@@ -3,6 +3,7 @@ package clipboard
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"image"
 	_ "image/gif"
@@ -33,6 +34,8 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wlcontext"
 	wlclient "github.com/AvengeMedia/DankMaterialShell/core/pkg/go-wayland/wayland/client"
 )
+
+var errEntryNotFound = errors.New("entry not found")
 
 // These mime types won't be stored in history
 var sensitiveMimeTypes = []string{
@@ -572,16 +575,16 @@ func (m *Manager) hasSensitiveMimeType(mimes []string) bool {
 func (m *Manager) selectMimeType(mimes []string) string {
 	preferredTypes := []string{
 		"text/uri-list",
-		"text/plain;charset=utf-8",
-		"text/plain",
-		"UTF8_STRING",
-		"STRING",
-		"TEXT",
 		"image/png",
 		"image/jpeg",
 		"image/gif",
 		"image/bmp",
 		"image/tiff",
+		"text/plain;charset=utf-8",
+		"text/plain",
+		"UTF8_STRING",
+		"STRING",
+		"TEXT",
 	}
 
 	for _, pref := range preferredTypes {
@@ -764,7 +767,23 @@ func stateEqual(a, b *State) bool {
 	if len(a.History) != len(b.History) {
 		return false
 	}
+	for i := range a.History {
+		if !entryStateEqual(a.History[i], b.History[i]) {
+			return false
+		}
+	}
 	return true
+}
+
+func entryStateEqual(a, b Entry) bool {
+	return a.ID == b.ID &&
+		a.Hash == b.Hash &&
+		a.Pinned == b.Pinned &&
+		a.IsImage == b.IsImage &&
+		a.MimeType == b.MimeType &&
+		a.Preview == b.Preview &&
+		a.Size == b.Size &&
+		a.Timestamp.Equal(b.Timestamp)
 }
 
 func (m *Manager) GetHistory() []Entry {
@@ -854,7 +873,7 @@ func (m *Manager) GetEntry(id uint64) (*Entry, error) {
 		return nil, err
 	}
 	if !found {
-		return nil, fmt.Errorf("entry not found")
+		return nil, errEntryNotFound
 	}
 
 	return &entry, nil
@@ -916,7 +935,7 @@ func (m *Manager) CreateHistoryEntryFromPinned(pinnedEntry *Entry) error {
 		Pinned:    false,
 	}
 
-	if err := m.storeEntryWithoutDedup(newEntry); err != nil {
+	if err := m.storeEntry(newEntry); err != nil {
 		return err
 	}
 
@@ -924,36 +943,6 @@ func (m *Manager) CreateHistoryEntryFromPinned(pinnedEntry *Entry) error {
 	m.notifySubscribers()
 
 	return nil
-}
-
-func (m *Manager) storeEntryWithoutDedup(entry Entry) error {
-	if m.db == nil {
-		return fmt.Errorf("database not available")
-	}
-
-	entry.Hash = computeHash(entry.Data)
-
-	return m.db.Update(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte("clipboard"))
-
-		id, err := b.NextSequence()
-		if err != nil {
-			return err
-		}
-
-		entry.ID = id
-
-		encoded, err := encodeEntry(entry)
-		if err != nil {
-			return err
-		}
-
-		if err := b.Put(itob(id), encoded); err != nil {
-			return err
-		}
-
-		return m.trimLengthInTx(b)
-	})
 }
 
 func (m *Manager) ClearHistory() {
@@ -1632,6 +1621,37 @@ func (m *Manager) UnpinEntry(id uint64) error {
 		entry, err := decodeEntry(v)
 		if err != nil {
 			return err
+		}
+
+		if entry.Pinned {
+			currentKey := itob(id)
+			var keepKey []byte
+			var deleteKeys [][]byte
+
+			c := b.Cursor()
+			for k, v := c.Last(); k != nil; k, v = c.Prev() {
+				if bytes.Equal(k, currentKey) || extractHash(v) != entry.Hash {
+					continue
+				}
+				duplicate, err := decodeEntryMeta(v)
+				if err == nil && !duplicate.Pinned {
+					key := append([]byte(nil), k...)
+					if keepKey == nil {
+						keepKey = key
+					} else {
+						deleteKeys = append(deleteKeys, key)
+					}
+				}
+			}
+
+			if keepKey != nil {
+				for _, key := range deleteKeys {
+					if err := b.Delete(key); err != nil {
+						return err
+					}
+				}
+				return b.Delete(currentKey)
+			}
 		}
 
 		entry.Pinned = false

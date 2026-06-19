@@ -22,7 +22,6 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/clipboard"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/cups"
 	serverDbus "github.com/AvengeMedia/DankMaterialShell/core/internal/server/dbus"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/dwl"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/evdev"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/freedesktop"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/location"
@@ -39,7 +38,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/pkg/syncmap"
 )
 
-const APIVersion = 24
+const APIVersion = 26
 
 var CLIVersion = "dev"
 
@@ -66,7 +65,6 @@ var bluezManager *bluez.Manager
 var appPickerManager *apppicker.Manager
 var cupsManager *cups.Manager
 var tailscaleManager *tailscale.Manager
-var dwlManager *dwl.Manager
 var brightnessManager *brightness.Manager
 var wlrOutputManager *wlroutput.Manager
 var evdevManager *evdev.Manager
@@ -252,30 +250,6 @@ func InitializeCupsManager() error {
 	return nil
 }
 
-func InitializeDwlManager() error {
-	log.Info("Attempting to initialize DWL IPC...")
-
-	if wlContext == nil {
-		ctx, err := wlcontext.New()
-		if err != nil {
-			log.Errorf("Failed to create shared Wayland context: %v", err)
-			return err
-		}
-		wlContext = ctx
-	}
-
-	manager, err := dwl.NewManager(wlContext.Display())
-	if err != nil {
-		log.Debug("Failed to initialize dwl manager: %v", err)
-		return err
-	}
-
-	dwlManager = manager
-
-	log.Info("DWL IPC initialized successfully")
-	return nil
-}
-
 func InitializeBrightnessManager() error {
 	manager, err := brightness.NewManager()
 	if err != nil {
@@ -418,6 +392,7 @@ func handleConnection(conn net.Conn) {
 	conn.Write(capsData)
 	conn.Write([]byte("\n"))
 	scanner := bufio.NewScanner(conn)
+	scanner.Buffer(make([]byte, bufio.MaxScanTokenSize), 64*1024*1024) // grow up to 64 MB for large clipboard payloads
 	for scanner.Scan() {
 		line := scanner.Bytes()
 
@@ -465,10 +440,6 @@ func getCapabilities() Capabilities {
 
 	if tailscaleManager != nil && tailscaleManager.IsAvailable() {
 		caps = append(caps, "tailscale")
-	}
-
-	if dwlManager != nil {
-		caps = append(caps, "dwl")
 	}
 
 	if brightnessManager != nil {
@@ -535,10 +506,6 @@ func getServerInfo() ServerInfo {
 
 	if tailscaleManager != nil && tailscaleManager.IsAvailable() {
 		caps = append(caps, "tailscale")
-	}
-
-	if dwlManager != nil {
-		caps = append(caps, "dwl")
 	}
 
 	if brightnessManager != nil {
@@ -1045,38 +1012,6 @@ func handleSubscribe(conn net.Conn, req models.Request) {
 		}()
 	}
 
-	if shouldSubscribe("dwl") && dwlManager != nil {
-		wg.Add(1)
-		dwlChan := dwlManager.Subscribe(clientID + "-dwl")
-		go func() {
-			defer wg.Done()
-			defer dwlManager.Unsubscribe(clientID + "-dwl")
-
-			initialState := dwlManager.GetState()
-			select {
-			case eventChan <- ServiceEvent{Service: "dwl", Data: initialState}:
-			case <-stopChan:
-				return
-			}
-
-			for {
-				select {
-				case state, ok := <-dwlChan:
-					if !ok {
-						return
-					}
-					select {
-					case eventChan <- ServiceEvent{Service: "dwl", Data: state}:
-					case <-stopChan:
-						return
-					}
-				case <-stopChan:
-					return
-				}
-			}
-		}()
-	}
-
 	if shouldSubscribe("brightness") && brightnessManager != nil {
 		wg.Add(2)
 		brightnessStateChan := brightnessManager.Subscribe(clientID + "-brightness-state")
@@ -1332,9 +1267,6 @@ func cleanupManagers() {
 	if cupsManager != nil {
 		cupsManager.Close()
 	}
-	if dwlManager != nil {
-		dwlManager.Close()
-	}
 	if brightnessManager != nil {
 		brightnessManager.Close()
 	}
@@ -1501,19 +1433,6 @@ func Start(printDocs bool) error {
 		log.Info(" cups.resumePrinter                    - Resume printer (params: printerName)")
 		log.Info(" cups.cancelJob                        - Cancel job (params: printerName, jobID)")
 		log.Info(" cups.purgeJobs                        - Cancel all jobs (params: printerName)")
-		log.Info("DWL:")
-		log.Info(" dwl.getState                          - Get current dwl state (tags, windows, layouts, keyboard)")
-		log.Info(" dwl.setTags                           - Set active tags (params: output, tagmask, toggleTagset)")
-		log.Info(" dwl.setClientTags                     - Set focused client tags (params: output, andTags, xorTags)")
-		log.Info(" dwl.setLayout                         - Set layout (params: output, index)")
-		log.Info(" dwl.subscribe                         - Subscribe to dwl state changes (streaming)")
-		log.Info("   Output state includes:")
-		log.Info("     - tags         : Tag states (active, clients, focused)")
-		log.Info("     - layoutSymbol : Current layout name")
-		log.Info("     - title        : Focused window title")
-		log.Info("     - appId        : Focused window app ID")
-		log.Info("     - kbLayout     : Current keyboard layout")
-		log.Info("     - keymode      : Current keybind mode")
 		log.Info("Brightness:")
 		log.Info(" brightness.getState                   - Get current brightness state for all devices")
 		log.Info(" brightness.setBrightness              - Set device brightness (params: device, percent)")
@@ -1688,10 +1607,6 @@ func Start(printDocs bool) error {
 
 	if err := InitializeAppPickerManager(); err != nil {
 		log.Debugf("AppPicker manager unavailable: %v", err)
-	}
-
-	if err := InitializeDwlManager(); err != nil {
-		log.Debugf("DWL manager unavailable: %v", err)
 	}
 
 	if err := InitializeWlrOutputManager(); err != nil {

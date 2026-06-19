@@ -124,6 +124,8 @@ Scope {
                 WlrLayershell.layer: WlrLayer.Overlay
                 WlrLayershell.exclusiveZone: -1
                 WlrLayershell.keyboardFocus: {
+                    if (PopoutManager.screenshotActive)
+                        return WlrKeyboardFocus.None;
                     if (!NiriService.inOverview)
                         return WlrKeyboardFocus.None;
                     if (!isActiveScreen)
@@ -338,45 +340,61 @@ Scope {
                         border.width: 1
                     }
 
-                    LauncherContent {
-                        id: launcherContent
+                    FocusScope {
                         anchors.fill: parent
-                        anchors.margins: 0
+                        focus: true
 
-                        property var fakeParentModal: QtObject {
-                            property bool spotlightOpen: spotlightContainer.visible
-                            property bool isClosing: niriOverviewScope.isClosing
-                            function hide() {
-                                if (niriOverviewScope.searchActive) {
-                                    niriOverviewScope.hideSpotlight();
-                                    return;
+                        Keys.onPressed: event => launcherContent.activeContextMenu?.handleKey(event)
+
+                        Keys.onEscapePressed: event => {
+                            launcherContent.activeContextMenu?.handleKey(event);
+                            if (!event.accepted)
+                                launcherContent.parentModal?.hide();
+                            event.accepted = true;
+                        }
+
+                        LauncherContent {
+                            id: launcherContent
+                            anchors.fill: parent
+                            anchors.margins: 0
+
+                            property var fakeParentModal: QtObject {
+                                property bool spotlightOpen: spotlightContainer.visible
+                                property bool isClosing: niriOverviewScope.isClosing
+                                property real alignedX: spotlightContainer.x
+                                property real alignedY: spotlightContainer.y
+                                function hide() {
+                                    if (niriOverviewScope.searchActive) {
+                                        niriOverviewScope.hideSpotlight();
+                                        return;
+                                    }
+                                    NiriService.toggleOverview();
                                 }
-                                NiriService.toggleOverview();
                             }
-                        }
 
-                        Connections {
-                            target: launcherContent.searchField
-                            function onTextChanged() {
-                                if (launcherContent.searchField.text.length > 0 || !niriOverviewScope.searchActive)
-                                    return;
-                                niriOverviewScope.hideSpotlight();
+                            Connections {
+                                target: launcherContent.searchField
+                                function onTextChanged() {
+                                    if (launcherContent.searchField.text.length > 0 || !niriOverviewScope.searchActive)
+                                        return;
+                                    niriOverviewScope.hideSpotlight();
+                                }
                             }
-                        }
 
-                        Component.onCompleted: {
-                            parentModal = fakeParentModal;
-                        }
-
-                        Connections {
-                            target: launcherContent.controller
-                            function onItemExecuted() {
-                                niriOverviewScope.releaseKeyboard = true;
+                            Component.onCompleted: {
+                                parentModal = fakeParentModal;
                             }
-                            function onModeChanged(mode) {
-                                if (launcherContent.controller.autoSwitchedToFiles)
-                                    return;
-                                SessionData.setNiriOverviewLastMode(mode);
+
+                            Connections {
+                                target: launcherContent.controller
+                                function onItemExecuted() {
+                                    niriOverviewScope.releaseKeyboard = true;
+                                }
+                                function onModeChanged(mode) {
+                                    if (launcherContent.controller.autoSwitchedToFiles)
+                                        return;
+                                    SessionData.setNiriOverviewLastMode(mode);
+                                }
                             }
                         }
                     }

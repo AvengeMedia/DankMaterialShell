@@ -32,6 +32,23 @@ Column {
     property string pluginHighlightedHtml: ""
     property string lastPluginContent: ""
     property int loadRequestId: 0
+    property bool ignoreNextExternalChange: false
+    property bool watcherReloadPending: false
+    property bool externalWatchPaused: false
+    property bool inPopout: false
+    property bool surfaceVisible: true
+    // Tab ids are Date.now() timestamps (~1.78e12) which overflow a 32-bit `int`,
+    // corrupting the value (e.g. -946062153) and breaking buffer keying. `var`
+    // holds the full JS-safe integer.
+    property var loadedTabId: -1
+    property bool applyingShared: false
+    property bool showPathInfo: false
+
+    function currentFilePath() {
+        if (!currentTab)
+            return "";
+        return currentTab.isTemporary ? (NotepadStorageService.baseDir + "/" + currentTab.filePath) : currentTab.filePath;
+    }
 
     signal saveRequested
     signal openRequested
@@ -40,6 +57,10 @@ Column {
     signal escapePressed
     signal contentChanged
     signal settingsRequested
+    signal popoutRequested
+    signal dockRequested
+    signal conflictDetected(string diskContent)
+    signal autoSaveRequested
 
     function hasUnsavedChanges() {
         if (!currentTab || !contentLoaded) {
@@ -52,6 +73,12 @@ Column {
         return textArea.text !== lastSavedContent;
     }
 
+    function commitLiveBuffer() {
+        if (loadedTabId < 0 || !contentLoaded)
+            return;
+        NotepadStorageService.setSessionBuffer(loadedTabId, textArea.text, lastSavedContent);
+    }
+
     function loadCurrentTabContent() {
         if (!currentTab)
             return;
@@ -62,8 +89,25 @@ Column {
             const activeTab = NotepadStorageService.tabs.length > NotepadStorageService.currentTabIndex ? NotepadStorageService.tabs[NotepadStorageService.currentTabIndex] : null;
             if (requestId !== loadRequestId || !activeTab || activeTab.id !== requestedTabId)
                 return;
+
+            const buffer = NotepadStorageService.getSessionBuffer(requestedTabId);
+            if (buffer !== undefined) {
+                applyingShared = true;
+                lastSavedContent = buffer.baseline;
+                textArea.text = buffer.content;
+                applyingShared = false;
+                loadedTabId = requestedTabId;
+                contentLoaded = true;
+                syncContentToPlugin();
+                applyDiskContent(content);
+                return;
+            }
+
+            applyingShared = true;
             lastSavedContent = content;
             textArea.text = content;
+            applyingShared = false;
+            loadedTabId = requestedTabId;
             contentLoaded = true;
             syncContentToPlugin();
         });
@@ -72,14 +116,56 @@ Column {
     function saveCurrentTabContent() {
         if (!currentTab || !contentLoaded)
             return;
+        if (!currentTab.isTemporary)
+            return;
         NotepadStorageService.saveTabContent(NotepadStorageService.currentTabIndex, textArea.text);
         lastSavedContent = textArea.text;
+        NotepadStorageService.clearSessionBuffer(loadedTabId);
     }
 
     function autoSaveToSession() {
+        commitLiveBuffer();
         if (!currentTab || !contentLoaded)
             return;
-        saveCurrentTabContent();
+        if (currentTab.isTemporary) {
+            saveCurrentTabContent();
+        } else if (SettingsData.notepadAutoSave) {
+            root.autoSaveRequested();
+        }
+    }
+
+    function syncFromDisk() {
+        if (!currentTab)
+            return;
+        loadCurrentTabContent();
+    }
+
+    function applyDiskContent(diskContent) {
+        if (diskContent === undefined || diskContent === null)
+            return;
+        if (diskContent === textArea.text) {
+            lastSavedContent = diskContent;
+            return;
+        }
+        if (diskContent === lastSavedContent) {
+            return;
+        }
+        if (textArea.text === lastSavedContent) {
+            reloadFromDisk(diskContent);
+        } else if (surfaceVisible) {
+            conflictDetected(diskContent);
+        }
+    }
+
+    function reloadFromDisk(diskContent) {
+        applyingShared = true;
+        contentLoaded = false;
+        textArea.text = diskContent;
+        lastSavedContent = diskContent;
+        contentLoaded = true;
+        applyingShared = false;
+        NotepadStorageService.clearSessionBuffer(loadedTabId);
+        syncContentToPlugin();
     }
 
     function setTextDocumentLineHeight() {
@@ -202,7 +288,8 @@ Column {
         if (!currentTab)
             return;
         const filePath = currentTab?.filePath || "";
-        const ext = filePath.split('.').pop().toLowerCase();
+        const baseName = filePath.split('/').pop();
+        const ext = baseName.includes('.') ? baseName.split('.').pop().toLowerCase() : "";
         const content = textArea.text;
 
         if (content === lastPluginContent && SettingsData.getBuiltInPluginSetting("dankNotepadModule", "previewActive", false) === inlinePreviewVisible) {
@@ -550,6 +637,7 @@ Column {
                         Connections {
                             target: NotepadStorageService
                             function onCurrentTabIndexChanged() {
+                                root.commitLiveBuffer();
                                 loadCurrentTabContent();
                                 Qt.callLater(() => {
                                     textArea.forceActiveFocus();
@@ -570,7 +658,9 @@ Column {
                         }
 
                         onTextChanged: {
-                            if (contentLoaded && text !== lastSavedContent) {
+                            // Debounced flush to the shared buffer (+ optional disk
+                            // autosave) for every loaded tab, not just scratch notes.
+                            if (contentLoaded && !applyingShared) {
                                 autoSaveTimer.restart();
                             }
                             root.contentChanged();
@@ -744,6 +834,7 @@ Column {
         spacing: Theme.spacingS
 
         Item {
+            id: buttonBarItem
             width: parent.width
             height: 32
 
@@ -820,17 +911,98 @@ Column {
                 }
             }
 
-            DankActionButton {
+            Row {
+                id: rightButtonRow
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
-                iconName: "more_horiz"
-                iconSize: Theme.iconSize - 2
-                iconColor: Theme.surfaceText
-                onClicked: root.settingsRequested()
+                spacing: Theme.spacingS
+
+                DankActionButton {
+                    visible: !root.inPopout
+                    iconName: "open_in_new"
+                    iconSize: Theme.iconSize - 2
+                    iconColor: Theme.surfaceText
+                    onClicked: root.popoutRequested()
+                }
+
+                DankActionButton {
+                    visible: root.inPopout
+                    iconName: "dock_to_right"
+                    iconSize: Theme.iconSize - 2
+                    iconColor: Theme.surfaceText
+                    onClicked: root.dockRequested()
+                }
+
+                DankActionButton {
+                    iconName: "more_horiz"
+                    iconSize: Theme.iconSize - 2
+                    iconColor: Theme.surfaceText
+                    onClicked: root.settingsRequested()
+                }
+            }
+
+            StyledRect {
+                id: pathInfoPopup
+                visible: root.showPathInfo
+                anchors.right: parent.right
+                anchors.bottom: parent.top
+                anchors.bottomMargin: Theme.spacingS
+                width: Math.min(root.width, 360)
+                height: pathInfoRow.implicitHeight + Theme.spacingS * 2
+                radius: Theme.cornerRadius
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+                border.color: Theme.outlineMedium
+                border.width: 1
+                z: 10
+
+                Row {
+                    id: pathInfoRow
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.leftMargin: Theme.spacingM
+                    anchors.rightMargin: Theme.spacingM
+                    spacing: Theme.spacingS
+
+                    DankIcon {
+                        name: currentTab && currentTab.isTemporary ? "draft" : "description"
+                        size: Theme.iconSize - 4
+                        color: Theme.surfaceVariantText
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    StyledText {
+                        width: pathInfoRow.width - (Theme.iconSize - 4) - copyPathButton.width - Theme.spacingS * 2
+                        text: root.currentFilePath()
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceText
+                        elide: Text.ElideMiddle
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    DankActionButton {
+                        id: copyPathButton
+                        iconName: "content_copy"
+                        iconSize: Theme.iconSize - 6
+                        iconColor: Theme.surfaceTextMedium
+                        anchors.verticalCenter: parent.verticalCenter
+                        onClicked: {
+                            const proc = clipboardCopyProcComp.createObject(root, {
+                                content: root.currentFilePath(),
+                                running: true
+                            });
+                            proc.exited.connect(() => {
+                                ToastService.showInfo(I18n.tr("Path copied to clipboard"));
+                                proc.destroy();
+                            });
+                        }
+                    }
+                }
             }
         }
 
         Row {
+            id: statusRow
             width: parent.width
             spacing: Theme.spacingL
 
@@ -853,35 +1025,46 @@ Column {
                 opacity: 1.0
             }
 
-            StyledText {
-                text: {
-                    if (autoSaveTimer.running) {
-                        return I18n.tr("Auto-saving...");
-                    }
+            Row {
+                visible: textArea.text.length > 0
+                spacing: Theme.spacingXS
 
-                    if (hasUnsavedChanges()) {
-                        if (currentTab && currentTab.isTemporary) {
-                            return I18n.tr("Unsaved note...");
-                        } else {
-                            return I18n.tr("Unsaved changes");
+                StyledText {
+                    anchors.verticalCenter: parent.verticalCenter
+                    readonly property bool savingToDisk: autoSaveTimer.running && currentTab && (currentTab.isTemporary || SettingsData.notepadAutoSave)
+                    text: {
+                        if (savingToDisk) {
+                            return I18n.tr("Saving...");
                         }
-                    } else {
-                        return I18n.tr("Saved");
-                    }
-                }
-                font.pixelSize: Theme.fontSizeSmall
-                color: {
-                    if (autoSaveTimer.running) {
-                        return Theme.primary;
-                    }
 
-                    if (hasUnsavedChanges()) {
-                        return Theme.warning;
-                    } else {
-                        return Theme.success;
+                        if (currentTab && currentTab.isTemporary) {
+                            return I18n.tr("Auto saved");
+                        }
+
+                        return hasUnsavedChanges() ? I18n.tr("Unsaved changes") : I18n.tr("Saved");
+                    }
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: {
+                        if (savingToDisk) {
+                            return Theme.primary;
+                        }
+
+                        if (currentTab && currentTab.isTemporary) {
+                            return Theme.success;
+                        }
+
+                        return hasUnsavedChanges() ? Theme.warning : Theme.success;
                     }
                 }
-                opacity: textArea.text.length > 0 ? 1.0 : 0.0
+
+                DankActionButton {
+                    anchors.verticalCenter: parent.verticalCenter
+                    iconName: "info"
+                    iconSize: Theme.iconSizeSmall
+                    iconColor: root.showPathInfo ? Theme.primary : Theme.surfaceTextMedium
+                    buttonSize: 20
+                    onClicked: root.showPathInfo = !root.showPathInfo
+                }
             }
         }
     }
@@ -902,11 +1085,63 @@ Column {
         onTriggered: syncContentToPlugin()
     }
 
+    FileView {
+        id: externalWatch
+        path: (!root.externalWatchPaused && currentTab && !currentTab.isTemporary && currentTab.filePath) ? currentTab.filePath : ""
+        blockLoading: true
+        preload: true
+        watchChanges: true
+
+        onFileChanged: {
+            root.watcherReloadPending = true;
+            reload();
+        }
+
+        onLoaded: {
+            if (root.ignoreNextExternalChange) {
+                root.ignoreNextExternalChange = false;
+                root.lastSavedContent = externalWatch.text();
+                root.watcherReloadPending = false;
+                return;
+            }
+            if (!root.watcherReloadPending)
+                return;
+            root.watcherReloadPending = false;
+            if (!root.contentLoaded || !root.currentTab || root.currentTab.isTemporary)
+                return;
+            if (!root.surfaceVisible)
+                return;
+            root.applyDiskContent(externalWatch.text());
+        }
+
+        onLoadFailed: error => {}
+    }
+
     Connections {
         target: SettingsData
         function onBuiltInPluginSettingsChanged() {
             if (PluginService.isPluginLoaded("dankNotepadModule")) {
                 pluginHighlightedHtml = SettingsData.getBuiltInPluginSetting("dankNotepadModule", "highlightedHtml", "");
+            }
+        }
+    }
+
+    Connections {
+        target: NotepadStorageService
+        function onSessionBufferRevisionChanged() {
+            if (applyingShared || !contentLoaded || loadedTabId < 0)
+                return;
+            if (textArea.activeFocus)
+                return;
+            var buffer = NotepadStorageService.getSessionBuffer(loadedTabId);
+            if (buffer === undefined || buffer.content === textArea.text)
+                return;
+            if (textArea.text === lastSavedContent) {
+                applyingShared = true;
+                lastSavedContent = buffer.baseline;
+                textArea.text = buffer.content;
+                applyingShared = false;
+                syncContentToPlugin();
             }
         }
     }

@@ -1,7 +1,6 @@
 pragma Singleton
 pragma ComponentBehavior: Bound
 
-import QtCore
 import QtQuick
 import Qt.labs.folderlistmodel
 import Quickshell
@@ -202,8 +201,51 @@ Singleton {
         }
     }
 
+    readonly property var pluginSurfaceKeys: ["widget", "desktop", "daemon", "launcher"]
+
+    function _stripDotSlash(p) {
+        return p.startsWith("./") ? p.slice(2) : p;
+    }
+
+    function _deriveLegacySurface(type, capabilities) {
+        if (type === "daemon")
+            return "daemon";
+        if (type === "launcher" || (capabilities && capabilities.includes("launcher")))
+            return "launcher";
+        if (type === "desktop")
+            return "desktop";
+        return "widget";
+    }
+
+    function _resolveComponentPaths(manifest, dir) {
+        const paths = {};
+        if (manifest.components && typeof manifest.components === "object") {
+            for (const surface in manifest.components) {
+                if (!pluginSurfaceKeys.includes(surface)) {
+                    log.warn("unknown plugin surface", surface, "in", dir);
+                    continue;
+                }
+                const rel = manifest.components[surface];
+                if (!rel)
+                    continue;
+                paths[surface] = dir + "/" + _stripDotSlash(rel);
+            }
+            return paths;
+        }
+        if (manifest.component) {
+            const surface = _deriveLegacySurface(manifest.type, manifest.capabilities);
+            paths[surface] = dir + "/" + _stripDotSlash(manifest.component);
+        }
+        return paths;
+    }
+
+    function pluginHasSurface(pluginId, surface) {
+        const plugin = availablePlugins[pluginId];
+        return !!(plugin && plugin.surfaces && plugin.surfaces.includes(surface));
+    }
+
     function _onManifestParsed(absPath, manifest, sourceTag, mtimeEpochMs) {
-        if (!manifest || !manifest.id || !manifest.name || !manifest.component) {
+        if (!manifest || !manifest.id || !manifest.name || (!manifest.component && !manifest.components)) {
             log.error("invalid manifest fields:", absPath);
             knownManifests[absPath] = {
                 mtime: mtimeEpochMs,
@@ -214,12 +256,21 @@ Singleton {
         }
 
         const dir = absPath.substring(0, absPath.lastIndexOf('/'));
-        let comp = manifest.component;
-        if (comp.startsWith("./"))
-            comp = comp.slice(2);
         let settings = manifest.settings;
         if (settings && settings.startsWith("./"))
             settings = settings.slice(2);
+
+        const componentPaths = _resolveComponentPaths(manifest, dir);
+        const surfaces = Object.keys(componentPaths);
+        if (surfaces.length === 0) {
+            log.error("no valid component surfaces in manifest:", absPath);
+            knownManifests[absPath] = {
+                mtime: mtimeEpochMs,
+                source: sourceTag,
+                bad: true
+            };
+            return;
+        }
 
         const info = {};
         for (const k in manifest)
@@ -236,10 +287,12 @@ Singleton {
 
         info.manifestPath = absPath;
         info.pluginDirectory = dir;
-        info.componentPath = dir + "/" + comp;
+        info.componentPaths = componentPaths;
+        info.surfaces = surfaces;
+        info.componentPath = componentPaths.widget || componentPaths[surfaces[0]];
         info.settingsPath = settings ? (dir + "/" + settings) : null;
         info.loaded = isPluginLoaded(manifest.id);
-        info.type = manifest.type || "widget";
+        info.type = manifest.type || (manifest.components ? "composite" : "widget");
         info.source = sourceTag;
         info.requires_dms = manifest.requires_dms || null;
 
@@ -260,7 +313,8 @@ Singleton {
             };
             _updateAvailablePluginsList();
             pluginListUpdated();
-            const enabled = info.type === "desktop" || SettingsData.getPluginSetting(manifest.id, "enabled", false);
+            const isPureDesktop = surfaces.length === 1 && surfaces[0] === "desktop";
+            const enabled = isPureDesktop || SettingsData.getPluginSetting(manifest.id, "enabled", false);
             if (enabled && !info.loaded)
                 loadPlugin(manifest.id);
         } else {
@@ -296,58 +350,69 @@ Singleton {
             return true;
         }
 
-        const isDaemon = plugin.type === "daemon";
-        const isLauncher = plugin.type === "launcher" || (plugin.capabilities && plugin.capabilities.includes("launcher"));
-        const isDesktop = plugin.type === "desktop";
+        const componentPaths = plugin.componentPaths || {};
+        const surfaces = Object.keys(componentPaths);
+        if (surfaces.length === 0) {
+            log.error("Plugin has no component surfaces:", pluginId);
+            pluginLoadFailed(pluginId, "No component surfaces");
+            return false;
+        }
 
-        const prevInstance = pluginInstances[pluginId];
+        const newWidgets = Object.assign({}, pluginWidgetComponents);
+        const newDesktop = Object.assign({}, pluginDesktopComponents);
+        const newDaemons = Object.assign({}, pluginDaemonComponents);
+        const newLaunchers = Object.assign({}, pluginLauncherComponents);
+        const newInstances = Object.assign({}, pluginInstances);
+
+        const prevInstance = newInstances[pluginId];
         if (prevInstance) {
             prevInstance.destroy();
-            const newInstances = Object.assign({}, pluginInstances);
             delete newInstances[pluginId];
-            pluginInstances = newInstances;
         }
 
         try {
-            let url = "file://" + plugin.componentPath;
-            if (bustCache)
-                url += "?t=" + Date.now();
-            const comp = Qt.createComponent(url, Component.PreferSynchronous);
-            if (comp.status === Component.Error) {
-                log.error("component error", pluginId, comp.errorString());
-                pluginLoadFailed(pluginId, comp.errorString());
-                return false;
-            }
-
-            if (isDaemon) {
-                const newDaemons = Object.assign({}, pluginDaemonComponents);
-                newDaemons[pluginId] = comp;
-                pluginDaemonComponents = newDaemons;
-            } else if (isLauncher) {
-                const instance = comp.createObject(root, {
-                    "pluginService": root
-                });
-                if (!instance) {
-                    log.error("failed to instantiate plugin:", pluginId, comp.errorString());
+            for (const surface of surfaces) {
+                let url = "file://" + componentPaths[surface];
+                if (bustCache)
+                    url += "?t=" + Date.now();
+                const comp = Qt.createComponent(url, Component.PreferSynchronous);
+                if (comp.status === Component.Error) {
+                    log.error("component error", pluginId, surface, comp.errorString());
                     pluginLoadFailed(pluginId, comp.errorString());
                     return false;
                 }
-                const newInstances = Object.assign({}, pluginInstances);
-                newInstances[pluginId] = instance;
-                pluginInstances = newInstances;
 
-                const newLaunchers = Object.assign({}, pluginLauncherComponents);
-                newLaunchers[pluginId] = comp;
-                pluginLauncherComponents = newLaunchers;
-            } else if (isDesktop) {
-                const newDesktop = Object.assign({}, pluginDesktopComponents);
-                newDesktop[pluginId] = comp;
-                pluginDesktopComponents = newDesktop;
-            } else {
-                const newComponents = Object.assign({}, pluginWidgetComponents);
-                newComponents[pluginId] = comp;
-                pluginWidgetComponents = newComponents;
+                switch (surface) {
+                case "daemon":
+                    newDaemons[pluginId] = comp;
+                    break;
+                case "desktop":
+                    newDesktop[pluginId] = comp;
+                    break;
+                case "launcher": {
+                    const instance = comp.createObject(root, {
+                        "pluginService": root
+                    });
+                    if (!instance) {
+                        log.error("failed to instantiate launcher surface:", pluginId, comp.errorString());
+                        pluginLoadFailed(pluginId, comp.errorString());
+                        return false;
+                    }
+                    newInstances[pluginId] = instance;
+                    newLaunchers[pluginId] = comp;
+                    break;
+                }
+                default:
+                    newWidgets[pluginId] = comp;
+                    break;
+                }
             }
+
+            pluginWidgetComponents = newWidgets;
+            pluginDesktopComponents = newDesktop;
+            pluginDaemonComponents = newDaemons;
+            pluginLauncherComponents = newLaunchers;
+            pluginInstances = newInstances;
 
             plugin.loaded = true;
             const newLoaded = Object.assign({}, loadedPlugins);
@@ -371,10 +436,6 @@ Singleton {
         }
 
         try {
-            const isDaemon = plugin.type === "daemon";
-            const isLauncher = plugin.type === "launcher" || (plugin.capabilities && plugin.capabilities.includes("launcher"));
-            const isDesktop = plugin.type === "desktop";
-
             const instance = pluginInstances[pluginId];
             if (instance) {
                 instance.destroy();
@@ -383,19 +444,22 @@ Singleton {
                 pluginInstances = newInstances;
             }
 
-            if (isDaemon && pluginDaemonComponents[pluginId]) {
+            if (pluginDaemonComponents[pluginId]) {
                 const newDaemons = Object.assign({}, pluginDaemonComponents);
                 delete newDaemons[pluginId];
                 pluginDaemonComponents = newDaemons;
-            } else if (isLauncher && pluginLauncherComponents[pluginId]) {
+            }
+            if (pluginLauncherComponents[pluginId]) {
                 const newLaunchers = Object.assign({}, pluginLauncherComponents);
                 delete newLaunchers[pluginId];
                 pluginLauncherComponents = newLaunchers;
-            } else if (isDesktop && pluginDesktopComponents[pluginId]) {
+            }
+            if (pluginDesktopComponents[pluginId]) {
                 const newDesktop = Object.assign({}, pluginDesktopComponents);
                 delete newDesktop[pluginId];
                 pluginDesktopComponents = newDesktop;
-            } else if (pluginWidgetComponents[pluginId]) {
+            }
+            if (pluginWidgetComponents[pluginId]) {
                 const newComponents = Object.assign({}, pluginWidgetComponents);
                 delete newComponents[pluginId];
                 pluginWidgetComponents = newComponents;
@@ -452,7 +516,8 @@ Singleton {
         const result = [];
         for (const pluginId in availablePlugins) {
             const plugin = availablePlugins[pluginId];
-            if (plugin.type !== "widget") {
+            const hasWidgetSurface = plugin.surfaces ? plugin.surfaces.includes("widget") : (plugin.type === "widget");
+            if (!hasWidgetSurface) {
                 continue;
             }
             const variants = getPluginVariants(pluginId);
@@ -900,5 +965,68 @@ Singleton {
             }
         }
         return result;
+    }
+
+    readonly property string _ipcIdPattern: "^[a-zA-Z0-9_\\-:]{1,64}$";
+
+    IpcHandler {
+        target: "plugin-scan"
+
+        function scan(): string {
+            root.scanPlugins();
+            return `SCAN_TRIGGERED: ${Object.keys(root.availablePlugins).length} known before debounce`;
+        }
+
+        function rescan(pluginId: string): string {
+            if (!pluginId)
+                return "ERROR: rescan requires a pluginId";
+            if (!new RegExp(root._ipcIdPattern).test(pluginId))
+                return `ERROR: invalid pluginId '${pluginId}' (allowed: [a-zA-Z0-9_\\-:]{1,64})`;
+            if (!(pluginId in root.availablePlugins))
+                return `ERROR: unknown pluginId '${pluginId}' (try 'list' first)`;
+            root.forceRescanPlugin(pluginId);
+            return `RESCAN_TRIGGERED: ${pluginId}`;
+        }
+
+        function reload(pluginId: string): string {
+            if (!pluginId)
+                return "ERROR: reload requires a pluginId";
+            if (!new RegExp(root._ipcIdPattern).test(pluginId))
+                return `ERROR: invalid pluginId '${pluginId}' (allowed: [a-zA-Z0-9_\\-:]{1,64})`;
+            if (!(pluginId in root.availablePlugins))
+                return `ERROR: unknown pluginId '${pluginId}'`;
+            root.reloadPlugin(pluginId);
+            return `RELOAD_TRIGGERED: ${pluginId}`;
+        }
+
+        function list(): string {
+            const ids = Object.keys(root.availablePlugins);
+            const cap = 256;
+            const n = Math.min(ids.length, cap);
+            const lines = [];
+            for (let i = 0; i < n; i++) {
+                const id = ids[i];
+                if (!new RegExp(root._ipcIdPattern).test(id))
+                    continue;
+                const p = root.availablePlugins[id];
+                const safeName = String(p.name || "").replace(/[\t\n\r]/g, " ");
+                lines.push(`${id}\t${p.loaded ? "loaded" : "unloaded"}\t${p.type || "unknown"}\t${safeName}`);
+            }
+            const header = `# count=${ids.length} returned=${n}${ids.length > n ? " (truncated, see cap)" : ""}`;
+            return header + "\n" + lines.join("\n");
+        }
+
+        function status(pluginId: string): string {
+            if (!pluginId)
+                return "ERROR: status requires a pluginId";
+            if (!new RegExp(root._ipcIdPattern).test(pluginId))
+                return `ERROR: invalid pluginId '${pluginId}'`;
+            const plugin = root.availablePlugins[pluginId];
+            if (!plugin)
+                return `ERROR: unknown pluginId '${pluginId}'`;
+            const err = root.pluginLoadErrors[pluginId] || "";
+            const safeErr = String(err).replace(/[\t\n\r]/g, " ");
+            return `${plugin.loaded ? "loaded" : "unloaded"}\t${plugin.type || ""}\t${safeErr}`;
+        }
     }
 }

@@ -18,6 +18,9 @@ Item {
     property bool showHourly: false
     property bool available: WeatherService.weather.available
 
+    Component.onCompleted: WeatherService.addRef()
+    Component.onDestruction: WeatherService.removeRef()
+
     function syncFrom(type) {
         if (!dailyLoader.item || !hourlyLoader.item)
             return;

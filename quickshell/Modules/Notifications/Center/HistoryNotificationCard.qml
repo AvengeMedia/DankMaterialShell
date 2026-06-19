@@ -31,7 +31,7 @@ Rectangle {
     height: baseCardHeight + contentItem.extraHeight
     radius: Theme.cornerRadius
     clip: false
-    readonly property bool shadowsAllowed: Theme.elevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1" && !BlurService.enabled
+    readonly property bool shadowsAllowed: Theme.elevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
 
     ElevationShadow {
         id: shadowLayer
@@ -99,8 +99,9 @@ Rectangle {
         id: contentItem
 
         readonly property real expandedTextHeight: descriptionText.contentHeight
-        readonly property real twoLineHeight: descriptionText.font.pixelSize * 1.2 * 2
-        readonly property real extraHeight: (descriptionExpanded && expandedTextHeight > twoLineHeight + 2) ? (expandedTextHeight - twoLineHeight) : 0
+        readonly property real collapsedLineCount: compactMode ? 1 : 2
+        readonly property real collapsedLineHeight: descriptionText.font.pixelSize * 1.2 * collapsedLineCount
+        readonly property real extraHeight: (descriptionExpanded && expandedTextHeight > collapsedLineHeight + 2) ? (expandedTextHeight - collapsedLineHeight) : 0
 
         anchors.top: parent.top
         anchors.left: parent.left
@@ -182,26 +183,30 @@ Rectangle {
                 Row {
                     width: parent.width
                     spacing: Theme.spacingXS
-                    readonly property real reservedTrailingWidth: historySeparator.implicitWidth + Math.max(historyTimeText.implicitWidth, 72) + spacing
 
-                    StyledText {
-                        id: historyTitleText
-                        width: Math.min(implicitWidth, Math.max(0, parent.width - parent.reservedTrailingWidth))
-                        text: {
-                            let title = historyItem.summary || "";
-                            const appName = historyItem.appName || "";
-                            const prefix = appName + " • ";
-                            if (appName && title.toLowerCase().startsWith(prefix.toLowerCase())) {
-                                title = title.substring(prefix.length);
+                    Item {
+                        width: Math.max(0, parent.width - historySeparator.implicitWidth - Math.max(historyTimeText.implicitWidth, 72) - parent.spacing * 2)
+                        height: historyTitleText.implicitHeight
+                        visible: historyTitleText.text.length > 0
+
+                        StyledText {
+                            id: historyTitleText
+                            anchors.fill: parent
+                            text: {
+                                let title = historyItem.summary || "";
+                                const appName = historyItem.appName || "";
+                                const prefix = appName + " • ";
+                                if (appName && title.toLowerCase().startsWith(prefix.toLowerCase())) {
+                                    title = title.substring(prefix.length);
+                                }
+                                return title;
                             }
-                            return title;
+                            color: Theme.surfaceText
+                            font.pixelSize: Theme.fontSizeMedium
+                            font.weight: Font.Medium
+                            elide: Text.ElideRight
+                            maximumLineCount: 1
                         }
-                        color: Theme.surfaceText
-                        font.pixelSize: Theme.fontSizeMedium
-                        font.weight: Font.Medium
-                        elide: Text.ElideRight
-                        maximumLineCount: 1
-                        visible: text.length > 0
                     }
                     StyledText {
                         id: historySeparator
@@ -225,6 +230,7 @@ Rectangle {
                     property bool hasMoreText: truncated
 
                     text: historyItem.htmlBody || historyItem.body || ""
+                    textFormat: Text.StyledText
                     color: Theme.surfaceVariantText
                     font.pixelSize: Theme.fontSizeSmall
                     width: parent.width

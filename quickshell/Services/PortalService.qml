@@ -239,11 +239,23 @@ Singleton {
         });
     }
 
+    property string pendingGreeterProfileUser: ""
+
     function getGreeterUserProfileImage(username) {
         if (!username) {
             profileImage = "";
+            pendingGreeterProfileUser = "";
             return;
         }
+        if (typeof GreeterUsersService !== "undefined") {
+            const cachedPath = GreeterUsersService.profileImagePath(username);
+            if (cachedPath) {
+                profileImage = cachedPath;
+                pendingGreeterProfileUser = "";
+                return;
+            }
+        }
+        pendingGreeterProfileUser = username;
         userProfileCheckProcess.command = ["bash", "-c", `uid=$(id -u ${username} 2>/dev/null) && [ -n "$uid" ] && dbus-send --system --print-reply --dest=org.freedesktop.Accounts /org/freedesktop/Accounts/User$uid org.freedesktop.DBus.Properties.Get string:org.freedesktop.Accounts.User string:IconFile 2>/dev/null | grep -oP 'string "\\K[^"]+' || echo ""`];
         userProfileCheckProcess.running = true;
     }
@@ -261,12 +273,14 @@ Singleton {
                 } else {
                     root.profileImage = "";
                 }
+                root.pendingGreeterProfileUser = "";
             }
         }
 
         onExited: exitCode => {
-            if (exitCode !== 0) {
+            if (exitCode !== 0 && root.pendingGreeterProfileUser !== "") {
                 root.profileImage = "";
+                root.pendingGreeterProfileUser = "";
             }
         }
     }

@@ -279,7 +279,7 @@ Singleton {
     }
 
     // High-level apply matching the generateOutputsConfig() pattern used by
-    // NiriService, HyprlandService and DwlService.  Instead of writing a
+    // NiriService, HyprlandService and MangoService.  Instead of writing a
     // config file, the changes are applied directly via the
     // wlr-output-management protocol.
     function applyOutputsConfig(outputsData, connectedOutputs) {
@@ -343,6 +343,15 @@ Singleton {
             return 7;
         default:
             return 0;
+        }
+    }
+
+    Connections {
+        target: SessionService
+
+        function onSessionResumed() {
+            log.info("Session resumed, re-requesting output state, current outputs:", outputs.length);
+            requestState();
         }
     }
 }

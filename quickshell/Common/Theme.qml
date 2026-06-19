@@ -450,7 +450,9 @@ Singleton {
                 "primaryText": getMatugenColor("on_primary", "#ffffff"),
                 "primaryContainer": getMatugenColor("primary_container", "#1976d2"),
                 "secondary": getMatugenColor("secondary", "#8ab4f8"),
+                "secondaryContainer": getMatugenColor("secondary_container", getMatugenColor("surface_container_high", "#292b2f")),
                 "tertiary": getMatugenColor("tertiary", "#efb8c8"),
+                "tertiaryContainer": getMatugenColor("tertiary_container", getMatugenColor("surface_container_high", "#292b2f")),
                 "surface": getMatugenColor("surface", "#1a1c1e"),
                 "surfaceText": getMatugenColor("on_background", "#e3e8ef"),
                 "surfaceVariant": getMatugenColor("surface_variant", "#44464f"),
@@ -521,7 +523,6 @@ Singleton {
 
     property color primary: currentThemeData.primary
     property color primaryText: currentThemeData.primaryText
-    property color primaryContainer: currentThemeData.primaryContainer
     property color secondary: currentThemeData.secondary
     property color tertiary: currentThemeData.tertiary || currentThemeData.secondary
     property color surface: currentThemeData.surface
@@ -536,6 +537,9 @@ Singleton {
     property color surfaceContainer: currentThemeData.surfaceContainer
     property color surfaceContainerHigh: currentThemeData.surfaceContainerHigh
     property color surfaceContainerHighest: currentThemeData.surfaceContainerHighest || surfaceContainerHigh
+    property color primaryContainer: currentThemeData.primaryContainer || blend(surfaceContainerHigh, primary, 0.45)
+    property color secondaryContainer: currentThemeData.secondaryContainer || blend(surfaceContainerHigh, secondary, 0.35)
+    property color tertiaryContainer: currentThemeData.tertiaryContainer || blend(surfaceContainerHigh, tertiary, 0.35)
 
     property color onSurface: surfaceText
     property color onSurfaceVariant: surfaceVariantText
@@ -577,6 +581,45 @@ Singleton {
     readonly property int layerOutlineWidth: BlurService.enabled && layerOutlineOpacity > 0 ? 1 : 0
     property color surfaceTextHover: Qt.rgba(surfaceText.r, surfaceText.g, surfaceText.b, 0.08)
     property color surfaceTextAlpha: Qt.rgba(surfaceText.r, surfaceText.g, surfaceText.b, 0.3)
+
+    function roleColor(mode) {
+        switch (mode) {
+        case "primary":
+        case "pri":
+            return primary;
+        case "primaryContainer":
+            return primaryContainer;
+        case "secondary":
+        case "sec":
+            return secondary;
+        case "secondaryContainer":
+            return secondaryContainer;
+        case "tertiary":
+        case "ter":
+            return tertiary;
+        case "tertiaryContainer":
+            return tertiaryContainer;
+        case "surfaceText":
+            return surfaceText;
+        case "surfaceVariant":
+            return surfaceVariant;
+        case "s":
+            return surface;
+        case "sc":
+            return surfaceContainer;
+        case "sch":
+            return surfaceContainerHigh;
+        case "schh":
+            return surfaceContainerHighest;
+        case "sth":
+            return surfaceTextHover;
+        case "error":
+        case "err":
+            return error;
+        default:
+            return "transparent";
+        }
+    }
     property color surfaceTextLight: Qt.rgba(surfaceText.r, surfaceText.g, surfaceText.b, 0.06)
     property color surfaceTextMedium: Qt.rgba(surfaceText.r, surfaceText.g, surfaceText.b, 0.7)
 
@@ -911,6 +954,16 @@ Singleton {
         }
         return Qt.rgba(r, g, b, alpha);
     }
+    function elevationAmbient(level) {
+        const blur = (level && level.blurPx !== undefined) ? Math.max(0, level.blurPx) : 0;
+        const alpha = ((level && level.alpha !== undefined) ? level.alpha : 0.3) * 0.5;
+        return {
+            blurPx: blur * 1.75,
+            spreadPx: 1,
+            alpha: alpha
+        };
+    }
+
     function elevationTintOpacity(level) {
         if (!level)
             return 0;
@@ -970,6 +1023,7 @@ Singleton {
 
     readonly property int shorterDuration: (typeof SettingsData !== "undefined" && SettingsData.animationSpeed === SettingsData.AnimationSpeed.Custom) ? SettingsData.customAnimationDuration : currentDurations.shorter
     readonly property int shortDuration: (typeof SettingsData !== "undefined" && SettingsData.animationSpeed === SettingsData.AnimationSpeed.Custom) ? SettingsData.customAnimationDuration : currentDurations.short
+    readonly property bool snapListModelChanges: shortDuration <= 0
     readonly property int mediumDuration: (typeof SettingsData !== "undefined" && SettingsData.animationSpeed === SettingsData.AnimationSpeed.Custom) ? SettingsData.customAnimationDuration : currentDurations.medium
     readonly property int longDuration: (typeof SettingsData !== "undefined" && SettingsData.animationSpeed === SettingsData.AnimationSpeed.Custom) ? SettingsData.customAnimationDuration : currentDurations.long
     readonly property int extraLongDuration: (typeof SettingsData !== "undefined" && SettingsData.animationSpeed === SettingsData.AnimationSpeed.Custom) ? SettingsData.customAnimationDuration : currentDurations.extraLong
@@ -1419,8 +1473,21 @@ Singleton {
 
     property bool widgetBackgroundHasAlpha: {
         const colorMode = typeof SettingsData !== "undefined" ? SettingsData.widgetBackgroundColor : "sch";
-        return colorMode === "sth";
+        return colorMode === "sth" || colorMode === "custom";
     }
+
+    function safeColor(value, fallback) {
+        try {
+            if (value === undefined || value === null || value === "")
+                return fallback;
+            return Qt.color(value);
+        } catch (e) {
+            return fallback;
+        }
+    }
+
+    readonly property color widgetBackgroundCustomBaseColor: safeColor(typeof SettingsData !== "undefined" ? SettingsData.widgetBackgroundCustomColor : "#6750A4", primaryContainer)
+    readonly property real widgetBackgroundCustomStrength: Math.max(0, Math.min(1, typeof SettingsData !== "undefined" ? (SettingsData.widgetBackgroundCustomStrength ?? 0.4) : 0.4))
 
     property var widgetBaseBackgroundColor: {
         const colorMode = typeof SettingsData !== "undefined" ? SettingsData.widgetBackgroundColor : "sch";
@@ -1431,6 +1498,14 @@ Singleton {
             return surfaceContainer;
         case "sch":
             return surfaceContainerHigh;
+        case "primaryContainer":
+            return primaryContainer;
+        case "secondaryContainer":
+            return secondaryContainer;
+        case "tertiaryContainer":
+            return tertiaryContainer;
+        case "custom":
+            return blend(surfaceContainerHigh, widgetBackgroundCustomBaseColor, widgetBackgroundCustomStrength);
         case "sth":
         default:
             return surfaceTextHover;
@@ -2079,12 +2154,29 @@ Singleton {
         }
     }
 
+    readonly property string _greeterCacheDir: Quickshell.env("DMS_GREET_CFG_DIR") || "/var/cache/dms-greeter"
+
+    property string greeterColorsBaseDir: root._greeterCacheDir
+
+    function setGreeterColorsBaseDir(dir) {
+        const next = dir || root._greeterCacheDir;
+        if (greeterColorsBaseDir === next)
+            return;
+        greeterColorsBaseDir = next;
+        if (typeof SessionData !== "undefined" && SessionData.isGreeterMode)
+            dynamicColorsFileView.reload();
+    }
+
+    function resetGreeterColorsBaseDir() {
+        setGreeterColorsBaseDir(root._greeterCacheDir);
+    }
+
     FileView {
         id: dynamicColorsFileView
         path: {
-            const greetCfgDir = Quickshell.env("DMS_GREET_CFG_DIR") || "/var/cache/dms-greeter";
-            const colorsPath = SessionData.isGreeterMode ? greetCfgDir + "/colors.json" : stateDir + "/dms-colors.json";
-            return colorsPath;
+            if (SessionData.isGreeterMode)
+                return root.greeterColorsBaseDir ? (root.greeterColorsBaseDir + "/colors.json") : "";
+            return stateDir + "/dms-colors.json";
         }
         blockLoading: false
         watchChanges: !SessionData.isGreeterMode

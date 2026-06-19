@@ -12,7 +12,7 @@ func (b *SystemdNetworkdBackend) GetWiredConnections() ([]WiredConnection, error
 
 	var conns []WiredConnection
 	for name, link := range b.links {
-		if b.isVirtualInterface(name) || strings.HasPrefix(name, "wlan") || strings.HasPrefix(name, "wlp") {
+		if !link.isWired() {
 			continue
 		}
 
@@ -73,8 +73,8 @@ func (b *SystemdNetworkdBackend) GetWiredNetworkDetails(id string) (*WiredNetwor
 func (b *SystemdNetworkdBackend) ConnectEthernet() error {
 	b.linksMutex.RLock()
 	var primaryWired *linkInfo
-	for name, l := range b.links {
-		if strings.HasPrefix(name, "lo") || strings.HasPrefix(name, "wlan") || strings.HasPrefix(name, "wlp") {
+	for _, l := range b.links {
+		if !l.isWired() {
 			continue
 		}
 		primaryWired = l

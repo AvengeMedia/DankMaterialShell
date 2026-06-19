@@ -199,8 +199,21 @@ func (m Model) viewInstallComplete() string {
 		b.WriteString("\n")
 	}
 
+	wm := m.selectedWindowManager()
+
+	// mango launches DMS via `exec-once=dms run` (not a systemd session target)
+	loginHint := "If you do not have a greeter, login with \"niri-session\" or \"Hyprland\""
+	switch wm {
+	case deps.WindowManagerNiri:
+		loginHint = "If you do not have a greeter, login with \"niri-session\""
+	case deps.WindowManagerHyprland:
+		loginHint = "If you do not have a greeter, login with \"Hyprland\""
+	case deps.WindowManagerMango:
+		loginHint = "If you do not have a greeter, login with \"mango\""
+	}
+
 	b.WriteString("\n")
-	info := m.styles.Normal.Render("Your system is ready! Log out and log back in to start using\nyour new desktop environment.\nIf you do not have a greeter, login with \"niri-session\" or \"Hyprland\"")
+	info := m.styles.Normal.Render("Your system is ready! Log out and log back in to start using\nyour new desktop environment.\n" + loginHint)
 	b.WriteString(info)
 	b.WriteString("\n\n")
 
@@ -209,8 +222,13 @@ func (m Model) viewInstallComplete() string {
 	labelStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(theme.Subtle))
 
 	b.WriteString(labelStyle.Render("Troubleshooting:") + "\n")
-	b.WriteString(labelStyle.Render("  Disable autostart: ") + cmdStyle.Render("systemctl --user disable dms") + "\n")
-	b.WriteString(labelStyle.Render("  View logs:         ") + cmdStyle.Render("journalctl --user -u dms") + "\n")
+	if wm == deps.WindowManagerMango {
+		b.WriteString(labelStyle.Render("  Disable autostart: ") + cmdStyle.Render("remove 'exec-once=dms run' from ~/.config/mango/config.conf") + "\n")
+		b.WriteString(labelStyle.Render("  View logs:         ") + cmdStyle.Render("qs -p ~/.config/quickshell/dms log") + "\n")
+	} else {
+		b.WriteString(labelStyle.Render("  Disable autostart: ") + cmdStyle.Render("systemctl --user disable dms") + "\n")
+		b.WriteString(labelStyle.Render("  View logs:         ") + cmdStyle.Render("journalctl --user -u dms") + "\n")
+	}
 
 	if m.osInfo != nil {
 		if cmd := uninstallCommand(m.osInfo.Distribution.ID, m.dependencies); cmd != "" {

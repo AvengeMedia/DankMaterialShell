@@ -1,16 +1,52 @@
 package clipboard
 
 import (
+	"bytes"
+	"encoding/json"
+	"net"
+	"path/filepath"
 	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
+	bolt "go.etcd.io/bbolt"
 
 	mocks_wlcontext "github.com/AvengeMedia/DankMaterialShell/core/internal/mocks/wlcontext"
 )
+
+type clipboardTestConn struct {
+	net.Conn
+	writeBuf *bytes.Buffer
+}
+
+func newClipboardTestConn() *clipboardTestConn {
+	return &clipboardTestConn{writeBuf: &bytes.Buffer{}}
+}
+
+func (c *clipboardTestConn) Write(b []byte) (int, error) {
+	return c.writeBuf.Write(b)
+}
+
+func newTestManagerWithDB(t *testing.T) *Manager {
+	t.Helper()
+
+	db, err := openDB(filepath.Join(t.TempDir(), "clipboard.db"))
+	require.NoError(t, err)
+
+	t.Cleanup(func() {
+		db.Close()
+	})
+
+	return &Manager{
+		config: DefaultConfig(),
+		db:     db,
+	}
+}
 
 func TestEncodeDecodeEntry_Roundtrip(t *testing.T) {
 	original := Entry{
@@ -131,9 +167,215 @@ func TestStateEqual_HistoryLengthDiffers(t *testing.T) {
 }
 
 func TestStateEqual_BothEqual(t *testing.T) {
-	a := &State{Enabled: true, History: []Entry{{ID: 1}, {ID: 2}}}
-	b := &State{Enabled: true, History: []Entry{{ID: 3}, {ID: 4}}}
+	ts := time.Now().Truncate(time.Second)
+	entry := Entry{
+		ID:        1,
+		Hash:      100,
+		MimeType:  "image/png",
+		Preview:   "[[ image 1 KiB png 32x32 ]]",
+		Size:      1024,
+		Timestamp: ts,
+		IsImage:   true,
+		Pinned:    true,
+	}
+	a := &State{Enabled: true, History: []Entry{entry}}
+	b := &State{Enabled: true, History: []Entry{entry}}
 	assert.True(t, stateEqual(a, b))
+}
+
+func TestStateEqual_SameLengthDifferentIDs(t *testing.T) {
+	ts := time.Now().Truncate(time.Second)
+	a := &State{Enabled: true, History: []Entry{{ID: 1, Hash: 100, Timestamp: ts}}}
+	b := &State{Enabled: true, History: []Entry{{ID: 2, Hash: 100, Timestamp: ts}}}
+
+	assert.False(t, stateEqual(a, b))
+}
+
+func TestStateEqual_MetadataDiffers(t *testing.T) {
+	ts := time.Now().Truncate(time.Second)
+	base := Entry{
+		ID:        1,
+		Hash:      100,
+		MimeType:  "image/png",
+		Preview:   "[[ image 1 KiB png 32x32 ]]",
+		Size:      1024,
+		Timestamp: ts,
+		IsImage:   true,
+		Pinned:    false,
+	}
+
+	tests := []struct {
+		name   string
+		mutate func(*Entry)
+	}{
+		{name: "hash", mutate: func(e *Entry) { e.Hash = 101 }},
+		{name: "pinned", mutate: func(e *Entry) { e.Pinned = true }},
+		{name: "is image", mutate: func(e *Entry) { e.IsImage = false }},
+		{name: "mime type", mutate: func(e *Entry) { e.MimeType = "image/jpeg" }},
+		{name: "preview", mutate: func(e *Entry) { e.Preview = "[[ image 2 KiB jpeg 64x64 ]]" }},
+		{name: "size", mutate: func(e *Entry) { e.Size = 2048 }},
+		{name: "timestamp", mutate: func(e *Entry) { e.Timestamp = ts.Add(time.Second) }},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			changed := base
+			tt.mutate(&changed)
+
+			a := &State{Enabled: true, History: []Entry{base}}
+			b := &State{Enabled: true, History: []Entry{changed}}
+
+			assert.False(t, stateEqual(a, b))
+		})
+	}
+}
+
+func TestHandleGetEntry_ReturnsExistingEntry(t *testing.T) {
+	m := newTestManagerWithDB(t)
+	err := m.storeEntry(Entry{
+		Data:      []byte("hello world"),
+		MimeType:  "text/plain;charset=utf-8",
+		Preview:   "hello world",
+		Size:      len("hello world"),
+		Timestamp: time.Now().Truncate(time.Second),
+		IsImage:   false,
+	})
+	require.NoError(t, err)
+
+	history := m.GetHistory()
+	require.Len(t, history, 1)
+
+	conn := newClipboardTestConn()
+	handleGetEntry(conn, models.Request{
+		ID:     1,
+		Params: map[string]any{"id": float64(history[0].ID)},
+	}, m)
+
+	var resp models.Response[Entry]
+	require.NoError(t, json.NewDecoder(conn.writeBuf).Decode(&resp))
+	assert.Empty(t, resp.Error)
+	require.NotNil(t, resp.Result)
+	assert.Equal(t, history[0].ID, resp.Result.ID)
+	assert.Equal(t, []byte("hello world"), resp.Result.Data)
+}
+
+func TestHandleGetEntry_MissingIDReturnsNullResult(t *testing.T) {
+	m := newTestManagerWithDB(t)
+	conn := newClipboardTestConn()
+
+	handleGetEntry(conn, models.Request{
+		ID:     1,
+		Params: map[string]any{"id": float64(999)},
+	}, m)
+
+	var resp models.Response[any]
+	require.NoError(t, json.NewDecoder(conn.writeBuf).Decode(&resp))
+	assert.Empty(t, resp.Error)
+	assert.Nil(t, resp.Result)
+}
+
+func TestUnpinEntry_KeepsTopUnpinnedDuplicate(t *testing.T) {
+	m := newTestManagerWithDB(t)
+
+	require.NoError(t, m.storeEntry(Entry{
+		Data:      []byte("saved content"),
+		MimeType:  "text/plain;charset=utf-8",
+		Preview:   "saved content",
+		Size:      len("saved content"),
+		Timestamp: time.Now().Add(-time.Minute).Truncate(time.Second),
+		IsImage:   false,
+	}))
+
+	history := m.GetHistory()
+	require.Len(t, history, 1)
+	pinnedID := history[0].ID
+	require.NoError(t, m.PinEntry(pinnedID))
+
+	pinnedEntry, err := m.GetEntry(pinnedID)
+	require.NoError(t, err)
+	require.True(t, pinnedEntry.Pinned)
+
+	// Bypass storeEntry to simulate legacy duplicate ordinary history entries.
+	insertLegacyUnpinnedDuplicate := func(timestamp time.Time) Entry {
+		duplicate := Entry{
+			Data:      pinnedEntry.Data,
+			MimeType:  pinnedEntry.MimeType,
+			Preview:   pinnedEntry.Preview,
+			Size:      pinnedEntry.Size,
+			Timestamp: timestamp,
+			IsImage:   pinnedEntry.IsImage,
+			Pinned:    false,
+		}
+		duplicate.Hash = computeHash(duplicate.Data)
+
+		require.NoError(t, m.db.Update(func(tx *bolt.Tx) error {
+			b := tx.Bucket([]byte("clipboard"))
+			id, err := b.NextSequence()
+			if err != nil {
+				return err
+			}
+			duplicate.ID = id
+
+			encoded, err := encodeEntry(duplicate)
+			if err != nil {
+				return err
+			}
+			return b.Put(itob(id), encoded)
+		}))
+
+		return duplicate
+	}
+
+	olderHistoryDuplicate := insertLegacyUnpinnedDuplicate(time.Now().Add(time.Hour))
+	topHistoryDuplicate := insertLegacyUnpinnedDuplicate(time.Now().Add(-time.Hour))
+	require.Greater(t, topHistoryDuplicate.ID, olderHistoryDuplicate.ID)
+	require.True(t, olderHistoryDuplicate.Timestamp.After(topHistoryDuplicate.Timestamp))
+
+	history = m.GetHistory()
+	require.Len(t, history, 3)
+	require.Equal(t, topHistoryDuplicate.ID, history[0].ID)
+	require.NoError(t, m.UnpinEntry(pinnedID))
+
+	history = m.GetHistory()
+	require.Len(t, history, 1)
+	assert.False(t, history[0].Pinned)
+	assert.Equal(t, pinnedEntry.Hash, history[0].Hash)
+	assert.Equal(t, topHistoryDuplicate.ID, history[0].ID)
+}
+
+func TestCreateHistoryEntryFromPinned_KeepsLatestUnpinnedDuplicate(t *testing.T) {
+	m := newTestManagerWithDB(t)
+
+	require.NoError(t, m.storeEntry(Entry{
+		Data:      []byte("saved content"),
+		MimeType:  "text/plain;charset=utf-8",
+		Preview:   "saved content",
+		Size:      len("saved content"),
+		Timestamp: time.Now().Add(-time.Minute).Truncate(time.Second),
+		IsImage:   false,
+	}))
+
+	history := m.GetHistory()
+	require.Len(t, history, 1)
+	pinnedID := history[0].ID
+	require.NoError(t, m.PinEntry(pinnedID))
+
+	pinnedEntry, err := m.GetEntry(pinnedID)
+	require.NoError(t, err)
+	require.True(t, pinnedEntry.Pinned)
+	require.NoError(t, m.CreateHistoryEntryFromPinned(pinnedEntry))
+	firstDuplicate := m.GetHistory()[0]
+	require.NotEqual(t, pinnedID, firstDuplicate.ID)
+	require.NoError(t, m.CreateHistoryEntryFromPinned(pinnedEntry))
+	latestDuplicate := m.GetHistory()[0]
+
+	history = m.GetHistory()
+	require.Len(t, history, 2)
+	assert.Equal(t, latestDuplicate.ID, history[0].ID)
+	assert.False(t, history[0].Pinned)
+	assert.Equal(t, pinnedID, history[1].ID)
+	assert.True(t, history[1].Pinned)
+	assert.NotEqual(t, firstDuplicate.ID, latestDuplicate.ID)
 }
 
 func TestManager_ConcurrentSubscriberAccess(t *testing.T) {
@@ -410,6 +652,8 @@ func TestSelectMimeType(t *testing.T) {
 		{[]string{"text/plain;charset=utf-8", "text/html"}, "text/plain;charset=utf-8"},
 		{[]string{"text/html", "text/plain"}, "text/plain"},
 		{[]string{"text/html", "image/png"}, "image/png"},
+		{[]string{"image/png", "text/plain"}, "image/png"},
+		{[]string{"text/plain", "image/png"}, "image/png"},
 		{[]string{"image/png", "image/jpeg"}, "image/png"},
 		{[]string{"image/png"}, "image/png"},
 		{[]string{"application/octet-stream"}, "application/octet-stream"},

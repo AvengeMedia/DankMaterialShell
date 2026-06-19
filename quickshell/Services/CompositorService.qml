@@ -15,7 +15,7 @@ Singleton {
 
     property bool isHyprland: false
     property bool isNiri: false
-    property bool isDwl: false
+    property bool isMango: false
     property bool isSway: false
     property bool isScroll: false
     property bool isMiracle: false
@@ -29,13 +29,16 @@ Singleton {
     readonly property string scrollSocket: Quickshell.env("SWAYSOCK")
     readonly property string miracleSocket: Quickshell.env("MIRACLESOCK")
     readonly property string labwcPid: Quickshell.env("LABWC_PID")
+    readonly property string mangoSignature: Quickshell.env("MANGO_INSTANCE_SIGNATURE")
     property bool useNiriSorting: isNiri && NiriService
+    property bool useMangoSorting: isMango && MangoService
 
     property var randrScales: ({})
     property bool randrReady: false
     signal randrDataReady
 
     property var sortedToplevels: []
+    property var hyprlandVisibleSpecialWorkspaces: ({})
     property bool _sortScheduled: false
 
     signal toplevelsChanged
@@ -93,10 +96,10 @@ Singleton {
                 return hyprlandMonitor.scale;
         }
 
-        if (isDwl && screen) {
-            const dwlScale = DwlService.getOutputScale(screen.name);
-            if (dwlScale !== undefined && dwlScale > 0)
-                return dwlScale;
+        if (isMango && screen) {
+            const mangoScale = MangoService.getOutputScale(screen.name);
+            if (mangoScale !== undefined && mangoScale > 0)
+                return mangoScale;
         }
 
         return screen?.devicePixelRatio || 1;
@@ -111,8 +114,8 @@ Singleton {
         else if (isSway || isScroll || isMiracle) {
             const focusedWs = I3.workspaces?.values?.find(ws => ws.focused === true);
             screenName = focusedWs?.monitor?.name || "";
-        } else if (isDwl && DwlService.activeOutput)
-            screenName = DwlService.activeOutput;
+        } else if (isMango && MangoService.activeOutput)
+            screenName = MangoService.activeOutput;
 
         if (!screenName)
             return Quickshell.screens.length > 0 ? Quickshell.screens[0] : null;
@@ -153,10 +156,14 @@ Singleton {
         enabled: isHyprland
 
         function onRawEvent(event) {
-            if (event.name === "openwindow" || event.name === "closewindow" || event.name === "movewindow" || event.name === "movewindowv2" || event.name === "workspace" || event.name === "workspacev2" || event.name === "focusedmon" || event.name === "focusedmonv2" || event.name === "activewindow" || event.name === "activewindowv2" || event.name === "changefloatingmode" || event.name === "fullscreen" || event.name === "moveintogroup" || event.name === "moveoutofgroup") {
+            if (event.name === "openwindow" || event.name === "closewindow" || event.name === "movewindow" || event.name === "movewindowv2" || event.name === "workspace" || event.name === "workspacev2" || event.name === "focusedmon" || event.name === "focusedmonv2" || event.name === "activewindow" || event.name === "activewindowv2" || event.name === "changefloatingmode" || event.name === "fullscreen" || event.name === "moveintogroup" || event.name === "moveoutofgroup" || event.name === "activespecial") {
                 try {
                     Hyprland.refreshToplevels();
+                    if (event.name === "workspace" || event.name === "workspacev2" || event.name === "focusedmon" || event.name === "focusedmonv2" || event.name === "activespecial")
+                        Hyprland.refreshMonitors();
                 } catch (e) {}
+                if (event.name === "activespecial")
+                    root.updateHyprlandVisibleSpecialWorkspaces(event);
                 root.scheduleSort();
             }
         }
@@ -171,20 +178,23 @@ Singleton {
     Component.onCompleted: {
         fetchRandrData();
         detectCompositor();
+        updateHyprlandVisibleSpecialWorkspaces(null);
         scheduleSort();
         Qt.callLater(() => {
             NiriService.generateNiriLayoutConfig();
             HyprlandService.generateLayoutConfig();
-            DwlService.generateLayoutConfig();
         });
     }
 
     Connections {
-        target: DwlService
+        target: MangoService
         function onStateChanged() {
-            if (isDwl && !isHyprland && !isNiri) {
+            if (isMango)
                 scheduleSort();
-            }
+        }
+        function onWindowsChanged() {
+            if (isMango)
+                scheduleSort();
         }
     }
 
@@ -194,6 +204,9 @@ Singleton {
 
         if (useNiriSorting)
             return NiriService.sortToplevels(ToplevelManager.toplevels.values);
+
+        if (useMangoSorting)
+            return MangoService.sortToplevels(ToplevelManager.toplevels.values);
 
         if (isHyprland)
             return sortHyprlandToplevelsSafe();
@@ -213,6 +226,75 @@ Singleton {
         } catch (e) {
             return fallback;
         }
+    }
+
+    function _normalizeSpecialWorkspaceName(name) {
+        const raw = String(name ?? "").trim();
+        if (raw.length === 0)
+            return "";
+        if (raw === "special")
+            return "special:special";
+        return raw.startsWith("special:") ? raw : `special:${raw}`;
+    }
+
+    function _hyprlandRawEventParts(event, argumentCount) {
+        if (!event)
+            return [];
+        try {
+            const parsed = event.parse(argumentCount);
+            if (parsed && parsed.length !== undefined)
+                return parsed;
+        } catch (e) {}
+        const data = String(event.data ?? "");
+        return data.length > 0 ? data.split(",") : [];
+    }
+
+    function _specialWorkspaceNameFromMonitor(monitor) {
+        if (!monitor)
+            return "";
+        const candidates = [monitor.activeSpecialWorkspace?.name, monitor.specialWorkspace?.name, monitor.lastIpcObject?.specialWorkspace?.name, monitor.lastIpcObject?.specialWorkspace, monitor.lastIpcObject?.activeSpecialWorkspace?.name];
+        for (let i = 0; i < candidates.length; i++) {
+            const normalized = _normalizeSpecialWorkspaceName(candidates[i]);
+            if (normalized)
+                return normalized;
+        }
+        return "";
+    }
+
+    function updateHyprlandVisibleSpecialWorkspaces(event) {
+        if (!isHyprland) {
+            hyprlandVisibleSpecialWorkspaces = ({});
+            return;
+        }
+
+        const next = {};
+        try {
+            const monitors = Hyprland.monitors?.values || [];
+            for (const monitor of monitors) {
+                const monitorName = monitor?.name ?? monitor?.lastIpcObject?.name ?? "";
+                if (!monitorName)
+                    continue;
+                const specialName = _specialWorkspaceNameFromMonitor(monitor);
+                if (specialName)
+                    next[monitorName] = specialName;
+            }
+        } catch (e) {
+            log.warn("updateHyprlandVisibleSpecialWorkspaces monitor snapshot failed:", e);
+        }
+
+        if (event?.name === "activespecial") {
+            const parts = _hyprlandRawEventParts(event, 2);
+            const specialName = _normalizeSpecialWorkspaceName(parts[0]);
+            const monitorName = String(parts[1] ?? Hyprland.focusedMonitor?.name ?? Hyprland.focusedWorkspace?.monitor?.name ?? "");
+            if (monitorName) {
+                if (specialName)
+                    next[monitorName] = specialName;
+                else
+                    delete next[monitorName];
+            }
+        }
+
+        hyprlandVisibleSpecialWorkspaces = next;
     }
 
     function sortHyprlandToplevelsSafe() {
@@ -451,6 +533,216 @@ Singleton {
         return false;
     }
 
+    function _hyprlandToplevelMapped(hyprToplevel) {
+        if (!hyprToplevel)
+            return false;
+        if (hyprToplevel.mapped === false)
+            return false;
+        const ipcMapped = hyprToplevel.lastIpcObject?.mapped;
+        if (ipcMapped === false)
+            return false;
+        if (hyprToplevel.hidden === true)
+            return false;
+        const ipcHidden = hyprToplevel.lastIpcObject?.hidden;
+        if (ipcHidden === true)
+            return false;
+        return true;
+    }
+
+    function hyprlandVisibleSpecialWorkspaceOnScreen(screenOrName) {
+        const screenName = _screenName(screenOrName);
+        if (!isHyprland || !screenName)
+            return "";
+        hyprlandVisibleSpecialWorkspaces;
+        const trackedName = hyprlandVisibleSpecialWorkspaces[screenName] ?? "";
+        if (trackedName)
+            return trackedName;
+        try {
+            const monitor = Hyprland.monitors?.values?.find(m => m.name === screenName);
+            return _specialWorkspaceNameFromMonitor(monitor);
+        } catch (e) {
+            return "";
+        }
+    }
+
+    function hyprlandSpecialWorkspaceBlocksConnectedFrame(screenOrName) {
+        const screenName = _screenName(screenOrName);
+        if (!isHyprland || !screenName || !Hyprland.toplevels?.values)
+            return false;
+        const visibleSpecialWorkspace = hyprlandVisibleSpecialWorkspaceOnScreen(screenName);
+        if (!visibleSpecialWorkspace)
+            return false;
+
+        try {
+            for (const t of Hyprland.toplevels.values) {
+                const monName = t.monitor?.name ?? t.lastIpcObject?.monitor ?? "";
+                if (monName !== screenName)
+                    continue;
+                const wsName = _normalizeSpecialWorkspaceName(t.workspace?.name ?? t.lastIpcObject?.workspace?.name ?? "");
+                if (!wsName || wsName !== visibleSpecialWorkspace)
+                    continue;
+                if (_hyprlandToplevelMapped(t))
+                    return true;
+            }
+        } catch (e) {
+            log.warn("hyprlandSpecialWorkspaceBlocksConnectedFrame failed:", e);
+        }
+        return false;
+    }
+
+    function connectedFrameBlockedOnScreen(screenOrName) {
+        if (hasFullscreenToplevelOnScreen(screenOrName))
+            return true;
+        return hyprlandSpecialWorkspaceBlocksConnectedFrame(screenOrName);
+    }
+
+    function _screenForName(screenOrName) {
+        if (screenOrName && typeof screenOrName !== "string")
+            return screenOrName;
+        const screenName = _screenName(screenOrName);
+        if (!screenName)
+            return null;
+        const screens = Quickshell.screens || [];
+        for (let i = 0; i < screens.length; i++) {
+            if (screens[i]?.name === screenName)
+                return screens[i];
+        }
+        return null;
+    }
+
+    function frameConfiguredForScreen(screenOrName) {
+        if (!SettingsData.frameEnabled)
+            return false;
+        const screen = _screenForName(screenOrName);
+        if (!screen || !SettingsData.isScreenInPreferences(screen, SettingsData.frameScreenPreferences))
+            return false;
+        return true;
+    }
+
+    function frameWindowVisibleForScreen(screenOrName) {
+        if (!frameConfiguredForScreen(screenOrName))
+            return false;
+        return !connectedFrameBlockedOnScreen(screenOrName);
+    }
+
+    function usesConnectedFrameChromeForScreen(screenOrName) {
+        return SettingsData.connectedFrameModeActive && frameWindowVisibleForScreen(screenOrName);
+    }
+
+    function framePeerSurfacesUseOverlayForScreen(screenOrName) {
+        return frameWindowVisibleForScreen(screenOrName);
+    }
+
+    function hyprlandToplevelOverlapsDockEdge(hyprToplevel, screenName, dockPosition, dockThickness, screenWidth, screenHeight) {
+        if (!hyprToplevel?.lastIpcObject || !screenName)
+            return false;
+        const monName = hyprToplevel.monitor?.name ?? hyprToplevel.lastIpcObject?.monitor ?? "";
+        if (monName && monName !== screenName)
+            return false;
+        const ipc = hyprToplevel.lastIpcObject;
+        const at = ipc.at;
+        const size = ipc.size;
+        if (!at || !size)
+            return false;
+        const monX = hyprToplevel.monitor?.x ?? 0;
+        const monY = hyprToplevel.monitor?.y ?? 0;
+        const winX = at[0] - monX;
+        const winY = at[1] - monY;
+        const winW = size[0];
+        const winH = size[1];
+        switch (dockPosition) {
+        case SettingsData.Position.Top:
+            return winY < dockThickness;
+        case SettingsData.Position.Bottom:
+            return winY + winH > screenHeight - dockThickness;
+        case SettingsData.Position.Left:
+            return winX < dockThickness;
+        case SettingsData.Position.Right:
+            return winX + winW > screenWidth - dockThickness;
+        default:
+            return false;
+        }
+    }
+
+    function hyprlandDockOverlapForSmartAutoHide(screenName, dockPosition, dockThickness, screenWidth, screenHeight) {
+        if (!isHyprland || !screenName || !Hyprland.toplevels?.values)
+            return false;
+
+        const filtered = filterCurrentWorkspace(sortedToplevels, screenName);
+        for (let i = 0; i < filtered.length; i++) {
+            const toplevel = filtered[i];
+            let hyprToplevel = null;
+            for (const t of Hyprland.toplevels.values) {
+                if (t.wayland === toplevel) {
+                    hyprToplevel = t;
+                    break;
+                }
+            }
+            if (hyprlandToplevelOverlapsDockEdge(hyprToplevel, screenName, dockPosition, dockThickness, screenWidth, screenHeight))
+                return true;
+        }
+
+        const visibleSpecialWorkspace = hyprlandVisibleSpecialWorkspaceOnScreen(screenName);
+        if (!visibleSpecialWorkspace)
+            return false;
+
+        for (const hyprToplevel of Hyprland.toplevels.values) {
+            const wsName = _normalizeSpecialWorkspaceName(hyprToplevel.workspace?.name ?? hyprToplevel.lastIpcObject?.workspace?.name ?? "");
+            if (wsName !== visibleSpecialWorkspace)
+                continue;
+            if (!_hyprlandToplevelMapped(hyprToplevel))
+                continue;
+            if (hyprlandToplevelOverlapsDockEdge(hyprToplevel, screenName, dockPosition, dockThickness, screenWidth, screenHeight))
+                return true;
+        }
+        return false;
+    }
+
+    // Mango clients carry absolute geometry + tags; count those on the screen's
+    // active tags (not minimized), made screen-relative via the monitor offset.
+    function mangoDockOverlapForSmartAutoHide(screenName, dockPosition, dockThickness, screenWidth, screenHeight) {
+        if (!isMango || !screenName || !MangoService.windows)
+            return false;
+
+        const out = MangoService.outputs[screenName];
+        const active = new Set((out?.activeTags) || []);
+        const monX = out?.x ?? 0;
+        const monY = out?.y ?? 0;
+
+        for (let i = 0; i < MangoService.windows.length; i++) {
+            const win = MangoService.windows[i];
+            if (!win || win.monitor !== screenName || win.is_minimized)
+                continue;
+            if (active.size > 0 && !(win.tags || []).some(t => active.has(t)))
+                continue;
+
+            const winX = (win.x ?? 0) - monX;
+            const winY = (win.y ?? 0) - monY;
+            const winW = win.width ?? 0;
+            const winH = win.height ?? 0;
+
+            switch (dockPosition) {
+            case SettingsData.Position.Top:
+                if (winY < dockThickness)
+                    return true;
+                break;
+            case SettingsData.Position.Bottom:
+                if (winY + winH > screenHeight - dockThickness)
+                    return true;
+                break;
+            case SettingsData.Position.Left:
+                if (winX < dockThickness)
+                    return true;
+                break;
+            case SettingsData.Position.Right:
+                if (winX + winW > screenWidth - dockThickness)
+                    return true;
+                break;
+            }
+        }
+        return false;
+    }
+
     function filterHyprlandCurrentDisplaySafe(toplevels, screenName) {
         if (!toplevels || toplevels.length === 0 || !Hyprland.toplevels)
             return toplevels;
@@ -543,16 +835,29 @@ Singleton {
             Qt.callLater(() => {
                 NiriService.generateNiriLayoutConfig();
                 HyprlandService.generateLayoutConfig();
-                DwlService.generateLayoutConfig();
+                MangoService.generateLayoutConfig();
             });
         }
     }
 
     function detectCompositor() {
+        if (mangoSignature && mangoSignature.length > 0) {
+            isHyprland = false;
+            isNiri = false;
+            isMango = true;
+            isSway = false;
+            isScroll = false;
+            isMiracle = false;
+            isLabwc = false;
+            compositor = "mango";
+            log.info("Detected MangoWM via MANGO_INSTANCE_SIGNATURE");
+            return;
+        }
+
         if (hyprlandSignature && hyprlandSignature.length > 0 && !niriSocket && !swaySocket && !scrollSocket && !miracleSocket && !labwcPid) {
             isHyprland = true;
             isNiri = false;
-            isDwl = false;
+            isMango = false;
             isSway = false;
             isScroll = false;
             isMiracle = false;
@@ -567,7 +872,7 @@ Singleton {
                 if (exitCode === 0) {
                     isNiri = true;
                     isHyprland = false;
-                    isDwl = false;
+                    isMango = false;
                     isSway = false;
                     isScroll = false;
                     isMiracle = false;
@@ -585,7 +890,6 @@ Singleton {
                 if (exitCode === 0) {
                     isNiri = false;
                     isHyprland = false;
-                    isDwl = false;
                     isSway = true;
                     isScroll = false;
                     isMiracle = false;
@@ -602,7 +906,7 @@ Singleton {
                 if (exitCode === 0) {
                     isNiri = false;
                     isHyprland = false;
-                    isDwl = false;
+                    isMango = false;
                     isSway = false;
                     isScroll = false;
                     isMiracle = true;
@@ -619,7 +923,7 @@ Singleton {
                 if (exitCode === 0) {
                     isNiri = false;
                     isHyprland = false;
-                    isDwl = false;
+                    isMango = false;
                     isSway = false;
                     isScroll = true;
                     isMiracle = false;
@@ -634,7 +938,7 @@ Singleton {
         if (labwcPid && labwcPid.length > 0) {
             isHyprland = false;
             isNiri = false;
-            isDwl = false;
+            isMango = false;
             isSway = false;
             isScroll = false;
             isMiracle = false;
@@ -644,42 +948,15 @@ Singleton {
             return;
         }
 
-        if (DMSService.dmsAvailable) {
-            Qt.callLater(checkForDwl);
-        } else {
-            isHyprland = false;
-            isNiri = false;
-            isDwl = false;
-            isSway = false;
-            isScroll = false;
-            isMiracle = false;
-            isLabwc = false;
-            compositor = "unknown";
-            log.warn("No compositor detected");
-        }
-    }
-
-    Connections {
-        target: DMSService
-        function onCapabilitiesReceived() {
-            if (!isHyprland && !isNiri && !isDwl && !isLabwc) {
-                checkForDwl();
-            }
-        }
-    }
-
-    function checkForDwl() {
-        if (DMSService.apiVersion >= 12 && DMSService.capabilities.includes("dwl")) {
-            isHyprland = false;
-            isNiri = false;
-            isDwl = true;
-            isSway = false;
-            isScroll = false;
-            isMiracle = false;
-            isLabwc = false;
-            compositor = "dwl";
-            log.info("Detected DWL via DMS capability");
-        }
+        isHyprland = false;
+        isNiri = false;
+        isMango = false;
+        isSway = false;
+        isScroll = false;
+        isMiracle = false;
+        isLabwc = false;
+        compositor = "unknown";
+        log.warn("No compositor detected");
     }
 
     function powerOffMonitors() {
@@ -687,8 +964,8 @@ Singleton {
             return NiriService.powerOffMonitors();
         if (isHyprland)
             return HyprlandService.dpmsOff();
-        if (isDwl)
-            return _dwlPowerOffMonitors();
+        if (isMango)
+            return MangoService.powerOffMonitors();
         if (isSway || isScroll || isMiracle) {
             try {
                 I3.dispatch("output * dpms off");
@@ -706,8 +983,8 @@ Singleton {
             return NiriService.powerOnMonitors();
         if (isHyprland)
             return HyprlandService.dpmsOn();
-        if (isDwl)
-            return _dwlPowerOnMonitors();
+        if (isMango)
+            return MangoService.powerOnMonitors();
         if (isSway || isScroll || isMiracle) {
             try {
                 I3.dispatch("output * dpms on");
@@ -718,33 +995,5 @@ Singleton {
             Quickshell.execDetached(["dms", "dpms", "on"]);
         }
         log.warn("Cannot power on monitors, unknown compositor");
-    }
-
-    function _dwlPowerOffMonitors() {
-        if (!Quickshell.screens || Quickshell.screens.length === 0) {
-            log.warn("No screens available for DWL power off");
-            return;
-        }
-
-        for (let i = 0; i < Quickshell.screens.length; i++) {
-            const screen = Quickshell.screens[i];
-            if (screen && screen.name) {
-                Quickshell.execDetached(["mmsg", "-d", "disable_monitor," + screen.name]);
-            }
-        }
-    }
-
-    function _dwlPowerOnMonitors() {
-        if (!Quickshell.screens || Quickshell.screens.length === 0) {
-            log.warn("No screens available for DWL power on");
-            return;
-        }
-
-        for (let i = 0; i < Quickshell.screens.length; i++) {
-            const screen = Quickshell.screens[i];
-            if (screen && screen.name) {
-                Quickshell.execDetached(["mmsg", "-d", "enable_monitor," + screen.name]);
-            }
-        }
     }
 }

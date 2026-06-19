@@ -3,10 +3,10 @@
 # Usage: ./create-source.sh <package-dir> [ubuntu-series]
 #
 # Example:
-#   ./create-source.sh ../dms questing    # Ubuntu 25.10 (default series in ppa-upload)
-#   ./create-source.sh ../dms resolute     # Ubuntu 26.04 LTS
-#   ./create-source.sh ../dms-git questing
+#   ./create-source.sh ../dms resolute     # Ubuntu 26.04 LTS (default series in ppa-upload)
+#   ./create-source.sh ../dms stonking     # Ubuntu 26.10
 #   ./create-source.sh ../dms-git resolute
+#   ./create-source.sh ../dms-git stonking
 
 set -e
 
@@ -27,13 +27,13 @@ if [ $# -lt 1 ]; then
     echo "Arguments:"
     echo "  package-dir     : Path to package directory (e.g., ../dms)"
     echo "  ubuntu-series   : Ubuntu series (optional, default: noble)"
-    echo "                    Options: noble, jammy, oracular, mantic, questing, resolute"
+    echo "                    Options: noble, jammy, oracular, mantic, resolute, stonking"
     echo
     echo "Examples:"
-    echo "  $0 ../dms questing"
     echo "  $0 ../dms resolute"
-    echo "  $0 ../dms-git questing"
+    echo "  $0 ../dms stonking"
     echo "  $0 ../dms-git resolute"
+    echo "  $0 ../dms-git stonking"
     exit 1
 fi
 
@@ -135,7 +135,7 @@ check_ppa_version_exists() {
     local CHECK_MODE="${4:-commit}"
     local DISTRO_SERIES="${5:-}"
 
-    # Query Launchpad API (optionally scoped to one Ubuntu series so the same version can ship to questing and resolute)
+    # Query Launchpad API (optionally scoped to one Ubuntu series so the same version can ship to resolute and stonking)
     local API_URL="https://api.launchpad.net/1.0/~avengemedia/+archive/ubuntu/$PPA_NAME?ws.op=getPublishedSources&source_name=$SOURCE_NAME&status=Published"
     if [[ -n "$DISTRO_SERIES" ]]; then
         API_URL+="&distro_series=https://api.launchpad.net/1.0/ubuntu/${DISTRO_SERIES}"

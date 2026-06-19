@@ -92,20 +92,11 @@ PanelWindow {
         }
     }
 
-    WlrLayershell.layer: {
-        switch (Quickshell.env("DMS_OSD_LAYER")) {
-        case "bottom":
-            log.warn("'bottom' layer is not valid for OSDs. Defaulting to 'overlay' layer.");
-            return WlrLayershell.Overlay;
-        case "background":
-            log.warn("'background' layer is not valid for OSDs. Defaulting to 'overlay' layer.");
-            return WlrLayershell.Overlay;
-        case "top":
-            return WlrLayershell.Top;
-        default:
-            return WlrLayershell.Overlay;
-        }
-    }
+    WlrLayershell.layer: LayerShell.fromEnv("DMS_OSD_LAYER", WlrLayer.Overlay, {
+        "allow": ["top", "overlay"],
+        "invalidLayer": WlrLayer.Overlay,
+        "label": "OSDs"
+    })
     WlrLayershell.exclusiveZone: -1
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
@@ -298,8 +289,6 @@ PanelWindow {
             borderColor: Theme.outlineMedium
             borderWidth: 1
             shadowEnabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
-            layer.textureSize: Qt.size(Math.round(width * root.dpr), Math.round(height * root.dpr))
-            layer.textureMirroring: ShaderEffectSource.MirrorVertically
         }
 
         MouseArea {

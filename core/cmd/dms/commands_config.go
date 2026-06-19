@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/luaconfig"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 	"github.com/spf13/cobra"
 )
@@ -27,7 +28,21 @@ var resolveIncludeCmd = &cobra.Command{
 		case 0:
 			return []string{"hyprland", "niri", "mangowc"}, cobra.ShellCompDirectiveNoFileComp
 		case 1:
-			return []string{"cursor.kdl", "cursor.conf", "outputs.kdl", "outputs.conf", "binds.kdl", "binds.conf"}, cobra.ShellCompDirectiveNoFileComp
+			return []string{
+				"binds.lua",
+				"binds-user.lua",
+				"colors.lua",
+				"layout.lua",
+				"outputs.lua",
+				"cursor.lua",
+				"windowrules.lua",
+				"cursor.kdl",
+				"outputs.kdl",
+				"binds.kdl",
+				"cursor.conf",
+				"outputs.conf",
+				"binds.conf",
+			}, cobra.ShellCompDirectiveNoFileComp
 		}
 		return nil, cobra.ShellCompDirectiveNoFileComp
 	},
@@ -39,8 +54,10 @@ func init() {
 }
 
 type IncludeResult struct {
-	Exists   bool `json:"exists"`
-	Included bool `json:"included"`
+	Exists       bool   `json:"exists"`
+	Included     bool   `json:"included"`
+	ConfigFormat string `json:"configFormat,omitempty"`
+	ReadOnly     bool   `json:"readOnly,omitempty"`
 }
 
 func runResolveInclude(cmd *cobra.Command, args []string) {
@@ -55,7 +72,7 @@ func runResolveInclude(cmd *cobra.Command, args []string) {
 		result, err = checkHyprlandInclude(filename)
 	case "niri":
 		result, err = checkNiriInclude(filename)
-	case "mangowc", "dwl", "mango":
+	case "mangowc", "mango":
 		result, err = checkMangoWCInclude(filename)
 	default:
 		log.Fatalf("Unknown compositor: %s", compositor)
@@ -70,10 +87,7 @@ func runResolveInclude(cmd *cobra.Command, args []string) {
 }
 
 func checkHyprlandInclude(filename string) (IncludeResult, error) {
-	configDir, err := utils.ExpandPath("$HOME/.config/hypr")
-	if err != nil {
-		return IncludeResult{}, err
-	}
+	configDir := filepath.Join(utils.XDGConfigHome(), "hypr")
 
 	targetPath := filepath.Join(configDir, "dms", filename)
 	result := IncludeResult{}
@@ -82,17 +96,41 @@ func checkHyprlandInclude(filename string) (IncludeResult, error) {
 		result.Exists = true
 	}
 
-	mainConfig := filepath.Join(configDir, "hyprland.conf")
-	if _, err := os.Stat(mainConfig); os.IsNotExist(err) {
-		return result, nil
+	targetAbs, err := filepath.Abs(targetPath)
+	if err != nil {
+		return result, err
 	}
 
-	processed := make(map[string]bool)
-	result.Included = hyprlandFindInclude(mainConfig, "dms/"+filename, processed)
+	targetRel := filepath.ToSlash(filepath.Join("dms", filename))
+
+	mainLua := filepath.Join(configDir, "hyprland.lua")
+	if _, err := os.Stat(mainLua); err == nil {
+		result.ConfigFormat = "lua"
+		result.ReadOnly = false
+		processedLua := make(map[string]bool)
+		if luaconfig.RequiresTarget(mainLua, targetAbs, processedLua) {
+			result.Included = true
+			return result, nil
+		}
+	}
+
+	mainConf := filepath.Join(configDir, "hyprland.conf")
+	if _, err := os.Stat(mainConf); err == nil {
+		if result.ConfigFormat == "" {
+			result.ConfigFormat = "hyprlang"
+			result.ReadOnly = true
+		}
+		processed := make(map[string]bool)
+		if hyprlandFindIncludeHyprlang(mainConf, targetRel, processed) {
+			result.Included = true
+			return result, nil
+		}
+	}
+
 	return result, nil
 }
 
-func hyprlandFindInclude(filePath, target string, processed map[string]bool) bool {
+func hyprlandFindIncludeHyprlang(filePath, target string, processed map[string]bool) bool {
 	absPath, err := filepath.Abs(filePath)
 	if err != nil {
 		return false
@@ -141,7 +179,7 @@ func hyprlandFindInclude(filePath, target string, processed map[string]bool) boo
 			continue
 		}
 
-		if hyprlandFindInclude(expanded, target, processed) {
+		if hyprlandFindIncludeHyprlang(expanded, target, processed) {
 			return true
 		}
 	}
@@ -150,10 +188,7 @@ func hyprlandFindInclude(filePath, target string, processed map[string]bool) boo
 }
 
 func checkNiriInclude(filename string) (IncludeResult, error) {
-	configDir, err := utils.ExpandPath("$HOME/.config/niri")
-	if err != nil {
-		return IncludeResult{}, err
-	}
+	configDir := filepath.Join(utils.XDGConfigHome(), "niri")
 
 	targetPath := filepath.Join(configDir, "dms", filename)
 	result := IncludeResult{}
@@ -229,10 +264,7 @@ func niriFindInclude(filePath, target string, processed map[string]bool) bool {
 }
 
 func checkMangoWCInclude(filename string) (IncludeResult, error) {
-	configDir, err := utils.ExpandPath("$HOME/.config/mango")
-	if err != nil {
-		return IncludeResult{}, err
-	}
+	configDir := filepath.Join(utils.XDGConfigHome(), "mango")
 
 	targetPath := filepath.Join(configDir, "dms", filename)
 	result := IncludeResult{}

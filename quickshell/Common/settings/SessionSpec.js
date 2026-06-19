@@ -56,6 +56,8 @@ var SPEC = {
     trayItemOrder: { def: [] },
     recentColors: { def: [] },
     showThirdPartyPlugins: { def: false },
+    pluginBrowserInstalledFirst: { def: false },
+    pluginBrowserSortMode: { def: "default" },
     launchPrefix: { def: "" },
     lastBrightnessDevice: { def: "" },
 
@@ -87,6 +89,7 @@ var SPEC = {
     timeLocale: { def: "" },
 
     launcherLastMode: { def: "all" },
+    launcherLastFileSearchType: { def: "all" },
     launcherLastQuery: { def: "" },
     launcherQueryHistory: { def: [] },
     appDrawerLastMode: { def: "apps" },

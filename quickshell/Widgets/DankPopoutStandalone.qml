@@ -18,6 +18,7 @@ Item {
     property Component overlayContent: null
     property alias overlayLoader: overlayLoader
     readonly property alias backgroundWindow: backgroundWindow
+    readonly property alias contentWindow: contentWindow
     property real popupWidth: 400
     property real popupHeight: 300
     property real triggerX: 0
@@ -52,6 +53,7 @@ Item {
     property real storedBarThickness: Theme.barHeight - 4
     property real storedBarSpacing: 4
     property var storedBarConfig: null
+    property bool triggerUsesOverlayLayer: false
     property var adjacentBarInfo: ({
             "topBar": 0,
             "bottomBar": 0,
@@ -59,11 +61,16 @@ Item {
             "rightBar": 0
         })
     property var screen: null
-    readonly property bool frameOnlyNoConnected: SettingsData.frameEnabled && !!screen && SettingsData.isScreenInPreferences(screen, SettingsData.frameScreenPreferences)
+    readonly property bool frameGapStandaloneActive: CompositorService.frameConfiguredForScreen(screen) && !CompositorService.usesConnectedFrameChromeForScreen(screen)
     readonly property bool fluidStandaloneActive: Theme.isDirectionalEffect
     readonly property bool backgroundDismissWindowRequired: backgroundInteractive
     readonly property bool backgroundWindowRequired: backgroundDismissWindowRequired || root.overlayContent !== null
     readonly property bool _fullHeight: fullHeightSurface
+    readonly property var effectivePopoutLayer: LayerShell.fromEnv("DMS_POPOUT_LAYER", root.triggerUsesOverlayLayer ? WlrLayer.Overlay : WlrLayer.Top, {
+        "allow": ["top", "overlay"],
+        "invalidLayer": WlrLayer.Top,
+        "label": "popouts"
+    })
 
     function _frameEdgeInset(side) {
         if (!screen)
@@ -76,7 +83,7 @@ Item {
     }
 
     function _edgeClearance(side, popupGap, adjacentInset) {
-        if (frameOnlyNoConnected)
+        if (frameGapStandaloneActive)
             return Math.max(adjacentInset, _frameGapMargin(side));
         return adjacentInset > 0 ? adjacentInset : popupGap;
     }
@@ -287,21 +294,43 @@ Item {
         _frozenMaskWidth = maskWidth;
         _frozenMaskHeight = maskHeight;
 
-        if (_lastOpenedScreen !== null && _lastOpenedScreen !== screen) {
+        const screenChanged = _lastOpenedScreen !== null && _lastOpenedScreen !== screen;
+        if (screenChanged) {
+            // Hide on this tick so Qt actually tears down the wl_surface; the show
+            // gets deferred below so the unmap is processed before the remap.
             contentWindow.visible = false;
             backgroundWindow.visible = false;
         }
         _lastOpenedScreen = screen;
 
-        if (contentContainer) {
-            // animationsEnabled is false here, so this snaps to closed without animating.
+        if (contentContainer && !shouldBeVisible) {
+            // Snap morph closed only on a fresh open; on screen-change re-open we stay at 1
+            // because shouldBeVisible doesn't change and won't drive morph back to 1.
             morph.openProgress = 0;
         }
 
         _setSurfaceGeometry(alignedX, alignedY, alignedWidth, alignedHeight);
-        if (backgroundWindowRequired)
-            backgroundWindow.visible = true;
-        contentWindow.visible = true;
+        if (screenChanged) {
+            // Defer the show one event-loop tick. Qt coalesces a synchronous
+            // false→true visibility flip into a no-op, leaving WindowBlur committed
+            // to the previous screen's wl_surface. Splitting the flip across ticks
+            // forces a real surface destroy+create so BackgroundEffect.surfaceCreated
+            // fires and the blur region republishes on the new surface.
+            Qt.callLater(() => {
+                if (!root.shouldBeVisible)
+                    return;
+                if (root.backgroundWindowRequired)
+                    backgroundWindow.visible = true;
+                contentWindow.visible = true;
+                popoutBlur.kick();
+                _bgCommitWindow = true;
+                bgCommitSettleTimer.restart();
+            });
+        } else {
+            if (backgroundWindowRequired)
+                backgroundWindow.visible = true;
+            contentWindow.visible = true;
+        }
 
         animationsEnabled = true;
         shouldBeVisible = true;
@@ -347,9 +376,9 @@ Item {
         interval: Theme.variantCloseInterval(animationDuration)
         onTriggered: {
             if (!shouldBeVisible) {
-                isClosing = false;
                 contentWindow.visible = false;
                 backgroundWindow.visible = false;
+                isClosing = false;
                 PopoutManager.hidePopout(popoutHandle);
                 popoutClosed();
             }
@@ -370,9 +399,11 @@ Item {
     property real renderedAlignedY: alignedY
     property real renderedAlignedHeight: alignedHeight
     readonly property bool renderedGeometryGrowing: alignedHeight >= renderedAlignedHeight
+    // Snap rendered geometry while the entrance morph runs so it doesn't ride a second animation.
+    readonly property bool _settlingToOpen: _fullHeight && shouldBeVisible && morphAnim.running
 
     Behavior on renderedAlignedY {
-        enabled: root.animationsEnabled && contentWindow.visible && root.shouldBeVisible
+        enabled: root.animationsEnabled && contentWindow.visible && root.shouldBeVisible && !root._settlingToOpen
         NumberAnimation {
             duration: Theme.variantDuration(root.animationDuration, root.renderedGeometryGrowing)
             easing.type: Easing.BezierSpline
@@ -381,7 +412,7 @@ Item {
     }
 
     Behavior on renderedAlignedHeight {
-        enabled: root.animationsEnabled && contentWindow.visible && root.shouldBeVisible
+        enabled: root.animationsEnabled && contentWindow.visible && root.shouldBeVisible && !root._settlingToOpen
         NumberAnimation {
             duration: Theme.variantDuration(root.animationDuration, root.renderedGeometryGrowing)
             easing.type: Easing.BezierSpline
@@ -464,31 +495,21 @@ Item {
             }
         })(), dpr)
 
-    readonly property real triggeringBarLeftExclusion: (effectiveBarPosition === SettingsData.Position.Left && barWidth > 0) ? Math.max(0, barX + barWidth) : 0
-    readonly property real triggeringBarTopExclusion: (effectiveBarPosition === SettingsData.Position.Top && barHeight > 0) ? Math.max(0, barY + barHeight) : 0
-    readonly property real triggeringBarRightExclusion: (effectiveBarPosition === SettingsData.Position.Right && barWidth > 0) ? Math.max(0, screenWidth - barX) : 0
-    readonly property real triggeringBarBottomExclusion: (effectiveBarPosition === SettingsData.Position.Bottom && barHeight > 0) ? Math.max(0, screenHeight - barY) : 0
+    readonly property real maskX: _dismissZone.x
+    readonly property real maskY: _dismissZone.y
+    readonly property real maskWidth: _dismissZone.width
+    readonly property real maskHeight: _dismissZone.height
 
-    readonly property real maskX: {
-        const adjacentLeftBar = adjacentBarInfo?.leftBar ?? 0;
-        return Math.max(triggeringBarLeftExclusion, adjacentLeftBar);
-    }
-
-    readonly property real maskY: {
-        const adjacentTopBar = adjacentBarInfo?.topBar ?? 0;
-        return Math.max(triggeringBarTopExclusion, adjacentTopBar);
-    }
-
-    readonly property real maskWidth: {
-        const adjacentRightBar = adjacentBarInfo?.rightBar ?? 0;
-        const rightExclusion = Math.max(triggeringBarRightExclusion, adjacentRightBar);
-        return Math.max(100, screenWidth - maskX - rightExclusion);
-    }
-
-    readonly property real maskHeight: {
-        const adjacentBottomBar = adjacentBarInfo?.bottomBar ?? 0;
-        const bottomExclusion = Math.max(triggeringBarBottomExclusion, adjacentBottomBar);
-        return Math.max(100, screenHeight - maskY - bottomExclusion);
+    DismissZone {
+        id: _dismissZone
+        barPosition: root.effectiveBarPosition
+        barX: root.barX
+        barY: root.barY
+        barWidth: root.barWidth
+        barHeight: root.barHeight
+        screenWidth: root.screenWidth
+        screenHeight: root.screenHeight
+        adjacentBarInfo: root.adjacentBarInfo
     }
 
     PanelWindow {
@@ -502,7 +523,7 @@ Item {
         updatesEnabled: root.overlayContent !== null || root._bgCommitWindow
 
         WlrLayershell.namespace: root.layerNamespace + ":background"
-        WlrLayershell.layer: WlrLayershell.Top
+        WlrLayershell.layer: root.effectivePopoutLayer
         WlrLayershell.exclusiveZone: -1
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
@@ -568,42 +589,25 @@ Item {
             id: popoutBlur
             targetWindow: contentWindow
             readonly property real s: Math.min(1, contentContainer.scaleValue)
-            readonly property bool trackBlurFromBarEdge: root.fluidStandaloneActive
             readonly property real op: Math.max(0, Math.min(1, (morph.openProgress - 0.08) * 1.6))
-            readonly property bool blurAlive: trackBlurFromBarEdge ? (contentContainer.revealWidth > 0 && contentContainer.revealHeight > 0) : root.shouldBeVisible
+            readonly property bool revealClipActive: root.fluidStandaloneActive
 
-            blurX: trackBlurFromBarEdge ? contentContainer.x + contentContainer.revealX : contentContainer.x + contentContainer.width * (1 - s * op) * 0.5 + Theme.snap(contentContainer.animX, root.dpr)
-            blurY: trackBlurFromBarEdge ? contentContainer.y + contentContainer.revealY : contentContainer.y + contentContainer.height * (1 - s * op) * 0.5 + Theme.snap(contentContainer.animY, root.dpr)
-            blurWidth: blurAlive ? (trackBlurFromBarEdge ? contentContainer.revealWidth : contentContainer.width * s * op) : 0
-            blurHeight: blurAlive ? (trackBlurFromBarEdge ? contentContainer.revealHeight : contentContainer.height * s * op) : 0
+            blurX: revealClipActive ? contentContainer.x : contentContainer.x + contentContainer.width * (1 - s * op) * 0.5 + Theme.snap(contentContainer.animX, root.dpr)
+            blurY: revealClipActive ? contentContainer.y : contentContainer.y + contentContainer.height * (1 - s * op) * 0.5 + Theme.snap(contentContainer.animY, root.dpr)
+            blurWidth: root.shouldBeVisible ? (revealClipActive ? contentContainer.width : contentContainer.width * s * op) : 0
+            blurHeight: root.shouldBeVisible ? (revealClipActive ? contentContainer.height : contentContainer.height * s * op) : 0
             blurRadius: Theme.cornerRadius
+            clipEnabled: revealClipActive
+            clipX: contentContainer.x + contentContainer.revealX
+            clipY: contentContainer.y + contentContainer.revealY
+            clipWidth: root.shouldBeVisible ? contentContainer.revealWidth : 0
+            clipHeight: root.shouldBeVisible ? contentContainer.revealHeight : 0
         }
 
         WlrLayershell.namespace: root.layerNamespace
-        WlrLayershell.layer: {
-            switch (Quickshell.env("DMS_POPOUT_LAYER")) {
-            case "bottom":
-                root.log.warn("'bottom' layer is not valid for popouts. Defaulting to 'top' layer.");
-                return WlrLayershell.Top;
-            case "background":
-                root.log.warn("'background' layer is not valid for popouts. Defaulting to 'top' layer.");
-                return WlrLayershell.Top;
-            case "overlay":
-                return WlrLayershell.Overlay;
-            default:
-                return WlrLayershell.Top;
-            }
-        }
+        WlrLayershell.layer: root.effectivePopoutLayer
         WlrLayershell.exclusiveZone: -1
-        WlrLayershell.keyboardFocus: {
-            if (customKeyboardFocus !== null)
-                return customKeyboardFocus;
-            if (!shouldBeVisible)
-                return WlrKeyboardFocus.None;
-            if (CompositorService.useHyprlandFocusGrab)
-                return WlrKeyboardFocus.OnDemand;
-            return WlrKeyboardFocus.Exclusive;
-        }
+        WlrLayershell.keyboardFocus: KeyboardFocus.keyboardFocus(shouldBeVisible || isClosing, customKeyboardFocus)
 
         anchors {
             left: true
@@ -702,9 +706,12 @@ Item {
             QtObject {
                 id: morph
                 property real openProgress: 0
+                onOpenProgressChanged: if (root.fluidStandaloneActive)
+                    root._kickBlurCommit()
                 Behavior on openProgress {
                     enabled: root.animationsEnabled
                     NumberAnimation {
+                        id: morphAnim
                         duration: Theme.variantDuration(root.animationDuration, root.shouldBeVisible)
                         easing.type: Easing.BezierSpline
                         easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
@@ -840,7 +847,9 @@ Item {
                         Connections {
                             target: contentWindow
                             function onVisibleChanged() {
-                                if (!contentWindow.visible)
+                                // open() flips contentWindow.visible to rebind the layer surface to
+                                // a new screen; don't deactivate the wrapper while still open.
+                                if (!contentWindow.visible && !root.shouldBeVisible)
                                     contentWrapper._renderActive = false;
                             }
                         }

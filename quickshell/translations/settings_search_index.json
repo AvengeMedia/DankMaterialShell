@@ -58,6 +58,7 @@
       "targetable",
       "wallpaper"
     ],
+    "icon": "blur_on",
     "description": "Enable compositor-targetable blur layer (namespace: dms:blurwallpaper). Requires manual niri configuration.",
     "conditionKey": "isNiri"
   },
@@ -428,6 +429,28 @@
     "description": "Automatically determine your location using your IP address"
   },
   {
+    "section": "calendarBackend",
+    "label": "Calendar Backend",
+    "tabIndex": 1,
+    "category": "Time & Weather",
+    "keywords": [
+      "backend",
+      "calendar",
+      "clock",
+      "daemon",
+      "dankcalendar",
+      "date",
+      "day",
+      "events",
+      "forecast",
+      "khal",
+      "month",
+      "time",
+      "weather",
+      "year"
+    ]
+  },
+  {
     "section": "dateFormat",
     "label": "Date Format",
     "tabIndex": 1,
@@ -728,60 +751,6 @@
     "icon": "dashboard"
   },
   {
-    "section": "barCorners",
-    "label": "Corners & Background",
-    "tabIndex": 3,
-    "category": "Dank Bar",
-    "keywords": [
-      "background",
-      "bar",
-      "corners",
-      "dank",
-      "panel",
-      "radius",
-      "round",
-      "rounded",
-      "statusbar",
-      "topbar"
-    ],
-    "icon": "rounded_corner"
-  },
-  {
-    "section": "_tab_3",
-    "label": "Dank Bar",
-    "tabIndex": 3,
-    "category": "Dank Bar",
-    "keywords": [
-      "bar",
-      "dank",
-      "panel",
-      "statusbar",
-      "taskbar",
-      "topbar"
-    ],
-    "icon": "toolbar"
-  },
-  {
-    "section": "barShadowDirectionSource",
-    "label": "Direction Source",
-    "tabIndex": 3,
-    "category": "Dank Bar",
-    "keywords": [
-      "bar",
-      "choose",
-      "dank",
-      "direction",
-      "panel",
-      "resolves",
-      "shadow",
-      "source",
-      "statusbar",
-      "taskbar",
-      "topbar"
-    ],
-    "description": "Choose how this bar resolves shadow direction"
-  },
-  {
     "section": "barDisplay",
     "label": "Display Assignment",
     "tabIndex": 3,
@@ -801,25 +770,6 @@
     "icon": "display_settings"
   },
   {
-    "section": "barShadowDirectionManual",
-    "label": "Manual Direction",
-    "tabIndex": 3,
-    "category": "Dank Bar",
-    "keywords": [
-      "bar",
-      "dank",
-      "direction",
-      "fixed",
-      "manual",
-      "panel",
-      "shadow",
-      "statusbar",
-      "taskbar",
-      "topbar"
-    ],
-    "description": "Use a fixed shadow direction for this bar"
-  },
-  {
     "section": "barPosition",
     "label": "Position",
     "tabIndex": 3,
@@ -835,91 +785,39 @@
     "icon": "vertical_align_center"
   },
   {
-    "section": "barShadow",
-    "label": "Shadow Override",
+    "section": "_tab_3",
+    "label": "Settings",
     "tabIndex": 3,
     "category": "Dank Bar",
     "keywords": [
       "bar",
       "dank",
-      "global",
-      "override",
       "panel",
       "settings",
-      "shadow",
+      "statusbar",
+      "topbar"
+    ],
+    "icon": "tune"
+  },
+  {
+    "section": "barUseOverlayLayer",
+    "label": "Use Overlay Layer",
+    "tabIndex": 3,
+    "category": "Dank Bar",
+    "keywords": [
+      "bar",
+      "dank",
+      "fullscreen",
+      "layer",
+      "overlay",
+      "panel",
+      "place",
       "statusbar",
       "taskbar",
-      "topbar"
-    ],
-    "icon": "layers",
-    "description": "Override the global shadow with per-bar settings"
-  },
-  {
-    "section": "barSpacing",
-    "label": "Spacing",
-    "tabIndex": 3,
-    "category": "Dank Bar",
-    "keywords": [
-      "bar",
-      "dank",
-      "gap",
-      "gaps",
-      "margin",
-      "margins",
-      "padding",
-      "panel",
-      "spacing",
-      "statusbar",
-      "topbar"
-    ],
-    "icon": "space_bar"
-  },
-  {
-    "section": "trayIconTint",
-    "label": "System Tray Icon Tint",
-    "tabIndex": 3,
-    "category": "Dank Bar",
-    "keywords": [
-      "applying",
-      "bar",
-      "before",
-      "color",
-      "colour",
-      "controls",
-      "dank",
-      "hue",
-      "icon",
-      "much",
-      "original",
-      "panel",
-      "removed",
-      "statusbar",
-      "system",
-      "tint",
       "topbar",
-      "tray"
+      "wayland"
     ],
-    "icon": "filter_b_and_w",
-    "description": "Controls how much original icon color is removed before applying tint"
-  },
-  {
-    "section": "barTransparency",
-    "label": "Transparency",
-    "tabIndex": 3,
-    "category": "Dank Bar",
-    "keywords": [
-      "alpha",
-      "bar",
-      "dank",
-      "opacity",
-      "panel",
-      "statusbar",
-      "topbar",
-      "translucent",
-      "transparency",
-      "transparent"
-    ],
-    "icon": "opacity"
+    "description": "Place the bar on the Wayland overlay layer"
   },
   {
     "section": "barVisibility",
@@ -929,79 +827,71 @@
     "keywords": [
       "auto-hide",
       "autohide",
+      "automatically",
+      "away",
       "bar",
       "dank",
+      "fullscreen",
       "hidden",
       "hide",
+      "layer",
+      "moves",
+      "overlay",
       "panel",
+      "pointer",
       "show",
       "statusbar",
+      "taskbar",
       "topbar",
       "visibility",
       "visible"
     ],
-    "icon": "visibility_off"
+    "icon": "visibility",
+    "description": "Automatically hide the bar when the pointer moves away"
   },
   {
     "section": "workspaceDragReorder",
     "label": "Drag to Reorder",
     "tabIndex": 4,
-    "category": "Workspaces",
+    "category": "Dank Bar",
     "keywords": [
+      "bar",
+      "dank",
       "desktop",
       "drag",
       "indicators",
       "move",
+      "panel",
       "reorder",
       "sort",
-      "spaces",
+      "statusbar",
+      "topbar",
       "virtual",
-      "virtual desktops",
-      "workspace",
-      "workspaces"
+      "workspace"
     ],
     "description": "Drag workspace indicators to reorder them",
     "conditionKey": "isNiri"
   },
   {
-    "section": "workspaceFocusedBorderEnabled",
-    "label": "Focused Border",
-    "tabIndex": 4,
-    "category": "Workspaces",
-    "keywords": [
-      "around",
-      "border",
-      "desktop",
-      "focused",
-      "indicator",
-      "outline",
-      "ring",
-      "show",
-      "spaces",
-      "virtual",
-      "virtual desktops",
-      "workspace",
-      "workspaces"
-    ],
-    "description": "Show an outline ring around the focused workspace indicator"
-  },
-  {
     "section": "workspaceFollowFocus",
     "label": "Follow Monitor Focus",
     "tabIndex": 4,
-    "category": "Workspaces",
+    "category": "Dank Bar",
     "keywords": [
+      "bar",
       "currently",
+      "dank",
       "desktop",
       "desktops",
       "focus",
       "focused",
       "follow",
       "monitor",
+      "panel",
       "show",
-      "spaces",
+      "statusbar",
+      "topbar",
       "virtual",
-      "virtual desktops",
       "workspace",
       "workspaces"
     ],
@@ -1009,26 +899,56 @@
     "conditionKey": "isNiri"
   },
   {
+    "section": "groupActiveWorkspaceApps",
+    "label": "Group Active Workspace",
+    "tabIndex": 4,
+    "category": "Dank Bar",
+    "keywords": [
+      "active",
+      "app",
+      "application",
+      "apps",
+      "bar",
+      "dank",
+      "desktop",
+      "focused",
+      "group",
+      "grouped",
+      "icons",
+      "panel",
+      "program",
+      "repeated",
+      "statusbar",
+      "topbar",
+      "virtual",
+      "workspace"
+    ],
+    "description": "Also group repeated application icons on the active workspace"
+  },
+  {
     "section": "groupWorkspaceApps",
     "label": "Group Workspace Apps",
     "tabIndex": 4,
-    "category": "Workspaces",
+    "category": "Dank Bar",
     "keywords": [
       "app",
       "application",
       "apps",
+      "bar",
       "collapse",
+      "dank",
       "desktop",
       "desktops",
       "group",
       "grouped",
       "icons",
+      "panel",
       "program",
       "repeated",
-      "spaces",
+      "statusbar",
+      "topbar",
       "unfocused",
       "virtual",
-      "virtual desktops",
       "workspace",
       "workspaces"
     ],
@@ -1038,12 +958,14 @@
     "section": "workspaceActiveAppHighlightEnabled",
     "label": "Highlight Active Workspace App",
     "tabIndex": 4,
-    "category": "Workspaces",
+    "category": "Dank Bar",
     "keywords": [
       "active",
       "app",
       "apps",
+      "bar",
       "currently",
+      "dank",
       "day",
       "desktop",
       "focused",
@@ -1052,11 +974,11 @@
       "indicators",
       "inside",
       "light mode",
-      "spaces",
+      "panel",
+      "statusbar",
+      "topbar",
       "virtual",
-      "virtual desktops",
-      "workspace",
-      "workspaces"
+      "workspace"
     ],
     "description": "Highlight the currently focused app inside workspace indicators"
   },
@@ -1064,16 +986,18 @@
     "section": "workspaceIcons",
     "label": "Named Workspace Icons",
     "tabIndex": 4,
-    "category": "Workspaces",
+    "category": "Dank Bar",
     "keywords": [
+      "bar",
+      "dank",
       "desktop",
       "icons",
       "named",
-      "spaces",
+      "panel",
+      "statusbar",
+      "topbar",
       "virtual",
-      "virtual desktops",
-      "workspace",
-      "workspaces"
+      "workspace"
     ],
     "icon": "label"
   },
@@ -1081,8 +1005,10 @@
     "section": "reverseScrolling",
     "label": "Reverse Scrolling Direction",
     "tabIndex": 4,
-    "category": "Workspaces",
+    "category": "Dank Bar",
     "keywords": [
+      "bar",
+      "dank",
       "desktop",
       "direction",
       "over",
@@ -1090,15 +1016,12 @@
       "reverse",
       "scroll",
       "scrolling",
-      "spaces",
       "statusbar",
       "switch",
       "taskbar",
       "topbar",
       "virtual",
-      "virtual desktops",
-      "workspace",
-      "workspaces"
+      "workspace"
     ],
     "description": "Reverse workspace switch direction when scrolling over the bar",
     "conditionKey": "isNiri"
@@ -1107,40 +1030,45 @@
     "section": "dwlShowAllTags",
     "label": "Show All Tags",
     "tabIndex": 4,
-    "category": "Workspaces",
+    "category": "Dank Bar",
     "keywords": [
       "all",
+      "bar",
+      "dank",
       "dwl",
       "occupied",
+      "panel",
       "show",
-      "spaces",
+      "statusbar",
       "tags",
-      "virtual desktops",
-      "workspace",
-      "workspaces"
+      "topbar",
+      "workspace"
     ],
-    "description": "Show all 9 tags instead of only occupied tags (DWL only)",
-    "conditionKey": "isDwl"
+    "description": "Show all 9 tags instead of only occupied tags",
+    "conditionKey": "isMango"
   },
   {
     "section": "showOccupiedWorkspacesOnly",
     "label": "Show Occupied Workspaces Only",
     "tabIndex": 4,
-    "category": "Workspaces",
+    "category": "Dank Bar",
     "keywords": [
       "active",
+      "bar",
       "contain",
+      "dank",
       "desktop",
       "desktops",
       "display",
       "monitor",
       "occupied",
       "output",
+      "panel",
       "screen",
       "show",
-      "spaces",
+      "statusbar",
+      "topbar",
       "virtual",
-      "virtual desktops",
       "windows",
       "workspace",
       "workspaces"
@@ -1152,76 +1080,52 @@
     "section": "showWorkspaceApps",
     "label": "Show Workspace Apps",
     "tabIndex": 4,
-    "category": "Workspaces",
+    "category": "Dank Bar",
     "keywords": [
       "app",
       "application",
       "applications",
       "apps",
+      "bar",
+      "dank",
       "desktop",
       "display",
       "icons",
       "indicators",
       "monitor",
       "output",
+      "panel",
       "program",
       "screen",
       "show",
-      "spaces",
+      "statusbar",
+      "topbar",
       "virtual",
-      "virtual desktops",
-      "workspace",
-      "workspaces"
+      "workspace"
     ],
     "description": "Display application icons in workspace indicators",
-    "conditionKey": "isNiri"
-  },
-  {
-    "section": "workspaceAppearance",
-    "label": "Workspace Appearance",
-    "tabIndex": 4,
-    "category": "Workspaces",
-    "keywords": [
-      "appearance",
-      "around",
-      "border",
-      "desktop",
-      "focused",
-      "indicator",
-      "outline",
-      "ring",
-      "show",
-      "spaces",
-      "virtual",
-      "virtual desktops",
-      "workspace",
-      "workspaces"
-    ],
-    "icon": "palette",
-    "description": "Show an outline ring around the focused workspace indicator",
     "conditionKey": "isNiri"
   },
   {
     "section": "showWorkspaceIndex",
     "label": "Workspace Index Numbers",
     "tabIndex": 4,
-    "category": "Workspaces",
+    "category": "Dank Bar",
     "keywords": [
+      "bar",
+      "dank",
       "desktop",
       "index",
       "labels",
       "numbers",
       "panel",
       "show",
-      "spaces",
       "statusbar",
       "switcher",
       "taskbar",
       "topbar",
       "virtual",
-      "virtual desktops",
-      "workspace",
-      "workspaces"
+      "workspace"
     ],
     "description": "Show workspace index numbers in the top bar workspace switcher"
   },
@@ -1229,9 +1133,11 @@
     "section": "showWorkspaceName",
     "label": "Workspace Names",
     "tabIndex": 4,
-    "category": "Workspaces",
+    "category": "Dank Bar",
     "keywords": [
+      "bar",
       "bars",
+      "dank",
       "desktop",
       "first",
       "horizontal",
@@ -1241,15 +1147,12 @@
       "names",
       "panel",
       "show",
-      "spaces",
       "statusbar",
       "taskbar",
       "topbar",
       "vertical",
       "virtual",
-      "virtual desktops",
-      "workspace",
-      "workspaces"
+      "workspace"
     ],
     "description": "Show workspace name on horizontal bars, and first letter on vertical bars"
   },
@@ -1257,20 +1160,23 @@
     "section": "showWorkspacePadding",
     "label": "Workspace Padding",
     "tabIndex": 4,
-    "category": "Workspaces",
+    "category": "Dank Bar",
     "keywords": [
       "always",
       "available",
+      "bar",
+      "dank",
       "desktop",
       "desktops",
       "even",
       "fewer",
       "minimum",
       "padding",
+      "panel",
       "show",
-      "spaces",
+      "statusbar",
+      "topbar",
       "virtual",
-      "virtual desktops",
       "workspace",
       "workspaces"
     ],
@@ -1280,8 +1186,10 @@
     "section": "workspaceSettings",
     "label": "Workspace Settings",
     "tabIndex": 4,
-    "category": "Workspaces",
+    "category": "Dank Bar",
     "keywords": [
+      "bar",
+      "dank",
       "desktop",
       "index",
       "labels",
@@ -1289,15 +1197,12 @@
       "panel",
       "settings",
       "show",
-      "spaces",
       "statusbar",
       "switcher",
       "taskbar",
       "topbar",
       "virtual",
-      "virtual desktops",
-      "workspace",
-      "workspaces"
+      "workspace"
     ],
     "icon": "view_module",
     "description": "Show workspace index numbers in the top bar workspace switcher",
@@ -1305,22 +1210,22 @@
   },
   {
     "section": "_tab_4",
-    "label": "Workspaces & Widgets",
+    "label": "Workspaces",
     "tabIndex": 4,
-    "category": "Workspaces",
+    "category": "Dank Bar",
     "keywords": [
-      "components",
+      "bar",
+      "dank",
       "desktop",
       "desktops",
-      "modules",
-      "spaces",
+      "panel",
+      "statusbar",
+      "topbar",
       "virtual",
-      "virtual desktops",
-      "widgets",
       "workspace",
       "workspaces"
     ],
-    "icon": "dashboard"
+    "icon": "view_module"
   },
   {
     "section": "dockAutoHide",
@@ -1431,7 +1336,7 @@
       "start menu",
       "taskbar"
     ],
-    "icon": "apps"
+    "icon": "shelf_auto_hide"
   },
   {
     "section": "dockVisibility",
@@ -1486,22 +1391,6 @@
       "windows"
     ],
     "description": "Group multiple windows of the same app together with a window count indicator"
-  },
-  {
-    "section": "dockHideOnFullscreen",
-    "label": "Hide When Fullscreen",
-    "tabIndex": 5,
-    "category": "Dock",
-    "keywords": [
-      "dock",
-      "fullscreen",
-      "hide",
-      "launcher bar",
-      "panel",
-      "taskbar",
-      "window"
-    ],
-    "description": "Hide the dock when a window is fullscreen"
   },
   {
     "section": "dockIconSize",
@@ -1635,6 +1524,19 @@
       "unlimited)",
       "windows"
     ]
+  },
+  {
+    "section": "dockTransparency",
+    "label": "Opacity",
+    "tabIndex": 5,
+    "category": "Dock",
+    "keywords": [
+      "dock",
+      "launcher bar",
+      "opacity",
+      "taskbar"
+    ],
+    "icon": "opacity"
   },
   {
     "section": "dockTrashFileManager",
@@ -1854,23 +1756,6 @@
     "icon": "space_bar"
   },
   {
-    "section": "dockTransparency",
-    "label": "Transparency",
-    "tabIndex": 5,
-    "category": "Dock",
-    "keywords": [
-      "alpha",
-      "dock",
-      "launcher bar",
-      "opacity",
-      "taskbar",
-      "translucent",
-      "transparency",
-      "transparent"
-    ],
-    "icon": "opacity"
-  },
-  {
     "section": "dockTrash",
     "label": "Trash",
     "tabIndex": 5,
@@ -1887,6 +1772,339 @@
     ],
     "icon": "delete",
     "description": "Place a trash bin at the end of the dock"
+  },
+  {
+    "section": "dockUseOverlayLayer",
+    "label": "Use Overlay Layer",
+    "tabIndex": 5,
+    "category": "Dock",
+    "keywords": [
+      "dock",
+      "fullscreen",
+      "launcher bar",
+      "layer",
+      "overlay",
+      "panel",
+      "place",
+      "taskbar",
+      "wayland"
+    ],
+    "description": "Place the dock on the Wayland overlay layer"
+  },
+  {
+    "section": "barBorder",
+    "label": "Border",
+    "tabIndex": 6,
+    "category": "Dank Bar",
+    "keywords": [
+      "appearance",
+      "bar",
+      "border",
+      "color",
+      "colors",
+      "colour",
+      "dank",
+      "hue",
+      "look",
+      "panel",
+      "statusbar",
+      "style",
+      "theme",
+      "tint",
+      "topbar"
+    ],
+    "icon": "border_style",
+    "description": "Theme color used for the border"
+  },
+  {
+    "section": "barCorners",
+    "label": "Corners & Background",
+    "tabIndex": 6,
+    "category": "Dank Bar",
+    "keywords": [
+      "background",
+      "bar",
+      "corner",
+      "corners",
+      "dank",
+      "panel",
+      "radius",
+      "remove",
+      "round",
+      "rounded",
+      "rounding",
+      "statusbar",
+      "taskbar",
+      "topbar"
+    ],
+    "icon": "rounded_corner",
+    "description": "Remove corner rounding from the bar"
+  },
+  {
+    "section": "barAppearance",
+    "label": "Dank Bar",
+    "tabIndex": 6,
+    "category": "Dank Bar",
+    "keywords": [
+      "bar",
+      "dank",
+      "panel",
+      "statusbar",
+      "taskbar",
+      "topbar"
+    ],
+    "icon": "toolbar"
+  },
+  {
+    "section": "barShadowDirectionSource",
+    "label": "Direction Source",
+    "tabIndex": 6,
+    "category": "Dank Bar",
+    "keywords": [
+      "bar",
+      "choose",
+      "dank",
+      "direction",
+      "panel",
+      "resolves",
+      "shadow",
+      "source",
+      "statusbar",
+      "taskbar",
+      "topbar"
+    ],
+    "description": "Choose how this bar resolves shadow direction"
+  },
+  {
+    "section": "workspaceFocusedBorderEnabled",
+    "label": "Focused Border",
+    "tabIndex": 6,
+    "category": "Dank Bar",
+    "keywords": [
+      "around",
+      "bar",
+      "border",
+      "dank",
+      "desktop",
+      "focused",
+      "indicator",
+      "outline",
+      "panel",
+      "ring",
+      "show",
+      "statusbar",
+      "topbar",
+      "virtual",
+      "workspace"
+    ],
+    "description": "Show an outline ring around the focused workspace indicator"
+  },
+  {
+    "section": "barFontScale",
+    "label": "Font Scale",
+    "tabIndex": 6,
+    "category": "Dank Bar",
+    "keywords": [
+      "bar",
+      "dank",
+      "dankbar",
+      "font",
+      "independently",
+      "panel",
+      "scale",
+      "sizes",
+      "statusbar",
+      "taskbar",
+      "topbar"
+    ],
+    "icon": "text_fields",
+    "description": "Scale DankBar font sizes independently"
+  },
+  {
+    "section": "barIconScale",
+    "label": "Icon Scale",
+    "tabIndex": 6,
+    "category": "Dank Bar",
+    "keywords": [
+      "bar",
+      "dank",
+      "dankbar",
+      "icon",
+      "independently",
+      "panel",
+      "scale",
+      "sizes",
+      "statusbar",
+      "taskbar",
+      "topbar"
+    ],
+    "icon": "interests",
+    "description": "Scale DankBar icon sizes independently"
+  },
+  {
+    "section": "barShadowDirectionManual",
+    "label": "Manual Direction",
+    "tabIndex": 6,
+    "category": "Dank Bar",
+    "keywords": [
+      "bar",
+      "dank",
+      "direction",
+      "fixed",
+      "manual",
+      "panel",
+      "shadow",
+      "statusbar",
+      "taskbar",
+      "topbar"
+    ],
+    "description": "Use a fixed shadow direction for this bar"
+  },
+  {
+    "section": "barTransparency",
+    "label": "Opacity",
+    "tabIndex": 6,
+    "category": "Dank Bar",
+    "keywords": [
+      "background",
+      "bar",
+      "controls",
+      "dank",
+      "opacity",
+      "panel",
+      "statusbar",
+      "taskbar",
+      "topbar"
+    ],
+    "icon": "opacity",
+    "description": "Controls opacity of the bar background"
+  },
+  {
+    "section": "barShadow",
+    "label": "Shadow Override",
+    "tabIndex": 6,
+    "category": "Dank Bar",
+    "keywords": [
+      "bar",
+      "dank",
+      "global",
+      "override",
+      "panel",
+      "settings",
+      "shadow",
+      "statusbar",
+      "taskbar",
+      "topbar"
+    ],
+    "icon": "layers",
+    "description": "Override the global shadow with per-bar settings"
+  },
+  {
+    "section": "barSpacing",
+    "label": "Spacing",
+    "tabIndex": 6,
+    "category": "Dank Bar",
+    "keywords": [
+      "bar",
+      "between",
+      "dank",
+      "edges",
+      "gap",
+      "gaps",
+      "margin",
+      "margins",
+      "padding",
+      "panel",
+      "screen",
+      "space",
+      "spacing",
+      "statusbar",
+      "taskbar",
+      "topbar"
+    ],
+    "icon": "space_bar",
+    "description": "Space between the bar and screen edges"
+  },
+  {
+    "section": "trayIconTint",
+    "label": "System Tray Icon Tint",
+    "tabIndex": 6,
+    "category": "Dank Bar",
+    "keywords": [
+      "applying",
+      "bar",
+      "before",
+      "color",
+      "colour",
+      "controls",
+      "dank",
+      "hue",
+      "icon",
+      "much",
+      "original",
+      "panel",
+      "removed",
+      "statusbar",
+      "system",
+      "tint",
+      "topbar",
+      "tray"
+    ],
+    "icon": "filter_b_and_w",
+    "description": "Controls how much original icon color is removed before applying tint"
+  },
+  {
+    "section": "barWidgetOutline",
+    "label": "Widget Outline",
+    "tabIndex": 6,
+    "category": "Dank Bar",
+    "keywords": [
+      "appearance",
+      "bar",
+      "color",
+      "colors",
+      "colour",
+      "dank",
+      "hue",
+      "look",
+      "outline",
+      "panel",
+      "statusbar",
+      "style",
+      "theme",
+      "tint",
+      "topbar",
+      "widget"
+    ],
+    "icon": "highlight",
+    "description": "Theme color used for the widget outline"
+  },
+  {
+    "section": "workspaceAppearance",
+    "label": "Workspace Appearance",
+    "tabIndex": 6,
+    "category": "Dank Bar",
+    "keywords": [
+      "appearance",
+      "around",
+      "bar",
+      "color",
+      "custom",
+      "dank",
+      "desktop",
+      "focused",
+      "indicator",
+      "outline",
+      "panel",
+      "ring",
+      "show",
+      "statusbar",
+      "topbar",
+      "virtual",
+      "workspace"
+    ],
+    "icon": "palette",
+    "description": "Show an outline ring around the focused workspace indicator"
   },
   {
     "section": "_tab_7",
@@ -1906,6 +2124,25 @@
     ],
     "icon": "wifi",
     "conditionKey": "dmsConnected"
+  },
+  {
+    "section": "networkStatus",
+    "label": "Network Status",
+    "tabIndex": 7,
+    "category": "Network",
+    "keywords": [
+      "connection",
+      "connectivity",
+      "ethernet",
+      "internet",
+      "network",
+      "online",
+      "status",
+      "wi-fi",
+      "wifi",
+      "wireless"
+    ],
+    "icon": "lan"
   },
   {
     "section": "_tab_8",
@@ -2022,6 +2259,50 @@
       "start"
     ],
     "icon": "extension"
+  },
+  {
+    "section": "launcherStyle",
+    "label": "Default Launcher",
+    "tabIndex": 9,
+    "category": "Launcher",
+    "keywords": [
+      "app drawer",
+      "app menu",
+      "applications",
+      "default",
+      "drawer",
+      "full",
+      "launcher",
+      "layer",
+      "menu",
+      "minimal",
+      "opening",
+      "overlay",
+      "spotlight",
+      "start",
+      "start menu",
+      "style"
+    ],
+    "icon": "search",
+    "description": "Use the overlay layer when opening the launcher"
+  },
+  {
+    "section": "launcherStyleSelector",
+    "label": "Default Opens",
+    "tabIndex": 9,
+    "category": "Launcher",
+    "keywords": [
+      "default",
+      "drawer",
+      "full",
+      "launcher",
+      "menu",
+      "minimal",
+      "opens",
+      "spotlight",
+      "start",
+      "style"
+    ]
   },
   {
     "section": "niriOverviewOverlayEnabled",
@@ -2259,6 +2540,30 @@
     "icon": "history"
   },
   {
+    "section": "rememberLastMode",
+    "label": "Remember Last Mode",
+    "tabIndex": 9,
+    "category": "Launcher",
+    "keywords": [
+      "app drawer",
+      "app menu",
+      "applications",
+      "drawer",
+      "last",
+      "launcher",
+      "menu",
+      "mode",
+      "opened",
+      "remember",
+      "restore",
+      "selected",
+      "start",
+      "start menu",
+      "tab"
+    ],
+    "description": "Restore the last selected mode (tab) when the launcher is opened"
+  },
+  {
     "section": "rememberLastQuery",
     "label": "Remember Last Query",
     "tabIndex": 9,
@@ -2341,6 +2646,40 @@
     "description": "Show mode tabs and keyboard hints at the bottom."
   },
   {
+    "section": "spotlightBarShowModeChips",
+    "label": "Show Mode Chips",
+    "tabIndex": 9,
+    "category": "Launcher",
+    "keywords": [
+      "addons",
+      "apps",
+      "bar",
+      "beside",
+      "chips",
+      "day",
+      "drawer",
+      "extensions",
+      "files",
+      "input",
+      "launcher",
+      "light mode",
+      "menu",
+      "mode",
+      "modes",
+      "panel",
+      "plugins",
+      "show",
+      "spotlight",
+      "start",
+      "statusbar",
+      "tabs",
+      "taskbar",
+      "topbar",
+      "widgets"
+    ],
+    "description": "Show All, Apps, Files, and Plugins chips beside the Spotlight Bar input."
+  },
+  {
     "section": "launcherLogoSizeOffset",
     "label": "Size Offset",
     "tabIndex": 9,
@@ -2404,6 +2743,40 @@
     "description": "When enabled, apps are sorted alphabetically. When disabled, apps are sorted by usage frequency."
   },
   {
+    "section": "spotlightBarLauncher",
+    "label": "Spotlight Bar",
+    "tabIndex": 9,
+    "category": "Launcher",
+    "keywords": [
+      "addons",
+      "apps",
+      "bar",
+      "beside",
+      "chips",
+      "day",
+      "drawer",
+      "extensions",
+      "files",
+      "input",
+      "launcher",
+      "light mode",
+      "menu",
+      "modes",
+      "panel",
+      "plugins",
+      "show",
+      "spotlight",
+      "start",
+      "statusbar",
+      "tabs",
+      "taskbar",
+      "topbar",
+      "widgets"
+    ],
+    "icon": "search",
+    "description": "Show All, Apps, Files, and Plugins chips beside the Spotlight Bar input."
+  },
+  {
     "section": "dankLauncherV2BorderThickness",
     "label": "Thickness",
     "tabIndex": 9,
@@ -2445,6 +2818,27 @@
       "vram"
     ],
     "description": "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening."
+  },
+  {
+    "section": "launcherUseOverlayLayer",
+    "label": "Use Overlay Layer",
+    "tabIndex": 9,
+    "category": "Launcher",
+    "keywords": [
+      "app drawer",
+      "app menu",
+      "applications",
+      "drawer",
+      "fullscreen",
+      "launcher",
+      "layer",
+      "menu",
+      "opening",
+      "overlay",
+      "start",
+      "start menu"
+    ],
+    "description": "Use the overlay layer when opening the launcher"
   },
   {
     "section": "matugenTemplateAlacritty",
@@ -2554,20 +2948,20 @@
       "background",
       "blur",
       "colors",
+      "compositor",
+      "does",
+      "effect",
       "frosted",
       "glass",
       "look",
-      "newer",
-      "quickshell",
-      "requires",
       "scheme",
       "style",
+      "support",
       "theme",
-      "transparency",
-      "version"
+      "transparency"
     ],
     "icon": "blur_on",
-    "description": "Requires a newer version of Quickshell"
+    "description": "Your compositor does not support background blur (ext-background-effect-v1)"
   },
   {
     "section": "barElevationEnabled",
@@ -2645,72 +3039,6 @@
       "windows"
     ],
     "description": "Controls the outer edge of protocol-blurred windows"
-  },
-  {
-    "section": "niriLayoutBorderSize",
-    "label": "Border Size",
-    "tabIndex": 10,
-    "category": "Theme & Colors",
-    "keywords": [
-      "appearance",
-      "border",
-      "colors",
-      "focus",
-      "look",
-      "niri",
-      "override",
-      "ring",
-      "scheme",
-      "size",
-      "style",
-      "theme",
-      "width",
-      "window"
-    ],
-    "description": "Width of window border and focus ring"
-  },
-  {
-    "section": "hyprlandLayoutBorderSize",
-    "label": "Border Size",
-    "tabIndex": 10,
-    "category": "Theme & Colors",
-    "keywords": [
-      "appearance",
-      "border",
-      "colors",
-      "hyprland",
-      "look",
-      "override",
-      "scheme",
-      "size",
-      "style",
-      "theme",
-      "width",
-      "window"
-    ],
-    "description": "Width of window border (general.border_size)"
-  },
-  {
-    "section": "mangoLayoutBorderSize",
-    "label": "Border Size",
-    "tabIndex": 10,
-    "category": "Theme & Colors",
-    "keywords": [
-      "appearance",
-      "border",
-      "colors",
-      "look",
-      "mango",
-      "mangowc",
-      "override",
-      "scheme",
-      "size",
-      "style",
-      "theme",
-      "width",
-      "window"
-    ],
-    "description": "Width of window border (borderpx)"
   },
   {
     "section": "buttonColorMode",
@@ -2851,6 +3179,33 @@
     "icon": "mouse",
     "description": "Mouse pointer appearance",
     "conditionKey": "isNiri"
+  },
+  {
+    "section": "widgetBackgroundCustomStrength",
+    "label": "Custom Blend",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "background",
+      "between",
+      "blend",
+      "color",
+      "colors",
+      "colour",
+      "custom",
+      "high",
+      "hue",
+      "look",
+      "scheme",
+      "selected",
+      "style",
+      "surface",
+      "theme",
+      "tint",
+      "widget"
+    ],
+    "description": "Blend between Surface High and the selected custom color"
   },
   {
     "section": "matugenTemplateNeovimSettings",
@@ -3083,41 +3438,6 @@
     ]
   },
   {
-    "section": "hyprlandLayout",
-    "label": "Hyprland Layout Overrides",
-    "tabIndex": 10,
-    "category": "Theme & Colors",
-    "keywords": [
-      "appearance",
-      "border",
-      "colors",
-      "custom",
-      "gap",
-      "gaps",
-      "hyprland",
-      "layout",
-      "look",
-      "margin",
-      "margins",
-      "overrides",
-      "padding",
-      "panel",
-      "radius",
-      "rounding",
-      "scheme",
-      "spacing",
-      "statusbar",
-      "style",
-      "taskbar",
-      "theme",
-      "topbar",
-      "window"
-    ],
-    "icon": "crop_square",
-    "description": "Use custom gaps instead of bar spacing",
-    "conditionKey": "isHyprland"
-  },
-  {
     "section": "iconTheme",
     "label": "Icon Theme",
     "tabIndex": 10,
@@ -3243,42 +3563,6 @@
       "theme"
     ],
     "description": "Use light theme instead of dark theme"
-  },
-  {
-    "section": "mangoLayout",
-    "label": "MangoWC Layout Overrides",
-    "tabIndex": 10,
-    "category": "Theme & Colors",
-    "keywords": [
-      "appearance",
-      "border",
-      "colors",
-      "custom",
-      "dwl",
-      "gap",
-      "gaps",
-      "layout",
-      "look",
-      "mango",
-      "mangowc",
-      "margin",
-      "margins",
-      "overrides",
-      "padding",
-      "panel",
-      "radius",
-      "scheme",
-      "spacing",
-      "statusbar",
-      "style",
-      "taskbar",
-      "theme",
-      "topbar",
-      "window"
-    ],
-    "icon": "crop_square",
-    "description": "Use custom gaps instead of bar spacing",
-    "conditionKey": "isDwl"
   },
   {
     "section": "matugenContrast",
@@ -3414,264 +3698,28 @@
     "description": "Shadow elevation on modals and dialogs"
   },
   {
-    "section": "niriLayout",
-    "label": "Niri Layout Overrides",
+    "section": "mangoTrackpadNaturalScrolling",
+    "label": "Natural Touchpad Scrolling",
     "tabIndex": 10,
     "category": "Theme & Colors",
     "keywords": [
       "appearance",
-      "border",
       "colors",
-      "custom",
-      "gap",
-      "gaps",
-      "layout",
-      "look",
-      "margin",
-      "margins",
-      "niri",
-      "overrides",
-      "padding",
-      "panel",
-      "radius",
-      "scheme",
-      "spacing",
-      "statusbar",
-      "style",
-      "taskbar",
-      "theme",
-      "topbar",
-      "window"
-    ],
-    "icon": "crop_square",
-    "description": "Use custom gaps instead of bar spacing",
-    "conditionKey": "isNiri"
-  },
-  {
-    "section": "niriLayoutBorderSizeEnabled",
-    "label": "Override Border Size",
-    "tabIndex": 10,
-    "category": "Theme & Colors",
-    "keywords": [
-      "appearance",
-      "border",
-      "colors",
-      "custom",
-      "focus",
-      "look",
-      "niri",
-      "override",
-      "ring",
-      "scheme",
-      "size",
-      "style",
-      "theme",
-      "width"
-    ],
-    "description": "Use custom border/focus-ring width"
-  },
-  {
-    "section": "hyprlandLayoutBorderSizeEnabled",
-    "label": "Override Border Size",
-    "tabIndex": 10,
-    "category": "Theme & Colors",
-    "keywords": [
-      "appearance",
-      "border",
-      "colors",
-      "custom",
-      "hyprland",
-      "look",
-      "override",
-      "scheme",
-      "size",
-      "style",
-      "theme"
-    ],
-    "description": "Use custom border size"
-  },
-  {
-    "section": "mangoLayoutBorderSizeEnabled",
-    "label": "Override Border Size",
-    "tabIndex": 10,
-    "category": "Theme & Colors",
-    "keywords": [
-      "appearance",
-      "border",
-      "colors",
-      "custom",
+      "direction",
+      "invert",
       "look",
       "mango",
-      "mangowc",
-      "override",
+      "natural",
       "scheme",
-      "size",
-      "style",
-      "theme"
-    ],
-    "description": "Use custom border size"
-  },
-  {
-    "section": "niriLayoutRadiusOverrideEnabled",
-    "label": "Override Corner Radius",
-    "tabIndex": 10,
-    "category": "Theme & Colors",
-    "keywords": [
-      "appearance",
-      "colors",
-      "colour",
-      "corner",
-      "corners",
-      "custom",
-      "look",
-      "niri",
-      "override",
-      "radius",
-      "round",
-      "rounded",
-      "scheme",
+      "scroll",
+      "scrolling",
       "style",
       "theme",
-      "window"
+      "touchpad",
+      "trackpad"
     ],
-    "description": "Use custom window radius instead of theme radius"
-  },
-  {
-    "section": "hyprlandLayoutRadiusOverrideEnabled",
-    "label": "Override Corner Radius",
-    "tabIndex": 10,
-    "category": "Theme & Colors",
-    "keywords": [
-      "appearance",
-      "colors",
-      "colour",
-      "corner",
-      "corners",
-      "custom",
-      "hyprland",
-      "look",
-      "override",
-      "radius",
-      "round",
-      "rounded",
-      "rounding",
-      "scheme",
-      "style",
-      "theme",
-      "window"
-    ],
-    "description": "Use custom window rounding instead of theme radius"
-  },
-  {
-    "section": "mangoLayoutRadiusOverrideEnabled",
-    "label": "Override Corner Radius",
-    "tabIndex": 10,
-    "category": "Theme & Colors",
-    "keywords": [
-      "appearance",
-      "colors",
-      "colour",
-      "corner",
-      "corners",
-      "custom",
-      "look",
-      "mango",
-      "mangowc",
-      "override",
-      "radius",
-      "round",
-      "rounded",
-      "scheme",
-      "style",
-      "theme",
-      "window"
-    ],
-    "description": "Use custom window radius instead of theme radius"
-  },
-  {
-    "section": "niriLayoutGapsOverrideEnabled",
-    "label": "Override Gaps",
-    "tabIndex": 10,
-    "category": "Theme & Colors",
-    "keywords": [
-      "appearance",
-      "colors",
-      "custom",
-      "gap",
-      "gaps",
-      "look",
-      "margin",
-      "margins",
-      "niri",
-      "override",
-      "padding",
-      "panel",
-      "scheme",
-      "spacing",
-      "statusbar",
-      "style",
-      "taskbar",
-      "theme",
-      "topbar"
-    ],
-    "description": "Use custom gaps instead of bar spacing"
-  },
-  {
-    "section": "hyprlandLayoutGapsOverrideEnabled",
-    "label": "Override Gaps",
-    "tabIndex": 10,
-    "category": "Theme & Colors",
-    "keywords": [
-      "appearance",
-      "colors",
-      "custom",
-      "gap",
-      "gaps",
-      "hyprland",
-      "look",
-      "margin",
-      "margins",
-      "override",
-      "padding",
-      "panel",
-      "scheme",
-      "spacing",
-      "statusbar",
-      "style",
-      "taskbar",
-      "theme",
-      "topbar"
-    ],
-    "description": "Use custom gaps instead of bar spacing"
-  },
-  {
-    "section": "mangoLayoutGapsOverrideEnabled",
-    "label": "Override Gaps",
-    "tabIndex": 10,
-    "category": "Theme & Colors",
-    "keywords": [
-      "appearance",
-      "colors",
-      "custom",
-      "gap",
-      "gaps",
-      "look",
-      "mango",
-      "mangowc",
-      "margin",
-      "margins",
-      "override",
-      "padding",
-      "panel",
-      "scheme",
-      "spacing",
-      "statusbar",
-      "style",
-      "taskbar",
-      "theme",
-      "topbar"
-    ],
-    "description": "Use custom gaps instead of bar spacing"
+    "description": "Invert touchpad scroll direction",
+    "conditionKey": "isMango"
   },
   {
     "section": "popoutElevationEnabled",
@@ -3791,7 +3839,6 @@
     "tabIndex": 10,
     "category": "Theme & Colors",
     "keywords": [
-      "alpha",
       "appearance",
       "colors",
       "controls",
@@ -3803,11 +3850,9 @@
       "shadow",
       "style",
       "theme",
-      "translucent",
-      "transparency",
-      "transparent"
+      "transparency"
     ],
-    "description": "Controls the transparency of the shadow"
+    "description": "Controls the opacity of the shadow"
   },
   {
     "section": "m3ElevationEnabled",
@@ -3832,6 +3877,7 @@
       "style",
       "theme"
     ],
+    "icon": "layers",
     "description": "Material inspired shadows and elevation on modals, popouts, and dialogs"
   },
   {
@@ -3842,9 +3888,7 @@
     "keywords": [
       "appearance",
       "colors",
-      "content",
       "controls",
-      "layers",
       "look",
       "modal",
       "modals",
@@ -3852,13 +3896,14 @@
       "popouts",
       "popup",
       "scheme",
+      "shell",
       "style",
       "surface",
-      "their",
+      "surfaces",
       "theme",
       "transparency"
     ],
-    "description": "Controls opacity of all popouts, modals, and their content layers"
+    "description": "Controls opacity of shell surfaces, popouts, and modals"
   },
   {
     "section": "syncModeWithPortal",
@@ -4028,219 +4073,58 @@
     ]
   },
   {
-    "section": "widgetBackgroundColor",
-    "label": "Widget Background Color",
-    "tabIndex": 10,
-    "category": "Theme & Colors",
-    "keywords": [
-      "appearance",
-      "background",
-      "choose",
-      "color",
-      "colors",
-      "colour",
-      "components",
-      "hue",
-      "look",
-      "modules",
-      "scheme",
-      "style",
-      "theme",
-      "tint",
-      "widget",
-      "widgets"
-    ],
-    "description": "Choose the background color for widgets"
-  },
-  {
-    "section": "widgetColorMode",
-    "label": "Widget Style",
-    "tabIndex": 10,
-    "category": "Theme & Colors",
-    "keywords": [
-      "appearance",
-      "change",
-      "colorful",
-      "colors",
-      "default",
-      "look",
-      "panel",
-      "scheme",
-      "statusbar",
-      "style",
-      "taskbar",
-      "theme",
-      "topbar",
-      "widget"
-    ],
-    "description": "Change bar appearance"
-  },
-  {
     "section": "widgetStyling",
     "label": "Widget Styling",
     "tabIndex": 10,
     "category": "Theme & Colors",
     "keywords": [
+      "accent",
       "appearance",
-      "change",
+      "choose",
+      "colored",
       "colors",
+      "colour",
+      "hue",
       "look",
+      "neutral",
       "opacity",
-      "panel",
       "scheme",
-      "statusbar",
       "style",
       "styling",
-      "taskbar",
+      "text",
       "theme",
-      "topbar",
+      "tint",
       "transparency",
       "widget"
     ],
     "icon": "opacity",
-    "description": "Change bar appearance"
+    "description": "Choose neutral or accent-colored widget text"
   },
   {
-    "section": "niriLayoutRadiusOverride",
-    "label": "Window Corner Radius",
+    "section": "widgetColorMode",
+    "label": "Widget Text Style",
     "tabIndex": 10,
     "category": "Theme & Colors",
     "keywords": [
+      "accent",
       "appearance",
+      "choose",
+      "colored",
+      "colorful",
       "colors",
-      "corner",
-      "corners",
+      "colour",
+      "default",
+      "hue",
       "look",
-      "niri",
-      "override",
-      "radius",
-      "round",
-      "rounded",
+      "neutral",
       "scheme",
       "style",
+      "text",
       "theme",
-      "window",
-      "windows"
+      "tint",
+      "widget"
     ],
-    "description": "Rounded corners for windows"
-  },
-  {
-    "section": "mangoLayoutRadiusOverride",
-    "label": "Window Corner Radius",
-    "tabIndex": 10,
-    "category": "Theme & Colors",
-    "keywords": [
-      "appearance",
-      "colors",
-      "corner",
-      "corners",
-      "look",
-      "mango",
-      "mangowc",
-      "override",
-      "radius",
-      "round",
-      "rounded",
-      "scheme",
-      "style",
-      "theme",
-      "window",
-      "windows"
-    ],
-    "description": "Rounded corners for windows (border_radius)"
-  },
-  {
-    "section": "niriLayoutGapsOverride",
-    "label": "Window Gaps",
-    "tabIndex": 10,
-    "category": "Theme & Colors",
-    "keywords": [
-      "appearance",
-      "between",
-      "colors",
-      "gaps",
-      "look",
-      "niri",
-      "override",
-      "scheme",
-      "space",
-      "style",
-      "theme",
-      "window",
-      "windows"
-    ],
-    "description": "Space between windows"
-  },
-  {
-    "section": "hyprlandLayoutGapsOverride",
-    "label": "Window Gaps",
-    "tabIndex": 10,
-    "category": "Theme & Colors",
-    "keywords": [
-      "appearance",
-      "between",
-      "colors",
-      "gaps",
-      "hyprland",
-      "look",
-      "override",
-      "scheme",
-      "space",
-      "style",
-      "theme",
-      "window",
-      "windows"
-    ],
-    "description": "Space between windows (gaps_in and gaps_out)"
-  },
-  {
-    "section": "mangoLayoutGapsOverride",
-    "label": "Window Gaps",
-    "tabIndex": 10,
-    "category": "Theme & Colors",
-    "keywords": [
-      "appearance",
-      "between",
-      "colors",
-      "gappiv",
-      "gappoh",
-      "gaps",
-      "look",
-      "mango",
-      "mangowc",
-      "override",
-      "scheme",
-      "space",
-      "style",
-      "theme",
-      "window",
-      "windows"
-    ],
-    "description": "Space between windows (gappih/gappiv/gappoh/gappov)"
-  },
-  {
-    "section": "hyprlandLayoutRadiusOverride",
-    "label": "Window Rounding",
-    "tabIndex": 10,
-    "category": "Theme & Colors",
-    "keywords": [
-      "appearance",
-      "colors",
-      "corners",
-      "hyprland",
-      "look",
-      "override",
-      "radius",
-      "round",
-      "rounded",
-      "rounding",
-      "scheme",
-      "style",
-      "theme",
-      "window",
-      "windows"
-    ],
-    "description": "Rounded corners for windows (decoration.rounding)"
+    "description": "Choose neutral or accent-colored widget text"
   },
   {
     "section": "matugenTemplateZed",
@@ -4702,6 +4586,27 @@
     "description": "Automatically lock the screen when DMS starts"
   },
   {
+    "section": "lockBeforeSuspend",
+    "label": "Lock before suspend",
+    "tabIndex": 11,
+    "category": "Lock Screen",
+    "keywords": [
+      "automatic",
+      "automatically",
+      "before",
+      "lock",
+      "login",
+      "password",
+      "prepares",
+      "screen",
+      "security",
+      "sleep",
+      "suspend",
+      "system"
+    ],
+    "description": "Automatically lock the screen when the system prepares to suspend"
+  },
+  {
     "section": "lockScreenNotificationMode",
     "label": "Notification Display",
     "tabIndex": 11,
@@ -4988,29 +4893,6 @@
     "icon": "info"
   },
   {
-    "section": "popoutAnimationSpeed",
-    "label": "%1 Animation Speed",
-    "tabIndex": 14,
-    "category": "Typography & Motion",
-    "keywords": [
-      "animate",
-      "animation",
-      "animations",
-      "custom",
-      "duration",
-      "fonts",
-      "motion",
-      "popout",
-      "speed",
-      "sync",
-      "text",
-      "transition",
-      "typography"
-    ],
-    "icon": "open_in_new",
-    "description": "%1 custom animation duration"
-  },
-  {
     "section": "modalAnimationSpeed",
     "label": "%1 Animation Speed",
     "tabIndex": 14,
@@ -5031,6 +4913,29 @@
       "typography"
     ],
     "icon": "web_asset",
+    "description": "%1 custom animation duration"
+  },
+  {
+    "section": "popoutAnimationSpeed",
+    "label": "%1 Animation Speed",
+    "tabIndex": 14,
+    "category": "Typography & Motion",
+    "keywords": [
+      "animate",
+      "animation",
+      "animations",
+      "custom",
+      "duration",
+      "fonts",
+      "motion",
+      "popout",
+      "speed",
+      "sync",
+      "text",
+      "transition",
+      "typography"
+    ],
+    "icon": "open_in_new",
     "description": "%1 custom animation duration"
   },
   {
@@ -5102,27 +5007,6 @@
     "icon": "auto_awesome_motion"
   },
   {
-    "section": "popoutCustomAnimationDuration",
-    "label": "Custom Duration",
-    "tabIndex": 14,
-    "category": "Typography & Motion",
-    "keywords": [
-      "animate",
-      "animation",
-      "animations",
-      "custom",
-      "duration",
-      "fonts",
-      "motion",
-      "popout",
-      "speed",
-      "text",
-      "transition",
-      "typography"
-    ],
-    "description": "%1 custom animation duration"
-  },
-  {
     "section": "modalCustomAnimationDuration",
     "label": "Custom Duration",
     "tabIndex": 14,
@@ -5136,6 +5020,27 @@
       "fonts",
       "modal",
       "motion",
+      "speed",
+      "text",
+      "transition",
+      "typography"
+    ],
+    "description": "%1 custom animation duration"
+  },
+  {
+    "section": "popoutCustomAnimationDuration",
+    "label": "Custom Duration",
+    "tabIndex": 14,
+    "category": "Typography & Motion",
+    "keywords": [
+      "animate",
+      "animation",
+      "animations",
+      "custom",
+      "duration",
+      "fonts",
+      "motion",
+      "popout",
       "speed",
       "text",
       "transition",
@@ -5399,6 +5304,30 @@
     "description": "Play sound after logging in"
   },
   {
+    "section": "muteSoundsWhenMediaPlaying",
+    "label": "Mute During Playback",
+    "tabIndex": 15,
+    "category": "Sounds",
+    "keywords": [
+      "audio",
+      "during",
+      "effects",
+      "media",
+      "mpris",
+      "music",
+      "mute",
+      "playback",
+      "playing",
+      "sfx",
+      "silence",
+      "sound",
+      "sounds",
+      "system",
+      "while"
+    ],
+    "description": "Silence system sounds while media is playing"
+  },
+  {
     "section": "soundNewNotification",
     "label": "New Notification",
     "tabIndex": 15,
@@ -5542,22 +5471,6 @@
     "description": "Play sound when volume is adjusted"
   },
   {
-    "section": "_tab_16",
-    "label": "Media Player",
-    "tabIndex": 16,
-    "category": "Media Player",
-    "keywords": [
-      "audio",
-      "media",
-      "mpris",
-      "music",
-      "playback",
-      "player",
-      "spotify"
-    ],
-    "icon": "music_note"
-  },
-  {
     "section": "mediaPlayer",
     "label": "Media Player Settings",
     "tabIndex": 16,
@@ -5601,6 +5514,48 @@
       "widget"
     ],
     "description": "Scroll wheel behavior on media widget"
+  },
+  {
+    "section": "_tab_16",
+    "label": "Widgets & Notifications",
+    "tabIndex": 16,
+    "category": "Media Player",
+    "keywords": [
+      "alert",
+      "alerts",
+      "components",
+      "media",
+      "modules",
+      "mpris",
+      "music",
+      "notif",
+      "notifications",
+      "notifs",
+      "player",
+      "spotify",
+      "widgets"
+    ],
+    "icon": "dashboard"
+  },
+  {
+    "section": "notificationBodyFontSize",
+    "label": "Body Font Size",
+    "tabIndex": 17,
+    "category": "Notifications",
+    "keywords": [
+      "alert",
+      "alerts",
+      "body",
+      "font",
+      "messages",
+      "notif",
+      "notification",
+      "notifications",
+      "size",
+      "text",
+      "toast"
+    ],
+    "description": "Set the font size for notification body text (htmlBody)"
   },
   {
     "section": "notificationCompactMode",
@@ -5999,22 +5954,19 @@
     "keywords": [
       "alert",
       "alerts",
-      "appear",
-      "choose",
-      "location",
+      "font",
       "messages",
       "notif",
       "notification",
       "notifications",
-      "popup",
       "popups",
-      "position",
-      "screen",
-      "toast",
-      "where"
+      "size",
+      "summary",
+      "text",
+      "toast"
     ],
     "icon": "notifications",
-    "description": "Choose where notification popups appear on screen"
+    "description": "Set the font size for notification summary text"
   },
   {
     "section": "notificationRules",
@@ -6163,6 +6115,74 @@
       "until"
     ],
     "description": "Hide notification content until expanded; popups show collapsed by default"
+  },
+  {
+    "section": "notificationSummaryFontSize",
+    "label": "Summary Font Size",
+    "tabIndex": 17,
+    "category": "Notifications",
+    "keywords": [
+      "alert",
+      "alerts",
+      "font",
+      "messages",
+      "notif",
+      "notification",
+      "notifications",
+      "size",
+      "summary",
+      "text",
+      "toast"
+    ],
+    "description": "Set the font size for notification summary text"
+  },
+  {
+    "section": "notificationDedupeEnabled",
+    "label": "Suppress Duplicate Notifications",
+    "tabIndex": 17,
+    "category": "Notifications",
+    "keywords": [
+      "alert",
+      "alerts",
+      "coalesce",
+      "dedupe",
+      "duplicate",
+      "messages",
+      "notif",
+      "notification",
+      "notifications",
+      "notifs",
+      "repeat",
+      "stack",
+      "suppress",
+      "toast"
+    ]
+  },
+  {
+    "section": "notificationShowTimeoutBar",
+    "label": "Timeout Progress Bar",
+    "tabIndex": 17,
+    "category": "Notifications",
+    "keywords": [
+      "alerts",
+      "bar",
+      "countdown",
+      "drains",
+      "messages",
+      "notification",
+      "notifications",
+      "panel",
+      "popup",
+      "progress",
+      "show",
+      "statusbar",
+      "taskbar",
+      "timeout",
+      "timer",
+      "toast",
+      "topbar"
+    ],
+    "description": "Show a bar that drains as the popup"
   },
   {
     "section": "osdAlwaysShowValue",
@@ -6389,25 +6409,6 @@
     "description": "Choose where on-screen displays appear on screen"
   },
   {
-    "section": "_tab_18",
-    "label": "On-screen Displays",
-    "tabIndex": 18,
-    "category": "On-screen Displays",
-    "keywords": [
-      "displays",
-      "indicator",
-      "monitor",
-      "monitors",
-      "osd",
-      "output",
-      "outputs",
-      "popup",
-      "screen",
-      "screens"
-    ],
-    "icon": "tune"
-  },
-  {
     "section": "osd",
     "label": "On-screen Displays",
     "tabIndex": 18,
@@ -6543,20 +6544,6 @@
     "description": "Open a terminal and run a custom command instead of the in-shell upgrade flow."
   },
   {
-    "section": "_tab_20",
-    "label": "System Updater",
-    "tabIndex": 20,
-    "category": "System Updater",
-    "keywords": [
-      "packages",
-      "system",
-      "updater",
-      "updates",
-      "upgrade"
-    ],
-    "icon": "refresh"
-  },
-  {
     "section": "systemUpdater",
     "label": "System Updater",
     "tabIndex": 20,
@@ -6573,30 +6560,6 @@
     ],
     "icon": "refresh",
     "description": "How often the server polls for new updates."
-  },
-  {
-    "section": "powerAdvanced",
-    "label": "Advanced",
-    "tabIndex": 21,
-    "category": "Power & Sleep",
-    "keywords": [
-      "actually",
-      "advanced",
-      "battery",
-      "changes",
-      "charge",
-      "charging",
-      "does",
-      "energy",
-      "limit",
-      "percentage",
-      "power",
-      "shutdown",
-      "sleep",
-      "suspend"
-    ],
-    "icon": "tune",
-    "description": "Note: this only changes the percentage, it does not actually limit charging."
   },
   {
     "section": "lockTimeout",
@@ -6617,28 +6580,6 @@
       "suspend",
       "timeout"
     ]
-  },
-  {
-    "section": "batteryChargeLimit",
-    "label": "Battery Charge Limit",
-    "tabIndex": 21,
-    "category": "Power & Sleep",
-    "keywords": [
-      "actually",
-      "battery",
-      "changes",
-      "charge",
-      "charging",
-      "does",
-      "energy",
-      "limit",
-      "percentage",
-      "power",
-      "shutdown",
-      "sleep",
-      "suspend"
-    ],
-    "description": "Note: this only changes the percentage, it does not actually limit charging."
   },
   {
     "section": "customPowerActions",
@@ -6806,27 +6747,6 @@
     ],
     "icon": "schedule",
     "description": "Gradually fade the screen before locking with a configurable grace period"
-  },
-  {
-    "section": "lockBeforeSuspend",
-    "label": "Lock before suspend",
-    "tabIndex": 21,
-    "category": "Power & Sleep",
-    "keywords": [
-      "automatically",
-      "before",
-      "energy",
-      "lock",
-      "power",
-      "prepares",
-      "screen",
-      "security",
-      "shutdown",
-      "sleep",
-      "suspend",
-      "system"
-    ],
-    "description": "Automatically lock the screen when the system prepares to suspend"
   },
   {
     "section": "fadeToLockGracePeriod",
@@ -7230,6 +7150,59 @@
     "description": "Maximum number of entries that can be saved"
   },
   {
+    "section": "clipboardRememberTypeFilter",
+    "label": "Remember Type Filter",
+    "tabIndex": 23,
+    "category": "System",
+    "keywords": [
+      "behavior",
+      "clipboard",
+      "cliphist",
+      "copy",
+      "filter",
+      "history",
+      "keep",
+      "linux",
+      "os",
+      "paste",
+      "remember",
+      "reopening",
+      "system",
+      "type"
+    ],
+    "description": "Keep the clipboard type filter when reopening history"
+  },
+  {
+    "section": "clipboardVisibleEntryActions",
+    "label": "Visible Entry Actions",
+    "tabIndex": 23,
+    "category": "System",
+    "keywords": [
+      "action",
+      "actions",
+      "appear",
+      "buttons",
+      "choose",
+      "clipboard",
+      "cliphist",
+      "copy",
+      "delete",
+      "density",
+      "edit",
+      "entries",
+      "entry",
+      "hide",
+      "history",
+      "linux",
+      "os",
+      "paste",
+      "pin",
+      "system",
+      "visible"
+    ],
+    "description": "Choose which action buttons appear on clipboard entries"
+  },
+  {
     "section": "_tab_24",
     "label": "Displays",
     "tabIndex": 24,
@@ -7331,7 +7304,8 @@
       "screen",
       "widgets"
     ],
-    "icon": "widgets"
+    "icon": "widgets",
+    "conditionKey": "dmsConnected"
   },
   {
     "section": "_tab_27",
@@ -7347,22 +7321,6 @@
       "widgets"
     ],
     "icon": "widgets"
-  },
-  {
-    "section": "_tab_28",
-    "label": "Window Rules",
-    "tabIndex": 28,
-    "category": "Window Rules",
-    "keywords": [
-      "floating",
-      "fullscreen",
-      "matching",
-      "opacity",
-      "rules",
-      "window"
-    ],
-    "icon": "select_window",
-    "conditionKey": "isNiri"
   },
   {
     "section": "audioInputDevices",
@@ -7468,36 +7426,1542 @@
     "description": "Change the locale used for date and time formatting, independent of the interface language."
   },
   {
+    "section": "greeterUse24Hour",
+    "label": "24-hour clock",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "24hour",
+      "affect",
+      "clock",
+      "display manager",
+      "does",
+      "greetd",
+      "greeter",
+      "hour",
+      "login",
+      "main",
+      "time",
+      "watch"
+    ],
+    "description": "Greeter only — does not affect main clock"
+  },
+  {
+    "section": "greeterAutoLogin",
+    "label": "Auto-login on startup",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "after",
+      "auto",
+      "autologin",
+      "boot",
+      "display manager",
+      "effect",
+      "greetd",
+      "greeter",
+      "lock",
+      "lockscreen",
+      "login",
+      "next",
+      "password",
+      "reboot",
+      "screen",
+      "security",
+      "sign",
+      "skip",
+      "startup",
+      "sync",
+      "takes",
+      "unchanged",
+      "unlock",
+      "until"
+    ],
+    "description": "Skip the greeter password after boot until you sign out. Lock screen unlock is unchanged. Takes effect on the next reboot after sync."
+  },
+  {
+    "section": "greeterLockDateFormat",
+    "label": "Date Format",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "date",
+      "display manager",
+      "format",
+      "greetd",
+      "greeter",
+      "login",
+      "screen"
+    ],
+    "description": "Greeter only — format for the date on the login screen"
+  },
+  {
+    "section": "greeterDeps",
+    "label": "Dependencies & documentation",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "dependencies",
+      "display manager",
+      "documentation",
+      "greetd",
+      "greeter",
+      "login"
+    ],
+    "icon": "extension"
+  },
+  {
+    "section": "greeterEnableFprint",
+    "label": "Enable fingerprint at login",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "auth",
+      "display manager",
+      "enable",
+      "fingerprint",
+      "fprintd",
+      "greetd",
+      "greeter",
+      "login"
+    ]
+  },
+  {
+    "section": "greeterEnableU2f",
+    "label": "Enable security key at login",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "auth",
+      "display manager",
+      "enable",
+      "greetd",
+      "greeter",
+      "key",
+      "login",
+      "security",
+      "u2f"
+    ]
+  },
+  {
     "section": "_tab_31",
     "label": "Greeter",
     "tabIndex": 31,
-    "category": "Settings",
+    "category": "Greeter",
     "keywords": [
+      "display manager",
+      "greetd",
       "greeter",
-      "settings"
+      "login"
     ],
     "icon": "login"
+  },
+  {
+    "section": "greeterAppearance",
+    "label": "Greeter Appearance",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "appearance",
+      "display manager",
+      "font",
+      "greetd",
+      "greeter",
+      "login",
+      "screen",
+      "typography"
+    ],
+    "icon": "palette",
+    "description": "Font used on the login screen"
+  },
+  {
+    "section": "greeterBehavior",
+    "label": "Greeter Behavior",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "behavior",
+      "display manager",
+      "greetd",
+      "greeter",
+      "last",
+      "login",
+      "remember",
+      "select",
+      "session"
+    ],
+    "icon": "history",
+    "description": "Pre-select the last used session on the greeter"
+  },
+  {
+    "section": "greeterStatus",
+    "label": "Greeter Status",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "display manager",
+      "greetd",
+      "greeter",
+      "login",
+      "status"
+    ],
+    "icon": "info"
+  },
+  {
+    "section": "greeterFontFamily",
+    "label": "Greeter font",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "display manager",
+      "font",
+      "greetd",
+      "greeter",
+      "login",
+      "screen",
+      "typography"
+    ],
+    "description": "Font used on the login screen"
+  },
+  {
+    "section": "greeterAuth",
+    "label": "Login Authentication",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "auth",
+      "authentication",
+      "display manager",
+      "fingerprint",
+      "fprintd",
+      "greetd",
+      "greeter",
+      "login"
+    ],
+    "icon": "fingerprint"
+  },
+  {
+    "section": "greeterPadHours",
+    "label": "Pad hours (02:00 vs 2:00)",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "(02:00",
+      "12hour",
+      "2:00)",
+      "display manager",
+      "greetd",
+      "greeter",
+      "hours",
+      "login",
+      "pad",
+      "time"
+    ]
+  },
+  {
+    "section": "greeterRememberLastSession",
+    "label": "Remember last session",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "display manager",
+      "greetd",
+      "greeter",
+      "last",
+      "login",
+      "remember",
+      "select",
+      "session"
+    ],
+    "description": "Pre-select the last used session on the greeter"
+  },
+  {
+    "section": "greeterRememberLastUser",
+    "label": "Remember last user",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "display manager",
+      "fill",
+      "greetd",
+      "greeter",
+      "last",
+      "login",
+      "remember",
+      "successful",
+      "user",
+      "username"
+    ],
+    "description": "Pre-fill the last successful username on the greeter"
+  },
+  {
+    "section": "greeterShowSeconds",
+    "label": "Show Seconds",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "display manager",
+      "greetd",
+      "greeter",
+      "login",
+      "seconds",
+      "show",
+      "time"
+    ]
+  },
+  {
+    "section": "greeterWallpaperFillMode",
+    "label": "Wallpaper fill mode",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "background",
+      "bg",
+      "desktop",
+      "display manager",
+      "fill",
+      "greetd",
+      "greeter",
+      "image",
+      "login",
+      "mode",
+      "picture",
+      "scaled",
+      "wallpaper"
+    ],
+    "description": "How the background image is scaled"
+  },
+  {
+    "section": "muxType",
+    "label": "Multiplexer",
+    "tabIndex": 32,
+    "category": "Multiplexers",
+    "keywords": [
+      "backend",
+      "multiplexer",
+      "multiplexers",
+      "mux",
+      "terminal",
+      "tmux",
+      "type",
+      "zellij"
+    ],
+    "icon": "terminal",
+    "description": "Terminal multiplexer backend to use"
   },
   {
     "section": "_tab_32",
     "label": "Multiplexers",
     "tabIndex": 32,
-    "category": "Settings",
+    "category": "Multiplexers",
     "keywords": [
       "multiplexers",
-      "settings"
+      "terminal",
+      "tmux",
+      "zellij"
     ],
     "icon": "terminal"
   },
   {
-    "section": "_tab_33",
+    "section": "muxUseCustomCommand",
+    "label": "Terminal",
+    "tabIndex": 32,
+    "category": "Multiplexers",
+    "keywords": [
+      "command",
+      "custom",
+      "multiplexers",
+      "mux",
+      "override",
+      "script",
+      "terminal",
+      "tmux",
+      "zellij"
+    ],
+    "icon": "desktop_windows",
+    "description": "Override terminal with a custom command or script"
+  },
+  {
+    "section": "frameLauncherArcExtender",
+    "label": "Arc Extender",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "app drawer",
+      "app menu",
+      "applications",
+      "arc",
+      "border",
+      "center",
+      "connected",
+      "content",
+      "decoration",
+      "extended",
+      "extender",
+      "frame",
+      "launcher",
+      "start menu",
+      "surface",
+      "window"
+    ],
+    "description": "Use the extended surface for launcher content"
+  },
+  {
+    "section": "frameBorder",
+    "label": "Border",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "border",
+      "corner",
+      "decoration",
+      "frame",
+      "horizontal",
+      "panel",
+      "radius",
+      "rounding",
+      "statusbar",
+      "taskbar",
+      "thickness",
+      "topbar",
+      "vertical",
+      "window"
+    ],
+    "icon": "border_outer",
+    "description": "Horizontal and vertical bar thickness"
+  },
+  {
+    "section": "frameColor",
+    "label": "Border Color",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "border",
+      "color",
+      "colour",
+      "decoration",
+      "default",
+      "frame",
+      "hue",
+      "primary",
+      "surface",
+      "theme",
+      "tint",
+      "window"
+    ]
+  },
+  {
+    "section": "frameRounding",
+    "label": "Border Radius",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "border",
+      "corner",
+      "decoration",
+      "frame",
+      "radius",
+      "rounding",
+      "window"
+    ]
+  },
+  {
+    "section": "frameThickness",
+    "label": "Border Width",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "border",
+      "decoration",
+      "frame",
+      "size",
+      "thickness",
+      "width",
+      "window"
+    ]
+  },
+  {
+    "section": "frameConnectedOptions",
+    "label": "Connected Options",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "arcs",
+      "border",
+      "connected",
+      "curves",
+      "decoration",
+      "edge",
+      "expose",
+      "frame",
+      "gap",
+      "meet",
+      "notification",
+      "options",
+      "popout",
+      "reveal",
+      "surfaces",
+      "where",
+      "window"
+    ],
+    "icon": "blur_linear",
+    "description": "Reveal the arcs where surfaces meet the frame"
+  },
+  {
+    "section": "frameDisplays",
+    "label": "Display Assignment",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "assignment",
+      "border",
+      "decoration",
+      "display",
+      "frame",
+      "monitor",
+      "output",
+      "screen",
+      "window"
+    ],
+    "icon": "monitor"
+  },
+  {
+    "section": "frameEnable",
+    "label": "Enable Frame",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "around",
+      "border",
+      "connected",
+      "decoration",
+      "display",
+      "draw",
+      "enable",
+      "entire",
+      "frame",
+      "monitor",
+      "outline",
+      "output",
+      "picture",
+      "screen",
+      "window"
+    ],
+    "description": "Draw a connected picture-frame border around the entire display"
+  },
+  {
+    "section": "frameCloseGaps",
+    "label": "Expose the Arcs",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "arcs",
+      "border",
+      "connected",
+      "curves",
+      "decoration",
+      "edge",
+      "expose",
+      "frame",
+      "gap",
+      "meet",
+      "notification",
+      "popout",
+      "reveal",
+      "surfaces",
+      "where",
+      "window"
+    ],
+    "description": "Reveal the arcs where surfaces meet the frame"
+  },
+  {
+    "section": "frameEnabled",
     "label": "Frame",
     "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "around",
+      "border",
+      "connected",
+      "decoration",
+      "display",
+      "draw",
+      "entire",
+      "frame",
+      "monitor",
+      "outline",
+      "output",
+      "picture",
+      "screen",
+      "window"
+    ],
+    "icon": "frame_source",
+    "description": "Draw a connected picture-frame border around the entire display"
+  },
+  {
+    "section": "frameBlurEnabled",
+    "label": "Frame Blur",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "background",
+      "blur",
+      "border",
+      "decoration",
+      "frame",
+      "frosted",
+      "glass",
+      "newer",
+      "quickshell",
+      "requires",
+      "transparency",
+      "version",
+      "window"
+    ],
+    "description": "Requires a newer version of Quickshell"
+  },
+  {
+    "section": "frameBarIntegration",
+    "label": "Integrations",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "border",
+      "decoration",
+      "during",
+      "frame",
+      "hide",
+      "integrations",
+      "niri",
+      "overview",
+      "show",
+      "window"
+    ],
+    "icon": "toolbar",
+    "description": "Show during Niri overview",
+    "conditionKey": "isNiri"
+  },
+  {
+    "section": "frameLauncherEmergeSide",
+    "label": "Launcher Emerge Side",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "app drawer",
+      "app menu",
+      "applications",
+      "border",
+      "bottom",
+      "connected",
+      "decoration",
+      "direction",
+      "edge",
+      "emerge",
+      "frame",
+      "launcher",
+      "modal",
+      "side",
+      "slides",
+      "start menu",
+      "top",
+      "window"
+    ],
+    "description": "Edge the launcher slides from"
+  },
+  {
+    "section": "frameMode",
+    "label": "Mode",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "border",
+      "connected",
+      "decoration",
+      "emerge",
+      "flush",
+      "frame",
+      "mode",
+      "panel",
+      "popout",
+      "separate",
+      "statusbar",
+      "surfaces",
+      "taskbar",
+      "topbar",
+      "window"
+    ],
+    "icon": "tune",
+    "description": "Surfaces emerge flush from the bar"
+  },
+  {
+    "section": "frameShowOnOverview",
+    "label": "Show on Overview",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "border",
+      "decoration",
+      "during",
+      "frame",
+      "hide",
+      "niri",
+      "overview",
+      "show",
+      "window"
+    ],
+    "description": "Show during Niri overview"
+  },
+  {
+    "section": "frameBarSize",
+    "label": "Size",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "bar",
+      "border",
+      "decoration",
+      "frame",
+      "height",
+      "horizontal",
+      "panel",
+      "size",
+      "statusbar",
+      "taskbar",
+      "thickness",
+      "topbar",
+      "vertical",
+      "width",
+      "window"
+    ],
+    "description": "Horizontal and vertical bar thickness"
+  },
+  {
+    "section": "frameModeSelector",
+    "label": "Surface Behavior",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "behavior",
+      "border",
+      "connected",
+      "decoration",
+      "emerge",
+      "flush",
+      "frame",
+      "mode",
+      "panel",
+      "popout",
+      "separate",
+      "statusbar",
+      "surface",
+      "surfaces",
+      "taskbar",
+      "topbar",
+      "window"
+    ],
+    "description": "Surfaces emerge flush from the bar"
+  },
+  {
+    "section": "frameOpacity",
+    "label": "Surface Opacity",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "border",
+      "decoration",
+      "frame",
+      "opacity",
+      "popup",
+      "surface",
+      "transparency",
+      "window"
+    ]
+  },
+  {
+    "section": "_tab_34",
+    "label": "Applications",
+    "tabIndex": 34,
+    "category": "Default Apps",
+    "keywords": [
+      "app",
+      "applications",
+      "apps",
+      "browser",
+      "default",
+      "handlers",
+      "mime",
+      "program",
+      "programs",
+      "terminal"
+    ],
+    "icon": "apps"
+  },
+  {
+    "section": "createUserGreeter",
+    "label": "Allow greeter login access",
+    "tabIndex": 35,
+    "category": "Users",
+    "keywords": [
+      "access",
+      "accounts",
+      "allow",
+      "greeter",
+      "group",
+      "login",
+      "profile",
+      "sync",
+      "they",
+      "user",
+      "users"
+    ],
+    "description": "Add the new user to the %1 group so they can run dms greeter sync --profile."
+  },
+  {
+    "section": "createUser",
+    "label": "Create User",
+    "tabIndex": 35,
+    "category": "Users",
+    "keywords": [
+      "accounts",
+      "admin",
+      "create",
+      "group",
+      "profile",
+      "sudo",
+      "they",
+      "user",
+      "users",
+      "wheel"
+    ],
+    "icon": "person_add",
+    "description": "Add the new user to the %1 group so they can use sudo."
+  },
+  {
+    "section": "usersList",
+    "label": "Existing Users",
+    "tabIndex": 35,
+    "category": "Users",
+    "keywords": [
+      "accounts",
+      "existing",
+      "profile",
+      "user",
+      "users"
+    ],
+    "icon": "group"
+  },
+  {
+    "section": "createUserAdmin",
+    "label": "Grant administrator privileges",
+    "tabIndex": 35,
+    "category": "Users",
+    "keywords": [
+      "accounts",
+      "admin",
+      "administrator",
+      "grant",
+      "group",
+      "privileges",
+      "profile",
+      "sudo",
+      "they",
+      "user",
+      "users",
+      "wheel"
+    ],
+    "description": "Add the new user to the %1 group so they can use sudo."
+  },
+  {
+    "section": "_tab_35",
+    "label": "Users",
+    "tabIndex": 35,
+    "category": "Users",
+    "keywords": [
+      "accounts",
+      "profile",
+      "user",
+      "users"
+    ],
+    "icon": "manage_accounts"
+  },
+  {
+    "section": "_tab_36",
+    "label": "Autostart Apps",
+    "tabIndex": 36,
+    "category": "Autostart",
+    "keywords": [
+      "apps",
+      "autostart",
+      "boot",
+      "launch",
+      "startup"
+    ],
+    "icon": "line_start"
+  },
+  {
+    "section": "autostartEntries",
+    "label": "Autostart Entries",
+    "tabIndex": 36,
+    "category": "Autostart",
+    "keywords": [
+      "autostart",
+      "boot",
+      "entries",
+      "launch",
+      "startup"
+    ],
+    "icon": "line_start"
+  },
+  {
+    "section": "hyprlandLayoutBorderSize",
+    "label": "Border Size",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "border",
+      "custom",
+      "customize",
+      "hyprland",
+      "override",
+      "personal",
+      "personalization",
+      "size",
+      "width",
+      "window"
+    ],
+    "description": "Width of window border"
+  },
+  {
+    "section": "mangoLayoutBorderSize",
+    "label": "Border Size",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "border",
+      "custom",
+      "customize",
+      "mango",
+      "mangowc",
+      "override",
+      "personal",
+      "personalization",
+      "size",
+      "width",
+      "window"
+    ],
+    "description": "Width of window border"
+  },
+  {
+    "section": "niriLayoutBorderSize",
+    "label": "Border Size",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "border",
+      "custom",
+      "customize",
+      "focus",
+      "niri",
+      "override",
+      "personal",
+      "personalization",
+      "ring",
+      "size",
+      "width",
+      "window"
+    ],
+    "description": "Width of window border and focus ring"
+  },
+  {
+    "section": "hyprlandLayout",
+    "label": "Hyprland Layout Overrides",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "border",
+      "custom",
+      "customize",
+      "gap",
+      "gaps",
+      "hyprland",
+      "layout",
+      "margin",
+      "margins",
+      "overrides",
+      "padding",
+      "panel",
+      "personal",
+      "personalization",
+      "radius",
+      "rounding",
+      "spacing",
+      "statusbar",
+      "taskbar",
+      "topbar",
+      "window"
+    ],
+    "icon": "crop_square",
+    "description": "Use custom gaps instead of bar spacing",
+    "conditionKey": "isHyprland"
+  },
+  {
+    "section": "mangoLayout",
+    "label": "MangoWC Layout Overrides",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "border",
+      "custom",
+      "customize",
+      "dwl",
+      "gap",
+      "gaps",
+      "layout",
+      "mango",
+      "mangowc",
+      "margin",
+      "margins",
+      "overrides",
+      "padding",
+      "panel",
+      "personal",
+      "personalization",
+      "radius",
+      "spacing",
+      "statusbar",
+      "taskbar",
+      "topbar",
+      "window"
+    ],
+    "icon": "crop_square",
+    "description": "Use custom gaps instead of bar spacing",
+    "conditionKey": "isMango"
+  },
+  {
+    "section": "niriLayout",
+    "label": "Niri Layout Overrides",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "border",
+      "custom",
+      "customize",
+      "gap",
+      "gaps",
+      "layout",
+      "margin",
+      "margins",
+      "niri",
+      "overrides",
+      "padding",
+      "panel",
+      "personal",
+      "personalization",
+      "radius",
+      "spacing",
+      "statusbar",
+      "taskbar",
+      "topbar",
+      "window"
+    ],
+    "icon": "layers",
+    "description": "Use custom gaps instead of bar spacing",
+    "conditionKey": "isNiri"
+  },
+  {
+    "section": "hyprlandLayoutBorderSizeEnabled",
+    "label": "Override Border Size",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "border",
+      "custom",
+      "customize",
+      "hyprland",
+      "override",
+      "personal",
+      "personalization",
+      "size"
+    ],
+    "description": "Use custom border size"
+  },
+  {
+    "section": "mangoLayoutBorderSizeEnabled",
+    "label": "Override Border Size",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "border",
+      "custom",
+      "customize",
+      "mango",
+      "mangowc",
+      "override",
+      "personal",
+      "personalization",
+      "size"
+    ],
+    "description": "Use custom border size"
+  },
+  {
+    "section": "niriLayoutBorderSizeEnabled",
+    "label": "Override Border Size",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "border",
+      "custom",
+      "customize",
+      "focus",
+      "niri",
+      "override",
+      "personal",
+      "personalization",
+      "ring",
+      "size",
+      "width"
+    ],
+    "description": "Use custom border/focus-ring width"
+  },
+  {
+    "section": "hyprlandLayoutRadiusOverrideEnabled",
+    "label": "Override Corner Radius",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "colors",
+      "colour",
+      "corner",
+      "corners",
+      "custom",
+      "customize",
+      "hyprland",
+      "look",
+      "override",
+      "personal",
+      "personalization",
+      "radius",
+      "round",
+      "rounded",
+      "rounding",
+      "style",
+      "theme",
+      "window"
+    ],
+    "description": "Use custom window radius instead of theme radius"
+  },
+  {
+    "section": "mangoLayoutRadiusOverrideEnabled",
+    "label": "Override Corner Radius",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "colors",
+      "colour",
+      "corner",
+      "corners",
+      "custom",
+      "customize",
+      "look",
+      "mango",
+      "mangowc",
+      "override",
+      "personal",
+      "personalization",
+      "radius",
+      "round",
+      "rounded",
+      "style",
+      "theme",
+      "window"
+    ],
+    "description": "Use custom window radius instead of theme radius"
+  },
+  {
+    "section": "niriLayoutRadiusOverrideEnabled",
+    "label": "Override Corner Radius",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "colors",
+      "colour",
+      "corner",
+      "corners",
+      "custom",
+      "customize",
+      "look",
+      "niri",
+      "override",
+      "personal",
+      "personalization",
+      "radius",
+      "round",
+      "rounded",
+      "style",
+      "theme",
+      "window"
+    ],
+    "description": "Use custom window radius instead of theme radius"
+  },
+  {
+    "section": "hyprlandLayoutGapsOverrideEnabled",
+    "label": "Override Gaps",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "custom",
+      "customize",
+      "gap",
+      "gaps",
+      "hyprland",
+      "margin",
+      "margins",
+      "override",
+      "padding",
+      "panel",
+      "personal",
+      "personalization",
+      "spacing",
+      "statusbar",
+      "taskbar",
+      "topbar"
+    ],
+    "description": "Use custom gaps instead of bar spacing"
+  },
+  {
+    "section": "mangoLayoutGapsOverrideEnabled",
+    "label": "Override Gaps",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "custom",
+      "customize",
+      "gap",
+      "gaps",
+      "mango",
+      "mangowc",
+      "margin",
+      "margins",
+      "override",
+      "padding",
+      "panel",
+      "personal",
+      "personalization",
+      "spacing",
+      "statusbar",
+      "taskbar",
+      "topbar"
+    ],
+    "description": "Use custom gaps instead of bar spacing"
+  },
+  {
+    "section": "niriLayoutGapsOverrideEnabled",
+    "label": "Override Gaps",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "custom",
+      "customize",
+      "gap",
+      "gaps",
+      "margin",
+      "margins",
+      "niri",
+      "override",
+      "padding",
+      "panel",
+      "personal",
+      "personalization",
+      "spacing",
+      "statusbar",
+      "taskbar",
+      "topbar"
+    ],
+    "description": "Use custom gaps instead of bar spacing"
+  },
+  {
+    "section": "hyprlandResizeOnBorder",
+    "label": "Resize on Border",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "border",
+      "custom",
+      "customize",
+      "drag",
+      "dragging",
+      "edges",
+      "hyprland",
+      "mouse",
+      "personal",
+      "personalization",
+      "resize",
+      "their",
+      "windows"
+    ],
+    "description": "Resize windows by dragging their edges with the mouse"
+  },
+  {
+    "section": "hyprlandLayoutRadiusOverride",
+    "label": "Window Corner Radius",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "corner",
+      "corners",
+      "custom",
+      "customize",
+      "hyprland",
+      "override",
+      "personal",
+      "personalization",
+      "radius",
+      "round",
+      "rounded",
+      "rounding",
+      "window",
+      "windows"
+    ],
+    "description": "Rounded corners for windows"
+  },
+  {
+    "section": "mangoLayoutRadiusOverride",
+    "label": "Window Corner Radius",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "corner",
+      "corners",
+      "custom",
+      "customize",
+      "mango",
+      "mangowc",
+      "override",
+      "personal",
+      "personalization",
+      "radius",
+      "round",
+      "rounded",
+      "window",
+      "windows"
+    ],
+    "description": "Rounded corners for windows"
+  },
+  {
+    "section": "niriLayoutRadiusOverride",
+    "label": "Window Corner Radius",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "corner",
+      "corners",
+      "custom",
+      "customize",
+      "niri",
+      "override",
+      "personal",
+      "personalization",
+      "radius",
+      "round",
+      "rounded",
+      "window",
+      "windows"
+    ],
+    "description": "Rounded corners for windows"
+  },
+  {
+    "section": "hyprlandLayoutGapsOverride",
+    "label": "Window Gaps",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "between",
+      "custom",
+      "customize",
+      "gaps",
+      "hyprland",
+      "override",
+      "personal",
+      "personalization",
+      "space",
+      "window",
+      "windows"
+    ],
+    "description": "Space between windows"
+  },
+  {
+    "section": "mangoLayoutGapsOverride",
+    "label": "Window Gaps",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "between",
+      "custom",
+      "customize",
+      "gaps",
+      "mango",
+      "mangowc",
+      "override",
+      "personal",
+      "personalization",
+      "space",
+      "window",
+      "windows"
+    ],
+    "description": "Space between windows"
+  },
+  {
+    "section": "niriLayoutGapsOverride",
+    "label": "Window Gaps",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "between",
+      "custom",
+      "customize",
+      "gaps",
+      "niri",
+      "override",
+      "personal",
+      "personalization",
+      "space",
+      "window",
+      "windows"
+    ],
+    "description": "Space between windows"
+  },
+  {
+    "section": "windowRules",
+    "label": "Window Rules",
+    "tabIndex": 38,
+    "category": "Applications",
+    "keywords": [
+      "applications",
+      "apps",
+      "behavior",
+      "compositor",
+      "define",
+      "floating",
+      "fullscreen",
+      "matching",
+      "opacity",
+      "programs",
+      "rules",
+      "window"
+    ],
+    "icon": "select_window",
+    "description": "Define compositor rules for window behavior",
+    "conditionKey": "windowRulesCapable"
+  },
+  {
+    "section": "networkEthernet",
+    "label": "Ethernet",
+    "tabIndex": 39,
+    "category": "Network",
+    "keywords": [
+      "adapters",
+      "connection",
+      "connectivity",
+      "ethernet",
+      "network",
+      "online",
+      "wired"
+    ],
+    "icon": "settings_ethernet"
+  },
+  {
+    "section": "networkSavedWifi",
+    "label": "Saved Networks",
+    "tabIndex": 40,
+    "category": "Network",
+    "keywords": [
+      "autoconnect",
+      "connection",
+      "connectivity",
+      "ethernet",
+      "forget",
+      "internet",
+      "known",
+      "network",
+      "networks",
+      "online",
+      "saved",
+      "ssid",
+      "wi-fi",
+      "wifi",
+      "wireless"
+    ],
+    "icon": "bookmark"
+  },
+  {
+    "section": "networkWifi",
+    "label": "WiFi",
+    "tabIndex": 40,
+    "category": "Network",
+    "keywords": [
+      "adapter",
+      "connectivity",
+      "network",
+      "online",
+      "radio",
+      "ssid",
+      "wi-fi",
+      "wifi",
+      "wireless"
+    ],
+    "icon": "wifi"
+  },
+  {
+    "section": "networkVpn",
+    "label": "VPN",
+    "tabIndex": 41,
+    "category": "Network",
+    "keywords": [
+      "connectivity",
+      "import",
+      "network",
+      "online",
+      "openvpn",
+      "profiles",
+      "vpn",
+      "wireguard"
+    ],
+    "icon": "vpn_key"
+  },
+  {
+    "section": "_tab_42",
+    "label": "Battery",
+    "tabIndex": 42,
     "category": "Settings",
     "keywords": [
-      "frame",
+      "battery",
+      "charge",
+      "charging",
+      "power",
       "settings"
     ],
-    "icon": "frame_source"
+    "icon": "battery_charging_full"
   }
 ]

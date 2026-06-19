@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell.Hyprland
 import qs.Common
 import qs.Services
 
@@ -32,6 +33,7 @@ Item {
     property real storedBarThickness: Theme.barHeight - 4
     property real storedBarSpacing: 4
     property var storedBarConfig: null
+    property bool triggerUsesOverlayLayer: false
     property var adjacentBarInfo: ({
             "topBar": 0,
             "bottomBar": 0,
@@ -49,6 +51,20 @@ Item {
     readonly property var contentLoader: impl.item ? impl.item.contentLoader : _fallbackContentLoader
     readonly property var overlayLoader: impl.item ? impl.item.overlayLoader : _fallbackOverlayLoader
     readonly property var backgroundWindow: impl.item ? impl.item.backgroundWindow : null
+    readonly property var contentWindow: impl.item ? impl.item.contentWindow : null
+
+    // Hyprland OnDemand grab: whitelist popout surfaces and bars so dismiss clicks still land.
+    HyprlandFocusGrab {
+        windows: {
+            const list = [];
+            if (root.contentWindow)
+                list.push(root.contentWindow);
+            if (root.backgroundWindow && root.backgroundWindow !== root.contentWindow)
+                list.push(root.backgroundWindow);
+            return list.concat(KeyboardFocus.barWindows);
+        }
+        active: KeyboardFocus.wantsGrab(root.shouldBeVisible || root.isClosing, root.customKeyboardFocus)
+    }
 
     Loader {
         id: _fallbackContentLoader
@@ -97,21 +113,35 @@ Item {
         function onConnectedFrameModeActiveChanged() {
             root._maybeResolveBackend();
         }
+        function onFrameEnabledChanged() {
+            root._maybeResolveBackend();
+        }
         function onFrameScreenPreferencesChanged() {
+            root._maybeResolveBackend();
+        }
+        function onShowDockChanged() {
+            root._maybeResolveBackend();
+        }
+        function onBarConfigsChanged() {
+            root._maybeResolveBackend();
+        }
+    }
+
+    Connections {
+        target: CompositorService
+        function onToplevelsChanged() {
             root._maybeResolveBackend();
         }
     }
 
     function _usesConnectedBackendForScreen(targetScreen) {
-        return SettingsData.connectedFrameModeActive && !!targetScreen && SettingsData.isScreenInPreferences(targetScreen, SettingsData.frameScreenPreferences);
+        return CompositorService.usesConnectedFrameChromeForScreen(targetScreen);
     }
 
     function _backendForScreen(targetScreen) {
         return _usesConnectedBackendForScreen(targetScreen) ? connectedComp : standaloneComp;
     }
 
-    // Defer Loader source-component swap until impl is fully closed; avoids
-    // tearing down a popout mid-animation when frame mode is toggled.
     function _maybeResolveBackend() {
         _resolveBackendForScreen(screen);
     }
@@ -151,6 +181,10 @@ Item {
         effectiveBarBottomGap = bottomGap !== undefined ? bottomGap : 0;
     }
 
+    function _triggerBarUsesOverlayLayer(targetScreen, barConfig) {
+        return LayerShell.envUsesOverlay("DMS_DANKBAR_LAYER", (barConfig?.useOverlayLayer ?? false) || CompositorService.framePeerSurfacesUseOverlayForScreen(targetScreen));
+    }
+
     function setTriggerPosition(x, y, width, section, targetScreen, barPosition, barThickness, barSpacing, barConfig) {
         triggerX = x;
         triggerY = y;
@@ -161,6 +195,7 @@ Item {
         storedBarThickness = barThickness !== undefined ? barThickness : (Theme.barHeight - 4);
         storedBarSpacing = barSpacing !== undefined ? barSpacing : 4;
         storedBarConfig = barConfig;
+        triggerUsesOverlayLayer = _triggerBarUsesOverlayLayer(targetScreen, barConfig);
 
         const pos = barPosition !== undefined ? barPosition : 0;
         const bottomGap = barConfig ? (barConfig.bottomGap !== undefined ? barConfig.bottomGap : 0) : 0;
@@ -221,6 +256,7 @@ Item {
         it.storedBarThickness = Qt.binding(() => root.storedBarThickness);
         it.storedBarSpacing = Qt.binding(() => root.storedBarSpacing);
         it.storedBarConfig = Qt.binding(() => root.storedBarConfig);
+        it.triggerUsesOverlayLayer = Qt.binding(() => root.triggerUsesOverlayLayer);
         it.adjacentBarInfo = Qt.binding(() => root.adjacentBarInfo);
         it.screen = Qt.binding(() => root.screen);
         it.effectiveBarPosition = Qt.binding(() => root.effectiveBarPosition);

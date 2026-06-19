@@ -13,6 +13,7 @@ Singleton {
     property var currentModalsByScreen: ({})
 
     function openModal(modal) {
+        PopoutManager.screenshotActive = false;
         const screenName = modal.effectiveScreen?.name ?? "unknown";
         currentModalsByScreen[screenName] = modal;
         modalChanged();
@@ -23,6 +24,11 @@ Singleton {
                 PopoutManager.closeAllPopouts();
             TrayMenuManager.closeAllMenus();
         });
+    }
+
+    function isCurrentModal(modal, screenName) {
+        const name = screenName || modal?.effectiveScreen?.name || "unknown";
+        return currentModalsByScreen[name] === modal;
     }
 
     function closeModal(modal) {

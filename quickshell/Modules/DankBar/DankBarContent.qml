@@ -24,8 +24,9 @@ Item {
     readonly property real innerPadding: barConfig?.innerPadding ?? 4
     readonly property real outlineThickness: (barConfig?.widgetOutlineEnabled ?? false) ? (barConfig?.widgetOutlineThickness ?? 1) : 0
     readonly property real _edgeBaseMargin: Math.max(Theme.spacingXS, innerPadding * 0.8)
-    readonly property real _frameEdgeFloorInset: SettingsData.frameEnabled ? Math.max(0, SettingsData.frameThickness - _edgeBaseMargin) : 0
     readonly property bool _hasBarWindow: barWindow !== undefined && barWindow !== null
+    readonly property bool _usesFrameBarChrome: _hasBarWindow && (barWindow.usesFrameBarChrome ?? false)
+    readonly property real _frameEdgeFloorInset: (SettingsData.frameEnabled && _usesFrameBarChrome) ? Math.max(0, SettingsData.frameThickness - _edgeBaseMargin) : 0
     readonly property bool _barIsVertical: _hasBarWindow ? barWindow.isVertical : false
     readonly property string _barScreenName: _hasBarWindow ? (barWindow.screenName || "") : ""
     readonly property bool hasAdjacentTopBarLive: _hasBarWindow && barWindow.hasAdjacentTopBar
@@ -47,22 +48,22 @@ Item {
         _hadAdjacentRightBar = true
 
     readonly property real _frameLeftInset: {
-        if (!_hasBarWindow || !SettingsData.frameEnabled || _barIsVertical)
+        if (!_hasBarWindow || !SettingsData.frameEnabled || !_usesFrameBarChrome || _barIsVertical)
             return 0;
         return hasAdjacentLeftBarLive ? SettingsData.frameBarSize : (_hadAdjacentLeftBar ? _frameEdgeFloorInset : 0);
     }
     readonly property real _frameRightInset: {
-        if (!_hasBarWindow || !SettingsData.frameEnabled || _barIsVertical)
+        if (!_hasBarWindow || !SettingsData.frameEnabled || !_usesFrameBarChrome || _barIsVertical)
             return 0;
         return hasAdjacentRightBarLive ? SettingsData.frameBarSize : (_hadAdjacentRightBar ? _frameEdgeFloorInset : 0);
     }
     readonly property real _frameTopInset: {
-        if (!_hasBarWindow || !SettingsData.frameEnabled || !_barIsVertical)
+        if (!_hasBarWindow || !SettingsData.frameEnabled || !_usesFrameBarChrome || !_barIsVertical)
             return 0;
         return hasAdjacentTopBarLive ? SettingsData.frameThickness : (_hadAdjacentTopBar ? _frameEdgeFloorInset : 0);
     }
     readonly property real _frameBottomInset: {
-        if (!_hasBarWindow || !SettingsData.frameEnabled || !_barIsVertical)
+        if (!_hasBarWindow || !SettingsData.frameEnabled || !_usesFrameBarChrome || !_barIsVertical)
             return 0;
         return hasAdjacentBottomBarLive ? SettingsData.frameThickness : (_hadAdjacentBottomBar ? _frameEdgeFloorInset : 0);
     }
@@ -95,7 +96,7 @@ Item {
     }
 
     Behavior on anchors.leftMargin {
-        enabled: _animateFrameInsets && SettingsData.frameEnabled
+        enabled: _animateFrameInsets && _usesFrameBarChrome
         NumberAnimation {
             duration: Theme.shortDuration
             easing.type: Easing.OutCubic
@@ -103,7 +104,7 @@ Item {
     }
 
     Behavior on anchors.rightMargin {
-        enabled: _animateFrameInsets && SettingsData.frameEnabled
+        enabled: _animateFrameInsets && _usesFrameBarChrome
         NumberAnimation {
             duration: Theme.shortDuration
             easing.type: Easing.OutCubic
@@ -111,7 +112,7 @@ Item {
     }
 
     Behavior on anchors.topMargin {
-        enabled: _animateFrameInsets && SettingsData.frameEnabled
+        enabled: _animateFrameInsets && _usesFrameBarChrome
         NumberAnimation {
             duration: Theme.shortDuration
             easing.type: Easing.OutCubic
@@ -119,7 +120,7 @@ Item {
     }
 
     Behavior on anchors.bottomMargin {
-        enabled: _animateFrameInsets && SettingsData.frameEnabled
+        enabled: _animateFrameInsets && _usesFrameBarChrome
         NumberAnimation {
             duration: Theme.shortDuration
             easing.type: Easing.OutCubic
@@ -188,16 +189,16 @@ Item {
             }
 
             return monitorWorkspaces.sort((a, b) => a.id - b.id);
-        } else if (CompositorService.isDwl) {
-            if (!DwlService.dwlAvailable) {
+        } else if (CompositorService.isMango) {
+            if (!MangoService.available) {
                 return [0];
             }
             if (SettingsData.dwlShowAllTags) {
                 return Array.from({
-                    length: DwlService.tagCount
+                    length: MangoService.tagCount
                 }, (_, i) => i);
             }
-            return DwlService.getVisibleTags(screenName);
+            return MangoService.getVisibleTags(screenName);
         } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
             const workspaces = I3.workspaces?.values || [];
             if (workspaces.length === 0)
@@ -233,13 +234,13 @@ Item {
             const monitors = Hyprland.monitors?.values || [];
             const currentMonitor = monitors.find(monitor => monitor.name === screenName);
             return currentMonitor?.activeWorkspace?.id ?? 1;
-        } else if (CompositorService.isDwl) {
-            if (!DwlService.dwlAvailable)
+        } else if (CompositorService.isMango) {
+            if (!MangoService.available)
                 return 0;
-            const outputState = DwlService.getOutputState(screenName);
+            const outputState = MangoService.getOutputState(screenName);
             if (!outputState || !outputState.tags)
                 return 0;
-            const activeTags = DwlService.getActiveTags(screenName);
+            const activeTags = MangoService.getActiveTags(screenName);
             return activeTags.length > 0 ? activeTags[0] : 0;
         } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
             if (!screenName || SettingsData.workspaceFollowFocus) {
@@ -281,14 +282,14 @@ Item {
             if (nextIndex !== validIndex) {
                 HyprlandService.focusWorkspace(realWorkspaces[nextIndex].id);
             }
-        } else if (CompositorService.isDwl) {
+        } else if (CompositorService.isMango) {
             const currentTag = getCurrentWorkspace();
             const currentIndex = realWorkspaces.findIndex(tag => tag === currentTag);
             const validIndex = currentIndex === -1 ? 0 : currentIndex;
             const nextIndex = direction > 0 ? Math.min(validIndex + 1, realWorkspaces.length - 1) : Math.max(validIndex - 1, 0);
 
             if (nextIndex !== validIndex) {
-                DwlService.switchToTag(_barScreenName, realWorkspaces[nextIndex]);
+                MangoService.switchToTag(_barScreenName, realWorkspaces[nextIndex]);
             }
         } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
             const currentWs = getCurrentWorkspace();
@@ -496,6 +497,7 @@ Item {
                 widgetThickness: barWindow.widgetThickness
                 barThickness: barWindow.effectiveBarThickness
                 barSpacing: barConfig?.spacing ?? 4
+                sectionAvailablePrimarySize: Math.max(1, hCenterSection.x > 0 ? hCenterSection.x : parent.width / 3)
             }
 
             Binding {
@@ -528,6 +530,7 @@ Item {
                 widgetThickness: barWindow.widgetThickness
                 barThickness: barWindow.effectiveBarThickness
                 barSpacing: barConfig?.spacing ?? 4
+                sectionAvailablePrimarySize: Math.max(1, hCenterSection.x > 0 ? parent.width - (hCenterSection.x + hCenterSection.width) : parent.width / 3)
             }
 
             Binding {
@@ -560,6 +563,7 @@ Item {
                 widgetThickness: barWindow.widgetThickness
                 barThickness: barWindow.effectiveBarThickness
                 barSpacing: barConfig?.spacing ?? 4
+                sectionAvailablePrimarySize: Math.max(1, hRightSection.x > 0 ? hRightSection.x - (hLeftSection.x + hLeftSection.width) : parent.width / 3)
             }
 
             Binding {
@@ -599,6 +603,7 @@ Item {
                 widgetThickness: barWindow.widgetThickness
                 barThickness: barWindow.effectiveBarThickness
                 barSpacing: barConfig?.spacing ?? 4
+                sectionAvailablePrimarySize: Math.max(1, vCenterSection.y > 0 ? vCenterSection.y : parent.height / 3)
             }
 
             Binding {
@@ -632,6 +637,7 @@ Item {
                 widgetThickness: barWindow.widgetThickness
                 barThickness: barWindow.effectiveBarThickness
                 barSpacing: barConfig?.spacing ?? 4
+                sectionAvailablePrimarySize: Math.max(1, vRightSection.y > 0 ? vRightSection.y - (vLeftSection.y + vLeftSection.height) : parent.height / 3)
             }
 
             Binding {
@@ -666,6 +672,7 @@ Item {
                 widgetThickness: barWindow.widgetThickness
                 barThickness: barWindow.effectiveBarThickness
                 barSpacing: barConfig?.spacing ?? 4
+                sectionAvailablePrimarySize: Math.max(1, vCenterSection.y > 0 ? parent.height - (vCenterSection.y + vCenterSection.height) : parent.height / 3)
             }
 
             Binding {

@@ -364,8 +364,10 @@ func (r *Runner) parseWindowManager() (deps.WindowManager, error) {
 		return deps.WindowManagerNiri, nil
 	case "hyprland":
 		return deps.WindowManagerHyprland, nil
+	case "mango", "mangowc":
+		return deps.WindowManagerMango, nil
 	default:
-		return 0, fmt.Errorf("invalid --compositor value %q: must be 'niri' or 'hyprland'", r.cfg.Compositor)
+		return 0, fmt.Errorf("invalid --compositor value %q: must be 'niri', 'hyprland', or 'mango'", r.cfg.Compositor)
 	}
 }
 

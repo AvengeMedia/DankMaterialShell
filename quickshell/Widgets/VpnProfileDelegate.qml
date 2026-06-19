@@ -211,21 +211,9 @@ Rectangle {
                 height: VPNService.configLoading ? 40 : 0
                 visible: VPNService.configLoading
 
-                Row {
+                DankSpinner {
                     anchors.centerIn: parent
-                    spacing: Theme.spacingS
-
-                    DankIcon {
-                        name: "sync"
-                        size: 16
-                        color: Theme.surfaceVariantText
-                    }
-
-                    StyledText {
-                        text: I18n.tr("Loading...")
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceVariantText
-                    }
+                    size: 20
                 }
             }
 

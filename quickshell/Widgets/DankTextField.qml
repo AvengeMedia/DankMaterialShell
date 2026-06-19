@@ -23,6 +23,7 @@ StyledRect {
 
     property alias text: textInput.text
     property string placeholderText: ""
+    property string labelText: ""
     property alias font: textInput.font
     property alias textColor: textInput.color
     property alias echoMode: textInput.echoMode
@@ -34,18 +35,19 @@ StyledRect {
     property color leftIconFocusedColor: Theme.primary
     property bool showClearButton: false
     property bool showPasswordToggle: false
+    property real rightAccessoryWidth: 0
     property bool passwordVisible: false
     property bool usePopupTransparency: !checkParentDisablesTransparency()
     property color backgroundColor: usePopupTransparency ? Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency) : Theme.surfaceContainerHigh
     property color focusedBorderColor: Theme.primary
     property color normalBorderColor: Theme.outlineMedium
     property color placeholderColor: Theme.outlineButton
-    property int borderWidth: 1
-    property int focusedBorderWidth: 2
+    property real borderWidth: 1
+    property real focusedBorderWidth: 2
     property real cornerRadius: Theme.cornerRadius
     readonly property real leftPadding: Theme.spacingM + (leftIconName ? leftIconSize + Theme.spacingM : 0)
     readonly property real rightPadding: {
-        let p = Theme.spacingS;
+        let p = Theme.spacingS + rightAccessoryWidth;
         if (showPasswordToggle)
             p += 20 + Theme.spacingXS;
         if (showClearButton && text.length > 0)
@@ -85,8 +87,10 @@ StyledRect {
         textInput.insert(textInput.cursorPosition, str);
     }
 
+    readonly property real labelBandHeight: Math.round(Theme.fontSizeSmall * 1.4) + Theme.spacingXS * 2
+
     width: 200
-    height: Math.round(Theme.fontSizeMedium * 3)
+    height: labelText !== "" ? Math.round(Theme.fontSizeMedium * 3) + labelBandHeight : Math.round(Theme.fontSizeMedium * 3)
     radius: cornerRadius
     color: backgroundColor
     border.color: textInput.activeFocus ? focusedBorderColor : normalBorderColor
@@ -97,11 +101,25 @@ StyledRect {
 
         anchors.left: parent.left
         anchors.leftMargin: Theme.spacingM
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenter: textInput.verticalCenter
         name: leftIconName
         size: leftIconSize
         color: textInput.activeFocus ? leftIconFocusedColor : leftIconColor
         visible: leftIconName !== ""
+    }
+
+    StyledText {
+        id: fieldLabel
+
+        anchors.left: textInput.left
+        anchors.right: textInput.right
+        anchors.top: parent.top
+        anchors.topMargin: Theme.spacingXS
+        text: root.labelText
+        visible: root.labelText !== ""
+        font.pixelSize: Theme.fontSizeSmall
+        color: textInput.activeFocus ? Theme.primary : Theme.surfaceVariantText
+        elide: Text.ElideRight
     }
 
     TextInput {
@@ -112,7 +130,7 @@ StyledRect {
         anchors.right: rightButtonsRow.left
         anchors.rightMargin: rightButtonsRow.visible ? Theme.spacingS : Theme.spacingM
         anchors.top: parent.top
-        anchors.topMargin: root.topPadding
+        anchors.topMargin: root.labelText !== "" ? root.labelBandHeight : root.topPadding
         anchors.bottom: parent.bottom
         anchors.bottomMargin: root.bottomPadding
         font.pixelSize: Theme.fontSizeMedium

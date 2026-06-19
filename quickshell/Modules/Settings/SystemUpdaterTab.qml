@@ -126,7 +126,7 @@ Item {
                 settingKey: "systemUpdaterAdvanced"
 
                 SettingsToggleRow {
-                    text: I18n.tr("Use custom command")
+                    text: I18n.tr("Use Custom Command")
                     description: I18n.tr("Open a terminal and run a custom command instead of the in-shell upgrade flow.")
                     checked: SettingsData.updaterUseCustomCommand
                     onToggled: checked => {

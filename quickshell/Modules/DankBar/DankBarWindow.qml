@@ -9,6 +9,8 @@ PanelWindow {
     id: barWindow
     readonly property var log: Log.scoped("DankBarWindow")
 
+    Component.onDestruction: KeyboardFocus.unregisterBarWindow(barWindow)
+
     required property var rootWindow
     required property var barConfig
     property var modelData: item
@@ -17,6 +19,8 @@ PanelWindow {
     property var leftWidgetsModel
     property var centerWidgetsModel
     property var rightWidgetsModel
+
+    readonly property bool barRevealed: inputMask.showing
 
     property var controlCenterButtonRef: null
     property var clockButtonRef: null
@@ -108,23 +112,9 @@ PanelWindow {
         triggerDashTab(2);
     }
 
-    readonly property var dBarLayer: {
-        switch (Quickshell.env("DMS_DANKBAR_LAYER")) {
-        case "bottom":
-            return WlrLayer.Bottom;
-        case "overlay":
-            return WlrLayer.Overlay;
-        case "background":
-            return WlrLayer.Background;
-        case "top":
-            return WlrLayer.Top;
-        default:
-            // Elevate to Overlay when Frame is enabled so the bar stays above
-            // the FrameWindow (WlrLayer.Top) when it is re-mapped on mode switch,
-            // but drop back to Top while a true fullscreen app owns this screen.
-            return SettingsData.frameEnabled && !barWindow.hasFullscreenToplevel ? WlrLayer.Overlay : WlrLayer.Top;
-        }
-    }
+    readonly property bool usesOverlayLayer: CompositorService.framePeerSurfacesUseOverlayForScreen(barWindow.screen) || (barConfig?.useOverlayLayer ?? false)
+
+    readonly property var dBarLayer: LayerShell.fromEnv("DMS_DANKBAR_LAYER", barWindow.usesOverlayLayer ? WlrLayer.Overlay : WlrLayer.Top)
 
     property var blurRegion: null
     property var _blurWidgetItems: []
@@ -152,6 +142,19 @@ PanelWindow {
         onTriggered: barBlur.rebuild()
     }
 
+    Connections {
+        target: barWindow
+        function onUsesConnectedFrameChromeChanged() {
+            _blurRebuildTimer.restart();
+        }
+        function onUsesFrameBarChromeChanged() {
+            _blurRebuildTimer.restart();
+        }
+        function onBarRevealedChanged() {
+            _blurRebuildTimer.restart();
+        }
+    }
+
     Component {
         id: blurRegionComp
         Region {}
@@ -176,10 +179,17 @@ PanelWindow {
             teardown();
             if (!BlurService.enabled || !BlurService.available)
                 return;
+            // When the bar is hidden (auto-hide, or config not visible) keep the blur
+            // region empty rather than sliding it off-surface. Some compositors (Hyprland)
+            // gate blur on a non-empty region and then blur the whole surface box when the
+            // clip degenerates to empty, leaving the bar strip blurred while the bar is
+            // hidden (issue #2656). A null region disables the effect cleanly.
+            if (!barWindow.barRevealed)
+                return;
             // In frame mode, FrameWindow owns the blur region for the entire screen edge
             // (including the bar area). The bar must not set its own competing blur region
             // so that frameBlurEnabled acts as the single control for all blur in frame mode.
-            if (SettingsData.frameEnabled)
+            if (SettingsData.frameEnabled && barWindow.usesFrameBarChrome)
                 return;
 
             const widgets = barWindow._blurWidgetItems.filter(w => w && w.visible && w.width > 0 && w.height > 0);
@@ -286,13 +296,10 @@ PanelWindow {
 
     readonly property bool isVertical: axis.isVertical
 
-    property bool gothCornersEnabled: barConfig?.gothCornersEnabled ?? false
-    property real wingtipsRadius: barConfig?.gothCornerRadiusOverride ? (barConfig?.gothCornerRadiusValue ?? 12) : Theme.cornerRadius
-    readonly property real _wingR: Math.max(0, wingtipsRadius)
     readonly property color _surfaceContainer: Theme.surfaceContainer
     readonly property string _barId: barConfig?.id ?? "default"
     property real _backgroundAlpha: barConfig?.transparency ?? 1.0
-    readonly property color _bgColor: SettingsData.frameEnabled ? Qt.rgba(SettingsData.effectiveFrameColor.r, SettingsData.effectiveFrameColor.g, SettingsData.effectiveFrameColor.b, SettingsData.frameOpacity) : Theme.withAlpha(_surfaceContainer, _backgroundAlpha)
+    readonly property color _bgColor: (SettingsData.frameEnabled && usesFrameBarChrome) ? Qt.rgba(SettingsData.effectiveFrameColor.r, SettingsData.effectiveFrameColor.g, SettingsData.effectiveFrameColor.b, SettingsData.frameOpacity) : Theme.withAlpha(_surfaceContainer, _backgroundAlpha)
 
     function _updateBackgroundAlpha() {
         const live = SettingsData.barConfigs.find(c => c.id === _barId);
@@ -300,36 +307,57 @@ PanelWindow {
     }
     readonly property real _dpr: CompositorService.getScreenScale(barWindow.screen)
 
+    property string screenName: modelData.name
+
+    readonly property bool usesConnectedFrameChrome: CompositorService.usesConnectedFrameChromeForScreen(screenName)
+    readonly property bool usesFrameBarChrome: CompositorService.frameWindowVisibleForScreen(screenName)
+    readonly property var renderBarConfig: SettingsData.effectiveBarConfigForRender(barConfig, usesFrameBarChrome)
+
+    property bool gothCornersEnabled: renderBarConfig?.gothCornersEnabled ?? false
+    property real wingtipsRadius: renderBarConfig?.gothCornerRadiusOverride ? (renderBarConfig?.gothCornerRadiusValue ?? 12) : Theme.cornerRadius
+    readonly property real _wingR: Math.max(0, wingtipsRadius)
+
     // Shadow buffer: extra window space for shadow to render beyond bar bounds
-    readonly property bool _shadowActive: (Theme.elevationEnabled && (typeof SettingsData !== "undefined" ? (SettingsData.barElevationEnabled ?? true) : false)) || (barConfig?.shadowIntensity ?? 0) > 0
+    readonly property bool _shadowActive: (Theme.elevationEnabled && (typeof SettingsData !== "undefined" ? (SettingsData.barElevationEnabled ?? true) : false)) || (renderBarConfig?.shadowIntensity ?? 0) > 0
     readonly property real _shadowBuffer: {
         if (!_shadowActive)
             return 0;
-        const hasOverride = (barConfig?.shadowIntensity ?? 0) > 0;
+        const hasOverride = (renderBarConfig?.shadowIntensity ?? 0) > 0;
         if (hasOverride) {
-            const blur = (barConfig.shadowIntensity ?? 0) * 0.2;
+            const blur = (renderBarConfig.shadowIntensity ?? 0) * 0.2;
             const offset = blur * 0.5;
             return Theme.snap(Math.max(16, blur + offset + 8), _dpr);
         }
         return Theme.snap(Theme.elevationRenderPadding(Theme.elevationLevel2, "top", 4, 8, 16), _dpr);
     }
 
-    property string screenName: modelData.name
+    // Flatten/spacing collapse for maximized windows is only for frame-integrated layout.
+    // When the bar draws its own pill, keep rounded corners and spacing like the dock.
+    readonly property bool flattenForMaximizedWindow: !SettingsData.frameEnabled || usesFrameBarChrome
 
     property bool hasMaximizedToplevel: false
-    readonly property bool hasFullscreenToplevel: {
-        if (!(barConfig?.fullscreenDetection ?? true))
-            return false;
-        CompositorService.sortedToplevels;
-        ToplevelManager.activeToplevel;
-        if (CompositorService.isNiri)
-            NiriService.allWorkspaces;
-        return CompositorService.hasFullscreenToplevelOnScreen(screenName);
-    }
     property bool shouldHideForWindows: false
 
     function _updateHasMaximizedToplevel() {
         if (!(barConfig?.maximizeDetection ?? true)) {
+            hasMaximizedToplevel = false;
+            return;
+        }
+        if (CompositorService.isMango) {
+            const out = MangoService.outputs[screenName];
+            const active = new Set((out?.activeTags) || []);
+            const wins = MangoService.windows || [];
+            for (let i = 0; i < wins.length; i++) {
+                const w = wins[i];
+                if (!w || w.monitor !== screenName || w.is_minimized)
+                    continue;
+                if (active.size > 0 && !(w.tags || []).some(t => active.has(t)))
+                    continue;
+                if (w.is_maximized || w.is_fullscreen) {
+                    hasMaximizedToplevel = true;
+                    return;
+                }
+            }
             hasMaximizedToplevel = false;
             return;
         }
@@ -357,7 +385,7 @@ PanelWindow {
             shouldHideForWindows = false;
             return;
         }
-        if (!CompositorService.isNiri && !CompositorService.isHyprland) {
+        if (!CompositorService.isNiri && !CompositorService.isHyprland && !CompositorService.isMango) {
             shouldHideForWindows = false;
             return;
         }
@@ -427,7 +455,7 @@ PanelWindow {
         shouldHideForWindows = filtered.length > 0;
     }
 
-    property real effectiveSpacing: SettingsData.frameEnabled ? 0 : (hasMaximizedToplevel ? 0 : (barConfig?.spacing ?? 4))
+    property real effectiveSpacing: (SettingsData.frameEnabled && usesFrameBarChrome) ? 0 : ((flattenForMaximizedWindow && hasMaximizedToplevel) ? 0 : (barConfig?.spacing ?? 4))
 
     Behavior on effectiveSpacing {
         enabled: barWindow.visible
@@ -438,7 +466,7 @@ PanelWindow {
     }
 
     readonly property int notificationCount: NotificationService.notifications.length
-    readonly property real effectiveBarThickness: SettingsData.frameEnabled ? SettingsData.frameBarSize : Theme.snap(Math.max(barWindow.widgetThickness + (barConfig?.innerPadding ?? 4) + 4, Theme.barHeight - 4 - (8 - (barConfig?.innerPadding ?? 4))), _dpr)
+    readonly property real effectiveBarThickness: (SettingsData.frameEnabled && usesFrameBarChrome) ? SettingsData.frameBarSize : Theme.snap(Math.max(barWindow.widgetThickness + (barConfig?.innerPadding ?? 4) + 4, Theme.barHeight - 4 - (8 - (barConfig?.innerPadding ?? 4))), _dpr)
     readonly property bool effectiveOpenOnOverview: SettingsData.frameEnabled ? SettingsData.frameShowOnOverview : (barConfig?.openOnOverview ?? false)
     readonly property real widgetThickness: Theme.snap(Math.max(20, 26 + (barConfig?.innerPadding ?? 4) * 0.6), _dpr)
 
@@ -538,11 +566,12 @@ PanelWindow {
     }
 
     screen: modelData
-    implicitHeight: !isVertical ? Theme.px(effectiveBarThickness + effectiveSpacing + ((barConfig?.gothCornersEnabled ?? false) && !hasMaximizedToplevel ? _wingR : 0), _dpr) + _shadowBuffer : 0
-    implicitWidth: isVertical ? Theme.px(effectiveBarThickness + effectiveSpacing + ((barConfig?.gothCornersEnabled ?? false) && !hasMaximizedToplevel ? _wingR : 0), _dpr) + _shadowBuffer : 0
+    implicitHeight: !isVertical ? Theme.px(effectiveBarThickness + effectiveSpacing + ((renderBarConfig?.gothCornersEnabled ?? false) && !hasMaximizedToplevel ? _wingR : 0), _dpr) + _shadowBuffer : 0
+    implicitWidth: isVertical ? Theme.px(effectiveBarThickness + effectiveSpacing + ((renderBarConfig?.gothCornersEnabled ?? false) && !hasMaximizedToplevel ? _wingR : 0), _dpr) + _shadowBuffer : 0
     color: "transparent"
 
     Component.onCompleted: {
+        KeyboardFocus.registerBarWindow(barWindow);
         updateGpuTempConfig();
         _updateBackgroundAlpha();
         _updateHasMaximizedToplevel();
@@ -636,9 +665,9 @@ PanelWindow {
     anchors.left: !isVertical ? true : (barPos === SettingsData.Position.Left)
     anchors.right: !isVertical ? true : (barPos === SettingsData.Position.Right)
 
-    readonly property bool reserveExclusiveWhenAutoHidden: SettingsData.connectedFrameModeActive && !!barWindow.screen && SettingsData.isScreenInPreferences(barWindow.screen, SettingsData.frameScreenPreferences)
+    readonly property bool reserveExclusiveWhenAutoHidden: SettingsData.frameEnabled && usesFrameBarChrome && !!barWindow.screen && SettingsData.isScreenInPreferences(barWindow.screen, SettingsData.frameScreenPreferences)
 
-    exclusiveZone: (barWindow.hasFullscreenToplevel || !(barConfig?.visible ?? true) || (topBarCore.autoHide && !barWindow.reserveExclusiveWhenAutoHidden)) ? -1 : (barWindow.effectiveBarThickness + effectiveSpacing + (Theme.isConnectedEffect ? 0 : (barConfig?.bottomGap ?? 0)))
+    exclusiveZone: (!(barConfig?.visible ?? true) || (topBarCore.autoHide && !barWindow.reserveExclusiveWhenAutoHidden)) ? -1 : (barWindow.effectiveBarThickness + effectiveSpacing + (usesFrameBarChrome ? 0 : (barConfig?.bottomGap ?? 0)))
 
     Item {
         id: inputMask
@@ -647,9 +676,9 @@ PanelWindow {
 
         readonly property bool inOverviewWithShow: CompositorService.isNiri && NiriService.inOverview && barWindow.effectiveOpenOnOverview
         readonly property bool effectiveVisible: (barConfig?.visible ?? true) || inOverviewWithShow
-        readonly property bool showing: effectiveVisible && !barWindow.hasFullscreenToplevel && (topBarCore.reveal || inOverviewWithShow || !topBarCore.autoHide)
+        readonly property bool showing: effectiveVisible && (topBarCore.reveal || inOverviewWithShow || !topBarCore.autoHide)
 
-        readonly property int maskThickness: barWindow.hasFullscreenToplevel ? 0 : (showing ? barThickness : 1)
+        readonly property int maskThickness: showing ? barThickness : 1
 
         x: {
             if (!axis.isVertical) {
@@ -719,7 +748,7 @@ PanelWindow {
         item: clickThroughEnabled ? null : inputMask
 
         Region {
-            readonly property var r: barWindow.clickThroughEnabled ? barWindow.sectionRect(barWindow._leftSection, false, barWindow._revealProgress) : {
+            readonly property var r: barWindow.clickThroughEnabled ? barWindow.sectionRect(barWindow._leftSection, false, barWindow._revealProgress + barWindow.width * 0) : {
                 "x": 0,
                 "y": 0,
                 "w": 0,
@@ -732,7 +761,7 @@ PanelWindow {
         }
 
         Region {
-            readonly property var r: barWindow.clickThroughEnabled ? barWindow.sectionRect(barWindow._centerSection, true, barWindow._revealProgress) : {
+            readonly property var r: barWindow.clickThroughEnabled ? barWindow.sectionRect(barWindow._centerSection, true, barWindow._revealProgress + barWindow.width * 0) : {
                 "x": 0,
                 "y": 0,
                 "w": 0,
@@ -745,7 +774,7 @@ PanelWindow {
         }
 
         Region {
-            readonly property var r: barWindow.clickThroughEnabled ? barWindow.sectionRect(barWindow._rightSection, false, barWindow._revealProgress) : {
+            readonly property var r: barWindow.clickThroughEnabled ? barWindow.sectionRect(barWindow._rightSection, false, barWindow._revealProgress + barWindow.width * 0) : {
                 "x": 0,
                 "y": 0,
                 "w": 0,
@@ -826,15 +855,12 @@ PanelWindow {
         }
 
         property bool reveal: {
-            if (barWindow.hasFullscreenToplevel)
-                return false;
-
             const inOverviewWithShow = CompositorService.isNiri && NiriService.inOverview && barWindow.effectiveOpenOnOverview;
             if (inOverviewWithShow)
                 return true;
 
             const showOnWindowsSetting = barConfig?.showOnWindowsOpen ?? false;
-            if (showOnWindowsSetting && autoHide && (CompositorService.isNiri || CompositorService.isHyprland)) {
+            if (showOnWindowsSetting && autoHide && (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango)) {
                 if (barWindow.shouldHideForWindows)
                     return topBarMouseArea.containsMouse || popoutPinsReveal || revealSticky || ipcReveal;
                 return true;
@@ -897,9 +923,9 @@ PanelWindow {
                 bottom: barWindow.isVertical ? parent.bottom : undefined
             }
             readonly property bool inOverview: CompositorService.isNiri && NiriService.inOverview && barWindow.effectiveOpenOnOverview
-            hoverEnabled: (barConfig?.autoHide ?? false) && !inOverview && !barWindow.hasFullscreenToplevel && !topBarCore.popoutPinsReveal
+            hoverEnabled: (barConfig?.autoHide ?? false) && !inOverview && !topBarCore.popoutPinsReveal
             acceptedButtons: Qt.NoButton
-            enabled: (barConfig?.autoHide ?? false) && !inOverview && !barWindow.hasFullscreenToplevel
+            enabled: (barConfig?.autoHide ?? false) && !inOverview
 
             Item {
                 id: topBarContainer
@@ -938,7 +964,7 @@ PanelWindow {
                         id: barBackground
                         barWindow: barWindow
                         axis: axis
-                        barConfig: barWindow.barConfig
+                        barConfig: barWindow.renderBarConfig
                     }
 
                     MouseArea {
@@ -947,8 +973,13 @@ PanelWindow {
                         acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
                         onClicked: {
                             const screenName = barWindow.screen?.name;
-                            if (screenName && PopoutManager.currentPopoutsByScreen[screenName])
+                            if (!screenName)
+                                return;
+                            if (PopoutManager.currentPopoutsByScreen[screenName])
                                 PopoutManager.closeAllPopouts();
+                            if (ModalManager.currentModalsByScreen[screenName])
+                                ModalManager.closeAllModalsExcept(null);
+                            TrayMenuManager.closeAllMenus();
                         }
                     }
 

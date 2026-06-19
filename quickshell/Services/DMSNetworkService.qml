@@ -41,6 +41,9 @@ Singleton {
     property var savedConnections: []
     property var ssidToConnectionName: ({})
     property var wifiSignalIcon: {
+        if (isConnecting) {
+            return "wifi";
+        }
         if (!wifiConnected) {
             return "wifi_off";
         }
@@ -66,6 +69,7 @@ Singleton {
     property bool changingPreference: false
     property string targetPreference: ""
     property var savedWifiNetworks: []
+    readonly property int savedWifiStateApiVersion: 26
     property string connectionStatus: ""
     property string lastConnectionError: ""
     property bool passwordDialogShouldReopen: false
@@ -306,17 +310,21 @@ Singleton {
 
         if (state.wifiNetworks) {
             wifiNetworks = state.wifiNetworks;
+        }
 
+        if (state.wifiNetworks || state.savedWifiNetworks) {
+            const hasSavedWifiState = DMSService.apiVersion >= savedWifiStateApiVersion && Array.isArray(state.savedWifiNetworks);
+            const sourceSavedNetworks = hasSavedWifiState ? state.savedWifiNetworks : (state.wifiNetworks || []).filter(network => network.saved);
             const saved = [];
             const mapping = {};
-            for (const network of state.wifiNetworks) {
-                if (network.saved) {
-                    saved.push({
-                        ssid: network.ssid,
-                        saved: true
-                    });
+            for (const network of sourceSavedNetworks) {
+                const normalized = Object.assign({}, network, {
+                    saved: true,
+                    outOfRange: hasSavedWifiState ? network.outOfRange === true : false
+                });
+                saved.push(normalized);
+                if (network?.ssid)
                     mapping[network.ssid] = network.ssid;
-                }
             }
             savedConnections = saved;
             savedWifiNetworks = saved;
@@ -593,6 +601,7 @@ Singleton {
                 }
                 wifiNetworks = updated;
                 networksUpdated();
+                Qt.callLater(() => refreshSavedWifiNetworks());
             }
             forgetSSID = "";
         });
@@ -981,5 +990,12 @@ Singleton {
                 Qt.callLater(() => getState());
             }
         });
+    }
+
+    function refreshSavedWifiNetworks() {
+        if (!networkAvailable)
+            return;
+
+        getState();
     }
 }

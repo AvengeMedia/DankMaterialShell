@@ -5,7 +5,7 @@ import qs.Modules.ControlCenter.Widgets
 CompoundPill {
     id: root
 
-    iconName: SessionData.doNotDisturb ? "do_not_disturb_on" : "do_not_disturb_off"
+    iconName: "do_not_disturb_on"
     iconColor: SessionData.doNotDisturb ? Theme.primary : Theme.surfaceText
     primaryText: I18n.tr("Do Not Disturb")
     isActive: SessionData.doNotDisturb

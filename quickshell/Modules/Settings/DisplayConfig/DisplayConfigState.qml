@@ -7,6 +7,7 @@ import Quickshell
 import Quickshell.Io
 import qs.Common
 import qs.Services
+import "../../../Common/ConfigIncludeResolve.js" as ConfigIncludeResolve
 
 Singleton {
     id: root
@@ -20,8 +21,11 @@ Singleton {
 
     property var includeStatus: ({
             "exists": false,
-            "included": false
+            "included": false,
+            "configFormat": "",
+            "readOnly": false
         })
+    readonly property bool readOnly: CompositorService.isHyprland && includeStatus.readOnly === true
     property bool checkingInclude: false
     property bool fixingInclude: false
 
@@ -154,12 +158,14 @@ Singleton {
         const compositorDirs = {
             "niri": configDir + "/niri/dms/profiles",
             "hyprland": configDir + "/hypr/dms/profiles",
-            "dwl": configDir + "/mango/dms/profiles"
+            "dwl": configDir + "/mango/dms/profiles",
+            "mango": configDir + "/mango/dms/profiles"
         };
         const compositorExts = {
             "niri": ".kdl",
             "hyprland": ".conf",
-            "dwl": ".conf"
+            "dwl": ".conf",
+            "mango": ".conf"
         };
 
         const tasks = [];
@@ -460,7 +466,7 @@ Singleton {
         return result;
     }
 
-    // Extract niri settings map from neutral config entry for generateNiriOutputsKdl
+    // Extract niri settings map from a neutral config entry.
     function getNiriSettingsFromConfig(configEntry) {
         const result = {};
         for (const outputId in (configEntry.outputs || {})) {
@@ -488,6 +494,28 @@ Singleton {
         return result;
     }
 
+    function backendSettingsFromConfig(configEntry) {
+        switch (CompositorService.compositor) {
+        case "niri":
+            return getNiriSettingsFromConfig(configEntry);
+        case "hyprland":
+            return getHyprlandSettingsFromConfig(configEntry);
+        default:
+            return null;
+        }
+    }
+
+    function backendMergedSettings() {
+        switch (CompositorService.compositor) {
+        case "niri":
+            return buildMergedNiriSettings();
+        case "hyprland":
+            return buildMergedHyprlandSettings();
+        default:
+            return null;
+        }
+    }
+
     function ensureEnabledOutput(configEntry) {
         const outputKeys = Object.keys(configEntry.outputs || {});
         if (outputKeys.length === 0)
@@ -501,6 +529,15 @@ Singleton {
 
     // Write compositor config from a neutral config entry and optionally reload
     function applyConfigEntry(configEntry, configId, profileName, isManual) {
+        if (CompositorService.isHyprland && readOnly) {
+            if (isManual) {
+                profilesLoading = false;
+                manualActivation = false;
+                profileError(I18n.tr("Hyprland conf mode is read-only in Settings"));
+            }
+            showHyprlandReadOnlyWarning();
+            return;
+        }
         ensureEnabledOutput(configEntry);
         // Capture the entry being applied so disabled-output settings fields can read
         // scale/position/transform back even when wlr reports no logical viewport.
@@ -525,43 +562,12 @@ Singleton {
             WlrOutputService.requestState();
         };
 
-        switch (CompositorService.compositor) {
-        case "niri":
-            {
-                const paths = getConfigPaths();
-                if (!paths) {
-                    onWriteFailed();
-                    return;
-                }
-                const configContent = generateNiriOutputsKdl(outputsData, getNiriSettingsFromConfig(configEntry));
-                Proc.runCommand("apply-config-write", ["sh", "-c", `mkdir -p "$(dirname "${paths.outputsFile}")" && cat > "${paths.outputsFile}" << 'EOF'\n${configContent}EOF`], (output, exitCode) => {
-                    if (exitCode !== 0) {
-                        onWriteFailed();
-                        return;
-                    }
-                    onWriteSuccess();
-                });
-                break;
-            }
-        case "hyprland":
-            HyprlandService.generateOutputsConfig(outputsData, getHyprlandSettingsFromConfig(configEntry), success => {
-                if (success)
-                    onWriteSuccess();
-                else
-                    onWriteFailed();
-            });
-            break;
-        case "dwl":
-            DwlService.generateOutputsConfig(outputsData, success => {
-                if (success)
-                    onWriteSuccess();
-                else
-                    onWriteFailed();
-            });
-            break;
-        default:
-            onWriteFailed();
-        }
+        backendWriteOutputsConfig(outputsData, backendSettingsFromConfig(configEntry), success => {
+            if (success)
+                onWriteSuccess();
+            else
+                onWriteFailed();
+        });
     }
 
     // ── Profile management ─────────────────────────────────────────────────
@@ -877,6 +883,7 @@ Singleton {
     Component.onCompleted: {
         outputs = buildOutputsMap();
         reloadSavedOutputs();
+        checkIncludeStatus();
     }
 
     function reloadSavedOutputs() {
@@ -1029,6 +1036,8 @@ Singleton {
                 const id = (o.make + " " + o.model + " " + serial).trim();
                 liveByIdentifier[id] = true;
                 liveByIdentifier[o.make + " " + o.model] = true;
+                if (CompositorService.isHyprland)
+                    liveByIdentifier[getHyprlandOutputIdentifier(o, name)] = true;
             }
             liveByIdentifier[name] = true;
         }
@@ -1047,7 +1056,7 @@ Singleton {
             return parseNiriOutputs(content);
         case "hyprland":
             return parseHyprlandOutputs(content);
-        case "dwl":
+        case "mango":
             return parseMangoOutputs(content);
         default:
             return {};
@@ -1107,10 +1116,88 @@ Singleton {
         return result;
     }
 
+    function hyprLuaField(line, field) {
+        const re = new RegExp("\\b" + field + "\\s*=\\s*(\\\"(?:\\\\\\\\.|[^\\\"])*\\\"|'(?:\\\\\\\\.|[^'])*'|\\[\\[.*?\\]\\]|[^,}\\s]+)");
+        const match = line.match(re);
+        if (!match)
+            return undefined;
+        const raw = match[1].trim();
+        if (raw.startsWith("[[") && raw.endsWith("]]"))
+            return raw.slice(2, -2);
+        if (raw.startsWith("\"")) {
+            try {
+                return JSON.parse(raw);
+            } catch (e) {
+                return raw.slice(1, -1);
+            }
+        }
+        if (raw.startsWith("'") && raw.endsWith("'"))
+            return raw.slice(1, -1).replace(/\\'/g, "'");
+        if (raw === "true")
+            return true;
+        if (raw === "false")
+            return false;
+        const num = Number(raw);
+        return isNaN(num) ? raw : num;
+    }
+
+    function parseHyprlandLuaMonitorLine(line) {
+        if (!line.match(/^\s*hl\.monitor\s*\(/))
+            return null;
+        const name = hyprLuaField(line, "output");
+        if (name === undefined)
+            return null;
+        const disabled = hyprLuaField(line, "disabled") === true;
+        const mode = hyprLuaField(line, "mode") || "preferred";
+        const position = hyprLuaField(line, "position") || "0x0";
+        const scaleValue = hyprLuaField(line, "scale");
+        const transform = Number(hyprLuaField(line, "transform") ?? 0);
+        const vrrMode = Number(hyprLuaField(line, "vrr") ?? 0);
+        const posMatch = String(position).match(/^(-?\d+)x(-?\d+)$/);
+        const modeMatch = String(mode).match(/^(\d+)x(\d+)@([\d.]+)/);
+        const settings = {
+            "disabled": disabled || undefined,
+            "bitdepth": hyprLuaField(line, "bitdepth"),
+            "colorManagement": hyprLuaField(line, "cm"),
+            "sdrBrightness": hyprLuaField(line, "sdrbrightness"),
+            "sdrSaturation": hyprLuaField(line, "sdrsaturation"),
+            "supportsWideColor": hyprLuaField(line, "supports_wide_color"),
+            "supportsHdr": hyprLuaField(line, "supports_hdr"),
+            "vrrFullscreenOnly": vrrMode === 2 ? true : undefined
+        };
+        return {
+            "name": String(name),
+            "logical": {
+                "x": posMatch ? parseInt(posMatch[1]) : 0,
+                "y": posMatch ? parseInt(posMatch[2]) : 0,
+                "scale": typeof scaleValue === "number" ? scaleValue : 1.0,
+                "transform": hyprlandToTransform(transform)
+            },
+            "modes": modeMatch ? [
+                {
+                    "width": parseInt(modeMatch[1]),
+                    "height": parseInt(modeMatch[2]),
+                    "refresh_rate": Math.round(parseFloat(modeMatch[3]) * 1000)
+                }
+            ] : [],
+            "current_mode": modeMatch ? 0 : -1,
+            "vrr_enabled": vrrMode >= 1,
+            "vrr_supported": vrrMode > 0,
+            "hyprlandSettings": settings,
+            "mirror": hyprLuaField(line, "mirror") || ""
+        };
+    }
+
     function parseHyprlandOutputs(content) {
         const result = {};
         const lines = content.split("\n");
         for (const line of lines) {
+            const luaMonitor = parseHyprlandLuaMonitorLine(line);
+            if (luaMonitor) {
+                result[luaMonitor.name] = luaMonitor;
+                continue;
+            }
+
             const disableMatch = line.match(/^\s*monitor\s*=\s*([^,]+),\s*disable\s*$/);
             if (disableMatch) {
                 const name = disableMatch[1].trim();
@@ -1240,7 +1327,7 @@ Singleton {
                 params[pair.substring(0, colonIdx).trim()] = pair.substring(colonIdx + 1).trim();
             }
 
-            const name = params.name;
+            const name = (params.name || "").replace(/^\^/, "").replace(/\$$/, "");
             if (!name)
                 continue;
 
@@ -1302,12 +1389,12 @@ Singleton {
             };
         case "hyprland":
             return {
-                "configFile": configDir + "/hypr/hyprland.conf",
-                "outputsFile": configDir + "/hypr/dms/outputs.conf",
-                "grepPattern": 'source.*dms/outputs.conf',
-                "includeLine": "source = ./dms/outputs.conf"
+                "configFile": configDir + "/hypr/hyprland.lua",
+                "outputsFile": configDir + "/hypr/dms/outputs.lua",
+                "grepPattern": "dms.outputs",
+                "includeLine": "require(\"dms.outputs\")"
             };
-        case "dwl":
+        case "mango":
             return {
                 "configFile": configDir + "/mango/config.conf",
                 "outputsFile": configDir + "/mango/dms/outputs.conf",
@@ -1321,16 +1408,18 @@ Singleton {
 
     function checkIncludeStatus() {
         const compositor = CompositorService.compositor;
-        if (compositor !== "niri" && compositor !== "hyprland" && compositor !== "dwl") {
+        if (compositor !== "niri" && compositor !== "hyprland" && compositor !== "mango") {
             includeStatus = {
                 "exists": false,
-                "included": false
+                "included": false,
+                "configFormat": "",
+                "readOnly": false
             };
             return;
         }
 
-        const filename = (compositor === "niri") ? "outputs.kdl" : "outputs.conf";
-        const compositorArg = (compositor === "dwl") ? "mangowc" : compositor;
+        const filename = (compositor === "niri") ? "outputs.kdl" : ((compositor === "hyprland") ? "outputs.lua" : "outputs.conf");
+        const compositorArg = (compositor === "mango") ? "mangowc" : compositor;
 
         checkingInclude = true;
         Proc.runCommand("check-outputs-include", ["dms", "config", "resolve-include", compositorArg, filename], (output, exitCode) => {
@@ -1338,7 +1427,9 @@ Singleton {
             if (exitCode !== 0) {
                 includeStatus = {
                     "exists": false,
-                    "included": false
+                    "included": false,
+                    "configFormat": "",
+                    "readOnly": false
                 };
                 return;
             }
@@ -1347,29 +1438,66 @@ Singleton {
             } catch (e) {
                 includeStatus = {
                     "exists": false,
-                    "included": false
+                    "included": false,
+                    "configFormat": "",
+                    "readOnly": false
                 };
             }
         });
     }
 
     function fixOutputsInclude() {
+        if (readOnly) {
+            showHyprlandReadOnlyWarning();
+            return;
+        }
+        if (CompositorService.isHyprland && !HyprlandService.luaConfigActive) {
+            showHyprlandReadOnlyWarning();
+            checkIncludeStatus();
+            return;
+        }
         const paths = getConfigPaths();
         if (!paths)
             return;
 
         fixingInclude = true;
-        const outputsDir = paths.outputsFile.substring(0, paths.outputsFile.lastIndexOf("/"));
         const unixTime = Math.floor(Date.now() / 1000);
         const backupFile = paths.configFile + ".backup" + unixTime;
+        const script = ConfigIncludeResolve.buildRepairScript({
+            configFile: paths.configFile,
+            backupFile: backupFile,
+            fragmentFile: paths.outputsFile,
+            grepPattern: paths.grepPattern,
+            includeLine: paths.includeLine
+        });
 
-        Proc.runCommand("fix-outputs-include", ["sh", "-c", `cp "${paths.configFile}" "${backupFile}" 2>/dev/null; ` + `mkdir -p "${outputsDir}" && ` + `touch "${paths.outputsFile}" && ` + `if ! grep -v '^[[:space:]]*\\(//\\|#\\)' "${paths.configFile}" 2>/dev/null | grep -q '${paths.grepPattern}'; then ` + `echo '' >> "${paths.configFile}" && ` + `echo '${paths.includeLine}' >> "${paths.configFile}"; fi`], (output, exitCode) => {
-            fixingInclude = false;
-            if (exitCode !== 0)
+        Proc.runCommand("fix-outputs-include", ["sh", "-c", script], (output, exitCode) => {
+            if (exitCode !== 0) {
+                fixingInclude = false;
                 return;
+            }
+
+            const liveOutputs = buildOutputsMap();
+            if (Object.keys(liveOutputs).length > 0) {
+                outputs = liveOutputs;
+                backendWriteOutputsConfig(liveOutputs, backendMergedSettings(), success => {
+                    fixingInclude = false;
+                    if (!success)
+                        ToastService.showError(I18n.tr("Display setup failed"), I18n.tr("Failed to write outputs config."), "", "display-config");
+                    checkIncludeStatus();
+                    WlrOutputService.requestState();
+                });
+                return;
+            }
+
+            fixingInclude = false;
             checkIncludeStatus();
             WlrOutputService.requestState();
         });
+    }
+
+    function showHyprlandReadOnlyWarning() {
+        ToastService.showWarning(I18n.tr("Hyprland conf mode"), I18n.tr("This install is still using hyprland.conf. Run dms setup to migrate before editing display settings."), "dms setup", "display-config");
     }
 
     function buildOutputsMap() {
@@ -1454,21 +1582,148 @@ Singleton {
         WlrOutputService.requestState();
     }
 
-    function backendWriteOutputsConfig(outputsData) {
+    function backendWriteOutputsConfig(outputsData, settingsOrCallback, maybeCallback) {
+        const settings = typeof settingsOrCallback === "function" ? null : settingsOrCallback;
+        const callback = typeof settingsOrCallback === "function" ? settingsOrCallback : maybeCallback;
+        const hasExplicitSettings = settings !== null && settings !== undefined;
+
+        function finish(success) {
+            if (callback)
+                callback(success);
+        }
+
         switch (CompositorService.compositor) {
         case "niri":
-            NiriService.generateOutputsConfig(outputsData);
-            break;
+            {
+                const niriSettings = hasExplicitSettings ? settings : buildMergedNiriSettings();
+                NiriService.generateOutputsConfig(outputsData, niriSettings, success => {
+                    if (!success) {
+                        finish(false);
+                        return;
+                    }
+                    reloadAndApplyNiriLiveOutputsConfig(outputsData, niriSettings, finish);
+                });
+                break;
+            }
         case "hyprland":
-            HyprlandService.generateOutputsConfig(outputsData, buildMergedHyprlandSettings());
-            break;
-        case "dwl":
-            DwlService.generateOutputsConfig(outputsData);
+            {
+                if (readOnly) {
+                    showHyprlandReadOnlyWarning();
+                    finish(false);
+                    return false;
+                }
+                const hyprlandSettings = hasExplicitSettings ? settings : buildMergedHyprlandSettings();
+                HyprlandService.generateOutputsConfig(outputsData, hyprlandSettings, finish);
+                break;
+            }
+        case "mango":
+            MangoService.generateOutputsConfig(outputsData, finish);
             break;
         default:
             WlrOutputService.applyOutputsConfig(outputsData, outputs);
+            finish(true);
             break;
         }
+        return true;
+    }
+
+    function niriTransformArg(transform) {
+        switch (transform) {
+        case "90":
+            return "90";
+        case "180":
+            return "180";
+        case "270":
+            return "270";
+        case "Flipped":
+            return "flipped";
+        case "Flipped90":
+            return "flipped-90";
+        case "Flipped180":
+            return "flipped-180";
+        case "Flipped270":
+            return "flipped-270";
+        default:
+            return "normal";
+        }
+    }
+
+    function getLiveNiriOutputName(outputName, outputData) {
+        if (outputs[outputName])
+            return outputName;
+        const targetId = getNiriOutputIdentifier(outputData, outputName);
+        for (const liveName in outputs) {
+            if (getNiriOutputIdentifier(outputs[liveName], liveName) === targetId)
+                return liveName;
+        }
+        return "";
+    }
+
+    function applyNiriLiveOutputsConfig(outputsData, niriSettings, callback) {
+        const names = Object.keys(outputsData || {});
+        let pending = 0;
+        let failed = false;
+
+        function done(success) {
+            if (callback)
+                callback(success);
+        }
+
+        for (const outputName of names) {
+            const output = outputsData[outputName];
+            if (!output)
+                continue;
+            const liveName = getLiveNiriOutputName(outputName, output);
+            if (!liveName)
+                continue;
+
+            const identifier = getNiriOutputIdentifier(output, outputName);
+            const settings = niriSettings?.[outputName] || niriSettings?.[identifier] || {};
+            const config = {};
+
+            if (settings.disabled === true)
+                config.disabled = true;
+            else if (settings.disabled === false)
+                config.disabled = false;
+
+            if (!config.disabled) {
+                if (output.current_mode !== undefined && output.modes && output.modes[output.current_mode]) {
+                    const mode = output.modes[output.current_mode];
+                    config.mode = mode.width + "x" + mode.height + "@" + (mode.refresh_rate / 1000).toFixed(3);
+                }
+                if (output.logical) {
+                    config.scale = output.logical.scale ?? 1.0;
+                    config.position = {
+                        "x": output.logical.x ?? 0,
+                        "y": output.logical.y ?? 0
+                    };
+                    config.transform = niriTransformArg(output.logical.transform);
+                }
+                if (settings.vrrOnDemand !== undefined)
+                    config.vrrOnDemand = settings.vrrOnDemand;
+                else if (output.vrr_enabled !== undefined)
+                    config.vrr = output.vrr_enabled;
+            }
+
+            pending++;
+            NiriService.applyOutputConfig(liveName, config, success => {
+                failed = failed || !success;
+                pending--;
+                if (pending === 0) {
+                    WlrOutputService.requestState();
+                    done(!failed);
+                }
+            });
+        }
+
+        if (pending === 0)
+            done(true);
+    }
+
+    function reloadAndApplyNiriLiveOutputsConfig(outputsData, niriSettings, callback) {
+        Proc.runCommand("niri-reload-output-config", ["niri", "msg", "action", "load-config-file"], () => {
+            applyNiriLiveOutputsConfig(outputsData, niriSettings, callback);
+        });
     }
 
     function normalizeOutputPositions(outputsData) {
@@ -1616,7 +1871,7 @@ Singleton {
 
     function getHyprlandOutputIdentifier(output, outputName) {
         if (SettingsData.displayNameMode === "model" && output?.make && output?.model)
-            return "desc:" + output.make + " " + output.model + " " + (output?.serial || "Unknown");
+            return ("desc:" + output.make + " " + output.model + " " + (output?.serial || "Unknown")).replace(/,/g, "");
         return outputName;
     }
 
@@ -1776,6 +2031,10 @@ Singleton {
     function applyChanges() {
         if (!hasPendingChanges)
             return;
+        if (CompositorService.isHyprland && readOnly) {
+            showHyprlandReadOnlyWarning();
+            return;
+        }
         const changeDescriptions = [];
 
         if (formatChanged) {
@@ -1854,7 +2113,7 @@ Singleton {
 
         const mergedOutputs = buildOutputsWithPendingChanges();
         const mergedNiriSettings = buildMergedNiriSettings();
-        const configContent = generateNiriOutputsKdl(mergedOutputs, mergedNiriSettings);
+        const configContent = NiriService.buildOutputsConfig(mergedOutputs, mergedNiriSettings);
 
         const configDir = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
         const tempFile = configDir + "/niri/dms/.outputs-validate-tmp.kdl";
@@ -1878,7 +2137,7 @@ Singleton {
                 if (formatChanged)
                     SettingsData.saveSettings();
                 commitNiriSettingsChanges();
-                backendWriteOutputsConfig(mergedOutputs);
+                backendWriteOutputsConfig(mergedOutputs, mergedNiriSettings);
             });
         });
     }
@@ -1953,108 +2212,6 @@ Singleton {
                     SettingsData.removeHyprlandOutputSetting(id, "disabled");
             }
         }
-    }
-
-    function generateNiriOutputsKdl(outputsData, niriSettings) {
-        let kdlContent = `// Auto-generated by DMS - do not edit manually\n\n`;
-        const sortedNames = Object.keys(outputsData).sort((a, b) => {
-            const la = outputsData[a].logical || {};
-            const lb = outputsData[b].logical || {};
-            return (la.x ?? 0) - (lb.x ?? 0) || (la.y ?? 0) - (lb.y ?? 0);
-        });
-        for (const outputName of sortedNames) {
-            const output = outputsData[outputName];
-            const identifier = getNiriOutputIdentifier(output, outputName);
-            const settings = niriSettings[identifier] || {};
-            kdlContent += `output "${identifier}" {\n`;
-            if (settings.disabled) {
-                kdlContent += `    off\n}\n\n`;
-                continue;
-            }
-            if (output.current_mode !== undefined && output.modes && output.modes[output.current_mode]) {
-                const mode = output.modes[output.current_mode];
-                kdlContent += `    mode "${mode.width}x${mode.height}@${(mode.refresh_rate / 1000).toFixed(3)}"\n`;
-            }
-            if (output.logical) {
-                kdlContent += `    scale ${output.logical.scale ?? 1.0}\n`;
-                if (output.logical.transform && output.logical.transform !== "Normal") {
-                    const transformMap = {
-                        "Normal": "normal",
-                        "90": "90",
-                        "180": "180",
-                        "270": "270",
-                        "Flipped": "flipped",
-                        "Flipped90": "flipped-90",
-                        "Flipped180": "flipped-180",
-                        "Flipped270": "flipped-270"
-                    };
-                    kdlContent += `    transform "${transformMap[output.logical.transform] || "normal"}"\n`;
-                }
-                if (output.logical.x !== undefined && output.logical.y !== undefined)
-                    kdlContent += `    position x=${output.logical.x} y=${output.logical.y}\n`;
-            }
-            if (settings.vrrOnDemand) {
-                kdlContent += `    variable-refresh-rate on-demand=true\n`;
-            } else if (output.vrr_enabled) {
-                kdlContent += `    variable-refresh-rate\n`;
-            }
-            if (settings.focusAtStartup)
-                kdlContent += `    focus-at-startup\n`;
-            if (settings.backdropColor)
-                kdlContent += `    backdrop-color "${settings.backdropColor}"\n`;
-            kdlContent += generateHotCornersBlock(settings);
-            kdlContent += generateLayoutBlock(settings);
-            kdlContent += `}\n\n`;
-        }
-        return kdlContent;
-    }
-
-    function generateHotCornersBlock(settings) {
-        if (!settings.hotCorners)
-            return "";
-        const hc = settings.hotCorners;
-        if (hc.off)
-            return `    hot-corners {\n        off\n    }\n`;
-        const corners = hc.corners || [];
-        if (corners.length === 0)
-            return "";
-        let block = `    hot-corners {\n`;
-        for (const corner of corners)
-            block += `        ${corner}\n`;
-        block += `    }\n`;
-        return block;
-    }
-
-    function generateLayoutBlock(settings) {
-        if (!settings.layout)
-            return "";
-        const layout = settings.layout;
-        const hasSettings = layout.gaps !== undefined || layout.defaultColumnWidth || layout.presetColumnWidths || layout.alwaysCenterSingleColumn !== undefined;
-        if (!hasSettings)
-            return "";
-        let block = `    layout {\n`;
-        if (layout.gaps !== undefined)
-            block += `        gaps ${layout.gaps}\n`;
-        if (layout.defaultColumnWidth?.type === "proportion") {
-            const val = layout.defaultColumnWidth.value;
-            const formatted = Number.isInteger(val) ? val.toFixed(1) : val.toString();
-            block += `        default-column-width { proportion ${formatted}; }\n`;
-        }
-        if (layout.presetColumnWidths && layout.presetColumnWidths.length > 0) {
-            block += `        preset-column-widths {\n`;
-            for (const preset of layout.presetColumnWidths) {
-                if (preset.type === "proportion") {
-                    const val = preset.value;
-                    const formatted = Number.isInteger(val) ? val.toFixed(1) : val.toString();
-                    block += `            proportion ${formatted}\n`;
-                }
-            }
-            block += `        }\n`;
-        }
-        if (layout.alwaysCenterSingleColumn !== undefined)
-            block += layout.alwaysCenterSingleColumn ? `        always-center-single-column\n` : `        always-center-single-column false\n`;
-        block += `    }\n`;
-        return block;
     }
 
     function confirmChanges(profileId) {
@@ -2420,6 +2577,50 @@ Singleton {
         if (!mode)
             return "";
         return mode.width + "x" + mode.height + "@" + (mode.refresh_rate / 1000).toFixed(3);
+    }
+
+    function formatScaleLabel(scale) {
+        const value = Number(scale);
+        if (!isFinite(value))
+            return "1";
+        return parseFloat(value.toFixed(2)).toString();
+    }
+
+    function getScalePresetValues(outputName, outputData) {
+        if (!CompositorService.isHyprland)
+            return [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3];
+
+        const candidates = [0.5, 2 / 3, 0.75, 0.8, 1, 4 / 3, 1.6, 2, 2.5, 8 / 3, 3.2, 4];
+        const mode = getModeForScalePresets(outputName, outputData);
+        if (!mode)
+            return candidates;
+
+        return candidates.filter(scale => scaleFitsMode(mode, scale));
+    }
+
+    function getModeForScalePresets(outputName, outputData) {
+        const pendingMode = getPendingValue(outputName, "mode");
+        const modes = outputData?.modes || [];
+        if (pendingMode) {
+            for (const mode of modes) {
+                if (formatMode(mode) === pendingMode)
+                    return mode;
+            }
+        }
+        const currentMode = outputData?.current_mode;
+        if (currentMode !== undefined && modes[currentMode])
+            return modes[currentMode];
+        return null;
+    }
+
+    function scaleFitsMode(mode, scale) {
+        const width = Number(mode?.width || 0);
+        const height = Number(mode?.height || 0);
+        if (width <= 0 || height <= 0 || scale <= 0)
+            return false;
+        const logicalWidth = width / scale;
+        const logicalHeight = height / scale;
+        return Math.abs(logicalWidth - Math.round(logicalWidth)) < 0.001 && Math.abs(logicalHeight - Math.round(logicalHeight)) < 0.001;
     }
 
     function getTransformLabel(transform) {

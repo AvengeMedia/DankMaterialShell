@@ -10,8 +10,10 @@ BasePill {
     property var widgetData: null
     property string mountPath: (widgetData && widgetData.mountPath !== undefined) ? widgetData.mountPath : "/"
     property int diskUsageMode: (widgetData && widgetData.diskUsageMode !== undefined) ? widgetData.diskUsageMode : 0
+    property bool showMountPath: (widgetData && widgetData.showMountPath !== undefined) ? widgetData.showMountPath : true
     property bool isHovered: mouseArea.containsMouse
     property bool isAutoHideBar: false
+    property bool minimumWidth: (widgetData && widgetData.minimumWidth !== undefined) ? widgetData.minimumWidth : true
 
     property var selectedMount: {
         if (!DgopService.diskMounts || DgopService.diskMounts.length === 0) {
@@ -69,6 +71,8 @@ BasePill {
     }
 
     Connections {
+        target: SettingsData
+
         function onWidgetDataChanged() {
             root.mountPath = Qt.binding(() => {
                 return (root.widgetData && root.widgetData.mountPath !== undefined) ? root.widgetData.mountPath : "/";
@@ -96,14 +100,12 @@ BasePill {
                 return DgopService.diskMounts[0] || null;
             });
         }
-
-        target: SettingsData
     }
 
     content: Component {
         Item {
             implicitWidth: root.isVerticalOrientation ? (root.widgetThickness - root.horizontalPadding * 2) : diskContent.implicitWidth
-            implicitHeight: root.isVerticalOrientation ? diskColumn.implicitHeight : (root.widgetThickness - root.horizontalPadding * 2)
+            implicitHeight: root.isVerticalOrientation ? diskColumn.implicitHeight : diskContent.implicitHeight
 
             Column {
                 id: diskColumn
@@ -118,10 +120,12 @@ BasePill {
                         if (root.diskUsagePercent > 90) {
                             return Theme.tempDanger;
                         }
+
                         if (root.diskUsagePercent > 75) {
                             return Theme.tempWarning;
                         }
-                        return Theme.surfaceText;
+
+                        return Theme.widgetIconColor;
                     }
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
@@ -154,24 +158,29 @@ BasePill {
                 id: diskContent
                 visible: !root.isVerticalOrientation
                 anchors.centerIn: parent
-                spacing: 3
+                spacing: Theme.spacingXS
 
                 DankIcon {
+                    id: diskIcon
                     name: "storage"
                     size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                     color: {
                         if (root.diskUsagePercent > 90) {
                             return Theme.tempDanger;
                         }
+
                         if (root.diskUsagePercent > 75) {
                             return Theme.tempWarning;
                         }
-                        return Theme.surfaceText;
+
+                        return Theme.widgetIconColor;
                     }
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
                 StyledText {
+                    id: mountText
+                    visible: root.showMountPath
                     text: {
                         if (!root.selectedMount) {
                             return "--";
@@ -182,32 +191,20 @@ BasePill {
                     color: Theme.widgetTextColor
                     anchors.verticalCenter: parent.verticalCenter
                     horizontalAlignment: Text.AlignLeft
+                    verticalAlignment: Text.AlignVCenter
                     elide: Text.ElideNone
+                    wrapMode: Text.NoWrap
                 }
 
-                StyledText {
-                    text: {
-                        if (root.diskUsagePercent === undefined || root.diskUsagePercent === null || root.diskUsagePercent === 0) {
-                            return "--%";
-                        }
-                        if (!root.selectedMount)
-                            return "--%";
-                        switch (root.diskUsageMode) {
-                        case 1:
-                            return root.selectedMount.size || "--";
-                        case 2:
-                            return root.selectedMount.avail || "--";
-                        case 3:
-                            return (root.selectedMount.avail || "--") + " / " + (root.selectedMount.size || "--");
-                        default:
-                            return root.diskUsagePercent.toFixed(0) + "%";
-                        }
-                    }
-                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
-                    color: Theme.widgetTextColor
+                Item {
+                    id: textBox
                     anchors.verticalCenter: parent.verticalCenter
-                    horizontalAlignment: Text.AlignLeft
-                    elide: Text.ElideNone
+
+                    implicitWidth: root.minimumWidth ? Math.max(diskBaseline.width, diskCurrent.width) : diskCurrent.width
+                    implicitHeight: diskText.implicitHeight
+
+                    width: implicitWidth
+                    height: implicitHeight
 
                     StyledTextMetrics {
                         id: diskBaseline
@@ -225,7 +222,40 @@ BasePill {
                         }
                     }
 
-                    width: Math.max(diskBaseline.width, paintedWidth)
+                    StyledTextMetrics {
+                        id: diskCurrent
+                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
+                        text: diskText.text
+                    }
+
+                    StyledText {
+                        id: diskText
+                        text: {
+                            if (root.diskUsagePercent === undefined || root.diskUsagePercent === null || root.diskUsagePercent === 0) {
+                                return "--%";
+                            }
+                            if (!root.selectedMount)
+                                return "--%";
+                            switch (root.diskUsageMode) {
+                            case 1:
+                                return root.selectedMount.size || "--";
+                            case 2:
+                                return root.selectedMount.avail || "--";
+                            case 3:
+                                return (root.selectedMount.avail || "--") + " / " + (root.selectedMount.size || "--");
+                            default:
+                                return root.diskUsagePercent.toFixed(0) + "%";
+                            }
+                        }
+                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
+                        color: Theme.widgetTextColor
+
+                        anchors.fill: parent
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        elide: Text.ElideNone
+                        wrapMode: Text.NoWrap
+                    }
                 }
             }
         }
@@ -246,15 +276,12 @@ BasePill {
             if (root.isVerticalOrientation && root.selectedMount) {
                 tooltipLoader.active = true;
                 if (tooltipLoader.item) {
-                    const globalPos = mapToGlobal(width / 2, height / 2);
+                    const localPos = mapToItem(null, width / 2, height / 2);
                     const currentScreen = root.parentScreen || Screen;
-                    const screenX = currentScreen ? currentScreen.x : 0;
-                    const screenY = currentScreen ? currentScreen.y : 0;
-                    const relativeY = globalPos.y - screenY;
-                    const adjustedY = relativeY + root.minTooltipY;
+                    const adjustedY = localPos.y + root.minTooltipY;
                     const tooltipX = root.axis?.edge === "left" ? (root.barThickness + root.barSpacing + Theme.spacingXS) : (currentScreen.width - root.barThickness - root.barSpacing - Theme.spacingXS);
                     const isLeft = root.axis?.edge === "left";
-                    tooltipLoader.item.show(root.selectedMount.mount, screenX + tooltipX, adjustedY, currentScreen, isLeft, !isLeft);
+                    tooltipLoader.item.show(root.selectedMount.mount, tooltipX, adjustedY, currentScreen, isLeft, !isLeft);
                 }
             }
         }

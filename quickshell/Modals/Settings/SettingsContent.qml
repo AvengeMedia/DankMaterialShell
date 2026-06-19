@@ -1,6 +1,8 @@
 import QtQuick
 import qs.Common
 import qs.Modules.Settings
+import qs.Services
+import qs.Widgets
 
 FocusScope {
     id: root
@@ -64,6 +66,7 @@ FocusScope {
 
             sourceComponent: KeybindsTab {
                 parentModal: root.parentModal
+                requestedSearchQuery: root.parentModal?.keybindSearchQuery ?? ""
             }
 
             onActiveChanged: {
@@ -97,6 +100,61 @@ FocusScope {
             focus: active
 
             sourceComponent: WorkspacesTab {}
+
+            onActiveChanged: {
+                if (active && item)
+                    Qt.callLater(() => item.forceActiveFocus());
+            }
+        }
+
+        Loader {
+            id: compositorLayoutLoader
+            anchors.fill: parent
+            active: root.currentIndex === 37
+            visible: active
+            focus: active
+
+            sourceComponent: CompositorLayoutTab {}
+
+            onActiveChanged: {
+                if (active && item)
+                    Qt.callLater(() => item.forceActiveFocus());
+            }
+        }
+
+        Loader {
+            id: windowRulesLoader
+
+            property bool loadedOnce: false
+
+            anchors.fill: parent
+            active: root.currentIndex === 38 || loadedOnce
+            visible: root.currentIndex === 38 && status === Loader.Ready
+            focus: visible
+            asynchronous: true
+
+            sourceComponent: WindowRulesTab {
+                pageActive: root.currentIndex === 38
+            }
+
+            onLoaded: loadedOnce = true
+        }
+
+        DankSpinner {
+            anchors.centerIn: parent
+            visible: root.currentIndex === 38 && windowRulesLoader.status === Loader.Loading
+        }
+
+        Loader {
+            id: dankBarAppearanceLoader
+            anchors.fill: parent
+            active: root.currentIndex === 6
+            visible: active
+            focus: active
+
+            sourceComponent: DankBarAppearanceTab {
+                parentModal: root.parentModal
+            }
 
             onActiveChanged: {
                 if (active && item)
@@ -175,7 +233,52 @@ FocusScope {
             visible: active
             focus: active
 
-            sourceComponent: NetworkTab {}
+            sourceComponent: NetworkStatusTab {}
+
+            onActiveChanged: {
+                if (active && item)
+                    Qt.callLater(() => item.forceActiveFocus());
+            }
+        }
+
+        Loader {
+            id: networkEthernetLoader
+            anchors.fill: parent
+            active: root.currentIndex === 39
+            visible: active
+            focus: active
+
+            sourceComponent: NetworkEthernetTab {}
+
+            onActiveChanged: {
+                if (active && item)
+                    Qt.callLater(() => item.forceActiveFocus());
+            }
+        }
+
+        Loader {
+            id: networkWifiLoader
+            anchors.fill: parent
+            active: root.currentIndex === 40
+            visible: active
+            focus: active
+
+            sourceComponent: NetworkWifiTab {}
+
+            onActiveChanged: {
+                if (active && item)
+                    Qt.callLater(() => item.forceActiveFocus());
+            }
+        }
+
+        Loader {
+            id: networkVpnLoader
+            anchors.fill: parent
+            active: root.currentIndex === 41
+            visible: active
+            focus: active
+
+            sourceComponent: NetworkVpnTab {}
 
             onActiveChanged: {
                 if (active && item)
@@ -205,7 +308,9 @@ FocusScope {
             visible: active
             focus: active
 
-            sourceComponent: LauncherTab {}
+            sourceComponent: LauncherTab {
+                parentModal: root.parentModal
+            }
 
             onActiveChanged: {
                 if (active && item)
@@ -367,7 +472,7 @@ FocusScope {
             }
         }
 
-		Loader {
+        Loader {
             id: defaultAppsLoader
             anchors.fill: parent
             active: root.currentIndex === 34
@@ -429,19 +534,33 @@ FocusScope {
 
         Loader {
             id: widgetsLoader
+
+            property bool loadedOnce: false
+
             anchors.fill: parent
-            active: root.currentIndex === 22
-            visible: active
-            focus: active
+            active: root.currentIndex === 22 || loadedOnce
+            visible: root.currentIndex === 22 && status === Loader.Ready
+            focus: visible
+            asynchronous: true
 
             sourceComponent: WidgetsTab {
                 parentModal: root.parentModal
             }
 
-            onActiveChanged: {
-                if (active && item)
+            onLoaded: {
+                loadedOnce = true;
+                if (visible && item)
                     Qt.callLater(() => item.forceActiveFocus());
             }
+            onVisibleChanged: {
+                if (visible && item)
+                    Qt.callLater(() => item.forceActiveFocus());
+            }
+        }
+
+        DankSpinner {
+            anchors.centerIn: parent
+            visible: root.currentIndex === 22 && widgetsLoader.status === Loader.Loading
         }
 
         Loader {
@@ -467,23 +586,6 @@ FocusScope {
             focus: active
 
             sourceComponent: DesktopWidgetsTab {
-                parentModal: root.parentModal
-            }
-
-            onActiveChanged: {
-                if (active && item)
-                    Qt.callLater(() => item.forceActiveFocus());
-            }
-        }
-
-        Loader {
-            id: windowRulesLoader
-            anchors.fill: parent
-            active: root.currentIndex === 28
-            visible: active
-            focus: active
-
-            sourceComponent: WindowRulesTab {
                 parentModal: root.parentModal
             }
 
@@ -546,6 +648,53 @@ FocusScope {
             focus: active
 
             sourceComponent: FrameTab {}
+
+            onActiveChanged: {
+                if (active && item)
+                    Qt.callLater(() => item.forceActiveFocus());
+            }
+        }
+
+        Loader {
+            id: usersLoader
+            anchors.fill: parent
+            active: root.currentIndex === 35
+            visible: active
+            focus: active
+
+            sourceComponent: UsersTab {}
+
+            onActiveChanged: {
+                if (active && item)
+                    Qt.callLater(() => item.forceActiveFocus());
+            }
+        }
+
+        Loader {
+            id: autoStartLoader
+            anchors.fill: parent
+            active: root.currentIndex === 36
+            visible: active
+            focus: active
+
+            sourceComponent: AutoStartTab {
+                parentModal: root.parentModal
+            }
+
+            onActiveChanged: {
+                if (active && item)
+                    Qt.callLater(() => item.forceActiveFocus());
+            }
+        }
+
+        Loader {
+            id: batteryLoader
+            anchors.fill: parent
+            active: root.currentIndex === 42
+            visible: active
+            focus: active
+
+            sourceComponent: BatteryTab {}
 
             onActiveChanged: {
                 if (active && item)

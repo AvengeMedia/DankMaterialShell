@@ -11,7 +11,6 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/clipboard"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/cups"
 	serverDbus "github.com/AvengeMedia/DankMaterialShell/core/internal/server/dbus"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/dwl"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/evdev"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/freedesktop"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/location"
@@ -122,15 +121,6 @@ func RouteRequest(conn net.Conn, req models.Request) {
 			return
 		}
 		tailscale.HandleRequest(conn, req, tailscaleManager)
-		return
-	}
-
-	if strings.HasPrefix(req.Method, "dwl.") {
-		if dwlManager == nil {
-			models.RespondError(conn, req.ID, "dwl manager not initialized")
-			return
-		}
-		dwl.HandleRequest(conn, req, dwlManager)
 		return
 	}
 

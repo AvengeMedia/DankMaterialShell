@@ -93,7 +93,7 @@ DankPopout {
     shouldBeVisible: false
 
     property bool credentialsPromptOpen: NetworkService.credentialsRequested
-    property bool wifiPasswordModalOpen: PopoutService.wifiPasswordModal?.visible ?? false
+    property bool wifiPasswordModalOpen: PopoutService.wifiPasswordModal?.shouldBeVisible ?? false
     property bool polkitModalOpen: PopoutService.polkitAuthModal?.visible ?? false
     property bool anyModalOpen: credentialsPromptOpen || wifiPasswordModalOpen || polkitModalOpen || powerMenuOpen
 
@@ -109,15 +109,7 @@ DankPopout {
             close();
     }
 
-    customKeyboardFocus: {
-        if (!shouldBeVisible)
-            return WlrKeyboardFocus.None;
-        if (anyModalOpen)
-            return WlrKeyboardFocus.None;
-        if (CompositorService.useHyprlandFocusGrab)
-            return WlrKeyboardFocus.OnDemand;
-        return WlrKeyboardFocus.Exclusive;
-    }
+    customKeyboardFocus: anyModalOpen ? WlrKeyboardFocus.None : null
 
     onBackgroundClicked: close()
 
@@ -273,6 +265,7 @@ DankPopout {
                         onMoveWidget: (fromIndex, toIndex) => widgetModel.moveWidget(fromIndex, toIndex)
                         onToggleWidgetSize: index => widgetModel.toggleWidgetSize(index)
                         onCollapseRequested: root.collapseAll()
+                        onConfigRequested: (idx, data, anchor) => widgetConfigOverlay.open(idx, data, anchor)
                     }
 
                     EditControls {
@@ -302,6 +295,11 @@ DankPopout {
                 id: bluetoothCodecSelector
                 anchors.fill: parent
                 z: 10000
+            }
+
+            WidgetConfigOverlay {
+                id: widgetConfigOverlay
+                anchors.fill: parent
             }
         }
     }

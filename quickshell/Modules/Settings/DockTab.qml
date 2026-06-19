@@ -70,7 +70,7 @@ Item {
                     text: I18n.tr("Intelligent Auto-hide")
                     description: I18n.tr("Show dock when floating windows don't overlap its area")
                     checked: SettingsData.dockSmartAutoHide
-                    visible: SettingsData.showDock && (CompositorService.isNiri || CompositorService.isHyprland)
+                    visible: SettingsData.showDock && (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango)
                     onToggled: checked => {
                         if (checked && SettingsData.dockAutoHide) {
                             SettingsData.set("dockAutoHide", false);
@@ -90,13 +90,13 @@ Item {
                 }
 
                 SettingsToggleRow {
-                    settingKey: "dockHideOnFullscreen"
-                    tags: ["dock", "fullscreen", "hide"]
-                    text: I18n.tr("Hide When Fullscreen", "dock visibility toggle: hide the dock when a window is fullscreen")
-                    description: I18n.tr("Hide the dock when a window is fullscreen", "dock visibility toggle description")
-                    checked: SettingsData.dockHideOnFullscreen
+                    settingKey: "dockUseOverlayLayer"
+                    tags: ["dock", "fullscreen", "overlay", "layer"]
+                    text: I18n.tr("Use Overlay Layer", "dock layer toggle: use Wayland overlay layer")
+                    description: I18n.tr("Place the dock on the Wayland overlay layer")
+                    checked: SettingsData.dockUseOverlayLayer
                     visible: SettingsData.showDock
-                    onToggled: checked => SettingsData.set("dockHideOnFullscreen", checked)
+                    onToggled: checked => SettingsData.set("dockUseOverlayLayer", checked)
                 }
             }
 
@@ -282,7 +282,7 @@ Item {
                                         modes.push("niri");
                                     } else if (CompositorService.isHyprland) {
                                         modes.push("Hyprland");
-                                    } else if (CompositorService.isDwl) {
+                                    } else if (CompositorService.isMango) {
                                         modes.push("mango");
                                     } else if (CompositorService.isSway) {
                                         modes.push("Sway");
@@ -643,19 +643,19 @@ Item {
             SettingsControlledByFrame {
                 visible: root.connectedFrameModeActive
                 parentModal: root.parentModal
-                settingLabel: I18n.tr("Dock margin, transparency, and border")
+                settingLabel: I18n.tr("Dock margin, opacity, and border")
                 reason: I18n.tr("Managed by Frame in Connected Mode")
             }
 
             SettingsCard {
                 width: parent.width
                 iconName: "opacity"
-                title: I18n.tr("Transparency")
+                title: I18n.tr("Opacity")
                 settingKey: "dockTransparency"
                 visible: !root.connectedFrameModeActive
 
                 SettingsSliderRow {
-                    text: I18n.tr("Dock Transparency")
+                    text: I18n.tr("Dock Opacity")
                     value: Math.round(SettingsData.dockTransparency * 100)
                     minimum: 0
                     maximum: 100

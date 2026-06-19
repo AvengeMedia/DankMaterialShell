@@ -12,7 +12,7 @@ PluginComponent {
         service: CupsService
     }
 
-    ccWidgetIcon: CupsService.cupsAvailable && CupsService.getPrintersNum() > 0 ? "print" : "print_disabled"
+    ccWidgetIcon: "print"
     ccWidgetPrimaryText: I18n.tr("Printers")
     ccWidgetSecondaryText: {
         if (CupsService.cupsAvailable && CupsService.getPrintersNum() > 0) {

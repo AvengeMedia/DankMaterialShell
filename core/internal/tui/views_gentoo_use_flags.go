@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/distros"
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -65,7 +66,7 @@ func (m Model) updateGentooUseFlagsState(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.skipGentooUseFlags = !m.skipGentooUseFlags
 			return m, nil
 		case "enter":
-			if m.selectedWM == 1 {
+			if m.selectedWindowManager() == deps.WindowManagerHyprland {
 				return m, m.checkGCCVersion()
 			}
 			return m.enterAuthPhase()

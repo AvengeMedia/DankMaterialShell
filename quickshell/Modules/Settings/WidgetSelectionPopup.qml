@@ -22,6 +22,15 @@ FloatingWindow {
 
     signal widgetSelected(string widgetId, string targetSection)
 
+    function translateSection(section) {
+        switch (section.toLowerCase()) {
+        case "left":   return I18n.tr("Left Section");
+        case "center": return I18n.tr("Center Section");
+        case "right":  return I18n.tr("Right Section");
+        default:       return section;
+        }
+    }
+
     function updateFilteredWidgets() {
         if (!searchQuery || searchQuery.length === 0) {
             filteredWidgets = allWidgets.slice();
@@ -224,7 +233,7 @@ FloatingWindow {
                     }
 
                     StyledText {
-                        text: I18n.tr("Add Widget to %1 Section").arg(root.targetSection)
+                        text: I18n.tr("Add Widget to %1").arg(translateSection(root.targetSection))
                         font.pixelSize: Theme.fontSizeXLarge
                         color: Theme.surfaceText
                         font.weight: Font.Medium
@@ -321,7 +330,7 @@ FloatingWindow {
 
                         delegate: Rectangle {
                             width: widgetList.width
-                            height: 60
+                            height: Math.max(60, textColumn.implicitHeight + 24)
                             radius: Theme.cornerRadius
                             property bool isSelected: root.keyboardNavigationActive && index === root.selectedIndex
                             color: isSelected ? Theme.withAlpha(Theme.primary, root.blurActive ? 0.22 : 0.16) : widgetArea.containsMouse ? Theme.withAlpha(Theme.primary, root.blurActive ? 0.14 : 0.08) : Theme.withAlpha(Theme.surfaceVariant, root.rowAlpha)
@@ -342,9 +351,10 @@ FloatingWindow {
                                 }
 
                                 Column {
+                                    id: textColumn
                                     anchors.verticalCenter: parent.verticalCenter
                                     spacing: 2
-                                    width: parent.width - Theme.iconSize - Theme.spacingM * 3
+                                    width: parent.width - Theme.iconSize * 2 - Theme.spacingM * 4 + 4
 
                                     StyledText {
                                         text: modelData.text
@@ -353,6 +363,7 @@ FloatingWindow {
                                         color: Theme.surfaceText
                                         elide: Text.ElideRight
                                         width: parent.width
+                                        wrapMode: Text.WordWrap
                                     }
 
                                     StyledText {

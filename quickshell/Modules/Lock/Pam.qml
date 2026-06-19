@@ -20,7 +20,11 @@ Scope {
     property string fprintState
     property string u2fState
     property bool u2fPending: false
+    property string u2fPendingMode
     property string buffer
+
+    property var attemptInfoMessages: []
+    property bool lockoutAnnouncedThisAttempt: false
 
     signal flashMsg
     signal unlockRequested
@@ -35,6 +39,7 @@ Scope {
         passwdActiveTimeout.running = false;
         unlockRequestTimeout.running = false;
         root.u2fPending = false;
+        root.u2fPendingMode = "";
         root.u2fState = "";
         root.unlockInProgress = false;
     }
@@ -58,6 +63,7 @@ Scope {
             u2fErrorRetry.running = false;
             u2fPendingTimeout.running = false;
             root.u2fPending = false;
+            root.u2fPendingMode = "";
             root.u2fState = "";
             unlockRequestTimeout.restart();
             unlockRequested();
@@ -79,6 +85,7 @@ Scope {
         u2fErrorRetry.running = false;
         u2fPendingTimeout.running = false;
         root.u2fPending = false;
+        root.u2fPendingMode = "";
         root.u2fState = "";
         fprint.checkAvail();
     }
@@ -114,23 +121,37 @@ Scope {
         configDirectory: (dankshellConfigWatcher.loaded || nixosMarker.loaded || root.runningFromNixStore) ? "/etc/pam.d" : Quickshell.shellDir + "/assets/pam"
 
         onMessageChanged: {
-            if (message.startsWith("The account is locked")) {
-                root.lockMessage = message;
-            } else if (root.lockMessage && message.endsWith(" left to unlock)")) {
-                root.lockMessage += "\n" + message;
-            } else if (root.lockMessage && message && message.length > 0) {
-                root.lockMessage = "";
-            }
+            // collected by position, not text, so it works in any locale
+            if (message.length > 0 && !responseRequired)
+                root.attemptInfoMessages = root.attemptInfoMessages.concat([message]);
         }
 
         onResponseRequiredChanged: {
             if (!responseRequired)
                 return;
 
+            const notice = root.attemptInfoMessages.filter(m => m !== message);
+            if (notice.length > 0) {
+                root.lockMessage = notice.join("\n");
+                root.lockoutAnnouncedThisAttempt = true;
+            }
+            root.attemptInfoMessages = [];
+
             respond(root.buffer);
         }
 
         onCompleted: res => {
+            // requisite preauth can lock without ever prompting; surface it here too
+            if (!root.lockoutAnnouncedThisAttempt) {
+                if (root.attemptInfoMessages.length > 0) {
+                    root.lockMessage = root.attemptInfoMessages.join("\n");
+                    root.lockoutAnnouncedThisAttempt = true;
+                } else {
+                    root.lockMessage = "";
+                }
+                root.attemptInfoMessages = [];
+            }
+
             if (res === PamResult.Success) {
                 if (!root.unlockInProgress) {
                     fprint.abort();
@@ -142,6 +163,7 @@ Scope {
             unlockRequestTimeout.running = false;
             root.unlockInProgress = false;
             root.u2fPending = false;
+            root.u2fPendingMode = "";
             root.u2fState = "";
             u2fPendingTimeout.running = false;
             u2f.abort();
@@ -163,6 +185,8 @@ Scope {
 
         function onActiveChanged() {
             if (passwd.active) {
+                root.attemptInfoMessages = [];
+                root.lockoutAnnouncedThisAttempt = false;
                 passwdActiveTimeout.restart();
             } else {
                 passwdActiveTimeout.running = false;
@@ -243,9 +267,8 @@ Scope {
                 return;
             }
 
-            if (SettingsData.u2fMode === "or") {
-                start();
-            }
+            if (SettingsData.u2fMode === "or")
+                abort();
         }
 
         function startForSecondFactor(): void {
@@ -255,6 +278,18 @@ Scope {
             }
             abort();
             root.u2fPending = true;
+            root.u2fPendingMode = "and";
+            root.u2fState = "";
+            u2fPendingTimeout.restart();
+            start();
+        }
+
+        function startForAlternativeAuth(): void {
+            if (!available || !SettingsData.enableU2f || SettingsData.u2fMode !== "or" || root.unlockInProgress || passwd.active || active)
+                return;
+            abort();
+            root.u2fPending = true;
+            root.u2fPendingMode = "or";
             root.u2fState = "";
             u2fPendingTimeout.restart();
             start();
@@ -281,9 +316,19 @@ Scope {
                 abort();
 
                 if (root.u2fPending) {
+                    if (root.u2fPendingMode === "or") {
+                        root.u2fPending = false;
+                        root.u2fPendingMode = "";
+                        root.u2fState = root.u2fState === "waiting" ? "" : "insert";
+                        u2fPendingTimeout.running = false;
+                        fprint.checkAvail();
+                        return;
+                    }
+
                     if (root.u2fState === "waiting") {
                         // AND mode: device was found but auth failed → back to password
                         root.u2fPending = false;
+                        root.u2fPendingMode = "";
                         root.u2fState = "";
                         fprint.checkAvail();
                     } else {
@@ -292,9 +337,7 @@ Scope {
                         u2fErrorRetry.restart();
                     }
                 } else {
-                    // OR mode: prompt to insert key, silently retry
                     root.u2fState = "insert";
-                    u2fErrorRetry.restart();
                 }
             }
         }
@@ -367,7 +410,10 @@ Scope {
         root.fprintState = "";
         root.u2fState = "";
         root.u2fPending = false;
+        root.u2fPendingMode = "";
         root.lockMessage = "";
+        root.attemptInfoMessages = [];
+        root.lockoutAnnouncedThisAttempt = false;
         root.resetAuthFlows();
         fprint.checkAvail();
         u2f.checkAvail();
@@ -399,6 +445,7 @@ Scope {
                 u2fPendingTimeout.running = false;
                 unlockRequestTimeout.running = false;
                 root.u2fPending = false;
+                root.u2fPendingMode = "";
                 root.u2fState = "";
                 u2f.checkAvail();
             }

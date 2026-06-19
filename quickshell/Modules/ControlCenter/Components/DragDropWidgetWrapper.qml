@@ -21,6 +21,7 @@ Item {
     signal widgetMoved(int fromIndex, int toIndex)
     signal removeWidget(int index)
     signal toggleWidgetSize(int index)
+    signal configRequested(int index, var widgetData, var anchor)
 
     width: {
         const widgetWidth = widgetData?.width || 50;
@@ -236,6 +237,7 @@ Item {
     }
 
     Rectangle {
+        id: removeButton
         width: 16
         height: 16
         radius: 8
@@ -275,6 +277,34 @@ Item {
                 widgets[widgetIndex].width = newSize;
                 SettingsData.set("controlCenterWidgets", widgets);
             }
+        }
+    }
+
+    readonly property bool hasConfigMenu: widgetData?.id === "diskUsage"
+
+    Rectangle {
+        id: configButton
+        width: 16
+        height: 16
+        radius: 8
+        color: Theme.primary
+        anchors.top: removeButton.top
+        anchors.right: removeButton.left
+        anchors.rightMargin: 4
+        visible: editMode && root.hasConfigMenu
+        z: 10
+
+        DankIcon {
+            anchors.centerIn: parent
+            name: "settings"
+            size: 12
+            color: Theme.primaryText
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            cursorShape: Qt.PointingHandCursor
+            onClicked: root.configRequested(root.widgetIndex, root.widgetData, configButton)
         }
     }
 

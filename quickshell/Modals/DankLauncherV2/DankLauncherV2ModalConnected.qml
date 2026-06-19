@@ -13,13 +13,14 @@ Item {
     readonly property var log: Log.scoped("DankLauncherV2ModalConnected")
 
     property var modalHandle: root
+    property bool triggerUsesOverlayLayer: false
 
     visible: false
 
     property bool spotlightOpen: false
     property bool keyboardActive: false
     property bool contentVisible: false
-    readonly property bool launcherMotionVisible: Theme.isConnectedEffect ? _motionActive : (Theme.isDirectionalEffect ? spotlightOpen : _motionActive)
+    readonly property bool launcherMotionVisible: frameOwnsConnectedChrome ? _motionActive : (Theme.isDirectionalEffect ? spotlightOpen : _motionActive)
     property var spotlightContent: launcherContentLoader.item
     property bool openedFromOverview: false
     property bool isClosing: false
@@ -29,7 +30,6 @@ Item {
     property string _pendingMode: ""
     readonly property bool unloadContentOnClose: SettingsData.dankLauncherV2UnloadOnClose
 
-    // Animation state — matches DankPopout/DankModal pattern
     property bool animationsEnabled: true
     property bool _motionActive: false
     property real _frozenMotionX: 0
@@ -40,6 +40,13 @@ Item {
     readonly property real screenWidth: effectiveScreen?.width ?? 1920
     readonly property real screenHeight: effectiveScreen?.height ?? 1080
     readonly property real dpr: effectiveScreen ? CompositorService.getScreenScale(effectiveScreen) : 1
+    readonly property bool usesOverlayLayer: SettingsData.launcherUseOverlayLayer || triggerUsesOverlayLayer
+    readonly property var effectiveLauncherLayer: LayerShell.fromEnv("DMS_MODAL_LAYER", root.usesOverlayLayer ? WlrLayer.Overlay : WlrLayer.Top, {
+        "allow": ["top", "overlay"],
+        "invalidLayer": WlrLayer.Top,
+        "label": "modals",
+        "error": true
+    })
 
     readonly property int baseWidth: {
         switch (SettingsData.dankLauncherV2Size) {
@@ -74,7 +81,7 @@ Item {
 
     readonly property string resolvedConnectedBarSide: frameConnectedMode ? preferredConnectedBarSide : ""
 
-    readonly property bool frameOwnsConnectedChrome: frameConnectedMode && resolvedConnectedBarSide !== ""
+    readonly property bool frameOwnsConnectedChrome: frameConnectedMode && resolvedConnectedBarSide !== "" && CompositorService.usesConnectedFrameChromeForScreen(effectiveScreen)
     readonly property bool launcherArcExtenderActive: frameOwnsConnectedChrome && SettingsData.frameLauncherArcExtender && (resolvedConnectedBarSide === "top" || resolvedConnectedBarSide === "bottom")
 
     function _dockOccupiesSide(side) {
@@ -100,8 +107,6 @@ Item {
         return SettingsData.frameEdgeInsetForSide(effectiveScreen, side);
     }
 
-    // frameEdgeInsetForSide is the full inset; do not add frameBarSize.
-    // Positions the modal flush to the emerge side, centered on the cross axis.
     readonly property var _connectedModalPos: {
         const fallback = {
             "x": (screenWidth - modalWidth) / 2,
@@ -140,10 +145,10 @@ Item {
     readonly property real modalX: frameOwnsConnectedChrome ? _connectedModalPos.x : ((screenWidth - modalWidth) / 2)
     readonly property real modalY: frameOwnsConnectedChrome ? _connectedModalPos.y : ((screenHeight - modalHeight) / 2)
 
-    readonly property bool connectedSurfaceOverride: Theme.isConnectedEffect
-    readonly property int launcherAnimationDuration: Theme.isConnectedEffect ? Theme.popoutAnimationDuration : Theme.modalAnimationDuration
-    readonly property list<real> launcherEnterCurve: Theme.isConnectedEffect ? Theme.variantPopoutEnterCurve : Theme.variantModalEnterCurve
-    readonly property list<real> launcherExitCurve: Theme.isConnectedEffect ? Theme.variantPopoutExitCurve : Theme.variantModalExitCurve
+    readonly property bool connectedSurfaceOverride: frameOwnsConnectedChrome
+    readonly property int launcherAnimationDuration: frameOwnsConnectedChrome ? Theme.popoutAnimationDuration : Theme.modalAnimationDuration
+    readonly property list<real> launcherEnterCurve: frameOwnsConnectedChrome ? Theme.variantPopoutEnterCurve : Theme.variantModalEnterCurve
+    readonly property list<real> launcherExitCurve: frameOwnsConnectedChrome ? Theme.variantPopoutExitCurve : Theme.variantModalExitCurve
     readonly property color backgroundColor: connectedSurfaceOverride ? Theme.connectedSurfaceColor : Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
     readonly property real cornerRadius: connectedSurfaceOverride ? Theme.connectedSurfaceRadius : Theme.cornerRadius
     readonly property color borderColor: {
@@ -167,8 +172,6 @@ Item {
     readonly property int effectiveBorderWidth: connectedSurfaceOverride ? 0 : borderWidth
     readonly property bool effectiveBlurEnabled: Theme.connectedSurfaceBlurEnabled
 
-    // Shadow padding for the content window (render padding only, no motion padding).
-    // Zeroed when frame owns the chrome and Wayland clips past the bar edge
     readonly property var shadowLevel: Theme.elevationLevel3
     readonly property real shadowFallbackOffset: 6
     readonly property real shadowRenderPadding: (!frameOwnsConnectedChrome && Theme.elevationEnabled && SettingsData.modalElevationEnabled) ? Theme.elevationRenderPadding(shadowLevel, Theme.elevationLightDirection, shadowFallbackOffset, 8, 16) : 0
@@ -195,81 +198,76 @@ Item {
     }
     readonly property real contentSurfaceHeight: launcherArcExtenderActive ? _connectedChromeHeight : alignedHeight
 
-    // For directional/depth: window extends from screen top (content slides within)
-    // For standard: small window tightly around the modal + shadow padding
-    readonly property bool _needsExtendedWindow: (Theme.isDirectionalEffect && !Theme.isConnectedEffect) || Theme.isDepthEffect
-    // Content window geometry
-    readonly property real _cwMarginLeft: Theme.snap(alignedX - shadowPad, dpr)
-    readonly property real _cwMarginTop: launcherArcExtenderActive ? _connectedChromeY : (_needsExtendedWindow ? 0 : Theme.snap(alignedY - shadowPad, dpr))
-    readonly property real _cwWidth: alignedWidth + shadowPad * 2
-    readonly property real _cwHeight: {
-        if (launcherArcExtenderActive)
-            return _connectedChromeHeight;
-        if (Theme.isDirectionalEffect && !Theme.isConnectedEffect)
-            return screenHeight + shadowPad;
-        if (Theme.isDepthEffect)
-            return alignedY + alignedHeight + shadowPad;
-        return alignedHeight + shadowPad * 2;
-    }
-    // Where the content container sits inside the content window
-    readonly property real _ccX: shadowPad
-    readonly property real _ccY: launcherArcExtenderActive ? 0 : (_needsExtendedWindow ? alignedY : shadowPad)
+    readonly property real _ccX: _connectedChromeX
+    readonly property real _ccY: _connectedChromeY
 
     signal dialogClosed
 
-    // Coalesce per-channel dirty bits; one ConnectedModeState write per tick.
     Timer {
         id: _syncTimer
         interval: 0
         onTriggered: root._flushSync()
     }
 
-    property string _chromeClaimId: ""
     property bool _fullSyncPending: false
-
-    function _nextChromeClaimId() {
-        return "dms:launcher-v2:" + (new Date()).getTime() + ":" + Math.floor(Math.random() * 1000);
-    }
 
     function _currentScreenName() {
         return effectiveScreen ? effectiveScreen.name : "";
     }
 
-    function _publishModalChromeState(isClaim) {
-        const screenName = _currentScreenName();
-        if (!screenName)
-            return;
+    ConnectedModalChrome {
+        id: modalChrome
+        modalHandle: root.modalHandle
+        claimPrefix: "dms:launcher-v2"
+        surfaceKind: "launcher"
+        screenName: root._currentScreenName()
+        enabled: root.frameOwnsConnectedChrome
+        active: root.spotlightOpen
+        presented: root.spotlightOpen || contentWindow.visible
+        dockBlocked: root._dockBlocksEmergence
+        dockSide: root.resolvedConnectedBarSide
+        onRecoveryRequested: root._queueFullSync()
+    }
+
+    function _publishModalChromeState() {
+        const presented = spotlightOpen || contentWindow.visible;
+        const phase = !presented ? "hidden" : (isClosing ? "closing" : (!contentWindow.visible ? "opening" : "open"));
+        const bodyRect = {
+            "x": _connectedChromeX,
+            "y": _connectedChromeY,
+            "width": _connectedChromeWidth,
+            "height": _connectedChromeHeight
+        };
+        const animationOffset = {
+            "x": contentContainer ? contentContainer.animX : 0,
+            "y": contentContainer ? contentContainer.animY : 0
+        };
         const state = {
-            "visible": spotlightOpen || contentWindow.visible,
+            "kind": "launcher",
+            "screenName": root._currentScreenName(),
+            "phase": phase,
+            "visible": presented,
+            "presented": presented,
             "barSide": resolvedConnectedBarSide,
+            "bodyRect": bodyRect,
+            "animationOffset": animationOffset,
+            "scale": 1,
+            "opacity": Theme.connectedSurfaceColor.a,
             "bodyX": _connectedChromeX,
             "bodyY": _connectedChromeY,
             "bodyW": _connectedChromeWidth,
             "bodyH": _connectedChromeHeight,
-            "animX": contentContainer ? contentContainer.animX : 0,
-            "animY": contentContainer ? contentContainer.animY : 0,
+            "animX": animationOffset.x,
+            "animY": animationOffset.y,
             "omitStartConnector": false,
-            "omitEndConnector": false
+            "omitEndConnector": false,
+            "dockRetractSide": root._dockBlocksEmergence ? resolvedConnectedBarSide : ""
         };
-        if (isClaim)
-            ConnectedModeState.claimModalState(screenName, state, _chromeClaimId);
-        else
-            ConnectedModeState.updateModalState(screenName, state, _chromeClaimId);
+        return modalChrome.publish(state);
     }
 
     function _syncModalChromeState() {
-        if (!frameOwnsConnectedChrome) {
-            _releaseModalChrome();
-            return;
-        }
-        const isClaim = !_chromeClaimId;
-        if (!_chromeClaimId)
-            _chromeClaimId = _nextChromeClaimId();
-        _publishModalChromeState(isClaim);
-        if (_dockBlocksEmergence && (spotlightOpen || contentWindow.visible))
-            ConnectedModeState.requestDockRetract(_chromeClaimId, _currentScreenName(), resolvedConnectedBarSide);
-        else
-            ConnectedModeState.releaseDockRetract(_chromeClaimId);
+        _publishModalChromeState();
     }
 
     property bool _animSyncQueued: false
@@ -306,32 +304,21 @@ Item {
     }
 
     function _syncModalAnim() {
-        if (!frameOwnsConnectedChrome || !_chromeClaimId)
+        if (!frameOwnsConnectedChrome)
             return;
-        const screenName = _currentScreenName();
-        if (!screenName || !contentContainer)
+        if (!contentContainer)
             return;
-        ConnectedModeState.setModalAnim(screenName, contentContainer.animX, contentContainer.animY, _chromeClaimId);
+        modalChrome.updateAnim(contentContainer.animX, contentContainer.animY);
     }
 
     function _syncModalBody() {
-        if (!frameOwnsConnectedChrome || !_chromeClaimId)
+        if (!frameOwnsConnectedChrome)
             return;
-        const screenName = _currentScreenName();
-        if (!screenName)
-            return;
-        ConnectedModeState.setModalBody(screenName, _connectedChromeX, _connectedChromeY, _connectedChromeWidth, _connectedChromeHeight, _chromeClaimId);
+        modalChrome.updateBody(_connectedChromeX, _connectedChromeY, _connectedChromeWidth, _connectedChromeHeight);
     }
 
     function _releaseModalChrome() {
-        if (!_chromeClaimId)
-            return;
-        ConnectedModeState.releaseDockRetract(_chromeClaimId);
-        const claimId = _chromeClaimId;
-        _chromeClaimId = "";
-        const screenName = _currentScreenName();
-        if (screenName)
-            ConnectedModeState.clearModalState(screenName, claimId);
+        modalChrome.release();
     }
 
     onFrameOwnsConnectedChromeChanged: _syncModalChromeState()
@@ -342,8 +329,6 @@ Item {
     onAlignedYChanged: _queueBodySync()
     onAlignedWidthChanged: _queueBodySync()
     onAlignedHeightChanged: _queueBodySync()
-
-    Component.onDestruction: _releaseModalChrome()
 
     Connections {
         target: contentWindow
@@ -372,19 +357,18 @@ Item {
         if (!spotlightContent)
             return;
         contentVisible = true;
-        // NOTE: forceActiveFocus() is deliberately NOT called here.
-        // It is deferred to after animation starts to avoid compositor IPC stalls.
+        spotlightContent.closeTransientUi?.();
 
         if (spotlightContent.searchField) {
             spotlightContent.searchField.text = query;
         }
         if (spotlightContent.controller) {
-            var targetMode = mode || SessionData.launcherLastMode || "all";
+            var targetMode = mode || SessionData.getLauncherRestoreMode();
             spotlightContent.controller.searchMode = targetMode;
             spotlightContent.controller.activePluginId = "";
             spotlightContent.controller.activePluginName = "";
             spotlightContent.controller.pluginFilter = "";
-            spotlightContent.controller.fileSearchType = "all";
+            spotlightContent.controller.fileSearchType = SessionData.launcherLastFileSearchType || "all";
             spotlightContent.controller.fileSearchExt = "";
             spotlightContent.controller.fileSearchFolder = "";
             spotlightContent.controller.fileSearchSort = "score";
@@ -411,40 +395,29 @@ Item {
         isClosing = false;
         openedFromOverview = false;
 
-        // Disable animations so the snap is instant
         animationsEnabled = false;
 
-        // Freeze the collapsed offsets (they depend on height which could change)
         _frozenMotionX = contentContainer ? contentContainer.collapsedMotionX : 0;
         _frozenMotionY = contentContainer ? contentContainer.collapsedMotionY : (Theme.isDirectionalEffect ? Math.max(root.screenHeight - root._ccY + root.shadowPad, Theme.effectAnimOffset * 1.1) : -Theme.effectAnimOffset);
 
         var focusedScreen = CompositorService.getFocusedScreen();
         if (focusedScreen) {
-            backgroundWindow.screen = focusedScreen;
             contentWindow.screen = focusedScreen;
         }
 
-        // _motionActive = false ensures motionX/Y snap to frozen collapsed position
         _motionActive = false;
 
-        // Make windows visible but do NOT request keyboard focus yet
         ModalManager.openModal(modalHandle);
         spotlightOpen = true;
-        backgroundWindow.visible = true;
         contentWindow.visible = true;
-        if (useHyprlandFocusGrab)
-            focusGrab.active = true;
 
-        // Load content and initialize (but no forceActiveFocus — that's deferred)
         _ensureContentLoadedAndInitialize(query || "", mode || "");
 
-        // Frame 1: enable animations and trigger enter motion
+        // Defer focus until after enter motion starts (avoids compositor IPC stalls).
         Qt.callLater(() => {
             root.animationsEnabled = true;
             root._motionActive = true;
 
-            // Frame 2: request keyboard focus + activate search field
-            // Double-deferred to avoid compositor IPC competing with animation frames
             Qt.callLater(() => {
                 root.keyboardActive = true;
                 if (root.spotlightContent && root.spotlightContent.searchField)
@@ -464,18 +437,16 @@ Item {
     function hide() {
         if (!spotlightOpen)
             return;
+        spotlightContent?.closeTransientUi?.();
         openedFromOverview = false;
         isClosing = true;
-        // For directional effects, defer contentVisible=false so content stays rendered during exit slide
         if (!Theme.isDirectionalEffect)
             contentVisible = false;
 
-        // Trigger exit animation — Behaviors will animate motionX/Y to frozen collapsed position
         _motionActive = false;
 
         keyboardActive = false;
         spotlightOpen = false;
-        focusGrab.active = false;
         ModalManager.closeModal(modalHandle);
         closeCleanupTimer.start();
     }
@@ -512,7 +483,6 @@ Item {
             isClosing = false;
             contentVisible = false;
             contentWindow.visible = false;
-            backgroundWindow.visible = false;
             if (root.unloadContentOnClose)
                 launcherContentLoader.active = false;
             dialogClosed();
@@ -521,8 +491,8 @@ Item {
 
     Connections {
         target: spotlightContent?.controller ?? null
-        function onModeChanged(mode) {
-            if (spotlightContent.controller.autoSwitchedToFiles)
+        function onModeChanged(mode, userInitiated) {
+            if (!userInitiated || !SettingsData.rememberLastMode)
                 return;
             SessionData.setLauncherLastMode(mode);
         }
@@ -531,7 +501,7 @@ Item {
     HyprlandFocusGrab {
         id: focusGrab
         windows: [contentWindow]
-        active: false
+        active: root.useHyprlandFocusGrab && root.spotlightOpen
 
         onCleared: {
             if (spotlightOpen) {
@@ -569,86 +539,22 @@ Item {
                 }
             }
 
-            if (!needsReset)
+            if (!needsReset) {
+                if (root.spotlightOpen)
+                    root._queueFullSync();
                 return;
+            }
 
             const newScreen = CompositorService.getFocusedScreen() ?? Quickshell.screens[0];
             if (!newScreen)
                 return;
 
+            root._releaseModalChrome();
             root._windowEnabled = false;
-            backgroundWindow.screen = newScreen;
             contentWindow.screen = newScreen;
             Qt.callLater(() => {
                 root._windowEnabled = true;
             });
-        }
-    }
-
-    PanelWindow {
-        id: backgroundWindow
-        visible: false
-        color: "transparent"
-
-        readonly property real _topMargin: contentContainer.dockTop ? contentContainer.dockThickness : (typeof SettingsData !== "undefined" && SettingsData.barPosition === 0 ? Theme.px(42, root.dpr) : 0)
-        readonly property real _bottomMargin: contentContainer.dockBottom ? contentContainer.dockThickness : (typeof SettingsData !== "undefined" && SettingsData.barPosition === 1 ? Theme.px(42, root.dpr) : 0)
-        readonly property real _leftMargin: contentContainer.dockLeft ? contentContainer.dockThickness : (typeof SettingsData !== "undefined" && SettingsData.barPosition === 2 ? Theme.px(42, root.dpr) : 0)
-        readonly property real _rightMargin: contentContainer.dockRight ? contentContainer.dockThickness : (typeof SettingsData !== "undefined" && SettingsData.barPosition === 3 ? Theme.px(42, root.dpr) : 0)
-
-        WlrLayershell.namespace: "dms:spotlight:bg"
-        WlrLayershell.layer: WlrLayershell.Top
-        WlrLayershell.exclusiveZone: -1
-        WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-
-        WlrLayershell.margins {
-            top: backgroundWindow._topMargin
-            bottom: backgroundWindow._bottomMargin
-            left: backgroundWindow._leftMargin
-            right: backgroundWindow._rightMargin
-        }
-
-        anchors {
-            top: true
-            bottom: true
-            left: true
-            right: true
-        }
-
-        mask: Region {
-            item: (spotlightOpen || isClosing) ? bgFullScreenMask : null
-
-            Region {
-                item: bgContentHole
-                intersection: Intersection.Subtract
-            }
-        }
-
-        Item {
-            id: bgFullScreenMask
-            anchors.fill: parent
-        }
-
-        Item {
-            id: bgContentHole
-            visible: false
-            x: root._cwMarginLeft + contentContainer.x - backgroundWindow._leftMargin
-            y: root._cwMarginTop + contentContainer.y - backgroundWindow._topMargin
-            width: root.alignedWidth
-            height: root.contentSurfaceHeight
-        }
-
-        Rectangle {
-            id: backgroundDarken
-            anchors.fill: parent
-            color: "black"
-            opacity: 0
-            visible: false
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            enabled: spotlightOpen
-            onClicked: root.hide()
         }
     }
 
@@ -669,38 +575,33 @@ Item {
         }
 
         WlrLayershell.namespace: "dms:spotlight"
-        WlrLayershell.layer: {
-            switch (Quickshell.env("DMS_MODAL_LAYER")) {
-            case "bottom":
-                log.error("'bottom' layer is not valid for modals. Defaulting to 'top' layer.");
-                return WlrLayershell.Top;
-            case "background":
-                log.error("'background' layer is not valid for modals. Defaulting to 'top' layer.");
-                return WlrLayershell.Top;
-            case "overlay":
-                return WlrLayershell.Overlay;
-            default:
-                return WlrLayershell.Top;
-            }
-        }
+        WlrLayershell.layer: root.effectiveLauncherLayer
         WlrLayershell.exclusiveZone: -1
-        WlrLayershell.keyboardFocus: keyboardActive ? (root.useHyprlandFocusGrab ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.Exclusive) : WlrKeyboardFocus.None
+        WlrLayershell.keyboardFocus: KeyboardFocus.keyboardFocus(keyboardActive, null)
 
         anchors {
             left: true
             top: true
+            right: true
+            bottom: true
         }
-
-        WlrLayershell.margins {
-            left: root._cwMarginLeft
-            top: root._cwMarginTop
-        }
-
-        implicitWidth: root._cwWidth
-        implicitHeight: root._cwHeight
 
         mask: Region {
-            item: contentInputMask
+            item: (root.spotlightOpen || root.isClosing) ? dismissArea : contentInputMask
+
+            Region {
+                item: (root.spotlightOpen || root.isClosing) ? contentInputMask : null
+            }
+        }
+
+        Item {
+            id: dismissArea
+            visible: false
+            anchors.fill: parent
+            anchors.topMargin: contentContainer.dockTop ? contentContainer.dockThickness : (typeof SettingsData !== "undefined" && SettingsData.barPosition === 0 ? Theme.px(42, root.dpr) : 0)
+            anchors.bottomMargin: contentContainer.dockBottom ? contentContainer.dockThickness : (typeof SettingsData !== "undefined" && SettingsData.barPosition === 1 ? Theme.px(42, root.dpr) : 0)
+            anchors.leftMargin: contentContainer.dockLeft ? contentContainer.dockThickness : (typeof SettingsData !== "undefined" && SettingsData.barPosition === 2 ? Theme.px(42, root.dpr) : 0)
+            anchors.rightMargin: contentContainer.dockRight ? contentContainer.dockThickness : (typeof SettingsData !== "undefined" && SettingsData.barPosition === 3 ? Theme.px(42, root.dpr) : 0)
         }
 
         Item {
@@ -712,15 +613,30 @@ Item {
             height: root.contentSurfaceHeight
         }
 
+        MouseArea {
+            anchors.fill: dismissArea
+            enabled: root.spotlightOpen
+            z: -2
+            onClicked: root.hide()
+        }
+
         Item {
             id: contentContainer
 
-            // For directional/depth: contentContainer is at alignedY from window top (window starts at screen top)
-            // For standard: contentContainer is at shadowPad from window top (window starts near modal)
             x: root._ccX
             y: root._ccY
             width: root.alignedWidth
             height: root.contentSurfaceHeight
+
+            MouseArea {
+                anchors.fill: parent
+                enabled: root.spotlightOpen
+                hoverEnabled: false
+                acceptedButtons: Qt.AllButtons
+                onPressed: mouse.accepted = true
+                onClicked: mouse.accepted = true
+                z: -1
+            }
 
             readonly property int dockEdge: typeof SettingsData !== "undefined" ? SettingsData.dockPosition : 1
             readonly property bool dockTop: dockEdge === 0
@@ -776,7 +692,6 @@ Item {
                 return -Math.max((root.shadowPad || 0) + Theme.effectAnimOffset, 40);
             }
 
-            // openProgress: 0 = closed (at frozenMotion, scaleCollapsed), 1 = open (at 0, scale 1).
             QtObject {
                 id: morph
                 property real openProgress: root._motionActive ? 1 : 0
@@ -835,7 +750,6 @@ Item {
                     width: contentContainer.width
                     height: contentContainer.height
 
-                    // Shadow mirrors contentWrapper position/scale/opacity
                     ElevationShadow {
                         id: launcherShadowLayer
                         width: parent.width
@@ -853,7 +767,6 @@ Item {
                         shadowEnabled: !root.frameOwnsConnectedChrome && Theme.elevationEnabled && SettingsData.modalElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
                     }
 
-                    // contentWrapper moves inside static contentContainer — DankPopout pattern
                     Item {
                         id: contentWrapper
                         width: parent.width
@@ -923,8 +836,12 @@ Item {
                                 }
                             }
 
+                            Keys.onPressed: event => root.spotlightContent?.activeContextMenu?.handleKey(event)
+
                             Keys.onEscapePressed: event => {
-                                root.hide();
+                                root.spotlightContent?.activeContextMenu?.handleKey(event);
+                                if (!event.accepted)
+                                    root.hide();
                                 event.accepted = true;
                             }
                         }

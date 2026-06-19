@@ -13,13 +13,36 @@ Item {
     LayoutMirroring.childrenInherit: true
 
     property var parentModal: null
-    property string selectedBarId: "default"
+    property bool appearanceOnly: false
+    property string selectedBarId: SettingsUiState.selectedBarId
+
+    onSelectedBarIdChanged: {
+        if (SettingsUiState.selectedBarId !== selectedBarId)
+            SettingsUiState.selectedBarId = selectedBarId;
+    }
+
+    Connections {
+        target: SettingsUiState
+
+        function onSelectedBarIdChanged() {
+            if (dankBarTab.selectedBarId !== SettingsUiState.selectedBarId)
+                dankBarTab.selectedBarId = SettingsUiState.selectedBarId;
+        }
+    }
 
     property var selectedBarConfig: {
         selectedBarId;
         SettingsData.barConfigs;
         const index = SettingsData.barConfigs.findIndex(cfg => cfg.id === selectedBarId);
         return index !== -1 ? SettingsData.barConfigs[index] : SettingsData.barConfigs[0];
+    }
+    readonly property string selectedBarName: {
+        selectedBarId;
+        SettingsData.barConfigs;
+        const index = SettingsData.barConfigs.findIndex(config => config.id === selectedBarId);
+        if (index < 0)
+            return I18n.tr("Bar", "fallback name for an unnamed bar");
+        return SettingsData.barConfigs[index].name || I18n.tr("Bar %1", "numbered name for an unnamed bar, %1 is its position").arg(index + 1);
     }
 
     property bool selectedBarIsVertical: {
@@ -137,7 +160,7 @@ Item {
             popupGapsAuto: defaultBar.popupGapsAuto ?? true,
             popupGapsManual: defaultBar.popupGapsManual ?? 4,
             maximizeDetection: defaultBar.maximizeDetection ?? true,
-            fullscreenDetection: defaultBar.fullscreenDetection ?? true,
+            useOverlayLayer: defaultBar.useOverlayLayer ?? false,
             scrollEnabled: defaultBar.scrollEnabled ?? true,
             scrollXBehavior: defaultBar.scrollXBehavior ?? "column",
             scrollYBehavior: defaultBar.scrollYBehavior ?? "workspace",
@@ -211,9 +234,32 @@ Item {
             spacing: Theme.spacingXL
 
             SettingsCard {
+                tab: "appearance"
+                iconName: "toolbar"
+                title: I18n.tr("Dank Bar")
+                settingKey: "barAppearance"
+                visible: dankBarTab.appearanceOnly
+
+                SettingsButtonGroupRow {
+                    text: I18n.tr("Editing changes on %1").arg(dankBarTab.selectedBarName)
+                    model: SettingsData.barConfigs.map((config, index) => config.name || I18n.tr("Bar %1").arg(index + 1))
+                    currentIndex: {
+                        const index = SettingsData.barConfigs.findIndex(config => config.id === dankBarTab.selectedBarId);
+                        return Math.max(0, index);
+                    }
+                    onSelectionChanged: (index, selected) => {
+                        if (!selected || index < 0 || index >= SettingsData.barConfigs.length)
+                            return;
+                        dankBarTab.selectedBarId = SettingsData.barConfigs[index].id;
+                    }
+                }
+            }
+
+            SettingsCard {
                 iconName: "dashboard"
                 title: I18n.tr("Bar Configurations")
                 settingKey: "barConfigurations"
+                visible: !dankBarTab.appearanceOnly
 
                 RowLayout {
                     width: parent.width
@@ -410,7 +456,7 @@ Item {
             SettingsCard {
                 iconName: selectedBarConfig?.enabled ? "visibility" : "visibility_off"
                 title: I18n.tr("Enable Bar")
-                visible: selectedBarId !== "default"
+                visible: !dankBarTab.appearanceOnly && selectedBarId !== "default"
 
                 SettingsToggleRow {
                     text: I18n.tr("Toggle visibility of this bar configuration")
@@ -426,7 +472,7 @@ Item {
                 iconName: "vertical_align_center"
                 title: I18n.tr("Position")
                 settingKey: "barPosition"
-                visible: selectedBarConfig?.enabled
+                visible: !dankBarTab.appearanceOnly && selectedBarConfig?.enabled
 
                 Item {
                     width: parent.width
@@ -486,7 +532,7 @@ Item {
                 settingKey: "barDisplay"
                 collapsible: true
                 expanded: false
-                visible: selectedBarConfig?.enabled
+                visible: !dankBarTab.appearanceOnly && selectedBarConfig?.enabled
 
                 StyledText {
                     width: parent.width
@@ -588,15 +634,16 @@ Item {
             }
 
             SettingsCard {
-                iconName: "visibility_off"
+                iconName: "visibility"
                 title: I18n.tr("Visibility")
                 settingKey: "barVisibility"
                 collapsible: true
-                expanded: false
-                visible: selectedBarConfig?.enabled
+                expanded: true
+                visible: !dankBarTab.appearanceOnly && selectedBarConfig?.enabled
 
                 SettingsToggleRow {
                     text: I18n.tr("Auto-hide")
+                    description: I18n.tr("Automatically hide the bar when the pointer moves away")
                     checked: selectedBarConfig?.autoHide ?? false
                     onToggled: toggled => {
                         SettingsData.updateBarConfig(selectedBarId, {
@@ -623,6 +670,7 @@ Item {
                         id: hideDelaySlider
                         width: parent.width - parent.parent.leftPadding
                         text: I18n.tr("Hide Delay")
+                        description: I18n.tr("Time to wait before hiding after the pointer leaves")
                         value: selectedBarConfig?.autoHideDelay ?? 250
                         minimum: 0
                         maximum: 2000
@@ -645,6 +693,7 @@ Item {
                     SettingsToggleRow {
                         width: parent.width - parent.leftPadding
                         text: I18n.tr("Strict auto-hide", "Dank bar setting: hide the bar when the pointer leaves even if a menu or bar popover is still open")
+                        description: I18n.tr("Hide the bar when the pointer leaves even if a popout is still open")
                         checked: selectedBarConfig?.autoHideStrict ?? false
                         onToggled: toggled => {
                             SettingsData.updateBarConfig(selectedBarId, {
@@ -656,8 +705,9 @@ Item {
 
                     SettingsToggleRow {
                         width: parent.width - parent.leftPadding
-                        visible: CompositorService.isNiri || CompositorService.isHyprland
+                        visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango
                         text: I18n.tr("Hide When Windows Open")
+                        description: I18n.tr("Show the bar only when no windows are open")
                         checked: selectedBarConfig?.showOnWindowsOpen ?? false
                         onToggled: toggled => {
                             SettingsData.updateBarConfig(selectedBarId, {
@@ -676,6 +726,7 @@ Item {
 
                 SettingsToggleRow {
                     text: I18n.tr("Manual Show/Hide")
+                    description: I18n.tr("Toggle bar visibility manually via IPC")
                     checked: selectedBarConfig?.visible ?? true
                     onToggled: toggled => {
                         SettingsData.updateBarConfig(selectedBarId, {
@@ -694,6 +745,7 @@ Item {
 
                 SettingsToggleRow {
                     text: I18n.tr("Click Through")
+                    description: I18n.tr("Mouse clicks pass through the bar to windows behind it")
                     checked: selectedBarConfig?.clickThrough ?? false
                     onToggled: toggled => SettingsData.updateBarConfig(selectedBarId, {
                             clickThrough: toggled
@@ -713,6 +765,7 @@ Item {
                     enabled: !SettingsData.frameEnabled
                     opacity: SettingsData.frameEnabled ? 0.5 : 1.0
                     text: I18n.tr("Show on Overview")
+                    description: I18n.tr("Show the bar when niri overview is active")
                     checked: selectedBarConfig?.openOnOverview ?? false
                     onToggled: toggled => {
                         SettingsData.updateBarConfig(selectedBarId, {
@@ -729,33 +782,93 @@ Item {
                 }
 
                 SettingsToggleRow {
-                    text: I18n.tr("Hide When Fullscreen", "bar visibility toggle: hide the bar when a window is fullscreen")
-                    checked: selectedBarConfig?.fullscreenDetection ?? true
+                    settingKey: "barUseOverlayLayer"
+                    tags: ["bar", "fullscreen", "overlay", "layer"]
+                    text: I18n.tr("Use Overlay Layer", "bar layer toggle: use Wayland overlay layer")
+                    description: I18n.tr("Place the bar on the Wayland overlay layer")
+                    checked: selectedBarConfig?.useOverlayLayer ?? false
                     onToggled: toggled => {
                         SettingsData.updateBarConfig(selectedBarId, {
-                            fullscreenDetection: toggled
+                            useOverlayLayer: toggled
                         });
                         notifyHorizontalBarChange();
                     }
                 }
             }
 
-            SettingsControlledByFrame {
-                visible: SettingsData.frameEnabled
-                parentModal: dankBarTab.parentModal
-                settingLabel: I18n.tr("Bar spacing and size")
-                reason: I18n.tr("Managed by Frame")
+            SettingsCard {
+                tab: "appearance"
+                iconName: "opacity"
+                title: I18n.tr("Opacity")
+                settingKey: "barTransparency"
+                visible: dankBarTab.appearanceOnly && selectedBarConfig?.enabled
+
+                SettingsSliderRow {
+                    id: barTransparencySlider
+                    visible: !SettingsData.frameEnabled
+                    text: I18n.tr("Bar Opacity")
+                    description: I18n.tr("Controls opacity of the bar background")
+                    value: (selectedBarConfig?.transparency ?? 1.0) * 100
+                    minimum: 0
+                    maximum: 100
+                    unit: "%"
+                    defaultValue: 100
+                    onSliderDragFinished: finalValue => {
+                        SettingsData.updateBarConfig(selectedBarId, {
+                            transparency: finalValue / 100
+                        });
+                    }
+
+                    Binding {
+                        target: barTransparencySlider
+                        property: "value"
+                        value: (selectedBarConfig?.transparency ?? 1.0) * 100
+                        restoreMode: Binding.RestoreBinding
+                    }
+                }
+
+                SettingsSliderRow {
+                    id: widgetTransparencySlider
+                    text: I18n.tr("Widget Opacity")
+                    description: I18n.tr("Controls opacity of widget backgrounds")
+                    value: (selectedBarConfig?.widgetTransparency ?? 1.0) * 100
+                    minimum: 0
+                    maximum: 100
+                    unit: "%"
+                    defaultValue: 100
+                    onSliderDragFinished: finalValue => {
+                        SettingsData.updateBarConfig(selectedBarId, {
+                            widgetTransparency: finalValue / 100
+                        });
+                    }
+
+                    Binding {
+                        target: widgetTransparencySlider
+                        property: "value"
+                        value: (selectedBarConfig?.widgetTransparency ?? 1.0) * 100
+                        restoreMode: Binding.RestoreBinding
+                    }
+                }
+
+                SettingsControlledByFrame {
+                    visible: SettingsData.frameEnabled
+                    parentModal: dankBarTab.parentModal
+                    settingLabel: I18n.tr("Bar Opacity")
+                    reason: I18n.tr("Managed by Frame")
+                }
             }
 
             SettingsCard {
+                tab: "appearance"
                 iconName: "space_bar"
                 title: I18n.tr("Spacing")
                 settingKey: "barSpacing"
-                visible: (selectedBarConfig?.enabled ?? false) && !SettingsData.frameEnabled
+                visible: dankBarTab.appearanceOnly && (selectedBarConfig?.enabled ?? false) && !SettingsData.frameEnabled
 
                 SettingsSliderRow {
                     id: edgeSpacingSlider
                     text: I18n.tr("Edge Spacing")
+                    description: I18n.tr("Space between the bar and screen edges")
                     value: selectedBarConfig?.spacing ?? 4
                     minimum: 0
                     maximum: 32
@@ -777,6 +890,7 @@ Item {
                 SettingsSliderRow {
                     id: exclusiveZoneSlider
                     text: I18n.tr("Exclusive Zone Offset")
+                    description: I18n.tr("Fine-tune the space reserved for the bar from the screen edge")
                     value: selectedBarConfig?.bottomGap ?? 0
                     minimum: -50
                     maximum: 50
@@ -798,6 +912,7 @@ Item {
                 SettingsSliderRow {
                     id: sizeSlider
                     text: I18n.tr("Size")
+                    description: I18n.tr("Adjust the bar height via inner padding")
                     value: selectedBarConfig?.innerPadding ?? 4
                     minimum: -8
                     maximum: 24
@@ -819,6 +934,7 @@ Item {
                 SettingsSliderRow {
                     id: widgetPaddingSlider
                     text: I18n.tr("Padding")
+                    description: I18n.tr("Inner padding applied to each widget")
                     value: selectedBarConfig?.widgetPadding ?? 8
                     minimum: 0
                     maximum: 32
@@ -849,6 +965,7 @@ Item {
 
                 SettingsToggleRow {
                     text: I18n.tr("Auto Popup Gaps")
+                    description: I18n.tr("Automatically calculate popup gap based on bar spacing")
                     checked: selectedBarConfig?.popupGapsAuto ?? true
                     onToggled: checked => {
                         SettingsData.updateBarConfig(selectedBarId, {
@@ -874,6 +991,7 @@ Item {
                         id: popupGapsManualSlider
                         width: parent.width - parent.parent.leftPadding
                         text: I18n.tr("Manual Gap Size")
+                        description: I18n.tr("Override the popup gap size when auto is disabled")
                         value: selectedBarConfig?.popupGapsManual ?? 4
                         minimum: 0
                         maximum: 50
@@ -894,71 +1012,14 @@ Item {
                 }
             }
 
-            SettingsCard {
-                iconName: "opacity"
-                title: I18n.tr("Transparency")
-                settingKey: "barTransparency"
-                visible: selectedBarConfig?.enabled
-
-                SettingsSliderRow {
-                    id: barTransparencySlider
-                    visible: !SettingsData.frameEnabled
-                    text: I18n.tr("Bar Transparency")
-                    value: (selectedBarConfig?.transparency ?? 1.0) * 100
-                    minimum: 0
-                    maximum: 100
-                    unit: "%"
-                    defaultValue: 100
-                    onSliderDragFinished: finalValue => {
-                        SettingsData.updateBarConfig(selectedBarId, {
-                            transparency: finalValue / 100
-                        });
-                    }
-
-                    Binding {
-                        target: barTransparencySlider
-                        property: "value"
-                        value: (selectedBarConfig?.transparency ?? 1.0) * 100
-                        restoreMode: Binding.RestoreBinding
-                    }
-                }
-
-                SettingsSliderRow {
-                    id: widgetTransparencySlider
-                    text: I18n.tr("Widget Transparency")
-                    value: (selectedBarConfig?.widgetTransparency ?? 1.0) * 100
-                    minimum: 0
-                    maximum: 100
-                    unit: "%"
-                    defaultValue: 100
-                    onSliderDragFinished: finalValue => {
-                        SettingsData.updateBarConfig(selectedBarId, {
-                            widgetTransparency: finalValue / 100
-                        });
-                    }
-
-                    Binding {
-                        target: widgetTransparencySlider
-                        property: "value"
-                        value: (selectedBarConfig?.widgetTransparency ?? 1.0) * 100
-                        restoreMode: Binding.RestoreBinding
-                    }
-                }
-
-                SettingsControlledByFrame {
-                    visible: SettingsData.frameEnabled
-                    parentModal: dankBarTab.parentModal
-                    settingLabel: I18n.tr("Bar transparency")
-                    reason: I18n.tr("Managed by Frame")
-                }
-            }
-
             SettingsSliderCard {
                 id: fontScaleSliderCard
+                tab: "appearance"
+                settingKey: "barFontScale"
                 iconName: "text_fields"
                 title: I18n.tr("Font Scale")
                 description: I18n.tr("Scale DankBar font sizes independently")
-                visible: selectedBarConfig?.enabled
+                visible: dankBarTab.appearanceOnly && selectedBarConfig?.enabled
                 minimum: 50
                 maximum: 200
                 value: Math.round((selectedBarConfig?.fontScale ?? 1.0) * 100)
@@ -980,10 +1041,12 @@ Item {
 
             SettingsSliderCard {
                 id: iconScaleSliderCard
+                tab: "appearance"
+                settingKey: "barIconScale"
                 iconName: "interests"
                 title: I18n.tr("Icon Scale")
                 description: I18n.tr("Scale DankBar icon sizes independently")
-                visible: selectedBarConfig?.enabled
+                visible: dankBarTab.appearanceOnly && selectedBarConfig?.enabled
                 minimum: 50
                 maximum: 200
                 value: Math.round((selectedBarConfig?.iconScale ?? 1.0) * 100)
@@ -1003,13 +1066,18 @@ Item {
                 }
             }
 
+            WorkspaceAppearanceCard {
+                visible: dankBarTab.appearanceOnly
+            }
+
             SettingsCard {
+                tab: "appearance"
                 iconName: "rounded_corner"
                 title: I18n.tr("Corners & Background")
                 settingKey: "barCorners"
                 collapsible: true
-                expanded: false
-                visible: selectedBarConfig?.enabled
+                expanded: true
+                visible: dankBarTab.appearanceOnly && selectedBarConfig?.enabled
 
                 SettingsControlledByFrame {
                     visible: SettingsData.frameEnabled
@@ -1020,6 +1088,7 @@ Item {
 
                 SettingsToggleRow {
                     text: I18n.tr("Square Corners")
+                    description: I18n.tr("Remove corner rounding from the bar")
                     visible: !SettingsData.frameEnabled
                     checked: selectedBarConfig?.squareCorners ?? false
                     onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
@@ -1029,6 +1098,7 @@ Item {
 
                 SettingsToggleRow {
                     text: I18n.tr("No Background")
+                    description: I18n.tr("Make the bar background fully transparent")
                     visible: !SettingsData.frameEnabled
                     checked: selectedBarConfig?.noBackground ?? false
                     onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
@@ -1038,6 +1108,7 @@ Item {
 
                 SettingsToggleRow {
                     text: I18n.tr("Maximize Widget Icons")
+                    description: I18n.tr("Stretch widget icons to fill the available bar height")
                     checked: selectedBarConfig?.maximizeWidgetIcons ?? false
                     onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
                             maximizeWidgetIcons: checked
@@ -1046,6 +1117,7 @@ Item {
 
                 SettingsToggleRow {
                     text: I18n.tr("Maximize Widget Text")
+                    description: I18n.tr("Stretch widget text to fill the available bar height")
                     checked: selectedBarConfig?.maximizeWidgetText ?? false
                     onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
                             maximizeWidgetText: checked
@@ -1054,6 +1126,7 @@ Item {
 
                 SettingsToggleRow {
                     text: I18n.tr("Remove Widget Padding")
+                    description: I18n.tr("Remove inner padding from all widgets")
                     checked: selectedBarConfig?.removeWidgetPadding ?? false
                     onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
                             removeWidgetPadding: checked
@@ -1069,6 +1142,7 @@ Item {
 
                 SettingsToggleRow {
                     text: I18n.tr("Goth Corners")
+                    description: I18n.tr("Apply inverse concave corner cutouts to the bar")
                     visible: !SettingsData.frameEnabled
                     checked: selectedBarConfig?.gothCornersEnabled ?? false
                     onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
@@ -1078,6 +1152,7 @@ Item {
 
                 SettingsToggleRow {
                     text: I18n.tr("Corner Radius Override")
+                    description: I18n.tr("Use a custom radius for goth corner cutouts")
                     checked: selectedBarConfig?.gothCornerRadiusOverride ?? false
                     visible: selectedBarConfig?.gothCornersEnabled ?? false
                     onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
@@ -1119,7 +1194,7 @@ Item {
                 iconName: "fit_screen"
                 title: I18n.tr("Maximize Detection")
                 description: I18n.tr("Remove gaps and border when windows are maximized")
-                visible: selectedBarConfig?.enabled && (CompositorService.isNiri || CompositorService.isHyprland)
+                visible: !dankBarTab.appearanceOnly && selectedBarConfig?.enabled && (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango)
                 checked: selectedBarConfig?.maximizeDetection ?? true
                 onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
                         maximizeDetection: checked
@@ -1127,10 +1202,11 @@ Item {
             }
 
             SettingsCard {
+                tab: "appearance"
                 iconName: "filter_b_and_w"
                 title: I18n.tr("System Tray Icon Tint")
                 settingKey: "trayIconTint"
-                visible: selectedBarConfig?.enabled
+                visible: dankBarTab.appearanceOnly && selectedBarConfig?.enabled
 
                 StyledText {
                     text: I18n.tr("Choose monochrome or a theme color tint for system tray icons")
@@ -1226,9 +1302,11 @@ Item {
             }
 
             SettingsToggleCard {
+                tab: "appearance"
+                settingKey: "barBorder"
                 iconName: "border_style"
                 title: I18n.tr("Border")
-                visible: selectedBarConfig?.enabled
+                visible: dankBarTab.appearanceOnly && selectedBarConfig?.enabled && !dankBarTab.connectedFrameModeActive
                 checked: selectedBarConfig?.borderEnabled ?? false
                 onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
                         borderEnabled: checked
@@ -1236,6 +1314,7 @@ Item {
 
                 SettingsButtonGroupRow {
                     text: I18n.tr("Color")
+                    description: I18n.tr("Theme color used for the border")
                     model: ["Surface", "Secondary", "Primary"]
                     currentIndex: {
                         switch (selectedBarConfig?.borderColor || "surfaceText") {
@@ -1273,6 +1352,7 @@ Item {
                 SettingsSliderRow {
                     id: borderOpacitySlider
                     text: I18n.tr("Opacity")
+                    description: I18n.tr("Controls opacity of the border")
                     value: (selectedBarConfig?.borderOpacity ?? 1.0) * 100
                     minimum: 0
                     maximum: 100
@@ -1295,6 +1375,7 @@ Item {
                 SettingsSliderRow {
                     id: borderThicknessSlider
                     text: I18n.tr("Thickness")
+                    description: I18n.tr("Width of the border in pixels")
                     value: selectedBarConfig?.borderThickness ?? 1
                     minimum: 1
                     maximum: 10
@@ -1316,9 +1397,11 @@ Item {
             }
 
             SettingsToggleCard {
+                tab: "appearance"
+                settingKey: "barWidgetOutline"
                 iconName: "highlight"
                 title: I18n.tr("Widget Outline")
-                visible: selectedBarConfig?.enabled
+                visible: dankBarTab.appearanceOnly && selectedBarConfig?.enabled
                 checked: selectedBarConfig?.widgetOutlineEnabled ?? false
                 onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
                         widgetOutlineEnabled: checked
@@ -1326,6 +1409,7 @@ Item {
 
                 SettingsButtonGroupRow {
                     text: I18n.tr("Color")
+                    description: I18n.tr("Theme color used for the widget outline")
                     model: ["Surface", "Secondary", "Primary"]
                     currentIndex: {
                         switch (selectedBarConfig?.widgetOutlineColor || "primary") {
@@ -1363,6 +1447,7 @@ Item {
                 SettingsSliderRow {
                     id: widgetOutlineOpacitySlider
                     text: I18n.tr("Opacity")
+                    description: I18n.tr("Controls opacity of the widget outline")
                     value: (selectedBarConfig?.widgetOutlineOpacity ?? 1.0) * 100
                     minimum: 0
                     maximum: 100
@@ -1385,6 +1470,7 @@ Item {
                 SettingsSliderRow {
                     id: widgetOutlineThicknessSlider
                     text: I18n.tr("Thickness")
+                    description: I18n.tr("Width of the widget outline in pixels")
                     value: selectedBarConfig?.widgetOutlineThickness ?? 1
                     minimum: 1
                     maximum: 10
@@ -1406,7 +1492,7 @@ Item {
             }
 
             SettingsControlledByFrame {
-                visible: dankBarTab.connectedFrameModeActive
+                visible: dankBarTab.appearanceOnly && dankBarTab.connectedFrameModeActive
                 parentModal: dankBarTab.parentModal
                 settingLabel: I18n.tr("Bar shadow, border, and corners")
                 reason: I18n.tr("Managed by Frame in Connected Mode")
@@ -1414,12 +1500,13 @@ Item {
 
             SettingsCard {
                 id: shadowCard
+                tab: "appearance"
                 iconName: "layers"
                 title: I18n.tr("Shadow Override", "bar shadow settings card")
                 settingKey: "barShadow"
                 collapsible: true
                 expanded: false
-                visible: (selectedBarConfig?.enabled ?? false) && !dankBarTab.connectedFrameModeActive
+                visible: dankBarTab.appearanceOnly && (selectedBarConfig?.enabled ?? false) && !dankBarTab.connectedFrameModeActive
 
                 readonly property bool shadowActive: (selectedBarConfig?.shadowIntensity ?? 0) > 0
                 readonly property bool isCustomColor: (selectedBarConfig?.shadowColorMode ?? "default") === "custom"
@@ -1455,6 +1542,7 @@ Item {
                 SettingsSliderRow {
                     visible: shadowCard.shadowActive
                     text: I18n.tr("Intensity", "shadow intensity slider")
+                    description: I18n.tr("Shadow blur radius in pixels")
                     minimum: 0
                     maximum: 100
                     unit: "px"
@@ -1468,6 +1556,7 @@ Item {
                 SettingsSliderRow {
                     visible: shadowCard.shadowActive
                     text: I18n.tr("Opacity")
+                    description: I18n.tr("Controls opacity of the shadow layer")
                     minimum: 10
                     maximum: 100
                     unit: "%"
@@ -1479,6 +1568,7 @@ Item {
                 }
 
                 SettingsDropdownRow {
+                    tab: "appearance"
                     visible: shadowCard.shadowActive
                     text: I18n.tr("Direction Source", "bar shadow direction source")
                     description: I18n.tr("Choose how this bar resolves shadow direction")
@@ -1512,6 +1602,7 @@ Item {
                 }
 
                 SettingsDropdownRow {
+                    tab: "appearance"
                     visible: shadowCard.shadowActive && shadowCard.directionSource === "manual"
                     text: I18n.tr("Manual Direction", "bar manual shadow direction")
                     description: I18n.tr("Use a fixed shadow direction for this bar")
@@ -1647,7 +1738,7 @@ Item {
                 iconName: "mouse"
                 title: I18n.tr("Scroll Wheel")
                 description: I18n.tr("Control workspaces and columns by scrolling on the bar")
-                visible: selectedBarConfig?.enabled
+                visible: !dankBarTab.appearanceOnly && selectedBarConfig?.enabled
                 checked: selectedBarConfig?.scrollEnabled ?? true
                 onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
                         scrollEnabled: checked
@@ -1655,7 +1746,11 @@ Item {
 
                 SettingsButtonGroupRow {
                     text: I18n.tr("Y Axis")
+                    description: I18n.tr("Action performed when scrolling vertically on the bar")
                     model: CompositorService.isNiri ? [I18n.tr("None"), I18n.tr("Workspace"), I18n.tr("Column")] : [I18n.tr("None"), I18n.tr("Workspace")]
+                    buttonPadding: Theme.spacingS
+                    minButtonWidth: 44
+                    textSize: Theme.fontSizeSmall
                     currentIndex: {
                         switch (selectedBarConfig?.scrollYBehavior || "workspace") {
                         case "none":
@@ -1691,8 +1786,12 @@ Item {
 
                 SettingsButtonGroupRow {
                     text: I18n.tr("X Axis")
+                    description: I18n.tr("Action performed when scrolling horizontally on the bar")
                     visible: CompositorService.isNiri
                     model: [I18n.tr("None"), I18n.tr("Workspace"), I18n.tr("Column")]
+                    buttonPadding: Theme.spacingS
+                    minButtonWidth: 44
+                    textSize: Theme.fontSizeSmall
                     currentIndex: {
                         switch (selectedBarConfig?.scrollXBehavior || "column") {
                         case "none":

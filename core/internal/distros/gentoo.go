@@ -106,6 +106,11 @@ func (g *GentooDistribution) DetectDependenciesWithTerminal(ctx context.Context,
 		dependencies = append(dependencies, g.detectXwaylandSatellite())
 	}
 
+	// Mango-specific tools (dwl-based, uses xwayland-satellite like niri)
+	if wm == deps.WindowManagerMango {
+		dependencies = append(dependencies, g.detectXwaylandSatellite())
+	}
+
 	dependencies = append(dependencies, g.detectMatugen())
 	dependencies = append(dependencies, g.detectDgop())
 
@@ -176,6 +181,10 @@ func (g *GentooDistribution) GetPackageMappingWithVariants(wm deps.WindowManager
 	case deps.WindowManagerNiri:
 		packages["niri"] = g.getNiriMapping(variants["niri"])
 		packages["xwayland-satellite"] = PackageMapping{Name: "gui-apps/xwayland-satellite", Repository: RepoTypeGURU, AcceptKeywords: archKeyword}
+	case deps.WindowManagerMango:
+		packages["mango"] = g.getMangoMapping(variants["mango"])
+		packages["scenefx"] = PackageMapping{Name: "gui-libs/scenefx", Repository: RepoTypeGURU, AcceptKeywords: archKeyword}
+		packages["xwayland-satellite"] = PackageMapping{Name: "gui-apps/xwayland-satellite", Repository: RepoTypeGURU, AcceptKeywords: archKeyword}
 	}
 
 	return packages
@@ -195,6 +204,10 @@ func (g *GentooDistribution) getHyprlandMapping(_ deps.PackageVariant) PackageMa
 
 func (g *GentooDistribution) getNiriMapping(_ deps.PackageVariant) PackageMapping {
 	return PackageMapping{Name: "gui-wm/niri", Repository: RepoTypeGURU, UseFlags: "dbus screencast", AcceptKeywords: g.getArchKeyword()}
+}
+
+func (g *GentooDistribution) getMangoMapping(_ deps.PackageVariant) PackageMapping {
+	return PackageMapping{Name: "gui-wm/mangowm", Repository: RepoTypeGURU, AcceptKeywords: g.getArchKeyword()}
 }
 
 func (g *GentooDistribution) getPrerequisites() []string {

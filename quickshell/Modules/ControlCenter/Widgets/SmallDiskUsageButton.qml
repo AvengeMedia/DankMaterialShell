@@ -11,6 +11,7 @@ Rectangle {
 
     property string mountPath: "/"
     property string instanceId: ""
+    property bool showMountPath: true
 
     property var selectedMount: {
         if (!DgopService.diskMounts || DgopService.diskMounts.length === 0)
@@ -67,7 +68,7 @@ Rectangle {
         DankIcon {
             anchors.verticalCenter: parent.verticalCenter
             name: "storage"
-            size: Theme.iconSizeSmall
+            size: Theme.iconSizeLarge
             color: {
                 if (root.usagePercent > 90)
                     return Theme.error;
@@ -82,6 +83,7 @@ Rectangle {
             spacing: 0
 
             StyledText {
+                visible: root.showMountPath
                 text: root.selectedMount?.mount || root.mountPath
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.surfaceVariantText
@@ -92,7 +94,7 @@ Rectangle {
 
             StyledText {
                 text: `${root.usagePercent.toFixed(0)}%`
-                font.pixelSize: Theme.fontSizeSmall
+                font.pixelSize: root.showMountPath ? Theme.fontSizeSmall : Theme.fontSizeLarge
                 font.weight: Font.Bold
                 color: {
                     if (root.usagePercent > 90)

@@ -62,7 +62,7 @@ CATEGORY_KEYWORDS = {
     "Time & Weather": ["clock", "forecast", "date"],
     "Keyboard Shortcuts": ["keys", "bindings", "hotkey"],
     "Dank Bar": ["panel", "topbar", "statusbar"],
-    "Workspaces": ["virtual desktops", "spaces"],
+    "Applications": ["apps", "programs", "window", "rules", "matching", "floating"],
     "Dock": ["taskbar", "launcher bar"],
     "Network": ["connectivity", "online"],
     "System": ["os", "linux"],
@@ -82,15 +82,13 @@ CATEGORY_KEYWORDS = {
     "Displays": ["monitor", "screen", "resolution"],
     "Desktop Widgets": ["conky", "desktop clock"],
     "Audio": ["sound", "volume", "speaker", "microphone", "headphones", "pipewire"],
-    "Window Rules": [
-        "window",
-        "rules",
-        "matching",
-        "floating",
-        "fullscreen",
-        "opacity",
-    ],
     "Locale": ["locale", "language", "country"],
+    "Greeter": ["login", "greetd", "display manager"],
+    "Multiplexers": ["tmux", "zellij", "terminal"],
+    "Frame": ["window", "border", "decoration"],
+    "Default Apps": ["browser", "terminal", "handlers", "mime"],
+    "Users": ["accounts", "user", "profile"],
+    "Autostart": ["startup", "launch", "boot"],
 }
 
 TAB_INDEX_MAP = {
@@ -99,8 +97,15 @@ TAB_INDEX_MAP = {
     "KeybindsTab.qml": 2,
     "DankBarTab.qml": 3,
     "WorkspacesTab.qml": 4,
+    "CompositorLayoutTab.qml": 37,
+    "WindowRulesTab.qml": 38,
     "DockTab.qml": 5,
-    "NetworkTab.qml": 7,
+    "DankBarAppearanceTab.qml": 6,
+    "WorkspaceAppearanceCard.qml": 6,
+    "NetworkStatusTab.qml": 7,
+    "NetworkEthernetTab.qml": 39,
+    "NetworkWifiTab.qml": 40,
+    "NetworkVpnTab.qml": 41,
     "PrinterTab.qml": 8,
     "LauncherTab.qml": 9,
     "ThemeColorsTab.qml": 10,
@@ -121,9 +126,14 @@ TAB_INDEX_MAP = {
     "GammaControlTab.qml": 25,
     "DisplayWidgetsTab.qml": 26,
     "DesktopWidgetsTab.qml": 27,
-    "WindowRulesTab.qml": 28,
     "AudioTab.qml": 29,
     "LocaleTab.qml": 30,
+    "GreeterTab.qml": 31,
+    "MuxTab.qml": 32,
+    "FrameTab.qml": 33,
+    "DefaultAppsTab.qml": 34,
+    "UsersTab.qml": 35,
+    "AutoStartTab.qml": 36,
 }
 
 TAB_CATEGORY_MAP = {
@@ -131,8 +141,9 @@ TAB_CATEGORY_MAP = {
     1: "Time & Weather",
     2: "Keyboard Shortcuts",
     3: "Dank Bar",
-    4: "Workspaces",
+    4: "Dank Bar",
     5: "Dock",
+    6: "Dank Bar",
     7: "Network",
     8: "System",
     9: "Launcher",
@@ -154,9 +165,19 @@ TAB_CATEGORY_MAP = {
     25: "Displays",
     26: "Displays",
     27: "Desktop Widgets",
-    28: "Window Rules",
     29: "Audio",
     30: "Locale",
+    31: "Greeter",
+    32: "Multiplexers",
+    33: "Frame",
+    34: "Default Apps",
+    35: "Users",
+    36: "Autostart",
+    37: "Personalization",
+    38: "Applications",
+    39: "Network",
+    40: "Network",
+    41: "Network",
 }
 
 SEARCHABLE_COMPONENTS = [
@@ -284,9 +305,9 @@ def extract_property(block, prop_name):
 
 def find_settings_components(content, filename):
     results = []
-    tab_index = TAB_INDEX_MAP.get(filename, -1)
+    file_tab_index = TAB_INDEX_MAP.get(filename, -1)
 
-    if tab_index == -1:
+    if file_tab_index == -1:
         return results
 
     for component in SEARCHABLE_COMPONENTS:
@@ -302,6 +323,11 @@ def find_settings_components(content, filename):
 
             if not setting_key:
                 continue
+
+            tab_index = file_tab_index
+            tab_raw = extract_property(block, "tab")
+            if tab_raw and tab_raw.strip("\"'") == "appearance":
+                tab_index = 6
 
             title_raw = extract_property(block, "title")
             text_raw = extract_property(block, "text")
@@ -338,6 +364,8 @@ def find_settings_components(content, filename):
                     condition_key = "isNiri"
                 elif "CompositorService.isHyprland" in visible_raw:
                     condition_key = "isHyprland"
+                elif "CompositorService.isMango" in visible_raw:
+                    condition_key = "isMango"
                 elif "KeybindsService.available" in visible_raw:
                     condition_key = "keybindsAvailable"
                 elif "AudioService.soundsAvailable" in visible_raw:
@@ -404,6 +432,8 @@ def parse_tabs_from_sidebar(sidebar_file):
             ("hyprlandNiriOnly", "isHyprlandOrNiri"),
             ("clipboardOnly", "dmsConnected"),
             ("niriOnly", "isNiri"),
+            ("windowRulesCapable", "windowRulesCapable"),
+            ("layoutCapable", "layoutCapable"),
         ]:
             if f'"{qml_cond}": true' in snippet:
                 cond = key
@@ -422,8 +452,14 @@ def parse_tabs_from_sidebar(sidebar_file):
     return tabs
 
 
-def generate_tab_entries(sidebar_file):
+def generate_tab_entries(sidebar_file, settings_entries=None):
     tabs = parse_tabs_from_sidebar(sidebar_file)
+    settings_entries = settings_entries or []
+    highlightable_labels = {
+        (entry["tabIndex"], entry["label"])
+        for entry in settings_entries
+        if not str(entry["section"]).startswith("_tab_")
+    }
 
     label_counts = Counter([t["label"] for t in tabs])
 
@@ -435,6 +471,9 @@ def generate_tab_entries(sidebar_file):
             else tab["label"]
         )
         category = TAB_CATEGORY_MAP.get(tab["tabIndex"], "Settings")
+
+        if (tab["tabIndex"], label) in highlightable_labels:
+            continue
 
         keywords = enrich_keywords(tab["label"], None, category, [])
 
@@ -470,8 +509,8 @@ def extract_settings_index(root_dir):
     all_entries = []
     seen_keys = set()
 
-    for qml_file in settings_dir.glob("*.qml"):
-        if not qml_file.name.endswith("Tab.qml"):
+    for qml_file in sorted(settings_dir.glob("*.qml")):
+        if qml_file.name not in TAB_INDEX_MAP:
             continue
 
         with open(qml_file, "r", encoding="utf-8") as f:
@@ -484,6 +523,25 @@ def extract_settings_index(root_dir):
                 seen_keys.add(key)
                 all_entries.append(entry)
 
+    if "windowRules" not in seen_keys:
+        all_entries.append(
+            {
+                "section": "windowRules",
+                "label": "Window Rules",
+                "tabIndex": 38,
+                "category": "Applications",
+                "keywords": enrich_keywords(
+                    "Window Rules",
+                    "Define compositor rules for window behavior",
+                    "Applications",
+                    ["matching", "floating", "fullscreen", "opacity"],
+                ),
+                "icon": "select_window",
+                "description": "Define compositor rules for window behavior",
+                "conditionKey": "windowRulesCapable",
+            }
+        )
+
     return all_entries
 
 
@@ -494,15 +552,16 @@ def main():
 
     print("Extracting settings search index...")
     settings_entries = extract_settings_index(root_dir)
-    tab_entries = generate_tab_entries(sidebar_file)
+    tab_entries = generate_tab_entries(sidebar_file, settings_entries)
 
     all_entries = tab_entries + settings_entries
 
-    all_entries.sort(key=lambda x: (x["tabIndex"], x["label"]))
+    all_entries.sort(key=lambda x: (x["tabIndex"], x["label"], x["section"]))
 
     output_path = script_dir / "settings_search_index.json"
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(all_entries, f, indent=2, ensure_ascii=False)
+        f.write("\n")
 
     print(f"Found {len(settings_entries)} searchable settings")
     print(f"Found {len(tab_entries)} tab entries")

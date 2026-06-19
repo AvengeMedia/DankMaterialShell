@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Layouts
 import Quickshell
 import qs.Common
 import qs.Modals.Common
@@ -20,9 +21,201 @@ FloatingWindow {
     parentWindow: parentModal
     property bool pendingInstallHandled: false
     property string typeFilter: ""
+    property string categoryFilter: "all"
+    property var categoryFilterOptions: []
+    property var availableLetters: []
+
+    readonly property bool activeCategorySort: normalizedSortMode(SessionData.pluginBrowserSortMode) === "category"
+    readonly property bool showCategoryFilters: activeCategorySort && categoryFilterOptions.length > 1
+    readonly property bool showLetterIndex: {
+        var mode = normalizedSortMode(SessionData.pluginBrowserSortMode);
+        return (mode === "name" || mode === "author") && availableLetters.length > 1;
+    }
+
+    readonly property var sortChipOptions: [
+        {
+            id: "installed",
+            label: I18n.tr("Installed", "plugin browser filter chip"),
+            toggle: true
+        },
+        {
+            id: "default",
+            label: I18n.tr("Default", "plugin browser sort option"),
+            toggle: false
+        },
+        {
+            id: "name",
+            label: I18n.tr("Name", "plugin browser sort option"),
+            toggle: false
+        },
+        {
+            id: "author",
+            label: I18n.tr("Contributor", "plugin browser sort option"),
+            toggle: false
+        },
+        {
+            id: "category",
+            label: I18n.tr("Category", "plugin browser sort option"),
+            toggle: false
+        }
+    ]
+
+    function normalizedSortMode(mode) {
+        if (mode === "type" || mode === "contributor")
+            return "author";
+        if (mode === "name" || mode === "author" || mode === "category")
+            return mode;
+        return "default";
+    }
+
+    function isSortChipSelected(chipId, toggle) {
+        if (toggle)
+            return SessionData.pluginBrowserInstalledFirst;
+        return normalizedSortMode(SessionData.pluginBrowserSortMode) === chipId;
+    }
+
+    function comparePluginName(a, b) {
+        var nameA = (a.name || "").toLowerCase();
+        var nameB = (b.name || "").toLowerCase();
+        if (nameA < nameB)
+            return -1;
+        if (nameA > nameB)
+            return 1;
+        return 0;
+    }
+
+    function comparePluginAuthor(a, b) {
+        var authorA = (a.author || "").toLowerCase() || "zzz";
+        var authorB = (b.author || "").toLowerCase() || "zzz";
+        if (authorA < authorB)
+            return -1;
+        if (authorA > authorB)
+            return 1;
+        return comparePluginName(a, b);
+    }
+
+    function comparePluginCategory(a, b) {
+        var catA = (a.category || "").toLowerCase() || "zzz";
+        var catB = (b.category || "").toLowerCase() || "zzz";
+        if (catA < catB)
+            return -1;
+        if (catA > catB)
+            return 1;
+        return comparePluginName(a, b);
+    }
+
+    function formatCategoryLabel(categoryKey) {
+        if (!categoryKey || categoryKey === "_uncategorized")
+            return I18n.tr("Uncategorized", "plugin browser category filter");
+        return categoryKey.charAt(0).toUpperCase() + categoryKey.slice(1);
+    }
+
+    function sortKeyForPlugin(plugin, mode) {
+        if (mode === "author")
+            return (plugin.author || "").trim();
+        if (mode === "category")
+            return formatCategoryLabel((plugin.category || "").toLowerCase() || "_uncategorized");
+        return (plugin.name || "").trim();
+    }
+
+    function buildCategoryFilterOptions(plugins) {
+        var counts = {};
+        for (var i = 0; i < plugins.length; i++) {
+            var cat = (plugins[i].category || "").toLowerCase();
+            if (!cat)
+                cat = "_uncategorized";
+            counts[cat] = (counts[cat] || 0) + 1;
+        }
+        var keys = Object.keys(counts).sort();
+        var options = [
+            {
+                key: "all",
+                label: I18n.tr("All", "plugin browser category filter"),
+                count: plugins.length
+            }
+        ];
+        for (var j = 0; j < keys.length; j++) {
+            var key = keys[j];
+            options.push({
+                key: key,
+                label: formatCategoryLabel(key),
+                count: counts[key]
+            });
+        }
+        return options;
+    }
+
+    function categoryFilterDisplayLabel(option) {
+        return option.label + " (" + option.count + ")";
+    }
+
+    function categoryFilterLabelForKey(key) {
+        for (var i = 0; i < categoryFilterOptions.length; i++) {
+            if (categoryFilterOptions[i].key === key)
+                return categoryFilterDisplayLabel(categoryFilterOptions[i]);
+        }
+        return "";
+    }
+
+    function categoryFilterKeyForLabel(label) {
+        for (var i = 0; i < categoryFilterOptions.length; i++) {
+            if (categoryFilterDisplayLabel(categoryFilterOptions[i]) === label)
+                return categoryFilterOptions[i].key;
+        }
+        return "all";
+    }
+
+    function categoryFilterDropdownLabels() {
+        var labels = [];
+        for (var i = 0; i < categoryFilterOptions.length; i++)
+            labels.push(categoryFilterDisplayLabel(categoryFilterOptions[i]));
+        return labels;
+    }
+
+    function updateAvailableLetters(plugins) {
+        var mode = normalizedSortMode(SessionData.pluginBrowserSortMode);
+        if (mode !== "name" && mode !== "author") {
+            availableLetters = [];
+            return;
+        }
+        var letters = {};
+        for (var i = 0; i < plugins.length; i++) {
+            var key = sortKeyForPlugin(plugins[i], mode);
+            if (!key)
+                continue;
+            var letter = key.charAt(0).toUpperCase();
+            if (letter >= "A" && letter <= "Z")
+                letters[letter] = true;
+        }
+        availableLetters = Object.keys(letters).sort();
+    }
+
+    function refreshListLayout() {
+        if (!pluginBrowserList)
+            return;
+        pluginBrowserList.savedY = 0;
+        pluginBrowserList.cancelFlick();
+        pluginBrowserList.contentY = 0;
+        Qt.callLater(() => {
+            if (pluginBrowserList)
+                pluginBrowserList.forceLayout();
+        });
+    }
+
+    function scrollToLetter(letter) {
+        var mode = normalizedSortMode(SessionData.pluginBrowserSortMode);
+        for (var i = 0; i < filteredPlugins.length; i++) {
+            var key = sortKeyForPlugin(filteredPlugins[i], mode);
+            if (key && key.charAt(0).toUpperCase() === letter) {
+                pluginBrowserList.positionViewAtIndex(i, ListView.Beginning);
+                pluginBrowserList.savedY = pluginBrowserList.contentY;
+                return;
+            }
+        }
+    }
 
     function updateFilteredPlugins() {
-        var filtered = [];
+        var baseFiltered = [];
         var query = searchQuery ? searchQuery.toLowerCase() : "";
 
         for (var i = 0; i < allPlugins.length; i++) {
@@ -38,7 +231,7 @@ FloatingWindow {
             }
 
             if (query.length === 0) {
-                filtered.push(plugin);
+                baseFiltered.push(plugin);
                 continue;
             }
 
@@ -47,20 +240,58 @@ FloatingWindow {
             var author = plugin.author ? plugin.author.toLowerCase() : "";
 
             if (name.indexOf(query) !== -1 || description.indexOf(query) !== -1 || author.indexOf(query) !== -1)
-                filtered.push(plugin);
+                baseFiltered.push(plugin);
+        }
+
+        categoryFilterOptions = buildCategoryFilterOptions(baseFiltered);
+        if (categoryFilter !== "all") {
+            var filterStillValid = false;
+            for (var c = 0; c < categoryFilterOptions.length; c++) {
+                if (categoryFilterOptions[c].key === categoryFilter) {
+                    filterStillValid = true;
+                    break;
+                }
+            }
+            if (!filterStillValid)
+                categoryFilter = "all";
+        }
+
+        var filtered = baseFiltered.slice();
+        if (activeCategorySort && categoryFilter !== "all") {
+            filtered = filtered.filter(p => {
+                var cat = (p.category || "").toLowerCase();
+                if (!cat)
+                    cat = "_uncategorized";
+                return cat === categoryFilter;
+            });
         }
 
         filtered.sort((a, b) => {
+            if (SessionData.pluginBrowserInstalledFirst) {
+                var instA = a.installed || false;
+                var instB = b.installed || false;
+                if (instA !== instB)
+                    return instA ? -1 : 1;
+            }
+            var sortMode = normalizedSortMode(SessionData.pluginBrowserSortMode);
+            if (sortMode === "name")
+                return comparePluginName(a, b);
+            if (sortMode === "author")
+                return comparePluginAuthor(a, b);
+            if (sortMode === "category")
+                return comparePluginCategory(a, b);
             if (a.featured !== b.featured)
                 return a.featured ? -1 : 1;
             if (a.firstParty !== b.firstParty)
                 return a.firstParty ? -1 : 1;
-            return 0;
+            return comparePluginName(a, b);
         });
 
         filteredPlugins = filtered;
+        updateAvailableLetters(filtered);
         selectedIndex = -1;
         keyboardNavigationActive = false;
+        refreshListLayout();
     }
 
     function selectNext() {
@@ -355,10 +586,160 @@ FloatingWindow {
             }
 
             Item {
-                id: listArea
+                id: sortControlsRow
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.top: browserSearchField.bottom
+                anchors.topMargin: Theme.spacingM
+                height: sortControlsLayout.implicitHeight
+
+                RowLayout {
+                    id: sortControlsLayout
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    spacing: Theme.spacingS
+
+                    Repeater {
+                        model: root.sortChipOptions
+
+                        Rectangle {
+                            id: sortChip
+                            required property var modelData
+                            required property int index
+
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 32
+                            Layout.maximumHeight: 32
+                            property bool selected: root.isSortChipSelected(modelData.id, modelData.toggle)
+                            property bool hovered: chipMouseArea.containsMouse
+                            property bool pressed: chipMouseArea.pressed
+
+                            implicitWidth: chipContent.implicitWidth + Theme.spacingM * 2
+                            radius: height / 2
+                            color: selected ? Theme.primary : Theme.surfaceVariant
+
+                            Behavior on color {
+                                ColorAnimation {
+                                    duration: Theme.shortDuration
+                                    easing.type: Theme.standardEasing
+                                }
+                            }
+
+                            Rectangle {
+                                anchors.fill: parent
+                                radius: parent.radius
+                                color: {
+                                    if (pressed)
+                                        return sortChip.selected ? Theme.primaryPressed : Theme.surfaceTextHover;
+                                    if (hovered)
+                                        return sortChip.selected ? Theme.primaryHover : Theme.surfaceTextHover;
+                                    return "transparent";
+                                }
+
+                                Behavior on color {
+                                    ColorAnimation {
+                                        duration: Theme.shorterDuration
+                                        easing.type: Theme.standardEasing
+                                    }
+                                }
+                            }
+
+                            DankRipple {
+                                id: chipRipple
+                                cornerRadius: sortChip.radius
+                                rippleColor: sortChip.selected ? Theme.primaryText : Theme.surfaceVariantText
+                            }
+
+                            Row {
+                                id: chipContent
+                                anchors.centerIn: parent
+                                spacing: Theme.spacingXS
+
+                                DankIcon {
+                                    name: modelData.toggle ? "download_done" : "check"
+                                    size: 16
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    color: Theme.primaryText
+                                    visible: sortChip.selected
+                                }
+
+                                StyledText {
+                                    text: modelData.label
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    font.weight: sortChip.selected ? Font.Medium : Font.Normal
+                                    color: sortChip.selected ? Theme.primaryText : Theme.surfaceVariantText
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                            }
+
+                            MouseArea {
+                                id: chipMouseArea
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onPressed: mouse => chipRipple.trigger(mouse.x, mouse.y)
+                                onClicked: {
+                                    if (modelData.toggle) {
+                                        SessionData.setPluginBrowserInstalledFirst(!SessionData.pluginBrowserInstalledFirst);
+                                    } else {
+                                        if (modelData.id !== "category")
+                                            root.categoryFilter = "all";
+                                        SessionData.setPluginBrowserSortMode(modelData.id);
+                                    }
+                                    root.updateFilteredPlugins();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            Item {
+                id: categoryFiltersRow
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: sortControlsRow.bottom
+                anchors.topMargin: root.showCategoryFilters ? Theme.spacingS : 0
+                height: root.showCategoryFilters ? 40 : 0
+                visible: root.showCategoryFilters
+                clip: true
+
+                RowLayout {
+                    anchors.fill: parent
+                    spacing: Theme.spacingS
+
+                    StyledText {
+                        id: categoryFilterLabel
+                        text: I18n.tr("Filter", "plugin browser category filter label")
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.outline
+                        Layout.alignment: Qt.AlignVCenter
+                    }
+
+                    DankDropdown {
+                        id: categoryFilterDropdown
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 32
+                        compactMode: true
+                        dropdownWidth: Math.max(240, categoryFiltersRow.width - categoryFilterLabel.implicitWidth - Theme.spacingS * 3)
+                        currentValue: root.categoryFilterLabelForKey(root.categoryFilter)
+                        options: root.categoryFilterDropdownLabels()
+                        onValueChanged: value => {
+                            var nextKey = root.categoryFilterKeyForLabel(value);
+                            if (nextKey === root.categoryFilter)
+                                return;
+                            root.categoryFilter = nextKey;
+                            root.updateFilteredPlugins();
+                        }
+                    }
+                }
+            }
+
+            Item {
+                id: listArea
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: categoryFiltersRow.bottom
                 anchors.topMargin: Theme.spacingM
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: Theme.spacingM
@@ -367,32 +748,9 @@ FloatingWindow {
                     anchors.fill: parent
                     visible: root.isLoading
 
-                    Column {
+                    DankSpinner {
                         anchors.centerIn: parent
-                        spacing: Theme.spacingM
-
-                        DankIcon {
-                            name: "sync"
-                            size: 48
-                            color: Theme.primary
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            smoothTransform: root.isLoading
-
-                            RotationAnimator on rotation {
-                                from: 0
-                                to: -360
-                                duration: 1000
-                                loops: Animation.Infinite
-                                running: root.isLoading
-                            }
-                        }
-
-                        StyledText {
-                            text: I18n.tr("Loading...", "loading indicator")
-                            font.pixelSize: Theme.fontSizeMedium
-                            color: Theme.surfaceVariantText
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
+                        running: root.isLoading
                     }
                 }
 
@@ -401,17 +759,20 @@ FloatingWindow {
 
                     anchors.fill: parent
                     anchors.leftMargin: Theme.spacingM
-                    anchors.rightMargin: Theme.spacingM
+                    anchors.rightMargin: root.showLetterIndex ? Theme.spacingM + 18 : Theme.spacingM
                     anchors.topMargin: Theme.spacingS
                     anchors.bottomMargin: Theme.spacingS
                     spacing: Theme.spacingS
                     model: ScriptModel {
                         values: root.filteredPlugins
+                        objectProp: "id"
                     }
                     clip: true
                     visible: !root.isLoading
                     add: null
+                    remove: null
                     displaced: null
+                    move: null
 
                     ScrollBar.vertical: DankScrollbar {
                         id: browserScrollbar
@@ -570,7 +931,8 @@ FloatingWindow {
                                         return "available";
                                     }
 
-                                    width: buttonState === "incompatible" ? incompatRow.implicitWidth + Theme.spacingM * 2 : 80
+                                    implicitWidth: Math.max(80, incompatRow.implicitWidth + Theme.spacingM * 2)
+                                    width: implicitWidth
                                     height: 32
                                     radius: Theme.cornerRadius
                                     anchors.verticalCenter: parent.verticalCenter
@@ -638,6 +1000,8 @@ FloatingWindow {
                                             }
                                             font.pixelSize: Theme.fontSizeSmall
                                             font.weight: Font.Medium
+                                            elide: Text.ElideNone
+                                            wrapMode: Text.NoWrap
                                             color: {
                                                 switch (installButton.buttonState) {
                                                 case "installed":
@@ -672,13 +1036,13 @@ FloatingWindow {
                                 color: Theme.outline
                                 width: parent.width
                                 wrapMode: Text.WordWrap
-                                visible: modelData.description && modelData.description.length > 0
+                                visible: (modelData.description || "").length > 0
                             }
 
                             Flow {
                                 width: parent.width
                                 spacing: Theme.spacingXS
-                                visible: modelData.capabilities && modelData.capabilities.length > 0
+                                visible: (modelData.capabilities || []).length > 0
 
                                 Repeater {
                                     model: modelData.capabilities || []
@@ -700,6 +1064,43 @@ FloatingWindow {
                                         }
                                     }
                                 }
+                            }
+                        }
+                    }
+                }
+
+                Column {
+                    id: letterIndex
+                    anchors.right: parent.right
+                    anchors.top: pluginBrowserList.top
+                    anchors.bottom: pluginBrowserList.bottom
+                    anchors.rightMargin: Theme.spacingXS
+                    width: 16
+                    visible: root.showLetterIndex && !root.isLoading
+                    spacing: 0
+
+                    Repeater {
+                        model: root.availableLetters
+
+                        Item {
+                            required property string modelData
+                            width: letterIndex.width
+                            height: Math.max(12, letterIndex.height / Math.max(1, root.availableLetters.length))
+
+                            StyledText {
+                                anchors.centerIn: parent
+                                text: modelData
+                                font.pixelSize: 10
+                                font.weight: Font.Medium
+                                color: letterMouseArea.containsMouse ? Theme.primary : Theme.outline
+                            }
+
+                            MouseArea {
+                                id: letterMouseArea
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: root.scrollToLetter(modelData)
                             }
                         }
                     }

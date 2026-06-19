@@ -108,6 +108,9 @@ Singleton {
     }
 
     property bool clipboardEnterToPaste: false
+    property bool clipboardRememberTypeFilter: false
+    property string clipboardTypeFilter: "all"
+    property var clipboardVisibleEntryActions: ["pin", "edit", "delete"]
 
     property var launcherPluginVisibility: ({})
 
@@ -163,6 +166,8 @@ Singleton {
     property real popupTransparency: 1.0
     property real dockTransparency: 1
     property string widgetBackgroundColor: "sch"
+    property string widgetBackgroundCustomColor: "#6750A4"
+    property real widgetBackgroundCustomStrength: 0.50
     property string widgetColorMode: "default"
     property string controlCenterTileColorMode: "primary"
     property string buttonColorMode: "primary"
@@ -173,12 +178,15 @@ Singleton {
     property int hyprlandLayoutGapsOverride: -1
     property int hyprlandLayoutRadiusOverride: -1
     property int hyprlandLayoutBorderSize: -1
+    property bool hyprlandResizeOnBorder: false
     property int mangoLayoutGapsOverride: -1
     property int mangoLayoutRadiusOverride: -1
     property int mangoLayoutBorderSize: -1
+    property bool mangoTrackpadNaturalScrolling: true
 
     property int firstDayOfWeek: -1
     property bool showWeekNumber: false
+    property string calendarBackend: "auto"
     property bool use24HourClock: true
     property bool showSeconds: false
     property bool padHours12Hour: false
@@ -315,6 +323,8 @@ Singleton {
     property bool controlCenterShowBatteryIcon: false
     property bool controlCenterShowPrinterIcon: false
     property bool controlCenterShowScreenSharingIcon: true
+    property bool controlCenterShowIdleInhibitorIcon: false
+    property bool controlCenterShowDoNotDisturbIcon: false
     property bool showPrivacyButton: true
     property bool privacyShowMicIcon: false
     property bool privacyShowCameraIcon: false
@@ -370,6 +380,7 @@ Singleton {
     property bool showWorkspaceApps: false
     property bool workspaceDragReorder: true
     property bool groupWorkspaceApps: true
+    property bool groupActiveWorkspaceApps: false
     property int maxWorkspaceIcons: 3
     property int workspaceAppIconSizeOffset: 0
     property bool workspaceFollowFocus: false
@@ -378,11 +389,16 @@ Singleton {
     property bool dwlShowAllTags: false
     property bool workspaceActiveAppHighlightEnabled: false
     property string workspaceColorMode: "default"
+    property string workspaceFocusedCustomColor: "#6750A4"
     property string workspaceOccupiedColorMode: "none"
+    property string workspaceOccupiedCustomColor: "#625B71"
     property string workspaceUnfocusedColorMode: "default"
+    property string workspaceUnfocusedCustomColor: "#49454E"
     property string workspaceUrgentColorMode: "default"
+    property string workspaceUrgentCustomColor: "#B3261E"
     property bool workspaceFocusedBorderEnabled: false
     property string workspaceFocusedBorderColor: "primary"
+    property string workspaceFocusedBorderCustomColor: "#6750A4"
     property int workspaceFocusedBorderThickness: 2
     property var workspaceNameIcons: ({})
     property bool waveProgressEnabled: true
@@ -391,12 +407,17 @@ Singleton {
     property bool audioVisualizerEnabled: true
     property string audioScrollMode: "volume"
     property int audioWheelScrollAmount: 5
+    property bool audioDeviceScrollVolumeEnabled: false
     property bool clockCompactMode: false
+    property int focusedWindowSize: 1
     property bool focusedWindowCompactMode: false
     property bool runningAppsCompactMode: true
     property int barMaxVisibleApps: 0
     property int barMaxVisibleRunningApps: 0
     property bool barShowOverflowBadge: true
+    property bool trayAutoOverflow: true
+    property bool trayPopupSingleLine: true
+    property int trayMaxVisibleItems: 0
     property bool appsDockHideIndicators: false
     property bool appsDockColorizeActive: false
     property string appsDockActiveColorMode: "primary"
@@ -404,6 +425,7 @@ Singleton {
     property int appsDockEnlargePercentage: 125
     property int appsDockIconSizePercentage: 100
     property bool keyboardLayoutNameCompactMode: false
+    property bool keyboardLayoutNameShowIcon: false
     property bool runningAppsCurrentWorkspace: true
     property bool runningAppsGroupByApp: false
     property bool runningAppsCurrentMonitor: false
@@ -413,6 +435,7 @@ Singleton {
     property string lockDateFormat: ""
     property bool greeterRememberLastSession: true
     property bool greeterRememberLastUser: true
+    property bool greeterAutoLogin: false
     property bool greeterEnableFprint: false
     property bool greeterEnableU2f: false
     property string greeterWallpaperPath: ""
@@ -434,6 +457,7 @@ Singleton {
     property int appLauncherGridColumns: 4
     property bool spotlightCloseNiriOverview: true
     property bool rememberLastQuery: false
+    property bool rememberLastMode: true
     property var spotlightSectionViewModes: ({})
     onSpotlightSectionViewModesChanged: saveSettings()
     property var appDrawerSectionViewModes: ({})
@@ -447,6 +471,11 @@ Singleton {
     property bool dankLauncherV2UnloadOnClose: false
     property bool dankLauncherV2IncludeFilesInAll: false
     property bool dankLauncherV2IncludeFoldersInAll: false
+    property bool launcherUseOverlayLayer: false
+    property string launcherStyle: "full"
+    property bool spotlightBarShowModeChips: false
+    property bool keybindsFloatingWindow: false
+    onKeybindsFloatingWindowChanged: saveSettings()
 
     property string _legacyWeatherLocation: "New York, NY"
     property string _legacyWeatherCoordinates: "40.7128,-74.0060"
@@ -477,7 +506,7 @@ Singleton {
                 "hideOnTouch": false,
                 "inactiveTimeout": 0
             },
-            "dwl": {
+            "mango": {
                 "cursorHideTimeout": 0
             }
         })
@@ -503,14 +532,42 @@ Singleton {
     property bool notepadUseMonospace: true
     property string notepadFontFamily: ""
     property real notepadFontSize: 14
+    property real notificationSummaryFontSize: Spec.SPEC.notificationSummaryFontSize.def
+    property real notificationBodyFontSize: Spec.SPEC.notificationBodyFontSize.def
     property bool notepadShowLineNumbers: false
+    property bool notepadAutoSave: false
+    property string notepadSlideoutSide: "right"
+    property string notepadDefaultMode: "slideout"
     property real notepadTransparencyOverride: -1
     property real notepadLastCustomTransparency: 0.7
+    property bool notepadUseCompositorGap: false
+    property int notepadEdgeGap: 0
+
+    // Compositor layout gap when enabled and available, else the manual value.
+    readonly property int notepadEffectiveEdgeGap: {
+        if (notepadUseCompositorGap) {
+            var g = -1;
+            if (CompositorService.isNiri)
+                g = niriLayoutGapsOverride;
+            else if (CompositorService.isHyprland)
+                g = hyprlandLayoutGapsOverride;
+            else if (CompositorService.isMango)
+                g = mangoLayoutGapsOverride;
+            if (g >= 0)
+                return g;
+        }
+        return Math.max(0, notepadEdgeGap);
+    }
 
     onNotepadUseMonospaceChanged: saveSettings()
     onNotepadFontFamilyChanged: saveSettings()
     onNotepadFontSizeChanged: saveSettings()
     onNotepadShowLineNumbersChanged: saveSettings()
+    onNotepadAutoSaveChanged: saveSettings()
+    onNotepadSlideoutSideChanged: saveSettings()
+    onNotepadDefaultModeChanged: saveSettings()
+    onNotepadUseCompositorGapChanged: saveSettings()
+    onNotepadEdgeGapChanged: saveSettings()
     // onCenteringModeChanged: saveSettings()
     onNotepadTransparencyOverrideChanged: {
         if (notepadTransparencyOverride > 0) {
@@ -526,6 +583,7 @@ Singleton {
     property bool soundVolumeChanged: true
     property bool soundPluggedIn: true
     property bool soundLogin: false
+    property bool muteSoundsWhenMediaPlaying: true
 
     property int acMonitorTimeout: 0
     property int acLockTimeout: 0
@@ -541,6 +599,13 @@ Singleton {
     property int batteryPostLockMonitorTimeout: 0
     property int batteryChargeLimit: 100
     property bool lowerDisplayRefreshRateOnBattery: false
+    property bool batteryNotifyChargeLimit: false
+    property int batteryCriticalThreshold: 10
+    property bool batteryNotifyCritical: true
+    property int batteryLowThreshold: 20
+    property bool batteryNotifyLow: false
+    property int batteryNotificationType: 0
+    property bool batteryAutoPowerSaver: false
     property bool lockBeforeSuspend: false
     property bool loginctlLockIntegration: true
     property bool fadeToLockEnabled: true
@@ -604,7 +669,7 @@ Singleton {
     property bool showDock: false
     property bool dockAutoHide: false
     property bool dockSmartAutoHide: false
-    property bool dockHideOnFullscreen: true
+    property bool dockUseOverlayLayer: false
     property bool dockGroupByApp: false
     property bool dockRestoreSpecialWorkspaceOnClick: false
     property bool dockOpenOnOverview: false
@@ -684,6 +749,8 @@ Singleton {
     property int notificationTimeoutNormal: 5000
     property int notificationTimeoutCritical: 0
     property bool notificationCompactMode: false
+    property bool notificationShowTimeoutBar: false
+    property bool notificationDedupeEnabled: true
     property int notificationPopupPosition: SettingsData.Position.Top
     property int notificationAnimationSpeed: SettingsData.AnimationSpeed.Short
     property int notificationCustomAnimationDuration: 400
@@ -704,6 +771,7 @@ Singleton {
     property bool osdBrightnessEnabled: true
     property bool osdIdleInhibitorEnabled: true
     property bool osdMicMuteEnabled: true
+    property bool osdMicVolumeEnabled: true
     property bool osdCapsLockEnabled: true
     property bool osdPowerProfileEnabled: true
     property bool osdAudioOutputEnabled: true
@@ -786,6 +854,7 @@ Singleton {
             "popupGapsAuto": true,
             "popupGapsManual": 4,
             "maximizeDetection": true,
+            "useOverlayLayer": false,
             "scrollEnabled": true,
             "scrollXBehavior": "column",
             "scrollYBehavior": "workspace",
@@ -1208,8 +1277,8 @@ Singleton {
             NiriService.generateNiriLayoutConfig();
         if (CompositorService.isHyprland && typeof HyprlandService !== "undefined")
             HyprlandService.generateLayoutConfig();
-        if (CompositorService.isDwl && typeof DwlService !== "undefined")
-            DwlService.generateLayoutConfig();
+        if (CompositorService.isMango && typeof MangoService !== "undefined")
+            MangoService.generateLayoutConfig();
     }
 
     function applyStoredIconTheme() {
@@ -1327,6 +1396,15 @@ Singleton {
         });
     }
 
+    function scheduleGreeterAutoLoginSync() {
+        if (isGreeterMode)
+            return;
+        Qt.callLater(() => {
+            Processes.settingsRoot = root;
+            Processes.scheduleGreeterAutoLoginSync();
+        });
+    }
+
     readonly property var _hooks: ({
             "applyStoredTheme": applyStoredTheme,
             "regenSystemThemes": regenSystemThemes,
@@ -1334,7 +1412,8 @@ Singleton {
             "applyStoredIconTheme": applyStoredIconTheme,
             "updateBarConfigs": updateBarConfigs,
             "updateCompositorCursor": updateCompositorCursor,
-            "scheduleAuthApply": scheduleAuthApply
+            "scheduleAuthApply": scheduleAuthApply,
+            "scheduleGreeterAutoLoginSync": scheduleGreeterAutoLoginSync
         })
 
     function set(key, value) {
@@ -1622,6 +1701,15 @@ Singleton {
             "configs": anyChanged ? out : configs,
             "changed": anyChanged
         };
+    }
+
+    function effectiveBarConfigForRender(config, usesFrameBarChrome) {
+        if (!config || !connectedFrameModeActive || usesFrameBarChrome)
+            return config;
+        const backup = connectedFrameBarStyleBackups[config.id];
+        if (!backup)
+            return config;
+        return Object.assign({}, config, backup);
     }
 
     // Single entry point for connected-mode settings state.
@@ -2213,7 +2301,10 @@ Singleton {
 
     function getFilteredScreens(componentId) {
         var prefs = screenPreferences && screenPreferences[componentId] || ["all"];
-        if (prefs.includes("all") || (typeof prefs[0] === "string" && prefs[0] === "all")) {
+        if (componentId === "wallpaper" && Array.isArray(prefs) && prefs.length === 0) {
+            return [];
+        }
+        if (!prefs || prefs.length === 0 || prefs.includes("all") || (typeof prefs[0] === "string" && prefs[0] === "all")) {
             return Quickshell.screens;
         }
         var filtered = Quickshell.screens.filter(screen => isScreenInPreferences(screen, prefs));
@@ -2420,8 +2511,8 @@ Singleton {
             HyprlandService.generateCursorConfig();
             return;
         }
-        if (CompositorService.isDwl && typeof DwlService !== "undefined") {
-            DwlService.generateCursorConfig();
+        if (CompositorService.isMango && typeof MangoService !== "undefined") {
+            MangoService.generateCursorConfig();
             return;
         }
     }

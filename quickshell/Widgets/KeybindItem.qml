@@ -21,6 +21,7 @@ Item {
     property var panelWindow: null
     property bool recording: false
     property bool isNew: false
+    property bool readOnly: false
     property string restoreKey: ""
 
     property int editingKeyIndex: -1
@@ -54,6 +55,7 @@ Item {
     readonly property var configConflict: bindData.conflict || null
     readonly property bool hasConfigConflict: configConflict !== null
     readonly property string _originalKey: editingKeyIndex >= 0 && editingKeyIndex < keys.length ? keys[editingKeyIndex].key : ""
+    readonly property string _selectedDesc: editingKeyIndex >= 0 && editingKeyIndex < keys.length ? (keys[editingKeyIndex].desc || bindData.desc || "") : (bindData.desc || "")
     readonly property var _conflicts: editKey ? KeyUtils.getConflictingBinds(editKey, bindData.action, KeybindsService.getFlatBinds()) : []
     readonly property bool hasConflict: _conflicts.length > 0
 
@@ -66,12 +68,27 @@ Item {
     signal toggleExpand
     signal saveBind(string originalKey, var newData)
     signal removeBind(string key)
+    signal resetBind(string key)
     signal cancelEdit
+
+    clip: true
+
+    property bool _userToggledExpand: false
 
     implicitHeight: contentColumn.implicitHeight
     height: implicitHeight
 
-    Component.onDestruction: _destroyShortcutInhibitor()
+    Behavior on implicitHeight {
+        enabled: root._userToggledExpand
+        NumberAnimation {
+            duration: Theme.shortDuration
+            easing.type: Theme.standardEasing
+            onRunningChanged: {
+                if (!running)
+                    root._userToggledExpand = false;
+            }
+        }
+    }
 
     Component.onCompleted: {
         if (isNew && isExpanded)
@@ -79,6 +96,7 @@ Item {
     }
 
     onIsExpandedChanged: {
+        _userToggledExpand = true;
         if (!isExpanded)
             return;
         if (restoreKey) {
@@ -100,7 +118,7 @@ Item {
                 editingKeyIndex = i;
                 editKey = keyToFind;
                 editAction = bindData.action || "";
-                editDesc = bindData.desc || "";
+                editDesc = keys[i].desc || bindData.desc || "";
                 if (_savedCooldownMs >= 0) {
                     editCooldownMs = _savedCooldownMs;
                     _savedCooldownMs = -1;
@@ -149,7 +167,7 @@ Item {
         editingKeyIndex = keys.length > 0 ? 0 : -1;
         editKey = editingKeyIndex >= 0 ? keys[editingKeyIndex].key : "";
         editAction = bindData.action || "";
-        editDesc = bindData.desc || "";
+        editDesc = editingKeyIndex >= 0 ? (keys[editingKeyIndex].desc || bindData.desc || "") : (bindData.desc || "");
         editCooldownMs = editingKeyIndex >= 0 ? (keys[editingKeyIndex].cooldownMs || 0) : 0;
         editFlags = editingKeyIndex >= 0 ? (keys[editingKeyIndex].flags || "") : "";
         editAllowWhenLocked = editingKeyIndex >= 0 ? (keys[editingKeyIndex].allowWhenLocked || false) : false;
@@ -161,6 +179,10 @@ Item {
     }
 
     function startAddingNewKey() {
+        if (readOnly) {
+            KeybindsService.showHyprlandReadOnlyWarning();
+            return;
+        }
         addingNewKey = true;
         editingKeyIndex = -1;
         editKey = "";
@@ -173,6 +195,7 @@ Item {
         addingNewKey = false;
         editingKeyIndex = index;
         editKey = keys[index].key;
+        editDesc = keys[index].desc || bindData.desc || "";
         editCooldownMs = keys[index].cooldownMs || 0;
         editFlags = keys[index].flags || "";
         editAllowWhenLocked = keys[index].allowWhenLocked || false;
@@ -182,6 +205,8 @@ Item {
     }
 
     function updateEdit(changes) {
+        if (readOnly)
+            return;
         if (changes.key !== undefined)
             editKey = changes.key;
         if (changes.action !== undefined)
@@ -200,15 +225,18 @@ Item {
             editAllowInhibiting = changes.allowInhibiting;
         const hasKey = editingKeyIndex >= 0 && editingKeyIndex < keys.length;
         const origKey = hasKey ? keys[editingKeyIndex].key : "";
+        const origDesc = hasKey ? (keys[editingKeyIndex].desc || bindData.desc || "") : (bindData.desc || "");
         const origCooldown = hasKey ? (keys[editingKeyIndex].cooldownMs || 0) : 0;
         const origFlags = hasKey ? (keys[editingKeyIndex].flags || "") : "";
         const origAllowWhenLocked = hasKey ? (keys[editingKeyIndex].allowWhenLocked || false) : false;
         const origRepeat = hasKey ? keys[editingKeyIndex].repeat : undefined;
         const origAllowInhibiting = hasKey ? keys[editingKeyIndex].allowInhibiting : undefined;
-        hasChanges = editKey !== origKey || editAction !== (bindData.action || "") || editDesc !== (bindData.desc || "") || editCooldownMs !== origCooldown || editFlags !== origFlags || editAllowWhenLocked !== origAllowWhenLocked || editRepeat !== origRepeat || editAllowInhibiting !== origAllowInhibiting;
+        hasChanges = editKey !== origKey || editAction !== (bindData.action || "") || editDesc !== origDesc || editCooldownMs !== origCooldown || editFlags !== origFlags || editAllowWhenLocked !== origAllowWhenLocked || editRepeat !== origRepeat || editAllowInhibiting !== origAllowInhibiting;
     }
 
     function canSave() {
+        if (readOnly)
+            return false;
         if (!editKey)
             return false;
         if (!Actions.isValidAction(editAction))
@@ -217,6 +245,10 @@ Item {
     }
 
     function doSave() {
+        if (readOnly) {
+            KeybindsService.showHyprlandReadOnlyWarning();
+            return;
+        }
         if (!canSave())
             return;
         const origKey = addingNewKey ? "" : _originalKey;
@@ -248,6 +280,10 @@ Item {
     }
 
     function startRecording() {
+        if (readOnly) {
+            KeybindsService.showHyprlandReadOnlyWarning();
+            return;
+        }
         recording = true;
     }
 
@@ -337,7 +373,7 @@ Item {
                     spacing: 2
 
                     StyledText {
-                        text: root.bindData.desc || root.bindData.action || I18n.tr("No action")
+                        text: root.isExpanded ? (root._selectedDesc || root.bindData.action || I18n.tr("No action")) : (root.bindData.desc || root.bindData.action || I18n.tr("No action"))
                         font.pixelSize: Theme.fontSizeMedium
                         color: Theme.surfaceText
                         elide: Text.ElideRight
@@ -412,7 +448,7 @@ Item {
             width: parent.width
             active: root.isExpanded
             visible: status === Loader.Ready
-            asynchronous: true
+            asynchronous: false
             sourceComponent: expandedComponent
         }
     }
@@ -439,6 +475,7 @@ Item {
                 anchors.top: parent.top
                 anchors.margins: Theme.spacingL
                 spacing: Theme.spacingM
+                enabled: !root.readOnly
 
                 Rectangle {
                     Layout.fillWidth: true
@@ -555,7 +592,7 @@ Item {
                             height: root._chipHeight
                             radius: root._chipHeight / 4
                             color: root.addingNewKey ? Theme.primary : Theme.surfaceVariant
-                            visible: !root.isNew
+                            visible: !root.isNew && !root.readOnly
 
                             Rectangle {
                                 anchors.fill: parent
@@ -645,6 +682,7 @@ Item {
                                     iconName: root.recording ? "close" : "radio_button_checked"
                                     iconSize: Theme.iconSizeSmall
                                     iconColor: root.recording ? Theme.error : Theme.primary
+                                    enabled: !root.readOnly
                                     onClicked: root.recording ? root.stopRecording() : root.startRecording()
                                 }
                             }
@@ -660,6 +698,12 @@ Item {
                             case Qt.Key_Shift:
                             case Qt.Key_Alt:
                             case Qt.Key_Meta:
+                            // Lock keys are toggles, not useful bind targets; ignore
+                            // them so toggling NumLock to pick the numpad keysym
+                            // (KP_7 vs KP_Home) doesn't get captured as the bind.
+                            case Qt.Key_NumLock:
+                            case Qt.Key_CapsLock:
+                            case Qt.Key_ScrollLock:
                                 return;
                             }
 
@@ -682,7 +726,7 @@ Item {
                                     mods.push("Shift");
                             }
 
-                            const key = KeyUtils.xkbKeyFromQtKey(qtKey);
+                            const key = KeyUtils.xkbKeyFromQtKey(qtKey, !!(event.modifiers & Qt.KeypadModifier));
                             if (!key) {
                                 log.warn("Unknown key:", event.key, "mods:", event.modifiers);
                                 return;
@@ -747,7 +791,7 @@ Item {
                         Layout.preferredHeight: root._inputHeight
                         radius: Theme.cornerRadius
                         color: root.addingNewKey ? Theme.primary : Theme.surfaceVariant
-                        visible: root.keys.length === 1 && !root.isNew
+                        visible: root.keys.length === 1 && !root.isNew && !root.readOnly
 
                         Rectangle {
                             anchors.fill: parent
@@ -831,9 +875,12 @@ Item {
                                 color: root._actionType === modelData.id ? Theme.surfaceContainerHighest : Theme.surfaceContainer
                                 border.color: root._actionType === modelData.id ? Theme.outline : (typeArea.containsMouse ? Theme.outlineVariant : "transparent")
                                 border.width: 1
+                                clip: true
 
                                 RowLayout {
-                                    anchors.centerIn: parent
+                                    anchors.fill: parent
+                                    anchors.leftMargin: Theme.spacingS
+                                    anchors.rightMargin: Theme.spacingS
                                     spacing: Theme.spacingXS
 
                                     DankIcon {
@@ -843,10 +890,13 @@ Item {
                                     }
 
                                     StyledText {
+                                        Layout.fillWidth: true
                                         text: typeDelegate.modelData.label
                                         font.pixelSize: Theme.fontSizeSmall
                                         color: root._actionType === typeDelegate.modelData.id ? Theme.surfaceText : Theme.surfaceVariantText
                                         visible: typeDelegate.width > 100
+                                        elide: Text.ElideRight
+                                        horizontalAlignment: Text.AlignHCenter
                                     }
                                 }
 
@@ -856,6 +906,8 @@ Item {
                                     hoverEnabled: true
                                     cursorShape: Qt.PointingHandCursor
                                     onClicked: {
+                                        if (root.readOnly)
+                                            return;
                                         switch (typeDelegate.modelData.id) {
                                         case "dms":
                                             root.updateEdit({
@@ -921,12 +973,14 @@ Item {
                         enableFuzzySearch: true
                         maxPopupHeight: 300
                         onValueChanged: value => {
+                            if (root.readOnly)
+                                return;
                             const actions = KeybindsService.getDmsActions();
                             for (const act of actions) {
                                 if (act.label === value) {
                                     root.updateEdit({
                                         "action": act.id,
-                                        "desc": act.label
+                                        "desc": KeybindsService.getActionLabel(act.id)
                                     });
                                     return;
                                 }
@@ -981,11 +1035,16 @@ Item {
                         onEditingFinished: {
                             if (!dmsArgsRow.parsedArgs)
                                 return;
+                            const oldAction = root.editAction;
                             const newArgs = Object.assign({}, dmsArgsRow.parsedArgs.args);
                             newArgs.amount = text || "5";
-                            root.updateEdit({
-                                "action": Actions.buildDmsAction(dmsArgsRow.parsedArgs.base, newArgs)
-                            });
+                            const newAction = Actions.buildDmsAction(dmsArgsRow.parsedArgs.base, newArgs);
+                            const changes = {
+                                "action": newAction
+                            };
+                            if (root.editDesc === "" || root.editDesc === KeybindsService.getActionLabel(oldAction))
+                                changes.desc = KeybindsService.getActionLabel(newAction);
+                            root.updateEdit(changes);
                         }
                     }
 
@@ -1171,8 +1230,12 @@ Item {
                             id: customToggleArea
                             anchors.fill: parent
                             hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: root.useCustomCompositor = true
+                            cursorShape: root.readOnly ? Qt.ArrowCursor : Qt.PointingHandCursor
+                            onClicked: {
+                                if (root.readOnly)
+                                    return;
+                                root.useCustomCompositor = true;
+                            }
                         }
                     }
                 }
@@ -1214,6 +1277,18 @@ Item {
                             }
                             placeholderText: optionsRow.argConfig?.config?.args[0]?.placeholder || ""
 
+                            function commitValue(textValue) {
+                                const cfg = optionsRow.argConfig;
+                                if (!cfg)
+                                    return;
+                                const parsed = optionsRow.parsedArgs;
+                                const args = Object.assign({}, parsed?.args || {});
+                                args[_argName] = textValue;
+                                root.updateEdit({
+                                    "action": Actions.buildCompositorAction(KeybindsService.currentProvider, parsed?.base || cfg.base, args)
+                                });
+                            }
+
                             Connections {
                                 target: optionsRow
                                 function onParsedArgsChanged() {
@@ -1228,17 +1303,7 @@ Item {
                                 text = optionsRow.parsedArgs?.args[_argName] || "";
                             }
 
-                            onEditingFinished: {
-                                const cfg = optionsRow.argConfig;
-                                if (!cfg)
-                                    return;
-                                const parsed = optionsRow.parsedArgs;
-                                const args = Object.assign({}, parsed?.args || {});
-                                args[_argName] = text;
-                                root.updateEdit({
-                                    "action": Actions.buildCompositorAction(KeybindsService.currentProvider, parsed?.base || cfg.base, args)
-                                });
-                            }
+                            onTextChanged: commitValue(text)
                         }
 
                         RowLayout {
@@ -1379,7 +1444,7 @@ Item {
                         id: customCompositorField
                         Layout.fillWidth: true
                         Layout.preferredHeight: root._inputHeight
-                        placeholderText: I18n.tr("e.g., focus-workspace 3, resize-column -10")
+                        placeholderText: KeybindsService.currentProvider === "hyprland" ? I18n.tr("e.g., hl.dsp.focus({ workspace = \"3\" })") : I18n.tr("e.g., focus-workspace 3, resize-column -10")
                         text: root._actionType === "compositor" ? root.editAction : ""
                         onTextChanged: {
                             if (root._actionType !== "compositor")
@@ -1413,8 +1478,10 @@ Item {
                             id: presetToggleArea
                             anchors.fill: parent
                             hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
+                            cursorShape: root.readOnly ? Qt.ArrowCursor : Qt.PointingHandCursor
                             onClicked: {
+                                if (root.readOnly)
+                                    return;
                                 root.useCustomCompositor = false;
                                 root.updateEdit({
                                     "action": "close-window",
@@ -1763,8 +1830,17 @@ Item {
                         iconName: "delete"
                         iconSize: Theme.iconSize - 4
                         iconColor: Theme.error
-                        visible: root.editingKeyIndex >= 0 && root.editingKeyIndex < root.keys.length && root.keys[root.editingKeyIndex].isOverride && !root.isNew
+                        visible: root.editingKeyIndex >= 0 && root.editingKeyIndex < root.keys.length && (root.keys[root.editingKeyIndex].isDMSManaged || root.keys[root.editingKeyIndex].isOverride) && !root.isNew && !root.readOnly
                         onClicked: root.removeBind(root._originalKey)
+                    }
+
+                    DankButton {
+                        text: I18n.tr("Reset to default")
+                        buttonHeight: root._buttonHeight
+                        backgroundColor: Theme.surfaceContainer
+                        textColor: Theme.primary
+                        visible: root.editingKeyIndex >= 0 && root.editingKeyIndex < root.keys.length && root.keys[root.editingKeyIndex].isOverride === true && root.keys[root.editingKeyIndex].hasDefault === true && !root.isNew && !root.readOnly
+                        onClicked: root.resetBind(root._originalKey)
                     }
 
                     Item {
@@ -1772,7 +1848,7 @@ Item {
                     }
 
                     StyledText {
-                        text: !root.canSave() ? I18n.tr("Set key and action to save") : (root.hasChanges ? I18n.tr("Unsaved changes") : I18n.tr("No changes"))
+                        text: root.readOnly ? I18n.tr("Read-only legacy config") : (!root.canSave() ? I18n.tr("Set key and action to save") : (root.hasChanges ? I18n.tr("Unsaved changes") : I18n.tr("No changes")))
                         font.pixelSize: Theme.fontSizeSmall
                         color: root.hasChanges ? Theme.surfaceText : Theme.surfaceVariantText
                         visible: !root.isNew

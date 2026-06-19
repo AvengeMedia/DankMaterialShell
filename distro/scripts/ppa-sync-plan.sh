@@ -5,7 +5,7 @@ set -euo pipefail
 
 PPA_OWNER="avengemedia"
 LAUNCHPAD_API="https://api.launchpad.net/1.0"
-SERIES_LIST=(questing resolute)
+SERIES_LIST=(resolute stonking)
 PACKAGE_FILTER="dms-git"
 REBUILD_RELEASE=""
 JSON=false
@@ -72,12 +72,12 @@ embedded_commit() {
 target_ppa() {
     local series="$1"
     if [[ -n "$REBUILD_RELEASE" ]]; then
-        if [[ "$series" == "resolute" ]]; then
+        if [[ "$series" == "stonking" ]]; then
             echo $((REBUILD_RELEASE + 1))
         else
             echo "$REBUILD_RELEASE"
         fi
-    elif [[ "$series" == "resolute" ]]; then
+    elif [[ "$series" == "stonking" ]]; then
         echo "2"
     else
         echo "1"

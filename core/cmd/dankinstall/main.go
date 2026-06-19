@@ -42,7 +42,7 @@ configure passwordless sudo for your user.`,
 }
 
 func init() {
-	rootCmd.Flags().StringVarP(&compositor, "compositor", "c", "", "Compositor/WM to install: niri or hyprland (enables headless mode)")
+	rootCmd.Flags().StringVarP(&compositor, "compositor", "c", "", "Compositor/WM to install: niri, hyprland, or mango (enables headless mode)")
 	rootCmd.Flags().StringVarP(&term, "term", "t", "", "Terminal emulator to install: ghostty, kitty, or alacritty (enables headless mode)")
 	rootCmd.Flags().StringSliceVar(&includeDeps, "include-deps", []string{}, "Optional deps to enable (e.g. dms-greeter)")
 	rootCmd.Flags().StringSliceVar(&excludeDeps, "exclude-deps", []string{}, "Deps to skip during installation")
@@ -95,7 +95,7 @@ func runDankinstall(cmd *cobra.Command, args []string) error {
 func runHeadless() error {
 	// Validate required flags
 	if compositor == "" {
-		return fmt.Errorf("--compositor is required for headless mode (niri or hyprland)")
+		return fmt.Errorf("--compositor is required for headless mode (niri, hyprland, or mango)")
 	}
 	if term == "" {
 		return fmt.Errorf("--term is required for headless mode (ghostty, kitty, or alacritty)")

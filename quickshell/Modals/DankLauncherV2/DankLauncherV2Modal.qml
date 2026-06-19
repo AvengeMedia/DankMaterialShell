@@ -23,6 +23,7 @@ Item {
     readonly property bool frameOwnsConnectedChrome: impl.item ? (impl.item.frameOwnsConnectedChrome ?? false) : false
     readonly property string resolvedConnectedBarSide: impl.item ? (impl.item.resolvedConnectedBarSide ?? "") : ""
     readonly property bool launcherArcExtenderActive: impl.item ? (impl.item.launcherArcExtenderActive ?? false) : false
+    property bool triggerUsesOverlayLayer: false
 
     signal dialogClosed
 
@@ -61,7 +62,8 @@ Item {
             impl.item.toggleWithMode(mode);
     }
 
-    readonly property var _desiredBackend: SettingsData.connectedFrameModeActive ? connectedComp : standaloneComp
+    readonly property bool useSpotlightBackend: !SettingsData.connectedFrameModeActive && SettingsData.launcherStyle === "spotlight"
+    readonly property var _desiredBackend: useSpotlightBackend ? spotlightComp : (SettingsData.connectedFrameModeActive ? connectedComp : standaloneComp)
     property var _resolvedBackend: null
 
     Component.onCompleted: _resolvedBackend = _desiredBackend
@@ -69,6 +71,9 @@ Item {
     Connections {
         target: SettingsData
         function onConnectedFrameModeActiveChanged() {
+            root._maybeResolveBackend();
+        }
+        function onLauncherStyleChanged() {
             root._maybeResolveBackend();
         }
     }
@@ -100,10 +105,16 @@ Item {
         DankLauncherV2ModalConnected {}
     }
 
+    Component {
+        id: spotlightComp
+        DankLauncherV2ModalSpotlight {}
+    }
+
     function _wireBackend(it) {
         if (!it)
             return;
         it.modalHandle = root;
+        it.triggerUsesOverlayLayer = Qt.binding(() => root.triggerUsesOverlayLayer);
     }
 
     Connections {

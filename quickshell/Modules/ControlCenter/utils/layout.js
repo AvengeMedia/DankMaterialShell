@@ -1,3 +1,71 @@
+function spanWidthFor(baseWidth, widgetWidth, spacing) {
+    const w = widgetWidth || 50
+    if (w <= 25)
+        return (baseWidth - spacing * 3) / 4
+    if (w <= 50)
+        return (baseWidth - spacing) / 2
+    if (w <= 75)
+        return (baseWidth - spacing * 2) * 0.75
+    return baseWidth
+}
+
+function isSliderWidget(id) {
+    return id === "volumeSlider" || id === "brightnessSlider" || id === "inputVolumeSlider"
+}
+
+function computeSlots(widgets, order, baseWidth, spacing, rowSpacing, sliderHeight, normalHeight) {
+    const slots = []
+    let x = 0
+    let y = 0
+    let rowRight = 0
+    let rowMaxH = 0
+    let countInRow = 0
+
+    for (let p = 0; p < order.length; p++) {
+        const sourceIndex = order[p]
+        const widget = widgets[sourceIndex]
+        if (!widget)
+            continue
+
+        const itemW = spanWidthFor(baseWidth, widget.width, spacing)
+        const itemH = isSliderWidget(widget.id || "") ? sliderHeight : normalHeight
+
+        if (countInRow > 0 && (rowRight + spacing + itemW > baseWidth + 0.5)) {
+            y += rowMaxH + rowSpacing
+            rowRight = 0
+            rowMaxH = 0
+            countInRow = 0
+        }
+
+        x = countInRow === 0 ? 0 : rowRight + spacing
+        slots[sourceIndex] = {
+            "x": x,
+            "y": y,
+            "w": itemW,
+            "h": itemH
+        }
+        rowRight = x + itemW
+        rowMaxH = Math.max(rowMaxH, itemH)
+        countInRow++
+    }
+
+    return {
+        "slots": slots,
+        "totalHeight": y + rowMaxH
+    }
+}
+
+function slotContainingPoint(slots, order, px, py) {
+    for (let p = 0; p < order.length; p++) {
+        const s = slots[order[p]]
+        if (!s)
+            continue
+        if (px >= s.x && px < s.x + s.w && py >= s.y && py < s.y + s.h)
+            return p
+    }
+    return -1
+}
+
 function calculateRowsAndWidgets(controlCenterColumn, expandedSection, expandedWidgetIndex) {
     var rows = []
     var currentRow = []

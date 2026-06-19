@@ -11,6 +11,7 @@ BasePill {
 
     property var widgetData: null
     property bool compactMode: widgetData?.keyboardLayoutNameCompactMode !== undefined ? widgetData.keyboardLayoutNameCompactMode : SettingsData.keyboardLayoutNameCompactMode
+    property bool showIcon: widgetData?.keyboardLayoutNameShowIcon !== undefined ? widgetData.keyboardLayoutNameShowIcon : SettingsData.keyboardLayoutNameShowIcon
     readonly property var langCodes: ({
             "afrikaans": "af",
             "albanian": "sq",
@@ -111,8 +112,8 @@ BasePill {
     property string currentLayout: {
         if (CompositorService.isNiri) {
             return NiriService.getCurrentKeyboardLayoutName();
-        } else if (CompositorService.isDwl) {
-            return DwlService.currentKeyboardLayout;
+        } else if (CompositorService.isMango) {
+            return MangoService.currentKeyboardLayout;
         }
         return "";
     }
@@ -134,6 +135,7 @@ BasePill {
                     size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                     color: Theme.widgetTextColor
                     anchors.horizontalCenter: parent.horizontalCenter
+                    visible: root.showIcon
                 }
 
                 StyledText {
@@ -155,6 +157,14 @@ BasePill {
                 visible: !root.isVerticalOrientation
                 anchors.centerIn: parent
                 spacing: Theme.spacingS
+
+                DankIcon {
+                    name: "keyboard"
+                    size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                    color: Theme.widgetTextColor
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: root.showIcon
+                }
 
                 StyledText {
                     text: {
@@ -197,8 +207,8 @@ BasePill {
                 NiriService.cycleKeyboardLayout();
             } else if (CompositorService.isHyprland) {
                 Quickshell.execDetached(["hyprctl", "switchxkblayout", root.hyprlandKeyboard, "next"]);
-            } else if (CompositorService.isDwl) {
-                Quickshell.execDetached(["mmsg", "-d", "switch_keyboard_layout"]);
+            } else if (CompositorService.isMango) {
+                MangoService.cycleKeyboardLayout();
             }
         }
     }

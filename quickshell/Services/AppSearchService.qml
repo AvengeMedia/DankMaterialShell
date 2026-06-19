@@ -9,6 +9,7 @@ import qs.Services
 Singleton {
     id: root
     readonly property var log: Log.scoped("AppSearchService")
+    property int refCount: 0
 
     property var applications: []
     property var _cachedCategories: null
@@ -211,11 +212,21 @@ Singleton {
             },
             "dms_settings_search": {
                 id: "dms_settings_search",
-                name: I18n.tr("Settings", "settings window title"),
+                name: I18n.tr("Settings Search"),
                 cornerIcon: "search",
-                comment: "DMS",
+                comment: I18n.tr("DMS Settings"),
                 defaultTrigger: "?",
                 isLauncher: true
+            },
+            "dms_clipboard_search": {
+                id: "dms_clipboard_search",
+                name: I18n.tr("Clipboard"),
+                cornerIcon: "content_paste",
+                comment: "DMS",
+                defaultTrigger: "cb",
+                isLauncher: true,
+                viewMode: "list",
+                viewModeEnforced: true
             }
         })
 
@@ -285,20 +296,33 @@ Singleton {
     }
 
     function getBuiltInLauncherItems(pluginId, query) {
+        if (pluginId === "dms_clipboard_search") {
+            const trimmed = (query || "").toString().trim();
+            const entries = ClipboardService.internalEntries.length > 0 ? ClipboardService.getLauncherEntries(trimmed, 20, 0) : ClipboardService.getCachedLauncherSearchEntries(trimmed, 20);
+            return entries.map(entry => ({
+                        type: "clipboard",
+                        data: entry
+                    }));
+        }
+
         if (pluginId !== "dms_settings_search")
             return [];
 
-        SettingsSearchService.search(query);
-        const results = SettingsSearchService.results;
+        const results = SettingsSearchService.searchForLauncher(query);
         const items = [];
         for (let i = 0; i < results.length; i++) {
             const r = results[i];
             items.push({
                 name: r.label,
+                type: "setting",
+                section: "settings",
                 icon: "material:" + r.icon,
-                comment: r.category,
+                comment: r.description || r.category,
                 action: "settings_nav:" + r.tabIndex + ":" + r.section,
                 categories: ["Settings"],
+                keywords: r.keywords || [],
+                source: I18n.tr("Settings", "settings window title"),
+                badgeLabel: I18n.tr("Setting"),
                 isCore: true,
                 isBuiltInLauncher: true,
                 builtInPluginId: pluginId

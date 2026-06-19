@@ -19,7 +19,12 @@ var (
 var colorCmd = &cobra.Command{
 	Use:   "color",
 	Short: "Color utilities",
-	Long:  "Color utilities including picking colors from the screen",
+	Long: `Color utilities including picking colors from the screen.
+
+This is the screen eyedropper CLI. To open the in-shell color modal, use:
+  dms ipc call color-picker toggle
+
+See: https://danklinux.com/docs/dankmaterialshell/keybinds-ipc`,
 }
 
 var colorPickCmd = &cobra.Command{
@@ -28,6 +33,9 @@ var colorPickCmd = &cobra.Command{
 	Long: `Pick a color from anywhere on your screen using an interactive color picker.
 
 Click on any pixel to capture its color, or press Escape to cancel.
+
+This is the screen eyedropper CLI. To open the in-shell color modal, use:
+  dms ipc call color-picker toggle
 
 Output format flags (mutually exclusive, default: --hex):
   --hex  - Hexadecimal (#RRGGBB)

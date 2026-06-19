@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import qs.Common
+import qs.Modals.Common
 import qs.Services
 import qs.Widgets
 
@@ -15,6 +16,7 @@ Item {
     property var parentModal: null
     property string selectedCategory: ""
     property string searchQuery: ""
+    property string requestedSearchQuery: ""
     property string expandedKey: ""
     property bool showingNewBind: false
 
@@ -82,6 +84,10 @@ Item {
     }
 
     function startNewBind() {
+        if (KeybindsService.readOnly) {
+            KeybindsService.showHyprlandReadOnlyWarning();
+            return;
+        }
         showingNewBind = true;
         expandedKey = "";
     }
@@ -94,6 +100,32 @@ Item {
         KeybindsService.saveBind("", bindData);
         _editingKey = bindData.key;
         expandedKey = bindData.action;
+    }
+
+    function confirmRemoveBind(key, remainingKey) {
+        removeBindConfirm.showWithOptions({
+            title: I18n.tr("Remove Shortcut?"),
+            message: KeybindsService.currentProvider === "hyprland" ? I18n.tr("Remove the shortcut %1? An unbind entry will be saved to dms/binds-user.lua so it stays removed across DMS updates.").arg(key) : I18n.tr("Remove the shortcut %1?").arg(key),
+            confirmText: I18n.tr("Remove"),
+            confirmColor: Theme.primary,
+            onConfirm: () => {
+                KeybindsService.removeBind(key);
+                keybindsTab._editingKey = remainingKey;
+            }
+        });
+    }
+
+    function confirmResetBind(key, remainingKey) {
+        removeBindConfirm.showWithOptions({
+            title: I18n.tr("Reset to Default?"),
+            message: I18n.tr("Drop your override for %1 so the DMS default action re-applies?").arg(key),
+            confirmText: I18n.tr("Reset"),
+            confirmColor: Theme.primary,
+            onConfirm: () => {
+                KeybindsService.resetBind(key);
+                keybindsTab._editingKey = remainingKey;
+            }
+        });
     }
 
     function _onSaveSuccess() {
@@ -127,6 +159,10 @@ Item {
         id: searchDebounce
         interval: 150
         onTriggered: keybindsTab._updateFiltered()
+    }
+
+    ConfirmModal {
+        id: removeBindConfirm
     }
 
     Connections {
@@ -175,13 +211,34 @@ Item {
         }
     }
 
-    Component.onCompleted: _ensureCurrentProvider()
+    function _applyRequestedSearch() {
+        if (!requestedSearchQuery)
+            return;
+        const query = requestedSearchQuery;
+        selectedCategory = "";
+        searchField.text = query;
+        searchQuery = query;
+        _updateFiltered();
+        if (parentModal?.keybindSearchQuery === query)
+            parentModal.keybindSearchQuery = "";
+        Qt.callLater(scrollToTop);
+    }
+
+    Component.onCompleted: {
+        _ensureCurrentProvider();
+        Qt.callLater(_applyRequestedSearch);
+    }
+
+    onRequestedSearchQueryChanged: Qt.callLater(_applyRequestedSearch)
 
     onVisibleChanged: {
         if (!visible)
             return;
-        Qt.callLater(scrollToTop);
         _ensureCurrentProvider();
+        Qt.callLater(() => {
+            _applyRequestedSearch();
+            scrollToTop();
+        });
     }
 
     DankFlickable {
@@ -238,8 +295,8 @@ Item {
                             }
 
                             StyledText {
-                                readonly property string bindsFile: KeybindsService.currentProvider === "niri" ? "dms/binds.kdl" : "dms/binds.conf"
-                                text: I18n.tr("Click any shortcut to edit. Changes save to %1").arg(bindsFile)
+                                readonly property string bindsFile: KeybindsService.currentProvider === "niri" ? "dms/binds.kdl" : KeybindsService.currentProvider === "hyprland" ? "dms/binds-user.lua" : "dms/binds.conf"
+                                text: KeybindsService.readOnly ? I18n.tr("Hyprland conf mode is read-only in Settings") : I18n.tr("Click any shortcut to edit. Changes save to %1").arg(bindsFile)
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText
                                 wrapMode: Text.WordWrap
@@ -273,7 +330,7 @@ Item {
                             iconSize: Theme.iconSize
                             iconColor: Theme.primary
                             anchors.verticalCenter: parent.verticalCenter
-                            enabled: !keybindsTab.showingNewBind
+                            enabled: !keybindsTab.showingNewBind && !KeybindsService.readOnly
                             opacity: enabled ? 1 : 0.5
                             onClicked: keybindsTab.startNewBind()
                         }
@@ -289,14 +346,15 @@ Item {
                 radius: Theme.cornerRadius
 
                 readonly property var status: KeybindsService.dmsStatus
-                readonly property bool showError: !status.included && status.exists
-                readonly property bool showWarning: status.included && status.overriddenBy > 0
-                readonly property bool showSetup: !status.exists
+                readonly property bool showLegacy: KeybindsService.readOnly
+                readonly property bool showError: !showLegacy && !status.included && status.exists
+                readonly property bool showWarning: !showLegacy && status.included && status.overriddenBy > 0
+                readonly property bool showSetup: !showLegacy && !status.exists
 
-                color: (showError || showWarning || showSetup) ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
-                border.color: (showError || showWarning || showSetup) ? Theme.withAlpha(Theme.primary, 0.3) : "transparent"
+                color: (showLegacy || showError || showWarning || showSetup) ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+                border.color: (showLegacy || showError || showWarning || showSetup) ? Theme.withAlpha(Theme.primary, 0.3) : "transparent"
                 border.width: 1
-                visible: (showError || showWarning || showSetup) && !KeybindsService.loading
+                visible: (showLegacy || showError || showWarning || showSetup) && !KeybindsService.loading
 
                 Column {
                     id: warningSection
@@ -322,6 +380,8 @@ Item {
 
                             StyledText {
                                 text: {
+                                    if (warningBox.showLegacy)
+                                        return I18n.tr("Hyprland conf mode");
                                     if (warningBox.showSetup)
                                         return I18n.tr("First Time Setup");
                                     if (warningBox.showError)
@@ -336,8 +396,10 @@ Item {
                             }
 
                             StyledText {
-                                readonly property string bindsFile: KeybindsService.currentProvider === "niri" ? "dms/binds.kdl" : "dms/binds.conf"
+                                readonly property string bindsFile: KeybindsService.currentProvider === "niri" ? "dms/binds.kdl" : KeybindsService.currentProvider === "hyprland" ? "dms/binds-user.lua" : "dms/binds.conf"
                                 text: {
+                                    if (warningBox.showLegacy)
+                                        return I18n.tr("This install is still using hyprland.conf. Run dms setup to migrate before editing shortcuts in Settings.");
                                     if (warningBox.showSetup)
                                         return I18n.tr("Click 'Setup' to create %1 and add include to config.").arg(bindsFile);
                                     if (warningBox.showError)
@@ -358,7 +420,7 @@ Item {
 
                         DankButton {
                             id: fixButton
-                            visible: warningBox.showError || warningBox.showSetup
+                            visible: !warningBox.showLegacy && (warningBox.showError || warningBox.showSetup)
                             text: {
                                 if (KeybindsService.fixing)
                                     return I18n.tr("Fixing...");
@@ -506,6 +568,7 @@ Item {
                                 desc: ""
                             })
                         panelWindow: keybindsTab.parentModal
+                        readOnly: KeybindsService.readOnly
                         onSaveBind: (originalKey, newData) => keybindsTab.saveNewBind(newData)
                         onCancelEdit: keybindsTab.cancelNewBind()
                     }
@@ -615,6 +678,7 @@ Item {
                             bindData: modelData
                             isExpanded: keybindsTab.expandedKey === modelData.action
                             panelWindow: keybindsTab.parentModal
+                            readOnly: KeybindsService.readOnly
                             onToggleExpand: keybindsTab.toggleExpanded(modelData.action)
                             onSaveBind: (originalKey, newData) => {
                                 KeybindsService.saveBind(originalKey, newData);
@@ -623,8 +687,11 @@ Item {
                             }
                             onRemoveBind: key => {
                                 const remainingKey = bindItem.keys.find(k => k.key !== key)?.key ?? "";
-                                KeybindsService.removeBind(key);
-                                keybindsTab._editingKey = remainingKey;
+                                keybindsTab.confirmRemoveBind(key, remainingKey);
+                            }
+                            onResetBind: key => {
+                                const remainingKey = bindItem.keys.find(k => k.key !== key)?.key ?? "";
+                                keybindsTab.confirmResetBind(key, remainingKey);
                             }
                             onIsExpandedChanged: {
                                 if (!isExpanded || !keybindsTab._editingKey)

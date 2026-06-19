@@ -40,6 +40,18 @@ override_dh_auto_install:
 	install -Dm644 DankMaterialShell-$(BASE_VERSION)/LICENSE \
 		debian/dms-greeter/usr/share/doc/dms-greeter/LICENSE
 
+	# Install systemd tmpfiles/sysusers fragments only when present in the fetched source.
+	# sysusers-dms-greeter.conf landed upstream after v1.4.6; guarding both lets older
+	# release tarballs build, while future tags that ship the files install them automatically.
+	if [ -f DankMaterialShell-$(BASE_VERSION)/quickshell/systemd/tmpfiles-dms-greeter.conf ]; then \
+		install -Dpm0644 DankMaterialShell-$(BASE_VERSION)/quickshell/systemd/tmpfiles-dms-greeter.conf \
+			debian/dms-greeter/usr/lib/tmpfiles.d/dms-greeter.conf; \
+	fi
+	if [ -f DankMaterialShell-$(BASE_VERSION)/quickshell/systemd/sysusers-dms-greeter.conf ]; then \
+		install -Dm644 DankMaterialShell-$(BASE_VERSION)/quickshell/systemd/sysusers-dms-greeter.conf \
+			debian/dms-greeter/usr/lib/sysusers.d/dms-greeter.conf; \
+	fi
+
 	# Create cache directory structure (will be created by postinst)
 	mkdir -p debian/dms-greeter/var/cache/dms-greeter
 

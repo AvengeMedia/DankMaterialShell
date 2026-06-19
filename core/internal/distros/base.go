@@ -337,6 +337,36 @@ func (b *BaseDistribution) detectWindowManager(wm deps.WindowManager) deps.Depen
 			Variant:     variant,
 			CanToggle:   true,
 		}
+	case deps.WindowManagerMango:
+		status := deps.StatusMissing
+		variant := deps.VariantStable
+		version := ""
+
+		if b.commandExists("mango") {
+			status = deps.StatusInstalled
+			cmd := exec.Command("mango", "-v")
+			if output, err := cmd.Output(); err == nil {
+				outStr := string(output)
+				if strings.Contains(outStr, "git") || strings.Contains(outStr, "dirty") {
+					variant = deps.VariantGit
+				}
+				if versionRegex := regexp.MustCompile(`(\d+\.\d+\.\d+)`); versionRegex.MatchString(outStr) {
+					matches := versionRegex.FindStringSubmatch(outStr)
+					if len(matches) > 1 {
+						version = matches[1]
+					}
+				}
+			}
+		}
+		return deps.Dependency{
+			Name:        "mango",
+			Status:      status,
+			Version:     version,
+			Description: "dwl-based dynamic tiling Wayland compositor",
+			Required:    true,
+			Variant:     variant,
+			CanToggle:   true,
+		}
 	default:
 		return deps.Dependency{
 			Name:        "unknown-wm",

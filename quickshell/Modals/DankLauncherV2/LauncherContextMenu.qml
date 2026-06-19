@@ -1,21 +1,59 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import QtQuick.Controls
+import Quickshell
+import Quickshell.Wayland
 import qs.Common
 import qs.Services
 import qs.Widgets
 
-Popup {
+Item {
     id: root
+
+    visible: false
+    width: 0
+    height: 0
 
     property var item: null
     property var controller: null
     property var searchField: null
     property var parentHandler: null
+    property bool allowEditActions: true
+    property real menuMargin: 8
+    property var targetScreen: null
+    property real anchorX: 0
+    property real anchorY: 0
+    property bool openState: false
+    property bool renderActive: false
+    readonly property bool blurActive: renderActive && openState && BlurService.enabled && Theme.connectedSurfaceBlurEnabled
+
+    readonly property real minMenuWidth: 180
+    readonly property real maxMenuWidth: Math.max(0, (targetScreen?.width ?? 500) - menuMargin * 2)
+    readonly property real maxMenuHeight: Math.max(0, (targetScreen?.height ?? 600) - menuMargin * 2)
+    readonly property string longestMenuText: {
+        let longest = "";
+        for (let i = 0; i < menuItems.length; i++) {
+            const text = menuItems[i].text || "";
+            if (text.length > longest.length)
+                longest = text;
+        }
+        return longest;
+    }
+    readonly property real naturalMenuWidth: Math.max(minMenuWidth, menuTextMetrics.width + Theme.iconSize + Theme.spacingS * 5)
+    readonly property real effectiveMenuWidth: Math.max(0, Math.min(maxMenuWidth, naturalMenuWidth))
+    readonly property real naturalMenuHeight: menuItemsHeight() + Theme.spacingS * 2
+    readonly property real effectiveMenuHeight: Math.min(maxMenuHeight, naturalMenuHeight)
+    readonly property bool menuScrolls: naturalMenuHeight > effectiveMenuHeight + 0.5
 
     signal hideRequested
     signal editAppRequested(var app)
+
+    TextMetrics {
+        id: menuTextMetrics
+        text: root.longestMenuText
+        font.pixelSize: Theme.fontSizeSmall
+        font.weight: Font.Normal
+    }
 
     function hasContextMenuActions(spotlightItem) {
         if (!spotlightItem)
@@ -23,14 +61,16 @@ Popup {
         if (spotlightItem.type === "app")
             return true;
         if (spotlightItem.type === "plugin" && spotlightItem.pluginId) {
-            var instance = PluginService.pluginInstances[spotlightItem.pluginId];
+            const instance = PluginService.pluginInstances[spotlightItem.pluginId];
             if (!instance)
                 return false;
             if (typeof instance.getContextMenuActions !== "function")
                 return false;
-            var actions = instance.getContextMenuActions(spotlightItem.data);
+            const actions = instance.getContextMenuActions(spotlightItem.data);
             return Array.isArray(actions) && actions.length > 0;
         }
+        if (spotlightItem.actions && spotlightItem.actions.length > 0)
+            return true;
         return false;
     }
 
@@ -51,13 +91,13 @@ Popup {
         if (!isPluginItem || !item?.pluginId)
             return [];
 
-        var instance = PluginService.pluginInstances[item.pluginId];
+        const instance = PluginService.pluginInstances[item.pluginId];
         if (!instance)
             return [];
         if (typeof instance.getContextMenuActions !== "function")
             return [];
 
-        var actions = instance.getContextMenuActions(item.data);
+        const actions = instance.getContextMenuActions(item.data);
         if (!Array.isArray(actions))
             return [];
 
@@ -65,8 +105,8 @@ Popup {
     }
 
     function executePluginAction(actionOrObj) {
-        var actionFunc = typeof actionOrObj === "function" ? actionOrObj : actionOrObj?.action;
-        var closeLauncher = typeof actionOrObj === "object" && actionOrObj?.closeLauncher;
+        const actionFunc = typeof actionOrObj === "function" ? actionOrObj : actionOrObj?.action;
+        const closeLauncher = typeof actionOrObj === "object" && actionOrObj?.closeLauncher;
 
         if (typeof actionFunc === "function")
             actionFunc();
@@ -79,18 +119,38 @@ Popup {
         hide();
     }
 
+    function executeLauncherAction(actionData) {
+        if (!controller || !item || !actionData)
+            return;
+        controller.executeAction(item, actionData);
+        hide();
+    }
+
     readonly property var menuItems: {
-        var items = [];
+        const items = [];
 
         if (isPluginItem) {
-            var pluginActions = getPluginContextMenuActions();
-            for (var i = 0; i < pluginActions.length; i++) {
-                var act = pluginActions[i];
+            const pluginActions = getPluginContextMenuActions();
+            for (let i = 0; i < pluginActions.length; i++) {
+                const act = pluginActions[i];
                 items.push({
                     type: "item",
                     icon: act.icon || "play_arrow",
                     text: act.text || act.name || "",
                     pluginAction: act
+                });
+            }
+            return items;
+        }
+
+        if (item?.type !== "app" && item?.actions && item.actions.length > 0) {
+            for (let i = 0; i < item.actions.length; i++) {
+                const genericAct = item.actions[i];
+                items.push({
+                    type: "item",
+                    icon: genericAct.icon || "play_arrow",
+                    text: genericAct.name || "",
+                    launcherActionData: genericAct
                 });
             }
             return items;
@@ -112,20 +172,22 @@ Popup {
                 text: I18n.tr("Hide App"),
                 action: hideCurrentApp
             });
-            items.push({
-                type: "item",
-                icon: "edit",
-                text: I18n.tr("Edit App"),
-                action: editCurrentApp
-            });
+            if (allowEditActions) {
+                items.push({
+                    type: "item",
+                    icon: "edit",
+                    text: I18n.tr("Edit App"),
+                    action: editCurrentApp
+                });
+            }
         }
 
         if (item?.actions && item.actions.length > 0) {
             items.push({
                 type: "separator"
             });
-            for (var i = 0; i < item.actions.length; i++) {
-                var act = item.actions[i];
+            for (let i = 0; i < item.actions.length; i++) {
+                const act = item.actions[i];
                 items.push({
                     type: "item",
                     icon: act.icon || "play_arrow",
@@ -158,43 +220,52 @@ Popup {
         return items;
     }
 
+    function menuItemsHeight() {
+        let h = 0;
+        for (let i = 0; i < menuItems.length; i++) {
+            h += menuItems[i].type === "separator" ? 5 : 32;
+        }
+        if (menuItems.length > 1)
+            h += menuItems.length - 1;
+        return h;
+    }
+
     function show(x, y, spotlightItem, fromKeyboard) {
         if (!spotlightItem?.data)
             return;
+
         item = spotlightItem;
         selectedMenuIndex = fromKeyboard ? 0 : -1;
         keyboardNavigation = fromKeyboard;
+
+        const modal = parentHandler?.parentModal ?? null;
+        const screenRef = modal?.effectiveScreen ?? parentHandler?.Window?.window?.screen ?? searchField?.Window?.window?.screen ?? null;
+        const screenX = screenRef?.x || 0;
+        const screenY = screenRef?.y || 0;
+        const screenRelativeX = modal ? ((modal.alignedX ?? 0) + x) : ((parentHandler ? parentHandler.mapToGlobal(x, y).x : x) - screenX);
+        const screenRelativeY = modal ? ((modal.alignedY ?? 0) + y) : ((parentHandler ? parentHandler.mapToGlobal(x, y).y : y) - screenY);
+
+        targetScreen = screenRef;
+        anchorX = screenRelativeX + 4;
+        anchorY = screenRelativeY + 4;
+        renderActive = true;
+        openState = true;
 
         if (parentHandler)
             parentHandler.enabled = false;
 
         Qt.callLater(() => {
-            var parentW = parent?.width ?? 500;
-            var parentH = parent?.height ?? 600;
-            var menuW = width > 0 ? width : 200;
-            var menuH = height > 0 ? height : 200;
-            var margin = 8;
-
-            var posX = x + 4;
-            var posY = y + 4;
-
-            if (posX + menuW > parentW - margin) {
-                posX = Math.max(margin, parentW - menuW - margin);
-            }
-            if (posY + menuH > parentH - margin) {
-                posY = Math.max(margin, parentH - menuH - margin);
-            }
-
-            root.x = posX;
-            root.y = posY;
-            open();
+            menuFlickable.contentY = 0;
+            keyboardHandler.forceActiveFocus();
+            ensureSelectedVisible();
         });
     }
 
     function hide() {
-        if (parentHandler)
-            parentHandler.enabled = true;
-        close();
+        if (!renderActive)
+            return;
+        openState = false;
+        hideRequested();
     }
 
     function togglePin() {
@@ -261,35 +332,102 @@ Popup {
     property bool keyboardNavigation: false
 
     readonly property int visibleItemCount: {
-        var count = 0;
-        for (var i = 0; i < menuItems.length; i++) {
+        let count = 0;
+        for (let i = 0; i < menuItems.length; i++) {
             if (menuItems[i].type === "item")
                 count++;
         }
         return count;
     }
 
+    function handleKey(event) {
+        if (!openState)
+            return;
+        switch (event.key) {
+        case Qt.Key_Down:
+            selectNext();
+            event.accepted = true;
+            return;
+        case Qt.Key_Up:
+            selectPrevious();
+            event.accepted = true;
+            return;
+        case Qt.Key_Return:
+        case Qt.Key_Enter:
+            activateSelected();
+            event.accepted = true;
+            return;
+        case Qt.Key_Left:
+        case Qt.Key_Escape:
+            hide();
+            event.accepted = true;
+            return;
+        }
+    }
+
     function selectNext() {
-        if (visibleItemCount > 0)
+        if (visibleItemCount > 0) {
+            keyboardNavigation = true;
             selectedMenuIndex = (selectedMenuIndex + 1) % visibleItemCount;
+            ensureSelectedVisible();
+        }
     }
 
     function selectPrevious() {
-        if (visibleItemCount > 0)
+        if (visibleItemCount > 0) {
+            keyboardNavigation = true;
             selectedMenuIndex = (selectedMenuIndex - 1 + visibleItemCount) % visibleItemCount;
+            ensureSelectedVisible();
+        }
+    }
+
+    function selectedDelegateIndex() {
+        let itemIndex = 0;
+        for (let i = 0; i < menuItems.length; i++) {
+            if (menuItems[i].type !== "item")
+                continue;
+            if (itemIndex === selectedMenuIndex)
+                return i;
+            itemIndex++;
+        }
+        return -1;
+    }
+
+    function ensureSelectedVisible() {
+        Qt.callLater(() => {
+            if (!menuFlickable || !menuRepeater)
+                return;
+            const delegateIndex = selectedDelegateIndex();
+            if (delegateIndex < 0)
+                return;
+            const delegate = menuRepeater.itemAt(delegateIndex);
+            if (!delegate)
+                return;
+            const top = delegate.y;
+            const bottom = top + delegate.height;
+            const viewTop = menuFlickable.contentY;
+            const viewBottom = viewTop + menuFlickable.height;
+            if (top < viewTop) {
+                menuFlickable.contentY = Math.max(0, top);
+            } else if (bottom > viewBottom) {
+                menuFlickable.contentY = Math.min(Math.max(0, menuFlickable.contentHeight - menuFlickable.height), bottom - menuFlickable.height);
+            }
+        });
     }
 
     function activateSelected() {
-        var itemIndex = 0;
-        for (var i = 0; i < menuItems.length; i++) {
+        let itemIndex = 0;
+        for (let i = 0; i < menuItems.length; i++) {
             if (menuItems[i].type !== "item")
                 continue;
             if (itemIndex === selectedMenuIndex) {
-                var menuItem = menuItems[i];
+                const menuItem = menuItems[i];
                 if (menuItem.action)
                     menuItem.action();
                 else if (menuItem.pluginAction)
                     executePluginAction(menuItem.pluginAction);
+                else if (menuItem.launcherActionData)
+                    executeLauncherAction(menuItem.launcherActionData);
                 else if (menuItem.actionData)
                     executeDesktopAction(menuItem.actionData);
                 return;
@@ -298,207 +436,233 @@ Popup {
         }
     }
 
-    width: menuContainer.implicitWidth
-    height: menuContainer.implicitHeight
-    padding: 0
-    closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-    modal: true
-    dim: false
-    background: Item {}
+    PanelWindow {
+        id: menuWindow
 
-    onOpened: {
-        Qt.callLater(() => keyboardHandler.forceActiveFocus());
-    }
+        screen: root.targetScreen
+        visible: root.renderActive
+        color: "transparent"
 
-    onClosed: {
-        if (parentHandler)
-            parentHandler.enabled = true;
-        if (searchField?.visible) {
-            Qt.callLater(() => searchField.forceActiveFocus());
-        }
-    }
+        WlrLayershell.namespace: "dms:launcher-context-menu"
+        WlrLayershell.layer: WlrLayershell.Overlay
+        WlrLayershell.exclusiveZone: -1
+        WlrLayershell.keyboardFocus: PopoutManager.screenshotActive ? WlrKeyboardFocus.None : (root.renderActive ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None)
 
-    enter: Transition {
-        NumberAnimation {
-            property: "opacity"
-            from: 0
-            to: 1
-            duration: Theme.shortDuration
-            easing.type: Theme.emphasizedEasing
-        }
-    }
-
-    exit: Transition {
-        NumberAnimation {
-            property: "opacity"
-            from: 1
-            to: 0
-            duration: Theme.shortDuration
-            easing.type: Theme.emphasizedEasing
-        }
-    }
-
-    contentItem: Item {
-        id: keyboardHandler
-        focus: true
-        implicitWidth: menuContainer.implicitWidth
-        implicitHeight: menuContainer.implicitHeight
-
-        Keys.onPressed: event => {
-            switch (event.key) {
-            case Qt.Key_Down:
-                root.selectNext();
-                event.accepted = true;
-                return;
-            case Qt.Key_Up:
-                root.selectPrevious();
-                event.accepted = true;
-                return;
-            case Qt.Key_Return:
-            case Qt.Key_Enter:
-                root.activateSelected();
-                event.accepted = true;
-                return;
-            case Qt.Key_Escape:
-            case Qt.Key_Left:
-                root.hide();
-                event.accepted = true;
-                return;
-            }
+        anchors {
+            top: true
+            left: true
+            right: true
+            bottom: true
         }
 
-        Rectangle {
-            id: menuContainer
+        WindowBlur {
+            targetWindow: menuWindow
+            blurX: root.blurActive ? menuContainer.x : 0
+            blurY: root.blurActive ? menuContainer.y : 0
+            blurWidth: root.blurActive ? menuContainer.width : 0
+            blurHeight: root.blurActive ? menuContainer.height : 0
+            blurRadius: Theme.cornerRadius
+        }
+
+        MouseArea {
             anchors.fill: parent
-            implicitWidth: Math.max(180, menuColumn.implicitWidth + Theme.spacingS * 2)
-            implicitHeight: menuColumn.implicitHeight + Theme.spacingS * 2
-            color: Theme.floatingSurface
-            radius: Theme.cornerRadius
-            border.color: BlurService.enabled ? BlurService.borderColor : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
-            border.width: BlurService.enabled ? BlurService.borderWidth : 1
+            z: -1
+            enabled: root.renderActive
+            onClicked: root.hide()
+        }
+
+        Item {
+            id: keyboardHandler
+            anchors.fill: parent
+            focus: root.openState
+
+            Keys.onPressed: event => {
+                switch (event.key) {
+                case Qt.Key_Down:
+                    root.selectNext();
+                    event.accepted = true;
+                    return;
+                case Qt.Key_Up:
+                    root.selectPrevious();
+                    event.accepted = true;
+                    return;
+                case Qt.Key_Return:
+                case Qt.Key_Enter:
+                    root.activateSelected();
+                    event.accepted = true;
+                    return;
+                case Qt.Key_Escape:
+                case Qt.Key_Left:
+                    root.hide();
+                    event.accepted = true;
+                    return;
+                }
+            }
 
             Rectangle {
-                anchors.fill: parent
-                anchors.topMargin: 4
-                anchors.leftMargin: 2
-                anchors.rightMargin: -2
-                anchors.bottomMargin: -4
-                radius: parent.radius
-                color: Qt.rgba(0, 0, 0, 0.15)
-                z: -1
-            }
+                id: menuContainer
+                x: Math.max(root.menuMargin, Math.min(menuWindow.width - width - root.menuMargin, root.anchorX))
+                y: Math.max(root.menuMargin, Math.min(menuWindow.height - height - root.menuMargin, root.anchorY))
+                width: root.effectiveMenuWidth
+                height: root.effectiveMenuHeight
+                color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+                radius: Theme.cornerRadius
+                border.color: BlurService.enabled ? BlurService.borderColor : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+                border.width: BlurService.enabled ? BlurService.borderWidth : 1
+                opacity: root.openState ? 1 : 0
 
-            Column {
-                id: menuColumn
-                anchors.fill: parent
-                anchors.margins: Theme.spacingS
-                spacing: 1
-
-                Repeater {
-                    model: root.menuItems
-
-                    Item {
-                        id: menuItemDelegate
-                        required property var modelData
-                        required property int index
-
-                        width: menuColumn.width
-                        height: modelData.type === "separator" ? 5 : 32
-
-                        readonly property int itemIndex: {
-                            var count = 0;
-                            for (var i = 0; i < index; i++) {
-                                if (root.menuItems[i].type === "item")
-                                    count++;
-                            }
-                            return count;
-                        }
-
-                        Rectangle {
-                            visible: menuItemDelegate.modelData.type === "separator"
-                            width: parent.width - Theme.spacingS * 2
-                            height: parent.height
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            color: "transparent"
-
-                            Rectangle {
-                                anchors.centerIn: parent
-                                width: parent.width
-                                height: 1
-                                color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: Theme.shortDuration
+                        easing.type: Theme.emphasizedEasing
+                        onRunningChanged: {
+                            if (!running && !root.openState) {
+                                root.renderActive = false;
+                                if (root.parentHandler)
+                                    root.parentHandler.enabled = true;
+                                if (root.searchField?.visible)
+                                    Qt.callLater(() => root.searchField.forceActiveFocus());
                             }
                         }
+                    }
+                }
 
-                        Rectangle {
-                            visible: menuItemDelegate.modelData.type === "item"
-                            width: parent.width
-                            height: parent.height
-                            radius: Theme.cornerRadius
-                            color: {
-                                if (root.keyboardNavigation && root.selectedMenuIndex === menuItemDelegate.itemIndex) {
-                                    return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.2);
+                Rectangle {
+                    anchors.fill: parent
+                    anchors.topMargin: 4
+                    anchors.leftMargin: 2
+                    anchors.rightMargin: -2
+                    anchors.bottomMargin: -4
+                    radius: parent.radius
+                    color: Qt.rgba(0, 0, 0, 0.15)
+                    z: -1
+                }
+
+                Flickable {
+                    id: menuFlickable
+                    anchors.fill: parent
+                    anchors.margins: Theme.spacingS
+                    clip: true
+                    contentWidth: width
+                    contentHeight: menuColumn.implicitHeight
+                    boundsBehavior: Flickable.StopAtBounds
+                    interactive: root.menuScrolls
+
+                    Column {
+                        id: menuColumn
+                        width: menuFlickable.width
+                        spacing: 1
+
+                        Repeater {
+                            id: menuRepeater
+                            model: root.menuItems
+
+                            Item {
+                                id: menuItemDelegate
+                                required property var modelData
+                                required property int index
+
+                                width: menuColumn.width
+                                height: modelData.type === "separator" ? 5 : 32
+
+                                readonly property int itemIndex: {
+                                    let count = 0;
+                                    for (let i = 0; i < index; i++) {
+                                        if (root.menuItems[i].type === "item")
+                                            count++;
+                                    }
+                                    return count;
                                 }
-                                return itemMouseArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent";
-                            }
 
-                            Row {
-                                anchors.left: parent.left
-                                anchors.leftMargin: Theme.spacingS
-                                anchors.right: parent.right
-                                anchors.rightMargin: Theme.spacingS
-                                anchors.verticalCenter: parent.verticalCenter
-                                spacing: Theme.spacingS
+                                Rectangle {
+                                    visible: menuItemDelegate.modelData.type === "separator"
+                                    width: parent.width - Theme.spacingS * 2
+                                    height: parent.height
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    color: "transparent"
 
-                                Item {
-                                    width: Theme.iconSize - 2
-                                    height: Theme.iconSize - 2
-                                    anchors.verticalCenter: parent.verticalCenter
-
-                                    DankIcon {
-                                        visible: (menuItemDelegate.modelData?.icon ?? "").length > 0
-                                        name: menuItemDelegate.modelData?.icon ?? ""
-                                        size: Theme.iconSize - 2
-                                        color: Theme.surfaceText
-                                        opacity: 0.7
-                                        anchors.verticalCenter: parent.verticalCenter
+                                    Rectangle {
+                                        anchors.centerIn: parent
+                                        width: parent.width
+                                        height: 1
+                                        color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                                     }
                                 }
 
-                                StyledText {
-                                    text: menuItemDelegate.modelData.text || ""
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: Theme.surfaceText
-                                    font.weight: Font.Normal
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    elide: Text.ElideRight
-                                    width: parent.width - (Theme.iconSize - 2) - Theme.spacingS
-                                }
-                            }
+                                Rectangle {
+                                    visible: menuItemDelegate.modelData.type === "item"
+                                    width: parent.width
+                                    height: parent.height
+                                    radius: Theme.cornerRadius
+                                    color: {
+                                        if (root.keyboardNavigation && root.selectedMenuIndex === menuItemDelegate.itemIndex) {
+                                            return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.2);
+                                        }
+                                        return itemMouseArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent";
+                                    }
 
-                            DankRipple {
-                                id: menuItemRipple
-                                rippleColor: Theme.surfaceText
-                                cornerRadius: Theme.cornerRadius
-                            }
+                                    Row {
+                                        anchors.left: parent.left
+                                        anchors.leftMargin: Theme.spacingS
+                                        anchors.right: parent.right
+                                        anchors.rightMargin: Theme.spacingS
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        spacing: Theme.spacingS
 
-                            MouseArea {
-                                id: itemMouseArea
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onEntered: {
-                                    root.keyboardNavigation = false;
-                                    root.selectedMenuIndex = menuItemDelegate.itemIndex;
-                                }
-                                onPressed: mouse => menuItemRipple.trigger(mouse.x, mouse.y)
-                                onClicked: {
-                                    var menuItem = menuItemDelegate.modelData;
-                                    if (menuItem.action)
-                                        menuItem.action();
-                                    else if (menuItem.pluginAction)
-                                        root.executePluginAction(menuItem.pluginAction);
-                                    else if (menuItem.actionData)
-                                        root.executeDesktopAction(menuItem.actionData);
+                                        Item {
+                                            width: Theme.iconSize - 2
+                                            height: Theme.iconSize - 2
+                                            anchors.verticalCenter: parent.verticalCenter
+
+                                            DankIcon {
+                                                visible: (menuItemDelegate.modelData?.icon ?? "").length > 0
+                                                name: menuItemDelegate.modelData?.icon ?? ""
+                                                size: Theme.iconSize - 2
+                                                color: Theme.surfaceText
+                                                opacity: 0.7
+                                                anchors.verticalCenter: parent.verticalCenter
+                                            }
+                                        }
+
+                                        StyledText {
+                                            text: menuItemDelegate.modelData.text || ""
+                                            font.pixelSize: Theme.fontSizeSmall
+                                            color: Theme.surfaceText
+                                            font.weight: Font.Normal
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            elide: Text.ElideRight
+                                            width: parent.width - (Theme.iconSize - 2) - Theme.spacingS
+                                        }
+                                    }
+
+                                    DankRipple {
+                                        id: menuItemRipple
+                                        rippleColor: Theme.surfaceText
+                                        cornerRadius: Theme.cornerRadius
+                                    }
+
+                                    MouseArea {
+                                        id: itemMouseArea
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+                                        onEntered: {
+                                            root.keyboardNavigation = false;
+                                            root.selectedMenuIndex = menuItemDelegate.itemIndex;
+                                        }
+                                        onPressed: mouse => menuItemRipple.trigger(mouse.x, mouse.y)
+                                        onClicked: {
+                                            const menuItem = menuItemDelegate.modelData;
+                                            if (menuItem.action)
+                                                menuItem.action();
+                                            else if (menuItem.pluginAction)
+                                                root.executePluginAction(menuItem.pluginAction);
+                                            else if (menuItem.launcherActionData)
+                                                root.executeLauncherAction(menuItem.launcherActionData);
+                                            else if (menuItem.actionData)
+                                                root.executeDesktopAction(menuItem.actionData);
+                                        }
+                                    }
                                 }
                             }
                         }

@@ -1,0 +1,1 @@
+-- Window rules. Deploy writes ~/.config/hypr/dms/windowrules.lua

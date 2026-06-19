@@ -77,7 +77,11 @@ func (f *FedoraDistribution) DetectDependenciesWithTerminal(ctx context.Context,
 
 	// Common detections using base methods
 	dependencies = append(dependencies, f.detectGit())
-	dependencies = append(dependencies, f.detectWindowManager(wm))
+	wmDep := f.detectWindowManager(wm)
+	if wm == deps.WindowManagerMango {
+		wmDep.Description = "MangoWM (Wayland compositor) — the Terra repo will be enabled automatically to install it"
+	}
+	dependencies = append(dependencies, wmDep)
 	dependencies = append(dependencies, f.detectQuickshell())
 	dependencies = append(dependencies, f.detectDMSGreeter())
 	dependencies = append(dependencies, f.detectXDGPortal())
@@ -90,6 +94,11 @@ func (f *FedoraDistribution) DetectDependenciesWithTerminal(ctx context.Context,
 
 	// Niri-specific tools
 	if wm == deps.WindowManagerNiri {
+		dependencies = append(dependencies, f.detectXwaylandSatellite())
+	}
+
+	// Mango-specific tools (dwl-based, uses xwayland-satellite like niri)
+	if wm == deps.WindowManagerMango {
 		dependencies = append(dependencies, f.detectXwaylandSatellite())
 	}
 
@@ -139,6 +148,10 @@ func (f *FedoraDistribution) GetPackageMappingWithVariants(wm deps.WindowManager
 	case deps.WindowManagerNiri:
 		packages["niri"] = f.getNiriMapping(variants["niri"])
 		packages["xwayland-satellite"] = PackageMapping{Name: "xwayland-satellite", Repository: RepoTypeSystem}
+	case deps.WindowManagerMango:
+		// mangowm resolves via Terra, enabled automatically by enableTerraRepo.
+		packages["mango"] = PackageMapping{Name: "mangowm", Repository: RepoTypeSystem}
+		packages["xwayland-satellite"] = PackageMapping{Name: "xwayland-satellite", Repository: RepoTypeSystem}
 	}
 
 	return packages
@@ -159,7 +172,7 @@ func (f *FedoraDistribution) getDmsMapping(variant deps.PackageVariant) PackageM
 }
 
 func (f *FedoraDistribution) getHyprlandMapping(_ deps.PackageVariant) PackageMapping {
-	return PackageMapping{Name: "hyprland", Repository: RepoTypeCOPR, RepoURL: "sdegler/hyprland"}
+	return PackageMapping{Name: "hyprland", Repository: RepoTypeCOPR, RepoURL: "lionheartp/Hyprland"}
 }
 
 func (f *FedoraDistribution) getNiriMapping(variant deps.PackageVariant) PackageMapping {
@@ -297,6 +310,22 @@ func (f *FedoraDistribution) InstallPackages(ctx context.Context, dependencies [
 		}
 	}
 
+	// Phase 2b: Enable Terra repo for MangoWM (not in Fedora's repos). Must run
+	// before the DNF phase so `mangowm` resolves.
+	if wm == deps.WindowManagerMango {
+		progressChan <- InstallProgressMsg{
+			Phase:      PhaseSystemPackages,
+			Progress:   0.25,
+			Step:       "Enabling Terra repository for MangoWM...",
+			IsComplete: false,
+			NeedsSudo:  true,
+			LogOutput:  "Setting up the Terra repo (fyralabs) to provide mango",
+		}
+		if err := f.enableTerraRepo(ctx, sudoPassword, progressChan); err != nil {
+			return fmt.Errorf("failed to enable Terra repository: %w", err)
+		}
+	}
+
 	// Phase 3: System Packages (DNF)
 	if len(dnfPkgs) > 0 {
 		progressChan <- InstallProgressMsg{
@@ -421,6 +450,30 @@ func (f *FedoraDistribution) extractPackageNames(packages []PackageMapping) []st
 		names[i] = pkg.Name
 	}
 	return names
+}
+
+// enableTerraRepo registers the persistent Terra repo (via terra-release) so
+// `mangowm` resolves in the DNF phase. $releasever is single-quoted so dnf, not
+// the shell, expands it.
+func (f *FedoraDistribution) enableTerraRepo(ctx context.Context, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
+	// Skip if Terra is already configured
+	if exec.CommandContext(ctx, "sh", "-c",
+		"rpm -q terra-release >/dev/null 2>&1 || test -f /etc/yum.repos.d/terra.repo").Run() == nil {
+		f.log("Terra repository already configured, skipping enable")
+		return nil
+	}
+
+	f.log("Enabling Terra repository (fyralabs) for mango...")
+	cmd := privesc.ExecCommand(ctx, sudoPassword,
+		`dnf install -y --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terra$releasever' terra-release 2>&1`)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		f.logError("failed to enable Terra repository", err)
+		f.log(fmt.Sprintf("Terra enable output: %s", string(output)))
+		return fmt.Errorf("failed to enable Terra repository: %w", err)
+	}
+	f.log(fmt.Sprintf("Terra repository enabled: %s", string(output)))
+	return nil
 }
 
 func (f *FedoraDistribution) enableCOPRRepos(ctx context.Context, coprPkgs []PackageMapping, sudoPassword string, progressChan chan<- InstallProgressMsg) error {

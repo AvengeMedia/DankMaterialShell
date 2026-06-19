@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/dwl_ipc"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wlr_output_management"
 	wlhelpers "github.com/AvengeMedia/DankMaterialShell/core/internal/wayland/client"
 	"github.com/AvengeMedia/DankMaterialShell/core/pkg/go-wayland/wayland/client"
@@ -19,9 +18,9 @@ const (
 	CompositorHyprland
 	CompositorSway
 	CompositorNiri
-	CompositorDWL
 	CompositorScroll
 	CompositorMiracle
+	CompositorMango
 )
 
 var detectedCompositor Compositor = -1
@@ -36,8 +35,14 @@ func DetectCompositor() Compositor {
 	swaySocket := os.Getenv("SWAYSOCK")
 	scrollSocket := os.Getenv("SCROLLSOCK")
 	miracleSocket := os.Getenv("MIRACLESOCK")
+	mangoSocket := os.Getenv("MANGO_INSTANCE_SIGNATURE")
 
 	switch {
+	case mangoSocket != "":
+		if _, err := os.Stat(mangoSocket); err == nil {
+			detectedCompositor = CompositorMango
+			return detectedCompositor
+		}
 	case niriSocket != "":
 		if _, err := os.Stat(niriSocket); err == nil {
 			detectedCompositor = CompositorNiri
@@ -63,66 +68,29 @@ func DetectCompositor() Compositor {
 		return detectedCompositor
 	}
 
-	if detectDWLProtocol() {
-		detectedCompositor = CompositorDWL
-		return detectedCompositor
-	}
-
 	detectedCompositor = CompositorUnknown
 	return detectedCompositor
 }
 
-func detectDWLProtocol() bool {
-	display, err := client.Connect("")
-	if err != nil {
-		return false
-	}
-	ctx := display.Context()
-	defer ctx.Close()
-
-	registry, err := display.GetRegistry()
-	if err != nil {
-		return false
-	}
-
-	found := false
-	registry.SetGlobalHandler(func(e client.RegistryGlobalEvent) {
-		if e.Interface == dwl_ipc.ZdwlIpcManagerV2InterfaceName {
-			found = true
-		}
-	})
-
-	if err := wlhelpers.Roundtrip(display, ctx); err != nil {
-		return false
-	}
-
-	return found
-}
-
-func SetCompositorDWL() {
-	detectedCompositor = CompositorDWL
-}
-
 type WindowGeometry struct {
-	X               int32
-	Y               int32
-	Width           int32
-	Height          int32
-	Output          string
-	Scale           float64
-	OutputX         int32
-	OutputY         int32
-	OutputTransform int32
+	X       int32
+	Y       int32
+	Width   int32
+	Height  int32
+	Output  string
+	Scale   float64
+	OutputX int32
+	OutputY int32
 }
 
 func GetActiveWindow() (*WindowGeometry, error) {
 	switch DetectCompositor() {
 	case CompositorHyprland:
 		return getHyprlandActiveWindow()
-	case CompositorDWL:
-		return getDWLActiveWindow()
+	case CompositorMango:
+		return getMangoActiveWindow()
 	default:
-		return nil, fmt.Errorf("window capture requires Hyprland or DWL")
+		return nil, fmt.Errorf("window capture requires Hyprland or Mango")
 	}
 }
 
@@ -285,6 +253,93 @@ func getMiracleFocusedMonitor() string {
 	return ""
 }
 
+type mangoMonitor struct {
+	Name   string  `json:"name"`
+	Active bool    `json:"active"`
+	X      int32   `json:"x"`
+	Y      int32   `json:"y"`
+	Scale  float64 `json:"scale"`
+}
+
+func getMangoMonitors() []mangoMonitor {
+	output, err := exec.Command("mmsg", "get", "all-monitors").Output()
+	if err != nil {
+		return nil
+	}
+
+	var data struct {
+		Monitors []mangoMonitor `json:"monitors"`
+	}
+	if err := json.Unmarshal(output, &data); err != nil {
+		return nil
+	}
+	return data.Monitors
+}
+
+func getMangoFocusedMonitor() string {
+	for _, m := range getMangoMonitors() {
+		if m.Active {
+			return m.Name
+		}
+	}
+	return ""
+}
+
+type mangoClient struct {
+	Monitor   string `json:"monitor"`
+	IsFocused bool   `json:"is_focused"`
+	X         int32  `json:"x"`
+	Y         int32  `json:"y"`
+	Width     int32  `json:"width"`
+	Height    int32  `json:"height"`
+}
+
+func getMangoActiveWindow() (*WindowGeometry, error) {
+	output, err := exec.Command("mmsg", "get", "all-clients").Output()
+	if err != nil {
+		return nil, fmt.Errorf("mmsg get all-clients: %w", err)
+	}
+
+	var data struct {
+		Clients []mangoClient `json:"clients"`
+	}
+	if err := json.Unmarshal(output, &data); err != nil {
+		return nil, fmt.Errorf("parse all-clients: %w", err)
+	}
+
+	for _, c := range data.Clients {
+		if !c.IsFocused {
+			continue
+		}
+		if c.Width <= 0 || c.Height <= 0 {
+			return nil, fmt.Errorf("no active window")
+		}
+
+		geom := &WindowGeometry{
+			X:      c.X,
+			Y:      c.Y,
+			Width:  c.Width,
+			Height: c.Height,
+			Output: c.Monitor,
+			Scale:  1.0,
+		}
+		for _, m := range getMangoMonitors() {
+			if m.Name != c.Monitor {
+				continue
+			}
+			geom.OutputX = m.X
+			geom.OutputY = m.Y
+			if m.Scale > 0 {
+				geom.Scale = m.Scale
+			}
+			break
+		}
+		return geom, nil
+	}
+
+	return nil, fmt.Errorf("no focused window")
+}
+
 type niriWorkspace struct {
 	Output    string `json:"output"`
 	IsFocused bool   `json:"is_focused"`
@@ -309,121 +364,6 @@ func getNiriFocusedMonitor() string {
 	return ""
 }
 
-var dwlActiveOutput string
-
-func SetDWLActiveOutput(name string) {
-	dwlActiveOutput = name
-}
-
-func getDWLFocusedMonitor() string {
-	if dwlActiveOutput != "" {
-		return dwlActiveOutput
-	}
-	return queryDWLActiveOutput()
-}
-
-func queryDWLActiveOutput() string {
-	display, err := client.Connect("")
-	if err != nil {
-		return ""
-	}
-	ctx := display.Context()
-	defer ctx.Close()
-
-	registry, err := display.GetRegistry()
-	if err != nil {
-		return ""
-	}
-
-	var dwlManager *dwl_ipc.ZdwlIpcManagerV2
-	outputs := make(map[uint32]*client.Output)
-
-	registry.SetGlobalHandler(func(e client.RegistryGlobalEvent) {
-		switch e.Interface {
-		case dwl_ipc.ZdwlIpcManagerV2InterfaceName:
-			mgr := dwl_ipc.NewZdwlIpcManagerV2(ctx)
-			if err := registry.Bind(e.Name, e.Interface, e.Version, mgr); err == nil {
-				dwlManager = mgr
-			}
-		case client.OutputInterfaceName:
-			out := client.NewOutput(ctx)
-			version := e.Version
-			if version > 4 {
-				version = 4
-			}
-			if err := registry.Bind(e.Name, e.Interface, version, out); err == nil {
-				outputs[e.Name] = out
-			}
-		}
-	})
-
-	if err := wlhelpers.Roundtrip(display, ctx); err != nil {
-		return ""
-	}
-
-	if dwlManager == nil || len(outputs) == 0 {
-		return ""
-	}
-
-	outputNames := make(map[uint32]string)
-	for name, out := range outputs {
-		n := name
-		out.SetNameHandler(func(e client.OutputNameEvent) {
-			outputNames[n] = e.Name
-		})
-	}
-
-	if err := wlhelpers.Roundtrip(display, ctx); err != nil {
-		return ""
-	}
-
-	type outputState struct {
-		name     string
-		active   bool
-		gotFrame bool
-	}
-	states := make(map[uint32]*outputState)
-
-	for name, out := range outputs {
-		dwlOut, err := dwlManager.GetOutput(out)
-		if err != nil {
-			continue
-		}
-		state := &outputState{name: outputNames[name]}
-		states[name] = state
-
-		dwlOut.SetActiveHandler(func(e dwl_ipc.ZdwlIpcOutputV2ActiveEvent) {
-			state.active = e.Active != 0
-		})
-		dwlOut.SetFrameHandler(func(e dwl_ipc.ZdwlIpcOutputV2FrameEvent) {
-			state.gotFrame = true
-		})
-	}
-
-	allFramesReceived := func() bool {
-		for _, s := range states {
-			if !s.gotFrame {
-				return false
-			}
-		}
-		return true
-	}
-
-	for !allFramesReceived() {
-		if err := ctx.Dispatch(); err != nil {
-			return ""
-		}
-	}
-
-	for _, state := range states {
-		if state.active {
-			return state.name
-		}
-	}
-
-	return ""
-}
-
 func GetFocusedMonitor() string {
 	switch DetectCompositor() {
 	case CompositorHyprland:
@@ -436,8 +376,8 @@ func GetFocusedMonitor() string {
 		return getMiracleFocusedMonitor()
 	case CompositorNiri:
 		return getNiriFocusedMonitor()
-	case CompositorDWL:
-		return getDWLFocusedMonitor()
+	case CompositorMango:
+		return getMangoFocusedMonitor()
 	}
 	return ""
 }
@@ -533,162 +473,4 @@ func getAllOutputInfos() map[string]*outputInfo {
 		}
 	}
 	return result
-}
-
-func getOutputInfo(outputName string) (*outputInfo, bool) {
-	infos := getAllOutputInfos()
-	if infos == nil {
-		return nil, false
-	}
-	info, ok := infos[outputName]
-	return info, ok
-}
-
-func getDWLActiveWindow() (*WindowGeometry, error) {
-	display, err := client.Connect("")
-	if err != nil {
-		return nil, fmt.Errorf("connect: %w", err)
-	}
-	ctx := display.Context()
-	defer ctx.Close()
-
-	registry, err := display.GetRegistry()
-	if err != nil {
-		return nil, fmt.Errorf("get registry: %w", err)
-	}
-
-	var dwlManager *dwl_ipc.ZdwlIpcManagerV2
-	outputs := make(map[uint32]*client.Output)
-
-	registry.SetGlobalHandler(func(e client.RegistryGlobalEvent) {
-		switch e.Interface {
-		case dwl_ipc.ZdwlIpcManagerV2InterfaceName:
-			mgr := dwl_ipc.NewZdwlIpcManagerV2(ctx)
-			if err := registry.Bind(e.Name, e.Interface, e.Version, mgr); err == nil {
-				dwlManager = mgr
-			}
-		case client.OutputInterfaceName:
-			out := client.NewOutput(ctx)
-			version := e.Version
-			if version > 4 {
-				version = 4
-			}
-			if err := registry.Bind(e.Name, e.Interface, version, out); err == nil {
-				outputs[e.Name] = out
-			}
-		}
-	})
-
-	if err := wlhelpers.Roundtrip(display, ctx); err != nil {
-		return nil, fmt.Errorf("roundtrip: %w", err)
-	}
-
-	if dwlManager == nil {
-		return nil, fmt.Errorf("dwl_ipc_manager not available")
-	}
-
-	if len(outputs) == 0 {
-		return nil, fmt.Errorf("no outputs found")
-	}
-
-	outputNames := make(map[uint32]string)
-	for name, out := range outputs {
-		n := name
-		out.SetNameHandler(func(e client.OutputNameEvent) {
-			outputNames[n] = e.Name
-		})
-	}
-
-	if err := wlhelpers.Roundtrip(display, ctx); err != nil {
-		return nil, fmt.Errorf("roundtrip: %w", err)
-	}
-
-	type dwlOutputState struct {
-		output      *dwl_ipc.ZdwlIpcOutputV2
-		name        string
-		active      bool
-		x, y        int32
-		w, h        int32
-		scalefactor uint32
-		gotFrame    bool
-	}
-
-	dwlOutputs := make(map[uint32]*dwlOutputState)
-	for name, out := range outputs {
-		dwlOut, err := dwlManager.GetOutput(out)
-		if err != nil {
-			continue
-		}
-		state := &dwlOutputState{output: dwlOut, name: outputNames[name]}
-		dwlOutputs[name] = state
-
-		dwlOut.SetActiveHandler(func(e dwl_ipc.ZdwlIpcOutputV2ActiveEvent) {
-			state.active = e.Active != 0
-		})
-		dwlOut.SetXHandler(func(e dwl_ipc.ZdwlIpcOutputV2XEvent) {
-			state.x = e.X
-		})
-		dwlOut.SetYHandler(func(e dwl_ipc.ZdwlIpcOutputV2YEvent) {
-			state.y = e.Y
-		})
-		dwlOut.SetWidthHandler(func(e dwl_ipc.ZdwlIpcOutputV2WidthEvent) {
-			state.w = e.Width
-		})
-		dwlOut.SetHeightHandler(func(e dwl_ipc.ZdwlIpcOutputV2HeightEvent) {
-			state.h = e.Height
-		})
-		dwlOut.SetScalefactorHandler(func(e dwl_ipc.ZdwlIpcOutputV2ScalefactorEvent) {
-			state.scalefactor = e.Scalefactor
-		})
-		dwlOut.SetFrameHandler(func(e dwl_ipc.ZdwlIpcOutputV2FrameEvent) {
-			state.gotFrame = true
-		})
-	}
-
-	allFramesReceived := func() bool {
-		for _, s := range dwlOutputs {
-			if !s.gotFrame {
-				return false
-			}
-		}
-		return true
-	}
-
-	for !allFramesReceived() {
-		if err := ctx.Dispatch(); err != nil {
-			return nil, fmt.Errorf("dispatch: %w", err)
-		}
-	}
-
-	for _, state := range dwlOutputs {
-		if !state.active {
-			continue
-		}
-		if state.w <= 0 || state.h <= 0 {
-			return nil, fmt.Errorf("no active window")
-		}
-		scale := float64(state.scalefactor) / 100.0
-		if scale <= 0 {
-			scale = 1.0
-		}
-
-		geom := &WindowGeometry{
-			X:      state.x,
-			Y:      state.y,
-			Width:  state.w,
-			Height: state.h,
-			Output: state.name,
-			Scale:  scale,
-		}
-
-		if info, ok := getOutputInfo(state.name); ok {
-			geom.OutputX = info.x
-			geom.OutputY = info.y
-			geom.OutputTransform = info.transform
-		}
-
-		return geom, nil
-	}
-
-	return nil, fmt.Errorf("no active output found")
 }

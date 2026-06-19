@@ -50,7 +50,7 @@ Row {
         WlrLayershell.namespace: "dms:control-center-widget-library"
         WlrLayershell.layer: WlrLayershell.Overlay
         WlrLayershell.exclusiveZone: -1
-        WlrLayershell.keyboardFocus: visible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+        WlrLayershell.keyboardFocus: PopoutManager.screenshotActive ? WlrKeyboardFocus.None : (visible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None)
 
         anchors {
             top: true

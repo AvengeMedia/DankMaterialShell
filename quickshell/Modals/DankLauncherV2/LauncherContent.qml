@@ -17,10 +17,22 @@ FocusScope {
     property alias controller: controller
     property alias resultsList: resultsList
     property alias actionPanel: actionPanel
+    readonly property alias activeContextMenu: contextMenu
 
     property bool editMode: false
     property var editingApp: null
     property string editAppId: ""
+    readonly property bool _blurActive: Theme.blurForegroundLayers || Theme.transparentBlurLayers
+    readonly property real _launcherFieldAlpha: {
+        if (Theme.transparentBlurLayers)
+            return 0.28;
+        if (Theme.blurForegroundLayers)
+            return Math.max(Theme.popupTransparency, 0.62);
+        return Theme.popupTransparency;
+    }
+    readonly property color _launcherSearchFieldColor: Theme.withAlpha(Theme.surfaceContainerHigh, _launcherFieldAlpha)
+    readonly property color _launcherSearchBorderColor: Theme.withAlpha(Theme.outline, _blurActive ? 0.16 : Theme.layerOutlineOpacity)
+    readonly property color _launcherSearchFocusedBorderColor: Theme.withAlpha(Theme.primary, _blurActive ? 0.72 : 1.0)
 
     function resetScroll() {
         resultsList.resetScroll();
@@ -28,6 +40,12 @@ FocusScope {
 
     function focusSearchField() {
         searchField.forceActiveFocus();
+    }
+
+    function closeTransientUi() {
+        contextMenu.hide();
+        actionPanel.hide();
+        root.enabled = true;
     }
 
     function openEditMode(app) {
@@ -108,6 +126,21 @@ FocusScope {
 
         onEditAppRequested: app => {
             root.openEditMode(app);
+        }
+    }
+
+    Connections {
+        target: root.parentModal
+        ignoreUnknownSignals: true
+
+        function onSpotlightOpenChanged() {
+            if (!root.parentModal?.spotlightOpen)
+                root.closeTransientUi();
+        }
+
+        function onContentVisibleChanged() {
+            if (!root.parentModal?.contentVisible)
+                root.closeTransientUi();
         }
     }
 
@@ -257,13 +290,6 @@ FocusScope {
             }
             event.accepted = false;
             return;
-        case Qt.Key_Slash:
-            if (event.modifiers === Qt.NoModifier && searchField.text.length === 0) {
-                controller.setMode("files", true);
-                return;
-            }
-            event.accepted = false;
-            return;
         default:
             event.accepted = false;
         }
@@ -284,7 +310,7 @@ FocusScope {
             anchors.bottom: parent.bottom
             anchors.leftMargin: root.parentModal?.borderWidth ?? 1
             anchors.rightMargin: root.parentModal?.borderWidth ?? 1
-            anchors.bottomMargin: _connectedBottomEmerge ? Theme.spacingS : (root.parentModal?.borderWidth ?? 1)
+            anchors.bottomMargin: _connectedBottomEmerge ? 0 : (root.parentModal?.borderWidth ?? 1)
             height: showFooter ? (_connectedArcAtFooter ? 76 : 36) : 0
             visible: showFooter
             clip: true
@@ -293,7 +319,7 @@ FocusScope {
                 anchors.fill: parent
                 anchors.topMargin: -Theme.cornerRadius
                 // In connected mode the launcher provides the surface so update the toolbar for arcs
-                visible: !(root.parentModal?.frameOwnsConnectedChrome ?? false)
+                visible: !(root.parentModal?.frameOwnsConnectedChrome ?? false) && !root._blurActive
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 radius: Theme.cornerRadius
             }
@@ -337,7 +363,7 @@ FocusScope {
                         width: buttonContent.width + Theme.spacingM * 2
                         height: 28
                         radius: Theme.cornerRadius
-                        color: controller.searchMode === modelData.id || modeArea.containsMouse ? Theme.primaryContainer : "transparent"
+                        color: controller.searchMode === modelData.id ? Theme.buttonBg : modeArea.containsMouse ? Theme.surfaceContainerHighest : "transparent"
 
                         Row {
                             id: buttonContent
@@ -348,14 +374,14 @@ FocusScope {
                                 anchors.verticalCenter: parent.verticalCenter
                                 name: modelData.icon
                                 size: 14
-                                color: controller.searchMode === modelData.id ? Theme.primary : Theme.surfaceVariantText
+                                color: controller.searchMode === modelData.id ? Theme.buttonText : Theme.surfaceVariantText
                             }
 
                             StyledText {
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: modelData.label
                                 font.pixelSize: Theme.fontSizeSmall
-                                color: controller.searchMode === modelData.id ? Theme.primary : Theme.surfaceText
+                                color: controller.searchMode === modelData.id ? Theme.buttonText : Theme.surfaceText
                             }
                         }
 
@@ -458,9 +484,11 @@ FocusScope {
                     id: searchField
                     width: parent.width - (pluginBadge.visible ? pluginBadge.width + Theme.spacingS : 0)
                     cornerRadius: Theme.cornerRadius
-                    backgroundColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                    normalBorderColor: Theme.outlineMedium
-                    focusedBorderColor: Theme.primary
+                    backgroundColor: root._launcherSearchFieldColor
+                    normalBorderColor: root._launcherSearchBorderColor
+                    focusedBorderColor: root._launcherSearchFocusedBorderColor
+                    borderWidth: 1
+                    focusedBorderWidth: 2
                     leftIconName: controller.activePluginId ? "extension" : controller.searchQuery.startsWith("/") ? "folder" : "search"
                     leftIconSize: Theme.iconSize
                     leftIconColor: Theme.surfaceVariantText
@@ -608,7 +636,7 @@ FocusScope {
                                 width: chipContent.width + Theme.spacingM * 2
                                 height: sortDropdown.height
                                 radius: Theme.cornerRadius
-                                color: controller.fileSearchType === modelData.id || chipArea.containsMouse ? Theme.primaryContainer : "transparent"
+                                color: controller.fileSearchType === modelData.id ? Theme.buttonBg : chipArea.containsMouse ? Theme.surfaceContainerHighest : "transparent"
 
                                 Row {
                                     id: chipContent
@@ -619,14 +647,14 @@ FocusScope {
                                         anchors.verticalCenter: parent.verticalCenter
                                         name: modelData.icon
                                         size: 14
-                                        color: controller.fileSearchType === modelData.id ? Theme.primary : Theme.surfaceVariantText
+                                        color: controller.fileSearchType === modelData.id ? Theme.buttonText : Theme.surfaceVariantText
                                     }
 
                                     StyledText {
                                         anchors.verticalCenter: parent.verticalCenter
                                         text: modelData.label
                                         font.pixelSize: Theme.fontSizeSmall
-                                        color: controller.fileSearchType === modelData.id ? Theme.primary : Theme.surfaceText
+                                        color: controller.fileSearchType === modelData.id ? Theme.buttonText : Theme.surfaceVariantText
                                     }
                                 }
 

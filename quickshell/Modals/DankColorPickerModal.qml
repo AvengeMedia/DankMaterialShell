@@ -1,6 +1,5 @@
 import QtQuick
 import Quickshell
-import Quickshell.Hyprland
 import Quickshell.Io
 import qs.Common
 import qs.Modals.Common
@@ -12,11 +11,6 @@ DankModal {
     readonly property var log: Log.scoped("DankColorPickerModal")
 
     layerNamespace: "dms:color-picker"
-
-    HyprlandFocusGrab {
-        windows: [root.contentWindow]
-        active: root.useHyprlandFocusGrab && root.shouldHaveFocus
-    }
 
     property string pickerTitle: I18n.tr("Choose Color")
     property color selectedColor: SessionData.recentColors.length > 0 ? SessionData.recentColors[0] : Theme.primary

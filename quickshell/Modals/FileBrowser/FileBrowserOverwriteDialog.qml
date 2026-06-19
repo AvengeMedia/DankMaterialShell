@@ -74,7 +74,7 @@ Item {
                     width: 80
                     height: 36
                     radius: Theme.cornerRadius
-                    color: cancelArea.containsMouse ? Theme.surfaceVariantHover : Theme.surfaceVariant
+                    color: cancelArea.containsMouse ? Qt.lighter(Theme.surfaceVariant, 1.2) : Theme.surfaceVariant
                     border.color: Theme.outline
                     border.width: 1
 

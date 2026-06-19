@@ -466,6 +466,11 @@ Item {
                                 desc: I18n.tr("Restart the DankMaterialShell")
                             },
                             {
+                                key: "switchuser",
+                                label: I18n.tr("Show Switch User"),
+                                desc: I18n.tr("Opens a picker of other active sessions on this seat")
+                            },
+                            {
                                 key: "hibernate",
                                 label: I18n.tr("Show Hibernate"),
                                 desc: I18n.tr("Only visible if hibernate is supported by your system"),
@@ -608,26 +613,6 @@ Item {
                 }
             }
 
-            SettingsCard {
-                width: parent.width
-                iconName: "tune"
-                title: I18n.tr("Advanced")
-                settingKey: "powerAdvanced"
-                collapsible: true
-                expanded: false
-
-                SettingsSliderRow {
-                    settingKey: "batteryChargeLimit"
-                    tags: ["battery", "charge", "limit", "percentage", "power"]
-                    text: I18n.tr("Battery Charge Limit")
-                    description: I18n.tr("Note: this only changes the percentage, it does not actually limit charging.")
-                    value: SettingsData.batteryChargeLimit
-                    minimum: 50
-                    maximum: 100
-                    defaultValue: 100
-                    onSliderValueChanged: newValue => SettingsData.set("batteryChargeLimit", newValue)
-                }
-            }
         }
     }
 }

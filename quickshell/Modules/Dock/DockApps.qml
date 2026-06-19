@@ -15,6 +15,7 @@ Item {
     property bool isVertical: false
     property var dockScreen: null
     property real iconSize: 40
+    property bool usesOverlayLayer: false
     property int draggedIndex: -1
     property int dropTargetIndex: -1
     property bool suppressShiftAnimation: false

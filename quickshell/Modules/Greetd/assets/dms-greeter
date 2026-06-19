@@ -75,6 +75,19 @@ normalize_bool_flag() {
     esac
 }
 
+is_hyprland_lua_config() {
+    local config_file="$1"
+    case "$config_file" in
+        *.lua)
+            return 0
+            ;;
+    esac
+    if [[ -f "$config_file" ]] && grep -qE '(^|[^[:alnum:]_])hl\.' "$config_file"; then
+        return 0
+    fi
+    return 1
+}
+
 exec_compositor() {
     local log_tag="$1"
     shift
@@ -263,10 +276,6 @@ environment {
     DMS_RUN_GREETER "1"
 }
 
-debug {
-  keep-max-bpc-unchanged
-}
-
 gestures {
    hot-corners {
      off
@@ -310,7 +319,17 @@ NIRI_EOF
             echo "Error: neither 'start-hyprland' nor 'Hyprland' was found in PATH" >&2
             exit 1
         fi
-        if [[ -z "$COMPOSITOR_CONFIG" ]]; then
+        if [[ -n "$COMPOSITOR_CONFIG" ]] && is_hyprland_lua_config "$COMPOSITOR_CONFIG"; then
+            TEMP_CONFIG=$(mktemp --suffix=.lua)
+            cat "$COMPOSITOR_CONFIG" > "$TEMP_CONFIG"
+            cat >> "$TEMP_CONFIG" << HYPRLAND_LUA_EOF
+
+hl.on("hyprland.start", function()
+    hl.exec_cmd('sh -c "$QS_CMD; hyprctl dispatch exit"')
+end)
+HYPRLAND_LUA_EOF
+            COMPOSITOR_CONFIG="$TEMP_CONFIG"
+        elif [[ -z "$COMPOSITOR_CONFIG" ]]; then
             TEMP_CONFIG=$(mktemp)
             cat > "$TEMP_CONFIG" << HYPRLAND_EOF
 env = DMS_RUN_GREETER,1
@@ -410,9 +429,9 @@ MIRACLE_EOF
     mango|mangowc)
         require_command "mango"
         if [[ -n "$COMPOSITOR_CONFIG" ]]; then
-            exec_compositor "mango" mango -c "$COMPOSITOR_CONFIG" -s "$QS_CMD && mmsg -d quit"
+            exec_compositor "mango" mango -c "$COMPOSITOR_CONFIG" -s "$QS_CMD && mmsg dispatch quit"
         else
-            exec_compositor "mango" mango -s "$QS_CMD && mmsg -d quit"
+            exec_compositor "mango" mango -s "$QS_CMD && mmsg dispatch quit"
         fi
         ;;
 

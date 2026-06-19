@@ -51,7 +51,7 @@ type NiriParser struct {
 }
 
 func parseKDL(data []byte) (*document.Document, error) {
-	return kdl.Parse(strings.NewReader(normalizeKDLBraces(string(data))))
+	return kdl.Parse(strings.NewReader(normalizeKDLBraces(quoteLeadingUnderscoreIdents(string(data)))))
 }
 
 func normalizeKDLBraces(input string) string {
@@ -92,6 +92,93 @@ func normalizeKDLBraces(input string) string {
 	}
 
 	return sb.String()
+}
+
+// quoteLeadingUnderscoreIdents wraps bare KDL identifiers that begin with '_'
+// in double quotes. kdl-go rejects '_' as the first character of a bare
+// identifier (e.g. the common `_JAVA_AWT_WM_NONREPARENTING "1"` environment
+// node), even though niri's own parser and the KDL spec accept it — so without
+// this the whole config fails to parse and no keybinds load. Quoting lets
+// kdl-go parse it; this is safe because the niri parser only dispatches on
+// fixed node/section names (binds, recent-windows, include, ...) that never
+// start with '_', so re-quoting such a name cannot change what DMS reads.
+// Underscores elsewhere in an identifier (XDG_CURRENT_DESKTOP) are left
+// untouched, and underscores inside strings or comments are skipped. Only a
+// leading '_' is handled; other start characters kdl-go over-rejects (e.g. '.'
+// or '?') do not occur in niri configs.
+func quoteLeadingUnderscoreIdents(input string) string {
+	var sb strings.Builder
+	sb.Grow(len(input))
+
+	var prev byte
+	n := len(input)
+	for i := 0; i < n; {
+		c := input[i]
+
+		switch {
+		case c == '"':
+			end := findStringEnd(input, i)
+			sb.WriteString(input[i:end])
+			prev = '"'
+			i = end
+		case c == '/' && i+1 < n && input[i+1] == '/':
+			end := findLineCommentEnd(input, i)
+			sb.WriteString(input[i:end])
+			prev = '\n'
+			i = end
+		case c == '/' && i+1 < n && input[i+1] == '*':
+			end := findBlockCommentEnd(input, i)
+			sb.WriteString(input[i:end])
+			prev = ' '
+			i = end
+		case c == '/' && i+1 < n && input[i+1] == '-':
+			// KDL slashdash: /- comments out the next node/value. Keep the
+			// marker but treat what follows as a fresh token start, so a
+			// slashdashed leading-underscore node (e.g. `/-_FOO "1"`) still
+			// gets quoted instead of crashing kdl-go.
+			sb.WriteByte('/')
+			sb.WriteByte('-')
+			prev = ' '
+			i += 2
+		case c == '_' && isIdentBoundary(prev):
+			end := scanBareIdent(input, i)
+			sb.WriteByte('"')
+			sb.WriteString(input[i:end])
+			sb.WriteByte('"')
+			prev = '"'
+			i = end
+		default:
+			sb.WriteByte(c)
+			prev = c
+			i++
+		}
+	}
+
+	return sb.String()
+}
+
+// isIdentBoundary reports whether the previously emitted byte ends a token, so
+// that a following '_' starts a fresh bare identifier rather than sitting in
+// the middle of one.
+func isIdentBoundary(prev byte) bool {
+	switch prev {
+	case 0, ' ', '\t', '\n', '\r', '{', '}', ';', '=', '(', ')', ',':
+		return true
+	}
+	return false
+}
+
+// scanBareIdent returns the index just past the bare identifier starting at
+// start, stopping at whitespace or any KDL delimiter.
+func scanBareIdent(s string, start int) int {
+	n := len(s)
+	for i := start; i < n; i++ {
+		switch s[i] {
+		case ' ', '\t', '\n', '\r', '"', '{', '}', '(', ')', ';', '=', ',', '/', '\\', '<', '>', '[', ']':
+			return i
+		}
+	}
+	return n
 }
 
 func findStringEnd(s string, start int) int {
@@ -162,6 +249,14 @@ func NewNiriParser(configDir string) *NiriParser {
 	}
 }
 
+func normalizeNiriBindKey(key string) string {
+	parts := strings.Split(key, "+")
+	for i := range parts {
+		parts[i] = strings.ToLower(strings.TrimSpace(parts[i]))
+	}
+	return strings.Join(parts, "+")
+}
+
 func (p *NiriParser) Parse() (*NiriSection, error) {
 	dmsBindsPath := filepath.Join(p.configDir, "dms", "binds.kdl")
 	if _, err := os.Stat(dmsBindsPath); err == nil {
@@ -213,24 +308,25 @@ func (p *NiriParser) finalizeBinds() []NiriKeyBinding {
 
 func (p *NiriParser) addBind(kb *NiriKeyBinding) {
 	key := p.formatBindKey(kb)
+	normalizedKey := normalizeNiriBindKey(key)
 	isDMSBind := strings.Contains(kb.Source, "dms/binds.kdl")
 
 	if isDMSBind {
-		p.dmsBindKeys[key] = true
-		p.dmsBindMap[key] = kb
-	} else if p.dmsBindKeys[key] {
+		p.dmsBindKeys[normalizedKey] = true
+		p.dmsBindMap[normalizedKey] = kb
+	} else if p.dmsBindKeys[normalizedKey] {
 		p.bindsAfterDMS++
-		p.conflictingConfigs[key] = kb
-		p.configBindKeys[key] = true
+		p.conflictingConfigs[normalizedKey] = kb
+		p.configBindKeys[normalizedKey] = true
 		return
 	} else {
-		p.configBindKeys[key] = true
+		p.configBindKeys[normalizedKey] = true
 	}
 
-	if _, exists := p.bindMap[key]; !exists {
-		p.bindOrder = append(p.bindOrder, key)
+	if _, exists := p.bindMap[normalizedKey]; !exists {
+		p.bindOrder = append(p.bindOrder, normalizedKey)
 	}
-	p.bindMap[key] = kb
+	p.bindMap[normalizedKey] = kb
 }
 
 func (p *NiriParser) formatBindKey(kb *NiriKeyBinding) string {

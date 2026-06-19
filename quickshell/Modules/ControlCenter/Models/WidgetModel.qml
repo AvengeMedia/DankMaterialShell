@@ -245,7 +245,7 @@ QtObject {
         {
             "id": "builtin_vpn",
             "text": I18n.tr("VPN"),
-            "description": I18n.tr("VPN connections"),
+            "description": I18n.tr("VPN Connections"),
             "icon": "vpn_key",
             "type": "builtin_plugin",
             "enabled": DMSNetworkService.available,
@@ -350,6 +350,10 @@ QtObject {
 
     function moveWidget(fromIndex, toIndex) {
         WidgetUtils.moveWidget(fromIndex, toIndex);
+    }
+
+    function reorderWidgets(newOrder) {
+        WidgetUtils.reorderWidgets(newOrder);
     }
 
     function resetToDefault() {

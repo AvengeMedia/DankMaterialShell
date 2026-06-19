@@ -90,6 +90,7 @@ Item {
         if (!useSingleWindow)
             clickCatcher.visible = true;
         contentWindow.visible = true;
+        opened();
         shouldHaveFocus = false;
         Qt.callLater(() => shouldHaveFocus = Qt.binding(() => shouldBeVisible));
     }
@@ -204,6 +205,7 @@ Item {
         id: clickCatcher
         visible: false
         color: "transparent"
+        updatesEnabled: false
 
         WlrLayershell.namespace: root.layerNamespace + ":clickcatcher"
         WlrLayershell.layer: WlrLayershell.Top
@@ -251,32 +253,14 @@ Item {
         }
 
         WlrLayershell.namespace: root.layerNamespace
-        WlrLayershell.layer: {
-            if (root.useOverlayLayer)
-                return WlrLayershell.Overlay;
-            switch (Quickshell.env("DMS_MODAL_LAYER")) {
-            case "bottom":
-                log.error("'bottom' layer is not valid for modals. Defaulting to 'top' layer.");
-                return WlrLayershell.Top;
-            case "background":
-                log.error("'background' layer is not valid for modals. Defaulting to 'top' layer.");
-                return WlrLayershell.Top;
-            case "overlay":
-                return WlrLayershell.Overlay;
-            default:
-                return WlrLayershell.Top;
-            }
-        }
+        WlrLayershell.layer: root.useOverlayLayer ? WlrLayer.Overlay : LayerShell.fromEnv("DMS_MODAL_LAYER", WlrLayer.Top, {
+            "allow": ["top", "overlay"],
+            "invalidLayer": WlrLayer.Top,
+            "label": "modals",
+            "error": true
+        })
         WlrLayershell.exclusiveZone: -1
-        WlrLayershell.keyboardFocus: {
-            if (customKeyboardFocus !== null)
-                return customKeyboardFocus;
-            if (!shouldHaveFocus)
-                return WlrKeyboardFocus.None;
-            if (root.useHyprlandFocusGrab)
-                return WlrKeyboardFocus.OnDemand;
-            return WlrKeyboardFocus.Exclusive;
-        }
+        WlrLayershell.keyboardFocus: KeyboardFocus.keyboardFocus(shouldHaveFocus, customKeyboardFocus)
 
         anchors {
             left: true
@@ -296,13 +280,11 @@ Item {
         implicitHeight: root.useSingleWindow ? 0 : root.alignedHeight + (shadowBuffer * 2)
 
         onVisibleChanged: {
-            if (visible) {
-                opened();
-            } else {
-                if (Qt.inputMethod) {
-                    Qt.inputMethod.hide();
-                    Qt.inputMethod.reset();
-                }
+            if (visible)
+                return;
+            if (Qt.inputMethod) {
+                Qt.inputMethod.hide();
+                Qt.inputMethod.reset();
             }
         }
 

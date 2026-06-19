@@ -10,6 +10,8 @@ const Weights = {
     typeBonus: {
         app: 1000,
         plugin: 900,
+        setting: 850,
+        clipboard: 825,
         file: 800,
         action: 600
     }

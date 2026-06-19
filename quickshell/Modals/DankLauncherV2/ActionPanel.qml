@@ -76,6 +76,13 @@ Rectangle {
                 }
             }
             break;
+        case "clipboard":
+            if (selectedItem?.actions) {
+                for (var i = 0; i < selectedItem.actions.length; i++) {
+                    result.push(selectedItem.actions[i]);
+                }
+            }
+            break;
         }
         return result;
     }

@@ -209,12 +209,7 @@ func (m Model) installPackages() tea.Cmd {
 		}
 
 		// Convert TUI selection to deps enum
-		var wm deps.WindowManager
-		if m.selectedWM == 0 {
-			wm = deps.WindowManagerNiri
-		} else {
-			wm = deps.WindowManagerHyprland
-		}
+		wm := m.selectedWindowManager()
 
 		installerProgressChan := make(chan distros.InstallProgressMsg, 100)
 
@@ -245,8 +240,11 @@ func (m Model) installPackages() tea.Cmd {
 					}
 					if greeterSelected {
 						compositorName := "niri"
-						if m.selectedWM == 1 {
+						switch m.selectedWindowManager() {
+						case deps.WindowManagerHyprland:
 							compositorName = "Hyprland"
+						case deps.WindowManagerMango:
+							compositorName = "mango"
 						}
 						m.packageProgressChan <- packageInstallProgressMsg{
 							progress:  0.92,

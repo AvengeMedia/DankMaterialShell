@@ -201,6 +201,21 @@ FocusScope {
         keyboardSelectionRequested = true;
     }
 
+    function activateFile(path, name, isDir) {
+        if (isDir) {
+            navigateTo(path);
+            return;
+        }
+        if (saveMode) {
+            saveRow.fileName = name;
+            pendingFilePath = path;
+            showOverwriteConfirmation = true;
+        } else {
+            fileSelected(path);
+            closeRequested();
+        }
+    }
+
     function handleSaveFile(filePath) {
         var normalizedPath = filePath;
         if (!normalizedPath.startsWith("file://")) {
@@ -652,6 +667,7 @@ FocusScope {
 
             Row {
                 anchors.fill: parent
+                anchors.bottomMargin: root.saveMode ? 40 + Theme.spacingL * 2 : 0
                 spacing: 0
 
                 Row {
@@ -756,12 +772,7 @@ FocusScope {
                                 onItemClicked: (index, path, name, isDir) => {
                                     selectedIndex = index;
                                     setSelectedFileData(path, name, isDir);
-                                    if (isDir) {
-                                        navigateTo(path);
-                                    } else {
-                                        fileSelected(path);
-                                        root.closeRequested();
-                                    }
+                                    root.activateFile(path, name, isDir);
                                 }
                                 onItemSelected: (index, path, name, isDir) => {
                                     setSelectedFileData(path, name, isDir);
@@ -776,12 +787,7 @@ FocusScope {
                                             root.keyboardSelectionRequested = false;
                                             selectedIndex = index;
                                             setSelectedFileData(filePath, fileName, fileIsDir);
-                                            if (fileIsDir) {
-                                                navigateTo(filePath);
-                                            } else {
-                                                fileSelected(filePath);
-                                                root.closeRequested();
-                                            }
+                                            root.activateFile(filePath, fileName, fileIsDir);
                                         }
                                     }
 
@@ -817,12 +823,7 @@ FocusScope {
                                 onItemClicked: (index, path, name, isDir) => {
                                     selectedIndex = index;
                                     setSelectedFileData(path, name, isDir);
-                                    if (isDir) {
-                                        navigateTo(path);
-                                    } else {
-                                        fileSelected(path);
-                                        root.closeRequested();
-                                    }
+                                    root.activateFile(path, name, isDir);
                                 }
                                 onItemSelected: (index, path, name, isDir) => {
                                     setSelectedFileData(path, name, isDir);
@@ -837,12 +838,7 @@ FocusScope {
                                             root.keyboardSelectionRequested = false;
                                             selectedIndex = index;
                                             setSelectedFileData(filePath, fileName, fileIsDir);
-                                            if (fileIsDir) {
-                                                navigateTo(filePath);
-                                            } else {
-                                                fileSelected(filePath);
-                                                root.closeRequested();
-                                            }
+                                            root.activateFile(filePath, fileName, fileIsDir);
                                         }
                                     }
 
@@ -855,6 +851,7 @@ FocusScope {
             }
 
             FileBrowserSaveRow {
+                id: saveRow
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 anchors.right: parent.right
@@ -913,21 +910,21 @@ FocusScope {
                 }
             }
         }
+    }
 
-        FileBrowserOverwriteDialog {
-            anchors.fill: parent
-            showDialog: showOverwriteConfirmation
-            pendingFilePath: root.pendingFilePath
-            onConfirmed: filePath => {
-                showOverwriteConfirmation = false;
-                fileSelected(filePath);
-                pendingFilePath = "";
-                Qt.callLater(() => root.closeRequested());
-            }
-            onCancelled: {
-                showOverwriteConfirmation = false;
-                pendingFilePath = "";
-            }
+    FileBrowserOverwriteDialog {
+        anchors.fill: parent
+        showDialog: showOverwriteConfirmation
+        pendingFilePath: root.pendingFilePath
+        onConfirmed: filePath => {
+            showOverwriteConfirmation = false;
+            fileSelected(filePath);
+            pendingFilePath = "";
+            Qt.callLater(() => root.closeRequested());
+        }
+        onCancelled: {
+            showOverwriteConfirmation = false;
+            pendingFilePath = "";
         }
     }
 
