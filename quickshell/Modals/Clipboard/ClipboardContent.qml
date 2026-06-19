@@ -254,6 +254,7 @@ Item {
                 modal: clipboardContent.modal
                 listView: clipboardListView
                 onCopyRequested: clipboardContent.modal.copyEntry(modelData)
+                onPasteRequested: clipboardContent.modal.pasteEntry(modelData)
                 onDeleteRequested: clipboardContent.modal.deleteEntry(modelData)
                 onPinRequested: targetEntry => clipboardContent.modal.pinEntry(targetEntry)
                 onUnpinRequested: targetEntry => clipboardContent.modal.unpinEntry(targetEntry)
@@ -329,6 +330,7 @@ Item {
                 modal: clipboardContent.modal
                 listView: savedListView
                 onCopyRequested: clipboardContent.modal.copyEntry(modelData)
+                onPasteRequested: clipboardContent.modal.pasteEntry(modelData)
                 onDeleteRequested: clipboardContent.modal.deletePinnedEntry(modelData)
                 onPinRequested: targetEntry => clipboardContent.modal.pinEntry(targetEntry)
                 onUnpinRequested: targetEntry => clipboardContent.modal.unpinEntry(targetEntry)

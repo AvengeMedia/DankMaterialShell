@@ -597,6 +597,7 @@ var SPEC = {
     desktopWidgetGroups: { def: [] },
 
     builtInPluginSettings: { def: {} },
+    clipboardClickToPaste: { def: false },
     clipboardEnterToPaste: { def: false },
     clipboardRememberTypeFilter: { def: false },
     clipboardTypeFilter: { def: "all" },

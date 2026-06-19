@@ -14,6 +14,7 @@ Rectangle {
     required property var listView
 
     signal copyRequested
+    signal pasteRequested
     signal deleteRequested
     signal pinRequested(var targetEntry)
     signal unpinRequested(var targetEntry)
@@ -207,7 +208,13 @@ Rectangle {
                 rippleLayer.trigger(pos.x, pos.y);
             }
         }
-        onClicked: copyRequested()
+        onClicked: {
+           if (SettingsData.clipboardClickToPaste) {
+                pasteRequested()
+            } else {
+                copyRequested()
+            }
+        }
     }
 
     MouseArea {

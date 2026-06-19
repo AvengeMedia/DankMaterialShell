@@ -456,6 +456,16 @@ Item {
 
                 SettingsToggleRow {
                     tab: "clipboard"
+                    tags: ["clipboard", "click", "paste", "behavior"]
+                    settingKey: "clipboardClickToPaste"
+                    text: I18n.tr("Click to Paste")
+                    description: I18n.tr("Click an entry to paste directly instead of copying", "Clipboard behavior setting description")
+                    checked: SettingsData.clipboardClickToPaste
+                    onToggled: checked => SettingsData.set("clipboardClickToPaste", checked)
+                }
+
+                SettingsToggleRow {
+                    tab: "clipboard"
                     tags: ["clipboard", "enter", "paste", "behavior"]
                     settingKey: "clipboardEnterToPaste"
                     text: I18n.tr("Enter to Paste")

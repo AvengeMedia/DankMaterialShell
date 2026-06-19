@@ -7049,6 +7049,25 @@
     "description": "Clear all history when server starts"
   },
   {
+    "section": "clipboardClickToPaste",
+    "label": "Click to Paste",
+    "tabIndex": 23,
+    "category": "System",
+    "keywords": [
+      "behavior",
+      "click",
+      "clipboard",
+      "copying",
+      "directly",
+      "entry",
+      "linux",
+      "os",
+      "paste",
+      "system"
+    ],
+    "description": "Click an entry to paste directly instead of copying"
+  },
+  {
     "section": "_tab_23",
     "label": "Clipboard",
     "tabIndex": 23,
