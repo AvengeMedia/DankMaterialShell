@@ -152,8 +152,8 @@ Item {
         }
     ]
 
-    readonly property var entryActionKeys: ["pin", "edit", "delete"]
-    readonly property var entryActionLabels: [I18n.tr("Pin"), I18n.tr("Edit"), I18n.tr("Delete")]
+    readonly property var entryActionKeys: ["copy", "paste", "pin", "edit", "delete"]
+    readonly property var entryActionLabels: [I18n.tr("Copy"), I18n.tr("Paste"), I18n.tr("Pin"), I18n.tr("Edit"), I18n.tr("Delete")]
 
     function getMaxHistoryText(value) {
         if (value <= 0)
@@ -486,7 +486,7 @@ Item {
 
                 SettingsButtonGroupRow {
                     tab: "clipboard"
-                    tags: ["clipboard", "actions", "buttons", "hide", "density", "pin", "edit", "delete"]
+                    tags: ["clipboard", "actions", "buttons", "hide", "density", "copy", "paste", "pin", "edit", "delete"]
                     settingKey: "clipboardVisibleEntryActions"
                     text: I18n.tr("Visible Entry Actions")
                     description: I18n.tr("Choose which action buttons appear on clipboard entries")

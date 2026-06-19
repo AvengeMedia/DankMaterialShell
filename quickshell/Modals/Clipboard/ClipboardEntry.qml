@@ -27,11 +27,13 @@ Rectangle {
     readonly property bool hasPinnedDuplicate: pinnedDuplicateEntry !== null
     readonly property bool effectivePinned: entry.pinned || hasPinnedDuplicate
     readonly property var visibleEntryActions: SettingsData.clipboardVisibleEntryActions || ["pin", "edit", "delete"]
+    readonly property bool showCopyAction: visibleEntryActions.includes("copy")
+    readonly property bool showPasteAction: visibleEntryActions.includes("paste")
     readonly property bool showPinAction: visibleEntryActions.includes("pin")
     readonly property bool showEditAction: visibleEntryActions.includes("edit")
     readonly property bool showDeleteAction: visibleEntryActions.includes("delete")
     readonly property bool showPinnedIndicator: hasPinnedDuplicate && !showPinAction
-    readonly property bool showAnyAction: showPinAction || showEditAction || showDeleteAction || showPinnedIndicator
+    readonly property bool showAnyAction: showCopyAction || showPasteAction || showPinAction || showEditAction || showDeleteAction || showPinnedIndicator
 
     radius: Theme.cornerRadius
     color: {
@@ -86,6 +88,22 @@ Rectangle {
                 size: Theme.iconSize - 6
                 color: Theme.primary
             }
+        }
+
+        DankActionButton {
+            iconName: "content_copy"
+            iconSize: Theme.iconSize - 6
+            iconColor: Theme.surfaceText
+            visible: root.showCopyAction
+            onClicked: copyRequested()
+        }
+
+        DankActionButton {
+            iconName: "content_paste"
+            iconSize: Theme.iconSize - 6
+            iconColor: Theme.surfaceText
+            visible: root.showPasteAction
+            onClicked: pasteRequested()
         }
 
         DankActionButton {
