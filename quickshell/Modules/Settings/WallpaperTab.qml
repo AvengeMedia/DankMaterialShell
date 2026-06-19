@@ -309,7 +309,7 @@ Item {
                         id: fillModeGroup
                         property var internalModes: ["Stretch", "Fit", "Fill", "Tile", "TileVertically", "TileHorizontally", "Pad"]
                         anchors.horizontalCenter: parent.horizontalCenter
-                        model: [I18n.tr("Stretch", "wallpaper fill mode"), I18n.tr("Fit", "wallpaper fill mode"), I18n.tr("Fill", "wallpaper fill mode"), I18n.tr("Tile", "wallpaper fill mode"), I18n.tr("Tile V", "wallpaper fill mode"), I18n.tr("Tile H", "wallpaper fill mode"), I18n.tr("Center", "wallpaper fill mode")]
+                        model: [I18n.tr("Stretch", "wallpaper fill mode"), I18n.tr("Fit", "wallpaper fill mode"), I18n.tr("Fill", "wallpaper fill mode"), I18n.tr("Tile", "wallpaper fill mode"), I18n.tr("Tile V", "wallpaper fill mode"), I18n.tr("Tile H", "wallpaper fill mode"), I18n.tr("Pad", "wallpaper fill mode")]
                         selectionMode: "single"
                         buttonHeight: 28
                         minButtonWidth: 48
@@ -359,7 +359,7 @@ Item {
                     tags: ["background", "color", "fill", "fit", "custom"]
                     settingKey: "wallpaperBackgroundColorMode"
                     text: I18n.tr("Background Color")
-                    description: I18n.tr("Color shown for areas not covered by wallpaper (e.g. Fit or Center modes)")
+                    description: I18n.tr("Color shown for areas not covered by wallpaper (e.g. Fit or Pad modes)")
                     visible: root.currentWallpaper !== "" && !root.currentWallpaper.startsWith("#")
                     dropdownWidth: 220
                     options: [

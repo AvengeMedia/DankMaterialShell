@@ -346,7 +346,6 @@
       "areas",
       "background",
       "bg",
-      "center",
       "color",
       "colour",
       "covered",
@@ -363,7 +362,7 @@
       "wallpaper"
     ],
     "icon": "wallpaper",
-    "description": "Color shown for areas not covered by wallpaper (e.g. Fit or Center modes)"
+    "description": "Color shown for areas not covered by wallpaper (e.g. Fit or Pad modes)"
   },
   {
     "section": "selectedMonitor",
