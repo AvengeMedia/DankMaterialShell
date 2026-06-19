@@ -343,28 +343,27 @@
     "category": "Personalization",
     "keywords": [
       "appearance",
+      "areas",
       "background",
       "bg",
+      "center",
+      "color",
+      "colour",
+      "covered",
       "custom",
       "customize",
-      "dark",
-      "dark mode",
-      "day",
       "desktop",
-      "different",
+      "hue",
       "image",
-      "light",
-      "light mode",
-      "mode",
-      "night",
       "personal",
       "personalization",
       "picture",
-      "wallpaper",
-      "wallpapers"
+      "shown",
+      "tint",
+      "wallpaper"
     ],
     "icon": "wallpaper",
-    "description": "Set different wallpapers for light and dark mode"
+    "description": "Color shown for areas not covered by wallpaper (e.g. Fit or Center modes)"
   },
   {
     "section": "selectedMonitor",
