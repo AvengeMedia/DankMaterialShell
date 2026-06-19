@@ -63,7 +63,7 @@ Item {
                 list.push(root.backgroundWindow);
             return list.concat(KeyboardFocus.barWindows);
         }
-        active: KeyboardFocus.wantsGrab(root.shouldBeVisible, root.customKeyboardFocus)
+        active: KeyboardFocus.wantsGrab(root.shouldBeVisible || root.isClosing, root.customKeyboardFocus)
     }
 
     Loader {

@@ -9,9 +9,8 @@ BasePill {
 
     visible: SettingsData.weatherEnabled
 
-    Ref {
-        service: WeatherService
-    }
+    Component.onCompleted: WeatherService.addRef()
+    Component.onDestruction: WeatherService.removeRef()
 
     content: Component {
         Item {

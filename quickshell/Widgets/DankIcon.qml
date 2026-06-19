@@ -37,13 +37,6 @@ Item {
         horizontalAlignment: Text.AlignHCenter
         renderType: root.smoothTransform ? Text.QtRendering : Text.NativeRendering
 
-        Behavior on color {
-            enabled: Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
-            DankColorAnim {
-                duration: Theme.shorterDuration
-                easing.bezierCurve: Theme.expressiveCurves.standard
-            }
-        }
         font.variableAxes: {
             "FILL": root.fill.toFixed(1),
             "GRAD": root.grade,

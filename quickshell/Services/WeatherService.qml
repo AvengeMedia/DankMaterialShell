@@ -43,6 +43,8 @@ Singleton {
     property int lastFetchTime: 0
     property int minFetchInterval: 30000
     property int persistentRetryCount: 0
+    property int _geocodeReqId: 0
+    property var _pendingCoords: null
 
     readonly property var lowPriorityCmd: ["nice", "-n", "19", "ionice", "-c3"]
     readonly property var curlBaseCmd: ["curl", "-sS", "--fail", "--connect-timeout", "3", "--max-time", "6", "--limit-rate", "100k", "--compressed"]
@@ -452,14 +454,52 @@ Singleton {
         if (!location) {
             return null;
         }
-
-        const params = ["latitude=" + location.latitude, "longitude=" + location.longitude, "current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,surface_pressure,wind_speed_10m", "daily=sunrise,sunset,temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max", "hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m,apparent_temperature,relative_humidity_2m,surface_pressure,visibility,cloud_cover", "timezone=auto", "forecast_days=7"];
-
-        return "https://api.open-meteo.com/v1/forecast?" + params.join('&');
+        return getWeatherApiUrlForCoords(location.latitude, location.longitude);
     }
 
     function getGeocodingUrl(query) {
         return "https://geocoding-api.open-meteo.com/v1/search?name=" + encodeURIComponent(query) + "&count=1&language=en&format=json";
+    }
+
+    function getConfiguredLocationName() {
+        return SessionData.isGreeterMode ? GreetdSettings.weatherLocation : SettingsData.weatherLocation;
+    }
+
+    function setLocation(lat, lon, city, country) {
+        root.location = {
+            city: city || I18n.tr("Local Weather"),
+            country: country || "",
+            latitude: lat,
+            longitude: lon
+        };
+    }
+
+    function updateLocationCity(city, country) {
+        if (!root.location)
+            return;
+
+        root.location = {
+            latitude: root.location.latitude,
+            longitude: root.location.longitude,
+            city: city || root.location.city,
+            country: country || root.location.country
+        };
+
+        if (root.weather.available) {
+            root.weather = Object.assign({}, root.weather, {
+                city: city || root.weather.city,
+                country: country || root.weather.country
+            });
+        }
+    }
+
+    function getWeatherApiUrlForCoords(lat, lon) {
+        if (lat == null || lon == null)
+            return null;
+
+        const params = ["latitude=" + lat, "longitude=" + lon, "current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,surface_pressure,wind_speed_10m", "daily=sunrise,sunset,temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max", "hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m,apparent_temperature,relative_humidity_2m,surface_pressure,visibility,cloud_cover", "timezone=auto", "forecast_days=7"];
+
+        return "https://api.open-meteo.com/v1/forecast?" + params.join('&');
     }
 
     function addRef() {
@@ -490,20 +530,30 @@ Singleton {
                 const lat = parseFloat(parts[0]);
                 const lon = parseFloat(parts[1]);
                 if (!isNaN(lat) && !isNaN(lon)) {
-                    getLocationFromCoords(lat, lon);
+                    if (cityName) {
+                        // User provided both: trust the configured name and coordinates, skip geocoding
+                        setLocation(lat, lon, cityName, "");
+                        fetchWeather(lat, lon);
+                    } else {
+                        getLocationFromCoords(lat, lon);
+                    }
                     return;
                 }
             }
         }
 
-        if (cityName)
+        if (cityName) {
             getLocationFromCity(cityName);
+        } else {
+            root.handleWeatherFailure();
+        }
     }
 
     function getLocationFromCoords(lat, lon) {
-        const url = "https://nominatim.openstreetmap.org/reverse?lat=" + lat + "&lon=" + lon + "&format=json&addressdetails=1&accept-language=en";
-        reverseGeocodeFetcher.command = lowPriorityCmd.concat(curlBaseCmd).concat(["-H", "User-Agent: DankMaterialShell Weather Widget", url]);
-        reverseGeocodeFetcher.running = true;
+        // Use coordinates immediately for weather; resolve city name in parallel with fallbacks
+        setLocation(lat, lon, I18n.tr("Local Weather"), "");
+        fetchWeather(lat, lon);
+        resolveCityName(lat, lon);
     }
 
     function getLocationFromCity(city) {
@@ -512,19 +562,78 @@ Singleton {
     }
 
     function getLocationFromService() {
-        if (!LocationService.valid)
+        if (!LocationService.valid) {
+            getLocationFromIP();
             return;
-        getLocationFromCoords(LocationService.latitude, LocationService.longitude);
+        }
+
+        const lat = LocationService.latitude;
+        const lon = LocationService.longitude;
+
+        if (lat === 0 && lon === 0) {
+            getLocationFromIP();
+            return;
+        }
+
+        getLocationFromCoords(lat, lon);
     }
 
-    function fetchWeather() {
+    function getLocationFromIP() {
+        ipLocationFetcher.running = true;
+    }
+
+    function resolveCityName(lat, lon) {
+        // Cancel any in-flight city resolution to avoid stale updates
+        if (nominatimFetcher.running)
+            nominatimFetcher.running = false;
+        if (photonFetcher.running)
+            photonFetcher.running = false;
+        if (bigDataCloudFetcher.running)
+            bigDataCloudFetcher.running = false;
+
+        root._geocodeReqId++;
+        root._pendingCoords = {
+            latitude: lat,
+            longitude: lon,
+            reqId: root._geocodeReqId
+        };
+
+        tryNominatim(lat, lon, root._geocodeReqId);
+    }
+
+    function tryNominatim(lat, lon, reqId) {
+        const url = "https://nominatim.openstreetmap.org/reverse?lat=" + lat + "&lon=" + lon + "&format=json&addressdetails=1&accept-language=en";
+        nominatimFetcher.command = lowPriorityCmd.concat(curlBaseCmd).concat(["-H", "User-Agent: DankMaterialShell Weather Widget", url]);
+        nominatimFetcher.reqId = reqId;
+        nominatimFetcher.running = true;
+    }
+
+    function tryPhoton(lat, lon, reqId) {
+        const url = "https://photon.komoot.io/reverse?lat=" + lat + "&lon=" + lon + "&lang=en";
+        photonFetcher.command = lowPriorityCmd.concat(curlBaseCmd).concat([url]);
+        photonFetcher.reqId = reqId;
+        photonFetcher.running = true;
+    }
+
+    function tryBigDataCloud(lat, lon, reqId) {
+        const url = "https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=" + lat + "&longitude=" + lon + "&localityLanguage=zh";
+        bigDataCloudFetcher.command = lowPriorityCmd.concat(curlBaseCmd).concat([url]);
+        bigDataCloudFetcher.reqId = reqId;
+        bigDataCloudFetcher.running = true;
+    }
+
+    function fetchWeather(lat, lon) {
         if (root.refCount === 0 || !SettingsData.weatherEnabled) {
             return;
         }
 
-        if (!location) {
-            updateLocation();
-            return;
+        if (lat == null || lon == null) {
+            if (!location) {
+                updateLocation();
+                return;
+            }
+            lat = location.latitude;
+            lon = location.longitude;
         }
 
         if (weatherFetcher.running) {
@@ -536,7 +645,7 @@ Singleton {
             return;
         }
 
-        const apiUrl = getWeatherApiUrl();
+        const apiUrl = getWeatherApiUrlForCoords(lat, lon);
         if (!apiUrl) {
             return;
         }
@@ -586,8 +695,122 @@ Singleton {
     }
 
     Process {
-        id: reverseGeocodeFetcher
+        id: nominatimFetcher
+        property int reqId: 0
         running: false
+
+        stdout: StdioCollector {
+            onStreamFinished: {
+                if (nominatimFetcher.reqId !== root._geocodeReqId)
+                    return;
+
+                const raw = text.trim();
+                if (!raw || raw[0] !== "{") {
+                    root.tryPhoton(root._pendingCoords.latitude, root._pendingCoords.longitude, root._geocodeReqId);
+                    return;
+                }
+
+                try {
+                    const data = JSON.parse(raw);
+                    const address = data.address || {};
+                    const city = address.hamlet || address.city || address.town || address.village || I18n.tr("Unknown");
+                    const country = address.country || I18n.tr("Unknown");
+                    root.updateLocationCity(city, country);
+                } catch (e) {
+                    root.tryPhoton(root._pendingCoords.latitude, root._pendingCoords.longitude, root._geocodeReqId);
+                }
+            }
+        }
+
+        onExited: exitCode => {
+            if (nominatimFetcher.reqId !== root._geocodeReqId)
+                return;
+            if (exitCode !== 0) {
+                root.tryPhoton(root._pendingCoords.latitude, root._pendingCoords.longitude, root._geocodeReqId);
+            }
+        }
+    }
+
+    Process {
+        id: photonFetcher
+        property int reqId: 0
+        running: false
+
+        stdout: StdioCollector {
+            onStreamFinished: {
+                if (photonFetcher.reqId !== root._geocodeReqId)
+                    return;
+
+                const raw = text.trim();
+                if (!raw || raw[0] !== "{") {
+                    root.tryBigDataCloud(root._pendingCoords.latitude, root._pendingCoords.longitude, root._geocodeReqId);
+                    return;
+                }
+
+                try {
+                    const data = JSON.parse(raw);
+                    const features = data.features;
+                    if (!features || features.length === 0) {
+                        throw new Error("No Photon results");
+                    }
+
+                    const props = features[0].properties || {};
+                    const city = props.city || props.town || props.village || props.locality || props.name || I18n.tr("Unknown");
+                    const country = props.country || I18n.tr("Unknown");
+                    root.updateLocationCity(city, country);
+                } catch (e) {
+                    root.tryBigDataCloud(root._pendingCoords.latitude, root._pendingCoords.longitude, root._geocodeReqId);
+                }
+            }
+        }
+
+        onExited: exitCode => {
+            if (photonFetcher.reqId !== root._geocodeReqId)
+                return;
+            if (exitCode !== 0) {
+                root.tryBigDataCloud(root._pendingCoords.latitude, root._pendingCoords.longitude, root._geocodeReqId);
+            }
+        }
+    }
+
+    Process {
+        id: bigDataCloudFetcher
+        property int reqId: 0
+        running: false
+
+        stdout: StdioCollector {
+            onStreamFinished: {
+                if (bigDataCloudFetcher.reqId !== root._geocodeReqId)
+                    return;
+
+                const raw = text.trim();
+                if (!raw || raw[0] !== "{") {
+                    // All city resolution fallbacks failed; weather is already displayed
+                    return;
+                }
+
+                try {
+                    const data = JSON.parse(raw);
+                    const city = data.city || data.locality || I18n.tr("Unknown");
+                    const country = data.countryName || I18n.tr("Unknown");
+                    root.updateLocationCity(city, country);
+                } catch (e) {
+                    // All fallbacks failed; keep placeholder city name
+                }
+            }
+        }
+
+        onExited: exitCode => {
+            if (bigDataCloudFetcher.reqId !== root._geocodeReqId)
+                return;
+            // Final fallback; no further action needed
+        }
+    }
+
+    Process {
+        id: ipLocationFetcher
+        running: false
+        command: lowPriorityCmd.concat(curlBaseCmd).concat(["http://ip-api.com/json/"])
 
         stdout: StdioCollector {
             onStreamFinished: {
@@ -599,16 +822,21 @@ Singleton {
 
                 try {
                     const data = JSON.parse(raw);
-                    const address = data.address || {};
 
-                    root.location = {
-                        city: address.hamlet || address.city || address.town || address.village || I18n.tr("Unknown"),
-                        country: address.country || I18n.tr("Unknown"),
-                        latitude: parseFloat(data.lat),
-                        longitude: parseFloat(data.lon)
-                    };
+                    if (data.status === "fail") {
+                        throw new Error("IP location lookup failed");
+                    }
 
-                    fetchWeather();
+                    const lat = parseFloat(data.lat);
+                    const lon = parseFloat(data.lon);
+                    const city = data.city;
+
+                    if (!city || isNaN(lat) || isNaN(lon)) {
+                        throw new Error("Missing or invalid location data");
+                    }
+
+                    setLocation(lat, lon, city, data.countryName || "");
+                    fetchWeather(lat, lon);
                 } catch (e) {
                     root.handleWeatherFailure();
                 }
@@ -833,8 +1061,10 @@ Singleton {
         function onLocationChanged(data) {
             if (!SettingsData.useAutoLocation)
                 return;
-            if (data.latitude === 0 && data.longitude === 0)
+            if (data.latitude === 0 && data.longitude === 0) {
+                root.getLocationFromIP();
                 return;
+            }
             root.getLocationFromCoords(data.latitude, data.longitude);
         }
     }

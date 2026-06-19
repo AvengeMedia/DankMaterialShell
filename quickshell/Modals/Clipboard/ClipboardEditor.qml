@@ -15,6 +15,12 @@ Item {
     property var entry: null
     property string editorText: ""
 
+    function releaseTextInputFocus() {
+        if (editField) {
+            editField.focus = false;
+        }
+    }
+
     function decodeEntryData(data) {
         if (!data) {
             return "";

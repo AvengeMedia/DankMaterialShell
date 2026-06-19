@@ -118,10 +118,18 @@ BasePill {
         width: battery.width + battery.leftMargin + battery.rightMargin
         height: battery.height + battery.topMargin + battery.bottomMargin
         cursorShape: Qt.PointingHandCursor
-        acceptedButtons: Qt.LeftButton
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
         onPressed: mouse => {
             battery.triggerRipple(this, mouse.x, mouse.y);
-            toggleBatteryPopup();
+            if (mouse.button === Qt.LeftButton) {
+                toggleBatteryPopup();
+            } else if (mouse.button === Qt.RightButton) {
+                if (PowerProfileWatcher.available) {
+                    PowerProfileWatcher.cycleProfile();
+                } else {
+                    ToastService.showError(I18n.tr("power-profiles-daemon not available"));
+                }
+            }
         }
         onWheel: wheel => {
             var delta = wheel.angleDelta.y;
@@ -131,33 +139,20 @@ BasePill {
             // Check if this is a touchpad
             if (delta !== 120 && delta !== -120) {
                 touchpadAccumulator += delta;
-                log.info("Acc: " + touchpadAccumulator);
                 if (Math.abs(touchpadAccumulator) < 500)
                     return;
                 delta = touchpadAccumulator;
                 touchpadAccumulator = 0;
             }
-            log.info("Trigger! Delta: " + delta);
 
-            // This is after the other delta checks so it only shows on valid Y scroll
-            if (!PowerProfileWatcher.available) {
-                ToastService.showError(I18n.tr("power-profiles-daemon not available"));
+            if (!DisplayService.brightnessAvailable) {
                 return;
             }
 
-            const profiles = PowerProfileWatcher.availableProfiles;
-            var index = profiles.findIndex(profile => PowerProfiles.profile === profile);
-
-            if (delta > 0)
-                index += 1;
-            else
-                index -= 1;
-
-            if (index < 0 || index >= profiles.length)
-                return;
-
-            if (!PowerProfileWatcher.applyProfile(profiles[index]))
-                ToastService.showError(I18n.tr("Failed to set power profile"));
+            const step = 5;
+            const change = delta > 0 ? step : -step;
+            const newBrightness = Math.max(0, Math.min(100, DisplayService.brightnessLevel + change));
+            DisplayService.setBrightness(newBrightness, "", false);
         }
     }
 }

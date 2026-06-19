@@ -464,6 +464,16 @@ Item {
                     onToggled: checked => SettingsData.set("clipboardEnterToPaste", checked)
                 }
 
+                SettingsToggleRow {
+                    tab: "clipboard"
+                    tags: ["clipboard", "filter", "type", "remember", "behavior"]
+                    settingKey: "clipboardRememberTypeFilter"
+                    text: I18n.tr("Remember Type Filter", "Clipboard behavior setting title")
+                    description: I18n.tr("Keep the clipboard type filter when reopening history", "Clipboard behavior setting description")
+                    checked: SettingsData.clipboardRememberTypeFilter
+                    onToggled: checked => SettingsData.set("clipboardRememberTypeFilter", checked)
+                }
+
                 SettingsButtonGroupRow {
                     tab: "clipboard"
                     tags: ["clipboard", "actions", "buttons", "hide", "density", "pin", "edit", "delete"]

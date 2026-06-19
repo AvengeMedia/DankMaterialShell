@@ -10,8 +10,8 @@
 
 PPA_OWNER="avengemedia"
 LAUNCHPAD_API="https://api.launchpad.net/1.0"
-# Supported Ubuntu series for PPA builds (25.10 questing + 26.04 LTS resolute)
-DISTRO_SERIES_LIST=(questing resolute)
+# Supported Ubuntu series for PPA builds (26.04 LTS resolute + 26.10 stonking)
+DISTRO_SERIES_LIST=(resolute stonking)
 
 # Define packages (sync with ppa-upload.sh)
 ALL_PACKAGES=(dms dms-git dms-greeter)

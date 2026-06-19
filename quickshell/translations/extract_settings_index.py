@@ -509,7 +509,7 @@ def extract_settings_index(root_dir):
     all_entries = []
     seen_keys = set()
 
-    for qml_file in settings_dir.glob("*.qml"):
+    for qml_file in sorted(settings_dir.glob("*.qml")):
         if qml_file.name not in TAB_INDEX_MAP:
             continue
 
@@ -556,7 +556,7 @@ def main():
 
     all_entries = tab_entries + settings_entries
 
-    all_entries.sort(key=lambda x: (x["tabIndex"], x["label"]))
+    all_entries.sort(key=lambda x: (x["tabIndex"], x["label"], x["section"]))
 
     output_path = script_dir / "settings_search_index.json"
     with open(output_path, "w", encoding="utf-8") as f:

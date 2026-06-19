@@ -1192,38 +1192,25 @@ Item {
                     return Math.max(baseHeight + iconsExtraHeight, contentImplicitHeight + padding);
                 }
 
-                readonly property color unfocusedColor: {
-                    switch (SettingsData.workspaceUnfocusedColorMode) {
-                    case "s":
-                        return Theme.surface;
-                    case "sc":
-                        return Theme.surfaceContainer;
-                    case "sch":
-                        return Theme.surfaceContainerHigh;
-                    default:
-                        return Theme.surfaceTextAlpha;
-                    }
-                }
-
-                readonly property color activeColor: {
-                    switch (SettingsData.workspaceColorMode) {
-                    case "s":
-                        return Theme.surface;
-                    case "sc":
-                        return Theme.surfaceContainer;
-                    case "sch":
-                        return Theme.surfaceContainerHigh;
-                    case "none":
-                        return unfocusedColor;
-                    default:
+                function colorFromMode(mode, fallbackColor, customColor, customFallbackColor) {
+                    switch (mode) {
+                    case "primary":
+                    case "pri":
                         return Theme.primary;
-                    }
-                }
-
-                readonly property color occupiedColor: {
-                    switch (SettingsData.workspaceOccupiedColorMode) {
+                    case "primaryContainer":
+                        return Theme.primaryContainer;
+                    case "secondary":
                     case "sec":
                         return Theme.secondary;
+                    case "secondaryContainer":
+                        return Theme.secondaryContainer;
+                    case "tertiary":
+                    case "ter":
+                        return Theme.tertiary;
+                    case "tertiaryContainer":
+                        return Theme.tertiaryContainer;
+                    case "surfaceText":
+                        return Theme.surfaceText;
                     case "s":
                         return Theme.surface;
                     case "sc":
@@ -1232,36 +1219,33 @@ Item {
                         return Theme.surfaceContainerHigh;
                     case "schh":
                         return Theme.surfaceContainerHighest;
-                    default:
-                        return unfocusedColor;
-                    }
-                }
-
-                readonly property color urgentColor: {
-                    switch (SettingsData.workspaceUrgentColorMode) {
-                    case "primary":
-                        return Theme.primary;
-                    case "secondary":
-                        return Theme.secondary;
-                    case "s":
-                        return Theme.surface;
-                    case "sc":
-                        return Theme.surfaceContainer;
-                    default:
+                    case "error":
+                    case "err":
                         return Theme.error;
+                    case "custom":
+                        return Theme.safeColor(customColor, customFallbackColor);
+                    default:
+                        return fallbackColor;
                     }
                 }
 
-                readonly property color focusedBorderColor: {
-                    switch (SettingsData.workspaceFocusedBorderColor) {
-                    case "surfaceText":
-                        return Theme.surfaceText;
-                    case "secondary":
-                        return Theme.secondary;
-                    default:
-                        return Theme.primary;
-                    }
+                readonly property color unfocusedColor: colorFromMode(SettingsData.workspaceUnfocusedColorMode, Theme.surfaceTextAlpha, SettingsData.workspaceUnfocusedCustomColor, Theme.surfaceTextAlpha)
+
+                readonly property color activeColor: {
+                    if (SettingsData.workspaceColorMode === "none")
+                        return unfocusedColor;
+                    return colorFromMode(SettingsData.workspaceColorMode, Theme.primary, SettingsData.workspaceFocusedCustomColor, Theme.primary);
                 }
+
+                readonly property color occupiedColor: {
+                    if (SettingsData.workspaceOccupiedColorMode === "none")
+                        return unfocusedColor;
+                    return colorFromMode(SettingsData.workspaceOccupiedColorMode, unfocusedColor, SettingsData.workspaceOccupiedCustomColor, Theme.secondary);
+                }
+
+                readonly property color urgentColor: colorFromMode(SettingsData.workspaceUrgentColorMode, Theme.error, SettingsData.workspaceUrgentCustomColor, Theme.error)
+
+                readonly property color focusedBorderColor: colorFromMode(SettingsData.workspaceFocusedBorderColor, Theme.primary, SettingsData.workspaceFocusedBorderCustomColor, Theme.primary)
 
                 function getContrastingIconColor(bgColor) {
                     const luminance = 0.299 * bgColor.r + 0.587 * bgColor.g + 0.114 * bgColor.b;
