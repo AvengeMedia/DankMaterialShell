@@ -4,41 +4,195 @@ import qs.Services
 import qs.Modules.Settings.Widgets
 
 SettingsCard {
+    id: root
+
     iconName: "palette"
     title: I18n.tr("Workspace Appearance")
     settingKey: "workspaceAppearance"
     collapsible: true
     expanded: false
 
-    SettingsButtonGroupRow {
+    readonly property var focusedColorOptions: [({
+                "value": "default",
+                "label": I18n.tr("Primary", "workspace color option")
+            }), ({
+                "value": "primaryContainer",
+                "label": I18n.tr("Primary Container", "workspace color option")
+            }), ({
+                "value": "secondary",
+                "label": I18n.tr("Secondary", "workspace color option")
+            }), ({
+                "value": "secondaryContainer",
+                "label": I18n.tr("Secondary Container", "workspace color option")
+            }), ({
+                "value": "tertiary",
+                "label": I18n.tr("Tertiary", "workspace color option")
+            }), ({
+                "value": "tertiaryContainer",
+                "label": I18n.tr("Tertiary Container", "workspace color option")
+            }), ({
+                "value": "s",
+                "label": I18n.tr("Surface", "workspace color option")
+            }), ({
+                "value": "sc",
+                "label": I18n.tr("Surface Container", "workspace color option")
+            }), ({
+                "value": "sch",
+                "label": I18n.tr("Surface High", "workspace color option")
+            }), ({
+                "value": "schh",
+                "label": I18n.tr("Surface Highest", "workspace color option")
+            }), ({
+                "value": "none",
+                "label": I18n.tr("None", "workspace color option")
+            }), ({
+                "value": "custom",
+                "label": I18n.tr("Custom", "workspace color option")
+            })]
+
+    readonly property var occupiedColorOptions: [({
+                "value": "none",
+                "label": I18n.tr("None", "workspace color option")
+            }), ({
+                "value": "primary",
+                "label": I18n.tr("Primary", "workspace color option")
+            }), ({
+                "value": "primaryContainer",
+                "label": I18n.tr("Primary Container", "workspace color option")
+            }), ({
+                "value": "sec",
+                "label": I18n.tr("Secondary", "workspace color option")
+            }), ({
+                "value": "secondaryContainer",
+                "label": I18n.tr("Secondary Container", "workspace color option")
+            }), ({
+                "value": "tertiary",
+                "label": I18n.tr("Tertiary", "workspace color option")
+            }), ({
+                "value": "tertiaryContainer",
+                "label": I18n.tr("Tertiary Container", "workspace color option")
+            }), ({
+                "value": "s",
+                "label": I18n.tr("Surface", "workspace color option")
+            }), ({
+                "value": "sc",
+                "label": I18n.tr("Surface Container", "workspace color option")
+            }), ({
+                "value": "sch",
+                "label": I18n.tr("Surface High", "workspace color option")
+            }), ({
+                "value": "schh",
+                "label": I18n.tr("Surface Highest", "workspace color option")
+            }), ({
+                "value": "custom",
+                "label": I18n.tr("Custom", "workspace color option")
+            })]
+
+    readonly property var unfocusedColorOptions: [({
+                "value": "default",
+                "label": I18n.tr("Default", "workspace color option")
+            }), ({
+                "value": "surfaceText",
+                "label": I18n.tr("Surface Text", "workspace color option")
+            }), ({
+                "value": "primary",
+                "label": I18n.tr("Primary", "workspace color option")
+            }), ({
+                "value": "secondary",
+                "label": I18n.tr("Secondary", "workspace color option")
+            }), ({
+                "value": "tertiary",
+                "label": I18n.tr("Tertiary", "workspace color option")
+            }), ({
+                "value": "s",
+                "label": I18n.tr("Surface", "workspace color option")
+            }), ({
+                "value": "sc",
+                "label": I18n.tr("Surface Container", "workspace color option")
+            }), ({
+                "value": "sch",
+                "label": I18n.tr("Surface High", "workspace color option")
+            }), ({
+                "value": "schh",
+                "label": I18n.tr("Surface Highest", "workspace color option")
+            }), ({
+                "value": "custom",
+                "label": I18n.tr("Custom", "workspace color option")
+            })]
+
+    readonly property var urgentColorOptions: [({
+                "value": "default",
+                "label": I18n.tr("Error", "workspace color option")
+            }), ({
+                "value": "primary",
+                "label": I18n.tr("Primary", "workspace color option")
+            }), ({
+                "value": "primaryContainer",
+                "label": I18n.tr("Primary Container", "workspace color option")
+            }), ({
+                "value": "secondary",
+                "label": I18n.tr("Secondary", "workspace color option")
+            }), ({
+                "value": "secondaryContainer",
+                "label": I18n.tr("Secondary Container", "workspace color option")
+            }), ({
+                "value": "tertiary",
+                "label": I18n.tr("Tertiary", "workspace color option")
+            }), ({
+                "value": "tertiaryContainer",
+                "label": I18n.tr("Tertiary Container", "workspace color option")
+            }), ({
+                "value": "s",
+                "label": I18n.tr("Surface", "workspace color option")
+            }), ({
+                "value": "sc",
+                "label": I18n.tr("Surface Container", "workspace color option")
+            }), ({
+                "value": "sch",
+                "label": I18n.tr("Surface High", "workspace color option")
+            }), ({
+                "value": "custom",
+                "label": I18n.tr("Custom", "workspace color option")
+            })]
+
+    readonly property var borderColorOptions: [({
+                "value": "surfaceText",
+                "label": I18n.tr("Surface Text", "workspace color option")
+            }), ({
+                "value": "primary",
+                "label": I18n.tr("Primary", "workspace color option")
+            }), ({
+                "value": "primaryContainer",
+                "label": I18n.tr("Primary Container", "workspace color option")
+            }), ({
+                "value": "secondary",
+                "label": I18n.tr("Secondary", "workspace color option")
+            }), ({
+                "value": "secondaryContainer",
+                "label": I18n.tr("Secondary Container", "workspace color option")
+            }), ({
+                "value": "tertiary",
+                "label": I18n.tr("Tertiary", "workspace color option")
+            }), ({
+                "value": "tertiaryContainer",
+                "label": I18n.tr("Tertiary Container", "workspace color option")
+            }), ({
+                "value": "custom",
+                "label": I18n.tr("Custom", "workspace color option")
+            })]
+
+    readonly property bool workspaceStateColorsVisible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango
+    readonly property bool urgentWorkspaceColorsVisible: workspaceStateColorsVisible || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle
+
+    ColorDropdownRow {
         text: I18n.tr("Focused Color")
-        model: ["pri", "s", "sc", "sch", "none"]
-        buttonHeight: 22
-        minButtonWidth: 36
-        buttonPadding: Theme.spacingS
-        checkIconSize: Theme.iconSizeSmall - 2
-        textSize: Theme.fontSizeSmall - 1
-        spacing: 1
-        currentIndex: {
-            switch (SettingsData.workspaceColorMode) {
-            case "s":
-                return 1;
-            case "sc":
-                return 2;
-            case "sch":
-                return 3;
-            case "none":
-                return 4;
-            default:
-                return 0;
-            }
-        }
-        onSelectionChanged: (index, selected) => {
-            if (!selected)
-                return;
-            const modes = ["default", "s", "sc", "sch", "none"];
-            SettingsData.set("workspaceColorMode", modes[index]);
-        }
+        settingKey: "workspaceColorMode"
+        tags: ["workspace", "focused", "color", "custom"]
+        options: root.focusedColorOptions
+        currentMode: SettingsData.workspaceColorMode
+        customColor: SettingsData.workspaceFocusedCustomColor || "#6750A4"
+        onModeSelected: mode => SettingsData.set("workspaceColorMode", mode)
+        onCustomColorSelected: selectedColor => SettingsData.set("workspaceFocusedCustomColor", selectedColor.toString())
     }
 
     Rectangle {
@@ -48,38 +202,16 @@ SettingsCard {
         opacity: 0.15
     }
 
-    SettingsButtonGroupRow {
+    ColorDropdownRow {
         text: I18n.tr("Occupied Color")
-        model: ["none", "sec", "s", "sc", "sch", "schh"]
-        visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango
-        buttonHeight: 22
-        minButtonWidth: 36
-        buttonPadding: Theme.spacingS
-        checkIconSize: Theme.iconSizeSmall - 2
-        textSize: Theme.fontSizeSmall - 1
-        spacing: 1
-        currentIndex: {
-            switch (SettingsData.workspaceOccupiedColorMode) {
-            case "sec":
-                return 1;
-            case "s":
-                return 2;
-            case "sc":
-                return 3;
-            case "sch":
-                return 4;
-            case "schh":
-                return 5;
-            default:
-                return 0;
-            }
-        }
-        onSelectionChanged: (index, selected) => {
-            if (!selected)
-                return;
-            const modes = ["none", "sec", "s", "sc", "sch", "schh"];
-            SettingsData.set("workspaceOccupiedColorMode", modes[index]);
-        }
+        settingKey: "workspaceOccupiedColorMode"
+        tags: ["workspace", "occupied", "color", "custom"]
+        visible: root.workspaceStateColorsVisible
+        options: root.occupiedColorOptions
+        currentMode: SettingsData.workspaceOccupiedColorMode
+        customColor: SettingsData.workspaceOccupiedCustomColor || "#625B71"
+        onModeSelected: mode => SettingsData.set("workspaceOccupiedColorMode", mode)
+        onCustomColorSelected: selectedColor => SettingsData.set("workspaceOccupiedCustomColor", selectedColor.toString())
     }
 
     Rectangle {
@@ -90,33 +222,16 @@ SettingsCard {
         visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango
     }
 
-    SettingsButtonGroupRow {
+    ColorDropdownRow {
         text: I18n.tr("Unfocused Color")
-        model: ["def", "s", "sc", "sch"]
-        buttonHeight: 22
-        minButtonWidth: 36
-        buttonPadding: Theme.spacingS
-        checkIconSize: Theme.iconSizeSmall - 2
-        textSize: Theme.fontSizeSmall - 1
-        spacing: 1
-        currentIndex: {
-            switch (SettingsData.workspaceUnfocusedColorMode) {
-            case "s":
-                return 1;
-            case "sc":
-                return 2;
-            case "sch":
-                return 3;
-            default:
-                return 0;
-            }
-        }
-        onSelectionChanged: (index, selected) => {
-            if (!selected)
-                return;
-            const modes = ["default", "s", "sc", "sch"];
-            SettingsData.set("workspaceUnfocusedColorMode", modes[index]);
-        }
+        settingKey: "workspaceUnfocusedColorMode"
+        tags: ["workspace", "unfocused", "color", "custom"]
+        options: root.unfocusedColorOptions
+        defaultColor: Theme.surfaceText
+        currentMode: SettingsData.workspaceUnfocusedColorMode
+        customColor: SettingsData.workspaceUnfocusedCustomColor || "#49454E"
+        onModeSelected: mode => SettingsData.set("workspaceUnfocusedColorMode", mode)
+        onCustomColorSelected: selectedColor => SettingsData.set("workspaceUnfocusedCustomColor", selectedColor.toString())
     }
 
     Rectangle {
@@ -127,36 +242,17 @@ SettingsCard {
         visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle
     }
 
-    SettingsButtonGroupRow {
+    ColorDropdownRow {
         text: I18n.tr("Urgent Color")
-        visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle
-        model: ["err", "pri", "sec", "s", "sc"]
-        buttonHeight: 22
-        minButtonWidth: 36
-        buttonPadding: Theme.spacingS
-        checkIconSize: Theme.iconSizeSmall - 2
-        textSize: Theme.fontSizeSmall - 1
-        spacing: 1
-        currentIndex: {
-            switch (SettingsData.workspaceUrgentColorMode) {
-            case "primary":
-                return 1;
-            case "secondary":
-                return 2;
-            case "s":
-                return 3;
-            case "sc":
-                return 4;
-            default:
-                return 0;
-            }
-        }
-        onSelectionChanged: (index, selected) => {
-            if (!selected)
-                return;
-            const modes = ["default", "primary", "secondary", "s", "sc"];
-            SettingsData.set("workspaceUrgentColorMode", modes[index]);
-        }
+        settingKey: "workspaceUrgentColorMode"
+        tags: ["workspace", "urgent", "color", "custom"]
+        visible: root.urgentWorkspaceColorsVisible
+        options: root.urgentColorOptions
+        defaultColor: Theme.error
+        currentMode: SettingsData.workspaceUrgentColorMode
+        customColor: SettingsData.workspaceUrgentCustomColor || "#B3261E"
+        onModeSelected: mode => SettingsData.set("workspaceUrgentColorMode", mode)
+        onCustomColorSelected: selectedColor => SettingsData.set("workspaceUrgentCustomColor", selectedColor.toString())
     }
 
     Rectangle {
@@ -181,39 +277,16 @@ SettingsCard {
         visible: SettingsData.workspaceFocusedBorderEnabled
         leftPadding: Theme.spacingM
 
-        SettingsButtonGroupRow {
+        ColorDropdownRow {
             width: parent.width - parent.leftPadding
             text: I18n.tr("Border Color")
-            model: [I18n.tr("Surface"), I18n.tr("Secondary"), I18n.tr("Primary")]
-            currentIndex: {
-                switch (SettingsData.workspaceFocusedBorderColor) {
-                case "surfaceText":
-                    return 0;
-                case "secondary":
-                    return 1;
-                case "primary":
-                    return 2;
-                default:
-                    return 2;
-                }
-            }
-            onSelectionChanged: (index, selected) => {
-                if (!selected)
-                    return;
-                let newColor = "primary";
-                switch (index) {
-                case 0:
-                    newColor = "surfaceText";
-                    break;
-                case 1:
-                    newColor = "secondary";
-                    break;
-                case 2:
-                    newColor = "primary";
-                    break;
-                }
-                SettingsData.set("workspaceFocusedBorderColor", newColor);
-            }
+            settingKey: "workspaceFocusedBorderColor"
+            tags: ["workspace", "focused", "border", "color", "custom"]
+            options: root.borderColorOptions
+            currentMode: SettingsData.workspaceFocusedBorderColor
+            customColor: SettingsData.workspaceFocusedBorderCustomColor || "#6750A4"
+            onModeSelected: mode => SettingsData.set("workspaceFocusedBorderColor", mode)
+            onCustomColorSelected: selectedColor => SettingsData.set("workspaceFocusedBorderCustomColor", selectedColor.toString())
         }
 
         SettingsSliderRow {

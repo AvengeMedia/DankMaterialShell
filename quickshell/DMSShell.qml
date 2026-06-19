@@ -116,6 +116,12 @@ Item {
                         fadeWindowLoader.item.cancelFade();
                     }
                 }
+
+                function onDismissFadeToLock() {
+                    if (fadeWindowLoader.item) {
+                        fadeWindowLoader.item.dismiss();
+                    }
+                }
             }
         }
     }
@@ -317,6 +323,9 @@ Item {
 
     property bool hadRealScreen: true
     property var previousRealScreenNames: []
+    // Guards for the screen-reconnect recovery path (see scheduleScreenReconnectRecovery).
+    property bool _screenRecoveryCooldown: false
+    property bool _screenRecoveryPending: false
 
     function _getRealScreenNames() {
         const names = [];
@@ -359,12 +368,57 @@ Item {
             const partialReconnect = root.previousRealScreenNames.length > 0
                 && currentNames.some(name => !root.previousRealScreenNames.includes(name));
             if (fullReconnect || partialReconnect) {
-                log.info("Screen reconnect detected, triggering surface recovery",
+                log.info("Screen reconnect detected, scheduling surface recovery",
                          "full:", fullReconnect, "partial:", partialReconnect);
-                root.triggerSurfaceRecovery("screen-reconnect");
+                root.scheduleScreenReconnectRecovery();
             }
             root.hadRealScreen = hasReal;
             root.previousRealScreenNames = currentNames;
+        }
+    }
+
+    // A DPMS off/on cycle removes an output from the screen list and re-adds it,
+    // which is indistinguishable here from a hotplug. Recovering immediately on
+    // every such event lets a flapping monitor (or a recovery that itself perturbs
+    // the output) drive an endless recovery storm that power-cycles the display
+    // (#2642). Debounce a burst of changes into a single pass, then hold a cooldown
+    // so repeated flaps trigger at most one recovery per window. Recovery still runs
+    // once per resume, so a partial DPMS resume keeps redrawing its surfaces (#2579).
+    function scheduleScreenReconnectRecovery() {
+        if (root._screenRecoveryCooldown) {
+            root._screenRecoveryPending = true;
+            return;
+        }
+        screenReconnectDebounce.restart();
+    }
+
+    Timer {
+        id: screenReconnectDebounce
+        // Wide enough to collapse the output-remove + output-re-add pair that one
+        // DPMS off/on cycle emits as two near-simultaneous events into one recovery.
+        interval: 450
+        repeat: false
+        onTriggered: {
+            root._screenRecoveryCooldown = true;
+            root._screenRecoveryPending = false;
+            screenReconnectCooldown.restart();
+            root.triggerSurfaceRecovery("screen-reconnect");
+        }
+    }
+
+    Timer {
+        id: screenReconnectCooldown
+        // Must exceed the full two-pass surfaceResumeRecoveryTimer sequence
+        // (800 + 2000 ms) so the cooldown still covers an in-flight recovery;
+        // raise this if those passes are lengthened.
+        interval: 4000
+        repeat: false
+        onTriggered: {
+            root._screenRecoveryCooldown = false;
+            if (root._screenRecoveryPending) {
+                root._screenRecoveryPending = false;
+                screenReconnectDebounce.restart();
+            }
         }
     }
 
@@ -996,6 +1050,14 @@ Item {
             root.pendingOsdResumeReloads = 2;
             osdResumeRecreateTimer.interval = 400;
             osdResumeRecreateTimer.restart();
+
+            // This path runs its own recovery directly, so drop any queued or
+            // in-flight screen-reconnect recovery to avoid a redundant pass once
+            // its cooldown expires.
+            screenReconnectDebounce.stop();
+            screenReconnectCooldown.stop();
+            root._screenRecoveryCooldown = false;
+            root._screenRecoveryPending = false;
 
             root.triggerSurfaceRecovery("sessionResumed");
         }

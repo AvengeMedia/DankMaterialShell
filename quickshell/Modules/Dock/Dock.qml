@@ -511,13 +511,11 @@ Variants {
             if (!dock.hoveredButton || !dock.reveal || slideXAnimation.running || slideYAnimation.running)
                 return;
 
-            const buttonGlobalPos = dock.hoveredButton.mapToGlobal(0, 0);
+            const buttonLocalPos = dock.hoveredButton.mapToItem(null, 0, 0);
             const tooltipText = dock.hoveredButton.tooltipText || "";
             if (!tooltipText)
                 return;
 
-            const screenX = dock.screen ? (dock.screen.x || 0) : 0;
-            const screenY = dock.screen ? (dock.screen.y || 0) : 0;
             const screenHeight = dock.screen ? dock.screen.height : 0;
 
             const gap = Theme.spacingS;
@@ -527,19 +525,19 @@ Variants {
 
             if (!dock.isVertical) {
                 const isBottom = SettingsData.dockPosition === SettingsData.Position.Bottom;
-                const globalX = buttonGlobalPos.x + btnW / 2 + adjacentLeftBarWidth;
+                const tooltipX = buttonLocalPos.x + btnW / 2 + adjacentLeftBarWidth;
                 const tooltipHeight = 32;
                 const totalFromEdge = bgMargin + dockBackground.height + dock.borderThickness + gap;
                 const screenRelativeY = isBottom ? (screenHeight - totalFromEdge - tooltipHeight) : totalFromEdge;
-                dockTooltip.show(tooltipText, globalX, screenRelativeY, dock.screen, false, false);
+                dockTooltip.show(tooltipText, tooltipX, screenRelativeY, dock.screen, false, false);
                 return;
             }
 
             const isLeft = SettingsData.dockPosition === SettingsData.Position.Left;
             const screenWidth = dock.screen ? dock.screen.width : 0;
             const totalFromEdge = bgMargin + dockBackground.width + dock.borderThickness + gap;
-            const tooltipX = isLeft ? (screenX + totalFromEdge) : (screenX + screenWidth - totalFromEdge);
-            const screenRelativeY = buttonGlobalPos.y - screenY + btnH / 2 + adjacentTopBarHeight;
+            const tooltipX = isLeft ? totalFromEdge : (screenWidth - totalFromEdge);
+            const screenRelativeY = buttonLocalPos.y + btnH / 2 + adjacentTopBarHeight;
             dockTooltip.show(tooltipText, tooltipX, screenRelativeY, dock.screen, isLeft, !isLeft);
         }
 

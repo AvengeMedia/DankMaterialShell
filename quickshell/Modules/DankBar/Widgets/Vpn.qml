@@ -106,18 +106,15 @@ BasePill {
             }
 
             if (root.isVerticalOrientation) {
-                const globalPos = mapToGlobal(width / 2, height / 2);
+                const localPos = mapToItem(null, width / 2, height / 2);
                 const currentScreen = root.parentScreen || Screen;
-                const screenX = currentScreen ? currentScreen.x : 0;
-                const screenY = currentScreen ? currentScreen.y : 0;
-                const relativeY = globalPos.y - screenY;
-                const adjustedY = relativeY + root.minTooltipY;
+                const adjustedY = localPos.y + root.minTooltipY;
                 const tooltipX = root.axis?.edge === "left" ? (root.barThickness + root.barSpacing + Theme.spacingXS) : (currentScreen.width - root.barThickness - root.barSpacing - Theme.spacingXS);
                 const isLeft = root.axis?.edge === "left";
-                tooltipLoader.item.show(tooltipText, screenX + tooltipX, adjustedY, currentScreen, isLeft, !isLeft);
+                tooltipLoader.item.show(tooltipText, tooltipX, adjustedY, currentScreen, isLeft, !isLeft);
             } else {
                 const isBottom = root.axis?.edge === "bottom";
-                const globalPos = mapToGlobal(width / 2, 0);
+                const localPos = mapToItem(null, width / 2, 0);
                 const currentScreen = root.parentScreen || Screen;
 
                 let tooltipY;
@@ -128,7 +125,7 @@ BasePill {
                     tooltipY = root.barThickness + root.barSpacing + Theme.spacingXS;
                 }
 
-                tooltipLoader.item.show(tooltipText, globalPos.x, tooltipY, currentScreen, false, false);
+                tooltipLoader.item.show(tooltipText, localPos.x, tooltipY, currentScreen, false, false);
             }
         }
         onExited: {

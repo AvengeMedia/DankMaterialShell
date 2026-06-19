@@ -2088,7 +2088,8 @@
       "appearance",
       "around",
       "bar",
-      "border",
+      "color",
+      "custom",
       "dank",
       "desktop",
       "focused",
@@ -2103,8 +2104,7 @@
       "workspace"
     ],
     "icon": "palette",
-    "description": "Show an outline ring around the focused workspace indicator",
-    "conditionKey": "isNiri"
+    "description": "Show an outline ring around the focused workspace indicator"
   },
   {
     "section": "_tab_7",
@@ -3181,6 +3181,33 @@
     "conditionKey": "isNiri"
   },
   {
+    "section": "widgetBackgroundCustomStrength",
+    "label": "Custom Blend",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "background",
+      "between",
+      "blend",
+      "color",
+      "colors",
+      "colour",
+      "custom",
+      "high",
+      "hue",
+      "look",
+      "scheme",
+      "selected",
+      "style",
+      "surface",
+      "theme",
+      "tint",
+      "widget"
+    ],
+    "description": "Blend between Surface High and the selected custom color"
+  },
+  {
     "section": "matugenTemplateNeovimSettings",
     "label": "Dark mode base",
     "tabIndex": 10,
@@ -4046,77 +4073,58 @@
     ]
   },
   {
-    "section": "widgetBackgroundColor",
-    "label": "Widget Background Color",
-    "tabIndex": 10,
-    "category": "Theme & Colors",
-    "keywords": [
-      "appearance",
-      "background",
-      "choose",
-      "color",
-      "colors",
-      "colour",
-      "components",
-      "hue",
-      "look",
-      "modules",
-      "scheme",
-      "style",
-      "theme",
-      "tint",
-      "widget",
-      "widgets"
-    ],
-    "description": "Choose the background color for widgets"
-  },
-  {
-    "section": "widgetColorMode",
-    "label": "Widget Style",
-    "tabIndex": 10,
-    "category": "Theme & Colors",
-    "keywords": [
-      "appearance",
-      "change",
-      "colorful",
-      "colors",
-      "default",
-      "look",
-      "panel",
-      "scheme",
-      "statusbar",
-      "style",
-      "taskbar",
-      "theme",
-      "topbar",
-      "widget"
-    ],
-    "description": "Change bar appearance"
-  },
-  {
     "section": "widgetStyling",
     "label": "Widget Styling",
     "tabIndex": 10,
     "category": "Theme & Colors",
     "keywords": [
+      "accent",
       "appearance",
-      "change",
+      "choose",
+      "colored",
       "colors",
+      "colour",
+      "hue",
       "look",
+      "neutral",
       "opacity",
-      "panel",
       "scheme",
-      "statusbar",
       "style",
       "styling",
-      "taskbar",
+      "text",
       "theme",
-      "topbar",
+      "tint",
       "transparency",
       "widget"
     ],
     "icon": "opacity",
-    "description": "Change bar appearance"
+    "description": "Choose neutral or accent-colored widget text"
+  },
+  {
+    "section": "widgetColorMode",
+    "label": "Widget Text Style",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "accent",
+      "appearance",
+      "choose",
+      "colored",
+      "colorful",
+      "colors",
+      "colour",
+      "default",
+      "hue",
+      "look",
+      "neutral",
+      "scheme",
+      "style",
+      "text",
+      "theme",
+      "tint",
+      "widget"
+    ],
+    "description": "Choose neutral or accent-colored widget text"
   },
   {
     "section": "matugenTemplateZed",
@@ -4885,29 +4893,6 @@
     "icon": "info"
   },
   {
-    "section": "popoutAnimationSpeed",
-    "label": "%1 Animation Speed",
-    "tabIndex": 14,
-    "category": "Typography & Motion",
-    "keywords": [
-      "animate",
-      "animation",
-      "animations",
-      "custom",
-      "duration",
-      "fonts",
-      "motion",
-      "popout",
-      "speed",
-      "sync",
-      "text",
-      "transition",
-      "typography"
-    ],
-    "icon": "open_in_new",
-    "description": "%1 custom animation duration"
-  },
-  {
     "section": "modalAnimationSpeed",
     "label": "%1 Animation Speed",
     "tabIndex": 14,
@@ -4928,6 +4913,29 @@
       "typography"
     ],
     "icon": "web_asset",
+    "description": "%1 custom animation duration"
+  },
+  {
+    "section": "popoutAnimationSpeed",
+    "label": "%1 Animation Speed",
+    "tabIndex": 14,
+    "category": "Typography & Motion",
+    "keywords": [
+      "animate",
+      "animation",
+      "animations",
+      "custom",
+      "duration",
+      "fonts",
+      "motion",
+      "popout",
+      "speed",
+      "sync",
+      "text",
+      "transition",
+      "typography"
+    ],
+    "icon": "open_in_new",
     "description": "%1 custom animation duration"
   },
   {
@@ -4999,27 +5007,6 @@
     "icon": "auto_awesome_motion"
   },
   {
-    "section": "popoutCustomAnimationDuration",
-    "label": "Custom Duration",
-    "tabIndex": 14,
-    "category": "Typography & Motion",
-    "keywords": [
-      "animate",
-      "animation",
-      "animations",
-      "custom",
-      "duration",
-      "fonts",
-      "motion",
-      "popout",
-      "speed",
-      "text",
-      "transition",
-      "typography"
-    ],
-    "description": "%1 custom animation duration"
-  },
-  {
     "section": "modalCustomAnimationDuration",
     "label": "Custom Duration",
     "tabIndex": 14,
@@ -5033,6 +5020,27 @@
       "fonts",
       "modal",
       "motion",
+      "speed",
+      "text",
+      "transition",
+      "typography"
+    ],
+    "description": "%1 custom animation duration"
+  },
+  {
+    "section": "popoutCustomAnimationDuration",
+    "label": "Custom Duration",
+    "tabIndex": 14,
+    "category": "Typography & Motion",
+    "keywords": [
+      "animate",
+      "animation",
+      "animations",
+      "custom",
+      "duration",
+      "fonts",
+      "motion",
+      "popout",
       "speed",
       "text",
       "transition",
@@ -5294,6 +5302,30 @@
       "startup"
     ],
     "description": "Play sound after logging in"
+  },
+  {
+    "section": "muteSoundsWhenMediaPlaying",
+    "label": "Mute During Playback",
+    "tabIndex": 15,
+    "category": "Sounds",
+    "keywords": [
+      "audio",
+      "during",
+      "effects",
+      "media",
+      "mpris",
+      "music",
+      "mute",
+      "playback",
+      "playing",
+      "sfx",
+      "silence",
+      "sound",
+      "sounds",
+      "system",
+      "while"
+    ],
+    "description": "Silence system sounds while media is playing"
   },
   {
     "section": "soundNewNotification",
@@ -6530,30 +6562,6 @@
     "description": "How often the server polls for new updates."
   },
   {
-    "section": "powerAdvanced",
-    "label": "Advanced",
-    "tabIndex": 21,
-    "category": "Power & Sleep",
-    "keywords": [
-      "actually",
-      "advanced",
-      "battery",
-      "changes",
-      "charge",
-      "charging",
-      "does",
-      "energy",
-      "limit",
-      "percentage",
-      "power",
-      "shutdown",
-      "sleep",
-      "suspend"
-    ],
-    "icon": "tune",
-    "description": "Note: this only changes the percentage, it does not actually limit charging."
-  },
-  {
     "section": "lockTimeout",
     "label": "Automatically lock after",
     "tabIndex": 21,
@@ -6572,28 +6580,6 @@
       "suspend",
       "timeout"
     ]
-  },
-  {
-    "section": "batteryChargeLimit",
-    "label": "Battery Charge Limit",
-    "tabIndex": 21,
-    "category": "Power & Sleep",
-    "keywords": [
-      "actually",
-      "battery",
-      "changes",
-      "charge",
-      "charging",
-      "does",
-      "energy",
-      "limit",
-      "percentage",
-      "power",
-      "shutdown",
-      "sleep",
-      "suspend"
-    ],
-    "description": "Note: this only changes the percentage, it does not actually limit charging."
   },
   {
     "section": "customPowerActions",
@@ -7162,6 +7148,29 @@
       "system"
     ],
     "description": "Maximum number of entries that can be saved"
+  },
+  {
+    "section": "clipboardRememberTypeFilter",
+    "label": "Remember Type Filter",
+    "tabIndex": 23,
+    "category": "System",
+    "keywords": [
+      "behavior",
+      "clipboard",
+      "cliphist",
+      "copy",
+      "filter",
+      "history",
+      "keep",
+      "linux",
+      "os",
+      "paste",
+      "remember",
+      "reopening",
+      "system",
+      "type"
+    ],
+    "description": "Keep the clipboard type filter when reopening history"
   },
   {
     "section": "clipboardVisibleEntryActions",
@@ -8304,28 +8313,6 @@
     "icon": "line_start"
   },
   {
-    "section": "niriLayoutBorderSize",
-    "label": "Border Size",
-    "tabIndex": 37,
-    "category": "Personalization",
-    "keywords": [
-      "appearance",
-      "border",
-      "custom",
-      "customize",
-      "focus",
-      "niri",
-      "override",
-      "personal",
-      "personalization",
-      "ring",
-      "size",
-      "width",
-      "window"
-    ],
-    "description": "Width of window border and focus ring"
-  },
-  {
     "section": "hyprlandLayoutBorderSize",
     "label": "Border Size",
     "tabIndex": 37,
@@ -8365,6 +8352,28 @@
       "window"
     ],
     "description": "Width of window border"
+  },
+  {
+    "section": "niriLayoutBorderSize",
+    "label": "Border Size",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "border",
+      "custom",
+      "customize",
+      "focus",
+      "niri",
+      "override",
+      "personal",
+      "personalization",
+      "ring",
+      "size",
+      "width",
+      "window"
+    ],
+    "description": "Width of window border and focus ring"
   },
   {
     "section": "hyprlandLayout",
@@ -8466,27 +8475,6 @@
     "conditionKey": "isNiri"
   },
   {
-    "section": "niriLayoutBorderSizeEnabled",
-    "label": "Override Border Size",
-    "tabIndex": 37,
-    "category": "Personalization",
-    "keywords": [
-      "appearance",
-      "border",
-      "custom",
-      "customize",
-      "focus",
-      "niri",
-      "override",
-      "personal",
-      "personalization",
-      "ring",
-      "size",
-      "width"
-    ],
-    "description": "Use custom border/focus-ring width"
-  },
-  {
     "section": "hyprlandLayoutBorderSizeEnabled",
     "label": "Override Border Size",
     "tabIndex": 37,
@@ -8524,31 +8512,25 @@
     "description": "Use custom border size"
   },
   {
-    "section": "niriLayoutRadiusOverrideEnabled",
-    "label": "Override Corner Radius",
+    "section": "niriLayoutBorderSizeEnabled",
+    "label": "Override Border Size",
     "tabIndex": 37,
     "category": "Personalization",
     "keywords": [
       "appearance",
-      "colors",
-      "colour",
-      "corner",
-      "corners",
+      "border",
       "custom",
       "customize",
-      "look",
+      "focus",
       "niri",
       "override",
       "personal",
       "personalization",
-      "radius",
-      "round",
-      "rounded",
-      "style",
-      "theme",
-      "window"
+      "ring",
+      "size",
+      "width"
     ],
-    "description": "Use custom window radius instead of theme radius"
+    "description": "Use custom border/focus-ring width"
   },
   {
     "section": "hyprlandLayoutRadiusOverrideEnabled",
@@ -8607,30 +8589,31 @@
     "description": "Use custom window radius instead of theme radius"
   },
   {
-    "section": "niriLayoutGapsOverrideEnabled",
-    "label": "Override Gaps",
+    "section": "niriLayoutRadiusOverrideEnabled",
+    "label": "Override Corner Radius",
     "tabIndex": 37,
     "category": "Personalization",
     "keywords": [
       "appearance",
+      "colors",
+      "colour",
+      "corner",
+      "corners",
       "custom",
       "customize",
-      "gap",
-      "gaps",
-      "margin",
-      "margins",
+      "look",
       "niri",
       "override",
-      "padding",
-      "panel",
       "personal",
       "personalization",
-      "spacing",
-      "statusbar",
-      "taskbar",
-      "topbar"
+      "radius",
+      "round",
+      "rounded",
+      "style",
+      "theme",
+      "window"
     ],
-    "description": "Use custom gaps instead of bar spacing"
+    "description": "Use custom window radius instead of theme radius"
   },
   {
     "section": "hyprlandLayoutGapsOverrideEnabled",
@@ -8686,6 +8669,32 @@
     "description": "Use custom gaps instead of bar spacing"
   },
   {
+    "section": "niriLayoutGapsOverrideEnabled",
+    "label": "Override Gaps",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "custom",
+      "customize",
+      "gap",
+      "gaps",
+      "margin",
+      "margins",
+      "niri",
+      "override",
+      "padding",
+      "panel",
+      "personal",
+      "personalization",
+      "spacing",
+      "statusbar",
+      "taskbar",
+      "topbar"
+    ],
+    "description": "Use custom gaps instead of bar spacing"
+  },
+  {
     "section": "hyprlandResizeOnBorder",
     "label": "Resize on Border",
     "tabIndex": 37,
@@ -8707,29 +8716,6 @@
       "windows"
     ],
     "description": "Resize windows by dragging their edges with the mouse"
-  },
-  {
-    "section": "niriLayoutRadiusOverride",
-    "label": "Window Corner Radius",
-    "tabIndex": 37,
-    "category": "Personalization",
-    "keywords": [
-      "appearance",
-      "corner",
-      "corners",
-      "custom",
-      "customize",
-      "niri",
-      "override",
-      "personal",
-      "personalization",
-      "radius",
-      "round",
-      "rounded",
-      "window",
-      "windows"
-    ],
-    "description": "Rounded corners for windows"
   },
   {
     "section": "hyprlandLayoutRadiusOverride",
@@ -8780,25 +8766,27 @@
     "description": "Rounded corners for windows"
   },
   {
-    "section": "niriLayoutGapsOverride",
-    "label": "Window Gaps",
+    "section": "niriLayoutRadiusOverride",
+    "label": "Window Corner Radius",
     "tabIndex": 37,
     "category": "Personalization",
     "keywords": [
       "appearance",
-      "between",
+      "corner",
+      "corners",
       "custom",
       "customize",
-      "gaps",
       "niri",
       "override",
       "personal",
       "personalization",
-      "space",
+      "radius",
+      "round",
+      "rounded",
       "window",
       "windows"
     ],
-    "description": "Space between windows"
+    "description": "Rounded corners for windows"
   },
   {
     "section": "hyprlandLayoutGapsOverride",
@@ -8834,6 +8822,27 @@
       "gaps",
       "mango",
       "mangowc",
+      "override",
+      "personal",
+      "personalization",
+      "space",
+      "window",
+      "windows"
+    ],
+    "description": "Space between windows"
+  },
+  {
+    "section": "niriLayoutGapsOverride",
+    "label": "Window Gaps",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "between",
+      "custom",
+      "customize",
+      "gaps",
+      "niri",
       "override",
       "personal",
       "personalization",
@@ -8940,5 +8949,19 @@
       "wireguard"
     ],
     "icon": "vpn_key"
+  },
+  {
+    "section": "_tab_42",
+    "label": "Battery",
+    "tabIndex": 42,
+    "category": "Settings",
+    "keywords": [
+      "battery",
+      "charge",
+      "charging",
+      "power",
+      "settings"
+    ],
+    "icon": "battery_charging_full"
   }
 ]

@@ -493,8 +493,8 @@ Item {
         interval: Theme.variantCloseInterval(animationDuration)
         onTriggered: {
             if (!shouldBeVisible) {
-                isClosing = false;
                 contentWindow.visible = false;
+                isClosing = false;
                 PopoutManager.hidePopout(popoutHandle);
                 popoutClosed();
             }
@@ -782,7 +782,7 @@ Item {
         WlrLayershell.namespace: root.layerNamespace
         WlrLayershell.layer: root.effectivePopoutLayer
         WlrLayershell.exclusiveZone: -1
-        WlrLayershell.keyboardFocus: KeyboardFocus.keyboardFocus(shouldBeVisible, customKeyboardFocus)
+        WlrLayershell.keyboardFocus: KeyboardFocus.keyboardFocus(shouldBeVisible || isClosing, customKeyboardFocus)
 
         readonly property bool _fullHeight: root.fullHeightSurface
         anchors {

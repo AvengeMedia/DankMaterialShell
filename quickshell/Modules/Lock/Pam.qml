@@ -23,6 +23,9 @@ Scope {
     property string u2fPendingMode
     property string buffer
 
+    property var attemptInfoMessages: []
+    property bool lockoutAnnouncedThisAttempt: false
+
     signal flashMsg
     signal unlockRequested
 
@@ -118,23 +121,37 @@ Scope {
         configDirectory: (dankshellConfigWatcher.loaded || nixosMarker.loaded || root.runningFromNixStore) ? "/etc/pam.d" : Quickshell.shellDir + "/assets/pam"
 
         onMessageChanged: {
-            if (message.startsWith("The account is locked")) {
-                root.lockMessage = message;
-            } else if (root.lockMessage && message.endsWith(" left to unlock)")) {
-                root.lockMessage += "\n" + message;
-            } else if (root.lockMessage && message && message.length > 0) {
-                root.lockMessage = "";
-            }
+            // collected by position, not text, so it works in any locale
+            if (message.length > 0 && !responseRequired)
+                root.attemptInfoMessages = root.attemptInfoMessages.concat([message]);
         }
 
         onResponseRequiredChanged: {
             if (!responseRequired)
                 return;
 
+            const notice = root.attemptInfoMessages.filter(m => m !== message);
+            if (notice.length > 0) {
+                root.lockMessage = notice.join("\n");
+                root.lockoutAnnouncedThisAttempt = true;
+            }
+            root.attemptInfoMessages = [];
+
             respond(root.buffer);
         }
 
         onCompleted: res => {
+            // requisite preauth can lock without ever prompting; surface it here too
+            if (!root.lockoutAnnouncedThisAttempt) {
+                if (root.attemptInfoMessages.length > 0) {
+                    root.lockMessage = root.attemptInfoMessages.join("\n");
+                    root.lockoutAnnouncedThisAttempt = true;
+                } else {
+                    root.lockMessage = "";
+                }
+                root.attemptInfoMessages = [];
+            }
+
             if (res === PamResult.Success) {
                 if (!root.unlockInProgress) {
                     fprint.abort();
@@ -168,6 +185,8 @@ Scope {
 
         function onActiveChanged() {
             if (passwd.active) {
+                root.attemptInfoMessages = [];
+                root.lockoutAnnouncedThisAttempt = false;
                 passwdActiveTimeout.restart();
             } else {
                 passwdActiveTimeout.running = false;
@@ -393,6 +412,8 @@ Scope {
         root.u2fPending = false;
         root.u2fPendingMode = "";
         root.lockMessage = "";
+        root.attemptInfoMessages = [];
+        root.lockoutAnnouncedThisAttempt = false;
         root.resetAuthFlows();
         fprint.checkAvail();
         u2f.checkAvail();

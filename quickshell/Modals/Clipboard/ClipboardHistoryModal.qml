@@ -45,8 +45,22 @@ DankModal {
         });
     }
 
+    function releaseTextInputFocus() {
+        contentLoader.item?.releaseTextInputFocus();
+    }
+
     function hide() {
-        close();
+        releaseTextInputFocus();
+        Qt.callLater(function () {
+            clipboardHistoryModal.close();
+        });
+    }
+
+    function instantHide() {
+        releaseTextInputFocus();
+        Qt.callLater(function () {
+            clipboardHistoryModal.instantClose();
+        });
     }
 
     onDialogClosed: {
@@ -68,6 +82,11 @@ DankModal {
     enableShadow: true
     closeOnEscapeKey: (contentLoader.item?.mode ?? "history") !== "editor"
     onBackgroundClicked: hide()
+    onShouldBeVisibleChanged: {
+        if (!shouldBeVisible) {
+            releaseTextInputFocus();
+        }
+    }
 
     Ref {
         service: ClipboardService
@@ -112,7 +131,7 @@ DankModal {
         ClipboardHistoryContent {
             clearConfirmDialog: clearConfirmDialog
             onCloseRequested: clipboardHistoryModal.hide()
-            onInstantCloseRequested: clipboardHistoryModal.instantClose()
+            onInstantCloseRequested: clipboardHistoryModal.instantHide()
         }
     }
 }

@@ -150,6 +150,9 @@ PanelWindow {
         function onUsesFrameBarChromeChanged() {
             _blurRebuildTimer.restart();
         }
+        function onBarRevealedChanged() {
+            _blurRebuildTimer.restart();
+        }
     }
 
     Component {
@@ -175,6 +178,13 @@ PanelWindow {
         function rebuild() {
             teardown();
             if (!BlurService.enabled || !BlurService.available)
+                return;
+            // When the bar is hidden (auto-hide, or config not visible) keep the blur
+            // region empty rather than sliding it off-surface. Some compositors (Hyprland)
+            // gate blur on a non-empty region and then blur the whole surface box when the
+            // clip degenerates to empty, leaving the bar strip blurred while the bar is
+            // hidden (issue #2656). A null region disables the effect cleanly.
+            if (!barWindow.barRevealed)
                 return;
             // In frame mode, FrameWindow owns the blur region for the entire screen edge
             // (including the bar area). The bar must not set its own competing blur region
