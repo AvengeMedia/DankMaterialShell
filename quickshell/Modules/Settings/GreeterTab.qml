@@ -689,14 +689,15 @@ Item {
                     tags: ["greeter", "wallpaper", "background", "fill"]
                     text: I18n.tr("Wallpaper fill mode")
                     description: I18n.tr("How the background image is scaled")
-                    options: root._wallpaperFillModes.map(m => I18n.tr(m, "wallpaper fill mode"))
+                    options: root._wallpaperFillModes.map(m => m === "Pad" ? I18n.tr("Center", "wallpaper fill mode") : I18n.tr(m, "wallpaper fill mode"))
                     currentValue: {
                         var mode = (SettingsData.greeterWallpaperFillMode && SettingsData.greeterWallpaperFillMode !== "") ? SettingsData.greeterWallpaperFillMode : (SettingsData.wallpaperFillMode || "Fill");
                         var idx = root._wallpaperFillModes.indexOf(mode);
-                        return idx >= 0 ? I18n.tr(root._wallpaperFillModes[idx], "wallpaper fill mode") : I18n.tr("Fill", "wallpaper fill mode");
+                        var actualMode = idx >= 0 ? root._wallpaperFillModes[idx] : "Fill";
+                        return actualMode === "Pad" ? I18n.tr("Center", "wallpaper fill mode") : I18n.tr(actualMode, "wallpaper fill mode");
                     }
                     onValueChanged: value => {
-                        var idx = root._wallpaperFillModes.map(m => I18n.tr(m, "wallpaper fill mode")).indexOf(value);
+                        var idx = root._wallpaperFillModes.map(m => m === "Pad" ? I18n.tr("Center", "wallpaper fill mode") : I18n.tr(m, "wallpaper fill mode")).indexOf(value);
                         if (idx >= 0)
                             SettingsData.set("greeterWallpaperFillMode", root._wallpaperFillModes[idx]);
                     }

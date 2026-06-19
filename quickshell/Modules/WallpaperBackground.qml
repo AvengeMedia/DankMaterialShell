@@ -42,6 +42,11 @@ Variants {
             id: root
             anchors.fill: parent
 
+            Rectangle {
+                anchors.fill: parent
+                color: SettingsData.effectiveWallpaperBackgroundColor
+            }
+
             function encodeFileUrl(path) {
                 if (!path)
                     return "";
@@ -129,6 +134,12 @@ Variants {
             Connections {
                 target: SettingsData
                 function onWallpaperFillModeChanged() {
+                    root.invalidate();
+                }
+                function onWallpaperBackgroundColorModeChanged() {
+                    root.invalidate();
+                }
+                function onWallpaperBackgroundCustomColorChanged() {
                     root.invalidate();
                 }
             }

@@ -74,6 +74,8 @@ var SPEC = {
     wallpaperFillMode: { def: "Fill" },
     blurredWallpaperLayer: { def: false },
     blurWallpaperOnOverview: { def: false },
+    wallpaperBackgroundColorMode: { def: "black" },
+    wallpaperBackgroundCustomColor: { def: "#000000" },
 
     showLauncherButton: { def: true },
     showWorkspaceSwitcher: { def: true },
