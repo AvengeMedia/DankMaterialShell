@@ -244,7 +244,10 @@ var SPEC = {
 
     networkPreference: { def: "auto" },
 
-    iconTheme: { def: "System Default", onChange: "applyStoredIconTheme" },
+    iconThemeDark: { def: "System Default", onChange: "applyStoredIconTheme" },
+    iconThemeLight: { def: "System Default", onChange: "applyStoredIconTheme" },
+    iconThemePerMode: { def: false, onChange: "applyStoredIconTheme" },
+    lastAppliedIconTheme: { def: "" },
     availableIconThemes: { def: ["System Default"], persist: false },
     systemDefaultIconTheme: { def: "", persist: false },
     qt5ctAvailable: { def: false, persist: false },

@@ -422,13 +422,6 @@ PanelWindow {
             }
         }
 
-        Behavior on color {
-            ColorAnimation {
-                duration: Theme.shortDuration
-                easing.type: Theme.standardEasing
-            }
-        }
-
         Behavior on height {
             enabled: false
         }

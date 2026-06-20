@@ -3208,6 +3208,30 @@
     "description": "Blend between Surface High and the selected custom color"
   },
   {
+    "section": "iconThemeDark",
+    "label": "Dark Mode Icon Theme",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "colors",
+      "colour",
+      "dankshell",
+      "dark",
+      "dark mode",
+      "icon",
+      "icons",
+      "look",
+      "mode",
+      "night",
+      "scheme",
+      "style",
+      "system",
+      "theme"
+    ],
+    "description": "DankShell & System Icons (requires restart)"
+  },
+  {
     "section": "matugenTemplateNeovimSettings",
     "label": "Dark mode base",
     "tabIndex": 10,
@@ -3446,17 +3470,24 @@
       "appearance",
       "colors",
       "colour",
-      "dankshell",
+      "dark",
+      "dark mode",
+      "day",
+      "different",
       "icon",
-      "icons",
+      "light",
+      "light mode",
       "look",
+      "mode",
+      "night",
       "scheme",
       "style",
       "system",
-      "theme"
+      "theme",
+      "themes"
     ],
     "icon": "interests",
-    "description": "DankShell & System Icons (requires restart)"
+    "description": "Use different icon themes for light and dark mode"
   },
   {
     "section": "matugenTemplateKcolorscheme",
@@ -3563,6 +3594,30 @@
       "theme"
     ],
     "description": "Use light theme instead of dark theme"
+  },
+  {
+    "section": "iconThemeLight",
+    "label": "Light Mode Icon Theme",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "colors",
+      "colour",
+      "dankshell",
+      "day",
+      "icon",
+      "icons",
+      "light",
+      "light mode",
+      "look",
+      "mode",
+      "scheme",
+      "style",
+      "system",
+      "theme"
+    ],
+    "description": "DankShell & System Icons (requires restart)"
   },
   {
     "section": "matugenContrast",
@@ -3782,6 +3837,33 @@
       "theme",
       "user"
     ]
+  },
+  {
+    "section": "iconThemePerMode",
+    "label": "Separate Light & Dark Themes",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "colors",
+      "colour",
+      "dark",
+      "dark mode",
+      "day",
+      "different",
+      "icon",
+      "light",
+      "light mode",
+      "look",
+      "mode",
+      "night",
+      "scheme",
+      "separate",
+      "style",
+      "theme",
+      "themes"
+    ],
+    "description": "Use different icon themes for light and dark mode"
   },
   {
     "section": "m3ElevationColorMode",
