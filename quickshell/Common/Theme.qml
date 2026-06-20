@@ -151,7 +151,7 @@ Singleton {
             if (colorsFileLoadFailed && currentTheme === dynamic && rawWallpaperPath) {
                 log.info("Matugen now available, regenerating colors for dynamic theme");
                 const isLight = (typeof SessionData !== "undefined" && SessionData.isLightMode);
-                const iconTheme = (typeof SettingsData !== "undefined" && SettingsData.iconTheme) ? SettingsData.iconTheme : "System Default";
+                const iconTheme = (typeof SettingsData !== "undefined") ? SettingsData.getActiveIconTheme() : "System Default";
                 const selectedMatugenType = (typeof SettingsData !== "undefined" && SettingsData.matugenScheme) ? SettingsData.matugenScheme : "scheme-tonal-spot";
                 if (rawWallpaperPath.startsWith("#")) {
                     setDesiredTheme("hex", rawWallpaperPath, isLight, iconTheme, selectedMatugenType);
@@ -162,7 +162,7 @@ Singleton {
             }
 
             const isLight = (typeof SessionData !== "undefined" && SessionData.isLightMode);
-            const iconTheme = (typeof SettingsData !== "undefined" && SettingsData.iconTheme) ? SettingsData.iconTheme : "System Default";
+            const iconTheme = (typeof SettingsData !== "undefined") ? SettingsData.getActiveIconTheme() : "System Default";
 
             if (currentTheme === dynamic) {
                 if (rawWallpaperPath) {
@@ -1574,6 +1574,9 @@ Singleton {
         if (currentTheme === "custom" && customThemeFileView.path) {
             customThemeFileView.reload();
         }
+        if (typeof SettingsData !== "undefined") {
+            SettingsData.applyStoredIconTheme();
+        }
     }
 
     function setDesiredTheme(kind, value, isLight, iconTheme, matugenType, stockColors) {
@@ -1707,7 +1710,7 @@ Singleton {
         _pendingGenerateParams = null;
 
         const isLight = (typeof SessionData !== "undefined" && SessionData.isLightMode);
-        const iconTheme = (typeof SettingsData !== "undefined" && SettingsData.iconTheme) ? SettingsData.iconTheme : "System Default";
+        const iconTheme = (typeof SettingsData !== "undefined") ? SettingsData.getActiveIconTheme() : "System Default";
 
         if (currentTheme === dynamic) {
             if (!rawWallpaperPath)

@@ -2223,7 +2223,68 @@ Item {
                 settingKey: "iconTheme"
                 iconName: "interests"
 
+                SettingsToggleRow {
+                    tab: "theme"
+                    tags: ["icon", "theme", "system"]
+                    settingKey: "enableModeSpecificIcons"
+                    text: I18n.tr("Separate Light/Dark Icons")
+                    description: I18n.tr("Use different icon themes for light and dark modes")
+                    checked: SettingsData.enableModeSpecificIcons
+                    onToggled: checked => {
+                        SettingsData.setEnableModeSpecificIcons(checked);
+                    }
+                }
+
+                SettingsDivider {
+                    visible: SettingsData.enableModeSpecificIcons
+                }
+
                 SettingsDropdownRow {
+                    visible: SettingsData.enableModeSpecificIcons
+                    tab: "theme"
+                    tags: ["icon", "theme", "system"]
+                    settingKey: "iconThemeLight"
+                    text: I18n.tr("Light Icon Theme")
+                    description: I18n.tr("Icons used in Light Mode (requires restart)")
+                    currentValue: SettingsData.iconThemeLight
+                    enableFuzzySearch: true
+                    popupWidthOffset: 100
+                    maxPopupHeight: 236
+                    options: cachedIconThemes
+                    onValueChanged: value => {
+                        SettingsData.setIconThemeLight(value);
+                        if (Quickshell.env("QT_QPA_PLATFORMTHEME") != "gtk3" && Quickshell.env("QT_QPA_PLATFORMTHEME") != "qt6ct" && Quickshell.env("QT_QPA_PLATFORMTHEME_QT6") != "qt6ct") {
+                            ToastService.showError(I18n.tr("Missing Environment Variables", "qt theme env error title"), I18n.tr("You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.", "qt theme env error body"));
+                        }
+                    }
+                }
+
+                SettingsDivider {
+                    visible: SettingsData.enableModeSpecificIcons
+                }
+
+                SettingsDropdownRow {
+                    visible: SettingsData.enableModeSpecificIcons
+                    tab: "theme"
+                    tags: ["icon", "theme", "system"]
+                    settingKey: "iconThemeDark"
+                    text: I18n.tr("Dark Icon Theme")
+                    description: I18n.tr("Icons used in Dark Mode (requires restart)")
+                    currentValue: SettingsData.iconThemeDark
+                    enableFuzzySearch: true
+                    popupWidthOffset: 100
+                    maxPopupHeight: 236
+                    options: cachedIconThemes
+                    onValueChanged: value => {
+                        SettingsData.setIconThemeDark(value);
+                        if (Quickshell.env("QT_QPA_PLATFORMTHEME") != "gtk3" && Quickshell.env("QT_QPA_PLATFORMTHEME") != "qt6ct" && Quickshell.env("QT_QPA_PLATFORMTHEME_QT6") != "qt6ct") {
+                            ToastService.showError(I18n.tr("Missing Environment Variables", "qt theme env error title"), I18n.tr("You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.", "qt theme env error body"));
+                        }
+                    }
+                }
+
+                SettingsDropdownRow {
+                    visible: !SettingsData.enableModeSpecificIcons
                     tab: "theme"
                     tags: ["icon", "theme", "system"]
                     settingKey: "iconTheme"

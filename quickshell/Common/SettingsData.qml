@@ -471,6 +471,9 @@ Singleton {
     property string networkPreference: "auto"
 
     property string iconTheme: "System Default"
+    property bool enableModeSpecificIcons: false
+    property string iconThemeLight: "System Default"
+    property string iconThemeDark: "System Default"
     property var availableIconThemes: ["System Default"]
     property string systemDefaultIconTheme: ""
     property bool qt5ctAvailable: false
@@ -1230,6 +1233,15 @@ Singleton {
             MangoService.generateLayoutConfig();
     }
 
+    function getActiveIconTheme() {
+        if (!enableModeSpecificIcons) {
+            return iconTheme;
+        }
+        const isLight = (typeof SessionData !== "undefined") ? SessionData.isLightMode : false;
+        const desiredTheme = isLight ? iconThemeLight : iconThemeDark;
+        return (desiredTheme === "System Default") ? iconTheme : desiredTheme;
+    }
+
     function applyStoredIconTheme() {
         updateGtkIconTheme();
         updateQtIconTheme();
@@ -1237,7 +1249,8 @@ Singleton {
     }
 
     function updateCosmicIconTheme() {
-        let cosmicThemeName = (iconTheme === "System Default") ? systemDefaultIconTheme : iconTheme;
+        const activeTheme = getActiveIconTheme();
+        let cosmicThemeName = (activeTheme === "System Default") ? systemDefaultIconTheme : activeTheme;
         if (!cosmicThemeName || cosmicThemeName === "System Default") {
             const detectScript = `if command -v gsettings >/dev/null 2>&1; then
             gsettings get org.gnome.desktop.interface icon-theme 2>/dev/null | sed "s/'//g"
@@ -1273,7 +1286,8 @@ Singleton {
     }
 
     function updateGtkIconTheme() {
-        const gtkThemeName = (iconTheme === "System Default") ? systemDefaultIconTheme : iconTheme;
+        const activeTheme = getActiveIconTheme();
+        const gtkThemeName = (activeTheme === "System Default") ? systemDefaultIconTheme : activeTheme;
         if (gtkThemeName === "System Default" || gtkThemeName === "")
             return;
         if (typeof DMSService !== "undefined" && DMSService.apiVersion >= 3 && typeof PortalService !== "undefined") {
@@ -1306,7 +1320,8 @@ Singleton {
     }
 
     function updateQtIconTheme() {
-        const qtThemeName = (iconTheme === "System Default") ? "" : iconTheme;
+        const activeTheme = getActiveIconTheme();
+        const qtThemeName = (activeTheme === "System Default") ? "" : activeTheme;
         if (!qtThemeName)
             return;
         const home = _homeUrl.replace("file://", "").replace(/'/g, "'\\''");
@@ -2407,6 +2422,36 @@ Singleton {
 
     function setIconTheme(themeName) {
         iconTheme = themeName;
+        updateGtkIconTheme();
+        updateQtIconTheme();
+        updateCosmicIconTheme();
+        saveSettings();
+        if (typeof Theme !== "undefined" && Theme.currentTheme === Theme.dynamic)
+            Theme.generateSystemThemesFromCurrentTheme();
+    }
+
+    function setEnableModeSpecificIcons(value) {
+        enableModeSpecificIcons = value;
+        updateGtkIconTheme();
+        updateQtIconTheme();
+        updateCosmicIconTheme();
+        saveSettings();
+        if (typeof Theme !== "undefined" && Theme.currentTheme === Theme.dynamic)
+            Theme.generateSystemThemesFromCurrentTheme();
+    }
+
+    function setIconThemeLight(themeName) {
+        iconThemeLight = themeName;
+        updateGtkIconTheme();
+        updateQtIconTheme();
+        updateCosmicIconTheme();
+        saveSettings();
+        if (typeof Theme !== "undefined" && Theme.currentTheme === Theme.dynamic)
+            Theme.generateSystemThemesFromCurrentTheme();
+    }
+
+    function setIconThemeDark(themeName) {
+        iconThemeDark = themeName;
         updateGtkIconTheme();
         updateQtIconTheme();
         updateCosmicIconTheme();
