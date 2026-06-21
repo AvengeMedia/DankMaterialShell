@@ -227,6 +227,7 @@ var SPEC = {
     appDrawerSectionViewModes: { def: {} },
     niriOverviewOverlayEnabled: { def: true },
     dankLauncherV2Size: { def: "compact" },
+    dankLauncherV2ShowSourceBadges: { def: true },
     dankLauncherV2BorderEnabled: { def: false },
     dankLauncherV2BorderThickness: { def: 2 },
     dankLauncherV2BorderColor: { def: "primary" },

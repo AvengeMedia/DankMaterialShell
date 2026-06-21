@@ -2680,6 +2680,34 @@
     "description": "Show All, Apps, Files, and Plugins chips beside the Spotlight Bar input."
   },
   {
+    "section": "dankLauncherV2ShowSourceBadges",
+    "label": "Show Package Source Badges",
+    "tabIndex": 9,
+    "category": "Launcher",
+    "keywords": [
+      "app drawer",
+      "app menu",
+      "appearance",
+      "appimage",
+      "applications",
+      "badge",
+      "badges",
+      "drawer",
+      "flatpak",
+      "icons",
+      "items",
+      "launcher",
+      "menu",
+      "package",
+      "show",
+      "snap",
+      "source",
+      "start",
+      "start menu"
+    ],
+    "description": "Show Flatpak, Snap, AppImage, or Nix badge icons on launcher items."
+  },
+  {
     "section": "launcherLogoSizeOffset",
     "label": "Size Offset",
     "tabIndex": 9,

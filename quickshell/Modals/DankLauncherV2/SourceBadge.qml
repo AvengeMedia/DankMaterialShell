@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell.Widgets
+import qs.Common
 
 Item {
     id: root
@@ -16,7 +17,7 @@ Item {
 
     readonly property string assetPath: sourceAsset[source] || ""
 
-    visible: assetPath.length > 0
+    visible: SettingsData.dankLauncherV2ShowSourceBadges && assetPath.length > 0
     implicitWidth: glyphSize
     implicitHeight: glyphSize
 
