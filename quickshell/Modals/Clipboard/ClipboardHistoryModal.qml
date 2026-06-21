@@ -129,6 +129,7 @@ DankModal {
 
     content: Component {
         ClipboardHistoryContent {
+            surfaceHost: clipboardHistoryModal
             clearConfirmDialog: clearConfirmDialog
             onCloseRequested: clipboardHistoryModal.hide()
             onInstantCloseRequested: clipboardHistoryModal.instantHide()
