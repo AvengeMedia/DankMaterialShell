@@ -227,7 +227,7 @@ Rectangle {
             }
         }
         onClicked: {
-           if (SettingsData.clipboardClickToPaste) {
+            if (SettingsData.clipboardClickToPaste) {
                 pasteRequested()
             } else {
                 copyRequested()

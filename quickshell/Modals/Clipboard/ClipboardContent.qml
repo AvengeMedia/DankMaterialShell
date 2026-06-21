@@ -66,6 +66,8 @@ Item {
         contextMenu.hide();
     }
 
+    readonly property bool contextMenuActive: contextMenu.openState
+
     anchors.fill: parent
 
     ClipboardContextMenu {

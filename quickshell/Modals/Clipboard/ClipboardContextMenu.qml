@@ -89,17 +89,6 @@ Item {
     readonly property real naturalMenuHeight: menuItemsHeight() + Theme.spacingS * 2
     readonly property real effectiveMenuHeight: Math.min(maxMenuHeight, naturalMenuHeight)
     readonly property bool menuScrolls: naturalMenuHeight > effectiveMenuHeight + 0.5
-    property int selectedMenuIndex: 0
-    property bool keyboardNavigation: false
-
-    readonly property int visibleItemCount: {
-        let count = 0;
-        for (let i = 0; i < menuItems.length; i++) {
-            if (menuItems[i].type === "item")
-                count++;
-        }
-        return count;
-    }
 
     TextMetrics {
         id: menuTextMetrics
@@ -123,8 +112,6 @@ Item {
             return;
 
         entry = targetEntry;
-        selectedMenuIndex = -1;
-        keyboardNavigation = false;
 
         const host = modal?.surfaceHost ?? null;
         const modalWindow = modal?.Window?.window ?? null;
@@ -170,35 +157,6 @@ Item {
         }
 
         show(hit.x, hit.y, hit.entry);
-    }
-
-    function selectNext() {
-        if (visibleItemCount <= 0)
-            return;
-        keyboardNavigation = true;
-        selectedMenuIndex = selectedMenuIndex < 0 ? 0 : (selectedMenuIndex + 1) % visibleItemCount;
-    }
-
-    function selectPrevious() {
-        if (visibleItemCount <= 0)
-            return;
-        keyboardNavigation = true;
-        selectedMenuIndex = selectedMenuIndex < 0 ? visibleItemCount - 1 : (selectedMenuIndex - 1 + visibleItemCount) % visibleItemCount;
-    }
-
-    function activateSelected() {
-        let itemIndex = 0;
-        for (let i = 0; i < menuItems.length; i++) {
-            if (menuItems[i].type !== "item")
-                continue;
-            if (itemIndex === selectedMenuIndex) {
-                const menuItem = menuItems[i];
-                if (menuItem.action)
-                    menuItem.action();
-                return;
-            }
-            itemIndex++;
-        }
     }
 
     function copyEntry() {
@@ -348,19 +306,9 @@ Item {
                             Item {
                                 id: menuItemDelegate
                                 required property var modelData
-                                required property int index
 
                                 width: menuColumn.width
                                 height: modelData.type === "separator" ? 5 : 32
-
-                                readonly property int itemIndex: {
-                                    let count = 0;
-                                    for (let i = 0; i < index; i++) {
-                                        if (root.menuItems[i].type === "item")
-                                            count++;
-                                    }
-                                    return count;
-                                }
 
                                 Rectangle {
                                     visible: menuItemDelegate.modelData.type === "separator"
@@ -382,11 +330,7 @@ Item {
                                     width: parent.width
                                     height: parent.height
                                     radius: Theme.cornerRadius
-                                    color: {
-                                        if (root.keyboardNavigation && root.selectedMenuIndex === menuItemDelegate.itemIndex)
-                                            return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.2);
-                                        return itemMouseArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent";
-                                    }
+                                    color: itemMouseArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
 
                                     Row {
                                         anchors.left: parent.left
@@ -434,10 +378,6 @@ Item {
                                         hoverEnabled: true
                                         cursorShape: Qt.PointingHandCursor
                                         acceptedButtons: Qt.LeftButton | Qt.RightButton
-                                        onEntered: {
-                                            root.keyboardNavigation = false;
-                                            root.selectedMenuIndex = menuItemDelegate.itemIndex;
-                                        }
                                         onPressed: mouse => menuItemRipple.trigger(mouse.x, mouse.y)
                                         onClicked: mouse => {
                                             if (mouse.button === Qt.RightButton) {

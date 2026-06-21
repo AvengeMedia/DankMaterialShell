@@ -89,6 +89,13 @@ QtObject {
             return;
         }
 
+        if (modal.contextMenuActive) {
+            if (event.key === Qt.Key_Escape)
+                modal.closeContextMenu();
+            event.accepted = true;
+            return;
+        }
+
         switch (event.key) {
         case Qt.Key_Escape:
             modal.hide();

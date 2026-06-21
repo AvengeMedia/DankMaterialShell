@@ -33,6 +33,11 @@ FocusScope {
     property alias searchField: historyContent.searchField
     property alias editorView: editorView
     property alias keyboardController: keyboardController
+    readonly property alias contextMenuActive: historyContent.contextMenuActive
+
+    function closeContextMenu() {
+        historyContent.closeContextMenu();
+    }
 
     signal closeRequested
     signal instantCloseRequested
