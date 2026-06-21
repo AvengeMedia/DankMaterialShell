@@ -28,6 +28,15 @@ PanelWindow {
     function show() {
         if (SessionData.suppressOSD)
             return;
+        // Hyprlock or any external exclusive-input surface can leave shouldBeVisible=true
+        // while the underlying layer surface has already gone, so every subsequent show()
+        // silently early-returns and the OSD never appears again. Reset and re-show when
+        // the flag and the actual visibility have desynced.
+        if (shouldBeVisible && !visible) {
+            shouldBeVisible = false;
+            hideTimer.stop();
+            closeTimer.stop();
+        }
         if (shouldBeVisible) {
             hideTimer.restart();
             return;
@@ -46,6 +55,15 @@ PanelWindow {
     }
 
     function resetHideTimer() {
+        // Hyprlock or any external exclusive-input surface can leave shouldBeVisible=true
+        // while the underlying layer surface has already gone, so every subsequent show()
+        // silently early-returns and the OSD never appears again. Reset and re-show when
+        // the flag and the actual visibility have desynced.
+        if (shouldBeVisible && !visible) {
+            shouldBeVisible = false;
+            hideTimer.stop();
+            closeTimer.stop();
+        }
         if (shouldBeVisible) {
             hideTimer.restart();
         }
