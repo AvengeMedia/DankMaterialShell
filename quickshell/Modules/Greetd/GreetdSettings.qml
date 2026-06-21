@@ -79,6 +79,24 @@ Singleton {
     property var screenPreferences: ({})
     property int animationSpeed: 2
     property string wallpaperFillMode: "Fill"
+    property string wallpaperBackgroundColorMode: "black"
+    property string wallpaperBackgroundCustomColor: "#000000"
+    readonly property color effectiveWallpaperBackgroundColor: {
+        switch (wallpaperBackgroundColorMode) {
+        case "black":
+            return "#000000";
+        case "white":
+            return "#ffffff";
+        case "primary":
+            return (typeof Theme !== "undefined") ? Theme.primary : "#000000";
+        case "surface":
+            return (typeof Theme !== "undefined") ? Theme.surfaceContainer : "#000000";
+        case "custom":
+            return wallpaperBackgroundCustomColor;
+        default:
+            return "#000000";
+        }
+    }
 
     function parseSettings(content) {
         try {
@@ -147,6 +165,8 @@ Singleton {
             screenPreferences = settings.screenPreferences !== undefined ? settings.screenPreferences : ({});
             animationSpeed = settings.animationSpeed !== undefined ? settings.animationSpeed : 2;
             wallpaperFillMode = settings.wallpaperFillMode !== undefined ? settings.wallpaperFillMode : "Fill";
+            wallpaperBackgroundColorMode = settings.wallpaperBackgroundColorMode !== undefined ? settings.wallpaperBackgroundColorMode : "black";
+            wallpaperBackgroundCustomColor = settings.wallpaperBackgroundCustomColor !== undefined ? settings.wallpaperBackgroundCustomColor : "#000000";
 
             if (typeof Theme !== "undefined") {
                 if (currentThemeName === "custom" && customThemeFile) {
