@@ -671,6 +671,15 @@ Item {
                     onToggled: checked => SettingsData.set("dankLauncherV2UnloadOnClose", checked)
                 }
 
+                 SettingsToggleRow {
+                    settingKey: "dankLauncherV2ShowSourceBadges"
+                    tags: ["launcher", "appearance", "badge", "source", "flatpak"]
+                    text: I18n.tr("Show Package Source Badges")
+                    description: I18n.tr("Show Flatpak, Snap, AppImage, or Nix badge icons on launcher items.")
+                    checked: SettingsData.dankLauncherV2ShowSourceBadges
+                    onToggled: checked => SettingsData.set("dankLauncherV2ShowSourceBadges", checked)
+                }
+
                 SettingsToggleRow {
                     settingKey: "dankLauncherV2BorderEnabled"
                     tags: ["launcher", "border", "outline"]

@@ -464,6 +464,7 @@ Singleton {
     onAppDrawerSectionViewModesChanged: saveSettings()
     property bool niriOverviewOverlayEnabled: true
     property string dankLauncherV2Size: "compact"
+    property bool dankLauncherV2ShowSourceBadges: true
     property bool dankLauncherV2BorderEnabled: false
     property int dankLauncherV2BorderThickness: 2
     property string dankLauncherV2BorderColor: "primary"
