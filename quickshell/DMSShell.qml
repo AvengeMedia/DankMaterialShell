@@ -1454,4 +1454,50 @@ Item {
             }
         }
     }
+
+    Loader {
+        id: captivePortalLoader
+        active: false
+        property string dismissedKey: ""
+
+        function connKey() {
+            return NetworkService.currentWifiSSID !== "" ? "wifi:" + NetworkService.currentWifiSSID : "net:" + NetworkService.networkStatus;
+        }
+
+        sourceComponent: CaptivePortalModal {
+            onDialogClosed: {
+                captivePortalLoader.dismissedKey = captivePortalLoader.connKey();
+                Qt.callLater(() => captivePortalLoader.active = false);
+            }
+            Component.onCompleted: Qt.callLater(() => open())
+        }
+
+        function evaluate() {
+            if (NetworkService.connectivity === "full")
+                dismissedKey = "";
+            const wantPortal = NetworkService.connectivity === "portal" && SettingsData.captivePortalAutoOpen && connKey() !== dismissedKey;
+            if (wantPortal) {
+                if (!active)
+                    active = true;
+                else if (item)
+                    item.open();
+            } else if (active && item) {
+                item.close();
+            }
+        }
+
+        Connections {
+            target: NetworkService
+            function onConnectivityChanged() {
+                captivePortalLoader.evaluate();
+            }
+        }
+
+        Connections {
+            target: SettingsData
+            function onCaptivePortalAutoOpenChanged() {
+                captivePortalLoader.evaluate();
+            }
+        }
+    }
 }

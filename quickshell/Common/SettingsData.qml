@@ -506,6 +506,7 @@ Singleton {
     property bool weatherEnabled: true
 
     property string networkPreference: "auto"
+    property bool captivePortalAutoOpen: true
 
     property string iconThemeDark: "System Default"
     property string iconThemeLight: "System Default"

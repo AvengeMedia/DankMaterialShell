@@ -624,6 +624,12 @@
     "comment": ""
   },
   {
+    "term": "A VPN is active. You may need to disconnect it to reach the login page.",
+    "context": "A VPN is active. You may need to disconnect it to reach the login page.",
+    "reference": "Modals/CaptivePortalModal.qml:88",
+    "comment": ""
+  },
+  {
     "term": "A file with this name already exists. Do you want to overwrite it?",
     "context": "A file with this name already exists. Do you want to overwrite it?",
     "reference": "Modals/FileBrowser/FileBrowserOverwriteDialog.qml:61",
@@ -2541,6 +2547,12 @@
     "term": "Caps Lock is on",
     "context": "Caps Lock is on",
     "reference": "Modules/Lock/LockScreenContent.qml:1200",
+    "comment": ""
+  },
+  {
+    "term": "Captive Portal",
+    "context": "Captive Portal",
+    "reference": "Modules/Settings/NetworkStatusTab.qml:202",
     "comment": ""
   },
   {
@@ -4724,7 +4736,7 @@
   {
     "term": "Dismiss",
     "context": "Dismiss",
-    "reference": "Modules/Notifications/Popup/NotificationPopup.qml:95, Modules/Notifications/Popup/NotificationPopup.qml:1452, Modules/Notifications/Center/NotificationCard.qml:835, Modules/Notifications/Center/NotificationCard.qml:975, Modules/Notifications/Center/NotificationCard.qml:1125",
+    "reference": "Modules/Notifications/Popup/NotificationPopup.qml:95, Modules/Notifications/Popup/NotificationPopup.qml:1452, Modules/Notifications/Center/NotificationCard.qml:835, Modules/Notifications/Center/NotificationCard.qml:975, Modules/Notifications/Center/NotificationCard.qml:1125, Modals/CaptivePortalModal.qml:114",
     "comment": ""
   },
   {
@@ -10740,9 +10752,27 @@
     "comment": ""
   },
   {
+    "term": "Open login page",
+    "context": "Open login page",
+    "reference": "Modals/CaptivePortalModal.qml:138",
+    "comment": ""
+  },
+  {
     "term": "Open search bar to find text",
     "context": "Open search bar to find text",
     "reference": "Modules/Notepad/NotepadSettings.qml:223",
+    "comment": ""
+  },
+  {
+    "term": "Open sign-in page",
+    "context": "Open sign-in page",
+    "reference": "Modules/Settings/NetworkStatusTab.qml:247",
+    "comment": ""
+  },
+  {
+    "term": "Open sign-in page automatically",
+    "context": "Open sign-in page automatically",
+    "reference": "Modules/Settings/NetworkStatusTab.qml:212",
     "comment": ""
   },
   {
@@ -13968,6 +13998,12 @@
     "comment": ""
   },
   {
+    "term": "Show a popup to sign in when a network requires it before reaching the internet.",
+    "context": "Show a popup to sign in when a network requires it before reaching the internet.",
+    "reference": "Modules/Settings/NetworkStatusTab.qml:213",
+    "comment": ""
+  },
+  {
     "term": "Show all 9 tags instead of only occupied tags",
     "context": "Show all 9 tags instead of only occupied tags",
     "reference": "Modules/Settings/WorkspacesTab.qml:194",
@@ -14223,6 +14259,18 @@
     "term": "Shutdown",
     "context": "Shutdown",
     "reference": "Services/CupsService.qml:817",
+    "comment": ""
+  },
+  {
+    "term": "Sign in to network",
+    "context": "Sign in to network",
+    "reference": "Modals/CaptivePortalModal.qml:69",
+    "comment": ""
+  },
+  {
+    "term": "Sign-in required for this network",
+    "context": "Sign-in required for this network",
+    "reference": "Modules/Settings/NetworkStatusTab.qml:228",
     "comment": ""
   },
   {
@@ -15012,6 +15060,12 @@
     "comment": ""
   },
   {
+    "term": "The network \"%1\" requires sign-in before you can reach the internet.",
+    "context": "The network \"%1\" requires sign-in before you can reach the internet.",
+    "reference": "Modals/CaptivePortalModal.qml:79",
+    "comment": ""
+  },
+  {
     "term": "The rule applies to any window matching one of these.",
     "context": "The rule applies to any window matching one of these.",
     "reference": "Modals/WindowRuleModal.qml:757",
@@ -15130,6 +15184,12 @@
     "context": "This may take a few seconds",
     "reference": "Modules/Settings/AudioTab.qml:513",
     "comment": "Loading overlay subtitle"
+  },
+  {
+    "term": "This network requires sign-in before you can reach the internet.",
+    "context": "This network requires sign-in before you can reach the internet.",
+    "reference": "Modals/CaptivePortalModal.qml:79",
+    "comment": ""
   },
   {
     "term": "This output is disabled in the current profile",

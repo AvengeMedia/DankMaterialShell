@@ -12,6 +12,8 @@ Singleton {
     property bool networkAvailable: activeService !== null
     property string backend: activeService?.backend ?? ""
     property string networkStatus: activeService?.networkStatus ?? "disconnected"
+    property string connectivity: activeService?.connectivity ?? "unknown"
+    property string portalURL: activeService?.portalURL ?? ""
     property string primaryConnection: activeService?.primaryConnection ?? ""
 
     property string ethernetIP: activeService?.ethernetIP ?? ""
