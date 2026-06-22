@@ -58,6 +58,7 @@ Singleton {
     signal openUrlRequested(string url)
     signal appPickerRequested(var data)
     signal screensaverStateUpdate(var data)
+    signal freedesktopStateUpdate(var data)
     signal clipboardStateUpdate(var data)
     signal locationStateUpdate(var data)
     signal sysupdateStateUpdate(var data)
@@ -384,6 +385,8 @@ Singleton {
             screensaverInhibited = data.inhibited || false;
             screensaverInhibitors = data.inhibitors || [];
             screensaverStateUpdate(data);
+        } else if (service === "freedesktop") {
+            freedesktopStateUpdate(data);
         } else if (service === "dbus") {
             dbusSignalReceived(data.subscriptionId || "", data);
         } else if (service === "clipboard") {
