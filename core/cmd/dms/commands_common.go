@@ -567,14 +567,22 @@ func updateAllPluginsCLI() error {
 		if plugin != nil {
 			fmt.Printf("Updating plugin: %s (ID: %s)\n", plugin.Name, plugin.ID)
 			if err := manager.Update(*plugin); err != nil {
-				errs = append(errs, fmt.Errorf("failed to update %s: %w", plugin.Name, err))
+				if strings.Contains(err.Error(), "cannot update system plugin") {
+					fmt.Printf("Skipping system plugin: %s\n", plugin.Name)
+				} else {
+					errs = append(errs, fmt.Errorf("failed to update %s: %w", plugin.Name, err))
+				}
 			} else {
 				fmt.Printf("Plugin updated successfully: %s\n", plugin.Name)
 			}
 		} else {
 			fmt.Printf("Updating plugin: %s\n", pluginID)
 			if err := manager.UpdateByIDOrName(pluginID); err != nil {
-				errs = append(errs, fmt.Errorf("failed to update %s: %w", pluginID, err))
+				if strings.Contains(err.Error(), "cannot update system plugin") {
+					fmt.Printf("Skipping system plugin: %s\n", pluginID)
+				} else {
+					errs = append(errs, fmt.Errorf("failed to update %s: %w", pluginID, err))
+				}
 			} else {
 				fmt.Printf("Plugin updated successfully: %s\n", pluginID)
 			}
