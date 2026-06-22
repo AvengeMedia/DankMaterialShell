@@ -708,12 +708,12 @@ Singleton {
         }
     }
 
-    function showProcessListModal() {
+    function showProcessListModal(tabIndex) {
         if (processListModal) {
-            processListModal.show();
+            processListModal.show(tabIndex);
         } else if (processListModalLoader) {
             processListModalLoader.active = true;
-            Qt.callLater(() => processListModal?.show());
+            Qt.callLater(() => processListModal?.show(tabIndex));
         }
     }
 
@@ -728,12 +728,12 @@ Singleton {
         }
     }
 
-    function toggleProcessListModal() {
+    function toggleProcessListModal(tabIndex) {
         if (processListModal) {
-            processListModal.toggle();
+            processListModal.toggle(tabIndex);
         } else if (processListModalLoader) {
             processListModalLoader.active = true;
-            Qt.callLater(() => processListModal?.show());
+            Qt.callLater(() => processListModal?.show(tabIndex));
         }
     }
 

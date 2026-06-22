@@ -21,11 +21,18 @@ FloatingWindow {
 
     signal closingModal
 
-    function show() {
+    function clampTab(tabIndex) {
+        if (tabIndex === undefined || tabIndex === null)
+            return currentTab;
+        return Math.max(0, Math.min(3, tabIndex));
+    }
+
+    function show(tabIndex) {
         if (!DgopService.dgopAvailable) {
             log.warn("dgop is not available");
             return;
         }
+        currentTab = clampTab(tabIndex);
         visible = true;
     }
 
@@ -35,12 +42,18 @@ FloatingWindow {
             processContextMenu.close();
     }
 
-    function toggle() {
+    function toggle(tabIndex) {
         if (!DgopService.dgopAvailable) {
             log.warn("dgop is not available");
             return;
         }
-        visible = !visible;
+        const targetTab = clampTab(tabIndex);
+        if (visible && currentTab === targetTab) {
+            hide();
+            return;
+        }
+        currentTab = targetTab;
+        visible = true;
     }
 
     function focusOrToggle() {

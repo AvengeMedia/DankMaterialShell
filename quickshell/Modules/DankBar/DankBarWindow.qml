@@ -957,8 +957,8 @@ PanelWindow {
                     anchors.fill: parent
                     anchors.leftMargin: !barWindow.isVertical ? spacingPx : (axis.edge === "left" ? spacingPx : 0)
                     anchors.rightMargin: !barWindow.isVertical ? spacingPx : (axis.edge === "right" ? spacingPx : 0)
-                    anchors.topMargin: barWindow.isVertical ? (barWindow.hasAdjacentTopBar ? 0 : spacingPx) : (axis.outerVisualEdge() === "bottom" ? 0 : spacingPx)
-                    anchors.bottomMargin: barWindow.isVertical ? (barWindow.hasAdjacentBottomBar ? 0 : spacingPx) : (axis.outerVisualEdge() === "bottom" ? spacingPx : 0)
+                    anchors.topMargin: barWindow.isVertical ? 0 : (axis.outerVisualEdge() === "bottom" ? 0 : spacingPx)
+                    anchors.bottomMargin: barWindow.isVertical ? 0 : (axis.outerVisualEdge() === "bottom" ? spacingPx : 0)
 
                     BarCanvas {
                         id: barBackground
