@@ -467,6 +467,8 @@ Singleton {
             return;
         pendingConnectionSSID = ssid;
         pendingConnectionStartTime = Date.now();
+        isConnecting = true;
+        connectingSSID = ssid;
         connectionError = "";
         connectionStatus = "connecting";
         credentialsRequested = false;
@@ -510,6 +512,8 @@ Singleton {
                 connectionError = response.error;
                 lastConnectionError = response.error;
                 pendingConnectionSSID = "";
+                isConnecting = false;
+                connectingSSID = "";
                 connectionStatus = "failed";
                 ToastService.showError(I18n.tr("Failed to start connection to %1").arg(ssid));
             }
