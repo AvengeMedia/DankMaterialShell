@@ -28,6 +28,29 @@ BasePill {
         return time !== "Unknown" ? time : "";
     }
 
+    readonly property string verticalBatteryTimeText: {
+        if (!batteryTimeText) return "";
+
+        // Parse batteryTimeText, e.g., "2h 41m" or "41m"
+        let hours = 0;
+        let minutes = 0;
+
+        const hourMatch = batteryTimeText.match(/(\d+)h/);
+        const minMatch = batteryTimeText.match(/(\d+)m/);
+
+        if (hourMatch) {
+            hours = parseInt(hourMatch[1], 10);
+        }
+        if (minMatch) {
+            minutes = parseInt(minMatch[1], 10);
+        }
+
+        const hoursStr = hours < 10 ? "0" + hours : hours.toString();
+        const minutesStr = minutes < 10 ? "0" + minutes : minutes.toString();
+
+        return `${hoursStr}\n${minutesStr}`;
+    }
+
     readonly property string horizontalDisplayText: {
         if (showPercent && showTime && batteryTimeText) {
             return `${BatteryService.batteryLevel}% (${batteryTimeText})`;
@@ -43,13 +66,13 @@ BasePill {
 
     readonly property string verticalDisplayText: {
         if (showPercent && showTime && batteryTimeText) {
-            return `${BatteryService.batteryLevel}% (${batteryTimeText})`;
+            return `${BatteryService.batteryLevel}%\n${verticalBatteryTimeText}`;
         }
         if (showPercent) {
             return BatteryService.batteryLevel.toString();
         }
         if (showTime && batteryTimeText) {
-            return batteryTimeText;
+            return verticalBatteryTimeText;
         }
         return "";
     }
@@ -111,6 +134,7 @@ BasePill {
                     text: battery.verticalDisplayText
                     font.pixelSize: Theme.barTextSize(battery.barThickness, battery.barConfig?.fontScale, battery.barConfig?.maximizeWidgetText)
                     color: Theme.widgetTextColor
+                    horizontalAlignment: Text.AlignHCenter
                     anchors.horizontalCenter: parent.horizontalCenter
                     visible: BatteryService.batteryAvailable && battery.verticalDisplayText !== ""
                 }
