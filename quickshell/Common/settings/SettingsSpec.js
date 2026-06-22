@@ -96,6 +96,10 @@ var SPEC = {
     showClock: { def: true },
     showNotificationButton: { def: true },
     showBattery: { def: true },
+    showBatteryPercent: { def: true },
+    showBatteryPercentOnlyOnBattery: { def: false },
+    showBatteryTime: { def: false },
+    showBatteryTimeOnlyOnBattery: { def: false },
     showControlCenterButton: { def: true },
     showCapsLockIndicator: { def: true },
 
