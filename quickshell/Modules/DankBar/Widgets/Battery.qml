@@ -66,7 +66,7 @@ BasePill {
 
     readonly property string verticalDisplayText: {
         if (showPercent && showTime && batteryTimeText) {
-            return `${BatteryService.batteryLevel}%\n${verticalBatteryTimeText}`;
+            return `${BatteryService.batteryLevel}\n${verticalBatteryTimeText}`;
         }
         if (showPercent) {
             return BatteryService.batteryLevel.toString();
