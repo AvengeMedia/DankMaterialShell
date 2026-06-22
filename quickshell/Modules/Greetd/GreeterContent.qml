@@ -1903,7 +1903,7 @@ Item {
             return;
 
         const savedSession = GreetdSettings.rememberLastSession ? GreetdMemory.lastSessionId : "";
-        const savedDesktopId = GreetdSettings.rememberLastSession ? GreetdMemory.lastSessionDesktopId : "";
+        const savedDesktopId = GreetdSettings.rememberLastSession ? (GreetdMemory.lastSessionDesktopId || desktopIdFromPath(GreetdMemory.lastSessionId)) : "";
         if ((savedSession || savedDesktopId) && GreetdSettings.rememberLastSession) {
             for (var i = 0; i < GreeterState.sessionPaths.length; i++) {
                 if ((savedDesktopId && GreeterState.sessionDesktopIds[i] === savedDesktopId) || (savedSession && GreeterState.sessionPaths[i] === savedSession)) {
