@@ -73,7 +73,7 @@ Item {
     readonly property bool greeterPamHasExternalAuth: greeterPamHasFprint || greeterPamHasU2f
     readonly property bool multipleUsersAvailable: GreeterUsersService.loaded && GreeterUsersService.users.length > 1
     readonly property bool showUserPicker: multipleUsersAvailable && !GreeterState.showPasswordInput && !manualUsernameEntry
-    readonly property bool showAccountSwitchLink: multipleUsersAvailable && !GreeterState.showPasswordInput && !GreeterState.unlocking
+    readonly property bool showAccountSwitchLink: multipleUsersAvailable && manualUsernameEntry && !GreeterState.showPasswordInput && !GreeterState.unlocking
     readonly property int userPickerMaxHeight: Math.min(400, Math.max(120, height * 0.35))
     property bool userListOpen: false
     property bool manualUsernameEntry: false
@@ -533,7 +533,6 @@ Item {
             passwordFailureCount = 0;
             clearAuthFeedback();
             externalAuthAutoStartedForUser = "";
-            root.autoLoginOnSuccess = false;
         }
         root.pickerThemeUsername = user;
         GreeterState.username = user;
@@ -870,6 +869,13 @@ Item {
         anchors.fill: parent
         color: "transparent"
 
+        MouseArea {
+            anchors.fill: parent
+            enabled: root.userListOpen
+            visible: root.userListOpen
+            onClicked: root.userListOpen = false
+        }
+
         Column {
             id: greeterMainColumn
 
@@ -1006,17 +1012,6 @@ Item {
                 opacity: 0.9
             }
 
-            StyledText {
-                id: userPickerHint
-
-                anchors.horizontalCenter: parent.horizontalCenter
-                visible: root.showUserPicker && !GreeterState.showPasswordInput && !GreeterState.username && !root.userListOpen
-                text: I18n.tr("Select user...", "greeter user picker placeholder")
-                font.pixelSize: Theme.fontSizeMedium
-                color: "white"
-                opacity: 0.85
-            }
-
             ColumnLayout {
                 id: authColumn
 
@@ -1055,13 +1050,36 @@ Item {
                             radius: width / 2
                             color: "transparent"
                             border.color: Theme.primary
-                            border.width: avatarPickerArea.containsMouse || root.userListOpen ? 2 : 0
+                            border.width: (avatarPickerArea.containsMouse || root.userListOpen) && !GreeterState.showPasswordInput ? 2 : 0
                             visible: root.multipleUsersAvailable
                             Behavior on border.width {
                                 NumberAnimation {
                                     duration: Theme.shortDuration
                                     easing.type: Theme.standardEasing
                                 }
+                            }
+                        }
+
+                        // Switch-user affordance: hover scrim over the selected user's avatar.
+                        Rectangle {
+                            anchors.fill: parent
+                            radius: width / 2
+                            color: Qt.rgba(0, 0, 0, 0.55)
+                            opacity: (root.multipleUsersAvailable && GreeterState.showPasswordInput && avatarPickerArea.containsMouse) ? 1 : 0
+                            visible: opacity > 0
+
+                            Behavior on opacity {
+                                NumberAnimation {
+                                    duration: Theme.shortDuration
+                                    easing.type: Theme.standardEasing
+                                }
+                            }
+
+                            DankIcon {
+                                anchors.centerIn: parent
+                                name: "switch_account"
+                                size: 24
+                                color: "white"
                             }
                         }
 
@@ -1089,6 +1107,7 @@ Item {
                         Layout.fillWidth: true
                         Layout.preferredHeight: root.showUserPicker && root.userListOpen ? Math.max(60, userPicker.implicitHeight + Theme.spacingM * 2) : 60
 
+                        clip: true
                         radius: Theme.cornerRadius
                         color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.9)
                         border.color: inputField.activeFocus ? Theme.primary : Qt.rgba(1, 1, 1, 0.3)
@@ -1105,8 +1124,13 @@ Item {
                             maxExpandedHeight: root.userPickerMaxHeight
                             visible: root.showUserPicker && !GreeterState.showPasswordInput
                             expanded: root.userListOpen
+                            autoLoginVisible: GreetdSettings.rememberLastUser && GreetdSettings.rememberLastSession
+                            autoLoginChecked: root.autoLoginOnSuccess
+                            manualEntryVisible: true
                             onUserSelected: username => root.selectUser(username, false)
                             onToggleRequested: root.userListOpen = !root.userListOpen
+                            onAutoLoginToggled: root.autoLoginOnSuccess = !root.autoLoginOnSuccess
+                            onManualEntryRequested: root.enterManualUsernameEntry()
                         }
 
                         DankIcon {
@@ -1341,6 +1365,13 @@ Item {
                                 easing.type: Theme.standardEasing
                             }
                         }
+
+                        Behavior on Layout.preferredHeight {
+                            NumberAnimation {
+                                duration: Theme.mediumDuration
+                                easing.type: Theme.standardEasing
+                            }
+                        }
                     }
                 }
 
@@ -1353,7 +1384,7 @@ Item {
                         id: accountSwitchLabel
 
                         anchors.horizontalCenter: parent.horizontalCenter
-                        text: root.manualUsernameEntry ? I18n.tr("Back to user list", "greeter link to return from manual username entry to user picker") : I18n.tr("Not listed?", "greeter link to switch to manual username entry")
+                        text: I18n.tr("Back to user list", "greeter link to return from manual username entry to user picker")
                         color: Theme.primary
                         font.pixelSize: Theme.fontSizeSmall
                         font.underline: accountSwitchMouse.containsMouse
@@ -1365,12 +1396,7 @@ Item {
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            if (root.manualUsernameEntry)
-                                root.returnToUserListFromManualEntry();
-                            else
-                                root.enterManualUsernameEntry();
-                        }
+                        onClicked: root.returnToUserListFromManualEntry()
                     }
                 }
 
@@ -1395,150 +1421,36 @@ Item {
                     }
                 }
 
-                // Password-screen actions: Switch User + Auto-login toggle as one compact chip row
+                // Single-user auto-login toggle: its only home, since there is no picker to host it.
+                // Multi-user switching lives on the avatar hover; multi-user auto-login lives in the picker.
+                // Height stays reserved during unlocking (fade only) so the centered column doesn't jump.
                 Item {
                     id: passwordActions
 
                     readonly property bool autoLoginAvailable: GreetdSettings.rememberLastUser && GreetdSettings.rememberLastSession
+                    readonly property bool showAutoLoginToggle: !root.multipleUsersAvailable && autoLoginAvailable
 
                     Layout.fillWidth: true
                     Layout.topMargin: Theme.spacingXS
                     Layout.preferredHeight: visible ? 32 : 0
-                    visible: GreeterState.showPasswordInput && !GreeterState.unlocking && (root.multipleUsersAvailable || autoLoginAvailable)
+                    visible: GreeterState.showPasswordInput && showAutoLoginToggle
+                    opacity: GreeterState.unlocking ? 0 : 1
 
-                    Row {
+                    Behavior on opacity {
+                        NumberAnimation {
+                            duration: Theme.shortDuration
+                            easing.type: Theme.standardEasing
+                        }
+                    }
+
+                    DankActionButton {
                         anchors.centerIn: parent
-                        spacing: Theme.spacingS
-
-                        Rectangle {
-                            id: switchUserChip
-
-                            visible: root.multipleUsersAvailable
-                            height: 32
-                            width: switchUserContent.implicitWidth + Theme.spacingM * 2
-                            radius: height / 2
-                            color: Theme.withAlpha(Theme.surfaceVariant, 0.65)
-
-                            Rectangle {
-                                anchors.fill: parent
-                                radius: parent.radius
-                                color: (switchUserMouse.containsMouse || switchUserMouse.pressed) ? Theme.surfaceTextHover : "transparent"
-
-                                Behavior on color {
-                                    ColorAnimation {
-                                        duration: Theme.shorterDuration
-                                        easing.type: Theme.standardEasing
-                                    }
-                                }
-                            }
-
-                            DankRipple {
-                                id: switchUserRipple
-                                cornerRadius: switchUserChip.radius
-                                rippleColor: Theme.surfaceVariantText
-                            }
-
-                            Row {
-                                id: switchUserContent
-                                anchors.centerIn: parent
-                                spacing: Theme.spacingXS
-
-                                DankIcon {
-                                    name: "people"
-                                    size: 16
-                                    color: Theme.surfaceVariantText
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-
-                                StyledText {
-                                    text: I18n.tr("Switch User")
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: Theme.surfaceVariantText
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-                            }
-
-                            MouseArea {
-                                id: switchUserMouse
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onPressed: mouse => switchUserRipple.trigger(mouse.x, mouse.y)
-                                onClicked: root.returnToUserPicker()
-                            }
-                        }
-
-                        Rectangle {
-                            id: autoLoginChip
-
-                            visible: passwordActions.autoLoginAvailable
-                            height: 32
-                            width: autoLoginContent.implicitWidth + Theme.spacingM * 2
-                            radius: height / 2
-                            color: root.autoLoginOnSuccess ? Theme.withAlpha(Theme.primary, 0.85) : Theme.withAlpha(Theme.surfaceVariant, 0.65)
-
-                            Behavior on color {
-                                ColorAnimation {
-                                    duration: Theme.shortDuration
-                                    easing.type: Theme.standardEasing
-                                }
-                            }
-
-                            Rectangle {
-                                anchors.fill: parent
-                                radius: parent.radius
-                                color: {
-                                    if (autoLoginMouse.pressed)
-                                        return root.autoLoginOnSuccess ? Theme.primaryPressed : Theme.surfaceTextHover;
-                                    if (autoLoginMouse.containsMouse)
-                                        return root.autoLoginOnSuccess ? Theme.primaryHover : Theme.surfaceTextHover;
-                                    return "transparent";
-                                }
-
-                                Behavior on color {
-                                    ColorAnimation {
-                                        duration: Theme.shorterDuration
-                                        easing.type: Theme.standardEasing
-                                    }
-                                }
-                            }
-
-                            DankRipple {
-                                id: autoLoginRipple
-                                cornerRadius: autoLoginChip.radius
-                                rippleColor: root.autoLoginOnSuccess ? Theme.primaryText : Theme.surfaceVariantText
-                            }
-
-                            Row {
-                                id: autoLoginContent
-                                anchors.centerIn: parent
-                                spacing: Theme.spacingXS
-
-                                DankIcon {
-                                    name: root.autoLoginOnSuccess ? "check" : "login"
-                                    size: 16
-                                    color: root.autoLoginOnSuccess ? Theme.primaryText : Theme.surfaceVariantText
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-
-                                StyledText {
-                                    text: I18n.tr("Auto-login")
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    font.weight: root.autoLoginOnSuccess ? Font.Medium : Font.Normal
-                                    color: root.autoLoginOnSuccess ? Theme.primaryText : Theme.surfaceVariantText
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-                            }
-
-                            MouseArea {
-                                id: autoLoginMouse
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: root.autoLoginOnSuccess = !root.autoLoginOnSuccess
-                                onPressed: mouse => autoLoginRipple.trigger(mouse.x, mouse.y)
-                            }
-                        }
+                        iconName: root.autoLoginOnSuccess ? "check_box" : "check_box_outline_blank"
+                        iconSize: 18
+                        buttonSize: 32
+                        iconColor: root.autoLoginOnSuccess ? Theme.primary : Qt.rgba(1, 1, 1, 0.55)
+                        tooltipText: I18n.tr("Auto-login")
+                        onClicked: root.autoLoginOnSuccess = !root.autoLoginOnSuccess
                     }
                 }
             }
