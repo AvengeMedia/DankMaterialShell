@@ -107,6 +107,7 @@ func init() {
 		printIPCHelp()
 	})
 	pluginsUpdateCmd.Flags().BoolP("all", "a", false, "Update all installed plugins")
+	pluginsUpdateCmd.Flags().Bool("check", false, "Check for available updates without applying them")
 }
 
 var debugSrvCmd = &cobra.Command{
@@ -208,7 +209,20 @@ var pluginsUpdateCmd = &cobra.Command{
 		return getInstalledPluginIDs(), cobra.ShellCompDirectiveNoFileComp
 	},
 	Run: func(cmd *cobra.Command, args []string) {
+		checkOnly, _ := cmd.Flags().GetBool("check")
 		updateAll, _ := cmd.Flags().GetBool("all")
+		if checkOnly {
+			if updateAll {
+				if err := checkAllPluginsCLI(); err != nil {
+					log.Fatalf("Error checking updates: %v", err)
+				}
+				return
+			}
+			if err := checkPluginCLI(args[0]); err != nil {
+				log.Fatalf("Error checking update: %v", err)
+			}
+			return
+		}
 		if updateAll {
 			if err := updateAllPluginsCLI(); err != nil {
 				log.Fatalf("Error updating plugins: %v", err)
@@ -363,7 +377,11 @@ func listInstalledPlugins() error {
 	fmt.Printf("\nInstalled Plugins (%d):\n\n", len(installedNames))
 	for _, id := range installedNames {
 		if plugin, ok := pluginMap[id]; ok {
-			fmt.Printf("  %s\n", plugin.Name)
+			hasUpdateStr := ""
+			if hasUpdates, err := manager.HasUpdates(id, plugin); err == nil && hasUpdates {
+				hasUpdateStr = " (update available)"
+			}
+			fmt.Printf("  %s%s\n", plugin.Name, hasUpdateStr)
 			fmt.Printf("    ID: %s\n", plugin.ID)
 			fmt.Printf("    Category: %s\n", plugin.Category)
 			fmt.Printf("    Author: %s\n", plugin.Author)
@@ -594,6 +612,104 @@ func updateAllPluginsCLI() error {
 			fmt.Fprintf(os.Stderr, "%v\n", err)
 		}
 		return fmt.Errorf("failed to update some plugins")
+	}
+
+	return nil
+}
+
+func checkPluginCLI(idOrName string) error {
+	manager, err := plugins.NewManager()
+	if err != nil {
+		return fmt.Errorf("failed to create manager: %w", err)
+	}
+
+	registry, err := plugins.NewRegistry()
+	if err != nil {
+		return fmt.Errorf("failed to create registry: %w", err)
+	}
+
+	pluginList, _ := registry.List()
+	plugin := plugins.FindByIDOrName(idOrName, pluginList)
+
+	if plugin != nil {
+		installed, err := manager.IsInstalled(*plugin)
+		if err != nil {
+			return fmt.Errorf("failed to check install status: %w", err)
+		}
+		if !installed {
+			return fmt.Errorf("plugin not installed: %s", plugin.Name)
+		}
+
+		hasUpdates, err := manager.HasUpdates(plugin.ID, *plugin)
+		if err != nil {
+			return fmt.Errorf("failed to check updates: %w", err)
+		}
+
+		if hasUpdates {
+			fmt.Printf("Update available for plugin: %s (ID: %s)\n", plugin.Name, plugin.ID)
+		} else {
+			fmt.Printf("Plugin is up to date: %s\n", plugin.Name)
+		}
+		return nil
+	}
+
+	dummyPlugin := plugins.Plugin{ID: idOrName}
+	hasUpdates, err := manager.HasUpdates(idOrName, dummyPlugin)
+	if err != nil {
+		return fmt.Errorf("failed to check updates: %w", err)
+	}
+
+	if hasUpdates {
+		fmt.Printf("Update available for plugin: %s\n", idOrName)
+	} else {
+		fmt.Printf("Plugin is up to date: %s\n", idOrName)
+	}
+	return nil
+}
+
+func checkAllPluginsCLI() error {
+	manager, err := plugins.NewManager()
+	if err != nil {
+		return fmt.Errorf("failed to create manager: %w", err)
+	}
+
+	registry, err := plugins.NewRegistry()
+	if err != nil {
+		return fmt.Errorf("failed to create registry: %w", err)
+	}
+
+	installed, err := manager.ListInstalled()
+	if err != nil {
+		return fmt.Errorf("failed to list installed plugins: %w", err)
+	}
+
+	pluginList, _ := registry.List()
+
+	var count int
+	for _, pluginID := range installed {
+		plugin := plugins.FindByIDOrName(pluginID, pluginList)
+		var hasUpdates bool
+		var name string
+
+		if plugin != nil {
+			name = plugin.Name
+			hasUpdates, _ = manager.HasUpdates(pluginID, *plugin)
+		} else {
+			name = pluginID
+			dummyPlugin := plugins.Plugin{ID: pluginID}
+			hasUpdates, _ = manager.HasUpdates(pluginID, dummyPlugin)
+		}
+
+		if hasUpdates {
+			fmt.Printf("Update available for plugin: %s (ID: %s)\n", name, pluginID)
+			count++
+		}
+	}
+
+	if count > 0 {
+		fmt.Printf("\nFound %d plugin(s) with available updates.\n", count)
+	} else {
+		fmt.Println("All plugins are up to date.")
 	}
 
 	return nil
