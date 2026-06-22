@@ -771,11 +771,10 @@ Singleton {
             interval: {
                 if (!wrapper.notification)
                     return 5000;
-                // Honor an app-specified expire timeout (seconds); -1 means the
-                // app deferred to the server, so fall back to our per-urgency settings.
+                // expireTimeout is in milliseconds; -1 defers to our settings.
                 const appTimeout = wrapper.notification.expireTimeout;
                 if (appTimeout >= 0)
-                    return Math.round(appTimeout * 1000);
+                    return Math.round(appTimeout);
                 switch (wrapper.urgency) {
                 case NotificationUrgency.Low:
                     return SettingsData.notificationTimeoutLow;
