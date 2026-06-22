@@ -235,9 +235,11 @@ FloatingWindow {
                                     DankButton {
                                         text: I18n.tr("Diff")
                                         iconName: "open_in_new"
-                                        visible: !!modelData.repo
+                                        visible: !!modelData.diffUrl || !!modelData.repo
+                                        backgroundColor: Theme.surfaceContainerHighest
+                                        textColor: Theme.surfaceText
                                         onClicked: {
-                                            Qt.openUrlExternally(modelData.repo);
+                                            Qt.openUrlExternally(modelData.diffUrl || modelData.repo);
                                         }
                                     }
 
@@ -275,6 +277,8 @@ FloatingWindow {
                     text: I18n.tr("Cancel")
                     iconName: "close"
                     enabled: !root.isUpdating
+                    backgroundColor: Theme.surfaceContainerHighest
+                    textColor: Theme.surfaceText
                     onClicked: root.hide()
                 }
 
