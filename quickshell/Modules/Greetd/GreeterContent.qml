@@ -20,6 +20,14 @@ Item {
         return "file://" + path.split('/').map(s => encodeURIComponent(s)).join('/');
     }
 
+    function desktopIdFromPath(path) {
+        if (!path)
+            return "";
+        const parts = path.split("/");
+        const id = parts.length > 0 ? parts[parts.length - 1] : path;
+        return id || "";
+    }
+
     readonly property string xdgDataDirs: Quickshell.env("XDG_DATA_DIRS")
     property string screenName: ""
     property string hyprlandCurrentLayout: ""
@@ -283,8 +291,8 @@ Item {
         function onRememberLastSessionChanged() {
             if (!isPrimaryScreen)
                 return;
-            if (!GreetdSettings.rememberLastSession && GreetdMemory.lastSessionId) {
-                GreetdMemory.setLastSessionId("");
+            if (!GreetdSettings.rememberLastSession && (GreetdMemory.lastSessionId || GreetdMemory.lastSessionDesktopId || GreetdMemory.lastSessionExec)) {
+                GreetdMemory.setLastSession("", "");
             }
             finalizeSessionSelection();
         }
@@ -1878,6 +1886,7 @@ Item {
                     GreeterState.currentSessionIndex = idx;
                     GreeterState.selectedSession = GreeterState.sessionExecs[idx];
                     GreeterState.selectedSessionPath = GreeterState.sessionPaths[idx];
+                    GreeterState.selectedSessionDesktopId = GreeterState.sessionDesktopIds[idx];
                 }
             }
         }
@@ -1894,12 +1903,14 @@ Item {
             return;
 
         const savedSession = GreetdSettings.rememberLastSession ? GreetdMemory.lastSessionId : "";
-        if (savedSession && GreetdSettings.rememberLastSession) {
+        const savedDesktopId = GreetdSettings.rememberLastSession ? GreetdMemory.lastSessionDesktopId : "";
+        if ((savedSession || savedDesktopId) && GreetdSettings.rememberLastSession) {
             for (var i = 0; i < GreeterState.sessionPaths.length; i++) {
-                if (GreeterState.sessionPaths[i] === savedSession) {
+                if ((savedDesktopId && GreeterState.sessionDesktopIds[i] === savedDesktopId) || (savedSession && GreeterState.sessionPaths[i] === savedSession)) {
                     GreeterState.currentSessionIndex = i;
                     GreeterState.selectedSession = GreeterState.sessionExecs[i] || "";
                     GreeterState.selectedSessionPath = GreeterState.sessionPaths[i];
+                    GreeterState.selectedSessionDesktopId = GreeterState.sessionDesktopIds[i] || "";
                     return;
                 }
             }
@@ -1908,6 +1919,7 @@ Item {
         GreeterState.currentSessionIndex = 0;
         GreeterState.selectedSession = GreeterState.sessionExecs[0] || "";
         GreeterState.selectedSessionPath = GreeterState.sessionPaths[0] || "";
+        GreeterState.selectedSessionDesktopId = GreeterState.sessionDesktopIds[0] || "";
     }
 
     property var sessionDirs: {
@@ -1943,6 +1955,7 @@ Item {
         GreeterState.sessionList = GreeterState.sessionList.concat([name]);
         GreeterState.sessionExecs = GreeterState.sessionExecs.concat([exec]);
         GreeterState.sessionPaths = GreeterState.sessionPaths.concat([path]);
+        GreeterState.sessionDesktopIds = GreeterState.sessionDesktopIds.concat([desktopIdFromPath(path)]);
     }
 
     function _parseDesktopFile(content, path) {
@@ -2088,6 +2101,7 @@ Item {
             clearAuthFeedback();
             const sessionCmd = GreeterState.selectedSession || GreeterState.sessionExecs[GreeterState.currentSessionIndex];
             const sessionPath = GreeterState.selectedSessionPath || GreeterState.sessionPaths[GreeterState.currentSessionIndex];
+            const sessionDesktopId = GreeterState.selectedSessionDesktopId || GreeterState.sessionDesktopIds[GreeterState.currentSessionIndex] || desktopIdFromPath(sessionPath);
             if (!sessionCmd) {
                 GreeterState.pamState = "error";
                 authFeedbackMessage = currentAuthMessage();
@@ -2098,10 +2112,9 @@ Item {
             GreeterState.unlocking = true;
             launchTimeout.restart();
             if (GreetdSettings.rememberLastSession) {
-                GreetdMemory.setLastSessionId(sessionPath);
-                GreetdMemory.setLastSessionExec(sessionCmd);
-            } else if (GreetdMemory.lastSessionId || GreetdMemory.lastSessionExec) {
-                GreetdMemory.setLastSessionId("");
+                GreetdMemory.setLastSession(sessionPath, sessionDesktopId);
+            } else if (GreetdMemory.lastSessionId || GreetdMemory.lastSessionDesktopId || GreetdMemory.lastSessionExec) {
+                GreetdMemory.setLastSession("", "");
             }
             if (GreetdSettings.rememberLastUser) {
                 GreetdMemory.setLastSuccessfulUser(GreeterState.username);

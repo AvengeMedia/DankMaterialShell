@@ -95,6 +95,35 @@ var greeterSyncCmd = &cobra.Command{
 	},
 }
 
+var greeterLaunchSessionCmd = &cobra.Command{
+	Use:    "launch-session",
+	Short:  "Launch a remembered greeter session",
+	Hidden: true,
+	Run: func(cmd *cobra.Command, args []string) {
+		sessionID, _ := cmd.Flags().GetString("session-id")
+		fromMemory, _ := cmd.Flags().GetBool("from-memory")
+		cacheDir, _ := cmd.Flags().GetString("cache-dir")
+
+		if fromMemory {
+			homeDir, err := os.UserHomeDir()
+			if err != nil {
+				log.Fatalf("failed to get user home directory: %v", err)
+			}
+			if err := greeter.LaunchSessionFromMemory(cacheDir, homeDir); err != nil {
+				log.Fatalf("failed to launch remembered greeter session: %v", err)
+			}
+			return
+		}
+
+		if sessionID == "" {
+			log.Fatal("missing --session-id or --from-memory")
+		}
+		if err := greeter.LaunchSessionByID(sessionID); err != nil {
+			log.Fatalf("failed to launch greeter session %q: %v", sessionID, err)
+		}
+	},
+}
+
 func init() {
 	greeterSyncCmd.Flags().BoolP("yes", "y", false, "Non-interactive mode: skip prompts, use defaults (for UI)")
 	greeterSyncCmd.Flags().BoolP("terminal", "t", false, "Run sync in a new terminal (for entering sudo password); terminal auto-closes when done")
@@ -102,6 +131,9 @@ func init() {
 	greeterSyncCmd.Flags().BoolP("local", "l", false, "Developer mode: force greetd config to use a local DMS checkout path")
 	greeterSyncCmd.Flags().BoolP("profile", "p", false, "Sync only your per-user greeter slot (no sudo; for secondary accounts)")
 	greeterSyncCmd.Flags().Bool("autologin", false, "Apply only greeter auto-login on startup settings to greetd (no theme or auth sync)")
+	greeterLaunchSessionCmd.Flags().String("session-id", "", "Desktop session id to launch")
+	greeterLaunchSessionCmd.Flags().Bool("from-memory", false, "Resolve the session id from greeter memory")
+	greeterLaunchSessionCmd.Flags().String("cache-dir", greeter.GreeterCacheDir, "Greeter cache directory")
 }
 
 var greeterEnableCmd = &cobra.Command{
