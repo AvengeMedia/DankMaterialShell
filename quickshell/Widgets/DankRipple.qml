@@ -7,6 +7,7 @@ Item {
     property color rippleColor: Theme.primary
     property real cornerRadius: 0
     property bool enableRipple: typeof SettingsData !== "undefined" ? (SettingsData.enableRippleEffects ?? true) : true
+    property int animationDuration: Theme.expressiveDurations.expressiveDefaultSpatial
 
     property real _rippleX: 0
     property real _rippleY: 0
@@ -58,18 +59,18 @@ Item {
                 property: "rippleRadius"
                 from: 0
                 to: root._rippleMaxRadius
-                duration: Theme.expressiveDurations.expressiveDefaultSpatial
+                duration: root.animationDuration
                 easing.bezierCurve: Theme.expressiveCurves.standardDecel
             }
             SequentialAnimation {
                 PauseAnimation {
-                    duration: Math.round(Theme.expressiveDurations.expressiveDefaultSpatial * 0.6)
+                    duration: Math.round(root.animationDuration * 0.6)
                 }
                 DankAnim {
                     target: rippleFx
                     property: "rippleOpacity"
                     to: 0
-                    duration: Theme.expressiveDurations.expressiveDefaultSpatial
+                    duration: root.animationDuration
                     easing.bezierCurve: Theme.expressiveCurves.standard
                 }
             }

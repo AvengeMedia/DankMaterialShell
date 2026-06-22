@@ -4,7 +4,6 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import Quickshell.Hyprland
 import Quickshell.I3
 import qs.Common
 import qs.Services
@@ -311,11 +310,6 @@ Singleton {
         if (SettingsData.customPowerActionLogout.length === 0) {
             if (CompositorService.isNiri) {
                 NiriService.quit();
-                return;
-            }
-
-            if (CompositorService.isDwl) {
-                DwlService.quit();
                 return;
             }
 

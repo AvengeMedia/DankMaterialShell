@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell.Hyprland
 import qs.Common
 import qs.Services
 
@@ -52,8 +53,13 @@ Item {
         focus: true
         anchors.fill: parent
     }
+
+    // Hyprland OnDemand grab delivers keyboard focus to the modal content surface.
+    HyprlandFocusGrab {
+        windows: root.contentWindow ? [root.contentWindow] : []
+        active: KeyboardFocus.wantsGrab(root.shouldHaveFocus, root.customKeyboardFocus)
+    }
     readonly property var contentWindow: impl.item ? impl.item.contentWindow : null
-    readonly property var clickCatcher: impl.item ? impl.item.clickCatcher : null
     readonly property var effectiveScreen: impl.item ? impl.item.effectiveScreen : null
     readonly property real screenWidth: impl.item ? impl.item.screenWidth : 1920
     readonly property real screenHeight: impl.item ? impl.item.screenHeight : 1080
@@ -96,8 +102,6 @@ Item {
         }
     }
 
-    // Defer Loader source-component swap until impl is fully closed; avoids
-    // tearing down a modal mid-animation when frame mode is toggled.
     function _maybeResolveBackend() {
         if (_resolvedBackend === _desiredBackend)
             return;

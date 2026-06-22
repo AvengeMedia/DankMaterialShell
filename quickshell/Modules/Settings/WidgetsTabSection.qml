@@ -43,7 +43,7 @@ Column {
             "id": widget.id,
             "enabled": widget.enabled
         };
-        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "diskUsageMode", "minimumWidth", "showSwap", "showInGb", "mediaSize", "clockCompactMode", "focusedWindowSize", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "keyboardLayoutNameShowIcon", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showPrinterIcon", "showScreenSharingIcon", "showIdleInhibitorIcon", "showDoNotDisturbIcon", "controlCenterGroupOrder", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge", "trayUseInlineExpansion"];
+        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "diskUsageMode", "minimumWidth", "showSwap", "showInGb", "mediaSize", "clockCompactMode", "focusedWindowSize", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "keyboardLayoutNameShowIcon", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showBatteryPercent", "showBatteryPercentOnlyOnBattery", "showBatteryTime", "showBatteryTimeOnlyOnBattery", "showPrinterIcon", "showScreenSharingIcon", "showIdleInhibitorIcon", "showDoNotDisturbIcon", "controlCenterGroupOrder", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge", "trayUseInlineExpansion", "trayPopupSingleLine", "trayAutoOverflow", "trayMaxVisibleItems"];
         for (var i = 0; i < keys.length; i++) {
             if (widget[keys[i]] !== undefined)
                 result[keys[i]] = widget[keys[i]];
@@ -90,7 +90,7 @@ Column {
                 property real originalY: y
 
                 width: itemsList.width
-                height: 70
+                height: Math.max(70, textColumn.implicitHeight + 32)
                 z: held ? 2 : 1
 
                 Rectangle {
@@ -123,6 +123,7 @@ Column {
                     }
 
                     Column {
+                        id: textColumn
                         anchors.left: parent.left
                         anchors.leftMargin: Theme.spacingM * 3 + 40 + Theme.iconSize
                         anchors.right: actionButtons.left
@@ -137,6 +138,7 @@ Column {
                             color: modelData.enabled ? Theme.surfaceText : Theme.outline
                             elide: Text.ElideRight
                             width: parent.width
+                            wrapMode: Text.WordWrap
                         }
 
                         StyledText {
@@ -488,6 +490,39 @@ Column {
                                 runningAppsContextMenu.x = xPos;
                                 runningAppsContextMenu.y = yPos;
                                 runningAppsContextMenu.open();
+                            }
+                        }
+
+                        DankActionButton {
+                            id: batteryMenuButton
+                            visible: modelData.id === "battery"
+                            buttonSize: 32
+                            iconName: "more_vert"
+                            iconSize: 18
+                            iconColor: Theme.outline
+                            onClicked: {
+                                batteryContextMenu.widgetData = modelData;
+                                batteryContextMenu.sectionId = root.sectionId;
+                                batteryContextMenu.widgetIndex = index;
+
+                                var buttonPos = batteryMenuButton.mapToItem(root, 0, 0);
+                                var popupWidth = batteryContextMenu.width;
+                                var popupHeight = batteryContextMenu.height;
+
+                                var xPos = buttonPos.x - popupWidth - Theme.spacingS;
+                                if (xPos < 0)
+                                    xPos = buttonPos.x + batteryMenuButton.width + Theme.spacingS;
+
+                                var yPos = buttonPos.y - popupHeight / 2 + batteryMenuButton.height / 2;
+                                if (yPos < 0) {
+                                    yPos = Theme.spacingS;
+                                } else if (yPos + popupHeight > root.height) {
+                                    yPos = root.height - popupHeight - Theme.spacingS;
+                                }
+
+                                batteryContextMenu.x = xPos;
+                                batteryContextMenu.y = yPos;
+                                batteryContextMenu.open();
                             }
                         }
 
@@ -1122,6 +1157,188 @@ Column {
                             const newValue = !(trayContextMenu.currentWidgetData?.trayUseInlineExpansion ?? false);
                             root.overflowSettingChanged(trayContextMenu.sectionId, trayContextMenu.widgetIndex, "trayUseInlineExpansion", newValue);
                         }
+                    }
+                }
+
+                Rectangle {
+                    width: parent.width
+                    height: 32
+                    radius: Theme.cornerRadius
+                    color: trayPopupLineArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                    opacity: (trayContextMenu.currentWidgetData?.trayUseInlineExpansion ?? false) ? 0.55 : 1
+
+                    Row {
+                        anchors.left: parent.left
+                        anchors.leftMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: Theme.spacingS
+
+                        DankIcon {
+                            name: "view_week"
+                            size: 16
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            text: I18n.tr("Single-Line Popup")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceText
+                            font.weight: Font.Normal
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    DankToggle {
+                        id: trayPopupLineToggle
+                        anchors.right: parent.right
+                        anchors.rightMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 40
+                        height: 20
+                        checked: trayContextMenu.currentWidgetData?.trayPopupSingleLine ?? SettingsData.trayPopupSingleLine
+                        enabled: !(trayContextMenu.currentWidgetData?.trayUseInlineExpansion ?? false)
+                    }
+
+                    MouseArea {
+                        id: trayPopupLineArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: (trayContextMenu.currentWidgetData?.trayUseInlineExpansion ?? false) ? Qt.ArrowCursor : Qt.PointingHandCursor
+                        onClicked: {
+                            if (trayContextMenu.currentWidgetData?.trayUseInlineExpansion ?? false)
+                                return;
+                            const newValue = !(trayContextMenu.currentWidgetData?.trayPopupSingleLine ?? SettingsData.trayPopupSingleLine);
+                            root.overflowSettingChanged(trayContextMenu.sectionId, trayContextMenu.widgetIndex, "trayPopupSingleLine", newValue);
+                        }
+                    }
+                }
+
+                Rectangle {
+                    width: parent.width
+                    height: 32
+                    radius: Theme.cornerRadius
+                    color: trayAutoOverflowArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+
+                    Row {
+                        anchors.left: parent.left
+                        anchors.leftMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: Theme.spacingS
+
+                        DankIcon {
+                            name: "responsive_layout"
+                            size: 16
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            text: I18n.tr("Auto Overflow")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceText
+                            font.weight: Font.Normal
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    DankToggle {
+                        id: trayAutoOverflowToggle
+                        anchors.right: parent.right
+                        anchors.rightMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 40
+                        height: 20
+                        checked: trayContextMenu.currentWidgetData?.trayAutoOverflow ?? SettingsData.trayAutoOverflow
+                    }
+
+                    MouseArea {
+                        id: trayAutoOverflowArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            const newValue = !(trayContextMenu.currentWidgetData?.trayAutoOverflow ?? SettingsData.trayAutoOverflow);
+                            root.overflowSettingChanged(trayContextMenu.sectionId, trayContextMenu.widgetIndex, "trayAutoOverflow", newValue);
+                        }
+                    }
+                }
+
+                Rectangle {
+                    width: parent.width
+                    height: 36
+                    radius: Theme.cornerRadius
+                    color: trayMaxVisibleArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                    opacity: (trayContextMenu.currentWidgetData?.trayAutoOverflow ?? SettingsData.trayAutoOverflow) ? 1 : 0.55
+
+                    Row {
+                        anchors.left: parent.left
+                        anchors.leftMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: Theme.spacingS
+
+                        DankIcon {
+                            name: "low_priority"
+                            size: 16
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            text: I18n.tr("Max Visible")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceText
+                            font.weight: Font.Normal
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            text: {
+                                const value = trayContextMenu.currentWidgetData?.trayMaxVisibleItems ?? SettingsData.trayMaxVisibleItems;
+                                return value > 0 ? String(value) : I18n.tr("Auto");
+                            }
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceTextMedium
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    Row {
+                        anchors.right: parent.right
+                        anchors.rightMargin: Theme.spacingXS
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: 2
+
+                        DankActionButton {
+                            buttonSize: 28
+                            iconName: "remove"
+                            iconSize: 16
+                            iconColor: Theme.surfaceText
+                            enabled: trayContextMenu.currentWidgetData?.trayAutoOverflow ?? SettingsData.trayAutoOverflow
+                            onClicked: {
+                                const current = trayContextMenu.currentWidgetData?.trayMaxVisibleItems ?? SettingsData.trayMaxVisibleItems;
+                                root.overflowSettingChanged(trayContextMenu.sectionId, trayContextMenu.widgetIndex, "trayMaxVisibleItems", Math.max(0, current - 1));
+                            }
+                        }
+
+                        DankActionButton {
+                            buttonSize: 28
+                            iconName: "add"
+                            iconSize: 16
+                            iconColor: Theme.surfaceText
+                            enabled: trayContextMenu.currentWidgetData?.trayAutoOverflow ?? SettingsData.trayAutoOverflow
+                            onClicked: {
+                                const current = trayContextMenu.currentWidgetData?.trayMaxVisibleItems ?? SettingsData.trayMaxVisibleItems;
+                                root.overflowSettingChanged(trayContextMenu.sectionId, trayContextMenu.widgetIndex, "trayMaxVisibleItems", Math.min(20, current + 1));
+                            }
+                        }
+                    }
+
+                    MouseArea {
+                        id: trayMaxVisibleArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        acceptedButtons: Qt.NoButton
                     }
                 }
             }
@@ -2371,6 +2588,256 @@ Column {
                                 root.gpuSelectionChanged(gpuContextMenu.sectionId, gpuContextMenu.widgetIndex, index);
                                 gpuContextMenu.close();
                             }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Popup {
+        id: batteryContextMenu
+
+        property var widgetData: null
+        property string sectionId: ""
+        property int widgetIndex: -1
+        readonly property var currentWidgetData: (widgetIndex >= 0 && widgetIndex < root.items.length) ? root.items[widgetIndex] : widgetData
+
+        width: 270
+        height: batteryMenuColumn.implicitHeight + Theme.spacingS * 2
+        padding: 0
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+
+        background: Rectangle {
+            color: Theme.surfaceContainer
+            radius: Theme.cornerRadius
+            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+            border.width: 0
+        }
+
+        contentItem: Item {
+            Column {
+                id: batteryMenuColumn
+                anchors.fill: parent
+                anchors.margins: Theme.spacingS
+                spacing: 2
+
+                Rectangle {
+                    width: parent.width
+                    height: Math.max(18, Theme.fontSizeSmall) + Theme.spacingM * 2
+                    radius: Theme.cornerRadius
+                    color: batteryPercentArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+
+                    Row {
+                        anchors.left: parent.left
+                        anchors.leftMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: Theme.spacingS
+
+                        DankIcon {
+                            name: "percent"
+                            size: 18
+                            color: Theme.outline
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            text: I18n.tr("Show Percentage")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceText
+                            font.weight: Font.Normal
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    DankToggle {
+                        id: batteryPercentToggle
+                        anchors.right: parent.right
+                        anchors.rightMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 40
+                        height: 20
+                        checked: batteryContextMenu.currentWidgetData?.showBatteryPercent ?? SettingsData.showBatteryPercent
+                        onToggled: {
+                            root.overflowSettingChanged(batteryContextMenu.sectionId, batteryContextMenu.widgetIndex, "showBatteryPercent", toggled);
+                        }
+                    }
+
+                    MouseArea {
+                        id: batteryPercentArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onPressed: {
+                            batteryPercentToggle.checked = !batteryPercentToggle.checked;
+                            root.overflowSettingChanged(batteryContextMenu.sectionId, batteryContextMenu.widgetIndex, "showBatteryPercent", batteryPercentToggle.checked);
+                        }
+                    }
+                }
+
+                Rectangle {
+                    width: parent.width
+                    height: Math.max(18, Theme.fontSizeSmall) + Theme.spacingM * 2
+                    radius: Theme.cornerRadius
+                    color: batteryPercentOnlyOnBatteryArea.containsMouse && batteryPercentToggle.checked ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                    opacity: batteryPercentToggle.checked ? 1.0 : 0.5
+
+                    Row {
+                        anchors.left: parent.left
+                        anchors.leftMargin: Theme.spacingS + 18
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: Theme.spacingS
+
+                        DankIcon {
+                            name: "battery_charging_full"
+                            size: 18
+                            color: Theme.outline
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            text: I18n.tr("Only on Battery")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceText
+                            font.weight: Font.Normal
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    DankToggle {
+                        id: batteryPercentOnlyOnBatteryToggle
+                        anchors.right: parent.right
+                        anchors.rightMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 40
+                        height: 20
+                        enabled: batteryPercentToggle.checked
+                        checked: batteryContextMenu.currentWidgetData?.showBatteryPercentOnlyOnBattery ?? SettingsData.showBatteryPercentOnlyOnBattery
+                        onToggled: {
+                            root.overflowSettingChanged(batteryContextMenu.sectionId, batteryContextMenu.widgetIndex, "showBatteryPercentOnlyOnBattery", toggled);
+                        }
+                    }
+
+                    MouseArea {
+                        id: batteryPercentOnlyOnBatteryArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        enabled: batteryPercentToggle.checked
+                        cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+                        onPressed: {
+                            batteryPercentOnlyOnBatteryToggle.checked = !batteryPercentOnlyOnBatteryToggle.checked;
+                            root.overflowSettingChanged(batteryContextMenu.sectionId, batteryContextMenu.widgetIndex, "showBatteryPercentOnlyOnBattery", batteryPercentOnlyOnBatteryToggle.checked);
+                        }
+                    }
+                }
+
+                Rectangle {
+                    width: parent.width
+                    height: Math.max(18, Theme.fontSizeSmall) + Theme.spacingM * 2
+                    radius: Theme.cornerRadius
+                    color: batteryTimeArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+
+                    Row {
+                        anchors.left: parent.left
+                        anchors.leftMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: Theme.spacingS
+
+                        DankIcon {
+                            name: "schedule"
+                            size: 18
+                            color: Theme.outline
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            text: I18n.tr("Show Remaining Time")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceText
+                            font.weight: Font.Normal
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    DankToggle {
+                        id: batteryTimeToggle
+                        anchors.right: parent.right
+                        anchors.rightMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 40
+                        height: 20
+                        checked: batteryContextMenu.currentWidgetData?.showBatteryTime ?? SettingsData.showBatteryTime
+                        onToggled: {
+                            root.overflowSettingChanged(batteryContextMenu.sectionId, batteryContextMenu.widgetIndex, "showBatteryTime", toggled);
+                        }
+                    }
+
+                    MouseArea {
+                        id: batteryTimeArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onPressed: {
+                            batteryTimeToggle.checked = !batteryTimeToggle.checked;
+                            root.overflowSettingChanged(batteryContextMenu.sectionId, batteryContextMenu.widgetIndex, "showBatteryTime", batteryTimeToggle.checked);
+                        }
+                    }
+                }
+
+                Rectangle {
+                    width: parent.width
+                    height: Math.max(18, Theme.fontSizeSmall) + Theme.spacingM * 2
+                    radius: Theme.cornerRadius
+                    color: batteryTimeOnlyOnBatteryArea.containsMouse && batteryTimeToggle.checked ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                    opacity: batteryTimeToggle.checked ? 1.0 : 0.5
+
+                    Row {
+                        anchors.left: parent.left
+                        anchors.leftMargin: Theme.spacingS + 18
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: Theme.spacingS
+
+                        DankIcon {
+                            name: "battery_charging_full"
+                            size: 18
+                            color: Theme.outline
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            text: I18n.tr("Only on Battery")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceText
+                            font.weight: Font.Normal
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    DankToggle {
+                        id: batteryTimeOnlyOnBatteryToggle
+                        anchors.right: parent.right
+                        anchors.rightMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 40
+                        height: 20
+                        enabled: batteryTimeToggle.checked
+                        checked: batteryContextMenu.currentWidgetData?.showBatteryTimeOnlyOnBattery ?? SettingsData.showBatteryTimeOnlyOnBattery
+                        onToggled: {
+                            root.overflowSettingChanged(batteryContextMenu.sectionId, batteryContextMenu.widgetIndex, "showBatteryTimeOnlyOnBattery", toggled);
+                        }
+                    }
+
+                    MouseArea {
+                        id: batteryTimeOnlyOnBatteryArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        enabled: batteryTimeToggle.checked
+                        cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+                        onPressed: {
+                            batteryTimeOnlyOnBatteryToggle.checked = !batteryTimeOnlyOnBatteryToggle.checked;
+                            root.overflowSettingChanged(batteryContextMenu.sectionId, batteryContextMenu.widgetIndex, "showBatteryTimeOnlyOnBattery", batteryTimeOnlyOnBatteryToggle.checked);
                         }
                     }
                 }

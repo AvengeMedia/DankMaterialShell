@@ -152,6 +152,9 @@ Item {
         }
     ]
 
+    readonly property var entryActionKeys: ["copy", "paste", "pin", "edit", "delete"]
+    readonly property var entryActionLabels: [I18n.tr("Copy"), I18n.tr("Paste"), I18n.tr("Pin"), I18n.tr("Edit"), I18n.tr("Delete")]
+
     function getMaxHistoryText(value) {
         if (value <= 0)
             return "∞";
@@ -185,6 +188,29 @@ Item {
                 return opt.text;
         }
         return value.toString();
+    }
+
+    function visibleEntryActionKeys() {
+        return SettingsData.clipboardVisibleEntryActions || ["pin", "edit", "delete"];
+    }
+
+    function visibleEntryActionLabels() {
+        const visibleKeys = visibleEntryActionKeys();
+        return entryActionKeys.map((key, index) => visibleKeys.includes(key) ? entryActionLabels[index] : null).filter(label => label !== null);
+    }
+
+    function setVisibleEntryAction(index, selected) {
+        const actionKey = entryActionKeys[index];
+        if (!actionKey)
+            return;
+
+        let actions = visibleEntryActionKeys().slice();
+        if (selected && !actions.includes(actionKey)) {
+            actions.push(actionKey);
+        } else if (!selected && actions.includes(actionKey)) {
+            actions = actions.filter(action => action !== actionKey);
+        }
+        SettingsData.set("clipboardVisibleEntryActions", actions);
     }
 
     function loadConfig() {
@@ -430,12 +456,50 @@ Item {
 
                 SettingsToggleRow {
                     tab: "clipboard"
+                    tags: ["clipboard", "click", "paste", "behavior"]
+                    settingKey: "clipboardClickToPaste"
+                    text: I18n.tr("Click to Paste")
+                    description: I18n.tr("Click an entry to paste directly instead of copying", "Clipboard behavior setting description")
+                    checked: SettingsData.clipboardClickToPaste
+                    onToggled: checked => SettingsData.set("clipboardClickToPaste", checked)
+                }
+
+                SettingsToggleRow {
+                    tab: "clipboard"
                     tags: ["clipboard", "enter", "paste", "behavior"]
                     settingKey: "clipboardEnterToPaste"
                     text: I18n.tr("Enter to Paste")
                     description: I18n.tr("Press Enter to paste, Shift+Enter to copy", "Clipboard behavior setting description")
                     checked: SettingsData.clipboardEnterToPaste
                     onToggled: checked => SettingsData.set("clipboardEnterToPaste", checked)
+                }
+
+                SettingsToggleRow {
+                    tab: "clipboard"
+                    tags: ["clipboard", "filter", "type", "remember", "behavior"]
+                    settingKey: "clipboardRememberTypeFilter"
+                    text: I18n.tr("Remember Type Filter", "Clipboard behavior setting title")
+                    description: I18n.tr("Keep the clipboard type filter when reopening history", "Clipboard behavior setting description")
+                    checked: SettingsData.clipboardRememberTypeFilter
+                    onToggled: checked => SettingsData.set("clipboardRememberTypeFilter", checked)
+                }
+
+                SettingsButtonGroupRow {
+                    tab: "clipboard"
+                    tags: ["clipboard", "actions", "buttons", "hide", "density", "copy", "paste", "pin", "edit", "delete"]
+                    settingKey: "clipboardVisibleEntryActions"
+                    text: I18n.tr("Visible Entry Actions")
+                    description: I18n.tr("Choose which action buttons appear on clipboard entries")
+                    selectionMode: "multi"
+                    model: root.entryActionLabels
+                    currentSelection: root.visibleEntryActionLabels()
+                    checkEnabled: false
+                    buttonHeight: 28
+                    minButtonWidth: 56
+                    buttonPadding: Theme.spacingS
+                    textSize: Theme.fontSizeSmall
+                    spacing: 1
+                    onSelectionChanged: (index, selected) => root.setVisibleEntryAction(index, selected)
                 }
             }
 

@@ -11,6 +11,71 @@ BasePill {
 
     property bool batteryPopupVisible: false
     property var popoutTarget: null
+    property var widgetData: null
+    readonly property bool showPercentOnlyOnBattery: widgetData?.showBatteryPercentOnlyOnBattery !== undefined ? widgetData.showBatteryPercentOnlyOnBattery : SettingsData.showBatteryPercentOnlyOnBattery
+    readonly property bool showPercent: {
+        const base = widgetData?.showBatteryPercent !== undefined ? widgetData.showBatteryPercent : SettingsData.showBatteryPercent;
+        return base && !(showPercentOnlyOnBattery && BatteryService.isPluggedIn);
+    }
+    readonly property bool showTime: widgetData?.showBatteryTime !== undefined ? widgetData.showBatteryTime : SettingsData.showBatteryTime
+    readonly property bool showTimeOnlyOnBattery: widgetData?.showBatteryTimeOnlyOnBattery !== undefined ? widgetData.showBatteryTimeOnlyOnBattery : SettingsData.showBatteryTimeOnlyOnBattery
+
+    readonly property string batteryTimeText: {
+        if (showTimeOnlyOnBattery && BatteryService.isPluggedIn) {
+            return "";
+        }
+        const time = BatteryService.formatTimeRemaining();
+        return time !== "Unknown" ? time : "";
+    }
+
+    readonly property string verticalBatteryTimeText: {
+        if (!batteryTimeText) return "";
+
+        // Parse batteryTimeText, e.g., "2h 41m" or "41m"
+        let hours = 0;
+        let minutes = 0;
+
+        const hourMatch = batteryTimeText.match(/(\d+)h/);
+        const minMatch = batteryTimeText.match(/(\d+)m/);
+
+        if (hourMatch) {
+            hours = parseInt(hourMatch[1], 10);
+        }
+        if (minMatch) {
+            minutes = parseInt(minMatch[1], 10);
+        }
+
+        const hoursStr = hours < 10 ? "0" + hours : hours.toString();
+        const minutesStr = minutes < 10 ? "0" + minutes : minutes.toString();
+
+        return `${hoursStr}\n${minutesStr}`;
+    }
+
+    readonly property string horizontalDisplayText: {
+        if (showPercent && showTime && batteryTimeText) {
+            return `${BatteryService.batteryLevel}% (${batteryTimeText})`;
+        }
+        if (showPercent) {
+            return `${BatteryService.batteryLevel}%`;
+        }
+        if (showTime && batteryTimeText) {
+            return batteryTimeText;
+        }
+        return "";
+    }
+
+    readonly property string verticalDisplayText: {
+        if (showPercent && showTime && batteryTimeText) {
+            return `${BatteryService.batteryLevel}\n${verticalBatteryTimeText}`;
+        }
+        if (showPercent) {
+            return BatteryService.batteryLevel.toString();
+        }
+        if (showTime && batteryTimeText) {
+            return verticalBatteryTimeText;
+        }
+        return "";
+    }
 
     property real touchpadAccumulator: 0
 
@@ -66,11 +131,12 @@ BasePill {
                 }
 
                 StyledText {
-                    text: BatteryService.batteryLevel.toString()
+                    text: battery.verticalDisplayText
                     font.pixelSize: Theme.barTextSize(battery.barThickness, battery.barConfig?.fontScale, battery.barConfig?.maximizeWidgetText)
                     color: Theme.widgetTextColor
+                    horizontalAlignment: Text.AlignHCenter
                     anchors.horizontalCenter: parent.horizontalCenter
-                    visible: BatteryService.batteryAvailable
+                    visible: BatteryService.batteryAvailable && battery.verticalDisplayText !== ""
                 }
             }
 
@@ -102,11 +168,11 @@ BasePill {
                 }
 
                 StyledText {
-                    text: `${BatteryService.batteryLevel}%`
+                    text: battery.horizontalDisplayText
                     font.pixelSize: Theme.barTextSize(battery.barThickness, battery.barConfig?.fontScale, battery.barConfig?.maximizeWidgetText)
                     color: Theme.widgetTextColor
                     anchors.verticalCenter: parent.verticalCenter
-                    visible: BatteryService.batteryAvailable
+                    visible: BatteryService.batteryAvailable && battery.horizontalDisplayText !== ""
                 }
             }
         }
@@ -118,10 +184,18 @@ BasePill {
         width: battery.width + battery.leftMargin + battery.rightMargin
         height: battery.height + battery.topMargin + battery.bottomMargin
         cursorShape: Qt.PointingHandCursor
-        acceptedButtons: Qt.LeftButton
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
         onPressed: mouse => {
             battery.triggerRipple(this, mouse.x, mouse.y);
-            toggleBatteryPopup();
+            if (mouse.button === Qt.LeftButton) {
+                toggleBatteryPopup();
+            } else if (mouse.button === Qt.RightButton) {
+                if (PowerProfileWatcher.available) {
+                    PowerProfileWatcher.cycleProfile();
+                } else {
+                    ToastService.showError(I18n.tr("power-profiles-daemon not available"));
+                }
+            }
         }
         onWheel: wheel => {
             var delta = wheel.angleDelta.y;
@@ -131,33 +205,20 @@ BasePill {
             // Check if this is a touchpad
             if (delta !== 120 && delta !== -120) {
                 touchpadAccumulator += delta;
-                log.info("Acc: " + touchpadAccumulator);
                 if (Math.abs(touchpadAccumulator) < 500)
                     return;
                 delta = touchpadAccumulator;
                 touchpadAccumulator = 0;
             }
-            log.info("Trigger! Delta: " + delta);
 
-            // This is after the other delta checks so it only shows on valid Y scroll
-            if (!PowerProfileWatcher.available) {
-                ToastService.showError(I18n.tr("power-profiles-daemon not available"));
+            if (!DisplayService.brightnessAvailable) {
                 return;
             }
 
-            const profiles = PowerProfileWatcher.availableProfiles;
-            var index = profiles.findIndex(profile => PowerProfiles.profile === profile);
-
-            if (delta > 0)
-                index += 1;
-            else
-                index -= 1;
-
-            if (index < 0 || index >= profiles.length)
-                return;
-
-            if (!PowerProfileWatcher.applyProfile(profiles[index]))
-                ToastService.showError(I18n.tr("Failed to set power profile"));
+            const step = 5;
+            const change = delta > 0 ? step : -step;
+            const newBrightness = Math.max(0, Math.min(100, DisplayService.brightnessLevel + change));
+            DisplayService.setBrightness(newBrightness, "", false);
         }
     }
 }

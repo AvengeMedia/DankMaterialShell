@@ -186,13 +186,36 @@ Variants {
                 return;
             }
 
+            const presented = dock.visible && (dock.reveal || slideXAnimation.running || slideYAnimation.running) && dock.hasApps;
+            const phase = !presented ? "hidden" : ((!dock.reveal && (slideXAnimation.running || slideYAnimation.running)) ? "closing" : ((slideXAnimation.running || slideYAnimation.running) ? "opening" : "open"));
+            const bodyX = dock._dockWindowOriginX() + dockBackground.x + dockContainer.x + dockMouseArea.x + dockCore.x;
+            const bodyY = dock._dockWindowOriginY() + dockBackground.y + dockContainer.y + dockMouseArea.y + dockCore.y;
+            const bodyW = dock.hasApps ? dockBackground.width : 0;
+            const bodyH = dock.hasApps ? dockBackground.height : 0;
             ConnectedModeState.setDockState(dock._dockScreenName, {
-                "reveal": dock.visible && (dock.reveal || slideXAnimation.running || slideYAnimation.running) && dock.hasApps,
+                "kind": "dock",
+                "screenName": dock._dockScreenName,
+                "phase": phase,
+                "visible": presented,
+                "presented": presented,
+                "reveal": presented,
                 "barSide": dock.connectedBarSide,
-                "bodyX": dock._dockWindowOriginX() + dockBackground.x + dockContainer.x + dockMouseArea.x + dockCore.x,
-                "bodyY": dock._dockWindowOriginY() + dockBackground.y + dockContainer.y + dockMouseArea.y + dockCore.y,
-                "bodyW": dock.hasApps ? dockBackground.width : 0,
-                "bodyH": dock.hasApps ? dockBackground.height : 0,
+                "bodyRect": {
+                    "x": bodyX,
+                    "y": bodyY,
+                    "width": bodyW,
+                    "height": bodyH
+                },
+                "animationOffset": {
+                    "x": dockSlide.x,
+                    "y": dockSlide.y
+                },
+                "scale": 1,
+                "opacity": Theme.connectedSurfaceColor.a,
+                "bodyX": bodyX,
+                "bodyY": bodyY,
+                "bodyW": bodyW,
+                "bodyH": bodyH,
                 "slideX": dockSlide.x,
                 "slideY": dockSlide.y
             });
@@ -488,13 +511,11 @@ Variants {
             if (!dock.hoveredButton || !dock.reveal || slideXAnimation.running || slideYAnimation.running)
                 return;
 
-            const buttonGlobalPos = dock.hoveredButton.mapToGlobal(0, 0);
+            const buttonLocalPos = dock.hoveredButton.mapToItem(null, 0, 0);
             const tooltipText = dock.hoveredButton.tooltipText || "";
             if (!tooltipText)
                 return;
 
-            const screenX = dock.screen ? (dock.screen.x || 0) : 0;
-            const screenY = dock.screen ? (dock.screen.y || 0) : 0;
             const screenHeight = dock.screen ? dock.screen.height : 0;
 
             const gap = Theme.spacingS;
@@ -504,19 +525,19 @@ Variants {
 
             if (!dock.isVertical) {
                 const isBottom = SettingsData.dockPosition === SettingsData.Position.Bottom;
-                const globalX = buttonGlobalPos.x + btnW / 2 + adjacentLeftBarWidth;
+                const tooltipX = buttonLocalPos.x + btnW / 2 + adjacentLeftBarWidth;
                 const tooltipHeight = 32;
                 const totalFromEdge = bgMargin + dockBackground.height + dock.borderThickness + gap;
                 const screenRelativeY = isBottom ? (screenHeight - totalFromEdge - tooltipHeight) : totalFromEdge;
-                dockTooltip.show(tooltipText, globalX, screenRelativeY, dock.screen, false, false);
+                dockTooltip.show(tooltipText, tooltipX, screenRelativeY, dock.screen, false, false);
                 return;
             }
 
             const isLeft = SettingsData.dockPosition === SettingsData.Position.Left;
             const screenWidth = dock.screen ? dock.screen.width : 0;
             const totalFromEdge = bgMargin + dockBackground.width + dock.borderThickness + gap;
-            const tooltipX = isLeft ? (screenX + totalFromEdge) : (screenX + screenWidth - totalFromEdge);
-            const screenRelativeY = buttonGlobalPos.y - screenY + btnH / 2 + adjacentTopBarHeight;
+            const tooltipX = isLeft ? totalFromEdge : (screenWidth - totalFromEdge);
+            const screenRelativeY = buttonLocalPos.y + btnH / 2 + adjacentTopBarHeight;
             dockTooltip.show(tooltipText, tooltipX, screenRelativeY, dock.screen, isLeft, !isLeft);
         }
 
@@ -724,16 +745,36 @@ Variants {
                         onHeightChanged: dock._syncDockChromeState()
                     }
 
-                    ConnectedShape {
+                    Item {
+                        id: dockConnectedChrome
                         visible: Theme.isConnectedEffect && dock.reveal && !SettingsData.connectedFrameModeActive
-                        barSide: dock.connectedBarSide
-                        bodyWidth: dockBackground.width
-                        bodyHeight: dockBackground.height
-                        connectorRadius: Theme.connectedCornerRadius
-                        surfaceRadius: dock.surfaceRadius
-                        fillColor: dock.surfaceColor
-                        x: dockBackground.x - bodyX
-                        y: dockBackground.y - bodyY
+                        readonly property real extraLeft: dock.isVertical ? 0 : Theme.connectedCornerRadius
+                        readonly property real extraTop: dock.isVertical ? Theme.connectedCornerRadius : 0
+                        readonly property real bodyRadius: dock.surfaceRadius
+                        readonly property bool barTop: dock.connectedBarSide === "top"
+                        readonly property bool barBottom: dock.connectedBarSide === "bottom"
+                        readonly property bool barLeft: dock.connectedBarSide === "left"
+                        readonly property bool barRight: dock.connectedBarSide === "right"
+
+                        x: dockBackground.x - extraLeft
+                        y: dockBackground.y - extraTop
+                        width: dockBackground.width + extraLeft * 2
+                        height: dockBackground.height + extraTop * 2
+
+                        ShaderEffect {
+                            anchors.fill: parent
+                            fragmentShader: Qt.resolvedUrl("../../Shaders/qsb/connected_chrome.frag.qsb")
+
+                            property real widthPx: width
+                            property real heightPx: height
+                            property vector4d surfaceColor: Qt.vector4d(dock.surfaceColor.r, dock.surfaceColor.g, dock.surfaceColor.b, dock.surfaceColor.a)
+                            property vector4d shadowColor: Qt.vector4d(0, 0, 0, 0)
+                            property vector4d shadowParam: Qt.vector4d(0, 0, 0, 0)
+                            property vector4d ambientParam: Qt.vector4d(0, 0, 0, 0)
+                            property vector4d bodyRect: Qt.vector4d(dockConnectedChrome.extraLeft, dockConnectedChrome.extraTop, dockBackground.width, dockBackground.height)
+                            property vector4d cornerRadius: Qt.vector4d(dockConnectedChrome.barTop || dockConnectedChrome.barLeft ? 0 : dockConnectedChrome.bodyRadius, dockConnectedChrome.barTop || dockConnectedChrome.barRight ? 0 : dockConnectedChrome.bodyRadius, dockConnectedChrome.barBottom || dockConnectedChrome.barRight ? 0 : dockConnectedChrome.bodyRadius, dockConnectedChrome.barBottom || dockConnectedChrome.barLeft ? 0 : dockConnectedChrome.bodyRadius)
+                            property vector4d edgeParam: Qt.vector4d(dockConnectedChrome.barTop ? 0 : (dockConnectedChrome.barBottom ? 1 : (dockConnectedChrome.barLeft ? 2 : 3)), Theme.connectedCornerRadius, 0, 0)
+                        }
                     }
 
                     Shape {

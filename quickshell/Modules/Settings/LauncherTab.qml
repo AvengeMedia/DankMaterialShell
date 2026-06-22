@@ -304,8 +304,6 @@ Item {
                                 modes.push("niri");
                             } else if (CompositorService.isHyprland) {
                                 modes.push("Hyprland");
-                            } else if (CompositorService.isDwl) {
-                                modes.push("mango");
                             } else if (CompositorService.isMango) {
                                 modes.push("mango");
                             } else if (CompositorService.isSway) {
@@ -673,6 +671,15 @@ Item {
                     onToggled: checked => SettingsData.set("dankLauncherV2UnloadOnClose", checked)
                 }
 
+                 SettingsToggleRow {
+                    settingKey: "dankLauncherV2ShowSourceBadges"
+                    tags: ["launcher", "appearance", "badge", "source", "flatpak"]
+                    text: I18n.tr("Show Package Source Badges")
+                    description: I18n.tr("Show Flatpak, Snap, AppImage, or Nix badge icons on launcher items.")
+                    checked: SettingsData.dankLauncherV2ShowSourceBadges
+                    onToggled: checked => SettingsData.set("dankLauncherV2ShowSourceBadges", checked)
+                }
+
                 SettingsToggleRow {
                     settingKey: "dankLauncherV2BorderEnabled"
                     tags: ["launcher", "border", "outline"]
@@ -771,7 +778,7 @@ Item {
                     spacing: Theme.spacingS
 
                     Repeater {
-                        model: ["dms_settings", "dms_notepad", "dms_sysmon", "dms_settings_search", "dms_clipboard_search"]
+                        model: ["dms_settings", "dms_notepad", "dms_sysmon", "dms_settings_search", "dms_clipboard_search", "dms_colorpicker"]
 
                         delegate: Rectangle {
                             id: pluginDelegate

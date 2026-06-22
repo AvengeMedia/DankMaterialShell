@@ -34,6 +34,7 @@ type WiFiNetwork struct {
 	Saved       bool   `json:"saved"`
 	Autoconnect bool   `json:"autoconnect"`
 	Hidden      bool   `json:"hidden"`
+	OutOfRange  bool   `json:"outOfRange"`
 	Frequency   uint32 `json:"frequency"`
 	Mode        string `json:"mode"`
 	Rate        uint32 `json:"rate"`
@@ -111,6 +112,7 @@ type NetworkState struct {
 	WiFiBSSID              string               `json:"wifiBSSID"`
 	WiFiSignal             uint8                `json:"wifiSignal"`
 	WiFiNetworks           []WiFiNetwork        `json:"wifiNetworks"`
+	SavedWiFiNetworks      []WiFiNetwork        `json:"savedWifiNetworks"`
 	WiFiDevices            []WiFiDevice         `json:"wifiDevices"`
 	WiredConnections       []WiredConnection    `json:"wiredConnections"`
 	VPNProfiles            []VPNProfile         `json:"vpnProfiles"`

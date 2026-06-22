@@ -354,6 +354,28 @@ Item {
                     }
                 }
 
+                ColorDropdownRow {
+                    tab: "wallpaper"
+                    tags: ["background", "color", "fill", "fit", "custom"]
+                    settingKey: "wallpaperBackgroundColorMode"
+                    text: I18n.tr("Background Color")
+                    description: I18n.tr("Color shown for areas not covered by wallpaper (e.g. Fit or Pad modes)")
+                    visible: root.currentWallpaper !== "" && !root.currentWallpaper.startsWith("#")
+                    dropdownWidth: 220
+                    options: [
+                        { "value": "black", "label": I18n.tr("Black") },
+                        { "value": "white", "label": I18n.tr("White") },
+                        { "value": "primary", "label": I18n.tr("Primary Theme Color") },
+                        { "value": "surface", "label": I18n.tr("Surface Container") },
+                        { "value": "custom", "label": I18n.tr("Custom") }
+                    ]
+                    currentMode: SettingsData.wallpaperBackgroundColorMode
+                    customColor: SettingsData.wallpaperBackgroundCustomColor || "#000000"
+                    pickerTitle: I18n.tr("Wallpaper Background Color")
+                    onModeSelected: mode => SettingsData.set("wallpaperBackgroundColorMode", mode)
+                    onCustomColorSelected: selectedColor => SettingsData.set("wallpaperBackgroundCustomColor", selectedColor.toString())
+                }
+
                 Rectangle {
                     width: parent.width
                     height: 1
@@ -1271,6 +1293,7 @@ Item {
                 tags: ["blur", "layer", "niri", "compositor"]
                 title: I18n.tr("Blur Wallpaper Layer")
                 settingKey: "blurWallpaper"
+                iconName: "blur_on"
                 visible: CompositorService.isNiri
 
                 SettingsToggleRow {

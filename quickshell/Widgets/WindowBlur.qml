@@ -16,6 +16,11 @@ Item {
     property real blurWidth: 0
     property real blurHeight: 0
     property real blurRadius: 0
+    property bool clipEnabled: false
+    property real clipX: blurX
+    property real clipY: blurY
+    property real clipWidth: blurWidth
+    property real clipHeight: blurHeight
 
     readonly property bool _active: blurEnabled && BlurService.enabled && !!targetWindow
 
@@ -26,6 +31,14 @@ Item {
         width: root.blurWidth
         height: root.blurHeight
         radius: root.blurRadius
+
+        Region {
+            intersection: Intersection.Intersect
+            x: root.clipEnabled ? root.clipX : root.blurX
+            y: root.clipEnabled ? root.clipY : root.blurY
+            width: root.clipEnabled ? root.clipWidth : root.blurWidth
+            height: root.clipEnabled ? root.clipHeight : root.blurHeight
+        }
     }
 
     function _apply() {
@@ -34,10 +47,12 @@ Item {
         targetWindow.BackgroundEffect.blurRegion = _active ? blurRegion : null;
     }
 
-    // Force BackgroundEffect to re-publish the blur region on the current wl_surface.
-    // Clearing first bypasses Quickshell's same-Region dedup in BackgroundEffect::setBlurRegion,
-    // setting pendingBlurRegion=true so the next polish actually ships the region — needed
-    // when the underlying surface has been remapped (e.g. PanelWindow.screen change).
+    function _clear() {
+        if (targetWindow)
+            targetWindow.BackgroundEffect.blurRegion = null;
+    }
+
+    // Re-publish blur region after wl_surface remaps (e.g. screen change).
     function kick() {
         if (!targetWindow)
             return;
@@ -45,20 +60,56 @@ Item {
         targetWindow.BackgroundEffect.blurRegion = _active ? blurRegion : null;
     }
 
-    on_ActiveChanged: _apply()
-    onTargetWindowChanged: _apply()
+    function _scheduleLifecycleKick() {
+        lifecycleKickAction.restart();
+    }
+
+    function _runLifecycleKick() {
+        if (!targetWindow)
+            return;
+        if (targetWindow.visible)
+            kick();
+        else
+            _apply();
+    }
+
+    on_ActiveChanged: {
+        if (_active)
+            _scheduleLifecycleKick();
+        else
+            _clear();
+    }
+    onTargetWindowChanged: {
+        lifecycleKickAction.cancel();
+        _apply();
+    }
+
+    DeferredAction {
+        id: lifecycleKickAction
+        onTriggered: root._runLifecycleKick()
+    }
 
     Connections {
         target: root.targetWindow ?? null
         ignoreUnknownSignals: true
         function onVisibleChanged() {
             if (root.targetWindow && root.targetWindow.visible)
-                root._apply();
+                root._scheduleLifecycleKick();
+            else
+                root._clear();
+        }
+        function onResourcesLost() {
+            lifecycleKickAction.cancel();
+            root._clear();
+        }
+        function onWindowConnected() {
+            root._scheduleLifecycleKick();
         }
     }
 
-    Component.onCompleted: _apply()
+    Component.onCompleted: _scheduleLifecycleKick()
     Component.onDestruction: {
+        lifecycleKickAction.cancel();
         if (targetWindow)
             targetWindow.BackgroundEffect.blurRegion = null;
     }

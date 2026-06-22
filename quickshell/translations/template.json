@@ -189,6 +189,13 @@
     "comment": ""
   },
   {
+    "term": "%1 tasks",
+    "translation": "",
+    "context": "task count next to a date, %1 is the number of tasks",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "%1 update",
     "translation": "",
     "context": "",
@@ -308,16 +315,16 @@
     "comment": ""
   },
   {
-    "term": "1 device connected",
+    "term": "1 day before",
     "translation": "",
-    "context": "KDE Connect status single device",
+    "context": "",
     "reference": "",
     "comment": ""
   },
   {
-    "term": "1 event",
+    "term": "1 device connected",
     "translation": "",
-    "context": "",
+    "context": "KDE Connect status single device",
     "reference": "",
     "comment": ""
   },
@@ -332,6 +339,13 @@
     "term": "1 hour 30 minutes",
     "translation": "",
     "context": "wallpaper interval",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "1 hour before",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -351,6 +365,20 @@
   },
   {
     "term": "1 second",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "1 task",
+    "translation": "",
+    "context": "task count next to a date",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "10 min before",
     "translation": "",
     "context": "",
     "reference": "",
@@ -393,6 +421,13 @@
   },
   {
     "term": "15 min",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "15 min before",
     "translation": "",
     "context": "",
     "reference": "",
@@ -532,6 +567,13 @@
     "comment": ""
   },
   {
+    "term": "30 min before",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "30 minutes",
     "translation": "",
     "context": "wallpaper interval",
@@ -584,6 +626,13 @@
     "term": "45 seconds",
     "translation": "",
     "context": "wallpaper interval",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "5 min before",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -1022,6 +1071,13 @@
     "comment": ""
   },
   {
+    "term": "Add a task...",
+    "translation": "",
+    "context": "placeholder in the new-task input field",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Add and configure widgets that appear on your desktop",
     "translation": "",
     "context": "",
@@ -1036,7 +1092,21 @@
     "comment": ""
   },
   {
+    "term": "Add location",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Add match",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Add notes",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1136,7 +1206,7 @@
   {
     "term": "All day",
     "translation": "",
-    "context": "",
+    "context": "calendar task with no specific time",
     "reference": "",
     "comment": ""
   },
@@ -1149,6 +1219,13 @@
   },
   {
     "term": "Allow",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Allow adjusting device volume by scrolling on the right half of items in the device list",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1177,6 +1254,13 @@
   },
   {
     "term": "Already on that session",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Also group repeated application icons on the active workspace",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1281,6 +1365,13 @@
     "comment": ""
   },
   {
+    "term": "Anchor",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Animation Duration",
     "translation": "",
     "context": "",
@@ -1316,13 +1407,6 @@
     "comment": ""
   },
   {
-    "term": "Any",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Any window",
     "translation": "",
     "context": "",
@@ -1338,6 +1422,13 @@
   },
   {
     "term": "App ID",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "App ID (e.g. firefox)",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1470,14 +1561,14 @@
     "comment": ""
   },
   {
-    "term": "Applying authentication changes…",
+    "term": "Applying authentication changes...",
     "translation": "",
     "context": "",
     "reference": "",
     "comment": ""
   },
   {
-    "term": "Applying auto-login on startup…",
+    "term": "Applying auto-login on startup...",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1569,6 +1660,13 @@
   },
   {
     "term": "At least one output must remain enabled",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "At start",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1766,7 +1864,7 @@
   {
     "term": "Auto",
     "translation": "",
-    "context": "theme category option",
+    "context": "calendar backend option | theme category option",
     "reference": "",
     "comment": ""
   },
@@ -1785,7 +1883,21 @@
     "comment": ""
   },
   {
+    "term": "Auto Compositor Gaps",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Auto Location",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Auto Overflow",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1800,6 +1912,13 @@
   },
   {
     "term": "Auto mode is on. Manual profile selection is disabled.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Auto saved",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1876,7 +1995,7 @@
     "comment": ""
   },
   {
-    "term": "Auto-saving...",
+    "term": "Auto-save to disk",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1989,6 +2108,13 @@
   },
   {
     "term": "Automatically lock the screen when the system prepares to suspend",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Automatically save changes to opened files as you type",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2170,6 +2296,20 @@
     "comment": ""
   },
   {
+    "term": "Bar",
+    "translation": "",
+    "context": "fallback name for an unnamed bar",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Bar %1",
+    "translation": "",
+    "context": "numbered name for an unnamed bar, %1 is its position",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Bar Configurations",
     "translation": "",
     "context": "",
@@ -2177,14 +2317,14 @@
     "comment": ""
   },
   {
-    "term": "Bar Shadows",
+    "term": "Bar Opacity",
     "translation": "",
     "context": "",
     "reference": "",
     "comment": ""
   },
   {
-    "term": "Bar Transparency",
+    "term": "Bar Shadows",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2408,7 +2548,7 @@
     "comment": ""
   },
   {
-    "term": "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support and configuration.",
+    "term": "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support. Adjust Opacity accordingly.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2425,6 +2565,13 @@
     "term": "Body",
     "translation": "",
     "context": "notification rule match field option",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Body Font Size",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -2709,6 +2856,13 @@
     "comment": ""
   },
   {
+    "term": "Calendar Backend",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Camera",
     "translation": "",
     "context": "",
@@ -2947,7 +3101,7 @@
     "comment": ""
   },
   {
-    "term": "Checking whether sudo authentication is needed…",
+    "term": "Checking whether sudo authentication is needed...",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2955,13 +3109,6 @@
   },
   {
     "term": "Checking...",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Checking…",
     "translation": "",
     "context": "greeter status loading",
     "reference": "",
@@ -3095,6 +3242,13 @@
   },
   {
     "term": "Choose whether to launch a desktop app or a command",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Choose which action buttons appear on clipboard entries",
     "translation": "",
     "context": "",
     "reference": "",
@@ -3815,7 +3969,7 @@
     "comment": ""
   },
   {
-    "term": "Connecting to clipboard service…",
+    "term": "Connecting to clipboard service...",
     "translation": "",
     "context": "",
     "reference": "",
@@ -3934,7 +4088,42 @@
     "comment": ""
   },
   {
-    "term": "Controls opacity of all popouts, modals, and their content layers",
+    "term": "Controls opacity of shell surfaces, popouts, and modals",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Controls opacity of the bar background",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Controls opacity of the border",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Controls opacity of the shadow layer",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Controls opacity of the widget outline",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Controls opacity of widget backgrounds",
     "translation": "",
     "context": "",
     "reference": "",
@@ -3962,14 +4151,14 @@
     "comment": ""
   },
   {
-    "term": "Controls the outer edge of protocol-blurred windows",
+    "term": "Controls the opacity of the shadow",
     "translation": "",
     "context": "",
     "reference": "",
     "comment": ""
   },
   {
-    "term": "Controls the transparency of the shadow",
+    "term": "Controls the outer edge of protocol-blurred windows",
     "translation": "",
     "context": "",
     "reference": "",
@@ -4203,6 +4392,20 @@
     "term": "Critical Priority",
     "translation": "",
     "context": "notification rule urgency option",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Ctrl+S: Save • Ctrl+O: Open • Ctrl+N: New • Ctrl+F: Find",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -4459,13 +4662,6 @@
     "comment": ""
   },
   {
-    "term": "Custom Transparency",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Custom command and terminal params are split on whitespace; paths with spaces will break.",
     "translation": "",
     "context": "",
@@ -4627,13 +4823,6 @@
     "comment": ""
   },
   {
-    "term": "DWL service not available",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Daily",
     "translation": "",
     "context": "",
@@ -4665,6 +4854,27 @@
     "term": "DankBar",
     "translation": "",
     "context": "greeter feature card title | greeter settings link",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "DankCalendar",
+    "translation": "",
+    "context": "calendar backend option",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "DankCalendar isn't installed",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "DankCalendar isn't running",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -4817,6 +5027,13 @@
   },
   {
     "term": "Default Launcher Shortcut",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Default Mode",
     "translation": "",
     "context": "",
     "reference": "",
@@ -5096,6 +5313,13 @@
     "comment": ""
   },
   {
+    "term": "Device list scroll volume",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Device names updated",
     "translation": "",
     "context": "",
@@ -5194,7 +5418,7 @@
     "comment": ""
   },
   {
-    "term": "Disabling auto-login on startup…",
+    "term": "Disabling auto-login on startup...",
     "translation": "",
     "context": "",
     "reference": "",
@@ -5348,7 +5572,7 @@
     "comment": ""
   },
   {
-    "term": "Display and switch DWL layouts",
+    "term": "Display and switch MangoWC layouts",
     "translation": "",
     "context": "",
     "reference": "",
@@ -5502,7 +5726,7 @@
     "comment": ""
   },
   {
-    "term": "Dock Transparency",
+    "term": "Dock Opacity",
     "translation": "",
     "context": "",
     "reference": "",
@@ -5516,7 +5740,7 @@
     "comment": ""
   },
   {
-    "term": "Dock margin, transparency, and border",
+    "term": "Dock margin, opacity, and border",
     "translation": "",
     "context": "",
     "reference": "",
@@ -5726,6 +5950,13 @@
     "comment": ""
   },
   {
+    "term": "Edit",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Edit App",
     "translation": "",
     "context": "",
@@ -5755,6 +5986,20 @@
   },
   {
     "term": "Edit clipboard text",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Edit event",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Editing changes on %1",
     "translation": "",
     "context": "",
     "reference": "",
@@ -6027,6 +6272,13 @@
     "comment": ""
   },
   {
+    "term": "End must be after start",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Enlarge on Hover",
     "translation": "",
     "context": "",
@@ -6219,6 +6471,13 @@
     "term": "Ethernet",
     "translation": "",
     "context": "network status",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Event title",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -6937,14 +7196,14 @@
     "comment": ""
   },
   {
-    "term": "Failed to write Hyprland outputs config.",
+    "term": "Failed to write autostart entry",
     "translation": "",
     "context": "",
     "reference": "",
     "comment": ""
   },
   {
-    "term": "Failed to write autostart entry",
+    "term": "Failed to write outputs config.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -7031,6 +7290,13 @@
     "term": "File Manager",
     "translation": "",
     "context": "File Manager",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "File changed on disk",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -7231,7 +7497,35 @@
     "comment": ""
   },
   {
+    "term": "Float Anchor",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Float X",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Float Y",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Floating",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Floating Position",
     "translation": "",
     "context": "",
     "reference": "",
@@ -8002,6 +8296,13 @@
   },
   {
     "term": "Group",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Group Active Workspace",
     "translation": "",
     "context": "",
     "reference": "",
@@ -8848,6 +9149,13 @@
     "comment": ""
   },
   {
+    "term": "Initial position for floating windows. Set both X and Y; anchor controls which corner/edge they're relative to.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Initialised",
     "translation": "",
     "context": "",
@@ -8877,6 +9185,13 @@
   },
   {
     "term": "Insert your security key...",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Inset the Notepad from screen edges using the compositor's configured gaps",
     "translation": "",
     "context": "",
     "reference": "",
@@ -9086,6 +9401,13 @@
     "comment": ""
   },
   {
+    "term": "Invert touchpad scroll direction",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Iris Bloom",
     "translation": "",
     "context": "wallpaper transition option",
@@ -9122,6 +9444,20 @@
   },
   {
     "term": "Keep Changes",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Keep My Edits",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Keep in Bar",
     "translation": "",
     "context": "",
     "reference": "",
@@ -9564,7 +9900,7 @@
   {
     "term": "Loading...",
     "translation": "",
-    "context": "loading indicator",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -9842,6 +10178,20 @@
     "comment": ""
   },
   {
+    "term": "Mango Options",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Mango service not available",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "MangoWC Layout Overrides",
     "translation": "",
     "context": "",
@@ -9871,6 +10221,13 @@
   },
   {
     "term": "Manual Gap Size",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Manual Gaps",
     "translation": "",
     "context": "",
     "reference": "",
@@ -10067,6 +10424,13 @@
   },
   {
     "term": "Max Running Apps (0 = Unlimited)",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Max Visible",
     "translation": "",
     "context": "",
     "reference": "",
@@ -10731,6 +11095,13 @@
     "comment": ""
   },
   {
+    "term": "Natural Touchpad Scrolling",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Navigate",
     "translation": "",
     "context": "",
@@ -10872,6 +11243,13 @@
   },
   {
     "term": "New York, NY",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "New event",
     "translation": "",
     "context": "",
     "reference": "",
@@ -11193,6 +11571,13 @@
     "comment": ""
   },
   {
+    "term": "No calendar source available",
+    "translation": "",
+    "context": "calendar backend status",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "No changes",
     "translation": "",
     "context": "",
@@ -11487,6 +11872,13 @@
     "comment": ""
   },
   {
+    "term": "No reminder",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "No results",
     "translation": "",
     "context": "",
@@ -11634,6 +12026,13 @@
     "comment": ""
   },
   {
+    "term": "No writable calendar available",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Noise",
     "translation": "",
     "context": "",
@@ -11767,7 +12166,7 @@
     "comment": ""
   },
   {
-    "term": "Notepad Font Settings",
+    "term": "Notepad Settings",
     "translation": "",
     "context": "",
     "reference": "",
@@ -11775,6 +12174,13 @@
   },
   {
     "term": "Notepad Slideout",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Notes",
     "translation": "",
     "context": "",
     "reference": "",
@@ -12019,20 +12425,6 @@
     "comment": ""
   },
   {
-    "term": "Opacity of the bar background",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Opacity of widget backgrounds",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Opaque",
     "translation": "",
     "context": "",
@@ -12062,6 +12454,13 @@
   },
   {
     "term": "Open Frame",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Open From",
     "translation": "",
     "context": "",
     "reference": "",
@@ -12635,6 +13034,13 @@
     "comment": ""
   },
   {
+    "term": "Path copied to clipboard",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Path to a video file or folder containing videos",
     "translation": "",
     "context": "",
@@ -13063,6 +13469,13 @@
   },
   {
     "term": "Polkit integration is disabled. User management requires Polkit to elevate privileges.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Popout",
     "translation": "",
     "context": "",
     "reference": "",
@@ -13776,7 +14189,7 @@
     "comment": ""
   },
   {
-    "term": "Refreshing…",
+    "term": "Refreshing...",
     "translation": "",
     "context": "",
     "reference": "",
@@ -13812,6 +14225,13 @@
   },
   {
     "term": "Release",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Reload From Disk",
     "translation": "",
     "context": "",
     "reference": "",
@@ -13861,6 +14281,13 @@
   },
   {
     "term": "Remember last user",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Reminder",
     "translation": "",
     "context": "",
     "reference": "",
@@ -14070,7 +14497,7 @@
     "comment": ""
   },
   {
-    "term": "Requires DWL compositor",
+    "term": "Requires MangoWC compositor",
     "translation": "",
     "context": "",
     "reference": "",
@@ -14141,6 +14568,20 @@
   },
   {
     "term": "Resize Widget",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Resize on Border",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Resize windows by dragging their edges with the mouse",
     "translation": "",
     "context": "",
     "reference": "",
@@ -14315,20 +14756,6 @@
     "comment": ""
   },
   {
-    "term": "Rounded corners for windows (border_radius)",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Rounded corners for windows (decoration.rounding)",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Rule",
     "translation": "",
     "context": "",
@@ -14413,7 +14840,7 @@
     "comment": ""
   },
   {
-    "term": "Running greeter sync…",
+    "term": "Running greeter sync...",
     "translation": "",
     "context": "",
     "reference": "",
@@ -14561,6 +14988,13 @@
   },
   {
     "term": "Saving...",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Saving…",
     "translation": "",
     "context": "",
     "reference": "",
@@ -15239,6 +15673,20 @@
     "comment": ""
   },
   {
+    "term": "Set the font size for notification body text (htmlBody)",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Set the font size for notification summary text",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Setting",
     "translation": "",
     "context": "",
@@ -15841,7 +16289,14 @@
     "comment": ""
   },
   {
-    "term": "Show all 9 tags instead of only occupied tags (DWL only)",
+    "term": "Show a bar that drains as the popup's auto-dismiss timer runs",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Show all 9 tags instead of only occupied tags",
     "translation": "",
     "context": "",
     "reference": "",
@@ -16170,6 +16625,13 @@
     "comment": ""
   },
   {
+    "term": "Single-Line Popup",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Size",
     "translation": "",
     "context": "launcher size option",
@@ -16220,6 +16682,13 @@
   },
   {
     "term": "Skip the greeter password after boot until you sign out. Lock screen unlock is unchanged. Takes effect on the next reboot after sync.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Slideout",
     "translation": "",
     "context": "",
     "reference": "",
@@ -16318,20 +16787,6 @@
   },
   {
     "term": "Space between windows",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Space between windows (gappih/gappiv/gappoh/gappov)",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Space between windows (gaps_in and gaps_out)",
     "translation": "",
     "context": "",
     "reference": "",
@@ -16530,6 +16985,13 @@
     "term": "Summary",
     "translation": "",
     "context": "notification rule match field option",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Summary Font Size",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -16850,6 +17312,13 @@
   },
   {
     "term": "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Tags",
     "translation": "",
     "context": "",
     "reference": "",
@@ -17339,6 +17808,13 @@
     "comment": ""
   },
   {
+    "term": "Timeout Progress Bar",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Timeout for critical priority notifications",
     "translation": "",
     "context": "",
@@ -17375,6 +17851,20 @@
   },
   {
     "term": "Title",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Title (optional)",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Title is required",
     "translation": "",
     "context": "",
     "reference": "",
@@ -17599,27 +18089,6 @@
   },
   {
     "term": "Transparency",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Transparency of the border",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Transparency of the shadow layer",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Transparency of the widget outline",
     "translation": "",
     "context": "",
     "reference": "",
@@ -18018,13 +18487,6 @@
     "comment": ""
   },
   {
-    "term": "Unsaved note...",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Unset",
     "translation": "",
     "context": "Unset",
@@ -18172,6 +18634,13 @@
     "comment": ""
   },
   {
+    "term": "Use HH:MM time format",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Use IP Location",
     "translation": "",
     "context": "",
@@ -18285,13 +18754,6 @@
   },
   {
     "term": "Use custom window radius instead of theme radius",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Use custom window rounding instead of theme radius",
     "translation": "",
     "context": "",
     "reference": "",
@@ -18501,9 +18963,23 @@
     "comment": ""
   },
   {
+    "term": "Using DankCalendar%1",
+    "translation": "",
+    "context": "calendar backend status",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Using global monospace font from Settings → Personalization",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Using khal",
+    "translation": "",
+    "context": "calendar backend status",
     "reference": "",
     "comment": ""
   },
@@ -18705,6 +19181,13 @@
   },
   {
     "term": "Visibility",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Visible Entry Actions",
     "translation": "",
     "context": "",
     "reference": "",
@@ -18998,6 +19481,13 @@
     "comment": ""
   },
   {
+    "term": "Widget Opacity",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Widget Outline",
     "translation": "",
     "context": "",
@@ -19013,13 +19503,6 @@
   },
   {
     "term": "Widget Styling",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Widget Transparency",
     "translation": "",
     "context": "",
     "reference": "",
@@ -19043,6 +19526,13 @@
     "term": "Widgets",
     "translation": "",
     "context": "settings_displays",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Widgets & Notifications",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -19075,14 +19565,7 @@
     "comment": ""
   },
   {
-    "term": "Width of window border (borderpx)",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Width of window border (general.border_size)",
+    "term": "Width of window border",
     "translation": "",
     "context": "",
     "reference": "",
@@ -19152,13 +19635,6 @@
     "comment": ""
   },
   {
-    "term": "Window Rounding",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Window Rules",
     "translation": "",
     "context": "",
@@ -19187,7 +19663,7 @@
     "comment": ""
   },
   {
-    "term": "Working…",
+    "term": "Working...",
     "translation": "",
     "context": "",
     "reference": "",
@@ -19257,13 +19733,6 @@
     "comment": ""
   },
   {
-    "term": "Workspaces & Widgets",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Wrap the app command. %command% is replaced with the actual executable",
     "translation": "",
     "context": "",
@@ -19274,6 +19743,13 @@
     "term": "Write:",
     "translation": "",
     "context": "disk write label",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "X",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -19300,6 +19776,13 @@
   },
   {
     "term": "Xray blurs only the wallpaper (efficient) and is the default when Blur is on. Set Xray to Off for regular full blur of everything beneath the window (more expensive).",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Y",
     "translation": "",
     "context": "",
     "reference": "",
@@ -19551,13 +20034,6 @@
     "comment": ""
   },
   {
-    "term": "events",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "ext",
     "translation": "",
     "context": "",
@@ -19568,6 +20044,13 @@
     "term": "featured",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "khal",
+    "translation": "",
+    "context": "calendar backend option",
     "reference": "",
     "comment": ""
   },
@@ -19594,6 +20077,20 @@
   },
   {
     "term": "loginctl not available - lock integration requires DMS socket connection",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "mango: config reloaded",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "mango: failed to reload config",
     "translation": "",
     "context": "",
     "reference": "",
@@ -19840,7 +20337,7 @@
   {
     "term": "up",
     "translation": "",
-    "context": "",
+    "context": "uptime prefix, e.g. 'up 4h 2m'",
     "reference": "",
     "comment": ""
   },

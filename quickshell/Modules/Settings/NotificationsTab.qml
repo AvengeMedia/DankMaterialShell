@@ -200,11 +200,39 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             spacing: Theme.spacingXL
 
+
             SettingsCard {
                 width: parent.width
                 iconName: "notifications"
                 title: I18n.tr("Notification Popups")
                 settingKey: "notificationPopups"
+
+                // Font size selectors for summary and body
+                SettingsDropdownRow {
+                    settingKey: "notificationSummaryFontSize"
+                    tags: ["notification", "font", "summary", "size"]
+                    text: I18n.tr("Summary Font Size")
+                    description: I18n.tr("Set the font size for notification summary text")
+                    options: [I18n.tr("Unset"), "10", "12", "14", "16", "18"]
+                    currentValue: (SettingsData.notificationSummaryFontSize || I18n.tr("Unset")).toString()
+                    onValueChanged: value => {
+                        SettingsData.set("notificationSummaryFontSize", Number(value === I18n.tr("Unset") ? 0 : value));
+                        SettingsData.sendTestNotifications();
+                    }
+                }
+
+                SettingsDropdownRow {
+                    settingKey: "notificationBodyFontSize"
+                    tags: ["notification", "font", "body", "size"]
+                    text: I18n.tr("Body Font Size")
+                    description: I18n.tr("Set the font size for notification body text (htmlBody)")
+                    options: [I18n.tr("Unset"), "10", "12", "14", "16", "18"]
+                    currentValue: (SettingsData.notificationBodyFontSize || I18n.tr("Unset")).toString()
+                    onValueChanged: value => {
+                        SettingsData.set("notificationBodyFontSize", Number(value === I18n.tr("Unset") ? 0 : value));
+                        SettingsData.sendTestNotifications();
+                    }
+                }
 
                 SettingsDropdownRow {
                     settingKey: "notificationPopupPosition"
@@ -271,6 +299,15 @@ Item {
                     description: I18n.tr("Use smaller notification cards")
                     checked: SettingsData.notificationCompactMode
                     onToggled: checked => SettingsData.set("notificationCompactMode", checked)
+                }
+
+                SettingsToggleRow {
+                    settingKey: "notificationShowTimeoutBar"
+                    tags: ["notification", "timeout", "progress", "bar", "timer", "countdown"]
+                    text: I18n.tr("Timeout Progress Bar")
+                    description: I18n.tr("Show a bar that drains as the popup's auto-dismiss timer runs")
+                    checked: SettingsData.notificationShowTimeoutBar
+                    onToggled: checked => SettingsData.set("notificationShowTimeoutBar", checked)
                 }
 
                 SettingsToggleRow {

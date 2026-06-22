@@ -130,7 +130,7 @@ Item {
             borderColor: volumePanel.border.color
             borderWidth: volumePanel.border.width
             shadowOpacity: Theme.elevationLevel2 && Theme.elevationLevel2.alpha !== undefined ? Theme.elevationLevel2.alpha : 0.25
-            shadowEnabled: Theme.elevationEnabled && !BlurService.enabled
+            shadowEnabled: Theme.elevationEnabled
         }
 
         MouseArea {
@@ -272,7 +272,7 @@ Item {
             borderColor: audioDevicesPanel.border.color
             borderWidth: audioDevicesPanel.border.width
             shadowOpacity: Theme.elevationLevel2 && Theme.elevationLevel2.alpha !== undefined ? Theme.elevationLevel2.alpha : 0.25
-            shadowEnabled: Theme.elevationEnabled && !BlurService.enabled
+            shadowEnabled: Theme.elevationEnabled
         }
 
         MouseArea {
@@ -383,7 +383,27 @@ Item {
                                 anchors.fill: parent
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
-                                onClicked: {
+                                acceptedButtons: Qt.LeftButton | Qt.RightButton
+                                onPressed: mouse => {
+                                    if (mouse.button === Qt.RightButton) {
+                                        mouse.accepted = true;
+                                    }
+                                }
+                                onWheel: wheelEvent => {
+                                    if (SettingsData.audioDeviceScrollVolumeEnabled && wheelEvent.x >= deviceMouseArea.width / 2) {
+                                        AudioService.handleNodeVolumeWheel(modelData, wheelEvent);
+                                    } else {
+                                        wheelEvent.accepted = false;
+                                    }
+                                }
+                                onClicked: mouse => {
+                                    if (mouse.button === Qt.RightButton) {
+                                        if (modelData && modelData.audio) {
+                                            SessionData.suppressOSDTemporarily();
+                                            modelData.audio.muted = !modelData.audio.muted;
+                                        }
+                                        return;
+                                    }
                                     if (modelData && modelData.name) {
                                         AudioService.setDefaultSinkByName(modelData.name);
                                         root.deviceSelected(modelData);
@@ -444,7 +464,7 @@ Item {
             borderColor: playersPanel.border.color
             borderWidth: playersPanel.border.width
             shadowOpacity: Theme.elevationLevel2 && Theme.elevationLevel2.alpha !== undefined ? Theme.elevationLevel2.alpha : 0.25
-            shadowEnabled: Theme.elevationEnabled && !BlurService.enabled
+            shadowEnabled: Theme.elevationEnabled
         }
 
         MouseArea {

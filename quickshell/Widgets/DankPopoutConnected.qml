@@ -5,7 +5,6 @@ import Quickshell
 import Quickshell.Wayland
 import qs.Common
 import qs.Services
-import "../Common/ConnectorGeometry.js" as ConnectorGeometry
 
 Item {
     id: root
@@ -18,6 +17,7 @@ Item {
     property Component overlayContent: null
     property alias overlayLoader: overlayLoader
     readonly property alias backgroundWindow: contentWindow
+    readonly property alias contentWindow: contentWindow
     property real popupWidth: 400
     property real popupHeight: 300
     property real triggerX: 0
@@ -38,8 +38,6 @@ Item {
     property bool fullHeightSurface: false
     property bool _primeContent: false
     property bool _resizeActive: false
-    property string _chromeClaimId: ""
-    property int _connectedChromeSerial: 0
     property real _chromeAnimTravelX: 1
     property real _chromeAnimTravelY: 1
     property bool _fullSyncQueued: false
@@ -55,7 +53,6 @@ Item {
             "rightBar": 0
         })
     property var screen: null
-    // Connected resize uses one full-screen surface; body-sized regions are masks.
     readonly property bool useBackgroundWindow: false
     readonly property var effectivePopoutLayer: LayerShell.fromEnv("DMS_POPOUT_LAYER", root.triggerUsesOverlayLayer ? WlrLayer.Overlay : WlrLayer.Top, {
         "allow": ["top", "overlay"],
@@ -93,11 +90,47 @@ Item {
     signal popoutClosed
     signal backgroundClicked
 
-    // Coalesce per-channel dirty bits; one ConnectedModeState write per tick.
     Timer {
         id: _syncTimer
         interval: 0
         onTriggered: root._flushSync()
+    }
+
+    ConnectedSurfaceLease {
+        id: chromeLease
+        claimPrefix: root.layerNamespace
+        screenName: root.screen ? root.screen.name : ""
+        enabled: root.frameOwnsConnectedChrome
+        active: contentWindow.visible || root.shouldBeVisible
+        presented: contentWindow.visible || root.shouldBeVisible
+        renewTokenOnRecovery: false
+        isCurrentOwner: function(name) {
+            return PopoutManager.isCurrentPopout(root.popoutHandle, name);
+        }
+        hasOwner: function(_name, ownerId) {
+            return ConnectedModeState.hasPopoutOwner(ownerId);
+        }
+        statePresent: function(name, ownerId) {
+            return ConnectedModeState.hasPopoutOwner(ownerId) && ConnectedModeState.hasSurfaceDescriptor(name, "popout", ownerId);
+        }
+        claimState: function(_name, state, ownerId) {
+            return ConnectedModeState.claimPopout(ownerId, state);
+        }
+        ensureState: function(_name, state, ownerId) {
+            if (!ConnectedModeState.hasPopoutOwner(ownerId))
+                return false;
+            return ConnectedModeState.updatePopout(ownerId, state);
+        }
+        releaseState: function(_name, ownerId) {
+            return ConnectedModeState.releasePopout(ownerId);
+        }
+        updateAnimationState: function(_name, ownerId, animX, animY) {
+            return ConnectedModeState.setPopoutAnim(ownerId, animX, animY);
+        }
+        updateBodyState: function(_name, ownerId, bodyX, bodyY, bodyW, bodyH) {
+            return ConnectedModeState.setPopoutBody(ownerId, bodyX, bodyY, bodyW, bodyH);
+        }
+        onRecoveryRequested: root._queueFullSync()
     }
 
     property var _lastOpenedScreen: null
@@ -169,11 +202,6 @@ Item {
         setBarContext(pos, bottomGap);
     }
 
-    function _nextChromeClaimId() {
-        _connectedChromeSerial += 1;
-        return layerNamespace + ":" + _connectedChromeSerial + ":" + (new Date()).getTime();
-    }
-
     function _captureChromeAnimTravel() {
         _chromeAnimTravelX = Math.max(1, Math.abs(contentContainer.offsetX));
         _chromeAnimTravelY = Math.max(1, Math.abs(contentContainer.offsetY));
@@ -203,15 +231,35 @@ Item {
 
     function _connectedChromeState(visibleOverride) {
         const visible = visibleOverride !== undefined ? !!visibleOverride : contentWindow.visible;
+        const presented = contentWindow.visible || root.shouldBeVisible;
+        const phase = root.isClosing ? "closing" : (!presented ? "hidden" : (!contentWindow.visible && root.shouldBeVisible ? "opening" : "open"));
+        const bodyRect = {
+            "x": root.alignedX,
+            "y": root.renderedAlignedY,
+            "width": root.alignedWidth,
+            "height": root.renderedAlignedHeight
+        };
+        const animationOffset = {
+            "x": _connectedChromeAnimX(),
+            "y": _connectedChromeAnimY()
+        };
         return {
+            "kind": "popout",
+            "screenName": root.screen ? root.screen.name : "",
+            "phase": phase,
             "visible": visible,
+            "presented": presented,
             "barSide": contentContainer.connectedBarSide,
+            "bodyRect": bodyRect,
+            "animationOffset": animationOffset,
+            "scale": 1,
+            "opacity": Theme.connectedSurfaceColor.a,
             "bodyX": root.alignedX,
             "bodyY": root.renderedAlignedY,
             "bodyW": root.alignedWidth,
             "bodyH": root.renderedAlignedHeight,
-            "animX": _connectedChromeAnimX(),
-            "animY": _connectedChromeAnimY(),
+            "animX": animationOffset.x,
+            "animY": animationOffset.y,
             "screen": root.screen ? root.screen.name : "",
             "omitStartConnector": root._closeGapOmitStartConnector(),
             "omitEndConnector": root._closeGapOmitEndConnector()
@@ -219,28 +267,18 @@ Item {
     }
 
     function _publishConnectedChromeState(forceClaim, visibleOverride) {
-        if (!root.frameOwnsConnectedChrome || !root.screen || !_chromeClaimId)
-            return;
-
-        const state = _connectedChromeState(visibleOverride);
-        if (forceClaim || !ConnectedModeState.hasPopoutOwner(_chromeClaimId)) {
-            ConnectedModeState.claimPopout(_chromeClaimId, state);
-        } else {
-            ConnectedModeState.updatePopout(_chromeClaimId, state);
-        }
+        if (!root.frameOwnsConnectedChrome || !root.screen)
+            return false;
+        return chromeLease.publish(_connectedChromeState(visibleOverride), !!forceClaim);
     }
 
     function _releaseConnectedChromeState() {
-        if (_chromeClaimId)
-            ConnectedModeState.releasePopout(_chromeClaimId);
-        _chromeClaimId = "";
+        chromeLease.release();
     }
 
-    // ─── Exposed animation state for ConnectedModeState ────────────────────
     readonly property real contentAnimX: contentContainer.animX
     readonly property real contentAnimY: contentContainer.animY
 
-    // ─── ConnectedModeState sync ────────────────────────────────────────────
     function _syncPopoutChromeState() {
         if (!root.frameOwnsConnectedChrome) {
             _releaseConnectedChromeState();
@@ -252,13 +290,11 @@ Item {
         }
         if (!contentWindow.visible && !shouldBeVisible)
             return;
-        if (!_chromeClaimId)
-            _chromeClaimId = _nextChromeClaimId();
-        _publishConnectedChromeState(contentWindow.visible && !ConnectedModeState.hasPopoutOwner(_chromeClaimId));
+        _publishConnectedChromeState(false);
     }
 
     function _syncPopoutAnim(axis) {
-        if (!root.frameOwnsConnectedChrome || !_chromeClaimId)
+        if (!root.frameOwnsConnectedChrome || !chromeLease.claimId)
             return;
         if (!contentWindow.visible && !shouldBeVisible)
             return;
@@ -267,15 +303,15 @@ Item {
         const syncY = axis === "y" && (barSide === "top" || barSide === "bottom");
         if (!syncX && !syncY)
             return;
-        ConnectedModeState.setPopoutAnim(_chromeClaimId, syncX ? _connectedChromeAnimX() : undefined, syncY ? _connectedChromeAnimY() : undefined);
+        chromeLease.updateAnim(syncX ? _connectedChromeAnimX() : undefined, syncY ? _connectedChromeAnimY() : undefined);
     }
 
     function _syncPopoutBody() {
-        if (!root.frameOwnsConnectedChrome || !_chromeClaimId)
+        if (!root.frameOwnsConnectedChrome || !chromeLease.claimId)
             return;
         if (!contentWindow.visible && !shouldBeVisible)
             return;
-        ConnectedModeState.setPopoutBody(_chromeClaimId, root.alignedX, root.renderedAlignedY, root.alignedWidth, root.renderedAlignedHeight);
+        chromeLease.updateBody(root.alignedX, root.renderedAlignedY, root.alignedWidth, root.renderedAlignedHeight);
     }
 
     property bool _animSyncQueued: false
@@ -337,17 +373,31 @@ Item {
         target: SettingsData
         function onConnectedFrameModeActiveChanged() {
             if (root.frameOwnsConnectedChrome) {
-                if (contentWindow.visible || root.shouldBeVisible) {
-                    if (!root._chromeClaimId)
-                        root._chromeClaimId = root._nextChromeClaimId();
+                if ((contentWindow.visible || root.shouldBeVisible) && root.screen && PopoutManager.isCurrentPopout(root.popoutHandle, root.screen.name))
                     root._publishConnectedChromeState(true);
-                }
             } else {
                 root._releaseConnectedChromeState();
             }
         }
         function onFrameCloseGapsChanged() {
             root._syncPopoutChromeState();
+        }
+    }
+
+    Connections {
+        target: ConnectedModeState
+        function onPopoutOwnerIdChanged() {
+            chromeLease.checkOwnershipRecovery();
+        }
+        function onSurfaceDescriptorsChanged() {
+            chromeLease.checkStateRecovery();
+        }
+    }
+
+    Connections {
+        target: PopoutManager
+        function onPopoutChanged() {
+            chromeLease.requestRecovery();
         }
     }
 
@@ -368,33 +418,26 @@ Item {
 
         const screenChanged = _lastOpenedScreen !== null && _lastOpenedScreen !== screen;
         if (screenChanged) {
-            // Hide on this tick so Qt actually tears down the wl_surface; the show
-            // gets deferred below so the unmap is processed before the remap.
             contentWindow.visible = false;
         }
         _lastOpenedScreen = screen;
+        PopoutManager.showPopout(popoutHandle);
 
         if (contentContainer) {
-            // Snap morph closed only on a fresh open; on screen-change re-open we stay at 1
-            // because shouldBeVisible doesn't change and won't drive morph back to 1.
             if (!shouldBeVisible)
                 morph.openProgress = 0;
             _captureChromeAnimTravel();
         }
 
         if (root.frameOwnsConnectedChrome) {
-            _chromeClaimId = _nextChromeClaimId();
+            chromeLease.beginClaim();
             _publishConnectedChromeState(true, true);
         } else {
-            _chromeClaimId = "";
+            chromeLease.release();
         }
 
         if (screenChanged) {
-            // Defer the show one event-loop tick. Qt coalesces a synchronous
-            // false→true visibility flip into a no-op, leaving WindowBlur committed
-            // to the previous screen's wl_surface. Splitting the flip across ticks
-            // forces a real surface destroy+create so BackgroundEffect.surfaceCreated
-            // fires and the blur region republishes on the new surface.
+            // Unmap/remap wl_surface across ticks so blur republishes on the new screen.
             Qt.callLater(() => {
                 if (!root.shouldBeVisible)
                     return;
@@ -408,7 +451,6 @@ Item {
         animationsEnabled = true;
         shouldBeVisible = true;
         if (shouldBeVisible && screen) {
-            PopoutManager.showPopout(popoutHandle);
             opened();
         }
     }
@@ -440,6 +482,8 @@ Item {
             }
             if (!screenStillExists) {
                 close();
+            } else {
+                root._queueFullSync();
             }
         }
     }
@@ -449,8 +493,8 @@ Item {
         interval: Theme.variantCloseInterval(animationDuration)
         onTriggered: {
             if (!shouldBeVisible) {
-                isClosing = false;
                 contentWindow.visible = false;
+                isClosing = false;
                 PopoutManager.hidePopout(popoutHandle);
                 popoutClosed();
             }
@@ -512,6 +556,18 @@ Item {
         return Math.abs(value - bound) <= Math.max(1, Theme.hairline(root.dpr) * 2);
     }
 
+    // Snap positions within connector radius flush to the frame edge (avoids pinched arcs).
+    function _snapNearFrameBound(value, minBound, maxBound, minIsFrame, maxIsFrame) {
+        if (!root.usesConnectedSurfaceChrome || !root.closeFrameGapsActive)
+            return value;
+        const snapDist = Theme.connectedCornerRadius;
+        if (maxIsFrame && value < maxBound && maxBound - value < snapDist && maxBound - value <= value - minBound)
+            return maxBound;
+        if (minIsFrame && value > minBound && value - minBound < snapDist)
+            return minBound;
+        return value;
+    }
+
     function _closeGapClampedToFrameSide(side) {
         if (!root.closeFrameGapsActive)
             return false;
@@ -567,7 +623,6 @@ Item {
     property real renderedAlignedY: alignedY
     property real renderedAlignedHeight: alignedHeight
     readonly property bool renderedGeometryGrowing: alignedHeight >= renderedAlignedHeight
-    // Snap rendered geometry while the entrance morph runs so it doesn't ride a second animation (side-bar ramp).
     readonly property bool _settlingToOpen: fullHeightSurface && shouldBeVisible && morphAnim.running
 
     Behavior on renderedAlignedY {
@@ -617,8 +672,6 @@ Item {
             return 0;
         if (!root.usesConnectedSurfaceChrome)
             return exclusion;
-        // In a shared frame corner, the adjacent connected bar already occupies
-        // one rounded-corner radius before the popout's own connector begins.
         return exclusion + Theme.connectedCornerRadius * 2;
     }
 
@@ -651,16 +704,16 @@ Item {
 
             switch (effectiveBarPosition) {
             case SettingsData.Position.Left:
-                // bar on left: left side is bar-adjacent (popupGap), right side is frame-perpendicular (edgeGap)
                 return Math.max(popupGap, Math.min(screenWidth - popupWidth - edgeGapRight, anchorX));
             case SettingsData.Position.Right:
-                // bar on right: right side is bar-adjacent (popupGap), left side is frame-perpendicular (edgeGap)
                 return Math.max(edgeGapLeft, Math.min(screenWidth - popupWidth - popupGap, anchorX - popupWidth));
             default:
                 const rawX = triggerX + (triggerWidth / 2) - (popupWidth / 2);
-                const minX = Math.max(edgeGapLeft, adjacentBarClearance(adjacentBarInfo.leftBar));
-                const maxX = screenWidth - popupWidth - Math.max(edgeGapRight, adjacentBarClearance(adjacentBarInfo.rightBar));
-                return Math.max(minX, Math.min(maxX, rawX));
+                const clearLeft = adjacentBarClearance(adjacentBarInfo.leftBar);
+                const clearRight = adjacentBarClearance(adjacentBarInfo.rightBar);
+                const minX = Math.max(edgeGapLeft, clearLeft);
+                const maxX = screenWidth - popupWidth - Math.max(edgeGapRight, clearRight);
+                return _snapNearFrameBound(Math.max(minX, Math.min(maxX, rawX)), minX, maxX, edgeGapLeft >= clearLeft, edgeGapRight >= clearRight);
             }
         })(), dpr)
 
@@ -672,44 +725,34 @@ Item {
 
             switch (effectiveBarPosition) {
             case SettingsData.Position.Bottom:
-                // bar on bottom: bottom side is bar-adjacent (popupGap), top side is frame-perpendicular (edgeGap)
                 return Math.max(edgeGapTop, Math.min(screenHeight - popupHeight - popupGap, anchorY - popupHeight));
             case SettingsData.Position.Top:
-                // bar on top: top side is bar-adjacent (popupGap), bottom side is frame-perpendicular (edgeGap)
                 return Math.max(popupGap, Math.min(screenHeight - popupHeight - edgeGapBottom, anchorY));
             default:
                 const rawY = triggerY - (popupHeight / 2);
-                const minY = Math.max(edgeGapTop, adjacentBarClearance(adjacentBarInfo.topBar));
-                const maxY = screenHeight - popupHeight - Math.max(edgeGapBottom, adjacentBarClearance(adjacentBarInfo.bottomBar));
-                return Math.max(minY, Math.min(maxY, rawY));
+                const clearTop = adjacentBarClearance(adjacentBarInfo.topBar);
+                const clearBottom = adjacentBarClearance(adjacentBarInfo.bottomBar);
+                const minY = Math.max(edgeGapTop, clearTop);
+                const maxY = screenHeight - popupHeight - Math.max(edgeGapBottom, clearBottom);
+                return _snapNearFrameBound(Math.max(minY, Math.min(maxY, rawY)), minY, maxY, edgeGapTop >= clearTop, edgeGapBottom >= clearBottom);
             }
         })(), dpr)
 
-    readonly property real triggeringBarLeftExclusion: (effectiveBarPosition === SettingsData.Position.Left && barWidth > 0) ? Math.max(0, barX + barWidth) : 0
-    readonly property real triggeringBarTopExclusion: (effectiveBarPosition === SettingsData.Position.Top && barHeight > 0) ? Math.max(0, barY + barHeight) : 0
-    readonly property real triggeringBarRightExclusion: (effectiveBarPosition === SettingsData.Position.Right && barWidth > 0) ? Math.max(0, screenWidth - barX) : 0
-    readonly property real triggeringBarBottomExclusion: (effectiveBarPosition === SettingsData.Position.Bottom && barHeight > 0) ? Math.max(0, screenHeight - barY) : 0
+    readonly property real maskX: _dismissZone.x
+    readonly property real maskY: _dismissZone.y
+    readonly property real maskWidth: _dismissZone.width
+    readonly property real maskHeight: _dismissZone.height
 
-    readonly property real maskX: {
-        const adjacentLeftBar = adjacentBarInfo?.leftBar ?? 0;
-        return Math.max(triggeringBarLeftExclusion, adjacentLeftBar);
-    }
-
-    readonly property real maskY: {
-        const adjacentTopBar = adjacentBarInfo?.topBar ?? 0;
-        return Math.max(triggeringBarTopExclusion, adjacentTopBar);
-    }
-
-    readonly property real maskWidth: {
-        const adjacentRightBar = adjacentBarInfo?.rightBar ?? 0;
-        const rightExclusion = Math.max(triggeringBarRightExclusion, adjacentRightBar);
-        return Math.max(100, screenWidth - maskX - rightExclusion);
-    }
-
-    readonly property real maskHeight: {
-        const adjacentBottomBar = adjacentBarInfo?.bottomBar ?? 0;
-        const bottomExclusion = Math.max(triggeringBarBottomExclusion, adjacentBottomBar);
-        return Math.max(100, screenHeight - maskY - bottomExclusion);
+    DismissZone {
+        id: _dismissZone
+        barPosition: root.effectiveBarPosition
+        barX: root.barX
+        barY: root.barY
+        barWidth: root.barWidth
+        barHeight: root.barHeight
+        screenWidth: root.screenWidth
+        screenHeight: root.screenHeight
+        adjacentBarInfo: root.adjacentBarInfo
     }
 
     PanelWindow {
@@ -724,10 +767,8 @@ Item {
             blurEnabled: root.effectiveSurfaceBlurEnabled && !root.frameOwnsConnectedChrome
 
             readonly property real s: Math.min(1, contentContainer.scaleValue)
-            readonly property bool trackBlurFromBarEdge: root.usesConnectedSurfaceChrome || Theme.isDirectionalEffect
+            readonly property bool trackBlurFromBarEdge: root.usesConnectedSurfaceChrome
 
-            // Directional popouts clip to the bar edge, so the blur needs to grow from
-            // that same edge instead of translating through the bar before settling.
             readonly property real _dyClamp: (contentContainer.barTop || contentContainer.barBottom) ? Math.max(-contentContainer.height, Math.min(contentContainer.animY, contentContainer.height)) : 0
             readonly property real _dxClamp: (contentContainer.barLeft || contentContainer.barRight) ? Math.max(-contentContainer.width, Math.min(contentContainer.animX, contentContainer.width)) : 0
 
@@ -741,17 +782,7 @@ Item {
         WlrLayershell.namespace: root.layerNamespace
         WlrLayershell.layer: root.effectivePopoutLayer
         WlrLayershell.exclusiveZone: -1
-        WlrLayershell.keyboardFocus: {
-            if (PopoutManager.screenshotActive)
-                return WlrKeyboardFocus.None;
-            if (customKeyboardFocus !== null)
-                return customKeyboardFocus;
-            if (!shouldBeVisible)
-                return WlrKeyboardFocus.None;
-            if (CompositorService.useHyprlandFocusGrab)
-                return WlrKeyboardFocus.OnDemand;
-            return WlrKeyboardFocus.Exclusive;
-        }
+        WlrLayershell.keyboardFocus: KeyboardFocus.keyboardFocus(shouldBeVisible || isClosing, customKeyboardFocus)
 
         readonly property bool _fullHeight: root.fullHeightSurface
         anchors {
@@ -773,7 +804,6 @@ Item {
 
         Region {
             id: contentInputMask
-            // Use bar-aware mask so bar widget clicks pass through when a popout is open.
             item: (shouldBeVisible && backgroundInteractive) ? backgroundDismissalMask : contentMaskRect
         }
 
@@ -884,7 +914,6 @@ Item {
 
             readonly property real computedScaleCollapsed: root.animationScaleCollapsed
 
-            // openProgress: 0 = closed (at offset, scaleCollapsed), 1 = open (at 0, scale 1).
             QtObject {
                 id: morph
                 property real openProgress: 0
@@ -931,7 +960,6 @@ Item {
 
                 clip: shouldClip
 
-                // Bound the clipping strictly to the bar side, allowing massive overflow on the other 3 sides for shadows
                 x: shouldClip ? (contentContainer.barLeft ? -connectedClipAllowance : -clipOversize) : 0
                 y: shouldClip ? (contentContainer.barTop ? -connectedClipAllowance : -clipOversize) : 0
 
@@ -968,22 +996,13 @@ Item {
 
                     ElevationShadow {
                         id: shadowSource
-                        readonly property real connectorExtent: root.usesConnectedSurfaceChrome ? Theme.connectedCornerRadius : 0
-                        readonly property real extraLeft: root.usesConnectedSurfaceChrome && (contentContainer.barTop || contentContainer.barBottom) ? connectorExtent : 0
-                        readonly property real extraRight: root.usesConnectedSurfaceChrome && (contentContainer.barTop || contentContainer.barBottom) ? connectorExtent : 0
-                        readonly property real extraTop: root.usesConnectedSurfaceChrome && (contentContainer.barLeft || contentContainer.barRight) ? connectorExtent : 0
-                        readonly property real extraBottom: root.usesConnectedSurfaceChrome && (contentContainer.barLeft || contentContainer.barRight) ? connectorExtent : 0
-                        readonly property real bodyX: extraLeft
-                        readonly property real bodyY: extraTop
-                        readonly property real bodyWidth: rollOutAdjuster.baseWidth
-                        readonly property real bodyHeight: rollOutAdjuster.baseHeight
-
-                        width: rollOutAdjuster.baseWidth + extraLeft + extraRight
-                        height: rollOutAdjuster.baseHeight + extraTop + extraBottom
+                        visible: !root.usesConnectedSurfaceChrome
+                        width: rollOutAdjuster.baseWidth
+                        height: rollOutAdjuster.baseHeight
                         opacity: contentWrapper.publishedOpacity
                         scale: contentWrapper.scale
-                        x: contentWrapper.x - extraLeft
-                        y: contentWrapper.y - extraTop
+                        x: contentWrapper.x
+                        y: contentWrapper.y
                         level: root.shadowLevel
                         direction: root.effectiveShadowDirection
                         fallbackOffset: root.shadowFallbackOffset
@@ -995,49 +1014,49 @@ Item {
                         targetColor: contentContainer.surfaceColor
                         borderColor: contentContainer.surfaceBorderColor
                         borderWidth: contentContainer.surfaceBorderWidth
-                        useCustomSource: root.usesConnectedSurfaceChrome
                         shadowEnabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1" && !(root.suspendShadowWhileResizing && root._resizeActive) && !root.frameOwnsConnectedChrome
+                    }
 
-                        Item {
+                    Item {
+                        id: localChrome
+                        visible: root.usesLocalConnectedSurfaceChrome
+
+                        readonly property real extraLeft: (contentContainer.barTop || contentContainer.barBottom) ? Theme.connectedCornerRadius : 0
+                        readonly property real extraTop: (contentContainer.barLeft || contentContainer.barRight) ? Theme.connectedCornerRadius : 0
+
+                        readonly property bool shadowsOn: Theme.elevationEnabled && SettingsData.popoutElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1" && !(root.suspendShadowWhileResizing && root._resizeActive)
+                        readonly property real shadowBlurPx: root.shadowLevel && root.shadowLevel.blurPx !== undefined ? root.shadowLevel.blurPx : 0
+                        readonly property real shadowSpreadPx: root.shadowLevel && root.shadowLevel.spreadPx !== undefined ? root.shadowLevel.spreadPx : 0
+                        readonly property real shadowOffsetX: Theme.elevationOffsetXFor(root.shadowLevel, root.effectiveShadowDirection, root.shadowFallbackOffset)
+                        readonly property real shadowOffsetY: Theme.elevationOffsetYFor(root.shadowLevel, root.effectiveShadowDirection, root.shadowFallbackOffset)
+                        readonly property color shadowTint: Theme.elevationShadowColor(root.shadowLevel)
+                        readonly property var ambient: Theme.elevationAmbient(root.shadowLevel)
+                        readonly property real pad: shadowsOn ? Math.ceil(Math.max(shadowBlurPx + shadowSpreadPx + Math.max(Math.abs(shadowOffsetX), Math.abs(shadowOffsetY)), ambient.blurPx + ambient.spreadPx) + 2) : 0
+
+                        width: rollOutAdjuster.baseWidth + extraLeft * 2
+                        height: rollOutAdjuster.baseHeight + extraTop * 2
+                        opacity: contentWrapper.publishedOpacity
+                        scale: contentWrapper.scale
+                        x: contentWrapper.x - extraLeft
+                        y: contentWrapper.y - extraTop
+
+                        ShaderEffect {
                             anchors.fill: parent
-                            visible: root.usesLocalConnectedSurfaceChrome
-                            clip: false
+                            anchors.topMargin: contentContainer.barTop ? 0 : -localChrome.pad
+                            anchors.bottomMargin: contentContainer.barBottom ? 0 : -localChrome.pad
+                            anchors.leftMargin: contentContainer.barLeft ? 0 : -localChrome.pad
+                            anchors.rightMargin: contentContainer.barRight ? 0 : -localChrome.pad
+                            fragmentShader: Qt.resolvedUrl("../Shaders/qsb/connected_chrome.frag.qsb")
 
-                            Rectangle {
-                                x: shadowSource.bodyX
-                                y: shadowSource.bodyY
-                                width: shadowSource.bodyWidth
-                                height: shadowSource.bodyHeight
-                                topLeftRadius: contentContainer.surfaceTopLeftRadius
-                                topRightRadius: contentContainer.surfaceTopRightRadius
-                                bottomLeftRadius: contentContainer.surfaceBottomLeftRadius
-                                bottomRightRadius: contentContainer.surfaceBottomRightRadius
-                                color: contentContainer.surfaceColor
-                            }
-
-                            ConnectedCorner {
-                                visible: root.usesConnectedSurfaceChrome
-                                barSide: contentContainer.connectedBarSide
-                                placement: "left"
-                                spacing: 0
-                                connectorRadius: Theme.connectedCornerRadius
-                                color: contentContainer.surfaceColor
-                                dpr: root.dpr
-                                x: Theme.snap(ConnectorGeometry.connectorX(contentContainer.connectedBarSide, shadowSource.bodyX, shadowSource.bodyWidth, placement, spacing, Theme.connectedCornerRadius), root.dpr)
-                                y: Theme.snap(ConnectorGeometry.connectorY(contentContainer.connectedBarSide, shadowSource.bodyY, shadowSource.bodyHeight, placement, spacing, Theme.connectedCornerRadius), root.dpr)
-                            }
-
-                            ConnectedCorner {
-                                visible: root.usesConnectedSurfaceChrome
-                                barSide: contentContainer.connectedBarSide
-                                placement: "right"
-                                spacing: 0
-                                connectorRadius: Theme.connectedCornerRadius
-                                color: contentContainer.surfaceColor
-                                dpr: root.dpr
-                                x: Theme.snap(ConnectorGeometry.connectorX(contentContainer.connectedBarSide, shadowSource.bodyX, shadowSource.bodyWidth, placement, spacing, Theme.connectedCornerRadius), root.dpr)
-                                y: Theme.snap(ConnectorGeometry.connectorY(contentContainer.connectedBarSide, shadowSource.bodyY, shadowSource.bodyHeight, placement, spacing, Theme.connectedCornerRadius), root.dpr)
-                            }
+                            property real widthPx: width
+                            property real heightPx: height
+                            property vector4d surfaceColor: Qt.vector4d(contentContainer.surfaceColor.r, contentContainer.surfaceColor.g, contentContainer.surfaceColor.b, contentContainer.surfaceColor.a)
+                            property vector4d shadowColor: Qt.vector4d(localChrome.shadowTint.r, localChrome.shadowTint.g, localChrome.shadowTint.b, localChrome.shadowsOn ? localChrome.shadowTint.a : 0)
+                            property vector4d shadowParam: Qt.vector4d(Math.max(0, localChrome.shadowBlurPx), localChrome.shadowSpreadPx, localChrome.shadowOffsetX, localChrome.shadowOffsetY)
+                            property vector4d ambientParam: Qt.vector4d(localChrome.ambient.blurPx, localChrome.ambient.spreadPx, localChrome.shadowsOn ? localChrome.ambient.alpha : 0, 0)
+                            property vector4d bodyRect: Qt.vector4d((contentContainer.barLeft ? 0 : localChrome.pad) + localChrome.extraLeft, (contentContainer.barTop ? 0 : localChrome.pad) + localChrome.extraTop, rollOutAdjuster.baseWidth, rollOutAdjuster.baseHeight)
+                            property vector4d cornerRadius: Qt.vector4d(contentContainer.surfaceTopLeftRadius, contentContainer.surfaceTopRightRadius, contentContainer.surfaceBottomRightRadius, contentContainer.surfaceBottomLeftRadius)
+                            property vector4d edgeParam: Qt.vector4d(contentContainer.barTop ? 0 : (contentContainer.barBottom ? 1 : (contentContainer.barLeft ? 2 : 3)), Theme.connectedCornerRadius, 0, 0)
                         }
                     }
 
@@ -1095,8 +1114,6 @@ Item {
                         Connections {
                             target: contentWindow
                             function onVisibleChanged() {
-                                // open() flips contentWindow.visible to rebind the layer surface to
-                                // a new screen; don't deactivate the wrapper while still open.
                                 if (!contentWindow.visible && !root.shouldBeVisible)
                                     contentWrapper._renderActive = false;
                             }

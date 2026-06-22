@@ -47,7 +47,7 @@ Rectangle {
     readonly property real targetHeight: expanded ? (expandedContent.height + cardPadding * 2) : (baseCardHeight + collapsedContent.extraHeight)
     radius: connectedFrameMode ? Theme.connectedSurfaceRadius : Theme.cornerRadius
     scale: (cardHoverHandler.hovered ? 1.004 : 1.0) * listLevelAdjacentScaleInfluence
-    readonly property bool shadowsAllowed: Theme.elevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1" && !BlurService.enabled
+    readonly property bool shadowsAllowed: Theme.elevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
     readonly property var shadowElevation: Theme.elevationLevel1
     readonly property real baseShadowBlurPx: (shadowElevation && shadowElevation.blurPx !== undefined) ? shadowElevation.blurPx : 4
     readonly property real hoverShadowBlurBoost: cardHoverHandler.hovered ? Math.min(2, baseShadowBlurPx * 0.25) : 0

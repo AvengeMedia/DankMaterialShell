@@ -98,6 +98,11 @@ Singleton {
         return currentPopoutsByScreen[screen.name] || null;
     }
 
+    function isCurrentPopout(popout, screenName) {
+        const name = screenName || popout?.screen?.name || "";
+        return !!name && currentPopoutsByScreen[name] === popout;
+    }
+
     function requestPopout(popout, tabIndex, triggerSource) {
         if (!popout || !popout.screen)
             return;

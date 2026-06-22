@@ -1,11 +1,21 @@
 import QtQuick
-import Quickshell
 import qs.Common
+import qs.Modals.Common
 import qs.Services
 import qs.Widgets
 
-FloatingWindow {
+DankModal {
     id: root
+
+    layerNamespace: "dms:wifi-password"
+    keepPopoutsOpen: true
+    allowStacking: true
+    shouldBeVisible: false
+    modalWidth: 420
+    modalHeight: calculatedHeight
+    enableShadow: true
+    onBackgroundClicked: clearAndClose()
+    directContent: contentFocusScope
 
     property bool disablePopupTransparency: true
     property string wifiPasswordSSID: ""
@@ -102,7 +112,7 @@ FloatingWindow {
         const network = NetworkService.wifiNetworks.find(n => n.ssid === ssid);
         requiresEnterprise = network?.enterprise || false;
 
-        visible = true;
+        open();
         Qt.callLater(focusFirstField);
     }
 
@@ -126,7 +136,7 @@ FloatingWindow {
         secretValues = {};
         requiresEnterprise = false;
 
-        visible = true;
+        open();
         Qt.callLater(focusFirstField);
     }
 
@@ -144,6 +154,7 @@ FloatingWindow {
 
         isVpnPrompt = (connectionType === "vpn" || connectionType === "wireguard");
         wifiPasswordSSID = isVpnPrompt ? connectionName : ssid;
+        savePasswordCheckbox.checked = !isVpnPrompt;
 
         requiresEnterprise = setting === "802-1x";
 
@@ -152,7 +163,7 @@ FloatingWindow {
         wifiAnonymousIdentityInput = "";
         wifiDomainInput = "";
 
-        visible = true;
+        open();
         Qt.callLater(() => {
             if (reason === "wrong-password" && fieldsInfo.length === 0) {
                 passwordInput.text = "";
@@ -162,7 +173,7 @@ FloatingWindow {
     }
 
     function hide() {
-        visible = false;
+        close();
     }
 
     function getFieldLabel(fieldName) {
@@ -242,23 +253,8 @@ FloatingWindow {
         secretValues = {};
     }
 
-    objectName: "wifiPasswordModal"
-    title: {
-        if (promptReason === "pkcs11")
-            return I18n.tr("Smartcard PIN");
-        if (isVpnPrompt)
-            return I18n.tr("VPN Password");
-        if (isHiddenNetwork)
-            return I18n.tr("Hidden Network");
-        return I18n.tr("Wi-Fi Password");
-    }
-    minimumSize: Qt.size(420, calculatedHeight)
-    maximumSize: Qt.size(420, calculatedHeight)
-    color: Theme.surfaceContainer
-    visible: false
-
-    onVisibleChanged: {
-        if (visible) {
+    onShouldBeVisibleChanged: {
+        if (shouldBeVisible) {
             Qt.callLater(focusFirstField);
             return;
         }
@@ -287,7 +283,7 @@ FloatingWindow {
                 return;
             wifiPasswordSSID = NetworkService.connectingSSID;
             wifiPasswordInput = "";
-            visible = true;
+            open();
             NetworkService.passwordDialogShouldReopen = false;
         }
     }
@@ -296,7 +292,7 @@ FloatingWindow {
         id: contentFocusScope
 
         anchors.fill: parent
-        focus: true
+        focus: root.shouldBeVisible
 
         Keys.onEscapePressed: event => {
             clearAndClose();
@@ -318,8 +314,6 @@ FloatingWindow {
                     anchors.right: buttonRow.left
                     anchors.rightMargin: Theme.spacingM
                     height: headerCol.height
-                    onPressed: windowControls.tryStartMove()
-                    onDoubleClicked: windowControls.tryToggleMaximize()
 
                     Column {
                         id: headerCol
@@ -381,14 +375,6 @@ FloatingWindow {
                     spacing: Theme.spacingXS
 
                     DankActionButton {
-                        visible: windowControls.canMaximize
-                        iconName: root.maximized ? "fullscreen_exit" : "fullscreen"
-                        iconSize: Theme.iconSize - 4
-                        iconColor: Theme.surfaceText
-                        onClicked: windowControls.tryToggleMaximize()
-                    }
-
-                    DankActionButton {
                         iconName: "close"
                         iconSize: Theme.iconSize - 4
                         iconColor: Theme.surfaceText
@@ -419,7 +405,7 @@ FloatingWindow {
                     textColor: Theme.surfaceText
                     placeholderText: I18n.tr("Network Name (SSID)")
                     backgroundColor: "transparent"
-                    enabled: root.visible
+                    enabled: root.shouldBeVisible
                     keyNavigationTab: passwordInput
                     onAccepted: passwordInput.forceActiveFocus()
                 }
@@ -449,7 +435,7 @@ FloatingWindow {
                         echoMode: modelData.isSecret && !passwordVisible ? TextInput.Password : TextInput.Normal
                         placeholderText: getFieldLabel(modelData.name)
                         backgroundColor: "transparent"
-                        enabled: root.visible
+                        enabled: root.shouldBeVisible
 
                         Keys.onTabPressed: event => {
                             if (index < fieldsInfo.length - 1) {
@@ -519,7 +505,7 @@ FloatingWindow {
                     text: wifiUsernameInput
                     placeholderText: I18n.tr("Username")
                     backgroundColor: "transparent"
-                    enabled: root.visible
+                    enabled: root.shouldBeVisible
                     keyNavigationTab: passwordInput
                     keyNavigationBacktab: domainMatchInput
                     onTextEdited: wifiUsernameInput = text
@@ -552,7 +538,7 @@ FloatingWindow {
                     echoMode: passwordVisible ? TextInput.Normal : TextInput.Password
                     placeholderText: (requiresEnterprise && !isVpnPrompt) ? I18n.tr("Password") : ""
                     backgroundColor: "transparent"
-                    enabled: root.visible
+                    enabled: root.shouldBeVisible
                     keyNavigationTab: (requiresEnterprise && !isVpnPrompt) ? anonInput : null
                     keyNavigationBacktab: (requiresEnterprise && !isVpnPrompt) ? usernameInput : null
                     onTextEdited: wifiPasswordInput = text
@@ -589,7 +575,7 @@ FloatingWindow {
                     text: wifiAnonymousIdentityInput
                     placeholderText: I18n.tr("Anonymous Identity (optional)")
                     backgroundColor: "transparent"
-                    enabled: root.visible
+                    enabled: root.shouldBeVisible
                     keyNavigationTab: domainMatchInput
                     keyNavigationBacktab: passwordInput
                     onTextEdited: wifiAnonymousIdentityInput = text
@@ -620,7 +606,7 @@ FloatingWindow {
                     text: wifiDomainInput
                     placeholderText: I18n.tr("Domain (optional)")
                     backgroundColor: "transparent"
-                    enabled: root.visible
+                    enabled: root.shouldBeVisible
                     keyNavigationTab: usernameInput
                     keyNavigationBacktab: anonInput
                     onTextEdited: wifiDomainInput = text
@@ -757,8 +743,5 @@ FloatingWindow {
         }
     }
 
-    FloatingWindowControls {
-        id: windowControls
-        targetWindow: root
-    }
+    onOpened: Qt.callLater(() => contentFocusScope.forceActiveFocus())
 }

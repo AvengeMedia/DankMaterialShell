@@ -55,7 +55,7 @@ BasePill {
             }
 
             IconImage {
-                visible: SettingsData.launcherLogoMode === "compositor" && (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isDwl || CompositorService.isMango || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle || CompositorService.isLabwc)
+                visible: SettingsData.launcherLogoMode === "compositor" && (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle || CompositorService.isLabwc)
                 anchors.centerIn: parent
                 width: Theme.barIconSize(root.barThickness, SettingsData.launcherLogoSizeOffset, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                 height: Theme.barIconSize(root.barThickness, SettingsData.launcherLogoSizeOffset, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
@@ -66,8 +66,6 @@ BasePill {
                         return "file://" + Theme.shellDir + "/assets/niri.svg";
                     } else if (CompositorService.isHyprland) {
                         return "file://" + Theme.shellDir + "/assets/hyprland.svg";
-                    } else if (CompositorService.isDwl) {
-                        return "file://" + Theme.shellDir + "/assets/mango.png";
                     } else if (CompositorService.isMango) {
                         return "file://" + Theme.shellDir + "/assets/mango.png";
                     } else if (CompositorService.isSway) {

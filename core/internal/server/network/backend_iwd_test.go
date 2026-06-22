@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/godbus/dbus/v5"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -166,6 +167,92 @@ func TestIWDBackend_MapIwdDBusError(t *testing.T) {
 			assert.Equal(t, tc.expected, code)
 		})
 	}
+}
+
+func TestIWDSavedWiFiProfilesFromManagedObjects(t *testing.T) {
+	objects := map[dbus.ObjectPath]map[string]map[string]dbus.Variant{
+		"/net/connman/iwd/known_network/1": {
+			iwdKnownNetworkInterface: {
+				"Name":        dbus.MakeVariant("Home"),
+				"AutoConnect": dbus.MakeVariant(false),
+				"Hidden":      dbus.MakeVariant(true),
+				"Type":        dbus.MakeVariant("psk"),
+			},
+		},
+		"/net/connman/iwd/known_network/2": {
+			iwdKnownNetworkInterface: {
+				"Name": dbus.MakeVariant("Office"),
+				"Type": dbus.MakeVariant("8021x"),
+			},
+		},
+		"/net/connman/iwd/known_network/3": {
+			iwdKnownNetworkInterface: {
+				"Name": dbus.MakeVariant("Cafe"),
+				"Type": dbus.MakeVariant("open"),
+			},
+		},
+		"/net/connman/iwd/network/1": {
+			iwdNetworkInterface: {
+				"Name": dbus.MakeVariant("VisibleOnly"),
+			},
+		},
+	}
+
+	profiles := iwdSavedWiFiProfilesFromManagedObjects(objects)
+
+	assert.Len(t, profiles, 3)
+	assert.False(t, profiles["Home"].Autoconnect)
+	assert.True(t, profiles["Home"].Hidden)
+	assert.True(t, profiles["Home"].Secured)
+	assert.False(t, profiles["Home"].Enterprise)
+
+	assert.True(t, profiles["Office"].Autoconnect)
+	assert.True(t, profiles["Office"].Secured)
+	assert.True(t, profiles["Office"].Enterprise)
+
+	assert.True(t, profiles["Cafe"].Autoconnect)
+	assert.False(t, profiles["Cafe"].Secured)
+	assert.False(t, profiles["Cafe"].Enterprise)
+}
+
+func TestIWDWiFiNetworksFromVisibleIncludesConnectedHiddenFallback(t *testing.T) {
+	profiles := map[string]savedWiFiProfile{
+		"Home": {
+			Autoconnect: true,
+			Secured:     true,
+			Hidden:      true,
+			Mode:        "infrastructure",
+		},
+	}
+	visible := []WiFiNetwork{
+		{
+			SSID:    "Cafe",
+			Signal:  42,
+			Secured: false,
+		},
+	}
+
+	networks := iwdWiFiNetworksFromVisible(visible, profiles, "Home", true, 68)
+	savedNetworks := savedWiFiNetworksFromProfiles(profiles, map[string]WiFiNetwork{
+		networks[0].SSID: networks[0],
+		networks[1].SSID: networks[1],
+	}, "Home", true)
+
+	assert.Len(t, networks, 2)
+	assert.Equal(t, "Cafe", networks[0].SSID)
+	assert.False(t, networks[0].Connected)
+
+	assert.Equal(t, "Home", networks[1].SSID)
+	assert.True(t, networks[1].Connected)
+	assert.True(t, networks[1].Hidden)
+	assert.True(t, networks[1].Saved)
+	assert.True(t, networks[1].Autoconnect)
+	assert.Equal(t, uint8(68), networks[1].Signal)
+
+	assert.Len(t, savedNetworks, 1)
+	assert.Equal(t, "Home", savedNetworks[0].SSID)
+	assert.True(t, savedNetworks[0].Connected)
+	assert.False(t, savedNetworks[0].OutOfRange)
 }
 
 func TestConnectAttempt_Finalization(t *testing.T) {

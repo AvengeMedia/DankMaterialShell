@@ -11,6 +11,10 @@ Singleton {
     readonly property int durMed: 450
     readonly property int durLong: 600
 
+    // Navigation feedback stays responsive even when ambient shell motion is slow.
+    readonly property int settingsNavigationStateDuration: 180
+    readonly property int settingsNavigationRippleDuration: 200
+
     readonly property int slidePx: 80
 
     readonly property var emphasized: [0.05, 0.00, 0.133333, 0.06, 0.166667, 0.40, 0.208333, 0.82, 0.25, 1.00, 1.00, 1.00]

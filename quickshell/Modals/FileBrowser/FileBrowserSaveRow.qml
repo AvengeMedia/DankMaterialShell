@@ -8,6 +8,7 @@ Row {
     property bool saveMode: false
     property string defaultFileName: ""
     property string currentPath: ""
+    property alias fileName: fileNameInput.text
 
     signal saveRequested(string filePath)
 

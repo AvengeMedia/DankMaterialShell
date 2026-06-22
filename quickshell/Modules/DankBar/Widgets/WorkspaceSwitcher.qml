@@ -22,10 +22,7 @@ Item {
     property var hyprlandOverviewLoader: null
     property var parentScreen: null
 
-    // mango shares dwl's tag model; route to the right service so one set of
-    // branches serves both.
-    readonly property bool isDwlLike: CompositorService.isDwl || CompositorService.isMango
-    readonly property var dwlSvc: CompositorService.isMango ? MangoService : DwlService
+    readonly property bool isMango: CompositorService.isMango
 
     readonly property real _leftMargin: {
         if (isVertical)
@@ -80,9 +77,8 @@ Item {
             return NiriService.currentOutput || root.screenName;
         case "hyprland":
             return Hyprland.focusedWorkspace?.monitor?.name || root.screenName;
-        case "dwl":
         case "mango":
-            return root.dwlSvc.activeOutput || root.screenName;
+            return MangoService.activeOutput || root.screenName;
         case "sway":
         case "scroll":
         case "miracle":
@@ -101,7 +97,6 @@ Item {
         switch (CompositorService.compositor) {
         case "niri":
         case "hyprland":
-        case "dwl":
         case "mango":
         case "sway":
         case "scroll":
@@ -128,7 +123,6 @@ Item {
             return getNiriActiveWorkspace();
         case "hyprland":
             return getHyprlandActiveWorkspace();
-        case "dwl":
         case "mango":
             const activeTags = getDwlActiveTags();
             return activeTags.length > 0 ? activeTags[0] : -1;
@@ -141,7 +135,7 @@ Item {
         }
     }
     property var dwlActiveTags: {
-        if (root.isDwlLike) {
+        if (root.isMango) {
             return getDwlActiveTags();
         }
         return [];
@@ -159,9 +153,6 @@ Item {
             break;
         case "hyprland":
             baseList = getHyprlandWorkspaces();
-            break;
-        case "dwl":
-            baseList = getDwlTags();
             break;
         case "mango":
             if (root.mangoOverviewActive)
@@ -302,7 +293,7 @@ Item {
             }
         } else if (CompositorService.isHyprland) {
             targetWorkspaceId = ws.id !== undefined ? ws.id : ws;
-        } else if (root.isDwlLike) {
+        } else if (root.isMango) {
             if (typeof ws !== "object" || ws.tag === undefined) {
                 return [];
             }
@@ -322,8 +313,8 @@ Item {
         } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
             const focusedWs = I3.workspaces?.values?.find(ws => ws.focused === true);
             isActiveWs = focusedWs ? (focusedWs.num === targetWorkspaceId) : false;
-        } else if (root.isDwlLike) {
-            const output = root.dwlSvc.getOutputState(root.effectiveScreenName);
+        } else if (root.isMango) {
+            const output = MangoService.getOutputState(root.effectiveScreenName);
             if (output && output.tags) {
                 const tag = output.tags.find(t => t.tag === targetWorkspaceId);
                 isActiveWs = tag ? (tag.state === 1) : false;
@@ -411,7 +402,7 @@ Item {
                 "id": -1,
                 "name": ""
             };
-        } else if (root.isDwlLike) {
+        } else if (root.isMango) {
             placeholder = {
                 "tag": -1
             };
@@ -493,11 +484,11 @@ Item {
     }
 
     function getDwlTags() {
-        if (!root.dwlSvc.available)
+        if (!MangoService.available)
             return [];
 
         const targetScreen = root.effectiveScreenName;
-        const output = root.dwlSvc.getOutputState(targetScreen);
+        const output = MangoService.getOutputState(targetScreen);
         if (!output || !output.tags || output.tags.length === 0)
             return [];
 
@@ -510,7 +501,7 @@ Item {
                     }));
         }
 
-        const visibleTagIndices = root.dwlSvc.getVisibleTags(targetScreen);
+        const visibleTagIndices = MangoService.getVisibleTags(targetScreen);
         return visibleTagIndices.map(tagIndex => {
             const tagData = output.tags.find(t => t.tag === tagIndex);
             return {
@@ -523,10 +514,10 @@ Item {
     }
 
     function getDwlActiveTags() {
-        if (!root.dwlSvc.available)
+        if (!MangoService.available)
             return [];
 
-        return root.dwlSvc.getActiveTags(root.effectiveScreenName);
+        return MangoService.getActiveTags(root.effectiveScreenName);
     }
 
     function getExtWorkspaceWorkspaces() {
@@ -577,7 +568,7 @@ Item {
                 return ws && ws.idx !== -1;
             if (CompositorService.isHyprland)
                 return ws && ws.id !== -1;
-            if (root.isDwlLike)
+            if (root.isMango)
                 return ws && ws.tag !== -1;
             if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle)
                 return ws && ws.num !== -1;
@@ -605,10 +596,9 @@ Item {
                 HyprlandService.focusWorkspace(data.id);
             }
             break;
-        case "dwl":
         case "mango":
             if (data.tag !== undefined)
-                root.dwlSvc.switchToTag(root.screenName, data.tag);
+                MangoService.switchToTag(root.screenName, data.tag);
             break;
         case "sway":
         case "scroll":
@@ -694,7 +684,7 @@ Item {
             }
 
             HyprlandService.focusWorkspace(realWorkspaces[nextIndex].id);
-        } else if (root.isDwlLike) {
+        } else if (root.isMango) {
             const realWorkspaces = getRealWorkspaces();
             if (realWorkspaces.length < 2) {
                 return;
@@ -708,7 +698,7 @@ Item {
                 return;
             }
 
-            root.dwlSvc.switchToTag(root.screenName, realWorkspaces[nextIndex].tag);
+            MangoService.switchToTag(root.screenName, realWorkspaces[nextIndex].tag);
         } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
             const realWorkspaces = getRealWorkspaces();
             if (realWorkspaces.length < 2) {
@@ -736,7 +726,7 @@ Item {
             return (modelData?.idx !== undefined && modelData?.idx !== -1) ? modelData.idx : "";
         if (CompositorService.isHyprland)
             return modelData?.id || "";
-        if (root.isDwlLike)
+        if (root.isMango)
             return (modelData?.tag !== undefined) ? (modelData.tag + 1) : "";
         if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle)
             return modelData?.num || "";
@@ -751,7 +741,7 @@ Item {
             isPlaceholder = modelData?.idx === -1;
         } else if (CompositorService.isHyprland) {
             isPlaceholder = modelData?.id === -1;
-        } else if (root.isDwlLike) {
+        } else if (root.isMango) {
             isPlaceholder = modelData?.tag === -1;
         } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
             isPlaceholder = modelData?.num === -1;
@@ -786,7 +776,7 @@ Item {
         return getWorkspaceIndexFallback(modelData, index);
     }
 
-    readonly property bool hasNativeWorkspaceSupport: CompositorService.isNiri || CompositorService.isHyprland || root.isDwlLike || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle
+    readonly property bool hasNativeWorkspaceSupport: CompositorService.isNiri || CompositorService.isHyprland || root.isMango || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle
     readonly property bool hasWorkspaces: getRealWorkspaces().length > 0
     readonly property bool shouldShow: hasNativeWorkspaceSupport || (useExtWorkspace && hasWorkspaces)
 
@@ -1051,7 +1041,7 @@ Item {
                         return !!(modelData && modelData.idx === root.currentWorkspace);
                     if (CompositorService.isHyprland)
                         return !!(modelData && modelData.id === root.currentWorkspace);
-                    if (root.isDwlLike)
+                    if (root.isMango)
                         return !!(modelData && root.dwlActiveTags.includes(modelData.tag));
                     if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle)
                         return !!(modelData && modelData.num === root.currentWorkspace);
@@ -1060,7 +1050,7 @@ Item {
                 property bool isOccupied: {
                     if (CompositorService.isHyprland)
                         return Array.from(Hyprland.toplevels?.values || []).some(tl => tl.workspace?.id === modelData?.id);
-                    if (root.isDwlLike)
+                    if (root.isMango)
                         return modelData.clients > 0;
                     if (CompositorService.isNiri) {
                         const workspace = NiriService.allWorkspaces.find(ws => ws.idx + 1 === modelData && ws.output === root.effectiveScreenName);
@@ -1075,7 +1065,7 @@ Item {
                         return !!(modelData && modelData.idx === -1);
                     if (CompositorService.isHyprland)
                         return !!(modelData && modelData.id === -1);
-                    if (root.isDwlLike)
+                    if (root.isMango)
                         return !!(modelData && modelData.tag === -1);
                     if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle)
                         return !!(modelData && modelData.num === -1);
@@ -1092,7 +1082,7 @@ Item {
                         return modelData?.urgent ?? false;
                     if (CompositorService.isNiri)
                         return loadedIsUrgent;
-                    if (root.isDwlLike)
+                    if (root.isMango)
                         return modelData?.state === 2;
                     if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle)
                         return loadedIsUrgent;
@@ -1120,7 +1110,7 @@ Item {
                         targetWorkspaceId = modelData?.id;
                     } else if (CompositorService.isHyprland) {
                         targetWorkspaceId = modelData?.id;
-                    } else if (root.isDwlLike) {
+                    } else if (root.isMango) {
                         targetWorkspaceId = modelData?.tag;
                     } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
                         targetWorkspaceId = modelData?.num;
@@ -1202,38 +1192,25 @@ Item {
                     return Math.max(baseHeight + iconsExtraHeight, contentImplicitHeight + padding);
                 }
 
-                readonly property color unfocusedColor: {
-                    switch (SettingsData.workspaceUnfocusedColorMode) {
-                    case "s":
-                        return Theme.surface;
-                    case "sc":
-                        return Theme.surfaceContainer;
-                    case "sch":
-                        return Theme.surfaceContainerHigh;
-                    default:
-                        return Theme.surfaceTextAlpha;
-                    }
-                }
-
-                readonly property color activeColor: {
-                    switch (SettingsData.workspaceColorMode) {
-                    case "s":
-                        return Theme.surface;
-                    case "sc":
-                        return Theme.surfaceContainer;
-                    case "sch":
-                        return Theme.surfaceContainerHigh;
-                    case "none":
-                        return unfocusedColor;
-                    default:
+                function colorFromMode(mode, fallbackColor, customColor, customFallbackColor) {
+                    switch (mode) {
+                    case "primary":
+                    case "pri":
                         return Theme.primary;
-                    }
-                }
-
-                readonly property color occupiedColor: {
-                    switch (SettingsData.workspaceOccupiedColorMode) {
+                    case "primaryContainer":
+                        return Theme.primaryContainer;
+                    case "secondary":
                     case "sec":
                         return Theme.secondary;
+                    case "secondaryContainer":
+                        return Theme.secondaryContainer;
+                    case "tertiary":
+                    case "ter":
+                        return Theme.tertiary;
+                    case "tertiaryContainer":
+                        return Theme.tertiaryContainer;
+                    case "surfaceText":
+                        return Theme.surfaceText;
                     case "s":
                         return Theme.surface;
                     case "sc":
@@ -1242,36 +1219,33 @@ Item {
                         return Theme.surfaceContainerHigh;
                     case "schh":
                         return Theme.surfaceContainerHighest;
-                    default:
-                        return unfocusedColor;
-                    }
-                }
-
-                readonly property color urgentColor: {
-                    switch (SettingsData.workspaceUrgentColorMode) {
-                    case "primary":
-                        return Theme.primary;
-                    case "secondary":
-                        return Theme.secondary;
-                    case "s":
-                        return Theme.surface;
-                    case "sc":
-                        return Theme.surfaceContainer;
-                    default:
+                    case "error":
+                    case "err":
                         return Theme.error;
+                    case "custom":
+                        return Theme.safeColor(customColor, customFallbackColor);
+                    default:
+                        return fallbackColor;
                     }
                 }
 
-                readonly property color focusedBorderColor: {
-                    switch (SettingsData.workspaceFocusedBorderColor) {
-                    case "surfaceText":
-                        return Theme.surfaceText;
-                    case "secondary":
-                        return Theme.secondary;
-                    default:
-                        return Theme.primary;
-                    }
+                readonly property color unfocusedColor: colorFromMode(SettingsData.workspaceUnfocusedColorMode, Theme.surfaceTextAlpha, SettingsData.workspaceUnfocusedCustomColor, Theme.surfaceTextAlpha)
+
+                readonly property color activeColor: {
+                    if (SettingsData.workspaceColorMode === "none")
+                        return unfocusedColor;
+                    return colorFromMode(SettingsData.workspaceColorMode, Theme.primary, SettingsData.workspaceFocusedCustomColor, Theme.primary);
                 }
+
+                readonly property color occupiedColor: {
+                    if (SettingsData.workspaceOccupiedColorMode === "none")
+                        return unfocusedColor;
+                    return colorFromMode(SettingsData.workspaceOccupiedColorMode, unfocusedColor, SettingsData.workspaceOccupiedCustomColor, Theme.secondary);
+                }
+
+                readonly property color urgentColor: colorFromMode(SettingsData.workspaceUrgentColorMode, Theme.error, SettingsData.workspaceUrgentCustomColor, Theme.error)
+
+                readonly property color focusedBorderColor: colorFromMode(SettingsData.workspaceFocusedBorderColor, Theme.primary, SettingsData.workspaceFocusedBorderCustomColor, Theme.primary)
 
                 function getContrastingIconColor(bgColor) {
                     const luminance = 0.299 * bgColor.r + 0.587 * bgColor.g + 0.114 * bgColor.b;
@@ -1383,8 +1357,8 @@ Item {
                                 }
                             } else if (CompositorService.isHyprland && modelData?.id) {
                                 HyprlandService.focusWorkspace(modelData.id);
-                            } else if (root.isDwlLike && modelData?.tag !== undefined) {
-                                root.dwlSvc.switchToTag(root.screenName, modelData.tag);
+                            } else if (root.isMango && modelData?.tag !== undefined) {
+                                MangoService.switchToTag(root.screenName, modelData.tag);
                             } else if ((CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) && modelData?.num) {
                                 try {
                                     I3.dispatch(`workspace number ${modelData.num}`);
@@ -1395,8 +1369,8 @@ Item {
                                 NiriService.toggleOverview();
                             } else if (CompositorService.isHyprland && root.hyprlandOverviewLoader?.item) {
                                 root.hyprlandOverviewLoader.item.overviewOpen = !root.hyprlandOverviewLoader.item.overviewOpen;
-                            } else if (root.isDwlLike && modelData?.tag !== undefined) {
-                                root.dwlSvc.toggleTag(root.screenName, modelData.tag);
+                            } else if (root.isMango && modelData?.tag !== undefined) {
+                                MangoService.toggleTag(root.screenName, modelData.tag);
                             }
                         }
                     }
@@ -1420,7 +1394,7 @@ Item {
                             wsData = modelData || null;
                         } else if (CompositorService.isHyprland) {
                             wsData = modelData;
-                        } else if (root.isDwlLike) {
+                        } else if (root.isMango) {
                             wsData = modelData;
                         } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
                             wsData = modelData;
@@ -1434,7 +1408,7 @@ Item {
                         }
 
                         if (SettingsData.showWorkspaceApps) {
-                            if (root.isDwlLike || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
+                            if (root.isMango || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
                                 delegateRoot.loadedIcons = root.getWorkspaceIcons(modelData);
                             } else if (CompositorService.isNiri) {
                                 delegateRoot.loadedIcons = root.getWorkspaceIcons(isPlaceholder ? null : modelData);
@@ -1994,8 +1968,8 @@ Item {
                     }
                 }
                 Connections {
-                    target: root.dwlSvc
-                    enabled: root.isDwlLike
+                    target: MangoService
+                    enabled: root.isMango
                     function onStateChanged() {
                         delegateRoot.updateAllData();
                     }

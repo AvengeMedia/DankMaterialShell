@@ -17,6 +17,8 @@ Item {
     LayoutMirroring.childrenInherit: true
 
     property var parentModal: null
+    property bool pageActive: true
+    property bool componentReady: false
     property var windowRulesIncludeStatus: ({
             "exists": false,
             "included": false,
@@ -31,6 +33,13 @@ Item {
     property var activeWindows: getActiveWindows()
     property string expandedExternalId: ""
     readonly property string dmsRulesFileName: CompositorService.isNiri ? "dms/windowrules.kdl" : CompositorService.isMango ? "dms/windowrules.conf" : "dms/windowrules.lua"
+
+    Component.onDestruction: SettingsSearchService.unregisterCard("windowRules")
+
+    onPageActiveChanged: {
+        if (componentReady && pageActive)
+            loadWindowRules();
+    }
 
     readonly property var matchLabels: ({
             "appId": I18n.tr("App ID"),
@@ -182,12 +191,15 @@ Item {
     function loadWindowRules() {
         const compositor = CompositorService.compositor;
         if (compositor !== "niri" && compositor !== "hyprland" && compositor !== "mango") {
+            checkingInclude = false;
             windowRules = [];
             externalRules = [];
             return;
         }
 
+        checkingInclude = true;
         Proc.runCommand("load-windowrules", ["dms", "config", "windowrules", "list", compositor], (output, exitCode) => {
+            checkingInclude = false;
             if (exitCode !== 0) {
                 windowRules = [];
                 externalRules = [];
@@ -258,44 +270,6 @@ Item {
         });
     }
 
-    function checkWindowRulesIncludeStatus() {
-        const compositor = CompositorService.compositor;
-        if (compositor !== "niri" && compositor !== "hyprland" && compositor !== "mango") {
-            windowRulesIncludeStatus = {
-                "exists": false,
-                "included": false,
-                "configFormat": "",
-                "readOnly": false
-            };
-            return;
-        }
-
-        const filename = (compositor === "niri") ? "windowrules.kdl" : (compositor === "mango") ? "windowrules.conf" : "windowrules.lua";
-        checkingInclude = true;
-        Proc.runCommand("check-windowrules-include", ["dms", "config", "resolve-include", compositor, filename], (output, exitCode) => {
-            checkingInclude = false;
-            if (exitCode !== 0) {
-                windowRulesIncludeStatus = {
-                    "exists": false,
-                    "included": false,
-                    "configFormat": "",
-                    "readOnly": false
-                };
-                return;
-            }
-            try {
-                windowRulesIncludeStatus = JSON.parse(output.trim());
-            } catch (e) {
-                windowRulesIncludeStatus = {
-                    "exists": false,
-                    "included": false,
-                    "configFormat": "",
-                    "readOnly": false
-                };
-            }
-        });
-    }
-
     function fixWindowRulesInclude() {
         if (readOnly) {
             showHyprlandReadOnlyWarning();
@@ -320,7 +294,6 @@ Item {
                 return;
             if (CompositorService.isMango)
                 MangoService.reloadConfig();
-            checkWindowRulesIncludeStatus();
             loadWindowRules();
         });
     }
@@ -372,10 +345,12 @@ Item {
     }
 
     Component.onCompleted: {
-        if (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango) {
-            checkWindowRulesIncludeStatus();
-            loadWindowRules();
-        }
+        componentReady = true;
+        Qt.callLater(() => {
+            SettingsSearchService.registerCard("windowRules", headerSection, flickable);
+            if (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango)
+                loadWindowRules();
+        });
     }
 
     DankFlickable {

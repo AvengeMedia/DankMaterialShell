@@ -2,17 +2,79 @@ import QtQuick
 import Quickshell
 import qs.Common
 import qs.Widgets
+import qs.Services
 
 Item {
     id: clipboardContent
 
     required property var modal
-    required property var clearConfirmDialog
 
     property alias searchField: searchField
     property alias clipboardListView: clipboardListView
 
+    readonly property var filterOptions: [I18n.tr("All"), I18n.tr("Text"), I18n.tr("Long Text"), I18n.tr("Image")]
+    readonly property var filterValues: ["all", "text", "long_text", "image"]
+
+    function closeFilterMenu() {
+        filterMenuLoader.active = false;
+        filterMenuLoader.active = true;
+    }
+
+    function showContextMenu(entry, sceneX, sceneY) {
+        const localPos = mapFromItem(null, sceneX, sceneY);
+        contextMenu.show(localPos.x, localPos.y, entry);
+    }
+
+    function contextEntryAtScreen(screenX, screenY) {
+        const host = modal.surfaceHost ?? null;
+        const hostX = host?.alignedX;
+        const hostY = host?.renderedAlignedY ?? host?.alignedY;
+
+        if (!isNaN(hostX) && !isNaN(hostY))
+            return contextEntryAtLocal(screenX - hostX, screenY - hostY);
+
+        const screenRef = host?.effectiveScreen ?? host?.screen ?? modal.Window?.window?.screen ?? null;
+        const globalOrigin = mapToGlobal(0, 0);
+        const screenOriginX = screenRef?.x || 0;
+        const screenOriginY = screenRef?.y || 0;
+        return contextEntryAtLocal(screenOriginX + screenX - globalOrigin.x, screenOriginY + screenY - globalOrigin.y);
+    }
+
+    function contextEntryAtLocal(localX, localY) {
+        const listView = modal.activeTab === "saved" ? savedListView : clipboardListView;
+        const entries = modal.activeTab === "saved" ? modal.pinnedEntries : modal.unpinnedEntries;
+
+        if (!listView.visible || !entries)
+            return null;
+
+        const listPos = mapToItem(listView, localX, localY);
+        if (listPos.x < 0 || listPos.x > listView.width || listPos.y < 0 || listPos.y > listView.height)
+            return null;
+
+        const index = listView.indexAt(listPos.x + listView.contentX, listPos.y + listView.contentY);
+        if (index < 0 || index >= entries.length)
+            return null;
+
+        return {
+            entry: entries[index],
+            x: localX,
+            y: localY
+        };
+    }
+
+    function closeContextMenu() {
+        contextMenu.hide();
+    }
+
+    readonly property bool contextMenuActive: contextMenu.openState
+
     anchors.fill: parent
+
+    ClipboardContextMenu {
+        id: contextMenu
+        modal: clipboardContent.modal
+        parentHandler: clipboardContent
+    }
 
     Column {
         id: headerColumn
@@ -33,38 +95,91 @@ Item {
             pinnedCount: modal.pinnedCount
             onKeyboardHintsToggled: modal.showKeyboardHints = !modal.showKeyboardHints
             onTabChanged: tabName => modal.activeTab = tabName
-            onClearAllClicked: {
-                const hasPinned = modal.pinnedCount > 0;
-                const message = hasPinned ? I18n.tr("This will delete all unpinned entries. %1 pinned entries will be kept.").arg(modal.pinnedCount) : I18n.tr("This will permanently delete all clipboard history.");
-                clearConfirmDialog.show(I18n.tr("Clear History?"), message, function () {
-                    modal.clearAll();
-                    modal.hide();
-                }, function () {});
-            }
+            onClearAllClicked: modal.confirmClearAll()
             onCloseClicked: modal.hide()
         }
 
-        DankTextField {
-            id: searchField
+        Item {
+            id: searchRow
             width: parent.width
-            placeholderText: ""
-            leftIconName: "search"
-            showClearButton: true
-            focus: true
-            ignoreTabKeys: true
-            keyForwardTargets: [modal.modalFocusScope]
-            onTextChanged: {
-                modal.searchText = text;
-                modal.updateFilteredModel();
+            implicitHeight: searchField.height
+
+            DankTextField {
+                id: searchField
+
+                width: parent.width
+                rightAccessoryWidth: filterButton.width + Theme.spacingS
+                placeholderText: ""
+                leftIconName: "search"
+                showClearButton: true
+                focus: true
+                ignoreTabKeys: true
+                keyForwardTargets: [modal.modalFocusScope]
+
+                onTextChanged: {
+                    modal.searchText = text;
+                    modal.updateFilteredModel();
+                    ClipboardService.selectedIndex = 0;
+                    ClipboardService.keyboardNavigationActive = true;
+                    Qt.callLater(function () {
+                        clipboardListView.positionViewAtBeginning();
+                        savedListView.positionViewAtBeginning();
+                    });
+                }
+
+                Keys.onEscapePressed: function (event) {
+                    modal.hide();
+                    event.accepted = true;
+                }
+
+                Component.onCompleted: {
+                    Qt.callLater(function () {
+                        forceActiveFocus();
+                    });
+                }
             }
-            Keys.onEscapePressed: function (event) {
-                modal.hide();
-                event.accepted = true;
+
+            DankActionButton {
+                id: filterButton
+
+                anchors.right: parent.right
+                anchors.rightMargin: Theme.spacingS
+                anchors.verticalCenter: parent.verticalCenter
+                iconName: "filter_list"
+                iconColor: modal.activeFilter !== "all" ? Theme.primary : Theme.surfaceText
+                backgroundColor: modal.activeFilter !== "all" ? Theme.primarySelected : "transparent"
+                tooltipText: I18n.tr("Filter by type", "Clipboard history type filter button tooltip")
+                onClicked: filterMenuLoader.item?.openDropdownMenu()
             }
-            Component.onCompleted: {
-                Qt.callLater(function () {
-                    forceActiveFocus();
-                });
+
+            Loader {
+                id: filterMenuLoader
+
+                active: true
+                sourceComponent: filterMenuComponent
+            }
+
+            Component {
+                id: filterMenuComponent
+
+                DankDropdown {
+                    showTrigger: false
+                    popupAnchorItem: filterButton
+                    popupWidth: 180
+                    alignPopupRight: true
+                    options: clipboardContent.filterOptions
+                    currentValue: {
+                        const idx = clipboardContent.filterValues.indexOf(clipboardContent.modal.activeFilter);
+                        return idx >= 0 ? clipboardContent.filterOptions[idx] : clipboardContent.filterOptions[0];
+                    }
+
+                    onValueChanged: value => {
+                        const idx = clipboardContent.filterOptions.indexOf(value);
+                        if (idx >= 0) {
+                            clipboardContent.modal.activeFilter = clipboardContent.filterValues[idx];
+                        }
+                    }
+                }
             }
         }
     }
@@ -128,7 +243,7 @@ Item {
             }
 
             StyledText {
-                text: clipboardContent.modal.clipboardAvailable ? I18n.tr("No recent clipboard entries found") : I18n.tr("Connecting to clipboard service…")
+                text: clipboardContent.modal.clipboardAvailable ? I18n.tr("No recent clipboard entries found") : I18n.tr("Connecting to clipboard service...")
                 anchors.centerIn: parent
                 font.pixelSize: Theme.fontSizeMedium
                 color: Theme.surfaceVariantText
@@ -148,10 +263,12 @@ Item {
                 modal: clipboardContent.modal
                 listView: clipboardListView
                 onCopyRequested: clipboardContent.modal.copyEntry(modelData)
+                onPasteRequested: clipboardContent.modal.pasteEntry(modelData)
                 onDeleteRequested: clipboardContent.modal.deleteEntry(modelData)
-                onPinRequested: clipboardContent.modal.pinEntry(modelData)
-                onUnpinRequested: clipboardContent.modal.unpinEntry(modelData)
+                onPinRequested: targetEntry => clipboardContent.modal.pinEntry(targetEntry)
+                onUnpinRequested: targetEntry => clipboardContent.modal.unpinEntry(targetEntry)
                 onEditRequested: clipboardContent.modal.editEntry(modelData)
+                onContextMenuRequested: (mouseX, mouseY) => clipboardContent.showContextMenu(modelData, mouseX, mouseY)
             }
         }
 
@@ -202,7 +319,7 @@ Item {
             }
 
             StyledText {
-                text: clipboardContent.modal.clipboardAvailable ? I18n.tr("No saved clipboard entries") : I18n.tr("Connecting to clipboard service…")
+                text: clipboardContent.modal.clipboardAvailable ? I18n.tr("No saved clipboard entries") : I18n.tr("Connecting to clipboard service...")
                 anchors.centerIn: parent
                 font.pixelSize: Theme.fontSizeMedium
                 color: Theme.surfaceVariantText
@@ -222,10 +339,12 @@ Item {
                 modal: clipboardContent.modal
                 listView: savedListView
                 onCopyRequested: clipboardContent.modal.copyEntry(modelData)
+                onPasteRequested: clipboardContent.modal.pasteEntry(modelData)
                 onDeleteRequested: clipboardContent.modal.deletePinnedEntry(modelData)
-                onPinRequested: clipboardContent.modal.pinEntry(modelData)
-                onUnpinRequested: clipboardContent.modal.unpinEntry(modelData)
+                onPinRequested: targetEntry => clipboardContent.modal.pinEntry(targetEntry)
+                onUnpinRequested: targetEntry => clipboardContent.modal.unpinEntry(targetEntry)
                 onEditRequested: clipboardContent.modal.editEntry(modelData)
+                onContextMenuRequested: (mouseX, mouseY) => clipboardContent.showContextMenu(modelData, mouseX, mouseY)
             }
         }
 

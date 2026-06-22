@@ -422,13 +422,6 @@ PanelWindow {
             }
         }
 
-        Behavior on color {
-            ColorAnimation {
-                duration: Theme.shortDuration
-                easing.type: Theme.standardEasing
-            }
-        }
-
         Behavior on height {
             enabled: false
         }
@@ -440,5 +433,15 @@ PanelWindow {
 
     mask: Region {
         item: toast
+    }
+
+    WindowBlur {
+        targetWindow: root
+        blurEnabled: root.shouldBeVisible
+        blurX: toast.x
+        blurY: toast.y
+        blurWidth: root.shouldBeVisible ? toast.width : 0
+        blurHeight: root.shouldBeVisible ? toast.height : 0
+        blurRadius: toast.radius
     }
 }

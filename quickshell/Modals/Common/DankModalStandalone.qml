@@ -205,6 +205,7 @@ Item {
         id: clickCatcher
         visible: false
         color: "transparent"
+        updatesEnabled: false
 
         WlrLayershell.namespace: root.layerNamespace + ":clickcatcher"
         WlrLayershell.layer: WlrLayershell.Top
@@ -259,15 +260,7 @@ Item {
             "error": true
         })
         WlrLayershell.exclusiveZone: -1
-        WlrLayershell.keyboardFocus: {
-            if (customKeyboardFocus !== null)
-                return customKeyboardFocus;
-            if (!shouldHaveFocus)
-                return WlrKeyboardFocus.None;
-            if (root.useHyprlandFocusGrab)
-                return WlrKeyboardFocus.OnDemand;
-            return WlrKeyboardFocus.Exclusive;
-        }
+        WlrLayershell.keyboardFocus: KeyboardFocus.keyboardFocus(shouldHaveFocus, customKeyboardFocus)
 
         anchors {
             left: true

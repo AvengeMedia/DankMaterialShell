@@ -641,21 +641,15 @@ PanelWindow {
             shadowOffsetY: content.shadowOffsetY
             shadowColor: content.shadowsAllowed && content.elevLevel ? Theme.elevationShadowColor(content.elevLevel) : "transparent"
             shadowEnabled: !win._isDestroying && win.screenValid && content.shadowsAllowed && !win.connectedFrameMode
-            layer.textureSize: Qt.size(Math.round(width * win.dpr), Math.round(height * win.dpr))
-            layer.textureMirroring: ShaderEffectSource.MirrorVertically
 
-            sourceRect.anchors.fill: undefined
-            sourceRect.x: content.shadowRenderPadding + content.cardInset
-            sourceRect.y: content.shadowRenderPadding + content.cardInset
-            sourceRect.width: Math.max(0, content.width - (content.cardInset * 2))
-            sourceRect.height: Math.max(0, content.height - (content.cardInset * 2))
-            sourceRect.radius: win.connectedFrameMode ? Theme.connectedSurfaceRadius : Theme.cornerRadius
-            sourceRect.color: win.connectedFrameMode ? Theme.floatingSurface : Theme.readableSurface
-            sourceRect.antialiasing: true
-            sourceRect.layer.enabled: false
-            sourceRect.layer.textureSize: Qt.size(0, 0)
-            sourceRect.border.color: notificationData && notificationData.urgency === NotificationUrgency.Critical ? Theme.withAlpha(Theme.primary, 0.3) : Theme.withAlpha(Theme.outline, 0.08)
-            sourceRect.border.width: notificationData && notificationData.urgency === NotificationUrgency.Critical ? 2 : 0
+            sourceX: content.shadowRenderPadding + content.cardInset
+            sourceY: content.shadowRenderPadding + content.cardInset
+            sourceWidth: Math.max(0, content.width - (content.cardInset * 2))
+            sourceHeight: Math.max(0, content.height - (content.cardInset * 2))
+            targetRadius: win.connectedFrameMode ? Theme.connectedSurfaceRadius : Theme.cornerRadius
+            targetColor: win.connectedFrameMode ? Theme.floatingSurface : Theme.readableSurface
+            borderColor: win.notificationData && win.notificationData.urgency === NotificationUrgency.Critical ? Theme.withAlpha(Theme.primary, 0.3) : Theme.withAlpha(Theme.outline, 0.08)
+            borderWidth: win.notificationData && win.notificationData.urgency === NotificationUrgency.Critical ? 2 : 0
         }
 
         // Keep critical accent outside shadow rendering so connected mode still shows it.
@@ -723,6 +717,51 @@ PanelWindow {
                             notificationData.timer.stop();
                     } else if (notificationData.popup && notificationData.timer) {
                         notificationData.timer.restart();
+                    }
+                }
+            }
+
+            // Timeout progress bar: drains as the dismiss timer runs; inset by
+            // the corner radius and frozen while hovered or during exit.
+            Rectangle {
+                id: timeoutBar
+
+                readonly property bool active: SettingsData.notificationShowTimeoutBar && notificationData && notificationData.timer && notificationData.timer.interval > 0
+                property real progress: 1
+                readonly property real surfaceRadius: win.connectedFrameMode ? Theme.connectedSurfaceRadius : Theme.cornerRadius
+
+                visible: active && progress > 0
+                anchors.left: parent.left
+                anchors.leftMargin: surfaceRadius
+                anchors.bottom: parent.bottom
+                width: Math.max(0, parent.width - surfaceRadius * 2) * progress
+                height: Math.max(2, Theme.snap(3, win.dpr))
+                radius: height / 2
+                z: 50
+                opacity: 0.9
+                color: notificationData && notificationData.urgency === NotificationUrgency.Critical ? Theme.error : Theme.primary
+
+                NumberAnimation {
+                    id: progressAnim
+                    target: timeoutBar
+                    property: "progress"
+                    from: 1
+                    to: 0
+                    duration: (notificationData && notificationData.timer && notificationData.timer.interval > 0) ? notificationData.timer.interval : 5000
+                    running: timeoutBar.active && notificationData && notificationData.timer && notificationData.timer.running && !win.exiting
+                    easing.type: Easing.Linear
+                }
+
+                // Reset to full on every (re)start, including an in-place
+                // restart on a deduped notification (running stays true, so the
+                // bound animation alone wouldn't re-fire).
+                Connections {
+                    target: timeoutBar.active ? notificationData.timer : null
+                    function onRunningChanged() {
+                        if (notificationData && notificationData.timer && notificationData.timer.running && !win.exiting) {
+                            timeoutBar.progress = 1;
+                            progressAnim.restart();
+                        }
                     }
                 }
             }
@@ -877,10 +916,11 @@ PanelWindow {
                         }
                     }
 
+
                     StyledText {
                         text: notificationData ? (notificationData.summary || "") : ""
                         color: Theme.surfaceText
-                        font.pixelSize: Theme.fontSizeMedium
+                        font.pixelSize: SettingsData.notificationSummaryFontSize || Theme.fontSizeMedium
                         font.weight: Font.Medium
                         width: parent.width
                         elide: Text.ElideRight
@@ -896,7 +936,7 @@ PanelWindow {
                         text: notificationData ? (notificationData.htmlBody || "") : ""
                         textFormat: Text.StyledText
                         color: Theme.surfaceVariantText
-                        font.pixelSize: Theme.fontSizeSmall
+                        font.pixelSize: SettingsData.notificationBodyFontSize || Theme.fontSizeSmall
                         width: parent.width
                         elide: descriptionExpanded ? Text.ElideNone : Text.ElideRight
                         horizontalAlignment: Text.AlignLeft

@@ -601,12 +601,30 @@ func parseTargetsFromIPCShowOutput(output string) ipcTargets {
 	return targets
 }
 
-func getShellIPCCompletions(args []string, _ string) []string {
+func buildQsIPCBaseArgs() ([]string, error) {
 	cmdArgs := []string{"ipc"}
-	if qsHasAnyDisplay() {
-		cmdArgs = append(cmdArgs, "--any-display")
+	switch pid, ok := getFirstDMSPID(); {
+	case ok:
+		cmdArgs = append(cmdArgs, "--pid", strconv.Itoa(pid))
+	default:
+		if err := findConfig(nil, nil); err != nil {
+			return nil, err
+		}
+		if qsHasAnyDisplay() {
+			cmdArgs = append(cmdArgs, "--any-display")
+		}
+		cmdArgs = append(cmdArgs, "-p", configPath)
 	}
-	cmdArgs = append(cmdArgs, "-p", configPath, "show")
+	return cmdArgs, nil
+}
+
+func getShellIPCCompletions(args []string, _ string) []string {
+	baseArgs, err := buildQsIPCBaseArgs()
+	if err != nil {
+		log.Debugf("Error building IPC args for completions: %v", err)
+		return nil
+	}
+	cmdArgs := append(baseArgs, "show")
 	cmd := exec.Command("qs", cmdArgs...)
 	var targets ipcTargets
 
@@ -623,7 +641,7 @@ func getShellIPCCompletions(args []string, _ string) []string {
 
 	if len(args) == 0 {
 		targetNames := make([]string, 0)
-		targetNames = append(targetNames, "call")
+		targetNames = append(targetNames, "call", "list")
 		for k := range targets {
 			targetNames = append(targetNames, k)
 		}
@@ -696,23 +714,11 @@ func runShellIPCCommand(args []string) {
 		args = append([]string{"call"}, args...)
 	}
 
-	cmdArgs := []string{"ipc"}
-
-	switch pid, ok := getFirstDMSPID(); {
-	case ok:
-		cmdArgs = append(cmdArgs, "--pid", strconv.Itoa(pid))
-	default:
-		if err := findConfig(nil, nil); err != nil {
-			log.Fatalf("Error finding config: %v", err)
-		}
-		// ! TODO - remove check when QS 0.3 is released
-		if qsHasAnyDisplay() {
-			cmdArgs = append(cmdArgs, "--any-display")
-		}
-		cmdArgs = append(cmdArgs, "-p", configPath)
+	baseArgs, err := buildQsIPCBaseArgs()
+	if err != nil {
+		log.Fatalf("Error finding config: %v", err)
 	}
-
-	cmdArgs = append(cmdArgs, args...)
+	cmdArgs := append(baseArgs, args...)
 	cmd := exec.Command("qs", cmdArgs...)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
@@ -724,19 +730,20 @@ func runShellIPCCommand(args []string) {
 }
 
 func printIPCHelp() {
-	fmt.Println("Usage: dms ipc <target> <function> [args...]")
+	fmt.Println("Usage: dms ipc call <target> <function> [args...]")
 	fmt.Println()
 
-	cmdArgs := []string{"ipc"}
-	if qsHasAnyDisplay() {
-		cmdArgs = append(cmdArgs, "--any-display")
+	baseArgs, err := buildQsIPCBaseArgs()
+	if err != nil {
+		printIPCHelpFailure(err)
+		return
 	}
-	cmdArgs = append(cmdArgs, "-p", configPath, "show")
+	cmdArgs := append(baseArgs, "show")
 	cmd := exec.Command("qs", cmdArgs...)
 
 	output, err := cmd.Output()
 	if err != nil {
-		fmt.Println("Could not retrieve available IPC targets (is DMS running?)")
+		printIPCHelpFailure(err)
 		return
 	}
 
@@ -763,6 +770,16 @@ func printIPCHelp() {
 		slices.Sort(funcNames)
 		fmt.Printf("  %-16s %s\n", targetName, strings.Join(funcNames, ", "))
 	}
+}
+
+func printIPCHelpFailure(err error) {
+	fmt.Println("Could not retrieve IPC targets.")
+	if err != nil {
+		fmt.Printf("  %v\n", err)
+	}
+	fmt.Println()
+	fmt.Println("  Full docs:  https://danklinux.com/docs/dankmaterialshell/keybinds-ipc")
+	fmt.Println("  Try:        dms ipc call <target> <function>")
 }
 
 // ensureFontCache rebuilds the fontconfig cache if user-configured fonts are missing while skipping defaults

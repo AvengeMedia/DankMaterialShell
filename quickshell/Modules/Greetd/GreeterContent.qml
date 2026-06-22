@@ -794,6 +794,11 @@ Item {
         }
     }
 
+    Rectangle {
+        anchors.fill: parent
+        color: GreetdSettings.effectiveWallpaperBackgroundColor
+    }
+
     DankBackdrop {
         anchors.fill: parent
         screenName: root.screenName

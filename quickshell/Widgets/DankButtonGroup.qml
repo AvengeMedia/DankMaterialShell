@@ -13,11 +13,12 @@ Row {
     property var initialSelection: []
     property var currentSelection: initialSelection
     property bool checkEnabled: true
-    property int buttonHeight: 40
-    property int minButtonWidth: 64
-    property int buttonPadding: Theme.spacingL
-    property int checkIconSize: Theme.iconSizeSmall
-    property int textSize: Theme.fontSizeMedium
+    property string size: "medium"
+    property int buttonHeight: size === "small" ? 32 : 40
+    property int minButtonWidth: size === "small" ? 56 : 64
+    property int buttonPadding: size === "small" ? Theme.spacingM : Theme.spacingL
+    property int checkIconSize: size === "small" ? Theme.iconSizeSmall - 2 : Theme.iconSizeSmall
+    property int textSize: size === "small" ? Theme.fontSizeSmall : Theme.fontSizeMedium
     property bool userInteracted: false
 
     signal selectionChanged(int index, bool selected)

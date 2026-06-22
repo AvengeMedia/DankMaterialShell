@@ -13,12 +13,11 @@ BasePill {
     signal toggleLayoutPopup
 
     // mango shares dwl's tag/layout model; route to the right service.
-    readonly property bool isDwlLike: CompositorService.isDwl || CompositorService.isMango
-    readonly property var dwlSvc: CompositorService.isMango ? MangoService : DwlService
+    readonly property bool isMango: CompositorService.isMango
 
-    visible: layout.isDwlLike && layout.dwlSvc.available
+    visible: layout.isMango && MangoService.available
 
-    property var outputState: parentScreen ? layout.dwlSvc.getOutputState(parentScreen.name) : null
+    property var outputState: parentScreen ? MangoService.getOutputState(parentScreen.name) : null
     property string currentLayoutSymbol: outputState?.layoutSymbol || ""
     property int currentLayoutIndex: outputState?.layout || 0
 
@@ -41,9 +40,9 @@ BasePill {
     }
 
     Connections {
-        target: layout.dwlSvc
+        target: MangoService
         function onStateChanged() {
-            outputState = parentScreen ? layout.dwlSvc.getOutputState(parentScreen.name) : null;
+            outputState = parentScreen ? MangoService.getOutputState(parentScreen.name) : null;
         }
     }
 
@@ -101,13 +100,13 @@ BasePill {
     }
 
     onRightClicked: {
-        if (!parentScreen || !layout.dwlSvc.available || layout.dwlSvc.layouts.length === 0) {
+        if (!parentScreen || !MangoService.available || MangoService.layouts.length === 0) {
             return;
         }
 
         const currentIndex = layout.currentLayoutIndex;
-        const nextIndex = (currentIndex + 1) % layout.dwlSvc.layouts.length;
+        const nextIndex = (currentIndex + 1) % MangoService.layouts.length;
 
-        layout.dwlSvc.setLayout(parentScreen.name, nextIndex);
+        MangoService.setLayout(parentScreen.name, nextIndex);
     }
 }

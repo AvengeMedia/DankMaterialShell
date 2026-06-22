@@ -32,8 +32,19 @@ BasePill {
     }
 
     readonly property var notepadInstance: resolveNotepadInstance()
-    readonly property bool isActive: notepadInstance?.isVisible ?? false
+    readonly property bool popoutDefault: SettingsData.notepadDefaultMode === "popout"
+    readonly property bool isActive: popoutDefault ? (PopoutService.notepadPopout?.visible ?? false) : (notepadInstance?.isVisible ?? false)
     property bool isAutoHideBar: false
+
+    function showActiveSurface() {
+        if (root.popoutDefault) {
+            PopoutService.openNotepadPopout();
+            return;
+        }
+        const instance = prepareNotepadInstance(root.notepadInstance);
+        if (instance && typeof instance.show === "function")
+            instance.show();
+    }
 
     function prepareNotepadInstance(instance) {
         if (instance)
@@ -75,20 +86,14 @@ BasePill {
     function openTabByIndex(tabIndex) {
         if (tabIndex < 0)
             return;
-        const instance = prepareNotepadInstance(root.notepadInstance);
-        if (instance && typeof instance.show === "function") {
-            instance.show();
-        }
+        showActiveSurface();
         Qt.callLater(() => {
             NotepadStorageService.switchToTab(tabIndex);
         });
     }
 
     function openNewNote() {
-        const instance = prepareNotepadInstance(root.notepadInstance);
-        if (instance && typeof instance.show === "function") {
-            instance.show();
-        }
+        showActiveSurface();
         Qt.callLater(() => {
             NotepadStorageService.createNewTab();
         });
@@ -145,6 +150,10 @@ BasePill {
         onClicked: function (mouse) {
             if (mouse.button === Qt.RightButton) {
                 openContextMenu();
+                return;
+            }
+            if (root.popoutDefault) {
+                PopoutService.toggleNotepadPopout();
                 return;
             }
             const inst = prepareNotepadInstance(root.notepadInstance);

@@ -33,11 +33,31 @@ FloatingWindow {
     }
 
     readonly property var sortChipOptions: [
-        { id: "installed", label: I18n.tr("Installed", "plugin browser filter chip"), toggle: true },
-        { id: "default", label: I18n.tr("Default", "plugin browser sort option"), toggle: false },
-        { id: "name", label: I18n.tr("Name", "plugin browser sort option"), toggle: false },
-        { id: "author", label: I18n.tr("Contributor", "plugin browser sort option"), toggle: false },
-        { id: "category", label: I18n.tr("Category", "plugin browser sort option"), toggle: false }
+        {
+            id: "installed",
+            label: I18n.tr("Installed", "plugin browser filter chip"),
+            toggle: true
+        },
+        {
+            id: "default",
+            label: I18n.tr("Default", "plugin browser sort option"),
+            toggle: false
+        },
+        {
+            id: "name",
+            label: I18n.tr("Name", "plugin browser sort option"),
+            toggle: false
+        },
+        {
+            id: "author",
+            label: I18n.tr("Contributor", "plugin browser sort option"),
+            toggle: false
+        },
+        {
+            id: "category",
+            label: I18n.tr("Category", "plugin browser sort option"),
+            toggle: false
+        }
     ]
 
     function normalizedSortMode(mode) {
@@ -107,11 +127,13 @@ FloatingWindow {
             counts[cat] = (counts[cat] || 0) + 1;
         }
         var keys = Object.keys(counts).sort();
-        var options = [{
-            key: "all",
-            label: I18n.tr("All", "plugin browser category filter"),
-            count: plugins.length
-        }];
+        var options = [
+            {
+                key: "all",
+                label: I18n.tr("All", "plugin browser category filter"),
+                count: plugins.length
+            }
+        ];
         for (var j = 0; j < keys.length; j++) {
             var key = keys[j];
             options.push({
@@ -726,32 +748,9 @@ FloatingWindow {
                     anchors.fill: parent
                     visible: root.isLoading
 
-                    Column {
+                    DankSpinner {
                         anchors.centerIn: parent
-                        spacing: Theme.spacingM
-
-                        DankIcon {
-                            name: "sync"
-                            size: 48
-                            color: Theme.primary
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            smoothTransform: root.isLoading
-
-                            RotationAnimator on rotation {
-                                from: 0
-                                to: -360
-                                duration: 1000
-                                loops: Animation.Infinite
-                                running: root.isLoading
-                            }
-                        }
-
-                        StyledText {
-                            text: I18n.tr("Loading...", "loading indicator")
-                            font.pixelSize: Theme.fontSizeMedium
-                            color: Theme.surfaceVariantText
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
+                        running: root.isLoading
                     }
                 }
 

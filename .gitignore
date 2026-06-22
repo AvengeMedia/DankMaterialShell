@@ -115,3 +115,11 @@ core.*
 .direnv/
 quickshell/dms-plugins
 __pycache__
+
+.vscode/
+
+# Void (xbps) build artifacts
+*.xbps
+distro/void/temp/
+distro/void/hostdir/
+distro/void/masterdir*/

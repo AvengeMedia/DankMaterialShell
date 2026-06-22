@@ -25,20 +25,22 @@ Item {
     }
 
     property bool hasMultipleBars: SettingsData.barConfigs.length > 1
+    property int pluginCatalogRevision: 0
 
     DankTooltipV2 {
         id: sharedTooltip
     }
 
     property var baseWidgetDefinitions: {
+        pluginCatalogRevision;
         var coreWidgets = [
             {
                 "id": "layout",
                 "text": I18n.tr("Layout"),
-                "description": I18n.tr("Display and switch DWL layouts"),
+                "description": I18n.tr("Display and switch MangoWC layouts"),
                 "icon": "view_quilt",
-                "enabled": (CompositorService.isDwl && DwlService.dwlAvailable) || (CompositorService.isMango && MangoService.available),
-                "warning": CompositorService.isMango ? (!MangoService.available ? I18n.tr("DWL service not available") : undefined) : (!CompositorService.isDwl ? I18n.tr("Requires DWL compositor") : (!DwlService.dwlAvailable ? I18n.tr("DWL service not available") : undefined))
+                "enabled": CompositorService.isMango && MangoService.available,
+                "warning": !CompositorService.isMango ? I18n.tr("Requires MangoWC compositor") : (!MangoService.available ? I18n.tr("Mango service not available") : undefined)
             },
             {
                 "id": "launcherButton",
@@ -274,6 +276,30 @@ Item {
         return coreWidgets;
     }
 
+    Connections {
+        target: PluginService
+
+        function onPluginDataChanged() {
+            widgetsTab.pluginCatalogRevision++;
+        }
+
+        function onPluginListUpdated() {
+            widgetsTab.pluginCatalogRevision++;
+        }
+
+        function onPluginLoaded() {
+            widgetsTab.pluginCatalogRevision++;
+        }
+
+        function onPluginStateChanged() {
+            widgetsTab.pluginCatalogRevision++;
+        }
+
+        function onPluginUnloaded() {
+            widgetsTab.pluginCatalogRevision++;
+        }
+    }
+
     property var defaultLeftWidgets: [
         {
             "id": "launcherButton",
@@ -396,6 +422,12 @@ Item {
             widgetObj.showDoNotDisturbIcon = SettingsData.controlCenterShowDoNotDisturbIcon;
             widgetObj.controlCenterGroupOrder = ["network", "vpn", "bluetooth", "audio", "microphone", "brightness", "battery", "printer", "screenSharing", "idleInhibitor", "doNotDisturb"];
         }
+        if (widgetId === "battery") {
+            widgetObj.showBatteryPercent = SettingsData.showBatteryPercent;
+            widgetObj.showBatteryPercentOnlyOnBattery = SettingsData.showBatteryPercentOnlyOnBattery;
+            widgetObj.showBatteryTime = SettingsData.showBatteryTime;
+            widgetObj.showBatteryTimeOnlyOnBattery = SettingsData.showBatteryTimeOnlyOnBattery;
+        }
         if (widgetId === "runningApps") {
             widgetObj.runningAppsCompactMode = SettingsData.runningAppsCompactMode;
             widgetObj.runningAppsGroupByApp = SettingsData.runningAppsGroupByApp;
@@ -434,7 +466,7 @@ Item {
             "id": widget.id,
             "enabled": widget.enabled
         };
-        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "diskUsageMode", "minimumWidth", "showSwap", "showInGb", "mediaSize", "clockCompactMode", "focusedWindowSize", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "keyboardLayoutNameShowIcon", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showPrinterIcon", "showScreenSharingIcon", "showIdleInhibitorIcon", "showDoNotDisturbIcon", "controlCenterGroupOrder", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge", "trayUseInlineExpansion", "hideWhenIdle"];
+        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "diskUsageMode", "minimumWidth", "showSwap", "showInGb", "mediaSize", "clockCompactMode", "focusedWindowSize", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "keyboardLayoutNameShowIcon", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showBatteryPercent", "showBatteryPercentOnlyOnBattery", "showBatteryTime", "showBatteryTimeOnlyOnBattery", "showPrinterIcon", "showScreenSharingIcon", "showIdleInhibitorIcon", "showDoNotDisturbIcon", "controlCenterGroupOrder", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge", "trayUseInlineExpansion", "trayPopupSingleLine", "trayAutoOverflow", "trayMaxVisibleItems", "hideWhenIdle"];
         for (var i = 0; i < keys.length; i++) {
             if (widget[keys[i]] !== undefined)
                 result[keys[i]] = widget[keys[i]];
@@ -733,6 +765,14 @@ Item {
                     item.showMicPercent = widget.showMicPercent;
                 if (widget.showBatteryIcon !== undefined)
                     item.showBatteryIcon = widget.showBatteryIcon;
+                if (widget.showBatteryPercent !== undefined)
+                    item.showBatteryPercent = widget.showBatteryPercent;
+                if (widget.showBatteryPercentOnlyOnBattery !== undefined)
+                    item.showBatteryPercentOnlyOnBattery = widget.showBatteryPercentOnlyOnBattery;
+                if (widget.showBatteryTime !== undefined)
+                    item.showBatteryTime = widget.showBatteryTime;
+                if (widget.showBatteryTimeOnlyOnBattery !== undefined)
+                    item.showBatteryTimeOnlyOnBattery = widget.showBatteryTimeOnlyOnBattery;
                 if (widget.showPrinterIcon !== undefined)
                     item.showPrinterIcon = widget.showPrinterIcon;
                 if (widget.showScreenSharingIcon !== undefined)
@@ -777,6 +817,12 @@ Item {
                     item.barShowOverflowBadge = widget.barShowOverflowBadge;
                 if (widget.trayUseInlineExpansion !== undefined)
                     item.trayUseInlineExpansion = widget.trayUseInlineExpansion;
+                if (widget.trayPopupSingleLine !== undefined)
+                    item.trayPopupSingleLine = widget.trayPopupSingleLine;
+                if (widget.trayAutoOverflow !== undefined)
+                    item.trayAutoOverflow = widget.trayAutoOverflow;
+                if (widget.trayMaxVisibleItems !== undefined)
+                    item.trayMaxVisibleItems = widget.trayMaxVisibleItems;
                 if (widget.hideWhenIdle !== undefined)
                     item.hideWhenIdle = widget.hideWhenIdle;
             }

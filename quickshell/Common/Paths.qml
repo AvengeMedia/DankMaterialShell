@@ -74,6 +74,15 @@ Singleton {
         return appId;
     }
 
+    function themedIconPath(name: string): string {
+        if (!name)
+            return "";
+        const themed = (typeof IconThemeService !== "undefined") ? IconThemeService.resolve(name) : "";
+        if (themed)
+            return themed;
+        return Quickshell.iconPath(name, true);
+    }
+
     function resolveIconPath(iconName: string): string {
         if (!iconName)
             return "";
@@ -83,23 +92,24 @@ Singleton {
                 return toFileUrl(expandTilde(moddedId));
             if (moddedId.startsWith("file://"))
                 return moddedId;
-            return Quickshell.iconPath(moddedId, true);
+            return themedIconPath(moddedId);
         }
-        return Quickshell.iconPath(iconName, true) || DesktopService.resolveIconPath(iconName);
+        return themedIconPath(iconName) || DesktopService.resolveIconPath(iconName);
     }
 
     function resolveIconUrl(iconName: string): string {
         if (!iconName)
             return "";
         const moddedId = moddedAppId(iconName);
-        if (moddedId !== iconName) {
-            if (moddedId.startsWith("~") || moddedId.startsWith("/"))
-                return toFileUrl(expandTilde(moddedId));
-            if (moddedId.startsWith("file://"))
-                return moddedId;
-            return "image://icon/" + moddedId;
-        }
-        return "image://icon/" + iconName;
+        const target = (moddedId !== iconName) ? moddedId : iconName;
+        if (target.startsWith("~") || target.startsWith("/"))
+            return toFileUrl(expandTilde(target));
+        if (target.startsWith("file://"))
+            return target;
+        const themed = (typeof IconThemeService !== "undefined") ? IconThemeService.resolve(target) : "";
+        if (themed)
+            return themed;
+        return "image://icon/" + target;
     }
 
     function getAppIcon(appId: string, desktopEntry: var): string {
@@ -113,10 +123,10 @@ Singleton {
             return resolveIconPath(appId);
 
         if (desktopEntry && desktopEntry.icon) {
-            return Quickshell.iconPath(desktopEntry.icon, true);
+            return themedIconPath(desktopEntry.icon);
         }
 
-        const icon = Quickshell.iconPath(appId, true);
+        const icon = themedIconPath(appId);
         if (icon && icon !== "")
             return icon;
 

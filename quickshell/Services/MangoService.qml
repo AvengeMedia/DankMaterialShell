@@ -10,9 +10,8 @@ import qs.Services
 
 // Native MangoWM IPC client. mango advertises a JSON-over-Unix-socket protocol
 // via MANGO_INSTANCE_SIGNATURE; each connection issues one `watch <target>` verb
-// and gets a full JSON snapshot followed by newline-delimited updates. Replaces
-// the legacy dwl-ipc-v2 path (DwlService) for mango, exposing a
-// DwlService-compatible tag API plus a per-client window list.
+// and gets a full JSON snapshot followed by newline-delimited updates. Exposes
+// a dwl-style tag API plus a per-client window list.
 Singleton {
     id: root
     readonly property var log: Log.scoped("MangoService")
@@ -219,7 +218,7 @@ Singleton {
         root.windows = data.clients;
     }
 
-    // ── DwlService-compatible tag API ──────────────────────────────────────
+    // ── Tag API (dwl-style tag model) ──────────────────────────────────────
 
     function getOutputState(outputName) {
         return (outputs && outputs[outputName]) ? outputs[outputName] : null;

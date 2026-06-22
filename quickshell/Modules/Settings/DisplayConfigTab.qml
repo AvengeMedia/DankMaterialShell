@@ -500,7 +500,7 @@ Item {
 
                         Column {
                             id: displayFormatColumn
-                            visible: !CompositorService.isDwl && !CompositorService.isMango
+                            visible: !CompositorService.isMango
                             spacing: Theme.spacingXS
                             anchors.verticalCenter: parent.verticalCenter
 

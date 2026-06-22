@@ -513,7 +513,7 @@ BasePill {
                                 case "vpn":
                                     return "vpn_lock";
                                 case "bluetooth":
-                                    return "bluetooth";
+                                    return BluetoothService.connected ? "bluetooth_connected" : "bluetooth";
                                 case "battery":
                                     return Theme.getBatteryIcon(BatteryService.batteryLevel, BatteryService.isCharging, BatteryService.batteryAvailable);
                                 case "printer":
@@ -698,7 +698,7 @@ BasePill {
                                 case "vpn":
                                     return "vpn_lock";
                                 case "bluetooth":
-                                    return "bluetooth";
+                                    return BluetoothService.connected ? "bluetooth_connected" : "bluetooth";
                                 case "battery":
                                     return Theme.getBatteryIcon(BatteryService.batteryLevel, BatteryService.isCharging, BatteryService.batteryAvailable);
                                 case "printer":

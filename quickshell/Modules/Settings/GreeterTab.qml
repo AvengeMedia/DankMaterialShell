@@ -151,7 +151,7 @@ Item {
 
     function runGreeterInstallAction() {
         root.greeterPendingAction = !root.greeterInstalled ? "install" : !root.greeterEnabled ? "activate" : "uninstall";
-        greeterStatusText = I18n.tr("Opening terminal: ") + root.greeterActionLabel + "…";
+        greeterStatusText = I18n.tr("Opening terminal: ") + root.greeterActionLabel + "...";
         greeterInstallActionRunning = true;
         greeterInstallActionProcess.running = true;
     }
@@ -188,7 +188,7 @@ Item {
         greeterSudoProbeStderr = "";
         greeterTerminalFallbackStderr = "";
         greeterTerminalFallbackFromPrecheck = false;
-        greeterStatusText = I18n.tr("Checking whether sudo authentication is needed…");
+        greeterStatusText = I18n.tr("Checking whether sudo authentication is needed...");
         greeterSyncRunning = true;
         greeterSudoProbeProcess.running = true;
     }
@@ -327,7 +327,7 @@ Item {
         onExited: exitCode => {
             const err = (root.greeterSudoProbeStderr || "").trim();
             if (exitCode === 0) {
-                root.greeterStatusText = I18n.tr("Running greeter sync…");
+                root.greeterStatusText = I18n.tr("Running greeter sync...");
                 greeterSyncProcess.running = true;
                 return;
             }
@@ -468,7 +468,7 @@ Item {
                         id: statusTextArea
                         anchors.fill: parent
                         anchors.margins: Theme.spacingM
-                        text: root.greeterStatusRunning ? I18n.tr("Checking…", "greeter status loading") : (root.greeterStatusText || I18n.tr("Click Refresh to check status.", "greeter status placeholder"))
+                        text: root.greeterStatusRunning ? I18n.tr("Checking...", "greeter status loading") : (root.greeterStatusText || I18n.tr("Click Refresh to check status.", "greeter status placeholder"))
                         font.pixelSize: Theme.fontSizeSmall
                         font.family: "monospace"
                         color: root.greeterStatusRunning ? Theme.surfaceVariantText : Theme.surfaceText

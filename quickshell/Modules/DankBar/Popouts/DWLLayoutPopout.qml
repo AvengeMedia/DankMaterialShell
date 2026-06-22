@@ -10,9 +10,7 @@ DankPopout {
 
     property var triggerScreen: null
 
-    // mango shares dwl's layout model; route to the right service.
-    readonly property bool isDwlLike: CompositorService.isDwl || CompositorService.isMango
-    readonly property var dwlSvc: CompositorService.isMango ? MangoService : DwlService
+    readonly property bool isMango: CompositorService.isMango
 
     function setTriggerPosition(x, y, width, section, screen, barPosition, barThickness, barSpacing, barConfig) {
         triggerX = x;
@@ -37,8 +35,8 @@ DankPopout {
     onScreenChanged: updateOutputState()
 
     function updateOutputState() {
-        if (screen && root.dwlSvc.available) {
-            outputState = root.dwlSvc.getOutputState(screen.name);
+        if (screen && MangoService.available) {
+            outputState = MangoService.getOutputState(screen.name);
         } else {
             outputState = null;
         }
@@ -84,7 +82,7 @@ DankPopout {
     }
 
     Connections {
-        target: DwlService
+        target: MangoService
         function onStateChanged() {
             updateOutputState();
         }
@@ -219,7 +217,7 @@ DankPopout {
                     spacing: Theme.spacingS
 
                     Repeater {
-                        model: root.dwlSvc.layouts
+                        model: MangoService.layouts
 
                         delegate: Rectangle {
                             required property string modelData
@@ -273,11 +271,11 @@ DankPopout {
                                     if (!root.triggerScreen) {
                                         return;
                                     }
-                                    if (!root.dwlSvc.available) {
+                                    if (!MangoService.available) {
                                         return;
                                     }
 
-                                    root.dwlSvc.setLayout(root.triggerScreen.name, index);
+                                    MangoService.setLayout(root.triggerScreen.name, index);
                                     root.close();
                                 }
                             }

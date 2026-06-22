@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	mock_gonetworkmanager "github.com/AvengeMedia/DankMaterialShell/core/internal/mocks/github.com/Wifx/gonetworkmanager/v2"
+	"github.com/Wifx/gonetworkmanager/v2"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -174,6 +175,54 @@ func TestNetworkManagerBackend_UpdateWiFiNetworks_NoDevice(t *testing.T) {
 	_, err = backend.updateWiFiNetworks()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "no WiFi device available")
+}
+
+func TestNetworkManagerBackend_UpdateSavedWiFiNetworksPreservesVisibleSavedNetworks(t *testing.T) {
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+	mockSettings := mock_gonetworkmanager.NewMockSettings(t)
+	mockConn := mock_gonetworkmanager.NewMockConnection(t)
+
+	backend, err := NewNetworkManagerBackend(mockNM)
+	assert.NoError(t, err)
+	backend.settings = mockSettings
+
+	backend.stateMutex.Lock()
+	backend.state.WiFiNetworks = []WiFiNetwork{
+		{
+			SSID:   "Home",
+			Signal: 76,
+		},
+	}
+	backend.stateMutex.Unlock()
+
+	settings := gonetworkmanager.ConnectionSettings{
+		"connection": {
+			"type":        "802-11-wireless",
+			"autoconnect": true,
+		},
+		"802-11-wireless": {
+			"ssid": []byte("Home"),
+		},
+		"802-11-wireless-security": {},
+	}
+	mockSettings.EXPECT().ListConnections().Return([]gonetworkmanager.Connection{mockConn}, nil)
+	mockConn.EXPECT().GetSettings().Return(settings, nil)
+
+	err = backend.updateSavedWiFiNetworks()
+	assert.NoError(t, err)
+
+	backend.stateMutex.RLock()
+	savedNetworks := append([]WiFiNetwork(nil), backend.state.SavedWiFiNetworks...)
+	wifiNetworks := append([]WiFiNetwork(nil), backend.state.WiFiNetworks...)
+	backend.stateMutex.RUnlock()
+
+	assert.Len(t, wifiNetworks, 1)
+	assert.True(t, wifiNetworks[0].Saved)
+	assert.Len(t, savedNetworks, 1)
+	assert.Equal(t, "Home", savedNetworks[0].SSID)
+	assert.True(t, savedNetworks[0].Saved)
+	assert.False(t, savedNetworks[0].OutOfRange)
+	assert.Equal(t, uint8(76), savedNetworks[0].Signal)
 }
 
 func TestNetworkManagerBackend_FindConnection_NoSettings(t *testing.T) {

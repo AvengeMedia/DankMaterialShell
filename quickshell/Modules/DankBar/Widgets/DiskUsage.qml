@@ -276,15 +276,12 @@ BasePill {
             if (root.isVerticalOrientation && root.selectedMount) {
                 tooltipLoader.active = true;
                 if (tooltipLoader.item) {
-                    const globalPos = mapToGlobal(width / 2, height / 2);
+                    const localPos = mapToItem(null, width / 2, height / 2);
                     const currentScreen = root.parentScreen || Screen;
-                    const screenX = currentScreen ? currentScreen.x : 0;
-                    const screenY = currentScreen ? currentScreen.y : 0;
-                    const relativeY = globalPos.y - screenY;
-                    const adjustedY = relativeY + root.minTooltipY;
+                    const adjustedY = localPos.y + root.minTooltipY;
                     const tooltipX = root.axis?.edge === "left" ? (root.barThickness + root.barSpacing + Theme.spacingXS) : (currentScreen.width - root.barThickness - root.barSpacing - Theme.spacingXS);
                     const isLeft = root.axis?.edge === "left";
-                    tooltipLoader.item.show(root.selectedMount.mount, screenX + tooltipX, adjustedY, currentScreen, isLeft, !isLeft);
+                    tooltipLoader.item.show(root.selectedMount.mount, tooltipX, adjustedY, currentScreen, isLeft, !isLeft);
                 }
             }
         }

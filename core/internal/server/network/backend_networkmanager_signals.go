@@ -5,6 +5,12 @@ import (
 	"github.com/godbus/dbus/v5"
 )
 
+const (
+	dbusNMSettingsPath                = "/org/freedesktop/NetworkManager/Settings"
+	dbusNMSettingsInterface           = "org.freedesktop.NetworkManager.Settings"
+	dbusNMSettingsConnectionInterface = "org.freedesktop.NetworkManager.Settings.Connection"
+)
+
 func (b *NetworkManagerBackend) startSignalPump() error {
 	conn, err := dbus.ConnectSystemBus()
 	if err != nil {
@@ -27,8 +33,8 @@ func (b *NetworkManagerBackend) startSignalPump() error {
 	}
 
 	if err := conn.AddMatchSignal(
-		dbus.WithMatchObjectPath(dbus.ObjectPath("/org/freedesktop/NetworkManager/Settings")),
-		dbus.WithMatchInterface("org.freedesktop.NetworkManager.Settings"),
+		dbus.WithMatchObjectPath(dbus.ObjectPath(dbusNMSettingsPath)),
+		dbus.WithMatchInterface(dbusNMSettingsInterface),
 		dbus.WithMatchMember("NewConnection"),
 	); err != nil {
 		conn.RemoveMatchSignal(
@@ -42,8 +48,8 @@ func (b *NetworkManagerBackend) startSignalPump() error {
 	}
 
 	if err := conn.AddMatchSignal(
-		dbus.WithMatchObjectPath(dbus.ObjectPath("/org/freedesktop/NetworkManager/Settings")),
-		dbus.WithMatchInterface("org.freedesktop.NetworkManager.Settings"),
+		dbus.WithMatchObjectPath(dbus.ObjectPath(dbusNMSettingsPath)),
+		dbus.WithMatchInterface(dbusNMSettingsInterface),
 		dbus.WithMatchMember("ConnectionRemoved"),
 	); err != nil {
 		conn.RemoveMatchSignal(
@@ -52,9 +58,34 @@ func (b *NetworkManagerBackend) startSignalPump() error {
 			dbus.WithMatchMember("PropertiesChanged"),
 		)
 		conn.RemoveMatchSignal(
-			dbus.WithMatchObjectPath(dbus.ObjectPath("/org/freedesktop/NetworkManager/Settings")),
-			dbus.WithMatchInterface("org.freedesktop.NetworkManager.Settings"),
+			dbus.WithMatchObjectPath(dbus.ObjectPath(dbusNMSettingsPath)),
+			dbus.WithMatchInterface(dbusNMSettingsInterface),
 			dbus.WithMatchMember("NewConnection"),
+		)
+		conn.RemoveSignal(signals)
+		conn.Close()
+		return err
+	}
+
+	if err := conn.AddMatchSignal(
+		dbus.WithMatchPathNamespace(dbus.ObjectPath(dbusNMSettingsPath)),
+		dbus.WithMatchInterface(dbusNMSettingsConnectionInterface),
+		dbus.WithMatchMember("Updated"),
+	); err != nil {
+		conn.RemoveMatchSignal(
+			dbus.WithMatchObjectPath(dbus.ObjectPath(dbusNMPath)),
+			dbus.WithMatchInterface(dbusPropsInterface),
+			dbus.WithMatchMember("PropertiesChanged"),
+		)
+		conn.RemoveMatchSignal(
+			dbus.WithMatchObjectPath(dbus.ObjectPath(dbusNMSettingsPath)),
+			dbus.WithMatchInterface(dbusNMSettingsInterface),
+			dbus.WithMatchMember("NewConnection"),
+		)
+		conn.RemoveMatchSignal(
+			dbus.WithMatchObjectPath(dbus.ObjectPath(dbusNMSettingsPath)),
+			dbus.WithMatchInterface(dbusNMSettingsInterface),
+			dbus.WithMatchMember("ConnectionRemoved"),
 		)
 		conn.RemoveSignal(signals)
 		conn.Close()
@@ -137,6 +168,32 @@ func (b *NetworkManagerBackend) stopSignalPump() {
 		dbus.WithMatchMember("PropertiesChanged"),
 	)
 
+	b.dbusConn.RemoveMatchSignal(
+		dbus.WithMatchObjectPath(dbus.ObjectPath(dbusNMSettingsPath)),
+		dbus.WithMatchInterface(dbusNMSettingsInterface),
+		dbus.WithMatchMember("NewConnection"),
+	)
+	b.dbusConn.RemoveMatchSignal(
+		dbus.WithMatchObjectPath(dbus.ObjectPath(dbusNMSettingsPath)),
+		dbus.WithMatchInterface(dbusNMSettingsInterface),
+		dbus.WithMatchMember("ConnectionRemoved"),
+	)
+	b.dbusConn.RemoveMatchSignal(
+		dbus.WithMatchPathNamespace(dbus.ObjectPath(dbusNMSettingsPath)),
+		dbus.WithMatchInterface(dbusNMSettingsConnectionInterface),
+		dbus.WithMatchMember("Updated"),
+	)
+	b.dbusConn.RemoveMatchSignal(
+		dbus.WithMatchObjectPath(dbus.ObjectPath(dbusNMPath)),
+		dbus.WithMatchInterface(dbusNMInterface),
+		dbus.WithMatchMember("DeviceAdded"),
+	)
+	b.dbusConn.RemoveMatchSignal(
+		dbus.WithMatchObjectPath(dbus.ObjectPath(dbusNMPath)),
+		dbus.WithMatchInterface(dbusNMInterface),
+		dbus.WithMatchMember("DeviceRemoved"),
+	)
+
 	for _, info := range b.wifiDevices {
 		b.dbusConn.RemoveMatchSignal(
 			dbus.WithMatchObjectPath(dbus.ObjectPath(info.device.GetPath())),
@@ -164,9 +221,13 @@ func (b *NetworkManagerBackend) stopSignalPump() {
 }
 
 func (b *NetworkManagerBackend) handleDBusSignal(sig *dbus.Signal) {
-	if sig.Name == "org.freedesktop.NetworkManager.Settings.NewConnection" ||
-		sig.Name == "org.freedesktop.NetworkManager.Settings.ConnectionRemoved" {
+	if sig.Name == dbusNMSettingsInterface+".NewConnection" ||
+		sig.Name == dbusNMSettingsInterface+".ConnectionRemoved" ||
+		sig.Name == dbusNMSettingsConnectionInterface+".Updated" {
 		b.ListVPNProfiles()
+		if err := b.updateSavedWiFiNetworks(); err != nil {
+			b.updateWiFiNetworks()
+		}
 		if b.onStateChange != nil {
 			b.onStateChange()
 		}

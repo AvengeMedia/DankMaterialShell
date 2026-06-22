@@ -49,7 +49,6 @@ Singleton {
     signal capabilitiesReceived
     signal credentialsRequest(var data)
     signal bluetoothPairingRequest(var data)
-    signal dwlStateUpdate(var data)
     signal brightnessStateUpdate(var data)
     signal brightnessDeviceUpdate(var device)
     signal wlrOutputStateUpdate(var data)
@@ -68,7 +67,7 @@ Singleton {
     property bool screensaverInhibited: false
     property var screensaverInhibitors: []
 
-    property var activeSubscriptions: ["network", "network.credentials", "loginctl", "freedesktop", "freedesktop.screensaver", "gamma", "theme.auto", "bluetooth", "bluetooth.pairing", "dwl", "brightness", "wlroutput", "evdev", "browser", "dbus", "clipboard", "location", "sysupdate"]
+    property var activeSubscriptions: ["network", "network.credentials", "loginctl", "freedesktop", "freedesktop.screensaver", "gamma", "theme.auto", "bluetooth", "bluetooth.pairing", "brightness", "wlroutput", "evdev", "browser", "dbus", "clipboard", "location", "sysupdate"]
 
     Component.onCompleted: {
         if (socketPath && socketPath.length > 0) {
@@ -286,7 +285,7 @@ Singleton {
 
     function removeSubscription(service) {
         if (activeSubscriptions.includes("all")) {
-            const allServices = ["network", "loginctl", "freedesktop", "gamma", "bluetooth", "dwl", "brightness", "browser", "location"];
+            const allServices = ["network", "loginctl", "freedesktop", "gamma", "bluetooth", "brightness", "browser", "location"];
             const filtered = allServices.filter(s => s !== service);
             subscribe(filtered);
         } else {
@@ -308,7 +307,7 @@ Singleton {
             excludeServices = [excludeServices];
         }
 
-        const allServices = ["network", "loginctl", "freedesktop", "gamma", "theme.auto", "bluetooth", "cups", "dwl", "brightness", "browser", "dbus", "location"];
+        const allServices = ["network", "loginctl", "freedesktop", "gamma", "theme.auto", "bluetooth", "cups", "brightness", "browser", "dbus", "location"];
         const filtered = allServices.filter(s => !excludeServices.includes(s));
         subscribe(filtered);
     }
@@ -354,8 +353,6 @@ Singleton {
             bluetoothPairingRequest(data);
         } else if (service === "cups") {
             cupsStateUpdate(data);
-        } else if (service === "dwl") {
-            dwlStateUpdate(data);
         } else if (service === "brightness") {
             brightnessStateUpdate(data);
         } else if (service === "brightness.update") {

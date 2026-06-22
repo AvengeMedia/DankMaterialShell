@@ -77,10 +77,15 @@ var killCmd = &cobra.Command{
 }
 
 var ipcCmd = &cobra.Command{
-	Use:   "ipc [target] [function] [args...]",
+	Use:   "ipc",
 	Short: "Send IPC commands to running DMS shell",
+	Long: `Send IPC commands to the running DMS shell.
+
+  dms ipc call <target> <function> [args...]   invoke a command
+  dms ipc list                                 list all targets and functions
+
+Full reference: https://danklinux.com/docs/dankmaterialshell/keybinds-ipc`,
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		_ = findConfig(cmd, args)
 		return getShellIPCCompletions(args, toComplete), cobra.ShellCompDirectiveNoFileComp
 	},
 	Run: func(cmd *cobra.Command, args []string) {
@@ -88,9 +93,17 @@ var ipcCmd = &cobra.Command{
 	},
 }
 
+var ipcListCmd = &cobra.Command{
+	Use:   "list",
+	Short: "List all IPC targets and functions",
+	Run: func(cmd *cobra.Command, args []string) {
+		printIPCHelp()
+	},
+}
+
 func init() {
+	ipcCmd.AddCommand(ipcListCmd)
 	ipcCmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {
-		_ = findConfig(cmd, args)
 		printIPCHelp()
 	})
 }

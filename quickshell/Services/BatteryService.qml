@@ -102,7 +102,81 @@ Singleton {
 
     // Is the system plugged in (Is not running on battery)
     readonly property bool isPluggedIn: !UPower.onBattery
-    readonly property bool isLowBattery: batteryAvailable && batteryLevel <= 20
+    readonly property bool isLowBattery: batteryAvailable && batteryLevel <= SettingsData.batteryLowThreshold
+    readonly property bool isCriticalBattery: batteryAvailable && batteryLevel <= SettingsData.batteryCriticalThreshold
+
+    property bool _hasNotifiedLowBattery: false
+    property bool _hasNotifiedCriticalBattery: false
+    property bool _hasNotifiedChargeLimit: false
+
+    function sendAlert(title, message, isWarning, category) {
+        if (SettingsData.batteryNotificationType === 1) {
+            Quickshell.execDetached(["notify-send", "-u", isWarning ? "critical" : "normal", "-a", "DMS", "-i", isWarning ? "battery-caution" : "battery-charging", title, message]);
+        } else {
+            if (isWarning) {
+                ToastService.showWarning(title, message, "", category);
+            } else {
+                ToastService.showInfo(title, message, "", category);
+            }
+        }
+    }
+
+    onBatteryLevelChanged: {
+        if (isCharging && batteryLevel >= SettingsData.batteryChargeLimit) {
+            if (!_hasNotifiedChargeLimit && SettingsData.batteryNotifyChargeLimit) {
+                _hasNotifiedChargeLimit = true;
+                sendAlert(I18n.tr("Charge Limit Reached"), I18n.tr("Battery has charged to your set limit of %1%").arg(SettingsData.batteryChargeLimit), false, "battery-charge-limit");
+            }
+        } else if (!isCharging || batteryLevel < SettingsData.batteryChargeLimit - 2) {
+            _hasNotifiedChargeLimit = false;
+        }
+
+        if (isCharging) {
+            _hasNotifiedLowBattery = false;
+            _hasNotifiedCriticalBattery = false;
+            return;
+        }
+
+        // Critical battery check (higher priority)
+        if (isCriticalBattery) {
+            if (!_hasNotifiedCriticalBattery && SettingsData.batteryNotifyCritical) {
+                _hasNotifiedCriticalBattery = true;
+                sendAlert(I18n.tr("Critical Battery"), I18n.tr("Battery is at %1% - Connect charger immediately!").arg(batteryLevel), true, "battery-critical");
+            }
+            return;
+        }
+
+        if (batteryLevel > SettingsData.batteryCriticalThreshold) {
+            _hasNotifiedCriticalBattery = false;
+        }
+
+        // Low battery check
+        if (isLowBattery) {
+            if (!_hasNotifiedLowBattery && SettingsData.batteryNotifyLow) {
+                _hasNotifiedLowBattery = true;
+                sendAlert(I18n.tr("Low Battery"), I18n.tr("Battery is at %1% - Consider charging soon").arg(batteryLevel), true, "battery-low");
+            }
+
+            if (SettingsData.batteryAutoPowerSaver && PowerProfileWatcher.available) {
+                if (PowerProfileWatcher.currentProfile !== PowerProfile.PowerSaver) {
+                    PowerProfileWatcher.applyProfile(PowerProfile.PowerSaver);
+                }
+            }
+        }
+
+        if (batteryLevel > SettingsData.batteryLowThreshold) {
+            _hasNotifiedLowBattery = false;
+        }
+    }
+
+    onIsChargingChanged: {
+        if (isCharging) {
+            _hasNotifiedLowBattery = false;
+            _hasNotifiedCriticalBattery = false;
+        } else {
+            _hasNotifiedChargeLimit = false;
+        }
+    }
 
     onIsPluggedInChanged: {
         if (suppressSound || !batteryAvailable) {

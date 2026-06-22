@@ -12,7 +12,15 @@ import (
 	"github.com/stretchr/testify/require"
 	"tailscale.com/ipn"
 	"tailscale.com/ipn/ipnstate"
+	"tailscale.com/tailcfg"
 )
+
+// blockingWatch is a watchFn that blocks until the context is cancelled, used
+// by tests that exercise direct manager calls rather than the watch loop.
+func blockingWatch(ctx context.Context, mask ipn.NotifyWatchOpt) (ipnBusWatcher, error) {
+	<-ctx.Done()
+	return nil, ctx.Err()
+}
 
 // mockWatcher yields canned Notify events, then returns err or blocks until Close/context cancel.
 type mockWatcher struct {
@@ -68,8 +76,10 @@ func (w *mockWatcher) Close() error {
 
 // mockClient implements tailscaleClient for testing.
 type mockClient struct {
-	watchFn  func(ctx context.Context, mask ipn.NotifyWatchOpt) (ipnBusWatcher, error)
-	statusFn func(ctx context.Context) (*ipnstate.Status, error)
+	watchFn     func(ctx context.Context, mask ipn.NotifyWatchOpt) (ipnBusWatcher, error)
+	statusFn    func(ctx context.Context) (*ipnstate.Status, error)
+	getPrefsFn  func(ctx context.Context) (*ipn.Prefs, error)
+	editPrefsFn func(ctx context.Context, mp *ipn.MaskedPrefs) (*ipn.Prefs, error)
 }
 
 func (c *mockClient) WatchIPNBus(ctx context.Context, mask ipn.NotifyWatchOpt) (ipnBusWatcher, error) {
@@ -78,6 +88,20 @@ func (c *mockClient) WatchIPNBus(ctx context.Context, mask ipn.NotifyWatchOpt) (
 
 func (c *mockClient) Status(ctx context.Context) (*ipnstate.Status, error) {
 	return c.statusFn(ctx)
+}
+
+func (c *mockClient) GetPrefs(ctx context.Context) (*ipn.Prefs, error) {
+	if c.getPrefsFn != nil {
+		return c.getPrefsFn(ctx)
+	}
+	return &ipn.Prefs{}, nil
+}
+
+func (c *mockClient) EditPrefs(ctx context.Context, mp *ipn.MaskedPrefs) (*ipn.Prefs, error) {
+	if c.editPrefsFn != nil {
+		return c.editPrefsFn(ctx, mp)
+	}
+	return &ipn.Prefs{}, nil
 }
 
 func runningStatus() *ipnstate.Status {
@@ -295,4 +319,79 @@ func TestManager_RefreshState(t *testing.T) {
 	state := m.GetState()
 	assert.True(t, state.Connected)
 	assert.Equal(t, "cachyos", state.Self.Hostname)
+}
+
+func TestManager_RefreshState_MergesPrefs(t *testing.T) {
+	client := &mockClient{
+		watchFn:  blockingWatch,
+		statusFn: func(ctx context.Context) (*ipnstate.Status, error) { return runningStatus(), nil },
+		getPrefsFn: func(ctx context.Context) (*ipn.Prefs, error) {
+			return &ipn.Prefs{ExitNodeAllowLANAccess: true}, nil
+		},
+	}
+
+	m := newManager(client)
+	defer m.Close()
+
+	m.RefreshState()
+
+	assert.True(t, m.GetState().ExitNodeAllowLANAccess)
+}
+
+func TestManager_Actions_EditPrefs(t *testing.T) {
+	var captured *ipn.MaskedPrefs
+	client := &mockClient{
+		watchFn:  blockingWatch,
+		statusFn: func(ctx context.Context) (*ipnstate.Status, error) { return runningStatus(), nil },
+		editPrefsFn: func(ctx context.Context, mp *ipn.MaskedPrefs) (*ipn.Prefs, error) {
+			captured = mp
+			return &ipn.Prefs{}, nil
+		},
+	}
+
+	m := newManager(client)
+	defer m.Close()
+
+	require.NoError(t, m.Connect())
+	require.NotNil(t, captured)
+	assert.True(t, captured.WantRunningSet)
+	assert.True(t, captured.WantRunning)
+
+	require.NoError(t, m.Disconnect())
+	assert.True(t, captured.WantRunningSet)
+	assert.False(t, captured.WantRunning)
+
+	require.NoError(t, m.SetExitNode("nABC123"))
+	assert.True(t, captured.ExitNodeIDSet)
+	assert.Equal(t, tailcfg.StableNodeID("nABC123"), captured.ExitNodeID)
+	// ExitNodeIPSet must also be set so a stale legacy ExitNodeIP cannot
+	// override the ID-based selection (mirrors `tailscale set --exit-node`).
+	assert.True(t, captured.ExitNodeIPSet)
+
+	require.NoError(t, m.SetExitNode(""))
+	assert.True(t, captured.ExitNodeIDSet)
+	assert.Equal(t, tailcfg.StableNodeID(""), captured.ExitNodeID)
+	// Clearing must zero both the ID and any legacy IP-based exit node.
+	assert.True(t, captured.ExitNodeIPSet)
+
+	require.NoError(t, m.SetAllowLANAccess(true))
+	assert.True(t, captured.ExitNodeAllowLANAccessSet)
+	assert.True(t, captured.ExitNodeAllowLANAccess)
+}
+
+func TestManager_Actions_PropagateError(t *testing.T) {
+	client := &mockClient{
+		watchFn:  blockingWatch,
+		statusFn: func(ctx context.Context) (*ipnstate.Status, error) { return runningStatus(), nil },
+		editPrefsFn: func(ctx context.Context, mp *ipn.MaskedPrefs) (*ipn.Prefs, error) {
+			return nil, fmt.Errorf("backend rejected edit")
+		},
+	}
+
+	m := newManager(client)
+	defer m.Close()
+
+	assert.Error(t, m.Connect())
+	assert.Error(t, m.SetExitNode("nABC123"))
+	assert.Error(t, m.SetAllowLANAccess(true))
 }

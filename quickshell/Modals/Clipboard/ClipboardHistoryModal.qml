@@ -1,7 +1,6 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import Quickshell.Hyprland
 import qs.Common
 import qs.Modals.Clipboard
 import qs.Modals.Common
@@ -11,11 +10,6 @@ DankModal {
     id: clipboardHistoryModal
 
     layerNamespace: "dms:clipboard"
-
-    HyprlandFocusGrab {
-        windows: [clipboardHistoryModal.contentWindow]
-        active: clipboardHistoryModal.useHyprlandFocusGrab && clipboardHistoryModal.shouldHaveFocus
-    }
 
     function toggle() {
         if (shouldBeVisible) {
@@ -51,8 +45,22 @@ DankModal {
         });
     }
 
+    function releaseTextInputFocus() {
+        contentLoader.item?.releaseTextInputFocus();
+    }
+
     function hide() {
-        close();
+        releaseTextInputFocus();
+        Qt.callLater(function () {
+            clipboardHistoryModal.close();
+        });
+    }
+
+    function instantHide() {
+        releaseTextInputFocus();
+        Qt.callLater(function () {
+            clipboardHistoryModal.instantClose();
+        });
     }
 
     onDialogClosed: {
@@ -64,6 +72,7 @@ DankModal {
     readonly property bool clipboardAvailable: ClipboardService.clipboardAvailable
 
     visible: false
+    keepContentLoaded: true
     modalWidth: ClipboardConstants.modalWidth
     modalHeight: ClipboardConstants.modalHeight
     backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
@@ -73,6 +82,11 @@ DankModal {
     enableShadow: true
     closeOnEscapeKey: (contentLoader.item?.mode ?? "history") !== "editor"
     onBackgroundClicked: hide()
+    onShouldBeVisibleChanged: {
+        if (!shouldBeVisible) {
+            releaseTextInputFocus();
+        }
+    }
 
     Ref {
         service: ClipboardService
@@ -82,29 +96,43 @@ DankModal {
         id: clearConfirmDialog
         confirmButtonText: I18n.tr("Clear All")
         confirmButtonColor: Theme.primary
-        onVisibleChanged: {
-            if (visible) {
+        onShouldBeVisibleChanged: {
+            if (shouldBeVisible) {
                 clipboardHistoryModal.shouldHaveFocus = false;
+                selectedButton = 0;
+                keyboardNavigation = true;
                 return;
             }
             Qt.callLater(function () {
                 if (!clipboardHistoryModal.shouldBeVisible) {
                     return;
                 }
-                clipboardHistoryModal.shouldHaveFocus = true;
+                clipboardHistoryModal.shouldHaveFocus = Qt.binding(() => clipboardHistoryModal.shouldBeVisible);
                 clipboardHistoryModal.modalFocusScope.forceActiveFocus();
                 if (clipboardHistoryModal.contentLoader.item?.searchField) {
                     clipboardHistoryModal.contentLoader.item.searchField.forceActiveFocus();
                 }
             });
         }
+        Connections {
+            target: clearConfirmDialog.modalFocusScope.Keys
+            function onPressed(event) {
+                if (!clearConfirmDialog.shouldBeVisible || event.key !== Qt.Key_Backtab) {
+                    return;
+                }
+                clearConfirmDialog.selectedButton = clearConfirmDialog.selectedButton === -1 ? 1 : (clearConfirmDialog.selectedButton - 1 + 2) % 2;
+                clearConfirmDialog.keyboardNavigation = true;
+                event.accepted = true;
+            }
+        }
     }
 
     content: Component {
         ClipboardHistoryContent {
+            surfaceHost: clipboardHistoryModal
             clearConfirmDialog: clearConfirmDialog
             onCloseRequested: clipboardHistoryModal.hide()
-            onInstantCloseRequested: clipboardHistoryModal.instantClose()
+            onInstantCloseRequested: clipboardHistoryModal.instantHide()
         }
     }
 }

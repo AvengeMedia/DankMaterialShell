@@ -18,6 +18,7 @@ Item {
     property Component overlayContent: null
     property alias overlayLoader: overlayLoader
     readonly property alias backgroundWindow: backgroundWindow
+    readonly property alias contentWindow: contentWindow
     property real popupWidth: 400
     property real popupHeight: 300
     property real triggerX: 0
@@ -375,9 +376,9 @@ Item {
         interval: Theme.variantCloseInterval(animationDuration)
         onTriggered: {
             if (!shouldBeVisible) {
-                isClosing = false;
                 contentWindow.visible = false;
                 backgroundWindow.visible = false;
+                isClosing = false;
                 PopoutManager.hidePopout(popoutHandle);
                 popoutClosed();
             }
@@ -494,31 +495,21 @@ Item {
             }
         })(), dpr)
 
-    readonly property real triggeringBarLeftExclusion: (effectiveBarPosition === SettingsData.Position.Left && barWidth > 0) ? Math.max(0, barX + barWidth) : 0
-    readonly property real triggeringBarTopExclusion: (effectiveBarPosition === SettingsData.Position.Top && barHeight > 0) ? Math.max(0, barY + barHeight) : 0
-    readonly property real triggeringBarRightExclusion: (effectiveBarPosition === SettingsData.Position.Right && barWidth > 0) ? Math.max(0, screenWidth - barX) : 0
-    readonly property real triggeringBarBottomExclusion: (effectiveBarPosition === SettingsData.Position.Bottom && barHeight > 0) ? Math.max(0, screenHeight - barY) : 0
+    readonly property real maskX: _dismissZone.x
+    readonly property real maskY: _dismissZone.y
+    readonly property real maskWidth: _dismissZone.width
+    readonly property real maskHeight: _dismissZone.height
 
-    readonly property real maskX: {
-        const adjacentLeftBar = adjacentBarInfo?.leftBar ?? 0;
-        return Math.max(triggeringBarLeftExclusion, adjacentLeftBar);
-    }
-
-    readonly property real maskY: {
-        const adjacentTopBar = adjacentBarInfo?.topBar ?? 0;
-        return Math.max(triggeringBarTopExclusion, adjacentTopBar);
-    }
-
-    readonly property real maskWidth: {
-        const adjacentRightBar = adjacentBarInfo?.rightBar ?? 0;
-        const rightExclusion = Math.max(triggeringBarRightExclusion, adjacentRightBar);
-        return Math.max(100, screenWidth - maskX - rightExclusion);
-    }
-
-    readonly property real maskHeight: {
-        const adjacentBottomBar = adjacentBarInfo?.bottomBar ?? 0;
-        const bottomExclusion = Math.max(triggeringBarBottomExclusion, adjacentBottomBar);
-        return Math.max(100, screenHeight - maskY - bottomExclusion);
+    DismissZone {
+        id: _dismissZone
+        barPosition: root.effectiveBarPosition
+        barX: root.barX
+        barY: root.barY
+        barWidth: root.barWidth
+        barHeight: root.barHeight
+        screenWidth: root.screenWidth
+        screenHeight: root.screenHeight
+        adjacentBarInfo: root.adjacentBarInfo
     }
 
     PanelWindow {
@@ -598,31 +589,25 @@ Item {
             id: popoutBlur
             targetWindow: contentWindow
             readonly property real s: Math.min(1, contentContainer.scaleValue)
-            readonly property bool trackBlurFromBarEdge: root.fluidStandaloneActive
             readonly property real op: Math.max(0, Math.min(1, (morph.openProgress - 0.08) * 1.6))
-            readonly property bool blurAlive: trackBlurFromBarEdge ? (contentContainer.revealWidth > 0 && contentContainer.revealHeight > 0) : root.shouldBeVisible
+            readonly property bool revealClipActive: root.fluidStandaloneActive
 
-            blurX: trackBlurFromBarEdge ? contentContainer.x + contentContainer.revealX : contentContainer.x + contentContainer.width * (1 - s * op) * 0.5 + Theme.snap(contentContainer.animX, root.dpr)
-            blurY: trackBlurFromBarEdge ? contentContainer.y + contentContainer.revealY : contentContainer.y + contentContainer.height * (1 - s * op) * 0.5 + Theme.snap(contentContainer.animY, root.dpr)
-            blurWidth: blurAlive ? (trackBlurFromBarEdge ? contentContainer.revealWidth : contentContainer.width * s * op) : 0
-            blurHeight: blurAlive ? (trackBlurFromBarEdge ? contentContainer.revealHeight : contentContainer.height * s * op) : 0
+            blurX: revealClipActive ? contentContainer.x : contentContainer.x + contentContainer.width * (1 - s * op) * 0.5 + Theme.snap(contentContainer.animX, root.dpr)
+            blurY: revealClipActive ? contentContainer.y : contentContainer.y + contentContainer.height * (1 - s * op) * 0.5 + Theme.snap(contentContainer.animY, root.dpr)
+            blurWidth: root.shouldBeVisible ? (revealClipActive ? contentContainer.width : contentContainer.width * s * op) : 0
+            blurHeight: root.shouldBeVisible ? (revealClipActive ? contentContainer.height : contentContainer.height * s * op) : 0
             blurRadius: Theme.cornerRadius
+            clipEnabled: revealClipActive
+            clipX: contentContainer.x + contentContainer.revealX
+            clipY: contentContainer.y + contentContainer.revealY
+            clipWidth: root.shouldBeVisible ? contentContainer.revealWidth : 0
+            clipHeight: root.shouldBeVisible ? contentContainer.revealHeight : 0
         }
 
         WlrLayershell.namespace: root.layerNamespace
         WlrLayershell.layer: root.effectivePopoutLayer
         WlrLayershell.exclusiveZone: -1
-        WlrLayershell.keyboardFocus: {
-            if (PopoutManager.screenshotActive)
-                return WlrKeyboardFocus.None;
-            if (customKeyboardFocus !== null)
-                return customKeyboardFocus;
-            if (!shouldBeVisible)
-                return WlrKeyboardFocus.None;
-            if (CompositorService.useHyprlandFocusGrab)
-                return WlrKeyboardFocus.OnDemand;
-            return WlrKeyboardFocus.Exclusive;
-        }
+        WlrLayershell.keyboardFocus: KeyboardFocus.keyboardFocus(shouldBeVisible || isClosing, customKeyboardFocus)
 
         anchors {
             left: true
@@ -721,6 +706,8 @@ Item {
             QtObject {
                 id: morph
                 property real openProgress: 0
+                onOpenProgressChanged: if (root.fluidStandaloneActive)
+                    root._kickBlurCommit()
                 Behavior on openProgress {
                     enabled: root.animationsEnabled
                     NumberAnimation {

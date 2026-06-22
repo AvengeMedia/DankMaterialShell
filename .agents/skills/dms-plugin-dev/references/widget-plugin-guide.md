@@ -235,7 +235,7 @@ Conditionally show/hide the bar pill:
 ```qml
 PluginComponent {
     visibilityCommand: "pgrep -x myapp"
-    visibilityInterval: 5000  // check every 5 seconds
+    visibilityInterval: 5  // seconds between checks; polling pauses while the bar is hidden
 }
 ```
 

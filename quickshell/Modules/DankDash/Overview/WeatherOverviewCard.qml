@@ -20,17 +20,25 @@ Card {
         spacing: Theme.spacingS
         visible: !WeatherService.weather.available
 
+        DankSpinner {
+            size: 24
+            visible: WeatherService.weather.loading
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
+
         DankIcon {
             name: "cloud_off"
             size: 24
             color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5)
+            visible: !WeatherService.weather.loading
             anchors.horizontalCenter: parent.horizontalCenter
         }
 
         StyledText {
-            text: WeatherService.weather.loading ? I18n.tr("Loading...") : I18n.tr("No Weather")
+            text: I18n.tr("No Weather")
             font.pixelSize: Theme.fontSizeSmall
             color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+            visible: !WeatherService.weather.loading
             anchors.horizontalCenter: parent.horizontalCenter
         }
 

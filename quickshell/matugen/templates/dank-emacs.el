@@ -1,4 +1,4 @@
-;;; dank-emacs-theme.el --- Enhanced theme using Matugen SCSS variables with dank16 colors
+;;; dank-emacs-theme.el --- Enhanced theme using Matugen SCSS variables with dank16 colors -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2025
 

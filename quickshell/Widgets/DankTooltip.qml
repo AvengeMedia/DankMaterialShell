@@ -2,6 +2,8 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 import qs.Common
+import qs.Services
+import qs.Widgets
 
 PanelWindow {
     id: root
@@ -17,14 +19,8 @@ PanelWindow {
 
     function show(text, x, y, screen, leftAlign, rightAlign) {
         root.text = text;
-        if (screen) {
-            targetScreen = screen;
-            const screenX = screen.x || 0;
-            targetX = x - screenX;
-        } else {
-            targetScreen = null;
-            targetX = x;
-        }
+        targetScreen = screen ?? null;
+        targetX = x;
         targetY = y;
         alignLeft = leftAlign ?? false;
         alignRight = rightAlign ?? false;
@@ -69,12 +65,21 @@ PanelWindow {
         }
     }
 
+    WindowBlur {
+        targetWindow: root
+        blurX: 0
+        blurY: 0
+        blurWidth: root.visible ? root.width : 0
+        blurHeight: root.visible ? root.height : 0
+        blurRadius: Theme.cornerRadius
+    }
+
     Rectangle {
         anchors.fill: parent
         color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
         radius: Theme.cornerRadius
-        border.width: 1
-        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+        border.width: BlurService.enabled ? BlurService.borderWidth : 1
+        border.color: BlurService.enabled ? BlurService.borderColor : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
 
         StyledText {
             id: textContent
