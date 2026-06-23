@@ -229,7 +229,7 @@
               with pkgs;
               [
                 (goForPkgs pkgs)
-                go-mockery_2
+                go-mockery
                 gopls
                 delve
                 go-tools

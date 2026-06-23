@@ -1,82 +1,85 @@
-with-expecter: true
-dir: "internal/mocks/{{.InterfaceDirRelative}}"
-mockname: "Mock{{.InterfaceName}}"
-outpkg: "{{.PackageName}}"
+dir: internal/mocks/{{.InterfaceDirRelative}}
+structname: Mock{{.InterfaceName}}
+pkgname: '{{.SrcPackageName}}'
+filename: 'mock_{{.InterfaceName}}.go'
+template: testify
+template-data:
+  unroll-variadic: true
 packages:
-  github.com/Wifx/gonetworkmanager/v2:
-    interfaces:
-      NetworkManager:
-      Device:
-      DeviceWireless:
-      AccessPoint:
-      Connection:
-      Settings:
-      ActiveConnection:
-      IP4Config:
-  net:
-    interfaces:
-      Conn:
-  github.com/AvengeMedia/danklinux/internal/plugins:
-    interfaces:
-      GitClient:
-  github.com/godbus/dbus/v5:
-    interfaces:
-      BusObject:
-  github.com/AvengeMedia/danklinux/internal/server/brightness:
-    config:
-      dir: "internal/mocks/brightness"
-      outpkg: mocks_brightness
-    interfaces:
-      DBusConn:
   github.com/AvengeMedia/DankMaterialShell/core/internal/geolocation:
     config:
-      dir: "internal/mocks/geolocation"
-      outpkg: mocks_geolocation
+      dir: internal/mocks/geolocation
+      pkgname: mocks_geolocation
     interfaces:
-      Client:
-  github.com/AvengeMedia/DankMaterialShell/core/internal/server/network:
-    config:
-      dir: "internal/mocks/network"
-      outpkg: mocks_network
-    interfaces:
-      Backend:
+      Client: {}
   github.com/AvengeMedia/DankMaterialShell/core/internal/server/cups:
     config:
-      dir: "internal/mocks/cups"
-      outpkg: mocks_cups
+      dir: internal/mocks/cups
+      pkgname: mocks_cups
     interfaces:
-      CUPSClientInterface:
+      CUPSClientInterface: {}
       PkHelper:
         config:
-          dir: "internal/mocks/cups_pkhelper"
-          outpkg: mocks_cups_pkhelper
+          dir: internal/mocks/cups_pkhelper
+          pkgname: mocks_cups_pkhelper
   github.com/AvengeMedia/DankMaterialShell/core/internal/server/evdev:
     config:
-      dir: "internal/mocks/evdev"
-      outpkg: mocks_evdev
+      dir: internal/mocks/evdev
+      pkgname: mocks_evdev
     interfaces:
-      EvdevDevice:
-  github.com/AvengeMedia/DankMaterialShell/core/internal/version:
+      EvdevDevice: {}
+  github.com/AvengeMedia/DankMaterialShell/core/internal/server/network:
     config:
-      dir: "internal/mocks/version"
-      outpkg: mocks_version
+      dir: internal/mocks/network
+      pkgname: mocks_network
     interfaces:
-      VersionFetcher:
+      Backend: {}
   github.com/AvengeMedia/DankMaterialShell/core/internal/server/wlcontext:
     config:
-      dir: "internal/mocks/wlcontext"
-      outpkg: mocks_wlcontext
+      dir: internal/mocks/wlcontext
+      pkgname: mocks_wlcontext
     interfaces:
-      WaylandContext:
-  github.com/AvengeMedia/DankMaterialShell/core/pkg/go-wayland/wayland/client:
-    config:
-      dir: "internal/mocks/wlclient"
-      outpkg: mocks_wlclient
-    interfaces:
-      WaylandDisplay:
+      WaylandContext: {}
   github.com/AvengeMedia/DankMaterialShell/core/internal/utils:
     config:
-      dir: "internal/mocks/utils"
-      outpkg: mocks_utils
+      dir: internal/mocks/utils
+      pkgname: mocks_utils
     interfaces:
-      AppChecker:
+      AppChecker: {}
+  github.com/AvengeMedia/DankMaterialShell/core/internal/version:
+    config:
+      dir: internal/mocks/version
+      pkgname: mocks_version
+    interfaces:
+      VersionFetcher: {}
+  github.com/AvengeMedia/DankMaterialShell/core/pkg/go-wayland/wayland/client:
+    config:
+      dir: internal/mocks/wlclient
+      pkgname: mocks_wlclient
+    interfaces:
+      WaylandDisplay: {}
+  github.com/AvengeMedia/DankMaterialShell/core/internal/plugins:
+    interfaces:
+      GitClient: {}
+  github.com/AvengeMedia/DankMaterialShell/core/internal/server/brightness:
+    config:
+      dir: internal/mocks/brightness
+      pkgname: mocks_brightness
+    interfaces:
+      DBusConn: {}
+  github.com/Wifx/gonetworkmanager/v2:
+    interfaces:
+      AccessPoint: {}
+      ActiveConnection: {}
+      Connection: {}
+      Device: {}
+      DeviceWireless: {}
+      IP4Config: {}
+      NetworkManager: {}
+      Settings: {}
+  github.com/godbus/dbus/v5:
+    interfaces:
+      BusObject: {}
+  net:
+    interfaces:
+      Conn: {}
