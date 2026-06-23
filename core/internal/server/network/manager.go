@@ -135,6 +135,8 @@ func (m *Manager) syncStateFromBackend() error {
 	m.state.ConnectingSSID = backendState.ConnectingSSID
 	m.state.ConnectingDevice = backendState.ConnectingDevice
 	m.state.LastError = backendState.LastError
+	m.state.VPNError = backendState.VPNError
+	m.state.VPNErrorUuid = backendState.VPNErrorUuid
 	m.stateMutex.Unlock()
 
 	return nil
@@ -214,6 +216,9 @@ func stateChangedMeaningfully(old, new *NetworkState) bool {
 		return true
 	}
 	if old.LastError != new.LastError {
+		return true
+	}
+	if old.VPNError != new.VPNError || old.VPNErrorUuid != new.VPNErrorUuid {
 		return true
 	}
 	if len(old.WiFiNetworks) != len(new.WiFiNetworks) {

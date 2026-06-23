@@ -689,23 +689,19 @@ Item {
         target: NetworkService
 
         function onCredentialsNeeded(token, ssid, setting, fields, hints, reason, connType, connName, vpnService, fieldsInfo) {
-            const now = Date.now();
-            const timeSinceLastPrompt = now - lastCredentialsTime;
+            const alreadyShown = wifiPasswordModalLoader.item && wifiPasswordModalLoader.item.shouldBeVisible;
+            if (alreadyShown && token === lastCredentialsToken)
+                return;
 
             wifiPasswordModalLoader.active = true;
             if (!wifiPasswordModalLoader.item)
                 return;
 
-            if (wifiPasswordModalLoader.item.shouldBeVisible && timeSinceLastPrompt < 1000) {
+            if (alreadyShown && lastCredentialsToken !== "" && lastCredentialsToken !== token)
                 NetworkService.cancelCredentials(lastCredentialsToken);
-                lastCredentialsToken = token;
-                lastCredentialsTime = now;
-                wifiPasswordModalLoader.item.showFromPrompt(token, ssid, setting, fields, hints, reason, connType, connName, vpnService, fieldsInfo);
-                return;
-            }
 
             lastCredentialsToken = token;
-            lastCredentialsTime = now;
+            lastCredentialsTime = Date.now();
             wifiPasswordModalLoader.item.showFromPrompt(token, ssid, setting, fields, hints, reason, connType, connName, vpnService, fieldsInfo);
         }
     }

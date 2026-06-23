@@ -84,6 +84,8 @@ Singleton {
     property string lastConnectedVpnUuid: ""
     property string pendingVpnUuid: ""
     property var vpnBusyStartTime: 0
+    property string vpnError: ""
+    property string vpnErrorUuid: ""
 
     property var profiles: {
         const mergedProfiles = vpnProfiles ? vpnProfiles.slice() : [];
@@ -136,6 +138,17 @@ Singleton {
     property alias available: root.vpnAvailable
     property alias isBusy: root.vpnIsBusy
     property alias connected: root.vpnConnected
+
+    function vpnStateForUuid(uuid) {
+        if (!uuid)
+            return "";
+        const match = vpnActive.find(v => v.uuid === uuid);
+        return match ? (match.state || "") : "";
+    }
+
+    function isVpnConnectingUuid(uuid) {
+        return vpnStateForUuid(uuid) === "activating" || (vpnIsBusy && pendingVpnUuid === uuid);
+    }
 
     property string networkInfoSSID: ""
     property string networkInfoDetails: ""
@@ -371,6 +384,17 @@ Singleton {
                 }
             }
         }
+
+        const incomingVpnError = state.vpnError || "";
+        if (incomingVpnError && incomingVpnError !== vpnError) {
+            vpnIsBusy = false;
+            pendingVpnUuid = "";
+            vpnBusyStartTime = 0;
+            const failedName = (vpnProfiles.find(p => p.uuid === state.vpnErrorUuid)?.name) || I18n.tr("VPN");
+            ToastService.showError(I18n.tr("%1: %2").arg(failedName).arg(incomingVpnError));
+        }
+        vpnError = incomingVpnError;
+        vpnErrorUuid = state.vpnErrorUuid || "";
 
         isConnecting = state.isConnecting || false;
         connectingSSID = state.connectingSSID || "";
