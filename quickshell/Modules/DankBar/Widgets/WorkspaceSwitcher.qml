@@ -71,43 +71,15 @@ Item {
     readonly property string effectiveScreenName: {
         if (!SettingsData.workspaceFollowFocus)
             return root.screenName;
-
-        switch (CompositorService.compositor) {
-        case "niri":
-            return NiriService.currentOutput || root.screenName;
-        case "hyprland":
-            return Hyprland.focusedWorkspace?.monitor?.name || root.screenName;
-        case "mango":
-            return MangoService.activeOutput || root.screenName;
-        case "sway":
-        case "scroll":
-        case "miracle":
-            const focusedWs = I3.workspaces?.values?.find(ws => ws.focused === true);
-            return focusedWs?.monitor?.name || root.screenName;
-        default:
-            return root.screenName;
-        }
+        return BarWidgetService.getFocusedScreenName() || root.screenName;
     }
     readonly property bool mangoOverviewActive: CompositorService.isMango && MangoService.isOutputInOverview(effectiveScreenName)
 
-    readonly property string focusedMonitorName: {
-        switch (CompositorService.compositor) {
-        case "niri":
-            return NiriService.currentOutput || "";
-        case "hyprland":
-            return Hyprland.focusedWorkspace?.monitor?.name || "";
-        case "mango":
-            return MangoService.activeOutput || "";
-        case "sway":
-        case "scroll":
-        case "miracle":
-            return I3.workspaces?.values?.find(ws => ws.focused === true)?.monitor?.name || "";
-        default:
-            return "";
-        }
+    readonly property bool isFocusedMonitor: {
+        const focused = BarWidgetService.getFocusedScreenName();
+        return focused === "" || root.screenName === "" || focused === root.screenName;
     }
-    readonly property bool isFocusedMonitor: focusedMonitorName === "" || root.screenName === "" || focusedMonitorName === root.screenName
-    readonly property bool useUnfocusedAppearance: !isFocusedMonitor && SettingsData.workspaceUnfocusedMonitorSeparateAppearance
+    readonly property bool useUnfocusedAppearance: !isFocusedMonitor && SettingsData.workspaceUnfocusedMonitorSeparateAppearance && BarWidgetService.focusedScreenDetectionSupported
 
     readonly property var extProjection: (useExtWorkspace && parentScreen) ? WindowManager.screenProjection(parentScreen) : null
     readonly property bool useExtWorkspace: {

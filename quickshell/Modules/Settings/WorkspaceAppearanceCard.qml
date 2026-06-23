@@ -10,6 +10,7 @@ SettingsCard {
     iconName: "palette"
     title: I18n.tr("Workspace Appearance")
     settingKey: "workspaceAppearance"
+    tags: ["workspace", "focused", "color", "custom"]
     collapsible: true
     expanded: false
 
@@ -236,75 +237,21 @@ SettingsCard {
         spacing: Theme.spacingM
         visible: workspaceTabBar.currentIndex === 0
 
-        ColorDropdownRow {
-            text: I18n.tr("Focused Color")
-            settingKey: "workspaceColorMode"
-            tags: ["workspace", "focused", "color", "custom"]
-            options: root.focusedColorOptions
-            currentMode: SettingsData.workspaceColorMode
-            customColor: SettingsData.workspaceFocusedCustomColor || "#6750A4"
-            onModeSelected: mode => SettingsData.set("workspaceColorMode", mode)
-            onCustomColorSelected: selectedColor => SettingsData.set("workspaceFocusedCustomColor", selectedColor.toString())
-        }
-
-        Rectangle {
-            width: parent.width
-            height: 1
-            color: Theme.outline
-            opacity: 0.15
-        }
-
-        ColorDropdownRow {
-            text: I18n.tr("Occupied Color")
-            settingKey: "workspaceOccupiedColorMode"
-            tags: ["workspace", "occupied", "color", "custom"]
-            visible: root.workspaceStateColorsVisible
-            options: root.occupiedColorOptions
-            currentMode: SettingsData.workspaceOccupiedColorMode
-            customColor: SettingsData.workspaceOccupiedCustomColor || "#625B71"
-            onModeSelected: mode => SettingsData.set("workspaceOccupiedColorMode", mode)
-            onCustomColorSelected: selectedColor => SettingsData.set("workspaceOccupiedCustomColor", selectedColor.toString())
-        }
-
-        Rectangle {
-            width: parent.width
-            height: 1
-            color: Theme.outline
-            opacity: 0.15
-            visible: root.workspaceStateColorsVisible
-        }
-
-        ColorDropdownRow {
-            text: I18n.tr("Unfocused Color")
-            settingKey: "workspaceUnfocusedColorMode"
-            tags: ["workspace", "unfocused", "color", "custom"]
-            options: root.unfocusedColorOptions
-            defaultColor: Theme.surfaceText
-            currentMode: SettingsData.workspaceUnfocusedColorMode
-            customColor: SettingsData.workspaceUnfocusedCustomColor || "#49454E"
-            onModeSelected: mode => SettingsData.set("workspaceUnfocusedColorMode", mode)
-            onCustomColorSelected: selectedColor => SettingsData.set("workspaceUnfocusedCustomColor", selectedColor.toString())
-        }
-
-        Rectangle {
-            width: parent.width
-            height: 1
-            color: Theme.outline
-            opacity: 0.15
-            visible: root.urgentWorkspaceColorsVisible
-        }
-
-        ColorDropdownRow {
-            text: I18n.tr("Urgent Color")
-            settingKey: "workspaceUrgentColorMode"
-            tags: ["workspace", "urgent", "color", "custom"]
-            visible: root.urgentWorkspaceColorsVisible
-            options: root.urgentColorOptions
-            defaultColor: Theme.error
-            currentMode: SettingsData.workspaceUrgentColorMode
-            customColor: SettingsData.workspaceUrgentCustomColor || "#B3261E"
-            onModeSelected: mode => SettingsData.set("workspaceUrgentColorMode", mode)
-            onCustomColorSelected: selectedColor => SettingsData.set("workspaceUrgentCustomColor", selectedColor.toString())
+        WorkspaceAppearanceColorOptions {
+            focusedColorOptions: root.focusedColorOptions
+            occupiedColorOptions: root.occupiedColorOptions
+            unfocusedColorOptions: root.unfocusedColorOptions
+            urgentColorOptions: root.urgentColorOptions
+            occupiedColorVisible: root.workspaceStateColorsVisible
+            urgentColorVisible: root.urgentWorkspaceColorsVisible
+            focusedColorModeKey: "workspaceColorMode"
+            focusedCustomColorKey: "workspaceFocusedCustomColor"
+            occupiedColorModeKey: "workspaceOccupiedColorMode"
+            occupiedCustomColorKey: "workspaceOccupiedCustomColor"
+            unfocusedColorModeKey: "workspaceUnfocusedColorMode"
+            unfocusedCustomColorKey: "workspaceUnfocusedCustomColor"
+            urgentColorModeKey: "workspaceUrgentColorMode"
+            urgentCustomColorKey: "workspaceUrgentCustomColor"
         }
 
         Rectangle {
@@ -323,34 +270,12 @@ SettingsCard {
             onToggled: checked => SettingsData.set("workspaceFocusedBorderEnabled", checked)
         }
 
-        Column {
-            width: parent.width
-            spacing: Theme.spacingS
+        WorkspaceAppearanceBorderFields {
             visible: SettingsData.workspaceFocusedBorderEnabled
-            leftPadding: Theme.spacingM
-
-            ColorDropdownRow {
-                width: parent.width - parent.leftPadding
-                text: I18n.tr("Border Color")
-                settingKey: "workspaceFocusedBorderColor"
-                tags: ["workspace", "focused", "border", "color", "custom"]
-                options: root.borderColorOptions
-                currentMode: SettingsData.workspaceFocusedBorderColor
-                customColor: SettingsData.workspaceFocusedBorderCustomColor || "#6750A4"
-                onModeSelected: mode => SettingsData.set("workspaceFocusedBorderColor", mode)
-                onCustomColorSelected: selectedColor => SettingsData.set("workspaceFocusedBorderCustomColor", selectedColor.toString())
-            }
-
-            SettingsSliderRow {
-                width: parent.width - parent.leftPadding
-                text: I18n.tr("Thickness")
-                value: SettingsData.workspaceFocusedBorderThickness
-                minimum: 1
-                maximum: 6
-                unit: "px"
-                defaultValue: 2
-                onSliderValueChanged: newValue => SettingsData.set("workspaceFocusedBorderThickness", newValue)
-            }
+            borderColorOptions: root.borderColorOptions
+            borderColorKey: "workspaceFocusedBorderColor"
+            borderCustomColorKey: "workspaceFocusedBorderCustomColor"
+            borderThicknessKey: "workspaceFocusedBorderThickness"
         }
     }
 
@@ -360,7 +285,17 @@ SettingsCard {
         spacing: Theme.spacingM
         visible: workspaceTabBar.currentIndex === 1
 
+        StyledText {
+            width: parent.width
+            visible: !BarWidgetService.focusedScreenDetectionSupported
+            text: I18n.tr("Separate appearance for unfocused displays is not supported on this compositor.")
+            wrapMode: Text.WordWrap
+            color: Theme.surfaceVariantText
+            font.pixelSize: Theme.fontSizeMedium
+        }
+
         SettingsToggleRow {
+            visible: BarWidgetService.focusedScreenDetectionSupported
             settingKey: "workspaceUnfocusedMonitorSeparateAppearance"
             tags: ["workspace", "unfocused", "monitor", "display", "separate", "color"]
             text: I18n.tr("Separate Appearance for Unfocused Display(s)")
@@ -374,84 +309,33 @@ SettingsCard {
             height: 1
             color: Theme.outline
             opacity: 0.15
+            visible: BarWidgetService.focusedScreenDetectionSupported
         }
 
         Column {
             id: unfocusedOptions
             width: parent.width
             spacing: Theme.spacingM
+            visible: BarWidgetService.focusedScreenDetectionSupported
             enabled: SettingsData.workspaceUnfocusedMonitorSeparateAppearance
             opacity: enabled ? 1 : 0.5
 
-            ColorDropdownRow {
-                text: I18n.tr("Focused Color")
-                settingKey: "workspaceUnfocusedMonitorColorMode"
-                tags: ["workspace", "focused", "color", "custom", "unfocused", "monitor", "display"]
-                options: root.focusedColorOptions
-                currentMode: SettingsData.workspaceUnfocusedMonitorColorMode
-                customColor: SettingsData.workspaceUnfocusedMonitorFocusedCustomColor || "#6750A4"
-                onModeSelected: mode => SettingsData.set("workspaceUnfocusedMonitorColorMode", mode)
-                onCustomColorSelected: selectedColor => SettingsData.set("workspaceUnfocusedMonitorFocusedCustomColor", selectedColor.toString())
-            }
-
-            Rectangle {
-                width: parent.width
-                height: 1
-                color: Theme.outline
-                opacity: 0.15
-            }
-
-            ColorDropdownRow {
-                text: I18n.tr("Occupied Color")
-                settingKey: "workspaceUnfocusedMonitorOccupiedColorMode"
-                tags: ["workspace", "occupied", "color", "custom", "unfocused", "monitor", "display"]
-                visible: root.workspaceStateColorsVisible
-                options: root.occupiedColorOptions
-                currentMode: SettingsData.workspaceUnfocusedMonitorOccupiedColorMode
-                customColor: SettingsData.workspaceUnfocusedMonitorOccupiedCustomColor || "#625B71"
-                onModeSelected: mode => SettingsData.set("workspaceUnfocusedMonitorOccupiedColorMode", mode)
-                onCustomColorSelected: selectedColor => SettingsData.set("workspaceUnfocusedMonitorOccupiedCustomColor", selectedColor.toString())
-            }
-
-            Rectangle {
-                width: parent.width
-                height: 1
-                color: Theme.outline
-                opacity: 0.15
-                visible: root.workspaceStateColorsVisible
-            }
-
-            ColorDropdownRow {
-                text: I18n.tr("Unfocused Color")
-                settingKey: "workspaceUnfocusedMonitorUnfocusedColorMode"
-                tags: ["workspace", "unfocused", "color", "custom", "monitor", "display"]
-                options: root.unfocusedColorOptions
-                defaultColor: Theme.surfaceText
-                currentMode: SettingsData.workspaceUnfocusedMonitorUnfocusedColorMode
-                customColor: SettingsData.workspaceUnfocusedMonitorUnfocusedCustomColor || "#49454E"
-                onModeSelected: mode => SettingsData.set("workspaceUnfocusedMonitorUnfocusedColorMode", mode)
-                onCustomColorSelected: selectedColor => SettingsData.set("workspaceUnfocusedMonitorUnfocusedCustomColor", selectedColor.toString())
-            }
-
-            Rectangle {
-                width: parent.width
-                height: 1
-                color: Theme.outline
-                opacity: 0.15
-                visible: root.urgentWorkspaceColorsVisible
-            }
-
-            ColorDropdownRow {
-                text: I18n.tr("Urgent Color")
-                settingKey: "workspaceUnfocusedMonitorUrgentColorMode"
-                tags: ["workspace", "urgent", "color", "custom", "unfocused", "monitor", "display"]
-                visible: root.urgentWorkspaceColorsVisible
-                options: root.urgentColorOptions
-                defaultColor: Theme.error
-                currentMode: SettingsData.workspaceUnfocusedMonitorUrgentColorMode
-                customColor: SettingsData.workspaceUnfocusedMonitorUrgentCustomColor || "#B3261E"
-                onModeSelected: mode => SettingsData.set("workspaceUnfocusedMonitorUrgentColorMode", mode)
-                onCustomColorSelected: selectedColor => SettingsData.set("workspaceUnfocusedMonitorUrgentCustomColor", selectedColor.toString())
+            WorkspaceAppearanceColorOptions {
+                focusedColorOptions: root.focusedColorOptions
+                occupiedColorOptions: root.occupiedColorOptions
+                unfocusedColorOptions: root.unfocusedColorOptions
+                urgentColorOptions: root.urgentColorOptions
+                occupiedColorVisible: root.workspaceStateColorsVisible
+                urgentColorVisible: root.urgentWorkspaceColorsVisible
+                extraTags: ["unfocused", "monitor", "display"]
+                focusedColorModeKey: "workspaceUnfocusedMonitorColorMode"
+                focusedCustomColorKey: "workspaceUnfocusedMonitorFocusedCustomColor"
+                occupiedColorModeKey: "workspaceUnfocusedMonitorOccupiedColorMode"
+                occupiedCustomColorKey: "workspaceUnfocusedMonitorOccupiedCustomColor"
+                unfocusedColorModeKey: "workspaceUnfocusedMonitorUnfocusedColorMode"
+                unfocusedCustomColorKey: "workspaceUnfocusedMonitorUnfocusedCustomColor"
+                urgentColorModeKey: "workspaceUnfocusedMonitorUrgentColorMode"
+                urgentCustomColorKey: "workspaceUnfocusedMonitorUrgentCustomColor"
             }
 
             Rectangle {
@@ -470,34 +354,13 @@ SettingsCard {
                 onToggled: checked => SettingsData.set("workspaceUnfocusedMonitorBorderEnabled", checked)
             }
 
-            Column {
-                width: parent.width
-                spacing: Theme.spacingS
+            WorkspaceAppearanceBorderFields {
                 visible: SettingsData.workspaceUnfocusedMonitorBorderEnabled
-                leftPadding: Theme.spacingM
-
-                ColorDropdownRow {
-                    width: parent.width - parent.leftPadding
-                    text: I18n.tr("Border Color")
-                    settingKey: "workspaceUnfocusedMonitorBorderColor"
-                    tags: ["workspace", "focused", "border", "color", "custom", "unfocused", "monitor", "display"]
-                    options: root.borderColorOptions
-                    currentMode: SettingsData.workspaceUnfocusedMonitorBorderColor
-                    customColor: SettingsData.workspaceUnfocusedMonitorBorderCustomColor || "#6750A4"
-                    onModeSelected: mode => SettingsData.set("workspaceUnfocusedMonitorBorderColor", mode)
-                    onCustomColorSelected: selectedColor => SettingsData.set("workspaceUnfocusedMonitorBorderCustomColor", selectedColor.toString())
-                }
-
-                SettingsSliderRow {
-                    width: parent.width - parent.leftPadding
-                    text: I18n.tr("Thickness")
-                    value: SettingsData.workspaceUnfocusedMonitorBorderThickness
-                    minimum: 1
-                    maximum: 6
-                    unit: "px"
-                    defaultValue: 2
-                    onSliderValueChanged: newValue => SettingsData.set("workspaceUnfocusedMonitorBorderThickness", newValue)
-                }
+                borderColorOptions: root.borderColorOptions
+                extraTags: ["unfocused", "monitor", "display"]
+                borderColorKey: "workspaceUnfocusedMonitorBorderColor"
+                borderCustomColorKey: "workspaceUnfocusedMonitorBorderCustomColor"
+                borderThicknessKey: "workspaceUnfocusedMonitorBorderThickness"
             }
         }
     }
