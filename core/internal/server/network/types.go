@@ -24,6 +24,16 @@ const (
 	PreferenceEthernet ConnectionPreference = "ethernet"
 )
 
+type Connectivity string
+
+const (
+	ConnectivityUnknown Connectivity = "unknown"
+	ConnectivityNone    Connectivity = "none"
+	ConnectivityPortal  Connectivity = "portal"
+	ConnectivityLimited Connectivity = "limited"
+	ConnectivityFull    Connectivity = "full"
+)
+
 type WiFiNetwork struct {
 	SSID        string `json:"ssid"`
 	BSSID       string `json:"bssid"`
@@ -98,6 +108,8 @@ type VPNState struct {
 type NetworkState struct {
 	Backend                string               `json:"backend"`
 	NetworkStatus          NetworkStatus        `json:"networkStatus"`
+	Connectivity           Connectivity         `json:"connectivity"`
+	PortalURL              string               `json:"portalURL"`
 	Preference             ConnectionPreference `json:"preference"`
 	EthernetIP             string               `json:"ethernetIP"`
 	EthernetDevice         string               `json:"ethernetDevice"`
@@ -162,6 +174,7 @@ type Manager struct {
 	notifierWg            sync.WaitGroup
 	lastNotifiedState     *NetworkState
 	credentialSubscribers syncmap.Map[string, chan CredentialPrompt]
+	portalProbe           *portalProbe
 }
 
 type EventType string

@@ -197,6 +197,70 @@ Item {
                     }
                 }
             }
+
+            SettingsCard {
+                title: I18n.tr("Captive Portal")
+                iconName: "wifi_lock"
+                settingKey: "captivePortal"
+                tags: ["captive", "portal", "hotspot", "sign in", "login", "public wifi"]
+
+                width: parent.width
+
+                Column {
+                    width: parent.width
+                    spacing: Theme.spacingM
+
+                    SettingsToggleRow {
+                        width: parent.width
+                        settingKey: "captivePortalAutoOpen"
+                        text: I18n.tr("Open sign-in page automatically")
+                        description: I18n.tr("Show a popup to sign in when a network requires it before reaching the internet.")
+                        checked: SettingsData.captivePortalAutoOpen
+                        onToggled: checked => SettingsData.set("captivePortalAutoOpen", checked)
+                    }
+
+                    Row {
+                        width: parent.width
+                        spacing: Theme.spacingM
+                        visible: NetworkService.connectivity === "portal"
+
+                        StyledText {
+                            text: I18n.tr("Sign-in required for this network")
+                            font.pixelSize: Theme.fontSizeMedium
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: parent.width - openPortalButton.width - Theme.spacingM
+                            wrapMode: Text.WordWrap
+                        }
+
+                        Rectangle {
+                            id: openPortalButton
+                            width: Math.max(120, openPortalLabel.contentWidth + Theme.spacingM * 2)
+                            height: 36
+                            radius: Theme.cornerRadius
+                            anchors.verticalCenter: parent.verticalCenter
+                            color: openPortalArea.containsMouse ? Qt.darker(Theme.primary, 1.1) : Theme.primary
+
+                            StyledText {
+                                id: openPortalLabel
+                                anchors.centerIn: parent
+                                text: I18n.tr("Open sign-in page")
+                                font.pixelSize: Theme.fontSizeMedium
+                                color: Theme.background
+                                font.weight: Font.Medium
+                            }
+
+                            MouseArea {
+                                id: openPortalArea
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: Qt.openUrlExternally(NetworkService.portalURL && NetworkService.portalURL.length > 0 ? NetworkService.portalURL : "http://nmcheck.gnome.org/check_network_status.txt")
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

@@ -70,6 +70,7 @@ func NewManager() (*Manager, error) {
 		backend: backend,
 		state: &NetworkState{
 			NetworkStatus:     StatusDisconnected,
+			Connectivity:      ConnectivityUnknown,
 			Preference:        PreferenceAuto,
 			WiFiNetworks:      []WiFiNetwork{},
 			SavedWiFiNetworks: []WiFiNetwork{},
@@ -100,6 +101,9 @@ func NewManager() (*Manager, error) {
 		m.Close()
 		return nil, fmt.Errorf("failed to start monitoring: %w", err)
 	}
+
+	m.portalProbe = newPortalProbe(m)
+	m.portalProbe.start()
 
 	return m, nil
 }
@@ -144,6 +148,9 @@ func (m *Manager) onBackendStateChange() {
 	if err := m.syncStateFromBackend(); err != nil {
 		log.Errorf("failed to sync state from backend: %v", err)
 	}
+	if m.portalProbe != nil {
+		m.portalProbe.kick()
+	}
 	m.notifySubscribers()
 }
 
@@ -174,6 +181,12 @@ func (m *Manager) snapshotState() NetworkState {
 
 func stateChangedMeaningfully(old, new *NetworkState) bool {
 	if old.NetworkStatus != new.NetworkStatus {
+		return true
+	}
+	if old.Connectivity != new.Connectivity {
+		return true
+	}
+	if old.PortalURL != new.PortalURL {
 		return true
 	}
 	if old.Preference != new.Preference {
@@ -425,6 +438,10 @@ func (m *Manager) GetPromptBroker() PromptBroker {
 }
 
 func (m *Manager) Close() {
+	if m.portalProbe != nil {
+		m.portalProbe.stop()
+	}
+
 	close(m.stopChan)
 	m.notifierWg.Wait()
 

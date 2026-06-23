@@ -14,6 +14,8 @@ Singleton {
     property string backend: ""
 
     property string networkStatus: "disconnected"
+    property string connectivity: "unknown"
+    property string portalURL: ""
     property string primaryConnection: ""
 
     property string ethernetIP: ""
@@ -285,6 +287,8 @@ Singleton {
         backend = state.backend || "";
         vpnAvailable = networkAvailable && backend === "networkmanager";
         networkStatus = state.networkStatus || "disconnected";
+        connectivity = state.connectivity || "unknown";
+        portalURL = state.portalURL || "";
         primaryConnection = state.primaryConnection || "";
 
         ethernetIP = state.ethernetIP || "";

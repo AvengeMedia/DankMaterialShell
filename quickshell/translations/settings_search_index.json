@@ -2109,6 +2109,37 @@
     "description": "Show an outline ring around the focused workspace indicator"
   },
   {
+    "section": "captivePortal",
+    "label": "Captive Portal",
+    "tabIndex": 7,
+    "category": "Network",
+    "keywords": [
+      "before",
+      "captive",
+      "connection",
+      "connectivity",
+      "ethernet",
+      "hotspot",
+      "internet",
+      "login",
+      "network",
+      "online",
+      "popup",
+      "portal",
+      "public wifi",
+      "reaching",
+      "requires",
+      "show",
+      "sign",
+      "sign in",
+      "wi-fi",
+      "wifi",
+      "wireless"
+    ],
+    "icon": "wifi_lock",
+    "description": "Show a popup to sign in when a network requires it before reaching the internet."
+  },
+  {
     "section": "_tab_7",
     "label": "Network",
     "tabIndex": 7,
@@ -2145,6 +2176,33 @@
       "wireless"
     ],
     "icon": "lan"
+  },
+  {
+    "section": "captivePortalAutoOpen",
+    "label": "Open sign-in page automatically",
+    "tabIndex": 7,
+    "category": "Network",
+    "keywords": [
+      "automatically",
+      "before",
+      "connection",
+      "connectivity",
+      "ethernet",
+      "internet",
+      "network",
+      "online",
+      "open",
+      "page",
+      "popup",
+      "reaching",
+      "requires",
+      "show",
+      "sign",
+      "wi-fi",
+      "wifi",
+      "wireless"
+    ],
+    "description": "Show a popup to sign in when a network requires it before reaching the internet."
   },
   {
     "section": "_tab_8",
