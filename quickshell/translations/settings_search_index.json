@@ -529,7 +529,8 @@
       "security",
       "time",
       "weather"
-    ]
+    ],
+    "description": "Preview: %1"
   },
   {
     "section": "padHours12Hour",
@@ -646,7 +647,8 @@
       "top",
       "topbar",
       "weather"
-    ]
+    ],
+    "description": "Preview: %1"
   },
   {
     "section": "useFahrenheit",
