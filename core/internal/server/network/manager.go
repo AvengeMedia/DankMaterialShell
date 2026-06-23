@@ -1,6 +1,7 @@
 package network
 
 import (
+	"errors"
 	"fmt"
 	"sync"
 	"time"
@@ -9,6 +10,10 @@ import (
 	"github.com/yeqown/go-qrcode/v2"
 	"github.com/yeqown/go-qrcode/writer/standard"
 )
+
+// ErrNoNetworkBackend is returned when no supported network management daemon
+// (NetworkManager, iwd, systemd-networkd, ConnMan) is present on the system.
+var ErrNoNetworkBackend = errors.New("no supported network backend found")
 
 func NewManager() (*Manager, error) {
 	detection, err := DetectNetworkStack()
@@ -58,7 +63,7 @@ func NewManager() (*Manager, error) {
 		}
 
 	default:
-		return nil, fmt.Errorf("no supported network backend found: %s", detection.ChosenReason)
+		return nil, fmt.Errorf("%w: %s", ErrNoNetworkBackend, detection.ChosenReason)
 	}
 
 	m := &Manager{

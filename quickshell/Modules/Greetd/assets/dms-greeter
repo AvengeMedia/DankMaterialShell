@@ -227,6 +227,15 @@ export XDG_STATE_HOME="$CACHE_DIR/.local/state"
 export XDG_DATA_HOME="$CACHE_DIR/.local/share"
 export XDG_CACHE_HOME="$CACHE_DIR/.cache"
 
+# Fallback runtime dir for systems without logind/pam_rundir (e.g. Void+seatd),
+# where Wayland compositors abort with "RuntimeDirNotSet". Guarded so logind
+# systems keep their own.
+if [[ -z "${XDG_RUNTIME_DIR:-}" || ! -d "${XDG_RUNTIME_DIR:-}" ]]; then
+    export XDG_RUNTIME_DIR="$CACHE_DIR/run"
+    mkdir -p "$XDG_RUNTIME_DIR"
+    chmod 700 "$XDG_RUNTIME_DIR"
+fi
+
 
 # Keep greeter VT clean by default; callers can override via env or --debug.
 if [[ -z "${RUST_LOG:-}" ]]; then

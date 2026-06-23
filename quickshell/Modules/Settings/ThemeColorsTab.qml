@@ -191,6 +191,12 @@ Item {
         PopoutService.colorPickerModal.show();
     }
 
+    function warnIfMissingQtTheme() {
+        if (Quickshell.env("QT_QPA_PLATFORMTHEME") === "gtk3" || Quickshell.env("QT_QPA_PLATFORMTHEME") === "qt6ct" || Quickshell.env("QT_QPA_PLATFORMTHEME_QT6") === "qt6ct")
+            return;
+        ToastService.showError(I18n.tr("Missing Environment Variables", "qt theme env error title"), I18n.tr("You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.", "qt theme env error body"));
+    }
+
     function formatThemeAutoTime(isoString) {
         if (!isoString)
             return "";
@@ -2264,22 +2270,67 @@ Item {
                 settingKey: "iconTheme"
                 iconName: "interests"
 
+                SettingsToggleRow {
+                    tab: "theme"
+                    tags: ["icon", "theme", "light", "dark", "mode"]
+                    settingKey: "iconThemePerMode"
+                    text: I18n.tr("Separate Light & Dark Themes")
+                    description: I18n.tr("Use different icon themes for light and dark mode")
+                    checked: SettingsData.iconThemePerMode
+                    onToggled: checked => SettingsData.setIconThemePerMode(checked)
+                }
+
                 SettingsDropdownRow {
                     tab: "theme"
                     tags: ["icon", "theme", "system"]
                     settingKey: "iconTheme"
                     text: I18n.tr("Icon Theme")
                     description: I18n.tr("DankShell & System Icons (requires restart)")
-                    currentValue: SettingsData.iconTheme
+                    visible: !SettingsData.iconThemePerMode
+                    currentValue: SettingsData.iconThemeDark
                     enableFuzzySearch: true
                     popupWidthOffset: 100
                     maxPopupHeight: 236
                     options: cachedIconThemes
                     onValueChanged: value => {
-                        SettingsData.setIconTheme(value);
-                        if (Quickshell.env("QT_QPA_PLATFORMTHEME") != "gtk3" && Quickshell.env("QT_QPA_PLATFORMTHEME") != "qt6ct" && Quickshell.env("QT_QPA_PLATFORMTHEME_QT6") != "qt6ct") {
-                            ToastService.showError(I18n.tr("Missing Environment Variables", "qt theme env error title"), I18n.tr("You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.", "qt theme env error body"));
-                        }
+                        SettingsData.setIconThemeForMode(value, false);
+                        warnIfMissingQtTheme();
+                    }
+                }
+
+                SettingsDropdownRow {
+                    tab: "theme"
+                    tags: ["icon", "theme", "system", "dark"]
+                    settingKey: "iconThemeDark"
+                    text: I18n.tr("Dark Mode Icon Theme")
+                    description: I18n.tr("DankShell & System Icons (requires restart)")
+                    visible: SettingsData.iconThemePerMode
+                    currentValue: SettingsData.iconThemeDark
+                    enableFuzzySearch: true
+                    popupWidthOffset: 100
+                    maxPopupHeight: 236
+                    options: cachedIconThemes
+                    onValueChanged: value => {
+                        SettingsData.setIconThemeForMode(value, false);
+                        warnIfMissingQtTheme();
+                    }
+                }
+
+                SettingsDropdownRow {
+                    tab: "theme"
+                    tags: ["icon", "theme", "system", "light"]
+                    settingKey: "iconThemeLight"
+                    text: I18n.tr("Light Mode Icon Theme")
+                    description: I18n.tr("DankShell & System Icons (requires restart)")
+                    visible: SettingsData.iconThemePerMode
+                    currentValue: SettingsData.iconThemeLight
+                    enableFuzzySearch: true
+                    popupWidthOffset: 100
+                    maxPopupHeight: 236
+                    options: cachedIconThemes
+                    onValueChanged: value => {
+                        SettingsData.setIconThemeForMode(value, true);
+                        warnIfMissingQtTheme();
                     }
                 }
             }

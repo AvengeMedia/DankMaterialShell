@@ -235,7 +235,7 @@ Singleton {
             }
         }
 
-        const shouldShowOsd = brightnessInitialized && anyDeviceBrightnessChanged;
+        const shouldShowOsd = brightnessInitialized && anyDeviceBrightnessChanged && !suppressOsd;
 
         if (!brightnessInitialized) {
             brightnessInitialized = true;
@@ -810,10 +810,11 @@ Singleton {
             if (rescanAttempt < 3) {
                 interval = rescanAttempt === 1 ? 5000 : 8000;
                 restart();
-            } else {
-                rescanAttempt = 0;
-                interval = 3000;
+                return;
             }
+            rescanAttempt = 0;
+            interval = 3000;
+            osdSuppressTimer.restart();
         }
     }
 
@@ -821,6 +822,7 @@ Singleton {
         target: Quickshell
 
         function onScreensChanged() {
+            suppressOsd = true;
             screenChangeRescanTimer.rescanAttempt = 0;
             screenChangeRescanTimer.interval = 3000;
             screenChangeRescanTimer.restart();

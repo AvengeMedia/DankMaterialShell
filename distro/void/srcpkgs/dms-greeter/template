@@ -1,0 +1,35 @@
+# Template file for 'dms-greeter'
+#
+# greetd greeter for DankMaterialShell
+# Builds from the same DMS release tarball as 'dms'; keep version/checksum in sync.
+# Setup is done by `dms greeter enable`, not by this package — see distro/void/README.md.
+pkgname=dms-greeter
+version=1.4.6
+revision=1
+short_desc="DankMaterialShell greeter for greetd"
+maintainer="AvengeMedia <AvengeMedia.US@gmail.com>"
+license="MIT"
+homepage="https://danklinux.com"
+distfiles="https://github.com/AvengeMedia/DankMaterialShell/archive/refs/tags/v${version}.tar.gz"
+checksum=f54601e522c883fa9cce02bec070e4321e47389a1cf453e7ad0bb7379ad91b61
+
+depends="greetd quickshell acl-progs seatd pam_rundir"
+
+# Cache dir the greeter uses as $HOME (owned by greetd's _greeter user).
+make_dirs="/var/cache/dms-greeter 0750 _greeter _greeter"
+
+do_install() {
+	# Launcher wrapper -> /usr/bin/dms-greeter
+	vbin quickshell/Modules/Greetd/assets/dms-greeter
+
+	# Same QML tree as the shell; greeter mode is selected at runtime via DMS_RUN_GREETER.
+	vmkdir usr/share/quickshell/dms-greeter
+	vcopy "quickshell/*" usr/share/quickshell/dms-greeter
+
+	# Sample compositor configs for reference
+	vinstall quickshell/Modules/Greetd/assets/dms-niri.kdl 644 usr/share/dms-greeter
+	vinstall quickshell/Modules/Greetd/assets/dms-hypr.conf 644 usr/share/dms-greeter
+
+	vdoc quickshell/Modules/Greetd/README.md
+	vlicense LICENSE
+}

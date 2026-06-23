@@ -202,7 +202,7 @@ StyledRect {
         id: rightButtonsRow
 
         anchors.right: parent.right
-        anchors.rightMargin: Theme.spacingS
+        anchors.rightMargin: Theme.spacingS + root.rightAccessoryWidth
         anchors.verticalCenter: parent.verticalCenter
         spacing: Theme.spacingXS
         visible: showPasswordToggle || (showClearButton && text.length > 0)

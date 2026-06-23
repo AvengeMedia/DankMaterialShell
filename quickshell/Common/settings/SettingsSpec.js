@@ -74,6 +74,8 @@ var SPEC = {
     wallpaperFillMode: { def: "Fill" },
     blurredWallpaperLayer: { def: false },
     blurWallpaperOnOverview: { def: false },
+    wallpaperBackgroundColorMode: { def: "black" },
+    wallpaperBackgroundCustomColor: { def: "#000000" },
 
     showLauncherButton: { def: true },
     showWorkspaceSwitcher: { def: true },
@@ -94,6 +96,10 @@ var SPEC = {
     showClock: { def: true },
     showNotificationButton: { def: true },
     showBattery: { def: true },
+    showBatteryPercent: { def: true },
+    showBatteryPercentOnlyOnBattery: { def: false },
+    showBatteryTime: { def: false },
+    showBatteryTimeOnlyOnBattery: { def: false },
     showControlCenterButton: { def: true },
     showCapsLockIndicator: { def: true },
 
@@ -227,6 +233,7 @@ var SPEC = {
     appDrawerSectionViewModes: { def: {} },
     niriOverviewOverlayEnabled: { def: true },
     dankLauncherV2Size: { def: "compact" },
+    dankLauncherV2ShowSourceBadges: { def: true },
     dankLauncherV2BorderEnabled: { def: false },
     dankLauncherV2BorderThickness: { def: 2 },
     dankLauncherV2BorderColor: { def: "primary" },
@@ -244,7 +251,10 @@ var SPEC = {
 
     networkPreference: { def: "auto" },
 
-    iconTheme: { def: "System Default", onChange: "applyStoredIconTheme" },
+    iconThemeDark: { def: "System Default", onChange: "applyStoredIconTheme" },
+    iconThemeLight: { def: "System Default", onChange: "applyStoredIconTheme" },
+    iconThemePerMode: { def: false, onChange: "applyStoredIconTheme" },
+    lastAppliedIconTheme: { def: "" },
     availableIconThemes: { def: ["System Default"], persist: false },
     systemDefaultIconTheme: { def: "", persist: false },
     qt5ctAvailable: { def: false, persist: false },
@@ -597,6 +607,7 @@ var SPEC = {
     desktopWidgetGroups: { def: [] },
 
     builtInPluginSettings: { def: {} },
+    clipboardClickToPaste: { def: false },
     clipboardEnterToPaste: { def: false },
     clipboardRememberTypeFilter: { def: false },
     clipboardTypeFilter: { def: "all" },
@@ -617,7 +628,10 @@ var SPEC = {
     frameCloseGaps: { def: true },
     frameLauncherEmergeSide: { def: "bottom" },
     frameLauncherArcExtender: { def: false },
-    frameMode: { def: "connected" }
+    frameMode: { def: "connected" },
+    barInsetPaddingShared: { def: -1 },
+    barInsetPaddingSyncAll: { def: false },
+    frameBarInsetPadding: { def: -1 }
 };
 
 function getValidKeys() {
