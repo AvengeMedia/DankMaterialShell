@@ -2005,10 +2005,14 @@
     "keywords": [
       "bar",
       "between",
+      "corner",
       "dank",
+      "edge",
       "edges",
+      "end",
       "gap",
       "gaps",
+      "inset",
       "margin",
       "margins",
       "padding",
@@ -7932,6 +7936,34 @@
       "window"
     ],
     "description": "Use the extended surface for launcher content"
+  },
+  {
+    "section": "frameBarInsetPadding",
+    "label": "Bar Inset Padding",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "bar",
+      "between",
+      "border",
+      "components",
+      "corner",
+      "decoration",
+      "edge",
+      "end",
+      "ends",
+      "frame",
+      "inset",
+      "modules",
+      "padding",
+      "panel",
+      "statusbar",
+      "taskbar",
+      "topbar",
+      "widgets",
+      "window"
+    ],
+    "description": "Gap between the end widgets and the bar ends (0 = edge-to-edge)"
   },
   {
     "section": "frameBorder",
