@@ -20,6 +20,11 @@ FocusScope {
     property string searchQuery: ""
     property var filteredPlugins: []
 
+    readonly property var pluginsWithUpdates: {
+        if (!DMSService.installedPlugins) return [];
+        return DMSService.installedPlugins.filter(p => p.hasUpdate === true);
+    }
+
     function updateFilteredPlugins() {
         var query = searchQuery.toLowerCase();
         filteredPlugins = PluginService.availablePluginsList.filter(plugin => {
@@ -246,6 +251,15 @@ FocusScope {
                                     DMSService.listInstalled();
                                 }
                                 pluginsTab.refreshPluginList();
+                            }
+                        }
+
+                        DankButton {
+                            text: I18n.tr("Update All")
+                            iconName: "download"
+                            enabled: DMSService.dmsAvailable && pluginsTab.pluginsWithUpdates.length > 0
+                            onClicked: {
+                                showPluginUpdatesDialog();
                             }
                         }
 
@@ -532,5 +546,24 @@ FocusScope {
         pluginBrowserLoader.active = true;
         if (pluginBrowserLoader.item)
             pluginBrowserLoader.item.show();
+    }
+
+    LazyLoader {
+        id: pluginUpdatesDialogLoader
+        active: false
+
+        PluginUpdatesDialog {
+            id: pluginUpdatesDialogItem
+
+            Component.onCompleted: {
+                pluginUpdatesDialogItem.parentModal = pluginsTab.parentModal;
+            }
+        }
+    }
+
+    function showPluginUpdatesDialog() {
+        pluginUpdatesDialogLoader.active = true;
+        if (pluginUpdatesDialogLoader.item)
+            pluginUpdatesDialogLoader.item.show(pluginsTab.pluginsWithUpdates);
     }
 }

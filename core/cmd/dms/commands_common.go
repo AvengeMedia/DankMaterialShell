@@ -106,6 +106,8 @@ func init() {
 	ipcCmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {
 		printIPCHelp()
 	})
+	pluginsUpdateCmd.Flags().BoolP("all", "a", false, "Update all installed plugins")
+	pluginsUpdateCmd.Flags().Bool("check", false, "Check for available updates without applying them")
 }
 
 var debugSrvCmd = &cobra.Command{
@@ -184,10 +186,22 @@ var pluginsUninstallCmd = &cobra.Command{
 }
 
 var pluginsUpdateCmd = &cobra.Command{
-	Use:   "update <plugin-id>",
-	Short: "Update a plugin by ID",
-	Long:  "Update an installed DMS plugin using its ID (e.g., 'myPlugin'). Plugin names are also supported.",
-	Args:  cobra.ExactArgs(1),
+	Use:   "update [plugin-id]",
+	Short: "Update a plugin by ID, or all plugins",
+	Long:  "Update an installed DMS plugin using its ID (e.g., 'myPlugin'). If --all or -a is specified, all installed plugins will be updated.",
+	Args: func(cmd *cobra.Command, args []string) error {
+		updateAll, _ := cmd.Flags().GetBool("all")
+		if updateAll {
+			if len(args) > 0 {
+				return fmt.Errorf("cannot specify plugin ID when using --all/-a")
+			}
+			return nil
+		}
+		if len(args) != 1 {
+			return fmt.Errorf("requires exactly 1 arg (plugin ID) or use --all/-a")
+		}
+		return nil
+	},
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		if len(args) != 0 {
 			return nil, cobra.ShellCompDirectiveNoFileComp
@@ -195,6 +209,26 @@ var pluginsUpdateCmd = &cobra.Command{
 		return getInstalledPluginIDs(), cobra.ShellCompDirectiveNoFileComp
 	},
 	Run: func(cmd *cobra.Command, args []string) {
+		checkOnly, _ := cmd.Flags().GetBool("check")
+		updateAll, _ := cmd.Flags().GetBool("all")
+		if checkOnly {
+			if updateAll {
+				if err := checkAllPluginsCLI(); err != nil {
+					log.Fatalf("Error checking updates: %v", err)
+				}
+				return
+			}
+			if err := checkPluginCLI(args[0]); err != nil {
+				log.Fatalf("Error checking update: %v", err)
+			}
+			return
+		}
+		if updateAll {
+			if err := updateAllPluginsCLI(); err != nil {
+				log.Fatalf("Error updating plugins: %v", err)
+			}
+			return
+		}
 		if err := updatePluginCLI(args[0]); err != nil {
 			log.Fatalf("Error updating plugin: %v", err)
 		}
@@ -343,7 +377,11 @@ func listInstalledPlugins() error {
 	fmt.Printf("\nInstalled Plugins (%d):\n\n", len(installedNames))
 	for _, id := range installedNames {
 		if plugin, ok := pluginMap[id]; ok {
-			fmt.Printf("  %s\n", plugin.Name)
+			hasUpdateStr := ""
+			if hasUpdates, err := manager.HasUpdates(id, plugin); err == nil && hasUpdates {
+				hasUpdateStr = " (update available)"
+			}
+			fmt.Printf("  %s%s\n", plugin.Name, hasUpdateStr)
 			fmt.Printf("    ID: %s\n", plugin.ID)
 			fmt.Printf("    Category: %s\n", plugin.Category)
 			fmt.Printf("    Author: %s\n", plugin.Author)
@@ -520,6 +558,160 @@ func updatePluginCLI(idOrName string) error {
 		return err
 	}
 	fmt.Printf("Plugin updated successfully: %s\n", idOrName)
+	return nil
+}
+
+func updateAllPluginsCLI() error {
+	manager, err := plugins.NewManager()
+	if err != nil {
+		return fmt.Errorf("failed to create manager: %w", err)
+	}
+
+	registry, err := plugins.NewRegistry()
+	if err != nil {
+		return fmt.Errorf("failed to create registry: %w", err)
+	}
+
+	installed, err := manager.ListInstalled()
+	if err != nil {
+		return fmt.Errorf("failed to list installed plugins: %w", err)
+	}
+
+	pluginList, _ := registry.List()
+
+	var errs []error
+	for _, pluginID := range installed {
+		plugin := plugins.FindByIDOrName(pluginID, pluginList)
+		if plugin != nil {
+			fmt.Printf("Updating plugin: %s (ID: %s)\n", plugin.Name, plugin.ID)
+			if err := manager.Update(*plugin); err != nil {
+				if strings.Contains(err.Error(), "cannot update system plugin") {
+					fmt.Printf("Skipping system plugin: %s\n", plugin.Name)
+				} else {
+					errs = append(errs, fmt.Errorf("failed to update %s: %w", plugin.Name, err))
+				}
+			} else {
+				fmt.Printf("Plugin updated successfully: %s\n", plugin.Name)
+			}
+		} else {
+			fmt.Printf("Updating plugin: %s\n", pluginID)
+			if err := manager.UpdateByIDOrName(pluginID); err != nil {
+				if strings.Contains(err.Error(), "cannot update system plugin") {
+					fmt.Printf("Skipping system plugin: %s\n", pluginID)
+				} else {
+					errs = append(errs, fmt.Errorf("failed to update %s: %w", pluginID, err))
+				}
+			} else {
+				fmt.Printf("Plugin updated successfully: %s\n", pluginID)
+			}
+		}
+	}
+
+	if len(errs) > 0 {
+		for _, err := range errs {
+			fmt.Fprintf(os.Stderr, "%v\n", err)
+		}
+		return fmt.Errorf("failed to update some plugins")
+	}
+
+	return nil
+}
+
+func checkPluginCLI(idOrName string) error {
+	manager, err := plugins.NewManager()
+	if err != nil {
+		return fmt.Errorf("failed to create manager: %w", err)
+	}
+
+	registry, err := plugins.NewRegistry()
+	if err != nil {
+		return fmt.Errorf("failed to create registry: %w", err)
+	}
+
+	pluginList, _ := registry.List()
+	plugin := plugins.FindByIDOrName(idOrName, pluginList)
+
+	if plugin != nil {
+		installed, err := manager.IsInstalled(*plugin)
+		if err != nil {
+			return fmt.Errorf("failed to check install status: %w", err)
+		}
+		if !installed {
+			return fmt.Errorf("plugin not installed: %s", plugin.Name)
+		}
+
+		hasUpdates, err := manager.HasUpdates(plugin.ID, *plugin)
+		if err != nil {
+			return fmt.Errorf("failed to check updates: %w", err)
+		}
+
+		if hasUpdates {
+			fmt.Printf("Update available for plugin: %s (ID: %s)\n", plugin.Name, plugin.ID)
+		} else {
+			fmt.Printf("Plugin is up to date: %s\n", plugin.Name)
+		}
+		return nil
+	}
+
+	dummyPlugin := plugins.Plugin{ID: idOrName}
+	hasUpdates, err := manager.HasUpdates(idOrName, dummyPlugin)
+	if err != nil {
+		return fmt.Errorf("failed to check updates: %w", err)
+	}
+
+	if hasUpdates {
+		fmt.Printf("Update available for plugin: %s\n", idOrName)
+	} else {
+		fmt.Printf("Plugin is up to date: %s\n", idOrName)
+	}
+	return nil
+}
+
+func checkAllPluginsCLI() error {
+	manager, err := plugins.NewManager()
+	if err != nil {
+		return fmt.Errorf("failed to create manager: %w", err)
+	}
+
+	registry, err := plugins.NewRegistry()
+	if err != nil {
+		return fmt.Errorf("failed to create registry: %w", err)
+	}
+
+	installed, err := manager.ListInstalled()
+	if err != nil {
+		return fmt.Errorf("failed to list installed plugins: %w", err)
+	}
+
+	pluginList, _ := registry.List()
+
+	var count int
+	for _, pluginID := range installed {
+		plugin := plugins.FindByIDOrName(pluginID, pluginList)
+		var hasUpdates bool
+		var name string
+
+		if plugin != nil {
+			name = plugin.Name
+			hasUpdates, _ = manager.HasUpdates(pluginID, *plugin)
+		} else {
+			name = pluginID
+			dummyPlugin := plugins.Plugin{ID: pluginID}
+			hasUpdates, _ = manager.HasUpdates(pluginID, dummyPlugin)
+		}
+
+		if hasUpdates {
+			fmt.Printf("Update available for plugin: %s (ID: %s)\n", name, pluginID)
+			count++
+		}
+	}
+
+	if count > 0 {
+		fmt.Printf("\nFound %d plugin(s) with available updates.\n", count)
+	} else {
+		fmt.Println("All plugins are up to date.")
+	}
+
 	return nil
 }
 
