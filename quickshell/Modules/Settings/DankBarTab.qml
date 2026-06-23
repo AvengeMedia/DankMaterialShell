@@ -986,7 +986,7 @@ Item {
                     id: barInsetPaddingSlider
                     visible: !SettingsData.frameEnabled
                     text: I18n.tr("Bar Inset Padding")
-                    description: I18n.tr("Gap between the end widgets and both bar ends (0 = edge-to-edge)")
+                    description: I18n.tr("Gap between the end widgets and the bar ends (0 = edge-to-edge)")
                     tags: ["bar", "padding", "inset", "edge", "corner", "end"]
                     unit: "px"
                     minimum: 0

@@ -363,15 +363,30 @@ Item {
                     visible: root.currentWallpaper !== "" && !root.currentWallpaper.startsWith("#")
                     dropdownWidth: 220
                     options: [
-                        { "value": "black", "label": I18n.tr("Black") },
-                        { "value": "white", "label": I18n.tr("White") },
-                        { "value": "primary", "label": I18n.tr("Primary Theme Color") },
-                        { "value": "surface", "label": I18n.tr("Surface Container") },
-                        { "value": "custom", "label": I18n.tr("Custom") }
+                        {
+                            "value": "black",
+                            "label": I18n.tr("Black")
+                        },
+                        {
+                            "value": "white",
+                            "label": I18n.tr("White")
+                        },
+                        {
+                            "value": "primary",
+                            "label": I18n.tr("Primary Theme Color")
+                        },
+                        {
+                            "value": "surface",
+                            "label": I18n.tr("Surface Container")
+                        },
+                        {
+                            "value": "custom",
+                            "label": I18n.tr("Custom")
+                        }
                     ]
                     currentMode: SettingsData.wallpaperBackgroundColorMode
                     customColor: SettingsData.wallpaperBackgroundCustomColor || "#000000"
-                    pickerTitle: I18n.tr("Wallpaper Background Color")
+                    pickerTitle: I18n.tr("Background Color")
                     onModeSelected: mode => SettingsData.set("wallpaperBackgroundColorMode", mode)
                     onCustomColorSelected: selectedColor => SettingsData.set("wallpaperBackgroundCustomColor", selectedColor.toString())
                 }

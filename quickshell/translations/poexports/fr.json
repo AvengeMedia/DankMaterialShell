@@ -323,6 +323,9 @@
   "A user with that name already exists.": {
     "A user with that name already exists.": ""
   },
+  "AC Adapter (Plugged In)": {
+    "AC Adapter (Plugged In)": ""
+  },
   "AC Power": {
     "AC Power": "Alimentation secteur"
   },
@@ -524,6 +527,9 @@
   "Allow": {
     "Allow": ""
   },
+  "Allow LAN access": {
+    "Allow LAN access": ""
+  },
   "Allow adjusting device volume by scrolling on the right half of items in the device list": {
     "Allow adjusting device volume by scrolling on the right half of items in the device list": ""
   },
@@ -664,6 +670,9 @@
   },
   "Apply inverse concave corner cutouts to the bar": {
     "Apply inverse concave corner cutouts to the bar": ""
+  },
+  "Apply to Hardware": {
+    "Apply to Hardware": ""
   },
   "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": {
     "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": "Appliquer une température de couleur chaude pour réduire la fatigue visuelle. Utilisez les paramètres d’automatisation ci-dessous pour définir son activation."
@@ -818,6 +827,9 @@
   "Auto Popup Gaps": {
     "Auto Popup Gaps": "Espacements automatiques des fenêtres contextuelles"
   },
+  "Auto Power Saver": {
+    "Auto Power Saver": ""
+  },
   "Auto mode is on. Manual profile selection is disabled.": {
     "Auto mode is on. Manual profile selection is disabled.": ""
   },
@@ -911,6 +923,9 @@
   "Automatically save changes to opened files as you type": {
     "Automatically save changes to opened files as you type": ""
   },
+  "Automatically turn on Power Saver profile when battery is low.": {
+    "Automatically turn on Power Saver profile when battery is low.": ""
+  },
   "Automation": {
     "Automation": "Automatisation"
   },
@@ -962,6 +977,9 @@
   "Background Blur": {
     "Background Blur": ""
   },
+  "Background Color": {
+    "Background Color": ""
+  },
   "Background Effect": {
     "Background Effect": ""
   },
@@ -995,11 +1013,17 @@
   "Bar Configurations": {
     "Bar Configurations": "Configurations de la barre"
   },
+  "Bar Inset Padding": {
+    "Bar Inset Padding": ""
+  },
   "Bar Opacity": {
     "Bar Opacity": ""
   },
   "Bar Shadows": {
     "Bar Shadows": "Ombres de barre"
+  },
+  "Bar Spacing": {
+    "Bar Spacing": ""
   },
   "Bar Transparency": {
     "Bar Transparency": "Transparence de la barre"
@@ -1028,11 +1052,35 @@
   "Battery Charge Limit": {
     "Battery Charge Limit": "Limite de charge de la batterie"
   },
+  "Battery Health": {
+    "Battery Health": ""
+  },
+  "Battery Power": {
+    "Battery Power": ""
+  },
+  "Battery Protection & Charging": {
+    "Battery Protection & Charging": ""
+  },
+  "Battery Status": {
+    "Battery Status": ""
+  },
   "Battery and power management": {
     "Battery and power management": "Gestion de la batterie et de l’alimentation"
   },
+  "Battery has charged to your set limit of %1%": {
+    "Battery has charged to your set limit of %1%": ""
+  },
+  "Battery is at %1% - Connect charger immediately!": {
+    "Battery is at %1% - Connect charger immediately!": ""
+  },
+  "Battery is at %1% - Consider charging soon": {
+    "Battery is at %1% - Consider charging soon": ""
+  },
   "Battery level and power management": {
     "Battery level and power management": "Niveau de batterie et gestion de l'alimentation"
+  },
+  "Battery percentage to trigger a critical alert.": {
+    "Battery percentage to trigger a critical alert.": ""
   },
   "Behavior": {
     "Behavior": "Comportement"
@@ -1057,6 +1105,9 @@
   },
   "Black": {
     "Black": ""
+  },
+  "Blend between Surface High and the selected custom color": {
+    "Blend between Surface High and the selected custom color": ""
   },
   "Block Out": {
     "Block Out": "Bloquer"
@@ -1316,6 +1367,15 @@
   "Channel": {
     "Channel": "Canal"
   },
+  "Charge Level": {
+    "Charge Level": ""
+  },
+  "Charge Limit Reached": {
+    "Charge Limit Reached": ""
+  },
+  "Charge limit applied successfully": {
+    "Charge limit applied successfully": ""
+  },
   "Charging": {
     "Charging": "En charge"
   },
@@ -1376,11 +1436,17 @@
   "Choose how this bar resolves shadow direction": {
     "Choose how this bar resolves shadow direction": "Choisissez comment cette barre gère la direction de l'ombre"
   },
+  "Choose how to be notified about battery alerts.": {
+    "Choose how to be notified about battery alerts.": ""
+  },
   "Choose icon": {
     "Choose icon": "Choisir une icône"
   },
   "Choose monochrome or a theme color tint for system tray icons": {
     "Choose monochrome or a theme color tint for system tray icons": ""
+  },
+  "Choose neutral or accent-colored widget text": {
+    "Choose neutral or accent-colored widget text": ""
   },
   "Choose the background color for widgets": {
     "Choose the background color for widgets": "Choisir la couleur de fond des widgets"
@@ -1466,8 +1532,14 @@
   "Click Through": {
     "Click Through": "Cliquable à travers"
   },
+  "Click an entry to paste directly instead of copying": {
+    "Click an entry to paste directly instead of copying": ""
+  },
   "Click any shortcut to edit. Changes save to %1": {
     "Click any shortcut to edit. Changes save to %1": "Cliquez sur un raccourci pour l’éditer. Les modifications sont enregistrées dans %1"
+  },
+  "Click to Paste": {
+    "Click to Paste": ""
   },
   "Click to capture": {
     "Click to capture": "Cliquer pour capturer"
@@ -1546,6 +1618,9 @@
   },
   "Color for primary action buttons": {
     "Color for primary action buttons": "Couleur primaire pour les boutons d'action"
+  },
+  "Color shown for areas not covered by wallpaper (e.g. Fit or Pad modes)": {
+    "Color shown for areas not covered by wallpaper (e.g. Fit or Pad modes)": ""
   },
   "Color temperature for day time": {
     "Color temperature for day time": "Température de couleur pour la journée"
@@ -1895,8 +1970,20 @@
   "Creating...": {
     "Creating...": "Création..."
   },
+  "Critical Battery": {
+    "Critical Battery": ""
+  },
+  "Critical Battery Alert": {
+    "Critical Battery Alert": ""
+  },
+  "Critical Battery Notifications": {
+    "Critical Battery Notifications": ""
+  },
   "Critical Priority": {
     "Critical Priority": "Priorité critique"
+  },
+  "Critical Threshold": {
+    "Critical Threshold": ""
   },
   "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": {
     "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": ""
@@ -1972,6 +2059,9 @@
   },
   "Custom": {
     "Custom": "Personnalisé"
+  },
+  "Custom Blend": {
+    "Custom Blend": ""
   },
   "Custom Color": {
     "Custom Color": "Couleur personnalisée"
@@ -2116,6 +2206,9 @@
   },
   "Dark Mode": {
     "Dark Mode": "Mode sombre"
+  },
+  "Dark Mode Icon Theme": {
+    "Dark Mode Icon Theme": ""
   },
   "Dark mode base": {
     "Dark mode base": ""
@@ -2486,6 +2579,9 @@
   "Dock margin, transparency, and border": {
     "Dock margin, transparency, and border": ""
   },
+  "Dock window": {
+    "Dock window": ""
+  },
   "Docs": {
     "Docs": "Documentation"
   },
@@ -2569,6 +2665,9 @@
   },
   "Edge Spacing": {
     "Edge Spacing": "Espacement des bords"
+  },
+  "Edge spacing, exclusive zone, and popup gaps are managed by Frame": {
+    "Edge spacing, exclusive zone, and popup gaps are managed by Frame": ""
   },
   "Edge the launcher slides from": {
     "Edge the launcher slides from": ""
@@ -2795,6 +2894,9 @@
   "Errors": {
     "Errors": "Erreurs"
   },
+  "Estimated Time": {
+    "Estimated Time": ""
+  },
   "Ethernet": {
     "Ethernet": "Ethernet"
   },
@@ -2821,6 +2923,9 @@
   },
   "Existing Users": {
     "Existing Users": ""
+  },
+  "Exit node": {
+    "Exit node": ""
   },
   "Experimental Feature": {
     "Experimental Feature": "Fonctionnalité expérimentale"
@@ -2884,6 +2989,9 @@
   },
   "Failed to apply Qt colors": {
     "Failed to apply Qt colors": ""
+  },
+  "Failed to apply charge limit to system": {
+    "Failed to apply charge limit to system": ""
   },
   "Failed to apply profile": {
     "Failed to apply profile": ""
@@ -3175,6 +3283,9 @@
   },
   "Filter": {
     "Filter": ""
+  },
+  "Filter by type": {
+    "Filter by type": ""
   },
   "Find in Text": {
     "Find in Text": "Rechercher dans le texte"
@@ -3475,6 +3586,9 @@
   },
   "Gamma control not available. Requires DMS API v6+.": {
     "Gamma control not available. Requires DMS API v6+.": "Le contrôle du gamma n’est pas disponible. Nécessite l’API DMS v6 ou supérieure."
+  },
+  "Gap between the end widgets and the bar ends (0 = edge-to-edge)": {
+    "Gap between the end widgets and the bar ends (0 = edge-to-edge)": ""
   },
   "Generate Override": {
     "Generate Override": ""
@@ -3845,6 +3959,9 @@
   "Icon Theme": {
     "Icon Theme": "Thème d'icônes"
   },
+  "Icon theme changed outside DMS; switched to System Default": {
+    "Icon theme changed outside DMS; switched to System Default": ""
+  },
   "Identical alerts show as one popup instead of stacking": {
     "Identical alerts show as one popup instead of stacking": ""
   },
@@ -4079,6 +4196,9 @@
   "Keep in Bar": {
     "Keep in Bar": ""
   },
+  "Keep the clipboard type filter when reopening history": {
+    "Keep the clipboard type filter when reopening history": ""
+  },
   "Keep typing": {
     "Keep typing": ""
   },
@@ -4220,6 +4340,9 @@
   "Light Mode": {
     "Light Mode": "Mode Clair"
   },
+  "Light Mode Icon Theme": {
+    "Light Mode Icon Theme": ""
+  },
   "Light Rain": {
     "Light Rain": "Pluie légère"
   },
@@ -4234,6 +4357,12 @@
   },
   "Light mode harmony": {
     "Light mode harmony": ""
+  },
+  "Limit set to %1%": {
+    "Limit set to %1%": ""
+  },
+  "Limit the maximum battery charge level to extend lifespan.": {
+    "Limit the maximum battery charge level to extend lifespan.": ""
   },
   "Line": {
     "Line": "Ligne"
@@ -4270,6 +4399,9 @@
   },
   "Local": {
     "Local": "Local"
+  },
+  "Local Weather": {
+    "Local Weather": ""
   },
   "Locale": {
     "Locale": "Régional"
@@ -4342,6 +4474,15 @@
   },
   "Low": {
     "Low": ""
+  },
+  "Low Battery": {
+    "Low Battery": ""
+  },
+  "Low Battery Notifications": {
+    "Low Battery Notifications": ""
+  },
+  "Low Battery Threshold": {
+    "Low Battery Threshold": ""
   },
   "Low Priority": {
     "Low Priority": "Faible priorité"
@@ -4744,6 +4885,9 @@
   },
   "Music Player": {
     "Music Player": ""
+  },
+  "Mute During Playback": {
+    "Mute During Playback": ""
   },
   "Mute Popups": {
     "Mute Popups": "Mettre les popups en sourdine"
@@ -5255,6 +5399,9 @@
   "Nothing to see here": {
     "Nothing to see here": "Rien à voir ici."
   },
+  "Notification": {
+    "Notification": ""
+  },
   "Notification Center": {
     "Notification Center": "Centre de Notifications"
   },
@@ -5276,11 +5423,17 @@
   "Notification Timeouts": {
     "Notification Timeouts": "Délais d’affichage des notifications"
   },
+  "Notification Type": {
+    "Notification Type": ""
+  },
   "Notification toast popups": {
     "Notification toast popups": "Notifications éphémères à l’écran"
   },
   "Notifications": {
     "Notifications": "Notifications"
+  },
+  "Notify when limit is reached": {
+    "Notify when limit is reached": ""
   },
   "Numbers": {
     "Numbers": "Nombres"
@@ -5342,6 +5495,9 @@
   "Only affects DMS-managed PAM. If greetd already includes pam_fprintd, fingerprint stays enabled.": {
     "Only affects DMS-managed PAM. If greetd already includes pam_fprintd, fingerprint stays enabled.": ""
   },
+  "Only on Battery": {
+    "Only on Battery": ""
+  },
   "Only show windows from the current monitor on each dock": {
     "Only show windows from the current monitor on each dock": "Afficher uniquement les fenêtres de l'écran actuel sur chaque dock"
   },
@@ -5392,6 +5548,9 @@
   },
   "Open a terminal and run a custom command instead of the in-shell upgrade flow.": {
     "Open a terminal and run a custom command instead of the in-shell upgrade flow.": ""
+  },
+  "Open as window": {
+    "Open as window": ""
   },
   "Open folder": {
     "Open folder": "Ouvrir dossier"
@@ -5876,6 +6035,9 @@
   "Power Profile Degradation": {
     "Power Profile Degradation": "Dégradation du profil d’alimentation"
   },
+  "Power Profiles Auto-Switching": {
+    "Power Profiles Auto-Switching": ""
+  },
   "Power Saver": {
     "Power Saver": "Économie d'énergie"
   },
@@ -5884,6 +6046,12 @@
   },
   "Power profile management available": {
     "Power profile management available": "Gestion du profil d’alimentation disponible"
+  },
+  "Power profile to use when AC power is connected.": {
+    "Power profile to use when AC power is connected.": ""
+  },
+  "Power profile to use when running on battery power.": {
+    "Power profile to use when running on battery power.": ""
   },
   "Power source": {
     "Power source": "Source d’alimentation"
@@ -5930,11 +6098,17 @@
   "Preview": {
     "Preview": "Aperçu"
   },
+  "Preview: %1": {
+    "Preview: %1": ""
+  },
   "Primary": {
     "Primary": "Principal"
   },
   "Primary Container": {
     "Primary Container": "Conteneur primaire"
+  },
+  "Primary Theme Color": {
+    "Primary Theme Color": ""
   },
   "Print Server Management": {
     "Print Server Management": "Gestion du serveur d’impression"
@@ -5984,6 +6158,9 @@
   "Process Count": {
     "Process Count": "Nombre de processus"
   },
+  "Process exited with code %1": {
+    "Process exited with code %1": ""
+  },
   "Processes": {
     "Processes": "Processus"
   },
@@ -6019,6 +6196,12 @@
   },
   "Profile saved: %1": {
     "Profile saved: %1": "Profil sauvegardé : %1"
+  },
+  "Profile when Plugged In (AC)": {
+    "Profile when Plugged In (AC)": ""
+  },
+  "Profile when on Battery": {
+    "Profile when on Battery": ""
   },
   "Protocol": {
     "Protocol": "Protocole"
@@ -6082,6 +6265,9 @@
   },
   "Re-enter password": {
     "Re-enter password": ""
+  },
+  "Reach local network devices while using an exit node": {
+    "Reach local network devices while using an exit node": ""
   },
   "Read-only legacy config": {
     "Read-only legacy config": ""
@@ -6148,6 +6334,9 @@
   },
   "Remember Last Query": {
     "Remember Last Query": ""
+  },
+  "Remember Type Filter": {
+    "Remember Type Filter": ""
   },
   "Remember last session": {
     "Remember last session": "Se souvenir de la dernière session"
@@ -6449,6 +6638,9 @@
   "Saved Configurations": {
     "Saved Configurations": "Configurations enregistrées"
   },
+  "Saved Networks": {
+    "Saved Networks": ""
+  },
   "Saved Note": {
     "Saved Note": "Note sauvegardée"
   },
@@ -6571,6 +6763,9 @@
   },
   "Secondary": {
     "Secondary": "Secondaire"
+  },
+  "Secondary Container": {
+    "Secondary Container": ""
   },
   "Secured": {
     "Secured": "Sécurisé"
@@ -6713,6 +6908,9 @@
   "Separate": {
     "Separate": ""
   },
+  "Separate Light & Dark Themes": {
+    "Separate Light & Dark Themes": ""
+  },
   "Separator": {
     "Separator": "Séparateur"
   },
@@ -6754,6 +6952,9 @@
   },
   "Set the font size for notification summary text": {
     "Set the font size for notification summary text": ""
+  },
+  "Set the percentage at which the battery is considered low.": {
+    "Set the percentage at which the battery is considered low.": ""
   },
   "Setting": {
     "Setting": ""
@@ -6869,6 +7070,9 @@
   "Show Feels Like Temperature": {
     "Show Feels Like Temperature": "Afficher la température ressentie"
   },
+  "Show Flatpak, Snap, AppImage, or Nix badge icons on launcher items.": {
+    "Show Flatpak, Snap, AppImage, or Nix badge icons on launcher items.": ""
+  },
   "Show Footer": {
     "Show Footer": "Afficher le pied de page"
   },
@@ -6941,8 +7145,14 @@
   "Show Overflow Badge Count": {
     "Show Overflow Badge Count": "Afficher le compteur du badge de débordement"
   },
+  "Show Package Source Badges": {
+    "Show Package Source Badges": ""
+  },
   "Show Password Field": {
     "Show Password Field": "Afficher le champ de mot de passe"
+  },
+  "Show Percentage": {
+    "Show Percentage": ""
   },
   "Show Power Actions": {
     "Show Power Actions": "Afficher les actions d’alimentation"
@@ -6961,6 +7171,9 @@
   },
   "Show Reboot": {
     "Show Reboot": "Afficher redémarrer"
+  },
+  "Show Remaining Time": {
+    "Show Remaining Time": ""
   },
   "Show Restart DMS": {
     "Show Restart DMS": "Afficher redémarrer DMS"
@@ -7016,11 +7229,20 @@
   "Show a bar that drains as the popup's auto-dismiss timer runs": {
     "Show a bar that drains as the popup's auto-dismiss timer runs": ""
   },
+  "Show a notification when battery reaches the charge limit.": {
+    "Show a notification when battery reaches the charge limit.": ""
+  },
+  "Show a warning popup when battery is running low.": {
+    "Show a warning popup when battery is running low.": ""
+  },
   "Show all 9 tags instead of only occupied tags": {
     "Show all 9 tags instead of only occupied tags": ""
   },
   "Show an outline ring around the focused workspace indicator": {
     "Show an outline ring around the focused workspace indicator": "Afficher un contour autour de l’indicateur de l’espace actif"
+  },
+  "Show an urgent alert when battery reaches critical level.": {
+    "Show an urgent alert when battery reaches critical level.": ""
   },
   "Show cava audio visualizer in media widget": {
     "Show cava audio visualizer in media widget": "Afficher le visualiseur audio Cava dans le widget multimédia"
@@ -7156,6 +7378,9 @@
   },
   "Silence notifications": {
     "Silence notifications": ""
+  },
+  "Silence system sounds while media is playing": {
+    "Silence system sounds while media is playing": ""
   },
   "Single-Line Popup": {
     "Single-Line Popup": ""
@@ -7310,6 +7535,9 @@
   "Stripes": {
     "Stripes": "Rayures"
   },
+  "Subtle Overlay": {
+    "Subtle Overlay": ""
+  },
   "Summary": {
     "Summary": "Résumé"
   },
@@ -7334,8 +7562,20 @@
   "Surface Behavior": {
     "Surface Behavior": ""
   },
+  "Surface Container": {
+    "Surface Container": ""
+  },
+  "Surface High": {
+    "Surface High": ""
+  },
+  "Surface Highest": {
+    "Surface Highest": ""
+  },
   "Surface Opacity": {
     "Surface Opacity": ""
+  },
+  "Surface Text": {
+    "Surface Text": ""
   },
   "Surface Variant": {
     "Surface Variant": "Variante de surface"
@@ -7372,6 +7612,9 @@
   },
   "Sync": {
     "Sync": "Synchro"
+  },
+  "Sync Bar Inset Padding": {
+    "Sync Bar Inset Padding": ""
   },
   "Sync Mode with Portal": {
     "Sync Mode with Portal": "Synchroniser le mode avec les portails"
@@ -7466,6 +7709,9 @@
   "Tailscale Network": {
     "Tailscale Network": ""
   },
+  "Tailscale action failed": {
+    "Tailscale action failed": ""
+  },
   "Tailscale not available": {
     "Tailscale not available": ""
   },
@@ -7498,6 +7744,12 @@
   },
   "Terminals - Always use Dark Theme": {
     "Terminals - Always use Dark Theme": "Forcer le mode sombre dans les terminaux"
+  },
+  "Tertiary": {
+    "Tertiary": ""
+  },
+  "Tertiary Container": {
+    "Tertiary Container": ""
   },
   "Test Connection": {
     "Test Connection": "Tester la connexion"
@@ -7705,6 +7957,9 @@
   },
   "To use this DMS bind, remove or change the keybind in your config.kdl": {
     "To use this DMS bind, remove or change the keybind in your config.kdl": "Pour utiliser ce raccourci DMS, supprimez ou modifiez le keybind dans votre config.kdl"
+  },
+  "Toast": {
+    "Toast": ""
   },
   "Toast Messages": {
     "Toast Messages": "Messages toast"
@@ -8087,6 +8342,9 @@
   "Use desktop wallpaper": {
     "Use desktop wallpaper": "Utiliser le fond d'écran du bureau"
   },
+  "Use different icon themes for light and dark mode": {
+    "Use different icon themes for light and dark mode": ""
+  },
   "Use fingerprint authentication for the lock screen.": {
     "Use fingerprint authentication for the lock screen.": "Utilisez l'authentification par empreinte pour l'écran de verrouillage."
   },
@@ -8098,6 +8356,9 @@
   },
   "Use meters per second instead of km/h for wind speed": {
     "Use meters per second instead of km/h for wind speed": "Utiliser les m/s au lieu des km/h pour la vitesse du vent"
+  },
+  "Use one inset value for every bar": {
+    "Use one inset value for every bar": ""
   },
   "Use smaller notification cards": {
     "Use smaller notification cards": "Utiliser des cartes de notification plus petites"
@@ -8354,6 +8615,9 @@
   "When locked": {
     "When locked": "Une fois verrouillé"
   },
+  "White": {
+    "White": ""
+  },
   "Wi-Fi Password": {
     "Wi-Fi Password": "Mot de passe Wi-Fi"
   },
@@ -8404,6 +8668,9 @@
   },
   "Widget Styling": {
     "Widget Styling": "Stylisation du widget"
+  },
+  "Widget Text Style": {
+    "Widget Text Style": ""
   },
   "Widget Transparency": {
     "Widget Transparency": "Transparence du widget"

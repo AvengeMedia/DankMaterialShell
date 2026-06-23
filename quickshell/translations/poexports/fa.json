@@ -323,6 +323,9 @@
   "A user with that name already exists.": {
     "A user with that name already exists.": "کاربر با این نام از قبل وجود دارد."
   },
+  "AC Adapter (Plugged In)": {
+    "AC Adapter (Plugged In)": ""
+  },
   "AC Power": {
     "AC Power": "برق AC"
   },
@@ -524,6 +527,9 @@
   "Allow": {
     "Allow": "مجاز"
   },
+  "Allow LAN access": {
+    "Allow LAN access": ""
+  },
   "Allow adjusting device volume by scrolling on the right half of items in the device list": {
     "Allow adjusting device volume by scrolling on the right half of items in the device list": ""
   },
@@ -664,6 +670,9 @@
   },
   "Apply inverse concave corner cutouts to the bar": {
     "Apply inverse concave corner cutouts to the bar": ""
+  },
+  "Apply to Hardware": {
+    "Apply to Hardware": ""
   },
   "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": {
     "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": "برای کاهش خستگی چشم دمای رنگ گرم را اعمال کن. از تنظیمات خودکارسازی پایین برای کنترل زمان فعال شدن آن استفاده کنید."
@@ -818,6 +827,9 @@
   "Auto Popup Gaps": {
     "Auto Popup Gaps": "فاصله پاپ‌آپ خودکار"
   },
+  "Auto Power Saver": {
+    "Auto Power Saver": ""
+  },
   "Auto mode is on. Manual profile selection is disabled.": {
     "Auto mode is on. Manual profile selection is disabled.": "حالت خودکار فعال است. انتخاب پروفایل دستی غیرفعال می‌باشد."
   },
@@ -911,6 +923,9 @@
   "Automatically save changes to opened files as you type": {
     "Automatically save changes to opened files as you type": ""
   },
+  "Automatically turn on Power Saver profile when battery is low.": {
+    "Automatically turn on Power Saver profile when battery is low.": ""
+  },
   "Automation": {
     "Automation": "خودکار‌سازی"
   },
@@ -962,6 +977,9 @@
   "Background Blur": {
     "Background Blur": "تاری پس‌زمینه"
   },
+  "Background Color": {
+    "Background Color": ""
+  },
   "Background Effect": {
     "Background Effect": ""
   },
@@ -995,11 +1013,17 @@
   "Bar Configurations": {
     "Bar Configurations": "پیکربندی نوار"
   },
+  "Bar Inset Padding": {
+    "Bar Inset Padding": ""
+  },
   "Bar Opacity": {
     "Bar Opacity": ""
   },
   "Bar Shadows": {
     "Bar Shadows": "سایه نوارها"
+  },
+  "Bar Spacing": {
+    "Bar Spacing": ""
   },
   "Bar Transparency": {
     "Bar Transparency": "شفافیت نوار"
@@ -1028,11 +1052,35 @@
   "Battery Charge Limit": {
     "Battery Charge Limit": "محدودیت شارژ باتری"
   },
+  "Battery Health": {
+    "Battery Health": ""
+  },
+  "Battery Power": {
+    "Battery Power": ""
+  },
+  "Battery Protection & Charging": {
+    "Battery Protection & Charging": ""
+  },
+  "Battery Status": {
+    "Battery Status": ""
+  },
   "Battery and power management": {
     "Battery and power management": "مدیریت باتری و پاور"
   },
+  "Battery has charged to your set limit of %1%": {
+    "Battery has charged to your set limit of %1%": ""
+  },
+  "Battery is at %1% - Connect charger immediately!": {
+    "Battery is at %1% - Connect charger immediately!": ""
+  },
+  "Battery is at %1% - Consider charging soon": {
+    "Battery is at %1% - Consider charging soon": ""
+  },
   "Battery level and power management": {
     "Battery level and power management": "وضعیت باتری و مدیریت انرژی"
+  },
+  "Battery percentage to trigger a critical alert.": {
+    "Battery percentage to trigger a critical alert.": ""
   },
   "Behavior": {
     "Behavior": "رفتار"
@@ -1057,6 +1105,9 @@
   },
   "Black": {
     "Black": "سیاه"
+  },
+  "Blend between Surface High and the selected custom color": {
+    "Blend between Surface High and the selected custom color": ""
   },
   "Block Out": {
     "Block Out": "مسدود کردن خروج"
@@ -1316,6 +1367,15 @@
   "Channel": {
     "Channel": "کانال"
   },
+  "Charge Level": {
+    "Charge Level": ""
+  },
+  "Charge Limit Reached": {
+    "Charge Limit Reached": ""
+  },
+  "Charge limit applied successfully": {
+    "Charge limit applied successfully": ""
+  },
   "Charging": {
     "Charging": "درحال شارژ"
   },
@@ -1376,11 +1436,17 @@
   "Choose how this bar resolves shadow direction": {
     "Choose how this bar resolves shadow direction": "انتخاب کنید که این نوار چگونه جهت سایه را مشخص کند"
   },
+  "Choose how to be notified about battery alerts.": {
+    "Choose how to be notified about battery alerts.": ""
+  },
   "Choose icon": {
     "Choose icon": "انتخاب آیکون"
   },
   "Choose monochrome or a theme color tint for system tray icons": {
     "Choose monochrome or a theme color tint for system tray icons": "تک رنگ یا رنگ سایه تم را برای آیکون‌های سینی سیستم انتخاب کنید"
+  },
+  "Choose neutral or accent-colored widget text": {
+    "Choose neutral or accent-colored widget text": ""
   },
   "Choose the background color for widgets": {
     "Choose the background color for widgets": "رنگ پس‌زمینه برای ابزارک‌ها انتخاب کنید"
@@ -1466,8 +1532,14 @@
   "Click Through": {
     "Click Through": "رد شدن کلیک"
   },
+  "Click an entry to paste directly instead of copying": {
+    "Click an entry to paste directly instead of copying": ""
+  },
   "Click any shortcut to edit. Changes save to %1": {
     "Click any shortcut to edit. Changes save to %1": "برای ویرایش، روی هر میانبری کلیک کنید. تغییرات در %1 ذخیره می‌شوند"
+  },
+  "Click to Paste": {
+    "Click to Paste": ""
   },
   "Click to capture": {
     "Click to capture": "برای ضبط کلیک کنید"
@@ -1546,6 +1618,9 @@
   },
   "Color for primary action buttons": {
     "Color for primary action buttons": "رنگ برای دکمه‌‌های عمل اصلی"
+  },
+  "Color shown for areas not covered by wallpaper (e.g. Fit or Pad modes)": {
+    "Color shown for areas not covered by wallpaper (e.g. Fit or Pad modes)": ""
   },
   "Color temperature for day time": {
     "Color temperature for day time": "دمای رنگ برای زمان روز"
@@ -1895,8 +1970,20 @@
   "Creating...": {
     "Creating...": "درحال ایجاد..."
   },
+  "Critical Battery": {
+    "Critical Battery": ""
+  },
+  "Critical Battery Alert": {
+    "Critical Battery Alert": ""
+  },
+  "Critical Battery Notifications": {
+    "Critical Battery Notifications": ""
+  },
   "Critical Priority": {
     "Critical Priority": "اولویت حیاتی"
+  },
+  "Critical Threshold": {
+    "Critical Threshold": ""
   },
   "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": {
     "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": ""
@@ -1972,6 +2059,9 @@
   },
   "Custom": {
     "Custom": "سفارشی"
+  },
+  "Custom Blend": {
+    "Custom Blend": ""
   },
   "Custom Color": {
     "Custom Color": "رنگ سفارشی"
@@ -2116,6 +2206,9 @@
   },
   "Dark Mode": {
     "Dark Mode": "حالت تاریک"
+  },
+  "Dark Mode Icon Theme": {
+    "Dark Mode Icon Theme": ""
   },
   "Dark mode base": {
     "Dark mode base": "پایه حالت تاریک"
@@ -2486,6 +2579,9 @@
   "Dock margin, transparency, and border": {
     "Dock margin, transparency, and border": "فاصله داخلی، شفافیت و حاشیه داک"
   },
+  "Dock window": {
+    "Dock window": ""
+  },
   "Docs": {
     "Docs": "مستندات"
   },
@@ -2569,6 +2665,9 @@
   },
   "Edge Spacing": {
     "Edge Spacing": "فاصله لبه"
+  },
+  "Edge spacing, exclusive zone, and popup gaps are managed by Frame": {
+    "Edge spacing, exclusive zone, and popup gaps are managed by Frame": ""
   },
   "Edge the launcher slides from": {
     "Edge the launcher slides from": "لبه‌ای که لانچر از آن بیرون می‌لغزد"
@@ -2795,6 +2894,9 @@
   "Errors": {
     "Errors": "خطا‌ها"
   },
+  "Estimated Time": {
+    "Estimated Time": ""
+  },
   "Ethernet": {
     "Ethernet": "اترنت"
   },
@@ -2821,6 +2923,9 @@
   },
   "Existing Users": {
     "Existing Users": "کاربران موجود"
+  },
+  "Exit node": {
+    "Exit node": ""
   },
   "Experimental Feature": {
     "Experimental Feature": "قابلیت آزمایشی"
@@ -2884,6 +2989,9 @@
   },
   "Failed to apply Qt colors": {
     "Failed to apply Qt colors": "اعمال رنگ‌های Qt ناموفق بود"
+  },
+  "Failed to apply charge limit to system": {
+    "Failed to apply charge limit to system": ""
   },
   "Failed to apply profile": {
     "Failed to apply profile": "اعمال پروفایل ناموفق بود"
@@ -3175,6 +3283,9 @@
   },
   "Filter": {
     "Filter": ""
+  },
+  "Filter by type": {
+    "Filter by type": ""
   },
   "Find in Text": {
     "Find in Text": "یافتن در متن"
@@ -3475,6 +3586,9 @@
   },
   "Gamma control not available. Requires DMS API v6+.": {
     "Gamma control not available. Requires DMS API v6+.": "کنترل گاما در دسترس نیست. نیاز به DMS API نسخه ۶ به بالا دارد."
+  },
+  "Gap between the end widgets and the bar ends (0 = edge-to-edge)": {
+    "Gap between the end widgets and the bar ends (0 = edge-to-edge)": ""
   },
   "Generate Override": {
     "Generate Override": ""
@@ -3845,6 +3959,9 @@
   "Icon Theme": {
     "Icon Theme": "تم آیکون"
   },
+  "Icon theme changed outside DMS; switched to System Default": {
+    "Icon theme changed outside DMS; switched to System Default": ""
+  },
   "Identical alerts show as one popup instead of stacking": {
     "Identical alerts show as one popup instead of stacking": "هشدارهای یکسان به‌جای روی هم قرار گرفتن به صورت یک پاپ‌آپ نمایش داده می‌شوند"
   },
@@ -4079,6 +4196,9 @@
   "Keep in Bar": {
     "Keep in Bar": ""
   },
+  "Keep the clipboard type filter when reopening history": {
+    "Keep the clipboard type filter when reopening history": ""
+  },
   "Keep typing": {
     "Keep typing": "به تایپ کردن ادامه دهید"
   },
@@ -4220,6 +4340,9 @@
   "Light Mode": {
     "Light Mode": "حالت روشن"
   },
+  "Light Mode Icon Theme": {
+    "Light Mode Icon Theme": ""
+  },
   "Light Rain": {
     "Light Rain": "باران سبک"
   },
@@ -4234,6 +4357,12 @@
   },
   "Light mode harmony": {
     "Light mode harmony": "هارمونی حالت روشن"
+  },
+  "Limit set to %1%": {
+    "Limit set to %1%": ""
+  },
+  "Limit the maximum battery charge level to extend lifespan.": {
+    "Limit the maximum battery charge level to extend lifespan.": ""
   },
   "Line": {
     "Line": "خط"
@@ -4270,6 +4399,9 @@
   },
   "Local": {
     "Local": "محلی"
+  },
+  "Local Weather": {
+    "Local Weather": ""
   },
   "Locale": {
     "Locale": "زبان"
@@ -4342,6 +4474,15 @@
   },
   "Low": {
     "Low": ""
+  },
+  "Low Battery": {
+    "Low Battery": ""
+  },
+  "Low Battery Notifications": {
+    "Low Battery Notifications": ""
+  },
+  "Low Battery Threshold": {
+    "Low Battery Threshold": ""
   },
   "Low Priority": {
     "Low Priority": "اولویت پایین"
@@ -4744,6 +4885,9 @@
   },
   "Music Player": {
     "Music Player": "پخش‌کننده موسیقی"
+  },
+  "Mute During Playback": {
+    "Mute During Playback": ""
   },
   "Mute Popups": {
     "Mute Popups": "پاپ‌آپ‌ها بی‌صدا شوند"
@@ -5255,6 +5399,9 @@
   "Nothing to see here": {
     "Nothing to see here": "چیزی برای مشاهده نیست"
   },
+  "Notification": {
+    "Notification": ""
+  },
   "Notification Center": {
     "Notification Center": "مرکز اعلانات"
   },
@@ -5276,11 +5423,17 @@
   "Notification Timeouts": {
     "Notification Timeouts": "وقفه اعلان‌ها"
   },
+  "Notification Type": {
+    "Notification Type": ""
+  },
   "Notification toast popups": {
     "Notification toast popups": "پاپ‌آپ‌های اعلان به صورت تُست"
   },
   "Notifications": {
     "Notifications": "اعلان‌ها"
+  },
+  "Notify when limit is reached": {
+    "Notify when limit is reached": ""
   },
   "Numbers": {
     "Numbers": "شماره‌ها"
@@ -5342,6 +5495,9 @@
   "Only affects DMS-managed PAM. If greetd already includes pam_fprintd, fingerprint stays enabled.": {
     "Only affects DMS-managed PAM. If greetd already includes pam_fprintd, fingerprint stays enabled.": "فقط روی PAM مدیریت شده توسط DMS تأثیر می‌گذارد. اگر greetd از قبل شامل pam_fprintd باشد، اثر انگشت فعال می‌ماند."
   },
+  "Only on Battery": {
+    "Only on Battery": ""
+  },
   "Only show windows from the current monitor on each dock": {
     "Only show windows from the current monitor on each dock": "تنها پنجره‌ها در مانیتور کنونی را در هر داک نمایش بده"
   },
@@ -5392,6 +5548,9 @@
   },
   "Open a terminal and run a custom command instead of the in-shell upgrade flow.": {
     "Open a terminal and run a custom command instead of the in-shell upgrade flow.": ""
+  },
+  "Open as window": {
+    "Open as window": ""
   },
   "Open folder": {
     "Open folder": "باز کردن پوشه"
@@ -5876,6 +6035,9 @@
   "Power Profile Degradation": {
     "Power Profile Degradation": "تنزل‌دادن پروفایل پاور"
   },
+  "Power Profiles Auto-Switching": {
+    "Power Profiles Auto-Switching": ""
+  },
   "Power Saver": {
     "Power Saver": "ذخیره انرژی"
   },
@@ -5884,6 +6046,12 @@
   },
   "Power profile management available": {
     "Power profile management available": "مدیریت پروفایل پاور در دسترس"
+  },
+  "Power profile to use when AC power is connected.": {
+    "Power profile to use when AC power is connected.": ""
+  },
+  "Power profile to use when running on battery power.": {
+    "Power profile to use when running on battery power.": ""
   },
   "Power source": {
     "Power source": "منبع پاور"
@@ -5930,11 +6098,17 @@
   "Preview": {
     "Preview": "پیش‌نمایش"
   },
+  "Preview: %1": {
+    "Preview: %1": ""
+  },
   "Primary": {
     "Primary": "اصلی"
   },
   "Primary Container": {
     "Primary Container": "زمینه اصلی"
+  },
+  "Primary Theme Color": {
+    "Primary Theme Color": ""
   },
   "Print Server Management": {
     "Print Server Management": "مدیریت سرور چاپ"
@@ -5984,6 +6158,9 @@
   "Process Count": {
     "Process Count": "تعداد فرایند‌ها"
   },
+  "Process exited with code %1": {
+    "Process exited with code %1": ""
+  },
   "Processes": {
     "Processes": "فرایندها"
   },
@@ -6019,6 +6196,12 @@
   },
   "Profile saved: %1": {
     "Profile saved: %1": "پروفایل ذخیره شد: %1"
+  },
+  "Profile when Plugged In (AC)": {
+    "Profile when Plugged In (AC)": ""
+  },
+  "Profile when on Battery": {
+    "Profile when on Battery": ""
   },
   "Protocol": {
     "Protocol": "پروتکل"
@@ -6082,6 +6265,9 @@
   },
   "Re-enter password": {
     "Re-enter password": "گذرواژه را دوباره وارد کنید"
+  },
+  "Reach local network devices while using an exit node": {
+    "Reach local network devices while using an exit node": ""
   },
   "Read-only legacy config": {
     "Read-only legacy config": ""
@@ -6148,6 +6334,9 @@
   },
   "Remember Last Query": {
     "Remember Last Query": "آخرین پرس‌و‌جو را به خاطر بسپار"
+  },
+  "Remember Type Filter": {
+    "Remember Type Filter": ""
   },
   "Remember last session": {
     "Remember last session": "آخرین نشست را به خاطر بسپار"
@@ -6449,6 +6638,9 @@
   "Saved Configurations": {
     "Saved Configurations": "پیکربندی‌های ذخیره شده"
   },
+  "Saved Networks": {
+    "Saved Networks": ""
+  },
   "Saved Note": {
     "Saved Note": "یادداشت ذخیره شده"
   },
@@ -6571,6 +6763,9 @@
   },
   "Secondary": {
     "Secondary": "ثانویه"
+  },
+  "Secondary Container": {
+    "Secondary Container": ""
   },
   "Secured": {
     "Secured": "ایمن"
@@ -6713,6 +6908,9 @@
   "Separate": {
     "Separate": "جدا"
   },
+  "Separate Light & Dark Themes": {
+    "Separate Light & Dark Themes": ""
+  },
   "Separator": {
     "Separator": "جداکننده"
   },
@@ -6754,6 +6952,9 @@
   },
   "Set the font size for notification summary text": {
     "Set the font size for notification summary text": ""
+  },
+  "Set the percentage at which the battery is considered low.": {
+    "Set the percentage at which the battery is considered low.": ""
   },
   "Setting": {
     "Setting": ""
@@ -6869,6 +7070,9 @@
   "Show Feels Like Temperature": {
     "Show Feels Like Temperature": "نمایش دمای حسی"
   },
+  "Show Flatpak, Snap, AppImage, or Nix badge icons on launcher items.": {
+    "Show Flatpak, Snap, AppImage, or Nix badge icons on launcher items.": ""
+  },
   "Show Footer": {
     "Show Footer": "نمایش پاورقی"
   },
@@ -6941,8 +7145,14 @@
   "Show Overflow Badge Count": {
     "Show Overflow Badge Count": "نمایش نشان تعداد سرریز"
   },
+  "Show Package Source Badges": {
+    "Show Package Source Badges": ""
+  },
   "Show Password Field": {
     "Show Password Field": "نمایش فیلد گذرواژه"
+  },
+  "Show Percentage": {
+    "Show Percentage": ""
   },
   "Show Power Actions": {
     "Show Power Actions": "نمایش اقدام‌های پاور"
@@ -6961,6 +7171,9 @@
   },
   "Show Reboot": {
     "Show Reboot": "نمایش راه‌اندازی مجدد"
+  },
+  "Show Remaining Time": {
+    "Show Remaining Time": ""
   },
   "Show Restart DMS": {
     "Show Restart DMS": "نمایش راه‌اندازی مجدد DMS"
@@ -7016,11 +7229,20 @@
   "Show a bar that drains as the popup's auto-dismiss timer runs": {
     "Show a bar that drains as the popup's auto-dismiss timer runs": ""
   },
+  "Show a notification when battery reaches the charge limit.": {
+    "Show a notification when battery reaches the charge limit.": ""
+  },
+  "Show a warning popup when battery is running low.": {
+    "Show a warning popup when battery is running low.": ""
+  },
   "Show all 9 tags instead of only occupied tags": {
     "Show all 9 tags instead of only occupied tags": ""
   },
   "Show an outline ring around the focused workspace indicator": {
     "Show an outline ring around the focused workspace indicator": "یک خط بیرونی دور نشانگر محیط‌کار فوکوس شده نشان بده"
+  },
+  "Show an urgent alert when battery reaches critical level.": {
+    "Show an urgent alert when battery reaches critical level.": ""
   },
   "Show cava audio visualizer in media widget": {
     "Show cava audio visualizer in media widget": "نمایش مصورساز صوتی cava در ابزارک رسانه"
@@ -7156,6 +7378,9 @@
   },
   "Silence notifications": {
     "Silence notifications": "بی‌صدا کردن اعلان‌ها"
+  },
+  "Silence system sounds while media is playing": {
+    "Silence system sounds while media is playing": ""
   },
   "Single-Line Popup": {
     "Single-Line Popup": ""
@@ -7310,6 +7535,9 @@
   "Stripes": {
     "Stripes": "راه راه"
   },
+  "Subtle Overlay": {
+    "Subtle Overlay": ""
+  },
   "Summary": {
     "Summary": "خلاصه"
   },
@@ -7334,8 +7562,20 @@
   "Surface Behavior": {
     "Surface Behavior": "رفتار سطح"
   },
+  "Surface Container": {
+    "Surface Container": ""
+  },
+  "Surface High": {
+    "Surface High": ""
+  },
+  "Surface Highest": {
+    "Surface Highest": ""
+  },
   "Surface Opacity": {
     "Surface Opacity": "شفافیت سطح"
+  },
+  "Surface Text": {
+    "Surface Text": ""
   },
   "Surface Variant": {
     "Surface Variant": "سطح متغیر"
@@ -7372,6 +7612,9 @@
   },
   "Sync": {
     "Sync": "همگام‌سازی"
+  },
+  "Sync Bar Inset Padding": {
+    "Sync Bar Inset Padding": ""
   },
   "Sync Mode with Portal": {
     "Sync Mode with Portal": "همگام‌سازی حالت با پورتال"
@@ -7466,6 +7709,9 @@
   "Tailscale Network": {
     "Tailscale Network": "شبکه Tailscale"
   },
+  "Tailscale action failed": {
+    "Tailscale action failed": ""
+  },
   "Tailscale not available": {
     "Tailscale not available": "Tailcale در دسترس نیست"
   },
@@ -7498,6 +7744,12 @@
   },
   "Terminals - Always use Dark Theme": {
     "Terminals - Always use Dark Theme": "ترمینال‌ها - همیشه از تم تاریک استفاده کن"
+  },
+  "Tertiary": {
+    "Tertiary": ""
+  },
+  "Tertiary Container": {
+    "Tertiary Container": ""
   },
   "Test Connection": {
     "Test Connection": "آزمایش اتصال"
@@ -7705,6 +7957,9 @@
   },
   "To use this DMS bind, remove or change the keybind in your config.kdl": {
     "To use this DMS bind, remove or change the keybind in your config.kdl": "برای استفاده از این نگاشت DMS، نگاشت‌کلید را در config.kdl خود حذف کنید یا تغییر دهید"
+  },
+  "Toast": {
+    "Toast": ""
   },
   "Toast Messages": {
     "Toast Messages": "پیام‌های تًست"
@@ -8087,6 +8342,9 @@
   "Use desktop wallpaper": {
     "Use desktop wallpaper": "از تصویر پس‌زمینه دسکتاپ استفاده کن"
   },
+  "Use different icon themes for light and dark mode": {
+    "Use different icon themes for light and dark mode": ""
+  },
   "Use fingerprint authentication for the lock screen.": {
     "Use fingerprint authentication for the lock screen.": "از احراز هویت اثرانگشت برای صفحه قفل استفاده کن."
   },
@@ -8098,6 +8356,9 @@
   },
   "Use meters per second instead of km/h for wind speed": {
     "Use meters per second instead of km/h for wind speed": "از متر بر ثانیه به جای km/h برای سرعت باد استفاده کن"
+  },
+  "Use one inset value for every bar": {
+    "Use one inset value for every bar": ""
   },
   "Use smaller notification cards": {
     "Use smaller notification cards": "از کارت‌های اعلان کوچکتر استفاده کن"
@@ -8354,6 +8615,9 @@
   "When locked": {
     "When locked": "هنگام قفل شدن"
   },
+  "White": {
+    "White": ""
+  },
   "Wi-Fi Password": {
     "Wi-Fi Password": "گذرواژه وای‌فای"
   },
@@ -8404,6 +8668,9 @@
   },
   "Widget Styling": {
     "Widget Styling": "استایل‌‌دهی ابزارک‌"
+  },
+  "Widget Text Style": {
+    "Widget Text Style": ""
   },
   "Widget Transparency": {
     "Widget Transparency": "شفافیت ابزارک"

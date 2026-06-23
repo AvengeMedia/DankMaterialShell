@@ -756,6 +756,13 @@
     "comment": ""
   },
   {
+    "term": "AC Adapter (Plugged In)",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "AC Power",
     "translation": "",
     "context": "",
@@ -1225,6 +1232,13 @@
     "comment": ""
   },
   {
+    "term": "Allow LAN access",
+    "translation": "",
+    "context": "Tailscale allow LAN access toggle",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Allow adjusting device volume by scrolling on the right half of items in the device list",
     "translation": "",
     "context": "",
@@ -1548,6 +1562,13 @@
   },
   {
     "term": "Apply inverse concave corner cutouts to the bar",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Apply to Hardware",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1911,6 +1932,13 @@
     "comment": ""
   },
   {
+    "term": "Auto Power Saver",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Auto mode is on. Manual profile selection is disabled.",
     "translation": "",
     "context": "",
@@ -2121,6 +2149,13 @@
     "comment": ""
   },
   {
+    "term": "Automatically turn on Power Saver profile when battery is low.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Automation",
     "translation": "",
     "context": "",
@@ -2240,6 +2275,13 @@
     "comment": ""
   },
   {
+    "term": "Background Color",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Background Effect",
     "translation": "",
     "context": "",
@@ -2317,6 +2359,13 @@
     "comment": ""
   },
   {
+    "term": "Bar Inset Padding",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Bar Opacity",
     "translation": "",
     "context": "",
@@ -2331,6 +2380,13 @@
     "comment": ""
   },
   {
+    "term": "Bar Spacing",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Bar corners and background",
     "translation": "",
     "context": "",
@@ -2339,13 +2395,6 @@
   },
   {
     "term": "Bar shadow, border, and corners",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Bar spacing and size",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2387,6 +2436,34 @@
     "comment": ""
   },
   {
+    "term": "Battery Health",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Battery Power",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Battery Protection & Charging",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Battery Status",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Battery and power management",
     "translation": "",
     "context": "",
@@ -2394,7 +2471,35 @@
     "comment": ""
   },
   {
+    "term": "Battery has charged to your set limit of %1%",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Battery is at %1% - Connect charger immediately!",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Battery is at %1% - Consider charging soon",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Battery level and power management",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Battery percentage to trigger a critical alert.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2453,6 +2558,13 @@
     "term": "Black",
     "translation": "",
     "context": "font weight",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Blend between Surface High and the selected custom color",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -3024,13 +3136,6 @@
     "comment": ""
   },
   {
-    "term": "Change bar appearance",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Change the locale used by the DMS interface.",
     "translation": "",
     "context": "",
@@ -3046,6 +3151,27 @@
   },
   {
     "term": "Channel",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Charge Level",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Charge Limit Reached",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Charge limit applied successfully",
     "translation": "",
     "context": "",
     "reference": "",
@@ -3192,6 +3318,13 @@
     "comment": ""
   },
   {
+    "term": "Choose how to be notified about battery alerts.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Choose icon",
     "translation": "",
     "context": "",
@@ -3200,6 +3333,13 @@
   },
   {
     "term": "Choose monochrome or a theme color tint for system tray icons",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Choose neutral or accent-colored widget text",
     "translation": "",
     "context": "",
     "reference": "",
@@ -3402,7 +3542,21 @@
     "comment": ""
   },
   {
+    "term": "Click an entry to paste directly instead of copying",
+    "translation": "",
+    "context": "Clipboard behavior setting description",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Click any shortcut to edit. Changes save to %1",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Click to Paste",
     "translation": "",
     "context": "",
     "reference": "",
@@ -3585,6 +3739,13 @@
   },
   {
     "term": "Color for primary action buttons",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Color shown for areas not covered by wallpaper (e.g. Fit or Pad modes)",
     "translation": "",
     "context": "",
     "reference": "",
@@ -3894,7 +4055,7 @@
   {
     "term": "Connect",
     "translation": "",
-    "context": "",
+    "context": "Tailscale connect button",
     "reference": "",
     "comment": ""
   },
@@ -3922,7 +4083,7 @@
   {
     "term": "Connected",
     "translation": "",
-    "context": "network status",
+    "context": "Tailscale connection status: connected | network status",
     "reference": "",
     "comment": ""
   },
@@ -4389,9 +4550,37 @@
     "comment": ""
   },
   {
+    "term": "Critical Battery",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Critical Battery Alert",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Critical Battery Notifications",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Critical Priority",
     "translation": "",
     "context": "notification rule urgency option",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Critical Threshold",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -4566,7 +4755,14 @@
   {
     "term": "Custom",
     "translation": "",
-    "context": "blur border color | shadow color option | theme category option",
+    "context": "blur border color | shadow color option | theme category option | widget background color option | workspace color option",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Custom Blend",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -4900,6 +5096,13 @@
     "comment": ""
   },
   {
+    "term": "Dark Mode Icon Theme",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Dark mode base",
     "translation": "",
     "context": "",
@@ -4993,7 +5196,7 @@
   {
     "term": "Default",
     "translation": "",
-    "context": "notification rule action option | notification rule urgency option | plugin browser sort option | widget style option",
+    "context": "notification rule action option | notification rule urgency option | plugin browser sort option | widget style option | workspace color option",
     "reference": "",
     "comment": ""
   },
@@ -5448,14 +5651,14 @@
   {
     "term": "Disconnect",
     "translation": "",
-    "context": "",
+    "context": "Tailscale disconnect button",
     "reference": "",
     "comment": ""
   },
   {
     "term": "Disconnected",
     "translation": "",
-    "context": "Tailscale disconnected status",
+    "context": "Tailscale connection status: disconnected | Tailscale disconnected status",
     "reference": "",
     "comment": ""
   },
@@ -5747,6 +5950,13 @@
     "comment": ""
   },
   {
+    "term": "Dock window",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Docs",
     "translation": "",
     "context": "greeter documentation link",
@@ -5937,6 +6147,13 @@
   },
   {
     "term": "Edge Spacing",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Edge spacing, exclusive zone, and popup gaps are managed by Frame",
     "translation": "",
     "context": "",
     "reference": "",
@@ -6456,7 +6673,7 @@
   {
     "term": "Error",
     "translation": "",
-    "context": "",
+    "context": "workspace color option",
     "reference": "",
     "comment": ""
   },
@@ -6464,6 +6681,13 @@
     "term": "Errors",
     "translation": "",
     "context": "greeter doctor page status card",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Estimated Time",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -6527,6 +6751,13 @@
     "term": "Existing Users",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Exit node",
+    "translation": "",
+    "context": "Tailscale exit node selector label",
     "reference": "",
     "comment": ""
   },
@@ -6672,6 +6903,13 @@
   },
   {
     "term": "Failed to apply Qt colors",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Failed to apply charge limit to system",
     "translation": "",
     "context": "",
     "reference": "",
@@ -7353,6 +7591,13 @@
     "term": "Filter",
     "translation": "",
     "context": "plugin browser category filter label",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Filter by type",
+    "translation": "",
+    "context": "Clipboard history type filter button tooltip",
     "reference": "",
     "comment": ""
   },
@@ -8057,6 +8302,13 @@
     "comment": ""
   },
   {
+    "term": "Gap between the end widgets and the bar ends (0 = edge-to-edge)",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Generate Override",
     "translation": "",
     "context": "",
@@ -8498,13 +8750,6 @@
     "comment": ""
   },
   {
-    "term": "Hidden Network",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Hidden apps won't appear in the launcher. Right-click an app and select 'Hide App' to hide it.",
     "translation": "",
     "context": "",
@@ -8914,6 +9159,13 @@
     "term": "Icon Theme",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Icon theme changed outside DMS; switched to System Default",
+    "translation": "",
+    "context": "shown when an external tool overrides the icon theme DMS applied",
     "reference": "",
     "comment": ""
   },
@@ -9464,6 +9716,13 @@
     "comment": ""
   },
   {
+    "term": "Keep the clipboard type filter when reopening history",
+    "translation": "",
+    "context": "Clipboard behavior setting description",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Keep typing",
     "translation": "",
     "context": "",
@@ -9793,6 +10052,13 @@
     "comment": ""
   },
   {
+    "term": "Light Mode Icon Theme",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Light Rain",
     "translation": "",
     "context": "",
@@ -9822,6 +10088,20 @@
   },
   {
     "term": "Light mode harmony",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Limit set to %1%",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Limit the maximum battery charge level to extend lifespan.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -9906,6 +10186,13 @@
   },
   {
     "term": "Local",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Local Weather",
     "translation": "",
     "context": "",
     "reference": "",
@@ -10074,6 +10361,27 @@
   },
   {
     "term": "Low",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Low Battery",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Low Battery Notifications",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Low Battery Threshold",
     "translation": "",
     "context": "",
     "reference": "",
@@ -11014,6 +11322,13 @@
     "term": "Music Player",
     "translation": "",
     "context": "Music Player",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Mute During Playback",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -12042,7 +12357,7 @@
   {
     "term": "None",
     "translation": "",
-    "context": "wallpaper transition option",
+    "context": "Tailscale exit node: none selected | wallpaper transition option | workspace color option",
     "reference": "",
     "comment": ""
   },
@@ -12152,13 +12467,6 @@
     "comment": ""
   },
   {
-    "term": "Note: this only changes the percentage, it does not actually limit charging.",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Notepad",
     "translation": "",
     "context": "Notepad",
@@ -12195,6 +12503,13 @@
   },
   {
     "term": "Nothing to see here",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Notification",
     "translation": "",
     "context": "",
     "reference": "",
@@ -12250,6 +12565,13 @@
     "comment": ""
   },
   {
+    "term": "Notification Type",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Notification toast popups",
     "translation": "",
     "context": "",
@@ -12260,6 +12582,13 @@
     "term": "Notifications",
     "translation": "",
     "context": "greeter settings link",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Notify when limit is reached",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -12404,6 +12733,13 @@
     "comment": ""
   },
   {
+    "term": "Only on Battery",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Only show windows from the current monitor on each dock",
     "translation": "",
     "context": "",
@@ -12503,6 +12839,13 @@
   },
   {
     "term": "Open a terminal and run a custom command instead of the in-shell upgrade flow.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Open as window",
     "translation": "",
     "context": "",
     "reference": "",
@@ -13636,6 +13979,13 @@
     "comment": ""
   },
   {
+    "term": "Power Profiles Auto-Switching",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Power Saver",
     "translation": "",
     "context": "power profile option",
@@ -13651,6 +14001,20 @@
   },
   {
     "term": "Power profile management available",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Power profile to use when AC power is connected.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Power profile to use when running on battery power.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -13762,16 +14126,30 @@
     "comment": ""
   },
   {
+    "term": "Preview: %1",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Primary",
     "translation": "",
-    "context": "blur border color | button color option | color option | primary color | shadow color option | tile color option",
+    "context": "blur border color | button color option | color option | primary color | shadow color option | tile color option | workspace color option",
     "reference": "",
     "comment": ""
   },
   {
     "term": "Primary Container",
     "translation": "",
-    "context": "button color option | tile color option",
+    "context": "button color option | tile color option | widget background color option | workspace color option",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Primary Theme Color",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -13888,6 +14266,13 @@
     "comment": ""
   },
   {
+    "term": "Process exited with code %1",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Processes",
     "translation": "",
     "context": "",
@@ -13966,6 +14351,20 @@
   },
   {
     "term": "Profile saved: %1",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Profile when Plugged In (AC)",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Profile when on Battery",
     "translation": "",
     "context": "",
     "reference": "",
@@ -14115,6 +14514,13 @@
     "term": "Re-enter password",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Reach local network devices while using an exit node",
+    "translation": "",
+    "context": "Tailscale allow LAN access description",
     "reference": "",
     "comment": ""
   },
@@ -14269,6 +14675,13 @@
     "term": "Remember Last Query",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Remember Type Filter",
+    "translation": "",
+    "context": "Clipboard behavior setting title",
     "reference": "",
     "comment": ""
   },
@@ -14973,6 +15386,13 @@
     "comment": ""
   },
   {
+    "term": "Saved Networks",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Saved Note",
     "translation": "",
     "context": "",
@@ -15255,7 +15675,14 @@
   {
     "term": "Secondary",
     "translation": "",
-    "context": "blur border color | button color option | color option | secondary color | tile color option",
+    "context": "blur border color | button color option | color option | secondary color | tile color option | workspace color option",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Secondary Container",
+    "translation": "",
+    "context": "widget background color option | workspace color option",
     "reference": "",
     "comment": ""
   },
@@ -15589,6 +16016,13 @@
     "comment": ""
   },
   {
+    "term": "Separate Light & Dark Themes",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Separator",
     "translation": "",
     "context": "",
@@ -15681,6 +16115,13 @@
   },
   {
     "term": "Set the font size for notification summary text",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Set the percentage at which the battery is considered low.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -15953,6 +16394,13 @@
     "comment": ""
   },
   {
+    "term": "Show Flatpak, Snap, AppImage, or Nix badge icons on launcher items.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Show Footer",
     "translation": "",
     "context": "launcher footer visibility",
@@ -16121,9 +16569,23 @@
     "comment": ""
   },
   {
+    "term": "Show Package Source Badges",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Show Password Field",
     "translation": "",
     "context": "Enable password field display on the lock screen window",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Show Percentage",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -16164,6 +16626,13 @@
   },
   {
     "term": "Show Reboot",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Show Remaining Time",
     "translation": "",
     "context": "",
     "reference": "",
@@ -16296,6 +16765,20 @@
     "comment": ""
   },
   {
+    "term": "Show a notification when battery reaches the charge limit.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Show a warning popup when battery is running low.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Show all 9 tags instead of only occupied tags",
     "translation": "",
     "context": "",
@@ -16304,6 +16787,13 @@
   },
   {
     "term": "Show an outline ring around the focused workspace indicator",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Show an urgent alert when battery reaches critical level.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -16625,6 +17115,13 @@
     "comment": ""
   },
   {
+    "term": "Silence system sounds while media is playing",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Single-Line Popup",
     "translation": "",
     "context": "",
@@ -16703,13 +17200,6 @@
   },
   {
     "term": "Smartcard Authentication",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Smartcard PIN",
     "translation": "",
     "context": "",
     "reference": "",
@@ -16982,6 +17472,13 @@
     "comment": ""
   },
   {
+    "term": "Subtle Overlay",
+    "translation": "",
+    "context": "widget background color option",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Summary",
     "translation": "",
     "context": "notification rule match field option",
@@ -17026,7 +17523,7 @@
   {
     "term": "Surface",
     "translation": "",
-    "context": "color option | shadow color option",
+    "context": "color option | shadow color option | widget background color option | workspace color option",
     "reference": "",
     "comment": ""
   },
@@ -17038,9 +17535,37 @@
     "comment": ""
   },
   {
+    "term": "Surface Container",
+    "translation": "",
+    "context": "widget background color option | workspace color option",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Surface High",
+    "translation": "",
+    "context": "widget background color option | workspace color option",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Surface Highest",
+    "translation": "",
+    "context": "workspace color option",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Surface Opacity",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Surface Text",
+    "translation": "",
+    "context": "workspace color option",
     "reference": "",
     "comment": ""
   },
@@ -17123,6 +17648,13 @@
   },
   {
     "term": "Sync",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Sync Bar Inset Padding",
     "translation": "",
     "context": "",
     "reference": "",
@@ -17346,6 +17878,13 @@
     "comment": ""
   },
   {
+    "term": "Tailscale action failed",
+    "translation": "",
+    "context": "Toast shown when a Tailscale write action is rejected",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Tailscale not available",
     "translation": "",
     "context": "Warning when Tailscale service is not running",
@@ -17419,6 +17958,20 @@
     "term": "Terminals - Always use Dark Theme",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Tertiary",
+    "translation": "",
+    "context": "workspace color option",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Tertiary Container",
+    "translation": "",
+    "context": "widget background color option | workspace color option",
     "reference": "",
     "comment": ""
   },
@@ -17900,6 +18453,13 @@
   },
   {
     "term": "To use this DMS bind, remove or change the keybind in your config.kdl",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Toast",
     "translation": "",
     "context": "",
     "reference": "",
@@ -18767,6 +19327,13 @@
     "comment": ""
   },
   {
+    "term": "Use different icon themes for light and dark mode",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Use fingerprint authentication for the lock screen.",
     "translation": "",
     "context": "",
@@ -18789,6 +19356,13 @@
   },
   {
     "term": "Use meters per second instead of km/h for wind speed",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Use one inset value for every bar",
     "translation": "",
     "context": "",
     "reference": "",
@@ -19006,13 +19580,6 @@
   },
   {
     "term": "VPN Connections",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "VPN Password",
     "translation": "",
     "context": "",
     "reference": "",
@@ -19390,7 +19957,7 @@
     "comment": ""
   },
   {
-    "term": "Wi-Fi Password",
+    "term": "White",
     "translation": "",
     "context": "",
     "reference": "",
@@ -19495,14 +20062,14 @@
     "comment": ""
   },
   {
-    "term": "Widget Style",
+    "term": "Widget Styling",
     "translation": "",
     "context": "",
     "reference": "",
     "comment": ""
   },
   {
-    "term": "Widget Styling",
+    "term": "Widget Text Style",
     "translation": "",
     "context": "",
     "reference": "",

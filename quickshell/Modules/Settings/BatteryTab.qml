@@ -1,5 +1,4 @@
 import QtQuick
-import Quickshell
 import Quickshell.Io
 import qs.Common
 import qs.Services
@@ -59,7 +58,7 @@ done
                     Row {
                         width: parent.width
                         StyledText {
-                            text: I18n.tr("Power Source")
+                            text: I18n.tr("Power source")
                             font.pixelSize: Theme.fontSizeMedium
                             color: Theme.surfaceVariantText
                             width: parent.width / 2
