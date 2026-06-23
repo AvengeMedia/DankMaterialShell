@@ -265,6 +265,12 @@ Singleton {
     onFrameEnabledChanged: saveSettings()
     property real frameThickness: 16
     onFrameThicknessChanged: saveSettings()
+    property int barInsetPaddingShared: -1
+    onBarInsetPaddingSharedChanged: saveSettings()
+    property bool barInsetPaddingSyncAll: false
+    onBarInsetPaddingSyncAllChanged: saveSettings()
+    property int frameBarInsetPadding: -1
+    onFrameBarInsetPaddingChanged: saveSettings()
     property real frameRounding: 23
     onFrameRoundingChanged: saveSettings()
     property string frameColor: ""
@@ -849,6 +855,7 @@ Singleton {
             "rightWidgets": ["systemTray", "clipboard", "cpuUsage", "memUsage", "notificationButton", "battery", "controlCenterButton"],
             "spacing": 4,
             "innerPadding": 4,
+            "barInsetPadding": -1,
             "bottomGap": 0,
             "transparency": 1.0,
             "widgetTransparency": 1.0,

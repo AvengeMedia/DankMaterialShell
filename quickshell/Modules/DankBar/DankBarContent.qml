@@ -26,46 +26,50 @@ Item {
     readonly property real _edgeBaseMargin: Math.max(Theme.spacingXS, innerPadding * 0.8)
     readonly property bool _hasBarWindow: barWindow !== undefined && barWindow !== null
     readonly property bool _usesFrameBarChrome: _hasBarWindow && (barWindow.usesFrameBarChrome ?? false)
-    readonly property real _frameEdgeFloorInset: (SettingsData.frameEnabled && _usesFrameBarChrome) ? Math.max(0, SettingsData.frameThickness - _edgeBaseMargin) : 0
     readonly property bool _barIsVertical: _hasBarWindow ? barWindow.isVertical : false
     readonly property string _barScreenName: _hasBarWindow ? (barWindow.screenName || "") : ""
     readonly property bool hasAdjacentTopBarLive: _hasBarWindow && barWindow.hasAdjacentTopBar
     readonly property bool hasAdjacentBottomBarLive: _hasBarWindow && barWindow.hasAdjacentBottomBar
     readonly property bool hasAdjacentLeftBarLive: _hasBarWindow && barWindow.hasAdjacentLeftBar
     readonly property bool hasAdjacentRightBarLive: _hasBarWindow && barWindow.hasAdjacentRightBar
-    property bool _hadAdjacentTopBar: false
-    property bool _hadAdjacentBottomBar: false
-    property bool _hadAdjacentLeftBar: false
-    property bool _hadAdjacentRightBar: false
 
-    onHasAdjacentTopBarLiveChanged: if (hasAdjacentTopBarLive)
-        _hadAdjacentTopBar = true
-    onHasAdjacentBottomBarLiveChanged: if (hasAdjacentBottomBarLive)
-        _hadAdjacentBottomBar = true
-    onHasAdjacentLeftBarLiveChanged: if (hasAdjacentLeftBarLive)
-        _hadAdjacentLeftBar = true
-    onHasAdjacentRightBarLiveChanged: if (hasAdjacentRightBarLive)
-        _hadAdjacentRightBar = true
+    // Standalone/separate Bar Inset Padding (per-bar, optionally synced): absolute gap at BOTH ends.
+    // Stored value < 0 (default -1) means "auto" — fall back to the natural edge margin so the look is unchanged.
+    readonly property real _barInsetPaddingRaw: SettingsData.barInsetPaddingSyncAll ? SettingsData.barInsetPaddingShared : (barConfig?.barInsetPadding ?? -1)
+    readonly property real _barInsetPaddingAuto: _barIsVertical ? Theme.spacingXS : _edgeBaseMargin
+    readonly property real _barInsetPadding: _barInsetPaddingRaw < 0 ? _barInsetPaddingAuto : _barInsetPaddingRaw
+    // Connected-frame Bar Inset Padding: absolute free-end inset (auto < 0 = frameThickness, 0 = edge-to-edge).
+    // Any amount beyond the frameThickness baseline is also added at the bar-clearance ends (all ends).
+    readonly property real _frameInsetResolved: SettingsData.frameBarInsetPadding < 0 ? SettingsData.frameThickness : SettingsData.frameBarInsetPadding
+    readonly property real _frameInsetExtra: Math.max(0, _frameInsetResolved - SettingsData.frameThickness)
 
-    readonly property real _frameLeftInset: {
-        if (!_hasBarWindow || !SettingsData.frameEnabled || !_usesFrameBarChrome || _barIsVertical)
-            return 0;
-        return hasAdjacentLeftBarLive ? SettingsData.frameBarSize : (_hadAdjacentLeftBar ? _frameEdgeFloorInset : 0);
+    readonly property real _leftMargin: {
+        if (_barIsVertical)
+            return _edgeBaseMargin;
+        if (_usesFrameBarChrome)
+            return hasAdjacentLeftBarLive ? (_edgeBaseMargin + SettingsData.frameBarSize + _frameInsetExtra) : Math.max(0, _frameInsetResolved);
+        return Math.max(0, _barInsetPadding);
     }
-    readonly property real _frameRightInset: {
-        if (!_hasBarWindow || !SettingsData.frameEnabled || !_usesFrameBarChrome || _barIsVertical)
-            return 0;
-        return hasAdjacentRightBarLive ? SettingsData.frameBarSize : (_hadAdjacentRightBar ? _frameEdgeFloorInset : 0);
+    readonly property real _rightMargin: {
+        if (_barIsVertical)
+            return _edgeBaseMargin;
+        if (_usesFrameBarChrome)
+            return hasAdjacentRightBarLive ? (_edgeBaseMargin + SettingsData.frameBarSize + _frameInsetExtra) : Math.max(0, _frameInsetResolved);
+        return Math.max(0, _barInsetPadding);
     }
-    readonly property real _frameTopInset: {
-        if (!_hasBarWindow || !SettingsData.frameEnabled || !_usesFrameBarChrome || !_barIsVertical)
+    readonly property real _topMargin: {
+        if (!_barIsVertical)
             return 0;
-        return hasAdjacentTopBarLive ? SettingsData.frameThickness : (_hadAdjacentTopBar ? _frameEdgeFloorInset : 0);
+        if (_usesFrameBarChrome)
+            return hasAdjacentTopBarLive ? (outlineThickness + SettingsData.frameThickness + _frameInsetExtra) : Math.max(0, _frameInsetResolved);
+        return Math.max(0, _barInsetPadding);
     }
-    readonly property real _frameBottomInset: {
-        if (!_hasBarWindow || !SettingsData.frameEnabled || !_usesFrameBarChrome || !_barIsVertical)
+    readonly property real _bottomMargin: {
+        if (!_barIsVertical)
             return 0;
-        return hasAdjacentBottomBarLive ? SettingsData.frameThickness : (_hadAdjacentBottomBar ? _frameEdgeFloorInset : 0);
+        if (_usesFrameBarChrome)
+            return hasAdjacentBottomBarLive ? (outlineThickness + SettingsData.frameThickness + _frameInsetExtra) : Math.max(0, _frameInsetResolved);
+        return Math.max(0, _barInsetPadding);
     }
 
     property alias hLeftSection: hLeftSection
@@ -76,10 +80,10 @@ Item {
     property alias vRightSection: vRightSection
 
     anchors.fill: parent
-    anchors.leftMargin: _edgeBaseMargin + _frameLeftInset
-    anchors.rightMargin: _edgeBaseMargin + _frameRightInset
-    anchors.topMargin: (_barIsVertical ? (hasAdjacentTopBarLive ? outlineThickness : Theme.spacingXS) : 0) + _frameTopInset
-    anchors.bottomMargin: (_barIsVertical ? (hasAdjacentBottomBarLive ? outlineThickness : Theme.spacingXS) : 0) + _frameBottomInset
+    anchors.leftMargin: _leftMargin
+    anchors.rightMargin: _rightMargin
+    anchors.topMargin: _topMargin
+    anchors.bottomMargin: _bottomMargin
     clip: false
 
     DeferredAction {
@@ -88,10 +92,6 @@ Item {
     }
 
     Component.onCompleted: {
-        _hadAdjacentTopBar = hasAdjacentTopBarLive;
-        _hadAdjacentBottomBar = hasAdjacentBottomBarLive;
-        _hadAdjacentLeftBar = hasAdjacentLeftBarLive;
-        _hadAdjacentRightBar = hasAdjacentRightBarLive;
         enableFrameInsetAnimation.schedule();
     }
 
