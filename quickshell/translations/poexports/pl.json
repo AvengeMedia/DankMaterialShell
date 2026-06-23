@@ -107,6 +107,9 @@
   "%1 windows": {
     "%1 windows": ""
   },
+  "%1: %2": {
+    "%1: %2": ""
+  },
   "%1m ago": {
     "%1m ago": "%1m temu"
   },
@@ -1790,6 +1793,9 @@
   "Connecting...": {
     "Connecting...": "Łączenie..."
   },
+  "Connecting…": {
+    "Connecting…": ""
+  },
   "Connection failed": {
     "Connection failed": ""
   },
@@ -1969,6 +1975,9 @@
   },
   "Creating...": {
     "Creating...": "Tworzenie..."
+  },
+  "Credentials": {
+    "Credentials": ""
   },
   "Critical Battery": {
     "Critical Battery": ""
@@ -2828,6 +2837,9 @@
   "Enter PIN for ": {
     "Enter PIN for ": "Wprowadź PIN dla "
   },
+  "Enter URI or text to share": {
+    "Enter URI or text to share": ""
+  },
   "Enter URL or text to share": {
     "Enter URL or text to share": "Wprowadź URL lub tekst, aby go udostępnić"
   },
@@ -3146,6 +3158,9 @@
   "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": {
     "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": ""
   },
+  "Failed to save VPN credentials": {
+    "Failed to save VPN credentials": ""
+  },
   "Failed to save audio config": {
     "Failed to save audio config": ""
   },
@@ -3157,6 +3172,9 @@
   },
   "Failed to save profile": {
     "Failed to save profile": ""
+  },
+  "Failed to send SMS": {
+    "Failed to send SMS": ""
   },
   "Failed to send clipboard": {
     "Failed to send clipboard": "Nie udało się wysłać zawartości schowka"
@@ -3503,6 +3521,9 @@
   "Format Legend": {
     "Format Legend": "Legenda formatowania"
   },
+  "Forward 10s": {
+    "Forward 10s": ""
+  },
   "Frame": {
     "Frame": ""
   },
@@ -3818,6 +3839,9 @@
   "Hide device": {
     "Hide device": ""
   },
+  "Hide installed": {
+    "Hide installed": ""
+  },
   "Hide notification content until expanded": {
     "Hide notification content until expanded": ""
   },
@@ -4126,6 +4150,9 @@
   },
   "Installed": {
     "Installed": "Zainstalowano"
+  },
+  "Installed first": {
+    "Installed first": ""
   },
   "Installed: %1": {
     "Installed: %1": "Zainstalowano: %1"
@@ -4952,6 +4979,9 @@
   "Network Status": {
     "Network Status": "Stan sieci"
   },
+  "Network Type": {
+    "Network Type": ""
+  },
   "Network download and upload speed display": {
     "Network download and upload speed display": "Wyświetlanie prędkości pobierania i wysyłania sieci"
   },
@@ -5179,6 +5209,9 @@
   },
   "No human user accounts found.": {
     "No human user accounts found.": ""
+  },
+  "No images found": {
+    "No images found": ""
   },
   "No info items": {
     "No info items": ""
@@ -5888,6 +5921,9 @@
   "Place the dock on the Wayland overlay layer": {
     "Place the dock on the Wayland overlay layer": ""
   },
+  "Play": {
+    "Play": ""
+  },
   "Play a video when the screen locks.": {
     "Play a video when the screen locks.": ""
   },
@@ -6101,6 +6137,9 @@
   "Preview: %1": {
     "Preview: %1": ""
   },
+  "Previous": {
+    "Previous": ""
+  },
   "Primary": {
     "Primary": "Główny"
   },
@@ -6286,6 +6325,9 @@
   },
   "Recent Colors": {
     "Recent Colors": "Ostatnie kolory"
+  },
+  "Recent Images": {
+    "Recent Images": ""
   },
   "Recently Used Apps": {
     "Recently Used Apps": "Ostatnio używane aplikacje"
@@ -6509,6 +6551,9 @@
   "Revert": {
     "Revert": "Odwracać"
   },
+  "Rewind 10s": {
+    "Rewind 10s": ""
+  },
   "Right": {
     "Right": "Prawo"
   },
@@ -6596,6 +6641,9 @@
   "SMS": {
     "SMS": "SMS"
   },
+  "SMS sent successfully": {
+    "SMS sent successfully": ""
+  },
   "Saturation": {
     "Saturation": ""
   },
@@ -6616,6 +6664,9 @@
   },
   "Save and switch between display configurations": {
     "Save and switch between display configurations": ""
+  },
+  "Save credentials": {
+    "Save credentials": ""
   },
   "Save critical priority notifications to history": {
     "Save critical priority notifications to history": ""
@@ -7370,6 +7421,9 @@
   "Signal": {
     "Signal": "Sygnał"
   },
+  "Signal Strength": {
+    "Signal Strength": ""
+  },
   "Signal:": {
     "Signal:": "Sygnał:"
   },
@@ -8123,6 +8177,9 @@
   "Typography & Motion": {
     "Typography & Motion": "Czcionki i Animacje"
   },
+  "URI": {
+    "URI": ""
+  },
   "Unavailable": {
     "Unavailable": "Niedostępny"
   },
@@ -8459,6 +8516,9 @@
   "VPN configuration updated": {
     "VPN configuration updated": "Konfiguracja VPN zaktualizowana"
   },
+  "VPN credentials saved": {
+    "VPN credentials saved": ""
+  },
   "VPN deleted": {
     "VPN deleted": "VPN usunięty"
   },
@@ -8551,6 +8611,9 @@
   },
   "Volume, brightness, and other system OSDs": {
     "Volume, brightness, and other system OSDs": "Głośność, jasność i inne systemowe menu ekranowe"
+  },
+  "Votes": {
+    "Votes": ""
   },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
@@ -8846,11 +8909,17 @@
   "brandon": {
     "brandon": ""
   },
+  "broken": {
+    "broken": ""
+  },
   "by %1": {
     "by %1": "od %1"
   },
   "days": {
     "days": "dni"
+  },
+  "deprecated": {
+    "deprecated": ""
   },
   "detached": {
     "detached": ""
@@ -8866,6 +8935,9 @@
   },
   "direct": {
     "direct": ""
+  },
+  "discuss": {
+    "discuss": ""
   },
   "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": {
     "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": ""
@@ -9026,6 +9098,9 @@
   "this app": {
     "this app": ""
   },
+  "unmaintained": {
+    "unmaintained": ""
+  },
   "until %1": {
     "until %1": ""
   },
@@ -9046,6 +9121,9 @@
   },
   "v%1 by %2": {
     "v%1 by %2": ""
+  },
+  "verified": {
+    "verified": ""
   },
   "wtype not available - install wtype for paste support": {
     "wtype not available - install wtype for paste support": "wtype niedostępny - zainstaluj wtype dla wsparcia wklejania"

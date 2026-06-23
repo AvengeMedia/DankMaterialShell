@@ -107,6 +107,9 @@
   "%1 windows": {
     "%1 windows": "%1 окон"
   },
+  "%1: %2": {
+    "%1: %2": ""
+  },
   "%1m ago": {
     "%1m ago": "%1 мин. назад"
   },
@@ -1790,6 +1793,9 @@
   "Connecting...": {
     "Connecting...": "Подключение..."
   },
+  "Connecting…": {
+    "Connecting…": ""
+  },
   "Connection failed": {
     "Connection failed": "Сбой подключения"
   },
@@ -1969,6 +1975,9 @@
   },
   "Creating...": {
     "Creating...": "Создание..."
+  },
+  "Credentials": {
+    "Credentials": ""
   },
   "Critical Battery": {
     "Critical Battery": ""
@@ -2828,6 +2837,9 @@
   "Enter PIN for ": {
     "Enter PIN for ": "Введите PIN для "
   },
+  "Enter URI or text to share": {
+    "Enter URI or text to share": ""
+  },
   "Enter URL or text to share": {
     "Enter URL or text to share": "Введите URL или текст для отправки"
   },
@@ -3146,6 +3158,9 @@
   "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": {
     "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": "Не удалось выполнить 'dms greeter status'. Убедитесь, что DMS установлен и dms находится в PATH."
   },
+  "Failed to save VPN credentials": {
+    "Failed to save VPN credentials": ""
+  },
   "Failed to save audio config": {
     "Failed to save audio config": "Не удалось сохранить аудиоконфиг"
   },
@@ -3157,6 +3172,9 @@
   },
   "Failed to save profile": {
     "Failed to save profile": "Не удалось сохранить профиль"
+  },
+  "Failed to send SMS": {
+    "Failed to send SMS": ""
   },
   "Failed to send clipboard": {
     "Failed to send clipboard": "Не удалось отправить буфер обмена"
@@ -3503,6 +3521,9 @@
   "Format Legend": {
     "Format Legend": "Условные Обозначения"
   },
+  "Forward 10s": {
+    "Forward 10s": ""
+  },
   "Frame": {
     "Frame": "Рамка"
   },
@@ -3818,6 +3839,9 @@
   "Hide device": {
     "Hide device": "Скрыть устройство"
   },
+  "Hide installed": {
+    "Hide installed": ""
+  },
   "Hide notification content until expanded": {
     "Hide notification content until expanded": "Скрывать содержимое уведомления до развёртывания"
   },
@@ -4126,6 +4150,9 @@
   },
   "Installed": {
     "Installed": "Установлено"
+  },
+  "Installed first": {
+    "Installed first": ""
   },
   "Installed: %1": {
     "Installed: %1": "Установлено: %1"
@@ -4952,6 +4979,9 @@
   "Network Status": {
     "Network Status": "Статус сети"
   },
+  "Network Type": {
+    "Network Type": ""
+  },
   "Network download and upload speed display": {
     "Network download and upload speed display": "Отображение скорости скачивания и загрузки данных по сети"
   },
@@ -5179,6 +5209,9 @@
   },
   "No human user accounts found.": {
     "No human user accounts found.": "Учётные записи пользователей не найдены."
+  },
+  "No images found": {
+    "No images found": ""
   },
   "No info items": {
     "No info items": "Нет предупреждений"
@@ -5888,6 +5921,9 @@
   "Place the dock on the Wayland overlay layer": {
     "Place the dock on the Wayland overlay layer": "Разместить док на слое оверлея Wayland"
   },
+  "Play": {
+    "Play": ""
+  },
   "Play a video when the screen locks.": {
     "Play a video when the screen locks.": "Воспроизводить видео при блокировке экрана."
   },
@@ -6101,6 +6137,9 @@
   "Preview: %1": {
     "Preview: %1": ""
   },
+  "Previous": {
+    "Previous": ""
+  },
   "Primary": {
     "Primary": "Основной"
   },
@@ -6286,6 +6325,9 @@
   },
   "Recent Colors": {
     "Recent Colors": "Недавние Цвета"
+  },
+  "Recent Images": {
+    "Recent Images": ""
   },
   "Recently Used Apps": {
     "Recently Used Apps": "Недавно Использованные Приложения"
@@ -6509,6 +6551,9 @@
   "Revert": {
     "Revert": "Инвертировать"
   },
+  "Rewind 10s": {
+    "Rewind 10s": ""
+  },
   "Right": {
     "Right": "Справа"
   },
@@ -6596,6 +6641,9 @@
   "SMS": {
     "SMS": "SMS"
   },
+  "SMS sent successfully": {
+    "SMS sent successfully": ""
+  },
   "Saturation": {
     "Saturation": "Насыщенность"
   },
@@ -6616,6 +6664,9 @@
   },
   "Save and switch between display configurations": {
     "Save and switch between display configurations": "Сохранить и переключаться между конфигурациями дисплеев"
+  },
+  "Save credentials": {
+    "Save credentials": ""
   },
   "Save critical priority notifications to history": {
     "Save critical priority notifications to history": "Сохранять уведомления обычного приоритета в историю"
@@ -7370,6 +7421,9 @@
   "Signal": {
     "Signal": "Сигнал"
   },
+  "Signal Strength": {
+    "Signal Strength": ""
+  },
   "Signal:": {
     "Signal:": "Сигнал:"
   },
@@ -8123,6 +8177,9 @@
   "Typography & Motion": {
     "Typography & Motion": "Типография и движение"
   },
+  "URI": {
+    "URI": ""
+  },
   "Unavailable": {
     "Unavailable": "Недоступно"
   },
@@ -8459,6 +8516,9 @@
   "VPN configuration updated": {
     "VPN configuration updated": "VPN конфигурации updated"
   },
+  "VPN credentials saved": {
+    "VPN credentials saved": ""
+  },
   "VPN deleted": {
     "VPN deleted": "VPN удалён"
   },
@@ -8551,6 +8611,9 @@
   },
   "Volume, brightness, and other system OSDs": {
     "Volume, brightness, and other system OSDs": "Громкость, яркость и другие системные OSD"
+  },
+  "Votes": {
+    "Votes": ""
   },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
@@ -8846,11 +8909,17 @@
   "brandon": {
     "brandon": "brandon"
   },
+  "broken": {
+    "broken": ""
+  },
   "by %1": {
     "by %1": "на %1"
   },
   "days": {
     "days": "дней"
+  },
+  "deprecated": {
+    "deprecated": ""
   },
   "detached": {
     "detached": "Отключён"
@@ -8866,6 +8935,9 @@
   },
   "direct": {
     "direct": "прямое"
+  },
+  "discuss": {
+    "discuss": ""
   },
   "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": {
     "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language."
@@ -9026,6 +9098,9 @@
   "this app": {
     "this app": "это приложение"
   },
+  "unmaintained": {
+    "unmaintained": ""
+  },
   "until %1": {
     "until %1": "до %1"
   },
@@ -9046,6 +9121,9 @@
   },
   "v%1 by %2": {
     "v%1 by %2": "v%1 от %2"
+  },
+  "verified": {
+    "verified": ""
   },
   "wtype not available - install wtype for paste support": {
     "wtype not available - install wtype for paste support": "wtype недоступен - установите wtype для поддержки вставки"

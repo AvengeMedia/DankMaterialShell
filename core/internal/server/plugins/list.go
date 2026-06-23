@@ -28,9 +28,12 @@ func HandleList(conn net.Conn, req models.Request) {
 		return
 	}
 
+	feedback := plugins.FetchFeedback()
+
 	result := make([]PluginInfo, len(pluginList))
 	for i, p := range pluginList {
 		installed, _ := manager.IsInstalled(p)
+		fb := feedback[p.ID]
 		result[i] = PluginInfo{
 			ID:           p.ID,
 			Name:         p.Name,
@@ -46,6 +49,9 @@ func HandleList(conn net.Conn, req models.Request) {
 			FirstParty:   strings.HasPrefix(p.Repo, "https://github.com/AvengeMedia"),
 			Featured:     p.Featured,
 			RequiresDMS:  p.RequiresDMS,
+			Upvotes:      fb.Upvotes,
+			Status:       fb.Status,
+			IssueURL:     fb.IssueURL,
 		}
 	}
 

@@ -107,6 +107,9 @@
   "%1 windows": {
     "%1 windows": "%1 個視窗"
   },
+  "%1: %2": {
+    "%1: %2": ""
+  },
   "%1m ago": {
     "%1m ago": "%1 分鐘前"
   },
@@ -1790,6 +1793,9 @@
   "Connecting...": {
     "Connecting...": "連線中..."
   },
+  "Connecting…": {
+    "Connecting…": ""
+  },
   "Connection failed": {
     "Connection failed": "連線失敗"
   },
@@ -1969,6 +1975,9 @@
   },
   "Creating...": {
     "Creating...": "建立中..."
+  },
+  "Credentials": {
+    "Credentials": ""
   },
   "Critical Battery": {
     "Critical Battery": ""
@@ -2828,6 +2837,9 @@
   "Enter PIN for ": {
     "Enter PIN for ": "請輸入 PIN 給 "
   },
+  "Enter URI or text to share": {
+    "Enter URI or text to share": ""
+  },
   "Enter URL or text to share": {
     "Enter URL or text to share": "輸入網址或文字以分享"
   },
@@ -3146,6 +3158,9 @@
   "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": {
     "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": "執行 'dms greeter status' 失敗。請確保 DMS 已安裝且 dms 位於 PATH 中。"
   },
+  "Failed to save VPN credentials": {
+    "Failed to save VPN credentials": ""
+  },
   "Failed to save audio config": {
     "Failed to save audio config": "無法儲存音訊設定"
   },
@@ -3157,6 +3172,9 @@
   },
   "Failed to save profile": {
     "Failed to save profile": "儲存設定檔失敗"
+  },
+  "Failed to send SMS": {
+    "Failed to send SMS": ""
   },
   "Failed to send clipboard": {
     "Failed to send clipboard": "無法傳送剪貼簿"
@@ -3503,6 +3521,9 @@
   "Format Legend": {
     "Format Legend": "格式說明"
   },
+  "Forward 10s": {
+    "Forward 10s": ""
+  },
   "Frame": {
     "Frame": "框架"
   },
@@ -3818,6 +3839,9 @@
   "Hide device": {
     "Hide device": "隱藏裝置"
   },
+  "Hide installed": {
+    "Hide installed": ""
+  },
   "Hide notification content until expanded": {
     "Hide notification content until expanded": "展開前隱藏通知內容"
   },
@@ -4126,6 +4150,9 @@
   },
   "Installed": {
     "Installed": "已安裝"
+  },
+  "Installed first": {
+    "Installed first": ""
   },
   "Installed: %1": {
     "Installed: %1": "已安裝：%1"
@@ -4952,6 +4979,9 @@
   "Network Status": {
     "Network Status": "網路狀態"
   },
+  "Network Type": {
+    "Network Type": ""
+  },
   "Network download and upload speed display": {
     "Network download and upload speed display": "顯示網路下載跟上傳速度"
   },
@@ -5179,6 +5209,9 @@
   },
   "No human user accounts found.": {
     "No human user accounts found.": "找不到任何真實使用者帳戶。"
+  },
+  "No images found": {
+    "No images found": ""
   },
   "No info items": {
     "No info items": "無資訊項目"
@@ -5888,6 +5921,9 @@
   "Place the dock on the Wayland overlay layer": {
     "Place the dock on the Wayland overlay layer": "將 Dock 放置在 Wayland 覆蓋層上"
   },
+  "Play": {
+    "Play": ""
+  },
   "Play a video when the screen locks.": {
     "Play a video when the screen locks.": "螢幕鎖定時播放影片。"
   },
@@ -6101,6 +6137,9 @@
   "Preview: %1": {
     "Preview: %1": ""
   },
+  "Previous": {
+    "Previous": ""
+  },
   "Primary": {
     "Primary": "主要"
   },
@@ -6286,6 +6325,9 @@
   },
   "Recent Colors": {
     "Recent Colors": "最近的顏色"
+  },
+  "Recent Images": {
+    "Recent Images": ""
   },
   "Recently Used Apps": {
     "Recently Used Apps": "最近使用的應用程式"
@@ -6509,6 +6551,9 @@
   "Revert": {
     "Revert": "還原"
   },
+  "Rewind 10s": {
+    "Rewind 10s": ""
+  },
   "Right": {
     "Right": "右方"
   },
@@ -6596,6 +6641,9 @@
   "SMS": {
     "SMS": "簡訊"
   },
+  "SMS sent successfully": {
+    "SMS sent successfully": ""
+  },
   "Saturation": {
     "Saturation": "飽和度"
   },
@@ -6616,6 +6664,9 @@
   },
   "Save and switch between display configurations": {
     "Save and switch between display configurations": "儲存並切換顯示設定"
+  },
+  "Save credentials": {
+    "Save credentials": ""
   },
   "Save critical priority notifications to history": {
     "Save critical priority notifications to history": "將高優先順序通知儲存至歷史記錄"
@@ -7370,6 +7421,9 @@
   "Signal": {
     "Signal": "訊號"
   },
+  "Signal Strength": {
+    "Signal Strength": ""
+  },
   "Signal:": {
     "Signal:": "訊號："
   },
@@ -8123,6 +8177,9 @@
   "Typography & Motion": {
     "Typography & Motion": "字體排版和動態"
   },
+  "URI": {
+    "URI": ""
+  },
   "Unavailable": {
     "Unavailable": "不可用"
   },
@@ -8459,6 +8516,9 @@
   "VPN configuration updated": {
     "VPN configuration updated": "VPN 設定已更新"
   },
+  "VPN credentials saved": {
+    "VPN credentials saved": ""
+  },
   "VPN deleted": {
     "VPN deleted": "VPN 已刪除"
   },
@@ -8551,6 +8611,9 @@
   },
   "Volume, brightness, and other system OSDs": {
     "Volume, brightness, and other system OSDs": "音量、亮度及其他系統OSD"
+  },
+  "Votes": {
+    "Votes": ""
   },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
@@ -8846,11 +8909,17 @@
   "brandon": {
     "brandon": "布蘭登"
   },
+  "broken": {
+    "broken": ""
+  },
   "by %1": {
     "by %1": "作者：%1"
   },
   "days": {
     "days": "天"
+  },
+  "deprecated": {
+    "deprecated": ""
   },
   "detached": {
     "detached": "已分離"
@@ -8866,6 +8935,9 @@
   },
   "direct": {
     "direct": "直接"
+  },
+  "discuss": {
+    "discuss": ""
   },
   "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": {
     "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": "dms 是一個高度可自訂的現代桌面外殼，其設計<a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">靈感來自 material 3</a>。<br /><br/>它使用 <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>（一個用於構建桌面外殼的 QT6 框架）和 <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>（一種靜態類型、編譯式程式語言）構建。"
@@ -9026,6 +9098,9 @@
   "this app": {
     "this app": "此應用程式"
   },
+  "unmaintained": {
+    "unmaintained": ""
+  },
   "until %1": {
     "until %1": "直到 %1"
   },
@@ -9046,6 +9121,9 @@
   },
   "v%1 by %2": {
     "v%1 by %2": "v%1 由 %2"
+  },
+  "verified": {
+    "verified": ""
   },
   "wtype not available - install wtype for paste support": {
     "wtype not available - install wtype for paste support": "wtype 未可用 - 請安裝 wtype 以支援貼上功能"

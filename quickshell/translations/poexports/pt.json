@@ -107,6 +107,9 @@
   "%1 windows": {
     "%1 windows": ""
   },
+  "%1: %2": {
+    "%1: %2": ""
+  },
   "%1m ago": {
     "%1m ago": "%1m atrás"
   },
@@ -1790,6 +1793,9 @@
   "Connecting...": {
     "Connecting...": "Conectando..."
   },
+  "Connecting…": {
+    "Connecting…": ""
+  },
   "Connection failed": {
     "Connection failed": ""
   },
@@ -1969,6 +1975,9 @@
   },
   "Creating...": {
     "Creating...": "Criando..."
+  },
+  "Credentials": {
+    "Credentials": ""
   },
   "Critical Battery": {
     "Critical Battery": ""
@@ -2828,6 +2837,9 @@
   "Enter PIN for ": {
     "Enter PIN for ": "Entre código PIN para "
   },
+  "Enter URI or text to share": {
+    "Enter URI or text to share": ""
+  },
   "Enter URL or text to share": {
     "Enter URL or text to share": "Digite URL ou texto para compartilhar"
   },
@@ -3146,6 +3158,9 @@
   "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": {
     "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": ""
   },
+  "Failed to save VPN credentials": {
+    "Failed to save VPN credentials": ""
+  },
   "Failed to save audio config": {
     "Failed to save audio config": "Falha ao salvar a configuração de áudio"
   },
@@ -3157,6 +3172,9 @@
   },
   "Failed to save profile": {
     "Failed to save profile": ""
+  },
+  "Failed to send SMS": {
+    "Failed to send SMS": ""
   },
   "Failed to send clipboard": {
     "Failed to send clipboard": "Falha ao enviar área de transferência"
@@ -3503,6 +3521,9 @@
   "Format Legend": {
     "Format Legend": "Formatar Legenda"
   },
+  "Forward 10s": {
+    "Forward 10s": ""
+  },
   "Frame": {
     "Frame": ""
   },
@@ -3818,6 +3839,9 @@
   "Hide device": {
     "Hide device": "Ocultar dispositivo"
   },
+  "Hide installed": {
+    "Hide installed": ""
+  },
   "Hide notification content until expanded": {
     "Hide notification content until expanded": "Ocultar conteúdo da notificação até expandir"
   },
@@ -4126,6 +4150,9 @@
   },
   "Installed": {
     "Installed": "Instalado"
+  },
+  "Installed first": {
+    "Installed first": ""
   },
   "Installed: %1": {
     "Installed: %1": "Instalado: %1"
@@ -4952,6 +4979,9 @@
   "Network Status": {
     "Network Status": "Status da Rede"
   },
+  "Network Type": {
+    "Network Type": ""
+  },
   "Network download and upload speed display": {
     "Network download and upload speed display": "Monitor de velocidades de download e upload da rede"
   },
@@ -5179,6 +5209,9 @@
   },
   "No human user accounts found.": {
     "No human user accounts found.": ""
+  },
+  "No images found": {
+    "No images found": ""
   },
   "No info items": {
     "No info items": "Nenhum item de informação"
@@ -5888,6 +5921,9 @@
   "Place the dock on the Wayland overlay layer": {
     "Place the dock on the Wayland overlay layer": ""
   },
+  "Play": {
+    "Play": ""
+  },
   "Play a video when the screen locks.": {
     "Play a video when the screen locks.": ""
   },
@@ -6101,6 +6137,9 @@
   "Preview: %1": {
     "Preview: %1": ""
   },
+  "Previous": {
+    "Previous": ""
+  },
   "Primary": {
     "Primary": "Primário"
   },
@@ -6286,6 +6325,9 @@
   },
   "Recent Colors": {
     "Recent Colors": "Cores Recentes"
+  },
+  "Recent Images": {
+    "Recent Images": ""
   },
   "Recently Used Apps": {
     "Recently Used Apps": "Apps Usados Recentemente"
@@ -6509,6 +6551,9 @@
   "Revert": {
     "Revert": "Reverter"
   },
+  "Rewind 10s": {
+    "Rewind 10s": ""
+  },
   "Right": {
     "Right": "Direita"
   },
@@ -6596,6 +6641,9 @@
   "SMS": {
     "SMS": "SMS"
   },
+  "SMS sent successfully": {
+    "SMS sent successfully": ""
+  },
   "Saturation": {
     "Saturation": ""
   },
@@ -6616,6 +6664,9 @@
   },
   "Save and switch between display configurations": {
     "Save and switch between display configurations": "Salvar e alternar entre configurações de exibição"
+  },
+  "Save credentials": {
+    "Save credentials": ""
   },
   "Save critical priority notifications to history": {
     "Save critical priority notifications to history": "Salvar notificações de prioridade crítica no histórico"
@@ -7370,6 +7421,9 @@
   "Signal": {
     "Signal": "Sinal"
   },
+  "Signal Strength": {
+    "Signal Strength": ""
+  },
   "Signal:": {
     "Signal:": "Sinal:"
   },
@@ -8123,6 +8177,9 @@
   "Typography & Motion": {
     "Typography & Motion": "Tipografia & Movimento"
   },
+  "URI": {
+    "URI": ""
+  },
   "Unavailable": {
     "Unavailable": "Indisponível"
   },
@@ -8459,6 +8516,9 @@
   "VPN configuration updated": {
     "VPN configuration updated": "Configuração da VPN atualizada"
   },
+  "VPN credentials saved": {
+    "VPN credentials saved": ""
+  },
   "VPN deleted": {
     "VPN deleted": "VPN excluída"
   },
@@ -8551,6 +8611,9 @@
   },
   "Volume, brightness, and other system OSDs": {
     "Volume, brightness, and other system OSDs": "Volume, brilho, e outros OSDs do sistema"
+  },
+  "Votes": {
+    "Votes": ""
   },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
@@ -8846,11 +8909,17 @@
   "brandon": {
     "brandon": "brandon"
   },
+  "broken": {
+    "broken": ""
+  },
   "by %1": {
     "by %1": "por %1"
   },
   "days": {
     "days": "dias"
+  },
+  "deprecated": {
+    "deprecated": ""
   },
   "detached": {
     "detached": ""
@@ -8866,6 +8935,9 @@
   },
   "direct": {
     "direct": ""
+  },
+  "discuss": {
+    "discuss": ""
   },
   "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": {
     "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": ""
@@ -9026,6 +9098,9 @@
   "this app": {
     "this app": "este aplicativo"
   },
+  "unmaintained": {
+    "unmaintained": ""
+  },
   "until %1": {
     "until %1": ""
   },
@@ -9046,6 +9121,9 @@
   },
   "v%1 by %2": {
     "v%1 by %2": "v%1 por %2"
+  },
+  "verified": {
+    "verified": ""
   },
   "wtype not available - install wtype for paste support": {
     "wtype not available - install wtype for paste support": "wtype não disponível - installe wtype para suporte de colagem"

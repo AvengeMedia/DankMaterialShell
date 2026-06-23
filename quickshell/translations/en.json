@@ -216,6 +216,12 @@
     "comment": ""
   },
   {
+    "term": "%1: %2",
+    "context": "%1: %2",
+    "reference": "Services/DMSNetworkService.qml:394",
+    "comment": ""
+  },
+  {
     "term": "%1m ago",
     "context": "%1m ago",
     "reference": "Services/NotificationService.qml:273",
@@ -236,7 +242,7 @@
   {
     "term": "(Default)",
     "context": "(Default)",
-    "reference": "Modules/Settings/WallpaperTab.qml:881, Modules/Settings/WallpaperTab.qml:896, Modules/Settings/WallpaperTab.qml:903",
+    "reference": "Modules/Settings/WallpaperTab.qml:896, Modules/Settings/WallpaperTab.qml:911, Modules/Settings/WallpaperTab.qml:918",
     "comment": "default monitor label suffix"
   },
   {
@@ -276,21 +282,15 @@
     "comment": ""
   },
   {
-    "term": "1 device connected",
-    "context": "1 device connected",
-    "reference": "dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:37",
-    "comment": "KDE Connect status single device"
-  },
-  {
     "term": "1 hour",
     "context": "1 hour",
-    "reference": "Modules/Settings/WallpaperTab.qml:1018, Modules/Settings/PowerSleepTab.qml:10, Modules/ControlCenter/Details/DoNotDisturbDetail.qml:71",
+    "reference": "Modules/Settings/WallpaperTab.qml:1033, Modules/Settings/PowerSleepTab.qml:10, Modules/ControlCenter/Details/DoNotDisturbDetail.qml:71",
     "comment": "wallpaper interval"
   },
   {
     "term": "1 hour 30 minutes",
     "context": "1 hour 30 minutes",
-    "reference": "Modules/Settings/WallpaperTab.qml:1018, Modules/Settings/PowerSleepTab.qml:10",
+    "reference": "Modules/Settings/WallpaperTab.qml:1033, Modules/Settings/PowerSleepTab.qml:10",
     "comment": "wallpaper interval"
   },
   {
@@ -302,7 +302,7 @@
   {
     "term": "1 minute",
     "context": "1 minute",
-    "reference": "Modules/Settings/WallpaperTab.qml:1018, Modules/Settings/PowerSleepTab.qml:10, Modules/Settings/NotificationsTab.qml:65, Modules/Notifications/Center/NotificationSettings.qml:70",
+    "reference": "Modules/Settings/WallpaperTab.qml:1033, Modules/Settings/PowerSleepTab.qml:10, Modules/Settings/NotificationsTab.qml:65, Modules/Notifications/Center/NotificationSettings.qml:70",
     "comment": "wallpaper interval"
   },
   {
@@ -338,7 +338,7 @@
   {
     "term": "10 seconds",
     "context": "10 seconds",
-    "reference": "Modules/Settings/WallpaperTab.qml:1018, Modules/Settings/PowerSleepTab.qml:103, Modules/Settings/PowerSleepTab.qml:129, Modules/Settings/PowerSleepTab.qml:512, Modules/Settings/NotificationsTab.qml:53, Modules/Notifications/Center/NotificationSettings.qml:58",
+    "reference": "Modules/Settings/WallpaperTab.qml:1033, Modules/Settings/PowerSleepTab.qml:103, Modules/Settings/PowerSleepTab.qml:129, Modules/Settings/PowerSleepTab.qml:512, Modules/Settings/NotificationsTab.qml:53, Modules/Notifications/Center/NotificationSettings.qml:58",
     "comment": "wallpaper interval"
   },
   {
@@ -350,7 +350,7 @@
   {
     "term": "12 hours",
     "context": "12 hours",
-    "reference": "Modules/Settings/WallpaperTab.qml:1018",
+    "reference": "Modules/Settings/WallpaperTab.qml:1033",
     "comment": "wallpaper interval"
   },
   {
@@ -374,13 +374,13 @@
   {
     "term": "15 minutes",
     "context": "15 minutes",
-    "reference": "Modules/Settings/WallpaperTab.qml:1018, Modules/Settings/PowerSleepTab.qml:10",
+    "reference": "Modules/Settings/WallpaperTab.qml:1033, Modules/Settings/PowerSleepTab.qml:10",
     "comment": "wallpaper interval"
   },
   {
     "term": "15 seconds",
     "context": "15 seconds",
-    "reference": "Modules/Settings/WallpaperTab.qml:1018, Modules/Settings/PowerSleepTab.qml:10, Modules/Settings/PowerSleepTab.qml:103, Modules/Settings/PowerSleepTab.qml:129, Modules/Settings/NotificationsTab.qml:57, Modules/Notifications/Center/NotificationSettings.qml:62",
+    "reference": "Modules/Settings/WallpaperTab.qml:1033, Modules/Settings/PowerSleepTab.qml:10, Modules/Settings/PowerSleepTab.qml:103, Modules/Settings/PowerSleepTab.qml:129, Modules/Settings/NotificationsTab.qml:57, Modules/Notifications/Center/NotificationSettings.qml:62",
     "comment": "wallpaper interval"
   },
   {
@@ -392,7 +392,7 @@
   {
     "term": "2 hours",
     "context": "2 hours",
-    "reference": "Modules/Settings/WallpaperTab.qml:1018, Modules/Settings/PowerSleepTab.qml:10",
+    "reference": "Modules/Settings/WallpaperTab.qml:1033, Modules/Settings/PowerSleepTab.qml:10",
     "comment": "wallpaper interval"
   },
   {
@@ -416,13 +416,13 @@
   {
     "term": "20 seconds",
     "context": "20 seconds",
-    "reference": "Modules/Settings/WallpaperTab.qml:1018, Modules/Settings/PowerSleepTab.qml:103, Modules/Settings/PowerSleepTab.qml:129",
+    "reference": "Modules/Settings/WallpaperTab.qml:1033, Modules/Settings/PowerSleepTab.qml:103, Modules/Settings/PowerSleepTab.qml:129",
     "comment": "wallpaper interval"
   },
   {
     "term": "24-Hour Format",
     "context": "24-Hour Format",
-    "reference": "Modules/Settings/WallpaperTab.qml:1156, Modules/Settings/TimeWeatherTab.qml:53",
+    "reference": "Modules/Settings/WallpaperTab.qml:1171, Modules/Settings/TimeWeatherTab.qml:53",
     "comment": ""
   },
   {
@@ -434,7 +434,7 @@
   {
     "term": "25 seconds",
     "context": "25 seconds",
-    "reference": "Modules/Settings/WallpaperTab.qml:1018",
+    "reference": "Modules/Settings/WallpaperTab.qml:1033",
     "comment": "wallpaper interval"
   },
   {
@@ -458,7 +458,7 @@
   {
     "term": "3 hours",
     "context": "3 hours",
-    "reference": "Modules/Settings/WallpaperTab.qml:1018, Modules/Settings/PowerSleepTab.qml:10, Modules/ControlCenter/Details/DoNotDisturbDetail.qml:75",
+    "reference": "Modules/Settings/WallpaperTab.qml:1033, Modules/Settings/PowerSleepTab.qml:10, Modules/ControlCenter/Details/DoNotDisturbDetail.qml:75",
     "comment": "wallpaper interval"
   },
   {
@@ -494,31 +494,31 @@
   {
     "term": "30 minutes",
     "context": "30 minutes",
-    "reference": "Modules/Settings/WallpaperTab.qml:1018, Modules/Settings/PowerSleepTab.qml:10",
+    "reference": "Modules/Settings/WallpaperTab.qml:1033, Modules/Settings/PowerSleepTab.qml:10",
     "comment": "wallpaper interval"
   },
   {
     "term": "30 seconds",
     "context": "30 seconds",
-    "reference": "Modules/Settings/WallpaperTab.qml:1018, Modules/Settings/PowerSleepTab.qml:10, Modules/Settings/PowerSleepTab.qml:103, Modules/Settings/PowerSleepTab.qml:129, Modules/Settings/NotificationsTab.qml:61, Modules/Notifications/Center/NotificationSettings.qml:66",
+    "reference": "Modules/Settings/WallpaperTab.qml:1033, Modules/Settings/PowerSleepTab.qml:10, Modules/Settings/PowerSleepTab.qml:103, Modules/Settings/PowerSleepTab.qml:129, Modules/Settings/NotificationsTab.qml:61, Modules/Notifications/Center/NotificationSettings.qml:66",
     "comment": "wallpaper interval"
   },
   {
     "term": "35 seconds",
     "context": "35 seconds",
-    "reference": "Modules/Settings/WallpaperTab.qml:1018",
+    "reference": "Modules/Settings/WallpaperTab.qml:1033",
     "comment": "wallpaper interval"
   },
   {
     "term": "3rd party",
     "context": "3rd party",
-    "reference": "Modules/Settings/PluginBrowser.qml:892",
+    "reference": "Modules/Settings/PluginBrowser.qml:941",
     "comment": ""
   },
   {
     "term": "4 hours",
     "context": "4 hours",
-    "reference": "Modules/Settings/WallpaperTab.qml:1018",
+    "reference": "Modules/Settings/WallpaperTab.qml:1033",
     "comment": "wallpaper interval"
   },
   {
@@ -530,13 +530,13 @@
   {
     "term": "40 seconds",
     "context": "40 seconds",
-    "reference": "Modules/Settings/WallpaperTab.qml:1018",
+    "reference": "Modules/Settings/WallpaperTab.qml:1033",
     "comment": "wallpaper interval"
   },
   {
     "term": "45 seconds",
     "context": "45 seconds",
-    "reference": "Modules/Settings/WallpaperTab.qml:1018",
+    "reference": "Modules/Settings/WallpaperTab.qml:1033",
     "comment": "wallpaper interval"
   },
   {
@@ -548,19 +548,19 @@
   {
     "term": "5 minutes",
     "context": "5 minutes",
-    "reference": "Modules/Settings/WallpaperTab.qml:1018, Modules/Settings/WallpaperTab.qml:1042, Modules/Settings/WallpaperTab.qml:1066, Modules/Settings/PowerSleepTab.qml:10, Modules/Settings/NotificationsTab.qml:73, Modules/Notifications/Center/NotificationSettings.qml:78",
+    "reference": "Modules/Settings/WallpaperTab.qml:1033, Modules/Settings/WallpaperTab.qml:1057, Modules/Settings/WallpaperTab.qml:1081, Modules/Settings/PowerSleepTab.qml:10, Modules/Settings/NotificationsTab.qml:73, Modules/Notifications/Center/NotificationSettings.qml:78",
     "comment": "wallpaper interval"
   },
   {
     "term": "5 seconds",
     "context": "5 seconds",
-    "reference": "Modules/Settings/WallpaperTab.qml:1018, Modules/Settings/PowerSleepTab.qml:103, Modules/Settings/PowerSleepTab.qml:114, Modules/Settings/PowerSleepTab.qml:129, Modules/Settings/PowerSleepTab.qml:140, Modules/Settings/PowerSleepTab.qml:512, Modules/Settings/NotificationsTab.qml:45, Modules/Settings/NotificationsTab.qml:160, Modules/Notifications/Center/NotificationSettings.qml:50, Modules/Notifications/Center/NotificationSettings.qml:89",
+    "reference": "Modules/Settings/WallpaperTab.qml:1033, Modules/Settings/PowerSleepTab.qml:103, Modules/Settings/PowerSleepTab.qml:114, Modules/Settings/PowerSleepTab.qml:129, Modules/Settings/PowerSleepTab.qml:140, Modules/Settings/PowerSleepTab.qml:512, Modules/Settings/NotificationsTab.qml:45, Modules/Settings/NotificationsTab.qml:160, Modules/Notifications/Center/NotificationSettings.qml:50, Modules/Notifications/Center/NotificationSettings.qml:89",
     "comment": "wallpaper interval"
   },
   {
     "term": "50 seconds",
     "context": "50 seconds",
-    "reference": "Modules/Settings/WallpaperTab.qml:1018",
+    "reference": "Modules/Settings/WallpaperTab.qml:1033",
     "comment": "wallpaper interval"
   },
   {
@@ -572,13 +572,13 @@
   {
     "term": "55 seconds",
     "context": "55 seconds",
-    "reference": "Modules/Settings/WallpaperTab.qml:1018",
+    "reference": "Modules/Settings/WallpaperTab.qml:1033",
     "comment": "wallpaper interval"
   },
   {
     "term": "6 hours",
     "context": "6 hours",
-    "reference": "Modules/Settings/WallpaperTab.qml:1018",
+    "reference": "Modules/Settings/WallpaperTab.qml:1033",
     "comment": "wallpaper interval"
   },
   {
@@ -596,7 +596,7 @@
   {
     "term": "8 hours",
     "context": "8 hours",
-    "reference": "Modules/Settings/WallpaperTab.qml:1018, Modules/ControlCenter/Details/DoNotDisturbDetail.qml:79",
+    "reference": "Modules/Settings/WallpaperTab.qml:1033, Modules/ControlCenter/Details/DoNotDisturbDetail.qml:79",
     "comment": "wallpaper interval"
   },
   {
@@ -650,7 +650,7 @@
   {
     "term": "AC Adapter (Plugged In)",
     "context": "AC Adapter (Plugged In)",
-    "reference": "Modules/Settings/BatteryTab.qml:68",
+    "reference": "Modules/Settings/BatteryTab.qml:67",
     "comment": ""
   },
   {
@@ -686,13 +686,13 @@
   {
     "term": "Accent Color",
     "context": "Accent Color",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:36",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:36, dms-plugins/dms-plugins-official/DankDesktopWeather/DankDesktopWeatherSettings.qml:36",
     "comment": ""
   },
   {
     "term": "Accept",
     "context": "Accept",
-    "reference": "dms-plugins/DankKDEConnect/components/DeviceCard.qml:182, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:370",
+    "reference": "dms-plugins/DankKDEConnect/components/DeviceCard.qml:272, dms-plugins/dms-plugins-official/DankKDEConnect/components/DeviceCard.qml:272",
     "comment": "KDE Connect accept pairing button"
   },
   {
@@ -776,7 +776,7 @@
   {
     "term": "Activation",
     "context": "Activation",
-    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeysSettings.qml:97",
+    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeysSettings.qml:97, dms-plugins/dms-plugins-official/DankLauncherKeys/DankLauncherKeysSettings.qml:97",
     "comment": ""
   },
   {
@@ -800,7 +800,7 @@
   {
     "term": "Active VPN",
     "context": "Active VPN",
-    "reference": "Services/DMSNetworkService.qml:109",
+    "reference": "Services/DMSNetworkService.qml:111",
     "comment": ""
   },
   {
@@ -1022,7 +1022,7 @@
   {
     "term": "All",
     "context": "All",
-    "reference": "Modals/ProcessListModal.qml:378, Services/AppSearchService.qml:724, Services/AppSearchService.qml:745, dms-plugins/DankStickerSearch/DankStickerSearch.qml:101, Modals/DankLauncherV2/Controller.qml:754, Modals/DankLauncherV2/SpotlightLauncherContent.qml:439, Modals/DankLauncherV2/LauncherContent.qml:339, Modals/DankLauncherV2/LauncherContent.qml:617, Modals/Clipboard/ClipboardContent.qml:15, Modules/ProcessList/ProcessListPopout.qml:155, Modules/Settings/WidgetsTabSection.qml:3303, Modules/Settings/WidgetsTabSection.qml:3357, Modules/Settings/PluginBrowser.qml:133, Modules/Settings/KeybindsTab.qml:468, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:103, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:106, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:118, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:254, Modules/Notifications/Center/HistoryNotificationList.qml:87",
+    "reference": "Modals/ProcessListModal.qml:378, Services/AppSearchService.qml:724, Services/AppSearchService.qml:745, dms-plugins/DankStickerSearch/DankStickerSearch.qml:101, dms-plugins/dms-plugins-official/DankStickerSearch/DankStickerSearch.qml:101, Modals/DankLauncherV2/Controller.qml:754, Modals/DankLauncherV2/SpotlightLauncherContent.qml:439, Modals/DankLauncherV2/LauncherContent.qml:339, Modals/DankLauncherV2/LauncherContent.qml:617, Modals/Clipboard/ClipboardContent.qml:15, Modules/ProcessList/ProcessListPopout.qml:155, Modules/Settings/WidgetsTabSection.qml:3303, Modules/Settings/WidgetsTabSection.qml:3357, Modules/Settings/PluginBrowser.qml:173, Modules/Settings/KeybindsTab.qml:468, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:103, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:106, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:118, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:254, Modules/Notifications/Center/HistoryNotificationList.qml:87",
     "comment": "Tailscale filter: all devices | notification history filter | plugin browser category filter"
   },
   {
@@ -1112,7 +1112,7 @@
   {
     "term": "Always Active",
     "context": "Always Active",
-    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeysSettings.qml:106",
+    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeysSettings.qml:106, dms-plugins/dms-plugins-official/DankLauncherKeys/DankLauncherKeysSettings.qml:106",
     "comment": ""
   },
   {
@@ -1346,7 +1346,7 @@
   {
     "term": "Apply to Hardware",
     "context": "Apply to Hardware",
-    "reference": "Modules/Settings/BatteryTab.qml:199",
+    "reference": "Modules/Settings/BatteryTab.qml:198",
     "comment": ""
   },
   {
@@ -1490,7 +1490,7 @@
   {
     "term": "Audio Output",
     "context": "Audio Output",
-    "reference": "Modules/ControlCenter/Models/WidgetModel.qml:179",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1876, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:1331, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:1876, dms-plugins/dms-plugins-official/DankKDEConnect/components/KDEConnectDetailContent.qml:1331, Modules/ControlCenter/Models/WidgetModel.qml:179",
     "comment": ""
   },
   {
@@ -1526,13 +1526,13 @@
   {
     "term": "Auth",
     "context": "Auth",
-    "reference": "Widgets/VpnProfileDelegate.qml:60, Modules/Settings/NetworkVpnTab.qml:435",
+    "reference": "Widgets/VpnProfileDelegate.qml:62, Modules/Settings/NetworkVpnTab.qml:435",
     "comment": ""
   },
   {
     "term": "Auth Type",
     "context": "Auth Type",
-    "reference": "Widgets/VpnProfileDelegate.qml:78, Modules/Settings/NetworkVpnTab.qml:450",
+    "reference": "Widgets/VpnProfileDelegate.qml:80, Modules/Settings/NetworkVpnTab.qml:450",
     "comment": ""
   },
   {
@@ -1658,7 +1658,7 @@
   {
     "term": "Auto Power Saver",
     "context": "Auto Power Saver",
-    "reference": "Modules/Settings/BatteryTab.qml:258",
+    "reference": "Modules/Settings/BatteryTab.qml:257",
     "comment": ""
   },
   {
@@ -1742,19 +1742,19 @@
   {
     "term": "Autoconnect",
     "context": "Autoconnect",
-    "reference": "Widgets/VpnProfileDelegate.qml:264, Modules/Settings/NetworkVpnTab.qml:493, Modules/Settings/NetworkWifiTab.qml:820",
+    "reference": "Widgets/VpnProfileDelegate.qml:276, Modules/Settings/NetworkVpnTab.qml:493, Modules/Settings/NetworkWifiTab.qml:820",
     "comment": ""
   },
   {
     "term": "Autoconnect disabled",
     "context": "Autoconnect disabled",
-    "reference": "Services/LegacyNetworkService.qml:506, Services/DMSNetworkService.qml:993",
+    "reference": "Services/LegacyNetworkService.qml:506, Services/DMSNetworkService.qml:1017",
     "comment": ""
   },
   {
     "term": "Autoconnect enabled",
     "context": "Autoconnect enabled",
-    "reference": "Services/LegacyNetworkService.qml:506, Services/DMSNetworkService.qml:993",
+    "reference": "Services/LegacyNetworkService.qml:506, Services/DMSNetworkService.qml:1017",
     "comment": ""
   },
   {
@@ -1778,7 +1778,7 @@
   {
     "term": "Automatic Cycling",
     "context": "Automatic Cycling",
-    "reference": "Modules/Settings/WallpaperTab.qml:929, Modules/Settings/LockScreenTab.qml:336",
+    "reference": "Modules/Settings/WallpaperTab.qml:944, Modules/Settings/LockScreenTab.qml:336",
     "comment": ""
   },
   {
@@ -1790,7 +1790,7 @@
   {
     "term": "Automatically cycle through wallpapers in the same folder",
     "context": "Automatically cycle through wallpapers in the same folder",
-    "reference": "Modules/Settings/WallpaperTab.qml:930",
+    "reference": "Modules/Settings/WallpaperTab.qml:945",
     "comment": ""
   },
   {
@@ -1844,7 +1844,7 @@
   {
     "term": "Automatically turn on Power Saver profile when battery is low.",
     "context": "Automatically turn on Power Saver profile when battery is low.",
-    "reference": "Modules/Settings/BatteryTab.qml:259",
+    "reference": "Modules/Settings/BatteryTab.qml:258",
     "comment": ""
   },
   {
@@ -1898,7 +1898,7 @@
   {
     "term": "Available in Detailed and Forecast view modes",
     "context": "Available in Detailed and Forecast view modes",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:121",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:121, dms-plugins/dms-plugins-official/DankDesktopWeather/DankDesktopWeatherSettings.qml:121",
     "comment": ""
   },
   {
@@ -1952,7 +1952,7 @@
   {
     "term": "Background Color",
     "context": "Background Color",
-    "reference": "Modules/Settings/WallpaperTab.qml:361, Modules/Settings/WallpaperTab.qml:374",
+    "reference": "Modules/Settings/WallpaperTab.qml:361, Modules/Settings/WallpaperTab.qml:389",
     "comment": ""
   },
   {
@@ -1964,7 +1964,7 @@
   {
     "term": "Background Opacity",
     "context": "Background Opacity",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:63, PLUGINS/ExampleDesktopClock/DesktopClockSettings.qml:39",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:63, dms-plugins/dms-plugins-official/DankDesktopWeather/DankDesktopWeatherSettings.qml:63, PLUGINS/ExampleDesktopClock/DesktopClockSettings.qml:39",
     "comment": ""
   },
   {
@@ -2072,8 +2072,8 @@
   {
     "term": "Battery",
     "context": "Battery",
-    "reference": "Modals/Settings/SettingsSidebar.qml:383, Modules/Settings/WidgetsTabSection.qml:1837, Modules/Settings/WidgetsTabSection.qml:2021, Modules/Settings/PowerSleepTab.qml:59, Modules/Settings/WidgetsTab.qml:178, Modules/ControlCenter/Models/WidgetModel.qml:221, Modules/ControlCenter/Widgets/BatteryPill.qml:17",
-    "comment": ""
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1678, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:740, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:1678, dms-plugins/dms-plugins-official/DankKDEConnect/components/KDEConnectDetailContent.qml:740, Modals/Settings/SettingsSidebar.qml:383, Modules/Settings/WidgetsTabSection.qml:1837, Modules/Settings/WidgetsTabSection.qml:2021, Modules/Settings/PowerSleepTab.qml:59, Modules/Settings/WidgetsTab.qml:178, Modules/ControlCenter/Models/WidgetModel.qml:221, Modules/ControlCenter/Widgets/BatteryPill.qml:17",
+    "comment": "KDE Connect battery label"
   },
   {
     "term": "Battery %1",
@@ -2084,31 +2084,31 @@
   {
     "term": "Battery Charge Limit",
     "context": "Battery Charge Limit",
-    "reference": "Modules/Settings/BatteryTab.qml:183",
+    "reference": "Modules/Settings/BatteryTab.qml:182",
     "comment": ""
   },
   {
     "term": "Battery Health",
     "context": "Battery Health",
-    "reference": "Modules/Settings/BatteryTab.qml:158",
+    "reference": "Modules/Settings/BatteryTab.qml:157",
     "comment": ""
   },
   {
     "term": "Battery Power",
     "context": "Battery Power",
-    "reference": "Modules/Settings/BatteryTab.qml:68",
+    "reference": "Modules/Settings/BatteryTab.qml:67",
     "comment": ""
   },
   {
     "term": "Battery Protection & Charging",
     "context": "Battery Protection & Charging",
-    "reference": "Modules/Settings/BatteryTab.qml:178",
+    "reference": "Modules/Settings/BatteryTab.qml:177",
     "comment": ""
   },
   {
     "term": "Battery Status",
     "context": "Battery Status",
-    "reference": "Modules/Settings/BatteryTab.qml:52",
+    "reference": "Modules/Settings/BatteryTab.qml:51",
     "comment": ""
   },
   {
@@ -2144,7 +2144,7 @@
   {
     "term": "Battery percentage to trigger a critical alert.",
     "context": "Battery percentage to trigger a critical alert.",
-    "reference": "Modules/Settings/BatteryTab.qml:282",
+    "reference": "Modules/Settings/BatteryTab.qml:281",
     "comment": ""
   },
   {
@@ -2192,7 +2192,7 @@
   {
     "term": "Black",
     "context": "Black",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:254, Modules/Settings/TypographyMotionTab.qml:274, Modules/Settings/TypographyMotionTab.qml:306, Modules/Settings/WallpaperTab.qml:366",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:254, Modules/Settings/TypographyMotionTab.qml:274, Modules/Settings/TypographyMotionTab.qml:306, Modules/Settings/WallpaperTab.qml:368",
     "comment": "font weight"
   },
   {
@@ -2270,13 +2270,13 @@
   {
     "term": "Blur Wallpaper Layer",
     "context": "Blur Wallpaper Layer",
-    "reference": "Modules/Settings/WallpaperTab.qml:1294",
+    "reference": "Modules/Settings/WallpaperTab.qml:1309",
     "comment": ""
   },
   {
     "term": "Blur on Overview",
     "context": "Blur on Overview",
-    "reference": "Modules/Settings/WallpaperTab.qml:804",
+    "reference": "Modules/Settings/WallpaperTab.qml:819",
     "comment": ""
   },
   {
@@ -2288,7 +2288,7 @@
   {
     "term": "Blur wallpaper when niri overview is open",
     "context": "Blur wallpaper when niri overview is open",
-    "reference": "Modules/Settings/WallpaperTab.qml:805",
+    "reference": "Modules/Settings/WallpaperTab.qml:820",
     "comment": ""
   },
   {
@@ -2444,13 +2444,13 @@
   {
     "term": "Browse Files",
     "context": "Browse Files",
-    "reference": "dms-plugins/DankKDEConnect/components/DeviceCard.qml:151, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:322",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1599, dms-plugins/DankKDEConnect/components/DeviceCard.qml:228, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:656, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:1599, dms-plugins/dms-plugins-official/DankKDEConnect/components/DeviceCard.qml:228, dms-plugins/dms-plugins-official/DankKDEConnect/components/KDEConnectDetailContent.qml:656",
     "comment": "KDE Connect browse tooltip"
   },
   {
     "term": "Browse Plugins",
     "context": "Browse Plugins",
-    "reference": "Modules/Settings/PluginBrowser.qml:379, Modules/Settings/PluginBrowser.qml:489, Modules/Settings/DesktopWidgetsTab.qml:101",
+    "reference": "Modules/Settings/PluginBrowser.qml:425, Modules/Settings/PluginBrowser.qml:535, Modules/Settings/DesktopWidgetsTab.qml:101",
     "comment": "plugin browser header | plugin browser window title"
   },
   {
@@ -2558,7 +2558,7 @@
   {
     "term": "Cancel",
     "context": "Cancel",
-    "reference": "DMSShell.qml:555, Modals/WindowRuleModal.qml:1851, Modals/PolkitAuthContent.qml:326, Modals/WorkspaceRenameModal.qml:161, Modals/BluetoothPairingModal.qml:267, Modals/WifiPasswordModal.qml:677, Widgets/KeybindItem.qml:1858, Modals/DankLauncherV2/LauncherContent.qml:1024, Modals/Common/ConfirmModal.qml:15, Modals/Common/ConfirmModal.qml:26, Modals/Common/ConfirmModal.qml:39, Modals/FileBrowser/FileBrowserOverwriteDialog.qml:83, Modals/Clipboard/ClipboardEditor.qml:322, Modules/Settings/PluginBrowser.qml:354, Modules/Settings/PluginBrowser.qml:1236, Modules/Settings/GreeterTab.qml:178, Modules/Settings/ThemeBrowser.qml:122, Modules/Settings/DisplayConfigTab.qml:287, Modules/Settings/DisplayConfigTab.qml:332, Modules/Settings/DisplayConfigTab.qml:416, Modules/Settings/AudioTab.qml:727, Modules/DankDash/Overview/CalendarEventEditor.qml:342, Modules/DankBar/Popouts/SystemUpdatePopout.qml:203",
+    "reference": "DMSShell.qml:555, Modals/WindowRuleModal.qml:1851, Modals/PolkitAuthContent.qml:326, Modals/WorkspaceRenameModal.qml:161, Modals/BluetoothPairingModal.qml:267, Modals/WifiPasswordModal.qml:677, Widgets/KeybindItem.qml:1858, Modals/DankLauncherV2/LauncherContent.qml:1024, Modals/Common/ConfirmModal.qml:15, Modals/Common/ConfirmModal.qml:26, Modals/Common/ConfirmModal.qml:39, Modals/FileBrowser/FileBrowserOverwriteDialog.qml:83, Modals/Clipboard/ClipboardEditor.qml:322, Modules/Settings/PluginBrowser.qml:400, Modules/Settings/PluginBrowser.qml:1342, Modules/Settings/GreeterTab.qml:178, Modules/Settings/ThemeBrowser.qml:122, Modules/Settings/DisplayConfigTab.qml:287, Modules/Settings/DisplayConfigTab.qml:332, Modules/Settings/DisplayConfigTab.qml:416, Modules/Settings/AudioTab.qml:727, Modules/DankDash/Overview/CalendarEventEditor.qml:342, Modules/DankBar/Popouts/SystemUpdatePopout.qml:203",
     "comment": ""
   },
   {
@@ -2648,7 +2648,7 @@
   {
     "term": "Category",
     "context": "Category",
-    "reference": "Modules/Settings/PluginBrowser.qml:58",
+    "reference": "Modules/Settings/PluginBrowser.qml:63",
     "comment": "plugin browser sort option"
   },
   {
@@ -2708,7 +2708,7 @@
   {
     "term": "Charge Level",
     "context": "Charge Level",
-    "reference": "Modules/Settings/BatteryTab.qml:86",
+    "reference": "Modules/Settings/BatteryTab.qml:85",
     "comment": ""
   },
   {
@@ -2720,7 +2720,7 @@
   {
     "term": "Charge limit applied successfully",
     "context": "Charge limit applied successfully",
-    "reference": "Modules/Settings/BatteryTab.qml:30",
+    "reference": "Modules/Settings/BatteryTab.qml:29",
     "comment": ""
   },
   {
@@ -2786,7 +2786,7 @@
   {
     "term": "Choose Dark Mode Color",
     "context": "Choose Dark Mode Color",
-    "reference": "Modules/Settings/WallpaperTab.qml:728",
+    "reference": "Modules/Settings/WallpaperTab.qml:743",
     "comment": "dark mode wallpaper color picker title"
   },
   {
@@ -2804,7 +2804,7 @@
   {
     "term": "Choose Light Mode Color",
     "context": "Choose Light Mode Color",
-    "reference": "Modules/Settings/WallpaperTab.qml:538",
+    "reference": "Modules/Settings/WallpaperTab.qml:553",
     "comment": "light mode wallpaper color picker title"
   },
   {
@@ -2834,7 +2834,7 @@
   {
     "term": "Choose how the weather widget is displayed",
     "context": "Choose how the weather widget is displayed",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:12",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:12, dms-plugins/dms-plugins-official/DankDesktopWeather/DankDesktopWeatherSettings.qml:12",
     "comment": ""
   },
   {
@@ -2846,7 +2846,7 @@
   {
     "term": "Choose how to be notified about battery alerts.",
     "context": "Choose how to be notified about battery alerts.",
-    "reference": "Modules/Settings/BatteryTab.qml:246",
+    "reference": "Modules/Settings/BatteryTab.qml:245",
     "comment": ""
   },
   {
@@ -2924,13 +2924,13 @@
   {
     "term": "Chroma Style",
     "context": "Chroma Style",
-    "reference": "dms-plugins/DankNotepadModule/DankNotepadModuleSettings.qml:74",
+    "reference": "dms-plugins/DankNotepadModule/DankNotepadModuleSettings.qml:74, dms-plugins/dms-plugins-official/DankNotepadModule/DankNotepadModuleSettings.qml:74",
     "comment": ""
   },
   {
     "term": "Cipher",
     "context": "Cipher",
-    "reference": "Widgets/VpnProfileDelegate.qml:54, Modules/Settings/NetworkVpnTab.qml:430",
+    "reference": "Widgets/VpnProfileDelegate.qml:56, Modules/Settings/NetworkVpnTab.qml:430",
     "comment": ""
   },
   {
@@ -3104,8 +3104,8 @@
   {
     "term": "Clipboard sent",
     "context": "Clipboard sent",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:117, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:300",
-    "comment": "KDE Connect clipboard action | Phone Connect clipboard action"
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:613, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:58, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:613, dms-plugins/dms-plugins-official/DankKDEConnect/components/KDEConnectDetailContent.qml:58",
+    "comment": "Phone Connect clipboard action"
   },
   {
     "term": "Clipboard works but nothing saved to disk",
@@ -3146,7 +3146,7 @@
   {
     "term": "Close Window",
     "context": "Close Window",
-    "reference": "dms-plugins/DankHyprlandWindows/DankHyprlandWindows.qml:169, Modules/Dock/DockContextMenu.qml:350, Modules/DankBar/Widgets/AppsDockContextMenu.qml:456",
+    "reference": "dms-plugins/DankHyprlandWindows/DankHyprlandWindows.qml:169, dms-plugins/dms-plugins-official/DankHyprlandWindows/DankHyprlandWindows.qml:169, Modules/Dock/DockContextMenu.qml:350, Modules/DankBar/Widgets/AppsDockContextMenu.qml:456",
     "comment": ""
   },
   {
@@ -3230,13 +3230,13 @@
   {
     "term": "Color theme for syntax highlighting.",
     "context": "Color theme for syntax highlighting.",
-    "reference": "dms-plugins/DankNotepadModule/DankNotepadModuleSettings.qml:77",
+    "reference": "dms-plugins/DankNotepadModule/DankNotepadModuleSettings.qml:77, dms-plugins/dms-plugins-official/DankNotepadModule/DankNotepadModuleSettings.qml:77",
     "comment": ""
   },
   {
     "term": "Color theme for syntax highlighting. %1 themes available.",
     "context": "Color theme for syntax highlighting. %1 themes available.",
-    "reference": "dms-plugins/DankNotepadModule/DankNotepadModuleSettings.qml:76",
+    "reference": "dms-plugins/DankNotepadModule/DankNotepadModuleSettings.qml:76, dms-plugins/dms-plugins-official/DankNotepadModule/DankNotepadModuleSettings.qml:76",
     "comment": ""
   },
   {
@@ -3326,7 +3326,7 @@
   {
     "term": "Compact",
     "context": "Compact",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:15, Modules/Settings/WidgetsTabSection.qml:1482, Modules/Settings/NotificationsTab.qml:298",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:15, dms-plugins/dms-plugins-official/DankDesktopWeather/DankDesktopWeatherSettings.qml:15, Modules/Settings/WidgetsTabSection.qml:1482, Modules/Settings/NotificationsTab.qml:298",
     "comment": ""
   },
   {
@@ -3380,7 +3380,7 @@
   {
     "term": "Configuration activated",
     "context": "Configuration activated",
-    "reference": "Services/DMSNetworkService.qml:437",
+    "reference": "Services/DMSNetworkService.qml:461",
     "comment": ""
   },
   {
@@ -3500,7 +3500,7 @@
   {
     "term": "Connected",
     "context": "Connected",
-    "reference": "Modules/Settings/AboutTab.qml:716, Modules/Settings/NetworkVpnTab.qml:101, Modules/Settings/NetworkEthernetTab.qml:163, Modules/Settings/DisplayConfigTab.qml:393, Modules/Settings/FrameTab.qml:59, Modules/Settings/NetworkWifiTab.qml:566, Modules/Settings/NetworkWifiTab.qml:969, Modules/ControlCenter/Details/BluetoothDetail.qml:301, Modules/ControlCenter/Details/BluetoothDetail.qml:302, Modules/ControlCenter/Details/NetworkDetail.qml:627, Modules/ControlCenter/BuiltinPlugins/VpnWidget.qml:21, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:111, Modules/ControlCenter/Components/DragDropGrid.qml:501, Modules/ControlCenter/Components/DragDropGrid.qml:504, Modules/ControlCenter/Components/DragDropGrid.qml:506, Modules/ControlCenter/Components/DragDropGrid.qml:509",
+    "reference": "Modules/Settings/AboutTab.qml:716, Modules/Settings/NetworkVpnTab.qml:101, Modules/Settings/NetworkEthernetTab.qml:163, Modules/Settings/DisplayConfigTab.qml:393, Modules/Settings/FrameTab.qml:59, Modules/Settings/NetworkWifiTab.qml:566, Modules/Settings/NetworkWifiTab.qml:969, Modules/ControlCenter/Details/BluetoothDetail.qml:301, Modules/ControlCenter/Details/BluetoothDetail.qml:302, Modules/ControlCenter/Details/NetworkDetail.qml:627, Modules/ControlCenter/BuiltinPlugins/VpnWidget.qml:26, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:111, Modules/ControlCenter/Components/DragDropGrid.qml:501, Modules/ControlCenter/Components/DragDropGrid.qml:504, Modules/ControlCenter/Components/DragDropGrid.qml:506, Modules/ControlCenter/Components/DragDropGrid.qml:509",
     "comment": "Tailscale connection status: connected | network status"
   },
   {
@@ -3530,7 +3530,7 @@
   {
     "term": "Connected to %1",
     "context": "Connected to %1",
-    "reference": "Services/LegacyNetworkService.qml:334, Services/DMSNetworkService.qml:384",
+    "reference": "Services/LegacyNetworkService.qml:334, Services/DMSNetworkService.qml:408",
     "comment": ""
   },
   {
@@ -3548,8 +3548,14 @@
   {
     "term": "Connecting...",
     "context": "Connecting...",
-    "reference": "Modules/Settings/NetworkWifiTab.qml:566, Modules/Settings/NetworkWifiTab.qml:968, Modules/Settings/NetworkWifiTab.qml:1191, Modules/ControlCenter/Details/BluetoothDetail.qml:297, Modules/ControlCenter/Details/NetworkDetail.qml:627, Modules/ControlCenter/Details/NetworkDetail.qml:803, Modules/ControlCenter/Components/DragDropGrid.qml:455, Modules/ControlCenter/Components/DragDropGrid.qml:497, Modules/ControlCenter/Components/DragDropGrid.qml:521",
+    "reference": "Widgets/VpnProfileDelegate.qml:145, Modules/Settings/NetworkWifiTab.qml:566, Modules/Settings/NetworkWifiTab.qml:968, Modules/Settings/NetworkWifiTab.qml:1191, Modules/ControlCenter/Details/BluetoothDetail.qml:297, Modules/ControlCenter/Details/NetworkDetail.qml:627, Modules/ControlCenter/Details/NetworkDetail.qml:803, Modules/ControlCenter/Components/DragDropGrid.qml:455, Modules/ControlCenter/Components/DragDropGrid.qml:497, Modules/ControlCenter/Components/DragDropGrid.qml:521",
     "comment": "bluetooth status | network status"
+  },
+  {
+    "term": "Connecting…",
+    "context": "Connecting…",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/VpnWidget.qml:21",
+    "comment": ""
   },
   {
     "term": "Connection failed",
@@ -3572,7 +3578,7 @@
   {
     "term": "Content copied",
     "context": "Content copied",
-    "reference": "dms-plugins/DankStickerSearch/DankStickerSearch.qml:262, dms-plugins/DankGifSearch/DankGifSearch.qml:209",
+    "reference": "dms-plugins/DankStickerSearch/DankStickerSearch.qml:262, dms-plugins/DankGifSearch/DankGifSearch.qml:209, dms-plugins/dms-plugins-official/DankStickerSearch/DankStickerSearch.qml:262, dms-plugins/dms-plugins-official/DankGifSearch/DankGifSearch.qml:209",
     "comment": ""
   },
   {
@@ -3584,7 +3590,7 @@
   {
     "term": "Contributor",
     "context": "Contributor",
-    "reference": "Modules/Settings/PluginBrowser.qml:53",
+    "reference": "Modules/Settings/PluginBrowser.qml:58",
     "comment": "plugin browser sort option"
   },
   {
@@ -3728,25 +3734,25 @@
   {
     "term": "Copied GIF",
     "context": "Copied GIF",
-    "reference": "dms-plugins/DankStickerSearch/DankStickerSearch.qml:283, dms-plugins/DankGifSearch/DankGifSearch.qml:230",
+    "reference": "dms-plugins/DankStickerSearch/DankStickerSearch.qml:283, dms-plugins/DankGifSearch/DankGifSearch.qml:230, dms-plugins/dms-plugins-official/DankStickerSearch/DankStickerSearch.qml:283, dms-plugins/dms-plugins-official/DankGifSearch/DankGifSearch.qml:230",
     "comment": ""
   },
   {
     "term": "Copied MP4",
     "context": "Copied MP4",
-    "reference": "dms-plugins/DankStickerSearch/DankStickerSearch.qml:293, dms-plugins/DankGifSearch/DankGifSearch.qml:240",
+    "reference": "dms-plugins/DankStickerSearch/DankStickerSearch.qml:293, dms-plugins/DankGifSearch/DankGifSearch.qml:240, dms-plugins/dms-plugins-official/DankStickerSearch/DankStickerSearch.qml:293, dms-plugins/dms-plugins-official/DankGifSearch/DankGifSearch.qml:240",
     "comment": ""
   },
   {
     "term": "Copied WebP",
     "context": "Copied WebP",
-    "reference": "dms-plugins/DankStickerSearch/DankStickerSearch.qml:273, dms-plugins/DankGifSearch/DankGifSearch.qml:220",
+    "reference": "dms-plugins/DankStickerSearch/DankStickerSearch.qml:273, dms-plugins/DankGifSearch/DankGifSearch.qml:220, dms-plugins/dms-plugins-official/DankStickerSearch/DankStickerSearch.qml:273, dms-plugins/dms-plugins-official/DankGifSearch/DankGifSearch.qml:220",
     "comment": ""
   },
   {
     "term": "Copied to clipboard",
     "context": "Copied to clipboard",
-    "reference": "Services/ClipboardService.qml:250, dms-plugins/DankStickerSearch/DankStickerSearch.qml:230, dms-plugins/DankLauncherKeys/DankLauncherKeys.qml:154, dms-plugins/DankGifSearch/DankGifSearch.qml:175, Modals/Settings/SettingsModal.qml:322, Modals/Settings/SettingsModal.qml:339, Modules/Notepad/NotepadTextEditor.qml:328, Modules/Settings/DesktopWidgetInstanceCard.qml:426",
+    "reference": "Services/ClipboardService.qml:250, dms-plugins/DankStickerSearch/DankStickerSearch.qml:230, dms-plugins/DankLauncherKeys/DankLauncherKeys.qml:154, dms-plugins/DankGifSearch/DankGifSearch.qml:175, dms-plugins/dms-plugins-official/DankStickerSearch/DankStickerSearch.qml:230, dms-plugins/dms-plugins-official/DankLauncherKeys/DankLauncherKeys.qml:154, dms-plugins/dms-plugins-official/DankGifSearch/DankGifSearch.qml:175, Modals/Settings/SettingsModal.qml:322, Modals/Settings/SettingsModal.qml:339, Modules/Notepad/NotepadTextEditor.qml:328, Modules/Settings/DesktopWidgetInstanceCard.qml:426",
     "comment": ""
   },
   {
@@ -3758,13 +3764,13 @@
   {
     "term": "Copy",
     "context": "Copy",
-    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeys.qml:170, Modals/DankLauncherV2/Controller.qml:1220, Modals/Clipboard/ClipboardContextMenu.qml:38, Modules/Settings/ClipboardTab.qml:156, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:395",
+    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeys.qml:170, dms-plugins/dms-plugins-official/DankLauncherKeys/DankLauncherKeys.qml:170, Modals/DankLauncherV2/Controller.qml:1220, Modals/Clipboard/ClipboardContextMenu.qml:38, Modules/Settings/ClipboardTab.qml:156, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:395",
     "comment": "Copy to clipboard"
   },
   {
     "term": "Copy Content",
     "context": "Copy Content",
-    "reference": "dms-plugins/DankStickerSearch/DankStickerSearch.qml:259, dms-plugins/DankGifSearch/DankGifSearch.qml:206",
+    "reference": "dms-plugins/DankStickerSearch/DankStickerSearch.qml:259, dms-plugins/DankGifSearch/DankGifSearch.qml:206, dms-plugins/dms-plugins-official/DankStickerSearch/DankStickerSearch.qml:259, dms-plugins/dms-plugins-official/DankGifSearch/DankGifSearch.qml:206",
     "comment": ""
   },
   {
@@ -3900,6 +3906,12 @@
     "comment": ""
   },
   {
+    "term": "Credentials",
+    "context": "Credentials",
+    "reference": "Widgets/VpnProfileDelegate.qml:292",
+    "comment": ""
+  },
+  {
     "term": "Critical Battery",
     "context": "Critical Battery",
     "reference": "Services/BatteryService.qml:144",
@@ -3908,13 +3920,13 @@
   {
     "term": "Critical Battery Alert",
     "context": "Critical Battery Alert",
-    "reference": "Modules/Settings/BatteryTab.qml:272",
+    "reference": "Modules/Settings/BatteryTab.qml:271",
     "comment": ""
   },
   {
     "term": "Critical Battery Notifications",
     "context": "Critical Battery Notifications",
-    "reference": "Modules/Settings/BatteryTab.qml:292",
+    "reference": "Modules/Settings/BatteryTab.qml:291",
     "comment": ""
   },
   {
@@ -3926,7 +3938,7 @@
   {
     "term": "Critical Threshold",
     "context": "Critical Threshold",
-    "reference": "Modules/Settings/BatteryTab.qml:281",
+    "reference": "Modules/Settings/BatteryTab.qml:280",
     "comment": ""
   },
   {
@@ -4076,7 +4088,7 @@
   {
     "term": "Custom",
     "context": "Custom",
-    "reference": "Widgets/KeybindItem.qml:1436, dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:47, Modules/Settings/ThemeColorsTab.qml:46, Modules/Settings/ThemeColorsTab.qml:343, Modules/Settings/ThemeColorsTab.qml:343, Modules/Settings/ThemeColorsTab.qml:1774, Modules/Settings/ThemeColorsTab.qml:1784, Modules/Settings/ThemeColorsTab.qml:1796, Modules/Settings/ThemeColorsTab.qml:1874, Modules/Settings/ThemeColorsTab.qml:1884, Modules/Settings/ThemeColorsTab.qml:1895, Modules/Settings/TypographyMotionTab.qml:495, Modules/Settings/TypographyMotionTab.qml:592, Modules/Settings/TypographyMotionTab.qml:676, Modules/Settings/DockTab.qml:296, Modules/Settings/DockTab.qml:403, Modules/Settings/WallpaperTab.qml:370, Modules/Settings/LauncherTab.qml:318, Modules/Settings/LauncherTab.qml:424, Modules/Settings/DankBarTab.qml:1733, Modules/Settings/WorkspaceAppearanceCard.qml:50, Modules/Settings/WorkspaceAppearanceCard.qml:88, Modules/Settings/WorkspaceAppearanceCard.qml:120, Modules/Settings/WorkspaceAppearanceCard.qml:155, Modules/Settings/WorkspaceAppearanceCard.qml:181, Modules/Settings/FrameTab.qml:231, Modules/Settings/NotificationsTab.qml:385, Modules/Settings/Widgets/SettingsColorPicker.qml:52, Modules/Settings/Widgets/DeviceAliasRow.qml:92",
+    "reference": "Widgets/KeybindItem.qml:1436, dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:47, dms-plugins/dms-plugins-official/DankDesktopWeather/DankDesktopWeatherSettings.qml:47, Modules/Settings/ThemeColorsTab.qml:46, Modules/Settings/ThemeColorsTab.qml:343, Modules/Settings/ThemeColorsTab.qml:343, Modules/Settings/ThemeColorsTab.qml:1774, Modules/Settings/ThemeColorsTab.qml:1784, Modules/Settings/ThemeColorsTab.qml:1796, Modules/Settings/ThemeColorsTab.qml:1874, Modules/Settings/ThemeColorsTab.qml:1884, Modules/Settings/ThemeColorsTab.qml:1895, Modules/Settings/TypographyMotionTab.qml:495, Modules/Settings/TypographyMotionTab.qml:592, Modules/Settings/TypographyMotionTab.qml:676, Modules/Settings/DockTab.qml:296, Modules/Settings/DockTab.qml:403, Modules/Settings/WallpaperTab.qml:384, Modules/Settings/LauncherTab.qml:318, Modules/Settings/LauncherTab.qml:424, Modules/Settings/DankBarTab.qml:1733, Modules/Settings/WorkspaceAppearanceCard.qml:50, Modules/Settings/WorkspaceAppearanceCard.qml:88, Modules/Settings/WorkspaceAppearanceCard.qml:120, Modules/Settings/WorkspaceAppearanceCard.qml:155, Modules/Settings/WorkspaceAppearanceCard.qml:181, Modules/Settings/FrameTab.qml:231, Modules/Settings/NotificationsTab.qml:385, Modules/Settings/Widgets/SettingsColorPicker.qml:52, Modules/Settings/Widgets/DeviceAliasRow.qml:92",
     "comment": "blur border color | shadow color option | theme category option | widget background color option | workspace color option"
   },
   {
@@ -4088,7 +4100,7 @@
   {
     "term": "Custom Color",
     "context": "Custom Color",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:56, Modules/Settings/ColorDropdownRow.qml:150, Modules/Settings/FrameTab.qml:288",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:56, dms-plugins/dms-plugins-official/DankDesktopWeather/DankDesktopWeatherSettings.qml:56, Modules/Settings/ColorDropdownRow.qml:150, Modules/Settings/FrameTab.qml:288",
     "comment": ""
   },
   {
@@ -4310,7 +4322,7 @@
   {
     "term": "Daily at:",
     "context": "Daily at:",
-    "reference": "Modules/Settings/WallpaperTab.qml:1083",
+    "reference": "Modules/Settings/WallpaperTab.qml:1098",
     "comment": ""
   },
   {
@@ -4364,7 +4376,7 @@
   {
     "term": "Dark Mode",
     "context": "Dark Mode",
-    "reference": "Modules/Settings/ThemeColorsTab.qml:1469, Modules/Settings/WallpaperTab.qml:604, Modules/ControlCenter/Models/WidgetModel.qml:137, Modules/ControlCenter/Components/DragDropGrid.qml:721",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:1469, Modules/Settings/WallpaperTab.qml:619, Modules/ControlCenter/Models/WidgetModel.qml:137, Modules/ControlCenter/Components/DragDropGrid.qml:721",
     "comment": ""
   },
   {
@@ -4454,8 +4466,8 @@
   {
     "term": "Default",
     "context": "Default",
-    "reference": "Modals/WindowRuleModal.qml:559, Modules/Settings/ThemeColorsTab.qml:1562, Modules/Settings/TypographyMotionTab.qml:458, Modules/Settings/PluginBrowser.qml:43, Modules/Settings/DockTab.qml:403, Modules/Settings/LauncherTab.qml:424, Modules/Settings/WorkspaceAppearanceCard.qml:93, Modules/Settings/FrameTab.qml:231, Modules/Settings/NotificationsTab.qml:119, Modules/Settings/NotificationsTab.qml:142",
-    "comment": "notification rule action option | notification rule urgency option | plugin browser sort option | widget style option | workspace color option"
+    "reference": "Modals/WindowRuleModal.qml:559, Modules/Settings/ThemeColorsTab.qml:1562, Modules/Settings/TypographyMotionTab.qml:458, Modules/Settings/DockTab.qml:403, Modules/Settings/LauncherTab.qml:424, Modules/Settings/WorkspaceAppearanceCard.qml:93, Modules/Settings/FrameTab.qml:231, Modules/Settings/NotificationsTab.qml:119, Modules/Settings/NotificationsTab.qml:142",
+    "comment": "notification rule action option | notification rule urgency option | widget style option | workspace color option"
   },
   {
     "term": "Default (Black)",
@@ -4694,7 +4706,7 @@
   {
     "term": "Detailed",
     "context": "Detailed",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:23",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:23, dms-plugins/dms-plugins-official/DankDesktopWeather/DankDesktopWeatherSettings.qml:23",
     "comment": ""
   },
   {
@@ -4742,14 +4754,14 @@
   {
     "term": "Device paired",
     "context": "Device paired",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:164, Modules/ControlCenter/Details/BluetoothDetail.qml:54",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:687, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:687, Modules/ControlCenter/Details/BluetoothDetail.qml:54",
     "comment": "Phone Connect pairing action"
   },
   {
     "term": "Device unpaired",
     "context": "Device unpaired",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:179, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:359",
-    "comment": "KDE Connect unpair action | Phone Connect unpair action"
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:702, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:702",
+    "comment": "Phone Connect unpair action"
   },
   {
     "term": "Digital",
@@ -4784,7 +4796,7 @@
   {
     "term": "Disable Built-in Wallpapers",
     "context": "Disable Built-in Wallpapers",
-    "reference": "Modules/Settings/WallpaperTab.qml:1272",
+    "reference": "Modules/Settings/WallpaperTab.qml:1287",
     "comment": "wallpaper settings disable toggle"
   },
   {
@@ -4826,7 +4838,7 @@
   {
     "term": "Disc",
     "context": "Disc",
-    "reference": "Modules/Settings/WallpaperTab.qml:1189",
+    "reference": "Modules/Settings/WallpaperTab.qml:1204",
     "comment": "wallpaper transition option"
   },
   {
@@ -4850,13 +4862,13 @@
   {
     "term": "Disconnected",
     "context": "Disconnected",
-    "reference": "Modules/Settings/NetworkVpnTab.qml:98, Modules/Settings/NetworkStatusTab.qml:119, Modules/Settings/NetworkEthernetTab.qml:165, Modules/Settings/DisplayConfigTab.qml:393, Modules/Settings/DisplayConfig/OutputCard.qml:85, Modules/Settings/DisplayConfig/MonitorRect.qml:93, Modules/ControlCenter/BuiltinPlugins/VpnWidget.qml:18, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:22, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:111",
+    "reference": "Modules/Settings/NetworkVpnTab.qml:98, Modules/Settings/NetworkStatusTab.qml:119, Modules/Settings/NetworkEthernetTab.qml:165, Modules/Settings/DisplayConfigTab.qml:393, Modules/Settings/DisplayConfig/OutputCard.qml:85, Modules/Settings/DisplayConfig/MonitorRect.qml:93, Modules/ControlCenter/BuiltinPlugins/VpnWidget.qml:23, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:22, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:111",
     "comment": "Tailscale connection status: disconnected | Tailscale disconnected status"
   },
   {
     "term": "Disconnected from WiFi",
     "context": "Disconnected from WiFi",
-    "reference": "Services/LegacyNetworkService.qml:390, Services/DMSNetworkService.qml:533",
+    "reference": "Services/LegacyNetworkService.qml:390, Services/DMSNetworkService.qml:557",
     "comment": ""
   },
   {
@@ -4982,7 +4994,7 @@
   {
     "term": "Display hourly weather predictions",
     "context": "Display hourly weather predictions",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:136",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:136, dms-plugins/dms-plugins-official/DankDesktopWeather/DankDesktopWeatherSettings.qml:136",
     "comment": ""
   },
   {
@@ -5126,7 +5138,7 @@
   {
     "term": "Don't Change",
     "context": "Don't Change",
-    "reference": "Modules/Settings/PowerSleepTab.qml:154, Modules/Settings/BatteryTab.qml:310, Modules/Settings/BatteryTab.qml:328",
+    "reference": "Modules/Settings/PowerSleepTab.qml:154, Modules/Settings/BatteryTab.qml:309, Modules/Settings/BatteryTab.qml:327",
     "comment": ""
   },
   {
@@ -5198,7 +5210,7 @@
   {
     "term": "Duplicate Wallpaper with Blur",
     "context": "Duplicate Wallpaper with Blur",
-    "reference": "Modules/Settings/WallpaperTab.qml:1303",
+    "reference": "Modules/Settings/WallpaperTab.qml:1318",
     "comment": ""
   },
   {
@@ -5444,7 +5456,7 @@
   {
     "term": "Enable compositor-targetable blur layer (namespace: dms:blurwallpaper). Requires manual niri configuration.",
     "context": "Enable compositor-targetable blur layer (namespace: dms:blurwallpaper). Requires manual niri configuration.",
-    "reference": "Modules/Settings/WallpaperTab.qml:1304",
+    "reference": "Modules/Settings/WallpaperTab.qml:1319",
     "comment": ""
   },
   {
@@ -5598,9 +5610,9 @@
     "comment": ""
   },
   {
-    "term": "Enter URL or text to share",
-    "context": "Enter URL or text to share",
-    "reference": "dms-plugins/DankKDEConnect/components/ShareDialog.qml:73",
+    "term": "Enter URI or text to share",
+    "context": "Enter URI or text to share",
+    "reference": "dms-plugins/DankKDEConnect/components/ShareDialog.qml:327, dms-plugins/dms-plugins-official/DankKDEConnect/components/ShareDialog.qml:327",
     "comment": "KDE Connect share input placeholder"
   },
   {
@@ -5732,7 +5744,7 @@
   {
     "term": "Estimated Time",
     "context": "Estimated Time",
-    "reference": "Modules/Settings/BatteryTab.qml:134",
+    "reference": "Modules/Settings/BatteryTab.qml:133",
     "comment": ""
   },
   {
@@ -5840,7 +5852,7 @@
   {
     "term": "External Wallpaper Management",
     "context": "External Wallpaper Management",
-    "reference": "Modules/Settings/WallpaperTab.qml:1264",
+    "reference": "Modules/Settings/WallpaperTab.qml:1279",
     "comment": "wallpaper settings external management"
   },
   {
@@ -5870,7 +5882,7 @@
   {
     "term": "Fade",
     "context": "Fade",
-    "reference": "Modules/Settings/WallpaperTab.qml:1185",
+    "reference": "Modules/Settings/WallpaperTab.qml:1200",
     "comment": "wallpaper transition option"
   },
   {
@@ -5888,13 +5900,13 @@
   {
     "term": "Failed to accept pairing",
     "context": "Failed to accept pairing",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:161",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:684, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:684",
     "comment": "Phone Connect error"
   },
   {
     "term": "Failed to activate configuration",
     "context": "Failed to activate configuration",
-    "reference": "Services/DMSNetworkService.qml:433",
+    "reference": "Services/DMSNetworkService.qml:457",
     "comment": ""
   },
   {
@@ -5924,7 +5936,7 @@
   {
     "term": "Failed to apply charge limit to system",
     "context": "Failed to apply charge limit to system",
-    "reference": "Modules/Settings/BatteryTab.qml:28",
+    "reference": "Modules/Settings/BatteryTab.qml:27",
     "comment": ""
   },
   {
@@ -5936,7 +5948,7 @@
   {
     "term": "Failed to browse device",
     "context": "Failed to browse device",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:143",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:666, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:666",
     "comment": "Phone Connect error"
   },
   {
@@ -5960,13 +5972,13 @@
   {
     "term": "Failed to connect VPN",
     "context": "Failed to connect VPN",
-    "reference": "Services/DMSNetworkService.qml:884",
+    "reference": "Services/DMSNetworkService.qml:908",
     "comment": ""
   },
   {
     "term": "Failed to connect to %1",
     "context": "Failed to connect to %1",
-    "reference": "Services/LegacyNetworkService.qml:318, Services/DMSNetworkService.qml:404",
+    "reference": "Services/LegacyNetworkService.qml:318, Services/DMSNetworkService.qml:428",
     "comment": ""
   },
   {
@@ -5984,7 +5996,7 @@
   {
     "term": "Failed to delete VPN",
     "context": "Failed to delete VPN",
-    "reference": "Services/VPNService.qml:159",
+    "reference": "Services/VPNService.qml:182",
     "comment": ""
   },
   {
@@ -6020,19 +6032,19 @@
   {
     "term": "Failed to disconnect VPN",
     "context": "Failed to disconnect VPN",
-    "reference": "Services/DMSNetworkService.qml:908",
+    "reference": "Services/DMSNetworkService.qml:932",
     "comment": ""
   },
   {
     "term": "Failed to disconnect VPNs",
     "context": "Failed to disconnect VPNs",
-    "reference": "Services/DMSNetworkService.qml:926",
+    "reference": "Services/DMSNetworkService.qml:950",
     "comment": ""
   },
   {
     "term": "Failed to disconnect WiFi",
     "context": "Failed to disconnect WiFi",
-    "reference": "Services/DMSNetworkService.qml:531",
+    "reference": "Services/DMSNetworkService.qml:555",
     "comment": ""
   },
   {
@@ -6050,7 +6062,7 @@
   {
     "term": "Failed to enable WiFi",
     "context": "Failed to enable WiFi",
-    "reference": "Services/DMSNetworkService.qml:635",
+    "reference": "Services/DMSNetworkService.qml:659",
     "comment": ""
   },
   {
@@ -6092,19 +6104,19 @@
   {
     "term": "Failed to import VPN",
     "context": "Failed to import VPN",
-    "reference": "Services/VPNService.qml:86, Services/VPNService.qml:100",
+    "reference": "Services/VPNService.qml:87, Services/VPNService.qml:101",
     "comment": ""
   },
   {
     "term": "Failed to launch SMS app",
     "context": "Failed to launch SMS app",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:133",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1766, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:809, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:1766, dms-plugins/dms-plugins-official/DankKDEConnect/components/KDEConnectDetailContent.qml:809",
     "comment": "Phone Connect error"
   },
   {
     "term": "Failed to load VPN config",
     "context": "Failed to load VPN config",
-    "reference": "Services/VPNService.qml:116",
+    "reference": "Services/VPNService.qml:117",
     "comment": ""
   },
   {
@@ -6134,7 +6146,7 @@
   {
     "term": "Failed to parse session.json",
     "context": "Failed to parse session.json",
-    "reference": "Common/SessionData.qml:265, Common/SessionData.qml:345",
+    "reference": "Common/SessionData.qml:266, Common/SessionData.qml:346",
     "comment": ""
   },
   {
@@ -6170,7 +6182,7 @@
   {
     "term": "Failed to reject pairing",
     "context": "Failed to reject pairing",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:170",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:693, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:693",
     "comment": "Phone Connect error"
   },
   {
@@ -6224,7 +6236,7 @@
   {
     "term": "Failed to ring device",
     "context": "Failed to ring device",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:96",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:624, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:624",
     "comment": "Phone Connect error"
   },
   {
@@ -6232,6 +6244,12 @@
     "context": "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.",
     "reference": "Modules/Settings/GreeterTab.qml:272",
     "comment": "greeter status error"
+  },
+  {
+    "term": "Failed to save VPN credentials",
+    "context": "Failed to save VPN credentials",
+    "reference": "Services/VPNService.qml:167",
+    "comment": ""
   },
   {
     "term": "Failed to save audio config",
@@ -6258,21 +6276,27 @@
     "comment": ""
   },
   {
+    "term": "Failed to send SMS",
+    "context": "Failed to send SMS",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1756, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:799, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:1756, dms-plugins/dms-plugins-official/DankKDEConnect/components/KDEConnectDetailContent.qml:799",
+    "comment": "Phone Connect error"
+  },
+  {
     "term": "Failed to send clipboard",
     "context": "Failed to send clipboard",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:114",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:610, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:55, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:610, dms-plugins/dms-plugins-official/DankKDEConnect/components/KDEConnectDetailContent.qml:55",
     "comment": "Phone Connect error"
   },
   {
     "term": "Failed to send file",
     "context": "Failed to send file",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:361, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:421",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1737, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:1737",
     "comment": "Phone Connect error"
   },
   {
     "term": "Failed to send ping",
     "context": "Failed to send ping",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:105",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:633, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:633",
     "comment": "Phone Connect error"
   },
   {
@@ -6320,13 +6344,13 @@
   {
     "term": "Failed to share",
     "context": "Failed to share",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:341, dms-plugins/DankKDEConnect/DankKDEConnect.qml:349, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:407",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1718, dms-plugins/DankKDEConnect/DankKDEConnect.qml:1726, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:1718, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:1726",
     "comment": "Phone Connect error"
   },
   {
     "term": "Failed to start connection to %1",
     "context": "Failed to start connection to %1",
-    "reference": "Services/DMSNetworkService.qml:518",
+    "reference": "Services/DMSNetworkService.qml:542",
     "comment": ""
   },
   {
@@ -6338,13 +6362,13 @@
   {
     "term": "Failed to update VPN",
     "context": "Failed to update VPN",
-    "reference": "Services/VPNService.qml:142",
+    "reference": "Services/VPNService.qml:143",
     "comment": ""
   },
   {
     "term": "Failed to update autoconnect",
     "context": "Failed to update autoconnect",
-    "reference": "Services/DMSNetworkService.qml:991",
+    "reference": "Services/DMSNetworkService.qml:1015",
     "comment": ""
   },
   {
@@ -6404,7 +6428,7 @@
   {
     "term": "Feels",
     "context": "Feels",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeather.qml:401",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeather.qml:401, dms-plugins/dms-plugins-official/DankDesktopWeather/DankDesktopWeather.qml:401",
     "comment": ""
   },
   {
@@ -6434,8 +6458,8 @@
   {
     "term": "File",
     "context": "File",
-    "reference": "Services/CupsService.qml:139, Modals/DankLauncherV2/ResultItem.qml:230, Modals/DankLauncherV2/SpotlightResultRow.qml:70",
-    "comment": ""
+    "reference": "Services/CupsService.qml:139, dms-plugins/DankKDEConnect/components/ShareDialog.qml:361, dms-plugins/dms-plugins-official/DankKDEConnect/components/ShareDialog.qml:361, Modals/DankLauncherV2/ResultItem.qml:230, Modals/DankLauncherV2/SpotlightResultRow.qml:70",
+    "comment": "KDE Connect send file button"
   },
   {
     "term": "File Already Exists",
@@ -6470,7 +6494,7 @@
   {
     "term": "File received from",
     "context": "File received from",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:79",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:597, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:597",
     "comment": "Phone Connect file share notification"
   },
   {
@@ -6506,7 +6530,7 @@
   {
     "term": "Filter",
     "context": "Filter",
-    "reference": "Modules/Settings/PluginBrowser.qml:713",
+    "reference": "Modules/Settings/PluginBrowser.qml:762",
     "comment": "plugin browser category filter label"
   },
   {
@@ -6884,13 +6908,13 @@
   {
     "term": "Forecast",
     "context": "Forecast",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:27",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:27, dms-plugins/dms-plugins-official/DankDesktopWeather/DankDesktopWeatherSettings.qml:27",
     "comment": ""
   },
   {
     "term": "Forecast Days",
     "context": "Forecast Days",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:127",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:127, dms-plugins/dms-plugins-official/DankDesktopWeather/DankDesktopWeatherSettings.qml:127",
     "comment": ""
   },
   {
@@ -6938,7 +6962,7 @@
   {
     "term": "Forgot network %1",
     "context": "Forgot network %1",
-    "reference": "Services/LegacyNetworkService.qml:398, Services/DMSNetworkService.qml:591",
+    "reference": "Services/LegacyNetworkService.qml:398, Services/DMSNetworkService.qml:615",
     "comment": ""
   },
   {
@@ -6946,6 +6970,12 @@
     "context": "Format Legend",
     "reference": "Modules/Settings/TimeWeatherTab.qml:341",
     "comment": ""
+  },
+  {
+    "term": "Forward 10s",
+    "context": "Forward 10s",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:2155, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:1610, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:2155, dms-plugins/dms-plugins-official/DankKDEConnect/components/KDEConnectDetailContent.qml:1610",
+    "comment": "Media forward tooltip"
   },
   {
     "term": "Frame",
@@ -7514,7 +7544,7 @@
   {
     "term": "Hide 3rd Party",
     "context": "Hide 3rd Party",
-    "reference": "Modules/Settings/PluginBrowser.qml:505",
+    "reference": "Modules/Settings/PluginBrowser.qml:551",
     "comment": ""
   },
   {
@@ -7570,6 +7600,12 @@
     "context": "Hide device",
     "reference": "Modules/Settings/Widgets/DeviceAliasRow.qml:142",
     "comment": ""
+  },
+  {
+    "term": "Hide installed",
+    "context": "Hide installed",
+    "reference": "Modules/Settings/PluginBrowser.qml:38",
+    "comment": "plugin browser filter chip"
   },
   {
     "term": "Hide notification content until expanded",
@@ -7724,7 +7760,7 @@
   {
     "term": "Hourly Forecast Count",
     "context": "Hourly Forecast Count",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:142",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:142, dms-plugins/dms-plugins-official/DankDesktopWeather/DankDesktopWeatherSettings.qml:142",
     "comment": ""
   },
   {
@@ -7736,7 +7772,7 @@
   {
     "term": "How often to change wallpaper",
     "context": "How often to change wallpaper",
-    "reference": "Modules/Settings/WallpaperTab.qml:1032",
+    "reference": "Modules/Settings/WallpaperTab.qml:1047",
     "comment": ""
   },
   {
@@ -7748,7 +7784,7 @@
   {
     "term": "Humidity",
     "context": "Humidity",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeather.qml:413, Modules/DankDash/WeatherTab.qml:88, Modules/DankDash/WeatherForecastCard.qml:80, Modules/Settings/TimeWeatherTab.qml:962",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeather.qml:413, dms-plugins/dms-plugins-official/DankDesktopWeather/DankDesktopWeather.qml:413, Modules/DankDash/WeatherTab.qml:88, Modules/DankDash/WeatherForecastCard.qml:80, Modules/Settings/TimeWeatherTab.qml:962",
     "comment": ""
   },
   {
@@ -7796,7 +7832,7 @@
   {
     "term": "I Understand",
     "context": "I Understand",
-    "reference": "Modules/Settings/PluginBrowser.qml:1242",
+    "reference": "Modules/Settings/PluginBrowser.qml:1348",
     "comment": ""
   },
   {
@@ -7976,7 +8012,7 @@
   {
     "term": "Include Transitions",
     "context": "Include Transitions",
-    "reference": "Modules/Settings/WallpaperTab.qml:1223",
+    "reference": "Modules/Settings/WallpaperTab.qml:1238",
     "comment": ""
   },
   {
@@ -8102,7 +8138,7 @@
   {
     "term": "Install",
     "context": "Install",
-    "reference": "Modules/Settings/PluginBrowser.qml:353, Modules/Settings/PluginBrowser.qml:998, Modules/Settings/GreeterTab.qml:118, Modules/Settings/GreeterTab.qml:164, Modules/Settings/ThemeBrowser.qml:121, Modules/Settings/ThemeBrowser.qml:627",
+    "reference": "Modules/Settings/PluginBrowser.qml:399, Modules/Settings/PluginBrowser.qml:1104, Modules/Settings/GreeterTab.qml:118, Modules/Settings/GreeterTab.qml:164, Modules/Settings/ThemeBrowser.qml:121, Modules/Settings/ThemeBrowser.qml:627",
     "comment": "install action button"
   },
   {
@@ -8114,7 +8150,7 @@
   {
     "term": "Install Plugin",
     "context": "Install Plugin",
-    "reference": "Modules/Settings/PluginBrowser.qml:351",
+    "reference": "Modules/Settings/PluginBrowser.qml:397",
     "comment": "plugin installation dialog title"
   },
   {
@@ -8144,7 +8180,7 @@
   {
     "term": "Install failed: %1",
     "context": "Install failed: %1",
-    "reference": "Modules/Settings/PluginBrowser.qml:317, Modules/Settings/ThemeBrowser.qml:69",
+    "reference": "Modules/Settings/PluginBrowser.qml:363, Modules/Settings/ThemeBrowser.qml:69",
     "comment": "installation error"
   },
   {
@@ -8156,13 +8192,13 @@
   {
     "term": "Install plugin '%1' from the DMS registry?",
     "context": "Install plugin '%1' from the DMS registry?",
-    "reference": "Modules/Settings/PluginBrowser.qml:352",
+    "reference": "Modules/Settings/PluginBrowser.qml:398",
     "comment": "plugin installation confirmation"
   },
   {
     "term": "Install plugins from the DMS plugin registry",
     "context": "Install plugins from the DMS plugin registry",
-    "reference": "Modules/Settings/PluginBrowser.qml:553",
+    "reference": "Modules/Settings/PluginBrowser.qml:599",
     "comment": "plugin browser description"
   },
   {
@@ -8186,19 +8222,25 @@
   {
     "term": "Installed",
     "context": "Installed",
-    "reference": "Modules/Settings/PluginBrowser.qml:38, Modules/Settings/PluginBrowser.qml:994, Modules/Settings/ThemeBrowser.qml:630",
-    "comment": "installed status | plugin browser filter chip"
+    "reference": "Modules/Settings/PluginBrowser.qml:1100, Modules/Settings/ThemeBrowser.qml:630",
+    "comment": "installed status"
+  },
+  {
+    "term": "Installed first",
+    "context": "Installed first",
+    "reference": "Modules/Settings/PluginBrowser.qml:43",
+    "comment": "plugin browser filter chip"
   },
   {
     "term": "Installed: %1",
     "context": "Installed: %1",
-    "reference": "Modules/Settings/PluginBrowser.qml:320, Modules/Settings/ThemeBrowser.qml:72",
+    "reference": "Modules/Settings/PluginBrowser.qml:366, Modules/Settings/ThemeBrowser.qml:72",
     "comment": "installation success"
   },
   {
     "term": "Installing: %1",
     "context": "Installing: %1",
-    "reference": "Modules/Settings/PluginBrowser.qml:314, Modules/Settings/ThemeBrowser.qml:66",
+    "reference": "Modules/Settings/PluginBrowser.qml:360, Modules/Settings/ThemeBrowser.qml:66",
     "comment": "installation progress"
   },
   {
@@ -8240,7 +8282,7 @@
   {
     "term": "Interval",
     "context": "Interval",
-    "reference": "Modules/Settings/WallpaperTab.qml:978, Modules/Settings/WallpaperTab.qml:1031",
+    "reference": "Modules/Settings/WallpaperTab.qml:993, Modules/Settings/WallpaperTab.qml:1046",
     "comment": "wallpaper cycling mode tab"
   },
   {
@@ -8282,7 +8324,7 @@
   {
     "term": "Iris Bloom",
     "context": "Iris Bloom",
-    "reference": "Modules/Settings/WallpaperTab.qml:1193",
+    "reference": "Modules/Settings/WallpaperTab.qml:1208",
     "comment": "wallpaper transition option"
   },
   {
@@ -8360,7 +8402,7 @@
   {
     "term": "Keybind Sources",
     "context": "Keybind Sources",
-    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeysSettings.qml:144",
+    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeysSettings.qml:144, dms-plugins/dms-plugins-official/DankLauncherKeys/DankLauncherKeysSettings.qml:144",
     "comment": ""
   },
   {
@@ -8372,13 +8414,13 @@
   {
     "term": "Keybinds Search Settings",
     "context": "Keybinds Search Settings",
-    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeysSettings.qml:70",
+    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeysSettings.qml:70, dms-plugins/dms-plugins-official/DankLauncherKeys/DankLauncherKeysSettings.qml:70",
     "comment": ""
   },
   {
     "term": "Keybinds shown alongside regular search results",
     "context": "Keybinds shown alongside regular search results",
-    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeysSettings.qml:107",
+    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeysSettings.qml:107, dms-plugins/dms-plugins-official/DankLauncherKeys/DankLauncherKeysSettings.qml:107",
     "comment": ""
   },
   {
@@ -8612,7 +8654,7 @@
   {
     "term": "Light Mode",
     "context": "Light Mode",
-    "reference": "Modules/Settings/ThemeColorsTab.qml:1469, Modules/Settings/ThemeColorsTab.qml:1539, Modules/Settings/WallpaperTab.qml:414",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:1469, Modules/Settings/ThemeColorsTab.qml:1539, Modules/Settings/WallpaperTab.qml:429",
     "comment": ""
   },
   {
@@ -8654,13 +8696,13 @@
   {
     "term": "Limit set to %1%",
     "context": "Limit set to %1%",
-    "reference": "Modules/Settings/BatteryTab.qml:30",
+    "reference": "Modules/Settings/BatteryTab.qml:29",
     "comment": ""
   },
   {
     "term": "Limit the maximum battery charge level to extend lifespan.",
     "context": "Limit the maximum battery charge level to extend lifespan.",
-    "reference": "Modules/Settings/BatteryTab.qml:184",
+    "reference": "Modules/Settings/BatteryTab.qml:183",
     "comment": ""
   },
   {
@@ -8720,7 +8762,7 @@
   {
     "term": "Loading trending...",
     "context": "Loading trending...",
-    "reference": "dms-plugins/DankStickerSearch/DankStickerSearch.qml:153, dms-plugins/DankGifSearch/DankGifSearch.qml:96",
+    "reference": "dms-plugins/DankStickerSearch/DankStickerSearch.qml:153, dms-plugins/DankGifSearch/DankGifSearch.qml:96, dms-plugins/dms-plugins-official/DankStickerSearch/DankStickerSearch.qml:153, dms-plugins/dms-plugins-official/DankGifSearch/DankGifSearch.qml:96",
     "comment": ""
   },
   {
@@ -8894,13 +8936,13 @@
   {
     "term": "Low Battery Notifications",
     "context": "Low Battery Notifications",
-    "reference": "Modules/Settings/BatteryTab.qml:237",
+    "reference": "Modules/Settings/BatteryTab.qml:236",
     "comment": ""
   },
   {
     "term": "Low Battery Threshold",
     "context": "Low Battery Threshold",
-    "reference": "Modules/Settings/BatteryTab.qml:226",
+    "reference": "Modules/Settings/BatteryTab.qml:225",
     "comment": ""
   },
   {
@@ -8918,7 +8960,7 @@
   {
     "term": "MTU",
     "context": "MTU",
-    "reference": "Widgets/VpnProfileDelegate.qml:72, Modules/Settings/NetworkVpnTab.qml:445",
+    "reference": "Widgets/VpnProfileDelegate.qml:74, Modules/Settings/NetworkVpnTab.qml:445",
     "comment": ""
   },
   {
@@ -8936,7 +8978,7 @@
   {
     "term": "Make sure KDE Connect or Valent is running on your other devices",
     "context": "Make sure KDE Connect or Valent is running on your other devices",
-    "reference": "dms-plugins/DankKDEConnect/components/EmptyState.qml:18",
+    "reference": "dms-plugins/DankKDEConnect/components/EmptyState.qml:18, dms-plugins/dms-plugins-official/DankKDEConnect/components/EmptyState.qml:18",
     "comment": "Phone Connect hint message"
   },
   {
@@ -9158,7 +9200,7 @@
   {
     "term": "Matugen Target Monitor",
     "context": "Matugen Target Monitor",
-    "reference": "Modules/Settings/WallpaperTab.qml:876",
+    "reference": "Modules/Settings/WallpaperTab.qml:891",
     "comment": ""
   },
   {
@@ -9356,7 +9398,7 @@
   {
     "term": "Media Player",
     "context": "Media Player",
-    "reference": "Modals/Settings/SettingsSidebar.qml:160",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1863, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:1318, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:1863, dms-plugins/dms-plugins-official/DankKDEConnect/components/KDEConnectDetailContent.qml:1318, Modals/Settings/SettingsSidebar.qml:160",
     "comment": ""
   },
   {
@@ -9422,7 +9464,7 @@
   {
     "term": "Message",
     "context": "Message",
-    "reference": "dms-plugins/DankKDEConnect/components/SmsDialog.qml:73",
+    "reference": "dms-plugins/DankKDEConnect/components/SmsDialog.qml:222, dms-plugins/dms-plugins-official/DankKDEConnect/components/SmsDialog.qml:222",
     "comment": "KDE Connect SMS message input placeholder"
   },
   {
@@ -9530,7 +9572,7 @@
   {
     "term": "Mode:",
     "context": "Mode:",
-    "reference": "Modules/Settings/WallpaperTab.qml:962",
+    "reference": "Modules/Settings/WallpaperTab.qml:977",
     "comment": ""
   },
   {
@@ -9572,7 +9614,7 @@
   {
     "term": "Monitor whose wallpaper drives dynamic theming colors",
     "context": "Monitor whose wallpaper drives dynamic theming colors",
-    "reference": "Modules/Settings/WallpaperTab.qml:877",
+    "reference": "Modules/Settings/WallpaperTab.qml:892",
     "comment": ""
   },
   {
@@ -9758,7 +9800,7 @@
   {
     "term": "Name",
     "context": "Name",
-    "reference": "Modals/DankLauncherV2/LauncherContent.qml:693, Modals/DankLauncherV2/LauncherContent.qml:702, Modals/DankLauncherV2/LauncherContent.qml:707, Modals/DankLauncherV2/LauncherContent.qml:883, Modules/ProcessList/ProcessesView.qml:249, Modules/Settings/PluginBrowser.qml:48, Modules/Settings/DisplayWidgetsTab.qml:225, Modules/Settings/AutoStartTab.qml:507, Modules/Settings/DesktopWidgetInstanceCard.qml:203, Modules/Settings/PrinterTab.qml:754, Modules/Settings/DisplayConfigTab.qml:517, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2008, Modules/Settings/Widgets/SystemMonitorVariantCard.qml:144",
+    "reference": "Modals/DankLauncherV2/LauncherContent.qml:693, Modals/DankLauncherV2/LauncherContent.qml:702, Modals/DankLauncherV2/LauncherContent.qml:707, Modals/DankLauncherV2/LauncherContent.qml:883, Modules/ProcessList/ProcessesView.qml:249, Modules/Settings/PluginBrowser.qml:53, Modules/Settings/DisplayWidgetsTab.qml:225, Modules/Settings/AutoStartTab.qml:507, Modules/Settings/DesktopWidgetInstanceCard.qml:203, Modules/Settings/PrinterTab.qml:754, Modules/Settings/DisplayConfigTab.qml:517, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2008, Modules/Settings/Widgets/SystemMonitorVariantCard.qml:144",
     "comment": "plugin browser sort option"
   },
   {
@@ -9838,6 +9880,12 @@
     "context": "Network Status",
     "reference": "Modules/Settings/NetworkStatusTab.qml:40",
     "comment": ""
+  },
+  {
+    "term": "Network Type",
+    "context": "Network Type",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1693, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:755, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:1693, dms-plugins/dms-plugins-official/DankKDEConnect/components/KDEConnectDetailContent.qml:755",
+    "comment": "KDE Connect network type label"
   },
   {
     "term": "Network download and upload speed display",
@@ -9926,8 +9974,8 @@
   {
     "term": "Next",
     "context": "Next",
-    "reference": "Modals/Greeter/GreeterModal.qml:296",
-    "comment": "greeter next button"
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:2167, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:1622, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:2167, dms-plugins/dms-plugins-official/DankKDEConnect/components/KDEConnectDetailContent.qml:1622, Modals/Greeter/GreeterModal.qml:296",
+    "comment": "Media next tooltip | greeter next button"
   },
   {
     "term": "Next Transition",
@@ -10100,7 +10148,7 @@
   {
     "term": "No Weather Data",
     "context": "No Weather Data",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeather.qml:166",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeather.qml:166, dms-plugins/dms-plugins-official/DankDesktopWeather/DankDesktopWeather.qml:166",
     "comment": ""
   },
   {
@@ -10214,19 +10262,13 @@
   {
     "term": "No devices",
     "context": "No devices",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:33, Modules/ControlCenter/Components/DragDropGrid.qml:534",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:462, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:462, Modules/ControlCenter/Components/DragDropGrid.qml:534",
     "comment": "Phone Connect no devices status | bluetooth status"
-  },
-  {
-    "term": "No devices connected",
-    "context": "No devices connected",
-    "reference": "dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:35",
-    "comment": "KDE Connect status"
   },
   {
     "term": "No devices found",
     "context": "No devices found",
-    "reference": "dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:124, dms-plugins/DankKDEConnect/components/EmptyState.qml:11, Modules/Settings/PrinterTab.qml:436",
+    "reference": "dms-plugins/DankKDEConnect/components/EmptyState.qml:11, dms-plugins/dms-plugins-official/DankKDEConnect/components/EmptyState.qml:11, Modules/Settings/PrinterTab.qml:436",
     "comment": "KDE Connect no devices message"
   },
   {
@@ -10294,6 +10336,12 @@
     "context": "No human user accounts found.",
     "reference": "Modules/Settings/UsersTab.qml:340",
     "comment": ""
+  },
+  {
+    "term": "No images found",
+    "context": "No images found",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:2296, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:2296",
+    "comment": "No recent images found message"
   },
   {
     "term": "No info items",
@@ -10364,7 +10412,7 @@
   {
     "term": "No monitors",
     "context": "No monitors",
-    "reference": "Modules/Settings/WallpaperTab.qml:850, Modules/Settings/WallpaperTab.qml:881",
+    "reference": "Modules/Settings/WallpaperTab.qml:865, Modules/Settings/WallpaperTab.qml:896",
     "comment": "no monitors available label"
   },
   {
@@ -10406,7 +10454,7 @@
   {
     "term": "No plugins found",
     "context": "No plugins found",
-    "reference": "Modules/Settings/PluginBrowser.qml:1111",
+    "reference": "Modules/Settings/PluginBrowser.qml:1217",
     "comment": "empty plugin list"
   },
   {
@@ -10460,7 +10508,7 @@
   {
     "term": "No results found",
     "context": "No results found",
-    "reference": "dms-plugins/DankStickerSearch/DankStickerSearch.qml:153, dms-plugins/DankGifSearch/DankGifSearch.qml:96, Modals/DankLauncherV2/ResultsList.qml:496, Modals/DankLauncherV2/ResultsList.qml:503",
+    "reference": "dms-plugins/DankStickerSearch/DankStickerSearch.qml:153, dms-plugins/DankGifSearch/DankGifSearch.qml:96, dms-plugins/dms-plugins-official/DankStickerSearch/DankStickerSearch.qml:153, dms-plugins/dms-plugins-official/DankGifSearch/DankGifSearch.qml:96, Modals/DankLauncherV2/ResultsList.qml:496, Modals/DankLauncherV2/ResultsList.qml:503",
     "comment": ""
   },
   {
@@ -10592,7 +10640,7 @@
   {
     "term": "None",
     "context": "None",
-    "reference": "Modals/WindowRuleModal.qml:1154, Services/CupsService.qml:786, Modules/Settings/TypographyMotionTab.qml:495, Modules/Settings/TypographyMotionTab.qml:592, Modules/Settings/TypographyMotionTab.qml:676, Modules/Settings/WallpaperTab.qml:1183, Modules/Settings/DesktopWidgetInstanceCard.qml:258, Modules/Settings/DesktopWidgetInstanceCard.qml:274, Modules/Settings/DankBarTab.qml:1287, Modules/Settings/DankBarTab.qml:1815, Modules/Settings/DankBarTab.qml:1815, Modules/Settings/DankBarTab.qml:1856, Modules/Settings/WorkspaceAppearanceCard.qml:47, Modules/Settings/WorkspaceAppearanceCard.qml:55, Modules/Settings/NotificationsTab.qml:385, Modules/Settings/WindowRulesTab.qml:1063, Modules/Settings/DisplayConfig/HyprlandOutputSettings.qml:94, Modules/Settings/DisplayConfig/HyprlandOutputSettings.qml:107, Modules/Settings/DisplayConfig/HyprlandOutputSettings.qml:111, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:181",
+    "reference": "Modals/WindowRuleModal.qml:1154, Services/CupsService.qml:786, Modules/Settings/TypographyMotionTab.qml:495, Modules/Settings/TypographyMotionTab.qml:592, Modules/Settings/TypographyMotionTab.qml:676, Modules/Settings/WallpaperTab.qml:1198, Modules/Settings/DesktopWidgetInstanceCard.qml:258, Modules/Settings/DesktopWidgetInstanceCard.qml:274, Modules/Settings/DankBarTab.qml:1287, Modules/Settings/DankBarTab.qml:1815, Modules/Settings/DankBarTab.qml:1815, Modules/Settings/DankBarTab.qml:1856, Modules/Settings/WorkspaceAppearanceCard.qml:47, Modules/Settings/WorkspaceAppearanceCard.qml:55, Modules/Settings/NotificationsTab.qml:385, Modules/Settings/WindowRulesTab.qml:1063, Modules/Settings/DisplayConfig/HyprlandOutputSettings.qml:94, Modules/Settings/DisplayConfig/HyprlandOutputSettings.qml:107, Modules/Settings/DisplayConfig/HyprlandOutputSettings.qml:111, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:181",
     "comment": "Tailscale exit node: none selected | wallpaper transition option | workspace color option"
   },
   {
@@ -10676,19 +10724,19 @@
   {
     "term": "Not paired",
     "context": "Not paired",
-    "reference": "dms-plugins/DankKDEConnect/components/DeviceCard.qml:214, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:207",
+    "reference": "dms-plugins/DankKDEConnect/components/DeviceCard.qml:304, dms-plugins/dms-plugins-official/DankKDEConnect/components/DeviceCard.qml:304",
     "comment": "KDE Connect not paired status"
   },
   {
     "term": "Not set",
     "context": "Not set",
-    "reference": "Modules/Settings/WallpaperTab.qml:589, Modules/Settings/WallpaperTab.qml:779",
+    "reference": "Modules/Settings/WallpaperTab.qml:604, Modules/Settings/WallpaperTab.qml:794",
     "comment": "wallpaper not set label"
   },
   {
     "term": "Notepad",
     "context": "Notepad",
-    "reference": "DMSShell.qml:1139, Services/AppSearchService.qml:182, Modules/Notepad/NotepadPopoutWindow.qml:25, Modules/Notepad/NotepadPopoutWindow.qml:80, Modules/Settings/WidgetsTab.qml:234",
+    "reference": "DMSShell.qml:1135, Services/AppSearchService.qml:182, Modules/Notepad/NotepadPopoutWindow.qml:25, Modules/Notepad/NotepadPopoutWindow.qml:80, Modules/Settings/WidgetsTab.qml:234",
     "comment": "Notepad"
   },
   {
@@ -10724,7 +10772,7 @@
   {
     "term": "Notification",
     "context": "Notification",
-    "reference": "Modules/Settings/BatteryTab.qml:247",
+    "reference": "Modules/Settings/BatteryTab.qml:246",
     "comment": ""
   },
   {
@@ -10772,7 +10820,7 @@
   {
     "term": "Notification Type",
     "context": "Notification Type",
-    "reference": "Modules/Settings/BatteryTab.qml:245",
+    "reference": "Modules/Settings/BatteryTab.qml:244",
     "comment": ""
   },
   {
@@ -10784,13 +10832,13 @@
   {
     "term": "Notifications",
     "context": "Notifications",
-    "reference": "Modals/Greeter/GreeterCompletePage.qml:397, Modals/Settings/SettingsSidebar.qml:166, Modules/Notifications/Center/NotificationHeader.qml:55",
-    "comment": "greeter settings link"
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1699, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:761, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:1699, dms-plugins/dms-plugins-official/DankKDEConnect/components/KDEConnectDetailContent.qml:761, Modals/Greeter/GreeterCompletePage.qml:397, Modals/Settings/SettingsSidebar.qml:166, Modules/Notifications/Center/NotificationHeader.qml:55",
+    "comment": "KDE Connect notifications label | greeter settings link"
   },
   {
     "term": "Notify when limit is reached",
     "context": "Notify when limit is reached",
-    "reference": "Modules/Settings/BatteryTab.qml:211",
+    "reference": "Modules/Settings/BatteryTab.qml:210",
     "comment": ""
   },
   {
@@ -10850,7 +10898,7 @@
   {
     "term": "Offline",
     "context": "Offline",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:40, dms-plugins/DankKDEConnect/components/DeviceCard.qml:216, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:209",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:469, dms-plugins/DankKDEConnect/components/DeviceCard.qml:306, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:469, dms-plugins/dms-plugins-official/DankKDEConnect/components/DeviceCard.qml:306",
     "comment": "KDE Connect offline status | Phone Connect offline status"
   },
   {
@@ -10952,7 +11000,7 @@
   {
     "term": "Open App",
     "context": "Open App",
-    "reference": "dms-plugins/DankKDEConnect/components/SmsDialog.qml:91",
+    "reference": "dms-plugins/DankKDEConnect/components/SmsDialog.qml:368, dms-plugins/dms-plugins-official/DankKDEConnect/components/SmsDialog.qml:368",
     "comment": "KDE Connect open SMS app button"
   },
   {
@@ -10972,12 +11020,6 @@
     "context": "Open From",
     "reference": "Modules/Notepad/NotepadSettings.qml:427",
     "comment": ""
-  },
-  {
-    "term": "Open KDE Connect on your phone",
-    "context": "Open KDE Connect on your phone",
-    "reference": "dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:131",
-    "comment": "KDE Connect open app hint"
   },
   {
     "term": "Open Notepad File",
@@ -11024,7 +11066,7 @@
   {
     "term": "Open in Browser",
     "context": "Open in Browser",
-    "reference": "dms-plugins/DankStickerSearch/DankStickerSearch.qml:301, dms-plugins/DankGifSearch/DankGifSearch.qml:248",
+    "reference": "dms-plugins/DankStickerSearch/DankStickerSearch.qml:301, dms-plugins/DankGifSearch/DankGifSearch.qml:248, dms-plugins/dms-plugins-official/DankStickerSearch/DankStickerSearch.qml:301, dms-plugins/dms-plugins-official/DankGifSearch/DankGifSearch.qml:248",
     "comment": ""
   },
   {
@@ -11042,32 +11084,20 @@
   {
     "term": "Open with...",
     "context": "Open with...",
-    "reference": "DMSShell.qml:935, Modals/BrowserPickerModal.qml:13",
+    "reference": "DMSShell.qml:931, Modals/BrowserPickerModal.qml:13",
     "comment": ""
-  },
-  {
-    "term": "Opening SMS",
-    "context": "Opening SMS",
-    "reference": "dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:344",
-    "comment": "KDE Connect SMS action"
   },
   {
     "term": "Opening SMS app",
     "context": "Opening SMS app",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:136",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1769, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:812, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:1769, dms-plugins/dms-plugins-official/DankKDEConnect/components/KDEConnectDetailContent.qml:812",
     "comment": "Phone Connect SMS action"
   },
   {
     "term": "Opening file browser",
     "context": "Opening file browser",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:146",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:669, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:669",
     "comment": "Phone Connect browse action"
-  },
-  {
-    "term": "Opening files",
-    "context": "Opening files",
-    "reference": "dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:328",
-    "comment": "KDE Connect browse action"
   },
   {
     "term": "Opening terminal to update greetd",
@@ -11354,8 +11384,8 @@
   {
     "term": "Pair",
     "context": "Pair",
-    "reference": "Modals/BluetoothPairingModal.qml:319, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:391, Modules/ControlCenter/Details/BluetoothDetail.qml:559",
-    "comment": "KDE Connect pair button"
+    "reference": "Modals/BluetoothPairingModal.qml:319, Modules/ControlCenter/Details/BluetoothDetail.qml:559",
+    "comment": ""
   },
   {
     "term": "Pair Bluetooth Device",
@@ -11372,31 +11402,31 @@
   {
     "term": "Pairing",
     "context": "Pairing",
-    "reference": "dms-plugins/DankKDEConnect/components/DeviceCard.qml:212, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:205",
+    "reference": "dms-plugins/DankKDEConnect/components/DeviceCard.qml:302, dms-plugins/dms-plugins-official/DankKDEConnect/components/DeviceCard.qml:302",
     "comment": "KDE Connect pairing in progress status"
   },
   {
     "term": "Pairing failed",
     "context": "Pairing failed",
-    "reference": "Modals/BluetoothPairingModal.qml:395, dms-plugins/DankKDEConnect/DankKDEConnect.qml:152, Modules/ControlCenter/Details/BluetoothDetail.qml:50",
+    "reference": "Modals/BluetoothPairingModal.qml:395, dms-plugins/DankKDEConnect/DankKDEConnect.qml:675, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:675, Modules/ControlCenter/Details/BluetoothDetail.qml:50",
     "comment": "Phone Connect error"
   },
   {
     "term": "Pairing request from",
     "context": "Pairing request from",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:71",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:589, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:589",
     "comment": "Phone Connect pairing request notification"
   },
   {
     "term": "Pairing request sent",
     "context": "Pairing request sent",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:155",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:678, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:678",
     "comment": "Phone Connect pairing action"
   },
   {
     "term": "Pairing requested",
     "context": "Pairing requested",
-    "reference": "dms-plugins/DankKDEConnect/components/DeviceCard.qml:210, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:203",
+    "reference": "dms-plugins/DankKDEConnect/components/DeviceCard.qml:300, dms-plugins/dms-plugins-official/DankKDEConnect/components/DeviceCard.qml:300",
     "comment": "KDE Connect pairing requested status"
   },
   {
@@ -11420,7 +11450,7 @@
   {
     "term": "Password",
     "context": "Password",
-    "reference": "Modals/WifiPasswordModal.qml:185, Modals/WifiPasswordModal.qml:195, Modals/WifiPasswordModal.qml:539, Modules/Settings/UsersTab.qml:402",
+    "reference": "Modals/WifiPasswordModal.qml:185, Modals/WifiPasswordModal.qml:195, Modals/WifiPasswordModal.qml:539, Widgets/VpnProfileDelegate.qml:307, Modules/Settings/UsersTab.qml:402",
     "comment": ""
   },
   {
@@ -11462,7 +11492,7 @@
   {
     "term": "Paste",
     "context": "Paste",
-    "reference": "dms-plugins/DankStickerSearch/DankStickerSearch.qml:248, dms-plugins/DankGifSearch/DankGifSearch.qml:195, Modals/DankLauncherV2/Controller.qml:1221, Modals/Clipboard/ClipboardContextMenu.qml:68, Modules/Settings/ClipboardTab.qml:156",
+    "reference": "dms-plugins/DankStickerSearch/DankStickerSearch.qml:248, dms-plugins/DankGifSearch/DankGifSearch.qml:195, dms-plugins/dms-plugins-official/DankStickerSearch/DankStickerSearch.qml:248, dms-plugins/dms-plugins-official/DankGifSearch/DankGifSearch.qml:195, Modals/DankLauncherV2/Controller.qml:1221, Modals/Clipboard/ClipboardContextMenu.qml:68, Modules/Settings/ClipboardTab.qml:156",
     "comment": ""
   },
   {
@@ -11486,8 +11516,8 @@
   {
     "term": "Pause",
     "context": "Pause",
-    "reference": "Modules/Settings/PrinterTab.qml:1232, Modules/ControlCenter/BuiltinPlugins/CupsWidget.qml:138",
-    "comment": ""
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1955, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:1410, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:1955, dms-plugins/dms-plugins-official/DankKDEConnect/components/KDEConnectDetailContent.qml:1410, Modules/Settings/PrinterTab.qml:1232, Modules/ControlCenter/BuiltinPlugins/CupsWidget.qml:138",
+    "comment": "Media pause tooltip"
   },
   {
     "term": "Paused",
@@ -11516,13 +11546,13 @@
   {
     "term": "Per-Mode Wallpapers",
     "context": "Per-Mode Wallpapers",
-    "reference": "Modules/Settings/WallpaperTab.qml:392",
+    "reference": "Modules/Settings/WallpaperTab.qml:407",
     "comment": ""
   },
   {
     "term": "Per-Monitor Wallpapers",
     "context": "Per-Monitor Wallpapers",
-    "reference": "Modules/Settings/WallpaperTab.qml:823",
+    "reference": "Modules/Settings/WallpaperTab.qml:838",
     "comment": ""
   },
   {
@@ -11564,19 +11594,13 @@
   {
     "term": "Phone Connect Not Available",
     "context": "Phone Connect Not Available",
-    "reference": "dms-plugins/DankKDEConnect/components/UnavailableMessage.qml:30",
+    "reference": "dms-plugins/DankKDEConnect/components/UnavailableMessage.qml:30, dms-plugins/dms-plugins-official/DankKDEConnect/components/UnavailableMessage.qml:30",
     "comment": "Phone Connect unavailable error title"
-  },
-  {
-    "term": "Phone Connect unavailable",
-    "context": "Phone Connect unavailable",
-    "reference": "dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:97",
-    "comment": "Phone Connect service unavailable message"
   },
   {
     "term": "Phone number",
     "context": "Phone number",
-    "reference": "dms-plugins/DankKDEConnect/components/SmsDialog.qml:67",
+    "reference": "dms-plugins/DankKDEConnect/components/SmsDialog.qml:209, dms-plugins/dms-plugins-official/DankKDEConnect/components/SmsDialog.qml:209",
     "comment": "KDE Connect SMS phone input placeholder"
   },
   {
@@ -11612,7 +11636,7 @@
   {
     "term": "Pin",
     "context": "Pin",
-    "reference": "Modals/WindowRuleModal.qml:1567, dms-plugins/DankLauncherKeys/DankLauncherKeys.qml:165, Modals/Clipboard/ClipboardContextMenu.qml:30, Modules/Settings/WindowRulesTab.qml:123, Modules/Settings/ClipboardTab.qml:156, Modules/ControlCenter/Details/BluetoothDetail.qml:357, Modules/ControlCenter/Details/BrightnessDetail.qml:239, Modules/ControlCenter/Details/AudioInputDetail.qml:297, Modules/ControlCenter/Details/AudioOutputDetail.qml:306, Modules/ControlCenter/Details/NetworkDetail.qml:696",
+    "reference": "Modals/WindowRuleModal.qml:1567, dms-plugins/DankLauncherKeys/DankLauncherKeys.qml:165, dms-plugins/dms-plugins-official/DankLauncherKeys/DankLauncherKeys.qml:165, Modals/Clipboard/ClipboardContextMenu.qml:30, Modules/Settings/WindowRulesTab.qml:123, Modules/Settings/ClipboardTab.qml:156, Modules/ControlCenter/Details/BluetoothDetail.qml:357, Modules/ControlCenter/Details/BrightnessDetail.qml:239, Modules/ControlCenter/Details/AudioInputDetail.qml:297, Modules/ControlCenter/Details/AudioOutputDetail.qml:306, Modules/ControlCenter/Details/NetworkDetail.qml:696",
     "comment": ""
   },
   {
@@ -11624,19 +11648,13 @@
   {
     "term": "Ping",
     "context": "Ping",
-    "reference": "dms-plugins/DankKDEConnect/components/DeviceCard.qml:124, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:281",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1580, dms-plugins/DankKDEConnect/components/DeviceCard.qml:170, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:635, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:1580, dms-plugins/dms-plugins-official/DankKDEConnect/components/DeviceCard.qml:170, dms-plugins/dms-plugins-official/DankKDEConnect/components/KDEConnectDetailContent.qml:635",
     "comment": "KDE Connect ping tooltip"
-  },
-  {
-    "term": "Ping sent",
-    "context": "Ping sent",
-    "reference": "dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:286",
-    "comment": "KDE Connect ping action"
   },
   {
     "term": "Ping sent to",
     "context": "Ping sent to",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:108",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:636, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:636",
     "comment": "Phone Connect ping action"
   },
   {
@@ -11654,7 +11672,7 @@
   {
     "term": "Pixelate",
     "context": "Pixelate",
-    "reference": "Modules/Settings/WallpaperTab.qml:1195",
+    "reference": "Modules/Settings/WallpaperTab.qml:1210",
     "comment": "wallpaper transition option"
   },
   {
@@ -11686,6 +11704,12 @@
     "context": "Place the dock on the Wayland overlay layer",
     "reference": "Modules/Settings/DockTab.qml:96",
     "comment": ""
+  },
+  {
+    "term": "Play",
+    "context": "Play",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1955, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:1410, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:1955, dms-plugins/dms-plugins-official/DankKDEConnect/components/KDEConnectDetailContent.qml:1410",
+    "comment": "Media play tooltip"
   },
   {
     "term": "Play a video when the screen locks.",
@@ -11900,7 +11924,7 @@
   {
     "term": "Portal",
     "context": "Portal",
-    "reference": "Modules/Settings/WallpaperTab.qml:1197",
+    "reference": "Modules/Settings/WallpaperTab.qml:1212",
     "comment": "wallpaper transition option"
   },
   {
@@ -11984,7 +12008,7 @@
   {
     "term": "Power Profiles Auto-Switching",
     "context": "Power Profiles Auto-Switching",
-    "reference": "Modules/Settings/BatteryTab.qml:303",
+    "reference": "Modules/Settings/BatteryTab.qml:302",
     "comment": ""
   },
   {
@@ -12008,19 +12032,19 @@
   {
     "term": "Power profile to use when AC power is connected.",
     "context": "Power profile to use when AC power is connected.",
-    "reference": "Modules/Settings/BatteryTab.qml:309",
+    "reference": "Modules/Settings/BatteryTab.qml:308",
     "comment": ""
   },
   {
     "term": "Power profile to use when running on battery power.",
     "context": "Power profile to use when running on battery power.",
-    "reference": "Modules/Settings/BatteryTab.qml:327",
+    "reference": "Modules/Settings/BatteryTab.qml:326",
     "comment": ""
   },
   {
     "term": "Power source",
     "context": "Power source",
-    "reference": "Modules/Settings/PowerSleepTab.qml:42, Modules/Settings/BatteryTab.qml:62",
+    "reference": "Modules/Settings/PowerSleepTab.qml:42, Modules/Settings/BatteryTab.qml:61",
     "comment": ""
   },
   {
@@ -12038,7 +12062,7 @@
   {
     "term": "Precip",
     "context": "Precip",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeather.qml:441",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeather.qml:441, dms-plugins/dms-plugins-official/DankDesktopWeather/DankDesktopWeather.qml:441",
     "comment": ""
   },
   {
@@ -12092,7 +12116,7 @@
   {
     "term": "Pressure",
     "context": "Pressure",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeather.qml:453, Modules/DankDash/WeatherTab.qml:98, Modules/DankDash/WeatherForecastCard.qml:90, Modules/Settings/TimeWeatherTab.qml:1063",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeather.qml:453, dms-plugins/dms-plugins-official/DankDesktopWeather/DankDesktopWeather.qml:453, Modules/DankDash/WeatherTab.qml:98, Modules/DankDash/WeatherForecastCard.qml:90, Modules/Settings/TimeWeatherTab.qml:1063",
     "comment": ""
   },
   {
@@ -12114,9 +12138,15 @@
     "comment": ""
   },
   {
+    "term": "Previous",
+    "context": "Previous",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1978, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:1433, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:1978, dms-plugins/dms-plugins-official/DankKDEConnect/components/KDEConnectDetailContent.qml:1433",
+    "comment": "Media previous tooltip"
+  },
+  {
     "term": "Primary",
     "context": "Primary",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:39, Modules/Settings/ThemeColorsTab.qml:1615, Modules/Settings/ThemeColorsTab.qml:1617, Modules/Settings/ThemeColorsTab.qml:1631, Modules/Settings/ThemeColorsTab.qml:1653, Modules/Settings/ThemeColorsTab.qml:1655, Modules/Settings/ThemeColorsTab.qml:1669, Modules/Settings/ThemeColorsTab.qml:1774, Modules/Settings/ThemeColorsTab.qml:1778, Modules/Settings/ThemeColorsTab.qml:1790, Modules/Settings/ThemeColorsTab.qml:1874, Modules/Settings/ThemeColorsTab.qml:1880, Modules/Settings/ThemeColorsTab.qml:1891, Modules/Settings/DockTab.qml:403, Modules/Settings/DockTab.qml:688, Modules/Settings/LauncherTab.qml:424, Modules/Settings/LauncherTab.qml:731, Modules/Settings/NetworkStatusTab.qml:131, Modules/Settings/DankBarTab.qml:1287, Modules/Settings/DankBarTab.qml:1733, Modules/Settings/WorkspaceAppearanceCard.qml:17, Modules/Settings/WorkspaceAppearanceCard.qml:58, Modules/Settings/WorkspaceAppearanceCard.qml:99, Modules/Settings/WorkspaceAppearanceCard.qml:128, Modules/Settings/WorkspaceAppearanceCard.qml:163, Modules/Settings/FrameTab.qml:231, Modules/Settings/Widgets/SettingsColorPicker.qml:42",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:39, dms-plugins/dms-plugins-official/DankDesktopWeather/DankDesktopWeatherSettings.qml:39, Modules/Settings/ThemeColorsTab.qml:1615, Modules/Settings/ThemeColorsTab.qml:1617, Modules/Settings/ThemeColorsTab.qml:1631, Modules/Settings/ThemeColorsTab.qml:1653, Modules/Settings/ThemeColorsTab.qml:1655, Modules/Settings/ThemeColorsTab.qml:1669, Modules/Settings/ThemeColorsTab.qml:1774, Modules/Settings/ThemeColorsTab.qml:1778, Modules/Settings/ThemeColorsTab.qml:1790, Modules/Settings/ThemeColorsTab.qml:1874, Modules/Settings/ThemeColorsTab.qml:1880, Modules/Settings/ThemeColorsTab.qml:1891, Modules/Settings/DockTab.qml:403, Modules/Settings/DockTab.qml:688, Modules/Settings/LauncherTab.qml:424, Modules/Settings/LauncherTab.qml:731, Modules/Settings/NetworkStatusTab.qml:131, Modules/Settings/DankBarTab.qml:1287, Modules/Settings/DankBarTab.qml:1733, Modules/Settings/WorkspaceAppearanceCard.qml:17, Modules/Settings/WorkspaceAppearanceCard.qml:58, Modules/Settings/WorkspaceAppearanceCard.qml:99, Modules/Settings/WorkspaceAppearanceCard.qml:128, Modules/Settings/WorkspaceAppearanceCard.qml:163, Modules/Settings/FrameTab.qml:231, Modules/Settings/Widgets/SettingsColorPicker.qml:42",
     "comment": "blur border color | button color option | color option | primary color | shadow color option | tile color option | workspace color option"
   },
   {
@@ -12128,7 +12158,7 @@
   {
     "term": "Primary Theme Color",
     "context": "Primary Theme Color",
-    "reference": "Modules/Settings/WallpaperTab.qml:368",
+    "reference": "Modules/Settings/WallpaperTab.qml:376",
     "comment": ""
   },
   {
@@ -12230,7 +12260,7 @@
   {
     "term": "Process exited with code %1",
     "context": "Process exited with code %1",
-    "reference": "Modules/Settings/BatteryTab.qml:28",
+    "reference": "Modules/Settings/BatteryTab.qml:27",
     "comment": ""
   },
   {
@@ -12308,19 +12338,19 @@
   {
     "term": "Profile when Plugged In (AC)",
     "context": "Profile when Plugged In (AC)",
-    "reference": "Modules/Settings/BatteryTab.qml:308",
+    "reference": "Modules/Settings/BatteryTab.qml:307",
     "comment": ""
   },
   {
     "term": "Profile when on Battery",
     "context": "Profile when on Battery",
-    "reference": "Modules/Settings/BatteryTab.qml:326",
+    "reference": "Modules/Settings/BatteryTab.qml:325",
     "comment": ""
   },
   {
     "term": "Protocol",
     "context": "Protocol",
-    "reference": "Widgets/VpnProfileDelegate.qml:66, Modules/Settings/NetworkVpnTab.qml:440, Modules/Settings/PrinterTab.qml:549",
+    "reference": "Widgets/VpnProfileDelegate.qml:68, Modules/Settings/NetworkVpnTab.qml:440, Modules/Settings/PrinterTab.qml:549",
     "comment": "Label for printer protocol selector, e.g. ipp, ipps, lpd, socket"
   },
   {
@@ -12428,7 +12458,7 @@
   {
     "term": "Random",
     "context": "Random",
-    "reference": "Modules/Settings/WallpaperTab.qml:1181, Modules/Settings/WallpaperTab.qml:1204, Modules/Settings/WallpaperTab.qml:1207",
+    "reference": "Modules/Settings/WallpaperTab.qml:1196, Modules/Settings/WallpaperTab.qml:1219, Modules/Settings/WallpaperTab.qml:1222",
     "comment": "wallpaper transition option"
   },
   {
@@ -12486,6 +12516,12 @@
     "comment": ""
   },
   {
+    "term": "Recent Images",
+    "context": "Recent Images",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:2215, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:870, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:2215, dms-plugins/dms-plugins-official/DankKDEConnect/components/KDEConnectDetailContent.qml:870",
+    "comment": "Recent Images title"
+  },
+  {
     "term": "Recently Used Apps",
     "context": "Recently Used Apps",
     "reference": "Modules/Settings/LauncherTab.qml:1402",
@@ -12500,8 +12536,8 @@
   {
     "term": "Refresh",
     "context": "Refresh",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:296, Modules/Settings/GreeterTab.qml:502, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:233, Modules/DankDash/Overview/WeatherOverviewCard.qml:46",
-    "comment": "Phone Connect refresh tooltip | Refresh Tailscale device status"
+    "reference": "Modules/Settings/GreeterTab.qml:502, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:233, Modules/DankDash/Overview/WeatherOverviewCard.qml:46",
+    "comment": "Refresh Tailscale device status"
   },
   {
     "term": "Refresh Weather",
@@ -12530,7 +12566,7 @@
   {
     "term": "Reject",
     "context": "Reject",
-    "reference": "dms-plugins/DankKDEConnect/components/DeviceCard.qml:188, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:377",
+    "reference": "dms-plugins/DankKDEConnect/components/DeviceCard.qml:278, dms-plugins/dms-plugins-official/DankKDEConnect/components/DeviceCard.qml:278",
     "comment": "KDE Connect reject pairing button"
   },
   {
@@ -12740,7 +12776,7 @@
   {
     "term": "Request Pairing",
     "context": "Request Pairing",
-    "reference": "dms-plugins/DankKDEConnect/components/DeviceCard.qml:199",
+    "reference": "dms-plugins/DankKDEConnect/components/DeviceCard.qml:289, dms-plugins/dms-plugins-official/DankKDEConnect/components/DeviceCard.qml:289",
     "comment": "KDE Connect request pairing button"
   },
   {
@@ -12758,7 +12794,7 @@
   {
     "term": "Requires %1",
     "context": "Requires %1",
-    "reference": "Modules/Settings/PluginBrowser.qml:996",
+    "reference": "Modules/Settings/PluginBrowser.qml:1102",
     "comment": "version requirement"
   },
   {
@@ -12930,6 +12966,12 @@
     "comment": ""
   },
   {
+    "term": "Rewind 10s",
+    "context": "Rewind 10s",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1986, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:1441, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:1986, dms-plugins/dms-plugins-official/DankKDEConnect/components/KDEConnectDetailContent.qml:1441",
+    "comment": "Media rewind tooltip"
+  },
+  {
     "term": "Right",
     "context": "Right",
     "reference": "Modules/Notepad/NotepadSettings.qml:434, Modules/Settings/DockTab.qml:116, Modules/Settings/DankBarTab.qml:346, Modules/Settings/DankBarTab.qml:491",
@@ -12974,14 +13016,14 @@
   {
     "term": "Ring",
     "context": "Ring",
-    "reference": "dms-plugins/DankKDEConnect/components/DeviceCard.qml:115, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:267",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1560, dms-plugins/DankKDEConnect/components/DeviceCard.qml:151, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:613, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:1560, dms-plugins/dms-plugins-official/DankKDEConnect/components/DeviceCard.qml:151, dms-plugins/dms-plugins-official/DankKDEConnect/components/KDEConnectDetailContent.qml:613",
     "comment": "KDE Connect ring tooltip"
   },
   {
     "term": "Ringing",
     "context": "Ringing",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:99, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:272",
-    "comment": "KDE Connect ring action | Phone Connect ring action"
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:627, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:627",
+    "comment": "Phone Connect ring action"
   },
   {
     "term": "Ripple Effects",
@@ -13100,8 +13142,14 @@
   {
     "term": "SMS",
     "context": "SMS",
-    "reference": "dms-plugins/DankKDEConnect/components/DeviceCard.qml:161, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:338",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1657, dms-plugins/DankKDEConnect/components/DeviceCard.qml:247, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:718, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:1657, dms-plugins/dms-plugins-official/DankKDEConnect/components/DeviceCard.qml:247, dms-plugins/dms-plugins-official/DankKDEConnect/components/KDEConnectDetailContent.qml:718",
     "comment": "KDE Connect SMS tooltip"
+  },
+  {
+    "term": "SMS sent successfully",
+    "context": "SMS sent successfully",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1759, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:802, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:1759, dms-plugins/dms-plugins-official/DankKDEConnect/components/KDEConnectDetailContent.qml:802",
+    "comment": "Phone Connect SMS action"
   },
   {
     "term": "Saturation",
@@ -13143,6 +13191,12 @@
     "term": "Save and switch between display configurations",
     "context": "Save and switch between display configurations",
     "reference": "Modules/Settings/DisplayConfigTab.qml:143",
+    "comment": ""
+  },
+  {
+    "term": "Save credentials",
+    "context": "Save credentials",
+    "reference": "Widgets/VpnProfileDelegate.qml:314",
     "comment": ""
   },
   {
@@ -13346,7 +13400,7 @@
   {
     "term": "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.",
     "context": "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.",
-    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeysSettings.qml:217",
+    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeysSettings.qml:217, dms-plugins/dms-plugins-official/DankLauncherKeys/DankLauncherKeysSettings.qml:217",
     "comment": ""
   },
   {
@@ -13376,13 +13430,13 @@
   {
     "term": "Search keyboard shortcuts from your compositor and applications",
     "context": "Search keyboard shortcuts from your compositor and applications",
-    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeysSettings.qml:78",
+    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeysSettings.qml:78, dms-plugins/dms-plugins-official/DankLauncherKeys/DankLauncherKeysSettings.qml:78",
     "comment": ""
   },
   {
     "term": "Search plugins...",
     "context": "Search plugins...",
-    "reference": "Modules/Settings/PluginBrowser.qml:577",
+    "reference": "Modules/Settings/PluginBrowser.qml:623",
     "comment": "plugin search placeholder"
   },
   {
@@ -13424,7 +13478,7 @@
   {
     "term": "Searching...",
     "context": "Searching...",
-    "reference": "dms-plugins/DankStickerSearch/DankStickerSearch.qml:140, dms-plugins/DankGifSearch/DankGifSearch.qml:83",
+    "reference": "dms-plugins/DankStickerSearch/DankStickerSearch.qml:140, dms-plugins/DankGifSearch/DankGifSearch.qml:83, dms-plugins/dms-plugins-official/DankStickerSearch/DankStickerSearch.qml:140, dms-plugins/dms-plugins-official/DankGifSearch/DankGifSearch.qml:83",
     "comment": ""
   },
   {
@@ -13436,7 +13490,7 @@
   {
     "term": "Secondary",
     "context": "Secondary",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:43, Modules/Settings/ThemeColorsTab.qml:1615, Modules/Settings/ThemeColorsTab.qml:1619, Modules/Settings/ThemeColorsTab.qml:1627, Modules/Settings/ThemeColorsTab.qml:1637, Modules/Settings/ThemeColorsTab.qml:1653, Modules/Settings/ThemeColorsTab.qml:1657, Modules/Settings/ThemeColorsTab.qml:1665, Modules/Settings/ThemeColorsTab.qml:1675, Modules/Settings/ThemeColorsTab.qml:1774, Modules/Settings/ThemeColorsTab.qml:1780, Modules/Settings/ThemeColorsTab.qml:1792, Modules/Settings/DockTab.qml:688, Modules/Settings/LauncherTab.qml:731, Modules/Settings/DankBarTab.qml:1287, Modules/Settings/DankBarTab.qml:1733, Modules/Settings/WorkspaceAppearanceCard.qml:23, Modules/Settings/WorkspaceAppearanceCard.qml:64, Modules/Settings/WorkspaceAppearanceCard.qml:102, Modules/Settings/WorkspaceAppearanceCard.qml:134, Modules/Settings/WorkspaceAppearanceCard.qml:169, Modules/Settings/Widgets/SettingsColorPicker.qml:47",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:43, dms-plugins/dms-plugins-official/DankDesktopWeather/DankDesktopWeatherSettings.qml:43, Modules/Settings/ThemeColorsTab.qml:1615, Modules/Settings/ThemeColorsTab.qml:1619, Modules/Settings/ThemeColorsTab.qml:1627, Modules/Settings/ThemeColorsTab.qml:1637, Modules/Settings/ThemeColorsTab.qml:1653, Modules/Settings/ThemeColorsTab.qml:1657, Modules/Settings/ThemeColorsTab.qml:1665, Modules/Settings/ThemeColorsTab.qml:1675, Modules/Settings/ThemeColorsTab.qml:1774, Modules/Settings/ThemeColorsTab.qml:1780, Modules/Settings/ThemeColorsTab.qml:1792, Modules/Settings/DockTab.qml:688, Modules/Settings/LauncherTab.qml:731, Modules/Settings/DankBarTab.qml:1287, Modules/Settings/DankBarTab.qml:1733, Modules/Settings/WorkspaceAppearanceCard.qml:23, Modules/Settings/WorkspaceAppearanceCard.qml:64, Modules/Settings/WorkspaceAppearanceCard.qml:102, Modules/Settings/WorkspaceAppearanceCard.qml:134, Modules/Settings/WorkspaceAppearanceCard.qml:169, Modules/Settings/Widgets/SettingsColorPicker.qml:47",
     "comment": "blur border color | button color option | color option | secondary color | tile color option | workspace color option"
   },
   {
@@ -13514,7 +13568,7 @@
   {
     "term": "Select File to Send",
     "context": "Select File to Send",
-    "reference": "dms-plugins/DankKDEConnect/components/ShareDialog.qml:101",
+    "reference": "dms-plugins/DankKDEConnect/components/ShareDialog.qml:373, dms-plugins/dms-plugins-official/DankKDEConnect/components/ShareDialog.qml:373",
     "comment": "KDE Connect file browser title"
   },
   {
@@ -13538,7 +13592,7 @@
   {
     "term": "Select Wallpaper",
     "context": "Select Wallpaper",
-    "reference": "Modals/Settings/SettingsModal.qml:158, Modules/Settings/WallpaperTab.qml:1336, Modules/Settings/WallpaperTab.qml:1358, Modules/Settings/WallpaperTab.qml:1378",
+    "reference": "Modals/Settings/SettingsModal.qml:158, Modules/Settings/WallpaperTab.qml:1351, Modules/Settings/WallpaperTab.qml:1373, Modules/Settings/WallpaperTab.qml:1393",
     "comment": "dark mode wallpaper file browser title | light mode wallpaper file browser title | wallpaper file browser title"
   },
   {
@@ -13592,7 +13646,7 @@
   {
     "term": "Select at least one provider",
     "context": "Select at least one provider",
-    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeysSettings.qml:178",
+    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeysSettings.qml:178, dms-plugins/dms-plugins-official/DankLauncherKeys/DankLauncherKeysSettings.qml:178",
     "comment": ""
   },
   {
@@ -13628,7 +13682,7 @@
   {
     "term": "Select monitor to configure wallpaper",
     "context": "Select monitor to configure wallpaper",
-    "reference": "Modules/Settings/WallpaperTab.qml:842",
+    "reference": "Modules/Settings/WallpaperTab.qml:857",
     "comment": ""
   },
   {
@@ -13670,13 +13724,13 @@
   {
     "term": "Select which keybind providers to include",
     "context": "Select which keybind providers to include",
-    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeysSettings.qml:151",
+    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeysSettings.qml:151, dms-plugins/dms-plugins-official/DankLauncherKeys/DankLauncherKeysSettings.qml:151",
     "comment": ""
   },
   {
     "term": "Select which transitions to include in randomization",
     "context": "Select which transitions to include in randomization",
-    "reference": "Modules/Settings/WallpaperTab.qml:1230",
+    "reference": "Modules/Settings/WallpaperTab.qml:1245",
     "comment": ""
   },
   {
@@ -13694,31 +13748,25 @@
   {
     "term": "Send",
     "context": "Send",
-    "reference": "dms-plugins/DankKDEConnect/components/SmsDialog.qml:80",
+    "reference": "dms-plugins/DankKDEConnect/components/SmsDialog.qml:278, dms-plugins/dms-plugins-official/DankKDEConnect/components/SmsDialog.qml:278",
     "comment": "KDE Connect SMS send button"
   },
   {
     "term": "Send Clipboard",
     "context": "Send Clipboard",
-    "reference": "dms-plugins/DankKDEConnect/components/DeviceCard.qml:133, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:295",
-    "comment": "KDE Connect clipboard tooltip"
-  },
-  {
-    "term": "Send File",
-    "context": "Send File",
-    "reference": "dms-plugins/DankKDEConnect/components/ShareDialog.qml:91",
-    "comment": "KDE Connect send file button"
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1619, dms-plugins/DankKDEConnect/components/DeviceCard.qml:190, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:679, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:1619, dms-plugins/dms-plugins-official/DankKDEConnect/components/DeviceCard.qml:190, dms-plugins/dms-plugins-official/DankKDEConnect/components/KDEConnectDetailContent.qml:679",
+    "comment": "KDE Connect clipboard tooltip | KDE Connect send clipboard tooltip"
   },
   {
     "term": "Send SMS",
     "context": "Send SMS",
-    "reference": "dms-plugins/DankKDEConnect/components/SmsDialog.qml:28",
+    "reference": "dms-plugins/DankKDEConnect/components/SmsDialog.qml:137, dms-plugins/dms-plugins-official/DankKDEConnect/components/SmsDialog.qml:137",
     "comment": "KDE Connect SMS dialog title"
   },
   {
     "term": "Sending",
     "context": "Sending",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:365, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:424",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1741, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:1741",
     "comment": "Phone Connect file send"
   },
   {
@@ -13742,7 +13790,7 @@
   {
     "term": "Server",
     "context": "Server",
-    "reference": "Widgets/VpnProfileDelegate.qml:42, Modules/Settings/NetworkVpnTab.qml:420",
+    "reference": "Widgets/VpnProfileDelegate.qml:44, Modules/Settings/NetworkVpnTab.qml:420",
     "comment": ""
   },
   {
@@ -13778,13 +13826,13 @@
   {
     "term": "Set different wallpapers for each connected monitor",
     "context": "Set different wallpapers for each connected monitor",
-    "reference": "Modules/Settings/WallpaperTab.qml:824",
+    "reference": "Modules/Settings/WallpaperTab.qml:839",
     "comment": ""
   },
   {
     "term": "Set different wallpapers for light and dark mode",
     "context": "Set different wallpapers for light and dark mode",
-    "reference": "Modules/Settings/WallpaperTab.qml:393",
+    "reference": "Modules/Settings/WallpaperTab.qml:408",
     "comment": ""
   },
   {
@@ -13820,7 +13868,7 @@
   {
     "term": "Set the percentage at which the battery is considered low.",
     "context": "Set the percentage at which the battery is considered low.",
-    "reference": "Modules/Settings/BatteryTab.qml:227",
+    "reference": "Modules/Settings/BatteryTab.qml:226",
     "comment": ""
   },
   {
@@ -13910,7 +13958,7 @@
   {
     "term": "Share",
     "context": "Share",
-    "reference": "dms-plugins/DankKDEConnect/components/ShareDialog.qml:34, dms-plugins/DankKDEConnect/components/DeviceCard.qml:142, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:309",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1638, dms-plugins/DankKDEConnect/components/ShareDialog.qml:251, dms-plugins/DankKDEConnect/components/DeviceCard.qml:209, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:698, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:1638, dms-plugins/dms-plugins-official/DankKDEConnect/components/ShareDialog.qml:251, dms-plugins/dms-plugins-official/DankKDEConnect/components/DeviceCard.qml:209, dms-plugins/dms-plugins-official/DankKDEConnect/components/KDEConnectDetailContent.qml:698",
     "comment": "KDE Connect share dialog title | KDE Connect share tooltip"
   },
   {
@@ -13920,21 +13968,9 @@
     "comment": ""
   },
   {
-    "term": "Share Text",
-    "context": "Share Text",
-    "reference": "dms-plugins/DankKDEConnect/components/ShareDialog.qml:81",
-    "comment": "KDE Connect share button"
-  },
-  {
-    "term": "Share URL",
-    "context": "Share URL",
-    "reference": "dms-plugins/DankKDEConnect/components/ShareDialog.qml:81",
-    "comment": "KDE Connect share URL button"
-  },
-  {
     "term": "Shared",
     "context": "Shared",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:344, dms-plugins/DankKDEConnect/DankKDEConnect.qml:352, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:410",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1721, dms-plugins/DankKDEConnect/DankKDEConnect.qml:1729, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:1721, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:1729",
     "comment": "Phone Connect share success"
   },
   {
@@ -13952,7 +13988,7 @@
   {
     "term": "Shift+Enter to paste",
     "context": "Shift+Enter to paste",
-    "reference": "dms-plugins/DankStickerSearch/DankStickerSearch.qml:176, dms-plugins/DankGifSearch/DankGifSearch.qml:119, Modals/DankLauncherV2/Controller.qml:1223",
+    "reference": "dms-plugins/DankStickerSearch/DankStickerSearch.qml:176, dms-plugins/DankGifSearch/DankGifSearch.qml:119, dms-plugins/dms-plugins-official/DankStickerSearch/DankStickerSearch.qml:176, dms-plugins/dms-plugins-official/DankGifSearch/DankGifSearch.qml:119, Modals/DankLauncherV2/Controller.qml:1223",
     "comment": ""
   },
   {
@@ -13988,7 +14024,7 @@
   {
     "term": "Show 3rd Party",
     "context": "Show 3rd Party",
-    "reference": "Modules/Settings/PluginBrowser.qml:505",
+    "reference": "Modules/Settings/PluginBrowser.qml:551",
     "comment": ""
   },
   {
@@ -14048,7 +14084,7 @@
   {
     "term": "Show Feels Like Temperature",
     "context": "Show Feels Like Temperature",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:84",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:84, dms-plugins/dms-plugins-official/DankDesktopWeather/DankDesktopWeatherSettings.qml:84",
     "comment": ""
   },
   {
@@ -14066,7 +14102,7 @@
   {
     "term": "Show Forecast",
     "context": "Show Forecast",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:120",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:120, dms-plugins/dms-plugins-official/DankDesktopWeather/DankDesktopWeatherSettings.qml:120",
     "comment": ""
   },
   {
@@ -14096,13 +14132,13 @@
   {
     "term": "Show Hourly Forecast",
     "context": "Show Hourly Forecast",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:135",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:135, dms-plugins/dms-plugins-official/DankDesktopWeather/DankDesktopWeatherSettings.qml:135",
     "comment": ""
   },
   {
     "term": "Show Humidity",
     "context": "Show Humidity",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:90",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:90, dms-plugins/dms-plugins-official/DankDesktopWeather/DankDesktopWeatherSettings.qml:90",
     "comment": ""
   },
   {
@@ -14126,7 +14162,7 @@
   {
     "term": "Show Location",
     "context": "Show Location",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:72",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:72, dms-plugins/dms-plugins-official/DankDesktopWeather/DankDesktopWeatherSettings.qml:72",
     "comment": ""
   },
   {
@@ -14234,13 +14270,13 @@
   {
     "term": "Show Precipitation Probability",
     "context": "Show Precipitation Probability",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:108",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:108, dms-plugins/dms-plugins-official/DankDesktopWeather/DankDesktopWeatherSettings.qml:108",
     "comment": ""
   },
   {
     "term": "Show Pressure",
     "context": "Show Pressure",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:102",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:102, dms-plugins/dms-plugins-official/DankDesktopWeather/DankDesktopWeatherSettings.qml:102",
     "comment": ""
   },
   {
@@ -14282,7 +14318,7 @@
   {
     "term": "Show Sunrise/Sunset",
     "context": "Show Sunrise/Sunset",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:114",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:114, dms-plugins/dms-plugins-official/DankDesktopWeather/DankDesktopWeatherSettings.qml:114",
     "comment": ""
   },
   {
@@ -14336,7 +14372,7 @@
   {
     "term": "Show Weather Condition",
     "context": "Show Weather Condition",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:78",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:78, dms-plugins/dms-plugins-official/DankDesktopWeather/DankDesktopWeatherSettings.qml:78",
     "comment": ""
   },
   {
@@ -14354,7 +14390,7 @@
   {
     "term": "Show Wind Speed",
     "context": "Show Wind Speed",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:96",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:96, dms-plugins/dms-plugins-official/DankDesktopWeather/DankDesktopWeatherSettings.qml:96",
     "comment": ""
   },
   {
@@ -14372,13 +14408,13 @@
   {
     "term": "Show a notification when battery reaches the charge limit.",
     "context": "Show a notification when battery reaches the charge limit.",
-    "reference": "Modules/Settings/BatteryTab.qml:212",
+    "reference": "Modules/Settings/BatteryTab.qml:211",
     "comment": ""
   },
   {
     "term": "Show a warning popup when battery is running low.",
     "context": "Show a warning popup when battery is running low.",
-    "reference": "Modules/Settings/BatteryTab.qml:238",
+    "reference": "Modules/Settings/BatteryTab.qml:237",
     "comment": ""
   },
   {
@@ -14396,7 +14432,7 @@
   {
     "term": "Show an urgent alert when battery reaches critical level.",
     "context": "Show an urgent alert when battery reaches critical level.",
-    "reference": "Modules/Settings/BatteryTab.qml:293",
+    "reference": "Modules/Settings/BatteryTab.qml:292",
     "comment": ""
   },
   {
@@ -14652,6 +14688,12 @@
     "comment": ""
   },
   {
+    "term": "Signal Strength",
+    "context": "Signal Strength",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1686, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:748, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:1686, dms-plugins/dms-plugins-official/DankKDEConnect/components/KDEConnectDetailContent.qml:748",
+    "comment": "KDE Connect signal strength label"
+  },
+  {
     "term": "Signal:",
     "context": "Signal:",
     "reference": "Modules/Settings/NetworkWifiTab.qml:321",
@@ -14882,7 +14924,7 @@
   {
     "term": "Standard",
     "context": "Standard",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:19, Modules/Settings/TypographyMotionTab.qml:145",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:19, dms-plugins/dms-plugins-official/DankDesktopWeather/DankDesktopWeatherSettings.qml:19, Modules/Settings/TypographyMotionTab.qml:145",
     "comment": ""
   },
   {
@@ -14898,15 +14940,9 @@
     "comment": ""
   },
   {
-    "term": "Start KDE Connect or Valent",
-    "context": "Start KDE Connect or Valent",
-    "reference": "dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:104",
-    "comment": "Phone Connect start daemon hint"
-  },
-  {
     "term": "Start KDE Connect or Valent to use this plugin",
     "context": "Start KDE Connect or Valent to use this plugin",
-    "reference": "dms-plugins/DankKDEConnect/components/UnavailableMessage.qml:39",
+    "reference": "dms-plugins/DankKDEConnect/components/UnavailableMessage.qml:39, dms-plugins/dms-plugins-official/DankKDEConnect/components/UnavailableMessage.qml:39",
     "comment": "Phone Connect daemon hint"
   },
   {
@@ -14924,7 +14960,7 @@
   {
     "term": "Status",
     "context": "Status",
-    "reference": "Widgets/DankIconPicker.qml:55, Modals/Settings/SettingsSidebar.qml:245, Modules/Settings/AboutTab.qml:698, Modules/Settings/NetworkStatusTab.qml:86, Modules/Settings/PrinterTab.qml:186, Modules/Settings/BatteryTab.qml:110",
+    "reference": "Widgets/DankIconPicker.qml:55, Modals/Settings/SettingsSidebar.qml:245, Modules/Settings/AboutTab.qml:698, Modules/Settings/NetworkStatusTab.qml:86, Modules/Settings/PrinterTab.qml:186, Modules/Settings/BatteryTab.qml:109",
     "comment": ""
   },
   {
@@ -14972,7 +15008,7 @@
   {
     "term": "Stripes",
     "context": "Stripes",
-    "reference": "Modules/Settings/WallpaperTab.qml:1191",
+    "reference": "Modules/Settings/WallpaperTab.qml:1206",
     "comment": "wallpaper transition option"
   },
   {
@@ -15032,7 +15068,7 @@
   {
     "term": "Surface Container",
     "context": "Surface Container",
-    "reference": "Modules/Settings/ThemeColorsTab.qml:31, Modules/Settings/WallpaperTab.qml:369, Modules/Settings/WorkspaceAppearanceCard.qml:38, Modules/Settings/WorkspaceAppearanceCard.qml:79, Modules/Settings/WorkspaceAppearanceCard.qml:111, Modules/Settings/WorkspaceAppearanceCard.qml:149",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:31, Modules/Settings/WallpaperTab.qml:380, Modules/Settings/WorkspaceAppearanceCard.qml:38, Modules/Settings/WorkspaceAppearanceCard.qml:79, Modules/Settings/WorkspaceAppearanceCard.qml:111, Modules/Settings/WorkspaceAppearanceCard.qml:149",
     "comment": "widget background color option | workspace color option"
   },
   {
@@ -15434,8 +15470,8 @@
   {
     "term": "Text",
     "context": "Text",
-    "reference": "Modals/DankLauncherV2/Controller.qml:1224, Modals/Clipboard/ClipboardEntry.qml:190, Modals/Clipboard/ClipboardContent.qml:15, Modules/Settings/LauncherTab.qml:731",
-    "comment": "text color"
+    "reference": "dms-plugins/DankKDEConnect/components/ShareDialog.qml:354, dms-plugins/dms-plugins-official/DankKDEConnect/components/ShareDialog.qml:354, Modals/DankLauncherV2/Controller.qml:1224, Modals/Clipboard/ClipboardEntry.qml:190, Modals/Clipboard/ClipboardContent.qml:15, Modules/Settings/LauncherTab.qml:731",
+    "comment": "KDE Connect share text button | text color"
   },
   {
     "term": "Text Color",
@@ -15554,13 +15590,13 @@
   {
     "term": "Third-Party Plugin Warning",
     "context": "Third-Party Plugin Warning",
-    "reference": "Modules/Settings/PluginBrowser.qml:1139, Modules/Settings/PluginBrowser.qml:1173",
+    "reference": "Modules/Settings/PluginBrowser.qml:1245, Modules/Settings/PluginBrowser.qml:1279",
     "comment": ""
   },
   {
     "term": "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\n\nThese plugins may pose security and privacy risks - install at your own risk.",
     "context": "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\n\nThese plugins may pose security and privacy risks - install at your own risk.",
-    "reference": "Modules/Settings/PluginBrowser.qml:1197",
+    "reference": "Modules/Settings/PluginBrowser.qml:1303",
     "comment": ""
   },
   {
@@ -15692,7 +15728,7 @@
   {
     "term": "Time",
     "context": "Time",
-    "reference": "Modules/Settings/ThemeColorsTab.qml:1148, Modules/Settings/GammaControlTab.qml:184, Modules/Settings/WallpaperTab.qml:982",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:1148, Modules/Settings/GammaControlTab.qml:184, Modules/Settings/WallpaperTab.qml:997",
     "comment": "theme auto mode tab | wallpaper cycling mode tab"
   },
   {
@@ -15824,7 +15860,7 @@
   {
     "term": "Toast",
     "context": "Toast",
-    "reference": "Modules/Settings/BatteryTab.qml:247",
+    "reference": "Modules/Settings/BatteryTab.qml:246",
     "comment": ""
   },
   {
@@ -15980,7 +16016,7 @@
   {
     "term": "Transition Effect",
     "context": "Transition Effect",
-    "reference": "Modules/Settings/WallpaperTab.qml:1175",
+    "reference": "Modules/Settings/WallpaperTab.qml:1190",
     "comment": ""
   },
   {
@@ -16010,13 +16046,13 @@
   {
     "term": "Trending GIFs",
     "context": "Trending GIFs",
-    "reference": "dms-plugins/DankGifSearch/DankGifSearch.qml:85",
+    "reference": "dms-plugins/DankGifSearch/DankGifSearch.qml:85, dms-plugins/dms-plugins-official/DankGifSearch/DankGifSearch.qml:85",
     "comment": ""
   },
   {
     "term": "Trending Stickers",
     "context": "Trending Stickers",
-    "reference": "dms-plugins/DankStickerSearch/DankStickerSearch.qml:142",
+    "reference": "dms-plugins/DankStickerSearch/DankStickerSearch.qml:142, dms-plugins/dms-plugins-official/DankStickerSearch/DankStickerSearch.qml:142",
     "comment": ""
   },
   {
@@ -16028,7 +16064,7 @@
   {
     "term": "Trigger Prefix",
     "context": "Trigger Prefix",
-    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeysSettings.qml:123",
+    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeysSettings.qml:123, dms-plugins/dms-plugins-official/DankLauncherKeys/DankLauncherKeysSettings.qml:123",
     "comment": ""
   },
   {
@@ -16046,7 +16082,7 @@
   {
     "term": "Try a different search",
     "context": "Try a different search",
-    "reference": "Modals/MuxModal.qml:552, dms-plugins/DankStickerSearch/DankStickerSearch.qml:155, dms-plugins/DankGifSearch/DankGifSearch.qml:98",
+    "reference": "Modals/MuxModal.qml:552, dms-plugins/DankStickerSearch/DankStickerSearch.qml:155, dms-plugins/DankGifSearch/DankGifSearch.qml:98, dms-plugins/dms-plugins-official/DankStickerSearch/DankStickerSearch.qml:155, dms-plugins/dms-plugins-official/DankGifSearch/DankGifSearch.qml:98",
     "comment": ""
   },
   {
@@ -16112,7 +16148,7 @@
   {
     "term": "Type this prefix to search keybinds",
     "context": "Type this prefix to search keybinds",
-    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeysSettings.qml:124",
+    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeysSettings.qml:124, dms-plugins/dms-plugins-official/DankLauncherKeys/DankLauncherKeysSettings.qml:124",
     "comment": ""
   },
   {
@@ -16134,15 +16170,21 @@
     "comment": ""
   },
   {
+    "term": "URI",
+    "context": "URI",
+    "reference": "dms-plugins/DankKDEConnect/components/ShareDialog.qml:346, dms-plugins/dms-plugins-official/DankKDEConnect/components/ShareDialog.qml:346",
+    "comment": "KDE Connect share URI button"
+  },
+  {
     "term": "Unavailable",
     "context": "Unavailable",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:31, Modules/Settings/NetworkVpnTab.qml:82, Modules/Settings/PrinterTab.qml:202, Modules/Settings/NetworkEthernetTab.qml:167, Modules/Settings/NetworkWifiTab.qml:970",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:460, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:460, Modules/Settings/NetworkVpnTab.qml:82, Modules/Settings/PrinterTab.qml:202, Modules/Settings/NetworkEthernetTab.qml:167, Modules/Settings/NetworkWifiTab.qml:970",
     "comment": "Phone Connect unavailable status"
   },
   {
     "term": "Uncategorized",
     "context": "Uncategorized",
-    "reference": "Modules/Settings/PluginBrowser.qml:109",
+    "reference": "Modules/Settings/PluginBrowser.qml:149",
     "comment": "plugin browser category filter"
   },
   {
@@ -16208,8 +16250,8 @@
   {
     "term": "Unknown",
     "context": "Unknown",
-    "reference": "Common/Theme.qml:1630, Services/WeatherService.qml:153, Services/WeatherService.qml:716, Services/WeatherService.qml:717, Services/WeatherService.qml:758, Services/WeatherService.qml:759, Services/WeatherService.qml:794, Services/WeatherService.qml:795, Services/WeatherService.qml:993, Services/WeatherService.qml:994, Services/BatteryService.qml:288, dms-plugins/DankKDEConnect/components/DeviceCard.qml:208, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:201, Modules/Lock/LockScreenContent.qml:406, Modules/Lock/LockScreenContent.qml:526, Modules/Lock/LockScreenContent.qml:622, Modules/Settings/PluginBrowser.qml:902, Modules/Settings/NetworkStatusTab.qml:79, Modules/Settings/NetworkStatusTab.qml:121, Modules/Settings/PrinterTab.qml:1638, Modules/Settings/ThemeBrowser.qml:506, Modules/Settings/NetworkEthernetTab.qml:146, Modules/Settings/NetworkEthernetTab.qml:169, Modules/Settings/NetworkEthernetTab.qml:317, Modules/Settings/NetworkEthernetTab.qml:428, Modules/Settings/NotificationsTab.qml:714, Modules/Settings/NetworkWifiTab.qml:537, Modules/Settings/NetworkWifiTab.qml:947, Modules/ControlCenter/Details/BatteryDetail.qml:184, Modules/ControlCenter/Components/HeaderPane.qml:63, Modules/ControlCenter/Components/DragDropGrid.qml:487, Modules/ControlCenter/Components/DragDropGrid.qml:725, Modules/DankDash/Overview/MediaOverviewCard.qml:91, Modules/DankBar/Popouts/BatteryPopout.qml:340",
-    "comment": "KDE Connect unknown device status | battery status | power profile option | unknown author | widget status"
+    "reference": "Common/Theme.qml:1630, Services/WeatherService.qml:153, Services/WeatherService.qml:716, Services/WeatherService.qml:717, Services/WeatherService.qml:758, Services/WeatherService.qml:759, Services/WeatherService.qml:794, Services/WeatherService.qml:795, Services/WeatherService.qml:993, Services/WeatherService.qml:994, Services/BatteryService.qml:288, dms-plugins/DankKDEConnect/DankKDEConnect.qml:1679, dms-plugins/DankKDEConnect/components/DeviceCard.qml:298, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:741, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:1679, dms-plugins/dms-plugins-official/DankKDEConnect/components/DeviceCard.qml:298, dms-plugins/dms-plugins-official/DankKDEConnect/components/KDEConnectDetailContent.qml:741, Modules/Lock/LockScreenContent.qml:406, Modules/Lock/LockScreenContent.qml:526, Modules/Lock/LockScreenContent.qml:622, Modules/Settings/PluginBrowser.qml:1007, Modules/Settings/NetworkStatusTab.qml:79, Modules/Settings/NetworkStatusTab.qml:121, Modules/Settings/PrinterTab.qml:1638, Modules/Settings/ThemeBrowser.qml:506, Modules/Settings/NetworkEthernetTab.qml:146, Modules/Settings/NetworkEthernetTab.qml:169, Modules/Settings/NetworkEthernetTab.qml:317, Modules/Settings/NetworkEthernetTab.qml:428, Modules/Settings/NotificationsTab.qml:714, Modules/Settings/NetworkWifiTab.qml:537, Modules/Settings/NetworkWifiTab.qml:947, Modules/ControlCenter/Details/BatteryDetail.qml:184, Modules/ControlCenter/Components/HeaderPane.qml:63, Modules/ControlCenter/Components/DragDropGrid.qml:487, Modules/ControlCenter/Components/DragDropGrid.qml:725, Modules/DankDash/Overview/MediaOverviewCard.qml:91, Modules/DankBar/Popouts/BatteryPopout.qml:340",
+    "comment": "KDE Connect unknown device status | Status | battery status | power profile option | unknown author | widget status"
   },
   {
     "term": "Unknown App",
@@ -16220,7 +16262,7 @@
   {
     "term": "Unknown Artist",
     "context": "Unknown Artist",
-    "reference": "Modules/DankDash/MediaDropdownOverlay.qml:551, Modules/DankDash/MediaPlayerTab.qml:426, Modules/OSD/MediaPlaybackOSD.qml:280, Modules/DankDash/Overview/MediaOverviewCard.qml:102",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1933, dms-plugins/DankKDEConnect/DankKDEConnect.qml:1939, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:1388, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:1394, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:1933, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:1939, dms-plugins/dms-plugins-official/DankKDEConnect/components/KDEConnectDetailContent.qml:1388, dms-plugins/dms-plugins-official/DankKDEConnect/components/KDEConnectDetailContent.qml:1394, Modules/DankDash/MediaDropdownOverlay.qml:551, Modules/DankDash/MediaPlayerTab.qml:426, Modules/OSD/MediaPlaybackOSD.qml:280, Modules/DankDash/Overview/MediaOverviewCard.qml:102",
     "comment": ""
   },
   {
@@ -16292,19 +16334,19 @@
   {
     "term": "Unpair",
     "context": "Unpair",
-    "reference": "dms-plugins/DankKDEConnect/components/DeviceCard.qml:171, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:354",
+    "reference": "dms-plugins/DankKDEConnect/components/DeviceCard.qml:261, dms-plugins/dms-plugins-official/DankKDEConnect/components/DeviceCard.qml:261",
     "comment": "KDE Connect unpair tooltip"
   },
   {
     "term": "Unpair failed",
     "context": "Unpair failed",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:176",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:699, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:699",
     "comment": "Phone Connect error"
   },
   {
     "term": "Unpin",
     "context": "Unpin",
-    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeys.qml:165, Modals/Clipboard/ClipboardContextMenu.qml:30",
+    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeys.qml:165, dms-plugins/dms-plugins-official/DankLauncherKeys/DankLauncherKeys.qml:165, Modals/Clipboard/ClipboardContextMenu.qml:30",
     "comment": ""
   },
   {
@@ -16430,7 +16472,7 @@
   {
     "term": "Usage Tips",
     "context": "Usage Tips",
-    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeysSettings.qml:208",
+    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeysSettings.qml:208, dms-plugins/dms-plugins-official/DankLauncherKeys/DankLauncherKeysSettings.qml:208",
     "comment": ""
   },
   {
@@ -16526,7 +16568,7 @@
   {
     "term": "Use an external wallpaper manager like swww, hyprpaper, or swaybg.",
     "context": "Use an external wallpaper manager like swww, hyprpaper, or swaybg.",
-    "reference": "Modules/Settings/WallpaperTab.qml:1273",
+    "reference": "Modules/Settings/WallpaperTab.qml:1288",
     "comment": "wallpaper settings disable description"
   },
   {
@@ -16634,7 +16676,7 @@
   {
     "term": "Use trigger prefix to activate",
     "context": "Use trigger prefix to activate",
-    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeysSettings.qml:107",
+    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeysSettings.qml:107, dms-plugins/dms-plugins-official/DankLauncherKeys/DankLauncherKeysSettings.qml:107",
     "comment": ""
   },
   {
@@ -16646,7 +16688,7 @@
   {
     "term": "Used when accent color is set to Custom",
     "context": "Used when accent color is set to Custom",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:57",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:57, dms-plugins/dms-plugins-official/DankDesktopWeather/DankDesktopWeatherSettings.qml:57",
     "comment": ""
   },
   {
@@ -16706,7 +16748,7 @@
   {
     "term": "Username",
     "context": "Username",
-    "reference": "Modals/WifiPasswordModal.qml:183, Modals/WifiPasswordModal.qml:506, Widgets/VpnProfileDelegate.qml:48, Modules/Settings/NetworkVpnTab.qml:425, Modules/Settings/UsersTab.qml:358",
+    "reference": "Modals/WifiPasswordModal.qml:183, Modals/WifiPasswordModal.qml:506, Widgets/VpnProfileDelegate.qml:50, Widgets/VpnProfileDelegate.qml:300, Modules/Settings/NetworkVpnTab.qml:425, Modules/Settings/UsersTab.qml:358",
     "comment": ""
   },
   {
@@ -16778,7 +16820,7 @@
   {
     "term": "VPN",
     "context": "VPN",
-    "reference": "Modals/Settings/SettingsSidebar.qml:263, Modules/Settings/WidgetsTabSection.qml:1772, Modules/Settings/WidgetsTabSection.qml:2021, Modules/Settings/NetworkVpnTab.qml:45, Modules/Settings/WidgetsTab.qml:185, Modules/ControlCenter/Models/WidgetModel.qml:247, Modules/ControlCenter/BuiltinPlugins/VpnWidget.qml:15",
+    "reference": "Services/DMSNetworkService.qml:393, Modals/Settings/SettingsSidebar.qml:263, Modules/Settings/WidgetsTabSection.qml:1772, Modules/Settings/WidgetsTabSection.qml:2021, Modules/Settings/NetworkVpnTab.qml:45, Modules/Settings/WidgetsTab.qml:185, Modules/ControlCenter/Models/WidgetModel.qml:247, Modules/ControlCenter/BuiltinPlugins/VpnWidget.qml:18",
     "comment": ""
   },
   {
@@ -16790,19 +16832,25 @@
   {
     "term": "VPN configuration updated",
     "context": "VPN configuration updated",
-    "reference": "Services/VPNService.qml:145",
+    "reference": "Services/VPNService.qml:146",
+    "comment": ""
+  },
+  {
+    "term": "VPN credentials saved",
+    "context": "VPN credentials saved",
+    "reference": "Services/VPNService.qml:170",
     "comment": ""
   },
   {
     "term": "VPN deleted",
     "context": "VPN deleted",
-    "reference": "Services/VPNService.qml:162",
+    "reference": "Services/VPNService.qml:185",
     "comment": ""
   },
   {
     "term": "VPN imported: %1",
     "context": "VPN imported: %1",
-    "reference": "Services/VPNService.qml:93",
+    "reference": "Services/VPNService.qml:94",
     "comment": ""
   },
   {
@@ -16844,7 +16892,7 @@
   {
     "term": "Verification",
     "context": "Verification",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:70",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:588, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:588",
     "comment": "Phone Connect pairing verification key label"
   },
   {
@@ -16922,7 +16970,7 @@
   {
     "term": "View Mode",
     "context": "View Mode",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:11",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:11, dms-plugins/dms-plugins-official/DankDesktopWeather/DankDesktopWeatherSettings.qml:11",
     "comment": ""
   },
   {
@@ -16952,7 +17000,7 @@
   {
     "term": "Visual effect used when wallpaper changes",
     "context": "Visual effect used when wallpaper changes",
-    "reference": "Modules/Settings/WallpaperTab.qml:1176",
+    "reference": "Modules/Settings/WallpaperTab.qml:1191",
     "comment": ""
   },
   {
@@ -16980,6 +17028,12 @@
     "comment": ""
   },
   {
+    "term": "Votes",
+    "context": "Votes",
+    "reference": "Modules/Settings/PluginBrowser.qml:48",
+    "comment": "plugin browser sort option"
+  },
+  {
     "term": "WPA/WPA2",
     "context": "WPA/WPA2",
     "reference": "Modules/Settings/NetworkWifiTab.qml:773, Modules/Settings/NetworkWifiTab.qml:1134",
@@ -17000,7 +17054,7 @@
   {
     "term": "Wallpaper Monitor",
     "context": "Wallpaper Monitor",
-    "reference": "Modules/Settings/WallpaperTab.qml:841",
+    "reference": "Modules/Settings/WallpaperTab.qml:856",
     "comment": ""
   },
   {
@@ -17108,7 +17162,7 @@
   {
     "term": "White",
     "context": "White",
-    "reference": "Modules/Settings/WallpaperTab.qml:367",
+    "reference": "Modules/Settings/WallpaperTab.qml:372",
     "comment": ""
   },
   {
@@ -17144,13 +17198,13 @@
   {
     "term": "WiFi disabled",
     "context": "WiFi disabled",
-    "reference": "Services/LegacyNetworkService.qml:211, Services/DMSNetworkService.qml:625",
+    "reference": "Services/LegacyNetworkService.qml:211, Services/DMSNetworkService.qml:649",
     "comment": ""
   },
   {
     "term": "WiFi enabled",
     "context": "WiFi enabled",
-    "reference": "Services/LegacyNetworkService.qml:211, Services/LegacyNetworkService.qml:416, Services/DMSNetworkService.qml:625, Services/DMSNetworkService.qml:637",
+    "reference": "Services/LegacyNetworkService.qml:211, Services/LegacyNetworkService.qml:416, Services/DMSNetworkService.qml:649, Services/DMSNetworkService.qml:661",
     "comment": ""
   },
   {
@@ -17270,7 +17324,7 @@
   {
     "term": "Wind",
     "context": "Wind",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeather.qml:425, Modules/DankDash/WeatherTab.qml:93, Modules/Settings/TimeWeatherTab.qml:1006",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeather.qml:425, dms-plugins/dms-plugins-official/DankDesktopWeather/DankDesktopWeather.qml:425, Modules/DankDash/WeatherTab.qml:93, Modules/Settings/TimeWeatherTab.qml:1006",
     "comment": ""
   },
   {
@@ -17336,7 +17390,7 @@
   {
     "term": "Wipe",
     "context": "Wipe",
-    "reference": "Modules/Settings/WallpaperTab.qml:1187",
+    "reference": "Modules/Settings/WallpaperTab.qml:1202",
     "comment": "wallpaper transition option"
   },
   {
@@ -17550,9 +17604,15 @@
     "comment": ""
   },
   {
+    "term": "broken",
+    "context": "broken",
+    "reference": "Modules/Settings/PluginBrowser.qml:115",
+    "comment": "plugin status"
+  },
+  {
     "term": "by %1",
     "context": "by %1",
-    "reference": "Modules/Settings/PluginBrowser.qml:902, Modules/Settings/ThemeBrowser.qml:506",
+    "reference": "Modules/Settings/PluginBrowser.qml:1007, Modules/Settings/ThemeBrowser.qml:506",
     "comment": "author attribution"
   },
   {
@@ -17560,6 +17620,12 @@
     "context": "days",
     "reference": "Modules/Settings/NotificationsTab.qml:897, Modules/Settings/ClipboardTab.qml:182",
     "comment": ""
+  },
+  {
+    "term": "deprecated",
+    "context": "deprecated",
+    "reference": "Modules/Settings/PluginBrowser.qml:119",
+    "comment": "plugin status"
   },
   {
     "term": "detached",
@@ -17570,14 +17636,8 @@
   {
     "term": "device",
     "context": "device",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:91, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:272",
-    "comment": "Generic device name | Generic device name fallback"
-  },
-  {
-    "term": "devices connected",
-    "context": "devices connected",
-    "reference": "dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:38",
-    "comment": "KDE Connect status multiple devices"
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:619, dms-plugins/dms-plugins-official/DankKDEConnect/DankKDEConnect.qml:619",
+    "comment": "Generic device name fallback"
   },
   {
     "term": "dgop not available",
@@ -17590,6 +17650,12 @@
     "context": "direct",
     "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:406",
     "comment": "Tailscale direct connection"
+  },
+  {
+    "term": "discuss",
+    "context": "discuss",
+    "reference": "Modules/Settings/PluginBrowser.qml:1009",
+    "comment": "plugin discussion link"
   },
   {
     "term": "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.",
@@ -17666,7 +17732,7 @@
   {
     "term": "featured",
     "context": "featured",
-    "reference": "Modules/Settings/PluginBrowser.qml:850, Modules/Settings/DesktopWidgetBrowser.qml:390",
+    "reference": "Modules/Settings/PluginBrowser.qml:899, Modules/Settings/DesktopWidgetBrowser.qml:390",
     "comment": ""
   },
   {
@@ -17804,7 +17870,7 @@
   {
     "term": "official",
     "context": "official",
-    "reference": "Modules/Settings/PluginBrowser.qml:872, Modules/Settings/ThemeBrowser.qml:473",
+    "reference": "Modules/Settings/PluginBrowser.qml:921, Modules/Settings/ThemeBrowser.qml:473",
     "comment": ""
   },
   {
@@ -17900,7 +17966,7 @@
   {
     "term": "source",
     "context": "source",
-    "reference": "Modules/Settings/PluginBrowser.qml:903",
+    "reference": "Modules/Settings/PluginBrowser.qml:1008",
     "comment": "source code link"
   },
   {
@@ -17908,6 +17974,12 @@
     "context": "this app",
     "reference": "Modules/Notifications/Popup/NotificationPopup.qml:1423, Modules/Notifications/Popup/NotificationPopup.qml:1423, Modules/Notifications/Center/NotificationCard.qml:1097, Modules/Notifications/Center/NotificationCard.qml:1097",
     "comment": ""
+  },
+  {
+    "term": "unmaintained",
+    "context": "unmaintained",
+    "reference": "Modules/Settings/PluginBrowser.qml:117",
+    "comment": "plugin status"
   },
   {
     "term": "until %1",
@@ -17952,6 +18024,12 @@
     "comment": ""
   },
   {
+    "term": "verified",
+    "context": "verified",
+    "reference": "Modules/Settings/PluginBrowser.qml:121",
+    "comment": "plugin status"
+  },
+  {
     "term": "wtype not available - install wtype for paste support",
     "context": "wtype not available - install wtype for paste support",
     "reference": "Services/ClipboardService.qml:260, Services/ClipboardService.qml:271, Modals/DankLauncherV2/Controller.qml:182",
@@ -17960,7 +18038,7 @@
   {
     "term": "• Install only from trusted sources",
     "context": "• Install only from trusted sources",
-    "reference": "Modules/Settings/PluginBrowser.qml:1220",
+    "reference": "Modules/Settings/PluginBrowser.qml:1326",
     "comment": ""
   },
   {
@@ -17990,13 +18068,13 @@
   {
     "term": "• Plugins may contain bugs or security issues",
     "context": "• Plugins may contain bugs or security issues",
-    "reference": "Modules/Settings/PluginBrowser.qml:1208",
+    "reference": "Modules/Settings/PluginBrowser.qml:1314",
     "comment": ""
   },
   {
     "term": "• Review code before installation when possible",
     "context": "• Review code before installation when possible",
-    "reference": "Modules/Settings/PluginBrowser.qml:1214",
+    "reference": "Modules/Settings/PluginBrowser.qml:1320",
     "comment": ""
   },
   {

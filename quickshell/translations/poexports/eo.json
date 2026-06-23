@@ -107,6 +107,9 @@
   "%1 windows": {
     "%1 windows": "%1 fenestroj"
   },
+  "%1: %2": {
+    "%1: %2": ""
+  },
   "%1m ago": {
     "%1m ago": "antaŭ %1m"
   },
@@ -1790,6 +1793,9 @@
   "Connecting...": {
     "Connecting...": "Konektante..."
   },
+  "Connecting…": {
+    "Connecting…": ""
+  },
   "Connection failed": {
     "Connection failed": "Konekto malsukcesis"
   },
@@ -1969,6 +1975,9 @@
   },
   "Creating...": {
     "Creating...": "Kreado..."
+  },
+  "Credentials": {
+    "Credentials": ""
   },
   "Critical Battery": {
     "Critical Battery": ""
@@ -2828,6 +2837,9 @@
   "Enter PIN for ": {
     "Enter PIN for ": "Enigu PIN-kodo por "
   },
+  "Enter URI or text to share": {
+    "Enter URI or text to share": ""
+  },
   "Enter URL or text to share": {
     "Enter URL or text to share": "Enigu URL-on aŭ tekston por kunhavigi"
   },
@@ -3146,6 +3158,9 @@
   "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": {
     "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": "Malsukcesis lanĉi 'dms greeter status'. Certigu ke DMS estas instalita kaj ke dms estas en PATH."
   },
+  "Failed to save VPN credentials": {
+    "Failed to save VPN credentials": ""
+  },
   "Failed to save audio config": {
     "Failed to save audio config": "Malsukcesis konservi sonan agordon"
   },
@@ -3157,6 +3172,9 @@
   },
   "Failed to save profile": {
     "Failed to save profile": "Malsukcesis konservi profilon"
+  },
+  "Failed to send SMS": {
+    "Failed to send SMS": ""
   },
   "Failed to send clipboard": {
     "Failed to send clipboard": "Malsukcesis sendi la poŝtabulon"
@@ -3503,6 +3521,9 @@
   "Format Legend": {
     "Format Legend": "Formata legendo"
   },
+  "Forward 10s": {
+    "Forward 10s": ""
+  },
   "Frame": {
     "Frame": "ŝipripo"
   },
@@ -3818,6 +3839,9 @@
   "Hide device": {
     "Hide device": "Kaŝi aparaton"
   },
+  "Hide installed": {
+    "Hide installed": ""
+  },
   "Hide notification content until expanded": {
     "Hide notification content until expanded": "Kaŝi sciigan enhavon ĝis etendo"
   },
@@ -4126,6 +4150,9 @@
   },
   "Installed": {
     "Installed": "Instalita"
+  },
+  "Installed first": {
+    "Installed first": ""
   },
   "Installed: %1": {
     "Installed: %1": "Instalita: %1"
@@ -4952,6 +4979,9 @@
   "Network Status": {
     "Network Status": "Reta stato"
   },
+  "Network Type": {
+    "Network Type": ""
+  },
   "Network download and upload speed display": {
     "Network download and upload speed display": "Vidigo de reta elŝuta kaj alŝuta rapido"
   },
@@ -5179,6 +5209,9 @@
   },
   "No human user accounts found.": {
     "No human user accounts found.": "Neniuj homaj uzantkontoj trovitaj."
+  },
+  "No images found": {
+    "No images found": ""
   },
   "No info items": {
     "No info items": "Neniuj informaj eroj"
@@ -5888,6 +5921,9 @@
   "Place the dock on the Wayland overlay layer": {
     "Place the dock on the Wayland overlay layer": "Metu la dokon sur la Wayland-kovrotavolo"
   },
+  "Play": {
+    "Play": ""
+  },
   "Play a video when the screen locks.": {
     "Play a video when the screen locks.": "Ludi videon kiam la ekrano ŝlosiĝas."
   },
@@ -6101,6 +6137,9 @@
   "Preview: %1": {
     "Preview: %1": ""
   },
+  "Previous": {
+    "Previous": ""
+  },
   "Primary": {
     "Primary": "Ĉefa"
   },
@@ -6286,6 +6325,9 @@
   },
   "Recent Colors": {
     "Recent Colors": "Lastatempaj koloroj"
+  },
+  "Recent Images": {
+    "Recent Images": ""
   },
   "Recently Used Apps": {
     "Recently Used Apps": "Lastatempe uzitaj aplikaĵoj"
@@ -6509,6 +6551,9 @@
   "Revert": {
     "Revert": "Malfari"
   },
+  "Rewind 10s": {
+    "Rewind 10s": ""
+  },
   "Right": {
     "Right": "Dekstre"
   },
@@ -6596,6 +6641,9 @@
   "SMS": {
     "SMS": "SMS-oj"
   },
+  "SMS sent successfully": {
+    "SMS sent successfully": ""
+  },
   "Saturation": {
     "Saturation": "satureco"
   },
@@ -6616,6 +6664,9 @@
   },
   "Save and switch between display configurations": {
     "Save and switch between display configurations": "Konservi kaj ŝanĝi inter ekranaj agordoj"
+  },
+  "Save credentials": {
+    "Save credentials": ""
   },
   "Save critical priority notifications to history": {
     "Save critical priority notifications to history": "Konservi kritik-prioritatajn sciigojn en historion"
@@ -7370,6 +7421,9 @@
   "Signal": {
     "Signal": "Signalo"
   },
+  "Signal Strength": {
+    "Signal Strength": ""
+  },
   "Signal:": {
     "Signal:": "Signalo:"
   },
@@ -8123,6 +8177,9 @@
   "Typography & Motion": {
     "Typography & Motion": "Tipografio kaj movo"
   },
+  "URI": {
+    "URI": ""
+  },
   "Unavailable": {
     "Unavailable": "Nedisponebla"
   },
@@ -8459,6 +8516,9 @@
   "VPN configuration updated": {
     "VPN configuration updated": "Agordo de VPN estas ĝisdatigita"
   },
+  "VPN credentials saved": {
+    "VPN credentials saved": ""
+  },
   "VPN deleted": {
     "VPN deleted": "VPN estas forigita"
   },
@@ -8551,6 +8611,9 @@
   },
   "Volume, brightness, and other system OSDs": {
     "Volume, brightness, and other system OSDs": "Laŭteco, brileco, kaj aliaj sistemaj OSD-oj"
+  },
+  "Votes": {
+    "Votes": ""
   },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
@@ -8846,11 +8909,17 @@
   "brandon": {
     "brandon": "brandon"
   },
+  "broken": {
+    "broken": ""
+  },
   "by %1": {
     "by %1": "de %1"
   },
   "days": {
     "days": "tagoj"
+  },
+  "deprecated": {
+    "deprecated": ""
   },
   "detached": {
     "detached": "deigita"
@@ -8866,6 +8935,9 @@
   },
   "direct": {
     "direct": "senpera"
+  },
+  "discuss": {
+    "discuss": ""
   },
   "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": {
     "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": "dms estas tre agordebla, moderna labortabla ŝelo kun dezajno <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">inspirita de material 3</a>.<br /><br/>Ĝi estas konstruita per <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, QT6-kadro por konstrui labortablajn ŝelojn, kaj <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, statike tipita, kompilita programlingvo."
@@ -9026,6 +9098,9 @@
   "this app": {
     "this app": "ĉi tiu aplikaĵo"
   },
+  "unmaintained": {
+    "unmaintained": ""
+  },
   "until %1": {
     "until %1": "ĝis %1"
   },
@@ -9046,6 +9121,9 @@
   },
   "v%1 by %2": {
     "v%1 by %2": "v%1 de %2"
+  },
+  "verified": {
+    "verified": ""
   },
   "wtype not available - install wtype for paste support": {
     "wtype not available - install wtype for paste support": "wtype ne disponeblas - instalu wtype por alglua subteno"

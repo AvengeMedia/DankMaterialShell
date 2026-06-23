@@ -107,6 +107,9 @@
   "%1 windows": {
     "%1 windows": "%1 پنجره"
   },
+  "%1: %2": {
+    "%1: %2": ""
+  },
   "%1m ago": {
     "%1m ago": "%1 دقیقه پیش"
   },
@@ -1790,6 +1793,9 @@
   "Connecting...": {
     "Connecting...": "درحال اتصال..."
   },
+  "Connecting…": {
+    "Connecting…": ""
+  },
   "Connection failed": {
     "Connection failed": "اتصال ناموفق بود"
   },
@@ -1969,6 +1975,9 @@
   },
   "Creating...": {
     "Creating...": "درحال ایجاد..."
+  },
+  "Credentials": {
+    "Credentials": ""
   },
   "Critical Battery": {
     "Critical Battery": ""
@@ -2828,6 +2837,9 @@
   "Enter PIN for ": {
     "Enter PIN for ": "ورود PIN برای "
   },
+  "Enter URI or text to share": {
+    "Enter URI or text to share": ""
+  },
   "Enter URL or text to share": {
     "Enter URL or text to share": "متن یا URL برای اشتراک‌گذاری وارد کنید"
   },
@@ -3146,6 +3158,9 @@
   "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": {
     "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": "اجرای 'dms greeter status' ناموفق بود. از نصب DMS و بودن dms در PATH اطمینان حاصل نمایید."
   },
+  "Failed to save VPN credentials": {
+    "Failed to save VPN credentials": ""
+  },
   "Failed to save audio config": {
     "Failed to save audio config": "ذخیره پیکربندی صوتی ناموفق بود"
   },
@@ -3157,6 +3172,9 @@
   },
   "Failed to save profile": {
     "Failed to save profile": "ذخیره پروفایل ناموفق بود"
+  },
+  "Failed to send SMS": {
+    "Failed to send SMS": ""
   },
   "Failed to send clipboard": {
     "Failed to send clipboard": "ارسال کلیپ‌بورد ناموفق بود"
@@ -3503,6 +3521,9 @@
   "Format Legend": {
     "Format Legend": "راهنمای قالب‌بندی"
   },
+  "Forward 10s": {
+    "Forward 10s": ""
+  },
   "Frame": {
     "Frame": "قاب"
   },
@@ -3818,6 +3839,9 @@
   "Hide device": {
     "Hide device": "پنهان کردن دستگاه"
   },
+  "Hide installed": {
+    "Hide installed": ""
+  },
   "Hide notification content until expanded": {
     "Hide notification content until expanded": "پنهان کردن محتوای اعلان را تا هنگام گسترش"
   },
@@ -4126,6 +4150,9 @@
   },
   "Installed": {
     "Installed": "نصب شده"
+  },
+  "Installed first": {
+    "Installed first": ""
   },
   "Installed: %1": {
     "Installed: %1": "نصب شده: %1"
@@ -4952,6 +4979,9 @@
   "Network Status": {
     "Network Status": "وضعیت شبکه"
   },
+  "Network Type": {
+    "Network Type": ""
+  },
   "Network download and upload speed display": {
     "Network download and upload speed display": "نمایش سرعت بارگیری و بارگذاری شبکه"
   },
@@ -5179,6 +5209,9 @@
   },
   "No human user accounts found.": {
     "No human user accounts found.": "هیچ حساب کاربری انسانی یافت نشد."
+  },
+  "No images found": {
+    "No images found": ""
   },
   "No info items": {
     "No info items": "مورد اطلاعاتی وجود ندارد"
@@ -5888,6 +5921,9 @@
   "Place the dock on the Wayland overlay layer": {
     "Place the dock on the Wayland overlay layer": "داک را روی لایه overlay ویلند قرار بده"
   },
+  "Play": {
+    "Play": ""
+  },
   "Play a video when the screen locks.": {
     "Play a video when the screen locks.": "یک ویدئو هنگامی که صفحه قفل شده پخش شود."
   },
@@ -6101,6 +6137,9 @@
   "Preview: %1": {
     "Preview: %1": ""
   },
+  "Previous": {
+    "Previous": ""
+  },
   "Primary": {
     "Primary": "اصلی"
   },
@@ -6286,6 +6325,9 @@
   },
   "Recent Colors": {
     "Recent Colors": "رنگ‌های اخیر"
+  },
+  "Recent Images": {
+    "Recent Images": ""
   },
   "Recently Used Apps": {
     "Recently Used Apps": "برنامه‌های استفاده شده اخیر"
@@ -6509,6 +6551,9 @@
   "Revert": {
     "Revert": "برگرداندن"
   },
+  "Rewind 10s": {
+    "Rewind 10s": ""
+  },
   "Right": {
     "Right": "راست"
   },
@@ -6596,6 +6641,9 @@
   "SMS": {
     "SMS": "SMS"
   },
+  "SMS sent successfully": {
+    "SMS sent successfully": ""
+  },
   "Saturation": {
     "Saturation": ""
   },
@@ -6616,6 +6664,9 @@
   },
   "Save and switch between display configurations": {
     "Save and switch between display configurations": "ذخیره و جابه‌جایی بین پیکربندی‌های نمایشگر"
+  },
+  "Save credentials": {
+    "Save credentials": ""
   },
   "Save critical priority notifications to history": {
     "Save critical priority notifications to history": "اعلان‌ها با اولویت حیاتی را در تاریخچه ذخیره کن"
@@ -7370,6 +7421,9 @@
   "Signal": {
     "Signal": "سیگنال"
   },
+  "Signal Strength": {
+    "Signal Strength": ""
+  },
   "Signal:": {
     "Signal:": "سیگنال:"
   },
@@ -8123,6 +8177,9 @@
   "Typography & Motion": {
     "Typography & Motion": "تایپوگرافی و حرکت"
   },
+  "URI": {
+    "URI": ""
+  },
   "Unavailable": {
     "Unavailable": "ناموجود"
   },
@@ -8459,6 +8516,9 @@
   "VPN configuration updated": {
     "VPN configuration updated": "گذرواژه VPN بروز شد"
   },
+  "VPN credentials saved": {
+    "VPN credentials saved": ""
+  },
   "VPN deleted": {
     "VPN deleted": "VPN حذف شد"
   },
@@ -8551,6 +8611,9 @@
   },
   "Volume, brightness, and other system OSDs": {
     "Volume, brightness, and other system OSDs": "OSD‌های حجم صدا، روشنایی و سیستمی"
+  },
+  "Votes": {
+    "Votes": ""
   },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
@@ -8846,11 +8909,17 @@
   "brandon": {
     "brandon": "براندون"
   },
+  "broken": {
+    "broken": ""
+  },
   "by %1": {
     "by %1": "توسط %1"
   },
   "days": {
     "days": "روز"
+  },
+  "deprecated": {
+    "deprecated": ""
   },
   "detached": {
     "detached": "جدا شد"
@@ -8866,6 +8935,9 @@
   },
   "direct": {
     "direct": "مستقیم"
+  },
+  "discuss": {
+    "discuss": ""
   },
   "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": {
     "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": ""
@@ -9026,6 +9098,9 @@
   "this app": {
     "this app": "این برنامه"
   },
+  "unmaintained": {
+    "unmaintained": ""
+  },
   "until %1": {
     "until %1": "تا %1"
   },
@@ -9046,6 +9121,9 @@
   },
   "v%1 by %2": {
     "v%1 by %2": "نسخه %1 توسط %2"
+  },
+  "verified": {
+    "verified": ""
   },
   "wtype not available - install wtype for paste support": {
     "wtype not available - install wtype for paste support": "wtype در دسترس نیست - wtype را برای پشتیبانی از الصاق نصب کنید"

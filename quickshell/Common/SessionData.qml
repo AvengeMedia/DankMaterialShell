@@ -155,6 +155,7 @@ Singleton {
     property var recentColors: []
     property bool showThirdPartyPlugins: false
     property bool pluginBrowserInstalledFirst: false
+    property bool pluginBrowserHideInstalled: true
     property string pluginBrowserSortMode: "default"
     property string launchPrefix: ""
     property string lastBrightnessDevice: ""
@@ -968,6 +969,11 @@ Singleton {
 
     function setPluginBrowserInstalledFirst(enabled) {
         pluginBrowserInstalledFirst = enabled;
+        saveSettings();
+    }
+
+    function setPluginBrowserHideInstalled(enabled) {
+        pluginBrowserHideInstalled = enabled;
         saveSettings();
     }
 

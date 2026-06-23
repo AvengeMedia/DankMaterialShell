@@ -107,6 +107,9 @@
   "%1 windows": {
     "%1 windows": "%1 fönster"
   },
+  "%1: %2": {
+    "%1: %2": ""
+  },
   "%1m ago": {
     "%1m ago": "för %1 min sedan"
   },
@@ -1790,6 +1793,9 @@
   "Connecting...": {
     "Connecting...": "Ansluter..."
   },
+  "Connecting…": {
+    "Connecting…": ""
+  },
   "Connection failed": {
     "Connection failed": "Anslutning misslyckades"
   },
@@ -1969,6 +1975,9 @@
   },
   "Creating...": {
     "Creating...": "Skapar..."
+  },
+  "Credentials": {
+    "Credentials": ""
   },
   "Critical Battery": {
     "Critical Battery": ""
@@ -2828,6 +2837,9 @@
   "Enter PIN for ": {
     "Enter PIN for ": "Ange PIN för "
   },
+  "Enter URI or text to share": {
+    "Enter URI or text to share": ""
+  },
   "Enter URL or text to share": {
     "Enter URL or text to share": "Ange URL eller text att dela"
   },
@@ -3146,6 +3158,9 @@
   "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": {
     "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": "Misslyckades med att köra 'dms greeter status'. Se till att DMS är installerat och att dms finns i PATH."
   },
+  "Failed to save VPN credentials": {
+    "Failed to save VPN credentials": ""
+  },
   "Failed to save audio config": {
     "Failed to save audio config": "Misslyckades med att spara ljudkonfiguration"
   },
@@ -3157,6 +3172,9 @@
   },
   "Failed to save profile": {
     "Failed to save profile": ""
+  },
+  "Failed to send SMS": {
+    "Failed to send SMS": ""
   },
   "Failed to send clipboard": {
     "Failed to send clipboard": "Misslyckades med att skicka urklipp"
@@ -3503,6 +3521,9 @@
   "Format Legend": {
     "Format Legend": "Formateringsguide"
   },
+  "Forward 10s": {
+    "Forward 10s": ""
+  },
   "Frame": {
     "Frame": ""
   },
@@ -3818,6 +3839,9 @@
   "Hide device": {
     "Hide device": "Dölj enhet"
   },
+  "Hide installed": {
+    "Hide installed": ""
+  },
   "Hide notification content until expanded": {
     "Hide notification content until expanded": "Dölj notisinnehåll tills det expanderas"
   },
@@ -4126,6 +4150,9 @@
   },
   "Installed": {
     "Installed": "Installerat"
+  },
+  "Installed first": {
+    "Installed first": ""
   },
   "Installed: %1": {
     "Installed: %1": "Installerat: %1"
@@ -4952,6 +4979,9 @@
   "Network Status": {
     "Network Status": "Nätverksstatus"
   },
+  "Network Type": {
+    "Network Type": ""
+  },
   "Network download and upload speed display": {
     "Network download and upload speed display": "Visa upp- och nedladdningshastighet"
   },
@@ -5179,6 +5209,9 @@
   },
   "No human user accounts found.": {
     "No human user accounts found.": ""
+  },
+  "No images found": {
+    "No images found": ""
   },
   "No info items": {
     "No info items": "Inga informationsobjekt"
@@ -5888,6 +5921,9 @@
   "Place the dock on the Wayland overlay layer": {
     "Place the dock on the Wayland overlay layer": ""
   },
+  "Play": {
+    "Play": ""
+  },
   "Play a video when the screen locks.": {
     "Play a video when the screen locks.": "Spela upp en video när skärmen låses."
   },
@@ -6101,6 +6137,9 @@
   "Preview: %1": {
     "Preview: %1": ""
   },
+  "Previous": {
+    "Previous": ""
+  },
   "Primary": {
     "Primary": "Primär"
   },
@@ -6286,6 +6325,9 @@
   },
   "Recent Colors": {
     "Recent Colors": "Nyligen använda färger"
+  },
+  "Recent Images": {
+    "Recent Images": ""
   },
   "Recently Used Apps": {
     "Recently Used Apps": "Nyligen använda appar"
@@ -6509,6 +6551,9 @@
   "Revert": {
     "Revert": "Återställ"
   },
+  "Rewind 10s": {
+    "Rewind 10s": ""
+  },
   "Right": {
     "Right": "Höger"
   },
@@ -6596,6 +6641,9 @@
   "SMS": {
     "SMS": "SMS"
   },
+  "SMS sent successfully": {
+    "SMS sent successfully": ""
+  },
   "Saturation": {
     "Saturation": ""
   },
@@ -6616,6 +6664,9 @@
   },
   "Save and switch between display configurations": {
     "Save and switch between display configurations": "Spara och växla mellan bildskärmskonfigurationer"
+  },
+  "Save credentials": {
+    "Save credentials": ""
   },
   "Save critical priority notifications to history": {
     "Save critical priority notifications to history": "Spara notiser med kritisk prioritet i historiken"
@@ -7370,6 +7421,9 @@
   "Signal": {
     "Signal": "Signal"
   },
+  "Signal Strength": {
+    "Signal Strength": ""
+  },
   "Signal:": {
     "Signal:": "Signal:"
   },
@@ -8123,6 +8177,9 @@
   "Typography & Motion": {
     "Typography & Motion": "Typografi & rörelse"
   },
+  "URI": {
+    "URI": ""
+  },
   "Unavailable": {
     "Unavailable": "Otillgänglig"
   },
@@ -8459,6 +8516,9 @@
   "VPN configuration updated": {
     "VPN configuration updated": "VPN-konfiguration uppdaterad"
   },
+  "VPN credentials saved": {
+    "VPN credentials saved": ""
+  },
   "VPN deleted": {
     "VPN deleted": "VPN raderat"
   },
@@ -8551,6 +8611,9 @@
   },
   "Volume, brightness, and other system OSDs": {
     "Volume, brightness, and other system OSDs": "Volym, ljusstyrka och andra systemskärmvisningar"
+  },
+  "Votes": {
+    "Votes": ""
   },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
@@ -8846,11 +8909,17 @@
   "brandon": {
     "brandon": "brandon"
   },
+  "broken": {
+    "broken": ""
+  },
   "by %1": {
     "by %1": "av %1"
   },
   "days": {
     "days": "dagar"
+  },
+  "deprecated": {
+    "deprecated": ""
   },
   "detached": {
     "detached": "frånkopplad"
@@ -8866,6 +8935,9 @@
   },
   "direct": {
     "direct": ""
+  },
+  "discuss": {
+    "discuss": ""
   },
   "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": {
     "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": "dms är ett mycket anpassningsbart, modernt skrivbordsskal med en <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">Material 3-inspirerad</a> design.<br /><br/>Det är byggt med <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, ett QT6-ramverk för att bygga skrivbordsskal, och <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, ett statiskt typat kompilerat programmeringsspråk."
@@ -9026,6 +9098,9 @@
   "this app": {
     "this app": "den här appen"
   },
+  "unmaintained": {
+    "unmaintained": ""
+  },
   "until %1": {
     "until %1": ""
   },
@@ -9046,6 +9121,9 @@
   },
   "v%1 by %2": {
     "v%1 by %2": "v%1 av %2"
+  },
+  "verified": {
+    "verified": ""
   },
   "wtype not available - install wtype for paste support": {
     "wtype not available - install wtype for paste support": "wtype är inte tillgängligt – installera wtype för inklistrningsstöd"

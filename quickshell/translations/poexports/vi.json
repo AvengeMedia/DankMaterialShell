@@ -107,6 +107,9 @@
   "%1 windows": {
     "%1 windows": "%1 cửa sổ"
   },
+  "%1: %2": {
+    "%1: %2": ""
+  },
   "%1m ago": {
     "%1m ago": "%1 phút trước"
   },
@@ -1790,6 +1793,9 @@
   "Connecting...": {
     "Connecting...": "Đang kết nối..."
   },
+  "Connecting…": {
+    "Connecting…": ""
+  },
   "Connection failed": {
     "Connection failed": "Kết nối thất bại"
   },
@@ -1969,6 +1975,9 @@
   },
   "Creating...": {
     "Creating...": "Đang tạo..."
+  },
+  "Credentials": {
+    "Credentials": ""
   },
   "Critical Battery": {
     "Critical Battery": ""
@@ -2828,6 +2837,9 @@
   "Enter PIN for ": {
     "Enter PIN for ": "Nhập PIN cho "
   },
+  "Enter URI or text to share": {
+    "Enter URI or text to share": ""
+  },
   "Enter URL or text to share": {
     "Enter URL or text to share": "Nhập URL hoặc văn bản để chia sẻ"
   },
@@ -3146,6 +3158,9 @@
   "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": {
     "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": "Chạy 'dms greeter status' thất bại. Đảm bảo DMS đã được cài đặt và dms có trong PATH."
   },
+  "Failed to save VPN credentials": {
+    "Failed to save VPN credentials": ""
+  },
   "Failed to save audio config": {
     "Failed to save audio config": "Lưu cấu hình âm thanh thất bại"
   },
@@ -3157,6 +3172,9 @@
   },
   "Failed to save profile": {
     "Failed to save profile": "Lưu cấu hình thất bại"
+  },
+  "Failed to send SMS": {
+    "Failed to send SMS": ""
   },
   "Failed to send clipboard": {
     "Failed to send clipboard": "Gửi bảng nhớ tạm thất bại"
@@ -3503,6 +3521,9 @@
   "Format Legend": {
     "Format Legend": "Chú thích định dạng"
   },
+  "Forward 10s": {
+    "Forward 10s": ""
+  },
   "Frame": {
     "Frame": "Khung"
   },
@@ -3818,6 +3839,9 @@
   "Hide device": {
     "Hide device": "Ẩn thiết bị"
   },
+  "Hide installed": {
+    "Hide installed": ""
+  },
   "Hide notification content until expanded": {
     "Hide notification content until expanded": "Ẩn nội dung thông báo cho đến khi được mở rộng"
   },
@@ -4126,6 +4150,9 @@
   },
   "Installed": {
     "Installed": "Đã cài đặt"
+  },
+  "Installed first": {
+    "Installed first": ""
   },
   "Installed: %1": {
     "Installed: %1": "Đã cài đặt: %1"
@@ -4952,6 +4979,9 @@
   "Network Status": {
     "Network Status": "Trạng thái mạng"
   },
+  "Network Type": {
+    "Network Type": ""
+  },
   "Network download and upload speed display": {
     "Network download and upload speed display": "Hiển thị tốc độ mạng (tải lên & tải xuống)"
   },
@@ -5179,6 +5209,9 @@
   },
   "No human user accounts found.": {
     "No human user accounts found.": "Không tìm thấy tài khoản người dùng người thật nào."
+  },
+  "No images found": {
+    "No images found": ""
   },
   "No info items": {
     "No info items": "Không có mục thông tin nào"
@@ -5888,6 +5921,9 @@
   "Place the dock on the Wayland overlay layer": {
     "Place the dock on the Wayland overlay layer": "Đặt thanh dock trên lớp phủ Wayland"
   },
+  "Play": {
+    "Play": ""
+  },
   "Play a video when the screen locks.": {
     "Play a video when the screen locks.": "Phát một video khi màn hình khóa."
   },
@@ -6101,6 +6137,9 @@
   "Preview: %1": {
     "Preview: %1": ""
   },
+  "Previous": {
+    "Previous": ""
+  },
   "Primary": {
     "Primary": "Chính"
   },
@@ -6286,6 +6325,9 @@
   },
   "Recent Colors": {
     "Recent Colors": "Màu gần đây"
+  },
+  "Recent Images": {
+    "Recent Images": ""
   },
   "Recently Used Apps": {
     "Recently Used Apps": "Ứng dụng đã dùng gần đây"
@@ -6509,6 +6551,9 @@
   "Revert": {
     "Revert": "Hoàn tác"
   },
+  "Rewind 10s": {
+    "Rewind 10s": ""
+  },
   "Right": {
     "Right": "Phải"
   },
@@ -6596,6 +6641,9 @@
   "SMS": {
     "SMS": "SMS"
   },
+  "SMS sent successfully": {
+    "SMS sent successfully": ""
+  },
   "Saturation": {
     "Saturation": "Độ bão hòa"
   },
@@ -6616,6 +6664,9 @@
   },
   "Save and switch between display configurations": {
     "Save and switch between display configurations": "Lưu và chuyển đổi giữa các cấu hình hiển thị"
+  },
+  "Save credentials": {
+    "Save credentials": ""
   },
   "Save critical priority notifications to history": {
     "Save critical priority notifications to history": "Lưu thông báo ưu tiên khẩn cấp vào lịch sử"
@@ -7370,6 +7421,9 @@
   "Signal": {
     "Signal": "Tín hiệu"
   },
+  "Signal Strength": {
+    "Signal Strength": ""
+  },
   "Signal:": {
     "Signal:": "Tín hiệu:"
   },
@@ -8123,6 +8177,9 @@
   "Typography & Motion": {
     "Typography & Motion": "Kiểu chữ & Chuyển động"
   },
+  "URI": {
+    "URI": ""
+  },
   "Unavailable": {
     "Unavailable": "Không khả dụng"
   },
@@ -8459,6 +8516,9 @@
   "VPN configuration updated": {
     "VPN configuration updated": "Đã cập nhật cấu hình VPN"
   },
+  "VPN credentials saved": {
+    "VPN credentials saved": ""
+  },
   "VPN deleted": {
     "VPN deleted": "Đã xóa VPN"
   },
@@ -8551,6 +8611,9 @@
   },
   "Volume, brightness, and other system OSDs": {
     "Volume, brightness, and other system OSDs": "Âm lượng, độ sáng và OSD hệ thống khác"
+  },
+  "Votes": {
+    "Votes": ""
   },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
@@ -8846,11 +8909,17 @@
   "brandon": {
     "brandon": "brandon (Kiểu)"
   },
+  "broken": {
+    "broken": ""
+  },
   "by %1": {
     "by %1": "bởi %1"
   },
   "days": {
     "days": "ngày"
+  },
+  "deprecated": {
+    "deprecated": ""
   },
   "detached": {
     "detached": "đã tách ra"
@@ -8866,6 +8935,9 @@
   },
   "direct": {
     "direct": "trực tiếp"
+  },
+  "discuss": {
+    "discuss": ""
   },
   "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": {
     "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": "dms là một shell desktop hiện đại, có khả năng tùy chỉnh cao với thiết kế <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">lấy cảm hứng từ material 3</a>.<br /><br/>Nó được xây dựng bằng <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, một framework QT6 để xây dựng shell desktop, và <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, một ngôn ngữ lập trình biên dịch, định kiểu tĩnh."
@@ -9026,6 +9098,9 @@
   "this app": {
     "this app": "ứng dụng này"
   },
+  "unmaintained": {
+    "unmaintained": ""
+  },
   "until %1": {
     "until %1": "cho đến %1"
   },
@@ -9046,6 +9121,9 @@
   },
   "v%1 by %2": {
     "v%1 by %2": "v%1 bởi %2"
+  },
+  "verified": {
+    "verified": ""
   },
   "wtype not available - install wtype for paste support": {
     "wtype not available - install wtype for paste support": "wtype không khả dụng - hãy cài đặt wtype để hỗ trợ dán"

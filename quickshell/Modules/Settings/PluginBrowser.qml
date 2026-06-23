@@ -34,13 +34,18 @@ FloatingWindow {
 
     readonly property var sortChipOptions: [
         {
+            id: "hideInstalled",
+            label: I18n.tr("Hide installed", "plugin browser filter chip"),
+            toggle: true
+        },
+        {
             id: "installed",
-            label: I18n.tr("Installed", "plugin browser filter chip"),
+            label: I18n.tr("Installed first", "plugin browser filter chip"),
             toggle: true
         },
         {
             id: "default",
-            label: I18n.tr("Default", "plugin browser sort option"),
+            label: I18n.tr("Votes", "plugin browser sort option"),
             toggle: false
         },
         {
@@ -69,8 +74,11 @@ FloatingWindow {
     }
 
     function isSortChipSelected(chipId, toggle) {
-        if (toggle)
+        if (toggle) {
+            if (chipId === "hideInstalled")
+                return SessionData.pluginBrowserHideInstalled;
             return SessionData.pluginBrowserInstalledFirst;
+        }
         return normalizedSortMode(SessionData.pluginBrowserSortMode) === chipId;
     }
 
@@ -82,6 +90,38 @@ FloatingWindow {
         if (nameA > nameB)
             return 1;
         return 0;
+    }
+
+    function pluginVerified(plugin) {
+        return (plugin.status || []).indexOf("verified") !== -1;
+    }
+
+    function statusColor(status) {
+        switch (status) {
+        case "broken":
+            return Theme.error;
+        case "unmaintained":
+            return Theme.warning;
+        case "verified":
+            return Theme.info;
+        default:
+            return Theme.outline;
+        }
+    }
+
+    function statusLabel(status) {
+        switch (status) {
+        case "broken":
+            return I18n.tr("broken", "plugin status");
+        case "unmaintained":
+            return I18n.tr("unmaintained", "plugin status");
+        case "deprecated":
+            return I18n.tr("deprecated", "plugin status");
+        case "verified":
+            return I18n.tr("verified", "plugin status");
+        default:
+            return status;
+        }
     }
 
     function comparePluginAuthor(a, b) {
@@ -257,6 +297,8 @@ FloatingWindow {
         }
 
         var filtered = baseFiltered.slice();
+        if (SessionData.pluginBrowserHideInstalled)
+            filtered = filtered.filter(p => !(p.installed || false));
         if (activeCategorySort && categoryFilter !== "all") {
             filtered = filtered.filter(p => {
                 var cat = (p.category || "").toLowerCase();
@@ -280,10 +322,14 @@ FloatingWindow {
                 return comparePluginAuthor(a, b);
             if (sortMode === "category")
                 return comparePluginCategory(a, b);
-            if (a.featured !== b.featured)
-                return a.featured ? -1 : 1;
-            if (a.firstParty !== b.firstParty)
-                return a.firstParty ? -1 : 1;
+            var votesA = a.upvotes || 0;
+            var votesB = b.upvotes || 0;
+            if (votesA !== votesB)
+                return votesB - votesA;
+            var verA = root.pluginVerified(a);
+            var verB = root.pluginVerified(b);
+            if (verA !== verB)
+                return verA ? -1 : 1;
             return comparePluginName(a, b);
         });
 
@@ -680,7 +726,10 @@ FloatingWindow {
                                 onPressed: mouse => chipRipple.trigger(mouse.x, mouse.y)
                                 onClicked: {
                                     if (modelData.toggle) {
-                                        SessionData.setPluginBrowserInstalledFirst(!SessionData.pluginBrowserInstalledFirst);
+                                        if (modelData.id === "hideInstalled")
+                                            SessionData.setPluginBrowserHideInstalled(!SessionData.pluginBrowserHideInstalled);
+                                        else
+                                            SessionData.setPluginBrowserInstalledFirst(!SessionData.pluginBrowserInstalledFirst);
                                     } else {
                                         if (modelData.id !== "category")
                                             root.categoryFilter = "all";
@@ -895,13 +944,70 @@ FloatingWindow {
                                                 font.weight: Font.Medium
                                             }
                                         }
+
+                                        Repeater {
+                                            model: modelData.status || []
+
+                                            Rectangle {
+                                                required property string modelData
+                                                height: 16
+                                                width: statusText.implicitWidth + Theme.spacingXS * 2
+                                                radius: 8
+                                                color: Theme.withAlpha(root.statusColor(modelData), 0.15)
+                                                border.color: Theme.withAlpha(root.statusColor(modelData), 0.4)
+                                                border.width: 1
+                                                anchors.verticalCenter: parent.verticalCenter
+
+                                                StyledText {
+                                                    id: statusText
+                                                    anchors.centerIn: parent
+                                                    text: root.statusLabel(parent.modelData)
+                                                    font.pixelSize: Theme.fontSizeSmall - 2
+                                                    color: root.statusColor(parent.modelData)
+                                                    font.weight: Font.Medium
+                                                }
+                                            }
+                                        }
+
+                                        Rectangle {
+                                            height: 16
+                                            width: upvoteRow.implicitWidth + Theme.spacingXS * 2
+                                            radius: 8
+                                            color: Theme.withAlpha(Theme.primary, 0.1)
+                                            border.color: Theme.withAlpha(Theme.primary, 0.3)
+                                            border.width: 1
+                                            visible: !!modelData.issueUrl
+                                            anchors.verticalCenter: parent.verticalCenter
+
+                                            Row {
+                                                id: upvoteRow
+                                                anchors.centerIn: parent
+                                                spacing: 2
+
+                                                DankIcon {
+                                                    name: "thumb_up"
+                                                    size: 10
+                                                    color: Theme.primary
+                                                    anchors.verticalCenter: parent.verticalCenter
+                                                }
+
+                                                StyledText {
+                                                    text: modelData.upvotes || 0
+                                                    font.pixelSize: Theme.fontSizeSmall - 2
+                                                    color: Theme.primary
+                                                    font.weight: Font.Medium
+                                                    anchors.verticalCenter: parent.verticalCenter
+                                                }
+                                            }
+                                        }
                                     }
 
                                     StyledText {
                                         text: {
                                             const author = I18n.tr("by %1", "author attribution").arg(modelData.author || I18n.tr("Unknown", "unknown author"));
                                             const source = modelData.repo ? ` • <a href="${modelData.repo}" style="text-decoration:none; color:${Theme.primary};">${I18n.tr("source", "source code link")}</a>` : "";
-                                            return author + source;
+                                            const discuss = modelData.issueUrl ? ` • <a href="${modelData.issueUrl}" style="text-decoration:none; color:${Theme.primary};">${I18n.tr("discuss", "plugin discussion link")}</a>` : "";
+                                            return author + source + discuss;
                                         }
                                         font.pixelSize: Theme.fontSizeSmall
                                         color: Theme.outline

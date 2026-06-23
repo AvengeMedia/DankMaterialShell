@@ -107,6 +107,9 @@
   "%1 windows": {
     "%1 windows": "ウィンドウ %1 個"
   },
+  "%1: %2": {
+    "%1: %2": ""
+  },
   "%1m ago": {
     "%1m ago": "%1分前"
   },
@@ -1790,6 +1793,9 @@
   "Connecting...": {
     "Connecting...": "接続中..."
   },
+  "Connecting…": {
+    "Connecting…": ""
+  },
   "Connection failed": {
     "Connection failed": "接続に失敗しました"
   },
@@ -1969,6 +1975,9 @@
   },
   "Creating...": {
     "Creating...": "作成中..."
+  },
+  "Credentials": {
+    "Credentials": ""
   },
   "Critical Battery": {
     "Critical Battery": ""
@@ -2828,6 +2837,9 @@
   "Enter PIN for ": {
     "Enter PIN for ": "PINを入力してください "
   },
+  "Enter URI or text to share": {
+    "Enter URI or text to share": ""
+  },
   "Enter URL or text to share": {
     "Enter URL or text to share": "共有する URL またはテキストを入力"
   },
@@ -3146,6 +3158,9 @@
   "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": {
     "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": "'dms greeter status' の実行に失敗しました。DMS がインストールされ、dms が PATH にあることを確認してください。"
   },
+  "Failed to save VPN credentials": {
+    "Failed to save VPN credentials": ""
+  },
   "Failed to save audio config": {
     "Failed to save audio config": "オーディオ設定の保存に失敗しました"
   },
@@ -3157,6 +3172,9 @@
   },
   "Failed to save profile": {
     "Failed to save profile": "プロファイルの保存に失敗しました"
+  },
+  "Failed to send SMS": {
+    "Failed to send SMS": ""
   },
   "Failed to send clipboard": {
     "Failed to send clipboard": "クリップボードの送信に失敗しました"
@@ -3503,6 +3521,9 @@
   "Format Legend": {
     "Format Legend": "フォーマット凡例"
   },
+  "Forward 10s": {
+    "Forward 10s": ""
+  },
   "Frame": {
     "Frame": "フレーム"
   },
@@ -3818,6 +3839,9 @@
   "Hide device": {
     "Hide device": "デバイスを非表示"
   },
+  "Hide installed": {
+    "Hide installed": ""
+  },
   "Hide notification content until expanded": {
     "Hide notification content until expanded": "展開するまで通知内容を非表示"
   },
@@ -4126,6 +4150,9 @@
   },
   "Installed": {
     "Installed": "インストール済み"
+  },
+  "Installed first": {
+    "Installed first": ""
   },
   "Installed: %1": {
     "Installed: %1": "インストール済み: %1"
@@ -4952,6 +4979,9 @@
   "Network Status": {
     "Network Status": "ネットワーク状態"
   },
+  "Network Type": {
+    "Network Type": ""
+  },
   "Network download and upload speed display": {
     "Network download and upload speed display": "ネットワークのダウンロードおよびアップロード速度を表示"
   },
@@ -5179,6 +5209,9 @@
   },
   "No human user accounts found.": {
     "No human user accounts found.": ""
+  },
+  "No images found": {
+    "No images found": ""
   },
   "No info items": {
     "No info items": "情報項目はありません"
@@ -5888,6 +5921,9 @@
   "Place the dock on the Wayland overlay layer": {
     "Place the dock on the Wayland overlay layer": ""
   },
+  "Play": {
+    "Play": ""
+  },
   "Play a video when the screen locks.": {
     "Play a video when the screen locks.": "画面がロックされたときに動画を再生します。"
   },
@@ -6101,6 +6137,9 @@
   "Preview: %1": {
     "Preview: %1": ""
   },
+  "Previous": {
+    "Previous": ""
+  },
   "Primary": {
     "Primary": "プライマリー"
   },
@@ -6286,6 +6325,9 @@
   },
   "Recent Colors": {
     "Recent Colors": "最近の色"
+  },
+  "Recent Images": {
+    "Recent Images": ""
   },
   "Recently Used Apps": {
     "Recently Used Apps": "最近使用したアプリ"
@@ -6509,6 +6551,9 @@
   "Revert": {
     "Revert": "戻す"
   },
+  "Rewind 10s": {
+    "Rewind 10s": ""
+  },
   "Right": {
     "Right": "右"
   },
@@ -6596,6 +6641,9 @@
   "SMS": {
     "SMS": "SMS"
   },
+  "SMS sent successfully": {
+    "SMS sent successfully": ""
+  },
   "Saturation": {
     "Saturation": ""
   },
@@ -6616,6 +6664,9 @@
   },
   "Save and switch between display configurations": {
     "Save and switch between display configurations": "ディスプレイ設定を保存して切り替える"
+  },
+  "Save credentials": {
+    "Save credentials": ""
   },
   "Save critical priority notifications to history": {
     "Save critical priority notifications to history": "最優先の通知を履歴に保存"
@@ -7370,6 +7421,9 @@
   "Signal": {
     "Signal": "Signal"
   },
+  "Signal Strength": {
+    "Signal Strength": ""
+  },
   "Signal:": {
     "Signal:": "Signal:"
   },
@@ -8123,6 +8177,9 @@
   "Typography & Motion": {
     "Typography & Motion": "タイポグラフィとモーション"
   },
+  "URI": {
+    "URI": ""
+  },
   "Unavailable": {
     "Unavailable": "利用できません"
   },
@@ -8459,6 +8516,9 @@
   "VPN configuration updated": {
     "VPN configuration updated": "VPN 設定を更新しました"
   },
+  "VPN credentials saved": {
+    "VPN credentials saved": ""
+  },
   "VPN deleted": {
     "VPN deleted": "VPN を削除しました"
   },
@@ -8551,6 +8611,9 @@
   },
   "Volume, brightness, and other system OSDs": {
     "Volume, brightness, and other system OSDs": "音量、明るさ、その他のシステム OSD"
+  },
+  "Votes": {
+    "Votes": ""
   },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
@@ -8846,11 +8909,17 @@
   "brandon": {
     "brandon": "brandon"
   },
+  "broken": {
+    "broken": ""
+  },
   "by %1": {
     "by %1": "%1 による"
   },
   "days": {
     "days": "日"
+  },
+  "deprecated": {
+    "deprecated": ""
   },
   "detached": {
     "detached": "切り離し済み"
@@ -8866,6 +8935,9 @@
   },
   "direct": {
     "direct": "直接"
+  },
+  "discuss": {
+    "discuss": ""
   },
   "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": {
     "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": "dms は、<a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">Material 3 に着想を得た</a>デザインを持つ、高度にカスタマイズ可能なモダンなデスクトップシェルです。<br /><br/>デスクトップシェルを構築するための QT6 フレームワークである <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a> と、静的型付けのコンパイル言語である <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a> で構築されています。"
@@ -9026,6 +9098,9 @@
   "this app": {
     "this app": "このアプリ"
   },
+  "unmaintained": {
+    "unmaintained": ""
+  },
   "until %1": {
     "until %1": "%1まで"
   },
@@ -9046,6 +9121,9 @@
   },
   "v%1 by %2": {
     "v%1 by %2": "v%1 by %2"
+  },
+  "verified": {
+    "verified": ""
   },
   "wtype not available - install wtype for paste support": {
     "wtype not available - install wtype for paste support": "wtype は利用できません - 貼り付け対応には wtype をインストールしてください"

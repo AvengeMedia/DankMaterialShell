@@ -107,6 +107,9 @@
   "%1 windows": {
     "%1 windows": "%1 个窗口"
   },
+  "%1: %2": {
+    "%1: %2": ""
+  },
   "%1m ago": {
     "%1m ago": "%1 分钟前"
   },
@@ -324,7 +327,7 @@
     "A user with that name already exists.": "已存在同名用户。"
   },
   "AC Adapter (Plugged In)": {
-    "AC Adapter (Plugged In)": ""
+    "AC Adapter (Plugged In)": "交流电适配器（已插入）"
   },
   "AC Power": {
     "AC Power": "交流电"
@@ -528,7 +531,7 @@
     "Allow": "允许"
   },
   "Allow LAN access": {
-    "Allow LAN access": ""
+    "Allow LAN access": "允许局域网访问"
   },
   "Allow adjusting device volume by scrolling on the right half of items in the device list": {
     "Allow adjusting device volume by scrolling on the right half of items in the device list": "允许在设备列表项目右半部分滚动鼠标滚轮调整设备音量"
@@ -672,7 +675,7 @@
     "Apply inverse concave corner cutouts to the bar": "为状态栏应用反向凹角裁切"
   },
   "Apply to Hardware": {
-    "Apply to Hardware": ""
+    "Apply to Hardware": "应用到硬件"
   },
   "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": {
     "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": "应用暖色温以减轻眼睛疲劳，可通过下方设置控制自动激活时间。"
@@ -828,7 +831,7 @@
     "Auto Popup Gaps": "自动弹窗间隙"
   },
   "Auto Power Saver": {
-    "Auto Power Saver": ""
+    "Auto Power Saver": "自动省电"
   },
   "Auto mode is on. Manual profile selection is disabled.": {
     "Auto mode is on. Manual profile selection is disabled.": "自动模式已开启。手动选择配置已禁用。"
@@ -924,7 +927,7 @@
     "Automatically save changes to opened files as you type": "键入时自动保存变更"
   },
   "Automatically turn on Power Saver profile when battery is low.": {
-    "Automatically turn on Power Saver profile when battery is low.": ""
+    "Automatically turn on Power Saver profile when battery is low.": "低电量时自动启用省电配置"
   },
   "Automation": {
     "Automation": "自动化"
@@ -978,7 +981,7 @@
     "Background Blur": "背景模糊"
   },
   "Background Color": {
-    "Background Color": ""
+    "Background Color": "背景颜色"
   },
   "Background Effect": {
     "Background Effect": "背景效果"
@@ -1014,7 +1017,7 @@
     "Bar Configurations": "状态栏设置"
   },
   "Bar Inset Padding": {
-    "Bar Inset Padding": ""
+    "Bar Inset Padding": "状态栏内嵌边距"
   },
   "Bar Opacity": {
     "Bar Opacity": "状态栏不透明度"
@@ -1023,7 +1026,7 @@
     "Bar Shadows": "状态栏阴影"
   },
   "Bar Spacing": {
-    "Bar Spacing": ""
+    "Bar Spacing": "状态栏间距"
   },
   "Bar Transparency": {
     "Bar Transparency": "状态栏透明度"
@@ -1053,34 +1056,34 @@
     "Battery Charge Limit": "电池充电限制"
   },
   "Battery Health": {
-    "Battery Health": ""
+    "Battery Health": "电池健康"
   },
   "Battery Power": {
-    "Battery Power": ""
+    "Battery Power": "电池电量"
   },
   "Battery Protection & Charging": {
-    "Battery Protection & Charging": ""
+    "Battery Protection & Charging": "电池保护与充电"
   },
   "Battery Status": {
-    "Battery Status": ""
+    "Battery Status": "电池状态"
   },
   "Battery and power management": {
     "Battery and power management": "电池与电源管理"
   },
   "Battery has charged to your set limit of %1%": {
-    "Battery has charged to your set limit of %1%": ""
+    "Battery has charged to your set limit of %1%": "电池已充电至设置的上限 %1%"
   },
   "Battery is at %1% - Connect charger immediately!": {
-    "Battery is at %1% - Connect charger immediately!": ""
+    "Battery is at %1% - Connect charger immediately!": "电池电量 %1% - 请立即连接充电器！"
   },
   "Battery is at %1% - Consider charging soon": {
-    "Battery is at %1% - Consider charging soon": ""
+    "Battery is at %1% - Consider charging soon": "电池电量 %1% - 请考虑尽快充电"
   },
   "Battery level and power management": {
     "Battery level and power management": "电池电量与电源管理"
   },
   "Battery percentage to trigger a critical alert.": {
-    "Battery percentage to trigger a critical alert.": ""
+    "Battery percentage to trigger a critical alert.": "触发警报的电量百分比"
   },
   "Behavior": {
     "Behavior": "行为"
@@ -1368,13 +1371,13 @@
     "Channel": "频道"
   },
   "Charge Level": {
-    "Charge Level": ""
+    "Charge Level": "充电级别"
   },
   "Charge Limit Reached": {
-    "Charge Limit Reached": ""
+    "Charge Limit Reached": "已达充电上限"
   },
   "Charge limit applied successfully": {
-    "Charge limit applied successfully": ""
+    "Charge limit applied successfully": "充电限制应用成功"
   },
   "Charging": {
     "Charging": "充电"
@@ -1437,7 +1440,7 @@
     "Choose how this bar resolves shadow direction": "选择此状态栏解析阴影方向的方式"
   },
   "Choose how to be notified about battery alerts.": {
-    "Choose how to be notified about battery alerts.": ""
+    "Choose how to be notified about battery alerts.": "选择电量警报通知方式"
   },
   "Choose icon": {
     "Choose icon": "选择图标"
@@ -1533,13 +1536,13 @@
     "Click Through": "鼠标穿透"
   },
   "Click an entry to paste directly instead of copying": {
-    "Click an entry to paste directly instead of copying": ""
+    "Click an entry to paste directly instead of copying": "点击任一项目直接粘贴，而不是复制"
   },
   "Click any shortcut to edit. Changes save to %1": {
     "Click any shortcut to edit. Changes save to %1": "点击任意快捷方式以编辑。更改将保存至 %1。"
   },
   "Click to Paste": {
-    "Click to Paste": ""
+    "Click to Paste": "点击粘贴"
   },
   "Click to capture": {
     "Click to capture": "点击以捕获"
@@ -1790,6 +1793,9 @@
   "Connecting...": {
     "Connecting...": "正在连接..."
   },
+  "Connecting…": {
+    "Connecting…": ""
+  },
   "Connection failed": {
     "Connection failed": "连接失败"
   },
@@ -1970,20 +1976,23 @@
   "Creating...": {
     "Creating...": "正在创建..."
   },
+  "Credentials": {
+    "Credentials": ""
+  },
   "Critical Battery": {
-    "Critical Battery": ""
+    "Critical Battery": "电量警报"
   },
   "Critical Battery Alert": {
-    "Critical Battery Alert": ""
+    "Critical Battery Alert": "紧急电量警报"
   },
   "Critical Battery Notifications": {
-    "Critical Battery Notifications": ""
+    "Critical Battery Notifications": "紧急电量通知"
   },
   "Critical Priority": {
     "Critical Priority": "紧急优先级"
   },
   "Critical Threshold": {
-    "Critical Threshold": ""
+    "Critical Threshold": "警报阈值"
   },
   "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": {
     "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": "Ctrl+A：全选 • Ctrl+P：预览 • Enter/Shift+Enter：查找下一个/上一个 • ESC：关闭"
@@ -2208,7 +2217,7 @@
     "Dark Mode": "深色模式"
   },
   "Dark Mode Icon Theme": {
-    "Dark Mode Icon Theme": ""
+    "Dark Mode Icon Theme": "深色模式图标主题"
   },
   "Dark mode base": {
     "Dark mode base": "深色模式基于..."
@@ -2667,7 +2676,7 @@
     "Edge Spacing": "边缘间距"
   },
   "Edge spacing, exclusive zone, and popup gaps are managed by Frame": {
-    "Edge spacing, exclusive zone, and popup gaps are managed by Frame": ""
+    "Edge spacing, exclusive zone, and popup gaps are managed by Frame": "边缘空隙、排除区域及弹窗间隙受框架管理"
   },
   "Edge the launcher slides from": {
     "Edge the launcher slides from": "启动器滑入侧"
@@ -2828,6 +2837,9 @@
   "Enter PIN for ": {
     "Enter PIN for ": "输入 PIN "
   },
+  "Enter URI or text to share": {
+    "Enter URI or text to share": ""
+  },
   "Enter URL or text to share": {
     "Enter URL or text to share": "请输入想要共享的网址或文本"
   },
@@ -2895,7 +2907,7 @@
     "Errors": "错误"
   },
   "Estimated Time": {
-    "Estimated Time": ""
+    "Estimated Time": "预估时间"
   },
   "Ethernet": {
     "Ethernet": "以太网"
@@ -2925,7 +2937,7 @@
     "Existing Users": "现有用户"
   },
   "Exit node": {
-    "Exit node": ""
+    "Exit node": "退出节点"
   },
   "Experimental Feature": {
     "Experimental Feature": "实验性功能"
@@ -2991,7 +3003,7 @@
     "Failed to apply Qt colors": "应用 QT 配色失败"
   },
   "Failed to apply charge limit to system": {
-    "Failed to apply charge limit to system": ""
+    "Failed to apply charge limit to system": "充电限制应用到系统失败"
   },
   "Failed to apply profile": {
     "Failed to apply profile": "应用配置失败"
@@ -3146,6 +3158,9 @@
   "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": {
     "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": "运行 'dms greeter status' 失败。确保 DMS 已安装，且 dms 已在 PATH 中。"
   },
+  "Failed to save VPN credentials": {
+    "Failed to save VPN credentials": ""
+  },
   "Failed to save audio config": {
     "Failed to save audio config": "音频配置保存失败"
   },
@@ -3157,6 +3172,9 @@
   },
   "Failed to save profile": {
     "Failed to save profile": "保存配置失败"
+  },
+  "Failed to send SMS": {
+    "Failed to send SMS": ""
   },
   "Failed to send clipboard": {
     "Failed to send clipboard": "发送剪切板失败"
@@ -3285,7 +3303,7 @@
     "Filter": "筛选"
   },
   "Filter by type": {
-    "Filter by type": ""
+    "Filter by type": "类别筛选"
   },
   "Find in Text": {
     "Find in Text": "查找文本"
@@ -3503,6 +3521,9 @@
   "Format Legend": {
     "Format Legend": "参考格式"
   },
+  "Forward 10s": {
+    "Forward 10s": ""
+  },
   "Frame": {
     "Frame": "框架"
   },
@@ -3588,7 +3609,7 @@
     "Gamma control not available. Requires DMS API v6+.": "伽玛控制不可用，需要 DMS API v6+。"
   },
   "Gap between the end widgets and the bar ends (0 = edge-to-edge)": {
-    "Gap between the end widgets and the bar ends (0 = edge-to-edge)": ""
+    "Gap between the end widgets and the bar ends (0 = edge-to-edge)": "两端部件与状态栏之间的间隙（ 0 = 边靠边）"
   },
   "Generate Override": {
     "Generate Override": "生成 Override"
@@ -3818,6 +3839,9 @@
   "Hide device": {
     "Hide device": "隐藏设备"
   },
+  "Hide installed": {
+    "Hide installed": ""
+  },
   "Hide notification content until expanded": {
     "Hide notification content until expanded": "隐藏通知内容，直到展开"
   },
@@ -3960,7 +3984,7 @@
     "Icon Theme": "图标主题"
   },
   "Icon theme changed outside DMS; switched to System Default": {
-    "Icon theme changed outside DMS; switched to System Default": ""
+    "Icon theme changed outside DMS; switched to System Default": "图标主题在 DMS 之外变更，切换至系统默认"
   },
   "Identical alerts show as one popup instead of stacking": {
     "Identical alerts show as one popup instead of stacking": "相同提醒显示为一个弹窗，而不是堆叠显示"
@@ -4127,6 +4151,9 @@
   "Installed": {
     "Installed": "已安装"
   },
+  "Installed first": {
+    "Installed first": ""
+  },
   "Installed: %1": {
     "Installed: %1": "已安装：%1"
   },
@@ -4197,7 +4224,7 @@
     "Keep in Bar": ""
   },
   "Keep the clipboard type filter when reopening history": {
-    "Keep the clipboard type filter when reopening history": ""
+    "Keep the clipboard type filter when reopening history": "重新打开剪切板历史记录时保持上次的筛选类别"
   },
   "Keep typing": {
     "Keep typing": "继续输入"
@@ -4341,7 +4368,7 @@
     "Light Mode": "浅色模式"
   },
   "Light Mode Icon Theme": {
-    "Light Mode Icon Theme": ""
+    "Light Mode Icon Theme": "浅色模式图标主题"
   },
   "Light Rain": {
     "Light Rain": "小雨"
@@ -4359,10 +4386,10 @@
     "Light mode harmony": "浅色模式调和"
   },
   "Limit set to %1%": {
-    "Limit set to %1%": ""
+    "Limit set to %1%": "电量限制设置为 %1%"
   },
   "Limit the maximum battery charge level to extend lifespan.": {
-    "Limit the maximum battery charge level to extend lifespan.": ""
+    "Limit the maximum battery charge level to extend lifespan.": "限制最大充电百分比以延长电池寿命"
   },
   "Line": {
     "Line": "线条"
@@ -4401,7 +4428,7 @@
     "Local": "本地"
   },
   "Local Weather": {
-    "Local Weather": ""
+    "Local Weather": "本地天气"
   },
   "Locale": {
     "Locale": "区域"
@@ -4476,13 +4503,13 @@
     "Low": "低"
   },
   "Low Battery": {
-    "Low Battery": ""
+    "Low Battery": "低电量"
   },
   "Low Battery Notifications": {
-    "Low Battery Notifications": ""
+    "Low Battery Notifications": "低电量通知"
   },
   "Low Battery Threshold": {
-    "Low Battery Threshold": ""
+    "Low Battery Threshold": "低电量阈值"
   },
   "Low Priority": {
     "Low Priority": "次要优先级"
@@ -4887,7 +4914,7 @@
     "Music Player": "音乐播放器"
   },
   "Mute During Playback": {
-    "Mute During Playback": ""
+    "Mute During Playback": "媒体播放时静音"
   },
   "Mute Popups": {
     "Mute Popups": "静音弹窗"
@@ -4951,6 +4978,9 @@
   },
   "Network Status": {
     "Network Status": "网络状态"
+  },
+  "Network Type": {
+    "Network Type": ""
   },
   "Network download and upload speed display": {
     "Network download and upload speed display": "显示网络下载与上传速度"
@@ -5180,6 +5210,9 @@
   "No human user accounts found.": {
     "No human user accounts found.": "未找到普通用户账户。"
   },
+  "No images found": {
+    "No images found": ""
+  },
   "No info items": {
     "No info items": "无信息项目"
   },
@@ -5400,7 +5433,7 @@
     "Nothing to see here": "空空如也"
   },
   "Notification": {
-    "Notification": ""
+    "Notification": "通知"
   },
   "Notification Center": {
     "Notification Center": "通知中心"
@@ -5424,7 +5457,7 @@
     "Notification Timeouts": "通知超时"
   },
   "Notification Type": {
-    "Notification Type": ""
+    "Notification Type": "通知类型"
   },
   "Notification toast popups": {
     "Notification toast popups": "通知弹窗"
@@ -5433,7 +5466,7 @@
     "Notifications": "通知"
   },
   "Notify when limit is reached": {
-    "Notify when limit is reached": ""
+    "Notify when limit is reached": "达到限制时通知"
   },
   "Numbers": {
     "Numbers": "数字"
@@ -5888,6 +5921,9 @@
   "Place the dock on the Wayland overlay layer": {
     "Place the dock on the Wayland overlay layer": "将程序坞置于 Wayland 叠加层"
   },
+  "Play": {
+    "Play": ""
+  },
   "Play a video when the screen locks.": {
     "Play a video when the screen locks.": "锁屏是播放视频。"
   },
@@ -6036,7 +6072,7 @@
     "Power Profile Degradation": "电源配置性能下降"
   },
   "Power Profiles Auto-Switching": {
-    "Power Profiles Auto-Switching": ""
+    "Power Profiles Auto-Switching": "性能模式自动切换"
   },
   "Power Saver": {
     "Power Saver": "省电"
@@ -6048,10 +6084,10 @@
     "Power profile management available": "电源配置管理可用"
   },
   "Power profile to use when AC power is connected.": {
-    "Power profile to use when AC power is connected.": ""
+    "Power profile to use when AC power is connected.": "交流电源连接时使用性能模式"
   },
   "Power profile to use when running on battery power.": {
-    "Power profile to use when running on battery power.": ""
+    "Power profile to use when running on battery power.": "电池供电时使用性能模式"
   },
   "Power source": {
     "Power source": "电源"
@@ -6099,7 +6135,10 @@
     "Preview": "预览"
   },
   "Preview: %1": {
-    "Preview: %1": ""
+    "Preview: %1": "预览：%1"
+  },
+  "Previous": {
+    "Previous": ""
   },
   "Primary": {
     "Primary": "主色"
@@ -6108,7 +6147,7 @@
     "Primary Container": "主色容器"
   },
   "Primary Theme Color": {
-    "Primary Theme Color": ""
+    "Primary Theme Color": "主要主题色"
   },
   "Print Server Management": {
     "Print Server Management": "打印服务器管理"
@@ -6159,7 +6198,7 @@
     "Process Count": "进程计数"
   },
   "Process exited with code %1": {
-    "Process exited with code %1": ""
+    "Process exited with code %1": "进程已退出，退出码：%1"
   },
   "Processes": {
     "Processes": "进程"
@@ -6198,10 +6237,10 @@
     "Profile saved: %1": "已保存配置：%1"
   },
   "Profile when Plugged In (AC)": {
-    "Profile when Plugged In (AC)": ""
+    "Profile when Plugged In (AC)": "电源供电配置模式"
   },
   "Profile when on Battery": {
-    "Profile when on Battery": ""
+    "Profile when on Battery": "电池供电配置模式"
   },
   "Protocol": {
     "Protocol": "协议"
@@ -6287,6 +6326,9 @@
   "Recent Colors": {
     "Recent Colors": "最近拾取的颜色"
   },
+  "Recent Images": {
+    "Recent Images": ""
+  },
   "Recently Used Apps": {
     "Recently Used Apps": "最近使用的应用"
   },
@@ -6336,7 +6378,7 @@
     "Remember Last Query": "记忆上次查询"
   },
   "Remember Type Filter": {
-    "Remember Type Filter": ""
+    "Remember Type Filter": "记住筛选类型"
   },
   "Remember last session": {
     "Remember last session": "记住上次的会话"
@@ -6509,6 +6551,9 @@
   "Revert": {
     "Revert": "还原"
   },
+  "Rewind 10s": {
+    "Rewind 10s": ""
+  },
   "Right": {
     "Right": "右侧"
   },
@@ -6596,6 +6641,9 @@
   "SMS": {
     "SMS": "短信"
   },
+  "SMS sent successfully": {
+    "SMS sent successfully": ""
+  },
   "Saturation": {
     "Saturation": "饱和度"
   },
@@ -6616,6 +6664,9 @@
   },
   "Save and switch between display configurations": {
     "Save and switch between display configurations": "保存和切换显示器配置"
+  },
+  "Save credentials": {
+    "Save credentials": ""
   },
   "Save critical priority notifications to history": {
     "Save critical priority notifications to history": "将关键优先级通知保存至历史"
@@ -6639,7 +6690,7 @@
     "Saved Configurations": "已保存的配置"
   },
   "Saved Networks": {
-    "Saved Networks": ""
+    "Saved Networks": "已保存的网络"
   },
   "Saved Note": {
     "Saved Note": "已保存笔记"
@@ -6765,7 +6816,7 @@
     "Secondary": "辅色"
   },
   "Secondary Container": {
-    "Secondary Container": ""
+    "Secondary Container": "辅色容器"
   },
   "Secured": {
     "Secured": "已加密"
@@ -6909,7 +6960,7 @@
     "Separate": "分离"
   },
   "Separate Light & Dark Themes": {
-    "Separate Light & Dark Themes": ""
+    "Separate Light & Dark Themes": "区分浅色主题与深色主题"
   },
   "Separator": {
     "Separator": "分隔符"
@@ -6954,7 +7005,7 @@
     "Set the font size for notification summary text": "设置通知标题字号"
   },
   "Set the percentage at which the battery is considered low.": {
-    "Set the percentage at which the battery is considered low.": ""
+    "Set the percentage at which the battery is considered low.": "设置低电量百分比"
   },
   "Setting": {
     "Setting": "设置项"
@@ -7071,7 +7122,7 @@
     "Show Feels Like Temperature": "显示体感温度"
   },
   "Show Flatpak, Snap, AppImage, or Nix badge icons on launcher items.": {
-    "Show Flatpak, Snap, AppImage, or Nix badge icons on launcher items.": ""
+    "Show Flatpak, Snap, AppImage, or Nix badge icons on launcher items.": "在启动器项目上显示 Flatpak、Snap、AppImage 或者 Nix 徽标"
   },
   "Show Footer": {
     "Show Footer": "显示页脚"
@@ -7146,13 +7197,13 @@
     "Show Overflow Badge Count": "显示溢出徽标计数"
   },
   "Show Package Source Badges": {
-    "Show Package Source Badges": ""
+    "Show Package Source Badges": "显示包来源徽标"
   },
   "Show Password Field": {
     "Show Password Field": "显示密码区域"
   },
   "Show Percentage": {
-    "Show Percentage": ""
+    "Show Percentage": "显示百分比"
   },
   "Show Power Actions": {
     "Show Power Actions": "显示电源操作"
@@ -7173,7 +7224,7 @@
     "Show Reboot": "显示重启"
   },
   "Show Remaining Time": {
-    "Show Remaining Time": ""
+    "Show Remaining Time": "显示剩余时间"
   },
   "Show Restart DMS": {
     "Show Restart DMS": "显示重启 DMS"
@@ -7230,10 +7281,10 @@
     "Show a bar that drains as the popup's auto-dismiss timer runs": "显示随通知弹窗超时倒计时而缩短的进度条"
   },
   "Show a notification when battery reaches the charge limit.": {
-    "Show a notification when battery reaches the charge limit.": ""
+    "Show a notification when battery reaches the charge limit.": "电池达到充电限制时显示通知"
   },
   "Show a warning popup when battery is running low.": {
-    "Show a warning popup when battery is running low.": ""
+    "Show a warning popup when battery is running low.": "低电量使用时显示警示弹窗"
   },
   "Show all 9 tags instead of only occupied tags": {
     "Show all 9 tags instead of only occupied tags": "显示所有的 9 个标签，而不是仅显示已占用的标签"
@@ -7242,7 +7293,7 @@
     "Show an outline ring around the focused workspace indicator": "在聚焦工作区指示器周围显示一个轮廓环"
   },
   "Show an urgent alert when battery reaches critical level.": {
-    "Show an urgent alert when battery reaches critical level.": ""
+    "Show an urgent alert when battery reaches critical level.": "电量达到紧急级别时显示紧急警报"
   },
   "Show cava audio visualizer in media widget": {
     "Show cava audio visualizer in media widget": "在多媒体部件中显示 cava 音频可视化"
@@ -7370,6 +7421,9 @@
   "Signal": {
     "Signal": "信号"
   },
+  "Signal Strength": {
+    "Signal Strength": ""
+  },
   "Signal:": {
     "Signal:": "信号："
   },
@@ -7380,7 +7434,7 @@
     "Silence notifications": "静默通知"
   },
   "Silence system sounds while media is playing": {
-    "Silence system sounds while media is playing": ""
+    "Silence system sounds while media is playing": "媒体播放时消除系统声音"
   },
   "Single-Line Popup": {
     "Single-Line Popup": "单行弹窗"
@@ -7536,7 +7590,7 @@
     "Stripes": "条纹"
   },
   "Subtle Overlay": {
-    "Subtle Overlay": ""
+    "Subtle Overlay": "轻微叠加"
   },
   "Summary": {
     "Summary": "概要"
@@ -7563,22 +7617,22 @@
     "Surface Behavior": "平面行为"
   },
   "Surface Container": {
-    "Surface Container": ""
+    "Surface Container": "平面容器"
   },
   "Surface High": {
-    "Surface High": ""
+    "Surface High": "平面增亮"
   },
   "Surface Highest": {
-    "Surface Highest": ""
+    "Surface Highest": "平面极亮"
   },
   "Surface Opacity": {
     "Surface Opacity": "平面不透明度"
   },
   "Surface Text": {
-    "Surface Text": ""
+    "Surface Text": "平面文字"
   },
   "Surface Variant": {
-    "Surface Variant": "平面色变体"
+    "Surface Variant": "平面变体"
   },
   "Surfaces emerge flush from the bar": {
     "Surfaces emerge flush from the bar": "平面从状态栏涌出"
@@ -7614,7 +7668,7 @@
     "Sync": "同步"
   },
   "Sync Bar Inset Padding": {
-    "Sync Bar Inset Padding": ""
+    "Sync Bar Inset Padding": "同步状态栏内嵌边距"
   },
   "Sync Mode with Portal": {
     "Sync Mode with Portal": "同步系统颜色模式"
@@ -7746,10 +7800,10 @@
     "Terminals - Always use Dark Theme": "终端总使用深色主题"
   },
   "Tertiary": {
-    "Tertiary": ""
+    "Tertiary": "三级"
   },
   "Tertiary Container": {
-    "Tertiary Container": ""
+    "Tertiary Container": "三级容器"
   },
   "Test Connection": {
     "Test Connection": "测试连接"
@@ -7959,7 +8013,7 @@
     "To use this DMS bind, remove or change the keybind in your config.kdl": "要使用此 DMS 绑定，请删除或更改 config.kdl 中的按键绑定"
   },
   "Toast": {
-    "Toast": ""
+    "Toast": "浮动通知"
   },
   "Toast Messages": {
     "Toast Messages": "弹出式信息"
@@ -8122,6 +8176,9 @@
   },
   "Typography & Motion": {
     "Typography & Motion": "排版与动画"
+  },
+  "URI": {
+    "URI": ""
   },
   "Unavailable": {
     "Unavailable": "不可用"
@@ -8343,7 +8400,7 @@
     "Use desktop wallpaper": "使用桌面壁纸"
   },
   "Use different icon themes for light and dark mode": {
-    "Use different icon themes for light and dark mode": ""
+    "Use different icon themes for light and dark mode": "为浅色模式与深色模式使用不同的图标主题"
   },
   "Use fingerprint authentication for the lock screen.": {
     "Use fingerprint authentication for the lock screen.": "为锁屏使用指纹认证。"
@@ -8358,7 +8415,7 @@
     "Use meters per second instead of km/h for wind speed": "使用 m/s 代替 km/h 来显示风速"
   },
   "Use one inset value for every bar": {
-    "Use one inset value for every bar": ""
+    "Use one inset value for every bar": "每个状态栏使用同一个内嵌值"
   },
   "Use smaller notification cards": {
     "Use smaller notification cards": "使用更小的通知卡片"
@@ -8459,6 +8516,9 @@
   "VPN configuration updated": {
     "VPN configuration updated": "VPN 配置已更新"
   },
+  "VPN credentials saved": {
+    "VPN credentials saved": ""
+  },
   "VPN deleted": {
     "VPN deleted": "VPN 已删除"
   },
@@ -8552,6 +8612,9 @@
   "Volume, brightness, and other system OSDs": {
     "Volume, brightness, and other system OSDs": "音量、亮度和其他系统 OSD"
   },
+  "Votes": {
+    "Votes": ""
+  },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
   },
@@ -8616,7 +8679,7 @@
     "When locked": "何时锁定"
   },
   "White": {
-    "White": ""
+    "White": "白色"
   },
   "Wi-Fi Password": {
     "Wi-Fi Password": "Wi-Fi 密码"
@@ -8670,7 +8733,7 @@
     "Widget Styling": "部件样式"
   },
   "Widget Text Style": {
-    "Widget Text Style": ""
+    "Widget Text Style": "部件文本风格"
   },
   "Widget Transparency": {
     "Widget Transparency": "部件透明度"
@@ -8846,11 +8909,17 @@
   "brandon": {
     "brandon": "brandon"
   },
+  "broken": {
+    "broken": ""
+  },
   "by %1": {
     "by %1": "%1"
   },
   "days": {
     "days": "天"
+  },
+  "deprecated": {
+    "deprecated": ""
   },
   "detached": {
     "detached": "已分离"
@@ -8866,6 +8935,9 @@
   },
   "direct": {
     "direct": "直接"
+  },
+  "discuss": {
+    "discuss": ""
   },
   "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": {
     "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": "DMS 是一款高度可自定义的现代桌面 Shell，采用受 <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">Material 3</a> 启发的设计。<br /><br/>DMS 基于 <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>（用于构建桌面 Shell 的 QT6 框架）和 <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>（静态类型编译型编程语言）开发。"
@@ -9026,6 +9098,9 @@
   "this app": {
     "this app": "此应用"
   },
+  "unmaintained": {
+    "unmaintained": ""
+  },
   "until %1": {
     "until %1": "直到 %1"
   },
@@ -9046,6 +9121,9 @@
   },
   "v%1 by %2": {
     "v%1 by %2": "v%1 by %2"
+  },
+  "verified": {
+    "verified": ""
   },
   "wtype not available - install wtype for paste support": {
     "wtype not available - install wtype for paste support": "wtype 不可用 - 安装 wtype 已支持粘贴功能"
