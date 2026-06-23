@@ -1,3 +1,6 @@
 #%PAM-1.0
 
 auth    required    pam_fprintd.so  max-tries=5
+account required    pam_permit.so
+password required   pam_deny.so
+session required    pam_permit.so

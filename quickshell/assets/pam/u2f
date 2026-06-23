@@ -1,3 +1,6 @@
 #%PAM-1.0
 
 auth    required    pam_u2f.so  cue nouserok timeout=10
+account required    pam_permit.so
+password required   pam_deny.so
+session required    pam_permit.so
