@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import qs.Common
 import qs.Widgets
+import qs.Services
 
 Item {
     id: clipboardContent
@@ -19,7 +20,61 @@ Item {
         filterMenuLoader.active = true;
     }
 
+    function showContextMenu(entry, sceneX, sceneY) {
+        const localPos = mapFromItem(null, sceneX, sceneY);
+        contextMenu.show(localPos.x, localPos.y, entry);
+    }
+
+    function contextEntryAtScreen(screenX, screenY) {
+        const host = modal.surfaceHost ?? null;
+        const hostX = host?.alignedX;
+        const hostY = host?.renderedAlignedY ?? host?.alignedY;
+
+        if (!isNaN(hostX) && !isNaN(hostY))
+            return contextEntryAtLocal(screenX - hostX, screenY - hostY);
+
+        const screenRef = host?.effectiveScreen ?? host?.screen ?? modal.Window?.window?.screen ?? null;
+        const globalOrigin = mapToGlobal(0, 0);
+        const screenOriginX = screenRef?.x || 0;
+        const screenOriginY = screenRef?.y || 0;
+        return contextEntryAtLocal(screenOriginX + screenX - globalOrigin.x, screenOriginY + screenY - globalOrigin.y);
+    }
+
+    function contextEntryAtLocal(localX, localY) {
+        const listView = modal.activeTab === "saved" ? savedListView : clipboardListView;
+        const entries = modal.activeTab === "saved" ? modal.pinnedEntries : modal.unpinnedEntries;
+
+        if (!listView.visible || !entries)
+            return null;
+
+        const listPos = mapToItem(listView, localX, localY);
+        if (listPos.x < 0 || listPos.x > listView.width || listPos.y < 0 || listPos.y > listView.height)
+            return null;
+
+        const index = listView.indexAt(listPos.x + listView.contentX, listPos.y + listView.contentY);
+        if (index < 0 || index >= entries.length)
+            return null;
+
+        return {
+            entry: entries[index],
+            x: localX,
+            y: localY
+        };
+    }
+
+    function closeContextMenu() {
+        contextMenu.hide();
+    }
+
+    readonly property bool contextMenuActive: contextMenu.openState
+
     anchors.fill: parent
+
+    ClipboardContextMenu {
+        id: contextMenu
+        modal: clipboardContent.modal
+        parentHandler: clipboardContent
+    }
 
     Column {
         id: headerColumn
@@ -64,6 +119,12 @@ Item {
                 onTextChanged: {
                     modal.searchText = text;
                     modal.updateFilteredModel();
+                    ClipboardService.selectedIndex = 0;
+                    ClipboardService.keyboardNavigationActive = true;
+                    Qt.callLater(function () {
+                        clipboardListView.positionViewAtBeginning();
+                        savedListView.positionViewAtBeginning();
+                    });
                 }
 
                 Keys.onEscapePressed: function (event) {
@@ -202,10 +263,12 @@ Item {
                 modal: clipboardContent.modal
                 listView: clipboardListView
                 onCopyRequested: clipboardContent.modal.copyEntry(modelData)
+                onPasteRequested: clipboardContent.modal.pasteEntry(modelData)
                 onDeleteRequested: clipboardContent.modal.deleteEntry(modelData)
                 onPinRequested: targetEntry => clipboardContent.modal.pinEntry(targetEntry)
                 onUnpinRequested: targetEntry => clipboardContent.modal.unpinEntry(targetEntry)
                 onEditRequested: clipboardContent.modal.editEntry(modelData)
+                onContextMenuRequested: (mouseX, mouseY) => clipboardContent.showContextMenu(modelData, mouseX, mouseY)
             }
         }
 
@@ -276,10 +339,12 @@ Item {
                 modal: clipboardContent.modal
                 listView: savedListView
                 onCopyRequested: clipboardContent.modal.copyEntry(modelData)
+                onPasteRequested: clipboardContent.modal.pasteEntry(modelData)
                 onDeleteRequested: clipboardContent.modal.deletePinnedEntry(modelData)
                 onPinRequested: targetEntry => clipboardContent.modal.pinEntry(targetEntry)
                 onUnpinRequested: targetEntry => clipboardContent.modal.unpinEntry(targetEntry)
                 onEditRequested: clipboardContent.modal.editEntry(modelData)
+                onContextMenuRequested: (mouseX, mouseY) => clipboardContent.showContextMenu(modelData, mouseX, mouseY)
             }
         }
 

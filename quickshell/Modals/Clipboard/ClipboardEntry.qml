@@ -14,10 +14,12 @@ Rectangle {
     required property var listView
 
     signal copyRequested
+    signal pasteRequested
     signal deleteRequested
     signal pinRequested(var targetEntry)
     signal unpinRequested(var targetEntry)
     signal editRequested
+    signal contextMenuRequested(real mouseX, real mouseY)
 
     readonly property string entryType: modal ? modal.getEntryType(entry) : "text"
     readonly property string entryPreview: modal ? modal.getEntryPreview(entry) : ""
@@ -25,11 +27,13 @@ Rectangle {
     readonly property bool hasPinnedDuplicate: pinnedDuplicateEntry !== null
     readonly property bool effectivePinned: entry.pinned || hasPinnedDuplicate
     readonly property var visibleEntryActions: SettingsData.clipboardVisibleEntryActions || ["pin", "edit", "delete"]
+    readonly property bool showCopyAction: visibleEntryActions.includes("copy")
+    readonly property bool showPasteAction: visibleEntryActions.includes("paste")
     readonly property bool showPinAction: visibleEntryActions.includes("pin")
     readonly property bool showEditAction: visibleEntryActions.includes("edit")
     readonly property bool showDeleteAction: visibleEntryActions.includes("delete")
     readonly property bool showPinnedIndicator: hasPinnedDuplicate && !showPinAction
-    readonly property bool showAnyAction: showPinAction || showEditAction || showDeleteAction || showPinnedIndicator
+    readonly property bool showAnyAction: showCopyAction || showPasteAction || showPinAction || showEditAction || showDeleteAction || showPinnedIndicator
 
     radius: Theme.cornerRadius
     color: {
@@ -84,6 +88,22 @@ Rectangle {
                 size: Theme.iconSize - 6
                 color: Theme.primary
             }
+        }
+
+        DankActionButton {
+            iconName: "content_copy"
+            iconSize: Theme.iconSize - 6
+            iconColor: Theme.surfaceText
+            visible: root.showCopyAction
+            onClicked: copyRequested()
+        }
+
+        DankActionButton {
+            iconName: "content_paste"
+            iconSize: Theme.iconSize - 6
+            iconColor: Theme.surfaceText
+            visible: root.showPasteAction
+            onClicked: pasteRequested()
         }
 
         DankActionButton {
@@ -199,10 +219,28 @@ Rectangle {
         anchors.bottom: parent.bottom
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
+        acceptedButtons: Qt.LeftButton
         onPressed: mouse => {
-            const pos = mouseArea.mapToItem(root, mouse.x, mouse.y);
-            rippleLayer.trigger(pos.x, pos.y);
+            if (mouse.button === Qt.LeftButton) {
+                const pos = mouseArea.mapToItem(root, mouse.x, mouse.y);
+                rippleLayer.trigger(pos.x, pos.y);
+            }
         }
-        onClicked: copyRequested()
+        onClicked: {
+            if (SettingsData.clipboardClickToPaste) {
+                pasteRequested()
+            } else {
+                copyRequested()
+            }
+        }
+    }
+
+    MouseArea {
+        anchors.fill: parent
+        acceptedButtons: Qt.RightButton
+        onClicked: mouse => {
+            const scenePos = mapToItem(null, mouse.x, mouse.y);
+            contextMenuRequested(scenePos.x, scenePos.y);
+        }
     }
 }

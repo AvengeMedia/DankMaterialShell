@@ -182,6 +182,11 @@ Item {
         }
     }
 
+    Rectangle {
+        anchors.fill: parent
+        color: SettingsData.effectiveWallpaperBackgroundColor
+    }
+
     Loader {
         anchors.fill: parent
         active: {

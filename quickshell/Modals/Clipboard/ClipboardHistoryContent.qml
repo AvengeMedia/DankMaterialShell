@@ -8,6 +8,7 @@ FocusScope {
     id: root
 
     property var clearConfirmDialog: null
+    property var surfaceHost: null
 
     property string activeTab: "recents"
     property bool showKeyboardHints: false
@@ -32,6 +33,11 @@ FocusScope {
     property alias searchField: historyContent.searchField
     property alias editorView: editorView
     property alias keyboardController: keyboardController
+    readonly property alias contextMenuActive: historyContent.contextMenuActive
+
+    function closeContextMenu() {
+        historyContent.closeContextMenu();
+    }
 
     signal closeRequested
     signal instantCloseRequested
@@ -42,7 +48,7 @@ FocusScope {
             return;
         }
         ClipboardService.selectedIndex = 0;
-        ClipboardService.keyboardNavigationActive = false;
+        ClipboardService.keyboardNavigationActive = true;
     }
     onPinnedCountChanged: {
         if (activeTab === "saved" && pinnedCount === 0) {
@@ -54,7 +60,7 @@ FocusScope {
     onActiveFilterChanged: {
         ClipboardService.activeFilter = activeFilter;
         ClipboardService.selectedIndex = 0;
-        ClipboardService.keyboardNavigationActive = false;
+        ClipboardService.keyboardNavigationActive = true;
         ClipboardService.updateFilteredModel();
         if (SettingsData.clipboardRememberTypeFilter) {
             SettingsData.set("clipboardTypeFilter", activeFilter);
@@ -89,6 +95,10 @@ FocusScope {
         const entry = selectedEntry();
         if (!entry)
             return;
+        ClipboardService.pasteEntry(entry, () => root.requestClose(true));
+    }
+
+    function pasteEntry(entry) {
         ClipboardService.pasteEntry(entry, () => root.requestClose(true));
     }
 
@@ -159,6 +169,7 @@ FocusScope {
     function resetState() {
         activeImageLoads = 0;
         mode = "history";
+        historyContent.closeContextMenu();
         historyContent.closeFilterMenu();
         activeFilter = SettingsData.clipboardRememberTypeFilter ? SettingsData.clipboardTypeFilter : "all";
         ClipboardService.reset();

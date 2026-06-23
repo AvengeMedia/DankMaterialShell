@@ -95,6 +95,35 @@ var greeterSyncCmd = &cobra.Command{
 	},
 }
 
+var greeterLaunchSessionCmd = &cobra.Command{
+	Use:    "launch-session",
+	Short:  "Launch a remembered greeter session",
+	Hidden: true,
+	Run: func(cmd *cobra.Command, args []string) {
+		sessionID, _ := cmd.Flags().GetString("session-id")
+		fromMemory, _ := cmd.Flags().GetBool("from-memory")
+		cacheDir, _ := cmd.Flags().GetString("cache-dir")
+
+		if fromMemory {
+			homeDir, err := os.UserHomeDir()
+			if err != nil {
+				log.Fatalf("failed to get user home directory: %v", err)
+			}
+			if err := greeter.LaunchSessionFromMemory(cacheDir, homeDir); err != nil {
+				log.Fatalf("failed to launch remembered greeter session: %v", err)
+			}
+			return
+		}
+
+		if sessionID == "" {
+			log.Fatal("missing --session-id or --from-memory")
+		}
+		if err := greeter.LaunchSessionByID(sessionID); err != nil {
+			log.Fatalf("failed to launch greeter session %q: %v", sessionID, err)
+		}
+	},
+}
+
 func init() {
 	greeterSyncCmd.Flags().BoolP("yes", "y", false, "Non-interactive mode: skip prompts, use defaults (for UI)")
 	greeterSyncCmd.Flags().BoolP("terminal", "t", false, "Run sync in a new terminal (for entering sudo password); terminal auto-closes when done")
@@ -102,6 +131,9 @@ func init() {
 	greeterSyncCmd.Flags().BoolP("local", "l", false, "Developer mode: force greetd config to use a local DMS checkout path")
 	greeterSyncCmd.Flags().BoolP("profile", "p", false, "Sync only your per-user greeter slot (no sudo; for secondary accounts)")
 	greeterSyncCmd.Flags().Bool("autologin", false, "Apply only greeter auto-login on startup settings to greetd (no theme or auth sync)")
+	greeterLaunchSessionCmd.Flags().String("session-id", "", "Desktop session id to launch")
+	greeterLaunchSessionCmd.Flags().Bool("from-memory", false, "Resolve the session id from greeter memory")
+	greeterLaunchSessionCmd.Flags().String("cache-dir", greeter.GreeterCacheDir, "Greeter cache directory")
 }
 
 var greeterEnableCmd = &cobra.Command{
@@ -299,7 +331,7 @@ func installGreeter(nonInteractive bool) error {
 
 	fmt.Println("\n=== Installation Complete ===")
 	fmt.Println("\nTo start the greeter now, run:")
-	fmt.Println("  sudo systemctl start greetd")
+	fmt.Println(startGreeterHint())
 	fmt.Println("\nOr reboot to see the greeter at next boot.")
 
 	return nil
@@ -326,7 +358,13 @@ func uninstallGreeter(nonInteractive bool) error {
 	}
 
 	fmt.Println("\nDisabling greetd...")
-	if err := privesc.Run(context.Background(), "", "systemctl", "disable", "greetd"); err != nil {
+	if isRunit() {
+		if err := disableRunitService("greetd"); err != nil {
+			fmt.Printf("  ⚠ Could not disable greetd: %v\n", err)
+		} else {
+			fmt.Println("  ✓ greetd disabled")
+		}
+	} else if err := privesc.Run(context.Background(), "", "systemctl", "disable", "greetd"); err != nil {
 		fmt.Printf("  ⚠ Could not disable greetd: %v\n", err)
 	} else {
 		fmt.Println("  ✓ greetd disabled")
@@ -449,6 +487,14 @@ func suggestDisplayManagerRestore(nonInteractive bool) {
 
 	enableDM := func(dm string) {
 		fmt.Printf("  Enabling %s...\n", dm)
+		if isRunit() {
+			if err := enableRunitService(dm); err != nil {
+				fmt.Printf("  ⚠ Failed to enable %s: %v\n", dm, err)
+			} else {
+				fmt.Printf("  ✓ %s enabled (linked into %s).\n", dm, runitServiceDir)
+			}
+			return
+		}
 		if err := privesc.Run(context.Background(), "", "systemctl", "enable", "--force", dm); err != nil {
 			fmt.Printf("  ⚠ Failed to enable %s: %v\n", dm, err)
 		} else {
@@ -495,6 +541,9 @@ func suggestDisplayManagerRestore(nonInteractive bool) {
 }
 
 func isSystemdUnitInstalled(unit string) bool {
+	if isRunit() {
+		return runitServiceInstalled(unit)
+	}
 	cmd := exec.Command("systemctl", "list-unit-files", unit+".service", "--no-legend", "--no-pager")
 	out, err := cmd.Output()
 	return err == nil && strings.Contains(string(out), unit)
@@ -943,6 +992,18 @@ func resolveLocalDMSPath() (string, error) {
 }
 
 func disableDisplayManager(dmName string) (bool, error) {
+	if isRunit() {
+		if !runitServiceEnabled(dmName) {
+			return false, nil
+		}
+		fmt.Printf("\nDisabling %s (runit)...\n", dmName)
+		if err := disableRunitService(dmName); err != nil {
+			return false, fmt.Errorf("failed to disable %s: %w", dmName, err)
+		}
+		fmt.Printf("  ✓ %s disabled (removed from %s)\n", dmName, runitServiceDir)
+		return true, nil
+	}
+
 	state, err := getSystemdServiceState(dmName)
 	if err != nil {
 		return false, fmt.Errorf("failed to check %s state: %w", dmName, err)
@@ -996,6 +1057,21 @@ func disableDisplayManager(dmName string) (bool, error) {
 }
 
 func ensureGreetdEnabled() error {
+	if isRunit() {
+		fmt.Println("\nEnabling greetd service (runit)...")
+		if !runitServiceInstalled("greetd") {
+			return fmt.Errorf("greetd service not found in %s. Please install greetd first", runitSvDir)
+		}
+		// Seat + runtime-dir setup that logind handles automatically on systemd.
+		ensureRunitSeat("_greeter")
+		ensureGreetdPamRundir()
+		if err := enableRunitService("greetd"); err != nil {
+			return fmt.Errorf("failed to enable greetd: %w", err)
+		}
+		fmt.Printf("  ✓ greetd enabled (%s)\n", runitServiceDir)
+		return nil
+	}
+
 	fmt.Println("\nChecking greetd service status...")
 
 	state, err := getSystemdServiceState("greetd")
@@ -1043,6 +1119,12 @@ func ensureGreetdEnabled() error {
 }
 
 func ensureGraphicalTarget() error {
+	if isRunit() {
+		// runit has no targets; a supervised greetd service is the graphical
+		// login, so there is nothing to set here.
+		return nil
+	}
+
 	getDefaultCmd := exec.Command("systemctl", "get-default")
 	currentTarget, err := getDefaultCmd.Output()
 	if err != nil {
@@ -1176,7 +1258,7 @@ func enableGreeter(nonInteractive bool) error {
 		fmt.Println("\n=== Enable Complete ===")
 		fmt.Println("\nGreeter configuration verified and system state corrected.")
 		fmt.Println("To start the greeter now, run:")
-		fmt.Println("  sudo systemctl start greetd")
+		fmt.Println(startGreeterHint())
 		fmt.Println("\nOr reboot to see the greeter at boot time.")
 
 		return nil
@@ -1257,7 +1339,7 @@ func enableGreeter(nonInteractive bool) error {
 
 	fmt.Println("\n=== Enable Complete ===")
 	fmt.Println("\nTo start the greeter now, run:")
-	fmt.Println("  sudo systemctl start greetd")
+	fmt.Println(startGreeterHint())
 	fmt.Println("\nOr reboot to see the greeter at boot time.")
 
 	return nil

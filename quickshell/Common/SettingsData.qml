@@ -107,6 +107,7 @@ Singleton {
         saveSettings();
     }
 
+    property bool clipboardClickToPaste: false
     property bool clipboardEnterToPaste: false
     property bool clipboardRememberTypeFilter: false
     property string clipboardTypeFilter: "all"
@@ -241,11 +242,35 @@ Singleton {
     property string wallpaperFillMode: "Fill"
     property bool blurredWallpaperLayer: false
     property bool blurWallpaperOnOverview: false
+    property string wallpaperBackgroundColorMode: "black"
+    property string wallpaperBackgroundCustomColor: "#000000"
+    readonly property color effectiveWallpaperBackgroundColor: {
+        switch (wallpaperBackgroundColorMode) {
+        case "black":
+            return "#000000";
+        case "white":
+            return "#ffffff";
+        case "primary":
+            return Theme.primary;
+        case "surface":
+            return Theme.surfaceContainer;
+        case "custom":
+            return wallpaperBackgroundCustomColor;
+        default:
+            return "#000000";
+        }
+    }
 
     property bool frameEnabled: false
     onFrameEnabledChanged: saveSettings()
     property real frameThickness: 16
     onFrameThicknessChanged: saveSettings()
+    property int barInsetPaddingShared: -1
+    onBarInsetPaddingSharedChanged: saveSettings()
+    property bool barInsetPaddingSyncAll: false
+    onBarInsetPaddingSyncAllChanged: saveSettings()
+    property int frameBarInsetPadding: -1
+    onFrameBarInsetPaddingChanged: saveSettings()
     property real frameRounding: 23
     onFrameRoundingChanged: saveSettings()
     property string frameColor: ""
@@ -464,6 +489,7 @@ Singleton {
     onAppDrawerSectionViewModesChanged: saveSettings()
     property bool niriOverviewOverlayEnabled: true
     property string dankLauncherV2Size: "compact"
+    property bool dankLauncherV2ShowSourceBadges: true
     property bool dankLauncherV2BorderEnabled: false
     property int dankLauncherV2BorderThickness: 2
     property string dankLauncherV2BorderColor: "primary"
@@ -487,7 +513,11 @@ Singleton {
 
     property string networkPreference: "auto"
 
-    property string iconTheme: "System Default"
+    property string iconThemeDark: "System Default"
+    property string iconThemeLight: "System Default"
+    property bool iconThemePerMode: false
+    property string lastAppliedIconTheme: ""
+    readonly property string iconTheme: resolveIconTheme()
     property var availableIconThemes: ["System Default"]
     property string systemDefaultIconTheme: ""
     property bool qt5ctAvailable: false
@@ -605,6 +635,10 @@ Singleton {
     property bool batteryNotifyLow: false
     property int batteryNotificationType: 0
     property bool batteryAutoPowerSaver: false
+    property bool showBatteryPercent: true
+    property bool showBatteryPercentOnlyOnBattery: false
+    property bool showBatteryTime: false
+    property bool showBatteryTimeOnlyOnBattery: false
     property bool lockBeforeSuspend: false
     property bool loginctlLockIntegration: true
     property bool fadeToLockEnabled: true
@@ -821,6 +855,7 @@ Singleton {
             "rightWidgets": ["systemTray", "clipboard", "cpuUsage", "memUsage", "notificationButton", "battery", "controlCenterButton"],
             "spacing": 4,
             "innerPadding": 4,
+            "barInsetPadding": -1,
             "bottomGap": 0,
             "transparency": 1.0,
             "widgetTransparency": 1.0,
@@ -1279,14 +1314,67 @@ Singleton {
             MangoService.generateLayoutConfig();
     }
 
+    function resolveIconTheme() {
+        if (iconThemePerMode && typeof SessionData !== "undefined" && SessionData.isLightMode)
+            return iconThemeLight;
+        return iconThemeDark;
+    }
+
     function applyStoredIconTheme() {
         updateGtkIconTheme();
         updateQtIconTheme();
         updateCosmicIconTheme();
     }
 
+    function setIconThemeUnmanaged() {
+        iconThemePerMode = false;
+        iconThemeDark = "System Default";
+        iconThemeLight = "System Default";
+        lastAppliedIconTheme = "";
+        saveSettings();
+    }
+
+    function checkIconThemeDrift() {
+        if (isGreeterMode)
+            return;
+        if (resolveIconTheme() === "System Default")
+            return;
+        if (!lastAppliedIconTheme)
+            return;
+        const script = `if command -v gsettings >/dev/null 2>&1; then
+        gsettings get org.gnome.desktop.interface icon-theme 2>/dev/null | sed "s/'//g"
+        elif command -v dconf >/dev/null 2>&1; then
+        dconf read /org/gnome/desktop/interface/icon-theme 2>/dev/null | sed "s/'//g"
+        fi`;
+
+        Proc.runCommand("iconThemeDriftCheck", ["sh", "-c", script], (output, exitCode) => {
+            const platform = (output || "").trim();
+            if (!platform)
+                return;
+            if (platform === root.lastAppliedIconTheme || platform === root.iconThemeDark || platform === root.iconThemeLight)
+                return;
+            root.setIconThemeUnmanaged();
+            ToastService.showWarning(I18n.tr("Icon theme changed outside DMS; switched to System Default", "shown when an external tool overrides the icon theme DMS applied"));
+        });
+    }
+
+    Connections {
+        target: typeof SessionData !== "undefined" ? SessionData : null
+        function onIsLightModeChanged() {
+            if (!SessionData.isSwitchingMode)
+                return;
+            if (!root.iconThemePerMode)
+                return;
+            if (root.iconThemeLight === root.iconThemeDark)
+                return;
+            root.applyStoredIconTheme();
+            root.saveSettings();
+        }
+    }
+
     function updateCosmicIconTheme() {
-        let cosmicThemeName = (iconTheme === "System Default") ? systemDefaultIconTheme : iconTheme;
+        const resolved = resolveIconTheme();
+        let cosmicThemeName = (resolved === "System Default") ? systemDefaultIconTheme : resolved;
         if (!cosmicThemeName || cosmicThemeName === "System Default") {
             const detectScript = `if command -v gsettings >/dev/null 2>&1; then
             gsettings get org.gnome.desktop.interface icon-theme 2>/dev/null | sed "s/'//g"
@@ -1322,9 +1410,11 @@ Singleton {
     }
 
     function updateGtkIconTheme() {
-        const gtkThemeName = (iconTheme === "System Default") ? systemDefaultIconTheme : iconTheme;
+        const resolved = resolveIconTheme();
+        const gtkThemeName = (resolved === "System Default") ? systemDefaultIconTheme : resolved;
         if (gtkThemeName === "System Default" || gtkThemeName === "")
             return;
+        lastAppliedIconTheme = gtkThemeName;
         if (typeof DMSService !== "undefined" && DMSService.apiVersion >= 3 && typeof PortalService !== "undefined") {
             PortalService.setSystemIconTheme(gtkThemeName);
         }
@@ -1349,13 +1439,20 @@ Singleton {
         fi
         done
 
+        if command -v gsettings >/dev/null 2>&1; then
+        gsettings set org.gnome.desktop.interface icon-theme '${gtkThemeName}' 2>/dev/null || true
+        elif command -v dconf >/dev/null 2>&1; then
+        dconf write /org/gnome/desktop/interface/icon-theme "'${gtkThemeName}'" 2>/dev/null || true
+        fi
+
         pkill -HUP -f 'gtk' 2>/dev/null || true`;
 
         Quickshell.execDetached(["sh", "-lc", configScript]);
     }
 
     function updateQtIconTheme() {
-        const qtThemeName = (iconTheme === "System Default") ? "" : iconTheme;
+        const resolved = resolveIconTheme();
+        const qtThemeName = (resolved === "System Default") ? "" : resolved;
         if (!qtThemeName)
             return;
         const home = _homeUrl.replace("file://", "").replace(/'/g, "'\\''");
@@ -1442,6 +1539,9 @@ Singleton {
             if (obj?.directionalAnimationMode === 3 && frameMode !== "connected")
                 frameMode = "connected";
 
+            if (obj?.iconTheme !== undefined && obj?.iconThemeDark === undefined)
+                iconThemeDark = obj.iconTheme;
+
             if (obj?.weatherLocation !== undefined)
                 _legacyWeatherLocation = obj.weatherLocation;
             if (obj?.weatherCoordinates !== undefined)
@@ -1457,6 +1557,7 @@ Singleton {
             applyStoredTheme();
             updateCompositorCursor();
             Processes.detectQtTools();
+            Qt.callLater(checkIconThemeDrift);
 
             _checkSettingsWritable();
         } catch (e) {
@@ -2464,10 +2565,24 @@ Singleton {
     }
 
     function setIconTheme(themeName) {
-        iconTheme = themeName;
-        updateGtkIconTheme();
-        updateQtIconTheme();
-        updateCosmicIconTheme();
+        const light = iconThemePerMode && typeof SessionData !== "undefined" && SessionData.isLightMode;
+        setIconThemeForMode(themeName, light);
+    }
+
+    function setIconThemeForMode(themeName, light) {
+        if (light)
+            iconThemeLight = themeName;
+        else
+            iconThemeDark = themeName;
+        applyStoredIconTheme();
+        saveSettings();
+        if (typeof Theme !== "undefined" && Theme.currentTheme === Theme.dynamic)
+            Theme.generateSystemThemesFromCurrentTheme();
+    }
+
+    function setIconThemePerMode(enabled) {
+        iconThemePerMode = enabled;
+        applyStoredIconTheme();
         saveSettings();
         if (typeof Theme !== "undefined" && Theme.currentTheme === Theme.dynamic)
             Theme.generateSystemThemesFromCurrentTheme();

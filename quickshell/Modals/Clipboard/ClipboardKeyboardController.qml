@@ -9,7 +9,7 @@ QtObject {
 
     function reset() {
         ClipboardService.selectedIndex = 0;
-        ClipboardService.keyboardNavigationActive = false;
+        ClipboardService.keyboardNavigationActive = true;
         modal.showKeyboardHints = false;
     }
 
@@ -89,13 +89,16 @@ QtObject {
             return;
         }
 
+        if (modal.contextMenuActive) {
+            if (event.key === Qt.Key_Escape)
+                modal.closeContextMenu();
+            event.accepted = true;
+            return;
+        }
+
         switch (event.key) {
         case Qt.Key_Escape:
-            if (ClipboardService.keyboardNavigationActive) {
-                ClipboardService.keyboardNavigationActive = false;
-            } else {
-                modal.hide();
-            }
+            modal.hide();
             event.accepted = true;
             return;
         case Qt.Key_Down:

@@ -343,28 +343,26 @@
     "category": "Personalization",
     "keywords": [
       "appearance",
+      "areas",
       "background",
       "bg",
+      "color",
+      "colour",
+      "covered",
       "custom",
       "customize",
-      "dark",
-      "dark mode",
-      "day",
       "desktop",
-      "different",
+      "hue",
       "image",
-      "light",
-      "light mode",
-      "mode",
-      "night",
       "personal",
       "personalization",
       "picture",
-      "wallpaper",
-      "wallpapers"
+      "shown",
+      "tint",
+      "wallpaper"
     ],
     "icon": "wallpaper",
-    "description": "Set different wallpapers for light and dark mode"
+    "description": "Color shown for areas not covered by wallpaper (e.g. Fit or Pad modes)"
   },
   {
     "section": "selectedMonitor",
@@ -2007,10 +2005,14 @@
     "keywords": [
       "bar",
       "between",
+      "corner",
       "dank",
+      "edge",
       "edges",
+      "end",
       "gap",
       "gaps",
+      "inset",
       "margin",
       "margins",
       "padding",
@@ -2680,6 +2682,34 @@
     "description": "Show All, Apps, Files, and Plugins chips beside the Spotlight Bar input."
   },
   {
+    "section": "dankLauncherV2ShowSourceBadges",
+    "label": "Show Package Source Badges",
+    "tabIndex": 9,
+    "category": "Launcher",
+    "keywords": [
+      "app drawer",
+      "app menu",
+      "appearance",
+      "appimage",
+      "applications",
+      "badge",
+      "badges",
+      "drawer",
+      "flatpak",
+      "icons",
+      "items",
+      "launcher",
+      "menu",
+      "package",
+      "show",
+      "snap",
+      "source",
+      "start",
+      "start menu"
+    ],
+    "description": "Show Flatpak, Snap, AppImage, or Nix badge icons on launcher items."
+  },
+  {
     "section": "launcherLogoSizeOffset",
     "label": "Size Offset",
     "tabIndex": 9,
@@ -3208,6 +3238,30 @@
     "description": "Blend between Surface High and the selected custom color"
   },
   {
+    "section": "iconThemeDark",
+    "label": "Dark Mode Icon Theme",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "colors",
+      "colour",
+      "dankshell",
+      "dark",
+      "dark mode",
+      "icon",
+      "icons",
+      "look",
+      "mode",
+      "night",
+      "scheme",
+      "style",
+      "system",
+      "theme"
+    ],
+    "description": "DankShell & System Icons (requires restart)"
+  },
+  {
     "section": "matugenTemplateNeovimSettings",
     "label": "Dark mode base",
     "tabIndex": 10,
@@ -3446,17 +3500,24 @@
       "appearance",
       "colors",
       "colour",
-      "dankshell",
+      "dark",
+      "dark mode",
+      "day",
+      "different",
       "icon",
-      "icons",
+      "light",
+      "light mode",
       "look",
+      "mode",
+      "night",
       "scheme",
       "style",
       "system",
-      "theme"
+      "theme",
+      "themes"
     ],
     "icon": "interests",
-    "description": "DankShell & System Icons (requires restart)"
+    "description": "Use different icon themes for light and dark mode"
   },
   {
     "section": "matugenTemplateKcolorscheme",
@@ -3563,6 +3624,30 @@
       "theme"
     ],
     "description": "Use light theme instead of dark theme"
+  },
+  {
+    "section": "iconThemeLight",
+    "label": "Light Mode Icon Theme",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "colors",
+      "colour",
+      "dankshell",
+      "day",
+      "icon",
+      "icons",
+      "light",
+      "light mode",
+      "look",
+      "mode",
+      "scheme",
+      "style",
+      "system",
+      "theme"
+    ],
+    "description": "DankShell & System Icons (requires restart)"
   },
   {
     "section": "matugenContrast",
@@ -3782,6 +3867,33 @@
       "theme",
       "user"
     ]
+  },
+  {
+    "section": "iconThemePerMode",
+    "label": "Separate Light & Dark Themes",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "colors",
+      "colour",
+      "dark",
+      "dark mode",
+      "day",
+      "different",
+      "icon",
+      "light",
+      "light mode",
+      "look",
+      "mode",
+      "night",
+      "scheme",
+      "separate",
+      "style",
+      "theme",
+      "themes"
+    ],
+    "description": "Use different icon themes for light and dark mode"
   },
   {
     "section": "m3ElevationColorMode",
@@ -7049,6 +7161,25 @@
     "description": "Clear all history when server starts"
   },
   {
+    "section": "clipboardClickToPaste",
+    "label": "Click to Paste",
+    "tabIndex": 23,
+    "category": "System",
+    "keywords": [
+      "behavior",
+      "click",
+      "clipboard",
+      "copying",
+      "directly",
+      "entry",
+      "linux",
+      "os",
+      "paste",
+      "system"
+    ],
+    "description": "Click an entry to paste directly instead of copying"
+  },
+  {
     "section": "_tab_23",
     "label": "Clipboard",
     "tabIndex": 23,
@@ -7805,6 +7936,34 @@
       "window"
     ],
     "description": "Use the extended surface for launcher content"
+  },
+  {
+    "section": "frameBarInsetPadding",
+    "label": "Bar Inset Padding",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "bar",
+      "between",
+      "border",
+      "components",
+      "corner",
+      "decoration",
+      "edge",
+      "end",
+      "ends",
+      "frame",
+      "inset",
+      "modules",
+      "padding",
+      "panel",
+      "statusbar",
+      "taskbar",
+      "topbar",
+      "widgets",
+      "window"
+    ],
+    "description": "Gap between the end widgets and the bar ends (0 = edge-to-edge)"
   },
   {
     "section": "frameBorder",

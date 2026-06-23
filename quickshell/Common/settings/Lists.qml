@@ -28,6 +28,10 @@ Singleton {
             showMicIcon: false,
             showMicPercent: true,
             showBatteryIcon: false,
+            showBatteryPercent: true,
+            showBatteryPercentOnlyOnBattery: false,
+            showBatteryTime: false,
+            showBatteryTimeOnlyOnBattery: false,
             showPrinterIcon: false,
             showScreenSharingIcon: true
         };
@@ -83,6 +87,14 @@ Singleton {
                 item.showMicPercent = order[i].showMicPercent;
             if (isObj && order[i].showBatteryIcon !== undefined)
                 item.showBatteryIcon = order[i].showBatteryIcon;
+            if (isObj && order[i].showBatteryPercent !== undefined)
+                item.showBatteryPercent = order[i].showBatteryPercent;
+            if (isObj && order[i].showBatteryPercentOnlyOnBattery !== undefined)
+                item.showBatteryPercentOnlyOnBattery = order[i].showBatteryPercentOnlyOnBattery;
+            if (isObj && order[i].showBatteryTime !== undefined)
+                item.showBatteryTime = order[i].showBatteryTime;
+            if (isObj && order[i].showBatteryTimeOnlyOnBattery !== undefined)
+                item.showBatteryTimeOnlyOnBattery = order[i].showBatteryTimeOnlyOnBattery;
             if (isObj && order[i].showPrinterIcon !== undefined)
                 item.showPrinterIcon = order[i].showPrinterIcon;
             if (isObj && order[i].showScreenSharingIcon !== undefined)

@@ -3,6 +3,7 @@ package server
 import (
 	"bufio"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net"
 	"os"
@@ -1481,26 +1482,36 @@ func Start(printDocs bool) error {
 	log.Info("")
 
 	go func() {
+		switch err := InitializeNetworkManager(); {
+		case err == nil:
+			notifyCapabilityChange()
+			return
+		case errors.Is(err, network.ErrNoNetworkBackend):
+			log.Warn("No supported network backend present; skipping retries")
+			return
+		default:
+			log.Warnf("Network manager unavailable, will retry: %v", err)
+		}
+
 		ticker := time.NewTicker(30 * time.Second)
 		defer ticker.Stop()
 
-		if err := InitializeNetworkManager(); err != nil {
-			log.Warnf("Network manager unavailable: %v", err)
-		} else {
-			notifyCapabilityChange()
-			return
-		}
-
-		for range ticker.C {
+		for range 10 {
+			<-ticker.C
 			if networkManager != nil {
 				return
 			}
-			if err := InitializeNetworkManager(); err == nil {
+			switch err := InitializeNetworkManager(); {
+			case err == nil:
 				log.Info("Network manager initialized")
 				notifyCapabilityChange()
 				return
+			case errors.Is(err, network.ErrNoNetworkBackend):
+				log.Warn("No supported network backend present; stopping retries")
+				return
 			}
 		}
+		log.Warn("Network manager still unavailable after retries; giving up")
 	}()
 
 	loginctlReady := make(chan struct{})

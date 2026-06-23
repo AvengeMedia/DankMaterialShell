@@ -233,24 +233,39 @@ func stripDesktopExecCodes(execLine string) string {
 	return strings.Join(cleaned, " ")
 }
 
-func formatInitialSessionCommand(sessionExec string) string {
-	execLine := strings.TrimSpace(stripDesktopExecCodes(sessionExec))
-	if execLine == "" {
+func shellQuote(value string) string {
+	return "'" + strings.ReplaceAll(value, "'", "'\\''") + "'"
+}
+
+func stableDMSCommand() string {
+	for _, candidate := range []string{"/usr/bin/dms", "/usr/local/bin/dms"} {
+		info, err := os.Stat(candidate)
+		if err == nil && !info.IsDir() && info.Mode()&0o111 != 0 {
+			return candidate
+		}
+	}
+	return "dms"
+}
+
+func formatInitialSessionCommand(cacheDir string) string {
+	cacheDir = strings.TrimSpace(cacheDir)
+	if cacheDir == "" {
 		return `command = ""`
 	}
-	escaped := strings.ReplaceAll(execLine, `'`, `'\''`)
+	launcher := fmt.Sprintf("%s greeter launch-session --from-memory --cache-dir %s", stableDMSCommand(), shellQuote(cacheDir))
+	escaped := strings.ReplaceAll(launcher, `'`, `'\''`)
 	inner := fmt.Sprintf("env XDG_SESSION_TYPE=wayland sh -c 'exec %s'", escaped)
 	tomlEscaped := strings.ReplaceAll(inner, `\`, `\\`)
 	tomlEscaped = strings.ReplaceAll(tomlEscaped, `"`, `\"`)
 	return fmt.Sprintf(`command = "%s"`, tomlEscaped)
 }
 
-func upsertInitialSession(configContent, loginUser, sessionExec string, enabled bool) string {
+func upsertInitialSession(configContent, loginUser, cacheDir string, enabled bool) string {
 	if !enabled {
 		return removeTomlSection(configContent, "initial_session")
 	}
 
-	commandLine := formatInitialSessionCommand(sessionExec)
+	commandLine := formatInitialSessionCommand(cacheDir)
 	lines := strings.Split(configContent, "\n")
 	var out []string
 
@@ -328,10 +343,11 @@ type greeterAutoLoginConfig struct {
 }
 
 type greeterAutoLoginMemory struct {
-	LastSuccessfulUser string `json:"lastSuccessfulUser"`
-	LastSessionID      string `json:"lastSessionId"`
-	LastSessionExec    string `json:"lastSessionExec"`
-	AutoLoginEnabled   bool   `json:"autoLoginEnabled"`
+	LastSuccessfulUser   string `json:"lastSuccessfulUser"`
+	LastSessionID        string `json:"lastSessionId"`
+	LastSessionDesktopID string `json:"lastSessionDesktopId"`
+	LastSessionExec      string `json:"lastSessionExec"`
+	AutoLoginEnabled     bool   `json:"autoLoginEnabled"`
 }
 
 func readGreeterAutoLoginConfig(settingsPath string) (greeterAutoLoginConfig, error) {
@@ -381,7 +397,7 @@ func execFromDesktopFile(path string) (string, error) {
 	return "", fmt.Errorf("no Exec= line found in %s", path)
 }
 
-func resolveGreeterAutoLoginState(cacheDir, homeDir string) (enabled bool, loginUser string, sessionExec string, err error) {
+func resolveGreeterAutoLoginState(cacheDir, homeDir string) (enabled bool, loginUser string, sessionID string, err error) {
 	settingsPath := filepath.Join(cacheDir, "settings.json")
 	if _, statErr := os.Stat(settingsPath); statErr != nil {
 		settingsPath = filepath.Join(homeDir, ".config", "DankMaterialShell", "settings.json")
@@ -416,15 +432,9 @@ func resolveGreeterAutoLoginState(cacheDir, homeDir string) (enabled bool, login
 		loginUser = current.Username
 	}
 
-	sessionExec = mem.LastSessionExec
-	if sessionExec == "" && mem.LastSessionID != "" {
-		sessionExec, err = execFromDesktopFile(mem.LastSessionID)
-		if err != nil {
-			sessionExec = ""
-		}
-	}
+	sessionID = sessionDesktopIDFromMemory(mem)
 
-	return true, loginUser, sessionExec, nil
+	return true, loginUser, sessionID, nil
 }
 
 func writeGreetdConfig(configPath, content string, logFunc func(string), sudoPassword, successMsg string) error {
@@ -540,7 +550,7 @@ func readGreeterMemoryFile(memoryPath, sudoPassword string) ([]byte, error) {
 }
 
 func SyncGreetdAutoLogin(cacheDir, homeDir string, logFunc func(string), sudoPassword string) error {
-	enabled, loginUser, sessionExec, err := resolveGreeterAutoLoginState(cacheDir, homeDir)
+	enabled, loginUser, sessionID, err := resolveGreeterAutoLoginState(cacheDir, homeDir)
 	if err != nil {
 		return err
 	}
@@ -568,7 +578,7 @@ func SyncGreetdAutoLogin(cacheDir, homeDir string, logFunc func(string), sudoPas
 		return writeGreetdConfig(configPath, newConfig, logFunc, sudoPassword, "✓ Disabled greeter auto-login")
 	}
 
-	if loginUser == "" || sessionExec == "" {
+	if loginUser == "" || sessionID == "" {
 		if logFunc != nil {
 			logFunc("⚠ Greeter auto-login is enabled but user or session is not configured yet. Log in manually once, then run sync.")
 		}
@@ -579,7 +589,7 @@ func SyncGreetdAutoLogin(cacheDir, homeDir string, logFunc func(string), sudoPas
 		return nil
 	}
 
-	newConfig := upsertInitialSession(configContent, loginUser, sessionExec, true)
+	newConfig := upsertInitialSession(configContent, loginUser, cacheDir, true)
 	if newConfig == configContent {
 		if logFunc != nil {
 			logFunc(fmt.Sprintf("✓ Greeter auto-login already configured for %s", loginUser))

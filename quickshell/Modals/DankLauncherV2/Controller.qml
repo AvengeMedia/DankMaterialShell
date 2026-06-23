@@ -1883,10 +1883,10 @@ Item {
         }
         if (!selectedItem)
             return;
-        executeItem(selectedItem);
+        executeItem(selectedItem, true);
     }
 
-    function executeItem(item) {
+    function executeItem(item, isKeyboard = false) {
         if (!item)
             return;
 
@@ -1929,7 +1929,8 @@ Item {
             AppSearchService.executeBuiltInLauncherItem(item.data);
             break;
         case "clipboard":
-            if (SettingsData.clipboardEnterToPaste) {
+            var shouldPaste = isKeyboard ? SettingsData.clipboardEnterToPaste : SettingsData.clipboardClickToPaste;
+            if (shouldPaste) {
                 ClipboardService.pasteEntry(item.data, function () {
                     root.itemExecuted();
                 });
