@@ -499,6 +499,9 @@ func buildManagedLockscreenU2FPamContent() string {
 	b.WriteString("#%PAM-1.0\n")
 	b.WriteString(LockscreenU2FPamManagedBlockStart + "\n")
 	b.WriteString("auth    required    pam_u2f.so  cue nouserok timeout=10\n")
+	b.WriteString("account required    pam_permit.so\n")
+	b.WriteString("password required   pam_deny.so\n")
+	b.WriteString("session required    pam_permit.so\n")
 	b.WriteString(LockscreenU2FPamManagedBlockEnd + "\n")
 	return b.String()
 }

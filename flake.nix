@@ -150,10 +150,17 @@
                   --replace-fail /bin/bash ${pkgs.bashInteractive}/bin/bash
 
                 substituteInPlace $out/share/quickshell/dms/assets/pam/fprint \
-                  --replace-fail pam_fprintd.so ${pkgs.fprintd}/lib/security/pam_fprintd.so
+                  --replace-fail pam_fprintd.so ${pkgs.fprintd}/lib/security/pam_fprintd.so \
+                  --replace-fail pam_deny.so ${pkgs.pam}/lib/security/pam_deny.so \
+                  --replace-fail pam_permit.so ${pkgs.pam}/lib/security/pam_permit.so
 
                 substituteInPlace $out/share/quickshell/dms/assets/pam/u2f \
-                  --replace-fail pam_u2f.so ${pkgs.pam_u2f}/lib/security/pam_u2f.so
+                  --replace-fail pam_u2f.so ${pkgs.pam_u2f}/lib/security/pam_u2f.so \
+                  --replace-fail pam_deny.so ${pkgs.pam}/lib/security/pam_deny.so \
+                  --replace-fail pam_permit.so ${pkgs.pam}/lib/security/pam_permit.so
+
+                substituteInPlace $out/share/quickshell/dms/assets/pam/other \
+                  --replace-fail pam_deny.so ${pkgs.pam}/lib/security/pam_deny.so
 
                 installShellCompletion --cmd dms \
                   --bash <($out/bin/dms completion bash) \
