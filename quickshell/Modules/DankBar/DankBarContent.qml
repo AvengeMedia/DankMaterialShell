@@ -1180,22 +1180,7 @@ Item {
             parentScreen: barWindow.screen
             widgetData: parent.widgetData
             onCpuTempClicked: {
-                processListPopoutLoader.active = true;
-                if (!processListPopoutLoader.item) {
-                    return;
-                }
-                const effectiveBarConfig = topBarContent.barConfig;
-                const barPosition = barWindow.axis?.edge === "left" ? 2 : (barWindow.axis?.edge === "right" ? 3 : (barWindow.axis?.edge === "top" ? 0 : 1));
-                if (processListPopoutLoader.item.setBarContext) {
-                    processListPopoutLoader.item.setBarContext(barPosition, effectiveBarConfig?.bottomGap ?? 0);
-                }
-                if (processListPopoutLoader.item.setTriggerPosition) {
-                    const globalPos = cpuTempWidget.mapToItem(null, 0, 0);
-                    const pos = SettingsData.getPopupTriggerPosition(globalPos, barWindow.screen, barWindow.effectiveBarThickness, cpuTempWidget.width, effectiveBarConfig?.spacing ?? 4, barPosition, effectiveBarConfig);
-                    const widgetSection = topBarContent.getWidgetSection(parent) || "right";
-                    processListPopoutLoader.item.setTriggerPosition(pos.x, pos.y, pos.width, widgetSection, barWindow.screen, barPosition, barWindow.effectiveBarThickness, effectiveBarConfig?.spacing ?? 4, effectiveBarConfig);
-                }
-                PopoutManager.requestPopout(processListPopoutLoader.item, undefined, "cpu_temp");
+                PopoutService.toggleProcessListModal(1);
             }
         }
     }
@@ -1213,22 +1198,7 @@ Item {
             parentScreen: barWindow.screen
             widgetData: parent.widgetData
             onGpuTempClicked: {
-                processListPopoutLoader.active = true;
-                if (!processListPopoutLoader.item) {
-                    return;
-                }
-                const effectiveBarConfig = topBarContent.barConfig;
-                const barPosition = barWindow.axis?.edge === "left" ? 2 : (barWindow.axis?.edge === "right" ? 3 : (barWindow.axis?.edge === "top" ? 0 : 1));
-                if (processListPopoutLoader.item.setBarContext) {
-                    processListPopoutLoader.item.setBarContext(barPosition, effectiveBarConfig?.bottomGap ?? 0);
-                }
-                if (processListPopoutLoader.item.setTriggerPosition) {
-                    const globalPos = gpuTempWidget.mapToItem(null, 0, 0);
-                    const pos = SettingsData.getPopupTriggerPosition(globalPos, barWindow.screen, barWindow.effectiveBarThickness, gpuTempWidget.width, effectiveBarConfig?.spacing ?? 4, barPosition, effectiveBarConfig);
-                    const widgetSection = topBarContent.getWidgetSection(parent) || "right";
-                    processListPopoutLoader.item.setTriggerPosition(pos.x, pos.y, pos.width, widgetSection, barWindow.screen, barPosition, barWindow.effectiveBarThickness, effectiveBarConfig?.spacing ?? 4, effectiveBarConfig);
-                }
-                PopoutManager.requestPopout(processListPopoutLoader.item, undefined, "gpu_temp");
+                PopoutService.toggleProcessListModal(3);
             }
         }
     }
