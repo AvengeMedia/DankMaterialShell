@@ -486,6 +486,61 @@ hl.bind("SUPER + 1", hl.dsp.exec_cmd("hyprctl dispatch workspace 1"))
 	}
 }
 
+func TestHyprlandSetBindTranslatesScrollWheelToMouse(t *testing.T) {
+	tmpDir := t.TempDir()
+	dmsDir := filepath.Join(tmpDir, "dms")
+	if err := os.MkdirAll(dmsDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	bindsUser := filepath.Join(dmsDir, "binds-user.lua")
+	if err := os.WriteFile(bindsUser, []byte("-- DMS user keybind overrides\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	provider := NewHyprlandProvider(tmpDir)
+	if err := provider.SetBind("SUPER + WheelScrollDown", "workspace 1", "", nil); err != nil {
+		t.Fatal(err)
+	}
+
+	got := readFile(t, bindsUser)
+	if !strings.Contains(got, `hl.bind("SUPER + mouse_down"`) {
+		t.Fatalf("expected scroll key translated to mouse_down, got:\n%s", got)
+	}
+	if strings.Contains(got, "WheelScroll") {
+		t.Fatalf("expected no raw niri scroll keysym in hyprland output, got:\n%s", got)
+	}
+
+	if err := provider.SetBind("SUPER + WheelScrollDown", "workspace 2", "", nil); err != nil {
+		t.Fatal(err)
+	}
+	got = readFile(t, bindsUser)
+	if strings.Count(got, `hl.bind("SUPER + mouse_down"`) != 1 {
+		t.Fatalf("expected exactly one mouse_down bind after re-save, got:\n%s", got)
+	}
+}
+
+func TestHyprlandScrollWheelRoundTrips(t *testing.T) {
+	for native, canonical := range map[string]string{
+		"mouse_up":    "WheelScrollUp",
+		"mouse_down":  "WheelScrollDown",
+		"mouse_left":  "WheelScrollLeft",
+		"mouse_right": "WheelScrollRight",
+	} {
+		if got := luaKeyComboToInternalKey("SUPER + " + native); got != "SUPER+"+canonical {
+			t.Errorf("luaKeyComboToInternalKey(%q) = %q, want SUPER+%s", native, got, canonical)
+		}
+	}
+}
+
+func readFile(t *testing.T, path string) string {
+	t.Helper()
+	data, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return string(data)
+}
+
 func TestHyprlandRemoveBindReplacesExistingOverrideWithNegativeOverride(t *testing.T) {
 	tmpDir := t.TempDir()
 	dmsDir := filepath.Join(tmpDir, "dms")
