@@ -452,6 +452,11 @@ Singleton {
             "id": "darkMode",
             "enabled": true,
             "width": 50
+        },
+        {
+            "id": "builtin_chromecast",
+            "enabled": true,
+            "width": 50
         }
     ]
 
