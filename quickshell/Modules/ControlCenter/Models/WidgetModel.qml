@@ -11,6 +11,7 @@ QtObject {
     property var vpnBuiltinInstance: null
     property var cupsBuiltinInstance: null
     property var tailscaleBuiltinInstance: null
+    property var chromecastBuiltinInstance: null
     property var displayProfilesBuiltinInstance: null
 
     property var vpnLoader: Loader {
@@ -89,6 +90,35 @@ QtObject {
                 if (!hasTailscaleWidget && tailscaleLoader.active) {
                     root.log.debug("No Tailscale widget in control center, deactivating loader");
                     tailscaleLoader.active = false;
+                }
+            }
+        }
+    }
+
+    property var chromecastLoader: Loader {
+        active: false
+        sourceComponent: Component {
+            ChromecastWidget {}
+        }
+
+        onItemChanged: {
+            root.chromecastBuiltinInstance = item;
+        }
+
+        onActiveChanged: {
+            if (!active) {
+                root.chromecastBuiltinInstance = null;
+            }
+        }
+
+        Connections {
+            target: SettingsData
+            function onControlCenterWidgetsChanged() {
+                const widgets = SettingsData.controlCenterWidgets || [];
+                const hasChromecastWidget = widgets.some(w => w.id === "builtin_chromecast");
+                if (!hasChromecastWidget && chromecastLoader.active) {
+                    root.log.debug("No Chromecast widget in control center, deactivating loader");
+                    chromecastLoader.active = false;
                 }
             }
         }
@@ -270,6 +300,16 @@ QtObject {
             "type": "builtin_plugin",
             "enabled": TailscaleService.available,
             "warning": !TailscaleService.available ? I18n.tr("Tailscale not available", "Warning when Tailscale service is not running") : undefined,
+            "isBuiltinPlugin": true
+        },
+        {
+            "id": "builtin_chromecast",
+            "text": I18n.tr("Cast", "Chromecast widget title"),
+            "description": I18n.tr("Cast media and mirror your screen to Cast devices", "Chromecast control center widget description"),
+            "icon": "cast",
+            "type": "builtin_plugin",
+            "enabled": ChromecastService.available,
+            "warning": !ChromecastService.available ? I18n.tr("Casting not available", "Warning when Chromecast service is not running") : undefined,
             "isBuiltinPlugin": true
         },
         {

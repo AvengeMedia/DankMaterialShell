@@ -81,7 +81,8 @@ function resetToDefault() {
         {"id": "audioOutput", "enabled": true, "width": 50},
         {"id": "audioInput", "enabled": true, "width": 50},
         {"id": "nightMode", "enabled": true, "width": 50},
-        {"id": "darkMode", "enabled": true, "width": 50}
+        {"id": "darkMode", "enabled": true, "width": 50},
+        {"id": "builtin_chromecast", "enabled": true, "width": 50}
     ]
     SettingsData.set("controlCenterWidgets", defaultWidgets)
 }
