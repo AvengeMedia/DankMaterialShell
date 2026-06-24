@@ -7,6 +7,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/apppicker"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/bluez"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/brightness"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/chromecast"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/clipboard"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/cups"
 	serverDbus "github.com/AvengeMedia/DankMaterialShell/core/internal/server/dbus"
@@ -143,6 +144,15 @@ func RouteRequest(conn *models.Conn, req models.Request) {
 			return
 		}
 		tailscale.HandleRequest(conn, req, tailscaleManager)
+		return
+	}
+
+	if strings.HasPrefix(req.Method, "chromecast.") {
+		if chromecastManager == nil {
+			models.RespondError(conn, req.ID, "chromecast manager not initialized")
+			return
+		}
+		chromecast.HandleRequest(conn, req, chromecastManager)
 		return
 	}
 
