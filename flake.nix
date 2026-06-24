@@ -131,6 +131,8 @@
                 # Install desktop file and icon
                 install -D ${rootSrc}/assets/dms-open.desktop \
                   $out/share/applications/dms-open.desktop
+                install -D ${rootSrc}/assets/com.danklinux.dms.desktop \
+                  $out/share/applications/com.danklinux.dms.desktop
                 install -D ${rootSrc}/core/assets/danklogo.svg \
                   $out/share/hicolor/scalable/apps/danklogo.svg
 
