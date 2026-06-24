@@ -28,6 +28,7 @@ Singleton {
     property var pathToPluginId: ({})
     property var pluginInstances: ({})
     property var globalVars: ({})
+    property var pluginLoadErrors: ({})
 
     property var _stateCache: ({})
     property var _stateLoaded: ({})
@@ -259,6 +260,9 @@ Singleton {
         let settings = manifest.settings;
         if (settings && settings.startsWith("./"))
             settings = settings.slice(2);
+        let startupCheck = manifest.startupCheck;
+        if (startupCheck && startupCheck.startsWith("./"))
+            startupCheck = startupCheck.slice(2);
 
         const componentPaths = _resolveComponentPaths(manifest, dir);
         const surfaces = Object.keys(componentPaths);
@@ -291,6 +295,7 @@ Singleton {
         info.surfaces = surfaces;
         info.componentPath = componentPaths.widget || componentPaths[surfaces[0]];
         info.settingsPath = settings ? (dir + "/" + settings) : null;
+        info.startupCheckPath = startupCheck ? (dir + "/" + startupCheck) : null;
         info.loaded = isPluginLoaded(manifest.id);
         info.type = manifest.type || (manifest.components ? "composite" : "widget");
         info.source = sourceTag;
@@ -316,7 +321,7 @@ Singleton {
             const isPureDesktop = surfaces.length === 1 && surfaces[0] === "desktop";
             const enabled = isPureDesktop || SettingsData.getPluginSetting(manifest.id, "enabled", false);
             if (enabled && !info.loaded)
-                loadPlugin(manifest.id);
+                runStartupGate(manifest.id);
         } else {
             knownManifests[absPath] = {
                 mtime: mtimeEpochMs,
@@ -637,9 +642,107 @@ Singleton {
         return loadedPlugins[pluginId] !== undefined;
     }
 
-    function enablePlugin(pluginId) {
+    function enablePlugin(pluginId, onResult) {
         SettingsData.setPluginSetting(pluginId, "enabled", true);
-        return loadPlugin(pluginId);
+        return runStartupGate(pluginId, onResult);
+    }
+
+    function _setLoadError(pluginId, err) {
+        const m = Object.assign({}, pluginLoadErrors);
+        m[pluginId] = err;
+        pluginLoadErrors = m;
+    }
+
+    function _clearLoadError(pluginId) {
+        if (!pluginLoadErrors[pluginId])
+            return;
+        const m = Object.assign({}, pluginLoadErrors);
+        delete m[pluginId];
+        pluginLoadErrors = m;
+    }
+
+    function _normalizeStartupError(result) {
+        if (!result)
+            return null;
+        if (typeof result === "string")
+            return {
+                "title": result,
+                "details": ""
+            };
+        return {
+            "title": result.title || I18n.tr("Plugin dependency missing"),
+            "details": result.details || ""
+        };
+    }
+
+    function _makeStartupCheckObject(pluginId, plugin) {
+        const comp = Qt.createComponent("file://" + plugin.startupCheckPath, Component.PreferSynchronous);
+        if (comp.status === Component.Error) {
+            log.error("startupCheck component error", pluginId, comp.errorString());
+            return null;
+        }
+        return comp.createObject(root);
+    }
+
+    function runStartupGate(pluginId, onResult) {
+        const plugin = availablePlugins[pluginId];
+        if (!plugin) {
+            if (onResult)
+                onResult(false);
+            return false;
+        }
+
+        if (!plugin.startupCheckPath) {
+            const ok = loadPlugin(pluginId);
+            if (onResult)
+                onResult(ok);
+            return ok;
+        }
+
+        const probe = _makeStartupCheckObject(pluginId, plugin);
+        const finish = result => {
+            if (probe)
+                probe.destroy();
+            const err = _normalizeStartupError(result);
+            if (err) {
+                _setLoadError(pluginId, err);
+                const title = I18n.tr("%1 Startup Failed").arg(plugin.name || pluginId);
+                const body = err.details ? (err.title + "\n\n" + err.details) : err.title;
+                ToastService.showError(title, body, "", "plugin-startup-" + pluginId);
+                pluginLoadFailed(pluginId, err.title);
+                if (onResult)
+                    onResult(false);
+                return;
+            }
+            _clearLoadError(pluginId);
+            const ok = loadPlugin(pluginId);
+            if (onResult)
+                onResult(ok);
+        };
+
+        const check = probe ? probe.check : null;
+        if (typeof check !== "function") {
+            finish(null);
+            return true;
+        }
+        if (check.length >= 1) {
+            try {
+                check(finish);
+            } catch (e) {
+                log.warn("startupCheck threw for", pluginId, e.message);
+                finish(null);
+            }
+            return true;
+        }
+        let r = null;
+        try {
+            r = check();
+        } catch (e) {
+            log.warn("startupCheck threw for", pluginId, e.message);
+            r = null;
+        }
+        finish(r);
+        return true;
     }
 
     function disablePlugin(pluginId) {
@@ -1024,7 +1127,8 @@ Singleton {
             const plugin = root.availablePlugins[pluginId];
             if (!plugin)
                 return `ERROR: unknown pluginId '${pluginId}'`;
-            const err = root.pluginLoadErrors[pluginId] || "";
+            const errObj = root.pluginLoadErrors[pluginId];
+            const err = errObj ? (errObj.title || "") : "";
             const safeErr = String(err).replace(/[\t\n\r]/g, " ");
             return `${plugin.loaded ? "loaded" : "unloaded"}\t${plugin.type || ""}\t${safeErr}`;
         }

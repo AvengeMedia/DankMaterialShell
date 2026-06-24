@@ -98,14 +98,26 @@
       "description": "Path to settings component QML file",
       "pattern": "^\\./.*\\.qml$"
     },
+    "startupCheck": {
+      "type": "string",
+      "description": "Path to a non-visual (QtObject) component exposing a check(done) function that gates activation. done(null) allows; done(error) blocks, where error is a string or { title, details }.",
+      "pattern": "^\\./.*\\.qml$"
+    },
     "requires_dms": {
       "type": "string",
       "description": "Minimum DMS version requirement (e.g., '>=0.1.18', '>0.1.0')",
       "pattern": "^(>=?|<=?|=|>|<)\\d+\\.\\d+\\.\\d+$"
     },
+    "dependencies": {
+      "type": "array",
+      "description": "Array of required system tools/dependencies (registry metadata)",
+      "items": {
+        "type": "string"
+      }
+    },
     "requires": {
       "type": "array",
-      "description": "Array of required system tools/dependencies",
+      "description": "Deprecated alias for 'dependencies'.",
       "items": {
         "type": "string"
       }

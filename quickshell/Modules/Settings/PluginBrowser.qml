@@ -94,8 +94,8 @@ FloatingWindow {
         return 0;
     }
 
-    function pluginVerified(plugin) {
-        return (plugin.status || []).indexOf("verified") !== -1;
+    function pluginReviewed(plugin) {
+        return (plugin.status || []).indexOf("reviewed") !== -1;
     }
 
     function statusColor(status) {
@@ -104,7 +104,7 @@ FloatingWindow {
             return Theme.error;
         case "unmaintained":
             return Theme.warning;
-        case "verified":
+        case "reviewed":
             return Theme.info;
         default:
             return Theme.outline;
@@ -119,8 +119,8 @@ FloatingWindow {
             return I18n.tr("unmaintained", "plugin status");
         case "deprecated":
             return I18n.tr("deprecated", "plugin status");
-        case "verified":
-            return I18n.tr("verified", "plugin status");
+        case "reviewed":
+            return I18n.tr("reviewed", "plugin status");
         default:
             return status;
         }
@@ -331,8 +331,8 @@ FloatingWindow {
             var votesB = b.upvotes || 0;
             if (votesA !== votesB)
                 return votesB - votesA;
-            var verA = root.pluginVerified(a);
-            var verB = root.pluginVerified(b);
+            var verA = root.pluginReviewed(a);
+            var verB = root.pluginReviewed(b);
             if (verA !== verB)
                 return verA ? -1 : 1;
             return comparePluginName(a, b);
