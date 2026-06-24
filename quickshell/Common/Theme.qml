@@ -140,7 +140,7 @@ Singleton {
 
     Component.onCompleted: {
         Quickshell.execDetached(["mkdir", "-p", stateDir]);
-        Proc.runCommand("matugenCheck", ["which", "matugen"], (output, code) => {
+        Proc.runCommand("matugenCheck", ["sh", "-c", "command -v matugen"], (output, code) => {
             matugenAvailable = (code === 0) && !envDisableMatugen;
             const isGreeterMode = (typeof SessionData !== "undefined" && SessionData.isGreeterMode);
 

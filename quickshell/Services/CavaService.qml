@@ -18,7 +18,7 @@ Singleton {
     Process {
         id: cavaCheck
 
-        command: ["which", "cava"]
+        command: ["sh", "-c", "command -v cava"]
         running: false
         onExited: exitCode => {
             root.cavaAvailable = exitCode === 0 && Quickshell.env("DMS_DISABLE_CAVA") !== "1";

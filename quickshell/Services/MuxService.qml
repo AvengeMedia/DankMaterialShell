@@ -47,7 +47,7 @@ Singleton {
 
     Process {
         id: tmuxCheckProcess
-        command: ["which", "tmux"]
+        command: ["sh", "-c", "command -v tmux"]
         running: false
         onExited: code => {
             root.tmuxAvailable = (code === 0);
@@ -56,7 +56,7 @@ Singleton {
 
     Process {
         id: zellijCheckProcess
-        command: ["which", "zellij"]
+        command: ["sh", "-c", "command -v zellij"]
         running: false
         onExited: code => {
             root.zellijAvailable = (code === 0);

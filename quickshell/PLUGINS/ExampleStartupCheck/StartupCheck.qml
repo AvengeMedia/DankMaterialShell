@@ -8,7 +8,7 @@ QtObject {
     //   done({ title, details })         -> block with an expandable details body
     // A synchronous variant (no argument, return the result) is also supported.
     function check(done) {
-        Proc.runCommand("exampleStartupCheck.depCheck", ["which", "boregard"], (stdout, exitCode) => {
+        Proc.runCommand("exampleStartupCheck.depCheck", ["sh", "-c", "command -v boregard"], (stdout, exitCode) => {
             if (exitCode === 0) {
                 done(null);
                 return;
