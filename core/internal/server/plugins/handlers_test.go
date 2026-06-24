@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/mocks/net"
+	coreplugins "github.com/AvengeMedia/DankMaterialShell/core/internal/plugins"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -165,6 +166,7 @@ func TestPluginInfoJSON(t *testing.T) {
 	info := PluginInfo{
 		Name:        "test",
 		Description: "test description",
+		Screenshot:  "https://raw.githubusercontent.com/test/repo/main/screenshot.png",
 		Installed:   true,
 		FirstParty:  true,
 	}
@@ -177,6 +179,59 @@ func TestPluginInfoJSON(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, info.Name, unmarshaled.Name)
 	assert.Equal(t, info.Installed, unmarshaled.Installed)
+	assert.Equal(t, info.Screenshot, unmarshaled.Screenshot)
+}
+
+func TestNormalizeScreenshotURL(t *testing.T) {
+	tests := []struct {
+		name string
+		raw  string
+		want string
+	}{
+		{
+			name: "raw github url is unchanged",
+			raw:  "https://raw.githubusercontent.com/alcxyz/DankVault/main/docs/screenshot.png",
+			want: "https://raw.githubusercontent.com/alcxyz/DankVault/main/docs/screenshot.png",
+		},
+		{
+			name: "github blob url becomes raw content url",
+			raw:  "https://github.com/acmagn/DMS-UPS-Monitor/blob/main/assets/screenshot.png",
+			want: "https://raw.githubusercontent.com/acmagn/DMS-UPS-Monitor/main/assets/screenshot.png",
+		},
+		{
+			name: "github raw url becomes raw content url",
+			raw:  "https://github.com/antonjah/nix-monitor/raw/master/assets/scrot.png",
+			want: "https://raw.githubusercontent.com/antonjah/nix-monitor/master/assets/scrot.png",
+		},
+		{
+			name: "non github url is unchanged",
+			raw:  "https://example.com/screenshot.png",
+			want: "https://example.com/screenshot.png",
+		},
+		{
+			name: "empty url is empty",
+			raw:  " ",
+			want: "",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, normalizeScreenshotURL(tt.raw))
+		})
+	}
+}
+
+func TestPluginInfoFromPluginIncludesScreenshot(t *testing.T) {
+	info := pluginInfoFromPlugin(coreplugins.Plugin{
+		ID:         "dankVault",
+		Name:       "Vault",
+		Repo:       "https://github.com/AvengeMedia/dms-plugins",
+		Screenshot: "https://github.com/AvengeMedia/dms-plugins/blob/master/DankNotepadModule/screenshot.png",
+	})
+
+	assert.Equal(t, "https://raw.githubusercontent.com/AvengeMedia/dms-plugins/master/DankNotepadModule/screenshot.png", info.Screenshot)
+	assert.True(t, info.FirstParty)
 }
 
 func TestSuccessResult(t *testing.T) {

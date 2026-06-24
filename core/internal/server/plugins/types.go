@@ -8,6 +8,7 @@ type PluginInfo struct {
 	Description  string   `json:"description,omitempty"`
 	Repo         string   `json:"repo,omitempty"`
 	Path         string   `json:"path,omitempty"`
+	Screenshot   string   `json:"screenshot,omitempty"`
 	Capabilities []string `json:"capabilities,omitempty"`
 	Compositors  []string `json:"compositors,omitempty"`
 	Dependencies []string `json:"dependencies,omitempty"`

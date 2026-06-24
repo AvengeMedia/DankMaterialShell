@@ -3,7 +3,6 @@ package plugins
 import (
 	"fmt"
 	"net"
-	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/plugins"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
@@ -34,25 +33,12 @@ func HandleList(conn net.Conn, req models.Request) {
 	for i, p := range pluginList {
 		installed, _ := manager.IsInstalled(p)
 		fb := feedback[p.ID]
-		result[i] = PluginInfo{
-			ID:           p.ID,
-			Name:         p.Name,
-			Category:     p.Category,
-			Author:       p.Author,
-			Description:  p.Description,
-			Repo:         p.Repo,
-			Path:         p.Path,
-			Capabilities: p.Capabilities,
-			Compositors:  p.Compositors,
-			Dependencies: p.Dependencies,
-			Installed:    installed,
-			FirstParty:   strings.HasPrefix(p.Repo, "https://github.com/AvengeMedia"),
-			Featured:     p.Featured,
-			RequiresDMS:  p.RequiresDMS,
-			Upvotes:      fb.Upvotes,
-			Status:       fb.Status,
-			IssueURL:     fb.IssueURL,
-		}
+		info := pluginInfoFromPlugin(p)
+		info.Installed = installed
+		info.Upvotes = fb.Upvotes
+		info.Status = fb.Status
+		info.IssueURL = fb.IssueURL
+		result[i] = info
 	}
 
 	models.Respond(conn, req.ID, result)

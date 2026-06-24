@@ -3,7 +3,6 @@ package plugins
 import (
 	"fmt"
 	"net"
-	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/plugins"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
@@ -53,21 +52,9 @@ func HandleSearch(conn net.Conn, req models.Request) {
 	result := make([]PluginInfo, len(searchResults))
 	for i, p := range searchResults {
 		installed, _ := manager.IsInstalled(p)
-		result[i] = PluginInfo{
-			ID:           p.ID,
-			Name:         p.Name,
-			Category:     p.Category,
-			Author:       p.Author,
-			Description:  p.Description,
-			Repo:         p.Repo,
-			Path:         p.Path,
-			Capabilities: p.Capabilities,
-			Compositors:  p.Compositors,
-			Dependencies: p.Dependencies,
-			Installed:    installed,
-			FirstParty:   strings.HasPrefix(p.Repo, "https://github.com/AvengeMedia"),
-			RequiresDMS:  p.RequiresDMS,
-		}
+		info := pluginInfoFromPlugin(p)
+		info.Installed = installed
+		result[i] = info
 	}
 
 	models.Respond(conn, req.ID, result)

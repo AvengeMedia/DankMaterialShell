@@ -18,12 +18,14 @@ FloatingWindow {
     property bool keyboardNavigationActive: false
     property bool isLoading: false
     property var parentModal: null
-    parentWindow: parentModal
+    parentWindow: null
     property bool pendingInstallHandled: false
     property string typeFilter: ""
     property string categoryFilter: "all"
     property var categoryFilterOptions: []
     property var availableLetters: []
+    property string expandedPluginId: ""
+    property string enlargedPreviewPluginId: ""
 
     readonly property bool activeCategorySort: normalizedSortMode(SessionData.pluginBrowserSortMode) === "category"
     readonly property bool showCategoryFilters: activeCategorySort && categoryFilterOptions.length > 1
@@ -255,6 +257,9 @@ FloatingWindow {
     }
 
     function updateFilteredPlugins() {
+        expandedPluginId = "";
+        enlargedPreviewPluginId = "";
+
         var baseFiltered = [];
         var query = searchQuery ? searchQuery.toLowerCase() : "";
 
@@ -338,6 +343,35 @@ FloatingWindow {
         selectedIndex = -1;
         keyboardNavigationActive = false;
         refreshListLayout();
+    }
+
+    function pluginKey(plugin, fallbackIndex) {
+        if (!plugin)
+            return "plugin-" + fallbackIndex;
+        return plugin.id || plugin.name || ("plugin-" + fallbackIndex);
+    }
+
+    function toggleExpandedPlugin(pluginId) {
+        if (expandedPluginId === pluginId) {
+            expandedPluginId = "";
+            enlargedPreviewPluginId = "";
+        } else {
+            expandedPluginId = pluginId;
+            enlargedPreviewPluginId = "";
+        }
+        keyboardNavigationActive = false;
+        Qt.callLater(() => {
+            if (pluginBrowserList)
+                pluginBrowserList.forceLayout();
+        });
+    }
+
+    function toggleEnlargedPreview(pluginId) {
+        enlargedPreviewPluginId = enlargedPreviewPluginId === pluginId ? "" : pluginId;
+        Qt.callLater(() => {
+            if (pluginBrowserList)
+                pluginBrowserList.forceLayout();
+        });
     }
 
     function selectNext() {
@@ -445,6 +479,8 @@ FloatingWindow {
         selectedIndex = -1;
         keyboardNavigationActive = false;
         isLoading = false;
+        expandedPluginId = "";
+        enlargedPreviewPluginId = "";
     }
 
     Connections {
@@ -828,6 +864,8 @@ FloatingWindow {
                     }
 
                     delegate: Rectangle {
+                        id: pluginDelegate
+
                         width: pluginBrowserList.width
                         height: pluginDelegateColumn.implicitHeight + Theme.spacingM * 2
                         radius: Theme.cornerRadius
@@ -836,12 +874,26 @@ FloatingWindow {
                         property bool isFirstParty: modelData.firstParty || false
                         property bool isFeatured: modelData.featured || false
                         property bool isCompatible: PluginService.checkPluginCompatibility(modelData.requires_dms)
-                        color: isSelected ? Theme.primarySelected : Theme.withAlpha(Theme.surfaceVariant, 0.3)
+                        property string pluginId: root.pluginKey(modelData, index)
+                        property bool isExpanded: root.expandedPluginId === pluginId
+                        property bool isPreviewEnlarged: root.enlargedPreviewPluginId === pluginId
+                        property string screenshotUrl: modelData.screenshot || ""
+                        color: isSelected ? Theme.primarySelected : rowMouseArea.containsMouse ? Theme.withAlpha(Theme.surfaceVariant, 0.45) : Theme.withAlpha(Theme.surfaceVariant, 0.3)
                         border.color: isSelected ? Theme.primary : Theme.withAlpha(Theme.outline, 0.2)
                         border.width: isSelected ? 2 : 1
 
+                        MouseArea {
+                            id: rowMouseArea
+                            z: 0
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: root.toggleExpandedPlugin(pluginDelegate.pluginId)
+                        }
+
                         Column {
                             id: pluginDelegateColumn
+                            z: 1
                             anchors.fill: parent
                             anchors.margins: Theme.spacingM
                             spacing: Theme.spacingXS
@@ -1168,6 +1220,76 @@ FloatingWindow {
                                             font.pixelSize: Theme.fontSizeSmall - 2
                                             color: Theme.primary
                                         }
+                                    }
+                                }
+                            }
+
+                            Rectangle {
+                                id: screenshotPreview
+                                width: parent.width
+                                height: pluginDelegate.isExpanded ? (pluginDelegate.isPreviewEnlarged ? Math.min(620, Math.max(320, width * 0.78)) : Math.min(260, Math.max(150, width * 0.42))) : 0
+                                visible: height > 0
+                                clip: true
+                                radius: Theme.cornerRadius
+                                color: Theme.surfaceContainerHigh
+                                border.color: Theme.withAlpha(Theme.outline, 0.2)
+                                border.width: 1
+
+                                Behavior on height {
+                                    NumberAnimation {
+                                        duration: Theme.shortDuration
+                                        easing.type: Theme.standardEasing
+                                    }
+                                }
+
+                                Loader {
+                                    id: screenshotImageLoader
+                                    anchors.fill: parent
+                                    anchors.margins: 1
+                                    active: pluginDelegate.isExpanded && pluginDelegate.screenshotUrl.length > 0
+
+                                    sourceComponent: CachingImage {
+                                        imagePath: pluginDelegate.screenshotUrl
+                                        maxCacheSize: pluginDelegate.isPreviewEnlarged ? 1600 : 960
+                                        fillMode: Image.PreserveAspectFit
+                                        visible: status !== Image.Error
+                                    }
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    enabled: screenshotImageLoader.item && screenshotImageLoader.item.status === Image.Ready
+                                    hoverEnabled: enabled
+                                    cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+                                    onClicked: mouse => {
+                                        mouse.accepted = true;
+                                        root.toggleEnlargedPreview(pluginDelegate.pluginId);
+                                    }
+                                }
+
+                                DankSpinner {
+                                    anchors.centerIn: parent
+                                    running: screenshotImageLoader.active && screenshotImageLoader.item && screenshotImageLoader.item.status === Image.Loading
+                                    visible: running
+                                }
+
+                                Column {
+                                    anchors.centerIn: parent
+                                    spacing: Theme.spacingXS
+                                    visible: pluginDelegate.isExpanded && (pluginDelegate.screenshotUrl.length === 0 || (screenshotImageLoader.item && screenshotImageLoader.item.status === Image.Error))
+
+                                    DankIcon {
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                        name: screenshotImageLoader.item && screenshotImageLoader.item.status === Image.Error ? "broken_image" : "image_not_supported"
+                                        size: Theme.iconSize
+                                        color: Theme.outline
+                                    }
+
+                                    StyledText {
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                        text: screenshotImageLoader.item && screenshotImageLoader.item.status === Image.Error ? I18n.tr("Screenshot unavailable", "plugin browser screenshot error") : I18n.tr("No screenshot provided", "plugin browser no screenshot")
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Theme.outline
                                     }
                                 }
                             }
