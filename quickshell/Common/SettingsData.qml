@@ -1372,7 +1372,14 @@ Singleton {
         }
     }
 
+    function cosmicIntegrationAvailable() {
+        const desktop = (Quickshell.env("XDG_CURRENT_DESKTOP") || "").toUpperCase();
+        return desktop.includes("COSMIC");
+    }
+
     function updateCosmicIconTheme() {
+        if (!cosmicIntegrationAvailable())
+            return;
         const resolved = resolveIconTheme();
         let cosmicThemeName = (resolved === "System Default") ? systemDefaultIconTheme : resolved;
         if (!cosmicThemeName || cosmicThemeName === "System Default") {
@@ -1403,6 +1410,8 @@ Singleton {
     }
 
     function updateCosmicThemeMode(isLightMode) {
+        if (!cosmicIntegrationAvailable())
+            return;
         const isDark = isLightMode ? "false" : "true";
         const script = `mkdir -p ${_configDir}/cosmic/com.system76.CosmicTheme.Mode/v1
         printf '%s\\n' ${isDark} > ${_configDir}/cosmic/com.system76.CosmicTheme.Mode/v1/is_dark 2>/dev/null || true`;

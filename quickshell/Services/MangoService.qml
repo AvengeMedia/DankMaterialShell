@@ -414,6 +414,8 @@ Singleton {
     }
 
     function reloadConfig(showToast, suppressWatch) {
+        if (!CompositorService.isMango || !root.available)
+            return;
         const shouldShowToast = showToast !== false;
         const shouldSuppressWatch = suppressWatch !== false;
         if (shouldSuppressWatch)

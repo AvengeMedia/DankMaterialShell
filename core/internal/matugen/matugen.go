@@ -47,13 +47,14 @@ type TemplateDef struct {
 	ConfigFile         string
 	Kind               TemplateKind
 	RunUnconditionally bool
+	RequiredEnv        string
 }
 
 var templateRegistry = []TemplateDef{
 	{ID: "gtk", Kind: TemplateKindGTK, RunUnconditionally: true},
 	{ID: "niri", Commands: []string{"niri"}, ConfigFile: "niri.toml"},
 	{ID: "hyprland", Commands: []string{"Hyprland"}, ConfigFile: "hyprland.toml"},
-	{ID: "mangowc", Commands: []string{"mango"}, ConfigFile: "mangowc.toml"},
+	{ID: "mangowc", Commands: []string{"mango"}, ConfigFile: "mangowc.toml", RequiredEnv: "MANGO_INSTANCE_SIGNATURE"},
 	{ID: "qt5ct", Commands: []string{"qt5ct"}, ConfigFile: "qt5ct.toml"},
 	{ID: "qt6ct", Commands: []string{"qt6ct"}, ConfigFile: "qt6ct.toml"},
 	{ID: "firefox", Commands: []string{"firefox"}, ConfigFile: "firefox.toml"},
@@ -356,6 +357,9 @@ output_path = '%s'
 		if opts.ShouldSkipTemplate(tmpl.ID) {
 			continue
 		}
+		if !templateSessionActive(tmpl) {
+			continue
+		}
 
 		switch tmpl.Kind {
 		case TemplateKindGTK:
@@ -487,6 +491,18 @@ func appendTerminalConfig(opts *Options, cfgFile *os.File, tmpDir string, checkC
 
 	cfgFile.WriteString(substituteVars(content, opts.ShellDir))
 	cfgFile.WriteString("\n")
+}
+
+func templateSessionActive(tmpl TemplateDef) bool {
+	if tmpl.RequiredEnv == "" {
+		return true
+	}
+	socket := os.Getenv(tmpl.RequiredEnv)
+	if socket == "" {
+		return false
+	}
+	_, err := os.Stat(socket)
+	return err == nil
 }
 
 func appExists(checker utils.AppChecker, checkCmd []string, checkFlatpaks []string) bool {
@@ -951,7 +967,7 @@ func CheckTemplates(checker utils.AppChecker) []TemplateCheck {
 		case tmpl.Kind == TemplateKindEmacs:
 			detected = appExists(checker, tmpl.Commands, tmpl.Flatpaks) && utils.EmacsConfigDir() != ""
 		default:
-			detected = appExists(checker, tmpl.Commands, tmpl.Flatpaks)
+			detected = appExists(checker, tmpl.Commands, tmpl.Flatpaks) && templateSessionActive(tmpl)
 		}
 
 		checks = append(checks, TemplateCheck{ID: tmpl.ID, Detected: detected})
