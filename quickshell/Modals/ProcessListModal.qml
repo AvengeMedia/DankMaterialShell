@@ -59,13 +59,13 @@ FloatingWindow {
             log.warn("dgop is not available");
             return;
         }
-        const targetTab = clampTab(tabIndex);
-        if (visible && currentTab === targetTab) {
+        // If already visible on the target tab, just hide.
+        // Otherwise delegate to show() which handles clampTab, sort state, and visibility.
+        if (visible && currentTab === clampTab(tabIndex)) {
             hide();
             return;
         }
-        currentTab = targetTab;
-        visible = true;
+        show(tabIndex);
     }
 
     function focusOrToggle() {
