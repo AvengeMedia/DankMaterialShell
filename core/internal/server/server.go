@@ -20,6 +20,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/apppicker"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/bluez"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/brightness"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/chromecast"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/clipboard"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/cups"
 	serverDbus "github.com/AvengeMedia/DankMaterialShell/core/internal/server/dbus"
@@ -67,6 +68,7 @@ var bluezManager *bluez.Manager
 var appPickerManager *apppicker.Manager
 var cupsManager *cups.Manager
 var tailscaleManager *tailscale.Manager
+var chromecastManager *chromecast.Manager
 var brightnessManager *brightness.Manager
 var wlrOutputManager *wlroutput.Manager
 var evdevManager *evdev.Manager
@@ -394,6 +396,12 @@ func InitializeSysUpdateManager() error {
 	return nil
 }
 
+func InitializeChromecastManager() error {
+	chromecastManager = chromecast.NewManager()
+	log.Info("Chromecast manager initialized")
+	return nil
+}
+
 func handleConnection(conn net.Conn) {
 	defer conn.Close()
 
@@ -450,6 +458,10 @@ func getCapabilities() Capabilities {
 
 	if tailscaleManager != nil && tailscaleManager.IsAvailable() {
 		caps = append(caps, "tailscale")
+	}
+
+	if chromecastManager != nil {
+		caps = append(caps, "chromecast")
 	}
 
 	if brightnessManager != nil {
@@ -520,6 +532,10 @@ func getServerInfo() ServerInfo {
 
 	if tailscaleManager != nil && tailscaleManager.IsAvailable() {
 		caps = append(caps, "tailscale")
+	}
+
+	if chromecastManager != nil {
+		caps = append(caps, "chromecast")
 	}
 
 	if brightnessManager != nil {
@@ -1062,6 +1078,38 @@ func handleSubscribe(conn net.Conn, req models.Request) {
 		}()
 	}
 
+	if shouldSubscribe("chromecast") && chromecastManager != nil {
+		wg.Add(1)
+		chromecastChan := chromecastManager.Subscribe(clientID + "-chromecast")
+		go func() {
+			defer wg.Done()
+			defer chromecastManager.Unsubscribe(clientID + "-chromecast")
+
+			initialState := chromecastManager.GetState()
+			select {
+			case eventChan <- ServiceEvent{Service: "chromecast", Data: initialState}:
+			case <-stopChan:
+				return
+			}
+
+			for {
+				select {
+				case state, ok := <-chromecastChan:
+					if !ok {
+						return
+					}
+					select {
+					case eventChan <- ServiceEvent{Service: "chromecast", Data: state}:
+					case <-stopChan:
+						return
+					}
+				case <-stopChan:
+					return
+				}
+			}
+		}()
+	}
+
 	if shouldSubscribe("brightness") && brightnessManager != nil {
 		wg.Add(2)
 		brightnessStateChan := brightnessManager.Subscribe(clientID + "-brightness-state")
@@ -1355,6 +1403,9 @@ func cleanupManagers() {
 	}
 	if tailscaleManager != nil {
 		tailscaleManager.Close()
+	}
+	if chromecastManager != nil {
+		chromecastManager.Close()
 	}
 }
 
@@ -1680,6 +1731,13 @@ func Start(printDocs bool) error {
 			notifyCapabilityChange()
 		}
 	}()
+
+	if err := InitializeChromecastManager(); err != nil {
+		log.Warnf("Chromecast manager unavailable: %v", err)
+	} else {
+		notifyCapabilityChange()
+		chromecastManager.StartupReconnect()
+	}
 
 	if err := InitializeAppPickerManager(); err != nil {
 		log.Debugf("AppPicker manager unavailable: %v", err)
