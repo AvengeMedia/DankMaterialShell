@@ -94,6 +94,8 @@ Item {
     readonly property bool useExtWorkspace: {
         if (Quickshell.env("DMS_FORCE_EXTWS") === "1")
             return (WindowManager.windowsets?.length ?? 0) > 0;
+        if (!CompositorService.compositorDetected)
+            return false;
         switch (CompositorService.compositor) {
         case "niri":
         case "hyprland":

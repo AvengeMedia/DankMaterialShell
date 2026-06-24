@@ -21,6 +21,7 @@ Singleton {
     property bool isMiracle: false
     property bool isLabwc: false
     property string compositor: "unknown"
+    property bool compositorDetected: false
     readonly property bool useHyprlandFocusGrab: isHyprland && Quickshell.env("DMS_HYPRLAND_EXCLUSIVE_FOCUS") !== "1"
 
     readonly property string hyprlandSignature: Quickshell.env("HYPRLAND_INSTANCE_SIGNATURE")
@@ -832,6 +833,7 @@ Singleton {
         repeat: false
         onTriggered: {
             detectCompositor();
+            compositorDetected = true;
             Qt.callLater(() => {
                 NiriService.generateNiriLayoutConfig();
                 HyprlandService.generateLayoutConfig();
