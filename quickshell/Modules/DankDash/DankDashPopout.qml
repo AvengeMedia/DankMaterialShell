@@ -191,6 +191,10 @@ DankPopout {
 
             Keys.onPressed: function (event) {
                 if (event.key === Qt.Key_Escape) {
+                    if (root.currentTabIndex === 2 && wallpaperLoader.item?.handleKeyEvent && wallpaperLoader.item.handleKeyEvent(event)) {
+                        event.accepted = true;
+                        return;
+                    }
                     root.dashVisible = false;
                     event.accepted = true;
                     return;

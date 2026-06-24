@@ -10,7 +10,7 @@ StyledRect {
     signal locationSelected(string path)
 
     width: 200
-    color: Theme.surface
+    color: Theme.nestedSurface
     clip: true
 
     Column {
