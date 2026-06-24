@@ -70,10 +70,7 @@ Variants {
             // Also requires the image to overflow on the compositor's scroll
             // axis — niri scrolls Y, Hyprland scrolls X — otherwise the
             // currentWallpaper Fill fallback handles it.
-            property bool effectiveScrolling: scrollingEnabled && totalWorkspaces > 1
-                && (!imageMetrics.ready
-                    || (CompositorService.isNiri && imageMetrics.nativeWidth / imageMetrics.nativeHeight < root.textureWidth / root.textureHeight - 0.01)
-                    || (CompositorService.isHyprland && imageMetrics.nativeWidth / imageMetrics.nativeHeight > root.textureWidth / root.textureHeight + 0.01))
+            property bool effectiveScrolling: scrollingEnabled && totalWorkspaces > 1 && (!imageMetrics.ready || (CompositorService.isNiri && imageMetrics.nativeWidth / imageMetrics.nativeHeight < root.textureWidth / root.textureHeight - 0.01) || (CompositorService.isHyprland && imageMetrics.nativeWidth / imageMetrics.nativeHeight > root.textureWidth / root.textureHeight + 0.01))
 
             Connections {
                 target: SessionData
@@ -131,8 +128,6 @@ Variants {
             property bool useNextForEffect: false
             property string pendingWallpaper: ""
             property string _deferredSource: ""
-            // ANDed into parallaxLoader.active; bounced to rebuild the ShaderEffect after a wl_output rebind.
-            property bool _parallaxRefreshGate: true
             readonly property bool overviewBlurActive: CompositorService.isNiri && SettingsData.blurWallpaperOnOverview && NiriService.inOverview && currentWallpaper.source !== ""
             readonly property var backingWindow: Window.window
             readonly property bool renderActive: !source || effectActive || overviewBlurActive || pendingWallpaper !== "" || _deferredSource !== "" || frameAnim.running || currentWallpaper.status === Image.Loading || nextWallpaper.status === Image.Loading
@@ -167,8 +162,7 @@ Variants {
                 target: Quickshell
                 function onScreensChanged() {
                     root.invalidate();
-                    root._reanchorScroll();
-                    root._refreshParallaxPipeline();
+                    root._onOutputRebind();
                 }
             }
 
@@ -191,12 +185,9 @@ Variants {
                     if (IdleService.isShellLocked)
                         return;
                     root.invalidate();
-                    // Unilateral re-attach on every unlock for parallax-active
-                    // surfaces — catches both detected rebinds and silent ones
-                    // the lifecycle signals miss. Non-parallax wallpapers don't
-                    // have the wedge risk so leave them be.
+                    // Catches silent rebinds during lock that no signal reports.
                     if (root.effectiveScrolling)
-                        root._reattachSurface();
+                        surfaceReattach.restart();
                 }
             }
 
@@ -208,28 +199,30 @@ Variants {
                 }
             }
 
-            // Re-anchor scroll target on output lifecycle; workspace signals
-            // don't re-fire when niri's list is unchanged across a rebind.
-            function _reanchorScroll() {
-                if (!root.scrollingEnabled) return;
+            // Workspace/scale signals don't re-fire when the output list is
+            // unchanged across a rebind, so re-derive scroll state by hand.
+            function _onOutputRebind() {
+                if (!root.scrollingEnabled)
+                    return;
                 root.firstScrollUpdate = true;
                 Qt.callLater(root.updateWorkspaceData);
+                parallaxLoader.rebuild();
+                if (root.effectiveScrolling && !IdleService.isShellLocked)
+                    surfaceReattach.restart();
             }
 
-            // Bounce the gate so parallaxLoader re-instantiates its ShaderEffect.
-            // Qt.callLater is required — Qt would otherwise coalesce the toggle.
-            function _refreshParallaxPipeline() {
-                if (!root._parallaxRefreshGate) return;
-                root._parallaxRefreshGate = false;
-                Qt.callLater(() => { root._parallaxRefreshGate = true; });
-            }
-
-            // Force WlrLayershell surface re-attach by bouncing visible. The
-            // Qt.callLater is the meaningful delay — Qt needs an event-loop
-            // tick between destroy and recreate.
-            function _reattachSurface() {
-                wallpaperWindow.visible = false;
-                Qt.callLater(() => { wallpaperWindow.visible = true; });
+            // Bouncing visible re-attaches a layer surface wedged by a rebind;
+            // debounced so a burst of signals yields one re-attach.
+            Timer {
+                id: surfaceReattach
+                interval: 0
+                repeat: false
+                onTriggered: {
+                    wallpaperWindow.visible = false;
+                    Qt.callLater(() => {
+                        wallpaperWindow.visible = true;
+                    });
+                }
             }
 
             Connections {
@@ -237,8 +230,7 @@ Variants {
                 function onDisplayScalesChanged() {
                     root._recheckScreenScale();
                     root.invalidate();
-                    root._reanchorScroll();
-                    root._refreshParallaxPipeline();
+                    root._onOutputRebind();
                 }
             }
 
@@ -247,8 +239,7 @@ Variants {
                 function onWlrOutputAvailableChanged() {
                     root._recheckScreenScale();
                     root.invalidate();
-                    root._reanchorScroll();
-                    root._refreshParallaxPipeline();
+                    root._onOutputRebind();
                 }
             }
 
@@ -262,8 +253,7 @@ Variants {
                     } else {
                         root._recheckScreenScale();
                     }
-                    root._reanchorScroll();
-                    root._refreshParallaxPipeline();
+                    root._onOutputRebind();
                 }
             }
 
@@ -311,40 +301,34 @@ Variants {
             }
 
             function updateWorkspaceData() {
-                if (!scrollingEnabled) return;
+                if (!scrollingEnabled)
+                    return;
 
                 let newTargetX = 50.0;
                 let newTargetY = 50.0;
 
                 if (CompositorService.isNiri) {
-                    const outputWorkspaces = NiriService.allWorkspaces.filter(
-                        ws => ws.output === modelData.name
-                    );
+                    const outputWorkspaces = NiriService.allWorkspaces.filter(ws => ws.output === modelData.name);
                     totalWorkspaces = outputWorkspaces.length;
 
                     const activeWs = outputWorkspaces.find(ws => ws.is_active);
                     currentWorkspaceIndex = activeWs ? activeWs.idx : 0;
 
-                    const scrollPercent = totalWorkspaces > 1
-                        ? ((currentWorkspaceIndex - 1) / (totalWorkspaces - 1)) * 100.0
-                        : 0.0;
+                    const scrollPercent = totalWorkspaces > 1 ? ((currentWorkspaceIndex - 1) / (totalWorkspaces - 1)) * 100.0 : 0.0;
 
                     newTargetY = scrollPercent;
                 } else if (CompositorService.isHyprland) {
                     const workspaces = Hyprland.workspaces?.values || [];
-                    const monitorWorkspaces = workspaces.filter(
-                        ws => ws.monitor?.name === modelData.name
-                    ).sort((a, b) => a.id - b.id);
+                    const monitorWorkspaces = workspaces.filter(ws => ws.monitor?.name === modelData.name).sort((a, b) => a.id - b.id);
 
                     totalWorkspaces = monitorWorkspaces.length;
                     const focusedId = Hyprland.focusedWorkspace?.id;
                     currentWorkspaceIndex = monitorWorkspaces.findIndex(ws => ws.id === focusedId);
 
-                    if (currentWorkspaceIndex < 0) currentWorkspaceIndex = 0;
+                    if (currentWorkspaceIndex < 0)
+                        currentWorkspaceIndex = 0;
 
-                    const scrollPercent = totalWorkspaces > 1
-                        ? ((currentWorkspaceIndex - 1) / (totalWorkspaces - 1)) * 100.0
-                        : 0.0;
+                    const scrollPercent = totalWorkspaces > 1 ? ((currentWorkspaceIndex - 1) / (totalWorkspaces - 1)) * 100.0 : 0.0;
 
                     newTargetX = scrollPercent;
                 }
@@ -367,12 +351,14 @@ Variants {
                 property real mass: 1.0
 
                 function springPositionJS(t, from, to) {
-                    if (t <= 0) return from;
+                    if (t <= 0)
+                        return from;
                     const beta = damping / (2 * mass);
                     const omega0 = Math.sqrt(stiffness / mass);
                     const x0 = from - to;
                     const envelope = Math.exp(-beta * t);
-                    if (Math.abs(x0 * envelope) < 0.01) return to;
+                    if (Math.abs(x0 * envelope) < 0.01)
+                        return to;
 
                     if (Math.abs(beta - omega0) < 0.0001) {
                         return to + envelope * (x0 + beta * x0 * t);
@@ -381,8 +367,8 @@ Variants {
                         return to + envelope * (x0 * Math.cos(omega1 * t) + (beta * x0 / omega1) * Math.sin(omega1 * t));
                     } else {
                         const omega2 = Math.sqrt(beta * beta - omega0 * omega0);
-                        const cosh = (x) => (Math.exp(x) + Math.exp(-x)) / 2;
-                        const sinh = (x) => (Math.exp(x) - Math.exp(-x)) / 2;
+                        const cosh = x => (Math.exp(x) + Math.exp(-x)) / 2;
+                        const sinh = x => (Math.exp(x) - Math.exp(-x)) / 2;
                         return to + envelope * (x0 * cosh(omega2 * t) + (beta * x0 / omega2) * sinh(omega2 * t));
                     }
                 }
@@ -394,7 +380,8 @@ Variants {
                     const currentY = springPositionJS(t, startY, targetY);
 
                     if (Math.abs(newTargetX - currentX) < 0.01 && Math.abs(newTargetY - currentY) < 0.01) {
-                        if (root.firstScrollUpdate) root.firstScrollUpdate = false;
+                        if (root.firstScrollUpdate)
+                            root.firstScrollUpdate = false;
                         return;
                     }
 
@@ -487,7 +474,7 @@ Variants {
                 // If currently locked, the unlock handler will re-attach;
                 // otherwise re-attach now.
                 if (wasSeen && root.effectiveScrolling && !IdleService.isShellLocked) {
-                    root._reattachSurface();
+                    surfaceReattach.restart();
                 }
             }
 
@@ -655,7 +642,8 @@ Variants {
                 }
 
                 readonly property real canvasWidth: {
-                    if (!ready || !root.effectiveScrolling) return root.textureWidth;
+                    if (!ready || !root.effectiveScrolling)
+                        return root.textureWidth;
                     const imageAspect = nativeWidth / nativeHeight;
                     const screenAspect = root.textureWidth / root.textureHeight;
                     if (imageAspect < screenAspect) {
@@ -666,7 +654,8 @@ Variants {
                 }
 
                 readonly property real canvasHeight: {
-                    if (!ready || !root.effectiveScrolling) return root.textureHeight;
+                    if (!ready || !root.effectiveScrolling)
+                        return root.textureHeight;
                     const imageAspect = nativeWidth / nativeHeight;
                     const screenAspect = root.textureWidth / root.textureHeight;
                     if (imageAspect < screenAspect) {
@@ -823,8 +812,19 @@ Variants {
             Loader {
                 id: parallaxLoader
                 anchors.fill: parent
-                active: root._parallaxRefreshGate && root.effectiveScrolling && !root.effectActive && imageMetrics.ready && parallaxImage.status === Image.Ready
+                active: root.effectiveScrolling && !root.effectActive && imageMetrics.ready && parallaxImage.status === Image.Ready
                 sourceComponent: parallaxScrollComp
+
+                // Rebuild after a rebind orphans the texture; callLater defeats
+                // sourceComponent coalescing.
+                function rebuild() {
+                    if (!active)
+                        return;
+                    sourceComponent = null;
+                    Qt.callLater(() => {
+                        sourceComponent = parallaxScrollComp;
+                    });
+                }
             }
 
             Component {

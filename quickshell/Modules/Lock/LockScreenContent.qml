@@ -200,49 +200,20 @@ Item {
         }
     }
 
-    Image {
-        id: wallpaperSource
-        visible: false
-        anchors.fill: parent
-        source: {
-            var currentWallpaper = SessionData.getMonitorWallpaper(screenName);
-            return (currentWallpaper && !currentWallpaper.startsWith("#")) ? encodeFileUrl(currentWallpaper) : "";
-        }
-        asynchronous: false
-        cache: true
-    }
-
-    ShaderEffectSource {
-        id: srcWallpaper
-        sourceItem: wallpaperSource
-        hideSource: true
-        live: false
-    }
-
-    ShaderEffect {
+    Loader {
         id: wallpaperBackground
         anchors.fill: parent
-        visible: wallpaperSource.source !== ""
 
-        property variant source1: srcWallpaper
-        property variant source2: srcWallpaper  // Same source for lock screen (no transition)
-        property real progress: 0.0
-
+        readonly property string wallpaperSource: {
+            var w = SessionData.getMonitorWallpaper(screenName);
+            return (w && !w.startsWith("#")) ? encodeFileUrl(w) : "";
+        }
         readonly property string fillModeName: SessionData.getMonitorWallpaperFillMode(screenName)
-        readonly property var scrollPos: SessionData.getMonitorScrollPosition(screenName)
 
-        property real fillMode: Theme.getShaderFillMode(fillModeName)
-        property real scrollX: scrollPos.scrollX
-        property real scrollY: scrollPos.scrollY
-        property real imageWidth1: wallpaperSource.implicitWidth > 0 ? wallpaperSource.implicitWidth : 1
-        property real imageHeight1: wallpaperSource.implicitHeight > 0 ? wallpaperSource.implicitHeight : 1
-        property real imageWidth2: wallpaperSource.implicitWidth > 0 ? wallpaperSource.implicitWidth : 1
-        property real imageHeight2: wallpaperSource.implicitHeight > 0 ? wallpaperSource.implicitHeight : 1
-        property real screenWidth: width > 0 ? width : 1
-        property real screenHeight: height > 0 ? height : 1
-        property vector4d fillColor: Qt.vector4d(0, 0, 0, 1)
+        active: wallpaperSource !== ""
+        asynchronous: false
 
-        fragmentShader: Qt.resolvedUrl("../../Shaders/qsb/wp_fade.frag.qsb")
+        sourceComponent: fillModeName === "Scrolling" ? scrollWallpaperComp : plainWallpaperComp
 
         layer.enabled: true
         layer.effect: MultiEffect {
@@ -257,6 +228,60 @@ Item {
             NumberAnimation {
                 duration: Theme.mediumDuration
                 easing.type: Theme.standardEasing
+            }
+        }
+    }
+
+    Component {
+        id: plainWallpaperComp
+        Image {
+            source: wallpaperBackground.wallpaperSource
+            fillMode: Theme.getFillMode(wallpaperBackground.fillModeName)
+            smooth: true
+            cache: true
+            asynchronous: false
+        }
+    }
+
+    Component {
+        id: scrollWallpaperComp
+        Item {
+            Image {
+                id: scrollSource
+                anchors.fill: parent
+                visible: false
+                source: wallpaperBackground.wallpaperSource
+                asynchronous: false
+                cache: true
+            }
+
+            ShaderEffectSource {
+                id: scrollSrc
+                sourceItem: scrollSource
+                hideSource: true
+                live: false
+            }
+
+            ShaderEffect {
+                anchors.fill: parent
+
+                readonly property var scrollPos: SessionData.getMonitorScrollPosition(screenName)
+
+                property variant source1: scrollSrc
+                property variant source2: scrollSrc
+                property real progress: 0.0
+                property real fillMode: Theme.getShaderFillMode(wallpaperBackground.fillModeName)
+                property real scrollX: scrollPos.scrollX
+                property real scrollY: scrollPos.scrollY
+                property real imageWidth1: scrollSource.implicitWidth > 0 ? scrollSource.implicitWidth : 1
+                property real imageHeight1: scrollSource.implicitHeight > 0 ? scrollSource.implicitHeight : 1
+                property real imageWidth2: imageWidth1
+                property real imageHeight2: imageHeight1
+                property real screenWidth: width > 0 ? width : 1
+                property real screenHeight: height > 0 ? height : 1
+                property vector4d fillColor: Qt.vector4d(0, 0, 0, 1)
+
+                fragmentShader: Qt.resolvedUrl("../../Shaders/qsb/wp_fade.frag.qsb")
             }
         }
     }
@@ -794,7 +819,7 @@ Item {
                         property string text: root.passwordBuffer
                         property int cursorPosition: text.length
 
-                        signal accepted()
+                        signal accepted
 
                         function clampCursorPosition() {
                             cursorPosition = Math.max(0, Math.min(cursorPosition, text.length));
