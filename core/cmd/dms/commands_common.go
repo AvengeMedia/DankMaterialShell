@@ -282,6 +282,11 @@ func browsePlugins() error {
 
 	feedback := plugins.FetchFeedback()
 
+	nameByID := make(map[string]string, len(pluginList))
+	for _, plugin := range pluginList {
+		nameByID[plugin.ID] = plugin.Name
+	}
+
 	fmt.Printf("\nAvailable Plugins (%d):\n\n", len(pluginList))
 	for _, plugin := range pluginList {
 		installed, _ := manager.IsInstalled(plugin)
@@ -312,6 +317,17 @@ func browsePlugins() error {
 			}
 			if fb.IssueURL != "" {
 				fmt.Printf("    Discuss: %s\n", fb.IssueURL)
+			}
+			if len(fb.Similar) > 0 {
+				names := make([]string, len(fb.Similar))
+				for i, id := range fb.Similar {
+					if name, ok := nameByID[id]; ok {
+						names[i] = name
+					} else {
+						names[i] = id
+					}
+				}
+				fmt.Printf("    Related: %s\n", strings.Join(names, ", "))
 			}
 		}
 		fmt.Println()

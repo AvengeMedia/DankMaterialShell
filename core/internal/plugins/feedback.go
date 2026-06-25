@@ -12,6 +12,7 @@ type Feedback struct {
 	Upvotes  int
 	Status   []string
 	IssueURL string
+	Similar  []string
 }
 
 // FetchFeedback retrieves community upvotes and moderator status from the directory API.
@@ -35,6 +36,7 @@ func FetchFeedback() map[string]Feedback {
 			Upvotes  int      `json:"upvotes"`
 			Status   []string `json:"status"`
 			IssueURL string   `json:"issueUrl"`
+			Similar  []string `json:"similar"`
 		} `json:"plugins"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&payload); err != nil {
@@ -43,7 +45,7 @@ func FetchFeedback() map[string]Feedback {
 
 	feedback := make(map[string]Feedback, len(payload.Plugins))
 	for _, p := range payload.Plugins {
-		feedback[p.ID] = Feedback{Upvotes: p.Upvotes, Status: p.Status, IssueURL: p.IssueURL}
+		feedback[p.ID] = Feedback{Upvotes: p.Upvotes, Status: p.Status, IssueURL: p.IssueURL, Similar: p.Similar}
 	}
 	return feedback
 }

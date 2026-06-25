@@ -38,6 +38,7 @@ func HandleList(conn net.Conn, req models.Request) {
 		info.Upvotes = fb.Upvotes
 		info.Status = fb.Status
 		info.IssueURL = fb.IssueURL
+		info.Similar = fb.Similar
 		result[i] = info
 	}
 

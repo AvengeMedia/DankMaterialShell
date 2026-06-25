@@ -21,6 +21,7 @@ type PluginInfo struct {
 	Upvotes      int      `json:"upvotes,omitempty"`
 	Status       []string `json:"status,omitempty"`
 	IssueURL     string   `json:"issueUrl,omitempty"`
+	Similar      []string `json:"similar,omitempty"`
 }
 
 type SuccessResult struct {

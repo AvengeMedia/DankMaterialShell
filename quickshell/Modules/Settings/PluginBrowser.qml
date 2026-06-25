@@ -18,7 +18,7 @@ FloatingWindow {
     property bool keyboardNavigationActive: false
     property bool isLoading: false
     property var parentModal: null
-    parentWindow: null
+    parentWindow: parentModal
     property bool pendingInstallHandled: false
     property string typeFilter: ""
     property string categoryFilter: "all"
@@ -124,6 +124,25 @@ FloatingWindow {
         default:
             return status;
         }
+    }
+
+    function relatedNames(plugin) {
+        if (!plugin || !plugin.similar || plugin.similar.length === 0)
+            return [];
+
+        var names = [];
+        for (var i = 0; i < plugin.similar.length; i++) {
+            var id = plugin.similar[i];
+            var name = id;
+            for (var j = 0; j < allPlugins.length; j++) {
+                if (allPlugins[j].id === id) {
+                    name = allPlugins[j].name || id;
+                    break;
+                }
+            }
+            names.push(name);
+        }
+        return names;
     }
 
     function comparePluginAuthor(a, b) {
@@ -1075,6 +1094,15 @@ FloatingWindow {
                                             acceptedButtons: Qt.NoButton
                                             propagateComposedEvents: true
                                         }
+                                    }
+
+                                    StyledText {
+                                        visible: root.relatedNames(modelData).length > 0
+                                        text: I18n.tr("Related: %1", "related plugins").arg(root.relatedNames(modelData).join(", "))
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Theme.outline
+                                        elide: Text.ElideRight
+                                        width: parent.width
                                     }
                                 }
 
