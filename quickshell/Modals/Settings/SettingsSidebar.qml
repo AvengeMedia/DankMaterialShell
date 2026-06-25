@@ -156,6 +156,12 @@ Rectangle {
             "collapsedByDefault": true,
             "children": [
                 {
+                    "id": "dank_dash",
+                    "text": I18n.tr("Dank Dash"),
+                    "icon": "space_dashboard",
+                    "tabIndex": 43
+                },
+                {
                     "id": "media_player",
                     "text": I18n.tr("Media Player"),
                     "icon": "music_note",

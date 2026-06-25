@@ -178,6 +178,7 @@ TAB_CATEGORY_MAP = {
     39: "Network",
     40: "Network",
     41: "Network",
+    43: "Dank Dash",
 }
 
 SEARCHABLE_COMPONENTS = [

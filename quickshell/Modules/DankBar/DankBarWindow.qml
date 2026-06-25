@@ -109,7 +109,7 @@ PanelWindow {
     }
 
     function triggerWallpaperBrowser() {
-        triggerDashTab(2);
+        triggerDashTab(SettingsData.dashTabIndexForId("wallpaper"));
     }
 
     readonly property bool usesOverlayLayer: CompositorService.framePeerSurfacesUseOverlayForScreen(barWindow.screen) || (barConfig?.useOverlayLayer ?? false)

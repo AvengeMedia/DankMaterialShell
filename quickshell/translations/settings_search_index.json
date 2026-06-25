@@ -9124,5 +9124,16 @@
       "settings"
     ],
     "icon": "battery_charging_full"
+  },
+  {
+    "section": "_tab_43",
+    "label": "Dank Dash",
+    "tabIndex": 43,
+    "category": "Dank Dash",
+    "keywords": [
+      "dank",
+      "dash"
+    ],
+    "icon": "space_dashboard"
   }
 ]

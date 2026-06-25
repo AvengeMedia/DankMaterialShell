@@ -511,6 +511,97 @@ Singleton {
     property bool useAutoLocation: false
     property bool weatherEnabled: true
 
+    readonly property var _dashTabIds: ["overview", "media", "wallpaper", "weather", "settings"]
+    readonly property var _dashTabsDefault: [
+        {
+            "id": "overview",
+            "enabled": true
+        },
+        {
+            "id": "media",
+            "enabled": true
+        },
+        {
+            "id": "wallpaper",
+            "enabled": true
+        },
+        {
+            "id": "weather",
+            "enabled": true
+        },
+        {
+            "id": "settings",
+            "enabled": true
+        }
+    ]
+    property var dashTabs: _dashTabsDefault
+    onDashTabsChanged: saveSettings()
+
+    function getDashTabs() {
+        const stored = Array.isArray(dashTabs) ? dashTabs : [];
+        const result = [];
+        const seen = {};
+        for (var i = 0; i < stored.length; i++) {
+            const id = stored[i] && stored[i].id;
+            if (_dashTabIds.indexOf(id) < 0 || seen[id])
+                continue;
+            seen[id] = true;
+            result.push({
+                "id": id,
+                "enabled": stored[i].enabled !== false
+            });
+        }
+        for (var j = 0; j < _dashTabIds.length; j++) {
+            if (!seen[_dashTabIds[j]])
+                result.push({
+                    "id": _dashTabIds[j],
+                    "enabled": true
+                });
+        }
+        return result;
+    }
+
+    function visibleDashTabIds() {
+        return getDashTabs().filter(t => t.enabled && (t.id !== "weather" || weatherEnabled)).map(t => t.id);
+    }
+
+    function dashTabIndexForId(id) {
+        const idx = visibleDashTabIds().indexOf(id);
+        return idx < 0 ? 0 : idx;
+    }
+
+    function setDashTabOrder(ids) {
+        const current = getDashTabs();
+        const ordered = [];
+        for (var i = 0; i < ids.length; i++) {
+            const existing = current.find(t => t.id === ids[i]);
+            if (existing)
+                ordered.push(existing);
+        }
+        for (var j = 0; j < current.length; j++) {
+            if (ids.indexOf(current[j].id) < 0)
+                ordered.push(current[j]);
+        }
+        dashTabs = ordered;
+    }
+
+    function setDashTabEnabled(id, on) {
+        const current = getDashTabs();
+        if (!on && id !== "settings" && current.filter(t => t.enabled && t.id !== "settings").length <= 1)
+            return;
+        dashTabs = current.map(t => t.id === id ? {
+            "id": t.id,
+            "enabled": on
+        } : t);
+    }
+
+    function resetDashTabs() {
+        dashTabs = _dashTabsDefault.map(t => ({
+                    "id": t.id,
+                    "enabled": t.enabled
+                }));
+    }
+
     property string networkPreference: "auto"
 
     property string iconThemeDark: "System Default"

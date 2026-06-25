@@ -701,5 +701,20 @@ FocusScope {
                     Qt.callLater(() => item.forceActiveFocus());
             }
         }
+
+        Loader {
+            id: dankDashLoader
+            anchors.fill: parent
+            active: root.currentIndex === 43
+            visible: active
+            focus: active
+
+            sourceComponent: DankDashTab {}
+
+            onActiveChanged: {
+                if (active && item)
+                    Qt.callLater(() => item.forceActiveFocus());
+            }
+        }
     }
 }

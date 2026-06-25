@@ -248,6 +248,7 @@ var SPEC = {
 
     useAutoLocation: { def: false },
     weatherEnabled: { def: true },
+    dashTabs: { def: [{ id: "overview", enabled: true }, { id: "media", enabled: true }, { id: "wallpaper", enabled: true }, { id: "weather", enabled: true }, { id: "settings", enabled: true }] },
 
     networkPreference: { def: "auto" },
 
