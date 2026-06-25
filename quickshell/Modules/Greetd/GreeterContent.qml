@@ -71,9 +71,13 @@ Item {
     readonly property bool greeterPamHasU2f: greeterPamStackHasModule("pam_u2f")
     readonly property bool greeterExternalAuthAvailable: (greeterPamHasFprint && GreetdSettings.greeterEnableFprint) || (greeterPamHasU2f && GreetdSettings.greeterEnableU2f)
     readonly property bool greeterPamHasExternalAuth: greeterPamHasFprint || greeterPamHasU2f
+    readonly property bool autoLoginAvailable: GreetdSettings.rememberLastUser && GreetdSettings.rememberLastSession
     readonly property bool multipleUsersAvailable: GreeterUsersService.loaded && GreeterUsersService.users.length > 1
-    readonly property bool showUserPicker: multipleUsersAvailable && !GreeterState.showPasswordInput && !manualUsernameEntry
-    readonly property bool showAccountSwitchLink: multipleUsersAvailable && manualUsernameEntry && !GreeterState.showPasswordInput && !GreeterState.unlocking
+    // Single-user systems get the picker too when auto-login is available, so the
+    // auto-login toggle lives inside the dropdown instead of floating on its own.
+    readonly property bool pickerAvailable: multipleUsersAvailable || (GreeterUsersService.loaded && GreeterUsersService.users.length === 1 && autoLoginAvailable)
+    readonly property bool showUserPicker: pickerAvailable && !GreeterState.showPasswordInput && !manualUsernameEntry
+    readonly property bool showAccountSwitchLink: pickerAvailable && manualUsernameEntry && !GreeterState.showPasswordInput && !GreeterState.unlocking
     readonly property int userPickerMaxHeight: Math.min(400, Math.max(120, height * 0.35))
     property bool userListOpen: false
     property bool manualUsernameEntry: false
@@ -467,7 +471,7 @@ Item {
     }
 
     function enterManualUsernameEntry() {
-        if (!root.multipleUsersAvailable || GreeterState.showPasswordInput)
+        if (!root.pickerAvailable || GreeterState.showPasswordInput)
             return;
         root.manualUsernameEntry = true;
         root.userListOpen = false;
@@ -480,7 +484,7 @@ Item {
     }
 
     function returnToUserListFromManualEntry() {
-        if (!root.multipleUsersAvailable)
+        if (!root.pickerAvailable)
             return;
         root.manualUsernameEntry = false;
         root.userListOpen = true;
@@ -491,7 +495,7 @@ Item {
     }
 
     function returnToUserPicker() {
-        if (!root.multipleUsersAvailable || GreeterState.unlocking)
+        if (!root.pickerAvailable || GreeterState.unlocking)
             return;
         root.manualUsernameEntry = false;
         root.skipAutoSelectUser = true;
@@ -1025,7 +1029,7 @@ Item {
                     Item {
                         Layout.preferredWidth: 60
                         Layout.preferredHeight: 60
-                        visible: GreetdSettings.lockScreenShowProfileImage || root.multipleUsersAvailable
+                        visible: GreetdSettings.lockScreenShowProfileImage || root.pickerAvailable
 
                         DankCircularImage {
                             anchors.fill: parent
@@ -1051,7 +1055,7 @@ Item {
                             color: "transparent"
                             border.color: Theme.primary
                             border.width: (avatarPickerArea.containsMouse || root.userListOpen) && !GreeterState.showPasswordInput ? 2 : 0
-                            visible: root.multipleUsersAvailable
+                            visible: root.pickerAvailable
                             Behavior on border.width {
                                 NumberAnimation {
                                     duration: Theme.shortDuration
@@ -1065,7 +1069,7 @@ Item {
                             anchors.fill: parent
                             radius: width / 2
                             color: Qt.rgba(0, 0, 0, 0.55)
-                            opacity: (root.multipleUsersAvailable && GreeterState.showPasswordInput && avatarPickerArea.containsMouse) ? 1 : 0
+                            opacity: (root.pickerAvailable && GreeterState.showPasswordInput && avatarPickerArea.containsMouse) ? 1 : 0
                             visible: opacity > 0
 
                             Behavior on opacity {
@@ -1087,7 +1091,7 @@ Item {
                             id: avatarPickerArea
 
                             anchors.fill: parent
-                            visible: root.multipleUsersAvailable
+                            visible: root.pickerAvailable
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
@@ -1124,7 +1128,7 @@ Item {
                             maxExpandedHeight: root.userPickerMaxHeight
                             visible: root.showUserPicker && !GreeterState.showPasswordInput
                             expanded: root.userListOpen
-                            autoLoginVisible: GreetdSettings.rememberLastUser && GreetdSettings.rememberLastSession
+                            autoLoginVisible: root.autoLoginAvailable
                             autoLoginChecked: root.autoLoginOnSuccess
                             manualEntryVisible: true
                             onUserSelected: username => root.selectUser(username, false)
@@ -1418,39 +1422,6 @@ Item {
                             duration: Theme.shortDuration
                             easing.type: Theme.standardEasing
                         }
-                    }
-                }
-
-                // Single-user auto-login toggle: its only home, since there is no picker to host it.
-                // Multi-user switching lives on the avatar hover; multi-user auto-login lives in the picker.
-                // Height stays reserved during unlocking (fade only) so the centered column doesn't jump.
-                Item {
-                    id: passwordActions
-
-                    readonly property bool autoLoginAvailable: GreetdSettings.rememberLastUser && GreetdSettings.rememberLastSession
-                    readonly property bool showAutoLoginToggle: !root.multipleUsersAvailable && autoLoginAvailable
-
-                    Layout.fillWidth: true
-                    Layout.topMargin: Theme.spacingXS
-                    Layout.preferredHeight: visible ? 32 : 0
-                    visible: GreeterState.showPasswordInput && showAutoLoginToggle
-                    opacity: GreeterState.unlocking ? 0 : 1
-
-                    Behavior on opacity {
-                        NumberAnimation {
-                            duration: Theme.shortDuration
-                            easing.type: Theme.standardEasing
-                        }
-                    }
-
-                    DankActionButton {
-                        anchors.centerIn: parent
-                        iconName: root.autoLoginOnSuccess ? "check_box" : "check_box_outline_blank"
-                        iconSize: 18
-                        buttonSize: 32
-                        iconColor: root.autoLoginOnSuccess ? Theme.primary : Qt.rgba(1, 1, 1, 0.55)
-                        tooltipText: I18n.tr("Auto-login")
-                        onClicked: root.autoLoginOnSuccess = !root.autoLoginOnSuccess
                     }
                 }
             }
