@@ -4611,6 +4611,21 @@
     ]
   },
   {
+    "section": "_tab_11",
+    "label": "Lock Screen",
+    "tabIndex": 11,
+    "category": "Lock Screen",
+    "keywords": [
+      "lock",
+      "lockscreen",
+      "login",
+      "password",
+      "screen",
+      "security"
+    ],
+    "icon": "lock"
+  },
+  {
     "section": "lockDisplay",
     "label": "Lock Screen Display",
     "tabIndex": 11,
@@ -4746,27 +4761,6 @@
       "what"
     ],
     "description": "Control what notification information is shown on the lock screen"
-  },
-  {
-    "section": "_tab_11",
-    "label": "Power & Security",
-    "tabIndex": 11,
-    "category": "Lock Screen",
-    "keywords": [
-      "hibernate",
-      "lock",
-      "login",
-      "password",
-      "power",
-      "reboot",
-      "restart",
-      "screen",
-      "security",
-      "shutdown",
-      "sleep",
-      "suspend"
-    ],
-    "icon": "security"
   },
   {
     "section": "lockScreenPowerOffMonitorsOnLock",
@@ -5585,6 +5579,22 @@
     "description": "Play sound when volume is adjusted"
   },
   {
+    "section": "_tab_16",
+    "label": "Media Player",
+    "tabIndex": 16,
+    "category": "Media Player",
+    "keywords": [
+      "audio",
+      "media",
+      "mpris",
+      "music",
+      "playback",
+      "player",
+      "spotify"
+    ],
+    "icon": "music_note"
+  },
+  {
     "section": "mediaPlayer",
     "label": "Media Player Settings",
     "tabIndex": 16,
@@ -5628,28 +5638,6 @@
       "widget"
     ],
     "description": "Scroll wheel behavior on media widget"
-  },
-  {
-    "section": "_tab_16",
-    "label": "Widgets & Notifications",
-    "tabIndex": 16,
-    "category": "Media Player",
-    "keywords": [
-      "alert",
-      "alerts",
-      "components",
-      "media",
-      "modules",
-      "mpris",
-      "music",
-      "notif",
-      "notifications",
-      "notifs",
-      "player",
-      "spotify",
-      "widgets"
-    ],
-    "icon": "dashboard"
   },
   {
     "section": "notificationBodyFontSize",
@@ -9113,27 +9101,39 @@
   },
   {
     "section": "_tab_42",
-    "label": "Battery",
+    "label": "Power & Security",
     "tabIndex": 42,
     "category": "Settings",
     "keywords": [
-      "battery",
-      "charge",
-      "charging",
+      "hibernate",
       "power",
-      "settings"
+      "reboot",
+      "restart",
+      "security",
+      "settings",
+      "shutdown",
+      "sleep",
+      "suspend"
     ],
-    "icon": "battery_charging_full"
+    "icon": "security"
   },
   {
     "section": "_tab_43",
-    "label": "Dank Dash",
+    "label": "Widgets & Notifications",
     "tabIndex": 43,
     "category": "Dank Dash",
     "keywords": [
+      "alert",
+      "alerts",
+      "components",
       "dank",
-      "dash"
+      "dash",
+      "modules",
+      "notif",
+      "notifications",
+      "notifs",
+      "widgets"
     ],
-    "icon": "space_dashboard"
+    "icon": "dashboard"
   }
 ]

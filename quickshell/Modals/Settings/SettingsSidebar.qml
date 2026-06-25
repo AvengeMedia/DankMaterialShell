@@ -367,6 +367,12 @@ Rectangle {
             "collapsedByDefault": true,
             "children": [
                 {
+                    "id": "battery",
+                    "text": I18n.tr("Battery"),
+                    "icon": "battery_charging_full",
+                    "tabIndex": 42
+                },
+                {
                     "id": "lock_screen",
                     "text": I18n.tr("Lock Screen"),
                     "icon": "lock",
@@ -383,12 +389,6 @@ Rectangle {
                     "text": I18n.tr("Power & Sleep"),
                     "icon": "power_settings_new",
                     "tabIndex": 21
-                },
-                {
-                    "id": "battery",
-                    "text": I18n.tr("Battery"),
-                    "icon": "battery_charging_full",
-                    "tabIndex": 42
                 }
             ]
         },

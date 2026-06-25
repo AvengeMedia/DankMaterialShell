@@ -59,7 +59,7 @@ Item {
     }
 
     readonly property real rowHeight: 70
-    readonly property real rowSpacing: Theme.spacingM
+    readonly property real rowSpacing: Theme.spacingS
     readonly property real dividerGap: 40
 
     property var enabledOrder: []
@@ -371,207 +371,207 @@ Item {
                             readonly property bool highlighted: root.highlightedId === modelData
                             readonly property bool canHide: root.canHide(modelData)
 
-                        width: reorderArea.width
-                        height: root.rowHeight
-                        z: dragging ? 100 : (highlighted ? 3 : 1)
+                            width: reorderArea.width
+                            height: root.rowHeight
+                            z: dragging ? 100 : (highlighted ? 3 : 1)
 
-                        Binding {
-                            target: rowItem
-                            property: "y"
-                            value: root.slotYForId(rowItem.modelData)
-                            when: !rowItem.dragging
-                            restoreMode: Binding.RestoreNone
-                        }
-
-                        onYChanged: {
-                            if (dragging)
-                                root.updateDragTarget(y + height / 2);
-                        }
-
-                        Behavior on y {
-                            enabled: !rowItem.dragging
-                            NumberAnimation {
-                                duration: Theme.expressiveDurations.expressiveDefaultSpatial
-                                easing.type: Easing.BezierSpline
-                                easing.bezierCurve: Theme.expressiveCurves.expressiveFastSpatial
+                            Binding {
+                                target: rowItem
+                                property: "y"
+                                value: root.slotYForId(rowItem.modelData)
+                                when: !rowItem.dragging
+                                restoreMode: Binding.RestoreNone
                             }
-                        }
 
-                        Item {
-                            id: content
-                            anchors.fill: parent
-                            scale: rowItem.dragging ? 1.02 : 1.0
-                            transformOrigin: Item.Center
+                            onYChanged: {
+                                if (dragging)
+                                    root.updateDragTarget(y + height / 2);
+                            }
 
-                            Behavior on scale {
+                            Behavior on y {
+                                enabled: !rowItem.dragging
                                 NumberAnimation {
-                                    duration: Theme.shortDuration
-                                    easing.type: Easing.OutCubic
+                                    duration: Theme.expressiveDurations.expressiveDefaultSpatial
+                                    easing.type: Easing.BezierSpline
+                                    easing.bezierCurve: Theme.expressiveCurves.expressiveFastSpatial
                                 }
                             }
 
-                            Rectangle {
-                                id: surface
+                            Item {
+                                id: content
                                 anchors.fill: parent
-                                radius: rowItem.dragging ? Theme.cornerRadius + 6 : Theme.cornerRadius
-                                color: {
-                                    if (rowItem.dragging)
-                                        return Theme.secondaryContainer;
-                                    const base = Theme.surfaceContainer;
-                                    return Qt.rgba(base.r, base.g, base.b, rowItem.isEnabled ? 0.7 : 0.4);
-                                }
-                                border.width: rowItem.dragging ? 2 : 1
-                                border.color: rowItem.dragging ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                                scale: rowItem.dragging ? 1.02 : 1.0
+                                transformOrigin: Item.Center
 
-                                Behavior on radius {
+                                Behavior on scale {
                                     NumberAnimation {
                                         duration: Theme.shortDuration
                                         easing.type: Easing.OutCubic
                                     }
                                 }
-                                Behavior on color {
-                                    ColorAnimation {
-                                        duration: Theme.shortDuration
-                                    }
-                                }
-                                Behavior on border.color {
-                                    ColorAnimation {
-                                        duration: Theme.shortDuration
-                                    }
-                                }
 
                                 Rectangle {
+                                    id: surface
                                     anchors.fill: parent
-                                    radius: parent.radius
-                                    color: Theme.primary
-                                    opacity: (dragArea.containsMouse && !rowItem.dragging) ? 0.06 : 0
-                                    Behavior on opacity {
+                                    radius: rowItem.dragging ? Theme.cornerRadius + 6 : Theme.cornerRadius
+                                    color: {
+                                        if (rowItem.dragging)
+                                            return Theme.secondaryContainer;
+                                        const base = Theme.surfaceContainer;
+                                        return Qt.rgba(base.r, base.g, base.b, rowItem.isEnabled ? 0.7 : 0.4);
+                                    }
+                                    border.width: rowItem.dragging ? 2 : 1
+                                    border.color: rowItem.dragging ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+
+                                    Behavior on radius {
                                         NumberAnimation {
                                             duration: Theme.shortDuration
+                                            easing.type: Easing.OutCubic
                                         }
                                     }
-                                }
-
-                                DankIcon {
-                                    id: dragHandle
-                                    name: "drag_indicator"
-                                    size: Theme.iconSize - 4
-                                    color: rowItem.dragging ? Theme.primary : Theme.outline
-                                    anchors.left: parent.left
-                                    anchors.leftMargin: Theme.spacingM
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    opacity: rowItem.isEnabled ? ((dragArea.containsMouse || rowItem.dragging || rowItem.highlighted) ? 1.0 : 0.45) : 0
-                                    visible: opacity > 0.01
-
-                                    Behavior on opacity {
-                                        NumberAnimation {
-                                            duration: Theme.shortDuration
-                                        }
-                                    }
-                                }
-
-                                DankIcon {
-                                    id: tabIcon
-                                    name: rowItem.present.icon
-                                    size: Theme.iconSize
-                                    color: rowItem.isEnabled ? Theme.primary : Theme.outline
-                                    anchors.left: parent.left
-                                    anchors.leftMargin: Theme.spacingM * 2 + Theme.iconSize - 4
-                                    anchors.verticalCenter: parent.verticalCenter
-
                                     Behavior on color {
                                         ColorAnimation {
                                             duration: Theme.shortDuration
                                         }
                                     }
-                                }
-
-                                Column {
-                                    anchors.left: tabIcon.right
-                                    anchors.leftMargin: Theme.spacingM
-                                    anchors.right: visibilityButton.left
-                                    anchors.rightMargin: Theme.spacingM
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    spacing: 2
-
-                                    StyledText {
-                                        text: rowItem.present.text
-                                        font.pixelSize: Theme.fontSizeMedium
-                                        font.weight: Font.Medium
-                                        color: rowItem.isEnabled ? Theme.surfaceText : Theme.outline
-                                        elide: Text.ElideRight
-                                        width: parent.width
+                                    Behavior on border.color {
+                                        ColorAnimation {
+                                            duration: Theme.shortDuration
+                                        }
                                     }
 
-                                    StyledText {
-                                        text: rowItem.present.description
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        color: rowItem.isEnabled ? Theme.outline : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.6)
-                                        elide: Text.ElideRight
-                                        width: parent.width
-                                        visible: text.length > 0
+                                    Rectangle {
+                                        anchors.fill: parent
+                                        radius: parent.radius
+                                        color: Theme.primary
+                                        opacity: (dragArea.containsMouse && !rowItem.dragging) ? 0.06 : 0
+                                        Behavior on opacity {
+                                            NumberAnimation {
+                                                duration: Theme.shortDuration
+                                            }
+                                        }
                                     }
-                                }
 
-                                DankActionButton {
-                                    id: visibilityButton
-                                    anchors.right: parent.right
-                                    anchors.rightMargin: Theme.spacingS
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    buttonSize: 36
-                                    iconName: rowItem.isEnabled ? "visibility" : "visibility_off"
-                                    iconSize: 18
-                                    iconColor: rowItem.isEnabled ? Theme.primary : Theme.outline
-                                    enabled: rowItem.canHide
-                                    onClicked: {
-                                        root.forceActiveFocus();
-                                        root.highlightedId = rowItem.modelData;
-                                        SettingsData.setDashTabEnabled(rowItem.modelData, !rowItem.isEnabled);
+                                    DankIcon {
+                                        id: dragHandle
+                                        name: "drag_indicator"
+                                        size: Theme.iconSize - 4
+                                        color: rowItem.dragging ? Theme.primary : Theme.outline
+                                        anchors.left: parent.left
+                                        anchors.leftMargin: Theme.spacingM
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        opacity: rowItem.isEnabled ? ((dragArea.containsMouse || rowItem.dragging || rowItem.highlighted) ? 1.0 : 0.45) : 0
+                                        visible: opacity > 0.01
+
+                                        Behavior on opacity {
+                                            NumberAnimation {
+                                                duration: Theme.shortDuration
+                                            }
+                                        }
+                                    }
+
+                                    DankIcon {
+                                        id: tabIcon
+                                        name: rowItem.present.icon
+                                        size: Theme.iconSize
+                                        color: rowItem.isEnabled ? Theme.primary : Theme.outline
+                                        anchors.left: parent.left
+                                        anchors.leftMargin: Theme.spacingM * 2 + Theme.iconSize - 4
+                                        anchors.verticalCenter: parent.verticalCenter
+
+                                        Behavior on color {
+                                            ColorAnimation {
+                                                duration: Theme.shortDuration
+                                            }
+                                        }
+                                    }
+
+                                    Column {
+                                        anchors.left: tabIcon.right
+                                        anchors.leftMargin: Theme.spacingM
+                                        anchors.right: visibilityButton.left
+                                        anchors.rightMargin: Theme.spacingM
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        spacing: 2
+
+                                        StyledText {
+                                            text: rowItem.present.text
+                                            font.pixelSize: Theme.fontSizeMedium
+                                            font.weight: Font.Medium
+                                            color: rowItem.isEnabled ? Theme.surfaceText : Theme.outline
+                                            elide: Text.ElideRight
+                                            width: parent.width
+                                        }
+
+                                        StyledText {
+                                            text: rowItem.present.description
+                                            font.pixelSize: Theme.fontSizeSmall
+                                            color: rowItem.isEnabled ? Theme.outline : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.6)
+                                            elide: Text.ElideRight
+                                            width: parent.width
+                                            visible: text.length > 0
+                                        }
+                                    }
+
+                                    DankActionButton {
+                                        id: visibilityButton
+                                        anchors.right: parent.right
+                                        anchors.rightMargin: Theme.spacingS
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        buttonSize: 36
+                                        iconName: rowItem.isEnabled ? "visibility" : "visibility_off"
+                                        iconSize: 18
+                                        iconColor: rowItem.isEnabled ? Theme.primary : Theme.outline
+                                        enabled: rowItem.canHide
+                                        onClicked: {
+                                            root.forceActiveFocus();
+                                            root.highlightedId = rowItem.modelData;
+                                            SettingsData.setDashTabEnabled(rowItem.modelData, !rowItem.isEnabled);
+                                        }
                                     }
                                 }
                             }
-                        }
 
-                        Rectangle {
-                            anchors.fill: parent
-                            anchors.margins: -2
-                            radius: Theme.cornerRadius + 2
-                            color: "transparent"
-                            border.width: 2
-                            border.color: Theme.primary
-                            opacity: rowItem.highlighted && !rowItem.dragging ? 0.6 : 0
-                            visible: opacity > 0.01
+                            Rectangle {
+                                anchors.fill: parent
+                                anchors.margins: -2
+                                radius: Theme.cornerRadius + 2
+                                color: "transparent"
+                                border.width: 2
+                                border.color: Theme.primary
+                                opacity: rowItem.highlighted && !rowItem.dragging ? 0.6 : 0
+                                visible: opacity > 0.01
 
-                            Behavior on opacity {
-                                NumberAnimation {
-                                    duration: Theme.shortDuration
+                                Behavior on opacity {
+                                    NumberAnimation {
+                                        duration: Theme.shortDuration
+                                    }
                                 }
                             }
-                        }
 
-                        MouseArea {
-                            id: dragArea
-                            anchors.fill: parent
-                            anchors.rightMargin: 48
-                            hoverEnabled: true
-                            enabled: rowItem.isEnabled
-                            cursorShape: rowItem.dragging ? Qt.ClosedHandCursor : Qt.OpenHandCursor
-                            drag.target: rowItem
-                            drag.axis: Drag.YAxis
-                            drag.minimumY: -rowItem.height
-                            drag.maximumY: reorderArea.height
-                            drag.smoothed: false
-                            onPressed: {
-                                root.forceActiveFocus();
-                                root.highlightedId = rowItem.modelData;
-                                root.beginDrag(rowItem.modelData);
+                            MouseArea {
+                                id: dragArea
+                                anchors.fill: parent
+                                anchors.rightMargin: 48
+                                hoverEnabled: true
+                                enabled: rowItem.isEnabled
+                                cursorShape: rowItem.dragging ? Qt.ClosedHandCursor : Qt.OpenHandCursor
+                                drag.target: rowItem
+                                drag.axis: Drag.YAxis
+                                drag.minimumY: -rowItem.height
+                                drag.maximumY: reorderArea.height
+                                drag.smoothed: false
+                                onPressed: {
+                                    root.forceActiveFocus();
+                                    root.highlightedId = rowItem.modelData;
+                                    root.beginDrag(rowItem.modelData);
+                                }
+                                onReleased: root.endDrag()
                             }
-                            onReleased: root.endDrag()
                         }
                     }
                 }
             }
         }
     }
-}
 }
