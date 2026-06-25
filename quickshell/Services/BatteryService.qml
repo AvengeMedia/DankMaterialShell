@@ -44,6 +44,22 @@ Singleton {
         return batteries.find(dev => dev.nativePath.toLowerCase().includes(override)) || null;
     }
     readonly property bool preferredDeviceKnown: preferredDevice && preferredDevice.ready && preferredDevice.state !== UPowerDeviceState.Unknown
+    readonly property bool _hasKnownChargingState: {
+        if (!batteryAvailable)
+            return false;
+        if (usePreferred)
+            return preferredDeviceKnown;
+        return stateKnownBatteries.length > 0;
+    }
+    readonly property bool _currentIsCharging: {
+        if (!batteryAvailable)
+            return false;
+        if (usePreferred && preferredDeviceKnown)
+            return preferredDevice.state === UPowerDeviceState.Charging;
+        if (usePreferred)
+            return false;
+        return stateKnownBatteries.some(b => b.state === UPowerDeviceState.Charging);
+    }
 
     // Main battery (for backward compatibility)
     readonly property UPowerDevice device: {
@@ -84,21 +100,7 @@ Singleton {
         _lastBatteryLevel = val;
         return val;
     }
-    readonly property bool isCharging: {
-        if (!batteryAvailable)
-            return false;
-        if (usePreferred && preferredDeviceKnown) {
-            const preferredCharging = preferredDevice.state === UPowerDeviceState.Charging;
-            _lastIsCharging = preferredCharging;
-            return preferredCharging;
-        }
-        if (usePreferred && preferredDevice)
-            return _lastIsCharging;
-        const val = stateKnownBatteries.some(b => b.state === UPowerDeviceState.Charging);
-        if (stateKnownBatteries.length > 0)
-            _lastIsCharging = val;
-        return stateKnownBatteries.length > 0 ? val : _lastIsCharging;
-    }
+    readonly property bool isCharging: _hasKnownChargingState ? _currentIsCharging : _lastIsCharging
 
     // Is the system plugged in (Is not running on battery)
     readonly property bool isPluggedIn: !UPower.onBattery
@@ -108,6 +110,16 @@ Singleton {
     property bool _hasNotifiedLowBattery: false
     property bool _hasNotifiedCriticalBattery: false
     property bool _hasNotifiedChargeLimit: false
+
+    function _syncLastIsCharging() {
+        if (_hasKnownChargingState)
+            _lastIsCharging = _currentIsCharging;
+    }
+
+    on_HasKnownChargingStateChanged: _syncLastIsCharging()
+    on_CurrentIsChargingChanged: _syncLastIsCharging()
+
+    Component.onCompleted: _syncLastIsCharging()
 
     function sendAlert(title, message, isWarning, category) {
         if (SettingsData.batteryNotificationType === 1) {
