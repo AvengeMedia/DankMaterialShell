@@ -1263,6 +1263,373 @@ Item {
                     }
                 }
             }
+
+            SettingsCard {
+                id: hotspotCard
+
+                property string ssid: NetworkService.hotspotSSID || ""
+                property string password: ""
+                property string device: NetworkService.hotspotDevice || ""
+                property string band: NetworkService.hotspotBand || ""
+                property bool formDirty: false
+                property bool editing: false
+                property bool passwordLoading: false
+                property bool passwordResolved: true
+                property int passwordRequestId: 0
+                property int passwordEditRevision: 0
+                readonly property bool showForm: !NetworkService.hotspotConfigured || editing
+                readonly property bool starting: NetworkService.hotspotBusy || NetworkService.hotspotActivating
+                property var startConfirm: ConfirmModal {}
+
+                function confirmThenStart(targetDevice, targetBand, startFn) {
+                    if (!NetworkService.hotspotTargetWouldDisconnectWifi(targetDevice, targetBand)) {
+                        startFn();
+                        return;
+                    }
+                    startConfirm.showWithOptions({
+                        title: I18n.tr("Start Hotspot?"),
+                        message: I18n.tr("This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.").arg(NetworkService.currentWifiSSID),
+                        confirmText: I18n.tr("Start"),
+                        onConfirm: startFn
+                    });
+                }
+
+                function bandLabel(value) {
+                    switch (value) {
+                    case "bg":
+                        return I18n.tr("2.4 GHz");
+                    case "a":
+                        return I18n.tr("5 GHz");
+                    default:
+                        return I18n.tr("Auto");
+                    }
+                }
+
+                function bandValue(label) {
+                    if (label === I18n.tr("2.4 GHz"))
+                        return "bg";
+                    if (label === I18n.tr("5 GHz"))
+                        return "a";
+                    return "";
+                }
+
+                function syncFromService() {
+                    ssid = NetworkService.hotspotSSID || ssid || "";
+                    device = NetworkService.hotspotDevice || "";
+                    band = NetworkService.hotspotBand || "";
+                    formDirty = false;
+                }
+
+                function beginEditing() {
+                    syncFromService();
+                    password = "";
+                    editing = true;
+                    passwordRequestId++;
+                    const requestId = passwordRequestId;
+                    const editRevision = passwordEditRevision;
+                    passwordLoading = NetworkService.hotspotSecured;
+                    passwordResolved = !NetworkService.hotspotSecured;
+                    if (NetworkService.hotspotSecured) {
+                        NetworkService.getHotspotSecrets(response => {
+                            if (!editing || requestId !== passwordRequestId)
+                                return;
+                            passwordLoading = false;
+                            if (response.error) {
+                                ToastService.showError(I18n.tr("Couldn't load hotspot password"), I18n.tr("Re-enter the password before saving."));
+                            } else {
+                                const storedPassword = response.result?.password ?? response.password ?? "";
+                                if (!storedPassword) {
+                                    ToastService.showError(I18n.tr("Couldn't load hotspot password"), I18n.tr("Re-enter the password before saving."));
+                                } else {
+                                    passwordResolved = true;
+                                    if (editRevision === passwordEditRevision) {
+                                        password = storedPassword;
+                                        formDirty = false;
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+
+                function stopEditing() {
+                    passwordRequestId++;
+                    editing = false;
+                    password = "";
+                    passwordLoading = false;
+                    passwordResolved = true;
+                    formDirty = false;
+                }
+
+                function buildCanConfigure() {
+                    return ssid.trim().length > 0 && passwordResolved && !passwordLoading && !NetworkService.hotspotBusy && !NetworkService.hotspotEnabled && !NetworkService.hotspotActivating;
+                }
+
+                function explainWiFiDisabled() {
+                    ToastService.showError(I18n.tr("WiFi is disabled"), I18n.tr("Enable WiFi before starting the hotspot."));
+                }
+
+                function saveOnly() {
+                    if (!buildCanConfigure())
+                        return;
+                    NetworkService.configureHotspot(ssid.trim(), password, device, band, response => {
+                        if (!response.error) {
+                            stopEditing();
+                            ToastService.showInfo(I18n.tr("Hotspot saved"));
+                        }
+                    });
+                }
+
+                function startOrStop() {
+                    if (NetworkService.hotspotEnabled) {
+                        NetworkService.stopHotspot(response => {
+                            if (!response.error)
+                                ToastService.showInfo(I18n.tr("Hotspot stopped"));
+                        });
+                        return;
+                    }
+
+                    if (!NetworkService.wifiEnabled) {
+                        explainWiFiDisabled();
+                        return;
+                    }
+
+                    if (showForm) {
+                        if (!buildCanConfigure())
+                            return;
+                        confirmThenStart(device, band, () => {
+                            NetworkService.configureAndStartHotspot(ssid.trim(), password, device, band, response => {
+                                if (!response.error)
+                                    stopEditing();
+                            });
+                        });
+                        return;
+                    }
+
+                    confirmThenStart(NetworkService.hotspotDevice, NetworkService.hotspotBand, () => NetworkService.startHotspot());
+                }
+
+                width: parent.width
+                title: I18n.tr("Hotspot")
+                iconName: "wifi_tethering"
+                settingKey: "networkHotspot"
+                tags: ["wifi", "wi-fi", "wireless", "network", "hotspot", "access point", "sharing", "ssid"]
+                visible: NetworkService.hotspotAvailable
+
+                onVisibleChanged: if (visible)
+                    syncFromService()
+
+                Column {
+                    width: parent.width
+                    spacing: Theme.spacingM
+
+                    StyledText {
+                        width: parent.width
+                        text: {
+                            if (NetworkService.hotspotEnabled)
+                                return I18n.tr("Your hotspot is running.");
+                            if (hotspotCard.starting)
+                                return I18n.tr("Starting hotspot...");
+                            if (NetworkService.hotspotConfigured)
+                                return I18n.tr("Your hotspot profile is saved and ready to start.");
+                            return I18n.tr("Set up a WiFi hotspot for sharing this connection.");
+                        }
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: NetworkService.hotspotEnabled ? Theme.primary : Theme.surfaceVariantText
+                        wrapMode: Text.WordWrap
+                    }
+
+                    StyledText {
+                        width: parent.width
+                        text: I18n.tr("WiFi is disabled. You can still edit and save hotspot settings, but starting the hotspot requires WiFi to be enabled.")
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.warning
+                        wrapMode: Text.WordWrap
+                        visible: !NetworkService.wifiEnabled
+                    }
+
+                    StyledText {
+                        width: parent.width
+                        text: I18n.tr("Starting the hotspot will disconnect WiFi from \"%1\" — the radio can't do both at once. Sharing internet then requires another connection, such as Ethernet.").arg(NetworkService.currentWifiSSID)
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.warning
+                        wrapMode: Text.WordWrap
+                        visible: NetworkService.wifiEnabled && !NetworkService.hotspotEnabled && !hotspotCard.starting && (hotspotCard.showForm ? NetworkService.hotspotTargetWouldDisconnectWifi(hotspotCard.device, hotspotCard.band) : NetworkService.hotspotWouldDisconnectWifi)
+                    }
+
+                    Row {
+                        width: parent.width
+                        spacing: Theme.spacingM
+                        visible: !hotspotCard.showForm
+
+                        DankIcon {
+                            name: NetworkService.hotspotEnabled ? "wifi_tethering" : "wifi_tethering_off"
+                            size: Theme.iconSize
+                            color: NetworkService.hotspotEnabled ? Theme.primary : Theme.surfaceVariantText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Column {
+                            width: parent.width - Theme.iconSize - Theme.spacingM
+                            spacing: 2
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            StyledText {
+                                width: parent.width
+                                text: NetworkService.hotspotSSID
+                                font.pixelSize: Theme.fontSizeMedium
+                                font.weight: Font.Medium
+                                color: Theme.surfaceText
+                                elide: Text.ElideRight
+                            }
+
+                            StyledText {
+                                width: parent.width
+                                text: {
+                                    const parts = [NetworkService.hotspotSecured ? I18n.tr("WPA2 password") : I18n.tr("Open network"), hotspotCard.bandLabel(NetworkService.hotspotBand)];
+                                    if (NetworkService.hotspotDevice)
+                                        parts.push(NetworkService.hotspotDevice);
+                                    return parts.join(" • ");
+                                }
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceVariantText
+                                elide: Text.ElideRight
+                            }
+                        }
+                    }
+
+                    Column {
+                        width: parent.width
+                        spacing: Theme.spacingM
+                        visible: hotspotCard.showForm
+
+                        DankTextField {
+                            width: parent.width
+                            labelText: I18n.tr("Hotspot name")
+                            placeholderText: I18n.tr("SSID")
+                            text: hotspotCard.ssid
+                            leftIconName: "badge"
+                            showClearButton: true
+                            onTextEdited: {
+                                hotspotCard.ssid = text;
+                                hotspotCard.formDirty = true;
+                            }
+                            onAccepted: hotspotCard.saveOnly()
+                        }
+
+                        DankTextField {
+                            width: parent.width
+                            labelText: I18n.tr("Password")
+                            placeholderText: I18n.tr("Optional; leave blank for open hotspot")
+                            text: hotspotCard.password
+                            leftIconName: "key"
+                            showPasswordToggle: true
+                            echoMode: passwordVisible ? TextInput.Normal : TextInput.Password
+                            onTextEdited: {
+                                hotspotCard.password = text;
+                                hotspotCard.passwordEditRevision++;
+                                if (text.length > 0)
+                                    hotspotCard.passwordResolved = true;
+                                hotspotCard.formDirty = true;
+                            }
+                            onAccepted: hotspotCard.saveOnly()
+                        }
+
+                        Row {
+                            width: parent.width
+                            spacing: Theme.spacingM
+
+                            DankDropdown {
+                                width: (parent.width - Theme.spacingM) / 2
+                                text: I18n.tr("Device")
+                                description: I18n.tr("Optional")
+                                currentValue: hotspotCard.device || I18n.tr("Auto")
+                                options: {
+                                    const devices = NetworkService.wifiDevices || [];
+                                    return [I18n.tr("Auto")].concat(devices.filter(d => d.apCapable).map(d => d.name));
+                                }
+                                onValueChanged: value => {
+                                    hotspotCard.device = value === I18n.tr("Auto") ? "" : value;
+                                    hotspotCard.formDirty = true;
+                                }
+                            }
+
+                            DankDropdown {
+                                width: (parent.width - Theme.spacingM) / 2
+                                text: I18n.tr("Band")
+                                description: I18n.tr("Optional")
+                                currentValue: hotspotCard.bandLabel(hotspotCard.band)
+                                options: [I18n.tr("Auto"), I18n.tr("2.4 GHz"), I18n.tr("5 GHz")]
+                                onValueChanged: value => {
+                                    hotspotCard.band = hotspotCard.bandValue(value);
+                                    hotspotCard.formDirty = true;
+                                }
+                            }
+                        }
+                    }
+
+                    Row {
+                        width: parent.width
+                        spacing: Theme.spacingS
+
+                        Item {
+                            width: Math.max(0, parent.width - (cancelButton.visible ? cancelButton.width + Theme.spacingS : 0) - (editButton.visible ? editButton.width + Theme.spacingS : 0) - (saveButton.visible ? saveButton.width + Theme.spacingS : 0) - (startStopButton.width + Theme.spacingS))
+                            height: 1
+                        }
+
+                        DankButton {
+                            id: cancelButton
+                            visible: hotspotCard.editing
+                            text: I18n.tr("Cancel")
+                            buttonHeight: 36
+                            backgroundColor: Theme.surfaceVariant
+                            textColor: Theme.surfaceText
+                            onClicked: hotspotCard.stopEditing()
+                        }
+
+                        DankButton {
+                            id: editButton
+                            visible: !hotspotCard.showForm
+                            text: I18n.tr("Edit")
+                            iconName: "edit"
+                            buttonHeight: 36
+                            enabled: !NetworkService.hotspotEnabled && !hotspotCard.starting
+                            backgroundColor: Theme.surfaceVariant
+                            textColor: Theme.surfaceText
+                            onClicked: hotspotCard.beginEditing()
+                        }
+
+                        DankButton {
+                            id: saveButton
+                            visible: hotspotCard.showForm
+                            text: hotspotCard.passwordLoading ? I18n.tr("Loading...") : (NetworkService.hotspotBusy ? I18n.tr("Saving...") : I18n.tr("Save"))
+                            iconName: "save"
+                            buttonHeight: 36
+                            enabled: hotspotCard.buildCanConfigure()
+                            backgroundColor: Theme.surfaceVariant
+                            textColor: Theme.surfaceText
+                            onClicked: hotspotCard.saveOnly()
+                        }
+
+                        DankButton {
+                            id: startStopButton
+                            text: {
+                                if (NetworkService.hotspotEnabled)
+                                    return I18n.tr("Stop");
+                                if (hotspotCard.starting)
+                                    return I18n.tr("Starting...");
+                                return hotspotCard.showForm ? I18n.tr("Save & Start") : I18n.tr("Start");
+                            }
+                            iconName: NetworkService.hotspotEnabled ? "stop" : "wifi_tethering"
+                            buttonHeight: 36
+                            enabled: !hotspotCard.starting && (NetworkService.hotspotEnabled || hotspotCard.buildCanConfigure())
+                            backgroundColor: NetworkService.hotspotEnabled ? Theme.error : Theme.primary
+                            textColor: NetworkService.hotspotEnabled ? Theme.surfaceText : Theme.onPrimary
+                            onClicked: hotspotCard.startOrStop()
+                        }
+                    }
+                }
+            }
         }
     }
 }

@@ -6,6 +6,7 @@ import qs.Modules.Network
 import qs.Services
 import qs.Widgets
 import qs.Modals
+import qs.Modals.Common
 
 Rectangle {
     id: root
@@ -17,10 +18,10 @@ Rectangle {
         if (height > 0)
             return height;
         if (NetworkService.wifiToggling)
-            return headerRow.height + wifiToggleContent.height + Theme.spacingM;
+            return headerRow.height + hotspotContentHeight + wifiToggleContent.height + Theme.spacingM;
         if (NetworkService.wifiEnabled)
-            return headerRow.height + wifiContent.height + Theme.spacingM;
-        return headerRow.height + wifiOffContent.height + Theme.spacingM;
+            return headerRow.height + hotspotContentHeight + wifiContent.height + Theme.spacingM;
+        return headerRow.height + hotspotContentHeight + wifiOffContent.height + Theme.spacingM;
     }
     radius: Theme.cornerRadius
     color: Theme.nestedSurface
@@ -39,6 +40,31 @@ Rectangle {
     property bool hasWifiAvailable: (NetworkService.wifiDevices?.length ?? 0) > 0
     property bool hasBothConnectionTypes: hasEthernetAvailable && hasWifiAvailable
     property int maxPinnedNetworks: 3
+    readonly property int hotspotContentHeight: currentPreferenceIndex === 1 && NetworkService.hotspotAvailable ? 56 + Theme.spacingS : 0
+
+    property var hotspotStartConfirm: ConfirmModal {}
+
+    function explainHotspotNeedsWiFi() {
+        ToastService.showError(I18n.tr("WiFi is disabled"), I18n.tr("Enable WiFi before starting the hotspot."));
+    }
+
+    function startHotspotWithConfirm() {
+        if (!NetworkService.hotspotWouldDisconnectWifi) {
+            NetworkService.startHotspot();
+            return;
+        }
+        hotspotStartConfirm.showWithOptions({
+            title: I18n.tr("Start Hotspot?"),
+            message: I18n.tr("This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.").arg(NetworkService.currentWifiSSID),
+            confirmText: I18n.tr("Start"),
+            onConfirm: () => NetworkService.startHotspot()
+        });
+    }
+
+    function openHotspotSettings() {
+        PopoutService.closeControlCenter();
+        PopoutService.openSettingsWithTab("network_wifi");
+    }
 
     function normalizePinList(value) {
         if (Array.isArray(value))
@@ -159,12 +185,183 @@ Rectangle {
     }
 
     Item {
-        id: wifiToggleContent
+        id: hotspotRow
         anchors.top: headerRow.bottom
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.margins: Theme.spacingM
         anchors.topMargin: Theme.spacingM
+        visible: currentPreferenceIndex === 1 && NetworkService.hotspotAvailable
+        height: visible ? 56 : 0
+
+        Rectangle {
+            anchors.fill: parent
+            radius: Theme.cornerRadius
+            color: hotspotMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.surfaceLight
+            border.width: NetworkService.hotspotEnabled ? 2 : 1
+            border.color: NetworkService.hotspotEnabled ? Theme.primary : Theme.outlineLight
+
+            Row {
+                anchors.left: parent.left
+                anchors.leftMargin: Theme.spacingM
+                anchors.right: hotspotRightControls.left
+                anchors.rightMargin: Theme.spacingS
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: Theme.spacingS
+
+                DankIcon {
+                    name: NetworkService.hotspotEnabled ? "wifi_tethering" : "wifi_tethering_off"
+                    size: Theme.iconSize - 4
+                    color: NetworkService.hotspotEnabled ? Theme.primary : Theme.surfaceText
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                Column {
+                    id: hotspotTextColumn
+
+                    readonly property bool warnsWifiDrop: NetworkService.hotspotConfigured && NetworkService.wifiEnabled && !NetworkService.hotspotBusy && !NetworkService.hotspotActivating && !NetworkService.hotspotEnabled && NetworkService.hotspotWouldDisconnectWifi
+
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: 2
+                    width: parent.width - Theme.iconSize - Theme.spacingS
+
+                    StyledText {
+                        text: NetworkService.hotspotConfigured ? I18n.tr("Hotspot") : I18n.tr("Set up hotspot")
+                        font.pixelSize: Theme.fontSizeMedium
+                        font.weight: NetworkService.hotspotEnabled ? Font.Medium : Font.Normal
+                        color: NetworkService.hotspotEnabled ? Theme.primary : Theme.surfaceText
+                        elide: Text.ElideRight
+                        width: parent.width
+                    }
+
+                    StyledText {
+                        visible: !hotspotTextColumn.warnsWifiDrop
+                        text: {
+                            if (!NetworkService.hotspotConfigured)
+                                return I18n.tr("Set up hotspot in Settings");
+                            if (NetworkService.hotspotBusy || NetworkService.hotspotActivating)
+                                return I18n.tr("Starting...");
+                            if (NetworkService.hotspotEnabled)
+                                return NetworkService.hotspotSSID || I18n.tr("Running");
+                            if (!NetworkService.wifiEnabled)
+                                return I18n.tr("WiFi disabled");
+                            return NetworkService.hotspotSSID || I18n.tr("Ready");
+                        }
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: NetworkService.hotspotEnabled ? Theme.primary : Theme.surfaceVariantText
+                        elide: Text.ElideRight
+                        width: parent.width
+                    }
+
+                    Row {
+                        visible: hotspotTextColumn.warnsWifiDrop
+                        width: parent.width
+                        spacing: Theme.spacingXS
+
+                        StyledText {
+                            id: hotspotWarnSsid
+                            text: NetworkService.hotspotSSID || I18n.tr("Ready")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                            elide: Text.ElideRight
+                            width: Math.min(implicitWidth, parent.width / 2)
+                        }
+
+                        StyledText {
+                            id: hotspotWarnSeparator
+                            text: "•"
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                        }
+
+                        StyledText {
+                            text: I18n.tr("Will disconnect \"%1\"").arg(NetworkService.currentWifiSSID)
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.warning
+                            elide: Text.ElideRight
+                            width: Math.max(0, parent.width - hotspotWarnSsid.width - hotspotWarnSeparator.width - Theme.spacingXS * 2)
+                        }
+                    }
+                }
+            }
+
+            Row {
+                id: hotspotRightControls
+                anchors.right: parent.right
+                anchors.rightMargin: Theme.spacingM
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: Theme.spacingS
+
+                StyledText {
+                    text: I18n.tr("Setup")
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.primary
+                    visible: !NetworkService.hotspotConfigured
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                DankIcon {
+                    name: "chevron_right"
+                    size: 20
+                    color: Theme.primary
+                    visible: !NetworkService.hotspotConfigured
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                DankSpinner {
+                    readonly property bool hotspotWorking: NetworkService.hotspotBusy || NetworkService.hotspotActivating
+                    size: 20
+                    strokeWidth: 2
+                    color: Theme.primary
+                    running: hotspotWorking
+                    visible: NetworkService.hotspotConfigured && hotspotWorking
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                DankToggle {
+                    readonly property bool hotspotWorking: NetworkService.hotspotBusy || NetworkService.hotspotActivating
+                    checked: NetworkService.hotspotEnabled
+                    enabled: NetworkService.hotspotConfigured && !hotspotWorking
+                    visible: NetworkService.hotspotConfigured && !hotspotWorking
+                    onToggled: checked => {
+                        if (checked) {
+                            if (!NetworkService.wifiEnabled) {
+                                root.explainHotspotNeedsWiFi();
+                                return;
+                            }
+                            root.startHotspotWithConfirm();
+                        } else {
+                            NetworkService.stopHotspot();
+                        }
+                    }
+                }
+            }
+
+            DankRipple {
+                id: hotspotRipple
+                cornerRadius: parent.radius
+            }
+
+            MouseArea {
+                id: hotspotMouseArea
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                enabled: !NetworkService.hotspotConfigured
+                visible: !NetworkService.hotspotConfigured
+                onPressed: mouse => hotspotRipple.trigger(mouse.x, mouse.y)
+                onClicked: root.openHotspotSettings()
+            }
+        }
+    }
+
+    Item {
+        id: wifiToggleContent
+        anchors.top: hotspotRow.visible ? hotspotRow.bottom : headerRow.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.margins: Theme.spacingM
+        anchors.topMargin: hotspotRow.visible ? Theme.spacingS : Theme.spacingM
         visible: currentPreferenceIndex === 1 && NetworkService.wifiToggling
         height: visible ? wifiToggleColumn.implicitHeight + Theme.spacingM * 2 : 0
 
@@ -201,11 +398,11 @@ Rectangle {
 
     Item {
         id: wifiOffContent
-        anchors.top: headerRow.bottom
+        anchors.top: hotspotRow.visible ? hotspotRow.bottom : headerRow.bottom
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.margins: Theme.spacingM
-        anchors.topMargin: Theme.spacingM
+        anchors.topMargin: hotspotRow.visible ? Theme.spacingS : Theme.spacingM
         visible: currentPreferenceIndex === 1 && !NetworkService.wifiEnabled && !NetworkService.wifiToggling
         height: visible ? wifiOffColumn.implicitHeight + Theme.spacingM * 2 : 0
 
@@ -482,12 +679,12 @@ Rectangle {
 
     Item {
         id: wifiScanningOverlay
-        anchors.top: headerRow.bottom
+        anchors.top: hotspotRow.visible ? hotspotRow.bottom : headerRow.bottom
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         anchors.margins: Theme.spacingM
-        anchors.topMargin: Theme.spacingM
+        anchors.topMargin: hotspotRow.visible ? Theme.spacingS : Theme.spacingM
         visible: currentPreferenceIndex === 1 && NetworkService.wifiEnabled && !NetworkService.wifiToggling && NetworkService.wifiInterface && (NetworkService.wifiNetworks?.length ?? 0) < 1 && NetworkService.isScanning
 
         DankIcon {
@@ -509,12 +706,12 @@ Rectangle {
 
     DankListView {
         id: wifiContent
-        anchors.top: headerRow.bottom
+        anchors.top: hotspotRow.visible ? hotspotRow.bottom : headerRow.bottom
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         anchors.margins: Theme.spacingM
-        anchors.topMargin: Theme.spacingM
+        anchors.topMargin: hotspotRow.visible ? Theme.spacingS : Theme.spacingM
         visible: currentPreferenceIndex === 1 && NetworkService.wifiEnabled && !NetworkService.wifiToggling && !wifiScanningOverlay.visible
         clip: true
         spacing: Theme.spacingS
