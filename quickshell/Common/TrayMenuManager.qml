@@ -8,6 +8,12 @@ Singleton {
 
     property var activeTrayMenus: ({})
 
+    signal openTrayMenuRequested(string itemId)
+
+    function requestOpenTrayMenu(itemId) {
+        openTrayMenuRequested(itemId)
+    }
+
     function registerMenu(screenName, menu) {
         if (!screenName || !menu) return
         const newMenus = Object.assign({}, activeTrayMenus)

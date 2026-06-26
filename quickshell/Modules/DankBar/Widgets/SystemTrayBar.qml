@@ -84,6 +84,25 @@ BasePill {
         root.showForTrayItem(trayItem, anchorItem, parentScreen, root.isAtBottom, root.isVerticalOrientation, root.axis);
     }
 
+    Connections {
+        target: TrayMenuManager
+
+        function onOpenTrayMenuRequested(itemId) {
+            const item = root.allTrayItems.find(trayItem => {
+                const id = trayItem?.id || "";
+                const tooltipTitle = trayItem?.tooltipTitle || "";
+                const fullKey = (!tooltipTitle || tooltipTitle === id) ? id : `${id}::${tooltipTitle}`;
+                return itemId === id || itemId === fullKey;
+            });
+
+            if (!item || !item.hasMenu)
+                return;
+
+            TrayMenuManager.closeAllMenus();
+            root.showForTrayItem(item, root, parentScreen, root.isAtBottom, root.isVerticalOrientation, root.axis);
+        }
+    }
+
     function openInlineTrayContextMenu(trayItem, areaItem, mouse, anchorItem) {
         if (!trayItem) {
             return;
