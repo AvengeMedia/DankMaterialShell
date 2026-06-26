@@ -83,6 +83,19 @@ BasePill {
         root.showForTrayItem(trayItem, anchorItem, parentScreen, root.isAtBottom, root.isVerticalOrientation, root.axis);
     }
 
+    Connections {
+        target: TrayMenuManager
+
+        function onOpenTrayMenuRequested(itemId) {
+            const item = TrayMenuManager.findTrayItem(itemId);
+
+            if (!item || !item.hasMenu)
+                return;
+
+            root.showForTrayItem(item, root, parentScreen, root.isAtBottom, root.isVerticalOrientation, root.axis);
+        }
+    }
+
     function openInlineTrayContextMenu(trayItem, areaItem, mouse, anchorItem) {
         if (!trayItem) {
             return;

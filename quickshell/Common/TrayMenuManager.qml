@@ -1,12 +1,27 @@
 pragma Singleton
 
 import Quickshell
+import Quickshell.Services.SystemTray
 import QtQuick
 
 Singleton {
     id: root
 
     property var activeTrayMenus: ({})
+
+    signal openTrayMenuRequested(string itemId)
+
+    function findTrayItem(itemId: string): var {
+        if (!itemId)
+            return null;
+
+        return SystemTray.items.values.find(item => {
+            const id = item?.id || "";
+            const title = item?.tooltipTitle || "";
+            const fullKey = title ? `${id}::${title}` : id;
+            return fullKey === itemId || id === itemId;
+        });
+    }
 
     function registerMenu(screenName, menu) {
         if (!screenName || !menu) return
