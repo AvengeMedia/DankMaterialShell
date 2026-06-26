@@ -122,6 +122,10 @@ func (o *Options) ColorsOutput() string {
 	return filepath.Join(o.StateDir, "dms-colors.json")
 }
 
+func (o *Options) colorsStaging() string {
+	return o.ColorsOutput() + ".tmp"
+}
+
 func (o *Options) ShouldSkipTemplate(name string) bool {
 	if o.SkipTemplates == "" {
 		return false
@@ -132,6 +136,38 @@ func (o *Options) ShouldSkipTemplate(name string) bool {
 		}
 	}
 	return false
+}
+
+func acquireMatugenLock(stateDir string) (*os.File, error) {
+	f, err := os.OpenFile(filepath.Join(stateDir, "matugen.lock"), os.O_CREATE|os.O_RDWR, 0o644)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open matugen lock: %w", err)
+	}
+
+	deadline := time.Now().Add(45 * time.Second)
+	for {
+		switch err := syscall.Flock(int(f.Fd()), syscall.LOCK_EX|syscall.LOCK_NB); err {
+		case nil:
+			return f, nil
+		case syscall.EWOULDBLOCK:
+			if time.Now().After(deadline) {
+				f.Close()
+				return nil, fmt.Errorf("timed out waiting for matugen lock")
+			}
+			time.Sleep(100 * time.Millisecond)
+		default:
+			f.Close()
+			return nil, fmt.Errorf("failed to lock matugen: %w", err)
+		}
+	}
+}
+
+func releaseMatugenLock(f *os.File) {
+	if f == nil {
+		return
+	}
+	_ = syscall.Flock(int(f.Fd()), syscall.LOCK_UN)
+	f.Close()
 }
 
 func Run(opts Options) error {
@@ -167,6 +203,12 @@ func Run(opts Options) error {
 		return fmt.Errorf("failed to create state dir: %w", err)
 	}
 
+	lock, err := acquireMatugenLock(opts.StateDir)
+	if err != nil {
+		return err
+	}
+	defer releaseMatugenLock(lock)
+
 	log.Infof("Building theme: %s %s (%s)", opts.Kind, opts.Value, opts.Mode)
 
 	changed, buildErr := buildOnce(&opts)
@@ -188,6 +230,8 @@ func Run(opts Options) error {
 }
 
 func buildOnce(opts *Options) (bool, error) {
+	defer os.Remove(opts.colorsStaging())
+
 	cfgFile, err := os.CreateTemp("", "matugen-config-*.toml")
 	if err != nil {
 		return false, fmt.Errorf("failed to create temp config: %w", err)
@@ -275,9 +319,15 @@ func buildOnce(opts *Options) (bool, error) {
 		}
 	}
 
-	newColors, _ := os.ReadFile(opts.ColorsOutput())
+	newColors, err := os.ReadFile(opts.colorsStaging())
+	if err != nil {
+		return false, fmt.Errorf("matugen did not produce colors output: %w", err)
+	}
 	if bytes.Equal(oldColors, newColors) && len(oldColors) > 0 {
 		return false, nil
+	}
+	if err := os.Rename(opts.colorsStaging(), opts.ColorsOutput()); err != nil {
+		return false, fmt.Errorf("failed to commit colors output: %w", err)
 	}
 
 	if opts.ColorsOnly {
@@ -346,7 +396,7 @@ func buildMergedConfig(opts *Options, cfgFile *os.File, tmpDir string) error {
 input_path = '%s/matugen/templates/dank.json'
 output_path = '%s'
 
-`, opts.ShellDir, opts.ColorsOutput())
+`, opts.ShellDir, opts.colorsStaging())
 
 	if opts.ColorsOnly {
 		return nil

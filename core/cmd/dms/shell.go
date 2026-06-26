@@ -101,14 +101,23 @@ func getPIDFilePath() string {
 	return filepath.Join(getRuntimeDir(), fmt.Sprintf("danklinux-%d.pid", os.Getpid()))
 }
 
+func getSessionFilePath() string {
+	return filepath.Join(getRuntimeDir(), fmt.Sprintf("danklinux-%d.session", os.Getpid()))
+}
+
 func writePIDFile(childPID int) error {
 	pidFile := getPIDFilePath()
+	if display := os.Getenv("WAYLAND_DISPLAY"); display != "" {
+		if err := os.WriteFile(getSessionFilePath(), []byte(display), 0o644); err != nil {
+			log.Warnf("Failed to write session file: %v", err)
+		}
+	}
 	return os.WriteFile(pidFile, []byte(strconv.Itoa(childPID)), 0o644)
 }
 
 func removePIDFile() {
-	pidFile := getPIDFilePath()
-	os.Remove(pidFile)
+	os.Remove(getPIDFilePath())
+	os.Remove(getSessionFilePath())
 }
 
 func getAllDMSPIDs() []int {
@@ -390,9 +399,11 @@ func killShell() {
 	}
 
 	for _, entry := range entries {
-		if strings.HasPrefix(entry.Name(), "danklinux-") && strings.HasSuffix(entry.Name(), ".pid") {
-			pidFile := filepath.Join(dir, entry.Name())
-			os.Remove(pidFile)
+		if !strings.HasPrefix(entry.Name(), "danklinux-") {
+			continue
+		}
+		if strings.HasSuffix(entry.Name(), ".pid") || strings.HasSuffix(entry.Name(), ".session") {
+			os.Remove(filepath.Join(dir, entry.Name()))
 		}
 	}
 }
@@ -609,7 +620,7 @@ func parseTargetsFromIPCShowOutput(output string) ipcTargets {
 
 func buildQsIPCBaseArgs() ([]string, error) {
 	cmdArgs := []string{"ipc"}
-	switch pid, ok := getFirstDMSPID(); {
+	switch pid, ok := getSessionDMSPID(); {
 	case ok:
 		cmdArgs = append(cmdArgs, "--pid", strconv.Itoa(pid))
 	default:
@@ -708,6 +719,64 @@ func getFirstDMSPID() (int, bool) {
 	}
 
 	return 0, false
+}
+
+func sessionParentPID(display string) (int, bool) {
+	if display == "" {
+		return 0, false
+	}
+
+	dir := getRuntimeDir()
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return 0, false
+	}
+
+	for _, entry := range entries {
+		name := entry.Name()
+		if !strings.HasPrefix(name, "danklinux-") || !strings.HasSuffix(name, ".session") {
+			continue
+		}
+
+		data, err := os.ReadFile(filepath.Join(dir, name))
+		if err != nil || strings.TrimSpace(string(data)) != display {
+			continue
+		}
+
+		parentStr := strings.TrimSuffix(strings.TrimPrefix(name, "danklinux-"), ".session")
+		parentPID, err := strconv.Atoi(parentStr)
+		if err != nil {
+			continue
+		}
+
+		return parentPID, true
+	}
+
+	return 0, false
+}
+
+func getSessionDMSPID() (int, bool) {
+	parentPID, ok := sessionParentPID(os.Getenv("WAYLAND_DISPLAY"))
+	if !ok {
+		return getFirstDMSPID()
+	}
+
+	data, err := os.ReadFile(filepath.Join(getRuntimeDir(), fmt.Sprintf("danklinux-%d.pid", parentPID)))
+	if err != nil {
+		return getFirstDMSPID()
+	}
+
+	pid, err := strconv.Atoi(strings.TrimSpace(string(data)))
+	if err != nil {
+		return getFirstDMSPID()
+	}
+
+	proc, err := os.FindProcess(pid)
+	if err != nil || proc.Signal(syscall.Signal(0)) != nil {
+		return getFirstDMSPID()
+	}
+
+	return pid, true
 }
 
 func runShellIPCCommand(args []string) {
