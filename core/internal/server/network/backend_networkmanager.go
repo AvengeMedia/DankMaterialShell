@@ -78,6 +78,8 @@ type NetworkManagerBackend struct {
 	lastFailedTime int64
 	failedMutex    sync.RWMutex
 
+	hotspotPendingDevice string
+
 	pendingVPNSave     *pendingVPNCredentials
 	pendingVPNSaveMu   sync.Mutex
 	cachedVPNCreds     *cachedVPNCredentials
@@ -249,12 +251,18 @@ func (b *NetworkManagerBackend) Initialize() error {
 		log.Warnf("Failed to get initial saved WiFi networks: %v", err)
 	}
 
+	if err := b.updateHotspotState(); err != nil {
+		log.Warnf("Failed to get initial hotspot state: %v", err)
+	}
+
 	if wifiEnabled {
 		if _, err := b.updateWiFiNetworks(); err != nil {
 			log.Warnf("Failed to get initial networks: %v", err)
 		}
-		b.updateAllWiFiDevices()
 	}
+	// Device metadata (names, AP capability) is needed even while the radio is
+	// disabled, e.g. by the hotspot device selector.
+	b.updateAllWiFiDevices()
 
 	b.updateAllEthernetDevices()
 

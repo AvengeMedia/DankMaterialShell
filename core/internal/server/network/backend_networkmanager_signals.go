@@ -261,6 +261,7 @@ func (b *NetworkManagerBackend) handleDBusSignal(sig *dbus.Signal) {
 		if err := b.updateSavedWiFiNetworks(); err != nil {
 			b.updateWiFiNetworks()
 		}
+		b.updateHotspotState()
 		if b.onStateChange != nil {
 			b.onStateChange()
 		}
@@ -360,6 +361,7 @@ func (b *NetworkManagerBackend) handleNetworkManagerChange(changes map[string]db
 		if _, exists := changes["ActiveConnections"]; exists {
 			b.updateVPNConnectionState()
 			b.ListActiveVPN()
+			b.updateHotspotState()
 		}
 		if b.onStateChange != nil {
 			b.onStateChange()
@@ -370,6 +372,7 @@ func (b *NetworkManagerBackend) handleNetworkManagerChange(changes map[string]db
 func (b *NetworkManagerBackend) handleActiveConnectionStateChange() {
 	b.updateVPNConnectionState()
 	b.ListActiveVPN()
+	b.updateHotspotState()
 	if b.onStateChange != nil {
 		b.onStateChange()
 	}
@@ -409,9 +412,15 @@ func (b *NetworkManagerBackend) handleDeviceChange(devicePath dbus.ObjectPath, c
 
 	if managedChanged {
 		if managedVariant, ok := changes["Managed"]; ok {
-			if managed, ok := managedVariant.Value().(bool); ok && managed {
-				b.handleDeviceAdded(devicePath)
-				return
+			if managed, ok := managedVariant.Value().(bool); ok {
+				if managed {
+					b.handleDeviceAdded(devicePath)
+					return
+				}
+				// Newly unmanaged devices stay tracked (matching Initialize),
+				// but capability-dependent state such as hotspotAvailable
+				// must be recomputed and broadcast.
+				needsUpdate = true
 			}
 		}
 	}
@@ -424,6 +433,7 @@ func (b *NetworkManagerBackend) handleDeviceChange(devicePath dbus.ObjectPath, c
 	b.updateEthernetState()
 	b.updateAllWiFiDevices()
 	b.updateWiFiState()
+	b.updateHotspotState()
 	if stateChanged {
 		b.listEthernetConnections()
 		b.updatePrimaryConnection()
@@ -587,6 +597,7 @@ func (b *NetworkManagerBackend) handleDeviceAdded(devicePath dbus.ObjectPath) {
 
 		b.updateAllWiFiDevices()
 		b.updateWiFiState()
+		b.updateHotspotState()
 	}
 
 	if b.onStateChange != nil {
@@ -642,6 +653,7 @@ func (b *NetworkManagerBackend) handleDeviceRemoved(devicePath dbus.ObjectPath) 
 
 		b.updateAllWiFiDevices()
 		b.updateWiFiState()
+		b.updateHotspotState()
 
 		if b.onStateChange != nil {
 			b.onStateChange()

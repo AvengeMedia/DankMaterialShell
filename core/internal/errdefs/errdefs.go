@@ -41,6 +41,10 @@ const (
 	ErrWifiDisabled     = "wifi-disabled"
 	ErrAlreadyConnected = "already-connected"
 	ErrConnectionFailed = "connection-failed"
+
+	ErrHotspotIPConfigFailed   = "hotspot-ip-config-failed"
+	ErrHotspotSupplicantFailed = "hotspot-supplicant-failed"
+	ErrHotspotFailed           = "hotspot-failed"
 )
 
 var (
