@@ -55,6 +55,19 @@ Singleton {
     property string targetPreference: activeService?.targetPreference ?? ""
     property var savedWifiNetworks: activeService?.savedWifiNetworks ?? []
     readonly property int savedWifiStateApiVersion: activeService?.savedWifiStateApiVersion ?? 26
+    readonly property int hotspotApiVersion: activeService?.hotspotApiVersion ?? 28
+    property bool hotspotSupported: activeService?.hotspotSupported ?? false
+    property bool hotspotAvailable: activeService?.hotspotAvailable ?? false
+    property bool hotspotConfigured: activeService?.hotspotConfigured ?? false
+    property bool hotspotEnabled: activeService?.hotspotEnabled ?? false
+    property bool hotspotActivating: activeService?.hotspotActivating ?? false
+    property bool hotspotSecured: activeService?.hotspotSecured ?? false
+    property bool hotspotWouldDisconnectWifi: activeService?.hotspotWouldDisconnectWifi ?? false
+    property string hotspotSSID: activeService?.hotspotSSID ?? ""
+    property string hotspotDevice: activeService?.hotspotDevice ?? ""
+    property string hotspotBand: activeService?.hotspotBand ?? ""
+    property bool hotspotBusy: activeService?.hotspotBusy ?? false
+    property string hotspotError: activeService?.hotspotError ?? ""
     property string connectionStatus: activeService?.connectionStatus ?? ""
     property string lastConnectionError: activeService?.lastConnectionError ?? ""
     property bool passwordDialogShouldReopen: activeService?.passwordDialogShouldReopen ?? false
@@ -310,6 +323,48 @@ Singleton {
         if (activeService && activeService.setWifiAutoconnect) {
             activeService.setWifiAutoconnect(ssid, autoconnect);
         }
+    }
+
+    function configureHotspot(ssid, password = "", device = "", band = "", callback = null) {
+        if (activeService && activeService.configureHotspot) {
+            return activeService.configureHotspot(ssid, password, device, band, callback);
+        }
+        return false;
+    }
+
+    function startHotspot(callback = null) {
+        if (activeService && activeService.startHotspot) {
+            return activeService.startHotspot(callback);
+        }
+        return false;
+    }
+
+    function stopHotspot(callback = null) {
+        if (activeService && activeService.stopHotspot) {
+            return activeService.stopHotspot(callback);
+        }
+        return false;
+    }
+
+    function configureAndStartHotspot(ssid, password = "", device = "", band = "", callback = null) {
+        if (activeService && activeService.configureAndStartHotspot) {
+            return activeService.configureAndStartHotspot(ssid, password, device, band, callback);
+        }
+        return false;
+    }
+
+    function getHotspotSecrets(callback) {
+        if (activeService && activeService.getHotspotSecrets) {
+            return activeService.getHotspotSecrets(callback);
+        }
+        return false;
+    }
+
+    function hotspotTargetWouldDisconnectWifi(device, band = "") {
+        if (activeService && activeService.hotspotTargetWouldDisconnectWifi) {
+            return activeService.hotspotTargetWouldDisconnectWifi(device, band);
+        }
+        return false;
     }
 
     function setWifiDeviceOverride(deviceName) {

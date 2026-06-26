@@ -70,6 +70,29 @@ Singleton {
     property string targetPreference: ""
     property var savedWifiNetworks: []
     readonly property int savedWifiStateApiVersion: 26
+    readonly property int hotspotApiVersion: 28
+    property bool backendHotspotSupported: false
+    property bool backendHotspotAvailable: false
+    property bool backendHotspotConfigured: false
+    property bool backendHotspotEnabled: false
+    property bool backendHotspotActivating: false
+    property bool backendHotspotSecured: false
+    property string backendHotspotSSID: ""
+    property string backendHotspotDevice: ""
+    property string backendHotspotBand: ""
+    property string backendHotspotLastError: ""
+    readonly property bool hotspotSupported: DMSService.isConnected && networkAvailable && DMSService.apiVersion >= hotspotApiVersion && backendHotspotSupported
+    readonly property bool hotspotAvailable: hotspotSupported && backendHotspotAvailable
+    readonly property bool hotspotConfigured: hotspotSupported && backendHotspotConfigured
+    readonly property bool hotspotEnabled: hotspotSupported && backendHotspotEnabled
+    readonly property bool hotspotActivating: hotspotSupported && backendHotspotActivating
+    readonly property bool hotspotSecured: hotspotSupported && backendHotspotSecured
+    readonly property bool hotspotWouldDisconnectWifi: hotspotSupported && !hotspotEnabled && !hotspotActivating && hotspotTargetWouldDisconnectWifi(backendHotspotDevice, backendHotspotBand)
+    readonly property string hotspotSSID: hotspotSupported ? backendHotspotSSID : ""
+    readonly property string hotspotDevice: hotspotSupported ? backendHotspotDevice : ""
+    readonly property string hotspotBand: hotspotSupported ? backendHotspotBand : ""
+    property bool hotspotBusy: false
+    property string hotspotError: ""
     property string connectionStatus: ""
     property string lastConnectionError: ""
     property bool passwordDialogShouldReopen: false
@@ -317,6 +340,43 @@ Singleton {
         activeAccessPointPath = state.activeAccessPointPath || "";
         wifiDevices = state.wifiDevices || [];
         connectingDevice = state.connectingDevice || "";
+
+        if (DMSService.apiVersion >= hotspotApiVersion) {
+            const supportsHotspot = state.hotspotSupported === true;
+            const wasHotspotEnabled = backendHotspotEnabled;
+            const wasHotspotActivating = backendHotspotActivating;
+            backendHotspotSupported = supportsHotspot;
+            backendHotspotAvailable = state.hotspotAvailable === true;
+            backendHotspotConfigured = state.hotspotConfigured === true;
+            backendHotspotEnabled = state.hotspotEnabled === true;
+            backendHotspotActivating = state.hotspotActivating === true;
+            backendHotspotSecured = state.hotspotSecured === true;
+            backendHotspotSSID = state.hotspotSSID || "";
+            backendHotspotDevice = state.hotspotDevice || "";
+            backendHotspotBand = state.hotspotBand || "";
+            backendHotspotLastError = state.hotspotLastError || "";
+
+            // Activation is asynchronous: only toast outcomes of starts we watched
+            // begin, so restoring state after a shell restart stays silent.
+            const watchedStart = wasHotspotActivating || hotspotBusy;
+            if (watchedStart && !wasHotspotEnabled && backendHotspotEnabled) {
+                ToastService.showInfo(I18n.tr("Hotspot started"));
+            } else if (wasHotspotActivating && !backendHotspotActivating && !backendHotspotEnabled && backendHotspotLastError) {
+                hotspotError = backendHotspotLastError;
+                ToastService.showError(I18n.tr("Failed to start hotspot"), hotspotErrorMessage(backendHotspotLastError));
+            }
+        } else {
+            backendHotspotSupported = false;
+            backendHotspotAvailable = false;
+            backendHotspotConfigured = false;
+            backendHotspotEnabled = false;
+            backendHotspotActivating = false;
+            backendHotspotSecured = false;
+            backendHotspotSSID = "";
+            backendHotspotDevice = "";
+            backendHotspotBand = "";
+            backendHotspotLastError = "";
+        }
 
         currentWifiSSID = state.wifiSSID || "";
         wifiSignalStrength = state.wifiSignal || 0;
@@ -1024,6 +1084,137 @@ Singleton {
                 Qt.callLater(() => getState());
             }
         });
+    }
+
+    function configureHotspot(ssid, password = "", device = "", band = "", callback = null) {
+        if (!hotspotSupported || hotspotBusy)
+            return false;
+
+        const params = {
+            ssid: ssid
+        };
+        if (password)
+            params.password = password;
+        if (device)
+            params.device = device;
+        if (band)
+            params.band = band;
+
+        hotspotBusy = true;
+        hotspotError = "";
+
+        DMSService.sendRequest("network.hotspot.configure", params, response => {
+            hotspotBusy = false;
+            if (response.error) {
+                hotspotError = response.error;
+                ToastService.showError(I18n.tr("Failed to configure hotspot"), response.error);
+            } else {
+                Qt.callLater(() => getState());
+            }
+            if (callback)
+                callback(response);
+        });
+
+        return true;
+    }
+
+    function startHotspot(callback = null) {
+        if (!hotspotAvailable || hotspotBusy)
+            return false;
+
+        hotspotBusy = true;
+        hotspotError = "";
+
+        DMSService.sendRequest("network.hotspot.start", null, response => {
+            hotspotBusy = false;
+            if (response.error) {
+                hotspotError = response.error;
+                ToastService.showError(I18n.tr("Failed to start hotspot"), response.error);
+            } else {
+                Qt.callLater(() => getState());
+            }
+            if (callback)
+                callback(response);
+        });
+
+        return true;
+    }
+
+    function stopHotspot(callback = null) {
+        if (!hotspotSupported || hotspotBusy)
+            return false;
+
+        hotspotBusy = true;
+        hotspotError = "";
+
+        DMSService.sendRequest("network.hotspot.stop", null, response => {
+            hotspotBusy = false;
+            if (response.error) {
+                hotspotError = response.error;
+                ToastService.showError(I18n.tr("Failed to stop hotspot"), response.error);
+            } else {
+                Qt.callLater(() => getState());
+            }
+            if (callback)
+                callback(response);
+        });
+
+        return true;
+    }
+
+    function configureAndStartHotspot(ssid, password = "", device = "", band = "", callback = null) {
+        return configureHotspot(ssid, password, device, band, configureResponse => {
+            if (configureResponse.error) {
+                if (callback)
+                    callback(configureResponse);
+                return;
+            }
+            startHotspot(callback);
+        });
+    }
+
+    function getHotspotSecrets(callback) {
+        if (!hotspotSupported) {
+            if (callback)
+                callback({
+                    error: "hotspot not supported"
+                });
+            return false;
+        }
+
+        DMSService.sendRequest("network.hotspot.getSecrets", null, response => {
+            if (callback)
+                callback(response);
+        });
+
+        return true;
+    }
+
+    function hotspotTargetWouldDisconnectWifi(device, band = "") {
+        const devices = wifiDevices || [];
+        const active = devices.find(d => d.connected);
+        if (!active)
+            return false;
+        if (device) {
+            const target = devices.find(d => d.name === device);
+            return target ? target.connected : device === active.name;
+        }
+        // Band capabilities are not exposed per device, so a fixed-band automatic
+        // selection cannot safely promise that an idle radio will be usable.
+        if (band)
+            return true;
+        return !devices.some(d => d.apCapable && !d.connected && d.state === "disconnected" && d.name !== active.name);
+    }
+
+    function hotspotErrorMessage(code) {
+        switch (code) {
+        case "hotspot-ip-config-failed":
+            return I18n.tr("IP sharing setup failed. Check that dnsmasq is installed.");
+        case "hotspot-supplicant-failed":
+            return I18n.tr("The WiFi adapter could not start access point mode.");
+        default:
+            return I18n.tr("Hotspot activation failed.");
+        }
     }
 
     function refreshSavedWifiNetworks() {
