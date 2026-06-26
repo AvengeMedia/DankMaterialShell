@@ -172,6 +172,143 @@ func TestHandleSetPreference(t *testing.T) {
 	})
 }
 
+func TestHandleHotspotRequests(t *testing.T) {
+	t.Run("configure requires ssid", func(t *testing.T) {
+		manager := &Manager{state: &NetworkState{}}
+		mc := newMockNetConn()
+		conn := models.NewConn(mc)
+		req := models.Request{
+			ID:     123,
+			Method: "network.hotspot.configure",
+			Params: map[string]any{},
+		}
+
+		handleConfigureHotspot(conn, req, manager)
+
+		var resp models.Response[any]
+		err := json.NewDecoder(mc.writeBuf).Decode(&resp)
+		require.NoError(t, err)
+
+		assert.Equal(t, 123, resp.ID)
+		assert.Contains(t, resp.Error, "missing or invalid 'ssid' parameter")
+	})
+
+	t.Run("configure dispatches request", func(t *testing.T) {
+		iwdBackend, err := NewIWDBackend()
+		require.NoError(t, err)
+		backend := &testHotspotBackend{IWDBackend: iwdBackend}
+		manager := NewTestManager(backend, &NetworkState{})
+		mc := newMockNetConn()
+		conn := models.NewConn(mc)
+		req := models.Request{
+			ID:     123,
+			Method: "network.hotspot.configure",
+			Params: map[string]any{
+				"ssid":     "DMS Hotspot",
+				"password": "hunter2-password",
+				"device":   "wlan0",
+				"band":     "bg",
+			},
+		}
+
+		HandleRequest(conn, req, manager)
+
+		var resp models.Response[models.SuccessResult]
+		err = json.NewDecoder(mc.writeBuf).Decode(&resp)
+		require.NoError(t, err)
+
+		assert.Equal(t, 123, resp.ID)
+		assert.Empty(t, resp.Error)
+		require.NotNil(t, resp.Result)
+		assert.True(t, resp.Result.Success)
+		assert.True(t, backend.configureCalled)
+		assert.Equal(t, HotspotRequest{
+			SSID:     "DMS Hotspot",
+			Password: "hunter2-password",
+			Device:   "wlan0",
+			Band:     "bg",
+		}, backend.configureReq)
+	})
+
+	t.Run("start dispatches without payload", func(t *testing.T) {
+		iwdBackend, err := NewIWDBackend()
+		require.NoError(t, err)
+		backend := &testHotspotBackend{IWDBackend: iwdBackend}
+		manager := NewTestManager(backend, &NetworkState{})
+		mc := newMockNetConn()
+		conn := models.NewConn(mc)
+		req := models.Request{ID: 123, Method: "network.hotspot.start"}
+
+		HandleRequest(conn, req, manager)
+
+		var resp models.Response[models.SuccessResult]
+		err = json.NewDecoder(mc.writeBuf).Decode(&resp)
+		require.NoError(t, err)
+
+		assert.Equal(t, 123, resp.ID)
+		assert.Empty(t, resp.Error)
+		assert.True(t, backend.startCalled)
+	})
+
+	t.Run("stop dispatches", func(t *testing.T) {
+		iwdBackend, err := NewIWDBackend()
+		require.NoError(t, err)
+		backend := &testHotspotBackend{IWDBackend: iwdBackend}
+		manager := NewTestManager(backend, &NetworkState{})
+		mc := newMockNetConn()
+		conn := models.NewConn(mc)
+		req := models.Request{ID: 123, Method: "network.hotspot.stop"}
+
+		HandleRequest(conn, req, manager)
+
+		var resp models.Response[models.SuccessResult]
+		err = json.NewDecoder(mc.writeBuf).Decode(&resp)
+		require.NoError(t, err)
+
+		assert.Equal(t, 123, resp.ID)
+		assert.Empty(t, resp.Error)
+		assert.True(t, backend.stopCalled)
+	})
+
+	t.Run("getSecrets dispatches", func(t *testing.T) {
+		iwdBackend, err := NewIWDBackend()
+		require.NoError(t, err)
+		backend := &testHotspotBackend{IWDBackend: iwdBackend, secrets: "hunter2-password"}
+		manager := NewTestManager(backend, &NetworkState{})
+		mc := newMockNetConn()
+		conn := models.NewConn(mc)
+		req := models.Request{ID: 123, Method: "network.hotspot.getSecrets"}
+
+		HandleRequest(conn, req, manager)
+
+		var resp models.Response[map[string]string]
+		err = json.NewDecoder(mc.writeBuf).Decode(&resp)
+		require.NoError(t, err)
+
+		assert.Equal(t, 123, resp.ID)
+		assert.Empty(t, resp.Error)
+		assert.True(t, backend.getSecretsCalled)
+		require.NotNil(t, resp.Result)
+		assert.Equal(t, "hunter2-password", (*resp.Result)["password"])
+	})
+
+	t.Run("unsupported backend returns error", func(t *testing.T) {
+		manager := &Manager{state: &NetworkState{}}
+		mc := newMockNetConn()
+		conn := models.NewConn(mc)
+		req := models.Request{ID: 123, Method: "network.hotspot.start"}
+
+		HandleRequest(conn, req, manager)
+
+		var resp models.Response[any]
+		err := json.NewDecoder(mc.writeBuf).Decode(&resp)
+		require.NoError(t, err)
+
+		assert.Equal(t, 123, resp.ID)
+		assert.Contains(t, resp.Error, ErrHotspotNotSupported.Error())
+	})
+}
+
 func TestHandleGetNetworkInfo(t *testing.T) {
 	t.Run("missing ssid parameter", func(t *testing.T) {
 		manager := &Manager{

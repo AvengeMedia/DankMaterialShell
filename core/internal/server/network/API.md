@@ -6,6 +6,99 @@ The network manager API provides methods for managing WiFi connections, monitori
 
 ## API Methods
 
+### network.hotspot.configure
+
+Create or update the DMS-managed hotspot profile. Hotspot support is capability-gated: clients should require API v28+, `hotspotSupported: true`, and `hotspotAvailable: true` from network state before showing hotspot controls.
+
+For this implementation, only hotspot-capable backends such as NetworkManager should accept this action. Unsupported backends return an error such as `hotspot not supported by active network backend`.
+
+Configuration changes are rejected while the DMS hotspot is active or activating; stop it before updating the profile.
+
+**Request:**
+```json
+{
+  "method": "network.hotspot.configure",
+  "params": {
+    "ssid": "Dank Hotspot",
+    "password": "optional-password",
+    "device": "wlan0",
+    "band": "bg"
+  }
+}
+```
+
+**Parameters:**
+- `ssid` (string, required): Hotspot SSID to advertise.
+- `password` (string, optional): WPA-PSK password. Omit for an open hotspot when the backend allows it.
+- `device` (string, optional): Wi-Fi interface name to use, for example `wlan0`.
+- `band` (string, optional): Requested NetworkManager band: `bg` for 2.4GHz or `a` for 5GHz.
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "hotspot configured"
+}
+```
+
+### network.hotspot.start
+
+Start the previously configured DMS-managed hotspot profile. This action does not accept or require SSID/password parameters; call `network.hotspot.configure` first when changing hotspot settings.
+
+A successful response only means the activation was requested; the outcome is reported asynchronously through network state updates. While activation is in flight, `hotspotActivating` is `true`; on success `hotspotEnabled` becomes `true`; on failure `hotspotActivating` returns to `false` and `hotspotLastError` carries one of `hotspot-ip-config-failed` (IP sharing setup failed, commonly a missing `dnsmasq`, which NetworkManager's shared IPv4 method requires), `hotspot-supplicant-failed` (the Wi-Fi driver could not start AP mode), or `hotspot-failed`. `hotspotLastError` is cleared on the next successful start.
+
+**Request:**
+```json
+{
+  "method": "network.hotspot.start"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "hotspot started"
+}
+```
+
+### network.hotspot.stop
+
+Stop the active DMS-managed hotspot connection. It must not stop arbitrary user-created hotspot profiles.
+
+**Request:**
+```json
+{
+  "method": "network.hotspot.stop"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "hotspot stopped"
+}
+```
+
+### network.hotspot.getSecrets
+
+Retrieve the stored password of the DMS-managed hotspot profile, for prefilling edit forms. Returns an empty string for an open hotspot. Network state exposes `hotspotSecured` so clients can tell an open hotspot apart from a secured one without fetching the secret.
+
+**Request:**
+```json
+{
+  "method": "network.hotspot.getSecrets"
+}
+```
+
+**Response:**
+```json
+{
+  "password": "the-stored-psk"
+}
+```
+
 ### network.wifi.connect
 
 Initiate a WiFi connection.
@@ -127,6 +220,16 @@ State updates are sent whenever network configuration changes:
 - `wifiIP`: Assigned IP address (empty until DHCP completes)
 - `savedWifiNetworks` (API v26+): Saved WiFi profiles exposed at SSID granularity. If a backend has multiple profiles for the same SSID, DMS merges them into one SSID-level entry. Clients talking to older servers should derive saved visible networks from `wifiNetworks` entries where `saved` is true.
 - `savedWifiNetworks[].outOfRange` (API v26+): Whether the saved profile is not currently visible in scan results. Fallback entries derived from `wifiNetworks` should be treated as visible (`outOfRange: false`).
+- `hotspotSupported` (API v28+): Whether the active backend implements hotspot actions.
+- `hotspotAvailable` (API v28+): Whether hotspot support is usable on this backend/device set. For NetworkManager this means at least one AP-capable managed Wi-Fi device exists, independent of Wi-Fi radio enabled state.
+- `hotspotConfigured` (API v28+): Whether the DMS-managed hotspot profile exists.
+- `hotspotEnabled` (API v28+): Whether the DMS-managed hotspot profile is currently active.
+- `hotspotActivating` (API v28+): Whether hotspot activation is currently in progress.
+- `hotspotSecured` (API v28+): Whether the configured hotspot uses password-based security.
+- `hotspotSSID` (API v28+): Configured DMS hotspot SSID.
+- `hotspotDevice` (API v28+): Optional configured Wi-Fi device for the DMS hotspot.
+- `hotspotBand` (API v28+): Optional configured hotspot band (`bg` or `a`).
+- `hotspotLastError` (API v28+): Machine-readable error from the most recent failed hotspot activation. Cleared when the next start succeeds.
 - `lastError`: Error message from last failed connection attempt
 
 ### network.credentials Service Events

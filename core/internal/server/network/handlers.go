@@ -79,6 +79,14 @@ func HandleRequest(conn *models.Conn, req models.Request, manager *Manager) {
 		handleSetVPNCredentials(conn, req, manager)
 	case "network.wifi.setAutoconnect":
 		handleSetWiFiAutoconnect(conn, req, manager)
+	case "network.hotspot.configure":
+		handleConfigureHotspot(conn, req, manager)
+	case "network.hotspot.start":
+		handleStartHotspot(conn, req, manager)
+	case "network.hotspot.stop":
+		handleStopHotspot(conn, req, manager)
+	case "network.hotspot.getSecrets":
+		handleGetHotspotSecrets(conn, req, manager)
 	default:
 		models.RespondError(conn, req.ID, fmt.Sprintf("unknown method: %s", req.Method))
 	}
@@ -527,6 +535,56 @@ func handleSetWiFiAutoconnect(conn *models.Conn, req models.Request, manager *Ma
 	}
 
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "autoconnect updated"})
+}
+
+func handleConfigureHotspot(conn *models.Conn, req models.Request, manager *Manager) {
+	ssid, err := params.String(req.Params, "ssid")
+	if err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+
+	hotspotReq := HotspotRequest{
+		SSID:     ssid,
+		Password: params.StringOpt(req.Params, "password", ""),
+		Device:   params.StringOpt(req.Params, "device", ""),
+		Band:     params.StringOpt(req.Params, "band", ""),
+	}
+
+	if err := manager.ConfigureHotspot(hotspotReq); err != nil {
+		models.RespondError(conn, req.ID, fmt.Sprintf("failed to configure hotspot: %v", err))
+		return
+	}
+
+	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "hotspot configured"})
+}
+
+func handleStartHotspot(conn *models.Conn, req models.Request, manager *Manager) {
+	if err := manager.StartHotspot(); err != nil {
+		models.RespondError(conn, req.ID, fmt.Sprintf("failed to start hotspot: %v", err))
+		return
+	}
+
+	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "hotspot started"})
+}
+
+func handleStopHotspot(conn *models.Conn, req models.Request, manager *Manager) {
+	if err := manager.StopHotspot(); err != nil {
+		models.RespondError(conn, req.ID, fmt.Sprintf("failed to stop hotspot: %v", err))
+		return
+	}
+
+	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "hotspot stopped"})
+}
+
+func handleGetHotspotSecrets(conn *models.Conn, req models.Request, manager *Manager) {
+	password, err := manager.GetHotspotSecrets()
+	if err != nil {
+		models.RespondError(conn, req.ID, fmt.Sprintf("failed to get hotspot secrets: %v", err))
+		return
+	}
+
+	models.Respond(conn, req.ID, map[string]string{"password": password})
 }
 
 func handleListVPNPlugins(conn *models.Conn, req models.Request, manager *Manager) {
