@@ -349,6 +349,120 @@ func TestConfigureHotspotCreatesDMSProfile(t *testing.T) {
 	assert.Equal(t, "wlan0", backend.state.HotspotDevice)
 }
 
+func TestGetSavedWiFiProfilesFiltersAPModeProfiles(t *testing.T) {
+	clientConn := mock_gonetworkmanager.NewMockConnection(t)
+	dmsHotspotConn := mock_gonetworkmanager.NewMockConnection(t)
+	userHotspotConn := mock_gonetworkmanager.NewMockConnection(t)
+
+	clientSettings := gonetworkmanager.ConnectionSettings{
+		"connection": {
+			"type":        "802-11-wireless",
+			"autoconnect": true,
+		},
+		"802-11-wireless": {
+			"mode": "infrastructure",
+			"ssid": []byte("Home WiFi"),
+		},
+	}
+	dmsSettings := buildHotspotSettings(HotspotRequest{SSID: "DMS Hotspot"}, nil)
+	userAPSettings := gonetworkmanager.ConnectionSettings{
+		"connection": {
+			"type": "802-11-wireless",
+			"id":   "User AP",
+		},
+		"802-11-wireless": {
+			"mode": "ap",
+			"ssid": []byte("User AP"),
+		},
+	}
+
+	clientConn.EXPECT().GetSettings().Return(clientSettings, nil).Once()
+	dmsHotspotConn.EXPECT().GetSettings().Return(dmsSettings, nil).Once()
+	userHotspotConn.EXPECT().GetSettings().Return(userAPSettings, nil).Once()
+
+	profiles := getSavedWiFiProfiles([]gonetworkmanager.Connection{clientConn, dmsHotspotConn, userHotspotConn})
+
+	assert.Contains(t, profiles, "Home WiFi")
+	assert.NotContains(t, profiles, "DMS Hotspot")
+	assert.NotContains(t, profiles, "User AP")
+}
+
+func TestUpdateWiFiNetworksFiltersAPModeAccessPoints(t *testing.T) {
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+	mockSettings := mock_gonetworkmanager.NewMockSettings(t)
+	mockWiFi := mock_gonetworkmanager.NewMockDeviceWireless(t)
+	mockAP := mock_gonetworkmanager.NewMockAccessPoint(t)
+
+	backend, err := NewNetworkManagerBackend(mockNM)
+	require.NoError(t, err)
+	backend.settings = mockSettings
+	backend.wifiDevice = mockWiFi
+	backend.wifiDev = mockWiFi
+
+	mockWiFi.EXPECT().GetAccessPoints().Return([]gonetworkmanager.AccessPoint{mockAP}, nil).Once()
+	mockSettings.EXPECT().ListConnections().Return([]gonetworkmanager.Connection{}, nil).Once()
+	mockAP.EXPECT().GetPropertySSID().Return("DMS Hotspot", nil).Once()
+	mockAP.EXPECT().GetPropertyMode().Return(gonetworkmanager.Nm80211ModeAp, nil).Once()
+
+	networks, err := backend.updateWiFiNetworks()
+	require.NoError(t, err)
+	assert.Empty(t, networks)
+
+	backend.stateMutex.RLock()
+	defer backend.stateMutex.RUnlock()
+	assert.Empty(t, backend.state.WiFiNetworks)
+	assert.Empty(t, backend.state.SavedWiFiNetworks)
+}
+
+func TestFindConnectionIgnoresAPModeProfiles(t *testing.T) {
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+	mockSettings := mock_gonetworkmanager.NewMockSettings(t)
+	dmsHotspotConn := mock_gonetworkmanager.NewMockConnection(t)
+	clientConn := mock_gonetworkmanager.NewMockConnection(t)
+
+	backend, err := NewNetworkManagerBackend(mockNM)
+	require.NoError(t, err)
+	backend.settings = mockSettings
+
+	dmsSettings := buildHotspotSettings(HotspotRequest{SSID: "Shared SSID"}, nil)
+	clientSettings := gonetworkmanager.ConnectionSettings{
+		"connection": {
+			"type": "802-11-wireless",
+			"id":   "Shared SSID",
+		},
+		"802-11-wireless": {
+			"mode": "infrastructure",
+			"ssid": []byte("Shared SSID"),
+		},
+	}
+
+	mockSettings.EXPECT().ListConnections().Return([]gonetworkmanager.Connection{dmsHotspotConn, clientConn}, nil).Once()
+	dmsHotspotConn.EXPECT().GetSettings().Return(dmsSettings, nil).Once()
+	clientConn.EXPECT().GetSettings().Return(clientSettings, nil).Once()
+
+	conn, err := backend.findConnection("Shared SSID")
+	require.NoError(t, err)
+	assert.Same(t, clientConn, conn)
+}
+
+func TestFindConnectionReturnsNotFoundForDMSHotspotOnly(t *testing.T) {
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+	mockSettings := mock_gonetworkmanager.NewMockSettings(t)
+	dmsHotspotConn := mock_gonetworkmanager.NewMockConnection(t)
+
+	backend, err := NewNetworkManagerBackend(mockNM)
+	require.NoError(t, err)
+	backend.settings = mockSettings
+
+	dmsSettings := buildHotspotSettings(HotspotRequest{SSID: "DMS Hotspot"}, nil)
+
+	mockSettings.EXPECT().ListConnections().Return([]gonetworkmanager.Connection{dmsHotspotConn}, nil).Once()
+	dmsHotspotConn.EXPECT().GetSettings().Return(dmsSettings, nil).Once()
+
+	_, err = backend.findConnection("DMS Hotspot")
+	assert.Error(t, err)
+}
+
 func TestFindActiveDMSHotspotConnectionIgnoresUserAPProfiles(t *testing.T) {
 	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
 	userConn := mock_gonetworkmanager.NewMockConnection(t)
@@ -382,6 +496,77 @@ func TestFindActiveDMSHotspotConnectionIgnoresUserAPProfiles(t *testing.T) {
 	active, err := backend.findActiveDMSHotspotConnection()
 	require.NoError(t, err)
 	assert.Same(t, dmsActive, active)
+}
+
+func TestUpdateWiFiStateSuppressesActiveAPModeConnection(t *testing.T) {
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+	mockWiFi := mock_gonetworkmanager.NewMockDeviceWireless(t)
+	mockConn := mock_gonetworkmanager.NewMockConnection(t)
+	mockActive := mock_gonetworkmanager.NewMockActiveConnection(t)
+
+	backend, err := NewNetworkManagerBackend(mockNM)
+	require.NoError(t, err)
+	backend.wifiDevice = mockWiFi
+	backend.wifiDev = mockWiFi
+
+	dmsSettings := buildHotspotSettings(HotspotRequest{SSID: "DMS Hotspot"}, nil)
+
+	mockWiFi.EXPECT().GetPropertyInterface().Return("wlan0", nil).Once()
+	mockWiFi.EXPECT().GetPropertyState().Return(gonetworkmanager.NmDeviceStateActivated, nil).Once()
+	mockWiFi.EXPECT().GetPath().Return("/org/freedesktop/NetworkManager/Devices/1").Twice()
+	mockNM.EXPECT().GetPropertyActiveConnections().Return([]gonetworkmanager.ActiveConnection{mockActive}, nil).Once()
+	mockActive.EXPECT().GetPropertyType().Return("802-11-wireless", nil).Once()
+	mockActive.EXPECT().GetPropertyConnection().Return(mockConn, nil).Once()
+	mockConn.EXPECT().GetSettings().Return(dmsSettings, nil).Once()
+	mockActive.EXPECT().GetPropertyDevices().Return([]gonetworkmanager.Device{mockWiFi}, nil).Once()
+
+	err = backend.updateWiFiState()
+	require.NoError(t, err)
+
+	backend.stateMutex.RLock()
+	defer backend.stateMutex.RUnlock()
+	assert.Equal(t, "wlan0", backend.state.WiFiDevice)
+	assert.False(t, backend.state.WiFiConnected)
+	assert.Empty(t, backend.state.WiFiSSID)
+	assert.Empty(t, backend.state.WiFiIP)
+}
+
+func TestUpdateAllWiFiDevicesSuppressesActiveAPModeConnection(t *testing.T) {
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+	mockSettings := mock_gonetworkmanager.NewMockSettings(t)
+	mockWiFi := mock_gonetworkmanager.NewMockDeviceWireless(t)
+	mockConn := mock_gonetworkmanager.NewMockConnection(t)
+	mockActive := mock_gonetworkmanager.NewMockActiveConnection(t)
+
+	backend, err := NewNetworkManagerBackend(mockNM)
+	require.NoError(t, err)
+	backend.settings = mockSettings
+	backend.wifiDevices = map[string]*wifiDeviceInfo{
+		"wlan0": {device: mockWiFi, wireless: mockWiFi, name: "wlan0", hwAddress: "00:11:22:33:44:55"},
+	}
+
+	dmsSettings := buildHotspotSettings(HotspotRequest{SSID: "DMS Hotspot"}, nil)
+
+	mockSettings.EXPECT().ListConnections().Return([]gonetworkmanager.Connection{}, nil).Once()
+	mockWiFi.EXPECT().GetPropertyState().Return(gonetworkmanager.NmDeviceStateActivated, nil).Once()
+	mockWiFi.EXPECT().GetPath().Return("/org/freedesktop/NetworkManager/Devices/1").Twice()
+	mockNM.EXPECT().GetPropertyActiveConnections().Return([]gonetworkmanager.ActiveConnection{mockActive}, nil).Once()
+	mockActive.EXPECT().GetPropertyType().Return("802-11-wireless", nil).Once()
+	mockActive.EXPECT().GetPropertyConnection().Return(mockConn, nil).Once()
+	mockConn.EXPECT().GetSettings().Return(dmsSettings, nil).Once()
+	mockActive.EXPECT().GetPropertyDevices().Return([]gonetworkmanager.Device{mockWiFi}, nil).Once()
+	mockWiFi.EXPECT().GetAccessPoints().Return([]gonetworkmanager.AccessPoint{}, nil).Once()
+
+	backend.updateAllWiFiDevices()
+
+	backend.stateMutex.RLock()
+	defer backend.stateMutex.RUnlock()
+	require.Len(t, backend.state.WiFiDevices, 1)
+	device := backend.state.WiFiDevices[0]
+	assert.Equal(t, "wlan0", device.Name)
+	assert.Equal(t, "disconnected", device.State)
+	assert.False(t, device.Connected)
+	assert.Empty(t, device.SSID)
 }
 
 func TestUpdateHotspotStateDetectsRunningDMSHotspot(t *testing.T) {

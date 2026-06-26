@@ -140,6 +140,18 @@ func (m *Manager) setConnectionPriority(connType string, autoconnectPriority int
 			continue
 		}
 
+		// AP-mode profiles (hotspots) are not routing candidates; leave their
+		// autoconnect priority and metrics alone.
+		if cType == "802-11-wireless" {
+			if wifiSection, ok := settings["802-11-wireless"]; ok {
+				if modeVariant, ok := wifiSection["mode"]; ok {
+					if mode, _ := modeVariant.Value().(string); mode == "ap" {
+						continue
+					}
+				}
+			}
+		}
+
 		connName := ""
 		if idVariant, ok := connSection["id"]; ok {
 			connName, _ = idVariant.Value().(string)

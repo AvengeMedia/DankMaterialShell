@@ -281,26 +281,83 @@ func (b *NetworkManagerBackend) findActiveDMSHotspotConnection() (gonetworkmanag
 }
 
 func isDMSHotspotConnection(settings gonetworkmanager.ConnectionSettings) bool {
-	connMeta, ok := settings["connection"]
-	if !ok {
-		return false
-	}
-	connType, _ := connMeta["type"].(string)
-	if connType != "802-11-wireless" {
-		return false
-	}
-
-	wifiSettings, ok := settings["802-11-wireless"]
-	if !ok {
-		return false
-	}
-	mode, _ := wifiSettings["mode"].(string)
-	if mode != "ap" {
+	connMeta, _, ok := wifiConnectionSettings(settings)
+	if !ok || !isAPModeWiFiConnection(settings) {
 		return false
 	}
 
 	stableID, _ := connMeta["stable-id"].(string)
 	return stableID == dmsHotspotStableID
+}
+
+func wifiConnectionSettings(settings gonetworkmanager.ConnectionSettings) (map[string]any, map[string]any, bool) {
+	connMeta, ok := settings["connection"]
+	if !ok {
+		return nil, nil, false
+	}
+	connType, _ := connMeta["type"].(string)
+	if connType != "802-11-wireless" {
+		return nil, nil, false
+	}
+
+	wifiSettings, ok := settings["802-11-wireless"]
+	if !ok {
+		return nil, nil, false
+	}
+
+	return connMeta, wifiSettings, true
+}
+
+func isAPModeWiFiConnection(settings gonetworkmanager.ConnectionSettings) bool {
+	_, wifiSettings, ok := wifiConnectionSettings(settings)
+	if !ok {
+		return false
+	}
+	mode, _ := wifiSettings["mode"].(string)
+	return mode == "ap"
+}
+
+func isClientWiFiConnection(settings gonetworkmanager.ConnectionSettings) bool {
+	_, _, ok := wifiConnectionSettings(settings)
+	return ok && !isAPModeWiFiConnection(settings)
+}
+
+func (b *NetworkManagerBackend) activeAPModeWiFiDevicePaths() map[string]bool {
+	paths := make(map[string]bool)
+	nm := b.nmConn.(gonetworkmanager.NetworkManager)
+	activeConns, err := nm.GetPropertyActiveConnections()
+	if err != nil {
+		return paths
+	}
+
+	for _, active := range activeConns {
+		connType, err := active.GetPropertyType()
+		if err != nil || connType != "802-11-wireless" {
+			continue
+		}
+
+		conn, err := active.GetPropertyConnection()
+		if err != nil || conn == nil {
+			continue
+		}
+
+		settings, err := conn.GetSettings()
+		if err != nil || !isAPModeWiFiConnection(settings) {
+			continue
+		}
+
+		devices, err := active.GetPropertyDevices()
+		if err != nil {
+			continue
+		}
+		for _, dev := range devices {
+			if dev != nil {
+				paths[string(dev.GetPath())] = true
+			}
+		}
+	}
+
+	return paths
 }
 
 func (b *NetworkManagerBackend) getAPCapableWiFiDevice(deviceName string, band string) (*wifiDeviceInfo, error) {

@@ -163,6 +163,12 @@ func (b *NetworkManagerBackend) updateWiFiState() error {
 	}
 
 	connected := state == gonetworkmanager.NmDeviceStateActivated
+	if connected {
+		apModeDevicePaths := b.activeAPModeWiFiDevicePaths()
+		if apModeDevicePaths[string(dev.GetPath())] {
+			connected = false
+		}
+	}
 	failed := state == gonetworkmanager.NmDeviceStateFailed
 	disconnected := state == gonetworkmanager.NmDeviceStateDisconnected
 

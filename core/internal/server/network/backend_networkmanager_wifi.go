@@ -94,25 +94,23 @@ func (b *NetworkManagerBackend) GetWiFiNetworkDetails(ssid string) (*NetworkInfo
 	autoconnectMap := make(map[string]bool)
 	for _, conn := range connections {
 		connSettings, err := conn.GetSettings()
-		if err != nil {
+		if err != nil || !isClientWiFiConnection(connSettings) {
 			continue
 		}
 
-		if connMeta, ok := connSettings["connection"]; ok {
-			if connType, ok := connMeta["type"].(string); ok && connType == "802-11-wireless" {
-				if wifiSettings, ok := connSettings["802-11-wireless"]; ok {
-					if ssidBytes, ok := wifiSettings["ssid"].([]byte); ok {
-						savedSSID := string(ssidBytes)
-						savedSSIDs[savedSSID] = true
-						autoconnect := true
-						if ac, ok := connMeta["autoconnect"].(bool); ok {
-							autoconnect = ac
-						}
-						autoconnectMap[savedSSID] = autoconnect
-					}
-				}
-			}
+		connMeta, wifiSettings, _ := wifiConnectionSettings(connSettings)
+		ssidBytes, ok := wifiSettings["ssid"].([]byte)
+		if !ok {
+			continue
 		}
+
+		savedSSID := string(ssidBytes)
+		savedSSIDs[savedSSID] = true
+		autoconnect := true
+		if ac, ok := connMeta["autoconnect"].(bool); ok {
+			autoconnect = ac
+		}
+		autoconnectMap[savedSSID] = autoconnect
 	}
 
 	b.stateMutex.RLock()
@@ -128,6 +126,11 @@ func (b *NetworkManagerBackend) GetWiFiNetworkDetails(ssid string) (*NetworkInfo
 			continue
 		}
 
+		mode, _ := ap.GetPropertyMode()
+		if mode == gonetworkmanager.Nm80211ModeAp {
+			continue
+		}
+
 		strength, _ := ap.GetPropertyStrength()
 		flags, _ := ap.GetPropertyFlags()
 		wpaFlags, _ := ap.GetPropertyWPAFlags()
@@ -135,7 +138,6 @@ func (b *NetworkManagerBackend) GetWiFiNetworkDetails(ssid string) (*NetworkInfo
 		freq, _ := ap.GetPropertyFrequency()
 		maxBitrate, _ := ap.GetPropertyMaxBitrate()
 		bssid, _ := ap.GetPropertyHWAddress()
-		mode, _ := ap.GetPropertyMode()
 
 		secured := flags != uint32(gonetworkmanager.Nm80211APFlagsNone) ||
 			wpaFlags != uint32(gonetworkmanager.Nm80211APSecNone) ||
@@ -418,24 +420,11 @@ func getSavedWiFiProfiles(connections []gonetworkmanager.Connection) map[string]
 
 	for _, conn := range connections {
 		connSettings, err := conn.GetSettings()
-		if err != nil {
+		if err != nil || !isClientWiFiConnection(connSettings) {
 			continue
 		}
 
-		connMeta, ok := connSettings["connection"]
-		if !ok {
-			continue
-		}
-
-		connType, ok := connMeta["type"].(string)
-		if !ok || connType != "802-11-wireless" {
-			continue
-		}
-
-		wifiSettings, ok := connSettings["802-11-wireless"]
-		if !ok {
-			continue
-		}
+		connMeta, wifiSettings, _ := wifiConnectionSettings(connSettings)
 
 		ssidBytes, ok := wifiSettings["ssid"].([]byte)
 		if !ok || len(ssidBytes) == 0 {
@@ -535,6 +524,10 @@ func (b *NetworkManagerBackend) updateWiFiNetworks() ([]WiFiNetwork, error) {
 		if err != nil || ssid == "" {
 			continue
 		}
+		mode, _ := ap.GetPropertyMode()
+		if mode == gonetworkmanager.Nm80211ModeAp {
+			continue
+		}
 
 		if existingIndex, exists := seenSSIDs[ssid]; exists {
 			existing := &networks[existingIndex]
@@ -556,7 +549,6 @@ func (b *NetworkManagerBackend) updateWiFiNetworks() ([]WiFiNetwork, error) {
 		freq, _ := ap.GetPropertyFrequency()
 		maxBitrate, _ := ap.GetPropertyMaxBitrate()
 		bssid, _ := ap.GetPropertyHWAddress()
-		mode, _ := ap.GetPropertyMode()
 
 		secured := flags != uint32(gonetworkmanager.Nm80211APFlagsNone) ||
 			wpaFlags != uint32(gonetworkmanager.Nm80211APSecNone) ||
@@ -695,21 +687,16 @@ func (b *NetworkManagerBackend) findConnection(ssid string) (gonetworkmanager.Co
 	ssidBytes := []byte(ssid)
 	for _, conn := range connections {
 		connSettings, err := conn.GetSettings()
-		if err != nil {
+		if err != nil || !isClientWiFiConnection(connSettings) {
 			continue
 		}
 
-		if connMeta, ok := connSettings["connection"]; ok {
-			if connType, ok := connMeta["type"].(string); ok && connType == "802-11-wireless" {
-				if wifiSettings, ok := connSettings["802-11-wireless"]; ok {
-					if candidateSSID, ok := wifiSettings["ssid"].([]byte); ok {
-						if bytes.Equal(candidateSSID, ssidBytes) {
-							return conn, nil
-						}
-						log.Debugf("[findConnection] SSID mismatch: stored=%q, request=%q", string(candidateSSID), ssid)
-					}
-				}
+		_, wifiSettings, _ := wifiConnectionSettings(connSettings)
+		if candidateSSID, ok := wifiSettings["ssid"].([]byte); ok {
+			if bytes.Equal(candidateSSID, ssidBytes) {
+				return conn, nil
 			}
+			log.Debugf("[findConnection] SSID mismatch: stored=%q, request=%q", string(candidateSSID), ssid)
 		}
 	}
 
@@ -1069,9 +1056,18 @@ func (b *NetworkManagerBackend) updateAllWiFiDevices() {
 	wifiConnected := b.state.WiFiConnected
 	b.stateMutex.RUnlock()
 
+	var apModeDevicePaths map[string]bool
 	for name, devInfo := range b.wifiDevicesSnapshot() {
 		state, _ := devInfo.device.GetPropertyState()
 		connected := state == gonetworkmanager.NmDeviceStateActivated
+		if connected {
+			if apModeDevicePaths == nil {
+				apModeDevicePaths = b.activeAPModeWiFiDevicePaths()
+			}
+			if apModeDevicePaths[string(devInfo.device.GetPath())] {
+				connected = false
+			}
+		}
 
 		var ssid, bssid, ip string
 		var signal uint8
@@ -1088,7 +1084,9 @@ func (b *NetworkManagerBackend) updateAllWiFiDevices() {
 		stateStr := "disconnected"
 		switch state {
 		case gonetworkmanager.NmDeviceStateActivated:
-			stateStr = "connected"
+			if connected {
+				stateStr = "connected"
+			}
 		case gonetworkmanager.NmDeviceStateConfig, gonetworkmanager.NmDeviceStateIpConfig:
 			stateStr = "connecting"
 		case gonetworkmanager.NmDeviceStatePrepare:
@@ -1105,6 +1103,10 @@ func (b *NetworkManagerBackend) updateAllWiFiDevices() {
 			for _, ap := range apPaths {
 				apSSID, err := ap.GetPropertySSID()
 				if err != nil || apSSID == "" {
+					continue
+				}
+				mode, _ := ap.GetPropertyMode()
+				if mode == gonetworkmanager.Nm80211ModeAp {
 					continue
 				}
 
@@ -1128,7 +1130,6 @@ func (b *NetworkManagerBackend) updateAllWiFiDevices() {
 				freq, _ := ap.GetPropertyFrequency()
 				maxBitrate, _ := ap.GetPropertyMaxBitrate()
 				apBSSID, _ := ap.GetPropertyHWAddress()
-				mode, _ := ap.GetPropertyMode()
 
 				secured := flags != uint32(gonetworkmanager.Nm80211APFlagsNone) ||
 					wpaFlags != uint32(gonetworkmanager.Nm80211APSecNone) ||
