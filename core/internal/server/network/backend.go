@@ -51,6 +51,13 @@ type Backend interface {
 	CancelCredentials(token string) error
 }
 
+type HotspotBackend interface {
+	ConfigureHotspot(req HotspotRequest) error
+	StartHotspot() error
+	StopHotspot() error
+	GetHotspotSecrets() (string, error)
+}
+
 type BackendState struct {
 	Backend                string
 	NetworkStatus          NetworkStatus
@@ -69,6 +76,15 @@ type BackendState struct {
 	WiFiNetworks           []WiFiNetwork
 	SavedWiFiNetworks      []WiFiNetwork
 	WiFiDevices            []WiFiDevice
+	HotspotAvailable       bool
+	HotspotConfigured      bool
+	HotspotEnabled         bool
+	HotspotActivating      bool
+	HotspotSecured         bool
+	HotspotSSID            string
+	HotspotDevice          string
+	HotspotBand            string
+	HotspotLastError       string
 	WiredConnections       []WiredConnection
 	VPNProfiles            []VPNProfile
 	VPNActive              []VPNActive

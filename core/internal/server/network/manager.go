@@ -16,6 +16,10 @@ import (
 // on the system.
 var ErrNoNetworkBackend = errors.New("no supported network backend found")
 
+// ErrHotspotNotSupported is returned when the active backend does not implement
+// hotspot operations.
+var ErrHotspotNotSupported = errors.New("hotspot not supported by active network backend")
+
 func NewManager() (*Manager, error) {
 	detection, err := DetectNetworkStack()
 	if err != nil {
@@ -112,11 +116,17 @@ func NewManager() (*Manager, error) {
 	return m, nil
 }
 
+func (m *Manager) hotspotBackend() (HotspotBackend, bool) {
+	backend, ok := m.backend.(HotspotBackend)
+	return backend, ok
+}
+
 func (m *Manager) syncStateFromBackend() error {
 	backendState, err := m.backend.GetCurrentState()
 	if err != nil {
 		return err
 	}
+	_, hotspotSupported := m.hotspotBackend()
 
 	m.stateMutex.Lock()
 	m.state.Backend = backendState.Backend
@@ -136,6 +146,28 @@ func (m *Manager) syncStateFromBackend() error {
 	m.state.WiFiNetworks = backendState.WiFiNetworks
 	m.state.SavedWiFiNetworks = backendState.SavedWiFiNetworks
 	m.state.WiFiDevices = backendState.WiFiDevices
+	m.state.HotspotSupported = hotspotSupported
+	if hotspotSupported {
+		m.state.HotspotAvailable = backendState.HotspotAvailable
+		m.state.HotspotConfigured = backendState.HotspotConfigured
+		m.state.HotspotEnabled = backendState.HotspotEnabled
+		m.state.HotspotActivating = backendState.HotspotActivating
+		m.state.HotspotSecured = backendState.HotspotSecured
+		m.state.HotspotSSID = backendState.HotspotSSID
+		m.state.HotspotDevice = backendState.HotspotDevice
+		m.state.HotspotBand = backendState.HotspotBand
+		m.state.HotspotLastError = backendState.HotspotLastError
+	} else {
+		m.state.HotspotAvailable = false
+		m.state.HotspotConfigured = false
+		m.state.HotspotEnabled = false
+		m.state.HotspotActivating = false
+		m.state.HotspotSecured = false
+		m.state.HotspotSSID = ""
+		m.state.HotspotDevice = ""
+		m.state.HotspotBand = ""
+		m.state.HotspotLastError = ""
+	}
 	m.state.WiredConnections = backendState.WiredConnections
 	m.state.VPNProfiles = backendState.VPNProfiles
 	m.state.VPNActive = backendState.VPNActive
@@ -210,11 +242,37 @@ func stateChangedMeaningfully(old, new *NetworkState) bool {
 	if old.WiFiIP != new.WiFiIP {
 		return true
 	}
-	if !signalChangeSignificant(old.WiFiSignal, new.WiFiSignal) {
-		if old.WiFiSignal != new.WiFiSignal {
-			return false
-		}
-	} else if old.WiFiSignal != new.WiFiSignal {
+	if old.HotspotSupported != new.HotspotSupported {
+		return true
+	}
+	if old.HotspotAvailable != new.HotspotAvailable {
+		return true
+	}
+	if old.HotspotConfigured != new.HotspotConfigured {
+		return true
+	}
+	if old.HotspotEnabled != new.HotspotEnabled {
+		return true
+	}
+	if old.HotspotActivating != new.HotspotActivating {
+		return true
+	}
+	if old.HotspotSecured != new.HotspotSecured {
+		return true
+	}
+	if old.HotspotLastError != new.HotspotLastError {
+		return true
+	}
+	if old.HotspotSSID != new.HotspotSSID {
+		return true
+	}
+	if old.HotspotDevice != new.HotspotDevice {
+		return true
+	}
+	if old.HotspotBand != new.HotspotBand {
+		return true
+	}
+	if old.WiFiSignal != new.WiFiSignal && signalChangeSignificant(old.WiFiSignal, new.WiFiSignal) {
 		return true
 	}
 	if old.IsConnecting != new.IsConnecting {
@@ -275,6 +333,25 @@ func stateChangedMeaningfully(old, new *NetworkState) bool {
 			return true
 		}
 		if oldNet.OutOfRange != newNet.OutOfRange {
+			return true
+		}
+	}
+
+	// Per-device signal strength is intentionally not compared: it churns
+	// constantly and the primary device's signal is already debounced above.
+	for i := range old.WiFiDevices {
+		oldDev := &old.WiFiDevices[i]
+		newDev := &new.WiFiDevices[i]
+		if oldDev.Name != newDev.Name {
+			return true
+		}
+		if oldDev.State != newDev.State {
+			return true
+		}
+		if oldDev.Connected != newDev.Connected {
+			return true
+		}
+		if oldDev.SSID != newDev.SSID {
 			return true
 		}
 	}
@@ -560,6 +637,69 @@ func (m *Manager) ConnectWiFi(req ConnectionRequest) error {
 
 func (m *Manager) DisconnectWiFi() error {
 	return m.backend.DisconnectWiFi()
+}
+
+func (m *Manager) ConfigureHotspot(req HotspotRequest) error {
+	backend, ok := m.hotspotBackend()
+	if !ok {
+		return ErrHotspotNotSupported
+	}
+
+	if err := backend.ConfigureHotspot(req); err != nil {
+		return err
+	}
+
+	if err := m.syncStateFromBackend(); err != nil {
+		return err
+	}
+	m.notifySubscribers()
+
+	return nil
+}
+
+func (m *Manager) StartHotspot() error {
+	backend, ok := m.hotspotBackend()
+	if !ok {
+		return ErrHotspotNotSupported
+	}
+
+	if err := backend.StartHotspot(); err != nil {
+		return err
+	}
+
+	if err := m.syncStateFromBackend(); err != nil {
+		return err
+	}
+	m.notifySubscribers()
+
+	return nil
+}
+
+func (m *Manager) StopHotspot() error {
+	backend, ok := m.hotspotBackend()
+	if !ok {
+		return ErrHotspotNotSupported
+	}
+
+	if err := backend.StopHotspot(); err != nil {
+		return err
+	}
+
+	if err := m.syncStateFromBackend(); err != nil {
+		return err
+	}
+	m.notifySubscribers()
+
+	return nil
+}
+
+func (m *Manager) GetHotspotSecrets() (string, error) {
+	backend, ok := m.hotspotBackend()
+	if !ok {
+		return "", ErrHotspotNotSupported
+	}
+
+	return backend.GetHotspotSecrets()
 }
 
 func (m *Manager) ForgetWiFiNetwork(ssid string) error {
