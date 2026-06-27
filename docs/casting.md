@@ -32,15 +32,16 @@ DMA-BUF import on Wayland, a VA-API driver.
 AirPlay mirroring shells out to **doubletake** (GPLv3) — a separate binary, never
 linked into the MIT `dms`. We use the fork
 [`domenkozar/doubletake` (`go-gst-capture`)](https://github.com/domenkozar/doubletake/tree/go-gst-capture),
-which captures via the GStreamer library (no `gst-launch`) and fixes the DMA-BUF
-import + 4:2:0 chroma issues (pending upstream in omarroth/doubletake).
+which drives `gst-launch-1.0` for capture and fixes the black-screen + pts-timing
+issues there (DMA-BUF import + 4:2:0 chroma; pending upstream in omarroth/doubletake).
 
-Build it (needs CGO + GStreamer dev) and put it on `PATH`, or point `DMS_DOUBLETAKE`
-at the binary:
+doubletake builds **CGO-free** — no GStreamer dev packages needed; it only needs the
+`gst-launch-1.0` CLI and plugins at runtime. Build it and put `bin/doubletake` on
+`PATH`, or point `DMS_DOUBLETAKE` at it:
 
 ```sh
 git clone -b go-gst-capture https://github.com/domenkozar/doubletake
-cd doubletake && CGO_ENABLED=1 go build -o doubletake ./cmd/doubletake
+cd doubletake && make            # builds bin/doubletake (CGO-free)
 ```
 
 Without doubletake, AirPlay devices still appear in discovery but connecting reports
