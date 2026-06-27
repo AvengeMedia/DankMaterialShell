@@ -31,7 +31,7 @@ func portRange() string {
 }
 
 // buildDoubletakeCmd builds the doubletake mirror invocation for host.
-// doubletake captures via the go-gst library itself (see the fork at
+// doubletake drives gst-launch-1.0 for capture itself (see the fork at
 // github.com/domenkozar/doubletake), so no capture hook is needed here.
 // Overridable in tests.
 var buildDoubletakeCmd = func(host string) *exec.Cmd {
