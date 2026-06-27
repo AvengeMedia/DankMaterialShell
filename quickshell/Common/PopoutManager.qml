@@ -191,7 +191,7 @@ Singleton {
         const p = getActivePopout(screen);
         if (!p || !_isPopoutPresented(p))
             return false;
-        return p.hoverDismissEnabled === false;
+        return p.hoverDismissEnabled === false || p.hoverDismissSuspended === true;
     }
 
     function isCurrentPopout(popout, screenName) {

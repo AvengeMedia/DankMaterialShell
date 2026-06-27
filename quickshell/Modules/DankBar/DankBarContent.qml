@@ -95,6 +95,14 @@ Item {
         enableFrameInsetAnimation.schedule();
     }
 
+    Connections {
+        target: topBarContent._hasBarWindow ? topBarContent.barWindow.axis : null
+
+        function onEdgeChanged() {
+            topBarContent.resetHoverForBarGeometryChange();
+        }
+    }
+
     Behavior on anchors.leftMargin {
         enabled: _animateFrameInsets && _usesFrameBarChrome
         NumberAnimation {
@@ -401,6 +409,19 @@ Item {
     property var _pendingHoverHit: null
     property string _pendingHoverTrigger: ""
 
+    function resetHoverForBarGeometryChange() {
+        _cancelPendingHover();
+        _hoverCloseTimer.stop();
+        _pendingPopoutOpenSpec = null;
+
+        const activePopout = PopoutManager.getActivePopout(barWindow?.screen);
+        const hasTransientSurface = activeHoverTrigger !== "" || activePopout?.hoverDismissEnabled === true;
+        if (hasTransientSurface && !PopoutManager.isActivePopoutPinned(barWindow?.screen))
+            closeHoverSurfaces();
+        else
+            activeHoverTrigger = "";
+    }
+
     Timer {
         id: _hoverIntentTimer
         interval: topBarContent.hoverPopoutDelay
@@ -524,6 +545,9 @@ Item {
                 popout.setTriggerPosition(pos.x, pos.y, pos.width, widgetSection, barWindow.screen, barPosition, barWindow.effectiveBarThickness, effectiveBarConfig?.spacing ?? 4, effectiveBarConfig);
             }
         }
+
+        if (typeof popout.prepareForTrigger === "function")
+            popout.prepareForTrigger(spec.triggerSource, mode);
 
         if (spec.prepare)
             spec.prepare(popout);
@@ -859,6 +883,10 @@ Item {
             const inst = _notepadWidgetForScreen()?.notepadInstance;
             return inst?.isVisible ?? false;
         }
+        if (activeHoverTrigger.startsWith("tray-")) {
+            const screenName = barWindow.screen?.name;
+            return !!(screenName && TrayMenuManager.activeTrayMenus[screenName]);
+        }
         const popout = PopoutManager.getActivePopout(barWindow?.screen);
         if (!popout)
             return false;
@@ -1116,12 +1144,19 @@ Item {
         if (!PopoutManager.cursorOverBar(_lastHoverGlobalX, _lastHoverGlobalY))
             return;
 
+        const activePopout = PopoutManager.getActivePopout(barWindow?.screen);
+        const targetLoader = _loaderForWidgetId(hit.widgetId);
+        const targetPopout = _resolvePopoutFromLoader(targetLoader);
+        const managerOwnsTransition = !!(activePopout && targetPopout);
+
         // A different trigger backed by the same already-open popout swaps tab/position
-        // in place (requestHoverPopout handles it) — don't close+reopen the same surface.
+        // in place. PopoutManager also owns handoff between loaded popouts, so only
+        // pre-close special/unmanaged surfaces here.
         if (triggerKey !== activeHoverTrigger && activeHoverTrigger !== "" && !_hitTargetsActivePopout(hit)) {
-            // Mark popout as superseded to fade in-place before closing.
-            _beginSupersededCloseForActive();
-            closeHoverSurfaces();
+            if (!managerOwnsTransition) {
+                _beginSupersededCloseForActive();
+                closeHoverSurfaces();
+            }
         }
 
         if (!openHoverPopoutForHit(hit)) {

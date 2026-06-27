@@ -37,13 +37,15 @@ Item {
     property bool isClosing: false
     property bool animationsEnabled: true
     property bool hoverDismissEnabled: false
+    property bool hoverDismissSuspended: false
 
     function cancelHoverDismiss() {
         hoverDismissTracker.cancelPending();
+        _hoverDismissGrace.stop();
     }
 
     function closeFromHoverDismiss() {
-        if (isClosing || !shouldBeVisible)
+        if (hoverDismissSuspended || isClosing || !shouldBeVisible)
             return;
         if (popoutHandle?.closeFromHoverDismiss)
             popoutHandle.closeFromHoverDismiss();
@@ -58,8 +60,16 @@ Item {
         _hoverOverBody = over;
         if (over)
             _hoverDismissGrace.stop();
-        else if (root.hoverDismissEnabled && root.shouldBeVisible)
+        else if (root.hoverDismissEnabled && !root.hoverDismissSuspended && root.shouldBeVisible)
             _hoverDismissGrace.restart();
+    }
+
+    onHoverDismissSuspendedChanged: {
+        if (hoverDismissSuspended) {
+            _hoverDismissGrace.stop();
+        } else if (hoverDismissEnabled && shouldBeVisible && !_hoverOverBody) {
+            _hoverDismissGrace.restart();
+        }
     }
 
     Timer {
@@ -67,7 +77,7 @@ Item {
         interval: 150
         repeat: false
         onTriggered: {
-            if (!root.hoverDismissEnabled || !root.shouldBeVisible)
+            if (!root.hoverDismissEnabled || root.hoverDismissSuspended || !root.shouldBeVisible)
                 return;
             if (root._hoverOverBody)
                 return;
@@ -641,7 +651,7 @@ Item {
         HoverDismissTracker {
             id: hoverDismissTracker
             anchors.fill: parent
-            enabled: root.hoverDismissEnabled && root.shouldBeVisible
+            enabled: root.hoverDismissEnabled && !root.hoverDismissSuspended && root.shouldBeVisible
             shouldDismiss: function () {
                 return !PopoutManager.cursorOverBar(PopoutManager.hoverCursorGlobalX, PopoutManager.hoverCursorGlobalY);
             }

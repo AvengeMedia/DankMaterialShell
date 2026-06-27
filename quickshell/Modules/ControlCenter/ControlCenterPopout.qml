@@ -98,6 +98,7 @@ DankPopout {
     property bool anyModalOpen: credentialsPromptOpen || wifiPasswordModalOpen || polkitModalOpen || powerMenuOpen
 
     backgroundInteractive: !anyModalOpen
+    hoverDismissSuspended: editMode || anyModalOpen
 
     onCredentialsPromptOpenChanged: {
         if (credentialsPromptOpen && shouldBeVisible)

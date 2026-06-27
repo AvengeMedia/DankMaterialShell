@@ -25,6 +25,7 @@ Item {
     property bool suspendShadowWhileResizing: false
     property bool shouldBeVisible: false
     property bool hoverDismissEnabled: false
+    property bool hoverDismissSuspended: false
     property var customKeyboardFocus: null
     property bool backgroundInteractive: true
     property bool contentHandlesKeys: false
@@ -187,6 +188,8 @@ Item {
     }
 
     function closeFromHoverDismiss() {
+        if (hoverDismissSuspended)
+            return;
         hoverDismissEnabled = false;
         // Enable animations using standard Theme-bound popout motion to preserve bindings.
         if (impl.item)
@@ -307,6 +310,7 @@ Item {
         it.effectiveBarPosition = Qt.binding(() => root.effectiveBarPosition);
         it.effectiveBarBottomGap = Qt.binding(() => root.effectiveBarBottomGap);
         it.hoverDismissEnabled = Qt.binding(() => root.hoverDismissEnabled);
+        it.hoverDismissSuspended = Qt.binding(() => root.hoverDismissSuspended);
 
         it.shouldBeVisible = root.shouldBeVisible;
         if (root._primeContent && typeof it.primeContent === "function")

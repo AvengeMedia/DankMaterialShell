@@ -359,7 +359,7 @@ Item {
                     tags: ["background", "color", "fill", "fit", "custom"]
                     settingKey: "wallpaperBackgroundColorMode"
                     text: I18n.tr("Background Color")
-                    description: I18n.tr("Color shown for areas not covered by wallpaper (e.g. Fit or Pad modes)")
+                    description: I18n.tr("Color shown for areas not covered by wallpaper")
                     visible: root.currentWallpaper !== "" && !root.currentWallpaper.startsWith("#")
                     dropdownWidth: 220
                     options: [

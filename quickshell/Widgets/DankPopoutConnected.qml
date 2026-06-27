@@ -409,13 +409,15 @@ Item {
 
     property bool animationsEnabled: true
     property bool hoverDismissEnabled: false
+    property bool hoverDismissSuspended: false
 
     function cancelHoverDismiss() {
         hoverDismissTracker.cancelPending();
+        _hoverDismissGrace.stop();
     }
 
     function closeFromHoverDismiss() {
-        if (isClosing || !shouldBeVisible)
+        if (hoverDismissSuspended || isClosing || !shouldBeVisible)
             return;
         if (popoutHandle?.closeFromHoverDismiss)
             popoutHandle.closeFromHoverDismiss();
@@ -479,7 +481,10 @@ Item {
     }
 
     function close() {
-        _endMorphTravel();
+        if (_supersededClose && morphTravelEnabled)
+            _freezeMorphTravel();
+        else
+            _endMorphTravel();
         isClosing = true;
         shouldBeVisible = false;
         _primeContent = false;
@@ -518,6 +523,7 @@ Item {
         onTriggered: {
             if (!shouldBeVisible) {
                 contentWindow.visible = false;
+                root._endMorphTravel();
                 isClosing = false;
                 PopoutManager.hidePopout(popoutHandle);
                 popoutClosed();
@@ -682,8 +688,9 @@ Item {
         NumberAnimation {
             duration: root._morphTravelDuration
             easing.type: Easing.BezierSpline
-            // Emphasized curve for fluid morph travel.
-            easing.bezierCurve: Theme.expressiveCurves.emphasized
+            // M3 Expressive spatial motion starts with momentum and settles gently,
+            // which keeps rapid hover retargets from pausing between surfaces.
+            easing.bezierCurve: Theme.variantEnterCurve
         }
     }
 
@@ -692,10 +699,9 @@ Item {
     readonly property real pubBodyW: morphSeedW + (alignedWidth - morphSeedW) * morphProgress
     readonly property real pubBodyH: morphSeedH + (renderedAlignedHeight - morphSeedH) * morphProgress
 
-    onPubBodyXChanged: _queueBodySync()
-    onPubBodyYChanged: _queueBodySync()
-    onPubBodyWChanged: _queueBodySync()
-    onPubBodyHChanged: _queueBodySync()
+    // One animation drives all four coordinates, so queue one coalesced state update
+    // per progress tick instead of reacting independently to each derived property.
+    onMorphProgressChanged: _queueBodySync()
 
     function _beginMorphTravel() {
         morphTravelEnabled = false;
@@ -716,18 +722,38 @@ Item {
         morphSeedY = ConnectedModeState.popoutBodyY;
         morphSeedW = w;
         morphSeedH = h;
-        // Scale travel time with distance within ~[0.8x, 1.4x] of the popout duration:
-        // enough room for the emphasized curve to breathe (fluid, not abrupt), capped so
-        // long sweeps don't drag, and collapsing to 0 when popout animations are off.
-        const base = Math.max(0, root.animationDuration);
-        const dist = Math.hypot(root.alignedX - morphSeedX, root.renderedAlignedY - morphSeedY);
-        _morphTravelDuration = Math.round(Math.min(base * 1.4, base * 0.8 + dist * 0.16));
+        // Scale spatial motion with both travel and shape change. Never shorten the
+        // configured enter duration; cap long sweeps so hover switching stays responsive.
+        const base = Math.max(0, Theme.variantDuration(root.animationDuration, true));
+        const travel = Math.hypot(root.alignedX - morphSeedX, root.renderedAlignedY - morphSeedY);
+        const resize = Math.hypot(root.alignedWidth - morphSeedW, root.renderedAlignedHeight - morphSeedH);
+        const spatialDistance = travel + resize * 0.35;
+        _morphTravelDuration = Math.round(Math.min(base * 1.6, base + spatialDistance * 0.15));
         morphProgress = 0;
         morphTravelEnabled = true;
         Qt.callLater(() => {
             if (root.shouldBeVisible)
                 root.morphProgress = 1;
         });
+    }
+
+    function _freezeMorphTravel() {
+        const x = pubBodyX;
+        const y = pubBodyY;
+        const w = pubBodyW;
+        const h = pubBodyH;
+
+        // A third hover can supersede a morph before it settles. Freeze the outgoing
+        // content at the live rectangle so it fades in place while the next surface
+        // inherits exactly the same geometry.
+        morphTravelEnabled = false;
+        morphSeedX = x;
+        morphSeedY = y;
+        morphSeedW = w;
+        morphSeedH = h;
+        morphProgress = 0;
+        morphTravelEnabled = true;
+        _syncPopoutBody();
     }
 
     function _endMorphTravel() {
@@ -856,8 +882,16 @@ Item {
         _hoverOverBody = over;
         if (over)
             _hoverDismissGrace.stop();
-        else if (root.hoverDismissEnabled && root.shouldBeVisible)
+        else if (root.hoverDismissEnabled && !root.hoverDismissSuspended && root.shouldBeVisible)
             _hoverDismissGrace.restart();
+    }
+
+    onHoverDismissSuspendedChanged: {
+        if (hoverDismissSuspended) {
+            _hoverDismissGrace.stop();
+        } else if (hoverDismissEnabled && shouldBeVisible && !_hoverOverBody) {
+            _hoverDismissGrace.restart();
+        }
     }
 
     Timer {
@@ -865,7 +899,7 @@ Item {
         interval: 150
         repeat: false
         onTriggered: {
-            if (!root.hoverDismissEnabled || !root.shouldBeVisible)
+            if (!root.hoverDismissEnabled || root.hoverDismissSuspended || !root.shouldBeVisible)
                 return;
             if (root._hoverOverBody)
                 return;
@@ -907,7 +941,7 @@ Item {
         HoverDismissTracker {
             id: hoverDismissTracker
             anchors.fill: parent
-            enabled: root.hoverDismissEnabled && root.shouldBeVisible
+            enabled: root.hoverDismissEnabled && !root.hoverDismissSuspended && root.shouldBeVisible
             shouldDismiss: function () {
                 return !PopoutManager.cursorOverBar(PopoutManager.hoverCursorGlobalX, PopoutManager.hoverCursorGlobalY);
             }
