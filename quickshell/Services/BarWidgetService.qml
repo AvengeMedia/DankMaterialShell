@@ -70,11 +70,15 @@ Singleton {
         return screens.length > 0 ? widgetRegistry[widgetId][screens[0]] : null;
     }
 
+    readonly property bool focusedScreenDetectionSupported: CompositorService.isHyprland || CompositorService.isNiri || CompositorService.isMango || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle
+
     function getFocusedScreenName() {
         if (CompositorService.isHyprland && Hyprland.focusedWorkspace?.monitor)
             return Hyprland.focusedWorkspace.monitor.name;
         if (CompositorService.isNiri && NiriService.currentOutput)
             return NiriService.currentOutput;
+        if (CompositorService.isMango && MangoService.activeOutput)
+            return MangoService.activeOutput;
         if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
             const focusedWs = I3.workspaces?.values?.find(ws => ws.focused === true);
             return focusedWs?.monitor?.name || "";

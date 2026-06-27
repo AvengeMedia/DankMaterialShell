@@ -425,6 +425,19 @@ Singleton {
     property string workspaceFocusedBorderColor: "primary"
     property string workspaceFocusedBorderCustomColor: "#6750A4"
     property int workspaceFocusedBorderThickness: 2
+    property bool workspaceUnfocusedMonitorSeparateAppearance: false
+    property string workspaceUnfocusedMonitorColorMode: "default"
+    property string workspaceUnfocusedMonitorFocusedCustomColor: "#6750A4"
+    property string workspaceUnfocusedMonitorOccupiedColorMode: "none"
+    property string workspaceUnfocusedMonitorOccupiedCustomColor: "#625B71"
+    property string workspaceUnfocusedMonitorUnfocusedColorMode: "default"
+    property string workspaceUnfocusedMonitorUnfocusedCustomColor: "#49454E"
+    property string workspaceUnfocusedMonitorUrgentColorMode: "default"
+    property string workspaceUnfocusedMonitorUrgentCustomColor: "#B3261E"
+    property bool workspaceUnfocusedMonitorBorderEnabled: false
+    property string workspaceUnfocusedMonitorBorderColor: "primary"
+    property string workspaceUnfocusedMonitorBorderCustomColor: "#6750A4"
+    property int workspaceUnfocusedMonitorBorderThickness: 2
     property var workspaceNameIcons: ({})
     property bool waveProgressEnabled: true
     property bool scrollTitleEnabled: true
