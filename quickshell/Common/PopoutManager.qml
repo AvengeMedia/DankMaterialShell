@@ -186,6 +186,14 @@ Singleton {
         return currentPopoutsByScreen[screen.name] || null;
     }
 
+    // Checks if the active popout is pinned for auto-dismissal
+    function isActivePopoutPinned(screen) {
+        const p = getActivePopout(screen);
+        if (!p || !_isPopoutPresented(p))
+            return false;
+        return p.hoverDismissEnabled === false;
+    }
+
     function isCurrentPopout(popout, screenName) {
         const name = screenName || popout?.screen?.name || "";
         return !!name && currentPopoutsByScreen[name] === popout;
@@ -194,6 +202,8 @@ Singleton {
     function requestPopout(popout, tabIndex, triggerSource) {
         if (!popout || !popout.screen)
             return;
+        // Clicking a hover popout pins it open rather than toggling it closed
+        const wasTransient = popout.hoverDismissEnabled === true;
         if (popout.hoverDismissEnabled !== undefined)
             popout.hoverDismissEnabled = false;
         screenshotActive = false;
@@ -240,13 +250,17 @@ Singleton {
         }
 
         if (currentPopout === popout && popout.shouldBeVisible && !movedFromOtherScreen) {
-            if (triggerId !== undefined && currentPopoutTriggers[screenName] === triggerId) {
-                _closePopout(popout);
-                return;
-            }
+            const sameTrigger = triggerId === undefined || currentPopoutTriggers[screenName] === triggerId;
 
-            if (triggerId === undefined) {
-                _closePopout(popout);
+            if (sameTrigger) {
+                if (!wasTransient) {
+                    _closePopout(popout);
+                    return;
+                }
+                if (popout.updateSurfacePosition)
+                    popout.updateSurfacePosition();
+                if (triggerId !== undefined)
+                    currentPopoutTriggers[screenName] = triggerId;
                 return;
             }
 
@@ -315,6 +329,9 @@ Singleton {
                 currentPopoutsByScreen[screenName] = null;
                 currentPopoutTriggers[screenName] = null;
             } else {
+                // Signal the active popout to fade in-place when morphed
+                if (typeof currentPopout.beginSupersededClose === "function")
+                    currentPopout.beginSupersededClose();
                 _closePopout(currentPopout);
             }
         }

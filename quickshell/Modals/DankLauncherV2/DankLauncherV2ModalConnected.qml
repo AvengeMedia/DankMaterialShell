@@ -394,6 +394,8 @@ Item {
         closeCleanupTimer.stop();
         isClosing = false;
         openedFromOverview = false;
+        _edgeArmed = false;
+        _edgeBodyHover = false;
 
         animationsEnabled = false;
 
@@ -447,6 +449,9 @@ Item {
 
         keyboardActive = false;
         spotlightOpen = false;
+        _edgeRetractGrace.stop();
+        _edgeArmed = false;
+        _edgeBodyHover = false;
         ModalManager.closeModal(modalHandle);
         closeCleanupTimer.start();
     }
@@ -486,6 +491,31 @@ Item {
             if (root.unloadContentOnClose)
                 launcherContentLoader.active = false;
             dialogClosed();
+        }
+    }
+
+    // Handles hover dismissal grace periods for edge-hover sessions w/cursor
+    readonly property bool _edgeRetractEnabled: (modalHandle && modalHandle.edgeHoverManaged === true) && spotlightOpen && !isClosing
+    property bool _edgeBodyHover: false
+    property bool _edgeArmed: false
+
+    Timer {
+        id: _edgeRetractGrace
+        interval: 150
+        repeat: false
+        onTriggered: {
+            if (root._edgeRetractEnabled && root._edgeArmed && !root._edgeBodyHover)
+                root.hide();
+        }
+    }
+
+    function _onEdgeBodyHoverChanged(over) {
+        root._edgeBodyHover = over;
+        if (over) {
+            root._edgeArmed = true;
+            _edgeRetractGrace.stop();
+        } else if (root._edgeRetractEnabled) {
+            _edgeRetractGrace.restart();
         }
     }
 
@@ -627,6 +657,13 @@ Item {
             y: root._ccY
             width: root.alignedWidth
             height: root.contentSurfaceHeight
+
+            // Passive tracker for edge-hover dismissal that preserves input events.
+            HoverHandler {
+                id: edgeBodyHoverHandler
+                enabled: root._edgeRetractEnabled
+                onHoveredChanged: root._onEdgeBodyHoverChanged(hovered)
+            }
 
             MouseArea {
                 anchors.fill: parent

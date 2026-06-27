@@ -1811,6 +1811,37 @@ Item {
                 onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
                         hoverPopouts: checked
                     })
+
+                Column {
+                    width: parent.width
+                    spacing: Theme.spacingS
+                    visible: selectedBarConfig?.hoverPopouts ?? false
+                    leftPadding: Theme.spacingM
+
+                    SettingsSliderRow {
+                        id: hoverDelaySlider
+                        width: parent.width - parent.leftPadding
+                        text: I18n.tr("Open Delay")
+                        description: I18n.tr("Time to rest on a widget before its popout opens")
+                        value: selectedBarConfig?.hoverPopoutDelay ?? 150
+                        minimum: 0
+                        maximum: 1000
+                        unit: "ms"
+                        defaultValue: 150
+                        onSliderValueChanged: newValue => {
+                            SettingsData.updateBarConfig(selectedBarId, {
+                                hoverPopoutDelay: newValue
+                            });
+                        }
+
+                        Binding {
+                            target: hoverDelaySlider
+                            property: "value"
+                            value: selectedBarConfig?.hoverPopoutDelay ?? 150
+                            restoreMode: Binding.RestoreBinding
+                        }
+                    }
+                }
             }
 
             SettingsToggleCard {

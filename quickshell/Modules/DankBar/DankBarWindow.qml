@@ -1111,33 +1111,25 @@ PanelWindow {
                         rightWidgetsModel: barWindow.rightWidgetsModel
                     }
 
-                    MouseArea {
-                        id: hoverPopoutArea
-                        anchors.fill: parent
-                        z: 1
-                        hoverEnabled: barConfig?.hoverPopouts ?? false
-                        enabled: hoverPopoutArea.hoverEnabled && !barWindow.clickThroughEnabled
-                        acceptedButtons: Qt.NoButton
-                        propagateComposedEvents: true
+                    // Passive HoverHandler to track cursor without intercepting clicks or scroll events.
+                    HoverHandler {
+                        id: hoverPopoutHandler
+                        enabled: (barConfig?.hoverPopouts ?? false) && !barWindow.clickThroughEnabled
 
                         property real lastGlobalX: 0
                         property real lastGlobalY: 0
 
-                        onPositionChanged: mouse => {
-                            const gp = mapToItem(null, mouse.x, mouse.y);
+                        onPointChanged: {
+                            const gp = barUnitInset.mapToItem(null, point.position.x, point.position.y);
                             lastGlobalX = gp.x;
                             lastGlobalY = gp.y;
                             topBarContent.checkHoverPopout(gp.x, gp.y);
                         }
 
-                        onWheel: wheel => scrollArea.processWheel(wheel)
-
-                        onContainsMouseChanged: {
-                            if (containsMouse)
+                        onHoveredChanged: {
+                            if (hovered)
                                 return;
-                            if (topBarContent.cursorOverHoverChain(lastGlobalX, lastGlobalY))
-                                return;
-                            topBarContent.closeHoverSurfaces();
+                            topBarContent.scheduleHoverClose(lastGlobalX, lastGlobalY);
                         }
                     }
                 }

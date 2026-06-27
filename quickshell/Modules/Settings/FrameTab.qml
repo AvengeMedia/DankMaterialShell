@@ -357,6 +357,15 @@ Item {
                     checked: SettingsData.frameLauncherArcExtender
                     onToggled: checked => SettingsData.set("frameLauncherArcExtender", checked)
                 }
+
+                SettingsToggleRow {
+                    settingKey: "frameLauncherEdgeHover"
+                    tags: ["frame", "connected", "launcher", "hover", "edge", "reveal"]
+                    text: I18n.tr("Edge Hover Reveal")
+                    description: I18n.tr("Open the launcher by hovering the emerge edge (when free of bar and dock)")
+                    checked: SettingsData.frameLauncherEdgeHover
+                    onToggled: checked => SettingsData.set("frameLauncherEdgeHover", checked)
+                }
             }
 
             SettingsCard {

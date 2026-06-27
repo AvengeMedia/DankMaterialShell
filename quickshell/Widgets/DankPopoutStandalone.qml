@@ -51,6 +51,32 @@ Item {
             close();
     }
 
+    // Track body hover to initiate grace timer for transient dismissal.
+    property bool _hoverOverBody: false
+
+    function _onBodyHoverChanged(over) {
+        _hoverOverBody = over;
+        if (over)
+            _hoverDismissGrace.stop();
+        else if (root.hoverDismissEnabled && root.shouldBeVisible)
+            _hoverDismissGrace.restart();
+    }
+
+    Timer {
+        id: _hoverDismissGrace
+        interval: 150
+        repeat: false
+        onTriggered: {
+            if (!root.hoverDismissEnabled || !root.shouldBeVisible)
+                return;
+            if (root._hoverOverBody)
+                return;
+            if (PopoutManager.cursorOverBar(PopoutManager.hoverCursorGlobalX, PopoutManager.hoverCursorGlobalY))
+                return;
+            root.closeFromHoverDismiss();
+        }
+    }
+
     property var customKeyboardFocus: null
     property bool backgroundInteractive: true
     property bool contentHandlesKeys: false
@@ -620,6 +646,7 @@ Item {
                 return !PopoutManager.cursorOverBar(PopoutManager.hoverCursorGlobalX, PopoutManager.hoverCursorGlobalY);
             }
             onDismissRequested: root.closeFromHoverDismiss()
+            onHoverMoved: (gx, gy) => PopoutManager.updateHoverCursor(gx, gy)
         }
 
         WindowBlur {
@@ -738,6 +765,19 @@ Item {
             }
 
             readonly property real computedScaleCollapsed: root.animationScaleCollapsed
+
+            // Ancestor HoverHandler to capture body hover reliably.
+            HoverHandler {
+                id: bodyHoverHandler
+                enabled: root.hoverDismissEnabled && root.shouldBeVisible
+                onHoveredChanged: root._onBodyHoverChanged(hovered)
+                onPointChanged: {
+                    if (!bodyHoverHandler.hovered)
+                        return;
+                    const gp = contentContainer.mapToItem(null, bodyHoverHandler.point.position.x, bodyHoverHandler.point.position.y);
+                    PopoutManager.updateHoverCursor(gp.x, gp.y);
+                }
+            }
 
             // openProgress: 0 = closed (at offset, scaleCollapsed), 1 = open (at 0, scale 1).
             QtObject {

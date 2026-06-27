@@ -385,6 +385,36 @@ Item {
     property real _lastHoverGlobalY: 0
 
     readonly property bool hoverPopoutsEnabled: barConfig?.hoverPopouts ?? false
+    readonly property int hoverPopoutDelay: Math.max(0, barConfig?.hoverPopoutDelay ?? 150)
+
+    // Clean up hover state and close transient popouts when the hover feature is disabled.
+    onHoverPopoutsEnabledChanged: {
+        if (hoverPopoutsEnabled)
+            return;
+        _cancelPendingHover();
+        _hoverCloseTimer.stop();
+        if (hasOpenHoverSurface() && !PopoutManager.isActivePopoutPinned(barWindow?.screen))
+            closeHoverSurfaces();
+        activeHoverTrigger = "";
+    }
+
+    property var _pendingHoverHit: null
+    property string _pendingHoverTrigger: ""
+
+    Timer {
+        id: _hoverIntentTimer
+        interval: topBarContent.hoverPopoutDelay
+        repeat: false
+        onTriggered: topBarContent._commitPendingHover()
+    }
+
+    // Grace timer to prevent flicker when crossing gaps.
+    Timer {
+        id: _hoverCloseTimer
+        interval: 120
+        repeat: false
+        onTriggered: topBarContent._commitHoverClose()
+    }
 
     function getBarPosition() {
         return barWindow.axis?.edge === "left" ? 2 : (barWindow.axis?.edge === "right" ? 3 : (barWindow.axis?.edge === "top" ? 0 : 1));
@@ -435,18 +465,7 @@ Item {
         if (loader.item)
             return loader.item;
 
-        const pairs = [
-            [PopoutService.appDrawerLoader, PopoutService.appDrawerPopout],
-            [PopoutService.batteryPopoutLoader, PopoutService.batteryPopout],
-            [PopoutService.clipboardHistoryPopoutLoader, PopoutService.clipboardHistoryPopout],
-            [PopoutService.controlCenterLoader, PopoutService.controlCenterPopout],
-            [PopoutService.dankDashPopoutLoader, PopoutService.dankDashPopout],
-            [PopoutService.layoutPopoutLoader, PopoutService.layoutPopout],
-            [PopoutService.notificationCenterLoader, PopoutService.notificationCenterPopout],
-            [PopoutService.processListPopoutLoader, PopoutService.processListPopout],
-            [PopoutService.systemUpdateLoader, PopoutService.systemUpdatePopout],
-            [PopoutService.vpnPopoutLoader, PopoutService.vpnPopout]
-        ];
+        const pairs = [[PopoutService.appDrawerLoader, PopoutService.appDrawerPopout], [PopoutService.batteryPopoutLoader, PopoutService.batteryPopout], [PopoutService.clipboardHistoryPopoutLoader, PopoutService.clipboardHistoryPopout], [PopoutService.controlCenterLoader, PopoutService.controlCenterPopout], [PopoutService.dankDashPopoutLoader, PopoutService.dankDashPopout], [PopoutService.layoutPopoutLoader, PopoutService.layoutPopout], [PopoutService.notificationCenterLoader, PopoutService.notificationCenterPopout], [PopoutService.processListPopoutLoader, PopoutService.processListPopout], [PopoutService.systemUpdateLoader, PopoutService.systemUpdatePopout], [PopoutService.vpnPopoutLoader, PopoutService.vpnPopout]];
         for (let i = 0; i < pairs.length; i++) {
             if (loader === pairs[i][0] && pairs[i][1])
                 return pairs[i][1];
@@ -803,6 +822,13 @@ Item {
         TrayMenuManager.closeAllMenus();
     }
 
+    // Fade out the active popout in-place during morph switch transitions.
+    function _beginSupersededCloseForActive() {
+        const popout = PopoutManager.getActivePopout(barWindow?.screen);
+        if (popout && typeof popout.beginSupersededClose === "function")
+            popout.beginSupersededClose();
+    }
+
     function openNotepadHover(widgetItem) {
         const instance = widgetItem.prepareNotepadInstance?.(widgetItem.notepadInstance) ?? widgetItem.notepadInstance;
         if (!instance || typeof instance.show !== "function")
@@ -981,10 +1007,14 @@ Item {
         PopoutManager.updateHoverCursor(gx, gy);
         _syncHoverTriggerState();
 
+        // Ignore hover events when a popout is pinned open.
+        if (PopoutManager.isActivePopoutPinned(barWindow?.screen))
+            return;
+
         const hit = findWidgetAtGlobalPoint(gx, gy);
         if (!hit) {
-            if (!cursorOverHoverChain(gx, gy))
-                closeHoverSurfaces();
+            _cancelPendingHover();
+            scheduleHoverClose(gx, gy);
             return;
         }
 
@@ -1002,16 +1032,97 @@ Item {
             triggerKey = _dashTriggerSource(hit.section, 3);
 
         if (!triggerKey) {
-            if (!cursorOverHoverChain(gx, gy))
-                closeHoverSurfaces();
+            _cancelPendingHover();
+            scheduleHoverClose(gx, gy);
             return;
         }
 
-        if (triggerKey === activeHoverTrigger && hasOpenHoverSurface())
+        _hoverCloseTimer.stop();
+
+        if (triggerKey === activeHoverTrigger && hasOpenHoverSurface()) {
+            _cancelPendingHover();
+            return;
+        }
+
+        _pendingHoverHit = hit;
+        if (_pendingHoverTrigger !== triggerKey) {
+            _pendingHoverTrigger = triggerKey;
+            if (hoverPopoutDelay <= 0)
+                _commitPendingHover();
+            else
+                _hoverIntentTimer.restart();
+        }
+    }
+
+    function _cancelPendingHover() {
+        _hoverIntentTimer.stop();
+        _pendingHoverHit = null;
+        _pendingHoverTrigger = "";
+    }
+
+    // Maps widgets to their loaders to support in-place switching between triggers sharing a popout.
+    function _loaderForWidgetId(widgetId) {
+        switch (widgetId) {
+        case "launcherButton":
+            return appDrawerLoader;
+        case "clipboard":
+            return clipboardHistoryPopoutLoader;
+        case "clock":
+        case "music":
+        case "weather":
+            return dankDashPopoutLoader;
+        case "cpuUsage":
+        case "memUsage":
+        case "cpuTemp":
+        case "gpuTemp":
+            return processListPopoutLoader;
+        case "notificationButton":
+            return notificationCenterLoader;
+        case "battery":
+            return batteryPopoutLoader;
+        case "layout":
+            return layoutPopoutLoader;
+        case "vpn":
+            return vpnPopoutLoader;
+        case "controlCenterButton":
+            return controlCenterLoader;
+        case "systemUpdate":
+            return systemUpdateLoader;
+        default:
+            return null;
+        }
+    }
+
+    function _hitTargetsActivePopout(hit) {
+        const active = PopoutManager.getActivePopout(barWindow?.screen);
+        if (!active || !hit)
+            return false;
+        const loader = _loaderForWidgetId(hit.widgetId);
+        if (!loader)
+            return false;
+        return _resolvePopoutFromLoader(loader) === active;
+    }
+
+    function _commitPendingHover() {
+        const hit = _pendingHoverHit;
+        const triggerKey = _pendingHoverTrigger;
+        _pendingHoverHit = null;
+        _pendingHoverTrigger = "";
+        if (!hit || !hoverPopoutsEnabled)
+            return;
+        if (PopoutManager.isActivePopoutPinned(barWindow?.screen))
+            return;
+        // Cursor may have left the bar before the timer fired.
+        if (!PopoutManager.cursorOverBar(_lastHoverGlobalX, _lastHoverGlobalY))
             return;
 
-        if (triggerKey !== activeHoverTrigger && activeHoverTrigger !== "")
+        // A different trigger backed by the same already-open popout swaps tab/position
+        // in place (requestHoverPopout handles it) — don't close+reopen the same surface.
+        if (triggerKey !== activeHoverTrigger && activeHoverTrigger !== "" && !_hitTargetsActivePopout(hit)) {
+            // Mark popout as superseded to fade in-place before closing.
+            _beginSupersededCloseForActive();
             closeHoverSurfaces();
+        }
 
         if (!openHoverPopoutForHit(hit)) {
             if (activeHoverTrigger !== "")
@@ -1020,6 +1131,27 @@ Item {
         }
 
         activeHoverTrigger = triggerKey;
+    }
+
+    function scheduleHoverClose(gx, gy) {
+        _cancelPendingHover();
+        if (!hoverPopoutsEnabled)
+            return;
+        if (PopoutManager.isActivePopoutPinned(barWindow?.screen))
+            return;
+        if (cursorOverHoverChain(gx, gy))
+            return;
+        _hoverCloseTimer.restart();
+    }
+
+    function _commitHoverClose() {
+        const gx = PopoutManager.hoverCursorGlobalX;
+        const gy = PopoutManager.hoverCursorGlobalY;
+        if (PopoutManager.isActivePopoutPinned(barWindow?.screen))
+            return;
+        if (cursorOverHoverChain(gx, gy))
+            return;
+        closeHoverSurfaces();
     }
 
     readonly property var widgetVisibility: ({

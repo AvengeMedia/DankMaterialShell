@@ -502,15 +502,26 @@ Singleton {
     property string _dankLauncherV2PendingQuery: ""
     property string _dankLauncherV2PendingMode: ""
     property bool _dankLauncherV2TriggerUsesOverlayLayer: false
+    property bool _dankLauncherV2EdgeHoverManaged: false
 
     function _setDankLauncherV2TriggerUsesOverlayLayer(value) {
         _dankLauncherV2TriggerUsesOverlayLayer = value === true;
+        // Disable edge-hover by default on every open/toggle path unless explicitly enabled.
+        _setDankLauncherV2EdgeHoverManaged(false);
         if (dankLauncherV2Modal)
             dankLauncherV2Modal.triggerUsesOverlayLayer = _dankLauncherV2TriggerUsesOverlayLayer;
     }
 
-    function openDankLauncherV2(triggerUsesOverlayLayer) {
+    // Set edgeHoverManaged to enable hover retraction for edge-hover triggered launcher sessions.
+    function _setDankLauncherV2EdgeHoverManaged(value) {
+        _dankLauncherV2EdgeHoverManaged = value === true;
+        if (dankLauncherV2Modal)
+            dankLauncherV2Modal.edgeHoverManaged = _dankLauncherV2EdgeHoverManaged;
+    }
+
+    function openDankLauncherV2(triggerUsesOverlayLayer, edgeHoverManaged) {
         _setDankLauncherV2TriggerUsesOverlayLayer(triggerUsesOverlayLayer);
+        _setDankLauncherV2EdgeHoverManaged(edgeHoverManaged);
         if (dankLauncherV2Modal) {
             dankLauncherV2Modal.show();
         } else if (dankLauncherV2ModalLoader) {
@@ -591,8 +602,10 @@ Singleton {
     }
 
     function _onDankLauncherV2ModalLoaded() {
-        if (dankLauncherV2Modal)
+        if (dankLauncherV2Modal) {
             dankLauncherV2Modal.triggerUsesOverlayLayer = _dankLauncherV2TriggerUsesOverlayLayer;
+            dankLauncherV2Modal.edgeHoverManaged = _dankLauncherV2EdgeHoverManaged;
+        }
         if (_dankLauncherV2WantsOpen) {
             _dankLauncherV2WantsOpen = false;
             if (_dankLauncherV2PendingQuery) {

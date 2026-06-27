@@ -235,10 +235,10 @@ Item {
         const presented = contentWindow.visible || root.shouldBeVisible;
         const phase = root.isClosing ? "closing" : (!presented ? "hidden" : (!contentWindow.visible && root.shouldBeVisible ? "opening" : "open"));
         const bodyRect = {
-            "x": root.alignedX,
-            "y": root.renderedAlignedY,
-            "width": root.alignedWidth,
-            "height": root.renderedAlignedHeight
+            "x": root.pubBodyX,
+            "y": root.pubBodyY,
+            "width": root.pubBodyW,
+            "height": root.pubBodyH
         };
         const animationOffset = {
             "x": _connectedChromeAnimX(),
@@ -255,10 +255,10 @@ Item {
             "animationOffset": animationOffset,
             "scale": 1,
             "opacity": Theme.connectedSurfaceColor.a,
-            "bodyX": root.alignedX,
-            "bodyY": root.renderedAlignedY,
-            "bodyW": root.alignedWidth,
-            "bodyH": root.renderedAlignedHeight,
+            "bodyX": root.pubBodyX,
+            "bodyY": root.pubBodyY,
+            "bodyW": root.pubBodyW,
+            "bodyH": root.pubBodyH,
             "animX": animationOffset.x,
             "animY": animationOffset.y,
             "screen": root.screen ? root.screen.name : "",
@@ -312,7 +312,7 @@ Item {
             return;
         if (!contentWindow.visible && !shouldBeVisible)
             return;
-        chromeLease.updateBody(root.alignedX, root.renderedAlignedY, root.alignedWidth, root.renderedAlignedHeight);
+        chromeLease.updateBody(root.pubBodyX, root.pubBodyY, root.pubBodyW, root.pubBodyH);
     }
 
     property bool _animSyncQueued: false
@@ -430,6 +430,7 @@ Item {
         isClosing = false;
         animationsEnabled = false;
         _primeContent = true;
+        _supersededClose = false;
 
         const screenChanged = _lastOpenedScreen !== null && _lastOpenedScreen !== screen;
         if (screenChanged) {
@@ -443,6 +444,13 @@ Item {
                 morph.openProgress = 0;
             _captureChromeAnimTravel();
         }
+
+        // Seed travel coordinates from the outgoing popout to morph continuously.
+        _beginMorphTravel();
+
+        // Skip emerge animation on morph switch.
+        if (morphTravelEnabled)
+            morph.openProgress = 1;
 
         if (root.frameOwnsConnectedChrome) {
             chromeLease.beginClaim();
@@ -471,6 +479,7 @@ Item {
     }
 
     function close() {
+        _endMorphTravel();
         isClosing = true;
         shouldBeVisible = false;
         _primeContent = false;
@@ -657,6 +666,88 @@ Item {
             easing.bezierCurve: root.renderedGeometryGrowing ? root.animationEnterCurve : root.animationExitCurve
         }
     }
+
+    // Morph transition coordinates to animate travel between popouts during switch.
+    property bool morphTravelEnabled: false
+    property real morphSeedX: 0
+    property real morphSeedY: 0
+    property real morphSeedW: 0
+    property real morphSeedH: 0
+    property real morphProgress: 1
+    // Distance-scaled duration for morph travel.
+    property int _morphTravelDuration: animationDuration
+
+    Behavior on morphProgress {
+        enabled: root.morphTravelEnabled && root.animationsEnabled
+        NumberAnimation {
+            duration: root._morphTravelDuration
+            easing.type: Easing.BezierSpline
+            // Emphasized curve for fluid morph travel.
+            easing.bezierCurve: Theme.expressiveCurves.emphasized
+        }
+    }
+
+    readonly property real pubBodyX: morphSeedX + (alignedX - morphSeedX) * morphProgress
+    readonly property real pubBodyY: morphSeedY + (renderedAlignedY - morphSeedY) * morphProgress
+    readonly property real pubBodyW: morphSeedW + (alignedWidth - morphSeedW) * morphProgress
+    readonly property real pubBodyH: morphSeedH + (renderedAlignedHeight - morphSeedH) * morphProgress
+
+    onPubBodyXChanged: _queueBodySync()
+    onPubBodyYChanged: _queueBodySync()
+    onPubBodyWChanged: _queueBodySync()
+    onPubBodyHChanged: _queueBodySync()
+
+    function _beginMorphTravel() {
+        morphTravelEnabled = false;
+        morphProgress = 1;
+        if (!root.frameOwnsConnectedChrome || !root.screen)
+            return;
+        if (!root.hoverDismissEnabled)
+            return;
+        if (ConnectedModeState.popoutScreen !== root.screen.name)
+            return;
+        if (!ConnectedModeState.popoutOwnerId || ConnectedModeState.popoutOwnerId === chromeLease.claimId)
+            return;
+        const w = ConnectedModeState.popoutBodyW;
+        const h = ConnectedModeState.popoutBodyH;
+        if (!(w > 0 && h > 0))
+            return;
+        morphSeedX = ConnectedModeState.popoutBodyX;
+        morphSeedY = ConnectedModeState.popoutBodyY;
+        morphSeedW = w;
+        morphSeedH = h;
+        // Scale travel time with distance within ~[0.8x, 1.4x] of the popout duration:
+        // enough room for the emphasized curve to breathe (fluid, not abrupt), capped so
+        // long sweeps don't drag, and collapsing to 0 when popout animations are off.
+        const base = Math.max(0, root.animationDuration);
+        const dist = Math.hypot(root.alignedX - morphSeedX, root.renderedAlignedY - morphSeedY);
+        _morphTravelDuration = Math.round(Math.min(base * 1.4, base * 0.8 + dist * 0.16));
+        morphProgress = 0;
+        morphTravelEnabled = true;
+        Qt.callLater(() => {
+            if (root.shouldBeVisible)
+                root.morphProgress = 1;
+        });
+    }
+
+    function _endMorphTravel() {
+        morphTravelEnabled = false;
+        morphProgress = 1;
+        morphSeedX = 0;
+        morphSeedY = 0;
+        morphSeedW = 0;
+        morphSeedH = 0;
+    }
+
+    // Flag to trigger in-place fade-out during a morph switch.
+    property bool _supersededClose: false
+
+    function beginSupersededClose() {
+        // Only set superseded flag for transient hover switches.
+        if (frameOwnsConnectedChrome && hoverDismissEnabled)
+            _supersededClose = true;
+    }
+
     readonly property real connectedAnchorX: {
         if (!root.usesConnectedSurfaceChrome)
             return triggerX;
@@ -758,6 +849,32 @@ Item {
     readonly property real maskWidth: _dismissZone.width
     readonly property real maskHeight: _dismissZone.height
 
+    // Track body hover to initiate grace timer for transient dismissal.
+    property bool _hoverOverBody: false
+
+    function _onBodyHoverChanged(over) {
+        _hoverOverBody = over;
+        if (over)
+            _hoverDismissGrace.stop();
+        else if (root.hoverDismissEnabled && root.shouldBeVisible)
+            _hoverDismissGrace.restart();
+    }
+
+    Timer {
+        id: _hoverDismissGrace
+        interval: 150
+        repeat: false
+        onTriggered: {
+            if (!root.hoverDismissEnabled || !root.shouldBeVisible)
+                return;
+            if (root._hoverOverBody)
+                return;
+            if (PopoutManager.cursorOverBar(PopoutManager.hoverCursorGlobalX, PopoutManager.hoverCursorGlobalY))
+                return;
+            root.closeFromHoverDismiss();
+        }
+    }
+
     DismissZone {
         id: _dismissZone
         barPosition: root.effectiveBarPosition
@@ -795,6 +912,7 @@ Item {
                 return !PopoutManager.cursorOverBar(PopoutManager.hoverCursorGlobalX, PopoutManager.hoverCursorGlobalY);
             }
             onDismissRequested: root.closeFromHoverDismiss()
+            onHoverMoved: (gx, gy) => PopoutManager.updateHoverCursor(gx, gy)
         }
 
         WindowBlur {
@@ -878,10 +996,11 @@ Item {
 
         Item {
             id: contentContainer
-            x: root.alignedX
-            y: root.renderedAlignedY
-            width: root.alignedWidth
-            height: root.renderedAlignedHeight
+            // Follow the morphing body bounds during transition.
+            x: root.morphTravelEnabled ? root.pubBodyX : root.alignedX
+            y: root.morphTravelEnabled ? root.pubBodyY : root.renderedAlignedY
+            width: root.morphTravelEnabled ? root.pubBodyW : root.alignedWidth
+            height: root.morphTravelEnabled ? root.pubBodyH : root.renderedAlignedHeight
 
             readonly property bool barTop: effectiveBarPosition === SettingsData.Position.Top
             readonly property bool barBottom: effectiveBarPosition === SettingsData.Position.Bottom
@@ -950,6 +1069,19 @@ Item {
 
             readonly property real computedScaleCollapsed: root.animationScaleCollapsed
 
+            // Ancestor HoverHandler to capture body hover reliably.
+            HoverHandler {
+                id: bodyHoverHandler
+                enabled: root.hoverDismissEnabled && root.shouldBeVisible
+                onHoveredChanged: root._onBodyHoverChanged(hovered)
+                onPointChanged: {
+                    if (!bodyHoverHandler.hovered)
+                        return;
+                    const gp = contentContainer.mapToItem(null, bodyHoverHandler.point.position.x, bodyHoverHandler.point.position.y);
+                    PopoutManager.updateHoverCursor(gp.x, gp.y);
+                }
+            }
+
             QtObject {
                 id: morph
                 property real openProgress: 0
@@ -977,7 +1109,8 @@ Item {
                 target: root
                 function onShouldBeVisibleChanged() {
                     root._captureChromeAnimTravel();
-                    morph.openProgress = root.shouldBeVisible ? 1 : 0;
+                    // Skip reverse emerge animation during a superseded close.
+                    morph.openProgress = (root.shouldBeVisible || root._supersededClose) ? 1 : 0;
                 }
             }
 
@@ -1103,23 +1236,27 @@ Item {
 
                         property bool _renderActive: Theme.isDirectionalEffect || shouldBeVisible
                         property bool _animating: false
-                        property real publishedOpacity: Theme.isDirectionalEffect ? 1 : (shouldBeVisible ? 1 : 0)
+                        readonly property bool _fadeWithOpacity: !Theme.isDirectionalEffect || root._supersededClose
+                        // Fast fade duration for superseded close.
+                        readonly property bool _supersededFade: root._supersededClose && !root.shouldBeVisible
+                        readonly property real _targetOpacity: root._supersededClose ? (root.shouldBeVisible ? 1 : 0) : (Theme.isDirectionalEffect ? 1 : (root.shouldBeVisible ? 1 : 0))
+                        property real publishedOpacity: _targetOpacity
 
-                        opacity: Theme.isDirectionalEffect ? 1 : (shouldBeVisible ? 1 : 0)
+                        opacity: _targetOpacity
                         visible: _renderActive
 
                         scale: contentContainer.scaleValue
                         x: Theme.snap(contentContainer.animX + (rollOutAdjuster.baseWidth - width) * (1 - scale) * 0.5, root.dpr)
                         y: Theme.snap(contentContainer.animY + (rollOutAdjuster.baseHeight - height) * (1 - scale) * 0.5, root.dpr)
 
-                        layer.enabled: _animating || (!Theme.isDirectionalEffect && publishedOpacity < 1)
+                        layer.enabled: _animating || (_fadeWithOpacity && publishedOpacity < 1)
                         layer.smooth: false
                         layer.textureSize: root.dpr > 1 ? Qt.size(Math.ceil(width * root.dpr), Math.ceil(height * root.dpr)) : Qt.size(0, 0)
 
                         Behavior on opacity {
-                            enabled: !Theme.isDirectionalEffect
+                            enabled: contentWrapper._fadeWithOpacity
                             NumberAnimation {
-                                duration: Math.round(Theme.variantDuration(animationDuration, shouldBeVisible) * Theme.variantOpacityDurationScale)
+                                duration: contentWrapper._supersededFade ? Theme.shorterDuration : Math.round(Theme.variantDuration(animationDuration, shouldBeVisible) * Theme.variantOpacityDurationScale)
                                 easing.type: Easing.BezierSpline
                                 easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
                                 onRunningChanged: {
@@ -1131,9 +1268,9 @@ Item {
                         }
 
                         Behavior on publishedOpacity {
-                            enabled: !Theme.isDirectionalEffect
+                            enabled: contentWrapper._fadeWithOpacity
                             NumberAnimation {
-                                duration: Math.round(Theme.variantDuration(animationDuration, shouldBeVisible) * Theme.variantOpacityDurationScale)
+                                duration: contentWrapper._supersededFade ? Theme.shorterDuration : Math.round(Theme.variantDuration(animationDuration, shouldBeVisible) * Theme.variantOpacityDurationScale)
                                 easing.type: Easing.BezierSpline
                                 easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
                             }

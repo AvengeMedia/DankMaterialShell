@@ -642,6 +642,7 @@ var SPEC = {
     frameCloseGaps: { def: true },
     frameLauncherEmergeSide: { def: "bottom" },
     frameLauncherArcExtender: { def: false },
+    frameLauncherEdgeHover: { def: false },
     frameMode: { def: "connected" },
     barInsetPaddingShared: { def: -1 },
     barInsetPaddingSyncAll: { def: false },

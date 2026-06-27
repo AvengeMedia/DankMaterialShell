@@ -180,20 +180,22 @@ Item {
             impl.item.cancelHoverDismiss();
     }
 
+    // Fade out in place during morph switch transitions.
+    function beginSupersededClose() {
+        if (impl.item?.beginSupersededClose)
+            impl.item.beginSupersededClose();
+    }
+
     function closeFromHoverDismiss() {
         hoverDismissEnabled = false;
-        if (impl.item) {
+        // Enable animations using standard Theme-bound popout motion to preserve bindings.
+        if (impl.item)
             impl.item.animationsEnabled = true;
-            impl.item.animationDuration = Math.round(Theme.expressiveDurations.expressiveDefaultSpatial);
-            impl.item.animationExitCurve = Theme.expressiveCurves.expressiveDefaultSpatial;
-        }
-        if (dashVisible !== undefined) {
-            dashVisible = false;
-            return;
-        }
-        if (notificationHistoryVisible !== undefined) {
-            notificationHistoryVisible = false;
-            return;
+        for (const prop of ["dashVisible", "notificationHistoryVisible"]) {
+            if (root[prop] !== undefined) {
+                root[prop] = false;
+                return;
+            }
         }
         if (impl.item)
             impl.item.close();
