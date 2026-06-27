@@ -39,6 +39,8 @@ Singleton {
     property var powerMenuModal: null
     property var processListModal: null
     property var processListModalLoader: null
+    // Pending tab index for async Loader path — consumed by Connections when modal loads
+    property int pendingProcessTab: -1
     property var colorPickerModal: null
     property var notificationModal: null
     property var wifiPasswordModal: null
@@ -708,12 +710,12 @@ Singleton {
         }
     }
 
-    function showProcessListModal() {
+    function showProcessListModal(tabIndex) {
         if (processListModal) {
-            processListModal.show();
+            processListModal.show(tabIndex);
         } else if (processListModalLoader) {
+            pendingProcessTab = (tabIndex !== undefined && tabIndex !== null) ? tabIndex : -1;
             processListModalLoader.active = true;
-            Qt.callLater(() => processListModal?.show());
         }
     }
 
@@ -728,12 +730,26 @@ Singleton {
         }
     }
 
-    function toggleProcessListModal() {
+    function toggleProcessListModal(tabIndex) {
         if (processListModal) {
-            processListModal.toggle();
+            processListModal.toggle(tabIndex);
         } else if (processListModalLoader) {
+            pendingProcessTab = (tabIndex !== undefined && tabIndex !== null) ? tabIndex : -1;
             processListModalLoader.active = true;
-            Qt.callLater(() => processListModal?.show());
+        }
+    }
+
+    // Reactive async path: when Loader finishes loading, show modal at pending tab.
+    // Avoids Qt.callLater race condition where the lambda fires before modal is ready.
+    Connections {
+        target: processListModalLoader
+        function onStatusChanged() {
+            if (!processListModalLoader)
+                return;
+            if (processListModalLoader.status === Loader.Ready && pendingProcessTab !== -1) {
+                processListModal?.show(pendingProcessTab);
+                pendingProcessTab = -1;
+            }
         }
     }
 

@@ -13,6 +13,11 @@ FloatingWindow {
 
     property bool disablePopupTransparency: true
     property int currentTab: 0
+    // Number of tabs in the tab bar — derived from the tab model array.
+    // Using array literal length (4) as a constant property; matches the
+    // inline Repeater model so the bound stays correct if tabs are added.
+    readonly property int tabCount: 4
+    readonly property int maxTabIndex: tabCount - 1
     property string searchText: ""
     property string expandedPid: ""
     property string processFilter: "all"
@@ -21,10 +26,24 @@ FloatingWindow {
 
     signal closingModal
 
-    function show() {
+    function clampTab(tabIndex) {
+        if (tabIndex === undefined || tabIndex === null)
+            return currentTab;
+        return Math.max(0, Math.min(maxTabIndex, tabIndex));
+    }
+
+    function show(tabIndex) {
         if (!DgopService.dgopAvailable) {
             log.warn("dgop is not available");
             return;
+        }
+        currentTab = clampTab(tabIndex);
+        // Restore sort state when navigating to Performance tab (tab 1).
+        // CpuMonitor and RamMonitor call setSortBy themselves; routing here
+        // from a thermal widget should also set the sort so the data is
+        // pre-sorted for the tab being opened.
+        if (currentTab === 1) {
+            DgopService.setSortBy("cpu");
         }
         visible = true;
     }
@@ -35,12 +54,18 @@ FloatingWindow {
             processContextMenu.close();
     }
 
-    function toggle() {
+    function toggle(tabIndex) {
         if (!DgopService.dgopAvailable) {
             log.warn("dgop is not available");
             return;
         }
-        visible = !visible;
+        // If already visible on the target tab, just hide.
+        // Otherwise delegate to show() which handles clampTab, sort state, and visibility.
+        if (visible && currentTab === clampTab(tabIndex)) {
+            hide();
+            return;
+        }
+        show(tabIndex);
     }
 
     function focusOrToggle() {
@@ -75,11 +100,11 @@ FloatingWindow {
     }
 
     function nextTab() {
-        currentTab = (currentTab + 1) % 4;
+        currentTab = (currentTab + 1) % tabCount;
     }
 
     function previousTab() {
-        currentTab = (currentTab - 1 + 4) % 4;
+        currentTab = (currentTab - 1 + tabCount) % tabCount;
     }
 
     objectName: "processListModal"
