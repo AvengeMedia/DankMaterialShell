@@ -631,7 +631,7 @@ Rectangle {
     implicitWidth: __calculatedWidth
     width: __calculatedWidth
     height: parent.height
-    color: Theme.surfaceContainer
+    color: "transparent"
     radius: Theme.cornerRadius
 
     Component.onCompleted: {

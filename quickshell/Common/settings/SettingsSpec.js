@@ -16,6 +16,7 @@ var SPEC = {
     matugenTargetMonitor: { def: "", onChange: "regenSystemThemes" },
 
     popupTransparency: { def: 1.0, coerce: percentToUnit },
+    settingsModalOpacity: { def: 1.0, coerce: percentToUnit },
     dockTransparency: { def: 1.0, coerce: percentToUnit },
 
     widgetBackgroundColor: { def: "sch" },

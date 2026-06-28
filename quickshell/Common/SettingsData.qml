@@ -165,6 +165,7 @@ Singleton {
     property bool runUserMatugenTemplates: true
     property string matugenTargetMonitor: ""
     property real popupTransparency: 1.0
+    property real settingsModalOpacity: 1.0
     property real dockTransparency: 1
     property string widgetBackgroundColor: "sch"
     property string widgetBackgroundCustomColor: "#6750A4"
