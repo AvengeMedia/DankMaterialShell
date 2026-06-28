@@ -42,6 +42,11 @@ Item {
     property real _chromeAnimTravelX: 1
     property real _chromeAnimTravelY: 1
     property bool _fullSyncQueued: false
+    property bool _publishedBodyValid: false
+    property real _publishedBodyX: 0
+    property real _publishedBodyY: 0
+    property real _publishedBodyW: 0
+    property real _publishedBodyH: 0
 
     property real storedBarThickness: Theme.barHeight - 4
     property real storedBarSpacing: 4
@@ -131,7 +136,11 @@ Item {
         updateBodyState: function(_name, ownerId, bodyX, bodyY, bodyW, bodyH) {
             return ConnectedModeState.setPopoutBody(ownerId, bodyX, bodyY, bodyW, bodyH);
         }
-        onRecoveryRequested: root._queueFullSync()
+        onClaimIdChanged: root._resetPublishedBody()
+        onRecoveryRequested: {
+            root._resetPublishedBody();
+            root._queueFullSync();
+        }
     }
 
     property var _lastOpenedScreen: null
@@ -234,11 +243,15 @@ Item {
         const visible = visibleOverride !== undefined ? !!visibleOverride : contentWindow.visible;
         const presented = contentWindow.visible || root.shouldBeVisible;
         const phase = root.isClosing ? "closing" : (!presented ? "hidden" : (!contentWindow.visible && root.shouldBeVisible ? "opening" : "open"));
+        const bodyX = Theme.snap(root.pubBodyX, root.dpr);
+        const bodyY = Theme.snap(root.pubBodyY, root.dpr);
+        const bodyW = Theme.snap(root.pubBodyW, root.dpr);
+        const bodyH = Theme.snap(root.pubBodyH, root.dpr);
         const bodyRect = {
-            "x": root.pubBodyX,
-            "y": root.pubBodyY,
-            "width": root.pubBodyW,
-            "height": root.pubBodyH
+            "x": bodyX,
+            "y": bodyY,
+            "width": bodyW,
+            "height": bodyH
         };
         const animationOffset = {
             "x": _connectedChromeAnimX(),
@@ -255,10 +268,10 @@ Item {
             "animationOffset": animationOffset,
             "scale": 1,
             "opacity": Theme.connectedSurfaceColor.a,
-            "bodyX": root.pubBodyX,
-            "bodyY": root.pubBodyY,
-            "bodyW": root.pubBodyW,
-            "bodyH": root.pubBodyH,
+            "bodyX": bodyX,
+            "bodyY": bodyY,
+            "bodyW": bodyW,
+            "bodyH": bodyH,
             "animX": animationOffset.x,
             "animY": animationOffset.y,
             "screen": root.screen ? root.screen.name : "",
@@ -270,10 +283,15 @@ Item {
     function _publishConnectedChromeState(forceClaim, visibleOverride) {
         if (!root.frameOwnsConnectedChrome || !root.screen)
             return false;
-        return chromeLease.publish(_connectedChromeState(visibleOverride), !!forceClaim);
+        const state = _connectedChromeState(visibleOverride);
+        const published = chromeLease.publish(state, !!forceClaim);
+        if (published)
+            _rememberPublishedBody(state.bodyX, state.bodyY, state.bodyW, state.bodyH);
+        return published;
     }
 
     function _releaseConnectedChromeState() {
+        _resetPublishedBody();
         chromeLease.release();
     }
 
@@ -312,7 +330,26 @@ Item {
             return;
         if (!contentWindow.visible && !shouldBeVisible)
             return;
-        chromeLease.updateBody(root.pubBodyX, root.pubBodyY, root.pubBodyW, root.pubBodyH);
+        const bodyX = Theme.snap(root.pubBodyX, root.dpr);
+        const bodyY = Theme.snap(root.pubBodyY, root.dpr);
+        const bodyW = Theme.snap(root.pubBodyW, root.dpr);
+        const bodyH = Theme.snap(root.pubBodyH, root.dpr);
+        if (_publishedBodyValid && _publishedBodyX === bodyX && _publishedBodyY === bodyY && _publishedBodyW === bodyW && _publishedBodyH === bodyH)
+            return;
+        if (chromeLease.updateBody(bodyX, bodyY, bodyW, bodyH))
+            _rememberPublishedBody(bodyX, bodyY, bodyW, bodyH);
+    }
+
+    function _rememberPublishedBody(bodyX, bodyY, bodyW, bodyH) {
+        _publishedBodyX = bodyX;
+        _publishedBodyY = bodyY;
+        _publishedBodyW = bodyW;
+        _publishedBodyH = bodyH;
+        _publishedBodyValid = true;
+    }
+
+    function _resetPublishedBody() {
+        _publishedBodyValid = false;
     }
 
     property bool _animSyncQueued: false
@@ -357,7 +394,10 @@ Item {
     onContentAnimYChanged: _queueAnimSync()
     onRenderedAlignedYChanged: _queueBodySync()
     onRenderedAlignedHeightChanged: _queueBodySync()
-    onScreenChanged: _queueFullSync()
+    onScreenChanged: {
+        _resetPublishedBody();
+        _queueFullSync();
+    }
     onEffectiveBarPositionChanged: _queueFullSync()
 
     Connections {
@@ -412,8 +452,7 @@ Item {
     property bool hoverDismissSuspended: false
 
     function cancelHoverDismiss() {
-        hoverDismissTracker.cancelPending();
-        _hoverDismissGrace.stop();
+        hoverDismissController.cancelPending();
     }
 
     function closeFromHoverDismiss() {
@@ -428,6 +467,7 @@ Item {
     function open() {
         if (!screen)
             return;
+        _resetPublishedBody();
         closeTimer.stop();
         isClosing = false;
         animationsEnabled = false;
@@ -485,6 +525,7 @@ Item {
             _freezeMorphTravel();
         else
             _endMorphTravel();
+        _resetPublishedBody();
         isClosing = true;
         shouldBeVisible = false;
         _primeContent = false;
@@ -875,40 +916,6 @@ Item {
     readonly property real maskWidth: _dismissZone.width
     readonly property real maskHeight: _dismissZone.height
 
-    // Track body hover to initiate grace timer for transient dismissal.
-    property bool _hoverOverBody: false
-
-    function _onBodyHoverChanged(over) {
-        _hoverOverBody = over;
-        if (over)
-            _hoverDismissGrace.stop();
-        else if (root.hoverDismissEnabled && !root.hoverDismissSuspended && root.shouldBeVisible)
-            _hoverDismissGrace.restart();
-    }
-
-    onHoverDismissSuspendedChanged: {
-        if (hoverDismissSuspended) {
-            _hoverDismissGrace.stop();
-        } else if (hoverDismissEnabled && shouldBeVisible && !_hoverOverBody) {
-            _hoverDismissGrace.restart();
-        }
-    }
-
-    Timer {
-        id: _hoverDismissGrace
-        interval: 150
-        repeat: false
-        onTriggered: {
-            if (!root.hoverDismissEnabled || root.hoverDismissSuspended || !root.shouldBeVisible)
-                return;
-            if (root._hoverOverBody)
-                return;
-            if (PopoutManager.cursorOverBar(PopoutManager.hoverCursorGlobalX, PopoutManager.hoverCursorGlobalY))
-                return;
-            root.closeFromHoverDismiss();
-        }
-    }
-
     DismissZone {
         id: _dismissZone
         barPosition: root.effectiveBarPosition
@@ -927,26 +934,13 @@ Item {
         visible: false
         color: "transparent"
 
-        MouseArea {
+        PopoutHoverDismiss {
+            id: hoverDismissController
             anchors.fill: parent
-            z: -1
-            acceptedButtons: Qt.NoButton
-            hoverEnabled: true
-            onPositionChanged: mouse => {
-                const gp = mapToItem(null, mouse.x, mouse.y);
-                PopoutManager.updateHoverCursor(gp.x, gp.y);
-            }
-        }
-
-        HoverDismissTracker {
-            id: hoverDismissTracker
-            anchors.fill: parent
-            enabled: root.hoverDismissEnabled && !root.hoverDismissSuspended && root.shouldBeVisible
-            shouldDismiss: function () {
-                return !PopoutManager.cursorOverBar(PopoutManager.hoverCursorGlobalX, PopoutManager.hoverCursorGlobalY);
-            }
+            dismissEnabled: root.hoverDismissEnabled
+            dismissSuspended: root.hoverDismissSuspended
+            surfaceVisible: root.shouldBeVisible
             onDismissRequested: root.closeFromHoverDismiss()
-            onHoverMoved: (gx, gy) => PopoutManager.updateHoverCursor(gx, gy)
         }
 
         WindowBlur {
@@ -1103,17 +1097,9 @@ Item {
 
             readonly property real computedScaleCollapsed: root.animationScaleCollapsed
 
-            // Ancestor HoverHandler to capture body hover reliably.
-            HoverHandler {
-                id: bodyHoverHandler
-                enabled: root.hoverDismissEnabled && root.shouldBeVisible
-                onHoveredChanged: root._onBodyHoverChanged(hovered)
-                onPointChanged: {
-                    if (!bodyHoverHandler.hovered)
-                        return;
-                    const gp = contentContainer.mapToItem(null, bodyHoverHandler.point.position.x, bodyHoverHandler.point.position.y);
-                    PopoutManager.updateHoverCursor(gp.x, gp.y);
-                }
+            PopoutHoverBodyTracker {
+                controller: hoverDismissController
+                trackingEnabled: root.hoverDismissEnabled && root.shouldBeVisible
             }
 
             QtObject {

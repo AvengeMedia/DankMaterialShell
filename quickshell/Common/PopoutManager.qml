@@ -25,12 +25,12 @@ Singleton {
         hoverCursorGlobalY = gy;
     }
 
-    function cursorOverBar(gx, gy, padding) {
+    function cursorOverBar(gx, gy, padding, excludedWindow) {
         const pad = padding !== undefined ? padding : 16;
         const bars = KeyboardFocus.barWindows || [];
         for (let i = 0; i < bars.length; i++) {
             const w = bars[i];
-            if (!w?.visible)
+            if (!w?.visible || w === excludedWindow)
                 continue;
             if (typeof w.containsGlobalPoint === "function") {
                 if (w.containsGlobalPoint(gx, gy, pad))
@@ -199,104 +199,22 @@ Singleton {
         return !!name && currentPopoutsByScreen[name] === popout;
     }
 
-    function requestPopout(popout, tabIndex, triggerSource) {
+    function _requestPopout(popout, tabIndex, triggerSource, hoverRequest) {
         if (!popout || !popout.screen)
             return;
-        // Clicking a hover popout pins it open rather than toggling it closed
+
+        // Clicking a transient popout pins it instead of toggling it closed.
         const wasTransient = popout.hoverDismissEnabled === true;
-        if (popout.hoverDismissEnabled !== undefined)
+        if (!hoverRequest && popout.hoverDismissEnabled !== undefined)
             popout.hoverDismissEnabled = false;
+
         screenshotActive = false;
         const screenName = popout.screen.name;
         const currentPopout = currentPopoutsByScreen[screenName];
         const triggerId = triggerSource !== undefined ? triggerSource : tabIndex;
+        const alreadyPresented = currentPopout === popout && (hoverRequest ? _isPopoutPresented(popout) : popout.shouldBeVisible);
 
-        const willOpen = !(currentPopout === popout && popout.shouldBeVisible && triggerId !== undefined && currentPopoutTriggers[screenName] === triggerId);
-        if (willOpen) {
-            popoutOpening();
-        }
-
-        let movedFromOtherScreen = false;
-        for (const otherScreenName in currentPopoutsByScreen) {
-            if (otherScreenName === screenName)
-                continue;
-            const otherPopout = currentPopoutsByScreen[otherScreenName];
-            if (!otherPopout)
-                continue;
-
-            if (_isStale(otherPopout)) {
-                currentPopoutsByScreen[otherScreenName] = null;
-                currentPopoutTriggers[otherScreenName] = null;
-                continue;
-            }
-
-            if (otherPopout === popout) {
-                movedFromOtherScreen = true;
-                currentPopoutsByScreen[otherScreenName] = null;
-                currentPopoutTriggers[otherScreenName] = null;
-                continue;
-            }
-
-            _closePopout(otherPopout);
-        }
-
-        if (currentPopout && currentPopout !== popout) {
-            if (_isStale(currentPopout)) {
-                currentPopoutsByScreen[screenName] = null;
-                currentPopoutTriggers[screenName] = null;
-            } else {
-                _closePopout(currentPopout);
-            }
-        }
-
-        if (currentPopout === popout && popout.shouldBeVisible && !movedFromOtherScreen) {
-            const sameTrigger = triggerId === undefined || currentPopoutTriggers[screenName] === triggerId;
-
-            if (sameTrigger) {
-                if (!wasTransient) {
-                    _closePopout(popout);
-                    return;
-                }
-                if (popout.updateSurfacePosition)
-                    popout.updateSurfacePosition();
-                if (triggerId !== undefined)
-                    currentPopoutTriggers[screenName] = triggerId;
-                return;
-            }
-
-            if (tabIndex !== undefined && popout.currentTabIndex !== undefined) {
-                popout.currentTabIndex = tabIndex;
-            }
-            if (popout.updateSurfacePosition)
-                popout.updateSurfacePosition();
-            currentPopoutTriggers[screenName] = triggerId;
-            return;
-        }
-
-        currentPopoutTriggers[screenName] = triggerId;
-        currentPopoutsByScreen[screenName] = popout;
-        popoutChanged();
-
-        if (tabIndex !== undefined && popout.currentTabIndex !== undefined) {
-            popout.currentTabIndex = tabIndex;
-        }
-
-        if (currentPopout !== popout) {
-            ModalManager.closeAllModalsExcept(null);
-        }
-
-        _openPopout(popout);
-    }
-
-    function requestHoverPopout(popout, tabIndex, triggerSource) {
-        if (!popout || !popout.screen)
-            return;
-        screenshotActive = false;
-        const screenName = popout.screen.name;
-        const currentPopout = currentPopoutsByScreen[screenName];
-        const triggerId = triggerSource !== undefined ? triggerSource : tabIndex;
-
-        const willOpen = !(currentPopout === popout && _isPopoutPresented(popout) && triggerId !== undefined && currentPopoutTriggers[screenName] === triggerId);
+        const willOpen = !(alreadyPresented && triggerId !== undefined && currentPopoutTriggers[screenName] === triggerId);
         if (willOpen)
             popoutOpening();
 
@@ -329,23 +247,36 @@ Singleton {
                 currentPopoutsByScreen[screenName] = null;
                 currentPopoutTriggers[screenName] = null;
             } else {
-                // Signal the active popout to fade in-place when morphed
-                if (typeof currentPopout.beginSupersededClose === "function")
+                if (hoverRequest && typeof currentPopout.beginSupersededClose === "function")
                     currentPopout.beginSupersededClose();
                 _closePopout(currentPopout);
             }
         }
 
-        if (currentPopout === popout && _isPopoutPresented(popout) && !movedFromOtherScreen) {
-            if (triggerId !== undefined && currentPopoutTriggers[screenName] === triggerId)
+        if (alreadyPresented && !movedFromOtherScreen) {
+            const sameDefinedTrigger = triggerId !== undefined && currentPopoutTriggers[screenName] === triggerId;
+            if (hoverRequest && sameDefinedTrigger)
                 return;
 
-            if (tabIndex !== undefined && popout.currentTabIndex !== undefined)
+            if (!hoverRequest && (triggerId === undefined || sameDefinedTrigger)) {
+                if (!wasTransient) {
+                    _closePopout(popout);
+                    return;
+                }
+                if (popout.updateSurfacePosition)
+                    popout.updateSurfacePosition();
+                if (triggerId !== undefined)
+                    currentPopoutTriggers[screenName] = triggerId;
+                return;
+            }
+
+            if (tabIndex !== undefined && popout.currentTabIndex !== undefined) {
                 popout.currentTabIndex = tabIndex;
+            }
             if (popout.updateSurfacePosition)
                 popout.updateSurfacePosition();
             currentPopoutTriggers[screenName] = triggerId;
-            if (popout.hoverDismissEnabled !== undefined)
+            if (hoverRequest && popout.hoverDismissEnabled !== undefined)
                 popout.hoverDismissEnabled = true;
             return;
         }
@@ -354,15 +285,25 @@ Singleton {
         currentPopoutsByScreen[screenName] = popout;
         popoutChanged();
 
-        if (tabIndex !== undefined && popout.currentTabIndex !== undefined)
+        if (tabIndex !== undefined && popout.currentTabIndex !== undefined) {
             popout.currentTabIndex = tabIndex;
+        }
 
-        if (currentPopout !== popout)
+        if (currentPopout !== popout) {
             ModalManager.closeAllModalsExcept(null);
+        }
 
-        if (popout.hoverDismissEnabled !== undefined)
+        if (hoverRequest && popout.hoverDismissEnabled !== undefined)
             popout.hoverDismissEnabled = true;
 
         _openPopout(popout);
+    }
+
+    function requestPopout(popout, tabIndex, triggerSource) {
+        _requestPopout(popout, tabIndex, triggerSource, false);
+    }
+
+    function requestHoverPopout(popout, tabIndex, triggerSource) {
+        _requestPopout(popout, tabIndex, triggerSource, true);
     }
 }

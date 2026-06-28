@@ -40,8 +40,7 @@ Item {
     property bool hoverDismissSuspended: false
 
     function cancelHoverDismiss() {
-        hoverDismissTracker.cancelPending();
-        _hoverDismissGrace.stop();
+        hoverDismissController.cancelPending();
     }
 
     function closeFromHoverDismiss() {
@@ -51,40 +50,6 @@ Item {
             popoutHandle.closeFromHoverDismiss();
         else
             close();
-    }
-
-    // Track body hover to initiate grace timer for transient dismissal.
-    property bool _hoverOverBody: false
-
-    function _onBodyHoverChanged(over) {
-        _hoverOverBody = over;
-        if (over)
-            _hoverDismissGrace.stop();
-        else if (root.hoverDismissEnabled && !root.hoverDismissSuspended && root.shouldBeVisible)
-            _hoverDismissGrace.restart();
-    }
-
-    onHoverDismissSuspendedChanged: {
-        if (hoverDismissSuspended) {
-            _hoverDismissGrace.stop();
-        } else if (hoverDismissEnabled && shouldBeVisible && !_hoverOverBody) {
-            _hoverDismissGrace.restart();
-        }
-    }
-
-    Timer {
-        id: _hoverDismissGrace
-        interval: 150
-        repeat: false
-        onTriggered: {
-            if (!root.hoverDismissEnabled || root.hoverDismissSuspended || !root.shouldBeVisible)
-                return;
-            if (root._hoverOverBody)
-                return;
-            if (PopoutManager.cursorOverBar(PopoutManager.hoverCursorGlobalX, PopoutManager.hoverCursorGlobalY))
-                return;
-            root.closeFromHoverDismiss();
-        }
     }
 
     property var customKeyboardFocus: null
@@ -637,26 +602,15 @@ Item {
         color: "transparent"
         readonly property bool closeVisualActive: root.shouldBeVisible || root.isClosing
 
-        MouseArea {
+        PopoutHoverDismiss {
+            id: hoverDismissController
             anchors.fill: parent
-            z: -1
-            acceptedButtons: Qt.NoButton
-            hoverEnabled: true
-            onPositionChanged: mouse => {
-                const gp = mapToItem(null, mouse.x, mouse.y);
-                PopoutManager.updateHoverCursor(gp.x, gp.y);
-            }
-        }
-
-        HoverDismissTracker {
-            id: hoverDismissTracker
-            anchors.fill: parent
-            enabled: root.hoverDismissEnabled && !root.hoverDismissSuspended && root.shouldBeVisible
-            shouldDismiss: function () {
-                return !PopoutManager.cursorOverBar(PopoutManager.hoverCursorGlobalX, PopoutManager.hoverCursorGlobalY);
-            }
+            dismissEnabled: root.hoverDismissEnabled
+            dismissSuspended: root.hoverDismissSuspended
+            surfaceVisible: root.shouldBeVisible
+            globalOffsetX: root._surfaceMarginLeft
+            globalOffsetY: root._fullHeight ? 0 : root._surfaceMarginTop
             onDismissRequested: root.closeFromHoverDismiss()
-            onHoverMoved: (gx, gy) => PopoutManager.updateHoverCursor(gx, gy)
         }
 
         WindowBlur {
@@ -776,17 +730,9 @@ Item {
 
             readonly property real computedScaleCollapsed: root.animationScaleCollapsed
 
-            // Ancestor HoverHandler to capture body hover reliably.
-            HoverHandler {
-                id: bodyHoverHandler
-                enabled: root.hoverDismissEnabled && root.shouldBeVisible
-                onHoveredChanged: root._onBodyHoverChanged(hovered)
-                onPointChanged: {
-                    if (!bodyHoverHandler.hovered)
-                        return;
-                    const gp = contentContainer.mapToItem(null, bodyHoverHandler.point.position.x, bodyHoverHandler.point.position.y);
-                    PopoutManager.updateHoverCursor(gp.x, gp.y);
-                }
+            PopoutHoverBodyTracker {
+                controller: hoverDismissController
+                trackingEnabled: root.hoverDismissEnabled && root.shouldBeVisible
             }
 
             // openProgress: 0 = closed (at offset, scaleCollapsed), 1 = open (at 0, scale 1).

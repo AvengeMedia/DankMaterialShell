@@ -172,6 +172,7 @@ Item {
             scrollXBehavior: defaultBar.scrollXBehavior ?? "column",
             scrollYBehavior: defaultBar.scrollYBehavior ?? "workspace",
             hoverPopouts: defaultBar.hoverPopouts ?? false,
+            hoverPopoutDelay: defaultBar.hoverPopoutDelay ?? 150,
             shadowIntensity: defaultBar.shadowIntensity ?? 0,
             shadowOpacity: defaultBar.shadowOpacity ?? 60,
             shadowDirectionMode: defaultBar.shadowDirectionMode ?? "inherit",

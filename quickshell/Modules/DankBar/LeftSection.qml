@@ -19,6 +19,7 @@ Item {
     property bool forceVerticalLayout: false
 
     readonly property bool isVertical: overrideAxisLayout ? forceVerticalLayout : (axis?.isVertical ?? false)
+    property alias widgetLayoutLoader: layoutLoader
 
     implicitHeight: layoutLoader.item ? layoutLoader.item.implicitHeight : 0
     implicitWidth: layoutLoader.item ? layoutLoader.item.implicitWidth : 0

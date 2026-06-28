@@ -14,6 +14,7 @@ PanelWindow {
 
     property bool isVisible: false
     property bool hoverDismissEnabled: false
+    property bool hoverDismissSuspended: false
     property var targetScreen: null
     property var modelData: null
     property bool triggerUsesOverlayLayer: false
@@ -26,6 +27,7 @@ PanelWindow {
     property real edgeGap: 0
     property string slideEdge: "right"
     readonly property bool slideFromLeft: slideEdge === "left"
+    readonly property real surfaceOriginX: slideFromLeft ? 0 : Math.max(0, (modelData?.width ?? width) - width)
     property Component content: null
     property string title: ""
     property alias container: contentContainer
@@ -48,6 +50,8 @@ PanelWindow {
     }
 
     function hideFromHoverDismiss() {
+        if (hoverDismissSuspended)
+            return;
         hoverDismissEnabled = false;
         slideAnimation.duration = Math.round(Theme.expressiveDurations.expressiveDefaultSpatial);
         hide();
@@ -62,7 +66,8 @@ PanelWindow {
             return false;
         const padding = 24;
         const topLeft = slideContainer.mapToItem(null, 0, 0);
-        return gx >= topLeft.x - padding && gx < topLeft.x + slideContainer.width + padding && gy >= topLeft.y - padding && gy < topLeft.y + slideContainer.height + padding;
+        const globalX = surfaceOriginX + topLeft.x;
+        return gx >= globalX - padding && gx < globalX + slideContainer.width + padding && gy >= topLeft.y - padding && gy < topLeft.y + slideContainer.height + padding;
     }
 
     function toggle() {
@@ -86,25 +91,15 @@ PanelWindow {
 
     color: "transparent"
 
-    MouseArea {
-        anchors.fill: parent
-        z: -1
-        acceptedButtons: Qt.NoButton
-        hoverEnabled: true
-        onPositionChanged: mouse => {
-            const gp = mapToItem(null, mouse.x, mouse.y);
-            PopoutManager.updateHoverCursor(gp.x, gp.y);
-        }
-    }
-
     HoverDismissTracker {
         id: hoverDismissTracker
-        anchors.fill: parent
-        enabled: root.hoverDismissEnabled && root.isVisible
+        parent: root.contentItem
+        enabled: root.hoverDismissEnabled && !root.hoverDismissSuspended && root.isVisible
         shouldDismiss: function () {
             return !PopoutManager.cursorOverBar(PopoutManager.hoverCursorGlobalX, PopoutManager.hoverCursorGlobalY);
         }
         onDismissRequested: root.hideFromHoverDismiss()
+        onHoverMoved: (sceneX, sceneY) => PopoutManager.updateHoverCursor(root.surfaceOriginX + sceneX, sceneY)
     }
 
     readonly property bool slideoutBlurActive: root.visible && BlurService.enabled && Theme.connectedSurfaceBlurEnabled

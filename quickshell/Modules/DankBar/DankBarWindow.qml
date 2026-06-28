@@ -1123,13 +1123,11 @@ PanelWindow {
                             const gp = barUnitInset.mapToItem(null, point.position.x, point.position.y);
                             lastGlobalX = gp.x;
                             lastGlobalY = gp.y;
-                            topBarContent.checkHoverPopout(gp.x, gp.y);
+                            topBarContent.queueHoverPopout(gp.x, gp.y);
                         }
 
                         onHoveredChanged: {
-                            if (hovered)
-                                return;
-                            topBarContent.scheduleHoverClose(lastGlobalX, lastGlobalY);
+                            topBarContent.updateHoverBarHovered(hovered);
                         }
                     }
                 }
