@@ -20,11 +20,11 @@ Singleton {
             return !excluded.some(ex => {
                 const exLower = String(ex).toLowerCase().trim();
                 if (!exLower) return false;
-                
+
                 // 1. Substring match
                 if (identity.includes(exLower) || desktopEntry.includes(exLower))
                     return true;
-                
+
                 // 2. Match reverse-DNS segments (e.g. app.zen_browser.zen -> zen)
                 if (exLower.indexOf(".") !== -1) {
                     const parts = exLower.split(".");
@@ -32,11 +32,11 @@ Singleton {
                     if (lastPart && (identity.includes(lastPart) || desktopEntry.includes(lastPart)))
                         return true;
                 }
-                
+
                 // 3. Bidirectional match (longer excluded name contains shorter player identity)
                 if (identity.length >= 3 && exLower.includes(identity))
                     return true;
-                
+
                 return false;
             });
         });
