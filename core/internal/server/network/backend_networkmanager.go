@@ -16,6 +16,9 @@ const (
 	dbusNMWiredInterface       = "org.freedesktop.NetworkManager.Device.Wired"
 	dbusNMWirelessInterface    = "org.freedesktop.NetworkManager.Device.Wireless"
 	dbusNMAccessPointInterface = "org.freedesktop.NetworkManager.AccessPoint"
+	dbusNMActiveConnInterface  = "org.freedesktop.NetworkManager.Connection.Active"
+	dbusNMVPNConnInterface     = "org.freedesktop.NetworkManager.VPN.Connection"
+	dbusNMActiveConnPath       = "/org/freedesktop/NetworkManager/ActiveConnection"
 	dbusPropsInterface         = "org.freedesktop.DBus.Properties"
 
 	NmDeviceStateReasonWrongPassword        = 8
@@ -77,6 +80,8 @@ type NetworkManagerBackend struct {
 	cachedPKCS11Mu     sync.Mutex
 	cachedGPSamlCookie *cachedGPSamlCookie
 	cachedGPSamlMu     sync.Mutex
+	cachedWiFiSecret   *cachedWiFiSecret
+	cachedWiFiSecretMu sync.Mutex
 
 	onStateChange func()
 }
@@ -97,6 +102,15 @@ type cachedVPNCredentials struct {
 type cachedPKCS11PIN struct {
 	ConnectionUUID string
 	PIN            string
+}
+
+// cachedWiFiSecret reuses a just-entered WiFi/802.1x secret across repeat
+// GetSecrets calls in one activation, so NM retries don't re-prompt.
+type cachedWiFiSecret struct {
+	ConnectionUUID string
+	SSID           string
+	SettingName    string
+	Secrets        map[string]string
 }
 
 type cachedGPSamlCookie struct {
@@ -338,6 +352,104 @@ func (b *NetworkManagerBackend) CancelCredentials(token string) error {
 	return b.promptBroker.Resolve(token, PromptReply{
 		Cancel: true,
 	})
+}
+
+// mergeStoredSecrets re-fetches stored secrets and folds them into settings
+// before an Update. GetSettings never returns secrets and Update replaces the
+// whole connection, so a bare GetSettings->Update wipes system-owned passwords
+// (e.g. an OpenVPN password with password-flags=0). Only fills keys that aren't
+// already being set, so an explicit credential change still wins.
+func mergeStoredSecrets(conn gonetworkmanager.Connection, settings gonetworkmanager.ConnectionSettings) {
+	for setting := range settings {
+		switch setting {
+		case "vpn", "802-11-wireless-security", "802-1x":
+		default:
+			continue
+		}
+
+		secrets, err := conn.GetSecrets(setting)
+		if err != nil {
+			continue
+		}
+
+		section, ok := secrets[setting]
+		if !ok {
+			continue
+		}
+
+		for k, v := range section {
+			if _, exists := settings[setting][k]; exists {
+				continue
+			}
+			settings[setting][k] = v
+		}
+	}
+}
+
+func (b *NetworkManagerBackend) cacheWiFiSecret(connUUID, ssid, settingName string, secrets map[string]string) {
+	if connUUID == "" || len(secrets) == 0 {
+		return
+	}
+
+	copied := make(map[string]string, len(secrets))
+	for k, v := range secrets {
+		copied[k] = v
+	}
+
+	b.cachedWiFiSecretMu.Lock()
+	b.cachedWiFiSecret = &cachedWiFiSecret{
+		ConnectionUUID: connUUID,
+		SSID:           ssid,
+		SettingName:    settingName,
+		Secrets:        copied,
+	}
+	b.cachedWiFiSecretMu.Unlock()
+}
+
+func (b *NetworkManagerBackend) lookupCachedWiFiSecret(connUUID, settingName string) map[string]string {
+	if connUUID == "" {
+		return nil
+	}
+
+	b.cachedWiFiSecretMu.Lock()
+	defer b.cachedWiFiSecretMu.Unlock()
+
+	cached := b.cachedWiFiSecret
+	if cached == nil || cached.ConnectionUUID != connUUID || cached.SettingName != settingName {
+		return nil
+	}
+
+	copied := make(map[string]string, len(cached.Secrets))
+	for k, v := range cached.Secrets {
+		copied[k] = v
+	}
+	return copied
+}
+
+func (b *NetworkManagerBackend) clearCachedWiFiSecret(connUUID string) {
+	b.cachedWiFiSecretMu.Lock()
+	defer b.cachedWiFiSecretMu.Unlock()
+
+	if connUUID == "" {
+		b.cachedWiFiSecret = nil
+		return
+	}
+	if b.cachedWiFiSecret != nil && b.cachedWiFiSecret.ConnectionUUID == connUUID {
+		b.cachedWiFiSecret = nil
+	}
+}
+
+func (b *NetworkManagerBackend) clearCachedWiFiSecretBySSID(ssid string) {
+	if ssid == "" {
+		return
+	}
+
+	b.cachedWiFiSecretMu.Lock()
+	defer b.cachedWiFiSecretMu.Unlock()
+
+	if b.cachedWiFiSecret != nil && b.cachedWiFiSecret.SSID == ssid {
+		b.cachedWiFiSecret = nil
+	}
 }
 
 func (b *NetworkManagerBackend) ensureWiFiDevice() error {

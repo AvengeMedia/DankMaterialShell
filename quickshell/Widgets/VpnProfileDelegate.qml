@@ -18,7 +18,9 @@ Rectangle {
     signal toggleExpand
     signal deleteRequested
 
-    readonly property bool isActive: DMSNetworkService.activeUuids?.includes(profile?.uuid) ?? false
+    readonly property bool isActive: DMSNetworkService.vpnStateForUuid(profile?.uuid) === "activated"
+    readonly property bool isConnecting: DMSNetworkService.isVpnConnectingUuid(profile?.uuid)
+    readonly property bool hasError: !isConnecting && DMSNetworkService.vpnError !== "" && DMSNetworkService.vpnErrorUuid === (profile?.uuid ?? "")
     readonly property bool isHovered: rowArea.containsMouse || expandBtn.containsMouse || deleteBtn.containsMouse
     readonly property var configData: (!isTransient && isExpanded) ? VPNService.editConfig : null
     readonly property var configFields: buildConfigFields()
@@ -28,7 +30,7 @@ Rectangle {
     color: isHovered ? Theme.primaryHoverLight : (isActive ? Theme.primaryPressed : Theme.surfaceLight)
     border.width: isActive ? 2 : 1
     border.color: isActive ? Theme.primary : Theme.outlineLight
-    opacity: DMSNetworkService.isBusy ? 0.5 : 1.0
+    opacity: (DMSNetworkService.isBusy && !isConnecting) ? 0.5 : 1.0
     clip: true
 
     function buildConfigFields() {
@@ -107,10 +109,20 @@ Rectangle {
             height: 46 - Theme.spacingS * 2
             spacing: Theme.spacingS
 
+            DankSpinner {
+                size: 18
+                strokeWidth: 2
+                color: Theme.warning
+                running: root.isConnecting
+                visible: root.isConnecting
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
             DankIcon {
-                name: isActive ? "vpn_lock" : "vpn_key_off"
+                visible: !root.isConnecting
+                name: isActive ? "vpn_lock" : (root.hasError ? "error" : "vpn_key_off")
                 size: 20
-                color: isActive ? Theme.primary : Theme.surfaceText
+                color: root.hasError ? Theme.error : (isActive ? Theme.primary : Theme.surfaceText)
                 anchors.verticalCenter: parent.verticalCenter
             }
 
@@ -130,9 +142,9 @@ Rectangle {
                 }
 
                 StyledText {
-                    text: VPNService.getVpnTypeFromProfile(profile)
+                    text: root.isConnecting ? I18n.tr("Connecting...") : (root.hasError ? DMSNetworkService.vpnError : VPNService.getVpnTypeFromProfile(profile))
                     font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceTextMedium
+                    color: root.isConnecting ? Theme.warning : (root.hasError ? Theme.error : Theme.surfaceTextMedium)
                     wrapMode: Text.NoWrap
                     width: parent.width
                     elide: Text.ElideRight
@@ -268,6 +280,45 @@ Rectangle {
                     VPNService.updateConfig(profile.uuid, {
                         autoconnect: checked
                     });
+                }
+            }
+
+            Column {
+                width: parent.width
+                spacing: Theme.spacingXS
+                visible: !isTransient && !VPNService.configLoading && profile?.type !== "wireguard"
+
+                StyledText {
+                    text: root.hasError ? DMSNetworkService.vpnError : I18n.tr("Credentials")
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: root.hasError ? Theme.error : Theme.surfaceVariantText
+                }
+
+                DankTextField {
+                    id: usernameField
+                    width: parent.width
+                    placeholderText: I18n.tr("Username")
+                    text: (configData && (configData.username || (configData.data && configData.data.username))) || ""
+                }
+
+                DankTextField {
+                    id: passwordField
+                    width: parent.width
+                    placeholderText: I18n.tr("Password")
+                    echoMode: TextInput.Password
+                    showPasswordToggle: true
+                    normalBorderColor: root.hasError ? Theme.error : Theme.outlineMedium
+                }
+
+                DankButton {
+                    text: I18n.tr("Save credentials")
+                    opacity: passwordField.text.length > 0 ? 1 : 0.5
+                    onClicked: {
+                        if (passwordField.text.length === 0)
+                            return;
+                        VPNService.setCredentials(profile.uuid, usernameField.text, passwordField.text, true);
+                        passwordField.text = "";
+                    }
                 }
             }
 

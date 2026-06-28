@@ -281,6 +281,8 @@ Popup {
                         Row {
                             anchors.left: parent.left
                             anchors.leftMargin: Theme.spacingS
+                            anchors.right: parent.right
+                            anchors.rightMargin: Theme.spacingS
                             anchors.verticalCenter: parent.verticalCenter
                             spacing: Theme.spacingS
 
@@ -311,6 +313,8 @@ Popup {
                                     return Theme.surfaceText;
                                 }
                                 anchors.verticalCenter: parent.verticalCenter
+                                elide: Text.ElideRight
+                                width: parent.width - 16 - Theme.spacingS
                             }
                         }
 

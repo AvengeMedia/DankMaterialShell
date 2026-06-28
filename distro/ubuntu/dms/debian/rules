@@ -54,6 +54,8 @@ override_dh_auto_install:
 	# Install desktop file and icon
 	install -Dm644 DankMaterialShell-$(BASE_VERSION)/assets/dms-open.desktop \
 		debian/dms/usr/share/applications/dms-open.desktop
+	install -Dm644 DankMaterialShell-$(BASE_VERSION)/assets/com.danklinux.dms.desktop \
+		debian/dms/usr/share/applications/com.danklinux.dms.desktop
 	install -Dm644 DankMaterialShell-$(BASE_VERSION)/assets/danklogo.svg \
 		debian/dms/usr/share/icons/hicolor/scalable/apps/danklogo.svg
 

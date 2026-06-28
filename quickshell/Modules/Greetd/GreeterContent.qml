@@ -20,6 +20,14 @@ Item {
         return "file://" + path.split('/').map(s => encodeURIComponent(s)).join('/');
     }
 
+    function desktopIdFromPath(path) {
+        if (!path)
+            return "";
+        const parts = path.split("/");
+        const id = parts.length > 0 ? parts[parts.length - 1] : path;
+        return id || "";
+    }
+
     readonly property string xdgDataDirs: Quickshell.env("XDG_DATA_DIRS")
     property string screenName: ""
     property string hyprlandCurrentLayout: ""
@@ -63,9 +71,13 @@ Item {
     readonly property bool greeterPamHasU2f: greeterPamStackHasModule("pam_u2f")
     readonly property bool greeterExternalAuthAvailable: (greeterPamHasFprint && GreetdSettings.greeterEnableFprint) || (greeterPamHasU2f && GreetdSettings.greeterEnableU2f)
     readonly property bool greeterPamHasExternalAuth: greeterPamHasFprint || greeterPamHasU2f
+    readonly property bool autoLoginAvailable: GreetdSettings.rememberLastUser && GreetdSettings.rememberLastSession
     readonly property bool multipleUsersAvailable: GreeterUsersService.loaded && GreeterUsersService.users.length > 1
-    readonly property bool showUserPicker: multipleUsersAvailable && !GreeterState.showPasswordInput && !manualUsernameEntry
-    readonly property bool showAccountSwitchLink: multipleUsersAvailable && !GreeterState.showPasswordInput && !GreeterState.unlocking
+    // Single-user systems get the picker too when auto-login is available, so the
+    // auto-login toggle lives inside the dropdown instead of floating on its own.
+    readonly property bool pickerAvailable: multipleUsersAvailable || (GreeterUsersService.loaded && GreeterUsersService.users.length === 1 && autoLoginAvailable)
+    readonly property bool showUserPicker: pickerAvailable && !GreeterState.showPasswordInput && !manualUsernameEntry
+    readonly property bool showAccountSwitchLink: pickerAvailable && manualUsernameEntry && !GreeterState.showPasswordInput && !GreeterState.unlocking
     readonly property int userPickerMaxHeight: Math.min(400, Math.max(120, height * 0.35))
     property bool userListOpen: false
     property bool manualUsernameEntry: false
@@ -283,8 +295,8 @@ Item {
         function onRememberLastSessionChanged() {
             if (!isPrimaryScreen)
                 return;
-            if (!GreetdSettings.rememberLastSession && GreetdMemory.lastSessionId) {
-                GreetdMemory.setLastSessionId("");
+            if (!GreetdSettings.rememberLastSession && (GreetdMemory.lastSessionId || GreetdMemory.lastSessionDesktopId || GreetdMemory.lastSessionExec)) {
+                GreetdMemory.setLastSession("", "");
             }
             finalizeSessionSelection();
         }
@@ -459,7 +471,7 @@ Item {
     }
 
     function enterManualUsernameEntry() {
-        if (!root.multipleUsersAvailable || GreeterState.showPasswordInput)
+        if (!root.pickerAvailable || GreeterState.showPasswordInput)
             return;
         root.manualUsernameEntry = true;
         root.userListOpen = false;
@@ -472,7 +484,7 @@ Item {
     }
 
     function returnToUserListFromManualEntry() {
-        if (!root.multipleUsersAvailable)
+        if (!root.pickerAvailable)
             return;
         root.manualUsernameEntry = false;
         root.userListOpen = true;
@@ -483,7 +495,7 @@ Item {
     }
 
     function returnToUserPicker() {
-        if (!root.multipleUsersAvailable || GreeterState.unlocking)
+        if (!root.pickerAvailable || GreeterState.unlocking)
             return;
         root.manualUsernameEntry = false;
         root.skipAutoSelectUser = true;
@@ -525,7 +537,6 @@ Item {
             passwordFailureCount = 0;
             clearAuthFeedback();
             externalAuthAutoStartedForUser = "";
-            root.autoLoginOnSuccess = false;
         }
         root.pickerThemeUsername = user;
         GreeterState.username = user;
@@ -862,6 +873,13 @@ Item {
         anchors.fill: parent
         color: "transparent"
 
+        MouseArea {
+            anchors.fill: parent
+            enabled: root.userListOpen
+            visible: root.userListOpen
+            onClicked: root.userListOpen = false
+        }
+
         Column {
             id: greeterMainColumn
 
@@ -998,17 +1016,6 @@ Item {
                 opacity: 0.9
             }
 
-            StyledText {
-                id: userPickerHint
-
-                anchors.horizontalCenter: parent.horizontalCenter
-                visible: root.showUserPicker && !GreeterState.showPasswordInput && !GreeterState.username && !root.userListOpen
-                text: I18n.tr("Select user...", "greeter user picker placeholder")
-                font.pixelSize: Theme.fontSizeMedium
-                color: "white"
-                opacity: 0.85
-            }
-
             ColumnLayout {
                 id: authColumn
 
@@ -1022,7 +1029,7 @@ Item {
                     Item {
                         Layout.preferredWidth: 60
                         Layout.preferredHeight: 60
-                        visible: GreetdSettings.lockScreenShowProfileImage || root.multipleUsersAvailable
+                        visible: GreetdSettings.lockScreenShowProfileImage || root.pickerAvailable
 
                         DankCircularImage {
                             anchors.fill: parent
@@ -1047,8 +1054,8 @@ Item {
                             radius: width / 2
                             color: "transparent"
                             border.color: Theme.primary
-                            border.width: avatarPickerArea.containsMouse || root.userListOpen ? 2 : 0
-                            visible: root.multipleUsersAvailable
+                            border.width: (avatarPickerArea.containsMouse || root.userListOpen) && !GreeterState.showPasswordInput ? 2 : 0
+                            visible: root.pickerAvailable
                             Behavior on border.width {
                                 NumberAnimation {
                                     duration: Theme.shortDuration
@@ -1057,11 +1064,34 @@ Item {
                             }
                         }
 
+                        // Switch-user affordance: hover scrim over the selected user's avatar.
+                        Rectangle {
+                            anchors.fill: parent
+                            radius: width / 2
+                            color: Qt.rgba(0, 0, 0, 0.55)
+                            opacity: (root.pickerAvailable && GreeterState.showPasswordInput && avatarPickerArea.containsMouse) ? 1 : 0
+                            visible: opacity > 0
+
+                            Behavior on opacity {
+                                NumberAnimation {
+                                    duration: Theme.shortDuration
+                                    easing.type: Theme.standardEasing
+                                }
+                            }
+
+                            DankIcon {
+                                anchors.centerIn: parent
+                                name: "switch_account"
+                                size: 24
+                                color: "white"
+                            }
+                        }
+
                         MouseArea {
                             id: avatarPickerArea
 
                             anchors.fill: parent
-                            visible: root.multipleUsersAvailable
+                            visible: root.pickerAvailable
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
@@ -1081,6 +1111,7 @@ Item {
                         Layout.fillWidth: true
                         Layout.preferredHeight: root.showUserPicker && root.userListOpen ? Math.max(60, userPicker.implicitHeight + Theme.spacingM * 2) : 60
 
+                        clip: true
                         radius: Theme.cornerRadius
                         color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.9)
                         border.color: inputField.activeFocus ? Theme.primary : Qt.rgba(1, 1, 1, 0.3)
@@ -1097,8 +1128,13 @@ Item {
                             maxExpandedHeight: root.userPickerMaxHeight
                             visible: root.showUserPicker && !GreeterState.showPasswordInput
                             expanded: root.userListOpen
+                            autoLoginVisible: root.autoLoginAvailable
+                            autoLoginChecked: root.autoLoginOnSuccess
+                            manualEntryVisible: true
                             onUserSelected: username => root.selectUser(username, false)
                             onToggleRequested: root.userListOpen = !root.userListOpen
+                            onAutoLoginToggled: root.autoLoginOnSuccess = !root.autoLoginOnSuccess
+                            onManualEntryRequested: root.enterManualUsernameEntry()
                         }
 
                         DankIcon {
@@ -1333,6 +1369,13 @@ Item {
                                 easing.type: Theme.standardEasing
                             }
                         }
+
+                        Behavior on Layout.preferredHeight {
+                            NumberAnimation {
+                                duration: Theme.mediumDuration
+                                easing.type: Theme.standardEasing
+                            }
+                        }
                     }
                 }
 
@@ -1345,7 +1388,7 @@ Item {
                         id: accountSwitchLabel
 
                         anchors.horizontalCenter: parent.horizontalCenter
-                        text: root.manualUsernameEntry ? I18n.tr("Back to user list", "greeter link to return from manual username entry to user picker") : I18n.tr("Not listed?", "greeter link to switch to manual username entry")
+                        text: I18n.tr("Back to user list", "greeter link to return from manual username entry to user picker")
                         color: Theme.primary
                         font.pixelSize: Theme.fontSizeSmall
                         font.underline: accountSwitchMouse.containsMouse
@@ -1357,12 +1400,7 @@ Item {
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            if (root.manualUsernameEntry)
-                                root.returnToUserListFromManualEntry();
-                            else
-                                root.enterManualUsernameEntry();
-                        }
+                        onClicked: root.returnToUserListFromManualEntry()
                     }
                 }
 
@@ -1383,153 +1421,6 @@ Item {
                         NumberAnimation {
                             duration: Theme.shortDuration
                             easing.type: Theme.standardEasing
-                        }
-                    }
-                }
-
-                // Password-screen actions: Switch User + Auto-login toggle as one compact chip row
-                Item {
-                    id: passwordActions
-
-                    readonly property bool autoLoginAvailable: GreetdSettings.rememberLastUser && GreetdSettings.rememberLastSession
-
-                    Layout.fillWidth: true
-                    Layout.topMargin: Theme.spacingXS
-                    Layout.preferredHeight: visible ? 32 : 0
-                    visible: GreeterState.showPasswordInput && !GreeterState.unlocking && (root.multipleUsersAvailable || autoLoginAvailable)
-
-                    Row {
-                        anchors.centerIn: parent
-                        spacing: Theme.spacingS
-
-                        Rectangle {
-                            id: switchUserChip
-
-                            visible: root.multipleUsersAvailable
-                            height: 32
-                            width: switchUserContent.implicitWidth + Theme.spacingM * 2
-                            radius: height / 2
-                            color: Theme.withAlpha(Theme.surfaceVariant, 0.65)
-
-                            Rectangle {
-                                anchors.fill: parent
-                                radius: parent.radius
-                                color: (switchUserMouse.containsMouse || switchUserMouse.pressed) ? Theme.surfaceTextHover : "transparent"
-
-                                Behavior on color {
-                                    ColorAnimation {
-                                        duration: Theme.shorterDuration
-                                        easing.type: Theme.standardEasing
-                                    }
-                                }
-                            }
-
-                            DankRipple {
-                                id: switchUserRipple
-                                cornerRadius: switchUserChip.radius
-                                rippleColor: Theme.surfaceVariantText
-                            }
-
-                            Row {
-                                id: switchUserContent
-                                anchors.centerIn: parent
-                                spacing: Theme.spacingXS
-
-                                DankIcon {
-                                    name: "people"
-                                    size: 16
-                                    color: Theme.surfaceVariantText
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-
-                                StyledText {
-                                    text: I18n.tr("Switch User")
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: Theme.surfaceVariantText
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-                            }
-
-                            MouseArea {
-                                id: switchUserMouse
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onPressed: mouse => switchUserRipple.trigger(mouse.x, mouse.y)
-                                onClicked: root.returnToUserPicker()
-                            }
-                        }
-
-                        Rectangle {
-                            id: autoLoginChip
-
-                            visible: passwordActions.autoLoginAvailable
-                            height: 32
-                            width: autoLoginContent.implicitWidth + Theme.spacingM * 2
-                            radius: height / 2
-                            color: root.autoLoginOnSuccess ? Theme.withAlpha(Theme.primary, 0.85) : Theme.withAlpha(Theme.surfaceVariant, 0.65)
-
-                            Behavior on color {
-                                ColorAnimation {
-                                    duration: Theme.shortDuration
-                                    easing.type: Theme.standardEasing
-                                }
-                            }
-
-                            Rectangle {
-                                anchors.fill: parent
-                                radius: parent.radius
-                                color: {
-                                    if (autoLoginMouse.pressed)
-                                        return root.autoLoginOnSuccess ? Theme.primaryPressed : Theme.surfaceTextHover;
-                                    if (autoLoginMouse.containsMouse)
-                                        return root.autoLoginOnSuccess ? Theme.primaryHover : Theme.surfaceTextHover;
-                                    return "transparent";
-                                }
-
-                                Behavior on color {
-                                    ColorAnimation {
-                                        duration: Theme.shorterDuration
-                                        easing.type: Theme.standardEasing
-                                    }
-                                }
-                            }
-
-                            DankRipple {
-                                id: autoLoginRipple
-                                cornerRadius: autoLoginChip.radius
-                                rippleColor: root.autoLoginOnSuccess ? Theme.primaryText : Theme.surfaceVariantText
-                            }
-
-                            Row {
-                                id: autoLoginContent
-                                anchors.centerIn: parent
-                                spacing: Theme.spacingXS
-
-                                DankIcon {
-                                    name: root.autoLoginOnSuccess ? "check" : "login"
-                                    size: 16
-                                    color: root.autoLoginOnSuccess ? Theme.primaryText : Theme.surfaceVariantText
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-
-                                StyledText {
-                                    text: I18n.tr("Auto-login")
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    font.weight: root.autoLoginOnSuccess ? Font.Medium : Font.Normal
-                                    color: root.autoLoginOnSuccess ? Theme.primaryText : Theme.surfaceVariantText
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-                            }
-
-                            MouseArea {
-                                id: autoLoginMouse
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: root.autoLoginOnSuccess = !root.autoLoginOnSuccess
-                                onPressed: mouse => autoLoginRipple.trigger(mouse.x, mouse.y)
-                            }
                         }
                     }
                 }
@@ -1878,6 +1769,7 @@ Item {
                     GreeterState.currentSessionIndex = idx;
                     GreeterState.selectedSession = GreeterState.sessionExecs[idx];
                     GreeterState.selectedSessionPath = GreeterState.sessionPaths[idx];
+                    GreeterState.selectedSessionDesktopId = GreeterState.sessionDesktopIds[idx];
                 }
             }
         }
@@ -1894,12 +1786,14 @@ Item {
             return;
 
         const savedSession = GreetdSettings.rememberLastSession ? GreetdMemory.lastSessionId : "";
-        if (savedSession && GreetdSettings.rememberLastSession) {
+        const savedDesktopId = GreetdSettings.rememberLastSession ? (GreetdMemory.lastSessionDesktopId || desktopIdFromPath(GreetdMemory.lastSessionId)) : "";
+        if ((savedSession || savedDesktopId) && GreetdSettings.rememberLastSession) {
             for (var i = 0; i < GreeterState.sessionPaths.length; i++) {
-                if (GreeterState.sessionPaths[i] === savedSession) {
+                if ((savedDesktopId && GreeterState.sessionDesktopIds[i] === savedDesktopId) || (savedSession && GreeterState.sessionPaths[i] === savedSession)) {
                     GreeterState.currentSessionIndex = i;
                     GreeterState.selectedSession = GreeterState.sessionExecs[i] || "";
                     GreeterState.selectedSessionPath = GreeterState.sessionPaths[i];
+                    GreeterState.selectedSessionDesktopId = GreeterState.sessionDesktopIds[i] || "";
                     return;
                 }
             }
@@ -1908,6 +1802,7 @@ Item {
         GreeterState.currentSessionIndex = 0;
         GreeterState.selectedSession = GreeterState.sessionExecs[0] || "";
         GreeterState.selectedSessionPath = GreeterState.sessionPaths[0] || "";
+        GreeterState.selectedSessionDesktopId = GreeterState.sessionDesktopIds[0] || "";
     }
 
     property var sessionDirs: {
@@ -1943,6 +1838,7 @@ Item {
         GreeterState.sessionList = GreeterState.sessionList.concat([name]);
         GreeterState.sessionExecs = GreeterState.sessionExecs.concat([exec]);
         GreeterState.sessionPaths = GreeterState.sessionPaths.concat([path]);
+        GreeterState.sessionDesktopIds = GreeterState.sessionDesktopIds.concat([desktopIdFromPath(path)]);
     }
 
     function _parseDesktopFile(content, path) {
@@ -2088,6 +1984,7 @@ Item {
             clearAuthFeedback();
             const sessionCmd = GreeterState.selectedSession || GreeterState.sessionExecs[GreeterState.currentSessionIndex];
             const sessionPath = GreeterState.selectedSessionPath || GreeterState.sessionPaths[GreeterState.currentSessionIndex];
+            const sessionDesktopId = GreeterState.selectedSessionDesktopId || GreeterState.sessionDesktopIds[GreeterState.currentSessionIndex] || desktopIdFromPath(sessionPath);
             if (!sessionCmd) {
                 GreeterState.pamState = "error";
                 authFeedbackMessage = currentAuthMessage();
@@ -2098,10 +1995,9 @@ Item {
             GreeterState.unlocking = true;
             launchTimeout.restart();
             if (GreetdSettings.rememberLastSession) {
-                GreetdMemory.setLastSessionId(sessionPath);
-                GreetdMemory.setLastSessionExec(sessionCmd);
-            } else if (GreetdMemory.lastSessionId || GreetdMemory.lastSessionExec) {
-                GreetdMemory.setLastSessionId("");
+                GreetdMemory.setLastSession(sessionPath, sessionDesktopId);
+            } else if (GreetdMemory.lastSessionId || GreetdMemory.lastSessionDesktopId || GreetdMemory.lastSessionExec) {
+                GreetdMemory.setLastSession("", "");
             }
             if (GreetdSettings.rememberLastUser) {
                 GreetdMemory.setLastSuccessfulUser(GreeterState.username);

@@ -26,46 +26,50 @@ Item {
     readonly property real _edgeBaseMargin: Math.max(Theme.spacingXS, innerPadding * 0.8)
     readonly property bool _hasBarWindow: barWindow !== undefined && barWindow !== null
     readonly property bool _usesFrameBarChrome: _hasBarWindow && (barWindow.usesFrameBarChrome ?? false)
-    readonly property real _frameEdgeFloorInset: (SettingsData.frameEnabled && _usesFrameBarChrome) ? Math.max(0, SettingsData.frameThickness - _edgeBaseMargin) : 0
     readonly property bool _barIsVertical: _hasBarWindow ? barWindow.isVertical : false
     readonly property string _barScreenName: _hasBarWindow ? (barWindow.screenName || "") : ""
     readonly property bool hasAdjacentTopBarLive: _hasBarWindow && barWindow.hasAdjacentTopBar
     readonly property bool hasAdjacentBottomBarLive: _hasBarWindow && barWindow.hasAdjacentBottomBar
     readonly property bool hasAdjacentLeftBarLive: _hasBarWindow && barWindow.hasAdjacentLeftBar
     readonly property bool hasAdjacentRightBarLive: _hasBarWindow && barWindow.hasAdjacentRightBar
-    property bool _hadAdjacentTopBar: false
-    property bool _hadAdjacentBottomBar: false
-    property bool _hadAdjacentLeftBar: false
-    property bool _hadAdjacentRightBar: false
 
-    onHasAdjacentTopBarLiveChanged: if (hasAdjacentTopBarLive)
-        _hadAdjacentTopBar = true
-    onHasAdjacentBottomBarLiveChanged: if (hasAdjacentBottomBarLive)
-        _hadAdjacentBottomBar = true
-    onHasAdjacentLeftBarLiveChanged: if (hasAdjacentLeftBarLive)
-        _hadAdjacentLeftBar = true
-    onHasAdjacentRightBarLiveChanged: if (hasAdjacentRightBarLive)
-        _hadAdjacentRightBar = true
+    // Standalone/separate Bar Inset Padding (per-bar, optionally synced): absolute gap at BOTH ends.
+    // Stored value < 0 (default -1) means "auto" — fall back to the natural edge margin so the look is unchanged.
+    readonly property real _barInsetPaddingRaw: SettingsData.barInsetPaddingSyncAll ? SettingsData.barInsetPaddingShared : (barConfig?.barInsetPadding ?? -1)
+    readonly property real _barInsetPaddingAuto: _barIsVertical ? Theme.spacingXS : _edgeBaseMargin
+    readonly property real _barInsetPadding: _barInsetPaddingRaw < 0 ? _barInsetPaddingAuto : _barInsetPaddingRaw
+    // Connected-frame Bar Inset Padding: absolute free-end inset (auto < 0 = frameThickness, 0 = edge-to-edge).
+    // Any amount beyond the frameThickness baseline is also added at the bar-clearance ends (all ends).
+    readonly property real _frameInsetResolved: SettingsData.frameBarInsetPadding < 0 ? SettingsData.frameThickness : SettingsData.frameBarInsetPadding
+    readonly property real _frameInsetExtra: Math.max(0, _frameInsetResolved - SettingsData.frameThickness)
 
-    readonly property real _frameLeftInset: {
-        if (!_hasBarWindow || !SettingsData.frameEnabled || !_usesFrameBarChrome || _barIsVertical)
-            return 0;
-        return hasAdjacentLeftBarLive ? SettingsData.frameBarSize : (_hadAdjacentLeftBar ? _frameEdgeFloorInset : 0);
+    readonly property real _leftMargin: {
+        if (_barIsVertical)
+            return _edgeBaseMargin;
+        if (_usesFrameBarChrome)
+            return hasAdjacentLeftBarLive ? (_edgeBaseMargin + SettingsData.frameBarSize + _frameInsetExtra) : Math.max(0, _frameInsetResolved);
+        return Math.max(0, _barInsetPadding);
     }
-    readonly property real _frameRightInset: {
-        if (!_hasBarWindow || !SettingsData.frameEnabled || !_usesFrameBarChrome || _barIsVertical)
-            return 0;
-        return hasAdjacentRightBarLive ? SettingsData.frameBarSize : (_hadAdjacentRightBar ? _frameEdgeFloorInset : 0);
+    readonly property real _rightMargin: {
+        if (_barIsVertical)
+            return _edgeBaseMargin;
+        if (_usesFrameBarChrome)
+            return hasAdjacentRightBarLive ? (_edgeBaseMargin + SettingsData.frameBarSize + _frameInsetExtra) : Math.max(0, _frameInsetResolved);
+        return Math.max(0, _barInsetPadding);
     }
-    readonly property real _frameTopInset: {
-        if (!_hasBarWindow || !SettingsData.frameEnabled || !_usesFrameBarChrome || !_barIsVertical)
+    readonly property real _topMargin: {
+        if (!_barIsVertical)
             return 0;
-        return hasAdjacentTopBarLive ? SettingsData.frameThickness : (_hadAdjacentTopBar ? _frameEdgeFloorInset : 0);
+        if (_usesFrameBarChrome)
+            return hasAdjacentTopBarLive ? (outlineThickness + SettingsData.frameThickness + _frameInsetExtra) : Math.max(0, _frameInsetResolved);
+        return Math.max(0, _barInsetPadding);
     }
-    readonly property real _frameBottomInset: {
-        if (!_hasBarWindow || !SettingsData.frameEnabled || !_usesFrameBarChrome || !_barIsVertical)
+    readonly property real _bottomMargin: {
+        if (!_barIsVertical)
             return 0;
-        return hasAdjacentBottomBarLive ? SettingsData.frameThickness : (_hadAdjacentBottomBar ? _frameEdgeFloorInset : 0);
+        if (_usesFrameBarChrome)
+            return hasAdjacentBottomBarLive ? (outlineThickness + SettingsData.frameThickness + _frameInsetExtra) : Math.max(0, _frameInsetResolved);
+        return Math.max(0, _barInsetPadding);
     }
 
     property alias hLeftSection: hLeftSection
@@ -76,10 +80,10 @@ Item {
     property alias vRightSection: vRightSection
 
     anchors.fill: parent
-    anchors.leftMargin: _edgeBaseMargin + _frameLeftInset
-    anchors.rightMargin: _edgeBaseMargin + _frameRightInset
-    anchors.topMargin: (_barIsVertical ? (hasAdjacentTopBarLive ? outlineThickness : Theme.spacingXS) : 0) + _frameTopInset
-    anchors.bottomMargin: (_barIsVertical ? (hasAdjacentBottomBarLive ? outlineThickness : Theme.spacingXS) : 0) + _frameBottomInset
+    anchors.leftMargin: _leftMargin
+    anchors.rightMargin: _rightMargin
+    anchors.topMargin: _topMargin
+    anchors.bottomMargin: _bottomMargin
     clip: false
 
     DeferredAction {
@@ -88,11 +92,15 @@ Item {
     }
 
     Component.onCompleted: {
-        _hadAdjacentTopBar = hasAdjacentTopBarLive;
-        _hadAdjacentBottomBar = hasAdjacentBottomBarLive;
-        _hadAdjacentLeftBar = hasAdjacentLeftBarLive;
-        _hadAdjacentRightBar = hasAdjacentRightBarLive;
         enableFrameInsetAnimation.schedule();
+    }
+
+    Connections {
+        target: topBarContent._hasBarWindow ? topBarContent.barWindow.axis : null
+
+        function onEdgeChanged() {
+            topBarContent.resetHoverForBarGeometryChange();
+        }
     }
 
     Behavior on anchors.leftMargin {
@@ -378,6 +386,173 @@ Item {
             current = current.parent;
         }
         return "left";
+    }
+
+    DankBarHoverController {
+        id: hoverController
+        barContent: topBarContent
+        barWindow: topBarContent.barWindow
+        barConfig: topBarContent.barConfig
+        hLeftSection: topBarContent.hLeftSection
+        hCenterSection: topBarContent.hCenterSection
+        hRightSection: topBarContent.hRightSection
+        vLeftSection: topBarContent.vLeftSection
+        vCenterSection: topBarContent.vCenterSection
+        vRightSection: topBarContent.vRightSection
+        leftWidgetsModel: topBarContent.leftWidgetsModel
+        centerWidgetsModel: topBarContent.centerWidgetsModel
+        rightWidgetsModel: topBarContent.rightWidgetsModel
+    }
+
+    readonly property string activeHoverTrigger: hoverController.activeHoverTrigger
+    readonly property bool hoverPopoutsEnabled: hoverController.hoverPopoutsEnabled
+
+    function queueHoverPopout(gx, gy) {
+        hoverController.queueHoverPoint(gx, gy);
+    }
+
+    function checkHoverPopout(gx, gy) {
+        hoverController.checkHoverPopout(gx, gy);
+    }
+
+    function findWidgetAtGlobalPoint(gx, gy) {
+        return hoverController.findWidgetAtGlobalPoint(gx, gy);
+    }
+
+    function scheduleHoverClose(gx, gy) {
+        hoverController.scheduleHoverClose(gx, gy);
+    }
+
+    function updateHoverBarHovered(hovered) {
+        hoverController.updateBarHovered(hovered);
+    }
+
+    function resetHoverForBarGeometryChange() {
+        hoverController.resetForBarGeometryChange();
+    }
+
+    function _dashTriggerSource(section, tabIndex) {
+        return hoverController.dashTriggerSource(section, tabIndex);
+    }
+
+    function getBarPosition() {
+        return barWindow.axis?.edge === "left" ? 2 : (barWindow.axis?.edge === "right" ? 3 : (barWindow.axis?.edge === "top" ? 0 : 1));
+    }
+
+    function resolveWidgetTriggerGeometry(widgetItem, section, opts) {
+        opts = opts || {};
+        if (opts.useCenterSection && section === "center") {
+            const centerSection = barWindow.isVertical ? vCenterSection : hCenterSection;
+            if (centerSection) {
+                if (barWindow.isVertical) {
+                    const centerY = centerSection.height / 2;
+                    return {
+                        triggerPos: centerSection.mapToItem(null, 0, centerY),
+                        triggerWidth: centerSection.height
+                    };
+                }
+                return {
+                    triggerPos: centerSection.mapToItem(null, 0, 0),
+                    triggerWidth: centerSection.width
+                };
+            }
+        }
+        const ref = opts.visualItem || widgetItem.visualContent || widgetItem;
+        const w = opts.triggerWidth !== undefined ? opts.triggerWidth : (widgetItem.visualWidth !== undefined ? widgetItem.visualWidth : widgetItem.width);
+        return {
+            triggerPos: ref.mapToItem(null, 0, 0),
+            triggerWidth: w
+        };
+    }
+
+    function openWidgetPopout(spec) {
+        if (!spec?.loader)
+            return false;
+        spec.loader.active = true;
+
+        let popout = _resolvePopoutFromLoader(spec.loader);
+        if (!popout) {
+            _queuePopoutLoaderOpen(spec);
+            return false;
+        }
+        return _finishWidgetPopoutOpen(spec, popout);
+    }
+
+    function _resolvePopoutFromLoader(loader) {
+        if (!loader)
+            return null;
+        if (loader.item)
+            return loader.item;
+
+        const pairs = [[PopoutService.appDrawerLoader, PopoutService.appDrawerPopout], [PopoutService.batteryPopoutLoader, PopoutService.batteryPopout], [PopoutService.clipboardHistoryPopoutLoader, PopoutService.clipboardHistoryPopout], [PopoutService.controlCenterLoader, PopoutService.controlCenterPopout], [PopoutService.dankDashPopoutLoader, PopoutService.dankDashPopout], [PopoutService.layoutPopoutLoader, PopoutService.layoutPopout], [PopoutService.notificationCenterLoader, PopoutService.notificationCenterPopout], [PopoutService.processListPopoutLoader, PopoutService.processListPopout], [PopoutService.systemUpdateLoader, PopoutService.systemUpdatePopout], [PopoutService.vpnPopoutLoader, PopoutService.vpnPopout]];
+        for (let i = 0; i < pairs.length; i++) {
+            if (loader === pairs[i][0] && pairs[i][1])
+                return pairs[i][1];
+        }
+        return null;
+    }
+
+    property var _pendingPopoutOpenSpec: null
+
+    function _queuePopoutLoaderOpen(spec) {
+        if (_pendingPopoutOpenSpec && _pendingPopoutOpenSpec.loader === spec.loader)
+            return;
+        _pendingPopoutOpenSpec = spec;
+        const loader = spec.loader;
+        const onLoaded = function () {
+            if (!loader.item)
+                return;
+            if (loader.loaded)
+                loader.loaded.disconnect(onLoaded);
+            const pending = topBarContent._pendingPopoutOpenSpec;
+            if (!pending || pending.loader !== loader)
+                return;
+            topBarContent._pendingPopoutOpenSpec = null;
+            topBarContent._finishWidgetPopoutOpen(pending, loader.item);
+            if (pending.mode === "hover")
+                hoverController.recheckLatestPoint();
+        };
+        if (loader.item) {
+            onLoaded();
+            return;
+        }
+        if (loader.loaded)
+            loader.loaded.connect(onLoaded);
+    }
+
+    function _finishWidgetPopoutOpen(spec, popout) {
+        const effectiveBarConfig = barConfig;
+        const barPosition = getBarPosition();
+        const widgetSection = spec.section || "right";
+        const mode = spec.mode || "click";
+
+        if (popout.setBarContext)
+            popout.setBarContext(barPosition, effectiveBarConfig?.bottomGap ?? 0);
+
+        if (spec.setTriggerScreen)
+            popout.triggerScreen = barWindow.screen;
+
+        if (popout.setTriggerPosition && spec.widgetItem) {
+            const geom = resolveWidgetTriggerGeometry(spec.widgetItem, widgetSection, {
+                useCenterSection: spec.useCenterSection,
+                visualItem: spec.visualItem,
+                triggerWidth: spec.triggerWidth
+            });
+            if (geom.triggerPos) {
+                const pos = SettingsData.getPopupTriggerPosition(geom.triggerPos, barWindow.screen, barWindow.effectiveBarThickness, geom.triggerWidth, effectiveBarConfig?.spacing ?? 4, barPosition, effectiveBarConfig);
+                popout.setTriggerPosition(pos.x, pos.y, pos.width, widgetSection, barWindow.screen, barPosition, barWindow.effectiveBarThickness, effectiveBarConfig?.spacing ?? 4, effectiveBarConfig);
+            }
+        }
+
+        if (typeof popout.prepareForTrigger === "function")
+            popout.prepareForTrigger(spec.triggerSource, mode);
+
+        if (spec.prepare)
+            spec.prepare(popout);
+
+        const request = mode === "hover" ? PopoutManager.requestHoverPopout : PopoutManager.requestPopout;
+        request(popout, spec.tabIndex, spec.triggerSource);
+        return true;
     }
 
     readonly property var widgetVisibility: ({
@@ -702,27 +877,18 @@ Item {
             parentScreen: barWindow.screen
             popoutTarget: clipboardHistoryPopoutLoader.item ?? null
 
-            function openClipboardPopout(initialTab) {
-                clipboardHistoryPopoutLoader.active = true;
-                if (!clipboardHistoryPopoutLoader.item) {
-                    return;
-                }
-                const popout = clipboardHistoryPopoutLoader.item;
-                const effectiveBarConfig = topBarContent.barConfig;
-                const barPosition = barWindow.axis?.edge === "left" ? 2 : (barWindow.axis?.edge === "right" ? 3 : (barWindow.axis?.edge === "top" ? 0 : 1));
-                if (popout.setBarContext) {
-                    popout.setBarContext(barPosition, effectiveBarConfig?.bottomGap ?? 0);
-                }
-                if (popout.setTriggerPosition) {
-                    const globalPos = clipboardWidget.mapToItem(null, 0, 0);
-                    const pos = SettingsData.getPopupTriggerPosition(globalPos, barWindow.screen, barWindow.effectiveBarThickness, clipboardWidget.width, effectiveBarConfig?.spacing ?? 4, barPosition, effectiveBarConfig);
-                    const widgetSection = topBarContent.getWidgetSection(parent) || "right";
-                    popout.setTriggerPosition(pos.x, pos.y, pos.width, widgetSection, barWindow.screen, barPosition, barWindow.effectiveBarThickness, effectiveBarConfig?.spacing ?? 4, effectiveBarConfig);
-                }
-                if (initialTab) {
-                    popout.activeTab = initialTab;
-                }
-                PopoutManager.requestPopout(popout, undefined, "clipboard");
+            function openClipboardPopout(initialTab, mode) {
+                openWidgetPopout({
+                    loader: clipboardHistoryPopoutLoader,
+                    widgetItem: clipboardWidget,
+                    section: topBarContent.getWidgetSection(parent) || "right",
+                    triggerSource: "clipboard",
+                    mode: mode || "click",
+                    prepare: popout => {
+                        if (initialTab)
+                            popout.activeTab = initialTab;
+                    }
+                });
             }
 
             onClipboardClicked: openClipboardPopout("recents")
@@ -821,9 +987,14 @@ Item {
             }
 
             onClicked: {
-                if (!_preparePopout())
-                    return;
-                PopoutManager.requestPopout(appDrawerLoader.item, undefined, "appDrawer");
+                topBarContent.openWidgetPopout({
+                    loader: appDrawerLoader,
+                    widgetItem: launcherButton,
+                    section: launcherButton.section,
+                    triggerSource: "appDrawer",
+                    mode: "click",
+                    visualItem: launcherButton
+                });
             }
         }
     }
@@ -890,6 +1061,7 @@ Item {
         id: clockComponent
 
         Clock {
+            id: clockWidget
             axis: barWindow.axis
             compactMode: topBarContent.overlapping
             barThickness: barWindow.effectiveBarThickness
@@ -909,43 +1081,17 @@ Item {
             }
 
             onClockClicked: {
-                dankDashPopoutLoader.active = true;
-                if (dankDashPopoutLoader.item) {
-                    const effectiveBarConfig = topBarContent.barConfig;
-                    const barPosition = barWindow.axis?.edge === "left" ? 2 : (barWindow.axis?.edge === "right" ? 3 : (barWindow.axis?.edge === "top" ? 0 : 1));
-                    if (dankDashPopoutLoader.item.setBarContext) {
-                        dankDashPopoutLoader.item.setBarContext(barPosition, effectiveBarConfig?.bottomGap ?? 0);
-                    }
-                    if (dankDashPopoutLoader.item.setTriggerPosition) {
-                        let triggerPos, triggerWidth;
-                        if (section === "center") {
-                            const centerSection = barWindow.isVertical ? (barWindow.axis?.edge === "left" ? vCenterSection : vCenterSection) : hCenterSection;
-                            if (centerSection) {
-                                if (barWindow.isVertical) {
-                                    const centerY = centerSection.height / 2;
-                                    const centerGlobalPos = centerSection.mapToItem(null, 0, centerY);
-                                    triggerPos = centerGlobalPos;
-                                    triggerWidth = centerSection.height;
-                                } else {
-                                    const centerGlobalPos = centerSection.mapToItem(null, 0, 0);
-                                    triggerPos = centerGlobalPos;
-                                    triggerWidth = centerSection.width;
-                                }
-                            } else {
-                                triggerPos = visualContent.mapToItem(null, 0, 0);
-                                triggerWidth = visualWidth;
-                            }
-                        } else {
-                            triggerPos = visualContent.mapToItem(null, 0, 0);
-                            triggerWidth = visualWidth;
-                        }
-                        const pos = SettingsData.getPopupTriggerPosition(triggerPos, barWindow.screen, barWindow.effectiveBarThickness, triggerWidth, effectiveBarConfig?.spacing ?? 4, barPosition, effectiveBarConfig);
-                        dankDashPopoutLoader.item.setTriggerPosition(pos.x, pos.y, pos.width, section, barWindow.screen, barPosition, barWindow.effectiveBarThickness, effectiveBarConfig?.spacing ?? 4, effectiveBarConfig);
-                    } else {
-                        dankDashPopoutLoader.item.triggerScreen = barWindow.screen;
-                    }
-                    PopoutManager.requestPopout(dankDashPopoutLoader.item, 0, (effectiveBarConfig?.id ?? "default") + "-" + section + "-0");
-                }
+                const section = topBarContent.getWidgetSection(parent) || "center";
+                topBarContent.openWidgetPopout({
+                    loader: dankDashPopoutLoader,
+                    widgetItem: clockWidget,
+                    section,
+                    tabIndex: 0,
+                    triggerSource: topBarContent._dashTriggerSource(section, 0),
+                    mode: "click",
+                    useCenterSection: true,
+                    setTriggerScreen: true
+                });
             }
         }
     }
@@ -954,6 +1100,7 @@ Item {
         id: mediaComponent
 
         Media {
+            id: mediaWidget
             axis: barWindow.axis
             compactMode: topBarContent.spacingTight || topBarContent.overlapping
             barThickness: barWindow.effectiveBarThickness
@@ -962,43 +1109,17 @@ Item {
             popoutTarget: dankDashPopoutLoader.item ?? null
             parentScreen: barWindow.screen
             onClicked: {
-                dankDashPopoutLoader.active = true;
-                if (dankDashPopoutLoader.item) {
-                    const effectiveBarConfig = topBarContent.barConfig;
-                    const barPosition = barWindow.axis?.edge === "left" ? 2 : (barWindow.axis?.edge === "right" ? 3 : (barWindow.axis?.edge === "top" ? 0 : 1));
-                    if (dankDashPopoutLoader.item.setBarContext) {
-                        dankDashPopoutLoader.item.setBarContext(barPosition, effectiveBarConfig?.bottomGap ?? 0);
-                    }
-                    if (dankDashPopoutLoader.item.setTriggerPosition) {
-                        let triggerPos, triggerWidth;
-                        if (section === "center") {
-                            const centerSection = barWindow.isVertical ? (barWindow.axis?.edge === "left" ? vCenterSection : vCenterSection) : hCenterSection;
-                            if (centerSection) {
-                                if (barWindow.isVertical) {
-                                    const centerY = centerSection.height / 2;
-                                    const centerGlobalPos = centerSection.mapToItem(null, 0, centerY);
-                                    triggerPos = centerGlobalPos;
-                                    triggerWidth = centerSection.height;
-                                } else {
-                                    const centerGlobalPos = centerSection.mapToItem(null, 0, 0);
-                                    triggerPos = centerGlobalPos;
-                                    triggerWidth = centerSection.width;
-                                }
-                            } else {
-                                triggerPos = visualContent.mapToItem(null, 0, 0);
-                                triggerWidth = visualWidth;
-                            }
-                        } else {
-                            triggerPos = visualContent.mapToItem(null, 0, 0);
-                            triggerWidth = visualWidth;
-                        }
-                        const pos = SettingsData.getPopupTriggerPosition(triggerPos, barWindow.screen, barWindow.effectiveBarThickness, triggerWidth, effectiveBarConfig?.spacing ?? 4, barPosition, effectiveBarConfig);
-                        dankDashPopoutLoader.item.setTriggerPosition(pos.x, pos.y, pos.width, section, barWindow.screen, barPosition, barWindow.effectiveBarThickness, effectiveBarConfig?.spacing ?? 4, effectiveBarConfig);
-                    } else {
-                        dankDashPopoutLoader.item.triggerScreen = barWindow.screen;
-                    }
-                    PopoutManager.requestPopout(dankDashPopoutLoader.item, 1, (effectiveBarConfig?.id ?? "default") + "-" + section + "-1");
-                }
+                const section = topBarContent.getWidgetSection(parent) || "center";
+                topBarContent.openWidgetPopout({
+                    loader: dankDashPopoutLoader,
+                    widgetItem: mediaWidget,
+                    section,
+                    tabIndex: 1,
+                    triggerSource: topBarContent._dashTriggerSource(section, 1),
+                    mode: "click",
+                    useCenterSection: true,
+                    setTriggerScreen: true
+                });
             }
         }
     }
@@ -1007,6 +1128,7 @@ Item {
         id: weatherComponent
 
         Weather {
+            id: weatherWidget
             axis: barWindow.axis
             barThickness: barWindow.effectiveBarThickness
             widgetThickness: barWindow.widgetThickness
@@ -1014,47 +1136,17 @@ Item {
             popoutTarget: dankDashPopoutLoader.item ?? null
             parentScreen: barWindow.screen
             onClicked: {
-                dankDashPopoutLoader.active = true;
-                if (dankDashPopoutLoader.item) {
-                    const effectiveBarConfig = topBarContent.barConfig;
-                    // Calculate barPosition from axis.edge
-                    const barPosition = barWindow.axis?.edge === "left" ? 2 : (barWindow.axis?.edge === "right" ? 3 : (barWindow.axis?.edge === "top" ? 0 : 1));
-                    if (dankDashPopoutLoader.item.setBarContext) {
-                        dankDashPopoutLoader.item.setBarContext(barPosition, effectiveBarConfig?.bottomGap ?? 0);
-                    }
-                    if (dankDashPopoutLoader.item.setTriggerPosition) {
-                        // For center section widgets, use center section bounds for DankDash centering
-                        let triggerPos, triggerWidth;
-                        if (section === "center") {
-                            const centerSection = barWindow.isVertical ? (barWindow.axis?.edge === "left" ? vCenterSection : vCenterSection) : hCenterSection;
-                            if (centerSection) {
-                                // For vertical bars, use center Y of section; for horizontal, use left edge
-                                if (barWindow.isVertical) {
-                                    const centerY = centerSection.height / 2;
-                                    const centerGlobalPos = centerSection.mapToItem(null, 0, centerY);
-                                    triggerPos = centerGlobalPos;
-                                    triggerWidth = centerSection.height;
-                                } else {
-                                    // For horizontal bars, use left edge (DankPopout will center it)
-                                    const centerGlobalPos = centerSection.mapToItem(null, 0, 0);
-                                    triggerPos = centerGlobalPos;
-                                    triggerWidth = centerSection.width;
-                                }
-                            } else {
-                                triggerPos = visualContent.mapToItem(null, 0, 0);
-                                triggerWidth = visualWidth;
-                            }
-                        } else {
-                            triggerPos = visualContent.mapToItem(null, 0, 0);
-                            triggerWidth = visualWidth;
-                        }
-                        const pos = SettingsData.getPopupTriggerPosition(triggerPos, barWindow.screen, barWindow.effectiveBarThickness, triggerWidth, effectiveBarConfig?.spacing ?? 4, barPosition, effectiveBarConfig);
-                        dankDashPopoutLoader.item.setTriggerPosition(pos.x, pos.y, pos.width, section, barWindow.screen, barPosition, barWindow.effectiveBarThickness, effectiveBarConfig?.spacing ?? 4, effectiveBarConfig);
-                    } else {
-                        dankDashPopoutLoader.item.triggerScreen = barWindow.screen;
-                    }
-                    PopoutManager.requestPopout(dankDashPopoutLoader.item, 3, (effectiveBarConfig?.id ?? "default") + "-" + section + "-3");
-                }
+                const section = topBarContent.getWidgetSection(parent) || "center";
+                topBarContent.openWidgetPopout({
+                    loader: dankDashPopoutLoader,
+                    widgetItem: weatherWidget,
+                    section,
+                    tabIndex: 3,
+                    triggerSource: topBarContent._dashTriggerSource(section, 3),
+                    mode: "click",
+                    useCenterSection: true,
+                    setTriggerScreen: true
+                });
             }
         }
     }
@@ -1100,22 +1192,13 @@ Item {
             parentScreen: barWindow.screen
             widgetData: parent.widgetData
             onCpuClicked: {
-                processListPopoutLoader.active = true;
-                if (!processListPopoutLoader.item) {
-                    return;
-                }
-                const effectiveBarConfig = topBarContent.barConfig;
-                const barPosition = barWindow.axis?.edge === "left" ? 2 : (barWindow.axis?.edge === "right" ? 3 : (barWindow.axis?.edge === "top" ? 0 : 1));
-                if (processListPopoutLoader.item.setBarContext) {
-                    processListPopoutLoader.item.setBarContext(barPosition, effectiveBarConfig?.bottomGap ?? 0);
-                }
-                if (processListPopoutLoader.item.setTriggerPosition) {
-                    const globalPos = cpuWidget.mapToItem(null, 0, 0);
-                    const pos = SettingsData.getPopupTriggerPosition(globalPos, barWindow.screen, barWindow.effectiveBarThickness, cpuWidget.width, effectiveBarConfig?.spacing ?? 4, barPosition, effectiveBarConfig);
-                    const widgetSection = topBarContent.getWidgetSection(parent) || "right";
-                    processListPopoutLoader.item.setTriggerPosition(pos.x, pos.y, pos.width, widgetSection, barWindow.screen, barPosition, barWindow.effectiveBarThickness, effectiveBarConfig?.spacing ?? 4, effectiveBarConfig);
-                }
-                PopoutManager.requestPopout(processListPopoutLoader.item, undefined, "cpu");
+                topBarContent.openWidgetPopout({
+                    loader: processListPopoutLoader,
+                    widgetItem: cpuWidget,
+                    section: topBarContent.getWidgetSection(parent) || "right",
+                    triggerSource: "cpu",
+                    mode: "click"
+                });
             }
         }
     }
@@ -1133,22 +1216,13 @@ Item {
             parentScreen: barWindow.screen
             widgetData: parent.widgetData
             onRamClicked: {
-                processListPopoutLoader.active = true;
-                if (!processListPopoutLoader.item) {
-                    return;
-                }
-                const effectiveBarConfig = topBarContent.barConfig;
-                const barPosition = barWindow.axis?.edge === "left" ? 2 : (barWindow.axis?.edge === "right" ? 3 : (barWindow.axis?.edge === "top" ? 0 : 1));
-                if (processListPopoutLoader.item.setBarContext) {
-                    processListPopoutLoader.item.setBarContext(barPosition, effectiveBarConfig?.bottomGap ?? 0);
-                }
-                if (processListPopoutLoader.item.setTriggerPosition) {
-                    const globalPos = ramWidget.mapToItem(null, 0, 0);
-                    const pos = SettingsData.getPopupTriggerPosition(globalPos, barWindow.screen, barWindow.effectiveBarThickness, ramWidget.width, effectiveBarConfig?.spacing ?? 4, barPosition, effectiveBarConfig);
-                    const widgetSection = topBarContent.getWidgetSection(parent) || "right";
-                    processListPopoutLoader.item.setTriggerPosition(pos.x, pos.y, pos.width, widgetSection, barWindow.screen, barPosition, barWindow.effectiveBarThickness, effectiveBarConfig?.spacing ?? 4, effectiveBarConfig);
-                }
-                PopoutManager.requestPopout(processListPopoutLoader.item, undefined, "memory");
+                topBarContent.openWidgetPopout({
+                    loader: processListPopoutLoader,
+                    widgetItem: ramWidget,
+                    section: topBarContent.getWidgetSection(parent) || "right",
+                    triggerSource: "memory",
+                    mode: "click"
+                });
             }
         }
     }
@@ -1180,22 +1254,13 @@ Item {
             parentScreen: barWindow.screen
             widgetData: parent.widgetData
             onCpuTempClicked: {
-                processListPopoutLoader.active = true;
-                if (!processListPopoutLoader.item) {
-                    return;
-                }
-                const effectiveBarConfig = topBarContent.barConfig;
-                const barPosition = barWindow.axis?.edge === "left" ? 2 : (barWindow.axis?.edge === "right" ? 3 : (barWindow.axis?.edge === "top" ? 0 : 1));
-                if (processListPopoutLoader.item.setBarContext) {
-                    processListPopoutLoader.item.setBarContext(barPosition, effectiveBarConfig?.bottomGap ?? 0);
-                }
-                if (processListPopoutLoader.item.setTriggerPosition) {
-                    const globalPos = cpuTempWidget.mapToItem(null, 0, 0);
-                    const pos = SettingsData.getPopupTriggerPosition(globalPos, barWindow.screen, barWindow.effectiveBarThickness, cpuTempWidget.width, effectiveBarConfig?.spacing ?? 4, barPosition, effectiveBarConfig);
-                    const widgetSection = topBarContent.getWidgetSection(parent) || "right";
-                    processListPopoutLoader.item.setTriggerPosition(pos.x, pos.y, pos.width, widgetSection, barWindow.screen, barPosition, barWindow.effectiveBarThickness, effectiveBarConfig?.spacing ?? 4, effectiveBarConfig);
-                }
-                PopoutManager.requestPopout(processListPopoutLoader.item, undefined, "cpu_temp");
+                topBarContent.openWidgetPopout({
+                    loader: processListPopoutLoader,
+                    widgetItem: cpuTempWidget,
+                    section: topBarContent.getWidgetSection(parent) || "right",
+                    triggerSource: "cpu_temp",
+                    mode: "click"
+                });
             }
         }
     }
@@ -1213,22 +1278,13 @@ Item {
             parentScreen: barWindow.screen
             widgetData: parent.widgetData
             onGpuTempClicked: {
-                processListPopoutLoader.active = true;
-                if (!processListPopoutLoader.item) {
-                    return;
-                }
-                const effectiveBarConfig = topBarContent.barConfig;
-                const barPosition = barWindow.axis?.edge === "left" ? 2 : (barWindow.axis?.edge === "right" ? 3 : (barWindow.axis?.edge === "top" ? 0 : 1));
-                if (processListPopoutLoader.item.setBarContext) {
-                    processListPopoutLoader.item.setBarContext(barPosition, effectiveBarConfig?.bottomGap ?? 0);
-                }
-                if (processListPopoutLoader.item.setTriggerPosition) {
-                    const globalPos = gpuTempWidget.mapToItem(null, 0, 0);
-                    const pos = SettingsData.getPopupTriggerPosition(globalPos, barWindow.screen, barWindow.effectiveBarThickness, gpuTempWidget.width, effectiveBarConfig?.spacing ?? 4, barPosition, effectiveBarConfig);
-                    const widgetSection = topBarContent.getWidgetSection(parent) || "right";
-                    processListPopoutLoader.item.setTriggerPosition(pos.x, pos.y, pos.width, widgetSection, barWindow.screen, barPosition, barWindow.effectiveBarThickness, effectiveBarConfig?.spacing ?? 4, effectiveBarConfig);
-                }
-                PopoutManager.requestPopout(processListPopoutLoader.item, undefined, "gpu_temp");
+                topBarContent.openWidgetPopout({
+                    loader: processListPopoutLoader,
+                    widgetItem: gpuTempWidget,
+                    section: topBarContent.getWidgetSection(parent) || "right",
+                    triggerSource: "gpu_temp",
+                    mode: "click"
+                });
             }
         }
     }
@@ -1253,23 +1309,14 @@ Item {
             popoutTarget: notificationCenterLoader.item ?? null
             parentScreen: barWindow.screen
             onClicked: {
-                notificationCenterLoader.active = true;
-                if (!notificationCenterLoader.item) {
-                    return;
-                }
-                notificationCenterLoader.item.triggerScreen = barWindow.screen;
-                const effectiveBarConfig = topBarContent.barConfig;
-                const barPosition = barWindow.axis?.edge === "left" ? 2 : (barWindow.axis?.edge === "right" ? 3 : (barWindow.axis?.edge === "top" ? 0 : 1));
-                if (notificationCenterLoader.item.setBarContext) {
-                    notificationCenterLoader.item.setBarContext(barPosition, effectiveBarConfig?.bottomGap ?? 0);
-                }
-                if (notificationCenterLoader.item.setTriggerPosition) {
-                    const globalPos = notificationButton.mapToItem(null, 0, 0);
-                    const pos = SettingsData.getPopupTriggerPosition(globalPos, barWindow.screen, barWindow.effectiveBarThickness, notificationButton.width, effectiveBarConfig?.spacing ?? 4, barPosition, effectiveBarConfig);
-                    const widgetSection = topBarContent.getWidgetSection(parent) || "right";
-                    notificationCenterLoader.item.setTriggerPosition(pos.x, pos.y, pos.width, widgetSection, barWindow.screen, barPosition, barWindow.effectiveBarThickness, effectiveBarConfig?.spacing ?? 4, effectiveBarConfig);
-                }
-                PopoutManager.requestPopout(notificationCenterLoader.item, undefined, "notifications");
+                topBarContent.openWidgetPopout({
+                    loader: notificationCenterLoader,
+                    widgetItem: notificationButton,
+                    section: topBarContent.getWidgetSection(parent) || "right",
+                    triggerSource: "notifications",
+                    mode: "click",
+                    setTriggerScreen: true
+                });
             }
         }
     }
@@ -1289,22 +1336,13 @@ Item {
             popoutTarget: batteryPopoutLoader.item ?? null
             parentScreen: barWindow.screen
             onToggleBatteryPopup: {
-                batteryPopoutLoader.active = true;
-                if (!batteryPopoutLoader.item) {
-                    return;
-                }
-                const effectiveBarConfig = topBarContent.barConfig;
-                const barPosition = barWindow.axis?.edge === "left" ? 2 : (barWindow.axis?.edge === "right" ? 3 : (barWindow.axis?.edge === "top" ? 0 : 1));
-                if (batteryPopoutLoader.item.setBarContext) {
-                    batteryPopoutLoader.item.setBarContext(barPosition, effectiveBarConfig?.bottomGap ?? 0);
-                }
-                if (batteryPopoutLoader.item.setTriggerPosition) {
-                    const globalPos = batteryWidget.mapToItem(null, 0, 0);
-                    const pos = SettingsData.getPopupTriggerPosition(globalPos, barWindow.screen, barWindow.effectiveBarThickness, batteryWidget.width, effectiveBarConfig?.spacing ?? 4, barPosition, effectiveBarConfig);
-                    const widgetSection = topBarContent.getWidgetSection(parent) || "right";
-                    batteryPopoutLoader.item.setTriggerPosition(pos.x, pos.y, pos.width, widgetSection, barWindow.screen, barPosition, barWindow.effectiveBarThickness, effectiveBarConfig?.spacing ?? 4, effectiveBarConfig);
-                }
-                PopoutManager.requestPopout(batteryPopoutLoader.item, undefined, "battery");
+                topBarContent.openWidgetPopout({
+                    loader: batteryPopoutLoader,
+                    widgetItem: batteryWidget,
+                    section: topBarContent.getWidgetSection(parent) || "right",
+                    triggerSource: "battery",
+                    mode: "click"
+                });
             }
         }
     }
@@ -1322,20 +1360,13 @@ Item {
             popoutTarget: layoutPopoutLoader.item ?? null
             parentScreen: barWindow.screen
             onToggleLayoutPopup: {
-                layoutPopoutLoader.active = true;
-                if (!layoutPopoutLoader.item)
-                    return;
-                const effectiveBarConfig = topBarContent.barConfig;
-                const barPosition = barWindow.axis?.edge === "left" ? 2 : (barWindow.axis?.edge === "right" ? 3 : (barWindow.axis?.edge === "top" ? 0 : 1));
-
-                if (layoutPopoutLoader.item.setTriggerPosition) {
-                    const globalPos = layoutWidget.mapToItem(null, 0, 0);
-                    const pos = SettingsData.getPopupTriggerPosition(globalPos, barWindow.screen, barWindow.effectiveBarThickness, layoutWidget.width, effectiveBarConfig?.spacing ?? 4, barPosition, effectiveBarConfig);
-                    const widgetSection = topBarContent.getWidgetSection(parent) || "center";
-                    layoutPopoutLoader.item.setTriggerPosition(pos.x, pos.y, pos.width, widgetSection, barWindow.screen, barPosition, barWindow.effectiveBarThickness, effectiveBarConfig?.spacing ?? 4, effectiveBarConfig);
-                }
-
-                PopoutManager.requestPopout(layoutPopoutLoader.item, undefined, "layout");
+                topBarContent.openWidgetPopout({
+                    loader: layoutPopoutLoader,
+                    widgetItem: layoutWidget,
+                    section: topBarContent.getWidgetSection(parent) || "center",
+                    triggerSource: "layout",
+                    mode: "click"
+                });
             }
         }
     }
@@ -1355,24 +1386,13 @@ Item {
             popoutTarget: vpnPopoutLoader.item ?? null
             parentScreen: barWindow.screen
             onToggleVpnPopup: {
-                vpnPopoutLoader.active = true;
-                if (!vpnPopoutLoader.item)
-                    return;
-                const effectiveBarConfig = topBarContent.barConfig;
-                const barPosition = barWindow.axis?.edge === "left" ? 2 : (barWindow.axis?.edge === "right" ? 3 : (barWindow.axis?.edge === "top" ? 0 : 1));
-
-                if (vpnPopoutLoader.item.setBarContext) {
-                    vpnPopoutLoader.item.setBarContext(barPosition, effectiveBarConfig?.bottomGap ?? 0);
-                }
-
-                if (vpnPopoutLoader.item.setTriggerPosition) {
-                    const globalPos = vpnWidget.mapToItem(null, 0, 0);
-                    const pos = SettingsData.getPopupTriggerPosition(globalPos, barWindow.screen, barWindow.effectiveBarThickness, vpnWidget.width, effectiveBarConfig?.spacing ?? 4, barPosition, effectiveBarConfig);
-                    const widgetSection = topBarContent.getWidgetSection(parent) || "right";
-                    vpnPopoutLoader.item.setTriggerPosition(pos.x, pos.y, pos.width, widgetSection, barWindow.screen, barPosition, barWindow.effectiveBarThickness, effectiveBarConfig?.spacing ?? 4, effectiveBarConfig);
-                }
-
-                PopoutManager.requestPopout(vpnPopoutLoader.item, undefined, "vpn");
+                topBarContent.openWidgetPopout({
+                    loader: vpnPopoutLoader,
+                    widgetItem: vpnWidget,
+                    section: topBarContent.getWidgetSection(parent) || "right",
+                    triggerSource: "vpn",
+                    mode: "click"
+                });
             }
         }
     }
@@ -1381,6 +1401,7 @@ Item {
         id: controlCenterButtonComponent
 
         ControlCenterButton {
+            id: controlCenterButton
             isActive: controlCenterLoader.item ? controlCenterLoader.item.shouldBeVisible : false
             widgetThickness: barWindow.widgetThickness
             barThickness: barWindow.effectiveBarThickness
@@ -1403,25 +1424,16 @@ Item {
             }
 
             onClicked: {
-                controlCenterLoader.active = true;
-                if (!controlCenterLoader.item) {
-                    return;
-                }
-                controlCenterLoader.item.triggerScreen = barWindow.screen;
-                if (controlCenterLoader.item.setTriggerPosition) {
-                    const globalPos = mapToItem(null, 0, 0);
-                    // Use topBarContent.barConfig directly
-                    const effectiveBarConfig = topBarContent.barConfig;
-                    // Calculate barPosition from axis.edge like Battery widget does
-                    const barPosition = barWindow.axis?.edge === "left" ? 2 : (barWindow.axis?.edge === "right" ? 3 : (barWindow.axis?.edge === "top" ? 0 : 1));
-                    const pos = SettingsData.getPopupTriggerPosition(globalPos, barWindow.screen, barWindow.effectiveBarThickness, width, effectiveBarConfig?.spacing ?? 4, barPosition, effectiveBarConfig);
-                    const section = topBarContent.getWidgetSection(parent) || "right";
-                    controlCenterLoader.item.setTriggerPosition(pos.x, pos.y, pos.width, section, barWindow.screen, barPosition, barWindow.effectiveBarThickness, effectiveBarConfig?.spacing ?? 4, effectiveBarConfig);
-                }
-                PopoutManager.requestPopout(controlCenterLoader.item, undefined, "controlCenter");
-                if (controlCenterLoader.item.shouldBeVisible && NetworkService.wifiEnabled) {
+                topBarContent.openWidgetPopout({
+                    loader: controlCenterLoader,
+                    widgetItem: controlCenterButton,
+                    section: topBarContent.getWidgetSection(parent) || "right",
+                    triggerSource: "controlCenter",
+                    mode: "click",
+                    setTriggerScreen: true
+                });
+                if (controlCenterLoader.item?.shouldBeVisible && NetworkService.wifiEnabled)
                     NetworkService.scanWifi();
-                }
             }
         }
     }
@@ -1531,6 +1543,7 @@ Item {
         id: systemUpdateComponent
 
         SystemUpdate {
+            id: systemUpdateWidget
             isActive: systemUpdateLoader.item ? systemUpdateLoader.item.shouldBeVisible : false
             widgetThickness: barWindow.widgetThickness
             barThickness: barWindow.effectiveBarThickness
@@ -1549,22 +1562,14 @@ Item {
             }
 
             onClicked: {
-                systemUpdateLoader.active = true;
-                if (!systemUpdateLoader.item)
-                    return;
-                const popout = systemUpdateLoader.item;
-                const effectiveBarConfig = topBarContent.barConfig;
-                const barPosition = barWindow.axis?.edge === "left" ? 2 : (barWindow.axis?.edge === "right" ? 3 : (barWindow.axis?.edge === "top" ? 0 : 1));
-                if (popout.setBarContext) {
-                    popout.setBarContext(barPosition, effectiveBarConfig?.bottomGap ?? 0);
-                }
-                if (popout.setTriggerPosition) {
-                    const globalPos = visualContent.mapToItem(null, 0, 0);
-                    const currentScreen = parentScreen || Screen;
-                    const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barWindow.effectiveBarThickness, visualWidth, effectiveBarConfig?.spacing ?? 4, barPosition, effectiveBarConfig);
-                    popout.setTriggerPosition(pos.x, pos.y, pos.width, section, currentScreen, barPosition, barWindow.effectiveBarThickness, effectiveBarConfig?.spacing ?? 4, effectiveBarConfig);
-                }
-                PopoutManager.requestPopout(popout, undefined, "systemUpdate");
+                topBarContent.openWidgetPopout({
+                    loader: systemUpdateLoader,
+                    widgetItem: systemUpdateWidget,
+                    section: topBarContent.getWidgetSection(parent) || "right",
+                    triggerSource: "systemUpdate",
+                    mode: "click",
+                    visualItem: systemUpdateWidget
+                });
             }
         }
     }

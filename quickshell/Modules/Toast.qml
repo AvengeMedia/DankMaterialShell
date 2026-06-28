@@ -71,6 +71,14 @@ PanelWindow {
 
         property bool expanded: false
 
+        function linkify(text) {
+            if (!text)
+                return "";
+            const escaped = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            const linked = escaped.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1">$1</a>');
+            return linked.replace(/\n/g, "<br>");
+        }
+
         Connections {
             target: ToastService
             function onResetToastState() {
@@ -240,7 +248,18 @@ PanelWindow {
 
                         StyledText {
                             id: detailsText
-                            text: ToastService.currentDetails
+                            readonly property bool hasLink: /https?:\/\//.test(ToastService.currentDetails)
+                            text: hasLink ? toast.linkify(ToastService.currentDetails) : ToastService.currentDetails
+                            textFormat: hasLink ? Text.StyledText : Text.PlainText
+                            linkColor: {
+                                switch (ToastService.currentLevel) {
+                                case ToastService.levelError:
+                                case ToastService.levelWarn:
+                                    return SessionData.isLightMode ? Theme.surfaceText : Theme.background;
+                                default:
+                                    return Theme.primary;
+                                }
+                            }
                             font.pixelSize: Theme.fontSizeSmall
                             color: {
                                 switch (ToastService.currentLevel) {
@@ -255,6 +274,13 @@ PanelWindow {
                             anchors.right: copyDetailsButton.left
                             anchors.rightMargin: Theme.spacingS
                             wrapMode: Text.Wrap
+                            onLinkActivated: url => Qt.openUrlExternally(url)
+
+                            MouseArea {
+                                anchors.fill: parent
+                                acceptedButtons: Qt.NoButton
+                                cursorShape: detailsText.hoveredLink ? Qt.PointingHandCursor : Qt.ArrowCursor
+                            }
                         }
 
                         DankActionButton {

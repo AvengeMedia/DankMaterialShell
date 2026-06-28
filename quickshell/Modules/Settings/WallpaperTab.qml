@@ -307,9 +307,9 @@ Item {
 
                     DankButtonGroup {
                         id: fillModeGroup
-                        property var internalModes: ["Stretch", "Fit", "Fill", "Tile", "TileVertically", "TileHorizontally", "Pad"]
+                        property var internalModes: ["Stretch", "Fit", "Fill", "Scrolling", "Tile", "TileVertically", "TileHorizontally", "Pad"]
                         anchors.horizontalCenter: parent.horizontalCenter
-                        model: [I18n.tr("Stretch", "wallpaper fill mode"), I18n.tr("Fit", "wallpaper fill mode"), I18n.tr("Fill", "wallpaper fill mode"), I18n.tr("Tile", "wallpaper fill mode"), I18n.tr("Tile V", "wallpaper fill mode"), I18n.tr("Tile H", "wallpaper fill mode"), I18n.tr("Pad", "wallpaper fill mode")]
+                        model: [I18n.tr("Stretch", "wallpaper fill mode"), I18n.tr("Fit", "wallpaper fill mode"), I18n.tr("Fill", "wallpaper fill mode"), I18n.tr("Scroll", "wallpaper fill mode"), I18n.tr("Tile", "wallpaper fill mode"), I18n.tr("Tile V", "wallpaper fill mode"), I18n.tr("Tile H", "wallpaper fill mode"), I18n.tr("Pad", "wallpaper fill mode")]
                         selectionMode: "single"
                         buttonHeight: 28
                         minButtonWidth: 48
@@ -359,19 +359,34 @@ Item {
                     tags: ["background", "color", "fill", "fit", "custom"]
                     settingKey: "wallpaperBackgroundColorMode"
                     text: I18n.tr("Background Color")
-                    description: I18n.tr("Color shown for areas not covered by wallpaper (e.g. Fit or Pad modes)")
+                    description: I18n.tr("Color shown for areas not covered by wallpaper")
                     visible: root.currentWallpaper !== "" && !root.currentWallpaper.startsWith("#")
                     dropdownWidth: 220
                     options: [
-                        { "value": "black", "label": I18n.tr("Black") },
-                        { "value": "white", "label": I18n.tr("White") },
-                        { "value": "primary", "label": I18n.tr("Primary Theme Color") },
-                        { "value": "surface", "label": I18n.tr("Surface Container") },
-                        { "value": "custom", "label": I18n.tr("Custom") }
+                        {
+                            "value": "black",
+                            "label": I18n.tr("Black")
+                        },
+                        {
+                            "value": "white",
+                            "label": I18n.tr("White")
+                        },
+                        {
+                            "value": "primary",
+                            "label": I18n.tr("Primary Theme Color")
+                        },
+                        {
+                            "value": "surface",
+                            "label": I18n.tr("Surface Container")
+                        },
+                        {
+                            "value": "custom",
+                            "label": I18n.tr("Custom")
+                        }
                     ]
                     currentMode: SettingsData.wallpaperBackgroundColorMode
                     customColor: SettingsData.wallpaperBackgroundCustomColor || "#000000"
-                    pickerTitle: I18n.tr("Wallpaper Background Color")
+                    pickerTitle: I18n.tr("Background Color")
                     onModeSelected: mode => SettingsData.set("wallpaperBackgroundColorMode", mode)
                     onCustomColorSelected: selectedColor => SettingsData.set("wallpaperBackgroundCustomColor", selectedColor.toString())
                 }

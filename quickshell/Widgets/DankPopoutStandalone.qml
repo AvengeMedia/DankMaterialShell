@@ -5,6 +5,7 @@ import Quickshell
 import Quickshell.Wayland
 import qs.Common
 import qs.Services
+import qs.Widgets
 
 Item {
     id: root
@@ -35,6 +36,22 @@ Item {
     property bool shouldBeVisible: false
     property bool isClosing: false
     property bool animationsEnabled: true
+    property bool hoverDismissEnabled: false
+    property bool hoverDismissSuspended: false
+
+    function cancelHoverDismiss() {
+        hoverDismissController.cancelPending();
+    }
+
+    function closeFromHoverDismiss() {
+        if (hoverDismissSuspended || isClosing || !shouldBeVisible)
+            return;
+        if (popoutHandle?.closeFromHoverDismiss)
+            popoutHandle.closeFromHoverDismiss();
+        else
+            close();
+    }
+
     property var customKeyboardFocus: null
     property bool backgroundInteractive: true
     property bool contentHandlesKeys: false
@@ -585,6 +602,17 @@ Item {
         color: "transparent"
         readonly property bool closeVisualActive: root.shouldBeVisible || root.isClosing
 
+        PopoutHoverDismiss {
+            id: hoverDismissController
+            anchors.fill: parent
+            dismissEnabled: root.hoverDismissEnabled
+            dismissSuspended: root.hoverDismissSuspended
+            surfaceVisible: root.shouldBeVisible
+            globalOffsetX: root._surfaceMarginLeft
+            globalOffsetY: root._fullHeight ? 0 : root._surfaceMarginTop
+            onDismissRequested: root.closeFromHoverDismiss()
+        }
+
         WindowBlur {
             id: popoutBlur
             targetWindow: contentWindow
@@ -607,7 +635,7 @@ Item {
         WlrLayershell.namespace: root.layerNamespace
         WlrLayershell.layer: root.effectivePopoutLayer
         WlrLayershell.exclusiveZone: -1
-        WlrLayershell.keyboardFocus: KeyboardFocus.keyboardFocus(shouldBeVisible || isClosing, customKeyboardFocus)
+        WlrLayershell.keyboardFocus: KeyboardFocus.keyboardFocus(shouldBeVisible || (isClosing && CompositorService.useHyprlandFocusGrab), customKeyboardFocus)
 
         anchors {
             left: true
@@ -701,6 +729,11 @@ Item {
             }
 
             readonly property real computedScaleCollapsed: root.animationScaleCollapsed
+
+            PopoutHoverBodyTracker {
+                controller: hoverDismissController
+                trackingEnabled: root.hoverDismissEnabled && root.shouldBeVisible
+            }
 
             // openProgress: 0 = closed (at offset, scaleCollapsed), 1 = open (at 0, scale 1).
             QtObject {

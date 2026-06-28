@@ -7,13 +7,14 @@ StyledRect {
 
     property string sortBy: "name"
     property bool sortAscending: true
+    property color surfaceColor: Theme.surfaceContainer
 
     signal sortBySelected(string value)
     signal sortOrderSelected(bool ascending)
 
     width: 200
     height: sortColumn.height + Theme.spacingM * 2
-    color: Theme.surfaceContainer
+    color: surfaceColor
     radius: Theme.cornerRadius
     border.color: Theme.outlineMedium
     border.width: 1

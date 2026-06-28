@@ -512,7 +512,7 @@ FloatingWindow {
                         }
 
                         StyledText {
-                            text: DgopService.shortUptime || "--"
+                            text: DgopService.shortUptime ? DgopService.shortUptime.slice(2) : "--"
                             font.pixelSize: Theme.fontSizeSmall
                             font.weight: Font.Bold
                             color: Theme.surfaceText

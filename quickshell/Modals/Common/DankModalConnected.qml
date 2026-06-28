@@ -490,8 +490,8 @@ Item {
                     enabled: root.shouldBeVisible
                     hoverEnabled: false
                     acceptedButtons: Qt.AllButtons
-                    onPressed: mouse.accepted = true
-                    onClicked: mouse.accepted = true
+                    onPressed: mouse => mouse.accepted = true
+                    onClicked: mouse => mouse.accepted = true
                     z: -1
                 }
 

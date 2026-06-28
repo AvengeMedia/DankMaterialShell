@@ -12,6 +12,9 @@ Item {
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
+    // Bar Inset Padding: resolve the "auto" sentinel (stored < 0) to the frame thickness for the slider display.
+    readonly property int frameInsetPaddingDisplay: SettingsData.frameBarInsetPadding < 0 ? Math.round(SettingsData.frameThickness) : SettingsData.frameBarInsetPadding
+
     DankFlickable {
         anchors.fill: parent
         clip: true
@@ -155,6 +158,27 @@ Item {
                         target: opacitySlider
                         property: "value"
                         value: SettingsData.frameOpacity * 100
+                    }
+                }
+
+                SettingsSliderRow {
+                    id: frameBarInsetPaddingSlider
+                    settingKey: "frameBarInsetPadding"
+                    tags: ["frame", "bar", "edge", "inset", "padding", "corner", "end"]
+                    text: I18n.tr("Bar Inset Padding")
+                    description: I18n.tr("Gap between the end widgets and the bar ends (0 = edge-to-edge)")
+                    unit: "px"
+                    minimum: 0
+                    maximum: 48
+                    step: 1
+                    defaultValue: Math.round(SettingsData.frameThickness)
+                    value: root.frameInsetPaddingDisplay
+                    onSliderDragFinished: v => SettingsData.set("frameBarInsetPadding", v)
+
+                    Binding {
+                        target: frameBarInsetPaddingSlider
+                        property: "value"
+                        value: root.frameInsetPaddingDisplay
                     }
                 }
 
@@ -332,6 +356,15 @@ Item {
                     description: I18n.tr("Use the extended surface for launcher content")
                     checked: SettingsData.frameLauncherArcExtender
                     onToggled: checked => SettingsData.set("frameLauncherArcExtender", checked)
+                }
+
+                SettingsToggleRow {
+                    settingKey: "frameLauncherEdgeHover"
+                    tags: ["frame", "connected", "launcher", "hover", "edge", "reveal"]
+                    text: I18n.tr("Edge Hover Reveal")
+                    description: I18n.tr("Open the launcher by hovering the emerge edge (when free of bar and dock)")
+                    checked: SettingsData.frameLauncherEdgeHover
+                    onToggled: checked => SettingsData.set("frameLauncherEdgeHover", checked)
                 }
             }
 

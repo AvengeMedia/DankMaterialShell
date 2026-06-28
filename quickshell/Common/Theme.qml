@@ -104,6 +104,8 @@ Singleton {
     signal matugenCompleted(string mode, string result)
     property var matugenColors: ({})
     property var _pendingGenerateParams: null
+    property int _colorsRetryCount: 0
+    property double _lastGenerateMs: 0
 
     property bool themeModeAutomationActive: false
     property bool dmsServiceWasDisconnected: true
@@ -140,7 +142,7 @@ Singleton {
 
     Component.onCompleted: {
         Quickshell.execDetached(["mkdir", "-p", stateDir]);
-        Proc.runCommand("matugenCheck", ["which", "matugen"], (output, code) => {
+        Proc.runCommand("matugenCheck", ["sh", "-c", "command -v matugen"], (output, code) => {
             matugenAvailable = (code === 0) && !envDisableMatugen;
             const isGreeterMode = (typeof SessionData !== "undefined" && SessionData.isGreeterMode);
 
@@ -1771,6 +1773,7 @@ Singleton {
         if (!matugenAvailable || isGreeterMode)
             return;
 
+        _lastGenerateMs = Date.now();
         _pendingGenerateParams = true;
         _themeGenerateDebounce.restart();
     }
@@ -2015,6 +2018,23 @@ Singleton {
         }
     }
 
+    // Returns numeric fillMode value for shader use (matches shader calculateUV logic)
+    function getShaderFillMode(modeName) {
+        switch (modeName) {
+        case "Stretch": return 0;
+        case "Fit":
+        case "PreserveAspectFit": return 1;
+        case "Fill":
+        case "PreserveAspectCrop": return 2;
+        case "Tile": return 3;
+        case "TileVertically": return 4;
+        case "TileHorizontally": return 5;
+        case "Pad": return 6;
+        case "Scrolling": return 7;
+        default: return 2;
+        }
+    }
+
     function snap(value, dpr) {
         const s = dpr || 1;
         return Math.round(value * s) / s;
@@ -2200,6 +2220,7 @@ Singleton {
         }
 
         onLoaded: {
+            _colorsRetryCount = 0;
             if (currentTheme === dynamic)
                 colorsFileLoadFailed = false;
             parseAndLoadColors();
@@ -2210,20 +2231,41 @@ Singleton {
         }
 
         onLoadFailed: function (error) {
-            if (currentTheme === dynamic) {
-                log.warn("Dynamic colors file load failed, marking for regeneration");
-                colorsFileLoadFailed = true;
-                const isGreeterMode = (typeof SessionData !== "undefined" && SessionData.isGreeterMode);
-                if (!isGreeterMode && matugenAvailable && rawWallpaperPath) {
-                    log.debug("Matugen available, triggering immediate regeneration");
-                    generateSystemThemesFromCurrentTheme();
-                }
+            if (currentTheme !== dynamic)
+                return;
+
+            if (SessionData.isGreeterMode)
+                return;
+
+            if (workerRunning) {
+                colorsReloadRetry.restart();
+                return;
+            }
+
+            if (_colorsRetryCount < 3) {
+                _colorsRetryCount++;
+                colorsReloadRetry.restart();
+                return;
+            }
+
+            colorsFileLoadFailed = true;
+            const stale = Date.now() - _lastGenerateMs > 5000;
+            if (matugenAvailable && rawWallpaperPath && stale) {
+                log.debug("Dynamic colors unrecoverable, regenerating");
+                generateSystemThemesFromCurrentTheme();
             }
         }
 
         onPathChanged: {
             colorsFileLoadFailed = false;
         }
+    }
+
+    Timer {
+        id: colorsReloadRetry
+        interval: 150
+        repeat: false
+        onTriggered: dynamicColorsFileView.reload()
     }
 
     IpcHandler {

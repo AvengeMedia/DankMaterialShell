@@ -362,7 +362,7 @@
       "wallpaper"
     ],
     "icon": "wallpaper",
-    "description": "Color shown for areas not covered by wallpaper (e.g. Fit or Pad modes)"
+    "description": "Color shown for areas not covered by wallpaper"
   },
   {
     "section": "selectedMonitor",
@@ -529,7 +529,8 @@
       "security",
       "time",
       "weather"
-    ]
+    ],
+    "description": "Preview: %1"
   },
   {
     "section": "padHours12Hour",
@@ -646,7 +647,8 @@
       "top",
       "topbar",
       "weather"
-    ]
+    ],
+    "description": "Preview: %1"
   },
   {
     "section": "useFahrenheit",
@@ -1898,6 +1900,33 @@
     "description": "Show an outline ring around the focused workspace indicator"
   },
   {
+    "section": "workspaceUnfocusedMonitorBorderEnabled",
+    "label": "Focused Border",
+    "tabIndex": 6,
+    "category": "Dank Bar",
+    "keywords": [
+      "around",
+      "bar",
+      "border",
+      "dank",
+      "desktop",
+      "display",
+      "focused",
+      "indicator",
+      "monitor",
+      "outline",
+      "panel",
+      "ring",
+      "show",
+      "statusbar",
+      "topbar",
+      "unfocused",
+      "virtual",
+      "workspace"
+    ],
+    "description": "Show an outline ring around the focused workspace indicator"
+  },
+  {
     "section": "barFontScale",
     "label": "Font Scale",
     "tabIndex": 6,
@@ -1978,6 +2007,44 @@
     "description": "Controls opacity of the bar background"
   },
   {
+    "section": "workspaceUnfocusedMonitorSeparateAppearance",
+    "label": "Separate Appearance for Unfocused Display(s)",
+    "tabIndex": 6,
+    "category": "Dank Bar",
+    "keywords": [
+      "appearance",
+      "bar",
+      "color",
+      "colors",
+      "colour",
+      "colours",
+      "dank",
+      "desktop",
+      "different",
+      "display",
+      "display(s)",
+      "displays",
+      "focused",
+      "hue",
+      "monitor",
+      "monitors",
+      "output",
+      "outputs",
+      "palette",
+      "panel",
+      "screen",
+      "screens",
+      "separate",
+      "statusbar",
+      "tint",
+      "topbar",
+      "unfocused",
+      "virtual",
+      "workspace"
+    ],
+    "description": "Use different workspace colors on displays that are not focused"
+  },
+  {
     "section": "barShadow",
     "label": "Shadow Override",
     "tabIndex": 6,
@@ -2005,10 +2072,14 @@
     "keywords": [
       "bar",
       "between",
+      "corner",
       "dank",
+      "edge",
       "edges",
+      "end",
       "gap",
       "gaps",
+      "inset",
       "margin",
       "margins",
       "padding",
@@ -4605,6 +4676,21 @@
     ]
   },
   {
+    "section": "_tab_11",
+    "label": "Lock Screen",
+    "tabIndex": 11,
+    "category": "Lock Screen",
+    "keywords": [
+      "lock",
+      "lockscreen",
+      "login",
+      "password",
+      "screen",
+      "security"
+    ],
+    "icon": "lock"
+  },
+  {
     "section": "lockDisplay",
     "label": "Lock Screen Display",
     "tabIndex": 11,
@@ -4740,27 +4826,6 @@
       "what"
     ],
     "description": "Control what notification information is shown on the lock screen"
-  },
-  {
-    "section": "_tab_11",
-    "label": "Power & Security",
-    "tabIndex": 11,
-    "category": "Lock Screen",
-    "keywords": [
-      "hibernate",
-      "lock",
-      "login",
-      "password",
-      "power",
-      "reboot",
-      "restart",
-      "screen",
-      "security",
-      "shutdown",
-      "sleep",
-      "suspend"
-    ],
-    "icon": "security"
   },
   {
     "section": "lockScreenPowerOffMonitorsOnLock",
@@ -5579,6 +5644,22 @@
     "description": "Play sound when volume is adjusted"
   },
   {
+    "section": "_tab_16",
+    "label": "Media Player",
+    "tabIndex": 16,
+    "category": "Media Player",
+    "keywords": [
+      "audio",
+      "media",
+      "mpris",
+      "music",
+      "playback",
+      "player",
+      "spotify"
+    ],
+    "icon": "music_note"
+  },
+  {
     "section": "mediaPlayer",
     "label": "Media Player Settings",
     "tabIndex": 16,
@@ -5622,28 +5703,6 @@
       "widget"
     ],
     "description": "Scroll wheel behavior on media widget"
-  },
-  {
-    "section": "_tab_16",
-    "label": "Widgets & Notifications",
-    "tabIndex": 16,
-    "category": "Media Player",
-    "keywords": [
-      "alert",
-      "alerts",
-      "components",
-      "media",
-      "modules",
-      "mpris",
-      "music",
-      "notif",
-      "notifications",
-      "notifs",
-      "player",
-      "spotify",
-      "widgets"
-    ],
-    "icon": "dashboard"
   },
   {
     "section": "notificationBodyFontSize",
@@ -7934,6 +7993,34 @@
     "description": "Use the extended surface for launcher content"
   },
   {
+    "section": "frameBarInsetPadding",
+    "label": "Bar Inset Padding",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "bar",
+      "between",
+      "border",
+      "components",
+      "corner",
+      "decoration",
+      "edge",
+      "end",
+      "ends",
+      "frame",
+      "inset",
+      "modules",
+      "padding",
+      "panel",
+      "statusbar",
+      "taskbar",
+      "topbar",
+      "widgets",
+      "window"
+    ],
+    "description": "Gap between the end widgets and the bar ends (0 = edge-to-edge)"
+  },
+  {
     "section": "frameBorder",
     "label": "Border",
     "tabIndex": 33,
@@ -8051,6 +8138,36 @@
       "window"
     ],
     "icon": "monitor"
+  },
+  {
+    "section": "frameLauncherEdgeHover",
+    "label": "Edge Hover Reveal",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "app drawer",
+      "app menu",
+      "applications",
+      "border",
+      "connected",
+      "decoration",
+      "edge",
+      "emerge",
+      "frame",
+      "free",
+      "hover",
+      "hovering",
+      "launcher",
+      "open",
+      "panel",
+      "reveal",
+      "start menu",
+      "statusbar",
+      "taskbar",
+      "topbar",
+      "window"
+    ],
+    "description": "Open the launcher by hovering the emerge edge (when free of bar and dock)"
   },
   {
     "section": "frameEnable",
@@ -9079,16 +9196,39 @@
   },
   {
     "section": "_tab_42",
-    "label": "Battery",
+    "label": "Power & Security",
     "tabIndex": 42,
     "category": "Settings",
     "keywords": [
-      "battery",
-      "charge",
-      "charging",
+      "hibernate",
       "power",
-      "settings"
+      "reboot",
+      "restart",
+      "security",
+      "settings",
+      "shutdown",
+      "sleep",
+      "suspend"
     ],
-    "icon": "battery_charging_full"
+    "icon": "security"
+  },
+  {
+    "section": "_tab_43",
+    "label": "Widgets & Notifications",
+    "tabIndex": 43,
+    "category": "Dank Dash",
+    "keywords": [
+      "alert",
+      "alerts",
+      "components",
+      "dank",
+      "dash",
+      "modules",
+      "notif",
+      "notifications",
+      "notifs",
+      "widgets"
+    ],
+    "icon": "dashboard"
   }
 ]

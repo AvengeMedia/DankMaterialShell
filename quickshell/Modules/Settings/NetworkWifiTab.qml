@@ -465,6 +465,7 @@ Item {
                                     required property int index
 
                                     readonly property bool isConnected: modelData.ssid === NetworkService.currentWifiSSID
+                                    readonly property bool isConnecting: NetworkService.isWifiConnecting && NetworkService.connectingSSID === modelData.ssid
                                     readonly property bool isPinned: root.getPinnedWifiNetworks().includes(modelData.ssid)
                                     readonly property bool isExpanded: root.expandedWifiSsid === modelData.ssid
 
@@ -499,7 +500,17 @@ Item {
                                                 anchors.rightMargin: Theme.spacingS
                                                 spacing: Theme.spacingS
 
+                                                DankSpinner {
+                                                    size: 20
+                                                    strokeWidth: 2
+                                                    color: Theme.warning
+                                                    running: isConnecting
+                                                    visible: isConnecting
+                                                    anchors.verticalCenter: parent.verticalCenter
+                                                }
+
                                                 DankIcon {
+                                                    visible: !isConnecting
                                                     name: {
                                                         const s = modelData.signal || 0;
                                                         if (s >= 50)
@@ -552,9 +563,9 @@ Item {
                                                         spacing: Theme.spacingXS
 
                                                         StyledText {
-                                                            text: isConnected ? I18n.tr("Connected") : (modelData.secured ? I18n.tr("Secured") : I18n.tr("Open"))
+                                                            text: isConnecting ? I18n.tr("Connecting...") : (isConnected ? I18n.tr("Connected") : (modelData.secured ? I18n.tr("Secured") : I18n.tr("Open")))
                                                             font.pixelSize: Theme.fontSizeSmall
-                                                            color: isConnected ? Theme.primary : Theme.surfaceVariantText
+                                                            color: isConnecting ? Theme.warning : (isConnected ? Theme.primary : Theme.surfaceVariantText)
                                                         }
 
                                                         StyledText {
@@ -672,7 +683,8 @@ Item {
                                                 anchors.fill: parent
                                                 anchors.rightMargin: wifiNetworkActions.width + Theme.spacingM
                                                 hoverEnabled: true
-                                                cursorShape: Qt.PointingHandCursor
+                                                enabled: !NetworkService.isWifiConnecting || isConnected
+                                                cursorShape: enabled ? Qt.PointingHandCursor : Qt.BusyCursor
                                                 onClicked: {
                                                     WifiConnectionActions.connectToNetwork(modelData, {
                                                         connected: isConnected,
@@ -859,6 +871,7 @@ Item {
                             required property int index
 
                             readonly property bool isConnected: modelData.ssid === NetworkService.currentWifiSSID
+                            readonly property bool isConnecting: NetworkService.isWifiConnecting && NetworkService.connectingSSID === modelData.ssid
                             readonly property bool isPinned: root.getPinnedWifiNetworks().includes(modelData.ssid)
                             readonly property bool isOutOfRange: modelData.outOfRange || false
                             readonly property bool isExpanded: !isOutOfRange && root.expandedSavedWifiSsid === modelData.ssid
@@ -894,7 +907,17 @@ Item {
                                         anchors.rightMargin: Theme.spacingS
                                         spacing: Theme.spacingS
 
+                                        DankSpinner {
+                                            size: 20
+                                            strokeWidth: 2
+                                            color: Theme.warning
+                                            running: isConnecting
+                                            visible: isConnecting
+                                            anchors.verticalCenter: parent.verticalCenter
+                                        }
+
                                         DankIcon {
+                                            visible: !isConnecting
                                             name: {
                                                 if (isOutOfRange)
                                                     return "wifi_off";
@@ -941,6 +964,8 @@ Item {
 
                                             StyledText {
                                                 text: {
+                                                    if (isConnecting)
+                                                        return I18n.tr("Connecting...");
                                                     const parts = [isConnected ? I18n.tr("Connected") : (modelData.secured ? I18n.tr("Secured") : I18n.tr("Open"))];
                                                     parts.push(isOutOfRange ? I18n.tr("Unavailable") : (modelData.signal || 0) + "%");
                                                     if (modelData.hidden || false)
@@ -948,7 +973,7 @@ Item {
                                                     return parts.join(" • ");
                                                 }
                                                 font.pixelSize: Theme.fontSizeSmall
-                                                color: isConnected ? Theme.primary : Theme.surfaceVariantText
+                                                color: isConnecting ? Theme.warning : (isConnected ? Theme.primary : Theme.surfaceVariantText)
                                                 width: parent.width
                                                 elide: Text.ElideRight
                                             }
@@ -1028,7 +1053,8 @@ Item {
                                         anchors.fill: parent
                                         anchors.rightMargin: savedWifiActions.width + Theme.spacingM
                                         hoverEnabled: true
-                                        cursorShape: isOutOfRange ? Qt.ArrowCursor : Qt.PointingHandCursor
+                                        enabled: !NetworkService.isWifiConnecting || isConnected
+                                        cursorShape: isOutOfRange ? Qt.ArrowCursor : (enabled ? Qt.PointingHandCursor : Qt.BusyCursor)
                                         onClicked: {
                                             if (isOutOfRange)
                                                 return;
@@ -1162,14 +1188,15 @@ Item {
                                 }
 
                                 MenuItem {
-                                    text: isConnected ? I18n.tr("Disconnect") : I18n.tr("Connect")
+                                    text: isConnecting ? I18n.tr("Connecting...") : (isConnected ? I18n.tr("Disconnect") : I18n.tr("Connect"))
                                     height: isOutOfRange ? 0 : 32
                                     visible: !isOutOfRange
+                                    enabled: !isConnecting
 
                                     contentItem: StyledText {
                                         text: parent.text
                                         font.pixelSize: Theme.fontSizeSmall
-                                        color: Theme.surfaceText
+                                        color: parent.enabled ? Theme.surfaceText : Theme.surfaceVariantText
                                         leftPadding: Theme.spacingS
                                         verticalAlignment: Text.AlignVCenter
                                     }

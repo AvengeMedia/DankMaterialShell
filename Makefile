@@ -74,10 +74,11 @@ install-icon:
 	@echo "Icon installed"
 
 install-desktop:
-	@echo "Installing desktop entry..."
+	@echo "Installing desktop entries..."
 	@install -D -m 644 $(ASSETS_DIR)/dms-open.desktop $(APPLICATIONS_DIR)/dms-open.desktop
+	@install -D -m 644 $(ASSETS_DIR)/com.danklinux.dms.desktop $(APPLICATIONS_DIR)/com.danklinux.dms.desktop
 	@update-desktop-database -q $(APPLICATIONS_DIR) 2>/dev/null || true
-	@echo "Desktop entry installed"
+	@echo "Desktop entries installed"
 
 install: install-bin install-shell install-completions install-systemd install-icon install-desktop
 	@echo ""
@@ -116,10 +117,11 @@ uninstall-icon:
 	@echo "Icon removed"
 
 uninstall-desktop:
-	@echo "Removing desktop entry..."
+	@echo "Removing desktop entries..."
 	@rm -f $(APPLICATIONS_DIR)/dms-open.desktop
+	@rm -f $(APPLICATIONS_DIR)/com.danklinux.dms.desktop
 	@update-desktop-database -q $(APPLICATIONS_DIR) 2>/dev/null || true
-	@echo "Desktop entry removed"
+	@echo "Desktop entries removed"
 
 uninstall: uninstall-systemd uninstall-desktop uninstall-icon uninstall-completions uninstall-shell uninstall-bin
 	@echo ""

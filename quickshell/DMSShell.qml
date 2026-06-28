@@ -175,8 +175,7 @@ Item {
     property bool barSurfacesLoaded: true
 
     function recreateBarSurfaces() {
-        log.info("Recreating bar surfaces, screens:", Quickshell.screens.length,
-                 Quickshell.screens.map(s => s.name).join(","));
+        log.info("Recreating bar surfaces, screens:", Quickshell.screens.length, Quickshell.screens.map(s => s.name).join(","));
         if (barSurfacesLoaded)
             barSurfacesLoaded = false;
         barSurfaceReloadAction.schedule();
@@ -232,6 +231,12 @@ Item {
         active: root.frameSurfacesLoaded
         asynchronous: false
         sourceComponent: Frame {}
+    }
+
+    Loader {
+        active: SettingsData.frameEnabled && SettingsData.frameLauncherEdgeHover
+        asynchronous: false
+        sourceComponent: FrameLauncherHoverZone {}
     }
 
     DeferredAction {
@@ -345,12 +350,7 @@ Item {
     }
 
     function triggerSurfaceRecovery(source) {
-        log.info("Surface recovery triggered by:", source,
-                 "screens:", Quickshell.screens.length,
-                 Quickshell.screens.map(s => s.name).join(","),
-                 "barLoaded:", root.barSurfacesLoaded,
-                 "frameLoaded:", root.frameSurfacesLoaded,
-                 "dockEnabled:", root.dockEnabled);
+        log.info("Surface recovery triggered by:", source, "screens:", Quickshell.screens.length, Quickshell.screens.map(s => s.name).join(","), "barLoaded:", root.barSurfacesLoaded, "frameLoaded:", root.frameSurfacesLoaded, "dockEnabled:", root.dockEnabled);
         surfaceResumeRecoveryTimer.pass = 0;
         surfaceResumeRecoveryTimer.interval = 800;
         surfaceResumeRecoveryTimer.restart();
@@ -361,15 +361,11 @@ Item {
         function onScreensChanged() {
             const hasReal = root._hasRealScreen();
             const currentNames = root._getRealScreenNames();
-            log.info("Screens changed:", Quickshell.screens.length,
-                     Quickshell.screens.map(s => "'" + s.name + "'").join(","),
-                     "hasReal:", hasReal, "hadReal:", root.hadRealScreen);
+            log.info("Screens changed:", Quickshell.screens.length, Quickshell.screens.map(s => "'" + s.name + "'").join(","), "hasReal:", hasReal, "hadReal:", root.hadRealScreen);
             const fullReconnect = !root.hadRealScreen && hasReal;
-            const partialReconnect = root.previousRealScreenNames.length > 0
-                && currentNames.some(name => !root.previousRealScreenNames.includes(name));
+            const partialReconnect = root.previousRealScreenNames.length > 0 && currentNames.some(name => !root.previousRealScreenNames.includes(name));
             if (fullReconnect || partialReconnect) {
-                log.info("Screen reconnect detected, scheduling surface recovery",
-                         "full:", fullReconnect, "partial:", partialReconnect);
+                log.info("Screen reconnect detected, scheduling surface recovery", "full:", fullReconnect, "partial:", partialReconnect);
                 root.scheduleScreenReconnectRecovery();
             }
             root.hadRealScreen = hasReal;
@@ -429,9 +425,7 @@ Item {
         property int pass: 0
         onTriggered: {
             pass++;
-            log.info("Surface recovery pass", pass,
-                     "screens:", Quickshell.screens.length,
-                     Quickshell.screens.map(s => s.name).join(","));
+            log.info("Surface recovery pass", pass, "screens:", Quickshell.screens.length, Quickshell.screens.map(s => s.name).join(","));
 
             root.recreateBarSurfaces();
 
@@ -457,11 +451,12 @@ Item {
 
     Component.onCompleted: {
         dockRecreateDebounce.start();
-        // Force PolkitService singleton to initialize
-        PolkitService.polkitAvailable;
-        // Force DisplayConfigState singleton to initialize so auto-config runs at startup
-        DisplayConfigState.hasOutputBackend;
         loginSoundTimer.start();
+
+        // These are dummy references just to trigger the singletons onCompleted to trigger
+        PolkitService.polkitAvailable;
+        DisplayConfigState.hasOutputBackend;
+        PortalService.systemColorScheme;
     }
 
     Loader {
@@ -700,23 +695,19 @@ Item {
         target: NetworkService
 
         function onCredentialsNeeded(token, ssid, setting, fields, hints, reason, connType, connName, vpnService, fieldsInfo) {
-            const now = Date.now();
-            const timeSinceLastPrompt = now - lastCredentialsTime;
+            const alreadyShown = wifiPasswordModalLoader.item && wifiPasswordModalLoader.item.shouldBeVisible;
+            if (alreadyShown && token === lastCredentialsToken)
+                return;
 
             wifiPasswordModalLoader.active = true;
             if (!wifiPasswordModalLoader.item)
                 return;
 
-            if (wifiPasswordModalLoader.item.shouldBeVisible && timeSinceLastPrompt < 1000) {
+            if (alreadyShown && lastCredentialsToken !== "" && lastCredentialsToken !== token)
                 NetworkService.cancelCredentials(lastCredentialsToken);
-                lastCredentialsToken = token;
-                lastCredentialsTime = now;
-                wifiPasswordModalLoader.item.showFromPrompt(token, ssid, setting, fields, hints, reason, connType, connName, vpnService, fieldsInfo);
-                return;
-            }
 
             lastCredentialsToken = token;
-            lastCredentialsTime = now;
+            lastCredentialsTime = Date.now();
             wifiPasswordModalLoader.item.showFromPrompt(token, ssid, setting, fields, hints, reason, connType, connName, vpnService, fieldsInfo);
         }
     }
@@ -1041,11 +1032,7 @@ Item {
         target: SessionService
 
         function onSessionResumed() {
-            log.info("Session resumed: screens:", Quickshell.screens.length,
-                     Quickshell.screens.map(s => s.name).join(","),
-                     "barLoaded:", root.barSurfacesLoaded,
-                     "frameLoaded:", root.frameSurfacesLoaded,
-                     "dockEnabled:", root.dockEnabled);
+            log.info("Session resumed: screens:", Quickshell.screens.length, Quickshell.screens.map(s => s.name).join(","), "barLoaded:", root.barSurfacesLoaded, "frameLoaded:", root.frameSurfacesLoaded, "dockEnabled:", root.dockEnabled);
 
             root.pendingOsdResumeReloads = 2;
             osdResumeRecreateTimer.interval = 400;

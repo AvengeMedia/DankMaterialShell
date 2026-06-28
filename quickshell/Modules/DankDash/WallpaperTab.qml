@@ -31,8 +31,45 @@ Item {
     property string selectedFileName: ""
     property var targetScreen: null
     property string targetScreenName: targetScreen ? targetScreen.name : ""
+    // Shared with the wallpaper FileBrowser via CacheData.fileBrowserSettings["wallpaper"]
+    property string sortBy: "name"
+    property bool sortAscending: true
+    // Forces the page grid to rebuild when the folder model reorders in place.
+    property int gridRevision: 0
 
     signal requestTabChange(int newIndex)
+
+    function refreshAfterSort() {
+        // Defer until FolderListModel finishes reordering.
+        Qt.callLater(() => {
+            gridRevision++;
+            if (visible && active) {
+                setInitialSelection();
+            }
+            updateSelectedFileName();
+        });
+    }
+
+    onSortByChanged: refreshAfterSort()
+    onSortAscendingChanged: refreshAfterSort()
+
+    function loadSort() {
+        const s = CacheData.fileBrowserSettings["wallpaper"];
+        if (s) {
+            sortBy = s.sortBy || "name";
+            sortAscending = s.sortAscending !== undefined ? s.sortAscending : true;
+        }
+    }
+
+    function persistSort() {
+        let settings = CacheData.fileBrowserSettings;
+        if (!settings["wallpaper"])
+            settings["wallpaper"] = {};
+        settings["wallpaper"].sortBy = sortBy;
+        settings["wallpaper"].sortAscending = sortAscending;
+        CacheData.fileBrowserSettings = settings;
+        CacheData.saveCache();
+    }
 
     function getCurrentWallpaper() {
         if (SessionData.perMonitorWallpaper && targetScreenName) {
@@ -68,7 +105,15 @@ Item {
     }
 
     Component.onCompleted: {
+        loadSort();
         loadWallpaperDirectory();
+    }
+
+    Connections {
+        target: CacheData
+        function onFileBrowserSettingsChanged() {
+            loadSort();
+        }
     }
 
     onActiveChanged: {
@@ -77,7 +122,45 @@ Item {
         }
     }
 
+    function goToNextCell(visibleCount) {
+        if (gridIndex + 1 < visibleCount) {
+            gridIndex++;
+        } else if (currentPage < totalPages - 1) {
+            gridIndex = 0;
+            currentPage++;
+        } else if (totalPages > 1) {
+            gridIndex = 0;
+            currentPage = 0;
+        }
+    }
+
+    function goToPrevCell() {
+        if (gridIndex > 0) {
+            gridIndex--;
+        } else if (currentPage > 0) {
+            currentPage--;
+            const prevPageCount = Math.min(itemsPerPage, wallpaperFolderModel.count - currentPage * itemsPerPage);
+            gridIndex = prevPageCount - 1;
+        } else if (totalPages > 1) {
+            currentPage = totalPages - 1;
+            const lastPageCount = Math.min(itemsPerPage, wallpaperFolderModel.count - currentPage * itemsPerPage);
+            gridIndex = lastPageCount - 1;
+        }
+    }
+
+    function closeOverlays() {
+        if (sortMenu.visible || pageJumpPopup.visible) {
+            sortMenu.visible = false;
+            pageJumpPopup.visible = false;
+            return true;
+        }
+        return false;
+    }
+
     function handleKeyEvent(event) {
+        if (event.key === Qt.Key_Escape) {
+            return closeOverlays();
+        }
         const columns = 4;
         const currentCol = gridIndex % columns;
         const visibleCount = Math.min(itemsPerPage, wallpaperFolderModel.count - currentPage * itemsPerPage);
@@ -97,40 +180,18 @@ Item {
 
         if (event.key === Qt.Key_Right || event.key === Qt.Key_L) {
             if (I18n.isRtl) {
-                if (gridIndex > 0) {
-                    gridIndex--;
-                } else if (currentPage > 0) {
-                    currentPage--;
-                    const prevPageCount = Math.min(itemsPerPage, wallpaperFolderModel.count - currentPage * itemsPerPage);
-                    gridIndex = prevPageCount - 1;
-                }
+                goToPrevCell();
             } else {
-                if (gridIndex + 1 < visibleCount) {
-                    gridIndex++;
-                } else if (currentPage < totalPages - 1) {
-                    gridIndex = 0;
-                    currentPage++;
-                }
+                goToNextCell(visibleCount);
             }
             return true;
         }
 
         if (event.key === Qt.Key_Left || event.key === Qt.Key_H) {
             if (I18n.isRtl) {
-                if (gridIndex + 1 < visibleCount) {
-                    gridIndex++;
-                } else if (currentPage < totalPages - 1) {
-                    gridIndex = 0;
-                    currentPage++;
-                }
+                goToNextCell(visibleCount);
             } else {
-                if (gridIndex > 0) {
-                    gridIndex--;
-                } else if (currentPage > 0) {
-                    currentPage--;
-                    const prevPageCount = Math.min(itemsPerPage, wallpaperFolderModel.count - currentPage * itemsPerPage);
-                    gridIndex = prevPageCount - 1;
-                }
+                goToPrevCell();
             }
             return true;
         }
@@ -141,6 +202,9 @@ Item {
             } else if (currentPage < totalPages - 1) {
                 gridIndex = currentCol;
                 currentPage++;
+            } else if (totalPages > 1) {
+                gridIndex = currentCol;
+                currentPage = 0;
             }
             return true;
         }
@@ -154,19 +218,25 @@ Item {
                 const prevPageRows = Math.ceil(prevPageCount / columns);
                 gridIndex = (prevPageRows - 1) * columns + currentCol;
                 gridIndex = Math.min(gridIndex, prevPageCount - 1);
+            } else if (totalPages > 1) {
+                currentPage = totalPages - 1;
+                const lastPageCount = Math.min(itemsPerPage, wallpaperFolderModel.count - currentPage * itemsPerPage);
+                const lastPageRows = Math.ceil(lastPageCount / columns);
+                gridIndex = (lastPageRows - 1) * columns + currentCol;
+                gridIndex = Math.min(gridIndex, lastPageCount - 1);
             }
             return true;
         }
 
-        if (event.key === Qt.Key_PageUp && currentPage > 0) {
+        if (event.key === Qt.Key_PageUp && totalPages > 1) {
             gridIndex = 0;
-            currentPage--;
+            currentPage = (currentPage - 1 + totalPages) % totalPages;
             return true;
         }
 
-        if (event.key === Qt.Key_PageDown && currentPage < totalPages - 1) {
+        if (event.key === Qt.Key_PageDown && totalPages > 1) {
             gridIndex = 0;
-            currentPage++;
+            currentPage = (currentPage + 1) % totalPages;
             return true;
         }
 
@@ -280,6 +350,17 @@ Item {
         }
     }
 
+    function collectWallpaperPaths() {
+        const paths = [];
+        for (var i = 0; i < wallpaperFolderModel.count; i++) {
+            const filePath = wallpaperFolderModel.get(i, "filePath");
+            if (filePath) {
+                paths.push(filePath.toString().replace(/^file:\/\//, ''));
+            }
+        }
+        return paths;
+    }
+
     Connections {
         target: wallpaperFolderModel
         function onCountChanged() {
@@ -288,6 +369,7 @@ Item {
                     setInitialSelection();
                 }
                 updateSelectedFileName();
+                thumbnailPreloader.paths = collectWallpaperPaths();
             }
         }
         function onStatusChanged() {
@@ -296,8 +378,14 @@ Item {
                     setInitialSelection();
                 }
                 updateSelectedFileName();
+                thumbnailPreloader.paths = collectWallpaperPaths();
             }
         }
+    }
+
+    WallpaperThumbnailPreloader {
+        id: thumbnailPreloader
+        cacheSize: 256
     }
 
     FolderListModel {
@@ -310,7 +398,19 @@ Item {
         nameFilters: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp", "*.jxl", "*.avif", "*.heif", "*.exr"]
         showFiles: true
         showDirs: false
-        sortField: FolderListModel.Name
+        sortField: {
+            switch (root.sortBy) {
+            case "size":
+                return FolderListModel.Size;
+            case "modified":
+                return FolderListModel.Time;
+            case "type":
+                return FolderListModel.Type;
+            default:
+                return FolderListModel.Name;
+            }
+        }
+        sortReversed: !root.sortAscending
         folder: wallpaperDir ? "file://" + wallpaperDir.split('/').map(s => encodeURIComponent(s)).join('/') : ""
     }
 
@@ -339,6 +439,7 @@ Item {
     }
 
     Column {
+        id: contentColumn
         anchors.fill: parent
         spacing: 0
 
@@ -376,6 +477,7 @@ Item {
                 }
 
                 model: {
+                    root.gridRevision; // re-evaluate when sort order changes in place
                     const startIndex = currentPage * itemsPerPage;
                     const endIndex = Math.min(startIndex + itemsPerPage, wallpaperFolderModel.count);
                     const items = [];
@@ -513,7 +615,7 @@ Item {
                 spacing: Theme.spacingS
 
                 Item {
-                    width: (parent.width - controlsRow.width - browseButton.width - Theme.spacingS) / 2
+                    width: (parent.width - controlsRow.width - sortButton.width - browseButton.width - Theme.spacingS * 3) / 2
                     height: parent.height
                 }
 
@@ -527,21 +629,42 @@ Item {
                         iconName: "skip_previous"
                         iconSize: 20
                         buttonSize: 32
-                        enabled: currentPage > 0
+                        enabled: totalPages > 1
                         opacity: enabled ? 1.0 : 0.3
+                        tooltipText: I18n.tr("Previous page")
+                        tooltipSide: "top"
                         onClicked: {
-                            if (currentPage > 0) {
-                                currentPage--;
+                            if (totalPages > 1) {
+                                currentPage = (currentPage - 1 + totalPages) % totalPages;
                             }
                         }
                     }
 
                     StyledText {
+                        id: pageIndicator
                         anchors.verticalCenter: parent.verticalCenter
                         text: wallpaperFolderModel.count > 0 ? (wallpaperFolderModel.count === 1 ? I18n.tr("%1 wallpaper  •  %2 / %3").arg(wallpaperFolderModel.count).arg(currentPage + 1).arg(totalPages) : I18n.tr("%1 wallpapers  •  %2 / %3").arg(wallpaperFolderModel.count).arg(currentPage + 1).arg(totalPages)) : I18n.tr("No wallpapers")
                         font.pixelSize: 14
-                        color: Theme.surfaceText
+                        color: pageIndicatorMouseArea.containsMouse && pageIndicatorMouseArea.enabled ? Theme.primary : Theme.surfaceText
                         opacity: 0.7
+
+                        MouseArea {
+                            id: pageIndicatorMouseArea
+                            anchors.fill: parent
+                            enabled: totalPages > 1
+                            hoverEnabled: true
+                            cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+                            onClicked: {
+                                sortMenu.visible = false;
+                                pageJumpPopup.visible = !pageJumpPopup.visible;
+                            }
+                            onEntered: if (enabled) pageJumpTooltip.show(I18n.tr("Jump to page"), pageIndicator, 0, 0, "top")
+                            onExited: pageJumpTooltip.hide()
+                        }
+
+                        DankTooltipV2 {
+                            id: pageJumpTooltip
+                        }
                     }
 
                     DankActionButton {
@@ -549,13 +672,31 @@ Item {
                         iconName: "skip_next"
                         iconSize: 20
                         buttonSize: 32
-                        enabled: currentPage < totalPages - 1
+                        enabled: totalPages > 1
                         opacity: enabled ? 1.0 : 0.3
+                        tooltipText: I18n.tr("Next page")
+                        tooltipSide: "top"
                         onClicked: {
-                            if (currentPage < totalPages - 1) {
-                                currentPage++;
+                            if (totalPages > 1) {
+                                currentPage = (currentPage + 1) % totalPages;
                             }
                         }
+                    }
+                }
+
+                DankActionButton {
+                    id: sortButton
+                    anchors.verticalCenter: parent.verticalCenter
+                    iconName: "sort"
+                    iconSize: 20
+                    buttonSize: 32
+                    opacity: 0.7
+                    enabled: wallpaperFolderModel.count > 0
+                    tooltipText: I18n.tr("Sort wallpapers")
+                    tooltipSide: "top"
+                    onClicked: {
+                        pageJumpPopup.visible = false;
+                        sortMenu.visible = !sortMenu.visible;
                     }
                 }
 
@@ -566,6 +707,8 @@ Item {
                     iconSize: 20
                     buttonSize: 32
                     opacity: 0.7
+                    tooltipText: I18n.tr("Choose wallpaper folder")
+                    tooltipSide: "top"
                     onClicked: wallpaperBrowser.open()
                 }
             }
@@ -580,6 +723,121 @@ Item {
                 visible: selectedFileName !== ""
                 elide: Text.ElideMiddle
                 horizontalAlignment: Text.AlignHCenter
+            }
+        }
+    }
+
+    function jumpToPage(value) {
+        const n = parseInt(value);
+        if (!isNaN(n)) {
+            currentPage = Math.max(0, Math.min(totalPages - 1, n - 1));
+        }
+        pageJumpPopup.visible = false;
+    }
+
+    // Click anywhere outside an open overlay to dismiss it.
+    MouseArea {
+        anchors.fill: parent
+        z: 99
+        visible: sortMenu.visible || pageJumpPopup.visible
+        enabled: visible
+        onClicked: closeOverlays()
+    }
+
+    BackdropBlur {
+        visible: sortMenu.visible
+        z: 100
+        width: sortMenu.width
+        height: sortMenu.height
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.rightMargin: Theme.spacingM
+        anchors.bottomMargin: 56
+        radius: Theme.cornerRadius
+        sourceItem: contentColumn
+    }
+
+    FileBrowserSortMenu {
+        id: sortMenu
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.rightMargin: Theme.spacingM
+        anchors.bottomMargin: 56
+        z: 101
+        surfaceColor: Theme.readableSurface
+        sortBy: root.sortBy
+        sortAscending: root.sortAscending
+        onSortBySelected: value => {
+            root.sortBy = value;
+            root.persistSort();
+        }
+        onSortOrderSelected: ascending => {
+            root.sortAscending = ascending;
+            root.persistSort();
+        }
+    }
+
+    BackdropBlur {
+        visible: pageJumpPopup.visible
+        z: 100
+        width: pageJumpPopup.width
+        height: pageJumpPopup.height
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 56
+        radius: Theme.cornerRadius
+        sourceItem: contentColumn
+    }
+
+    StyledRect {
+        id: pageJumpPopup
+        width: 180
+        height: jumpColumn.height + Theme.spacingM * 2
+        color: Theme.readableSurface
+        radius: Theme.cornerRadius
+        border.color: Theme.outlineMedium
+        border.width: 1
+        visible: false
+        z: 101
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 56
+
+        onVisibleChanged: {
+            if (visible) {
+                pageJumpField.text = (root.currentPage + 1).toString();
+                pageJumpField.forceActiveFocus();
+                pageJumpField.selectAll();
+            }
+        }
+
+        Column {
+            id: jumpColumn
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.margins: Theme.spacingM
+            spacing: Theme.spacingXS
+
+            StyledText {
+                text: I18n.tr("Jump to page (1 - %1)").arg(root.totalPages)
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.surfaceTextMedium
+                font.weight: Font.Medium
+            }
+
+            DankTextField {
+                id: pageJumpField
+                width: parent.width
+                placeholderText: "1 - " + root.totalPages
+                maximumLength: 6
+                topPadding: Theme.spacingS
+                bottomPadding: Theme.spacingS
+                validator: IntValidator {
+                    bottom: 1
+                    top: root.totalPages
+                }
+                onAccepted: root.jumpToPage(text)
             }
         }
     }

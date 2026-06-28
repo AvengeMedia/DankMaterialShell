@@ -131,7 +131,9 @@ func (m *Manager) SetInterval(seconds int) {
 	}
 	m.mu.Lock()
 	m.state.IntervalSeconds = seconds
+	m.state.NextCheckUnix = time.Now().Unix() + int64(seconds)
 	m.mu.Unlock()
+	m.wake()
 	m.markDirty()
 }
 
@@ -182,15 +184,24 @@ func (m *Manager) Cancel() {
 
 func (m *Manager) Acquire() {
 	atomic.AddInt32(&m.acquireCount, 1)
-	select {
-	case m.wakeSched <- struct{}{}:
-	default:
+	m.mu.Lock()
+	if m.state.NextCheckUnix == 0 {
+		m.state.NextCheckUnix = time.Now().Unix() + int64(m.state.IntervalSeconds)
 	}
+	m.mu.Unlock()
+	m.wake()
 }
 
 func (m *Manager) Release() {
 	if atomic.AddInt32(&m.acquireCount, -1) < 0 {
 		atomic.StoreInt32(&m.acquireCount, 0)
+	}
+}
+
+func (m *Manager) wake() {
+	select {
+	case m.wakeSched <- struct{}{}:
+	default:
 	}
 }
 
@@ -208,11 +219,17 @@ func (m *Manager) scheduler() {
 
 		m.mu.RLock()
 		interval := m.state.IntervalSeconds
+		next := m.state.NextCheckUnix
 		m.mu.RUnlock()
 		if interval < minIntervalSeconds {
 			interval = minIntervalSeconds
 		}
-		t := time.NewTimer(time.Duration(interval) * time.Second)
+		now := time.Now().Unix()
+		if next == 0 {
+			next = now + int64(interval)
+		}
+		wait := max(time.Duration(next-now)*time.Second, 0)
+		t := time.NewTimer(wait)
 		select {
 		case <-m.stopChan:
 			t.Stop()
@@ -279,13 +296,13 @@ func (m *Manager) runRefresh(parent context.Context) {
 		m.state.Packages = append(m.state.Packages, r.pkgs...)
 	}
 	m.state.Count = len(m.state.Packages)
+	m.state.NextCheckUnix = now + int64(m.state.IntervalSeconds)
 	if firstErr != nil {
 		m.state.Phase = PhaseError
 		m.state.Error = &ErrorInfo{Code: ErrCodeBackendFailed, Message: firstErr.Error()}
 	} else {
 		m.state.Phase = PhaseIdle
 		m.state.LastSuccessUnix = now
-		m.state.NextCheckUnix = now + int64(m.state.IntervalSeconds)
 	}
 	m.mu.Unlock()
 	m.markDirty()

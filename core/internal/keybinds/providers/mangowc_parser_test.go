@@ -6,6 +6,29 @@ import (
 	"testing"
 )
 
+func TestMangoWCParseAxisBindToScrollKey(t *testing.T) {
+	tmpDir := t.TempDir()
+	cfg := filepath.Join(tmpDir, "config.conf")
+	content := "axisbind=SUPER,UP,spawn,dms ipc call test\n"
+	if err := os.WriteFile(cfg, []byte(content), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	binds, err := ParseMangoWCKeys(cfg)
+	if err != nil {
+		t.Fatalf("ParseMangoWCKeys failed: %v", err)
+	}
+	if len(binds) != 1 {
+		t.Fatalf("expected 1 bind, got %d", len(binds))
+	}
+	if binds[0].Key != "WheelScrollUp" {
+		t.Fatalf("expected axis direction parsed as WheelScrollUp, got %q", binds[0].Key)
+	}
+	if len(binds[0].Mods) != 1 || binds[0].Mods[0] != "SUPER" {
+		t.Fatalf("expected SUPER mod, got %v", binds[0].Mods)
+	}
+}
+
 func TestMangoWCAutogenerateComment(t *testing.T) {
 	tests := []struct {
 		command  string

@@ -26,6 +26,19 @@ DankPopout {
         open();
     }
 
+    function prepareForTrigger(triggerSource) {
+        switch (triggerSource) {
+        case "memory":
+            DgopService.setSortBy("memory");
+            break;
+        case "cpu":
+        case "cpu_temp":
+        case "gpu_temp":
+            DgopService.setSortBy("cpu");
+            break;
+        }
+    }
+
     popupWidth: Math.round(Theme.fontSizeMedium * 46)
     popupHeight: Math.round(Theme.fontSizeMedium * 39)
     triggerWidth: 55

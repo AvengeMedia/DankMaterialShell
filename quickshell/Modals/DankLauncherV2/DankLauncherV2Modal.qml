@@ -24,6 +24,7 @@ Item {
     readonly property string resolvedConnectedBarSide: impl.item ? (impl.item.resolvedConnectedBarSide ?? "") : ""
     readonly property bool launcherArcExtenderActive: impl.item ? (impl.item.launcherArcExtenderActive ?? false) : false
     property bool triggerUsesOverlayLayer: false
+    property bool edgeHoverManaged: false
 
     signal dialogClosed
 

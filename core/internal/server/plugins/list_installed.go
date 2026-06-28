@@ -3,7 +3,6 @@ package plugins
 import (
 	"fmt"
 	"net"
-	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/plugins"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
@@ -47,21 +46,9 @@ func HandleListInstalled(conn net.Conn, req models.Request) {
 				hasUpdate = hasUpdates
 			}
 
-			result = append(result, PluginInfo{
-				ID:           plugin.ID,
-				Name:         plugin.Name,
-				Category:     plugin.Category,
-				Author:       plugin.Author,
-				Description:  plugin.Description,
-				Repo:         plugin.Repo,
-				Path:         plugin.Path,
-				Capabilities: plugin.Capabilities,
-				Compositors:  plugin.Compositors,
-				Dependencies: plugin.Dependencies,
-				FirstParty:   strings.HasPrefix(plugin.Repo, "https://github.com/AvengeMedia"),
-				HasUpdate:    hasUpdate,
-				RequiresDMS:  plugin.RequiresDMS,
-			})
+			info := pluginInfoFromPlugin(plugin)
+			info.HasUpdate = hasUpdate
+			result = append(result, info)
 		} else {
 			result = append(result, PluginInfo{
 				ID:   id,

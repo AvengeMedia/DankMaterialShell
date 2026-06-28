@@ -113,8 +113,7 @@ Singleton {
     }
 
     function getAppIcon(appId: string, desktopEntry: var): string {
-        // ! TODO - after QS 0.3, we can install our icon properly
-        if (appId === "org.quickshell" || appId === "com.danklinux.dms") {
+        if (appId === "org.quickshell") {
             return Qt.resolvedUrl("../assets/danklogo.svg");
         }
 

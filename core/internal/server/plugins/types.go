@@ -8,6 +8,7 @@ type PluginInfo struct {
 	Description  string   `json:"description,omitempty"`
 	Repo         string   `json:"repo,omitempty"`
 	Path         string   `json:"path,omitempty"`
+	Screenshot   string   `json:"screenshot,omitempty"`
 	Capabilities []string `json:"capabilities,omitempty"`
 	Compositors  []string `json:"compositors,omitempty"`
 	Dependencies []string `json:"dependencies,omitempty"`
@@ -17,6 +18,10 @@ type PluginInfo struct {
 	Note         string   `json:"note,omitempty"`
 	HasUpdate    bool     `json:"hasUpdate,omitempty"`
 	RequiresDMS  string   `json:"requires_dms,omitempty"`
+	Upvotes      int      `json:"upvotes,omitempty"`
+	Status       []string `json:"status,omitempty"`
+	IssueURL     string   `json:"issueUrl,omitempty"`
+	Similar      []string `json:"similar,omitempty"`
 }
 
 type SuccessResult struct {

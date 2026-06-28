@@ -71,29 +71,22 @@ Item {
     readonly property string effectiveScreenName: {
         if (!SettingsData.workspaceFollowFocus)
             return root.screenName;
-
-        switch (CompositorService.compositor) {
-        case "niri":
-            return NiriService.currentOutput || root.screenName;
-        case "hyprland":
-            return Hyprland.focusedWorkspace?.monitor?.name || root.screenName;
-        case "mango":
-            return MangoService.activeOutput || root.screenName;
-        case "sway":
-        case "scroll":
-        case "miracle":
-            const focusedWs = I3.workspaces?.values?.find(ws => ws.focused === true);
-            return focusedWs?.monitor?.name || root.screenName;
-        default:
-            return root.screenName;
-        }
+        return BarWidgetService.getFocusedScreenName() || root.screenName;
     }
     readonly property bool mangoOverviewActive: CompositorService.isMango && MangoService.isOutputInOverview(effectiveScreenName)
+
+    readonly property bool isFocusedMonitor: {
+        const focused = BarWidgetService.getFocusedScreenName();
+        return focused === "" || root.screenName === "" || focused === root.screenName;
+    }
+    readonly property bool useUnfocusedAppearance: !isFocusedMonitor && SettingsData.workspaceUnfocusedMonitorSeparateAppearance && BarWidgetService.focusedScreenDetectionSupported
 
     readonly property var extProjection: (useExtWorkspace && parentScreen) ? WindowManager.screenProjection(parentScreen) : null
     readonly property bool useExtWorkspace: {
         if (Quickshell.env("DMS_FORCE_EXTWS") === "1")
             return (WindowManager.windowsets?.length ?? 0) > 0;
+        if (!CompositorService.compositorDetected)
+            return false;
         switch (CompositorService.compositor) {
         case "niri":
         case "hyprland":
@@ -1229,23 +1222,36 @@ Item {
                     }
                 }
 
-                readonly property color unfocusedColor: colorFromMode(SettingsData.workspaceUnfocusedColorMode, Theme.surfaceTextAlpha, SettingsData.workspaceUnfocusedCustomColor, Theme.surfaceTextAlpha)
+                function effectiveColorMode(focusedMode, unfocusedMode) {
+                    return root.useUnfocusedAppearance ? unfocusedMode : focusedMode;
+                }
+
+                function effectiveCustomColor(focusedCustom, unfocusedCustom) {
+                    return root.useUnfocusedAppearance ? unfocusedCustom : focusedCustom;
+                }
+
+                readonly property color unfocusedColor: colorFromMode(effectiveColorMode(SettingsData.workspaceUnfocusedColorMode, SettingsData.workspaceUnfocusedMonitorUnfocusedColorMode), Theme.surfaceTextAlpha, effectiveCustomColor(SettingsData.workspaceUnfocusedCustomColor, SettingsData.workspaceUnfocusedMonitorUnfocusedCustomColor), Theme.surfaceTextAlpha)
 
                 readonly property color activeColor: {
-                    if (SettingsData.workspaceColorMode === "none")
+                    const mode = effectiveColorMode(SettingsData.workspaceColorMode, SettingsData.workspaceUnfocusedMonitorColorMode);
+                    if (mode === "none")
                         return unfocusedColor;
-                    return colorFromMode(SettingsData.workspaceColorMode, Theme.primary, SettingsData.workspaceFocusedCustomColor, Theme.primary);
+                    return colorFromMode(mode, Theme.primary, effectiveCustomColor(SettingsData.workspaceFocusedCustomColor, SettingsData.workspaceUnfocusedMonitorFocusedCustomColor), Theme.primary);
                 }
 
                 readonly property color occupiedColor: {
-                    if (SettingsData.workspaceOccupiedColorMode === "none")
+                    const mode = effectiveColorMode(SettingsData.workspaceOccupiedColorMode, SettingsData.workspaceUnfocusedMonitorOccupiedColorMode);
+                    if (mode === "none")
                         return unfocusedColor;
-                    return colorFromMode(SettingsData.workspaceOccupiedColorMode, unfocusedColor, SettingsData.workspaceOccupiedCustomColor, Theme.secondary);
+                    return colorFromMode(mode, unfocusedColor, effectiveCustomColor(SettingsData.workspaceOccupiedCustomColor, SettingsData.workspaceUnfocusedMonitorOccupiedCustomColor), Theme.secondary);
                 }
 
-                readonly property color urgentColor: colorFromMode(SettingsData.workspaceUrgentColorMode, Theme.error, SettingsData.workspaceUrgentCustomColor, Theme.error)
+                readonly property color urgentColor: colorFromMode(effectiveColorMode(SettingsData.workspaceUrgentColorMode, SettingsData.workspaceUnfocusedMonitorUrgentColorMode), Theme.error, effectiveCustomColor(SettingsData.workspaceUrgentCustomColor, SettingsData.workspaceUnfocusedMonitorUrgentCustomColor), Theme.error)
 
-                readonly property color focusedBorderColor: colorFromMode(SettingsData.workspaceFocusedBorderColor, Theme.primary, SettingsData.workspaceFocusedBorderCustomColor, Theme.primary)
+                readonly property color focusedBorderColor: colorFromMode(effectiveColorMode(SettingsData.workspaceFocusedBorderColor, SettingsData.workspaceUnfocusedMonitorBorderColor), Theme.primary, effectiveCustomColor(SettingsData.workspaceFocusedBorderCustomColor, SettingsData.workspaceUnfocusedMonitorBorderCustomColor), Theme.primary)
+
+                readonly property bool focusedBorderEnabledForMonitor: root.useUnfocusedAppearance ? SettingsData.workspaceUnfocusedMonitorBorderEnabled : SettingsData.workspaceFocusedBorderEnabled
+                readonly property int focusedBorderThicknessForMonitor: root.useUnfocusedAppearance ? SettingsData.workspaceUnfocusedMonitorBorderThickness : SettingsData.workspaceFocusedBorderThickness
 
                 function getContrastingIconColor(bgColor) {
                     const luminance = 0.299 * bgColor.r + 0.587 * bgColor.g + 0.114 * bgColor.b;
@@ -1447,17 +1453,17 @@ Item {
                     x: root.isVertical ? (root.widgetHeight - width) / 2 : (parent.width - width) / 2
                     y: root.isVertical ? (parent.height - height) / 2 : (root.widgetHeight - height) / 2
                     width: {
-                        const borderWidth = (SettingsData.workspaceFocusedBorderEnabled && isActive && !isPlaceholder) ? SettingsData.workspaceFocusedBorderThickness : 0;
+                        const borderWidth = (delegateRoot.focusedBorderEnabledForMonitor && isActive && !isPlaceholder) ? delegateRoot.focusedBorderThicknessForMonitor : 0;
                         return delegateRoot.visualWidth + borderWidth * 2;
                     }
                     height: {
-                        const borderWidth = (SettingsData.workspaceFocusedBorderEnabled && isActive && !isPlaceholder) ? SettingsData.workspaceFocusedBorderThickness : 0;
+                        const borderWidth = (delegateRoot.focusedBorderEnabledForMonitor && isActive && !isPlaceholder) ? delegateRoot.focusedBorderThicknessForMonitor : 0;
                         return delegateRoot.visualHeight + borderWidth * 2;
                     }
                     radius: Theme.cornerRadius
                     color: "transparent"
-                    border.width: (SettingsData.workspaceFocusedBorderEnabled && isActive && !isPlaceholder) ? SettingsData.workspaceFocusedBorderThickness : 0
-                    border.color: (SettingsData.workspaceFocusedBorderEnabled && isActive && !isPlaceholder) ? focusedBorderColor : "transparent"
+                    border.width: (delegateRoot.focusedBorderEnabledForMonitor && isActive && !isPlaceholder) ? delegateRoot.focusedBorderThicknessForMonitor : 0
+                    border.color: (delegateRoot.focusedBorderEnabledForMonitor && isActive && !isPlaceholder) ? focusedBorderColor : "transparent"
 
                     Behavior on width {
                         NumberAnimation {

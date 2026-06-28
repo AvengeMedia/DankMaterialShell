@@ -24,6 +24,8 @@ FloatingWindow {
     property string categoryFilter: "all"
     property var categoryFilterOptions: []
     property var availableLetters: []
+    property string expandedPluginId: ""
+    property string enlargedPreviewPluginId: ""
 
     readonly property bool activeCategorySort: normalizedSortMode(SessionData.pluginBrowserSortMode) === "category"
     readonly property bool showCategoryFilters: activeCategorySort && categoryFilterOptions.length > 1
@@ -34,13 +36,18 @@ FloatingWindow {
 
     readonly property var sortChipOptions: [
         {
+            id: "hideInstalled",
+            label: I18n.tr("Hide installed", "plugin browser filter chip"),
+            toggle: true
+        },
+        {
             id: "installed",
-            label: I18n.tr("Installed", "plugin browser filter chip"),
+            label: I18n.tr("Installed first", "plugin browser filter chip"),
             toggle: true
         },
         {
             id: "default",
-            label: I18n.tr("Default", "plugin browser sort option"),
+            label: I18n.tr("Votes", "plugin browser sort option"),
             toggle: false
         },
         {
@@ -69,8 +76,11 @@ FloatingWindow {
     }
 
     function isSortChipSelected(chipId, toggle) {
-        if (toggle)
+        if (toggle) {
+            if (chipId === "hideInstalled")
+                return SessionData.pluginBrowserHideInstalled;
             return SessionData.pluginBrowserInstalledFirst;
+        }
         return normalizedSortMode(SessionData.pluginBrowserSortMode) === chipId;
     }
 
@@ -82,6 +92,57 @@ FloatingWindow {
         if (nameA > nameB)
             return 1;
         return 0;
+    }
+
+    function pluginReviewed(plugin) {
+        return (plugin.status || []).indexOf("reviewed") !== -1;
+    }
+
+    function statusColor(status) {
+        switch (status) {
+        case "broken":
+            return Theme.error;
+        case "unmaintained":
+            return Theme.warning;
+        case "reviewed":
+            return Theme.info;
+        default:
+            return Theme.outline;
+        }
+    }
+
+    function statusLabel(status) {
+        switch (status) {
+        case "broken":
+            return I18n.tr("broken", "plugin status");
+        case "unmaintained":
+            return I18n.tr("unmaintained", "plugin status");
+        case "deprecated":
+            return I18n.tr("deprecated", "plugin status");
+        case "reviewed":
+            return I18n.tr("reviewed", "plugin status");
+        default:
+            return status;
+        }
+    }
+
+    function relatedNames(plugin) {
+        if (!plugin || !plugin.similar || plugin.similar.length === 0)
+            return [];
+
+        var names = [];
+        for (var i = 0; i < plugin.similar.length; i++) {
+            var id = plugin.similar[i];
+            var name = id;
+            for (var j = 0; j < allPlugins.length; j++) {
+                if (allPlugins[j].id === id) {
+                    name = allPlugins[j].name || id;
+                    break;
+                }
+            }
+            names.push(name);
+        }
+        return names;
     }
 
     function comparePluginAuthor(a, b) {
@@ -215,6 +276,9 @@ FloatingWindow {
     }
 
     function updateFilteredPlugins() {
+        expandedPluginId = "";
+        enlargedPreviewPluginId = "";
+
         var baseFiltered = [];
         var query = searchQuery ? searchQuery.toLowerCase() : "";
 
@@ -257,6 +321,8 @@ FloatingWindow {
         }
 
         var filtered = baseFiltered.slice();
+        if (SessionData.pluginBrowserHideInstalled)
+            filtered = filtered.filter(p => !(p.installed || false));
         if (activeCategorySort && categoryFilter !== "all") {
             filtered = filtered.filter(p => {
                 var cat = (p.category || "").toLowerCase();
@@ -280,10 +346,14 @@ FloatingWindow {
                 return comparePluginAuthor(a, b);
             if (sortMode === "category")
                 return comparePluginCategory(a, b);
-            if (a.featured !== b.featured)
-                return a.featured ? -1 : 1;
-            if (a.firstParty !== b.firstParty)
-                return a.firstParty ? -1 : 1;
+            var votesA = a.upvotes || 0;
+            var votesB = b.upvotes || 0;
+            if (votesA !== votesB)
+                return votesB - votesA;
+            var verA = root.pluginReviewed(a);
+            var verB = root.pluginReviewed(b);
+            if (verA !== verB)
+                return verA ? -1 : 1;
             return comparePluginName(a, b);
         });
 
@@ -292,6 +362,35 @@ FloatingWindow {
         selectedIndex = -1;
         keyboardNavigationActive = false;
         refreshListLayout();
+    }
+
+    function pluginKey(plugin, fallbackIndex) {
+        if (!plugin)
+            return "plugin-" + fallbackIndex;
+        return plugin.id || plugin.name || ("plugin-" + fallbackIndex);
+    }
+
+    function toggleExpandedPlugin(pluginId) {
+        if (expandedPluginId === pluginId) {
+            expandedPluginId = "";
+            enlargedPreviewPluginId = "";
+        } else {
+            expandedPluginId = pluginId;
+            enlargedPreviewPluginId = "";
+        }
+        keyboardNavigationActive = false;
+        Qt.callLater(() => {
+            if (pluginBrowserList)
+                pluginBrowserList.forceLayout();
+        });
+    }
+
+    function toggleEnlargedPreview(pluginId) {
+        enlargedPreviewPluginId = enlargedPreviewPluginId === pluginId ? "" : pluginId;
+        Qt.callLater(() => {
+            if (pluginBrowserList)
+                pluginBrowserList.forceLayout();
+        });
     }
 
     function selectNext() {
@@ -399,6 +498,8 @@ FloatingWindow {
         selectedIndex = -1;
         keyboardNavigationActive = false;
         isLoading = false;
+        expandedPluginId = "";
+        enlargedPreviewPluginId = "";
     }
 
     Connections {
@@ -680,7 +781,10 @@ FloatingWindow {
                                 onPressed: mouse => chipRipple.trigger(mouse.x, mouse.y)
                                 onClicked: {
                                     if (modelData.toggle) {
-                                        SessionData.setPluginBrowserInstalledFirst(!SessionData.pluginBrowserInstalledFirst);
+                                        if (modelData.id === "hideInstalled")
+                                            SessionData.setPluginBrowserHideInstalled(!SessionData.pluginBrowserHideInstalled);
+                                        else
+                                            SessionData.setPluginBrowserInstalledFirst(!SessionData.pluginBrowserInstalledFirst);
                                     } else {
                                         if (modelData.id !== "category")
                                             root.categoryFilter = "all";
@@ -779,6 +883,8 @@ FloatingWindow {
                     }
 
                     delegate: Rectangle {
+                        id: pluginDelegate
+
                         width: pluginBrowserList.width
                         height: pluginDelegateColumn.implicitHeight + Theme.spacingM * 2
                         radius: Theme.cornerRadius
@@ -787,12 +893,26 @@ FloatingWindow {
                         property bool isFirstParty: modelData.firstParty || false
                         property bool isFeatured: modelData.featured || false
                         property bool isCompatible: PluginService.checkPluginCompatibility(modelData.requires_dms)
-                        color: isSelected ? Theme.primarySelected : Theme.withAlpha(Theme.surfaceVariant, 0.3)
+                        property string pluginId: root.pluginKey(modelData, index)
+                        property bool isExpanded: root.expandedPluginId === pluginId
+                        property bool isPreviewEnlarged: root.enlargedPreviewPluginId === pluginId
+                        property string screenshotUrl: modelData.screenshot || ""
+                        color: isSelected ? Theme.primarySelected : rowMouseArea.containsMouse ? Theme.withAlpha(Theme.surfaceVariant, 0.45) : Theme.withAlpha(Theme.surfaceVariant, 0.3)
                         border.color: isSelected ? Theme.primary : Theme.withAlpha(Theme.outline, 0.2)
                         border.width: isSelected ? 2 : 1
 
+                        MouseArea {
+                            id: rowMouseArea
+                            z: 0
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: root.toggleExpandedPlugin(pluginDelegate.pluginId)
+                        }
+
                         Column {
                             id: pluginDelegateColumn
+                            z: 1
                             anchors.fill: parent
                             anchors.margins: Theme.spacingM
                             spacing: Theme.spacingXS
@@ -895,13 +1015,70 @@ FloatingWindow {
                                                 font.weight: Font.Medium
                                             }
                                         }
+
+                                        Repeater {
+                                            model: modelData.status || []
+
+                                            Rectangle {
+                                                required property string modelData
+                                                height: 16
+                                                width: statusText.implicitWidth + Theme.spacingXS * 2
+                                                radius: 8
+                                                color: Theme.withAlpha(root.statusColor(modelData), 0.15)
+                                                border.color: Theme.withAlpha(root.statusColor(modelData), 0.4)
+                                                border.width: 1
+                                                anchors.verticalCenter: parent.verticalCenter
+
+                                                StyledText {
+                                                    id: statusText
+                                                    anchors.centerIn: parent
+                                                    text: root.statusLabel(parent.modelData)
+                                                    font.pixelSize: Theme.fontSizeSmall - 2
+                                                    color: root.statusColor(parent.modelData)
+                                                    font.weight: Font.Medium
+                                                }
+                                            }
+                                        }
+
+                                        Rectangle {
+                                            height: 16
+                                            width: upvoteRow.implicitWidth + Theme.spacingXS * 2
+                                            radius: 8
+                                            color: Theme.withAlpha(Theme.primary, 0.1)
+                                            border.color: Theme.withAlpha(Theme.primary, 0.3)
+                                            border.width: 1
+                                            visible: !!modelData.issueUrl
+                                            anchors.verticalCenter: parent.verticalCenter
+
+                                            Row {
+                                                id: upvoteRow
+                                                anchors.centerIn: parent
+                                                spacing: 2
+
+                                                DankIcon {
+                                                    name: "thumb_up"
+                                                    size: 10
+                                                    color: Theme.primary
+                                                    anchors.verticalCenter: parent.verticalCenter
+                                                }
+
+                                                StyledText {
+                                                    text: modelData.upvotes || 0
+                                                    font.pixelSize: Theme.fontSizeSmall - 2
+                                                    color: Theme.primary
+                                                    font.weight: Font.Medium
+                                                    anchors.verticalCenter: parent.verticalCenter
+                                                }
+                                            }
+                                        }
                                     }
 
                                     StyledText {
                                         text: {
                                             const author = I18n.tr("by %1", "author attribution").arg(modelData.author || I18n.tr("Unknown", "unknown author"));
                                             const source = modelData.repo ? ` • <a href="${modelData.repo}" style="text-decoration:none; color:${Theme.primary};">${I18n.tr("source", "source code link")}</a>` : "";
-                                            return author + source;
+                                            const discuss = modelData.issueUrl ? ` • <a href="${modelData.issueUrl}" style="text-decoration:none; color:${Theme.primary};">${I18n.tr("discuss", "plugin discussion link")}</a>` : "";
+                                            return author + source + discuss;
                                         }
                                         font.pixelSize: Theme.fontSizeSmall
                                         color: Theme.outline
@@ -917,6 +1094,15 @@ FloatingWindow {
                                             acceptedButtons: Qt.NoButton
                                             propagateComposedEvents: true
                                         }
+                                    }
+
+                                    StyledText {
+                                        visible: root.relatedNames(modelData).length > 0
+                                        text: I18n.tr("Related: %1", "related plugins").arg(root.relatedNames(modelData).join(", "))
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Theme.outline
+                                        elide: Text.ElideRight
+                                        width: parent.width
                                     }
                                 }
 
@@ -1062,6 +1248,76 @@ FloatingWindow {
                                             font.pixelSize: Theme.fontSizeSmall - 2
                                             color: Theme.primary
                                         }
+                                    }
+                                }
+                            }
+
+                            Rectangle {
+                                id: screenshotPreview
+                                width: parent.width
+                                height: pluginDelegate.isExpanded ? (pluginDelegate.isPreviewEnlarged ? Math.min(620, Math.max(320, width * 0.78)) : Math.min(260, Math.max(150, width * 0.42))) : 0
+                                visible: height > 0
+                                clip: true
+                                radius: Theme.cornerRadius
+                                color: Theme.surfaceContainerHigh
+                                border.color: Theme.withAlpha(Theme.outline, 0.2)
+                                border.width: 1
+
+                                Behavior on height {
+                                    NumberAnimation {
+                                        duration: Theme.shortDuration
+                                        easing.type: Theme.standardEasing
+                                    }
+                                }
+
+                                Loader {
+                                    id: screenshotImageLoader
+                                    anchors.fill: parent
+                                    anchors.margins: 1
+                                    active: pluginDelegate.isExpanded && pluginDelegate.screenshotUrl.length > 0
+
+                                    sourceComponent: CachingImage {
+                                        imagePath: pluginDelegate.screenshotUrl
+                                        maxCacheSize: pluginDelegate.isPreviewEnlarged ? 1600 : 960
+                                        fillMode: Image.PreserveAspectFit
+                                        visible: status !== Image.Error
+                                    }
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    enabled: screenshotImageLoader.item && screenshotImageLoader.item.status === Image.Ready
+                                    hoverEnabled: enabled
+                                    cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+                                    onClicked: mouse => {
+                                        mouse.accepted = true;
+                                        root.toggleEnlargedPreview(pluginDelegate.pluginId);
+                                    }
+                                }
+
+                                DankSpinner {
+                                    anchors.centerIn: parent
+                                    running: screenshotImageLoader.active && screenshotImageLoader.item && screenshotImageLoader.item.status === Image.Loading
+                                    visible: running
+                                }
+
+                                Column {
+                                    anchors.centerIn: parent
+                                    spacing: Theme.spacingXS
+                                    visible: pluginDelegate.isExpanded && (pluginDelegate.screenshotUrl.length === 0 || (screenshotImageLoader.item && screenshotImageLoader.item.status === Image.Error))
+
+                                    DankIcon {
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                        name: screenshotImageLoader.item && screenshotImageLoader.item.status === Image.Error ? "broken_image" : "image_not_supported"
+                                        size: Theme.iconSize
+                                        color: Theme.outline
+                                    }
+
+                                    StyledText {
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                        text: screenshotImageLoader.item && screenshotImageLoader.item.status === Image.Error ? I18n.tr("Screenshot unavailable", "plugin browser screenshot error") : I18n.tr("No screenshot provided", "plugin browser no screenshot")
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Theme.outline
                                     }
                                 }
                             }

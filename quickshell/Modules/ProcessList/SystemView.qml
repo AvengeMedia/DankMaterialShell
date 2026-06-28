@@ -78,7 +78,7 @@ Item {
                     }
                     InfoRow {
                         label: I18n.tr("Uptime")
-                        value: DgopService.uptime || "--"
+                        value: DgopService.uptime ? DgopService.uptime.slice(3) : "--"
                     }
                     InfoRow {
                         label: I18n.tr("Load Average", "system info label")

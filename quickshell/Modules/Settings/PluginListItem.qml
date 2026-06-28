@@ -316,11 +316,10 @@ StyledRect {
                         const currentPluginName = root.pluginName;
 
                         if (isChecked) {
-                            if (PluginService.enablePlugin(currentPluginId)) {
-                                ToastService.showInfo(I18n.tr("Plugin enabled: %1").arg(currentPluginName));
-                                return;
-                            }
-                            ToastService.showError(I18n.tr("Failed to enable plugin: %1").arg(currentPluginName));
+                            PluginService.enablePlugin(currentPluginId, ok => {
+                                if (ok)
+                                    ToastService.showInfo(I18n.tr("Plugin enabled: %1").arg(currentPluginName));
+                            });
                             return;
                         }
                         if (PluginService.disablePlugin(currentPluginId)) {

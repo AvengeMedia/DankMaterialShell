@@ -110,7 +110,7 @@ Item {
     Component.onCompleted: _scheduleLifecycleKick()
     Component.onDestruction: {
         lifecycleKickAction.cancel();
-        if (targetWindow)
+        if (targetWindow && targetWindow.BackgroundEffect)
             targetWindow.BackgroundEffect.blurRegion = null;
     }
 }

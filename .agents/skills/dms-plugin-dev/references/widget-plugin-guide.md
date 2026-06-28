@@ -235,9 +235,11 @@ Conditionally show/hide the bar pill:
 ```qml
 PluginComponent {
     visibilityCommand: "pgrep -x myapp"
-    visibilityInterval: 5  // seconds between checks; polling pauses while the bar is hidden
+    visibilityInterval: 5  // seconds between checks
 }
 ```
+
+**Bar reveal optimization:** The visibility timer automatically pauses while the bar is hidden (auto-hide mode) and resumes checks when the bar is revealed. This is handled via the internal `_barRevealed` property - no plugin code needed. Plugins using `visibilityCommand` with `visibilityInterval` benefit from this automatically.
 
 ## Popout Namespace
 

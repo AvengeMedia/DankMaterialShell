@@ -121,6 +121,8 @@ type NetworkState struct {
 	ConnectingSSID         string               `json:"connectingSSID"`
 	ConnectingDevice       string               `json:"connectingDevice,omitempty"`
 	LastError              string               `json:"lastError"`
+	VPNError               string               `json:"vpnError"`
+	VPNErrorUuid           string               `json:"vpnErrorUuid"`
 }
 
 type ConnectionRequest struct {

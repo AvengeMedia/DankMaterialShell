@@ -219,6 +219,24 @@ FocusScope {
             }
             event.accepted = false;
             return;
+        case Qt.Key_L:
+            if (hasCtrl) {
+                if (controller.getCurrentSectionViewMode() !== "list") {
+                    controller.selectRight();
+                }
+                return;
+            }
+            event.accepted = false;
+            return;
+        case Qt.Key_H:
+            if (hasCtrl) {
+                if (controller.getCurrentSectionViewMode() !== "list") {
+                    controller.selectLeft();
+                }
+                return;
+            }
+            event.accepted = false;
+            return;
         case Qt.Key_N:
             if (hasCtrl) {
                 controller.selectNextSection();
