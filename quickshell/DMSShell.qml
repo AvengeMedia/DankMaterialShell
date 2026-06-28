@@ -233,6 +233,12 @@ Item {
         sourceComponent: Frame {}
     }
 
+    Loader {
+        active: SettingsData.frameEnabled && SettingsData.frameLauncherEdgeHover
+        asynchronous: false
+        sourceComponent: FrameLauncherHoverZone {}
+    }
+
     DeferredAction {
         id: frameSurfaceReloadAction
         onTriggered: root.frameSurfacesLoaded = true

@@ -362,7 +362,7 @@
       "wallpaper"
     ],
     "icon": "wallpaper",
-    "description": "Color shown for areas not covered by wallpaper (e.g. Fit or Pad modes)"
+    "description": "Color shown for areas not covered by wallpaper"
   },
   {
     "section": "selectedMonitor",
@@ -8138,6 +8138,36 @@
       "window"
     ],
     "icon": "monitor"
+  },
+  {
+    "section": "frameLauncherEdgeHover",
+    "label": "Edge Hover Reveal",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "app drawer",
+      "app menu",
+      "applications",
+      "border",
+      "connected",
+      "decoration",
+      "edge",
+      "emerge",
+      "frame",
+      "free",
+      "hover",
+      "hovering",
+      "launcher",
+      "open",
+      "panel",
+      "reveal",
+      "start menu",
+      "statusbar",
+      "taskbar",
+      "topbar",
+      "window"
+    ],
+    "description": "Open the launcher by hovering the emerge edge (when free of bar and dock)"
   },
   {
     "section": "frameEnable",

@@ -171,6 +171,8 @@ Item {
             scrollEnabled: defaultBar.scrollEnabled ?? true,
             scrollXBehavior: defaultBar.scrollXBehavior ?? "column",
             scrollYBehavior: defaultBar.scrollYBehavior ?? "workspace",
+            hoverPopouts: defaultBar.hoverPopouts ?? false,
+            hoverPopoutDelay: defaultBar.hoverPopoutDelay ?? 150,
             shadowIntensity: defaultBar.shadowIntensity ?? 0,
             shadowOpacity: defaultBar.shadowOpacity ?? 60,
             shadowDirectionMode: defaultBar.shadowDirectionMode ?? "inherit",
@@ -1249,6 +1251,50 @@ Item {
                             target: gothCornerRadiusSlider
                             property: "value"
                             value: selectedBarConfig?.gothCornerRadiusValue ?? 12
+                            restoreMode: Binding.RestoreBinding
+                        }
+                    }
+                }
+            }
+
+            SettingsToggleCard {
+                iconName: "touch_app"
+                title: I18n.tr("Hover Popouts")
+                description: I18n.tr("Open widget popouts by hovering over the bar. Moving to another widget switches the popout.")
+                visible: !dankBarTab.appearanceOnly && selectedBarConfig?.enabled
+                enabled: !(selectedBarConfig?.clickThrough ?? false)
+                opacity: (selectedBarConfig?.clickThrough ?? false) ? 0.5 : 1.0
+                checked: selectedBarConfig?.hoverPopouts ?? false
+                onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
+                        hoverPopouts: checked
+                    })
+
+                Column {
+                    width: parent.width
+                    spacing: Theme.spacingS
+                    visible: selectedBarConfig?.hoverPopouts ?? false
+                    leftPadding: Theme.spacingM
+
+                    SettingsSliderRow {
+                        id: hoverDelaySlider
+                        width: parent.width - parent.leftPadding
+                        text: I18n.tr("Open Delay")
+                        description: I18n.tr("Time to rest on a widget before its popout opens")
+                        value: selectedBarConfig?.hoverPopoutDelay ?? 150
+                        minimum: 0
+                        maximum: 1000
+                        unit: "ms"
+                        defaultValue: 150
+                        onSliderValueChanged: newValue => {
+                            SettingsData.updateBarConfig(selectedBarId, {
+                                hoverPopoutDelay: newValue
+                            });
+                        }
+
+                        Binding {
+                            target: hoverDelaySlider
+                            property: "value"
+                            value: selectedBarConfig?.hoverPopoutDelay ?? 150
                             restoreMode: Binding.RestoreBinding
                         }
                     }

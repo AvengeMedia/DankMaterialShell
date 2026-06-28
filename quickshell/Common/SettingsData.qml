@@ -291,6 +291,8 @@ Singleton {
     onFrameLauncherEmergeSideChanged: saveSettings()
     property bool frameLauncherArcExtender: false
     onFrameLauncherArcExtenderChanged: saveSettings()
+    property bool frameLauncherEdgeHover: false
+    onFrameLauncherEdgeHoverChanged: saveSettings()
     readonly property string frameModalEmergeSide: frameLauncherEmergeSide === "top" ? "bottom" : "top"
     property string frameMode: "connected"
     onFrameModeChanged: saveSettings()
@@ -603,9 +605,9 @@ Singleton {
         if (!on && id !== "settings" && current.filter(t => t.enabled && t.id !== "settings").length <= 1)
             return;
         dashTabs = current.map(t => t.id === id ? {
-            "id": t.id,
-            "enabled": on
-        } : t);
+                "id": t.id,
+                "enabled": on
+            } : t);
     }
 
     function resetDashTabs() {
@@ -999,7 +1001,9 @@ Singleton {
             "shadowOpacity": 60,
             "shadowColorMode": "default",
             "shadowCustomColor": "#000000",
-            "clickThrough": false
+            "clickThrough": false,
+            "hoverPopouts": false,
+            "hoverPopoutDelay": 150
         }
     ]
 
@@ -2434,6 +2438,46 @@ Singleton {
 
     function getEnabledBarConfigs() {
         return barConfigs.filter(cfg => cfg.enabled);
+    }
+
+    function _sideToPosition(side) {
+        switch (side) {
+        case "top":
+            return SettingsData.Position.Top;
+        case "bottom":
+            return SettingsData.Position.Bottom;
+        case "left":
+            return SettingsData.Position.Left;
+        case "right":
+            return SettingsData.Position.Right;
+        }
+        return -1;
+    }
+
+    // Check if a bar occupies the specified screen edge
+    function barOccupiesSide(screen, side) {
+        if (!screen)
+            return false;
+        const sidePos = _sideToPosition(side);
+        if (sidePos < 0)
+            return false;
+        const bars = getEnabledBarConfigs();
+        for (var i = 0; i < bars.length; i++) {
+            const bc = bars[i];
+            if (bc.position !== sidePos)
+                continue;
+            const prefs = bc.screenPreferences || ["all"];
+            if (prefs.includes("all") || isScreenInPreferences(screen, prefs))
+                return true;
+        }
+        return false;
+    }
+
+    // Check if the dock occupies the specified screen edge.
+    function dockOccupiesSide(side) {
+        if (!showDock)
+            return false;
+        return dockPosition === _sideToPosition(side);
     }
 
     function getScreensSortedByPosition() {

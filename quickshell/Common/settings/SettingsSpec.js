@@ -569,7 +569,9 @@ var SPEC = {
             shadowOpacity: 60,
             shadowColorMode: "default",
             shadowCustomColor: "#000000",
-            clickThrough: false
+            clickThrough: false,
+            hoverPopouts: false,
+            hoverPopoutDelay: 150
         }], onChange: "updateBarConfigs"
     },
 
@@ -642,6 +644,7 @@ var SPEC = {
     frameCloseGaps: { def: true },
     frameLauncherEmergeSide: { def: "bottom" },
     frameLauncherArcExtender: { def: false },
+    frameLauncherEdgeHover: { def: false },
     frameMode: { def: "connected" },
     barInsetPaddingShared: { def: -1 },
     barInsetPaddingSyncAll: { def: false },

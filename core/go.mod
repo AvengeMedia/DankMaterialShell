@@ -22,7 +22,6 @@ require (
 	github.com/yuin/goldmark-highlighting/v2 v2.0.0-20230729083705-37449abec8cc
 	go.etcd.io/bbolt v1.4.3
 	go4.org/mem v0.0.0-20240501181205-ae6ca9944745
-	golang.org/x/exp v0.0.0-20260410095643-746e56fc9e2f
 	golang.org/x/image v0.39.0
 	tailscale.com v1.96.5
 )
@@ -64,6 +63,7 @@ require (
 	github.com/yeqown/reedsolomon v1.0.0 // indirect
 	go4.org/netipx v0.0.0-20231129151722-fdeea329fbba // indirect
 	golang.org/x/crypto v0.50.0 // indirect
+	golang.org/x/exp v0.0.0-20260410095643-746e56fc9e2f // indirect
 	golang.org/x/net v0.53.0 // indirect
 	golang.org/x/sync v0.20.0 // indirect
 	golang.zx2c4.com/wireguard/windows v1.0.1 // indirect

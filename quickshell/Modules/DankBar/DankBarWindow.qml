@@ -719,6 +719,14 @@ PanelWindow {
     readonly property var _rightSection: topBarContent ? (barWindow.isVertical ? topBarContent.vRightSection : topBarContent.hRightSection) : null
     readonly property real _revealProgress: topBarSlide.x + topBarSlide.y
 
+    function containsGlobalPoint(gx, gy, padding) {
+        const pad = padding !== undefined ? padding : 16;
+        if (!inputMask.showing)
+            return false;
+        const topLeft = inputMask.mapToItem(null, 0, 0);
+        return gx >= topLeft.x - pad && gx < topLeft.x + inputMask.width + pad && gy >= topLeft.y - pad && gy < topLeft.y + inputMask.height + pad;
+    }
+
     function sectionRect(section, isCenter, _dep) {
         if (!section)
             return {
@@ -1020,7 +1028,7 @@ PanelWindow {
                             }
                         }
 
-                        onWheel: wheel => {
+                        function processWheel(wheel) {
                             if (!(barConfig?.scrollEnabled ?? true) || actionInProgress) {
                                 wheel.accepted = false;
                                 return;
@@ -1089,6 +1097,8 @@ PanelWindow {
 
                             wheel.accepted = false;
                         }
+
+                        onWheel: wheel => processWheel(wheel)
                     }
 
                     DankBarContent {
@@ -1099,6 +1109,26 @@ PanelWindow {
                         leftWidgetsModel: barWindow.leftWidgetsModel
                         centerWidgetsModel: barWindow.centerWidgetsModel
                         rightWidgetsModel: barWindow.rightWidgetsModel
+                    }
+
+                    // Passive HoverHandler to track cursor without intercepting clicks or scroll events.
+                    HoverHandler {
+                        id: hoverPopoutHandler
+                        enabled: (barConfig?.hoverPopouts ?? false) && !barWindow.clickThroughEnabled
+
+                        property real lastGlobalX: 0
+                        property real lastGlobalY: 0
+
+                        onPointChanged: {
+                            const gp = barUnitInset.mapToItem(null, point.position.x, point.position.y);
+                            lastGlobalX = gp.x;
+                            lastGlobalY = gp.y;
+                            topBarContent.queueHoverPopout(gp.x, gp.y);
+                        }
+
+                        onHoveredChanged: {
+                            topBarContent.updateHoverBarHovered(hovered);
+                        }
                     }
                 }
             }
