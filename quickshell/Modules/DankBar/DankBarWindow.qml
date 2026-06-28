@@ -979,7 +979,26 @@ PanelWindow {
                         anchors.fill: parent
                         z: -2
                         acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
-                        onClicked: {
+                        onClicked: mouse => {
+                            if (mouse.button === Qt.MiddleButton) {
+                                const action = barConfig?.middleClickAction ?? "none"
+                                switch (action) {
+                                case "control-center":
+                                    barWindow.triggerControlCenter();
+                                    return;
+                                case "spotlight":
+                                    PopoutService.toggleDankLauncherV2();
+                                    return;
+                                case "close-window":
+                                    const active = ToplevelManager.activeToplevel;
+                                    if (active && typeof active.close === "function")
+                                        active.close();
+                                    return;
+                                case "settings":
+                                    PopoutService.toggleSettings();
+                                    return;
+                                }
+                            }
                             const screenName = barWindow.screen?.name;
                             if (!screenName)
                                 return;

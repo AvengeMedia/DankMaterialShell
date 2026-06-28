@@ -171,6 +171,7 @@ Item {
             scrollEnabled: defaultBar.scrollEnabled ?? true,
             scrollXBehavior: defaultBar.scrollXBehavior ?? "column",
             scrollYBehavior: defaultBar.scrollYBehavior ?? "workspace",
+            middleClickAction: defaultBar.middleClickAction ?? "none",
             hoverPopouts: defaultBar.hoverPopouts ?? false,
             hoverPopoutDelay: defaultBar.hoverPopoutDelay ?? 150,
             shadowIntensity: defaultBar.shadowIntensity ?? 0,
@@ -1933,6 +1934,52 @@ Item {
                         SettingsData.updateBarConfig(selectedBarId, {
                             scrollXBehavior: behavior
                         });
+                    }
+                }
+            }
+
+            SettingsCard {
+                iconName: "mouse"
+                title: I18n.tr("Mouse Click Action")
+                settingKey: "barMouseClickAction"
+                visible: !dankBarTab.appearanceOnly && selectedBarConfig?.enabled
+
+                SettingsDropdownRow {
+                    text: I18n.tr("Middle Click")
+                    description: I18n.tr("Choose what middle-clicking empty bar space does")
+                    settingKey: "barMiddleClickAction"
+                    options: [
+                        I18n.tr("None", "bar middle click action"),
+                        I18n.tr("Toggle Control Center", "bar middle click action"),
+                        I18n.tr("Toggle Launcher", "bar middle click action"),
+                        I18n.tr("Close Active Window", "bar middle click action"),
+                        I18n.tr("Toggle Settings", "bar middle click action")
+                    ]
+                    currentValue: {
+                        switch (selectedBarConfig?.middleClickAction ?? "none") {
+                        case "control-center":
+                            return I18n.tr("Toggle Control Center", "bar middle click action");
+                        case "spotlight":
+                            return I18n.tr("Toggle Launcher", "bar middle click action");
+                        case "close-window":
+                            return I18n.tr("Close Active Window", "bar middle click action");
+                        case "settings":
+                            return I18n.tr("Toggle Settings", "bar middle click action");
+                        default:
+                            return I18n.tr("None", "bar middle click action");
+                        }
+                    }
+                    onValueChanged: value => {
+                        if (value === I18n.tr("Toggle Control Center", "bar middle click action"))
+                            SettingsData.updateBarConfig(selectedBarId, { middleClickAction: "control-center" });
+                        else if (value === I18n.tr("Toggle Launcher", "bar middle click action"))
+                            SettingsData.updateBarConfig(selectedBarId, { middleClickAction: "spotlight" });
+                        else if (value === I18n.tr("Close Active Window", "bar middle click action"))
+                            SettingsData.updateBarConfig(selectedBarId, { middleClickAction: "close-window" });
+                        else if (value === I18n.tr("Toggle Settings", "bar middle click action"))
+                            SettingsData.updateBarConfig(selectedBarId, { middleClickAction: "settings" });
+                        else
+                            SettingsData.updateBarConfig(selectedBarId, { middleClickAction: "none" });
                     }
                 }
             }
