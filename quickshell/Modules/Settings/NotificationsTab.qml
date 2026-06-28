@@ -331,6 +331,16 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    settingKey: "notificationPopupBgDisabled"
+                    visible: SettingsData.connectedFrameModeActive
+                    tags: ["notification", "popup", "background", "color", "fill", "transparent", "blur"]
+                    text: I18n.tr("Disable Background Fill")
+                    description: I18n.tr("Render notification popups with no fill color, letting blur and border show through.")
+                    checked: SettingsData.notificationPopupBgDisabled
+                    onToggled: checked => SettingsData.set("notificationPopupBgDisabled", checked)
+                }
+
+                SettingsToggleRow {
                     settingKey: "notificationPopupPrivacyMode"
                     tags: ["notification", "popup", "privacy", "body", "content", "hide"]
                     text: I18n.tr("Privacy Mode")

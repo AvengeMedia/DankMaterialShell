@@ -647,7 +647,9 @@ PanelWindow {
             sourceWidth: Math.max(0, content.width - (content.cardInset * 2))
             sourceHeight: Math.max(0, content.height - (content.cardInset * 2))
             targetRadius: win.connectedFrameMode ? Theme.connectedSurfaceRadius : Theme.cornerRadius
-            targetColor: win.connectedFrameMode ? Theme.floatingSurface : Theme.readableSurface
+            targetColor: (win.connectedFrameMode && SettingsData.notificationPopupBgDisabled)
+                ? "transparent"
+                : (win.connectedFrameMode ? Theme.floatingSurface : Theme.readableSurface)
             borderColor: win.notificationData && win.notificationData.urgency === NotificationUrgency.Critical ? Theme.withAlpha(Theme.primary, 0.3) : Theme.withAlpha(Theme.outline, 0.08)
             borderWidth: win.notificationData && win.notificationData.urgency === NotificationUrgency.Critical ? 2 : 0
         }
