@@ -997,6 +997,7 @@ Singleton {
             "scrollEnabled": true,
             "scrollXBehavior": "column",
             "scrollYBehavior": "workspace",
+            "middleClickAction": "none",
             "shadowIntensity": 0,
             "shadowOpacity": 60,
             "shadowColorMode": "default",

@@ -979,7 +979,26 @@ PanelWindow {
                         anchors.fill: parent
                         z: -2
                         acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
-                        onClicked: {
+                        onClicked: mouse => {
+                            if (mouse.button === Qt.MiddleButton) {
+                                const action = barConfig?.middleClickAction ?? "none"
+                                switch (action) {
+                                case "control-center":
+                                    barWindow.triggerControlCenter();
+                                    return;
+                                case "spotlight":
+                                    Quickshell.execDetached(["dms", "ipc", "call", "spotlight", "toggle"]);
+                                    return;
+                                case "close-window":
+                                    const active = ToplevelManager.activeToplevel;
+                                    if (active && typeof active.close === "function")
+                                        active.close();
+                                    return;
+                                case "settings":
+                                    Quickshell.execDetached(["dms", "ipc", "call", "settings", "toggle"]);
+                                    return;
+                                }
+                            }
                             const screenName = barWindow.screen?.name;
                             if (!screenName)
                                 return;
