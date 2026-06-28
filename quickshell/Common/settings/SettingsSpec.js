@@ -184,6 +184,7 @@ var SPEC = {
     audioScrollMode: { def: "volume" },
     audioWheelScrollAmount: { def: 5 },
     audioDeviceScrollVolumeEnabled: { def: false },
+    mediaExcludePlayers: { def: [] },
     clockCompactMode: { def: false },
     focusedWindowCompactMode: { def: false },
     focusedWindowSize: { def: 1 },

@@ -434,7 +434,9 @@ FocusScope {
             visible: active
             focus: active
 
-            sourceComponent: MediaPlayerTab {}
+            sourceComponent: MediaPlayerTab {
+                parentModal: root.parentModal
+            }
 
             onActiveChanged: {
                 if (active && item)

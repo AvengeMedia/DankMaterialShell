@@ -2,9 +2,21 @@ import QtQuick
 import qs.Common
 import qs.Widgets
 import qs.Modules.Settings.Widgets
+import qs.Services
 
 Item {
     id: root
+
+    property var desktopApps: []
+    property var parentModal: null
+
+    Component.onCompleted: {
+        desktopApps = AppSearchService.getVisibleApplications() || [];
+    }
+
+    Component.onDestruction: {
+        desktopApps = [];
+    }
 
     DankFlickable {
         anchors.fill: parent
@@ -121,6 +133,149 @@ Item {
                     onToggled: checked => SettingsData.set("audioDeviceScrollVolumeEnabled", checked)
                 }
             }
+
+            SettingsCard {
+                width: parent.width
+                iconName: "do_not_disturb_on"
+                title: I18n.tr("Excluded Media Players")
+                settingKey: "mediaExcludePlayers"
+                tags: ["media", "music", "exclude", "ignore", "player", "mpris"]
+
+                Column {
+                    width: parent.width
+                    spacing: Theme.spacingM
+
+                    StyledText {
+                        text: I18n.tr("Prevent specific applications from displaying in the media controllers (e.g., browser audio streams, background tools). Matches player identity or desktop file name case-insensitively.")
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                        wrapMode: Text.WordWrap
+                        width: parent.width
+                    }
+
+                    Row {
+                        width: parent.width
+                        spacing: Theme.spacingS
+
+                        DankTextField {
+                            id: newExcludePlayerField
+                            width: parent.width - addBtn.width - selectAppBtn.width - Theme.spacingS * 2
+                            height: 36
+                            placeholderText: I18n.tr("App name or identity (e.g., firefox)")
+                            font.pixelSize: Theme.fontSizeSmall
+                            onAccepted: {
+                                if (text.trim() !== "") {
+                                    SettingsData.addMediaExcludePlayer(text.trim());
+                                    text = "";
+                                }
+                            }
+                        }
+
+                        DankActionButton {
+                            id: addBtn
+                            buttonSize: 36
+                            iconName: "add"
+                            iconSize: 20
+                            backgroundColor: Theme.primary
+                            iconColor: Theme.onPrimary
+                            onClicked: {
+                                if (newExcludePlayerField.text.trim() !== "") {
+                                    SettingsData.addMediaExcludePlayer(newExcludePlayerField.text.trim());
+                                    newExcludePlayerField.text = "";
+                                }
+                            }
+                        }
+
+                        DankActionButton {
+                            id: selectAppBtn
+                            buttonSize: 36
+                            iconName: "apps"
+                            iconSize: 20
+                            backgroundColor: Theme.surfaceContainer
+                            iconColor: Theme.primary
+                            onClicked: appBrowserPopup.show()
+                        }
+                    }
+
+                    Column {
+                        width: parent.width
+                        spacing: Theme.spacingS
+
+                        Repeater {
+                            model: SettingsData.mediaExcludePlayers
+
+                            delegate: Rectangle {
+                                width: parent.width
+                                height: 48
+                                radius: Theme.cornerRadius
+                                color: Theme.withAlpha(Theme.surfaceContainer, 0.5)
+
+                                Row {
+                                    anchors.fill: parent
+                                    anchors.leftMargin: Theme.spacingM
+                                    anchors.rightMargin: Theme.spacingS
+                                    spacing: Theme.spacingM
+
+                                    Row {
+                                        width: parent.width - deleteBtn.width - Theme.spacingS
+                                        height: parent.height
+                                        spacing: Theme.spacingS
+
+                                        DankIcon {
+                                            name: "music_off"
+                                            size: 20
+                                            color: Theme.surfaceVariantText
+                                            anchors.verticalCenter: parent.verticalCenter
+                                        }
+
+                                        StyledText {
+                                            text: modelData
+                                            font.pixelSize: Theme.fontSizeSmall
+                                            color: Theme.surfaceText
+                                            anchors.verticalCenter: parent.verticalCenter
+                                        }
+                                    }
+
+                                    DankActionButton {
+                                        id: deleteBtn
+                                        buttonSize: 32
+                                        iconName: "delete"
+                                        iconSize: 18
+                                        iconColor: Theme.error
+                                        backgroundColor: "transparent"
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        onClicked: SettingsData.removeMediaExcludePlayer(index)
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    StyledText {
+                        visible: !SettingsData.mediaExcludePlayers || SettingsData.mediaExcludePlayers.length === 0
+                        text: I18n.tr("No excluded players configured")
+                        font.pixelSize: Theme.fontSizeSmall
+                        font.italic: true
+                        color: Theme.surfaceVariantText
+                        horizontalAlignment: Text.AlignHCenter
+                        width: parent.width
+                        topPadding: Theme.spacingS
+                    }
+                }
+            }
+        }
+    }
+
+    AppBrowserPopup {
+        id: appBrowserPopup
+        appsModel: root.desktopApps
+        parentModal: root.parentModal
+        onAppSelected: appId => {
+            var name = appId;
+            if (name.endsWith(".desktop")) {
+                name = name.slice(0, -8);
+            }
+            SettingsData.addMediaExcludePlayer(name);
         }
     }
 }

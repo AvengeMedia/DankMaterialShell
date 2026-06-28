@@ -9,7 +9,38 @@ import qs.Common
 Singleton {
     id: root
 
-    readonly property list<MprisPlayer> availablePlayers: Mpris.players.values
+    readonly property list<MprisPlayer> availablePlayers: {
+        const players = Mpris.players.values;
+        const excluded = SettingsData.mediaExcludePlayers || [];
+        if (excluded.length === 0)
+            return players;
+        return players.filter(p => {
+            const identity = (p.identity || "").toLowerCase();
+            const desktopEntry = ("desktopEntry" in p && p.desktopEntry) ? String(p.desktopEntry).toLowerCase() : "";
+            return !excluded.some(ex => {
+                const exLower = String(ex).toLowerCase().trim();
+                if (!exLower) return false;
+                
+                // 1. Substring match
+                if (identity.includes(exLower) || desktopEntry.includes(exLower))
+                    return true;
+                
+                // 2. Match reverse-DNS segments (e.g. app.zen_browser.zen -> zen)
+                if (exLower.indexOf(".") !== -1) {
+                    const parts = exLower.split(".");
+                    const lastPart = parts[parts.length - 1];
+                    if (lastPart && (identity.includes(lastPart) || desktopEntry.includes(lastPart)))
+                        return true;
+                }
+                
+                // 3. Bidirectional match (longer excluded name contains shorter player identity)
+                if (identity.length >= 3 && exLower.includes(identity))
+                    return true;
+                
+                return false;
+            });
+        });
+    }
     property MprisPlayer activePlayer: null
     property real activePlayerStableLength: 0
 
