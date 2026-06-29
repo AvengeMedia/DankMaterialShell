@@ -5644,6 +5644,26 @@
     "description": "Play sound when volume is adjusted"
   },
   {
+    "section": "mediaExcludePlayers",
+    "label": "Excluded Media Players",
+    "tabIndex": 16,
+    "category": "Media Player",
+    "keywords": [
+      "audio",
+      "exclude",
+      "excluded",
+      "ignore",
+      "media",
+      "mpris",
+      "music",
+      "playback",
+      "player",
+      "players",
+      "spotify"
+    ],
+    "icon": "do_not_disturb_on"
+  },
+  {
     "section": "_tab_16",
     "label": "Media Player",
     "tabIndex": 16,
