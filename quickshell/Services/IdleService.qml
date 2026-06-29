@@ -64,10 +64,6 @@ Singleton {
     property bool monitorsOff: false
     property bool isShellLocked: false
 
-    function wake() {
-        requestMonitorOn();
-    }
-
     function reapplyDpmsIfNeeded() {
         if (monitorsOff)
             CompositorService.powerOffMonitors();

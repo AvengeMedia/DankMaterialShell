@@ -1538,15 +1538,11 @@ BasePill {
                 }
             }
 
-            function closeWithAction() {
-                close();
-            }
-
             Timer {
                 id: pendingActionCloseTimer
                 interval: 80
                 repeat: false
-                onTriggered: menuRoot.closeWithAction()
+                onTriggered: menuRoot.close()
             }
 
             function showSubMenu(entry) {
@@ -1906,7 +1902,7 @@ BasePill {
                                     } else {
                                         SessionData.hideTrayId(itemKey);
                                     }
-                                    menuRoot.closeWithAction();
+                                    menuRoot.close();
                                 }
                             }
                         }

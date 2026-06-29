@@ -102,15 +102,7 @@ Item {
         return textEditor.hasUnsavedChanges();
     }
 
-    function hasUnsavedTemporaryContent() {
-        return hasUnsavedChanges();
-    }
-
     function createNewTab() {
-        performCreateNewTab();
-    }
-
-    function performCreateNewTab() {
         textEditor.commitLiveBuffer();
         NotepadStorageService.createNewTab();
         textEditor.applyingShared = true;
@@ -221,7 +213,7 @@ Item {
     }
 
     function loadFromFile(fileUrl) {
-        if (hasUnsavedTemporaryContent()) {
+        if (hasUnsavedChanges()) {
             root.pendingFileUrl = fileUrl;
             root.pendingAction = "load_file";
             root.confirmationDialogOpen = true;

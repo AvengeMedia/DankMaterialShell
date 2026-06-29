@@ -19,33 +19,25 @@ Item {
     readonly property Component detailContent: pluginInstance?.ccDetailContent || null
     readonly property real detailHeight: pluginInstance?.ccDetailHeight || 250
 
-    signal toggled()
-    signal expanded()
+    signal toggled
+    signal expanded
 
     Component.onCompleted: {
         if (pluginInstance) {
-            pluginInstance.ccWidgetToggled.connect(handleToggled)
-            pluginInstance.ccWidgetExpanded.connect(handleExpanded)
+            pluginInstance.ccWidgetToggled.connect(toggled);
+            pluginInstance.ccWidgetExpanded.connect(expanded);
         }
-    }
-
-    function handleToggled() {
-        toggled()
-    }
-
-    function handleExpanded() {
-        expanded()
     }
 
     function invokeToggle() {
         if (pluginInstance) {
-            pluginInstance.ccWidgetToggled()
+            pluginInstance.ccWidgetToggled();
         }
     }
 
     function invokeExpand() {
         if (pluginInstance) {
-            pluginInstance.ccWidgetExpanded()
+            pluginInstance.ccWidgetExpanded();
         }
     }
 }
