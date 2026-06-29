@@ -81,32 +81,53 @@ jobs:
 
       - name: Configure signing keys and trust
         run: |
-          # Write private key; extract and register the public key for
-          # host and chroot trust (needed to fetch from sibling repos).
+          # Write private key; extract and register the public key
           echo "${{ secrets.XBPS_PRIVATE_KEY }}" > /tmp/xbps_privkey.pem
           chmod 600 /tmp/xbps_privkey.pem
           
+          # Extract public key in PEM format
           openssl rsa -in /tmp/xbps_privkey.pem -pubout -out /tmp/dms-key.pub
-          rm -f /tmp/xbps_privkey.pem   # cleaned up; re-written only for signing step
+          rm -f /tmp/xbps_privkey.pem
           
+          # Compute MD5 fingerprint in colon-separated hex format
+          FINGERPRINT=$(openssl rsa -pubin -in /tmp/dms-key.pub -outform DER 2>/dev/null | openssl dgst -md5 -c | tr '[:upper:]' '[:lower:]' | awk '{print $NF}')
+          
+          # Format key in XML property list (plist) format as expected by xbps
+          mkdir -p /tmp/keys
+          cat <<EOF > "/tmp/keys/${FINGERPRINT}.plist"
+          <?xml version="1.0" encoding="UTF-8"?>
+          <plist version="1.0">
+          <dict>
+          	<key>public-key</key>
+          	<data>$(base64 -w0 /tmp/dms-key.pub)</data>
+          	<key>public-key-size</key>
+          	<integer>4096</integer>
+          	<key>signature-by</key>
+          	<string>AvengeMedia</string>
+          </dict>
+          </plist>
+          EOF
+
+          # Copy keys to all host and chroot trust stores
           sudo mkdir -p /var/db/xbps/keys
-          sudo cp /tmp/dms-key.pub /var/db/xbps/keys/dms-key.pub
+          sudo cp "/tmp/keys/${FINGERPRINT}.plist" "/var/db/xbps/keys/${FINGERPRINT}.plist"
           
           mkdir -p void-packages/masterdir/var/db/xbps/keys
-          cp /tmp/dms-key.pub void-packages/masterdir/var/db/xbps/keys/dms-key.pub
-          rm -f /tmp/dms-key.pub
+          cp "/tmp/keys/${FINGERPRINT}.plist" "void-packages/masterdir/var/db/xbps/keys/${FINGERPRINT}.plist"
+          
+          mkdir -p void-packages/etc/xbps.d/keys
+          cp "/tmp/keys/${FINGERPRINT}.plist" "void-packages/etc/xbps.d/keys/${FINGERPRINT}.plist"
+          
+          mkdir -p void-packages/common/repo-keys
+          cp "/tmp/keys/${FINGERPRINT}.plist" "void-packages/common/repo-keys/${FINGERPRINT}.plist"
+          
+          rm -rf /tmp/keys /tmp/dms-key.pub
 
       - name: Configure repositories
         run: |
-          # Write repo configuration to host, chroot/masterdir, and template dir to guarantee dependency resolution
-          sudo mkdir -p /etc/xbps.d
-          echo "repository=https://avengemedia.github.io/DankLinux/current" | sudo tee /etc/xbps.d/90-danklinux.conf
-          
-          sudo mkdir -p void-packages/masterdir/etc/xbps.d
-          echo "repository=https://avengemedia.github.io/DankLinux/current" | sudo tee void-packages/masterdir/etc/xbps.d/90-danklinux.conf
-          
-          mkdir -p void-packages/etc/xbps.d
-          echo "repository=https://avengemedia.github.io/DankLinux/current" > void-packages/etc/xbps.d/90-danklinux.conf
+          # Append the repository to repos-remote templates so xbps-src translates it automatically
+          echo "repository=https://avengemedia.github.io/DankLinux/current" >> void-packages/etc/xbps.d/repos-remote.conf
+          echo "repository=https://avengemedia.github.io/DankLinux/current" >> void-packages/etc/xbps.d/repos-remote-x86_64-multilib.conf
           
           # Add any existing compiled packages to the build cache directory to avoid rebuilds
           if [ -d "gh-pages-repo/current" ]; then
