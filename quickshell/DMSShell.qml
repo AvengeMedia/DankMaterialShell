@@ -251,6 +251,8 @@ Item {
             values: JSON.parse(root._barLayoutStateJson)
         }
 
+        Component.onCompleted: BarWidgetService.dankBarRepeater = dankBarRepeater
+
         property var hyprlandOverviewLoaderRef: hyprlandOverviewLoader
 
         delegate: Loader {
