@@ -576,7 +576,8 @@ Item {
 
     readonly property real screenWidth: screen ? screen.width : 0
     readonly property real screenHeight: screen ? screen.height : 0
-    readonly property real dpr: screen ? screen.devicePixelRatio : 1
+    // devicePixelRatio rounds to integer under fractional scaling; use the real scale Qt renders at.
+    readonly property real dpr: screen ? (CompositorService.getScreenScale(screen) || screen.devicePixelRatio) : 1
     readonly property bool closeFrameGapsActive: SettingsData.frameCloseGaps && frameOwnsConnectedChrome
     readonly property real frameInset: {
         if (!root.frameOwnsConnectedChrome)
@@ -1271,7 +1272,7 @@ Item {
 
                         layer.enabled: _animating || (_fadeWithOpacity && publishedOpacity < 1)
                         layer.smooth: false
-                        layer.textureSize: root.dpr > 1 ? Qt.size(Math.ceil(width * root.dpr), Math.ceil(height * root.dpr)) : Qt.size(0, 0)
+                        layer.textureSize: Qt.size(0, 0)
 
                         Behavior on opacity {
                             enabled: contentWrapper._fadeWithOpacity

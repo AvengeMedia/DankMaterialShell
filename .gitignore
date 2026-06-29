@@ -110,6 +110,9 @@ bin/
 # Core dumps
 core.*
 
+# prek-installed local git hooks (generated from .pre-commit-config.yaml)
+.githooks/
+
 # direnv
 .envrc
 .direnv/
