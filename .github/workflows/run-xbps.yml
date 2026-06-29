@@ -177,7 +177,6 @@ jobs:
             SRC_CACHE="hostdir/sources/dms-git-${GIT_VER}"
             mkdir -p "$SRC_CACHE"
             tar -czf "${SRC_CACHE}/dms-git-${GIT_VER}.tar.gz" \
-              --transform "s,^\.,dms-git-${GIT_VER}," \
               --exclude=void-packages \
               --exclude=gh-pages-repo \
               --exclude=.git \
