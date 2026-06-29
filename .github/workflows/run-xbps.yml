@@ -18,8 +18,13 @@ on:
         type: boolean
         required: false
         default: true
-      build_stable:
-        description: 'Build stable dms & dms-greeter packages'
+      build_dms:
+        description: 'Build stable dms package'
+        type: boolean
+        required: false
+        default: true
+      build_greeter:
+        description: 'Build stable dms-greeter package'
         type: boolean
         required: false
         default: true
@@ -93,7 +98,14 @@ jobs:
 
       - name: Configure repositories
         run: |
-          # Enable sibling danklinux repo to resolve dependencies (like dgop)
+          # Write repo configuration to host, chroot/masterdir, and template dir to guarantee dependency resolution
+          sudo mkdir -p /etc/xbps.d
+          echo "repository=https://avengemedia.github.io/DankLinux/current" | sudo tee /etc/xbps.d/90-danklinux.conf
+          
+          sudo mkdir -p void-packages/masterdir/etc/xbps.d
+          echo "repository=https://avengemedia.github.io/DankLinux/current" | sudo tee void-packages/masterdir/etc/xbps.d/90-danklinux.conf
+          
+          mkdir -p void-packages/etc/xbps.d
           echo "repository=https://avengemedia.github.io/DankLinux/current" > void-packages/etc/xbps.d/90-danklinux.conf
           
           # Add any existing compiled packages to the build cache directory to avoid rebuilds
@@ -107,24 +119,28 @@ jobs:
         run: |
           mkdir -p gh-pages-repo/current
           
-          BUILD_STABLE="${{ github.event.inputs.build_stable || 'true' }}"
+          BUILD_DMS="${{ github.event.inputs.build_dms || 'true' }}"
+          BUILD_GREETER="${{ github.event.inputs.build_greeter || 'true' }}"
           BUILD_GIT="${{ github.event.inputs.build_git || 'true' }}"
           FORCE_REBUILD="${{ github.event.inputs.force_rebuild || 'false' }}"
           
           if [ "${{ github.event_name }}" = "push" ]; then
-            BUILD_STABLE="false"
+            BUILD_DMS="false"
+            BUILD_GREETER="false"
             BUILD_GIT="true"
           fi
           
           if [ "${{ github.event_name }}" = "release" ]; then
-            BUILD_STABLE="true"
+            BUILD_DMS="true"
+            BUILD_GREETER="true"
             BUILD_GIT="false"
           fi
           
           echo "=== Starting Builds ==="
-          echo "Stable build enabled: $BUILD_STABLE"
-          echo "Git build enabled:    $BUILD_GIT"
-          echo "Force rebuild:        $FORCE_REBUILD"
+          echo "DMS stable build enabled:     $BUILD_DMS"
+          echo "Greeter stable build enabled: $BUILD_GREETER"
+          echo "Git build enabled:            $BUILD_GIT"
+          echo "Force rebuild:                $FORCE_REBUILD"
           
           cd void-packages
           
@@ -166,12 +182,11 @@ jobs:
             fi
           fi
           
-          # 2. Build stable packages (dms & dms-greeter)
-          if [ "$BUILD_STABLE" = "true" ]; then
+          # 2. Build stable dms package
+          if [ "$BUILD_DMS" = "true" ]; then
             STABLE_VER=$(grep -E '^version=' srcpkgs/dms/template | cut -d= -f2 | tr -d '"')
             STABLE_REV=$(grep -E '^revision=' srcpkgs/dms/template | cut -d= -f2 | tr -d '"')
             
-            # Build dms
             EXPECTED_DMS_FILE="dms-${STABLE_VER}_${STABLE_REV}.x86_64.xbps"
             if [ -f "../gh-pages-repo/current/$EXPECTED_DMS_FILE" ] && [ "$FORCE_REBUILD" != "true" ]; then
               echo "✅ $EXPECTED_DMS_FILE already exists, skipping build."
@@ -181,10 +196,13 @@ jobs:
               rm -f "../gh-pages-repo/current/${EXPECTED_DMS_FILE}"
               cp -L hostdir/binpkgs/dms-${STABLE_VER}_${STABLE_REV}.x86_64.xbps ../gh-pages-repo/current/
             fi
-            
-            # Build dms-greeter (read version/revision from its own template)
+          fi
+          
+          # 3. Build stable dms-greeter package
+          if [ "$BUILD_GREETER" = "true" ]; then
             GREETER_VER=$(grep -E '^version=' srcpkgs/dms-greeter/template | cut -d= -f2 | tr -d '"')
             GREETER_REV=$(grep -E '^revision=' srcpkgs/dms-greeter/template | cut -d= -f2 | tr -d '"')
+            
             EXPECTED_GREETER_FILE="dms-greeter-${GREETER_VER}_${GREETER_REV}.x86_64.xbps"
             if [ -f "../gh-pages-repo/current/$EXPECTED_GREETER_FILE" ] && [ "$FORCE_REBUILD" != "true" ]; then
               echo "✅ $EXPECTED_GREETER_FILE already exists, skipping build."
