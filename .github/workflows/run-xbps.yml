@@ -83,14 +83,14 @@ jobs:
           # Write private key; extract and register the public key
           echo "${{ secrets.XBPS_PRIVATE_KEY }}" > /tmp/xbps_privkey.pem
           chmod 600 /tmp/xbps_privkey.pem
-          
+
           # Extract public key in PEM format
           openssl rsa -in /tmp/xbps_privkey.pem -pubout -out /tmp/dms-key.pub
           rm -f /tmp/xbps_privkey.pem
-          
+
           # Compute MD5 fingerprint in colon-separated hex format
           FINGERPRINT=$(openssl rsa -pubin -in /tmp/dms-key.pub -outform DER 2>/dev/null | openssl dgst -md5 -c | tr '[:upper:]' '[:lower:]' | awk '{print $NF}')
-          
+
           # Format key in XML property list (plist) format as expected by xbps
           mkdir -p /tmp/keys
           cat <<EOF > "/tmp/keys/${FINGERPRINT}.plist"
@@ -110,16 +110,16 @@ jobs:
           # Copy keys to all host and chroot trust stores
           sudo mkdir -p /var/db/xbps/keys
           sudo cp "/tmp/keys/${FINGERPRINT}.plist" "/var/db/xbps/keys/${FINGERPRINT}.plist"
-          
+
           mkdir -p void-packages/masterdir/var/db/xbps/keys
           cp "/tmp/keys/${FINGERPRINT}.plist" "void-packages/masterdir/var/db/xbps/keys/${FINGERPRINT}.plist"
-          
+
           mkdir -p void-packages/etc/xbps.d/keys
           cp "/tmp/keys/${FINGERPRINT}.plist" "void-packages/etc/xbps.d/keys/${FINGERPRINT}.plist"
-          
+
           mkdir -p void-packages/common/repo-keys
           cp "/tmp/keys/${FINGERPRINT}.plist" "void-packages/common/repo-keys/${FINGERPRINT}.plist"
-          
+
           rm -rf /tmp/keys /tmp/dms-key.pub
 
       - name: Configure repositories
@@ -127,7 +127,7 @@ jobs:
           # Append the repository to repos-remote templates so xbps-src translates it automatically
           echo "repository=https://avengemedia.github.io/DankLinux/current" >> void-packages/etc/xbps.d/repos-remote.conf
           echo "repository=https://avengemedia.github.io/DankLinux/current" >> void-packages/etc/xbps.d/repos-remote-x86_64-multilib.conf
-          
+
           # Add any existing compiled packages to the build cache directory to avoid rebuilds
           if [ -d "gh-pages-repo/current" ]; then
             mkdir -p void-packages/hostdir/binpkgs
@@ -138,38 +138,38 @@ jobs:
       - name: Build packages
         run: |
           mkdir -p gh-pages-repo/current
-          
+
           BUILD_DMS="${{ github.event.inputs.build_dms || 'true' }}"
           BUILD_GREETER="${{ github.event.inputs.build_greeter || 'true' }}"
           BUILD_GIT="${{ github.event.inputs.build_git || 'true' }}"
           FORCE_REBUILD="${{ github.event.inputs.force_rebuild || 'false' }}"
-          
+
           if [ "${{ github.event_name }}" = "schedule" ]; then
             BUILD_DMS="false"
             BUILD_GREETER="false"
             BUILD_GIT="true"
           fi
-          
+
           if [ "${{ github.event_name }}" = "release" ]; then
             BUILD_DMS="true"
             BUILD_GREETER="true"
             BUILD_GIT="false"
           fi
-          
+
           echo "=== Starting Builds ==="
           echo "DMS stable build enabled:     $BUILD_DMS"
           echo "Greeter stable build enabled: $BUILD_GREETER"
           echo "Git build enabled:            $BUILD_GIT"
           echo "Force rebuild:                $FORCE_REBUILD"
-          
+
           cd void-packages
-          
+
           # 1. Build dms-git (development package)
           if [ "$BUILD_GIT" = "true" ]; then
             # Calculate dynamic git version (tag.commits.hash)
             GIT_VER=$(git -C .. describe --tags --always | sed 's/^v//; s/-/./g')
             echo "🔨 Preparing dms-git version $GIT_VER"
-            
+
             # Stage source tarball in the xbps-src source cache.
             # --transform adds a top-level directory so xbps-src can extract
             # into $wrksrc (create_wrksrc=yes handles the rest).
@@ -181,16 +181,16 @@ jobs:
               --exclude=.git \
               --exclude=danklinux \
               -C .. .
-              
+
             CHECKSUM=$(sha256sum "${SRC_CACHE}/dms-git-${GIT_VER}.tar.gz" | cut -d' ' -f1)
-            
+
             # Dynamically patch template version, checksum, and distfiles
             sed -i "s/^version=.*/version=${GIT_VER}/" srcpkgs/dms-git/template
             sed -i "s/^checksum=.*/checksum=${CHECKSUM}/" srcpkgs/dms-git/template
             sed -i "s|^distfiles=.*|distfiles=\"dms-git-${GIT_VER}.tar.gz\"|" srcpkgs/dms-git/template
-            
+
             EXPECTED_GIT_FILE="dms-git-${GIT_VER}_1.x86_64.xbps"
-            
+
             if [ -f "../gh-pages-repo/current/$EXPECTED_GIT_FILE" ] && [ "$FORCE_REBUILD" != "true" ]; then
               echo "✅ $EXPECTED_GIT_FILE already exists, skipping build."
             else
@@ -200,12 +200,12 @@ jobs:
               cp -L hostdir/binpkgs/dms-git-*.xbps ../gh-pages-repo/current/
             fi
           fi
-          
+
           # 2. Build stable dms package
           if [ "$BUILD_DMS" = "true" ]; then
             STABLE_VER=$(grep -E '^version=' srcpkgs/dms/template | cut -d= -f2 | tr -d '"')
             STABLE_REV=$(grep -E '^revision=' srcpkgs/dms/template | cut -d= -f2 | tr -d '"')
-            
+
             EXPECTED_DMS_FILE="dms-${STABLE_VER}_${STABLE_REV}.x86_64.xbps"
             if [ -f "../gh-pages-repo/current/$EXPECTED_DMS_FILE" ] && [ "$FORCE_REBUILD" != "true" ]; then
               echo "✅ $EXPECTED_DMS_FILE already exists, skipping build."
@@ -216,12 +216,12 @@ jobs:
               cp -L hostdir/binpkgs/dms-${STABLE_VER}_${STABLE_REV}.x86_64.xbps ../gh-pages-repo/current/
             fi
           fi
-          
+
           # 3. Build stable dms-greeter package
           if [ "$BUILD_GREETER" = "true" ]; then
             GREETER_VER=$(grep -E '^version=' srcpkgs/dms-greeter/template | cut -d= -f2 | tr -d '"')
             GREETER_REV=$(grep -E '^revision=' srcpkgs/dms-greeter/template | cut -d= -f2 | tr -d '"')
-            
+
             EXPECTED_GREETER_FILE="dms-greeter-${GREETER_VER}_${GREETER_REV}.x86_64.xbps"
             if [ -f "../gh-pages-repo/current/$EXPECTED_GREETER_FILE" ] && [ "$FORCE_REBUILD" != "true" ]; then
               echo "✅ $EXPECTED_GREETER_FILE already exists, skipping build."
@@ -236,26 +236,26 @@ jobs:
       - name: Index and sign repository
         run: |
           cd gh-pages-repo/current
-          
+
           # Clean up any stale or dangling signature files to prevent O_CREAT ENOENT errors
           rm -f *.sig2 *.sig
-          
+
           # Guard: nothing to index if no .xbps files exist
           if ! ls *.xbps 1>/dev/null 2>&1; then
             echo "⚠️ No .xbps files found to index, skipping."
             exit 0
           fi
-          
+
           # Regenerate repo index
           xbps-rindex -a $(pwd)/*.xbps
-          
+
           # Sign repository
           echo "${{ secrets.XBPS_PRIVATE_KEY }}" > /tmp/xbps_privkey.pem
           chmod 600 /tmp/xbps_privkey.pem
-          
+
           xbps-rindex --sign --signedby "AvengeMedia <AvengeMedia.US@gmail.com>" --privkey /tmp/xbps_privkey.pem $(pwd)
           xbps-rindex --sign-pkg --privkey /tmp/xbps_privkey.pem $(pwd)/*.xbps
-          
+
           rm -f /tmp/xbps_privkey.pem
 
       - name: Deploy to gh-pages branch
