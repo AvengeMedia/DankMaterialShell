@@ -14,10 +14,10 @@ Item {
     property real phase: 0.0
     property bool isPlaying: false
     property real currentAmp: 1.6
-    property color trackColor: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.40)
+    property color trackColor: Theme.withAlpha(Theme.surfaceVariant, 0.40)
     property color fillColor: Theme.primary
     property color playheadColor: Theme.primary
-    property color actualProgressColor: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.45)
+    property color actualProgressColor: Theme.onSurface_38
 
     property real dpr: (root.window ? root.window.devicePixelRatio : 1)
     function snap(v) {

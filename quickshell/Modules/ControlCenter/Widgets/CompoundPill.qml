@@ -47,7 +47,7 @@ Rectangle {
         return Theme.ccTileInactiveBg;
     }
     readonly property color _tileRingActive: Theme.ccTileRing
-    readonly property color _tileRingInactive: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.18)
+    readonly property color _tileRingInactive: Theme.outlineHeavy
     readonly property color _tileIconActive: Theme.ccTileActiveText
     readonly property color _tileIconInactive: Theme.ccTileInactiveIcon
 

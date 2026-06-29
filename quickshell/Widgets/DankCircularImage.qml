@@ -52,7 +52,7 @@ Rectangle {
     }
 
     radius: width / 2
-    color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.1)
+    color: Theme.primaryHover
     border.color: "transparent"
     border.width: 0
 

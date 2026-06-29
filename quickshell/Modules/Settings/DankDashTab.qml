@@ -418,10 +418,10 @@ Item {
                                         if (rowItem.dragging)
                                             return Theme.secondaryContainer;
                                         const base = Theme.surfaceContainer;
-                                        return Qt.rgba(base.r, base.g, base.b, rowItem.isEnabled ? 0.7 : 0.4);
+                                        return Theme.withAlpha(base, rowItem.isEnabled ? 0.7 : 0.4);
                                     }
                                     border.width: rowItem.dragging ? 2 : 1
-                                    border.color: rowItem.dragging ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                                    border.color: rowItem.dragging ? Theme.primary : Theme.outlineHeavy
 
                                     Behavior on radius {
                                         NumberAnimation {
@@ -506,7 +506,7 @@ Item {
                                         StyledText {
                                             text: rowItem.present.description
                                             font.pixelSize: Theme.fontSizeSmall
-                                            color: rowItem.isEnabled ? Theme.outline : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.6)
+                                            color: rowItem.isEnabled ? Theme.outline : Theme.outlineVariant
                                             elide: Text.ElideRight
                                             width: parent.width
                                             visible: text.length > 0

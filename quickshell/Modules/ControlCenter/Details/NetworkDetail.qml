@@ -219,7 +219,7 @@ Rectangle {
                 anchors.horizontalCenter: parent.horizontalCenter
                 name: "wifi_off"
                 size: 48
-                color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5)
+                color: Theme.surfaceTextSecondary
             }
 
             StyledText {
@@ -236,7 +236,7 @@ Rectangle {
                 width: enableWifiLabel.implicitWidth + Theme.spacingL * 2
                 height: enableWifiLabel.implicitHeight + Theme.spacingM * 2
                 radius: height / 2
-                color: enableWifiButton.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08)
+                color: enableWifiButton.containsMouse ? Theme.primaryHover : Theme.primaryHoverLight
                 border.width: 0
                 border.color: Theme.primary
 
@@ -398,7 +398,7 @@ Rectangle {
             color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
             radius: Theme.cornerRadius
             border.width: 0
-            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+            border.color: Theme.outlineStrong
         }
 
         MenuItem {
@@ -415,7 +415,7 @@ Rectangle {
             }
 
             background: Rectangle {
-                color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                color: parent.hovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
                 radius: Theme.cornerRadius / 2
             }
 
@@ -439,7 +439,7 @@ Rectangle {
             }
 
             background: Rectangle {
-                color: parent.hovered ? Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.08) : "transparent"
+                color: parent.hovered ? Theme.errorHover : Theme.withAlpha(Theme.errorHover, 0)
                 radius: Theme.cornerRadius / 2
             }
 
@@ -462,7 +462,7 @@ Rectangle {
             }
 
             background: Rectangle {
-                color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                color: parent.hovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
                 radius: Theme.cornerRadius / 2
             }
 
@@ -494,7 +494,7 @@ Rectangle {
             anchors.centerIn: parent
             name: "refresh"
             size: 48
-            color: Qt.rgba(Theme.surfaceText.r || 0.8, Theme.surfaceText.g || 0.8, Theme.surfaceText.b || 0.8, 0.3)
+            color: Theme.surfaceTextAlpha
             smoothTransform: wifiScanningOverlay.visible
 
             RotationAnimator on rotation {
@@ -678,7 +678,7 @@ Rectangle {
                 width: pinWifiRow.width + Theme.spacingS * 2
                 height: pinWifiRow.implicitHeight + Theme.spacingXS * 2
                 radius: height / 2
-                color: wifiDelegate.isPinned ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.withAlpha(Theme.surfaceText, 0.05)
+                color: wifiDelegate.isPinned ? Theme.primaryHover : Theme.withAlpha(Theme.surfaceText, 0.05)
 
                 Row {
                     id: pinWifiRow
@@ -796,7 +796,7 @@ Rectangle {
             color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
             radius: Theme.cornerRadius
             border.width: 0
-            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+            border.color: Theme.outlineStrong
         }
 
         MenuItem {
@@ -813,7 +813,7 @@ Rectangle {
             }
 
             background: Rectangle {
-                color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                color: parent.hovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
                 radius: Theme.cornerRadius / 2
             }
 
@@ -837,7 +837,7 @@ Rectangle {
             }
 
             background: Rectangle {
-                color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                color: parent.hovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
                 radius: Theme.cornerRadius / 2
             }
 
@@ -862,7 +862,7 @@ Rectangle {
             }
 
             background: Rectangle {
-                color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                color: parent.hovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
                 radius: Theme.cornerRadius / 2
             }
 
@@ -885,7 +885,7 @@ Rectangle {
             }
 
             background: Rectangle {
-                color: parent.hovered ? Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.08) : "transparent"
+                color: parent.hovered ? Theme.errorHover : Theme.withAlpha(Theme.errorHover, 0)
                 radius: Theme.cornerRadius / 2
             }
 

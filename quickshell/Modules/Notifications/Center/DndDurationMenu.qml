@@ -109,7 +109,7 @@ Rectangle {
     implicitHeight: menuColumn.implicitHeight + Theme.spacingM * 2
     color: Theme.floatingSurface
     radius: Theme.cornerRadius
-    border.color: BlurService.enabled ? BlurService.borderColor : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+    border.color: BlurService.enabled ? BlurService.borderColor : Theme.outlineStrong
     border.width: BlurService.enabled ? BlurService.borderWidth : 1
 
     Column {
@@ -164,7 +164,7 @@ Rectangle {
         Rectangle {
             width: parent.width
             height: 1
-            color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.15)
+            color: Theme.outlineStrong
         }
 
         Repeater {
@@ -176,7 +176,7 @@ Rectangle {
                 width: menuColumn.width
                 height: 32
                 radius: Theme.cornerRadius
-                color: optionArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
+                color: optionArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0)
 
                 StyledText {
                     anchors.left: parent.left
@@ -204,7 +204,7 @@ Rectangle {
             visible: root.currentlyActive
             width: parent.width
             height: 1
-            color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.15)
+            color: Theme.outlineStrong
         }
 
         Rectangle {
@@ -212,7 +212,7 @@ Rectangle {
             width: menuColumn.width
             height: 32
             radius: Theme.cornerRadius
-            color: offArea.containsMouse ? Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.14) : "transparent"
+            color: offArea.containsMouse ? Theme.errorPressed : Theme.withAlpha(Theme.errorPressed, 0)
 
             Row {
                 anchors.left: parent.left

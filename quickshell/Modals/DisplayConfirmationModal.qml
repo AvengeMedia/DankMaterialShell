@@ -129,7 +129,7 @@ DankModal {
                             width: Math.max(70, revertText.contentWidth + Theme.spacingM * 2)
                             height: 36
                             radius: Theme.cornerRadius
-                            color: revertArea.containsMouse ? Theme.surfaceTextHover : "transparent"
+                            color: revertArea.containsMouse ? Theme.surfaceTextHover : Theme.withAlpha(Theme.surfaceTextHover, 0)
                             border.color: Theme.surfaceVariantAlpha
                             border.width: 1
 

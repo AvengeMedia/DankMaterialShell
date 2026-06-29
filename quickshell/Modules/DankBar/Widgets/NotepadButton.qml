@@ -271,7 +271,7 @@ BasePill {
             height: Math.max(60, menuColumn.implicitHeight + Theme.spacingS * 2)
             color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
             radius: Theme.cornerRadius
-            border.color: BlurService.enabled ? BlurService.borderColor : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+            border.color: BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium
             border.width: BlurService.enabled ? BlurService.borderWidth : 1
 
             opacity: contextMenuWindow.visible ? 1 : 0
@@ -312,7 +312,7 @@ BasePill {
                         width: parent.width
                         height: 30
                         radius: Theme.cornerRadius
-                        color: tabArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
+                        color: tabArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0)
 
                         Row {
                             anchors.fill: parent
@@ -354,7 +354,7 @@ BasePill {
                     width: parent.width
                     height: 30
                     radius: Theme.cornerRadius
-                    color: newNoteArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
+                    color: newNoteArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0)
 
                     Row {
                         anchors.fill: parent

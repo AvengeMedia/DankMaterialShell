@@ -29,14 +29,16 @@ Item {
     function lookupDesktopIcon(name, exec, fileName) {
         const appId = fileName ? fileName.replace(/\.desktop$/, "") : "";
         let entry = appId ? DesktopEntries.heuristicLookup(appId) : null;
-        if (entry && entry.icon) return entry.icon;
+        if (entry && entry.icon)
+            return entry.icon;
         if (exec) {
             const cmdBase = exec.split(" ")[0].split("/").pop();
             for (let i = 0; i < root.desktopApps.length; i++) {
                 const app = root.desktopApps[i];
                 if (app.icon) {
                     const appExec = (app.exec || app.execString || "").split(" ")[0].split("/").pop();
-                    if (appExec === cmdBase) return app.icon;
+                    if (appExec === cmdBase)
+                        return app.icon;
                 }
             }
         }
@@ -44,7 +46,8 @@ Item {
     }
 
     function parseDesktopFile(content, filePath) {
-        if (!content || content.length === 0) return null;
+        if (!content || content.length === 0)
+            return null;
         const lines = content.split("\n");
         let name = "";
         let execCmd = "";
@@ -56,28 +59,45 @@ Item {
             if (line === "[Desktop Entry]") {
                 isDesktopEntry = true;
             } else if (isDesktopEntry) {
-                if (line.startsWith("[")) break;
+                if (line.startsWith("["))
+                    break;
                 const nameMatch = line.match(/^Name=(.+)$/);
-                if (nameMatch) name = nameMatch[1];
+                if (nameMatch)
+                    name = nameMatch[1];
                 const execMatch = line.match(/^Exec=(.+)$/);
-                if (execMatch) execCmd = execMatch[1];
+                if (execMatch)
+                    execCmd = execMatch[1];
                 const iconMatch = line.match(/^Icon=(.+)$/);
-                if (iconMatch) icon = iconMatch[1];
+                if (iconMatch)
+                    icon = iconMatch[1];
                 const hiddenMatch = line.match(/^Hidden=(true|false)$/);
-                if (hiddenMatch) hidden = hiddenMatch[1] === "true";
+                if (hiddenMatch)
+                    hidden = hiddenMatch[1] === "true";
             }
         }
-        if (!isDesktopEntry || !name || !execCmd) return null;
+        if (!isDesktopEntry || !name || !execCmd)
+            return null;
         const fileName = filePath.split("/").pop();
-        if (!icon) icon = root.lookupDesktopIcon(name, execCmd, fileName);
-        return { name: name, exec: execCmd, icon: icon, hidden: hidden, filePath: filePath, fileName: fileName, content: content };
+        if (!icon)
+            icon = root.lookupDesktopIcon(name, execCmd, fileName);
+        return {
+            name: name,
+            exec: execCmd,
+            icon: icon,
+            hidden: hidden,
+            filePath: filePath,
+            fileName: fileName,
+            content: content
+        };
     }
 
     function addEntry() {
         if (newEntryType === "desktop") {
-            if (!newEntryDesktopId) return;
+            if (!newEntryDesktopId)
+                return;
             const app = desktopApps.find(a => (a.id || a.execString) === newEntryDesktopId);
-            if (!app) return;
+            if (!app)
+                return;
             const entryName = app.name || newEntryDesktopId;
             const appExec = app.exec || app.execString || "";
             const execCmd = root.newEntryCommandWrapper.replace("%command%", appExec);
@@ -85,7 +105,8 @@ Item {
             const fileName = entryName.toLowerCase().replace(/[^a-z0-9]/g, "-") + ".desktop";
             writeDesktopFile(fileName, entryName, execCmd, appIcon);
         } else {
-            if (!newEntryName || !newEntryExec) return;
+            if (!newEntryName || !newEntryExec)
+                return;
             const fileName = newEntryName.toLowerCase().replace(/[^a-z0-9]/g, "-") + ".desktop";
             writeDesktopFile(fileName, newEntryName, newEntryExec, "");
         }
@@ -93,14 +114,16 @@ Item {
 
     function writeDesktopFile(fileName, name, execCmd, icon) {
         let content = "[Desktop Entry]\nType=Application\nName=" + name + "\nExec=" + execCmd + "\n";
-        if (icon) content += "Icon=" + icon + "\n";
+        if (icon)
+            content += "Icon=" + icon + "\n";
         writerFileView.path = root.autostartDir + "/" + fileName;
         writerFileView.setText(content);
         root.resetNewEntry();
     }
 
     function setHidden(entry, hidden) {
-        if (!entry || !entry.content) return;
+        if (!entry || !entry.content)
+            return;
         const lines = entry.content.split("\n");
         const hiddenValue = hidden ? "true" : "false";
         let found = false;
@@ -162,7 +185,7 @@ Item {
         blockLoading: true
         atomicWrites: true
         onSaveFailed: error => {
-            ToastService.showError(I18n.tr("Failed to write autostart entry"))
+            ToastService.showError(I18n.tr("Failed to write autostart entry"));
             log.warn("Failed to write autostart entry to " + writerFileView.path + ": " + error);
         }
     }
@@ -176,7 +199,8 @@ Item {
         sortField: FolderListModel.Name
 
         onStatusChanged: {
-            if (status !== FolderListModel.Ready) return;
+            if (status !== FolderListModel.Ready)
+                return;
             // rebuild entries
             const validPaths = new Set();
             for (let i = 0; i < folderModel.count; i++) {
@@ -244,7 +268,10 @@ Item {
     function generateTrayIconFixSystemdOverride() {
         const configHome = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
         const dir = configHome + "/systemd/user/app-@autostart.service.d";
-        const proc = systemdOverrideMkDirComp.createObject(root, { targetPath: dir, running: true });
+        const proc = systemdOverrideMkDirComp.createObject(root, {
+            targetPath: dir,
+            running: true
+        });
     }
 
     FileView {
@@ -253,10 +280,12 @@ Item {
 
         // make sure we don't overwrite an existing override with a default one, in case the user has already customized it
         function buildOverrideContent(existing) {
-            if (!existing) return "[Unit]\nAfter=dms.service\n";
+            if (!existing)
+                return "[Unit]\nAfter=dms.service\n";
             const lines = existing.split("\n");
             const hasAfter = lines.some(l => l.trim() === "After=dms.service");
-            if (hasAfter) return existing;
+            if (hasAfter)
+                return existing;
             const unitIdx = lines.findIndex(l => l.trim() === "[Unit]");
             if (unitIdx >= 0) {
                 lines.splice(unitIdx + 1, 0, "After=dms.service");
@@ -268,7 +297,8 @@ Item {
 
         onLoaded: {
             const merged = buildOverrideContent(text());
-            if (merged !== text()) setText(merged);
+            if (merged !== text())
+                setText(merged);
             ToastService.showInfo(I18n.tr("Systemd Override generated"));
         }
 
@@ -288,7 +318,7 @@ Item {
         Process {
             property string targetPath: ""
             command: ["mkdir", "-p", targetPath]
-            onExited: (exitCode) => {
+            onExited: exitCode => {
                 if (exitCode === 0) {
                     systemdOverrideWriter.path = targetPath + "/override.conf";
                 } else {
@@ -303,7 +333,7 @@ Item {
         id: autostartInitMkDirComp
         Process {
             command: ["mkdir", "-p", root.autostartDir]
-            onExited: (exitCode) => {
+            onExited: exitCode => {
                 if (exitCode === 0) {
                     folderModel.folder = "file://" + root.autostartDir;
                 }
@@ -314,7 +344,9 @@ Item {
 
     Component.onCompleted: {
         desktopApps = AppSearchService.getVisibleApplications() || [];
-        autostartInitMkDirComp.createObject(root, { running: true });
+        autostartInitMkDirComp.createObject(root, {
+            running: true
+        });
     }
 
     Component.onDestruction: {
@@ -399,7 +431,8 @@ Item {
                             LayoutMirroring.childrenInherit: true
 
                             readonly property string selectedName: {
-                                if (!root.newEntryDesktopId) return "";
+                                if (!root.newEntryDesktopId)
+                                    return "";
                                 const app = root.desktopApps.find(a => (a.id || a.execString) === root.newEntryDesktopId);
                                 return app ? (app.name || app.id || "") : root.newEntryDesktopId;
                             }
@@ -576,7 +609,8 @@ Item {
                     text: I18n.tr("Add to Autostart")
                     iconName: "add"
                     enabled: {
-                        if (root.newEntryType === "desktop") return root.newEntryDesktopId !== "";
+                        if (root.newEntryType === "desktop")
+                            return root.newEntryDesktopId !== "";
                         return root.newEntryName !== "" && root.newEntryExec !== "";
                     }
                     onClicked: root.addEntry()
@@ -631,7 +665,7 @@ Item {
                             width: entriesList.width
                             height: 48
                             radius: Theme.cornerRadius
-                            color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.3)
+                            color: Theme.withAlpha(Theme.surfaceContainer, 0.3)
                             border.width: 0
 
                             Row {

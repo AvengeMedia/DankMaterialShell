@@ -114,7 +114,7 @@ Rectangle {
             width: 100
             height: 36
             radius: 18
-            color: scanMouseArea.containsMouse && adapterEnabled ? Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency) : "transparent"
+            color: scanMouseArea.containsMouse && adapterEnabled ? Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency) : Theme.withAlpha(Theme.surfaceContainerHigh, 0)
             border.color: adapterEnabled ? Theme.primary : Theme.outlineStrong
             border.width: 0
             visible: adapterEnabled
@@ -240,7 +240,7 @@ Rectangle {
 
                     color: {
                         if (isConnecting)
-                            return Qt.rgba(Theme.warning.r, Theme.warning.g, Theme.warning.b, 0.12);
+                            return Theme.warningHover;
                         if (deviceMouseArea.containsMouse)
                             return Theme.primaryHoverLight;
                         return Theme.surfaceLight;
@@ -339,7 +339,7 @@ Rectangle {
                         width: pinBluetoothRow.width + Theme.spacingS * 2
                         height: 28
                         radius: height / 2
-                        color: pairedDelegate.isPinned ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.withAlpha(Theme.surfaceText, 0.05)
+                        color: pairedDelegate.isPinned ? Theme.primaryHover : Theme.withAlpha(Theme.surfaceText, 0.05)
 
                         Row {
                             id: pinBluetoothRow
@@ -447,7 +447,7 @@ Rectangle {
                     anchors.centerIn: parent
                     name: "sync"
                     size: 24
-                    color: Qt.rgba(Theme.surfaceText.r || 0.8, Theme.surfaceText.g || 0.8, Theme.surfaceText.b || 0.8, 0.4)
+                    color: Theme.onSurface_38
                     smoothTransform: BluetoothService.adapter?.discovering ?? false
 
                     RotationAnimator on rotation {
@@ -626,7 +626,7 @@ Rectangle {
             }
 
             background: Rectangle {
-                color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                color: parent.hovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
                 radius: Theme.cornerRadius / 2
             }
 
@@ -655,7 +655,7 @@ Rectangle {
             }
 
             background: Rectangle {
-                color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                color: parent.hovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
                 radius: Theme.cornerRadius / 2
             }
 
@@ -683,7 +683,7 @@ Rectangle {
             }
 
             background: Rectangle {
-                color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                color: parent.hovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
                 radius: Theme.cornerRadius / 2
             }
 
@@ -707,7 +707,7 @@ Rectangle {
             }
 
             background: Rectangle {
-                color: parent.hovered ? Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.08) : "transparent"
+                color: parent.hovered ? Theme.errorHover : Theme.withAlpha(Theme.errorHover, 0)
                 radius: Theme.cornerRadius / 2
             }
 

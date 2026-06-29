@@ -397,7 +397,7 @@ Item {
             anchors.fill: parent
             anchors.margins: 2
             radius: Theme.cornerRadius
-            color: headerItem.isActive ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : (headerMouseArea.containsMouse ? Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.06) : "transparent")
+            color: headerItem.isActive ? Theme.primaryHover : (headerMouseArea.containsMouse ? Theme.surfaceTextLight : Theme.withAlpha(Theme.surfaceTextLight, 0))
 
             Behavior on color {
                 ColorAnimation {
@@ -470,13 +470,13 @@ Item {
         radius: Theme.cornerRadius
         color: {
             if (isSelected)
-                return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.15);
-            return processMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.06) : "transparent";
+                return Theme.primaryPressed;
+            return processMouseArea.containsMouse ? Theme.primaryBackground : Theme.withAlpha(Theme.primaryBackground, 0);
         }
         border.color: {
             if (isSelected)
-                return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.3);
-            return processMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent";
+                return Theme.primarySelected;
+            return processMouseArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0);
         }
         border.width: 1
         clip: true
@@ -572,10 +572,10 @@ Item {
                             radius: Theme.cornerRadius
                             color: {
                                 if (processItemRoot.processCpu > 80)
-                                    return Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.15);
+                                    return Theme.errorPressed;
                                 if (processItemRoot.processCpu > 50)
-                                    return Qt.rgba(Theme.warning.r, Theme.warning.g, Theme.warning.b, 0.12);
-                                return Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.06);
+                                    return Theme.warningHover;
+                                return Theme.surfaceTextLight;
                             }
 
                             StyledText {
@@ -606,10 +606,10 @@ Item {
                             radius: Theme.cornerRadius
                             color: {
                                 if (processItemRoot.processMemKB > 2 * 1024 * 1024)
-                                    return Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.15);
+                                    return Theme.errorPressed;
                                 if (processItemRoot.processMemKB > 1024 * 1024)
-                                    return Qt.rgba(Theme.warning.r, Theme.warning.g, Theme.warning.b, 0.12);
-                                return Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.06);
+                                    return Theme.warningHover;
+                                return Theme.surfaceTextLight;
                             }
 
                             StyledText {
@@ -662,7 +662,7 @@ Item {
                 height: processItemRoot.isExpanded ? (expandedContent.implicitHeight + Theme.spacingS * 2) : 0
                 anchors.horizontalCenter: parent.horizontalCenter
                 radius: Theme.cornerRadius - 2
-                color: Qt.rgba(Theme.surfaceContainerHigh.r, Theme.surfaceContainerHigh.g, Theme.surfaceContainerHigh.b, 0.6)
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.6)
                 clip: true
                 visible: processItemRoot.isExpanded
 
@@ -711,7 +711,7 @@ Item {
                             Layout.preferredHeight: 24
                             Layout.alignment: Qt.AlignVCenter
                             radius: Theme.cornerRadius - 2
-                            color: copyMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.15) : "transparent"
+                            color: copyMouseArea.containsMouse ? Theme.primaryPressed : Theme.withAlpha(Theme.primaryPressed, 0)
 
                             DankIcon {
                                 anchors.centerIn: parent

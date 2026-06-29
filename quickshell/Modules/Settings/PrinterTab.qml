@@ -173,7 +173,7 @@ Item {
                     Rectangle {
                         width: parent.width
                         height: 1
-                        color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+                        color: Theme.outlineStrong
                     }
 
                     Grid {
@@ -286,7 +286,7 @@ Item {
                             width: 28
                             height: 28
                             radius: 14
-                            color: addPrinterToggleArea.containsMouse ? Theme.surfacePressed : "transparent"
+                            color: addPrinterToggleArea.containsMouse ? Theme.surfacePressed : Theme.withAlpha(Theme.surfacePressed, 0)
                             anchors.verticalCenter: parent.verticalCenter
 
                             DankIcon {
@@ -324,7 +324,7 @@ Item {
                         Rectangle {
                             width: parent.width
                             height: 1
-                            color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+                            color: Theme.outlineStrong
                         }
 
                         Row {
@@ -900,7 +900,7 @@ Item {
                     Rectangle {
                         width: parent.width
                         height: 1
-                        color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+                        color: Theme.outlineStrong
                     }
 
                     Item {
@@ -1049,7 +1049,7 @@ Item {
                                                 width: 28
                                                 height: 28
                                                 radius: 14
-                                                color: expandBtn.containsMouse ? Theme.surfacePressed : "transparent"
+                                                color: expandBtn.containsMouse ? Theme.surfacePressed : Theme.withAlpha(Theme.surfacePressed, 0)
 
                                                 DankIcon {
                                                     anchors.centerIn: parent
@@ -1073,7 +1073,7 @@ Item {
                                                 width: 28
                                                 height: 28
                                                 radius: 14
-                                                color: deleteBtn.containsMouse ? Theme.errorHover : "transparent"
+                                                color: deleteBtn.containsMouse ? Theme.errorHover : Theme.withAlpha(Theme.errorHover, 0)
 
                                                 DankIcon {
                                                     anchors.centerIn: parent
@@ -1459,7 +1459,7 @@ Item {
                                                                     width: 24
                                                                     height: 24
                                                                     radius: 12
-                                                                    color: holdJobBtn.containsMouse ? Theme.surfacePressed : "transparent"
+                                                                    color: holdJobBtn.containsMouse ? Theme.surfacePressed : Theme.withAlpha(Theme.surfacePressed, 0)
                                                                     visible: modelData.state === "pending"
 
                                                                     DankIcon {
@@ -1482,7 +1482,7 @@ Item {
                                                                     width: 24
                                                                     height: 24
                                                                     radius: 12
-                                                                    color: restartJobBtn.containsMouse ? Theme.surfacePressed : "transparent"
+                                                                    color: restartJobBtn.containsMouse ? Theme.surfacePressed : Theme.withAlpha(Theme.surfacePressed, 0)
                                                                     visible: modelData.state === "pending-held" || modelData.state === "completed" || modelData.state === "aborted"
 
                                                                     DankIcon {
@@ -1505,7 +1505,7 @@ Item {
                                                                     width: 24
                                                                     height: 24
                                                                     radius: 12
-                                                                    color: cancelJobBtn.containsMouse ? Theme.errorHover : "transparent"
+                                                                    color: cancelJobBtn.containsMouse ? Theme.errorHover : Theme.withAlpha(Theme.errorHover, 0)
 
                                                                     DankIcon {
                                                                         anchors.centerIn: parent
@@ -1596,7 +1596,7 @@ Item {
                     Rectangle {
                         width: parent.width
                         height: 1
-                        color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+                        color: Theme.outlineStrong
                     }
 
                     Column {
@@ -1659,7 +1659,7 @@ Item {
                                         width: 28
                                         height: 28
                                         radius: 14
-                                        color: deleteClassBtn.containsMouse ? Theme.errorHover : "transparent"
+                                        color: deleteClassBtn.containsMouse ? Theme.errorHover : Theme.withAlpha(Theme.errorHover, 0)
 
                                         DankIcon {
                                             anchors.centerIn: parent

@@ -1113,7 +1113,7 @@ Item {
 
                         clip: true
                         radius: Theme.cornerRadius
-                        color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.9)
+                        color: Theme.withAlpha(Theme.surfaceContainer, 0.9)
                         border.color: inputField.activeFocus ? Theme.primary : Qt.rgba(1, 1, 1, 0.3)
                         border.width: inputField.activeFocus ? 2 : 1
 

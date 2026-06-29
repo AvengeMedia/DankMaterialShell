@@ -159,7 +159,7 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         radius: Theme.cornerRadius
         color: dropdownArea.containsMouse || dropdownMenu.visible ? Theme.surfaceContainerHigh : (root.usePopupTransparency ? Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency) : Theme.surfaceContainer)
-        border.color: dropdownMenu.visible ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+        border.color: dropdownMenu.visible ? Theme.primary : Theme.outlineHeavy
         border.width: dropdownMenu.visible ? 2 : 1
 
         MouseArea {
@@ -350,7 +350,7 @@ Item {
 
             LayoutMirroring.enabled: I18n.isRtl
             LayoutMirroring.childrenInherit: true
-            color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 1)
+            color: Theme.withAlpha(Theme.surfaceContainer, 1)
             border.color: Theme.primary
             border.width: 2
             radius: Theme.cornerRadius
@@ -481,7 +481,7 @@ Item {
                         width: ListView.view.width
                         height: 32
                         radius: Theme.cornerRadius
-                        color: isSelected ? Theme.primaryHover : optionArea.containsMouse ? Theme.primaryHoverLight : "transparent"
+                        color: isSelected ? Theme.primaryHover : optionArea.containsMouse ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
 
                         Row {
                             anchors.left: parent.left
@@ -498,7 +498,7 @@ Item {
                                 height: 16
                                 anchors.verticalCenter: parent.verticalCenter
                                 visible: delegateRoot.swatchColor !== undefined
-                                swatchColor: visible ? delegateRoot.swatchColor : "transparent"
+                                swatchColor: visible ? delegateRoot.swatchColor : Theme.withAlpha(delegateRoot.swatchColor, 0)
                                 ringColor: delegateRoot.isCurrentValue ? Theme.primary : Theme.outline
                             }
 

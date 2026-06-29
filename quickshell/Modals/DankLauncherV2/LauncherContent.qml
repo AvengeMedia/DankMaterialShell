@@ -381,7 +381,7 @@ FocusScope {
                         width: buttonContent.width + Theme.spacingM * 2
                         height: 28
                         radius: Theme.cornerRadius
-                        color: controller.searchMode === modelData.id ? Theme.buttonBg : modeArea.containsMouse ? Theme.surfaceContainerHighest : "transparent"
+                        color: controller.searchMode === modelData.id ? Theme.buttonBg : modeArea.containsMouse ? Theme.surfaceContainerHighest : Theme.withAlpha(Theme.surfaceContainerHighest, 0)
 
                         Row {
                             id: buttonContent
@@ -654,7 +654,7 @@ FocusScope {
                                 width: chipContent.width + Theme.spacingM * 2
                                 height: sortDropdown.height
                                 radius: Theme.cornerRadius
-                                color: controller.fileSearchType === modelData.id ? Theme.buttonBg : chipArea.containsMouse ? Theme.surfaceContainerHighest : "transparent"
+                                color: controller.fileSearchType === modelData.id ? Theme.buttonBg : chipArea.containsMouse ? Theme.surfaceContainerHighest : Theme.withAlpha(Theme.surfaceContainerHighest, 0)
 
                                 Row {
                                     id: chipContent
@@ -828,7 +828,7 @@ FocusScope {
                     width: 40
                     height: 40
                     radius: Theme.cornerRadius
-                    color: backButtonArea.containsMouse ? Theme.surfaceHover : "transparent"
+                    color: backButtonArea.containsMouse ? Theme.surfaceHover : Theme.withAlpha(Theme.surfaceHover, 0)
 
                     DankIcon {
                         anchors.centerIn: parent
@@ -1060,7 +1060,7 @@ FocusScope {
                     width: 90
                     height: 40
                     radius: Theme.cornerRadius
-                    color: saveButtonArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.9) : Theme.primary
+                    color: saveButtonArea.containsMouse ? Theme.withAlpha(Theme.primary, 0.9) : Theme.primary
 
                     StyledText {
                         text: I18n.tr("Save")

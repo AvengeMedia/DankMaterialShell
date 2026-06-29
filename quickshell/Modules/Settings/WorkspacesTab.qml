@@ -220,7 +220,7 @@ Item {
                         width: parent.width
                         height: workspaceIconRow.implicitHeight + Theme.spacingM
                         radius: Theme.cornerRadius
-                        color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.5)
+                        color: Theme.withAlpha(Theme.surfaceContainer, 0.5)
                         border.width: 0
 
                         Row {

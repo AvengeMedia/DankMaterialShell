@@ -132,7 +132,7 @@ Item {
                 height: asciiSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.surfaceContainerHigh
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                border.color: Theme.outlineHeavy
                 border.width: 0
 
                 Column {
@@ -274,7 +274,7 @@ Item {
                             text: resourceButtonsRow.compactMode ? "" : I18n.tr("Docs")
                             iconName: "menu_book"
                             iconSize: 18
-                            backgroundColor: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.08)
+                            backgroundColor: Theme.surfaceTextHover
                             textColor: Theme.surfaceText
                             onClicked: Qt.openUrlExternally("https://danklinux.com/docs")
                             onHoveredChanged: {
@@ -290,7 +290,7 @@ Item {
                             text: resourceButtonsRow.compactMode ? "" : I18n.tr("Plugins")
                             iconName: "extension"
                             iconSize: 18
-                            backgroundColor: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.08)
+                            backgroundColor: Theme.surfaceTextHover
                             textColor: Theme.surfaceText
                             onClicked: Qt.openUrlExternally("https://plugins.danklinux.com")
                             onHoveredChanged: {
@@ -306,7 +306,7 @@ Item {
                             text: resourceButtonsRow.compactMode ? "" : I18n.tr("GitHub")
                             iconName: "code"
                             iconSize: 18
-                            backgroundColor: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.08)
+                            backgroundColor: Theme.surfaceTextHover
                             textColor: Theme.surfaceText
                             onClicked: Qt.openUrlExternally("https://github.com/AvengeMedia/DankMaterialShell")
                             onHoveredChanged: {
@@ -322,7 +322,7 @@ Item {
                             text: resourceButtonsRow.compactMode ? "" : I18n.tr("Ko-fi")
                             iconName: "favorite"
                             iconSize: 18
-                            backgroundColor: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12)
+                            backgroundColor: Theme.primaryHover
                             textColor: Theme.primary
                             onClicked: Qt.openUrlExternally("https://ko-fi.com/danklinux")
                             onHoveredChanged: {
@@ -551,7 +551,7 @@ Item {
                 height: projectSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.surfaceContainerHigh
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                border.color: Theme.outlineHeavy
                 border.width: 0
 
                 Column {
@@ -607,7 +607,7 @@ Item {
                 height: backendSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.surfaceContainerHigh
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                border.color: Theme.outlineHeavy
                 border.width: 0
 
                 Column {
@@ -747,7 +747,7 @@ Item {
                                     width: capText.implicitWidth + 16
                                     height: 26
                                     radius: 13
-                                    color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12)
+                                    color: Theme.primaryHover
 
                                     StyledText {
                                         id: capText
@@ -768,7 +768,7 @@ Item {
                 height: toolsSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.surfaceContainerHigh
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                border.color: Theme.outlineHeavy
                 border.width: 0
 
                 Column {
@@ -805,7 +805,7 @@ Item {
                         DankButton {
                             text: I18n.tr("Show Welcome")
                             iconName: "waving_hand"
-                            backgroundColor: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.08)
+                            backgroundColor: Theme.surfaceTextHover
                             textColor: Theme.surfaceText
                             onClicked: FirstLaunchService.showWelcome()
                         }
@@ -813,7 +813,7 @@ Item {
                         DankButton {
                             text: I18n.tr("System Check")
                             iconName: "vital_signs"
-                            backgroundColor: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.08)
+                            backgroundColor: Theme.surfaceTextHover
                             textColor: Theme.surfaceText
                             onClicked: FirstLaunchService.showDoctor()
                         }

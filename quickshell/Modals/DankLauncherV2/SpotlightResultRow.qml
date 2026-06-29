@@ -76,7 +76,7 @@ Rectangle {
     width: parent?.width ?? 200
     height: 64
     radius: Theme.cornerRadius
-    color: root.isSelected ? Theme.primaryPressed : root.isHovered ? Theme.primaryHoverLight : "transparent"
+    color: root.isSelected ? Theme.primaryPressed : root.isHovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
 
     Behavior on color {
         ColorAnimation {
@@ -225,7 +225,7 @@ Rectangle {
             height: 28
             radius: height / 2
             anchors.verticalCenter: parent.verticalCenter
-            color: quickToggleArea.containsMouse ? Theme.surfaceHover : "transparent"
+            color: quickToggleArea.containsMouse ? Theme.surfaceHover : Theme.withAlpha(Theme.surfaceHover, 0)
 
             readonly property bool isAllowed: {
                 if (root.item?.type !== "plugin_browse")

@@ -8,7 +8,7 @@ Item {
     property color ringColor: Theme.outline
     property real minPreviewAlpha: 0.4
     readonly property bool translucent: swatchColor.a > 0 && swatchColor.a < 1
-    readonly property color displayColor: translucent ? Qt.rgba(swatchColor.r, swatchColor.g, swatchColor.b, Math.max(swatchColor.a, minPreviewAlpha)) : swatchColor
+    readonly property color displayColor: translucent ? Theme.withAlpha(swatchColor, Math.max(swatchColor.a, minPreviewAlpha)) : swatchColor
 
     Loader {
         anchors.fill: parent

@@ -333,7 +333,7 @@ PluginComponent {
                                     width: peerListColumn.width
                                     height: peerCardColumn.implicitHeight + Theme.spacingS * 2
                                     radius: Theme.cornerRadius
-                                    color: modelData.hostname === (TailscaleService.selfNode ? TailscaleService.selfNode.hostname : "") ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : Theme.surfaceContainerHighest
+                                    color: modelData.hostname === (TailscaleService.selfNode ? TailscaleService.selfNode.hostname : "") ? Theme.primaryHoverLight : Theme.surfaceContainerHighest
 
                                     property bool isSelf: modelData.hostname === (TailscaleService.selfNode ? TailscaleService.selfNode.hostname : "")
                                     property bool isExpanded: detailRoot.expandedHostname === modelData.hostname

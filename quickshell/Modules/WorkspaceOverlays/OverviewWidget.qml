@@ -222,7 +222,7 @@ Item {
                             color: hoveredWhileDragging ? hoveredWorkspaceColor : defaultWorkspaceColor
                             radius: Theme.cornerRadius
                             border.width: 2
-                            border.color: hoveredWhileDragging ? hoveredBorderColor : (shouldShowActiveIndicator ? root.activeBorderColor : "transparent")
+                            border.color: hoveredWhileDragging ? hoveredBorderColor : (shouldShowActiveIndicator ? root.activeBorderColor : Theme.withAlpha(root.activeBorderColor, 0))
 
                             StyledText {
                                 anchors.centerIn: parent

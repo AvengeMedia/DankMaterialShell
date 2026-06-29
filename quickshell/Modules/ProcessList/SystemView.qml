@@ -148,22 +148,22 @@ Item {
                         color: {
                             const vendor = (modelData?.vendor ?? "").toLowerCase();
                             if (vendor.includes("nvidia"))
-                                return Qt.rgba(Theme.success.r, Theme.success.g, Theme.success.b, 0.08);
+                                return Theme.withAlpha(Theme.success, 0.08);
                             if (vendor.includes("amd"))
-                                return Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.08);
+                                return Theme.errorHover;
                             if (vendor.includes("intel"))
-                                return Qt.rgba(Theme.info.r, Theme.info.g, Theme.info.b, 0.08);
-                            return Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.08);
+                                return Theme.withAlpha(Theme.info, 0.08);
+                            return Theme.surfaceHover;
                         }
                         border.color: {
                             const vendor = (modelData?.vendor ?? "").toLowerCase();
                             if (vendor.includes("nvidia"))
-                                return Qt.rgba(Theme.success.r, Theme.success.g, Theme.success.b, 0.2);
+                                return Theme.withAlpha(Theme.success, 0.2);
                             if (vendor.includes("amd"))
-                                return Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.2);
+                                return Theme.errorPressed;
                             if (vendor.includes("intel"))
-                                return Qt.rgba(Theme.info.r, Theme.info.g, Theme.info.b, 0.2);
-                            return Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.2);
+                                return Theme.withAlpha(Theme.info, 0.2);
+                            return Theme.surfaceVariantAlpha;
                         }
                         border.width: 1
 
@@ -242,8 +242,8 @@ Item {
                                 width: 70
                                 height: 32
                                 radius: Theme.cornerRadius
-                                color: parent.parent.tempEnabled ? Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.3) : Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.15)
-                                border.color: tempMouseArea.containsMouse ? Theme.outline : "transparent"
+                                color: parent.parent.tempEnabled ? Theme.withAlpha(Theme.surfaceVariant, 0.3) : Theme.surfaceSelected
+                                border.color: tempMouseArea.containsMouse ? Theme.outline : Theme.withAlpha(Theme.outline, 0)
                                 border.width: 1
 
                                 Row {

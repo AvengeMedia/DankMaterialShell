@@ -486,7 +486,7 @@ Item {
                                     anchors.fill: parent
                                     anchors.margins: 1
                                     radius: Theme.cornerRadius - 1
-                                    color: Theme.wallpaperPath && Theme.wallpaperPath.startsWith("#") ? Theme.wallpaperPath : "transparent"
+                                    color: Theme.wallpaperPath && Theme.wallpaperPath.startsWith("#") ? Theme.wallpaperPath : Theme.withAlpha(Theme.wallpaperPath, 0)
                                     visible: Theme.wallpaperPath && Theme.wallpaperPath.startsWith("#")
                                 }
 
@@ -614,7 +614,7 @@ Item {
                                 buttonSize: 48
                                 iconName: "folder_open"
                                 iconSize: Theme.iconSize
-                                backgroundColor: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12)
+                                backgroundColor: Theme.primaryHover
                                 iconColor: Theme.primary
                                 onClicked: fileBrowserModal.open()
                             }
@@ -2084,8 +2084,8 @@ Item {
                         readonly property bool showError: themeColorsTab.cursorIncludeStatus.exists && !themeColorsTab.cursorIncludeStatus.included
                         readonly property bool showSetup: !themeColorsTab.cursorIncludeStatus.exists && !themeColorsTab.cursorIncludeStatus.included
 
-                        color: (showError || showSetup) ? Theme.withAlpha(Theme.warning, 0.15) : "transparent"
-                        border.color: (showError || showSetup) ? Theme.withAlpha(Theme.warning, 0.3) : "transparent"
+                        color: (showError || showSetup) ? Theme.withAlpha(Theme.warning, 0.15) : Theme.withAlpha(Theme.warning, 0)
+                        border.color: (showError || showSetup) ? Theme.withAlpha(Theme.warning, 0.3) : Theme.withAlpha(Theme.warning, 0)
                         border.width: 1
                         visible: (showError || showSetup) && !themeColorsTab.checkingCursorInclude
 
@@ -2732,7 +2732,7 @@ Item {
                 width: parent.width
                 height: warningText.implicitHeight + Theme.spacingM * 2
                 radius: Theme.cornerRadius
-                color: Qt.rgba(Theme.warning.r, Theme.warning.g, Theme.warning.b, 0.12)
+                color: Theme.warningHover
 
                 Row {
                     anchors.fill: parent
@@ -2773,7 +2773,7 @@ Item {
                         width: (parent.width - Theme.spacingM) / 2
                         height: 48
                         radius: Theme.cornerRadius
-                        color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12)
+                        color: Theme.primaryHover
 
                         Row {
                             anchors.centerIn: parent
@@ -2807,7 +2807,7 @@ Item {
                         width: (parent.width - Theme.spacingM) / 2
                         height: 48
                         radius: Theme.cornerRadius
-                        color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12)
+                        color: Theme.primaryHover
 
                         Row {
                             anchors.centerIn: parent

@@ -168,7 +168,7 @@ Item {
         }
     }
     readonly property int borderWidth: SettingsData.dankLauncherV2BorderEnabled ? SettingsData.dankLauncherV2BorderThickness : 0
-    readonly property color effectiveBorderColor: connectedSurfaceOverride ? "transparent" : borderColor
+    readonly property color effectiveBorderColor: connectedSurfaceOverride ? Theme.withAlpha(borderColor, 0) : borderColor
     readonly property int effectiveBorderWidth: connectedSurfaceOverride ? 0 : borderWidth
     readonly property bool effectiveBlurEnabled: Theme.connectedSurfaceBlurEnabled
 
@@ -797,8 +797,8 @@ Item {
                         y: contentWrapper.y
                         level: root.shadowLevel
                         fallbackOffset: root.shadowFallbackOffset
-                        targetColor: root.frameOwnsConnectedChrome ? "transparent" : root.backgroundColor
-                        borderColor: root.frameOwnsConnectedChrome ? "transparent" : root.effectiveBorderColor
+                        targetColor: root.frameOwnsConnectedChrome ? Theme.withAlpha(root.backgroundColor, 0) : root.backgroundColor
+                        borderColor: root.frameOwnsConnectedChrome ? Theme.withAlpha(root.effectiveBorderColor, 0) : root.effectiveBorderColor
                         borderWidth: root.frameOwnsConnectedChrome ? 0 : root.effectiveBorderWidth
                         targetRadius: root.cornerRadius
                         shadowEnabled: !root.frameOwnsConnectedChrome && Theme.elevationEnabled && SettingsData.modalElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"

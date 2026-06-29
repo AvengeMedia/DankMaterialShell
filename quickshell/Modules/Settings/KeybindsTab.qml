@@ -351,8 +351,8 @@ Item {
                 readonly property bool showWarning: !showLegacy && status.included && status.overriddenBy > 0
                 readonly property bool showSetup: !showLegacy && !status.exists
 
-                color: (showLegacy || showError || showWarning || showSetup) ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
-                border.color: (showLegacy || showError || showWarning || showSetup) ? Theme.withAlpha(Theme.primary, 0.3) : "transparent"
+                color: (showLegacy || showError || showWarning || showSetup) ? Theme.withAlpha(Theme.primary, 0.15) : Theme.withAlpha(Theme.primary, 0)
+                border.color: (showLegacy || showError || showWarning || showSetup) ? Theme.withAlpha(Theme.primary, 0.3) : Theme.withAlpha(Theme.primary, 0)
                 border.width: 1
                 visible: (showLegacy || showError || showWarning || showSetup) && !KeybindsService.loading
 

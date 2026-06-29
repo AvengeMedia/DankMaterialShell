@@ -195,7 +195,7 @@ FloatingWindow {
             width: 400
             height: 200
             radius: Theme.cornerRadius
-            color: Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.1)
+            color: Theme.errorHover
             border.color: Theme.error
             border.width: 2
             visible: !DgopService.dgopAvailable
@@ -326,8 +326,8 @@ FloatingWindow {
                             width: tabRowContent.implicitWidth + Theme.spacingM * 2
                             height: Math.round(Theme.fontSizeMedium * 3.1)
                             radius: Theme.cornerRadius
-                            color: currentTab === index ? Theme.primaryPressed : (tabMouseArea.containsMouse ? Theme.primaryHoverLight : "transparent")
-                            border.color: currentTab === index ? Theme.primary : "transparent"
+                            color: currentTab === index ? Theme.primaryPressed : (tabMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0))
+                            border.color: currentTab === index ? Theme.primary : Theme.withAlpha(Theme.primary, 0)
                             border.width: currentTab === index ? 1 : 0
 
                             Row {

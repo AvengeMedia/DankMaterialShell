@@ -475,8 +475,8 @@ Item {
                 readonly property bool showError: !showLegacy && root.windowRulesIncludeStatus.exists && !root.windowRulesIncludeStatus.included
                 readonly property bool showSetup: !showLegacy && !root.windowRulesIncludeStatus.exists && !root.windowRulesIncludeStatus.included
 
-                color: (showLegacy || showError || showSetup) ? Theme.withAlpha(Theme.warning, 0.15) : "transparent"
-                border.color: (showLegacy || showError || showSetup) ? Theme.withAlpha(Theme.warning, 0.3) : "transparent"
+                color: (showLegacy || showError || showSetup) ? Theme.withAlpha(Theme.warning, 0.15) : Theme.withAlpha(Theme.warning, 0)
+                border.color: (showLegacy || showError || showSetup) ? Theme.withAlpha(Theme.warning, 0.3) : Theme.withAlpha(Theme.warning, 0)
                 border.width: 1
                 visible: (showLegacy || showError || showSetup) && !root.checkingInclude && (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango)
 

@@ -187,7 +187,7 @@ PanelWindow {
                 anchors.fill: parent
                 color: contentRect.slideoutSurfaceColor
                 radius: Theme.connectedSurfaceRadius
-                border.color: Theme.isConnectedEffect ? "transparent" : (BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium)
+                border.color: Theme.isConnectedEffect ? Theme.withAlpha(Theme.outlineMedium, 0) : (BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium)
                 border.width: Theme.isConnectedEffect ? 0 : BlurService.borderWidth
             }
 

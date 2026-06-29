@@ -187,7 +187,7 @@ Popup {
     contentItem: Rectangle {
         color: Theme.floatingSurface
         radius: Theme.cornerRadius
-        border.color: BlurService.enabled ? BlurService.borderColor : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+        border.color: BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium
         border.width: BlurService.enabled ? BlurService.borderWidth : 1
 
         Item {
@@ -254,7 +254,7 @@ Popup {
                         height: 1
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.verticalCenter: parent.verticalCenter
-                        color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.15)
+                        color: Theme.outlineStrong
                     }
 
                     Rectangle {
@@ -269,12 +269,12 @@ Popup {
                             const isSelected = keyboardNavigation && selectedIndex === index;
                             if (modelData.dangerous) {
                                 if (isSelected)
-                                    return Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.2);
-                                return menuItemArea.containsMouse ? Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.12) : "transparent";
+                                    return Theme.errorPressed;
+                                return menuItemArea.containsMouse ? Theme.errorHover : Theme.withAlpha(Theme.errorHover, 0);
                             }
                             if (isSelected)
-                                return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.2);
-                            return menuItemArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent";
+                                return Theme.primaryPressed;
+                            return menuItemArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0);
                         }
                         opacity: modelData.enabled ? 1 : 0.5
 

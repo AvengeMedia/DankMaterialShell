@@ -96,7 +96,7 @@ PluginComponent {
                             width: autoLabel.implicitWidth + Theme.spacingL * 2
                             height: 28
                             radius: 14
-                            color: root.autoMode ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.16) : (autoMouseArea.containsMouse ? Theme.surfaceLight : "transparent")
+                            color: root.autoMode ? Theme.primaryPressed : (autoMouseArea.containsMouse ? Theme.surfaceLight : Theme.withAlpha(Theme.surfaceLight, 0))
                             border.color: root.autoMode ? Theme.primary : Theme.outlineMedium
                             border.width: root.autoMode ? 1 : Theme.layerOutlineWidth
 
@@ -170,7 +170,7 @@ PluginComponent {
                             radius: Theme.cornerRadius
                             color: {
                                 if (isActive)
-                                    return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12);
+                                    return Theme.primaryHover;
                                 if (profileMouseArea.containsMouse)
                                     return Theme.surfaceLight;
                                 return Theme.floatingSurface;

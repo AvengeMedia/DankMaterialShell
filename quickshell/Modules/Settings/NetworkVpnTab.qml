@@ -191,7 +191,7 @@ Item {
                     Rectangle {
                         width: parent.width
                         height: 1
-                        color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+                        color: Theme.outlineStrong
                         visible: DMSNetworkService.vpnAvailable
                     }
 
@@ -320,7 +320,7 @@ Item {
                                             width: 28
                                             height: 28
                                             radius: 14
-                                            color: vpnExpandBtn.containsMouse ? Theme.surfacePressed : "transparent"
+                                            color: vpnExpandBtn.containsMouse ? Theme.surfacePressed : Theme.withAlpha(Theme.surfacePressed, 0)
                                             anchors.verticalCenter: parent.verticalCenter
                                             visible: canExpand
 
@@ -351,7 +351,7 @@ Item {
                                             width: 28
                                             height: 28
                                             radius: 14
-                                            color: vpnDeleteBtn.containsMouse ? Theme.errorHover : "transparent"
+                                            color: vpnDeleteBtn.containsMouse ? Theme.errorHover : Theme.withAlpha(Theme.errorHover, 0)
                                             anchors.verticalCenter: parent.verticalCenter
                                             visible: canDelete
 

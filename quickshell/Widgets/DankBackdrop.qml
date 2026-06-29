@@ -9,8 +9,8 @@ Item {
 
     property string screenName: ""
     property bool isColorWallpaper: {
-        var currentWallpaper = SessionData.getMonitorWallpaper(screenName)
-        return currentWallpaper && currentWallpaper.startsWith("#")
+        var currentWallpaper = SessionData.getMonitorWallpaper(screenName);
+        return currentWallpaper && currentWallpaper.startsWith("#");
     }
 
     Rectangle {
@@ -23,7 +23,7 @@ Item {
         y: -parent.height * 0.3
         width: parent.width * 0.8
         height: parent.height * 1.5
-        color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.15)
+        color: Theme.primaryPressed
         rotation: 35
         visible: !isColorWallpaper
     }
@@ -33,7 +33,7 @@ Item {
         y: -parent.height * 0.2
         width: parent.width * 0.4
         height: parent.height * 1.2
-        color: Qt.rgba(Theme.secondary.r, Theme.secondary.g, Theme.secondary.b, 0.12)
+        color: Theme.secondaryHover
         rotation: 35
         visible: !isColorWallpaper
     }

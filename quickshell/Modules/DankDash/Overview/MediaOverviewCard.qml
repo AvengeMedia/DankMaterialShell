@@ -48,14 +48,14 @@ Card {
         DankIcon {
             name: "music_note"
             size: Theme.iconSize
-            color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5)
+            color: Theme.surfaceTextSecondary
             anchors.horizontalCenter: parent.horizontalCenter
         }
 
         StyledText {
             text: I18n.tr("No Media")
             font.pixelSize: Theme.fontSizeSmall
-            color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+            color: Theme.surfaceTextMedium
             anchors.horizontalCenter: parent.horizontalCenter
         }
     }
@@ -101,7 +101,7 @@ Card {
             StyledText {
                 text: activePlayer?.trackArtist || I18n.tr("Unknown Artist")
                 font.pixelSize: Theme.fontSizeSmall
-                color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                color: Theme.surfaceTextMedium
                 width: parent.width
                 elide: Text.ElideRight
                 maximumLineCount: 1
@@ -131,7 +131,7 @@ Card {
                     height: 28
                     radius: 14
                     anchors.verticalCenter: playPauseButton.verticalCenter
-                    color: prevArea.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency) : "transparent"
+                    color: prevArea.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency) : Theme.withAlpha(Theme.surfaceContainerHigh, 0)
 
                     DankIcon {
                         anchors.centerIn: parent
@@ -176,7 +176,7 @@ Card {
                     height: 28
                     radius: 14
                     anchors.verticalCenter: playPauseButton.verticalCenter
-                    color: nextArea.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency) : "transparent"
+                    color: nextArea.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency) : Theme.withAlpha(Theme.surfaceContainerHigh, 0)
 
                     DankIcon {
                         anchors.centerIn: parent

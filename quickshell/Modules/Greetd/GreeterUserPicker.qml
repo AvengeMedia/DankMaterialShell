@@ -118,8 +118,8 @@ Item {
                 width: userListView.width
                 height: root.rowHeight
                 radius: Theme.cornerRadius
-                color: userRowMouse.containsMouse ? Theme.surfacePressed : "transparent"
-                border.color: GreeterState.username === userRow.modelData.username ? Theme.primary : "transparent"
+                color: userRowMouse.containsMouse ? Theme.surfacePressed : Theme.withAlpha(Theme.surfacePressed, 0)
+                border.color: GreeterState.username === userRow.modelData.username ? Theme.primary : Theme.withAlpha(Theme.primary, 0)
                 border.width: GreeterState.username === userRow.modelData.username ? 1 : 0
 
                 RowLayout {
@@ -164,7 +164,7 @@ Item {
             height: root.actionRowHeight
             visible: root.manualEntryVisible
             radius: Theme.cornerRadius
-            color: manualEntryRowMouse.containsMouse ? Theme.surfacePressed : "transparent"
+            color: manualEntryRowMouse.containsMouse ? Theme.surfacePressed : Theme.withAlpha(Theme.surfacePressed, 0)
 
             RowLayout {
                 anchors.fill: parent
@@ -203,7 +203,7 @@ Item {
             height: root.actionRowHeight
             visible: root.autoLoginVisible
             radius: Theme.cornerRadius
-            color: autoLoginRowMouse.containsMouse ? Theme.surfacePressed : "transparent"
+            color: autoLoginRowMouse.containsMouse ? Theme.surfacePressed : Theme.withAlpha(Theme.surfacePressed, 0)
 
             RowLayout {
                 anchors.fill: parent

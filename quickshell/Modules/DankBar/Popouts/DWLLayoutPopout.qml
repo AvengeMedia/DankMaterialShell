@@ -183,7 +183,7 @@ DankPopout {
                         width: 32
                         height: 32
                         radius: 16
-                        color: closeLayoutArea.containsMouse ? Theme.errorHover : "transparent"
+                        color: closeLayoutArea.containsMouse ? Theme.errorHover : Theme.withAlpha(Theme.errorHover, 0)
                         anchors.top: parent.top
 
                         DankIcon {
@@ -228,7 +228,7 @@ DankPopout {
                             width: parent.width
                             height: 40
                             radius: Theme.cornerRadius
-                            color: layoutArea.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency) : "transparent"
+                            color: layoutArea.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency) : Theme.withAlpha(Theme.surfaceContainerHighest, 0)
 
                             Row {
                                 anchors.left: parent.left

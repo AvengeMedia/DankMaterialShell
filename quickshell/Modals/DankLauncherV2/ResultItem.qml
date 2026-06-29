@@ -37,7 +37,7 @@ Rectangle {
 
     width: parent?.width ?? 200
     height: 52
-    color: isSelected ? Theme.primaryPressed : isHovered ? Theme.primaryHoverLight : "transparent"
+    color: isSelected ? Theme.primaryPressed : isHovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
     radius: Theme.cornerRadius
 
     DankRipple {
@@ -170,7 +170,7 @@ Rectangle {
             height: 28
             radius: 14
             anchors.verticalCenter: parent.verticalCenter
-            color: allModeToggleArea.containsMouse ? Theme.surfaceHover : "transparent"
+            color: allModeToggleArea.containsMouse ? Theme.surfaceHover : Theme.withAlpha(Theme.surfaceHover, 0)
 
             property bool isAllowed: {
                 if (root.item?.type !== "plugin_browse")

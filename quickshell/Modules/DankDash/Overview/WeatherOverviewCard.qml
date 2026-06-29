@@ -29,7 +29,7 @@ Card {
         DankIcon {
             name: "cloud_off"
             size: 24
-            color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5)
+            color: Theme.surfaceTextSecondary
             visible: !WeatherService.weather.loading
             anchors.horizontalCenter: parent.horizontalCenter
         }
@@ -37,7 +37,7 @@ Card {
         StyledText {
             text: I18n.tr("No Weather")
             font.pixelSize: Theme.fontSizeSmall
-            color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+            color: Theme.surfaceTextMedium
             visible: !WeatherService.weather.loading
             anchors.horizontalCenter: parent.horizontalCenter
         }
@@ -85,7 +85,7 @@ Card {
             StyledText {
                 text: WeatherService.getWeatherCondition(WeatherService.weather.wCode)
                 font.pixelSize: Theme.fontSizeSmall
-                color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                color: Theme.surfaceTextMedium
                 elide: Text.ElideRight
                 width: parent.parent.parent.width - 48 - Theme.spacingL * 2
                 horizontalAlignment: Text.AlignLeft

@@ -44,6 +44,7 @@ Theme.cornerRadiusLarge // Larger radius
 ### Surface Colors
 ```qml
 Theme.surface
+Theme.surfaceContainerLowest
 Theme.surfaceContainerLow
 Theme.surfaceContainer
 Theme.surfaceContainerHigh

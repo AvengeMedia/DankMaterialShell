@@ -219,7 +219,7 @@ Row {
         width: (parent.width - Theme.spacingS * 2) / 3
         height: 48
         radius: Theme.cornerRadius
-        color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12)
+        color: Theme.primaryHover
         border.color: Theme.primary
         border.width: 0
 
@@ -253,7 +253,7 @@ Row {
         width: (parent.width - Theme.spacingS * 2) / 3
         height: 48
         radius: Theme.cornerRadius
-        color: Qt.rgba(Theme.warning.r, Theme.warning.g, Theme.warning.b, 0.12)
+        color: Theme.warningHover
         border.color: Theme.warning
         border.width: 0
 
@@ -287,7 +287,7 @@ Row {
         width: (parent.width - Theme.spacingS * 2) / 3
         height: 48
         radius: Theme.cornerRadius
-        color: Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.12)
+        color: Theme.errorHover
         border.color: Theme.error
         border.width: 0
 

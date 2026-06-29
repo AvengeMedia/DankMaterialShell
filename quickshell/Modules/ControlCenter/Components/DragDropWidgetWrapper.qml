@@ -337,7 +337,7 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        color: editMode ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+        color: editMode ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
         radius: Theme.cornerRadius
         border.color: "transparent"
         border.width: 0

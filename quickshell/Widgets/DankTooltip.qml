@@ -79,7 +79,7 @@ PanelWindow {
         color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
         radius: Theme.cornerRadius
         border.width: BlurService.enabled ? BlurService.borderWidth : 1
-        border.color: BlurService.enabled ? BlurService.borderColor : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+        border.color: BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium
 
         StyledText {
             id: textContent

@@ -121,7 +121,7 @@ PanelWindow {
         height: Math.max(60, menuColumn.implicitHeight + Theme.spacingS * 2)
         color: Theme.floatingSurface
         radius: Theme.cornerRadius
-        border.color: BlurService.enabled ? BlurService.borderColor : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+        border.color: BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium
         border.width: BlurService.enabled ? BlurService.borderWidth : 1
 
         opacity: root.visible ? 1 : 0
@@ -174,7 +174,7 @@ PanelWindow {
                     width: parent.width
                     height: 28
                     radius: Theme.cornerRadius
-                    color: windowArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
+                    color: windowArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0)
 
                     StyledText {
                         anchors.left: parent.left
@@ -198,7 +198,7 @@ PanelWindow {
                         width: 20
                         height: 20
                         radius: 10
-                        color: closeMouseArea.containsMouse ? Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.2) : "transparent"
+                        color: closeMouseArea.containsMouse ? Theme.errorPressed : Theme.withAlpha(Theme.errorPressed, 0)
 
                         DankIcon {
                             anchors.centerIn: parent
@@ -254,7 +254,7 @@ PanelWindow {
                 }
                 width: parent.width
                 height: 1
-                color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                color: Theme.outlineHeavy
             }
 
             Repeater {
@@ -264,7 +264,7 @@ PanelWindow {
                     width: parent.width
                     height: 28
                     radius: Theme.cornerRadius
-                    color: actionArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
+                    color: actionArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0)
 
                     Row {
                         anchors.left: parent.left
@@ -331,7 +331,7 @@ PanelWindow {
                 }
                 width: parent.width
                 height: 1
-                color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                color: Theme.outlineHeavy
             }
 
             Rectangle {
@@ -339,7 +339,7 @@ PanelWindow {
                 width: parent.width
                 height: 28
                 radius: Theme.cornerRadius
-                color: pinArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
+                color: pinArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0)
 
                 StyledText {
                     anchors.left: parent.left
@@ -391,7 +391,7 @@ PanelWindow {
                 }
                 width: parent.width
                 height: 1
-                color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                color: Theme.outlineHeavy
             }
 
             Rectangle {
@@ -399,7 +399,7 @@ PanelWindow {
                 width: parent.width
                 height: 28
                 radius: Theme.cornerRadius
-                color: nvidiaArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
+                color: nvidiaArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0)
 
                 StyledText {
                     anchors.left: parent.left
@@ -441,7 +441,7 @@ PanelWindow {
                 width: parent.width
                 height: 28
                 radius: Theme.cornerRadius
-                color: closeArea.containsMouse ? Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.12) : "transparent"
+                color: closeArea.containsMouse ? Theme.errorHover : Theme.withAlpha(Theme.errorHover, 0)
 
                 StyledText {
                     anchors.left: parent.left

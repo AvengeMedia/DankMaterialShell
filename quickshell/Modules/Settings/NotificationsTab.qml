@@ -200,7 +200,6 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             spacing: Theme.spacingXL
 
-
             SettingsCard {
                 width: parent.width
                 iconName: "notifications"
@@ -314,9 +313,7 @@ Item {
                     settingKey: "notificationDedupeEnabled"
                     tags: ["notification", "duplicate", "dedupe", "stack", "coalesce", "repeat"]
                     text: I18n.tr("Suppress Duplicate Notifications")
-                    description: SettingsData.notificationDedupeEnabled
-                             ? I18n.tr("Identical alerts show as one popup instead of stacking")
-                             : I18n.tr("Identical alerts stack as separate notification cards")
+                    description: SettingsData.notificationDedupeEnabled ? I18n.tr("Identical alerts show as one popup instead of stacking") : I18n.tr("Identical alerts stack as separate notification cards")
                     checked: SettingsData.notificationDedupeEnabled
                     onToggled: checked => SettingsData.set("notificationDedupeEnabled", checked)
                 }
@@ -542,7 +539,7 @@ Item {
                                         Rectangle {
                                             anchors.fill: parent
                                             radius: Theme.cornerRadius
-                                            color: deleteArea.containsMouse ? Theme.withAlpha(Theme.error, 0.2) : "transparent"
+                                            color: deleteArea.containsMouse ? Theme.withAlpha(Theme.error, 0.2) : Theme.withAlpha(Theme.error, 0)
                                         }
 
                                         DankIcon {
@@ -739,7 +736,7 @@ Item {
                                     Rectangle {
                                         anchors.fill: parent
                                         radius: Theme.cornerRadius
-                                        color: deleteArea.containsMouse ? Theme.withAlpha(Theme.error, 0.2) : "transparent"
+                                        color: deleteArea.containsMouse ? Theme.withAlpha(Theme.error, 0.2) : Theme.withAlpha(Theme.error, 0)
                                     }
 
                                     DankIcon {

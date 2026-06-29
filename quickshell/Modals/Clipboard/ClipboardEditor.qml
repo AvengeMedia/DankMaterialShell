@@ -419,7 +419,7 @@ Item {
                     implicitWidth: saveMenuRow.implicitWidth + Theme.spacingS * 2
                     implicitHeight: saveMenuRow.implicitHeight + Theme.spacingS * 2
                     radius: Theme.cornerRadius
-                    color: saveMenuSaveArea.containsMouse ? Theme.surfaceVariant : "transparent"
+                    color: saveMenuSaveArea.containsMouse ? Theme.surfaceVariant : Theme.withAlpha(Theme.surfaceVariant, 0)
 
                     Row {
                         id: saveMenuRow
@@ -457,7 +457,7 @@ Item {
                     implicitWidth: saveMenuCloseRow.implicitWidth + Theme.spacingS * 2
                     implicitHeight: saveMenuCloseRow.implicitHeight + Theme.spacingS * 2
                     radius: Theme.cornerRadius
-                    color: saveMenuCloseArea.containsMouse ? Theme.surfaceVariant : "transparent"
+                    color: saveMenuCloseArea.containsMouse ? Theme.surfaceVariant : Theme.withAlpha(Theme.surfaceVariant, 0)
 
                     Row {
                         id: saveMenuCloseRow
@@ -495,7 +495,7 @@ Item {
                     implicitWidth: saveMenuPasteRow.implicitWidth + Theme.spacingS * 2
                     implicitHeight: saveMenuPasteRow.implicitHeight + Theme.spacingS * 2
                     radius: Theme.cornerRadius
-                    color: saveMenuPasteArea.containsMouse ? Theme.surfaceVariant : "transparent"
+                    color: saveMenuPasteArea.containsMouse ? Theme.surfaceVariant : Theme.withAlpha(Theme.surfaceVariant, 0)
                     opacity: modal.wtypeAvailable ? 1 : 0.5
 
                     Row {

@@ -142,7 +142,7 @@ StyledRect {
                     DankIcon {
                         name: root.showSettings ? (root.isExpanded ? "expand_less" : "expand_more") : ""
                         size: 16
-                        color: root.showSettings ? Theme.primary : "transparent"
+                        color: root.showSettings ? Theme.primary : Theme.withAlpha(Theme.primary, 0)
                         anchors.verticalCenter: parent.verticalCenter
                         visible: root.showSettings
                     }
@@ -183,7 +183,7 @@ StyledRect {
                     width: 28
                     height: 28
                     radius: 14
-                    color: updateArea.containsMouse ? Theme.surfaceContainerHighest : "transparent"
+                    color: updateArea.containsMouse ? Theme.surfaceContainerHighest : Theme.withAlpha(Theme.surfaceContainerHighest, 0)
                     visible: DMSService.dmsAvailable && root.isLoaded && root.hasUpdate && !root.isSystemPlugin
 
                     DankIcon {
@@ -227,7 +227,7 @@ StyledRect {
                     width: 28
                     height: 28
                     radius: 14
-                    color: uninstallArea.containsMouse ? Theme.surfaceContainerHighest : "transparent"
+                    color: uninstallArea.containsMouse ? Theme.surfaceContainerHighest : Theme.withAlpha(Theme.surfaceContainerHighest, 0)
                     visible: DMSService.dmsAvailable && !root.isSystemPlugin
 
                     DankIcon {
@@ -270,7 +270,7 @@ StyledRect {
                     width: 28
                     height: 28
                     radius: 14
-                    color: reloadArea.containsMouse ? Theme.surfaceContainerHighest : "transparent"
+                    color: reloadArea.containsMouse ? Theme.surfaceContainerHighest : Theme.withAlpha(Theme.surfaceContainerHighest, 0)
                     visible: root.isLoaded
 
                     DankIcon {

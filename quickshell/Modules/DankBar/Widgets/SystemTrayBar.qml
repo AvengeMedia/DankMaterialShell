@@ -507,7 +507,7 @@ BasePill {
                         height: root.trayItemSize
                         anchors.centerIn: parent
                         radius: Theme.cornerRadius
-                        color: trayItemArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
+                        color: trayItemArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0)
                         border.width: dragHandler.dragging ? 2 : 0
                         border.color: Theme.primary
                         opacity: dragHandler.dragging ? 0.8 : 1.0
@@ -640,7 +640,7 @@ BasePill {
                     height: root.trayItemSize
                     anchors.centerIn: parent
                     radius: Theme.cornerRadius
-                    color: caretArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
+                    color: caretArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0)
 
                     DankIcon {
                         anchors.centerIn: parent
@@ -713,7 +713,7 @@ BasePill {
                 x: root.isVerticalOrientation ? Math.round((parent.width - width) / 2) : (root.reverseInlineHorizontal ? parent.width - width : 0)
                 y: root.isVerticalOrientation ? (root.reverseInlineVertical ? parent.height - height : 0) : Math.round((parent.height - height) / 2)
                 radius: Theme.cornerRadius
-                color: inlineTrayItemArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
+                color: inlineTrayItemArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0)
                 opacity: root.inlineExpanded ? 1 : 0
 
                 Behavior on opacity {
@@ -833,7 +833,7 @@ BasePill {
                 height: root.trayItemSize
                 anchors.centerIn: parent
                 radius: Theme.cornerRadius
-                color: trayItemArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
+                color: trayItemArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0)
                 border.width: dragHandler.dragging ? 2 : 0
                 border.color: Theme.primary
                 opacity: dragHandler.dragging ? 0.8 : 1.0
@@ -983,7 +983,7 @@ BasePill {
                     height: root.trayItemSize
                     anchors.centerIn: parent
                     radius: Theme.cornerRadius
-                    color: caretAreaVert.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
+                    color: caretAreaVert.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0)
 
                     DankIcon {
                         anchors.centerIn: parent
@@ -1911,7 +1911,7 @@ BasePill {
                             visible: entryStack.count === 0
                             width: parent.width
                             height: 1
-                            color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                            color: Theme.outlineHeavy
                         }
 
                         Rectangle {
@@ -1955,7 +1955,7 @@ BasePill {
                             visible: entryStack.count > 0
                             width: parent.width
                             height: 1
-                            color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                            color: Theme.outlineHeavy
                         }
 
                         Repeater {
@@ -1969,7 +1969,7 @@ BasePill {
                                 radius: menuEntry?.isSeparator ? 0 : Theme.cornerRadius
                                 color: {
                                     if (menuEntry?.isSeparator)
-                                        return Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2);
+                                        return Theme.outlineHeavy;
                                     return itemArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(Theme.surfaceContainer, 0);
                                 }
 

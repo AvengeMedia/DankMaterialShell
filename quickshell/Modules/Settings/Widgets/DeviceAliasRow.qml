@@ -24,7 +24,7 @@ Rectangle {
     width: parent?.width ?? 0
     height: deviceRowContent.height + Theme.spacingM * 2
     radius: Theme.cornerRadius
-    color: deviceMouseArea.containsMouse ? Theme.surfaceHover : "transparent"
+    color: deviceMouseArea.containsMouse ? Theme.surfaceHover : Theme.withAlpha(Theme.surfaceHover, 0)
 
     readonly property bool hasCustomAlias: AudioService.hasDeviceAlias(deviceNode?.name ?? "")
     readonly property string displayedName: AudioService.displayName(deviceNode)

@@ -507,7 +507,7 @@ Item {
                 height: root.effectiveMenuHeight
                 color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
                 radius: Theme.cornerRadius
-                border.color: BlurService.enabled ? BlurService.borderColor : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+                border.color: BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium
                 border.width: BlurService.enabled ? BlurService.borderWidth : 1
                 opacity: root.openState ? 1 : 0
 
@@ -585,7 +585,7 @@ Item {
                                         anchors.centerIn: parent
                                         width: parent.width
                                         height: 1
-                                        color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                                        color: Theme.outlineHeavy
                                     }
                                 }
 
@@ -596,9 +596,9 @@ Item {
                                     radius: Theme.cornerRadius
                                     color: {
                                         if (root.keyboardNavigation && root.selectedMenuIndex === menuItemDelegate.itemIndex) {
-                                            return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.2);
+                                            return Theme.primaryPressed;
                                         }
-                                        return itemMouseArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent";
+                                        return itemMouseArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0);
                                     }
 
                                     Row {

@@ -67,7 +67,7 @@ Item {
         anchors.fill: parent
         visible: root.isVisible
         z: 50
-        color: Qt.rgba(Theme.surface.r, Theme.surface.g, Theme.surface.b, 0.85)
+        color: Theme.withAlpha(Theme.surface, 0.85)
 
         WheelHandler {
             // Hold scroll so the editor beneath doesn't move while settings are open.
@@ -90,8 +90,8 @@ Item {
         width: Math.min(360, root.width - Theme.spacingL * 2)
         height: Math.min(settingsColumn.implicitHeight + Theme.spacingXL * 2, root.height - Theme.spacingL * 2)
         radius: Theme.cornerRadius
-        color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, Theme.notepadTransparency)
-        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+        color: Theme.withAlpha(Theme.surfaceContainer, Theme.notepadTransparency)
+        border.color: Theme.outlineMedium
         border.width: 1
         z: 100
 
@@ -139,7 +139,7 @@ Item {
                 Rectangle {
                     width: parent.width
                     height: 1
-                    color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                    color: Theme.outlineHeavy
                 }
 
                 DankToggle {
@@ -297,7 +297,7 @@ Item {
                                 iconName: "remove"
                                 iconSize: Theme.iconSizeSmall
                                 enabled: SettingsData.notepadFontSize > 8
-                                backgroundColor: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.5)
+                                backgroundColor: Theme.withAlpha(Theme.surfaceVariant, 0.5)
                                 iconColor: Theme.surfaceText
                                 onClicked: {
                                     var newSize = Math.max(8, SettingsData.notepadFontSize - 1);
@@ -309,8 +309,8 @@ Item {
                                 width: 60
                                 height: 32
                                 radius: Theme.cornerRadius
-                                color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.3)
-                                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                                color: Theme.withAlpha(Theme.surfaceVariant, 0.3)
+                                border.color: Theme.outlineHeavy
                                 border.width: 1
 
                                 StyledText {
@@ -327,7 +327,7 @@ Item {
                                 iconName: "add"
                                 iconSize: Theme.iconSizeSmall
                                 enabled: SettingsData.notepadFontSize < 48
-                                backgroundColor: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.5)
+                                backgroundColor: Theme.withAlpha(Theme.surfaceVariant, 0.5)
                                 iconColor: Theme.surfaceText
                                 onClicked: {
                                     var newSize = Math.min(48, SettingsData.notepadFontSize + 1);
@@ -494,7 +494,7 @@ Item {
                     width: parent.width
                     implicitHeight: shortcutsHeader.height + (root.shortcutsExpanded ? shortcutsColumn.implicitHeight + Theme.spacingM : 0)
                     radius: Theme.cornerRadius
-                    color: root.shortcutsExpanded ? Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.95) : "transparent"
+                    color: root.shortcutsExpanded ? Theme.withAlpha(Theme.surfaceContainer, 0.95) : Theme.withAlpha(Theme.surfaceContainer, 0)
                     border.color: root.shortcutsExpanded ? Theme.primary : Theme.outlineMedium
                     border.width: root.shortcutsExpanded ? 2 : 1
 

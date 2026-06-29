@@ -43,7 +43,7 @@ Rectangle {
     Rectangle {
         anchors.fill: parent
         radius: Theme.cornerRadius
-        color: mouseArea.containsMouse ? hoverTint(root.color) : "transparent"
+        color: mouseArea.containsMouse ? hoverTint(root.color) : Theme.withAlpha(hoverTint(root.color), 0)
         opacity: mouseArea.containsMouse ? 0.08 : 0.0
 
         Behavior on opacity {

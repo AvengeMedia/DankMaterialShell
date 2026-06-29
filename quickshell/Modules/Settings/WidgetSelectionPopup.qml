@@ -24,10 +24,14 @@ FloatingWindow {
 
     function translateSection(section) {
         switch (section.toLowerCase()) {
-        case "left":   return I18n.tr("Left Section");
-        case "center": return I18n.tr("Center Section");
-        case "right":  return I18n.tr("Right Section");
-        default:       return section;
+        case "left":
+            return I18n.tr("Left Section");
+        case "center":
+            return I18n.tr("Center Section");
+        case "right":
+            return I18n.tr("Right Section");
+        default:
+            return section;
         }
     }
 
@@ -108,7 +112,7 @@ FloatingWindow {
     minimumSize: Qt.size(400, 350)
     implicitWidth: 500
     implicitHeight: 550
-    color: blurActive ? "transparent" : Theme.surfaceContainer
+    color: blurActive ? Theme.withAlpha(Theme.surfaceContainer, 0) : Theme.surfaceContainer
     visible: false
 
     onVisibleChanged: {
@@ -146,7 +150,7 @@ FloatingWindow {
         anchors.fill: parent
         radius: Theme.cornerRadius
         color: Theme.withAlpha(Theme.surfaceContainer, root.surfaceAlpha)
-        border.color: root.blurActive ? Theme.outlineMedium : "transparent"
+        border.color: root.blurActive ? Theme.outlineMedium : Theme.withAlpha(Theme.outlineMedium, 0)
         border.width: root.blurActive ? Theme.layerOutlineWidth : 0
         antialiasing: true
     }

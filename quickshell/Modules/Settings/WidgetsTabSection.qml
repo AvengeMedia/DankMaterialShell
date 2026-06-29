@@ -239,8 +239,8 @@ Column {
                     scale: delegateItem.dragging ? 1.02 : 1.0
                     transformOrigin: Item.Center
                     radius: delegateItem.dragging ? Theme.cornerRadius + 6 : Theme.cornerRadius
-                    color: delegateItem.dragging ? Theme.secondaryContainer : Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.8)
-                    border.color: delegateItem.dragging ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                    color: delegateItem.dragging ? Theme.secondaryContainer : Theme.withAlpha(Theme.surfaceContainer, 0.8)
+                    border.color: delegateItem.dragging ? Theme.primary : Theme.outlineHeavy
                     border.width: delegateItem.dragging ? 2 : 0
 
                     Behavior on scale {
@@ -317,7 +317,7 @@ Column {
                                 return modelData.description;
                             }
                             font.pixelSize: Theme.fontSizeSmall
-                            color: modelData.enabled ? Theme.outline : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.6)
+                            color: modelData.enabled ? Theme.outline : Theme.outlineVariant
                             elide: Text.ElideRight
                             width: parent.width
                             wrapMode: Text.WordWrap
@@ -1070,8 +1070,8 @@ Column {
         width: 200
         height: 40
         radius: Theme.cornerRadius
-        color: addButtonArea.containsMouse ? Theme.primaryContainer : Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.3)
-        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+        color: addButtonArea.containsMouse ? Theme.primaryContainer : Theme.withAlpha(Theme.surfaceVariant, 0.3)
+        border.color: Theme.outlineHeavy
         border.width: 0
         anchors.horizontalCenter: parent.horizontalCenter
 
@@ -1120,7 +1120,7 @@ Column {
         background: Rectangle {
             color: Theme.surfaceContainer
             radius: Theme.cornerRadius
-            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+            border.color: Theme.outlineMedium
             border.width: 0
         }
 
@@ -1134,7 +1134,7 @@ Column {
                     width: parent.width
                     height: 32
                     radius: Theme.cornerRadius
-                    color: swapToggleArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                    color: swapToggleArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
 
                     Row {
                         anchors.left: parent.left
@@ -1187,7 +1187,7 @@ Column {
                     width: parent.width
                     height: 32
                     radius: Theme.cornerRadius
-                    color: gbToggleArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                    color: gbToggleArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
 
                     Row {
                         anchors.left: parent.left
@@ -1257,7 +1257,7 @@ Column {
         background: Rectangle {
             color: Theme.surfaceContainer
             radius: Theme.cornerRadius
-            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+            border.color: Theme.outlineMedium
             border.width: 0
         }
 
@@ -1272,7 +1272,7 @@ Column {
                     width: parent.width
                     height: 32
                     radius: Theme.cornerRadius
-                    color: trayOverflowArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                    color: trayOverflowArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
 
                     Row {
                         anchors.left: parent.left
@@ -1322,7 +1322,7 @@ Column {
                     width: parent.width
                     height: 32
                     radius: Theme.cornerRadius
-                    color: trayPopupLineArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                    color: trayPopupLineArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
                     opacity: (trayContextMenu.currentWidgetData?.trayUseInlineExpansion ?? false) ? 0.55 : 1
 
                     Row {
@@ -1376,7 +1376,7 @@ Column {
                     width: parent.width
                     height: 32
                     radius: Theme.cornerRadius
-                    color: trayAutoOverflowArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                    color: trayAutoOverflowArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
 
                     Row {
                         anchors.left: parent.left
@@ -1426,7 +1426,7 @@ Column {
                     width: parent.width
                     height: 36
                     radius: Theme.cornerRadius
-                    color: trayMaxVisibleArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                    color: trayMaxVisibleArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
                     opacity: (trayContextMenu.currentWidgetData?.trayAutoOverflow ?? SettingsData.trayAutoOverflow) ? 1 : 0.55
 
                     Row {
@@ -1521,7 +1521,7 @@ Column {
         background: Rectangle {
             color: Theme.surfaceContainer
             radius: Theme.cornerRadius
-            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+            border.color: Theme.outlineMedium
             border.width: 0
         }
 
@@ -1536,7 +1536,7 @@ Column {
                     width: parent.width
                     height: 32
                     radius: Theme.cornerRadius
-                    color: kbdLayoutCtxMenuIconArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                    color: kbdLayoutCtxMenuIconArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
 
                     Row {
                         anchors.left: parent.left
@@ -1606,7 +1606,7 @@ Column {
         background: Rectangle {
             color: Theme.surfaceContainer
             radius: Theme.cornerRadius
-            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+            border.color: Theme.outlineMedium
             border.width: 0
         }
 
@@ -1621,7 +1621,7 @@ Column {
                     width: parent.width
                     height: 32
                     radius: Theme.cornerRadius
-                    color: fwCompactArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                    color: fwCompactArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
 
                     Row {
                         anchors.left: parent.left
@@ -1707,7 +1707,7 @@ Column {
                         width: focusedWindowMenuColumn.width
                         height: Math.max(18, Theme.fontSizeSmall) + Theme.spacingM * 2
                         radius: Theme.cornerRadius
-                        color: focusedWindowOptionArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                        color: focusedWindowOptionArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
 
                         Row {
                             anchors.left: parent.left
@@ -1775,7 +1775,7 @@ Column {
         background: Rectangle {
             color: Theme.surfaceContainer
             radius: Theme.cornerRadius
-            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+            border.color: Theme.outlineMedium
             border.width: 0
         }
 
@@ -1834,7 +1834,7 @@ Column {
                         width: diskMenuColumn.width
                         height: 32
                         radius: Theme.cornerRadius
-                        color: diskOptionArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                        color: diskOptionArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
 
                         function isSelected() {
                             return (diskUsageContextMenu.currentWidgetData?.diskUsageMode ?? 0) === modelData.mode;
@@ -2148,7 +2148,7 @@ Column {
         background: Rectangle {
             color: Theme.surfaceContainer
             radius: Theme.cornerRadius
-            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+            border.color: Theme.outlineMedium
             border.width: 0
         }
 
@@ -2248,7 +2248,7 @@ Column {
                             anchors.top: parent.top
                             height: groupContent.implicitHeight + Theme.spacingXS * 2
                             radius: Theme.cornerRadius
-                            color: isDragged ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.18) : (groupHoverArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent")
+                            color: isDragged ? Theme.primaryPressed : (groupHoverArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0))
                             opacity: isDragged ? 0.75 : 1.0
                         }
 
@@ -2308,7 +2308,7 @@ Column {
                                         height: 32
                                         radius: Theme.cornerRadius
                                         opacity: rowEnabled ? 1.0 : 0.5
-                                        color: rowHovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                                        color: rowHovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
 
                                         Row {
                                             anchors.left: parent.left
@@ -2451,7 +2451,7 @@ Column {
         background: Rectangle {
             color: Theme.surfaceContainer
             radius: Theme.cornerRadius
-            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+            border.color: Theme.outlineMedium
             border.width: 0
         }
 
@@ -2489,7 +2489,7 @@ Column {
                     width: parent.width
                     height: 32
                     radius: Theme.cornerRadius
-                    color: micToggleArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                    color: micToggleArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
 
                     Row {
                         anchors.left: parent.left
@@ -2541,7 +2541,7 @@ Column {
                     width: parent.width
                     height: 32
                     radius: Theme.cornerRadius
-                    color: cameraToggleArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                    color: cameraToggleArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
 
                     Row {
                         anchors.left: parent.left
@@ -2593,7 +2593,7 @@ Column {
                     width: parent.width
                     height: 32
                     radius: Theme.cornerRadius
-                    color: screenshareToggleArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                    color: screenshareToggleArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
 
                     Row {
                         anchors.left: parent.left
@@ -2662,7 +2662,7 @@ Column {
         background: Rectangle {
             color: Theme.surfaceContainer
             radius: Theme.cornerRadius
-            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+            border.color: Theme.outlineMedium
             border.width: 0
         }
 
@@ -2683,7 +2683,7 @@ Column {
                         width: gpuMenuColumn.width
                         height: 40
                         radius: Theme.cornerRadius
-                        color: gpuOptionArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                        color: gpuOptionArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
 
                         property bool isSelected: {
                             var selectedIdx = gpuContextMenu.widgetData ? (gpuContextMenu.widgetData.selectedGpuIndex !== undefined ? gpuContextMenu.widgetData.selectedGpuIndex : 0) : 0;
@@ -2771,7 +2771,7 @@ Column {
         background: Rectangle {
             color: Theme.surfaceContainer
             radius: Theme.cornerRadius
-            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+            border.color: Theme.outlineMedium
             border.width: 0
         }
 
@@ -2786,7 +2786,7 @@ Column {
                     width: parent.width
                     height: Math.max(18, Theme.fontSizeSmall) + Theme.spacingM * 2
                     radius: Theme.cornerRadius
-                    color: batteryPercentArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                    color: batteryPercentArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
 
                     Row {
                         anchors.left: parent.left
@@ -2839,7 +2839,7 @@ Column {
                     width: parent.width
                     height: Math.max(18, Theme.fontSizeSmall) + Theme.spacingM * 2
                     radius: Theme.cornerRadius
-                    color: batteryPercentOnlyOnBatteryArea.containsMouse && batteryPercentToggle.checked ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                    color: batteryPercentOnlyOnBatteryArea.containsMouse && batteryPercentToggle.checked ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
                     opacity: batteryPercentToggle.checked ? 1.0 : 0.5
 
                     Row {
@@ -2895,7 +2895,7 @@ Column {
                     width: parent.width
                     height: Math.max(18, Theme.fontSizeSmall) + Theme.spacingM * 2
                     radius: Theme.cornerRadius
-                    color: batteryTimeArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                    color: batteryTimeArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
 
                     Row {
                         anchors.left: parent.left
@@ -2948,7 +2948,7 @@ Column {
                     width: parent.width
                     height: Math.max(18, Theme.fontSizeSmall) + Theme.spacingM * 2
                     radius: Theme.cornerRadius
-                    color: batteryTimeOnlyOnBatteryArea.containsMouse && batteryTimeToggle.checked ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                    color: batteryTimeOnlyOnBatteryArea.containsMouse && batteryTimeToggle.checked ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
                     opacity: batteryTimeToggle.checked ? 1.0 : 0.5
 
                     Row {
@@ -3020,7 +3020,7 @@ Column {
         background: Rectangle {
             color: Theme.surfaceContainer
             radius: Theme.cornerRadius
-            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+            border.color: Theme.outlineMedium
             border.width: 0
         }
 
@@ -3068,7 +3068,7 @@ Column {
                         width: musicMenuColumn.width
                         height: Math.max(18, Theme.fontSizeSmall) + Theme.spacingM * 2
                         radius: Theme.cornerRadius
-                        color: musicOptionArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                        color: musicOptionArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
 
                         Row {
                             anchors.left: parent.left
@@ -3137,7 +3137,7 @@ Column {
         background: Rectangle {
             color: Theme.surfaceContainer
             radius: Theme.cornerRadius
-            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+            border.color: Theme.outlineMedium
             border.width: 0
         }
 
@@ -3169,7 +3169,7 @@ Column {
                     width: parent.width
                     height: 32
                     radius: Theme.cornerRadius
-                    color: raCompactArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                    color: raCompactArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
 
                     Row {
                         anchors.left: parent.left
@@ -3221,7 +3221,7 @@ Column {
                     width: parent.width
                     height: 32
                     radius: Theme.cornerRadius
-                    color: raGroupArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                    color: raGroupArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
 
                     Row {
                         anchors.left: parent.left
@@ -3273,7 +3273,7 @@ Column {
                     width: parent.width
                     height: 32
                     radius: Theme.cornerRadius
-                    color: raWorkspaceArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                    color: raWorkspaceArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
 
                     Row {
                         anchors.left: parent.left
@@ -3325,7 +3325,7 @@ Column {
                     width: parent.width
                     height: 32
                     radius: Theme.cornerRadius
-                    color: raDisplayArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                    color: raDisplayArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
 
                     Row {
                         anchors.left: parent.left
@@ -3396,7 +3396,7 @@ Column {
         background: Rectangle {
             color: Theme.surfaceContainer
             radius: Theme.cornerRadius
-            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+            border.color: Theme.outlineMedium
             border.width: 0
         }
 
@@ -3546,7 +3546,7 @@ Column {
                         width: parent.width
                         height: 32
                         radius: Theme.cornerRadius
-                        color: badgeToggleArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                        color: badgeToggleArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
 
                         Row {
                             anchors.left: parent.left
@@ -3615,7 +3615,7 @@ Column {
                         width: parent.width
                         height: 32
                         radius: Theme.cornerRadius
-                        color: hideIndicatorsArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                        color: hideIndicatorsArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
 
                         Row {
                             anchors.left: parent.left
@@ -3668,7 +3668,7 @@ Column {
                         width: parent.width
                         height: 32
                         radius: Theme.cornerRadius
-                        color: colorizeActiveArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                        color: colorizeActiveArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
 
                         Row {
                             anchors.left: parent.left
@@ -3767,7 +3767,7 @@ Column {
                         width: parent.width
                         height: 32
                         radius: Theme.cornerRadius
-                        color: enlargeOnHoverArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                        color: enlargeOnHoverArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
 
                         Row {
                             anchors.left: parent.left

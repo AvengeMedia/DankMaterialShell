@@ -147,7 +147,7 @@ Item {
                     visible: SettingsData.updaterUseCustomCommand
                     height: warnText.implicitHeight + Theme.spacingS * 2
                     radius: Theme.cornerRadius
-                    color: Qt.rgba(Theme.warning.r, Theme.warning.g, Theme.warning.b, 0.12)
+                    color: Theme.warningHover
 
                     StyledText {
                         id: warnText

@@ -19,7 +19,7 @@ Rectangle {
         if (!area.containsMouse || !enabled)
             return "transparent";
         if (isDestructive)
-            return Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.12);
+            return Theme.errorHover;
         return BlurService.hoverColor(Theme.widgetBaseHoverColor);
     }
 

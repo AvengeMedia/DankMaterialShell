@@ -534,7 +534,7 @@ BasePill {
                 visible: isSeparator
                 width: root.isVerticalOrientation ? root.barThickness * 0.6 : 2
                 height: root.isVerticalOrientation ? 2 : root.barThickness * 0.6
-                color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.3)
+                color: Theme.outlineHeavy
                 radius: 1
                 anchors.centerIn: parent
             }
@@ -631,7 +631,7 @@ BasePill {
                         if (appItem.isFocused && colorizeEnabled) {
                             return mouseArea.containsMouse ? Theme.withAlpha(Qt.lighter(appItem.activeOverlayColor, 1.3), 0.4) : Theme.withAlpha(appItem.activeOverlayColor, 0.3);
                         }
-                        return mouseArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent";
+                        return mouseArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0);
                     }
 
                     border.width: dragHandler.dragging ? 2 : 0

@@ -282,7 +282,7 @@ DankPopout {
                 anchors.topMargin: Theme.spacingM
                 anchors.bottomMargin: Theme.spacingM
                 radius: Theme.cornerRadius
-                color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.1)
+                color: Theme.surfaceLight
 
                 StyledText {
                     id: statusText
@@ -321,7 +321,7 @@ DankPopout {
                         width: ListView.view.width
                         height: 48
                         radius: Theme.cornerRadius
-                        color: packageMouseArea.containsMouse ? Theme.primaryHoverLight : "transparent"
+                        color: packageMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
 
                         required property var modelData
 
@@ -338,7 +338,7 @@ DankPopout {
                                 width: 64
                                 height: 18
                                 radius: 9
-                                color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.18)
+                                color: Theme.primaryPressed
 
                                 StyledText {
                                     anchors.centerIn: parent

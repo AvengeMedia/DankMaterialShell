@@ -56,7 +56,7 @@ CompoundPill {
 
     iconColor: {
         if (!DgopService.dgopAvailable || !selectedMount) {
-            return Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5);
+            return Theme.surfaceTextSecondary;
         }
         if (usagePercent > 90) {
             return Theme.error;

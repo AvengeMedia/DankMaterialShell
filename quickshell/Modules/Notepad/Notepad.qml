@@ -700,7 +700,7 @@ Item {
                                     width: Math.max(80, discardText.contentWidth + Theme.spacingM * 2)
                                     height: 36
                                     radius: Theme.cornerRadius
-                                    color: discardArea.containsMouse ? Theme.surfaceTextHover : "transparent"
+                                    color: discardArea.containsMouse ? Theme.surfaceTextHover : Theme.withAlpha(Theme.surfaceTextHover, 0)
                                     border.color: Theme.surfaceVariantAlpha
                                     border.width: 1
 

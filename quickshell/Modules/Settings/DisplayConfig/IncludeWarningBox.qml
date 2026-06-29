@@ -16,8 +16,8 @@ StyledRect {
     readonly property bool showError: !showLegacy && DisplayConfigState.includeStatus.exists && !DisplayConfigState.includeStatus.included
     readonly property bool showSetup: !showLegacy && !DisplayConfigState.includeStatus.exists && !DisplayConfigState.includeStatus.included
 
-    color: (showLegacy || showError || showSetup) ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
-    border.color: (showLegacy || showError || showSetup) ? Theme.withAlpha(Theme.primary, 0.3) : "transparent"
+    color: (showLegacy || showError || showSetup) ? Theme.withAlpha(Theme.primary, 0.15) : Theme.withAlpha(Theme.primary, 0)
+    border.color: (showLegacy || showError || showSetup) ? Theme.withAlpha(Theme.primary, 0.3) : Theme.withAlpha(Theme.primary, 0)
     border.width: 1
     visible: (showLegacy || showError || showSetup) && DisplayConfigState.hasOutputBackend && !DisplayConfigState.checkingInclude
 

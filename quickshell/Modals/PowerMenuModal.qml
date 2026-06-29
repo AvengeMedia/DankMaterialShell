@@ -551,12 +551,12 @@ DankModal {
                         radius: Theme.cornerRadius
                         color: {
                             if (isSelected)
-                                return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12);
+                                return Theme.primaryHover;
                             if (mouseArea.containsMouse)
-                                return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08);
-                            return Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.08);
+                                return Theme.primaryHoverLight;
+                            return Theme.surfaceHover;
                         }
-                        border.color: isSelected ? Theme.primary : "transparent"
+                        border.color: isSelected ? Theme.primary : Theme.withAlpha(Theme.primary, 0)
                         border.width: isSelected ? 2 : 0
 
                         Rectangle {
@@ -585,10 +585,10 @@ DankModal {
                                 width: parent.width * root.holdProgress
                                 color: {
                                     if (gridButtonRect.modelData === "poweroff")
-                                        return Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.3);
+                                        return Theme.errorSelected;
                                     if (gridButtonRect.modelData === "reboot")
-                                        return Qt.rgba(Theme.warning.r, Theme.warning.g, Theme.warning.b, 0.3);
-                                    return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.3);
+                                        return Theme.withAlpha(Theme.warning, 0.3);
+                                    return Theme.primarySelected;
                                 }
                             }
                         }
@@ -626,13 +626,13 @@ DankModal {
                                 width: 20
                                 height: 16
                                 radius: 4
-                                color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.1)
+                                color: Theme.onSurface_12
                                 anchors.horizontalCenter: parent.horizontalCenter
 
                                 StyledText {
                                     text: gridButtonRect.actionData.key
                                     font.pixelSize: Theme.fontSizeSmall - 1
-                                    color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6)
+                                    color: Theme.surfaceTextSecondary
                                     font.weight: Font.Medium
                                     anchors.centerIn: parent
                                 }
@@ -688,12 +688,12 @@ DankModal {
                         radius: Theme.cornerRadius
                         color: {
                             if (isSelected)
-                                return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12);
+                                return Theme.primaryHover;
                             if (listMouseArea.containsMouse)
-                                return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08);
-                            return Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.08);
+                                return Theme.primaryHoverLight;
+                            return Theme.surfaceHover;
                         }
-                        border.color: isSelected ? Theme.primary : "transparent"
+                        border.color: isSelected ? Theme.primary : Theme.withAlpha(Theme.primary, 0)
                         border.width: isSelected ? 2 : 0
 
                         Rectangle {
@@ -722,10 +722,10 @@ DankModal {
                                 width: parent.width * root.holdProgress
                                 color: {
                                     if (listButtonRect.modelData === "poweroff")
-                                        return Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.3);
+                                        return Theme.errorSelected;
                                     if (listButtonRect.modelData === "reboot")
-                                        return Qt.rgba(Theme.warning.r, Theme.warning.g, Theme.warning.b, 0.3);
-                                    return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.3);
+                                        return Theme.withAlpha(Theme.warning, 0.3);
+                                    return Theme.primarySelected;
                                 }
                             }
                         }
@@ -770,7 +770,7 @@ DankModal {
                             width: 28
                             height: 20
                             radius: 4
-                            color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.1)
+                            color: Theme.onSurface_12
                             anchors {
                                 right: parent.right
                                 rightMargin: Theme.spacingM
@@ -780,7 +780,7 @@ DankModal {
                             StyledText {
                                 text: listButtonRect.actionData.key
                                 font.pixelSize: Theme.fontSizeSmall
-                                color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6)
+                                color: Theme.surfaceTextSecondary
                                 font.weight: Font.Medium
                                 anchors.centerIn: parent
                             }
@@ -820,7 +820,7 @@ DankModal {
                 DankIcon {
                     name: root.showHoldHint ? "warning" : "touch_app"
                     size: Theme.fontSizeSmall
-                    color: root.showHoldHint ? Theme.warning : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6)
+                    color: root.showHoldHint ? Theme.warning : Theme.surfaceTextSecondary
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
@@ -840,7 +840,7 @@ DankModal {
                         return I18n.tr("Hold to confirm (%1s)").arg(SettingsData.powerActionHoldDuration);
                     }
                     font.pixelSize: Theme.fontSizeSmall
-                    color: root.showHoldHint ? Theme.warning : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6)
+                    color: root.showHoldHint ? Theme.warning : Theme.surfaceTextSecondary
                     anchors.verticalCenter: parent.verticalCenter
                 }
             }

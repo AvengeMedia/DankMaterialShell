@@ -228,8 +228,8 @@ Rectangle {
             visible: CalendarService && CalendarService.dankNeedsLaunch
             height: visible ? Math.max(28, warningRow.implicitHeight) + Theme.spacingS : 0
             radius: Theme.cornerRadius
-            color: Qt.rgba(Theme.warning.r, Theme.warning.g, Theme.warning.b, 0.12)
-            border.color: Qt.rgba(Theme.warning.r, Theme.warning.g, Theme.warning.b, 0.35)
+            color: Theme.warningHover
+            border.color: Theme.withAlpha(Theme.warning, 0.35)
             border.width: 1
 
             Row {
@@ -283,7 +283,7 @@ Rectangle {
                 anchors.left: parent.left
                 anchors.leftMargin: Theme.spacingS
                 radius: Theme.cornerRadius
-                color: backButtonArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                color: backButtonArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
 
                 DankIcon {
                     anchors.centerIn: parent
@@ -309,7 +309,7 @@ Rectangle {
                 anchors.rightMargin: Theme.spacingS
                 radius: Theme.cornerRadius
                 visible: CalendarService && CalendarService.canCreateEvents
-                color: addEventArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                color: addEventArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
 
                 DankIcon {
                     anchors.centerIn: parent
@@ -362,7 +362,7 @@ Rectangle {
                 width: 28
                 height: 28
                 radius: Theme.cornerRadius
-                color: prevMonthArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                color: prevMonthArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
 
                 DankIcon {
                     anchors.centerIn: parent
@@ -400,7 +400,7 @@ Rectangle {
                 width: 28
                 height: 28
                 radius: Theme.cornerRadius
-                color: todayArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                color: todayArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
 
                 DankIcon {
                     anchors.centerIn: parent
@@ -422,7 +422,7 @@ Rectangle {
                 width: 28
                 height: 28
                 radius: Theme.cornerRadius
-                color: nextMonthArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                color: nextMonthArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
 
                 DankIcon {
                     anchors.centerIn: parent
@@ -485,7 +485,7 @@ Rectangle {
                                     return root.getWeekNumber(rowDate);
                                 }
                                 font.pixelSize: Theme.fontSizeSmall
-                                color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6)
+                                color: Theme.surfaceTextSecondary
                                 font.weight: Font.Medium
                             }
                         }
@@ -522,7 +522,7 @@ Rectangle {
                                 anchors.centerIn: parent
                                 text: modelData
                                 font.pixelSize: Theme.fontSizeSmall
-                                color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6)
+                                color: Theme.surfaceTextSecondary
                                 font.weight: Font.Medium
                             }
                         }
@@ -565,16 +565,16 @@ Rectangle {
                                 anchors.centerIn: parent
                                 width: Math.min(parent.width - 4, parent.height - 4, 32)
                                 height: width
-                                color: isToday ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : dayArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                                color: isToday ? Theme.primaryHover : dayArea.containsMouse ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
                                 radius: Theme.cornerRadius
-                                border.color: (isSelected && !isToday) ? Theme.primary : "transparent"
+                                border.color: (isSelected && !isToday) ? Theme.primary : Theme.withAlpha(Theme.primary, 0)
                                 border.width: (isSelected && !isToday) ? 1 : 0
 
                                 StyledText {
                                     anchors.centerIn: parent
                                     text: dayDate.getDate()
                                     font.pixelSize: Theme.fontSizeSmall
-                                    color: isToday ? Theme.primary : isCurrentMonth ? Theme.surfaceText : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.4)
+                                    color: isToday ? Theme.primary : isCurrentMonth ? Theme.surfaceText : Theme.onSurface_38
                                     font.weight: isToday ? Font.Medium : Font.Normal
                                 }
 
@@ -817,13 +817,13 @@ Rectangle {
                         readonly property bool isTask: modelData && modelData.id && modelData.id.startsWith("task_")
                         readonly property color accentColor: {
                             if (isTask)
-                                return modelData.completed ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.4) : Theme.primary;
+                                return modelData.completed ? Theme.withAlpha(Theme.primary, 0.4) : Theme.primary;
                             return (modelData && modelData.color && modelData.color.length) ? modelData.color : Theme.primary;
                         }
-                        readonly property color surfaceColor: isDragging ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.15) : (eventMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.06) : Theme.nestedSurface)
+                        readonly property color surfaceColor: isDragging ? Theme.primaryPressed : (eventMouseArea.containsMouse ? Theme.primaryBackground : Theme.nestedSurface)
 
                         color: surfaceColor
-                        border.color: isDragging ? Theme.primary : (eventMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.15) : Theme.outlineMedium)
+                        border.color: isDragging ? Theme.primary : (eventMouseArea.containsMouse ? Theme.primaryPressed : Theme.outlineMedium)
                         border.width: (isDragging || eventMouseArea.containsMouse) ? 1 : Theme.layerOutlineWidth
 
                         scale: isDragging ? 1.02 : 1.0
@@ -894,7 +894,7 @@ Rectangle {
                                 anchors.centerIn: parent
                                 name: "drag_indicator"
                                 size: 14
-                                color: dragMouseArea.containsMouse ? Theme.primary : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.3)
+                                color: dragMouseArea.containsMouse ? Theme.primary : Theme.surfaceTextAlpha
                             }
 
                             MouseArea {
@@ -953,7 +953,7 @@ Rectangle {
                                 anchors.centerIn: parent
                                 name: (modelData && modelData.completed) ? "check_box" : "check_box_outline_blank"
                                 size: 16
-                                color: (modelData && modelData.completed) ? Theme.primary : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.4)
+                                color: (modelData && modelData.completed) ? Theme.primary : Theme.onSurface_38
                             }
                         }
 
@@ -972,7 +972,7 @@ Rectangle {
                                 width: parent.width
                                 text: modelData ? modelData.title : ""
                                 font.pixelSize: Theme.fontSizeSmall
-                                color: (modelData && modelData.id && modelData.id.startsWith("task_") && modelData.completed) ? Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5) : Theme.surfaceText
+                                color: (modelData && modelData.id && modelData.id.startsWith("task_") && modelData.completed) ? Theme.surfaceTextSecondary : Theme.surfaceText
                                 font.weight: Font.Medium
                                 horizontalAlignment: Text.AlignLeft
                                 elide: Text.ElideRight
@@ -997,7 +997,7 @@ Rectangle {
                                     return "";
                                 }
                                 font.pixelSize: Theme.fontSizeSmall
-                                color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                                color: Theme.surfaceTextMedium
                                 font.weight: Font.Normal
                                 horizontalAlignment: Text.AlignLeft
                                 visible: text !== "" && modelData && modelData.id && !modelData.id.startsWith("task_")
@@ -1071,14 +1071,14 @@ Rectangle {
                             anchors.rightMargin: Theme.spacingS
                             anchors.verticalCenter: parent.verticalCenter
                             radius: Theme.cornerRadius
-                            color: deleteMouseArea.containsMouse ? (taskItem.isEditing ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Qt.rgba(0.9, 0.2, 0.2, 0.15)) : "transparent"
+                            color: deleteMouseArea.containsMouse ? (taskItem.isEditing ? Theme.primaryHover : Qt.rgba(0.9, 0.2, 0.2, 0.15)) : Theme.withAlpha(Qt.rgba(0.9, 0.2, 0.2, 0.15), 0)
                             visible: modelData && modelData.id && modelData.id.startsWith("task_")
 
                             DankIcon {
                                 anchors.centerIn: parent
                                 name: taskItem.isEditing ? "close" : "delete"
                                 size: 14
-                                color: deleteMouseArea.containsMouse ? (taskItem.isEditing ? Theme.primary : Qt.rgba(0.9, 0.2, 0.2, 1.0)) : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.4)
+                                color: deleteMouseArea.containsMouse ? (taskItem.isEditing ? Theme.primary : Qt.rgba(0.9, 0.2, 0.2, 1.0)) : Theme.onSurface_38
                             }
 
                             MouseArea {
@@ -1105,14 +1105,14 @@ Rectangle {
                             anchors.rightMargin: Theme.spacingXS
                             anchors.verticalCenter: parent.verticalCenter
                             radius: Theme.cornerRadius
-                            color: editMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                            color: editMouseArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
                             visible: modelData && modelData.id && modelData.id.startsWith("task_")
 
                             DankIcon {
                                 anchors.centerIn: parent
                                 name: taskItem.isEditing ? "check" : "edit"
                                 size: 14
-                                color: editMouseArea.containsMouse ? Theme.primary : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.4)
+                                color: editMouseArea.containsMouse ? Theme.primary : Theme.onSurface_38
                             }
 
                             MouseArea {
@@ -1161,7 +1161,7 @@ Rectangle {
 
                 Text {
                     text: I18n.tr("Add a task...", "placeholder in the new-task input field")
-                    color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.4)
+                    color: Theme.onSurface_38
                     visible: taskInput.text.length === 0
                     font.pixelSize: Theme.fontSizeSmall
                     anchors.verticalCenter: parent.verticalCenter

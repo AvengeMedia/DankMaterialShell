@@ -156,7 +156,7 @@ Column {
                         height: 44
                         radius: Theme.cornerRadius
                         color: isSelected ? Theme.primarySelected : Theme.surfaceHover
-                        border.color: isSelected ? Theme.primary : "transparent"
+                        border.color: isSelected ? Theme.primary : Theme.withAlpha(Theme.primary, 0)
                         border.width: 2
 
                         Row {

@@ -1038,7 +1038,7 @@ Item {
             readonly property string connectedBarSide: barTop ? "top" : (barBottom ? "bottom" : (barLeft ? "left" : "right"))
             readonly property real surfaceRadius: root.usesConnectedSurfaceChrome ? Theme.connectedSurfaceRadius : Theme.cornerRadius
             readonly property color surfaceColor: root.usesConnectedSurfaceChrome ? Theme.connectedSurfaceColor : Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-            readonly property color surfaceBorderColor: root.usesConnectedSurfaceChrome ? "transparent" : (BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium)
+            readonly property color surfaceBorderColor: root.usesConnectedSurfaceChrome ? Theme.withAlpha(Theme.outlineMedium, 0) : (BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium)
             readonly property real surfaceBorderWidth: root.usesConnectedSurfaceChrome ? 0 : BlurService.borderWidth
             readonly property real surfaceTopLeftRadius: root.usesConnectedSurfaceChrome && (barTop || barLeft) ? 0 : surfaceRadius
             readonly property real surfaceTopRightRadius: root.usesConnectedSurfaceChrome && (barTop || barRight) ? 0 : surfaceRadius

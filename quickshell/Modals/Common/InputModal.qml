@@ -194,7 +194,7 @@ DankModal {
                     height: 40
                     radius: Theme.cornerRadius
                     color: Theme.surfaceVariantAlpha
-                    border.color: textInput.activeFocus ? Theme.primary : "transparent"
+                    border.color: textInput.activeFocus ? Theme.primary : Theme.withAlpha(Theme.primary, 0)
                     border.width: textInput.activeFocus ? 1 : 0
 
                     TextInput {
@@ -216,7 +216,7 @@ DankModal {
                             anchors.fill: parent
                             verticalAlignment: Text.AlignVCenter
                             font.pixelSize: Theme.fontSizeMedium
-                            color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.4)
+                            color: Theme.onSurface_38
                             text: root.inputPlaceholder
                             visible: textInput.text === "" && !textInput.activeFocus
                         }
@@ -238,14 +238,14 @@ DankModal {
                         radius: Theme.cornerRadius
                         color: {
                             if (root.keyboardNavigation && root.selectedButton === 0) {
-                                return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12);
+                                return Theme.primaryHover;
                             } else if (cancelButton.containsMouse) {
                                 return Theme.surfacePressed;
                             } else {
                                 return Theme.surfaceVariantAlpha;
                             }
                         }
-                        border.color: (root.keyboardNavigation && root.selectedButton === 0) ? Theme.primary : "transparent"
+                        border.color: (root.keyboardNavigation && root.selectedButton === 0) ? Theme.primary : Theme.withAlpha(Theme.primary, 0)
                         border.width: (root.keyboardNavigation && root.selectedButton === 0) ? 1 : 0
 
                         StyledText {
@@ -273,14 +273,14 @@ DankModal {
                         color: {
                             const baseColor = root.confirmButtonColor;
                             if (root.keyboardNavigation && root.selectedButton === 1) {
-                                return Qt.rgba(baseColor.r, baseColor.g, baseColor.b, 1);
+                                return Theme.withAlpha(baseColor, 1);
                             } else if (confirmButton.containsMouse) {
-                                return Qt.rgba(baseColor.r, baseColor.g, baseColor.b, 0.9);
+                                return Theme.withAlpha(baseColor, 0.9);
                             } else {
                                 return baseColor;
                             }
                         }
-                        border.color: (root.keyboardNavigation && root.selectedButton === 1) ? "white" : "transparent"
+                        border.color: (root.keyboardNavigation && root.selectedButton === 1) ? "white" : Qt.rgba(1, 1, 1, 0)
                         border.width: (root.keyboardNavigation && root.selectedButton === 1) ? 1 : 0
 
                         StyledText {

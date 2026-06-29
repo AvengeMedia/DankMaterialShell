@@ -360,14 +360,14 @@ Item {
         DankIcon {
             name: "music_note"
             size: Theme.iconSize * 3
-            color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5)
+            color: Theme.surfaceTextSecondary
             anchors.horizontalCenter: parent.horizontalCenter
         }
 
         StyledText {
             text: I18n.tr("No Active Players")
             font.pixelSize: Theme.fontSizeLarge
-            color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+            color: Theme.surfaceTextMedium
             anchors.horizontalCenter: parent.horizontalCenter
         }
     }
@@ -425,7 +425,7 @@ Item {
                     StyledText {
                         text: activePlayer?.trackArtist || I18n.tr("Unknown Artist")
                         font.pixelSize: Theme.fontSizeMedium
-                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.8)
+                        color: Theme.surfaceTextMedium
                         width: parent.width
                         horizontalAlignment: Text.AlignHCenter
                         elide: Text.ElideRight
@@ -436,7 +436,7 @@ Item {
                     StyledText {
                         text: activePlayer?.trackAlbum || ""
                         font.pixelSize: Theme.fontSizeSmall
-                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6)
+                        color: Theme.surfaceTextSecondary
                         width: parent.width
                         horizontalAlignment: Text.AlignHCenter
                         elide: Text.ElideRight
@@ -531,7 +531,7 @@ Item {
                                 height: 40
                                 radius: 20
                                 anchors.centerIn: parent
-                                color: shuffleArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                                color: shuffleArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
 
                                 DankIcon {
                                     anchors.centerIn: parent
@@ -564,7 +564,7 @@ Item {
                                 height: 40
                                 radius: 20
                                 anchors.centerIn: parent
-                                color: prevBtnArea.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency) : "transparent"
+                                color: prevBtnArea.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency) : Theme.withAlpha(Theme.surfaceContainerHigh, 0)
 
                                 DankIcon {
                                     anchors.centerIn: parent
@@ -633,7 +633,7 @@ Item {
                                 height: 40
                                 radius: 20
                                 anchors.centerIn: parent
-                                color: nextBtnArea.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency) : "transparent"
+                                color: nextBtnArea.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency) : Theme.withAlpha(Theme.surfaceContainerHigh, 0)
 
                                 DankIcon {
                                     anchors.centerIn: parent
@@ -663,7 +663,7 @@ Item {
                                 height: 40
                                 radius: 20
                                 anchors.centerIn: parent
-                                color: repeatArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                                color: repeatArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
 
                                 DankIcon {
                                     anchors.centerIn: parent
@@ -719,7 +719,7 @@ Item {
         radius: 20
         x: isRightEdge ? Theme.spacingM : parent.width - 40 - Theme.spacingM
         y: 185
-        color: playerSelectorArea.containsMouse || playersExpanded ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.2) : "transparent"
+        color: playerSelectorArea.containsMouse || playersExpanded ? Theme.primaryPressed : Theme.withAlpha(Theme.primaryPressed, 0)
         border.color: Theme.outlineStrong
         border.width: 1
         z: 100
@@ -786,7 +786,7 @@ Item {
         radius: 20
         x: isRightEdge ? Theme.spacingM : parent.width - 40 - Theme.spacingM
         y: 130
-        color: volumeButtonArea.containsMouse && volumeAvailable || volumeExpanded ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.2) : "transparent"
+        color: volumeButtonArea.containsMouse && volumeAvailable || volumeExpanded ? Theme.primaryPressed : Theme.withAlpha(Theme.primaryPressed, 0)
         border.color: volumeAvailable ? Theme.outlineStrong : Theme.outlineMedium
         border.width: 1
         z: 101
@@ -798,7 +798,7 @@ Item {
             anchors.centerIn: parent
             name: getVolumeIcon()
             size: 18
-            color: volumeAvailable && currentVolume > 0 ? Theme.primary : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, volumeAvailable ? 1.0 : 0.5)
+            color: volumeAvailable && currentVolume > 0 ? Theme.primary : Theme.withAlpha(Theme.surfaceText, volumeAvailable ? 1.0 : 0.5)
         }
 
         MouseArea {
@@ -849,7 +849,7 @@ Item {
         radius: 20
         x: isRightEdge ? Theme.spacingM : parent.width - 40 - Theme.spacingM
         y: 240
-        color: audioDevicesArea.containsMouse || devicesExpanded ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.2) : "transparent"
+        color: audioDevicesArea.containsMouse || devicesExpanded ? Theme.primaryPressed : Theme.withAlpha(Theme.primaryPressed, 0)
         border.color: Theme.outlineStrong
         border.width: 1
         z: 100

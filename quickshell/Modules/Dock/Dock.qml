@@ -52,7 +52,7 @@ Variants {
         readonly property real dockFrameInset: dockGeometry.frameInset
         readonly property real surfaceRadius: usesConnectedFrameChrome ? Theme.connectedSurfaceRadius : Theme.cornerRadius
         readonly property color surfaceColor: usesConnectedFrameChrome ? Theme.connectedSurfaceColor : Theme.withAlpha(Theme.surfaceContainer, backgroundTransparency)
-        readonly property color surfaceBorderColor: usesConnectedFrameChrome ? "transparent" : BlurService.borderColor
+        readonly property color surfaceBorderColor: usesConnectedFrameChrome ? Theme.withAlpha(BlurService.borderColor, 0) : BlurService.borderColor
         readonly property real surfaceBorderWidth: usesConnectedFrameChrome ? 0 : BlurService.borderWidth
         readonly property real surfaceTopLeftRadius: usesConnectedFrameChrome && (SettingsData.dockPosition === SettingsData.Position.Top || SettingsData.dockPosition === SettingsData.Position.Left) ? 0 : surfaceRadius
         readonly property real surfaceTopRightRadius: usesConnectedFrameChrome && (SettingsData.dockPosition === SettingsData.Position.Top || SettingsData.dockPosition === SettingsData.Position.Right) ? 0 : surfaceRadius

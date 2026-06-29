@@ -142,13 +142,13 @@ Rectangle {
     }
     border.color: {
         if (isGroupSelected && keyboardNavigationActive) {
-            return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.5);
+            return Theme.withAlpha(Theme.primary, 0.5);
         }
         if (keyboardNavigationActive && expanded && selectedNotificationIndex >= 0) {
-            return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.2);
+            return Theme.primaryPressed;
         }
         if (notificationGroup?.latestNotification?.urgency === NotificationUrgency.Critical) {
-            return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.3);
+            return Theme.primarySelected;
         }
         return Theme.outlineMedium;
     }
@@ -207,7 +207,7 @@ Rectangle {
         shadowSpreadPx: 0
         shadowOffsetX: root.shadowOffsetXPx
         shadowOffsetY: root.shadowOffsetYPx
-        shadowColor: root.shadowElevation ? Theme.elevationShadowColor(root.shadowElevation) : "transparent"
+        shadowColor: root.shadowElevation ? Theme.elevationShadowColor(root.shadowElevation) : Theme.withAlpha(Theme.elevationShadowColor(root.shadowElevation), 0)
         shadowEnabled: root.shadowsAllowed && !root.connectedFrameMode
     }
 
@@ -352,7 +352,7 @@ Rectangle {
                     StyledText {
                         id: collapsedHeaderAppNameText
                         text: notificationGroup?.appName || ""
-                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                        color: Theme.surfaceTextMedium
                         font.pixelSize: Theme.fontSizeSmall
                         font.weight: Font.Normal
                         elide: Text.ElideRight
@@ -363,7 +363,7 @@ Rectangle {
                     StyledText {
                         id: collapsedHeaderSeparator
                         text: (collapsedHeaderAppNameText.text.length > 0 && collapsedHeaderTimeText.text.length > 0) ? " • " : ""
-                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                        color: Theme.surfaceTextMedium
                         font.pixelSize: Theme.fontSizeSmall
                         font.weight: Font.Normal
                     }
@@ -371,7 +371,7 @@ Rectangle {
                     StyledText {
                         id: collapsedHeaderTimeText
                         text: notificationGroup?.latestNotification?.timeStr || ""
-                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                        color: Theme.surfaceTextMedium
                         font.pixelSize: Theme.fontSizeSmall
                         font.weight: Font.Normal
                     }
@@ -568,7 +568,7 @@ Rectangle {
                         }
                         radius: Theme.cornerRadius
                         color: isSelected ? Theme.primaryPressed : Theme.nestedSurface
-                        border.color: isSelected ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.4) : Theme.outlineMedium
+                        border.color: isSelected ? Theme.withAlpha(Theme.primary, 0.4) : Theme.outlineMedium
                         border.width: 1
 
                         Behavior on border.color {
@@ -664,7 +664,7 @@ Rectangle {
                                         StyledText {
                                             id: expandedDelegateHeaderAppNameText
                                             text: modelData?.appName || ""
-                                            color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                                            color: Theme.surfaceTextMedium
                                             font.pixelSize: Theme.fontSizeSmall
                                             font.weight: Font.Normal
                                             elide: Text.ElideRight
@@ -675,7 +675,7 @@ Rectangle {
                                         StyledText {
                                             id: expandedDelegateHeaderSeparator
                                             text: (expandedDelegateHeaderAppNameText.text.length > 0 && expandedDelegateHeaderTimeText.text.length > 0) ? " • " : ""
-                                            color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                                            color: Theme.surfaceTextMedium
                                             font.pixelSize: Theme.fontSizeSmall
                                             font.weight: Font.Normal
                                         }
@@ -683,7 +683,7 @@ Rectangle {
                                         StyledText {
                                             id: expandedDelegateHeaderTimeText
                                             text: modelData?.timeStr || ""
-                                            color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                                            color: Theme.surfaceTextMedium
                                             font.pixelSize: Theme.fontSizeSmall
                                             font.weight: Font.Normal
                                         }
@@ -779,7 +779,7 @@ Rectangle {
                                                 width: Math.max(expandedActionText.implicitWidth + Theme.spacingM, Theme.notificationActionMinWidth)
                                                 height: actionButtonHeight
                                                 radius: Theme.notificationButtonCornerRadius
-                                                color: isHovered ? Theme.withAlpha(Theme.primary, Theme.stateLayerHover) : "transparent"
+                                                color: isHovered ? Theme.withAlpha(Theme.primary, Theme.stateLayerHover) : Theme.withAlpha(Theme.primary, 0)
 
                                                 StyledText {
                                                     id: expandedActionText
@@ -821,7 +821,7 @@ Rectangle {
                                             width: Math.max(expandedClearText.implicitWidth + Theme.spacingM, Theme.notificationActionMinWidth)
                                             height: actionButtonHeight
                                             radius: Theme.notificationButtonCornerRadius
-                                            color: isHovered ? Theme.withAlpha(Theme.primary, Theme.stateLayerHover) : "transparent"
+                                            color: isHovered ? Theme.withAlpha(Theme.primary, Theme.stateLayerHover) : Theme.withAlpha(Theme.primary, 0)
 
                                             Behavior on opacity {
                                                 NumberAnimation {
@@ -918,7 +918,7 @@ Rectangle {
                 width: Math.max(collapsedActionText.implicitWidth + Theme.spacingM, Theme.notificationActionMinWidth)
                 height: actionButtonHeight
                 radius: Theme.notificationButtonCornerRadius
-                color: isHovered ? Theme.withAlpha(Theme.primary, Theme.stateLayerHover) : "transparent"
+                color: isHovered ? Theme.withAlpha(Theme.primary, Theme.stateLayerHover) : Theme.withAlpha(Theme.primary, 0)
 
                 StyledText {
                     id: collapsedActionText
@@ -968,7 +968,7 @@ Rectangle {
         width: Math.max(collapsedClearText.implicitWidth + Theme.spacingM, Theme.notificationActionMinWidth)
         height: actionButtonHeight
         radius: Theme.notificationButtonCornerRadius
-        color: isHovered ? Theme.withAlpha(Theme.primary, Theme.stateLayerHover) : "transparent"
+        color: isHovered ? Theme.withAlpha(Theme.primary, Theme.stateLayerHover) : Theme.withAlpha(Theme.primary, 0)
 
         StyledText {
             id: collapsedClearText
@@ -1063,7 +1063,7 @@ Rectangle {
             color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
             radius: Theme.cornerRadius
             border.width: 0
-            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+            border.color: Theme.outlineStrong
         }
 
         MenuItem {
@@ -1079,7 +1079,7 @@ Rectangle {
             }
 
             background: Rectangle {
-                color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                color: parent.hovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
                 radius: Theme.cornerRadius / 2
             }
 
@@ -1105,7 +1105,7 @@ Rectangle {
             }
 
             background: Rectangle {
-                color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                color: parent.hovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
                 radius: Theme.cornerRadius / 2
             }
 
@@ -1133,7 +1133,7 @@ Rectangle {
             }
 
             background: Rectangle {
-                color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                color: parent.hovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
                 radius: Theme.cornerRadius / 2
             }
 

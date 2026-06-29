@@ -6334,16 +6334,21 @@
       "coalesce",
       "dedupe",
       "duplicate",
+      "identical",
       "messages",
       "notif",
       "notification",
       "notifications",
       "notifs",
+      "popup",
       "repeat",
+      "show",
       "stack",
+      "stacking",
       "suppress",
       "toast"
-    ]
+    ],
+    "description": "Identical alerts show as one popup instead of stacking"
   },
   {
     "section": "notificationShowTimeoutBar",

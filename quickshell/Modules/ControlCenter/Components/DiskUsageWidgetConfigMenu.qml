@@ -13,7 +13,7 @@ Rectangle {
     height: menuColumn.implicitHeight + Theme.spacingS * 2
     radius: Theme.cornerRadius
     color: Theme.surfaceContainer
-    border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.16)
+    border.color: Theme.outlineStrong
     border.width: 1
 
     MouseArea {

@@ -639,7 +639,7 @@ PanelWindow {
             shadowBlurPx: content.shadowBlurPx
             shadowOffsetX: content.shadowOffsetX
             shadowOffsetY: content.shadowOffsetY
-            shadowColor: content.shadowsAllowed && content.elevLevel ? Theme.elevationShadowColor(content.elevLevel) : "transparent"
+            shadowColor: content.shadowsAllowed && content.elevLevel ? Theme.elevationShadowColor(content.elevLevel) : Theme.withAlpha(Theme.elevationShadowColor(content.elevLevel), 0)
             shadowEnabled: !win._isDestroying && win.screenValid && content.shadowsAllowed && !win.connectedFrameMode
 
             sourceX: content.shadowRenderPadding + content.cardInset
@@ -690,7 +690,7 @@ PanelWindow {
             anchors.margins: content.cardInset
             radius: win.connectedFrameMode ? Theme.connectedSurfaceRadius : Theme.cornerRadius
             color: "transparent"
-            border.color: win.connectedFrameMode ? "transparent" : BlurService.borderColor
+            border.color: win.connectedFrameMode ? Theme.withAlpha(BlurService.borderColor, 0) : BlurService.borderColor
             border.width: win.connectedFrameMode ? 0 : BlurService.borderWidth
             z: 100
             scale: content.chromeScale
@@ -891,7 +891,7 @@ PanelWindow {
                         StyledText {
                             id: headerAppNameText
                             text: notificationData ? (notificationData.appName || "") : ""
-                            color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                            color: Theme.surfaceTextMedium
                             font.pixelSize: Theme.fontSizeSmall
                             font.weight: Font.Normal
                             elide: Text.ElideRight
@@ -902,7 +902,7 @@ PanelWindow {
                         StyledText {
                             id: headerSeparator
                             text: (headerAppNameText.text.length > 0 && headerTimeText.text.length > 0) ? " • " : ""
-                            color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                            color: Theme.surfaceTextMedium
                             font.pixelSize: Theme.fontSizeSmall
                             font.weight: Font.Normal
                         }
@@ -910,12 +910,11 @@ PanelWindow {
                         StyledText {
                             id: headerTimeText
                             text: notificationData ? (notificationData.timeStr || "") : ""
-                            color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                            color: Theme.surfaceTextMedium
                             font.pixelSize: Theme.fontSizeSmall
                             font.weight: Font.Normal
                         }
                     }
-
 
                     StyledText {
                         text: notificationData ? (notificationData.summary || "") : ""
@@ -1041,7 +1040,7 @@ PanelWindow {
                         width: Math.max(actionText.implicitWidth + Theme.spacingM, Theme.notificationActionMinWidth)
                         height: actionButtonHeight
                         radius: Theme.notificationButtonCornerRadius
-                        color: isHovered ? Theme.withAlpha(Theme.primary, Theme.stateLayerHover) : "transparent"
+                        color: isHovered ? Theme.withAlpha(Theme.primary, Theme.stateLayerHover) : Theme.withAlpha(Theme.primary, 0)
 
                         StyledText {
                             id: actionText
@@ -1093,7 +1092,7 @@ PanelWindow {
                 width: Math.max(clearTextLabel.implicitWidth + Theme.spacingM, Theme.notificationActionMinWidth)
                 height: actionButtonHeight
                 radius: Theme.notificationButtonCornerRadius
-                color: isHovered ? Theme.withAlpha(Theme.primary, Theme.stateLayerHover) : "transparent"
+                color: isHovered ? Theme.withAlpha(Theme.primary, Theme.stateLayerHover) : Theme.withAlpha(Theme.primary, 0)
                 z: 20
 
                 StyledText {
@@ -1389,7 +1388,7 @@ PanelWindow {
             color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
             radius: Theme.cornerRadius
             border.width: 0
-            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+            border.color: Theme.outlineStrong
         }
 
         MenuItem {
@@ -1405,7 +1404,7 @@ PanelWindow {
             }
 
             background: Rectangle {
-                color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                color: parent.hovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
                 radius: Theme.cornerRadius / 2
             }
 
@@ -1431,7 +1430,7 @@ PanelWindow {
             }
 
             background: Rectangle {
-                color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                color: parent.hovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
                 radius: Theme.cornerRadius / 2
             }
 
@@ -1460,7 +1459,7 @@ PanelWindow {
             }
 
             background: Rectangle {
-                color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                color: parent.hovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
                 radius: Theme.cornerRadius / 2
             }
 

@@ -95,7 +95,7 @@ StyledRect {
                 width: 28
                 height: 28
                 radius: Theme.cornerRadius
-                color: deleteArea.containsMouse ? Theme.errorHover : "transparent"
+                color: deleteArea.containsMouse ? Theme.errorHover : Theme.withAlpha(Theme.errorHover, 0)
                 anchors.verticalCenter: parent.verticalCenter
 
                 DankIcon {

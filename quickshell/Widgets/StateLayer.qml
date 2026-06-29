@@ -27,7 +27,7 @@ MouseArea {
         id: stateRect
         anchors.fill: parent
         radius: root.cornerRadius
-        color: Qt.rgba(stateColor.r, stateColor.g, stateColor.b, stateOpacity)
+        color: Theme.withAlpha(stateColor, stateOpacity)
 
         Behavior on color {
             enabled: Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None

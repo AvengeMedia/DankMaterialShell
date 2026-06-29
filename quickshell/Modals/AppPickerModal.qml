@@ -264,7 +264,7 @@ DankModal {
                             iconName: "view_list"
                             iconSize: 20
                             iconColor: root.viewMode === "list" ? Theme.primary : Theme.surfaceText
-                            backgroundColor: root.viewMode === "list" ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                            backgroundColor: root.viewMode === "list" ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
                             onClicked: {
                                 root.viewMode = "list";
                             }
@@ -276,7 +276,7 @@ DankModal {
                             iconName: "grid_view"
                             iconSize: 20
                             iconColor: root.viewMode === "grid" ? Theme.primary : Theme.surfaceText
-                            backgroundColor: root.viewMode === "grid" ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                            backgroundColor: root.viewMode === "grid" ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
                             onClicked: {
                                 root.viewMode = "grid";
                             }

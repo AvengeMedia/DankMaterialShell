@@ -97,7 +97,7 @@ SettingsCard {
                         width: parent.width
                         height: Theme.iconSizeLarge
                         radius: Theme.cornerRadius
-                        color: duplicateArea.containsMouse ? Theme.primaryHover : "transparent"
+                        color: duplicateArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
 
                         Row {
                             anchors.left: parent.left
@@ -134,7 +134,7 @@ SettingsCard {
                         width: parent.width
                         height: Theme.iconSizeLarge
                         radius: Theme.cornerRadius
-                        color: deleteArea.containsMouse ? Theme.errorHover : "transparent"
+                        color: deleteArea.containsMouse ? Theme.errorHover : Theme.withAlpha(Theme.errorHover, 0)
 
                         Row {
                             anchors.left: parent.left

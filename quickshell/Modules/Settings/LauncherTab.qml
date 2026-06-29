@@ -364,7 +364,7 @@ Item {
                         width: parent.width - selectButton.width - Theme.spacingM
                         height: 36
                         radius: Theme.cornerRadius
-                        color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.9)
+                        color: Theme.withAlpha(Theme.surfaceContainer, 0.9)
                         border.color: Theme.outlineStrong
                         border.width: 1
 
@@ -671,7 +671,7 @@ Item {
                     onToggled: checked => SettingsData.set("dankLauncherV2UnloadOnClose", checked)
                 }
 
-                 SettingsToggleRow {
+                SettingsToggleRow {
                     settingKey: "dankLauncherV2ShowSourceBadges"
                     tags: ["launcher", "appearance", "badge", "source", "flatpak"]
                     text: I18n.tr("Show Package Source Badges")
@@ -789,7 +789,7 @@ Item {
                             width: parent.width
                             height: 56
                             radius: Theme.cornerRadius
-                            color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.3)
+                            color: Theme.withAlpha(Theme.surfaceContainer, 0.3)
 
                             Row {
                                 anchors.left: parent.left
@@ -957,7 +957,7 @@ Item {
                                 width: parent.width
                                 height: 52
                                 radius: Theme.cornerRadius
-                                color: visibilityDelegateItem.held ? Theme.surfaceHover : Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.3)
+                                color: visibilityDelegateItem.held ? Theme.surfaceHover : Theme.withAlpha(Theme.surfaceContainer, 0.3)
 
                                 Row {
                                     anchors.left: parent.left
@@ -1219,7 +1219,7 @@ Item {
                             width: hiddenAppsList.width
                             height: 48
                             radius: Theme.cornerRadius
-                            color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.3)
+                            color: Theme.withAlpha(Theme.surfaceContainer, 0.3)
                             border.width: 0
 
                             Row {
@@ -1330,7 +1330,7 @@ Item {
                             width: overridesList.width
                             height: 48
                             radius: Theme.cornerRadius
-                            color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.3)
+                            color: Theme.withAlpha(Theme.surfaceContainer, 0.3)
                             border.width: 0
 
                             Row {
@@ -1467,7 +1467,7 @@ Item {
                             width: rankedAppsList.width
                             height: 48
                             radius: Theme.cornerRadius
-                            color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.3)
+                            color: Theme.withAlpha(Theme.surfaceContainer, 0.3)
                             border.width: 0
 
                             Row {

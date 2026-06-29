@@ -48,7 +48,7 @@ Column {
                 width: 32
                 height: 32
                 radius: 16
-                color: closeArea.containsMouse ? Theme.errorHover : "transparent"
+                color: closeArea.containsMouse ? Theme.errorHover : Theme.withAlpha(Theme.errorHover, 0)
                 visible: root.showCloseButton
 
                 DankIcon {

@@ -1470,7 +1470,7 @@ Item {
             Rectangle {
                 anchors.fill: parent
                 color: "transparent"
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.1)
+                border.color: Theme.outlineStrong
                 border.width: 1
                 radius: 2
                 visible: false

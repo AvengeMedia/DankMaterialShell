@@ -161,7 +161,7 @@ Rectangle {
                 width: 28
                 height: 28
                 radius: 14
-                color: expandBtn.containsMouse ? Theme.surfacePressed : "transparent"
+                color: expandBtn.containsMouse ? Theme.surfacePressed : Theme.withAlpha(Theme.surfacePressed, 0)
                 anchors.verticalCenter: parent.verticalCenter
                 visible: canExpand
 
@@ -185,7 +185,7 @@ Rectangle {
                 width: 28
                 height: 28
                 radius: 14
-                color: deleteBtn.containsMouse ? Theme.errorHover : "transparent"
+                color: deleteBtn.containsMouse ? Theme.errorHover : Theme.withAlpha(Theme.errorHover, 0)
                 anchors.verticalCenter: parent.verticalCenter
                 visible: canDelete
 

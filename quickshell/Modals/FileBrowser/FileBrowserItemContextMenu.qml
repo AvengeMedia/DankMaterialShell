@@ -89,7 +89,7 @@ Popup {
     contentItem: Rectangle {
         color: Theme.floatingSurface
         radius: Theme.cornerRadius
-        border.color: BlurService.enabled ? BlurService.borderColor : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+        border.color: BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium
         border.width: BlurService.enabled ? BlurService.borderWidth : 1
 
         Column {
@@ -110,7 +110,7 @@ Popup {
                         if (!modelData.enabled || !area.containsMouse)
                             return "transparent";
                         if (modelData.dangerous)
-                            return Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.12);
+                            return Theme.errorHover;
                         return BlurService.hoverColor(Theme.widgetBaseHoverColor);
                     }
 

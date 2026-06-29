@@ -19,7 +19,7 @@ Rectangle {
     signal rightClicked(real mouseX, real mouseY)
 
     radius: Theme.cornerRadius
-    color: isSelected ? Theme.primaryPressed : isHovered ? Theme.primaryPressed : "transparent"
+    color: isSelected ? Theme.primaryPressed : isHovered ? Theme.primaryPressed : Theme.withAlpha(Theme.primaryPressed, 0)
     border.width: isSelected ? 2 : 0
     border.color: Theme.primary
 
@@ -93,7 +93,7 @@ Rectangle {
 
                 Rectangle {
                     anchors.fill: parent
-                    color: root.isHovered ? Theme.withAlpha(Theme.surfaceVariant, 0.2) : "transparent"
+                    color: root.isHovered ? Theme.withAlpha(Theme.surfaceVariant, 0.2) : Theme.withAlpha(Theme.surfaceVariant, 0)
                 }
             }
 
@@ -155,7 +155,7 @@ Rectangle {
                 width: root.hasScreencopy ? 28 : 40
                 height: root.hasScreencopy ? 28 : 16
                 radius: root.hasScreencopy ? 14 : 4
-                color: root.hasScreencopy ? Theme.surfaceContainer : "transparent"
+                color: root.hasScreencopy ? Theme.surfaceContainer : Theme.withAlpha(Theme.surfaceContainer, 0)
                 visible: attributionImage.status === Image.Ready
                 opacity: 0.95
 

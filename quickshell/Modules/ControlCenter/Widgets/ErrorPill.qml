@@ -12,7 +12,7 @@ StyledRect {
     property string secondaryMessage: ""
 
     radius: Theme.cornerRadius
-    color: Qt.rgba(Theme.warning.r, Theme.warning.g, Theme.warning.b, 0.1)
+    color: Theme.warningHover
     border.color: Theme.warning
     border.width: 1
 

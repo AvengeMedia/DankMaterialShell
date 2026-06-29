@@ -159,7 +159,7 @@ Item {
                         width: mountListView.width
                         height: 60
                         radius: Theme.cornerRadius
-                        color: mountMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.06) : "transparent"
+                        color: mountMouseArea.containsMouse ? Theme.primaryBackground : Theme.withAlpha(Theme.primaryBackground, 0)
 
                         readonly property real usedPct: {
                             const pctStr = modelData?.percent ?? "0%";
@@ -244,7 +244,7 @@ Item {
                                     width: parent.width
                                     height: 8
                                     radius: 4
-                                    color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                                    color: Theme.outlineHeavy
 
                                     Rectangle {
                                         width: parent.width * Math.min(1, parent.parent.parent.parent.usedPct)

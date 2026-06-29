@@ -671,14 +671,14 @@ Item {
                     DankIcon {
                         name: "cloud_off"
                         size: Theme.iconSize * 2
-                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5)
+                        color: Theme.surfaceTextSecondary
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
 
                     StyledText {
                         text: I18n.tr("No Weather Data Available")
                         font.pixelSize: Theme.fontSizeLarge
-                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                        color: Theme.surfaceTextMedium
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
                 }
@@ -696,7 +696,7 @@ Item {
                             id: refreshButton
                             name: "refresh"
                             size: Theme.iconSize - 4
-                            color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.4)
+                            color: Theme.onSurface_38
                             anchors.right: parent.right
                             anchors.top: parent.top
                             smoothTransform: isRefreshing
@@ -782,7 +782,7 @@ Item {
                                         id: unitText
                                         text: SettingsData.useFahrenheit ? "F" : "C"
                                         font.pixelSize: Theme.fontSizeMedium
-                                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                                        color: Theme.surfaceTextMedium
                                         anchors.left: tempText.right
                                         anchors.leftMargin: Theme.spacingXS
                                         anchors.verticalCenter: parent.verticalCenter
@@ -804,13 +804,13 @@ Item {
                                     property var feelsLike: SettingsData.useFahrenheit ? (WeatherService.weather.feelsLikeF || WeatherService.weather.tempF) : (WeatherService.weather.feelsLike || WeatherService.weather.temp)
                                     text: I18n.tr("Feels Like %1°").arg(feelsLike)
                                     font.pixelSize: Theme.fontSizeSmall
-                                    color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5)
+                                    color: Theme.surfaceTextSecondary
                                 }
 
                                 StyledText {
                                     text: WeatherService.weather.city || ""
                                     font.pixelSize: Theme.fontSizeMedium
-                                    color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                                    color: Theme.surfaceTextMedium
                                     visible: text.length > 0
                                 }
                             }
@@ -831,7 +831,7 @@ Item {
                                         id: sunriseIcon
                                         name: "wb_twilight"
                                         size: Theme.iconSize - 6
-                                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6)
+                                        color: Theme.surfaceTextSecondary
                                         anchors.left: parent.left
                                         anchors.verticalCenter: parent.verticalCenter
                                     }
@@ -840,7 +840,7 @@ Item {
                                         id: sunriseText
                                         text: WeatherService.weather.sunrise || ""
                                         font.pixelSize: Theme.fontSizeSmall
-                                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6)
+                                        color: Theme.surfaceTextSecondary
                                         anchors.left: sunriseIcon.right
                                         anchors.leftMargin: Theme.spacingXS
                                         anchors.verticalCenter: parent.verticalCenter
@@ -855,7 +855,7 @@ Item {
                                         id: sunsetIcon
                                         name: "bedtime"
                                         size: Theme.iconSize - 6
-                                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6)
+                                        color: Theme.surfaceTextSecondary
                                         anchors.left: parent.left
                                         anchors.verticalCenter: parent.verticalCenter
                                     }
@@ -864,7 +864,7 @@ Item {
                                         id: sunsetText
                                         text: WeatherService.weather.sunset || ""
                                         font.pixelSize: Theme.fontSizeSmall
-                                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6)
+                                        color: Theme.surfaceTextSecondary
                                         anchors.left: sunsetIcon.right
                                         anchors.leftMargin: Theme.spacingXS
                                         anchors.verticalCenter: parent.verticalCenter
@@ -877,7 +877,7 @@ Item {
                     Rectangle {
                         width: parent.width
                         height: 1
-                        color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.1)
+                        color: Theme.outlineStrong
                     }
 
                     GridLayout {
@@ -901,7 +901,7 @@ Item {
                                     width: 32
                                     height: 32
                                     radius: 16
-                                    color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.1)
+                                    color: Theme.primaryHover
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     DankIcon {
                                         anchors.centerIn: parent
@@ -917,7 +917,7 @@ Item {
                                     StyledText {
                                         text: I18n.tr("Feels Like")
                                         font.pixelSize: Theme.fontSizeSmall
-                                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                                        color: Theme.surfaceTextMedium
                                         anchors.horizontalCenter: parent.horizontalCenter
                                     }
                                     StyledText {
@@ -945,7 +945,7 @@ Item {
                                     width: 32
                                     height: 32
                                     radius: 16
-                                    color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.1)
+                                    color: Theme.primaryHover
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     DankIcon {
                                         anchors.centerIn: parent
@@ -961,7 +961,7 @@ Item {
                                     StyledText {
                                         text: I18n.tr("Humidity")
                                         font.pixelSize: Theme.fontSizeSmall
-                                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                                        color: Theme.surfaceTextMedium
                                         anchors.horizontalCenter: parent.horizontalCenter
                                     }
                                     StyledText {
@@ -989,7 +989,7 @@ Item {
                                     width: 32
                                     height: 32
                                     radius: 16
-                                    color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.1)
+                                    color: Theme.primaryHover
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     DankIcon {
                                         anchors.centerIn: parent
@@ -1005,7 +1005,7 @@ Item {
                                     StyledText {
                                         text: I18n.tr("Wind")
                                         font.pixelSize: Theme.fontSizeSmall
-                                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                                        color: Theme.surfaceTextMedium
                                         anchors.horizontalCenter: parent.horizontalCenter
                                     }
                                     StyledText {
@@ -1046,7 +1046,7 @@ Item {
                                     width: 32
                                     height: 32
                                     radius: 16
-                                    color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.1)
+                                    color: Theme.primaryHover
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     DankIcon {
                                         anchors.centerIn: parent
@@ -1062,7 +1062,7 @@ Item {
                                     StyledText {
                                         text: I18n.tr("Pressure")
                                         font.pixelSize: Theme.fontSizeSmall
-                                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                                        color: Theme.surfaceTextMedium
                                         anchors.horizontalCenter: parent.horizontalCenter
                                     }
                                     StyledText {
@@ -1096,7 +1096,7 @@ Item {
                                     width: 32
                                     height: 32
                                     radius: 16
-                                    color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.1)
+                                    color: Theme.primaryHover
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     DankIcon {
                                         anchors.centerIn: parent
@@ -1112,7 +1112,7 @@ Item {
                                     StyledText {
                                         text: I18n.tr("Rain Chance")
                                         font.pixelSize: Theme.fontSizeSmall
-                                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                                        color: Theme.surfaceTextMedium
                                         anchors.horizontalCenter: parent.horizontalCenter
                                     }
                                     StyledText {
@@ -1140,7 +1140,7 @@ Item {
                                     width: 32
                                     height: 32
                                     radius: 16
-                                    color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.1)
+                                    color: Theme.primaryHover
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     DankIcon {
                                         anchors.centerIn: parent
@@ -1156,7 +1156,7 @@ Item {
                                     StyledText {
                                         text: I18n.tr("Visibility")
                                         font.pixelSize: Theme.fontSizeSmall
-                                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                                        color: Theme.surfaceTextMedium
                                         anchors.horizontalCenter: parent.horizontalCenter
                                     }
                                     StyledText {

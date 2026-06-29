@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -10,9 +9,9 @@ PluginSettings {
     pluginId: "exampleVariants"
 
     onVariantsChanged: {
-        variantsModel.clear()
+        variantsModel.clear();
         for (var i = 0; i < variants.length; i++) {
-            variantsModel.append(variants[i])
+            variantsModel.append(variants[i]);
         }
     }
 
@@ -112,21 +111,21 @@ PluginSettings {
                 iconName: "add"
                 onClicked: {
                     if (!nameField.text) {
-                        ToastService.showError("Please enter a variant name")
-                        return
+                        ToastService.showError("Please enter a variant name");
+                        return;
                     }
 
                     var variantConfig = {
                         text: textField.text || nameField.text,
                         icon: iconField.text || "widgets"
-                    }
+                    };
 
-                    createVariant(nameField.text, variantConfig)
-                    ToastService.showInfo("Variant created: " + nameField.text)
+                    createVariant(nameField.text, variantConfig);
+                    ToastService.showInfo("Variant created: " + nameField.text);
 
-                    nameField.text = ""
-                    iconField.text = ""
-                    textField.text = ""
+                    nameField.text = "";
+                    iconField.text = "";
+                    textField.text = "";
                 }
             }
         }
@@ -217,7 +216,7 @@ PluginSettings {
                             width: 32
                             height: 32
                             radius: 16
-                            color: deleteArea.containsMouse ? Theme.error : "transparent"
+                            color: deleteArea.containsMouse ? Theme.error : Theme.withAlpha(Theme.error, 0)
                             anchors.verticalCenter: parent.verticalCenter
 
                             DankIcon {
@@ -233,8 +232,8 @@ PluginSettings {
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: {
-                                    removeVariant(model.id)
-                                    ToastService.showInfo("Variant removed: " + model.name)
+                                    removeVariant(model.id);
+                                    ToastService.showInfo("Variant removed: " + model.name);
                                 }
                             }
                         }

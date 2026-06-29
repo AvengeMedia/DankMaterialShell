@@ -233,7 +233,7 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08)
+        color: Theme.primaryHoverLight
         radius: Theme.cornerRadius
         border.color: "transparent"
         border.width: 0

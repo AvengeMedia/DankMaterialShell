@@ -626,7 +626,7 @@ DankModal {
                     width: 20
                     height: 20
                     radius: 4
-                    color: checked ? Theme.primary : "transparent"
+                    color: checked ? Theme.primary : Theme.withAlpha(Theme.primary, 0)
                     border.color: checked ? Theme.primary : Theme.outlineButton
                     border.width: 2
 
@@ -667,7 +667,7 @@ DankModal {
                         width: Math.max(70, cancelText.contentWidth + Theme.spacingM * 2)
                         height: 36
                         radius: Theme.cornerRadius
-                        color: cancelArea.containsMouse ? Theme.surfaceTextHover : "transparent"
+                        color: cancelArea.containsMouse ? Theme.surfaceTextHover : Theme.withAlpha(Theme.surfaceTextHover, 0)
                         border.color: Theme.surfaceVariantAlpha
                         border.width: 1
 

@@ -126,7 +126,7 @@ Item {
                                         Rectangle {
                                             anchors.fill: parent
                                             radius: Theme.cornerRadius
-                                            color: deleteArea.containsMouse ? Theme.withAlpha(Theme.error, 0.2) : "transparent"
+                                            color: deleteArea.containsMouse ? Theme.withAlpha(Theme.error, 0.2) : Theme.withAlpha(Theme.error, 0)
                                         }
 
                                         DankIcon {

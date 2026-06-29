@@ -71,7 +71,7 @@ Item {
                     Rectangle {
                         width: parent.width
                         height: 1
-                        color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+                        color: Theme.outlineStrong
                     }
 
                     Column {
@@ -201,7 +201,7 @@ Item {
                                                 width: 28
                                                 height: 28
                                                 radius: 14
-                                                color: ethExpandBtn.containsMouse ? Theme.surfacePressed : "transparent"
+                                                color: ethExpandBtn.containsMouse ? Theme.surfacePressed : Theme.withAlpha(Theme.surfacePressed, 0)
                                                 visible: isConnected
 
                                                 DankIcon {
@@ -231,7 +231,7 @@ Item {
                                                 width: 28
                                                 height: 28
                                                 radius: 14
-                                                color: ethDisconnectBtn.containsMouse ? Theme.errorHover : "transparent"
+                                                color: ethDisconnectBtn.containsMouse ? Theme.errorHover : Theme.withAlpha(Theme.errorHover, 0)
                                                 visible: isConnected
 
                                                 DankIcon {
@@ -381,7 +381,7 @@ Item {
                         Rectangle {
                             width: parent.width
                             height: 1
-                            color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+                            color: Theme.outlineStrong
                         }
 
                         StyledText {

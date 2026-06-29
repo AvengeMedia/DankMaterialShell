@@ -20,7 +20,7 @@ Rectangle {
 
     width: parent?.width ?? 200
     height: 32
-    color: isSticky ? "transparent" : (hoverArea.containsMouse ? Theme.surfaceHover : "transparent")
+    color: isSticky ? Theme.withAlpha(Theme.surfaceHover, 0) : (hoverArea.containsMouse ? Theme.surfaceHover : Theme.withAlpha(Theme.surfaceHover, 0))
     radius: Theme.cornerRadius
 
     MouseArea {
@@ -81,7 +81,7 @@ Rectangle {
             Rectangle {
                 anchors.fill: parent
                 radius: Theme.cornerRadius
-                color: chipArea.containsMouse || categoryPopup.visible ? Theme.surfaceContainerHigh : "transparent"
+                color: chipArea.containsMouse || categoryPopup.visible ? Theme.surfaceContainerHigh : Theme.withAlpha(Theme.surfaceContainerHigh, 0)
                 border.color: categoryPopup.visible ? Theme.primary : Theme.outlineMedium
                 border.width: categoryPopup.visible ? 2 : 1
             }
@@ -145,7 +145,7 @@ Rectangle {
 
                 contentItem: Rectangle {
                     radius: Theme.cornerRadius
-                    color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 1)
+                    color: Theme.withAlpha(Theme.surfaceContainer, 1)
                     border.color: Theme.primary
                     border.width: 2
 
@@ -179,7 +179,7 @@ Rectangle {
                             height: 32
                             radius: Theme.cornerRadius
                             readonly property bool isCurrent: categoryChip.currentCategory === modelData
-                            color: isCurrent ? Theme.primaryHover : catArea.containsMouse ? Theme.primaryHoverLight : "transparent"
+                            color: isCurrent ? Theme.primaryHover : catArea.containsMouse ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
 
                             Row {
                                 anchors.left: parent.left
@@ -269,7 +269,7 @@ Rectangle {
                     width: 20
                     height: 20
                     radius: 4
-                    color: root.viewMode === modelData.mode ? Theme.primaryHover : modeArea.containsMouse ? Theme.surfaceHover : "transparent"
+                    color: root.viewMode === modelData.mode ? Theme.primaryHover : modeArea.containsMouse ? Theme.surfaceHover : Theme.withAlpha(Theme.surfaceHover, 0)
 
                     DankIcon {
                         anchors.centerIn: parent

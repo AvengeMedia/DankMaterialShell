@@ -405,8 +405,8 @@ Item {
 
                                 var c = root.accentColor;
                                 var grad = ctx.createLinearGradient(0, 0, 0, height);
-                                grad.addColorStop(0, Qt.rgba(c.r, c.g, c.b, 0.3));
-                                grad.addColorStop(1, Qt.rgba(c.r, c.g, c.b, 0.05));
+                                grad.addColorStop(0, Theme.withAlpha(c, 0.3));
+                                grad.addColorStop(1, Theme.withAlpha(c, 0.05));
 
                                 ctx.fillStyle = grad;
                                 ctx.beginPath();
@@ -420,7 +420,7 @@ Item {
                                 ctx.closePath();
                                 ctx.fill();
 
-                                ctx.strokeStyle = Qt.rgba(c.r, c.g, c.b, 0.6);
+                                ctx.strokeStyle = Theme.withAlpha(c, 0.6);
                                 ctx.lineWidth = 1.5;
                                 ctx.beginPath();
                                 for (var j = 0; j < hist.length; j++) {
@@ -431,7 +431,7 @@ Item {
                                 ctx.stroke();
 
                                 if (hist2 && hist2.length >= 2) {
-                                    ctx.strokeStyle = Qt.rgba(c.r, c.g, c.b, 0.3);
+                                    ctx.strokeStyle = Theme.withAlpha(c, 0.3);
                                     ctx.lineWidth = 1;
                                     ctx.beginPath();
                                     for (var m = 0; m < hist2.length; m++) {

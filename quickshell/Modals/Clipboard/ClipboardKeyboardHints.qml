@@ -15,7 +15,7 @@ Rectangle {
 
     height: ClipboardConstants.keyboardHintsHeight
     radius: Theme.cornerRadius
-    color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.95)
+    color: Theme.withAlpha(Theme.surfaceContainer, 0.95)
     border.color: Theme.primary
     border.width: 2
     opacity: visible ? 1 : 0

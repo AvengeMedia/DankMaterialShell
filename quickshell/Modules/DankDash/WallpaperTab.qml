@@ -537,7 +537,7 @@ Item {
 
                         Rectangle {
                             anchors.fill: parent
-                            color: isSelected ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.15) : "transparent"
+                            color: isSelected ? Theme.primaryPressed : Theme.withAlpha(Theme.primaryPressed, 0)
                             radius: parent.radius
 
                             Behavior on color {
@@ -658,7 +658,8 @@ Item {
                                 sortMenu.visible = false;
                                 pageJumpPopup.visible = !pageJumpPopup.visible;
                             }
-                            onEntered: if (enabled) pageJumpTooltip.show(I18n.tr("Jump to page"), pageIndicator, 0, 0, "top")
+                            onEntered: if (enabled)
+                                pageJumpTooltip.show(I18n.tr("Jump to page"), pageIndicator, 0, 0, "top")
                             onExited: pageJumpTooltip.hide()
                         }
 

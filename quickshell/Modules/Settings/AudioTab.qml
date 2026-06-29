@@ -718,7 +718,7 @@ Item {
                         width: cancelButtonText.width + Theme.spacingL * 2
                         height: Theme.buttonHeight
                         radius: Theme.cornerRadius
-                        color: cancelButtonMouseArea.containsMouse ? Theme.surfaceHover : "transparent"
+                        color: cancelButtonMouseArea.containsMouse ? Theme.surfaceHover : Theme.withAlpha(Theme.surfaceHover, 0)
                         border.width: 1
                         border.color: Theme.outline
 

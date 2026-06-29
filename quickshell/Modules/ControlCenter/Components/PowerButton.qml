@@ -15,7 +15,7 @@ Rectangle {
 
     height: 34
     radius: Theme.cornerRadius
-    color: mouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.5)
+    color: mouseArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.surfaceVariant, 0.5)
 
     Row {
         anchors.centerIn: parent

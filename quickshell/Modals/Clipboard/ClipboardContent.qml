@@ -147,7 +147,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 iconName: "filter_list"
                 iconColor: modal.activeFilter !== "all" ? Theme.primary : Theme.surfaceText
-                backgroundColor: modal.activeFilter !== "all" ? Theme.primarySelected : "transparent"
+                backgroundColor: modal.activeFilter !== "all" ? Theme.primarySelected : Theme.withAlpha(Theme.primarySelected, 0)
                 tooltipText: I18n.tr("Filter by type", "Clipboard history type filter button tooltip")
                 onClicked: filterMenuLoader.item?.openDropdownMenu()
             }
