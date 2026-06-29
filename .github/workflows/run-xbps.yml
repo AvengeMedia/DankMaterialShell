@@ -1,9 +1,8 @@
 name: Void Linux XBPS Repository
 
 on:
-  push:
-    paths:
-      - 'distro/void/srcpkgs/**'
+  schedule:
+    - cron: "0 2,5,14,17,20,23 * * *" # 9am, 12pm, 3pm, 6pm, 9pm, 12am EST (UTC times shown)
   release:
     types: [published]
   workflow_dispatch:
@@ -145,7 +144,7 @@ jobs:
           BUILD_GIT="${{ github.event.inputs.build_git || 'true' }}"
           FORCE_REBUILD="${{ github.event.inputs.force_rebuild || 'false' }}"
           
-          if [ "${{ github.event_name }}" = "push" ]; then
+          if [ "${{ github.event_name }}" = "schedule" ]; then
             BUILD_DMS="false"
             BUILD_GREETER="false"
             BUILD_GIT="true"
