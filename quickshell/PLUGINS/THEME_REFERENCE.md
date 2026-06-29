@@ -44,12 +44,18 @@ Theme.cornerRadiusLarge // Larger radius
 ### Surface Colors
 ```qml
 Theme.surface
-Theme.surfaceContainerLowest
-Theme.surfaceContainerLow
+Theme.surfaceContainerLowest   // matugen-only (see note)
+Theme.surfaceContainerLow      // matugen-only (see note)
 Theme.surfaceContainer
 Theme.surfaceContainerHigh
 Theme.surfaceContainerHighest
 ```
+
+> **Note:** Not every theme color is consumed by DMS's own UI. `surfaceContainerLowest`,
+> `surfaceContainerLow`, and `backgroundText` are currently unused by DMS components — they
+> exist to complete the Material palette and are exported to matugen templates (VS Code,
+> KDE, Firefox, Zed, etc.). They're still safe to reference in plugins; they just aren't
+> relied on internally.
 
 ### Text Colors
 ```qml

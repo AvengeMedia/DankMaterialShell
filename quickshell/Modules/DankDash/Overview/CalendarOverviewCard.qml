@@ -574,7 +574,7 @@ Rectangle {
                                     anchors.centerIn: parent
                                     text: dayDate.getDate()
                                     font.pixelSize: Theme.fontSizeSmall
-                                    color: isToday ? Theme.primary : isCurrentMonth ? Theme.surfaceText : Theme.onSurface_38
+                                    color: isToday ? Theme.primary : isCurrentMonth ? Theme.surfaceText : Theme.surfaceVariantText
                                     font.weight: isToday ? Font.Medium : Font.Normal
                                 }
 
