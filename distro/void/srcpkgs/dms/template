@@ -21,8 +21,8 @@ changelog="https://github.com/AvengeMedia/DankMaterialShell/releases"
 distfiles="https://github.com/AvengeMedia/DankMaterialShell/archive/refs/tags/v${version}.tar.gz"
 checksum=f54601e522c883fa9cce02bec070e4321e47389a1cf453e7ad0bb7379ad91b61
 
-# Optional feature deps (XBPS has no "recommends") are listed in distro/void/README.md.
-depends="quickshell accountsservice dgop matugen"
+# Optional feature deps are listed in distro/void/README.md.
+depends="quickshell accountsservice dgop matugen dbus"
 
 post_install() {
 	# QML shell tree (build_style=go already installed the dms binary)

@@ -31,8 +31,8 @@ checksum=badbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadb
 conflicts="dms"
 provides="dms-${version}_${revision}"
 
-# Optional feature deps (XBPS has no "recommends") are listed in distro/void/README.md.
-depends="quickshell accountsservice dgop matugen"
+# Optional feature deps are listed in distro/void/README.md.
+depends="quickshell accountsservice dgop matugen dbus"
 
 post_install() {
 	# QML shell tree (build_style=go already installed the dms binary)
