@@ -428,7 +428,7 @@ Item {
                         },
                         {
                             "value": "primary",
-                            "label": I18n.tr("Primary Theme Color")
+                            "label": I18n.tr("Primary")
                         },
                         {
                             "value": "surface",
