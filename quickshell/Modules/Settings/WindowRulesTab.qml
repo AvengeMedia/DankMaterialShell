@@ -472,13 +472,12 @@ Item {
                 radius: Theme.cornerRadius
 
                 readonly property bool showLegacy: root.readOnly
-                readonly property bool showError: !showLegacy && root.windowRulesIncludeStatus.exists && !root.windowRulesIncludeStatus.included
-                readonly property bool showSetup: !showLegacy && !root.windowRulesIncludeStatus.exists && !root.windowRulesIncludeStatus.included
+                readonly property bool showSetup: !showLegacy && !root.windowRulesIncludeStatus.included
 
-                color: (showLegacy || showError || showSetup) ? Theme.withAlpha(Theme.warning, 0.15) : Theme.withAlpha(Theme.warning, 0)
-                border.color: (showLegacy || showError || showSetup) ? Theme.withAlpha(Theme.warning, 0.3) : Theme.withAlpha(Theme.warning, 0)
+                color: (showLegacy || showSetup) ? Theme.withAlpha(Theme.primary, 0.15) : Theme.withAlpha(Theme.primary, 0)
+                border.color: (showLegacy || showSetup) ? Theme.withAlpha(Theme.primary, 0.3) : Theme.withAlpha(Theme.primary, 0)
                 border.width: 1
-                visible: (showLegacy || showError || showSetup) && !root.checkingInclude && (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango)
+                visible: (showLegacy || showSetup) && !root.checkingInclude && (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango)
 
                 Row {
                     id: warningSection
@@ -489,7 +488,7 @@ Item {
                     DankIcon {
                         name: "warning"
                         size: Theme.iconSize
-                        color: Theme.warning
+                        color: Theme.primary
                         anchors.verticalCenter: parent.verticalCenter
                     }
 
@@ -499,17 +498,16 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
 
                         StyledText {
-                            text: warningBox.showLegacy ? I18n.tr("Hyprland conf mode") : (warningBox.showSetup ? I18n.tr("Window Rules Not Configured") : I18n.tr("Window Rules Include Missing"))
+                            text: warningBox.showLegacy ? I18n.tr("Hyprland conf mode") : I18n.tr("First Time Setup")
                             font.pixelSize: Theme.fontSizeMedium
                             font.weight: Font.Medium
-                            color: Theme.warning
+                            color: Theme.primary
                             width: parent.width
                             horizontalAlignment: Text.AlignLeft
                         }
 
                         StyledText {
-                            readonly property string rulesFile: root.dmsRulesFileName
-                            text: warningBox.showLegacy ? I18n.tr("This install is still using hyprland.conf. Run dms setup to migrate before editing window rules in Settings.") : (warningBox.showSetup ? I18n.tr("Click 'Setup' to create %1 and add include to your compositor config.").arg(rulesFile) : I18n.tr("%1 exists but is not included. Window rules won't apply.").arg(rulesFile))
+                            text: warningBox.showLegacy ? I18n.tr("This install is still using hyprland.conf. Run dms setup to migrate before editing window rules in Settings.") : I18n.tr("Click 'Setup' to create %1 and add include to your compositor config.").arg("dms/windowrules")
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceVariantText
                             wrapMode: Text.WordWrap
@@ -520,10 +518,10 @@ Item {
 
                     DankButton {
                         id: fixButton
-                        visible: !warningBox.showLegacy && (warningBox.showError || warningBox.showSetup)
-                        text: root.fixingInclude ? I18n.tr("Fixing...") : (warningBox.showSetup ? I18n.tr("Setup") : I18n.tr("Fix Now"))
-                        backgroundColor: Theme.warning
-                        textColor: Theme.background
+                        visible: !warningBox.showLegacy && warningBox.showSetup
+                        text: root.fixingInclude ? I18n.tr("Setting up...") : I18n.tr("Setup")
+                        backgroundColor: Theme.primary
+                        textColor: Theme.primaryText
                         enabled: !root.fixingInclude
                         anchors.verticalCenter: parent.verticalCenter
                         onClicked: root.fixWindowRulesInclude()

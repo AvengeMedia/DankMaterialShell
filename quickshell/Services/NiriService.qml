@@ -1252,7 +1252,7 @@ Singleton {
             commands.push(`niri msg output "${outputName}" ${config.disabled ? "off" : "on"}`);
             if (config.disabled) {
                 const fullDisableCommand = "{ " + commands.join(" && ") + "; } 2>&1";
-                Proc.runCommand("niri-output-config", ["sh", "-c", fullDisableCommand], (output, exitCode) => {
+                Proc.runCommand("niri-output-config-" + outputName, ["sh", "-c", fullDisableCommand], (output, exitCode) => {
                     if (exitCode !== 0) {
                         log.warn("Failed to apply output config:", outputName, "exit:", exitCode, output);
                         if (callback)
@@ -1296,7 +1296,7 @@ Singleton {
         }
 
         const fullCommand = "{ " + commands.join(" && ") + "; } 2>&1";
-        Proc.runCommand("niri-output-config", ["sh", "-c", fullCommand], (output, exitCode) => {
+        Proc.runCommand("niri-output-config-" + outputName, ["sh", "-c", fullCommand], (output, exitCode) => {
             if (exitCode !== 0) {
                 log.warn("Failed to apply output config:", outputName, "exit:", exitCode, output);
                 if (callback)

@@ -2078,27 +2078,27 @@ Item {
                     StyledRect {
                         id: cursorWarningBox
                         width: parent.width
-                        height: cursorWarningContent.implicitHeight + Theme.spacingM * 2
+                        height: cursorWarningContent.implicitHeight + Theme.spacingL * 2
                         radius: Theme.cornerRadius
 
-                        readonly property bool showError: themeColorsTab.cursorIncludeStatus.exists && !themeColorsTab.cursorIncludeStatus.included
-                        readonly property bool showSetup: !themeColorsTab.cursorIncludeStatus.exists && !themeColorsTab.cursorIncludeStatus.included
+                        readonly property bool showLegacy: themeColorsTab.cursorReadOnly
+                        readonly property bool showSetup: !showLegacy && !themeColorsTab.cursorIncludeStatus.included
 
-                        color: (showError || showSetup) ? Theme.withAlpha(Theme.warning, 0.15) : Theme.withAlpha(Theme.warning, 0)
-                        border.color: (showError || showSetup) ? Theme.withAlpha(Theme.warning, 0.3) : Theme.withAlpha(Theme.warning, 0)
+                        color: (showLegacy || showSetup) ? Theme.withAlpha(Theme.primary, 0.15) : Theme.withAlpha(Theme.primary, 0)
+                        border.color: (showLegacy || showSetup) ? Theme.withAlpha(Theme.primary, 0.3) : Theme.withAlpha(Theme.primary, 0)
                         border.width: 1
-                        visible: (showError || showSetup) && !themeColorsTab.checkingCursorInclude
+                        visible: (showLegacy || showSetup) && !themeColorsTab.checkingCursorInclude
 
                         Row {
                             id: cursorWarningContent
                             anchors.fill: parent
-                            anchors.margins: Theme.spacingM
+                            anchors.margins: Theme.spacingL
                             spacing: Theme.spacingM
 
                             DankIcon {
                                 name: "warning"
                                 size: Theme.iconSize
-                                color: Theme.warning
+                                color: Theme.primary
                                 anchors.verticalCenter: parent.verticalCenter
                             }
 
@@ -2108,27 +2108,42 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
 
                                 StyledText {
-                                    text: cursorWarningBox.showSetup ? I18n.tr("Cursor Config Not Configured") : I18n.tr("Cursor Include Missing")
+                                    text: {
+                                        if (cursorWarningBox.showLegacy)
+                                            return I18n.tr("Hyprland conf mode");
+                                        if (cursorWarningBox.showSetup)
+                                            return I18n.tr("First Time Setup");
+                                        return "";
+                                    }
                                     font.pixelSize: Theme.fontSizeMedium
                                     font.weight: Font.Medium
-                                    color: Theme.warning
+                                    color: Theme.primary
+                                    width: parent.width
+                                    horizontalAlignment: Text.AlignLeft
                                 }
 
                                 StyledText {
-                                    text: cursorWarningBox.showSetup ? I18n.tr("Click 'Setup' to create cursor config and add include to your compositor config.") : I18n.tr("dms/cursor config exists but is not included. Cursor settings won't apply.")
+                                    text: {
+                                        if (cursorWarningBox.showLegacy)
+                                            return I18n.tr("This install is still using hyprland.conf. Run dms setup to migrate before editing cursor settings.");
+                                        if (cursorWarningBox.showSetup)
+                                            return I18n.tr("Click 'Setup' to create %1 and add include to your compositor config.").arg("dms/cursor");
+                                        return "";
+                                    }
                                     font.pixelSize: Theme.fontSizeSmall
                                     color: Theme.surfaceVariantText
                                     wrapMode: Text.WordWrap
                                     width: parent.width
+                                    horizontalAlignment: Text.AlignLeft
                                 }
                             }
 
                             DankButton {
                                 id: cursorFixButton
-                                visible: cursorWarningBox.showError || cursorWarningBox.showSetup
-                                text: themeColorsTab.fixingCursorInclude ? I18n.tr("Fixing...") : (cursorWarningBox.showSetup ? I18n.tr("Setup") : I18n.tr("Fix Now"))
-                                backgroundColor: Theme.warning
-                                textColor: Theme.background
+                                visible: !cursorWarningBox.showLegacy && cursorWarningBox.showSetup
+                                text: themeColorsTab.fixingCursorInclude ? I18n.tr("Setting up...") : I18n.tr("Setup")
+                                backgroundColor: Theme.primary
+                                textColor: Theme.primaryText
                                 enabled: !themeColorsTab.fixingCursorInclude
                                 anchors.verticalCenter: parent.verticalCenter
                                 onClicked: themeColorsTab.fixCursorInclude()

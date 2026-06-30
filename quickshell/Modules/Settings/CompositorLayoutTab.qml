@@ -1,10 +1,130 @@
+import QtCore
 import QtQuick
+import Quickshell
 import qs.Common
 import qs.Services
 import qs.Widgets
 import qs.Modules.Settings.Widgets
+import "../../Common/ConfigIncludeResolve.js" as ConfigIncludeResolve
 
 Item {
+    id: root
+
+    LayoutMirroring.enabled: I18n.isRtl
+    LayoutMirroring.childrenInherit: true
+
+    property var layoutIncludeStatus: ({
+            "exists": false,
+            "included": false,
+            "configFormat": "",
+            "readOnly": false
+        })
+    readonly property bool readOnly: CompositorService.isHyprland && layoutIncludeStatus.readOnly === true
+    property bool checkingInclude: false
+    property bool fixingInclude: false
+
+    function getLayoutConfigPaths() {
+        const configDir = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
+        switch (CompositorService.compositor) {
+        case "niri":
+            return {
+                "configFile": configDir + "/niri/config.kdl",
+                "layoutFile": configDir + "/niri/dms/layout.kdl",
+                "grepPattern": 'include.*"dms/layout.kdl"',
+                "includeLine": 'include "dms/layout.kdl"'
+            };
+        case "hyprland":
+            return {
+                "configFile": configDir + "/hypr/hyprland.lua",
+                "layoutFile": configDir + "/hypr/dms/layout.lua",
+                "grepPattern": "dms.layout",
+                "includeLine": "require(\"dms.layout\")"
+            };
+        case "mango":
+            return {
+                "configFile": configDir + "/mango/config.conf",
+                "layoutFile": configDir + "/mango/dms/layout.conf",
+                "grepPattern": "source.*dms/layout.conf",
+                "includeLine": "source=./dms/layout.conf"
+            };
+        default:
+            return null;
+        }
+    }
+
+    function checkLayoutIncludeStatus() {
+        const compositor = CompositorService.compositor;
+        if (compositor !== "niri" && compositor !== "hyprland" && compositor !== "mango") {
+            layoutIncludeStatus = {
+                "exists": false,
+                "included": false,
+                "configFormat": "",
+                "readOnly": false
+            };
+            return;
+        }
+
+        const filename = compositor === "niri" ? "layout.kdl" : (compositor === "hyprland" ? "layout.lua" : "layout.conf");
+        const compositorArg = compositor === "mango" ? "mangowc" : compositor;
+
+        checkingInclude = true;
+        Proc.runCommand("check-layout-include", ["dms", "config", "resolve-include", compositorArg, filename], (output, exitCode) => {
+            checkingInclude = false;
+            if (exitCode !== 0) {
+                layoutIncludeStatus = {
+                    "exists": false,
+                    "included": false,
+                    "configFormat": "",
+                    "readOnly": false
+                };
+                return;
+            }
+            try {
+                layoutIncludeStatus = JSON.parse(output.trim());
+            } catch (e) {
+                layoutIncludeStatus = {
+                    "exists": false,
+                    "included": false,
+                    "configFormat": "",
+                    "readOnly": false
+                };
+            }
+        });
+    }
+
+    function fixLayoutInclude() {
+        if (readOnly) {
+            ToastService.showWarning(I18n.tr("Hyprland conf mode"), I18n.tr("This install is still using hyprland.conf. Run dms setup to migrate before editing layout settings."), "dms setup", "hyprland-migration");
+            return;
+        }
+        const paths = getLayoutConfigPaths();
+        if (!paths)
+            return;
+
+        fixingInclude = true;
+        const unixTime = Math.floor(Date.now() / 1000);
+        const backupFile = paths.configFile + ".backup" + unixTime;
+        const script = ConfigIncludeResolve.buildRepairScript({
+            configFile: paths.configFile,
+            backupFile: backupFile,
+            fragmentFile: paths.layoutFile,
+            grepPattern: paths.grepPattern,
+            includeLine: paths.includeLine
+        });
+        Proc.runCommand("fix-layout-include", ["sh", "-c", script], (output, exitCode) => {
+            fixingInclude = false;
+            if (exitCode !== 0)
+                return;
+            checkLayoutIncludeStatus();
+            SettingsData.updateCompositorLayout();
+        });
+    }
+
+    Component.onCompleted: {
+        if (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango)
+            checkLayoutIncludeStatus();
+    }
+
     DankFlickable {
         anchors.fill: parent
         clip: true
@@ -18,6 +138,82 @@ Item {
             width: Math.min(550, parent.width - Theme.spacingL * 2)
             anchors.horizontalCenter: parent.horizontalCenter
             spacing: Theme.spacingXL
+
+            StyledRect {
+                id: warningBox
+                width: parent.width
+                height: warningContent.implicitHeight + Theme.spacingL * 2
+                radius: Theme.cornerRadius
+
+                readonly property bool showLegacy: root.readOnly
+                readonly property bool showSetup: !showLegacy && !root.layoutIncludeStatus.included
+
+                color: (showLegacy || showSetup) ? Theme.withAlpha(Theme.primary, 0.15) : Theme.withAlpha(Theme.primary, 0)
+                border.color: (showLegacy || showSetup) ? Theme.withAlpha(Theme.primary, 0.3) : Theme.withAlpha(Theme.primary, 0)
+                border.width: 1
+                visible: (showLegacy || showSetup) && !root.checkingInclude && (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango)
+
+                Row {
+                    id: warningContent
+                    anchors.fill: parent
+                    anchors.margins: Theme.spacingL
+                    spacing: Theme.spacingM
+
+                    DankIcon {
+                        name: "warning"
+                        size: Theme.iconSize
+                        color: Theme.primary
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    Column {
+                        width: parent.width - Theme.iconSize - (fixButton.visible ? fixButton.width + Theme.spacingM : 0) - Theme.spacingM
+                        spacing: Theme.spacingXS
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        StyledText {
+                            text: {
+                                if (warningBox.showLegacy)
+                                    return I18n.tr("Hyprland conf mode");
+                                if (warningBox.showSetup)
+                                    return I18n.tr("First Time Setup");
+                                return "";
+                            }
+                            font.pixelSize: Theme.fontSizeMedium
+                            font.weight: Font.Medium
+                            color: Theme.primary
+                            width: parent.width
+                            horizontalAlignment: Text.AlignLeft
+                        }
+
+                        StyledText {
+                            text: {
+                                if (warningBox.showLegacy)
+                                    return I18n.tr("This install is still using hyprland.conf. Run dms setup to migrate before editing layout settings.");
+                                if (warningBox.showSetup)
+                                    return I18n.tr("Click 'Setup' to create %1 and add include to your compositor config.").arg("dms/layout");
+                                return "";
+                            }
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                            wrapMode: Text.WordWrap
+                            width: parent.width
+                            horizontalAlignment: Text.AlignLeft
+                        }
+                    }
+
+                    DankButton {
+                        id: fixButton
+                        visible: !warningBox.showLegacy && warningBox.showSetup
+                        text: root.fixingInclude ? I18n.tr("Setting up...") : I18n.tr("Setup")
+                        backgroundColor: Theme.primary
+                        textColor: Theme.primaryText
+                        enabled: !root.fixingInclude
+                        anchors.verticalCenter: parent.verticalCenter
+                        onClicked: root.fixLayoutInclude()
+                    }
+                }
+            }
 
             SettingsCard {
                 width: parent.width
