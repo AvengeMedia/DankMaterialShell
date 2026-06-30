@@ -57,12 +57,30 @@ Column {
     readonly property real rowHeight: 72
     readonly property real rowSpacing: Theme.spacingS
 
+    property var rowHeights: []
+
+    function rowHeightAt(i) {
+        if (i < 0 || i >= rowHeights.length || rowHeights[i] === undefined)
+            return rowHeight;
+        return Math.max(rowHeight, rowHeights[i]);
+    }
+
+    function cumulativeHeightUpTo(pos) {
+        var y = 0;
+        var n = Math.min(pos, items.length);
+        for (var i = 0; i < n; i++)
+            y += rowHeightAt(i) + rowSpacing;
+        return y;
+    }
+
     readonly property real totalHeight: {
         const n = items.length;
-        let base = n * (rowHeight + rowSpacing);
+        let base = cumulativeHeightUpTo(n);
+        if (n > 0)
+            base -= rowSpacing;
         if (gapIndex >= 0)
             base += (rowHeight + rowSpacing);
-        return Math.max(0, base - rowSpacing);
+        return Math.max(0, base);
     }
 
     function resetWorkingOrder() {
@@ -76,15 +94,21 @@ Column {
         var pos = workingOrder.indexOf(i);
         if (pos < 0)
             pos = i;
-        var y = pos * (rowHeight + rowSpacing);
+        var y = cumulativeHeightUpTo(pos);
         if (gapIndex >= 0 && pos >= gapIndex)
             y += (rowHeight + rowSpacing);
         return y;
     }
 
     function slotIndexForY(localY) {
-        var idx = Math.round(localY / (rowHeight + rowSpacing));
-        return Math.max(0, Math.min(idx, items.length));
+        var y = 0;
+        for (var i = 0; i < items.length; i++) {
+            var h = rowHeightAt(i) + rowSpacing;
+            if (y + h / 2 > localY)
+                return i;
+            y += h;
+        }
+        return items.length;
     }
 
     function slotIndexForGlobalY(rootItem, gy) {
@@ -102,7 +126,7 @@ Column {
     function updateDragTarget(centerY) {
         if (draggingIndex < 0)
             return;
-        var pos = Math.floor(centerY / (rowHeight + rowSpacing));
+        var pos = slotIndexForY(centerY);
         pos = Math.max(0, Math.min(pos, items.length - 1));
         var arr = workingOrder.slice();
         var d = arr.indexOf(draggingIndex);
@@ -201,9 +225,26 @@ Column {
                 readonly property bool highlighted: root.highlightedId !== "" && root.highlightedId === modelData.id && root.highlightedSection === root.sectionId
 
                 width: reorderArea.width
-                height: root.rowHeight
+                height: Math.max(root.rowHeight, textColumn.implicitHeight + 28)
                 z: dragging ? 100 : (highlighted ? 3 : 1)
                 opacity: (dragging && root.crossSectionActive) ? 0 : 1
+
+                onHeightChanged: {
+                    var arr = root.rowHeights.slice();
+                    while (arr.length <= rowIndex)
+                        arr.push(root.rowHeight);
+                    if (arr[rowIndex] !== height) {
+                        arr[rowIndex] = height;
+                        root.rowHeights = arr;
+                    }
+                }
+                Component.onCompleted: {
+                    var arr = root.rowHeights.slice();
+                    while (arr.length <= rowIndex)
+                        arr.push(root.rowHeight);
+                    arr[rowIndex] = height;
+                    root.rowHeights = arr;
+                }
 
                 Binding {
                     target: delegateItem
@@ -235,13 +276,12 @@ Column {
                     id: itemBackground
 
                     anchors.fill: parent
-                    anchors.margins: 2
                     scale: delegateItem.dragging ? 1.02 : 1.0
                     transformOrigin: Item.Center
                     radius: delegateItem.dragging ? Theme.cornerRadius + 6 : Theme.cornerRadius
-                    color: delegateItem.dragging ? Theme.secondaryContainer : Theme.withAlpha(Theme.surfaceContainer, 0.8)
+                    color: delegateItem.dragging ? Theme.secondaryContainer : Theme.withAlpha(Theme.surfaceContainer, modelData.enabled ? 0.7 : 0.4)
                     border.color: delegateItem.dragging ? Theme.primary : Theme.outlineHeavy
-                    border.width: delegateItem.dragging ? 2 : 0
+                    border.width: delegateItem.dragging ? 2 : 1
 
                     Behavior on scale {
                         NumberAnimation {
@@ -266,29 +306,61 @@ Column {
                         }
                     }
 
-                    DankIcon {
-                        name: "drag_indicator"
-                        size: Theme.iconSize - 4
-                        color: Theme.outline
-                        anchors.left: parent.left
-                        anchors.leftMargin: Theme.spacingM + 8
-                        anchors.verticalCenter: parent.verticalCenter
-                        opacity: 0.8
+                    Rectangle {
+                        anchors.fill: parent
+                        radius: parent.radius
+                        color: Theme.primary
+                        opacity: (dragArea.containsMouse && !delegateItem.dragging) ? 0.06 : 0
+                        Behavior on opacity {
+                            NumberAnimation {
+                                duration: Theme.shortDuration
+                            }
+                        }
                     }
 
                     DankIcon {
+                        id: dragHandle
+                        name: "drag_indicator"
+                        size: Theme.iconSize - 4
+                        color: delegateItem.dragging ? Theme.primary : Theme.outline
+                        anchors.left: parent.left
+                        anchors.leftMargin: Theme.spacingM
+                        anchors.verticalCenter: parent.verticalCenter
+                        opacity: modelData.enabled ? ((dragArea.containsMouse || delegateItem.dragging || delegateItem.highlighted) ? 1.0 : 0.45) : 0
+                        visible: opacity > 0.01
+
+                        Behavior on opacity {
+                            NumberAnimation {
+                                duration: Theme.shortDuration
+                            }
+                        }
+                        Behavior on color {
+                            ColorAnimation {
+                                duration: Theme.shortDuration
+                            }
+                        }
+                    }
+
+                    DankIcon {
+                        id: tabIcon
                         name: modelData.icon
                         size: Theme.iconSize
                         color: modelData.enabled ? Theme.primary : Theme.outline
                         anchors.left: parent.left
-                        anchors.leftMargin: Theme.spacingM * 2 + 40
+                        anchors.leftMargin: Theme.spacingM * 2 + Theme.iconSize - 4
                         anchors.verticalCenter: parent.verticalCenter
+
+                        Behavior on color {
+                            ColorAnimation {
+                                duration: Theme.shortDuration
+                            }
+                        }
                     }
 
                     Column {
                         id: textColumn
-                        anchors.left: parent.left
-                        anchors.leftMargin: Theme.spacingM * 3 + 40 + Theme.iconSize
+                        anchors.left: tabIcon.right
+                        anchors.leftMargin: Theme.spacingM
                         anchors.right: actionButtons.left
                         anchors.rightMargin: Theme.spacingM
                         anchors.verticalCenter: parent.verticalCenter
@@ -496,7 +568,7 @@ Column {
                             }
                             onEntered: {
                                 var currentEnabled = modelData.minimumWidth !== undefined ? modelData.minimumWidth : true;
-                                const tooltipText = currentEnabled ? "Force Padding" : "Dynamic Width";
+                                const tooltipText = currentEnabled ? I18n.tr("Force Padding") : I18n.tr("Dynamic Width");
                                 sharedTooltip.show(tooltipText, minimumWidthButton, 0, 0, "bottom");
                             }
                             onExited: {
@@ -515,7 +587,7 @@ Column {
                                 root.hideWhenIdleChanged(root.sectionId, index, modelData.hideWhenIdle !== true);
                             }
                             onEntered: {
-                                const tooltipText = modelData.hideWhenIdle === true ? "Hide when no updates: ON" : "Hide when no updates: OFF";
+                                const tooltipText = modelData.hideWhenIdle === true ? I18n.tr("Hide when no updates: ON") : I18n.tr("Hide when no updates: OFF");
                                 sharedTooltip.show(tooltipText, hideWhenIdleButton, 0, 0, "bottom");
                             }
                             onExited: {
@@ -748,7 +820,7 @@ Column {
                                                 return false;
                                             }
                                         })();
-                                    const tooltipText = isCompact ? "Full Size" : "Compact";
+                                    const tooltipText = isCompact ? I18n.tr("Full Size") : I18n.tr("Compact");
                                     sharedTooltip.show(tooltipText, compactModeButton, 0, 0, "bottom");
                                 }
                                 onExited: {
@@ -965,13 +1037,6 @@ Column {
                             iconColor: modelData.enabled ? Theme.primary : Theme.outline
                             onClicked: {
                                 root.itemEnabledChanged(root.sectionId, modelData.id, !modelData.enabled);
-                            }
-                            onEntered: {
-                                const tooltipText = modelData.enabled ? "Hide" : "Show";
-                                sharedTooltip.show(tooltipText, visibilityButton, 0, 0, "bottom");
-                            }
-                            onExited: {
-                                sharedTooltip.hide();
                             }
                         }
 
@@ -2317,6 +2382,7 @@ Column {
                                             anchors.rightMargin: Theme.spacingM
                                             anchors.verticalCenter: parent.verticalCenter
                                             spacing: Theme.spacingS
+                                            clip: true
 
                                             Item {
                                                 width: 16
@@ -2376,6 +2442,8 @@ Column {
                                                 color: Theme.surfaceText
                                                 font.weight: Font.Normal
                                                 anchors.verticalCenter: parent.verticalCenter
+                                                elide: Text.ElideRight
+                                                width: parent.width - 16 - Theme.spacingS - 16 - Theme.spacingS
                                             }
                                         }
 
@@ -2433,8 +2501,8 @@ Column {
         property string sectionId: ""
         property int widgetIndex: -1
 
-        width: 200
-        height: 160
+        width: 240
+        height: menuPrivacyColumn.implicitHeight + Theme.spacingS * 2
         padding: 0
         modal: true
         focus: true
@@ -2494,8 +2562,11 @@ Column {
                     Row {
                         anchors.left: parent.left
                         anchors.leftMargin: Theme.spacingS
+                        anchors.right: micToggle.left
+                        anchors.rightMargin: Theme.spacingS
                         anchors.verticalCenter: parent.verticalCenter
                         spacing: Theme.spacingS
+                        clip: true
 
                         DankIcon {
                             name: "mic"
@@ -2510,6 +2581,8 @@ Column {
                             color: Theme.surfaceText
                             font.weight: Font.Normal
                             anchors.verticalCenter: parent.verticalCenter
+                            elide: Text.ElideRight
+                            width: parent.width - 16 - Theme.spacingS
                         }
                     }
 
@@ -2546,8 +2619,11 @@ Column {
                     Row {
                         anchors.left: parent.left
                         anchors.leftMargin: Theme.spacingS
+                        anchors.right: cameraToggle.left
+                        anchors.rightMargin: Theme.spacingS
                         anchors.verticalCenter: parent.verticalCenter
                         spacing: Theme.spacingS
+                        clip: true
 
                         DankIcon {
                             name: "camera_video"
@@ -2562,6 +2638,8 @@ Column {
                             color: Theme.surfaceText
                             font.weight: Font.Normal
                             anchors.verticalCenter: parent.verticalCenter
+                            elide: Text.ElideRight
+                            width: parent.width - 16 - Theme.spacingS
                         }
                     }
 
@@ -2598,8 +2676,11 @@ Column {
                     Row {
                         anchors.left: parent.left
                         anchors.leftMargin: Theme.spacingS
+                        anchors.right: screenshareToggle.left
+                        anchors.rightMargin: Theme.spacingS
                         anchors.verticalCenter: parent.verticalCenter
                         spacing: Theme.spacingS
+                        clip: true
 
                         DankIcon {
                             name: "screen_share"
@@ -2614,6 +2695,8 @@ Column {
                             color: Theme.surfaceText
                             font.weight: Font.Normal
                             anchors.verticalCenter: parent.verticalCenter
+                            elide: Text.ElideRight
+                            width: parent.width - 16 - Theme.spacingS
                         }
                     }
 
