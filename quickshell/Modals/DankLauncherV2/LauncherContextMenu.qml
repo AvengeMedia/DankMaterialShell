@@ -25,6 +25,7 @@ Item {
     property real anchorY: 0
     property bool openState: false
     property bool renderActive: false
+    readonly property alias contextWindow: menuWindow
     readonly property bool blurActive: renderActive && openState && BlurService.enabled && Theme.connectedSurfaceBlurEnabled
 
     readonly property real minMenuWidth: 180
@@ -446,7 +447,17 @@ Item {
         WlrLayershell.namespace: "dms:launcher-context-menu"
         WlrLayershell.layer: WlrLayershell.Overlay
         WlrLayershell.exclusiveZone: -1
-        WlrLayershell.keyboardFocus: PopoutManager.screenshotActive ? WlrKeyboardFocus.None : (root.renderActive ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None)
+        // Hyprland steals the launcher's focus grab on exclusive focus; keep keys on the
+        // launcher window, which forwards them to the menu via handleKey().
+        WlrLayershell.keyboardFocus: {
+            if (PopoutManager.screenshotActive)
+                return WlrKeyboardFocus.None;
+            if (!root.renderActive)
+                return WlrKeyboardFocus.None;
+            if (CompositorService.useHyprlandFocusGrab)
+                return WlrKeyboardFocus.None;
+            return WlrKeyboardFocus.Exclusive;
+        }
 
         anchors {
             top: true

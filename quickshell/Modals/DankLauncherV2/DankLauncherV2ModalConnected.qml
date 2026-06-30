@@ -530,7 +530,9 @@ Item {
 
     HyprlandFocusGrab {
         id: focusGrab
-        windows: [contentWindow]
+        readonly property var contextMenuWindow: root.spotlightContent?.activeContextMenu?.contextWindow ?? null
+        readonly property bool contextMenuActive: root.spotlightContent?.activeContextMenu?.renderActive ?? false
+        windows: contextMenuActive && contextMenuWindow ? [contentWindow, contextMenuWindow] : [contentWindow]
         active: root.useHyprlandFocusGrab && root.spotlightOpen
 
         onCleared: {
