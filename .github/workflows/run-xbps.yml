@@ -35,6 +35,7 @@ jobs:
   build-and-deploy:
     name: Build & Deploy XBPS packages
     runs-on: ubuntu-latest
+    if: github.repository == 'AvengeMedia/DankMaterialShell'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
