@@ -22,6 +22,102 @@ Item {
     readonly property var allInstances: SettingsData.desktopWidgetInstances || []
     readonly property var allGroups: SettingsData.desktopWidgetGroups || []
 
+    property bool dragActive: false
+    property string dragInstanceId: ""
+    property string dragSourceKey: ""
+    property int dragSourceIndex: -1
+    property var dragWidgetData: null
+    property bool dragTargetValid: false
+    property string dragTargetKey: ""
+    property int dragTargetIndex: -1
+    property bool proxyVisible: false
+    property real proxyX: 0
+    property real proxyY: 0
+
+    function storageKeyFor(sectionKey) {
+        return sectionKey === "" ? "_ungrouped" : sectionKey;
+    }
+
+    function toggleCollapsed(sectionKey) {
+        const key = storageKeyFor(sectionKey);
+        var states = Object.assign({}, groupCollapsedStates);
+        states[key] = !(states[key] ?? false);
+        groupCollapsedStates = states;
+    }
+
+    function setExpanded(instanceId, expanded) {
+        if (expanded === (expandedStates[instanceId] ?? false))
+            return;
+        var states = Object.assign({}, expandedStates);
+        states[instanceId] = expanded;
+        expandedStates = states;
+    }
+
+    function hitTestSection(sec, gy) {
+        const top = sec.mapToItem(root, 0, 0).y;
+        if (gy < top || gy > top + sec.height)
+            return false;
+        root.dragTargetValid = true;
+        root.dragTargetKey = sec.sectionKey;
+        root.dragTargetIndex = sec.insertionIndexForGlobalY(gy);
+        return true;
+    }
+
+    function updateDropTarget(gc) {
+        for (var i = 0; i < groupsRepeater.count; i++) {
+            const sec = groupsRepeater.itemAt(i);
+            if (sec && sec.visible && hitTestSection(sec, gc.y))
+                return;
+        }
+        if (ungroupedSection.visible && hitTestSection(ungroupedSection, gc.y))
+            return;
+        root.dragTargetValid = false;
+        root.dragTargetKey = "";
+        root.dragTargetIndex = -1;
+    }
+
+    function handleDragStarted(instanceId, groupId, index, widgetData, gc) {
+        root.dragActive = true;
+        root.dragInstanceId = instanceId;
+        root.dragSourceKey = groupId ? groupId : "";
+        root.dragSourceIndex = index;
+        root.dragWidgetData = widgetData;
+        root.dragTargetValid = false;
+        root.dragTargetKey = root.dragSourceKey;
+        root.dragTargetIndex = index;
+        root.proxyX = gc.x;
+        root.proxyY = gc.y;
+        root.proxyVisible = true;
+    }
+
+    function handleDragMoved(gc) {
+        if (!root.dragActive)
+            return;
+        root.proxyX = gc.x;
+        root.proxyY = gc.y;
+        updateDropTarget(gc);
+    }
+
+    function handleDragEnded() {
+        if (!root.dragActive)
+            return;
+        if (root.dragTargetValid) {
+            var idx = root.dragTargetIndex;
+            if (root.dragTargetKey === root.dragSourceKey && idx > root.dragSourceIndex)
+                idx -= 1;
+            SettingsData.moveDesktopWidgetInstanceToGroup(root.dragInstanceId, root.dragTargetKey === "" ? null : root.dragTargetKey, idx);
+        }
+        root.dragActive = false;
+        root.dragInstanceId = "";
+        root.dragSourceKey = "";
+        root.dragSourceIndex = -1;
+        root.dragWidgetData = null;
+        root.dragTargetValid = false;
+        root.dragTargetKey = "";
+        root.dragTargetIndex = -1;
+        root.proxyVisible = false;
+    }
+
     function showWidgetBrowser() {
         widgetBrowserLoader.active = true;
         if (widgetBrowserLoader.item)
@@ -255,185 +351,39 @@ Item {
             }
 
             Repeater {
+                id: groupsRepeater
                 model: root.allGroups
 
-                Column {
-                    id: groupSection
+                DesktopWidgetGroupSection {
                     required property var modelData
                     required property int index
 
-                    readonly property string groupId: modelData.id
-                    readonly property var groupInstances: root.allInstances.filter(inst => inst.group === groupId)
-
                     width: mainColumn.width
-                    spacing: Theme.spacingM
-                    visible: groupInstances.length > 0
+                    coordinator: root
+                    groupId: modelData.id
+                    groupName: modelData.name
+                    isUngrouped: false
+                    showHeader: true
+                    collapsed: root.groupCollapsedStates[modelData.id] ?? false
+                    instances: root.allInstances.filter(inst => inst.group === modelData.id)
+                    expandedStates: root.expandedStates
+                    visible: instances.length > 0 || root.dragActive
 
-                    Rectangle {
-                        width: parent.width
-                        height: 44
-                        radius: Theme.cornerRadius
-                        color: Theme.surfaceContainer
-
-                        Row {
-                            anchors.fill: parent
-                            anchors.leftMargin: Theme.spacingM
-                            anchors.rightMargin: Theme.spacingM
-                            spacing: Theme.spacingS
-
-                            DankIcon {
-                                name: (root.groupCollapsedStates[groupSection.groupId] ?? false) ? "expand_more" : "expand_less"
-                                size: Theme.iconSize
-                                color: Theme.surfaceText
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            DankIcon {
-                                name: "folder"
-                                size: Theme.iconSize
-                                color: Theme.primary
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            StyledText {
-                                text: groupSection.modelData.name
-                                font.pixelSize: Theme.fontSizeMedium
-                                font.weight: Font.Medium
-                                color: Theme.surfaceText
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            StyledText {
-                                text: "(" + groupSection.groupInstances.length + ")"
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.surfaceVariantText
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                var states = Object.assign({}, root.groupCollapsedStates);
-                                states[groupSection.groupId] = !(states[groupSection.groupId] ?? false);
-                                root.groupCollapsedStates = states;
-                            }
-                        }
+                    onCollapseToggled: key => root.toggleCollapsed(key)
+                    onExpandedToggled: (instanceId, expanded) => root.setExpanded(instanceId, expanded)
+                    onDuplicateRequested: instanceId => SettingsData.duplicateDesktopWidgetInstance(instanceId)
+                    onDeleteRequested: instanceId => {
+                        SettingsData.removeDesktopWidgetInstance(instanceId);
+                        ToastService.showInfo(I18n.tr("Widget removed"));
                     }
-
-                    Column {
-                        width: parent.width
-                        spacing: Theme.spacingM
-                        visible: !(root.groupCollapsedStates[groupSection.groupId] ?? false)
-                        leftPadding: Theme.spacingM
-
-                        Repeater {
-                            model: ScriptModel {
-                                objectProp: "id"
-                                values: groupSection.groupInstances
-                            }
-
-                            Item {
-                                id: groupDelegateItem
-                                required property var modelData
-                                required property int index
-
-                                property bool held: groupDragArea.pressed
-                                property real originalY: y
-
-                                readonly property string instanceIdRef: modelData.id
-                                readonly property var liveInstanceData: {
-                                    const instances = root.allInstances;
-                                    return instances.find(inst => inst.id === instanceIdRef) ?? modelData;
-                                }
-
-                                width: groupSection.width - Theme.spacingM
-                                height: groupCard.height
-                                z: held ? 2 : 1
-
-                                DesktopWidgetInstanceCard {
-                                    id: groupCard
-                                    width: parent.width
-                                    headerLeftPadding: 20
-                                    instanceData: groupDelegateItem.liveInstanceData
-                                    isExpanded: root.expandedStates[groupDelegateItem.instanceIdRef] ?? false
-
-                                    onExpandedChanged: {
-                                        if (expanded === (root.expandedStates[groupDelegateItem.instanceIdRef] ?? false))
-                                            return;
-                                        var states = Object.assign({}, root.expandedStates);
-                                        states[groupDelegateItem.instanceIdRef] = expanded;
-                                        root.expandedStates = states;
-                                    }
-
-                                    onDuplicateRequested: SettingsData.duplicateDesktopWidgetInstance(groupDelegateItem.instanceIdRef)
-
-                                    onDeleteRequested: {
-                                        SettingsData.removeDesktopWidgetInstance(groupDelegateItem.instanceIdRef);
-                                        ToastService.showInfo(I18n.tr("Widget removed"));
-                                    }
-                                }
-
-                                MouseArea {
-                                    id: groupDragArea
-                                    anchors.left: parent.left
-                                    anchors.top: parent.top
-                                    width: 40
-                                    height: 50
-                                    hoverEnabled: true
-                                    cursorShape: Qt.SizeVerCursor
-                                    drag.target: groupDelegateItem.held ? groupDelegateItem : undefined
-                                    drag.axis: Drag.YAxis
-                                    preventStealing: true
-
-                                    onPressed: {
-                                        groupDelegateItem.z = 2;
-                                        groupDelegateItem.originalY = groupDelegateItem.y;
-                                    }
-                                    onReleased: {
-                                        groupDelegateItem.z = 1;
-                                        if (!drag.active) {
-                                            groupDelegateItem.y = groupDelegateItem.originalY;
-                                            return;
-                                        }
-                                        const spacing = Theme.spacingM;
-                                        const itemH = groupDelegateItem.height + spacing;
-                                        var newIndex = Math.round(groupDelegateItem.y / itemH);
-                                        newIndex = Math.max(0, Math.min(newIndex, groupSection.groupInstances.length - 1));
-                                        if (newIndex !== groupDelegateItem.index)
-                                            SettingsData.reorderDesktopWidgetInstanceInGroup(groupDelegateItem.instanceIdRef, groupSection.groupId, newIndex);
-                                        groupDelegateItem.y = groupDelegateItem.originalY;
-                                    }
-                                }
-
-                                DankIcon {
-                                    x: Theme.spacingL - 2
-                                    y: Theme.spacingL + (Theme.iconSize / 2) - (size / 2)
-                                    name: "drag_indicator"
-                                    size: 18
-                                    color: Theme.outline
-                                    opacity: groupDragArea.containsMouse || groupDragArea.pressed ? 1 : 0.5
-                                }
-
-                                Behavior on y {
-                                    enabled: !groupDragArea.pressed && !groupDragArea.drag.active
-                                    NumberAnimation {
-                                        duration: Theme.shortDuration
-                                        easing.type: Theme.standardEasing
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    onDragStarted: (instanceId, groupId, index, widgetData, globalCenter) => root.handleDragStarted(instanceId, groupId, index, widgetData, globalCenter)
+                    onDragMoved: globalCenter => root.handleDragMoved(globalCenter)
+                    onDragEnded: root.handleDragEnded()
                 }
             }
 
-            Column {
+            DesktopWidgetGroupSection {
                 id: ungroupedSection
-                width: parent.width
-                spacing: Theme.spacingM
-                visible: ungroupedInstances.length > 0
 
                 readonly property var ungroupedInstances: root.allInstances.filter(inst => {
                     if (!inst.group)
@@ -441,164 +391,27 @@ Item {
                     return !root.allGroups.some(g => g.id === inst.group);
                 })
 
-                Rectangle {
-                    width: parent.width
-                    height: 44
-                    radius: Theme.cornerRadius
-                    color: Theme.surfaceContainer
-                    visible: root.allGroups.length > 0
+                width: mainColumn.width
+                coordinator: root
+                groupId: null
+                groupName: I18n.tr("Ungrouped")
+                isUngrouped: true
+                showHeader: root.allGroups.length > 0
+                collapsed: root.groupCollapsedStates["_ungrouped"] ?? false
+                instances: ungroupedInstances
+                expandedStates: root.expandedStates
+                visible: ungroupedInstances.length > 0 || root.dragActive
 
-                    Row {
-                        anchors.fill: parent
-                        anchors.leftMargin: Theme.spacingM
-                        anchors.rightMargin: Theme.spacingM
-                        spacing: Theme.spacingS
-
-                        DankIcon {
-                            name: (root.groupCollapsedStates["_ungrouped"] ?? false) ? "expand_more" : "expand_less"
-                            size: Theme.iconSize
-                            color: Theme.surfaceText
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        DankIcon {
-                            name: "widgets"
-                            size: Theme.iconSize
-                            color: Theme.primary
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        StyledText {
-                            text: I18n.tr("Ungrouped")
-                            font.pixelSize: Theme.fontSizeMedium
-                            font.weight: Font.Medium
-                            color: Theme.surfaceText
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        StyledText {
-                            text: "(" + ungroupedSection.ungroupedInstances.length + ")"
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceVariantText
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            var states = Object.assign({}, root.groupCollapsedStates);
-                            states["_ungrouped"] = !(states["_ungrouped"] ?? false);
-                            root.groupCollapsedStates = states;
-                        }
-                    }
+                onCollapseToggled: key => root.toggleCollapsed(key)
+                onExpandedToggled: (instanceId, expanded) => root.setExpanded(instanceId, expanded)
+                onDuplicateRequested: instanceId => SettingsData.duplicateDesktopWidgetInstance(instanceId)
+                onDeleteRequested: instanceId => {
+                    SettingsData.removeDesktopWidgetInstance(instanceId);
+                    ToastService.showInfo(I18n.tr("Widget removed"));
                 }
-
-                Column {
-                    width: parent.width
-                    spacing: Theme.spacingM
-                    visible: !(root.groupCollapsedStates["_ungrouped"] ?? false)
-                    leftPadding: root.allGroups.length > 0 ? Theme.spacingM : 0
-
-                    Repeater {
-                        model: ScriptModel {
-                            objectProp: "id"
-                            values: ungroupedSection.ungroupedInstances
-                        }
-
-                        Item {
-                            id: ungroupedDelegateItem
-                            required property var modelData
-                            required property int index
-
-                            property bool held: ungroupedDragArea.pressed
-                            property real originalY: y
-
-                            readonly property string instanceIdRef: modelData.id
-                            readonly property var liveInstanceData: {
-                                const instances = root.allInstances;
-                                return instances.find(inst => inst.id === instanceIdRef) ?? modelData;
-                            }
-
-                            width: ungroupedSection.width - (root.allGroups.length > 0 ? Theme.spacingM : 0)
-                            height: ungroupedCard.height
-                            z: held ? 2 : 1
-
-                            DesktopWidgetInstanceCard {
-                                id: ungroupedCard
-                                width: parent.width
-                                headerLeftPadding: 20
-                                instanceData: ungroupedDelegateItem.liveInstanceData
-                                isExpanded: root.expandedStates[ungroupedDelegateItem.instanceIdRef] ?? false
-
-                                onExpandedChanged: {
-                                    if (expanded === (root.expandedStates[ungroupedDelegateItem.instanceIdRef] ?? false))
-                                        return;
-                                    var states = Object.assign({}, root.expandedStates);
-                                    states[ungroupedDelegateItem.instanceIdRef] = expanded;
-                                    root.expandedStates = states;
-                                }
-
-                                onDuplicateRequested: SettingsData.duplicateDesktopWidgetInstance(ungroupedDelegateItem.instanceIdRef)
-
-                                onDeleteRequested: {
-                                    SettingsData.removeDesktopWidgetInstance(ungroupedDelegateItem.instanceIdRef);
-                                    ToastService.showInfo(I18n.tr("Widget removed"));
-                                }
-                            }
-
-                            MouseArea {
-                                id: ungroupedDragArea
-                                anchors.left: parent.left
-                                anchors.top: parent.top
-                                width: 40
-                                height: 50
-                                hoverEnabled: true
-                                cursorShape: Qt.SizeVerCursor
-                                drag.target: ungroupedDelegateItem.held ? ungroupedDelegateItem : undefined
-                                drag.axis: Drag.YAxis
-                                preventStealing: true
-
-                                onPressed: {
-                                    ungroupedDelegateItem.z = 2;
-                                    ungroupedDelegateItem.originalY = ungroupedDelegateItem.y;
-                                }
-                                onReleased: {
-                                    ungroupedDelegateItem.z = 1;
-                                    if (!drag.active) {
-                                        ungroupedDelegateItem.y = ungroupedDelegateItem.originalY;
-                                        return;
-                                    }
-                                    const spacing = Theme.spacingM;
-                                    const itemH = ungroupedDelegateItem.height + spacing;
-                                    var newIndex = Math.round(ungroupedDelegateItem.y / itemH);
-                                    newIndex = Math.max(0, Math.min(newIndex, ungroupedSection.ungroupedInstances.length - 1));
-                                    if (newIndex !== ungroupedDelegateItem.index)
-                                        SettingsData.reorderDesktopWidgetInstanceInGroup(ungroupedDelegateItem.instanceIdRef, null, newIndex);
-                                    ungroupedDelegateItem.y = ungroupedDelegateItem.originalY;
-                                }
-                            }
-
-                            DankIcon {
-                                x: Theme.spacingL - 2
-                                y: Theme.spacingL + (Theme.iconSize / 2) - (size / 2)
-                                name: "drag_indicator"
-                                size: 18
-                                color: Theme.outline
-                                opacity: ungroupedDragArea.containsMouse || ungroupedDragArea.pressed ? 1 : 0.5
-                            }
-
-                            Behavior on y {
-                                enabled: !ungroupedDragArea.pressed && !ungroupedDragArea.drag.active
-                                NumberAnimation {
-                                    duration: Theme.shortDuration
-                                    easing.type: Theme.standardEasing
-                                }
-                            }
-                        }
-                    }
-                }
+                onDragStarted: (instanceId, groupId, index, widgetData, globalCenter) => root.handleDragStarted(instanceId, groupId, index, widgetData, globalCenter)
+                onDragMoved: globalCenter => root.handleDragMoved(globalCenter)
+                onDragEnded: root.handleDragEnded()
             }
 
             StyledText {
@@ -704,6 +517,90 @@ Item {
                             }
                         }
                     }
+
+                    Row {
+                        width: parent.width
+                        spacing: Theme.spacingM
+
+                        Rectangle {
+                            width: 40
+                            height: 40
+                            radius: 20
+                            color: Theme.primarySelected
+
+                            DankIcon {
+                                anchors.centerIn: parent
+                                name: "drag_indicator"
+                                size: Theme.iconSize
+                                color: Theme.primary
+                            }
+                        }
+
+                        Column {
+                            spacing: 2
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: parent.width - 40 - Theme.spacingM
+
+                            StyledText {
+                                text: I18n.tr("Reorder & Group")
+                                font.pixelSize: Theme.fontSizeMedium
+                                font.weight: Font.Medium
+                                color: Theme.surfaceText
+                                width: parent.width
+                                horizontalAlignment: Text.AlignLeft
+                            }
+
+                            StyledText {
+                                text: I18n.tr("Drag a widget by its handle here to reorder it or drop it into another group")
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceVariantText
+                                width: parent.width
+                                wrapMode: Text.WordWrap
+                                horizontalAlignment: Text.AlignLeft
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Item {
+        id: dragProxy
+
+        visible: root.proxyVisible
+        x: root.proxyX - width / 2
+        y: root.proxyY - height / 2
+        width: proxyContent.implicitWidth + Theme.spacingM * 2
+        height: 40
+        z: 9999
+
+        Rectangle {
+            anchors.fill: parent
+            radius: Theme.cornerRadius + 4
+            color: Theme.secondaryContainer
+            border.color: Theme.primary
+            border.width: 2
+            opacity: 0.95
+
+            Row {
+                id: proxyContent
+                anchors.centerIn: parent
+                spacing: Theme.spacingS
+
+                DankIcon {
+                    name: (root.dragWidgetData && root.dragWidgetData.icon) ? root.dragWidgetData.icon : "widgets"
+                    size: Theme.iconSize
+                    color: Theme.primary
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                StyledText {
+                    text: (root.dragWidgetData && root.dragWidgetData.name) ? root.dragWidgetData.name : ""
+                    font.pixelSize: Theme.fontSizeMedium
+                    font.weight: Font.Medium
+                    color: Theme.surfaceText
+                    anchors.verticalCenter: parent.verticalCenter
                 }
             }
         }

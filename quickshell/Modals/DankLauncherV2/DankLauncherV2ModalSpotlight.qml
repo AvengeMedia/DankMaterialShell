@@ -228,7 +228,9 @@ Item {
 
     HyprlandFocusGrab {
         id: focusGrab
-        windows: [launcherWindow]
+        readonly property var contextMenuWindow: root.spotlightContent?.activeContextMenu?.contextWindow ?? null
+        readonly property bool contextMenuActive: root.spotlightContent?.activeContextMenu?.renderActive ?? false
+        windows: contextMenuActive && contextMenuWindow ? [launcherWindow, contextMenuWindow] : [launcherWindow]
         active: root.useHyprlandFocusGrab && root.keyboardActive
         onCleared: {
             if (spotlightOpen)
