@@ -3446,7 +3446,6 @@
     "keywords": [
       "appearance",
       "blur",
-      "blurred",
       "colors",
       "contrast",
       "foreground",
@@ -3459,10 +3458,11 @@
       "show",
       "stronger",
       "style",
+      "surface",
       "surfaces",
       "theme"
     ],
-    "description": "Show foreground surfaces on blurred panels for stronger contrast"
+    "description": "Show foreground surfaces on panels for stronger contrast"
   },
   {
     "section": "matugenTemplateGtk",
@@ -3618,8 +3618,6 @@
       "alert",
       "appearance",
       "around",
-      "blur",
-      "blurred",
       "border",
       "cards",
       "colors",
@@ -3641,7 +3639,7 @@
       "theme",
       "widgets"
     ],
-    "description": "Controls outlines around blurred foreground cards, pills, and notification cards"
+    "description": "Controls outlines around foreground cards, pills, and notification cards"
   },
   {
     "section": "m3ElevationLightDirection",

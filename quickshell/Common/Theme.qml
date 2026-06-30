@@ -575,16 +575,17 @@ Singleton {
     property color surfaceLight: withAlpha(surfaceVariant, transparentBlurLayers ? 0.3 : 0.1)
     property color surfaceVariantAlpha: withAlpha(surfaceVariant, 0.2)
 
-    readonly property bool blurForegroundLayers: BlurService.enabled && (typeof SettingsData === "undefined" || (SettingsData.blurForegroundLayers ?? true))
-    readonly property bool transparentBlurLayers: BlurService.enabled && !blurForegroundLayers
+    readonly property bool foregroundLayers: typeof SettingsData === "undefined" || (SettingsData.blurForegroundLayers ?? true)
+    readonly property bool blurForegroundLayers: BlurService.enabled && foregroundLayers
+    readonly property bool transparentBlurLayers: BlurService.enabled && !foregroundLayers
     readonly property color readableSurface: withAlpha(surfaceContainer, popupTransparency)
     readonly property color readableSurfaceHigh: withAlpha(surfaceContainerHigh, popupTransparency)
-    readonly property color floatingSurface: transparentBlurLayers ? withAlpha(readableSurface, 0) : readableSurface
-    readonly property color floatingSurfaceHigh: transparentBlurLayers ? withAlpha(readableSurfaceHigh, 0) : readableSurfaceHigh
+    readonly property color floatingSurface: foregroundLayers ? readableSurface : withAlpha(readableSurface, 0)
+    readonly property color floatingSurfaceHigh: foregroundLayers ? readableSurfaceHigh : withAlpha(readableSurfaceHigh, 0)
     readonly property color nestedSurface: floatingSurfaceHigh
     readonly property real blurLayerOutlineOpacity: Math.max(0, Math.min(1, typeof SettingsData === "undefined" ? 0.12 : (SettingsData.blurLayerOutlineOpacity ?? 0.12)))
-    readonly property real layerOutlineOpacity: BlurService.enabled ? blurLayerOutlineOpacity : 0.08
-    readonly property int layerOutlineWidth: BlurService.enabled && layerOutlineOpacity > 0 ? 1 : 0
+    readonly property real layerOutlineOpacity: blurLayerOutlineOpacity
+    readonly property int layerOutlineWidth: layerOutlineOpacity > 0 ? 1 : 0
     property color surfaceTextHover: withAlpha(surfaceText, 0.08)
     property color surfaceTextAlpha: withAlpha(surfaceText, 0.3)
 
@@ -635,9 +636,9 @@ Singleton {
     property color surfaceTextMedium: withAlpha(surfaceText, 0.7)
 
     property color outlineButton: withAlpha(outline, 0.5)
-    property color outlineLight: withAlpha(outline, BlurService.enabled ? Math.min(1, layerOutlineOpacity * 0.625) : 0.05)
+    property color outlineLight: withAlpha(outline, Math.min(1, layerOutlineOpacity * 0.625))
     property color outlineMedium: withAlpha(outline, layerOutlineOpacity)
-    property color outlineStrong: withAlpha(outline, BlurService.enabled ? Math.min(1, layerOutlineOpacity * 1.5) : 0.12)
+    property color outlineStrong: withAlpha(outline, Math.min(1, layerOutlineOpacity * 1.5))
     property color outlineHeavy: withAlpha(outline, 0.2)
 
     property color errorHover: withAlpha(error, 0.12)
@@ -658,7 +659,7 @@ Singleton {
         }
     }
 
-    readonly property color ccTileInactiveBg: transparentBlurLayers ? withAlpha(surfaceContainerHigh, 0.16) : (blurForegroundLayers ? withAlpha(surfaceContainerHigh, Math.min(popupTransparency, 0.24)) : withAlpha(surfaceContainer, popupTransparency))
+    readonly property color ccTileInactiveBg: transparentBlurLayers ? withAlpha(surfaceContainerHigh, 0.16) : (foregroundLayers ? withAlpha(surfaceContainerHigh, BlurService.enabled ? Math.min(popupTransparency, 0.24) : popupTransparency) : withAlpha(surfaceContainer, 0))
     readonly property color ccPillInactiveBg: transparentBlurLayers ? withAlpha(surfaceContainerHigh, 0.08) : nestedSurface
     readonly property color ccPillInactiveHoverBg: transparentBlurLayers ? withAlpha(primary, 0.10) : primaryPressed
     readonly property color ccSliderTrackColor: transparentBlurLayers ? surfaceText : surfaceContainerHigh
