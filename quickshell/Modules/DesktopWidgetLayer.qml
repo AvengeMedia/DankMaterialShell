@@ -57,6 +57,53 @@ Variants {
             });
         }
 
+        // Layer surfaces stack by map order, so recreate them in list order on
+        // reorder/enable/display-pref changes or once a plugin component loads (#2715).
+        property bool rebuilding: false
+
+        readonly property string orderSignature: {
+            const instances = SettingsData.desktopWidgetInstances || [];
+            let sig = "";
+            for (const inst of instances) {
+                const prefs = inst.config?.displayPreferences ?? ["all"];
+                const prefsKey = Array.isArray(prefs) ? prefs.join(",") : "all";
+                sig += inst.id + ":" + (inst.enabled ? "1" : "0") + ":" + prefsKey + "|";
+            }
+            return sig;
+        }
+
+        readonly property string pluginReadyKey: {
+            const instances = SettingsData.desktopWidgetInstances || [];
+            const comps = PluginService.pluginDesktopComponents;
+            let key = "";
+            for (const inst of instances) {
+                if (!inst.enabled)
+                    continue;
+                if (inst.widgetType === "desktopClock" || inst.widgetType === "systemMonitor")
+                    continue;
+                key += inst.widgetType + (comps[inst.widgetType] ? ":1" : ":0") + ",";
+            }
+            return key;
+        }
+
+        onOrderSignatureChanged: rebuildDebounce.restart()
+        onPluginReadyKeyChanged: rebuildDebounce.restart()
+
+        property Timer rebuildDebounce: Timer {
+            interval: 150
+            repeat: false
+            onTriggered: {
+                screenDelegate.rebuilding = true;
+                rebuildApply.restart();
+            }
+        }
+
+        property Timer rebuildApply: Timer {
+            interval: 32
+            repeat: false
+            onTriggered: screenDelegate.rebuilding = false
+        }
+
         property Component clockComponent: Component {
             DesktopClockWidget {}
         }
@@ -68,7 +115,8 @@ Variants {
         property Instantiator widgetInstantiator: Instantiator {
             model: ScriptModel {
                 objectProp: "id"
-                values: SettingsData.desktopWidgetInstances
+                // Reversed so the top of the list maps last and renders in front.
+                values: screenDelegate.rebuilding ? [] : [...(SettingsData.desktopWidgetInstances || [])].reverse()
             }
 
             DesktopPluginWrapper {

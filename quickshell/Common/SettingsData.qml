@@ -1323,6 +1323,35 @@ Singleton {
         return true;
     }
 
+    function moveDesktopWidgetInstanceToGroup(instanceId, groupId, newIndexInGroup) {
+        const instances = JSON.parse(JSON.stringify(desktopWidgetInstances || []));
+        const groups = desktopWidgetGroups || [];
+        const idx = instances.findIndex(inst => inst.id === instanceId);
+        if (idx === -1)
+            return false;
+        const [item] = instances.splice(idx, 1);
+        item.group = groupId || null;
+        const groupMatches = inst => {
+            if (!groupId)
+                return !inst.group || !groups.some(g => g.id === inst.group);
+            return inst.group === groupId;
+        };
+        const groupInstances = instances.filter(groupMatches);
+        const clamped = Math.max(0, Math.min(newIndexInGroup, groupInstances.length));
+        let targetGlobalIdx;
+        if (clamped >= groupInstances.length) {
+            const last = groupInstances[groupInstances.length - 1];
+            targetGlobalIdx = last ? instances.findIndex(inst => inst.id === last.id) + 1 : instances.length;
+        } else {
+            const targetInstance = groupInstances[clamped];
+            targetGlobalIdx = instances.findIndex(inst => inst.id === targetInstance.id);
+        }
+        instances.splice(targetGlobalIdx, 0, item);
+        desktopWidgetInstances = instances;
+        saveSettings();
+        return true;
+    }
+
     function createDesktopWidgetGroup(name) {
         const id = "dwg_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
         const group = {
@@ -3070,7 +3099,7 @@ Singleton {
         if (!normalizedIdentity)
             return;
         var list = mediaExcludePlayers ? mediaExcludePlayers.slice() : [];
-        var normalizedList = list.map(function(id) {
+        var normalizedList = list.map(function (id) {
             return id ? id.toString().trim().toLowerCase() : "";
         });
         if (normalizedList.indexOf(normalizedIdentity) >= 0)
