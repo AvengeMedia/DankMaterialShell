@@ -33,13 +33,14 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/tailscale"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/thememode"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/trayrecovery"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wallpaper"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wayland"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wlcontext"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wlroutput"
 	"github.com/AvengeMedia/DankMaterialShell/core/pkg/syncmap"
 )
 
-const APIVersion = 26
+const APIVersion = 27
 
 var CLIVersion = "dev"
 
@@ -73,6 +74,7 @@ var clipboardManager *clipboard.Manager
 var dbusManager *serverDbus.Manager
 var wlContext *wlcontext.SharedContext
 var themeModeManager *thememode.Manager
+var wallpaperManager *wallpaper.Manager
 var trayRecoveryManager *trayrecovery.Manager
 var locationManager *location.Manager
 var sysUpdateManager *sysupdate.Manager
@@ -347,6 +349,13 @@ func InitializeThemeModeManager() error {
 	return nil
 }
 
+func InitializeWallpaperManager() error {
+	wallpaperManager = wallpaper.NewManager()
+
+	log.Info("Wallpaper rotation scheduler initialized")
+	return nil
+}
+
 func InitializeTrayRecoveryManager() error {
 	manager, err := trayrecovery.NewManager()
 	if err != nil {
@@ -463,6 +472,10 @@ func getCapabilities() Capabilities {
 		caps = append(caps, "theme.auto")
 	}
 
+	if wallpaperManager != nil {
+		caps = append(caps, "wallpaper")
+	}
+
 	if dbusManager != nil {
 		caps = append(caps, "dbus")
 	}
@@ -527,6 +540,10 @@ func getServerInfo() ServerInfo {
 
 	if themeModeManager != nil {
 		caps = append(caps, "theme.auto")
+	}
+
+	if wallpaperManager != nil {
+		caps = append(caps, "wallpaper")
 	}
 
 	if locationManager != nil {
@@ -831,6 +848,38 @@ func handleSubscribe(conn net.Conn, req models.Request) {
 					}
 					select {
 					case eventChan <- ServiceEvent{Service: "theme.auto", Data: state}:
+					case <-stopChan:
+						return
+					}
+				case <-stopChan:
+					return
+				}
+			}
+		}()
+	}
+
+	if shouldSubscribe("wallpaper") && wallpaperManager != nil {
+		wg.Add(1)
+		wallpaperChan := wallpaperManager.Subscribe(clientID + "-wallpaper")
+		go func() {
+			defer wg.Done()
+			defer wallpaperManager.Unsubscribe(clientID + "-wallpaper")
+
+			initialState := wallpaperManager.GetState()
+			select {
+			case eventChan <- ServiceEvent{Service: "wallpaper", Data: initialState}:
+			case <-stopChan:
+				return
+			}
+
+			for {
+				select {
+				case state, ok := <-wallpaperChan:
+					if !ok {
+						return
+					}
+					select {
+					case eventChan <- ServiceEvent{Service: "wallpaper", Data: state}:
 					case <-stopChan:
 						return
 					}
@@ -1286,6 +1335,9 @@ func cleanupManagers() {
 	if themeModeManager != nil {
 		themeModeManager.Close()
 	}
+	if wallpaperManager != nil {
+		wallpaperManager.Close()
+	}
 	if trayRecoveryManager != nil {
 		trayRecoveryManager.Close()
 	}
@@ -1575,6 +1627,19 @@ func Start(printDocs bool) error {
 				return
 			}
 			themeModeManager.WatchLoginctl(loginctlManager)
+		}()
+	}
+
+	if err := InitializeWallpaperManager(); err != nil {
+		log.Warnf("Wallpaper scheduler unavailable: %v", err)
+	} else {
+		notifyCapabilityChange()
+		go func() {
+			<-loginctlReady
+			if loginctlManager == nil {
+				return
+			}
+			wallpaperManager.WatchLoginctl(loginctlManager)
 		}()
 	}
 

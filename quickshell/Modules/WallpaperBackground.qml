@@ -129,9 +129,13 @@ Variants {
             property bool useNextForEffect: false
             property string pendingWallpaper: ""
             property string _deferredSource: ""
+            // Held true from the moment a wallpaper change is initiated until it
+            // settles, so the paused render loop wakes and drives the async load
+            // and transition even when nothing else marks the window dirty.
+            property bool changePending: false
             readonly property bool overviewBlurActive: CompositorService.isNiri && SettingsData.blurWallpaperOnOverview && NiriService.inOverview && currentWallpaper.source !== ""
             readonly property var backingWindow: Window.window
-            readonly property bool renderActive: !source || effectActive || overviewBlurActive || pendingWallpaper !== "" || _deferredSource !== "" || frameAnim.running || currentWallpaper.status === Image.Loading || nextWallpaper.status === Image.Loading
+            readonly property bool renderActive: !source || effectActive || overviewBlurActive || pendingWallpaper !== "" || _deferredSource !== "" || changePending || frameAnim.running || currentWallpaper.status === Image.Loading || nextWallpaper.status === Image.Loading
             property int _settleFrames: 3
 
             function invalidate() {
@@ -265,6 +269,7 @@ Variants {
                 root.useNextForEffect = false;
                 root.effectActive = false;
                 root.transitionProgress = 0.0;
+                root.changePending = false;
                 currentWallpaper.layer.enabled = false;
                 nextWallpaper.layer.enabled = false;
                 nextWallpaper.source = "";
@@ -502,6 +507,9 @@ Variants {
                     return;
                 }
 
+                root.changePending = true;
+                invalidate();
+
                 const formattedSource = source.startsWith("file://") ? source : encodeFileUrl(source);
 
                 if (!isInitialized || !currentWallpaper.source) {
@@ -687,6 +695,9 @@ Variants {
                     }
                     if (status === Image.Ready) {
                         imageMetrics.capture(implicitWidth, implicitHeight);
+                    }
+                    if (status === Image.Ready || status === Image.Error) {
+                        root.changePending = false;
                     }
                 }
 
@@ -890,6 +901,8 @@ Variants {
                     property real imageHeight2: modelData.height
                     property real screenWidth: modelData.width
                     property real screenHeight: modelData.height
+                    property real scrollX: 50
+                    property real scrollY: 50
                     fragmentShader: Qt.resolvedUrl("../Shaders/qsb/wp_fade.frag.qsb")
                 }
             }
@@ -1048,6 +1061,7 @@ Variants {
                     currentWallpaper.layer.enabled = false;
                     nextWallpaper.layer.enabled = false;
                     root.effectActive = false;
+                    root.changePending = false;
 
                     if (!root.pendingWallpaper)
                         return;

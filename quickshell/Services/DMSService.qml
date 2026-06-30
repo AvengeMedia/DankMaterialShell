@@ -55,6 +55,7 @@ Singleton {
     signal evdevStateUpdate(var data)
     signal gammaStateUpdate(var data)
     signal themeAutoStateUpdate(var data)
+    signal wallpaperCycleUpdate(var data)
     signal openUrlRequested(string url)
     signal appPickerRequested(var data)
     signal screensaverStateUpdate(var data)
@@ -68,7 +69,7 @@ Singleton {
     property bool screensaverInhibited: false
     property var screensaverInhibitors: []
 
-    property var activeSubscriptions: ["network", "network.credentials", "loginctl", "freedesktop", "freedesktop.screensaver", "gamma", "theme.auto", "bluetooth", "bluetooth.pairing", "brightness", "wlroutput", "evdev", "browser", "dbus", "clipboard", "location", "sysupdate"]
+    property var activeSubscriptions: ["network", "network.credentials", "loginctl", "freedesktop", "freedesktop.screensaver", "gamma", "theme.auto", "wallpaper", "bluetooth", "bluetooth.pairing", "brightness", "wlroutput", "evdev", "browser", "dbus", "clipboard", "location", "sysupdate"]
 
     Component.onCompleted: {
         if (socketPath && socketPath.length > 0) {
@@ -371,6 +372,8 @@ Singleton {
             gammaStateUpdate(data);
         } else if (service === "theme.auto") {
             themeAutoStateUpdate(data);
+        } else if (service === "wallpaper") {
+            wallpaperCycleUpdate(data);
         } else if (service === "browser.open_requested") {
             if (data.target) {
                 if (data.requestType === "url" || !data.requestType) {

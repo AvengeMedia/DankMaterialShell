@@ -74,6 +74,9 @@ func NewManager(display wlclient.WaylandDisplay, config Config) (*Manager, error
 
 	if config.Enabled {
 		m.post(func() {
+			if m.controlsInitialized {
+				return
+			}
 			log.Info("Gamma control enabled at startup")
 			gammaMgr := m.gammaControl.(*wlr_gamma_control.ZwlrGammaControlManagerV1)
 			m.availOutputsMu.RLock()
@@ -184,13 +187,26 @@ func (m *Manager) setupRegistry() error {
 			enabled := m.config.Enabled
 			m.configMutex.RUnlock()
 
-			if enabled && m.controlsInitialized {
-				m.post(func() {
-					if err := m.addOutputControl(output); err != nil {
-						log.Warnf("Failed to add output control: %v", err)
-					}
-				})
+			if !enabled {
+				return
 			}
+			m.post(func() {
+				if err := m.addOutputControl(output); err != nil {
+					log.Warnf("gamma: failed to add output control: %v", err)
+					return
+				}
+				if m.controlsInitialized {
+					return
+				}
+				// All outputs had been torn down (monitor sleep/disconnect),
+				// clearing controlsInitialized. Mark it ready again so the
+				// gamma_size event that follows control creation drives the
+				// reapply, instead of waiting for a manual toggle. No explicit
+				// apply here: applyGamma's dedup would suppress a no-change
+				// write anyway, and the new control isn't ready until gamma_size.
+				log.Info("gamma: output returned, re-establishing controls")
+				m.controlsInitialized = true
+			})
 		}
 	})
 
