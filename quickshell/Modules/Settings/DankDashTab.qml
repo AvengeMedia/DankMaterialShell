@@ -12,6 +12,10 @@ Item {
     focus: true
     property string highlightedId: ""
 
+    DankTooltipV2 {
+        id: sharedTooltip
+    }
+
     readonly property var __presentation: ({
             "overview": {
                 "icon": "dashboard",
@@ -261,6 +265,12 @@ Item {
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: SettingsData.resetDashTabs()
+                                onEntered: {
+                                    sharedTooltip.show(I18n.tr("Reset"), resetButton, 0, 0, "bottom");
+                                }
+                                onExited: {
+                                    sharedTooltip.hide();
+                                }
                             }
 
                             Behavior on color {
@@ -527,6 +537,13 @@ Item {
                                             root.forceActiveFocus();
                                             root.highlightedId = rowItem.modelData;
                                             SettingsData.setDashTabEnabled(rowItem.modelData, !rowItem.isEnabled);
+                                        }
+                                        onEntered: {
+                                            const tooltipText = rowItem.isEnabled ? I18n.tr("Hide") : I18n.tr("Show");
+                                            sharedTooltip.show(tooltipText, visibilityButton, 0, 0, "bottom");
+                                        }
+                                        onExited: {
+                                            sharedTooltip.hide();
                                         }
                                     }
                                 }

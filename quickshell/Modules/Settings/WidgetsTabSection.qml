@@ -411,6 +411,12 @@ Column {
                             iconName: "more_vert"
                             iconSize: 18
                             iconColor: Theme.outline
+                            onEntered: {
+                                sharedTooltip.show(I18n.tr("Options"), gpuMenuButton, 0, 0, "bottom");
+                            }
+                            onExited: {
+                                sharedTooltip.hide();
+                            }
                             onClicked: {
                                 gpuContextMenu.widgetData = modelData;
                                 gpuContextMenu.sectionId = root.sectionId;
@@ -477,6 +483,12 @@ Column {
                             iconName: "more_vert"
                             iconSize: 18
                             iconColor: Theme.outline
+                            onEntered: {
+                                sharedTooltip.show(I18n.tr("Options"), diskMenuButton, 0, 0, "bottom");
+                            }
+                            onExited: {
+                                sharedTooltip.hide();
+                            }
                             onClicked: {
                                 diskUsageContextMenu.widgetData = modelData;
                                 diskUsageContextMenu.sectionId = root.sectionId;
@@ -602,6 +614,12 @@ Column {
                             iconName: "more_vert"
                             iconSize: 18
                             iconColor: Theme.outline
+                            onEntered: {
+                                sharedTooltip.show(I18n.tr("Options"), memMenuButton, 0, 0, "bottom");
+                            }
+                            onExited: {
+                                sharedTooltip.hide();
+                            }
                             onClicked: {
                                 memUsageContextMenu.widgetData = modelData;
                                 memUsageContextMenu.sectionId = root.sectionId;
@@ -636,6 +654,12 @@ Column {
                             iconName: "more_vert"
                             iconSize: 18
                             iconColor: Theme.outline
+                            onEntered: {
+                                sharedTooltip.show(I18n.tr("Options"), focusedWindowMenuButton, 0, 0, "bottom");
+                            }
+                            onExited: {
+                                sharedTooltip.hide();
+                            }
                             onClicked: {
                                 focusedWindowContextMenu.widgetData = modelData;
                                 focusedWindowContextMenu.sectionId = root.sectionId;
@@ -669,6 +693,12 @@ Column {
                             iconName: "more_vert"
                             iconSize: 18
                             iconColor: Theme.outline
+                            onEntered: {
+                                sharedTooltip.show(I18n.tr("Options"), musicMenuButton, 0, 0, "bottom");
+                            }
+                            onExited: {
+                                sharedTooltip.hide();
+                            }
                             onClicked: {
                                 musicContextMenu.widgetData = modelData;
                                 musicContextMenu.sectionId = root.sectionId;
@@ -702,6 +732,12 @@ Column {
                             iconName: "more_vert"
                             iconSize: 18
                             iconColor: Theme.outline
+                            onEntered: {
+                                sharedTooltip.show(I18n.tr("Options"), runningAppsMenuButton, 0, 0, "bottom");
+                            }
+                            onExited: {
+                                sharedTooltip.hide();
+                            }
                             onClicked: {
                                 runningAppsContextMenu.widgetData = modelData;
                                 runningAppsContextMenu.sectionId = root.sectionId;
@@ -735,6 +771,12 @@ Column {
                             iconName: "more_vert"
                             iconSize: 18
                             iconColor: Theme.outline
+                            onEntered: {
+                                sharedTooltip.show(I18n.tr("Options"), batteryMenuButton, 0, 0, "bottom");
+                            }
+                            onExited: {
+                                sharedTooltip.hide();
+                            }
                             onClicked: {
                                 batteryContextMenu.widgetData = modelData;
                                 batteryContextMenu.sectionId = root.sectionId;
@@ -836,6 +878,12 @@ Column {
                                 iconSize: 18
                                 iconColor: Theme.outline
 
+                                onEntered: {
+                                    sharedTooltip.show(I18n.tr("Options"), kbdLayoutCtxMenuButton, 0, 0, "bottom");
+                                }
+                                onExited: {
+                                    sharedTooltip.hide();
+                                }
                                 onClicked: {
                                     kbdLayoutCtxMenu.widgetData = modelData;
                                     kbdLayoutCtxMenu.sectionId = root.sectionId;
@@ -869,6 +917,12 @@ Column {
                                 iconName: "more_vert"
                                 iconSize: 18
                                 iconColor: Theme.outline
+                                onEntered: {
+                                    sharedTooltip.show(I18n.tr("Options"), appsDockMenuButton, 0, 0, "bottom");
+                                }
+                                onExited: {
+                                    sharedTooltip.hide();
+                                }
                                 onClicked: {
                                     appsDockContextMenu.widgetData = modelData;
                                     appsDockContextMenu.sectionId = root.sectionId;
@@ -902,6 +956,12 @@ Column {
                                 iconName: "more_vert"
                                 iconSize: 18
                                 iconColor: Theme.outline
+                                onEntered: {
+                                    sharedTooltip.show(I18n.tr("Options"), trayMenuButton, 0, 0, "bottom");
+                                }
+                                onExited: {
+                                    sharedTooltip.hide();
+                                }
                                 onClicked: {
                                     trayContextMenu.widgetData = modelData;
                                     trayContextMenu.sectionId = root.sectionId;
@@ -966,6 +1026,12 @@ Column {
                             iconName: "more_vert"
                             iconSize: 18
                             iconColor: Theme.outline
+                            onEntered: {
+                                sharedTooltip.show(I18n.tr("Options"), ccMenuButton, 0, 0, "bottom");
+                            }
+                            onExited: {
+                                sharedTooltip.hide();
+                            }
                             onClicked: {
                                 controlCenterContextMenu.widgetData = modelData;
                                 controlCenterContextMenu.sectionId = root.sectionId;
@@ -1001,6 +1067,12 @@ Column {
                             iconName: "more_vert"
                             iconSize: 18
                             iconColor: Theme.outline
+                            onEntered: {
+                                sharedTooltip.show(I18n.tr("Options"), privacyMenuButton, 0, 0, "bottom");
+                            }
+                            onExited: {
+                                sharedTooltip.hide();
+                            }
                             onClicked: {
                                 privacyContextMenu.widgetData = modelData;
                                 privacyContextMenu.sectionId = root.sectionId;
@@ -1037,6 +1109,13 @@ Column {
                             iconColor: modelData.enabled ? Theme.primary : Theme.outline
                             onClicked: {
                                 root.itemEnabledChanged(root.sectionId, modelData.id, !modelData.enabled);
+                            }
+                            onEntered: {
+                                const tooltipText = modelData.enabled ? I18n.tr("Hide") : I18n.tr("Show");
+                                sharedTooltip.show(tooltipText, visibilityButton, 0, 0, "bottom");
+                            }
+                            onExited: {
+                                sharedTooltip.hide();
                             }
                         }
 
@@ -1078,12 +1157,19 @@ Column {
                         }
 
                         DankActionButton {
+                            id: removeWidgetButton
                             buttonSize: 32
                             iconName: "close"
                             iconSize: 18
                             iconColor: Theme.error
                             onClicked: {
                                 root.removeWidget(root.sectionId, index);
+                            }
+                            onEntered: {
+                                sharedTooltip.show(I18n.tr("Remove"), removeWidgetButton, 0, 0, "bottom");
+                            }
+                            onExited: {
+                                sharedTooltip.hide();
                             }
                         }
                     }
