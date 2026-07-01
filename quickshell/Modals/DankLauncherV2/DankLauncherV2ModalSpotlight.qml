@@ -155,7 +155,7 @@ Item {
         }
         if (spotlightContent.searchField) {
             spotlightContent.searchField.forceActiveFocus();
-            spotlightContent.searchField.cursorPosition = spotlightContent.searchField.text.length;
+            spotlightContent.searchField.selectAll();
         }
     }
 

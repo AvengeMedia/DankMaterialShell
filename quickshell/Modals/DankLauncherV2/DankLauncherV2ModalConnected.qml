@@ -424,8 +424,10 @@ Item {
 
             Qt.callLater(() => {
                 root.keyboardActive = true;
-                if (root.spotlightContent && root.spotlightContent.searchField)
+                if (root.spotlightContent && root.spotlightContent.searchField) {
                     root.spotlightContent.searchField.forceActiveFocus();
+                    root.spotlightContent.searchField.selectAll();
+                }
             });
         });
     }
