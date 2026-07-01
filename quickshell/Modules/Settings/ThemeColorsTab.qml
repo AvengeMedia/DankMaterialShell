@@ -1812,6 +1812,40 @@ Item {
                     defaultValue: 35
                     onSliderValueChanged: newValue => SettingsData.set("blurBorderOpacity", newValue / 100)
                 }
+
+                Item {
+                    width: parent.width
+                    height: xrayHintRow.implicitHeight
+                    visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango
+
+                    Row {
+                        id: xrayHintRow
+                        width: parent.width
+                        spacing: Theme.spacingS
+
+                        DankIcon {
+                            name: "info"
+                            size: Theme.iconSizeSmall
+                            color: Theme.primary
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            width: parent.width - Theme.iconSizeSmall - Theme.spacingS
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: I18n.tr("Xray specific options for blurred surfaces live in Compositor → Layout")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.primary
+                            wrapMode: Text.Wrap
+                        }
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: PopoutService.openSettingsWithTab("compositor_layout")
+                    }
+                }
             }
 
             SettingsCard {

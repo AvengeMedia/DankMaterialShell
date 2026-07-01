@@ -176,10 +176,14 @@ Singleton {
     property int niriLayoutGapsOverride: -1
     property int niriLayoutRadiusOverride: -1
     property int niriLayoutBorderSize: -1
+    property bool niriLayoutXrayEnabled: false
+    property bool niriLayoutBarXrayEnabled: true
     property int hyprlandLayoutGapsOverride: -1
     property int hyprlandLayoutRadiusOverride: -1
     property int hyprlandLayoutBorderSize: -1
     property bool hyprlandResizeOnBorder: false
+    property bool hyprlandLayoutXrayEnabled: false
+    property bool hyprlandLayoutBarXrayEnabled: true
     property int mangoLayoutGapsOverride: -1
     property int mangoLayoutRadiusOverride: -1
     property int mangoLayoutBorderSize: -1

@@ -8643,6 +8643,46 @@
     "description": "Width of window border and focus ring"
   },
   {
+    "section": "hyprlandLayoutBarXrayEnabled",
+    "label": "Frame Xray",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "bar",
+      "custom",
+      "customize",
+      "frame",
+      "hyprland",
+      "makes",
+      "performance",
+      "personal",
+      "personalization",
+      "xray"
+    ],
+    "description": "Xray on makes the Frame"
+  },
+  {
+    "section": "niriLayoutBarXrayEnabled",
+    "label": "Frame Xray",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "bar",
+      "custom",
+      "customize",
+      "frame",
+      "makes",
+      "niri",
+      "performance",
+      "personal",
+      "personalization",
+      "xray"
+    ],
+    "description": "Xray on makes the Frame"
+  },
+  {
     "section": "hyprlandLayout",
     "label": "Hyprland Layout Overrides",
     "tabIndex": 37,
@@ -9118,6 +9158,66 @@
       "windows"
     ],
     "description": "Space between windows"
+  },
+  {
+    "section": "hyprlandLayoutXrayEnabled",
+    "label": "Xray Blur Effect",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "background",
+      "background-effect",
+      "bg",
+      "blur",
+      "custom",
+      "customize",
+      "desktop",
+      "effect",
+      "hyprland",
+      "image",
+      "makes",
+      "performance",
+      "personal",
+      "personalization",
+      "picture",
+      "through",
+      "visible",
+      "wallpaper",
+      "windows",
+      "xray"
+    ],
+    "description": "Xray on makes the windows background visible through to the wallpaper"
+  },
+  {
+    "section": "niriLayoutXrayEnabled",
+    "label": "Xray Blur Effect",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "background",
+      "background-effect",
+      "bg",
+      "blur",
+      "custom",
+      "customize",
+      "desktop",
+      "effect",
+      "image",
+      "makes",
+      "niri",
+      "performance",
+      "personal",
+      "personalization",
+      "picture",
+      "through",
+      "visible",
+      "wallpaper",
+      "windows",
+      "xray"
+    ],
+    "description": "Xray on makes the windows background visible through to the wallpaper"
   },
   {
     "section": "windowRules",

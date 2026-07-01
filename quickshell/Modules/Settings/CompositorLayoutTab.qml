@@ -310,6 +310,26 @@ Item {
                     defaultValue: 2
                     onSliderValueChanged: newValue => SettingsData.set("niriLayoutBorderSize", newValue)
                 }
+
+                SettingsToggleRow {
+                    tags: ["niri", "xray", "blur", "background-effect", "performance"]
+                    settingKey: "niriLayoutXrayEnabled"
+                    text: I18n.tr("Xray Blur Effect")
+                    description: SettingsData.niriLayoutXrayEnabled ? I18n.tr("Xray on makes the windows background visible through to the wallpaper") : I18n.tr("Xray off shows the real background beneath the blurred surfaces")
+                    checked: SettingsData.niriLayoutXrayEnabled
+                    onToggled: checked => SettingsData.set("niriLayoutXrayEnabled", checked)
+                }
+
+                SettingsToggleRow {
+                    // Hidden in Frame Connected mode, where it has no target
+                    visible: !(SettingsData.frameEnabled && SettingsData.frameMode === "connected")
+                    tags: ["niri", "xray", "bar", "frame", "performance"]
+                    settingKey: "niriLayoutBarXrayEnabled"
+                    text: SettingsData.frameEnabled ? I18n.tr("Frame Xray") : I18n.tr("Dank Bar Xray")
+                    description: SettingsData.niriLayoutBarXrayEnabled ? (SettingsData.frameEnabled ? I18n.tr("Xray on makes the Frame's border visible through to the wallpaper; more efficient") : I18n.tr("Xray on makes the Dank Bar visible through to the wallpaper; more efficient")) : (SettingsData.frameEnabled ? I18n.tr("Xray off shows the real background beneath the Frame's border") : I18n.tr("Xray off shows the real background beneath the Dank Bar"))
+                    checked: SettingsData.niriLayoutBarXrayEnabled
+                    onToggled: checked => SettingsData.set("niriLayoutBarXrayEnabled", checked)
+                }
             }
 
             SettingsCard {
@@ -415,6 +435,26 @@ Item {
                     description: I18n.tr("Resize windows by dragging their edges with the mouse")
                     checked: SettingsData.hyprlandResizeOnBorder
                     onToggled: checked => SettingsData.set("hyprlandResizeOnBorder", checked)
+                }
+
+                SettingsToggleRow {
+                    tags: ["hyprland", "xray", "blur", "background-effect", "performance"]
+                    settingKey: "hyprlandLayoutXrayEnabled"
+                    text: I18n.tr("Xray Blur Effect")
+                    description: SettingsData.hyprlandLayoutXrayEnabled ? I18n.tr("Xray on makes the windows background visible through to the wallpaper") : I18n.tr("Xray off shows the real background beneath the blurred surfaces")
+                    checked: SettingsData.hyprlandLayoutXrayEnabled
+                    onToggled: checked => SettingsData.set("hyprlandLayoutXrayEnabled", checked)
+                }
+
+                SettingsToggleRow {
+                    // Hidden in Frame Connected mode, where it has no target
+                    visible: !(SettingsData.frameEnabled && SettingsData.frameMode === "connected")
+                    tags: ["hyprland", "xray", "bar", "frame", "performance"]
+                    settingKey: "hyprlandLayoutBarXrayEnabled"
+                    text: SettingsData.frameEnabled ? I18n.tr("Frame Xray") : I18n.tr("Dank Bar Xray")
+                    description: SettingsData.hyprlandLayoutBarXrayEnabled ? (SettingsData.frameEnabled ? I18n.tr("Xray on makes the Frame's border visible through to the wallpaper; more efficient") : I18n.tr("Xray on makes the Dank Bar visible through to the wallpaper; more efficient")) : (SettingsData.frameEnabled ? I18n.tr("Xray off shows the real background beneath the Frame's border") : I18n.tr("Xray off shows the real background beneath the Dank Bar"))
+                    checked: SettingsData.hyprlandLayoutBarXrayEnabled
+                    onToggled: checked => SettingsData.set("hyprlandLayoutBarXrayEnabled", checked)
                 }
             }
 
