@@ -735,6 +735,7 @@ Singleton {
     property string batteryProfileName: ""
     property int batteryPostLockMonitorTimeout: 0
     property int batteryChargeLimit: 100
+    property bool lowerDisplayRefreshRateOnBattery: false
     property bool batteryNotifyChargeLimit: false
     property int batteryCriticalThreshold: 10
     property bool batteryNotifyCritical: true
@@ -944,6 +945,7 @@ Singleton {
     property var hyprlandOutputSettings: ({})
     property var displayProfiles: ({})
     property var activeDisplayProfile: ({})
+    property var activeDisplayProfileModes: ({})
     property bool displayProfileAutoSelect: false
     property bool displayShowDisconnected: false
     property bool displaySnapToEdge: true

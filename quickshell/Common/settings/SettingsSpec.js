@@ -330,6 +330,7 @@ var SPEC = {
     batteryProfileName: { def: "" },
     batteryPostLockMonitorTimeout: { def: 0 },
     batteryChargeLimit: { def: 100 },
+    lowerDisplayRefreshRateOnBattery: { def: false },
     batteryNotifyChargeLimit: { def: false },
     batteryCriticalThreshold: { def: 10 },
     batteryNotifyCritical: { def: true },
