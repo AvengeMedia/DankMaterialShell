@@ -1976,6 +1976,18 @@ Item {
             return `SUCCESS: Activated ${itemId}`;
         }
 
+        function menu(itemId: string): string {
+            const item = findTrayItem(itemId);
+            if (!item)
+                return `ERROR: Tray item not found: ${itemId}`;
+
+            if (!item.hasMenu)
+                return `ERROR: Tray item has no menu: ${itemId}`;
+
+            TrayMenuManager.requestOpenTrayMenu(itemId);
+            return `SUCCESS: Requested menu ${itemId}`;
+        }
+
         function status(itemId: string): string {
             const item = findTrayItem(itemId);
             if (!item)
