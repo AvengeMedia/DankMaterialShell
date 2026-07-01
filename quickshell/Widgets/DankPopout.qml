@@ -65,7 +65,10 @@ Item {
                 list.push(root.backgroundWindow);
             return list.concat(KeyboardFocus.barWindows);
         }
-        active: KeyboardFocus.wantsGrab(root.shouldBeVisible || root.isClosing, root.customKeyboardFocus)
+        active: KeyboardFocus.wantsGrab(root.shouldBeVisible, root.customKeyboardFocus)
+
+        property var restoreToplevel: null
+        onActiveChanged: restoreToplevel = active ? KeyboardFocus.captureActiveToplevel() : KeyboardFocus.restoreToplevel(restoreToplevel)
     }
 
     Loader {

@@ -58,6 +58,9 @@ Item {
     HyprlandFocusGrab {
         windows: root.contentWindow ? [root.contentWindow] : []
         active: KeyboardFocus.wantsGrab(root.shouldHaveFocus, root.customKeyboardFocus)
+
+        property var restoreToplevel: null
+        onActiveChanged: restoreToplevel = active ? KeyboardFocus.captureActiveToplevel() : KeyboardFocus.restoreToplevel(restoreToplevel)
     }
     readonly property var contentWindow: impl.item ? impl.item.contentWindow : null
     readonly property var effectiveScreen: impl.item ? impl.item.effectiveScreen : null

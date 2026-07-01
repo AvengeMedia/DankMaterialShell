@@ -1051,6 +1051,9 @@ BasePill {
         HyprlandFocusGrab {
             windows: [overflowMenu].concat(KeyboardFocus.barWindows)
             active: root.useOverflowPopup && KeyboardFocus.wantsGrab(root.menuOpen, null)
+
+            property var restoreToplevel: null
+            onActiveChanged: restoreToplevel = active ? KeyboardFocus.captureActiveToplevel() : KeyboardFocus.restoreToplevel(restoreToplevel)
         }
 
         Connections {
@@ -1595,6 +1598,9 @@ BasePill {
                 HyprlandFocusGrab {
                     windows: [menuWindow].concat(KeyboardFocus.barWindows)
                     active: KeyboardFocus.wantsGrab(menuRoot.showMenu, null)
+
+                    property var restoreToplevel: null
+                    onActiveChanged: restoreToplevel = active ? KeyboardFocus.captureActiveToplevel() : KeyboardFocus.restoreToplevel(restoreToplevel)
                 }
 
                 anchors {
