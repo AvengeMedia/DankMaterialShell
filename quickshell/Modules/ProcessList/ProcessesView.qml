@@ -16,12 +16,26 @@ Item {
     property int selectedIndex: -1
     property bool keyboardNavigationActive: false
     property int forceRefreshCount: 0
+    property var killedPids: []
 
     readonly property bool pauseUpdates: (contextMenu?.visible ?? false) || expandedPid.length > 0
     readonly property bool shouldUpdate: !pauseUpdates || forceRefreshCount > 0
     property var cachedProcesses: []
 
     signal openContextMenuRequested(int index, real x, real y, bool fromKeyboard)
+
+    Connections {
+        target: DgopService
+        function onAllProcessesChanged() {
+            if (root.killedPids.length > 0 && DgopService.allProcesses) {
+                var activePids = DgopService.allProcesses.map(p => p.pid);
+                var newKilledPids = root.killedPids.filter(pid => activePids.includes(pid));
+                if (newKilledPids.length !== root.killedPids.length) {
+                    root.killedPids = newKilledPids;
+                }
+            }
+        }
+    }
 
     onFilteredProcessesChanged: {
         if (!shouldUpdate)
@@ -41,6 +55,10 @@ Item {
             return [];
 
         let procs = DgopService.allProcesses.slice();
+
+        if (root.killedPids.length > 0) {
+            procs = procs.filter(p => !root.killedPids.includes(p.pid));
+        }
 
         if (processFilter === "user") {
             procs = procs.filter(p => p.username === UserInfoService.username);
@@ -301,19 +319,10 @@ Item {
             clip: true
             spacing: 2
 
-            states: [
-                State {
-                    name: "snap"
-                    when: Theme.snapListModelChanges
-                    PropertyChanges {
-                        target: processListView
-                        add: null
-                        remove: null
-                        displaced: null
-                        move: null
-                    }
-                }
-            ]
+            add: root.searchText.length > 0 ? ListViewTransitions.add : null
+            remove: root.searchText.length > 0 ? ListViewTransitions.remove : null
+            displaced: root.searchText.length > 0 ? ListViewTransitions.displaced : null
+            move: root.searchText.length > 0 ? ListViewTransitions.move : null
 
             model: ScriptModel {
                 values: root.cachedProcesses
@@ -460,13 +469,15 @@ Item {
         signal clicked
         signal contextMenuRequested(real mouseX, real mouseY)
 
+        property bool isKilled: false
+
         readonly property int processPid: process?.pid ?? 0
         readonly property real processCpu: process?.cpu ?? 0
         readonly property int processMemKB: process?.memoryKB ?? 0
         readonly property string processCmd: process?.command ?? ""
         readonly property string processFullCmd: process?.fullCommand ?? processCmd
 
-        height: isExpanded ? (44 + expandedRect.height + Theme.spacingXS) : 44
+        height: isKilled ? 0 : (isExpanded ? (44 + expandedRect.height + Theme.spacingXS) : 44)
         radius: Theme.cornerRadius
         color: {
             if (isSelected)
@@ -482,11 +493,49 @@ Item {
         clip: true
 
         Behavior on height {
+            enabled: !processItemRoot.isKilled
             NumberAnimation {
                 duration: Theme.shortDuration
                 easing.type: Theme.standardEasing
             }
         }
+
+        states: [
+            State {
+                name: "killed"
+                when: processItemRoot.isKilled
+                PropertyChanges {
+                    processItemRoot.opacity: 0.0
+                    processItemRoot.height: 0
+                }
+            }
+        ]
+
+        transitions: [
+            Transition {
+                from: "*"
+                to: "killed"
+
+                SequentialAnimation {
+                    ParallelAnimation {
+                        NumberAnimation {
+                            properties: "opacity,height"
+                            duration: Theme.shortDuration
+                            easing.type: Theme.standardEasing
+                        }
+                    }
+                    ScriptAction {
+                        script: {
+                            root.killedPids = root.killedPids.concat([processItemRoot.processPid]);
+                            Quickshell.execDetached(["kill", processItemRoot.processPid.toString()]);
+                            if (root.expandedPid === processItemRoot.processPid.toString()) {
+                                root.expandedPid = "";
+                            }
+                        }
+                    }
+                }
+            }
+        ]
 
         Behavior on color {
             ColorAnimation {
@@ -706,6 +755,32 @@ Item {
                         }
 
                         Rectangle {
+                            id: killBtn
+                            Layout.preferredWidth: 24
+                            Layout.preferredHeight: 24
+                            Layout.alignment: Qt.AlignVCenter
+                            radius: Theme.cornerRadius - 2
+                            color: killMouseArea.containsMouse ? Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.15) : "transparent"
+
+                            DankIcon {
+                                anchors.centerIn: parent
+                                name: "delete"
+                                size: 14
+                                color: killMouseArea.containsMouse ? Theme.error : Theme.surfaceVariantText
+                            }
+
+                             MouseArea {
+                                 id: killMouseArea
+                                 anchors.fill: parent
+                                 hoverEnabled: true
+                                 cursorShape: Qt.PointingHandCursor
+                                 onClicked: {
+                                     processItemRoot.isKilled = true;
+                                 }
+                             }
+                        }
+
+                        Rectangle {
                             id: copyBtn
                             Layout.preferredWidth: 24
                             Layout.preferredHeight: 24
@@ -774,5 +849,7 @@ Item {
                 }
             }
         }
+
+
     }
 }
