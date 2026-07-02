@@ -427,6 +427,7 @@ var SPEC = {
 
     notificationOverlayEnabled: { def: false },
     notificationPopupShadowEnabled: { def: true },
+    notificationPopupBgDisabled: { def: false },
     notificationPopupPrivacyMode: { def: false },
     overviewRows: { def: 2, persist: false },
     overviewColumns: { def: 5, persist: false },
