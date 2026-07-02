@@ -4689,6 +4689,29 @@
     "icon": "lock"
   },
   {
+    "section": "lockAppearance",
+    "label": "Lock Screen Appearance",
+    "tabIndex": 11,
+    "category": "Lock Screen",
+    "keywords": [
+      "appearance",
+      "clock",
+      "date",
+      "font",
+      "lock",
+      "lockscreen",
+      "login",
+      "password",
+      "screen",
+      "security",
+      "time",
+      "typography",
+      "watch"
+    ],
+    "icon": "palette",
+    "description": "Font used for the clock and date on the lock screen"
+  },
+  {
     "section": "lockDisplay",
     "label": "Lock Screen Display",
     "tabIndex": 11,
@@ -7824,22 +7847,6 @@
     "icon": "info"
   },
   {
-    "section": "greeterFontFamily",
-    "label": "Greeter font",
-    "tabIndex": 31,
-    "category": "Greeter",
-    "keywords": [
-      "display manager",
-      "font",
-      "greetd",
-      "greeter",
-      "login",
-      "screen",
-      "typography"
-    ],
-    "description": "Font used on the login screen"
-  },
-  {
     "section": "greeterAuth",
     "label": "Login Authentication",
     "tabIndex": 31,
@@ -7924,28 +7931,6 @@
       "show",
       "time"
     ]
-  },
-  {
-    "section": "greeterWallpaperFillMode",
-    "label": "Wallpaper fill mode",
-    "tabIndex": 31,
-    "category": "Greeter",
-    "keywords": [
-      "background",
-      "bg",
-      "desktop",
-      "display manager",
-      "fill",
-      "greetd",
-      "greeter",
-      "image",
-      "login",
-      "mode",
-      "picture",
-      "scaled",
-      "wallpaper"
-    ],
-    "description": "How the background image is scaled"
   },
   {
     "section": "muxType",

@@ -332,7 +332,6 @@ Singleton {
     property bool greeterAutoLoginSyncRerunRequested: false
     property string greeterAutoLoginSyncStdout: ""
     property string greeterAutoLoginSyncStderr: ""
-    property string greeterAutoLoginSyncTerminalFallbackStderr: ""
 
     function scheduleGreeterAutoLoginSync() {
         if (!settingsRoot || settingsRoot.isGreeterMode)
@@ -355,15 +354,16 @@ Singleton {
         greeterAutoLoginSyncRerunRequested = false;
         greeterAutoLoginSyncStdout = "";
         greeterAutoLoginSyncStderr = "";
-        greeterAutoLoginSyncTerminalFallbackStderr = "";
         greeterAutoLoginSyncRunning = true;
         greeterAutoLoginSyncSudoProbeProcess.running = true;
     }
 
-    function launchGreeterAutoLoginSyncTerminalFallback(details) {
-        ToastService.showWarning(I18n.tr("Opening terminal to update greetd"), I18n.tr("DMS needs administrator access. The terminal closes automatically when done.") + (details ? "\n\n" + details : ""), "dms greeter sync --autologin", "greeter-autologin-sync");
-        greeterAutoLoginSyncTerminalFallbackStderr = "";
-        greeterAutoLoginSyncTerminalFallbackProcess.running = true;
+    function deferGreeterAutoLoginSyncToPill(details) {
+        ToastService.dismissCategory("greeter-autologin-sync");
+        if (settingsRoot)
+            settingsRoot.set("greeterSyncPending", true);
+        ToastService.showWarning(I18n.tr("Auto-login change needs a sync"), I18n.tr("Administrator access is required. Use the Sync button in Settings → Greeter to apply.") + (details ? "\n\n" + details : ""), "dms greeter sync --autologin", "greeter-autologin-sync");
+        finishGreeterAutoLoginSync();
     }
 
     function greeterAutoLoginSyncSuccessToast(details) {
@@ -559,7 +559,7 @@ Singleton {
                 details = out;
             if (err !== "")
                 details = details !== "" ? details + "\n\nstderr:\n" + err : "stderr:\n" + err;
-            root.launchGreeterAutoLoginSyncTerminalFallback(details);
+            root.deferGreeterAutoLoginSyncToPill(details);
         }
     }
 
@@ -575,26 +575,7 @@ Singleton {
                 return;
             }
 
-            root.launchGreeterAutoLoginSyncTerminalFallback();
-        }
-    }
-
-    property var greeterAutoLoginSyncTerminalFallbackProcess: Process {
-        command: ["dms", "greeter", "sync", "--terminal", "--yes", "--autologin"]
-        running: false
-
-        stderr: StdioCollector {
-            onStreamFinished: root.greeterAutoLoginSyncTerminalFallbackStderr = text || ""
-        }
-
-        onExited: exitCode => {
-            if (exitCode === 0) {
-                root.greeterAutoLoginSyncSuccessToast("");
-            } else {
-                let details = (root.greeterAutoLoginSyncTerminalFallbackStderr || "").trim();
-                ToastService.showError(I18n.tr("Couldn't open a terminal for the auto-login update.") + " (exit " + exitCode + ")", details, "dms greeter sync --autologin", "greeter-autologin-sync");
-            }
-            root.finishGreeterAutoLoginSync();
+            root.deferGreeterAutoLoginSyncToPill("");
         }
     }
 

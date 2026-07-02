@@ -494,6 +494,8 @@ Singleton {
     property string greeterLockDateFormat: ""
     property string greeterFontFamily: ""
     property string greeterWallpaperFillMode: ""
+    property bool greeterSyncPending: false
+    property var greeterSyncBaseline: ({})
     property int mediaSize: 1
 
     property string appLauncherViewMode: "list"
@@ -891,6 +893,9 @@ Singleton {
     property bool lockScreenVideoEnabled: false
     property string lockScreenVideoPath: ""
     property bool lockScreenVideoCycling: false
+    property string lockScreenWallpaperPath: ""
+    property string lockScreenWallpaperFillMode: ""
+    property string lockScreenFontFamily: ""
     property bool hideBrightnessSlider: false
 
     property int notificationTimeoutLow: 5000
@@ -1677,6 +1682,32 @@ Singleton {
         });
     }
 
+    function markGreeterSyncPending(who, key, oldValue) {
+        if (isGreeterMode)
+            return;
+        if (!(key in greeterSyncBaseline)) {
+            var baseline = greeterSyncBaseline;
+            baseline[key] = oldValue;
+            greeterSyncBaseline = baseline;
+        }
+        greeterSyncPending = true;
+    }
+
+    function clearGreeterSyncPending() {
+        greeterSyncBaseline = {};
+        greeterSyncPending = false;
+        saveSettings();
+    }
+
+    function revertGreeterSyncPending() {
+        for (var key in greeterSyncBaseline) {
+            root[key] = greeterSyncBaseline[key];
+        }
+        greeterSyncBaseline = {};
+        greeterSyncPending = false;
+        saveSettings();
+    }
+
     readonly property var _hooks: ({
             "applyStoredTheme": applyStoredTheme,
             "regenSystemThemes": regenSystemThemes,
@@ -1685,7 +1716,8 @@ Singleton {
             "updateBarConfigs": updateBarConfigs,
             "updateCompositorCursor": updateCompositorCursor,
             "scheduleAuthApply": scheduleAuthApply,
-            "scheduleGreeterAutoLoginSync": scheduleGreeterAutoLoginSync
+            "scheduleGreeterAutoLoginSync": scheduleGreeterAutoLoginSync,
+            "markGreeterSyncPending": markGreeterSyncPending
         })
 
     function set(key, value) {

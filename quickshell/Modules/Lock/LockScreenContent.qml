@@ -34,6 +34,16 @@ Item {
     property int hyprlandLayoutCount: 0
     property bool lockerReadySent: false
     property bool lockerReadyArmed: false
+    readonly property bool hasCustomWallpaper: SettingsData.lockScreenWallpaperPath !== ""
+    readonly property string lockFontFamily: SettingsData.lockScreenFontFamily
+
+    component ClockDigitText: StyledText {
+        font.pixelSize: 120
+        font.weight: Font.Light
+        color: "white"
+        horizontalAlignment: Text.AlignHCenter
+        font.family: root.lockFontFamily !== "" ? root.lockFontFamily : resolvedFontFamily
+    }
 
     signal unlockRequested
 
@@ -190,6 +200,8 @@ Item {
     Loader {
         anchors.fill: parent
         active: {
+            if (root.hasCustomWallpaper)
+                return false;
             var currentWallpaper = SessionData.getMonitorWallpaper(screenName);
             return !currentWallpaper || (currentWallpaper && currentWallpaper.startsWith("#"));
         }
@@ -205,10 +217,16 @@ Item {
         anchors.fill: parent
 
         readonly property string wallpaperSource: {
+            if (root.hasCustomWallpaper)
+                return root.encodeFileUrl(SettingsData.lockScreenWallpaperPath);
             var w = SessionData.getMonitorWallpaper(screenName);
             return (w && !w.startsWith("#")) ? encodeFileUrl(w) : "";
         }
-        readonly property string fillModeName: SessionData.getMonitorWallpaperFillMode(screenName)
+        readonly property string fillModeName: {
+            if (SettingsData.lockScreenWallpaperFillMode !== "")
+                return SettingsData.lockScreenWallpaperFillMode;
+            return root.hasCustomWallpaper ? "Fill" : SessionData.getMonitorWallpaperFillMode(root.screenName);
+        }
 
         active: wallpaperSource !== ""
         asynchronous: false
@@ -332,91 +350,55 @@ Item {
                 }
                 property bool hasSeconds: timeParts.length > 2
 
-                StyledText {
+                ClockDigitText {
                     width: 75
                     text: clockText.hours.length > 1 ? clockText.hours[0] : ""
-                    font.pixelSize: 120
-                    font.weight: Font.Light
-                    color: "white"
-                    horizontalAlignment: Text.AlignHCenter
                 }
 
-                StyledText {
+                ClockDigitText {
                     width: 75
                     text: clockText.hours.length > 1 ? clockText.hours[1] : clockText.hours.length > 0 ? clockText.hours[0] : ""
-                    font.pixelSize: 120
-                    font.weight: Font.Light
-                    color: "white"
-                    horizontalAlignment: Text.AlignHCenter
                 }
 
-                StyledText {
+                ClockDigitText {
                     text: ":"
-                    font.pixelSize: 120
-                    font.weight: Font.Light
-                    color: "white"
                 }
 
-                StyledText {
+                ClockDigitText {
                     width: 75
                     text: clockText.minutes.length > 0 ? clockText.minutes[0] : ""
-                    font.pixelSize: 120
-                    font.weight: Font.Light
-                    color: "white"
-                    horizontalAlignment: Text.AlignHCenter
                 }
 
-                StyledText {
+                ClockDigitText {
                     width: 75
                     text: clockText.minutes.length > 1 ? clockText.minutes[1] : ""
-                    font.pixelSize: 120
-                    font.weight: Font.Light
-                    color: "white"
-                    horizontalAlignment: Text.AlignHCenter
                 }
 
-                StyledText {
+                ClockDigitText {
                     text: clockText.hasSeconds ? ":" : ""
-                    font.pixelSize: 120
-                    font.weight: Font.Light
-                    color: "white"
                     visible: clockText.hasSeconds
                 }
 
-                StyledText {
+                ClockDigitText {
                     width: 75
                     text: clockText.hasSeconds && clockText.seconds.length > 0 ? clockText.seconds[0] : ""
-                    font.pixelSize: 120
-                    font.weight: Font.Light
-                    color: "white"
-                    horizontalAlignment: Text.AlignHCenter
                     visible: clockText.hasSeconds
                 }
 
-                StyledText {
+                ClockDigitText {
                     width: 75
                     text: clockText.hasSeconds && clockText.seconds.length > 1 ? clockText.seconds[1] : ""
-                    font.pixelSize: 120
-                    font.weight: Font.Light
-                    color: "white"
-                    horizontalAlignment: Text.AlignHCenter
                     visible: clockText.hasSeconds
                 }
 
-                StyledText {
+                ClockDigitText {
                     width: 20
                     text: " "
-                    font.pixelSize: 120
-                    font.weight: Font.Light
-                    color: "white"
                     visible: clockText.ampm !== ""
                 }
 
-                StyledText {
+                ClockDigitText {
                     text: clockText.ampm
-                    font.pixelSize: 120
-                    font.weight: Font.Light
-                    color: "white"
                     visible: clockText.ampm !== ""
                 }
             }
@@ -435,6 +417,7 @@ Item {
                 return systemClock.date.toLocaleDateString(I18n.locale(), Locale.LongFormat);
             }
             font.pixelSize: Theme.fontSizeXLarge
+            font.family: root.lockFontFamily !== "" ? root.lockFontFamily : resolvedFontFamily
             color: "white"
             opacity: 0.9
         }
