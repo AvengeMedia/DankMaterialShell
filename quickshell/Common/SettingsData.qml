@@ -1016,18 +1016,6 @@ Singleton {
         }
     ]
 
-    // Bar xray is only safe when no window can end up underneath: auto-hide and overlay-layer
-    // bars float over windows, and negative spacing pulls windows under the strip
-    function _standaloneBarXrayAvailable(configs) {
-        const list = configs || [];
-        const activeBars = list.filter(c => c && c.enabled && (c.visible ?? true));
-        const gapsOverride = (typeof CompositorService !== "undefined" && CompositorService.isHyprland) ? hyprlandLayoutGapsOverride : niriLayoutGapsOverride;
-        const layoutGaps = gapsOverride >= 0 ? gapsOverride : Math.max(4, (list[0]?.spacing ?? 4));
-        return activeBars.every(c => !c.autoHide && !(c.useOverlayLayer ?? false) && (c.spacing ?? 4) + (c.bottomGap ?? 0) + layoutGaps >= 0);
-    }
-
-    readonly property bool standaloneBarXrayAvailable: _standaloneBarXrayAvailable(barConfigs)
-
     property bool desktopClockEnabled: false
     property string desktopClockStyle: "analog"
     property real desktopClockTransparency: 0.8
@@ -2430,17 +2418,13 @@ Singleton {
         if (index === -1)
             return;
         const positionChanged = updates.position !== undefined && configs[index].position !== updates.position;
-        const barXrayTargetWasAvailable = _standaloneBarXrayAvailable(configs);
         if (updates.autoHide === false || updates.visible === false)
             setBarIpcReveal(barId, false);
 
         Object.assign(configs[index], updates);
-        const sanitizedConfigs = _sanitizeBarConfigsForConnectedFrame(configs).configs;
-        barConfigs = sanitizedConfigs;
+        barConfigs = _sanitizeBarConfigsForConnectedFrame(configs).configs;
         updateBarConfigs();
 
-        if (!frameEnabled && _standaloneBarXrayAvailable(sanitizedConfigs) !== barXrayTargetWasAvailable)
-            updateCompositorLayout();
         if (positionChanged) {
             NotificationService.dismissAllPopups();
         }

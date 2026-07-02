@@ -372,6 +372,17 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
                     checked: NiriService.layoutXrayEnabled
                     onToggled: checked => NiriService.setLayoutXray(checked)
                 }
+
+                SettingsToggleRow {
+                    // Hidden in Frame Connected mode, where it has no target
+                    visible: CompositorService.isNiri && !SettingsData.connectedFrameModeActive
+                    tags: ["niri", "xray", "bar", "frame", "performance"]
+                    settingKey: "niriLayoutBarXrayEnabled"
+                    text: SettingsData.frameEnabled ? I18n.tr("Frame Xray") : I18n.tr("Dank Bar Xray")
+                    description: I18n.tr("Always blur against the wallpaper, even with Xray off")
+                    checked: NiriService.layoutBarXrayEnabled
+                    onToggled: checked => NiriService.setLayoutBarXray(checked)
+                }
             }
 
             SettingsCard {
@@ -487,6 +498,17 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
                     description: I18n.tr("Blurred surfaces show the wallpaper instead of the content beneath")
                     checked: HyprlandService.layoutXrayEnabled
                     onToggled: checked => HyprlandService.setLayoutXray(checked)
+                }
+
+                SettingsToggleRow {
+                    // Hidden in Frame Connected mode, where it has no target
+                    visible: CompositorService.isHyprland && !SettingsData.connectedFrameModeActive
+                    tags: ["hyprland", "xray", "bar", "frame", "performance"]
+                    settingKey: "hyprlandLayoutBarXrayEnabled"
+                    text: SettingsData.frameEnabled ? I18n.tr("Frame Xray") : I18n.tr("Dank Bar Xray")
+                    description: I18n.tr("Always blur against the wallpaper, even with Xray off")
+                    checked: HyprlandService.layoutBarXrayEnabled
+                    onToggled: checked => HyprlandService.setLayoutBarXray(checked)
                 }
             }
 
