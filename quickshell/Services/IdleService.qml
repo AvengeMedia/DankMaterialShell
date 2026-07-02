@@ -35,9 +35,13 @@ Singleton {
     onIsShellLockedChanged: _rearmIdleMonitors()
 
     function _applyMonitorEnableds() {
-        const base = enabled;
+        // Gate on the shell's own inhibit state rather than relying on the
+        // compositor honoring the bar-surface zwp_idle_inhibit inhibitor,
+        // which goes inactive whenever the bar surface is occluded
+        // (fullscreen windows) or hidden (auto-hide).
+        const base = enabled && !SessionService.idleInhibited;
         monitorOffMonitor.enabled = base && monitorTimeout > 0 && !postLockMonitorActive;
-        postLockMonitorOffMonitor.enabled = base && postLockMonitorActive;
+        postLockMonitorOffMonitor.enabled = enabled && postLockMonitorActive;
         lockMonitor.enabled = base && lockTimeout > 0;
         suspendMonitor.enabled = base && suspendTimeout > 0;
     }
@@ -146,6 +150,14 @@ Singleton {
         onIsIdleChanged: {
             if (!isIdle && root.monitorsOff)
                 root.requestMonitorOn();
+        }
+    }
+
+    Connections {
+        target: SessionService
+
+        function onIdleInhibitedChanged() {
+            root._rearmIdleMonitors();
         }
     }
 
