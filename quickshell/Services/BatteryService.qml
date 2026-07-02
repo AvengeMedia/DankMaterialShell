@@ -78,7 +78,7 @@ Singleton {
             return 0;
         if (batteryCapacity === 0) {
             if (usePreferred && preferredDeviceKnown) {
-                const val = Math.round(preferredDevice.percentage * 100 * scale);
+                const val = Math.min(100, Math.round(preferredDevice.percentage * 100 * scale));
                 _lastBatteryLevel = val;
                 return val;
             }
@@ -88,7 +88,7 @@ Singleton {
             if (validBatteries.length === 0)
                 return _lastBatteryLevel;
             const avgPercentage = validBatteries.reduce((sum, b) => sum + b.percentage, 0) / validBatteries.length;
-            const val = Math.round(avgPercentage * 100 * scale);
+            const val = Math.min(100, Math.round(avgPercentage * 100 * scale));
             _lastBatteryLevel = val;
             return val;
         }
@@ -96,7 +96,7 @@ Singleton {
         const cap = batteryCapacity;
         if (cap === 0)
             return _lastBatteryLevel;
-        const val = Math.round((energy * 100) / cap * scale);
+        const val = Math.min(100, Math.round((energy * 100) / cap * scale));
         _lastBatteryLevel = val;
         return val;
     }
