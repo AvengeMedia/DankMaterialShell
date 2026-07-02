@@ -63,8 +63,8 @@ Item {
             impl.item.toggleWithMode(mode);
     }
 
-    readonly property bool useSpotlightBackend: !SettingsData.connectedFrameModeActive && SettingsData.launcherStyle === "spotlight"
-    readonly property var _desiredBackend: useSpotlightBackend ? spotlightComp : (SettingsData.connectedFrameModeActive ? connectedComp : standaloneComp)
+    readonly property bool useSpotlightBackend: !FrameTransitionState.effectiveConnectedFrameModeActive && SettingsData.launcherStyle === "spotlight"
+    readonly property var _desiredBackend: useSpotlightBackend ? spotlightComp : (FrameTransitionState.effectiveConnectedFrameModeActive ? connectedComp : standaloneComp)
     property var _resolvedBackend: null
 
     Component.onCompleted: _resolvedBackend = _desiredBackend

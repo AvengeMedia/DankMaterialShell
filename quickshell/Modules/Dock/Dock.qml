@@ -717,7 +717,7 @@ Variants {
 
                         Rectangle {
                             anchors.fill: parent
-                            visible: !usesConnectedFrameChrome && (!SettingsData.connectedFrameModeActive || dock.reveal)
+                            visible: !usesConnectedFrameChrome && (!FrameTransitionState.effectiveConnectedFrameModeActive || dock.reveal)
                             color: dock.surfaceColor
                             topLeftRadius: dock.surfaceTopLeftRadius
                             topRightRadius: dock.surfaceTopRightRadius
@@ -727,7 +727,7 @@ Variants {
 
                         Rectangle {
                             anchors.fill: parent
-                            visible: !usesConnectedFrameChrome && (!SettingsData.connectedFrameModeActive || dock.reveal)
+                            visible: !usesConnectedFrameChrome && (!FrameTransitionState.effectiveConnectedFrameModeActive || dock.reveal)
                             color: "transparent"
                             topLeftRadius: dock.surfaceTopLeftRadius
                             topRightRadius: dock.surfaceTopRightRadius
@@ -747,7 +747,7 @@ Variants {
 
                     Item {
                         id: dockConnectedChrome
-                        visible: Theme.isConnectedEffect && dock.reveal && !SettingsData.connectedFrameModeActive
+                        visible: Theme.isConnectedEffect && dock.reveal && !FrameTransitionState.effectiveConnectedFrameModeActive
                         readonly property real extraLeft: dock.isVertical ? 0 : Theme.connectedCornerRadius
                         readonly property real extraTop: dock.isVertical ? Theme.connectedCornerRadius : 0
                         readonly property real bodyRadius: dock.surfaceRadius

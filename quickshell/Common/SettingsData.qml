@@ -266,7 +266,11 @@ Singleton {
     }
 
     property bool frameEnabled: false
-    onFrameEnabledChanged: saveSettings()
+    onFrameEnabledChanged: {
+        saveSettings();
+        if (!_loading)
+            updateFrameCompositorLayout();
+    }
     property real frameThickness: 16
     onFrameThicknessChanged: saveSettings()
     property int barInsetPaddingShared: -1
@@ -299,7 +303,11 @@ Singleton {
     onFrameLauncherEdgeHoverChanged: saveSettings()
     readonly property string frameModalEmergeSide: frameLauncherEmergeSide === "top" ? "bottom" : "top"
     property string frameMode: "connected"
-    onFrameModeChanged: saveSettings()
+    onFrameModeChanged: {
+        saveSettings();
+        if (!_loading && frameEnabled)
+            updateFrameCompositorLayout();
+    }
     property var connectedFrameBarStyleBackups: ({})
     onConnectedFrameBarStyleBackupsChanged: saveSettings()
     readonly property bool connectedFrameModeActive: frameEnabled && frameMode === "connected"
@@ -1012,6 +1020,13 @@ Singleton {
         }
     ]
 
+    function _standaloneBarXrayAvailable(configs) {
+        const activeBars = (configs || []).filter(c => c && c.enabled && (c.visible ?? true));
+        return activeBars.every(c => !c.autoHide);
+    }
+
+    readonly property bool standaloneBarXrayAvailable: _standaloneBarXrayAvailable(barConfigs)
+
     property bool desktopClockEnabled: false
     property string desktopClockStyle: "analog"
     property real desktopClockTransparency: 0.8
@@ -1454,6 +1469,17 @@ Singleton {
             HyprlandService.generateLayoutConfig();
         if (CompositorService.isMango && typeof MangoService !== "undefined")
             MangoService.generateLayoutConfig();
+    }
+
+    function updateFrameCompositorLayout() {
+        // Generate before begin() so compositor readiness is already pending at transitionRequested
+        if (typeof CompositorService !== "undefined") {
+            if (CompositorService.isNiri && typeof NiriService !== "undefined")
+                NiriService.generateNiriLayoutConfig(true);
+            if (CompositorService.isHyprland && typeof HyprlandService !== "undefined")
+                HyprlandService.generateLayoutConfig(true);
+        }
+        FrameTransitionState.begin();
     }
 
     function resolveIconTheme() {
@@ -2403,13 +2429,17 @@ Singleton {
         if (index === -1)
             return;
         const positionChanged = updates.position !== undefined && configs[index].position !== updates.position;
+        const barXrayTargetWasAvailable = _standaloneBarXrayAvailable(configs);
         if (updates.autoHide === false || updates.visible === false)
             setBarIpcReveal(barId, false);
 
         Object.assign(configs[index], updates);
-        barConfigs = _sanitizeBarConfigsForConnectedFrame(configs).configs;
+        const sanitizedConfigs = _sanitizeBarConfigsForConnectedFrame(configs).configs;
+        barConfigs = sanitizedConfigs;
         updateBarConfigs();
 
+        if (!frameEnabled && _standaloneBarXrayAvailable(sanitizedConfigs) !== barXrayTargetWasAvailable)
+            updateCompositorLayout();
         if (positionChanged) {
             NotificationService.dismissAllPopups();
         }
@@ -3542,6 +3572,9 @@ Singleton {
         onLoaded: {
             if (isGreeterMode)
                 return;
+            const wasLoaded = _hasLoaded;
+            const prevFrameEnabled = frameEnabled;
+            const prevFrameMode = frameMode;
             _loading = true;
             _hasUnsavedChanges = false;
             try {
@@ -3576,6 +3609,9 @@ Singleton {
             } finally {
                 _loading = false;
             }
+            // External edits reload under _loading, which skips the per-property transition triggers
+            if (wasLoaded && !_parseError && (frameEnabled !== prevFrameEnabled || (frameEnabled && frameMode !== prevFrameMode)))
+                updateFrameCompositorLayout();
         }
         onLoadFailed: error => {
             if (!isGreeterMode) {

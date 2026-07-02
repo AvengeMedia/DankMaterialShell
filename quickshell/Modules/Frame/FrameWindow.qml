@@ -40,7 +40,7 @@ PanelWindow {
     }
 
     readonly property real _dpr: CompositorService.getScreenScale(win.targetScreen)
-    readonly property bool _frameActive: SettingsData.frameEnabled && SettingsData.isScreenInPreferences(win.targetScreen, SettingsData.frameScreenPreferences)
+    readonly property bool _frameActive: FrameTransitionState.effectiveFrameEnabled && SettingsData.isScreenInPreferences(win.targetScreen, SettingsData.frameScreenPreferences)
     readonly property int _windowRegionWidth: win._regionInt(win.width)
     readonly property int _windowRegionHeight: win._regionInt(win.height)
     readonly property string _screenName: win.targetScreen ? win.targetScreen.name : ""

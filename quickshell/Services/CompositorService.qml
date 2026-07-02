@@ -22,6 +22,7 @@ Singleton {
     property bool isLabwc: false
     property string compositor: "unknown"
     property bool compositorDetected: false
+    readonly property bool frameCompositorLayoutReady: (!isNiri || NiriService.frameLayoutReady) && (!isHyprland || HyprlandService.frameLayoutReady)
     readonly property bool useHyprlandFocusGrab: isHyprland && Quickshell.env("DMS_HYPRLAND_EXCLUSIVE_FOCUS") !== "1"
 
     readonly property string hyprlandSignature: Quickshell.env("HYPRLAND_INSTANCE_SIGNATURE")
@@ -612,7 +613,7 @@ Singleton {
     }
 
     function frameConfiguredForScreen(screenOrName) {
-        if (!SettingsData.frameEnabled)
+        if (!FrameTransitionState.effectiveFrameEnabled)
             return false;
         const screen = _screenForName(screenOrName);
         if (!screen || !SettingsData.isScreenInPreferences(screen, SettingsData.frameScreenPreferences))
@@ -627,7 +628,7 @@ Singleton {
     }
 
     function usesConnectedFrameChromeForScreen(screenOrName) {
-        return SettingsData.connectedFrameModeActive && frameWindowVisibleForScreen(screenOrName);
+        return FrameTransitionState.effectiveConnectedFrameModeActive && frameWindowVisibleForScreen(screenOrName);
     }
 
     function framePeerSurfacesUseOverlayForScreen(screenOrName) {

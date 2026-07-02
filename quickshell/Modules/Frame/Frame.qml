@@ -14,7 +14,8 @@ Variants {
 
         required property var modelData
 
-        active: SettingsData.frameEnabled && SettingsData.isScreenInPreferences(instanceLoader.modelData, SettingsData.frameScreenPreferences)
+        // Live-or-latched: instances build early on enable, survive until ack on disable
+        active: (SettingsData.frameEnabled || FrameTransitionState.effectiveFrameEnabled) && SettingsData.isScreenInPreferences(instanceLoader.modelData, SettingsData.frameScreenPreferences)
         asynchronous: false
 
         sourceComponent: FrameInstance {

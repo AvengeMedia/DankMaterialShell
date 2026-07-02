@@ -73,7 +73,6 @@ PanelWindow {
 
         let section = "center";
         if (clockButtonRef && clockButtonRef.visualContent && dankDashPopoutLoader.item.setTriggerPosition) {
-            // Calculate barPosition from axis.edge
             const barPosition = axis?.edge === "left" ? 2 : (axis?.edge === "right" ? 3 : (axis?.edge === "top" ? 0 : 1));
             section = clockButtonRef.section || "center";
 
@@ -148,7 +147,8 @@ PanelWindow {
             _blurRebuildTimer.restart();
         }
         function onUsesFrameBarChromeChanged() {
-            _blurRebuildTimer.restart();
+            // Rebuild immediately so the bar region never overlaps FrameWindow's during chrome handoff
+            barBlur.rebuild();
         }
         function onBarRevealedChanged() {
             _blurRebuildTimer.restart();
@@ -179,17 +179,11 @@ PanelWindow {
             teardown();
             if (!BlurService.enabled || !BlurService.available)
                 return;
-            // When the bar is hidden (auto-hide, or config not visible) keep the blur
-            // region empty rather than sliding it off-surface. Some compositors (Hyprland)
-            // gate blur on a non-empty region and then blur the whole surface box when the
-            // clip degenerates to empty, leaving the bar strip blurred while the bar is
-            // hidden (issue #2656). A null region disables the effect cleanly.
+            // Hidden bar keeps a null region — an empty clip makes Hyprland blur the whole surface box
             if (!barWindow.barRevealed)
                 return;
-            // In frame mode, FrameWindow owns the blur region for the entire screen edge
-            // (including the bar area). The bar must not set its own competing blur region
-            // so that frameBlurEnabled acts as the single control for all blur in frame mode.
-            if (SettingsData.frameEnabled && barWindow.usesFrameBarChrome)
+            // FrameWindow owns the blur region for the whole edge while the bar wears frame chrome
+            if (FrameTransitionState.effectiveFrameEnabled && barWindow.usesFrameBarChrome)
                 return;
 
             const widgets = barWindow._blurWidgetItems.filter(w => w && w.visible && w.width > 0 && w.height > 0);
@@ -245,8 +239,8 @@ PanelWindow {
         }
 
         Connections {
-            target: SettingsData
-            function onFrameEnabledChanged() {
+            target: FrameTransitionState
+            function onEffectiveFrameEnabledChanged() {
                 barBlur.rebuild();
             }
         }
@@ -299,7 +293,7 @@ PanelWindow {
     readonly property color _surfaceContainer: Theme.surfaceContainer
     readonly property string _barId: barConfig?.id ?? "default"
     property real _backgroundAlpha: barConfig?.transparency ?? 1.0
-    readonly property color _bgColor: (SettingsData.frameEnabled && usesFrameBarChrome) ? Theme.withAlpha(SettingsData.effectiveFrameColor, SettingsData.frameOpacity) : Theme.withAlpha(_surfaceContainer, _backgroundAlpha)
+    readonly property color _bgColor: (FrameTransitionState.effectiveFrameEnabled && usesFrameBarChrome) ? Theme.withAlpha(SettingsData.effectiveFrameColor, SettingsData.frameOpacity) : Theme.withAlpha(_surfaceContainer, _backgroundAlpha)
 
     function _updateBackgroundAlpha() {
         const live = SettingsData.barConfigs.find(c => c.id === _barId);
@@ -331,9 +325,8 @@ PanelWindow {
         return Theme.snap(Theme.elevationRenderPadding(Theme.elevationLevel2, "top", 4, 8, 16), _dpr);
     }
 
-    // Flatten/spacing collapse for maximized windows is only for frame-integrated layout.
-    // When the bar draws its own pill, keep rounded corners and spacing like the dock.
-    readonly property bool flattenForMaximizedWindow: !SettingsData.frameEnabled || usesFrameBarChrome
+    // Flatten/spacing collapse for maximized windows only applies to frame-integrated layout
+    readonly property bool flattenForMaximizedWindow: !FrameTransitionState.effectiveFrameEnabled || usesFrameBarChrome
 
     property bool hasMaximizedToplevel: false
     property bool shouldHideForWindows: false
@@ -455,7 +448,7 @@ PanelWindow {
         shouldHideForWindows = filtered.length > 0;
     }
 
-    property real effectiveSpacing: (SettingsData.frameEnabled && usesFrameBarChrome) ? 0 : ((flattenForMaximizedWindow && hasMaximizedToplevel) ? 0 : (barConfig?.spacing ?? 4))
+    property real effectiveSpacing: (FrameTransitionState.effectiveFrameEnabled && usesFrameBarChrome) ? 0 : ((flattenForMaximizedWindow && hasMaximizedToplevel) ? 0 : (barConfig?.spacing ?? 4))
 
     Behavior on effectiveSpacing {
         enabled: barWindow.visible
@@ -466,8 +459,8 @@ PanelWindow {
     }
 
     readonly property int notificationCount: NotificationService.notifications.length
-    readonly property real effectiveBarThickness: (SettingsData.frameEnabled && usesFrameBarChrome) ? SettingsData.frameBarSize : Theme.snap(Math.max(barWindow.widgetThickness + (barConfig?.innerPadding ?? 4) + 4, Theme.barHeight - 4 - (8 - (barConfig?.innerPadding ?? 4))), _dpr)
-    readonly property bool effectiveOpenOnOverview: SettingsData.frameEnabled ? SettingsData.frameShowOnOverview : (barConfig?.openOnOverview ?? false)
+    readonly property real effectiveBarThickness: (FrameTransitionState.effectiveFrameEnabled && usesFrameBarChrome) ? SettingsData.frameBarSize : Theme.snap(Math.max(barWindow.widgetThickness + (barConfig?.innerPadding ?? 4) + 4, Theme.barHeight - 4 - (8 - (barConfig?.innerPadding ?? 4))), _dpr)
+    readonly property bool effectiveOpenOnOverview: FrameTransitionState.effectiveFrameEnabled ? SettingsData.frameShowOnOverview : (barConfig?.openOnOverview ?? false)
     readonly property real widgetThickness: Theme.snap(Math.max(20, 26 + (barConfig?.innerPadding ?? 4) * 0.6), _dpr)
 
     readonly property bool hasAdjacentTopBar: {
@@ -665,7 +658,7 @@ PanelWindow {
     anchors.left: !isVertical ? true : (barPos === SettingsData.Position.Left)
     anchors.right: !isVertical ? true : (barPos === SettingsData.Position.Right)
 
-    readonly property bool reserveExclusiveWhenAutoHidden: SettingsData.frameEnabled && usesFrameBarChrome && !!barWindow.screen && SettingsData.isScreenInPreferences(barWindow.screen, SettingsData.frameScreenPreferences)
+    readonly property bool reserveExclusiveWhenAutoHidden: FrameTransitionState.effectiveFrameEnabled && usesFrameBarChrome && !!barWindow.screen && SettingsData.isScreenInPreferences(barWindow.screen, SettingsData.frameScreenPreferences)
 
     exclusiveZone: (!(barConfig?.visible ?? true) || (topBarCore.autoHide && !barWindow.reserveExclusiveWhenAutoHidden)) ? -1 : (barWindow.effectiveBarThickness + effectiveSpacing + (usesFrameBarChrome ? 0 : (barConfig?.bottomGap ?? 0)))
 
@@ -1111,7 +1104,7 @@ PanelWindow {
                         rightWidgetsModel: barWindow.rightWidgetsModel
                     }
 
-                    // Passive HoverHandler to track cursor without intercepting clicks or scroll events.
+                    // Passive: tracks cursor without intercepting clicks or scroll
                     HoverHandler {
                         id: hoverPopoutHandler
                         enabled: (barConfig?.hoverPopouts ?? false) && !barWindow.clickThroughEnabled

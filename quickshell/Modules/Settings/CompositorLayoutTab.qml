@@ -323,10 +323,12 @@ Item {
                 SettingsToggleRow {
                     // Hidden in Frame Connected mode, where it has no target
                     visible: !(SettingsData.frameEnabled && SettingsData.frameMode === "connected")
+                    enabled: SettingsData.frameEnabled || SettingsData.standaloneBarXrayAvailable
+                    opacity: enabled ? 1 : 0.5
                     tags: ["niri", "xray", "bar", "frame", "performance"]
                     settingKey: "niriLayoutBarXrayEnabled"
                     text: SettingsData.frameEnabled ? I18n.tr("Frame Xray") : I18n.tr("Dank Bar Xray")
-                    description: SettingsData.niriLayoutBarXrayEnabled ? (SettingsData.frameEnabled ? I18n.tr("Xray on makes the Frame's border visible through to the wallpaper; more efficient") : I18n.tr("Xray on makes the Dank Bar visible through to the wallpaper; more efficient")) : (SettingsData.frameEnabled ? I18n.tr("Xray off shows the real background beneath the Frame's border") : I18n.tr("Xray off shows the real background beneath the Dank Bar"))
+                    description: !SettingsData.frameEnabled && !SettingsData.standaloneBarXrayAvailable ? I18n.tr("Unavailable while using Auto Hide as Xray would reveal the wallpaper through windows") : (SettingsData.niriLayoutBarXrayEnabled ? (SettingsData.frameEnabled ? I18n.tr("Xray on makes the Frame's border visible through to the wallpaper; more efficient") : I18n.tr("Xray on makes the Dank Bar visible through to the wallpaper; more efficient")) : (SettingsData.frameEnabled ? I18n.tr("Xray off shows the real background beneath the Frame's border") : I18n.tr("Xray off shows the real background beneath the Dank Bar")))
                     checked: SettingsData.niriLayoutBarXrayEnabled
                     onToggled: checked => SettingsData.set("niriLayoutBarXrayEnabled", checked)
                 }
@@ -449,10 +451,12 @@ Item {
                 SettingsToggleRow {
                     // Hidden in Frame Connected mode, where it has no target
                     visible: !(SettingsData.frameEnabled && SettingsData.frameMode === "connected")
+                    enabled: SettingsData.frameEnabled || SettingsData.standaloneBarXrayAvailable
+                    opacity: enabled ? 1 : 0.5
                     tags: ["hyprland", "xray", "bar", "frame", "performance"]
                     settingKey: "hyprlandLayoutBarXrayEnabled"
                     text: SettingsData.frameEnabled ? I18n.tr("Frame Xray") : I18n.tr("Dank Bar Xray")
-                    description: SettingsData.hyprlandLayoutBarXrayEnabled ? (SettingsData.frameEnabled ? I18n.tr("Xray on makes the Frame's border visible through to the wallpaper; more efficient") : I18n.tr("Xray on makes the Dank Bar visible through to the wallpaper; more efficient")) : (SettingsData.frameEnabled ? I18n.tr("Xray off shows the real background beneath the Frame's border") : I18n.tr("Xray off shows the real background beneath the Dank Bar"))
+                    description: !SettingsData.frameEnabled && !SettingsData.standaloneBarXrayAvailable ? I18n.tr("Unavailable while an enabled Dank Bar uses Auto Hide because Xray would reveal the wallpaper through windows") : (SettingsData.hyprlandLayoutBarXrayEnabled ? (SettingsData.frameEnabled ? I18n.tr("Xray on makes the Frame's border visible through to the wallpaper; more efficient") : I18n.tr("Xray on makes the Dank Bar visible through to the wallpaper; more efficient")) : (SettingsData.frameEnabled ? I18n.tr("Xray off shows the real background beneath the Frame's border") : I18n.tr("Xray off shows the real background beneath the Dank Bar")))
                     checked: SettingsData.hyprlandLayoutBarXrayEnabled
                     onToggled: checked => SettingsData.set("hyprlandLayoutBarXrayEnabled", checked)
                 }

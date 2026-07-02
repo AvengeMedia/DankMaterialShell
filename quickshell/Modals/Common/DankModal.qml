@@ -93,7 +93,7 @@ Item {
             impl.item.toggle();
     }
 
-    readonly property var _desiredBackend: SettingsData.connectedFrameModeActive ? connectedComp : standaloneComp
+    readonly property var _desiredBackend: FrameTransitionState.effectiveConnectedFrameModeActive ? connectedComp : standaloneComp
     property var _resolvedBackend: null
 
     Component.onCompleted: _resolvedBackend = _desiredBackend

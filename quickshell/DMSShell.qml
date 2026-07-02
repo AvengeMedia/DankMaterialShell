@@ -173,6 +173,7 @@ Item {
     }
 
     property bool barSurfacesLoaded: true
+    property int pendingFrameTransitionRevision: 0
 
     function recreateBarSurfaces() {
         log.info("Recreating bar surfaces, screens:", Quickshell.screens.length, Quickshell.screens.map(s => s.name).join(","));
@@ -181,9 +182,23 @@ Item {
         barSurfaceReloadAction.schedule();
     }
 
+    // Holds the bar rebuild until the compositor applies the layout, so the swap lands in one pass
+    function runPendingFrameTransition() {
+        if (pendingFrameTransitionRevision <= 0 || !CompositorService.frameCompositorLayoutReady)
+            return;
+        recreateBarSurfaces();
+    }
+
     DeferredAction {
         id: barSurfaceReloadAction
-        onTriggered: root.barSurfacesLoaded = true
+        onTriggered: {
+            // Ack first so the latch flips and new bars build directly in the post-transition state
+            if (root.pendingFrameTransitionRevision > 0 && CompositorService.frameCompositorLayoutReady) {
+                FrameTransitionState.acknowledge(root.pendingFrameTransitionRevision);
+                root.pendingFrameTransitionRevision = 0;
+            }
+            root.barSurfacesLoaded = true;
+        }
     }
 
     property string _barLayoutStateJson: {
@@ -213,13 +228,22 @@ Item {
     }
 
     Connections {
+        target: FrameTransitionState
+        function onTransitionRequested(revision) {
+            root.pendingFrameTransitionRevision = Math.max(root.pendingFrameTransitionRevision, revision);
+            root.runPendingFrameTransition();
+        }
+    }
+
+    Connections {
+        target: CompositorService
+        function onFrameCompositorLayoutReadyChanged() {
+            root.runPendingFrameTransition();
+        }
+    }
+
+    Connections {
         target: SettingsData
-        function onFrameEnabledChanged() {
-            root.recreateBarSurfaces();
-        }
-        function onConnectedFrameModeActiveChanged() {
-            root.recreateBarSurfaces();
-        }
         function onForceDankBarLayoutRefresh() {
             root.recreateBarSurfaces();
         }
@@ -234,7 +258,7 @@ Item {
     }
 
     Loader {
-        active: SettingsData.frameEnabled && SettingsData.frameLauncherEdgeHover
+        active: FrameTransitionState.effectiveFrameEnabled && SettingsData.frameLauncherEdgeHover
         asynchronous: false
         sourceComponent: FrameLauncherHoverZone {}
     }

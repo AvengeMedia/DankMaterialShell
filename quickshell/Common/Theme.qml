@@ -1076,7 +1076,7 @@ Singleton {
     readonly property real connectedCornerRadius: {
         if (typeof SettingsData === "undefined")
             return 12;
-        return SettingsData.connectedFrameModeActive ? SettingsData.frameRounding : cornerRadius;
+        return FrameTransitionState.effectiveConnectedFrameModeActive ? SettingsData.frameRounding : cornerRadius;
     }
     readonly property color connectedSurfaceColor: {
         if (typeof SettingsData === "undefined")
