@@ -24,6 +24,8 @@ FloatingWindow {
     color: Theme.surfaceContainer
     visible: false
 
+    onClosed: visible = false
+
     FocusScope {
         id: contentFocusScope
         anchors.fill: parent

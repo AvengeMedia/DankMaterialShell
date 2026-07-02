@@ -18,6 +18,8 @@ FloatingWindow {
     color: Theme.surfaceContainer
     visible: false
 
+    onClosed: hide()
+
     function show(name) {
         nameInput.text = name;
         visible = true;

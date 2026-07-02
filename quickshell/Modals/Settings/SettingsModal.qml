@@ -92,6 +92,8 @@ FloatingWindow {
     color: Theme.surfaceContainer
     visible: false
 
+    onClosed: hide()
+
     onIsCompactModeChanged: {
         enableAnimations = false;
         if (!isCompactMode) {

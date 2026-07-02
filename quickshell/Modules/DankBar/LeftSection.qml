@@ -45,6 +45,7 @@ Item {
                 Item {
                     readonly property real rowSpacing: parent.widgetSpacing
                     property var itemData: modelData
+                    visible: widgetLoader.active && widgetLoader.widgetEnabled
                     width: widgetLoader.item ? widgetLoader.item.width : 0
                     height: widgetLoader.item ? widgetLoader.item.height : 0
                     WidgetHost {
@@ -92,6 +93,7 @@ Item {
                     width: parent.width
                     readonly property real columnSpacing: parent.widgetSpacing
                     property var itemData: modelData
+                    visible: widgetLoader.active && widgetLoader.widgetEnabled
                     height: widgetLoader.item ? widgetLoader.item.height : 0
                     WidgetHost {
                         id: widgetLoader

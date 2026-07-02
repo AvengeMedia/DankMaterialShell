@@ -115,6 +115,8 @@ FloatingWindow {
     color: blurActive ? Theme.withAlpha(Theme.surfaceContainer, 0) : Theme.surfaceContainer
     visible: false
 
+    onClosed: hide()
+
     onVisibleChanged: {
         if (visible) {
             Qt.callLater(() => {

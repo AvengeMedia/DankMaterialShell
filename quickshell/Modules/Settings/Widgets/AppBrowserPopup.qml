@@ -26,6 +26,8 @@ FloatingWindow {
     color: "transparent"
     visible: false
 
+    onClosed: hide()
+
     WindowBlur {
         targetWindow: root
         blurX: 0

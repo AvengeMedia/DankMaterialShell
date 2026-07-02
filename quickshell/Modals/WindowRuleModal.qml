@@ -32,6 +32,8 @@ FloatingWindow {
     color: Theme.surfaceContainer
     visible: false
 
+    onClosed: hide()
+
     function resetForm() {
         nameInput.text = "";
         appIdInput.text = "";

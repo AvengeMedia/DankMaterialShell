@@ -110,6 +110,8 @@ FloatingWindow {
     color: Theme.surfaceContainer
     visible: false
 
+    onClosed: hide()
+
     onVisibleChanged: {
         if (visible) {
             updateFilteredWidgets();

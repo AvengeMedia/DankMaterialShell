@@ -27,12 +27,14 @@ Singleton {
         widgetRegistered(widgetId, screenName);
     }
 
-    function unregisterWidget(widgetId, screenName) {
+    function unregisterWidget(widgetId, screenName, widgetRef) {
         if (!widgetId || !screenName)
             return;
         if (typeof widgetRegistry !== "object" || widgetRegistry === null)
             return;
         if (!widgetRegistry[widgetId])
+            return;
+        if (widgetRef && widgetRegistry[widgetId][screenName] !== widgetRef)
             return;
 
         const nextRegistry = Object.assign({}, widgetRegistry);
