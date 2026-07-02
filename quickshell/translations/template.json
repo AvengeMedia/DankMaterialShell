@@ -21,6 +21,13 @@
     "comment": ""
   },
   {
+    "term": "%1 Startup Failed",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "%1 active session",
     "translation": "",
     "context": "",
@@ -106,20 +113,6 @@
   },
   {
     "term": "%1 displays",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "%1 exists but is not included in config. Custom keybinds will not work until this is fixed.",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "%1 exists but is not included. Window rules won't apply.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1358,6 +1351,13 @@
     "comment": ""
   },
   {
+    "term": "An xray rule at %1 may conflict with the Xray settings below",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Analog",
     "translation": "",
     "context": "",
@@ -1487,6 +1487,13 @@
     "term": "App Theming",
     "translation": "",
     "context": "greeter feature card title",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "App name or identity (e.g., firefox)",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -2534,13 +2541,6 @@
     "comment": ""
   },
   {
-    "term": "Binds Include Missing",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Binds include added",
     "translation": "",
     "context": "",
@@ -2668,6 +2668,13 @@
   },
   {
     "term": "Blur wallpaper when niri overview is open",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Blurred surfaces show the wallpaper instead of the content beneath",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2866,6 +2873,13 @@
     "term": "Browse Themes",
     "translation": "",
     "context": "browse themes button | theme browser header | theme browser window title",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Browse and set wallpapers",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -3367,6 +3381,13 @@
     "comment": ""
   },
   {
+    "term": "Choose wallpaper folder",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Choose where notification popups appear on screen",
     "translation": "",
     "context": "",
@@ -3493,21 +3514,7 @@
     "comment": ""
   },
   {
-    "term": "Click 'Setup' to create %1 and add include to config.",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Click 'Setup' to create %1 and add include to your compositor config.",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Click 'Setup' to create cursor config and add include to your compositor config.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -3647,6 +3654,13 @@
     "comment": ""
   },
   {
+    "term": "Clock, calendar, system info and profile",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Close",
     "translation": "",
     "context": "",
@@ -3745,7 +3759,7 @@
     "comment": ""
   },
   {
-    "term": "Color shown for areas not covered by wallpaper (e.g. Fit or Pad modes)",
+    "term": "Color shown for areas not covered by wallpaper",
     "translation": "",
     "context": "",
     "reference": "",
@@ -4298,7 +4312,7 @@
     "comment": ""
   },
   {
-    "term": "Controls outlines around blurred foreground cards, pills, and notification cards",
+    "term": "Controls outlines around foreground cards, pills, and notification cards",
     "translation": "",
     "context": "",
     "reference": "",
@@ -4725,20 +4739,6 @@
     "comment": ""
   },
   {
-    "term": "Cursor Config Not Configured",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Cursor Include Missing",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Cursor Size",
     "translation": "",
     "context": "",
@@ -5055,6 +5055,13 @@
   },
   {
     "term": "Dank Bar",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Dank Dash",
     "translation": "",
     "context": "",
     "reference": "",
@@ -6020,7 +6027,21 @@
     "comment": ""
   },
   {
+    "term": "Drag a widget by its handle here to reorder it or drop it into another group",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Drag to Reorder",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Drag to reorder or click to hide tabs. Use ↑/↓ to highlight a tab and Ctrl+↑/↓ to move it.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -6056,6 +6077,13 @@
   },
   {
     "term": "Drizzle",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Drop here",
     "translation": "",
     "context": "",
     "reference": "",
@@ -6154,6 +6182,13 @@
   },
   {
     "term": "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Edge Hover Reveal",
     "translation": "",
     "context": "",
     "reference": "",
@@ -6755,6 +6790,13 @@
     "comment": ""
   },
   {
+    "term": "Excluded Media Players",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Exclusive Zone Offset",
     "translation": "",
     "context": "",
@@ -7085,13 +7127,6 @@
   },
   {
     "term": "Failed to enable night mode",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Failed to enable plugin: %1",
     "translation": "",
     "context": "",
     "reference": "",
@@ -7714,20 +7749,6 @@
     "comment": ""
   },
   {
-    "term": "Fix Now",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Fixing...",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Flags",
     "translation": "",
     "context": "",
@@ -7864,6 +7885,13 @@
     "term": "Focused Color",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Focused Display",
+    "translation": "",
+    "context": "workspace appearance tab",
     "reference": "",
     "comment": ""
   },
@@ -8072,6 +8100,13 @@
   },
   {
     "term": "Forecast Not Available",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Forecast and conditions",
     "translation": "",
     "context": "",
     "reference": "",
@@ -8792,6 +8827,13 @@
     "comment": ""
   },
   {
+    "term": "Hidden until weather is enabled",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Hide",
     "translation": "",
     "context": "",
@@ -9052,6 +9094,13 @@
   },
   {
     "term": "Hourly Forecast Count",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Hover Popouts",
     "translation": "",
     "context": "",
     "reference": "",
@@ -9731,6 +9780,20 @@
   },
   {
     "term": "Jobs: ",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Jump to page",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Jump to page (1 - %1)",
     "translation": "",
     "context": "",
     "reference": "",
@@ -11648,6 +11711,13 @@
     "comment": ""
   },
   {
+    "term": "Next page",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Night",
     "translation": "",
     "context": "",
@@ -12019,6 +12089,13 @@
     "comment": ""
   },
   {
+    "term": "No excluded players configured",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "No features enabled",
     "translation": "",
     "context": "",
@@ -12267,6 +12344,13 @@
     "term": "No saved clipboard entries",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "No screenshot provided",
+    "translation": "",
+    "context": "plugin browser no screenshot",
     "reference": "",
     "comment": ""
   },
@@ -12649,6 +12733,13 @@
     "comment": ""
   },
   {
+    "term": "Now playing and media controls",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Numbers",
     "translation": "",
     "context": "",
@@ -12838,6 +12929,13 @@
     "comment": ""
   },
   {
+    "term": "Open Delay",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Open Dir",
     "translation": "",
     "context": "",
@@ -12923,6 +13021,20 @@
   },
   {
     "term": "Open search bar to find text",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Open the launcher by hovering the emerge edge (when free of bar and dock)",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Open widget popouts by hovering over the bar. Moving to another widget switches the popout.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -13070,13 +13182,6 @@
   },
   {
     "term": "Output Tray Missing",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Outputs Include Missing",
     "translation": "",
     "context": "",
     "reference": "",
@@ -13783,6 +13888,13 @@
     "comment": ""
   },
   {
+    "term": "Plugin dependency missing",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Plugin disabled: %1",
     "translation": "",
     "context": "",
@@ -14147,6 +14259,13 @@
     "comment": ""
   },
   {
+    "term": "Prevent specific applications from displaying in the media controllers (e.g., browser audio streams, background tools). Matches player identity or desktop file name case-insensitively.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Preview",
     "translation": "",
     "context": "",
@@ -14164,6 +14283,13 @@
     "term": "Previous",
     "translation": "",
     "context": "Media previous tooltip",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Previous page",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -14672,6 +14798,13 @@
     "comment": ""
   },
   {
+    "term": "Related: %1",
+    "translation": "",
+    "context": "related plugins",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Release",
     "translation": "",
     "context": "",
@@ -14876,6 +15009,13 @@
   },
   {
     "term": "Rename Workspace",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Reorder & Group",
     "translation": "",
     "context": "",
     "reference": "",
@@ -15554,9 +15694,16 @@
     "comment": ""
   },
   {
+    "term": "Screenshot unavailable",
+    "translation": "",
+    "context": "plugin browser screenshot error",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Scroll",
     "translation": "",
-    "context": "",
+    "context": "wallpaper fill mode",
     "reference": "",
     "comment": ""
   },
@@ -16072,7 +16219,21 @@
     "comment": ""
   },
   {
+    "term": "Separate Appearance for Unfocused Display(s)",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Separate Light & Dark Themes",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Separate appearance for unfocused displays is not supported on this compositor.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -16185,6 +16346,13 @@
   },
   {
     "term": "Setting",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Setting up...",
     "translation": "",
     "context": "",
     "reference": "",
@@ -16332,6 +16500,13 @@
   },
   {
     "term": "Shortcut (%1)",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Shortcut that opens this settings window",
     "translation": "",
     "context": "",
     "reference": "",
@@ -16884,7 +17059,7 @@
     "comment": ""
   },
   {
-    "term": "Show foreground surfaces on blurred panels for stronger contrast",
+    "term": "Show foreground surfaces on panels for stronger contrast",
     "translation": "",
     "context": "",
     "reference": "",
@@ -17284,6 +17459,13 @@
   },
   {
     "term": "Sort By",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Sort wallpapers",
     "translation": "",
     "context": "",
     "reference": "",
@@ -18074,6 +18256,13 @@
     "comment": ""
   },
   {
+    "term": "The 'boregard' tool is not installed or not on your PATH.\n\nInstall it from https://danklinux.com, then re-enable this plugin.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.",
     "translation": "",
     "context": "dgop unavailable error message",
@@ -18228,6 +18417,13 @@
     "comment": ""
   },
   {
+    "term": "This install is still using hyprland.conf. Run dms setup to migrate before editing layout settings.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "This install is still using hyprland.conf. Run dms setup to migrate before editing shortcuts in Settings.",
     "translation": "",
     "context": "",
@@ -18376,6 +18572,13 @@
   },
   {
     "term": "Time remaining: %1",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Time to rest on a widget before its popout opens",
     "translation": "",
     "context": "",
     "reference": "",
@@ -18893,6 +19096,13 @@
     "comment": ""
   },
   {
+    "term": "Unfocused Display(s)",
+    "translation": "",
+    "context": "workspace appearance tab",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Ungrouped",
     "translation": "",
     "context": "",
@@ -19377,6 +19587,13 @@
   },
   {
     "term": "Use different icon themes for light and dark mode",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Use different workspace colors on displays that are not focused",
     "translation": "",
     "context": "",
     "reference": "",
@@ -20272,20 +20489,6 @@
     "comment": ""
   },
   {
-    "term": "Window Rules Include Missing",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Window Rules Not Configured",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Wipe",
     "translation": "",
     "context": "wallpaper transition option",
@@ -20405,7 +20608,21 @@
     "comment": ""
   },
   {
+    "term": "Xray Blur Effect",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Xray blurs only the wallpaper (efficient) and is the default when Blur is on. Set Xray to Off for regular full blur of everything beneath the window (more expensive).",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Xray options are in Compositor → Layout",
     "translation": "",
     "context": "",
     "reference": "",
@@ -20531,6 +20748,13 @@
     "comment": ""
   },
   {
+    "term": "boregard is required",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "brandon",
     "translation": "",
     "context": "",
@@ -20602,20 +20826,6 @@
   },
   {
     "term": "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "dms/cursor config exists but is not included. Cursor settings won't apply.",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "dms/outputs config exists but is not included in your compositor config. Display changes won't persist.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -20944,6 +21154,13 @@
     "comment": ""
   },
   {
+    "term": "reviewed",
+    "translation": "",
+    "context": "plugin status",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "seconds",
     "translation": "",
     "context": "",
@@ -21024,13 +21241,6 @@
     "term": "v%1 by %2",
     "translation": "",
     "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "verified",
-    "translation": "",
-    "context": "plugin status",
     "reference": "",
     "comment": ""
   },

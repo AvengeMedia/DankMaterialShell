@@ -1,6 +1,5 @@
 import QtCore
 import QtQuick
-import Quickshell
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -22,6 +21,7 @@ Item {
     readonly property bool readOnly: CompositorService.isHyprland && layoutIncludeStatus.readOnly === true
     property bool checkingInclude: false
     property bool fixingInclude: false
+    property string xrayConflictSource: ""
 
     function getLayoutConfigPaths() {
         const configDir = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
@@ -120,9 +120,28 @@ Item {
         });
     }
 
+    function checkXrayConflicts() {
+        if (!CompositorService.isNiri)
+            return;
+        const configDir = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
+        const script = `cd "${configDir}/niri" 2>/dev/null || exit 0
+files="config.kdl"
+for f in $(sed -nE 's/^[[:space:]]*include[[:space:]]+"([^"]+)".*/\\1/p' config.kdl 2>/dev/null); do
+    case "$f" in dms/*|/*dms/*) continue ;; esac
+    [ -f "$f" ] && files="$files $f"
+done
+awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
+
+        Proc.runCommand("check-xray-conflict", ["sh", "-c", script], (output, exitCode) => {
+            xrayConflictSource = exitCode === 0 ? output.trim() : "";
+        });
+    }
+
     Component.onCompleted: {
-        if (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango)
+        if (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango) {
             checkLayoutIncludeStatus();
+            checkXrayConflicts();
+        }
     }
 
     DankFlickable {
@@ -211,6 +230,39 @@ Item {
                         enabled: !root.fixingInclude
                         anchors.verticalCenter: parent.verticalCenter
                         onClicked: root.fixLayoutInclude()
+                    }
+                }
+            }
+
+            StyledRect {
+                width: parent.width
+                height: xrayConflictRow.implicitHeight + Theme.spacingL * 2
+                radius: Theme.cornerRadius
+                color: Theme.withAlpha(Theme.primary, 0.15)
+                border.color: Theme.withAlpha(Theme.primary, 0.3)
+                border.width: 1
+                visible: root.xrayConflictSource !== ""
+
+                Row {
+                    id: xrayConflictRow
+                    anchors.fill: parent
+                    anchors.margins: Theme.spacingL
+                    spacing: Theme.spacingM
+
+                    DankIcon {
+                        name: "warning"
+                        size: Theme.iconSize
+                        color: Theme.primary
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    StyledText {
+                        width: parent.width - Theme.iconSize - Theme.spacingM
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: I18n.tr("An xray rule at %1 may conflict with the Xray settings below").arg(root.xrayConflictSource)
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                        wrapMode: Text.WordWrap
                     }
                 }
             }
@@ -312,25 +364,13 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    visible: CompositorService.isNiri
                     tags: ["niri", "xray", "blur", "background-effect", "performance"]
                     settingKey: "niriLayoutXrayEnabled"
                     text: I18n.tr("Xray Blur Effect")
-                    description: SettingsData.niriLayoutXrayEnabled ? I18n.tr("Xray on makes the windows background visible through to the wallpaper") : I18n.tr("Xray off shows the real background beneath the blurred surfaces")
-                    checked: SettingsData.niriLayoutXrayEnabled
-                    onToggled: checked => SettingsData.set("niriLayoutXrayEnabled", checked)
-                }
-
-                SettingsToggleRow {
-                    // Hidden in Frame Connected mode, where it has no target
-                    visible: !(SettingsData.frameEnabled && SettingsData.frameMode === "connected")
-                    enabled: SettingsData.frameEnabled || SettingsData.standaloneBarXrayAvailable
-                    opacity: enabled ? 1 : 0.5
-                    tags: ["niri", "xray", "bar", "frame", "performance"]
-                    settingKey: "niriLayoutBarXrayEnabled"
-                    text: SettingsData.frameEnabled ? I18n.tr("Frame Xray") : I18n.tr("Dank Bar Xray")
-                    description: !SettingsData.frameEnabled && !SettingsData.standaloneBarXrayAvailable ? I18n.tr("Unavailable while using Auto Hide as Xray would reveal the wallpaper through windows") : (SettingsData.niriLayoutBarXrayEnabled ? (SettingsData.frameEnabled ? I18n.tr("Xray on makes the Frame's border visible through to the wallpaper; more efficient") : I18n.tr("Xray on makes the Dank Bar visible through to the wallpaper; more efficient")) : (SettingsData.frameEnabled ? I18n.tr("Xray off shows the real background beneath the Frame's border") : I18n.tr("Xray off shows the real background beneath the Dank Bar")))
-                    checked: SettingsData.niriLayoutBarXrayEnabled
-                    onToggled: checked => SettingsData.set("niriLayoutBarXrayEnabled", checked)
+                    description: I18n.tr("Blurred surfaces show the wallpaper instead of the content beneath")
+                    checked: NiriService.layoutXrayEnabled
+                    onToggled: checked => NiriService.setLayoutXray(checked)
                 }
             }
 
@@ -440,25 +480,13 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    visible: CompositorService.isHyprland
                     tags: ["hyprland", "xray", "blur", "background-effect", "performance"]
                     settingKey: "hyprlandLayoutXrayEnabled"
                     text: I18n.tr("Xray Blur Effect")
-                    description: SettingsData.hyprlandLayoutXrayEnabled ? I18n.tr("Xray on makes the windows background visible through to the wallpaper") : I18n.tr("Xray off shows the real background beneath the blurred surfaces")
-                    checked: SettingsData.hyprlandLayoutXrayEnabled
-                    onToggled: checked => SettingsData.set("hyprlandLayoutXrayEnabled", checked)
-                }
-
-                SettingsToggleRow {
-                    // Hidden in Frame Connected mode, where it has no target
-                    visible: !(SettingsData.frameEnabled && SettingsData.frameMode === "connected")
-                    enabled: SettingsData.frameEnabled || SettingsData.standaloneBarXrayAvailable
-                    opacity: enabled ? 1 : 0.5
-                    tags: ["hyprland", "xray", "bar", "frame", "performance"]
-                    settingKey: "hyprlandLayoutBarXrayEnabled"
-                    text: SettingsData.frameEnabled ? I18n.tr("Frame Xray") : I18n.tr("Dank Bar Xray")
-                    description: !SettingsData.frameEnabled && !SettingsData.standaloneBarXrayAvailable ? I18n.tr("Unavailable while an enabled Dank Bar uses Auto Hide because Xray would reveal the wallpaper through windows") : (SettingsData.hyprlandLayoutBarXrayEnabled ? (SettingsData.frameEnabled ? I18n.tr("Xray on makes the Frame's border visible through to the wallpaper; more efficient") : I18n.tr("Xray on makes the Dank Bar visible through to the wallpaper; more efficient")) : (SettingsData.frameEnabled ? I18n.tr("Xray off shows the real background beneath the Frame's border") : I18n.tr("Xray off shows the real background beneath the Dank Bar")))
-                    checked: SettingsData.hyprlandLayoutBarXrayEnabled
-                    onToggled: checked => SettingsData.set("hyprlandLayoutBarXrayEnabled", checked)
+                    description: I18n.tr("Blurred surfaces show the wallpaper instead of the content beneath")
+                    checked: HyprlandService.layoutXrayEnabled
+                    onToggled: checked => HyprlandService.setLayoutXray(checked)
                 }
             }
 

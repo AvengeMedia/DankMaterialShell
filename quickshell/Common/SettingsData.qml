@@ -176,14 +176,10 @@ Singleton {
     property int niriLayoutGapsOverride: -1
     property int niriLayoutRadiusOverride: -1
     property int niriLayoutBorderSize: -1
-    property bool niriLayoutXrayEnabled: false
-    property bool niriLayoutBarXrayEnabled: true
     property int hyprlandLayoutGapsOverride: -1
     property int hyprlandLayoutRadiusOverride: -1
     property int hyprlandLayoutBorderSize: -1
     property bool hyprlandResizeOnBorder: false
-    property bool hyprlandLayoutXrayEnabled: false
-    property bool hyprlandLayoutBarXrayEnabled: true
     property int mangoLayoutGapsOverride: -1
     property int mangoLayoutRadiusOverride: -1
     property int mangoLayoutBorderSize: -1
@@ -1020,9 +1016,14 @@ Singleton {
         }
     ]
 
+    // Bar xray is only safe when no window can end up underneath: auto-hide and overlay-layer
+    // bars float over windows, and negative spacing pulls windows under the strip
     function _standaloneBarXrayAvailable(configs) {
-        const activeBars = (configs || []).filter(c => c && c.enabled && (c.visible ?? true));
-        return activeBars.every(c => !c.autoHide);
+        const list = configs || [];
+        const activeBars = list.filter(c => c && c.enabled && (c.visible ?? true));
+        const gapsOverride = (typeof CompositorService !== "undefined" && CompositorService.isHyprland) ? hyprlandLayoutGapsOverride : niriLayoutGapsOverride;
+        const layoutGaps = gapsOverride >= 0 ? gapsOverride : Math.max(4, (list[0]?.spacing ?? 4));
+        return activeBars.every(c => !c.autoHide && !(c.useOverlayLayer ?? false) && (c.spacing ?? 4) + (c.bottomGap ?? 0) + layoutGaps >= 0);
     }
 
     readonly property bool standaloneBarXrayAvailable: _standaloneBarXrayAvailable(barConfigs)

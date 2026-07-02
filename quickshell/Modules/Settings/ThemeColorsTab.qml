@@ -1816,7 +1816,7 @@ Item {
                 Item {
                     width: parent.width
                     height: xrayHintRow.implicitHeight
-                    visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango
+                    visible: CompositorService.isNiri || CompositorService.isHyprland
 
                     Row {
                         id: xrayHintRow
@@ -1833,7 +1833,7 @@ Item {
                         StyledText {
                             width: parent.width - Theme.iconSizeSmall - Theme.spacingS
                             anchors.verticalCenter: parent.verticalCenter
-                            text: I18n.tr("Xray specific options for blurred surfaces live in Compositor → Layout")
+                            text: I18n.tr("Xray options are in Compositor → Layout")
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.primary
                             wrapMode: Text.Wrap
