@@ -139,6 +139,7 @@ Item {
 
         if (spotlightContent.searchField) {
             spotlightContent.searchField.text = targetQuery;
+            spotlightContent.searchField.selectAll();
         }
         if (spotlightContent.controller) {
             var targetMode = mode || SessionData.getLauncherRestoreMode();

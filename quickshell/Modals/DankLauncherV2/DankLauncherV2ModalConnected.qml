@@ -359,8 +359,10 @@ Item {
         contentVisible = true;
         spotlightContent.closeTransientUi?.();
 
+        const targetQuery = query || (SettingsData.rememberLastQuery ? (SessionData.launcherLastQuery || "") : "");
+
         if (spotlightContent.searchField) {
-            spotlightContent.searchField.text = query;
+            spotlightContent.searchField.text = targetQuery;
         }
         if (spotlightContent.controller) {
             var targetMode = mode || SessionData.getLauncherRestoreMode();
@@ -375,8 +377,8 @@ Item {
             spotlightContent.controller.collapsedSections = {};
             spotlightContent.controller.selectedFlatIndex = 0;
             spotlightContent.controller.selectedItem = null;
-            if (query) {
-                spotlightContent.controller.setSearchQuery(query);
+            if (targetQuery) {
+                spotlightContent.controller.setSearchQuery(targetQuery);
             } else {
                 spotlightContent.controller.searchQuery = "";
                 spotlightContent.controller.performSearch();
@@ -422,8 +424,10 @@ Item {
 
             Qt.callLater(() => {
                 root.keyboardActive = true;
-                if (root.spotlightContent && root.spotlightContent.searchField)
+                if (root.spotlightContent && root.spotlightContent.searchField) {
                     root.spotlightContent.searchField.forceActiveFocus();
+                    root.spotlightContent.searchField.selectAll();
+                }
             });
         });
     }
