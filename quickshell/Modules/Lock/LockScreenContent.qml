@@ -846,6 +846,13 @@ Item {
                             cursorPosition -= 1;
                         }
 
+                        function deleteForward() {
+                            clampCursorPosition();
+                            if (cursorPosition === text.length)
+                                return;
+                            text = text.slice(0, cursorPosition) + text.slice(cursorPosition + 1);
+                        }
+
                         function isPrintableText(value) {
                             if (value.length === 0)
                                 return false;
@@ -915,14 +922,36 @@ Item {
                                 return;
                             }
 
-                            if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                            switch (event.key) {
+                            case Qt.Key_Return:
+                            case Qt.Key_Enter:
                                 accepted();
                                 event.accepted = true;
                                 return;
-                            }
-
-                            if (event.key === Qt.Key_Backspace) {
+                            case Qt.Key_Backspace:
                                 backspace();
+                                event.accepted = true;
+                                return;
+                            case Qt.Key_Delete:
+                                deleteForward();
+                                event.accepted = true;
+                                return;
+                            case Qt.Key_Left:
+                                clampCursorPosition();
+                                cursorPosition = Math.max(0, cursorPosition - 1);
+                                event.accepted = true;
+                                return;
+                            case Qt.Key_Right:
+                                clampCursorPosition();
+                                cursorPosition = Math.min(text.length, cursorPosition + 1);
+                                event.accepted = true;
+                                return;
+                            case Qt.Key_Home:
+                                cursorPosition = 0;
+                                event.accepted = true;
+                                return;
+                            case Qt.Key_End:
+                                cursorPosition = text.length;
                                 event.accepted = true;
                                 return;
                             }
@@ -1028,6 +1057,8 @@ Item {
                     }
 
                     StyledText {
+                        id: passwordDisplay
+
                         anchors.left: lockIconContainer.right
                         anchors.leftMargin: Theme.spacingM
                         anchors.right: (revealButton.visible ? revealButton.left : (virtualKeyboardButton.visible ? virtualKeyboardButton.left : (securityKeyButton.visible ? securityKeyButton.left : (enterButton.visible ? enterButton.left : (loadingSpinner.visible ? loadingSpinner.left : parent.right)))))
@@ -1053,6 +1084,33 @@ Item {
                             NumberAnimation {
                                 duration: Theme.mediumDuration
                                 easing.type: Theme.standardEasing
+                            }
+                        }
+                    }
+
+                    TextMetrics {
+                        id: passwordCursorMetrics
+                        font: passwordDisplay.font
+                        text: passwordDisplay.text.slice(0, passwordField.cursorPosition)
+                    }
+
+                    DankTextCursor {
+                        id: passwordCursor
+
+                        x: passwordDisplay.x + passwordCursorMetrics.advanceWidth + Math.min(0, passwordDisplay.width - passwordDisplay.implicitWidth)
+                        anchors.verticalCenter: parent.verticalCenter
+                        height: passwordDisplay.font.pixelSize + 4
+                        shown: !demoMode && passwordField.activeFocus && !pam.passwd.active && !pam.u2fPending && !root.unlocking
+
+                        Connections {
+                            target: passwordField
+
+                            function onCursorPositionChanged() {
+                                passwordCursor.resetBlink();
+                            }
+
+                            function onTextChanged() {
+                                passwordCursor.resetBlink();
                             }
                         }
                     }
