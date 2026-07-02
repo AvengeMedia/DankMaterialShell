@@ -1573,6 +1573,7 @@ func syncGreeterDynamicOverrideColors(dmsPath, homeDir string, state greeterThem
 		StateDir:         greeterOverrideColorsStateDir(homeDir),
 		ShellDir:         dmsPath,
 		ConfigDir:        filepath.Join(homeDir, ".config"),
+		DataDir:          filepath.Join(homeDir, ".local/share"),
 		Kind:             "image",
 		Value:            state.ResolvedGreeterWallpaperPath,
 		Mode:             mode,

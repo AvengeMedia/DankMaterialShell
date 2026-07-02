@@ -96,6 +96,7 @@ type Options struct {
 	StateDir            string
 	ShellDir            string
 	ConfigDir           string
+	DataDir             string
 	Kind                string
 	Value               string
 	Mode                ColorMode
@@ -179,6 +180,9 @@ func Run(opts Options) error {
 	}
 	if opts.ConfigDir == "" {
 		return fmt.Errorf("config-dir is required")
+	}
+	if opts.DataDir == "" {
+		return fmt.Errorf("data-dir is required")
 	}
 	if opts.Kind == "" {
 		return fmt.Errorf("kind is required")
@@ -334,16 +338,14 @@ func buildOnce(opts *Options) (bool, error) {
 		return true, nil
 	}
 
-	if isDMSGTKActive(opts.ConfigDir) {
-		switch opts.Mode {
-		case ColorModeLight:
-			syncAccentColor(primaryLight)
-		default:
-			syncAccentColor(primaryDark)
-		}
-		refreshGTK(opts.Mode)
-		refreshGTK4()
+	switch opts.Mode {
+	case ColorModeLight:
+		syncAccentColor(primaryLight)
+	default:
+		syncAccentColor(primaryDark)
 	}
+	refreshGTK(opts.Mode)
+	refreshGTK4()
 
 	if !opts.ShouldSkipTemplate("qt6ct") && appExists(opts.AppChecker, []string{"qt6ct"}, nil) {
 		refreshQt6ct()
@@ -840,23 +842,6 @@ func generateDank16Variants(primaryDark, primaryLight, surface string, mode Colo
 	}
 	variantColors := dank16.GenerateVariantPalette(variantOpts)
 	return dank16.GenerateVariantJSON(variantColors)
-}
-
-func isDMSGTKActive(configDir string) bool {
-	gtkCSS := filepath.Join(configDir, "gtk-3.0", "gtk.css")
-
-	info, err := os.Lstat(gtkCSS)
-	if err != nil {
-		return false
-	}
-
-	if info.Mode()&os.ModeSymlink != 0 {
-		target, err := os.Readlink(gtkCSS)
-		return err == nil && strings.Contains(target, "dank-colors.css")
-	}
-
-	data, err := os.ReadFile(gtkCSS)
-	return err == nil && strings.Contains(string(data), "dank-colors.css")
 }
 
 func refreshGTK(mode ColorMode) {
