@@ -41,6 +41,7 @@ Scope {
     property bool pendingLock: false
     property bool lockPowerOffArmed: false
     property bool lockWakeAllowed: false
+    property bool customLockerSpawned: false
 
     Component.onCompleted: {
         IdleService.lockComponent = this;
@@ -57,13 +58,26 @@ Scope {
             DMSService.unlockSession(() => {});
     }
 
+    function spawnCustomLocker() {
+        Quickshell.execDetached(["sh", "-c", SettingsData.customPowerActionLock]);
+        // The custom locker manages its own surface; DMS never engages
+        // WlSessionLock here, so isShellLocked stays false and the fade
+        // overlay would never be dismissed. Hand off by dismissing it now.
+        IdleService.dismissFadeToLock();
+        customLockerSpawned = true;
+    }
+
+    function handleLoginctlCustomLock(): bool {
+        if (!(SettingsData.customPowerActionLock?.length > 0))
+            return false;
+        if (!customLockerSpawned)
+            spawnCustomLocker();
+        return true;
+    }
+
     function lock() {
         if (SettingsData.customPowerActionLock?.length > 0) {
-            Quickshell.execDetached(["sh", "-c", SettingsData.customPowerActionLock]);
-            // The custom locker manages its own surface; DMS never engages
-            // WlSessionLock here, so isShellLocked stays false and the fade
-            // overlay would never be dismissed. Hand off by dismissing it now.
-            IdleService.dismissFadeToLock();
+            spawnCustomLocker();
             return;
         }
         if (shouldLock || pendingLock)
@@ -94,6 +108,7 @@ Scope {
         lockInitiatedLocally = false;
         pendingLock = false;
         shouldLock = false;
+        customLockerSpawned = false;
     }
 
     function activate() {
@@ -106,6 +121,8 @@ Scope {
         function onSessionLocked() {
             if (shouldLock || pendingLock)
                 return;
+            if (handleLoginctlCustomLock())
+                return;
             if (!SessionService.active && SessionService.loginctlAvailable && SettingsData.loginctlLockIntegration) {
                 pendingLock = true;
                 lockInitiatedLocally = false;
@@ -117,6 +134,7 @@ Scope {
         }
 
         function onSessionUnlocked() {
+            customLockerSpawned = false;
             if (pendingLock) {
                 pendingLock = false;
                 lockInitiatedLocally = false;
@@ -136,6 +154,8 @@ Scope {
                 return;
             }
             if (SessionService.locked && !shouldLock && !pendingLock) {
+                if (handleLoginctlCustomLock())
+                    return;
                 lockInitiatedLocally = false;
                 lockPowerOffArmed = SettingsData.lockScreenPowerOffMonitorsOnLock;
                 shouldLock = true;

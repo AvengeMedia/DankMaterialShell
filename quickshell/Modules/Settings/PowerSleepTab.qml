@@ -536,6 +536,7 @@ Item {
                 iconName: "developer_mode"
                 title: I18n.tr("Custom Power Actions")
                 settingKey: "customPowerActions"
+                tags: ["lock", "logout", "suspend", "hibernate", "reboot", "poweroff", "power off", "shutdown", "command", "script", "override"]
 
                 Repeater {
                     model: [
@@ -602,7 +603,6 @@ Item {
                     }
                 }
             }
-
         }
     }
 }
