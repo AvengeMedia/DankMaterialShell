@@ -32,13 +32,14 @@ var greeterCmd = &cobra.Command{
 var (
 	greeterConfigSyncFn = greeter.SyncDMSConfigs
 	sharedAuthSyncFn    = sharedpam.SyncAuthConfig
+	greeterIsNixOSFn    = greeter.IsNixOS
 )
 
 var greeterInstallCmd = &cobra.Command{
 	Use:     "install",
 	Short:   "Install and configure DMS greeter",
 	Long:    "Install greetd and configure it to use DMS as the greeter interface",
-	PreRunE: preRunPrivileged,
+	PreRunE: preRunGreeterMutation,
 	Run: func(cmd *cobra.Command, args []string) {
 		yes, _ := cmd.Flags().GetBool("yes")
 		term, _ := cmd.Flags().GetBool("terminal")
@@ -64,6 +65,9 @@ var greeterSyncCmd = &cobra.Command{
 	Short: "Sync DMS theme and settings with greeter",
 	Long:  "Synchronize your current user's DMS theme, settings, and wallpaper configuration with the login greeter screen. Also updates a per-user cache slot at users/<username>/ for multi-account greeter theme preview.\n\nUse --profile on secondary accounts to sync only your own users/<username>/ slot without sudo or greetd changes.",
 	PreRunE: func(cmd *cobra.Command, args []string) error {
+		if err := rejectNixOSGreeterMutation(cmd); err != nil {
+			return err
+		}
 		profile, _ := cmd.Flags().GetBool("profile")
 		if profile {
 			return nil
@@ -140,7 +144,7 @@ var greeterEnableCmd = &cobra.Command{
 	Use:     "enable",
 	Short:   "Enable DMS greeter in greetd config",
 	Long:    "Configure greetd to use DMS as the greeter",
-	PreRunE: preRunPrivileged,
+	PreRunE: preRunGreeterMutation,
 	Run: func(cmd *cobra.Command, args []string) {
 		yes, _ := cmd.Flags().GetBool("yes")
 		term, _ := cmd.Flags().GetBool("terminal")
@@ -176,7 +180,7 @@ var greeterUninstallCmd = &cobra.Command{
 	Use:     "uninstall",
 	Short:   "Remove DMS greeter configuration and restore previous display manager",
 	Long:    "Disable greetd, remove DMS managed configs, and restore the system to its pre-DMS-greeter state",
-	PreRunE: preRunPrivileged,
+	PreRunE: preRunGreeterMutation,
 	Run: func(cmd *cobra.Command, args []string) {
 		yes, _ := cmd.Flags().GetBool("yes")
 		term, _ := cmd.Flags().GetBool("terminal")
@@ -204,6 +208,21 @@ func init() {
 	greeterEnableCmd.Flags().BoolP("terminal", "t", false, "Run in a new terminal (for entering sudo password)")
 	greeterUninstallCmd.Flags().BoolP("yes", "y", false, "Non-interactive: skip confirmation prompt")
 	greeterUninstallCmd.Flags().BoolP("terminal", "t", false, "Run in a new terminal (for entering sudo password)")
+}
+
+func rejectNixOSGreeterMutation(cmd *cobra.Command) error {
+	if !greeterIsNixOSFn() {
+		return nil
+	}
+
+	return fmt.Errorf("dms %s is disabled on NixOS because the greeter is managed declaratively\nConfigure the DMS greeter in your NixOS module, then apply the change with your normal nixos-rebuild workflow", normalizeCommandSpec(cmd.CommandPath()))
+}
+
+func preRunGreeterMutation(cmd *cobra.Command, args []string) error {
+	if err := rejectNixOSGreeterMutation(cmd); err != nil {
+		return err
+	}
+	return preRunPrivileged(cmd, args)
 }
 
 func syncGreeterConfigsAndAuth(dmsPath, compositor string, logFunc func(string), options sharedpam.SyncAuthOptions, beforeAuth func()) error {
@@ -1415,23 +1434,35 @@ func readDefaultSessionCommand(configPath string) string {
 	return ""
 }
 
-func extractGreeterCacheDirFromCommand(command string) string {
-	if command == "" {
-		return greeter.GreeterCacheDir
-	}
+func explicitGreeterCacheDirFromCommand(command string) (string, bool) {
 	tokens := strings.Fields(command)
 	for i := 0; i < len(tokens); i++ {
 		token := strings.Trim(tokens[i], "\"")
 		if token == "--cache-dir" && i+1 < len(tokens) {
-			return strings.Trim(tokens[i+1], "\"")
+			value := strings.Trim(tokens[i+1], "\"")
+			if value != "" {
+				return value, true
+			}
 		}
 		if strings.HasPrefix(token, "--cache-dir=") {
 			value := strings.TrimPrefix(token, "--cache-dir=")
 			value = strings.Trim(value, "\"")
 			if value != "" {
-				return value
+				return value, true
 			}
 		}
+	}
+	return "", false
+}
+
+const nixOSGreeterStateDir = "/var/lib/dms-greeter"
+
+func greeterStatusStateDir(command string, isNixOS bool) string {
+	if cacheDir, ok := explicitGreeterCacheDirFromCommand(command); ok {
+		return cacheDir
+	}
+	if isNixOS {
+		return nixOSGreeterStateDir
 	}
 	return greeter.GreeterCacheDir
 }
@@ -1569,6 +1600,10 @@ func checkGreeterStatus() error {
 	fmt.Println("=== DMS Greeter Status ===")
 	fmt.Println()
 
+	if greeterIsNixOSFn() {
+		return checkNixOSGreeterStatus()
+	}
+
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		return fmt.Errorf("failed to get user home directory: %w", err)
@@ -1632,7 +1667,7 @@ func checkGreeterStatus() error {
 		fmt.Println("    Run 'dms greeter sync' to set up group membership and permissions")
 	}
 
-	cacheDir := extractGreeterCacheDirFromCommand(configuredCommand)
+	cacheDir := greeterStatusStateDir(configuredCommand, false)
 	fmt.Println("\nGreeter Cache Directory:")
 	fmt.Printf("  Effective cache dir: %s\n", cacheDir)
 	if cacheDir != greeter.GreeterCacheDir {
@@ -1890,6 +1925,85 @@ func checkGreeterStatus() error {
 		fmt.Println("⚠ Some issues detected. Run 'dms greeter sync' to repair configuration.")
 	} else if !inGreeterGroup {
 		fmt.Printf("⚠ User is not in %s group. Run 'dms greeter sync' after adding group membership.\n", greeterGroup)
+	}
+
+	return nil
+}
+
+func checkNixOSGreeterStatus() error {
+	const configPath = "/etc/greetd/config.toml"
+
+	configuredCommand := readDefaultSessionCommand(configPath)
+	allGood := true
+
+	fmt.Println("Greeter Configuration:")
+	switch {
+	case strings.Contains(configuredCommand, "dms-greeter"):
+		fmt.Println("  ✓ DMS greeter command found")
+		if wrapper := extractGreeterWrapperFromCommand(configuredCommand); wrapper != "" {
+			fmt.Printf("  Wrapper: %s\n", wrapper)
+		}
+	case configuredCommand != "":
+		fmt.Println("  ⚠ greetd default session does not reference dms-greeter")
+		allGood = false
+	default:
+		fmt.Printf("  ℹ No readable DMS command found in %s\n", configPath)
+	}
+	fmt.Println("  ℹ NixOS manages greeter configuration declaratively; apply changes through your NixOS module.")
+
+	stateDir := greeterStatusStateDir(configuredCommand, true)
+	fmt.Println("\nGreeter State Directory:")
+	fmt.Printf("  Effective state dir: %s\n", stateDir)
+	if stateDir == nixOSGreeterStateDir {
+		fmt.Println("  ✓ Using the NixOS module state path")
+	}
+	if stat, err := os.Stat(stateDir); err == nil && stat.IsDir() {
+		fmt.Printf("  ✓ %s exists\n", stateDir)
+	} else if os.IsNotExist(err) {
+		fmt.Printf("  ✗ %s not found\n", stateDir)
+		fmt.Println("    Rebuild your NixOS configuration after enabling the DMS greeter module.")
+		allGood = false
+	} else if err != nil {
+		fmt.Printf("  ✗ Could not inspect %s: %v\n", stateDir, err)
+		allGood = false
+	} else {
+		fmt.Printf("  ✗ %s is not a directory\n", stateDir)
+		allGood = false
+	}
+
+	fmt.Println("\nDeclarative Configuration Files:")
+	configFiles := []struct {
+		name string
+		path string
+	}{
+		{name: "Settings", path: filepath.Join(stateDir, "settings.json")},
+		{name: "Session state", path: filepath.Join(stateDir, "session.json")},
+		{name: "Color theme", path: filepath.Join(stateDir, "colors.json")},
+	}
+	for _, configFile := range configFiles {
+		if stat, err := os.Stat(configFile.path); err == nil && !stat.IsDir() {
+			fmt.Printf("  ✓ %s: %s\n", configFile.name, configFile.path)
+		} else if os.IsNotExist(err) {
+			fmt.Printf("  ℹ %s not present (optional; configure configHome/configFiles in the NixOS module)\n", configFile.name)
+		} else if err != nil {
+			fmt.Printf("  ⚠ %s could not be inspected: %v\n", configFile.name, err)
+		} else {
+			fmt.Printf("  ⚠ %s path is not a regular file: %s\n", configFile.name, configFile.path)
+		}
+	}
+
+	fmt.Println("\nGroup Membership:")
+	fmt.Println("  ℹ User group membership is managed by NixOS and is not required for declarative theme copies.")
+
+	fmt.Println("\nGreeter PAM Authentication:")
+	fmt.Println("  ℹ PAM is managed by NixOS modules.")
+	fmt.Println("    Configure fingerprint/U2F through security.pam.services.greetd.")
+
+	fmt.Println()
+	if allGood {
+		fmt.Println("✓ NixOS greeter state looks healthy and is managed declaratively.")
+	} else {
+		fmt.Println("⚠ Some issues detected. Update the DMS greeter module and rebuild NixOS; do not run 'dms greeter sync'.")
 	}
 
 	return nil
