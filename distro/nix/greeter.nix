@@ -10,6 +10,8 @@ let
   inherit (lib) types;
   cfg = config.programs.dank-material-shell.greeter;
   cfgDms = config.programs.dank-material-shell;
+  cfgAutoLogin = config.services.displayManager.autoLogin;
+  sessionData = config.services.displayManager.sessionData;
 
   inherit (config.services.greetd.settings.default_session) user;
 
@@ -47,6 +49,38 @@ let
       )
     } ${lib.optionalString cfg.logs.save "> ${cfg.logs.path} 2>&1"}
   '';
+
+  autoLoginCommand =
+    pkgs.runCommand "dms-greeter-autologin-command"
+      {
+        nativeBuildInputs = [
+          pkgs.gnugrep
+          pkgs.coreutils
+        ];
+      }
+      ''
+        set -euo pipefail
+
+        session="${sessionData.autologinSession}"
+        desktops="${sessionData.desktops}"
+
+        for sessionFile in \
+          "$desktops/share/wayland-sessions/$session.desktop" \
+          "$desktops/share/xsessions/$session.desktop"
+        do
+          if [ -f "$sessionFile" ]; then
+            command="$(grep -m1 '^Exec=' "$sessionFile" | cut -d= -f2- || true)"
+
+            if [ -n "$command" ]; then
+              printf '%s\n' "$command" > "$out"
+              exit 0
+            fi
+          fi
+        done
+
+        echo "dms-greeter autologin: could not resolve Exec for session '$session'" >&2
+        exit 1
+      '';
 
   jq = lib.getExe pkgs.jq;
 in
@@ -155,6 +189,13 @@ in
           dmsgreeter: user set for greetd default_session ${user} does not exist. Please create it before referencing it.
         '';
       }
+      {
+        assertion = cfgAutoLogin.enable -> sessionData.autologinSession != null;
+        message = ''
+          dms-greeter auto-login requires services.displayManager.defaultSession to be set,
+          or at least one session in services.displayManager.sessionPackages.
+        '';
+      }
     ];
     # DMS currently relies on /etc/pam.d/login for lock screen password auth on NixOS.
     # Declare security.pam.services.dankshell only if you want to override that runtime fallback.
@@ -165,7 +206,13 @@ in
     # };
     services.greetd = {
       enable = lib.mkDefault true;
-      settings.default_session.command = lib.mkDefault (lib.getExe greeterScript);
+      settings = {
+        default_session.command = lib.mkDefault (lib.getExe greeterScript);
+        initial_session = lib.mkIf (cfgAutoLogin.enable && (cfgAutoLogin.user != null)) {
+          inherit (cfgAutoLogin) user;
+          command = ''${lib.getExe pkgs.bash} -lc "${pkgs.systemd}/bin/systemd-cat $(<${autoLoginCommand})"'';
+        };
+      };
     };
     fonts.packages = with pkgs; [
       fira-code
