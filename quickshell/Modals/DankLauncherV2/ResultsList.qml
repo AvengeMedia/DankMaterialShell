@@ -11,9 +11,11 @@ Item {
 
     property var controller: null
     property int gridColumns: controller?.gridColumns ?? 4
+    property bool leadingSectionHeaderAtBottom: false
     property var _visualRows: []
     property var _flatIndexToRowMap: ({})
     property var _cumulativeHeights: []
+    readonly property bool _bottomSectionHeaderActive: leadingSectionHeaderAtBottom && (controller?.sections?.length ?? 0) > 0
 
     signal itemRightClicked(int index, var item, real mouseX, real mouseY)
 
@@ -28,15 +30,17 @@ Item {
             var section = sections[s];
             var sectionId = section.id;
 
-            cumHeights.push(cumY);
-            rows.push({
-                _rowId: "h_" + sectionId,
-                type: "header",
-                section: section,
-                sectionId: sectionId,
-                height: 32
-            });
-            cumY += 32;
+            if (!root._bottomSectionHeaderActive || s > 0) {
+                cumHeights.push(cumY);
+                rows.push({
+                    _rowId: "h_" + sectionId,
+                    type: "header",
+                    section: section,
+                    sectionId: sectionId,
+                    height: 32
+                });
+                cumY += 32;
+            }
 
             if (section.collapsed)
                 continue;
@@ -103,6 +107,7 @@ Item {
 
     onGridColumnsChanged: Qt.callLater(_rebuildVisualModel)
     onWidthChanged: Qt.callLater(_rebuildVisualModel)
+    onLeadingSectionHeaderAtBottomChanged: Qt.callLater(_rebuildVisualModel)
 
     Connections {
         target: root.controller
@@ -117,10 +122,25 @@ Item {
             root._cumulativeHeights = [];
             root._flatIndexToRowMap = {};
         }
+        function onSectionExpanded(sectionId) {
+            Qt.callLater(() => {
+                root._rebuildVisualModel();
+                Qt.callLater(() => root.revealExpandedSection(sectionId));
+            });
+        }
     }
 
     function resetScroll() {
         mainListView.contentY = mainListView.originY;
+    }
+
+    function revealExpandedSection(sectionId) {
+        for (var i = 0; i < _visualRows.length; i++) {
+            if (_visualRows[i].sectionId === sectionId) {
+                mainListView.positionViewAtIndex(i, ListView.Beginning);
+                return;
+            }
+        }
     }
 
     function ensureVisible(index) {
@@ -194,6 +214,7 @@ Item {
         id: listClip
         anchors.fill: parent
         anchors.topMargin: BlurService.enabled && stickyHeader.visible ? 32 : 0
+        anchors.bottomMargin: bottomSectionHeader.visible ? bottomSectionHeader.height : 0
         clip: true
 
         DankListView {
@@ -332,6 +353,7 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
+        anchors.bottomMargin: bottomSectionHeader.visible ? bottomSectionHeader.height : 0
         height: 24
         z: 100
         visible: {
@@ -377,7 +399,7 @@ Item {
         height: 32
         z: 101
         color: Theme.floatingSurface
-        visible: stickyHeaderSection !== null
+        visible: !root._bottomSectionHeaderActive && stickyHeaderSection !== null
 
         readonly property int versionTrigger: root.controller?.viewModeVersion ?? 0
 
@@ -426,6 +448,30 @@ Item {
             }
             isSticky: true
         }
+    }
+
+    SectionHeader {
+        id: bottomSectionHeader
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        z: 101
+        visible: root._bottomSectionHeaderActive
+        section: visible ? root.controller.sections[0] : null
+        controller: root.controller
+        viewMode: {
+            var vt = root.controller?.viewModeVersion ?? 0;
+            void (vt);
+            return root.controller?.getSectionViewMode(section?.id ?? "") ?? "list";
+        }
+        canChangeViewMode: {
+            var vt = root.controller?.viewModeVersion ?? 0;
+            void (vt);
+            return root.controller?.canChangeSectionViewMode(section?.id ?? "") ?? false;
+        }
+        canCollapse: root.controller?.canCollapseSection(section?.id ?? "") ?? false
+        isSticky: true
+        popupAbove: true
     }
 
     Item {

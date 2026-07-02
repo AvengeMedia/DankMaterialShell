@@ -314,8 +314,12 @@ FocusScope {
     }
 
     Item {
+        id: contentHolder
         anchors.fill: parent
         visible: !editMode
+
+        readonly property bool inverted: (root.parentModal?.frameOwnsConnectedChrome ?? false) && (root.parentModal?.resolvedConnectedBarSide === "top")
+        readonly property bool _connectedArcAtHeader: inverted && !(root.parentModal?.launcherArcExtenderActive ?? false)
 
         Item {
             id: footerBar
@@ -325,11 +329,10 @@ FocusScope {
 
             anchors.left: parent.left
             anchors.right: parent.right
-            anchors.bottom: parent.bottom
             anchors.leftMargin: root.parentModal?.borderWidth ?? 1
             anchors.rightMargin: root.parentModal?.borderWidth ?? 1
-            anchors.bottomMargin: _connectedBottomEmerge ? 0 : (root.parentModal?.borderWidth ?? 1)
-            height: showFooter ? (_connectedArcAtFooter ? 76 : 36) : 0
+            y: contentHolder.inverted ? 0 : (parent.height - height - (_connectedBottomEmerge ? 0 : (root.parentModal?.borderWidth ?? 1)))
+            height: showFooter ? ((_connectedArcAtFooter || contentHolder._connectedArcAtHeader) ? 76 : 36) : 0
             visible: showFooter
             clip: true
 
@@ -446,104 +449,111 @@ FocusScope {
             }
         }
 
-        Column {
+        Row {
+            id: searchRow
+            spacing: Theme.spacingS
             anchors.left: parent.left
             anchors.right: parent.right
-            anchors.top: parent.top
-            anchors.bottom: footerBar.top
             anchors.leftMargin: Theme.spacingM
             anchors.rightMargin: Theme.spacingM
-            anchors.topMargin: Theme.spacingM
-            spacing: Theme.spacingXS
-            clip: false
+            y: contentHolder.inverted ? (parent.height - height - Theme.spacingM) : Theme.spacingM
 
-            Row {
-                width: parent.width
-                spacing: Theme.spacingS
+            Rectangle {
+                id: pluginBadge
+                visible: controller.activePluginName.length > 0
+                width: visible ? pluginBadgeContent.implicitWidth + Theme.spacingM : 0
+                height: searchField.height
+                radius: 16
+                color: Theme.primary
 
-                Rectangle {
-                    id: pluginBadge
-                    visible: controller.activePluginName.length > 0
-                    width: visible ? pluginBadgeContent.implicitWidth + Theme.spacingM : 0
-                    height: searchField.height
-                    radius: 16
-                    color: Theme.primary
+                Row {
+                    id: pluginBadgeContent
+                    anchors.centerIn: parent
+                    spacing: Theme.spacingXS
 
-                    Row {
-                        id: pluginBadgeContent
-                        anchors.centerIn: parent
-                        spacing: Theme.spacingXS
-
-                        DankIcon {
-                            anchors.verticalCenter: parent.verticalCenter
-                            name: "extension"
-                            size: 14
-                            color: Theme.primaryText
-                        }
-
-                        StyledText {
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: controller.activePluginName
-                            font.pixelSize: Theme.fontSizeSmall
-                            font.weight: Font.Medium
-                            color: Theme.primaryText
-                        }
+                    DankIcon {
+                        anchors.verticalCenter: parent.verticalCenter
+                        name: "extension"
+                        size: 14
+                        color: Theme.primaryText
                     }
 
-                    Behavior on width {
-                        NumberAnimation {
-                            duration: Theme.shortDuration
-                            easing.type: Theme.standardEasing
-                        }
+                    StyledText {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: controller.activePluginName
+                        font.pixelSize: Theme.fontSizeSmall
+                        font.weight: Font.Medium
+                        color: Theme.primaryText
                     }
                 }
 
-                DankTextField {
-                    id: searchField
-                    width: parent.width - (pluginBadge.visible ? pluginBadge.width + Theme.spacingS : 0)
-                    cornerRadius: Theme.cornerRadius
-                    backgroundColor: root._launcherSearchFieldColor
-                    normalBorderColor: root._launcherSearchBorderColor
-                    focusedBorderColor: root._launcherSearchFocusedBorderColor
-                    borderWidth: 1
-                    focusedBorderWidth: 2
-                    leftIconName: controller.activePluginId ? "extension" : controller.searchQuery.startsWith("/") ? "folder" : "search"
-                    leftIconSize: Theme.iconSize
-                    leftIconColor: Theme.surfaceVariantText
-                    leftIconFocusedColor: Theme.primary
-                    showClearButton: true
-                    textColor: Theme.surfaceText
-                    font.pixelSize: Theme.fontSizeLarge
-                    enabled: root.parentModal ? (root.parentModal.spotlightOpen || root.parentModal.isClosing) : true
-                    placeholderText: ""
-                    ignoreUpDownKeys: true
-                    ignoreTabKeys: true
-                    keyForwardTargets: [root]
-
-                    onTextChanged: {
-                        controller.setSearchQuery(text);
-                        if (actionPanel.expanded) {
-                            actionPanel.hide();
-                        }
-                    }
-
-                    Keys.onPressed: event => {
-                        if (event.key === Qt.Key_Escape) {
-                            if (root.parentModal) {
-                                root.parentModal.hide();
-                            }
-                            event.accepted = true;
-                        } else if ((event.key === Qt.Key_Return || event.key === Qt.Key_Enter)) {
-                            if (actionPanel.expanded && actionPanel.selectedActionIndex > 0) {
-                                actionPanel.executeSelectedAction();
-                            } else {
-                                controller.executeSelected();
-                            }
-                            event.accepted = true;
-                        }
+                Behavior on width {
+                    NumberAnimation {
+                        duration: Theme.shortDuration
+                        easing.type: Theme.standardEasing
                     }
                 }
             }
+
+            DankTextField {
+                id: searchField
+                width: parent.width - (pluginBadge.visible ? pluginBadge.width + Theme.spacingS : 0)
+                cornerRadius: Theme.cornerRadius
+                backgroundColor: root._launcherSearchFieldColor
+                normalBorderColor: root._launcherSearchBorderColor
+                focusedBorderColor: root._launcherSearchFocusedBorderColor
+                borderWidth: 1
+                focusedBorderWidth: 2
+                leftIconName: controller.activePluginId ? "extension" : controller.searchQuery.startsWith("/") ? "folder" : "search"
+                leftIconSize: Theme.iconSize
+                leftIconColor: Theme.surfaceVariantText
+                leftIconFocusedColor: Theme.primary
+                showClearButton: true
+                textColor: Theme.surfaceText
+                font.pixelSize: Theme.fontSizeLarge
+                enabled: root.parentModal ? (root.parentModal.spotlightOpen || root.parentModal.isClosing) : true
+                placeholderText: ""
+                ignoreUpDownKeys: true
+                ignoreTabKeys: true
+                keyForwardTargets: [root]
+
+                onTextChanged: {
+                    controller.setSearchQuery(text);
+                    if (actionPanel.expanded) {
+                        actionPanel.hide();
+                    }
+                }
+
+                Keys.onPressed: event => {
+                    if (event.key === Qt.Key_Escape) {
+                        if (root.parentModal) {
+                            root.parentModal.hide();
+                        }
+                        event.accepted = true;
+                    } else if ((event.key === Qt.Key_Return || event.key === Qt.Key_Enter)) {
+                        if (actionPanel.expanded && actionPanel.selectedActionIndex > 0) {
+                            actionPanel.executeSelectedAction();
+                        } else {
+                            controller.executeSelected();
+                        }
+                        event.accepted = true;
+                    }
+                }
+            }
+        }
+
+        Item {
+            id: contentStack
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: contentHolder.inverted ? footerBar.bottom : searchRow.bottom
+            anchors.bottom: contentHolder.inverted ? searchRow.top : footerBar.top
+            anchors.leftMargin: Theme.spacingM
+            anchors.rightMargin: Theme.spacingM
+            anchors.topMargin: contentHolder.inverted && !footerBar.showFooter ? Theme.spacingM : contentStack.gap
+            anchors.bottomMargin: contentHolder.inverted ? contentStack.gap : 0
+            readonly property real gap: Theme.spacingXS
+            clip: false
 
             Row {
                 id: categoryRow
@@ -552,6 +562,8 @@ FocusScope {
                 height: showPluginCategories ? 36 : 0
                 visible: showPluginCategories
                 spacing: Theme.spacingS
+                anchors.top: parent.top
+                anchors.topMargin: 0
 
                 clip: true
 
@@ -607,6 +619,8 @@ FocusScope {
                 width: parent.width
                 height: showFileFilters ? fileFilterContent.height : 0
                 visible: showFileFilters
+                anchors.top: parent.top
+                anchors.topMargin: 0
 
                 readonly property bool showFileFilters: controller.searchMode === "files"
 
@@ -746,8 +760,12 @@ FocusScope {
             }
 
             Item {
+                id: resultsSlot
                 width: parent.width
-                height: parent.height - searchField.height - categoryRow.height - fileFilterRow.height - actionPanel.height - Theme.spacingXS * ((categoryRow.visible ? 1 : 0) + (fileFilterRow.visible ? 1 : 0) + 2)
+                anchors.top: fileFilterRow.visible ? fileFilterRow.bottom : (categoryRow.visible ? categoryRow.bottom : parent.top)
+                anchors.topMargin: (fileFilterRow.visible || categoryRow.visible) ? contentStack.gap : 0
+                anchors.bottom: actionPanel.top
+                anchors.bottomMargin: actionPanel.height > 0 || !contentHolder.inverted ? contentStack.gap : 0
                 opacity: {
                     if (!root.parentModal)
                         return 1;
@@ -760,6 +778,7 @@ FocusScope {
                     id: resultsList
                     anchors.fill: parent
                     controller: root.controller
+                    leadingSectionHeaderAtBottom: contentHolder.inverted
 
                     onItemRightClicked: (index, item, sceneX, sceneY) => {
                         if (item && contextMenu.hasContextMenuActions(item)) {
@@ -773,6 +792,7 @@ FocusScope {
             ActionPanel {
                 id: actionPanel
                 width: parent.width
+                anchors.bottom: parent.bottom
                 selectedItem: controller.selectedItem
                 controller: controller
             }
