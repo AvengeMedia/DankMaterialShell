@@ -48,19 +48,22 @@ FloatingWindow {
             log.warn("dgop is not available");
             return;
         }
-        if (visible) {
-            const modalTitle = I18n.tr("System Monitor", "sysmon window title");
-            for (const toplevel of ToplevelManager.toplevels.values) {
-                if (toplevel.title !== "System Monitor" && toplevel.title !== modalTitle)
-                    continue;
-                if (toplevel.activated) {
-                    hide();
-                    return;
-                }
-                toplevel.activate();
+        if (!visible) {
+            show();
+            return;
+        }
+        const modalTitle = I18n.tr("System Monitor", "sysmon window title");
+        for (const toplevel of ToplevelManager.toplevels.values) {
+            if (toplevel.title !== "System Monitor" && toplevel.title !== modalTitle)
+                continue;
+            if (toplevel.activated) {
+                hide();
                 return;
             }
+            toplevel.activate();
+            return;
         }
+        hide();
         show();
     }
 
@@ -89,6 +92,8 @@ FloatingWindow {
     implicitHeight: Math.round(Theme.fontSizeMedium * 51)
     color: Theme.surfaceContainer
     visible: false
+
+    onClosed: hide()
 
     onCurrentTabChanged: {
         if (visible && currentTab === 0 && searchField.visible)
