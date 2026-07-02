@@ -1228,4 +1228,13 @@ Rectangle {
         id: systemClock
         precision: SystemClock.Hours
     }
+
+    Connections {
+        target: SessionService
+
+        function onSessionResumed() {
+            systemClock.enabled = false;
+            systemClock.enabled = true;
+        }
+    }
 }

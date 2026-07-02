@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import qs.Common
+import qs.Services
 import qs.Widgets
 
 Item {
@@ -90,6 +91,15 @@ Item {
     SystemClock {
         id: systemClock
         precision: root.needsSeconds ? SystemClock.Seconds : SystemClock.Minutes
+    }
+
+    Connections {
+        target: SessionService
+
+        function onSessionResumed() {
+            systemClock.enabled = false;
+            systemClock.enabled = true;
+        }
     }
 
     Rectangle {
