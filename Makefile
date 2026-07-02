@@ -18,7 +18,7 @@ SHELL_INSTALL_DIR=$(DATA_DIR)/quickshell/dms
 ASSETS_DIR=assets
 APPLICATIONS_DIR=$(DATA_DIR)/applications
 
-.PHONY: all build clean lint-qml install install-bin install-shell install-completions install-systemd install-icon install-desktop uninstall uninstall-bin uninstall-shell uninstall-completions uninstall-systemd uninstall-icon uninstall-desktop help
+.PHONY: all build cast-helper clean lint-qml install install-bin install-cast-helper install-shell install-completions install-systemd install-icon install-desktop uninstall uninstall-bin uninstall-shell uninstall-completions uninstall-systemd uninstall-icon uninstall-desktop help
 
 all: build
 
@@ -26,6 +26,11 @@ build:
 	@echo "Building $(BINARY_NAME)..."
 	@$(MAKE) -C $(CORE_DIR) build
 	@echo "Build complete"
+
+# Opt-in: builds the go-gst screen-capture helper for the cast screen-mirror
+# feature (needs CGO + GStreamer dev packages). The main dms build stays CGO-free.
+cast-helper:
+	@$(MAKE) -C $(CORE_DIR) cast-helper
 
 clean:
 	@echo "Cleaning build artifacts..."
@@ -40,6 +45,10 @@ install-bin:
 	@echo "Installing $(BINARY_NAME) to $(INSTALL_DIR)..."
 	@install -D -m 755 $(BUILD_DIR)/$(BINARY_NAME) $(INSTALL_DIR)/$(BINARY_NAME)
 	@echo "Binary installed"
+
+# Install the cast helper alongside dms (dms locates it in the same directory).
+install-cast-helper:
+	@$(MAKE) -C $(CORE_DIR) install-cast-helper PREFIX=$(PREFIX)
 
 install-shell:
 	@echo "Installing shell files to $(SHELL_INSTALL_DIR)..."

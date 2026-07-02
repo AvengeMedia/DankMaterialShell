@@ -969,6 +969,12 @@ Column {
                     }
                     builtinInstance = Qt.binding(() => root.model?.tailscaleBuiltinInstance);
                 }
+                if (id === "builtin_chromecast") {
+                    if (root.model?.chromecastLoader) {
+                        root.model.chromecastLoader.active = true;
+                    }
+                    builtinInstance = Qt.binding(() => root.model?.chromecastBuiltinInstance);
+                }
                 if (id === "builtin_display_profiles") {
                     if (root.model?.displayProfilesLoader) {
                         root.model.displayProfilesLoader.active = true;
