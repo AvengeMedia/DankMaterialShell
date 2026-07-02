@@ -89,7 +89,7 @@ FloatingWindow {
     minimumSize: Qt.size(500, 400)
     implicitWidth: 900
     implicitHeight: screen ? Math.min(940, screen.height - 100) : 940
-    color: Theme.surfaceContainer
+    color: "transparent"
     visible: false
 
     onIsCompactModeChanged: {
@@ -169,6 +169,11 @@ FloatingWindow {
         }
     }
 
+    Rectangle {
+        anchors.fill: parent
+        color: Theme.withAlpha(Theme.surfaceContainer, SettingsData.settingsModalOpacity)
+    }
+
     FocusScope {
         id: contentFocusScope
 
@@ -193,12 +198,6 @@ FloatingWindow {
                     anchors.fill: parent
                     onPressed: windowControls.tryStartMove()
                     onDoubleClicked: windowControls.tryToggleMaximize()
-                }
-
-                Rectangle {
-                    anchors.fill: parent
-                    color: Theme.surfaceContainer
-                    opacity: 0.5
                 }
 
                 Row {

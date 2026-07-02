@@ -2063,6 +2063,20 @@ Item {
                     checked: SettingsData.modalDarkenBackground
                     onToggled: checked => SettingsData.set("modalDarkenBackground", checked)
                 }
+
+                SettingsSliderRow {
+                    tab: "theme"
+                    tags: ["modal", "settings", "transparency", "opacity", "background"]
+                    settingKey: "settingsModalOpacity"
+                    text: I18n.tr("Settings Window Opacity")
+                    description: I18n.tr("Controls opacity of the Settings window background")
+                    value: Math.round(SettingsData.settingsModalOpacity * 100)
+                    minimum: 0
+                    maximum: 100
+                    unit: "%"
+                    defaultValue: 100
+                    onSliderValueChanged: newValue => SettingsData.set("settingsModalOpacity", newValue / 100)
+                }
             }
 
             SettingsCard {
