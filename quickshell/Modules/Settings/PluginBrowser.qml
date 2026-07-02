@@ -930,7 +930,7 @@ FloatingWindow {
 
                                 Column {
                                     width: parent.width - Theme.iconSize - Theme.spacingM - installButton.width - Theme.spacingM
-                                    spacing: 2
+                                    spacing: Theme.spacingXXS
 
                                     Row {
                                         spacing: Theme.spacingXS
@@ -957,7 +957,7 @@ FloatingWindow {
                                             Row {
                                                 id: featuredRow
                                                 anchors.centerIn: parent
-                                                spacing: 2
+                                                spacing: Theme.spacingXXS
 
                                                 DankIcon {
                                                     name: "star"
@@ -1053,7 +1053,7 @@ FloatingWindow {
                                             Row {
                                                 id: upvoteRow
                                                 anchors.centerIn: parent
-                                                spacing: 2
+                                                spacing: Theme.spacingXXS
 
                                                 DankIcon {
                                                     name: "thumb_up"

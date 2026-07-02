@@ -148,7 +148,7 @@ Item {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     clip: true
-                    spacing: 4
+                    spacing: Theme.spacingXS
 
                     model: DgopService.diskMounts
 

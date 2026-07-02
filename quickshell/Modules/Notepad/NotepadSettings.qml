@@ -537,7 +537,7 @@ Item {
                         width: parent.width - Theme.spacingL * 2
                         anchors.top: shortcutsHeader.bottom
                         anchors.horizontalCenter: parent.horizontalCenter
-                        spacing: 2
+                        spacing: Theme.spacingXXS
 
                         StyledText {
                             width: parent.width

@@ -364,7 +364,7 @@ Column {
                         anchors.right: actionButtons.left
                         anchors.rightMargin: Theme.spacingM
                         anchors.verticalCenter: parent.verticalCenter
-                        spacing: 2
+                        spacing: Theme.spacingXXS
 
                         StyledText {
                             text: modelData.text
@@ -1279,7 +1279,7 @@ Column {
             Column {
                 anchors.fill: parent
                 anchors.margins: Theme.spacingS
-                spacing: 2
+                spacing: Theme.spacingXXS
 
                 Rectangle {
                     width: parent.width
@@ -1417,7 +1417,7 @@ Column {
                 id: contentColumn
                 anchors.fill: parent
                 anchors.margins: Theme.spacingS
-                spacing: 2
+                spacing: Theme.spacingXXS
 
                 Rectangle {
                     width: parent.width
@@ -1616,7 +1616,7 @@ Column {
                         anchors.right: parent.right
                         anchors.rightMargin: Theme.spacingXS
                         anchors.verticalCenter: parent.verticalCenter
-                        spacing: 2
+                        spacing: Theme.spacingXXS
 
                         DankActionButton {
                             buttonSize: 28
@@ -1681,7 +1681,7 @@ Column {
                 id: kbdLayoutCtxMenuColumn
                 anchors.fill: parent
                 anchors.margins: Theme.spacingS
-                spacing: 2
+                spacing: Theme.spacingXXS
 
                 Rectangle {
                     width: parent.width
@@ -1766,7 +1766,7 @@ Column {
                 id: focusedWindowMenuColumn
                 anchors.fill: parent
                 anchors.margins: Theme.spacingS
-                spacing: 2
+                spacing: Theme.spacingXXS
 
                 Rectangle {
                     width: parent.width
@@ -1935,7 +1935,7 @@ Column {
                 id: diskMenuColumn
                 anchors.fill: parent
                 anchors.margins: Theme.spacingS
-                spacing: 2
+                spacing: Theme.spacingXXS
 
                 Rectangle {
                     width: parent.width
@@ -2315,7 +2315,7 @@ Column {
                 id: menuColumn
                 anchors.fill: parent
                 anchors.margins: Theme.spacingS
-                spacing: 2
+                spacing: Theme.spacingXXS
 
                 Item {
                     id: controlCenterContentMetrics
@@ -2615,7 +2615,7 @@ Column {
                 id: menuPrivacyColumn
                 anchors.fill: parent
                 anchors.margins: Theme.spacingS
-                spacing: 2
+                spacing: Theme.spacingXXS
 
                 Rectangle {
                     width: parent.width
@@ -2840,7 +2840,7 @@ Column {
                 id: gpuMenuColumn
                 anchors.fill: parent
                 anchors.margins: Theme.spacingS
-                spacing: 2
+                spacing: Theme.spacingXXS
 
                 Repeater {
                     model: DgopService.availableGpus || []
@@ -2876,7 +2876,7 @@ Column {
 
                             Column {
                                 anchors.verticalCenter: parent.verticalCenter
-                                spacing: 2
+                                spacing: Theme.spacingXXS
 
                                 StyledText {
                                     text: modelData.driver ? modelData.driver.toUpperCase() : ""
@@ -2949,7 +2949,7 @@ Column {
                 id: batteryMenuColumn
                 anchors.fill: parent
                 anchors.margins: Theme.spacingS
-                spacing: 2
+                spacing: Theme.spacingXXS
 
                 Rectangle {
                     width: parent.width
@@ -3198,7 +3198,7 @@ Column {
                 id: musicMenuColumn
                 anchors.fill: parent
                 anchors.margins: Theme.spacingS
-                spacing: 2
+                spacing: Theme.spacingXXS
 
                 Repeater {
                     model: [
@@ -3315,7 +3315,7 @@ Column {
                 id: runningAppsMenuColumn
                 anchors.fill: parent
                 anchors.margins: Theme.spacingS
-                spacing: 2
+                spacing: Theme.spacingXXS
 
                 Rectangle {
                     width: parent.width

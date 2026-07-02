@@ -15,7 +15,7 @@ PluginComponent {
 
     horizontalBarPill: Component {
         Row {
-            spacing: 3
+            spacing: Theme.spacingXS
 
             DankIcon {
                 name: root.displayIcon

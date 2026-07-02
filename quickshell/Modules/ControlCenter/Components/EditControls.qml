@@ -170,7 +170,7 @@ Row {
 
                             Column {
                                 anchors.verticalCenter: parent.verticalCenter
-                                spacing: 2
+                                spacing: Theme.spacingXXS
                                 width: parent.width - Theme.iconSize * 2 - Theme.spacingM * 3
 
                                 Typography {

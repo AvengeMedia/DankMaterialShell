@@ -81,7 +81,7 @@ Item {
 
                                     Column {
                                         width: (parent.width - deleteBtn.width - Theme.spacingS) / 2
-                                        spacing: 2
+                                        spacing: Theme.spacingXXS
 
                                         StyledText {
                                             text: I18n.tr("Pattern")
@@ -100,7 +100,7 @@ Item {
 
                                     Column {
                                         width: (parent.width - deleteBtn.width - Theme.spacingS) / 2
-                                        spacing: 2
+                                        spacing: Theme.spacingXXS
 
                                         StyledText {
                                             text: I18n.tr("Replacement")
@@ -148,7 +148,7 @@ Item {
 
                                 Column {
                                     width: 120
-                                    spacing: 2
+                                    spacing: Theme.spacingXXS
 
                                     StyledText {
                                         text: I18n.tr("Type")

@@ -667,7 +667,7 @@ Item {
                                         anchors.right: parent.right
                                         anchors.top: parent.top
                                         anchors.margins: Theme.spacingS
-                                        spacing: 2
+                                        spacing: Theme.spacingXXS
 
                                         Row {
                                             width: parent.width
@@ -1246,7 +1246,7 @@ Item {
             anchors.top: passwordLayout.bottom
             anchors.topMargin: Theme.spacingS
             anchors.horizontalCenter: passwordLayout.horizontalCenter
-            spacing: 4
+            spacing: Theme.spacingXS
             opacity: DMSService.capsLockState ? 1 : 0
 
             DankIcon {
@@ -1304,7 +1304,7 @@ Item {
 
                 Row {
                     id: keyboardLayoutRow
-                    spacing: 4
+                    spacing: Theme.spacingXS
 
                     Item {
                         width: Theme.iconSize
@@ -1546,7 +1546,7 @@ Item {
             }
 
             Row {
-                spacing: 6
+                spacing: Theme.spacingXS
                 visible: WeatherService.weather.available
                 anchors.verticalCenter: parent.verticalCenter
 
@@ -1664,7 +1664,7 @@ Item {
             }
 
             Row {
-                spacing: 4
+                spacing: Theme.spacingXS
                 visible: BatteryService.batteryAvailable
                 anchors.verticalCenter: parent.verticalCenter
 

@@ -458,7 +458,7 @@ Item {
                     model: ScriptModel {
                         values: dropdownMenu.filteredOptions
                     }
-                    spacing: 2
+                    spacing: Theme.spacingXXS
 
                     interactive: true
                     flickDeceleration: 1500

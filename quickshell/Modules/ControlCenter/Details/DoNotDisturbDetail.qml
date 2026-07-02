@@ -107,7 +107,7 @@ Rectangle {
             Column {
                 anchors.verticalCenter: parent.verticalCenter
                 width: parent.width - Theme.iconSizeLarge - Theme.spacingM
-                spacing: 2
+                spacing: Theme.spacingXXS
 
                 StyledText {
                     text: I18n.tr("Silence notifications")

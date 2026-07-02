@@ -357,7 +357,7 @@ FloatingWindow {
                                 Column {
                                     id: textColumn
                                     anchors.verticalCenter: parent.verticalCenter
-                                    spacing: 2
+                                    spacing: Theme.spacingXXS
                                     width: parent.width - Theme.iconSize * 2 - Theme.spacingM * 4 + 4
 
                                     StyledText {

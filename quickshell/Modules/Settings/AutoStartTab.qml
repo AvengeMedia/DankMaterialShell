@@ -701,7 +701,7 @@ Item {
                                 Column {
                                     width: parent.width - 20 - Theme.spacingM - 24 - Theme.spacingM - Theme.spacingM - 60 - Theme.spacingM - 32 - Theme.spacingS
                                     anchors.verticalCenter: parent.verticalCenter
-                                    spacing: 2
+                                    spacing: Theme.spacingXXS
 
                                     StyledText {
                                         width: parent.width

@@ -16,7 +16,7 @@ StyledRect {
     Column {
         anchors.fill: parent
         anchors.margins: Theme.spacingS
-        spacing: 4
+        spacing: Theme.spacingXS
 
         StyledText {
             text: I18n.tr("Quick Access")

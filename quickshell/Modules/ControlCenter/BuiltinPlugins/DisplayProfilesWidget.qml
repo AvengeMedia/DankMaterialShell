@@ -234,7 +234,7 @@ PluginComponent {
 
     verticalBarPill: Component {
         Column {
-            spacing: 2
+            spacing: Theme.spacingXXS
             DankIcon {
                 name: "monitor"
                 color: Theme.primary

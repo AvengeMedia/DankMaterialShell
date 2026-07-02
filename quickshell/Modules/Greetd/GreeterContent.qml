@@ -1448,7 +1448,7 @@ Item {
 
                 Row {
                     id: keyboardLayoutRow
-                    spacing: 4
+                    spacing: Theme.spacingXS
 
                     Item {
                         width: Theme.iconSize
@@ -1518,7 +1518,7 @@ Item {
             }
 
             Row {
-                spacing: 6
+                spacing: Theme.spacingXS
                 visible: GreetdSettings.weatherEnabled && WeatherService.weather.available
                 anchors.verticalCenter: parent.verticalCenter
 
@@ -1597,7 +1597,7 @@ Item {
             }
 
             Row {
-                spacing: 4
+                spacing: Theme.spacingXS
                 visible: BatteryService.batteryAvailable
                 anchors.verticalCenter: parent.verticalCenter
 

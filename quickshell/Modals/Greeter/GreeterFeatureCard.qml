@@ -45,7 +45,7 @@ Rectangle {
 
         Column {
             anchors.horizontalCenter: parent.horizontalCenter
-            spacing: 2
+            spacing: Theme.spacingXXS
 
             StyledText {
                 text: root.title

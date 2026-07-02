@@ -930,7 +930,7 @@ Item {
 
                     Column {
                         width: parent.width
-                        spacing: 4
+                        spacing: Theme.spacingXS
                         visible: CupsService.printerNames.length > 0
 
                         Repeater {
@@ -987,7 +987,7 @@ Item {
 
                                             Column {
                                                 anchors.verticalCenter: parent.verticalCenter
-                                                spacing: 2
+                                                spacing: Theme.spacingXXS
                                                 width: parent.width - 20 - Theme.spacingS
 
                                                 StyledText {
@@ -1453,7 +1453,7 @@ Item {
                                                                 anchors.right: parent.right
                                                                 anchors.rightMargin: Theme.spacingS
                                                                 anchors.verticalCenter: parent.verticalCenter
-                                                                spacing: 4
+                                                                spacing: Theme.spacingXS
 
                                                                 Rectangle {
                                                                     width: 24
@@ -1601,7 +1601,7 @@ Item {
 
                     Column {
                         width: parent.width
-                        spacing: 4
+                        spacing: Theme.spacingXS
 
                         Repeater {
                             model: CupsService.printerClasses
@@ -1632,7 +1632,7 @@ Item {
 
                                     Column {
                                         anchors.verticalCenter: parent.verticalCenter
-                                        spacing: 2
+                                        spacing: Theme.spacingXXS
 
                                         StyledText {
                                             text: modelData.name || I18n.tr("Unknown")

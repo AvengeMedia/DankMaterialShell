@@ -154,7 +154,7 @@ Rectangle {
 
             Column {
                 id: detailsColumn
-                spacing: 2
+                spacing: Theme.spacingXXS
                 visible: !root.dense
                 width: implicitWidth
 
@@ -183,7 +183,7 @@ Rectangle {
                 Repeater {
                     model: root.values.length
                     Row {
-                        spacing: 2
+                        spacing: Theme.spacingXXS
 
                         DankIcon {
                             name: root.values[index].icon

@@ -349,7 +349,7 @@ Item {
                                 }
 
                                 Column {
-                                    spacing: 2
+                                    spacing: Theme.spacingXXS
 
                                     StyledText {
                                         text: modelData.label

@@ -13,7 +13,7 @@ Row {
 
     readonly property var availableSizes: isSlider ? [50, 75, 100] : [25, 50, 75, 100]
 
-    spacing: 2
+    spacing: Theme.spacingXXS
 
     Repeater {
         model: root.availableSizes

@@ -1250,6 +1250,7 @@ Singleton {
         return typeof SettingsData !== "undefined" ? SettingsData.fontScale : 1.0;
     }
 
+    property real spacingXXS: 2
     property real spacingXS: 4
     property real spacingS: 8
     property real spacingM: 12

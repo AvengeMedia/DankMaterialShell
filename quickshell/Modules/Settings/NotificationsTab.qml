@@ -561,7 +561,7 @@ Item {
 
                                 Column {
                                     width: parent.width
-                                    spacing: 2
+                                    spacing: Theme.spacingXXS
 
                                     StyledText {
                                         text: I18n.tr("Pattern")
@@ -584,7 +584,7 @@ Item {
 
                                     Column {
                                         width: (parent.width - Theme.spacingS * 3) / 4
-                                        spacing: 2
+                                        spacing: Theme.spacingXXS
 
                                         StyledText {
                                             text: I18n.tr("Field")
@@ -605,7 +605,7 @@ Item {
 
                                     Column {
                                         width: (parent.width - Theme.spacingS * 3) / 4
-                                        spacing: 2
+                                        spacing: Theme.spacingXXS
 
                                         StyledText {
                                             text: I18n.tr("Type")
@@ -625,7 +625,7 @@ Item {
 
                                     Column {
                                         width: (parent.width - Theme.spacingS * 3) / 4
-                                        spacing: 2
+                                        spacing: Theme.spacingXXS
 
                                         StyledText {
                                             text: I18n.tr("Action")
@@ -646,7 +646,7 @@ Item {
 
                                     Column {
                                         width: (parent.width - Theme.spacingS * 3) / 4
-                                        spacing: 2
+                                        spacing: Theme.spacingXXS
 
                                         StyledText {
                                             text: I18n.tr("Priority")

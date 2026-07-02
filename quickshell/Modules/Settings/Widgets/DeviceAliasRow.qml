@@ -48,7 +48,7 @@ Rectangle {
         Column {
             anchors.verticalCenter: parent.verticalCenter
             width: parent.width - Theme.iconSize - Theme.spacingM * 3 - buttonsRow.width
-            spacing: 2
+            spacing: Theme.spacingXXS
 
             StyledText {
                 text: root.displayedName
@@ -62,7 +62,7 @@ Rectangle {
 
             Column {
                 width: parent.width
-                spacing: 2
+                spacing: Theme.spacingXXS
 
                 Row {
                     width: parent.width

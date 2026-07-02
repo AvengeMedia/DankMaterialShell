@@ -24,7 +24,7 @@ Rectangle {
     Column {
         width: parent.width - Theme.spacingL * 2
         anchors.centerIn: parent
-        spacing: 2
+        spacing: Theme.spacingXXS
 
         StyledText {
             text: keyboardHints.enterToPaste ? I18n.tr("↑/↓: Navigate • Enter: Paste • Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help", "Keyboard hints when enter-to-paste is enabled") : I18n.tr("↑/↓: Navigate • Enter/Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help")

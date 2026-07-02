@@ -1331,7 +1331,7 @@ BasePill {
                     anchors.verticalCenter: menuContainer.popupUsesVerticalLine ? undefined : parent.verticalCenter
                     anchors.horizontalCenter: menuContainer.popupUsesVerticalLine ? parent.horizontalCenter : undefined
                     columns: menuContainer.popupUsesVerticalLine ? 1 : (root.useSingleLineOverflowPopup ? root.hiddenBarItems.length : Math.min(5, root.hiddenBarItems.length))
-                    spacing: 2
+                    spacing: Theme.spacingXXS
                     rowSpacing: 2
 
                     Repeater {

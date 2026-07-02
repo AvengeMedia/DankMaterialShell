@@ -229,7 +229,7 @@ Item {
 
                     Column {
                         width: parent.width
-                        spacing: 4
+                        spacing: Theme.spacingXS
                         visible: DMSNetworkService.vpnAvailable && DMSNetworkService.profiles.length > 0
 
                         Repeater {
@@ -290,7 +290,7 @@ Item {
                                         }
 
                                         Column {
-                                            spacing: 2
+                                            spacing: Theme.spacingXXS
                                             anchors.verticalCenter: parent.verticalCenter
                                             width: parent.width - 20 - ((canExpand ? 28 : 0) + (canDelete ? 28 : 0)) - Theme.spacingS * 4
 

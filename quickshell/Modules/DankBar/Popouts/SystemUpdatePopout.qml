@@ -351,7 +351,7 @@ DankPopout {
                             Column {
                                 anchors.verticalCenter: parent.verticalCenter
                                 width: parent.width - 64 - Theme.spacingS
-                                spacing: 2
+                                spacing: Theme.spacingXXS
 
                                 StyledText {
                                     width: parent.width
@@ -364,7 +364,7 @@ DankPopout {
 
                                 Row {
                                     width: parent.width
-                                    spacing: 4
+                                    spacing: Theme.spacingXS
 
                                     StyledText {
                                         text: {

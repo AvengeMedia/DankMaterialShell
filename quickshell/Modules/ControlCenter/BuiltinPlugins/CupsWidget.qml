@@ -274,7 +274,7 @@ PluginComponent {
                                     }
 
                                     Column {
-                                        spacing: 2
+                                        spacing: Theme.spacingXXS
                                         Layout.alignment: Qt.AlignVCenter
                                         Layout.fillWidth: true
 

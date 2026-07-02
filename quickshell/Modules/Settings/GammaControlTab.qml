@@ -636,7 +636,7 @@ Item {
                                     }
 
                                     Column {
-                                        spacing: 2
+                                        spacing: Theme.spacingXXS
                                         anchors.verticalCenter: parent.verticalCenter
 
                                         StyledText {

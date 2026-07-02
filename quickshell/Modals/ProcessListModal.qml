@@ -300,7 +300,7 @@ FloatingWindow {
                 spacing: Theme.spacingM
 
                 Row {
-                    spacing: 2
+                    spacing: Theme.spacingXXS
 
                     Repeater {
                         model: [

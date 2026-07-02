@@ -804,7 +804,7 @@ FocusScope {
                             anchors.topMargin: Theme.spacingS
                             anchors.bottomMargin: Theme.spacingS
                             visible: viewMode === "list"
-                            spacing: 2
+                            spacing: Theme.spacingXXS
                             model: folderModel
                             currentIndex: selectedIndex
                             onCurrentIndexChanged: {

@@ -135,7 +135,7 @@ Item {
 
                             Row {
                                 anchors.centerIn: parent
-                                spacing: 4
+                                spacing: Theme.spacingXS
 
                                 Rectangle {
                                     width: 32
@@ -562,7 +562,7 @@ Item {
 
                                     Row {
                                         anchors.centerIn: parent
-                                        spacing: 4
+                                        spacing: Theme.spacingXS
 
                                         Rectangle {
                                             width: 28
@@ -752,7 +752,7 @@ Item {
 
                                     Row {
                                         anchors.centerIn: parent
-                                        spacing: 4
+                                        spacing: Theme.spacingXS
 
                                         Rectangle {
                                             width: 28

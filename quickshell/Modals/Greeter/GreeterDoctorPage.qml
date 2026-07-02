@@ -209,7 +209,7 @@ Item {
 
                 Column {
                     anchors.verticalCenter: parent.verticalCenter
-                    spacing: 2
+                    spacing: Theme.spacingXXS
 
                     StyledText {
                         text: I18n.tr("System Check", "greeter doctor page title")

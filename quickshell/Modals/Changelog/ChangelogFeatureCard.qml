@@ -48,7 +48,7 @@ Rectangle {
 
         Column {
             anchors.verticalCenter: parent.verticalCenter
-            spacing: 2
+            spacing: Theme.spacingXXS
             width: parent.width - root.iconContainerSize - Theme.spacingS
 
             StyledText {

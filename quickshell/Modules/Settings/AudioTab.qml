@@ -575,7 +575,7 @@ Item {
 
                     Column {
                         width: parent.width - Theme.iconSize - Theme.spacingM - 8
-                        spacing: 4
+                        spacing: Theme.spacingXS
 
                         StyledText {
                             text: I18n.tr("Set Custom Device Name", "Audio device rename dialog title")

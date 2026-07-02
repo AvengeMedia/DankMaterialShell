@@ -248,7 +248,7 @@ Rectangle {
                     }
 
                     Column {
-                        spacing: 2
+                        spacing: Theme.spacingXXS
                         anchors.verticalCenter: parent.verticalCenter
                         width: overlayRow.width - Theme.iconSizeSmall - Theme.spacingM
 
@@ -299,7 +299,7 @@ Rectangle {
                     }
 
                     Column {
-                        spacing: 2
+                        spacing: Theme.spacingXXS
                         anchors.verticalCenter: parent.verticalCenter
                         width: privacyRow.width - Theme.iconSizeSmall - Theme.spacingM
 

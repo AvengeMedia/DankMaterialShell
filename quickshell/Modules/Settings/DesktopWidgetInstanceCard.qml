@@ -91,7 +91,7 @@ SettingsCard {
                 }
 
                 contentItem: Column {
-                    spacing: 2
+                    spacing: Theme.spacingXXS
 
                     Rectangle {
                         width: parent.width

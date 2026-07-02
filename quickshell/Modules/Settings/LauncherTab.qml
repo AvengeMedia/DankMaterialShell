@@ -127,7 +127,7 @@ Item {
                         Column {
                             width: Math.max(0, parent.width - Theme.iconSize - defaultShortcutValue.width - Theme.spacingM * 2)
                             anchors.verticalCenter: parent.verticalCenter
-                            spacing: 2
+                            spacing: Theme.spacingXXS
 
                             StyledText {
                                 text: I18n.tr("Default Launcher Shortcut")
@@ -221,7 +221,7 @@ Item {
                         Column {
                             width: Math.max(0, parent.width - Theme.iconSize - spotlightShortcutValue.width - Theme.spacingM * 2)
                             anchors.verticalCenter: parent.verticalCenter
-                            spacing: 2
+                            spacing: Theme.spacingXXS
 
                             StyledText {
                                 text: I18n.tr("Spotlight Bar Shortcut")
@@ -806,7 +806,7 @@ Item {
 
                                 Column {
                                     anchors.verticalCenter: parent.verticalCenter
-                                    spacing: 2
+                                    spacing: Theme.spacingXXS
 
                                     StyledText {
                                         text: pluginDelegate.plugin?.name ?? pluginDelegate.modelData
@@ -989,7 +989,7 @@ Item {
 
                                     Column {
                                         anchors.verticalCenter: parent.verticalCenter
-                                        spacing: 2
+                                        spacing: Theme.spacingXXS
 
                                         Row {
                                             spacing: Theme.spacingS
@@ -1244,7 +1244,7 @@ Item {
 
                                 Column {
                                     anchors.verticalCenter: parent.verticalCenter
-                                    spacing: 2
+                                    spacing: Theme.spacingXXS
 
                                     StyledText {
                                         text: modelData.name
@@ -1355,7 +1355,7 @@ Item {
 
                                 Column {
                                     anchors.verticalCenter: parent.verticalCenter
-                                    spacing: 2
+                                    spacing: Theme.spacingXXS
 
                                     StyledText {
                                         text: modelData.name
@@ -1501,7 +1501,7 @@ Item {
 
                                 Column {
                                     anchors.verticalCenter: parent.verticalCenter
-                                    spacing: 2
+                                    spacing: Theme.spacingXXS
 
                                     StyledText {
                                         text: modelData.name || I18n.tr("Unknown App")

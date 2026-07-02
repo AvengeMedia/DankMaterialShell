@@ -24,7 +24,7 @@ Rectangle {
         id: menuColumn
         anchors.fill: parent
         anchors.margins: Theme.spacingS
-        spacing: 2
+        spacing: Theme.spacingXXS
 
         DankToggle {
             width: parent.width

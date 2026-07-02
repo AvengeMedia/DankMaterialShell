@@ -40,7 +40,7 @@ StyledRect {
         Column {
             anchors.verticalCenter: parent.verticalCenter
             width: parent.width - Theme.iconSize - openButton.width - Theme.spacingM * 2
-            spacing: 2
+            spacing: Theme.spacingXXS
 
             StyledText {
                 text: root.settingLabel

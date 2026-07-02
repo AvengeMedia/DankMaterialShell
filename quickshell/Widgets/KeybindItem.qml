@@ -370,7 +370,7 @@ Item {
                 ColumnLayout {
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignVCenter
-                    spacing: 2
+                    spacing: Theme.spacingXXS
 
                     StyledText {
                         text: root.isExpanded ? (root._selectedDesc || root.bindData.action || I18n.tr("No action")) : (root.bindData.desc || root.bindData.action || I18n.tr("No action"))

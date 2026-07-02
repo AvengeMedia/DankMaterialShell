@@ -76,7 +76,7 @@ Item {
 
                     Column {
                         width: parent.width
-                        spacing: 4
+                        spacing: Theme.spacingXS
                         visible: NetworkService.ethernetDevices.length > 0
 
                         StyledText {
@@ -139,7 +139,7 @@ Item {
 
                                             Column {
                                                 anchors.verticalCenter: parent.verticalCenter
-                                                spacing: 2
+                                                spacing: Theme.spacingXXS
                                                 width: parent.width - 20 - Theme.spacingS
 
                                                 StyledText {
@@ -422,7 +422,7 @@ Item {
 
                                     Column {
                                         anchors.verticalCenter: parent.verticalCenter
-                                        spacing: 2
+                                        spacing: Theme.spacingXXS
 
                                         StyledText {
                                             text: modelData.id || I18n.tr("Unknown")

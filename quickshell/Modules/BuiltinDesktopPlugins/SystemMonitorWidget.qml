@@ -447,7 +447,7 @@ Item {
                         ColumnLayout {
                             anchors.fill: parent
                             anchors.margins: Theme.spacingS
-                            spacing: 2
+                            spacing: Theme.spacingXXS
 
                             RowLayout {
                                 Layout.fillWidth: true

@@ -711,7 +711,7 @@ Rectangle {
             rightPadding: Theme.spacingS
             bottomPadding: Theme.spacingL
             topPadding: Theme.spacingM + 2
-            spacing: 2
+            spacing: Theme.spacingXXS
 
             ProfileSection {
                 width: parent.width - parent.leftPadding - parent.rightPadding
@@ -804,7 +804,7 @@ Rectangle {
             Column {
                 id: searchResultsColumn
                 width: parent.width - parent.leftPadding - parent.rightPadding
-                spacing: 2
+                spacing: Theme.spacingXXS
                 visible: root.searchActive
 
                 Item {
@@ -859,7 +859,7 @@ Rectangle {
                             Column {
                                 width: parent.width - Theme.iconSize - Theme.spacingM
                                 anchors.verticalCenter: parent.verticalCenter
-                                spacing: 2
+                                spacing: Theme.spacingXXS
 
                                 StyledText {
                                     text: resultDelegate.modelData.label
@@ -928,7 +928,7 @@ Rectangle {
 
                     width: parent.width - parent.leftPadding - parent.rightPadding
                     visible: !root.searchActive && root.isCategoryVisible(modelData)
-                    spacing: 2
+                    spacing: Theme.spacingXXS
 
                     Rectangle {
                         width: parent.width
@@ -1035,7 +1035,7 @@ Rectangle {
                     Column {
                         id: childrenColumn
                         width: parent.width
-                        spacing: 2
+                        spacing: Theme.spacingXXS
                         visible: categoryDelegate.modelData.children !== undefined && root.isCategoryExpanded(categoryDelegate.modelData.id)
                         clip: true
 

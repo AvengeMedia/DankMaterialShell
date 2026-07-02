@@ -453,7 +453,7 @@ Item {
                         }
 
                         Column {
-                            spacing: 2
+                            spacing: Theme.spacingXXS
                             anchors.verticalCenter: parent.verticalCenter
                             width: parent.width - 40 - Theme.spacingM
 
@@ -495,7 +495,7 @@ Item {
                         }
 
                         Column {
-                            spacing: 2
+                            spacing: Theme.spacingXXS
                             anchors.verticalCenter: parent.verticalCenter
                             width: parent.width - 40 - Theme.spacingM
 
@@ -537,7 +537,7 @@ Item {
                         }
 
                         Column {
-                            spacing: 2
+                            spacing: Theme.spacingXXS
                             anchors.verticalCenter: parent.verticalCenter
                             width: parent.width - 40 - Theme.spacingM
 

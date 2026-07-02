@@ -114,7 +114,7 @@ StyledRect {
 
                         Row {
                             anchors.centerIn: parent
-                            spacing: 2
+                            spacing: Theme.spacingXXS
 
                             DankIcon {
                                 id: incompatIcon

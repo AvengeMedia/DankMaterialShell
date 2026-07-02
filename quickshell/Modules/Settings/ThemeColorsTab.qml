@@ -1415,7 +1415,7 @@ Item {
                                 width: parent.width - Theme.spacingM * 2
 
                                 Column {
-                                    spacing: 2
+                                    spacing: Theme.spacingXXS
                                     width: (parent.width - Theme.spacingL * 2) / 3
                                     anchors.verticalCenter: parent.verticalCenter
 
@@ -1450,7 +1450,7 @@ Item {
                                 }
 
                                 Column {
-                                    spacing: 2
+                                    spacing: Theme.spacingXXS
                                     width: (parent.width - Theme.spacingL * 2) / 3
                                     anchors.verticalCenter: parent.verticalCenter
 
@@ -1485,7 +1485,7 @@ Item {
                                 }
 
                                 Column {
-                                    spacing: 2
+                                    spacing: Theme.spacingXXS
                                     width: (parent.width - Theme.spacingL * 2) / 3
                                     anchors.verticalCenter: parent.verticalCenter
                                     visible: SessionData.themeModeAutoEnabled && SessionData.themeModeNextTransition

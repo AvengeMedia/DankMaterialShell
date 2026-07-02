@@ -169,7 +169,7 @@ Rectangle {
                         anchors.fill: parent
                         anchors.margins: Theme.spacingS
                         model: root.controller?.appCategories ?? []
-                        spacing: 2
+                        spacing: Theme.spacingXXS
                         clip: true
                         interactive: contentHeight > height
                         implicitHeight: contentHeight
@@ -246,7 +246,7 @@ Rectangle {
         Row {
             id: viewModeRow
             anchors.verticalCenter: parent.verticalCenter
-            spacing: 2
+            spacing: Theme.spacingXXS
             visible: root.canChangeViewMode && !root.section?.collapsed
 
             Repeater {

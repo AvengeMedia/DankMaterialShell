@@ -1572,7 +1572,7 @@ Item {
                             Component {
                                 id: rowLayout
                                 Row {
-                                    spacing: 4
+                                    spacing: Theme.spacingXS
                                     visible: loadedIcons.length > 0 || SettingsData.showWorkspaceIndex || SettingsData.showWorkspaceName || loadedHasIcon
 
                                     Item {
@@ -1759,7 +1759,7 @@ Item {
                             Component {
                                 id: columnLayout
                                 Column {
-                                    spacing: 4
+                                    spacing: Theme.spacingXS
                                     visible: loadedIcons.length > 0 || SettingsData.showWorkspaceIndex || SettingsData.showWorkspaceName || loadedHasIcon
 
                                     DankIcon {

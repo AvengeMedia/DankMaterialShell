@@ -288,7 +288,7 @@ Rectangle {
                         Row {
                             id: pinOutputRow
                             anchors.centerIn: parent
-                            spacing: 4
+                            spacing: Theme.spacingXS
 
                             DankIcon {
                                 name: "push_pin"

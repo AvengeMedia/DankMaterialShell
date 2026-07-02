@@ -425,7 +425,7 @@ FloatingWindow {
 
                             Column {
                                 width: parent.width - (hasPreview ? 180 : 48) - Theme.spacingM - installButton.width - Theme.spacingM
-                                spacing: 6
+                                spacing: Theme.spacingXS
                                 anchors.verticalCenter: parent.verticalCenter
 
                                 Row {

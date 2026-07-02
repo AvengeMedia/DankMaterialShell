@@ -134,7 +134,7 @@ Item {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     clip: true
-                    spacing: 8
+                    spacing: Theme.spacingS
 
                     model: DgopService.availableGpus
 

@@ -224,7 +224,7 @@ DankModal {
 
                     Column {
                         anchors.centerIn: parent
-                        spacing: 2
+                        spacing: Theme.spacingXXS
 
                         StyledText {
                             text: I18n.tr("Passkey:")

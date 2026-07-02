@@ -253,7 +253,7 @@ DankModal {
                     }
 
                     Row {
-                        spacing: 4
+                        spacing: Theme.spacingXS
                         anchors.right: parent.right
                         anchors.rightMargin: Theme.spacingS
                         anchors.verticalCenter: parent.verticalCenter

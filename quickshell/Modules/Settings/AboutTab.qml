@@ -642,7 +642,7 @@ Item {
                         spacing: Theme.spacingL
 
                         Column {
-                            spacing: 2
+                            spacing: Theme.spacingXXS
 
                             StyledText {
                                 text: I18n.tr("Version")
@@ -667,7 +667,7 @@ Item {
                         }
 
                         Column {
-                            spacing: 2
+                            spacing: Theme.spacingXXS
 
                             StyledText {
                                 text: I18n.tr("API")
@@ -692,7 +692,7 @@ Item {
                         }
 
                         Column {
-                            spacing: 2
+                            spacing: Theme.spacingXXS
 
                             StyledText {
                                 text: I18n.tr("Status")
@@ -702,7 +702,7 @@ Item {
                             }
 
                             Row {
-                                spacing: 4
+                                spacing: Theme.spacingXS
 
                                 Rectangle {
                                     width: 8
@@ -738,7 +738,7 @@ Item {
 
                         Flow {
                             width: parent.width
-                            spacing: 6
+                            spacing: Theme.spacingS
 
                             Repeater {
                                 model: DMSService.capabilities

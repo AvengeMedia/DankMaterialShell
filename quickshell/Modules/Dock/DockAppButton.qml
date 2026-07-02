@@ -556,7 +556,7 @@ Item {
         id: rowIndicator
 
         Row {
-            spacing: 2
+            spacing: Theme.spacingXXS
 
             Repeater {
                 model: {
@@ -614,7 +614,7 @@ Item {
         id: columnIndicator
 
         Column {
-            spacing: 2
+            spacing: Theme.spacingXXS
 
             Repeater {
                 model: {

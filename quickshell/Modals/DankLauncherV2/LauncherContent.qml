@@ -351,7 +351,7 @@ FocusScope {
                 anchors.leftMargin: Theme.spacingM
                 anchors.verticalCenter: parent.verticalCenter
                 layoutDirection: I18n.isRtl ? Qt.RightToLeft : Qt.LeftToRight
-                spacing: 2
+                spacing: Theme.spacingXXS
 
                 Repeater {
                     model: [
@@ -639,7 +639,7 @@ FocusScope {
                     Row {
                         id: typeChips
                         anchors.verticalCenter: parent.verticalCenter
-                        spacing: 2
+                        spacing: Theme.spacingXXS
                         visible: DSearchService.supportsTypeFilter
 
                         Repeater {
@@ -878,7 +878,7 @@ FocusScope {
 
                 Column {
                     anchors.verticalCenter: parent.verticalCenter
-                    spacing: 2
+                    spacing: Theme.spacingXXS
 
                     StyledText {
                         text: I18n.tr("Edit App")
@@ -915,7 +915,7 @@ FocusScope {
 
                     Column {
                         width: parent.width
-                        spacing: 4
+                        spacing: Theme.spacingXS
 
                         StyledText {
                             text: I18n.tr("Name")
@@ -935,7 +935,7 @@ FocusScope {
 
                     Column {
                         width: parent.width
-                        spacing: 4
+                        spacing: Theme.spacingXS
 
                         StyledText {
                             text: I18n.tr("Icon")
@@ -955,7 +955,7 @@ FocusScope {
 
                     Column {
                         width: parent.width
-                        spacing: 4
+                        spacing: Theme.spacingXS
 
                         StyledText {
                             text: I18n.tr("Description")
@@ -975,7 +975,7 @@ FocusScope {
 
                     Column {
                         width: parent.width
-                        spacing: 4
+                        spacing: Theme.spacingXS
 
                         StyledText {
                             text: I18n.tr("Environment Variables")
@@ -1001,7 +1001,7 @@ FocusScope {
 
                     Column {
                         width: parent.width
-                        spacing: 4
+                        spacing: Theme.spacingXS
 
                         StyledText {
                             text: I18n.tr("Extra Arguments")

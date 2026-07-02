@@ -350,7 +350,7 @@ Item {
 
                             Column {
                                 width: (parent.width - Theme.spacingL) / 2
-                                spacing: 2
+                                spacing: Theme.spacingXXS
 
                                 StyledText {
                                     text: I18n.tr("• d - Day (1-31)")
@@ -381,7 +381,7 @@ Item {
 
                             Column {
                                 width: (parent.width - Theme.spacingL) / 2
-                                spacing: 2
+                                spacing: Theme.spacingXXS
 
                                 StyledText {
                                     text: I18n.tr("• MM - Month (01-12)")
@@ -913,7 +913,7 @@ Item {
 
                                 Column {
                                     anchors.horizontalCenter: parent.horizontalCenter
-                                    spacing: 2
+                                    spacing: Theme.spacingXXS
                                     StyledText {
                                         text: I18n.tr("Feels Like")
                                         font.pixelSize: Theme.fontSizeSmall
@@ -957,7 +957,7 @@ Item {
 
                                 Column {
                                     anchors.horizontalCenter: parent.horizontalCenter
-                                    spacing: 2
+                                    spacing: Theme.spacingXXS
                                     StyledText {
                                         text: I18n.tr("Humidity")
                                         font.pixelSize: Theme.fontSizeSmall
@@ -1001,7 +1001,7 @@ Item {
 
                                 Column {
                                     anchors.horizontalCenter: parent.horizontalCenter
-                                    spacing: 2
+                                    spacing: Theme.spacingXXS
                                     StyledText {
                                         text: I18n.tr("Wind")
                                         font.pixelSize: Theme.fontSizeSmall
@@ -1058,7 +1058,7 @@ Item {
 
                                 Column {
                                     anchors.horizontalCenter: parent.horizontalCenter
-                                    spacing: 2
+                                    spacing: Theme.spacingXXS
                                     StyledText {
                                         text: I18n.tr("Pressure")
                                         font.pixelSize: Theme.fontSizeSmall
@@ -1108,7 +1108,7 @@ Item {
 
                                 Column {
                                     anchors.horizontalCenter: parent.horizontalCenter
-                                    spacing: 2
+                                    spacing: Theme.spacingXXS
                                     StyledText {
                                         text: I18n.tr("Rain Chance")
                                         font.pixelSize: Theme.fontSizeSmall
@@ -1152,7 +1152,7 @@ Item {
 
                                 Column {
                                     anchors.horizontalCenter: parent.horizontalCenter
-                                    spacing: 2
+                                    spacing: Theme.spacingXXS
                                     StyledText {
                                         text: I18n.tr("Visibility")
                                         font.pixelSize: Theme.fontSizeSmall

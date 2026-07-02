@@ -582,7 +582,7 @@ Rectangle {
                                     anchors.bottom: parent.bottom
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     anchors.bottomMargin: 3
-                                    spacing: 2
+                                    spacing: Theme.spacingXXS
                                     visible: CalendarService && CalendarService.calendarAvailable && CalendarService.hasEventsForDate(dayDate)
 
                                     Repeater {
@@ -965,7 +965,7 @@ Rectangle {
                             anchors.verticalCenter: parent.verticalCenter
                             anchors.leftMargin: (modelData && modelData.id && modelData.id.startsWith("task_")) ? 60 : (Theme.spacingS + 6)
                             anchors.rightMargin: (modelData && modelData.id && modelData.id.startsWith("task_")) ? 64 : Theme.spacingXS
-                            spacing: 2
+                            spacing: Theme.spacingXXS
                             visible: !taskItem.isEditing
 
                             StyledText {

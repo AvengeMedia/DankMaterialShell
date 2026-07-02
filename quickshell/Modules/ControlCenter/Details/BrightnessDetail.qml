@@ -226,7 +226,7 @@ Rectangle {
                         Row {
                             id: globalPinRow
                             anchors.centerIn: parent
-                            spacing: 4
+                            spacing: Theme.spacingXS
 
                             DankIcon {
                                 name: "push_pin"
@@ -304,7 +304,7 @@ Rectangle {
                                 Column {
                                     id: deviceIconColumn
                                     anchors.verticalCenter: parent.verticalCenter
-                                    spacing: 2
+                                    spacing: Theme.spacingXXS
 
                                     DankIcon {
                                         name: {
@@ -502,7 +502,7 @@ Rectangle {
 
                             Row {
                                 anchors.centerIn: parent
-                                spacing: 4
+                                spacing: Theme.spacingXS
 
                                 DankIcon {
                                     name: "show_chart"

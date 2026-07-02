@@ -447,7 +447,7 @@ DankPopout {
 
                                         Column {
                                             anchors.centerIn: parent
-                                            spacing: 2
+                                            spacing: Theme.spacingXXS
 
                                             StyledText {
                                                 text: I18n.tr("Health")
@@ -484,7 +484,7 @@ DankPopout {
 
                                         Column {
                                             anchors.centerIn: parent
-                                            spacing: 2
+                                            spacing: Theme.spacingXXS
 
                                             StyledText {
                                                 text: I18n.tr("Capacity")
@@ -513,7 +513,7 @@ DankPopout {
 
                                         Column {
                                             anchors.centerIn: parent
-                                            spacing: 2
+                                            spacing: Theme.spacingXXS
 
                                             StyledText {
                                                 text: modelData.state === UPowerDeviceState.Charging ? I18n.tr("To Full") : modelData.state === UPowerDeviceState.Discharging ? I18n.tr("Left") : ""

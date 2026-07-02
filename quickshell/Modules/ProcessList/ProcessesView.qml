@@ -299,7 +299,7 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
             clip: true
-            spacing: 2
+            spacing: Theme.spacingXXS
 
             states: [
                 State {
@@ -410,7 +410,7 @@ Item {
             anchors.fill: parent
             anchors.leftMargin: Theme.spacingS
             anchors.rightMargin: Theme.spacingS
-            spacing: 4
+            spacing: Theme.spacingXS
 
             Item {
                 Layout.fillWidth: headerItem.alignment === Text.AlignLeft

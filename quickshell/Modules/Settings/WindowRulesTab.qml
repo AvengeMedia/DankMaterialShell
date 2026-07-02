@@ -646,7 +646,7 @@ Item {
 
                                         ColumnLayout {
                                             Layout.fillWidth: true
-                                            spacing: 2
+                                            spacing: Theme.spacingXXS
 
                                             StyledText {
                                                 text: ruleDelegateItem.displayName
@@ -715,7 +715,7 @@ Item {
 
                                         RowLayout {
                                             Layout.alignment: Qt.AlignVCenter
-                                            spacing: 2
+                                            spacing: Theme.spacingXXS
 
                                             DankActionButton {
                                                 buttonSize: 28
@@ -899,7 +899,7 @@ Item {
 
                                         ColumnLayout {
                                             Layout.fillWidth: true
-                                            spacing: 2
+                                            spacing: Theme.spacingXXS
 
                                             RowLayout {
                                                 Layout.fillWidth: true

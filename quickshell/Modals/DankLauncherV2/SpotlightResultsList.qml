@@ -143,7 +143,7 @@ Item {
             Column {
                 anchors.verticalCenter: parent.verticalCenter
                 width: Math.min(420, root.width - 88)
-                spacing: 2
+                spacing: Theme.spacingXXS
 
                 StyledText {
                     width: parent.width

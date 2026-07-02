@@ -344,7 +344,7 @@ PluginComponent {
                                         anchors.right: parent.right
                                         anchors.top: parent.top
                                         anchors.margins: Theme.spacingS
-                                        spacing: 2
+                                        spacing: Theme.spacingXXS
 
                                         RowLayout {
                                             width: parent.width
@@ -419,7 +419,7 @@ PluginComponent {
                                         Column {
                                             visible: isExpanded
                                             width: parent.width
-                                            spacing: 2
+                                            spacing: Theme.spacingXXS
                                             topPadding: 4
 
                                             RowLayout {

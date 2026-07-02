@@ -194,7 +194,7 @@ Rectangle {
                 id: vpnListView
                 anchors.fill: parent
                 visible: DMSNetworkService.profiles.length > 0
-                spacing: 4
+                spacing: Theme.spacingXS
                 cacheBuffer: 200
                 clip: true
 

@@ -361,7 +361,7 @@ DankModal {
 
                     Column {
                         Layout.fillWidth: true
-                        spacing: 2
+                        spacing: Theme.spacingXXS
 
                         StyledText {
                             text: I18n.tr("New Session")
@@ -449,7 +449,7 @@ DankModal {
                                     // Info
                                     Column {
                                         Layout.fillWidth: true
-                                        spacing: 2
+                                        spacing: Theme.spacingXXS
 
                                         StyledText {
                                             text: modelData.name
@@ -601,7 +601,7 @@ DankModal {
 
                     delegate: Row {
                         required property var modelData
-                        spacing: 4
+                        spacing: Theme.spacingXS
 
                         Rectangle {
                             width: keyText.width + Theme.spacingS

@@ -430,7 +430,7 @@ Item {
 
                         Column {
                             width: parent.width
-                            spacing: 4
+                            spacing: Theme.spacingXS
                             visible: (NetworkService.wifiNetworks?.length ?? 0) > 0
 
                             Repeater {
@@ -526,7 +526,7 @@ Item {
 
                                                 Column {
                                                     anchors.verticalCenter: parent.verticalCenter
-                                                    spacing: 2
+                                                    spacing: Theme.spacingXXS
                                                     width: parent.width - 20 - Theme.spacingS
 
                                                     Row {
@@ -859,7 +859,7 @@ Item {
 
                 Column {
                     width: parent.width
-                    spacing: 4
+                    spacing: Theme.spacingXS
 
                     Repeater {
                         model: savedWifiCard.expanded ? savedWifiCard.savedNetworks : []
@@ -935,7 +935,7 @@ Item {
 
                                         Column {
                                             anchors.verticalCenter: parent.verticalCenter
-                                            spacing: 2
+                                            spacing: Theme.spacingXXS
                                             width: parent.width - 20 - Theme.spacingS
 
                                             Row {

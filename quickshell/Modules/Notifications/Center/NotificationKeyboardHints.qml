@@ -20,7 +20,7 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.margins: Theme.spacingS
-        spacing: 2
+        spacing: Theme.spacingXXS
 
         StyledText {
             text: I18n.tr("↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text")

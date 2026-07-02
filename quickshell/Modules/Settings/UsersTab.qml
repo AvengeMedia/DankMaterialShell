@@ -182,7 +182,7 @@ Item {
 
                             Column {
                                 width: parent.width - Theme.iconSize - actionButtons.width - Theme.spacingM * 3
-                                spacing: 2
+                                spacing: Theme.spacingXXS
                                 anchors.verticalCenter: parent.verticalCenter
 
                                 Row {

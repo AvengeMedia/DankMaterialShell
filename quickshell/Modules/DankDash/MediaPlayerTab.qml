@@ -455,7 +455,7 @@ Item {
 
                     Column {
                         width: parent.width
-                        spacing: 2
+                        spacing: Theme.spacingXXS
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.verticalCenterOffset: parent.height * 0.2

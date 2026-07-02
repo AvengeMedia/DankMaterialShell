@@ -202,7 +202,7 @@ FloatingWindow {
 
                                 Column {
                                     anchors.verticalCenter: parent.verticalCenter
-                                    spacing: 2
+                                    spacing: Theme.spacingXXS
                                     width: parent.width - 28 - Theme.spacingM * 3 - 24
 
                                     StyledText {
@@ -283,26 +283,31 @@ FloatingWindow {
     }
 
     function selectNext() {
-        if (filteredApps.length === 0) return;
+        if (filteredApps.length === 0)
+            return;
         keyboardNavigationActive = true;
         selectedIndex = Math.min(selectedIndex + 1, filteredApps.length - 1);
     }
 
     function selectPrevious() {
-        if (filteredApps.length === 0) return;
+        if (filteredApps.length === 0)
+            return;
         keyboardNavigationActive = true;
         selectedIndex = Math.max(selectedIndex - 1, -1);
-        if (selectedIndex === -1) keyboardNavigationActive = false;
+        if (selectedIndex === -1)
+            keyboardNavigationActive = false;
     }
 
     function selectApp() {
-        if (selectedIndex < 0 || selectedIndex >= filteredApps.length) return;
+        if (selectedIndex < 0 || selectedIndex >= filteredApps.length)
+            return;
         selectAppByIndex(selectedIndex);
     }
 
     function selectAppByIndex(idx) {
         const app = filteredApps[idx];
-        if (!app) return;
+        if (!app)
+            return;
         root.appSelected(app.id || app.execString || "");
         hide();
     }
