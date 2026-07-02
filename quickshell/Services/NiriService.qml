@@ -1161,7 +1161,7 @@ Singleton {
         const frameEnabled = typeof SettingsData !== "undefined" && SettingsData.frameEnabled;
         const frameConnectedMode = frameEnabled && SettingsData.frameMode === "connected";
         // Connected frame mode has no separate bar/frame surface to target
-        const barFrameTargetNamespace = !frameEnabled ? "dms:bar" : (frameConnectedMode ? null : "dms:frame");
+        const barFrameTargetNamespace = !frameEnabled ? (SettingsData.standaloneBarXrayAvailable ? "dms:bar" : null) : (frameConnectedMode ? null : "dms:frame");
 
         // Xray is niri's default blur, so only the off state needs a rule
         let xrayRules = "";
