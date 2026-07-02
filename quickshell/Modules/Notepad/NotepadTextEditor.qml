@@ -568,7 +568,7 @@ Column {
                                     text: index + 1
                                     font.family: textArea.font.family
                                     font.pixelSize: textArea.font.pixelSize
-                                    color: Theme.onSurface_38
+                                    color: Theme.surfaceVariantText
                                     horizontalAlignment: Text.AlignRight
                                 }
                             }
