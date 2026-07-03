@@ -255,15 +255,6 @@ FocusScope {
                         }
 
                         DankButton {
-                            text: I18n.tr("Update All")
-                            iconName: "download"
-                            enabled: DMSService.dmsAvailable && pluginsTab.pluginsWithUpdates.length > 0
-                            onClicked: {
-                                showPluginUpdatesDialog();
-                            }
-                        }
-
-                        DankButton {
                             text: PluginService.pluginDirectoryExists ? I18n.tr("Open Dir") : I18n.tr("Create Dir")
                             iconName: PluginService.pluginDirectoryExists ? "folder_open" : "create_new_folder"
                             onClicked: {
@@ -275,8 +266,22 @@ FocusScope {
                                 }
                             }
                         }
+
+                        DankButton {
+                            text: I18n.tr("Update All")
+                            iconName: "download"
+                            enabled: DMSService.dmsAvailable && pluginsTab.pluginsWithUpdates.length > 0
+                            onClicked: {
+                                showPluginUpdatesDialog();
+                            }
+                        }
                     }
                 }
+            }
+
+            PluginUpdatesDialog {
+                id: pluginUpdatesDialogItem
+                width: parent.width
             }
 
             StyledRect {
@@ -548,22 +553,7 @@ FocusScope {
             pluginBrowserLoader.item.show();
     }
 
-    LazyLoader {
-        id: pluginUpdatesDialogLoader
-        active: false
-
-        PluginUpdatesDialog {
-            id: pluginUpdatesDialogItem
-
-            Component.onCompleted: {
-                pluginUpdatesDialogItem.parentModal = pluginsTab.parentModal;
-            }
-        }
-    }
-
     function showPluginUpdatesDialog() {
-        pluginUpdatesDialogLoader.active = true;
-        if (pluginUpdatesDialogLoader.item)
-            pluginUpdatesDialogLoader.item.show(pluginsTab.pluginsWithUpdates);
+        pluginUpdatesDialogItem.show(pluginsTab.pluginsWithUpdates);
     }
 }

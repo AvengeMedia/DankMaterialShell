@@ -33,7 +33,7 @@ type Plugin struct {
 type GitClient interface {
 	PlainClone(path string, url string) error
 	Pull(path string) error
-	HasUpdates(path string) (bool, error)
+	HasUpdates(path string) (hasUpdates bool, localHash string, remoteHash string, err error)
 }
 
 type realGitClient struct{}
@@ -65,10 +65,10 @@ func (g *realGitClient) Pull(path string) error {
 	return nil
 }
 
-func (g *realGitClient) HasUpdates(path string) (bool, error) {
+func (g *realGitClient) HasUpdates(path string) (bool, string, string, error) {
 	repo, err := git.PlainOpen(path)
 	if err != nil {
-		return false, err
+		return false, "", "", err
 	}
 
 	// Fetch remote changes
@@ -76,24 +76,24 @@ func (g *realGitClient) HasUpdates(path string) (bool, error) {
 	if err != nil && err.Error() != "already up-to-date" {
 		// If fetch fails, we can't determine if there are updates
 		// Return false and the error
-		return false, err
+		return false, "", "", err
 	}
 
 	// Get the HEAD reference
 	head, err := repo.Head()
 	if err != nil {
-		return false, err
+		return false, "", "", err
 	}
 
 	// Get the remote HEAD reference (typically origin/HEAD or origin/main or origin/master)
 	remote, err := repo.Remote("origin")
 	if err != nil {
-		return false, err
+		return false, "", "", err
 	}
 
 	refs, err := remote.List(&git.ListOptions{})
 	if err != nil {
-		return false, err
+		return false, "", "", err
 	}
 
 	// Find the default branch remote ref
@@ -108,13 +108,14 @@ func (g *realGitClient) HasUpdates(path string) (bool, error) {
 		}
 	}
 
+	localHash := head.Hash().String()
 	// If we couldn't find a remote HEAD, assume no updates
 	if remoteHead == "" {
-		return false, nil
+		return false, localHash, "", nil
 	}
 
 	// Compare local HEAD with remote HEAD
-	return head.Hash().String() != remoteHead, nil
+	return localHash != remoteHead, localHash, remoteHead, nil
 }
 
 type Registry struct {

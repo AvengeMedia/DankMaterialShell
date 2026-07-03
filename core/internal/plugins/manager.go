@@ -554,35 +554,50 @@ func (m *Manager) findInDirByIDOrName(dir, idOrName string) (string, error) {
 	return "", nil
 }
 
-func (m *Manager) HasUpdates(pluginID string, plugin Plugin) (bool, error) {
+func (m *Manager) HasUpdates(pluginID string, plugin Plugin) (hasUpdates bool, diffURL string, err error) {
 	pluginPath, err := m.findInstalledPath(pluginID)
 	if err != nil {
-		return false, fmt.Errorf("failed to find plugin: %w", err)
+		return false, "", fmt.Errorf("failed to find plugin: %w", err)
 	}
 
 	if pluginPath == "" {
-		return false, fmt.Errorf("plugin not installed: %s", pluginID)
+		return false, "", fmt.Errorf("plugin not installed: %s", pluginID)
 	}
 
 	if strings.HasPrefix(pluginPath, "/etc/xdg/quickshell/dms-plugins") {
-		return false, nil
+		return false, "", nil
 	}
 
 	metaPath := pluginPath + ".meta"
 	metaExists, err := afero.Exists(m.fs, metaPath)
 	if err != nil {
-		return false, fmt.Errorf("failed to check metadata: %w", err)
+		return false, "", fmt.Errorf("failed to check metadata: %w", err)
 	}
 
+	var hasUp bool
+	var localHash, remoteHash string
 	if metaExists {
 		// Plugin is from a monorepo, check the repo directory
 		reposDir := filepath.Join(m.pluginsDir, ".repos")
 		repoName := m.getRepoName(plugin.Repo)
 		repoPath := filepath.Join(reposDir, repoName)
 
-		return m.gitClient.HasUpdates(repoPath)
+		hasUp, localHash, remoteHash, err = m.gitClient.HasUpdates(repoPath)
+	} else {
+		// Plugin is a standalone repo
+		hasUp, localHash, remoteHash, err = m.gitClient.HasUpdates(pluginPath)
 	}
 
-	// Plugin is a standalone repo
-	return m.gitClient.HasUpdates(pluginPath)
+	if err != nil {
+		return false, "", err
+	}
+
+	diffURL = plugin.Repo
+	if diffURL != "" {
+		diffURL = strings.TrimSuffix(diffURL, ".git")
+		if hasUp && len(localHash) >= 7 && len(remoteHash) >= 7 {
+			diffURL = fmt.Sprintf("%s/compare/%s...%s", diffURL, localHash[:7], remoteHash[:7])
+		}
+	}
+	return hasUp, diffURL, nil
 }

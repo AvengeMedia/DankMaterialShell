@@ -3,13 +3,9 @@ package plugins
 import (
 	"fmt"
 	"net"
-	"os"
-	"path/filepath"
-	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/plugins"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
-	git "github.com/go-git/go-git/v6"
 )
 
 func HandleListInstalled(conn net.Conn, req models.Request) {
@@ -46,13 +42,15 @@ func HandleListInstalled(conn net.Conn, req models.Request) {
 	for _, id := range installedNames {
 		if plugin, ok := pluginMap[id]; ok {
 			hasUpdate := false
-			if hasUpdates, err := manager.HasUpdates(id, plugin); err == nil {
+			diffURL := plugin.Repo
+			if hasUpdates, dURL, err := manager.HasUpdates(id, plugin); err == nil {
 				hasUpdate = hasUpdates
+				diffURL = dURL
 			}
 
 			info := pluginInfoFromPlugin(plugin)
 			info.HasUpdate = hasUpdate
-			info.DiffURL = getGitDiffURL(manager.GetPluginsDir(), plugin.ID, plugin.Repo)
+			info.DiffURL = diffURL
 			result = append(result, info)
 		} else {
 			result = append(result, PluginInfo{
@@ -66,61 +64,4 @@ func HandleListInstalled(conn net.Conn, req models.Request) {
 	SortPluginInfoByFirstParty(result)
 
 	models.Respond(conn, req.ID, result)
-}
-
-func getGitDiffURL(pluginsDir string, pluginID string, repoURL string) string {
-	if repoURL == "" {
-		return ""
-	}
-
-	repoURL = strings.TrimSuffix(repoURL, ".git")
-
-	// Standalone path
-	pluginPath := filepath.Join(pluginsDir, pluginID)
-	metaPath := pluginPath + ".meta"
-
-	// If metadata file exists, it's a monorepo
-	if _, err := os.Stat(metaPath); err == nil {
-		reposDir := filepath.Join(pluginsDir, ".repos")
-		parts := strings.Split(repoURL, "/")
-		repoName := parts[len(parts)-1]
-		pluginPath = filepath.Join(reposDir, repoName)
-	}
-
-	repo, err := git.PlainOpen(pluginPath)
-	if err != nil {
-		return repoURL
-	}
-
-	head, err := repo.Head()
-	if err != nil {
-		return repoURL
-	}
-	localHash := head.Hash().String()
-
-	remote, err := repo.Remote("origin")
-	if err != nil {
-		return repoURL
-	}
-
-	refs, err := remote.List(&git.ListOptions{})
-	if err != nil {
-		return repoURL
-	}
-
-	var remoteHead string
-	for _, ref := range refs {
-		if ref.Name().IsBranch() {
-			if ref.Name().Short() == "main" || ref.Name().Short() == "master" {
-				remoteHead = ref.Hash().String()
-				break
-			}
-		}
-	}
-
-	if remoteHead != "" && localHash != "" && localHash != remoteHead {
-		return fmt.Sprintf("%s/compare/%s...%s", repoURL, localHash[:7], remoteHead[:7])
-	}
-
-	return repoURL
 }

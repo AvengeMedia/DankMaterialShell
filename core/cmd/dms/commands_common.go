@@ -405,7 +405,7 @@ func listInstalledPlugins() error {
 	for _, id := range installedNames {
 		if plugin, ok := pluginMap[id]; ok {
 			hasUpdateStr := ""
-			if hasUpdates, err := manager.HasUpdates(id, plugin); err == nil && hasUpdates {
+			if hasUpdates, _, err := manager.HasUpdates(id, plugin); err == nil && hasUpdates {
 				hasUpdateStr = " (update available)"
 			}
 			fmt.Printf("  %s%s\n", plugin.Name, hasUpdateStr)
@@ -667,7 +667,7 @@ func checkPluginCLI(idOrName string) error {
 			return fmt.Errorf("plugin not installed: %s", plugin.Name)
 		}
 
-		hasUpdates, err := manager.HasUpdates(plugin.ID, *plugin)
+		hasUpdates, _, err := manager.HasUpdates(plugin.ID, *plugin)
 		if err != nil {
 			return fmt.Errorf("failed to check updates: %w", err)
 		}
@@ -681,7 +681,7 @@ func checkPluginCLI(idOrName string) error {
 	}
 
 	dummyPlugin := plugins.Plugin{ID: idOrName}
-	hasUpdates, err := manager.HasUpdates(idOrName, dummyPlugin)
+	hasUpdates, _, err := manager.HasUpdates(idOrName, dummyPlugin)
 	if err != nil {
 		return fmt.Errorf("failed to check updates: %w", err)
 	}
@@ -720,11 +720,11 @@ func checkAllPluginsCLI() error {
 
 		if plugin != nil {
 			name = plugin.Name
-			hasUpdates, _ = manager.HasUpdates(pluginID, *plugin)
+			hasUpdates, _, _ = manager.HasUpdates(pluginID, *plugin)
 		} else {
 			name = pluginID
 			dummyPlugin := plugins.Plugin{ID: pluginID}
-			hasUpdates, _ = manager.HasUpdates(pluginID, dummyPlugin)
+			hasUpdates, _, _ = manager.HasUpdates(pluginID, dummyPlugin)
 		}
 
 		if hasUpdates {
