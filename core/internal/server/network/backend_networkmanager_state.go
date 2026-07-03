@@ -213,6 +213,7 @@ func (b *NetworkManagerBackend) updateWiFiState() error {
 	}
 
 	var forgetSSID string
+	var doneSSID string
 
 	b.stateMutex.Lock()
 
@@ -226,6 +227,7 @@ func (b *NetworkManagerBackend) updateWiFiState() error {
 			b.state.IsConnecting = false
 			b.state.ConnectingSSID = ""
 			b.state.LastError = ""
+			doneSSID = connectingSSID
 		case failed || (disconnected && !connected):
 			log.Warnf("[updateWiFiState] Connection failed: SSID=%s, state=%d", connectingSSID, state)
 			b.state.IsConnecting = false
@@ -240,6 +242,8 @@ func (b *NetworkManagerBackend) updateWiFiState() error {
 			b.lastFailedSSID = connectingSSID
 			b.lastFailedTime = time.Now().Unix()
 			b.failedMutex.Unlock()
+
+			doneSSID = connectingSSID
 		}
 	}
 
@@ -251,6 +255,10 @@ func (b *NetworkManagerBackend) updateWiFiState() error {
 	b.state.WiFiSignal = signal
 
 	b.stateMutex.Unlock()
+
+	if doneSSID != "" {
+		b.clearCachedWiFiSecretBySSID(doneSSID)
+	}
 
 	if forgetSSID != "" {
 		log.Infof("[updateWiFiState] User cancelled authentication, removing connection profile for %s", forgetSSID)

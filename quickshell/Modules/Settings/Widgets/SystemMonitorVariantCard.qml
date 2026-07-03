@@ -94,7 +94,7 @@ Rectangle {
                     width: 32
                     height: 32
                     radius: 16
-                    color: deleteMouse.containsMouse ? Theme.error : "transparent"
+                    color: deleteMouse.containsMouse ? Theme.error : Theme.withAlpha(Theme.error, 0)
                     anchors.verticalCenter: parent.verticalCenter
 
                     DankIcon {
@@ -285,7 +285,7 @@ Rectangle {
                         height: 40
                         radius: Theme.cornerRadius
                         color: root.cfg.gpuPciId === modelData.pciId ? Theme.primarySelected : Theme.surfaceContainer
-                        border.color: root.cfg.gpuPciId === modelData.pciId ? Theme.primary : "transparent"
+                        border.color: root.cfg.gpuPciId === modelData.pciId ? Theme.primary : Theme.withAlpha(Theme.primary, 0)
                         border.width: 2
 
                         Row {

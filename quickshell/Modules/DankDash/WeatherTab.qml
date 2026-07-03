@@ -349,7 +349,7 @@ Item {
                                 }
 
                                 Column {
-                                    spacing: 2
+                                    spacing: Theme.spacingXXS
 
                                     StyledText {
                                         text: modelData.label
@@ -512,7 +512,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.right: parent.right
                         enabled: Math.abs(dateStepper.currentDate - new Date()) > 1000
-                        iconColor: enabled ? Theme.blendAlpha(Theme.surfaceText, 0.5) : "transparent"
+                        iconColor: enabled ? Theme.blendAlpha(Theme.surfaceText, 0.5) : Theme.withAlpha(Theme.blendAlpha(Theme.surfaceText, 0.5), 0)
                         iconSize: 12
                         buttonSize: 20
                         iconName: "replay"

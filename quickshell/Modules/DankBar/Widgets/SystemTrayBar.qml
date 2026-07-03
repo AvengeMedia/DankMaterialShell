@@ -507,7 +507,7 @@ BasePill {
                         height: root.trayItemSize
                         anchors.centerIn: parent
                         radius: Theme.cornerRadius
-                        color: trayItemArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
+                        color: trayItemArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0)
                         border.width: dragHandler.dragging ? 2 : 0
                         border.color: Theme.primary
                         opacity: dragHandler.dragging ? 0.8 : 1.0
@@ -640,7 +640,7 @@ BasePill {
                     height: root.trayItemSize
                     anchors.centerIn: parent
                     radius: Theme.cornerRadius
-                    color: caretArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
+                    color: caretArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0)
 
                     DankIcon {
                         anchors.centerIn: parent
@@ -713,7 +713,7 @@ BasePill {
                 x: root.isVerticalOrientation ? Math.round((parent.width - width) / 2) : (root.reverseInlineHorizontal ? parent.width - width : 0)
                 y: root.isVerticalOrientation ? (root.reverseInlineVertical ? parent.height - height : 0) : Math.round((parent.height - height) / 2)
                 radius: Theme.cornerRadius
-                color: inlineTrayItemArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
+                color: inlineTrayItemArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0)
                 opacity: root.inlineExpanded ? 1 : 0
 
                 Behavior on opacity {
@@ -833,7 +833,7 @@ BasePill {
                 height: root.trayItemSize
                 anchors.centerIn: parent
                 radius: Theme.cornerRadius
-                color: trayItemArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
+                color: trayItemArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0)
                 border.width: dragHandler.dragging ? 2 : 0
                 border.color: Theme.primary
                 opacity: dragHandler.dragging ? 0.8 : 1.0
@@ -983,7 +983,7 @@ BasePill {
                     height: root.trayItemSize
                     anchors.centerIn: parent
                     radius: Theme.cornerRadius
-                    color: caretAreaVert.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
+                    color: caretAreaVert.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0)
 
                     DankIcon {
                         anchors.centerIn: parent
@@ -1051,6 +1051,9 @@ BasePill {
         HyprlandFocusGrab {
             windows: [overflowMenu].concat(KeyboardFocus.barWindows)
             active: root.useOverflowPopup && KeyboardFocus.wantsGrab(root.menuOpen, null)
+
+            property var restoreToplevel: null
+            onActiveChanged: restoreToplevel = active ? KeyboardFocus.captureActiveToplevel() : KeyboardFocus.restoreToplevel(restoreToplevel)
         }
 
         Connections {
@@ -1328,7 +1331,7 @@ BasePill {
                     anchors.verticalCenter: menuContainer.popupUsesVerticalLine ? undefined : parent.verticalCenter
                     anchors.horizontalCenter: menuContainer.popupUsesVerticalLine ? parent.horizontalCenter : undefined
                     columns: menuContainer.popupUsesVerticalLine ? 1 : (root.useSingleLineOverflowPopup ? root.hiddenBarItems.length : Math.min(5, root.hiddenBarItems.length))
-                    spacing: 2
+                    spacing: Theme.spacingXXS
                     rowSpacing: 2
 
                     Repeater {
@@ -1538,15 +1541,11 @@ BasePill {
                 }
             }
 
-            function closeWithAction() {
-                close();
-            }
-
             Timer {
                 id: pendingActionCloseTimer
                 interval: 80
                 repeat: false
-                onTriggered: menuRoot.closeWithAction()
+                onTriggered: menuRoot.close()
             }
 
             function showSubMenu(entry) {
@@ -1599,6 +1598,9 @@ BasePill {
                 HyprlandFocusGrab {
                     windows: [menuWindow].concat(KeyboardFocus.barWindows)
                     active: KeyboardFocus.wantsGrab(menuRoot.showMenu, null)
+
+                    property var restoreToplevel: null
+                    onActiveChanged: restoreToplevel = active ? KeyboardFocus.captureActiveToplevel() : KeyboardFocus.restoreToplevel(restoreToplevel)
                 }
 
                 anchors {
@@ -1906,7 +1908,7 @@ BasePill {
                                     } else {
                                         SessionData.hideTrayId(itemKey);
                                     }
-                                    menuRoot.closeWithAction();
+                                    menuRoot.close();
                                 }
                             }
                         }
@@ -1915,7 +1917,7 @@ BasePill {
                             visible: entryStack.count === 0
                             width: parent.width
                             height: 1
-                            color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                            color: Theme.outlineHeavy
                         }
 
                         Rectangle {
@@ -1959,7 +1961,7 @@ BasePill {
                             visible: entryStack.count > 0
                             width: parent.width
                             height: 1
-                            color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                            color: Theme.outlineHeavy
                         }
 
                         Repeater {
@@ -1973,7 +1975,7 @@ BasePill {
                                 radius: menuEntry?.isSeparator ? 0 : Theme.cornerRadius
                                 color: {
                                     if (menuEntry?.isSeparator)
-                                        return Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2);
+                                        return Theme.outlineHeavy;
                                     return itemArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(Theme.surfaceContainer, 0);
                                 }
 
@@ -2102,5 +2104,54 @@ BasePill {
         if (!currentTrayMenu)
             return;
         currentTrayMenu.showForTrayItem(item, anchor, screen, atBottom, vertical ?? false, axisObj);
+    }
+
+    function _trayLayoutRoot() {
+        const contentChildren = root.visualContent?.children;
+        if (!contentChildren || contentChildren.length === 0)
+            return null;
+        const contentRoot = contentChildren[0];
+        return contentRoot?.layoutLoader?.item || null;
+    }
+
+    function _trayHitAtGlobalPoint(gx, gy) {
+        if (!root.visible || root.width <= 0 || root.height <= 0)
+            return null;
+        const local = root.mapFromItem(null, gx, gy);
+        if (local.x < 0 || local.y < 0 || local.x > root.width || local.y > root.height)
+            return null;
+        const layout = _trayLayoutRoot();
+        if (!layout)
+            return null;
+        const layoutLocal = layout.mapFromItem(null, gx, gy);
+        const children = layout.children || [];
+        for (let i = 0; i < children.length; i++) {
+            const child = children[i];
+            if (!child.visible || child.width <= 0 || child.height <= 0)
+                continue;
+            if (layoutLocal.x < child.x || layoutLocal.x >= child.x + child.width)
+                continue;
+            if (layoutLocal.y < child.y || layoutLocal.y >= child.y + child.height)
+                continue;
+            if (child.trayItem)
+                return child;
+        }
+        return null;
+    }
+
+    function hoverTriggerAtGlobalPoint(gx, gy) {
+        const hit = _trayHitAtGlobalPoint(gx, gy);
+        if (!hit?.trayItem?.hasMenu)
+            return "";
+        return "tray-" + (hit.trayItem.id || hit.itemKey || "");
+    }
+
+    function openHoverAtGlobalPoint(gx, gy) {
+        const hit = _trayHitAtGlobalPoint(gx, gy);
+        if (!hit?.trayItem?.hasMenu)
+            return false;
+        const anchor = hit.children?.length > 0 ? hit.children[0] : hit;
+        showForTrayItem(hit.trayItem, anchor, parentScreen, isAtBottom, isVerticalOrientation, axis);
+        return true;
     }
 }

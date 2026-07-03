@@ -244,7 +244,7 @@ func (p *MangoWCParser) ParseKeys() []MangoWCKeyBinding {
 			}
 			continue
 		}
-		if !strings.HasPrefix(trimmed, "bind") {
+		if !strings.HasPrefix(trimmed, "bind") && !strings.HasPrefix(trimmed, mangowcAxisBindPrefix) {
 			pendingComment = ""
 			continue
 		}
@@ -427,7 +427,7 @@ func (p *MangoWCParser) parseFileWithSource(filePath string) ([]MangoWCKeyBindin
 			continue
 		}
 
-		if !strings.HasPrefix(trimmed, "bind") {
+		if !strings.HasPrefix(trimmed, "bind") && !strings.HasPrefix(trimmed, mangowcAxisBindPrefix) {
 			pendingComment = ""
 			continue
 		}
@@ -493,7 +493,7 @@ func (p *MangoWCParser) parseDMSBindsDirectly(dmsBindsPath string) []MangoWCKeyB
 // line directly above) is the description: mango feeds inline comments to spawn
 // as argv, so DMS keeps descriptions on the line above; inline `#` is a fallback.
 func (p *MangoWCParser) getKeybindAtLineContent(line string, precedingComment string) *MangoWCKeyBinding {
-	bindMatch := regexp.MustCompile(`^(bind[lsrp]*)\s*=\s*(.+)$`)
+	bindMatch := regexp.MustCompile(`^(bind[lsrp]*|axisbind)\s*=\s*(.+)$`)
 	matches := bindMatch.FindStringSubmatch(line)
 	if len(matches) < 3 {
 		return nil
@@ -526,6 +526,12 @@ func (p *MangoWCParser) getKeybindAtLineContent(line string, precedingComment st
 	mods := strings.TrimSpace(keyFields[0])
 	key := strings.TrimSpace(keyFields[1])
 	command := strings.TrimSpace(keyFields[2])
+
+	if matches[1] == mangowcAxisBindPrefix {
+		if canonical, ok := mangowcDirectionToScroll(key); ok {
+			key = canonical
+		}
+	}
 
 	var params string
 	if len(keyFields) > 3 {

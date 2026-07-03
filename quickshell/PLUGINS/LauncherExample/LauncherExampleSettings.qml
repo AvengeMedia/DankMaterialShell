@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import qs.Common
 import qs.Widgets
 
 FocusScope {
@@ -14,7 +15,7 @@ FocusScope {
         id: settingsColumn
         anchors.fill: parent
         anchors.margins: 16
-        spacing: 16
+        spacing: Theme.spacingL
 
         Text {
             text: "Launcher Example Plugin Settings"
@@ -38,7 +39,7 @@ FocusScope {
         }
 
         Column {
-            spacing: 12
+            spacing: Theme.spacingM
             width: parent.width - 32
 
             Text {
@@ -57,7 +58,7 @@ FocusScope {
             }
 
             Row {
-                spacing: 12
+                spacing: Theme.spacingM
 
                 CheckBox {
                     id: noTriggerToggle
@@ -91,18 +92,18 @@ FocusScope {
                     }
 
                     onCheckedChanged: {
-                        saveSettings("noTrigger", checked)
+                        saveSettings("noTrigger", checked);
                         if (checked) {
-                            saveSettings("trigger", "")
+                            saveSettings("trigger", "");
                         } else {
-                            saveSettings("trigger", triggerField.text || "#")
+                            saveSettings("trigger", triggerField.text || "#");
                         }
                     }
                 }
             }
 
             Row {
-                spacing: 12
+                spacing: Theme.spacingM
                 anchors.left: parent.left
                 anchors.right: parent.right
                 visible: !noTriggerToggle.checked
@@ -124,9 +125,9 @@ FocusScope {
                     textColor: "#FFFFFF"
 
                     onTextEdited: {
-                        const newTrigger = text.trim()
-                        saveSettings("trigger", newTrigger || "#")
-                        saveSettings("noTrigger", newTrigger === "")
+                        const newTrigger = text.trim();
+                        saveSettings("trigger", newTrigger || "#");
+                        saveSettings("noTrigger", newTrigger === "");
                     }
                 }
 
@@ -146,7 +147,7 @@ FocusScope {
         }
 
         Column {
-            spacing: 8
+            spacing: Theme.spacingS
             width: parent.width - 32
 
             Text {
@@ -157,7 +158,7 @@ FocusScope {
             }
 
             Column {
-                spacing: 4
+                spacing: Theme.spacingXS
                 leftPadding: 16
 
                 Text {
@@ -187,7 +188,7 @@ FocusScope {
         }
 
         Column {
-            spacing: 8
+            spacing: Theme.spacingS
             width: parent.width - 32
 
             Text {
@@ -198,7 +199,7 @@ FocusScope {
             }
 
             Column {
-                spacing: 4
+                spacing: Theme.spacingXS
                 leftPadding: 16
                 bottomPadding: 24
 
@@ -231,14 +232,14 @@ FocusScope {
 
     function saveSettings(key, value) {
         if (pluginService) {
-            pluginService.savePluginData("launcherExample", key, value)
+            pluginService.savePluginData("launcherExample", key, value);
         }
     }
 
     function loadSettings(key, defaultValue) {
         if (pluginService) {
-            return pluginService.loadPluginData("launcherExample", key, defaultValue)
+            return pluginService.loadPluginData("launcherExample", key, defaultValue);
         }
-        return defaultValue
+        return defaultValue;
     }
 }

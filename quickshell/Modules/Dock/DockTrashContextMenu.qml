@@ -39,7 +39,7 @@ DockContextMenuBase {
     Rectangle {
         width: parent.width
         height: 1
-        color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+        color: Theme.outlineHeavy
     }
 
     DockTrashMenuItem {

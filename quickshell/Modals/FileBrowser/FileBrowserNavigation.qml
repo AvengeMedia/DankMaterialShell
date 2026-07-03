@@ -26,7 +26,7 @@ Row {
         width: 32
         height: 32
         radius: Theme.cornerRadius
-        color: (backButtonMouseArea.containsMouse || (backButtonFocused && keyboardNavigationActive)) && currentPath !== homeDir ? Theme.surfaceVariant : "transparent"
+        color: (backButtonMouseArea.containsMouse || (backButtonFocused && keyboardNavigationActive)) && currentPath !== homeDir ? Theme.surfaceVariant : Theme.withAlpha(Theme.surfaceVariant, 0)
         opacity: currentPath !== homeDir ? 1 : 0
         anchors.verticalCenter: parent.verticalCenter
 
@@ -56,8 +56,8 @@ Row {
         StyledRect {
             anchors.fill: parent
             radius: Theme.cornerRadius
-            color: pathEditMode ? Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency) : "transparent"
-            border.color: pathEditMode ? Theme.primary : "transparent"
+            color: pathEditMode ? Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency) : Theme.withAlpha(Theme.surfaceContainer, 0)
+            border.color: pathEditMode ? Theme.primary : Theme.withAlpha(Theme.primary, 0)
             border.width: pathEditMode ? 1 : 0
             visible: !pathEditMode
 

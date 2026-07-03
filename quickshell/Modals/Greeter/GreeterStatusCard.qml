@@ -18,7 +18,7 @@ Rectangle {
     radius: Theme.cornerRadius
     color: bgColor
     border.width: selected ? 2 : 0
-    border.color: selected ? iconColor : "transparent"
+    border.color: selected ? iconColor : Theme.withAlpha(iconColor, 0)
     scale: mouseArea.pressed ? 0.97 : 1
 
     Behavior on scale {

@@ -79,4 +79,6 @@ type BackendState struct {
 	IsConnectingVPN        bool
 	ConnectingVPNUUID      string
 	LastError              string
+	VPNError               string
+	VPNErrorUuid           string
 }

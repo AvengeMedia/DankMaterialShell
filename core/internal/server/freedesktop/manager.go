@@ -6,6 +6,7 @@ import (
 	"os"
 	"sync"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/AvengeMedia/DankMaterialShell/core/pkg/dbusutil"
 	"github.com/godbus/dbus/v5"
 )
@@ -94,7 +95,63 @@ func (m *Manager) initializeSettings() error {
 		return fmt.Errorf("failed to update settings state: %w", err)
 	}
 
+	go m.watchSettingsChanges()
+
 	return nil
+}
+
+func (m *Manager) watchSettingsChanges() {
+	conn, err := dbus.ConnectSessionBus()
+	if err != nil {
+		log.Warnf("color-scheme watcher: session bus connect: %v", err)
+		return
+	}
+
+	if err := conn.AddMatchSignal(
+		dbus.WithMatchInterface(dbusPortalSettingsInterface),
+		dbus.WithMatchMember("SettingChanged"),
+	); err != nil {
+		log.Warnf("Failed to watch portal settings changes: %v", err)
+		conn.Close()
+		return
+	}
+
+	signals := make(chan *dbus.Signal, 64)
+	conn.Signal(signals)
+
+	for sig := range signals {
+		if sig.Name != dbusPortalSettingsInterface+".SettingChanged" {
+			continue
+		}
+		if len(sig.Body) < 3 {
+			continue
+		}
+
+		namespace, _ := sig.Body[0].(string)
+		key, _ := sig.Body[1].(string)
+		if namespace != "org.freedesktop.appearance" || key != "color-scheme" {
+			continue
+		}
+
+		variant, ok := sig.Body[2].(dbus.Variant)
+		if !ok {
+			continue
+		}
+		colorScheme, ok := dbusutil.As[uint32](variant)
+		if !ok {
+			continue
+		}
+
+		m.stateMutex.Lock()
+		changed := m.state.Settings.ColorScheme != colorScheme || !m.state.Settings.Available
+		m.state.Settings.ColorScheme = colorScheme
+		m.state.Settings.Available = true
+		m.stateMutex.Unlock()
+
+		if changed {
+			m.NotifySubscribers()
+		}
+	}
 }
 
 func (m *Manager) updateAccountsState() error {
@@ -134,10 +191,23 @@ func (m *Manager) updateSettingsState() error {
 	var variant dbus.Variant
 	err := m.settingsObj.Call(dbusPortalSettingsInterface+".ReadOne", 0, "org.freedesktop.appearance", "color-scheme").Store(&variant)
 	if err != nil {
-		return err
+		// Older xdg-desktop-portal versions only expose the deprecated Read.
+		var nested dbus.Variant
+		if rerr := m.settingsObj.Call(dbusPortalSettingsInterface+".Read", 0, "org.freedesktop.appearance", "color-scheme").Store(&nested); rerr != nil {
+			log.Warnf("color-scheme: ReadOne (%v) and Read (%v) both failed", err, rerr)
+			return err
+		}
+		variant = nested
 	}
 
-	if colorScheme, ok := dbusutil.As[uint32](variant); ok {
+	colorScheme, ok := dbusutil.As[uint32](variant)
+	if !ok {
+		// Read double-wraps the value in a variant.
+		if inner, innerOk := variant.Value().(dbus.Variant); innerOk {
+			colorScheme, ok = dbusutil.As[uint32](inner)
+		}
+	}
+	if ok {
 		m.stateMutex.Lock()
 		m.state.Settings.ColorScheme = colorScheme
 		m.stateMutex.Unlock()

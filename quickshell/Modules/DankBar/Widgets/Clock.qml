@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import qs.Common
 import qs.Modules.Plugins
+import qs.Services
 import qs.Widgets
 
 BasePill {
@@ -325,6 +326,15 @@ BasePill {
             SystemClock {
                 id: systemClock
                 precision: SettingsData.showSeconds ? SystemClock.Seconds : SystemClock.Minutes
+            }
+
+            Connections {
+                target: SessionService
+
+                function onSessionResumed() {
+                    systemClock.enabled = false;
+                    systemClock.enabled = true;
+                }
             }
         }
     }

@@ -50,24 +50,10 @@ func HandleListInstalled(conn net.Conn, req models.Request) {
 				hasUpdate = hasUpdates
 			}
 
-			diffURL := getGitDiffURL(manager.GetPluginsDir(), plugin.ID, plugin.Repo)
-
-			result = append(result, PluginInfo{
-				ID:           plugin.ID,
-				Name:         plugin.Name,
-				Category:     plugin.Category,
-				Author:       plugin.Author,
-				Description:  plugin.Description,
-				Repo:         plugin.Repo,
-				Path:         plugin.Path,
-				Capabilities: plugin.Capabilities,
-				Compositors:  plugin.Compositors,
-				Dependencies: plugin.Dependencies,
-				FirstParty:   strings.HasPrefix(plugin.Repo, "https://github.com/AvengeMedia"),
-				HasUpdate:    hasUpdate,
-				RequiresDMS:  plugin.RequiresDMS,
-				DiffURL:      diffURL,
-			})
+			info := pluginInfoFromPlugin(plugin)
+			info.HasUpdate = hasUpdate
+			info.DiffURL = getGitDiffURL(manager.GetPluginsDir(), plugin.ID, plugin.Repo)
+			result = append(result, info)
 		} else {
 			result = append(result, PluginInfo{
 				ID:   id,

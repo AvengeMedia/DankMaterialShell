@@ -26,6 +26,8 @@ DankModal {
     property int holdActionIndex: -1
     property real holdProgress: 0
     property bool showHoldHint: false
+    property bool holdFromKeyboard: false
+    property string pendingKeyAction: ""
 
     readonly property bool needsConfirmation: SettingsData.powerActionConfirm
     readonly property int holdDurationMs: SettingsData.powerActionHoldDuration * 1000
@@ -39,6 +41,10 @@ DankModal {
 
     function startHold(action, actionIndex) {
         if (!needsConfirmation || !actionNeedsConfirm(action)) {
+            if (holdFromKeyboard) {
+                pendingKeyAction = action;
+                return;
+            }
             executeAction(action);
             return;
         }
@@ -50,6 +56,7 @@ DankModal {
     }
 
     function cancelHold() {
+        pendingKeyAction = "";
         if (holdAction === "")
             return;
         const wasHolding = holdProgress > 0;
@@ -68,8 +75,12 @@ DankModal {
             cancelHold();
             return;
         }
-        const action = holdAction;
         holdTimer.stop();
+        if (holdFromKeyboard) {
+            pendingKeyAction = holdAction;
+            return;
+        }
+        const action = holdAction;
         holdAction = "";
         holdActionIndex = -1;
         holdProgress = 0;
@@ -274,6 +285,8 @@ DankModal {
         holdActionIndex = -1;
         holdProgress = 0;
         showHoldHint = false;
+        holdFromKeyboard = false;
+        pendingKeyAction = "";
         updateVisibleActions();
         const defaultIndex = getDefaultActionIndex();
         selectedIndex = defaultIndex;
@@ -296,6 +309,7 @@ DankModal {
             event.accepted = true;
             return;
         }
+        holdFromKeyboard = true;
         if (SettingsData.powerMenuGridLayout) {
             handleGridNavigation(event, true);
         } else {
@@ -317,7 +331,16 @@ DankModal {
     function handleListNavigation(event, isPressed) {
         if (!isPressed) {
             if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_R || event.key === Qt.Key_X || event.key === Qt.Key_L || event.key === Qt.Key_S || event.key === Qt.Key_H || event.key === Qt.Key_D || (event.key === Qt.Key_P && !(event.modifiers & Qt.ControlModifier))) {
-                cancelHold();
+                if (pendingKeyAction !== "") {
+                    const action = pendingKeyAction;
+                    pendingKeyAction = "";
+                    holdAction = "";
+                    holdActionIndex = -1;
+                    holdProgress = 0;
+                    executeAction(action);
+                } else {
+                    cancelHold();
+                }
                 event.accepted = true;
             }
             return;
@@ -411,7 +434,16 @@ DankModal {
     function handleGridNavigation(event, isPressed) {
         if (!isPressed) {
             if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_R || event.key === Qt.Key_X || event.key === Qt.Key_L || event.key === Qt.Key_S || event.key === Qt.Key_H || event.key === Qt.Key_D || (event.key === Qt.Key_P && !(event.modifiers & Qt.ControlModifier))) {
-                cancelHold();
+                if (pendingKeyAction !== "") {
+                    const action = pendingKeyAction;
+                    pendingKeyAction = "";
+                    holdAction = "";
+                    holdActionIndex = -1;
+                    holdProgress = 0;
+                    executeAction(action);
+                } else {
+                    cancelHold();
+                }
                 event.accepted = true;
             }
             return;
@@ -551,12 +583,12 @@ DankModal {
                         radius: Theme.cornerRadius
                         color: {
                             if (isSelected)
-                                return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12);
+                                return Theme.primaryHover;
                             if (mouseArea.containsMouse)
-                                return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08);
-                            return Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.08);
+                                return Theme.primaryHoverLight;
+                            return Theme.surfaceHover;
                         }
-                        border.color: isSelected ? Theme.primary : "transparent"
+                        border.color: isSelected ? Theme.primary : Theme.withAlpha(Theme.primary, 0)
                         border.width: isSelected ? 2 : 0
 
                         Rectangle {
@@ -585,10 +617,10 @@ DankModal {
                                 width: parent.width * root.holdProgress
                                 color: {
                                     if (gridButtonRect.modelData === "poweroff")
-                                        return Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.3);
+                                        return Theme.errorSelected;
                                     if (gridButtonRect.modelData === "reboot")
-                                        return Qt.rgba(Theme.warning.r, Theme.warning.g, Theme.warning.b, 0.3);
-                                    return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.3);
+                                        return Theme.withAlpha(Theme.warning, 0.3);
+                                    return Theme.primarySelected;
                                 }
                             }
                         }
@@ -626,13 +658,13 @@ DankModal {
                                 width: 20
                                 height: 16
                                 radius: 4
-                                color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.1)
+                                color: Theme.onSurface_12
                                 anchors.horizontalCenter: parent.horizontalCenter
 
                                 StyledText {
                                     text: gridButtonRect.actionData.key
                                     font.pixelSize: Theme.fontSizeSmall - 1
-                                    color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6)
+                                    color: Theme.surfaceTextSecondary
                                     font.weight: Font.Medium
                                     anchors.centerIn: parent
                                 }
@@ -645,6 +677,7 @@ DankModal {
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
                             onPressed: {
+                                root.holdFromKeyboard = false;
                                 root.selectedRow = Math.floor(index / root.gridColumns);
                                 root.selectedCol = index % root.gridColumns;
                                 root.selectedIndex = index;
@@ -688,12 +721,12 @@ DankModal {
                         radius: Theme.cornerRadius
                         color: {
                             if (isSelected)
-                                return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12);
+                                return Theme.primaryHover;
                             if (listMouseArea.containsMouse)
-                                return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08);
-                            return Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.08);
+                                return Theme.primaryHoverLight;
+                            return Theme.surfaceHover;
                         }
-                        border.color: isSelected ? Theme.primary : "transparent"
+                        border.color: isSelected ? Theme.primary : Theme.withAlpha(Theme.primary, 0)
                         border.width: isSelected ? 2 : 0
 
                         Rectangle {
@@ -722,10 +755,10 @@ DankModal {
                                 width: parent.width * root.holdProgress
                                 color: {
                                     if (listButtonRect.modelData === "poweroff")
-                                        return Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.3);
+                                        return Theme.errorSelected;
                                     if (listButtonRect.modelData === "reboot")
-                                        return Qt.rgba(Theme.warning.r, Theme.warning.g, Theme.warning.b, 0.3);
-                                    return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.3);
+                                        return Theme.withAlpha(Theme.warning, 0.3);
+                                    return Theme.primarySelected;
                                 }
                             }
                         }
@@ -770,7 +803,7 @@ DankModal {
                             width: 28
                             height: 20
                             radius: 4
-                            color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.1)
+                            color: Theme.onSurface_12
                             anchors {
                                 right: parent.right
                                 rightMargin: Theme.spacingM
@@ -780,7 +813,7 @@ DankModal {
                             StyledText {
                                 text: listButtonRect.actionData.key
                                 font.pixelSize: Theme.fontSizeSmall
-                                color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6)
+                                color: Theme.surfaceTextSecondary
                                 font.weight: Font.Medium
                                 anchors.centerIn: parent
                             }
@@ -792,6 +825,7 @@ DankModal {
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
                             onPressed: {
+                                root.holdFromKeyboard = false;
                                 root.selectedIndex = index;
                                 root.startHold(modelData, index);
                             }
@@ -820,7 +854,7 @@ DankModal {
                 DankIcon {
                     name: root.showHoldHint ? "warning" : "touch_app"
                     size: Theme.fontSizeSmall
-                    color: root.showHoldHint ? Theme.warning : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6)
+                    color: root.showHoldHint ? Theme.warning : Theme.surfaceTextSecondary
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
@@ -840,7 +874,7 @@ DankModal {
                         return I18n.tr("Hold to confirm (%1s)").arg(SettingsData.powerActionHoldDuration);
                     }
                     font.pixelSize: Theme.fontSizeSmall
-                    color: root.showHoldHint ? Theme.warning : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6)
+                    color: root.showHoldHint ? Theme.warning : Theme.surfaceTextSecondary
                     anchors.verticalCenter: parent.verticalCenter
                 }
             }

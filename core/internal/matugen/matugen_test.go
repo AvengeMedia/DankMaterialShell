@@ -437,7 +437,53 @@ func TestBuildMergedConfigColorsOnly(t *testing.T) {
 
 	content := string(output)
 	assert.Contains(t, content, "[templates.dank]")
-	assert.Contains(t, content, "output_path = '"+filepath.Join(opts.StateDir, "dms-colors.json")+"'")
+	assert.Contains(t, content, "output_path = '"+opts.colorsStaging()+"'")
 	assert.NotContains(t, content, "[templates.gtk]")
 	assert.False(t, strings.Contains(content, "output_path = 'CONFIG_DIR/"), "colors-only config should not emit app template outputs")
+}
+
+func TestBuildMergedConfigSkipsMangowcWithoutActiveSession(t *testing.T) {
+	t.Setenv("MANGO_INSTANCE_SIGNATURE", "")
+
+	tempDir := t.TempDir()
+	shellDir := filepath.Join(tempDir, "shell")
+	configsDir := filepath.Join(shellDir, "matugen", "configs")
+	if err := os.MkdirAll(configsDir, 0o755); err != nil {
+		t.Fatalf("failed to create configs dir: %v", err)
+	}
+
+	if err := os.WriteFile(filepath.Join(configsDir, "base.toml"), []byte("[config]\n"), 0o644); err != nil {
+		t.Fatalf("failed to write base config: %v", err)
+	}
+	mangowcConfig := "[templates.dmsmango]\ninput_path = 'in'\noutput_path = 'out'\n"
+	if err := os.WriteFile(filepath.Join(configsDir, "mangowc.toml"), []byte(mangowcConfig), 0o644); err != nil {
+		t.Fatalf("failed to write mangowc config: %v", err)
+	}
+
+	cfgFile, err := os.CreateTemp(tempDir, "merged-*.toml")
+	if err != nil {
+		t.Fatalf("failed to create temp config: %v", err)
+	}
+	defer os.Remove(cfgFile.Name())
+	defer cfgFile.Close()
+
+	opts := &Options{
+		ShellDir:      shellDir,
+		ConfigDir:     filepath.Join(tempDir, "config"),
+		StateDir:      filepath.Join(tempDir, "state"),
+		SkipTemplates: "gtk,niri,hyprland,qt5ct,qt6ct,firefox,pywalfox,zenbrowser,vesktop,vencord,equibop,ghostty,kitty,foot,alacritty,wezterm,nvim,dgop,kcolorscheme,vscode,emacs,zed",
+	}
+
+	if err := buildMergedConfig(opts, cfgFile, filepath.Join(tempDir, "templates")); err != nil {
+		t.Fatalf("buildMergedConfig failed: %v", err)
+	}
+	if err := cfgFile.Close(); err != nil {
+		t.Fatalf("failed to close merged config: %v", err)
+	}
+
+	output, err := os.ReadFile(cfgFile.Name())
+	if err != nil {
+		t.Fatalf("failed to read merged config: %v", err)
+	}
+	assert.NotContains(t, string(output), "[templates.dmsmango]")
 }

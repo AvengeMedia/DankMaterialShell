@@ -347,9 +347,13 @@ func (p *HyprlandParser) buildDMSStatus() *HyprlandDMSStatus {
 }
 
 func (p *HyprlandParser) formatBindKey(kb *HyprlandKeyBinding) string {
+	key := kb.Key
+	if canonical, ok := hyprlandScrollToCanonical(key); ok {
+		key = canonical
+	}
 	parts := make([]string, 0, len(kb.Mods)+1)
 	parts = append(parts, kb.Mods...)
-	parts = append(parts, kb.Key)
+	parts = append(parts, key)
 	return strings.Join(parts, "+")
 }
 

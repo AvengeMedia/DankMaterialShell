@@ -24,6 +24,7 @@ Item {
     readonly property string resolvedConnectedBarSide: impl.item ? (impl.item.resolvedConnectedBarSide ?? "") : ""
     readonly property bool launcherArcExtenderActive: impl.item ? (impl.item.launcherArcExtenderActive ?? false) : false
     property bool triggerUsesOverlayLayer: false
+    property bool edgeHoverManaged: false
 
     signal dialogClosed
 
@@ -62,8 +63,8 @@ Item {
             impl.item.toggleWithMode(mode);
     }
 
-    readonly property bool useSpotlightBackend: !SettingsData.connectedFrameModeActive && SettingsData.launcherStyle === "spotlight"
-    readonly property var _desiredBackend: useSpotlightBackend ? spotlightComp : (SettingsData.connectedFrameModeActive ? connectedComp : standaloneComp)
+    readonly property bool useSpotlightBackend: !FrameTransitionState.effectiveConnectedFrameModeActive && SettingsData.launcherStyle === "spotlight"
+    readonly property var _desiredBackend: useSpotlightBackend ? spotlightComp : (FrameTransitionState.effectiveConnectedFrameModeActive ? connectedComp : standaloneComp)
     property var _resolvedBackend: null
 
     Component.onCompleted: _resolvedBackend = _desiredBackend

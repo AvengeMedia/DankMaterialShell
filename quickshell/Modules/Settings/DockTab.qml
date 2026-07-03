@@ -343,7 +343,7 @@ Item {
                             width: parent.width - selectButton.width - Theme.spacingM
                             height: 36
                             radius: Theme.cornerRadius
-                            color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.9)
+                            color: Theme.withAlpha(Theme.surfaceContainer, 0.9)
                             border.color: Theme.outlineStrong
                             border.width: 1
 

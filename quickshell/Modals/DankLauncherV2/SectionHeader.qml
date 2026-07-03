@@ -15,12 +15,14 @@ Rectangle {
     property bool canChangeViewMode: true
     property bool canCollapse: true
     property bool isSticky: false
+    property bool popupAbove: false
+    property Item popupAboveItem: null
 
     signal viewModeToggled
 
     width: parent?.width ?? 200
     height: 32
-    color: isSticky ? "transparent" : (hoverArea.containsMouse ? Theme.surfaceHover : "transparent")
+    color: isSticky ? Theme.withAlpha(Theme.surfaceHover, 0) : (hoverArea.containsMouse ? Theme.surfaceHover : Theme.withAlpha(Theme.surfaceHover, 0))
     radius: Theme.cornerRadius
 
     MouseArea {
@@ -81,7 +83,7 @@ Rectangle {
             Rectangle {
                 anchors.fill: parent
                 radius: Theme.cornerRadius
-                color: chipArea.containsMouse || categoryPopup.visible ? Theme.surfaceContainerHigh : "transparent"
+                color: chipArea.containsMouse || categoryPopup.visible ? Theme.surfaceContainerHigh : Theme.withAlpha(Theme.surfaceContainerHigh, 0)
                 border.color: categoryPopup.visible ? Theme.primary : Theme.outlineMedium
                 border.width: categoryPopup.visible ? 2 : 1
             }
@@ -122,9 +124,10 @@ Rectangle {
                     if (categoryPopup.visible) {
                         categoryPopup.close();
                     } else {
-                        const pos = categoryChip.mapToItem(Overlay.overlay, 0, 0);
-                        categoryPopup.x = pos.x;
-                        categoryPopup.y = pos.y + categoryChip.height + 4;
+                        const chipPos = categoryChip.mapToItem(Overlay.overlay, 0, 0);
+                        const abovePos = (root.popupAboveItem ?? categoryChip).mapToItem(Overlay.overlay, 0, 0);
+                        categoryPopup.x = chipPos.x;
+                        categoryPopup.y = root.popupAbove ? abovePos.y - categoryPopup.height - 4 : chipPos.y + categoryChip.height + 4;
                         categoryPopup.open();
                     }
                 }
@@ -145,7 +148,7 @@ Rectangle {
 
                 contentItem: Rectangle {
                     radius: Theme.cornerRadius
-                    color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 1)
+                    color: Theme.withAlpha(Theme.surfaceContainer, 1)
                     border.color: Theme.primary
                     border.width: 2
 
@@ -166,7 +169,7 @@ Rectangle {
                         anchors.fill: parent
                         anchors.margins: Theme.spacingS
                         model: root.controller?.appCategories ?? []
-                        spacing: 2
+                        spacing: Theme.spacingXXS
                         clip: true
                         interactive: contentHeight > height
                         implicitHeight: contentHeight
@@ -179,7 +182,7 @@ Rectangle {
                             height: 32
                             radius: Theme.cornerRadius
                             readonly property bool isCurrent: categoryChip.currentCategory === modelData
-                            color: isCurrent ? Theme.primaryHover : catArea.containsMouse ? Theme.primaryHoverLight : "transparent"
+                            color: isCurrent ? Theme.primaryHover : catArea.containsMouse ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
 
                             Row {
                                 anchors.left: parent.left
@@ -243,7 +246,7 @@ Rectangle {
         Row {
             id: viewModeRow
             anchors.verticalCenter: parent.verticalCenter
-            spacing: 2
+            spacing: Theme.spacingXXS
             visible: root.canChangeViewMode && !root.section?.collapsed
 
             Repeater {
@@ -269,7 +272,7 @@ Rectangle {
                     width: 20
                     height: 20
                     radius: 4
-                    color: root.viewMode === modelData.mode ? Theme.primaryHover : modeArea.containsMouse ? Theme.surfaceHover : "transparent"
+                    color: root.viewMode === modelData.mode ? Theme.primaryHover : modeArea.containsMouse ? Theme.surfaceHover : Theme.withAlpha(Theme.surfaceHover, 0)
 
                     DankIcon {
                         anchors.centerIn: parent
@@ -325,7 +328,7 @@ Rectangle {
         anchors.fill: parent
         anchors.rightMargin: rightContent.width + Theme.spacingS
         cursorShape: root.canCollapse ? Qt.PointingHandCursor : Qt.ArrowCursor
-        enabled: root.canCollapse
+        enabled: root.canCollapse && !leftContent.hasAppCategories
         onClicked: {
             if (root.canCollapse && root.controller && root.section) {
                 root.controller.toggleSection(root.section.id);

@@ -206,7 +206,7 @@ PluginComponent {
                 Rectangle {
                     height: 1
                     width: parent.width
-                    color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+                    color: Theme.outlineStrong
                 }
 
                 DankFlickable {
@@ -274,7 +274,7 @@ PluginComponent {
                                     }
 
                                     Column {
-                                        spacing: 2
+                                        spacing: Theme.spacingXXS
                                         Layout.alignment: Qt.AlignVCenter
                                         Layout.fillWidth: true
 

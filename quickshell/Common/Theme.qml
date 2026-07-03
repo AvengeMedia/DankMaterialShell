@@ -104,6 +104,8 @@ Singleton {
     signal matugenCompleted(string mode, string result)
     property var matugenColors: ({})
     property var _pendingGenerateParams: null
+    property int _colorsRetryCount: 0
+    property double _lastGenerateMs: 0
 
     property bool themeModeAutomationActive: false
     property bool dmsServiceWasDisconnected: true
@@ -140,7 +142,7 @@ Singleton {
 
     Component.onCompleted: {
         Quickshell.execDetached(["mkdir", "-p", stateDir]);
-        Proc.runCommand("matugenCheck", ["which", "matugen"], (output, code) => {
+        Proc.runCommand("matugenCheck", ["sh", "-c", "command -v matugen"], (output, code) => {
             matugenAvailable = (code === 0) && !envDisableMatugen;
             const isGreeterMode = (typeof SessionData !== "undefined" && SessionData.isGreeterMode);
 
@@ -461,6 +463,8 @@ Singleton {
                 "background": getMatugenColor("background", "#1a1c1e"),
                 "backgroundText": getMatugenColor("on_background", "#e3e8ef"),
                 "outline": getMatugenColor("outline", "#8e918f"),
+                "surfaceContainerLowest": getMatugenColor("surface_container_lowest", "#0e1013"),
+                "surfaceContainerLow": getMatugenColor("surface_container_low", "#181a1d"),
                 "surfaceContainer": getMatugenColor("surface_container", "#1e2023"),
                 "surfaceContainerHigh": getMatugenColor("surface_container_high", "#292b2f"),
                 "surfaceContainerHighest": getMatugenColor("surface_container_highest", "#343740"),
@@ -533,7 +537,9 @@ Singleton {
     property color background: currentThemeData.background
     property color backgroundText: currentThemeData.backgroundText
     property color outline: currentThemeData.outline
-    property color outlineVariant: currentThemeData.outlineVariant || Qt.rgba(outline.r, outline.g, outline.b, 0.6)
+    property color outlineVariant: currentThemeData.outlineVariant || withAlpha(outline, 0.6)
+    property color surfaceContainerLowest: currentThemeData.surfaceContainerLowest || blend(surfaceContainer, surface, 1.2)
+    property color surfaceContainerLow: currentThemeData.surfaceContainerLow || blend(surface, surfaceContainer, 0.667)
     property color surfaceContainer: currentThemeData.surfaceContainer
     property color surfaceContainerHigh: currentThemeData.surfaceContainerHigh
     property color surfaceContainerHighest: currentThemeData.surfaceContainerHighest || surfaceContainerHigh
@@ -544,9 +550,9 @@ Singleton {
     property color onSurface: surfaceText
     property color onSurfaceVariant: surfaceVariantText
     property color onPrimary: primaryText
-    property color onSurface_12: Qt.rgba(onSurface.r, onSurface.g, onSurface.b, 0.12)
-    property color onSurface_38: Qt.rgba(onSurface.r, onSurface.g, onSurface.b, 0.38)
-    property color onSurfaceVariant_30: Qt.rgba(onSurfaceVariant.r, onSurfaceVariant.g, onSurfaceVariant.b, 0.30)
+    property color onSurface_12: withAlpha(onSurface, 0.12)
+    property color onSurface_38: withAlpha(onSurface, 0.38)
+    property color onSurfaceVariant_30: withAlpha(onSurfaceVariant, 0.30)
 
     property color error: currentThemeData.error || "#F2B8B5"
     property color warning: currentThemeData.warning || "#FF9800"
@@ -555,32 +561,33 @@ Singleton {
     property color tempDanger: "#ff5555"
     property color success: currentThemeData.success || "#4CAF50"
 
-    property color primaryHover: Qt.rgba(primary.r, primary.g, primary.b, 0.12)
-    property color primaryHoverLight: Qt.rgba(primary.r, primary.g, primary.b, transparentBlurLayers ? 0.12 : 0.08)
-    property color primaryPressed: Qt.rgba(primary.r, primary.g, primary.b, transparentBlurLayers ? 0.24 : 0.16)
-    property color primarySelected: Qt.rgba(primary.r, primary.g, primary.b, 0.3)
-    property color primaryBackground: Qt.rgba(primary.r, primary.g, primary.b, 0.04)
+    property color primaryHover: withAlpha(primary, 0.12)
+    property color primaryHoverLight: withAlpha(primary, transparentBlurLayers ? 0.12 : 0.08)
+    property color primaryPressed: withAlpha(primary, transparentBlurLayers ? 0.24 : 0.16)
+    property color primarySelected: withAlpha(primary, 0.3)
+    property color primaryBackground: withAlpha(primary, 0.04)
 
-    property color secondaryHover: Qt.rgba(secondary.r, secondary.g, secondary.b, 0.08)
+    property color secondaryHover: withAlpha(secondary, 0.08)
 
-    property color surfaceHover: Qt.rgba(surfaceVariant.r, surfaceVariant.g, surfaceVariant.b, 0.08)
-    property color surfacePressed: Qt.rgba(surfaceVariant.r, surfaceVariant.g, surfaceVariant.b, 0.12)
-    property color surfaceSelected: Qt.rgba(surfaceVariant.r, surfaceVariant.g, surfaceVariant.b, 0.15)
-    property color surfaceLight: Qt.rgba(surfaceVariant.r, surfaceVariant.g, surfaceVariant.b, transparentBlurLayers ? 0.3 : 0.1)
-    property color surfaceVariantAlpha: Qt.rgba(surfaceVariant.r, surfaceVariant.g, surfaceVariant.b, 0.2)
+    property color surfaceHover: withAlpha(surfaceVariant, 0.08)
+    property color surfacePressed: withAlpha(surfaceVariant, 0.12)
+    property color surfaceSelected: withAlpha(surfaceVariant, 0.15)
+    property color surfaceLight: withAlpha(surfaceVariant, transparentBlurLayers ? 0.3 : 0.1)
+    property color surfaceVariantAlpha: withAlpha(surfaceVariant, 0.2)
 
-    readonly property bool blurForegroundLayers: BlurService.enabled && (typeof SettingsData === "undefined" || (SettingsData.blurForegroundLayers ?? true))
-    readonly property bool transparentBlurLayers: BlurService.enabled && !blurForegroundLayers
+    readonly property bool foregroundLayers: typeof SettingsData === "undefined" || (SettingsData.blurForegroundLayers ?? true)
+    readonly property bool blurForegroundLayers: BlurService.enabled && foregroundLayers
+    readonly property bool transparentBlurLayers: BlurService.enabled && !foregroundLayers
     readonly property color readableSurface: withAlpha(surfaceContainer, popupTransparency)
     readonly property color readableSurfaceHigh: withAlpha(surfaceContainerHigh, popupTransparency)
-    readonly property color floatingSurface: transparentBlurLayers ? "transparent" : readableSurface
-    readonly property color floatingSurfaceHigh: transparentBlurLayers ? "transparent" : readableSurfaceHigh
+    readonly property color floatingSurface: foregroundLayers ? readableSurface : withAlpha(readableSurface, 0)
+    readonly property color floatingSurfaceHigh: foregroundLayers ? readableSurfaceHigh : withAlpha(readableSurfaceHigh, 0)
     readonly property color nestedSurface: floatingSurfaceHigh
     readonly property real blurLayerOutlineOpacity: Math.max(0, Math.min(1, typeof SettingsData === "undefined" ? 0.12 : (SettingsData.blurLayerOutlineOpacity ?? 0.12)))
-    readonly property real layerOutlineOpacity: BlurService.enabled ? blurLayerOutlineOpacity : 0.08
-    readonly property int layerOutlineWidth: BlurService.enabled && layerOutlineOpacity > 0 ? 1 : 0
-    property color surfaceTextHover: Qt.rgba(surfaceText.r, surfaceText.g, surfaceText.b, 0.08)
-    property color surfaceTextAlpha: Qt.rgba(surfaceText.r, surfaceText.g, surfaceText.b, 0.3)
+    readonly property real layerOutlineOpacity: blurLayerOutlineOpacity
+    readonly property int layerOutlineWidth: layerOutlineOpacity > 0 ? 1 : 0
+    property color surfaceTextHover: withAlpha(surfaceText, 0.08)
+    property color surfaceTextAlpha: withAlpha(surfaceText, 0.3)
 
     function roleColor(mode) {
         switch (mode) {
@@ -605,6 +612,10 @@ Singleton {
             return surfaceVariant;
         case "s":
             return surface;
+        case "scll":
+            return surfaceContainerLowest;
+        case "scl":
+            return surfaceContainerLow;
         case "sc":
             return surfaceContainer;
         case "sch":
@@ -617,19 +628,23 @@ Singleton {
         case "err":
             return error;
         default:
-            return "transparent";
+            return withAlpha(surface, 0);
         }
     }
-    property color surfaceTextLight: Qt.rgba(surfaceText.r, surfaceText.g, surfaceText.b, 0.06)
-    property color surfaceTextMedium: Qt.rgba(surfaceText.r, surfaceText.g, surfaceText.b, 0.7)
+    property color surfaceTextLight: withAlpha(surfaceText, 0.06)
+    property color surfaceTextSecondary: withAlpha(surfaceText, 0.6)
+    property color surfaceTextMedium: withAlpha(surfaceText, 0.7)
 
-    property color outlineButton: Qt.rgba(outline.r, outline.g, outline.b, 0.5)
-    property color outlineLight: Qt.rgba(outline.r, outline.g, outline.b, BlurService.enabled ? Math.min(1, layerOutlineOpacity * 0.625) : 0.05)
-    property color outlineMedium: Qt.rgba(outline.r, outline.g, outline.b, layerOutlineOpacity)
-    property color outlineStrong: Qt.rgba(outline.r, outline.g, outline.b, BlurService.enabled ? Math.min(1, layerOutlineOpacity * 1.5) : 0.12)
+    property color outlineButton: withAlpha(outline, 0.5)
+    property color outlineLight: withAlpha(outline, Math.min(1, layerOutlineOpacity * 0.625))
+    property color outlineMedium: withAlpha(outline, layerOutlineOpacity)
+    property color outlineStrong: withAlpha(outline, Math.min(1, layerOutlineOpacity * 1.5))
+    property color outlineHeavy: withAlpha(outline, 0.2)
 
-    property color errorHover: Qt.rgba(error.r, error.g, error.b, 0.12)
-    property color errorPressed: Qt.rgba(error.r, error.g, error.b, 0.16)
+    property color errorHover: withAlpha(error, 0.12)
+    property color errorPressed: withAlpha(error, 0.16)
+    property color errorSelected: withAlpha(error, 0.3)
+    property color warningHover: withAlpha(warning, 0.12)
 
     readonly property color ccTileActiveBg: {
         switch (SettingsData.controlCenterTileColorMode) {
@@ -644,7 +659,7 @@ Singleton {
         }
     }
 
-    readonly property color ccTileInactiveBg: transparentBlurLayers ? withAlpha(surfaceContainerHigh, 0.16) : (blurForegroundLayers ? withAlpha(surfaceContainerHigh, Math.min(popupTransparency, 0.24)) : withAlpha(surfaceContainer, popupTransparency))
+    readonly property color ccTileInactiveBg: transparentBlurLayers ? withAlpha(surfaceContainerHigh, 0.16) : (foregroundLayers ? withAlpha(surfaceContainerHigh, BlurService.enabled ? Math.min(popupTransparency, 0.24) : popupTransparency) : withAlpha(surfaceContainer, 0))
     readonly property color ccPillInactiveBg: transparentBlurLayers ? withAlpha(surfaceContainerHigh, 0.08) : nestedSurface
     readonly property color ccPillInactiveHoverBg: transparentBlurLayers ? withAlpha(primary, 0.10) : primaryPressed
     readonly property color ccSliderTrackColor: transparentBlurLayers ? surfaceText : surfaceContainerHigh
@@ -679,13 +694,13 @@ Singleton {
     readonly property color ccTileRing: {
         switch (SettingsData.controlCenterTileColorMode) {
         case "primaryContainer":
-            return Qt.rgba(primary.r, primary.g, primary.b, 0.22);
+            return withAlpha(primary, 0.22);
         case "secondary":
-            return Qt.rgba(surfaceText.r, surfaceText.g, surfaceText.b, 0.22);
+            return withAlpha(surfaceText, 0.22);
         case "surfaceVariant":
-            return Qt.rgba(surfaceText.r, surfaceText.g, surfaceText.b, 0.22);
+            return withAlpha(surfaceText, 0.22);
         default:
-            return Qt.rgba(primaryText.r, primaryText.g, primaryText.b, 0.22);
+            return withAlpha(primaryText, 0.22);
         }
     }
 
@@ -718,11 +733,11 @@ Singleton {
     readonly property color buttonHover: {
         switch (SettingsData.buttonColorMode) {
         case "primaryContainer":
-            return Qt.rgba(primary.r, primary.g, primary.b, 0.12);
+            return withAlpha(primary, 0.12);
         case "secondary":
-            return Qt.rgba(surfaceText.r, surfaceText.g, surfaceText.b, 0.12);
+            return withAlpha(surfaceText, 0.12);
         case "surfaceVariant":
-            return Qt.rgba(surfaceText.r, surfaceText.g, surfaceText.b, 0.12);
+            return withAlpha(surfaceText, 0.12);
         default:
             return primaryHover;
         }
@@ -731,11 +746,11 @@ Singleton {
     readonly property color buttonPressed: {
         switch (SettingsData.buttonColorMode) {
         case "primaryContainer":
-            return Qt.rgba(primary.r, primary.g, primary.b, 0.16);
+            return withAlpha(primary, 0.16);
         case "secondary":
-            return Qt.rgba(surfaceText.r, surfaceText.g, surfaceText.b, 0.16);
+            return withAlpha(surfaceText, 0.16);
         case "surfaceVariant":
-            return Qt.rgba(surfaceText.r, surfaceText.g, surfaceText.b, 0.16);
+            return withAlpha(surfaceText, 0.16);
         default:
             return primaryPressed;
         }
@@ -1061,12 +1076,12 @@ Singleton {
     readonly property real connectedCornerRadius: {
         if (typeof SettingsData === "undefined")
             return 12;
-        return SettingsData.connectedFrameModeActive ? SettingsData.frameRounding : cornerRadius;
+        return FrameTransitionState.effectiveConnectedFrameModeActive ? SettingsData.frameRounding : cornerRadius;
     }
     readonly property color connectedSurfaceColor: {
         if (typeof SettingsData === "undefined")
             return withAlpha(surfaceContainer, popupTransparency);
-        return isConnectedEffect ? Qt.rgba(SettingsData.effectiveFrameColor.r, SettingsData.effectiveFrameColor.g, SettingsData.effectiveFrameColor.b, SettingsData.frameOpacity) : withAlpha(surfaceContainer, popupTransparency);
+        return isConnectedEffect ? withAlpha(SettingsData.effectiveFrameColor, SettingsData.frameOpacity) : withAlpha(surfaceContainer, popupTransparency);
     }
     readonly property real connectedSurfaceRadius: isConnectedEffect ? connectedCornerRadius : cornerRadius
     readonly property bool connectedSurfaceBlurEnabled: (typeof SettingsData === "undefined") ? true : (!isConnectedEffect || SettingsData.frameBlurEnabled)
@@ -1235,6 +1250,7 @@ Singleton {
         return typeof SettingsData !== "undefined" ? SettingsData.fontScale : 1.0;
     }
 
+    property real spacingXXS: 2
     property real spacingXS: 4
     property real spacingS: 8
     property real spacingM: 12
@@ -1466,7 +1482,7 @@ Singleton {
     property string currentThemeName: currentTheme
 
     function panelBackground() {
-        return Qt.rgba(surfaceContainer.r, surfaceContainer.g, surfaceContainer.b, panelTransparency);
+        return withAlpha(surfaceContainer, panelTransparency);
     }
 
     property real notepadTransparency: SettingsData.notepadTransparencyOverride >= 0 ? SettingsData.notepadTransparencyOverride : popupTransparency
@@ -1771,6 +1787,7 @@ Singleton {
         if (!matugenAvailable || isGreeterMode)
             return;
 
+        _lastGenerateMs = Date.now();
         _pendingGenerateParams = true;
         _themeGenerateDebounce.restart();
     }
@@ -1810,19 +1827,21 @@ Singleton {
                         const storedLight = isGreeterMode ? (GreetdSettings.registryThemeVariants[themeId]?.light || lightDefaults) : (typeof SettingsData !== "undefined" ? SettingsData.getRegistryThemeMultiVariant(themeId, lightDefaults, "light") : lightDefaults);
                         const darkFlavorId = storedDark.flavor || darkDefaults.flavor || "";
                         const lightFlavorId = storedLight.flavor || lightDefaults.flavor || "";
-                        const accentId = storedDark.accent || darkDefaults.accent || "";
+                        const darkAccentId = storedDark.accent || darkDefaults.accent || "";
+                        const lightAccentId = storedLight.accent || lightDefaults.accent || "";
                         const darkFlavor = findVariant(customThemeRawData.variants.flavors, darkFlavorId);
                         const lightFlavor = findVariant(customThemeRawData.variants.flavors, lightFlavorId);
-                        const accent = findAccent(customThemeRawData.variants.accents, accentId);
+                        const darkAccent = findAccent(customThemeRawData.variants.accents, darkAccentId);
+                        const lightAccent = findAccent(customThemeRawData.variants.accents, lightAccentId);
                         if (darkFlavor) {
                             darkTheme = mergeColors(darkTheme, darkFlavor.dark || {});
-                            if (accent)
-                                darkTheme = mergeColors(darkTheme, accent[darkFlavor.id] || {});
+                            if (darkAccent)
+                                darkTheme = mergeColors(darkTheme, darkAccent[darkFlavor.id] || {});
                         }
                         if (lightFlavor) {
                             lightTheme = mergeColors(lightTheme, lightFlavor.light || {});
-                            if (accent)
-                                lightTheme = mergeColors(lightTheme, accent[lightFlavor.id] || {});
+                            if (lightAccent)
+                                lightTheme = mergeColors(lightTheme, lightAccent[lightFlavor.id] || {});
                         }
                     } else if (customThemeRawData.variants.options) {
                         const isGreeterMode = typeof SessionData !== "undefined" && SessionData.isGreeterMode;
@@ -1975,6 +1994,8 @@ Singleton {
     }
 
     function withAlpha(c, a) {
+        if (!c || c.r === undefined)
+            return Qt.rgba(0, 0, 0, 0);
         return Qt.rgba(c.r, c.g, c.b, a);
     }
 
@@ -1985,6 +2006,8 @@ Singleton {
     }
 
     function blendAlpha(c, a) {
+        if (!c || c.r === undefined)
+            return Qt.rgba(0, 0, 0, 0);
         return Qt.rgba(c.r, c.g, c.b, c.a * a);
     }
 
@@ -2012,6 +2035,23 @@ Singleton {
             return Image.Pad;
         default:
             return Image.PreserveAspectCrop;
+        }
+    }
+
+    // Returns numeric fillMode value for shader use (matches shader calculateUV logic)
+    function getShaderFillMode(modeName) {
+        switch (modeName) {
+        case "Stretch": return 0;
+        case "Fit":
+        case "PreserveAspectFit": return 1;
+        case "Fill":
+        case "PreserveAspectCrop": return 2;
+        case "Tile": return 3;
+        case "TileVertically": return 4;
+        case "TileHorizontally": return 5;
+        case "Pad": return 6;
+        case "Scrolling": return 7;
+        default: return 2;
         }
     }
 
@@ -2200,6 +2240,7 @@ Singleton {
         }
 
         onLoaded: {
+            _colorsRetryCount = 0;
             if (currentTheme === dynamic)
                 colorsFileLoadFailed = false;
             parseAndLoadColors();
@@ -2210,20 +2251,41 @@ Singleton {
         }
 
         onLoadFailed: function (error) {
-            if (currentTheme === dynamic) {
-                log.warn("Dynamic colors file load failed, marking for regeneration");
-                colorsFileLoadFailed = true;
-                const isGreeterMode = (typeof SessionData !== "undefined" && SessionData.isGreeterMode);
-                if (!isGreeterMode && matugenAvailable && rawWallpaperPath) {
-                    log.debug("Matugen available, triggering immediate regeneration");
-                    generateSystemThemesFromCurrentTheme();
-                }
+            if (currentTheme !== dynamic)
+                return;
+
+            if (SessionData.isGreeterMode)
+                return;
+
+            if (workerRunning) {
+                colorsReloadRetry.restart();
+                return;
+            }
+
+            if (_colorsRetryCount < 3) {
+                _colorsRetryCount++;
+                colorsReloadRetry.restart();
+                return;
+            }
+
+            colorsFileLoadFailed = true;
+            const stale = Date.now() - _lastGenerateMs > 5000;
+            if (matugenAvailable && rawWallpaperPath && stale) {
+                log.debug("Dynamic colors unrecoverable, regenerating");
+                generateSystemThemesFromCurrentTheme();
             }
         }
 
         onPathChanged: {
             colorsFileLoadFailed = false;
         }
+    }
+
+    Timer {
+        id: colorsReloadRetry
+        interval: 150
+        repeat: false
+        onTriggered: dynamicColorsFileView.reload()
     }
 
     IpcHandler {

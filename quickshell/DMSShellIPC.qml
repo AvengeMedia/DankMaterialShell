@@ -269,13 +269,13 @@ Item {
         function resolveTabIndex(tab: string): int {
             switch ((tab || "").toLowerCase()) {
             case "media":
-                return 1;
+                return SettingsData.dashTabIndexForId("media");
             case "wallpaper":
-                return 2;
+                return SettingsData.dashTabIndexForId("wallpaper");
             case "weather":
-                return SettingsData.weatherEnabled ? 3 : 0;
+                return SettingsData.dashTabIndexForId("weather");
             default:
-                return 0;
+                return SettingsData.dashTabIndexForId("overview");
             }
         }
 

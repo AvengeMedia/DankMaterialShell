@@ -6,6 +6,16 @@ import qs.Widgets
 Row {
     id: root
 
+    function checkParentDisablesTransparency() {
+        let p = parent;
+        while (p) {
+            if (p.disablePopupTransparency === true)
+                return true;
+            p = p.parent;
+        }
+        return false;
+    }
+
     property var model: []
     property int currentIndex: -1
     property string selectionMode: "single"
@@ -20,6 +30,7 @@ Row {
     property int checkIconSize: size === "small" ? Theme.iconSizeSmall - 2 : Theme.iconSizeSmall
     property int textSize: size === "small" ? Theme.fontSizeSmall : Theme.fontSizeMedium
     property bool userInteracted: false
+    property bool usePopupTransparency: !checkParentDisablesTransparency()
 
     signal selectionChanged(int index, bool selected)
     signal animationCompleted
@@ -90,7 +101,7 @@ Row {
             width: Math.max(contentItem.implicitWidth + root.buttonPadding * 2, root.minButtonWidth) + (selected ? 4 : 0)
             height: root.buttonHeight
 
-            color: selected ? Theme.buttonBg : Theme.withAlpha(Theme.surfaceVariant, Theme.popupTransparency)
+            color: selected ? Theme.buttonBg : (root.usePopupTransparency ? Theme.withAlpha(Theme.surfaceVariant, Theme.popupTransparency) : Theme.surfaceVariant)
             border.color: "transparent"
             border.width: 0
 

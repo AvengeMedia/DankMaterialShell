@@ -24,6 +24,7 @@ jobs:
   check-updates:
     name: Check for updates
     runs-on: ubuntu-latest
+    if: github.repository == 'AvengeMedia/DankMaterialShell'
 
     outputs:
       has_updates: ${{ steps.check.outputs.has_updates }}

@@ -5,7 +5,7 @@ import QtQuick.Layouts
 import Quickshell.Io
 import qs.Common
 import qs.Modals.Common
-import qs.Modals.FileBrowser
+import qs.Services
 import qs.Widgets
 import qs.Modules.Settings.Widgets
 
@@ -83,19 +83,6 @@ Item {
         id: greeterActionConfirm
     }
 
-    FileBrowserModal {
-        id: greeterWallpaperBrowserModal
-        browserTitle: I18n.tr("Select greeter background image")
-        browserIcon: "wallpaper"
-        browserType: "wallpaper"
-        showHiddenFiles: true
-        fileExtensions: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp", "*.jxl", "*.avif", "*.heif"]
-        onFileSelected: path => {
-            SettingsData.set("greeterWallpaperPath", path);
-            close();
-        }
-    }
-
     property string greeterStatusText: ""
     property bool greeterStatusRunning: false
     property bool greeterSyncRunning: false
@@ -107,8 +94,6 @@ Item {
     property string greeterSudoProbeStderr: ""
     property string greeterTerminalFallbackStderr: ""
     property bool greeterTerminalFallbackFromPrecheck: false
-    property var cachedFontFamilies: []
-    property bool fontsEnumerated: false
     property bool greeterBinaryExists: false
     property bool greeterEnabled: false
     readonly property bool greeterInstalled: greeterBinaryExists || greeterEnabled
@@ -201,26 +186,8 @@ Item {
         greeterTerminalFallbackProcess.running = true;
     }
 
-    function enumerateFonts() {
-        if (fontsEnumerated)
-            return;
-        var fonts = [];
-        var availableFonts = Qt.fontFamilies();
-        for (var i = 0; i < availableFonts.length; i++) {
-            var fontName = availableFonts[i];
-            if (fontName.startsWith("."))
-                continue;
-            fonts.push(fontName);
-        }
-        fonts.sort();
-        fonts.unshift("Default");
-        cachedFontFamilies = fonts;
-        fontsEnumerated = true;
-    }
-
     Component.onCompleted: {
         refreshAuthDetection();
-        Qt.callLater(enumerateFonts);
         Qt.callLater(checkGreeterInstallState);
     }
 
@@ -302,6 +269,8 @@ Item {
                 if (err !== "")
                     success = success + "\n\nstderr:\n" + err;
                 root.greeterStatusText = success;
+                SettingsData.clearGreeterSyncPending();
+                ToastService.showInfo(I18n.tr("Greeter sync complete"));
             } else {
                 var failure = I18n.tr("Sync failed in background mode. Trying terminal mode so you can authenticate interactively.") + " (exit " + exitCode + ")";
                 if (out !== "")
@@ -353,6 +322,7 @@ Item {
             if (exitCode === 0) {
                 var launched = root.greeterTerminalFallbackFromPrecheck ? I18n.tr("Terminal opened. Complete sync authentication there; it will close automatically when done.") : I18n.tr("Terminal fallback opened. Complete sync there; it will close automatically when done.");
                 root.greeterStatusText = root.greeterStatusText ? root.greeterStatusText + "\n\n" + launched : launched;
+                SettingsData.clearGreeterSyncPending();
                 return;
             }
             var fallback = I18n.tr("Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.") + " (exit " + exitCode + ")";
@@ -424,12 +394,11 @@ Item {
             label: I18n.tr("Full Day & Month", "date format option")
         }
     ]
-    readonly property var _wallpaperFillModes: ["Stretch", "Fit", "Fill", "Tile", "TileVertically", "TileHorizontally", "Pad"]
 
     DankFlickable {
         anchors.fill: parent
         clip: true
-        contentHeight: mainColumn.height + Theme.spacingXL
+        contentHeight: mainColumn.height + Theme.spacingXL + (syncPendingPill.shown ? syncPendingPill.height + Theme.spacingL : 0)
         contentWidth: width
 
         Column {
@@ -446,7 +415,7 @@ Item {
                 settingKey: "greeterStatus"
 
                 StyledText {
-                    text: I18n.tr("Check sync status on demand. Sync (full) is for the main admin: it copies your theme to the login screen and sets up system greeter config. On multi-user systems, add other accounts in Settings → Users, then have each of them run dms greeter sync --profile after logging out and back in—not full sync. Authentication changes apply automatically.")
+                    text: I18n.tr("Sync applies your theme and settings to the login screen. Other users should run dms greeter sync --profile instead of a full sync. Authentication changes apply automatically.")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceVariantText
                     width: parent.width
@@ -567,22 +536,13 @@ Item {
                     topPadding: Theme.spacingM
                 }
 
-                SettingsDropdownRow {
+                SettingsFontDropdownRow {
                     settingKey: "greeterFontFamily"
                     tags: ["greeter", "font", "typography"]
                     text: I18n.tr("Greeter font")
                     description: I18n.tr("Font used on the login screen")
-                    options: root.fontsEnumerated ? root.cachedFontFamilies : ["Default"]
-                    currentValue: (!SettingsData.greeterFontFamily || SettingsData.greeterFontFamily === "" || SettingsData.greeterFontFamily === Theme.defaultFontFamily) ? "Default" : (SettingsData.greeterFontFamily || "Default")
-                    enableFuzzySearch: true
-                    popupWidthOffset: 100
-                    maxPopupHeight: 400
-                    onValueChanged: value => {
-                        if (value === "Default")
-                            SettingsData.set("greeterFontFamily", "");
-                        else
-                            SettingsData.set("greeterFontFamily", value);
-                    }
+                    currentFont: SettingsData.greeterFontFamily || ""
+                    onFontSelected: family => SettingsData.set("greeterFontFamily", family)
                 }
 
                 StyledText {
@@ -660,55 +620,16 @@ Item {
                     wrapMode: Text.Wrap
                 }
 
-                Row {
+                SettingsWallpaperPicker {
                     width: parent.width
-                    spacing: Theme.spacingS
-
-                    DankTextField {
-                        id: greeterWallpaperPathField
-                        width: parent.width - browseGreeterWallpaperButton.width - Theme.spacingS
-                        placeholderText: I18n.tr("Use desktop wallpaper")
-                        text: SettingsData.greeterWallpaperPath
-                        backgroundColor: Theme.surfaceContainerHighest
-                        onTextChanged: {
-                            if (text !== SettingsData.greeterWallpaperPath)
-                                SettingsData.set("greeterWallpaperPath", text);
-                        }
-                    }
-
-                    DankButton {
-                        id: browseGreeterWallpaperButton
-                        text: I18n.tr("Browse")
-                        horizontalPadding: Theme.spacingL
-                        onClicked: greeterWallpaperBrowserModal.open()
-                    }
-                }
-
-                SettingsDropdownRow {
-                    settingKey: "greeterWallpaperFillMode"
-                    tags: ["greeter", "wallpaper", "background", "fill"]
-                    text: I18n.tr("Wallpaper fill mode")
-                    description: I18n.tr("How the background image is scaled")
-                    options: root._wallpaperFillModes.map(m => I18n.tr(m, "wallpaper fill mode"))
-                    currentValue: {
-                        var mode = (SettingsData.greeterWallpaperFillMode && SettingsData.greeterWallpaperFillMode !== "") ? SettingsData.greeterWallpaperFillMode : (SettingsData.wallpaperFillMode || "Fill");
-                        var idx = root._wallpaperFillModes.indexOf(mode);
-                        return idx >= 0 ? I18n.tr(root._wallpaperFillModes[idx], "wallpaper fill mode") : I18n.tr("Fill", "wallpaper fill mode");
-                    }
-                    onValueChanged: value => {
-                        var idx = root._wallpaperFillModes.map(m => I18n.tr(m, "wallpaper fill mode")).indexOf(value);
-                        if (idx >= 0)
-                            SettingsData.set("greeterWallpaperFillMode", root._wallpaperFillModes[idx]);
-                    }
-                }
-
-                StyledText {
-                    text: I18n.tr("Layout and module positions on the greeter are synced from your shell (e.g. bar config). Run Sync to apply.")
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceVariantText
-                    width: parent.width
-                    wrapMode: Text.Wrap
-                    topPadding: Theme.spacingS
+                    path: SettingsData.greeterWallpaperPath
+                    fillMode: SettingsData.greeterWallpaperFillMode
+                    fallbackFillMode: SettingsData.wallpaperFillMode || "Fill"
+                    browserTitle: I18n.tr("Select greeter background image")
+                    fillModeSettingKey: "greeterWallpaperFillMode"
+                    fillModeTags: ["greeter", "wallpaper", "background", "fill"]
+                    onPathSelected: path => SettingsData.set("greeterWallpaperPath", path)
+                    onFillModeSelected: mode => SettingsData.set("greeterWallpaperFillMode", mode)
                 }
             }
 
@@ -762,7 +683,7 @@ Item {
                 settingKey: "greeterDeps"
 
                 StyledText {
-                    text: I18n.tr("DMS greeter needs: greetd, dms-greeter. Fingerprint: fprintd, pam_fprintd. Security keys: pam_u2f. Add your user to the greeter group. Authentication changes apply automatically and may open a terminal when sudo authentication is required.")
+                    text: I18n.tr("Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys). Auth changes apply automatically and may open a terminal for sudo.")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceVariantText
                     width: parent.width
@@ -786,6 +707,85 @@ Item {
                         propagateComposedEvents: true
                     }
                 }
+            }
+        }
+    }
+
+    Rectangle {
+        id: syncPendingPill
+
+        readonly property bool shown: SettingsData.greeterSyncPending && root.greeterInstalled
+
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: shown ? Theme.spacingL : Theme.spacingXS
+        width: pillRow.implicitWidth + Theme.spacingL * 2
+        height: 44
+        radius: height / 2
+        color: Theme.primary
+        opacity: shown ? 1 : 0
+        visible: opacity > 0
+
+        Behavior on opacity {
+            NumberAnimation {
+                duration: Theme.shortDuration
+                easing.type: Theme.standardEasing
+            }
+        }
+
+        Behavior on anchors.bottomMargin {
+            NumberAnimation {
+                duration: Theme.shortDuration
+                easing.type: Theme.standardEasing
+            }
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            cursorShape: Qt.PointingHandCursor
+            enabled: !root.greeterSyncRunning && !root.greeterInstallActionRunning
+            onClicked: root.runGreeterSync()
+        }
+
+        Row {
+            id: pillRow
+            anchors.centerIn: parent
+            spacing: Theme.spacingS
+
+            DankIcon {
+                id: syncPillIcon
+                name: "sync"
+                size: Theme.iconSize - 4
+                color: Theme.primaryText
+                anchors.verticalCenter: parent.verticalCenter
+
+                RotationAnimation on rotation {
+                    running: root.greeterSyncRunning && syncPendingPill.shown
+                    from: 0
+                    to: 360
+                    duration: 1000
+                    loops: Animation.Infinite
+                    onRunningChanged: {
+                        if (!running)
+                            syncPillIcon.rotation = 0;
+                    }
+                }
+            }
+
+            StyledText {
+                text: root.greeterSyncRunning ? I18n.tr("Syncing...") : I18n.tr("Sync to apply")
+                color: Theme.primaryText
+                font.pixelSize: Theme.fontSizeMedium
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            DankActionButton {
+                iconName: "close"
+                iconSize: Theme.iconSize - 6
+                iconColor: Theme.primaryText
+                buttonSize: 28
+                anchors.verticalCenter: parent.verticalCenter
+                onClicked: SettingsData.revertGreeterSyncPending()
             }
         }
     }

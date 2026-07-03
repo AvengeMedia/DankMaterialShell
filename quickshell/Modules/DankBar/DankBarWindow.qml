@@ -73,7 +73,6 @@ PanelWindow {
 
         let section = "center";
         if (clockButtonRef && clockButtonRef.visualContent && dankDashPopoutLoader.item.setTriggerPosition) {
-            // Calculate barPosition from axis.edge
             const barPosition = axis?.edge === "left" ? 2 : (axis?.edge === "right" ? 3 : (axis?.edge === "top" ? 0 : 1));
             section = clockButtonRef.section || "center";
 
@@ -109,7 +108,7 @@ PanelWindow {
     }
 
     function triggerWallpaperBrowser() {
-        triggerDashTab(2);
+        triggerDashTab(SettingsData.dashTabIndexForId("wallpaper"));
     }
 
     readonly property bool usesOverlayLayer: CompositorService.framePeerSurfacesUseOverlayForScreen(barWindow.screen) || (barConfig?.useOverlayLayer ?? false)
@@ -148,10 +147,11 @@ PanelWindow {
             _blurRebuildTimer.restart();
         }
         function onUsesFrameBarChromeChanged() {
-            _blurRebuildTimer.restart();
+            // Rebuild immediately so the bar region never overlaps FrameWindow's during chrome handoff
+            barBlur.rebuild();
         }
         function onBarRevealedChanged() {
-            _blurRebuildTimer.restart();
+            barBlur.rebuild();
         }
     }
 
@@ -169,6 +169,73 @@ PanelWindow {
         }
     }
 
+    Component {
+        id: blurWingRegionComp
+
+        // r×r square at a bar end minus a quarter-disc — the swoop BarCanvas paints
+        Region {
+            id: wingRegion
+
+            property bool atEnd: false
+
+            readonly property real r: barBackground.wing
+            readonly property real bx: topBarMouseArea.x + barUnitInset.x + topBarSlide.x
+            readonly property real by: topBarMouseArea.y + barUnitInset.y + topBarSlide.y
+            readonly property real bw: barUnitInset.width
+            readonly property real bh: barUnitInset.height
+
+            x: {
+                switch (barPos) {
+                case SettingsData.Position.Left:
+                    return bx + bw;
+                case SettingsData.Position.Right:
+                    return bx - r;
+                default:
+                    return atEnd ? bx + bw - r : bx;
+                }
+            }
+            y: {
+                switch (barPos) {
+                case SettingsData.Position.Top:
+                    return by + bh;
+                case SettingsData.Position.Bottom:
+                    return by - r;
+                default:
+                    return atEnd ? by + bh - r : by;
+                }
+            }
+            width: r
+            height: r
+
+            Region {
+                intersection: Intersection.Subtract
+                radius: wingRegion.r
+                width: wingRegion.r * 2
+                height: wingRegion.r * 2
+                x: {
+                    switch (barPos) {
+                    case SettingsData.Position.Left:
+                        return wingRegion.bx + wingRegion.bw;
+                    case SettingsData.Position.Right:
+                        return wingRegion.bx - wingRegion.r * 2;
+                    default:
+                        return wingRegion.atEnd ? wingRegion.bx + wingRegion.bw - wingRegion.r * 2 : wingRegion.bx;
+                    }
+                }
+                y: {
+                    switch (barPos) {
+                    case SettingsData.Position.Top:
+                        return wingRegion.by + wingRegion.bh;
+                    case SettingsData.Position.Bottom:
+                        return wingRegion.by - wingRegion.r * 2;
+                    default:
+                        return wingRegion.atEnd ? wingRegion.by + wingRegion.bh - wingRegion.r * 2 : wingRegion.by;
+                    }
+                }
+            }
+        }
+    }
+
     Item {
         id: barBlur
         visible: false
@@ -179,17 +246,10 @@ PanelWindow {
             teardown();
             if (!BlurService.enabled || !BlurService.available)
                 return;
-            // When the bar is hidden (auto-hide, or config not visible) keep the blur
-            // region empty rather than sliding it off-surface. Some compositors (Hyprland)
-            // gate blur on a non-empty region and then blur the whole surface box when the
-            // clip degenerates to empty, leaving the bar strip blurred while the bar is
-            // hidden (issue #2656). A null region disables the effect cleanly.
-            if (!barWindow.barRevealed)
+            if (!barWindow.barRevealed && CompositorService.isHyprland)
                 return;
-            // In frame mode, FrameWindow owns the blur region for the entire screen edge
-            // (including the bar area). The bar must not set its own competing blur region
-            // so that frameBlurEnabled acts as the single control for all blur in frame mode.
-            if (SettingsData.frameEnabled && barWindow.usesFrameBarChrome)
+            // FrameWindow owns the blur region for the whole edge while the bar wears frame chrome
+            if (FrameTransitionState.effectiveFrameEnabled && barWindow.usesFrameBarChrome)
                 return;
 
             const widgets = barWindow._blurWidgetItems.filter(w => w && w.visible && w.width > 0 && w.height > 0);
@@ -219,6 +279,17 @@ PanelWindow {
                 if (sub)
                     subRegions.push(sub);
             }
+
+            if (hasBar && barBackground.gothEnabled && barWindow._wingR > 0) {
+                for (const atEnd of [false, true]) {
+                    const wing = blurWingRegionComp.createObject(region, {
+                        atEnd: atEnd
+                    });
+                    if (wing)
+                        subRegions.push(wing);
+                }
+            }
+
             region.regions = subRegions;
 
             barWindow.BackgroundEffect.blurRegion = region;
@@ -230,7 +301,9 @@ PanelWindow {
                 return;
             try {
                 barWindow.BackgroundEffect.blurRegion = null;
-            } catch (e) {}
+            } catch (e) {
+                log.warn("BarBlur: failed to clear blur region:", e);
+            }
             barWindow.blurRegion.destroy();
             barWindow.blurRegion = null;
         }
@@ -245,8 +318,8 @@ PanelWindow {
         }
 
         Connections {
-            target: SettingsData
-            function onFrameEnabledChanged() {
+            target: FrameTransitionState
+            function onEffectiveFrameEnabledChanged() {
                 barBlur.rebuild();
             }
         }
@@ -258,6 +331,17 @@ PanelWindow {
                     barWindow.blurRegion.changed();
             }
             function onYChanged() {
+                if (barWindow.blurRegion)
+                    barWindow.blurRegion.changed();
+            }
+        }
+
+        Connections {
+            target: barBackground
+            function onGothEnabledChanged() {
+                _blurRebuildTimer.restart();
+            }
+            function onWingChanged() {
                 if (barWindow.blurRegion)
                     barWindow.blurRegion.changed();
             }
@@ -299,7 +383,7 @@ PanelWindow {
     readonly property color _surfaceContainer: Theme.surfaceContainer
     readonly property string _barId: barConfig?.id ?? "default"
     property real _backgroundAlpha: barConfig?.transparency ?? 1.0
-    readonly property color _bgColor: (SettingsData.frameEnabled && usesFrameBarChrome) ? Qt.rgba(SettingsData.effectiveFrameColor.r, SettingsData.effectiveFrameColor.g, SettingsData.effectiveFrameColor.b, SettingsData.frameOpacity) : Theme.withAlpha(_surfaceContainer, _backgroundAlpha)
+    readonly property color _bgColor: (FrameTransitionState.effectiveFrameEnabled && usesFrameBarChrome) ? Theme.withAlpha(SettingsData.effectiveFrameColor, SettingsData.frameOpacity) : Theme.withAlpha(_surfaceContainer, _backgroundAlpha)
 
     function _updateBackgroundAlpha() {
         const live = SettingsData.barConfigs.find(c => c.id === _barId);
@@ -331,9 +415,8 @@ PanelWindow {
         return Theme.snap(Theme.elevationRenderPadding(Theme.elevationLevel2, "top", 4, 8, 16), _dpr);
     }
 
-    // Flatten/spacing collapse for maximized windows is only for frame-integrated layout.
-    // When the bar draws its own pill, keep rounded corners and spacing like the dock.
-    readonly property bool flattenForMaximizedWindow: !SettingsData.frameEnabled || usesFrameBarChrome
+    // Flatten/spacing collapse for maximized windows only applies to frame-integrated layout
+    readonly property bool flattenForMaximizedWindow: !FrameTransitionState.effectiveFrameEnabled || usesFrameBarChrome
 
     property bool hasMaximizedToplevel: false
     property bool shouldHideForWindows: false
@@ -455,7 +538,7 @@ PanelWindow {
         shouldHideForWindows = filtered.length > 0;
     }
 
-    property real effectiveSpacing: (SettingsData.frameEnabled && usesFrameBarChrome) ? 0 : ((flattenForMaximizedWindow && hasMaximizedToplevel) ? 0 : (barConfig?.spacing ?? 4))
+    property real effectiveSpacing: (FrameTransitionState.effectiveFrameEnabled && usesFrameBarChrome) ? 0 : ((flattenForMaximizedWindow && hasMaximizedToplevel) ? 0 : (barConfig?.spacing ?? 4))
 
     Behavior on effectiveSpacing {
         enabled: barWindow.visible
@@ -466,8 +549,8 @@ PanelWindow {
     }
 
     readonly property int notificationCount: NotificationService.notifications.length
-    readonly property real effectiveBarThickness: (SettingsData.frameEnabled && usesFrameBarChrome) ? SettingsData.frameBarSize : Theme.snap(Math.max(barWindow.widgetThickness + (barConfig?.innerPadding ?? 4) + 4, Theme.barHeight - 4 - (8 - (barConfig?.innerPadding ?? 4))), _dpr)
-    readonly property bool effectiveOpenOnOverview: SettingsData.frameEnabled ? SettingsData.frameShowOnOverview : (barConfig?.openOnOverview ?? false)
+    readonly property real effectiveBarThickness: (FrameTransitionState.effectiveFrameEnabled && usesFrameBarChrome) ? SettingsData.frameBarSize : Theme.snap(Math.max(barWindow.widgetThickness + (barConfig?.innerPadding ?? 4) + 4, Theme.barHeight - 4 - (8 - (barConfig?.innerPadding ?? 4))), _dpr)
+    readonly property bool effectiveOpenOnOverview: FrameTransitionState.effectiveFrameEnabled ? SettingsData.frameShowOnOverview : (barConfig?.openOnOverview ?? false)
     readonly property real widgetThickness: Theme.snap(Math.max(20, 26 + (barConfig?.innerPadding ?? 4) * 0.6), _dpr)
 
     readonly property bool hasAdjacentTopBar: {
@@ -665,7 +748,7 @@ PanelWindow {
     anchors.left: !isVertical ? true : (barPos === SettingsData.Position.Left)
     anchors.right: !isVertical ? true : (barPos === SettingsData.Position.Right)
 
-    readonly property bool reserveExclusiveWhenAutoHidden: SettingsData.frameEnabled && usesFrameBarChrome && !!barWindow.screen && SettingsData.isScreenInPreferences(barWindow.screen, SettingsData.frameScreenPreferences)
+    readonly property bool reserveExclusiveWhenAutoHidden: FrameTransitionState.effectiveFrameEnabled && usesFrameBarChrome && !!barWindow.screen && SettingsData.isScreenInPreferences(barWindow.screen, SettingsData.frameScreenPreferences)
 
     exclusiveZone: (!(barConfig?.visible ?? true) || (topBarCore.autoHide && !barWindow.reserveExclusiveWhenAutoHidden)) ? -1 : (barWindow.effectiveBarThickness + effectiveSpacing + (usesFrameBarChrome ? 0 : (barConfig?.bottomGap ?? 0)))
 
@@ -718,6 +801,14 @@ PanelWindow {
     readonly property var _centerSection: topBarContent ? (barWindow.isVertical ? topBarContent.vCenterSection : topBarContent.hCenterSection) : null
     readonly property var _rightSection: topBarContent ? (barWindow.isVertical ? topBarContent.vRightSection : topBarContent.hRightSection) : null
     readonly property real _revealProgress: topBarSlide.x + topBarSlide.y
+
+    function containsGlobalPoint(gx, gy, padding) {
+        const pad = padding !== undefined ? padding : 16;
+        if (!inputMask.showing)
+            return false;
+        const topLeft = inputMask.mapToItem(null, 0, 0);
+        return gx >= topLeft.x - pad && gx < topLeft.x + inputMask.width + pad && gy >= topLeft.y - pad && gy < topLeft.y + inputMask.height + pad;
+    }
 
     function sectionRect(section, isCenter, _dep) {
         if (!section)
@@ -802,14 +893,53 @@ PanelWindow {
 
         property bool autoHide: barConfig?.autoHide ?? false
         property bool revealSticky: false
+        // In click-through mode the hidden bar's input mask covers the full
+        // band while the revealed bar's mask covers only the widget sections,
+        // so the pointer position is unknowable while it is over a gap. An
+        // enter on the hidden bar therefore only reveals once the pointer
+        // reaches a thin strip at the screen edge; anything else (including
+        // the spurious enter generated by the mask expanding underneath a
+        // resting pointer) keeps the bar hidden.
+        property bool gapEnterSuppressed: false
+        readonly property bool hoverReveal: topBarMouseArea.containsMouse && !gapEnterSuppressed
         readonly property bool ipcReveal: !!SettingsData.barIpcRevealStates[barConfig?.id ?? ""]
+
+        onRevealChanged: {
+            if (reveal && barWindow.clickThroughEnabled)
+                revealSettle.restart();
+        }
+
+        // The input mask updates lag reveal transitions, generating spurious
+        // enter/leave pairs. Hides are deferred until the transition settles;
+        // the timer re-evaluates against the post-transition mask.
+        Timer {
+            id: revealSettle
+            interval: 600
+            repeat: false
+            onTriggered: topBarCore.evaluateReveal()
+        }
+
+        function inEdgeStrip(x, y) {
+            const band = barWindow.isVertical ? topBarMouseArea.width : topBarMouseArea.height;
+            const strip = Math.max(8, band * 0.15);
+            switch (barPos) {
+            case SettingsData.Position.Bottom:
+                return y >= band - strip;
+            case SettingsData.Position.Left:
+                return x <= strip;
+            case SettingsData.Position.Right:
+                return x >= band - strip;
+            default:
+                return y <= strip;
+            }
+        }
 
         Timer {
             id: revealHold
-            interval: barWindow.clickThroughEnabled ? Math.max((barConfig?.autoHideDelay ?? 250) * 6, 1500) : (barConfig?.autoHideDelay ?? 250)
+            interval: barConfig?.autoHideDelay ?? 250
             repeat: false
             onTriggered: {
-                if (!topBarMouseArea.containsMouse && !topBarCore.popoutPinsReveal)
+                if (!topBarCore.hoverReveal && !topBarCore.popoutPinsReveal)
                     topBarCore.revealSticky = false;
             }
         }
@@ -862,14 +992,14 @@ PanelWindow {
             const showOnWindowsSetting = barConfig?.showOnWindowsOpen ?? false;
             if (showOnWindowsSetting && autoHide && (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango)) {
                 if (barWindow.shouldHideForWindows)
-                    return topBarMouseArea.containsMouse || popoutPinsReveal || revealSticky || ipcReveal;
+                    return hoverReveal || popoutPinsReveal || revealSticky || ipcReveal;
                 return true;
             }
 
             if (CompositorService.isNiri && NiriService.inOverview)
-                return topBarMouseArea.containsMouse || popoutPinsReveal || revealSticky || ipcReveal;
+                return hoverReveal || popoutPinsReveal || revealSticky || ipcReveal;
 
-            return (barConfig?.visible ?? true) && (!autoHide || topBarMouseArea.containsMouse || popoutPinsReveal || revealSticky || ipcReveal);
+            return (barConfig?.visible ?? true) && (!autoHide || hoverReveal || popoutPinsReveal || revealSticky || ipcReveal);
         }
 
         Connections {
@@ -887,7 +1017,7 @@ PanelWindow {
             if (!autoHide)
                 return;
 
-            if (topBarMouseArea.containsMouse) {
+            if (hoverReveal) {
                 SettingsData.setBarIpcReveal(barConfig?.id ?? "", false);
                 revealSticky = true;
                 revealHold.stop();
@@ -900,12 +1030,21 @@ PanelWindow {
                 return;
             }
 
+            if (revealSettle.running)
+                return;
+
+            revealHold.interval = barConfig?.autoHideDelay ?? 250;
             revealHold.restart();
         }
 
         Connections {
             target: topBarMouseArea
             function onContainsMouseChanged() {
+                if (!topBarMouseArea.containsMouse) {
+                    topBarCore.gapEnterSuppressed = false;
+                } else if (barWindow.clickThroughEnabled && !topBarCore.reveal) {
+                    topBarCore.gapEnterSuppressed = true;
+                }
                 topBarCore.evaluateReveal();
             }
         }
@@ -926,6 +1065,14 @@ PanelWindow {
             hoverEnabled: (barConfig?.autoHide ?? false) && !inOverview && !topBarCore.popoutPinsReveal
             acceptedButtons: Qt.NoButton
             enabled: (barConfig?.autoHide ?? false) && !inOverview
+            onPositionChanged: mouse => {
+                if (!topBarCore.gapEnterSuppressed)
+                    return;
+                if (!topBarCore.inEdgeStrip(mouse.x, mouse.y))
+                    return;
+                topBarCore.gapEnterSuppressed = false;
+                topBarCore.evaluateReveal();
+            }
 
             Item {
                 id: topBarContainer
@@ -1011,16 +1158,16 @@ PanelWindow {
                                 if (!CompositorService.isNiri)
                                     return false;
                                 if (direction > 0)
-                                    NiriService.moveColumnRight();
+                                    NiriService.moveColumnRight(barWindow.screenName);
                                 else
-                                    NiriService.moveColumnLeft();
+                                    NiriService.moveColumnLeft(barWindow.screenName);
                                 return true;
                             default:
                                 return false;
                             }
                         }
 
-                        onWheel: wheel => {
+                        function processWheel(wheel) {
                             if (!(barConfig?.scrollEnabled ?? true) || actionInProgress) {
                                 wheel.accepted = false;
                                 return;
@@ -1089,6 +1236,8 @@ PanelWindow {
 
                             wheel.accepted = false;
                         }
+
+                        onWheel: wheel => processWheel(wheel)
                     }
 
                     DankBarContent {
@@ -1099,6 +1248,26 @@ PanelWindow {
                         leftWidgetsModel: barWindow.leftWidgetsModel
                         centerWidgetsModel: barWindow.centerWidgetsModel
                         rightWidgetsModel: barWindow.rightWidgetsModel
+                    }
+
+                    // Passive: tracks cursor without intercepting clicks or scroll
+                    HoverHandler {
+                        id: hoverPopoutHandler
+                        enabled: (barConfig?.hoverPopouts ?? false) && !barWindow.clickThroughEnabled
+
+                        property real lastGlobalX: 0
+                        property real lastGlobalY: 0
+
+                        onPointChanged: {
+                            const gp = barUnitInset.mapToItem(null, point.position.x, point.position.y);
+                            lastGlobalX = gp.x;
+                            lastGlobalY = gp.y;
+                            topBarContent.queueHoverPopout(gp.x, gp.y);
+                        }
+
+                        onHoveredChanged: {
+                            topBarContent.updateHoverBarHovered(hovered);
+                        }
                     }
                 }
             }

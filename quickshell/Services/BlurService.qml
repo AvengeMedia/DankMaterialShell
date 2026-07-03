@@ -15,9 +15,8 @@ Singleton {
     readonly property bool available: compositorSupported
     readonly property bool enabled: available && (SettingsData.blurEnabled ?? false)
 
+    // These settings predate non-blurred surface borders, so keep their keys for compatibility.
     readonly property color borderColor: {
-        if (!enabled)
-            return "transparent";
         const opacity = SettingsData.blurBorderOpacity ?? 0.35;
         switch (SettingsData.blurBorderColor ?? "outline") {
         case "primary":
@@ -32,7 +31,7 @@ Singleton {
             return Theme.withAlpha(Theme.outline, opacity);
         }
     }
-    readonly property int borderWidth: enabled ? 1 : 0
+    readonly property int borderWidth: 1
 
     function hoverColor(baseColor, hoverAlpha) {
         if (!enabled)

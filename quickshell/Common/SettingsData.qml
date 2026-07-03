@@ -177,10 +177,12 @@ Singleton {
     property int niriLayoutRadiusOverride: -1
     property int niriLayoutBorderSize: -1
     property int hyprlandLayoutGapsOverride: -1
+    property int hyprlandLayoutGapsOutOverride: -1
     property int hyprlandLayoutRadiusOverride: -1
     property int hyprlandLayoutBorderSize: -1
     property bool hyprlandResizeOnBorder: false
     property int mangoLayoutGapsOverride: -1
+    property int mangoLayoutGapsOutOverride: -1
     property int mangoLayoutRadiusOverride: -1
     property int mangoLayoutBorderSize: -1
     property bool mangoTrackpadNaturalScrolling: true
@@ -262,9 +264,19 @@ Singleton {
     }
 
     property bool frameEnabled: false
-    onFrameEnabledChanged: saveSettings()
+    onFrameEnabledChanged: {
+        saveSettings();
+        if (!_loading)
+            updateFrameCompositorLayout();
+    }
     property real frameThickness: 16
     onFrameThicknessChanged: saveSettings()
+    property int barInsetPaddingShared: -1
+    onBarInsetPaddingSharedChanged: saveSettings()
+    property bool barInsetPaddingSyncAll: false
+    onBarInsetPaddingSyncAllChanged: saveSettings()
+    property int frameBarInsetPadding: -1
+    onFrameBarInsetPaddingChanged: saveSettings()
     property real frameRounding: 23
     onFrameRoundingChanged: saveSettings()
     property string frameColor: ""
@@ -285,9 +297,15 @@ Singleton {
     onFrameLauncherEmergeSideChanged: saveSettings()
     property bool frameLauncherArcExtender: false
     onFrameLauncherArcExtenderChanged: saveSettings()
+    property bool frameLauncherEdgeHover: false
+    onFrameLauncherEdgeHoverChanged: saveSettings()
     readonly property string frameModalEmergeSide: frameLauncherEmergeSide === "top" ? "bottom" : "top"
     property string frameMode: "connected"
-    onFrameModeChanged: saveSettings()
+    onFrameModeChanged: {
+        saveSettings();
+        if (!_loading && frameEnabled)
+            updateFrameCompositorLayout();
+    }
     property var connectedFrameBarStyleBackups: ({})
     onConnectedFrameBarStyleBackupsChanged: saveSettings()
     readonly property bool connectedFrameModeActive: frameEnabled && frameMode === "connected"
@@ -419,6 +437,19 @@ Singleton {
     property string workspaceFocusedBorderColor: "primary"
     property string workspaceFocusedBorderCustomColor: "#6750A4"
     property int workspaceFocusedBorderThickness: 2
+    property bool workspaceUnfocusedMonitorSeparateAppearance: false
+    property string workspaceUnfocusedMonitorColorMode: "default"
+    property string workspaceUnfocusedMonitorFocusedCustomColor: "#6750A4"
+    property string workspaceUnfocusedMonitorOccupiedColorMode: "none"
+    property string workspaceUnfocusedMonitorOccupiedCustomColor: "#625B71"
+    property string workspaceUnfocusedMonitorUnfocusedColorMode: "default"
+    property string workspaceUnfocusedMonitorUnfocusedCustomColor: "#49454E"
+    property string workspaceUnfocusedMonitorUrgentColorMode: "default"
+    property string workspaceUnfocusedMonitorUrgentCustomColor: "#B3261E"
+    property bool workspaceUnfocusedMonitorBorderEnabled: false
+    property string workspaceUnfocusedMonitorBorderColor: "primary"
+    property string workspaceUnfocusedMonitorBorderCustomColor: "#6750A4"
+    property int workspaceUnfocusedMonitorBorderThickness: 2
     property var workspaceNameIcons: ({})
     property bool waveProgressEnabled: true
     property bool scrollTitleEnabled: true
@@ -427,6 +458,7 @@ Singleton {
     property string audioScrollMode: "volume"
     property int audioWheelScrollAmount: 5
     property bool audioDeviceScrollVolumeEnabled: false
+    property var mediaExcludePlayers: []
     property bool clockCompactMode: false
     property int focusedWindowSize: 1
     property bool focusedWindowCompactMode: false
@@ -464,6 +496,8 @@ Singleton {
     property string greeterLockDateFormat: ""
     property string greeterFontFamily: ""
     property string greeterWallpaperFillMode: ""
+    property bool greeterSyncPending: false
+    property var greeterSyncBaseline: ({})
     property int mediaSize: 1
 
     property string appLauncherViewMode: "list"
@@ -504,6 +538,97 @@ Singleton {
     readonly property string weatherCoordinates: SessionData.weatherCoordinates
     property bool useAutoLocation: false
     property bool weatherEnabled: true
+
+    readonly property var _dashTabIds: ["overview", "media", "wallpaper", "weather", "settings"]
+    readonly property var _dashTabsDefault: [
+        {
+            "id": "overview",
+            "enabled": true
+        },
+        {
+            "id": "media",
+            "enabled": true
+        },
+        {
+            "id": "wallpaper",
+            "enabled": true
+        },
+        {
+            "id": "weather",
+            "enabled": true
+        },
+        {
+            "id": "settings",
+            "enabled": true
+        }
+    ]
+    property var dashTabs: _dashTabsDefault
+    onDashTabsChanged: saveSettings()
+
+    function getDashTabs() {
+        const stored = Array.isArray(dashTabs) ? dashTabs : [];
+        const result = [];
+        const seen = {};
+        for (var i = 0; i < stored.length; i++) {
+            const id = stored[i] && stored[i].id;
+            if (_dashTabIds.indexOf(id) < 0 || seen[id])
+                continue;
+            seen[id] = true;
+            result.push({
+                "id": id,
+                "enabled": stored[i].enabled !== false
+            });
+        }
+        for (var j = 0; j < _dashTabIds.length; j++) {
+            if (!seen[_dashTabIds[j]])
+                result.push({
+                    "id": _dashTabIds[j],
+                    "enabled": true
+                });
+        }
+        return result;
+    }
+
+    function visibleDashTabIds() {
+        return getDashTabs().filter(t => t.enabled && (t.id !== "weather" || weatherEnabled)).map(t => t.id);
+    }
+
+    function dashTabIndexForId(id) {
+        const idx = visibleDashTabIds().indexOf(id);
+        return idx < 0 ? 0 : idx;
+    }
+
+    function setDashTabOrder(ids) {
+        const current = getDashTabs();
+        const ordered = [];
+        for (var i = 0; i < ids.length; i++) {
+            const existing = current.find(t => t.id === ids[i]);
+            if (existing)
+                ordered.push(existing);
+        }
+        for (var j = 0; j < current.length; j++) {
+            if (ids.indexOf(current[j].id) < 0)
+                ordered.push(current[j]);
+        }
+        dashTabs = ordered;
+    }
+
+    function setDashTabEnabled(id, on) {
+        const current = getDashTabs();
+        if (!on && id !== "settings" && current.filter(t => t.enabled && t.id !== "settings").length <= 1)
+            return;
+        dashTabs = current.map(t => t.id === id ? {
+                "id": t.id,
+                "enabled": on
+            } : t);
+    }
+
+    function resetDashTabs() {
+        dashTabs = _dashTabsDefault.map(t => ({
+                    "id": t.id,
+                    "enabled": t.enabled
+                }));
+    }
 
     property string networkPreference: "auto"
 
@@ -770,6 +895,9 @@ Singleton {
     property bool lockScreenVideoEnabled: false
     property string lockScreenVideoPath: ""
     property bool lockScreenVideoCycling: false
+    property string lockScreenWallpaperPath: ""
+    property string lockScreenWallpaperFillMode: ""
+    property string lockScreenFontFamily: ""
     property bool hideBrightnessSlider: false
 
     property int notificationTimeoutLow: 5000
@@ -849,6 +977,7 @@ Singleton {
             "rightWidgets": ["systemTray", "clipboard", "cpuUsage", "memUsage", "notificationButton", "battery", "controlCenterButton"],
             "spacing": 4,
             "innerPadding": 4,
+            "barInsetPadding": -1,
             "bottomGap": 0,
             "transparency": 1.0,
             "widgetTransparency": 1.0,
@@ -888,9 +1017,22 @@ Singleton {
             "shadowOpacity": 60,
             "shadowColorMode": "default",
             "shadowCustomColor": "#000000",
-            "clickThrough": false
+            "clickThrough": false,
+            "hoverPopouts": false,
+            "hoverPopoutDelay": 150
         }
     ]
+
+    // Standalone bar xray is unsafe when windows can render beneath its surface
+    function _standaloneBarXrayAvailable(configs) {
+        const list = configs || [];
+        const activeBars = list.filter(c => c && c.enabled && (c.visible ?? true));
+        const gapsOverride = (typeof CompositorService !== "undefined" && CompositorService.isHyprland) ? hyprlandLayoutGapsOverride : niriLayoutGapsOverride;
+        const layoutGaps = gapsOverride >= 0 ? gapsOverride : Math.max(4, (list[0]?.spacing ?? 4));
+        return activeBars.every(c => !c.autoHide && !(c.useOverlayLayer ?? false) && (c.spacing ?? 4) + (c.bottomGap ?? 0) + layoutGaps >= 0);
+    }
+
+    readonly property bool standaloneBarXrayAvailable: _standaloneBarXrayAvailable(barConfigs)
 
     property bool desktopClockEnabled: false
     property string desktopClockStyle: "analog"
@@ -1207,6 +1349,35 @@ Singleton {
         return true;
     }
 
+    function moveDesktopWidgetInstanceToGroup(instanceId, groupId, newIndexInGroup) {
+        const instances = JSON.parse(JSON.stringify(desktopWidgetInstances || []));
+        const groups = desktopWidgetGroups || [];
+        const idx = instances.findIndex(inst => inst.id === instanceId);
+        if (idx === -1)
+            return false;
+        const [item] = instances.splice(idx, 1);
+        item.group = groupId || null;
+        const groupMatches = inst => {
+            if (!groupId)
+                return !inst.group || !groups.some(g => g.id === inst.group);
+            return inst.group === groupId;
+        };
+        const groupInstances = instances.filter(groupMatches);
+        const clamped = Math.max(0, Math.min(newIndexInGroup, groupInstances.length));
+        let targetGlobalIdx;
+        if (clamped >= groupInstances.length) {
+            const last = groupInstances[groupInstances.length - 1];
+            targetGlobalIdx = last ? instances.findIndex(inst => inst.id === last.id) + 1 : instances.length;
+        } else {
+            const targetInstance = groupInstances[clamped];
+            targetGlobalIdx = instances.findIndex(inst => inst.id === targetInstance.id);
+        }
+        instances.splice(targetGlobalIdx, 0, item);
+        desktopWidgetInstances = instances;
+        saveSettings();
+        return true;
+    }
+
     function createDesktopWidgetGroup(name) {
         const id = "dwg_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
         const group = {
@@ -1307,6 +1478,17 @@ Singleton {
             MangoService.generateLayoutConfig();
     }
 
+    function updateFrameCompositorLayout() {
+        // Generate before begin() so compositor readiness is already pending at transitionRequested
+        if (typeof CompositorService !== "undefined") {
+            if (CompositorService.isNiri && typeof NiriService !== "undefined")
+                NiriService.generateNiriLayoutConfig(true);
+            if (CompositorService.isHyprland && typeof HyprlandService !== "undefined")
+                HyprlandService.generateLayoutConfig(true);
+        }
+        FrameTransitionState.begin();
+    }
+
     function resolveIconTheme() {
         if (iconThemePerMode && typeof SessionData !== "undefined" && SessionData.isLightMode)
             return iconThemeLight;
@@ -1365,7 +1547,14 @@ Singleton {
         }
     }
 
+    function cosmicIntegrationAvailable() {
+        const desktop = (Quickshell.env("XDG_CURRENT_DESKTOP") || "").toUpperCase();
+        return desktop.includes("COSMIC");
+    }
+
     function updateCosmicIconTheme() {
+        if (!cosmicIntegrationAvailable())
+            return;
         const resolved = resolveIconTheme();
         let cosmicThemeName = (resolved === "System Default") ? systemDefaultIconTheme : resolved;
         if (!cosmicThemeName || cosmicThemeName === "System Default") {
@@ -1396,6 +1585,8 @@ Singleton {
     }
 
     function updateCosmicThemeMode(isLightMode) {
+        if (!cosmicIntegrationAvailable())
+            return;
         const isDark = isLightMode ? "false" : "true";
         const script = `mkdir -p ${_configDir}/cosmic/com.system76.CosmicTheme.Mode/v1
         printf '%s\\n' ${isDark} > ${_configDir}/cosmic/com.system76.CosmicTheme.Mode/v1/is_dark 2>/dev/null || true`;
@@ -1493,6 +1684,32 @@ Singleton {
         });
     }
 
+    function markGreeterSyncPending(who, key, oldValue) {
+        if (isGreeterMode)
+            return;
+        if (!(key in greeterSyncBaseline)) {
+            var baseline = greeterSyncBaseline;
+            baseline[key] = oldValue;
+            greeterSyncBaseline = baseline;
+        }
+        greeterSyncPending = true;
+    }
+
+    function clearGreeterSyncPending() {
+        greeterSyncBaseline = {};
+        greeterSyncPending = false;
+        saveSettings();
+    }
+
+    function revertGreeterSyncPending() {
+        for (var key in greeterSyncBaseline) {
+            root[key] = greeterSyncBaseline[key];
+        }
+        greeterSyncBaseline = {};
+        greeterSyncPending = false;
+        saveSettings();
+    }
+
     readonly property var _hooks: ({
             "applyStoredTheme": applyStoredTheme,
             "regenSystemThemes": regenSystemThemes,
@@ -1501,7 +1718,8 @@ Singleton {
             "updateBarConfigs": updateBarConfigs,
             "updateCompositorCursor": updateCompositorCursor,
             "scheduleAuthApply": scheduleAuthApply,
-            "scheduleGreeterAutoLoginSync": scheduleGreeterAutoLoginSync
+            "scheduleGreeterAutoLoginSync": scheduleGreeterAutoLoginSync,
+            "markGreeterSyncPending": markGreeterSyncPending
         })
 
     function set(key, value) {
@@ -2245,13 +2463,17 @@ Singleton {
         if (index === -1)
             return;
         const positionChanged = updates.position !== undefined && configs[index].position !== updates.position;
+        const barXrayTargetWasAvailable = _standaloneBarXrayAvailable(configs);
         if (updates.autoHide === false || updates.visible === false)
             setBarIpcReveal(barId, false);
 
         Object.assign(configs[index], updates);
-        barConfigs = _sanitizeBarConfigsForConnectedFrame(configs).configs;
+        const sanitizedConfigs = _sanitizeBarConfigsForConnectedFrame(configs).configs;
+        barConfigs = sanitizedConfigs;
         updateBarConfigs();
 
+        if (!frameEnabled && _standaloneBarXrayAvailable(sanitizedConfigs) !== barXrayTargetWasAvailable)
+            updateCompositorLayout();
         if (positionChanged) {
             NotificationService.dismissAllPopups();
         }
@@ -2314,6 +2536,46 @@ Singleton {
 
     function getEnabledBarConfigs() {
         return barConfigs.filter(cfg => cfg.enabled);
+    }
+
+    function _sideToPosition(side) {
+        switch (side) {
+        case "top":
+            return SettingsData.Position.Top;
+        case "bottom":
+            return SettingsData.Position.Bottom;
+        case "left":
+            return SettingsData.Position.Left;
+        case "right":
+            return SettingsData.Position.Right;
+        }
+        return -1;
+    }
+
+    // Check if a bar occupies the specified screen edge
+    function barOccupiesSide(screen, side) {
+        if (!screen)
+            return false;
+        const sidePos = _sideToPosition(side);
+        if (sidePos < 0)
+            return false;
+        const bars = getEnabledBarConfigs();
+        for (var i = 0; i < bars.length; i++) {
+            const bc = bars[i];
+            if (bc.position !== sidePos)
+                continue;
+            const prefs = bc.screenPreferences || ["all"];
+            if (prefs.includes("all") || isScreenInPreferences(screen, prefs))
+                return true;
+        }
+        return false;
+    }
+
+    // Check if the dock occupies the specified screen edge.
+    function dockOccupiesSide(side) {
+        if (!showDock)
+            return false;
+        return dockPosition === _sideToPosition(side);
     }
 
     function getScreensSortedByPosition() {
@@ -2898,6 +3160,32 @@ Singleton {
         saveSettings();
     }
 
+    function addMediaExcludePlayer(identity) {
+        if (identity === undefined || identity === null)
+            return;
+        var normalizedIdentity = identity.toString().trim().toLowerCase();
+        if (!normalizedIdentity)
+            return;
+        var list = mediaExcludePlayers ? mediaExcludePlayers.slice() : [];
+        var normalizedList = list.map(function (id) {
+            return id ? id.toString().trim().toLowerCase() : "";
+        });
+        if (normalizedList.indexOf(normalizedIdentity) >= 0)
+            return;
+        list.push(normalizedIdentity);
+        mediaExcludePlayers = list;
+        saveSettings();
+    }
+
+    function removeMediaExcludePlayer(index) {
+        var list = mediaExcludePlayers ? mediaExcludePlayers.slice() : [];
+        if (index < 0 || index >= list.length)
+            return;
+        list.splice(index, 1);
+        mediaExcludePlayers = list;
+        saveSettings();
+    }
+
     property bool _pendingExpandNotificationRules: false
     property int _pendingNotificationRuleIndex: -1
 
@@ -3318,6 +3606,9 @@ Singleton {
         onLoaded: {
             if (isGreeterMode)
                 return;
+            const wasLoaded = _hasLoaded;
+            const prevFrameEnabled = frameEnabled;
+            const prevFrameMode = frameMode;
             _loading = true;
             _hasUnsavedChanges = false;
             try {
@@ -3352,6 +3643,9 @@ Singleton {
             } finally {
                 _loading = false;
             }
+            // External edits reload under _loading, which skips the per-property transition triggers
+            if (wasLoaded && !_parseError && (frameEnabled !== prevFrameEnabled || (frameEnabled && frameMode !== prevFrameMode)))
+                updateFrameCompositorLayout();
         }
         onLoadFailed: error => {
             if (!isGreeterMode) {

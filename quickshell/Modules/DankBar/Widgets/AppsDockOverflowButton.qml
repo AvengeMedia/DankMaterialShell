@@ -19,7 +19,7 @@ Item {
         width: root.iconSize
         height: root.iconSize
         radius: Theme.cornerRadius
-        color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, mouseArea.containsMouse ? 0.2 : 0.1)
+        color: Theme.withAlpha(Theme.primary, mouseArea.containsMouse ? 0.2 : 0.1)
 
         Behavior on color {
             ColorAnimation {

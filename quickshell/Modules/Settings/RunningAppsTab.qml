@@ -81,7 +81,7 @@ Item {
 
                                     Column {
                                         width: (parent.width - deleteBtn.width - Theme.spacingS) / 2
-                                        spacing: 2
+                                        spacing: Theme.spacingXXS
 
                                         StyledText {
                                             text: I18n.tr("Pattern")
@@ -100,7 +100,7 @@ Item {
 
                                     Column {
                                         width: (parent.width - deleteBtn.width - Theme.spacingS) / 2
-                                        spacing: 2
+                                        spacing: Theme.spacingXXS
 
                                         StyledText {
                                             text: I18n.tr("Replacement")
@@ -126,7 +126,7 @@ Item {
                                         Rectangle {
                                             anchors.fill: parent
                                             radius: Theme.cornerRadius
-                                            color: deleteArea.containsMouse ? Theme.withAlpha(Theme.error, 0.2) : "transparent"
+                                            color: deleteArea.containsMouse ? Theme.withAlpha(Theme.error, 0.2) : Theme.withAlpha(Theme.error, 0)
                                         }
 
                                         DankIcon {
@@ -148,7 +148,7 @@ Item {
 
                                 Column {
                                     width: 120
-                                    spacing: 2
+                                    spacing: Theme.spacingXXS
 
                                     StyledText {
                                         text: I18n.tr("Type")

@@ -7,13 +7,14 @@ StyledRect {
 
     property string sortBy: "name"
     property bool sortAscending: true
+    property color surfaceColor: Theme.surfaceContainer
 
     signal sortBySelected(string value)
     signal sortOrderSelected(bool ascending)
 
     width: 200
     height: sortColumn.height + Theme.spacingM * 2
-    color: Theme.surfaceContainer
+    color: surfaceColor
     radius: Theme.cornerRadius
     border.color: Theme.outlineMedium
     border.width: 1
@@ -59,7 +60,7 @@ StyledRect {
                 width: sortColumn?.width ?? 0
                 height: 32
                 radius: Theme.cornerRadius
-                color: sortMouseArea.containsMouse ? Theme.surfaceVariant : (sortBy === modelData?.value ? Theme.surfacePressed : "transparent")
+                color: sortMouseArea.containsMouse ? Theme.surfaceVariant : (sortBy === modelData?.value ? Theme.surfacePressed : Theme.withAlpha(Theme.surfacePressed, 0))
 
                 Row {
                     anchors.fill: parent
@@ -113,7 +114,7 @@ StyledRect {
             width: sortColumn?.width ?? 0
             height: 32
             radius: Theme.cornerRadius
-            color: ascMouseArea.containsMouse ? Theme.surfaceVariant : (sortAscending ? Theme.surfacePressed : "transparent")
+            color: ascMouseArea.containsMouse ? Theme.surfaceVariant : (sortAscending ? Theme.surfacePressed : Theme.withAlpha(Theme.surfacePressed, 0))
 
             Row {
                 anchors.fill: parent
@@ -151,7 +152,7 @@ StyledRect {
             width: sortColumn?.width ?? 0
             height: 32
             radius: Theme.cornerRadius
-            color: descMouseArea.containsMouse ? Theme.surfaceVariant : (!sortAscending ? Theme.surfacePressed : "transparent")
+            color: descMouseArea.containsMouse ? Theme.surfaceVariant : (!sortAscending ? Theme.surfacePressed : Theme.withAlpha(Theme.surfacePressed, 0))
 
             Row {
                 anchors.fill: parent

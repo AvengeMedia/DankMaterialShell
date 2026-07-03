@@ -62,7 +62,7 @@ Item {
                     height: 60
                     radius: Theme.cornerRadius
                     color: root.colorMode === modelData.id ? Theme.primarySelected : Theme.surfaceHover
-                    border.color: root.colorMode === modelData.id ? Theme.primary : "transparent"
+                    border.color: root.colorMode === modelData.id ? Theme.primary : Theme.withAlpha(Theme.primary, 0)
                     border.width: 2
 
                     Column {

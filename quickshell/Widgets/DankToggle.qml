@@ -99,11 +99,11 @@ Item {
         radius: Theme.cornerRadius
 
         // Distinguish disabled checked vs unchecked so unchecked disabled switches don't look enabled
-        color: !toggle.enabled ? (toggle.checked ? Qt.alpha(Theme.surfaceText, 0.12) : "transparent") : (toggle.checked ? Theme.primary : Theme.surfaceVariantAlpha)
+        color: !toggle.enabled ? (toggle.checked ? Qt.alpha(Theme.surfaceText, 0.12) : Theme.withAlpha(Qt.alpha(Theme.surfaceText, 0.12), 0)) : (toggle.checked ? Theme.primary : Theme.surfaceVariantAlpha)
         opacity: toggle.toggling ? 0.6 : 1
 
         // M3 disabled unchecked border: on surface 12% opacity
-        border.color: toggle.checked ? "transparent" : (!toggle.enabled ? Qt.alpha(Theme.surfaceText, 0.12) : Theme.outline)
+        border.color: toggle.checked ? Theme.withAlpha(Theme.outline, 0) : (!toggle.enabled ? Qt.alpha(Theme.surfaceText, 0.12) : Theme.outline)
 
         readonly property int pad: Math.round((height - thumb.width) / 2)
         readonly property int edgeLeft: pad
@@ -119,8 +119,8 @@ Item {
 
             // M3 disabled thumb:
             // checked = solid surface | unchecked = outlined off-state thumb
-            color: !toggle.enabled ? (toggle.checked ? Theme.surface : "transparent") : (toggle.checked ? Theme.surface : Theme.outline)
-            border.color: !toggle.enabled ? (toggle.checked ? "transparent" : Qt.alpha(Theme.surfaceText, 0.38)) : Theme.outline
+            color: !toggle.enabled ? (toggle.checked ? Theme.surface : Theme.withAlpha(Theme.surface, 0)) : (toggle.checked ? Theme.surface : Theme.outline)
+            border.color: !toggle.enabled ? (toggle.checked ? Theme.withAlpha(Qt.alpha(Theme.surfaceText, 0.38), 0) : Qt.alpha(Theme.surfaceText, 0.38)) : Theme.outline
             border.width: (toggle.checked && toggle.enabled) ? 1 : 2
 
             x: toggle.checked ? toggleTrack.edgeRight : toggleTrack.edgeLeft

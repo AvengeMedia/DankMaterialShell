@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import qs.Common
+import qs.Services
 import qs.Widgets
 
 Card {
@@ -85,7 +86,7 @@ Card {
             StyledText {
                 text: String(systemClock?.date?.getSeconds()).padStart(2, '0')
                 font.pixelSize: 24
-                color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.7)
+                color: Theme.withAlpha(Theme.primary, 0.7)
                 font.weight: Font.Medium
                 horizontalAlignment: Text.AlignHCenter
             }
@@ -100,7 +101,7 @@ Card {
         StyledText {
             text: systemClock?.date?.toLocaleDateString(I18n.locale(), "MMM dd")
             font.pixelSize: Theme.fontSizeSmall
-            color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+            color: Theme.surfaceTextMedium
             anchors.horizontalCenter: parent.horizontalCenter
         }
     }
@@ -108,5 +109,14 @@ Card {
     SystemClock {
         id: systemClock
         precision: SettingsData.showSeconds ? SystemClock.Seconds : SystemClock.Minutes
+    }
+
+    Connections {
+        target: SessionService
+
+        function onSessionResumed() {
+            systemClock.enabled = false;
+            systemClock.enabled = true;
+        }
     }
 }

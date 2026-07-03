@@ -211,14 +211,14 @@ DankModal {
                         radius: Theme.cornerRadius
                         color: {
                             if (keyboardNavigation && selectedButton === 0) {
-                                return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12);
+                                return Theme.primaryHover;
                             } else if (cancelButton.containsMouse) {
                                 return Theme.surfacePressed;
                             } else {
                                 return Theme.surfaceVariantAlpha;
                             }
                         }
-                        border.color: (keyboardNavigation && selectedButton === 0) ? Theme.primary : "transparent"
+                        border.color: (keyboardNavigation && selectedButton === 0) ? Theme.primary : Theme.withAlpha(Theme.primary, 0)
                         border.width: (keyboardNavigation && selectedButton === 0) ? 1 : 0
 
                         StyledText {
@@ -249,14 +249,14 @@ DankModal {
                         color: {
                             const baseColor = confirmButtonColor;
                             if (keyboardNavigation && selectedButton === 1) {
-                                return Qt.rgba(baseColor.r, baseColor.g, baseColor.b, 1);
+                                return Theme.withAlpha(baseColor, 1);
                             } else if (confirmButton.containsMouse) {
-                                return Qt.rgba(baseColor.r, baseColor.g, baseColor.b, 0.9);
+                                return Theme.withAlpha(baseColor, 0.9);
                             } else {
                                 return baseColor;
                             }
                         }
-                        border.color: (keyboardNavigation && selectedButton === 1) ? "white" : "transparent"
+                        border.color: (keyboardNavigation && selectedButton === 1) ? "white" : Qt.rgba(1, 1, 1, 0)
                         border.width: (keyboardNavigation && selectedButton === 1) ? 1 : 0
 
                         StyledText {

@@ -9,7 +9,7 @@ Rectangle {
 
     height: 80
     radius: Theme.cornerRadius
-    color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.95)
+    color: Theme.withAlpha(Theme.surfaceContainer, 0.95)
     border.color: Theme.primary
     border.width: 2
     opacity: showHints ? 1 : 0
@@ -20,7 +20,7 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.margins: Theme.spacingS
-        spacing: 2
+        spacing: Theme.spacingXXS
 
         StyledText {
             text: I18n.tr("Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select")

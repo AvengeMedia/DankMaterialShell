@@ -362,7 +362,7 @@
       "wallpaper"
     ],
     "icon": "wallpaper",
-    "description": "Color shown for areas not covered by wallpaper (e.g. Fit or Pad modes)"
+    "description": "Color shown for areas not covered by wallpaper"
   },
   {
     "section": "selectedMonitor",
@@ -529,7 +529,8 @@
       "security",
       "time",
       "weather"
-    ]
+    ],
+    "description": "Preview: %1"
   },
   {
     "section": "padHours12Hour",
@@ -646,7 +647,8 @@
       "top",
       "topbar",
       "weather"
-    ]
+    ],
+    "description": "Preview: %1"
   },
   {
     "section": "useFahrenheit",
@@ -1898,6 +1900,33 @@
     "description": "Show an outline ring around the focused workspace indicator"
   },
   {
+    "section": "workspaceUnfocusedMonitorBorderEnabled",
+    "label": "Focused Border",
+    "tabIndex": 6,
+    "category": "Dank Bar",
+    "keywords": [
+      "around",
+      "bar",
+      "border",
+      "dank",
+      "desktop",
+      "display",
+      "focused",
+      "indicator",
+      "monitor",
+      "outline",
+      "panel",
+      "ring",
+      "show",
+      "statusbar",
+      "topbar",
+      "unfocused",
+      "virtual",
+      "workspace"
+    ],
+    "description": "Show an outline ring around the focused workspace indicator"
+  },
+  {
     "section": "barFontScale",
     "label": "Font Scale",
     "tabIndex": 6,
@@ -1978,6 +2007,44 @@
     "description": "Controls opacity of the bar background"
   },
   {
+    "section": "workspaceUnfocusedMonitorSeparateAppearance",
+    "label": "Separate Appearance for Unfocused Display(s)",
+    "tabIndex": 6,
+    "category": "Dank Bar",
+    "keywords": [
+      "appearance",
+      "bar",
+      "color",
+      "colors",
+      "colour",
+      "colours",
+      "dank",
+      "desktop",
+      "different",
+      "display",
+      "display(s)",
+      "displays",
+      "focused",
+      "hue",
+      "monitor",
+      "monitors",
+      "output",
+      "outputs",
+      "palette",
+      "panel",
+      "screen",
+      "screens",
+      "separate",
+      "statusbar",
+      "tint",
+      "topbar",
+      "unfocused",
+      "virtual",
+      "workspace"
+    ],
+    "description": "Use different workspace colors on displays that are not focused"
+  },
+  {
     "section": "barShadow",
     "label": "Shadow Override",
     "tabIndex": 6,
@@ -2005,10 +2072,14 @@
     "keywords": [
       "bar",
       "between",
+      "corner",
       "dank",
+      "edge",
       "edges",
+      "end",
       "gap",
       "gaps",
+      "inset",
       "margin",
       "margins",
       "padding",
@@ -2987,7 +3058,8 @@
       "transparency"
     ],
     "icon": "blur_on",
-    "description": "Your compositor does not support background blur (ext-background-effect-v1)"
+    "description": "Your compositor does not support background blur (ext-background-effect-v1)",
+    "conditionKey": "isNiri"
   },
   {
     "section": "barElevationEnabled",
@@ -3015,56 +3087,6 @@
       "topbar"
     ],
     "description": "Shadow elevation on bars and panels"
-  },
-  {
-    "section": "blurBorderColor",
-    "label": "Blur Border Color",
-    "tabIndex": 10,
-    "category": "Theme & Colors",
-    "keywords": [
-      "appearance",
-      "around",
-      "blur",
-      "blurred",
-      "border",
-      "color",
-      "colors",
-      "colour",
-      "edge",
-      "hue",
-      "look",
-      "outline",
-      "scheme",
-      "style",
-      "surfaces",
-      "theme",
-      "tint"
-    ],
-    "description": "Border color around blurred surfaces"
-  },
-  {
-    "section": "blurBorderOpacity",
-    "label": "Blur Border Opacity",
-    "tabIndex": 10,
-    "category": "Theme & Colors",
-    "keywords": [
-      "appearance",
-      "blur",
-      "blurred",
-      "border",
-      "colors",
-      "controls",
-      "edge",
-      "look",
-      "opacity",
-      "outer",
-      "protocol",
-      "scheme",
-      "style",
-      "theme",
-      "windows"
-    ],
-    "description": "Controls the outer edge of protocol-blurred windows"
   },
   {
     "section": "buttonColorMode",
@@ -3375,7 +3397,6 @@
     "keywords": [
       "appearance",
       "blur",
-      "blurred",
       "colors",
       "contrast",
       "foreground",
@@ -3388,10 +3409,11 @@
       "show",
       "stronger",
       "style",
+      "surface",
       "surfaces",
       "theme"
     ],
-    "description": "Show foreground surfaces on blurred panels for stronger contrast"
+    "description": "Show foreground surfaces on panels for stronger contrast"
   },
   {
     "section": "matugenTemplateGtk",
@@ -3547,8 +3569,6 @@
       "alert",
       "appearance",
       "around",
-      "blur",
-      "blurred",
       "border",
       "cards",
       "colors",
@@ -3570,7 +3590,7 @@
       "theme",
       "widgets"
     ],
-    "description": "Controls outlines around blurred foreground cards, pills, and notification cards"
+    "description": "Controls outlines around foreground cards, pills, and notification cards"
   },
   {
     "section": "m3ElevationLightDirection",
@@ -3987,6 +4007,62 @@
     ],
     "icon": "layers",
     "description": "Material inspired shadows and elevation on modals, popouts, and dialogs"
+  },
+  {
+    "section": "blurBorderColor",
+    "label": "Surface Border Color",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "around",
+      "border",
+      "color",
+      "colors",
+      "colour",
+      "edge",
+      "hue",
+      "look",
+      "modal",
+      "modals",
+      "outline",
+      "popouts",
+      "popup",
+      "scheme",
+      "shell",
+      "style",
+      "surface",
+      "surfaces",
+      "theme",
+      "tint"
+    ],
+    "description": "Border color around popouts, modals, and other shell surfaces"
+  },
+  {
+    "section": "blurBorderOpacity",
+    "label": "Surface Border Opacity",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "border",
+      "colors",
+      "controls",
+      "look",
+      "modal",
+      "modals",
+      "opacity",
+      "outline",
+      "popouts",
+      "popup",
+      "scheme",
+      "shell",
+      "style",
+      "surface",
+      "surfaces",
+      "theme"
+    ],
+    "description": "Controls the outline of popouts, modals, and other shell surfaces"
   },
   {
     "section": "popupTransparency",
@@ -4605,6 +4681,44 @@
     ]
   },
   {
+    "section": "_tab_11",
+    "label": "Lock Screen",
+    "tabIndex": 11,
+    "category": "Lock Screen",
+    "keywords": [
+      "lock",
+      "lockscreen",
+      "login",
+      "password",
+      "screen",
+      "security"
+    ],
+    "icon": "lock"
+  },
+  {
+    "section": "lockAppearance",
+    "label": "Lock Screen Appearance",
+    "tabIndex": 11,
+    "category": "Lock Screen",
+    "keywords": [
+      "appearance",
+      "clock",
+      "date",
+      "font",
+      "lock",
+      "lockscreen",
+      "login",
+      "password",
+      "screen",
+      "security",
+      "time",
+      "typography",
+      "watch"
+    ],
+    "icon": "palette",
+    "description": "Font used for the clock and date on the lock screen"
+  },
+  {
     "section": "lockDisplay",
     "label": "Lock Screen Display",
     "tabIndex": 11,
@@ -4740,27 +4854,6 @@
       "what"
     ],
     "description": "Control what notification information is shown on the lock screen"
-  },
-  {
-    "section": "_tab_11",
-    "label": "Power & Security",
-    "tabIndex": 11,
-    "category": "Lock Screen",
-    "keywords": [
-      "hibernate",
-      "lock",
-      "login",
-      "password",
-      "power",
-      "reboot",
-      "restart",
-      "screen",
-      "security",
-      "shutdown",
-      "sleep",
-      "suspend"
-    ],
-    "icon": "security"
   },
   {
     "section": "lockScreenPowerOffMonitorsOnLock",
@@ -5579,6 +5672,42 @@
     "description": "Play sound when volume is adjusted"
   },
   {
+    "section": "mediaExcludePlayers",
+    "label": "Excluded Media Players",
+    "tabIndex": 16,
+    "category": "Media Player",
+    "keywords": [
+      "audio",
+      "exclude",
+      "excluded",
+      "ignore",
+      "media",
+      "mpris",
+      "music",
+      "playback",
+      "player",
+      "players",
+      "spotify"
+    ],
+    "icon": "do_not_disturb_on"
+  },
+  {
+    "section": "_tab_16",
+    "label": "Media Player",
+    "tabIndex": 16,
+    "category": "Media Player",
+    "keywords": [
+      "audio",
+      "media",
+      "mpris",
+      "music",
+      "playback",
+      "player",
+      "spotify"
+    ],
+    "icon": "music_note"
+  },
+  {
     "section": "mediaPlayer",
     "label": "Media Player Settings",
     "tabIndex": 16,
@@ -5622,28 +5751,6 @@
       "widget"
     ],
     "description": "Scroll wheel behavior on media widget"
-  },
-  {
-    "section": "_tab_16",
-    "label": "Widgets & Notifications",
-    "tabIndex": 16,
-    "category": "Media Player",
-    "keywords": [
-      "alert",
-      "alerts",
-      "components",
-      "media",
-      "modules",
-      "mpris",
-      "music",
-      "notif",
-      "notifications",
-      "notifs",
-      "player",
-      "spotify",
-      "widgets"
-    ],
-    "icon": "dashboard"
   },
   {
     "section": "notificationBodyFontSize",
@@ -6255,16 +6362,21 @@
       "coalesce",
       "dedupe",
       "duplicate",
+      "identical",
       "messages",
       "notif",
       "notification",
       "notifications",
       "notifs",
+      "popup",
       "repeat",
+      "show",
       "stack",
+      "stacking",
       "suppress",
       "toast"
-    ]
+    ],
+    "description": "Identical alerts show as one popup instead of stacking"
   },
   {
     "section": "notificationShowTimeoutBar",
@@ -6696,12 +6808,19 @@
     "category": "Power & Sleep",
     "keywords": [
       "actions",
+      "command",
       "custom",
       "energy",
       "hibernate",
+      "lock",
+      "logout",
+      "override",
       "power",
+      "power off",
+      "poweroff",
       "reboot",
       "restart",
+      "script",
       "shutdown",
       "sleep",
       "suspend"
@@ -7735,22 +7854,6 @@
     "icon": "info"
   },
   {
-    "section": "greeterFontFamily",
-    "label": "Greeter font",
-    "tabIndex": 31,
-    "category": "Greeter",
-    "keywords": [
-      "display manager",
-      "font",
-      "greetd",
-      "greeter",
-      "login",
-      "screen",
-      "typography"
-    ],
-    "description": "Font used on the login screen"
-  },
-  {
     "section": "greeterAuth",
     "label": "Login Authentication",
     "tabIndex": 31,
@@ -7837,28 +7940,6 @@
     ]
   },
   {
-    "section": "greeterWallpaperFillMode",
-    "label": "Wallpaper fill mode",
-    "tabIndex": 31,
-    "category": "Greeter",
-    "keywords": [
-      "background",
-      "bg",
-      "desktop",
-      "display manager",
-      "fill",
-      "greetd",
-      "greeter",
-      "image",
-      "login",
-      "mode",
-      "picture",
-      "scaled",
-      "wallpaper"
-    ],
-    "description": "How the background image is scaled"
-  },
-  {
     "section": "muxType",
     "label": "Multiplexer",
     "tabIndex": 32,
@@ -7932,6 +8013,34 @@
       "window"
     ],
     "description": "Use the extended surface for launcher content"
+  },
+  {
+    "section": "frameBarInsetPadding",
+    "label": "Bar Inset Padding",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "bar",
+      "between",
+      "border",
+      "components",
+      "corner",
+      "decoration",
+      "edge",
+      "end",
+      "ends",
+      "frame",
+      "inset",
+      "modules",
+      "padding",
+      "panel",
+      "statusbar",
+      "taskbar",
+      "topbar",
+      "widgets",
+      "window"
+    ],
+    "description": "Gap between the end widgets and the bar ends (0 = edge-to-edge)"
   },
   {
     "section": "frameBorder",
@@ -8051,6 +8160,36 @@
       "window"
     ],
     "icon": "monitor"
+  },
+  {
+    "section": "frameLauncherEdgeHover",
+    "label": "Edge Hover Reveal",
+    "tabIndex": 33,
+    "category": "Frame",
+    "keywords": [
+      "app drawer",
+      "app menu",
+      "applications",
+      "border",
+      "connected",
+      "decoration",
+      "edge",
+      "emerge",
+      "frame",
+      "free",
+      "hover",
+      "hovering",
+      "launcher",
+      "open",
+      "panel",
+      "reveal",
+      "start menu",
+      "statusbar",
+      "taskbar",
+      "topbar",
+      "window"
+    ],
+    "description": "Open the launcher by hovering the emerge edge (when free of bar and dock)"
   },
   {
     "section": "frameEnable",
@@ -8503,21 +8642,180 @@
     "description": "Width of window border and focus ring"
   },
   {
+    "section": "hyprlandLayoutBarXrayEnabled",
+    "label": "Frame Xray",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "against",
+      "always",
+      "appearance",
+      "background",
+      "bar",
+      "bg",
+      "blur",
+      "custom",
+      "customize",
+      "desktop",
+      "even",
+      "frame",
+      "hyprland",
+      "image",
+      "performance",
+      "personal",
+      "personalization",
+      "picture",
+      "wallpaper",
+      "xray"
+    ],
+    "description": "Always blur against the wallpaper, even with Xray off",
+    "conditionKey": "isHyprland"
+  },
+  {
+    "section": "niriLayoutBarXrayEnabled",
+    "label": "Frame Xray",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "against",
+      "always",
+      "appearance",
+      "background",
+      "bar",
+      "bg",
+      "blur",
+      "custom",
+      "customize",
+      "desktop",
+      "even",
+      "frame",
+      "image",
+      "niri",
+      "performance",
+      "personal",
+      "personalization",
+      "picture",
+      "wallpaper",
+      "xray"
+    ],
+    "description": "Always blur against the wallpaper, even with Xray off",
+    "conditionKey": "isNiri"
+  },
+  {
+    "section": "hyprlandLayoutGapsMode",
+    "label": "Gaps",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "auto",
+      "config",
+      "custom",
+      "customize",
+      "gap",
+      "gaps",
+      "hyprland",
+      "inner",
+      "leaves",
+      "margin",
+      "margins",
+      "matches",
+      "outer",
+      "override",
+      "padding",
+      "panel",
+      "personal",
+      "personalization",
+      "statusbar",
+      "taskbar",
+      "topbar",
+      "unmanaged"
+    ],
+    "description": "Auto matches bar spacing; Off leaves gaps to your Hyprland config"
+  },
+  {
+    "section": "mangoLayoutGapsMode",
+    "label": "Gaps",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "auto",
+      "config",
+      "custom",
+      "customize",
+      "gap",
+      "gaps",
+      "inner",
+      "leaves",
+      "mango",
+      "mangowc",
+      "margin",
+      "margins",
+      "matches",
+      "outer",
+      "override",
+      "padding",
+      "panel",
+      "personal",
+      "personalization",
+      "statusbar",
+      "taskbar",
+      "topbar",
+      "unmanaged"
+    ],
+    "description": "Auto matches bar spacing; Off leaves gaps to your MangoWC config"
+  },
+  {
+    "section": "niriLayoutGapsMode",
+    "label": "Gaps",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "auto",
+      "config",
+      "custom",
+      "customize",
+      "gap",
+      "gaps",
+      "leaves",
+      "margin",
+      "margins",
+      "matches",
+      "niri",
+      "override",
+      "padding",
+      "panel",
+      "personal",
+      "personalization",
+      "statusbar",
+      "taskbar",
+      "topbar",
+      "unmanaged"
+    ],
+    "description": "Auto matches bar spacing; Off leaves gaps to your niri config"
+  },
+  {
     "section": "hyprlandLayout",
     "label": "Hyprland Layout Overrides",
     "tabIndex": 37,
     "category": "Personalization",
     "keywords": [
       "appearance",
+      "auto",
       "border",
+      "config",
       "custom",
       "customize",
       "gap",
       "gaps",
       "hyprland",
       "layout",
+      "leaves",
       "margin",
       "margins",
+      "matches",
       "overrides",
       "padding",
       "panel",
@@ -8525,15 +8823,57 @@
       "personalization",
       "radius",
       "rounding",
-      "spacing",
       "statusbar",
       "taskbar",
       "topbar",
       "window"
     ],
     "icon": "crop_square",
-    "description": "Use custom gaps instead of bar spacing",
+    "description": "Auto matches bar spacing; Off leaves gaps to your Hyprland config",
     "conditionKey": "isHyprland"
+  },
+  {
+    "section": "hyprlandLayoutGapsOverride",
+    "label": "Inner Gaps",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "between",
+      "custom",
+      "customize",
+      "gaps",
+      "hyprland",
+      "inner",
+      "override",
+      "personal",
+      "personalization",
+      "space",
+      "windows"
+    ],
+    "description": "Space between windows"
+  },
+  {
+    "section": "mangoLayoutGapsOverride",
+    "label": "Inner Gaps",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "between",
+      "custom",
+      "customize",
+      "gaps",
+      "inner",
+      "mango",
+      "mangowc",
+      "override",
+      "personal",
+      "personalization",
+      "space",
+      "windows"
+    ],
+    "description": "Space between windows"
   },
   {
     "section": "mangoLayout",
@@ -8542,31 +8882,34 @@
     "category": "Personalization",
     "keywords": [
       "appearance",
+      "auto",
       "border",
+      "config",
       "custom",
       "customize",
       "dwl",
       "gap",
       "gaps",
       "layout",
+      "leaves",
       "mango",
       "mangowc",
       "margin",
       "margins",
+      "matches",
       "overrides",
       "padding",
       "panel",
       "personal",
       "personalization",
       "radius",
-      "spacing",
       "statusbar",
       "taskbar",
       "topbar",
       "window"
     ],
     "icon": "crop_square",
-    "description": "Use custom gaps instead of bar spacing",
+    "description": "Auto matches bar spacing; Off leaves gaps to your MangoWC config",
     "conditionKey": "isMango"
   },
   {
@@ -8576,14 +8919,18 @@
     "category": "Personalization",
     "keywords": [
       "appearance",
+      "auto",
       "border",
+      "config",
       "custom",
       "customize",
       "gap",
       "gaps",
       "layout",
+      "leaves",
       "margin",
       "margins",
+      "matches",
       "niri",
       "overrides",
       "padding",
@@ -8591,15 +8938,63 @@
       "personal",
       "personalization",
       "radius",
-      "spacing",
       "statusbar",
       "taskbar",
       "topbar",
       "window"
     ],
     "icon": "layers",
-    "description": "Use custom gaps instead of bar spacing",
+    "description": "Auto matches bar spacing; Off leaves gaps to your niri config",
     "conditionKey": "isNiri"
+  },
+  {
+    "section": "hyprlandLayoutGapsOutOverride",
+    "label": "Outer Gaps",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "between",
+      "custom",
+      "customize",
+      "edge",
+      "edges",
+      "gaps",
+      "hyprland",
+      "outer",
+      "override",
+      "personal",
+      "personalization",
+      "screen",
+      "space",
+      "windows"
+    ],
+    "description": "Space between windows and screen edges"
+  },
+  {
+    "section": "mangoLayoutGapsOutOverride",
+    "label": "Outer Gaps",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "between",
+      "custom",
+      "customize",
+      "edge",
+      "edges",
+      "gaps",
+      "mango",
+      "mangowc",
+      "outer",
+      "override",
+      "personal",
+      "personalization",
+      "screen",
+      "space",
+      "windows"
+    ],
+    "description": "Space between windows and screen edges"
   },
   {
     "section": "hyprlandLayoutBorderSizeEnabled",
@@ -8743,85 +9138,6 @@
     "description": "Use custom window radius instead of theme radius"
   },
   {
-    "section": "hyprlandLayoutGapsOverrideEnabled",
-    "label": "Override Gaps",
-    "tabIndex": 37,
-    "category": "Personalization",
-    "keywords": [
-      "appearance",
-      "custom",
-      "customize",
-      "gap",
-      "gaps",
-      "hyprland",
-      "margin",
-      "margins",
-      "override",
-      "padding",
-      "panel",
-      "personal",
-      "personalization",
-      "spacing",
-      "statusbar",
-      "taskbar",
-      "topbar"
-    ],
-    "description": "Use custom gaps instead of bar spacing"
-  },
-  {
-    "section": "mangoLayoutGapsOverrideEnabled",
-    "label": "Override Gaps",
-    "tabIndex": 37,
-    "category": "Personalization",
-    "keywords": [
-      "appearance",
-      "custom",
-      "customize",
-      "gap",
-      "gaps",
-      "mango",
-      "mangowc",
-      "margin",
-      "margins",
-      "override",
-      "padding",
-      "panel",
-      "personal",
-      "personalization",
-      "spacing",
-      "statusbar",
-      "taskbar",
-      "topbar"
-    ],
-    "description": "Use custom gaps instead of bar spacing"
-  },
-  {
-    "section": "niriLayoutGapsOverrideEnabled",
-    "label": "Override Gaps",
-    "tabIndex": 37,
-    "category": "Personalization",
-    "keywords": [
-      "appearance",
-      "custom",
-      "customize",
-      "gap",
-      "gaps",
-      "margin",
-      "margins",
-      "niri",
-      "override",
-      "padding",
-      "panel",
-      "personal",
-      "personalization",
-      "spacing",
-      "statusbar",
-      "taskbar",
-      "topbar"
-    ],
-    "description": "Use custom gaps instead of bar spacing"
-  },
-  {
     "section": "hyprlandResizeOnBorder",
     "label": "Resize on Border",
     "tabIndex": 37,
@@ -8916,49 +9232,6 @@
     "description": "Rounded corners for windows"
   },
   {
-    "section": "hyprlandLayoutGapsOverride",
-    "label": "Window Gaps",
-    "tabIndex": 37,
-    "category": "Personalization",
-    "keywords": [
-      "appearance",
-      "between",
-      "custom",
-      "customize",
-      "gaps",
-      "hyprland",
-      "override",
-      "personal",
-      "personalization",
-      "space",
-      "window",
-      "windows"
-    ],
-    "description": "Space between windows"
-  },
-  {
-    "section": "mangoLayoutGapsOverride",
-    "label": "Window Gaps",
-    "tabIndex": 37,
-    "category": "Personalization",
-    "keywords": [
-      "appearance",
-      "between",
-      "custom",
-      "customize",
-      "gaps",
-      "mango",
-      "mangowc",
-      "override",
-      "personal",
-      "personalization",
-      "space",
-      "window",
-      "windows"
-    ],
-    "description": "Space between windows"
-  },
-  {
     "section": "niriLayoutGapsOverride",
     "label": "Window Gaps",
     "tabIndex": 37,
@@ -8978,6 +9251,70 @@
       "windows"
     ],
     "description": "Space between windows"
+  },
+  {
+    "section": "hyprlandLayoutXrayEnabled",
+    "label": "Xray Blur Effect",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "background",
+      "background-effect",
+      "beneath",
+      "bg",
+      "blur",
+      "blurred",
+      "content",
+      "custom",
+      "customize",
+      "desktop",
+      "effect",
+      "hyprland",
+      "image",
+      "performance",
+      "personal",
+      "personalization",
+      "picture",
+      "show",
+      "surfaces",
+      "wallpaper",
+      "xray"
+    ],
+    "description": "Blurred surfaces show the wallpaper instead of the content beneath",
+    "conditionKey": "isHyprland"
+  },
+  {
+    "section": "niriLayoutXrayEnabled",
+    "label": "Xray Blur Effect",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "background",
+      "background-effect",
+      "beneath",
+      "bg",
+      "blur",
+      "blurred",
+      "content",
+      "custom",
+      "customize",
+      "desktop",
+      "effect",
+      "image",
+      "niri",
+      "performance",
+      "personal",
+      "personalization",
+      "picture",
+      "show",
+      "surfaces",
+      "wallpaper",
+      "xray"
+    ],
+    "description": "Blurred surfaces show the wallpaper instead of the content beneath",
+    "conditionKey": "isNiri"
   },
   {
     "section": "windowRules",
@@ -9079,16 +9416,39 @@
   },
   {
     "section": "_tab_42",
-    "label": "Battery",
+    "label": "Power & Security",
     "tabIndex": 42,
     "category": "Settings",
     "keywords": [
-      "battery",
-      "charge",
-      "charging",
+      "hibernate",
       "power",
-      "settings"
+      "reboot",
+      "restart",
+      "security",
+      "settings",
+      "shutdown",
+      "sleep",
+      "suspend"
     ],
-    "icon": "battery_charging_full"
+    "icon": "security"
+  },
+  {
+    "section": "_tab_43",
+    "label": "Widgets & Notifications",
+    "tabIndex": 43,
+    "category": "Dank Dash",
+    "keywords": [
+      "alert",
+      "alerts",
+      "components",
+      "dank",
+      "dash",
+      "modules",
+      "notif",
+      "notifications",
+      "notifs",
+      "widgets"
+    ],
+    "icon": "dashboard"
   }
 ]

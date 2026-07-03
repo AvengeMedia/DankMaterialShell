@@ -1,4 +1,5 @@
 import QtQuick
+import qs.Common
 import qs.Widgets
 
 FocusScope {
@@ -13,7 +14,7 @@ FocusScope {
         id: settingsColumn
         anchors.fill: parent
         anchors.margins: 16
-        spacing: 16
+        spacing: Theme.spacingL
 
         Text {
             text: "Quick Notes Settings"
@@ -37,7 +38,7 @@ FocusScope {
         }
 
         Column {
-            spacing: 12
+            spacing: Theme.spacingM
             width: parent.width - 32
 
             Text {
@@ -48,7 +49,7 @@ FocusScope {
             }
 
             Row {
-                spacing: 12
+                spacing: Theme.spacingM
                 anchors.left: parent.left
                 anchors.right: parent.right
 
@@ -82,7 +83,7 @@ FocusScope {
         }
 
         Column {
-            spacing: 12
+            spacing: Theme.spacingM
             width: parent.width - 32
 
             Text {
@@ -93,7 +94,7 @@ FocusScope {
             }
 
             Row {
-                spacing: 12
+                spacing: Theme.spacingM
 
                 Text {
                     text: "Max notes:"
@@ -137,7 +138,7 @@ FocusScope {
                 Row {
                     id: clearRow
                     anchors.centerIn: parent
-                    spacing: 8
+                    spacing: Theme.spacingS
 
                     Text {
                         text: "🗑"
@@ -174,7 +175,7 @@ FocusScope {
         }
 
         Column {
-            spacing: 8
+            spacing: Theme.spacingS
             width: parent.width - 32
 
             Text {
@@ -185,7 +186,7 @@ FocusScope {
             }
 
             Column {
-                spacing: 4
+                spacing: Theme.spacingXS
                 leftPadding: 16
                 bottomPadding: 24
 

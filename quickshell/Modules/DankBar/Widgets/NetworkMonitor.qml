@@ -34,7 +34,7 @@ BasePill {
             Column {
                 id: contentColumn
                 anchors.centerIn: parent
-                spacing: 2
+                spacing: Theme.spacingXXS
                 visible: root.isVerticalOrientation
 
                 DankIcon {
@@ -88,7 +88,7 @@ BasePill {
 
                 Row {
                     anchors.verticalCenter: parent.verticalCenter
-                    spacing: 4
+                    spacing: Theme.spacingXS
 
                     StyledText {
                         text: "↓"
@@ -117,7 +117,7 @@ BasePill {
 
                 Row {
                     anchors.verticalCenter: parent.verticalCenter
-                    spacing: 4
+                    spacing: Theme.spacingXS
 
                     StyledText {
                         text: "↑"

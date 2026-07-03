@@ -203,8 +203,8 @@ Item {
 
                 const c = card.accentColor;
                 const grad = ctx.createLinearGradient(0, 0, 0, height);
-                grad.addColorStop(0, Qt.rgba(c.r, c.g, c.b, 0.25));
-                grad.addColorStop(1, Qt.rgba(c.r, c.g, c.b, 0.02));
+                grad.addColorStop(0, Theme.withAlpha(c, 0.25));
+                grad.addColorStop(1, Theme.withAlpha(c, 0.02));
 
                 ctx.fillStyle = grad;
                 ctx.beginPath();
@@ -218,7 +218,7 @@ Item {
                 ctx.closePath();
                 ctx.fill();
 
-                ctx.strokeStyle = Qt.rgba(c.r, c.g, c.b, 0.8);
+                ctx.strokeStyle = Theme.withAlpha(c, 0.8);
                 ctx.lineWidth = 2;
                 ctx.beginPath();
                 for (let j = 0; j < hist.length; j++) {
@@ -229,7 +229,7 @@ Item {
                 ctx.stroke();
 
                 if (hist2 && hist2.length >= 2 && card.showSecondary) {
-                    ctx.strokeStyle = Qt.rgba(c.r, c.g, c.b, 0.4);
+                    ctx.strokeStyle = Theme.withAlpha(c, 0.4);
                     ctx.lineWidth = 1.5;
                     ctx.setLineDash([4, 4]);
                     ctx.beginPath();

@@ -52,6 +52,13 @@ Item {
     }
     readonly property bool connectedFrameModeActive: SettingsData.connectedFrameModeActive
 
+    // Bar Inset Padding: resolve the "auto" sentinel (stored < 0) to each mode's natural inset for the slider display.
+    readonly property real insetPadAutoUI: SettingsData.connectedFrameModeActive ? SettingsData.frameThickness : (selectedBarIsVertical ? Theme.spacingXS : Math.max(Theme.spacingXS, (selectedBarConfig?.innerPadding ?? 4) * 0.8))
+    readonly property int insetPadDisplayValue: {
+        const raw = SettingsData.barInsetPaddingSyncAll ? SettingsData.barInsetPaddingShared : (selectedBarConfig?.barInsetPadding ?? -1);
+        return raw < 0 ? Math.round(insetPadAutoUI) : raw;
+    }
+
     Timer {
         id: horizontalBarChangeDebounce
         interval: 500
@@ -164,6 +171,8 @@ Item {
             scrollEnabled: defaultBar.scrollEnabled ?? true,
             scrollXBehavior: defaultBar.scrollXBehavior ?? "column",
             scrollYBehavior: defaultBar.scrollYBehavior ?? "workspace",
+            hoverPopouts: defaultBar.hoverPopouts ?? false,
+            hoverPopoutDelay: defaultBar.hoverPopoutDelay ?? 150,
             shadowIntensity: defaultBar.shadowIntensity ?? 0,
             shadowOpacity: defaultBar.shadowOpacity ?? 60,
             shadowDirectionMode: defaultBar.shadowDirectionMode ?? "inherit",
@@ -863,10 +872,18 @@ Item {
                 iconName: "space_bar"
                 title: I18n.tr("Spacing")
                 settingKey: "barSpacing"
-                visible: dankBarTab.appearanceOnly && (selectedBarConfig?.enabled ?? false) && !SettingsData.frameEnabled
+                visible: dankBarTab.appearanceOnly && (selectedBarConfig?.enabled ?? false)
+
+                SettingsControlledByFrame {
+                    visible: SettingsData.frameEnabled
+                    parentModal: dankBarTab.parentModal
+                    settingLabel: I18n.tr("Bar Spacing")
+                    reason: I18n.tr("Edge spacing, exclusive zone, and popup gaps are managed by Frame")
+                }
 
                 SettingsSliderRow {
                     id: edgeSpacingSlider
+                    visible: !SettingsData.frameEnabled
                     text: I18n.tr("Edge Spacing")
                     description: I18n.tr("Space between the bar and screen edges")
                     value: selectedBarConfig?.spacing ?? 4
@@ -889,6 +906,7 @@ Item {
 
                 SettingsSliderRow {
                     id: exclusiveZoneSlider
+                    visible: !SettingsData.frameEnabled
                     text: I18n.tr("Exclusive Zone Offset")
                     description: I18n.tr("Fine-tune the space reserved for the bar from the screen edge")
                     value: selectedBarConfig?.bottomGap ?? 0
@@ -911,6 +929,7 @@ Item {
 
                 SettingsSliderRow {
                     id: sizeSlider
+                    visible: !SettingsData.frameEnabled
                     text: I18n.tr("Size")
                     description: I18n.tr("Adjust the bar height via inner padding")
                     value: selectedBarConfig?.innerPadding ?? 4
@@ -933,6 +952,7 @@ Item {
 
                 SettingsSliderRow {
                     id: widgetPaddingSlider
+                    visible: !SettingsData.frameEnabled
                     text: I18n.tr("Padding")
                     description: I18n.tr("Inner padding applied to each widget")
                     value: selectedBarConfig?.widgetPadding ?? 8
@@ -961,9 +981,56 @@ Item {
                     height: 1
                     color: Theme.outline
                     opacity: 0.15
+                    visible: !SettingsData.frameEnabled
+                }
+
+                SettingsSliderRow {
+                    id: barInsetPaddingSlider
+                    visible: !SettingsData.frameEnabled
+                    text: I18n.tr("Bar Inset Padding")
+                    description: I18n.tr("Gap between the end widgets and the bar ends (0 = edge-to-edge)")
+                    tags: ["bar", "padding", "inset", "edge", "corner", "end"]
+                    unit: "px"
+                    minimum: 0
+                    maximum: 48
+                    defaultValue: Math.round(dankBarTab.insetPadAutoUI)
+                    value: dankBarTab.insetPadDisplayValue
+                    onSliderDragFinished: finalValue => {
+                        if (SettingsData.barInsetPaddingSyncAll)
+                            SettingsData.set("barInsetPaddingShared", finalValue);
+                        else
+                            SettingsData.updateBarConfig(selectedBarId, {
+                                barInsetPadding: finalValue
+                            });
+                    }
+
+                    Binding {
+                        target: barInsetPaddingSlider
+                        property: "value"
+                        value: dankBarTab.insetPadDisplayValue
+                        restoreMode: Binding.RestoreBinding
+                    }
                 }
 
                 SettingsToggleRow {
+                    visible: !SettingsData.frameEnabled
+                    text: I18n.tr("Sync Bar Inset Padding")
+                    description: I18n.tr("Use one inset value for every bar")
+                    tags: ["bar", "padding", "inset", "edge", "sync", "all", "global"]
+                    checked: SettingsData.barInsetPaddingSyncAll
+                    onToggled: checked => SettingsData.set("barInsetPaddingSyncAll", checked)
+                }
+
+                Rectangle {
+                    width: parent.width
+                    height: 1
+                    color: Theme.outline
+                    opacity: 0.15
+                    visible: !SettingsData.frameEnabled
+                }
+
+                SettingsToggleRow {
+                    visible: !SettingsData.frameEnabled
                     text: I18n.tr("Auto Popup Gaps")
                     description: I18n.tr("Automatically calculate popup gap based on bar spacing")
                     checked: selectedBarConfig?.popupGapsAuto ?? true
@@ -978,7 +1045,7 @@ Item {
                     width: parent.width
                     leftPadding: Theme.spacingM
                     spacing: Theme.spacingM
-                    visible: !(selectedBarConfig?.popupGapsAuto ?? true)
+                    visible: !SettingsData.frameEnabled && !(selectedBarConfig?.popupGapsAuto ?? true)
 
                     Rectangle {
                         width: parent.width - parent.leftPadding
@@ -1184,6 +1251,50 @@ Item {
                             target: gothCornerRadiusSlider
                             property: "value"
                             value: selectedBarConfig?.gothCornerRadiusValue ?? 12
+                            restoreMode: Binding.RestoreBinding
+                        }
+                    }
+                }
+            }
+
+            SettingsToggleCard {
+                iconName: "touch_app"
+                title: I18n.tr("Hover Popouts")
+                description: I18n.tr("Open widget popouts by hovering over the bar. Moving to another widget switches the popout.")
+                visible: !dankBarTab.appearanceOnly && selectedBarConfig?.enabled
+                enabled: !(selectedBarConfig?.clickThrough ?? false)
+                opacity: (selectedBarConfig?.clickThrough ?? false) ? 0.5 : 1.0
+                checked: selectedBarConfig?.hoverPopouts ?? false
+                onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
+                        hoverPopouts: checked
+                    })
+
+                Column {
+                    width: parent.width
+                    spacing: Theme.spacingS
+                    visible: selectedBarConfig?.hoverPopouts ?? false
+                    leftPadding: Theme.spacingM
+
+                    SettingsSliderRow {
+                        id: hoverDelaySlider
+                        width: parent.width - parent.leftPadding
+                        text: I18n.tr("Open Delay")
+                        description: I18n.tr("Time to rest on a widget before its popout opens")
+                        value: selectedBarConfig?.hoverPopoutDelay ?? 150
+                        minimum: 0
+                        maximum: 1000
+                        unit: "ms"
+                        defaultValue: 150
+                        onSliderValueChanged: newValue => {
+                            SettingsData.updateBarConfig(selectedBarId, {
+                                hoverPopoutDelay: newValue
+                            });
+                        }
+
+                        Binding {
+                            target: hoverDelaySlider
+                            property: "value"
+                            value: selectedBarConfig?.hoverPopoutDelay ?? 150
                             restoreMode: Binding.RestoreBinding
                         }
                     }

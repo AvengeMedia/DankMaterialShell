@@ -23,6 +23,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/tailscale"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/thememode"
 	serverThemes "github.com/AvengeMedia/DankMaterialShell/core/internal/server/themes"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wallpaper"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wayland"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wlroutput"
 )
@@ -53,6 +54,15 @@ func RouteRequest(conn net.Conn, req models.Request) {
 			return
 		}
 		thememode.HandleRequest(conn, req, themeModeManager)
+		return
+	}
+
+	if strings.HasPrefix(req.Method, "wallpaper.") {
+		if wallpaperManager == nil {
+			models.RespondError(conn, req.ID, "wallpaper manager not initialized")
+			return
+		}
+		wallpaper.HandleRequest(conn, req, wallpaperManager)
 		return
 	}
 

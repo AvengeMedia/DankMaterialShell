@@ -417,6 +417,40 @@ bind=SUPER,3,view,3
 	}
 }
 
+func TestMangoWCSetBindTranslatesScrollWheelToAxisBind(t *testing.T) {
+	tmpDir := t.TempDir()
+	dmsDir := filepath.Join(tmpDir, "dms")
+	if err := os.MkdirAll(dmsDir, 0o755); err != nil {
+		t.Fatalf("failed to create dms dir: %v", err)
+	}
+	bindsPath := filepath.Join(dmsDir, "binds.conf")
+	seed := "# === Custom Keybinds ===\nbind=SUPER,t,spawn,ghostty\ngesturebind=none,left,3,focusdir,left\n"
+	if err := os.WriteFile(bindsPath, []byte(seed), 0o644); err != nil {
+		t.Fatalf("failed to write seed binds: %v", err)
+	}
+
+	provider := NewMangoWCProvider(tmpDir)
+	if err := provider.SetBind("SUPER+WheelScrollDown", "spawn dms ipc call test", "Scroll down", nil); err != nil {
+		t.Fatalf("SetBind failed: %v", err)
+	}
+
+	content := readFile(t, bindsPath)
+	if !strings.Contains(content, "axisbind=SUPER,DOWN,spawn,dms ipc call test") {
+		t.Fatalf("expected scroll bind written as axisbind direction, got:\n%s", content)
+	}
+	if strings.Contains(content, "WheelScroll") {
+		t.Fatalf("expected no raw niri scroll keysym in mango output, got:\n%s", content)
+	}
+
+	if err := provider.SetBind("SUPER+WheelScrollDown", "spawn dms ipc call test2", "Scroll down", nil); err != nil {
+		t.Fatalf("SetBind failed: %v", err)
+	}
+	content = readFile(t, bindsPath)
+	if strings.Count(content, "axisbind=SUPER,DOWN,") != 1 {
+		t.Fatalf("expected exactly one axisbind after re-save, got:\n%s", content)
+	}
+}
+
 func TestMangoWCRemoveBindPreservesNonBindLines(t *testing.T) {
 	tmpDir := t.TempDir()
 	dmsDir := filepath.Join(tmpDir, "dms")

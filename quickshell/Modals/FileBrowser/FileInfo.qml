@@ -13,7 +13,7 @@ Rectangle {
 
     height: 200
     radius: Theme.cornerRadius
-    color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.95)
+    color: Theme.withAlpha(Theme.surfaceContainer, 0.95)
     border.color: Theme.secondary
     border.width: 2
     opacity: showFileInfo ? 1 : 0

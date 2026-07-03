@@ -46,6 +46,19 @@ func (m *Manager) Activate() error {
 	return nil
 }
 
+func (m *Manager) SetLockedHint(locked bool) error {
+	err := m.sessionObj.Call(dbusSessionInterface+".SetLockedHint", 0, locked).Err
+	if err != nil {
+		if refreshErr := m.refreshSessionBinding(); refreshErr == nil {
+			err = m.sessionObj.Call(dbusSessionInterface+".SetLockedHint", 0, locked).Err
+		}
+		if err != nil {
+			return fmt.Errorf("failed to set locked hint: %w", err)
+		}
+	}
+	return nil
+}
+
 func (m *Manager) SetIdleHint(idle bool) error {
 	err := m.sessionObj.Call(dbusSessionInterface+".SetIdleHint", 0, idle).Err
 	if err != nil {

@@ -42,6 +42,18 @@ Singleton {
     property bool suppressNextConfigToast: false
     property bool matugenSuppression: false
     property bool configGenerationPending: false
+    property int _layoutRequestRevision: 0
+    property int _layoutAppliedRevision: 0
+    property int _frameTransitionRevision: 0
+    property int _awaitingLayoutReloadRevision: 0
+    property string _lastGeneratedAlttabContent: ""
+    readonly property bool frameLayoutReady: _layoutAppliedRevision >= _frameTransitionRevision
+
+    // dms/layout.kdl is the source of truth for xray; parsed once before the first regeneration
+    property bool layoutXrayEnabled: true
+    property bool layoutBarXrayEnabled: true
+    property bool _layoutXrayLoaded: false
+    property bool _layoutXrayLoading: false
 
     readonly property string screenshotsDir: Paths.strip(StandardPaths.writableLocation(StandardPaths.PicturesLocation)) + "/Screenshots"
     property string pendingScreenshotPath: ""
@@ -72,9 +84,8 @@ Singleton {
         onTriggered: root.matugenSuppression = false
     }
 
-    Timer {
-        id: configGenerationDebounce
-        interval: 100
+    DeferredAction {
+        id: configGenerationAction
         onTriggered: root.doGenerateNiriLayoutConfig()
     }
 
@@ -117,13 +128,20 @@ Singleton {
         id: writeConfigProcess
         property string configContent: ""
         property string configPath: ""
+        property int requestRevision: 0
 
         onExited: exitCode => {
             if (exitCode === 0) {
                 log.info("Generated layout config at", configPath);
-                return;
+            } else {
+                if (root._awaitingLayoutReloadRevision === requestRevision)
+                    root._awaitingLayoutReloadRevision = 0;
+                // Best-effort ack so a failed write can't wedge frame transitions
+                root._layoutAppliedRevision = Math.max(root._layoutAppliedRevision, requestRevision);
+                log.warn("Failed to write layout config, exit code:", exitCode);
             }
-            log.warn("Failed to write layout config, exit code:", exitCode);
+            if (root.configGenerationPending && root._awaitingLayoutReloadRevision <= root._layoutAppliedRevision)
+                configGenerationAction.schedule();
         }
     }
 
@@ -417,26 +435,31 @@ Singleton {
     function handleWindowFocusChanged(data) {
         const focusedWindowId = data.id;
 
+        // Only clone windows whose focus flag changes; skip reassignment if nothing changed.
         let focusedWindow = null;
-        const updatedWindows = [];
+        let changed = false;
+        const updatedWindows = new Array(windows.length);
 
         for (var i = 0; i < windows.length; i++) {
             const w = windows[i];
-            const updatedWindow = {};
-
-            for (let prop in w) {
-                updatedWindow[prop] = w[prop];
+            const isFocused = w.id === focusedWindowId;
+            if (!!w.is_focused === isFocused) {
+                updatedWindows[i] = w;
+                if (isFocused)
+                    focusedWindow = w;
+                continue;
             }
-
-            updatedWindow.is_focused = (w.id === focusedWindowId);
-            if (updatedWindow.is_focused) {
+            const updatedWindow = Object.assign({}, w, {
+                "is_focused": isFocused
+            });
+            if (isFocused)
                 focusedWindow = updatedWindow;
-            }
-
-            updatedWindows.push(updatedWindow);
+            updatedWindows[i] = updatedWindow;
+            changed = true;
         }
 
-        windows = updatedWindows;
+        if (changed)
+            windows = updatedWindows;
 
         if (focusedWindow) {
             const ws = root.workspaces[focusedWindow.workspace_id];
@@ -472,26 +495,29 @@ Singleton {
             setWorkspaces(updatedWorkspaces);
         }
 
-        const updatedWindows = [];
+        let changed = false;
+        const updatedWindows = new Array(windows.length);
 
         for (var i = 0; i < windows.length; i++) {
             const w = windows[i];
-            const updatedWindow = {};
-
-            for (let prop in w) {
-                updatedWindow[prop] = w[prop];
-            }
-
+            let isFocused;
             if (data.active_window_id !== null && data.active_window_id !== undefined) {
-                updatedWindow.is_focused = (w.id == data.active_window_id);
+                isFocused = (w.id == data.active_window_id);
             } else {
-                updatedWindow.is_focused = w.workspace_id == data.workspace_id ? false : w.is_focused;
+                isFocused = w.workspace_id == data.workspace_id ? false : !!w.is_focused;
             }
-
-            updatedWindows.push(updatedWindow);
+            if (!!w.is_focused === isFocused) {
+                updatedWindows[i] = w;
+                continue;
+            }
+            updatedWindows[i] = Object.assign({}, w, {
+                "is_focused": isFocused
+            });
+            changed = true;
         }
 
-        windows = updatedWindows;
+        if (changed)
+            windows = updatedWindows;
     }
 
     function handleWindowsChanged(data) {
@@ -559,12 +585,25 @@ Singleton {
     function handleConfigLoaded(data) {
         if (data.failed) {
             validateProcess.running = true;
+            // Best-effort ack: a rejected reload must not wedge frame transitions
+            if (_awaitingLayoutReloadRevision > _layoutAppliedRevision) {
+                _layoutAppliedRevision = _awaitingLayoutReloadRevision;
+                _awaitingLayoutReloadRevision = 0;
+            }
+            if (configGenerationPending)
+                configGenerationAction.schedule();
             return;
         }
 
         configValidationOutput = "";
         ToastService.dismissCategory("niri-config");
         fetchOutputs();
+        if (_awaitingLayoutReloadRevision > _layoutAppliedRevision) {
+            _layoutAppliedRevision = _awaitingLayoutReloadRevision;
+            _awaitingLayoutReloadRevision = 0;
+        }
+        if (configGenerationPending)
+            configGenerationAction.schedule();
         configReloaded();
 
         if (hasInitialConnection && !suppressConfigToast && !suppressNextConfigToast && !matugenSuppression) {
@@ -702,7 +741,19 @@ Singleton {
         });
     }
 
-    function moveColumnLeft() {
+    function focusMonitor(outputName) {
+        return send({
+            "Action": {
+                "FocusMonitor": {
+                    "output": outputName
+                }
+            }
+        });
+    }
+
+    function moveColumnLeft(outputName) {
+        if (outputName && outputName !== currentOutput)
+            focusMonitor(outputName);
         return send({
             "Action": {
                 "FocusColumnLeft": {}
@@ -710,7 +761,9 @@ Singleton {
         });
     }
 
-    function moveColumnRight() {
+    function moveColumnRight(outputName) {
+        if (outputName && outputName !== currentOutput)
+            focusMonitor(outputName);
         return send({
             "Action": {
                 "FocusColumnRight": {}
@@ -1069,15 +1122,55 @@ Singleton {
         return _matchAndEnrichToplevels(toplevels, windows.filter(nw => outputWorkspaceIds.has(nw.workspace_id)));
     }
 
-    function generateNiriLayoutConfig() {
-        if (!CompositorService.isNiri || configGenerationPending)
+    function setLayoutXray(enabled) {
+        layoutXrayEnabled = enabled;
+        _layoutXrayLoaded = true;
+        generateNiriLayoutConfig();
+    }
+
+    function setLayoutBarXray(enabled) {
+        layoutBarXrayEnabled = enabled;
+        _layoutXrayLoaded = true;
+        generateNiriLayoutConfig();
+    }
+
+    function loadLayoutXrayState() {
+        if (_layoutXrayLoading)
             return;
+        _layoutXrayLoading = true;
+        const configDir = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
+        Proc.runCommand("niri-read-layout-xray", ["cat", configDir + "/niri/dms/layout.kdl"], (output, exitCode) => {
+            _layoutXrayLoading = false;
+            if (!_layoutXrayLoaded) {
+                const content = exitCode === 0 ? output : "";
+                layoutXrayEnabled = !content.includes("xray false");
+                layoutBarXrayEnabled = !content.includes("// bar-xray off");
+                _layoutXrayLoaded = true;
+            }
+            if (configGenerationPending)
+                configGenerationAction.schedule();
+        });
+    }
+
+    function generateNiriLayoutConfig(frameTransition) {
+        if (!CompositorService.isNiri)
+            return;
+        _layoutRequestRevision++;
+        if (frameTransition === true)
+            _frameTransitionRevision = _layoutRequestRevision;
         suppressNextToast();
         configGenerationPending = true;
-        configGenerationDebounce.restart();
+        configGenerationAction.schedule();
     }
 
     function doGenerateNiriLayoutConfig() {
+        if (writeConfigProcess.running || _awaitingLayoutReloadRevision > _layoutAppliedRevision)
+            return;
+        if (!_layoutXrayLoaded) {
+            loadLayoutXrayState();
+            return;
+        }
+        configGenerationPending = false;
         log.debug("Generating layout config...");
 
         const defaultRadius = typeof SettingsData !== "undefined" ? SettingsData.cornerRadius : 12;
@@ -1085,39 +1178,71 @@ Singleton {
         const defaultBorderSize = 2;
 
         const cornerRadius = (typeof SettingsData !== "undefined" && SettingsData.niriLayoutRadiusOverride >= 0) ? SettingsData.niriLayoutRadiusOverride : defaultRadius;
-        const gaps = (typeof SettingsData !== "undefined" && SettingsData.niriLayoutGapsOverride >= 0) ? SettingsData.niriLayoutGapsOverride : defaultGaps;
+        const gapsOverride = typeof SettingsData !== "undefined" ? SettingsData.niriLayoutGapsOverride : -1;
+        const manageGaps = gapsOverride !== -2;
+        const gaps = gapsOverride >= 0 ? gapsOverride : defaultGaps;
         const borderSize = (typeof SettingsData !== "undefined" && SettingsData.niriLayoutBorderSize >= 0) ? SettingsData.niriLayoutBorderSize : defaultBorderSize;
+        const frameEnabled = typeof SettingsData !== "undefined" && SettingsData.frameEnabled;
+        const frameConnectedMode = frameEnabled && SettingsData.frameMode === "connected";
+        // Connected frame mode has no separate bar/frame surface to target
+        const barFrameTargetNamespace = !frameEnabled ? (SettingsData.standaloneBarXrayAvailable ? "dms:bar" : null) : (frameConnectedMode ? null : "dms:frame");
+
+        // Xray is niri's default blur, so only the off state needs a rule
+        let xrayRules = "";
+        if (!layoutXrayEnabled) {
+            xrayRules += `
+
+layer-rule {
+    background-effect {
+        xray false
+    }
+}`;
+        }
+
+        if (layoutBarXrayEnabled && barFrameTargetNamespace) {
+            xrayRules += `
+
+layer-rule {
+    match namespace="^${barFrameTargetNamespace}$"
+    background-effect {
+        xray true
+    }
+}`;
+        }
+        // Marker persists the preference even while the rule has no target
+        if (!layoutBarXrayEnabled)
+            xrayRules += `
+
+// bar-xray off`;
 
         const dmsWarning = `// ! DO NOT EDIT !
-        // ! AUTO-GENERATED BY DMS !
-        // ! CHANGES WILL BE OVERWRITTEN !
-        // ! PLACE YOUR CUSTOM CONFIGURATION ELSEWHERE !
+// ! AUTO-GENERATED BY DMS !
+// ! CHANGES WILL BE OVERWRITTEN !
+// ! PLACE YOUR CUSTOM CONFIGURATION ELSEWHERE !
 
-        `;
+`;
+
+        const layoutLines = [];
+        if (manageGaps)
+            layoutLines.push(`    gaps ${gaps}`, "");
+        layoutLines.push("    border {", `        width ${borderSize}`, "    }", "", "    focus-ring {", `        width ${borderSize}`, "    }");
 
         const configContent = dmsWarning + `layout {
-        gaps ${gaps}
+${layoutLines.join("\n")}
+}
 
-        border {
-        width ${borderSize}
-        }
-
-        focus-ring {
-        width ${borderSize}
-        }
-        }
-        window-rule {
-        geometry-corner-radius ${cornerRadius}
-        clip-to-geometry true
-        tiled-state true
-        draw-border-with-background false
-        }`;
+window-rule {
+    geometry-corner-radius ${cornerRadius}
+    clip-to-geometry true
+    tiled-state true
+    draw-border-with-background false
+}` + xrayRules;
 
         const alttabContent = dmsWarning + `recent-windows {
-        highlight {
+    highlight {
         corner-radius ${cornerRadius}
-        }
-        }`;
+    }
+}`;
 
         const configDir = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
         const niriDmsDir = configDir + "/niri/dms";
@@ -1126,13 +1251,18 @@ Singleton {
 
         writeConfigProcess.configContent = configContent;
         writeConfigProcess.configPath = configPath;
+        writeConfigProcess.requestRevision = _layoutRequestRevision;
         writeConfigProcess.command = ["sh", "-c", `mkdir -p "${niriDmsDir}" && cat > "${configPath}" << 'EOF'\n${configContent}\nEOF`];
+        _awaitingLayoutReloadRevision = Math.max(_awaitingLayoutReloadRevision, _layoutRequestRevision);
         writeConfigProcess.running = true;
 
-        writeAlttabProcess.alttabContent = alttabContent;
-        writeAlttabProcess.alttabPath = alttabPath;
-        writeAlttabProcess.command = ["sh", "-c", `mkdir -p "${niriDmsDir}" && cat > "${alttabPath}" << 'EOF'\n${alttabContent}\nEOF`];
-        writeAlttabProcess.running = true;
+        if (_lastGeneratedAlttabContent !== alttabContent) {
+            _lastGeneratedAlttabContent = alttabContent;
+            writeAlttabProcess.alttabContent = alttabContent;
+            writeAlttabProcess.alttabPath = alttabPath;
+            writeAlttabProcess.command = ["sh", "-c", `mkdir -p "${niriDmsDir}" && cat > "${alttabPath}" << 'EOF'\n${alttabContent}\nEOF`];
+            writeAlttabProcess.running = true;
+        }
 
         for (const name of ["outputs", "binds", "cursor", "windowrules", "colors", "alttab", "layout"]) {
             const path = niriDmsDir + "/" + name + ".kdl";
@@ -1141,8 +1271,6 @@ Singleton {
                     log.warn("Failed to ensure " + name + ".kdl, exit code:", exitCode);
             });
         }
-
-        configGenerationPending = false;
     }
 
     function generateNiriBlurrule() {
@@ -1252,7 +1380,7 @@ Singleton {
             commands.push(`niri msg output "${outputName}" ${config.disabled ? "off" : "on"}`);
             if (config.disabled) {
                 const fullDisableCommand = "{ " + commands.join(" && ") + "; } 2>&1";
-                Proc.runCommand("niri-output-config", ["sh", "-c", fullDisableCommand], (output, exitCode) => {
+                Proc.runCommand("niri-output-config-" + outputName, ["sh", "-c", fullDisableCommand], (output, exitCode) => {
                     if (exitCode !== 0) {
                         log.warn("Failed to apply output config:", outputName, "exit:", exitCode, output);
                         if (callback)
@@ -1296,7 +1424,7 @@ Singleton {
         }
 
         const fullCommand = "{ " + commands.join(" && ") + "; } 2>&1";
-        Proc.runCommand("niri-output-config", ["sh", "-c", fullCommand], (output, exitCode) => {
+        Proc.runCommand("niri-output-config-" + outputName, ["sh", "-c", fullCommand], (output, exitCode) => {
             if (exitCode !== 0) {
                 log.warn("Failed to apply output config:", outputName, "exit:", exitCode, output);
                 if (callback)

@@ -110,7 +110,7 @@ Rectangle {
             iconName: "push_pin"
             iconSize: Theme.iconSize - 6
             iconColor: (entry.pinned || hasPinnedDuplicate) ? Theme.primary : Theme.surfaceText
-            backgroundColor: (entry.pinned || hasPinnedDuplicate) ? Theme.primarySelected : "transparent"
+            backgroundColor: (entry.pinned || hasPinnedDuplicate) ? Theme.primarySelected : Theme.withAlpha(Theme.primarySelected, 0)
             visible: root.showPinAction
             onClicked: {
                 if (entry.pinned) {
@@ -228,9 +228,9 @@ Rectangle {
         }
         onClicked: {
             if (SettingsData.clipboardClickToPaste) {
-                pasteRequested()
+                pasteRequested();
             } else {
-                copyRequested()
+                copyRequested();
             }
         }
     }

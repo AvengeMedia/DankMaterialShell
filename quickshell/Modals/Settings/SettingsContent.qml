@@ -434,7 +434,9 @@ FocusScope {
             visible: active
             focus: active
 
-            sourceComponent: MediaPlayerTab {}
+            sourceComponent: MediaPlayerTab {
+                parentModal: root.parentModal
+            }
 
             onActiveChanged: {
                 if (active && item)
@@ -695,6 +697,21 @@ FocusScope {
             focus: active
 
             sourceComponent: BatteryTab {}
+
+            onActiveChanged: {
+                if (active && item)
+                    Qt.callLater(() => item.forceActiveFocus());
+            }
+        }
+
+        Loader {
+            id: dankDashLoader
+            anchors.fill: parent
+            active: root.currentIndex === 43
+            visible: active
+            focus: active
+
+            sourceComponent: DankDashTab {}
 
             onActiveChanged: {
                 if (active && item)

@@ -17,6 +17,24 @@ import (
 	"github.com/godbus/dbus/v5"
 )
 
+const nmVPNStateFailed = 6
+
+// vpnFailureMessage maps NMVpnConnectionStateReason to a user-facing message.
+func vpnFailureMessage(reason uint32) string {
+	switch reason {
+	case 9: // NO_SECRETS
+		return "Authentication required"
+	case 10: // LOGIN_FAILED
+		return "Authentication failed"
+	case 6: // CONNECT_TIMEOUT
+		return "Connection timed out"
+	case 7, 8: // SERVICE_START_TIMEOUT, SERVICE_START_FAILED
+		return "VPN service failed to start"
+	default:
+		return "VPN connection failed"
+	}
+}
+
 func (b *NetworkManagerBackend) ListVPNProfiles() ([]VPNProfile, error) {
 	s := b.settings
 	if s == nil {
@@ -199,25 +217,38 @@ func (b *NetworkManagerBackend) ListActiveVPN() ([]VPNActive, error) {
 }
 
 func (b *NetworkManagerBackend) ConnectVPN(uuidOrName string, singleActive bool) error {
+	// Drop any stale connecting state from a prior attempt that never resolved;
+	// a leftover flag makes the secret agent refuse secrets for other VPNs.
+	b.stateMutex.Lock()
+	b.state.IsConnectingVPN = false
+	b.state.ConnectingVPNUUID = ""
+	b.state.VPNError = ""
+	b.state.VPNErrorUuid = ""
+	b.stateMutex.Unlock()
+
 	if singleActive {
 		active, err := b.ListActiveVPN()
 		if err == nil && len(active) > 0 {
 			alreadyConnected := false
 			for _, vpn := range active {
-				if vpn.UUID == uuidOrName || vpn.Name == uuidOrName {
-					alreadyConnected = true
-					break
+				if vpn.UUID != uuidOrName && vpn.Name != uuidOrName {
+					continue
 				}
+				switch vpn.State {
+				case "activated", "activating":
+					alreadyConnected = true
+				}
+				break
 			}
 
-			if !alreadyConnected {
-				if err := b.DisconnectAllVPN(); err != nil {
-					log.Warnf("Failed to disconnect existing VPNs: %v", err)
-				}
-				time.Sleep(500 * time.Millisecond)
-			} else {
+			if alreadyConnected {
 				return nil
 			}
+
+			if err := b.DisconnectAllVPN(); err != nil {
+				log.Warnf("Failed to disconnect existing VPNs: %v", err)
+			}
+			time.Sleep(500 * time.Millisecond)
 		}
 	}
 
@@ -723,6 +754,8 @@ func (b *NetworkManagerBackend) updateVPNConnectionState() {
 				b.state.IsConnectingVPN = false
 				b.state.ConnectingVPNUUID = ""
 				b.state.LastError = ""
+				b.state.VPNError = ""
+				b.state.VPNErrorUuid = ""
 				b.stateMutex.Unlock()
 
 				// Clear cached PKCS11 PIN and SAML cookie on success
@@ -748,6 +781,10 @@ func (b *NetworkManagerBackend) updateVPNConnectionState() {
 				b.state.IsConnectingVPN = false
 				b.state.ConnectingVPNUUID = ""
 				b.state.LastError = "VPN connection failed"
+				if b.state.VPNError == "" {
+					b.state.VPNError = "VPN connection failed"
+				}
+				b.state.VPNErrorUuid = connectingVPNUUID
 				b.stateMutex.Unlock()
 
 				// Clear cached PKCS11 PIN and SAML cookie on failure
@@ -768,6 +805,10 @@ func (b *NetworkManagerBackend) updateVPNConnectionState() {
 		b.state.IsConnectingVPN = false
 		b.state.ConnectingVPNUUID = ""
 		b.state.LastError = "VPN connection failed"
+		if b.state.VPNError == "" {
+			b.state.VPNError = "VPN connection failed"
+		}
+		b.state.VPNErrorUuid = connectingVPNUUID
 		b.stateMutex.Unlock()
 
 		// Clear cached PKCS11 PIN and SAML cookie
@@ -1217,6 +1258,8 @@ func (b *NetworkManagerBackend) UpdateVPNConfig(connUUID string, updates map[str
 			delete(ipv6, "dns")
 		}
 
+		mergeStoredSecrets(conn, settings)
+
 		if err := conn.Update(settings); err != nil {
 			return fmt.Errorf("failed to update connection: %w", err)
 		}
@@ -1310,6 +1353,8 @@ func (b *NetworkManagerBackend) SetVPNCredentials(connUUID string, username stri
 			delete(ipv6, "routes")
 			delete(ipv6, "dns")
 		}
+
+		mergeStoredSecrets(conn, settings)
 
 		if err := conn.Update(settings); err != nil {
 			return fmt.Errorf("failed to update connection: %w", err)

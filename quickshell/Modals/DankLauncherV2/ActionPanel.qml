@@ -157,7 +157,7 @@ Rectangle {
                         width: actionContent.implicitWidth + Theme.spacingM * 2
                         height: actionsRow.height
                         radius: Theme.cornerRadius
-                        color: index === root.selectedActionIndex ? Theme.primaryHover : actionArea.containsMouse ? Theme.surfaceHover : "transparent"
+                        color: index === root.selectedActionIndex ? Theme.primaryHover : actionArea.containsMouse ? Theme.surfaceHover : Theme.withAlpha(Theme.surfaceHover, 0)
 
                         Row {
                             id: actionContent

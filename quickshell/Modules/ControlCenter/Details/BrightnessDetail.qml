@@ -221,12 +221,12 @@ Rectangle {
                         width: globalPinRow.width + Theme.spacingS * 2
                         height: 28
                         radius: height / 2
-                        color: monitorHeader.currentDevicePinned ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.16) : Theme.withAlpha(Theme.surfaceText, 0.05)
+                        color: monitorHeader.currentDevicePinned ? Theme.primaryPressed : Theme.withAlpha(Theme.surfaceText, 0.05)
 
                         Row {
                             id: globalPinRow
                             anchors.centerIn: parent
-                            spacing: 4
+                            spacing: Theme.spacingXS
 
                             DankIcon {
                                 name: "push_pin"
@@ -282,7 +282,7 @@ Rectangle {
                     height: 100
                     radius: Theme.cornerRadius
                     color: Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency)
-                    border.color: selected ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+                    border.color: selected ? Theme.primary : Theme.outlineStrong
                     border.width: selected ? 2 : 0
 
                     Column {
@@ -304,7 +304,7 @@ Rectangle {
                                 Column {
                                     id: deviceIconColumn
                                     anchors.verticalCenter: parent.verticalCenter
-                                    spacing: 2
+                                    spacing: Theme.spacingXXS
 
                                     DankIcon {
                                         name: {
@@ -476,7 +476,7 @@ Rectangle {
                                     height: 28
                                     radius: Theme.cornerRadius
                                     visible: root.screenName && root.screenName.length > 0 && DisplayService.devices && DisplayService.devices.length > 1
-                                    color: devicePinnedHere ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.16) : Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency)
+                                    color: devicePinnedHere ? Theme.primaryPressed : Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency)
 
                                     DankIcon {
                                         anchors.centerIn: parent
@@ -498,11 +498,11 @@ Rectangle {
                             width: parent.width
                             height: 24
                             radius: height / 2
-                            color: SessionData.getBrightnessExponential(modelData.name) ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.withAlpha(Theme.surfaceText, 0.05)
+                            color: SessionData.getBrightnessExponential(modelData.name) ? Theme.primaryHover : Theme.withAlpha(Theme.surfaceText, 0.05)
 
                             Row {
                                 anchors.centerIn: parent
-                                spacing: 4
+                                spacing: Theme.spacingXS
 
                                 DankIcon {
                                     name: "show_chart"

@@ -755,7 +755,7 @@ BasePill {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 1
                                 anchors.verticalCenter: parent.verticalCenter
-                                spacing: 2
+                                spacing: Theme.spacingXXS
 
                                 DankIcon {
                                     id: audioIcon
@@ -792,7 +792,7 @@ BasePill {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 1
                                 anchors.verticalCenter: parent.verticalCenter
-                                spacing: 2
+                                spacing: Theme.spacingXXS
 
                                 DankIcon {
                                     id: micIcon
@@ -829,7 +829,7 @@ BasePill {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 1
                                 anchors.verticalCenter: parent.verticalCenter
-                                spacing: 2
+                                spacing: Theme.spacingXXS
 
                                 DankIcon {
                                     id: brightnessIcon

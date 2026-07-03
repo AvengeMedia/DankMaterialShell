@@ -956,6 +956,8 @@ func (b *NetworkManagerBackend) SetWiFiAutoconnect(ssid string, autoconnect bool
 		delete(ipv6, "dns")
 	}
 
+	mergeStoredSecrets(conn, settings)
+
 	err = conn.Update(settings)
 	if err != nil {
 		return fmt.Errorf("failed to update connection: %w", err)

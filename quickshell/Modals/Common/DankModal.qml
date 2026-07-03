@@ -58,6 +58,9 @@ Item {
     HyprlandFocusGrab {
         windows: root.contentWindow ? [root.contentWindow] : []
         active: KeyboardFocus.wantsGrab(root.shouldHaveFocus, root.customKeyboardFocus)
+
+        property var restoreToplevel: null
+        onActiveChanged: restoreToplevel = active ? KeyboardFocus.captureActiveToplevel() : KeyboardFocus.restoreToplevel(restoreToplevel)
     }
     readonly property var contentWindow: impl.item ? impl.item.contentWindow : null
     readonly property var effectiveScreen: impl.item ? impl.item.effectiveScreen : null
@@ -90,7 +93,7 @@ Item {
             impl.item.toggle();
     }
 
-    readonly property var _desiredBackend: SettingsData.connectedFrameModeActive ? connectedComp : standaloneComp
+    readonly property var _desiredBackend: FrameTransitionState.effectiveConnectedFrameModeActive ? connectedComp : standaloneComp
     property var _resolvedBackend: null
 
     Component.onCompleted: _resolvedBackend = _desiredBackend

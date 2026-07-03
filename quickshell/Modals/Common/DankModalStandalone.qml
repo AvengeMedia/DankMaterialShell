@@ -53,7 +53,7 @@ Item {
     readonly property alias contentWindow: contentWindow
     readonly property alias clickCatcher: clickCatcher
     readonly property bool useHyprlandFocusGrab: CompositorService.useHyprlandFocusGrab
-    readonly property bool useBackground: showBackground && !SettingsData.frameEnabled && SettingsData.modalDarkenBackground
+    readonly property bool useBackground: showBackground && !FrameTransitionState.effectiveFrameEnabled && SettingsData.modalDarkenBackground
     readonly property bool useSingleWindow: CompositorService.isHyprland || useBackground
 
     signal opened
@@ -325,8 +325,8 @@ Item {
                 enabled: root.useSingleWindow && root.shouldBeVisible
                 hoverEnabled: false
                 acceptedButtons: Qt.AllButtons
-                onPressed: mouse.accepted = true
-                onClicked: mouse.accepted = true
+                onPressed: mouse => mouse.accepted = true
+                onClicked: mouse => mouse.accepted = true
                 z: -1
             }
 

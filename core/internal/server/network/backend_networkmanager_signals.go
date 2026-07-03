@@ -136,6 +136,29 @@ func (b *NetworkManagerBackend) startSignalPump() error {
 		}
 	}
 
+	// activating->activated/failed fires on the active-connection object, not the
+	// manager's ActiveConnections property. VPN.Connection covers plugin VPNs;
+	// Connection.Active covers the rest, including WireGuard.
+	if err := conn.AddMatchSignal(
+		dbus.WithMatchPathNamespace(dbus.ObjectPath(dbusNMActiveConnPath)),
+		dbus.WithMatchInterface(dbusNMVPNConnInterface),
+		dbus.WithMatchMember("VpnStateChanged"),
+	); err != nil {
+		conn.RemoveSignal(signals)
+		conn.Close()
+		return err
+	}
+
+	if err := conn.AddMatchSignal(
+		dbus.WithMatchPathNamespace(dbus.ObjectPath(dbusNMActiveConnPath)),
+		dbus.WithMatchInterface(dbusNMActiveConnInterface),
+		dbus.WithMatchMember("StateChanged"),
+	); err != nil {
+		conn.RemoveSignal(signals)
+		conn.Close()
+		return err
+	}
+
 	b.sigWG.Add(1)
 	go func() {
 		defer b.sigWG.Done()
@@ -193,6 +216,16 @@ func (b *NetworkManagerBackend) stopSignalPump() {
 		dbus.WithMatchInterface(dbusNMInterface),
 		dbus.WithMatchMember("DeviceRemoved"),
 	)
+	b.dbusConn.RemoveMatchSignal(
+		dbus.WithMatchPathNamespace(dbus.ObjectPath(dbusNMActiveConnPath)),
+		dbus.WithMatchInterface(dbusNMVPNConnInterface),
+		dbus.WithMatchMember("VpnStateChanged"),
+	)
+	b.dbusConn.RemoveMatchSignal(
+		dbus.WithMatchPathNamespace(dbus.ObjectPath(dbusNMActiveConnPath)),
+		dbus.WithMatchInterface(dbusNMActiveConnInterface),
+		dbus.WithMatchMember("StateChanged"),
+	)
 
 	for _, info := range b.wifiDevices {
 		b.dbusConn.RemoveMatchSignal(
@@ -231,6 +264,20 @@ func (b *NetworkManagerBackend) handleDBusSignal(sig *dbus.Signal) {
 		if b.onStateChange != nil {
 			b.onStateChange()
 		}
+		return
+	}
+
+	if sig.Name == dbusNMVPNConnInterface+".VpnStateChanged" {
+		if len(sig.Body) >= 2 {
+			state, _ := sig.Body[0].(uint32)
+			reason, _ := sig.Body[1].(uint32)
+			b.handleVPNStateChange(state, reason)
+		}
+		return
+	}
+
+	if sig.Name == dbusNMActiveConnInterface+".StateChanged" {
+		b.handleActiveConnectionStateChange()
 		return
 	}
 
@@ -318,6 +365,27 @@ func (b *NetworkManagerBackend) handleNetworkManagerChange(changes map[string]db
 			b.onStateChange()
 		}
 	}
+}
+
+func (b *NetworkManagerBackend) handleActiveConnectionStateChange() {
+	b.updateVPNConnectionState()
+	b.ListActiveVPN()
+	if b.onStateChange != nil {
+		b.onStateChange()
+	}
+}
+
+func (b *NetworkManagerBackend) handleVPNStateChange(state, reason uint32) {
+	if state == nmVPNStateFailed {
+		b.stateMutex.Lock()
+		if uuid := b.state.ConnectingVPNUUID; uuid != "" {
+			b.state.VPNError = vpnFailureMessage(reason)
+			b.state.VPNErrorUuid = uuid
+		}
+		b.stateMutex.Unlock()
+	}
+
+	b.handleActiveConnectionStateChange()
 }
 
 func (b *NetworkManagerBackend) handleDeviceChange(devicePath dbus.ObjectPath, changes map[string]dbus.Variant) {

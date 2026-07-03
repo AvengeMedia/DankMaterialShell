@@ -107,6 +107,9 @@
   "%1 windows": {
     "%1 windows": "%1 fönster"
   },
+  "%1: %2": {
+    "%1: %2": ""
+  },
   "%1m ago": {
     "%1m ago": "för %1 min sedan"
   },
@@ -323,6 +326,9 @@
   "A user with that name already exists.": {
     "A user with that name already exists.": ""
   },
+  "AC Adapter (Plugged In)": {
+    "AC Adapter (Plugged In)": ""
+  },
   "AC Power": {
     "AC Power": "Nätström"
   },
@@ -524,6 +530,9 @@
   "Allow": {
     "Allow": ""
   },
+  "Allow LAN access": {
+    "Allow LAN access": ""
+  },
   "Allow adjusting device volume by scrolling on the right half of items in the device list": {
     "Allow adjusting device volume by scrolling on the right half of items in the device list": ""
   },
@@ -664,6 +673,9 @@
   },
   "Apply inverse concave corner cutouts to the bar": {
     "Apply inverse concave corner cutouts to the bar": ""
+  },
+  "Apply to Hardware": {
+    "Apply to Hardware": ""
   },
   "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": {
     "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": "Applicera varm färgtemperatur för att minska ögontrötthet. Använd automatiseringsinställningarna nedan för att styra när det aktiveras."
@@ -818,6 +830,9 @@
   "Auto Popup Gaps": {
     "Auto Popup Gaps": "Automatiska mellanrum för popupfönster"
   },
+  "Auto Power Saver": {
+    "Auto Power Saver": ""
+  },
   "Auto mode is on. Manual profile selection is disabled.": {
     "Auto mode is on. Manual profile selection is disabled.": ""
   },
@@ -911,6 +926,9 @@
   "Automatically save changes to opened files as you type": {
     "Automatically save changes to opened files as you type": ""
   },
+  "Automatically turn on Power Saver profile when battery is low.": {
+    "Automatically turn on Power Saver profile when battery is low.": ""
+  },
   "Automation": {
     "Automation": "Automatisering"
   },
@@ -962,6 +980,9 @@
   "Background Blur": {
     "Background Blur": ""
   },
+  "Background Color": {
+    "Background Color": ""
+  },
   "Background Effect": {
     "Background Effect": ""
   },
@@ -995,11 +1016,17 @@
   "Bar Configurations": {
     "Bar Configurations": "Menyradskonfigurationer"
   },
+  "Bar Inset Padding": {
+    "Bar Inset Padding": ""
+  },
   "Bar Opacity": {
     "Bar Opacity": ""
   },
   "Bar Shadows": {
     "Bar Shadows": "Menyradsskuggor"
+  },
+  "Bar Spacing": {
+    "Bar Spacing": ""
   },
   "Bar Transparency": {
     "Bar Transparency": "Genomskinlighet på menyraden"
@@ -1028,11 +1055,35 @@
   "Battery Charge Limit": {
     "Battery Charge Limit": "Laddningsgräns"
   },
+  "Battery Health": {
+    "Battery Health": ""
+  },
+  "Battery Power": {
+    "Battery Power": ""
+  },
+  "Battery Protection & Charging": {
+    "Battery Protection & Charging": ""
+  },
+  "Battery Status": {
+    "Battery Status": ""
+  },
   "Battery and power management": {
     "Battery and power management": "Batteri och energihantering"
   },
+  "Battery has charged to your set limit of %1%": {
+    "Battery has charged to your set limit of %1%": ""
+  },
+  "Battery is at %1% - Connect charger immediately!": {
+    "Battery is at %1% - Connect charger immediately!": ""
+  },
+  "Battery is at %1% - Consider charging soon": {
+    "Battery is at %1% - Consider charging soon": ""
+  },
   "Battery level and power management": {
     "Battery level and power management": "Energi och batteri"
+  },
+  "Battery percentage to trigger a critical alert.": {
+    "Battery percentage to trigger a critical alert.": ""
   },
   "Behavior": {
     "Behavior": "Beteende"
@@ -1057,6 +1108,9 @@
   },
   "Black": {
     "Black": ""
+  },
+  "Blend between Surface High and the selected custom color": {
+    "Blend between Surface High and the selected custom color": ""
   },
   "Block Out": {
     "Block Out": "Blockera"
@@ -1316,6 +1370,15 @@
   "Channel": {
     "Channel": "Kanal"
   },
+  "Charge Level": {
+    "Charge Level": ""
+  },
+  "Charge Limit Reached": {
+    "Charge Limit Reached": ""
+  },
+  "Charge limit applied successfully": {
+    "Charge limit applied successfully": ""
+  },
   "Charging": {
     "Charging": "Laddar"
   },
@@ -1376,11 +1439,17 @@
   "Choose how this bar resolves shadow direction": {
     "Choose how this bar resolves shadow direction": "Välj hur denna menyrad hanterar skuggriktning"
   },
+  "Choose how to be notified about battery alerts.": {
+    "Choose how to be notified about battery alerts.": ""
+  },
   "Choose icon": {
     "Choose icon": "Välj ikon"
   },
   "Choose monochrome or a theme color tint for system tray icons": {
     "Choose monochrome or a theme color tint for system tray icons": ""
+  },
+  "Choose neutral or accent-colored widget text": {
+    "Choose neutral or accent-colored widget text": ""
   },
   "Choose the background color for widgets": {
     "Choose the background color for widgets": "Välj bakgrundsfärg för widgetar"
@@ -1466,8 +1535,14 @@
   "Click Through": {
     "Click Through": "Klick igenom"
   },
+  "Click an entry to paste directly instead of copying": {
+    "Click an entry to paste directly instead of copying": ""
+  },
   "Click any shortcut to edit. Changes save to %1": {
     "Click any shortcut to edit. Changes save to %1": "Klicka på ett kortkommando för att redigera. Ändringar sparas i %1"
+  },
+  "Click to Paste": {
+    "Click to Paste": ""
   },
   "Click to capture": {
     "Click to capture": "Klicka för att fånga"
@@ -1546,6 +1621,9 @@
   },
   "Color for primary action buttons": {
     "Color for primary action buttons": "Färg på primära åtgärdsknappar"
+  },
+  "Color shown for areas not covered by wallpaper (e.g. Fit or Pad modes)": {
+    "Color shown for areas not covered by wallpaper (e.g. Fit or Pad modes)": ""
   },
   "Color temperature for day time": {
     "Color temperature for day time": "Färgtemperatur för dagtid"
@@ -1714,6 +1792,9 @@
   },
   "Connecting...": {
     "Connecting...": "Ansluter..."
+  },
+  "Connecting…": {
+    "Connecting…": ""
   },
   "Connection failed": {
     "Connection failed": "Anslutning misslyckades"
@@ -1895,8 +1976,23 @@
   "Creating...": {
     "Creating...": "Skapar..."
   },
+  "Credentials": {
+    "Credentials": ""
+  },
+  "Critical Battery": {
+    "Critical Battery": ""
+  },
+  "Critical Battery Alert": {
+    "Critical Battery Alert": ""
+  },
+  "Critical Battery Notifications": {
+    "Critical Battery Notifications": ""
+  },
   "Critical Priority": {
     "Critical Priority": "Kritisk prioritet"
+  },
+  "Critical Threshold": {
+    "Critical Threshold": ""
   },
   "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": {
     "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": ""
@@ -1972,6 +2068,9 @@
   },
   "Custom": {
     "Custom": "Anpassad"
+  },
+  "Custom Blend": {
+    "Custom Blend": ""
   },
   "Custom Color": {
     "Custom Color": "Anpassad färg"
@@ -2116,6 +2215,9 @@
   },
   "Dark Mode": {
     "Dark Mode": "Mörkt läge"
+  },
+  "Dark Mode Icon Theme": {
+    "Dark Mode Icon Theme": ""
   },
   "Dark mode base": {
     "Dark mode base": "Mörkt läge-bas"
@@ -2486,6 +2588,9 @@
   "Dock margin, transparency, and border": {
     "Dock margin, transparency, and border": ""
   },
+  "Dock window": {
+    "Dock window": ""
+  },
   "Docs": {
     "Docs": "Dokumentation"
   },
@@ -2569,6 +2674,9 @@
   },
   "Edge Spacing": {
     "Edge Spacing": "Avstånd från skärmkanter"
+  },
+  "Edge spacing, exclusive zone, and popup gaps are managed by Frame": {
+    "Edge spacing, exclusive zone, and popup gaps are managed by Frame": ""
   },
   "Edge the launcher slides from": {
     "Edge the launcher slides from": ""
@@ -2729,6 +2837,9 @@
   "Enter PIN for ": {
     "Enter PIN for ": "Ange PIN för "
   },
+  "Enter URI or text to share": {
+    "Enter URI or text to share": ""
+  },
   "Enter URL or text to share": {
     "Enter URL or text to share": "Ange URL eller text att dela"
   },
@@ -2795,6 +2906,9 @@
   "Errors": {
     "Errors": "Fel"
   },
+  "Estimated Time": {
+    "Estimated Time": ""
+  },
   "Ethernet": {
     "Ethernet": "Ethernet"
   },
@@ -2821,6 +2935,9 @@
   },
   "Existing Users": {
     "Existing Users": ""
+  },
+  "Exit node": {
+    "Exit node": ""
   },
   "Experimental Feature": {
     "Experimental Feature": "Experimentell funktion"
@@ -2884,6 +3001,9 @@
   },
   "Failed to apply Qt colors": {
     "Failed to apply Qt colors": ""
+  },
+  "Failed to apply charge limit to system": {
+    "Failed to apply charge limit to system": ""
   },
   "Failed to apply profile": {
     "Failed to apply profile": ""
@@ -3038,6 +3158,9 @@
   "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": {
     "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": "Misslyckades med att köra 'dms greeter status'. Se till att DMS är installerat och att dms finns i PATH."
   },
+  "Failed to save VPN credentials": {
+    "Failed to save VPN credentials": ""
+  },
   "Failed to save audio config": {
     "Failed to save audio config": "Misslyckades med att spara ljudkonfiguration"
   },
@@ -3049,6 +3172,9 @@
   },
   "Failed to save profile": {
     "Failed to save profile": ""
+  },
+  "Failed to send SMS": {
+    "Failed to send SMS": ""
   },
   "Failed to send clipboard": {
     "Failed to send clipboard": "Misslyckades med att skicka urklipp"
@@ -3175,6 +3301,9 @@
   },
   "Filter": {
     "Filter": ""
+  },
+  "Filter by type": {
+    "Filter by type": ""
   },
   "Find in Text": {
     "Find in Text": "Sök i text"
@@ -3392,6 +3521,9 @@
   "Format Legend": {
     "Format Legend": "Formateringsguide"
   },
+  "Forward 10s": {
+    "Forward 10s": ""
+  },
   "Frame": {
     "Frame": ""
   },
@@ -3475,6 +3607,9 @@
   },
   "Gamma control not available. Requires DMS API v6+.": {
     "Gamma control not available. Requires DMS API v6+.": "Gammakontroll är inte tillgänglig. Kräver DMS API v6+."
+  },
+  "Gap between the end widgets and the bar ends (0 = edge-to-edge)": {
+    "Gap between the end widgets and the bar ends (0 = edge-to-edge)": ""
   },
   "Generate Override": {
     "Generate Override": ""
@@ -3704,6 +3839,9 @@
   "Hide device": {
     "Hide device": "Dölj enhet"
   },
+  "Hide installed": {
+    "Hide installed": ""
+  },
   "Hide notification content until expanded": {
     "Hide notification content until expanded": "Dölj notisinnehåll tills det expanderas"
   },
@@ -3844,6 +3982,9 @@
   },
   "Icon Theme": {
     "Icon Theme": "Ikontema"
+  },
+  "Icon theme changed outside DMS; switched to System Default": {
+    "Icon theme changed outside DMS; switched to System Default": ""
   },
   "Identical alerts show as one popup instead of stacking": {
     "Identical alerts show as one popup instead of stacking": ""
@@ -4010,6 +4151,9 @@
   "Installed": {
     "Installed": "Installerat"
   },
+  "Installed first": {
+    "Installed first": ""
+  },
   "Installed: %1": {
     "Installed: %1": "Installerat: %1"
   },
@@ -4078,6 +4222,9 @@
   },
   "Keep in Bar": {
     "Keep in Bar": ""
+  },
+  "Keep the clipboard type filter when reopening history": {
+    "Keep the clipboard type filter when reopening history": ""
   },
   "Keep typing": {
     "Keep typing": ""
@@ -4220,6 +4367,9 @@
   "Light Mode": {
     "Light Mode": "Ljust läge"
   },
+  "Light Mode Icon Theme": {
+    "Light Mode Icon Theme": ""
+  },
   "Light Rain": {
     "Light Rain": "Lätt regn"
   },
@@ -4234,6 +4384,12 @@
   },
   "Light mode harmony": {
     "Light mode harmony": "Ljust läge-harmoni"
+  },
+  "Limit set to %1%": {
+    "Limit set to %1%": ""
+  },
+  "Limit the maximum battery charge level to extend lifespan.": {
+    "Limit the maximum battery charge level to extend lifespan.": ""
   },
   "Line": {
     "Line": "Linje"
@@ -4270,6 +4426,9 @@
   },
   "Local": {
     "Local": "Lokal"
+  },
+  "Local Weather": {
+    "Local Weather": ""
   },
   "Locale": {
     "Locale": "Språk"
@@ -4342,6 +4501,15 @@
   },
   "Low": {
     "Low": ""
+  },
+  "Low Battery": {
+    "Low Battery": ""
+  },
+  "Low Battery Notifications": {
+    "Low Battery Notifications": ""
+  },
+  "Low Battery Threshold": {
+    "Low Battery Threshold": ""
   },
   "Low Priority": {
     "Low Priority": "Låg prioritet"
@@ -4745,6 +4913,9 @@
   "Music Player": {
     "Music Player": ""
   },
+  "Mute During Playback": {
+    "Mute During Playback": ""
+  },
   "Mute Popups": {
     "Mute Popups": "Tysta banderoller"
   },
@@ -4807,6 +4978,9 @@
   },
   "Network Status": {
     "Network Status": "Nätverksstatus"
+  },
+  "Network Type": {
+    "Network Type": ""
   },
   "Network download and upload speed display": {
     "Network download and upload speed display": "Visa upp- och nedladdningshastighet"
@@ -5036,6 +5210,9 @@
   "No human user accounts found.": {
     "No human user accounts found.": ""
   },
+  "No images found": {
+    "No images found": ""
+  },
   "No info items": {
     "No info items": "Inga informationsobjekt"
   },
@@ -5255,6 +5432,9 @@
   "Nothing to see here": {
     "Nothing to see here": "Inga äldre notiser"
   },
+  "Notification": {
+    "Notification": ""
+  },
   "Notification Center": {
     "Notification Center": "Notiscenter"
   },
@@ -5276,11 +5456,17 @@
   "Notification Timeouts": {
     "Notification Timeouts": "Tidsgräns för notiser"
   },
+  "Notification Type": {
+    "Notification Type": ""
+  },
   "Notification toast popups": {
     "Notification toast popups": "Notisbanderoller"
   },
   "Notifications": {
     "Notifications": "Notiser"
+  },
+  "Notify when limit is reached": {
+    "Notify when limit is reached": ""
   },
   "Numbers": {
     "Numbers": "Tal"
@@ -5342,6 +5528,9 @@
   "Only affects DMS-managed PAM. If greetd already includes pam_fprintd, fingerprint stays enabled.": {
     "Only affects DMS-managed PAM. If greetd already includes pam_fprintd, fingerprint stays enabled.": "Påverkar bara DMS-hanterad PAM. Om greetd redan inkluderar pam_fprintd förblir fingeravtrycksläsaren aktiverad."
   },
+  "Only on Battery": {
+    "Only on Battery": ""
+  },
   "Only show windows from the current monitor on each dock": {
     "Only show windows from the current monitor on each dock": "Visa bara fönster från den aktuella bildskärmen i varje dock"
   },
@@ -5392,6 +5581,9 @@
   },
   "Open a terminal and run a custom command instead of the in-shell upgrade flow.": {
     "Open a terminal and run a custom command instead of the in-shell upgrade flow.": ""
+  },
+  "Open as window": {
+    "Open as window": ""
   },
   "Open folder": {
     "Open folder": "Öppna mapp"
@@ -5729,6 +5921,9 @@
   "Place the dock on the Wayland overlay layer": {
     "Place the dock on the Wayland overlay layer": ""
   },
+  "Play": {
+    "Play": ""
+  },
   "Play a video when the screen locks.": {
     "Play a video when the screen locks.": "Spela upp en video när skärmen låses."
   },
@@ -5876,6 +6071,9 @@
   "Power Profile Degradation": {
     "Power Profile Degradation": "Nedgradering av energiläge"
   },
+  "Power Profiles Auto-Switching": {
+    "Power Profiles Auto-Switching": ""
+  },
   "Power Saver": {
     "Power Saver": "Energisparläge"
   },
@@ -5884,6 +6082,12 @@
   },
   "Power profile management available": {
     "Power profile management available": "Energiprofilhantering tillgänglig"
+  },
+  "Power profile to use when AC power is connected.": {
+    "Power profile to use when AC power is connected.": ""
+  },
+  "Power profile to use when running on battery power.": {
+    "Power profile to use when running on battery power.": ""
   },
   "Power source": {
     "Power source": "Strömkälla"
@@ -5930,11 +6134,20 @@
   "Preview": {
     "Preview": "Förhandsgranskning"
   },
+  "Preview: %1": {
+    "Preview: %1": ""
+  },
+  "Previous": {
+    "Previous": ""
+  },
   "Primary": {
     "Primary": "Primär"
   },
   "Primary Container": {
     "Primary Container": "Primär behållare"
+  },
+  "Primary Theme Color": {
+    "Primary Theme Color": ""
   },
   "Print Server Management": {
     "Print Server Management": "Skrivarserverhantering"
@@ -5984,6 +6197,9 @@
   "Process Count": {
     "Process Count": "Antal processer"
   },
+  "Process exited with code %1": {
+    "Process exited with code %1": ""
+  },
   "Processes": {
     "Processes": "Processer"
   },
@@ -6019,6 +6235,12 @@
   },
   "Profile saved: %1": {
     "Profile saved: %1": "Profil sparad: %1"
+  },
+  "Profile when Plugged In (AC)": {
+    "Profile when Plugged In (AC)": ""
+  },
+  "Profile when on Battery": {
+    "Profile when on Battery": ""
   },
   "Protocol": {
     "Protocol": "Protokoll"
@@ -6083,6 +6305,9 @@
   "Re-enter password": {
     "Re-enter password": ""
   },
+  "Reach local network devices while using an exit node": {
+    "Reach local network devices while using an exit node": ""
+  },
   "Read-only legacy config": {
     "Read-only legacy config": ""
   },
@@ -6100,6 +6325,9 @@
   },
   "Recent Colors": {
     "Recent Colors": "Nyligen använda färger"
+  },
+  "Recent Images": {
+    "Recent Images": ""
   },
   "Recently Used Apps": {
     "Recently Used Apps": "Nyligen använda appar"
@@ -6148,6 +6376,9 @@
   },
   "Remember Last Query": {
     "Remember Last Query": ""
+  },
+  "Remember Type Filter": {
+    "Remember Type Filter": ""
   },
   "Remember last session": {
     "Remember last session": "Kom ihåg senaste session"
@@ -6320,6 +6551,9 @@
   "Revert": {
     "Revert": "Återställ"
   },
+  "Rewind 10s": {
+    "Rewind 10s": ""
+  },
   "Right": {
     "Right": "Höger"
   },
@@ -6407,6 +6641,9 @@
   "SMS": {
     "SMS": "SMS"
   },
+  "SMS sent successfully": {
+    "SMS sent successfully": ""
+  },
   "Saturation": {
     "Saturation": ""
   },
@@ -6428,6 +6665,9 @@
   "Save and switch between display configurations": {
     "Save and switch between display configurations": "Spara och växla mellan bildskärmskonfigurationer"
   },
+  "Save credentials": {
+    "Save credentials": ""
+  },
   "Save critical priority notifications to history": {
     "Save critical priority notifications to history": "Spara notiser med kritisk prioritet i historiken"
   },
@@ -6448,6 +6688,9 @@
   },
   "Saved Configurations": {
     "Saved Configurations": "Sparade konfigurationer"
+  },
+  "Saved Networks": {
+    "Saved Networks": ""
   },
   "Saved Note": {
     "Saved Note": "Sparad anteckning"
@@ -6571,6 +6814,9 @@
   },
   "Secondary": {
     "Secondary": "Sekundär"
+  },
+  "Secondary Container": {
+    "Secondary Container": ""
   },
   "Secured": {
     "Secured": "Lösenordsskyddad"
@@ -6713,6 +6959,9 @@
   "Separate": {
     "Separate": ""
   },
+  "Separate Light & Dark Themes": {
+    "Separate Light & Dark Themes": ""
+  },
   "Separator": {
     "Separator": "Avskiljare"
   },
@@ -6754,6 +7003,9 @@
   },
   "Set the font size for notification summary text": {
     "Set the font size for notification summary text": ""
+  },
+  "Set the percentage at which the battery is considered low.": {
+    "Set the percentage at which the battery is considered low.": ""
   },
   "Setting": {
     "Setting": ""
@@ -6869,6 +7121,9 @@
   "Show Feels Like Temperature": {
     "Show Feels Like Temperature": "Visa känns som-temperatur"
   },
+  "Show Flatpak, Snap, AppImage, or Nix badge icons on launcher items.": {
+    "Show Flatpak, Snap, AppImage, or Nix badge icons on launcher items.": ""
+  },
   "Show Footer": {
     "Show Footer": "Visa sidfot"
   },
@@ -6941,8 +7196,14 @@
   "Show Overflow Badge Count": {
     "Show Overflow Badge Count": "Visa overflow-märkesantal"
   },
+  "Show Package Source Badges": {
+    "Show Package Source Badges": ""
+  },
   "Show Password Field": {
     "Show Password Field": "Visa lösenordsfält"
+  },
+  "Show Percentage": {
+    "Show Percentage": ""
   },
   "Show Power Actions": {
     "Show Power Actions": "Visa strömåtgärder"
@@ -6961,6 +7222,9 @@
   },
   "Show Reboot": {
     "Show Reboot": "Visa omstart"
+  },
+  "Show Remaining Time": {
+    "Show Remaining Time": ""
   },
   "Show Restart DMS": {
     "Show Restart DMS": "Visa DMS-omstart"
@@ -7016,11 +7280,20 @@
   "Show a bar that drains as the popup's auto-dismiss timer runs": {
     "Show a bar that drains as the popup's auto-dismiss timer runs": ""
   },
+  "Show a notification when battery reaches the charge limit.": {
+    "Show a notification when battery reaches the charge limit.": ""
+  },
+  "Show a warning popup when battery is running low.": {
+    "Show a warning popup when battery is running low.": ""
+  },
   "Show all 9 tags instead of only occupied tags": {
     "Show all 9 tags instead of only occupied tags": ""
   },
   "Show an outline ring around the focused workspace indicator": {
     "Show an outline ring around the focused workspace indicator": "Visa en konturring runt den fokuserade arbetsytans indikator"
+  },
+  "Show an urgent alert when battery reaches critical level.": {
+    "Show an urgent alert when battery reaches critical level.": ""
   },
   "Show cava audio visualizer in media widget": {
     "Show cava audio visualizer in media widget": "Visa cava-ljudvisualiserare i mediawidget"
@@ -7148,6 +7421,9 @@
   "Signal": {
     "Signal": "Signal"
   },
+  "Signal Strength": {
+    "Signal Strength": ""
+  },
   "Signal:": {
     "Signal:": "Signal:"
   },
@@ -7156,6 +7432,9 @@
   },
   "Silence notifications": {
     "Silence notifications": ""
+  },
+  "Silence system sounds while media is playing": {
+    "Silence system sounds while media is playing": ""
   },
   "Single-Line Popup": {
     "Single-Line Popup": ""
@@ -7310,6 +7589,9 @@
   "Stripes": {
     "Stripes": "Ränder"
   },
+  "Subtle Overlay": {
+    "Subtle Overlay": ""
+  },
   "Summary": {
     "Summary": "Sammanfattning"
   },
@@ -7334,8 +7616,20 @@
   "Surface Behavior": {
     "Surface Behavior": ""
   },
+  "Surface Container": {
+    "Surface Container": ""
+  },
+  "Surface High": {
+    "Surface High": ""
+  },
+  "Surface Highest": {
+    "Surface Highest": ""
+  },
   "Surface Opacity": {
     "Surface Opacity": ""
+  },
+  "Surface Text": {
+    "Surface Text": ""
   },
   "Surface Variant": {
     "Surface Variant": "Ytvariant"
@@ -7372,6 +7666,9 @@
   },
   "Sync": {
     "Sync": "Synka"
+  },
+  "Sync Bar Inset Padding": {
+    "Sync Bar Inset Padding": ""
   },
   "Sync Mode with Portal": {
     "Sync Mode with Portal": "Synkronisera läge med portal"
@@ -7466,6 +7763,9 @@
   "Tailscale Network": {
     "Tailscale Network": ""
   },
+  "Tailscale action failed": {
+    "Tailscale action failed": ""
+  },
   "Tailscale not available": {
     "Tailscale not available": ""
   },
@@ -7498,6 +7798,12 @@
   },
   "Terminals - Always use Dark Theme": {
     "Terminals - Always use Dark Theme": "Terminaler – Använd alltid mörkt tema"
+  },
+  "Tertiary": {
+    "Tertiary": ""
+  },
+  "Tertiary Container": {
+    "Tertiary Container": ""
   },
   "Test Connection": {
     "Test Connection": "Testa anslutning"
@@ -7706,6 +8012,9 @@
   "To use this DMS bind, remove or change the keybind in your config.kdl": {
     "To use this DMS bind, remove or change the keybind in your config.kdl": "För att använda denna DMS-kommando, ta bort eller ändra kortkommandot i din config.kdl"
   },
+  "Toast": {
+    "Toast": ""
+  },
   "Toast Messages": {
     "Toast Messages": "Notisbanderoller"
   },
@@ -7867,6 +8176,9 @@
   },
   "Typography & Motion": {
     "Typography & Motion": "Typografi & rörelse"
+  },
+  "URI": {
+    "URI": ""
   },
   "Unavailable": {
     "Unavailable": "Otillgänglig"
@@ -8087,6 +8399,9 @@
   "Use desktop wallpaper": {
     "Use desktop wallpaper": "Använd skrivbordets bakgrundsbild"
   },
+  "Use different icon themes for light and dark mode": {
+    "Use different icon themes for light and dark mode": ""
+  },
   "Use fingerprint authentication for the lock screen.": {
     "Use fingerprint authentication for the lock screen.": "Använd fingeravtrycksautentisering för låsskärmen."
   },
@@ -8098,6 +8413,9 @@
   },
   "Use meters per second instead of km/h for wind speed": {
     "Use meters per second instead of km/h for wind speed": "Använd meter per sekund istället för km/h för vindhastighet"
+  },
+  "Use one inset value for every bar": {
+    "Use one inset value for every bar": ""
   },
   "Use smaller notification cards": {
     "Use smaller notification cards": "Använd mindre notiskort"
@@ -8198,6 +8516,9 @@
   "VPN configuration updated": {
     "VPN configuration updated": "VPN-konfiguration uppdaterad"
   },
+  "VPN credentials saved": {
+    "VPN credentials saved": ""
+  },
   "VPN deleted": {
     "VPN deleted": "VPN raderat"
   },
@@ -8291,6 +8612,9 @@
   "Volume, brightness, and other system OSDs": {
     "Volume, brightness, and other system OSDs": "Volym, ljusstyrka och andra systemskärmvisningar"
   },
+  "Votes": {
+    "Votes": ""
+  },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
   },
@@ -8354,6 +8678,9 @@
   "When locked": {
     "When locked": "När låst"
   },
+  "White": {
+    "White": ""
+  },
   "Wi-Fi Password": {
     "Wi-Fi Password": "Wi-Fi-lösenord"
   },
@@ -8404,6 +8731,9 @@
   },
   "Widget Styling": {
     "Widget Styling": "Widgetstil"
+  },
+  "Widget Text Style": {
+    "Widget Text Style": ""
   },
   "Widget Transparency": {
     "Widget Transparency": "Genomskinlighet på widget"
@@ -8579,11 +8909,17 @@
   "brandon": {
     "brandon": "brandon"
   },
+  "broken": {
+    "broken": ""
+  },
   "by %1": {
     "by %1": "av %1"
   },
   "days": {
     "days": "dagar"
+  },
+  "deprecated": {
+    "deprecated": ""
   },
   "detached": {
     "detached": "frånkopplad"
@@ -8599,6 +8935,9 @@
   },
   "direct": {
     "direct": ""
+  },
+  "discuss": {
+    "discuss": ""
   },
   "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": {
     "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": "dms är ett mycket anpassningsbart, modernt skrivbordsskal med en <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">Material 3-inspirerad</a> design.<br /><br/>Det är byggt med <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, ett QT6-ramverk för att bygga skrivbordsskal, och <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, ett statiskt typat kompilerat programmeringsspråk."
@@ -8759,6 +9098,9 @@
   "this app": {
     "this app": "den här appen"
   },
+  "unmaintained": {
+    "unmaintained": ""
+  },
   "until %1": {
     "until %1": ""
   },
@@ -8779,6 +9121,9 @@
   },
   "v%1 by %2": {
     "v%1 by %2": "v%1 av %2"
+  },
+  "verified": {
+    "verified": ""
   },
   "wtype not available - install wtype for paste support": {
     "wtype not available - install wtype for paste support": "wtype är inte tillgängligt – installera wtype för inklistrningsstöd"

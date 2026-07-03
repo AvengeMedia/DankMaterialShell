@@ -62,10 +62,6 @@ Singleton {
         }
     }
 
-    function showChangelog() {
-        changelogRequested();
-    }
-
     function dismissChangelog() {
         changelogDismissed = true;
         touchMarkerProcess.running = true;

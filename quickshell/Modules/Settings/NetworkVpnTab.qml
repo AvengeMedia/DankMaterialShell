@@ -191,7 +191,7 @@ Item {
                     Rectangle {
                         width: parent.width
                         height: 1
-                        color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+                        color: Theme.outlineStrong
                         visible: DMSNetworkService.vpnAvailable
                     }
 
@@ -229,7 +229,7 @@ Item {
 
                     Column {
                         width: parent.width
-                        spacing: 4
+                        spacing: Theme.spacingXS
                         visible: DMSNetworkService.vpnAvailable && DMSNetworkService.profiles.length > 0
 
                         Repeater {
@@ -290,7 +290,7 @@ Item {
                                         }
 
                                         Column {
-                                            spacing: 2
+                                            spacing: Theme.spacingXXS
                                             anchors.verticalCenter: parent.verticalCenter
                                             width: parent.width - 20 - ((canExpand ? 28 : 0) + (canDelete ? 28 : 0)) - Theme.spacingS * 4
 
@@ -320,7 +320,7 @@ Item {
                                             width: 28
                                             height: 28
                                             radius: 14
-                                            color: vpnExpandBtn.containsMouse ? Theme.surfacePressed : "transparent"
+                                            color: vpnExpandBtn.containsMouse ? Theme.surfacePressed : Theme.withAlpha(Theme.surfacePressed, 0)
                                             anchors.verticalCenter: parent.verticalCenter
                                             visible: canExpand
 
@@ -351,7 +351,7 @@ Item {
                                             width: 28
                                             height: 28
                                             radius: 14
-                                            color: vpnDeleteBtn.containsMouse ? Theme.errorHover : "transparent"
+                                            color: vpnDeleteBtn.containsMouse ? Theme.errorHover : Theme.withAlpha(Theme.errorHover, 0)
                                             anchors.verticalCenter: parent.verticalCenter
                                             visible: canDelete
 

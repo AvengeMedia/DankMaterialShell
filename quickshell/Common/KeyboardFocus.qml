@@ -25,6 +25,16 @@ Singleton {
         return CompositorService.useHyprlandFocusGrab && keyboardFocus(active, customFocus) === WlrKeyboardFocus.OnDemand;
     }
 
+    function captureActiveToplevel() {
+        return ToplevelManager.activeToplevel;
+    }
+
+    function restoreToplevel(toplevel) {
+        if (toplevel)
+            Qt.callLater(() => toplevel.activate());
+        return null;
+    }
+
     property list<var> barWindows: []
 
     function registerBarWindow(window) {

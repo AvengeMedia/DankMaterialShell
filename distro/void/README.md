@@ -13,16 +13,41 @@ All build from source.
 
 ## Distribution
 
-These packages target the official
-[`void-linux/void-packages`](https://github.com/void-linux/void-packages)
-repository, so they install with a plain `xbps-install dms` and no extra setup.
-Most dependencies (`quickshell`, `matugen`, `cava`, `niri`, `greetd`, …) are
-already in Void; `dgop` and `danksearch` are packaged alongside in the
-[danklinux repo](https://github.com/AvengeMedia/danklinux/tree/master/distro/void).
+This is a DMS maintained repo for VoidLinux until these packages are officially merged upstream in the Void Linux repositories, you can install them from our self-hosted custom XBPS repositories served via GitHub Pages.
+
+### Using the Self-Hosted Repositories
+
+We serve both stable release and development packages directly from our repository branches.
+
+#### 1. Add Repository Configurations
+
+Create configuration files in `/etc/xbps.d/` pointing to our repositories (needed for both stable and git/nightly variants):
+
+```sh
+echo "repository=https://avengemedia.github.io/DankMaterialShell/current" | sudo tee /etc/xbps.d/dms.conf
+echo "repository=https://avengemedia.github.io/DankLinux/current" | sudo tee /etc/xbps.d/danklinux.conf
+```
+
+#### 2. Install DMS
+
+Synchronize repositories and install the package:
+
+* For the **stable** variant:
+
+    ```sh
+    sudo xbps-install -S dms
+    ```
+
+* For the **git/nightly** variant (this will conflict with and replace the stable package):
+
+    ```sh
+    sudo xbps-install -S dms-git
+    ```
+
+*Note: On the first sync, `xbps-install` will output our signing key fingerprint and ask you to type `y` to trust and import it. Verify that the key matches our official signing fingerprint.*
 
 The templates here are the source of truth: copy each into a void-packages
-checkout at `srcpkgs/<pkg>/template` to build or submit it. Only tagged releases
-are packaged (no `-git`/nightly variant).
+checkout at `srcpkgs/<pkg>/template` to build or submit it.
 
 ## Dependencies
 

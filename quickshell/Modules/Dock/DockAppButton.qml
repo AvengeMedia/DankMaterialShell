@@ -447,7 +447,7 @@ Item {
         Rectangle {
             anchors.fill: parent
             radius: Theme.cornerRadius
-            color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.3)
+            color: Theme.primarySelected
             border.width: 2
             border.color: Theme.primary
             visible: dragging
@@ -556,7 +556,7 @@ Item {
         id: rowIndicator
 
         Row {
-            spacing: 2
+            spacing: Theme.spacingXXS
 
             Repeater {
                 model: {
@@ -593,7 +593,7 @@ Item {
                             if (isWindowFocused) {
                                 return Theme.primary;
                             }
-                            return Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6);
+                            return Theme.surfaceTextSecondary;
                         }
 
                         if (appData.type === "grouped" && appData.windowCount > 1) {
@@ -603,7 +603,7 @@ Item {
                             }
                         }
 
-                        return Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6);
+                        return Theme.surfaceTextSecondary;
                     }
                 }
             }
@@ -614,7 +614,7 @@ Item {
         id: columnIndicator
 
         Column {
-            spacing: 2
+            spacing: Theme.spacingXXS
 
             Repeater {
                 model: {
@@ -651,7 +651,7 @@ Item {
                             if (isWindowFocused) {
                                 return Theme.primary;
                             }
-                            return Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6);
+                            return Theme.surfaceTextSecondary;
                         }
 
                         if (appData.type === "grouped" && appData.windowCount > 1) {
@@ -661,7 +661,7 @@ Item {
                             }
                         }
 
-                        return Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6);
+                        return Theme.surfaceTextSecondary;
                     }
                 }
             }

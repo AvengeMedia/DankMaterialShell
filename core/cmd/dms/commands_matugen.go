@@ -38,10 +38,17 @@ var matugenCheckCmd = &cobra.Command{
 	Run:   runMatugenCheck,
 }
 
+var matugenPreviewCmd = &cobra.Command{
+	Use:   "preview",
+	Short: "Preview Matugen scheme colors without applying them",
+	Run:   runMatugenPreview,
+}
+
 func init() {
 	matugenCmd.AddCommand(matugenGenerateCmd)
 	matugenCmd.AddCommand(matugenQueueCmd)
 	matugenCmd.AddCommand(matugenCheckCmd)
+	matugenCmd.AddCommand(matugenPreviewCmd)
 
 	for _, cmd := range []*cobra.Command{matugenGenerateCmd, matugenQueueCmd} {
 		cmd.Flags().String("state-dir", "", "State directory for cache files")
@@ -62,6 +69,8 @@ func init() {
 
 	matugenQueueCmd.Flags().Bool("wait", true, "Wait for completion")
 	matugenQueueCmd.Flags().Duration("timeout", 90*time.Second, "Timeout for waiting")
+	matugenPreviewCmd.Flags().String("source-color", "", "Source color used to generate previews")
+	matugenPreviewCmd.Flags().Float64("contrast", 0, "Contrast value from -1 to 1 (0 = standard)")
 }
 
 func buildMatugenOptions(cmd *cobra.Command) matugen.Options {
@@ -197,6 +206,20 @@ func runMatugenCheck(cmd *cobra.Command, args []string) {
 	data, err := json.Marshal(checks)
 	if err != nil {
 		log.Fatalf("Failed to marshal check results: %v", err)
+	}
+	fmt.Println(string(data))
+}
+
+func runMatugenPreview(cmd *cobra.Command, args []string) {
+	sourceColor, _ := cmd.Flags().GetString("source-color")
+	contrast, _ := cmd.Flags().GetFloat64("contrast")
+	previews, err := matugen.PreviewSchemes(sourceColor, contrast)
+	if err != nil {
+		log.Fatalf("Failed to generate Matugen previews: %v", err)
+	}
+	data, err := json.Marshal(previews)
+	if err != nil {
+		log.Fatalf("Failed to marshal Matugen previews: %v", err)
 	}
 	fmt.Println(string(data))
 }

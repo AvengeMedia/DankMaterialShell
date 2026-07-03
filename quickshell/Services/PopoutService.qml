@@ -58,6 +58,65 @@ Singleton {
     property string pendingThemeInstall: ""
     property string pendingPluginInstall: ""
 
+    // Deferred unload: keep popouts warm while the session is active and reclaim them on lock/monitors-off.
+    property var _pendingUnloads: ({})
+
+    Connections {
+        target: SessionService
+        function onSessionLocked() {
+            root._flushPendingUnloads();
+        }
+    }
+
+    Connections {
+        target: IdleService
+        function onMonitorsOffChanged() {
+            if (IdleService.monitorsOff)
+                root._flushPendingUnloads();
+        }
+    }
+
+    function _scheduleUnload(key) {
+        _pendingUnloads[key] = true;
+    }
+
+    function _flushPendingUnloads() {
+        const keys = Object.keys(_pendingUnloads);
+        _pendingUnloads = ({});
+        for (let i = 0; i < keys.length; i++) {
+            const unload = _deferredUnloaders[keys[i]];
+            if (unload)
+                unload();
+        }
+    }
+
+    function _popoutStillPresented(popout) {
+        return !!popout && (popout.shouldBeVisible === true || popout.isClosing === true);
+    }
+
+    function _unloadPopoutNow(popoutName, loaderName) {
+        const loader = root[loaderName];
+        if (!loader)
+            return;
+        if (_popoutStillPresented(root[popoutName]))
+            return;
+        root[popoutName] = null;
+        loader.active = false;
+    }
+
+    readonly property var _deferredUnloaders: ({
+            "controlCenter": () => _unloadPopoutNow("controlCenterPopout", "controlCenterLoader"),
+            "notificationCenter": () => _unloadPopoutNow("notificationCenterPopout", "notificationCenterLoader"),
+            "appDrawer": () => _unloadPopoutNow("appDrawerPopout", "appDrawerLoader"),
+            "processList": () => _unloadPopoutNow("processListPopout", "processListPopoutLoader"),
+            "battery": () => _unloadPopoutNow("batteryPopout", "batteryPopoutLoader"),
+            "vpn": () => _unloadPopoutNow("vpnPopout", "vpnPopoutLoader"),
+            "systemUpdate": () => _unloadPopoutNow("systemUpdatePopout", "systemUpdateLoader"),
+            "layout": () => _unloadPopoutNow("layoutPopout", "layoutPopoutLoader"),
+            "clipboardHistory": () => _unloadPopoutNow("clipboardHistoryPopout", "clipboardHistoryPopoutLoader"),
+            "settings": () => _unloadSettingsNow()
+        })
+
     function setPosition(popout, x, y, width, section, screen) {
         if (popout && popout.setTriggerPosition && arguments.length >= 6) {
             popout.setTriggerPosition(x, y, width, section, screen);
@@ -76,10 +135,7 @@ Singleton {
     }
 
     function unloadControlCenter() {
-        if (!controlCenterLoader)
-            return;
-        controlCenterPopout = null;
-        controlCenterLoader.active = false;
+        _scheduleUnload("controlCenter");
     }
 
     function toggleControlCenter(x, y, width, section, screen) {
@@ -101,10 +157,7 @@ Singleton {
     }
 
     function unloadNotificationCenter() {
-        if (!notificationCenterLoader)
-            return;
-        notificationCenterPopout = null;
-        notificationCenterLoader.active = false;
+        _scheduleUnload("notificationCenter");
     }
 
     function toggleNotificationCenter(x, y, width, section, screen) {
@@ -126,10 +179,7 @@ Singleton {
     }
 
     function unloadAppDrawer() {
-        if (!appDrawerLoader)
-            return;
-        appDrawerPopout = null;
-        appDrawerLoader.active = false;
+        _scheduleUnload("appDrawer");
     }
 
     function toggleAppDrawer(x, y, width, section, screen) {
@@ -151,10 +201,7 @@ Singleton {
     }
 
     function unloadProcessListPopout() {
-        if (!processListPopoutLoader)
-            return;
-        processListPopout = null;
-        processListPopoutLoader.active = false;
+        _scheduleUnload("processList");
     }
 
     function toggleProcessList(x, y, width, section, screen) {
@@ -268,10 +315,7 @@ Singleton {
     }
 
     function unloadBattery() {
-        if (!batteryPopoutLoader)
-            return;
-        batteryPopout = null;
-        batteryPopoutLoader.active = false;
+        _scheduleUnload("battery");
     }
 
     function toggleBattery(x, y, width, section, screen) {
@@ -293,10 +337,7 @@ Singleton {
     }
 
     function unloadVpn() {
-        if (!vpnPopoutLoader)
-            return;
-        vpnPopout = null;
-        vpnPopoutLoader.active = false;
+        _scheduleUnload("vpn");
     }
 
     function toggleVpn(x, y, width, section, screen) {
@@ -319,10 +360,7 @@ Singleton {
     }
 
     function unloadSystemUpdate() {
-        if (!systemUpdateLoader)
-            return;
-        systemUpdatePopout = null;
-        systemUpdateLoader.active = false;
+        _scheduleUnload("systemUpdate");
     }
 
     function toggleSystemUpdate(x, y, width, section, screen) {
@@ -441,10 +479,16 @@ Singleton {
     }
 
     function unloadSettings() {
-        if (settingsModalLoader) {
-            settingsModal = null;
-            settingsModalLoader.active = false;
-        }
+        _scheduleUnload("settings");
+    }
+
+    function _unloadSettingsNow() {
+        if (!settingsModalLoader)
+            return;
+        if (settingsModal && settingsModal.visible)
+            return;
+        settingsModal = null;
+        settingsModalLoader.active = false;
     }
 
     function _onSettingsModalLoaded() {
@@ -484,17 +528,11 @@ Singleton {
     }
 
     function unloadClipboardHistoryPopout() {
-        if (!clipboardHistoryPopoutLoader)
-            return;
-        clipboardHistoryPopout = null;
-        clipboardHistoryPopoutLoader.active = false;
+        _scheduleUnload("clipboardHistory");
     }
 
     function unloadLayoutPopout() {
-        if (!layoutPopoutLoader)
-            return;
-        layoutPopout = null;
-        layoutPopoutLoader.active = false;
+        _scheduleUnload("layout");
     }
 
     property bool _dankLauncherV2WantsOpen: false
@@ -502,15 +540,26 @@ Singleton {
     property string _dankLauncherV2PendingQuery: ""
     property string _dankLauncherV2PendingMode: ""
     property bool _dankLauncherV2TriggerUsesOverlayLayer: false
+    property bool _dankLauncherV2EdgeHoverManaged: false
 
     function _setDankLauncherV2TriggerUsesOverlayLayer(value) {
         _dankLauncherV2TriggerUsesOverlayLayer = value === true;
+        // Disable edge-hover by default on every open/toggle path unless explicitly enabled.
+        _setDankLauncherV2EdgeHoverManaged(false);
         if (dankLauncherV2Modal)
             dankLauncherV2Modal.triggerUsesOverlayLayer = _dankLauncherV2TriggerUsesOverlayLayer;
     }
 
-    function openDankLauncherV2(triggerUsesOverlayLayer) {
+    // Set edgeHoverManaged to enable hover retraction for edge-hover triggered launcher sessions.
+    function _setDankLauncherV2EdgeHoverManaged(value) {
+        _dankLauncherV2EdgeHoverManaged = value === true;
+        if (dankLauncherV2Modal)
+            dankLauncherV2Modal.edgeHoverManaged = _dankLauncherV2EdgeHoverManaged;
+    }
+
+    function openDankLauncherV2(triggerUsesOverlayLayer, edgeHoverManaged) {
         _setDankLauncherV2TriggerUsesOverlayLayer(triggerUsesOverlayLayer);
+        _setDankLauncherV2EdgeHoverManaged(edgeHoverManaged);
         if (dankLauncherV2Modal) {
             dankLauncherV2Modal.show();
         } else if (dankLauncherV2ModalLoader) {
@@ -591,8 +640,10 @@ Singleton {
     }
 
     function _onDankLauncherV2ModalLoaded() {
-        if (dankLauncherV2Modal)
+        if (dankLauncherV2Modal) {
             dankLauncherV2Modal.triggerUsesOverlayLayer = _dankLauncherV2TriggerUsesOverlayLayer;
+            dankLauncherV2Modal.edgeHoverManaged = _dankLauncherV2EdgeHoverManaged;
+        }
         if (_dankLauncherV2WantsOpen) {
             _dankLauncherV2WantsOpen = false;
             if (_dankLauncherV2PendingQuery) {

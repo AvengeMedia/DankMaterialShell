@@ -10,7 +10,7 @@ Item {
     required property var axis
     required property var barConfig
 
-    readonly property bool frameShapesBar: SettingsData.frameEnabled && barWindow.usesFrameBarChrome
+    readonly property bool frameShapesBar: FrameTransitionState.effectiveFrameEnabled && barWindow.usesFrameBarChrome
 
     visible: !frameShapesBar
 

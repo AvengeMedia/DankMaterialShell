@@ -41,6 +41,8 @@ FloatingWindow {
     color: Theme.surfaceContainer
     visible: false
 
+    onClosed: close()
+
     onVisibleChanged: {
         if (visible) {
             if (parentModal && "shouldHaveFocus" in parentModal) {

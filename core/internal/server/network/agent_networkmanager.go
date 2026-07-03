@@ -361,11 +361,27 @@ func (a *SecretAgent) GetSecrets(
 		}
 	}
 
-	// Phase 4: Non-interactive secret retrieval (keyring).
-	// Always try the keyring even when REQUEST_NEW is set — the vault may have
-	// been unlocked by a prior call's Prompt flow, making the lookup non-interactive.
-	if secretOut := a.trySecretService(connUuid, settingName, fields); secretOut != nil {
-		return secretOut, nil
+	// Phase 4: Non-interactive secret retrieval. REQUEST_NEW means NM thinks the
+	// secret is wrong, so force a prompt; otherwise reuse keyring then cached secret.
+	requestNew := flags&nmSecretAgentFlagRequestNew != 0
+	if requestNew {
+		if a.backend != nil {
+			a.backend.clearCachedWiFiSecret(connUuid)
+		}
+	} else {
+		if secretOut := a.trySecretService(connUuid, settingName, fields); secretOut != nil {
+			return secretOut, nil
+		}
+
+		switch settingName {
+		case "802-11-wireless-security", "802-1x":
+			if a.backend != nil {
+				if cached := a.backend.lookupCachedWiFiSecret(connUuid, settingName); cached != nil {
+					log.Infof("[SecretAgent] Reusing cached WiFi secret for %s (no REQUEST_NEW)", connUuid)
+					return buildWiFiSecretsResponse(settingName, cached), nil
+				}
+			}
+		}
 	}
 
 	// Phase 5: If interaction is not allowed, we're done.
@@ -435,6 +451,8 @@ func (a *SecretAgent) GetSecrets(
 				a.backend.state.ConnectingVPNUUID = ""
 			}
 			a.backend.stateMutex.Unlock()
+
+			a.backend.clearCachedWiFiSecret(connUuid)
 
 			// If this was a WiFi connection that was just cancelled, remove the connection profile
 			// (it was created with AddConnection but activation was cancelled)
@@ -537,6 +555,13 @@ func (a *SecretAgent) GetSecrets(
 		}
 		a.backend.pendingVPNSaveMu.Unlock()
 		log.Infof("[SecretAgent] Queued credentials persist for after connection succeeds")
+	}
+
+	if a.backend != nil {
+		switch settingName {
+		case "802-11-wireless-security", "802-1x":
+			a.backend.cacheWiFiSecret(connUuid, ssid, settingName, reply.Secrets)
+		}
 	}
 
 	return out, nil
@@ -904,6 +929,27 @@ func reasonFromFlags(flags uint32) string {
 		return "user-requested"
 	}
 	return "required"
+}
+
+func buildWiFiSecretsResponse(settingName string, secrets map[string]string) nmSettingMap {
+	sec := nmVariantMap{}
+	switch settingName {
+	case "802-1x":
+		for k, v := range secrets {
+			switch k {
+			case "password", "private-key-password", "phase2-private-key-password", "pin":
+				sec[k] = dbus.MakeVariant(v)
+			}
+		}
+	default:
+		for k, v := range secrets {
+			sec[k] = dbus.MakeVariant(v)
+		}
+	}
+
+	out := nmSettingMap{}
+	out[settingName] = sec
+	return out
 }
 
 func buildGPSamlSecretsResponse(settingName, cookie, host, fingerprint string) nmSettingMap {

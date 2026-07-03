@@ -317,8 +317,8 @@ Item {
                             width: parent.width
                             height: 48
                             radius: Theme.cornerRadius
-                            color: deviceMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.nestedSurface
-                            border.color: modelData === AudioService.sink ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                            color: deviceMouseArea.containsMouse ? Theme.primaryHover : Theme.nestedSurface
+                            border.color: modelData === AudioService.sink ? Theme.primary : Theme.outlineHeavy
                             border.width: modelData === AudioService.sink ? 2 : 1
 
                             Row {
@@ -509,8 +509,8 @@ Item {
                             width: parent.width
                             height: 48
                             radius: Theme.cornerRadius
-                            color: playerMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.nestedSurface
-                            border.color: modelData === activePlayer ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                            color: playerMouseArea.containsMouse ? Theme.primaryHover : Theme.nestedSurface
+                            border.color: modelData === activePlayer ? Theme.primary : Theme.outlineHeavy
                             border.width: modelData === activePlayer ? 2 : 1
 
                             Row {

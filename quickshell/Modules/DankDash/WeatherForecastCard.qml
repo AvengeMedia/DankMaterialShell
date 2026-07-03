@@ -104,7 +104,7 @@ Rectangle {
     ]
 
     color: isCurrent ? Theme.withAlpha(Theme.primary, 0.1) : Theme.nestedSurface
-    border.color: isCurrent ? Theme.withAlpha(Theme.primary, 0.3) : "transparent"
+    border.color: isCurrent ? Theme.withAlpha(Theme.primary, 0.3) : Theme.withAlpha(Theme.primary, 0)
     border.width: isCurrent ? 1 : 0
 
     Column {
@@ -154,7 +154,7 @@ Rectangle {
 
             Column {
                 id: detailsColumn
-                spacing: 2
+                spacing: Theme.spacingXXS
                 visible: !root.dense
                 width: implicitWidth
 
@@ -183,7 +183,7 @@ Rectangle {
                 Repeater {
                     model: root.values.length
                     Row {
-                        spacing: 2
+                        spacing: Theme.spacingXXS
 
                         DankIcon {
                             name: root.values[index].icon

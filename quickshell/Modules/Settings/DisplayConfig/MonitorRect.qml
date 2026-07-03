@@ -69,7 +69,7 @@ Rectangle {
 
     Column {
         anchors.centerIn: parent
-        spacing: 2
+        spacing: Theme.spacingXXS
 
         DankIcon {
             name: root.isConnected ? "desktop_windows" : "desktop_access_disabled"

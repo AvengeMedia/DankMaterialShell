@@ -24,7 +24,7 @@ Rectangle {
     width: parent?.width ?? 0
     height: deviceRowContent.height + Theme.spacingM * 2
     radius: Theme.cornerRadius
-    color: deviceMouseArea.containsMouse ? Theme.surfaceHover : "transparent"
+    color: deviceMouseArea.containsMouse ? Theme.surfaceHover : Theme.withAlpha(Theme.surfaceHover, 0)
 
     readonly property bool hasCustomAlias: AudioService.hasDeviceAlias(deviceNode?.name ?? "")
     readonly property string displayedName: AudioService.displayName(deviceNode)
@@ -48,7 +48,7 @@ Rectangle {
         Column {
             anchors.verticalCenter: parent.verticalCenter
             width: parent.width - Theme.iconSize - Theme.spacingM * 3 - buttonsRow.width
-            spacing: 2
+            spacing: Theme.spacingXXS
 
             StyledText {
                 text: root.displayedName
@@ -62,7 +62,7 @@ Rectangle {
 
             Column {
                 width: parent.width
-                spacing: 2
+                spacing: Theme.spacingXXS
 
                 Row {
                     width: parent.width

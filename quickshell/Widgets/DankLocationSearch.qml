@@ -204,13 +204,13 @@ Item {
                 anchors.fill: parent
                 clip: true
                 model: searchResultsModel
-                spacing: 2
+                spacing: Theme.spacingXXS
 
                 delegate: StyledRect {
                     width: searchResultsList.width
                     height: 36
                     radius: Theme.cornerRadius
-                    color: resultMouseArea.containsMouse ? Theme.surfaceLight : "transparent"
+                    color: resultMouseArea.containsMouse ? Theme.surfaceLight : Theme.withAlpha(Theme.surfaceLight, 0)
 
                     Row {
                         anchors.fill: parent

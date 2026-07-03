@@ -8,7 +8,6 @@ import qs.Widgets
 FloatingWindow {
     id: settingsModal
 
-    property bool disablePopupTransparency: true
     property var profileBrowser: profileBrowserLoader.item
     property var wallpaperBrowser: wallpaperBrowserLoader.item
 
@@ -93,6 +92,8 @@ FloatingWindow {
     color: Theme.surfaceContainer
     visible: false
 
+    onClosed: hide()
+
     onIsCompactModeChanged: {
         enableAnimations = false;
         if (!isCompactMode) {
@@ -172,6 +173,8 @@ FloatingWindow {
 
     FocusScope {
         id: contentFocusScope
+
+        property bool disablePopupTransparency: true
 
         LayoutMirroring.enabled: I18n.isRtl
         LayoutMirroring.childrenInherit: true

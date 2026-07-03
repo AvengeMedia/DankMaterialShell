@@ -91,7 +91,7 @@ Rectangle {
 
                         Column {
                             anchors.verticalCenter: parent.verticalCenter
-                            spacing: 2
+                            spacing: Theme.spacingXXS
 
                             DankIcon {
                                 name: "storage"

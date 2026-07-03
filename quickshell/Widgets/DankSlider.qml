@@ -5,6 +5,16 @@ import qs.Widgets
 Item {
     id: slider
 
+    function checkParentDisablesTransparency() {
+        let p = parent;
+        while (p) {
+            if (p.disablePopupTransparency === true)
+                return true;
+            p = p.parent;
+        }
+        return false;
+    }
+
     property int value: 50
     property int minimum: 0
     property int maximum: 100
@@ -22,7 +32,8 @@ Item {
 
     property color thumbOutlineColor: Theme.surfaceContainer
     property color trackColor: enabled ? Theme.outline : Theme.outline
-    property real trackOpacity: Theme.popupTransparency
+    property bool usePopupTransparency: !checkParentDisablesTransparency()
+    property real trackOpacity: usePopupTransparency ? Theme.popupTransparency : 1.0
 
     signal sliderValueChanged(int newValue)
     signal sliderDragFinished(int finalValue)

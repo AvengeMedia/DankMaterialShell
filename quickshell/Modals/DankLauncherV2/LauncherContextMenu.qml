@@ -25,6 +25,7 @@ Item {
     property real anchorY: 0
     property bool openState: false
     property bool renderActive: false
+    readonly property alias contextWindow: menuWindow
     readonly property bool blurActive: renderActive && openState && BlurService.enabled && Theme.connectedSurfaceBlurEnabled
 
     readonly property real minMenuWidth: 180
@@ -446,7 +447,17 @@ Item {
         WlrLayershell.namespace: "dms:launcher-context-menu"
         WlrLayershell.layer: WlrLayershell.Overlay
         WlrLayershell.exclusiveZone: -1
-        WlrLayershell.keyboardFocus: PopoutManager.screenshotActive ? WlrKeyboardFocus.None : (root.renderActive ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None)
+        // Hyprland steals the launcher's focus grab on exclusive focus; keep keys on the
+        // launcher window, which forwards them to the menu via handleKey().
+        WlrLayershell.keyboardFocus: {
+            if (PopoutManager.screenshotActive)
+                return WlrKeyboardFocus.None;
+            if (!root.renderActive)
+                return WlrKeyboardFocus.None;
+            if (CompositorService.useHyprlandFocusGrab)
+                return WlrKeyboardFocus.None;
+            return WlrKeyboardFocus.Exclusive;
+        }
 
         anchors {
             top: true
@@ -507,8 +518,8 @@ Item {
                 height: root.effectiveMenuHeight
                 color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
                 radius: Theme.cornerRadius
-                border.color: BlurService.enabled ? BlurService.borderColor : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
-                border.width: BlurService.enabled ? BlurService.borderWidth : 1
+                border.color: BlurService.borderColor
+                border.width: BlurService.borderWidth
                 opacity: root.openState ? 1 : 0
 
                 Behavior on opacity {
@@ -585,7 +596,7 @@ Item {
                                         anchors.centerIn: parent
                                         width: parent.width
                                         height: 1
-                                        color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                                        color: Theme.outlineHeavy
                                     }
                                 }
 
@@ -596,9 +607,9 @@ Item {
                                     radius: Theme.cornerRadius
                                     color: {
                                         if (root.keyboardNavigation && root.selectedMenuIndex === menuItemDelegate.itemIndex) {
-                                            return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.2);
+                                            return Theme.primaryPressed;
                                         }
-                                        return itemMouseArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent";
+                                        return itemMouseArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0);
                                     }
 
                                     Row {

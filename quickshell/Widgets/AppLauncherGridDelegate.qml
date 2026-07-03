@@ -33,7 +33,7 @@ Rectangle {
     width: cellWidth - 1
     height: cellHeight - 1
     radius: Theme.cornerRadius
-    color: currentIndex === index ? Theme.primaryPressed : mouseArea.containsMouse ? Theme.primaryPressed : "transparent"
+    color: currentIndex === index ? Theme.primaryPressed : mouseArea.containsMouse ? Theme.primaryPressed : Theme.withAlpha(Theme.primaryPressed, 0)
 
     Column {
         anchors.centerIn: parent

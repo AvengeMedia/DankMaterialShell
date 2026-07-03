@@ -110,6 +110,8 @@ FloatingWindow {
     color: Theme.surfaceContainer
     visible: false
 
+    onClosed: hide()
+
     onVisibleChanged: {
         if (visible) {
             updateFilteredWidgets();
@@ -350,7 +352,7 @@ FloatingWindow {
 
                                 Column {
                                     anchors.verticalCenter: parent.verticalCenter
-                                    spacing: 2
+                                    spacing: Theme.spacingXXS
                                     width: parent.width - 44 - Theme.iconSize - Theme.spacingM * 3
 
                                     Row {
@@ -376,7 +378,7 @@ FloatingWindow {
                                             Row {
                                                 id: featuredWidgetRow
                                                 anchors.centerIn: parent
-                                                spacing: 2
+                                                spacing: Theme.spacingXXS
 
                                                 DankIcon {
                                                     name: "star"

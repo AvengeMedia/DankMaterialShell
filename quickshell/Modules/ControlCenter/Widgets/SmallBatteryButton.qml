@@ -60,7 +60,7 @@ Rectangle {
 
     Row {
         anchors.centerIn: parent
-        spacing: 4
+        spacing: Theme.spacingXS
 
         DankIcon {
             name: BatteryService.getBatteryIcon()

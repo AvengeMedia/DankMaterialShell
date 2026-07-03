@@ -219,7 +219,7 @@ Rectangle {
                 anchors.horizontalCenter: parent.horizontalCenter
                 name: "wifi_off"
                 size: 48
-                color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5)
+                color: Theme.surfaceTextSecondary
             }
 
             StyledText {
@@ -236,7 +236,7 @@ Rectangle {
                 width: enableWifiLabel.implicitWidth + Theme.spacingL * 2
                 height: enableWifiLabel.implicitHeight + Theme.spacingM * 2
                 radius: height / 2
-                color: enableWifiButton.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08)
+                color: enableWifiButton.containsMouse ? Theme.primaryHover : Theme.primaryHoverLight
                 border.width: 0
                 border.color: Theme.primary
 
@@ -395,10 +395,10 @@ Rectangle {
         property bool currentConnected: false
 
         background: Rectangle {
-            color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+            color: BlurService.enabled ? Theme.surfaceContainer : Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
             radius: Theme.cornerRadius
             border.width: 0
-            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+            border.color: Theme.outlineStrong
         }
 
         MenuItem {
@@ -415,7 +415,7 @@ Rectangle {
             }
 
             background: Rectangle {
-                color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                color: parent.hovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
                 radius: Theme.cornerRadius / 2
             }
 
@@ -439,7 +439,7 @@ Rectangle {
             }
 
             background: Rectangle {
-                color: parent.hovered ? Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.08) : "transparent"
+                color: parent.hovered ? Theme.errorHover : Theme.withAlpha(Theme.errorHover, 0)
                 radius: Theme.cornerRadius / 2
             }
 
@@ -462,7 +462,7 @@ Rectangle {
             }
 
             background: Rectangle {
-                color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                color: parent.hovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
                 radius: Theme.cornerRadius / 2
             }
 
@@ -494,7 +494,7 @@ Rectangle {
             anchors.centerIn: parent
             name: "refresh"
             size: 48
-            color: Qt.rgba(Theme.surfaceText.r || 0.8, Theme.surfaceText.g || 0.8, Theme.surfaceText.b || 0.8, 0.3)
+            color: Theme.surfaceTextAlpha
             smoothTransform: wifiScanningOverlay.visible
 
             RotationAnimator on rotation {
@@ -565,6 +565,7 @@ Rectangle {
             required property int index
 
             readonly property bool isConnected: modelData.ssid === NetworkService.currentWifiSSID
+            readonly property bool isConnecting: NetworkService.isWifiConnecting && NetworkService.connectingSSID === modelData.ssid
             readonly property bool isPinned: root.getPinnedNetworks().includes(modelData.ssid)
             readonly property string networkName: modelData.ssid || I18n.tr("Unknown Network")
             readonly property int signalStrength: modelData.signal || 0
@@ -583,7 +584,17 @@ Rectangle {
                 anchors.leftMargin: Theme.spacingM
                 spacing: Theme.spacingS
 
+                DankSpinner {
+                    size: Theme.iconSize - 4
+                    strokeWidth: 2
+                    color: Theme.warning
+                    running: wifiDelegate.isConnecting
+                    visible: wifiDelegate.isConnecting
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
                 DankIcon {
+                    visible: !wifiDelegate.isConnecting
                     name: {
                         if (wifiDelegate.signalStrength >= 50)
                             return "wifi";
@@ -603,7 +614,7 @@ Rectangle {
                     StyledText {
                         text: wifiDelegate.networkName
                         font.pixelSize: Theme.fontSizeMedium
-                        color: Theme.surfaceText
+                        color: wifiDelegate.isConnected ? Theme.primary : Theme.surfaceText
                         font.weight: wifiDelegate.isConnected ? Font.Medium : Font.Normal
                         elide: Text.ElideRight
                         width: parent.width
@@ -613,9 +624,9 @@ Rectangle {
                         spacing: Theme.spacingXS
 
                         StyledText {
-                            text: wifiDelegate.isConnected ? I18n.tr("Connected") + " \u2022" : (modelData.secured ? I18n.tr("Secured") + " \u2022" : I18n.tr("Open") + " \u2022")
+                            text: wifiDelegate.isConnecting ? I18n.tr("Connecting...") + " \u2022" : (wifiDelegate.isConnected ? I18n.tr("Connected") + " \u2022" : (modelData.secured ? I18n.tr("Secured") + " \u2022" : I18n.tr("Open") + " \u2022"))
                             font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceVariantText
+                            color: wifiDelegate.isConnecting ? Theme.warning : Theme.surfaceVariantText
                         }
 
                         StyledText {
@@ -651,6 +662,7 @@ Rectangle {
                     networkContextMenu.currentSecured = modelData.secured;
                     networkContextMenu.currentEnterprise = modelData.enterprise;
                     networkContextMenu.currentConnected = wifiDelegate.isConnected;
+                    networkContextMenu.currentConnecting = wifiDelegate.isConnecting;
                     networkContextMenu.currentSaved = modelData.saved;
                     networkContextMenu.currentSignal = modelData.signal;
                     networkContextMenu.currentAutoconnect = modelData.autoconnect || false;
@@ -666,12 +678,12 @@ Rectangle {
                 width: pinWifiRow.width + Theme.spacingS * 2
                 height: pinWifiRow.implicitHeight + Theme.spacingXS * 2
                 radius: height / 2
-                color: wifiDelegate.isPinned ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.withAlpha(Theme.surfaceText, 0.05)
+                color: wifiDelegate.isPinned ? Theme.primaryHover : Theme.withAlpha(Theme.surfaceText, 0.05)
 
                 Row {
                     id: pinWifiRow
                     anchors.centerIn: parent
-                    spacing: 4
+                    spacing: Theme.spacingXS
 
                     DankIcon {
                         name: "push_pin"
@@ -743,7 +755,8 @@ Rectangle {
                 anchors.fill: parent
                 anchors.rightMargin: optionsButton.width + pinWifiRow.width + (qrCodeButton.visible ? qrCodeButton.width : 0) + Theme.spacingS * 5 + Theme.spacingM
                 hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
+                enabled: !NetworkService.isWifiConnecting || wifiDelegate.isConnected
+                cursorShape: enabled ? Qt.PointingHandCursor : Qt.BusyCursor
                 onPressed: mouse => wifiRipple.trigger(mouse.x, mouse.y)
                 onClicked: function (event) {
                     if (wifiDelegate.isConnected) {
@@ -768,6 +781,7 @@ Rectangle {
         property bool currentSecured: false
         property bool currentEnterprise: false
         property bool currentConnected: false
+        property bool currentConnecting: false
         property bool currentSaved: false
         property int currentSignal: 0
         property bool currentAutoconnect: false
@@ -779,26 +793,27 @@ Rectangle {
         }
 
         background: Rectangle {
-            color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+            color: BlurService.enabled ? Theme.surfaceContainer : Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
             radius: Theme.cornerRadius
             border.width: 0
-            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+            border.color: Theme.outlineStrong
         }
 
         MenuItem {
-            text: networkContextMenu.currentConnected ? I18n.tr("Disconnect") : I18n.tr("Connect")
+            text: networkContextMenu.currentConnecting ? I18n.tr("Connecting...") : (networkContextMenu.currentConnected ? I18n.tr("Disconnect") : I18n.tr("Connect"))
             height: 32
+            enabled: !networkContextMenu.currentConnecting
 
             contentItem: StyledText {
                 text: parent.text
                 font.pixelSize: Theme.fontSizeSmall
-                color: Theme.surfaceText
+                color: parent.enabled ? Theme.surfaceText : Theme.surfaceVariantText
                 leftPadding: Theme.spacingS
                 verticalAlignment: Text.AlignVCenter
             }
 
             background: Rectangle {
-                color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                color: parent.hovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
                 radius: Theme.cornerRadius / 2
             }
 
@@ -822,7 +837,7 @@ Rectangle {
             }
 
             background: Rectangle {
-                color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                color: parent.hovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
                 radius: Theme.cornerRadius / 2
             }
 
@@ -847,7 +862,7 @@ Rectangle {
             }
 
             background: Rectangle {
-                color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                color: parent.hovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
                 radius: Theme.cornerRadius / 2
             }
 
@@ -870,7 +885,7 @@ Rectangle {
             }
 
             background: Rectangle {
-                color: parent.hovered ? Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.08) : "transparent"
+                color: parent.hovered ? Theme.errorHover : Theme.withAlpha(Theme.errorHover, 0)
                 radius: Theme.cornerRadius / 2
             }
 

@@ -21,6 +21,8 @@ func HandleRequest(conn net.Conn, req models.Request, manager *Manager) {
 		handleActivate(conn, req, manager)
 	case "loginctl.setIdleHint":
 		handleSetIdleHint(conn, req, manager)
+	case "loginctl.setLockedHint":
+		handleSetLockedHint(conn, req, manager)
 	case "loginctl.setLockBeforeSuspend":
 		handleSetLockBeforeSuspend(conn, req, manager)
 	case "loginctl.setSleepInhibitorEnabled":
@@ -76,6 +78,20 @@ func handleSetIdleHint(conn net.Conn, req models.Request, manager *Manager) {
 		return
 	}
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "idle hint set"})
+}
+
+func handleSetLockedHint(conn net.Conn, req models.Request, manager *Manager) {
+	locked, err := params.Bool(req.Params, "locked")
+	if err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+
+	if err := manager.SetLockedHint(locked); err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "locked hint set"})
 }
 
 func handleSetLockBeforeSuspend(conn net.Conn, req models.Request, manager *Manager) {

@@ -449,7 +449,7 @@ Column {
                 Layout.alignment: Qt.AlignVCenter
                 text: I18n.tr("Find in note...")
                 font: searchField.font
-                color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5)
+                color: Theme.surfaceTextSecondary
                 visible: searchField.text.length === 0 && !searchField.activeFocus
                 Layout.leftMargin: -(searchField.width - 20) // Position over the input field
             }
@@ -499,7 +499,7 @@ Column {
     StyledRect {
         width: parent.width
         height: parent.height - bottomControls.height - Theme.spacingM - (searchVisible ? searchBar.height + Theme.spacingM : 0)
-        color: Qt.rgba(Theme.surface.r, Theme.surface.g, Theme.surface.b, Theme.notepadTransparency)
+        color: Theme.withAlpha(Theme.surface, Theme.notepadTransparency)
         border.color: Theme.outlineMedium
         border.width: 1
         radius: Theme.cornerRadius
@@ -568,7 +568,7 @@ Column {
                                     text: index + 1
                                     font.family: textArea.font.family
                                     font.pixelSize: textArea.font.pixelSize
-                                    color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.4)
+                                    color: Theme.surfaceVariantText
                                     horizontalAlignment: Text.AlignRight
                                 }
                             }
@@ -578,7 +578,7 @@ Column {
                     TextArea.flickable: TextArea {
                         id: textArea
                         placeholderText: ""
-                        placeholderTextColor: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5)
+                        placeholderTextColor: Theme.surfaceTextSecondary
                         font.family: SettingsData.notepadUseMonospace ? SettingsData.monoFontFamily : (SettingsData.notepadFontFamily || SettingsData.fontFamily)
                         font.pixelSize: SettingsData.notepadFontSize * SettingsData.fontScale
                         font.letterSpacing: 0
@@ -598,29 +598,20 @@ Column {
                         topPadding: Theme.spacingM
                         rightPadding: Theme.spacingM
                         bottomPadding: Theme.spacingM
-                        cursorDelegate: Rectangle {
+                        cursorDelegate: DankTextCursor {
+                            id: notepadCursor
                             width: 1.5
-                            radius: 1
                             color: Theme.surfaceText
                             x: textArea.cursorRectangle.x
                             y: textArea.cursorRectangle.y
                             height: textArea.cursorRectangle.height
-                            opacity: 1.0
+                            shown: textArea.cursorVisible
 
-                            SequentialAnimation on opacity {
-                                running: textArea.activeFocus
-                                loops: Animation.Infinite
-                                OpacityAnimator {
-                                    from: 1.0
-                                    to: 0.0
-                                    duration: 650
-                                    easing.type: Easing.InOutQuad
-                                }
-                                OpacityAnimator {
-                                    from: 0.0
-                                    to: 1.0
-                                    duration: 650
-                                    easing.type: Easing.InOutQuad
+                            Connections {
+                                target: textArea
+
+                                function onCursorPositionChanged() {
+                                    notepadCursor.resetBlink();
                                 }
                             }
                         }
@@ -714,7 +705,7 @@ Column {
                     StyledText {
                         id: placeholderOverlay
                         text: I18n.tr("Start typing your notes here...")
-                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5)
+                        color: Theme.surfaceTextSecondary
                         font.family: textArea.font.family
                         font.pixelSize: textArea.font.pixelSize
                         visible: textArea.text.length === 0
@@ -750,7 +741,7 @@ Column {
                     anchors.left: parent.left
                     anchors.right: parent.right
                     height: 36
-                    color: Qt.rgba(Theme.surface.r, Theme.surface.g, Theme.surface.b, Theme.notepadTransparency)
+                    color: Theme.withAlpha(Theme.surface, Theme.notepadTransparency)
                     z: 2
 
                     Row {

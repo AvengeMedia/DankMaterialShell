@@ -87,17 +87,22 @@ Singleton {
         }
     }
 
-    function getSystemColorScheme() {
-        if (typeof SettingsData !== "undefined" && SettingsData.syncModeWithPortal === false) {
+    function evaluateColorScheme() {
+        if (typeof SettingsData === "undefined" || !SettingsData.syncModeWithPortal)
             return;
-        }
-        if (!freedeskAvailable)
+        if (!settingsPortalAvailable)
             return;
-        DMSService.sendRequest("freedesktop.settings.getColorScheme", null, response => {
-            if (response.result) {
-                systemColorScheme = response.result.value || 0;
-            }
-        });
+        if (typeof SessionData !== "undefined" && SessionData.themeModeAutoEnabled)
+            return;
+        if (typeof Theme === "undefined")
+            return;
+        // Defer mid-generation: setLightMode's regen would be dropped, and DMS's own transient color-scheme toggle would be misread. Re-run on worker completion.
+        if (Theme.workerRunning)
+            return;
+        const shouldBeLight = systemColorScheme !== 1;
+        if (Theme.isLightMode === shouldBeLight)
+            return;
+        Theme.setLightMode(shouldBeLight, true, false);
     }
 
     function setLightMode(isLightMode) {
@@ -177,6 +182,36 @@ Singleton {
     }
 
     Connections {
+        target: typeof SettingsData !== "undefined" ? SettingsData : null
+
+        function onSyncModeWithPortalChanged() {
+            if (SettingsData.syncModeWithPortal)
+                root.evaluateColorScheme();
+        }
+    }
+
+    Connections {
+        target: DMSService
+
+        function onFreedesktopStateUpdate(data) {
+            if (!data || !data.settings)
+                return;
+            root.settingsPortalAvailable = data.settings.available === true;
+            root.systemColorScheme = data.settings.colorScheme || 0;
+            root.evaluateColorScheme();
+        }
+    }
+
+    Connections {
+        target: typeof Theme !== "undefined" ? Theme : null
+
+        function onWorkerRunningChanged() {
+            if (!Theme.workerRunning)
+                root.evaluateColorScheme();
+        }
+    }
+
+    Connections {
         target: DMSService
 
         function onConnectionStateChanged() {
@@ -232,9 +267,8 @@ Singleton {
         DMSService.sendRequest("freedesktop.getState", null, response => {
             if (response.result && response.result.settings) {
                 settingsPortalAvailable = response.result.settings.available || false;
-                if (settingsPortalAvailable && SettingsData.syncModeWithPortal) {
-                    getSystemColorScheme();
-                }
+                systemColorScheme = response.result.settings.colorScheme || 0;
+                evaluateColorScheme();
             }
         });
     }

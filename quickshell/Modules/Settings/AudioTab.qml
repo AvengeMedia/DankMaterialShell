@@ -575,7 +575,7 @@ Item {
 
                     Column {
                         width: parent.width - Theme.iconSize - Theme.spacingM - 8
-                        spacing: 4
+                        spacing: Theme.spacingXS
 
                         StyledText {
                             text: I18n.tr("Set Custom Device Name", "Audio device rename dialog title")
@@ -718,7 +718,7 @@ Item {
                         width: cancelButtonText.width + Theme.spacingL * 2
                         height: Theme.buttonHeight
                         radius: Theme.cornerRadius
-                        color: cancelButtonMouseArea.containsMouse ? Theme.surfaceHover : "transparent"
+                        color: cancelButtonMouseArea.containsMouse ? Theme.surfaceHover : Theme.withAlpha(Theme.surfaceHover, 0)
                         border.width: 1
                         border.color: Theme.outline
 

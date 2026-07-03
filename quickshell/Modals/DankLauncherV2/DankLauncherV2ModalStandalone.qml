@@ -79,7 +79,7 @@ Item {
     readonly property real windowHeight: alignedHeight + contentY + shadowPad
 
     readonly property color backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-    readonly property bool useBackgroundDarken: !SettingsData.frameEnabled && SettingsData.modalDarkenBackground
+    readonly property bool useBackgroundDarken: !FrameTransitionState.effectiveFrameEnabled && SettingsData.modalDarkenBackground
     readonly property bool useSingleWindow: CompositorService.isHyprland || useBackgroundDarken
     readonly property bool usesOverlayLayer: useBackgroundDarken || SettingsData.launcherUseOverlayLayer || triggerUsesOverlayLayer
     readonly property var effectiveLauncherLayer: LayerShell.fromEnv("DMS_MODAL_LAYER", root.usesOverlayLayer ? WlrLayer.Overlay : WlrLayer.Top, {
@@ -139,6 +139,7 @@ Item {
 
         if (spotlightContent.searchField) {
             spotlightContent.searchField.text = targetQuery;
+            spotlightContent.searchField.selectAll();
         }
         if (spotlightContent.controller) {
             var targetMode = mode || SessionData.getLauncherRestoreMode();
@@ -259,7 +260,9 @@ Item {
 
     HyprlandFocusGrab {
         id: focusGrab
-        windows: [launcherWindow]
+        readonly property var contextMenuWindow: root.spotlightContent?.activeContextMenu?.contextWindow ?? null
+        readonly property bool contextMenuActive: root.spotlightContent?.activeContextMenu?.renderActive ?? false
+        windows: contextMenuActive && contextMenuWindow ? [launcherWindow, contextMenuWindow] : [launcherWindow]
         active: root.useHyprlandFocusGrab && root.keyboardActive
 
         onCleared: {
@@ -443,8 +446,8 @@ Item {
                 enabled: spotlightOpen
                 hoverEnabled: false
                 acceptedButtons: Qt.AllButtons
-                onPressed: mouse.accepted = true
-                onClicked: mouse.accepted = true
+                onPressed: mouse => mouse.accepted = true
+                onClicked: mouse => mouse.accepted = true
                 z: -1
             }
 

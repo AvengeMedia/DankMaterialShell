@@ -25,6 +25,7 @@ Singleton {
     signal importComplete(string uuid, string name)
     signal configLoaded(var config)
     signal configUpdated
+    signal credentialsSet(string uuid)
     signal vpnDeleted(string uuid)
 
     Component.onCompleted: {
@@ -146,6 +147,28 @@ Singleton {
             DMSNetworkService.refreshVpnProfiles();
             getConfig(uuid);
             configUpdated();
+        });
+    }
+
+    function setCredentials(uuid, username, password, save = true) {
+        if (!available)
+            return;
+        const params = {
+            uuid: uuid,
+            save: save
+        };
+        if (username)
+            params.username = username;
+        if (password)
+            params.password = password;
+
+        DMSService.sendRequest("network.vpn.setCredentials", params, response => {
+            if (response.error) {
+                ToastService.showError(I18n.tr("Failed to save VPN credentials"), response.error);
+                return;
+            }
+            ToastService.showInfo(I18n.tr("VPN credentials saved"));
+            credentialsSet(uuid);
         });
     }
 

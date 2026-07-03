@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Wayland
 import Quickshell.Services.Notifications
 import qs.Common
+import qs.Modules.Notifications
 import qs.Services
 import qs.Widgets
 
@@ -639,7 +640,7 @@ PanelWindow {
             shadowBlurPx: content.shadowBlurPx
             shadowOffsetX: content.shadowOffsetX
             shadowOffsetY: content.shadowOffsetY
-            shadowColor: content.shadowsAllowed && content.elevLevel ? Theme.elevationShadowColor(content.elevLevel) : "transparent"
+            shadowColor: content.shadowsAllowed && content.elevLevel ? Theme.elevationShadowColor(content.elevLevel) : Theme.withAlpha(Theme.elevationShadowColor(content.elevLevel), 0)
             shadowEnabled: !win._isDestroying && win.screenValid && content.shadowsAllowed && !win.connectedFrameMode
 
             sourceX: content.shadowRenderPadding + content.cardInset
@@ -690,7 +691,7 @@ PanelWindow {
             anchors.margins: content.cardInset
             radius: win.connectedFrameMode ? Theme.connectedSurfaceRadius : Theme.cornerRadius
             color: "transparent"
-            border.color: win.connectedFrameMode ? "transparent" : BlurService.borderColor
+            border.color: win.connectedFrameMode ? Theme.withAlpha(BlurService.borderColor, 0) : BlurService.borderColor
             border.width: win.connectedFrameMode ? 0 : BlurService.borderWidth
             z: 100
             scale: content.chromeScale
@@ -891,7 +892,7 @@ PanelWindow {
                         StyledText {
                             id: headerAppNameText
                             text: notificationData ? (notificationData.appName || "") : ""
-                            color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                            color: Theme.surfaceTextMedium
                             font.pixelSize: Theme.fontSizeSmall
                             font.weight: Font.Normal
                             elide: Text.ElideRight
@@ -902,7 +903,7 @@ PanelWindow {
                         StyledText {
                             id: headerSeparator
                             text: (headerAppNameText.text.length > 0 && headerTimeText.text.length > 0) ? " • " : ""
-                            color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                            color: Theme.surfaceTextMedium
                             font.pixelSize: Theme.fontSizeSmall
                             font.weight: Font.Normal
                         }
@@ -910,12 +911,11 @@ PanelWindow {
                         StyledText {
                             id: headerTimeText
                             text: notificationData ? (notificationData.timeStr || "") : ""
-                            color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                            color: Theme.surfaceTextMedium
                             font.pixelSize: Theme.fontSizeSmall
                             font.weight: Font.Normal
                         }
                     }
-
 
                     StyledText {
                         text: notificationData ? (notificationData.summary || "") : ""
@@ -1041,7 +1041,7 @@ PanelWindow {
                         width: Math.max(actionText.implicitWidth + Theme.spacingM, Theme.notificationActionMinWidth)
                         height: actionButtonHeight
                         radius: Theme.notificationButtonCornerRadius
-                        color: isHovered ? Theme.withAlpha(Theme.primary, Theme.stateLayerHover) : "transparent"
+                        color: isHovered ? Theme.withAlpha(Theme.primary, Theme.stateLayerHover) : Theme.withAlpha(Theme.primary, 0)
 
                         StyledText {
                             id: actionText
@@ -1093,7 +1093,7 @@ PanelWindow {
                 width: Math.max(clearTextLabel.implicitWidth + Theme.spacingM, Theme.notificationActionMinWidth)
                 height: actionButtonHeight
                 radius: Theme.notificationButtonCornerRadius
-                color: isHovered ? Theme.withAlpha(Theme.primary, Theme.stateLayerHover) : "transparent"
+                color: isHovered ? Theme.withAlpha(Theme.primary, Theme.stateLayerHover) : Theme.withAlpha(Theme.primary, 0)
                 z: 20
 
                 StyledText {
@@ -1133,7 +1133,12 @@ PanelWindow {
                     if (!notificationData || win.exiting)
                         return;
                     if (mouse.button === Qt.RightButton) {
-                        popupContextMenu.popup();
+                        popupContextMenuLoader.active = true;
+                        const menu = popupContextMenuLoader.item;
+                        if (menu) {
+                            const p = mapToItem(null, mouse.x, mouse.y);
+                            menu.showAt(win.margins.left + p.x, win.margins.top + p.y, win.screen);
+                        }
                     } else if (mouse.button === Qt.LeftButton) {
                         const canExpand = bodyText.hasMoreText || win.descriptionExpanded || (SettingsData.notificationPopupPrivacyMode && win.hasExpandableBody);
                         if (canExpand) {
@@ -1377,95 +1382,19 @@ PanelWindow {
         }
     }
 
-    Menu {
-        id: popupContextMenu
-        width: 220
-        contentHeight: 130
-        margins: -1
-        popupType: Popup.Window
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+    Loader {
+        id: popupContextMenuLoader
+        active: false
 
-        background: Rectangle {
-            color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-            radius: Theme.cornerRadius
-            border.width: 0
-            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
-        }
-
-        MenuItem {
-            id: setNotificationRulesItem
-            text: I18n.tr("Set notification rules")
-
-            contentItem: StyledText {
-                text: parent.text
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.surfaceText
-                leftPadding: Theme.spacingS
-                verticalAlignment: Text.AlignVCenter
+        sourceComponent: NotificationContextMenu {
+            appName: notificationData?.appName ?? ""
+            desktopEntry: notificationData?.desktopEntry ?? ""
+            onMuted: {
+                if (notificationData && !win.exiting)
+                    NotificationService.dismissNotification(notificationData);
             }
-
-            background: Rectangle {
-                color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
-                radius: Theme.cornerRadius / 2
-            }
-
-            onTriggered: {
-                const appName = notificationData?.appName || "";
-                const desktopEntry = notificationData?.desktopEntry || "";
-                SettingsData.addNotificationRuleForNotification(appName, desktopEntry);
-                PopoutService.openSettingsWithTab("notifications");
-            }
-        }
-
-        MenuItem {
-            id: muteUnmuteItem
-            readonly property bool isMuted: SettingsData.isAppMuted(notificationData?.appName || "", notificationData?.desktopEntry || "")
-            text: isMuted ? I18n.tr("Unmute popups for %1").arg(notificationData?.appName || I18n.tr("this app")) : I18n.tr("Mute popups for %1").arg(notificationData?.appName || I18n.tr("this app"))
-
-            contentItem: StyledText {
-                text: parent.text
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.surfaceText
-                leftPadding: Theme.spacingS
-                verticalAlignment: Text.AlignVCenter
-            }
-
-            background: Rectangle {
-                color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
-                radius: Theme.cornerRadius / 2
-            }
-
-            onTriggered: {
-                const appName = notificationData?.appName || "";
-                const desktopEntry = notificationData?.desktopEntry || "";
-                if (isMuted) {
-                    SettingsData.removeMuteRuleForApp(appName, desktopEntry);
-                } else {
-                    SettingsData.addMuteRuleForApp(appName, desktopEntry);
-                    if (notificationData && !exiting)
-                        NotificationService.dismissNotification(notificationData);
-                }
-            }
-        }
-
-        MenuItem {
-            text: I18n.tr("Dismiss")
-
-            contentItem: StyledText {
-                text: parent.text
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.surfaceText
-                leftPadding: Theme.spacingS
-                verticalAlignment: Text.AlignVCenter
-            }
-
-            background: Rectangle {
-                color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
-                radius: Theme.cornerRadius / 2
-            }
-
-            onTriggered: {
-                if (notificationData && !exiting)
+            onDismissRequested: {
+                if (notificationData && !win.exiting)
                     NotificationService.dismissNotification(notificationData);
             }
         }

@@ -15,7 +15,7 @@ Column {
     Rectangle {
         width: parent.width
         height: headerRow.implicitHeight + Theme.spacingS * 2
-        color: headerMouse.containsMouse ? Theme.withAlpha(Theme.primary, 0.1) : "transparent"
+        color: headerMouse.containsMouse ? Theme.withAlpha(Theme.primary, 0.1) : Theme.withAlpha(Theme.primary, 0)
         radius: Theme.cornerRadius / 2
 
         Row {

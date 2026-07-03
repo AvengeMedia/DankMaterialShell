@@ -272,7 +272,7 @@ Item {
                 width: parent.width
                 height: warningContent.implicitHeight + Theme.spacingM * 2
                 radius: Theme.cornerRadius
-                color: Qt.rgba(Theme.warning.r, Theme.warning.g, Theme.warning.b, 0.12)
+                color: Theme.warningHover
                 visible: !DMSService.isConnected || configError
 
                 Row {

@@ -174,15 +174,15 @@ DankModal {
 
                             color: {
                                 if (isActive)
-                                    return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.16);
+                                    return Theme.primaryPressed;
                                 if (isSelected)
-                                    return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08);
+                                    return Theme.primaryHoverLight;
                                 if (mouseArea.containsMouse)
-                                    return Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.12);
-                                return Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.06);
+                                    return Theme.surfacePressed;
+                                return Theme.surfaceHover;
                             }
 
-                            border.color: isActive ? Theme.primary : (isSelected ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.5) : "transparent")
+                            border.color: isActive ? Theme.primary : (isSelected ? Theme.withAlpha(Theme.primary, 0.5) : Theme.withAlpha(Theme.primary, 0))
                             border.width: (isActive || isSelected) ? 2 : 0
 
                             // Shortcut Key Badge on Top-Right Corner
@@ -193,8 +193,8 @@ DankModal {
                                 width: 20
                                 height: 20
                                 radius: 4
-                                color: isActive ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.2) : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.08)
-                                border.color: isActive ? Theme.primary : "transparent"
+                                color: isActive ? Theme.primaryPressed : Theme.surfaceTextHover
+                                border.color: isActive ? Theme.primary : Theme.withAlpha(Theme.primary, 0)
                                 border.width: isActive ? 1 : 0
 
                                 StyledText {

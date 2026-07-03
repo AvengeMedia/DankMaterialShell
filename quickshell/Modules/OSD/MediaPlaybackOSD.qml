@@ -261,7 +261,7 @@ DankOSD {
                 x: parent.gap * 2 + Theme.iconSize
                 width: parent.width - Theme.iconSize - parent.gap * 3
                 anchors.verticalCenter: parent.verticalCenter
-                spacing: 3
+                spacing: Theme.spacingXXS
 
                 StyledText {
                     id: topText

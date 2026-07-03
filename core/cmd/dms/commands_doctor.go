@@ -557,6 +557,8 @@ func detectRunningWM() string {
 		return "Hyprland"
 	case os.Getenv("NIRI_SOCKET") != "":
 		return "niri"
+	case os.Getenv("MANGO_INSTANCE_SIGNATURE") != "":
+		return "MangoWC"
 	case os.Getenv("MIRACLESOCK") != "":
 		return "Miracle WM"
 	case os.Getenv("XDG_CURRENT_DESKTOP") != "":

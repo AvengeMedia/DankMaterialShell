@@ -214,8 +214,8 @@ Rectangle {
             width: parent.width
             height: degradationContent.implicitHeight + Theme.spacingL * 2
             radius: Theme.cornerRadius
-            color: Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.12)
-            border.color: Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.3)
+            color: Theme.errorHover
+            border.color: Theme.errorSelected
             border.width: 0
             visible: (typeof PowerProfiles !== "undefined") && PowerProfiles.degradationReason !== PerformanceDegradationReason.None
 
@@ -253,7 +253,7 @@ Rectangle {
                         StyledText {
                             text: (typeof PowerProfiles !== "undefined") ? PerformanceDegradationReason.toString(PowerProfiles.degradationReason) : ""
                             font.pixelSize: Theme.fontSizeSmall
-                            color: Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.8)
+                            color: Theme.withAlpha(Theme.error, 0.8)
                             wrapMode: Text.WordWrap
                             width: parent.width
                             horizontalAlignment: Text.AlignLeft

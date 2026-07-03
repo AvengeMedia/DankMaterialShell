@@ -71,7 +71,7 @@ Singleton {
     Process {
         id: detectUwsmProcess
         running: false
-        command: ["which", "uwsm"]
+        command: ["sh", "-c", "command -v uwsm"]
 
         onExited: function (exitCode) {
             hasUwsm = (exitCode === 0);
@@ -123,7 +123,7 @@ Singleton {
     Process {
         id: detectWtypeProcess
         running: false
-        command: ["which", "wtype"]
+        command: ["sh", "-c", "command -v wtype"]
         onExited: exitCode => {
             wtypeAvailable = (exitCode === 0);
         }
@@ -132,7 +132,7 @@ Singleton {
     Process {
         id: detectPrimeRunProcess
         running: false
-        command: ["which", "prime-run"]
+        command: ["sh", "-c", "command -v prime-run"]
 
         onExited: function (exitCode) {
             if (exitCode === 0) {
@@ -146,7 +146,7 @@ Singleton {
     Process {
         id: detectNvidiaOffloadProcess
         running: false
-        command: ["which", "nvidia-offload"]
+        command: ["sh", "-c", "command -v nvidia-offload"]
 
         onExited: function (exitCode) {
             if (exitCode === 0) {

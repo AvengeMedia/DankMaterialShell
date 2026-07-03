@@ -16,8 +16,14 @@ pkgs.testers.runNixOSTest {
       isSystemUser = true;
       group = "greeter";
     };
+    users.users.alice.isNormalUser = true;
 
     services.greetd.settings.default_session.user = "greeter";
+    services.displayManager.autoLogin = {
+      enable = true;
+      user = "alice";
+    };
+    services.displayManager.defaultSession = "niri";
 
     programs.niri.enable = true;
 
@@ -46,6 +52,11 @@ pkgs.testers.runNixOSTest {
     greetd_config_path = config_match.group(1)
     greetd_config = machine.succeed(f"cat {greetd_config_path}")
     t.assertIn("dms-greeter", greetd_config)
+    t.assertIn("[initial_session]", greetd_config)
+
+    initial_session = greetd_config.split("[initial_session]", 1)[1]
+    t.assertIn('user = "alice"', initial_session)
+    t.assertIn("systemd-cat", initial_session)
 
     script_match = re.search(r'command\s*=\s*"([^"]+/bin/dms-greeter)"', greetd_config)
     if script_match is None:

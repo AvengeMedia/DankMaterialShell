@@ -51,7 +51,7 @@ Rectangle {
 
         Column {
             anchors.verticalCenter: parent.verticalCenter
-            spacing: 2
+            spacing: Theme.spacingXXS
 
             Typography {
                 text: UserInfoService.fullName || UserInfoService.username || I18n.tr("User")

@@ -139,9 +139,9 @@ StyledRect {
     color: {
         if (keyboardNavigationActive && listDelegateRoot.index === selectedIndex)
             return Theme.surfacePressed;
-        return listMouseArea.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency) : "transparent";
+        return listMouseArea.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency) : Theme.withAlpha(Theme.surfaceContainerHigh, 0);
     }
-    border.color: keyboardNavigationActive && listDelegateRoot.index === selectedIndex ? Theme.primary : "transparent"
+    border.color: keyboardNavigationActive && listDelegateRoot.index === selectedIndex ? Theme.primary : Theme.withAlpha(Theme.primary, 0)
     border.width: (keyboardNavigationActive && listDelegateRoot.index === selectedIndex) ? 2 : 0
 
     Component.onCompleted: {

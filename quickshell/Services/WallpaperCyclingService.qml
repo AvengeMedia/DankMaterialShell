@@ -22,62 +22,37 @@ Singleton {
         return false;
     }
     readonly property bool shouldPauseCycling: fullscreenShowing || SessionService.locked
-    property string cachedCyclingTime: SessionData.wallpaperCyclingTime
-    property int cachedCyclingInterval: SessionData.wallpaperCyclingInterval
-    property string lastTimeCheck: ""
-    property var monitorTimers: ({})
-    property var monitorLastTimeChecks: ({})
+    readonly property bool serverSchedulingAvailable: DMSService.capabilities.includes("wallpaper")
+    property real lastCycleSeq: -1
     property var monitorProcesses: ({})
 
-    Component {
-        id: monitorTimerComponent
-        Timer {
-            property string targetScreen: ""
-            running: false
-            repeat: true
-	        onTriggered: {
-                if (typeof WallpaperCyclingService !== "undefined" && targetScreen !== "" && !WallpaperCyclingService.shouldPauseCycling) {
-                    WallpaperCyclingService.cycleNextForMonitor(targetScreen);
-                }
+    Connections {
+        target: DMSService
+
+        function onWallpaperCycleUpdate(data) {
+            if (!data)
+                return;
+            const seq = data.cycleSeq || 0;
+            if (lastCycleSeq < 0) {
+                lastCycleSeq = seq;
+                return;
+            }
+            if (seq <= lastCycleSeq)
+                return;
+            lastCycleSeq = seq;
+            if (shouldPauseCycling)
+                return;
+            const target = data.target || "";
+            if (target === "") {
+                cycleToNextWallpaper();
+            } else {
+                cycleNextForMonitor(target);
             }
         }
-    }
 
-    Component {
-        id: monitorProcessComponent
-        Process {
-            property string targetScreenName: ""
-            property string currentWallpaper: ""
-            property bool goToPrevious: false
-            running: false
-            stdout: StdioCollector {
-                onStreamFinished: {
-                    if (text && text.trim()) {
-                        const files = text.trim().split('\n').filter(file => file.length > 0);
-                        if (files.length <= 1)
-                            return;
-                        const wallpaperList = files.sort();
-                        const currentPath = currentWallpaper;
-                        let currentIndex = wallpaperList.findIndex(path => path === currentPath);
-                        if (currentIndex === -1)
-                            currentIndex = 0;
-                        let targetIndex;
-                        if (goToPrevious) {
-                            targetIndex = currentIndex === 0 ? wallpaperList.length - 1 : currentIndex - 1;
-                        } else {
-                            targetIndex = (currentIndex + 1) % wallpaperList.length;
-                        }
-                        const targetWallpaper = wallpaperList[targetIndex];
-                        if (targetWallpaper && targetWallpaper !== currentPath) {
-                            if (targetScreenName) {
-                                SessionData.setMonitorWallpaper(targetScreenName, targetWallpaper);
-                            } else {
-                                SessionData.setWallpaper(targetWallpaper);
-                            }
-                        }
-                    }
-                }
-            }
+        function onCapabilitiesReceived() {
+            lastCycleSeq = -1;
+            updateCyclingState();
         }
     }
 
@@ -93,17 +68,11 @@ Singleton {
         }
 
         function onWallpaperCyclingIntervalChanged() {
-            cachedCyclingInterval = SessionData.wallpaperCyclingInterval;
-            if (SessionData.wallpaperCyclingMode === "interval") {
-                updateCyclingState();
-            }
+            updateCyclingState();
         }
 
         function onWallpaperCyclingTimeChanged() {
-            cachedCyclingTime = SessionData.wallpaperCyclingTime;
-            if (SessionData.wallpaperCyclingMode === "time") {
-                updateCyclingState();
-            }
+            updateCyclingState();
         }
 
         function onPerMonitorWallpaperChanged() {
@@ -119,225 +88,117 @@ Singleton {
         target: SessionService
 
         function onSessionUnlocked() {
-            if (SessionData.wallpaperCyclingEnabled || SessionData.perMonitorWallpaper) {
-                updateCyclingState();
-            }
+            updateCyclingState();
         }
     }
 
     function updateCyclingState() {
-        if (SessionData.perMonitorWallpaper) {
-            stopCycling();
-            updatePerMonitorCycling();
-        } else if (SessionData.wallpaperCyclingEnabled && SessionData.wallpaperPath) {
-            startCycling();
-            stopAllMonitorCycling();
-        } else {
-            stopCycling();
-            stopAllMonitorCycling();
-        }
+        cyclingActive = serverSchedulingAvailable && (SessionData.wallpaperCyclingEnabled || SessionData.perMonitorWallpaper);
+        pushConfigToServer();
     }
 
-    function updatePerMonitorCycling() {
-        if (typeof Quickshell === "undefined")
+    function buildServerConfig() {
+        var monitors = {};
+        if (SessionData.perMonitorWallpaper && typeof Quickshell !== "undefined") {
+            var screens = Quickshell.screens;
+            for (var i = 0; i < screens.length; i++) {
+                var name = screens[i].name;
+                var s = SessionData.getMonitorCyclingSettings(name);
+                var wp = SessionData.getMonitorWallpaper(name);
+                monitors[name] = {
+                    "enabled": !!(s.enabled && wp && !wp.startsWith("#")),
+                    "mode": s.mode || "interval",
+                    "intervalSec": s.interval || 300,
+                    "time": s.time || "06:00"
+                };
+            }
+        }
+        return {
+            "perMonitor": SessionData.perMonitorWallpaper,
+            "global": {
+                "enabled": !!(SessionData.wallpaperCyclingEnabled && SessionData.wallpaperPath),
+                "mode": SessionData.wallpaperCyclingMode,
+                "intervalSec": SessionData.wallpaperCyclingInterval,
+                "time": SessionData.wallpaperCyclingTime
+            },
+            "monitors": monitors
+        };
+    }
+
+    function pushConfigToServer() {
+        if (!serverSchedulingAvailable)
             return;
-        var screens = Quickshell.screens;
-        for (var i = 0; i < screens.length; i++) {
-            var screenName = screens[i].name;
-            var settings = SessionData.getMonitorCyclingSettings(screenName);
-            var wallpaper = SessionData.getMonitorWallpaper(screenName);
-
-            if (settings.enabled && wallpaper && !wallpaper.startsWith("#")) {
-                startMonitorCycling(screenName, settings);
-            } else {
-                stopMonitorCycling(screenName);
-            }
-        }
+        DMSService.sendRequest("wallpaper.setConfig", {
+            "config": buildServerConfig()
+        }, null);
     }
 
-    function stopAllMonitorCycling() {
-        var screenNames = Object.keys(monitorTimers);
-        for (var i = 0; i < screenNames.length; i++) {
-            stopMonitorCycling(screenNames[i]);
-        }
+    function findCommand(wallpaperDir) {
+        return ["sh", "-c", `find -L "${wallpaperDir}" -maxdepth 1 -type f \\( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.bmp" -o -iname "*.gif" -o -iname "*.webp" -o -iname "*.jxl" -o -iname "*.avif" -o -iname "*.heif" -o -iname "*.exr" \\) 2>/dev/null | sort`];
     }
 
-    function startCycling() {
-        switch (SessionData.wallpaperCyclingMode) {
-        case "interval":
-            lastTimeCheck = "";
-            intervalTimer.interval = cachedCyclingInterval * 1000;
-            intervalTimer.start();
-            cyclingActive = true;
-            break;
-        case "time":
-            intervalTimer.stop();
-            cyclingActive = true;
-            checkTimeBasedCycling();
-            break;
-        }
-    }
-
-    function stopCycling() {
-        intervalTimer.stop();
-        cyclingActive = false;
-    }
-
-    function startMonitorCycling(screenName, settings) {
-        switch (settings.mode) {
-        case "interval":
-            {
-                var newChecks = Object.assign({}, monitorLastTimeChecks);
-                delete newChecks[screenName];
-                monitorLastTimeChecks = newChecks;
-
-                var timer = monitorTimers[screenName];
-                if (!timer && monitorTimerComponent && monitorTimerComponent.status === Component.Ready) {
-                    var newTimers = Object.assign({}, monitorTimers);
-                    var newTimer = monitorTimerComponent.createObject(root);
-                    newTimer.targetScreen = screenName;
-                    newTimers[screenName] = newTimer;
-                    monitorTimers = newTimers;
-                    timer = newTimer;
-                }
-                if (timer) {
-                    timer.interval = settings.interval * 1000;
-                    timer.start();
-                }
-                break;
-            }
-        case "time":
-            {
-                var existingTimer = monitorTimers[screenName];
-                if (existingTimer) {
-                    existingTimer.stop();
-                    existingTimer.destroy();
-                    var newTimers = Object.assign({}, monitorTimers);
-                    delete newTimers[screenName];
-                    monitorTimers = newTimers;
-                }
-
-                var newChecks = Object.assign({}, monitorLastTimeChecks);
-                newChecks[screenName] = "";
-                monitorLastTimeChecks = newChecks;
-                break;
-            }
-        }
-    }
-
-    function stopMonitorCycling(screenName) {
-        var timer = monitorTimers[screenName];
-        if (timer) {
-            timer.stop();
-            timer.destroy();
-            var newTimers = Object.assign({}, monitorTimers);
-            delete newTimers[screenName];
-            monitorTimers = newTimers;
-        }
-
+    function monitorProcessFor(screenName) {
         var process = monitorProcesses[screenName];
-        if (process) {
-            process.destroy();
-            var newProcesses = Object.assign({}, monitorProcesses);
-            delete newProcesses[screenName];
-            monitorProcesses = newProcesses;
+        if (process)
+            return process;
+        var newProcesses = Object.assign({}, monitorProcesses);
+        process = monitorProcessComponent.createObject(root);
+        newProcesses[screenName] = process;
+        monitorProcesses = newProcesses;
+        return process;
+    }
+
+    function cycle(screenName, wallpaperPath, goToPrevious) {
+        const currentWallpaper = wallpaperPath || SessionData.wallpaperPath;
+        if (!currentWallpaper)
+            return;
+        const wallpaperDir = currentWallpaper.substring(0, currentWallpaper.lastIndexOf('/'));
+
+        if (screenName && monitorProcessComponent.status === Component.Ready) {
+            var process = monitorProcessFor(screenName);
+            process.command = findCommand(wallpaperDir);
+            process.targetScreenName = screenName;
+            process.currentWallpaper = currentWallpaper;
+            process.goToPrevious = goToPrevious;
+            process.running = true;
+            return;
         }
 
-        var newChecks = Object.assign({}, monitorLastTimeChecks);
-        delete newChecks[screenName];
-        monitorLastTimeChecks = newChecks;
+        var globalProcess = goToPrevious ? prevCyclingProcess : cyclingProcess;
+        globalProcess.command = findCommand(wallpaperDir);
+        globalProcess.targetScreenName = screenName || "";
+        globalProcess.currentWallpaper = currentWallpaper;
+        globalProcess.running = true;
     }
 
     function cycleToNextWallpaper(screenName, wallpaperPath) {
-        const currentWallpaper = wallpaperPath || SessionData.wallpaperPath;
-        if (!currentWallpaper)
-            return;
-        const wallpaperDir = currentWallpaper.substring(0, currentWallpaper.lastIndexOf('/'));
-
-        if (screenName && monitorProcessComponent && monitorProcessComponent.status === Component.Ready) {
-            // Use per-monitor process
-            var process = monitorProcesses[screenName];
-            if (!process) {
-                var newProcesses = Object.assign({}, monitorProcesses);
-                var newProcess = monitorProcessComponent.createObject(root);
-                newProcesses[screenName] = newProcess;
-                monitorProcesses = newProcesses;
-                process = newProcess;
-            }
-
-            if (process) {
-                process.command = ["sh", "-c", `find -L "${wallpaperDir}" -maxdepth 1 -type f \\( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.bmp" -o -iname "*.gif" -o -iname "*.webp" -o -iname "*.jxl" -o -iname "*.avif" -o -iname "*.heif" -o -iname "*.exr" \\) 2>/dev/null | sort`];
-                process.targetScreenName = screenName;
-                process.currentWallpaper = currentWallpaper;
-                process.goToPrevious = false;
-                process.running = true;
-            }
-        } else {
-            // Use global process for fallback
-            cyclingProcess.command = ["sh", "-c", `find -L "${wallpaperDir}" -maxdepth 1 -type f \\( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.bmp" -o -iname "*.gif" -o -iname "*.webp" -o -iname "*.jxl" -o -iname "*.avif" -o -iname "*.heif" -o -iname "*.exr" \\) 2>/dev/null | sort`];
-            cyclingProcess.targetScreenName = screenName || "";
-            cyclingProcess.currentWallpaper = currentWallpaper;
-            cyclingProcess.running = true;
-        }
+        cycle(screenName, wallpaperPath, false);
     }
 
     function cycleToPrevWallpaper(screenName, wallpaperPath) {
-        const currentWallpaper = wallpaperPath || SessionData.wallpaperPath;
-        if (!currentWallpaper)
+        cycle(screenName, wallpaperPath, true);
+    }
+
+    function resetScheduleAfterManual() {
+        if (!serverSchedulingAvailable)
             return;
-        const wallpaperDir = currentWallpaper.substring(0, currentWallpaper.lastIndexOf('/'));
-
-        if (screenName && monitorProcessComponent && monitorProcessComponent.status === Component.Ready) {
-            // Use per-monitor process (same as next, but with prev flag)
-            var process = monitorProcesses[screenName];
-            if (!process) {
-                var newProcesses = Object.assign({}, monitorProcesses);
-                var newProcess = monitorProcessComponent.createObject(root);
-                newProcesses[screenName] = newProcess;
-                monitorProcesses = newProcesses;
-                process = newProcess;
-            }
-
-            if (process) {
-                process.command = ["sh", "-c", `find -L "${wallpaperDir}" -maxdepth 1 -type f \\( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.bmp" -o -iname "*.gif" -o -iname "*.webp" -o -iname "*.jxl" -o -iname "*.avif" -o -iname "*.heif" -o -iname "*.exr" \\) 2>/dev/null | sort`];
-                process.targetScreenName = screenName;
-                process.currentWallpaper = currentWallpaper;
-                process.goToPrevious = true;
-                process.running = true;
-            }
-        } else {
-            // Use global process for fallback
-            prevCyclingProcess.command = ["sh", "-c", `find -L "${wallpaperDir}" -maxdepth 1 -type f \\( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.bmp" -o -iname "*.gif" -o -iname "*.webp" -o -iname "*.jxl" -o -iname "*.avif" -o -iname "*.heif" -o -iname "*.exr" \\) 2>/dev/null | sort`];
-            prevCyclingProcess.targetScreenName = screenName || "";
-            prevCyclingProcess.currentWallpaper = currentWallpaper;
-            prevCyclingProcess.running = true;
-        }
+        DMSService.sendRequest("wallpaper.trigger", {
+            "target": ""
+        }, null);
     }
 
     function cycleNextManually() {
-        if (SessionData.wallpaperPath) {
-            cycleToNextWallpaper();
-            // Restart timers if cycling is active
-            if (cyclingActive && SessionData.wallpaperCyclingEnabled) {
-                if (SessionData.wallpaperCyclingMode === "interval") {
-                    intervalTimer.interval = cachedCyclingInterval * 1000;
-                    intervalTimer.restart();
-                }
-            }
-        }
+        if (!SessionData.wallpaperPath)
+            return;
+        cycleToNextWallpaper();
+        resetScheduleAfterManual();
     }
 
     function cyclePrevManually() {
-        if (SessionData.wallpaperPath) {
-            cycleToPrevWallpaper();
-            // Restart timers if cycling is active
-            if (cyclingActive && SessionData.wallpaperCyclingEnabled) {
-                if (SessionData.wallpaperCyclingMode === "interval") {
-                    intervalTimer.interval = cachedCyclingInterval * 1000;
-                    intervalTimer.restart();
-                }
-            }
-        }
+        if (!SessionData.wallpaperPath)
+            return;
+        cycleToPrevWallpaper();
+        resetScheduleAfterManual();
     }
 
     function cycleNextForMonitor(screenName) {
@@ -358,138 +219,66 @@ Singleton {
         }
     }
 
-    function checkTimeBasedCycling() {
-        if (shouldPauseCycling)
+    function applyCycledWallpaper(text, currentPath, targetScreenName, goToPrevious) {
+        if (!text || !text.trim())
             return;
-        const currentTime = Qt.formatTime(systemClock.date, "hh:mm");
+        const files = text.trim().split('\n').filter(file => file.length > 0);
+        if (files.length <= 1)
+            return;
+        const wallpaperList = files.sort();
+        let currentIndex = wallpaperList.findIndex(path => path === currentPath);
+        if (currentIndex === -1)
+            currentIndex = 0;
 
-        if (!SessionData.perMonitorWallpaper) {
-            if (currentTime === cachedCyclingTime && currentTime !== lastTimeCheck) {
-                lastTimeCheck = currentTime;
-                cycleToNextWallpaper();
-            } else if (currentTime !== cachedCyclingTime) {
-                lastTimeCheck = "";
-            }
+        let targetIndex;
+        if (goToPrevious) {
+            targetIndex = currentIndex === 0 ? wallpaperList.length - 1 : currentIndex - 1;
         } else {
-            checkPerMonitorTimeBasedCycling(currentTime);
+            targetIndex = (currentIndex + 1) % wallpaperList.length;
         }
-    }
-
-    function checkPerMonitorTimeBasedCycling(currentTime) {
-        if (typeof Quickshell === "undefined")
+        const targetWallpaper = wallpaperList[targetIndex];
+        if (!targetWallpaper || targetWallpaper === currentPath)
             return;
-        var screens = Quickshell.screens;
-        for (var i = 0; i < screens.length; i++) {
-            var screenName = screens[i].name;
-            var settings = SessionData.getMonitorCyclingSettings(screenName);
-            var wallpaper = SessionData.getMonitorWallpaper(screenName);
 
-            if (settings.enabled && settings.mode === "time" && wallpaper && !wallpaper.startsWith("#")) {
-                var lastCheck = monitorLastTimeChecks[screenName] || "";
-
-                if (currentTime === settings.time && currentTime !== lastCheck) {
-                    var newChecks = Object.assign({}, monitorLastTimeChecks);
-                    newChecks[screenName] = currentTime;
-                    monitorLastTimeChecks = newChecks;
-                    cycleNextForMonitor(screenName);
-                } else if (currentTime !== settings.time) {
-                    var newChecks = Object.assign({}, monitorLastTimeChecks);
-                    newChecks[screenName] = "";
-                    monitorLastTimeChecks = newChecks;
-                }
-            }
+        if (targetScreenName) {
+            SessionData.setMonitorWallpaper(targetScreenName, targetWallpaper);
+        } else {
+            SessionData.setWallpaper(targetWallpaper);
         }
     }
 
-    Timer {
-        id: intervalTimer
-        interval: cachedCyclingInterval * 1000
-        running: false
-        repeat: true
-        onTriggered: {
-            if (shouldPauseCycling)
-                return;
-            cycleToNextWallpaper();
-        }
-    }
-
-    SystemClock {
-        id: systemClock
-        precision: SystemClock.Minutes
-        onDateChanged: {
-            if ((SessionData.wallpaperCyclingMode === "time" && cyclingActive) || SessionData.perMonitorWallpaper) {
-                checkTimeBasedCycling();
+    Component {
+        id: monitorProcessComponent
+        Process {
+            property string targetScreenName: ""
+            property string currentWallpaper: ""
+            property bool goToPrevious: false
+            running: false
+            stdout: StdioCollector {
+                onStreamFinished: root.applyCycledWallpaper(text, currentWallpaper, targetScreenName, goToPrevious)
             }
         }
     }
 
     Process {
         id: cyclingProcess
-
         property string targetScreenName: ""
         property string currentWallpaper: ""
-
+        property bool goToPrevious: false
         running: false
-
         stdout: StdioCollector {
-            onStreamFinished: {
-                if (text && text.trim()) {
-                    const files = text.trim().split('\n').filter(file => file.length > 0);
-                    if (files.length <= 1)
-                        return;
-                    const wallpaperList = files.sort();
-                    const currentPath = cyclingProcess.currentWallpaper;
-                    let currentIndex = wallpaperList.findIndex(path => path === currentPath);
-                    if (currentIndex === -1)
-                        currentIndex = 0;
-
-                    const nextIndex = (currentIndex + 1) % wallpaperList.length;
-                    const nextWallpaper = wallpaperList[nextIndex];
-
-                    if (nextWallpaper && nextWallpaper !== currentPath) {
-                        if (cyclingProcess.targetScreenName) {
-                            SessionData.setMonitorWallpaper(cyclingProcess.targetScreenName, nextWallpaper);
-                        } else {
-                            SessionData.setWallpaper(nextWallpaper);
-                        }
-                    }
-                }
-            }
+            onStreamFinished: root.applyCycledWallpaper(text, cyclingProcess.currentWallpaper, cyclingProcess.targetScreenName, cyclingProcess.goToPrevious)
         }
     }
 
     Process {
         id: prevCyclingProcess
-
         property string targetScreenName: ""
         property string currentWallpaper: ""
-
+        property bool goToPrevious: true
         running: false
-
         stdout: StdioCollector {
-            onStreamFinished: {
-                if (text && text.trim()) {
-                    const files = text.trim().split('\n').filter(file => file.length > 0);
-                    if (files.length <= 1)
-                        return;
-                    const wallpaperList = files.sort();
-                    const currentPath = prevCyclingProcess.currentWallpaper;
-                    let currentIndex = wallpaperList.findIndex(path => path === currentPath);
-                    if (currentIndex === -1)
-                        currentIndex = 0;
-
-                    const prevIndex = currentIndex === 0 ? wallpaperList.length - 1 : currentIndex - 1;
-                    const prevWallpaper = wallpaperList[prevIndex];
-
-                    if (prevWallpaper && prevWallpaper !== currentPath) {
-                        if (prevCyclingProcess.targetScreenName) {
-                            SessionData.setMonitorWallpaper(prevCyclingProcess.targetScreenName, prevWallpaper);
-                        } else {
-                            SessionData.setWallpaper(prevWallpaper);
-                        }
-                    }
-                }
-            }
+            onStreamFinished: root.applyCycledWallpaper(text, prevCyclingProcess.currentWallpaper, prevCyclingProcess.targetScreenName, prevCyclingProcess.goToPrevious)
         }
     }
 }

@@ -50,7 +50,7 @@ Item {
             id: listComponent
 
             Column {
-                spacing: 4
+                spacing: Theme.spacingXS
                 width: contentLoader.width
 
                 Repeater {
@@ -83,7 +83,7 @@ Item {
 
             Flow {
                 width: contentLoader.width
-                spacing: 4
+                spacing: Theme.spacingXS
 
                 Repeater {
                     model: ScriptModel {

@@ -847,6 +847,14 @@ Singleton {
         }
     }
 
+    Connections {
+        target: NiriService
+        enabled: CompositorService.isNiri
+        function onConfigReloaded() {
+            root.checkIncludeStatus();
+        }
+    }
+
     Component.onCompleted: {
         outputs = buildOutputsMap();
         reloadSavedOutputs();

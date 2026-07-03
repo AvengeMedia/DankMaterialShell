@@ -7,6 +7,24 @@ function dirname(path) {
     return idx > 0 ? path.substring(0, idx) : ".";
 }
 
+function sectionHeaderFor(includeLine) {
+    const line = String(includeLine ?? "").trim();
+    if (line.startsWith("require"))
+        return "-- DMS Include Configs";
+    if (line.startsWith("source"))
+        return "# DMS Include Configs";
+    return "// DMS Include Configs";
+}
+
+function managedIncludePatternFor(includeLine) {
+    const line = String(includeLine ?? "").trim();
+    if (line.startsWith("require"))
+        return "require.*dms[.]";
+    if (line.startsWith("source"))
+        return "source.*dms/";
+    return "include.*dms/";
+}
+
 function buildRepairScript(options) {
     const configFile = options.configFile;
     const backupFile = options.backupFile;
@@ -31,7 +49,9 @@ function buildRepairScript(options) {
     for (const include of includes) {
         if (!include.grepPattern || !include.includeLine)
             continue;
-        commands.push(`if ! grep -v '^[[:space:]]*\\(//\\|#\\|--\\)' ${shQuote(configFile)} 2>/dev/null | grep -q ${shQuote(include.grepPattern)}; then echo '' >> ${shQuote(configFile)} && printf '%s\\n' ${shQuote(include.includeLine)} >> ${shQuote(configFile)}; fi`);
+        const sectionHeader = options.sectionHeader || sectionHeaderFor(include.includeLine);
+        const managedIncludePattern = managedIncludePatternFor(include.includeLine);
+        commands.push(`if ! grep -v '^[[:space:]]*\\(//\\|#\\|--\\)' ${shQuote(configFile)} 2>/dev/null | grep -q ${shQuote(include.grepPattern)}; then if grep -Fqx ${shQuote(sectionHeader)} ${shQuote(configFile)} 2>/dev/null || grep -v '^[[:space:]]*\\(//\\|#\\|--\\)' ${shQuote(configFile)} 2>/dev/null | grep -q ${shQuote(managedIncludePattern)}; then printf '%s\\n' ${shQuote(include.includeLine)} >> ${shQuote(configFile)}; elif [ -s ${shQuote(configFile)} ]; then printf '\\n%s\\n%s\\n' ${shQuote(sectionHeader)} ${shQuote(include.includeLine)} >> ${shQuote(configFile)}; else printf '%s\\n%s\\n' ${shQuote(sectionHeader)} ${shQuote(include.includeLine)} >> ${shQuote(configFile)}; fi; fi`);
     }
 
     return commands.join("; ");

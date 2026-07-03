@@ -19,7 +19,7 @@ func init() {
 	runCmd.Flags().String("log-file", "", "Append logs to this file in addition to stderr (overrides DMS_LOG_FILE)")
 	runCmd.Flags().MarkHidden("daemon-child")
 
-	greeterCmd.AddCommand(greeterInstallCmd, greeterSyncCmd, greeterEnableCmd, greeterStatusCmd, greeterUninstallCmd)
+	greeterCmd.AddCommand(greeterInstallCmd, greeterSyncCmd, greeterEnableCmd, greeterStatusCmd, greeterUninstallCmd, greeterLaunchSessionCmd)
 	authCmd.AddCommand(authSyncCmd)
 	setupCmd.AddCommand(setupBindsCmd, setupLayoutCmd, setupColorsCmd, setupAlttabCmd, setupOutputsCmd, setupCursorCmd, setupWindowrulesCmd)
 	pluginsCmd.AddCommand(pluginsBrowseCmd, pluginsListCmd, pluginsInstallCmd, pluginsUninstallCmd, pluginsUpdateCmd)

@@ -121,8 +121,8 @@ PanelWindow {
         height: Math.max(60, menuColumn.implicitHeight + Theme.spacingS * 2)
         color: Theme.floatingSurface
         radius: Theme.cornerRadius
-        border.color: BlurService.enabled ? BlurService.borderColor : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
-        border.width: BlurService.enabled ? BlurService.borderWidth : 1
+        border.color: BlurService.borderColor
+        border.width: BlurService.borderWidth
 
         opacity: root.visible ? 1 : 0
         visible: opacity > 0
@@ -171,12 +171,14 @@ PanelWindow {
                 }
 
                 Rectangle {
+                    implicitWidth: Theme.spacingS + windowTitle.implicitWidth + Theme.spacingXS + closeButton.width + Theme.spacingXS
                     width: parent.width
                     height: 28
                     radius: Theme.cornerRadius
-                    color: windowArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
+                    color: windowArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0)
 
                     StyledText {
+                        id: windowTitle
                         anchors.left: parent.left
                         anchors.leftMargin: Theme.spacingS
                         anchors.right: closeButton.left
@@ -198,7 +200,7 @@ PanelWindow {
                         width: 20
                         height: 20
                         radius: 10
-                        color: closeMouseArea.containsMouse ? Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.2) : "transparent"
+                        color: closeMouseArea.containsMouse ? Theme.errorPressed : Theme.withAlpha(Theme.errorPressed, 0)
 
                         DankIcon {
                             anchors.centerIn: parent
@@ -254,50 +256,50 @@ PanelWindow {
                 }
                 width: parent.width
                 height: 1
-                color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                color: Theme.outlineHeavy
             }
 
             Repeater {
                 model: root.desktopEntry && root.desktopEntry.actions ? root.desktopEntry.actions : []
 
                 Rectangle {
+                    implicitWidth: Theme.spacingS * 2 + (actionIcon.visible ? actionIcon.width + Theme.spacingXS : 0) + actionLabel.implicitWidth
                     width: parent.width
                     height: 28
                     radius: Theme.cornerRadius
-                    color: actionArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
+                    color: actionArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0)
 
-                    Row {
+                    Item {
+                        id: actionIcon
                         anchors.left: parent.left
                         anchors.leftMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 16
+                        height: 16
+                        visible: modelData.icon && modelData.icon !== ""
+
+                        IconImage {
+                            anchors.fill: parent
+                            source: modelData.icon ? Paths.resolveIconPath(modelData.icon) : ""
+                            smooth: true
+                            asynchronous: true
+                            visible: status === Image.Ready
+                        }
+                    }
+
+                    StyledText {
+                        id: actionLabel
+                        anchors.left: actionIcon.visible ? actionIcon.right : parent.left
+                        anchors.leftMargin: actionIcon.visible ? Theme.spacingXS : Theme.spacingS
                         anchors.right: parent.right
                         anchors.rightMargin: Theme.spacingS
                         anchors.verticalCenter: parent.verticalCenter
-                        spacing: Theme.spacingXS
-
-                        Item {
-                            anchors.verticalCenter: parent.verticalCenter
-                            width: 16
-                            height: 16
-                            visible: modelData.icon && modelData.icon !== ""
-
-                            IconImage {
-                                anchors.fill: parent
-                                source: modelData.icon ? Paths.resolveIconPath(modelData.icon) : ""
-                                smooth: true
-                                asynchronous: true
-                                visible: status === Image.Ready
-                            }
-                        }
-
-                        StyledText {
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: modelData.name || ""
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceText
-                            font.weight: Font.Normal
-                            elide: Text.ElideRight
-                            wrapMode: Text.NoWrap
-                        }
+                        text: modelData.name || ""
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceText
+                        font.weight: Font.Normal
+                        elide: Text.ElideRight
+                        wrapMode: Text.NoWrap
                     }
 
                     DankRipple {
@@ -331,17 +333,19 @@ PanelWindow {
                 }
                 width: parent.width
                 height: 1
-                color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                color: Theme.outlineHeavy
             }
 
             Rectangle {
                 visible: !root.hidePin
+                implicitWidth: Theme.spacingS * 2 + pinLabel.implicitWidth
                 width: parent.width
                 height: 28
                 radius: Theme.cornerRadius
-                color: pinArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
+                color: pinArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0)
 
                 StyledText {
+                    id: pinLabel
                     anchors.left: parent.left
                     anchors.leftMargin: Theme.spacingS
                     anchors.right: parent.right
@@ -391,17 +395,19 @@ PanelWindow {
                 }
                 width: parent.width
                 height: 1
-                color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                color: Theme.outlineHeavy
             }
 
             Rectangle {
                 visible: !root.isDmsWindow && root.desktopEntry && SessionService.nvidiaCommand
+                implicitWidth: Theme.spacingS * 2 + nvidiaLabel.implicitWidth
                 width: parent.width
                 height: 28
                 radius: Theme.cornerRadius
-                color: nvidiaArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
+                color: nvidiaArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0)
 
                 StyledText {
+                    id: nvidiaLabel
                     anchors.left: parent.left
                     anchors.leftMargin: Theme.spacingS
                     anchors.right: parent.right
@@ -438,12 +444,14 @@ PanelWindow {
 
             Rectangle {
                 visible: root.appData && (root.appData.type === "window" || (root.appData.type === "grouped" && root.appData.windowCount > 0))
+                implicitWidth: Theme.spacingS * 2 + closeLabel.implicitWidth
                 width: parent.width
                 height: 28
                 radius: Theme.cornerRadius
-                color: closeArea.containsMouse ? Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.12) : "transparent"
+                color: closeArea.containsMouse ? Theme.errorHover : Theme.withAlpha(Theme.errorHover, 0)
 
                 StyledText {
+                    id: closeLabel
                     anchors.left: parent.left
                     anchors.leftMargin: Theme.spacingS
                     anchors.right: parent.right

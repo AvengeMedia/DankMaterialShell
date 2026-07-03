@@ -52,7 +52,7 @@ Rectangle {
 
                 Row {
                     anchors.centerIn: parent
-                    spacing: 4
+                    spacing: Theme.spacingXS
 
                     Rectangle {
                         width: 28

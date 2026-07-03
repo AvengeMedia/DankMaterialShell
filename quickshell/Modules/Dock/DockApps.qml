@@ -573,7 +573,7 @@ Item {
                         visible: itemData.type === "separator"
                         width: root.isVertical ? root.iconSize * 0.5 : 2
                         height: root.isVertical ? 2 : root.iconSize * 0.5
-                        color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.3)
+                        color: Theme.outlineHeavy
                         radius: 1
                         anchors.centerIn: parent
                     }

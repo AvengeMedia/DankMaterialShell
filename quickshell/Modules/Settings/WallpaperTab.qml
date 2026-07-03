@@ -135,7 +135,7 @@ Item {
 
                             Row {
                                 anchors.centerIn: parent
-                                spacing: 4
+                                spacing: Theme.spacingXS
 
                                 Rectangle {
                                     width: 32
@@ -302,54 +302,109 @@ Item {
 
                 Item {
                     width: parent.width
-                    height: fillModeGroup.height
+                    height: fillModeColumn.height
                     visible: root.currentWallpaper !== "" && !root.currentWallpaper.startsWith("#")
 
-                    DankButtonGroup {
-                        id: fillModeGroup
-                        property var internalModes: ["Stretch", "Fit", "Fill", "Tile", "TileVertically", "TileHorizontally", "Pad"]
+                    Column {
+                        id: fillModeColumn
                         anchors.horizontalCenter: parent.horizontalCenter
-                        model: [I18n.tr("Stretch", "wallpaper fill mode"), I18n.tr("Fit", "wallpaper fill mode"), I18n.tr("Fill", "wallpaper fill mode"), I18n.tr("Tile", "wallpaper fill mode"), I18n.tr("Tile V", "wallpaper fill mode"), I18n.tr("Tile H", "wallpaper fill mode"), I18n.tr("Pad", "wallpaper fill mode")]
-                        selectionMode: "single"
-                        buttonHeight: 28
-                        minButtonWidth: 48
-                        buttonPadding: Theme.spacingS
-                        checkIconSize: 0
-                        textSize: Theme.fontSizeSmall
-                        checkEnabled: false
-                        currentIndex: {
-                            var mode = SessionData.perMonitorWallpaper ? SessionData.getMonitorWallpaperFillMode(selectedMonitorName) : SettingsData.wallpaperFillMode;
-                            return internalModes.indexOf(mode);
+                        spacing: Theme.spacingS
+
+                        property var firstRowModes: ["Stretch", "Fit", "Fill", "Scrolling"]
+                        property var secondRowModes: ["Tile", "TileVertically", "TileHorizontally", "Pad"]
+
+                        function currentMode() {
+                            return SessionData.perMonitorWallpaper ? SessionData.getMonitorWallpaperFillMode(selectedMonitorName) : SettingsData.wallpaperFillMode;
                         }
-                        onSelectionChanged: (index, selected) => {
-                            if (!selected)
-                                return;
+
+                        function selectMode(mode) {
                             if (SessionData.perMonitorWallpaper) {
-                                SessionData.setMonitorWallpaperFillMode(selectedMonitorName, internalModes[index]);
+                                SessionData.setMonitorWallpaperFillMode(selectedMonitorName, mode);
                             } else {
-                                SettingsData.set("wallpaperFillMode", internalModes[index]);
+                                SettingsData.set("wallpaperFillMode", mode);
                             }
                         }
 
-                        Connections {
-                            target: SettingsData
-                            function onWallpaperFillModeChanged() {
-                                if (SessionData.perMonitorWallpaper)
+                        DankButtonGroup {
+                            id: fillModeGroupFirstRow
+                            property var internalModes: fillModeColumn.firstRowModes
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            model: [I18n.tr("Stretch", "wallpaper fill mode"), I18n.tr("Fit", "wallpaper fill mode"), I18n.tr("Fill", "wallpaper fill mode"), I18n.tr("Scroll", "wallpaper fill mode")]
+                            selectionMode: "single"
+                            buttonHeight: 28
+                            minButtonWidth: 48
+                            buttonPadding: Theme.spacingS
+                            checkIconSize: 0
+                            textSize: Theme.fontSizeSmall
+                            checkEnabled: false
+                            currentIndex: {
+                                var mode = fillModeColumn.currentMode();
+                                var idx = internalModes.indexOf(mode);
+                                return idx >= 0 ? idx : -1;
+                            }
+                            onSelectionChanged: (index, selected) => {
+                                if (!selected)
                                     return;
-                                fillModeGroup.currentIndex = fillModeGroup.internalModes.indexOf(SettingsData.wallpaperFillMode);
+                                fillModeColumn.selectMode(internalModes[index]);
                             }
                         }
 
-                        Connections {
-                            target: root
-                            function onSelectedMonitorNameChanged() {
-                                if (!SessionData.perMonitorWallpaper)
-                                    return;
-                                fillModeGroup.currentIndex = Qt.binding(() => {
-                                    var mode = SessionData.perMonitorWallpaper ? SessionData.getMonitorWallpaperFillMode(selectedMonitorName) : SettingsData.wallpaperFillMode;
-                                    return fillModeGroup.internalModes.indexOf(mode);
-                                });
+                        DankButtonGroup {
+                            id: fillModeGroupSecondRow
+                            property var internalModes: fillModeColumn.secondRowModes
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            model: [I18n.tr("Tile", "wallpaper fill mode"), I18n.tr("Tile V", "wallpaper fill mode"), I18n.tr("Tile H", "wallpaper fill mode"), I18n.tr("Pad", "wallpaper fill mode")]
+                            selectionMode: "single"
+                            buttonHeight: 28
+                            minButtonWidth: 48
+                            buttonPadding: Theme.spacingS
+                            checkIconSize: 0
+                            textSize: Theme.fontSizeSmall
+                            checkEnabled: false
+                            currentIndex: {
+                                var mode = fillModeColumn.currentMode();
+                                var idx = internalModes.indexOf(mode);
+                                return idx >= 0 ? idx : -1;
                             }
+                            onSelectionChanged: (index, selected) => {
+                                if (!selected)
+                                    return;
+                                fillModeColumn.selectMode(internalModes[index]);
+                            }
+                        }
+                    }
+
+                    Connections {
+                        target: SettingsData
+                        function onWallpaperFillModeChanged() {
+                            if (SessionData.perMonitorWallpaper)
+                                return;
+                            fillModeGroupFirstRow.currentIndex = Qt.binding(() => {
+                                var idx = fillModeGroupFirstRow.internalModes.indexOf(SettingsData.wallpaperFillMode);
+                                return idx >= 0 ? idx : -1;
+                            });
+                            fillModeGroupSecondRow.currentIndex = Qt.binding(() => {
+                                var idx = fillModeGroupSecondRow.internalModes.indexOf(SettingsData.wallpaperFillMode);
+                                return idx >= 0 ? idx : -1;
+                            });
+                        }
+                    }
+
+                    Connections {
+                        target: root
+                        function onSelectedMonitorNameChanged() {
+                            if (!SessionData.perMonitorWallpaper)
+                                return;
+                            fillModeGroupFirstRow.currentIndex = Qt.binding(() => {
+                                var mode = SessionData.getMonitorWallpaperFillMode(selectedMonitorName);
+                                var idx = fillModeGroupFirstRow.internalModes.indexOf(mode);
+                                return idx >= 0 ? idx : -1;
+                            });
+                            fillModeGroupSecondRow.currentIndex = Qt.binding(() => {
+                                var mode = SessionData.getMonitorWallpaperFillMode(selectedMonitorName);
+                                var idx = fillModeGroupSecondRow.internalModes.indexOf(mode);
+                                return idx >= 0 ? idx : -1;
+                            });
                         }
                     }
                 }
@@ -359,19 +414,34 @@ Item {
                     tags: ["background", "color", "fill", "fit", "custom"]
                     settingKey: "wallpaperBackgroundColorMode"
                     text: I18n.tr("Background Color")
-                    description: I18n.tr("Color shown for areas not covered by wallpaper (e.g. Fit or Pad modes)")
+                    description: I18n.tr("Color shown for areas not covered by wallpaper")
                     visible: root.currentWallpaper !== "" && !root.currentWallpaper.startsWith("#")
                     dropdownWidth: 220
                     options: [
-                        { "value": "black", "label": I18n.tr("Black") },
-                        { "value": "white", "label": I18n.tr("White") },
-                        { "value": "primary", "label": I18n.tr("Primary Theme Color") },
-                        { "value": "surface", "label": I18n.tr("Surface Container") },
-                        { "value": "custom", "label": I18n.tr("Custom") }
+                        {
+                            "value": "black",
+                            "label": I18n.tr("Black")
+                        },
+                        {
+                            "value": "white",
+                            "label": I18n.tr("White")
+                        },
+                        {
+                            "value": "primary",
+                            "label": I18n.tr("Primary")
+                        },
+                        {
+                            "value": "surface",
+                            "label": I18n.tr("Surface Container")
+                        },
+                        {
+                            "value": "custom",
+                            "label": I18n.tr("Custom")
+                        }
                     ]
                     currentMode: SettingsData.wallpaperBackgroundColorMode
                     customColor: SettingsData.wallpaperBackgroundCustomColor || "#000000"
-                    pickerTitle: I18n.tr("Wallpaper Background Color")
+                    pickerTitle: I18n.tr("Background Color")
                     onModeSelected: mode => SettingsData.set("wallpaperBackgroundColorMode", mode)
                     onCustomColorSelected: selectedColor => SettingsData.set("wallpaperBackgroundCustomColor", selectedColor.toString())
                 }
@@ -492,7 +562,7 @@ Item {
 
                                     Row {
                                         anchors.centerIn: parent
-                                        spacing: 4
+                                        spacing: Theme.spacingXS
 
                                         Rectangle {
                                             width: 28
@@ -682,7 +752,7 @@ Item {
 
                                     Row {
                                         anchors.centerIn: parent
-                                        spacing: 4
+                                        spacing: Theme.spacingXS
 
                                         Rectangle {
                                             width: 28

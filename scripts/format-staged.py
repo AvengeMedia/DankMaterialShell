@@ -13,13 +13,16 @@ would silently absorb those into the commit.
 
 import json
 import os
+import queue
 import shutil
 import subprocess
 import sys
+import threading
 from pathlib import Path
 
 
 TAB_SIZE = 4
+REQUEST_TIMEOUT = 30
 QMLLS_CANDIDATES = ["qmlls6", "qmlls"]
 QMLLINT_CANDIDATES = ["/usr/lib/qt6/bin/qmllint", "qmllint6", "qmllint"]
 
@@ -111,12 +114,19 @@ class LspClient:
             stderr=subprocess.DEVNULL,
         )
         self._next_id = 1
+        self._write_lock = threading.Lock()
+        self._responses = queue.Queue()
+        # Drain stdout continuously: qmlls floods publishDiagnostics (~100KB
+        # per file) and blocks once the 64KB pipe fills, deadlocking against
+        # our own blocking write of a large didOpen.
+        threading.Thread(target=self._pump, daemon=True).start()
 
     def _send(self, msg):
         body = json.dumps(msg).encode("utf-8")
         header = f"Content-Length: {len(body)}\r\n\r\n".encode("ascii")
-        self.proc.stdin.write(header + body)
-        self.proc.stdin.flush()
+        with self._write_lock:
+            self.proc.stdin.write(header + body)
+            self.proc.stdin.flush()
 
     def _read(self):
         headers = {}
@@ -138,19 +148,39 @@ class LspClient:
             body += chunk
         return json.loads(body)
 
+    def _pump(self):
+        while True:
+            try:
+                msg = self._read()
+            except (RuntimeError, OSError, ValueError):
+                self._responses.put(None)
+                return
+            if "id" in msg and "method" in msg:
+                # Server-to-client request — reply with null so it doesn't stall.
+                try:
+                    self._send({"jsonrpc": "2.0", "id": msg["id"], "result": None})
+                except OSError:
+                    pass
+                continue
+            if "id" in msg and ("result" in msg or "error" in msg):
+                self._responses.put(msg)
+
     def request(self, method, params):
         req_id = self._next_id
         self._next_id += 1
         self._send({"jsonrpc": "2.0", "id": req_id, "method": method, "params": params})
         while True:
-            msg = self._read()
-            if msg.get("id") == req_id and ("result" in msg or "error" in msg):
-                if "error" in msg:
-                    raise RuntimeError(f"LSP {method} error: {msg['error']}")
-                return msg.get("result")
-            if "id" in msg and "method" in msg:
-                # Server-to-client request — reply with null so it doesn't stall.
-                self._send({"jsonrpc": "2.0", "id": msg["id"], "result": None})
+            try:
+                msg = self._responses.get(timeout=REQUEST_TIMEOUT)
+            except queue.Empty:
+                raise RuntimeError(f"LSP {method} timed out after {REQUEST_TIMEOUT}s")
+            if msg is None:
+                raise RuntimeError("qmlls closed unexpectedly")
+            if msg.get("id") != req_id:
+                continue
+            if "error" in msg:
+                raise RuntimeError(f"LSP {method} error: {msg['error']}")
+            return msg.get("result")
 
     def notify(self, method, params):
         self._send({"jsonrpc": "2.0", "method": method, "params": params})
@@ -270,6 +300,11 @@ def main():
                 skipped += 1
                 if client.proc.poll() is not None:
                     print("skipped (qmlls crashed on this file; restarting it)")
+                    client = start_client(qmlls, root)
+                    continue
+                if "timed out" in str(exc):
+                    print("skipped (qmlls timed out on this file; restarting it)")
+                    client.proc.kill()
                     client = start_client(qmlls, root)
                     continue
                 client.notify("textDocument/didClose", {"textDocument": {"uri": uri}})

@@ -21,6 +21,8 @@ Singleton {
     property bool isMiracle: false
     property bool isLabwc: false
     property string compositor: "unknown"
+    property bool compositorDetected: false
+    readonly property bool frameCompositorLayoutReady: (!isNiri || NiriService.frameLayoutReady) && (!isHyprland || HyprlandService.frameLayoutReady)
     readonly property bool useHyprlandFocusGrab: isHyprland && Quickshell.env("DMS_HYPRLAND_EXCLUSIVE_FOCUS") !== "1"
 
     readonly property string hyprlandSignature: Quickshell.env("HYPRLAND_INSTANCE_SIGNATURE")
@@ -133,9 +135,32 @@ Singleton {
         repeat: false
         onTriggered: {
             _sortScheduled = false;
-            sortedToplevels = computeSortedToplevels();
+            const next = computeSortedToplevels();
+            // Avoid reassigning (and invalidating bindings) when contents are equivalent.
+            if (!_toplevelListEquivalent(next, sortedToplevels))
+                sortedToplevels = next;
+            _recomputeFrameBlocked();
             toplevelsChanged();
         }
+    }
+
+    function _toplevelListEquivalent(a, b) {
+        if (!a || !b || a.length !== b.length)
+            return false;
+        for (let i = 0; i < a.length; i++) {
+            const x = a[i];
+            const y = b[i];
+            if (x === y)
+                continue;
+            if (!x || !y)
+                return false;
+            // Only niri's enriched snapshots support value comparison.
+            if (x.niriWindowId === undefined || y.niriWindowId === undefined)
+                return false;
+            if (x.niriWindowId !== y.niriWindowId || x.niriWorkspaceId !== y.niriWorkspaceId || x.appId !== y.appId || x.title !== y.title || !!x.activated !== !!y.activated || !!x.fullscreen !== !!y.fullscreen || !!x.maximized !== !!y.maximized || !!x.minimized !== !!y.minimized)
+                return false;
+        }
+        return true;
     }
 
     function scheduleSort() {
@@ -162,8 +187,10 @@ Singleton {
                     if (event.name === "workspace" || event.name === "workspacev2" || event.name === "focusedmon" || event.name === "focusedmonv2" || event.name === "activespecial")
                         Hyprland.refreshMonitors();
                 } catch (e) {}
-                if (event.name === "activespecial")
+                if (event.name === "activespecial") {
                     root.updateHyprlandVisibleSpecialWorkspaces(event);
+                    root._recomputeFrameBlocked();
+                }
                 root.scheduleSort();
             }
         }
@@ -173,6 +200,10 @@ Singleton {
         function onWindowsChanged() {
             root.scheduleSort();
         }
+        // Workspace switches affect the fullscreen check's active workspace.
+        function onAllWorkspacesChanged() {
+            root._recomputeFrameBlocked();
+        }
     }
 
     Component.onCompleted: {
@@ -180,6 +211,7 @@ Singleton {
         detectCompositor();
         updateHyprlandVisibleSpecialWorkspaces(null);
         scheduleSort();
+        _recomputeFrameBlocked();
         Qt.callLater(() => {
             NiriService.generateNiriLayoutConfig();
             HyprlandService.generateLayoutConfig();
@@ -590,10 +622,74 @@ Singleton {
         return false;
     }
 
-    function connectedFrameBlockedOnScreen(screenOrName) {
-        if (hasFullscreenToplevelOnScreen(screenOrName))
+    // Per-screen cache for connectedFrameBlockedOnScreen to avoid recomputing on every consumer binding.
+    property var frameBlockedByScreen: ({})
+
+    function _computeConnectedFrameBlocked(screenName) {
+        if (hasFullscreenToplevelOnScreen(screenName))
             return true;
-        return hyprlandSpecialWorkspaceBlocksConnectedFrame(screenOrName);
+        return hyprlandSpecialWorkspaceBlocksConnectedFrame(screenName);
+    }
+
+    function _recomputeFrameBlocked() {
+        const screens = Quickshell.screens || [];
+        const next = {};
+        let changed = false;
+        for (let i = 0; i < screens.length; i++) {
+            const name = screens[i]?.name;
+            if (!name)
+                continue;
+            const blocked = _computeConnectedFrameBlocked(name);
+            next[name] = blocked;
+            if (frameBlockedByScreen[name] !== blocked)
+                changed = true;
+        }
+        if (!changed) {
+            for (const name in frameBlockedByScreen) {
+                if (!(name in next)) {
+                    changed = true;
+                    break;
+                }
+            }
+        }
+        if (changed)
+            frameBlockedByScreen = next;
+    }
+
+    function connectedFrameBlockedOnScreen(screenOrName) {
+        const screenName = _screenName(screenOrName);
+        if (!screenName)
+            return false;
+        const cached = frameBlockedByScreen[screenName];
+        if (cached !== undefined)
+            return cached;
+        return _computeConnectedFrameBlocked(screenName);
+    }
+
+    Connections {
+        target: ToplevelManager
+        function onActiveToplevelChanged() {
+            root._recomputeFrameBlocked();
+        }
+    }
+
+    // Track active toplevel's fullscreen/activated state directly (no per-property signals from ToplevelManager).
+    Connections {
+        target: ToplevelManager.activeToplevel
+        ignoreUnknownSignals: true
+        function onFullscreenChanged() {
+            root._recomputeFrameBlocked();
+        }
+        function onActivatedChanged() {
+            root._recomputeFrameBlocked();
+        }
+    }
+
+    Connections {
+        target: Quickshell
+        function onScreensChanged() {
+            root._recomputeFrameBlocked();
+        }
     }
 
     function _screenForName(screenOrName) {
@@ -611,7 +707,7 @@ Singleton {
     }
 
     function frameConfiguredForScreen(screenOrName) {
-        if (!SettingsData.frameEnabled)
+        if (!FrameTransitionState.effectiveFrameEnabled)
             return false;
         const screen = _screenForName(screenOrName);
         if (!screen || !SettingsData.isScreenInPreferences(screen, SettingsData.frameScreenPreferences))
@@ -626,7 +722,7 @@ Singleton {
     }
 
     function usesConnectedFrameChromeForScreen(screenOrName) {
-        return SettingsData.connectedFrameModeActive && frameWindowVisibleForScreen(screenOrName);
+        return FrameTransitionState.effectiveConnectedFrameModeActive && frameWindowVisibleForScreen(screenOrName);
     }
 
     function framePeerSurfacesUseOverlayForScreen(screenOrName) {
@@ -832,6 +928,7 @@ Singleton {
         repeat: false
         onTriggered: {
             detectCompositor();
+            compositorDetected = true;
             Qt.callLater(() => {
                 NiriService.generateNiriLayoutConfig();
                 HyprlandService.generateLayoutConfig();

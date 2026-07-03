@@ -30,7 +30,7 @@ Item {
     readonly property real screenWidth: effectiveScreen?.width ?? 1920
     readonly property real screenHeight: effectiveScreen?.height ?? 1080
     readonly property real dpr: effectiveScreen ? CompositorService.getScreenScale(effectiveScreen) : 1
-    readonly property bool useBackgroundDarken: !SettingsData.frameEnabled && SettingsData.modalDarkenBackground
+    readonly property bool useBackgroundDarken: !FrameTransitionState.effectiveFrameEnabled && SettingsData.modalDarkenBackground
     readonly property bool usesOverlayLayer: useBackgroundDarken || SettingsData.launcherUseOverlayLayer || triggerUsesOverlayLayer
     readonly property var effectiveLauncherLayer: LayerShell.fromEnv("DMS_MODAL_LAYER", root.usesOverlayLayer ? WlrLayer.Overlay : WlrLayer.Top, {
         "allow": ["top", "overlay"],
@@ -155,7 +155,7 @@ Item {
         }
         if (spotlightContent.searchField) {
             spotlightContent.searchField.forceActiveFocus();
-            spotlightContent.searchField.cursorPosition = spotlightContent.searchField.text.length;
+            spotlightContent.searchField.selectAll();
         }
     }
 
@@ -228,7 +228,9 @@ Item {
 
     HyprlandFocusGrab {
         id: focusGrab
-        windows: [launcherWindow]
+        readonly property var contextMenuWindow: root.spotlightContent?.activeContextMenu?.contextWindow ?? null
+        readonly property bool contextMenuActive: root.spotlightContent?.activeContextMenu?.renderActive ?? false
+        windows: contextMenuActive && contextMenuWindow ? [launcherWindow, contextMenuWindow] : [launcherWindow]
         active: root.useHyprlandFocusGrab && root.keyboardActive
         onCleared: {
             if (spotlightOpen)
@@ -407,8 +409,8 @@ Item {
                 enabled: spotlightOpen
                 hoverEnabled: false
                 acceptedButtons: Qt.AllButtons
-                onPressed: mouse.accepted = true
-                onClicked: mouse.accepted = true
+                onPressed: mouse => mouse.accepted = true
+                onClicked: mouse => mouse.accepted = true
                 z: -1
             }
 

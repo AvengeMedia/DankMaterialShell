@@ -111,7 +111,7 @@ Item {
                 const baseColor = isHovered ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.widgetBaseBackgroundColor;
 
                 if (Theme.widgetBackgroundHasAlpha) {
-                    return Qt.rgba(baseColor.r, baseColor.g, baseColor.b, baseColor.a * transparency);
+                    return Theme.blendAlpha(baseColor, transparency);
                 }
                 return Theme.withAlpha(baseColor, transparency);
             }

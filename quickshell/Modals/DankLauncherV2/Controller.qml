@@ -43,6 +43,7 @@ Item {
     signal queryChanged(string query)
     signal viewModeChanged(string sectionId, string mode)
     signal searchQueryRequested(string query)
+    signal sectionExpanded(string sectionId)
 
     Ref {
         service: AppSearchService
@@ -1874,6 +1875,9 @@ Item {
             selectedFlatIndex = getFirstItemIndex();
         }
         updateSelectedItem();
+
+        if (!newCollapsed[sectionId])
+            sectionExpanded(sectionId);
     }
 
     function executeSelected() {

@@ -151,7 +151,7 @@ Rectangle {
                 width: 24
                 height: 24
                 radius: 12
-                color: closeMouseArea.containsMouse ? Theme.errorHover : "transparent"
+                color: closeMouseArea.containsMouse ? Theme.errorHover : Theme.withAlpha(Theme.errorHover, 0)
                 anchors.top: parent.top
                 anchors.right: parent.right
                 anchors.topMargin: Theme.spacingS
@@ -203,7 +203,7 @@ Rectangle {
 
                             Flow {
                                 width: parent.width
-                                spacing: 4
+                                spacing: Theme.spacingXS
 
                                 Repeater {
                                     model: modelData.icons

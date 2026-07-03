@@ -141,7 +141,7 @@ DankModal {
 
                                 Column {
                                     width: parent.width - Theme.iconSize - 4 - chevron.width - Theme.spacingM * 2
-                                    spacing: 2
+                                    spacing: Theme.spacingXXS
                                     anchors.verticalCenter: parent.verticalCenter
 
                                     StyledText {
@@ -215,7 +215,7 @@ DankModal {
                             Column {
                                 id: bodyCol
                                 width: parent.width - Theme.iconSize - Theme.spacingM
-                                spacing: 4
+                                spacing: Theme.spacingXS
 
                                 StyledText {
                                     text: I18n.tr("No other active sessions on this seat")

@@ -1,6 +1,4 @@
 import QtQuick
-import QtQuick.Controls
-import Quickshell
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -16,17 +14,17 @@ PluginComponent {
     ccWidgetPrimaryText: "Detail Example"
     ccWidgetSecondaryText: {
         if (isEnabled) {
-            const selected = pluginData.selectedOption || "Option A"
-            return selected
+            const selected = pluginData.selectedOption || "Option A";
+            return selected;
         }
-        return "Disabled"
+        return "Disabled";
     }
     ccWidgetIsActive: isEnabled
 
     onCcWidgetToggled: {
-        isEnabled = !isEnabled
+        isEnabled = !isEnabled;
         if (pluginService) {
-            pluginService.savePluginData("controlCenterDetailExample", "isEnabled", isEnabled)
+            pluginService.savePluginData("controlCenterDetailExample", "isEnabled", isEnabled);
         }
     }
 
@@ -68,8 +66,8 @@ PluginComponent {
                         width: parent.width
                         height: 40
                         radius: Theme.cornerRadius
-                        color: optionMouseArea.containsMouse ? Theme.surfaceContainerHighest : "transparent"
-                        border.color: detailRoot.currentSelection === modelData ? Theme.primary : "transparent"
+                        color: optionMouseArea.containsMouse ? Theme.surfaceContainerHighest : Theme.withAlpha(Theme.surfaceContainerHighest, 0)
+                        border.color: detailRoot.currentSelection === modelData ? Theme.primary : Theme.withAlpha(Theme.primary, 0)
                         border.width: detailRoot.currentSelection === modelData ? 2 : 0
 
                         MouseArea {
@@ -79,10 +77,10 @@ PluginComponent {
                             cursorShape: Qt.PointingHandCursor
                             z: 100
                             onClicked: {
-                                SettingsData.setPluginSetting("controlCenterDetailExample", "selectedOption", modelData)
-                                detailRoot.currentSelection = modelData
-                                PluginService.pluginDataChanged("controlCenterDetailExample")
-                                ToastService.showInfo("Option Selected", modelData)
+                                SettingsData.setPluginSetting("controlCenterDetailExample", "selectedOption", modelData);
+                                detailRoot.currentSelection = modelData;
+                                PluginService.pluginDataChanged("controlCenterDetailExample");
+                                ToastService.showInfo("Option Selected", modelData);
                             }
                         }
 
@@ -126,8 +124,8 @@ PluginComponent {
 
             StyledText {
                 text: {
-                    const selected = root.pluginData.selectedOption || "Option A"
-                    return selected.substring(0, 1)
+                    const selected = root.pluginData.selectedOption || "Option A";
+                    return selected.substring(0, 1);
                 }
                 color: root.isEnabled ? Theme.primary : Theme.surfaceVariantText
                 font.pixelSize: Theme.fontSizeMedium

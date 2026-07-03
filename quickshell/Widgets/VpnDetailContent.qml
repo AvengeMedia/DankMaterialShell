@@ -156,7 +156,7 @@ Rectangle {
         Rectangle {
             height: 1
             width: parent.width
-            color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+            color: Theme.outlineStrong
         }
 
         Item {
@@ -194,7 +194,7 @@ Rectangle {
                 id: vpnListView
                 anchors.fill: parent
                 visible: DMSNetworkService.profiles.length > 0
-                spacing: 4
+                spacing: Theme.spacingXS
                 cacheBuffer: 200
                 clip: true
 

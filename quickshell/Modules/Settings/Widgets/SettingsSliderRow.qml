@@ -72,6 +72,11 @@ Item {
 
     signal sliderValueChanged(int newValue)
     signal sliderDragFinished(int finalValue)
+
+    DankTooltipV2 {
+        id: sharedTooltip
+    }
+
     width: parent?.width ?? 0
     height: headerRow.height + Theme.spacingXS + slider.height
 
@@ -134,6 +139,12 @@ Item {
                         slider.value = root.defaultValue;
                         root.sliderValueChanged(root.defaultValue);
                         root.sliderDragFinished(root.defaultValue);
+                    }
+                    onEntered: {
+                        sharedTooltip.show(I18n.tr("Reset"), resetButton, 0, 0, "bottom");
+                    }
+                    onExited: {
+                        sharedTooltip.hide();
                     }
                 }
             }

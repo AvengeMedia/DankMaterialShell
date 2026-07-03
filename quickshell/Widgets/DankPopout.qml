@@ -24,6 +24,8 @@ Item {
     property list<real> animationExitCurve: Theme.variantPopoutExitCurve
     property bool suspendShadowWhileResizing: false
     property bool shouldBeVisible: false
+    property bool hoverDismissEnabled: false
+    property bool hoverDismissSuspended: false
     property var customKeyboardFocus: null
     property bool backgroundInteractive: true
     property bool contentHandlesKeys: false
@@ -63,7 +65,10 @@ Item {
                 list.push(root.backgroundWindow);
             return list.concat(KeyboardFocus.barWindows);
         }
-        active: KeyboardFocus.wantsGrab(root.shouldBeVisible || root.isClosing, root.customKeyboardFocus)
+        active: KeyboardFocus.wantsGrab(root.shouldBeVisible, root.customKeyboardFocus)
+
+        property var restoreToplevel: null
+        onActiveChanged: restoreToplevel = active ? KeyboardFocus.captureActiveToplevel() : KeyboardFocus.restoreToplevel(restoreToplevel)
     }
 
     Loader {
@@ -82,6 +87,8 @@ Item {
     readonly property real alignedY: impl.item ? impl.item.alignedY : 0
     readonly property real alignedWidth: impl.item ? impl.item.alignedWidth : 0
     readonly property real alignedHeight: impl.item ? impl.item.alignedHeight : 0
+    readonly property real renderedAlignedY: impl.item ? (impl.item.renderedAlignedY ?? impl.item.alignedY) : 0
+    readonly property real renderedAlignedHeight: impl.item ? (impl.item.renderedAlignedHeight ?? impl.item.alignedHeight) : 0
     readonly property real maskX: impl.item ? impl.item.maskX : 0
     readonly property real maskY: impl.item ? impl.item.maskY : 0
     readonly property real maskWidth: impl.item ? impl.item.maskWidth : 0
@@ -127,12 +134,7 @@ Item {
         }
     }
 
-    Connections {
-        target: CompositorService
-        function onToplevelsChanged() {
-            root._maybeResolveBackend();
-        }
-    }
+    // Backend re-resolution on toplevel activity is covered by CompositorService.frameBlockedByScreen.
 
     function _usesConnectedBackendForScreen(targetScreen) {
         return CompositorService.usesConnectedFrameChromeForScreen(targetScreen);
@@ -172,6 +174,36 @@ Item {
             impl.item.close();
     }
 
+    function cancelHoverDismiss() {
+        if (impl.item?.cancelHoverDismiss)
+            impl.item.cancelHoverDismiss();
+    }
+
+    // Fade out in place during morph switch transitions.
+    function beginSupersededClose() {
+        if (impl.item?.beginSupersededClose)
+            impl.item.beginSupersededClose();
+    }
+
+    function closeFromHoverDismiss() {
+        if (hoverDismissSuspended)
+            return;
+        hoverDismissEnabled = false;
+        // Enable animations using standard Theme-bound popout motion to preserve bindings.
+        if (impl.item)
+            impl.item.animationsEnabled = true;
+        for (const prop of ["dashVisible", "notificationHistoryVisible"]) {
+            if (root[prop] !== undefined) {
+                root[prop] = false;
+                return;
+            }
+        }
+        if (impl.item)
+            impl.item.close();
+        else
+            close();
+    }
+
     function toggle() {
         (shouldBeVisible || _pendingOpen) ? close() : open();
     }
@@ -208,6 +240,20 @@ Item {
     function updateSurfacePosition() {
         if (impl.item && typeof impl.item.updateSurfacePosition === "function")
             impl.item.updateSurfacePosition();
+    }
+
+    function containsGlobalPoint(gx, gy) {
+        if (!screen)
+            return false;
+        const presented = shouldBeVisible || (impl.item?.isClosing ?? false);
+        if (!presented)
+            return false;
+        const padding = 24;
+        const x = alignedX - padding;
+        const y = renderedAlignedY - padding;
+        const w = alignedWidth + padding * 2;
+        const h = renderedAlignedHeight + padding * 2;
+        return gx >= x && gx <= x + w && gy >= y && gy <= y + h;
     }
 
     Loader {
@@ -261,6 +307,8 @@ Item {
         it.screen = Qt.binding(() => root.screen);
         it.effectiveBarPosition = Qt.binding(() => root.effectiveBarPosition);
         it.effectiveBarBottomGap = Qt.binding(() => root.effectiveBarBottomGap);
+        it.hoverDismissEnabled = Qt.binding(() => root.hoverDismissEnabled);
+        it.hoverDismissSuspended = Qt.binding(() => root.hoverDismissSuspended);
 
         it.shouldBeVisible = root.shouldBeVisible;
         if (root._primeContent && typeof it.primeContent === "function")

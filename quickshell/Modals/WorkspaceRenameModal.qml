@@ -18,6 +18,8 @@ FloatingWindow {
     color: Theme.surfaceContainer
     visible: false
 
+    onClosed: hide()
+
     function show(name) {
         nameInput.text = name;
         visible = true;
@@ -151,7 +153,7 @@ FloatingWindow {
                         width: Math.max(70, cancelText.contentWidth + Theme.spacingM * 2)
                         height: 36
                         radius: Theme.cornerRadius
-                        color: cancelArea.containsMouse ? Theme.surfaceTextHover : "transparent"
+                        color: cancelArea.containsMouse ? Theme.surfaceTextHover : Theme.withAlpha(Theme.surfaceTextHover, 0)
                         border.color: Theme.surfaceVariantAlpha
                         border.width: 1
 

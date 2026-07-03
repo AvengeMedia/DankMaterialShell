@@ -1,6 +1,7 @@
 package network
 
 import (
+	"errors"
 	"fmt"
 	"sync"
 	"time"
@@ -9,6 +10,10 @@ import (
 	"github.com/yeqown/go-qrcode/v2"
 	"github.com/yeqown/go-qrcode/writer/standard"
 )
+
+// ErrNoNetworkBackend is returned when no supported network management daemon
+// (NetworkManager, iwd, systemd-networkd, ConnMan) is present on the system.
+var ErrNoNetworkBackend = errors.New("no supported network backend found")
 
 func NewManager() (*Manager, error) {
 	detection, err := DetectNetworkStack()
@@ -58,7 +63,7 @@ func NewManager() (*Manager, error) {
 		}
 
 	default:
-		return nil, fmt.Errorf("no supported network backend found: %s", detection.ChosenReason)
+		return nil, fmt.Errorf("%w: %s", ErrNoNetworkBackend, detection.ChosenReason)
 	}
 
 	m := &Manager{
@@ -130,6 +135,8 @@ func (m *Manager) syncStateFromBackend() error {
 	m.state.ConnectingSSID = backendState.ConnectingSSID
 	m.state.ConnectingDevice = backendState.ConnectingDevice
 	m.state.LastError = backendState.LastError
+	m.state.VPNError = backendState.VPNError
+	m.state.VPNErrorUuid = backendState.VPNErrorUuid
 	m.stateMutex.Unlock()
 
 	return nil
@@ -209,6 +216,9 @@ func stateChangedMeaningfully(old, new *NetworkState) bool {
 		return true
 	}
 	if old.LastError != new.LastError {
+		return true
+	}
+	if old.VPNError != new.VPNError || old.VPNErrorUuid != new.VPNErrorUuid {
 		return true
 	}
 	if len(old.WiFiNetworks) != len(new.WiFiNetworks) {

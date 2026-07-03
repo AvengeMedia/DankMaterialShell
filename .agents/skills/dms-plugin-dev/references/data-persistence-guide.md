@@ -166,6 +166,16 @@ function increment() {
 | Cross-instance sync (multi-monitor data) | `PluginGlobalVar` or `getGlobalVar`/`setGlobalVar` | No (runtime only) | All instances |
 | Quick reactive reads from settings | `pluginData` property | N/A (read-only) | Per instance |
 
+## Plugin Path
+
+Retrieve a plugin's installation directory at runtime:
+
+```qml
+var dir = pluginService.getPluginPath(pluginId)
+```
+
+Returns the absolute path to the plugin's directory (e.g., `~/.config/DankMaterialShell/plugins/MyPlugin`), or an empty string if the plugin is not found. Useful for loading bundled assets (images, data files) relative to the plugin's location.
+
 ## Important Notes
 
 1. **pluginData is reactive** - bindings update automatically when data changes

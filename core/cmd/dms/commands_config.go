@@ -37,9 +37,11 @@ var resolveIncludeCmd = &cobra.Command{
 				"cursor.lua",
 				"windowrules.lua",
 				"cursor.kdl",
+				"layout.kdl",
 				"outputs.kdl",
 				"binds.kdl",
 				"cursor.conf",
+				"layout.conf",
 				"outputs.conf",
 				"binds.conf",
 			}, cobra.ShellCompDirectiveNoFileComp

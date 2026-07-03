@@ -33,7 +33,7 @@ Item {
 
     property string preferredConnectedBarSide: SettingsData.frameModalEmergeSide
 
-    readonly property bool frameConnectedMode: SettingsData.frameEnabled && Theme.isConnectedEffect && !!effectiveScreen && SettingsData.isScreenInPreferences(effectiveScreen, SettingsData.frameScreenPreferences)
+    readonly property bool frameConnectedMode: FrameTransitionState.effectiveFrameEnabled && Theme.isConnectedEffect && !!effectiveScreen && SettingsData.isScreenInPreferences(effectiveScreen, SettingsData.frameScreenPreferences)
 
     readonly property string resolvedConnectedBarSide: frameConnectedMode ? preferredConnectedBarSide : ""
 
@@ -69,7 +69,7 @@ Item {
     property real cornerRadius: Theme.cornerRadius
     readonly property bool connectedSurfaceOverride: frameOwnsConnectedChrome
     readonly property color effectiveBackgroundColor: connectedSurfaceOverride ? Theme.connectedSurfaceColor : backgroundColor
-    readonly property color effectiveBorderColor: connectedSurfaceOverride ? "transparent" : borderColor
+    readonly property color effectiveBorderColor: connectedSurfaceOverride ? Theme.withAlpha(borderColor, 0) : borderColor
     readonly property real effectiveBorderWidth: connectedSurfaceOverride ? 0 : borderWidth
     readonly property real effectiveCornerRadius: connectedSurfaceOverride ? Theme.connectedSurfaceRadius : cornerRadius
     readonly property bool effectiveBlurEnabled: Theme.connectedSurfaceBlurEnabled
@@ -490,8 +490,8 @@ Item {
                     enabled: root.shouldBeVisible
                     hoverEnabled: false
                     acceptedButtons: Qt.AllButtons
-                    onPressed: mouse.accepted = true
-                    onClicked: mouse.accepted = true
+                    onPressed: mouse => mouse.accepted = true
+                    onClicked: mouse => mouse.accepted = true
                     z: -1
                 }
 
@@ -659,8 +659,8 @@ Item {
                             level: root.shadowLevel
                             fallbackOffset: root.shadowFallbackOffset
                             targetRadius: root.effectiveCornerRadius
-                            targetColor: root.frameOwnsConnectedChrome ? "transparent" : root.effectiveBackgroundColor
-                            borderColor: root.frameOwnsConnectedChrome ? "transparent" : root.effectiveBorderColor
+                            targetColor: root.frameOwnsConnectedChrome ? Theme.withAlpha(root.effectiveBackgroundColor, 0) : root.effectiveBackgroundColor
+                            borderColor: root.frameOwnsConnectedChrome ? Theme.withAlpha(root.effectiveBorderColor, 0) : root.effectiveBorderColor
                             borderWidth: root.frameOwnsConnectedChrome ? 0 : root.effectiveBorderWidth
                             shadowEnabled: !root.frameOwnsConnectedChrome && root.enableShadow && Theme.elevationEnabled && SettingsData.modalElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
                         }
@@ -669,7 +669,7 @@ Item {
                             anchors.fill: parent
                             radius: root.effectiveCornerRadius
                             color: "transparent"
-                            border.color: (root.connectedSurfaceOverride || root.frameOwnsConnectedChrome) ? "transparent" : BlurService.borderColor
+                            border.color: (root.connectedSurfaceOverride || root.frameOwnsConnectedChrome) ? Theme.withAlpha(BlurService.borderColor, 0) : BlurService.borderColor
                             border.width: (root.connectedSurfaceOverride || root.frameOwnsConnectedChrome) ? 0 : BlurService.borderWidth
                             z: 100
                         }

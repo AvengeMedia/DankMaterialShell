@@ -330,6 +330,24 @@ Item {
         pluginPopout.toggle();
     }
 
+    function triggerHoverPopout(widgetHostId) {
+        if (pillClickAction) {
+            triggerPopout();
+            return;
+        }
+        if (!hasPopout)
+            return;
+
+        const pill = isVertical ? verticalPill : horizontalPill;
+        const globalPos = pill.visualContent.mapToItem(null, 0, 0);
+        const currentScreen = parentScreen || Screen;
+        const barPosition = axis?.edge === "left" ? 2 : (axis?.edge === "right" ? 3 : (axis?.edge === "top" ? 0 : 1));
+        const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barThickness, pill.visualWidth, barSpacing, barPosition, barConfig);
+
+        pluginPopout.setTriggerPosition(pos.x, pos.y, pos.width, section, currentScreen, barPosition, barThickness, barSpacing, barConfig);
+        PopoutManager.requestHoverPopout(pluginPopout, undefined, widgetHostId || pluginId);
+    }
+
     PluginPopout {
         id: pluginPopout
         contentWidth: root.popoutWidth

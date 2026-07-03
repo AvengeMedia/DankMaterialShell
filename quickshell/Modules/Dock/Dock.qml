@@ -52,7 +52,7 @@ Variants {
         readonly property real dockFrameInset: dockGeometry.frameInset
         readonly property real surfaceRadius: usesConnectedFrameChrome ? Theme.connectedSurfaceRadius : Theme.cornerRadius
         readonly property color surfaceColor: usesConnectedFrameChrome ? Theme.connectedSurfaceColor : Theme.withAlpha(Theme.surfaceContainer, backgroundTransparency)
-        readonly property color surfaceBorderColor: usesConnectedFrameChrome ? "transparent" : BlurService.borderColor
+        readonly property color surfaceBorderColor: usesConnectedFrameChrome ? Theme.withAlpha(BlurService.borderColor, 0) : BlurService.borderColor
         readonly property real surfaceBorderWidth: usesConnectedFrameChrome ? 0 : BlurService.borderWidth
         readonly property real surfaceTopLeftRadius: usesConnectedFrameChrome && (SettingsData.dockPosition === SettingsData.Position.Top || SettingsData.dockPosition === SettingsData.Position.Left) ? 0 : surfaceRadius
         readonly property real surfaceTopRightRadius: usesConnectedFrameChrome && (SettingsData.dockPosition === SettingsData.Position.Top || SettingsData.dockPosition === SettingsData.Position.Right) ? 0 : surfaceRadius
@@ -717,7 +717,7 @@ Variants {
 
                         Rectangle {
                             anchors.fill: parent
-                            visible: !usesConnectedFrameChrome && (!SettingsData.connectedFrameModeActive || dock.reveal)
+                            visible: !usesConnectedFrameChrome && (!FrameTransitionState.effectiveConnectedFrameModeActive || dock.reveal)
                             color: dock.surfaceColor
                             topLeftRadius: dock.surfaceTopLeftRadius
                             topRightRadius: dock.surfaceTopRightRadius
@@ -727,7 +727,7 @@ Variants {
 
                         Rectangle {
                             anchors.fill: parent
-                            visible: !usesConnectedFrameChrome && (!SettingsData.connectedFrameModeActive || dock.reveal)
+                            visible: !usesConnectedFrameChrome && (!FrameTransitionState.effectiveConnectedFrameModeActive || dock.reveal)
                             color: "transparent"
                             topLeftRadius: dock.surfaceTopLeftRadius
                             topRightRadius: dock.surfaceTopRightRadius
@@ -747,7 +747,7 @@ Variants {
 
                     Item {
                         id: dockConnectedChrome
-                        visible: Theme.isConnectedEffect && dock.reveal && !SettingsData.connectedFrameModeActive
+                        visible: Theme.isConnectedEffect && dock.reveal && !FrameTransitionState.effectiveConnectedFrameModeActive
                         readonly property real extraLeft: dock.isVertical ? 0 : Theme.connectedCornerRadius
                         readonly property real extraTop: dock.isVertical ? Theme.connectedCornerRadius : 0
                         readonly property real bodyRadius: dock.surfaceRadius

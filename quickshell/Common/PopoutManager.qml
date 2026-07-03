@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 
 import Quickshell
 import QtQuick
+import qs.Common
 
 Singleton {
     id: root
@@ -16,8 +17,76 @@ Singleton {
     signal popoutOpening
     signal popoutChanged
 
+    property real hoverCursorGlobalX: 0
+    property real hoverCursorGlobalY: 0
+
+    function updateHoverCursor(gx, gy) {
+        hoverCursorGlobalX = gx;
+        hoverCursorGlobalY = gy;
+    }
+
+    function cursorOverBar(gx, gy, padding, excludedWindow) {
+        const pad = padding !== undefined ? padding : 16;
+        const bars = KeyboardFocus.barWindows || [];
+        for (let i = 0; i < bars.length; i++) {
+            const w = bars[i];
+            if (!w?.visible || w === excludedWindow)
+                continue;
+            if (typeof w.containsGlobalPoint === "function") {
+                if (w.containsGlobalPoint(gx, gy, pad))
+                    return true;
+                continue;
+            }
+            const item = w.contentItem;
+            if (!item || typeof item.mapToItem !== "function")
+                continue;
+            const topLeft = item.mapToItem(null, 0, 0);
+            if (!topLeft)
+                continue;
+            if (gx >= topLeft.x - pad && gx < topLeft.x + item.width + pad && gy >= topLeft.y - pad && gy < topLeft.y + item.height + pad)
+                return true;
+        }
+        return false;
+    }
+
+    function _isPopoutPresented(popout) {
+        if (!popout)
+            return false;
+        try {
+            if (popout.dashVisible !== undefined)
+                return !!popout.dashVisible;
+            if (popout.notificationHistoryVisible !== undefined)
+                return !!popout.notificationHistoryVisible;
+            return !!(popout.shouldBeVisible || popout.isClosing);
+        } catch (e) {
+            return false;
+        }
+    }
+
+    function _openPopout(popout) {
+        if (popout.dashVisible !== undefined) {
+            if (popout.dashVisible && !popout.shouldBeVisible && !popout.isClosing)
+                popout.dashVisible = false;
+            popout.dashVisible = true;
+            return;
+        }
+        if (popout.notificationHistoryVisible !== undefined) {
+            popout.notificationHistoryVisible = true;
+            return;
+        }
+        popout.open();
+    }
+
     function _closePopout(popout) {
         try {
+            if (popout?.hoverDismissEnabled) {
+                if (typeof popout.closeFromHoverDismiss === "function") {
+                    popout.closeFromHoverDismiss();
+                    return;
+                }
+            }
+            if (popout.hoverDismissEnabled !== undefined)
+                popout.hoverDismissEnabled = false;
             switch (true) {
             case popout.dashVisible !== undefined:
                 popout.dashVisible = false;
@@ -89,7 +158,26 @@ Singleton {
                 continue;
             _closePopout(popout);
         }
-        currentPopoutsByScreen = {};
+        // Keep map entries until each popout's close animation finishes (hidePopout).
+    }
+
+    function closePopoutForScreen(screen) {
+        if (!screen)
+            return;
+        const screenName = screen.name;
+        const popout = currentPopoutsByScreen[screenName];
+        if (!popout || _isStale(popout)) {
+            currentPopoutsByScreen[screenName] = null;
+            currentPopoutTriggers[screenName] = null;
+            return;
+        }
+        _closePopout(popout);
+    }
+
+    function cancelHoverDismiss(screen) {
+        const popout = getActivePopout(screen);
+        if (popout?.cancelHoverDismiss)
+            popout.cancelHoverDismiss();
     }
 
     function getActivePopout(screen) {
@@ -98,23 +186,37 @@ Singleton {
         return currentPopoutsByScreen[screen.name] || null;
     }
 
+    // Checks if the active popout is pinned for auto-dismissal
+    function isActivePopoutPinned(screen) {
+        const p = getActivePopout(screen);
+        if (!p || !_isPopoutPresented(p))
+            return false;
+        return p.hoverDismissEnabled === false || p.hoverDismissSuspended === true;
+    }
+
     function isCurrentPopout(popout, screenName) {
         const name = screenName || popout?.screen?.name || "";
         return !!name && currentPopoutsByScreen[name] === popout;
     }
 
-    function requestPopout(popout, tabIndex, triggerSource) {
+    function _requestPopout(popout, tabIndex, triggerSource, hoverRequest) {
         if (!popout || !popout.screen)
             return;
+
+        // Clicking a transient popout pins it instead of toggling it closed.
+        const wasTransient = popout.hoverDismissEnabled === true;
+        if (!hoverRequest && popout.hoverDismissEnabled !== undefined)
+            popout.hoverDismissEnabled = false;
+
         screenshotActive = false;
         const screenName = popout.screen.name;
         const currentPopout = currentPopoutsByScreen[screenName];
         const triggerId = triggerSource !== undefined ? triggerSource : tabIndex;
+        const alreadyPresented = currentPopout === popout && (hoverRequest ? _isPopoutPresented(popout) : popout.shouldBeVisible);
 
-        const willOpen = !(currentPopout === popout && popout.shouldBeVisible && triggerId !== undefined && currentPopoutTriggers[screenName] === triggerId);
-        if (willOpen) {
+        const willOpen = !(alreadyPresented && triggerId !== undefined && currentPopoutTriggers[screenName] === triggerId);
+        if (willOpen)
             popoutOpening();
-        }
 
         let movedFromOtherScreen = false;
         for (const otherScreenName in currentPopoutsByScreen) {
@@ -145,18 +247,26 @@ Singleton {
                 currentPopoutsByScreen[screenName] = null;
                 currentPopoutTriggers[screenName] = null;
             } else {
+                if (hoverRequest && typeof currentPopout.beginSupersededClose === "function")
+                    currentPopout.beginSupersededClose();
                 _closePopout(currentPopout);
             }
         }
 
-        if (currentPopout === popout && popout.shouldBeVisible && !movedFromOtherScreen) {
-            if (triggerId !== undefined && currentPopoutTriggers[screenName] === triggerId) {
-                _closePopout(popout);
+        if (alreadyPresented && !movedFromOtherScreen) {
+            const sameDefinedTrigger = triggerId !== undefined && currentPopoutTriggers[screenName] === triggerId;
+            if (hoverRequest && sameDefinedTrigger)
                 return;
-            }
 
-            if (triggerId === undefined) {
-                _closePopout(popout);
+            if (!hoverRequest && (triggerId === undefined || sameDefinedTrigger)) {
+                if (!wasTransient) {
+                    _closePopout(popout);
+                    return;
+                }
+                if (popout.updateSurfacePosition)
+                    popout.updateSurfacePosition();
+                if (triggerId !== undefined)
+                    currentPopoutTriggers[screenName] = triggerId;
                 return;
             }
 
@@ -166,6 +276,8 @@ Singleton {
             if (popout.updateSurfacePosition)
                 popout.updateSurfacePosition();
             currentPopoutTriggers[screenName] = triggerId;
+            if (hoverRequest && popout.hoverDismissEnabled !== undefined)
+                popout.hoverDismissEnabled = true;
             return;
         }
 
@@ -181,16 +293,17 @@ Singleton {
             ModalManager.closeAllModalsExcept(null);
         }
 
-        if (movedFromOtherScreen) {
-            popout.open();
-        } else {
-            if (popout.dashVisible !== undefined) {
-                popout.dashVisible = true;
-            } else if (popout.notificationHistoryVisible !== undefined) {
-                popout.notificationHistoryVisible = true;
-            } else {
-                popout.open();
-            }
-        }
+        if (hoverRequest && popout.hoverDismissEnabled !== undefined)
+            popout.hoverDismissEnabled = true;
+
+        _openPopout(popout);
+    }
+
+    function requestPopout(popout, tabIndex, triggerSource) {
+        _requestPopout(popout, tabIndex, triggerSource, false);
+    }
+
+    function requestHoverPopout(popout, tabIndex, triggerSource) {
+        _requestPopout(popout, tabIndex, triggerSource, true);
     }
 }

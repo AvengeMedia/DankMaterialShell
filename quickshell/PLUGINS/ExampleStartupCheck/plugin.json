@@ -1,0 +1,14 @@
+{
+    "id": "exampleStartupCheck",
+    "name": "Startup Check Example",
+    "description": "Demonstrates startupCheck - blocks activation when the 'boregard' dependency is missing",
+    "version": "1.0.0",
+    "author": "AvengeMedia",
+    "type": "widget",
+    "capabilities": ["dankbar-widget"],
+    "component": "./StartupCheckWidget.qml",
+    "startupCheck": "./StartupCheck.qml",
+    "icon": "verified_user",
+    "dependencies": ["boregard"],
+    "permissions": ["process"]
+}

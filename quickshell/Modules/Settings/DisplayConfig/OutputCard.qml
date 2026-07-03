@@ -51,7 +51,7 @@ StyledRect {
 
             Column {
                 width: parent.width - Theme.iconSize - Theme.spacingM - (disconnectedBadge.visible ? disconnectedBadge.width + deleteButton.width + Theme.spacingS * 2 : disabledBadge.visible ? disabledBadge.width + Theme.spacingS : 0)
-                spacing: 2
+                spacing: Theme.spacingXXS
 
                 StyledText {
                     text: DisplayConfigState.getOutputDisplayName(root.outputData, root.outputName)
@@ -95,7 +95,7 @@ StyledRect {
                 width: 28
                 height: 28
                 radius: Theme.cornerRadius
-                color: deleteArea.containsMouse ? Theme.errorHover : "transparent"
+                color: deleteArea.containsMouse ? Theme.errorHover : Theme.withAlpha(Theme.errorHover, 0)
                 anchors.verticalCenter: parent.verticalCenter
 
                 DankIcon {

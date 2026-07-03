@@ -36,7 +36,7 @@ Rectangle {
     readonly property int computedIconSize: Math.min(48, Math.max(32, width * 0.45))
 
     radius: Theme.cornerRadius
-    color: isSelected ? Theme.primaryPressed : isHovered ? Theme.primaryHoverLight : "transparent"
+    color: isSelected ? Theme.primaryPressed : isHovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
 
     DankRipple {
         id: rippleLayer

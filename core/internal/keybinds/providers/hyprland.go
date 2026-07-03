@@ -190,9 +190,13 @@ func (h *HyprlandProvider) formatRawAction(dispatcher, params string) string {
 }
 
 func (h *HyprlandProvider) formatKey(kb *HyprlandKeyBinding) string {
+	key := kb.Key
+	if canonical, ok := hyprlandScrollToCanonical(key); ok {
+		key = canonical
+	}
 	parts := make([]string, 0, len(kb.Mods)+1)
 	parts = append(parts, kb.Mods...)
-	parts = append(parts, kb.Key)
+	parts = append(parts, key)
 	return strings.Join(parts, "+")
 }
 
@@ -410,6 +414,9 @@ func normalizeLuaBindKeyPart(part string) string {
 		return "SHIFT"
 	case "alt", "mod1":
 		return "ALT"
+	}
+	if native, ok := hyprlandScrollToNative(part); ok {
+		return native
 	}
 	if len(part) == 1 {
 		return strings.ToUpper(part)
@@ -1130,6 +1137,11 @@ func parseLuaUnbindLine(line string) (string, bool) {
 
 func luaKeyComboToInternalKey(combo string) string {
 	parts := strings.Fields(strings.ReplaceAll(strings.ReplaceAll(combo, "+", " "), "  ", " "))
+	for i, part := range parts {
+		if canonical, ok := hyprlandScrollToCanonical(part); ok {
+			parts[i] = canonical
+		}
+	}
 	return strings.Join(parts, "+")
 }
 

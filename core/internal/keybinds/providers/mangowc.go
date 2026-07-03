@@ -236,6 +236,9 @@ func (m *MangoWCProvider) SetBind(key, action, description string, options map[s
 	if optionPrefix := m.bindPrefixFromOptions(options); optionPrefix != "" {
 		prefix = optionPrefix
 	}
+	if _, leaf := m.parseKeyString(key); isScrollKey(leaf) {
+		prefix = mangowcAxisBindPrefix
+	}
 
 	existingBinds[normalizedKey] = &mangowcOverrideBind{
 		Key:         key,
@@ -346,6 +349,12 @@ func (m *MangoWCProvider) parseOverrideBindLine(line, precedingComment string) (
 	keyName := strings.TrimSpace(fields[1])
 	command := strings.TrimSpace(fields[2])
 
+	if prefix == mangowcAxisBindPrefix {
+		if canonical, ok := mangowcDirectionToScroll(keyName); ok {
+			keyName = canonical
+		}
+	}
+
 	var params string
 	if len(fields) > 3 {
 		params = strings.TrimSpace(fields[3])
@@ -365,6 +374,9 @@ func (m *MangoWCProvider) parseOverrideBindLine(line, precedingComment string) (
 }
 
 func (m *MangoWCProvider) isBindPrefix(prefix string) bool {
+	if prefix == mangowcAxisBindPrefix {
+		return true
+	}
 	if !strings.HasPrefix(prefix, "bind") {
 		return false
 	}
@@ -590,6 +602,11 @@ func (m *MangoWCProvider) writeBindLine(sb *strings.Builder, bind *mangowcOverri
 	prefix := bind.Prefix
 	if prefix == "" {
 		prefix = "bind"
+	}
+	if prefix == mangowcAxisBindPrefix {
+		if direction, ok := mangowcScrollToDirection(key); ok {
+			key = direction
+		}
 	}
 	sb.WriteString(prefix)
 	sb.WriteString("=")

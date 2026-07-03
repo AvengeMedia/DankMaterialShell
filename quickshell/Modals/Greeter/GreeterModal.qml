@@ -93,6 +93,8 @@ FloatingWindow {
     color: Theme.surfaceContainer
     visible: false
 
+    onClosed: visible = false
+
     Process {
         id: cheatsheetProcess
         running: false

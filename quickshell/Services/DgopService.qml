@@ -713,7 +713,7 @@ Singleton {
 
     Process {
         id: dgopCheckProcess
-        command: ["which", "dgop"]
+        command: ["sh", "-c", "command -v dgop"]
         running: false
         onExited: exitCode => {
             dgopAvailable = (exitCode === 0);

@@ -23,8 +23,10 @@ Column {
 
     readonly property var optionColorMap: {
         var map = {};
-        for (var i = 0; i < options.length; i++)
-            map[options[i].label] = root.colorForValue(options[i].value);
+        for (var i = 0; i < options.length; i++) {
+            const option = options[i];
+            map[option.label] = option.previewColor ?? root.colorForValue(option.value);
+        }
         return map;
     }
 

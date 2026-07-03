@@ -26,6 +26,7 @@ Loader {
     property bool isTopBarEdge: false
     property bool isBottomBarEdge: false
     property string _registeredScreenName: ""
+    property var _registeredItem: null
 
     asynchronous: false
 
@@ -227,15 +228,17 @@ Loader {
             return;
 
         _registeredScreenName = parentScreen.name;
-        BarWidgetService.registerWidget(widgetId, _registeredScreenName, item);
+        _registeredItem = item;
+        BarWidgetService.registerWidget(widgetId, _registeredScreenName, _registeredItem);
     }
 
     function unregisterWidget() {
         if (!widgetId || !_registeredScreenName)
             return;
 
-        BarWidgetService.unregisterWidget(widgetId, _registeredScreenName);
+        BarWidgetService.unregisterWidget(widgetId, _registeredScreenName, _registeredItem);
         _registeredScreenName = "";
+        _registeredItem = null;
     }
 
     function getWidgetComponent(widgetId, components) {

@@ -101,6 +101,13 @@ func getServerSocketPath() string {
 		runtimeDir = os.TempDir()
 	}
 
+	if parentPID, ok := sessionParentPID(os.Getenv("WAYLAND_DISPLAY")); ok {
+		sessionSock := filepath.Join(runtimeDir, fmt.Sprintf("danklinux-%d.sock", parentPID))
+		if _, err := os.Stat(sessionSock); err == nil {
+			return sessionSock
+		}
+	}
+
 	entries, err := os.ReadDir(runtimeDir)
 	if err != nil {
 		return filepath.Join(runtimeDir, "danklinux.sock")

@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -8,10 +7,10 @@ Card {
     id: root
 
     Component.onCompleted: {
-        DgopService.addRef(["cpu", "memory", "system"])
+        DgopService.addRef(["cpu", "memory", "system"]);
     }
     Component.onDestruction: {
-        DgopService.removeRef(["cpu", "memory", "system"])
+        DgopService.removeRef(["cpu", "memory", "system"]);
     }
 
     Row {
@@ -30,7 +29,7 @@ Card {
                 height: parent.height - Theme.iconSizeSmall - Theme.spacingS
                 radius: 4
                 anchors.horizontalCenter: parent.horizontalCenter
-                color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                color: Theme.outlineHeavy
 
                 Rectangle {
                     width: parent.width
@@ -39,9 +38,11 @@ Card {
                     anchors.bottom: parent.bottom
                     anchors.horizontalCenter: parent.horizontalCenter
                     color: {
-                        if (DgopService.cpuUsage > 80) return Theme.error
-                        if (DgopService.cpuUsage > 60) return Theme.warning
-                        return Theme.primary
+                        if (DgopService.cpuUsage > 80)
+                            return Theme.error;
+                        if (DgopService.cpuUsage > 60)
+                            return Theme.warning;
+                        return Theme.primary;
                     }
 
                     Behavior on height {
@@ -63,9 +64,11 @@ Card {
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.bottom: parent.bottom
                     color: {
-                        if (DgopService.cpuUsage > 80) return Theme.error
-                        if (DgopService.cpuUsage > 60) return Theme.warning
-                        return Theme.primary
+                        if (DgopService.cpuUsage > 80)
+                            return Theme.error;
+                        if (DgopService.cpuUsage > 60)
+                            return Theme.warning;
+                        return Theme.primary;
                     }
                 }
             }
@@ -82,7 +85,7 @@ Card {
                 height: parent.height - Theme.iconSizeSmall - Theme.spacingS
                 radius: 4
                 anchors.horizontalCenter: parent.horizontalCenter
-                color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                color: Theme.outlineHeavy
 
                 Rectangle {
                     width: parent.width
@@ -91,9 +94,11 @@ Card {
                     anchors.bottom: parent.bottom
                     anchors.horizontalCenter: parent.horizontalCenter
                     color: {
-                        if (DgopService.cpuTemperature > 85) return Theme.error
-                        if (DgopService.cpuTemperature > 69) return Theme.warning
-                        return Theme.primary
+                        if (DgopService.cpuTemperature > 85)
+                            return Theme.error;
+                        if (DgopService.cpuTemperature > 69)
+                            return Theme.warning;
+                        return Theme.primary;
                     }
 
                     Behavior on height {
@@ -115,9 +120,11 @@ Card {
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.bottom: parent.bottom
                     color: {
-                        if (DgopService.cpuTemperature > 85) return Theme.error
-                        if (DgopService.cpuTemperature > 69) return Theme.warning
-                        return Theme.primary
+                        if (DgopService.cpuTemperature > 85)
+                            return Theme.error;
+                        if (DgopService.cpuTemperature > 69)
+                            return Theme.warning;
+                        return Theme.primary;
                     }
                 }
             }
@@ -134,7 +141,7 @@ Card {
                 height: parent.height - Theme.iconSizeSmall - Theme.spacingS
                 radius: 4
                 anchors.horizontalCenter: parent.horizontalCenter
-                color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                color: Theme.outlineHeavy
 
                 Rectangle {
                     width: parent.width
@@ -143,9 +150,11 @@ Card {
                     anchors.bottom: parent.bottom
                     anchors.horizontalCenter: parent.horizontalCenter
                     color: {
-                        if (DgopService.memoryUsage > 90) return Theme.error
-                        if (DgopService.memoryUsage > 75) return Theme.warning
-                        return Theme.primary
+                        if (DgopService.memoryUsage > 90)
+                            return Theme.error;
+                        if (DgopService.memoryUsage > 75)
+                            return Theme.warning;
+                        return Theme.primary;
                     }
 
                     Behavior on height {
@@ -167,9 +176,11 @@ Card {
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.bottom: parent.bottom
                     color: {
-                        if (DgopService.memoryUsage > 90) return Theme.error
-                        if (DgopService.memoryUsage > 75) return Theme.warning
-                        return Theme.primary
+                        if (DgopService.memoryUsage > 90)
+                            return Theme.error;
+                        if (DgopService.memoryUsage > 75)
+                            return Theme.warning;
+                        return Theme.primary;
                     }
                 }
             }

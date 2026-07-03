@@ -53,9 +53,9 @@ Rectangle {
     }
     border.color: {
         if (isSelected && keyboardNavigationActive)
-            return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.5);
+            return Theme.withAlpha(Theme.primary, 0.5);
         if (historyItem.urgency === 2)
-            return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.3);
+            return Theme.primarySelected;
         return Theme.outlineMedium;
     }
     border.width: {
@@ -211,14 +211,14 @@ Rectangle {
                     StyledText {
                         id: historySeparator
                         text: (historyTitleText.text.length > 0 && historyTimeText.text.length > 0) ? " • " : ""
-                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                        color: Theme.surfaceTextMedium
                         font.pixelSize: Theme.fontSizeSmall
                         font.weight: Font.Normal
                     }
                     StyledText {
                         id: historyTimeText
                         text: NotificationService.formatHistoryTime(historyItem.timestamp)
-                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                        color: Theme.surfaceTextMedium
                         font.pixelSize: Theme.fontSizeSmall
                         font.weight: Font.Normal
                         visible: text.length > 0

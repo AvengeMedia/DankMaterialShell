@@ -158,6 +158,57 @@ Item {
 
             SettingsCard {
                 width: parent.width
+                iconName: "palette"
+                title: I18n.tr("Lock Screen Appearance")
+                settingKey: "lockAppearance"
+
+                StyledText {
+                    text: I18n.tr("Customize the font and background of the lock screen, or leave empty to use your theme font and desktop wallpaper. Changes apply instantly.")
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceVariantText
+                    width: parent.width
+                    wrapMode: Text.Wrap
+                }
+
+                SettingsFontDropdownRow {
+                    settingKey: "lockScreenFontFamily"
+                    tags: ["lock", "screen", "font", "typography"]
+                    text: I18n.tr("Lock screen font")
+                    description: I18n.tr("Font used for the clock and date on the lock screen")
+                    currentFont: SettingsData.lockScreenFontFamily || ""
+                    onFontSelected: family => SettingsData.set("lockScreenFontFamily", family)
+                }
+
+                StyledText {
+                    text: I18n.tr("Background")
+                    font.pixelSize: Theme.fontSizeMedium
+                    font.weight: Font.Medium
+                    color: Theme.surfaceText
+                    topPadding: Theme.spacingM
+                }
+
+                StyledText {
+                    text: I18n.tr("Use a custom image for the lock screen, or leave empty to use your desktop wallpaper.")
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceVariantText
+                    width: parent.width
+                    wrapMode: Text.Wrap
+                }
+
+                SettingsWallpaperPicker {
+                    width: parent.width
+                    path: SettingsData.lockScreenWallpaperPath
+                    fillMode: SettingsData.lockScreenWallpaperFillMode
+                    browserTitle: I18n.tr("Select lock screen background image")
+                    fillModeSettingKey: "lockScreenWallpaperFillMode"
+                    fillModeTags: ["lock", "screen", "wallpaper", "background", "fill"]
+                    onPathSelected: path => SettingsData.set("lockScreenWallpaperPath", path)
+                    onFillModeSelected: mode => SettingsData.set("lockScreenWallpaperFillMode", mode)
+                }
+            }
+
+            SettingsCard {
+                width: parent.width
                 iconName: "lock"
                 title: I18n.tr("Lock Screen behaviour")
                 settingKey: "lockBehavior"

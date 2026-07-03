@@ -71,29 +71,22 @@ Item {
     readonly property string effectiveScreenName: {
         if (!SettingsData.workspaceFollowFocus)
             return root.screenName;
-
-        switch (CompositorService.compositor) {
-        case "niri":
-            return NiriService.currentOutput || root.screenName;
-        case "hyprland":
-            return Hyprland.focusedWorkspace?.monitor?.name || root.screenName;
-        case "mango":
-            return MangoService.activeOutput || root.screenName;
-        case "sway":
-        case "scroll":
-        case "miracle":
-            const focusedWs = I3.workspaces?.values?.find(ws => ws.focused === true);
-            return focusedWs?.monitor?.name || root.screenName;
-        default:
-            return root.screenName;
-        }
+        return BarWidgetService.getFocusedScreenName() || root.screenName;
     }
     readonly property bool mangoOverviewActive: CompositorService.isMango && MangoService.isOutputInOverview(effectiveScreenName)
+
+    readonly property bool isFocusedMonitor: {
+        const focused = BarWidgetService.getFocusedScreenName();
+        return focused === "" || root.screenName === "" || focused === root.screenName;
+    }
+    readonly property bool useUnfocusedAppearance: !isFocusedMonitor && SettingsData.workspaceUnfocusedMonitorSeparateAppearance && BarWidgetService.focusedScreenDetectionSupported
 
     readonly property var extProjection: (useExtWorkspace && parentScreen) ? WindowManager.screenProjection(parentScreen) : null
     readonly property bool useExtWorkspace: {
         if (Quickshell.env("DMS_FORCE_EXTWS") === "1")
             return (WindowManager.windowsets?.length ?? 0) > 0;
+        if (!CompositorService.compositorDetected)
+            return false;
         switch (CompositorService.compositor) {
         case "niri":
         case "hyprland":
@@ -212,6 +205,21 @@ Item {
         return focusedWs ? focusedWs.num : 1;
     }
 
+    // Numbered workspaces first in id order, named (negative id) after, by name
+    function hyprlandWorkspaceOrder(a, b) {
+        const keyA = a.id < 0 ? Number.MAX_SAFE_INTEGER : a.id;
+        const keyB = b.id < 0 ? Number.MAX_SAFE_INTEGER : b.id;
+        if (keyA !== keyB)
+            return keyA - keyB;
+        return (a.name ?? "").localeCompare(b.name ?? "");
+    }
+
+    function hyprlandWorkspaceSelector(ws) {
+        if (!ws)
+            return 1;
+        return ws.id > 0 ? ws.id : "name:" + (ws.name ?? "");
+    }
+
     function getHyprlandWorkspaces() {
         const workspaces = Hyprland.workspaces?.values || [];
         if (workspaces.length === 0) {
@@ -223,7 +231,14 @@ Item {
             ];
         }
 
-        let filtered = workspaces.filter(ws => ws.id > -1);
+        // Hyprland gives named workspaces negative ids (from -1337 down); special
+        // workspaces always store a "special:" name prefix ("special" pre-colon era)
+        let filtered = workspaces.filter(ws => {
+            if (ws.id > 0)
+                return true;
+            const name = ws.name ?? "";
+            return name !== "special" && !name.startsWith("special:");
+        });
         if (filtered.length === 0) {
             return [
                 {
@@ -234,10 +249,10 @@ Item {
         }
 
         if (!root.screenName || SettingsData.workspaceFollowFocus) {
-            filtered = filtered.slice().sort((a, b) => a.id - b.id);
+            filtered = filtered.slice().sort(hyprlandWorkspaceOrder);
         } else {
             const monitorWorkspaces = filtered.filter(ws => ws.monitor?.name === root.screenName);
-            filtered = monitorWorkspaces.length > 0 ? monitorWorkspaces.sort((a, b) => a.id - b.id) : [
+            filtered = monitorWorkspaces.length > 0 ? monitorWorkspaces.sort(hyprlandWorkspaceOrder) : [
                 {
                     id: 1,
                     name: "1"
@@ -593,7 +608,7 @@ Item {
             break;
         case "hyprland":
             if (data.id) {
-                HyprlandService.focusWorkspace(data.id);
+                HyprlandService.focusWorkspace(hyprlandWorkspaceSelector(data));
             }
             break;
         case "mango":
@@ -683,7 +698,7 @@ Item {
                 return;
             }
 
-            HyprlandService.focusWorkspace(realWorkspaces[nextIndex].id);
+            HyprlandService.focusWorkspace(hyprlandWorkspaceSelector(realWorkspaces[nextIndex]));
         } else if (root.isMango) {
             const realWorkspaces = getRealWorkspaces();
             if (realWorkspaces.length < 2) {
@@ -725,7 +740,7 @@ Item {
         if (CompositorService.isNiri)
             return (modelData?.idx !== undefined && modelData?.idx !== -1) ? modelData.idx : "";
         if (CompositorService.isHyprland)
-            return modelData?.id || "";
+            return modelData?.id > 0 ? modelData.id : (modelData?.name ?? "");
         if (root.isMango)
             return (modelData?.tag !== undefined) ? (modelData.tag + 1) : "";
         if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle)
@@ -838,7 +853,7 @@ Item {
                 const baseColor = Theme.widgetBaseBackgroundColor;
                 const transparency = (root.barConfig && root.barConfig.widgetTransparency !== undefined) ? root.barConfig.widgetTransparency : 1.0;
                 if (Theme.widgetBackgroundHasAlpha) {
-                    return Qt.rgba(baseColor.r, baseColor.g, baseColor.b, baseColor.a * transparency);
+                    return Theme.blendAlpha(baseColor, transparency);
                 }
                 return Theme.withAlpha(baseColor, transparency);
             }
@@ -1229,23 +1244,36 @@ Item {
                     }
                 }
 
-                readonly property color unfocusedColor: colorFromMode(SettingsData.workspaceUnfocusedColorMode, Theme.surfaceTextAlpha, SettingsData.workspaceUnfocusedCustomColor, Theme.surfaceTextAlpha)
+                function effectiveColorMode(focusedMode, unfocusedMode) {
+                    return root.useUnfocusedAppearance ? unfocusedMode : focusedMode;
+                }
+
+                function effectiveCustomColor(focusedCustom, unfocusedCustom) {
+                    return root.useUnfocusedAppearance ? unfocusedCustom : focusedCustom;
+                }
+
+                readonly property color unfocusedColor: colorFromMode(effectiveColorMode(SettingsData.workspaceUnfocusedColorMode, SettingsData.workspaceUnfocusedMonitorUnfocusedColorMode), Theme.surfaceTextAlpha, effectiveCustomColor(SettingsData.workspaceUnfocusedCustomColor, SettingsData.workspaceUnfocusedMonitorUnfocusedCustomColor), Theme.surfaceTextAlpha)
 
                 readonly property color activeColor: {
-                    if (SettingsData.workspaceColorMode === "none")
+                    const mode = effectiveColorMode(SettingsData.workspaceColorMode, SettingsData.workspaceUnfocusedMonitorColorMode);
+                    if (mode === "none")
                         return unfocusedColor;
-                    return colorFromMode(SettingsData.workspaceColorMode, Theme.primary, SettingsData.workspaceFocusedCustomColor, Theme.primary);
+                    return colorFromMode(mode, Theme.primary, effectiveCustomColor(SettingsData.workspaceFocusedCustomColor, SettingsData.workspaceUnfocusedMonitorFocusedCustomColor), Theme.primary);
                 }
 
                 readonly property color occupiedColor: {
-                    if (SettingsData.workspaceOccupiedColorMode === "none")
+                    const mode = effectiveColorMode(SettingsData.workspaceOccupiedColorMode, SettingsData.workspaceUnfocusedMonitorOccupiedColorMode);
+                    if (mode === "none")
                         return unfocusedColor;
-                    return colorFromMode(SettingsData.workspaceOccupiedColorMode, unfocusedColor, SettingsData.workspaceOccupiedCustomColor, Theme.secondary);
+                    return colorFromMode(mode, unfocusedColor, effectiveCustomColor(SettingsData.workspaceOccupiedCustomColor, SettingsData.workspaceUnfocusedMonitorOccupiedCustomColor), Theme.secondary);
                 }
 
-                readonly property color urgentColor: colorFromMode(SettingsData.workspaceUrgentColorMode, Theme.error, SettingsData.workspaceUrgentCustomColor, Theme.error)
+                readonly property color urgentColor: colorFromMode(effectiveColorMode(SettingsData.workspaceUrgentColorMode, SettingsData.workspaceUnfocusedMonitorUrgentColorMode), Theme.error, effectiveCustomColor(SettingsData.workspaceUrgentCustomColor, SettingsData.workspaceUnfocusedMonitorUrgentCustomColor), Theme.error)
 
-                readonly property color focusedBorderColor: colorFromMode(SettingsData.workspaceFocusedBorderColor, Theme.primary, SettingsData.workspaceFocusedBorderCustomColor, Theme.primary)
+                readonly property color focusedBorderColor: colorFromMode(effectiveColorMode(SettingsData.workspaceFocusedBorderColor, SettingsData.workspaceUnfocusedMonitorBorderColor), Theme.primary, effectiveCustomColor(SettingsData.workspaceFocusedBorderCustomColor, SettingsData.workspaceUnfocusedMonitorBorderCustomColor), Theme.primary)
+
+                readonly property bool focusedBorderEnabledForMonitor: root.useUnfocusedAppearance ? SettingsData.workspaceUnfocusedMonitorBorderEnabled : SettingsData.workspaceFocusedBorderEnabled
+                readonly property int focusedBorderThicknessForMonitor: root.useUnfocusedAppearance ? SettingsData.workspaceUnfocusedMonitorBorderThickness : SettingsData.workspaceFocusedBorderThickness
 
                 function getContrastingIconColor(bgColor) {
                     const luminance = 0.299 * bgColor.r + 0.587 * bgColor.g + 0.114 * bgColor.b;
@@ -1254,6 +1282,13 @@ Item {
 
                 readonly property color quickshellIconActiveColor: getContrastingIconColor(activeColor)
                 readonly property color quickshellIconInactiveColor: getContrastingIconColor(unfocusedColor)
+
+                readonly property color requestedColor: isActive ? activeColor : isUrgent ? urgentColor : isPlaceholder ? Theme.surfaceTextLight : isHovered ? Theme.withAlpha(unfocusedColor, 0.7) : isOccupied ? occupiedColor : unfocusedColor
+
+                property color displayColor: requestedColor
+                property bool colorAnimationReady: false
+
+                onRequestedColorChanged: Qt.callLater(() => delegateRoot.displayColor = delegateRoot.requestedColor)
 
                 Item {
                     id: dragHandler
@@ -1356,7 +1391,7 @@ Item {
                                     NiriService.switchToWorkspace(modelData.id);
                                 }
                             } else if (CompositorService.isHyprland && modelData?.id) {
-                                HyprlandService.focusWorkspace(modelData.id);
+                                HyprlandService.focusWorkspace(root.hyprlandWorkspaceSelector(modelData));
                             } else if (root.isMango && modelData?.tag !== undefined) {
                                 MangoService.switchToTag(root.screenName, modelData.tag);
                             } else if ((CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) && modelData?.num) {
@@ -1447,17 +1482,17 @@ Item {
                     x: root.isVertical ? (root.widgetHeight - width) / 2 : (parent.width - width) / 2
                     y: root.isVertical ? (parent.height - height) / 2 : (root.widgetHeight - height) / 2
                     width: {
-                        const borderWidth = (SettingsData.workspaceFocusedBorderEnabled && isActive && !isPlaceholder) ? SettingsData.workspaceFocusedBorderThickness : 0;
+                        const borderWidth = (delegateRoot.focusedBorderEnabledForMonitor && isActive && !isPlaceholder) ? delegateRoot.focusedBorderThicknessForMonitor : 0;
                         return delegateRoot.visualWidth + borderWidth * 2;
                     }
                     height: {
-                        const borderWidth = (SettingsData.workspaceFocusedBorderEnabled && isActive && !isPlaceholder) ? SettingsData.workspaceFocusedBorderThickness : 0;
+                        const borderWidth = (delegateRoot.focusedBorderEnabledForMonitor && isActive && !isPlaceholder) ? delegateRoot.focusedBorderThicknessForMonitor : 0;
                         return delegateRoot.visualHeight + borderWidth * 2;
                     }
                     radius: Theme.cornerRadius
                     color: "transparent"
-                    border.width: (SettingsData.workspaceFocusedBorderEnabled && isActive && !isPlaceholder) ? SettingsData.workspaceFocusedBorderThickness : 0
-                    border.color: (SettingsData.workspaceFocusedBorderEnabled && isActive && !isPlaceholder) ? focusedBorderColor : "transparent"
+                    border.width: (delegateRoot.focusedBorderEnabledForMonitor && isActive && !isPlaceholder) ? delegateRoot.focusedBorderThicknessForMonitor : 0
+                    border.color: (delegateRoot.focusedBorderEnabledForMonitor && isActive && !isPlaceholder) ? focusedBorderColor : Theme.withAlpha(focusedBorderColor, 0)
 
                     Behavior on width {
                         NumberAnimation {
@@ -1495,11 +1530,11 @@ Item {
                     x: root.isVertical ? (root.widgetHeight - width) / 2 : (parent.width - width) / 2
                     y: root.isVertical ? (parent.height - height) / 2 : (root.widgetHeight - height) / 2
                     radius: Theme.cornerRadius
-                    color: isActive ? activeColor : isUrgent ? urgentColor : isPlaceholder ? Theme.surfaceTextLight : isHovered ? Theme.withAlpha(unfocusedColor, 0.7) : isOccupied ? occupiedColor : unfocusedColor
+                    color: delegateRoot.displayColor
                     opacity: dragHandler.dragging ? 0.8 : 1.0
 
                     border.width: dragHandler.dragging ? 2 : (isUrgent ? 2 : (isDropTarget ? 2 : 0))
-                    border.color: dragHandler.dragging ? Theme.primary : (isUrgent ? urgentColor : (isDropTarget ? Theme.primary : "transparent"))
+                    border.color: dragHandler.dragging ? Theme.primary : (isUrgent ? urgentColor : (isDropTarget ? Theme.primary : Theme.withAlpha(Theme.primary, 0)))
 
                     transform: Translate {
                         x: root.isVertical ? 0 : (dragHandler.dragging ? dragHandler.dragAxisOffset : 0)
@@ -1528,6 +1563,7 @@ Item {
                     }
 
                     Behavior on color {
+                        enabled: delegateRoot.colorAnimationReady
                         ColorAnimation {
                             duration: Theme.mediumDuration
                             easing.type: Theme.emphasizedEasing
@@ -1566,7 +1602,7 @@ Item {
                             Component {
                                 id: rowLayout
                                 Row {
-                                    spacing: 4
+                                    spacing: Theme.spacingXS
                                     visible: loadedIcons.length > 0 || SettingsData.showWorkspaceIndex || SettingsData.showWorkspaceName || loadedHasIcon
 
                                     Item {
@@ -1579,7 +1615,7 @@ Item {
                                             anchors.verticalCenter: parent.verticalCenter
                                             name: loadedIconData?.value ?? ""
                                             size: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
-                                            color: (isActive || isUrgent) ? Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
+                                            color: (isActive || isUrgent) ? Theme.withAlpha(Theme.surfaceContainer, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
                                             weight: (isActive && !isPlaceholder) ? 500 : 400
                                         }
                                     }
@@ -1593,7 +1629,7 @@ Item {
                                             id: wsText
                                             anchors.verticalCenter: parent.verticalCenter
                                             text: loadedIconData?.value ?? ""
-                                            color: (isActive || isUrgent) ? Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
+                                            color: (isActive || isUrgent) ? Theme.withAlpha(Theme.surfaceContainer, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
                                             font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
                                             font.weight: (isActive && !isPlaceholder) ? Font.DemiBold : Font.Normal
                                         }
@@ -1608,7 +1644,7 @@ Item {
                                             id: wsIndexText
                                             anchors.verticalCenter: parent.verticalCenter
                                             text: loadedHasIcon ? (modelData?.name ?? "") : root.getWorkspaceIndex(modelData, index)
-                                            color: (isActive || isUrgent) ? Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
+                                            color: (isActive || isUrgent) ? Theme.withAlpha(Theme.surfaceContainer, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
                                             font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
                                             font.weight: (isActive && !isPlaceholder) ? Font.DemiBold : Font.Normal
                                         }
@@ -1753,7 +1789,7 @@ Item {
                             Component {
                                 id: columnLayout
                                 Column {
-                                    spacing: 4
+                                    spacing: Theme.spacingXS
                                     visible: loadedIcons.length > 0 || SettingsData.showWorkspaceIndex || SettingsData.showWorkspaceName || loadedHasIcon
 
                                     DankIcon {
@@ -1761,7 +1797,7 @@ Item {
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         name: loadedIconData?.value ?? ""
                                         size: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
-                                        color: (isActive || isUrgent) ? Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
+                                        color: (isActive || isUrgent) ? Theme.withAlpha(Theme.surfaceContainer, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
                                         weight: (isActive && !isPlaceholder) ? 500 : 400
                                     }
 
@@ -1769,7 +1805,7 @@ Item {
                                         visible: loadedHasIcon && loadedIconData?.type === "text"
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         text: loadedIconData?.value ?? ""
-                                        color: (isActive || isUrgent) ? Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
+                                        color: (isActive || isUrgent) ? Theme.withAlpha(Theme.surfaceContainer, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
                                         font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
                                         font.weight: (isActive && !isPlaceholder) ? Font.DemiBold : Font.Normal
                                     }
@@ -1778,7 +1814,7 @@ Item {
                                         visible: ((SettingsData.showWorkspaceIndex || SettingsData.showWorkspaceName) && !loadedHasIcon) || (loadedHasIcon && SettingsData.showWorkspaceName && hasWorkspaceName)
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         text: loadedHasIcon ? (root.isVertical ? (modelData?.name ?? "").charAt(0) : (modelData?.name ?? "")) : root.getWorkspaceIndex(modelData, index)
-                                        color: (isActive || isUrgent) ? Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
+                                        color: (isActive || isUrgent) ? Theme.withAlpha(Theme.surfaceContainer, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
                                         font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
                                         font.weight: (isActive && !isPlaceholder) ? Font.DemiBold : Font.Normal
                                     }
@@ -1922,7 +1958,10 @@ Item {
                     }
                 }
 
-                Component.onCompleted: updateAllData()
+                Component.onCompleted: {
+                    updateAllData();
+                    delegateRoot.colorAnimationReady = true;
+                }
 
                 Connections {
                     target: CompositorService

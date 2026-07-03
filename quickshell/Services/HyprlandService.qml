@@ -25,6 +25,28 @@ Singleton {
     property bool luaConfigStatusReady: false
     property bool luaConfigStatusLoading: false
     property string luaConfigFormat: ""
+    property bool layoutGenerationPending: false
+    property bool layoutGenerationRunning: false
+    property int _layoutRequestRevision: 0
+    property int _layoutAppliedRevision: 0
+    property int _frameTransitionRevision: 0
+    readonly property bool frameLayoutReady: _layoutAppliedRevision >= _frameTransitionRevision
+
+    // dms/layout.lua is the source of truth for xray; parsed once before the first regeneration
+    property bool layoutXrayEnabled: false
+    property bool layoutBarXrayEnabled: true
+    property bool _layoutXrayLoaded: false
+    property bool _layoutXrayLoading: false
+
+    DeferredAction {
+        id: layoutGenerationAction
+        onTriggered: root.doGenerateLayoutConfig()
+    }
+
+    onLuaConfigStatusLoadingChanged: {
+        if (!luaConfigStatusLoading && layoutGenerationPending)
+            layoutGenerationAction.schedule();
+    }
 
     onLuaConfigActiveChanged: {
         if (luaConfigActive)
@@ -237,36 +259,101 @@ Singleton {
         });
     }
 
-    function reloadConfig() {
+    function reloadConfig(callback) {
         Proc.runCommand("hyprctl-reload", ["hyprctl", "reload"], (output, exitCode) => {
             if (exitCode !== 0)
                 log.warn("hyprctl reload failed:", output);
+            if (callback)
+                callback(exitCode === 0);
         });
     }
 
-    function generateLayoutConfig() {
+    function setLayoutXray(enabled) {
+        layoutXrayEnabled = enabled;
+        _layoutXrayLoaded = true;
+        generateLayoutConfig();
+    }
+
+    function setLayoutBarXray(enabled) {
+        layoutBarXrayEnabled = enabled;
+        _layoutXrayLoaded = true;
+        generateLayoutConfig();
+    }
+
+    function loadLayoutXrayState() {
+        if (_layoutXrayLoading)
+            return;
+        _layoutXrayLoading = true;
+        const configDir = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
+        Proc.runCommand("hypr-read-layout-xray", ["cat", configDir + "/hypr/dms/layout.lua"], (output, exitCode) => {
+            _layoutXrayLoading = false;
+            if (!_layoutXrayLoaded) {
+                const content = exitCode === 0 ? output : "";
+                layoutXrayEnabled = content.includes('"^dms:.*$"');
+                layoutBarXrayEnabled = !content.includes("-- bar-xray off");
+                _layoutXrayLoaded = true;
+            }
+            if (layoutGenerationPending)
+                layoutGenerationAction.schedule();
+        });
+    }
+
+    function generateLayoutConfig(frameTransition) {
         if (!CompositorService.isHyprland)
             return;
-        if (!canWriteLuaConfig("layout"))
+        _layoutRequestRevision++;
+        if (frameTransition === true)
+            _frameTransitionRevision = _layoutRequestRevision;
+        layoutGenerationPending = true;
+        layoutGenerationAction.schedule();
+    }
+
+    function doGenerateLayoutConfig() {
+        if (layoutGenerationRunning)
             return;
+        if (!_layoutXrayLoaded) {
+            loadLayoutXrayState();
+            return;
+        }
+        layoutGenerationPending = false;
+        const requestRevision = _layoutRequestRevision;
+        if (!canWriteLuaConfig("layout")) {
+            if (luaConfigStatusLoading || !luaConfigStatusReady) {
+                layoutGenerationPending = true;
+                return;
+            }
+            _layoutAppliedRevision = Math.max(_layoutAppliedRevision, requestRevision);
+            return;
+        }
+        layoutGenerationRunning = true;
 
         const defaultRadius = typeof SettingsData !== "undefined" ? SettingsData.cornerRadius : 12;
         const defaultGaps = typeof SettingsData !== "undefined" ? Math.max(4, (SettingsData.barConfigs[0]?.spacing ?? 4)) : 4;
         const defaultBorderSize = 2;
 
         const cornerRadius = (typeof SettingsData !== "undefined" && SettingsData.hyprlandLayoutRadiusOverride >= 0) ? SettingsData.hyprlandLayoutRadiusOverride : defaultRadius;
-        const gaps = (typeof SettingsData !== "undefined" && SettingsData.hyprlandLayoutGapsOverride >= 0) ? SettingsData.hyprlandLayoutGapsOverride : defaultGaps;
+        const gapsOverride = typeof SettingsData !== "undefined" ? SettingsData.hyprlandLayoutGapsOverride : -1;
+        const manageGaps = gapsOverride !== -2;
+        const gapsIn = gapsOverride >= 0 ? gapsOverride : defaultGaps;
+        const gapsOut = (gapsOverride >= 0 && SettingsData.hyprlandLayoutGapsOutOverride >= 0) ? SettingsData.hyprlandLayoutGapsOutOverride : gapsIn;
         const borderSize = (typeof SettingsData !== "undefined" && SettingsData.hyprlandLayoutBorderSize >= 0) ? SettingsData.hyprlandLayoutBorderSize : defaultBorderSize;
         const resizeOnBorder = (typeof SettingsData !== "undefined" && SettingsData.hyprlandResizeOnBorder) ? true : false;
+        const frameEnabled = typeof SettingsData !== "undefined" && SettingsData.frameEnabled;
+        const frameConnectedMode = frameEnabled && SettingsData.frameMode === "connected";
+        // Hyprland `xray = false` is still early-development; unset already samples real content, so only force xray=true
+        // Connected frame mode has no separate bar/frame surface to target
+        const barFrameTargetNamespace = !frameEnabled ? (SettingsData.standaloneBarXrayAvailable ? "dms:bar" : null) : (frameConnectedMode ? null : "dms:frame");
+
+        const generalLines = [];
+        if (manageGaps)
+            generalLines.push(`gaps_in = ${gapsIn},`, `gaps_out = ${gapsOut},`);
+        generalLines.push(`border_size = ${borderSize},`, `resize_on_border = ${resizeOnBorder},`);
 
         let content = `-- Auto-generated by DMS — do not edit manually
 
 hl.config({
 	general = {
-		gaps_in = ${gaps},
-		gaps_out = ${gaps},
-		border_size = ${borderSize},
-		resize_on_border = ${resizeOnBorder},
+${generalLines.map(l => "\t\t" + l).join("\n")}
 	},
 	decoration = {
 		rounding = ${cornerRadius},
@@ -274,13 +361,47 @@ hl.config({
 })
 `;
 
+        if (layoutXrayEnabled) {
+            content += `
+hl.layer_rule({
+	match = { namespace = "^dms:.*$" },
+	xray = true,
+})
+`;
+        }
+        if (layoutBarXrayEnabled && barFrameTargetNamespace) {
+            content += `
+hl.layer_rule({
+	match = { namespace = "^${barFrameTargetNamespace}$" },
+	xray = true,
+})
+`;
+        }
+        // Marker persists the preference even while the rule has no target
+        if (!layoutBarXrayEnabled) {
+            content += `
+-- bar-xray off
+`;
+        }
+
         Proc.runCommand("hypr-write-layout", ["sh", "-c", `mkdir -p "${hyprDmsDir}" && cat > "${layoutPath}" << 'EOF'\n${content}EOF`], (output, exitCode) => {
             if (exitCode !== 0) {
                 log.warn("Failed to write layout config:", output);
+                // Best-effort ack so a failed write can't wedge frame transitions
+                _layoutAppliedRevision = Math.max(_layoutAppliedRevision, requestRevision);
+                layoutGenerationRunning = false;
+                if (layoutGenerationPending)
+                    layoutGenerationAction.schedule();
                 return;
             }
             log.info("Generated layout config at", layoutPath);
-            reloadConfig();
+            reloadConfig(success => {
+                // Advance even on failure — proceed degraded rather than wedge the transition
+                _layoutAppliedRevision = Math.max(_layoutAppliedRevision, requestRevision);
+                layoutGenerationRunning = false;
+                if (layoutGenerationPending)
+                    layoutGenerationAction.schedule();
+            });
         });
     }
 

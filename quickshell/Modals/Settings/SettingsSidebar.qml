@@ -156,6 +156,12 @@ Rectangle {
             "collapsedByDefault": true,
             "children": [
                 {
+                    "id": "dank_dash",
+                    "text": I18n.tr("Dank Dash"),
+                    "icon": "space_dashboard",
+                    "tabIndex": 43
+                },
+                {
                     "id": "media_player",
                     "text": I18n.tr("Media Player"),
                     "icon": "music_note",
@@ -361,6 +367,12 @@ Rectangle {
             "collapsedByDefault": true,
             "children": [
                 {
+                    "id": "battery",
+                    "text": I18n.tr("Battery"),
+                    "icon": "battery_charging_full",
+                    "tabIndex": 42
+                },
+                {
                     "id": "lock_screen",
                     "text": I18n.tr("Lock Screen"),
                     "icon": "lock",
@@ -377,12 +389,6 @@ Rectangle {
                     "text": I18n.tr("Power & Sleep"),
                     "icon": "power_settings_new",
                     "tabIndex": 21
-                },
-                {
-                    "id": "battery",
-                    "text": I18n.tr("Battery"),
-                    "icon": "battery_charging_full",
-                    "tabIndex": 42
                 }
             ]
         },
@@ -705,7 +711,7 @@ Rectangle {
             rightPadding: Theme.spacingS
             bottomPadding: Theme.spacingL
             topPadding: Theme.spacingM + 2
-            spacing: 2
+            spacing: Theme.spacingXXS
 
             ProfileSection {
                 width: parent.width - parent.leftPadding - parent.rightPadding
@@ -798,7 +804,7 @@ Rectangle {
             Column {
                 id: searchResultsColumn
                 width: parent.width - parent.leftPadding - parent.rightPadding
-                spacing: 2
+                spacing: Theme.spacingXXS
                 visible: root.searchActive
 
                 Item {
@@ -853,7 +859,7 @@ Rectangle {
                             Column {
                                 width: parent.width - Theme.iconSize - Theme.spacingM
                                 anchors.verticalCenter: parent.verticalCenter
-                                spacing: 2
+                                spacing: Theme.spacingXXS
 
                                 StyledText {
                                     text: resultDelegate.modelData.label
@@ -922,7 +928,7 @@ Rectangle {
 
                     width: parent.width - parent.leftPadding - parent.rightPadding
                     visible: !root.searchActive && root.isCategoryVisible(modelData)
-                    spacing: 2
+                    spacing: Theme.spacingXXS
 
                     Rectangle {
                         width: parent.width
@@ -1029,7 +1035,7 @@ Rectangle {
                     Column {
                         id: childrenColumn
                         width: parent.width
-                        spacing: 2
+                        spacing: Theme.spacingXXS
                         visible: categoryDelegate.modelData.children !== undefined && root.isCategoryExpanded(categoryDelegate.modelData.id)
                         clip: true
 

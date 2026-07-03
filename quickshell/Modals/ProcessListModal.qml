@@ -48,19 +48,22 @@ FloatingWindow {
             log.warn("dgop is not available");
             return;
         }
-        if (visible) {
-            const modalTitle = I18n.tr("System Monitor", "sysmon window title");
-            for (const toplevel of ToplevelManager.toplevels.values) {
-                if (toplevel.title !== "System Monitor" && toplevel.title !== modalTitle)
-                    continue;
-                if (toplevel.activated) {
-                    hide();
-                    return;
-                }
-                toplevel.activate();
+        if (!visible) {
+            show();
+            return;
+        }
+        const modalTitle = I18n.tr("System Monitor", "sysmon window title");
+        for (const toplevel of ToplevelManager.toplevels.values) {
+            if (toplevel.title !== "System Monitor" && toplevel.title !== modalTitle)
+                continue;
+            if (toplevel.activated) {
+                hide();
                 return;
             }
+            toplevel.activate();
+            return;
         }
+        hide();
         show();
     }
 
@@ -89,6 +92,8 @@ FloatingWindow {
     implicitHeight: Math.round(Theme.fontSizeMedium * 51)
     color: Theme.surfaceContainer
     visible: false
+
+    onClosed: hide()
 
     onCurrentTabChanged: {
         if (visible && currentTab === 0 && searchField.visible)
@@ -195,7 +200,7 @@ FloatingWindow {
             width: 400
             height: 200
             radius: Theme.cornerRadius
-            color: Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.1)
+            color: Theme.errorHover
             border.color: Theme.error
             border.width: 2
             visible: !DgopService.dgopAvailable
@@ -300,7 +305,7 @@ FloatingWindow {
                 spacing: Theme.spacingM
 
                 Row {
-                    spacing: 2
+                    spacing: Theme.spacingXXS
 
                     Repeater {
                         model: [
@@ -326,8 +331,8 @@ FloatingWindow {
                             width: tabRowContent.implicitWidth + Theme.spacingM * 2
                             height: Math.round(Theme.fontSizeMedium * 3.1)
                             radius: Theme.cornerRadius
-                            color: currentTab === index ? Theme.primaryPressed : (tabMouseArea.containsMouse ? Theme.primaryHoverLight : "transparent")
-                            border.color: currentTab === index ? Theme.primary : "transparent"
+                            color: currentTab === index ? Theme.primaryPressed : (tabMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0))
+                            border.color: currentTab === index ? Theme.primary : Theme.withAlpha(Theme.primary, 0)
                             border.width: currentTab === index ? 1 : 0
 
                             Row {
@@ -512,7 +517,7 @@ FloatingWindow {
                         }
 
                         StyledText {
-                            text: DgopService.shortUptime || "--"
+                            text: DgopService.shortUptime ? DgopService.shortUptime.slice(2) : "--"
                             font.pixelSize: Theme.fontSizeSmall
                             font.weight: Font.Bold
                             color: Theme.surfaceText

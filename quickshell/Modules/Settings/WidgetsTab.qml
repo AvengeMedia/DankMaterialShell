@@ -27,6 +27,22 @@ Item {
     property bool hasMultipleBars: SettingsData.barConfigs.length > 1
     property int pluginCatalogRevision: 0
 
+    property string highlightedId: ""
+    property string highlightedSection: ""
+
+    // Cross-section drag coordinator state + floating proxy avatar.
+    property bool dragActive: false
+    property string dragSourceSection: ""
+    property string dragTargetSection: ""
+    property string dragId: ""
+    property var dragWidgetData: null
+    property int targetIndex: -1
+    property real dragRowHeight: 72
+    property bool proxyVisible: false
+    property real proxyX: 0
+    property real proxyY: 0
+    property real proxyWidth: 0
+
     DankTooltipV2 {
         id: sharedTooltip
     }
@@ -276,6 +292,48 @@ Item {
         return coreWidgets;
     }
 
+    focus: true
+    Keys.onPressed: function (event) {
+        var flat = flatList();
+        if (flat.length === 0)
+            return;
+        var ctrl = (event.modifiers & Qt.ControlModifier) !== 0;
+        if (event.key === Qt.Key_Up || event.key === Qt.Key_Down) {
+            var dir = event.key === Qt.Key_Down ? 1 : -1;
+            if (ctrl) {
+                if (highlightedId !== "")
+                    moveWithinSection(highlightedSection, highlightedId, dir);
+            } else {
+                var idx = -1;
+                for (var i = 0; i < flat.length; i++) {
+                    if (flat[i].section === highlightedSection && flat[i].id === highlightedId) {
+                        idx = i;
+                        break;
+                    }
+                }
+                if (idx < 0) {
+                    var f = dir > 0 ? flat[0] : flat[flat.length - 1];
+                    highlightedSection = f.section;
+                    highlightedId = f.id;
+                } else {
+                    idx = Math.max(0, Math.min(flat.length - 1, idx + dir));
+                    highlightedSection = flat[idx].section;
+                    highlightedId = flat[idx].id;
+                }
+            }
+            event.accepted = true;
+        } else if ((event.key === Qt.Key_Left || event.key === Qt.Key_Right) && ctrl) {
+            if (highlightedId !== "")
+                moveAcrossSections(highlightedSection, highlightedId, event.key === Qt.Key_Right ? 1 : -1);
+            event.accepted = true;
+        } else if (event.key === Qt.Key_Space || event.key === Qt.Key_Return) {
+            if (highlightedId !== "") {
+                toggleHighlighted();
+                event.accepted = true;
+            }
+        }
+    }
+
     Connections {
         target: PluginService
 
@@ -489,8 +547,200 @@ Item {
         setWidgetsForSection(sectionId, widgets);
     }
 
-    function handleItemOrderChanged(sectionId, newOrder) {
-        setWidgetsForSection(sectionId, newOrder);
+    function barKey(sectionId) {
+        return sectionId === "left" ? "leftWidgets" : sectionId === "center" ? "centerWidgets" : "rightWidgets";
+    }
+
+    function sectionItem(sectionId) {
+        return sectionId === "left" ? leftSection : sectionId === "center" ? centerSection : sectionId === "right" ? rightSection : null;
+    }
+
+    // Id-based reorder; rebuilds from authoritative objects so every prop (incl. hideWhenIdle) survives
+    function reorderSection(sectionId, orderedIds) {
+        var current = getWidgetsForSection(sectionId);
+        var byId = {};
+        current.forEach(w => {
+            var id = (typeof w === "string" ? w : w.id);
+            byId[id] = w;
+        });
+        var reordered = [];
+        orderedIds.forEach(id => {
+            if (byId[id] !== undefined)
+                reordered.push(byId[id]);
+        });
+        setWidgetsForSection(sectionId, reordered);
+    }
+
+    // Move a widget across sections (or within); committed as one atomic bar-config save
+    function moveWidget(fromSection, toSection, movedId, toIndex) {
+        if (fromSection === toSection) {
+            var arr = getWidgetsForSection(fromSection).slice();
+            var fi = arr.findIndex(w => (typeof w === "string" ? w : w.id) === movedId);
+            if (fi < 0)
+                return;
+            var m = arr.splice(fi, 1)[0];
+            arr.splice(Math.max(0, Math.min(toIndex, arr.length)), 0, m);
+            setWidgetsForSection(fromSection, arr);
+            return;
+        }
+        var src = getWidgetsForSection(fromSection).slice();
+        var fromIdx = src.findIndex(w => (typeof w === "string" ? w : w.id) === movedId);
+        if (fromIdx < 0)
+            return;
+        var moved = src.splice(fromIdx, 1)[0];
+        var dst = getWidgetsForSection(toSection).slice();
+        dst.splice(Math.max(0, Math.min(toIndex, dst.length)), 0, moved);
+        var updates = {};
+        updates[barKey(fromSection)] = src;
+        updates[barKey(toSection)] = dst;
+        SettingsData.updateBarConfig(selectedBarId, updates);
+    }
+
+    function sectionAtY(gy) {
+        var sections = ["left", "center", "right"];
+        var nearest = "";
+        var nearestDist = Infinity;
+        for (var i = 0; i < sections.length; i++) {
+            var it = sectionItem(sections[i]);
+            if (!it)
+                continue;
+            var top = it.mapToItem(widgetsTab, 0, 0).y;
+            var bot = top + it.height;
+            if (gy >= top && gy <= bot)
+                return sections[i];
+            var d = gy < top ? (top - gy) : (gy - bot);
+            if (d < nearestDist) {
+                nearestDist = d;
+                nearest = sections[i];
+            }
+        }
+        return nearest;
+    }
+
+    function handleDragStarted(sectionId, id, index, widgetData, localPos) {
+        widgetsTab.forceActiveFocus();
+        highlightedSection = sectionId;
+        highlightedId = id;
+        dragActive = true;
+        dragSourceSection = sectionId;
+        dragTargetSection = sectionId;
+        dragId = id;
+        dragWidgetData = widgetData;
+        targetIndex = -1;
+        var src = sectionItem(sectionId);
+        dragRowHeight = src ? src.rowHeight : 72;
+        var origin = src ? src.mapToItem(widgetsTab, 0, 0) : {
+            "x": 0,
+            "y": 0
+        };
+        proxyX = origin.x;
+        proxyWidth = src ? src.width : 0;
+        proxyVisible = false;
+    }
+
+    function handleDragMoved(sectionId, localPos) {
+        if (!dragActive)
+            return;
+        var src = sectionItem(sectionId);
+        if (!src)
+            return;
+        var g = src.mapToItem(widgetsTab, localPos.x, localPos.y);
+        var hit = sectionAtY(g.y);
+        if (hit === "" || hit === dragSourceSection) {
+            if (dragTargetSection !== dragSourceSection) {
+                var prev = sectionItem(dragTargetSection);
+                if (prev)
+                    prev.clearGap();
+                dragTargetSection = dragSourceSection;
+            }
+            src.setCrossMode(false);
+            targetIndex = -1;
+            proxyVisible = false;
+            return;
+        }
+        if (dragTargetSection !== hit) {
+            if (dragTargetSection !== dragSourceSection) {
+                var prevSec = sectionItem(dragTargetSection);
+                if (prevSec)
+                    prevSec.clearGap();
+            }
+            dragTargetSection = hit;
+        }
+        src.setCrossMode(true);
+        var tgt = sectionItem(hit);
+        targetIndex = tgt.slotIndexForGlobalY(widgetsTab, g.y);
+        tgt.openGapAt(targetIndex);
+        proxyY = g.y - dragRowHeight / 2;
+        proxyVisible = true;
+    }
+
+    function handleDragEnded(sectionId) {
+        var src = sectionItem(dragSourceSection);
+        var crossing = dragTargetSection !== "" && dragTargetSection !== dragSourceSection;
+        if (crossing) {
+            moveWidget(dragSourceSection, dragTargetSection, dragId, targetIndex);
+            var tgt = sectionItem(dragTargetSection);
+            if (tgt)
+                tgt.clearGap();
+            if (src)
+                src.cancelDrag();
+        } else if (src) {
+            src.commitDrag();
+        }
+        if (src)
+            src.setCrossMode(false);
+        dragActive = false;
+        dragSourceSection = "";
+        dragTargetSection = "";
+        dragId = "";
+        dragWidgetData = null;
+        targetIndex = -1;
+        proxyVisible = false;
+    }
+
+    function flatList() {
+        var out = [];
+        ["left", "center", "right"].forEach(s => {
+            getWidgetsForSection(s).forEach(w => {
+                out.push({
+                    "section": s,
+                    "id": (typeof w === "string" ? w : w.id)
+                });
+            });
+        });
+        return out;
+    }
+
+    function moveWithinSection(sectionId, id, delta) {
+        var ids = getWidgetsForSection(sectionId).map(w => typeof w === "string" ? w : w.id);
+        var pos = ids.indexOf(id);
+        var next = pos + delta;
+        if (pos < 0 || next < 0 || next >= ids.length)
+            return;
+        ids.splice(pos, 1);
+        ids.splice(next, 0, id);
+        reorderSection(sectionId, ids);
+    }
+
+    function moveAcrossSections(sectionId, id, delta) {
+        var order = ["left", "center", "right"];
+        var si = order.indexOf(sectionId);
+        var ti = si + delta;
+        if (si < 0 || ti < 0 || ti >= order.length)
+            return;
+        var to = order[ti];
+        moveWidget(sectionId, to, id, getWidgetsForSection(to).length);
+        highlightedSection = to;
+    }
+
+    function toggleHighlighted() {
+        if (highlightedId === "" || highlightedSection === "")
+            return;
+        var w = getWidgetsForSection(highlightedSection).find(x => (typeof x === "string" ? x : x.id) === highlightedId);
+        if (w === undefined)
+            return;
+        var en = (typeof w === "string") ? true : (w.enabled !== false);
+        handleItemEnabledChanged(highlightedSection, highlightedId, !en);
     }
 
     function handleSpacerSizeChanged(sectionId, widgetIndex, newSize) {
@@ -1069,8 +1319,19 @@ Item {
                         onItemEnabledChanged: (sectionId, itemId, enabled) => {
                             widgetsTab.handleItemEnabledChanged(sectionId, itemId, enabled);
                         }
-                        onItemOrderChanged: newOrder => {
-                            widgetsTab.handleItemOrderChanged(sectionId, newOrder);
+                        highlightedId: widgetsTab.highlightedId
+                        highlightedSection: widgetsTab.highlightedSection
+                        onItemOrderChanged: (sectionId, orderedIds) => {
+                            widgetsTab.reorderSection(sectionId, orderedIds);
+                        }
+                        onDragStarted: (sectionId, id, index, widgetData, localPos) => {
+                            widgetsTab.handleDragStarted(sectionId, id, index, widgetData, localPos);
+                        }
+                        onDragMoved: (sectionId, localPos) => {
+                            widgetsTab.handleDragMoved(sectionId, localPos);
+                        }
+                        onDragEnded: sectionId => {
+                            widgetsTab.handleDragEnded(sectionId);
                         }
                         onAddWidget: sectionId => {
                             showWidgetSelectionPopup(sectionId);
@@ -1145,8 +1406,19 @@ Item {
                         onItemEnabledChanged: (sectionId, itemId, enabled) => {
                             widgetsTab.handleItemEnabledChanged(sectionId, itemId, enabled);
                         }
-                        onItemOrderChanged: newOrder => {
-                            widgetsTab.handleItemOrderChanged(sectionId, newOrder);
+                        highlightedId: widgetsTab.highlightedId
+                        highlightedSection: widgetsTab.highlightedSection
+                        onItemOrderChanged: (sectionId, orderedIds) => {
+                            widgetsTab.reorderSection(sectionId, orderedIds);
+                        }
+                        onDragStarted: (sectionId, id, index, widgetData, localPos) => {
+                            widgetsTab.handleDragStarted(sectionId, id, index, widgetData, localPos);
+                        }
+                        onDragMoved: (sectionId, localPos) => {
+                            widgetsTab.handleDragMoved(sectionId, localPos);
+                        }
+                        onDragEnded: sectionId => {
+                            widgetsTab.handleDragEnded(sectionId);
                         }
                         onAddWidget: sectionId => {
                             showWidgetSelectionPopup(sectionId);
@@ -1221,8 +1493,19 @@ Item {
                         onItemEnabledChanged: (sectionId, itemId, enabled) => {
                             widgetsTab.handleItemEnabledChanged(sectionId, itemId, enabled);
                         }
-                        onItemOrderChanged: newOrder => {
-                            widgetsTab.handleItemOrderChanged(sectionId, newOrder);
+                        highlightedId: widgetsTab.highlightedId
+                        highlightedSection: widgetsTab.highlightedSection
+                        onItemOrderChanged: (sectionId, orderedIds) => {
+                            widgetsTab.reorderSection(sectionId, orderedIds);
+                        }
+                        onDragStarted: (sectionId, id, index, widgetData, localPos) => {
+                            widgetsTab.handleDragStarted(sectionId, id, index, widgetData, localPos);
+                        }
+                        onDragMoved: (sectionId, localPos) => {
+                            widgetsTab.handleDragMoved(sectionId, localPos);
+                        }
+                        onDragEnded: sectionId => {
+                            widgetsTab.handleDragEnded(sectionId);
                         }
                         onAddWidget: sectionId => {
                             showWidgetSelectionPopup(sectionId);
@@ -1277,6 +1560,61 @@ Item {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    // Floating drag avatar, outside the DankFlickable clip so it paints over the inter-card gap.
+    Item {
+        id: dragProxy
+
+        visible: widgetsTab.proxyVisible
+        x: widgetsTab.proxyX
+        y: widgetsTab.proxyY
+        width: widgetsTab.proxyWidth
+        height: widgetsTab.dragRowHeight
+        z: 9999
+
+        Rectangle {
+            anchors.fill: parent
+            anchors.margins: 2
+            radius: Theme.cornerRadius + 6
+            color: Theme.secondaryContainer
+            border.color: Theme.primary
+            border.width: 2
+            scale: 1.02
+            opacity: 0.95
+
+            DankIcon {
+                name: "drag_indicator"
+                size: Theme.iconSize - 4
+                color: Theme.primary
+                anchors.left: parent.left
+                anchors.leftMargin: Theme.spacingM + 8
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            DankIcon {
+                id: proxyIcon
+                name: (widgetsTab.dragWidgetData && widgetsTab.dragWidgetData.icon) ? widgetsTab.dragWidgetData.icon : "widgets"
+                size: Theme.iconSize
+                color: Theme.primary
+                anchors.left: parent.left
+                anchors.leftMargin: Theme.spacingM * 2 + 40
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            StyledText {
+                text: (widgetsTab.dragWidgetData && widgetsTab.dragWidgetData.text) ? widgetsTab.dragWidgetData.text : ""
+                font.pixelSize: Theme.fontSizeMedium
+                font.weight: Font.Medium
+                color: Theme.surfaceText
+                elide: Text.ElideRight
+                anchors.left: proxyIcon.right
+                anchors.leftMargin: Theme.spacingM
+                anchors.right: parent.right
+                anchors.rightMargin: Theme.spacingM
+                anchors.verticalCenter: parent.verticalCenter
             }
         }
     }

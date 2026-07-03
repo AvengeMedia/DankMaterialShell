@@ -374,6 +374,57 @@ func TestSecretAgent_GetSecrets_NoInteractionFlag(t *testing.T) {
 	assert.Contains(t, err.Error(), "NoSecrets")
 }
 
+func TestBuildWiFiSecretsResponse(t *testing.T) {
+	t.Run("wpa-psk returns psk", func(t *testing.T) {
+		out := buildWiFiSecretsResponse("802-11-wireless-security", map[string]string{"psk": "hunter2"})
+
+		sec, ok := out["802-11-wireless-security"]
+		assert.True(t, ok)
+		assert.Equal(t, "hunter2", sec["psk"].Value())
+	})
+
+	t.Run("802-1x keeps secrets and drops identity", func(t *testing.T) {
+		out := buildWiFiSecretsResponse("802-1x", map[string]string{
+			"identity": "john",
+			"password": "hunter2",
+		})
+
+		sec := out["802-1x"]
+		assert.Equal(t, "hunter2", sec["password"].Value())
+		_, hasIdentity := sec["identity"]
+		assert.False(t, hasIdentity, "identity is persisted separately, not returned as a secret")
+	})
+}
+
+func TestWiFiSecretCache(t *testing.T) {
+	b := &NetworkManagerBackend{}
+
+	b.cacheWiFiSecret("uuid-1", "HomeNet", "802-11-wireless-security", map[string]string{"psk": "hunter2"})
+
+	got := b.lookupCachedWiFiSecret("uuid-1", "802-11-wireless-security")
+	assert.Equal(t, map[string]string{"psk": "hunter2"}, got)
+
+	assert.Nil(t, b.lookupCachedWiFiSecret("uuid-1", "802-1x"), "setting mismatch must miss")
+	assert.Nil(t, b.lookupCachedWiFiSecret("uuid-2", "802-11-wireless-security"), "uuid mismatch must miss")
+	assert.Nil(t, b.lookupCachedWiFiSecret("", "802-11-wireless-security"), "empty uuid must miss")
+
+	// REQUEST_NEW path clears by uuid.
+	b.clearCachedWiFiSecret("uuid-1")
+	assert.Nil(t, b.lookupCachedWiFiSecret("uuid-1", "802-11-wireless-security"))
+
+	// Returned map is a copy: mutating it must not affect the cache.
+	b.cacheWiFiSecret("uuid-1", "HomeNet", "802-11-wireless-security", map[string]string{"psk": "hunter2"})
+	got = b.lookupCachedWiFiSecret("uuid-1", "802-11-wireless-security")
+	got["psk"] = "tampered"
+	assert.Equal(t, "hunter2", b.lookupCachedWiFiSecret("uuid-1", "802-11-wireless-security")["psk"])
+
+	// Terminal-state path clears by SSID.
+	b.clearCachedWiFiSecretBySSID("OtherNet")
+	assert.NotNil(t, b.lookupCachedWiFiSecret("uuid-1", "802-11-wireless-security"), "ssid mismatch must not clear")
+	b.clearCachedWiFiSecretBySSID("HomeNet")
+	assert.Nil(t, b.lookupCachedWiFiSecret("uuid-1", "802-11-wireless-security"))
+}
+
 func TestNmVariantMap(t *testing.T) {
 	// Test that nmVariantMap and nmSettingMap work correctly
 	settingMap := make(nmSettingMap)

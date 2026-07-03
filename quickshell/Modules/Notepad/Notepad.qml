@@ -23,6 +23,7 @@ Item {
     property bool showSettingsMenu: false
     property string pendingSaveContent: ""
     readonly property bool conflictBannerVisible: currentTab !== null && NotepadStorageService.conflictTabId === currentTab.id
+    readonly property bool anyModalOpen: fileDialogOpen || confirmationDialogOpen
     property var slideout: null
     property bool inPopout: false
     property bool surfaceVisible: slideout ? slideout.isVisible : true
@@ -48,6 +49,14 @@ Item {
     onFileDialogOpenChanged: {
         if (slideout)
             slideout.suppressOverlayLayer = fileDialogOpen;
+    }
+
+    Binding {
+        target: root.slideout
+        property: "hoverDismissSuspended"
+        value: root.anyModalOpen
+        when: root.slideout !== null
+        restoreMode: Binding.RestoreBindingOrValue
     }
 
     Connections {
@@ -93,15 +102,7 @@ Item {
         return textEditor.hasUnsavedChanges();
     }
 
-    function hasUnsavedTemporaryContent() {
-        return hasUnsavedChanges();
-    }
-
     function createNewTab() {
-        performCreateNewTab();
-    }
-
-    function performCreateNewTab() {
         textEditor.commitLiveBuffer();
         NotepadStorageService.createNewTab();
         textEditor.applyingShared = true;
@@ -212,7 +213,7 @@ Item {
     }
 
     function loadFromFile(fileUrl) {
-        if (hasUnsavedTemporaryContent()) {
+        if (hasUnsavedChanges()) {
             root.pendingFileUrl = fileUrl;
             root.pendingAction = "load_file";
             root.confirmationDialogOpen = true;
@@ -699,7 +700,7 @@ Item {
                                     width: Math.max(80, discardText.contentWidth + Theme.spacingM * 2)
                                     height: 36
                                     radius: Theme.cornerRadius
-                                    color: discardArea.containsMouse ? Theme.surfaceTextHover : "transparent"
+                                    color: discardArea.containsMouse ? Theme.surfaceTextHover : Theme.withAlpha(Theme.surfaceTextHover, 0)
                                     border.color: Theme.surfaceVariantAlpha
                                     border.width: 1
 

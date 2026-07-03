@@ -157,8 +157,8 @@ PanelWindow {
         height: menuColumn.implicitHeight + Theme.spacingS * 2
         color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
         radius: Theme.cornerRadius
-        border.color: BlurService.enabled ? BlurService.borderColor : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
-        border.width: BlurService.enabled ? BlurService.borderWidth : 1
+        border.color: BlurService.borderColor
+        border.width: BlurService.borderWidth
 
         opacity: root.visible ? 1 : 0
         visible: opacity > 0

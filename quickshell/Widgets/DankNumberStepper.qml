@@ -27,7 +27,7 @@ Column {
     readonly property bool effectiveDecrementEnabled: root.onDecrement ? root.decrementEnabled : false
 
     width: Math.max(buttonSize * 2, root.implicitWidth + horizontalPadding * 2)
-    spacing: 4
+    spacing: Theme.spacingXS
 
     DankActionButton {
         anchors.horizontalCenter: parent.horizontalCenter

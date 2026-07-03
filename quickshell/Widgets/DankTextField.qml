@@ -213,7 +213,7 @@ StyledRect {
             width: 20
             height: 20
             radius: 10
-            color: passwordToggleArea.containsMouse ? Theme.outlineStrong : "transparent"
+            color: passwordToggleArea.containsMouse ? Theme.outlineStrong : Theme.withAlpha(Theme.outlineStrong, 0)
             visible: showPasswordToggle
 
             DankIcon {
@@ -239,7 +239,7 @@ StyledRect {
             width: 20
             height: 20
             radius: 10
-            color: clearArea.containsMouse ? Theme.outlineStrong : "transparent"
+            color: clearArea.containsMouse ? Theme.outlineStrong : Theme.withAlpha(Theme.outlineStrong, 0)
             visible: showClearButton && text.length > 0
 
             DankIcon {

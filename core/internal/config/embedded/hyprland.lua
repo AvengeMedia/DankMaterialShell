@@ -13,6 +13,7 @@ hl.config({
 	input = {
 		kb_layout = "us",
 		numlock_by_default = true,
+		follow_mouse = 0,
 		touchpad = {
 			tap_to_click = true,
 			natural_scroll = true,

@@ -167,7 +167,7 @@ Rectangle {
             Rectangle {
                 width: parent.width
                 height: 1
-                color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.1)
+                color: Theme.outlineStrong
             }
 
             StyledText {
@@ -225,7 +225,7 @@ Rectangle {
             Rectangle {
                 width: parent.width
                 height: 1
-                color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.1)
+                color: Theme.outlineStrong
             }
 
             Item {
@@ -248,7 +248,7 @@ Rectangle {
                     }
 
                     Column {
-                        spacing: 2
+                        spacing: Theme.spacingXXS
                         anchors.verticalCenter: parent.verticalCenter
                         width: overlayRow.width - Theme.iconSizeSmall - Theme.spacingM
 
@@ -299,7 +299,7 @@ Rectangle {
                     }
 
                     Column {
-                        spacing: 2
+                        spacing: Theme.spacingXXS
                         anchors.verticalCenter: parent.verticalCenter
                         width: privacyRow.width - Theme.iconSizeSmall - Theme.spacingM
 
@@ -333,7 +333,7 @@ Rectangle {
             Rectangle {
                 width: parent.width
                 height: 1
-                color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.1)
+                color: Theme.outlineStrong
             }
 
             StyledText {

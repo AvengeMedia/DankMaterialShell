@@ -12,12 +12,14 @@ Singleton {
     property bool showPasswordInput: false
     property string selectedSession: ""
     property string selectedSessionPath: ""
+    property string selectedSessionDesktopId: ""
     property string pamState: ""
     property bool unlocking: false
 
     property var sessionList: []
     property var sessionExecs: []
     property var sessionPaths: []
+    property var sessionDesktopIds: []
     property int currentSessionIndex: 0
     property var availableUsers: []
     property int selectedUserIndex: -1

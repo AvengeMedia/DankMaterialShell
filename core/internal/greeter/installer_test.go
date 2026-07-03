@@ -111,15 +111,18 @@ command = "/usr/bin/dms-greeter --command niri"
 
 	t.Run("inserts initial session", func(t *testing.T) {
 		t.Parallel()
-		got := upsertInitialSession(baseConfig, "alice", "niri", true)
+		got := upsertInitialSession(baseConfig, "alice", "/var/cache/dms-greeter", true)
 		if !strings.Contains(got, "[initial_session]") {
 			t.Fatalf("expected [initial_session] section, got:\n%s", got)
 		}
 		if !strings.Contains(got, `user = "alice"`) {
 			t.Fatalf("expected alice user in initial session, got:\n%s", got)
 		}
-		if !strings.Contains(got, `env XDG_SESSION_TYPE=wayland sh -c 'exec niri'`) {
-			t.Fatalf("expected wrapped session command, got:\n%s", got)
+		if !strings.Contains(got, `dms greeter launch-session --from-memory --cache-dir`) {
+			t.Fatalf("expected stable launch-session command, got:\n%s", got)
+		}
+		if strings.Contains(got, `exec niri`) {
+			t.Fatalf("initial session must not bake the desktop Exec command, got:\n%s", got)
 		}
 	})
 
@@ -130,12 +133,12 @@ command = "/usr/bin/dms-greeter --command niri"
 user = "bob"
 command = "old-command"
 `
-		got := upsertInitialSession(existing, "alice", "Hyprland", true)
+		got := upsertInitialSession(existing, "alice", "/var/cache/dms-greeter", true)
 		if strings.Contains(got, `user = "bob"`) {
 			t.Fatalf("expected bob to be replaced, got:\n%s", got)
 		}
-		if !strings.Contains(got, `exec Hyprland`) {
-			t.Fatalf("expected Hyprland command, got:\n%s", got)
+		if !strings.Contains(got, `dms greeter launch-session --from-memory`) {
+			t.Fatalf("expected launch-session command, got:\n%s", got)
 		}
 	})
 
@@ -179,15 +182,46 @@ func TestResolveGreeterAutoLoginState(t *testing.T) {
 }`)
 	writeTestFile(t, filepath.Join(cacheDir, ".local/state/memory.json"), `{
   "lastSuccessfulUser": "alice",
-  "lastSessionExec": "niri"
+  "lastSessionDesktopId": "niri.desktop"
 }`)
 
-	enabled, loginUser, sessionExec, err := resolveGreeterAutoLoginState(cacheDir, homeDir)
+	enabled, loginUser, sessionID, err := resolveGreeterAutoLoginState(cacheDir, homeDir)
 	if err != nil {
 		t.Fatalf("resolveGreeterAutoLoginState returned error: %v", err)
 	}
-	if !enabled || loginUser != "alice" || sessionExec != "niri" {
-		t.Fatalf("got enabled=%v user=%q exec=%q", enabled, loginUser, sessionExec)
+	if !enabled || loginUser != "alice" || sessionID != "niri.desktop" {
+		t.Fatalf("got enabled=%v user=%q session=%q", enabled, loginUser, sessionID)
+	}
+}
+
+func TestResolveGreeterAutoLoginStateIgnoresStaleSessionExec(t *testing.T) {
+	t.Parallel()
+
+	cacheDir := t.TempDir()
+	homeDir := t.TempDir()
+
+	writeTestFile(t, filepath.Join(cacheDir, "settings.json"), `{
+  "greeterAutoLogin": true,
+  "greeterRememberLastUser": true,
+  "greeterRememberLastSession": true
+}`)
+	writeTestFile(t, filepath.Join(cacheDir, ".local/state/memory.json"), `{
+  "lastSuccessfulUser": "alice",
+  "lastSessionId": "/nix/store/old-session/share/wayland-sessions/example.desktop",
+  "lastSessionExec": "/nix/store/old-session/bin/start-example-session"
+}`)
+
+	enabled, loginUser, sessionID, err := resolveGreeterAutoLoginState(cacheDir, homeDir)
+	if err != nil {
+		t.Fatalf("resolveGreeterAutoLoginState returned error: %v", err)
+	}
+	if !enabled || loginUser != "alice" || sessionID != "example.desktop" {
+		t.Fatalf("got enabled=%v user=%q session=%q", enabled, loginUser, sessionID)
+	}
+
+	got := upsertInitialSession("", loginUser, cacheDir, true)
+	if strings.Contains(got, "/nix/store/old-session") {
+		t.Fatalf("initial session must not include stale store path, got:\n%s", got)
 	}
 }
 
@@ -208,12 +242,35 @@ func TestResolveGreeterAutoLoginStateIgnoresMemoryFlag(t *testing.T) {
   "lastSessionExec": "niri"
 }`)
 
-	enabled, loginUser, sessionExec, err := resolveGreeterAutoLoginState(cacheDir, homeDir)
+	enabled, loginUser, sessionID, err := resolveGreeterAutoLoginState(cacheDir, homeDir)
 	if err != nil {
 		t.Fatalf("resolveGreeterAutoLoginState returned error: %v", err)
 	}
-	if enabled || loginUser != "" || sessionExec != "" {
-		t.Fatalf("expected disabled with empty user/exec, got enabled=%v user=%q exec=%q", enabled, loginUser, sessionExec)
+	if enabled || loginUser != "" || sessionID != "" {
+		t.Fatalf("expected disabled with empty user/session, got enabled=%v user=%q session=%q", enabled, loginUser, sessionID)
+	}
+}
+
+func TestResolveSessionExecInDirs(t *testing.T) {
+	t.Parallel()
+
+	oldDir := filepath.Join(t.TempDir(), "wayland-sessions")
+	newDir := filepath.Join(t.TempDir(), "wayland-sessions")
+	writeTestFile(t, filepath.Join(oldDir, "example.desktop"), `[Desktop Entry]
+Name=Example Session
+Exec=/nix/store/old-session/bin/start-example-session
+`)
+	writeTestFile(t, filepath.Join(newDir, "example.desktop"), `[Desktop Entry]
+Name=Example Session
+Exec=/run/current-system/sw/bin/start-example-session
+`)
+
+	got, err := resolveSessionExecInDirs("example.desktop", []string{newDir, oldDir})
+	if err != nil {
+		t.Fatalf("resolveSessionExecInDirs returned error: %v", err)
+	}
+	if got != "/run/current-system/sw/bin/start-example-session" {
+		t.Fatalf("resolveSessionExecInDirs = %q", got)
 	}
 }
 

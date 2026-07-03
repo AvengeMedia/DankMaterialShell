@@ -361,7 +361,7 @@ DankModal {
 
                     Column {
                         Layout.fillWidth: true
-                        spacing: 2
+                        spacing: Theme.spacingXXS
 
                         StyledText {
                             text: I18n.tr("New Session")
@@ -414,7 +414,7 @@ DankModal {
                                 width: parent.width
                                 height: 64
                                 radius: Theme.cornerRadius
-                                color: muxModal.selectedIndex === index ? Theme.primaryContainer : (sessionMouse.containsMouse ? Theme.surfaceContainerHigh : "transparent")
+                                color: muxModal.selectedIndex === index ? Theme.primaryContainer : (sessionMouse.containsMouse ? Theme.surfaceContainerHigh : Theme.withAlpha(Theme.surfaceContainerHigh, 0))
 
                                 MouseArea {
                                     id: sessionMouse
@@ -449,7 +449,7 @@ DankModal {
                                     // Info
                                     Column {
                                         Layout.fillWidth: true
-                                        spacing: 2
+                                        spacing: Theme.spacingXXS
 
                                         StyledText {
                                             text: modelData.name
@@ -478,7 +478,7 @@ DankModal {
                                         Layout.preferredHeight: 36
                                         radius: 18
                                         visible: MuxService.supportsRename
-                                        color: renameMouse.containsMouse ? Theme.surfaceContainerHighest : "transparent"
+                                        color: renameMouse.containsMouse ? Theme.surfaceContainerHighest : Theme.withAlpha(Theme.surfaceContainerHighest, 0)
 
                                         DankIcon {
                                             anchors.centerIn: parent
@@ -501,7 +501,7 @@ DankModal {
                                         Layout.preferredWidth: 36
                                         Layout.preferredHeight: 36
                                         radius: 18
-                                        color: deleteMouse.containsMouse ? Theme.errorContainer : "transparent"
+                                        color: deleteMouse.containsMouse ? Theme.errorContainer : Theme.withAlpha(Theme.errorContainer, 0)
 
                                         DankIcon {
                                             anchors.centerIn: parent
@@ -601,7 +601,7 @@ DankModal {
 
                     delegate: Row {
                         required property var modelData
-                        spacing: 4
+                        spacing: Theme.spacingXS
 
                         Rectangle {
                             width: keyText.width + Theme.spacingS

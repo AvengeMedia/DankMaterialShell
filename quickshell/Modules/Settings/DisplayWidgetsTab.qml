@@ -137,7 +137,7 @@ Item {
                 height: screensInfoSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.surfaceContainerHigh
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                border.color: Theme.outlineHeavy
                 border.width: 0
 
                 Column {
@@ -250,7 +250,7 @@ Item {
                                 height: screenRow.implicitHeight + Theme.spacingS * 2
                                 radius: Theme.cornerRadius
                                 color: Theme.surfaceContainerHigh
-                                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.3)
+                                border.color: Theme.outlineHeavy
                                 border.width: 0
 
                                 Row {
@@ -331,7 +331,7 @@ Item {
                         height: componentSection.implicitHeight + Theme.spacingL * 2
                         radius: Theme.cornerRadius
                         color: Theme.surfaceContainerHigh
-                        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                        border.color: Theme.outlineHeavy
                         border.width: 0
 
                         Column {

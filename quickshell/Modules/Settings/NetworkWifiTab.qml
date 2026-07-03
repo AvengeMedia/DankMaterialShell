@@ -259,7 +259,7 @@ Item {
                     Rectangle {
                         width: parent.width
                         height: 1
-                        color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+                        color: Theme.outlineStrong
                         visible: NetworkService.wifiEnabled
                     }
 
@@ -430,7 +430,7 @@ Item {
 
                         Column {
                             width: parent.width
-                            spacing: 4
+                            spacing: Theme.spacingXS
                             visible: (NetworkService.wifiNetworks?.length ?? 0) > 0
 
                             Repeater {
@@ -465,6 +465,7 @@ Item {
                                     required property int index
 
                                     readonly property bool isConnected: modelData.ssid === NetworkService.currentWifiSSID
+                                    readonly property bool isConnecting: NetworkService.isWifiConnecting && NetworkService.connectingSSID === modelData.ssid
                                     readonly property bool isPinned: root.getPinnedWifiNetworks().includes(modelData.ssid)
                                     readonly property bool isExpanded: root.expandedWifiSsid === modelData.ssid
 
@@ -499,7 +500,17 @@ Item {
                                                 anchors.rightMargin: Theme.spacingS
                                                 spacing: Theme.spacingS
 
+                                                DankSpinner {
+                                                    size: 20
+                                                    strokeWidth: 2
+                                                    color: Theme.warning
+                                                    running: isConnecting
+                                                    visible: isConnecting
+                                                    anchors.verticalCenter: parent.verticalCenter
+                                                }
+
                                                 DankIcon {
+                                                    visible: !isConnecting
                                                     name: {
                                                         const s = modelData.signal || 0;
                                                         if (s >= 50)
@@ -515,7 +526,7 @@ Item {
 
                                                 Column {
                                                     anchors.verticalCenter: parent.verticalCenter
-                                                    spacing: 2
+                                                    spacing: Theme.spacingXXS
                                                     width: parent.width - 20 - Theme.spacingS
 
                                                     Row {
@@ -552,9 +563,9 @@ Item {
                                                         spacing: Theme.spacingXS
 
                                                         StyledText {
-                                                            text: isConnected ? I18n.tr("Connected") : (modelData.secured ? I18n.tr("Secured") : I18n.tr("Open"))
+                                                            text: isConnecting ? I18n.tr("Connecting...") : (isConnected ? I18n.tr("Connected") : (modelData.secured ? I18n.tr("Secured") : I18n.tr("Open")))
                                                             font.pixelSize: Theme.fontSizeSmall
-                                                            color: isConnected ? Theme.primary : Theme.surfaceVariantText
+                                                            color: isConnecting ? Theme.warning : (isConnected ? Theme.primary : Theme.surfaceVariantText)
                                                         }
 
                                                         StyledText {
@@ -611,7 +622,7 @@ Item {
                                                     width: 28
                                                     height: 28
                                                     radius: 14
-                                                    color: wifiExpandBtn.containsMouse ? Theme.surfacePressed : "transparent"
+                                                    color: wifiExpandBtn.containsMouse ? Theme.surfacePressed : Theme.withAlpha(Theme.surfacePressed, 0)
                                                     visible: isConnected || modelData.saved
 
                                                     DankIcon {
@@ -672,7 +683,8 @@ Item {
                                                 anchors.fill: parent
                                                 anchors.rightMargin: wifiNetworkActions.width + Theme.spacingM
                                                 hoverEnabled: true
-                                                cursorShape: Qt.PointingHandCursor
+                                                enabled: !NetworkService.isWifiConnecting || isConnected
+                                                cursorShape: enabled ? Qt.PointingHandCursor : Qt.BusyCursor
                                                 onClicked: {
                                                     WifiConnectionActions.connectToNetwork(modelData, {
                                                         connected: isConnected,
@@ -847,7 +859,7 @@ Item {
 
                 Column {
                     width: parent.width
-                    spacing: 4
+                    spacing: Theme.spacingXS
 
                     Repeater {
                         model: savedWifiCard.expanded ? savedWifiCard.savedNetworks : []
@@ -859,6 +871,7 @@ Item {
                             required property int index
 
                             readonly property bool isConnected: modelData.ssid === NetworkService.currentWifiSSID
+                            readonly property bool isConnecting: NetworkService.isWifiConnecting && NetworkService.connectingSSID === modelData.ssid
                             readonly property bool isPinned: root.getPinnedWifiNetworks().includes(modelData.ssid)
                             readonly property bool isOutOfRange: modelData.outOfRange || false
                             readonly property bool isExpanded: !isOutOfRange && root.expandedSavedWifiSsid === modelData.ssid
@@ -894,7 +907,17 @@ Item {
                                         anchors.rightMargin: Theme.spacingS
                                         spacing: Theme.spacingS
 
+                                        DankSpinner {
+                                            size: 20
+                                            strokeWidth: 2
+                                            color: Theme.warning
+                                            running: isConnecting
+                                            visible: isConnecting
+                                            anchors.verticalCenter: parent.verticalCenter
+                                        }
+
                                         DankIcon {
+                                            visible: !isConnecting
                                             name: {
                                                 if (isOutOfRange)
                                                     return "wifi_off";
@@ -912,7 +935,7 @@ Item {
 
                                         Column {
                                             anchors.verticalCenter: parent.verticalCenter
-                                            spacing: 2
+                                            spacing: Theme.spacingXXS
                                             width: parent.width - 20 - Theme.spacingS
 
                                             Row {
@@ -941,6 +964,8 @@ Item {
 
                                             StyledText {
                                                 text: {
+                                                    if (isConnecting)
+                                                        return I18n.tr("Connecting...");
                                                     const parts = [isConnected ? I18n.tr("Connected") : (modelData.secured ? I18n.tr("Secured") : I18n.tr("Open"))];
                                                     parts.push(isOutOfRange ? I18n.tr("Unavailable") : (modelData.signal || 0) + "%");
                                                     if (modelData.hidden || false)
@@ -948,7 +973,7 @@ Item {
                                                     return parts.join(" • ");
                                                 }
                                                 font.pixelSize: Theme.fontSizeSmall
-                                                color: isConnected ? Theme.primary : Theme.surfaceVariantText
+                                                color: isConnecting ? Theme.warning : (isConnected ? Theme.primary : Theme.surfaceVariantText)
                                                 width: parent.width
                                                 elide: Text.ElideRight
                                             }
@@ -966,7 +991,7 @@ Item {
                                             width: 28
                                             height: 28
                                             radius: 14
-                                            color: savedWifiExpandBtn.containsMouse ? Theme.surfacePressed : "transparent"
+                                            color: savedWifiExpandBtn.containsMouse ? Theme.surfacePressed : Theme.withAlpha(Theme.surfacePressed, 0)
                                             visible: !isOutOfRange
 
                                             DankIcon {
@@ -1028,7 +1053,8 @@ Item {
                                         anchors.fill: parent
                                         anchors.rightMargin: savedWifiActions.width + Theme.spacingM
                                         hoverEnabled: true
-                                        cursorShape: isOutOfRange ? Qt.ArrowCursor : Qt.PointingHandCursor
+                                        enabled: !NetworkService.isWifiConnecting || isConnected
+                                        cursorShape: isOutOfRange ? Qt.ArrowCursor : (enabled ? Qt.PointingHandCursor : Qt.BusyCursor)
                                         onClicked: {
                                             if (isOutOfRange)
                                                 return;
@@ -1162,20 +1188,21 @@ Item {
                                 }
 
                                 MenuItem {
-                                    text: isConnected ? I18n.tr("Disconnect") : I18n.tr("Connect")
+                                    text: isConnecting ? I18n.tr("Connecting...") : (isConnected ? I18n.tr("Disconnect") : I18n.tr("Connect"))
                                     height: isOutOfRange ? 0 : 32
                                     visible: !isOutOfRange
+                                    enabled: !isConnecting
 
                                     contentItem: StyledText {
                                         text: parent.text
                                         font.pixelSize: Theme.fontSizeSmall
-                                        color: Theme.surfaceText
+                                        color: parent.enabled ? Theme.surfaceText : Theme.surfaceVariantText
                                         leftPadding: Theme.spacingS
                                         verticalAlignment: Text.AlignVCenter
                                     }
 
                                     background: Rectangle {
-                                        color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                                        color: parent.hovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
                                         radius: Theme.cornerRadius / 2
                                     }
 
@@ -1201,7 +1228,7 @@ Item {
                                     }
 
                                     background: Rectangle {
-                                        color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                                        color: parent.hovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
                                         radius: Theme.cornerRadius / 2
                                     }
 
@@ -1223,7 +1250,7 @@ Item {
                                     }
 
                                     background: Rectangle {
-                                        color: parent.hovered ? Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.08) : "transparent"
+                                        color: parent.hovered ? Theme.errorHover : Theme.withAlpha(Theme.errorHover, 0)
                                         radius: Theme.cornerRadius / 2
                                     }
 

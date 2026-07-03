@@ -77,7 +77,7 @@ Rectangle {
             height: Theme.iconSize + Theme.spacingS * 2
             anchors.verticalCenter: parent.verticalCenter
             radius: (Theme.iconSize + Theme.spacingS * 2) / 2
-            color: iconArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+            color: iconArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
 
             DankRipple {
                 id: muteRipple
@@ -282,13 +282,13 @@ Rectangle {
                         radius: height / 2
                         color: {
                             const isThisDevicePinned = audioContent.getPinnedOutputs().includes(modelData.name);
-                            return isThisDevicePinned ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.withAlpha(Theme.surfaceText, 0.05);
+                            return isThisDevicePinned ? Theme.primaryHover : Theme.withAlpha(Theme.surfaceText, 0.05);
                         }
 
                         Row {
                             id: pinOutputRow
                             anchors.centerIn: parent
-                            spacing: 4
+                            spacing: Theme.spacingXS
 
                             DankIcon {
                                 name: "push_pin"
@@ -463,7 +463,7 @@ Rectangle {
                                 height: Theme.iconSize + Theme.spacingS * 2
                                 anchors.verticalCenter: parent.verticalCenter
                                 radius: Theme.cornerRadius
-                                color: appIconArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.withAlpha(Theme.primary, 0)
+                                color: appIconArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primary, 0)
 
                                 DankRipple {
                                     id: appMuteRipple
