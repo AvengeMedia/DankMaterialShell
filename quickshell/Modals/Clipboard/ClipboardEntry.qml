@@ -49,6 +49,15 @@ Rectangle {
         cornerRadius: root.radius
     }
 
+    MouseArea {
+        anchors.fill: parent
+        acceptedButtons: Qt.RightButton
+        onClicked: mouse => {
+            const scenePos = mapToItem(null, mouse.x, mouse.y);
+            contextMenuRequested(scenePos.x, scenePos.y);
+        }
+    }
+
     Rectangle {
         id: indexBadge
         anchors.left: parent.left
@@ -232,15 +241,6 @@ Rectangle {
             } else {
                 copyRequested();
             }
-        }
-    }
-
-    MouseArea {
-        anchors.fill: parent
-        acceptedButtons: Qt.RightButton
-        onClicked: mouse => {
-            const scenePos = mapToItem(null, mouse.x, mouse.y);
-            contextMenuRequested(scenePos.x, scenePos.y);
         }
     }
 }
