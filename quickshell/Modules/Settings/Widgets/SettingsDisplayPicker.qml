@@ -80,7 +80,7 @@ Item {
 
                     width: parent.width
                     text: SettingsData.getScreenDisplayName(modelData)
-                    description: modelData.width + "×" + modelData.height
+                    description: modelData.width + "×" + modelData.height + " • " + (SettingsData.displayNameMode === "system" ? (modelData.model || I18n.tr("Unknown Model")) : modelData.name)
                     checked: localChecked
                     onToggled: isChecked => {
                         var prefs = JSON.parse(JSON.stringify(root.displayPreferences));

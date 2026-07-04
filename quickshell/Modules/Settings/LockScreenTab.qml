@@ -398,64 +398,33 @@ Item {
                 iconName: "monitor"
                 title: I18n.tr("Lock Screen Display")
                 settingKey: "lockDisplay"
-                visible: Quickshell.screens.length > 1
 
                 StyledText {
-                    text: I18n.tr("Choose which monitor shows the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.")
+                    text: I18n.tr("Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceVariantText
                     width: parent.width
                     wrapMode: Text.Wrap
                 }
 
-                SettingsDropdownRow {
-                    id: lockScreenMonitorDropdown
-                    settingKey: "lockScreenActiveMonitor"
-                    tags: ["lock", "screen", "monitor", "display", "active"]
-                    text: I18n.tr("Active Lock Screen Monitor")
-                    options: {
-                        var opts = [I18n.tr("All Monitors")];
-                        var screens = Quickshell.screens;
-                        for (var i = 0; i < screens.length; i++) {
-                            opts.push(SettingsData.getScreenDisplayName(screens[i]));
-                        }
-                        return opts;
-                    }
-
-                    Component.onCompleted: {
-                        if (SettingsData.lockScreenActiveMonitor === "all") {
-                            currentValue = I18n.tr("All Monitors");
-                            return;
-                        }
-                        var screens = Quickshell.screens;
-                        for (var i = 0; i < screens.length; i++) {
-                            if (screens[i].name === SettingsData.lockScreenActiveMonitor) {
-                                currentValue = SettingsData.getScreenDisplayName(screens[i]);
-                                return;
-                            }
-                        }
-                        currentValue = I18n.tr("All Monitors");
-                    }
-
-                    onValueChanged: value => {
-                        if (value === I18n.tr("All Monitors")) {
-                            SettingsData.set("lockScreenActiveMonitor", "all");
-                            return;
-                        }
-                        var screens = Quickshell.screens;
-                        for (var i = 0; i < screens.length; i++) {
-                            if (SettingsData.getScreenDisplayName(screens[i]) === value) {
-                                SettingsData.set("lockScreenActiveMonitor", screens[i].name);
-                                return;
-                            }
-                        }
+                SettingsDisplayPicker {
+                    width: parent.width
+                    displayPreferences: SettingsData.screenPreferences?.lockScreen || ["all"]
+                    onPreferencesChanged: prefs => {
+                        var p = SettingsData.screenPreferences || {};
+                        var updated = Object.assign({}, p);
+                        updated["lockScreen"] = prefs;
+                        SettingsData.set("screenPreferences", updated);
                     }
                 }
 
                 Row {
                     width: parent.width
                     spacing: Theme.spacingM
-                    visible: SettingsData.lockScreenActiveMonitor !== "all"
+                    visible: {
+                        var prefs = SettingsData.screenPreferences?.lockScreen;
+                        return Array.isArray(prefs) && !prefs.includes("all") && prefs.length > 0;
+                    }
 
                     Column {
                         width: parent.width - inactiveColorPreview.width - Theme.spacingM

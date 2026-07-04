@@ -196,9 +196,7 @@ Scope {
             property bool isActiveScreen: {
                 if (Quickshell.screens.length <= 1)
                     return true;
-                if (SettingsData.lockScreenActiveMonitor === "all")
-                    return true;
-                return currentScreenName === SettingsData.lockScreenActiveMonitor;
+                return SettingsData.getFilteredScreens("lockScreen").includes(screen);
             }
 
             color: isActiveScreen ? "transparent" : SettingsData.lockScreenInactiveColor

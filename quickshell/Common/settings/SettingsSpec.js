@@ -451,7 +451,6 @@ var SPEC = {
     maxFprintTries: { def: 15 },
     enableU2f: { def: false, onChange: "scheduleAuthApply" },
     u2fMode: { def: "or" },
-    lockScreenActiveMonitor: { def: "all" },
     lockScreenInactiveColor: { def: "#000000" },
     lockScreenNotificationMode: { def: 0 },
     lockScreenVideoEnabled: { def: false },
