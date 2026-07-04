@@ -252,6 +252,17 @@ function migrateToVersion(obj, targetVersion) {
         settings.configVersion = 11;
     }
 
+    if (currentVersion < 12) {
+        console.info("Migrating settings from version", currentVersion, "to version 12");
+        if (settings.batteryNotificationType !== undefined) {
+            settings.batteryChargeLimitNotificationType = settings.batteryNotificationType;
+            settings.batteryLowNotificationType = settings.batteryNotificationType;
+            settings.batteryCriticalNotificationType = settings.batteryNotificationType;
+            delete settings.batteryNotificationType;
+        }
+        settings.configVersion = 12;
+    }
+
     return settings;
 }
 

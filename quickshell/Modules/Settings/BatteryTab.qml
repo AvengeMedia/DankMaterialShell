@@ -52,8 +52,11 @@ done
                 settingKey: "batteryStatusCard"
 
                 Column {
-                    width: parent.width
+                    width: parent.width - Theme.spacingM * 2
+                    x: Theme.spacingM
                     spacing: Theme.spacingM
+
+                    SettingsDivider {}
 
                     Row {
                         width: parent.width
@@ -72,12 +75,7 @@ done
                         }
                     }
 
-                    Rectangle {
-                        width: parent.width
-                        height: 1
-                        color: Theme.outline
-                        opacity: 0.1
-                    }
+                    SettingsDivider {}
 
                     Row {
                         width: parent.width
@@ -96,12 +94,7 @@ done
                         }
                     }
 
-                    Rectangle {
-                        width: parent.width
-                        height: 1
-                        color: Theme.outline
-                        opacity: 0.1
-                    }
+                    SettingsDivider {}
 
                     Row {
                         width: parent.width
@@ -120,12 +113,7 @@ done
                         }
                     }
 
-                    Rectangle {
-                        width: parent.width
-                        height: 1
-                        color: Theme.outline
-                        opacity: 0.1
-                    }
+                    SettingsDivider {}
 
                     Row {
                         width: parent.width
@@ -144,12 +132,7 @@ done
                         }
                     }
 
-                    Rectangle {
-                        width: parent.width
-                        height: 1
-                        color: Theme.outline
-                        opacity: 0.1
-                    }
+                    SettingsDivider {}
 
                     Row {
                         width: parent.width
@@ -174,7 +157,7 @@ done
             SettingsCard {
                 width: parent.width
                 iconName: "tune"
-                title: I18n.tr("Battery Protection & Charging")
+                title: I18n.tr("Battery Protection")
                 settingKey: "batteryProtection"
 
                 SettingsSliderRow {
@@ -191,7 +174,12 @@ done
                 Row {
                     width: parent.width
                     height: applyButton.height
-                    layoutDirection: Qt.RightToLeft
+                    layoutDirection: I18n.isRtl ? Qt.LeftToRight : Qt.RightToLeft
+
+                    Item {
+                        width: Theme.spacingM
+                        height: 1
+                    }
 
                     DankButton {
                         id: applyButton
@@ -213,12 +201,27 @@ done
                     onToggled: checked => SettingsData.set("batteryNotifyChargeLimit", checked)
                 }
 
-                Rectangle {
-                    width: parent.width
-                    height: 1
-                    color: Theme.outline
-                    opacity: 0.15
+                SettingsButtonGroupRow {
+                    settingKey: "batteryChargeLimitNotificationType"
+                    text: I18n.tr("Notification Type")
+                    description: I18n.tr("Choose how to be notified when charge limit is reached.")
+                    model: [I18n.tr("Toast"), I18n.tr("Notification")]
+                    visible: SettingsData.batteryNotifyChargeLimit
+                    currentIndex: SettingsData.batteryChargeLimitNotificationType
+                    onSelectionChanged: (index, selected) => {
+                        if (selected) {
+                            SettingsData.set("batteryChargeLimitNotificationType", index);
+                        }
+                    }
                 }
+            }
+
+            // 3. Battery Alerts Card
+            SettingsCard {
+                width: parent.width
+                iconName: "notifications"
+                title: I18n.tr("Battery Alerts")
+                settingKey: "batteryAlerts"
 
                 SettingsSliderRow {
                     settingKey: "batteryLowThreshold"
@@ -240,39 +243,29 @@ done
                 }
 
                 SettingsButtonGroupRow {
-                    settingKey: "batteryNotificationType"
+                    settingKey: "batteryLowNotificationType"
                     text: I18n.tr("Notification Type")
-                    description: I18n.tr("Choose how to be notified about battery alerts.")
+                    description: I18n.tr("Choose how to be notified about low battery alerts.")
                     model: [I18n.tr("Toast"), I18n.tr("Notification")]
-                    currentIndex: SettingsData.batteryNotificationType
+                    visible: SettingsData.batteryNotifyLow
+                    currentIndex: SettingsData.batteryLowNotificationType
                     onSelectionChanged: (index, selected) => {
                         if (selected) {
-                            SettingsData.set("batteryNotificationType", index);
+                            SettingsData.set("batteryLowNotificationType", index);
                         }
                     }
                 }
 
-                SettingsToggleRow {
-                    settingKey: "batteryAutoPowerSaver"
-                    text: I18n.tr("Auto Power Saver")
-                    description: I18n.tr("Automatically turn on Power Saver profile when battery is low.")
-                    checked: SettingsData.batteryAutoPowerSaver
-                    onToggled: checked => SettingsData.set("batteryAutoPowerSaver", checked)
-                }
-
-                Rectangle {
-                    width: parent.width
-                    height: 1
-                    color: Theme.outline
-                    opacity: 0.15
-                }
+                SettingsDivider {}
 
                 StyledText {
                     text: I18n.tr("Critical Battery Alert")
                     font.pixelSize: Theme.fontSizeMedium
                     font.weight: Font.DemiBold
                     color: Theme.surfaceText
-                    topPadding: Theme.spacingM
+                    x: Theme.spacingM
+                    width: parent.width - Theme.spacingM * 2
+                    topPadding: Theme.spacingS
                 }
 
                 SettingsSliderRow {
@@ -293,14 +286,38 @@ done
                     checked: SettingsData.batteryNotifyCritical
                     onToggled: checked => SettingsData.set("batteryNotifyCritical", checked)
                 }
+
+                SettingsButtonGroupRow {
+                    settingKey: "batteryCriticalNotificationType"
+                    text: I18n.tr("Notification Type")
+                    description: I18n.tr("Choose how to be notified about critical battery alerts.")
+                    model: [I18n.tr("Toast"), I18n.tr("Notification")]
+                    visible: SettingsData.batteryNotifyCritical
+                    currentIndex: SettingsData.batteryCriticalNotificationType
+                    onSelectionChanged: (index, selected) => {
+                        if (selected) {
+                            SettingsData.set("batteryCriticalNotificationType", index);
+                        }
+                    }
+                }
             }
 
-            // 3. Power Profiles Card
+            // 4. Power Profiles & Saving Card
             SettingsCard {
                 width: parent.width
                 iconName: "power"
-                title: I18n.tr("Power Profiles Auto-Switching")
-                settingKey: "powerProfilesAuto"
+                title: I18n.tr("Power Profiles & Saving")
+                settingKey: "powerProfilesSaving"
+
+                SettingsToggleRow {
+                    settingKey: "batteryAutoPowerSaver"
+                    text: I18n.tr("Auto Power Saver")
+                    description: I18n.tr("Automatically turn on Power Saver profile when battery is low.")
+                    checked: SettingsData.batteryAutoPowerSaver
+                    onToggled: checked => SettingsData.set("batteryAutoPowerSaver", checked)
+                }
+
+                SettingsDivider {}
 
                 SettingsDropdownRow {
                     settingKey: "acProfileName"
