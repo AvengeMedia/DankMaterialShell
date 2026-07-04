@@ -282,6 +282,7 @@ BasePill {
                 Row {
                     id: mediaInfo
                     spacing: Theme.spacingXS
+                    anchors.verticalCenter: parent.verticalCenter
 
                     Item {
                         width: 20
