@@ -65,6 +65,7 @@ done
                             font.pixelSize: Theme.fontSizeMedium
                             color: Theme.surfaceVariantText
                             width: parent.width / 2
+                            horizontalAlignment: Text.AlignLeft
                         }
                         StyledText {
                             text: BatteryService.isPluggedIn ? I18n.tr("AC Adapter (Plugged In)") : I18n.tr("Battery Power")
@@ -72,6 +73,7 @@ done
                             font.weight: Font.Medium
                             color: Theme.surfaceText
                             width: parent.width / 2
+                            horizontalAlignment: Text.AlignLeft
                         }
                     }
 
@@ -84,6 +86,7 @@ done
                             font.pixelSize: Theme.fontSizeMedium
                             color: Theme.surfaceVariantText
                             width: parent.width / 2
+                            horizontalAlignment: Text.AlignLeft
                         }
                         StyledText {
                             text: `${BatteryService.batteryLevel}%`
@@ -91,6 +94,7 @@ done
                             font.weight: Font.Medium
                             color: Theme.surfaceText
                             width: parent.width / 2
+                            horizontalAlignment: Text.AlignLeft
                         }
                     }
 
@@ -103,6 +107,7 @@ done
                             font.pixelSize: Theme.fontSizeMedium
                             color: Theme.surfaceVariantText
                             width: parent.width / 2
+                            horizontalAlignment: Text.AlignLeft
                         }
                         StyledText {
                             text: BatteryService.batteryStatus
@@ -110,6 +115,7 @@ done
                             font.weight: Font.Medium
                             color: Theme.surfaceText
                             width: parent.width / 2
+                            horizontalAlignment: Text.AlignLeft
                         }
                     }
 
@@ -122,6 +128,7 @@ done
                             font.pixelSize: Theme.fontSizeMedium
                             color: Theme.surfaceVariantText
                             width: parent.width / 2
+                            horizontalAlignment: Text.AlignLeft
                         }
                         StyledText {
                             text: BatteryService.formatTimeRemaining()
@@ -129,6 +136,7 @@ done
                             font.weight: Font.Medium
                             color: Theme.surfaceText
                             width: parent.width / 2
+                            horizontalAlignment: Text.AlignLeft
                         }
                     }
 
@@ -141,6 +149,7 @@ done
                             font.pixelSize: Theme.fontSizeMedium
                             color: Theme.surfaceVariantText
                             width: parent.width / 2
+                            horizontalAlignment: Text.AlignLeft
                         }
                         StyledText {
                             text: BatteryService.batteryHealth
@@ -148,6 +157,7 @@ done
                             font.weight: Font.Medium
                             color: Theme.surfaceText
                             width: parent.width / 2
+                            horizontalAlignment: Text.AlignLeft
                         }
                     }
                 }
