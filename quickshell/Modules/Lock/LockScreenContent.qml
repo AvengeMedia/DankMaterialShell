@@ -358,7 +358,7 @@ Item {
                 property bool hasSeconds: timeParts.length > 2
 
                 ClockDigitText {
-                    width: 75
+                    width: clockText.hours.length > 1 ? 75 : 0
                     text: clockText.hours.length > 1 ? clockText.hours[0] : ""
                 }
 
