@@ -203,7 +203,9 @@ FocusScope {
             visible: active
             focus: active
 
-            sourceComponent: GammaControlTab {}
+            sourceComponent: GammaControlTab {
+                parentModal: root.parentModal
+            }
 
             onActiveChanged: {
                 if (active && item)

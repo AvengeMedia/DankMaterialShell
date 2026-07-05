@@ -3,9 +3,11 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
+import Quickshell.Wayland
 import Quickshell.Io
 import qs.Common
 import qs.Services
+import qs.Modules.WorkspaceOverlays
 
 Singleton {
     id: root
@@ -105,6 +107,11 @@ Singleton {
     property bool nightModeActive: nightModeEnabled
 
     property bool nightModeEnabled: false
+    property bool nightModePaused: false
+    property var nightModeExcludedAppsMatchesCache: []
+
+    property var hyprlandOverviewLoader: null
+
     property bool automationAvailable: false
     property bool gammaControlAvailable: false
     property int resumeRecoveryAttempt: 0
@@ -1070,6 +1077,62 @@ Singleton {
         }
     }
 
+    function pauseNightMode() {
+        disableNightMode();
+        nightModePaused = true;
+        SessionData.setNightModePaused(true);
+    }
+    function resumeNightMode() {
+        enableNightMode();
+        nightModePaused = false;
+        SessionData.setNightModePaused(false);
+    }
+
+    function isNightModeExcludedApp(appId: string): bool {
+        const excludedApps = SettingsData.nightModeExcludedApps || "";
+        if (excludedApps.length === 0) {
+            return false;
+        }
+
+        const exclusionCache = nightModeExcludedAppsMatchesCache;
+        if (exclusionCache.includes(appId)) {
+            return true;
+        }
+
+        const moddedId = Paths.moddedAppId(appId);
+        const desktopId = DesktopEntries.heuristicLookup(moddedId)?.id ?? "";
+        const isExcludedAppException = excludedApps.some(excludedId => Paths.isAppIdMatch(appId, excludedId, desktopId));
+        if (isExcludedAppException) {
+            SessionData.cacheNightModeExcludedAppMatch(appId);
+        }
+        return isExcludedAppException;
+    }
+
+    function handleNightModeExceptions(topLevel) {
+        if (!nightModePaused && !nightModeEnabled) {
+            return;
+        }
+
+        if (nightModePaused) {
+            const isInOverview = (CompositorService.isHyprland && root.hyprlandOverviewLoader?.item?.overviewOpen) || (CompositorService.isNiri && NiriService.inOverview) || (CompositorService.isMango && MangoService.inOverview);
+            if (isInOverview) {
+                resumeNightMode();
+                return;
+            }
+        }
+
+        const activeApp = ToplevelManager.activeToplevel;
+        if (activeApp) {
+            const isFullscreenExcluded = SettingsData.nightModeExcludeFullscreen || false;
+            const shouldPause = (isFullscreenExcluded && activeApp.fullscreen) || isNightModeExcludedApp(activeApp.appId);
+            if (shouldPause && !nightModePaused && nightModeEnabled) {
+                pauseNightMode();
+            } else if (!shouldPause && nightModePaused) {
+                resumeNightMode();
+            }
+        }
+    }
+
     function applyNightModeDirectly() {
         const temperature = SessionData.nightModeTemperature || 4000;
 
@@ -1364,6 +1427,7 @@ Singleton {
 
     Component.onCompleted: {
         nightModeEnabled = SessionData.nightModeEnabled;
+        nightModePaused = SessionData.nightModePaused;
         deviceBrightnessUserSet = Object.assign({}, SessionData.brightnessUserSetValues);
         if (DMSService.isConnected) {
             checkGammaControlAvailability();
@@ -1442,7 +1506,6 @@ Singleton {
         }
     }
 
-    // Session Data Connections
     Connections {
         target: SessionData
 
@@ -1483,6 +1546,20 @@ Singleton {
         }
         function onNightModeUseIPLocationChanged() {
             evaluateNightMode();
+        }
+        function onNightModePausedChanged() {
+            nightModePaused = SessionData.nightModePaused;
+        }
+        function onNightModeExcludedAppsMatchesCacheChanged() {
+            nightModeExcludedAppsMatchesCache = SessionData.nightModeExcludedAppsMatchesCache;
+        }
+    }
+
+    Connections {
+        target: CompositorService
+
+        function onToplevelsChanged() {
+            root.handleNightModeExceptions();
         }
     }
 
