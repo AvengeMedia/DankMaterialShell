@@ -368,7 +368,7 @@ Item {
                                                 hoverEnabled: true
                                                 cursorShape: Qt.PointingHandCursor
                                                 onClicked: {
-                                                    deleteVpnConfirm.showWithOptions({
+                                                    root.deleteVpnConfirm.showWithOptions({
                                                         title: I18n.tr("Delete VPN"),
                                                         message: I18n.tr("Delete \"%1\"?").arg(modelData.name),
                                                         confirmText: I18n.tr("Delete"),
