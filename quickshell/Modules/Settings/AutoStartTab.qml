@@ -353,18 +353,39 @@ Item {
         desktopApps = [];
     }
 
-    DankFlickable {
-        anchors.fill: parent
-        clip: true
-        contentHeight: mainColumn.height + Theme.spacingXL
-        contentWidth: width
-
-        AppBrowserPopup {
+    Loader {
+        id: popupLoader
+        active: false
+        sourceComponent: AppBrowserPopup {
             id: appBrowserPopup
             appsModel: root.desktopApps
             parentModal: root.parentModal
             onAppSelected: appId => root.newEntryDesktopId = appId
         }
+
+        function recreatePopup() {
+            log.debug("Recreating popup");
+            popupLoader.active = false;
+            popupLoader.active = true;
+        }
+
+        function showPopup() {
+            if (!popupLoader.item) {
+                popupLoader.active = true;
+            }
+            popupLoader.item.show();
+            if (!popupLoader.item.visible) {
+                recreatePopup();
+                popupLoader.item.show();
+            }
+        }
+    }
+
+    DankFlickable {
+        anchors.fill: parent
+        clip: true
+        contentHeight: mainColumn.height + Theme.spacingXL
+        contentWidth: width
 
         Column {
             id: mainColumn
@@ -488,7 +509,7 @@ Item {
                             id: browseButton
                             text: I18n.tr("Browse")
                             iconName: "search"
-                            onClicked: appBrowserPopup.show()
+                            onClicked: popupLoader.showPopup()
                         }
                     }
 
