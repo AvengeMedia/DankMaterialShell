@@ -3222,10 +3222,6 @@ Singleton {
         saveSettings();
     }
 
-    function addMediaExcludePlayer(identity) {
-        if (identity === undefined || identity === null)
-            return;
-        var normalizedIdentity = identity.toString().trim().toLowerCase();
     function setNightModeExcludeFullscreen(enabled) {
         nightModeExcludeFullscreen = enabled;
         saveSettings();
@@ -3274,24 +3270,16 @@ Singleton {
         SessionData.resetNightModeExcludedAppsMatchesCache();
         saveSettings();
     }
-            return;
-        var list = mediaExcludePlayers ? mediaExcludePlayers.slice() : [];
-        var normalizedList = list.map(function (id) {
-            return id ? id.toString().trim().toLowerCase() : "";
-        });
-        if (normalizedList.indexOf(normalizedIdentity) >= 0)
-            return;
-        list.push(normalizedIdentity);
-        mediaExcludePlayers = list;
+
+    function addMediaExcludePlayer(identity) {
+        var newList = addAppIdToList(identity, mediaExcludePlayers);
+        mediaExcludePlayers = newList;
         saveSettings();
     }
 
     function removeMediaExcludePlayer(index) {
-        var list = mediaExcludePlayers ? mediaExcludePlayers.slice() : [];
-        if (index < 0 || index >= list.length)
-            return;
-        list.splice(index, 1);
-        mediaExcludePlayers = list;
+        var newList = removeAppIdFromList(index, mediaExcludePlayers);
+        mediaExcludePlayers = newList;
         saveSettings();
     }
 
