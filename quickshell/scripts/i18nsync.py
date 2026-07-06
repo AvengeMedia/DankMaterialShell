@@ -15,6 +15,7 @@ SYNC_STATE = REPO_ROOT / ".git" / "i18n_sync_state.json"
 
 LANGUAGES = {
     "ja": "ja.json",
+    "ko": "ko.json",
     "zh-Hans": "zh_CN.json",
     "zh-Hant": "zh_TW.json",
     "pt-br": "pt.json",
