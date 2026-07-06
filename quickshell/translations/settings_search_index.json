@@ -9421,17 +9421,6 @@
   },
   {
     "section": "_tab_42",
-    "label": "Cellular",
-    "tabIndex": 42,
-    "category": "Settings",
-    "keywords": [
-      "cellular",
-      "settings"
-    ],
-    "icon": "network_cell"
-  },
-  {
-    "section": "_tab_42",
     "label": "Power & Security",
     "tabIndex": 42,
     "category": "Settings",
@@ -9466,5 +9455,16 @@
       "widgets"
     ],
     "icon": "dashboard"
+  },
+  {
+    "section": "_tab_44",
+    "label": "Cellular",
+    "tabIndex": 44,
+    "category": "Settings",
+    "keywords": [
+      "cellular",
+      "settings"
+    ],
+    "icon": "network_cell"
   }
 ]
