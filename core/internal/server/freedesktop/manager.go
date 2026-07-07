@@ -137,22 +137,28 @@ func (m *Manager) consumeSelfEcho(value uint32) bool {
 }
 
 func (m *Manager) watchSettingsChanges() {
-	conn, err := dbus.ConnectSessionBus()
-	if err != nil {
-		log.Warnf("color-scheme watcher: session bus connect: %v", err)
+	// Reuse the shared session connection instead of opening a new one:
+	// a dedicated connection here was never stored on Manager, so Close()
+	// (which only closes m.systemConn/m.sessionConn) had no way to reach
+	// it, and the connection plus this goroutine leaked for the life of
+	// the process every time a Manager was created.
+	if m.sessionConn == nil {
 		return
 	}
+	conn := m.sessionConn
 
 	if err := conn.AddMatchSignal(
 		dbus.WithMatchInterface(dbusPortalSettingsInterface),
 		dbus.WithMatchMember("SettingChanged"),
 	); err != nil {
 		log.Warnf("Failed to watch portal settings changes: %v", err)
-		conn.Close()
 		return
 	}
 
 	signals := make(chan *dbus.Signal, 64)
+	m.stateMutex.Lock()
+	m.settingsSignals = signals
+	m.stateMutex.Unlock()
 	conn.Signal(signals)
 
 	for sig := range signals {
@@ -309,6 +315,18 @@ func (m *Manager) Close() {
 		m.systemConn.Close()
 	}
 	if m.sessionConn != nil {
+		m.sessionConn.RemoveMatchSignal(
+			dbus.WithMatchInterface(dbusPortalSettingsInterface),
+			dbus.WithMatchMember("SettingChanged"),
+		)
+		m.stateMutex.Lock()
+		signals := m.settingsSignals
+		m.settingsSignals = nil
+		m.stateMutex.Unlock()
+		if signals != nil {
+			m.sessionConn.RemoveSignal(signals)
+			close(signals)
+		}
 		m.sessionConn.Close()
 	}
 }

@@ -8,6 +8,7 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 	"strconv"
 	"strings"
 	"sync"
@@ -80,8 +81,6 @@ var trayRecoveryManager *trayrecovery.Manager
 var locationManager *location.Manager
 var sysUpdateManager *sysupdate.Manager
 var geoClientInstance geolocation.Client
-
-const dbusClientID = "dms-dbus-client"
 
 var capabilitySubscribers syncmap.Map[string, chan ServerInfo]
 var cupsSubscribers syncmap.Map[string, bool]
@@ -398,6 +397,11 @@ func InitializeSysUpdateManager() error {
 
 func handleConnection(conn net.Conn) {
 	defer conn.Close()
+	defer func() {
+		if r := recover(); r != nil {
+			log.Errorf("handleConnection panic recovered: panic=%v\n%s", r, debug.Stack())
+		}
+	}()
 
 	caps := getCapabilities()
 	capsData, _ := json.Marshal(caps)
@@ -415,8 +419,23 @@ func handleConnection(conn net.Conn) {
 			continue
 		}
 
-		go RouteRequest(conn, req)
+		go routeRequestRecovered(conn, req)
 	}
+}
+
+// routeRequestRecovered runs RouteRequest with a panic boundary so that a
+// bug in any one handler (bad type assertion, nil deref, out-of-range
+// index, etc. -- reachable from client-controlled req.Method/req.Params)
+// can't crash the whole daemon and disconnect every other client. It
+// reports back to the offending client as a normal error response instead.
+func routeRequestRecovered(conn net.Conn, req models.Request) {
+	defer func() {
+		if r := recover(); r != nil {
+			log.Errorf("RouteRequest panic recovered: method=%s panic=%v\n%s", req.Method, r, debug.Stack())
+			models.RespondError(conn, req.ID, "internal server error")
+		}
+	}()
+	RouteRequest(conn, req)
 }
 
 func getCapabilities() Capabilities {
@@ -1249,10 +1268,10 @@ func handleSubscribe(conn net.Conn, req models.Request) {
 
 	if shouldSubscribe("dbus") && dbusManager != nil {
 		wg.Add(1)
-		dbusChan := dbusManager.SubscribeSignals(dbusClientID)
+		dbusChan := dbusManager.SubscribeSignals(clientID)
 		go func() {
 			defer wg.Done()
-			defer dbusManager.UnsubscribeSignals(dbusClientID)
+			defer dbusManager.UnsubscribeSignals(clientID)
 
 			for {
 				select {

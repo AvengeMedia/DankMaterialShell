@@ -112,7 +112,7 @@ func (b *NetworkManagerBackend) startSignalPump() error {
 		return err
 	}
 
-	for _, info := range b.wifiDevices {
+	for _, info := range b.wifiDevicesSnapshot() {
 		if err := conn.AddMatchSignal(
 			dbus.WithMatchObjectPath(dbus.ObjectPath(info.device.GetPath())),
 			dbus.WithMatchInterface(dbusPropsInterface),
@@ -124,7 +124,7 @@ func (b *NetworkManagerBackend) startSignalPump() error {
 		}
 	}
 
-	for _, info := range b.ethernetDevices {
+	for _, info := range b.ethernetDevicesSnapshot() {
 		if err := conn.AddMatchSignal(
 			dbus.WithMatchObjectPath(dbus.ObjectPath(info.device.GetPath())),
 			dbus.WithMatchInterface(dbusPropsInterface),
@@ -227,7 +227,7 @@ func (b *NetworkManagerBackend) stopSignalPump() {
 		dbus.WithMatchMember("StateChanged"),
 	)
 
-	for _, info := range b.wifiDevices {
+	for _, info := range b.wifiDevicesSnapshot() {
 		b.dbusConn.RemoveMatchSignal(
 			dbus.WithMatchObjectPath(dbus.ObjectPath(info.device.GetPath())),
 			dbus.WithMatchInterface(dbusPropsInterface),
@@ -235,7 +235,7 @@ func (b *NetworkManagerBackend) stopSignalPump() {
 		)
 	}
 
-	for _, info := range b.ethernetDevices {
+	for _, info := range b.ethernetDevicesSnapshot() {
 		b.dbusConn.RemoveMatchSignal(
 			dbus.WithMatchObjectPath(dbus.ObjectPath(info.device.GetPath())),
 			dbus.WithMatchInterface(dbusPropsInterface),
@@ -550,12 +550,12 @@ func (b *NetworkManagerBackend) handleDeviceAdded(devicePath dbus.ObjectPath) {
 		}
 		hwAddr, _ := w.GetPropertyHwAddress()
 
-		b.ethernetDevices[iface] = &ethernetDeviceInfo{
+		b.setEthernetDeviceInfo(iface, &ethernetDeviceInfo{
 			device:    dev,
 			wired:     w,
 			name:      iface,
 			hwAddress: hwAddr,
-		}
+		})
 
 		if b.ethernetDevice == nil {
 			b.ethernetDevice = dev
@@ -573,12 +573,12 @@ func (b *NetworkManagerBackend) handleDeviceAdded(devicePath dbus.ObjectPath) {
 		}
 		hwAddr, _ := w.GetPropertyHwAddress()
 
-		b.wifiDevices[iface] = &wifiDeviceInfo{
+		b.setWifiDeviceInfo(iface, &wifiDeviceInfo{
 			device:    dev,
 			wireless:  w,
 			name:      iface,
 			hwAddress: hwAddr,
-		}
+		})
 
 		if b.wifiDevice == nil {
 			b.wifiDevice = dev
@@ -603,57 +603,49 @@ func (b *NetworkManagerBackend) handleDeviceRemoved(devicePath dbus.ObjectPath) 
 		)
 	}
 
-	for iface, info := range b.ethernetDevices {
-		if info.device.GetPath() == devicePath {
-			delete(b.ethernetDevices, iface)
-
-			if b.ethernetDevice != nil {
-				dev := b.ethernetDevice.(gonetworkmanager.Device)
-				if dev.GetPath() == devicePath {
-					b.ethernetDevice = nil
-					for _, remaining := range b.ethernetDevices {
-						b.ethernetDevice = remaining.device
-						break
-					}
+	if _, remaining, found := b.removeEthernetDeviceByPath(devicePath); found {
+		if b.ethernetDevice != nil {
+			dev := b.ethernetDevice.(gonetworkmanager.Device)
+			if dev.GetPath() == devicePath {
+				b.ethernetDevice = nil
+				for _, r := range remaining {
+					b.ethernetDevice = r.device
+					break
 				}
 			}
-
-			b.updateAllEthernetDevices()
-			b.updateEthernetState()
-			b.listEthernetConnections()
-			b.updatePrimaryConnection()
-
-			if b.onStateChange != nil {
-				b.onStateChange()
-			}
-			return
 		}
+
+		b.updateAllEthernetDevices()
+		b.updateEthernetState()
+		b.listEthernetConnections()
+		b.updatePrimaryConnection()
+
+		if b.onStateChange != nil {
+			b.onStateChange()
+		}
+		return
 	}
 
-	for iface, info := range b.wifiDevices {
-		if info.device.GetPath() == devicePath {
-			delete(b.wifiDevices, iface)
-
-			if b.wifiDevice != nil {
-				dev := b.wifiDevice.(gonetworkmanager.Device)
-				if dev.GetPath() == devicePath {
-					b.wifiDevice = nil
-					b.wifiDev = nil
-					for _, remaining := range b.wifiDevices {
-						b.wifiDevice = remaining.device
-						b.wifiDev = remaining.wireless
-						break
-					}
+	if _, remaining, found := b.removeWifiDeviceByPath(devicePath); found {
+		if b.wifiDevice != nil {
+			dev := b.wifiDevice.(gonetworkmanager.Device)
+			if dev.GetPath() == devicePath {
+				b.wifiDevice = nil
+				b.wifiDev = nil
+				for _, r := range remaining {
+					b.wifiDevice = r.device
+					b.wifiDev = r.wireless
+					break
 				}
 			}
-
-			b.updateAllWiFiDevices()
-			b.updateWiFiState()
-
-			if b.onStateChange != nil {
-				b.onStateChange()
-			}
-			return
 		}
+
+		b.updateAllWiFiDevices()
+		b.updateWiFiState()
+
+		if b.onStateChange != nil {
+			b.onStateChange()
+		}
+		return
 	}
 }

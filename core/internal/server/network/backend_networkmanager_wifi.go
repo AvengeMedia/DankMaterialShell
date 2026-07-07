@@ -973,7 +973,7 @@ func (b *NetworkManagerBackend) SetWiFiAutoconnect(ssid string, autoconnect bool
 }
 
 func (b *NetworkManagerBackend) ScanWiFiDevice(device string) error {
-	devInfo, ok := b.wifiDevices[device]
+	devInfo, ok := b.wifiDeviceByIface(device)
 	if !ok {
 		return fmt.Errorf("WiFi device not found: %s", device)
 	}
@@ -995,7 +995,7 @@ func (b *NetworkManagerBackend) ScanWiFiDevice(device string) error {
 }
 
 func (b *NetworkManagerBackend) DisconnectWiFiDevice(device string) error {
-	devInfo, ok := b.wifiDevices[device]
+	devInfo, ok := b.wifiDeviceByIface(device)
 	if !ok {
 		return fmt.Errorf("WiFi device not found: %s", device)
 	}
@@ -1047,7 +1047,7 @@ func (b *NetworkManagerBackend) updateAllWiFiDevices() {
 	wifiConnected := b.state.WiFiConnected
 	b.stateMutex.RUnlock()
 
-	for name, devInfo := range b.wifiDevices {
+	for name, devInfo := range b.wifiDevicesSnapshot() {
 		state, _ := devInfo.device.GetPropertyState()
 		connected := state == gonetworkmanager.NmDeviceStateActivated
 
@@ -1211,7 +1211,7 @@ func (b *NetworkManagerBackend) updateAllWiFiDevices() {
 
 func (b *NetworkManagerBackend) getWifiDeviceForConnection(deviceName string) (*wifiDeviceInfo, error) {
 	if deviceName != "" {
-		devInfo, ok := b.wifiDevices[deviceName]
+		devInfo, ok := b.wifiDeviceByIface(deviceName)
 		if !ok {
 			return nil, fmt.Errorf("WiFi device not found: %s", deviceName)
 		}
@@ -1224,7 +1224,7 @@ func (b *NetworkManagerBackend) getWifiDeviceForConnection(deviceName string) (*
 
 	dev := b.wifiDevice.(gonetworkmanager.Device)
 	iface, _ := dev.GetPropertyInterface()
-	if devInfo, ok := b.wifiDevices[iface]; ok {
+	if devInfo, ok := b.wifiDeviceByIface(iface); ok {
 		return devInfo, nil
 	}
 

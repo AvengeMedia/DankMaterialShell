@@ -64,7 +64,26 @@ func (m *Manager) findInstalledPath(pluginID string) (string, error) {
 	return m.findInDir(systemDir, pluginID)
 }
 
+// isSafePluginPathComponent rejects anything that isn't a single, plain
+// path component: no separators, no "." or "..", not empty. Plugin IDs and
+// names are supposed to be plain identifiers, matched directly against a
+// directory name one level under a trusted plugins dir -- allowing a
+// caller-supplied value containing "/" or ".." here would let
+// filepath.Join resolve outside that directory entirely (e.g. an uninstall
+// request for "../../../etc" resolving to a real, existing directory that
+// then gets RemoveAll'd).
+func isSafePluginPathComponent(s string) bool {
+	if s == "" || s == "." || s == ".." {
+		return false
+	}
+	return !strings.ContainsAny(s, "/\\")
+}
+
 func (m *Manager) findInDir(dir, pluginID string) (string, error) {
+	if !isSafePluginPathComponent(pluginID) {
+		return "", fmt.Errorf("invalid plugin id: %q", pluginID)
+	}
+
 	// First, check if folder with exact ID name exists
 	exactPath := filepath.Join(dir, pluginID)
 	if exists, _ := afero.DirExists(m.fs, exactPath); exists {
@@ -507,6 +526,10 @@ func (m *Manager) findInstalledPathByIDOrName(idOrName string) (string, error) {
 }
 
 func (m *Manager) findInDirByIDOrName(dir, idOrName string) (string, error) {
+	if !isSafePluginPathComponent(idOrName) {
+		return "", fmt.Errorf("invalid plugin id/name: %q", idOrName)
+	}
+
 	// Check exact folder name match first
 	exactPath := filepath.Join(dir, idOrName)
 	if exists, _ := afero.DirExists(m.fs, exactPath); exists {

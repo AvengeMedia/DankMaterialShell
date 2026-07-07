@@ -133,6 +133,18 @@ func mergedAssociations() *MimeAssociations {
 	return merged
 }
 
+// isSafeIniField rejects anything that could break out of a single
+// "key=value" line in the generated INI-format mimeapps.list: a newline
+// could inject a fake [Section] header or extra key=value lines, and a
+// bracket could be confused for one even without a newline. mimeType and
+// desktopId ultimately come from the local IPC socket with no other
+// sanitization (StripMimeParams only trims a trailing ";params" suffix),
+// and this file is a shared freedesktop config consumed by other
+// applications (GTK, KDE, xdg-open) beyond this daemon.
+func isSafeIniField(s string) bool {
+	return !strings.ContainsAny(s, "\n\r[]")
+}
+
 func writeUserMimeapps(update func(*MimeAssociations)) error {
 	mimeappsWriteMu.Lock()
 	defer mimeappsWriteMu.Unlock()
@@ -152,6 +164,7 @@ func writeUserMimeapps(update func(*MimeAssociations)) error {
 	var buf bytes.Buffer
 	w := bufio.NewWriter(&buf)
 
+	var writeErr error
 	writeSection := func(name string, entries map[string]string) {
 		fmt.Fprintf(w, "[%s]\n", name)
 		keys := make([]string, 0, len(entries))
@@ -160,7 +173,14 @@ func writeUserMimeapps(update func(*MimeAssociations)) error {
 		}
 		sort.Strings(keys)
 		for _, k := range keys {
-			fmt.Fprintf(w, "%s=%s\n", k, entries[k])
+			v := entries[k]
+			if !isSafeIniField(k) || !isSafeIniField(v) {
+				if writeErr == nil {
+					writeErr = fmt.Errorf("invalid mimeapps.list field %q=%q", k, v)
+				}
+				continue
+			}
+			fmt.Fprintf(w, "%s=%s\n", k, v)
 		}
 		fmt.Fprintln(w)
 	}
@@ -176,6 +196,10 @@ func writeUserMimeapps(update func(*MimeAssociations)) error {
 	writeSection(groupDefaults, assoc.Defaults)
 	writeSection(groupAdded, flatten(assoc.Added))
 	writeSection(groupRemoved, flatten(assoc.Removed))
+
+	if writeErr != nil {
+		return writeErr
+	}
 
 	if err := w.Flush(); err != nil {
 		return err

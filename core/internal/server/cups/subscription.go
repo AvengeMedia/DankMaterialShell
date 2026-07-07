@@ -37,6 +37,18 @@ func (sm *SubscriptionManager) Start() error {
 		return fmt.Errorf("subscription manager already running")
 	}
 	sm.running = true
+	// Fresh channel here, not in Stop(): if Manager.eventHandler() is busy
+	// draining a backlog right when Stop() runs, it might not re-enter its
+	// select until after Stop() had already swapped in a replacement --
+	// and would then block forever on that new, empty channel that nothing
+	// will ever write to or close, instead of observing the close it
+	// missed. Only ever replacing the channel here, immediately before the
+	// one writer goroutine (notificationLoop) starts, means Stop()'s
+	// close() is the last thing that ever happens to whatever channel is
+	// current between one Start()/Stop() cycle and the next -- so
+	// eventHandler is guaranteed to observe it, no matter how far behind
+	// it's running.
+	sm.eventChan = make(chan SubscriptionEvent, 100)
 	sm.mu.Unlock()
 
 	subID, err := sm.createSubscription()
@@ -206,6 +218,8 @@ func (sm *SubscriptionManager) parseEvent(attrs ipp.Attributes) SubscriptionEven
 }
 
 func (sm *SubscriptionManager) Events() <-chan SubscriptionEvent {
+	sm.mu.Lock()
+	defer sm.mu.Unlock()
 	return sm.eventChan
 }
 
@@ -228,6 +242,20 @@ func (sm *SubscriptionManager) Stop() {
 	}
 
 	sm.stopChan = make(chan struct{})
+
+	// notificationLoop (the only writer, just joined via sm.wg.Wait() above)
+	// has exited, so it's safe to close this now. Without it, Manager's
+	// eventHandler() -- which exits only on <-m.stopChan (full manager
+	// shutdown) or this channel closing -- blocks forever on every
+	// Unsubscribe() of the last subscriber, and Unsubscribe()'s
+	// m.eventWG.Wait() deadlocks that caller's goroutine permanently.
+	//
+	// Deliberately NOT recreated here (unlike stopChan above): Start()
+	// allocates the replacement, right before the next notificationLoop
+	// starts. See the comment there for why that matters.
+	sm.mu.Lock()
+	close(sm.eventChan)
+	sm.mu.Unlock()
 }
 
 func (sm *SubscriptionManager) cancelSubscription() {

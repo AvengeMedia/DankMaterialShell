@@ -96,7 +96,7 @@ func (ctx *Context) GetDispatch() func() error {
 		}
 	}
 
-	return func() error {
+	return func() (dispatchErr error) {
 		proxy, ok := ctx.objects.Load(senderID)
 		if !ok {
 			return nil // Proxy already deleted via delete_id, silently ignore
@@ -110,6 +110,22 @@ func (ctx *Context) GetDispatch() func() error {
 		if !ok {
 			return fmt.Errorf("%w (senderID=%d)", ErrDispatchSenderUnsupported, senderID)
 		}
+
+		// The generated per-object Dispatch methods trust length/object-ID
+		// fields taken straight off the wire with no bounds checking (see
+		// e.g. client.go's event handlers). A malformed or truncated
+		// message from a misbehaving compositor -- or simply a bug in a
+		// rarely-exercised event decoder -- panics here. Since Dispatch is
+		// called from a shared loop used by every CLI tool (screenshot,
+		// colorpicker, clipboard) as well as the long-lived daemon, an
+		// unrecovered panic here would otherwise crash the whole process
+		// over a single bad event. Recover and surface it as a normal
+		// error instead.
+		defer func() {
+			if r := recover(); r != nil {
+				dispatchErr = fmt.Errorf("dispatch: panic handling opcode=%d senderID=%d: %v", opcode, senderID, r)
+			}
+		}()
 
 		sender.Dispatch(opcode, fd, data)
 		return nil

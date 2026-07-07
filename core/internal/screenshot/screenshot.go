@@ -747,12 +747,17 @@ func (s *Screenshoter) processFrame(frame *wlr_screencopy.ZwlrScreencopyFrameV1,
 		bpp := format.BytesPerPixel()
 		if int(e.Stride) < int(e.Width)*bpp {
 			log.Error("invalid stride from compositor", "stride", e.Stride, "width", e.Width, "bpp", bpp)
+			// Without this, we never call frame.Copy() and the compositor
+			// has no reason to ever send ready/failed -- the dispatch loop
+			// below waits forever on an event neither side is going to send.
+			failed = true
 			return
 		}
 		var err error
 		buf, err = CreateShmBuffer(int(e.Width), int(e.Height), int(e.Stride))
 		if err != nil {
 			log.Error("failed to create buffer", "err", err)
+			failed = true
 			return
 		}
 		buf.Format = format
@@ -771,6 +776,7 @@ func (s *Screenshoter) processFrame(frame *wlr_screencopy.ZwlrScreencopyFrameV1,
 		pool, err = s.shm.CreatePool(buf.Fd(), int32(buf.Size()))
 		if err != nil {
 			log.Error("failed to create pool", "err", err)
+			failed = true
 			return
 		}
 
@@ -779,6 +785,7 @@ func (s *Screenshoter) processFrame(frame *wlr_screencopy.ZwlrScreencopyFrameV1,
 			pool.Destroy()
 			pool = nil
 			log.Error("failed to create wl_buffer", "err", err)
+			failed = true
 			return
 		}
 
