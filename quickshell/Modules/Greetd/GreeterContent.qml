@@ -1545,7 +1545,7 @@ Item {
                 visible: NetworkService.networkStatus !== "disconnected" || (BluetoothService.available && BluetoothService.enabled) || (AudioService.sink && AudioService.sink.audio)
 
                 DankIcon {
-                    name: NetworkService.networkStatus === "ethernet" ? "lan" : NetworkService.wifiSignalIcon
+                    name: NetworkService.networkStatus === "ethernet" ? "lan" : (NetworkService.networkStatus === "cellular" ? "network_cell" : NetworkService.wifiSignalIcon)
                     size: Theme.iconSize - 2
                     color: NetworkService.networkStatus !== "disconnected" ? "white" : Qt.rgba(255, 255, 255, 0.5)
                     anchors.verticalCenter: parent.verticalCenter

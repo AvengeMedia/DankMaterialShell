@@ -7,6 +7,9 @@ type Backend interface {
 	GetWiFiEnabled() (bool, error)
 	SetWiFiEnabled(enabled bool) error
 
+	GetCellularEnabled() (bool, error)
+	SetCellularEnabled(enabled bool) error
+
 	ScanWiFi() error
 	ScanWiFiDevice(device string) error
 	GetWiFiNetworkDetails(ssid string) (*NetworkInfoResponse, error)
@@ -26,6 +29,13 @@ type Backend interface {
 	DisconnectEthernet() error
 	DisconnectEthernetDevice(device string) error
 	ActivateWiredConnection(uuid string) error
+
+	GetCellularDevices() []CellularDevice
+	GetCellularConnections() ([]WiredConnection, error)
+	ConnectCellular() error
+	DisconnectCellular() error
+	DisconnectCellularDevice(device string) error
+	ActivateCellularConnection(uuid string) error
 
 	ListVPNProfiles() ([]VPNProfile, error)
 	ListActiveVPN() ([]VPNActive, error)
@@ -52,33 +62,41 @@ type Backend interface {
 }
 
 type BackendState struct {
-	Backend                string
-	NetworkStatus          NetworkStatus
-	EthernetIP             string
-	EthernetDevice         string
-	EthernetConnected      bool
-	EthernetConnectionUuid string
-	EthernetDevices        []EthernetDevice
-	WiFiIP                 string
-	WiFiDevice             string
-	WiFiConnected          bool
-	WiFiEnabled            bool
-	WiFiSSID               string
-	WiFiBSSID              string
-	WiFiSignal             uint8
-	WiFiNetworks           []WiFiNetwork
-	SavedWiFiNetworks      []WiFiNetwork
-	WiFiDevices            []WiFiDevice
-	WiredConnections       []WiredConnection
-	VPNProfiles            []VPNProfile
-	VPNActive              []VPNActive
-	IsConnecting           bool
-	ConnectingSSID         string
-	ConnectingDevice       string
-	ConnectingPreExisting  bool
-	IsConnectingVPN        bool
-	ConnectingVPNUUID      string
-	LastError              string
-	VPNError               string
-	VPNErrorUuid           string
+	Backend                 string
+	NetworkStatus           NetworkStatus
+	EthernetIP              string
+	EthernetDevice          string
+	EthernetConnected       bool
+	EthernetConnectionUuid  string
+	EthernetDevices         []EthernetDevice
+	CellularIP              string
+	CellularDevice          string
+	CellularConnected       bool
+	CellularEnabled         bool
+	CellularHardwareEnabled bool
+	CellularConnectionUuid  string
+	CellularDevices         []CellularDevice
+	CellularConnections     []WiredConnection
+	WiFiIP                  string
+	WiFiDevice              string
+	WiFiConnected           bool
+	WiFiEnabled             bool
+	WiFiSSID                string
+	WiFiBSSID               string
+	WiFiSignal              uint8
+	WiFiNetworks            []WiFiNetwork
+	SavedWiFiNetworks       []WiFiNetwork
+	WiFiDevices             []WiFiDevice
+	WiredConnections        []WiredConnection
+	VPNProfiles             []VPNProfile
+	VPNActive               []VPNActive
+	IsConnecting            bool
+	ConnectingSSID          string
+	ConnectingDevice        string
+	ConnectingPreExisting   bool
+	IsConnectingVPN         bool
+	ConnectingVPNUUID       string
+	LastError               string
+	VPNError                string
+	VPNErrorUuid            string
 }
