@@ -175,6 +175,7 @@ DankPopout {
             }
             implicitHeight: targetImplicitHeight
             property alias bluetoothCodecSelector: bluetoothCodecSelector
+            property alias audioPortSelector: audioPortSelector
 
             color: "transparent"
             clip: true
@@ -247,6 +248,7 @@ DankPopout {
                         expandedWidgetData: root.expandedWidgetData
                         model: widgetModel
                         bluetoothCodecSelector: bluetoothCodecSelector
+                        audioPortSelector: audioPortSelector
                         colorPickerModal: root.colorPickerModal
                         screenName: root.triggerScreen?.name || ""
                         screenModel: root.triggerScreen?.model || ""
@@ -294,6 +296,12 @@ DankPopout {
 
             BluetoothCodecSelector {
                 id: bluetoothCodecSelector
+                anchors.fill: parent
+                z: 10000
+            }
+
+            AudioPortSelector {
+                id: audioPortSelector
                 anchors.fill: parent
                 z: 10000
             }
