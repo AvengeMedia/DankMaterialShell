@@ -51,6 +51,8 @@ Singleton {
     property string wireplumberConfigPath: Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation)) + "/wireplumber/wireplumber.conf.d/51-dms-audio-aliases.conf"
     property bool wireplumberReloading: false
 
+    property var sinkPorts: ({})
+
     readonly property int sinkMaxVolume: {
         const name = sink?.name ?? "";
         if (!name)
@@ -156,6 +158,106 @@ Singleton {
                 return setSource(node);
         }
         return false;
+    }
+
+    function refreshSinkPorts(callback) {
+        // ensure that parsed labels are in English
+        Proc.runCommand("audio-list-sink-ports", ["env", "LC_ALL=C", "pactl", "list", "sinks"], (output, exitCode) => {
+            if (exitCode === 0)
+                root.sinkPorts = root.parseSinkPorts(output);
+            if (callback)
+                callback();
+        }, 0);
+    }
+
+    function getSinkPorts(node) {
+        return sinkPorts[node?.name] ?? null;
+    }
+
+    function sinkHasMultiplePorts(node) {
+        return (sinkPorts[node?.name]?.ports?.length ?? 0) > 1;
+    }
+
+    function setSinkPort(sinkName, portName, callback) {
+        Proc.runCommand("audio-set-sink-port", ["env", "LC_ALL=C", "pactl", "set-sink-port", sinkName, portName], (output, exitCode) => {
+            const ok = exitCode === 0;
+            if (callback)
+                callback(ok, ok ? I18n.tr("Port switched") : (output || I18n.tr("Failed to switch port")));
+            if (ok)
+                Qt.callLater(() => root.refreshSinkPorts());
+        }, 0);
+    }
+
+    function parseSinkPorts(text) {
+        const result = {};
+        const lines = (text || "").split("\n");
+        let current = null;
+        let inPorts = false;
+
+        function commit() {
+            if (current && current.name)
+                result[current.name] = {
+                    active: current.active,
+                    ports: current.ports
+                };
+        }
+
+        for (const rawLine of lines) {
+            const line = rawLine.trim();
+
+            if (/^Sink #\d+/.test(line)) {
+                commit();
+                current = {
+                    name: null,
+                    active: "",
+                    ports: []
+                };
+                inPorts = false;
+                continue;
+            }
+
+            if (!current)
+                continue;
+
+            if (line.startsWith("Name:")) {
+                current.name = line.substring(5).trim();
+                inPorts = false;
+                continue;
+            }
+
+            if (line === "Ports:") {
+                inPorts = true;
+                continue;
+            }
+
+            if (line.startsWith("Active Port:")) {
+                current.active = line.substring(12).trim();
+                inPorts = false;
+                continue;
+            }
+
+            if (inPorts) {
+                // name up to first ": ", meta is the trailing "(...)", description is whatever's in between
+                const match = line.match(/^(.+?):\s+(.*)\s+\(([^()]*)\)$/);
+                if (!match)
+                    continue;
+                const meta = match[3];
+                let availability = "unknown";
+                if (meta.includes("not available") || meta.includes("available: no"))
+                    availability = "no";
+                else if (meta.includes("available: yes"))
+                    availability = "yes";
+                current.ports.push({
+                    name: match[1],
+                    description: match[2],
+                    availability: availability,
+                    priority: parseInt(meta.match(/priority:?\s*(\d+)/)?.[1] ?? "0", 10)
+                });
+            }
+        }
+
+        commit();
+        return result;
     }
 
     function cycleAudioOutputDirection(forward) {
