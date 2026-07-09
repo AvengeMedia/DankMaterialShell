@@ -9,7 +9,16 @@ import qs.Common
 Singleton {
     id: root
 
-    readonly property Transition add: Transition {
+    // 0ms ViewTransitions break ListView delegate cleanup, so null the set when the shortest
+    // duration truncates to 0. Keep this gate - don't inline these back into add/remove/etc.
+    readonly property bool enabled: Math.floor(Theme.currentAnimationBaseDuration * 0.4) >= 1
+
+    readonly property Transition add: enabled ? _add : null
+    readonly property Transition remove: enabled ? _remove : null
+    readonly property Transition displaced: enabled ? _displaced : null
+    readonly property Transition move: enabled ? _move : null
+
+    readonly property Transition _add: Transition {
         DankAnim {
             property: "opacity"
             from: 0
@@ -19,7 +28,7 @@ Singleton {
         }
     }
 
-    readonly property Transition remove: Transition {
+    readonly property Transition _remove: Transition {
         DankAnim {
             property: "opacity"
             to: 0
@@ -28,7 +37,7 @@ Singleton {
         }
     }
 
-    readonly property Transition displaced: Transition {
+    readonly property Transition _displaced: Transition {
         DankAnim {
             property: "y"
             duration: Theme.expressiveDurations.normal
@@ -36,7 +45,7 @@ Singleton {
         }
     }
 
-    readonly property Transition move: Transition {
+    readonly property Transition _move: Transition {
         DankAnim {
             property: "y"
             duration: Theme.expressiveDurations.normal
