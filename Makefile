@@ -6,8 +6,8 @@ BINARY_NAME=dms
 CORE_DIR=core
 BUILD_DIR=$(CORE_DIR)/bin
 PREFIX ?= /usr/local
-INSTALL_DIR=$(PREFIX)/bin
-DATA_DIR=$(PREFIX)/share
+INSTALL_DIR=$(DESTDIR)$(PREFIX)/bin
+DATA_DIR=$(DESTDIR)$(PREFIX)/share
 ICON_DIR=$(DATA_DIR)/icons/hicolor/scalable/apps
 
 USER_HOME := $(if $(SUDO_USER),$(shell getent passwd $(SUDO_USER) | cut -d: -f6),$(HOME))
@@ -62,7 +62,7 @@ install-systemd:
 	@echo "Installing systemd user service..."
 	@mkdir -p $(SYSTEMD_USER_DIR)
 	@if [ -n "$(SUDO_USER)" ]; then chown -R $(SUDO_USER):"$(id -gn $SUDO_USER)" $(SYSTEMD_USER_DIR); fi
-	@sed 's|/usr/bin/dms|$(INSTALL_DIR)/dms|g' $(ASSETS_DIR)/systemd/dms.service > $(SYSTEMD_USER_DIR)/dms.service
+	@sed 's|/usr/bin/dms|$(PREFIX)/bin/dms|g' $(ASSETS_DIR)/systemd/dms.service > $(SYSTEMD_USER_DIR)/dms.service
 	@chmod 644 $(SYSTEMD_USER_DIR)/dms.service
 	@if [ -n "$(SUDO_USER)" ]; then chown $(SUDO_USER):"$(id -gn $SUDO_USER)" $(SYSTEMD_USER_DIR)/dms.service; fi
 	@echo "Systemd service installed to $(SYSTEMD_USER_DIR)/dms.service"
