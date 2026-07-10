@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "repository": "dms",
+  "source_commit": "204ecd0461da62a080d5083703b1d51d7f1cedb8",
+  "published_at": "2026-07-10T22:20:08Z",
+  "packages": [
+    {
+      "name": "dms",
+      "version": "1.5.0",
+      "revision": "1",
+      "filename": "dms-1.5.0_1.x86_64.xbps",
+      "sha256": "e1fcb8643fae5289cf14a04482bb62c7b2f8f04584d8cd2c9672ec9108d9411e",
+      "size": 31372461
+    },
+    {
+      "name": "dms-git",
+      "version": "1.5.0.27.g204ecd04",
+      "revision": "1",
+      "filename": "dms-git-1.5.0.27.g204ecd04_1.x86_64.xbps",
+      "sha256": "452e9b77913f399ce0fd1d5f47083d27e3872753a3c0a9ebe59729198de311a6",
+      "size": 31395028
+    },
+    {
+      "name": "dms-greeter",
+      "version": "1.5.0",
+      "revision": "1",
+      "filename": "dms-greeter-1.5.0_1.x86_64.xbps",
+      "sha256": "575146fd02618316324445691043308adaeea411aa96314a912880b50d7d052d",
+      "size": 21143582
+    }
+  ]
+}
