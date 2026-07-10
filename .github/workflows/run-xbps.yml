@@ -34,13 +34,49 @@ on:
         default: true
 
 permissions:
-  contents: write
+  contents: read
+
+concurrency:
+  group: void-xbps-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
+  preflight:
+    name: Check for unpublished changes
+    runs-on: ubuntu-latest
+    outputs:
+      should_build: ${{ steps.check.outputs.should_build }}
+    steps:
+      - name: Check published commit
+        id: check
+        env:
+          MANIFEST_URL: https://void.danklinux.com/dms/current/manifest.json
+        run: |
+          SHOULD_BUILD=true
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            PUBLISHED_COMMIT="$(curl -fsSL --retry 3 "$MANIFEST_URL" | jq -r '.source_commit // empty' 2>/dev/null || true)"
+            if [ "$PUBLISHED_COMMIT" = "${{ github.sha }}" ]; then
+              SHOULD_BUILD=false
+              echo "${{ github.sha }} is already published; skipping the scheduled build."
+            fi
+          fi
+          echo "should_build=$SHOULD_BUILD" >> "$GITHUB_OUTPUT"
+
   build-and-deploy:
     name: Build & Deploy XBPS packages
     runs-on: ubuntu-latest
-    if: github.repository == 'AvengeMedia/DankMaterialShell'
+    needs: preflight
+    if: github.repository == 'AvengeMedia/DankMaterialShell' && needs.preflight.outputs.should_build == 'true'
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: auto
+      AWS_EC2_METADATA_DISABLED: true
+      R2_BUCKET: danklinux-void
+      R2_ENDPOINT: https://${{ secrets.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com
+      R2_PREFIX: dms
+      REPOSITORY_DIR: ${{ github.workspace }}/r2-repo
+      SOURCE_COMMIT: ${{ github.sha }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -48,17 +84,13 @@ jobs:
           ref: ${{ github.event.release.tag_name || (github.event.inputs.version && (startsWith(github.event.inputs.version, 'v') && github.event.inputs.version || format('v{0}', github.event.inputs.version))) || github.ref }}
           fetch-depth: 0
 
-      - name: Checkout gh-pages branch
+      - name: Record checked-out source commit
+        run: echo "SOURCE_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - name: Download current R2 repository
         run: |
-          git clone --branch gh-pages https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git gh-pages-repo || {
-            echo "⚠️ gh-pages branch not found or empty, initializing a new one..."
-            mkdir gh-pages-repo
-            cd gh-pages-repo
-            git init
-            git checkout -b gh-pages
-            git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-            cd ..
-          }
+          aws --version
+          bash .github/scripts/publish-void-r2.sh download
 
       - name: Install XBPS Static Utilities
         run: |
@@ -132,19 +164,19 @@ jobs:
       - name: Configure repositories
         run: |
           # Append the repository to repos-remote templates so xbps-src translates it automatically
-          echo "repository=https://avengemedia.github.io/DankLinux/current" >> void-packages/etc/xbps.d/repos-remote.conf
-          echo "repository=https://avengemedia.github.io/DankLinux/current" >> void-packages/etc/xbps.d/repos-remote-x86_64-multilib.conf
+          echo "repository=https://void.danklinux.com/danklinux/current" >> void-packages/etc/xbps.d/repos-remote.conf
+          echo "repository=https://void.danklinux.com/danklinux/current" >> void-packages/etc/xbps.d/repos-remote-x86_64-multilib.conf
 
           # Add any existing compiled packages to the build cache directory to avoid rebuilds
-          if [ -d "gh-pages-repo/current" ]; then
+          if [ -d "r2-repo/current" ]; then
             mkdir -p void-packages/hostdir/binpkgs
-            cp -L gh-pages-repo/current/*.xbps void-packages/hostdir/binpkgs/ 2>/dev/null || true
+            cp -L r2-repo/current/*.xbps void-packages/hostdir/binpkgs/ 2>/dev/null || true
             xbps-rindex -a void-packages/hostdir/binpkgs/*.xbps 2>/dev/null || true
           fi
 
       - name: Build packages
         run: |
-          mkdir -p gh-pages-repo/current
+          mkdir -p r2-repo/current
 
           BUILD_DMS="${{ github.event.inputs.build_dms || 'true' }}"
           BUILD_GREETER="${{ github.event.inputs.build_greeter || 'true' }}"
@@ -216,7 +248,7 @@ jobs:
             mkdir -p "$SRC_CACHE"
             tar -czf "${SRC_CACHE}/dms-git-${GIT_VER}.tar.gz" \
               --exclude=void-packages \
-              --exclude=gh-pages-repo \
+              --exclude=r2-repo \
               --exclude=.git \
               --exclude=danklinux \
               -C .. .
@@ -230,13 +262,13 @@ jobs:
 
             EXPECTED_GIT_FILE="dms-git-${GIT_VER}_1.x86_64.xbps"
 
-            if [ -f "../gh-pages-repo/current/$EXPECTED_GIT_FILE" ] && [ "$FORCE_REBUILD" != "true" ]; then
+            if [ -f "../r2-repo/current/$EXPECTED_GIT_FILE" ] && [ "$FORCE_REBUILD" != "true" ]; then
               echo "✅ $EXPECTED_GIT_FILE already exists, skipping build."
             else
               echo "🔨 Compiling dms-git..."
               ./xbps-src pkg dms-git
-              rm -f "../gh-pages-repo/current/${EXPECTED_GIT_FILE}"
-              cp -L hostdir/binpkgs/dms-git-*.xbps ../gh-pages-repo/current/
+              rm -f "../r2-repo/current/${EXPECTED_GIT_FILE}"
+              cp -L "hostdir/binpkgs/${EXPECTED_GIT_FILE}" ../r2-repo/current/
             fi
           fi
 
@@ -246,13 +278,13 @@ jobs:
             STABLE_REV=$(grep -E '^revision=' srcpkgs/dms/template | cut -d= -f2 | tr -d '"')
 
             EXPECTED_DMS_FILE="dms-${STABLE_VER}_${STABLE_REV}.x86_64.xbps"
-            if [ -f "../gh-pages-repo/current/$EXPECTED_DMS_FILE" ] && [ "$FORCE_REBUILD" != "true" ]; then
+            if [ -f "../r2-repo/current/$EXPECTED_DMS_FILE" ] && [ "$FORCE_REBUILD" != "true" ]; then
               echo "✅ $EXPECTED_DMS_FILE already exists, skipping build."
             else
               echo "🔨 Compiling dms ($STABLE_VER)..."
               ./xbps-src pkg dms
-              rm -f "../gh-pages-repo/current/${EXPECTED_DMS_FILE}"
-              cp -L hostdir/binpkgs/dms-${STABLE_VER}_${STABLE_REV}.x86_64.xbps ../gh-pages-repo/current/
+              rm -f "../r2-repo/current/${EXPECTED_DMS_FILE}"
+              cp -L hostdir/binpkgs/dms-${STABLE_VER}_${STABLE_REV}.x86_64.xbps ../r2-repo/current/
             fi
           fi
 
@@ -262,22 +294,21 @@ jobs:
             GREETER_REV=$(grep -E '^revision=' srcpkgs/dms-greeter/template | cut -d= -f2 | tr -d '"')
 
             EXPECTED_GREETER_FILE="dms-greeter-${GREETER_VER}_${GREETER_REV}.x86_64.xbps"
-            if [ -f "../gh-pages-repo/current/$EXPECTED_GREETER_FILE" ] && [ "$FORCE_REBUILD" != "true" ]; then
+            if [ -f "../r2-repo/current/$EXPECTED_GREETER_FILE" ] && [ "$FORCE_REBUILD" != "true" ]; then
               echo "✅ $EXPECTED_GREETER_FILE already exists, skipping build."
             else
               echo "🔨 Compiling dms-greeter ($GREETER_VER)..."
               ./xbps-src pkg dms-greeter
-              rm -f "../gh-pages-repo/current/${EXPECTED_GREETER_FILE}"
-              cp -L hostdir/binpkgs/dms-greeter-${GREETER_VER}_${GREETER_REV}.x86_64.xbps ../gh-pages-repo/current/
+              rm -f "../r2-repo/current/${EXPECTED_GREETER_FILE}"
+              cp -L hostdir/binpkgs/dms-greeter-${GREETER_VER}_${GREETER_REV}.x86_64.xbps ../r2-repo/current/
             fi
           fi
 
       - name: Index and sign repository
         run: |
-          cd gh-pages-repo/current
+          cd r2-repo/current
 
-          # Clean up any stale or dangling signature files to prevent O_CREAT ENOENT errors
-          rm -f *.sig2 *.sig
+          rm -f *.sig
 
           # Guard: nothing to index if no .xbps files exist
           if ! ls *.xbps 1>/dev/null 2>&1; then
@@ -287,6 +318,14 @@ jobs:
 
           # Regenerate repo index
           xbps-rindex -a $(pwd)/*.xbps
+          xbps-rindex --remove-obsoletes $(pwd)
+
+          # Remove signatures left behind by obsolete packages. Signatures for
+          # unchanged immutable packages are retained byte-for-byte.
+          for sig in *.sig2; do
+            [ -e "$sig" ] || break
+            [ -f "${sig%.sig2}" ] || rm -f "$sig"
+          done
 
           # Sign repository
           echo "${{ secrets.XBPS_PRIVATE_KEY }}" > /tmp/xbps_privkey.pem
@@ -297,10 +336,5 @@ jobs:
 
           rm -f /tmp/xbps_privkey.pem
 
-      - name: Deploy to gh-pages branch
-        run: |
-          cd gh-pages-repo
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add current/
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Update XBPS packages [skip ci]" && git push origin gh-pages)
+      - name: Publish repository to R2
+        run: bash .github/scripts/publish-void-r2.sh publish
