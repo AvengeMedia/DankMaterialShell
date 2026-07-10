@@ -23,8 +23,7 @@ DankOSD {
     Connections {
         target: AudioService.source?.audio ?? null
 
-        // Sync only - apps adjusting mic gain (WebRTC AGC etc.) fire this
-        // constantly, so external volume changes must not surface the OSD
+        // sync only - app AGC rewrites mic gain constantly, must not surface the OSD
         function onVolumeChanged() {
             root._syncVolume();
         }

@@ -23,7 +23,7 @@ DankOSD {
         if (!player) {
             _displayIcon = "music_note";
             iconDebounce.stop();
-            return;
+            return false;
         }
         let icon = "music_note";
         switch (player.playbackState) {
@@ -35,10 +35,13 @@ DankOSD {
             icon = "play_arrow";
             break;
         }
-        if (icon === _displayIcon)
-            return;
+        if (icon === _displayIcon) {
+            iconDebounce.stop();
+            return false;
+        }
         iconDebounce.pendingIcon = icon;
         iconDebounce.restart();
+        return true;
     }
 
     function togglePlaying() {
@@ -52,11 +55,45 @@ DankOSD {
     property string _displayArtist: ""
     property string _displayAlbum: ""
 
+    function _showPending() {
+        _pendingShow = false;
+        pendingShowFallback.stop();
+        show();
+    }
+
+    function _evaluateShow() {
+        // art url can land in a later metadata update than the title
+        if (TrackArtService.getArtworkUrl(player) === "") {
+            _pendingShow = true;
+            pendingShowFallback.interval = 600;
+            pendingShowFallback.restart();
+            return;
+        }
+        if (TrackArtService.artReadyFor(player) && artPreloader.status === Image.Ready) {
+            _showPending();
+            return;
+        }
+        _pendingShow = true;
+        pendingShowFallback.interval = 1500;
+        pendingShowFallback.restart();
+    }
+
     Timer {
         id: iconDebounce
         interval: 150
         property string pendingIcon: "music_note"
         onTriggered: root._displayIcon = pendingIcon
+    }
+
+    Timer {
+        id: pendingShowFallback
+        interval: 1500
+        onTriggered: {
+            if (!root._pendingShow)
+                return;
+            root._pendingShow = false;
+            root.show();
+        }
     }
 
     Image {
@@ -70,6 +107,7 @@ DankOSD {
     onPlayerChanged: {
         if (!player) {
             _pendingShow = false;
+            pendingShowFallback.stop();
             hide();
         }
     }
@@ -77,12 +115,19 @@ DankOSD {
     Connections {
         target: TrackArtService
         function onLoadingChanged() {
-            if (TrackArtService.loading || !root._pendingShow)
+            if (!root._pendingShow)
                 return;
-            if (!TrackArtService.resolvedArtUrl || artPreloader.status === Image.Ready) {
-                root._pendingShow = false;
-                root.show();
+            if (TrackArtService.loading) {
+                pendingShowFallback.interval = 1500;
+                pendingShowFallback.restart();
+                return;
             }
+            if (!TrackArtService.resolvedArtUrl) {
+                root._showPending();
+                return;
+            }
+            if (TrackArtService.artReadyFor(root.player) && artPreloader.status === Image.Ready)
+                root._showPending();
         }
     }
 
@@ -94,8 +139,7 @@ DankOSD {
             switch (artPreloader.status) {
             case Image.Ready:
             case Image.Error:
-                root._pendingShow = false;
-                root.show();
+                root._showPending();
                 break;
             }
         }
@@ -112,26 +156,32 @@ DankOSD {
             if (MprisController.isFirefoxYoutubeHoverPreview(player))
                 return;
 
-            root._displayTitle = player.trackTitle || "";
-            root._displayArtist = player.trackArtist || "";
-            root._displayAlbum = player.trackAlbum || "";
+            const newTitle = player.trackTitle || "";
+            const newArtist = player.trackArtist || "";
+            const newAlbum = player.trackAlbum || "";
+            const trackChanged = newTitle !== root._displayTitle || newArtist !== root._displayArtist || newAlbum !== root._displayAlbum;
 
-            root.updatePlaybackIcon();
-            const resolvedArtUrl = TrackArtService.resolvedArtUrl;
+            root._displayTitle = newTitle;
+            root._displayArtist = newArtist;
+            root._displayAlbum = newAlbum;
 
-            if (!resolvedArtUrl || resolvedArtUrl === "") {
+            const iconChanged = root.updatePlaybackIcon();
+
+            // live streams re-emit metadata as mpris:length grows - ignore churn
+            if (!trackChanged && !iconChanged)
+                return;
+
+            // vertical layout has no art background
+            if (root.useVertical) {
                 root.show();
                 return;
             }
-            if (TrackArtService.loading) {
-                root._pendingShow = true;
+            if (trackChanged) {
+                root._evaluateShow();
                 return;
             }
-            if (!TrackArtService.resolvedArtUrl || artPreloader.status === Image.Ready) {
+            if (!root._pendingShow)
                 root.show();
-                return;
-            }
-            root._pendingShow = true;
         }
 
         function onTrackArtUrlChanged() {

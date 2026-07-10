@@ -191,6 +191,11 @@ Singleton {
         return (p.trackTitle || "") + "" + (p.trackArtist || "") + "" + (p.trackAlbum || "");
     }
 
+    function artReadyFor(player) {
+        const url = getArtworkUrl(player);
+        return url !== "" && url === _lastArtUrl && !loading && resolvedArtUrl !== "";
+    }
+
     function _updateArtUrl() {
         const key = _trackKey();
         // Skip once real art is committed for this track (dedup Chrome's multi-size
