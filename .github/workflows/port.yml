@@ -1,7 +1,8 @@
 name: Port to release branch
 
 # Ports flagged commits from master onto release/X.Y branches:
-#   - "Port: 1.5" (or "Port/1.5") trailer line in a commit message pushed to master
+#   - trailer line in a commit message pushed to master; accepted forms:
+#     "Port: 1.5", "Port/1.5", "Port 1.5", "Port - 1.5", "Port: release/1.5"
 #   - "port release/1.5" label on a merged PR
 # Conflicts are reported to the "Port status: <branch>" tracking issue.
 
@@ -54,9 +55,11 @@ jobs:
             # skip merge commits (handled by the label path)
             [ "$(git rev-list --no-walk --count --min-parents=2 "$sha")" -eq 0 ] || continue
 
+            # extract targets, then keep only version-shaped ones (X.Y[.Z])
             targets=$(git log -1 --format=%B "$sha" |
-              { grep -iE '^Port[:/]' || true; } | sed 's|^port[:/] *||I' | tr ',' '\n' |
-              sed 's/[[:space:]]//g; /^$/d' | sed 's|^release/||I' | sort -u)
+              { grep -iE '^Port[:/ -]' || true; } | sed -E 's|^port[-:/ ]+||I' | tr ',' '\n' |
+              sed 's/[[:space:]]//g; /^$/d' | sed 's|^release/||I' |
+              { grep -E '^[0-9]+\.[0-9]+(\.[0-9]+)?$' || true; } | sort -u)
             for ver in $targets; do
               echo "::group::port $sha -> release/$ver"
               bash scripts/port.sh "release/$ver" "$sha"
