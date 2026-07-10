@@ -9,6 +9,8 @@ import qs.Services
 Singleton {
     id: root
 
+    readonly property var log: Log.scoped("Paths")
+
     readonly property url home: StandardPaths.standardLocations(StandardPaths.HomeLocation)[0]
     readonly property url pictures: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
     readonly property url xdgCache: StandardPaths.standardLocations(StandardPaths.GenericCacheLocation)[0]
@@ -23,7 +25,13 @@ Singleton {
     Component.onCompleted: mkdir(imagecache)
 
     function stringify(path: url): string {
-        return path.toString().replace(/%20/g, " ");
+        const raw = path.toString();
+        try {
+            return decodeURIComponent(raw);
+        } catch (e) {
+            log.warn("failed to decode path:", raw, e);
+            return raw;
+        }
     }
 
     function expandTilde(path: string): string {
