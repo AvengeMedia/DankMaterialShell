@@ -64,6 +64,10 @@ DankModal {
         NotificationService.dismissAllPopups();
     }
 
+    function dismissLastNotification() {
+        NotificationService.dismissLastNotification();
+    }
+
     modalWidth: Math.min(500, screenWidth - 48)
     modalHeight: Math.min(700, screenHeight * 0.85)
     backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
@@ -188,6 +192,11 @@ DankModal {
         function dismissAllPopups(): string {
             notificationModal.dismissAllPopups();
             return "NOTIFICATION_MODAL_DISMISS_ALL_POPUPS_SUCCESS";
+        }
+
+        function dismiss(): string {
+            notificationModal.dismissLastNotification();
+            return "NOTIFICATION_DISMISS_SUCCESS";
         }
 
         target: "notifications"
