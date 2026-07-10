@@ -1,0 +1,28 @@
+// ! Auto-generated file. Do not edit directly.
+// Remove source ./dms/colors.kdl from your config to override.
+
+layout {
+    // Window borders share the DMS pill palette: the resting border uses the
+    // pill resting colour (surface_container_high) and the focused border uses
+    // the pill focus colour (primary), so borders and native pills read as one
+    // material. urgent stays on error; the gradient pairs primary + tertiary.
+    border {
+        color 0x{{colors.surface_container_high.default.hex_stripped}}ff
+        focus-color 0x{{colors.primary.default.hex_stripped}}ff
+        urgent-color 0x{{colors.error.default.hex_stripped}}ff
+        // Focused-border gradient endpoint (asteroidz): the Material tertiary
+        // accent pairs with focus-color (primary) for a two-tone gradient
+        gradient { color2 0x{{colors.tertiary.default.hex_stripped}}ff }
+    }
+}
+
+// Native UI pills (asteroidz): DMS pill language, shared by every native pill
+// overlay — monocle tab bar, window-group bars, jump-mode labels, and the
+// screenshot UI. Resting pill on surface_container_high, focused pill on
+// primary with on_primary text.
+pill {
+    bg-color 0x{{colors.surface_container_high.default.hex_stripped}}ff
+    fg-color 0x{{colors.on_surface.default.hex_stripped}}ff
+    focus-bg-color 0x{{colors.primary.default.hex_stripped}}ff
+    focus-fg-color 0x{{colors.on_primary.default.hex_stripped}}ff
+}

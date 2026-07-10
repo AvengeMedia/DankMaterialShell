@@ -102,6 +102,11 @@ func initializeProviders() {
 		log.Warnf("Failed to register MangoWC provider: %v", err)
 	}
 
+	asteroidzProvider := providers.NewAsteroidzProvider("")
+	if err := registry.Register(asteroidzProvider); err != nil {
+		log.Warnf("Failed to register Asteroidz provider: %v", err)
+	}
+
 	configDir, _ := os.UserConfigDir()
 
 	if configDir != "" {
@@ -161,6 +166,8 @@ func makeProviderWithPath(name, path string) keybinds.Provider {
 		return providers.NewHyprlandProvider(path)
 	case "mangowc":
 		return providers.NewMangoWCProvider(path)
+	case "asteroidz":
+		return providers.NewAsteroidzProvider(path)
 	case "sway":
 		return providers.NewSwayProvider(path)
 	case "scroll":

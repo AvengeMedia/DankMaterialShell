@@ -17,6 +17,14 @@ type MatchCriteria struct {
 }
 
 type Actions struct {
+	// Mango fork extensions
+	ForceTearing      *bool             `json:"forceTearing,omitempty"`
+	VrrOnlyFullscreen *bool             `json:"vrrOnlyFullscreen,omitempty"`
+	ShieldWhenCapture *bool             `json:"shieldWhenCapture,omitempty"`
+	DenyGroup         *bool             `json:"denyGroup,omitempty"`
+	Pinned            *bool             `json:"pinned,omitempty"`
+	AsteroidzExtra        map[string]string `json:"asteroidzExtra,omitempty"` // unrecognized mango options, preserved verbatim
+
 	Opacity              *float64 `json:"opacity,omitempty"`
 	OpenFloating         *bool    `json:"openFloating,omitempty"`
 	OpenMaximized        *bool    `json:"openMaximized,omitempty"`
@@ -55,6 +63,7 @@ type Actions struct {
 	Move                      string `json:"move,omitempty"`
 	Monitor                   string `json:"monitor,omitempty"`
 	Workspace                 string `json:"workspace,omitempty"`
+	SpecialWorkspace          string `json:"specialWorkspace,omitempty"` // mango: named special workspace assignment
 	Tile                      *bool  `json:"tile,omitempty"`
 	NoFocus                   *bool  `json:"nofocus,omitempty"`
 	NoBorder                  *bool  `json:"noborder,omitempty"`

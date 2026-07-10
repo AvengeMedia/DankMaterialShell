@@ -1,0 +1,4 @@
+[templates.dmsasteroidz]
+input_path = 'SHELL_DIR/matugen/templates/asteroidz-colors.kdl'
+output_path = 'CONFIG_DIR/asteroidz/dms/colors.kdl'
+post_hook = 'sh -c "amsg dispatch reload_config 2>&1 || true"'

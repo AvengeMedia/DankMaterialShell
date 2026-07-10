@@ -15,7 +15,15 @@ Singleton {
 
     property bool isHyprland: false
     property bool isNiri: false
+    // isMango: generic/upstream MangoWC (MANGO_INSTANCE_SIGNATURE, no
+    // ASTEROIDZ_INSTANCE_SIGNATURE). isAsteroidz: the asteroidz fork,
+    // detected independently via ASTEROIDZ_INSTANCE_SIGNATURE. They are
+    // separate compositors - asteroidz is not a variant or subset of mango -
+    // even though it happens to reuse mango's IPC/config syntax. Consumers
+    // that need to support both check both flags explicitly; there is no
+    // shared "is this a mango-like compositor" property.
     property bool isMango: false
+    property bool isAsteroidz: false
     property bool isSway: false
     property bool isScroll: false
     property bool isMiracle: false
@@ -31,9 +39,13 @@ Singleton {
     readonly property string scrollSocket: Quickshell.env("SWAYSOCK")
     readonly property string miracleSocket: Quickshell.env("MIRACLESOCK")
     readonly property string labwcPid: Quickshell.env("LABWC_PID")
-    readonly property string mangoSignature: Quickshell.env("MANGO_INSTANCE_SIGNATURE")
+    readonly property string asteroidzSignature: Quickshell.env("ASTEROIDZ_INSTANCE_SIGNATURE") || ""
+    readonly property string mangoSignature: asteroidzSignature || Quickshell.env("MANGO_INSTANCE_SIGNATURE") || ""
     property bool useNiriSorting: isNiri && NiriService
-    property bool useMangoSorting: isMango && MangoService
+    // mango and asteroidz share the dwl-tag model; route to whichever backend
+    // is active so both compositors are handled (additive, not either/or).
+    readonly property var dwlService: isAsteroidz ? AsteroidzService : (isMango ? MangoService : null)
+    property bool useMangoSorting: (isMango || isAsteroidz) && dwlService
 
     property var randrScales: ({})
     property bool randrReady: false
@@ -98,8 +110,8 @@ Singleton {
                 return hyprlandMonitor.scale;
         }
 
-        if (isMango && screen) {
-            const mangoScale = MangoService.getOutputScale(screen.name);
+        if ((isAsteroidz) && screen) {
+            const mangoScale = AsteroidzService.getOutputScale(screen.name);
             if (mangoScale !== undefined && mangoScale > 0)
                 return mangoScale;
         }
@@ -116,8 +128,8 @@ Singleton {
         else if (isSway || isScroll || isMiracle) {
             const focusedWs = I3.workspaces?.values?.find(ws => ws.focused === true);
             screenName = focusedWs?.monitor?.name || "";
-        } else if (isMango && MangoService.activeOutput)
-            screenName = MangoService.activeOutput;
+        } else if ((isAsteroidz) && AsteroidzService.activeOutput)
+            screenName = AsteroidzService.activeOutput;
 
         if (!screenName)
             return Quickshell.screens.length > 0 ? Quickshell.screens[0] : null;
@@ -221,13 +233,13 @@ Singleton {
     }
 
     Connections {
-        target: MangoService
+        target: AsteroidzService
         function onStateChanged() {
-            if (isMango)
+            if (isAsteroidz)
                 scheduleSort();
         }
         function onWindowsChanged() {
-            if (isMango)
+            if (isAsteroidz)
                 scheduleSort();
         }
     }
@@ -240,7 +252,7 @@ Singleton {
             return NiriService.sortToplevels(ToplevelManager.toplevels.values);
 
         if (useMangoSorting)
-            return MangoService.sortToplevels(ToplevelManager.toplevels.values);
+            return dwlService.sortToplevels(ToplevelManager.toplevels.values);
 
         if (isHyprland)
             return sortHyprlandToplevelsSafe();
@@ -486,7 +498,7 @@ Singleton {
         if (useNiriSorting)
             return NiriService.filterCurrentWorkspace(toplevels, screen);
         if (useMangoSorting)
-            return MangoService.filterCurrentWorkspace(toplevels, screen);
+            return dwlService.filterCurrentWorkspace(toplevels, screen);
         if (isHyprland)
             return filterHyprlandCurrentWorkspaceSafe(toplevels, screen);
         return toplevels;
@@ -509,7 +521,7 @@ Singleton {
             return NiriService.filterCurrentDisplay(toplevels, screenName);
         }
         if (useMangoSorting)
-            return MangoService.filterCurrentDisplay(toplevels, screenName);
+            return dwlService.filterCurrentDisplay(toplevels, screenName);
         if (isHyprland)
             return filterHyprlandCurrentDisplaySafe(toplevels, screenName);
         return toplevels;
@@ -803,16 +815,16 @@ Singleton {
     // Mango clients carry absolute geometry + tags; count those on the screen's
     // active tags (not minimized), made screen-relative via the monitor offset.
     function mangoDockOverlapForSmartAutoHide(screenName, dockPosition, dockThickness, screenWidth, screenHeight) {
-        if (!isMango || !screenName || !MangoService.windows)
+        if (!(isAsteroidz) || !screenName || !AsteroidzService.windows)
             return false;
 
-        const out = MangoService.outputs[screenName];
+        const out = AsteroidzService.outputs[screenName];
         const active = new Set((out?.activeTags) || []);
         const monX = out?.x ?? 0;
         const monY = out?.y ?? 0;
 
-        for (let i = 0; i < MangoService.windows.length; i++) {
-            const win = MangoService.windows[i];
+        for (let i = 0; i < AsteroidzService.windows.length; i++) {
+            const win = AsteroidzService.windows[i];
             if (!win || win.monitor !== screenName || win.is_minimized)
                 continue;
             if (active.size > 0 && !(win.tags || []).some(t => active.has(t)))
@@ -938,7 +950,7 @@ Singleton {
             Qt.callLater(() => {
                 NiriService.generateNiriLayoutConfig();
                 HyprlandService.generateLayoutConfig();
-                MangoService.generateLayoutConfig();
+                AsteroidzService.generateLayoutConfig();
             });
         }
     }
@@ -947,19 +959,28 @@ Singleton {
         if (mangoSignature && mangoSignature.length > 0) {
             isHyprland = false;
             isNiri = false;
-            isMango = true;
             isSway = false;
             isScroll = false;
             isMiracle = false;
             isLabwc = false;
-            compositor = "mango";
-            log.info("Detected MangoWM via MANGO_INSTANCE_SIGNATURE");
+            if (asteroidzSignature && asteroidzSignature.length > 0) {
+                isAsteroidz = true;
+                isMango = false;
+                compositor = "asteroidz";
+                log.info("Detected Asteroidz via ASTEROIDZ_INSTANCE_SIGNATURE");
+            } else {
+                isAsteroidz = false;
+                isMango = true;
+                compositor = "mango";
+                log.info("Detected MangoWM via MANGO_INSTANCE_SIGNATURE");
+            }
             return;
         }
 
         if (hyprlandSignature && hyprlandSignature.length > 0 && !niriSocket && !swaySocket && !scrollSocket && !miracleSocket && !labwcPid) {
             isHyprland = true;
             isNiri = false;
+            isAsteroidz = false;
             isMango = false;
             isSway = false;
             isScroll = false;
@@ -975,6 +996,7 @@ Singleton {
                 if (exitCode === 0) {
                     isNiri = true;
                     isHyprland = false;
+                    isAsteroidz = false;
                     isMango = false;
                     isSway = false;
                     isScroll = false;
@@ -1009,6 +1031,7 @@ Singleton {
                 if (exitCode === 0) {
                     isNiri = false;
                     isHyprland = false;
+                    isAsteroidz = false;
                     isMango = false;
                     isSway = false;
                     isScroll = false;
@@ -1026,6 +1049,7 @@ Singleton {
                 if (exitCode === 0) {
                     isNiri = false;
                     isHyprland = false;
+                    isAsteroidz = false;
                     isMango = false;
                     isSway = false;
                     isScroll = true;
@@ -1041,6 +1065,7 @@ Singleton {
         if (labwcPid && labwcPid.length > 0) {
             isHyprland = false;
             isNiri = false;
+            isAsteroidz = false;
             isMango = false;
             isSway = false;
             isScroll = false;
@@ -1053,6 +1078,7 @@ Singleton {
 
         isHyprland = false;
         isNiri = false;
+        isAsteroidz = false;
         isMango = false;
         isSway = false;
         isScroll = false;
@@ -1067,8 +1093,8 @@ Singleton {
             return NiriService.powerOffMonitors();
         if (isHyprland)
             return HyprlandService.dpmsOff();
-        if (isMango)
-            return MangoService.powerOffMonitors();
+        if (isAsteroidz)
+            return AsteroidzService.powerOffMonitors();
         if (isSway || isScroll || isMiracle) {
             try {
                 I3.dispatch("output * dpms off");
@@ -1086,8 +1112,8 @@ Singleton {
             return NiriService.powerOnMonitors();
         if (isHyprland)
             return HyprlandService.dpmsOn();
-        if (isMango)
-            return MangoService.powerOnMonitors();
+        if (isAsteroidz)
+            return AsteroidzService.powerOnMonitors();
         if (isSway || isScroll || isMiracle) {
             try {
                 I3.dispatch("output * dpms on");

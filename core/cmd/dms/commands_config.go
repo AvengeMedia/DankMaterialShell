@@ -26,7 +26,7 @@ var resolveIncludeCmd = &cobra.Command{
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		switch len(args) {
 		case 0:
-			return []string{"hyprland", "niri", "mangowc"}, cobra.ShellCompDirectiveNoFileComp
+			return []string{"hyprland", "niri", "mangowc", "asteroidz"}, cobra.ShellCompDirectiveNoFileComp
 		case 1:
 			return []string{
 				"binds.lua",
@@ -74,7 +74,7 @@ func runResolveInclude(cmd *cobra.Command, args []string) {
 		result, err = checkHyprlandInclude(filename)
 	case "niri":
 		result, err = checkNiriInclude(filename)
-	case "mangowc", "mango":
+	case "mangowc", "mango", "asteroidz":
 		result, err = checkMangoWCInclude(filename)
 	default:
 		log.Fatalf("Unknown compositor: %s", compositor)
@@ -153,7 +153,8 @@ func hyprlandFindIncludeHyprlang(filePath, target string, processed map[string]b
 
 	for _, line := range lines {
 		trimmed := strings.TrimSpace(line)
-		if strings.HasPrefix(trimmed, "#") || trimmed == "" {
+		if strings.HasPrefix(trimmed, "#") || strings.HasPrefix(trimmed, "//") ||
+			trimmed == "" {
 			continue
 		}
 
@@ -161,12 +162,16 @@ func hyprlandFindIncludeHyprlang(filePath, target string, processed map[string]b
 			continue
 		}
 
-		parts := strings.SplitN(trimmed, "=", 2)
-		if len(parts) < 2 {
-			continue
+		// legacy: `source=./path`  |  KDL: `source "./path"`
+		var sourcePath string
+		if eq := strings.Index(trimmed, "="); eq >= 0 {
+			sourcePath = strings.TrimSpace(trimmed[eq+1:])
+		} else {
+			rest := strings.TrimSpace(trimmed[len("source"):])
+			rest = strings.TrimPrefix(rest, "-optional")
+			sourcePath = strings.TrimSpace(rest)
 		}
-
-		sourcePath := strings.TrimSpace(parts[1])
+		sourcePath = strings.Trim(sourcePath, "\"")
 		if matchesTarget(sourcePath, target) {
 			return true
 		}
@@ -275,7 +280,10 @@ func checkMangoWCInclude(filename string) (IncludeResult, error) {
 		result.Exists = true
 	}
 
-	mainConfig := filepath.Join(configDir, "config.conf")
+	mainConfig := filepath.Join(configDir, "config.kdl") // asteroidz
+	if _, err := os.Stat(mainConfig); os.IsNotExist(err) {
+		mainConfig = filepath.Join(configDir, "config.conf")
+	}
 	if _, err := os.Stat(mainConfig); os.IsNotExist(err) {
 		mainConfig = filepath.Join(configDir, "mango.conf")
 	}
@@ -309,7 +317,8 @@ func mangowcFindInclude(filePath, target string, processed map[string]bool) bool
 
 	for _, line := range lines {
 		trimmed := strings.TrimSpace(line)
-		if strings.HasPrefix(trimmed, "#") || trimmed == "" {
+		if strings.HasPrefix(trimmed, "#") || strings.HasPrefix(trimmed, "//") ||
+			trimmed == "" {
 			continue
 		}
 
@@ -317,12 +326,16 @@ func mangowcFindInclude(filePath, target string, processed map[string]bool) bool
 			continue
 		}
 
-		parts := strings.SplitN(trimmed, "=", 2)
-		if len(parts) < 2 {
-			continue
+		// legacy: `source=./path`  |  KDL: `source "./path"`
+		var sourcePath string
+		if eq := strings.Index(trimmed, "="); eq >= 0 {
+			sourcePath = strings.TrimSpace(trimmed[eq+1:])
+		} else {
+			rest := strings.TrimSpace(trimmed[len("source"):])
+			rest = strings.TrimPrefix(rest, "-optional")
+			sourcePath = strings.TrimSpace(rest)
 		}
-
-		sourcePath := strings.TrimSpace(parts[1])
+		sourcePath = strings.Trim(sourcePath, "\"")
 		if matchesTarget(sourcePath, target) {
 			return true
 		}
@@ -346,7 +359,18 @@ func mangowcFindInclude(filePath, target string, processed map[string]bool) bool
 }
 
 func matchesTarget(path, target string) bool {
-	path = strings.TrimPrefix(path, "./")
+	path = strings.Trim(strings.TrimPrefix(path, "./"), "\"")
 	target = strings.TrimPrefix(target, "./")
-	return path == target || strings.HasSuffix(path, "/"+target)
+	if path == target || strings.HasSuffix(path, "/"+target) {
+		return true
+	}
+	// tolerate the config-format extension differing (.conf vs .kdl)
+	stripExt := func(s string) string {
+		for _, e := range []string{".kdl", ".conf", ".lua"} {
+			s = strings.TrimSuffix(s, e)
+		}
+		return s
+	}
+	p, t := stripExt(path), stripExt(target)
+	return p == t || strings.HasSuffix(p, "/"+t)
 }

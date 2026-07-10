@@ -1,0 +1,139 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- asteroidz: 1979-arcade vector-wireframe mark. A wedge ship fires a
+       stream of shots into an asteroid that is fracturing apart, while a
+       flying saucer looks on. White strokes over a dark field, with a warm
+       amber accent (matching the asteroidz theme) for energy and impact. -->
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="42%" r="75%">
+      <stop offset="0%" stop-color="#15131f"/>
+      <stop offset="55%" stop-color="#0c0b13"/>
+      <stop offset="100%" stop-color="#050509"/>
+    </radialGradient>
+    <radialGradient id="blast" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffd9a8" stop-opacity="0.95"/>
+      <stop offset="45%" stop-color="#ffb86b" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#ffb86b" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="round">
+      <rect x="0" y="0" width="512" height="512" rx="112" ry="112"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#round)">
+    <rect width="512" height="512" fill="url(#bg)"/>
+
+    <!-- starfield -->
+    <g fill="#cfd0e6">
+      <circle cx="60" cy="70" r="2.4" opacity="0.9"/>
+      <circle cx="120" cy="300" r="1.6" opacity="0.6"/>
+      <circle cx="250" cy="70" r="1.8" opacity="0.7"/>
+      <circle cx="330" cy="330" r="1.5" opacity="0.55"/>
+      <circle cx="450" cy="120" r="2.2" opacity="0.85"/>
+      <circle cx="470" cy="300" r="1.5" opacity="0.6"/>
+      <circle cx="90" cy="460" r="1.7" opacity="0.6"/>
+      <circle cx="300" cy="470" r="1.8" opacity="0.7"/>
+      <circle cx="200" cy="200" r="1.3" opacity="0.4"/>
+      <circle cx="420" cy="440" r="1.4" opacity="0.5"/>
+      <circle cx="150" cy="150" r="1.2" opacity="0.4"/>
+      <circle cx="380" cy="70" r="1.3" opacity="0.45"/>
+    </g>
+
+    <!-- ================= flying saucer (UFO) ================= -->
+    <g stroke="#f4f4fb" stroke-width="5" fill="none" stroke-linejoin="round" stroke-linecap="round">
+      <g transform="translate(146,150)">
+        <!-- hull -->
+        <ellipse cx="0" cy="6" rx="58" ry="20"/>
+        <!-- dome -->
+        <path d="M -30,-2 A 32 30 0 0 1 30,-2"/>
+        <!-- dome window seam -->
+        <path d="M -18,-8 A 20 18 0 0 1 18,-8" stroke-width="3" opacity="0.85"/>
+        <!-- underside lights -->
+        <g stroke="#ffb86b" stroke-width="6" stroke-linecap="round">
+          <line x1="-34" y1="15" x2="-34" y2="15.5"/>
+          <line x1="-11" y1="21" x2="-11" y2="21.5"/>
+          <line x1="12" y1="21" x2="12" y2="21.5"/>
+          <line x1="35" y1="15" x2="35" y2="15.5"/>
+        </g>
+      </g>
+    </g>
+
+    <!-- ================= intact asteroids ================= -->
+    <g stroke="#dfe0ee" stroke-width="4.5" fill="none" stroke-linejoin="round" stroke-linecap="round">
+      <!-- small drifting rock lower-left -->
+      <g transform="translate(96,392) rotate(18)">
+        <polygon points="-24,-8 -6,-22 18,-16 26,4 12,22 -12,20 -26,6"/>
+        <polyline points="-6,-22 -2,-4 18,-16" opacity="0.7" stroke-width="3"/>
+      </g>
+      <!-- tiny rock lower-right -->
+      <g transform="translate(428,404) rotate(-24)">
+        <polygon points="-16,-6 0,-16 16,-8 14,10 -4,16 -18,4"/>
+      </g>
+    </g>
+
+    <!-- ================= the impact: asteroid breaking apart ============ -->
+    <g transform="translate(372,180)">
+      <!-- blast glow -->
+      <circle cx="0" cy="0" r="86" fill="url(#blast)"/>
+
+      <!-- fractured chunks flying apart -->
+      <g stroke="#f4f4fb" stroke-width="5" fill="#0c0b13" stroke-linejoin="round" stroke-linecap="round">
+        <!-- upper chunk, drifting up-right -->
+        <g transform="translate(20,-30) rotate(-14)">
+          <polygon points="-22,-20 6,-30 30,-14 26,12 -2,20 -24,4"/>
+        </g>
+        <!-- left chunk, drifting left -->
+        <g transform="translate(-40,10) rotate(20)">
+          <polygon points="-20,-14 2,-22 20,-6 12,16 -12,18 -24,2"/>
+        </g>
+        <!-- lower chunk, drifting down -->
+        <g transform="translate(4,42) rotate(-8)">
+          <polygon points="-18,-12 8,-18 22,-2 16,16 -8,18 -20,4"/>
+        </g>
+      </g>
+
+      <!-- explosion burst lines + debris -->
+      <g stroke="#ffb86b" stroke-width="5" stroke-linecap="round">
+        <line x1="0" y1="0" x2="0" y2="-70"/>
+        <line x1="0" y1="0" x2="58" y2="-40"/>
+        <line x1="0" y1="0" x2="70" y2="14"/>
+        <line x1="0" y1="0" x2="-58" y2="-34"/>
+        <line x1="0" y1="0" x2="-64" y2="30"/>
+        <line x1="0" y1="0" x2="34" y2="58"/>
+        <line x1="0" y1="0" x2="-24" y2="60"/>
+      </g>
+      <g fill="#ffd9a8">
+        <circle cx="72" cy="-48" r="4"/>
+        <circle cx="-70" cy="-40" r="3.4"/>
+        <circle cx="60" cy="42" r="3.6"/>
+        <circle cx="-52" cy="54" r="3"/>
+        <circle cx="6" cy="-84" r="3.6"/>
+      </g>
+    </g>
+
+    <!-- ================= the ship, firing up-right ================= -->
+    <!-- tracer stream of shots from ship toward the asteroid -->
+    <g stroke="#ffb86b" stroke-width="6" stroke-linecap="round">
+      <line x1="252" y1="300" x2="272" y2="272"/>
+      <line x1="286" y1="256" x2="306" y2="228"/>
+      <line x1="320" y1="212" x2="338" y2="188"/>
+    </g>
+
+    <g transform="translate(214,344) rotate(38)">
+      <!-- classic wedge ship with open notched tail -->
+      <g stroke="#ffffff" stroke-width="6" fill="#0c0b13" stroke-linejoin="round" stroke-linecap="round">
+        <polygon points="0,-42 26,36 0,20 -26,36"/>
+      </g>
+      <!-- cockpit tick -->
+      <line x1="0" y1="-14" x2="0" y2="2" stroke="#f4f4fb" stroke-width="3.5" stroke-linecap="round"/>
+      <!-- thrust flame -->
+      <g fill="none" stroke-linejoin="round" stroke-linecap="round">
+        <polyline points="-11,30 0,54 11,30" stroke="#ffb86b" stroke-width="6"/>
+        <polyline points="-5,30 0,42 5,30" stroke="#ffd9a8" stroke-width="4"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- subtle inner rim -->
+  <rect x="3" y="3" width="506" height="506" rx="110" ry="110"
+        fill="none" stroke="#2a2838" stroke-width="3"/>
+</svg>

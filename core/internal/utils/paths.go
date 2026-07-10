@@ -98,3 +98,17 @@ func ExpandPath(path string) (string, error) {
 
 	return expanded, nil
 }
+
+// AsteroidzConfigDir returns the asteroidz compositor config dir
+// (post-rename) when running under it or when the dir exists, else mango.
+func AsteroidzConfigDir() string {
+	base := XDGConfigHome()
+	if os.Getenv("ASTEROIDZ_INSTANCE_SIGNATURE") != "" {
+		return filepath.Join(base, "asteroidz")
+	}
+	az := filepath.Join(base, "asteroidz")
+	if _, err := os.Stat(az); err == nil {
+		return az
+	}
+	return filepath.Join(base, "mango")
+}

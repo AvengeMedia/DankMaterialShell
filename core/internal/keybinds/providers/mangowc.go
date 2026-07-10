@@ -13,6 +13,7 @@ import (
 )
 
 type MangoWCProvider struct {
+	name             string
 	configPath       string
 	dmsBindsIncluded bool
 	parsed           bool
@@ -20,22 +21,33 @@ type MangoWCProvider struct {
 
 func NewMangoWCProvider(configPath string) *MangoWCProvider {
 	if configPath == "" {
-		configPath = defaultMangoWCConfigDir()
+		configPath = utils.AsteroidzConfigDir()
 	}
 	return &MangoWCProvider{
+		name:       "mangowc",
 		configPath: configPath,
 	}
 }
 
-func defaultMangoWCConfigDir() string {
-	configDir, err := os.UserConfigDir()
-	if err != nil {
-		return ""
+// NewAsteroidzProvider is the same config-format provider as MangoWCProvider
+// (binds.conf syntax is shared across the mango/asteroidz fork lineage) but
+// registered under a distinct name and defaulting to the asteroidz config
+// directory, so asteroidz installs are addressable independently of a
+// generic upstream MangoWC install.
+func NewAsteroidzProvider(configPath string) *MangoWCProvider {
+	if configPath == "" {
+		configPath = filepath.Join(utils.XDGConfigHome(), "asteroidz")
 	}
-	return filepath.Join(configDir, "mango")
+	return &MangoWCProvider{
+		name:       "asteroidz",
+		configPath: configPath,
+	}
 }
 
 func (m *MangoWCProvider) Name() string {
+	if m.name != "" {
+		return m.name
+	}
 	return "mangowc"
 }
 

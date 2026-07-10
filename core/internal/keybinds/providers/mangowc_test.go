@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/config"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 )
 
 func TestMangoWCProviderName(t *testing.T) {
@@ -18,15 +19,17 @@ func TestMangoWCProviderName(t *testing.T) {
 
 func TestMangoWCProviderDefaultPath(t *testing.T) {
 	provider := NewMangoWCProvider("")
-	configDir, err := os.UserConfigDir()
-	if err != nil {
+	if _, err := os.UserConfigDir(); err != nil {
 		// Fall back to testing for non-empty path
 		if provider.configPath == "" {
 			t.Error("configPath should not be empty")
 		}
 		return
 	}
-	expected := filepath.Join(configDir, "mango")
+	// Resolves dynamically: prefers the asteroidz config dir when
+	// ASTEROIDZ_INSTANCE_SIGNATURE is set (or the dir already exists),
+	// otherwise falls back to the legacy mango config dir.
+	expected := utils.AsteroidzConfigDir()
 	if provider.configPath != expected {
 		t.Errorf("configPath = %q, want %q", provider.configPath, expected)
 	}

@@ -121,6 +121,9 @@ func getCompositor(args []string) string {
 	if os.Getenv("HYPRLAND_INSTANCE_SIGNATURE") != "" {
 		return "hyprland"
 	}
+	if os.Getenv("ASTEROIDZ_INSTANCE_SIGNATURE") != "" {
+		return "asteroidz"
+	}
 	if os.Getenv("MANGO_INSTANCE_SIGNATURE") != "" {
 		return "mango"
 	}
@@ -226,6 +229,38 @@ func runWindowrulesList(cmd *cobra.Command, args []string) {
 		allRules := providers.ConvertMangoRulesToWindowRules(parseResult.Rules)
 
 		provider := providers.NewMangoWritableProvider(configDir)
+		dmsRules, _ := provider.LoadDMSRules()
+
+		dmsRuleMap := make(map[int]windowrules.WindowRule)
+		for i, dr := range dmsRules {
+			dmsRuleMap[i] = dr
+		}
+
+		dmsIdx := 0
+		for i, r := range allRules {
+			if r.Source == "dms/windowrules.conf" {
+				if dmr, ok := dmsRuleMap[dmsIdx]; ok {
+					allRules[i].ID = dmr.ID
+					allRules[i].Name = dmr.Name
+				}
+				dmsIdx++
+			}
+		}
+
+		result.Rules = allRules
+		result.DMSStatus = parseResult.DMSStatus
+
+	case "asteroidz":
+		configDir := utils.AsteroidzConfigDir()
+
+		parseResult, err := providers.ParseAsteroidzWindowRules(configDir)
+		if err != nil {
+			log.Fatalf("Failed to parse asteroidz window rules: %v", err)
+		}
+
+		allRules := providers.ConvertAsteroidzRulesToWindowRules(parseResult.Rules)
+
+		provider := providers.NewAsteroidzWritableProvider(configDir)
 		dmsRules, _ := provider.LoadDMSRules()
 
 		dmsRuleMap := make(map[int]windowrules.WindowRule)
@@ -353,6 +388,9 @@ func getWindowRulesProvider(compositor string) windowrules.WritableProvider {
 	case "mango", "mangowc":
 		configDir := filepath.Join(utils.XDGConfigHome(), "mango")
 		return providers.NewMangoWritableProvider(configDir)
+	case "asteroidz":
+		configDir := utils.AsteroidzConfigDir()
+		return providers.NewAsteroidzWritableProvider(configDir)
 	default:
 		return nil
 	}
