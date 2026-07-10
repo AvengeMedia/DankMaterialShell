@@ -1209,11 +1209,14 @@ func (b *NetworkManagerBackend) updateAllWiFiDevices() {
 			sortWiFiNetworks(networks)
 		}
 
+		apCapable, _ := isAPCapableWiFiDevice(devInfo)
+
 		devices = append(devices, WiFiDevice{
 			Name:      name,
 			HwAddress: devInfo.hwAddress,
 			State:     stateStr,
 			Connected: connected,
+			APCapable: apCapable,
 			SSID:      ssid,
 			BSSID:     bssid,
 			Signal:    signal,

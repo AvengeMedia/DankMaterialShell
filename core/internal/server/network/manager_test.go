@@ -100,6 +100,7 @@ func TestStateChangedMeaningfully_WiFiDeviceFields(t *testing.T) {
 	}{
 		{name: "state", mutate: func(d *WiFiDevice) { d.State = "connecting" }, changed: true},
 		{name: "connected", mutate: func(d *WiFiDevice) { d.Connected = true }, changed: true},
+		{name: "apCapable", mutate: func(d *WiFiDevice) { d.APCapable = true }, changed: true},
 		{name: "ssid", mutate: func(d *WiFiDevice) { d.SSID = "HomeNet" }, changed: true},
 		{name: "signal jitter is ignored", mutate: func(d *WiFiDevice) { d.Signal = 63 }, changed: false},
 	}

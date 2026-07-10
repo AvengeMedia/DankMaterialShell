@@ -5,6 +5,7 @@ import (
 
 	mock_gonetworkmanager "github.com/AvengeMedia/DankMaterialShell/core/internal/mocks/github.com/Wifx/gonetworkmanager/v2"
 	"github.com/Wifx/gonetworkmanager/v2"
+	"github.com/godbus/dbus/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -211,10 +212,166 @@ func TestGetAPCapableWiFiDeviceSelectsDeviceCompatibleWithRequestedBand(t *testi
 	wlan0.EXPECT().GetPropertyWirelessCapabilities().Return(nmWiFiDeviceCapAP|nmWiFiDeviceCapFreqValid|nmWiFiDeviceCapFreq2GHz, nil).Twice()
 	wlan1.EXPECT().GetPropertyManaged().Return(true, nil)
 	wlan1.EXPECT().GetPropertyWirelessCapabilities().Return(nmWiFiDeviceCapAP|nmWiFiDeviceCapFreqValid|nmWiFiDeviceCapFreq5GHz, nil).Twice()
+	mockNM.EXPECT().GetPropertyActiveConnections().Return(nil, nil).Once()
+	wlan1.EXPECT().GetPropertyState().Return(gonetworkmanager.NmDeviceStateDisconnected, nil).Once()
 
 	devInfo, err := backend.getAPCapableWiFiDevice("", "a")
 	require.NoError(t, err)
 	assert.Equal(t, "wlan1", devInfo.name)
+}
+
+func TestGetAPCapableWiFiDeviceAutoPrefersIdleDevice(t *testing.T) {
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+	wlan0 := mock_gonetworkmanager.NewMockDeviceWireless(t)
+	wlan1 := mock_gonetworkmanager.NewMockDeviceWireless(t)
+
+	backend, err := NewNetworkManagerBackend(mockNM)
+	require.NoError(t, err)
+	backend.wifiDevices = map[string]*wifiDeviceInfo{
+		"wlan0": {device: wlan0, wireless: wlan0, name: "wlan0"},
+		"wlan1": {device: wlan1, wireless: wlan1, name: "wlan1"},
+	}
+
+	wlan0.EXPECT().GetPropertyManaged().Return(true, nil)
+	wlan0.EXPECT().GetPropertyWirelessCapabilities().Return(nmWiFiDeviceCapAP, nil)
+	wlan1.EXPECT().GetPropertyManaged().Return(true, nil)
+	wlan1.EXPECT().GetPropertyWirelessCapabilities().Return(nmWiFiDeviceCapAP, nil)
+	mockNM.EXPECT().GetPropertyActiveConnections().Return(nil, nil).Once()
+	wlan0.EXPECT().GetPropertyState().Return(gonetworkmanager.NmDeviceStateActivated, nil).Once()
+	wlan1.EXPECT().GetPropertyState().Return(gonetworkmanager.NmDeviceStateDisconnected, nil).Once()
+
+	devInfo, err := backend.getAPCapableWiFiDevice("", "")
+	require.NoError(t, err)
+	assert.Equal(t, "wlan1", devInfo.name, "auto selection should prefer the radio without an active connection")
+}
+
+func TestGetAPCapableWiFiDeviceAutoRanksTransitionalAndUnusableStates(t *testing.T) {
+	tests := []struct {
+		name       string
+		wlan0State gonetworkmanager.NmDeviceState
+		wlan1State gonetworkmanager.NmDeviceState
+		want       string
+	}{
+		{
+			name:       "disconnected beats client activation in progress",
+			wlan0State: gonetworkmanager.NmDeviceStateConfig,
+			wlan1State: gonetworkmanager.NmDeviceStateDisconnected,
+			want:       "wlan1",
+		},
+		{
+			name:       "active connection beats failed radio",
+			wlan0State: gonetworkmanager.NmDeviceStateFailed,
+			wlan1State: gonetworkmanager.NmDeviceStateActivated,
+			want:       "wlan1",
+		},
+		{
+			name:       "active connection beats unavailable radio",
+			wlan0State: gonetworkmanager.NmDeviceStateUnavailable,
+			wlan1State: gonetworkmanager.NmDeviceStateActivated,
+			want:       "wlan1",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+			wlan0 := mock_gonetworkmanager.NewMockDeviceWireless(t)
+			wlan1 := mock_gonetworkmanager.NewMockDeviceWireless(t)
+
+			backend, err := NewNetworkManagerBackend(mockNM)
+			require.NoError(t, err)
+			backend.wifiDevices = map[string]*wifiDeviceInfo{
+				"wlan0": {device: wlan0, wireless: wlan0, name: "wlan0"},
+				"wlan1": {device: wlan1, wireless: wlan1, name: "wlan1"},
+			}
+
+			wlan0.EXPECT().GetPropertyManaged().Return(true, nil)
+			wlan0.EXPECT().GetPropertyWirelessCapabilities().Return(nmWiFiDeviceCapAP, nil)
+			wlan1.EXPECT().GetPropertyManaged().Return(true, nil)
+			wlan1.EXPECT().GetPropertyWirelessCapabilities().Return(nmWiFiDeviceCapAP, nil)
+			mockNM.EXPECT().GetPropertyActiveConnections().Return(nil, nil).Once()
+			wlan0.EXPECT().GetPropertyState().Return(tt.wlan0State, nil).Once()
+			wlan1.EXPECT().GetPropertyState().Return(tt.wlan1State, nil).Once()
+
+			devInfo, err := backend.getAPCapableWiFiDevice("", "")
+			require.NoError(t, err)
+			assert.Equal(t, tt.want, devInfo.name)
+		})
+	}
+}
+
+func TestGetAPCapableWiFiDeviceAutoDoesNotEvictForeignHotspot(t *testing.T) {
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+	wlan0 := mock_gonetworkmanager.NewMockDeviceWireless(t)
+	wlan1 := mock_gonetworkmanager.NewMockDeviceWireless(t)
+	mockActive := mock_gonetworkmanager.NewMockActiveConnection(t)
+	mockConn := mock_gonetworkmanager.NewMockConnection(t)
+
+	backend, err := NewNetworkManagerBackend(mockNM)
+	require.NoError(t, err)
+	backend.wifiDevices = map[string]*wifiDeviceInfo{
+		"wlan0": {device: wlan0, wireless: wlan0, name: "wlan0"},
+		"wlan1": {device: wlan1, wireless: wlan1, name: "wlan1"},
+	}
+
+	userHotspot := gonetworkmanager.ConnectionSettings{
+		"connection": {
+			"type": "802-11-wireless",
+			"id":   "User Hotspot",
+		},
+		"802-11-wireless": {
+			"mode": "ap",
+		},
+	}
+
+	wlan0.EXPECT().GetPropertyManaged().Return(true, nil)
+	wlan0.EXPECT().GetPropertyWirelessCapabilities().Return(nmWiFiDeviceCapAP, nil)
+	wlan1.EXPECT().GetPropertyManaged().Return(true, nil)
+	wlan1.EXPECT().GetPropertyWirelessCapabilities().Return(nmWiFiDeviceCapAP, nil)
+	mockNM.EXPECT().GetPropertyActiveConnections().Return([]gonetworkmanager.ActiveConnection{mockActive}, nil).Once()
+	mockActive.EXPECT().GetPropertyType().Return("802-11-wireless", nil).Once()
+	mockActive.EXPECT().GetPropertyConnection().Return(mockConn, nil).Once()
+	mockConn.EXPECT().GetSettings().Return(userHotspot, nil).Once()
+	wlan0.EXPECT().GetPropertyState().Return(gonetworkmanager.NmDeviceStateActivated, nil).Once()
+	wlan1.EXPECT().GetPropertyState().Return(gonetworkmanager.NmDeviceStateDisconnected, nil).Once()
+
+	devInfo, err := backend.getAPCapableWiFiDevice("", "")
+	require.NoError(t, err)
+	assert.Equal(t, "wlan1", devInfo.name, "a radio hosting a foreign hotspot must rank as busy, not preferred")
+}
+
+func TestGetAPCapableWiFiDeviceAutoSticksWithActiveDMSHotspot(t *testing.T) {
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+	wlan0 := mock_gonetworkmanager.NewMockDeviceWireless(t)
+	wlan1 := mock_gonetworkmanager.NewMockDeviceWireless(t)
+	mockActive := mock_gonetworkmanager.NewMockActiveConnection(t)
+	mockConn := mock_gonetworkmanager.NewMockConnection(t)
+
+	backend, err := NewNetworkManagerBackend(mockNM)
+	require.NoError(t, err)
+	backend.wifiDevices = map[string]*wifiDeviceInfo{
+		"wlan0": {device: wlan0, wireless: wlan0, name: "wlan0"},
+		"wlan1": {device: wlan1, wireless: wlan1, name: "wlan1"},
+	}
+
+	dmsSettings := buildHotspotSettings(HotspotRequest{SSID: "DMS Hotspot"}, nil)
+
+	wlan0.EXPECT().GetPropertyManaged().Return(true, nil)
+	wlan0.EXPECT().GetPropertyWirelessCapabilities().Return(nmWiFiDeviceCapAP, nil)
+	wlan1.EXPECT().GetPropertyManaged().Return(true, nil)
+	wlan1.EXPECT().GetPropertyWirelessCapabilities().Return(nmWiFiDeviceCapAP, nil)
+	mockNM.EXPECT().GetPropertyActiveConnections().Return([]gonetworkmanager.ActiveConnection{mockActive}, nil).Once()
+	mockActive.EXPECT().GetPropertyType().Return("802-11-wireless", nil).Once()
+	mockActive.EXPECT().GetPropertyConnection().Return(mockConn, nil).Once()
+	mockConn.EXPECT().GetSettings().Return(dmsSettings, nil).Once()
+	mockActive.EXPECT().GetPropertyDevices().Return([]gonetworkmanager.Device{wlan0}, nil).Once()
+	wlan0.EXPECT().GetPath().Return(dbus.ObjectPath("/org/freedesktop/NetworkManager/Devices/1"))
+	wlan1.EXPECT().GetPath().Return(dbus.ObjectPath("/org/freedesktop/NetworkManager/Devices/2"))
+	wlan1.EXPECT().GetPropertyState().Return(gonetworkmanager.NmDeviceStateDisconnected, nil).Once()
+
+	devInfo, err := backend.getAPCapableWiFiDevice("", "")
+	require.NoError(t, err)
+	assert.Equal(t, "wlan0", devInfo.name, "the radio already hosting the DMS hotspot keeps the preference")
 }
 
 func TestConfigureHotspotRejectsNonAPCapableDevice(t *testing.T) {
@@ -556,6 +713,8 @@ func TestUpdateAllWiFiDevicesSuppressesActiveAPModeConnection(t *testing.T) {
 	mockConn.EXPECT().GetSettings().Return(dmsSettings, nil).Once()
 	mockActive.EXPECT().GetPropertyDevices().Return([]gonetworkmanager.Device{mockWiFi}, nil).Once()
 	mockWiFi.EXPECT().GetAccessPoints().Return([]gonetworkmanager.AccessPoint{}, nil).Once()
+	mockWiFi.EXPECT().GetPropertyManaged().Return(true, nil).Once()
+	mockWiFi.EXPECT().GetPropertyWirelessCapabilities().Return(nmWiFiDeviceCapAP, nil).Once()
 
 	backend.updateAllWiFiDevices()
 

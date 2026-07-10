@@ -30,7 +30,7 @@ Configuration changes are rejected while the DMS hotspot is active or activating
 **Parameters:**
 - `ssid` (string, required): Hotspot SSID to advertise.
 - `password` (string, optional): WPA-PSK password. Omit for an open hotspot when the backend allows it.
-- `device` (string, optional): Wi-Fi interface name to use, for example `wlan0`.
+- `device` (string, optional): Wi-Fi interface name to use, for example `wlan0`. When omitted, the backend picks an AP-capable radio at start time, preferring one that is already hosting the hotspot, then an idle radio, and only as a last resort a radio carrying an active connection (which NetworkManager will disconnect). Network state exposes `apCapable` on each `wifiDevices` entry so clients can predict this choice.
 - `band` (string, optional): Requested NetworkManager band: `bg` for 2.4GHz or `a` for 5GHz.
 
 **Response:**

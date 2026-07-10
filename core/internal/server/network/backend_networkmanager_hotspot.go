@@ -322,6 +322,29 @@ func isClientWiFiConnection(settings gonetworkmanager.ConnectionSettings) bool {
 	return ok && !isAPModeWiFiConnection(settings)
 }
 
+// activeDMSHotspotDevicePaths returns only the devices hosting the DMS-owned
+// hotspot, unlike activeAPModeWiFiDevicePaths which matches any AP-mode
+// connection (as the client-state isolation requires).
+func (b *NetworkManagerBackend) activeDMSHotspotDevicePaths() map[string]bool {
+	paths := make(map[string]bool)
+	active, err := b.findActiveDMSHotspotConnection()
+	if err != nil || active == nil {
+		return paths
+	}
+
+	devices, err := active.GetPropertyDevices()
+	if err != nil {
+		return paths
+	}
+	for _, dev := range devices {
+		if dev != nil {
+			paths[string(dev.GetPath())] = true
+		}
+	}
+
+	return paths
+}
+
 func (b *NetworkManagerBackend) activeAPModeWiFiDevicePaths() map[string]bool {
 	paths := make(map[string]bool)
 	nm := b.nmConn.(gonetworkmanager.NetworkManager)
@@ -383,7 +406,38 @@ func (b *NetworkManagerBackend) getAPCapableWiFiDevice(deviceName string, band s
 	}
 	sort.Strings(deviceNames)
 
+	dmsHotspotDevicePaths := b.activeDMSHotspotDevicePaths()
+
+	// Rank 0: already hosting the DMS hotspot (keep it where it is). Radios
+	// hosting foreign AP-mode connections must not get this preference and
+	// rank as busy through their Activated state instead.
+	// Rank 1: genuinely disconnected, so starting the AP disturbs nothing.
+	// Rank 2: client activation in progress; grabbing it kills the attempt.
+	// Rank 3: carrying an active connection; only used as a last resort.
+	// Rank 4: unavailable, failed, or unknown; activation is unlikely to succeed.
+	rankDevice := func(devInfo *wifiDeviceInfo) int {
+		if len(dmsHotspotDevicePaths) > 0 && dmsHotspotDevicePaths[string(devInfo.device.GetPath())] {
+			return 0
+		}
+		state, err := devInfo.device.GetPropertyState()
+		if err != nil {
+			return 4
+		}
+		switch {
+		case state == gonetworkmanager.NmDeviceStateDisconnected:
+			return 1
+		case state == gonetworkmanager.NmDeviceStateActivated:
+			return 3
+		case state > gonetworkmanager.NmDeviceStateDisconnected && state < gonetworkmanager.NmDeviceStateActivated:
+			return 2
+		default:
+			return 4
+		}
+	}
+
 	var lastBandErr error
+	var best *wifiDeviceInfo
+	bestRank := 5
 	for _, name := range deviceNames {
 		devInfo := wifiDevices[name]
 		ok, err := isAPCapableWiFiDevice(devInfo)
@@ -394,9 +448,15 @@ func (b *NetworkManagerBackend) getAPCapableWiFiDevice(deviceName string, band s
 			lastBandErr = err
 			continue
 		}
-		return devInfo, nil
+		if rank := rankDevice(devInfo); rank < bestRank {
+			best = devInfo
+			bestRank = rank
+		}
 	}
 
+	if best != nil {
+		return best, nil
+	}
 	if lastBandErr != nil {
 		return nil, lastBandErr
 	}

@@ -351,6 +351,9 @@ func stateChangedMeaningfully(old, new *NetworkState) bool {
 		if oldDev.Connected != newDev.Connected {
 			return true
 		}
+		if oldDev.APCapable != newDev.APCapable {
+			return true
+		}
 		if oldDev.SSID != newDev.SSID {
 			return true
 		}

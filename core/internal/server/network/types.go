@@ -47,6 +47,7 @@ type WiFiDevice struct {
 	HwAddress string        `json:"hwAddress"`
 	State     string        `json:"state"`
 	Connected bool          `json:"connected"`
+	APCapable bool          `json:"apCapable"`
 	SSID      string        `json:"ssid,omitempty"`
 	BSSID     string        `json:"bssid,omitempty"`
 	Signal    uint8         `json:"signal,omitempty"`
