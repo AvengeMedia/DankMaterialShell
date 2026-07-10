@@ -13,6 +13,8 @@ FloatingWindow {
     property bool isNiri: CompositorService.isNiri
     property bool isHyprland: CompositorService.isHyprland
     property bool isMango: CompositorService.isMango
+    property bool isAsteroidz: CompositorService.isAsteroidz
+    property bool isDwlTagCompositor: (CompositorService.isMango || CompositorService.isAsteroidz)
     property bool submitting: false
     property var targetWindow: null
 
@@ -106,6 +108,13 @@ FloatingWindow {
         mangoNoShadowToggle.checked = false;
         mangoNoRoundingToggle.checked = false;
         mangoNoAnimToggle.checked = false;
+        mangoForceTearingToggle.checked = false;
+        mangoVrrFullscreenToggle.checked = false;
+        mangoShieldCaptureToggle.checked = false;
+        mangoPinnedToggle.checked = false;
+        mangoDenyGroupToggle.checked = false;
+        mangoToplevelTagInput.text = "";
+        mangoSpecialWorkspaceInput.text = "";
     }
 
     function show(window) {
@@ -115,7 +124,7 @@ FloatingWindow {
         if (targetWindow) {
             nameInput.text = targetWindow.appId || "";
             if (targetWindow.appId)
-                appIdInput.text = isMango ? targetWindow.appId : "^" + targetWindow.appId + "$";
+                appIdInput.text = isDwlTagCompositor ? targetWindow.appId : "^" + targetWindow.appId + "$";
             else
                 appIdInput.text = "";
         }
@@ -232,6 +241,13 @@ FloatingWindow {
         mangoNoShadowToggle.checked = actions.noshadow || false;
         mangoNoRoundingToggle.checked = actions.norounding || false;
         mangoNoAnimToggle.checked = actions.noanim || false;
+        mangoForceTearingToggle.checked = actions.forceTearing || false;
+        mangoVrrFullscreenToggle.checked = actions.vrrOnlyFullscreen || false;
+        mangoShieldCaptureToggle.checked = actions.shieldWhenCapture || false;
+        mangoPinnedToggle.checked = actions.pinned || false;
+        mangoDenyGroupToggle.checked = actions.denyGroup || false;
+        mangoToplevelTagInput.text = editingRule?.matchCriteria?.toplevelTag || "";
+        mangoSpecialWorkspaceInput.text = actions.specialWorkspace || "";
     }
 
     function showEdit(rule) {
@@ -410,7 +426,7 @@ FloatingWindow {
                 actions.workspace = hyprWorkspaceInput.text.trim();
         }
 
-        if (isMango) {
+        if (isDwlTagCompositor) {
             if (mangoTagsInput.text.trim())
                 actions.workspace = mangoTagsInput.text.trim();
             if (mangoMonitorInput.text.trim())
@@ -427,6 +443,20 @@ FloatingWindow {
                 actions.norounding = true;
             if (mangoNoAnimToggle.checked)
                 actions.noanim = true;
+            if (isAsteroidz && mangoForceTearingToggle.checked)
+                actions.forceTearing = true;
+            if (isAsteroidz && mangoVrrFullscreenToggle.checked)
+                actions.vrrOnlyFullscreen = true;
+            if (isAsteroidz && mangoShieldCaptureToggle.checked)
+                actions.shieldWhenCapture = true;
+            if (isAsteroidz && mangoPinnedToggle.checked)
+                actions.pinned = true;
+            if (isAsteroidz && mangoDenyGroupToggle.checked)
+                actions.denyGroup = true;
+            if (isAsteroidz && mangoToplevelTagInput.text.trim())
+                matchCriteria.toplevelTag = mangoToplevelTagInput.text.trim();
+            if (isAsteroidz && mangoSpecialWorkspaceInput.text.trim())
+                actions.specialWorkspace = mangoSpecialWorkspaceInput.text.trim();
         }
 
         const name = nameInput.text.trim() || matchCriteria.appId || I18n.tr("Rule");
@@ -453,8 +483,8 @@ FloatingWindow {
                     return;
                 if (shouldValidate)
                     NiriService.validate();
-                if (CompositorService.isMango)
-                    MangoService.reloadConfig();
+                if ((CompositorService.isAsteroidz))
+                    CompositorService.dwlService.reloadConfig();
                 root.ruleSubmitted();
                 root.hide();
             });
@@ -466,8 +496,8 @@ FloatingWindow {
                     return;
                 if (shouldValidate)
                     NiriService.validate();
-                if (CompositorService.isMango)
-                    MangoService.reloadConfig();
+                if ((CompositorService.isAsteroidz))
+                    CompositorService.dwlService.reloadConfig();
                 root.ruleSubmitted();
                 root.hide();
             });
@@ -710,7 +740,7 @@ FloatingWindow {
                         anchors.fill: parent
                         font.pixelSize: Theme.fontSizeSmall
                         textColor: Theme.surfaceText
-                        placeholderText: isMango ? I18n.tr("App ID (e.g. firefox)") : isHyprland ? I18n.tr("Class regex (e.g. ^firefox$)") : I18n.tr("App ID regex (e.g. ^firefox$)")
+                        placeholderText: isDwlTagCompositor ? I18n.tr("App ID (e.g. firefox)") : isHyprland ? I18n.tr("Class regex (e.g. ^firefox$)") : I18n.tr("App ID regex (e.g. ^firefox$)")
                         backgroundColor: "transparent"
                         enabled: root.visible
                     }
@@ -728,7 +758,7 @@ FloatingWindow {
                             anchors.fill: parent
                             font.pixelSize: Theme.fontSizeSmall
                             textColor: Theme.surfaceText
-                            placeholderText: isMango ? I18n.tr("Title (optional)") : I18n.tr("Title regex (optional)")
+                            placeholderText: isDwlTagCompositor ? I18n.tr("Title (optional)") : I18n.tr("Title regex (optional)")
                             backgroundColor: "transparent"
                             enabled: root.visible
                         }
@@ -748,7 +778,7 @@ FloatingWindow {
                         onClicked: {
                             if (!root.targetWindow?.title)
                                 return;
-                            titleInput.text = isMango ? root.targetWindow.title : "^" + root.targetWindow.title + "$";
+                            titleInput.text = isDwlTagCompositor ? root.targetWindow.title : "^" + root.targetWindow.title + "$";
                         }
                     }
                 }
@@ -941,7 +971,7 @@ FloatingWindow {
                     CheckboxRow {
                         id: maximizedToggle
                         label: I18n.tr("Maximize")
-                        visible: !isMango
+                        visible: !isDwlTagCompositor
                     }
                     CheckboxRow {
                         id: fullscreenToggle
@@ -1695,14 +1725,14 @@ FloatingWindow {
                 }
 
                 SectionHeader {
-                    title: I18n.tr("Mango Options")
-                    visible: isMango
+                    title: I18n.tr("Asteroidz Options")
+                    visible: isDwlTagCompositor
                 }
 
                 Flow {
                     width: parent.width
                     spacing: Theme.spacingL
-                    visible: isMango
+                    visible: isDwlTagCompositor
 
                     CheckboxRow {
                         id: mangoNoBlurToggle
@@ -1724,12 +1754,73 @@ FloatingWindow {
                         id: mangoNoAnimToggle
                         label: I18n.tr("No Anim")
                     }
+                    CheckboxRow {
+                        id: mangoForceTearingToggle
+                        visible: isAsteroidz
+                        label: I18n.tr("Force Tearing")
+                    }
+                    CheckboxRow {
+                        id: mangoVrrFullscreenToggle
+                        visible: isAsteroidz
+                        label: I18n.tr("VRR only fullscreen")
+                    }
+                    CheckboxRow {
+                        id: mangoShieldCaptureToggle
+                        visible: isAsteroidz
+                        label: I18n.tr("Hide from captures")
+                    }
+                    CheckboxRow {
+                        id: mangoPinnedToggle
+                        visible: isAsteroidz
+                        label: I18n.tr("Pinned")
+                    }
+                    CheckboxRow {
+                        id: mangoDenyGroupToggle
+                        visible: isAsteroidz
+                        label: I18n.tr("Deny From Group")
+                    }
+                }
+
+                Column {
+                    width: parent.width
+                    spacing: Theme.spacingXS
+                    visible: isDwlTagCompositor
+
+                    StyledText {
+                        text: I18n.tr("Toplevel Tag Match (xdg-toplevel-tag-v1, regex)")
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                        width: parent.width
+                    }
+                    DankTextField {
+                        id: mangoToplevelTagInput
+                        width: parent.width
+                        placeholderText: I18n.tr("e.g. ^my-app-tag$")
+                    }
+                }
+
+                Column {
+                    width: parent.width
+                    spacing: Theme.spacingXS
+                    visible: isDwlTagCompositor
+
+                    StyledText {
+                        text: I18n.tr("Special Workspace")
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                        width: parent.width
+                    }
+                    DankTextField {
+                        id: mangoSpecialWorkspaceInput
+                        width: parent.width
+                        placeholderText: I18n.tr("e.g. term")
+                    }
                 }
 
                 Row {
                     width: parent.width
                     spacing: Theme.spacingM
-                    visible: isMango
+                    visible: isDwlTagCompositor
 
                     Column {
                         width: (parent.width - Theme.spacingM) / 2
@@ -1789,7 +1880,7 @@ FloatingWindow {
                 Row {
                     width: parent.width
                     spacing: Theme.spacingM
-                    visible: isMango
+                    visible: isDwlTagCompositor
 
                     Column {
                         width: parent.width

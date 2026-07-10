@@ -1156,8 +1156,7 @@
       "topbar",
       "workspace"
     ],
-    "description": "Show all 9 tags instead of only occupied tags",
-    "conditionKey": "isMango"
+    "description": "Show all 9 tags instead of only occupied tags"
   },
   {
     "section": "showOccupiedWorkspacesOnly",
@@ -3822,7 +3821,7 @@
     "description": "Shadow elevation on modals and dialogs"
   },
   {
-    "section": "mangoTrackpadNaturalScrolling",
+    "section": "asteroidzTrackpadNaturalScrolling",
     "label": "Natural Touchpad Scrolling",
     "tabIndex": 10,
     "category": "Theme & Colors",
@@ -3842,8 +3841,7 @@
       "touchpad",
       "trackpad"
     ],
-    "description": "Invert touchpad scroll direction",
-    "conditionKey": "isMango"
+    "description": "Invert touchpad scroll direction"
   },
   {
     "section": "popoutElevationEnabled",
@@ -4348,6 +4346,23 @@
       "template",
       "theme",
       "zed"
+    ]
+  },
+  {
+    "section": "matugenTemplateAsteroidz",
+    "label": "asteroidz",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "asteroidz",
+      "colors",
+      "look",
+      "matugen",
+      "scheme",
+      "style",
+      "template",
+      "theme"
     ]
   },
   {
@@ -8584,6 +8599,91 @@
     "icon": "line_start"
   },
   {
+    "section": "asteroidzDisplay",
+    "label": "Asteroidz Display",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "asteroidz",
+      "brightness",
+      "comes",
+      "custom",
+      "customize",
+      "default",
+      "display",
+      "focused",
+      "fork",
+      "hdr",
+      "luminance",
+      "mango",
+      "monitor",
+      "monitorrule",
+      "output",
+      "personal",
+      "personalization",
+      "screen",
+      "startup"
+    ],
+    "icon": "hdr_on",
+    "description": "BT.2020 + PQ on the focused output (runtime toggle; startup default comes from monitorrule hdr:1)"
+  },
+  {
+    "section": "asteroidzLayout",
+    "label": "Asteroidz Layout Overrides",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "asteroidz",
+      "border",
+      "custom",
+      "customize",
+      "dwl",
+      "gap",
+      "gaps",
+      "layout",
+      "mango",
+      "mangowc",
+      "margin",
+      "margins",
+      "overrides",
+      "padding",
+      "panel",
+      "personal",
+      "personalization",
+      "radius",
+      "spacing",
+      "statusbar",
+      "taskbar",
+      "topbar",
+      "window"
+    ],
+    "icon": "crop_square",
+    "description": "Use custom gaps instead of bar spacing"
+  },
+  {
+    "section": "asteroidzLayoutBorderSize",
+    "label": "Border Size",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "border",
+      "custom",
+      "customize",
+      "mango",
+      "mangowc",
+      "override",
+      "personal",
+      "personalization",
+      "size",
+      "width",
+      "window"
+    ],
+    "description": "Width of window border"
+  },
+  {
     "section": "hyprlandLayoutBorderSize",
     "label": "Border Size",
     "tabIndex": 37,
@@ -8802,6 +8902,30 @@
     "description": "Auto matches bar spacing; Off leaves gaps to your niri config"
   },
   {
+    "section": "asteroidzHdr",
+    "label": "HDR",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "asteroidz",
+      "comes",
+      "custom",
+      "customize",
+      "default",
+      "focused",
+      "hdr",
+      "mango",
+      "monitorrule",
+      "output",
+      "personal",
+      "personalization",
+      "startup",
+      "toggle"
+    ],
+    "description": "BT.2020 + PQ on the focused output (runtime toggle; startup default comes from monitorrule hdr:1)"
+  },
+  {
     "section": "hyprlandLayout",
     "label": "Hyprland Layout Overrides",
     "tabIndex": 37,
@@ -9002,6 +9126,25 @@
     "description": "Space between windows and screen edges"
   },
   {
+    "section": "asteroidzLayoutBorderSizeEnabled",
+    "label": "Override Border Size",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "border",
+      "custom",
+      "customize",
+      "mango",
+      "mangowc",
+      "override",
+      "personal",
+      "personalization",
+      "size"
+    ],
+    "description": "Use custom border size"
+  },
+  {
     "section": "hyprlandLayoutBorderSizeEnabled",
     "label": "Override Border Size",
     "tabIndex": 37,
@@ -9058,6 +9201,34 @@
       "width"
     ],
     "description": "Use custom border/focus-ring width"
+  },
+  {
+    "section": "asteroidzLayoutRadiusOverrideEnabled",
+    "label": "Override Corner Radius",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "colors",
+      "colour",
+      "corner",
+      "corners",
+      "custom",
+      "customize",
+      "look",
+      "mango",
+      "mangowc",
+      "override",
+      "personal",
+      "personalization",
+      "radius",
+      "round",
+      "rounded",
+      "style",
+      "theme",
+      "window"
+    ],
+    "description": "Use custom window radius instead of theme radius"
   },
   {
     "section": "hyprlandLayoutRadiusOverrideEnabled",
@@ -9143,6 +9314,33 @@
     "description": "Use custom window radius instead of theme radius"
   },
   {
+    "section": "asteroidzLayoutGapsOverrideEnabled",
+    "label": "Override Gaps",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "custom",
+      "customize",
+      "gap",
+      "gaps",
+      "mango",
+      "mangowc",
+      "margin",
+      "margins",
+      "override",
+      "padding",
+      "panel",
+      "personal",
+      "personalization",
+      "spacing",
+      "statusbar",
+      "taskbar",
+      "topbar"
+    ],
+    "description": "Use custom gaps instead of bar spacing"
+  },
+  {
     "section": "hyprlandResizeOnBorder",
     "label": "Resize on Border",
     "tabIndex": 37,
@@ -9164,6 +9362,59 @@
       "windows"
     ],
     "description": "Resize windows by dragging their edges with the mouse"
+  },
+  {
+    "section": "asteroidzSdrLuminance",
+    "label": "SDR Brightness in HDR",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "asteroidz",
+      "backlight",
+      "bright",
+      "brightness",
+      "config",
+      "content",
+      "custom",
+      "customize",
+      "dim",
+      "hdr",
+      "level",
+      "luminance",
+      "mango",
+      "outputs",
+      "personal",
+      "personalization",
+      "reference",
+      "sdr",
+      "white"
+    ],
+    "description": "White level for SDR content on HDR outputs (persist via sdr_reference_luminance in config.conf)"
+  },
+  {
+    "section": "asteroidzLayoutRadiusOverride",
+    "label": "Window Corner Radius",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "corner",
+      "corners",
+      "custom",
+      "customize",
+      "mango",
+      "mangowc",
+      "override",
+      "personal",
+      "personalization",
+      "radius",
+      "round",
+      "rounded",
+      "window",
+      "windows"
+    ],
+    "description": "Rounded corners for windows"
   },
   {
     "section": "hyprlandLayoutRadiusOverride",
@@ -9235,6 +9486,28 @@
       "windows"
     ],
     "description": "Rounded corners for windows"
+  },
+  {
+    "section": "asteroidzLayoutGapsOverride",
+    "label": "Window Gaps",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "between",
+      "custom",
+      "customize",
+      "gaps",
+      "mango",
+      "mangowc",
+      "override",
+      "personal",
+      "personalization",
+      "space",
+      "window",
+      "windows"
+    ],
+    "description": "Space between windows"
   },
   {
     "section": "niriLayoutGapsOverride",

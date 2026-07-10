@@ -47,6 +47,13 @@ Item {
                 "grepPattern": "source.*dms/layout.conf",
                 "includeLine": "source=./dms/layout.conf"
             };
+        case "asteroidz":
+            return {
+                "configFile": configDir + "/asteroidz/config.kdl",
+                "layoutFile": configDir + "/asteroidz/dms/layout.kdl",
+                "grepPattern": "source.*dms/layout.conf",
+                "includeLine": "source=./dms/layout.conf"
+            };
         default:
             return null;
         }
@@ -54,7 +61,7 @@ Item {
 
     function checkLayoutIncludeStatus() {
         const compositor = CompositorService.compositor;
-        if (compositor !== "niri" && compositor !== "hyprland" && compositor !== "mango") {
+        if (compositor !== "niri" && compositor !== "hyprland" && compositor !== "mango" && compositor !== "asteroidz") {
             layoutIncludeStatus = {
                 "exists": false,
                 "included": false,
@@ -138,7 +145,7 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
     }
 
     Component.onCompleted: {
-        if (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango) {
+        if (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isAsteroidz) {
             checkLayoutIncludeStatus();
             checkXrayConflicts();
         }
@@ -170,7 +177,7 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
                 color: (showLegacy || showSetup) ? Theme.withAlpha(Theme.primary, 0.15) : Theme.withAlpha(Theme.primary, 0)
                 border.color: (showLegacy || showSetup) ? Theme.withAlpha(Theme.primary, 0.3) : Theme.withAlpha(Theme.primary, 0)
                 border.width: 1
-                visible: (showLegacy || showSetup) && !root.checkingInclude && (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango)
+                visible: (showLegacy || showSetup) && !root.checkingInclude && (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isAsteroidz)
 
                 Row {
                     id: warningContent
@@ -667,6 +674,140 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
                     unit: "px"
                     defaultValue: 2
                     onSliderValueChanged: newValue => SettingsData.set("mangoLayoutBorderSize", newValue)
+                }
+            }
+
+            SettingsCard {
+                width: parent.width
+                tags: ["mango", "asteroidz", "hdr", "display", "brightness", "luminance", "fork"]
+                title: I18n.tr("Asteroidz Display")
+                settingKey: "asteroidzDisplay"
+                iconName: "hdr_on"
+                visible: (CompositorService.isAsteroidz)
+
+                SettingsToggleRow {
+                    tags: ["mango", "asteroidz", "hdr", "toggle"]
+                    settingKey: "asteroidzHdr"
+                    text: I18n.tr("HDR")
+                    description: I18n.tr("BT.2020 + PQ on the focused output (runtime toggle; startup default comes from monitorrule hdr:1)")
+                    checked: {
+                        const out = CompositorService.dwlService.getOutputState(CompositorService.dwlService.activeOutput);
+                        return out?.hdr ?? false;
+                    }
+                    onToggled: () => CompositorService.dwlService.dispatchCommand("toggle_hdr")
+                }
+
+                SettingsSliderRow {
+                    tags: ["mango", "asteroidz", "hdr", "brightness", "sdr"]
+                    settingKey: "asteroidzSdrLuminance"
+                    text: I18n.tr("SDR Brightness in HDR")
+                    description: I18n.tr("White level for SDR content on HDR outputs (persist via sdr_reference_luminance in config.conf)")
+                    value: {
+                        const out = CompositorService.dwlService.getOutputState(CompositorService.dwlService.activeOutput);
+                        return Math.round(out?.sdr_luminance ?? 280);
+                    }
+                    minimum: 100
+                    maximum: 600
+                    unit: "nits"
+                    defaultValue: 280
+                    onSliderValueChanged: newValue => CompositorService.dwlService.dispatchCommand("set_sdr_luminance," + newValue)
+                }
+            }
+
+            SettingsCard {
+                width: parent.width
+                tags: ["mangowc", "mango", "asteroidz", "dwl", "layout", "gaps", "radius", "window", "border"]
+                title: I18n.tr("Asteroidz Layout Overrides")
+                settingKey: "asteroidzLayout"
+                iconName: "crop_square"
+                visible: (CompositorService.isAsteroidz)
+
+                SettingsToggleRow {
+                    tags: ["mangowc", "mango", "gaps", "override"]
+                    settingKey: "asteroidzLayoutGapsOverrideEnabled"
+                    text: I18n.tr("Override Gaps")
+                    description: I18n.tr("Use custom gaps instead of bar spacing")
+                    checked: SettingsData.asteroidzLayoutGapsOverride >= 0
+                    onToggled: checked => {
+                        if (checked) {
+                            const currentGaps = Math.max(4, (SettingsData.barConfigs[0]?.spacing ?? 4));
+                            SettingsData.set("asteroidzLayoutGapsOverride", currentGaps);
+                            return;
+                        }
+                        SettingsData.set("asteroidzLayoutGapsOverride", -1);
+                    }
+                }
+
+                SettingsSliderRow {
+                    tags: ["mangowc", "mango", "gaps", "override"]
+                    settingKey: "asteroidzLayoutGapsOverride"
+                    text: I18n.tr("Window Gaps")
+                    description: I18n.tr("Space between windows") + " (gappih/gappiv/gappoh/gappov)"
+                    visible: SettingsData.asteroidzLayoutGapsOverride >= 0
+                    value: Math.max(0, SettingsData.asteroidzLayoutGapsOverride)
+                    minimum: 0
+                    maximum: 50
+                    unit: "px"
+                    defaultValue: Math.max(4, (SettingsData.barConfigs[0]?.spacing ?? 4))
+                    onSliderValueChanged: newValue => SettingsData.set("asteroidzLayoutGapsOverride", newValue)
+                }
+
+                SettingsToggleRow {
+                    tags: ["mangowc", "mango", "radius", "override"]
+                    settingKey: "asteroidzLayoutRadiusOverrideEnabled"
+                    text: I18n.tr("Override Corner Radius")
+                    description: I18n.tr("Use custom window radius instead of theme radius")
+                    checked: SettingsData.asteroidzLayoutRadiusOverride >= 0
+                    onToggled: checked => {
+                        if (checked) {
+                            SettingsData.set("asteroidzLayoutRadiusOverride", SettingsData.cornerRadius);
+                            return;
+                        }
+                        SettingsData.set("asteroidzLayoutRadiusOverride", -1);
+                    }
+                }
+
+                SettingsSliderRow {
+                    tags: ["mangowc", "mango", "radius", "override"]
+                    settingKey: "asteroidzLayoutRadiusOverride"
+                    text: I18n.tr("Window Corner Radius")
+                    description: I18n.tr("Rounded corners for windows") + " (border_radius)"
+                    visible: SettingsData.asteroidzLayoutRadiusOverride >= 0
+                    value: Math.max(0, SettingsData.asteroidzLayoutRadiusOverride)
+                    minimum: 0
+                    maximum: 100
+                    unit: "px"
+                    defaultValue: SettingsData.cornerRadius
+                    onSliderValueChanged: newValue => SettingsData.set("asteroidzLayoutRadiusOverride", newValue)
+                }
+
+                SettingsToggleRow {
+                    tags: ["mangowc", "mango", "border", "override"]
+                    settingKey: "asteroidzLayoutBorderSizeEnabled"
+                    text: I18n.tr("Override Border Size")
+                    description: I18n.tr("Use custom border size")
+                    checked: SettingsData.asteroidzLayoutBorderSize >= 0
+                    onToggled: checked => {
+                        if (checked) {
+                            SettingsData.set("asteroidzLayoutBorderSize", 2);
+                            return;
+                        }
+                        SettingsData.set("asteroidzLayoutBorderSize", -1);
+                    }
+                }
+
+                SettingsSliderRow {
+                    tags: ["mangowc", "mango", "border", "override"]
+                    settingKey: "asteroidzLayoutBorderSize"
+                    text: I18n.tr("Border Size")
+                    description: I18n.tr("Width of window border") + " (borderpx)"
+                    visible: SettingsData.asteroidzLayoutBorderSize >= 0
+                    value: Math.max(0, SettingsData.asteroidzLayoutBorderSize)
+                    minimum: 0
+                    maximum: 10
+                    unit: "px"
+                    defaultValue: 2
+                    onSliderValueChanged: newValue => SettingsData.set("asteroidzLayoutBorderSize", newValue)
                 }
             }
         }

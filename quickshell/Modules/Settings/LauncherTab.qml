@@ -305,8 +305,8 @@ Item {
                                 modes.push("niri");
                             } else if (CompositorService.isHyprland) {
                                 modes.push("Hyprland");
-                            } else if (CompositorService.isMango) {
-                                modes.push("mango");
+                            } else if ((CompositorService.isAsteroidz)) {
+                                modes.push(CompositorService.compositor === "asteroidz" ? "asteroidz" : "mango");
                             } else if (CompositorService.isSway) {
                                 modes.push("Sway");
                             } else if (CompositorService.isScroll) {

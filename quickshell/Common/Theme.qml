@@ -1736,6 +1736,8 @@ Singleton {
                     skipTemplates.push("hyprland");
                 if (!SettingsData.matugenTemplateMangowc)
                     skipTemplates.push("mangowc");
+                if (!SettingsData.matugenTemplateAsteroidz)
+                    skipTemplates.push("asteroidz");
                 if (!SettingsData.matugenTemplateQt5ct)
                     skipTemplates.push("qt5ct");
                 if (!SettingsData.matugenTemplateQt6ct)

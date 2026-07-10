@@ -10,7 +10,7 @@ DankPopout {
 
     property var triggerScreen: null
 
-    readonly property bool isMango: CompositorService.isMango
+    readonly property bool isDwlTagCompositor: (CompositorService.isMango || CompositorService.isAsteroidz)
 
     function setTriggerPosition(x, y, width, section, screen, barPosition, barThickness, barSpacing, barConfig) {
         triggerX = x;
@@ -35,8 +35,8 @@ DankPopout {
     onScreenChanged: updateOutputState()
 
     function updateOutputState() {
-        if (screen && MangoService.available) {
-            outputState = MangoService.getOutputState(screen.name);
+        if (screen && CompositorService.dwlService.available) {
+            outputState = CompositorService.dwlService.getOutputState(screen.name);
         } else {
             outputState = null;
         }
@@ -82,7 +82,7 @@ DankPopout {
     }
 
     Connections {
-        target: MangoService
+        target: CompositorService.dwlService
         function onStateChanged() {
             updateOutputState();
         }
@@ -217,7 +217,7 @@ DankPopout {
                     spacing: Theme.spacingS
 
                     Repeater {
-                        model: MangoService.layouts
+                        model: CompositorService.dwlService.layouts
 
                         delegate: Rectangle {
                             required property string modelData
@@ -271,11 +271,11 @@ DankPopout {
                                     if (!root.triggerScreen) {
                                         return;
                                     }
-                                    if (!MangoService.available) {
+                                    if (!CompositorService.dwlService.available) {
                                         return;
                                     }
 
-                                    MangoService.setLayout(root.triggerScreen.name, index);
+                                    CompositorService.dwlService.setLayout(root.triggerScreen.name, index);
                                     root.close();
                                 }
                             }

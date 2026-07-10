@@ -250,7 +250,7 @@ Variants {
         readonly property bool shouldHideForWindows: {
             if (!SettingsData.dockSmartAutoHide)
                 return false;
-            if (!CompositorService.isNiri && !CompositorService.isHyprland && !CompositorService.isMango)
+            if (!CompositorService.isNiri && !CompositorService.isHyprland && !(CompositorService.isAsteroidz))
                 return false;
 
             const screenName = dock.modelData?.name ?? "";
@@ -314,9 +314,9 @@ Variants {
                 return false;
             }
 
-            if (CompositorService.isMango) {
-                MangoService.windows;
-                MangoService.outputs;
+            if ((CompositorService.isAsteroidz)) {
+                CompositorService.dwlService.windows;
+                CompositorService.dwlService.outputs;
                 return CompositorService.mangoDockOverlapForSmartAutoHide(screenName, SettingsData.dockPosition, dockThickness, screenWidth, screenHeight);
             }
 

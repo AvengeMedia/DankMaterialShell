@@ -479,6 +479,16 @@ Item {
                 if (appData.isCoreApp && appData.coreAppData) {
                     return "";
                 }
+                // Prefer the icon the client itself set via
+                // xdg-toplevel-icon-v1 (exposed through the mango IPC)
+                if ((CompositorService.isAsteroidz) && CompositorService.dwlService.windows && CompositorService.dwlService.windows.length) {
+                    const wmWin = CompositorService.dwlService.windows.find(w => w.appid === appData.appId && w.icon);
+                    if (wmWin) {
+                        const p = Quickshell.iconPath(wmWin.icon, true);
+                        if (p)
+                            return p;
+                    }
+                }
                 return Paths.getAppIcon(appData.appId, cachedDesktopEntry);
             }
             mipmap: true

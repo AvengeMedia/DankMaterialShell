@@ -32,12 +32,14 @@ Singleton {
     property var pendingChanges: ({})
     property var pendingNiriChanges: ({})
     property var pendingHyprlandChanges: ({})
+    property var pendingAsteroidzChanges: ({})
     property var originalNiriSettings: null
     property var originalHyprlandSettings: null
+    property var originalAsteroidzSettings: null
     property var originalOutputs: null
     property string originalDisplayNameMode: ""
     property bool formatChanged: originalDisplayNameMode !== "" && originalDisplayNameMode !== SettingsData.displayNameMode
-    property bool hasPendingChanges: Object.keys(pendingChanges).length > 0 || Object.keys(pendingNiriChanges).length > 0 || Object.keys(pendingHyprlandChanges).length > 0 || formatChanged
+    property bool hasPendingChanges: Object.keys(pendingChanges).length > 0 || Object.keys(pendingNiriChanges).length > 0 || Object.keys(pendingHyprlandChanges).length > 0 || Object.keys(pendingAsteroidzChanges).length > 0 || formatChanged
 
     property bool validatingConfig: false
     property string validationError: ""
@@ -1078,6 +1080,7 @@ Singleton {
         case "hyprland":
             return parseHyprlandOutputs(content);
         case "mango":
+        case "asteroidz":
             return parseMangoOutputs(content);
         default:
             return {};
@@ -1422,6 +1425,13 @@ Singleton {
                 "grepPattern": 'source.*dms/outputs.conf',
                 "includeLine": "source=./dms/outputs.conf"
             };
+        case "asteroidz":
+            return {
+                "configFile": configDir + "/asteroidz/config.kdl",
+                "outputsFile": configDir + "/asteroidz/dms/outputs.kdl",
+                "grepPattern": 'source.*dms/outputs.conf',
+                "includeLine": "source=./dms/outputs.conf"
+            };
         default:
             return null;
         }
@@ -1429,7 +1439,7 @@ Singleton {
 
     function checkIncludeStatus() {
         const compositor = CompositorService.compositor;
-        if (compositor !== "niri" && compositor !== "hyprland" && compositor !== "mango") {
+        if (compositor !== "niri" && compositor !== "hyprland" && compositor !== "mango" && compositor !== "asteroidz") {
             includeStatus = {
                 "exists": false,
                 "included": false,
@@ -1639,8 +1649,14 @@ Singleton {
                 break;
             }
         case "mango":
-            MangoService.generateOutputsConfig(outputsData, finish);
+            AsteroidzService.generateOutputsConfig(outputsData, {}, finish);
             break;
+        case "asteroidz":
+            {
+                const asteroidzSettings = hasExplicitSettings ? settings : buildMergedAsteroidzSettings();
+                AsteroidzService.generateOutputsConfig(outputsData, asteroidzSettings, finish);
+                break;
+            }
         default:
             WlrOutputService.applyOutputsConfig(outputsData, outputs);
             finish(true);
@@ -1927,6 +1943,34 @@ Singleton {
         originalHyprlandSettings = JSON.parse(JSON.stringify(SettingsData.hyprlandOutputSettings));
     }
 
+    function getAsteroidzSetting(output, outputName, key, defaultValue) {
+        if (!CompositorService.isAsteroidz)
+            return defaultValue;
+        const pending = pendingAsteroidzChanges[outputName];
+        if (pending && (key in pending)) {
+            const val = pending[key];
+            return (val !== null && val !== undefined) ? val : defaultValue;
+        }
+        return SettingsData.getAsteroidzOutputSetting(outputName, key, defaultValue);
+    }
+
+    function setAsteroidzSetting(output, outputName, key, value) {
+        if (!CompositorService.isAsteroidz)
+            return;
+        initOriginalAsteroidzSettings();
+        const newPending = JSON.parse(JSON.stringify(pendingAsteroidzChanges));
+        if (!newPending[outputName])
+            newPending[outputName] = {};
+        newPending[outputName][key] = value;
+        pendingAsteroidzChanges = newPending;
+    }
+
+    function initOriginalAsteroidzSettings() {
+        if (originalAsteroidzSettings)
+            return;
+        originalAsteroidzSettings = JSON.parse(JSON.stringify(SettingsData.asteroidzOutputSettings));
+    }
+
     function initOriginalOutputs() {
         if (!originalOutputs)
             originalOutputs = JSON.parse(JSON.stringify(outputs));
@@ -2035,9 +2079,11 @@ Singleton {
         pendingChanges = {};
         pendingNiriChanges = {};
         pendingHyprlandChanges = {};
+        pendingAsteroidzChanges = {};
         originalOutputs = null;
         originalNiriSettings = null;
         originalHyprlandSettings = null;
+        originalAsteroidzSettings = null;
         originalDisplayNameMode = "";
     }
 
@@ -2112,6 +2158,22 @@ Singleton {
                 changeDescriptions.push(outputId + ": " + I18n.tr("VRR Fullscreen Only") + " → " + (changes.vrrFullscreenOnly ? I18n.tr("Enabled") : I18n.tr("Disabled")));
         }
 
+        for (const outputId in pendingAsteroidzChanges) {
+            const changes = pendingAsteroidzChanges[outputId];
+            if (changes.hdr !== undefined)
+                changeDescriptions.push(outputId + ": " + I18n.tr("HDR") + " → " + (changes.hdr ? I18n.tr("Enabled") : I18n.tr("Disabled")));
+            if (changes.bitdepth !== undefined)
+                changeDescriptions.push(outputId + ": " + I18n.tr("Bit Depth") + " → " + changes.bitdepth);
+            if (changes.hdr_max_luminance !== undefined)
+                changeDescriptions.push(outputId + ": " + I18n.tr("HDR Max Luminance") + " → " + changes.hdr_max_luminance);
+            if (changes.hdr_min_luminance !== undefined)
+                changeDescriptions.push(outputId + ": " + I18n.tr("HDR Min Luminance") + " → " + changes.hdr_min_luminance);
+            if (changes.hdr_max_fall !== undefined)
+                changeDescriptions.push(outputId + ": " + I18n.tr("HDR Max Frame-Average Luminance") + " → " + changes.hdr_max_fall);
+            if (changes.icc_profile !== undefined)
+                changeDescriptions.push(outputId + ": " + I18n.tr("ICC Profile") + " → " + (changes.icc_profile || I18n.tr("None")));
+        }
+
         if (CompositorService.isNiri) {
             validateAndApplyNiriConfig(changeDescriptions);
             return;
@@ -2124,6 +2186,8 @@ Singleton {
 
         if (CompositorService.isHyprland)
             commitHyprlandSettingsChanges();
+        if (CompositorService.isAsteroidz)
+            commitAsteroidzSettingsChanges();
 
         const mergedOutputs = buildOutputsWithPendingChanges();
         backendWriteOutputsConfig(mergedOutputs);
@@ -2232,6 +2296,34 @@ Singleton {
             for (const id in SettingsData.hyprlandOutputSettings) {
                 if (SettingsData.hyprlandOutputSettings[id]?.disabled)
                     SettingsData.removeHyprlandOutputSetting(id, "disabled");
+            }
+        }
+    }
+
+    function buildMergedAsteroidzSettings() {
+        const merged = JSON.parse(JSON.stringify(SettingsData.asteroidzOutputSettings));
+        for (const outputId in pendingAsteroidzChanges) {
+            if (!merged[outputId])
+                merged[outputId] = {};
+            for (const key in pendingAsteroidzChanges[outputId]) {
+                const val = pendingAsteroidzChanges[outputId][key];
+                if (val === null || val === undefined)
+                    delete merged[outputId][key];
+                else
+                    merged[outputId][key] = val;
+            }
+        }
+        return merged;
+    }
+
+    function commitAsteroidzSettingsChanges() {
+        for (const outputId in pendingAsteroidzChanges) {
+            for (const key in pendingAsteroidzChanges[outputId]) {
+                const val = pendingAsteroidzChanges[outputId][key];
+                if (val === null || val === undefined)
+                    SettingsData.removeAsteroidzOutputSetting(outputId, key);
+                else
+                    SettingsData.setAsteroidzOutputSetting(outputId, key, val);
             }
         }
     }

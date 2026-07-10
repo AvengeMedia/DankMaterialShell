@@ -108,8 +108,8 @@ Item {
         } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
             const focusedWs = I3.workspaces?.values?.find(ws => ws.focused === true);
             focusedScreenName = focusedWs?.monitor?.name || "";
-        } else if (CompositorService.isMango && MangoService.activeOutput) {
-            focusedScreenName = MangoService.activeOutput;
+        } else if ((CompositorService.isAsteroidz) && CompositorService.dwlService.activeOutput) {
+            focusedScreenName = CompositorService.dwlService.activeOutput;
         }
 
         if (!focusedScreenName && barVariants.instances.length > 0) {
@@ -137,8 +137,8 @@ Item {
         } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
             const focusedWs = I3.workspaces?.values?.find(ws => ws.focused === true);
             focusedScreenName = focusedWs?.monitor?.name || "";
-        } else if (CompositorService.isMango && MangoService.activeOutput) {
-            focusedScreenName = MangoService.activeOutput;
+        } else if ((CompositorService.isAsteroidz) && CompositorService.dwlService.activeOutput) {
+            focusedScreenName = CompositorService.dwlService.activeOutput;
         }
 
         if (!focusedScreenName && barVariants.instances.length > 0) {

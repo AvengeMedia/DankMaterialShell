@@ -35,10 +35,11 @@ Singleton {
     readonly property var conditionMap: ({
             "isNiri": () => CompositorService.isNiri,
             "isHyprland": () => CompositorService.isHyprland,
+            "isAsteroidz": () => (CompositorService.isAsteroidz),
             "isMango": () => CompositorService.isMango,
             "isHyprlandOrNiri": () => CompositorService.isHyprland || CompositorService.isNiri,
-            "windowRulesCapable": () => CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango,
-            "layoutCapable": () => CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango,
+            "windowRulesCapable": () => CompositorService.isNiri || CompositorService.isHyprland || (CompositorService.isAsteroidz),
+            "layoutCapable": () => CompositorService.isNiri || CompositorService.isHyprland || (CompositorService.isAsteroidz),
             "keybindsAvailable": () => KeybindsService.available,
             "soundsAvailable": () => AudioService.soundsAvailable,
             "cupsAvailable": () => CupsService.cupsAvailable,

@@ -32,7 +32,7 @@ Item {
     property var externalRules: []
     property var activeWindows: getActiveWindows()
     property string expandedExternalId: ""
-    readonly property string dmsRulesFileName: CompositorService.isNiri ? "dms/windowrules.kdl" : CompositorService.isMango ? "dms/windowrules.conf" : "dms/windowrules.lua"
+    readonly property string dmsRulesFileName: CompositorService.isNiri ? "dms/windowrules.kdl" : (CompositorService.isAsteroidz) ? "dms/windowrules.kdl" : "dms/windowrules.lua"
 
     Component.onDestruction: SettingsSearchService.unregisterCard("windowRules")
 
@@ -183,6 +183,13 @@ Item {
                 "grepPattern": "dms/windowrules.conf",
                 "includeLine": "source=./dms/windowrules.conf"
             };
+        case "asteroidz":
+            return {
+                "configFile": configDir + "/asteroidz/config.kdl",
+                "rulesFile": configDir + "/asteroidz/dms/windowrules.kdl",
+                "grepPattern": "dms/windowrules.conf",
+                "includeLine": "source=./dms/windowrules.conf"
+            };
         default:
             return null;
         }
@@ -190,7 +197,7 @@ Item {
 
     function loadWindowRules() {
         const compositor = CompositorService.compositor;
-        if (compositor !== "niri" && compositor !== "hyprland" && compositor !== "mango") {
+        if (compositor !== "niri" && compositor !== "hyprland" && compositor !== "mango" && compositor !== "asteroidz") {
             checkingInclude = false;
             windowRules = [];
             externalRules = [];
@@ -231,13 +238,13 @@ Item {
             return;
         }
         const compositor = CompositorService.compositor;
-        if (compositor !== "niri" && compositor !== "hyprland" && compositor !== "mango")
+        if (compositor !== "niri" && compositor !== "hyprland" && compositor !== "mango" && compositor !== "asteroidz")
             return;
 
         Proc.runCommand("remove-windowrule", ["dms", "config", "windowrules", "remove", compositor, ruleId], (output, exitCode) => {
             if (exitCode === 0) {
-                if (CompositorService.isMango)
-                    MangoService.reloadConfig();
+                if ((CompositorService.isAsteroidz))
+                    CompositorService.dwlService.reloadConfig();
                 loadWindowRules();
                 rulesChanged();
             }
@@ -253,7 +260,7 @@ Item {
             return;
 
         const compositor = CompositorService.compositor;
-        if (compositor !== "niri" && compositor !== "hyprland" && compositor !== "mango")
+        if (compositor !== "niri" && compositor !== "hyprland" && compositor !== "mango" && compositor !== "asteroidz")
             return;
 
         let ids = windowRules.map(r => r.id);
@@ -262,8 +269,8 @@ Item {
 
         Proc.runCommand("reorder-windowrules", ["dms", "config", "windowrules", "reorder", compositor, JSON.stringify(ids)], (output, exitCode) => {
             if (exitCode === 0) {
-                if (CompositorService.isMango)
-                    MangoService.reloadConfig();
+                if ((CompositorService.isAsteroidz))
+                    CompositorService.dwlService.reloadConfig();
                 loadWindowRules();
                 rulesChanged();
             }
@@ -292,8 +299,8 @@ Item {
             fixingInclude = false;
             if (exitCode !== 0)
                 return;
-            if (CompositorService.isMango)
-                MangoService.reloadConfig();
+            if ((CompositorService.isAsteroidz))
+                CompositorService.dwlService.reloadConfig();
             loadWindowRules();
         });
     }
@@ -348,7 +355,7 @@ Item {
         componentReady = true;
         Qt.callLater(() => {
             SettingsSearchService.registerCard("windowRules", headerSection, flickable);
-            if (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango)
+            if (CompositorService.isNiri || CompositorService.isHyprland || (CompositorService.isAsteroidz))
                 loadWindowRules();
         });
     }
@@ -477,7 +484,7 @@ Item {
                 color: (showLegacy || showSetup) ? Theme.withAlpha(Theme.primary, 0.15) : Theme.withAlpha(Theme.primary, 0)
                 border.color: (showLegacy || showSetup) ? Theme.withAlpha(Theme.primary, 0.3) : Theme.withAlpha(Theme.primary, 0)
                 border.width: 1
-                visible: (showLegacy || showSetup) && !root.checkingInclude && (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango)
+                visible: (showLegacy || showError || showSetup) && !root.checkingInclude && (CompositorService.isNiri || CompositorService.isHyprland || (CompositorService.isAsteroidz))
 
                 Row {
                     id: warningSection

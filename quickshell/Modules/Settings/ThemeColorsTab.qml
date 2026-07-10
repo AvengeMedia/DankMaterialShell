@@ -96,6 +96,13 @@ Item {
                 "grepPattern": 'source.*dms/cursor.conf',
                 "includeLine": "source=./dms/cursor.conf"
             };
+        case "asteroidz":
+            return {
+                "configFile": configDir + "/asteroidz/config.kdl",
+                "cursorFile": configDir + "/asteroidz/dms/cursor.kdl",
+                "grepPattern": 'source.*dms/cursor.conf',
+                "includeLine": "source=./dms/cursor.conf"
+            };
         default:
             return null;
         }
@@ -103,7 +110,7 @@ Item {
 
     function checkCursorIncludeStatus() {
         const compositor = CompositorService.compositor;
-        if (compositor !== "niri" && compositor !== "hyprland" && compositor !== "mango") {
+        if (compositor !== "niri" && compositor !== "hyprland" && compositor !== "mango" && compositor !== "asteroidz") {
             cursorIncludeStatus = {
                 "exists": false,
                 "included": false,
@@ -269,7 +276,7 @@ Item {
                 themeColorsTab.templateDetection = JSON.parse(output.trim());
             } catch (e) {}
         });
-        if (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango)
+        if (CompositorService.isNiri || CompositorService.isHyprland || (CompositorService.isAsteroidz))
             checkCursorIncludeStatus();
         refreshMatugenSchemePreviews();
     }
@@ -2164,7 +2171,7 @@ Item {
                 title: I18n.tr("Cursor Theme")
                 settingKey: "cursorTheme"
                 iconName: "mouse"
-                visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango
+                visible: CompositorService.isNiri || CompositorService.isHyprland || (CompositorService.isAsteroidz)
 
                 Column {
                     width: parent.width
@@ -2279,12 +2286,12 @@ Item {
                     SettingsToggleRow {
                         tab: "theme"
                         tags: ["mango", "touchpad", "trackpad", "natural", "scrolling"]
-                        settingKey: "mangoTrackpadNaturalScrolling"
+                        settingKey: "asteroidzTrackpadNaturalScrolling"
                         text: I18n.tr("Natural Touchpad Scrolling")
                         description: I18n.tr("Invert touchpad scroll direction")
-                        visible: CompositorService.isMango
-                        checked: SettingsData.mangoTrackpadNaturalScrolling
-                        onToggled: checked => SettingsData.set("mangoTrackpadNaturalScrolling", checked)
+                        visible: (CompositorService.isAsteroidz)
+                        checked: SettingsData.asteroidzTrackpadNaturalScrolling
+                        onToggled: checked => SettingsData.set("asteroidzTrackpadNaturalScrolling", checked)
                     }
 
                     SettingsToggleRow {
@@ -2344,8 +2351,8 @@ Item {
                                 return SettingsData.cursorSettings.niri?.hideAfterInactiveMs || 0;
                             if (CompositorService.isHyprland)
                                 return SettingsData.cursorSettings.hyprland?.inactiveTimeout || 0;
-                            if (CompositorService.isMango)
-                                return SettingsData.cursorSettings.mango?.cursorHideTimeout || 0;
+                            if ((CompositorService.isAsteroidz))
+                                return SettingsData.cursorSettings.asteroidz?.cursorHideTimeout || 0;
                             return 0;
                         }
                         minimum: 0
@@ -2362,10 +2369,10 @@ Item {
                                 if (!updated.hyprland)
                                     updated.hyprland = {};
                                 updated.hyprland.inactiveTimeout = newValue;
-                            } else if (CompositorService.isMango) {
-                                if (!updated.mango)
-                                    updated.mango = {};
-                                updated.mango.cursorHideTimeout = newValue;
+                            } else if ((CompositorService.isAsteroidz)) {
+                                if (!updated.asteroidz)
+                                    updated.asteroidz = {};
+                                updated.asteroidz.cursorHideTimeout = newValue;
                             }
                             SettingsData.set("cursorSettings", updated);
                         }
@@ -2521,6 +2528,18 @@ Item {
                     visible: SettingsData.runDmsMatugenTemplates
                     checked: SettingsData.matugenTemplateMangowc
                     onToggled: checked => SettingsData.set("matugenTemplateMangowc", checked)
+                }
+
+                SettingsToggleRow {
+                    tab: "theme"
+                    tags: ["matugen", "asteroidz", "template"]
+                    settingKey: "matugenTemplateAsteroidz"
+                    text: "asteroidz"
+                    description: getTemplateDescription("asteroidz", "")
+                    descriptionColor: getTemplateDescriptionColor("asteroidz")
+                    visible: SettingsData.runDmsMatugenTemplates
+                    checked: SettingsData.matugenTemplateAsteroidz
+                    onToggled: checked => SettingsData.set("matugenTemplateAsteroidz", checked)
                 }
 
                 SettingsToggleRow {

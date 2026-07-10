@@ -426,10 +426,10 @@ PanelWindow {
             hasMaximizedToplevel = false;
             return;
         }
-        if (CompositorService.isMango) {
-            const out = MangoService.outputs[screenName];
+        if ((CompositorService.isAsteroidz)) {
+            const out = CompositorService.dwlService.outputs[screenName];
             const active = new Set((out?.activeTags) || []);
-            const wins = MangoService.windows || [];
+            const wins = CompositorService.dwlService.windows || [];
             for (let i = 0; i < wins.length; i++) {
                 const w = wins[i];
                 if (!w || w.monitor !== screenName || w.is_minimized)
@@ -468,7 +468,7 @@ PanelWindow {
             shouldHideForWindows = false;
             return;
         }
-        if (!CompositorService.isNiri && !CompositorService.isHyprland && !CompositorService.isMango) {
+        if (!CompositorService.isNiri && !CompositorService.isHyprland && !(CompositorService.isAsteroidz)) {
             shouldHideForWindows = false;
             return;
         }
@@ -990,7 +990,7 @@ PanelWindow {
                 return true;
 
             const showOnWindowsSetting = barConfig?.showOnWindowsOpen ?? false;
-            if (showOnWindowsSetting && autoHide && (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango)) {
+            if (showOnWindowsSetting && autoHide && (CompositorService.isNiri || CompositorService.isHyprland || (CompositorService.isAsteroidz))) {
                 if (barWindow.shouldHideForWindows)
                     return hoverReveal || popoutPinsReveal || revealSticky || ipcReveal;
                 return true;

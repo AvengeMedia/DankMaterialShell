@@ -317,11 +317,13 @@ StyledRect {
         DankToggle {
             width: parent.width
             text: I18n.tr("Variable Refresh Rate")
-            visible: root.isConnected && !root.isDisabled && !CompositorService.isMango && !CompositorService.isHyprland && !CompositorService.isNiri && (DisplayConfigState.outputs[root.outputName]?.vrr_supported ?? false)
+            visible: root.isConnected && !root.isDisabled && !CompositorService.isMango && !CompositorService.isHyprland && !CompositorService.isNiri && (CompositorService.isAsteroidz ? (AsteroidzService.getOutputState(root.outputName)?.vrrCapable ?? false) : (DisplayConfigState.outputs[root.outputName]?.vrr_supported ?? false))
             checked: {
                 const pendingVrr = DisplayConfigState.getPendingValue(root.outputName, "vrr");
                 if (pendingVrr !== undefined)
                     return pendingVrr;
+                if (CompositorService.isAsteroidz)
+                    return AsteroidzService.getOutputState(root.outputName)?.vrrEnabled ?? false;
                 return DisplayConfigState.outputs[root.outputName]?.vrr_enabled ?? false;
             }
             onToggled: checked => DisplayConfigState.setPendingChange(root.outputName, "vrr", checked)
@@ -392,6 +394,8 @@ StyledRect {
                     return "NiriOutputSettings.qml";
                 case "hyprland":
                     return "HyprlandOutputSettings.qml";
+                case "asteroidz":
+                    return "AsteroidzOutputSettings.qml";
                 default:
                     return "";
                 }

@@ -18,8 +18,8 @@ BasePill {
     property string currentLayout: {
         if (CompositorService.isNiri) {
             return NiriService.getCurrentKeyboardLayoutName();
-        } else if (CompositorService.isMango) {
-            return MangoService.currentKeyboardLayout;
+        } else if ((CompositorService.isAsteroidz)) {
+            return CompositorService.dwlService.currentKeyboardLayout;
         }
         return "";
     }
@@ -109,8 +109,8 @@ BasePill {
                 NiriService.cycleKeyboardLayout();
             } else if (CompositorService.isHyprland) {
                 Quickshell.execDetached(["hyprctl", "switchxkblayout", root.hyprlandKeyboard, "next"]);
-            } else if (CompositorService.isMango) {
-                MangoService.cycleKeyboardLayout();
+            } else if ((CompositorService.isAsteroidz)) {
+                CompositorService.dwlService.cycleKeyboardLayout();
             } else if (CompositorService.isSway) {
                 I3.dispatch("input type:keyboard xkb_switch_layout next");
             }

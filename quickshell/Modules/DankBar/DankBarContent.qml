@@ -197,16 +197,16 @@ Item {
             }
 
             return monitorWorkspaces.sort((a, b) => a.id - b.id);
-        } else if (CompositorService.isMango) {
-            if (!MangoService.available) {
+        } else if ((CompositorService.isAsteroidz)) {
+            if (!CompositorService.dwlService.available) {
                 return [0];
             }
             if (SettingsData.dwlShowAllTags) {
                 return Array.from({
-                    length: MangoService.tagCount
+                    length: CompositorService.dwlService.tagCount
                 }, (_, i) => i);
             }
-            return MangoService.getVisibleTags(screenName);
+            return CompositorService.dwlService.getVisibleTags(screenName);
         } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
             const workspaces = I3.workspaces?.values || [];
             if (workspaces.length === 0)
@@ -242,13 +242,13 @@ Item {
             const monitors = Hyprland.monitors?.values || [];
             const currentMonitor = monitors.find(monitor => monitor.name === screenName);
             return currentMonitor?.activeWorkspace?.id ?? 1;
-        } else if (CompositorService.isMango) {
-            if (!MangoService.available)
+        } else if ((CompositorService.isAsteroidz)) {
+            if (!CompositorService.dwlService.available)
                 return 0;
-            const outputState = MangoService.getOutputState(screenName);
+            const outputState = CompositorService.dwlService.getOutputState(screenName);
             if (!outputState || !outputState.tags)
                 return 0;
-            const activeTags = MangoService.getActiveTags(screenName);
+            const activeTags = CompositorService.dwlService.getActiveTags(screenName);
             return activeTags.length > 0 ? activeTags[0] : 0;
         } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
             if (!screenName || SettingsData.workspaceFollowFocus) {
@@ -311,14 +311,14 @@ Item {
             if (nextIndex !== validIndex) {
                 HyprlandService.focusWorkspace(realWorkspaces[nextIndex].id);
             }
-        } else if (CompositorService.isMango) {
+        } else if ((CompositorService.isAsteroidz)) {
             const currentTag = getCurrentWorkspace();
             const currentIndex = realWorkspaces.findIndex(tag => tag === currentTag);
             const validIndex = currentIndex === -1 ? 0 : currentIndex;
             const nextIndex = direction > 0 ? Math.min(validIndex + 1, realWorkspaces.length - 1) : Math.max(validIndex - 1, 0);
 
             if (nextIndex !== validIndex) {
-                MangoService.switchToTag(_barScreenName, realWorkspaces[nextIndex]);
+                CompositorService.dwlService.switchToTag(_barScreenName, realWorkspaces[nextIndex]);
             }
         } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
             const currentWs = getCurrentWorkspace();
@@ -608,6 +608,7 @@ Item {
             "gpuTemp": gpuTempComponent,
             "notificationButton": notificationButtonComponent,
             "battery": batteryComponent,
+            "medication": medicationComponent,
             "layout": layoutComponent,
             "controlCenterButton": controlCenterButtonComponent,
             "capsLockIndicator": capsLockIndicatorComponent,
@@ -650,6 +651,7 @@ Item {
             "gpuTempComponent": gpuTempComponent,
             "notificationButtonComponent": notificationButtonComponent,
             "batteryComponent": batteryComponent,
+            "medicationComponent": medicationComponent,
             "layoutComponent": layoutComponent,
             "controlCenterButtonComponent": controlCenterButtonComponent,
             "capsLockIndicatorComponent": capsLockIndicatorComponent,
@@ -1367,6 +1369,32 @@ Item {
                     widgetItem: batteryWidget,
                     section: topBarContent.getWidgetSection(parent) || "right",
                     triggerSource: "battery",
+                    mode: "click"
+                });
+            }
+        }
+    }
+
+    Component {
+        id: medicationComponent
+
+        Medication {
+            id: medicationWidget
+            medicationPopupVisible: medicationPopoutLoader.item ? medicationPopoutLoader.item.shouldBeVisible : false
+            widgetThickness: barWindow.widgetThickness
+            barThickness: barWindow.effectiveBarThickness
+            axis: barWindow.axis
+            section: topBarContent.getWidgetSection(parent) || "right"
+            barSpacing: barConfig?.spacing ?? 4
+            barConfig: topBarContent.barConfig
+            popoutTarget: medicationPopoutLoader.item ?? null
+            parentScreen: barWindow.screen
+            onToggleMedicationPopup: {
+                topBarContent.openWidgetPopout({
+                    loader: medicationPopoutLoader,
+                    widgetItem: medicationWidget,
+                    section: topBarContent.getWidgetSection(parent) || "right",
+                    triggerSource: "medication",
                     mode: "click"
                 });
             }

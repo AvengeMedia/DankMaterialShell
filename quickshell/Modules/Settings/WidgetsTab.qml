@@ -53,10 +53,10 @@ Item {
             {
                 "id": "layout",
                 "text": I18n.tr("Layout"),
-                "description": I18n.tr("Display and switch MangoWC layouts"),
+                "description": I18n.tr("Display and switch %1 layouts").arg(CompositorService.isAsteroidz ? "Asteroidz" : "MangoWC"),
                 "icon": "view_quilt",
-                "enabled": CompositorService.isMango && MangoService.available,
-                "warning": !CompositorService.isMango ? I18n.tr("Requires MangoWC compositor") : (!MangoService.available ? I18n.tr("Mango service not available") : undefined)
+                "enabled": (CompositorService.isAsteroidz) && CompositorService.dwlService.available,
+                "warning": !(CompositorService.isAsteroidz) ? I18n.tr("Requires MangoWC or Asteroidz compositor") : (!CompositorService.dwlService.available ? I18n.tr("Mango service not available") : undefined)
             },
             {
                 "id": "launcherButton",
@@ -194,6 +194,13 @@ Item {
                 "text": I18n.tr("Battery"),
                 "description": I18n.tr("Battery level and power management"),
                 "icon": "battery_std",
+                "enabled": true
+            },
+            {
+                "id": "medication",
+                "text": I18n.tr("Medication Reminder"),
+                "description": I18n.tr("Track medicines and get alerts when doses are due"),
+                "icon": "medication",
                 "enabled": true
             },
             {

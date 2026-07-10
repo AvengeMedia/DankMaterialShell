@@ -15,7 +15,7 @@ Item {
     property bool isSway: CompositorService.isSway
     property bool isScroll: CompositorService.isScroll
     property bool isMiracle: CompositorService.isMiracle
-    property bool isMango: CompositorService.isMango
+    property bool isDwlTagCompositor: (CompositorService.isMango || CompositorService.isAsteroidz)
     property bool isLabwc: CompositorService.isLabwc
 
     property string compositorName: {
@@ -27,8 +27,8 @@ Item {
             return "scroll";
         if (isMiracle)
             return "miracle";
-        if (isMango)
-            return "mangowc";
+        if (isDwlTagCompositor)
+            return CompositorService.compositor === "asteroidz" ? "asteroidz" : "mangowc";
         if (isLabwc)
             return "labwc";
         return "niri";
@@ -43,8 +43,8 @@ Item {
             return "/assets/sway.svg";
         if (isMiracle)
             return "/assets/miraclewm.svg";
-        if (isMango)
-            return "/assets/mango.png";
+        if (isDwlTagCompositor)
+            return "/assets/asteroidz.svg";
         if (isLabwc)
             return "/assets/labwc.png";
         return "/assets/niri.svg";
@@ -59,8 +59,8 @@ Item {
             return "https://github.com/dawsers/scroll";
         if (isMiracle)
             return "https://github.com/miracle-wm-org/miracle-wm";
-        if (isMango)
-            return "https://github.com/DreamMaoMao/mangowc";
+        if (isDwlTagCompositor)
+            return CompositorService.compositor === "asteroidz" ? "https://github.com/asteroidzman/asteroidz" : "https://github.com/DreamMaoMao/mangowc";
         if (isLabwc)
             return "https://labwc.github.io/";
         return "https://github.com/niri-wm/niri";
@@ -75,8 +75,8 @@ Item {
             return I18n.tr("Scroll GitHub");
         if (isMiracle)
             return I18n.tr("Scroll GitHub");
-        if (isMango)
-            return I18n.tr("mangowc GitHub");
+        if (isDwlTagCompositor)
+            return CompositorService.compositor === "asteroidz" ? I18n.tr("asteroidz GitHub") : I18n.tr("mangowc GitHub");
         if (isLabwc)
             return I18n.tr("LabWC Website");
         return I18n.tr("niri GitHub");
@@ -88,7 +88,7 @@ Item {
     property string compositorDiscordUrl: {
         if (isHyprland)
             return "https://discord.com/invite/hQ9XvMUjjr";
-        if (isMango)
+        if (isDwlTagCompositor && CompositorService.compositor !== "asteroidz")
             return "https://discord.gg/CPjbDxesh5";
         return "";
     }
@@ -96,7 +96,7 @@ Item {
     property string compositorDiscordTooltip: {
         if (isHyprland)
             return I18n.tr("Hyprland Discord Server");
-        if (isMango)
+        if (isDwlTagCompositor && CompositorService.compositor !== "asteroidz")
             return I18n.tr("mangowc Discord Server");
         return "";
     }
@@ -107,9 +107,9 @@ Item {
     property string ircUrl: "https://web.libera.chat/gamja/?channels=#labwc"
     property string ircTooltip: I18n.tr("LabWC IRC Channel")
 
-    property bool showMatrix: isNiri && !isHyprland && !isSway && !isScroll && !isMiracle && !isMango && !isLabwc
-    property bool showCompositorDiscord: isHyprland || isMango
-    property bool showReddit: isNiri && !isHyprland && !isSway && !isScroll && !isMiracle && !isMango && !isLabwc
+    property bool showMatrix: isNiri && !isHyprland && !isSway && !isScroll && !isMiracle && !isDwlTagCompositor && !isLabwc
+    property bool showCompositorDiscord: isHyprland || isDwlTagCompositor
+    property bool showReddit: isNiri && !isHyprland && !isSway && !isScroll && !isMiracle && !isDwlTagCompositor && !isLabwc
     property bool showIrc: isLabwc
 
     DankFlickable {

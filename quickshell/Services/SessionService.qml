@@ -326,8 +326,8 @@ Singleton {
                 return;
             }
 
-            if (CompositorService.isMango) {
-                MangoService.quit();
+            if ((CompositorService.isAsteroidz)) {
+                CompositorService.dwlService.quit();
                 return;
             }
 

@@ -67,6 +67,8 @@ Card {
                             return I18n.tr("on Niri");
                         if (CompositorService.isHyprland)
                             return I18n.tr("on Hyprland");
+                        if (CompositorService.isAsteroidz)
+                            return I18n.tr("on Asteroidz");
                         if (CompositorService.isMango)
                             return I18n.tr("on MangoWC");
                         if (CompositorService.isSway)

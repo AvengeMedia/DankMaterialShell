@@ -129,7 +129,7 @@ Item {
                     title: I18n.tr("Multi-Monitor", "greeter feature card title")
                     description: I18n.tr("Per-screen config", "greeter feature card description")
                     onClicked: {
-                        const hasDisplayConfig = CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango;
+                        const hasDisplayConfig = CompositorService.isNiri || CompositorService.isHyprland || (CompositorService.isAsteroidz);
                         PopoutService.openSettingsWithTab(hasDisplayConfig ? "display_config" : "display_widgets");
                     }
                 }

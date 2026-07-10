@@ -260,6 +260,7 @@ Loader {
             "gpuTemp": components.gpuTempComponent,
             "notificationButton": components.notificationButtonComponent,
             "battery": components.batteryComponent,
+            "medication": components.medicationComponent,
             "controlCenterButton": components.controlCenterButtonComponent,
             "capsLockIndicator": components.capsLockIndicatorComponent,
             "idleInhibitor": components.idleInhibitorComponent,
@@ -294,7 +295,7 @@ Loader {
             "cpuTemp": dgopAvailable,
             "gpuTemp": dgopAvailable,
             "network_speed_monitor": dgopAvailable,
-            "layout": CompositorService.isMango && MangoService.available
+            "layout": (CompositorService.isAsteroidz) && CompositorService.dwlService.available
         };
 
         return widgetVisibility[widgetId] ?? true;

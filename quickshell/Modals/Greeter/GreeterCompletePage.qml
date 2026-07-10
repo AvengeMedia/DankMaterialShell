@@ -320,7 +320,7 @@ Item {
                                     url = "https://danklinux.com/docs/dankmaterialshell/compositors#dms-keybindings";
                                 else if (CompositorService.isHyprland)
                                     url = "https://danklinux.com/docs/dankmaterialshell/compositors#dms-keybindings-1";
-                                else if (CompositorService.isMango)
+                                else if ((CompositorService.isAsteroidz))
                                     url = "https://danklinux.com/docs/dankmaterialshell/compositors#dms-keybindings-2";
                                 Qt.openUrlExternally(url);
                             }

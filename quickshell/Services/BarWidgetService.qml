@@ -79,8 +79,10 @@ Singleton {
             return Hyprland.focusedWorkspace.monitor.name;
         if (CompositorService.isNiri && NiriService.currentOutput)
             return NiriService.currentOutput;
-        if (CompositorService.isMango && MangoService.activeOutput)
-            return MangoService.activeOutput;
+        if (CompositorService.isMango && CompositorService.dwlService.activeOutput)
+            return CompositorService.dwlService.activeOutput;
+        if (CompositorService.isAsteroidz && CompositorService.dwlService.activeOutput)
+            return CompositorService.dwlService.activeOutput;
         if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
             const focusedWs = I3.workspaces?.values?.find(ws => ws.focused === true);
             return focusedWs?.monitor?.name || "";
@@ -112,6 +114,7 @@ Singleton {
 
         const signalMap = {
             "battery": "toggleBatteryPopup",
+            "medication": "toggleMedicationPopup",
             "vpn": "toggleVpnPopup",
             "layout": "toggleLayoutPopup",
             "clock": "clockClicked",

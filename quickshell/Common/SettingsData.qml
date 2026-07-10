@@ -186,6 +186,10 @@ Singleton {
     property int mangoLayoutRadiusOverride: -1
     property int mangoLayoutBorderSize: -1
     property bool mangoTrackpadNaturalScrolling: true
+    property int asteroidzLayoutGapsOverride: -1
+    property int asteroidzLayoutRadiusOverride: -1
+    property int asteroidzLayoutBorderSize: -1
+    property bool asteroidzTrackpadNaturalScrolling: true
 
     property int firstDayOfWeek: -1
     property bool showWeekNumber: false
@@ -656,7 +660,7 @@ Singleton {
                 "hideOnTouch": false,
                 "inactiveTimeout": 0
             },
-            "mango": {
+            "asteroidz": {
                 "cursorHideTimeout": 0
             }
         })
@@ -701,8 +705,8 @@ Singleton {
                 g = niriLayoutGapsOverride;
             else if (CompositorService.isHyprland)
                 g = hyprlandLayoutGapsOverride;
-            else if (CompositorService.isMango)
-                g = mangoLayoutGapsOverride;
+            else if ((CompositorService.isAsteroidz))
+                g = asteroidzLayoutGapsOverride;
             if (g >= 0)
                 return g;
         }
@@ -791,6 +795,7 @@ Singleton {
     property bool matugenTemplateNiri: true
     property bool matugenTemplateHyprland: true
     property bool matugenTemplateMangowc: true
+    property bool matugenTemplateAsteroidz: true
     property bool matugenTemplateQt5ct: true
     property bool matugenTemplateQt6ct: true
     property bool matugenTemplateFirefox: true
@@ -961,6 +966,7 @@ Singleton {
     property var showOnLastDisplay: ({})
     property var niriOutputSettings: ({})
     property var hyprlandOutputSettings: ({})
+    property var asteroidzOutputSettings: ({})
     property var displayProfiles: ({})
     property var activeDisplayProfile: ({})
     property bool displayProfileAutoSelect: false
@@ -1467,8 +1473,8 @@ Singleton {
             NiriService.generateNiriLayoutConfig();
         if (CompositorService.isHyprland && typeof HyprlandService !== "undefined")
             HyprlandService.generateLayoutConfig();
-        if (CompositorService.isMango && typeof MangoService !== "undefined")
-            MangoService.generateLayoutConfig();
+        if ((CompositorService.isAsteroidz) && typeof AsteroidzService !== "undefined")
+            CompositorService.dwlService.generateLayoutConfig();
     }
 
     function updateFrameCompositorLayout() {
@@ -2880,8 +2886,8 @@ Singleton {
             HyprlandService.generateCursorConfig();
             return;
         }
-        if (CompositorService.isMango && typeof MangoService !== "undefined") {
-            MangoService.generateCursorConfig();
+        if ((CompositorService.isAsteroidz) && typeof AsteroidzService !== "undefined") {
+            CompositorService.dwlService.generateCursorConfig();
             return;
         }
     }
@@ -3509,6 +3515,30 @@ Singleton {
         const updated = JSON.parse(JSON.stringify(hyprlandOutputSettings));
         delete updated[outputId];
         hyprlandOutputSettings = updated;
+        saveSettings();
+    }
+
+    function getAsteroidzOutputSetting(outputId, key, defaultValue) {
+        if (!asteroidzOutputSettings[outputId])
+            return defaultValue;
+        return asteroidzOutputSettings[outputId][key] !== undefined ? asteroidzOutputSettings[outputId][key] : defaultValue;
+    }
+
+    function setAsteroidzOutputSetting(outputId, key, value) {
+        const updated = JSON.parse(JSON.stringify(asteroidzOutputSettings));
+        if (!updated[outputId])
+            updated[outputId] = {};
+        updated[outputId][key] = value;
+        asteroidzOutputSettings = updated;
+        saveSettings();
+    }
+
+    function removeAsteroidzOutputSetting(outputId, key) {
+        if (!asteroidzOutputSettings[outputId] || !(key in asteroidzOutputSettings[outputId]))
+            return;
+        const updated = JSON.parse(JSON.stringify(asteroidzOutputSettings));
+        delete updated[outputId][key];
+        asteroidzOutputSettings = updated;
         saveSettings();
     }
 

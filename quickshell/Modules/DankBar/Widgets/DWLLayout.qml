@@ -13,11 +13,11 @@ BasePill {
     signal toggleLayoutPopup
 
     // mango shares dwl's tag/layout model; route to the right service.
-    readonly property bool isMango: CompositorService.isMango
+    readonly property bool isDwlTagCompositor: (CompositorService.isMango || CompositorService.isAsteroidz)
 
-    visible: layout.isMango && MangoService.available
+    visible: layout.isDwlTagCompositor && CompositorService.dwlService.available
 
-    property var outputState: parentScreen ? MangoService.getOutputState(parentScreen.name) : null
+    property var outputState: parentScreen ? CompositorService.dwlService.getOutputState(parentScreen.name) : null
     property string currentLayoutSymbol: outputState?.layoutSymbol || ""
     property int currentLayoutIndex: outputState?.layout || 0
 
@@ -40,9 +40,9 @@ BasePill {
     }
 
     Connections {
-        target: MangoService
+        target: CompositorService.dwlService
         function onStateChanged() {
-            outputState = parentScreen ? MangoService.getOutputState(parentScreen.name) : null;
+            outputState = parentScreen ? CompositorService.dwlService.getOutputState(parentScreen.name) : null;
         }
     }
 
@@ -100,13 +100,13 @@ BasePill {
     }
 
     onRightClicked: {
-        if (!parentScreen || !MangoService.available || MangoService.layouts.length === 0) {
+        if (!parentScreen || !CompositorService.dwlService.available || CompositorService.dwlService.layouts.length === 0) {
             return;
         }
 
         const currentIndex = layout.currentLayoutIndex;
-        const nextIndex = (currentIndex + 1) % MangoService.layouts.length;
+        const nextIndex = (currentIndex + 1) % CompositorService.dwlService.layouts.length;
 
-        MangoService.setLayout(parentScreen.name, nextIndex);
+        CompositorService.dwlService.setLayout(parentScreen.name, nextIndex);
     }
 }

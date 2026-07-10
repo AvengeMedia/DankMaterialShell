@@ -14,14 +14,14 @@ Singleton {
     id: root
     readonly property var log: Log.scoped("KeybindsService")
 
-    property bool available: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango
+    property bool available: CompositorService.isNiri || CompositorService.isHyprland || (CompositorService.isAsteroidz)
     property string currentProvider: {
         if (CompositorService.isNiri)
             return "niri";
         if (CompositorService.isHyprland)
             return "hyprland";
-        if (CompositorService.isMango)
-            return "mangowc";
+        if ((CompositorService.isAsteroidz))
+            return CompositorService.compositor === "asteroidz" ? "asteroidz" : "mangowc";
         return "";
     }
 
@@ -30,8 +30,8 @@ Singleton {
             return "niri";
         if (CompositorService.isHyprland)
             return "hyprland";
-        if (CompositorService.isMango)
-            return "mangowc";
+        if ((CompositorService.isAsteroidz))
+            return CompositorService.compositor === "asteroidz" ? "asteroidz" : "mangowc";
         return "";
     }
     property bool cheatsheetAvailable: cheatsheetProvider !== ""
@@ -76,7 +76,8 @@ Singleton {
         case "hyprland":
             return configDir + "/hypr";
         case "mangowc":
-            return configDir + "/mango";
+        case "asteroidz":
+            return configDir + "/" + CompositorService.dwlService.compositorConfigName;
         default:
             return "";
         }
@@ -88,6 +89,7 @@ Singleton {
         case "hyprland":
             return compositorConfigDir + "/dms/binds.lua";
         case "mangowc":
+        case "asteroidz":
             return compositorConfigDir + "/dms/binds.conf";
         default:
             return "";
@@ -100,6 +102,7 @@ Singleton {
         case "hyprland":
             return compositorConfigDir + "/hyprland.lua";
         case "mangowc":
+        case "asteroidz":
             return compositorConfigDir + "/config.conf";
         default:
             return "";
@@ -119,7 +122,7 @@ Singleton {
     Connections {
         target: CompositorService
         function onCompositorChanged() {
-            if (!CompositorService.isNiri && !CompositorService.isMango)
+            if (!CompositorService.isNiri && !(CompositorService.isAsteroidz))
                 return;
             Qt.callLater(root.loadBinds);
         }
@@ -204,8 +207,8 @@ Singleton {
             }
             root.lastError = "";
             root.bindSaveCompleted(true);
-            if (CompositorService.isMango)
-                MangoService.reloadConfig();
+            if ((CompositorService.isAsteroidz))
+                CompositorService.dwlService.reloadConfig();
             root.loadBinds(false);
         }
     }
@@ -229,8 +232,8 @@ Singleton {
                 return;
             }
             root.lastError = "";
-            if (CompositorService.isMango)
-                MangoService.reloadConfig();
+            if ((CompositorService.isAsteroidz))
+                CompositorService.dwlService.reloadConfig();
             root.loadBinds(false);
         }
     }
@@ -259,8 +262,8 @@ Singleton {
             root.dmsBindsFixed();
             const bindsRel = root.currentProvider === "niri" ? "dms/binds.kdl" : root.currentProvider === "hyprland" ? "dms/binds.lua" : "dms/binds.conf";
             ToastService.showInfo(I18n.tr("Binds include added"), I18n.tr("%1 is now included in config").arg(bindsRel), "", "keybinds");
-            if (CompositorService.isMango)
-                MangoService.reloadConfig();
+            if ((CompositorService.isAsteroidz))
+                CompositorService.dwlService.reloadConfig();
             Qt.callLater(root.forceReload);
         }
     }
@@ -304,6 +307,7 @@ Singleton {
             });
             break;
         case "mangowc":
+        case "asteroidz":
             script = ConfigIncludeResolve.buildRepairScript({
                 configFile: mainConfigPath,
                 backupFile: backupPath,

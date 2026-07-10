@@ -234,7 +234,7 @@ Item {
             }
 
             IconImage {
-                visible: SettingsData.dockLauncherLogoMode === "compositor" && (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle || CompositorService.isLabwc)
+                visible: SettingsData.dockLauncherLogoMode === "compositor" && (CompositorService.isNiri || CompositorService.isHyprland || (CompositorService.isAsteroidz) || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle || CompositorService.isLabwc)
                 anchors.centerIn: parent
                 width: actualIconSize + SettingsData.dockLauncherLogoSizeOffset
                 height: actualIconSize + SettingsData.dockLauncherLogoSizeOffset
@@ -245,8 +245,8 @@ Item {
                         return "file://" + Theme.shellDir + "/assets/niri.svg";
                     } else if (CompositorService.isHyprland) {
                         return "file://" + Theme.shellDir + "/assets/hyprland.svg";
-                    } else if (CompositorService.isMango) {
-                        return "file://" + Theme.shellDir + "/assets/mango.png";
+                    } else if ((CompositorService.isAsteroidz)) {
+                        return "file://" + Theme.shellDir + "/assets/asteroidz.svg";
                     } else if (CompositorService.isSway) {
                         return "file://" + Theme.shellDir + "/assets/sway.svg";
                     } else if (CompositorService.isScroll) {

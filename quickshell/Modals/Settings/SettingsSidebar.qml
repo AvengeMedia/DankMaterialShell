@@ -105,7 +105,7 @@ Rectangle {
                 },
                 {
                     "id": "compositor_layout",
-                    "text": CompositorService.isNiri ? "Niri" : (CompositorService.isHyprland ? "Hyprland" : "MangoWC"),
+                    "text": CompositorService.isNiri ? "Niri" : (CompositorService.isHyprland ? "Hyprland" : (CompositorService.isAsteroidz ? "Asteroidz" : "MangoWC")),
                     "icon": "layers",
                     "tabIndex": 37,
                     "layoutCapable": true
@@ -421,9 +421,9 @@ Rectangle {
             return false;
         if (item.hyprlandNiriOnly && !CompositorService.isNiri && !CompositorService.isHyprland)
             return false;
-        if (item.windowRulesCapable && !CompositorService.isNiri && !CompositorService.isHyprland && !CompositorService.isMango)
+        if (item.windowRulesCapable && !CompositorService.isNiri && !CompositorService.isHyprland && !(CompositorService.isAsteroidz))
             return false;
-        if (item.layoutCapable && !CompositorService.isNiri && !CompositorService.isHyprland && !CompositorService.isMango)
+        if (item.layoutCapable && !CompositorService.isNiri && !CompositorService.isHyprland && !(CompositorService.isAsteroidz))
             return false;
         if (item.niriOnly && !CompositorService.isNiri)
             return false;

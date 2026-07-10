@@ -22,7 +22,7 @@ Item {
     property var hyprlandOverviewLoader: null
     property var parentScreen: null
 
-    readonly property bool isMango: CompositorService.isMango
+    readonly property bool isDwlTagCompositor: (CompositorService.isMango || CompositorService.isAsteroidz)
 
     readonly property real _leftMargin: {
         if (isVertical)
@@ -71,9 +71,25 @@ Item {
     readonly property string effectiveScreenName: {
         if (!SettingsData.workspaceFollowFocus)
             return root.screenName;
-        return BarWidgetService.getFocusedScreenName() || root.screenName;
+
+        switch (CompositorService.compositor) {
+        case "niri":
+            return NiriService.currentOutput || root.screenName;
+        case "hyprland":
+            return Hyprland.focusedWorkspace?.monitor?.name || root.screenName;
+        case "mango":
+        case "asteroidz":
+            return CompositorService.dwlService.activeOutput || root.screenName;
+        case "sway":
+        case "scroll":
+        case "miracle":
+            const focusedWs = I3.workspaces?.values?.find(ws => ws.focused === true);
+            return focusedWs?.monitor?.name || root.screenName;
+        default:
+            return root.screenName;
+        }
     }
-    readonly property bool mangoOverviewActive: CompositorService.isMango && MangoService.isOutputInOverview(effectiveScreenName)
+    readonly property bool mangoOverviewActive: (CompositorService.isAsteroidz) && CompositorService.dwlService.isOutputInOverview(effectiveScreenName)
 
     readonly property bool isFocusedMonitor: {
         const focused = BarWidgetService.getFocusedScreenName();
@@ -91,6 +107,7 @@ Item {
         case "niri":
         case "hyprland":
         case "mango":
+        case "asteroidz":
         case "sway":
         case "scroll":
         case "miracle":
@@ -125,6 +142,7 @@ Item {
         case "hyprland":
             return getHyprlandActiveWorkspace();
         case "mango":
+        case "asteroidz":
             const activeTags = getDwlActiveTags();
             return activeTags.length > 0 ? activeTags[0] : -1;
         case "sway":
@@ -136,7 +154,7 @@ Item {
         }
     }
     property var dwlActiveTags: {
-        if (root.isMango) {
+        if (root.isDwlTagCompositor) {
             return getDwlActiveTags();
         }
         return [];
@@ -155,6 +173,7 @@ Item {
         case "hyprland":
             return hyprlandSlotList(getHyprlandWorkspaces());
         case "mango":
+        case "asteroidz":
             if (root.mangoOverviewActive)
                 return [];
             baseList = getDwlTags();
@@ -357,7 +376,7 @@ Item {
             }
         } else if (CompositorService.isHyprland) {
             targetWorkspaceId = ws.id !== undefined ? ws.id : ws;
-        } else if (root.isMango) {
+        } else if (root.isDwlTagCompositor) {
             if (typeof ws !== "object" || ws.tag === undefined) {
                 return [];
             }
@@ -377,8 +396,8 @@ Item {
         } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
             const focusedWs = I3.workspaces?.values?.find(ws => ws.focused === true);
             isActiveWs = focusedWs ? (focusedWs.num === targetWorkspaceId) : false;
-        } else if (root.isMango) {
-            const output = MangoService.getOutputState(root.effectiveScreenName);
+        } else if (root.isDwlTagCompositor) {
+            const output = CompositorService.dwlService.getOutputState(root.effectiveScreenName);
             if (output && output.tags) {
                 const tag = output.tags.find(t => t.tag === targetWorkspaceId);
                 isActiveWs = tag ? (tag.state === 1) : false;
@@ -392,9 +411,9 @@ Item {
                 return;
             }
 
-            if (CompositorService.isMango) {
-                // mangoTags are 1-based; targetWorkspaceId is 0-based.
-                if (!(w.mangoTags || []).includes(targetWorkspaceId + 1))
+            if ((CompositorService.isAsteroidz)) {
+                // asteroidzTags are 1-based; targetWorkspaceId is 0-based.
+                if (!(w.asteroidzTags || []).includes(targetWorkspaceId + 1))
                     return;
             } else {
                 let winWs = null;
@@ -418,6 +437,12 @@ Item {
             const groupThisWs = SettingsData.groupWorkspaceApps && (!isActiveWs || SettingsData.groupActiveWorkspaceApps);
             const key = groupThisWs ? moddedId : `${moddedId}_${i}`;
 
+            // Parked: window belongs to a named special workspace (drawer)
+            // that isn't the one currently open on its monitor, so its icon
+            // is shown but not actually visible on screen right now.
+            const isParked = root.isDwlTagCompositor && !!w.asteroidzSpecialWorkspace &&
+                w.asteroidzSpecialWorkspace !== CompositorService.dwlService.getActiveSpecial(w.asteroidzMonitor || root.effectiveScreenName);
+
             if (!byApp[key]) {
                 const isQuickshell = keyBase === "org.quickshell" || keyBase === "com.danklinux.dms";
                 const isSteamApp = Paths.isSteamApp(moddedId);
@@ -432,12 +457,16 @@ Item {
                     "active": !!((w.activated || w.is_focused) || (CompositorService.isNiri && w.is_focused)),
                     "count": 1,
                     "windowId": w.address || w.id,
-                    "fallbackText": appName || ""
+                    "fallbackText": appName || "",
+                    "parked": isParked
                 };
             } else {
                 byApp[key].count++;
                 if ((w.activated || w.is_focused) || (CompositorService.isNiri && w.is_focused)) {
                     byApp[key].active = true;
+                }
+                if (!isParked) {
+                    byApp[key].parked = false;
                 }
             }
         });
@@ -464,7 +493,7 @@ Item {
                 "id": -1,
                 "name": ""
             };
-        if (root.isMango)
+        if (root.isDwlTagCompositor)
             return {
                 "tag": -1
             };
@@ -592,28 +621,30 @@ Item {
     }
 
     function getDwlTags() {
-        if (!MangoService.available)
+        if (!CompositorService.dwlService.available)
             return [];
 
         const targetScreen = root.effectiveScreenName;
-        const output = MangoService.getOutputState(targetScreen);
+        const output = CompositorService.dwlService.getOutputState(targetScreen);
         if (!output || !output.tags || output.tags.length === 0)
             return [];
 
         if (SettingsData.dwlShowAllTags) {
             return output.tags.map(tag => ({
                         "tag": tag.tag,
+                        "name": tag.name ?? "",
                         "state": tag.state,
                         "clients": tag.clients,
                         "focused": tag.focused
                     }));
         }
 
-        const visibleTagIndices = MangoService.getVisibleTags(targetScreen);
+        const visibleTagIndices = CompositorService.dwlService.getVisibleTags(targetScreen);
         return visibleTagIndices.map(tagIndex => {
             const tagData = output.tags.find(t => t.tag === tagIndex);
             return {
                 "tag": tagIndex,
+                "name": tagData?.name ?? "",
                 "state": tagData?.state ?? 0,
                 "clients": tagData?.clients ?? 0,
                 "focused": tagData?.focused ?? false
@@ -622,10 +653,10 @@ Item {
     }
 
     function getDwlActiveTags() {
-        if (!MangoService.available)
+        if (!CompositorService.dwlService.available)
             return [];
 
-        return MangoService.getActiveTags(root.effectiveScreenName);
+        return CompositorService.dwlService.getActiveTags(root.effectiveScreenName);
     }
 
     function getExtWorkspaceWorkspaces() {
@@ -676,7 +707,7 @@ Item {
                 return ws && ws.idx !== -1;
             if (CompositorService.isHyprland)
                 return ws && ws.id !== -1;
-            if (root.isMango)
+            if (root.isDwlTagCompositor)
                 return ws && ws.tag !== -1;
             if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle)
                 return ws && !ws._placeholder;
@@ -705,8 +736,9 @@ Item {
             }
             break;
         case "mango":
+        case "asteroidz":
             if (data.tag !== undefined)
-                MangoService.switchToTag(root.screenName, data.tag);
+                CompositorService.dwlService.switchToTag(root.screenName, data.tag);
             break;
         case "sway":
         case "scroll":
@@ -789,7 +821,7 @@ Item {
             }
 
             HyprlandService.focusWorkspace(hyprlandWorkspaceSelector(realWorkspaces[nextIndex]));
-        } else if (root.isMango) {
+        } else if (root.isDwlTagCompositor) {
             const realWorkspaces = getRealWorkspaces();
             if (realWorkspaces.length < 2) {
                 return;
@@ -803,7 +835,7 @@ Item {
                 return;
             }
 
-            MangoService.switchToTag(root.screenName, realWorkspaces[nextIndex].tag);
+            CompositorService.dwlService.switchToTag(root.screenName, realWorkspaces[nextIndex].tag);
         } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
             const realWorkspaces = getRealWorkspaces();
             if (realWorkspaces.length < 2) {
@@ -829,7 +861,7 @@ Item {
             return (modelData?.idx !== undefined && modelData?.idx !== -1) ? modelData.idx : "";
         if (CompositorService.isHyprland)
             return modelData?.id > 0 ? modelData.id : (modelData?.name ?? "");
-        if (root.isMango)
+        if (root.isDwlTagCompositor)
             return (modelData?.tag !== undefined) ? (modelData.tag + 1) : "";
         if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle)
             return (modelData?.num !== undefined && modelData.num !== -1) ? modelData.num : (modelData?.name ?? "");
@@ -844,7 +876,7 @@ Item {
             isPlaceholder = modelData?.idx === -1;
         } else if (CompositorService.isHyprland) {
             isPlaceholder = modelData?.id === -1;
-        } else if (root.isMango) {
+        } else if (root.isDwlTagCompositor) {
             isPlaceholder = modelData?.tag === -1;
         } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
             isPlaceholder = modelData?._placeholder === true;
@@ -879,7 +911,7 @@ Item {
         return getWorkspaceIndexFallback(modelData, index);
     }
 
-    readonly property bool hasNativeWorkspaceSupport: CompositorService.isNiri || CompositorService.isHyprland || root.isMango || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle
+    readonly property bool hasNativeWorkspaceSupport: CompositorService.isNiri || CompositorService.isHyprland || root.isDwlTagCompositor || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle
     readonly property bool hasWorkspaces: getRealWorkspaces().length > 0
     readonly property bool shouldShow: hasNativeWorkspaceSupport || (useExtWorkspace && hasWorkspaces)
 
@@ -1046,7 +1078,7 @@ Item {
         // mango reports active_tags=0 while the overview is open; surface it as a pill
         Item {
             id: overviewPill
-            visible: CompositorService.isMango && MangoService.inOverview
+            visible: (CompositorService.isAsteroidz) && CompositorService.dwlService.inOverview
             width: root.isVertical ? root.widgetHeight : overviewBg.width
             height: root.isVertical ? overviewBg.height : root.widgetHeight
 
@@ -1087,6 +1119,50 @@ Item {
                 anchors.fill: parent
                 cursorShape: Qt.PointingHandCursor
                 onClicked: Quickshell.execDetached(["mmsg", "dispatch", "toggleoverview"])
+            }
+        }
+
+        // mango special workspaces are named, monitor-scoped scratchpads; surface
+        // the active one as a small chip so it's clear the output isn't showing a
+        // regular tag
+        Item {
+            id: specialWorkspacePill
+            readonly property string specialName: ((CompositorService.isAsteroidz) && root.effectiveScreenName) ? CompositorService.dwlService.getActiveSpecial(root.effectiveScreenName) : ""
+            visible: specialName !== ""
+            width: root.isVertical ? root.widgetHeight : specialBg.width
+            height: root.isVertical ? specialBg.height : root.widgetHeight
+
+            readonly property real labelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
+
+            Rectangle {
+                id: specialBg
+                anchors.centerIn: parent
+                width: root.isVertical ? Math.max(root.widgetHeight * 0.7, specialContent.implicitWidth + Theme.spacingS) : (specialContent.implicitWidth + Theme.spacingS * 2)
+                height: Math.max(root.widgetHeight * 0.5, specialContent.implicitHeight + Theme.spacingXS)
+                radius: Theme.cornerRadius
+                color: Theme.withAlpha(Theme.tertiary, 0.18)
+
+                Row {
+                    id: specialContent
+                    anchors.centerIn: parent
+                    spacing: Theme.spacingXS
+
+                    DankIcon {
+                        anchors.verticalCenter: parent.verticalCenter
+                        name: "picture_in_picture_alt"
+                        size: specialWorkspacePill.labelSize + 2
+                        color: Theme.tertiary
+                    }
+
+                    StyledText {
+                        anchors.verticalCenter: parent.verticalCenter
+                        visible: !root.isVertical
+                        text: specialWorkspacePill.specialName
+                        color: Theme.tertiary
+                        font.pixelSize: specialWorkspacePill.labelSize
+                        font.weight: Font.DemiBold
+                    }
+                }
             }
         }
 
@@ -1144,7 +1220,7 @@ Item {
                         return !!(modelData && modelData.idx === root.currentWorkspace);
                     if (CompositorService.isHyprland)
                         return !!(modelData && modelData.id === root.currentWorkspace);
-                    if (root.isMango)
+                    if (root.isDwlTagCompositor)
                         return !!(modelData && root.dwlActiveTags.includes(modelData.tag));
                     if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle)
                         return !!(modelData && root.swayWorkspaceKey(modelData) === root.currentWorkspace);
@@ -1153,7 +1229,7 @@ Item {
                 property bool isOccupied: {
                     if (CompositorService.isHyprland)
                         return Array.from(Hyprland.toplevels?.values || []).some(tl => tl.workspace?.id === modelData?.id);
-                    if (root.isMango)
+                    if (root.isDwlTagCompositor)
                         return modelData.clients > 0;
                     if (CompositorService.isNiri)
                         return NiriService.windows?.some(win => win.workspace_id === modelData?.id) ?? false;
@@ -1166,7 +1242,7 @@ Item {
                         return !!(modelData && modelData.idx === -1);
                     if (CompositorService.isHyprland)
                         return !!(modelData && modelData.id === -1);
-                    if (root.isMango)
+                    if (root.isDwlTagCompositor)
                         return !!(modelData && modelData.tag === -1);
                     if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle)
                         return !!(modelData && modelData._placeholder);
@@ -1183,7 +1259,7 @@ Item {
                         return modelData?.urgent ?? false;
                     if (CompositorService.isNiri)
                         return loadedIsUrgent;
-                    if (root.isMango)
+                    if (root.isDwlTagCompositor)
                         return modelData?.state === 2;
                     if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle)
                         return loadedIsUrgent;
@@ -1211,7 +1287,7 @@ Item {
                         targetWorkspaceId = modelData?.id;
                     } else if (CompositorService.isHyprland) {
                         targetWorkspaceId = modelData?.id;
-                    } else if (root.isMango) {
+                    } else if (root.isDwlTagCompositor) {
                         targetWorkspaceId = modelData?.tag;
                     } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
                         targetWorkspaceId = modelData?.num;
@@ -1240,8 +1316,8 @@ Item {
                             winWs = hyprToplevel?.workspace?.id;
                         }
 
-                        if (CompositorService.isMango) {
-                            if (!(w.mangoTags || []).includes(targetWorkspaceId + 1))
+                        if ((CompositorService.isAsteroidz)) {
+                            if (!(w.asteroidzTags || []).includes(targetWorkspaceId + 1))
                                 continue;
                         } else if (winWs !== targetWorkspaceId) {
                             continue;
@@ -1483,8 +1559,8 @@ Item {
                                 }
                             } else if (CompositorService.isHyprland && modelData?.id) {
                                 HyprlandService.focusWorkspace(root.hyprlandWorkspaceSelector(modelData));
-                            } else if (root.isMango && modelData?.tag !== undefined) {
-                                MangoService.switchToTag(root.screenName, modelData.tag);
+                            } else if (root.isDwlTagCompositor && modelData?.tag !== undefined) {
+                                CompositorService.dwlService.switchToTag(root.screenName, modelData.tag);
                             } else if ((CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) && modelData?.num !== undefined) {
                                 root.dispatchSwayWorkspace(modelData);
                             }
@@ -1493,8 +1569,8 @@ Item {
                                 NiriService.toggleOverview();
                             } else if (CompositorService.isHyprland && root.hyprlandOverviewLoader?.item) {
                                 root.hyprlandOverviewLoader.item.overviewOpen = !root.hyprlandOverviewLoader.item.overviewOpen;
-                            } else if (root.isMango && modelData?.tag !== undefined) {
-                                MangoService.toggleTag(root.screenName, modelData.tag);
+                            } else if (root.isDwlTagCompositor && modelData?.tag !== undefined) {
+                                CompositorService.dwlService.toggleTag(root.screenName, modelData.tag);
                             }
                         }
                     }
@@ -1518,7 +1594,7 @@ Item {
                             wsData = modelData || null;
                         } else if (CompositorService.isHyprland) {
                             wsData = modelData;
-                        } else if (root.isMango) {
+                        } else if (root.isDwlTagCompositor) {
                             wsData = modelData;
                         } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
                             wsData = modelData;
@@ -1532,7 +1608,7 @@ Item {
                         }
 
                         if (SettingsData.showWorkspaceApps) {
-                            if (root.isMango || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
+                            if (root.isDwlTagCompositor || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
                                 delegateRoot.loadedIcons = root.getWorkspaceIcons(modelData);
                             } else if (CompositorService.isNiri) {
                                 delegateRoot.loadedIcons = root.getWorkspaceIcons(isPlaceholder ? null : modelData);
@@ -1741,13 +1817,13 @@ Item {
                                             readonly property bool appHighlightActive: SettingsData.workspaceActiveAppHighlightEnabled && modelData.active
                                             readonly property color appBorderColor: appHighlightActive ? focusedBorderColor : Theme.primarySelected
                                             readonly property color appGlyphColor: appHighlightActive ? focusedBorderColor : Theme.primary
-                                            readonly property real appOpacity: modelData.active ? 1.0 : rowAppMouseArea.containsMouse ? 0.8 : 0.6
+                                            readonly property real appOpacity: (modelData.active ? 1.0 : rowAppMouseArea.containsMouse ? 0.8 : 0.6) * (modelData.parked ? 0.45 : 1.0)
 
                                             IconImage {
                                                 id: rowAppIcon
                                                 anchors.fill: parent
                                                 source: modelData.icon || ""
-                                                opacity: modelData.active ? 1.0 : rowAppMouseArea.containsMouse ? 0.8 : 0.6
+                                                opacity: appOpacity
                                                 visible: !modelData.isQuickshell && !modelData.isSteamApp && status === Image.Ready
                                             }
 
@@ -1789,7 +1865,7 @@ Item {
                                             IconImage {
                                                 anchors.fill: parent
                                                 source: modelData.icon
-                                                opacity: modelData.active ? 1.0 : rowAppMouseArea.containsMouse ? 0.8 : 0.6
+                                                opacity: appOpacity
                                                 visible: modelData.isQuickshell
                                                 layer.enabled: true
                                                 layer.effect: MultiEffect {
@@ -1803,7 +1879,7 @@ Item {
                                                 id: rowSteamIcon
                                                 anchors.fill: parent
                                                 source: modelData.icon
-                                                opacity: modelData.active ? 1.0 : rowAppMouseArea.containsMouse ? 0.8 : 0.6
+                                                opacity: appOpacity
                                                 visible: modelData.isSteamApp && modelData.icon
                                             }
 
@@ -1812,7 +1888,7 @@ Item {
                                                 size: root.appIconSize
                                                 name: "sports_esports"
                                                 color: appHighlightActive ? focusedBorderColor : Theme.widgetTextColor
-                                                opacity: modelData.active ? 1.0 : rowAppMouseArea.containsMouse ? 0.8 : 0.6
+                                                opacity: appOpacity
                                                 visible: modelData.isSteamApp && !modelData.icon
                                             }
 
@@ -1910,13 +1986,13 @@ Item {
                                             readonly property bool appHighlightActive: SettingsData.workspaceActiveAppHighlightEnabled && modelData.active
                                             readonly property color appBorderColor: appHighlightActive ? focusedBorderColor : Theme.primarySelected
                                             readonly property color appGlyphColor: appHighlightActive ? focusedBorderColor : Theme.primary
-                                            readonly property real appOpacity: modelData.active ? 1.0 : colAppMouseArea.containsMouse ? 0.8 : 0.6
+                                            readonly property real appOpacity: (modelData.active ? 1.0 : colAppMouseArea.containsMouse ? 0.8 : 0.6) * (modelData.parked ? 0.45 : 1.0)
 
                                             IconImage {
                                                 id: colAppIcon
                                                 anchors.fill: parent
                                                 source: modelData.icon || ""
-                                                opacity: modelData.active ? 1.0 : colAppMouseArea.containsMouse ? 0.8 : 0.6
+                                                opacity: appOpacity
                                                 visible: !modelData.isQuickshell && !modelData.isSteamApp && status === Image.Ready
                                             }
 
@@ -1958,7 +2034,7 @@ Item {
                                             IconImage {
                                                 anchors.fill: parent
                                                 source: modelData.icon
-                                                opacity: modelData.active ? 1.0 : colAppMouseArea.containsMouse ? 0.8 : 0.6
+                                                opacity: appOpacity
                                                 visible: modelData.isQuickshell
                                                 layer.enabled: true
                                                 layer.effect: MultiEffect {
@@ -1972,7 +2048,7 @@ Item {
                                                 id: colSteamIcon
                                                 anchors.fill: parent
                                                 source: modelData.icon
-                                                opacity: modelData.active ? 1.0 : colAppMouseArea.containsMouse ? 0.8 : 0.6
+                                                opacity: appOpacity
                                                 visible: modelData.isSteamApp && modelData.icon
                                             }
 
@@ -1981,7 +2057,7 @@ Item {
                                                 size: root.appIconSize
                                                 name: "sports_esports"
                                                 color: appHighlightActive ? focusedBorderColor : Theme.widgetTextColor
-                                                opacity: modelData.active ? 1.0 : colAppMouseArea.containsMouse ? 0.8 : 0.6
+                                                opacity: appOpacity
                                                 visible: modelData.isSteamApp && !modelData.icon
                                             }
 
@@ -2088,8 +2164,8 @@ Item {
                     }
                 }
                 Connections {
-                    target: MangoService
-                    enabled: root.isMango
+                    target: CompositorService.dwlService
+                    enabled: root.isDwlTagCompositor
                     function onStateChanged() {
                         delegateRoot.updateAllData();
                     }
