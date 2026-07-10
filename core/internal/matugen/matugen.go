@@ -260,13 +260,13 @@ func Run(opts Options) error {
 		return buildErr
 	}
 
+	if opts.SyncModeWithPortal {
+		syncColorScheme(opts.Mode)
+	}
+
 	if !changed {
 		log.Info("No color changes detected, skipping refresh")
 		return ErrNoChanges
-	}
-
-	if opts.SyncModeWithPortal {
-		syncColorScheme(opts.Mode)
 	}
 
 	log.Info("Done")
@@ -1004,6 +1004,13 @@ func syncColorScheme(mode ColorMode) {
 	scheme := "prefer-dark"
 	if mode == ColorModeLight {
 		scheme = "default"
+	}
+
+	if cur, err := utils.GsettingsGet("org.gnome.desktop.interface", "color-scheme"); err == nil {
+		cur = strings.Trim(cur, "'")
+		if cur == scheme || (mode == ColorModeLight && cur == "prefer-light") {
+			return
+		}
 	}
 
 	if err := utils.GsettingsSet("org.gnome.desktop.interface", "color-scheme", scheme); err != nil {

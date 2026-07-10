@@ -1336,9 +1336,7 @@ Singleton {
         }
 
         if (!isGreeterMode) {
-            if (!matugenAvailable) {
-                PortalService.setLightMode(light);
-            }
+            PortalService.setLightMode(light);
             if (typeof SettingsData !== "undefined") {
                 SettingsData.updateCosmicThemeMode(light);
             }

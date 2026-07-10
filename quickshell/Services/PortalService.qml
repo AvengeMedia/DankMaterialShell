@@ -16,6 +16,7 @@ Singleton {
     property string profileImage: ""
     property bool settingsPortalAvailable: false
     property int systemColorScheme: 0
+    property bool colorSchemeInitialized: false
 
     property bool freedeskAvailable: false
     property string colorSchemeCommand: ""
@@ -97,15 +98,24 @@ Singleton {
         return typeof Theme !== "undefined";
     }
 
-    // Only follow values stable for the settle window — the opt-in GTK4-refresh toggle reverts within ~400ms and following it would loop.
-    function evaluateColorScheme() {
+    // Follow only genuine portal transitions, debounced by the settle window — the
+    // opt-in GTK4-refresh toggle reverts within ~400ms, and a stale portal value
+    // (broken gsettings→portal bridge) must never revert a DMS-initiated change.
+    function handlePortalColorScheme(scheme) {
+        const isTransition = colorSchemeInitialized && scheme !== systemColorScheme;
+        colorSchemeInitialized = true;
+        systemColorScheme = scheme;
+
         if (!canSyncColorScheme())
             return;
-        const shouldBeLight = systemColorScheme !== 1;
+
+        const shouldBeLight = scheme !== 1;
         if (Theme.isLightMode === shouldBeLight) {
             colorSchemeSettleTimer.stop();
             return;
         }
+        if (!isTransition)
+            return;
         colorSchemeSettleTimer.restart();
     }
 
@@ -138,13 +148,16 @@ Singleton {
             return;
         }
 
-        const targetScheme = isLightMode ? "default" : "prefer-dark";
+        const preferLight = isLightMode && systemColorScheme === 2;
+        const targetScheme = isLightMode ? (preferLight ? "prefer-light" : "default") : "prefer-dark";
 
-        if (colorSchemeCommand === "gsettings") {
+        switch (colorSchemeCommand) {
+        case "gsettings":
             Quickshell.execDetached(["gsettings", "set", "org.gnome.desktop.interface", "color-scheme", targetScheme]);
-        }
-        if (colorSchemeCommand === "dconf") {
+            break;
+        case "dconf":
             Quickshell.execDetached(["dconf", "write", "/org/gnome/desktop/interface/color-scheme", `'${targetScheme}'`]);
+            break;
         }
     }
 
@@ -206,8 +219,11 @@ Singleton {
         target: typeof SettingsData !== "undefined" ? SettingsData : null
 
         function onSyncModeWithPortalChanged() {
-            if (SettingsData.syncModeWithPortal)
-                root.evaluateColorScheme();
+            if (!SettingsData.syncModeWithPortal)
+                return;
+            if (typeof Theme === "undefined")
+                return;
+            root.setSystemColorScheme(Theme.isLightMode);
         }
     }
 
@@ -218,17 +234,7 @@ Singleton {
             if (!data || !data.settings)
                 return;
             root.settingsPortalAvailable = data.settings.available === true;
-            root.systemColorScheme = data.settings.colorScheme || 0;
-            root.evaluateColorScheme();
-        }
-    }
-
-    Connections {
-        target: typeof Theme !== "undefined" ? Theme : null
-
-        function onWorkerRunningChanged() {
-            if (!Theme.workerRunning)
-                root.evaluateColorScheme();
+            root.handlePortalColorScheme(data.settings.colorScheme || 0);
         }
     }
 
@@ -288,8 +294,7 @@ Singleton {
         DMSService.sendRequest("freedesktop.getState", null, response => {
             if (response.result && response.result.settings) {
                 settingsPortalAvailable = response.result.settings.available || false;
-                systemColorScheme = response.result.settings.colorScheme || 0;
-                evaluateColorScheme();
+                handlePortalColorScheme(response.result.settings.colorScheme || 0);
             }
         });
     }
