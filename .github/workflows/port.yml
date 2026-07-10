@@ -1,8 +1,9 @@
 name: Port to release branch
 
 # Ports flagged commits from master onto release/X.Y branches:
-#   - trailer line in a commit message pushed to master; accepted forms:
-#     "Port: 1.5", "Port/1.5", "Port 1.5", "Port - 1.5", "Port: release/1.5"
+#   - "port 1.5" flag in a commit message pushed to master — own line or
+#     mid-line; separators : / - or space; "release/1.5" also accepted;
+#     comma lists ("Port: 1.5, 1.4") work in the own-line form
 #   - "port release/1.5" label on a merged PR
 # Conflicts are reported to the "Port status: <branch>" tracking issue.
 
@@ -55,11 +56,16 @@ jobs:
             # skip merge commits (handled by the label path)
             [ "$(git rev-list --no-walk --count --min-parents=2 "$sha")" -eq 0 ] || continue
 
-            # extract targets, then keep only version-shaped ones (X.Y[.Z])
-            targets=$(git log -1 --format=%B "$sha" |
+            # own-line form (supports comma lists), validated version-shaped
+            t1=$(git log -1 --format=%B "$sha" |
               { grep -iE '^Port[:/ -]' || true; } | sed -E 's|^port[-:/ ]+||I' | tr ',' '\n' |
               sed 's/[[:space:]]//g; /^$/d' | sed 's|^release/||I' |
-              { grep -E '^[0-9]+\.[0-9]+(\.[0-9]+)?$' || true; } | sort -u)
+              { grep -E '^[0-9]+\.[0-9]+(\.[0-9]+)?$' || true; })
+            # mid-line form, e.g. "fix thing fixes #2802 port 1.5"
+            t2=$(git log -1 --format=%B "$sha" |
+              { grep -oiE '\bport[-: /]+(release/)?[0-9]+\.[0-9]+(\.[0-9]+)?\b' || true; } |
+              sed -E 's|^port[-:/ ]+||I' | sed 's|^release/||I')
+            targets=$(printf '%s\n%s\n' "$t1" "$t2" | sed '/^$/d' | sort -u)
             for ver in $targets; do
               echo "::group::port $sha -> release/$ver"
               bash scripts/port.sh "release/$ver" "$sha"

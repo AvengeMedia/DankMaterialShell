@@ -38,8 +38,12 @@ done < <(git log --format=%B "${BASE}..origin/${TARGET}" 2>/dev/null |
 # git cherry: "+ sha" = not on target (by patch-id), "- sha" = equivalent exists
 fixes=""
 others=""
+flagged=""
 fix_count=0
 other_count=0
+flagged_count=0
+VER="${TARGET#release/}"
+FLAG_RE="\\bport[-: /]+(release/)?${VER//./\\.}\\b"
 while read -r mark sha; do
   [ "$mark" = "+" ] || continue
   [ -n "${PORTED[$sha]:-}" ] && continue
@@ -50,7 +54,11 @@ while read -r mark sha; do
   short=$(git rev-parse --short "$sha")
   pr=$(grep -oE '#[0-9]+' <<<"$subject" | head -1 || true)
   line="- [ ] \`${short}\` ${subject} (${author}${pr:+, ${pr}})"
-  if grep -qiE '^(fix|hotfix|bugfix)([(:! ]|$)|^[a-z0-9_-]+: *fix' <<<"$subject"; then
+  # explicit "port X.Y" mention anywhere in the message = strongest signal
+  if git log -1 --format=%B "$sha" | grep -qiE "$FLAG_RE"; then
+    flagged+="${line}"$'\n'
+    flagged_count=$((flagged_count + 1))
+  elif grep -qiE '^(fix|hotfix|bugfix)([(:! ]|$)|^[a-z0-9_./-]+: *fix' <<<"$subject"; then
     fixes+="${line}"$'\n'
     fix_count=$((fix_count + 1))
   else
@@ -59,11 +67,17 @@ while read -r mark sha; do
   fi
 done < <(git cherry "origin/${TARGET}" origin/master "$BASE")
 
+FLAGGED_SECTION=""
+if [ "$flagged_count" -gt 0 ]; then
+  FLAGGED_SECTION="### :warning: Flagged \"port ${VER}\" but not applied (${flagged_count})"$'\n\n'"${flagged}"
+fi
+
 REPORT=$(cat <<EOF
 ## Port audit: \`${TARGET}\` vs \`master\`
 
 Base: \`$(git rev-parse --short "$BASE")\` · generated $(date -u +%Y-%m-%dT%H:%MZ)
 
+${FLAGGED_SECTION}
 ### Candidate fixes not ported (${fix_count})
 
 ${fixes:-_none — all caught up_ }
