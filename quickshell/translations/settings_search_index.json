@@ -6981,6 +6981,31 @@
     "description": "Gradually fade the screen before locking with a configurable grace period"
   },
   {
+    "section": "idleInhibitLidSwitch",
+    "label": "Keep awake blocks lid switch",
+    "tabIndex": 21,
+    "category": "Power & Sleep",
+    "keywords": [
+      "active",
+      "awake",
+      "blocks",
+      "closing",
+      "energy",
+      "inhibit",
+      "keep",
+      "laptop",
+      "lid",
+      "power",
+      "shutdown",
+      "sleep",
+      "suspend",
+      "switch",
+      "system",
+      "while"
+    ],
+    "description": "While keep awake is active, closing the laptop lid will not suspend the system"
+  },
+  {
     "section": "fadeToLockGracePeriod",
     "label": "Lock fade grace period",
     "tabIndex": 21,

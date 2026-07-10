@@ -41,7 +41,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/pkg/syncmap"
 )
 
-const APIVersion = 27
+const APIVersion = 28
 
 var CLIVersion = "dev"
 
@@ -1437,6 +1437,7 @@ func Start(printDocs bool) error {
 		log.Info(" loginctl.setIdleHint        - Set idle hint (params: idle)")
 		log.Info(" loginctl.setLockBeforeSuspend - Set lock before suspend (params: enabled)")
 		log.Info(" loginctl.setSleepInhibitorEnabled - Enable/disable sleep inhibitor (params: enabled)")
+		log.Info(" loginctl.setLidInhibitorEnabled - Enable/disable lid switch inhibitor (params: enabled)")
 		log.Info(" loginctl.lockerReady        - Signal locker UI is ready (releases sleep inhibitor)")
 		log.Info(" loginctl.terminate          - Terminate session")
 		log.Info(" loginctl.subscribe          - Subscribe to session state changes (streaming)")

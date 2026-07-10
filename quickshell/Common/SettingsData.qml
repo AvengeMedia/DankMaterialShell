@@ -765,6 +765,7 @@ Singleton {
     property bool batteryPillPercentSign: false
     property bool lockBeforeSuspend: false
     property bool loginctlLockIntegration: true
+    property bool idleInhibitLidSwitch: false
     property bool fadeToLockEnabled: true
     property int fadeToLockGracePeriod: 5
     property bool fadeToDpmsEnabled: true

@@ -96,6 +96,16 @@ Item {
                     onToggled: checked => SettingsData.set("lockBeforeSuspend", checked)
                 }
 
+                SettingsToggleRow {
+                    settingKey: "idleInhibitLidSwitch"
+                    tags: ["keep", "awake", "lid", "laptop", "suspend", "inhibit"]
+                    text: I18n.tr("Keep awake blocks lid switch")
+                    description: I18n.tr("While keep awake is active, closing the laptop lid will not suspend the system")
+                    checked: SettingsData.idleInhibitLidSwitch
+                    visible: SessionService.loginctlAvailable
+                    onToggled: checked => SettingsData.set("idleInhibitLidSwitch", checked)
+                }
+
                 SettingsDropdownRow {
                     id: fadeGracePeriodDropdown
                     settingKey: "fadeToLockGracePeriod"

@@ -99,3 +99,45 @@ func (m *Manager) SetSleepInhibitorEnabled(enabled bool) {
 		m.releaseSleepInhibitor()
 	}
 }
+
+// SetLidInhibitorEnabled acquires or releases a block-mode handle-lid-switch
+// inhibitor so logind ignores lid close while keep awake is active. logind
+// always honors handle-lid-switch locks regardless of LidSwitchIgnoreInhibited.
+func (m *Manager) SetLidInhibitorEnabled(enabled bool) error {
+	m.lidInhibitMu.Lock()
+	defer m.lidInhibitMu.Unlock()
+
+	if !enabled {
+		m.releaseLidInhibitorLocked()
+		return nil
+	}
+
+	if m.lidInhibitFile != nil {
+		return nil
+	}
+
+	if m.managerObj == nil {
+		return fmt.Errorf("manager object not available")
+	}
+
+	file, err := m.inhibit("handle-lid-switch", "DankMaterialShell", "Keep awake", "block")
+	if err != nil {
+		return fmt.Errorf("failed to acquire lid inhibitor: %w", err)
+	}
+
+	m.lidInhibitFile = file
+	return nil
+}
+
+func (m *Manager) releaseLidInhibitor() {
+	m.lidInhibitMu.Lock()
+	defer m.lidInhibitMu.Unlock()
+	m.releaseLidInhibitorLocked()
+}
+
+func (m *Manager) releaseLidInhibitorLocked() {
+	if m.lidInhibitFile != nil {
+		m.lidInhibitFile.Close()
+		m.lidInhibitFile = nil
+	}
+}

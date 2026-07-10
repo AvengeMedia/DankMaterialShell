@@ -59,6 +59,8 @@ type Manager struct {
 	sigWG                 sync.WaitGroup
 	inhibitMu             sync.Mutex
 	inhibitFile           *os.File
+	lidInhibitMu          sync.Mutex
+	lidInhibitFile        *os.File
 	lockBeforeSuspend     atomic.Bool
 	inSleepCycle          atomic.Bool
 	sleepCycleID          atomic.Uint64

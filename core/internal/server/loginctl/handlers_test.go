@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"net"
+	"os"
 	"sync"
+	"syscall"
 	"testing"
 	"time"
 
@@ -340,6 +342,111 @@ func TestHandleSetIdleHint(t *testing.T) {
 
 		assert.Equal(t, 123, resp.ID)
 		assert.Contains(t, resp.Error, "failed to set idle hint")
+	})
+}
+
+func TestHandleSetLidInhibitorEnabled(t *testing.T) {
+	t.Run("missing enabled parameter", func(t *testing.T) {
+		manager := &Manager{
+			state:      &SessionState{},
+			stateMutex: sync.RWMutex{},
+		}
+
+		conn := newMockNetConn()
+		req := models.Request{
+			ID:     123,
+			Method: "loginctl.setLidInhibitorEnabled",
+			Params: map[string]any{},
+		}
+
+		handleSetLidInhibitorEnabled(conn, req, manager)
+
+		var resp models.Response[any]
+		err := json.NewDecoder(conn.writeBuf).Decode(&resp)
+		require.NoError(t, err)
+
+		assert.Equal(t, 123, resp.ID)
+		assert.Contains(t, resp.Error, "missing or invalid 'enabled' parameter")
+	})
+
+	t.Run("disable when not held succeeds", func(t *testing.T) {
+		manager := &Manager{
+			state:      &SessionState{},
+			stateMutex: sync.RWMutex{},
+		}
+
+		conn := newMockNetConn()
+		req := models.Request{
+			ID:     123,
+			Method: "loginctl.setLidInhibitorEnabled",
+			Params: map[string]any{
+				"enabled": false,
+			},
+		}
+
+		handleSetLidInhibitorEnabled(conn, req, manager)
+
+		var resp models.Response[models.SuccessResult]
+		err := json.NewDecoder(conn.writeBuf).Decode(&resp)
+		require.NoError(t, err)
+
+		assert.Equal(t, 123, resp.ID)
+		assert.Empty(t, resp.Error)
+		require.NotNil(t, resp.Result)
+		assert.True(t, resp.Result.Success)
+	})
+
+	t.Run("enable without manager object fails", func(t *testing.T) {
+		manager := &Manager{
+			state:      &SessionState{},
+			stateMutex: sync.RWMutex{},
+		}
+
+		conn := newMockNetConn()
+		req := models.Request{
+			ID:     123,
+			Method: "loginctl.setLidInhibitorEnabled",
+			Params: map[string]any{
+				"enabled": true,
+			},
+		}
+
+		handleSetLidInhibitorEnabled(conn, req, manager)
+
+		var resp models.Response[any]
+		err := json.NewDecoder(conn.writeBuf).Decode(&resp)
+		require.NoError(t, err)
+
+		assert.Equal(t, 123, resp.ID)
+		assert.Contains(t, resp.Error, "manager object not available")
+	})
+
+	t.Run("enable acquires inhibitor once, disable releases it", func(t *testing.T) {
+		r, w, err := os.Pipe()
+		require.NoError(t, err)
+		defer r.Close()
+		defer w.Close()
+		fd, err := syscall.Dup(int(r.Fd()))
+		require.NoError(t, err)
+
+		mockManagerObj := mockdbus.NewMockBusObject(t)
+		mockCall := &dbus.Call{Body: []any{dbus.UnixFD(fd)}}
+		mockManagerObj.EXPECT().Call(dbusManagerInterface+".Inhibit", dbus.Flags(0), "handle-lid-switch", "DankMaterialShell", "Keep awake", "block").Return(mockCall).Once()
+
+		manager := &Manager{
+			state:      &SessionState{},
+			stateMutex: sync.RWMutex{},
+			managerObj: mockManagerObj,
+		}
+
+		require.NoError(t, manager.SetLidInhibitorEnabled(true))
+		require.NotNil(t, manager.lidInhibitFile)
+
+		// Already held: no second dbus call (enforced by .Once())
+		require.NoError(t, manager.SetLidInhibitorEnabled(true))
+
+		require.NoError(t, manager.SetLidInhibitorEnabled(false))
+		assert.Nil(t, manager.lidInhibitFile)
 	})
 }
 

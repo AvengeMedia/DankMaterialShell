@@ -348,6 +348,7 @@ var SPEC = {
     batteryAutoPowerSaver: { def: false },
     lockBeforeSuspend: { def: false },
     loginctlLockIntegration: { def: true },
+    idleInhibitLidSwitch: { def: false },
     fadeToLockEnabled: { def: true },
     fadeToLockGracePeriod: { def: 5 },
     fadeToDpmsEnabled: { def: true },

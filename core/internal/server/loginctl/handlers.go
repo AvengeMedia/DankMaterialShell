@@ -27,6 +27,8 @@ func HandleRequest(conn net.Conn, req models.Request, manager *Manager) {
 		handleSetLockBeforeSuspend(conn, req, manager)
 	case "loginctl.setSleepInhibitorEnabled":
 		handleSetSleepInhibitorEnabled(conn, req, manager)
+	case "loginctl.setLidInhibitorEnabled":
+		handleSetLidInhibitorEnabled(conn, req, manager)
 	case "loginctl.lockerReady":
 		handleLockerReady(conn, req, manager)
 	case "loginctl.terminate":
@@ -114,6 +116,20 @@ func handleSetSleepInhibitorEnabled(conn net.Conn, req models.Request, manager *
 
 	manager.SetSleepInhibitorEnabled(enabled)
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "sleep inhibitor setting updated"})
+}
+
+func handleSetLidInhibitorEnabled(conn net.Conn, req models.Request, manager *Manager) {
+	enabled, err := params.Bool(req.Params, "enabled")
+	if err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+
+	if err := manager.SetLidInhibitorEnabled(enabled); err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "lid inhibitor setting updated"})
 }
 
 func handleLockerReady(conn net.Conn, req models.Request, manager *Manager) {

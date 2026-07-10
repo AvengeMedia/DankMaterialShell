@@ -410,6 +410,7 @@ Singleton {
             return;
         idleInhibited = true;
         inhibitorChanged();
+        syncLidInhibitor();
     }
 
     function disableIdleInhibit() {
@@ -417,6 +418,7 @@ Singleton {
             return;
         idleInhibited = false;
         inhibitorChanged();
+        syncLidInhibitor();
     }
 
     function toggleIdleInhibit() {
@@ -444,6 +446,7 @@ Singleton {
 
         function onCapabilitiesReceived() {
             syncSleepInhibitor();
+            syncLidInhibitor();
         }
     }
 
@@ -486,6 +489,10 @@ Singleton {
                 syncLockBeforeSuspend();
             }
             syncSleepInhibitor();
+        }
+
+        function onIdleInhibitLidSwitchChanged() {
+            syncLidInhibitor();
         }
     }
 
@@ -611,6 +618,23 @@ Singleton {
                 log.warn("Failed to sync sleep inhibitor:", response.error);
             } else {
                 log.debug("Synced sleep inhibitor:", SettingsData.loginctlLockIntegration);
+            }
+        });
+    }
+
+    function syncLidInhibitor() {
+        if (!loginctlAvailable)
+            return;
+        if (!DMSService.apiVersion || DMSService.apiVersion < 28)
+            return;
+        const enabled = idleInhibited && SettingsData.idleInhibitLidSwitch;
+        DMSService.sendRequest("loginctl.setLidInhibitorEnabled", {
+            enabled: enabled
+        }, response => {
+            if (response.error) {
+                log.warn("Failed to sync lid inhibitor:", response.error);
+            } else {
+                log.debug("Synced lid inhibitor:", enabled);
             }
         });
     }
