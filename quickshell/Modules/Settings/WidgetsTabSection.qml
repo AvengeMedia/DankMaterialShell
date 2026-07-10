@@ -181,22 +181,74 @@ Column {
     height: implicitHeight
     spacing: Theme.spacingM
 
-    Row {
-        spacing: Theme.spacingM
+    Item {
+        width: parent.width
+        height: Math.max(headerRow.implicitHeight, centeringModeRow.implicitHeight)
+        LayoutMirroring.enabled: I18n.isRtl
+        LayoutMirroring.childrenInherit: true
 
-        DankIcon {
-            name: root.titleIcon
-            size: Theme.iconSize
-            color: Theme.primary
+        Row {
+            id: headerRow
+            spacing: Theme.spacingM
+            anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
+
+            DankIcon {
+                name: root.titleIcon
+                size: Theme.iconSize
+                color: Theme.primary
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            StyledText {
+                text: root.title
+                font.pixelSize: Theme.fontSizeLarge
+                font.weight: Font.Medium
+                color: Theme.surfaceText
+                anchors.verticalCenter: parent.verticalCenter
+            }
         }
 
-        StyledText {
-            text: root.title
-            font.pixelSize: Theme.fontSizeLarge
-            font.weight: Font.Medium
-            color: Theme.surfaceText
+        Row {
+            id: centeringModeRow
+            spacing: Theme.spacingXS
+            anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
+            visible: root.sectionId === "center"
+
+            DankActionButton {
+                id: indexCenterButton
+                buttonSize: 28
+                iconName: "format_list_numbered"
+                iconSize: 16
+                iconColor: SettingsData.centeringMode === "index" ? Theme.primary : Theme.outline
+                onClicked: {
+                    SettingsData.set("centeringMode", "index");
+                }
+                onEntered: {
+                    sharedTooltip.show(I18n.tr("Index Centering"), indexCenterButton, 0, 0, "bottom");
+                }
+                onExited: {
+                    sharedTooltip.hide();
+                }
+            }
+
+            DankActionButton {
+                id: geometricCenterButton
+                buttonSize: 28
+                iconName: "center_focus_weak"
+                iconSize: 16
+                iconColor: SettingsData.centeringMode === "geometric" ? Theme.primary : Theme.outline
+                onClicked: {
+                    SettingsData.set("centeringMode", "geometric");
+                }
+                onEntered: {
+                    sharedTooltip.show(I18n.tr("Geometric Centering"), geometricCenterButton, 0, 0, "bottom");
+                }
+                onExited: {
+                    sharedTooltip.hide();
+                }
+            }
         }
     }
 
