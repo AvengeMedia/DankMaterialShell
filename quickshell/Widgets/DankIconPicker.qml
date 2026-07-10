@@ -118,7 +118,7 @@ Rectangle {
     Popup {
         id: iconPopup
 
-        parent: Overlay.overlay
+        parent: root.Overlay.overlay
         width: 320
         height: Math.min(500, dropdownContent.implicitHeight + 32)
         padding: 0

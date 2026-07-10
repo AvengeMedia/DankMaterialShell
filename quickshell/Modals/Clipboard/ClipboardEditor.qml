@@ -397,7 +397,7 @@ Item {
 
         Popup {
             id: saveMenu
-            parent: Overlay.overlay
+            parent: root.Overlay.overlay
             padding: Theme.spacingM
             modal: true
             dim: false

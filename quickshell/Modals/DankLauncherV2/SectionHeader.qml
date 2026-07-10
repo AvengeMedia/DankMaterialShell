@@ -147,7 +147,7 @@ Rectangle {
 
             Popup {
                 id: categoryPopup
-                parent: Overlay.overlay
+                parent: categoryChip.Overlay.overlay
                 width: Math.max(categoryChip.width, 180)
                 padding: 0
                 modal: true
