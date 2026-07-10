@@ -134,6 +134,7 @@ TAB_INDEX_MAP = {
     "DefaultAppsTab.qml": 34,
     "UsersTab.qml": 35,
     "AutoStartTab.qml": 36,
+    "BatteryTab.qml": 42,
 }
 
 TAB_CATEGORY_MAP = {
@@ -178,6 +179,7 @@ TAB_CATEGORY_MAP = {
     39: "Network",
     40: "Network",
     41: "Network",
+    42: "Power & Security",
     43: "Dank Dash",
 }
 
