@@ -223,6 +223,27 @@ Singleton {
 
         applyPowerProfile();
 
+        if (isPluggedIn) {
+            const dismissLow = SettingsData.batteryLowNotificationType === 1 && SettingsData.notificationTimeoutNormal === 0;
+            const dismissCritical = SettingsData.batteryCriticalNotificationType === 1 && SettingsData.notificationTimeoutCritical === 0;
+
+            if (dismissLow || dismissCritical) {
+                const lowSummary = I18n.tr("Low Battery");
+                const criticalSummary = I18n.tr("Critical Battery");
+
+                for (const w of NotificationService.visibleNotifications) {
+                    if (!w || !w.notification)
+                        continue;
+
+                    const summary = w.notification.summary;
+
+                    if ((dismissLow && summary === lowSummary) || (dismissCritical && summary === lowSummary)) {
+                        NotificationService.dismissNotification(w);
+                    }
+                }
+            }
+        }
+
         previousPluggedState = isPluggedIn;
     }
 
