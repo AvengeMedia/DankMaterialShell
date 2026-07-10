@@ -577,6 +577,12 @@ Singleton {
 
         credentialsRequested = false;
 
+        if (credentialsReason === "wrong-password" && credentialsSSID && credentialsSetting === "802-11-wireless-security") {
+            pendingConnectionSSID = credentialsSSID;
+            pendingConnectionStartTime = Date.now();
+            connectionStatus = "connecting";
+        }
+
         DMSService.sendRequest("network.credentials.submit", params, response => {
             if (response.error) {
                 log.warn("Failed to submit credentials:", response.error);

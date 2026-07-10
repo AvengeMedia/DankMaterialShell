@@ -126,3 +126,6 @@ __pycache__
 distro/void/temp/
 distro/void/hostdir/
 distro/void/masterdir*/
+
+# Often gets built
+core/dms

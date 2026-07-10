@@ -18,6 +18,7 @@ func (b *IWDBackend) StartMonitoring(onStateChange func()) error {
 		}
 		agent.onUserCanceled = b.OnUserCanceledPrompt
 		agent.onPromptRetry = b.OnPromptRetry
+		agent.takePendingSecret = b.takePendingPSK
 		b.iwdAgent = agent
 	}
 

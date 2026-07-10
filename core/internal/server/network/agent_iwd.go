@@ -22,13 +22,14 @@ type ConnectionStateChecker interface {
 }
 
 type IWDAgent struct {
-	conn            *dbus.Conn
-	objPath         dbus.ObjectPath
-	prompts         PromptBroker
-	onUserCanceled  func()
-	onPromptRetry   func(ssid string)
-	lastRequestSSID string
-	stateChecker    ConnectionStateChecker
+	conn              *dbus.Conn
+	objPath           dbus.ObjectPath
+	prompts           PromptBroker
+	onUserCanceled    func()
+	onPromptRetry     func(ssid string)
+	takePendingSecret func(ssid string) (string, bool)
+	lastRequestSSID   string
+	stateChecker      ConnectionStateChecker
 }
 
 const iwdAgentIntrospectXML = `
@@ -119,6 +120,13 @@ func (a *IWDAgent) RequestPassphrase(network dbus.ObjectPath) (string, *dbus.Err
 		return "", dbus.NewError("net.connman.iwd.Agent.Error.Canceled", nil)
 	}
 
+	if a.takePendingSecret != nil {
+		if psk, ok := a.takePendingSecret(ssid); ok {
+			a.lastRequestSSID = ssid
+			return psk, nil
+		}
+	}
+
 	if a.prompts == nil {
 		if a.onUserCanceled != nil {
 			a.onUserCanceled()
@@ -126,12 +134,16 @@ func (a *IWDAgent) RequestPassphrase(network dbus.ObjectPath) (string, *dbus.Err
 		return "", dbus.NewError("net.connman.iwd.Agent.Error.Canceled", nil)
 	}
 
-	if a.lastRequestSSID == ssid {
-		if a.onPromptRetry != nil {
-			a.onPromptRetry(ssid)
-		}
+	retry := a.lastRequestSSID == ssid
+	if retry && a.onPromptRetry != nil {
+		a.onPromptRetry(ssid)
 	}
 	a.lastRequestSSID = ssid
+
+	reason := ""
+	if retry {
+		reason = "wrong-password"
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
@@ -139,6 +151,7 @@ func (a *IWDAgent) RequestPassphrase(network dbus.ObjectPath) (string, *dbus.Err
 	token, err := a.prompts.Ask(ctx, PromptRequest{
 		SSID:   ssid,
 		Fields: []string{"psk"},
+		Reason: reason,
 	})
 	if err != nil {
 		if a.onUserCanceled != nil {

@@ -24,6 +24,7 @@ const (
 type connectAttempt struct {
 	ssid           string
 	netPath        dbus.ObjectPath
+	saved          bool
 	start          time.Time
 	deadline       time.Time
 	sawAuthish     bool
@@ -53,6 +54,37 @@ type IWDBackend struct {
 	attemptMutex  sync.RWMutex
 	recentScans   map[string]time.Time
 	recentScansMu sync.Mutex
+	pendingPSK    *pendingReplacementPSK
+	pendingPSKMu  sync.Mutex
+}
+
+type pendingReplacementPSK struct {
+	ssid    string
+	psk     string
+	expires time.Time
+}
+
+func (b *IWDBackend) storePendingPSK(ssid, psk string) {
+	b.pendingPSKMu.Lock()
+	b.pendingPSK = &pendingReplacementPSK{
+		ssid:    ssid,
+		psk:     psk,
+		expires: time.Now().Add(30 * time.Second),
+	}
+	b.pendingPSKMu.Unlock()
+}
+
+func (b *IWDBackend) takePendingPSK(ssid string) (string, bool) {
+	b.pendingPSKMu.Lock()
+	defer b.pendingPSKMu.Unlock()
+
+	pending := b.pendingPSK
+	if pending == nil || pending.ssid != ssid || time.Now().After(pending.expires) {
+		return "", false
+	}
+
+	b.pendingPSK = nil
+	return pending.psk, true
 }
 
 func NewIWDBackend() (*IWDBackend, error) {

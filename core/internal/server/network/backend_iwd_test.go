@@ -1,6 +1,7 @@
 package network
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -312,6 +313,133 @@ func TestConnectAttempt_Finalization(t *testing.T) {
 	assert.Empty(t, backend.state.ConnectingSSID)
 	assert.Equal(t, "bad-credentials", backend.state.LastError)
 	backend.stateMutex.RUnlock()
+}
+
+func TestIWDBackend_PendingPSK(t *testing.T) {
+	backend, _ := NewIWDBackend()
+
+	_, ok := backend.takePendingPSK("Home")
+	assert.False(t, ok)
+
+	backend.storePendingPSK("Home", "newpass")
+
+	_, ok = backend.takePendingPSK("Other")
+	assert.False(t, ok, "pending PSK should not match a different SSID")
+
+	psk, ok := backend.takePendingPSK("Home")
+	assert.True(t, ok)
+	assert.Equal(t, "newpass", psk)
+
+	_, ok = backend.takePendingPSK("Home")
+	assert.False(t, ok, "pending PSK should be consumed on take")
+
+	backend.storePendingPSK("Home", "newpass")
+	backend.pendingPSKMu.Lock()
+	backend.pendingPSK.expires = time.Now().Add(-time.Second)
+	backend.pendingPSKMu.Unlock()
+
+	_, ok = backend.takePendingPSK("Home")
+	assert.False(t, ok, "expired pending PSK should not be returned")
+}
+
+type fakePromptBroker struct {
+	asked    chan PromptRequest
+	reply    PromptReply
+	replyErr error
+}
+
+func (f *fakePromptBroker) Ask(ctx context.Context, req PromptRequest) (string, error) {
+	f.asked <- req
+	return "token", nil
+}
+
+func (f *fakePromptBroker) Wait(ctx context.Context, token string) (PromptReply, error) {
+	return f.reply, f.replyErr
+}
+
+func (f *fakePromptBroker) Resolve(token string, reply PromptReply) error { return nil }
+
+func (f *fakePromptBroker) Cancel(path string, setting string) error { return nil }
+
+func TestIWDBackend_BadCredentialsSavedNetwork_PromptsReplacement(t *testing.T) {
+	backend, _ := NewIWDBackend()
+	backend.state = &BackendState{}
+	broker := &fakePromptBroker{
+		asked: make(chan PromptRequest, 1),
+		reply: PromptReply{Cancel: true},
+	}
+	backend.promptBroker = broker
+
+	att := &connectAttempt{
+		ssid:     "Home",
+		netPath:  "/test",
+		saved:    true,
+		start:    time.Now(),
+		deadline: time.Now().Add(15 * time.Second),
+	}
+
+	backend.finalizeAttempt(att, "bad-credentials")
+
+	select {
+	case req := <-broker.asked:
+		assert.Equal(t, "Home", req.SSID)
+		assert.Equal(t, "wrong-password", req.Reason)
+		assert.Equal(t, []string{"psk"}, req.Fields)
+	case <-time.After(time.Second):
+		t.Fatal("expected replacement credentials prompt for saved network")
+	}
+}
+
+func TestIWDBackend_BadCredentialsUnsavedNetwork_NoReplacementPrompt(t *testing.T) {
+	backend, _ := NewIWDBackend()
+	backend.state = &BackendState{}
+	broker := &fakePromptBroker{
+		asked: make(chan PromptRequest, 1),
+		reply: PromptReply{Cancel: true},
+	}
+	backend.promptBroker = broker
+
+	att := &connectAttempt{
+		ssid:     "Home",
+		netPath:  "/test",
+		start:    time.Now(),
+		deadline: time.Now().Add(15 * time.Second),
+	}
+
+	backend.finalizeAttempt(att, "bad-credentials")
+
+	select {
+	case <-broker.asked:
+		t.Fatal("unsaved network should not trigger a replacement prompt")
+	case <-time.After(100 * time.Millisecond):
+	}
+}
+
+func TestIWDBackend_BadCredentialsAfterPromptRetry_NoReplacementPrompt(t *testing.T) {
+	backend, _ := NewIWDBackend()
+	backend.state = &BackendState{}
+	broker := &fakePromptBroker{
+		asked: make(chan PromptRequest, 1),
+		reply: PromptReply{Cancel: true},
+	}
+	backend.promptBroker = broker
+
+	att := &connectAttempt{
+		ssid:           "Home",
+		netPath:        "/test",
+		saved:          true,
+		sawPromptRetry: true,
+		start:          time.Now(),
+		deadline:       time.Now().Add(15 * time.Second),
+	}
+
+	backend.finalizeAttempt(att, "bad-credentials")
+
+	select {
+	case <-broker.asked:
+		t.Fatal("attempt that already prompted should not trigger a replacement prompt")
+	case <-time.After(100 * time.Millisecond):
+	}
 }
 
 func TestConnectAttempt_DoubleFinalization(t *testing.T) {

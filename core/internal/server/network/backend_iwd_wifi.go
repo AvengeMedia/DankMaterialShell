@@ -1,10 +1,12 @@
 package network
 
 import (
+	"context"
 	"fmt"
 	"time"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/errdefs"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/godbus/dbus/v5"
 )
 
@@ -476,6 +478,73 @@ func (b *IWDBackend) finalizeAttempt(att *connectAttempt, code string) {
 	if b.onStateChange != nil {
 		b.onStateChange()
 	}
+
+	if code == errdefs.ErrBadCredentials {
+		b.maybeReplaceSavedPSK(att)
+	}
+}
+
+func (b *IWDBackend) maybeReplaceSavedPSK(att *connectAttempt) {
+	if b.promptBroker == nil || !att.saved {
+		return
+	}
+
+	att.mu.Lock()
+	prompted := att.sawPromptRetry
+	att.mu.Unlock()
+	if prompted {
+		return
+	}
+
+	b.sigWG.Add(1)
+	go func() {
+		defer b.sigWG.Done()
+		b.requestReplacementPSK(att.ssid)
+	}()
+}
+
+func (b *IWDBackend) requestReplacementPSK(ssid string) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+
+	go func() {
+		select {
+		case <-b.stopChan:
+			cancel()
+		case <-ctx.Done():
+		}
+	}()
+
+	token, err := b.promptBroker.Ask(ctx, PromptRequest{
+		SSID:        ssid,
+		SettingName: "802-11-wireless-security",
+		Fields:      []string{"psk"},
+		Reason:      "wrong-password",
+	})
+	if err != nil {
+		log.Warnf("failed to request replacement credentials for %s: %v", ssid, err)
+		return
+	}
+
+	reply, err := b.promptBroker.Wait(ctx, token)
+	if err != nil || reply.Cancel {
+		return
+	}
+
+	psk, ok := reply.Secrets["psk"]
+	if !ok || psk == "" {
+		return
+	}
+
+	if err := b.ForgetWiFiNetwork(ssid); err != nil {
+		log.Warnf("failed to forget %s before credential replacement: %v", ssid, err)
+	}
+
+	b.storePendingPSK(ssid, psk)
+
+	if err := b.ConnectWiFi(ConnectionRequest{SSID: ssid}); err != nil {
+		log.Warnf("failed to reconnect %s with replacement credentials: %v", ssid, err)
+	}
 }
 
 func (b *IWDBackend) startAttemptWatchdog(att *connectAttempt) {
@@ -560,7 +629,7 @@ func (b *IWDBackend) ConnectWiFi(req ConnectionRequest) error {
 		return fmt.Errorf("no WiFi device available")
 	}
 
-	networkPath, err := b.findNetworkPath(req.SSID)
+	networkPath, saved, err := b.findNetworkPath(req.SSID)
 	if err != nil {
 		b.setConnectError(errdefs.ErrNoSuchSSID)
 		if b.onStateChange != nil {
@@ -572,6 +641,7 @@ func (b *IWDBackend) ConnectWiFi(req ConnectionRequest) error {
 	att := &connectAttempt{
 		ssid:     req.SSID,
 		netPath:  networkPath,
+		saved:    saved,
 		start:    time.Now(),
 		deadline: time.Now().Add(15 * time.Second),
 	}
@@ -619,26 +689,39 @@ func (b *IWDBackend) ConnectWiFi(req ConnectionRequest) error {
 	return nil
 }
 
-func (b *IWDBackend) findNetworkPath(ssid string) (dbus.ObjectPath, error) {
+func (b *IWDBackend) findNetworkPath(ssid string) (dbus.ObjectPath, bool, error) {
 	obj := b.conn.Object(iwdBusName, iwdObjectPath)
 
 	var objects map[dbus.ObjectPath]map[string]map[string]dbus.Variant
 	err := obj.Call(dbusObjectManager+".GetManagedObjects", 0).Store(&objects)
 	if err != nil {
-		return "", err
+		return "", false, err
 	}
 
+	var netPath dbus.ObjectPath
+	saved := false
 	for path, interfaces := range objects {
 		if netProps, ok := interfaces[iwdNetworkInterface]; ok {
 			if nameVar, ok := netProps["Name"]; ok {
 				if name, ok := nameVar.Value().(string); ok && name == ssid {
-					return path, nil
+					netPath = path
+				}
+			}
+		}
+		if knownProps, ok := interfaces[iwdKnownNetworkInterface]; ok {
+			if nameVar, ok := knownProps["Name"]; ok {
+				if name, ok := nameVar.Value().(string); ok && name == ssid {
+					saved = true
 				}
 			}
 		}
 	}
 
-	return "", fmt.Errorf("network not found")
+	if netPath == "" {
+		return "", false, fmt.Errorf("network not found")
+	}
+
+	return netPath, saved, nil
 }
 
 func (b *IWDBackend) DisconnectWiFi() error {
