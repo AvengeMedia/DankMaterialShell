@@ -892,6 +892,11 @@ Singleton {
                     return;
                 }
 
+                // Dismiss visible popup when sender closes the notification
+                // (e.g. YubiKey sends CloseNotification after touch).
+                // Without this, expireTimeout=0 popups stay visible forever.
+                wrapper.popup = false;
+
                 const groupKey = getGroupKey(wrapper);
                 const remainingInGroup = root.notifications.filter(n => getGroupKey(n) === groupKey);
 
