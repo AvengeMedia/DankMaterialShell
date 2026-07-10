@@ -1535,7 +1535,7 @@ func packageInstallHint() string {
 	case distros.FamilyArch:
 		return "Install from AUR with 'paru -S greetd-dms-greeter-git' or 'yay -S greetd-dms-greeter-git'"
 	case distros.FamilyVoid:
-		return "Install with 'sudo xbps-install -S dms-greeter' (requires DMS XBPS repo: echo 'repository=https://avengemedia.github.io/DankMaterialShell/current' | sudo tee /etc/xbps.d/dms.conf)"
+		return "Install with 'sudo xbps-install -S dms-greeter' (requires DMS XBPS repo: echo 'repository=https://void.danklinux.com/dms/current' | sudo tee /etc/xbps.d/dms.conf)"
 	default:
 		return "Run 'dms greeter install' to install greeter"
 	}

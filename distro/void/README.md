@@ -17,15 +17,21 @@ This is a DMS maintained repo for VoidLinux until these packages are officially 
 
 ### Using the Self-Hosted Repositories
 
-We serve both stable release and development packages directly from our repository branches.
+We serve both stable release and development packages from Cloudflare R2 at
+`void.danklinux.com`.
+
+> **Repository migration:** the former GitHub Pages repositories will be
+> frozen for 14 days at cutover. Their retirement date will be announced when
+> the snapshots are frozen. Replace any existing `avengemedia.github.io`
+> entries with the URLs below.
 
 #### 1. Add Repository Configurations
 
 Create configuration files in `/etc/xbps.d/` pointing to our repositories (needed for both stable and git/nightly variants):
 
 ```sh
-echo "repository=https://avengemedia.github.io/DankMaterialShell/current" | sudo tee /etc/xbps.d/dms.conf
-echo "repository=https://avengemedia.github.io/DankLinux/current" | sudo tee /etc/xbps.d/danklinux.conf
+echo "repository=https://void.danklinux.com/dms/current" | sudo tee /etc/xbps.d/dms.conf
+echo "repository=https://void.danklinux.com/danklinux/current" | sudo tee /etc/xbps.d/danklinux.conf
 ```
 
 #### 2. Install DMS

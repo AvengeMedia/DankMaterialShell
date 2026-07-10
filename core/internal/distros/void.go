@@ -13,8 +13,8 @@ import (
 )
 
 const (
-	VoidDMSRepo       = "https://avengemedia.github.io/DankMaterialShell/current"
-	VoidDankLinuxRepo = "https://avengemedia.github.io/DankLinux/current"
+	VoidDMSRepo       = "https://void.danklinux.com/dms/current"
+	VoidDankLinuxRepo = "https://void.danklinux.com/danklinux/current"
 	VoidHyprlandRepo  = "https://mirror.black-hole.dev/x86_64"
 
 	voidRunitSvDir      = "/etc/sv"

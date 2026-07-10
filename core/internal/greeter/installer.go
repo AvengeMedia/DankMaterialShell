@@ -990,7 +990,7 @@ func TryInstallGreeterPackage(logFunc func(string), sudoPassword string) bool {
 		failHint = fmt.Sprintf("⚠ dms-greeter install failed. Install from AUR: %s -S greetd-dms-greeter-git", aurHelper)
 		installCmd = exec.CommandContext(ctx, aurHelper, "-S", "--noconfirm", "greetd-dms-greeter-git")
 	case distros.FamilyVoid:
-		failHint = "⚠ dms-greeter install failed. Add the DMS XBPS repo manually:\necho 'repository=https://avengemedia.github.io/DankMaterialShell/current' | sudo tee /etc/xbps.d/dms.conf\nsudo xbps-install -Sy dms-greeter"
+		failHint = "⚠ dms-greeter install failed. Add the DMS XBPS repo manually:\necho 'repository=https://void.danklinux.com/dms/current' | sudo tee /etc/xbps.d/dms.conf\nsudo xbps-install -Sy dms-greeter"
 		logFunc("Adding DMS XBPS repository...")
 		if err := ensureVoidXBPSRepo(ctx, sudoPassword, "dms", distros.VoidDMSRepo); err != nil {
 			logFunc(fmt.Sprintf("⚠ Failed to add DMS XBPS repository: %v", err))
