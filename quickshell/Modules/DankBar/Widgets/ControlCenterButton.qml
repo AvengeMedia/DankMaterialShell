@@ -255,6 +255,7 @@ BasePill {
         const newVolume = delta > 0 ? Math.min(100, currentVolume + step) : Math.max(0, currentVolume - step);
         AudioService.source.audio.muted = false;
         AudioService.source.audio.volume = newVolume / 100;
+        AudioService.micVolumeChanged();
     }
 
     function handleBrightnessWheel(delta) {

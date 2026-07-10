@@ -61,6 +61,7 @@ Singleton {
     readonly property int wheelVolumeStep: SettingsData.audioWheelScrollAmount
 
     signal micMuteChanged
+    signal micVolumeChanged
     signal audioOutputCycled(string deviceName, string deviceIcon)
     signal deviceAliasChanged(string nodeName, string newAlias)
     signal wireplumberReloadStarted
@@ -905,6 +906,7 @@ EOFCONFIG
 
         const clampedVolume = Math.max(0, Math.min(100, percentage));
         root.source.audio.volume = clampedVolume / 100;
+        micVolumeChanged();
         return `Microphone volume set to ${clampedVolume}%`;
     }
 
@@ -929,6 +931,7 @@ EOFCONFIG
         const newVolume = Math.max(0, Math.min(100, currentVolume + stepValue));
 
         root.source.audio.volume = newVolume / 100;
+        micVolumeChanged();
         return `Microphone volume increased to ${newVolume}%`;
     }
 
@@ -944,6 +947,7 @@ EOFCONFIG
         const newVolume = Math.max(0, Math.min(100, currentVolume - stepValue));
 
         root.source.audio.volume = newVolume / 100;
+        micVolumeChanged();
         return `Microphone volume decreased to ${newVolume}%`;
     }
 
