@@ -736,6 +736,24 @@ Rectangle {
                         readonly property bool isDankTask: taskId.startsWith("vtodo_")
                         readonly property bool isTask: isLocalTask || isDankTask
                         readonly property bool canModify: isLocalTask || (isDankTask && modelData && !modelData.readOnly)
+                        readonly property string quickUrl: {
+                            if (isTask || !modelData)
+                                return "";
+                            if (modelData.meetingUrl)
+                                return modelData.meetingUrl;
+                            const loc = (modelData.location || "").trim();
+                            if (/^https?:\/\/\S+$/i.test(loc))
+                                return loc;
+                            if (/^www\.\S+$/i.test(loc))
+                                return "https://" + loc;
+                            return modelData.url || "";
+                        }
+                        readonly property string quickUrlLabel: {
+                            const u = quickUrl.replace(/^https?:\/\//i, "");
+                            if (u.length <= 40)
+                                return u;
+                            return u.slice(0, 39) + "…";
+                        }
                         readonly property color baseAccent: {
                             if (isLocalTask || !modelData || !modelData.color || !modelData.color.length)
                                 return Theme.primary;
@@ -866,7 +884,7 @@ Rectangle {
                             anchors.right: parent.right
                             anchors.verticalCenter: parent.verticalCenter
                             anchors.leftMargin: taskItem.isLocalTask ? 60 : taskItem.isDankTask ? 36 : (Theme.spacingS + 6)
-                            anchors.rightMargin: taskItem.canModify ? 64 : Theme.spacingXS
+                            anchors.rightMargin: taskItem.canModify ? 64 : (taskItem.quickUrl !== "" ? 32 + Theme.spacingS : Theme.spacingXS)
                             spacing: Theme.spacingXXS
                             visible: !taskItem.isEditing
 
@@ -963,6 +981,20 @@ Rectangle {
                                 }
                                 root.detailEvent = modelData;
                             }
+                        }
+
+                        DankActionButton {
+                            buttonSize: 24
+                            iconSize: 14
+                            iconName: (modelData && modelData.meetingUrl) ? "videocam" : "link"
+                            iconColor: Theme.primary
+                            anchors.right: parent.right
+                            anchors.rightMargin: Theme.spacingS
+                            anchors.verticalCenter: parent.verticalCenter
+                            visible: taskItem.quickUrl !== ""
+                            tooltipText: taskItem.quickUrlLabel
+                            tooltipSide: "left"
+                            onClicked: Qt.openUrlExternally(taskItem.quickUrl)
                         }
 
                         DankActionButton {
