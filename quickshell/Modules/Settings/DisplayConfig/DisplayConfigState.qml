@@ -1443,7 +1443,7 @@ Singleton {
         const compositorArg = (compositor === "mango") ? "mangowc" : compositor;
 
         checkingInclude = true;
-        Proc.runCommand("check-outputs-include", ["dms", "config", "resolve-include", compositorArg, filename], (output, exitCode) => {
+        Proc.runCommand("check-outputs-include", [Proc.dmsBin, "config", "resolve-include", compositorArg, filename], (output, exitCode) => {
             checkingInclude = false;
             if (exitCode !== 0) {
                 includeStatus = {

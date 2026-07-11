@@ -68,7 +68,7 @@ Item {
         const compositorArg = compositor === "mango" ? "mangowc" : compositor;
 
         checkingInclude = true;
-        Proc.runCommand("check-layout-include", ["dms", "config", "resolve-include", compositorArg, filename], (output, exitCode) => {
+        Proc.runCommand("check-layout-include", [Proc.dmsBin, "config", "resolve-include", compositorArg, filename], (output, exitCode) => {
             checkingInclude = false;
             if (exitCode !== 0) {
                 layoutIncludeStatus = {

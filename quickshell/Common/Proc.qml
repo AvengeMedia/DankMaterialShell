@@ -11,6 +11,7 @@ Singleton {
     readonly property var log: Log.scoped("Proc")
 
     readonly property int noTimeout: -1
+    readonly property string dmsBin: Quickshell.env("DMS_EXECUTABLE") || "dms"
     property int defaultDebounceMs: 50
     property int defaultTimeoutMs: 10000
     property var _procDebouncers: ({})

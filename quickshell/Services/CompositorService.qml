@@ -46,7 +46,7 @@ Singleton {
     signal toplevelsChanged
 
     function fetchRandrData() {
-        Proc.runCommand("randr", ["dms", "randr", "--json"], (output, exitCode) => {
+        Proc.runCommand("randr", [Proc.dmsBin, "randr", "--json"], (output, exitCode) => {
             if (exitCode === 0 && output) {
                 try {
                     const data = JSON.parse(output.trim());
