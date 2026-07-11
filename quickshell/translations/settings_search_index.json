@@ -9476,6 +9476,27 @@
     "icon": "settings_ethernet"
   },
   {
+    "section": "networkHotspot",
+    "label": "Hotspot",
+    "tabIndex": 40,
+    "category": "Network",
+    "keywords": [
+      "access point",
+      "connectivity",
+      "hotspot",
+      "network",
+      "online",
+      "optional",
+      "sharing",
+      "ssid",
+      "wi-fi",
+      "wifi",
+      "wireless"
+    ],
+    "icon": "wifi_tethering",
+    "description": "Optional"
+  },
+  {
     "section": "networkSavedWifi",
     "label": "Saved Networks",
     "tabIndex": 40,

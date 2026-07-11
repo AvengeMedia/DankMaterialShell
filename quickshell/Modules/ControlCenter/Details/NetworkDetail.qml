@@ -45,7 +45,7 @@ Rectangle {
     property var hotspotStartConfirm: ConfirmModal {}
 
     function explainHotspotNeedsWiFi() {
-        ToastService.showError(I18n.tr("WiFi is disabled"), I18n.tr("Enable WiFi before starting the hotspot."));
+        ToastService.showError(I18n.tr("WiFi is disabled", "hotspot start error title"), I18n.tr("Enable WiFi before starting the hotspot.", "hotspot WiFi requirement message"));
     }
 
     function startHotspotWithConfirm() {
@@ -54,9 +54,9 @@ Rectangle {
             return;
         }
         hotspotStartConfirm.showWithOptions({
-            title: I18n.tr("Start Hotspot?"),
-            message: I18n.tr("This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.").arg(NetworkService.currentWifiSSID),
-            confirmText: I18n.tr("Start"),
+            title: I18n.tr("Start Hotspot?", "hotspot start confirmation title"),
+            message: I18n.tr("This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.", "hotspot WiFi disconnection confirmation message").arg(NetworkService.currentWifiSSID),
+            confirmText: I18n.tr("Start", "hotspot start confirmation action"),
             onConfirm: () => NetworkService.startHotspot()
         });
     }
@@ -226,7 +226,7 @@ Rectangle {
                     width: parent.width - Theme.iconSize - Theme.spacingS
 
                     StyledText {
-                        text: NetworkService.hotspotConfigured ? I18n.tr("Hotspot") : I18n.tr("Set up hotspot")
+                        text: NetworkService.hotspotConfigured ? I18n.tr("Hotspot", "hotspot control label") : I18n.tr("Set up hotspot", "hotspot setup action label")
                         font.pixelSize: Theme.fontSizeMedium
                         font.weight: NetworkService.hotspotEnabled ? Font.Medium : Font.Normal
                         color: NetworkService.hotspotEnabled ? Theme.primary : Theme.surfaceText
@@ -238,14 +238,14 @@ Rectangle {
                         visible: !hotspotTextColumn.warnsWifiDrop
                         text: {
                             if (!NetworkService.hotspotConfigured)
-                                return I18n.tr("Set up hotspot in Settings");
+                                return I18n.tr("Set up hotspot in Settings", "unconfigured hotspot status message");
                             if (NetworkService.hotspotBusy || NetworkService.hotspotActivating)
-                                return I18n.tr("Starting...");
+                                return I18n.tr("Starting...", "hotspot activation status");
                             if (NetworkService.hotspotEnabled)
-                                return NetworkService.hotspotSSID || I18n.tr("Running");
+                                return NetworkService.hotspotSSID || I18n.tr("Running", "hotspot active status");
                             if (!NetworkService.wifiEnabled)
-                                return I18n.tr("WiFi disabled");
-                            return NetworkService.hotspotSSID || I18n.tr("Ready");
+                                return I18n.tr("WiFi disabled", "hotspot unavailable status");
+                            return NetworkService.hotspotSSID || I18n.tr("Ready", "hotspot ready status");
                         }
                         font.pixelSize: Theme.fontSizeSmall
                         color: NetworkService.hotspotEnabled ? Theme.primary : Theme.surfaceVariantText
@@ -260,7 +260,7 @@ Rectangle {
 
                         StyledText {
                             id: hotspotWarnSsid
-                            text: NetworkService.hotspotSSID || I18n.tr("Ready")
+                            text: NetworkService.hotspotSSID || I18n.tr("Ready", "hotspot ready status")
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceVariantText
                             elide: Text.ElideRight
@@ -275,7 +275,7 @@ Rectangle {
                         }
 
                         StyledText {
-                            text: I18n.tr("Will disconnect \"%1\"").arg(NetworkService.currentWifiSSID)
+                            text: I18n.tr("Will disconnect \"%1\"", "hotspot WiFi disconnection warning").arg(NetworkService.currentWifiSSID)
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.warning
                             elide: Text.ElideRight
@@ -293,7 +293,7 @@ Rectangle {
                 spacing: Theme.spacingS
 
                 StyledText {
-                    text: I18n.tr("Setup")
+                    text: I18n.tr("Setup", "hotspot setup action")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.primary
                     visible: !NetworkService.hotspotConfigured

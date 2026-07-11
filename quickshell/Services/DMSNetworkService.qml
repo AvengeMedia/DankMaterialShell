@@ -360,10 +360,10 @@ Singleton {
             // begin, so restoring state after a shell restart stays silent.
             const watchedStart = wasHotspotActivating || hotspotBusy;
             if (watchedStart && !wasHotspotEnabled && backendHotspotEnabled) {
-                ToastService.showInfo(I18n.tr("Hotspot started"));
+                ToastService.showInfo(I18n.tr("Hotspot started", "hotspot start success message"));
             } else if (wasHotspotActivating && !backendHotspotActivating && !backendHotspotEnabled && backendHotspotLastError) {
                 hotspotError = backendHotspotLastError;
-                ToastService.showError(I18n.tr("Failed to start hotspot"), hotspotErrorMessage(backendHotspotLastError));
+                ToastService.showError(I18n.tr("Failed to start hotspot", "hotspot start error title"), hotspotErrorMessage(backendHotspotLastError));
             }
         } else {
             backendHotspotSupported = false;
@@ -1107,7 +1107,7 @@ Singleton {
             hotspotBusy = false;
             if (response.error) {
                 hotspotError = response.error;
-                ToastService.showError(I18n.tr("Failed to configure hotspot"), response.error);
+                ToastService.showError(I18n.tr("Failed to configure hotspot", "hotspot configuration error title"), response.error);
             } else {
                 Qt.callLater(() => getState());
             }
@@ -1129,7 +1129,7 @@ Singleton {
             hotspotBusy = false;
             if (response.error) {
                 hotspotError = response.error;
-                ToastService.showError(I18n.tr("Failed to start hotspot"), response.error);
+                ToastService.showError(I18n.tr("Failed to start hotspot", "hotspot start error title"), response.error);
             } else {
                 Qt.callLater(() => getState());
             }
@@ -1151,7 +1151,7 @@ Singleton {
             hotspotBusy = false;
             if (response.error) {
                 hotspotError = response.error;
-                ToastService.showError(I18n.tr("Failed to stop hotspot"), response.error);
+                ToastService.showError(I18n.tr("Failed to stop hotspot", "hotspot stop error title"), response.error);
             } else {
                 Qt.callLater(() => getState());
             }
@@ -1209,11 +1209,11 @@ Singleton {
     function hotspotErrorMessage(code) {
         switch (code) {
         case "hotspot-ip-config-failed":
-            return I18n.tr("IP sharing setup failed. Check that dnsmasq is installed.");
+            return I18n.tr("IP sharing setup failed. Check that dnsmasq is installed.", "hotspot IP configuration failure message");
         case "hotspot-supplicant-failed":
-            return I18n.tr("The WiFi adapter could not start access point mode.");
+            return I18n.tr("The WiFi adapter could not start access point mode.", "hotspot adapter failure message");
         default:
-            return I18n.tr("Hotspot activation failed.");
+            return I18n.tr("Hotspot activation failed.", "generic hotspot activation failure message");
         }
     }
 
