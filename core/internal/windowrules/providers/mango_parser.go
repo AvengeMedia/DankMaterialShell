@@ -169,6 +169,8 @@ func ConvertMangoRulesToWindowRules(mangoRules []MangoWindowRule) []windowrules.
 		if w, ok := f["width"]; ok {
 			if h, ok2 := f["height"]; ok2 {
 				actions.Size = w + "x" + h
+				actions.SizeWidth = w
+				actions.SizeHeight = h
 			}
 		}
 
@@ -200,7 +202,10 @@ func formatMangoRule(rule windowrules.WindowRule) string {
 	add("tags", rule.Actions.Workspace)
 	add("monitor", rule.Actions.Monitor)
 
-	if rule.Actions.Size != "" {
+	if rule.Actions.SizeWidth != "" && rule.Actions.SizeHeight != "" {
+		add("width", rule.Actions.SizeWidth)
+		add("height", rule.Actions.SizeHeight)
+	} else if rule.Actions.Size != "" {
 		if w, h, ok := splitSize(rule.Actions.Size); ok {
 			add("width", w)
 			add("height", h)

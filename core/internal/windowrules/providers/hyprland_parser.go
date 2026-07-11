@@ -634,10 +634,14 @@ func luaAppendActions(a windowrules.Actions, dst *[]string) {
 	if a.Opacity != nil {
 		*dst = append(*dst, fmt.Sprintf(`opacity = %s`, strconv.FormatFloat(*a.Opacity, 'g', -1, 64)))
 	}
-	if a.Size != "" {
+	if a.SizeWidth != "" && a.SizeHeight != "" {
+		*dst = append(*dst, fmt.Sprintf(`size = { %s, %s }`, a.SizeWidth, a.SizeHeight))
+	} else if a.Size != "" {
 		*dst = append(*dst, fmt.Sprintf(`size = %s`, strconv.Quote(a.Size)))
 	}
-	if a.Move != "" {
+	if a.MoveX != "" && a.MoveY != "" {
+		*dst = append(*dst, fmt.Sprintf(`move = { %s, %s }`, a.MoveX, a.MoveY))
+	} else if a.Move != "" {
 		*dst = append(*dst, fmt.Sprintf(`move = %s`, strconv.Quote(a.Move)))
 	}
 	if a.Monitor != "" {
@@ -1349,10 +1353,30 @@ func applyLuaActionKey(a *windowrules.Actions, key, raw string) bool {
 			}
 		}
 	case "size":
-		a.Size = strings.TrimSpace(luaStringValue(raw))
+		v := strings.TrimSpace(luaStringValue(raw))
+		if strings.HasPrefix(v, "{") && strings.HasSuffix(v, "}") {
+			inner := trimOuterBraces(v)
+			parts := splitTopLevelCommaLua(inner)
+			if len(parts) == 2 {
+				a.SizeWidth = strings.TrimSpace(luaStringValue(parts[0]))
+				a.SizeHeight = strings.TrimSpace(luaStringValue(parts[1]))
+				return true
+			}
+		}
+		a.Size = v
 		return true
 	case "move":
-		a.Move = strings.TrimSpace(luaStringValue(raw))
+		v := strings.TrimSpace(luaStringValue(raw))
+		if strings.HasPrefix(v, "{") && strings.HasSuffix(v, "}") {
+			inner := trimOuterBraces(v)
+			parts := splitTopLevelCommaLua(inner)
+			if len(parts) == 2 {
+				a.MoveX = strings.TrimSpace(luaStringValue(parts[0]))
+				a.MoveY = strings.TrimSpace(luaStringValue(parts[1]))
+				return true
+			}
+		}
+		a.Move = v
 		return true
 	case "monitor":
 		a.Monitor = strings.TrimSpace(luaStringValue(raw))

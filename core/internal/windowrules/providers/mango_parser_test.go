@@ -101,6 +101,12 @@ func TestMangoSetAndLoadRoundTrip(t *testing.T) {
 	if got.Actions.Size != "1000x900" {
 		t.Errorf("Size = %q, want 1000x900", got.Actions.Size)
 	}
+	if got.Actions.SizeWidth != "1000" {
+		t.Errorf("SizeWidth = %q, want 1000", got.Actions.SizeWidth)
+	}
+	if got.Actions.SizeHeight != "900" {
+		t.Errorf("SizeHeight = %q, want 900", got.Actions.SizeHeight)
+	}
 	if got.Actions.OpenFloating == nil || !*got.Actions.OpenFloating {
 		t.Errorf("OpenFloating = %v, want true", got.Actions.OpenFloating)
 	}
@@ -112,5 +118,46 @@ func TestMangoSetAndLoadRoundTrip(t *testing.T) {
 	loaded, _ = provider.LoadDMSRules()
 	if len(loaded) != 0 {
 		t.Errorf("after remove got %d rules, want 0", len(loaded))
+	}
+}
+
+func TestMangoRoundTripWithSizeWidthHeight(t *testing.T) {
+	tmpDir := t.TempDir()
+	provider := NewMangoWritableProvider(tmpDir)
+
+	rule := windowrules.WindowRule{
+		ID:      "rule_roundtrip",
+		Name:    "Size Test",
+		Enabled: true,
+		MatchCriteria: windowrules.MatchCriteria{
+			AppID: "testapp",
+		},
+		Actions: windowrules.Actions{
+			SizeWidth:  "800",
+			SizeHeight: "600",
+			Size:       "800x600",
+		},
+	}
+
+	if err := provider.SetRule(rule); err != nil {
+		t.Fatalf("SetRule: %v", err)
+	}
+
+	loaded, err := provider.LoadDMSRules()
+	if err != nil {
+		t.Fatalf("LoadDMSRules: %v", err)
+	}
+	if len(loaded) != 1 {
+		t.Fatalf("got %d rules, want 1", len(loaded))
+	}
+	got := loaded[0]
+	if got.Actions.SizeWidth != "800" {
+		t.Errorf("SizeWidth = %q, want 800", got.Actions.SizeWidth)
+	}
+	if got.Actions.SizeHeight != "600" {
+		t.Errorf("SizeHeight = %q, want 600", got.Actions.SizeHeight)
+	}
+	if got.Actions.Size != "800x600" {
+		t.Errorf("Size = %q, want 800x600", got.Actions.Size)
 	}
 }

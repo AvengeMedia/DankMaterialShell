@@ -53,6 +53,10 @@ type Actions struct {
 	DefaultFloatingRelativeTo string `json:"defaultFloatingRelativeTo,omitempty"`
 	Size                      string `json:"size,omitempty"`
 	Move                      string `json:"move,omitempty"`
+	MoveX                     string `json:"moveX,omitempty"`
+	MoveY                     string `json:"moveY,omitempty"`
+	SizeWidth                 string `json:"sizeWidth,omitempty"`
+	SizeHeight                string `json:"sizeHeight,omitempty"`
 	Monitor                   string `json:"monitor,omitempty"`
 	Workspace                 string `json:"workspace,omitempty"`
 	Tile                      *bool  `json:"tile,omitempty"`
