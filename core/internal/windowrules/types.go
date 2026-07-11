@@ -51,8 +51,6 @@ type Actions struct {
 	DefaultFloatingX          *int   `json:"defaultFloatingX,omitempty"`
 	DefaultFloatingY          *int   `json:"defaultFloatingY,omitempty"`
 	DefaultFloatingRelativeTo string `json:"defaultFloatingRelativeTo,omitempty"`
-	Size                      string `json:"size,omitempty"`
-	Move                      string `json:"move,omitempty"`
 	MoveX                     string `json:"moveX,omitempty"`
 	MoveY                     string `json:"moveY,omitempty"`
 	SizeWidth                 string `json:"sizeWidth,omitempty"`

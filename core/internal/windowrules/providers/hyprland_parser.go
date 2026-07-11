@@ -384,10 +384,6 @@ func applyHyprlandRuleAction(actions *windowrules.Actions, rule, value string) {
 		if f, err := strconv.ParseFloat(value, 64); err == nil {
 			actions.Opacity = &f
 		}
-	case "size":
-		actions.Size = value
-	case "move":
-		actions.Move = value
 	case "monitor":
 		actions.Monitor = value
 	case "workspace":
@@ -564,6 +560,13 @@ func hyprLuaBoolStr(b bool) string {
 	return "false"
 }
 
+func hyprLuaExprWrap(v string) string {
+	if _, err := strconv.ParseFloat(v, 64); err == nil {
+		return v
+	}
+	return strconv.Quote(v)
+}
+
 func luaAppendMatch(mc windowrules.MatchCriteria, dst *[]string) {
 	if mc.AppID != "" {
 		*dst = append(*dst, fmt.Sprintf(`class = %s`, strconv.Quote(mc.AppID)))
@@ -635,14 +638,10 @@ func luaAppendActions(a windowrules.Actions, dst *[]string) {
 		*dst = append(*dst, fmt.Sprintf(`opacity = %s`, strconv.FormatFloat(*a.Opacity, 'g', -1, 64)))
 	}
 	if a.SizeWidth != "" && a.SizeHeight != "" {
-		*dst = append(*dst, fmt.Sprintf(`size = { %s, %s }`, a.SizeWidth, a.SizeHeight))
-	} else if a.Size != "" {
-		*dst = append(*dst, fmt.Sprintf(`size = %s`, strconv.Quote(a.Size)))
+		*dst = append(*dst, fmt.Sprintf(`size = { %s, %s }`, hyprLuaExprWrap(a.SizeWidth), hyprLuaExprWrap(a.SizeHeight)))
 	}
 	if a.MoveX != "" && a.MoveY != "" {
-		*dst = append(*dst, fmt.Sprintf(`move = { %s, %s }`, a.MoveX, a.MoveY))
-	} else if a.Move != "" {
-		*dst = append(*dst, fmt.Sprintf(`move = %s`, strconv.Quote(a.Move)))
+		*dst = append(*dst, fmt.Sprintf(`move = { %s, %s }`, hyprLuaExprWrap(a.MoveX), hyprLuaExprWrap(a.MoveY)))
 	}
 	if a.Monitor != "" {
 		*dst = append(*dst, fmt.Sprintf(`monitor = %s`, strconv.Quote(a.Monitor)))
@@ -1198,7 +1197,11 @@ func luaStringValue(s string) string {
 			}
 		}
 	}
-	return strings.Trim(strings.TrimSpace(s), `"'`)
+	v := strings.Trim(strings.TrimSpace(s), `"'`)
+	if len(v) >= 2 && v[0] == '(' && v[len(v)-1] == ')' {
+		v = strings.TrimSpace(v[1 : len(v)-1])
+	}
+	return v
 }
 
 func luaBoolLike(s string) (val bool, ok bool) {
@@ -1363,8 +1366,7 @@ func applyLuaActionKey(a *windowrules.Actions, key, raw string) bool {
 				return true
 			}
 		}
-		a.Size = v
-		return true
+		return false
 	case "move":
 		v := strings.TrimSpace(luaStringValue(raw))
 		if strings.HasPrefix(v, "{") && strings.HasSuffix(v, "}") {
@@ -1376,8 +1378,7 @@ func applyLuaActionKey(a *windowrules.Actions, key, raw string) bool {
 				return true
 			}
 		}
-		a.Move = v
-		return true
+		return false
 	case "monitor":
 		a.Monitor = strings.TrimSpace(luaStringValue(raw))
 		return true

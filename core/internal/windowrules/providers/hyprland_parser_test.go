@@ -402,46 +402,44 @@ func TestBoolToInt(t *testing.T) {
 }
 
 func TestLuaAppendActionsTableSyntax(t *testing.T) {
-	tests := []struct {
-		name     string
-		actions  windowrules.Actions
-		wantSize string
-		wantMove string
-	}{
-		{
-			name: "new fields populated",
-			actions: windowrules.Actions{
-				SizeWidth:  "800",
-				SizeHeight: "600",
-				MoveX:      "100",
-				MoveY:      "200",
-			},
-			wantSize: `size = { 800, 600 }`,
-			wantMove: `move = { 100, 200 }`,
-		},
-		{
-			name: "old fields only",
-			actions: windowrules.Actions{
-				Size: "800x600",
-				Move: "100 200",
-			},
-			wantSize: `size = "800x600"`,
-			wantMove: `move = "100 200"`,
-		},
+	actions := windowrules.Actions{
+		SizeWidth:  "800",
+		SizeHeight: "600",
+		MoveX:      "100",
+		MoveY:      "200",
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			var out []string
-			luaAppendActions(tt.actions, &out)
-			joined := strings.Join(out, "\n")
-			if tt.wantSize != "" && !strings.Contains(joined, tt.wantSize) {
-				t.Errorf("expected size output %q, got:\n%s", tt.wantSize, joined)
-			}
-			if tt.wantMove != "" && !strings.Contains(joined, tt.wantMove) {
-				t.Errorf("expected move output %q, got:\n%s", tt.wantMove, joined)
-			}
-		})
+	var out []string
+	luaAppendActions(actions, &out)
+	joined := strings.Join(out, "\n")
+	for _, want := range []string{
+		`size = { 800, 600 }`,
+		`move = { 100, 200 }`,
+	} {
+		if !strings.Contains(joined, want) {
+			t.Errorf("expected output to contain %q, got:\n%s", want, joined)
+		}
+	}
+}
+
+func TestLuaAppendActionsExprWrap(t *testing.T) {
+	actions := windowrules.Actions{
+		SizeWidth:  "window_w * 0.5",
+		SizeHeight: "window_h - 50",
+		MoveX:      "100",
+		MoveY:      "(monitor_h / 2) + 17",
+	}
+
+	var out []string
+	luaAppendActions(actions, &out)
+	joined := strings.Join(out, "\n")
+	for _, want := range []string{
+		`size = { "window_w * 0.5", "window_h - 50" }`,
+		`move = { 100, "(monitor_h / 2) + 17" }`,
+	} {
+		if !strings.Contains(joined, want) {
+			t.Errorf("expected output to contain %q, got:\n%s", want, joined)
+		}
 	}
 }
 
@@ -454,8 +452,6 @@ func TestApplyLuaActionKeyTableSyntax(t *testing.T) {
 		wantSizeH string
 		wantMoveX string
 		wantMoveY string
-		wantSize  string
-		wantMove  string
 	}{
 		{
 			name:      "size table syntax",
@@ -465,12 +461,6 @@ func TestApplyLuaActionKeyTableSyntax(t *testing.T) {
 			wantSizeH: "600",
 		},
 		{
-			name:     "size string syntax",
-			key:      "size",
-			raw:      `"800x600"`,
-			wantSize: "800x600",
-		},
-		{
 			name:      "move table syntax",
 			key:       "move",
 			raw:       `{ 100, 200 }`,
@@ -478,17 +468,42 @@ func TestApplyLuaActionKeyTableSyntax(t *testing.T) {
 			wantMoveY: "200",
 		},
 		{
-			name:     "move string syntax",
-			key:      "move",
-			raw:      `"100 200"`,
-			wantMove: "100 200",
+			name: "size string syntax returns false",
+			key:  "size",
+			raw:  `"800x600"`,
+		},
+		{
+			name: "move string syntax returns false",
+			key:  "move",
+			raw:  `"100 200"`,
+		},
+		{
+			name:      "size expressions",
+			key:       "size",
+			raw:       `{ "window_w * 0.5", "window_h - 50" }`,
+			wantSizeW: "window_w * 0.5",
+			wantSizeH: "window_h - 50",
+		},
+		{
+			name:      "move expressions",
+			key:       "move",
+			raw:       `{ 100, "(monitor_h / 2) + 17" }`,
+			wantMoveX: "100",
+			wantMoveY: "(monitor_h / 2) + 17",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var a windowrules.Actions
-			if !applyLuaActionKey(&a, tt.key, tt.raw) {
+			result := applyLuaActionKey(&a, tt.key, tt.raw)
+			if tt.wantSizeW == "" && tt.wantSizeH == "" && tt.wantMoveX == "" && tt.wantMoveY == "" {
+				if result {
+					t.Errorf("expected applyLuaActionKey to return false for string syntax, got true")
+				}
+				return
+			}
+			if !result {
 				t.Fatal("applyLuaActionKey returned false")
 			}
 			if tt.wantSizeW != "" && a.SizeWidth != tt.wantSizeW {
@@ -503,12 +518,6 @@ func TestApplyLuaActionKeyTableSyntax(t *testing.T) {
 			if tt.wantMoveY != "" && a.MoveY != tt.wantMoveY {
 				t.Errorf("MoveY = %q, want %q", a.MoveY, tt.wantMoveY)
 			}
-			if tt.wantSize != "" && a.Size != tt.wantSize {
-				t.Errorf("Size = %q, want %q", a.Size, tt.wantSize)
-			}
-			if tt.wantMove != "" && a.Move != tt.wantMove {
-				t.Errorf("Move = %q, want %q", a.Move, tt.wantMove)
-			}
 		})
 	}
 }
@@ -519,6 +528,42 @@ func TestLuaRoundTripTableSyntax(t *testing.T) {
 		SizeHeight: "600",
 		MoveX:      "100",
 		MoveY:      "200",
+	}
+
+	var out []string
+	luaAppendActions(original, &out)
+
+	var parsed windowrules.Actions
+	for _, line := range out {
+		parts := strings.SplitN(line, "=", 2)
+		if len(parts) != 2 {
+			continue
+		}
+		key := strings.TrimSpace(parts[0])
+		val := strings.TrimSpace(parts[1])
+		applyLuaActionKey(&parsed, key, val)
+	}
+
+	if parsed.SizeWidth != original.SizeWidth {
+		t.Errorf("SizeWidth = %q, want %q", parsed.SizeWidth, original.SizeWidth)
+	}
+	if parsed.SizeHeight != original.SizeHeight {
+		t.Errorf("SizeHeight = %q, want %q", parsed.SizeHeight, original.SizeHeight)
+	}
+	if parsed.MoveX != original.MoveX {
+		t.Errorf("MoveX = %q, want %q", parsed.MoveX, original.MoveX)
+	}
+	if parsed.MoveY != original.MoveY {
+		t.Errorf("MoveY = %q, want %q", parsed.MoveY, original.MoveY)
+	}
+}
+
+func TestLuaRoundTripTableSyntaxExpressions(t *testing.T) {
+	original := windowrules.Actions{
+		SizeWidth:  "window_w * 0.5",
+		SizeHeight: "window_h - 50",
+		MoveX:      "100",
+		MoveY:      "(monitor_h / 2) + 17",
 	}
 
 	var out []string

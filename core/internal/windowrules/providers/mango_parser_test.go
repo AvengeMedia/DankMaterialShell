@@ -65,7 +65,8 @@ func TestMangoSetAndLoadRoundTrip(t *testing.T) {
 		Actions: windowrules.Actions{
 			OpenFloating: &floating,
 			Workspace:    "9",
-			Size:         "1000x900",
+			SizeWidth:    "1000",
+			SizeHeight:   "900",
 		},
 	}
 
@@ -97,9 +98,6 @@ func TestMangoSetAndLoadRoundTrip(t *testing.T) {
 	}
 	if got.Actions.Workspace != "9" {
 		t.Errorf("Workspace = %q, want 9", got.Actions.Workspace)
-	}
-	if got.Actions.Size != "1000x900" {
-		t.Errorf("Size = %q, want 1000x900", got.Actions.Size)
 	}
 	if got.Actions.SizeWidth != "1000" {
 		t.Errorf("SizeWidth = %q, want 1000", got.Actions.SizeWidth)
@@ -135,7 +133,6 @@ func TestMangoRoundTripWithSizeWidthHeight(t *testing.T) {
 		Actions: windowrules.Actions{
 			SizeWidth:  "800",
 			SizeHeight: "600",
-			Size:       "800x600",
 		},
 	}
 
@@ -156,8 +153,5 @@ func TestMangoRoundTripWithSizeWidthHeight(t *testing.T) {
 	}
 	if got.Actions.SizeHeight != "600" {
 		t.Errorf("SizeHeight = %q, want 600", got.Actions.SizeHeight)
-	}
-	if got.Actions.Size != "800x600" {
-		t.Errorf("Size = %q, want 800x600", got.Actions.Size)
 	}
 }
