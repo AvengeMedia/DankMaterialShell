@@ -1840,6 +1840,7 @@ Item {
                                                     } else if (CompositorService.isNiri) {
                                                         NiriService.focusWindow(winId);
                                                     }
+                                                    delegateRoot.updateAllData();
                                                 }
                                             }
 
@@ -2009,6 +2010,7 @@ Item {
                                                     } else if (CompositorService.isNiri) {
                                                         NiriService.focusWindow(winId);
                                                     }
+                                                    delegateRoot.updateAllData();
                                                 }
                                             }
 
