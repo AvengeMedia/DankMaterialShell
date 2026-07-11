@@ -136,7 +136,7 @@ Singleton {
 
     function sendAlert(title, message, isWarning, category, notificationType) {
         if (notificationType === 1) {
-            Quickshell.execDetached(["notify-send", "-u", isWarning ? "critical" : "normal", "-a", "DMS", "-i", isWarning ? "battery-caution" : "battery-charging", title, message]);
+            Quickshell.execDetached(["notify-send", "-u", isWarning ? "critical" : "normal", "-a", "DMS", "-i", isWarning ? "material:battery_alert" : "material:battery_charging_full", title, message]);
         } else {
             if (isWarning) {
                 ToastService.showWarning(title, message, "", category);
@@ -150,7 +150,7 @@ Singleton {
         if (isCharging && batteryLevel >= SettingsData.batteryChargeLimit) {
             if (!_hasNotifiedChargeLimit && SettingsData.batteryNotifyChargeLimit) {
                 _hasNotifiedChargeLimit = true;
-                sendAlert(I18n.tr("Charge Limit Reached"), I18n.tr("Battery has charged to your set limit of %1%").arg(SettingsData.batteryChargeLimit), false, "battery-charge-limit", SettingsData.batteryChargeLimitNotificationType);
+                sendAlert(I18n.tr("Charge Limit Reached"), I18n.tr("Battery has charged to your set limit of %1%").arg(SettingsData.batteryChargeLimit), false, "material:battery_profile", SettingsData.batteryChargeLimitNotificationType);
             }
         } else if (!isCharging || batteryLevel < SettingsData.batteryChargeLimit - 2) {
             _hasNotifiedChargeLimit = false;
@@ -166,7 +166,7 @@ Singleton {
         if (isCriticalBattery) {
             if (!_hasNotifiedCriticalBattery && SettingsData.batteryNotifyCritical) {
                 _hasNotifiedCriticalBattery = true;
-                sendAlert(I18n.tr("Critical Battery"), I18n.tr("Battery is at %1% - Connect charger immediately!").arg(batteryLevel), true, "battery-critical", SettingsData.batteryCriticalNotificationType);
+                sendAlert(I18n.tr("Critical Battery"), I18n.tr("Battery is at %1% - Connect charger immediately!").arg(batteryLevel), true, "material:battery_alert", SettingsData.batteryCriticalNotificationType);
             }
             return;
         }
@@ -179,7 +179,7 @@ Singleton {
         if (isLowBattery) {
             if (!_hasNotifiedLowBattery && SettingsData.batteryNotifyLow) {
                 _hasNotifiedLowBattery = true;
-                sendAlert(I18n.tr("Low Battery"), I18n.tr("Battery is at %1% - Consider charging soon").arg(batteryLevel), true, "battery-low", SettingsData.batteryLowNotificationType);
+                sendAlert(I18n.tr("Low Battery"), I18n.tr("Battery is at %1% - Consider charging soon").arg(batteryLevel), true, "material:battery_0_bar", SettingsData.batteryLowNotificationType);
             }
 
             if (SettingsData.batteryAutoPowerSaver && PowerProfileWatcher.available) {
