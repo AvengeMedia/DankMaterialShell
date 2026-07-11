@@ -179,8 +179,10 @@ Item {
     IpcHandler {
         function open(): string {
             root.processListModalLoader.active = true;
-            if (root.processListModalLoader.item)
-                root.processListModalLoader.item.show();
+            Qt.callLater(() => {
+                if (root.processListModalLoader.item)
+                    root.processListModalLoader.item.show();
+            });
 
             return "PROCESSLIST_OPEN_SUCCESS";
         }
@@ -194,16 +196,20 @@ Item {
 
         function toggle(): string {
             root.processListModalLoader.active = true;
-            if (root.processListModalLoader.item)
-                root.processListModalLoader.item.toggle();
+            Qt.callLater(() => {
+                if (root.processListModalLoader.item)
+                    root.processListModalLoader.item.toggle();
+            });
 
             return "PROCESSLIST_TOGGLE_SUCCESS";
         }
 
         function focusOrToggle(): string {
             root.processListModalLoader.active = true;
-            if (root.processListModalLoader.item)
-                root.processListModalLoader.item.focusOrToggle();
+            Qt.callLater(() => {
+                if (root.processListModalLoader.item)
+                    root.processListModalLoader.item.focusOrToggle();
+            });
 
             return "PROCESSLIST_FOCUS_OR_TOGGLE_SUCCESS";
         }
