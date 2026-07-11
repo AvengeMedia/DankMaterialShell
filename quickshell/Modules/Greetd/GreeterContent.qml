@@ -2001,6 +2001,8 @@ Item {
                 greeterAutoLoginPendingProcess.running = true;
             pendingLaunchCommand = sessionCmd;
             pendingLaunchEnv = ["XDG_SESSION_TYPE=wayland"];
+            if (Quickshell.env("DMS_VOID") === "1")
+                pendingLaunchEnv.push("LIBSEAT_BACKEND=logind");
             memoryFlushTimer.restart();
         }
 
@@ -2052,7 +2054,14 @@ Item {
             const launchEnv = pendingLaunchEnv;
             pendingLaunchCommand = "";
             pendingLaunchEnv = [];
-            Greetd.launch(sessionCommand.split(" "), launchEnv);
+            const sessionArgs = sessionCommand.trim().split(/\s+/);
+            const needsVoidDbusSession = Quickshell.env("DMS_VOID") === "1"
+                && !Quickshell.env("DBUS_SESSION_BUS_ADDRESS")
+                && sessionArgs[0] !== "dbus-run-session";
+            const launchArgs = needsVoidDbusSession
+                ? ["dbus-run-session"].concat(sessionArgs)
+                : sessionArgs;
+            Greetd.launch(launchArgs, launchEnv);
         }
     }
 

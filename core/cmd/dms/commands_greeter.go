@@ -1081,8 +1081,11 @@ func ensureGreetdEnabled() error {
 		if !runitServiceInstalled("greetd") {
 			return fmt.Errorf("greetd service not found in %s. Please install greetd first", runitSvDir)
 		}
-		// Seat + runtime-dir setup that logind handles automatically on systemd.
-		ensureRunitSeat("_greeter")
+		if greeter.IsVoidLinux() {
+			ensureVoidLogindGreeter("_greeter")
+		} else {
+			ensureRunitSeat("_greeter")
+		}
 		ensureGreetdPamRundir()
 		if err := enableRunitService("greetd"); err != nil {
 			return fmt.Errorf("failed to enable greetd: %w", err)
@@ -1260,6 +1263,9 @@ func enableGreeter(nonInteractive bool) error {
 		}
 		if err := greeter.EnsureGreeterCacheDir(logFunc, ""); err != nil {
 			fmt.Printf("⚠ Could not ensure cache directory: %v\n  Run: sudo mkdir -p %s && sudo chown root:%s %s && sudo chmod 2770 %s\n", err, greeter.GreeterCacheDir, greeterGroup, greeter.GreeterCacheDir, greeter.GreeterCacheDir)
+		}
+		if err := greeter.EnsureVoidLogindGreetdCommand(logFunc, ""); err != nil {
+			return err
 		}
 
 		if err := ensureGraphicalTarget(); err != nil {
@@ -1475,12 +1481,23 @@ func extractGreeterWrapperFromCommand(command string) string {
 	if len(tokens) == 0 {
 		return ""
 	}
-	wrapper := strings.Trim(tokens[0], "\"")
+	wrapperIndex := 0
+	if filepath.Base(strings.Trim(tokens[0], "\"")) == "env" {
+		wrapperIndex = 1
+		for wrapperIndex < len(tokens) && strings.Contains(tokens[wrapperIndex], "=") {
+			wrapperIndex++
+		}
+	}
+	if wrapperIndex >= len(tokens) {
+		return ""
+	}
+
+	wrapper := strings.Trim(tokens[wrapperIndex], "\"")
 	if wrapper == "" {
 		return ""
 	}
-	if len(tokens) > 1 {
-		next := strings.Trim(tokens[1], "\"")
+	if wrapperIndex+1 < len(tokens) {
+		next := strings.Trim(tokens[wrapperIndex+1], "\"")
 		if next != "" && (filepath.Base(wrapper) == "bash" || filepath.Base(wrapper) == "sh") && strings.Contains(filepath.Base(next), "dms-greeter") {
 			return fmt.Sprintf("%s (script: %s)", wrapper, next)
 		}

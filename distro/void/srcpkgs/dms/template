@@ -7,7 +7,7 @@
 # CI rewrites version/checksum from the selected release tag before building.
 pkgname=dms
 version=1.5.0
-revision=1
+revision=2
 build_style=go
 build_wrksrc="core"
 go_import_path="github.com/AvengeMedia/DankMaterialShell/core"
@@ -23,7 +23,7 @@ distfiles="https://github.com/AvengeMedia/DankMaterialShell/archive/refs/tags/v$
 checksum=14f2678d6a15223ba069d1b8c8a21a5564b735d190c231f62ed44fd8bf48677c
 
 # Optional feature deps are listed in distro/void/README.md.
-depends="quickshell accountsservice dgop matugen dbus elogind"
+depends="quickshell accountsservice dgop matugen dbus elogind mesa-dri"
 
 post_install() {
 	# QML shell tree (build_style=go already installed the dms binary)

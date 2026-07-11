@@ -169,6 +169,56 @@ func TestStripDesktopExecCodes(t *testing.T) {
 	}
 }
 
+func TestBuildGreetdCommand(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name          string
+		wrapper       string
+		compositor    string
+		dmsPath       string
+		useVoidLogind bool
+		want          string
+	}{
+		{
+			name:       "standard command",
+			wrapper:    "/usr/bin/dms-greeter",
+			compositor: "Niri",
+			want:       "/usr/bin/dms-greeter --command niri --cache-dir /var/cache/dms-greeter",
+		},
+		{
+			name:          "void selects elogind and keeps custom DMS path",
+			wrapper:       "/usr/bin/dms-greeter",
+			compositor:    "Niri",
+			dmsPath:       "/usr/share/quickshell/dms-greeter",
+			useVoidLogind: true,
+			want:          "env LIBSEAT_BACKEND=logind DMS_VOID=1 /usr/bin/dms-greeter --command niri --cache-dir /var/cache/dms-greeter -p /usr/share/quickshell/dms-greeter",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			if got := buildGreetdCommand(tt.wrapper, tt.compositor, tt.dmsPath, tt.useVoidLogind); got != tt.want {
+				t.Fatalf("buildGreetdCommand() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestVoidLogindGreeterCommand(t *testing.T) {
+	t.Parallel()
+
+	const oldCommand = "/usr/bin/dms-greeter --command niri -C /etc/greetd/niri.kdl"
+	const want = "env LIBSEAT_BACKEND=logind DMS_VOID=1 " + oldCommand
+	if got := voidLogindGreeterCommand(oldCommand); got != want {
+		t.Fatalf("voidLogindGreeterCommand() = %q, want %q", got, want)
+	}
+	if got := voidLogindGreeterCommand(want); got != want {
+		t.Fatalf("voidLogindGreeterCommand() must be idempotent, got %q", got)
+	}
+}
+
 func TestResolveGreeterAutoLoginState(t *testing.T) {
 	t.Parallel()
 

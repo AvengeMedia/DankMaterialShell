@@ -72,6 +72,7 @@ func (v *VoidDistribution) DetectDependenciesWithTerminal(ctx context.Context, w
 	dependencies = append(dependencies, v.detectAccountsService())
 	dependencies = append(dependencies, v.detectDBus())
 	dependencies = append(dependencies, v.detectElogind())
+	dependencies = append(dependencies, v.detectMesaDri())
 
 	if wm == deps.WindowManagerHyprland {
 		dependencies = append(dependencies, v.detectHyprlandTools()...)
@@ -142,6 +143,10 @@ func (v *VoidDistribution) detectElogind() deps.Dependency {
 	return v.detectPackage("elogind", "loginctl/logind provider for power management and session tracking", v.packageInstalled("elogind") || v.commandExists("loginctl"))
 }
 
+func (v *VoidDistribution) detectMesaDri() deps.Dependency {
+	return v.detectPackage("mesa-dri", "Mesa DRI/EGL drivers (GPU rendering; compositors find no outputs without it)", v.packageInstalled("mesa-dri"))
+}
+
 func (v *VoidDistribution) detectXwaylandSatellite() deps.Dependency {
 	return v.detectPackage("xwayland-satellite", "Xwayland support", v.packageInstalled("xwayland-satellite"))
 }
@@ -172,6 +177,7 @@ func (v *VoidDistribution) GetPackageMappingWithVariants(wm deps.WindowManager, 
 		"accountsservice":        {Name: "accountsservice", Repository: RepoTypeSystem},
 		"dbus":                   {Name: "dbus", Repository: RepoTypeSystem},
 		"elogind":                {Name: "elogind", Repository: RepoTypeSystem},
+		"mesa-dri":               {Name: "mesa-dri", Repository: RepoTypeSystem},
 
 		"quickshell":              {Name: "quickshell", Repository: RepoTypeSystem},
 		"matugen":                 {Name: "matugen", Repository: RepoTypeSystem},
@@ -305,6 +311,7 @@ func (v *VoidDistribution) ensureSessionServices(ctx context.Context, sudoPasswo
 		return nil
 	}
 
+	// D-Bus activation alone starts elogind without its wrapper mounts; the runit service is required.
 	for _, service := range []string{"dbus", "elogind"} {
 		if !v.runitServiceInstalled(service) {
 			v.log(fmt.Sprintf("Warning: %s runit service not found in %s; power/session actions may not work until %s is installed", service, voidRunitSvDir, service))

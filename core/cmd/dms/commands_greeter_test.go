@@ -101,6 +101,13 @@ func TestGreeterStatusStateDirHonorsExplicitOverrideOnNixOS(t *testing.T) {
 	}
 }
 
+func TestExtractGreeterWrapperFromEnvCommand(t *testing.T) {
+	command := "env LIBSEAT_BACKEND=logind DMS_VOID=1 /usr/bin/dms-greeter --command niri"
+	if got := extractGreeterWrapperFromCommand(command); got != "/usr/bin/dms-greeter" {
+		t.Fatalf("extractGreeterWrapperFromCommand() = %q, want %q", got, "/usr/bin/dms-greeter")
+	}
+}
+
 func TestRejectNixOSGreeterMutationBlocksImperativeCommands(t *testing.T) {
 	origGreeterIsNixOSFn := greeterIsNixOSFn
 	greeterIsNixOSFn = func() bool { return true }

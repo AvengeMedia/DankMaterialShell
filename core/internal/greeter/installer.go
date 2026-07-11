@@ -115,6 +115,52 @@ func ensureRunitSeat(greeterUser, sudoPassword string, logFunc func(string)) {
 	}
 }
 
+// VoidGreetdRunScript orders greetd after dbus/elogind so the first greeter session can't race elogind's runtime-dir setup.
+const VoidGreetdRunScript = `#!/bin/sh
+sv check dbus >/dev/null || exit 1
+sv check elogind >/dev/null || exit 1
+exec greetd
+`
+
+// EnsureVoidGreetdRunScript rewrites /etc/sv/greetd/run with dbus/elogind ordering (greetd updates restore stock; enable re-asserts).
+func EnsureVoidGreetdRunScript(logFunc func(string), sudoPassword string) {
+	const runPath = "/etc/sv/greetd/run"
+	if data, err := os.ReadFile(runPath); err == nil && strings.Contains(string(data), "sv check elogind") {
+		logFunc("✓ greetd run script already waits for elogind")
+		return
+	}
+	script := fmt.Sprintf("cat > %s <<'EOF'\n%sEOF\nchmod 755 %s", runPath, VoidGreetdRunScript, runPath)
+	if err := privesc.Run(context.Background(), sudoPassword, "sh", "-c", script); err != nil {
+		logFunc(fmt.Sprintf("⚠ could not update %s: %v", runPath, err))
+		return
+	}
+	logFunc("✓ greetd run script now waits for dbus/elogind")
+}
+
+// ensureVoidLogindGreeter configures the elogind-backed greeter on Void.
+func ensureVoidLogindGreeter(greeterUser, sudoPassword string, logFunc func(string)) {
+	for _, service := range []string{"dbus", "elogind"} {
+		if err := enableRunitService(service, sudoPassword); err != nil {
+			logFunc(fmt.Sprintf("⚠ could not enable %s: %v", service, err))
+		} else {
+			logFunc(fmt.Sprintf("✓ %s enabled", service))
+		}
+	}
+	EnsureVoidGreetdRunScript(logFunc, sudoPassword)
+	if runitServiceEnabled("seatd") {
+		if err := disableRunitService("seatd", sudoPassword); err != nil {
+			logFunc(fmt.Sprintf("⚠ could not disable seatd: %v", err))
+		} else {
+			logFunc("✓ seatd disabled (elogind manages the seat)")
+		}
+	}
+	if err := privesc.Run(context.Background(), sudoPassword, "usermod", "-aG", "video,input", greeterUser); err != nil {
+		logFunc(fmt.Sprintf("⚠ could not add %s to video/input groups: %v", greeterUser, err))
+	} else {
+		logFunc(fmt.Sprintf("✓ %s added to video/input groups (elogind manages the seat)", greeterUser))
+	}
+}
+
 func ensureGreetdPamRundir(sudoPassword string, logFunc func(string)) {
 	const pamPath = "/etc/pam.d/greetd"
 	data, err := os.ReadFile(pamPath)
@@ -1740,6 +1786,10 @@ func syncGreeterColorSource(homeDir, cacheDir string, state greeterThemeSyncStat
 }
 
 func SyncDMSConfigs(dmsPath, compositor string, logFunc func(string), sudoPassword string) error {
+	if err := EnsureVoidLogindGreetdCommand(logFunc, sudoPassword); err != nil {
+		return err
+	}
+
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		return fmt.Errorf("failed to get user home directory: %w", err)
@@ -2271,13 +2321,7 @@ vt = 1
 		return fmt.Errorf("failed to read greetd config: %w", err)
 	}
 
-	wrapperCmd := resolveGreeterWrapperPath()
-
-	compositorLower := strings.ToLower(compositor)
-	commandValue := fmt.Sprintf("%s --command %s --cache-dir %s", wrapperCmd, compositorLower, GreeterCacheDir)
-	if dmsPath != "" {
-		commandValue = fmt.Sprintf("%s -p %s", commandValue, dmsPath)
-	}
+	commandValue := buildGreetdCommand(resolveGreeterWrapperPath(), compositor, dmsPath, IsVoidLinux())
 
 	commandLine := fmt.Sprintf(`command = "%s"`, commandValue)
 	newConfig := upsertDefaultSession(configContent, greeterUser, commandLine)
@@ -2287,6 +2331,84 @@ vt = 1
 	}
 
 	return nil
+}
+
+func buildGreetdCommand(wrapperCmd, compositor, dmsPath string, useVoidLogind bool) string {
+	commandValue := fmt.Sprintf("%s --command %s --cache-dir %s", wrapperCmd, strings.ToLower(compositor), GreeterCacheDir)
+	if dmsPath != "" {
+		commandValue = fmt.Sprintf("%s -p %s", commandValue, dmsPath)
+	}
+	if useVoidLogind {
+		commandValue = "env LIBSEAT_BACKEND=logind DMS_VOID=1 " + commandValue
+	}
+	return commandValue
+}
+
+// EnsureVoidLogindGreetdCommand migrates DMS greeter commands on Void.
+func EnsureVoidLogindGreetdCommand(logFunc func(string), sudoPassword string) error {
+	if !IsVoidLinux() {
+		return nil
+	}
+
+	const configPath = "/etc/greetd/config.toml"
+	data, err := os.ReadFile(configPath)
+	if os.IsNotExist(err) {
+		return nil
+	}
+	if err != nil {
+		return fmt.Errorf("failed to read greetd config: %w", err)
+	}
+
+	configContent := string(data)
+	command := extractDefaultSessionCommand(configContent)
+	if command == "" || !strings.Contains(command, "dms-greeter") {
+		return nil
+	}
+
+	migratedCommand := voidLogindGreeterCommand(command)
+	if migratedCommand == command {
+		return nil
+	}
+
+	greeterUser := extractDefaultSessionUser(configContent)
+	if greeterUser == "" {
+		greeterUser = DetectGreeterUser()
+	}
+	newConfig := upsertDefaultSession(configContent, greeterUser, fmt.Sprintf(`command = "%s"`, migratedCommand))
+	return writeGreetdConfig(configPath, newConfig, logFunc, sudoPassword, "✓ Updated existing Void greeter to use elogind")
+}
+
+func extractDefaultSessionCommand(configContent string) string {
+	inDefaultSession := false
+	for line := range strings.SplitSeq(configContent, "\n") {
+		if section, ok := parseTomlSection(line); ok {
+			inDefaultSession = section == "default_session"
+			continue
+		}
+		if !inDefaultSession {
+			continue
+		}
+
+		trimmed := stripTomlComment(line)
+		if !strings.HasPrefix(trimmed, "command =") && !strings.HasPrefix(trimmed, "command=") {
+			continue
+		}
+		parts := strings.SplitN(trimmed, "=", 2)
+		if len(parts) != 2 {
+			continue
+		}
+		if command := strings.Trim(strings.TrimSpace(parts[1]), `"`); command != "" {
+			return command
+		}
+	}
+	return ""
+}
+
+func voidLogindGreeterCommand(command string) string {
+	if strings.Contains(command, "LIBSEAT_BACKEND=logind") && strings.Contains(command, "DMS_VOID=1") {
+		return command
+	}
+	return "env LIBSEAT_BACKEND=logind DMS_VOID=1 " + command
 }
 
 func stripConfigFlag(command string) string {
@@ -2430,7 +2552,11 @@ func EnableGreetd(sudoPassword string, logFunc func(string)) error {
 		if !runitServiceInstalled("greetd") {
 			return fmt.Errorf("greetd service not found in %s; ensure greetd is installed", runitSvDir)
 		}
-		ensureRunitSeat(DetectGreeterUser(), sudoPassword, logFunc)
+		if IsVoidLinux() {
+			ensureVoidLogindGreeter(DetectGreeterUser(), sudoPassword, logFunc)
+		} else {
+			ensureRunitSeat(DetectGreeterUser(), sudoPassword, logFunc)
+		}
 		ensureGreetdPamRundir(sudoPassword, logFunc)
 		if err := enableRunitService("greetd", sudoPassword); err != nil {
 			return fmt.Errorf("failed to enable greetd: %w", err)

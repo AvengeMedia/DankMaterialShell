@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/greeter"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/privesc"
 )
 
@@ -83,9 +84,31 @@ func ensureRunitSeat(greeterUser string) {
 	}
 }
 
-// ensureGreetdPamRundir adds pam_rundir to the greetd PAM stack so the post-login
-// session gets an XDG_RUNTIME_DIR on systems without logind (Void with seatd).
-// Appended outside DMS's managed auth block so it survives `dms greeter sync`.
+// ensureVoidLogindGreeter configures the elogind-backed greeter on Void.
+func ensureVoidLogindGreeter(greeterUser string) {
+	for _, service := range []string{"dbus", "elogind"} {
+		if err := enableRunitService(service); err != nil {
+			fmt.Printf("  ⚠ could not enable %s: %v\n", service, err)
+		} else {
+			fmt.Printf("  ✓ %s enabled\n", service)
+		}
+	}
+	greeter.EnsureVoidGreetdRunScript(func(msg string) { fmt.Println("  " + msg) }, "")
+	if runitServiceEnabled("seatd") {
+		if err := disableRunitService("seatd"); err != nil {
+			fmt.Printf("  ⚠ could not disable seatd: %v\n", err)
+		} else {
+			fmt.Println("  ✓ seatd disabled (elogind manages the seat)")
+		}
+	}
+	if err := privesc.Run(context.Background(), "", "usermod", "-aG", "video,input", greeterUser); err != nil {
+		fmt.Printf("  ⚠ could not add %s to video/input groups: %v\n", greeterUser, err)
+	} else {
+		fmt.Printf("  ✓ %s added to video/input groups (elogind manages the seat)\n", greeterUser)
+	}
+}
+
+// ensureGreetdPamRundir provides XDG_RUNTIME_DIR to runit greeter sessions.
 func ensureGreetdPamRundir() {
 	const pamPath = "/etc/pam.d/greetd"
 	data, err := os.ReadFile(pamPath)

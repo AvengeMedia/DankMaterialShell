@@ -58,7 +58,8 @@ checkout at `srcpkgs/<pkg>/template` to build or submit it.
 ## Dependencies
 
 Installing `dms` automatically pulls in `quickshell`, `accountsservice`, `dgop`,
-`matugen` (which drives the Material You theming), `dbus`, and `elogind`.
+`matugen` (which drives the Material You theming), `dbus`, `elogind`, and
+`mesa-dri` (GL drivers, required for compositors to render).
 The rest are optional, install whichever features you want:
 
 | Package | Enables |
@@ -123,7 +124,7 @@ sudo ln -sf /etc/sv/dbus /var/service/dbus
 sudo ln -sf /etc/sv/elogind /var/service/elogind
 ```
 
-The `dankinstall` Void path does this automatically after installing packages.
+The `dankinstall` Void path enables both services after installing packages.
 
 ## Greeter (optional)
 
@@ -134,8 +135,16 @@ dms greeter enable      # configures greetd + the Void seat/PAM bits below
 dms greeter sync        # optional: share theming with the shell
 ```
 
-`dms greeter enable` handles what logind does automatically on systemd: it points
-greetd at the greeter, enables `seatd`, adds `_greeter` to the `_seatd`/`video`/
-`input` groups, and adds `pam_rundir` to `/etc/pam.d/greetd` (so the post-login
-session gets an `XDG_RUNTIME_DIR`). A Wayland compositor and a working DRM device
-(`/dev/dri/card*`) are required and not pulled in automatically.
+`dms-greeter` requires D-Bus and elogind. `dms greeter enable` enables the
+`dbus` and `elogind` runit services, configures greetd for elogind
+(`LIBSEAT_BACKEND=logind`), adds `_greeter` to the `video` and `input` groups,
+and adds `pam_rundir` to `/etc/pam.d/greetd` (so the post-login session gets an
+`XDG_RUNTIME_DIR`). It disables seatd if enabled: on Void, seatd is the
+alternative to elogind, and running both fights over the seat. Greeter sessions
+are launched through `dbus-run-session`. A Wayland compositor and a working DRM
+device (`/dev/dri/card*`) are required and not pulled in automatically.
+
+`dms greeter enable` also rewrites `/etc/sv/greetd/run` to wait for the `dbus`
+and `elogind` services, preventing a first-boot race that can leave the greeter
+on a black screen. greetd package updates restore the stock run script; re-run
+`dms greeter enable` afterwards.
