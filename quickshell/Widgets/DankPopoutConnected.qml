@@ -996,18 +996,53 @@ Item {
             height: root.renderedAlignedHeight + contentContainer.verticalConnectorExtent * 2
         }
 
-        MouseArea {
-            anchors.fill: parent
-            enabled: shouldBeVisible && backgroundInteractive
-            acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+        Item {
+            id: backgroundClickCatcher
             z: -1
-            onClicked: mouse => {
-                const clickX = mouse.x;
-                const clickY = mouse.y;
-                const outsideContent = clickX < root.alignedX || clickX > root.alignedX + root.alignedWidth || clickY < root.renderedAlignedY || clickY > root.renderedAlignedY + root.renderedAlignedHeight;
-                if (!outsideContent)
-                    return;
-                backgroundClicked();
+            enabled: shouldBeVisible && backgroundInteractive
+            x: 0
+            y: 0
+            width: parent.width
+            height: parent.height
+
+            // Four edge strips that exclude the popup body, so cursor shapes
+            // inside the content propagate correctly (full-screen MouseAreas
+            // at z:-1 can suppress child cursorShape on Wayland).
+            MouseArea {
+                x: 0
+                y: 0
+                width: parent.width
+                height: root.renderedAlignedY
+                enabled: parent.enabled
+                acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+                onClicked: backgroundClicked()
+            }
+            MouseArea {
+                x: 0
+                y: root.renderedAlignedY + root.renderedAlignedHeight
+                width: parent.width
+                height: Math.max(0, parent.height - root.renderedAlignedY - root.renderedAlignedHeight)
+                enabled: parent.enabled
+                acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+                onClicked: backgroundClicked()
+            }
+            MouseArea {
+                x: 0
+                y: root.renderedAlignedY
+                width: root.alignedX
+                height: root.renderedAlignedHeight
+                enabled: parent.enabled
+                acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+                onClicked: backgroundClicked()
+            }
+            MouseArea {
+                x: root.alignedX + root.alignedWidth
+                y: root.renderedAlignedY
+                width: Math.max(0, parent.width - root.alignedX - root.alignedWidth)
+                height: root.renderedAlignedHeight
+                enabled: parent.enabled
+                acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+                onClicked: backgroundClicked()
             }
         }
 
