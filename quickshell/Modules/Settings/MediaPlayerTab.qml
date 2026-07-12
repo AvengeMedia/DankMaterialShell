@@ -65,6 +65,13 @@ Item {
                     onToggled: checked => SettingsData.set("mediaAdaptiveWidthEnabled", checked)
                 }
 
+                SettingsToggleRow {
+                    text: I18n.tr("Use album art accent")
+                    description: I18n.tr("Use colors extracted from album art instead of system theme colors")
+                    checked: SettingsData.mediaUseAlbumArtAccent
+                    onToggled: checked => SettingsData.set("mediaUseAlbumArtAccent", checked)
+                }
+
                 SettingsDropdownRow {
                     property var scrollOptsInternal: ["volume", "song", "nothing"]
                     property var scrollOptsDisplay: [I18n.tr("Change Volume", "media scroll wheel option"), I18n.tr("Change Song", "media scroll wheel option"), I18n.tr("Nothing", "media scroll wheel option")]

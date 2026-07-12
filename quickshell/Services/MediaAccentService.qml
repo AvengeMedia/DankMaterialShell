@@ -11,14 +11,13 @@ import qs.Services
 Singleton {
     id: root
 
-    readonly property bool hasAccent: _accent !== null
-    readonly property color accent: _accent !== null ? _accent : Theme.primary
+    readonly property bool hasAccent: SettingsData.mediaUseAlbumArtAccent ? _accent !== null : true
+    readonly property color accent: SettingsData.mediaUseAlbumArtAccent && _accent !== null ? _accent : Theme.primary
 
-    readonly property color onAccent: {
-        const c = accent;
-        const lum = 0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b;
+    readonly property color onAccent: SettingsData.mediaUseAlbumArtAccent && _accent !== null ? (() => {
+        const lum = 0.2126 * _accent.r + 0.7152 * _accent.g + 0.0722 * _accent.b;
         return lum > 0.6 ? Qt.rgba(0, 0, 0, 1) : Qt.rgba(1, 1, 1, 1);
-    }
+    })() : Theme.onPrimary
 
     readonly property color accentHover: Theme.withAlpha(accent, 0.12)
     readonly property color accentPressed: Theme.withAlpha(accent, Theme.transparentBlurLayers ? 0.24 : 0.16)
