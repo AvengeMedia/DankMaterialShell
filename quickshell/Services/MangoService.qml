@@ -469,7 +469,7 @@ Singleton {
         const screens = Quickshell.screens || [];
         for (let i = 0; i < screens.length; i++) {
             if (screens[i] && screens[i].name)
-                Quickshell.execDetached(["mmsg", "dispatch", "disable_monitor," + screens[i].name]);
+                Quickshell.execDetached(["mmsg", "dispatch", "sleep_monitor," + screens[i].name]);
         }
     }
 
@@ -477,7 +477,7 @@ Singleton {
         const screens = Quickshell.screens || [];
         for (let i = 0; i < screens.length; i++) {
             if (screens[i] && screens[i].name)
-                Quickshell.execDetached(["mmsg", "dispatch", "enable_monitor," + screens[i].name]);
+                Quickshell.execDetached(["mmsg", "dispatch", "wakeup_monitor," + screens[i].name]);
         }
     }
 
