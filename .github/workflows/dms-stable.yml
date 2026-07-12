@@ -45,7 +45,7 @@ jobs:
           git push "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" HEAD:refs/heads/stable --force
 
   cut-release-branch:
-    # create release/X.Y at each vX.Y.0 tag
+    # create stable-X.Y at each vX.Y.0 tag
     if: ${{ !contains(github.ref_name, '-') }}
     runs-on: ubuntu-latest
     steps:
@@ -71,7 +71,7 @@ jobs:
             echo "not a vX.Y.0 tag, no release branch to cut"
             exit 0
           fi
-          branch="release/${BASH_REMATCH[1]}.${BASH_REMATCH[2]}"
+          branch="stable-${BASH_REMATCH[1]}.${BASH_REMATCH[2]}"
           if git ls-remote --exit-code origin "refs/heads/${branch}" >/dev/null 2>&1; then
             echo "${branch} already exists"
             exit 0

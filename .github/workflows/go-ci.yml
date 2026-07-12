@@ -8,7 +8,7 @@ on:
       - "core/**"
       - ".github/workflows/go-ci.yml"
   pull_request:
-    branches: [master, main, "release/**"]
+    branches: [master, main, "stable-*"]
     paths:
       - "core/**"
       - ".github/workflows/go-ci.yml"

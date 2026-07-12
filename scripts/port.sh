@@ -50,7 +50,8 @@ report_conflict() {
   local sha="$1" short subject branch issue
   short=$(git rev-parse --short "$sha")
   subject=$(git log -1 --format=%s "$sha")
-  branch="port/${short}-${TARGET#release/}"
+  local ver="${TARGET#stable-}"
+  branch="port/${short}-${ver}"
   git push origin "refs/remotes/origin/${TARGET}:refs/heads/${branch}" 2>/dev/null ||
     log "conflict branch ${branch} already exists"
   issue=$(tracking_issue)

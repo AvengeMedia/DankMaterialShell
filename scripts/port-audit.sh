@@ -3,7 +3,7 @@
 #
 # Usage: port-audit.sh [<target-branch>] [--issue]
 #
-# Target defaults to the newest origin/release/* branch. --issue writes the
+# Target defaults to the newest origin/stable-* branch. --issue writes the
 # report to the "Port status: <target>" tracking issue body (needs gh auth).
 set -euo pipefail
 
@@ -19,9 +19,9 @@ done
 git fetch origin --quiet 2>/dev/null || true
 
 if [ -z "$TARGET" ]; then
-  TARGET=$(git branch -r --list 'origin/release/*' --format='%(refname:short)' |
+  TARGET=$(git branch -r --list 'origin/stable-*' --format='%(refname:short)' |
     sed 's|^origin/||' | sort -V | tail -1)
-  [ -n "$TARGET" ] || { echo "error: no origin/release/* branch found" >&2; exit 1; }
+  [ -n "$TARGET" ] || { echo "error: no origin/stable-* branch found" >&2; exit 1; }
 fi
 git rev-parse --verify "origin/${TARGET}" >/dev/null 2>&1 ||
   { echo "error: branch origin/${TARGET} not found" >&2; exit 1; }
@@ -42,8 +42,8 @@ flagged=""
 fix_count=0
 other_count=0
 flagged_count=0
-VER="${TARGET#release/}"
-FLAG_RE="\\bport[-: /]+(release/)?${VER//./\\.}\\b"
+VER="${TARGET#stable-}"
+FLAG_RE="\\bport[-: /]+(stable-)?${VER//./\\.}\\b"
 while read -r mark sha; do
   [ "$mark" = "+" ] || continue
   [ -n "${PORTED[$sha]:-}" ] && continue
