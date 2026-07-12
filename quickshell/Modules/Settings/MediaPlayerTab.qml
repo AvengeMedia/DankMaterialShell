@@ -67,7 +67,7 @@ Item {
 
                 SettingsToggleRow {
                     text: I18n.tr("Use album art accent")
-                    description: I18n.tr("Use colours extracted from album art instead of system theme colours")
+                    description: I18n.tr("Use colors extracted from album art instead of system theme colors")
                     checked: SettingsData.mediaUseAlbumArtAccent
                     onToggled: checked => SettingsData.set("mediaUseAlbumArtAccent", checked)
                 }
