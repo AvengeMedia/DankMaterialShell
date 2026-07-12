@@ -28,6 +28,16 @@ Item {
     property string newPrinterInfo: ""
     property var suggestedPPDs: []
 
+    readonly property string effectiveDeviceUri: {
+        if (selectedDeviceUri)
+            return selectedDeviceUri;
+        if (!manualEntryMode || !manualHost)
+            return "";
+        const port = parseInt(manualPort) || 631;
+        const path = manualProtocol === "ipp" || manualProtocol === "ipps" ? "/ipp/print" : "";
+        return `${manualProtocol}://${manualHost}:${port}${path}`;
+    }
+
     function resetAddPrinterForm() {
         manualEntryMode = false;
         manualHost = "";
@@ -512,6 +522,7 @@ Item {
                                     text: printerTab.manualHost
                                     onTextEdited: {
                                         printerTab.manualHost = text;
+                                        printerTab.selectedDeviceUri = "";
                                         printerTab.testConnectionResult = null;
                                     }
                                 }
@@ -536,6 +547,7 @@ Item {
                                     text: printerTab.manualPort
                                     onTextEdited: {
                                         printerTab.manualPort = text;
+                                        printerTab.selectedDeviceUri = "";
                                         printerTab.testConnectionResult = null;
                                     }
                                 }
@@ -562,6 +574,7 @@ Item {
                                     options: ["ipp", "ipps", "lpd", "socket"]
                                     onValueChanged: value => {
                                         printerTab.manualProtocol = value;
+                                        printerTab.selectedDeviceUri = "";
                                         printerTab.testConnectionResult = null;
                                     }
                                 }
@@ -661,7 +674,7 @@ Item {
 
                                 Row {
                                     spacing: Theme.spacingS
-                                    visible: !printerTab.testConnectionResult?.success && printerTab.testConnectionResult?.data?.error
+                                    visible: !!(printerTab.testConnectionResult?.data?.error || printerTab.testConnectionResult?.error)
 
                                     Item {
                                         width: 80
@@ -820,9 +833,9 @@ Item {
                                 text: CupsService.creatingPrinter ? I18n.tr("Creating...") : I18n.tr("Create Printer")
                                 iconName: CupsService.creatingPrinter ? "sync" : "add"
                                 buttonHeight: 36
-                                enabled: printerTab.newPrinterName.length > 0 && printerTab.selectedDeviceUri.length > 0 && printerTab.selectedPpd.length > 0 && !CupsService.creatingPrinter
+                                enabled: printerTab.newPrinterName.length > 0 && printerTab.effectiveDeviceUri.length > 0 && printerTab.selectedPpd.length > 0 && !CupsService.creatingPrinter
                                 onClicked: {
-                                    CupsService.createPrinter(printerTab.newPrinterName, printerTab.selectedDeviceUri, printerTab.selectedPpd, {
+                                    CupsService.createPrinter(printerTab.newPrinterName, printerTab.effectiveDeviceUri, printerTab.selectedPpd, {
                                         location: printerTab.newPrinterLocation,
                                         information: printerTab.newPrinterInfo
                                     });
