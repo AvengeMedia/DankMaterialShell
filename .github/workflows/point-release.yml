@@ -1,6 +1,6 @@
 name: Point release
 
-# Cuts vX.Y.Z from release/X.Y: runs the port audit (warn-only), bumps
+# Cuts vX.Y.Z from stable-X.Y: runs the port audit (warn-only), bumps
 # quickshell/VERSION, tags, and dispatches the Release workflow. Distro
 # builds are dispatched separately.
 
@@ -33,7 +33,7 @@ jobs:
           if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "::error::version must be X.Y.Z (got '$VERSION')"; exit 1
           fi
-          echo "branch=release/${VERSION%.*}" >> "$GITHUB_OUTPUT"
+          echo "branch=stable-${VERSION%.*}" >> "$GITHUB_OUTPUT"
           echo "tag=v${VERSION}" >> "$GITHUB_OUTPUT"
 
       - name: Create GitHub App token

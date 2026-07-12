@@ -1,10 +1,10 @@
 name: Port to release branch
 
-# Ports flagged commits from master onto release/X.Y branches:
+# Ports flagged commits from master onto stable-X.Y branches:
 #   - "port 1.5" flag in a commit message pushed to master — own line or
-#     mid-line; separators : / - or space; "release/1.5" also accepted;
+#     mid-line; separators : / - or space; "stable-1.5" also accepted;
 #     comma lists ("Port: 1.5, 1.4") work in the own-line form
-#   - "port release/1.5" label on a merged PR
+#   - "port stable-1.5" label on a merged PR
 # Conflicts are reported to the "Port status: <branch>" tracking issue.
 
 on:
@@ -59,16 +59,16 @@ jobs:
             # own-line form (supports comma lists), validated version-shaped
             t1=$(git log -1 --format=%B "$sha" |
               { grep -iE '^Port[:/ -]' || true; } | sed -E 's|^port[-:/ ]+||I' | tr ',' '\n' |
-              sed 's/[[:space:]]//g; /^$/d' | sed 's|^release/||I' |
+              sed 's/[[:space:]]//g; /^$/d' | sed -E 's,^stable-,,I' |
               { grep -E '^[0-9]+\.[0-9]+(\.[0-9]+)?$' || true; })
             # mid-line form, e.g. "fix thing fixes #2802 port 1.5"
             t2=$(git log -1 --format=%B "$sha" |
-              { grep -oiE '\bport[-: /]+(release/)?[0-9]+\.[0-9]+(\.[0-9]+)?\b' || true; } |
-              sed -E 's|^port[-:/ ]+||I' | sed 's|^release/||I')
+              { grep -oiE '\bport[-: /]+(stable-)?[0-9]+\.[0-9]+(\.[0-9]+)?\b' || true; } |
+              sed -E 's|^port[-:/ ]+||I' | sed -E 's,^stable-,,I')
             targets=$(printf '%s\n%s\n' "$t1" "$t2" | sed '/^$/d' | sort -u)
             for ver in $targets; do
-              echo "::group::port $sha -> release/$ver"
-              bash scripts/port.sh "release/$ver" "$sha"
+              echo "::group::port $sha -> stable-$ver"
+              bash scripts/port.sh "stable-$ver" "$sha"
               echo "::endgroup::"
             done
           done
@@ -90,12 +90,12 @@ jobs:
           git config user.email "dms-ci[bot]@users.noreply.github.com"
 
           targets=$(jq -r '.[] | select(startswith("port ")) | sub("^port +"; "")' <<<"$LABELS" |
-            sed 's|^release/||' | sort -u)
+            sed -E 's,^stable-,,' | sort -u)
           [ -n "$targets" ] || { echo "no port labels, nothing to do"; exit 0; }
           [ -n "$MERGE_SHA" ] || { echo "::error::PR has no merge commit sha"; exit 1; }
 
           for ver in $targets; do
-            echo "::group::port PR #${PORT_SOURCE_PR} ($MERGE_SHA) -> release/$ver"
-            bash scripts/port.sh "release/$ver" "$MERGE_SHA"
+            echo "::group::port PR #${PORT_SOURCE_PR} ($MERGE_SHA) -> stable-$ver"
+            bash scripts/port.sh "stable-$ver" "$MERGE_SHA"
             echo "::endgroup::"
           done

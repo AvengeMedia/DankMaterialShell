@@ -2,7 +2,7 @@ name: Nix flake and NixOS tests
 
 on:
   pull_request:
-    branches: [master, main, "release/**"]
+    branches: [master, main, "stable-*"]
     paths:
       - "flake.*"
       - "distro/nix/**"
