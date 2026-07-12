@@ -11,6 +11,11 @@ on:
         description: "Point release version (e.g. 1.5.1)"
         required: true
         type: string
+      notify_issues:
+        description: "Comment on open related/fixes issues asking reporters to retest"
+        required: false
+        type: boolean
+        default: true
 
 permissions:
   contents: write
@@ -79,7 +84,10 @@ jobs:
       - name: Dispatch Release workflow
         env:
           GH_TOKEN: ${{ steps.app_token.outputs.token }}
-        run: gh workflow run release.yml --ref "${{ steps.derive.outputs.tag }}" -f tag="${{ steps.derive.outputs.tag }}"
+        run: |
+          gh workflow run release.yml --ref "${{ steps.derive.outputs.tag }}" \
+            -f tag="${{ steps.derive.outputs.tag }}" \
+            -f notify_issues="${{ inputs.notify_issues }}"
 
       - name: Next steps
         run: |

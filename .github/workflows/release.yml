@@ -7,6 +7,11 @@ on:
         description: "Tag to release (e.g., v1.0.1)"
         required: true
         type: string
+      notify_issues:
+        description: "Comment on open related/fixes issues asking reporters to retest"
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -430,9 +435,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Ask reporters on still-open "related/fixes #N" issues to retest.
-      # Skipped for prereleases; --dry-run locally: scripts/notify-issues.sh <prev> <tag> --dry-run
+      # Opt-in via notify_issues (Point release defaults it on). Skipped for
+      # prereleases. Preview: scripts/notify-issues.sh <prev> <tag> --dry-run
       - name: Notify open issues to retest
-        if: ${{ !contains(env.TAG, '-') }}
+        if: ${{ inputs.notify_issues && !contains(env.TAG, '-') }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
