@@ -11,6 +11,7 @@ on:
 permissions:
   contents: write
   actions: write
+  issues: write
 
 concurrency:
   group: release-${{ inputs.tag }}
@@ -427,3 +428,18 @@ jobs:
           prerelease: ${{ contains(env.TAG, '-') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Ask reporters on still-open "related/fixes #N" issues to retest.
+      # Skipped for prereleases; --dry-run locally: scripts/notify-issues.sh <prev> <tag> --dry-run
+      - name: Notify open issues to retest
+        if: ${{ !contains(env.TAG, '-') }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 "${TAG}^" 2>/dev/null || true)
+          if [ -z "$PREVIOUS_TAG" ]; then
+            echo "no previous tag; skipping issue notify"
+            exit 0
+          fi
+          bash scripts/notify-issues.sh "$PREVIOUS_TAG" "$TAG"
