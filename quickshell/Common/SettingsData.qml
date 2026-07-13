@@ -617,7 +617,8 @@ Singleton {
 
     function setDashTabEnabled(id, on) {
         const current = getDashTabs();
-        if (!on && id !== "settings" && current.filter(t => t.enabled && t.id !== "settings").length <= 1)
+        const visibleContentIds = visibleDashTabIds().filter(tabId => tabId !== "settings");
+        if (!on && visibleContentIds.indexOf(id) >= 0 && visibleContentIds.length <= 1)
             return;
         dashTabs = current.map(t => t.id === id ? {
                 "id": t.id,

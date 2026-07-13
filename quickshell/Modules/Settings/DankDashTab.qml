@@ -48,7 +48,7 @@ Item {
     // its delegates alive across commits (preserving focus for keyboard reorder)
     readonly property var tabIds: SettingsData._dashTabIds
     readonly property var tabState: SettingsData.getDashTabs()
-    readonly property int enabledContentCount: tabState.filter(t => t.enabled && t.id !== "settings").length
+    readonly property var visibleContentIds: SettingsData.visibleDashTabIds().filter(id => id !== "settings")
 
     function presentationFor(id) {
         return __presentation[id] ?? {
@@ -149,7 +149,7 @@ Item {
     }
 
     function canHide(id) {
-        return !isEnabled(id) || id === "settings" || enabledContentCount > 1;
+        return !isEnabled(id) || id === "settings" || visibleContentIds.indexOf(id) < 0 || visibleContentIds.length > 1;
     }
 
     // Keyboard nav is handled at the tab root (not per-row activeFocusOnTab)

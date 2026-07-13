@@ -323,7 +323,8 @@ DankPopout {
                     id: tabBar
 
                     width: parent.width
-                    height: 48
+                    height: visible ? 48 : 0
+                    visible: model.length > 0
                     currentIndex: root.currentTabIndex
                     spacing: Theme.spacingS
                     equalWidthTabs: true
@@ -355,7 +356,8 @@ DankPopout {
 
                 Item {
                     width: parent.width
-                    height: Theme.spacingXS
+                    height: visible ? Theme.spacingXS : 0
+                    visible: tabBar.visible
                 }
 
                 Item {
