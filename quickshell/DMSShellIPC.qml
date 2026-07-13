@@ -1003,6 +1003,10 @@ Item {
             return JSON.stringify(SettingsData?.[key]);
         }
 
+        function dump(): string {
+            return SettingsData.getCurrentSettingsJson();
+        }
+
         function set(key: string, value: string): string {
             if (!(key in SettingsData)) {
                 log.warn("Cannot set property, not found:", key);
