@@ -206,7 +206,7 @@ Uses COPR repositories (`avengemedia/danklinux`, `avengemedia/dms`).
 Requires PPA support. Most packages built from source (slow first install).
 
 **Debian**
-Debian 13+ (Trixie). niri only, no Hyprland support. Builds from source.
+Debian 13+ (Trixie), testing, and sid. Stable quickshell from Debian (trixie-backports on 13). Other companions via OBS.
 
 **openSUSE**
 Most packages available in standard repos. Minimal building required.

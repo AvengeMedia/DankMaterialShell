@@ -161,7 +161,60 @@ func (d *DebianDistribution) getQuickshellMapping(variant deps.PackageVariant) P
 	if forceQuickshellGit || variant == deps.VariantGit {
 		return PackageMapping{Name: "quickshell-git", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"}
 	}
-	return PackageMapping{Name: "quickshell", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"}
+	// Debian 13 ships stable quickshell in trixie-backports only.
+	if d.debianNeedsQuickshellBackports() {
+		return PackageMapping{Name: "quickshell/trixie-backports", Repository: RepoTypeSystem}
+	}
+	return PackageMapping{Name: "quickshell", Repository: RepoTypeSystem}
+}
+
+func (d *DebianDistribution) debianNeedsQuickshellBackports() bool {
+	osInfo, err := GetOSInfo()
+	if err != nil {
+		return false
+	}
+	return osInfo.VersionID == "13" || strings.EqualFold(osInfo.VersionCodename, "trixie")
+}
+
+func (d *DebianDistribution) ensureQuickshellBackports(ctx context.Context, systemPkgs []string, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
+	needsBackports := false
+	for _, pkg := range systemPkgs {
+		if strings.Contains(pkg, "trixie-backports") {
+			needsBackports = true
+			break
+		}
+	}
+	if !needsBackports {
+		return nil
+	}
+
+	policyOut, err := exec.CommandContext(ctx, "apt-cache", "policy").Output()
+	if err == nil && strings.Contains(string(policyOut), "trixie-backports") {
+		d.log("trixie-backports already configured")
+		return nil
+	}
+
+	listFile := "/etc/apt/sources.list.d/trixie-backports.list"
+	repoLine := "deb http://deb.debian.org/debian trixie-backports main contrib non-free non-free-firmware"
+
+	progressChan <- InstallProgressMsg{
+		Phase:       PhaseSystemPackages,
+		Progress:    0.30,
+		Step:        "Enabling trixie-backports for quickshell...",
+		IsComplete:  false,
+		NeedsSudo:   true,
+		CommandInfo: fmt.Sprintf("echo '%s' | sudo tee %s", repoLine, listFile),
+		LogOutput:   "Debian 13 ships quickshell in trixie-backports",
+	}
+
+	addCmd := privesc.ExecCommand(ctx, sudoPassword,
+		fmt.Sprintf("bash -c \"echo '%s' | tee %s\"", repoLine, listFile))
+	if err := d.runWithProgress(addCmd, progressChan, PhaseSystemPackages, 0.30, 0.31); err != nil {
+		return err
+	}
+
+	updateCmd := privesc.ExecCommand(ctx, sudoPassword, "apt-get update")
+	return d.runWithProgress(updateCmd, progressChan, PhaseSystemPackages, 0.31, 0.33)
 }
 
 func (d *DebianDistribution) getNiriMapping(variant deps.PackageVariant) PackageMapping {
@@ -264,6 +317,10 @@ func (d *DebianDistribution) InstallPackages(ctx context.Context, dependencies [
 		if err := d.enableOBSRepos(ctx, obsPkgs, sudoPassword, progressChan); err != nil {
 			return fmt.Errorf("failed to enable OBS repositories: %w", err)
 		}
+	}
+
+	if err := d.ensureQuickshellBackports(ctx, systemPkgs, sudoPassword, progressChan); err != nil {
+		return fmt.Errorf("failed to enable trixie-backports for quickshell: %w", err)
 	}
 
 	// System Packages
