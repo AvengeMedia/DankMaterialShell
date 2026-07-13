@@ -1840,7 +1840,6 @@ Item {
                                                     } else if (CompositorService.isNiri) {
                                                         NiriService.focusWindow(winId);
                                                     }
-                                                    delegateRoot.updateAllData();
                                                 }
                                             }
 
@@ -2010,7 +2009,6 @@ Item {
                                                     } else if (CompositorService.isNiri) {
                                                         NiriService.focusWindow(winId);
                                                     }
-                                                    delegateRoot.updateAllData();
                                                 }
                                             }
 
@@ -2101,6 +2099,14 @@ Item {
                     enabled: CompositorService.isHyprland
                     function onValuesChanged() {
                         delegateRoot.updateAllData();
+                    }
+                }
+                Connections {
+                    target: CompositorService.isHyprland ? Hyprland : null
+                    enabled: CompositorService.isHyprland
+                    function onRawEvent(event) {
+                        if (event.name === "activewindow" || event.name === "activewindowv2")
+                            delegateRoot.updateAllData();
                     }
                 }
                 Connections {
