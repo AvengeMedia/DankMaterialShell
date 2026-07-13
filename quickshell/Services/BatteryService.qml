@@ -182,6 +182,9 @@ Singleton {
     }
 
     onIsChargingChanged: {
+        // Reset average when switching states
+        _smoothedChangeRate = (_hasKnownChargingState && changeRate > 0) ? changeRate : 0;
+
         if (isCharging) {
             _hasNotifiedLowBattery = false;
             _hasNotifiedCriticalBattery = false;
@@ -232,6 +235,23 @@ Singleton {
         _lastChangeRate = val;
         return val;
     }
+
+    // An exponential moving average based on the aggregated charge/discharge rate
+    property real _smoothedChangeRate: 0
+    readonly property real _rateSmoothingAlpha: 0.2
+
+    function _updateSmoothedRate() {
+        if (!_hasKnownChargingState || changeRate <= 0)
+            return;
+        if (_smoothedChangeRate <= 0)
+            _smoothedChangeRate = changeRate;
+        else
+            _smoothedChangeRate += _rateSmoothingAlpha * (changeRate - _smoothedChangeRate);
+    }
+
+    onChangeRateChanged: _updateSmoothedRate()
+    onBatteryAvailableChanged: if (!batteryAvailable)
+        _smoothedChangeRate = 0
 
     // Aggregated battery health
     readonly property string batteryHealth: {
@@ -341,8 +361,8 @@ Singleton {
             return "Unknown";
         }
 
-        let totalTime = 0;
-        totalTime = (isCharging) ? ((batteryCapacity - batteryEnergy) / changeRate) : (batteryEnergy / changeRate);
+        const rate = _smoothedChangeRate > 0 ? _smoothedChangeRate : changeRate;
+        const totalTime = (isCharging) ? ((batteryCapacity - batteryEnergy) / rate) : (batteryEnergy / rate);
         const avgTime = Math.abs(totalTime * 3600);
         if (!avgTime || avgTime <= 0 || avgTime > 86400)
             return "Unknown";
