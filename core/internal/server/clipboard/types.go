@@ -153,7 +153,9 @@ type Manager struct {
 	notifierWg  sync.WaitGroup
 	lastState   *State
 
-	dbusConn *dbus.Conn
+	// lazily created by dbusConnForFlatpak under dbusConnMutex
+	dbusConn      *dbus.Conn
+	dbusConnMutex sync.Mutex
 }
 
 func (m *Manager) GetState() State {

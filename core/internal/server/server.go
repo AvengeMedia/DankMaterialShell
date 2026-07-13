@@ -8,6 +8,7 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 	"strconv"
 	"strings"
 	"sync"
@@ -41,7 +42,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/pkg/syncmap"
 )
 
-const APIVersion = 27
+const APIVersion = 28
 
 var CLIVersion = "dev"
 
@@ -398,6 +399,11 @@ func InitializeSysUpdateManager() error {
 
 func handleConnection(conn net.Conn) {
 	defer conn.Close()
+	defer func() {
+		if r := recover(); r != nil {
+			log.Errorf("handleConnection panic recovered: panic=%v\n%s", r, debug.Stack())
+		}
+	}()
 
 	caps := getCapabilities()
 	capsData, _ := json.Marshal(caps)
@@ -415,8 +421,19 @@ func handleConnection(conn net.Conn) {
 			continue
 		}
 
-		go RouteRequest(conn, req)
+		go routeRequestRecovered(conn, req)
 	}
+}
+
+// routeRequestRecovered keeps a panicking handler from taking down the whole daemon
+func routeRequestRecovered(conn net.Conn, req models.Request) {
+	defer func() {
+		if r := recover(); r != nil {
+			log.Errorf("RouteRequest panic recovered: method=%s panic=%v\n%s", req.Method, r, debug.Stack())
+			models.RespondError(conn, req.ID, "internal server error")
+		}
+	}()
+	RouteRequest(conn, req)
 }
 
 func getCapabilities() Capabilities {
@@ -580,6 +597,11 @@ func notifyCapabilityChange() {
 
 func handleSubscribe(conn net.Conn, req models.Request) {
 	clientID := fmt.Sprintf("meta-client-%p", conn)
+
+	dbusClient := dbusClientID
+	if id, ok := models.Get[string](req, "clientId"); ok && id != "" {
+		dbusClient = id
+	}
 
 	var services []string
 	if servicesParam, ok := models.Get[[]any](req, "services"); ok {
@@ -1249,10 +1271,10 @@ func handleSubscribe(conn net.Conn, req models.Request) {
 
 	if shouldSubscribe("dbus") && dbusManager != nil {
 		wg.Add(1)
-		dbusChan := dbusManager.SubscribeSignals(dbusClientID)
+		dbusChan := dbusManager.SubscribeSignals(dbusClient)
 		go func() {
 			defer wg.Done()
-			defer dbusManager.UnsubscribeSignals(dbusClientID)
+			defer dbusManager.UnsubscribeSignals(dbusClient)
 
 			for {
 				select {

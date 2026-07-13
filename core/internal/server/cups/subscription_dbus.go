@@ -38,6 +38,8 @@ func (sm *DBusSubscriptionManager) Start() error {
 		return fmt.Errorf("subscription manager already running")
 	}
 	sm.running = true
+	// replaced here rather than in Stop(); see SubscriptionManager.Start()
+	sm.eventChan = make(chan SubscriptionEvent, 100)
 	sm.mu.Unlock()
 
 	conn, err := dbus.ConnectSystemBus()
@@ -252,6 +254,8 @@ func (sm *DBusSubscriptionManager) parseDBusSignal(sig *dbus.Signal) Subscriptio
 }
 
 func (sm *DBusSubscriptionManager) Events() <-chan SubscriptionEvent {
+	sm.mu.Lock()
+	defer sm.mu.Unlock()
 	return sm.eventChan
 }
 
@@ -278,6 +282,12 @@ func (sm *DBusSubscriptionManager) Stop() {
 	}
 
 	sm.stopChan = make(chan struct{})
+
+	// the writer (dbusListenerLoop) joined above, so closing is safe; see
+	// SubscriptionManager.Stop()
+	sm.mu.Lock()
+	close(sm.eventChan)
+	sm.mu.Unlock()
 }
 
 func (sm *DBusSubscriptionManager) cancelSubscription() {

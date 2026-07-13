@@ -323,7 +323,7 @@ func (b *NetworkManagerBackend) GetEthernetDevices() []EthernetDevice {
 }
 
 func (b *NetworkManagerBackend) DisconnectEthernetDevice(device string) error {
-	info, ok := b.ethernetDevices[device]
+	info, ok := b.ethernetDeviceByIface(device)
 	if !ok {
 		return fmt.Errorf("ethernet device %s not found", device)
 	}
@@ -345,9 +345,10 @@ func (b *NetworkManagerBackend) DisconnectEthernetDevice(device string) error {
 }
 
 func (b *NetworkManagerBackend) updateAllEthernetDevices() {
-	devices := make([]EthernetDevice, 0, len(b.ethernetDevices))
+	ethernetDevices := b.ethernetDevicesSnapshot()
+	devices := make([]EthernetDevice, 0, len(ethernetDevices))
 
-	for name, info := range b.ethernetDevices {
+	for name, info := range ethernetDevices {
 		state, _ := info.device.GetPropertyState()
 		connected := state == gonetworkmanager.NmDeviceStateActivated
 		driver, _ := info.device.GetPropertyDriver()

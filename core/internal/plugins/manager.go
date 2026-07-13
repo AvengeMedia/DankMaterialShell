@@ -64,7 +64,20 @@ func (m *Manager) findInstalledPath(pluginID string) (string, error) {
 	return m.findInDir(systemDir, pluginID)
 }
 
+// isSafePluginPathComponent rejects ids that aren't a single path component,
+// so filepath.Join can't resolve (and later RemoveAll) outside the plugins dir
+func isSafePluginPathComponent(s string) bool {
+	if s == "" || s == "." || s == ".." {
+		return false
+	}
+	return !strings.ContainsAny(s, "/\\")
+}
+
 func (m *Manager) findInDir(dir, pluginID string) (string, error) {
+	if !isSafePluginPathComponent(pluginID) {
+		return "", fmt.Errorf("invalid plugin id: %q", pluginID)
+	}
+
 	// First, check if folder with exact ID name exists
 	exactPath := filepath.Join(dir, pluginID)
 	if exists, _ := afero.DirExists(m.fs, exactPath); exists {
@@ -507,6 +520,10 @@ func (m *Manager) findInstalledPathByIDOrName(idOrName string) (string, error) {
 }
 
 func (m *Manager) findInDirByIDOrName(dir, idOrName string) (string, error) {
+	if !isSafePluginPathComponent(idOrName) {
+		return "", fmt.Errorf("invalid plugin id/name: %q", idOrName)
+	}
+
 	// Check exact folder name match first
 	exactPath := filepath.Join(dir, idOrName)
 	if exists, _ := afero.DirExists(m.fs, exactPath); exists {

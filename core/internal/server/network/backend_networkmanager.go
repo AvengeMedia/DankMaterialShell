@@ -2,6 +2,7 @@ package network
 
 import (
 	"fmt"
+	"maps"
 	"sync"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
@@ -56,6 +57,11 @@ type NetworkManagerBackend struct {
 	settings        any
 	wifiDev         any
 	wifiDevices     map[string]*wifiDeviceInfo
+
+	// devMutex guards ethernetDevices/wifiDevices (written by the signal pump,
+	// read by request handlers). Not reentrant — never hold it across calls
+	// into other backend methods.
+	devMutex sync.RWMutex
 
 	dbusConn *dbus.Conn
 	signals  chan *dbus.Signal
@@ -185,12 +191,12 @@ func (b *NetworkManagerBackend) Initialize() error {
 			}
 			hwAddr, _ := w.GetPropertyHwAddress()
 
-			b.ethernetDevices[iface] = &ethernetDeviceInfo{
+			b.setEthernetDeviceInfo(iface, &ethernetDeviceInfo{
 				device:    dev,
 				wired:     w,
 				name:      iface,
 				hwAddress: hwAddr,
-			}
+			})
 
 			if b.ethernetDevice == nil {
 				b.ethernetDevice = dev
@@ -214,12 +220,12 @@ func (b *NetworkManagerBackend) Initialize() error {
 			}
 			hwAddr, _ := w.GetPropertyHwAddress()
 
-			b.wifiDevices[iface] = &wifiDeviceInfo{
+			b.setWifiDeviceInfo(iface, &wifiDeviceInfo{
 				device:    dev,
 				wireless:  w,
 				name:      iface,
 				hwAddress: hwAddr,
-			}
+			})
 
 			if b.wifiDevice == nil {
 				b.wifiDevice = dev
@@ -265,6 +271,80 @@ func (b *NetworkManagerBackend) Initialize() error {
 	}
 
 	return nil
+}
+
+func (b *NetworkManagerBackend) ethernetDevicesSnapshot() map[string]*ethernetDeviceInfo {
+	b.devMutex.RLock()
+	defer b.devMutex.RUnlock()
+	out := make(map[string]*ethernetDeviceInfo, len(b.ethernetDevices))
+	maps.Copy(out, b.ethernetDevices)
+	return out
+}
+
+func (b *NetworkManagerBackend) wifiDevicesSnapshot() map[string]*wifiDeviceInfo {
+	b.devMutex.RLock()
+	defer b.devMutex.RUnlock()
+	out := make(map[string]*wifiDeviceInfo, len(b.wifiDevices))
+	maps.Copy(out, b.wifiDevices)
+	return out
+}
+
+func (b *NetworkManagerBackend) ethernetDeviceByIface(iface string) (*ethernetDeviceInfo, bool) {
+	b.devMutex.RLock()
+	defer b.devMutex.RUnlock()
+	info, ok := b.ethernetDevices[iface]
+	return info, ok
+}
+
+func (b *NetworkManagerBackend) wifiDeviceByIface(iface string) (*wifiDeviceInfo, bool) {
+	b.devMutex.RLock()
+	defer b.devMutex.RUnlock()
+	info, ok := b.wifiDevices[iface]
+	return info, ok
+}
+
+func (b *NetworkManagerBackend) setEthernetDeviceInfo(iface string, info *ethernetDeviceInfo) {
+	b.devMutex.Lock()
+	b.ethernetDevices[iface] = info
+	b.devMutex.Unlock()
+}
+
+func (b *NetworkManagerBackend) setWifiDeviceInfo(iface string, info *wifiDeviceInfo) {
+	b.devMutex.Lock()
+	b.wifiDevices[iface] = info
+	b.devMutex.Unlock()
+}
+
+// removeEthernetDeviceByPath deletes the device and returns a snapshot of
+// what's left so the caller can pick a replacement without holding devMutex
+func (b *NetworkManagerBackend) removeEthernetDeviceByPath(path dbus.ObjectPath) (removed *ethernetDeviceInfo, remaining map[string]*ethernetDeviceInfo, found bool) {
+	b.devMutex.Lock()
+	defer b.devMutex.Unlock()
+	for iface, info := range b.ethernetDevices {
+		if info.device.GetPath() != path {
+			continue
+		}
+		delete(b.ethernetDevices, iface)
+		remaining = make(map[string]*ethernetDeviceInfo, len(b.ethernetDevices))
+		maps.Copy(remaining, b.ethernetDevices)
+		return info, remaining, true
+	}
+	return nil, nil, false
+}
+
+func (b *NetworkManagerBackend) removeWifiDeviceByPath(path dbus.ObjectPath) (removed *wifiDeviceInfo, remaining map[string]*wifiDeviceInfo, found bool) {
+	b.devMutex.Lock()
+	defer b.devMutex.Unlock()
+	for iface, info := range b.wifiDevices {
+		if info.device.GetPath() != path {
+			continue
+		}
+		delete(b.wifiDevices, iface)
+		remaining = make(map[string]*wifiDeviceInfo, len(b.wifiDevices))
+		maps.Copy(remaining, b.wifiDevices)
+		return info, remaining, true
+	}
+	return nil, nil, false
 }
 
 func (b *NetworkManagerBackend) Close() {

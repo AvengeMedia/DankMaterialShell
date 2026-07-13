@@ -1839,21 +1839,34 @@ func (m *Manager) EntryToFile(entry *Entry) string {
 	return ""
 }
 
+func (m *Manager) dbusConnForFlatpak() (*dbus.Conn, error) {
+	m.dbusConnMutex.Lock()
+	defer m.dbusConnMutex.Unlock()
+
+	if m.dbusConn != nil {
+		return m.dbusConn, nil
+	}
+
+	conn, err := dbus.ConnectSessionBus()
+	if err != nil {
+		return nil, fmt.Errorf("connect session bus: %w", err)
+	}
+	if !conn.SupportsUnixFDs() {
+		conn.Close()
+		return nil, fmt.Errorf("D-Bus connection does not support Unix FD passing")
+	}
+	m.dbusConn = conn
+	return conn, nil
+}
+
 func (m *Manager) ExportFileForFlatpak(filePath string) (string, error) {
 	if _, err := os.Stat(filePath); err != nil {
 		return "", fmt.Errorf("file not found: %w", err)
 	}
 
-	if m.dbusConn == nil {
-		conn, err := dbus.ConnectSessionBus()
-		if err != nil {
-			return "", fmt.Errorf("connect session bus: %w", err)
-		}
-		if !conn.SupportsUnixFDs() {
-			conn.Close()
-			return "", fmt.Errorf("D-Bus connection does not support Unix FD passing")
-		}
-		m.dbusConn = conn
+	dbusConn, err := m.dbusConnForFlatpak()
+	if err != nil {
+		return "", err
 	}
 
 	file, err := os.Open(filePath)
@@ -1862,7 +1875,7 @@ func (m *Manager) ExportFileForFlatpak(filePath string) (string, error) {
 	}
 	fd := int(file.Fd())
 
-	portal := m.dbusConn.Object("org.freedesktop.portal.Documents", "/org/freedesktop/portal/documents")
+	portal := dbusConn.Object("org.freedesktop.portal.Documents", "/org/freedesktop/portal/documents")
 
 	var docIds []string
 	var extra map[string]dbus.Variant

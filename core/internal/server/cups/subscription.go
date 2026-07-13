@@ -37,6 +37,9 @@ func (sm *SubscriptionManager) Start() error {
 		return fmt.Errorf("subscription manager already running")
 	}
 	sm.running = true
+	// replace the channel closed by the previous Stop(); doing it here rather
+	// than in Stop() guarantees a lagging eventHandler still observes the close
+	sm.eventChan = make(chan SubscriptionEvent, 100)
 	sm.mu.Unlock()
 
 	subID, err := sm.createSubscription()
@@ -206,6 +209,8 @@ func (sm *SubscriptionManager) parseEvent(attrs ipp.Attributes) SubscriptionEven
 }
 
 func (sm *SubscriptionManager) Events() <-chan SubscriptionEvent {
+	sm.mu.Lock()
+	defer sm.mu.Unlock()
 	return sm.eventChan
 }
 
@@ -228,6 +233,13 @@ func (sm *SubscriptionManager) Stop() {
 	}
 
 	sm.stopChan = make(chan struct{})
+
+	// the writer (notificationLoop) joined above, so closing is safe; without
+	// this close Manager.eventHandler never returns and Unsubscribe deadlocks
+	// on eventWG.Wait(). Start() allocates the replacement.
+	sm.mu.Lock()
+	close(sm.eventChan)
+	sm.mu.Unlock()
 }
 
 func (sm *SubscriptionManager) cancelSubscription() {

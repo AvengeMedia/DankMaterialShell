@@ -299,6 +299,9 @@ type hyprlandOverrideBind struct {
 	Options     map[string]any
 	// Unbind: negative override (hl.unbind only, no rebind).
 	Unbind bool
+	// RawLuaAction: Action is a custom hl.* Lua expression round-tripped from an
+	// existing Lua override; re-emit it verbatim instead of quoting it.
+	RawLuaAction bool
 }
 
 func (h *HyprlandProvider) ensureWritableConfig() error {
@@ -1046,18 +1049,26 @@ func luaActionStringFromHyprlangAction(action string) string {
 	if expr, ok := luaActionStringFromKnownHyprlandAction(action); ok {
 		return expr
 	}
-	return action
+	// Unrecognized dispatchers are freeform text, not Lua; forward them to
+	// hyprctl quoted so a stray `"` can't produce broken Lua output.
+	return luaHyprctlDispatchFunction(action)
 }
 
-func luaExprToInternalAction(expr string) string {
+// luaExprToInternalAction converts a parsed Lua bind expression back into
+// "dispatcher params" text. isRawLua reports that expr matched no known hl.*
+// shape and must be re-emitted verbatim as Lua on write-back.
+func luaExprToInternalAction(expr string) (action string, isRawLua bool) {
 	d, p := luaExprToDispatcherParams(expr)
+	if d == expr && p == "" {
+		return expr, true
+	}
 	if d == "exec" && p != "" && !strings.HasPrefix(p, "hyprctl dispatch lua:") {
-		return "exec " + p
+		return "exec " + p, false
 	}
 	if p != "" {
-		return d + " " + p
+		return d + " " + p, false
 	}
-	return d
+	return d, false
 }
 
 func luaBindOptions(bind *hyprlandOverrideBind) []string {
@@ -1075,20 +1086,25 @@ func luaBindOptions(bind *hyprlandOverrideBind) []string {
 }
 
 func writeLuaBindLine(sb *strings.Builder, bind *hyprlandOverrideBind) {
-	key := formatLuaBindKey(bind.Key)
+	key := strconv.Quote(formatLuaBindKey(bind.Key))
 	if bind.Unbind {
-		fmt.Fprintf(sb, `hl.unbind("%s")`, key)
+		fmt.Fprintf(sb, `hl.unbind(%s)`, key)
 		sb.WriteByte('\n')
 		return
 	}
-	expr := luaActionStringFromHyprlangAction(bind.Action)
+	var expr string
+	if bind.RawLuaAction {
+		expr = bind.Action
+	} else {
+		expr = luaActionStringFromHyprlangAction(bind.Action)
+	}
 	opts := luaBindOptions(bind)
-	fmt.Fprintf(sb, `hl.unbind("%s")`, key)
+	fmt.Fprintf(sb, `hl.unbind(%s)`, key)
 	sb.WriteByte('\n')
 	if len(opts) > 0 {
-		fmt.Fprintf(sb, `hl.bind("%s", %s, { %s })`, key, expr, strings.Join(opts, ", "))
+		fmt.Fprintf(sb, `hl.bind(%s, %s, { %s })`, key, expr, strings.Join(opts, ", "))
 	} else {
-		fmt.Fprintf(sb, `hl.bind("%s", %s)`, key, expr)
+		fmt.Fprintf(sb, `hl.bind(%s, %s)`, key, expr)
 	}
 	sb.WriteByte('\n')
 }
@@ -1104,17 +1120,18 @@ func parseLuaBindOverrideLine(line string) (*hyprlandOverrideBind, bool) {
 	}
 	internalKey := luaKeyComboToInternalKey(kbc)
 
-	action := luaExprToInternalAction(actionExpr)
+	action, isRawLua := luaExprToInternalAction(actionExpr)
 	flags := luaBindOptFlags(optSuffix)
 	description := luaBindOptDescription(optSuffix)
 	if description == "" {
 		description = luaLineTrailingComment(line)
 	}
 	return &hyprlandOverrideBind{
-		Key:         internalKey,
-		Action:      action,
-		Description: description,
-		Flags:       flags,
+		Key:          internalKey,
+		Action:       action,
+		Description:  description,
+		Flags:        flags,
+		RawLuaAction: isRawLua,
 	}, true
 }
 

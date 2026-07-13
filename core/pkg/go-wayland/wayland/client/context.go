@@ -96,7 +96,7 @@ func (ctx *Context) GetDispatch() func() error {
 		}
 	}
 
-	return func() error {
+	return func() (dispatchErr error) {
 		proxy, ok := ctx.objects.Load(senderID)
 		if !ok {
 			return nil // Proxy already deleted via delete_id, silently ignore
@@ -110,6 +110,14 @@ func (ctx *Context) GetDispatch() func() error {
 		if !ok {
 			return fmt.Errorf("%w (senderID=%d)", ErrDispatchSenderUnsupported, senderID)
 		}
+
+		// generated Dispatch methods don't bounds-check wire data; surface a
+		// decoder panic as an error instead of crashing the process
+		defer func() {
+			if r := recover(); r != nil {
+				dispatchErr = fmt.Errorf("dispatch: panic handling opcode=%d senderID=%d: %v", opcode, senderID, r)
+			}
+		}()
 
 		sender.Dispatch(opcode, fd, data)
 		return nil

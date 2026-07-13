@@ -132,7 +132,7 @@ func (c *GeoClueClient) startSignalPump() error {
 	if err := c.dbusConn.AddMatchSignal(
 		dbus.WithMatchObjectPath(c.clientPath),
 		dbus.WithMatchInterface(dbusGeoClueClientInterface),
-		dbus.WithMatchSender(dbusGeoClueClientLocationUpdated),
+		dbus.WithMatchMember("LocationUpdated"),
 	); err != nil {
 		return err
 	}

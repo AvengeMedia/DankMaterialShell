@@ -147,15 +147,34 @@ hl.bind("SUPER + N", hl.dsp.exec_cmd("dms ipc call notepad toggle"), { descripti
 func TestWriteLuaBindLineLeavesCustomLuaDispatcherRaw(t *testing.T) {
 	var sb strings.Builder
 	writeLuaBindLine(&sb, &hyprlandOverrideBind{
-		Key:         "Super+u",
-		Action:      "hl.dsp.no_op()",
-		Description: "Custom Lua",
+		Key:          "Super+u",
+		Action:       "hl.dsp.no_op()",
+		Description:  "Custom Lua",
+		RawLuaAction: true,
 	})
 
 	want := `hl.unbind("SUPER + U")
 hl.bind("SUPER + U", hl.dsp.no_op(), { description = "Custom Lua" })`
 	if got := strings.TrimSpace(sb.String()); got != want {
 		t.Fatalf("writeLuaBindLine() = %q, want %q", got, want)
+	}
+}
+
+func TestWriteLuaBindLineQuotesUnrecognizedActionWithoutRawLuaFlag(t *testing.T) {
+	var sb strings.Builder
+	writeLuaBindLine(&sb, &hyprlandOverrideBind{
+		Key:    "Super+u",
+		Action: `customdispatcher "),os.execute("id")--`,
+	})
+
+	got := sb.String()
+	if !strings.Contains(got, "hl.exec_cmd(") {
+		t.Fatalf("expected unrecognized action to go through the hyprctl-dispatch wrapper, got %q", got)
+	}
+	// an unpaired bare quote means the action broke out of its string literal
+	withoutEscapedQuotes := strings.ReplaceAll(got, `\"`, "")
+	if n := strings.Count(withoutEscapedQuotes, `"`); n%2 != 0 {
+		t.Fatalf("action broke out of its string literal (%d unpaired quotes): %q", n, got)
 	}
 }
 
@@ -226,14 +245,11 @@ func TestParseLuaBindLineHandlesFunctionDispatcherFallback(t *testing.T) {
 	}
 }
 
-func TestLuaActionStringLeavesCustomLuaDispatcherRaw(t *testing.T) {
+func TestLuaActionStringFromHyprlangActionAlwaysQuotesUnrecognizedText(t *testing.T) {
 	got := luaActionStringFromHyprlangAction("hl.dsp.no_op()")
-	want := `hl.dsp.no_op()`
+	want := `function() hl.exec_cmd("hyprctl dispatch hl.dsp.no_op()") end`
 	if got != want {
 		t.Fatalf("luaActionStringFromHyprlangAction() = %q, want %q", got, want)
-	}
-	if strings.Contains(got, "hl.dispatch") || strings.Contains(got, "hyprctl dispatch") {
-		t.Fatalf("expected custom Lua dispatcher expression to stay raw, got %q", got)
 	}
 }
 

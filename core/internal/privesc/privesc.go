@@ -135,15 +135,14 @@ func EscapeSingleQuotes(s string) string {
 }
 
 // MakeCommand returns a bash command string that runs `command` with the
-// detected tool. When the tool supports stdin passwords and password is
-// non-empty, the password is piped in. Otherwise the tool is invoked with
-// no non-interactive flag so that an interactive TTY prompt is still
-// possible for CLI callers.
+// detected tool, prompting interactively on a TTY where applicable. The
+// sudo-with-password case lives in ExecCommand, which pipes the password via
+// stdin so it never lands in argv.
 //
 // If detection fails, the returned shell string exits 1 with an error
 // message so callers that treat the *exec.Cmd as infallible still fail
 // deterministically.
-func MakeCommand(password, command string) string {
+func MakeCommand(command string) string {
 	t, err := Detect()
 	if err != nil {
 		return failingShell(err)
@@ -151,9 +150,6 @@ func MakeCommand(password, command string) string {
 
 	switch t {
 	case ToolSudo:
-		if password != "" {
-			return fmt.Sprintf("echo '%s' | sudo -S %s", EscapeSingleQuotes(password), command)
-		}
 		return fmt.Sprintf("sudo %s", command)
 	case ToolDoas:
 		return fmt.Sprintf("doas sh -c '%s'", EscapeSingleQuotes(command))
@@ -166,9 +162,19 @@ func MakeCommand(password, command string) string {
 
 // ExecCommand builds an exec.Cmd that runs `command` as root via the
 // detected tool. Detection errors surface at Run() time as a failing
-// command writing a clear error to stderr.
+// command writing a clear error to stderr. A sudo password is piped via
+// stdin (sudo -S) so it never appears in argv.
 func ExecCommand(ctx context.Context, password, command string) *exec.Cmd {
-	return exec.CommandContext(ctx, "bash", "-c", MakeCommand(password, command))
+	t, err := Detect()
+	if err != nil {
+		return exec.CommandContext(ctx, "bash", "-c", failingShell(err))
+	}
+	if t == ToolSudo && password != "" {
+		cmd := exec.CommandContext(ctx, "sudo", "-S", "sh", "-c", command)
+		cmd.Stdin = strings.NewReader(password + "\n")
+		return cmd
+	}
+	return exec.CommandContext(ctx, "bash", "-c", MakeCommand(command))
 }
 
 // ExecArgv builds an exec.Cmd that runs argv as root via the detected tool.

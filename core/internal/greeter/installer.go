@@ -529,11 +529,23 @@ func execFromDesktopFile(path string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	inDesktopEntry := false
 	for line := range strings.SplitSeq(string(data), "\n") {
 		trimmed := strings.TrimSpace(line)
-		if strings.HasPrefix(trimmed, "Exec=") {
-			return strings.TrimSpace(trimmed[len("Exec="):]), nil
+		switch {
+		case trimmed == "" || strings.HasPrefix(trimmed, "#"):
+			continue
+		case strings.HasPrefix(trimmed, "[") && strings.HasSuffix(trimmed, "]"):
+			inDesktopEntry = trimmed == "[Desktop Entry]"
+			continue
+		case !inDesktopEntry:
+			continue
 		}
+		key, value, found := strings.Cut(trimmed, "=")
+		if !found || strings.TrimSpace(key) != "Exec" {
+			continue
+		}
+		return strings.TrimSpace(value), nil
 	}
 	return "", fmt.Errorf("no Exec= line found in %s", path)
 }

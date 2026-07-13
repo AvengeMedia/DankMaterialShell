@@ -133,6 +133,11 @@ func mergedAssociations() *MimeAssociations {
 	return merged
 }
 
+// isSafeIniField rejects values that would corrupt a key=value line in mimeapps.list
+func isSafeIniField(s string) bool {
+	return !strings.ContainsAny(s, "\n\r[]")
+}
+
 func writeUserMimeapps(update func(*MimeAssociations)) error {
 	mimeappsWriteMu.Lock()
 	defer mimeappsWriteMu.Unlock()
@@ -152,6 +157,7 @@ func writeUserMimeapps(update func(*MimeAssociations)) error {
 	var buf bytes.Buffer
 	w := bufio.NewWriter(&buf)
 
+	var writeErr error
 	writeSection := func(name string, entries map[string]string) {
 		fmt.Fprintf(w, "[%s]\n", name)
 		keys := make([]string, 0, len(entries))
@@ -160,7 +166,14 @@ func writeUserMimeapps(update func(*MimeAssociations)) error {
 		}
 		sort.Strings(keys)
 		for _, k := range keys {
-			fmt.Fprintf(w, "%s=%s\n", k, entries[k])
+			v := entries[k]
+			if !isSafeIniField(k) || !isSafeIniField(v) {
+				if writeErr == nil {
+					writeErr = fmt.Errorf("invalid mimeapps.list field %q=%q", k, v)
+				}
+				continue
+			}
+			fmt.Fprintf(w, "%s=%s\n", k, v)
 		}
 		fmt.Fprintln(w)
 	}
@@ -176,6 +189,10 @@ func writeUserMimeapps(update func(*MimeAssociations)) error {
 	writeSection(groupDefaults, assoc.Defaults)
 	writeSection(groupAdded, flatten(assoc.Added))
 	writeSection(groupRemoved, flatten(assoc.Removed))
+
+	if writeErr != nil {
+		return writeErr
+	}
 
 	if err := w.Flush(); err != nil {
 		return err

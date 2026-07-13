@@ -71,4 +71,6 @@ type Manager struct {
 	screensaverGnomeClaimed       bool
 	selfEchoMu                    sync.Mutex
 	selfEchoes                    []colorSchemeEcho
+	// registered on sessionConn by watchSettingsChanges; guarded by stateMutex
+	settingsSignals chan *dbus.Signal
 }

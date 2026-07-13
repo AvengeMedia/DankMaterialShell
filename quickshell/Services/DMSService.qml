@@ -246,13 +246,14 @@ Singleton {
 
     function sendSubscribeRequest() {
         const request = {
-            "method": "subscribe"
+            "method": "subscribe",
+            "params": {
+                "clientId": dbusClientId
+            }
         };
 
         if (activeSubscriptions.length > 0) {
-            request.params = {
-                "services": activeSubscriptions
-            };
+            request.params.services = activeSubscriptions;
             log.debug("Subscribing to services:", JSON.stringify(activeSubscriptions));
         } else {
             log.debug("Subscribing to all services");
@@ -672,6 +673,7 @@ Singleton {
 
     signal dbusSignalReceived(string subscriptionId, var data)
 
+    readonly property string dbusClientId: "dms-qml-" + Date.now() + "-" + Math.floor(Math.random() * 0xffffffff)
     property var dbusSubscriptions: ({})
 
     function dbusCall(bus, dest, path, iface, method, args, callback) {
@@ -735,7 +737,8 @@ Singleton {
             "sender": sender || "",
             "path": path || "",
             "interface": iface || "",
-            "member": member || ""
+            "member": member || "",
+            "clientId": dbusClientId
         }, response => {
             if (!response.error && response.result?.subscriptionId) {
                 dbusSubscriptions[response.result.subscriptionId] = true;

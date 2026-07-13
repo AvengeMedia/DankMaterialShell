@@ -201,6 +201,10 @@ func handleListNames(conn net.Conn, req models.Request, m *Manager) {
 }
 
 func handleSubscribe(conn net.Conn, req models.Request, m *Manager, clientID string) {
+	if id := params.StringOpt(req.Params, "clientId", ""); id != "" {
+		clientID = id
+	}
+
 	bus, err := params.String(req.Params, "bus")
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())

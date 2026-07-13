@@ -76,7 +76,7 @@ func (b *NetworkManagerBackend) updateEthernetState() error {
 	var connectedIP string
 	var anyConnected bool
 
-	for name, info := range b.ethernetDevices {
+	for name, info := range b.ethernetDevicesSnapshot() {
 		state, err := info.device.GetPropertyState()
 		if err != nil {
 			continue
