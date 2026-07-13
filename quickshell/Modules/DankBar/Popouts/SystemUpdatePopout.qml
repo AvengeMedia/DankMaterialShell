@@ -230,21 +230,6 @@ DankPopout {
                 elide: Text.ElideRight
             }
 
-            StyledText {
-                id: hiddenRow
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: backendsRow.visible ? backendsRow.bottom : header.bottom
-                anchors.leftMargin: Theme.spacingL
-                anchors.rightMargin: Theme.spacingL
-                anchors.topMargin: Theme.spacingXS
-                visible: SystemUpdateService.hiddenUpdateCount > 0 && !SystemUpdateService.isUpgrading
-                text: I18n.tr("%1 hidden (AUR disabled or ignored)").arg(SystemUpdateService.hiddenUpdateCount)
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.surfaceVariantText
-                wrapMode: Text.WordWrap
-            }
-
             Row {
                 id: buttonsRow
                 anchors.left: parent.left
@@ -340,7 +325,7 @@ DankPopout {
                 id: bodyArea
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.top: hiddenRow.visible ? hiddenRow.bottom : (backendsRow.visible ? backendsRow.bottom : header.bottom)
+                anchors.top: backendsRow.visible ? backendsRow.bottom : header.bottom
                 anchors.bottom: buttonsRow.top
                 anchors.leftMargin: Theme.spacingL
                 anchors.rightMargin: Theme.spacingL

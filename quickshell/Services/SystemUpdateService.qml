@@ -33,7 +33,6 @@ Singleton {
     property int nextCheckUnix: 0
 
     readonly property int updateCount: availableUpdates.length
-    readonly property int hiddenUpdateCount: _rawUpdates.length - availableUpdates.length
     readonly property bool helperAvailable: sysupdateAvailable && backends.length > 0
 
     Connections {
