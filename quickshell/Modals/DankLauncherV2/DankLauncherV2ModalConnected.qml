@@ -370,6 +370,7 @@ Item {
         }
         if (spotlightContent.controller) {
             var targetMode = mode || SessionData.getLauncherRestoreMode();
+            spotlightContent.controller.explicitQuerySession = !!query;
             spotlightContent.controller.searchMode = targetMode;
             spotlightContent.controller.activePluginId = "";
             spotlightContent.controller.activePluginName = "";
@@ -430,7 +431,10 @@ Item {
                 root.keyboardActive = true;
                 if (root.spotlightContent && root.spotlightContent.searchField) {
                     root.spotlightContent.searchField.forceActiveFocus();
-                    root.spotlightContent.searchField.selectAll();
+                    if (query)
+                        root.spotlightContent.searchField.cursorPosition = root.spotlightContent.searchField.text.length;
+                    else
+                        root.spotlightContent.searchField.selectAll();
                 }
             });
         });

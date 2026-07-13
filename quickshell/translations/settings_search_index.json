@@ -2899,6 +2899,19 @@
     "description": "Show All, Apps, Files, and Plugins chips beside the Spotlight Bar input."
   },
   {
+    "section": "terminalOverride",
+    "label": "Terminal",
+    "tabIndex": 9,
+    "category": "Launcher",
+    "keywords": [
+      "drawer",
+      "launcher",
+      "menu",
+      "start",
+      "terminal"
+    ]
+  },
+  {
     "section": "dankLauncherV2BorderThickness",
     "label": "Thickness",
     "tabIndex": 9,
@@ -4834,6 +4847,27 @@
       "system"
     ],
     "description": "Automatically lock the screen when the system prepares to suspend"
+  },
+  {
+    "section": "lockScreenFontFamily",
+    "label": "Lock screen font",
+    "tabIndex": 11,
+    "category": "Lock Screen",
+    "keywords": [
+      "clock",
+      "date",
+      "font",
+      "lock",
+      "lockscreen",
+      "login",
+      "password",
+      "screen",
+      "security",
+      "time",
+      "typography",
+      "watch"
+    ],
+    "description": "Font used for the clock and date on the lock screen"
   },
   {
     "section": "lockScreenNotificationMode",
@@ -7838,6 +7872,22 @@
       "status"
     ],
     "icon": "info"
+  },
+  {
+    "section": "greeterFontFamily",
+    "label": "Greeter font",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "display manager",
+      "font",
+      "greetd",
+      "greeter",
+      "login",
+      "screen",
+      "typography"
+    ],
+    "description": "Font used on the login screen"
   },
   {
     "section": "greeterAuth",

@@ -36,6 +36,7 @@ Item {
     property int viewModeVersion: 0
     property string viewModeContext: "spotlight"
     property bool forceLinearNavigation: false
+    property bool explicitQuerySession: false
 
     signal itemExecuted
     signal searchCompleted
@@ -54,7 +55,7 @@ Item {
         if (active)
             return;
 
-        SessionData.addLauncherHistory(searchQuery);
+        SessionData.addLauncherHistory(searchQuery, explicitQuerySession);
         sections = [];
         flatModel = [];
         selectedItem = null;
@@ -1940,7 +1941,7 @@ Item {
         if (!item)
             return;
 
-        SessionData.addLauncherHistory(searchQuery);
+        SessionData.addLauncherHistory(searchQuery, explicitQuerySession);
 
         if (item.type === "plugin_browse") {
             var browsePluginId = item.data?.pluginId;

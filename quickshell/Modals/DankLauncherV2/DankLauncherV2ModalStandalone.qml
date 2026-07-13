@@ -154,10 +154,14 @@ Item {
 
         if (spotlightContent.searchField) {
             spotlightContent.searchField.text = targetQuery;
-            spotlightContent.searchField.selectAll();
+            if (query)
+                spotlightContent.searchField.cursorPosition = targetQuery.length;
+            else
+                spotlightContent.searchField.selectAll();
         }
         if (spotlightContent.controller) {
             var targetMode = mode || SessionData.getLauncherRestoreMode();
+            spotlightContent.controller.explicitQuerySession = !!query;
             spotlightContent.controller.searchMode = targetMode;
             spotlightContent.controller.activePluginId = "";
             spotlightContent.controller.activePluginName = "";

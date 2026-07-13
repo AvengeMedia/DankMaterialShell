@@ -306,21 +306,45 @@ def extract_property(block, prop_name):
     return None
 
 
-def find_settings_components(content, filename):
+def load_wrapper_components(root_dir):
+    widgets_dir = Path(root_dir) / "Modules" / "Settings" / "Widgets"
+    wrappers = {}
+
+    for qml_file in sorted(widgets_dir.glob("*.qml")):
+        if qml_file.stem in SEARCHABLE_COMPONENTS:
+            continue
+
+        with open(qml_file, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        root_match = re.search(r"^(\w+)\s*\{", content, re.MULTILINE)
+        if not root_match or root_match.group(1) not in SEARCHABLE_COMPONENTS:
+            continue
+
+        wrappers[qml_file.stem] = {
+            prop: extract_property(content, prop)
+            for prop in ("settingKey", "title", "text", "description", "iconName", "tags")
+        }
+
+    return wrappers
+
+
+def find_settings_components(content, filename, wrappers):
     results = []
     file_tab_index = TAB_INDEX_MAP.get(filename, -1)
 
     if file_tab_index == -1:
         return results
 
-    for component in SEARCHABLE_COMPONENTS:
+    for component in SEARCHABLE_COMPONENTS + sorted(wrappers):
+        defaults = wrappers.get(component, {})
         pattern = rf"\b{component}\s*\{{"
         for match in re.finditer(pattern, content):
             block = parse_component_block(content, match.start(), component)
             if not block:
                 continue
 
-            setting_key = extract_property(block, "settingKey")
+            setting_key = extract_property(block, "settingKey") or defaults.get("settingKey")
             if setting_key:
                 setting_key = setting_key.strip("\"'")
 
@@ -332,8 +356,8 @@ def find_settings_components(content, filename):
             if tab_raw and tab_raw.strip("\"'") == "appearance":
                 tab_index = 6
 
-            title_raw = extract_property(block, "title")
-            text_raw = extract_property(block, "text")
+            title_raw = extract_property(block, "title") or defaults.get("title")
+            text_raw = extract_property(block, "text") or defaults.get("text")
             label = None
             if title_raw:
                 label = extract_i18n_string(title_raw)
@@ -343,19 +367,19 @@ def find_settings_components(content, filename):
             if not label:
                 continue
 
-            icon_raw = extract_property(block, "iconName")
+            icon_raw = extract_property(block, "iconName") or defaults.get("iconName")
             icon = None
             if icon_raw:
                 icon = icon_raw.strip("\"'")
                 if icon.startswith("{") or "?" in icon:
                     icon = None
 
-            tags_raw = extract_property(block, "tags")
+            tags_raw = extract_property(block, "tags") or defaults.get("tags")
             tags = []
             if tags_raw:
                 tags = extract_tags(tags_raw)
 
-            desc_raw = extract_property(block, "description")
+            desc_raw = extract_property(block, "description") or defaults.get("description")
             description = None
             if desc_raw:
                 description = extract_i18n_string(desc_raw)
@@ -509,6 +533,7 @@ def generate_tab_entries(sidebar_file, settings_entries=None):
 
 def extract_settings_index(root_dir):
     settings_dir = Path(root_dir) / "Modules" / "Settings"
+    wrappers = load_wrapper_components(root_dir)
     all_entries = []
     seen_keys = set()
 
@@ -519,7 +544,7 @@ def extract_settings_index(root_dir):
         with open(qml_file, "r", encoding="utf-8") as f:
             content = f.read()
 
-        entries = find_settings_components(content, qml_file.name)
+        entries = find_settings_components(content, qml_file.name, wrappers)
         for entry in entries:
             key = entry["section"]
             if key not in seen_keys:

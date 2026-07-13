@@ -1252,10 +1252,11 @@ Singleton {
         saveSettings();
     }
 
-    function addLauncherHistory(query) {
+    function addLauncherHistory(query, skipLastQuery) {
         let q = query.trim();
 
-        setLauncherLastQuery(q);
+        if (!skipLastQuery)
+            setLauncherLastQuery(q);
 
         if (!q)
             return;

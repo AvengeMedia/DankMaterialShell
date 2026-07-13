@@ -22,6 +22,7 @@ StyledRect {
     }
 
     property alias text: textInput.text
+    property alias cursorPosition: textInput.cursorPosition
     property string placeholderText: ""
     property string labelText: ""
     property alias font: textInput.font
