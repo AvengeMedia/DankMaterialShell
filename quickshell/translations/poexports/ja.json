@@ -3701,6 +3701,9 @@
   "Generic": {
     "Generic": "汎用"
   },
+  "Geometric Centering": {
+    "Geometric Centering": ""
+  },
   "Get Started": {
     "Get Started": "はじめる"
   },
@@ -3838,6 +3841,9 @@
   },
   "HTML copied to clipboard": {
     "HTML copied to clipboard": "HTML をクリップボードにコピーしました"
+  },
+  "Handles geo: location links": {
+    "Handles geo: location links": ""
   },
   "Handles links and opens HTML files": {
     "Handles links and opens HTML files": "リンクを処理し、HTML ファイルを開く"
@@ -4163,6 +4169,9 @@
   "Incorrect password - try again": {
     "Incorrect password - try again": "パスワードが間違っています - もう一度試してください"
   },
+  "Index Centering": {
+    "Index Centering": ""
+  },
   "Indicator Style": {
     "Indicator Style": "インジケータースタイル"
   },
@@ -4312,6 +4321,9 @@
   },
   "Jobs: ": {
     "Jobs: ": "ジョブ: "
+  },
+  "Join video call": {
+    "Join video call": ""
   },
   "Jump to page": {
     "Jump to page": ""
@@ -4699,6 +4711,9 @@
   },
   "Map window class names to icon names for proper icon display": {
     "Map window class names to icon names for proper icon display": "適切にアイコンを表示するため、ウィンドウ class 名をアイコン名にマッピングします"
+  },
+  "Maps": {
+    "Maps": ""
   },
   "Margin": {
     "Margin": "マージン"
@@ -8594,11 +8609,17 @@
   "Use a security key for lock screen authentication.": {
     "Use a security key for lock screen authentication.": "ロック画面の認証にセキュリティキーを使用します。"
   },
+  "Use album art accent": {
+    "Use album art accent": ""
+  },
   "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": {
     "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": "swww, hyprpaper, swaybg などの外部壁紙マネージャーを使用します。"
   },
   "Use animated wave progress bars for media playback": {
     "Use animated wave progress bars for media playback": "アニメーション化されたウェーブの進行状況バーをメディア再生に使用"
+  },
+  "Use colors extracted from album art instead of system theme colors": {
+    "Use colors extracted from album art instead of system theme colors": ""
   },
   "Use custom border size": {
     "Use custom border size": "カスタム境界線サイズを使用"

@@ -3701,6 +3701,9 @@
   "Generic": {
     "Generic": "一般"
   },
+  "Geometric Centering": {
+    "Geometric Centering": ""
+  },
   "Get Started": {
     "Get Started": "開始使用"
   },
@@ -3838,6 +3841,9 @@
   },
   "HTML copied to clipboard": {
     "HTML copied to clipboard": "HTML 已複製到剪貼簿"
+  },
+  "Handles geo: location links": {
+    "Handles geo: location links": ""
   },
   "Handles links and opens HTML files": {
     "Handles links and opens HTML files": "處理連結並開啟 HTML 檔案"
@@ -4163,6 +4169,9 @@
   "Incorrect password - try again": {
     "Incorrect password - try again": "密碼不正確 - 請再試一次"
   },
+  "Index Centering": {
+    "Index Centering": ""
+  },
   "Indicator Style": {
     "Indicator Style": "指示樣式"
   },
@@ -4312,6 +4321,9 @@
   },
   "Jobs: ": {
     "Jobs: ": "工作: "
+  },
+  "Join video call": {
+    "Join video call": ""
   },
   "Jump to page": {
     "Jump to page": ""
@@ -4699,6 +4711,9 @@
   },
   "Map window class names to icon names for proper icon display": {
     "Map window class names to icon names for proper icon display": "為正確顯示圖示，將視窗類別名稱對應至圖示名稱"
+  },
+  "Maps": {
+    "Maps": ""
   },
   "Margin": {
     "Margin": "邊距"
@@ -8594,11 +8609,17 @@
   "Use a security key for lock screen authentication.": {
     "Use a security key for lock screen authentication.": "使用安全金鑰進行鎖定螢幕驗證。"
   },
+  "Use album art accent": {
+    "Use album art accent": ""
+  },
   "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": {
     "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": "使用外部桌布管理器，如 swww、hyprpaper 或 swaybg。"
   },
   "Use animated wave progress bars for media playback": {
     "Use animated wave progress bars for media playback": "在媒體播放使用動畫波浪進度條"
+  },
+  "Use colors extracted from album art instead of system theme colors": {
+    "Use colors extracted from album art instead of system theme colors": ""
   },
   "Use custom border size": {
     "Use custom border size": "使用自訂邊框大小"

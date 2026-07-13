@@ -3701,6 +3701,9 @@
   "Generic": {
     "Generic": "Générique"
   },
+  "Geometric Centering": {
+    "Geometric Centering": ""
+  },
   "Get Started": {
     "Get Started": "Commencer"
   },
@@ -3838,6 +3841,9 @@
   },
   "HTML copied to clipboard": {
     "HTML copied to clipboard": "HTML copié dans le presse-papier"
+  },
+  "Handles geo: location links": {
+    "Handles geo: location links": ""
   },
   "Handles links and opens HTML files": {
     "Handles links and opens HTML files": ""
@@ -4163,6 +4169,9 @@
   "Incorrect password - try again": {
     "Incorrect password - try again": ""
   },
+  "Index Centering": {
+    "Index Centering": ""
+  },
   "Indicator Style": {
     "Indicator Style": "Style d'indicateur"
   },
@@ -4312,6 +4321,9 @@
   },
   "Jobs: ": {
     "Jobs: ": "Tâches : "
+  },
+  "Join video call": {
+    "Join video call": ""
   },
   "Jump to page": {
     "Jump to page": ""
@@ -4699,6 +4711,9 @@
   },
   "Map window class names to icon names for proper icon display": {
     "Map window class names to icon names for proper icon display": "Associer les classes de fenêtres aux icônes correspondantes"
+  },
+  "Maps": {
+    "Maps": ""
   },
   "Margin": {
     "Margin": "Marge"
@@ -8594,11 +8609,17 @@
   "Use a security key for lock screen authentication.": {
     "Use a security key for lock screen authentication.": "Utilisez une clé de sécurité pour l'authentification de l'écran de verrouillage."
   },
+  "Use album art accent": {
+    "Use album art accent": ""
+  },
   "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": {
     "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": "Utiliser un gestionnaire de fonds d’écran externe comme swww, hyprpaper ou swaybg."
   },
   "Use animated wave progress bars for media playback": {
     "Use animated wave progress bars for media playback": "Utiliser des barres de progression animées en forme de vague pour la lecture multimédia"
+  },
+  "Use colors extracted from album art instead of system theme colors": {
+    "Use colors extracted from album art instead of system theme colors": ""
   },
   "Use custom border size": {
     "Use custom border size": "Utiliser une taille de bordure personnalisée"

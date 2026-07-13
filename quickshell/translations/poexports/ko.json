@@ -3701,6 +3701,9 @@
   "Generic": {
     "Generic": "일반"
   },
+  "Geometric Centering": {
+    "Geometric Centering": ""
+  },
   "Get Started": {
     "Get Started": "시작하기"
   },
@@ -3838,6 +3841,9 @@
   },
   "HTML copied to clipboard": {
     "HTML copied to clipboard": "HTML이 클립보드에 복사됨"
+  },
+  "Handles geo: location links": {
+    "Handles geo: location links": ""
   },
   "Handles links and opens HTML files": {
     "Handles links and opens HTML files": "링크 처리 및 HTML 파일 열기"
@@ -4163,6 +4169,9 @@
   "Incorrect password - try again": {
     "Incorrect password - try again": "잘못된 비밀번호 - 다시 시도하세요"
   },
+  "Index Centering": {
+    "Index Centering": ""
+  },
   "Indicator Style": {
     "Indicator Style": "표시기 스타일"
   },
@@ -4312,6 +4321,9 @@
   },
   "Jobs: ": {
     "Jobs: ": "작업:"
+  },
+  "Join video call": {
+    "Join video call": ""
   },
   "Jump to page": {
     "Jump to page": "페이지로 이동"
@@ -4699,6 +4711,9 @@
   },
   "Map window class names to icon names for proper icon display": {
     "Map window class names to icon names for proper icon display": "올바른 아이콘 표시를 위해 창 클래스 이름을 아이콘 이름에 매핑"
+  },
+  "Maps": {
+    "Maps": ""
   },
   "Margin": {
     "Margin": "여백"
@@ -8594,11 +8609,17 @@
   "Use a security key for lock screen authentication.": {
     "Use a security key for lock screen authentication.": "잠금 화면 인증에 보안 키를 사용합니다."
   },
+  "Use album art accent": {
+    "Use album art accent": ""
+  },
   "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": {
     "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": "swww, hyprpaper 또는 swaybg와 같은 외부 배경화면 관리자를 사용합니다."
   },
   "Use animated wave progress bars for media playback": {
     "Use animated wave progress bars for media playback": "미디어 재생에 애니메이션 웨이브 진행률 바 사용"
+  },
+  "Use colors extracted from album art instead of system theme colors": {
+    "Use colors extracted from album art instead of system theme colors": ""
   },
   "Use custom border size": {
     "Use custom border size": "사용자 지정 테두리 크기 사용"

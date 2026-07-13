@@ -3,7 +3,7 @@
     "%1 (+%2 more)": "%1（另有 %2 项）"
   },
   "%1 Animation Speed": {
-    "%1 Animation Speed": "%1动画速度"
+    "%1 Animation Speed": "%1 动画速度"
   },
   "%1 Sessions": {
     "%1 Sessions": "%1 个会话"
@@ -36,7 +36,7 @@
     "%1 copied": "已复制 RGB 颜色 %1"
   },
   "%1 custom animation duration": {
-    "%1 custom animation duration": "%1自定义动画持续时间"
+    "%1 custom animation duration": "%1 自定义动画持续时间"
   },
   "%1 disconnected": {
     "%1 disconnected": "%1 已断开连接"
@@ -57,7 +57,7 @@
     "%1 filtered": "已筛选 %1 个"
   },
   "%1 h %2 m left": {
-    "%1 h %2 m left": "剩余 %1 小时 %2 分钟"
+    "%1 h %2 m left": "剩余 %1 小时 %2 分"
   },
   "%1 h left": {
     "%1 h left": "剩余 %1 小时"
@@ -72,7 +72,7 @@
     "%1 issues found": "发现 %1 个问题"
   },
   "%1 min left": {
-    "%1 min left": "剩余 %1 分钟"
+    "%1 min left": "剩余 %1 分"
   },
   "%1 notifications": {
     "%1 notifications": "%1 条通知"
@@ -111,7 +111,7 @@
     "%1: %2": "%1: %2"
   },
   "%1m ago": {
-    "%1m ago": "%1 分钟前"
+    "%1m ago": "%1 分前"
   },
   "%command%": {
     "%command%": "%command%"
@@ -123,7 +123,7 @@
     "(Default)": "（默认）"
   },
   "(Unnamed)": {
-    "(Unnamed)": "(未命名)"
+    "(Unnamed)": "（未命名）"
   },
   "+ %1 more": {
     "+ %1 more": "+ %1 个更多"
@@ -144,31 +144,31 @@
     "1 hour": "1 小时"
   },
   "1 hour 30 minutes": {
-    "1 hour 30 minutes": "1 小时 30 分钟"
+    "1 hour 30 minutes": "1 小时 30 分"
   },
   "1 hour before": {
     "1 hour before": "1 小时前"
   },
   "1 minute": {
-    "1 minute": "1 分钟"
+    "1 minute": "1 分"
   },
   "1 notification": {
     "1 notification": "1 条通知"
   },
   "1 second": {
-    "1 second": "1 秒钟"
+    "1 second": "1 秒"
   },
   "1 task": {
     "1 task": "1 项任务"
   },
   "10 min before": {
-    "10 min before": "10 分钟前"
+    "10 min before": "10 分前"
   },
   "10 minutes": {
-    "10 minutes": "10 分钟"
+    "10 minutes": "10 分"
   },
   "10 seconds": {
-    "10 seconds": "10 秒钟"
+    "10 seconds": "10 秒"
   },
   "10-bit Color": {
     "10-bit Color": "10 位颜色"
@@ -180,16 +180,16 @@
     "14 days": "14 天"
   },
   "15 min": {
-    "15 min": "15 分钟"
+    "15 min": "15 分"
   },
   "15 min before": {
-    "15 min before": "15 分钟前"
+    "15 min before": "15 分前"
   },
   "15 minutes": {
-    "15 minutes": "15 分钟"
+    "15 minutes": "15 分"
   },
   "15 seconds": {
-    "15 seconds": "15 秒钟"
+    "15 seconds": "15 秒"
   },
   "180°": {
     "180°": "180°"
@@ -198,16 +198,16 @@
     "2 hours": "2 小时"
   },
   "2 minutes": {
-    "2 minutes": "2 分钟"
+    "2 minutes": "2 分"
   },
   "2 seconds": {
-    "2 seconds": "2 秒钟"
+    "2 seconds": "2 秒"
   },
   "20 minutes": {
-    "20 minutes": "20 分钟"
+    "20 minutes": "20 分"
   },
   "20 seconds": {
-    "20 seconds": "20 秒钟"
+    "20 seconds": "20 秒"
   },
   "24-Hour Format": {
     "24-Hour Format": "24 小时制"
@@ -216,7 +216,7 @@
     "24-hour clock": "24 小时制时钟"
   },
   "25 seconds": {
-    "25 seconds": "25 秒钟"
+    "25 seconds": "25 秒"
   },
   "250 ms": {
     "250 ms": "250 毫秒"
@@ -231,28 +231,28 @@
     "3 hours": "3 小时"
   },
   "3 minutes": {
-    "3 minutes": "3 分钟"
+    "3 minutes": "3 分"
   },
   "3 seconds": {
-    "3 seconds": "3 秒钟"
+    "3 seconds": "3 秒"
   },
   "30 days": {
     "30 days": "30 天"
   },
   "30 min": {
-    "30 min": "30 分钟"
+    "30 min": "30 分"
   },
   "30 min before": {
-    "30 min before": "30 分钟前"
+    "30 min before": "30 分前"
   },
   "30 minutes": {
-    "30 minutes": "30 分钟"
+    "30 minutes": "30 分"
   },
   "30 seconds": {
-    "30 seconds": "30 秒钟"
+    "30 seconds": "30 秒"
   },
   "35 seconds": {
-    "35 seconds": "35 秒钟"
+    "35 seconds": "35 秒"
   },
   "3rd party": {
     "3rd party": "第三方"
@@ -261,31 +261,31 @@
     "4 hours": "4 小时"
   },
   "4 seconds": {
-    "4 seconds": "4 秒钟"
+    "4 seconds": "4 秒"
   },
   "40 seconds": {
-    "40 seconds": "40 秒钟"
+    "40 seconds": "40 秒"
   },
   "45 seconds": {
-    "45 seconds": "45 秒钟"
+    "45 seconds": "45 秒"
   },
   "5 min before": {
-    "5 min before": "5 分钟前"
+    "5 min before": "5 分前"
   },
   "5 minutes": {
-    "5 minutes": "5 分钟"
+    "5 minutes": "5 分"
   },
   "5 seconds": {
-    "5 seconds": "5 秒钟"
+    "5 seconds": "5 秒"
   },
   "50 seconds": {
-    "50 seconds": "50 秒钟"
+    "50 seconds": "50 秒"
   },
   "500 ms": {
     "500 ms": "500 毫秒"
   },
   "55 seconds": {
-    "55 seconds": "55 秒钟"
+    "55 seconds": "55 秒"
   },
   "6 hours": {
     "6 hours": "6 小时"
@@ -300,7 +300,7 @@
     "8 hours": "8 小时"
   },
   "8 seconds": {
-    "8 seconds": "8 秒钟"
+    "8 seconds": "8 秒"
   },
   "90 days": {
     "90 days": "90 天"
@@ -354,7 +354,7 @@
     "Accepting": "正在接受"
   },
   "Access clipboard history": {
-    "Access clipboard history": "访问剪切板历史记录"
+    "Access clipboard history": "访问剪贴板历史记录"
   },
   "Access to notifications and do not disturb": {
     "Access to notifications and do not disturb": "访问通知与请勿打扰"
@@ -423,10 +423,10 @@
     "Add": "添加"
   },
   "Add \"%1\" to the %2 group?": {
-    "Add \"%1\" to the %2 group?": "将“%1” 添加到 %2 组吗？"
+    "Add \"%1\" to the %2 group?": "将“%1”添加到 %2 组吗？"
   },
   "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": {
-    "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": "将“%1” 添加到 %2 组吗？该用户必须注销并重新登录，然后运行 dms greeter sync --profile 以应用其登录屏幕主题。"
+    "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": "将“%1”添加到 %2 组吗？该用户必须注销并重新登录，然后运行 dms greeter sync --profile 以应用其登录屏幕主题。"
   },
   "Add Bar": {
     "Add Bar": "添加状态栏"
@@ -447,13 +447,13 @@
     "Add Widget": "添加部件"
   },
   "Add Widget to %1": {
-    "Add Widget to %1": "添加部件到%1"
+    "Add Widget to %1": "添加部件到 %1"
   },
   "Add Window Rule": {
     "Add Window Rule": "新建窗口规则"
   },
   "Add a border around the dock": {
-    "Add a border around the dock": "在程序坞周围添加边框"
+    "Add a border around the dock": "在 Dock 周围添加边框"
   },
   "Add a custom prefix to all application launches. This can be used for things like 'uwsm-app', 'systemd-run', or other command wrappers.": {
     "Add a custom prefix to all application launches. This can be used for things like 'uwsm-app', 'systemd-run', or other command wrappers.": "在所有应用启动前添加自定义前缀。可用于 uwsm-app、systemd-run 或其他命令封装器"
@@ -498,7 +498,7 @@
     "Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)": "调整生成颜色的对比度（-100 = 最小，0 = 标准，100 = 最大）"
   },
   "Administrator access is required. Use the Sync button in Settings → Greeter to apply.": {
-    "Administrator access is required. Use the Sync button in Settings → Greeter to apply.": ""
+    "Administrator access is required. Use the Sync button in Settings → Greeter to apply.": "需要管理员权限。请使用「设置 → Greeter」中的同步按钮进行应用。"
   },
   "Administrator group:": {
     "Administrator group:": "管理员组："
@@ -558,10 +558,10 @@
     "Always Show Percentage": "始终显示百分比"
   },
   "Always blur against the wallpaper, even with Xray off": {
-    "Always blur against the wallpaper, even with Xray off": ""
+    "Always blur against the wallpaper, even with Xray off": "即使关闭 Xray 也始终对壁纸进行模糊处理"
   },
   "Always hide the dock and reveal it when hovering near the dock area": {
-    "Always hide the dock and reveal it when hovering near the dock area": "总是隐藏程序坞，并在靠近它时显露"
+    "Always hide the dock and reveal it when hovering near the dock area": "总是隐藏 Dock，并在靠近它时显露"
   },
   "Always on icons": {
     "Always on icons": "始终显示的图标"
@@ -570,7 +570,7 @@
     "Always show a minimum of 3 workspaces, even if fewer are available": "即使不足也总是显示至少三个工作区"
   },
   "Always show the dock when niri's overview is open": {
-    "Always show the dock when niri's overview is open": "当 Niri 的概览打开时，也总是显示程序坞"
+    "Always show the dock when niri's overview is open": "当 Niri 的概览打开时，也总是显示 Dock"
   },
   "Always show when there's only one connected display": {
     "Always show when there's only one connected display": "当仅连接一个显示器时，总是显示"
@@ -582,7 +582,7 @@
     "Amount": "数量"
   },
   "An xray rule at %1 may conflict with the Xray settings below": {
-    "An xray rule at %1 may conflict with the Xray settings below": ""
+    "An xray rule at %1 may conflict with the Xray settings below": "%1 处的 Xray 规则可能与下方 Xray 设置冲突"
   },
   "Analog": {
     "Analog": "模拟式"
@@ -651,7 +651,7 @@
     "Application": "应用程序"
   },
   "Application Dock": {
-    "Application Dock": "程序坞"
+    "Application Dock": "应用 Dock"
   },
   "Applications": {
     "Applications": "应用程序"
@@ -669,7 +669,7 @@
     "Apply GTK Colors": "应用 GTK 配色"
   },
   "Apply Qt Colors": {
-    "Apply Qt Colors": "应用 QT 配色"
+    "Apply Qt Colors": "应用 Qt 配色"
   },
   "Apply compositor blur behind the frame border": {
     "Apply compositor blur behind the frame border": "在框架边框后面应用合成器模糊"
@@ -693,10 +693,10 @@
     "Apps": "应用"
   },
   "Apps Dock": {
-    "Apps Dock": "程序坞"
+    "Apps Dock": "应用 Dock"
   },
   "Apps Dock Settings": {
-    "Apps Dock Settings": "程序坞设置"
+    "Apps Dock Settings": "应用 Dock 设置"
   },
   "Apps Icon": {
     "Apps Icon": "应用图标"
@@ -717,7 +717,7 @@
     "Architecture": "架构"
   },
   "Are you sure you want to kill session \"%1\"?": {
-    "Are you sure you want to kill session \"%1\"?": "确认要结束会话“%1” 吗？"
+    "Are you sure you want to kill session \"%1\"?": "确认要结束会话“%1”吗？"
   },
   "Arrange displays and configure resolution, refresh rate, and VRR": {
     "Arrange displays and configure resolution, refresh rate, and VRR": "排列显示器，配置分辨率、刷新率和 VRR"
@@ -819,7 +819,7 @@
     "Auto (Bar-aware)": "自动（感知状态栏）"
   },
   "Auto (Wide)": {
-    "Auto (Wide)": "自动（宽角）"
+    "Auto (Wide)": "自动（宽色域）"
   },
   "Auto Compositor Gaps": {
     "Auto Compositor Gaps": "自动合成器间隙"
@@ -837,13 +837,13 @@
     "Auto Power Saver": "自动省电"
   },
   "Auto matches bar spacing; Off leaves gaps to your Hyprland config": {
-    "Auto matches bar spacing; Off leaves gaps to your Hyprland config": ""
+    "Auto matches bar spacing; Off leaves gaps to your Hyprland config": "自动匹配状态栏间距；关闭则使用 Hyprland 配置的间距"
   },
   "Auto matches bar spacing; Off leaves gaps to your MangoWC config": {
-    "Auto matches bar spacing; Off leaves gaps to your MangoWC config": ""
+    "Auto matches bar spacing; Off leaves gaps to your MangoWC config": "自动匹配状态栏间距；关闭则使用 MangoWC 配置的间距"
   },
   "Auto matches bar spacing; Off leaves gaps to your niri config": {
-    "Auto matches bar spacing; Off leaves gaps to your niri config": ""
+    "Auto matches bar spacing; Off leaves gaps to your niri config": "自动匹配状态栏间距；关闭则使用 niri 配置的间距"
   },
   "Auto mode is on. Manual profile selection is disabled.": {
     "Auto mode is on. Manual profile selection is disabled.": "自动模式已开启。手动选择配置已禁用。"
@@ -867,13 +867,13 @@
     "Auto-hide": "自动隐藏"
   },
   "Auto-hide Dock": {
-    "Auto-hide Dock": "自动隐藏程序坞"
+    "Auto-hide Dock": "自动隐藏 Dock"
   },
   "Auto-login": {
     "Auto-login": "自动登录"
   },
   "Auto-login change needs a sync": {
-    "Auto-login change needs a sync": ""
+    "Auto-login change needs a sync": "自动登录更改需要同步"
   },
   "Auto-login disabled": {
     "Auto-login disabled": "已禁用自动登录"
@@ -903,7 +903,7 @@
     "Automatic Color Mode": "自动颜色模式"
   },
   "Automatic Control": {
-    "Automatic Control": "自动切换"
+    "Automatic Control": "自动控制"
   },
   "Automatic Cycling": {
     "Automatic Cycling": "自动轮换"
@@ -966,7 +966,7 @@
     "Available Screens (%1)": "可用屏幕（%1）"
   },
   "Available Updates (%1)": {
-    "Available Updates (%1)": ""
+    "Available Updates (%1)": "可用更新 (%1)"
   },
   "Available in Detailed and Forecast view modes": {
     "Available in Detailed and Forecast view modes": "提供详细视图和预测视图两种模式"
@@ -1065,7 +1065,7 @@
     "Battery %1": "剩余电量 %1"
   },
   "Battery Alerts": {
-    "Battery Alerts": ""
+    "Battery Alerts": "电池提醒"
   },
   "Battery Charge Limit": {
     "Battery Charge Limit": "电池充电限制"
@@ -1077,7 +1077,7 @@
     "Battery Power": "电池电量"
   },
   "Battery Protection": {
-    "Battery Protection": ""
+    "Battery Protection": "电池保护"
   },
   "Battery Protection & Charging": {
     "Battery Protection & Charging": "电池保护与充电"
@@ -1122,10 +1122,10 @@
     "Bit Depth": "位深"
   },
   "Black": {
-    "Black": "黑体"
+    "Black": "粗黑"
   },
   "Blend between Surface High and the selected custom color": {
-    "Blend between Surface High and the selected custom color": ""
+    "Blend between Surface High and the selected custom color": "在 Surface High 与所选自定义颜色之间混合"
   },
   "Block Out": {
     "Block Out": "阻止捕获"
@@ -1176,7 +1176,7 @@
     "Blur wallpaper when niri overview is open": "打开 Niri 概览时模糊壁纸"
   },
   "Blurred surfaces show the wallpaper instead of the content beneath": {
-    "Blurred surfaces show the wallpaper instead of the content beneath": ""
+    "Blurred surfaces show the wallpaper instead of the content beneath": "模糊表面显示壁纸而非下方内容"
   },
   "Body": {
     "Body": "主体"
@@ -1215,7 +1215,7 @@
     "Border color around blurred surfaces": "模糊平面周围的边框颜色"
   },
   "Border color around popouts, modals, and other shell surfaces": {
-    "Border color around popouts, modals, and other shell surfaces": ""
+    "Border color around popouts, modals, and other shell surfaces": "弹出窗口、模态框及其他 Shell 表面周围的边框颜色"
   },
   "Border w/ Bg": {
     "Border w/ Bg": "边框带背景"
@@ -1239,7 +1239,7 @@
     "Bottom Section": "底部区域"
   },
   "Bottom dock for pinned and running applications": {
-    "Bottom dock for pinned and running applications": "显示已固定和运行中应用的程序坞"
+    "Bottom dock for pinned and running applications": "显示已固定和运行中应用的 Dock"
   },
   "Brightness": {
     "Brightness": "亮度"
@@ -1275,7 +1275,7 @@
     "Button Color": "按钮颜色"
   },
   "By %1": {
-    "By %1": ""
+    "By %1": "来自 %1"
   },
   "CPU": {
     "CPU": "CPU"
@@ -1416,10 +1416,10 @@
     "Check on startup": "启动时检查"
   },
   "Check sync status on demand. Sync (full) is for the main admin: it copies your theme to the login screen and sets up system greeter config. On multi-user systems, add other accounts in Settings → Users, then have each of them run dms greeter sync --profile after logging out and back in—not full sync. Authentication changes apply automatically.": {
-    "Check sync status on demand. Sync (full) is for the main admin: it copies your theme to the login screen and sets up system greeter config. On multi-user systems, add other accounts in Settings → Users, then have each of them run dms greeter sync --profile after logging out and back in—not full sync. Authentication changes apply automatically.": "按需检查同步状态。“同步（完整）”供主管理员使用：它会将你的主题复制到登录屏幕，并设置系统登录界面配置。在多用户系统上，请在“设置” → “用户”中添加其他账户，然后让各用户注销并重新登录后运行 dms greeter sync --profile，而不是执行完整同步。认证变更会自动应用。"
+    "Check sync status on demand. Sync (full) is for the main admin: it copies your theme to the login screen and sets up system greeter config. On multi-user systems, add other accounts in Settings → Users, then have each of them run dms greeter sync --profile after logging out and back in—not full sync. Authentication changes apply automatically.": "按需检查同步状态。「同步（完整）」供主管理员使用：它会将你的主题复制到登录屏幕，并设置系统登录界面配置。在多用户系统上，请在「设置 → 用户」中添加其他账户，然后让各用户注销并重新登录后运行 dms greeter sync --profile，而不是执行完整同步。认证变更会自动应用。"
   },
   "Check your custom command in Settings → Dock → Trash.": {
-    "Check your custom command in Settings → Dock → Trash.": "在“设置” → “程序坞” → “回收站”中检查你的自定义命令。"
+    "Check your custom command in Settings → Dock → Trash.": "在「设置 → Dock → 回收站」中检查你的自定义命令。"
   },
   "Checking for updates...": {
     "Checking for updates...": "正在检查更新..."
@@ -1437,7 +1437,7 @@
     "Choose Dark Mode Color": "选择深色模式颜色"
   },
   "Choose Dock Launcher Logo Color": {
-    "Choose Dock Launcher Logo Color": "选择程序坞启动器 Logo 颜色"
+    "Choose Dock Launcher Logo Color": "选择 Dock 启动器 Logo 颜色"
   },
   "Choose Launcher Logo Color": {
     "Choose Launcher Logo Color": "设置启动器 Logo 颜色"
@@ -1467,13 +1467,13 @@
     "Choose how to be notified about battery alerts.": "选择电量警报通知方式"
   },
   "Choose how to be notified about critical battery alerts.": {
-    "Choose how to be notified about critical battery alerts.": ""
+    "Choose how to be notified about critical battery alerts.": "选择关键电池警报的通知方式。"
   },
   "Choose how to be notified about low battery alerts.": {
-    "Choose how to be notified about low battery alerts.": ""
+    "Choose how to be notified about low battery alerts.": "选择低电量警报的通知方式。"
   },
   "Choose how to be notified when charge limit is reached.": {
-    "Choose how to be notified when charge limit is reached.": ""
+    "Choose how to be notified when charge limit is reached.": "选择充电限制达到时的通知方式。"
   },
   "Choose icon": {
     "Choose icon": "选择图标"
@@ -1482,7 +1482,7 @@
     "Choose monochrome or a theme color tint for system tray icons": "为系统托盘图标选择单色或主题色调"
   },
   "Choose neutral or accent-colored widget text": {
-    "Choose neutral or accent-colored widget text": ""
+    "Choose neutral or accent-colored widget text": "选择中性色或强调色部件文字"
   },
   "Choose the background color for widgets": {
     "Choose the background color for widgets": "选择部件背景色"
@@ -1506,16 +1506,16 @@
     "Choose whether to launch a desktop app or a command": "选择需要启动的桌面应用程序或命令"
   },
   "Choose which action buttons appear on clipboard entries": {
-    "Choose which action buttons appear on clipboard entries": "剪切板项目上显示的操作按钮"
+    "Choose which action buttons appear on clipboard entries": "剪贴板项目上显示的操作按钮"
   },
   "Choose which displays show this widget": {
-    "Choose which displays show this widget": "选择要在哪个显示器显示该小部件"
+    "Choose which displays show this widget": "选择要在哪个显示器显示该部件"
   },
   "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": {
-    "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": ""
+    "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": "选择哪些显示器显示锁屏界面。其他显示器将显示纯色以防止 OLED 烧屏。"
   },
   "Chroma Style": {
-    "Chroma Style": "浓度风格"
+    "Chroma Style": "色度风格"
   },
   "Cipher": {
     "Cipher": "密码"
@@ -1551,7 +1551,7 @@
     "Clear at Startup": "启动时清除"
   },
   "Click 'Setup' to create %1 and add include to your compositor config.": {
-    "Click 'Setup' to create %1 and add include to your compositor config.": "点击“设置”以创建%1配置，并添加引用至合成器配置文件。"
+    "Click 'Setup' to create %1 and add include to your compositor config.": "点击“设置”以创建 %1 配置，并添加引用至合成器配置文件。"
   },
   "Click 'Setup' to create the outputs config and add include to your compositor config.": {
     "Click 'Setup' to create the outputs config and add include to your compositor config.": "点击“设置”以创建输出配置，并添加引用至合成器配置文件。"
@@ -1587,22 +1587,22 @@
     "Clip to Geometry": "裁剪至几何形"
   },
   "Clipboard": {
-    "Clipboard": "剪切板"
+    "Clipboard": "剪贴板"
   },
   "Clipboard History": {
-    "Clipboard History": "剪切板历史记录"
+    "Clipboard History": "剪贴板历史记录"
   },
   "Clipboard Manager": {
-    "Clipboard Manager": "剪切板管理器"
+    "Clipboard Manager": "剪贴板管理器"
   },
   "Clipboard Saved": {
     "Clipboard Saved": "剪贴板已保存"
   },
   "Clipboard sent": {
-    "Clipboard sent": "已发送剪切板"
+    "Clipboard sent": "已发送剪贴板"
   },
   "Clipboard works but nothing saved to disk": {
-    "Clipboard works but nothing saved to disk": "剪切板正常工作但无存入磁盘内容"
+    "Clipboard works but nothing saved to disk": "剪贴板正常工作但无存入磁盘内容"
   },
   "Clock": {
     "Clock": "时钟"
@@ -1626,7 +1626,7 @@
     "Close Window": "关闭窗口"
   },
   "Codec switching is unavailable because pactl was not found": {
-    "Codec switching is unavailable because pactl was not found": ""
+    "Codec switching is unavailable because pactl was not found": "找不到 pactl，无法切换编解码器"
   },
   "Color": {
     "Color": "颜色"
@@ -1662,7 +1662,7 @@
     "Color shown for areas not covered by wallpaper": "未被壁纸覆盖区域显示的颜色"
   },
   "Color shown for areas not covered by wallpaper (e.g. Fit or Pad modes)": {
-    "Color shown for areas not covered by wallpaper (e.g. Fit or Pad modes)": ""
+    "Color shown for areas not covered by wallpaper (e.g. Fit or Pad modes)": "壁纸未覆盖区域显示的颜色（例如适应或填充模式）"
   },
   "Color temperature for day time": {
     "Color temperature for day time": "白天模式色温"
@@ -1767,7 +1767,7 @@
     "Configure match criteria and actions": "配置匹配条件与动作"
   },
   "Configure one in Settings → Dock → Trash.": {
-    "Configure one in Settings → Dock → Trash.": "在“设置” → “程序坞” → “回收站”中进行设置。"
+    "Configure one in Settings → Dock → Trash.": "在「设置 → Dock → 回收站」中进行设置。"
   },
   "Configure which displays show \"%1": {
     "Configure which displays show \"%1\"": "配置要显示“%1” 的显示器"
@@ -1827,7 +1827,7 @@
     "Connecting to Device": "正在连接设备"
   },
   "Connecting to clipboard service...": {
-    "Connecting to clipboard service...": "正在连接至剪切板服务..."
+    "Connecting to clipboard service...": "正在连接至剪贴板服务..."
   },
   "Connecting...": {
     "Connecting...": "正在连接..."
@@ -1917,7 +1917,7 @@
     "Controls the outer edge of protocol-blurred windows": "控制协议模糊窗口的边缘"
   },
   "Controls the outline of popouts, modals, and other shell surfaces": {
-    "Controls the outline of popouts, modals, and other shell surfaces": ""
+    "Controls the outline of popouts, modals, and other shell surfaces": "控制弹出窗口、模态框及其他 Shell 表面的轮廓"
   },
   "Controls the transparency of the shadow": {
     "Controls the transparency of the shadow": "控制阴影的透明度"
@@ -1941,10 +1941,10 @@
     "Copied WebP": "已复制的 WebP"
   },
   "Copied to clipboard": {
-    "Copied to clipboard": "已复制到剪切板"
+    "Copied to clipboard": "已复制到剪贴板"
   },
   "Copied!": {
-    "Copied!": "复制成功！"
+    "Copied!": "已复制！"
   },
   "Copy": {
     "Copy": "复制"
@@ -2004,7 +2004,7 @@
     "Create Window Rule": "创建窗口规则"
   },
   "Create a new %1 session (^N)": {
-    "Create a new %1 session (^N)": ""
+    "Create a new %1 session (^N)": "创建新 %1 会话 (^N)"
   },
   "Create a new %1 session (n)": {
     "Create a new %1 session (n)": "创建新的 %1 会话（n）"
@@ -2040,7 +2040,7 @@
     "Critical Threshold": "警报阈值"
   },
   "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": {
-    "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": "Ctrl+A：全选 • Ctrl+P：预览 • Enter/Shift+Enter：查找下一个/上一个 • ESC：关闭"
+    "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": "Ctrl+A：全选 • Ctrl+P：预览 • Enter/Shift+Enter：查找下一个/上一个 • Esc：关闭"
   },
   "Ctrl+S: Save • Ctrl+O: Open • Ctrl+N: New • Ctrl+F: Find": {
     "Ctrl+S: Save • Ctrl+O: Open • Ctrl+N: New • Ctrl+F: Find": "Ctrl+S：保存 • Ctrl+O：打开 • Ctrl+N：新建 • Ctrl+F：查找"
@@ -2109,7 +2109,7 @@
     "Custom": "自定义"
   },
   "Custom Blend": {
-    "Custom Blend": ""
+    "Custom Blend": "自定义混合"
   },
   "Custom Color": {
     "Custom Color": "自定义颜色"
@@ -2175,7 +2175,7 @@
     "Customizable empty space": "可调节留白"
   },
   "Customize the font and background of the lock screen, or leave empty to use your theme font and desktop wallpaper. Changes apply instantly.": {
-    "Customize the font and background of the lock screen, or leave empty to use your theme font and desktop wallpaper. Changes apply instantly.": ""
+    "Customize the font and background of the lock screen, or leave empty to use your theme font and desktop wallpaper. Changes apply instantly.": "自定义锁屏字体和背景，留空则使用主题字体和桌面壁纸。更改即时生效。"
   },
   "Customize which actions appear in the power menu": {
     "Customize which actions appear in the power menu": "自定义电源菜单选项"
@@ -2214,7 +2214,7 @@
     "DMS server is outdated (API v%1, expected v%2)": "DMS 服务器版本过旧（API v%1，应为 v%2）"
   },
   "DMS service is not connected. Clipboard settings are unavailable.": {
-    "DMS service is not connected. Clipboard settings are unavailable.": "DMS 服务未连接。剪切板设置不可用。"
+    "DMS service is not connected. Clipboard settings are unavailable.": "DMS 服务未连接。剪贴板设置不可用。"
   },
   "DMS shell actions (launcher, clipboard, etc.)": {
     "DMS shell actions (launcher, clipboard, etc.)": "DMS Shell 操作（启动器、剪贴板等）"
@@ -2235,7 +2235,7 @@
     "Dank Bar": "Dank 状态栏"
   },
   "Dank Bar Xray": {
-    "Dank Bar Xray": ""
+    "Dank Bar Xray": "Dank 状态栏 Xray"
   },
   "Dank Dash": {
     "Dank Dash": "Dank 面板"
@@ -2256,7 +2256,7 @@
     "DankMaterialShell is ready to use": "DankMaterialShell 现已可用"
   },
   "DankShell & System Icons (requires restart)": {
-    "DankShell & System Icons (requires restart)": "DankShell 和系统图标 (需要重启)"
+    "DankShell & System Icons (requires restart)": "DankShell 和系统图标 （需要重启）"
   },
   "Dark Mode": {
     "Dark Mode": "深色模式"
@@ -2289,7 +2289,7 @@
     "Dawn (Nautical Twilight)": "黎明（航海晨光）"
   },
   "Day Date": {
-    "Day Date": "周 日"
+    "Day Date": "星期 日期"
   },
   "Day Month Date": {
     "Day Month Date": "周 月 日"
@@ -2352,7 +2352,7 @@
     "Delete": "删除"
   },
   "Delete \"%1\" and remove the home directory? This cannot be undone.": {
-    "Delete \"%1\" and remove the home directory? This cannot be undone.": "确认删除“%1” 并移除主目录？此操作无法撤销。"
+    "Delete \"%1\" and remove the home directory? This cannot be undone.": "确认删除“%1”并移除主目录？此操作无法撤销。"
   },
   "Delete \"%1\"?": {
     "Delete \"%1\"?": "删除“%1” 吗？"
@@ -2427,7 +2427,7 @@
     "Detailed": "详细"
   },
   "Details for \"%1": {
-    "Details for \"%1\"": "“%1” 的详细信息"
+    "Details for \"%1\"": "“%1”的详细信息"
   },
   "Detected backends: %1": {
     "Detected backends: %1": "检测到后端：%1"
@@ -2454,7 +2454,7 @@
     "Device unpaired": "设备已取消配对"
   },
   "Diff": {
-    "Diff": ""
+    "Diff": "差异"
   },
   "Digital": {
     "Digital": "数字式"
@@ -2550,7 +2550,7 @@
     "Display Settings": "显示设置"
   },
   "Display a dock with pinned and running applications": {
-    "Display a dock with pinned and running applications": "显示带有固定和运行中应用程序的程序坞"
+    "Display a dock with pinned and running applications": "显示带有固定和运行中应用程序的 Dock"
   },
   "Display all priorities over fullscreen apps": {
     "Display all priorities over fullscreen apps": "应用全屏时仍显示所有优先级的通知"
@@ -2607,7 +2607,7 @@
     "Displays the active keyboard layout and allows switching": "显示当前键盘布局并支持切换"
   },
   "Distribution": {
-    "Distribution": "发行"
+    "Distribution": "发行版"
   },
   "Diverse palette spanning the full spectrum.": {
     "Diverse palette spanning the full spectrum.": "多元配色，覆盖全面"
@@ -2616,25 +2616,25 @@
     "Do Not Disturb": "勿扰模式"
   },
   "Dock": {
-    "Dock": "程序坞"
+    "Dock": "Dock"
   },
   "Dock & Launcher": {
-    "Dock & Launcher": "程序坞和启动器"
+    "Dock & Launcher": "Dock 和启动器"
   },
   "Dock Opacity": {
-    "Dock Opacity": "程序坞不透明度"
+    "Dock Opacity": "Dock 不透明度"
   },
   "Dock Visibility": {
-    "Dock Visibility": "程序坞可见性"
+    "Dock Visibility": "Dock 可见性"
   },
   "Dock margin, opacity, and border": {
-    "Dock margin, opacity, and border": "程序坞边距、不透明度和边框"
+    "Dock margin, opacity, and border": "Dock 边距、不透明度和边框"
   },
   "Dock margin, transparency, and border": {
-    "Dock margin, transparency, and border": "程序坞边距、透明度和边框"
+    "Dock margin, transparency, and border": "Dock 边距、透明度和边框"
   },
   "Dock window": {
-    "Dock window": ""
+    "Dock window": "Dock 窗口"
   },
   "Docs": {
     "Docs": "文档"
@@ -2715,7 +2715,7 @@
     "Dynamic Theming": "动态主题"
   },
   "Dynamic Width": {
-    "Dynamic Width": ""
+    "Dynamic Width": "动态宽度"
   },
   "Dynamic colors from wallpaper": {
     "Dynamic colors from wallpaper": "从壁纸选取的动态色"
@@ -2730,7 +2730,7 @@
     "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": "动态：带有过冲的弹簧贝塞尔——进场短暂超出目标后稳定。富有表现力，充满生命力。"
   },
   "Edge Hover Reveal": {
-    "Edge Hover Reveal": ""
+    "Edge Hover Reveal": "边缘悬停显示"
   },
   "Edge Spacing": {
     "Edge Spacing": "边缘间距"
@@ -2901,7 +2901,7 @@
     "Enter URI or text to share": "输入 URI 或文本以分享"
   },
   "Enter a new name for session \"%1": {
-    "Enter a new name for session \"%1\"": "为会话“%1” 设置新名称"
+    "Enter a new name for session \"%1\"": "为会话“%1”设置新名称"
   },
   "Enter a new name for this workspace": {
     "Enter a new name for this workspace": "为此工作区键入新名称"
@@ -2973,10 +2973,10 @@
     "Event title": "事务标题"
   },
   "Every 15 minutes": {
-    "Every 15 minutes": "每 15 分钟"
+    "Every 15 minutes": "每 15 分"
   },
   "Every 30 minutes": {
-    "Every 30 minutes": "每 30 分钟"
+    "Every 30 minutes": "每 30 分"
   },
   "Every 4 hours": {
     "Every 4 hours": "每 4 小时"
@@ -2988,7 +2988,7 @@
     "Exact": "精确"
   },
   "Excluded Media Players": {
-    "Excluded Media Players": ""
+    "Excluded Media Players": "排除的媒体播放器"
   },
   "Exclusive Zone Offset": {
     "Exclusive Zone Offset": "独占区域偏移量"
@@ -2997,7 +2997,7 @@
     "Existing Users": "现有用户"
   },
   "Exit node": {
-    "Exit node": "退出节点"
+    "Exit node": "出口节点"
   },
   "Experimental Feature": {
     "Experimental Feature": "实验性功能"
@@ -3060,7 +3060,7 @@
     "Failed to apply GTK colors": "应用 GTK 配色失败"
   },
   "Failed to apply Qt colors": {
-    "Failed to apply Qt colors": "应用 QT 配色失败"
+    "Failed to apply Qt colors": "应用 Qt 配色失败"
   },
   "Failed to apply charge limit to system": {
     "Failed to apply charge limit to system": "充电限制应用到系统失败"
@@ -3078,7 +3078,7 @@
     "Failed to cancel selected job": "取消所选的任务失败"
   },
   "Failed to check pin limit": {
-    "Failed to check pin limit": "检查固定限制失败"
+    "Failed to check pin limit": "检查固定项目限制失败"
   },
   "Failed to connect VPN": {
     "Failed to connect VPN": "连接 VPN 失败"
@@ -3114,7 +3114,7 @@
     "Failed to disconnect VPN": "断开 VPN 失败"
   },
   "Failed to disconnect VPNs": {
-    "Failed to disconnect VPNs": "断开 VPN 失败"
+    "Failed to disconnect VPNs": "断开所有 VPN 失败"
   },
   "Failed to disconnect WiFi": {
     "Failed to disconnect WiFi": "断开 Wi-Fi 连接失败"
@@ -3156,7 +3156,7 @@
     "Failed to load VPN config": "加载 VPN 配置失败"
   },
   "Failed to load clipboard configuration.": {
-    "Failed to load clipboard configuration.": "读取剪切板配置失败"
+    "Failed to load clipboard configuration.": "读取剪贴板配置失败"
   },
   "Failed to move job": {
     "Failed to move job": "移动任务失败"
@@ -3219,13 +3219,13 @@
     "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": "运行 'dms greeter status' 失败。确保 DMS 已安装，且 dms 已在 PATH 中。"
   },
   "Failed to save VPN credentials": {
-    "Failed to save VPN credentials": "保存 VPN 证书失败"
+    "Failed to save VPN credentials": "保存 VPN 凭据失败"
   },
   "Failed to save audio config": {
     "Failed to save audio config": "音频配置保存失败"
   },
   "Failed to save clipboard setting": {
-    "Failed to save clipboard setting": "保存剪切板设置失败"
+    "Failed to save clipboard setting": "保存剪贴板设置失败"
   },
   "Failed to save keybind": {
     "Failed to save keybind": "保存按键绑定失败"
@@ -3237,7 +3237,7 @@
     "Failed to send SMS": "发送短信失败"
   },
   "Failed to send clipboard": {
-    "Failed to send clipboard": "发送剪切板失败"
+    "Failed to send clipboard": "发送剪贴板失败"
   },
   "Failed to send file": {
     "Failed to send file": "发送文件失败"
@@ -3276,7 +3276,7 @@
     "Failed to unpin entry": "取消固定项目失败"
   },
   "Failed to update %1: %2": {
-    "Failed to update %1: %2": ""
+    "Failed to update %1: %2": "更新 %1 失败：%2"
   },
   "Failed to update VPN": {
     "Failed to update VPN": "更新 VPN 失败"
@@ -3312,7 +3312,7 @@
     "Features": "功能"
   },
   "Feels": {
-    "Feels": "感官"
+    "Feels": "体感"
   },
   "Feels Like": {
     "Feels Like": "体感温度"
@@ -3363,7 +3363,7 @@
     "Fill": "填充"
   },
   "Fill Mode": {
-    "Fill Mode": ""
+    "Fill Mode": "填充模式"
   },
   "Filter": {
     "Filter": "筛选"
@@ -3468,7 +3468,7 @@
     "Focused Color": "聚焦颜色"
   },
   "Focused Display": {
-    "Focused Display": ""
+    "Focused Display": "焦点显示器"
   },
   "Focused Monitor Only": {
     "Focused Monitor Only": "仅聚焦的显示器"
@@ -3513,7 +3513,7 @@
     "Font Weight": "字体粗细"
   },
   "Font used for the clock and date on the lock screen": {
-    "Font used for the clock and date on the lock screen": ""
+    "Font used for the clock and date on the lock screen": "锁屏时钟和日期使用的字体"
   },
   "Font used on the login screen": {
     "Font used on the login screen": "登录界面使用的字体"
@@ -3522,13 +3522,13 @@
     "For 1 hour": "1 小时"
   },
   "For 15 minutes": {
-    "For 15 minutes": "15 分钟"
+    "For 15 minutes": "15 分"
   },
   "For 3 hours": {
     "For 3 hours": "3 小时"
   },
   "For 30 minutes": {
-    "For 30 minutes": "30 分钟"
+    "For 30 minutes": "30 分"
   },
   "For 8 hours": {
     "For 8 hours": "8 小时"
@@ -3546,7 +3546,7 @@
     "Force Kill (SIGKILL)": "强制结束（SIGKILL）"
   },
   "Force Padding": {
-    "Force Padding": ""
+    "Force Padding": "强制内边距"
   },
   "Force RGBX": {
     "Force RGBX": "强制 RGBX"
@@ -3561,13 +3561,13 @@
     "Forecast": "预测"
   },
   "Forecast Days": {
-    "Forecast Days": "天气预测"
+    "Forecast Days": "预测天数"
   },
   "Forecast Not Available": {
     "Forecast Not Available": "暂无预报"
   },
   "Forecast and conditions": {
-    "Forecast and conditions": ""
+    "Forecast and conditions": "预报与天气状况"
   },
   "Foreground Layers": {
     "Foreground Layers": "前景层"
@@ -3594,7 +3594,7 @@
     "Format Legend": "参考格式"
   },
   "Forward 10s": {
-    "Forward 10s": "快进 10 秒钟"
+    "Forward 10s": "快进 10 秒"
   },
   "Frame": {
     "Frame": "框架"
@@ -3609,10 +3609,10 @@
     "Frame Border Color": "框架边框颜色"
   },
   "Frame Xray": {
-    "Frame Xray": ""
+    "Frame Xray": "框架 Xray"
   },
   "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": {
-    "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": "启动器关闭时释放显存/内存。重新打开时可能会有轻微延迟"
+    "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": "启动器关闭时释放显存/内存。重新打开时可能会有轻微延迟。"
   },
   "Freezing Drizzle": {
     "Freezing Drizzle": "冰冷细雨"
@@ -3636,13 +3636,13 @@
     "Full Day & Month": "周 月 日（全称）"
   },
   "Full Size": {
-    "Full Size": ""
+    "Full Size": "全尺寸"
   },
   "Full command to execute": {
     "Full command to execute": "要执行的完整命令"
   },
   "Full with Year": {
-    "Full with Year": "周 日 月 年"
+    "Full with Year": "星期 日期 年份"
   },
   "Fullscreen": {
     "Fullscreen": "全屏"
@@ -3675,7 +3675,7 @@
     "GTK colors applied successfully": "GTK 配色已成功应用"
   },
   "GTK, Qt, IDEs, more": {
-    "GTK, Qt, IDEs, more": "GTK、QT、IDE 等"
+    "GTK, Qt, IDEs, more": "GTK、Qt、IDE 等"
   },
   "Games": {
     "Games": "游戏"
@@ -3687,19 +3687,22 @@
     "Gamma control not available. Requires DMS API v6+.": "伽玛控制不可用，需要 DMS API v6+。"
   },
   "Gap between the end widgets and the bar ends (0 = edge-to-edge)": {
-    "Gap between the end widgets and the bar ends (0 = edge-to-edge)": "两端部件与状态栏之间的间隙（ 0 = 边靠边）"
+    "Gap between the end widgets and the bar ends (0 = edge-to-edge)": "两端部件与状态栏之间的间隙（0 = 边靠边）"
   },
   "Gaps": {
-    "Gaps": ""
+    "Gaps": "间距"
   },
   "Generate Override": {
     "Generate Override": "生成 Override"
   },
   "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.": {
-    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.": "生成遵循 DMS 颜色的 GTK3/GTK4 或 QT5/QT6（需要 qt6ct-kde）基线配置。仅需执行一次。<br /><br />建议在应用 GTK 主题前先配置 <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a>。"
+    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.": "生成遵循 DMS 颜色的 GTK3/GTK4 或 Qt5/Qt6（需要 qt6ct-kde）基线配置。仅需执行一次。<br /><br />建议在应用 GTK 主题前先配置 <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a>。"
   },
   "Generic": {
     "Generic": "通用"
+  },
+  "Geometric Centering": {
+    "Geometric Centering": ""
   },
   "Get Started": {
     "Get Started": "开始使用"
@@ -3708,7 +3711,7 @@
     "GitHub": "GitHub"
   },
   "Global fonts can be configured in Settings → Personalization": {
-    "Global fonts can be configured in Settings → Personalization": "可在“设置 → 个性化”中配置全局字体"
+    "Global fonts can be configured in Settings → Personalization": "可在「设置 → 个性化」中配置全局字体"
   },
   "Globally scale all animation durations": {
     "Globally scale all animation durations": "全局缩放所有动画持续时间"
@@ -3723,7 +3726,7 @@
     "Goth Corner Radius": "哥特圆角半径"
   },
   "Goth Corners": {
-    "Goth Corners": "哥特风格圆角"
+    "Goth Corners": "Goth 圆角"
   },
   "Gradually fade the screen before locking with a configurable grace period": {
     "Gradually fade the screen before locking with a configurable grace period": "通过配置的宽限期逐步过渡屏幕到锁屏"
@@ -3783,7 +3786,7 @@
     "Greeter only — format for the date on the login screen": "仅登录界面 - 登录屏幕上的日期格式"
   },
   "Greeter sync complete": {
-    "Greeter sync complete": ""
+    "Greeter sync complete": "Greeter 同步完成"
   },
   "Grid": {
     "Grid": "网格"
@@ -3837,7 +3840,10 @@
     "HSV %1 copied": "已复制 HSV 颜色 %1"
   },
   "HTML copied to clipboard": {
-    "HTML copied to clipboard": "HTML 已复制到剪切板"
+    "HTML copied to clipboard": "HTML 已复制到剪贴板"
+  },
+  "Handles geo: location links": {
+    "Handles geo: location links": ""
   },
   "Handles links and opens HTML files": {
     "Handles links and opens HTML files": "处理链接并打开 HTML 文件"
@@ -3888,7 +3894,7 @@
     "Hidden apps won't appear in the launcher. Right-click an app and select 'Hide App' to hide it.": "已隐藏应用不会出现在启动器中。右键应用选择“隐藏应用”以隐藏。"
   },
   "Hidden until weather is enabled": {
-    "Hidden until weather is enabled": ""
+    "Hidden until weather is enabled": "启用天气前隐藏"
   },
   "Hide": {
     "Hide": "隐藏"
@@ -3939,10 +3945,10 @@
     "Hide the bar when the pointer leaves even if a popout is still open": "即使弹窗仍打开，指针离开时也隐藏状态栏"
   },
   "Hide when no updates: OFF": {
-    "Hide when no updates: OFF": ""
+    "Hide when no updates: OFF": "无更新时隐藏：关闭"
   },
   "Hide when no updates: ON": {
-    "Hide when no updates: ON": ""
+    "Hide when no updates: ON": "无更新时隐藏：开启"
   },
   "High": {
     "High": "高"
@@ -4011,7 +4017,7 @@
     "Hourly Forecast Count": "每小时预测计数"
   },
   "Hover Popouts": {
-    "Hover Popouts": ""
+    "Hover Popouts": "悬停弹出"
   },
   "How often the server polls for new updates.": {
     "How often the server polls for new updates.": "服务器多久轮询一次更新。"
@@ -4023,7 +4029,7 @@
     "How the background image is scaled": "背景图片如何缩放"
   },
   "How the wallpaper is scaled to fit the screen": {
-    "How the wallpaper is scaled to fit the screen": ""
+    "How the wallpaper is scaled to fit the screen": "壁纸如何缩放以适应屏幕"
   },
   "Humidity": {
     "Humidity": "湿度"
@@ -4089,7 +4095,7 @@
     "Identical alerts stack as separate notification cards": "相同提醒堆叠为单独的通知卡片"
   },
   "Identify": {
-    "Identify": ""
+    "Identify": "识别"
   },
   "Idle": {
     "Idle": "待机"
@@ -4119,7 +4125,7 @@
     "Image Viewer": "图像查看器"
   },
   "Image copied to clipboard": {
-    "Image copied to clipboard": "已复制图像至剪切板"
+    "Image copied to clipboard": "已复制图像至剪贴板"
   },
   "Import": {
     "Import": "导入"
@@ -4163,6 +4169,9 @@
   "Incorrect password - try again": {
     "Incorrect password - try again": "密码错误 - 请重试"
   },
+  "Index Centering": {
+    "Index Centering": ""
+  },
   "Indicator Style": {
     "Indicator Style": "指示器样式"
   },
@@ -4191,7 +4200,7 @@
     "Initialised": "已初始化"
   },
   "Inner Gaps": {
-    "Inner Gaps": ""
+    "Inner Gaps": "内间距"
   },
   "Inner padding applied to each widget": {
     "Inner padding applied to each widget": "应用到每个部件的内边距"
@@ -4313,11 +4322,14 @@
   "Jobs: ": {
     "Jobs: ": "作业："
   },
+  "Join video call": {
+    "Join video call": ""
+  },
   "Jump to page": {
-    "Jump to page": ""
+    "Jump to page": "跳转到页面"
   },
   "Jump to page (1 - %1)": {
-    "Jump to page (1 - %1)": ""
+    "Jump to page (1 - %1)": "跳转到页面 (1 - %1)"
   },
   "Keep Awake": {
     "Keep Awake": "保持活动"
@@ -4329,10 +4341,10 @@
     "Keep My Edits": "保持当前的编辑"
   },
   "Keep in Bar": {
-    "Keep in Bar": ""
+    "Keep in Bar": "保留在 Bar"
   },
   "Keep the clipboard type filter when reopening history": {
-    "Keep the clipboard type filter when reopening history": "重新打开剪切板历史记录时保持上次的筛选类别"
+    "Keep the clipboard type filter when reopening history": "重新打开剪贴板历史记录时保持上次的筛选类别"
   },
   "Keep typing": {
     "Keep typing": "继续输入"
@@ -4413,10 +4425,10 @@
     "Last launched %1 hours ago": "最后启动于 %1 小时前"
   },
   "Last launched %1 minute ago": {
-    "Last launched %1 minute ago": "最后启动于 %1 分钟前"
+    "Last launched %1 minute ago": "最后启动于 %1 分前"
   },
   "Last launched %1 minutes ago": {
-    "Last launched %1 minutes ago": "最后启动于 %1 分钟前"
+    "Last launched %1 minutes ago": "最后启动于 %1 分前"
   },
   "Last launched just now": {
     "Last launched just now": "刚刚启动"
@@ -4485,7 +4497,7 @@
     "Light Snow": "小雪"
   },
   "Light Snow Showers": {
-    "Light Snow Showers": "小雨阵"
+    "Light Snow Showers": "小阵雪"
   },
   "Light mode base": {
     "Light mode base": "浅色模式基于..."
@@ -4557,7 +4569,7 @@
     "Lock Screen": "锁屏"
   },
   "Lock Screen Appearance": {
-    "Lock Screen Appearance": ""
+    "Lock Screen Appearance": "锁屏外观"
   },
   "Lock Screen Display": {
     "Lock Screen Display": "锁屏显示"
@@ -4584,7 +4596,7 @@
     "Lock screen authentication changes apply automatically and may open a terminal when sudo authentication is required.": "锁屏认证变更会自动生效，当需要 sudo 认证时可能会打开终端。"
   },
   "Lock screen font": {
-    "Lock screen font": ""
+    "Lock screen font": "锁屏字体"
   },
   "Locked": {
     "Locked": "已锁定"
@@ -4700,6 +4712,9 @@
   "Map window class names to icon names for proper icon display": {
     "Map window class names to icon names for proper icon display": "将窗口类名称映射到图标名称以实现正确的图标显示"
   },
+  "Maps": {
+    "Maps": ""
+  },
   "Margin": {
     "Margin": "边距"
   },
@@ -4728,7 +4743,7 @@
     "Material": "Material"
   },
   "Material Battery Style": {
-    "Material Battery Style": ""
+    "Material Battery Style": "Material 电池样式"
   },
   "Material Colors": {
     "Material Colors": "Material 配色"
@@ -4818,10 +4833,10 @@
     "Maximum fingerprint attempts reached. Please use password.": "指纹尝试已达最大次数。请使用密码。"
   },
   "Maximum number of clipboard entries to keep": {
-    "Maximum number of clipboard entries to keep": "最大剪切板项目留存数量"
+    "Maximum number of clipboard entries to keep": "最大剪贴板项目留存数量"
   },
   "Maximum number of entries that can be saved": {
-    "Maximum number of entries that can be saved": "最大剪切板固定项目留存数量"
+    "Maximum number of entries that can be saved": "最大剪贴板固定项目留存数量"
   },
   "Maximum number of notifications to keep": {
     "Maximum number of notifications to keep": "保留通知的最大数量"
@@ -4830,7 +4845,7 @@
     "Maximum pinned entries reached": "已达固定项目最多数量"
   },
   "Maximum size per clipboard entry": {
-    "Maximum size per clipboard entry": "每个剪切板项目的最高磁盘占用"
+    "Maximum size per clipboard entry": "每个剪贴板项目的最高磁盘占用"
   },
   "Media": {
     "Media": "媒体"
@@ -4962,10 +4977,10 @@
     "Monitor fade grace period": "熄屏渐变时间"
   },
   "Monitor whose wallpaper drives dynamic theming colors": {
-    "Monitor whose wallpaper drives dynamic theming colors": "监视使用动态主题色的壁纸"
+    "Monitor whose wallpaper drives dynamic theming colors": "壁纸颜色用于生成动态主题色的显示器"
   },
   "Monitors in \"%1\":": {
-    "Monitors in \"%1\":": "“%1” 中的显示器："
+    "Monitors in \"%1\":": "“%1”中的显示器："
   },
   "Monochrome": {
     "Monochrome": "单色"
@@ -5148,7 +5163,7 @@
     "Next Transition": "下一次切换"
   },
   "Next page": {
-    "Next page": ""
+    "Next page": "下一页"
   },
   "Night": {
     "Night": "夜晚"
@@ -5286,7 +5301,7 @@
     "No checks passed": "检查未通过"
   },
   "No codecs found": {
-    "No codecs found": ""
+    "No codecs found": "未找到编解码器"
   },
   "No custom theme file": {
     "No custom theme file": "缺失自定义主题文件"
@@ -5304,7 +5319,7 @@
     "No disk data available": "无可用磁盘数据"
   },
   "No display profiles found. Create them in Settings > Displays.": {
-    "No display profiles found. Create them in Settings > Displays.": "未找到显示器配置文件。请在“设置” → “显示器”中创建。"
+    "No display profiles found. Create them in Settings > Displays.": "未找到显示器配置文件。请在「设置 → 显示器」中创建。"
   },
   "No drivers found": {
     "No drivers found": "未找到驱动程序"
@@ -5313,7 +5328,7 @@
     "No errors": "无报错"
   },
   "No excluded players configured": {
-    "No excluded players configured": ""
+    "No excluded players configured": "未配置排除的播放器"
   },
   "No features enabled": {
     "No features enabled": "未启用功能"
@@ -5409,7 +5424,7 @@
     "No profiles": "无配置"
   },
   "No recent clipboard entries found": {
-    "No recent clipboard entries found": "未找到近期剪切板项目"
+    "No recent clipboard entries found": "未找到近期剪贴板项目"
   },
   "No reminder": {
     "No reminder": "无提醒"
@@ -5421,10 +5436,10 @@
     "No results found": "未找到结果"
   },
   "No saved clipboard entries": {
-    "No saved clipboard entries": "无已保存剪切板项目"
+    "No saved clipboard entries": "无已保存剪贴板项目"
   },
   "No screenshot provided": {
-    "No screenshot provided": ""
+    "No screenshot provided": "未提供截图"
   },
   "No session selected": {
     "No session selected": "未选择会话"
@@ -5451,7 +5466,7 @@
     "No trigger": "无触发器"
   },
   "No updates available.": {
-    "No updates available.": ""
+    "No updates available.": "暂无可用更新。"
   },
   "No user specified": {
     "No user specified": "未指定用户"
@@ -5553,7 +5568,7 @@
     "Nothing": "无"
   },
   "Nothing to see here": {
-    "Nothing to see here": "空空如也"
+    "Nothing to see here": "暂无内容"
   },
   "Notification": {
     "Notification": "通知"
@@ -5592,7 +5607,7 @@
     "Notify when limit is reached": "达到限制时通知"
   },
   "Now playing and media controls": {
-    "Now playing and media controls": ""
+    "Now playing and media controls": "正在播放与媒体控制"
   },
   "Numbers": {
     "Numbers": "数字"
@@ -5658,7 +5673,7 @@
     "Only on Battery": "仅使用电池时"
   },
   "Only show windows from the current monitor on each dock": {
-    "Only show windows from the current monitor on each dock": "在每个程序坞上仅显示当前显示器上的窗口"
+    "Only show windows from the current monitor on each dock": "在每个 Dock 上仅显示当前显示器上的窗口"
   },
   "Only visible if hibernate is supported by your system": {
     "Only visible if hibernate is supported by your system": "仅在休眠受系统支持时可见"
@@ -5682,7 +5697,7 @@
     "Open App": "打开应用"
   },
   "Open Delay": {
-    "Open Delay": ""
+    "Open Delay": "打开延迟"
   },
   "Open Dir": {
     "Open Dir": "打开目录"
@@ -5709,7 +5724,7 @@
     "Open a terminal and run a custom command instead of the in-shell upgrade flow.": "打开终端，运行自定义命令，而非 shell 内的升级流程。"
   },
   "Open as window": {
-    "Open as window": ""
+    "Open as window": "以窗口形式打开"
   },
   "Open folder": {
     "Open folder": "打开文件夹"
@@ -5724,10 +5739,10 @@
     "Open search bar to find text": "打开搜索栏以查找文本"
   },
   "Open the launcher by hovering the emerge edge (when free of bar and dock)": {
-    "Open the launcher by hovering the emerge edge (when free of bar and dock)": ""
+    "Open the launcher by hovering the emerge edge (when free of bar and dock)": "通过悬停触发边缘打开启动器（当状态栏和 Dock 无占用时）"
   },
   "Open widget popouts by hovering over the bar. Moving to another widget switches the popout.": {
-    "Open widget popouts by hovering over the bar. Moving to another widget switches the popout.": ""
+    "Open widget popouts by hovering over the bar. Moving to another widget switches the popout.": "通过悬停在状态栏上打开部件弹出窗口。移动到另一个部件将切换弹出窗口。"
   },
   "Open with...": {
     "Open with...": "打开方式..."
@@ -5775,7 +5790,7 @@
     "Other": "其他"
   },
   "Outer Gaps": {
-    "Outer Gaps": ""
+    "Outer Gaps": "外间距"
   },
   "Outline": {
     "Outline": "轮廓"
@@ -5802,7 +5817,7 @@
     "Overflow": "溢出"
   },
   "Overlay": {
-    "Overlay": ""
+    "Overlay": "覆盖层"
   },
   "Overridden by config": {
     "Overridden by config": "被配置覆盖"
@@ -5937,10 +5952,10 @@
     "Paste": "粘贴"
   },
   "Paste failed: %1": {
-    "Paste failed: %1": ""
+    "Paste failed: %1": "粘贴失败：%1"
   },
   "Path copied to clipboard": {
-    "Path copied to clipboard": "路径已复制至剪切板"
+    "Path copied to clipboard": "路径已复制至剪贴板"
   },
   "Path to a video file or folder containing videos": {
     "Path to a video file or folder containing videos": "视频文件路径或包含视频的文件夹"
@@ -5997,13 +6012,13 @@
     "Phone number": "电话号码"
   },
   "Pick a different file manager in Settings → Dock → Trash.": {
-    "Pick a different file manager in Settings → Dock → Trash.": "在“设置” → “程序坞” → “回收站”中选择其他文件管理器。"
+    "Pick a different file manager in Settings → Dock → Trash.": "在「设置 → Dock → 回收站」中选择其他文件管理器。"
   },
   "Pick a different random video each time from the same folder": {
     "Pick a different random video each time from the same folder": "每次都从同一文件夹下选择随机的视频"
   },
   "Pick a terminal in Settings → Launcher (or set $TERMINAL).": {
-    "Pick a terminal in Settings → Launcher (or set $TERMINAL).": "在“设置” → “启动器”中选择终端（或者设置$TERMINAL）。"
+    "Pick a terminal in Settings → Launcher (or set $TERMINAL).": "在「设置 → 启动器」中选择终端（或者设置 $TERMINAL）。"
   },
   "Pick how long to pause notifications": {
     "Pick how long to pause notifications": "选择暂停通知的时间"
@@ -6015,7 +6030,7 @@
     "Pin": "固定"
   },
   "Pin to Dock": {
-    "Pin to Dock": "固定到程序坞"
+    "Pin to Dock": "固定到 Dock"
   },
   "Ping": {
     "Ping": "Ping"
@@ -6033,7 +6048,7 @@
     "Pixelate": "像素化"
   },
   "Place a trash bin at the end of the dock": {
-    "Place a trash bin at the end of the dock": "在程序坞末尾放置回收站图标"
+    "Place a trash bin at the end of the dock": "在 Dock 末尾放置回收站图标"
   },
   "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
     "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "此处为插件目录，每个插件应带有一个 plugin.json 描述文件。"
@@ -6045,13 +6060,13 @@
     "Place the bar on the Wayland overlay layer": "将状态栏置于 Wayland 叠加层"
   },
   "Place the dock on the Wayland overlay layer": {
-    "Place the dock on the Wayland overlay layer": "将程序坞置于 Wayland 叠加层"
+    "Place the dock on the Wayland overlay layer": "将 Dock 置于 Wayland 叠加层"
   },
   "Play": {
     "Play": "播放"
   },
   "Play a video when the screen locks.": {
-    "Play a video when the screen locks.": "锁屏是播放视频。"
+    "Play a video when the screen locks.": "锁屏时播放视频。"
   },
   "Play sound after logging in": {
     "Play sound after logging in": "登录后播放声音"
@@ -6102,7 +6117,7 @@
     "Plugin Visibility": "插件可见性"
   },
   "Plugin dependency missing": {
-    "Plugin dependency missing": ""
+    "Plugin dependency missing": "缺少插件依赖"
   },
   "Plugin disabled: %1": {
     "Plugin disabled: %1": "插件已禁用：%1"
@@ -6111,7 +6126,7 @@
     "Plugin enabled: %1": "插件已启用：%1"
   },
   "Plugin is disabled - enable in Plugins settings to use": {
-    "Plugin is disabled - enable in Plugins settings to use": "插件已禁用 - 在插件设置中启用以使用"
+    "Plugin is disabled - enable in Plugins settings to use": "插件已禁用 - 请在插件设置中启用后使用"
   },
   "Plugin reloaded: %1": {
     "Plugin reloaded: %1": "插件已重载：%1"
@@ -6201,7 +6216,7 @@
     "Power Profile Degradation": "电源配置性能下降"
   },
   "Power Profiles & Saving": {
-    "Power Profiles & Saving": ""
+    "Power Profiles & Saving": "电源模式与节能"
   },
   "Power Profiles Auto-Switching": {
     "Power Profiles Auto-Switching": "性能模式自动切换"
@@ -6249,7 +6264,7 @@
     "Press 'n' or click 'New Session' to create one": "按 n 或点击“新建会话”以创建"
   },
   "Press Ctrl+N or click 'New Session' to create one": {
-    "Press Ctrl+N or click 'New Session' to create one": ""
+    "Press Ctrl+N or click 'New Session' to create one": "按 Ctrl+N 或单击「新建会话」创建一个"
   },
   "Press Enter and the audio system will restart to apply the change": {
     "Press Enter and the audio system will restart to apply the change": "按下 Enter，音频系统会重启以应用更改"
@@ -6264,10 +6279,10 @@
     "Pressure": "气压"
   },
   "Prevent screen timeout": {
-    "Prevent screen timeout": "阻止屏幕超时"
+    "Prevent screen timeout": "防止屏幕超时"
   },
   "Prevent specific applications from displaying in the media controllers (e.g., browser audio streams, background tools). Matches player identity or desktop file name case-insensitively.": {
-    "Prevent specific applications from displaying in the media controllers (e.g., browser audio streams, background tools). Matches player identity or desktop file name case-insensitively.": ""
+    "Prevent specific applications from displaying in the media controllers (e.g., browser audio streams, background tools). Matches player identity or desktop file name case-insensitively.": "阻止特定应用显示在媒体控制器中（例如浏览器音频流、后台工具）。不区分大小写匹配播放器标识或桌面文件名。"
   },
   "Preview": {
     "Preview": "预览"
@@ -6279,7 +6294,7 @@
     "Previous": "上一个"
   },
   "Previous page": {
-    "Previous page": ""
+    "Previous page": "上一页"
   },
   "Primary": {
     "Primary": "主色"
@@ -6390,10 +6405,10 @@
     "Qt": "Qt"
   },
   "Qt colors applied successfully": {
-    "Qt colors applied successfully": "QT 配色已成功应用"
+    "Qt colors applied successfully": "Qt 配色已成功应用"
   },
   "Qt: distance-field renderer.": {
-    "Qt: distance-field renderer.": "QT：距离场渲染器。"
+    "Qt: distance-field renderer.": "Qt：距离场渲染器。"
   },
   "QtMultimedia is not available": {
     "QtMultimedia is not available": "QtMultimedia 不可用"
@@ -6414,7 +6429,7 @@
     "Quick access to color picker": "快捷访问取色器"
   },
   "Quick access to notepad": {
-    "Quick access to notepad": "快捷访问剪切板"
+    "Quick access to notepad": "快捷访问便签"
   },
   "Quick note-taking slideout panel": {
     "Quick note-taking slideout panel": "便于快速记便签的侧边栏面板"
@@ -6447,7 +6462,7 @@
     "Re-enter password": "再次输入密码"
   },
   "Reach local network devices while using an exit node": {
-    "Reach local network devices while using an exit node": ""
+    "Reach local network devices while using an exit node": "使用出口节点时访问本地网络设备"
   },
   "Read-only legacy config": {
     "Read-only legacy config": "只读旧版配置"
@@ -6498,7 +6513,7 @@
     "Reject Jobs": "拒绝作业"
   },
   "Related: %1": {
-    "Related: %1": ""
+    "Related: %1": "相关：%1"
   },
   "Release": {
     "Release": "松开"
@@ -6537,7 +6552,7 @@
     "Remove": "移除"
   },
   "Remove \"%1\" from the %2 group?": {
-    "Remove \"%1\" from the %2 group?": "将“%1” 从 %2 组中移除吗？"
+    "Remove \"%1\" from the %2 group?": "将“%1”从 %2 组中移除吗？"
   },
   "Remove Shortcut?": {
     "Remove Shortcut?": "移除快捷键？"
@@ -6570,10 +6585,10 @@
     "Remove match": "移除匹配条件"
   },
   "Remove the shortcut %1?": {
-    "Remove the shortcut %1?": "移除快捷键 %1 ？"
+    "Remove the shortcut %1?": "移除快捷键 %1？"
   },
   "Remove the shortcut %1? An unbind entry will be saved to dms/binds-user.lua so it stays removed across DMS updates.": {
-    "Remove the shortcut %1? An unbind entry will be saved to dms/binds-user.lua so it stays removed across DMS updates.": "移除快捷键 %1 ？将向 dms/binds-user.lua 保存一条解绑记录，使其在 DMS 更新后仍保持移除。"
+    "Remove the shortcut %1? An unbind entry will be saved to dms/binds-user.lua so it stays removed across DMS updates.": "移除快捷键 %1？将向 dms/binds-user.lua 保存一条解绑记录，使其在 DMS 更新后仍保持移除。"
   },
   "Removed administrator privileges": {
     "Removed administrator privileges": "已移除管理员权限"
@@ -6591,7 +6606,7 @@
     "Rename Workspace": "重命名工作区"
   },
   "Reorder & Group": {
-    "Reorder & Group": ""
+    "Reorder & Group": "重新排序与分组"
   },
   "Repeat": {
     "Repeat": "重复"
@@ -6630,7 +6645,7 @@
     "Requires a newer version of Quickshell": "需要更新版本的 Quickshell"
   },
   "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys). Auth changes apply automatically and may open a terminal for sudo.": {
-    "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys). Auth changes apply automatically and may open a terminal for sudo.": ""
+    "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys). Auth changes apply automatically and may open a terminal for sudo.": "需要 greetd、dms-greeter 且您的用户在 greeter 组中（指纹需要 fprintd/pam_fprintd，安全密钥需要 pam_u2f）。认证更改会自动应用，可能会打开终端请求 sudo。"
   },
   "Requires night mode support": {
     "Requires night mode support": "需要夜间模式支持"
@@ -6702,7 +6717,7 @@
     "Revert": "还原"
   },
   "Rewind 10s": {
-    "Rewind 10s": "快退 10 秒钟"
+    "Rewind 10s": "快退 10 秒"
   },
   "Right": {
     "Right": "右侧"
@@ -6771,10 +6786,10 @@
     "Run paru/yay with AUR enabled when 'Update All' is clicked.": "点击“全部更新”时运行 paru/yay 并启用 AUR。"
   },
   "Running Apps": {
-    "Running Apps": "活动应用程序"
+    "Running Apps": "运行中的应用"
   },
   "Running Apps Settings": {
-    "Running Apps Settings": "活动应用设置"
+    "Running Apps Settings": "运行中应用设置"
   },
   "Running greeter sync...": {
     "Running greeter sync...": "正在运行登录界面同步..."
@@ -6816,7 +6831,7 @@
     "Save and switch between display configurations": "保存和切换显示器配置"
   },
   "Save credentials": {
-    "Save credentials": "保存证书"
+    "Save credentials": "保存凭据"
   },
   "Save critical priority notifications to history": {
     "Save critical priority notifications to history": "将关键优先级通知保存至历史"
@@ -6858,10 +6873,10 @@
     "Scale": "缩放"
   },
   "Scale DankBar font sizes independently": {
-    "Scale DankBar font sizes independently": "独立调整 Dank 状态栏字体缩放"
+    "Scale DankBar font sizes independently": "独立调整 DankBar 字体大小"
   },
   "Scale DankBar icon sizes independently": {
-    "Scale DankBar icon sizes independently": "独立调整 Dank 状态栏图标大小"
+    "Scale DankBar icon sizes independently": "独立调整 DankBar 图标大小"
   },
   "Scale all font sizes throughout the shell": {
     "Scale all font sizes throughout the shell": "缩放整个 shell 中的所有字体大小"
@@ -6885,7 +6900,7 @@
     "Screen sharing": "屏幕共享"
   },
   "Screenshot unavailable": {
-    "Screenshot unavailable": ""
+    "Screenshot unavailable": "截图不可用"
   },
   "Scroll": {
     "Scroll": "Scroll"
@@ -6963,7 +6978,7 @@
     "Searching...": "正在搜索..."
   },
   "Second Factor (AND)": {
-    "Second Factor (AND)": "次选因素（AND）"
+    "Second Factor (AND)": "双重验证（AND）"
   },
   "Secondary": {
     "Secondary": "辅色"
@@ -7002,7 +7017,7 @@
     "Select Custom Theme": "选择自定义主题"
   },
   "Select Dock Launcher Logo": {
-    "Select Dock Launcher Logo": "选择程序坞启动器 Logo"
+    "Select Dock Launcher Logo": "选择 Dock 启动器 Logo"
   },
   "Select File to Send": {
     "Select File to Send": "选择要发送的文件"
@@ -7047,7 +7062,7 @@
     "Select at least one provider": "至少选择一个提供源"
   },
   "Select background image": {
-    "Select background image": ""
+    "Select background image": "选择背景图片"
   },
   "Select device": {
     "Select device": "选择设备"
@@ -7065,7 +7080,7 @@
     "Select greeter background image": "选择登录界面背景图片"
   },
   "Select lock screen background image": {
-    "Select lock screen background image": ""
+    "Select lock screen background image": "选择锁屏背景图片"
   },
   "Select monitor to configure wallpaper": {
     "Select monitor to configure wallpaper": "选择要设置壁纸的显示器"
@@ -7104,7 +7119,7 @@
     "Send": "发送"
   },
   "Send Clipboard": {
-    "Send Clipboard": "发送剪切板"
+    "Send Clipboard": "发送剪贴板"
   },
   "Send File": {
     "Send File": "发送文件"
@@ -7119,13 +7134,13 @@
     "Separate": "分离"
   },
   "Separate Appearance for Unfocused Display(s)": {
-    "Separate Appearance for Unfocused Display(s)": ""
+    "Separate Appearance for Unfocused Display(s)": "为非焦点显示器单独设置外观"
   },
   "Separate Light & Dark Themes": {
     "Separate Light & Dark Themes": "区分浅色主题与深色主题"
   },
   "Separate appearance for unfocused displays is not supported on this compositor.": {
-    "Separate appearance for unfocused displays is not supported on this compositor.": ""
+    "Separate appearance for unfocused displays is not supported on this compositor.": "此合成器不支持为非焦点显示器单独设置外观。"
   },
   "Separator": {
     "Separator": "分隔符"
@@ -7176,7 +7191,7 @@
     "Setting": "设置项"
   },
   "Setting up...": {
-    "Setting up...": ""
+    "Setting up...": "设置中..."
   },
   "Settings": {
     "Settings": "设置"
@@ -7245,7 +7260,7 @@
     "Shortcut (%1)": "快捷方式（%1）"
   },
   "Shortcut that opens this settings window": {
-    "Shortcut that opens this settings window": ""
+    "Shortcut that opens this settings window": "打开此设置窗口的快捷键"
   },
   "Shortcuts": {
     "Shortcuts": "快捷键"
@@ -7284,7 +7299,7 @@
     "Show Disk": "显示磁盘"
   },
   "Show Dock": {
-    "Show Dock": "显示程序坞"
+    "Show Dock": "显示 Dock"
   },
   "Show Feels Like Temperature": {
     "Show Feels Like Temperature": "显示体感温度"
@@ -7296,7 +7311,7 @@
     "Show Footer": "显示页脚"
   },
   "Show Forecast": {
-    "Show Forecast": "显示天气预测"
+    "Show Forecast": "显示预报"
   },
   "Show GPU Temperature": {
     "Show GPU Temperature": "显示 GPU 温度"
@@ -7428,7 +7443,7 @@
     "Show Top Processes": "显示占用多的进程"
   },
   "Show Trash in Dock": {
-    "Show Trash in Dock": "在程序坞中显示回收站"
+    "Show Trash in Dock": "在 Dock 中显示回收站"
   },
   "Show Weather Condition": {
     "Show Weather Condition": "显示天气状况"
@@ -7473,7 +7488,7 @@
     "Show device": "显示设备"
   },
   "Show dock when floating windows don't overlap its area": {
-    "Show dock when floating windows don't overlap its area": "当浮动窗口不覆盖其区域时显示程序坞"
+    "Show dock when floating windows don't overlap its area": "当浮动窗口不覆盖其区域时显示 Dock"
   },
   "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": {
     "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": "在通知弹窗上显示下拉阴影。需要在“主题与配色”中启用 M3 高程。"
@@ -7485,7 +7500,7 @@
     "Show foreground surfaces on blurred panels for stronger contrast": "在模糊面板上显示前景平面，以增强对比度"
   },
   "Show foreground surfaces on panels for stronger contrast": {
-    "Show foreground surfaces on panels for stronger contrast": ""
+    "Show foreground surfaces on panels for stronger contrast": "在面板上显示前台表面以增强对比度"
   },
   "Show in GB": {
     "Show in GB": "以 GB 为单位"
@@ -7506,13 +7521,13 @@
     "Show notifications only on the currently focused monitor": "仅在当前聚焦的显示器上显示通知"
   },
   "Show on Last Display": {
-    "Show on Last Display": "最近使用的显示器"
+    "Show on Last Display": "在最后使用的显示器上显示"
   },
   "Show on Overlay": {
     "Show on Overlay": "叠加层中显示"
   },
   "Show on Overview": {
-    "Show on Overview": "概览中显示"
+    "Show on Overview": "在概览中显示"
   },
   "Show on Overview Only": {
     "Show on Overview Only": "仅在概览中显示"
@@ -7584,7 +7599,7 @@
     "Shows when microphone, camera, or screen sharing is active": "显示麦克风、摄像头或屏幕共享的使用状态"
   },
   "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size": {
-    "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size": "将媒体小部件缩小以适应较短的歌曲标题，同时仍尊重配置的最大尺寸"
+    "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size": "将媒体部件缩小以适应较短的歌曲标题，同时仍尊重配置的最大尺寸"
   },
   "Shutdown": {
     "Shutdown": "关机"
@@ -7659,7 +7674,7 @@
     "Sort By": "排序方式"
   },
   "Sort wallpapers": {
-    "Sort wallpapers": ""
+    "Sort wallpapers": "排序壁纸"
   },
   "Sorting & Layout": {
     "Sorting & Layout": "排序与布局"
@@ -7680,7 +7695,7 @@
     "Space between windows": "窗口间空隙"
   },
   "Space between windows and screen edges": {
-    "Space between windows and screen edges": ""
+    "Space between windows and screen edges": "窗口与屏幕边缘之间的间距"
   },
   "Spacer": {
     "Spacer": "空白占位"
@@ -7791,10 +7806,10 @@
     "Surface Behavior": "平面行为"
   },
   "Surface Border Color": {
-    "Surface Border Color": ""
+    "Surface Border Color": "表面边框颜色"
   },
   "Surface Border Opacity": {
-    "Surface Border Opacity": ""
+    "Surface Border Opacity": "表面边框不透明度"
   },
   "Surface Container": {
     "Surface Container": "平面容器"
@@ -7860,7 +7875,7 @@
     "Sync Position Across Screens": "在显示器间同步位置"
   },
   "Sync applies your theme and settings to the login screen. Other users should run dms greeter sync --profile instead of a full sync. Authentication changes apply automatically.": {
-    "Sync applies your theme and settings to the login screen. Other users should run dms greeter sync --profile instead of a full sync. Authentication changes apply automatically.": ""
+    "Sync applies your theme and settings to the login screen. Other users should run dms greeter sync --profile instead of a full sync. Authentication changes apply automatically.": "将您的主题和设置同步到登录屏幕。其他用户应运行 dms greeter sync --profile 而非完整同步。认证更改会自动应用。"
   },
   "Sync completed successfully.": {
     "Sync completed successfully.": "同步已完成。"
@@ -7875,10 +7890,10 @@
     "Sync needs sudo authentication. Opening terminal so you can use password or fingerprint.": "同步需要 sudo 身份验证。正在打开终端，以便您可以使用密码或指纹。"
   },
   "Sync to apply": {
-    "Sync to apply": ""
+    "Sync to apply": "同步并应用"
   },
   "Syncing...": {
-    "Syncing...": ""
+    "Syncing...": "同步中..."
   },
   "System": {
     "System": "系统"
@@ -7953,7 +7968,7 @@
     "Tailscale Network": "Tailscale 网络"
   },
   "Tailscale action failed": {
-    "Tailscale action failed": ""
+    "Tailscale action failed": "Tailscale 操作失败"
   },
   "Tailscale not available": {
     "Tailscale not available": "Tailscale 不可用"
@@ -8019,7 +8034,7 @@
     "Text Rendering": "文本渲染"
   },
   "The 'boregard' tool is not installed or not on your PATH.\n\nInstall it from https://danklinux.com, then re-enable this plugin.": {
-    "The 'boregard' tool is not installed or not on your PATH.\n\nInstall it from https://danklinux.com, then re-enable this plugin.": ""
+    "The 'boregard' tool is not installed or not on your PATH.\n\nInstall it from https://danklinux.com, then re-enable this plugin.": "未安装 'boregard' 工具或不在 PATH 中。\n\n请从 https://danklinux.com 安装，然后重新启用此插件。"
   },
   "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": {
     "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": "系统监视器功能需要 dgop。\n请安装 dgop 以使用此功能。"
@@ -8028,7 +8043,7 @@
     "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "未设置 DMS_SOCKET 环境变量或套接字不可用，无法使用自动插件管理。"
   },
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
-    "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "以下设置将修改您的 GTK 和 QT 配置。如需保留当前配置，请先备份 (qt5ct.conf|qt6ct.conf 和 ~/.config/gtk-3.0|gtk-4.0)。"
+    "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "以下设置将修改您的 GTK 和 Qt 配置。如需保留当前配置，请先备份 (qt5ct.conf|qt6ct.conf 和 ~/.config/gtk-3.0|gtk-4.0)。"
   },
   "The custom command used when attaching to sessions (receives the session name as the first argument)": {
     "The custom command used when attaching to sessions (receives the session name as the first argument)": "连接会话时使用的自定义命令（将接收会话名称作为首个参数）"
@@ -8088,7 +8103,7 @@
     "This install is still using hyprland.conf. Run dms setup to migrate before editing display settings.": "当前安装仍在使用 hyprland.conf。请先运行 dms setup 完成迁移，再编辑显示设置。"
   },
   "This install is still using hyprland.conf. Run dms setup to migrate before editing layout settings.": {
-    "This install is still using hyprland.conf. Run dms setup to migrate before editing layout settings.": ""
+    "This install is still using hyprland.conf. Run dms setup to migrate before editing layout settings.": "此安装仍在使用 hyprland.conf。请先运行 dms setup 迁移后再编辑布局设置。"
   },
   "This install is still using hyprland.conf. Run dms setup to migrate before editing shortcuts in Settings.": {
     "This install is still using hyprland.conf. Run dms setup to migrate before editing shortcuts in Settings.": "当前安装仍在使用 hyprland.conf。请先运行 dms setup 完成迁移，再在设置中编辑快捷键。"
@@ -8130,13 +8145,13 @@
     "Tile H": "水平平铺"
   },
   "Tile Horizontally": {
-    "Tile Horizontally": ""
+    "Tile Horizontally": "水平平铺"
   },
   "Tile V": {
     "Tile V": "垂直平铺"
   },
   "Tile Vertically": {
-    "Tile Vertically": ""
+    "Tile Vertically": "垂直平铺"
   },
   "Tiled": {
     "Tiled": "平铺"
@@ -8163,7 +8178,7 @@
     "Time remaining: %1": "剩余时间：%1"
   },
   "Time to rest on a widget before its popout opens": {
-    "Time to rest on a widget before its popout opens": ""
+    "Time to rest on a widget before its popout opens": "在部件上停留后弹出窗口的打开延迟"
   },
   "Time to wait before hiding after the pointer leaves": {
     "Time to wait before hiding after the pointer leaves": "指针离开后隐藏前的等待时间"
@@ -8223,7 +8238,7 @@
     "Toast Messages": "弹出式信息"
   },
   "Today": {
-    "Today": "今日"
+    "Today": "今天"
   },
   "Toggle bar visibility manually via IPC": {
     "Toggle bar visibility manually via IPC": "通过 IPC 手动切换状态栏可见性"
@@ -8238,7 +8253,7 @@
     "Toggling...": "正在切换..."
   },
   "Tomorrow": {
-    "Tomorrow": "明日"
+    "Tomorrow": "明天"
   },
   "Tonal Spot": {
     "Tonal Spot": "色块"
@@ -8394,7 +8409,7 @@
     "Unfocused Color": "非聚焦颜色"
   },
   "Unfocused Display(s)": {
-    "Unfocused Display(s)": ""
+    "Unfocused Display(s)": "非焦点显示器"
   },
   "Ungrouped": {
     "Ungrouped": "已解除分组"
@@ -8442,7 +8457,7 @@
     "Unknown GPU": "未知 GPU"
   },
   "Unknown Model": {
-    "Unknown Model": ""
+    "Unknown Model": "未知型号"
   },
   "Unknown Monitor": {
     "Unknown Monitor": "未知显示器"
@@ -8478,7 +8493,7 @@
     "Unpin": "解除固定"
   },
   "Unpin from Dock": {
-    "Unpin from Dock": "从程序坞取消固定"
+    "Unpin from Dock": "从 Dock 取消固定"
   },
   "Unsaved Changes": {
     "Unsaved Changes": "未保存更改"
@@ -8493,10 +8508,10 @@
     "Until %1": "直到 %1"
   },
   "Until 8 AM": {
-    "Until 8 AM": "直至早上 8 点"
+    "Until 8 AM": "直到早上 8 点"
   },
   "Until I turn it off": {
-    "Until I turn it off": "直至关闭"
+    "Until I turn it off": "直到关闭"
   },
   "Until tomorrow, 8:00 AM": {
     "Until tomorrow, 8:00 AM": "直至明早 8 点"
@@ -8523,10 +8538,10 @@
     "Update failed: %1": "更新失败：%1"
   },
   "Updating %1...": {
-    "Updating %1...": ""
+    "Updating %1...": "正在更新 %1..."
   },
   "Updating plugins...": {
-    "Updating plugins...": ""
+    "Updating plugins...": "正在更新插件..."
   },
   "Upgrading...": {
     "Upgrading...": "正在更新..."
@@ -8580,13 +8595,13 @@
     "Use System Theme": "使用系统主题"
   },
   "Use a custom image for the lock screen, or leave empty to use your desktop wallpaper.": {
-    "Use a custom image for the lock screen, or leave empty to use your desktop wallpaper.": ""
+    "Use a custom image for the lock screen, or leave empty to use your desktop wallpaper.": "使用自定义锁屏图片，留空则使用桌面壁纸。"
   },
   "Use a custom image for the login screen, or leave empty to use your desktop wallpaper.": {
     "Use a custom image for the login screen, or leave empty to use your desktop wallpaper.": "使用自定义图像作为登录屏幕，或留空以使用您的桌面壁纸。"
   },
   "Use a custom radius for goth corner cutouts": {
-    "Use a custom radius for goth corner cutouts": "为哥特式圆角裁切使用自定义半径"
+    "Use a custom radius for goth corner cutouts": "为Goth 圆角裁切使用自定义半径"
   },
   "Use a fixed shadow direction for this bar": {
     "Use a fixed shadow direction for this bar": "为此状态栏使用固定的阴影方向"
@@ -8594,11 +8609,17 @@
   "Use a security key for lock screen authentication.": {
     "Use a security key for lock screen authentication.": "使用安全密钥进行锁屏认证。"
   },
+  "Use album art accent": {
+    "Use album art accent": ""
+  },
   "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": {
     "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": "使用外部壁纸管理器，例如 swww、hyprpaper 或 swaybg。"
   },
   "Use animated wave progress bars for media playback": {
     "Use animated wave progress bars for media playback": "媒体播放时显示动态波形进度条"
+  },
+  "Use colors extracted from album art instead of system theme colors": {
+    "Use colors extracted from album art instead of system theme colors": ""
   },
   "Use custom border size": {
     "Use custom border size": "使用自定义边框尺寸"
@@ -8616,7 +8637,7 @@
     "Use different icon themes for light and dark mode": "为浅色模式与深色模式使用不同的图标主题"
   },
   "Use different workspace colors on displays that are not focused": {
-    "Use different workspace colors on displays that are not focused": ""
+    "Use different workspace colors on displays that are not focused": "在非焦点显示器上使用不同的工作区颜色"
   },
   "Use fingerprint authentication for the lock screen.": {
     "Use fingerprint authentication for the lock screen.": "为锁屏使用指纹认证。"
@@ -8706,10 +8727,10 @@
     "Uses the spotlight-bar IPC action and always opens the minimal bar.": "使用 spotlight-bar IPC 动作，并始终打开聚焦搜索栏"
   },
   "Using DankCalendar%1": {
-    "Using DankCalendar%1": "使用 DankCalendar%1"
+    "Using DankCalendar%1": "使用 DankCalendar %1"
   },
   "Using global monospace font from Settings → Personalization": {
-    "Using global monospace font from Settings → Personalization": "正在使用“设置” → “个性化”中的全局等宽字体"
+    "Using global monospace font from Settings → Personalization": "正在使用「设置 → 个性化」中的全局等宽字体"
   },
   "Using khal": {
     "Using khal": "使用 khal"
@@ -8730,7 +8751,7 @@
     "VPN configuration updated": "VPN 配置已更新"
   },
   "VPN credentials saved": {
-    "VPN credentials saved": "VPN 证书已保存"
+    "VPN credentials saved": "VPN 凭据已保存"
   },
   "VPN deleted": {
     "VPN deleted": "VPN 已删除"
@@ -8880,7 +8901,7 @@
     "Welcome to DankMaterialShell": "欢迎使用 DankMaterialShell"
   },
   "When clicking a dock window in a Hyprland special workspace, bring that special workspace back before focusing the window": {
-    "When clicking a dock window in a Hyprland special workspace, bring that special workspace back before focusing the window": "在 Hyprland 特殊工作区点击程序坞窗口时，会拉回该特殊工作区，再聚焦窗口"
+    "When clicking a dock window in a Hyprland special workspace, bring that special workspace back before focusing the window": "在 Hyprland 特殊工作区点击 Dock 窗口时，会拉回该特殊工作区，再聚焦窗口"
   },
   "When enabled, apps are sorted alphabetically. When disabled, apps are sorted by usage frequency.": {
     "When enabled, apps are sorted alphabetically. When disabled, apps are sorted by usage frequency.": "启用时，应用按字母顺序排序；禁用时，应用按使用频率排序"
@@ -9009,7 +9030,7 @@
     "Wipe": "擦除"
   },
   "Working...": {
-    "Working...": ""
+    "Working...": "正在处理..."
   },
   "Workspace": {
     "Workspace": "工作区"
@@ -9057,13 +9078,13 @@
     "XWayland": "XWayland"
   },
   "Xray Blur Effect": {
-    "Xray Blur Effect": ""
+    "Xray Blur Effect": "Xray 模糊效果"
   },
   "Xray blurs only the wallpaper (efficient) and is the default when Blur is on. Set Xray to Off for regular full blur of everything beneath the window (more expensive).": {
     "Xray blurs only the wallpaper (efficient) and is the default when Blur is on. Set Xray to Off for regular full blur of everything beneath the window (more expensive).": "Xray 只模糊壁纸，性能开销更低，也是启用模糊时的默认行为。将 Xray 设为关闭后，会对窗口下方的所有内容进行常规全模糊，但性能开销更高。"
   },
   "Xray options are in Compositor → Layout": {
-    "Xray options are in Compositor → Layout": ""
+    "Xray options are in Compositor → Layout": "Xray 选项位于合成器 → 布局"
   },
   "Y": {
     "Y": "Y"
@@ -9117,7 +9138,7 @@
     "attached": "已附加"
   },
   "boregard is required": {
-    "boregard is required": ""
+    "boregard is required": "需要 boregard"
   },
   "brandon": {
     "brandon": "brandon"
@@ -9153,7 +9174,7 @@
     "discuss": "讨论"
   },
   "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": {
-    "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": "DMS 是一款高度可自定义的现代桌面 Shell，采用受 <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">Material 3</a> 启发的设计。<br /><br/>DMS 基于 <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>（用于构建桌面 Shell 的 QT6 框架）和 <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>（静态类型编译型编程语言）开发。"
+    "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": "DMS 是一款高度可自定义的现代桌面 Shell，采用受 <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">Material 3</a> 启发的设计。<br /><br/>DMS 基于 <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>（用于构建桌面 Shell 的 Qt6 框架）和 <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>（静态类型编译型编程语言）开发。"
   },
   "e.g. /usr/bin/my-script --flag": {
     "e.g. /usr/bin/my-script --flag": "例如：/usr/bin/my-script --flag"
@@ -9174,7 +9195,7 @@
     "e.g., hl.dsp.focus({ workspace = \"3\" })": "例如：hl.dsp.focus({ workspace = \"3\" })"
   },
   "e.g., notify-send 'Hello' && sleep 1": {
-    "e.g., notify-send 'Hello' && sleep 1": "例如：通知发送 'Hello' && sleep 1"
+    "e.g., notify-send 'Hello' && sleep 1": "例如：notify-send 'Hello' && sleep 1"
   },
   "e.g., scratch, /^tmp_.*/, build": {
     "e.g., scratch, /^tmp_.*/, build": "例如：scratch, /^tmp_.*/, build"
@@ -9216,7 +9237,7 @@
     "matugen not available or disabled - cannot apply GTK colors": "Matugen 不可用或已禁用，无法应用 GTK 配色"
   },
   "matugen not available or disabled - cannot apply Qt colors": {
-    "matugen not available or disabled - cannot apply Qt colors": "matugen 不可用或已禁用，无法应用 QT 配色"
+    "matugen not available or disabled - cannot apply Qt colors": "matugen 不可用或已禁用，无法应用 Qt 配色"
   },
   "matugen not found - install matugen package for dynamic theming": {
     "matugen not found - install matugen package for dynamic theming": "未找到 Matugen - 请为动态主题安装 matugen 包"
@@ -9294,10 +9315,10 @@
     "remote": "远程"
   },
   "reviewed": {
-    "reviewed": ""
+    "reviewed": "已审核"
   },
   "seconds": {
-    "seconds": "秒钟"
+    "seconds": "秒"
   },
   "session %1": {
     "session %1": "会话 %1"
@@ -9306,7 +9327,7 @@
     "source": "源"
   },
   "the Qt 6 Multimedia QML module": {
-    "the Qt 6 Multimedia QML module": ""
+    "the Qt 6 Multimedia QML module": "Qt 6 多媒体 QML 模块"
   },
   "this app": {
     "this app": "此应用"
@@ -9345,7 +9366,7 @@
     "• M - Month (1-12)": "• M - 月（1-12）"
   },
   "• MM - Month (01-12)": {
-    "• MM - Month (01-12)": "• M - 月（01-12）"
+    "• MM - Month (01-12)": "• MM - 月（01-12）"
   },
   "• MMM - Month (Jan)": {
     "• MMM - Month (Jan)": "• MMM - 月（1 月）"
@@ -9375,10 +9396,10 @@
     "• yy - Year (24)": "• yy - 年（24）"
   },
   "• yyyy - Year (2024)": {
-    "• yyyy - Year (2024)": "• yy - 年（2024）"
+    "• yyyy - Year (2024)": "• yyyy - 年（2024）"
   },
   "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": {
-    "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": "↑/↓： 导航 • Space：展开 • Enter：动作/展开 • E：文本"
+    "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": "↑/↓：导航 • Space：展开 • Enter：动作/展开 • E：文本"
   },
   "↑/↓: Navigate • Enter/Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help": {
     "↑/↓: Navigate • Enter/Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help": "↑/↓：导航 • Enter/Ctrl+C：复制 • Del：删除 • Ctrl+E：编辑 • Ctrl+S：固定/取消固定 • F10：帮助"

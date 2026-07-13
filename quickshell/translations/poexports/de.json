@@ -1626,7 +1626,7 @@
     "Close Window": "Fenster schließen"
   },
   "Codec switching is unavailable because pactl was not found": {
-    "Codec switching is unavailable because pactl was not found": ""
+    "Codec switching is unavailable because pactl was not found": "Codec-Umschaltung ist nicht verfügbar, da pactl nicht gefunden wurde"
   },
   "Color": {
     "Color": "Farbe"
@@ -3701,6 +3701,9 @@
   "Generic": {
     "Generic": "Generisch"
   },
+  "Geometric Centering": {
+    "Geometric Centering": ""
+  },
   "Get Started": {
     "Get Started": "Erste Schritte"
   },
@@ -3838,6 +3841,9 @@
   },
   "HTML copied to clipboard": {
     "HTML copied to clipboard": "HTML in die Zwischenablage kopiert"
+  },
+  "Handles geo: location links": {
+    "Handles geo: location links": ""
   },
   "Handles links and opens HTML files": {
     "Handles links and opens HTML files": "Verarbeitet Links und öffnet HTML-Dateien"
@@ -4163,6 +4169,9 @@
   "Incorrect password - try again": {
     "Incorrect password - try again": "Falsches Passwort – bitte erneut versuchen"
   },
+  "Index Centering": {
+    "Index Centering": ""
+  },
   "Indicator Style": {
     "Indicator Style": "Indikatorstil"
   },
@@ -4312,6 +4321,9 @@
   },
   "Jobs: ": {
     "Jobs: ": "Druckaufträge: "
+  },
+  "Join video call": {
+    "Join video call": ""
   },
   "Jump to page": {
     "Jump to page": "Zu Seite springen"
@@ -4699,6 +4711,9 @@
   },
   "Map window class names to icon names for proper icon display": {
     "Map window class names to icon names for proper icon display": "Fensterklassennamen Symbolnamen zuordnen für korrekte Symbolanzeige"
+  },
+  "Maps": {
+    "Maps": ""
   },
   "Margin": {
     "Margin": "äußerer Abstand"
@@ -5286,7 +5301,7 @@
     "No checks passed": "Keine Prüfungen bestanden"
   },
   "No codecs found": {
-    "No codecs found": ""
+    "No codecs found": "Keine Codecs gefunden"
   },
   "No custom theme file": {
     "No custom theme file": "Keine benutzerdefinierte Theme-Datei"
@@ -8594,11 +8609,17 @@
   "Use a security key for lock screen authentication.": {
     "Use a security key for lock screen authentication.": "Sicherheitsschlüssel für die Sperrbildschirm-Authentifizierung verwenden."
   },
+  "Use album art accent": {
+    "Use album art accent": ""
+  },
   "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": {
     "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": "Nutze externe Hintergrundbild Verwaltung, z.B. swww, hyprpaper, or swaybg."
   },
   "Use animated wave progress bars for media playback": {
     "Use animated wave progress bars for media playback": "Animierte Wellen-Fortschrittsbalken für Medienwiedergabe verwenden"
+  },
+  "Use colors extracted from album art instead of system theme colors": {
+    "Use colors extracted from album art instead of system theme colors": ""
   },
   "Use custom border size": {
     "Use custom border size": "Benutzerdefinierte Rahmengröße verwenden"

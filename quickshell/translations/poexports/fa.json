@@ -3701,6 +3701,9 @@
   "Generic": {
     "Generic": "عمومی"
   },
+  "Geometric Centering": {
+    "Geometric Centering": ""
+  },
   "Get Started": {
     "Get Started": "شروع کنید"
   },
@@ -3838,6 +3841,9 @@
   },
   "HTML copied to clipboard": {
     "HTML copied to clipboard": "کد HTML در کلیپ‌بورد کپی شد"
+  },
+  "Handles geo: location links": {
+    "Handles geo: location links": ""
   },
   "Handles links and opens HTML files": {
     "Handles links and opens HTML files": "پیوند‌ها را مدیریت و فایل‌های HTML را باز می‌کند"
@@ -4163,6 +4169,9 @@
   "Incorrect password - try again": {
     "Incorrect password - try again": "گذرواژه نادرست - دوباره تلاش کنید"
   },
+  "Index Centering": {
+    "Index Centering": ""
+  },
   "Indicator Style": {
     "Indicator Style": "استایل نشانگر"
   },
@@ -4312,6 +4321,9 @@
   },
   "Jobs: ": {
     "Jobs: ": "کار‌های چاپ: "
+  },
+  "Join video call": {
+    "Join video call": ""
   },
   "Jump to page": {
     "Jump to page": ""
@@ -4699,6 +4711,9 @@
   },
   "Map window class names to icon names for proper icon display": {
     "Map window class names to icon names for proper icon display": "نام کلاس پنجره‌ها را برای نمایش مناسب آیکون به نام آیکون‌ها نگاشت کنید"
+  },
+  "Maps": {
+    "Maps": ""
   },
   "Margin": {
     "Margin": "فاصله بیرونی"
@@ -8594,11 +8609,17 @@
   "Use a security key for lock screen authentication.": {
     "Use a security key for lock screen authentication.": "از یک کلید امنیتی برای صفحه قفل استفاده کن."
   },
+  "Use album art accent": {
+    "Use album art accent": ""
+  },
   "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": {
     "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": "از مدیریت تصویر پس‌زمینه خارجی مانند swww، hyprpaper یا swaybg استفاده کن."
   },
   "Use animated wave progress bars for media playback": {
     "Use animated wave progress bars for media playback": "استفاده از نوارهای پیشرفت موجی متحرک برای پخش رسانه"
+  },
+  "Use colors extracted from album art instead of system theme colors": {
+    "Use colors extracted from album art instead of system theme colors": ""
   },
   "Use custom border size": {
     "Use custom border size": "از اندازه حاشیه سفارشی استفاده کن"

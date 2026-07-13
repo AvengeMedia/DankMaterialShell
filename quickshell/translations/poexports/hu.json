@@ -498,7 +498,7 @@
     "Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)": "Beállítja az előállított színek kontrasztját (-100 = minimum, 0 = normál, 100 = maximum)"
   },
   "Administrator access is required. Use the Sync button in Settings → Greeter to apply.": {
-    "Administrator access is required. Use the Sync button in Settings → Greeter to apply.": ""
+    "Administrator access is required. Use the Sync button in Settings → Greeter to apply.": "Rendszergazdai hozzáférés szükséges. Az alkalmazáshoz használd a Szinkronizálás gombot a Beállítások → Üdvözlőképernyő menüpontban."
   },
   "Administrator group:": {
     "Administrator group:": "Rendszergazda csoport:"
@@ -558,7 +558,7 @@
     "Always Show Percentage": "Mindig mutassa a százalékot"
   },
   "Always blur against the wallpaper, even with Xray off": {
-    "Always blur against the wallpaper, even with Xray off": ""
+    "Always blur against the wallpaper, even with Xray off": "Mindig homályosítson a háttérképpel szemben, még kikapcsolt Röntgen esetén is"
   },
   "Always hide the dock and reveal it when hovering near the dock area": {
     "Always hide the dock and reveal it when hovering near the dock area": "A dokk mindig rejtett, és csak akkor jelenik meg, ha az egérrel a közelébe mutatsz"
@@ -837,13 +837,13 @@
     "Auto Power Saver": "Automatikus energiatakarékosság"
   },
   "Auto matches bar spacing; Off leaves gaps to your Hyprland config": {
-    "Auto matches bar spacing; Off leaves gaps to your Hyprland config": ""
+    "Auto matches bar spacing; Off leaves gaps to your Hyprland config": "Automatikusan igazítja a sávtávolságot; Kikapcsolva hézagokat hagy a Hyprland konfigurációhoz"
   },
   "Auto matches bar spacing; Off leaves gaps to your MangoWC config": {
-    "Auto matches bar spacing; Off leaves gaps to your MangoWC config": ""
+    "Auto matches bar spacing; Off leaves gaps to your MangoWC config": "Automatikusan igazítja a sávtávolságot; Kikapcsolva hézagokat hagy a MangoWC konfigurációhoz"
   },
   "Auto matches bar spacing; Off leaves gaps to your niri config": {
-    "Auto matches bar spacing; Off leaves gaps to your niri config": ""
+    "Auto matches bar spacing; Off leaves gaps to your niri config": "Automatikusan igazítja a sávtávolságot; Kikapcsolva hézagokat hagy a niri konfigurációhoz"
   },
   "Auto mode is on. Manual profile selection is disabled.": {
     "Auto mode is on. Manual profile selection is disabled.": "Az automatikus mód be van kapcsolva. A kézi profilválasztás le van tiltva."
@@ -873,7 +873,7 @@
     "Auto-login": "Automatikus bejelentkezés"
   },
   "Auto-login change needs a sync": {
-    "Auto-login change needs a sync": ""
+    "Auto-login change needs a sync": "Az automatikus bejelentkezés módosításához szinkronizálás szükséges"
   },
   "Auto-login disabled": {
     "Auto-login disabled": "Automatikus bejelentkezés letiltva"
@@ -966,7 +966,7 @@
     "Available Screens (%1)": "Elérhető kijelzők (%1)"
   },
   "Available Updates (%1)": {
-    "Available Updates (%1)": ""
+    "Available Updates (%1)": "Elérhető frissítések (%1)"
   },
   "Available in Detailed and Forecast view modes": {
     "Available in Detailed and Forecast view modes": "Részletes és Előrejelzés nézetmódokban érhető el"
@@ -1065,7 +1065,7 @@
     "Battery %1": "Akkumulátor: %1"
   },
   "Battery Alerts": {
-    "Battery Alerts": ""
+    "Battery Alerts": "Akkumulátor figyelmeztetések"
   },
   "Battery Charge Limit": {
     "Battery Charge Limit": "Akkumulátor töltési korlát"
@@ -1077,7 +1077,7 @@
     "Battery Power": "Akkumulátoros tápellátás"
   },
   "Battery Protection": {
-    "Battery Protection": ""
+    "Battery Protection": "Akkumulátorvédelem"
   },
   "Battery Protection & Charging": {
     "Battery Protection & Charging": "Akkumulátorvédelem és töltés"
@@ -1215,7 +1215,7 @@
     "Border color around blurred surfaces": "Szegélyszín az elmosott felületek körül"
   },
   "Border color around popouts, modals, and other shell surfaces": {
-    "Border color around popouts, modals, and other shell surfaces": ""
+    "Border color around popouts, modals, and other shell surfaces": "Keretszín a felugró ablakok, modális ablakok és egyéb felületek körül"
   },
   "Border w/ Bg": {
     "Border w/ Bg": "Keret háttérrel"
@@ -1275,7 +1275,7 @@
     "Button Color": "Gomb színe"
   },
   "By %1": {
-    "By %1": ""
+    "By %1": "Készítette: %1"
   },
   "CPU": {
     "CPU": "CPU"
@@ -1467,13 +1467,13 @@
     "Choose how to be notified about battery alerts.": "Válaszd ki, hogyan szeretnél értesülni az akkumulátorriasztásokról."
   },
   "Choose how to be notified about critical battery alerts.": {
-    "Choose how to be notified about critical battery alerts.": ""
+    "Choose how to be notified about critical battery alerts.": "Hogyan kapj értesítést a kritikus akkumulátor-figyelmeztetésekről."
   },
   "Choose how to be notified about low battery alerts.": {
-    "Choose how to be notified about low battery alerts.": ""
+    "Choose how to be notified about low battery alerts.": "Hogyan kapj értesítést az alacsony akkumulátorszint-figyelmeztetésekről."
   },
   "Choose how to be notified when charge limit is reached.": {
-    "Choose how to be notified when charge limit is reached.": ""
+    "Choose how to be notified when charge limit is reached.": "Hogyan kapj értesítést a töltési korlát elérésekor."
   },
   "Choose icon": {
     "Choose icon": "Ikon kiválasztása"
@@ -1512,7 +1512,7 @@
     "Choose which displays show this widget": "Mely kijelzők mutassák ezt a widgetet"
   },
   "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": {
-    "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": ""
+    "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": "Mely monitorok jelenítsék meg a lezárási képernyő felületét. A többi monitor egyszínű képet jelenít meg az OLED beégés elleni védelem érdekében."
   },
   "Chroma Style": {
     "Chroma Style": "Chroma stílus"
@@ -1626,7 +1626,7 @@
     "Close Window": "Ablak bezárása"
   },
   "Codec switching is unavailable because pactl was not found": {
-    "Codec switching is unavailable because pactl was not found": ""
+    "Codec switching is unavailable because pactl was not found": "A kodekváltás nem érhető el, mert a pactl nem található"
   },
   "Color": {
     "Color": "Szín"
@@ -1917,7 +1917,7 @@
     "Controls the outer edge of protocol-blurred windows": "Szabályozza a protokoll-elmosott ablakok külső szélét"
   },
   "Controls the outline of popouts, modals, and other shell surfaces": {
-    "Controls the outline of popouts, modals, and other shell surfaces": ""
+    "Controls the outline of popouts, modals, and other shell surfaces": "Szabályozza a felugró ablakok, modális ablakok és egyéb felületek körvonalát"
   },
   "Controls the transparency of the shadow": {
     "Controls the transparency of the shadow": "Az árnyék átlátszósága"
@@ -2004,7 +2004,7 @@
     "Create Window Rule": "Ablakszabály létrehozása"
   },
   "Create a new %1 session (^N)": {
-    "Create a new %1 session (^N)": ""
+    "Create a new %1 session (^N)": "Új %1 munkamenet létrehozása (^N)"
   },
   "Create a new %1 session (n)": {
     "Create a new %1 session (n)": "Új %1 munkamenet létrehozása (n)"
@@ -2175,7 +2175,7 @@
     "Customizable empty space": "Testreszabható üres terület"
   },
   "Customize the font and background of the lock screen, or leave empty to use your theme font and desktop wallpaper. Changes apply instantly.": {
-    "Customize the font and background of the lock screen, or leave empty to use your theme font and desktop wallpaper. Changes apply instantly.": ""
+    "Customize the font and background of the lock screen, or leave empty to use your theme font and desktop wallpaper. Changes apply instantly.": "Szabd testre a lezárási képernyő betűtípusát és hátterét, vagy hagyd üresen a téma betűtípusának és az asztal háttérképének használatához. A változtatások azonnal érvénybe lépnek."
   },
   "Customize which actions appear in the power menu": {
     "Customize which actions appear in the power menu": "A főkapcsoló menüben megjelenő műveletek testreszabása"
@@ -2235,7 +2235,7 @@
     "Dank Bar": "Dank Bar"
   },
   "Dank Bar Xray": {
-    "Dank Bar Xray": ""
+    "Dank Bar Xray": "Dank Bar-röntgen"
   },
   "Dank Dash": {
     "Dank Dash": "Dank Dash"
@@ -2454,7 +2454,7 @@
     "Device unpaired": "Eszköz párosítása megszüntetve"
   },
   "Diff": {
-    "Diff": ""
+    "Diff": "Különbség"
   },
   "Digital": {
     "Digital": "Digitális"
@@ -2715,7 +2715,7 @@
     "Dynamic Theming": "Dinamikus témázás"
   },
   "Dynamic Width": {
-    "Dynamic Width": ""
+    "Dynamic Width": "Dinamikus szélesség"
   },
   "Dynamic colors from wallpaper": {
     "Dynamic colors from wallpaper": "Dinamikus színek a háttérképből"
@@ -3276,7 +3276,7 @@
     "Failed to unpin entry": "Nem sikerült a bejegyzés rögzítésének feloldása"
   },
   "Failed to update %1: %2": {
-    "Failed to update %1: %2": ""
+    "Failed to update %1: %2": "Nem sikerült frissíteni a(z) %1 elemet: %2"
   },
   "Failed to update VPN": {
     "Failed to update VPN": "Nem sikerült frissíteni a VPN-t"
@@ -3363,7 +3363,7 @@
     "Fill": "Kitöltés"
   },
   "Fill Mode": {
-    "Fill Mode": ""
+    "Fill Mode": "Kitöltési mód"
   },
   "Filter": {
     "Filter": "Szűrő"
@@ -3513,7 +3513,7 @@
     "Font Weight": "Betűvastagság"
   },
   "Font used for the clock and date on the lock screen": {
-    "Font used for the clock and date on the lock screen": ""
+    "Font used for the clock and date on the lock screen": "A lezárási képernyőn az órához és a dátumhoz használt betűtípus"
   },
   "Font used on the login screen": {
     "Font used on the login screen": "A bejelentkezési képernyőn használt betűtípus"
@@ -3546,7 +3546,7 @@
     "Force Kill (SIGKILL)": "Kényszerített megszakítás (SIGKILL)"
   },
   "Force Padding": {
-    "Force Padding": ""
+    "Force Padding": "Margó kényszerítése"
   },
   "Force RGBX": {
     "Force RGBX": "RGBX kényszerítése"
@@ -3609,7 +3609,7 @@
     "Frame Border Color": "Keretszegély színe"
   },
   "Frame Xray": {
-    "Frame Xray": ""
+    "Frame Xray": "Keret-röntgen"
   },
   "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": {
     "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": "VRAM/memória felszabadítása az indító bezárásakor. Újranyitáskor némi késést okozhat."
@@ -3636,7 +3636,7 @@
     "Full Day & Month": "Teljes nap és hónap"
   },
   "Full Size": {
-    "Full Size": ""
+    "Full Size": "Teljes méret"
   },
   "Full command to execute": {
     "Full command to execute": "Teljes végrehajtandó parancs"
@@ -3690,7 +3690,7 @@
     "Gap between the end widgets and the bar ends (0 = edge-to-edge)": "Hézag a szélső widgetek és a sáv végei között (0 = szegélytől szegélyig)"
   },
   "Gaps": {
-    "Gaps": ""
+    "Gaps": "Hézagok"
   },
   "Generate Override": {
     "Generate Override": "Felülbírálás létrehozása"
@@ -3700,6 +3700,9 @@
   },
   "Generic": {
     "Generic": "Általános"
+  },
+  "Geometric Centering": {
+    "Geometric Centering": ""
   },
   "Get Started": {
     "Get Started": "Kezdés"
@@ -3783,7 +3786,7 @@
     "Greeter only — format for the date on the login screen": "Csak az üdvözlőképernyőre – a bejelentkezési képernyőn megjelenő dátum formátuma"
   },
   "Greeter sync complete": {
-    "Greeter sync complete": ""
+    "Greeter sync complete": "Bejelentkezőképernyő szinkronizálása kész"
   },
   "Grid": {
     "Grid": "Rács"
@@ -3838,6 +3841,9 @@
   },
   "HTML copied to clipboard": {
     "HTML copied to clipboard": "HTML a vágólapra másolva"
+  },
+  "Handles geo: location links": {
+    "Handles geo: location links": ""
   },
   "Handles links and opens HTML files": {
     "Handles links and opens HTML files": "Kezeli a hivatkozásokat és megnyitja a HTML-fájlokat"
@@ -3939,10 +3945,10 @@
     "Hide the bar when the pointer leaves even if a popout is still open": "A sáv elrejtése, ha a mutató elhagyja azt, még akkor is, ha egy felugró ablak nyitva van"
   },
   "Hide when no updates: OFF": {
-    "Hide when no updates: OFF": ""
+    "Hide when no updates: OFF": "Elrejtés, ha nincs frissítés: KI"
   },
   "Hide when no updates: ON": {
-    "Hide when no updates: ON": ""
+    "Hide when no updates: ON": "Elrejtés, ha nincs frissítés: BE"
   },
   "High": {
     "High": "Magas"
@@ -4023,7 +4029,7 @@
     "How the background image is scaled": "A háttérkép méretezésének módja"
   },
   "How the wallpaper is scaled to fit the screen": {
-    "How the wallpaper is scaled to fit the screen": ""
+    "How the wallpaper is scaled to fit the screen": "Hogyan méreteződik a háttérkép a képernyőhöz"
   },
   "Humidity": {
     "Humidity": "Páratartalom"
@@ -4089,7 +4095,7 @@
     "Identical alerts stack as separate notification cards": "Az azonos riasztások különálló értesítési kártyákként halmozódnak"
   },
   "Identify": {
-    "Identify": ""
+    "Identify": "Azonosítás"
   },
   "Idle": {
     "Idle": "Tétlen"
@@ -4163,6 +4169,9 @@
   "Incorrect password - try again": {
     "Incorrect password - try again": "Helytelen jelszó - próbáld újra"
   },
+  "Index Centering": {
+    "Index Centering": ""
+  },
   "Indicator Style": {
     "Indicator Style": "Jelzőstílus"
   },
@@ -4191,7 +4200,7 @@
     "Initialised": "Inicializálva"
   },
   "Inner Gaps": {
-    "Inner Gaps": ""
+    "Inner Gaps": "Belső hézagok"
   },
   "Inner padding applied to each widget": {
     "Inner padding applied to each widget": "Az egyes widgetekre alkalmazott belső térköz"
@@ -4312,6 +4321,9 @@
   },
   "Jobs: ": {
     "Jobs: ": "Feladatok: "
+  },
+  "Join video call": {
+    "Join video call": ""
   },
   "Jump to page": {
     "Jump to page": "Ugrás az oldalra"
@@ -4557,7 +4569,7 @@
     "Lock Screen": "Zárolási képernyő"
   },
   "Lock Screen Appearance": {
-    "Lock Screen Appearance": ""
+    "Lock Screen Appearance": "Lezárási képernyő megjelenése"
   },
   "Lock Screen Display": {
     "Lock Screen Display": "Zárolási képernyő megjelenítése"
@@ -4584,7 +4596,7 @@
     "Lock screen authentication changes apply automatically and may open a terminal when sudo authentication is required.": "A képernyőzár hitelesítési módosításai automatikusan alkalmazásra kerülnek, és terminált nyithatnak meg, ha sudo hitelesítés szükséges."
   },
   "Lock screen font": {
-    "Lock screen font": ""
+    "Lock screen font": "Lezárási képernyő betűtípusa"
   },
   "Locked": {
     "Locked": "Zárolva"
@@ -4700,6 +4712,9 @@
   "Map window class names to icon names for proper icon display": {
     "Map window class names to icon names for proper icon display": "Rendelj hozzá ablakosztályneveket ikonnevekhez a megfelelő megjelenítés érdekében"
   },
+  "Maps": {
+    "Maps": ""
+  },
   "Margin": {
     "Margin": "Margó"
   },
@@ -4728,7 +4743,7 @@
     "Material": "Material"
   },
   "Material Battery Style": {
-    "Material Battery Style": ""
+    "Material Battery Style": "Anyagszerű akkumulátor stílus"
   },
   "Material Colors": {
     "Material Colors": "Material színek"
@@ -5286,7 +5301,7 @@
     "No checks passed": "Nincs sikeres ellenőrzés"
   },
   "No codecs found": {
-    "No codecs found": ""
+    "No codecs found": "Nem találhatók kodekek"
   },
   "No custom theme file": {
     "No custom theme file": "Nincs egyéni témafájl"
@@ -5451,7 +5466,7 @@
     "No trigger": "Nincs indító"
   },
   "No updates available.": {
-    "No updates available.": ""
+    "No updates available.": "Nincsenek elérhető frissítések."
   },
   "No user specified": {
     "No user specified": "Nincs felhasználó megadva"
@@ -5775,7 +5790,7 @@
     "Other": "Egyéb"
   },
   "Outer Gaps": {
-    "Outer Gaps": ""
+    "Outer Gaps": "Külső hézagok"
   },
   "Outline": {
     "Outline": "Körvonal"
@@ -5802,7 +5817,7 @@
     "Overflow": "Túlcsordulás"
   },
   "Overlay": {
-    "Overlay": ""
+    "Overlay": "Átfedés"
   },
   "Overridden by config": {
     "Overridden by config": "Felülírta a konfiguráció"
@@ -5937,7 +5952,7 @@
     "Paste": "Beillesztés"
   },
   "Paste failed: %1": {
-    "Paste failed: %1": ""
+    "Paste failed: %1": "A beillesztés meghiúsult: %1"
   },
   "Path copied to clipboard": {
     "Path copied to clipboard": "Útmutató a vágólapra másolva"
@@ -6201,7 +6216,7 @@
     "Power Profile Degradation": "Energiaprofil visszavétele"
   },
   "Power Profiles & Saving": {
-    "Power Profiles & Saving": ""
+    "Power Profiles & Saving": "Energiaprofilok és energiatakarékosság"
   },
   "Power Profiles Auto-Switching": {
     "Power Profiles Auto-Switching": "Energiaprofilok automatikus váltása"
@@ -6249,7 +6264,7 @@
     "Press 'n' or click 'New Session' to create one": "Nyomd meg az 'n' billentyűt vagy kattints az 'Új munkamenet' gombra a létrehozáshoz"
   },
   "Press Ctrl+N or click 'New Session' to create one": {
-    "Press Ctrl+N or click 'New Session' to create one": ""
+    "Press Ctrl+N or click 'New Session' to create one": "Nyomd meg a Ctrl+N billentyűkombinációt vagy kattints az „Új munkamenet” gombra a létrehozásához"
   },
   "Press Enter and the audio system will restart to apply the change": {
     "Press Enter and the audio system will restart to apply the change": "Nyomd meg az Enter gombot a hangrendszer újraindulásához és a módosítások alkalmazásához"
@@ -6630,7 +6645,7 @@
     "Requires a newer version of Quickshell": "A Quickshell újabb verziója szükséges"
   },
   "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys). Auth changes apply automatically and may open a terminal for sudo.": {
-    "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys). Auth changes apply automatically and may open a terminal for sudo.": ""
+    "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys). Auth changes apply automatically and may open a terminal for sudo.": "Megköveteli a greetd, dms-greeter programokat, és hogy a felhasználója a greeter csoportban legyen (valamint fprintd/pam_fprintd az ujjlenyomathoz, pam_u2f a biztonsági kulcsokhoz). A hitelesítési változtatások automatikusan érvényesülnek, és terminált nyithatnak meg a sudo-hoz."
   },
   "Requires night mode support": {
     "Requires night mode support": "Éjszakai mód támogatás szükséges"
@@ -7047,7 +7062,7 @@
     "Select at least one provider": "Válassz ki legalább egy szolgáltatót"
   },
   "Select background image": {
-    "Select background image": ""
+    "Select background image": "Háttérkép kiválasztása"
   },
   "Select device": {
     "Select device": "Eszköz kiválasztása"
@@ -7065,7 +7080,7 @@
     "Select greeter background image": "Üdvözlőképernyő háttérképének kiválasztása"
   },
   "Select lock screen background image": {
-    "Select lock screen background image": ""
+    "Select lock screen background image": "Lezárási képernyő háttérképének kiválasztása"
   },
   "Select monitor to configure wallpaper": {
     "Select monitor to configure wallpaper": "Válassz monitort a háttérkép beállításához"
@@ -7176,7 +7191,7 @@
     "Setting": "Beállítás"
   },
   "Setting up...": {
-    "Setting up...": "Beállítás..."
+    "Setting up...": "Beállítás…"
   },
   "Settings": {
     "Settings": "Beállítások"
@@ -7680,7 +7695,7 @@
     "Space between windows": "Ablakok közötti hely"
   },
   "Space between windows and screen edges": {
-    "Space between windows and screen edges": ""
+    "Space between windows and screen edges": "Távolság az ablakok és a képernyő szélei között"
   },
   "Spacer": {
     "Spacer": "Térköz"
@@ -7791,10 +7806,10 @@
     "Surface Behavior": "Felület viselkedése"
   },
   "Surface Border Color": {
-    "Surface Border Color": ""
+    "Surface Border Color": "Felületkeret színe"
   },
   "Surface Border Opacity": {
-    "Surface Border Opacity": ""
+    "Surface Border Opacity": "Felületkeret átlátszatlansága"
   },
   "Surface Container": {
     "Surface Container": "Felszíni tároló"
@@ -7860,7 +7875,7 @@
     "Sync Position Across Screens": "Pozíció szinkronizálása a képernyők között"
   },
   "Sync applies your theme and settings to the login screen. Other users should run dms greeter sync --profile instead of a full sync. Authentication changes apply automatically.": {
-    "Sync applies your theme and settings to the login screen. Other users should run dms greeter sync --profile instead of a full sync. Authentication changes apply automatically.": ""
+    "Sync applies your theme and settings to the login screen. Other users should run dms greeter sync --profile instead of a full sync. Authentication changes apply automatically.": "A szinkronizálás alkalmazza a témát és a beállításokat a bejelentkező képernyőre. A többi felhasználónak a dms greeter sync --profile parancsot kell futtatnia a teljes szinkronizálás helyett. A hitelesítési módosítások automatikusan érvényesülnek."
   },
   "Sync completed successfully.": {
     "Sync completed successfully.": "Szinkronizálás sikeresen befejeződött."
@@ -7875,10 +7890,10 @@
     "Sync needs sudo authentication. Opening terminal so you can use password or fingerprint.": "A szinkronizáláshoz sudo hitelesítés szükséges. Terminál megnyitása a jelszó vagy ujjlenyomat használatához."
   },
   "Sync to apply": {
-    "Sync to apply": ""
+    "Sync to apply": "Szinkronizálás az alkalmazáshoz"
   },
   "Syncing...": {
-    "Syncing...": ""
+    "Syncing...": "Szinkronizálás…"
   },
   "System": {
     "System": "Rendszer"
@@ -8130,13 +8145,13 @@
     "Tile H": "Vízszintes mozaik"
   },
   "Tile Horizontally": {
-    "Tile Horizontally": ""
+    "Tile Horizontally": "Csempézés vízszintesen"
   },
   "Tile V": {
     "Tile V": "Függőleges mozaik"
   },
   "Tile Vertically": {
-    "Tile Vertically": ""
+    "Tile Vertically": "Csempézés függőlegesen"
   },
   "Tiled": {
     "Tiled": "Csempézett"
@@ -8442,7 +8457,7 @@
     "Unknown GPU": "Ismeretlen GPU"
   },
   "Unknown Model": {
-    "Unknown Model": ""
+    "Unknown Model": "Ismeretlen modell"
   },
   "Unknown Monitor": {
     "Unknown Monitor": "Ismeretlen monitor"
@@ -8523,10 +8538,10 @@
     "Update failed: %1": "Frissítés sikertelen: %1"
   },
   "Updating %1...": {
-    "Updating %1...": ""
+    "Updating %1...": "A(z) %1 frissítése…"
   },
   "Updating plugins...": {
-    "Updating plugins...": ""
+    "Updating plugins...": "Bővítmények frissítése…"
   },
   "Upgrading...": {
     "Upgrading...": "Frissítés…"
@@ -8580,7 +8595,7 @@
     "Use System Theme": "Rendszertéma használata"
   },
   "Use a custom image for the lock screen, or leave empty to use your desktop wallpaper.": {
-    "Use a custom image for the lock screen, or leave empty to use your desktop wallpaper.": ""
+    "Use a custom image for the lock screen, or leave empty to use your desktop wallpaper.": "Egyéni kép használata a lezárási képernyőhöz, vagy hagyd üresen az asztali háttérkép használatához."
   },
   "Use a custom image for the login screen, or leave empty to use your desktop wallpaper.": {
     "Use a custom image for the login screen, or leave empty to use your desktop wallpaper.": "Egyéni kép használata a bejelentkezési képernyőhöz, hagyd üresen az asztali háttérkép használatához."
@@ -8594,11 +8609,17 @@
   "Use a security key for lock screen authentication.": {
     "Use a security key for lock screen authentication.": "Biztonsági kulcs használata a képernyőzár hitelesítéséhez."
   },
+  "Use album art accent": {
+    "Use album art accent": ""
+  },
   "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": {
     "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": "Külső háttérképkezelő használatához, mint például a swww, hyprpaper vagy a swaybg."
   },
   "Use animated wave progress bars for media playback": {
     "Use animated wave progress bars for media playback": "Animált, hullámzó folyamatjelzők használata a médialejátszáshoz"
+  },
+  "Use colors extracted from album art instead of system theme colors": {
+    "Use colors extracted from album art instead of system theme colors": ""
   },
   "Use custom border size": {
     "Use custom border size": "Egyéni szegélyméret használata"
@@ -9306,7 +9327,7 @@
     "source": "forrás"
   },
   "the Qt 6 Multimedia QML module": {
-    "the Qt 6 Multimedia QML module": ""
+    "the Qt 6 Multimedia QML module": "a Qt 6 Multimedia QML modul"
   },
   "this app": {
     "this app": "ez az alkalmazás"

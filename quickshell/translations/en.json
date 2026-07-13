@@ -416,13 +416,7 @@
   {
     "term": "24-Hour Format",
     "context": "24-Hour Format",
-    "reference": "Modules/Settings/WallpaperTab.qml:1121, Modules/Settings/TimeWeatherTab.qml:53",
-    "comment": ""
-  },
-  {
-    "term": "24-hour clock",
-    "context": "24-hour clock",
-    "reference": "Modules/Settings/GreeterTab.qml:563",
+    "reference": "Modules/Settings/WallpaperTab.qml:1121",
     "comment": ""
   },
   {
@@ -692,13 +686,13 @@
   {
     "term": "Accept Jobs",
     "context": "Accept Jobs",
-    "reference": "Modules/Settings/PrinterTab.qml:1306",
+    "reference": "Modules/Settings/PrinterTab.qml:1319",
     "comment": ""
   },
   {
     "term": "Accepting",
     "context": "Accepting",
-    "reference": "Modules/Settings/PrinterTab.qml:1168",
+    "reference": "Modules/Settings/PrinterTab.qml:1181",
     "comment": ""
   },
   {
@@ -782,7 +776,7 @@
   {
     "term": "Active Color",
     "context": "Active Color",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:4251",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:4303",
     "comment": ""
   },
   {
@@ -872,7 +866,7 @@
   {
     "term": "Add Printer",
     "context": "Add Printer",
-    "reference": "Modules/Settings/PrinterTab.qml:267",
+    "reference": "Modules/Settings/PrinterTab.qml:277",
     "comment": ""
   },
   {
@@ -884,7 +878,7 @@
   {
     "term": "Add Widget",
     "context": "Add Widget",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:1230, Modules/Settings/WidgetSelectionPopup.qml:111, Modules/Settings/DesktopWidgetsTab.qml:191, Modules/ControlCenter/Components/EditControls.qml:131, Modules/ControlCenter/Components/EditControls.qml:238",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:1282, Modules/Settings/WidgetSelectionPopup.qml:111, Modules/Settings/DesktopWidgetsTab.qml:191, Modules/ControlCenter/Components/EditControls.qml:131, Modules/ControlCenter/Components/EditControls.qml:238",
     "comment": ""
   },
   {
@@ -914,7 +908,7 @@
   {
     "term": "Add a task...",
     "context": "Add a task...",
-    "reference": "Modules/DankDash/Overview/CalendarOverviewCard.qml:1048",
+    "reference": "Modules/DankDash/Overview/CalendarOverviewCard.qml:1080",
     "comment": "placeholder in the new-task input field"
   },
   {
@@ -926,7 +920,7 @@
   {
     "term": "Add by Address",
     "context": "Add by Address",
-    "reference": "Modules/Settings/PrinterTab.qml:390",
+    "reference": "Modules/Settings/PrinterTab.qml:400",
     "comment": "Toggle button to manually add a printer by IP or hostname"
   },
   {
@@ -980,7 +974,7 @@
   {
     "term": "Adjust volume per scroll indent",
     "context": "Adjust volume per scroll indent",
-    "reference": "Modules/Settings/MediaPlayerTab.qml:102",
+    "reference": "Modules/Settings/MediaPlayerTab.qml:109",
     "comment": ""
   },
   {
@@ -1016,7 +1010,7 @@
   {
     "term": "All",
     "context": "All",
-    "reference": "Modals/ProcessListModal.qml:383, Services/AppSearchService.qml:728, Services/AppSearchService.qml:749, dms-plugins/DankStickerSearch/DankStickerSearch.qml:101, Modals/DankLauncherV2/Controller.qml:783, Modals/DankLauncherV2/SpotlightLauncherContent.qml:440, Modals/DankLauncherV2/LauncherContent.qml:334, Modals/DankLauncherV2/LauncherContent.qml:623, Modals/Clipboard/ClipboardContent.qml:16, Modules/ProcessList/ProcessListPopout.qml:169, Modules/Settings/WidgetsTabSection.qml:3962, Modules/Settings/WidgetsTabSection.qml:4018, Modules/Settings/PluginBrowser.qml:194, Modules/Settings/KeybindsTab.qml:458, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:103, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:106, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:118, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:254, Modules/Notifications/Center/HistoryNotificationList.qml:87",
+    "reference": "Modals/ProcessListModal.qml:383, Services/AppSearchService.qml:728, Services/AppSearchService.qml:749, dms-plugins/DankStickerSearch/DankStickerSearch.qml:101, Modals/DankLauncherV2/Controller.qml:783, Modals/DankLauncherV2/SpotlightLauncherContent.qml:440, Modals/DankLauncherV2/LauncherContent.qml:334, Modals/DankLauncherV2/LauncherContent.qml:623, Modals/Clipboard/ClipboardContent.qml:16, Modules/ProcessList/ProcessListPopout.qml:169, Modules/Settings/WidgetsTabSection.qml:4014, Modules/Settings/WidgetsTabSection.qml:4070, Modules/Settings/PluginBrowser.qml:194, Modules/Settings/KeybindsTab.qml:458, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:103, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:106, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:118, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:254, Modules/Notifications/Center/HistoryNotificationList.qml:87",
     "comment": "Tailscale filter: all devices | notification history filter | plugin browser category filter"
   },
   {
@@ -1028,7 +1022,7 @@
   {
     "term": "All day",
     "context": "All day",
-    "reference": "Modules/DankDash/Overview/CalendarEventEditor.qml:205, Modules/DankDash/Overview/CalendarEventDetail.qml:88, Modules/DankDash/Overview/CalendarOverviewCard.qml:891",
+    "reference": "Modules/DankDash/Overview/CalendarEventEditor.qml:205, Modules/DankDash/Overview/CalendarEventDetail.qml:104, Modules/DankDash/Overview/CalendarOverviewCard.qml:909",
     "comment": "calendar task with no specific time"
   },
   {
@@ -1052,7 +1046,7 @@
   {
     "term": "Allow adjusting device volume by scrolling on the right half of items in the device list",
     "context": "Allow adjusting device volume by scrolling on the right half of items in the device list",
-    "reference": "Modules/Settings/MediaPlayerTab.qml:133",
+    "reference": "Modules/Settings/MediaPlayerTab.qml:140",
     "comment": ""
   },
   {
@@ -1124,7 +1118,7 @@
   {
     "term": "Always on icons",
     "context": "Always on icons",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:2768",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2820",
     "comment": ""
   },
   {
@@ -1280,7 +1274,7 @@
   {
     "term": "App name or identity (e.g., firefox)",
     "context": "App name or identity (e.g., firefox)",
-    "reference": "Modules/Settings/MediaPlayerTab.qml:166",
+    "reference": "Modules/Settings/MediaPlayerTab.qml:173",
     "comment": ""
   },
   {
@@ -1388,7 +1382,7 @@
   {
     "term": "Apps Dock Settings",
     "context": "Apps Dock Settings",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:3904",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:3956",
     "comment": ""
   },
   {
@@ -1466,7 +1460,7 @@
   {
     "term": "Audio",
     "context": "Audio",
-    "reference": "Modals/Settings/SettingsSidebar.qml:318, Modules/Settings/WidgetsTabSection.qml:2231, Modules/Settings/WidgetsTabSection.qml:2462",
+    "reference": "Modals/Settings/SettingsSidebar.qml:318, Modules/Settings/WidgetsTabSection.qml:2283, Modules/Settings/WidgetsTabSection.qml:2514",
     "comment": ""
   },
   {
@@ -1520,7 +1514,7 @@
   {
     "term": "Audio system restarted",
     "context": "Audio system restarted",
-    "reference": "Services/AudioService.qml:367",
+    "reference": "Services/AudioService.qml:368",
     "comment": ""
   },
   {
@@ -1622,7 +1616,7 @@
   {
     "term": "Auto",
     "context": "Auto",
-    "reference": "Modules/Settings/ThemeColorsTab.qml:406, Modules/Settings/ThemeColorsTab.qml:406, Modules/Settings/WidgetsTabSection.qml:1645, Modules/Settings/NetworkStatusTab.qml:164, Modules/Settings/TimeWeatherTab.qml:135, Modules/Settings/DisplayConfigTab.qml:159, Modules/Settings/DisplayConfigTab.qml:205, Modules/Settings/NetworkWifiTab.qml:239, Modules/Settings/NetworkWifiTab.qml:243, Modules/Settings/NetworkWifiTab.qml:244, Modules/Settings/NetworkWifiTab.qml:247, Modules/Settings/CompositorLayoutTab.qml:283, Modules/Settings/CompositorLayoutTab.qml:412, Modules/Settings/CompositorLayoutTab.qml:564, Modules/Settings/DesktopWidgetSettings/SystemMonitorSettings.qml:351, Modules/Settings/DesktopWidgetSettings/SystemMonitorSettings.qml:359, Modules/Settings/Widgets/TerminalPickerRow.qml:7, Modules/ControlCenter/Details/NetworkDetail.qml:118, Modules/ControlCenter/Details/NetworkDetail.qml:119, Modules/ControlCenter/Details/NetworkDetail.qml:122, Modules/ControlCenter/Details/NetworkDetail.qml:125, Modules/ControlCenter/BuiltinPlugins/DisplayProfilesWidget.qml:29, Modules/ControlCenter/BuiltinPlugins/DisplayProfilesWidget.qml:106",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:406, Modules/Settings/ThemeColorsTab.qml:406, Modules/Settings/WidgetsTabSection.qml:1697, Modules/Settings/NetworkStatusTab.qml:164, Modules/Settings/TimeWeatherTab.qml:158, Modules/Settings/DisplayConfigTab.qml:159, Modules/Settings/DisplayConfigTab.qml:205, Modules/Settings/NetworkWifiTab.qml:239, Modules/Settings/NetworkWifiTab.qml:243, Modules/Settings/NetworkWifiTab.qml:244, Modules/Settings/NetworkWifiTab.qml:247, Modules/Settings/CompositorLayoutTab.qml:283, Modules/Settings/CompositorLayoutTab.qml:412, Modules/Settings/CompositorLayoutTab.qml:564, Modules/Settings/DesktopWidgetSettings/SystemMonitorSettings.qml:351, Modules/Settings/DesktopWidgetSettings/SystemMonitorSettings.qml:359, Modules/Settings/Widgets/TerminalPickerRow.qml:7, Modules/ControlCenter/Details/NetworkDetail.qml:118, Modules/ControlCenter/Details/NetworkDetail.qml:119, Modules/ControlCenter/Details/NetworkDetail.qml:122, Modules/ControlCenter/Details/NetworkDetail.qml:125, Modules/ControlCenter/BuiltinPlugins/DisplayProfilesWidget.qml:29, Modules/ControlCenter/BuiltinPlugins/DisplayProfilesWidget.qml:106",
     "comment": "calendar backend option | theme category option"
   },
   {
@@ -1646,13 +1640,13 @@
   {
     "term": "Auto Location",
     "context": "Auto Location",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:486",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:509",
     "comment": ""
   },
   {
     "term": "Auto Overflow",
     "context": "Auto Overflow",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:1577",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:1629",
     "comment": ""
   },
   {
@@ -1760,7 +1754,7 @@
   {
     "term": "Auto-login on startup",
     "context": "Auto-login on startup",
-    "reference": "Modules/Settings/GreeterTab.qml:681",
+    "reference": "Modules/Settings/GreeterTab.qml:645",
     "comment": ""
   },
   {
@@ -1778,13 +1772,13 @@
   {
     "term": "Autoconnect disabled",
     "context": "Autoconnect disabled",
-    "reference": "Services/LegacyNetworkService.qml:506, Services/DMSNetworkService.qml:1017",
+    "reference": "Services/LegacyNetworkService.qml:506, Services/DMSNetworkService.qml:1023",
     "comment": ""
   },
   {
     "term": "Autoconnect enabled",
     "context": "Autoconnect enabled",
-    "reference": "Services/LegacyNetworkService.qml:506, Services/DMSNetworkService.qml:1017",
+    "reference": "Services/LegacyNetworkService.qml:506, Services/DMSNetworkService.qml:1023",
     "comment": ""
   },
   {
@@ -1838,7 +1832,7 @@
   {
     "term": "Automatically determine your location using your IP address",
     "context": "Automatically determine your location using your IP address",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:487",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:510",
     "comment": ""
   },
   {
@@ -1898,7 +1892,7 @@
   {
     "term": "Available",
     "context": "Available",
-    "reference": "Modules/DankDash/MediaDropdownOverlay.qml:372, Modules/Settings/PrinterTab.qml:202, Modules/ControlCenter/Details/AudioInputDetail.qml:256, Modules/ControlCenter/Details/AudioOutputDetail.qml:265",
+    "reference": "Modules/DankDash/MediaDropdownOverlay.qml:372, Modules/Settings/PrinterTab.qml:212, Modules/ControlCenter/Details/AudioInputDetail.qml:256, Modules/ControlCenter/Details/AudioOutputDetail.qml:265",
     "comment": ""
   },
   {
@@ -1976,7 +1970,7 @@
   {
     "term": "Background",
     "context": "Background",
-    "reference": "Modules/Settings/GreeterTab.qml:614, Modules/Settings/LockScreenTab.qml:183",
+    "reference": "Modules/Settings/GreeterTab.qml:578, Modules/Settings/LockScreenTab.qml:183",
     "comment": ""
   },
   {
@@ -2024,13 +2018,13 @@
   {
     "term": "Balance power and performance",
     "context": "Balance power and performance",
-    "reference": "Common/Theme.qml:1657",
+    "reference": "Common/Theme.qml:1655",
     "comment": "power profile description"
   },
   {
     "term": "Balanced",
     "context": "Balanced",
-    "reference": "Common/Theme.qml:1644",
+    "reference": "Common/Theme.qml:1642",
     "comment": "power profile option"
   },
   {
@@ -2108,7 +2102,7 @@
   {
     "term": "Battery",
     "context": "Battery",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1581, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:740, Modals/Settings/SettingsSidebar.qml:371, Modules/Settings/WidgetsTabSection.qml:2276, Modules/Settings/WidgetsTabSection.qml:2462, Modules/Settings/PowerSleepTab.qml:59, Modules/Settings/WidgetsTab.qml:194, Modules/ControlCenter/Models/WidgetModel.qml:221, Modules/ControlCenter/Widgets/BatteryPill.qml:17",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1581, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:740, Modals/Settings/SettingsSidebar.qml:371, Modules/Settings/WidgetsTabSection.qml:2328, Modules/Settings/WidgetsTabSection.qml:2514, Modules/Settings/PowerSleepTab.qml:59, Modules/Settings/WidgetsTab.qml:194, Modules/ControlCenter/Models/WidgetModel.qml:221, Modules/ControlCenter/Widgets/BatteryPill.qml:17",
     "comment": "KDE Connect battery label"
   },
   {
@@ -2270,7 +2264,7 @@
   {
     "term": "Bluetooth",
     "context": "Bluetooth",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:2221, Modules/Settings/WidgetsTabSection.qml:2462, Modules/ControlCenter/Models/WidgetModel.qml:170, Modules/ControlCenter/Components/DragDropGrid.qml:505",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2273, Modules/Settings/WidgetsTabSection.qml:2514, Modules/ControlCenter/Models/WidgetModel.qml:170, Modules/ControlCenter/Components/DragDropGrid.qml:505",
     "comment": "bluetooth status"
   },
   {
@@ -2444,7 +2438,7 @@
   {
     "term": "Brightness",
     "context": "Brightness",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:2261, Modules/Settings/WidgetsTabSection.qml:2462, Modules/Settings/DockTab.qml:498, Modules/Settings/LauncherTab.qml:523, Modules/Settings/OSDTab.qml:117",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2313, Modules/Settings/WidgetsTabSection.qml:2514, Modules/Settings/DockTab.qml:498, Modules/Settings/LauncherTab.qml:523, Modules/Settings/OSDTab.qml:117",
     "comment": ""
   },
   {
@@ -2456,7 +2450,7 @@
   {
     "term": "Brightness Value",
     "context": "Brightness Value",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:2266, Modules/Settings/WidgetsTabSection.qml:2462",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2318, Modules/Settings/WidgetsTabSection.qml:2514",
     "comment": ""
   },
   {
@@ -2570,7 +2564,7 @@
   {
     "term": "CUPS Print Server",
     "context": "CUPS Print Server",
-    "reference": "Modules/Settings/PrinterTab.qml:163",
+    "reference": "Modules/Settings/PrinterTab.qml:173",
     "comment": ""
   },
   {
@@ -2582,19 +2576,19 @@
   {
     "term": "Calendar",
     "context": "Calendar",
-    "reference": "Modules/Settings/DefaultAppsTab.qml:302, Modules/DankDash/Overview/CalendarEventEditor.qml:273",
+    "reference": "Modules/Settings/DefaultAppsTab.qml:312, Modules/DankDash/Overview/CalendarEventEditor.qml:273",
     "comment": "Calendar"
   },
   {
     "term": "Calendar Backend",
     "context": "Calendar Backend",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:122",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:145",
     "comment": ""
   },
   {
     "term": "Camera",
     "context": "Camera",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:2858",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2910",
     "comment": ""
   },
   {
@@ -2606,7 +2600,7 @@
   {
     "term": "Cancel all jobs for \"%1\"?",
     "context": "Cancel all jobs for \"%1\"?",
-    "reference": "Modules/Settings/PrinterTab.qml:1385",
+    "reference": "Modules/Settings/PrinterTab.qml:1398",
     "comment": ""
   },
   {
@@ -2720,13 +2714,13 @@
   {
     "term": "Change Song",
     "context": "Change Song",
-    "reference": "Modules/Settings/MediaPlayerTab.qml:70",
+    "reference": "Modules/Settings/MediaPlayerTab.qml:77",
     "comment": "media scroll wheel option"
   },
   {
     "term": "Change Volume",
     "context": "Change Volume",
-    "reference": "Modules/Settings/MediaPlayerTab.qml:70",
+    "reference": "Modules/Settings/MediaPlayerTab.qml:77",
     "comment": "media scroll wheel option"
   },
   {
@@ -3008,19 +3002,19 @@
   {
     "term": "Clear",
     "context": "Clear",
-    "reference": "Modules/Settings/PrinterTab.qml:1386, Modules/Notifications/Center/NotificationHeader.qml:161",
+    "reference": "Modules/Settings/PrinterTab.qml:1399, Modules/Notifications/Center/NotificationHeader.qml:161",
     "comment": ""
   },
   {
     "term": "Clear All",
     "context": "Clear All",
-    "reference": "Modals/Clipboard/ClipboardHeader.qml:70, Modals/Clipboard/ClipboardHistoryPopout.qml:105, Modals/Clipboard/ClipboardHistoryModal.qml:97, Modules/Settings/PrinterTab.qml:1370, Modules/DankBar/Widgets/ClipboardButton.qml:254",
+    "reference": "Modals/Clipboard/ClipboardHeader.qml:70, Modals/Clipboard/ClipboardHistoryPopout.qml:105, Modals/Clipboard/ClipboardHistoryModal.qml:97, Modules/Settings/PrinterTab.qml:1383, Modules/DankBar/Widgets/ClipboardButton.qml:254",
     "comment": ""
   },
   {
     "term": "Clear All Jobs",
     "context": "Clear All Jobs",
-    "reference": "Modules/Settings/PrinterTab.qml:1384",
+    "reference": "Modules/Settings/PrinterTab.qml:1397",
     "comment": ""
   },
   {
@@ -3314,7 +3308,7 @@
   {
     "term": "Colorize Active",
     "context": "Colorize Active",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:4208",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:4260",
     "comment": ""
   },
   {
@@ -3380,13 +3374,13 @@
   {
     "term": "Compact",
     "context": "Compact",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:15, Modules/Settings/WidgetsTabSection.qml:865, Modules/Settings/WidgetsTabSection.qml:1843, Modules/Settings/NotificationsTab.qml:297",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:15, Modules/Settings/WidgetsTabSection.qml:917, Modules/Settings/WidgetsTabSection.qml:1895, Modules/Settings/NotificationsTab.qml:297",
     "comment": ""
   },
   {
     "term": "Compact Mode",
     "context": "Compact Mode",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:1008, Modules/Settings/WidgetsTabSection.qml:3658",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:1060, Modules/Settings/WidgetsTabSection.qml:3710",
     "comment": ""
   },
   {
@@ -3458,7 +3452,7 @@
   {
     "term": "Configure a new printer",
     "context": "Configure a new printer",
-    "reference": "Modules/Settings/PrinterTab.qml:276",
+    "reference": "Modules/Settings/PrinterTab.qml:286",
     "comment": ""
   },
   {
@@ -3614,7 +3608,7 @@
   {
     "term": "Connection failed",
     "context": "Connection failed",
-    "reference": "Modules/Settings/PrinterTab.qml:639",
+    "reference": "Modules/Settings/PrinterTab.qml:652",
     "comment": "Status message when test connection to printer fails"
   },
   {
@@ -3770,7 +3764,7 @@
   {
     "term": "Convenience options for the login screen. Sync to apply.",
     "context": "Convenience options for the login screen. Sync to apply.",
-    "reference": "Modules/Settings/GreeterTab.qml:652",
+    "reference": "Modules/Settings/GreeterTab.qml:616",
     "comment": ""
   },
   {
@@ -3908,7 +3902,7 @@
   {
     "term": "Create Printer",
     "context": "Create Printer",
-    "reference": "Modules/Settings/PrinterTab.qml:820",
+    "reference": "Modules/Settings/PrinterTab.qml:833",
     "comment": ""
   },
   {
@@ -3950,7 +3944,7 @@
   {
     "term": "Creating...",
     "context": "Creating...",
-    "reference": "Modules/Settings/PrinterTab.qml:820",
+    "reference": "Modules/Settings/PrinterTab.qml:833",
     "comment": ""
   },
   {
@@ -4040,7 +4034,7 @@
   {
     "term": "Current Monitor",
     "context": "Current Monitor",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:3832",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:3884",
     "comment": "Running apps filter: only show apps from the same monitor"
   },
   {
@@ -4070,13 +4064,13 @@
   {
     "term": "Current Weather",
     "context": "Current Weather",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:663",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:686",
     "comment": ""
   },
   {
     "term": "Current Workspace",
     "context": "Current Workspace",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:3774",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:3826",
     "comment": "Running apps filter: only show apps from the active workspace"
   },
   {
@@ -4154,7 +4148,7 @@
   {
     "term": "Custom Location",
     "context": "Custom Location",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:515",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:538",
     "comment": ""
   },
   {
@@ -4226,7 +4220,7 @@
   {
     "term": "Custom power profile",
     "context": "Custom power profile",
-    "reference": "Common/Theme.qml:1661",
+    "reference": "Common/Theme.qml:1659",
     "comment": "power profile description"
   },
   {
@@ -4244,13 +4238,13 @@
   {
     "term": "Custom...",
     "context": "Custom...",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:159, Modules/Settings/TimeWeatherTab.qml:211, Modules/Settings/TimeWeatherTab.qml:246, Modules/Settings/TimeWeatherTab.qml:298, Modules/Settings/DisplayConfig/OutputCard.qml:215, Modules/Settings/DisplayConfig/OutputCard.qml:250",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:182, Modules/Settings/TimeWeatherTab.qml:234, Modules/Settings/TimeWeatherTab.qml:269, Modules/Settings/TimeWeatherTab.qml:321, Modules/Settings/DisplayConfig/OutputCard.qml:215, Modules/Settings/DisplayConfig/OutputCard.qml:250",
     "comment": "date format option"
   },
   {
     "term": "Custom: ",
     "context": "Custom: ",
-    "reference": "Modules/Settings/GreeterTab.qml:605, Modules/Settings/TimeWeatherTab.qml:198, Modules/Settings/TimeWeatherTab.qml:285",
+    "reference": "Modules/Settings/GreeterTab.qml:569, Modules/Settings/TimeWeatherTab.qml:221, Modules/Settings/TimeWeatherTab.qml:308",
     "comment": ""
   },
   {
@@ -4286,7 +4280,7 @@
   {
     "term": "DMS Chooser",
     "context": "DMS Chooser",
-    "reference": "Modules/Settings/DefaultAppsTab.qml:86",
+    "reference": "Modules/Settings/DefaultAppsTab.qml:89",
     "comment": ""
   },
   {
@@ -4388,7 +4382,7 @@
   {
     "term": "DankCalendar",
     "context": "DankCalendar",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:135",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:158",
     "comment": "calendar backend option"
   },
   {
@@ -4448,13 +4442,13 @@
   {
     "term": "Date Format",
     "context": "Date Format",
-    "reference": "Modules/Settings/GreeterTab.qml:599, Modules/Settings/TimeWeatherTab.qml:84",
+    "reference": "Modules/Settings/GreeterTab.qml:563, Modules/Settings/TimeWeatherTab.qml:107",
     "comment": ""
   },
   {
     "term": "Date format on greeter",
     "context": "Date format on greeter",
-    "reference": "Modules/Settings/GreeterTab.qml:587",
+    "reference": "Modules/Settings/GreeterTab.qml:551",
     "comment": ""
   },
   {
@@ -4478,13 +4472,13 @@
   {
     "term": "Day Date",
     "context": "Day Date",
-    "reference": "Modules/Settings/GreeterTab.qml:368, Modules/Settings/TimeWeatherTab.qml:159, Modules/Settings/TimeWeatherTab.qml:166, Modules/Settings/TimeWeatherTab.qml:203, Modules/Settings/TimeWeatherTab.qml:246, Modules/Settings/TimeWeatherTab.qml:253, Modules/Settings/TimeWeatherTab.qml:290",
+    "reference": "Modules/Settings/GreeterTab.qml:368, Modules/Settings/TimeWeatherTab.qml:182, Modules/Settings/TimeWeatherTab.qml:189, Modules/Settings/TimeWeatherTab.qml:226, Modules/Settings/TimeWeatherTab.qml:269, Modules/Settings/TimeWeatherTab.qml:276, Modules/Settings/TimeWeatherTab.qml:313",
     "comment": "date format option"
   },
   {
     "term": "Day Month Date",
     "context": "Day Month Date",
-    "reference": "Modules/Settings/GreeterTab.qml:372, Modules/Settings/TimeWeatherTab.qml:159, Modules/Settings/TimeWeatherTab.qml:170, Modules/Settings/TimeWeatherTab.qml:204, Modules/Settings/TimeWeatherTab.qml:246, Modules/Settings/TimeWeatherTab.qml:257, Modules/Settings/TimeWeatherTab.qml:291",
+    "reference": "Modules/Settings/GreeterTab.qml:372, Modules/Settings/TimeWeatherTab.qml:182, Modules/Settings/TimeWeatherTab.qml:193, Modules/Settings/TimeWeatherTab.qml:227, Modules/Settings/TimeWeatherTab.qml:269, Modules/Settings/TimeWeatherTab.qml:280, Modules/Settings/TimeWeatherTab.qml:314",
     "comment": "date format option"
   },
   {
@@ -4598,7 +4592,7 @@
   {
     "term": "Delete",
     "context": "Delete",
-    "reference": "Widgets/VpnDetailContent.qml:223, Modals/Clipboard/ClipboardContextMenu.qml:63, Modules/Settings/NetworkVpnTab.qml:374, Modules/Settings/DesktopWidgetInstanceCard.qml:152, Modules/Settings/PrinterTab.qml:1094, Modules/Settings/PrinterTab.qml:1680, Modules/Settings/UsersTab.qml:322, Modules/Settings/DisplayConfigTab.qml:322, Modules/Settings/ClipboardTab.qml:156, Modules/DankDash/Overview/CalendarEventDetail.qml:300",
+    "reference": "Widgets/VpnDetailContent.qml:223, Modals/Clipboard/ClipboardContextMenu.qml:63, Modules/Settings/NetworkVpnTab.qml:374, Modules/Settings/DesktopWidgetInstanceCard.qml:152, Modules/Settings/PrinterTab.qml:1107, Modules/Settings/PrinterTab.qml:1693, Modules/Settings/UsersTab.qml:322, Modules/Settings/DisplayConfigTab.qml:322, Modules/Settings/ClipboardTab.qml:156, Modules/DankDash/Overview/CalendarEventDetail.qml:368",
     "comment": ""
   },
   {
@@ -4610,19 +4604,19 @@
   {
     "term": "Delete \"%1\"?",
     "context": "Delete \"%1\"?",
-    "reference": "Widgets/VpnDetailContent.qml:222, Modules/Settings/NetworkVpnTab.qml:373, Modules/Settings/PrinterTab.qml:1093",
+    "reference": "Widgets/VpnDetailContent.qml:222, Modules/Settings/NetworkVpnTab.qml:373, Modules/Settings/PrinterTab.qml:1106",
     "comment": ""
   },
   {
     "term": "Delete Class",
     "context": "Delete Class",
-    "reference": "Modules/Settings/PrinterTab.qml:1678",
+    "reference": "Modules/Settings/PrinterTab.qml:1691",
     "comment": ""
   },
   {
     "term": "Delete Printer",
     "context": "Delete Printer",
-    "reference": "Modules/Settings/PrinterTab.qml:1092",
+    "reference": "Modules/Settings/PrinterTab.qml:1105",
     "comment": ""
   },
   {
@@ -4646,7 +4640,7 @@
   {
     "term": "Delete class \"%1\"?",
     "context": "Delete class \"%1\"?",
-    "reference": "Modules/Settings/PrinterTab.qml:1679",
+    "reference": "Modules/Settings/PrinterTab.qml:1692",
     "comment": ""
   },
   {
@@ -4676,7 +4670,7 @@
   {
     "term": "Dependencies & documentation",
     "context": "Dependencies & documentation",
-    "reference": "Modules/Settings/GreeterTab.qml:692",
+    "reference": "Modules/Settings/GreeterTab.qml:656",
     "comment": ""
   },
   {
@@ -4700,7 +4694,7 @@
   {
     "term": "Description",
     "context": "Description",
-    "reference": "Modals/DankLauncherV2/AppEditView.qml:182, Modules/Settings/PrinterTab.qml:796",
+    "reference": "Modals/DankLauncherV2/AppEditView.qml:182, Modules/Settings/PrinterTab.qml:809",
     "comment": ""
   },
   {
@@ -4772,7 +4766,7 @@
   {
     "term": "Device",
     "context": "Device",
-    "reference": "Widgets/KeybindItem.qml:1064, Modules/Settings/PrinterTab.qml:423",
+    "reference": "Widgets/KeybindItem.qml:1064, Modules/Settings/PrinterTab.qml:433",
     "comment": ""
   },
   {
@@ -4784,13 +4778,13 @@
   {
     "term": "Device list scroll volume",
     "context": "Device list scroll volume",
-    "reference": "Modules/Settings/MediaPlayerTab.qml:132",
+    "reference": "Modules/Settings/MediaPlayerTab.qml:139",
     "comment": ""
   },
   {
     "term": "Device names updated",
     "context": "Device names updated",
-    "reference": "Services/AudioService.qml:367",
+    "reference": "Services/AudioService.qml:368",
     "comment": ""
   },
   {
@@ -4922,7 +4916,7 @@
   {
     "term": "Discover Devices",
     "context": "Discover Devices",
-    "reference": "Modules/Settings/PrinterTab.qml:352",
+    "reference": "Modules/Settings/PrinterTab.qml:362",
     "comment": "Toggle button to scan for printers via mDNS/Avahi"
   },
   {
@@ -4946,7 +4940,7 @@
   {
     "term": "Disk Usage Display",
     "context": "Disk Usage Display",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:2073",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2125",
     "comment": ""
   },
   {
@@ -5072,7 +5066,7 @@
   {
     "term": "Display seconds in the clock",
     "context": "Display seconds in the clock",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:64",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:87",
     "comment": ""
   },
   {
@@ -5126,7 +5120,7 @@
   {
     "term": "Do Not Disturb",
     "context": "Do Not Disturb",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:2316, Modules/Settings/WidgetsTabSection.qml:2462, Modules/Settings/NotificationsTab.qml:431, Modules/ControlCenter/Models/WidgetModel.qml:145, Modules/ControlCenter/Widgets/DndPill.qml:10, Modules/Notifications/Center/NotificationHeader.qml:90, Modules/Notifications/Center/NotificationSettings.qml:152, Modules/Notifications/Center/DndDurationMenu.qml:140",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2368, Modules/Settings/WidgetsTabSection.qml:2514, Modules/Settings/NotificationsTab.qml:431, Modules/ControlCenter/Models/WidgetModel.qml:145, Modules/ControlCenter/Widgets/DndPill.qml:10, Modules/Notifications/Center/NotificationHeader.qml:90, Modules/Notifications/Center/NotificationSettings.qml:152, Modules/Notifications/Center/DndDurationMenu.qml:140",
     "comment": ""
   },
   {
@@ -5174,7 +5168,7 @@
   {
     "term": "Documents",
     "context": "Documents",
-    "reference": "Modals/FileBrowser/FileBrowserContent.qml:268, Modules/Settings/DefaultAppsTab.qml:310",
+    "reference": "Modals/FileBrowser/FileBrowserContent.qml:268, Modules/Settings/DefaultAppsTab.qml:320",
     "comment": "Documents"
   },
   {
@@ -5246,7 +5240,7 @@
   {
     "term": "Driver",
     "context": "Driver",
-    "reference": "Modules/Settings/PrinterTab.qml:691, Modules/Settings/NetworkEthernetTab.qml:312",
+    "reference": "Modules/Settings/PrinterTab.qml:704, Modules/Settings/NetworkEthernetTab.qml:312",
     "comment": ""
   },
   {
@@ -5324,7 +5318,7 @@
   {
     "term": "Dynamic Width",
     "context": "Dynamic Width",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:583",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:635",
     "comment": ""
   },
   {
@@ -5336,7 +5330,7 @@
   {
     "term": "Dynamic colors parse error: %1",
     "context": "Dynamic colors parse error: %1",
-    "reference": "Common/Theme.qml:2242",
+    "reference": "Common/Theme.qml:2240",
     "comment": ""
   },
   {
@@ -5378,7 +5372,7 @@
   {
     "term": "Edit",
     "context": "Edit",
-    "reference": "Modals/Clipboard/ClipboardContextMenu.qml:55, Modules/Settings/ClipboardTab.qml:156, Modules/DankDash/Overview/CalendarEventDetail.qml:293",
+    "reference": "Modals/Clipboard/ClipboardContextMenu.qml:55, Modules/Settings/ClipboardTab.qml:156, Modules/DankDash/Overview/CalendarEventDetail.qml:361",
     "comment": ""
   },
   {
@@ -5516,7 +5510,7 @@
   {
     "term": "Enable Weather",
     "context": "Enable Weather",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:428",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:451",
     "comment": ""
   },
   {
@@ -5660,13 +5654,13 @@
   {
     "term": "Enlarge on Hover",
     "context": "Enlarge on Hover",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:4315",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:4367",
     "comment": ""
   },
   {
     "term": "Enlargement %",
     "context": "Enlargement %",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:4357",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:4409",
     "comment": ""
   },
   {
@@ -5720,13 +5714,13 @@
   {
     "term": "Enter custom lock screen format (e.g., dddd, MMMM d)",
     "context": "Enter custom lock screen format (e.g., dddd, MMMM d)",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:312",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:335",
     "comment": ""
   },
   {
     "term": "Enter custom top bar format (e.g., ddd MMM d)",
     "context": "Enter custom top bar format (e.g., ddd MMM d)",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:225",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:248",
     "comment": ""
   },
   {
@@ -5870,7 +5864,7 @@
   {
     "term": "Excluded Media Players",
     "context": "Excluded Media Players",
-    "reference": "Modules/Settings/MediaPlayerTab.qml:142",
+    "reference": "Modules/Settings/MediaPlayerTab.qml:149",
     "comment": ""
   },
   {
@@ -5924,7 +5918,7 @@
   {
     "term": "Extend battery life",
     "context": "Extend battery life",
-    "reference": "Common/Theme.qml:1655",
+    "reference": "Common/Theme.qml:1653",
     "comment": "power profile description"
   },
   {
@@ -6008,13 +6002,13 @@
   {
     "term": "Failed to apply GTK colors",
     "context": "Failed to apply GTK colors",
-    "reference": "Common/Theme.qml:1974",
+    "reference": "Common/Theme.qml:1972",
     "comment": ""
   },
   {
     "term": "Failed to apply Qt colors",
     "context": "Failed to apply Qt colors",
-    "reference": "Common/Theme.qml:1995",
+    "reference": "Common/Theme.qml:1993",
     "comment": ""
   },
   {
@@ -6056,7 +6050,7 @@
   {
     "term": "Failed to connect VPN",
     "context": "Failed to connect VPN",
-    "reference": "Services/DMSNetworkService.qml:908",
+    "reference": "Services/DMSNetworkService.qml:914",
     "comment": ""
   },
   {
@@ -6116,13 +6110,13 @@
   {
     "term": "Failed to disconnect VPN",
     "context": "Failed to disconnect VPN",
-    "reference": "Services/DMSNetworkService.qml:932",
+    "reference": "Services/DMSNetworkService.qml:938",
     "comment": ""
   },
   {
     "term": "Failed to disconnect VPNs",
     "context": "Failed to disconnect VPNs",
-    "reference": "Services/DMSNetworkService.qml:950",
+    "reference": "Services/DMSNetworkService.qml:956",
     "comment": ""
   },
   {
@@ -6146,7 +6140,7 @@
   {
     "term": "Failed to enable WiFi",
     "context": "Failed to enable WiFi",
-    "reference": "Services/DMSNetworkService.qml:659",
+    "reference": "Services/DMSNetworkService.qml:665",
     "comment": ""
   },
   {
@@ -6218,7 +6212,7 @@
   {
     "term": "Failed to parse plugin_settings.json",
     "context": "Failed to parse plugin_settings.json",
-    "reference": "Common/SettingsData.qml:1881",
+    "reference": "Common/SettingsData.qml:1890",
     "comment": ""
   },
   {
@@ -6230,7 +6224,7 @@
   {
     "term": "Failed to parse settings.json",
     "context": "Failed to parse settings.json",
-    "reference": "Common/SettingsData.qml:1783, Common/SettingsData.qml:3643",
+    "reference": "Common/SettingsData.qml:1792, Common/SettingsData.qml:3652",
     "comment": ""
   },
   {
@@ -6254,7 +6248,7 @@
   {
     "term": "Failed to read theme file: %1",
     "context": "Failed to read theme file: %1",
-    "reference": "Common/Theme.qml:2197",
+    "reference": "Common/Theme.qml:2195",
     "comment": ""
   },
   {
@@ -6296,7 +6290,7 @@
   {
     "term": "Failed to restart audio system",
     "context": "Failed to restart audio system",
-    "reference": "Services/AudioService.qml:371",
+    "reference": "Services/AudioService.qml:372",
     "comment": ""
   },
   {
@@ -6332,7 +6326,7 @@
   {
     "term": "Failed to save audio config",
     "context": "Failed to save audio config",
-    "reference": "Services/AudioService.qml:256",
+    "reference": "Services/AudioService.qml:257",
     "comment": ""
   },
   {
@@ -6410,13 +6404,13 @@
   {
     "term": "Failed to set profile image",
     "context": "Failed to set profile image",
-    "reference": "Services/PortalService.qml:173",
+    "reference": "Services/PortalService.qml:186",
     "comment": ""
   },
   {
     "term": "Failed to set profile image: %1",
     "context": "Failed to set profile image: %1",
-    "reference": "Services/PortalService.qml:182",
+    "reference": "Services/PortalService.qml:195",
     "comment": ""
   },
   {
@@ -6452,7 +6446,7 @@
   {
     "term": "Failed to update autoconnect",
     "context": "Failed to update autoconnect",
-    "reference": "Services/DMSNetworkService.qml:1015",
+    "reference": "Services/DMSNetworkService.qml:1021",
     "comment": ""
   },
   {
@@ -6518,13 +6512,13 @@
   {
     "term": "Feels Like",
     "context": "Feels Like",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:920",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:943",
     "comment": ""
   },
   {
     "term": "Feels Like %1°",
     "context": "Feels Like %1°",
-    "reference": "Modules/DankDash/WeatherTab.qml:302, Modules/Settings/TimeWeatherTab.qml:807",
+    "reference": "Modules/DankDash/WeatherTab.qml:302, Modules/Settings/TimeWeatherTab.qml:830",
     "comment": "weather feels like temperature"
   },
   {
@@ -6560,7 +6554,7 @@
   {
     "term": "File Manager",
     "context": "File Manager",
-    "reference": "Modules/Settings/DefaultAppsTab.qml:290",
+    "reference": "Modules/Settings/DefaultAppsTab.qml:300",
     "comment": "File Manager"
   },
   {
@@ -6686,7 +6680,7 @@
   {
     "term": "First Day of Week",
     "context": "First Day of Week",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:102",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:125",
     "comment": ""
   },
   {
@@ -6956,13 +6950,13 @@
   {
     "term": "For editing plain text files",
     "context": "For editing plain text files",
-    "reference": "Modules/Settings/DefaultAppsTab.qml:317",
+    "reference": "Modules/Settings/DefaultAppsTab.qml:327",
     "comment": "For editing plain text files"
   },
   {
     "term": "For reading PDF files",
     "context": "For reading PDF files",
-    "reference": "Modules/Settings/DefaultAppsTab.qml:323",
+    "reference": "Modules/Settings/DefaultAppsTab.qml:333",
     "comment": "For reading PDF files"
   },
   {
@@ -6980,7 +6974,7 @@
   {
     "term": "Force Padding",
     "context": "Force Padding",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:583",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:635",
     "comment": ""
   },
   {
@@ -7064,13 +7058,13 @@
   {
     "term": "Forgot network %1",
     "context": "Forgot network %1",
-    "reference": "Services/LegacyNetworkService.qml:398, Services/DMSNetworkService.qml:615",
+    "reference": "Services/LegacyNetworkService.qml:398, Services/DMSNetworkService.qml:621",
     "comment": ""
   },
   {
     "term": "Format Legend",
     "context": "Format Legend",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:341",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:364",
     "comment": ""
   },
   {
@@ -7154,13 +7148,13 @@
   {
     "term": "Full Day & Month",
     "context": "Full Day & Month",
-    "reference": "Modules/Settings/GreeterTab.qml:396, Modules/Settings/TimeWeatherTab.qml:159, Modules/Settings/TimeWeatherTab.qml:194, Modules/Settings/TimeWeatherTab.qml:210, Modules/Settings/TimeWeatherTab.qml:246, Modules/Settings/TimeWeatherTab.qml:281, Modules/Settings/TimeWeatherTab.qml:297",
+    "reference": "Modules/Settings/GreeterTab.qml:396, Modules/Settings/TimeWeatherTab.qml:182, Modules/Settings/TimeWeatherTab.qml:217, Modules/Settings/TimeWeatherTab.qml:233, Modules/Settings/TimeWeatherTab.qml:269, Modules/Settings/TimeWeatherTab.qml:304, Modules/Settings/TimeWeatherTab.qml:320",
     "comment": "date format option"
   },
   {
     "term": "Full Size",
     "context": "Full Size",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:865",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:917",
     "comment": ""
   },
   {
@@ -7172,7 +7166,7 @@
   {
     "term": "Full with Year",
     "context": "Full with Year",
-    "reference": "Modules/Settings/GreeterTab.qml:388, Modules/Settings/TimeWeatherTab.qml:159, Modules/Settings/TimeWeatherTab.qml:186, Modules/Settings/TimeWeatherTab.qml:208, Modules/Settings/TimeWeatherTab.qml:246, Modules/Settings/TimeWeatherTab.qml:273, Modules/Settings/TimeWeatherTab.qml:295",
+    "reference": "Modules/Settings/GreeterTab.qml:388, Modules/Settings/TimeWeatherTab.qml:182, Modules/Settings/TimeWeatherTab.qml:209, Modules/Settings/TimeWeatherTab.qml:231, Modules/Settings/TimeWeatherTab.qml:269, Modules/Settings/TimeWeatherTab.qml:296, Modules/Settings/TimeWeatherTab.qml:318",
     "comment": "date format option"
   },
   {
@@ -7232,7 +7226,7 @@
   {
     "term": "GTK colors applied successfully",
     "context": "GTK colors applied successfully",
-    "reference": "Common/Theme.qml:1970",
+    "reference": "Common/Theme.qml:1968",
     "comment": ""
   },
   {
@@ -7290,6 +7284,12 @@
     "comment": "theme category option"
   },
   {
+    "term": "Geometric Centering",
+    "context": "Geometric Centering",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:246",
+    "comment": ""
+  },
+  {
     "term": "Get Started",
     "context": "Get Started",
     "reference": "Modals/Greeter/GreeterModal.qml:298",
@@ -7322,7 +7322,7 @@
   {
     "term": "Good",
     "context": "Good",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:1165",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:1188",
     "comment": ""
   },
   {
@@ -7406,7 +7406,7 @@
   {
     "term": "Greeter Behavior",
     "context": "Greeter Behavior",
-    "reference": "Modules/Settings/GreeterTab.qml:648",
+    "reference": "Modules/Settings/GreeterTab.qml:612",
     "comment": ""
   },
   {
@@ -7440,15 +7440,9 @@
     "comment": ""
   },
   {
-    "term": "Greeter only — does not affect main clock",
-    "context": "Greeter only — does not affect main clock",
-    "reference": "Modules/Settings/GreeterTab.qml:564",
-    "comment": ""
-  },
-  {
     "term": "Greeter only — format for the date on the login screen",
     "context": "Greeter only — format for the date on the login screen",
-    "reference": "Modules/Settings/GreeterTab.qml:600",
+    "reference": "Modules/Settings/GreeterTab.qml:564",
     "comment": ""
   },
   {
@@ -7502,7 +7496,7 @@
   {
     "term": "Group by App",
     "context": "Group by App",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:3716, Modules/Settings/DockTab.qml:171",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:3768, Modules/Settings/DockTab.qml:171",
     "comment": ""
   },
   {
@@ -7566,15 +7560,21 @@
     "comment": ""
   },
   {
+    "term": "Handles geo: location links",
+    "context": "Handles geo: location links",
+    "reference": "Modules/Settings/DefaultAppsTab.qml:291",
+    "comment": "Handles geo: location links"
+  },
+  {
     "term": "Handles links and opens HTML files",
     "context": "Handles links and opens HTML files",
-    "reference": "Modules/Settings/DefaultAppsTab.qml:274",
+    "reference": "Modules/Settings/DefaultAppsTab.qml:277",
     "comment": "Handles links and opens HTML files"
   },
   {
     "term": "Handles mailto links",
     "context": "Handles mailto links",
-    "reference": "Modules/Settings/DefaultAppsTab.qml:281",
+    "reference": "Modules/Settings/DefaultAppsTab.qml:284",
     "comment": "Handles mailto links"
   },
   {
@@ -7670,7 +7670,7 @@
   {
     "term": "Hide",
     "context": "Hide",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:1114, Modules/Settings/DisplayConfigTab.qml:569, Modules/Settings/DankDashTab.qml:538",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:1166, Modules/Settings/DisplayConfigTab.qml:569, Modules/Settings/DankDashTab.qml:538",
     "comment": ""
   },
   {
@@ -7694,7 +7694,7 @@
   {
     "term": "Hide Indicators",
     "context": "Hide Indicators",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:4149",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:4201",
     "comment": ""
   },
   {
@@ -7766,13 +7766,13 @@
   {
     "term": "Hide when no updates: OFF",
     "context": "Hide when no updates: OFF",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:602",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:654",
     "comment": ""
   },
   {
     "term": "Hide when no updates: ON",
     "context": "Hide when no updates: ON",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:602",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:654",
     "comment": ""
   },
   {
@@ -7868,7 +7868,7 @@
   {
     "term": "Host",
     "context": "Host",
-    "reference": "Modules/Settings/PrinterTab.qml:501",
+    "reference": "Modules/Settings/PrinterTab.qml:511",
     "comment": "Label for printer IP address or hostname input field"
   },
   {
@@ -7940,7 +7940,7 @@
   {
     "term": "Humidity",
     "context": "Humidity",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeather.qml:413, Modules/DankDash/WeatherTab.qml:87, Modules/DankDash/WeatherForecastCard.qml:80, Modules/Settings/TimeWeatherTab.qml:964",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeather.qml:413, Modules/DankDash/WeatherTab.qml:87, Modules/DankDash/WeatherForecastCard.qml:80, Modules/Settings/TimeWeatherTab.qml:987",
     "comment": ""
   },
   {
@@ -8006,13 +8006,13 @@
   {
     "term": "IP address or hostname",
     "context": "IP address or hostname",
-    "reference": "Modules/Settings/PrinterTab.qml:511",
+    "reference": "Modules/Settings/PrinterTab.qml:521",
     "comment": "Placeholder text for manual printer address input"
   },
   {
     "term": "ISO Date",
     "context": "ISO Date",
-    "reference": "Modules/Settings/GreeterTab.qml:392, Modules/Settings/TimeWeatherTab.qml:159, Modules/Settings/TimeWeatherTab.qml:190, Modules/Settings/TimeWeatherTab.qml:209, Modules/Settings/TimeWeatherTab.qml:246, Modules/Settings/TimeWeatherTab.qml:277, Modules/Settings/TimeWeatherTab.qml:296",
+    "reference": "Modules/Settings/GreeterTab.qml:392, Modules/Settings/TimeWeatherTab.qml:182, Modules/Settings/TimeWeatherTab.qml:213, Modules/Settings/TimeWeatherTab.qml:232, Modules/Settings/TimeWeatherTab.qml:269, Modules/Settings/TimeWeatherTab.qml:300, Modules/Settings/TimeWeatherTab.qml:319",
     "comment": "date format option"
   },
   {
@@ -8036,7 +8036,7 @@
   {
     "term": "Icon Size %",
     "context": "Icon Size %",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:4410",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:4462",
     "comment": ""
   },
   {
@@ -8048,7 +8048,7 @@
   {
     "term": "Icon theme changed outside DMS; switched to System Default",
     "context": "Icon theme changed outside DMS; switched to System Default",
-    "reference": "Common/SettingsData.qml:1525",
+    "reference": "Common/SettingsData.qml:1529",
     "comment": "shown when an external tool overrides the icon theme DMS applied"
   },
   {
@@ -8084,7 +8084,7 @@
   {
     "term": "Idle Inhibitor",
     "context": "Idle Inhibitor",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:2306, Modules/Settings/WidgetsTabSection.qml:2462, Modules/Settings/WidgetsTab.qml:208, Modules/Settings/OSDTab.qml:125",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2358, Modules/Settings/WidgetsTabSection.qml:2514, Modules/Settings/WidgetsTab.qml:208, Modules/Settings/OSDTab.qml:125",
     "comment": ""
   },
   {
@@ -8120,7 +8120,7 @@
   {
     "term": "Image Viewer",
     "context": "Image Viewer",
-    "reference": "Modules/Settings/DefaultAppsTab.qml:331",
+    "reference": "Modules/Settings/DefaultAppsTab.qml:341",
     "comment": "Image Viewer"
   },
   {
@@ -8211,6 +8211,12 @@
     "term": "Incorrect password - try again",
     "context": "Incorrect password - try again",
     "reference": "Modules/Lock/LockScreenContent.qml:81",
+    "comment": ""
+  },
+  {
+    "term": "Index Centering",
+    "context": "Index Centering",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:229",
     "comment": ""
   },
   {
@@ -8384,7 +8390,7 @@
   {
     "term": "Installation and PAM setup: see the ",
     "context": "Installation and PAM setup: see the ",
-    "reference": "Modules/Settings/GreeterTab.qml:705",
+    "reference": "Modules/Settings/GreeterTab.qml:669",
     "comment": ""
   },
   {
@@ -8444,7 +8450,7 @@
   {
     "term": "Internet",
     "context": "Internet",
-    "reference": "Services/AppSearchService.qml:676, Services/AppSearchService.qml:677, Services/AppSearchService.qml:678, Modules/Settings/DefaultAppsTab.qml:267",
+    "reference": "Services/AppSearchService.qml:676, Services/AppSearchService.qml:677, Services/AppSearchService.qml:678, Modules/Settings/DefaultAppsTab.qml:270",
     "comment": "Internet"
   },
   {
@@ -8456,7 +8462,7 @@
   {
     "term": "Invalid JSON format: %1",
     "context": "Invalid JSON format: %1",
-    "reference": "Common/Theme.qml:2183",
+    "reference": "Common/Theme.qml:2181",
     "comment": ""
   },
   {
@@ -8504,13 +8510,19 @@
   {
     "term": "Jobs",
     "context": "Jobs",
-    "reference": "Modules/Settings/PrinterTab.qml:1339, Modules/ControlCenter/BuiltinPlugins/CupsWidget.qml:183",
+    "reference": "Modules/Settings/PrinterTab.qml:1352, Modules/ControlCenter/BuiltinPlugins/CupsWidget.qml:183",
     "comment": ""
   },
   {
     "term": "Jobs: ",
     "context": "Jobs: ",
     "reference": "Modules/ControlCenter/BuiltinPlugins/CupsWidget.qml:19",
+    "comment": ""
+  },
+  {
+    "term": "Join video call",
+    "context": "Join video call",
+    "reference": "Modules/DankDash/Overview/CalendarEventDetail.qml:285",
     "comment": ""
   },
   {
@@ -8666,13 +8678,13 @@
   {
     "term": "Large",
     "context": "Large",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:1952, Modules/Settings/WidgetsTabSection.qml:3506",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2004, Modules/Settings/WidgetsTabSection.qml:3558",
     "comment": ""
   },
   {
     "term": "Largest",
     "context": "Largest",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:1957, Modules/Settings/WidgetsTabSection.qml:3511",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2009, Modules/Settings/WidgetsTabSection.qml:3563",
     "comment": ""
   },
   {
@@ -8732,7 +8744,7 @@
   {
     "term": "Latitude",
     "context": "Latitude",
-    "reference": "Modules/Settings/ThemeColorsTab.qml:1394, Modules/Settings/GammaControlTab.qml:379, Modules/Settings/TimeWeatherTab.qml:530",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:1394, Modules/Settings/GammaControlTab.qml:379, Modules/Settings/TimeWeatherTab.qml:553",
     "comment": ""
   },
   {
@@ -8942,7 +8954,7 @@
   {
     "term": "Loading...",
     "context": "Loading...",
-    "reference": "Modules/Settings/PrinterTab.qml:707",
+    "reference": "Modules/Settings/PrinterTab.qml:720",
     "comment": ""
   },
   {
@@ -8972,13 +8984,13 @@
   {
     "term": "Location",
     "context": "Location",
-    "reference": "Modules/Settings/ThemeColorsTab.qml:1205, Modules/Settings/GammaControlTab.qml:188, Modules/Settings/PrinterTab.qml:775, Modules/Settings/PrinterTab.qml:1164, Modules/DankDash/Overview/CalendarEventEditor.qml:300",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:1205, Modules/Settings/GammaControlTab.qml:188, Modules/Settings/PrinterTab.qml:788, Modules/Settings/PrinterTab.qml:1177, Modules/DankDash/Overview/CalendarEventEditor.qml:300",
     "comment": "theme auto mode tab"
   },
   {
     "term": "Location Search",
     "context": "Location Search",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:632",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:655",
     "comment": ""
   },
   {
@@ -9008,7 +9020,7 @@
   {
     "term": "Lock Screen Format",
     "context": "Lock Screen Format",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:244",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:267",
     "comment": ""
   },
   {
@@ -9104,7 +9116,7 @@
   {
     "term": "Longitude",
     "context": "Longitude",
-    "reference": "Modules/Settings/ThemeColorsTab.qml:1417, Modules/Settings/GammaControlTab.qml:402, Modules/Settings/TimeWeatherTab.qml:580",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:1417, Modules/Settings/GammaControlTab.qml:402, Modules/Settings/TimeWeatherTab.qml:603",
     "comment": ""
   },
   {
@@ -9152,7 +9164,7 @@
   {
     "term": "Mail",
     "context": "Mail",
-    "reference": "Modules/Settings/DefaultAppsTab.qml:278",
+    "reference": "Modules/Settings/DefaultAppsTab.qml:281",
     "comment": "Mail"
   },
   {
@@ -9206,13 +9218,13 @@
   {
     "term": "Manages calendar events",
     "context": "Manages calendar events",
-    "reference": "Modules/Settings/DefaultAppsTab.qml:305",
+    "reference": "Modules/Settings/DefaultAppsTab.qml:315",
     "comment": "Manages calendar events"
   },
   {
     "term": "Manages files and directories",
     "context": "Manages files and directories",
-    "reference": "Modules/Settings/DefaultAppsTab.qml:293",
+    "reference": "Modules/Settings/DefaultAppsTab.qml:303",
     "comment": "Manages files and directories"
   },
   {
@@ -9282,6 +9294,12 @@
     "comment": ""
   },
   {
+    "term": "Maps",
+    "context": "Maps",
+    "reference": "Modules/Settings/DefaultAppsTab.qml:288",
+    "comment": "Maps"
+  },
+  {
     "term": "Margin",
     "context": "Margin",
     "reference": "Modules/Settings/DockTab.qml:632",
@@ -9338,7 +9356,7 @@
   {
     "term": "Material Battery Style",
     "context": "Material Battery Style",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:3361",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:3413",
     "comment": ""
   },
   {
@@ -9416,7 +9434,7 @@
   {
     "term": "Max Pinned Apps",
     "context": "Max Pinned Apps",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:3934",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:3986",
     "comment": ""
   },
   {
@@ -9428,7 +9446,7 @@
   {
     "term": "Max Running Apps",
     "context": "Max Running Apps",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:3990",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:4042",
     "comment": ""
   },
   {
@@ -9440,7 +9458,7 @@
   {
     "term": "Max Visible",
     "context": "Max Visible",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:1634",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:1686",
     "comment": ""
   },
   {
@@ -9614,7 +9632,7 @@
   {
     "term": "Medium",
     "context": "Medium",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:254, Modules/Settings/TypographyMotionTab.qml:266, Modules/Settings/TypographyMotionTab.qml:294, Modules/Settings/TypographyMotionTab.qml:495, Modules/Settings/TypographyMotionTab.qml:592, Modules/Settings/TypographyMotionTab.qml:676, Modules/Settings/WidgetsTabSection.qml:1947, Modules/Settings/WidgetsTabSection.qml:3501, Modules/Settings/NotificationsTab.qml:382",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:254, Modules/Settings/TypographyMotionTab.qml:266, Modules/Settings/TypographyMotionTab.qml:294, Modules/Settings/TypographyMotionTab.qml:495, Modules/Settings/TypographyMotionTab.qml:592, Modules/Settings/TypographyMotionTab.qml:676, Modules/Settings/WidgetsTabSection.qml:1999, Modules/Settings/WidgetsTabSection.qml:3553, Modules/Settings/NotificationsTab.qml:382",
     "comment": "font weight"
   },
   {
@@ -9668,7 +9686,7 @@
   {
     "term": "Microphone",
     "context": "Microphone",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:2246, Modules/Settings/WidgetsTabSection.qml:2462, Modules/Settings/WidgetsTabSection.qml:2800",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2298, Modules/Settings/WidgetsTabSection.qml:2514, Modules/Settings/WidgetsTabSection.qml:2852",
     "comment": ""
   },
   {
@@ -9680,7 +9698,7 @@
   {
     "term": "Microphone Volume",
     "context": "Microphone Volume",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:2251, Modules/Settings/WidgetsTabSection.qml:2462",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2303, Modules/Settings/WidgetsTabSection.qml:2514",
     "comment": ""
   },
   {
@@ -9770,7 +9788,7 @@
   {
     "term": "Model",
     "context": "Model",
-    "reference": "Modules/Settings/DisplayWidgetsTab.qml:225, Modules/Settings/PrinterTab.qml:1159, Modules/Settings/DisplayConfigTab.qml:517, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2063",
+    "reference": "Modules/Settings/DisplayWidgetsTab.qml:225, Modules/Settings/PrinterTab.qml:1172, Modules/Settings/DisplayConfigTab.qml:517, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2063",
     "comment": ""
   },
   {
@@ -9836,7 +9854,7 @@
   {
     "term": "Month Date",
     "context": "Month Date",
-    "reference": "Modules/Settings/GreeterTab.qml:376, Modules/Settings/TimeWeatherTab.qml:159, Modules/Settings/TimeWeatherTab.qml:174, Modules/Settings/TimeWeatherTab.qml:205, Modules/Settings/TimeWeatherTab.qml:246, Modules/Settings/TimeWeatherTab.qml:261, Modules/Settings/TimeWeatherTab.qml:292",
+    "reference": "Modules/Settings/GreeterTab.qml:376, Modules/Settings/TimeWeatherTab.qml:182, Modules/Settings/TimeWeatherTab.qml:197, Modules/Settings/TimeWeatherTab.qml:228, Modules/Settings/TimeWeatherTab.qml:269, Modules/Settings/TimeWeatherTab.qml:284, Modules/Settings/TimeWeatherTab.qml:315",
     "comment": "date format option"
   },
   {
@@ -9908,7 +9926,7 @@
   {
     "term": "Multimedia",
     "context": "Multimedia",
-    "reference": "Modules/Settings/DefaultAppsTab.qml:328",
+    "reference": "Modules/Settings/DefaultAppsTab.qml:338",
     "comment": "Multimedia"
   },
   {
@@ -9938,7 +9956,7 @@
   {
     "term": "Music Player",
     "context": "Music Player",
-    "reference": "Modules/Settings/DefaultAppsTab.qml:343",
+    "reference": "Modules/Settings/DefaultAppsTab.qml:353",
     "comment": "Music Player"
   },
   {
@@ -9992,7 +10010,7 @@
   {
     "term": "Name",
     "context": "Name",
-    "reference": "Modals/DankLauncherV2/AppEditView.qml:142, Modals/DankLauncherV2/LauncherContent.qml:699, Modals/DankLauncherV2/LauncherContent.qml:708, Modals/DankLauncherV2/LauncherContent.qml:713, Modules/ProcessList/ProcessesView.qml:249, Modules/Settings/PluginBrowser.qml:55, Modules/Settings/DisplayWidgetsTab.qml:225, Modules/Settings/AutoStartTab.qml:540, Modules/Settings/DesktopWidgetInstanceCard.qml:203, Modules/Settings/PrinterTab.qml:754, Modules/Settings/DisplayConfigTab.qml:517, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2063, Modules/Settings/Widgets/SystemMonitorVariantCard.qml:144",
+    "reference": "Modals/DankLauncherV2/AppEditView.qml:142, Modals/DankLauncherV2/LauncherContent.qml:699, Modals/DankLauncherV2/LauncherContent.qml:708, Modals/DankLauncherV2/LauncherContent.qml:713, Modules/ProcessList/ProcessesView.qml:249, Modules/Settings/PluginBrowser.qml:55, Modules/Settings/DisplayWidgetsTab.qml:225, Modules/Settings/AutoStartTab.qml:540, Modules/Settings/DesktopWidgetInstanceCard.qml:203, Modules/Settings/PrinterTab.qml:767, Modules/Settings/DisplayConfigTab.qml:517, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2063, Modules/Settings/Widgets/SystemMonitorVariantCard.qml:144",
     "comment": "plugin browser sort option"
   },
   {
@@ -10034,7 +10052,7 @@
   {
     "term": "Network",
     "context": "Network",
-    "reference": "Services/CupsService.qml:136, Modals/Settings/SettingsSidebar.qml:245, Modules/ProcessList/PerformanceView.qml:112, Modules/Settings/WidgetsTabSection.qml:2201, Modules/Settings/WidgetsTabSection.qml:2462, Modules/Settings/DesktopWidgetSettings/SystemMonitorSettings.qml:229, Modules/ControlCenter/Details/NetworkDetail.qml:89, Modules/ControlCenter/Models/WidgetModel.qml:161",
+    "reference": "Services/CupsService.qml:136, Modals/Settings/SettingsSidebar.qml:245, Modules/ProcessList/PerformanceView.qml:112, Modules/Settings/WidgetsTabSection.qml:2253, Modules/Settings/WidgetsTabSection.qml:2514, Modules/Settings/DesktopWidgetSettings/SystemMonitorSettings.qml:229, Modules/ControlCenter/Details/NetworkDetail.qml:89, Modules/ControlCenter/Models/WidgetModel.qml:161",
     "comment": ""
   },
   {
@@ -10148,7 +10166,7 @@
   {
     "term": "New York, NY",
     "context": "New York, NY",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:642",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:665",
     "comment": ""
   },
   {
@@ -10232,7 +10250,7 @@
   {
     "term": "No",
     "context": "No",
-    "reference": "Modules/Settings/PrinterTab.qml:1169, Modules/Settings/WindowRulesTab.qml:77, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2084, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2088, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2098, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2108, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2110",
+    "reference": "Modules/Settings/PrinterTab.qml:1182, Modules/Settings/WindowRulesTab.qml:77, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2084, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2088, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2098, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2108, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2110",
     "comment": ""
   },
   {
@@ -10292,7 +10310,7 @@
   {
     "term": "No GPU detected",
     "context": "No GPU detected",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:387",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:439",
     "comment": ""
   },
   {
@@ -10352,7 +10370,7 @@
   {
     "term": "No Weather Data Available",
     "context": "No Weather Data Available",
-    "reference": "Modules/DankDash/WeatherTab.qml:138, Modules/Settings/TimeWeatherTab.qml:681",
+    "reference": "Modules/DankDash/WeatherTab.qml:138, Modules/Settings/TimeWeatherTab.qml:704",
     "comment": ""
   },
   {
@@ -10436,7 +10454,7 @@
   {
     "term": "No calendar source available",
     "context": "No calendar source available",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:131",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:154",
     "comment": "calendar backend status"
   },
   {
@@ -10472,7 +10490,7 @@
   {
     "term": "No devices found",
     "context": "No devices found",
-    "reference": "dms-plugins/DankKDEConnect/components/EmptyState.qml:11, Modules/Settings/PrinterTab.qml:436",
+    "reference": "dms-plugins/DankKDEConnect/components/EmptyState.qml:11, Modules/Settings/PrinterTab.qml:446",
     "comment": "KDE Connect no devices message"
   },
   {
@@ -10496,7 +10514,7 @@
   {
     "term": "No drivers found",
     "context": "No drivers found",
-    "reference": "Modules/Settings/PrinterTab.qml:704",
+    "reference": "Modules/Settings/PrinterTab.qml:717",
     "comment": ""
   },
   {
@@ -10508,7 +10526,7 @@
   {
     "term": "No excluded players configured",
     "context": "No excluded players configured",
-    "reference": "Modules/Settings/MediaPlayerTab.qml:258",
+    "reference": "Modules/Settings/MediaPlayerTab.qml:265",
     "comment": ""
   },
   {
@@ -10604,7 +10622,7 @@
   {
     "term": "No matches",
     "context": "No matches",
-    "reference": "Modals/Settings/SettingsSidebar.qml:906, Modules/Notepad/NotepadTextEditor.qml:460",
+    "reference": "Modals/Settings/SettingsSidebar.qml:903, Modules/Notepad/NotepadTextEditor.qml:460",
     "comment": ""
   },
   {
@@ -10682,13 +10700,13 @@
   {
     "term": "No printers configured",
     "context": "No printers configured",
-    "reference": "Modules/Settings/PrinterTab.qml:881",
+    "reference": "Modules/Settings/PrinterTab.qml:894",
     "comment": ""
   },
   {
     "term": "No printers found",
     "context": "No printers found",
-    "reference": "Modules/Settings/PrinterTab.qml:923",
+    "reference": "Modules/Settings/PrinterTab.qml:936",
     "comment": ""
   },
   {
@@ -10982,7 +11000,7 @@
   {
     "term": "Nothing",
     "context": "Nothing",
-    "reference": "Modules/Settings/MediaPlayerTab.qml:70",
+    "reference": "Modules/Settings/MediaPlayerTab.qml:77",
     "comment": "media scroll wheel option"
   },
   {
@@ -11078,13 +11096,13 @@
   {
     "term": "Numeric (D/M)",
     "context": "Numeric (D/M)",
-    "reference": "Modules/Settings/GreeterTab.qml:384, Modules/Settings/TimeWeatherTab.qml:159, Modules/Settings/TimeWeatherTab.qml:182, Modules/Settings/TimeWeatherTab.qml:207, Modules/Settings/TimeWeatherTab.qml:246, Modules/Settings/TimeWeatherTab.qml:269, Modules/Settings/TimeWeatherTab.qml:294",
+    "reference": "Modules/Settings/GreeterTab.qml:384, Modules/Settings/TimeWeatherTab.qml:182, Modules/Settings/TimeWeatherTab.qml:205, Modules/Settings/TimeWeatherTab.qml:230, Modules/Settings/TimeWeatherTab.qml:269, Modules/Settings/TimeWeatherTab.qml:292, Modules/Settings/TimeWeatherTab.qml:317",
     "comment": "date format option"
   },
   {
     "term": "Numeric (M/D)",
     "context": "Numeric (M/D)",
-    "reference": "Modules/Settings/GreeterTab.qml:380, Modules/Settings/TimeWeatherTab.qml:159, Modules/Settings/TimeWeatherTab.qml:178, Modules/Settings/TimeWeatherTab.qml:206, Modules/Settings/TimeWeatherTab.qml:246, Modules/Settings/TimeWeatherTab.qml:265, Modules/Settings/TimeWeatherTab.qml:293",
+    "reference": "Modules/Settings/GreeterTab.qml:380, Modules/Settings/TimeWeatherTab.qml:182, Modules/Settings/TimeWeatherTab.qml:201, Modules/Settings/TimeWeatherTab.qml:229, Modules/Settings/TimeWeatherTab.qml:269, Modules/Settings/TimeWeatherTab.qml:288, Modules/Settings/TimeWeatherTab.qml:316",
     "comment": "date format option"
   },
   {
@@ -11192,7 +11210,7 @@
   {
     "term": "Only on Battery",
     "context": "Only on Battery",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:3179, Modules/Settings/WidgetsTabSection.qml:3300",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:3231, Modules/Settings/WidgetsTabSection.qml:3352",
     "comment": ""
   },
   {
@@ -11360,7 +11378,7 @@
   {
     "term": "Opens image files",
     "context": "Opens image files",
-    "reference": "Modules/Settings/DefaultAppsTab.qml:334",
+    "reference": "Modules/Settings/DefaultAppsTab.qml:344",
     "comment": "Opens image files"
   },
   {
@@ -11372,13 +11390,13 @@
   {
     "term": "Optional description",
     "context": "Optional description",
-    "reference": "Modules/Settings/PrinterTab.qml:806",
+    "reference": "Modules/Settings/PrinterTab.qml:819",
     "comment": ""
   },
   {
     "term": "Optional location",
     "context": "Optional location",
-    "reference": "Modules/Settings/PrinterTab.qml:785",
+    "reference": "Modules/Settings/PrinterTab.qml:798",
     "comment": ""
   },
   {
@@ -11390,7 +11408,7 @@
   {
     "term": "Options",
     "context": "Options",
-    "reference": "Widgets/KeybindItem.qml:1258, Widgets/KeybindItem.qml:1751, Modules/Settings/WidgetsTabSection.qml:415, Modules/Settings/WidgetsTabSection.qml:487, Modules/Settings/WidgetsTabSection.qml:618, Modules/Settings/WidgetsTabSection.qml:658, Modules/Settings/WidgetsTabSection.qml:697, Modules/Settings/WidgetsTabSection.qml:736, Modules/Settings/WidgetsTabSection.qml:775, Modules/Settings/WidgetsTabSection.qml:882, Modules/Settings/WidgetsTabSection.qml:921, Modules/Settings/WidgetsTabSection.qml:960, Modules/Settings/WidgetsTabSection.qml:1030, Modules/Settings/WidgetsTabSection.qml:1071",
+    "reference": "Widgets/KeybindItem.qml:1258, Widgets/KeybindItem.qml:1751, Modules/Settings/WidgetsTabSection.qml:467, Modules/Settings/WidgetsTabSection.qml:539, Modules/Settings/WidgetsTabSection.qml:670, Modules/Settings/WidgetsTabSection.qml:710, Modules/Settings/WidgetsTabSection.qml:749, Modules/Settings/WidgetsTabSection.qml:788, Modules/Settings/WidgetsTabSection.qml:827, Modules/Settings/WidgetsTabSection.qml:934, Modules/Settings/WidgetsTabSection.qml:973, Modules/Settings/WidgetsTabSection.qml:1012, Modules/Settings/WidgetsTabSection.qml:1082, Modules/Settings/WidgetsTabSection.qml:1123",
     "comment": ""
   },
   {
@@ -11462,7 +11480,7 @@
   {
     "term": "Overflow",
     "context": "Overflow",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:3915",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:3967",
     "comment": ""
   },
   {
@@ -11588,7 +11606,7 @@
   {
     "term": "PDF Reader",
     "context": "PDF Reader",
-    "reference": "Modules/Settings/DefaultAppsTab.qml:320",
+    "reference": "Modules/Settings/DefaultAppsTab.qml:330",
     "comment": "PDF Reader"
   },
   {
@@ -11606,13 +11624,7 @@
   {
     "term": "Pad Hours",
     "context": "Pad Hours",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:73",
-    "comment": ""
-  },
-  {
-    "term": "Pad hours (02:00 vs 2:00)",
-    "context": "Pad hours (02:00 vs 2:00)",
-    "reference": "Modules/Settings/GreeterTab.qml:580",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:96",
     "comment": ""
   },
   {
@@ -11762,7 +11774,7 @@
   {
     "term": "Pause",
     "context": "Pause",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1858, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:1410, Modules/Settings/PrinterTab.qml:1232, Modules/ControlCenter/BuiltinPlugins/CupsWidget.qml:138",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1858, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:1410, Modules/Settings/PrinterTab.qml:1245, Modules/ControlCenter/BuiltinPlugins/CupsWidget.qml:138",
     "comment": "Media pause tooltip"
   },
   {
@@ -11810,13 +11822,13 @@
   {
     "term": "Percentage",
     "context": "Percentage",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:2083, Modules/Settings/WidgetsTab.qml:143",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2135, Modules/Settings/WidgetsTab.qml:143",
     "comment": ""
   },
   {
     "term": "Performance",
     "context": "Performance",
-    "reference": "Modals/ProcessListModal.qml:317, Common/Theme.qml:1646",
+    "reference": "Modals/ProcessListModal.qml:317, Common/Theme.qml:1644",
     "comment": "power profile option"
   },
   {
@@ -11828,7 +11840,7 @@
   {
     "term": "Permission denied to set profile image.",
     "context": "Permission denied to set profile image.",
-    "reference": "Services/PortalService.qml:178",
+    "reference": "Services/PortalService.qml:191",
     "comment": ""
   },
   {
@@ -12008,13 +12020,13 @@
   {
     "term": "Plays audio files",
     "context": "Plays audio files",
-    "reference": "Modules/Settings/DefaultAppsTab.qml:346",
+    "reference": "Modules/Settings/DefaultAppsTab.qml:356",
     "comment": "Plays audio files"
   },
   {
     "term": "Plays video files",
     "context": "Plays video files",
-    "reference": "Modules/Settings/DefaultAppsTab.qml:340",
+    "reference": "Modules/Settings/DefaultAppsTab.qml:350",
     "comment": "Plays video files"
   },
   {
@@ -12170,7 +12182,7 @@
   {
     "term": "Port",
     "context": "Port",
-    "reference": "Modules/Settings/PrinterTab.qml:525",
+    "reference": "Modules/Settings/PrinterTab.qml:536",
     "comment": "Label for printer port number input field"
   },
   {
@@ -12266,7 +12278,7 @@
   {
     "term": "Power Saver",
     "context": "Power Saver",
-    "reference": "Common/Theme.qml:1642",
+    "reference": "Common/Theme.qml:1640",
     "comment": "power profile option"
   },
   {
@@ -12302,13 +12314,13 @@
   {
     "term": "Pre-fill the last successful username on the greeter",
     "context": "Pre-fill the last successful username on the greeter",
-    "reference": "Modules/Settings/GreeterTab.qml:673",
+    "reference": "Modules/Settings/GreeterTab.qml:637",
     "comment": ""
   },
   {
     "term": "Pre-select the last used session on the greeter",
     "context": "Pre-select the last used session on the greeter",
-    "reference": "Modules/Settings/GreeterTab.qml:664",
+    "reference": "Modules/Settings/GreeterTab.qml:628",
     "comment": ""
   },
   {
@@ -12368,7 +12380,7 @@
   {
     "term": "Pressure",
     "context": "Pressure",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeather.qml:453, Modules/DankDash/WeatherTab.qml:97, Modules/DankDash/WeatherForecastCard.qml:90, Modules/Settings/TimeWeatherTab.qml:1065",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeather.qml:453, Modules/DankDash/WeatherTab.qml:97, Modules/DankDash/WeatherForecastCard.qml:90, Modules/Settings/TimeWeatherTab.qml:1088",
     "comment": ""
   },
   {
@@ -12380,7 +12392,7 @@
   {
     "term": "Prevent specific applications from displaying in the media controllers (e.g., browser audio streams, background tools). Matches player identity or desktop file name case-insensitively.",
     "context": "Prevent specific applications from displaying in the media controllers (e.g., browser audio streams, background tools). Matches player identity or desktop file name case-insensitively.",
-    "reference": "Modules/Settings/MediaPlayerTab.qml:151",
+    "reference": "Modules/Settings/MediaPlayerTab.qml:158",
     "comment": ""
   },
   {
@@ -12392,7 +12404,7 @@
   {
     "term": "Preview: %1",
     "context": "Preview: %1",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:158, Modules/Settings/TimeWeatherTab.qml:245",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:181, Modules/Settings/TimeWeatherTab.qml:268",
     "comment": ""
   },
   {
@@ -12434,13 +12446,13 @@
   {
     "term": "Printer",
     "context": "Printer",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:2286, Modules/Settings/WidgetsTabSection.qml:2462",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2338, Modules/Settings/WidgetsTabSection.qml:2514",
     "comment": ""
   },
   {
     "term": "Printer Classes",
     "context": "Printer Classes",
-    "reference": "Modules/Settings/PrinterTab.qml:1570",
+    "reference": "Modules/Settings/PrinterTab.qml:1583",
     "comment": ""
   },
   {
@@ -12458,19 +12470,19 @@
   {
     "term": "Printer name (no spaces)",
     "context": "Printer name (no spaces)",
-    "reference": "Modules/Settings/PrinterTab.qml:764",
+    "reference": "Modules/Settings/PrinterTab.qml:777",
     "comment": ""
   },
   {
     "term": "Printer reachable",
     "context": "Printer reachable",
-    "reference": "Modules/Settings/PrinterTab.qml:639",
+    "reference": "Modules/Settings/PrinterTab.qml:652",
     "comment": "Status message when test connection to printer succeeds"
   },
   {
     "term": "Printers",
     "context": "Printers",
-    "reference": "Modals/Settings/SettingsSidebar.qml:337, Modules/Settings/PrinterTab.qml:210, Modules/Settings/PrinterTab.qml:869, Modules/ControlCenter/Models/WidgetModel.qml:257, Modules/ControlCenter/BuiltinPlugins/CupsWidget.qml:16",
+    "reference": "Modals/Settings/SettingsSidebar.qml:337, Modules/Settings/PrinterTab.qml:220, Modules/Settings/PrinterTab.qml:882, Modules/ControlCenter/Models/WidgetModel.qml:257, Modules/ControlCenter/BuiltinPlugins/CupsWidget.qml:16",
     "comment": ""
   },
   {
@@ -12482,7 +12494,7 @@
   {
     "term": "Prioritize performance",
     "context": "Prioritize performance",
-    "reference": "Common/Theme.qml:1659",
+    "reference": "Common/Theme.qml:1657",
     "comment": "power profile description"
   },
   {
@@ -12542,7 +12554,7 @@
   {
     "term": "Profile Image Error",
     "context": "Profile Image Error",
-    "reference": "Services/PortalService.qml:185",
+    "reference": "Services/PortalService.qml:198",
     "comment": ""
   },
   {
@@ -12566,7 +12578,7 @@
   {
     "term": "Profile image is too large. Please use a smaller image.",
     "context": "Profile image is too large. Please use a smaller image.",
-    "reference": "Services/PortalService.qml:176",
+    "reference": "Services/PortalService.qml:189",
     "comment": ""
   },
   {
@@ -12608,7 +12620,7 @@
   {
     "term": "Protocol",
     "context": "Protocol",
-    "reference": "Widgets/VpnProfileDelegate.qml:68, Modules/Settings/NetworkVpnTab.qml:440, Modules/Settings/PrinterTab.qml:549",
+    "reference": "Widgets/VpnProfileDelegate.qml:68, Modules/Settings/NetworkVpnTab.qml:440, Modules/Settings/PrinterTab.qml:561",
     "comment": "Label for printer protocol selector, e.g. ipp, ipps, lpd, socket"
   },
   {
@@ -12620,7 +12632,7 @@
   {
     "term": "Qt colors applied successfully",
     "context": "Qt colors applied successfully",
-    "reference": "Common/Theme.qml:1991",
+    "reference": "Common/Theme.qml:1989",
     "comment": ""
   },
   {
@@ -12704,7 +12716,7 @@
   {
     "term": "Rain Chance",
     "context": "Rain Chance",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:1115",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:1138",
     "comment": ""
   },
   {
@@ -12752,7 +12764,7 @@
   {
     "term": "Reason",
     "context": "Reason",
-    "reference": "Services/CupsService.qml:357, Modules/Settings/PrinterTab.qml:1154",
+    "reference": "Services/CupsService.qml:357, Modules/Settings/PrinterTab.qml:1167",
     "comment": ""
   },
   {
@@ -12788,7 +12800,7 @@
   {
     "term": "Recommended available",
     "context": "Recommended available",
-    "reference": "Modules/Settings/PrinterTab.qml:716",
+    "reference": "Modules/Settings/PrinterTab.qml:729",
     "comment": ""
   },
   {
@@ -12830,7 +12842,7 @@
   {
     "term": "Reject Jobs",
     "context": "Reject Jobs",
-    "reference": "Modules/Settings/PrinterTab.qml:1306",
+    "reference": "Modules/Settings/PrinterTab.qml:1319",
     "comment": ""
   },
   {
@@ -12860,13 +12872,13 @@
   {
     "term": "Remaining",
     "context": "Remaining",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:2093",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2145",
     "comment": ""
   },
   {
     "term": "Remaining / Total",
     "context": "Remaining / Total",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:2098",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2150",
     "comment": ""
   },
   {
@@ -12890,13 +12902,13 @@
   {
     "term": "Remember last session",
     "context": "Remember last session",
-    "reference": "Modules/Settings/GreeterTab.qml:663",
+    "reference": "Modules/Settings/GreeterTab.qml:627",
     "comment": ""
   },
   {
     "term": "Remember last user",
     "context": "Remember last user",
-    "reference": "Modules/Settings/GreeterTab.qml:672",
+    "reference": "Modules/Settings/GreeterTab.qml:636",
     "comment": ""
   },
   {
@@ -12908,7 +12920,7 @@
   {
     "term": "Remove",
     "context": "Remove",
-    "reference": "Modules/Plugins/ListSetting.qml:114, Modules/Plugins/ListSettingWithInput.qml:230, Modules/Settings/WidgetsTabSection.qml:1169, Modules/Settings/UsersTab.qml:267, Modules/Settings/UsersTab.qml:295, Modules/Settings/KeybindsTab.qml:109",
+    "reference": "Modules/Plugins/ListSetting.qml:114, Modules/Plugins/ListSettingWithInput.qml:230, Modules/Settings/WidgetsTabSection.qml:1221, Modules/Settings/UsersTab.qml:267, Modules/Settings/UsersTab.qml:295, Modules/Settings/KeybindsTab.qml:109",
     "comment": ""
   },
   {
@@ -13100,7 +13112,7 @@
   {
     "term": "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys). Auth changes apply automatically and may open a terminal for sudo.",
     "context": "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys). Auth changes apply automatically and may open a terminal for sudo.",
-    "reference": "Modules/Settings/GreeterTab.qml:696",
+    "reference": "Modules/Settings/GreeterTab.qml:660",
     "comment": ""
   },
   {
@@ -13112,7 +13124,7 @@
   {
     "term": "Requires remembering the last user and session. Enable those options first.",
     "context": "Requires remembering the last user and session. Enable those options first.",
-    "reference": "Modules/Settings/GreeterTab.qml:682",
+    "reference": "Modules/Settings/GreeterTab.qml:646",
     "comment": ""
   },
   {
@@ -13214,7 +13226,7 @@
   {
     "term": "Resume",
     "context": "Resume",
-    "reference": "Modules/Settings/PrinterTab.qml:1232, Modules/ControlCenter/BuiltinPlugins/CupsWidget.qml:138",
+    "reference": "Modules/Settings/PrinterTab.qml:1245, Modules/ControlCenter/BuiltinPlugins/CupsWidget.qml:138",
     "comment": ""
   },
   {
@@ -13388,7 +13400,7 @@
   {
     "term": "Running Apps Settings",
     "context": "Running Apps Settings",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:3628",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:3680",
     "comment": ""
   },
   {
@@ -13586,7 +13598,7 @@
   {
     "term": "Scanning...",
     "context": "Scanning...",
-    "reference": "Modules/Settings/PrinterTab.qml:439, Modules/Settings/NetworkWifiTab.qml:423",
+    "reference": "Modules/Settings/PrinterTab.qml:449, Modules/Settings/NetworkWifiTab.qml:423",
     "comment": ""
   },
   {
@@ -13604,7 +13616,7 @@
   {
     "term": "Screen sharing",
     "context": "Screen sharing",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:2296, Modules/Settings/WidgetsTabSection.qml:2462, Modules/Settings/WidgetsTabSection.qml:2916",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2348, Modules/Settings/WidgetsTabSection.qml:2514, Modules/Settings/WidgetsTabSection.qml:2968",
     "comment": ""
   },
   {
@@ -13634,7 +13646,7 @@
   {
     "term": "Scroll Wheel",
     "context": "Scroll Wheel",
-    "reference": "Modules/Settings/MediaPlayerTab.qml:72, Modules/Settings/DankBarTab.qml:1846",
+    "reference": "Modules/Settings/MediaPlayerTab.qml:79, Modules/Settings/DankBarTab.qml:1846",
     "comment": ""
   },
   {
@@ -13652,7 +13664,7 @@
   {
     "term": "Scroll wheel behavior on media widget",
     "context": "Scroll wheel behavior on media widget",
-    "reference": "Modules/Settings/MediaPlayerTab.qml:73",
+    "reference": "Modules/Settings/MediaPlayerTab.qml:80",
     "comment": ""
   },
   {
@@ -13748,7 +13760,7 @@
   {
     "term": "Search...",
     "context": "Search...",
-    "reference": "Widgets/DankDropdown.qml:402, Modals/Settings/SettingsSidebar.qml:736, Modules/ProcessList/ProcessListPopout.qml:199",
+    "reference": "Widgets/DankDropdown.qml:402, Modals/Settings/SettingsSidebar.qml:733, Modules/ProcessList/ProcessListPopout.qml:199",
     "comment": ""
   },
   {
@@ -13946,13 +13958,13 @@
   {
     "term": "Select device...",
     "context": "Select device...",
-    "reference": "Modules/Settings/PrinterTab.qml:442",
+    "reference": "Modules/Settings/PrinterTab.qml:452",
     "comment": ""
   },
   {
     "term": "Select driver...",
     "context": "Select driver...",
-    "reference": "Modules/Settings/PrinterTab.qml:716",
+    "reference": "Modules/Settings/PrinterTab.qml:729",
     "comment": ""
   },
   {
@@ -13964,7 +13976,7 @@
   {
     "term": "Select greeter background image",
     "context": "Select greeter background image",
-    "reference": "Modules/Settings/GreeterTab.qml:637",
+    "reference": "Modules/Settings/GreeterTab.qml:601",
     "comment": ""
   },
   {
@@ -14036,7 +14048,7 @@
   {
     "term": "Selected image file not found.",
     "context": "Selected image file not found.",
-    "reference": "Services/PortalService.qml:180",
+    "reference": "Services/PortalService.qml:193",
     "comment": ""
   },
   {
@@ -14336,7 +14348,7 @@
   {
     "term": "Show",
     "context": "Show",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:1114, Modules/Settings/DisplayConfigTab.qml:569, Modules/Settings/DankDashTab.qml:538",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:1166, Modules/Settings/DisplayConfigTab.qml:569, Modules/Settings/DankDashTab.qml:538",
     "comment": ""
   },
   {
@@ -14360,7 +14372,7 @@
   {
     "term": "Show Badge",
     "context": "Show Badge",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:4071",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:4123",
     "comment": ""
   },
   {
@@ -14462,7 +14474,7 @@
   {
     "term": "Show Icon",
     "context": "Show Icon",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:1750, Modules/Settings/WidgetsTabSection.qml:1902",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:1802, Modules/Settings/WidgetsTabSection.qml:1954",
     "comment": ""
   },
   {
@@ -14570,7 +14582,7 @@
   {
     "term": "Show Percentage",
     "context": "Show Percentage",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:3119, Modules/Settings/WidgetsTabSection.qml:3421",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:3171, Modules/Settings/WidgetsTabSection.qml:3473",
     "comment": ""
   },
   {
@@ -14612,7 +14624,7 @@
   {
     "term": "Show Remaining Time",
     "context": "Show Remaining Time",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:3240",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:3292",
     "comment": ""
   },
   {
@@ -14630,7 +14642,7 @@
   {
     "term": "Show Seconds",
     "context": "Show Seconds",
-    "reference": "Modules/Settings/GreeterTab.qml:572, Modules/Settings/TimeWeatherTab.qml:63, Modules/Settings/DesktopWidgetSettings/ClockSettings.qml:71, Modules/Settings/DesktopWidgetSettings/ClockSettings.qml:82",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:86, Modules/Settings/DesktopWidgetSettings/ClockSettings.qml:71, Modules/Settings/DesktopWidgetSettings/ClockSettings.qml:82",
     "comment": ""
   },
   {
@@ -14648,7 +14660,7 @@
   {
     "term": "Show Swap",
     "context": "Show Swap",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:1309",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:1361",
     "comment": ""
   },
   {
@@ -14696,7 +14708,7 @@
   {
     "term": "Show Week Number",
     "context": "Show Week Number",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:92",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:115",
     "comment": ""
   },
   {
@@ -14798,7 +14810,7 @@
   {
     "term": "Show in GB",
     "context": "Show in GB",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:1368",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:1420",
     "comment": ""
   },
   {
@@ -14936,13 +14948,13 @@
   {
     "term": "Show weather information in top bar and control center",
     "context": "Show weather information in top bar and control center",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:429",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:452",
     "comment": ""
   },
   {
     "term": "Show week number in the calendar",
     "context": "Show week number in the calendar",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:93",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:116",
     "comment": ""
   },
   {
@@ -15038,7 +15050,7 @@
   {
     "term": "Single-Line Popup",
     "context": "Single-Line Popup",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:1518",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:1570",
     "comment": ""
   },
   {
@@ -15086,7 +15098,7 @@
   {
     "term": "Skip the greeter password after boot until you sign out. Lock screen unlock is unchanged. Takes effect on the next reboot after sync.",
     "context": "Skip the greeter password after boot until you sign out. Lock screen unlock is unchanged. Takes effect on the next reboot after sync.",
-    "reference": "Modules/Settings/GreeterTab.qml:682",
+    "reference": "Modules/Settings/GreeterTab.qml:646",
     "comment": ""
   },
   {
@@ -15098,7 +15110,7 @@
   {
     "term": "Small",
     "context": "Small",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:1942, Modules/Settings/WidgetsTabSection.qml:3496",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:1994, Modules/Settings/WidgetsTabSection.qml:3548",
     "comment": ""
   },
   {
@@ -15284,13 +15296,13 @@
   {
     "term": "State",
     "context": "State",
-    "reference": "Modules/Settings/PrinterTab.qml:1149, Modules/Settings/NetworkEthernetTab.qml:316",
+    "reference": "Modules/Settings/PrinterTab.qml:1162, Modules/Settings/NetworkEthernetTab.qml:316",
     "comment": ""
   },
   {
     "term": "Status",
     "context": "Status",
-    "reference": "Widgets/DankIconPicker.qml:55, Modals/Settings/SettingsSidebar.qml:251, Modules/Settings/AboutTab.qml:698, Modules/Settings/NetworkStatusTab.qml:86, Modules/Settings/PrinterTab.qml:186, Modules/Settings/BatteryTab.qml:106",
+    "reference": "Widgets/DankIconPicker.qml:55, Modals/Settings/SettingsSidebar.qml:251, Modules/Settings/AboutTab.qml:698, Modules/Settings/NetworkStatusTab.qml:86, Modules/Settings/PrinterTab.qml:196, Modules/Settings/BatteryTab.qml:106",
     "comment": ""
   },
   {
@@ -15560,13 +15572,13 @@
   {
     "term": "Sync to apply",
     "context": "Sync to apply",
-    "reference": "Modules/Settings/GreeterTab.qml:788",
+    "reference": "Modules/Settings/GreeterTab.qml:752",
     "comment": ""
   },
   {
     "term": "Syncing...",
     "context": "Syncing...",
-    "reference": "Modules/Settings/GreeterTab.qml:788",
+    "reference": "Modules/Settings/GreeterTab.qml:752",
     "comment": ""
   },
   {
@@ -15590,7 +15602,7 @@
   {
     "term": "System Default",
     "context": "System Default",
-    "reference": "Modules/Settings/GreeterTab.qml:364, Modules/Settings/TimeWeatherTab.qml:12, Modules/Settings/TimeWeatherTab.qml:159, Modules/Settings/TimeWeatherTab.qml:162, Modules/Settings/TimeWeatherTab.qml:202, Modules/Settings/TimeWeatherTab.qml:246, Modules/Settings/TimeWeatherTab.qml:249, Modules/Settings/TimeWeatherTab.qml:289, Modules/Settings/LocaleTab.qml:9",
+    "reference": "Modules/Settings/GreeterTab.qml:364, Modules/Settings/TimeWeatherTab.qml:12, Modules/Settings/TimeWeatherTab.qml:58, Modules/Settings/TimeWeatherTab.qml:66, Modules/Settings/TimeWeatherTab.qml:182, Modules/Settings/TimeWeatherTab.qml:185, Modules/Settings/TimeWeatherTab.qml:225, Modules/Settings/TimeWeatherTab.qml:269, Modules/Settings/TimeWeatherTab.qml:272, Modules/Settings/TimeWeatherTab.qml:312, Modules/Settings/LocaleTab.qml:9",
     "comment": "date format option"
   },
   {
@@ -15728,7 +15740,7 @@
   {
     "term": "Terminal",
     "context": "Terminal",
-    "reference": "Modules/Settings/DefaultAppsTab.qml:296, Modules/Settings/MuxTab.qml:46, Modules/Settings/Widgets/TerminalPickerRow.qml:9",
+    "reference": "Modules/Settings/DefaultAppsTab.qml:306, Modules/Settings/MuxTab.qml:46, Modules/Settings/Widgets/TerminalPickerRow.qml:9",
     "comment": "Terminal"
   },
   {
@@ -15800,13 +15812,13 @@
   {
     "term": "Test Connection",
     "context": "Test Connection",
-    "reference": "Modules/Settings/PrinterTab.qml:580",
+    "reference": "Modules/Settings/PrinterTab.qml:593",
     "comment": "Button to test connection to a printer by IP address"
   },
   {
     "term": "Test Page",
     "context": "Test Page",
-    "reference": "Modules/Settings/PrinterTab.qml:1272",
+    "reference": "Modules/Settings/PrinterTab.qml:1285",
     "comment": ""
   },
   {
@@ -15818,7 +15830,7 @@
   {
     "term": "Testing...",
     "context": "Testing...",
-    "reference": "Modules/Settings/PrinterTab.qml:580",
+    "reference": "Modules/Settings/PrinterTab.qml:593",
     "comment": "Button state while testing printer connection"
   },
   {
@@ -15836,7 +15848,7 @@
   {
     "term": "Text Editor",
     "context": "Text Editor",
-    "reference": "Modules/Settings/DefaultAppsTab.qml:314",
+    "reference": "Modules/Settings/DefaultAppsTab.qml:324",
     "comment": "Text Editor"
   },
   {
@@ -15914,7 +15926,7 @@
   {
     "term": "Theme worker failed (%1)",
     "context": "Theme worker failed (%1)",
-    "reference": "Common/Theme.qml:2157",
+    "reference": "Common/Theme.qml:2155",
     "comment": ""
   },
   {
@@ -16106,7 +16118,7 @@
   {
     "term": "Time Format",
     "context": "Time Format",
-    "reference": "Modules/Settings/GreeterTab.qml:551, Modules/Settings/TimeWeatherTab.qml:45",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:45, Modules/Settings/TimeWeatherTab.qml:53",
     "comment": ""
   },
   {
@@ -16322,7 +16334,7 @@
   {
     "term": "Top Bar Format",
     "context": "Top Bar Format",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:157",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:180",
     "comment": ""
   },
   {
@@ -16358,13 +16370,13 @@
   {
     "term": "Total",
     "context": "Total",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:2088",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2140",
     "comment": ""
   },
   {
     "term": "Total Jobs",
     "context": "Total Jobs",
-    "reference": "Modules/Settings/PrinterTab.qml:222",
+    "reference": "Modules/Settings/PrinterTab.qml:232",
     "comment": ""
   },
   {
@@ -16544,7 +16556,7 @@
   {
     "term": "Unavailable",
     "context": "Unavailable",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:459, Modules/Settings/NetworkVpnTab.qml:82, Modules/Settings/PrinterTab.qml:202, Modules/Settings/NetworkEthernetTab.qml:167, Modules/Settings/NetworkWifiTab.qml:970",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:459, Modules/Settings/NetworkVpnTab.qml:82, Modules/Settings/PrinterTab.qml:212, Modules/Settings/NetworkEthernetTab.qml:167, Modules/Settings/NetworkWifiTab.qml:970",
     "comment": "Phone Connect unavailable status"
   },
   {
@@ -16622,7 +16634,7 @@
   {
     "term": "Unknown",
     "context": "Unknown",
-    "reference": "Common/Theme.qml:1648, Services/WeatherService.qml:153, Services/WeatherService.qml:716, Services/WeatherService.qml:717, Services/WeatherService.qml:758, Services/WeatherService.qml:759, Services/WeatherService.qml:794, Services/WeatherService.qml:795, Services/WeatherService.qml:993, Services/WeatherService.qml:994, Services/BatteryService.qml:300, dms-plugins/DankKDEConnect/DankKDEConnect.qml:1582, dms-plugins/DankKDEConnect/components/DeviceCard.qml:298, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:741, Modules/Lock/LockScreenContent.qml:451, Modules/Lock/LockScreenContent.qml:571, Modules/Lock/LockScreenContent.qml:667, Modules/Settings/PluginBrowser.qml:1077, Modules/Settings/NetworkStatusTab.qml:79, Modules/Settings/NetworkStatusTab.qml:121, Modules/Settings/PrinterTab.qml:1638, Modules/Settings/ThemeBrowser.qml:506, Modules/Settings/NetworkEthernetTab.qml:146, Modules/Settings/NetworkEthernetTab.qml:169, Modules/Settings/NetworkEthernetTab.qml:317, Modules/Settings/NetworkEthernetTab.qml:428, Modules/Settings/NotificationsTab.qml:711, Modules/Settings/NetworkWifiTab.qml:537, Modules/Settings/NetworkWifiTab.qml:947, Modules/ControlCenter/Details/BatteryDetail.qml:184, Modules/ControlCenter/Components/HeaderPane.qml:63, Modules/ControlCenter/Components/DragDropGrid.qml:517, Modules/ControlCenter/Components/DragDropGrid.qml:755, Modules/DankDash/Overview/MediaOverviewCard.qml:91, Modules/DankBar/Popouts/BatteryPopout.qml:340",
+    "reference": "Common/Theme.qml:1646, Services/WeatherService.qml:153, Services/WeatherService.qml:716, Services/WeatherService.qml:717, Services/WeatherService.qml:758, Services/WeatherService.qml:759, Services/WeatherService.qml:794, Services/WeatherService.qml:795, Services/WeatherService.qml:993, Services/WeatherService.qml:994, Services/BatteryService.qml:300, dms-plugins/DankKDEConnect/DankKDEConnect.qml:1582, dms-plugins/DankKDEConnect/components/DeviceCard.qml:298, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:741, Modules/Lock/LockScreenContent.qml:451, Modules/Lock/LockScreenContent.qml:571, Modules/Lock/LockScreenContent.qml:667, Modules/Settings/PluginBrowser.qml:1077, Modules/Settings/NetworkStatusTab.qml:79, Modules/Settings/NetworkStatusTab.qml:121, Modules/Settings/PrinterTab.qml:1651, Modules/Settings/ThemeBrowser.qml:506, Modules/Settings/NetworkEthernetTab.qml:146, Modules/Settings/NetworkEthernetTab.qml:169, Modules/Settings/NetworkEthernetTab.qml:317, Modules/Settings/NetworkEthernetTab.qml:428, Modules/Settings/NotificationsTab.qml:711, Modules/Settings/NetworkWifiTab.qml:537, Modules/Settings/NetworkWifiTab.qml:947, Modules/ControlCenter/Details/BatteryDetail.qml:184, Modules/ControlCenter/Components/HeaderPane.qml:63, Modules/ControlCenter/Components/DragDropGrid.qml:517, Modules/ControlCenter/Components/DragDropGrid.qml:755, Modules/DankDash/Overview/MediaOverviewCard.qml:91, Modules/DankBar/Popouts/BatteryPopout.qml:340",
     "comment": "KDE Connect unknown device status | Status | battery status | power profile option | unknown author | widget status"
   },
   {
@@ -16634,7 +16646,7 @@
   {
     "term": "Unknown Artist",
     "context": "Unknown Artist",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1836, dms-plugins/DankKDEConnect/DankKDEConnect.qml:1842, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:1388, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:1394, Modules/DankDash/MediaDropdownOverlay.qml:555, Modules/DankDash/MediaPlayerTab.qml:484, Modules/OSD/MediaPlaybackOSD.qml:264, Modules/DankDash/Overview/MediaOverviewCard.qml:102",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1836, dms-plugins/DankKDEConnect/DankKDEConnect.qml:1842, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:1388, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:1394, Modules/DankDash/MediaDropdownOverlay.qml:555, Modules/DankDash/MediaPlayerTab.qml:484, Modules/OSD/MediaPlaybackOSD.qml:314, Modules/DankDash/Overview/MediaOverviewCard.qml:102",
     "comment": ""
   },
   {
@@ -16676,7 +16688,7 @@
   {
     "term": "Unknown Title",
     "context": "Unknown Title",
-    "reference": "Modules/OSD/MediaPlaybackOSD.qml:253",
+    "reference": "Modules/OSD/MediaPlaybackOSD.qml:303",
     "comment": ""
   },
   {
@@ -16748,7 +16760,7 @@
   {
     "term": "Unset",
     "context": "Unset",
-    "reference": "Modules/Settings/DefaultAppsTab.qml:229, Modules/Settings/NotificationsTab.qml:215, Modules/Settings/NotificationsTab.qml:216, Modules/Settings/NotificationsTab.qml:218, Modules/Settings/NotificationsTab.qml:228, Modules/Settings/NotificationsTab.qml:229, Modules/Settings/NotificationsTab.qml:231",
+    "reference": "Modules/Settings/DefaultAppsTab.qml:232, Modules/Settings/NotificationsTab.qml:215, Modules/Settings/NotificationsTab.qml:216, Modules/Settings/NotificationsTab.qml:218, Modules/Settings/NotificationsTab.qml:228, Modules/Settings/NotificationsTab.qml:229, Modules/Settings/NotificationsTab.qml:231",
     "comment": "Unset"
   },
   {
@@ -16898,19 +16910,19 @@
   {
     "term": "Use Imperial Units",
     "context": "Use Imperial Units",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:450",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:473",
     "comment": ""
   },
   {
     "term": "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)",
     "context": "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:451",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:474",
     "comment": ""
   },
   {
     "term": "Use Inline Expansion",
     "context": "Use Inline Expansion",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:1461",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:1513",
     "comment": ""
   },
   {
@@ -16940,7 +16952,7 @@
   {
     "term": "Use a custom image for the login screen, or leave empty to use your desktop wallpaper.",
     "context": "Use a custom image for the login screen, or leave empty to use your desktop wallpaper.",
-    "reference": "Modules/Settings/GreeterTab.qml:624",
+    "reference": "Modules/Settings/GreeterTab.qml:588",
     "comment": ""
   },
   {
@@ -16962,6 +16974,12 @@
     "comment": "lock screen U2F security key setting"
   },
   {
+    "term": "Use album art accent",
+    "context": "Use album art accent",
+    "reference": "Modules/Settings/MediaPlayerTab.qml:69",
+    "comment": ""
+  },
+  {
     "term": "Use an external wallpaper manager like swww, hyprpaper, or swaybg.",
     "context": "Use an external wallpaper manager like swww, hyprpaper, or swaybg.",
     "reference": "Modules/Settings/WallpaperTab.qml:1238",
@@ -16971,6 +16989,12 @@
     "term": "Use animated wave progress bars for media playback",
     "context": "Use animated wave progress bars for media playback",
     "reference": "Modules/Settings/MediaPlayerTab.qml:42",
+    "comment": ""
+  },
+  {
+    "term": "Use colors extracted from album art instead of system theme colors",
+    "context": "Use colors extracted from album art instead of system theme colors",
+    "reference": "Modules/Settings/MediaPlayerTab.qml:70",
     "comment": ""
   },
   {
@@ -17030,7 +17054,7 @@
   {
     "term": "Use meters per second instead of km/h for wind speed",
     "context": "Use meters per second instead of km/h for wind speed",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:469",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:492",
     "comment": ""
   },
   {
@@ -17078,7 +17102,7 @@
   {
     "term": "Used for xdg-terminal-exec",
     "context": "Used for xdg-terminal-exec",
-    "reference": "Modules/Settings/DefaultAppsTab.qml:299",
+    "reference": "Modules/Settings/DefaultAppsTab.qml:309",
     "comment": "Used for xdg-terminal-exec"
   },
   {
@@ -17186,7 +17210,7 @@
   {
     "term": "Using DankCalendar%1",
     "context": "Using DankCalendar%1",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:127",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:150",
     "comment": "calendar backend status"
   },
   {
@@ -17198,7 +17222,7 @@
   {
     "term": "Using khal",
     "context": "Using khal",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:129",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:152",
     "comment": "calendar backend status"
   },
   {
@@ -17210,13 +17234,13 @@
   {
     "term": "Utilities",
     "context": "Utilities",
-    "reference": "Services/AppSearchService.qml:686, Services/AppSearchService.qml:687, Services/AppSearchService.qml:688, Services/AppSearchService.qml:689, Modules/Settings/DefaultAppsTab.qml:286",
+    "reference": "Services/AppSearchService.qml:686, Services/AppSearchService.qml:687, Services/AppSearchService.qml:688, Services/AppSearchService.qml:689, Modules/Settings/DefaultAppsTab.qml:296",
     "comment": "Utilities"
   },
   {
     "term": "VPN",
     "context": "VPN",
-    "reference": "Services/DMSNetworkService.qml:393, Modals/Settings/SettingsSidebar.qml:269, Modules/Settings/WidgetsTabSection.qml:2211, Modules/Settings/WidgetsTabSection.qml:2462, Modules/Settings/NetworkVpnTab.qml:45, Modules/Settings/WidgetsTab.qml:201, Modules/ControlCenter/Models/WidgetModel.qml:247, Modules/ControlCenter/BuiltinPlugins/VpnWidget.qml:18",
+    "reference": "Services/DMSNetworkService.qml:393, Modals/Settings/SettingsSidebar.qml:269, Modules/Settings/WidgetsTabSection.qml:2263, Modules/Settings/WidgetsTabSection.qml:2514, Modules/Settings/NetworkVpnTab.qml:45, Modules/Settings/WidgetsTab.qml:201, Modules/ControlCenter/Models/WidgetModel.qml:247, Modules/ControlCenter/BuiltinPlugins/VpnWidget.qml:18",
     "comment": ""
   },
   {
@@ -17348,7 +17372,7 @@
   {
     "term": "Video Player",
     "context": "Video Player",
-    "reference": "Modules/Settings/DefaultAppsTab.qml:337",
+    "reference": "Modules/Settings/DefaultAppsTab.qml:347",
     "comment": "Video Player"
   },
   {
@@ -17372,7 +17396,7 @@
   {
     "term": "Visibility",
     "context": "Visibility",
-    "reference": "Modules/DankDash/WeatherForecastCard.qml:100, Modules/Settings/TimeWeatherTab.qml:1159, Modules/Settings/DankBarTab.qml:647",
+    "reference": "Modules/DankDash/WeatherForecastCard.qml:100, Modules/Settings/TimeWeatherTab.qml:1182, Modules/Settings/DankBarTab.qml:647",
     "comment": ""
   },
   {
@@ -17384,7 +17408,7 @@
   {
     "term": "Visual Effects",
     "context": "Visual Effects",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:4115",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:4167",
     "comment": ""
   },
   {
@@ -17402,7 +17426,7 @@
   {
     "term": "Volume",
     "context": "Volume",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:2236, Modules/Settings/WidgetsTabSection.qml:2462, Modules/Settings/OSDTab.qml:93",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2288, Modules/Settings/WidgetsTabSection.qml:2514, Modules/Settings/OSDTab.qml:93",
     "comment": ""
   },
   {
@@ -17504,7 +17528,7 @@
   {
     "term": "Weather",
     "context": "Weather",
-    "reference": "Widgets/KeybindItem.qml:1131, Widgets/KeybindItem.qml:1136, Widgets/KeybindItem.qml:1148, Modules/DankDash/DankDashPopout.qml:30, Modules/Settings/TimeWeatherTab.qml:420, Modules/Settings/DankDashTab.qml:37",
+    "reference": "Widgets/KeybindItem.qml:1131, Widgets/KeybindItem.qml:1136, Widgets/KeybindItem.qml:1148, Modules/DankDash/DankDashPopout.qml:30, Modules/Settings/TimeWeatherTab.qml:443, Modules/Settings/DankDashTab.qml:37",
     "comment": ""
   },
   {
@@ -17516,7 +17540,7 @@
   {
     "term": "Web Browser",
     "context": "Web Browser",
-    "reference": "Modules/Settings/DefaultAppsTab.qml:271",
+    "reference": "Modules/Settings/DefaultAppsTab.qml:274",
     "comment": "Web Browser"
   },
   {
@@ -17594,13 +17618,13 @@
   {
     "term": "WiFi disabled",
     "context": "WiFi disabled",
-    "reference": "Services/LegacyNetworkService.qml:211, Services/DMSNetworkService.qml:649",
+    "reference": "Services/LegacyNetworkService.qml:211, Services/DMSNetworkService.qml:655",
     "comment": ""
   },
   {
     "term": "WiFi enabled",
     "context": "WiFi enabled",
-    "reference": "Services/LegacyNetworkService.qml:211, Services/LegacyNetworkService.qml:416, Services/DMSNetworkService.qml:649, Services/DMSNetworkService.qml:661",
+    "reference": "Services/LegacyNetworkService.qml:211, Services/LegacyNetworkService.qml:416, Services/DMSNetworkService.qml:655, Services/DMSNetworkService.qml:667",
     "comment": ""
   },
   {
@@ -17720,7 +17744,7 @@
   {
     "term": "Wind",
     "context": "Wind",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeather.qml:425, Modules/DankDash/WeatherTab.qml:92, Modules/Settings/TimeWeatherTab.qml:1008",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeather.qml:425, Modules/DankDash/WeatherTab.qml:92, Modules/Settings/TimeWeatherTab.qml:1031",
     "comment": ""
   },
   {
@@ -17732,7 +17756,7 @@
   {
     "term": "Wind Speed in m/s",
     "context": "Wind Speed in m/s",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:468",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:491",
     "comment": ""
   },
   {
@@ -17906,7 +17930,7 @@
   {
     "term": "Yes",
     "context": "Yes",
-    "reference": "Modules/Settings/PrinterTab.qml:1169, Modules/Settings/WindowRulesTab.qml:77, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2084, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2088, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2098, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2108, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2110",
+    "reference": "Modules/Settings/PrinterTab.qml:1182, Modules/Settings/WindowRulesTab.qml:77, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2084, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2088, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2098, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2108, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2110",
     "comment": ""
   },
   {
@@ -18122,7 +18146,7 @@
   {
     "term": "khal",
     "context": "khal",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:135",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:158",
     "comment": "calendar backend option"
   },
   {
@@ -18176,13 +18200,13 @@
   {
     "term": "matugen not available or disabled - cannot apply GTK colors",
     "context": "matugen not available or disabled - cannot apply GTK colors",
-    "reference": "Common/Theme.qml:1961",
+    "reference": "Common/Theme.qml:1959",
     "comment": ""
   },
   {
     "term": "matugen not available or disabled - cannot apply Qt colors",
     "context": "matugen not available or disabled - cannot apply Qt colors",
-    "reference": "Common/Theme.qml:1983",
+    "reference": "Common/Theme.qml:1981",
     "comment": ""
   },
   {
@@ -18302,7 +18326,7 @@
   {
     "term": "or run ",
     "context": "or run ",
-    "reference": "Modules/Settings/GreeterTab.qml:705",
+    "reference": "Modules/Settings/GreeterTab.qml:669",
     "comment": ""
   },
   {
@@ -18428,25 +18452,25 @@
   {
     "term": "• M - Month (1-12)",
     "context": "• M - Month (1-12)",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:376",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:399",
     "comment": ""
   },
   {
     "term": "• MM - Month (01-12)",
     "context": "• MM - Month (01-12)",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:387",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:410",
     "comment": ""
   },
   {
     "term": "• MMM - Month (Jan)",
     "context": "• MMM - Month (Jan)",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:392",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:415",
     "comment": ""
   },
   {
     "term": "• MMMM - Month (January)",
     "context": "• MMMM - Month (January)",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:397",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:420",
     "comment": ""
   },
   {
@@ -18464,37 +18488,37 @@
   {
     "term": "• d - Day (1-31)",
     "context": "• d - Day (1-31)",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:356",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:379",
     "comment": ""
   },
   {
     "term": "• dd - Day (01-31)",
     "context": "• dd - Day (01-31)",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:361",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:384",
     "comment": ""
   },
   {
     "term": "• ddd - Day name (Mon)",
     "context": "• ddd - Day name (Mon)",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:366",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:389",
     "comment": ""
   },
   {
     "term": "• dddd - Day name (Monday)",
     "context": "• dddd - Day name (Monday)",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:371",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:394",
     "comment": ""
   },
   {
     "term": "• yy - Year (24)",
     "context": "• yy - Year (24)",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:402",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:425",
     "comment": ""
   },
   {
     "term": "• yyyy - Year (2024)",
     "context": "• yyyy - Year (2024)",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:407",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:430",
     "comment": ""
   },
   {

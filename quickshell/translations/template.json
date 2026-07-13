@@ -490,13 +490,6 @@
     "comment": ""
   },
   {
-    "term": "24-hour clock",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "25 seconds",
     "translation": "",
     "context": "wallpaper interval",
@@ -8505,6 +8498,13 @@
     "comment": ""
   },
   {
+    "term": "Geometric Centering",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Get Started",
     "translation": "",
     "context": "greeter first page button",
@@ -8680,13 +8680,6 @@
     "comment": ""
   },
   {
-    "term": "Greeter only — does not affect main clock",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Greeter only — format for the date on the login screen",
     "translation": "",
     "context": "",
@@ -8823,6 +8816,13 @@
     "term": "HTML copied to clipboard",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Handles geo: location links",
+    "translation": "",
+    "context": "Handles geo: location links",
     "reference": "",
     "comment": ""
   },
@@ -9583,6 +9583,13 @@
     "comment": ""
   },
   {
+    "term": "Index Centering",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Indicator Style",
     "translation": "",
     "context": "",
@@ -9927,6 +9934,13 @@
   },
   {
     "term": "Jobs: ",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Join video call",
     "translation": "",
     "context": "",
     "reference": "",
@@ -10825,6 +10839,13 @@
     "term": "Map window class names to icon names for proper icon display",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Maps",
+    "translation": "",
+    "context": "Maps",
     "reference": "",
     "comment": ""
   },
@@ -13539,13 +13560,6 @@
   },
   {
     "term": "Pad Hours",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Pad hours (02:00 vs 2:00)",
     "translation": "",
     "context": "",
     "reference": "",
@@ -19789,6 +19803,13 @@
     "comment": ""
   },
   {
+    "term": "Use album art accent",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Use an external wallpaper manager like swww, hyprpaper, or swaybg.",
     "translation": "",
     "context": "wallpaper settings disable description",
@@ -19797,6 +19818,13 @@
   },
   {
     "term": "Use animated wave progress bars for media playback",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Use colors extracted from album art instead of system theme colors",
     "translation": "",
     "context": "",
     "reference": "",

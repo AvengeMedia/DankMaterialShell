@@ -1626,7 +1626,7 @@
     "Close Window": "סגור/י חלון"
   },
   "Codec switching is unavailable because pactl was not found": {
-    "Codec switching is unavailable because pactl was not found": ""
+    "Codec switching is unavailable because pactl was not found": "החלפת קודק אינה זמינה מכיוון שלא ניתן היה למצוא את pactl"
   },
   "Color": {
     "Color": "צבע"
@@ -3701,6 +3701,9 @@
   "Generic": {
     "Generic": "כללי"
   },
+  "Geometric Centering": {
+    "Geometric Centering": ""
+  },
   "Get Started": {
     "Get Started": "התחל/י"
   },
@@ -3838,6 +3841,9 @@
   },
   "HTML copied to clipboard": {
     "HTML copied to clipboard": "HTML הועתק ללוח ההעתקה"
+  },
+  "Handles geo: location links": {
+    "Handles geo: location links": ""
   },
   "Handles links and opens HTML files": {
     "Handles links and opens HTML files": "לטיפול בקישורים ופתיחת קובצי HTML"
@@ -4163,6 +4169,9 @@
   "Incorrect password - try again": {
     "Incorrect password - try again": "סיסמה שגויה - נסה/י שנית"
   },
+  "Index Centering": {
+    "Index Centering": ""
+  },
   "Indicator Style": {
     "Indicator Style": "סגנון מחוון"
   },
@@ -4312,6 +4321,9 @@
   },
   "Jobs: ": {
     "Jobs: ": "עבודות: "
+  },
+  "Join video call": {
+    "Join video call": ""
   },
   "Jump to page": {
     "Jump to page": "מעבר לעמוד"
@@ -4699,6 +4711,9 @@
   },
   "Map window class names to icon names for proper icon display": {
     "Map window class names to icon names for proper icon display": "מפה/י שמות של סוגי חלונות לשמות של סמלים כדי לוודא שהסמלים מוצגים כראוי"
+  },
+  "Maps": {
+    "Maps": ""
   },
   "Margin": {
     "Margin": "שוליים"
@@ -5286,7 +5301,7 @@
     "No checks passed": "אף בדיקה לא עברה"
   },
   "No codecs found": {
-    "No codecs found": ""
+    "No codecs found": "לא נמצאו קודקים"
   },
   "No custom theme file": {
     "No custom theme file": "אין קובץ ערכת נושא מותאמת אישית"
@@ -8594,11 +8609,17 @@
   "Use a security key for lock screen authentication.": {
     "Use a security key for lock screen authentication.": "השתמש/י במפתח אבטחה לאימות מסך הנעילה."
   },
+  "Use album art accent": {
+    "Use album art accent": ""
+  },
   "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": {
     "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": "השתמש/י במנהל רקעים חיצוני כמו hyprpaper, awww או swaybg."
   },
   "Use animated wave progress bars for media playback": {
     "Use animated wave progress bars for media playback": "השתמש/י בסרגלי התקדמות מונפשים בצורת גלים לניגון מדיה"
+  },
+  "Use colors extracted from album art instead of system theme colors": {
+    "Use colors extracted from album art instead of system theme colors": ""
   },
   "Use custom border size": {
     "Use custom border size": "השתמש/י בגודל מסגרת מותאם אישית"
