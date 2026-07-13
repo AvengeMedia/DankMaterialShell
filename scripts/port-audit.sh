@@ -16,7 +16,7 @@ for arg in "$@"; do
   esac
 done
 
-git fetch origin --quiet 2>/dev/null || true
+git fetch origin --prune --quiet 2>/dev/null || true
 
 if [ -z "$TARGET" ]; then
   TARGET=$(git branch -r --list 'origin/stable-*' --format='%(refname:short)' |
