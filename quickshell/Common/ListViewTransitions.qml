@@ -32,21 +32,12 @@ Singleton {
             PauseAnimation {
                 duration: Math.max(0, Math.min(addTransition.ViewTransition.index - (addTransition.ViewTransition.targetIndexes[0] ?? 0), root._staggerCap)) * root._staggerMs
             }
-            ParallelAnimation {
-                DankAnim {
-                    property: "opacity"
-                    from: 0
-                    to: 1
-                    duration: Theme.expressiveDurations.fast
-                    easing.bezierCurve: Theme.expressiveCurves.emphasizedDecel
-                }
-                DankAnim {
-                    property: "y"
-                    from: addTransition.ViewTransition.destination.y + Theme.spacingS
-                    to: addTransition.ViewTransition.destination.y
-                    duration: Theme.expressiveDurations.fast
-                    easing.bezierCurve: Theme.expressiveCurves.emphasizedDecel
-                }
+            DankAnim {
+                property: "opacity"
+                from: 0
+                to: 1
+                duration: Theme.expressiveDurations.fast
+                easing.bezierCurve: Theme.expressiveCurves.emphasizedDecel
             }
         }
     }

@@ -28,6 +28,70 @@ ListView {
     displaced: ListViewTransitions.displaced
     move: ListViewTransitions.move
 
+    // QQmlDelegateModel can release a delegate back to its cache without hiding it,
+    // leaving a stale row painted over live ones. Hide anything the view no longer claims.
+    Connections {
+        target: listView.model?.objectName !== undefined ? listView.model : null
+        ignoreUnknownSignals: true
+        function onRowsInserted() {
+            orphanSweep.arm();
+        }
+        function onRowsRemoved() {
+            orphanSweep.arm();
+        }
+        function onRowsMoved() {
+            orphanSweep.arm();
+        }
+        function onModelReset() {
+            orphanSweep.arm();
+        }
+    }
+
+    FrameAnimation {
+        id: orphanSweep
+
+        property int frames: 0
+
+        function arm() {
+            frames = 0;
+            running = true;
+        }
+
+        onTriggered: {
+            const kids = listView.contentItem.children;
+            const rows = [];
+            for (let i = 0; i < kids.length; i++) {
+                const c = kids[i];
+                if (!c || c.index === undefined)
+                    continue;
+                const claimed = listView.itemAtIndex(c.index) === c;
+                if (claimed && !c.visible) {
+                    c.visible = true;
+                    continue;
+                }
+                if (c.visible)
+                    rows.push({
+                        item: c,
+                        claimed: claimed
+                    });
+            }
+            for (let a = 0; a < rows.length; a++) {
+                if (rows[a].claimed)
+                    continue;
+                for (let b = 0; b < rows.length; b++) {
+                    if (a === b || !rows[b].claimed)
+                        continue;
+                    if (Math.abs(rows[a].item.y - rows[b].item.y) < rows[b].item.height / 2) {
+                        rows[a].item.visible = false;
+                        break;
+                    }
+                }
+            }
+            if (++frames >= 3)
+                running = false;
+        }
+    }
+
     onMovementStarted: {
         isUserScrolling = true;
         vbar._scrollBarActive = true;

@@ -362,11 +362,12 @@ Item {
         WlrLayershell.exclusiveZone: -1
         WlrLayershell.keyboardFocus: KeyboardFocus.keyboardFocus(keyboardActive, null)
 
+        // Anchored top+bottom: dynamic layer-surface resizes misbehave on some compositors
         anchors {
             top: true
             left: true
             right: root.useSingleWindow
-            bottom: root.useSingleWindow
+            bottom: true
         }
 
         WlrLayershell.margins {
@@ -377,7 +378,6 @@ Item {
         }
 
         implicitWidth: root.useSingleWindow ? 0 : root.windowWidth
-        implicitHeight: root.useSingleWindow ? 0 : root.windowHeight
 
         mask: Region {
             item: inputMask

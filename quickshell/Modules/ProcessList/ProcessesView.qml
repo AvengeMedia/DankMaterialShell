@@ -301,20 +301,6 @@ Item {
             clip: true
             spacing: Theme.spacingXXS
 
-            states: [
-                State {
-                    name: "snap"
-                    when: Theme.snapListModelChanges
-                    PropertyChanges {
-                        target: processListView
-                        add: null
-                        remove: null
-                        displaced: null
-                        move: null
-                    }
-                }
-            ]
-
             model: ScriptModel {
                 values: root.cachedProcesses
                 objectProp: "pid"
