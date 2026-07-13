@@ -226,6 +226,13 @@ DankPopout {
             LayoutMirroring.enabled: I18n.isRtl
             LayoutMirroring.childrenInherit: true
 
+            MouseArea {
+                anchors.fill: parent
+                z: -1
+                enabled: root.__dropdownType !== 0
+                onClicked: root.__hideDropdowns()
+            }
+
             implicitWidth: Math.max(700, pages.implicitWidth + (Theme.spacingM * 2))
             implicitHeight: contentColumn.height + Theme.spacingM * 2
             color: "transparent"

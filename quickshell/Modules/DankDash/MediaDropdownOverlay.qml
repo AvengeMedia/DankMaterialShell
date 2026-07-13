@@ -6,6 +6,7 @@ import qs.Widgets
 
 Item {
     id: root
+    visible: dropdownType !== 0
 
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
@@ -582,10 +583,4 @@ Item {
         }
     }
 
-    MouseArea {
-        anchors.fill: parent
-        z: -1
-        enabled: dropdownType !== 0
-        onClicked: closeRequested()
-    }
 }
