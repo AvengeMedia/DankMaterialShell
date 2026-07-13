@@ -42,7 +42,17 @@ FocusScope {
         return Theme.surfaceContainer;
     }
 
-    implicitHeight: _searchAreaH + _resultsH
+    implicitHeight: _searchAreaH + resultsContainer.height
+
+    property bool _animateResize: false
+
+    Component.onCompleted: resizeAnimEnableTimer.restart()
+
+    Timer {
+        id: resizeAnimEnableTimer
+        interval: 100
+        onTriggered: root._animateResize = true
+    }
 
     function resetScroll() {
         resultsList.resetScroll();
@@ -239,8 +249,12 @@ FocusScope {
         }
 
         function onContentVisibleChanged() {
-            if (!root.parentModal?.contentVisible)
+            if (!root.parentModal?.contentVisible) {
                 root.closeTransientUi();
+                return;
+            }
+            root._animateResize = false;
+            resizeAnimEnableTimer.restart();
         }
     }
 
@@ -420,6 +434,7 @@ FocusScope {
         height: root._resultsH
 
         Behavior on height {
+            enabled: root._animateResize
             NumberAnimation {
                 duration: root._resizeDuration
                 easing.type: Easing.BezierSpline
