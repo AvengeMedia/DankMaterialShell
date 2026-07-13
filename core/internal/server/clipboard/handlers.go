@@ -138,20 +138,22 @@ func handleCopyEntry(conn net.Conn, req models.Request, m *Manager) {
 		return
 	}
 
-	filePath := m.EntryToFile(entry)
-	if filePath != "" {
-		if err := m.CopyFile(filePath); err != nil {
-			models.RespondError(conn, req.ID, err.Error())
+	if entry.AltMimeType == "" {
+		filePath := m.EntryToFile(entry)
+		if filePath != "" {
+			if err := m.CopyFile(filePath); err != nil {
+				models.RespondError(conn, req.ID, err.Error())
+				return
+			}
+			models.Respond(conn, req.ID, map[string]any{
+				"success":  true,
+				"filePath": filePath,
+			})
 			return
 		}
-		models.Respond(conn, req.ID, map[string]any{
-			"success":  true,
-			"filePath": filePath,
-		})
-		return
 	}
 
-	if err := m.SetClipboard(entry.Data, entry.MimeType); err != nil {
+	if err := m.SetClipboardEntry(entry); err != nil {
 		models.RespondError(conn, req.ID, err.Error())
 		return
 	}

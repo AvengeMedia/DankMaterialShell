@@ -279,7 +279,29 @@ func (m *Manager) setupDataDeviceSync() {
 		}
 		w.Close()
 
-		go m.readAndStore(r, preferredMime)
+		altMime := ""
+		if m.isImageMimeType(preferredMime) && !slices.Contains(mimes, "x-special/gnome-copied-files") {
+			altMime = selectAltTextMimeType(mimes)
+		}
+		if altMime == "" {
+			go m.readAndStore(r, preferredMime, nil, "")
+			return
+		}
+
+		altR, altW, err := os.Pipe()
+		if err != nil {
+			go m.readAndStore(r, preferredMime, nil, "")
+			return
+		}
+		if err := typedOffer.Receive(altMime, int(altW.Fd())); err != nil {
+			altR.Close()
+			altW.Close()
+			go m.readAndStore(r, preferredMime, nil, "")
+			return
+		}
+		altW.Close()
+
+		go m.readAndStore(r, preferredMime, altR, altMime)
 	})
 
 	if err := dataMgr.GetDataDeviceWithProxy(dataDevice, m.seat); err != nil {
@@ -324,22 +346,42 @@ func (m *Manager) releaseCurrentSource() {
 	source.Destroy()
 }
 
-func (m *Manager) readAndStore(r *os.File, mimeType string) {
-	defer r.Close()
-
-	cfg := m.getConfig()
-
+func readPipeTimeout(r *os.File) []byte {
 	done := make(chan []byte, 1)
 	go func() {
 		data, _ := io.ReadAll(r)
 		done <- data
 	}()
 
-	var data []byte
 	select {
-	case data = <-done:
+	case data := <-done:
+		return data
 	case <-time.After(500 * time.Millisecond):
-		return
+		return nil
+	}
+}
+
+func (m *Manager) readAndStore(r *os.File, mimeType string, altR *os.File, altMime string) {
+	defer r.Close()
+
+	cfg := m.getConfig()
+
+	altCh := make(chan []byte, 1)
+	switch altR {
+	case nil:
+		altCh <- nil
+	default:
+		go func() {
+			defer altR.Close()
+			altCh <- readPipeTimeout(altR)
+		}()
+	}
+
+	data := readPipeTimeout(r)
+	altData := <-altCh
+
+	if len(bytes.TrimSpace(altData)) == 0 || int64(len(altData)) > cfg.MaxEntrySize {
+		altData, altMime = nil, ""
 	}
 
 	if len(data) == 0 || int64(len(data)) > cfg.MaxEntrySize {
@@ -350,14 +392,14 @@ func (m *Manager) readAndStore(r *os.File, mimeType string) {
 	}
 
 	if !cfg.Disabled && m.db != nil {
-		m.storeClipboardEntry(data, mimeType)
+		m.storeClipboardEntry(data, mimeType, altData, altMime)
 	}
 
 	m.updateState()
 	m.notifySubscribers()
 }
 
-func (m *Manager) storeClipboardEntry(data []byte, mimeType string) {
+func (m *Manager) storeClipboardEntry(data []byte, mimeType string, altData []byte, altMime string) {
 	if mimeType == "text/uri-list" {
 		if imgData, imgMime, ok := m.tryReadImageFromURI(data); ok {
 			data = imgData
@@ -366,11 +408,13 @@ func (m *Manager) storeClipboardEntry(data []byte, mimeType string) {
 	}
 
 	entry := Entry{
-		Data:      data,
-		MimeType:  mimeType,
-		Size:      len(data),
-		Timestamp: time.Now(),
-		IsImage:   m.isImageMimeType(mimeType),
+		Data:        data,
+		MimeType:    mimeType,
+		Size:        len(data),
+		Timestamp:   time.Now(),
+		IsImage:     m.isImageMimeType(mimeType),
+		AltData:     altData,
+		AltMimeType: altMime,
 	}
 
 	switch {
@@ -483,6 +527,12 @@ func encodeEntry(e Entry) ([]byte, error) {
 	} else {
 		buf.WriteByte(0)
 	}
+	if e.AltMimeType != "" {
+		binary.Write(buf, binary.BigEndian, uint32(len(e.AltMimeType)))
+		buf.WriteString(e.AltMimeType)
+		binary.Write(buf, binary.BigEndian, uint32(len(e.AltData)))
+		buf.Write(e.AltData)
+	}
 
 	return buf.Bytes(), nil
 }
@@ -547,6 +597,21 @@ func decodeEntryFields(data []byte, withData bool) (Entry, error) {
 		e.Pinned = pinnedByte == 1
 	}
 
+	if buf.Len() >= 4 {
+		var altMimeLen uint32
+		binary.Read(buf, binary.BigEndian, &altMimeLen)
+		altMimeBytes := make([]byte, altMimeLen)
+		buf.Read(altMimeBytes)
+		e.AltMimeType = string(altMimeBytes)
+
+		var altDataLen uint32
+		binary.Read(buf, binary.BigEndian, &altDataLen)
+		if withData {
+			e.AltData = make([]byte, altDataLen)
+			buf.Read(e.AltData)
+		}
+	}
+
 	return e, nil
 }
 
@@ -563,10 +628,27 @@ func computeHash(data []byte) uint64 {
 }
 
 func extractHash(data []byte) uint64 {
-	if len(data) < 9 {
+	buf := bytes.NewReader(data)
+	if _, err := buf.Seek(8, io.SeekStart); err != nil {
 		return 0
 	}
-	return binary.BigEndian.Uint64(data[len(data)-9 : len(data)-1])
+	for range 3 { // data, mime type, preview
+		var length uint32
+		if binary.Read(buf, binary.BigEndian, &length) != nil {
+			return 0
+		}
+		if _, err := buf.Seek(int64(length), io.SeekCurrent); err != nil {
+			return 0
+		}
+	}
+	if _, err := buf.Seek(4+8+1, io.SeekCurrent); err != nil { // size, timestamp, isImage
+		return 0
+	}
+	var hash uint64
+	if binary.Read(buf, binary.BigEndian, &hash) != nil {
+		return 0
+	}
+	return hash
 }
 
 func (m *Manager) hasSensitiveMimeType(mimes []string) bool {
@@ -608,6 +690,23 @@ func (m *Manager) selectMimeType(mimes []string) string {
 		}
 	}
 
+	return ""
+}
+
+var altTextMimeTypes = []string{
+	"text/plain;charset=utf-8",
+	"text/plain",
+	"UTF8_STRING",
+	"STRING",
+	"TEXT",
+}
+
+func selectAltTextMimeType(mimes []string) string {
+	for _, pref := range altTextMimeTypes {
+		if slices.Contains(mimes, pref) {
+			return pref
+		}
+	}
 	return ""
 }
 
@@ -929,13 +1028,15 @@ func (m *Manager) CreateHistoryEntryFromPinned(pinnedEntry *Entry) error {
 
 	// Create a new unpinned entry with the same data
 	newEntry := Entry{
-		Data:      pinnedEntry.Data,
-		MimeType:  pinnedEntry.MimeType,
-		Size:      pinnedEntry.Size,
-		Timestamp: time.Now(),
-		IsImage:   pinnedEntry.IsImage,
-		Preview:   pinnedEntry.Preview,
-		Pinned:    false,
+		Data:        pinnedEntry.Data,
+		MimeType:    pinnedEntry.MimeType,
+		Size:        pinnedEntry.Size,
+		Timestamp:   time.Now(),
+		IsImage:     pinnedEntry.IsImage,
+		Preview:     pinnedEntry.Preview,
+		Pinned:      false,
+		AltData:     pinnedEntry.AltData,
+		AltMimeType: pinnedEntry.AltMimeType,
 	}
 
 	if err := m.storeEntry(newEntry); err != nil {
@@ -1061,6 +1162,23 @@ func (m *Manager) SetClipboard(data []byte, mimeType string) error {
 	return nil
 }
 
+// SetClipboardEntry takes the selection serving the entry's primary
+// representation plus its stored alternate, so history restores keep
+// both the text and image sides pasteable.
+func (m *Manager) SetClipboardEntry(entry *Entry) error {
+	if int64(len(entry.Data)) > m.config.MaxEntrySize {
+		return fmt.Errorf("data too large")
+	}
+
+	offers := clipboardstore.ExpandOffers(slices.Clone(entry.Data), entry.MimeType)
+	if entry.AltMimeType != "" {
+		offers = append(offers, clipboardstore.ExpandOffers(slices.Clone(entry.AltData), entry.AltMimeType)...)
+	}
+
+	m.takeSelection(offers)
+	return nil
+}
+
 // takeSelection makes the daemon the selection owner, serving the given
 // offers until another client claims the clipboard.
 func (m *Manager) takeSelection(offers []clipboardstore.Offer) {
@@ -1154,16 +1272,20 @@ func (m *Manager) PasteText() (string, error) {
 	}
 
 	entry := history[0]
-	if entry.IsImage {
-		return "", fmt.Errorf("clipboard contains image, not text")
-	}
 
 	fullEntry, err := m.GetEntry(entry.ID)
 	if err != nil {
 		return "", err
 	}
 
-	return string(fullEntry.Data), nil
+	switch {
+	case !fullEntry.IsImage:
+		return string(fullEntry.Data), nil
+	case fullEntry.AltMimeType != "":
+		return string(fullEntry.AltData), nil
+	default:
+		return "", fmt.Errorf("clipboard contains image, not text")
+	}
 }
 
 func (m *Manager) Close() {

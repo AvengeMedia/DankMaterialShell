@@ -144,6 +144,72 @@ func TestEncodeDecodeEntry_LargeData(t *testing.T) {
 	assert.Equal(t, original.Size, decoded.Size)
 }
 
+func TestEncodeDecodeEntry_AltRepresentation(t *testing.T) {
+	original := Entry{
+		ID:          555,
+		Data:        []byte{0x42, 0x4D, 0x01, 0x02},
+		MimeType:    "image/bmp",
+		Preview:     "[[ image 4 B bmp 85x19 ]]",
+		Size:        4,
+		Timestamp:   time.Now().Truncate(time.Second),
+		IsImage:     true,
+		Hash:        computeHash([]byte{0x42, 0x4D, 0x01, 0x02}),
+		Pinned:      true,
+		AltData:     []byte("real text from OneNote"),
+		AltMimeType: "text/plain;charset=utf-8",
+	}
+
+	encoded, err := encodeEntry(original)
+	assert.NoError(t, err)
+
+	decoded, err := decodeEntry(encoded)
+	assert.NoError(t, err)
+	assert.Equal(t, original.Data, decoded.Data)
+	assert.Equal(t, original.MimeType, decoded.MimeType)
+	assert.True(t, decoded.Pinned)
+	assert.Equal(t, original.AltData, decoded.AltData)
+	assert.Equal(t, original.AltMimeType, decoded.AltMimeType)
+
+	meta, err := decodeEntryMeta(encoded)
+	assert.NoError(t, err)
+	assert.Empty(t, meta.Data)
+	assert.Equal(t, original.AltMimeType, meta.AltMimeType)
+
+	assert.Equal(t, original.Hash, extractHash(encoded))
+}
+
+func TestExtractHash_NoAlt(t *testing.T) {
+	entry := Entry{
+		ID:        1,
+		Data:      []byte("plain entry"),
+		MimeType:  "text/plain",
+		Preview:   "plain entry",
+		Size:      11,
+		Timestamp: time.Now().Truncate(time.Second),
+		Hash:      computeHash([]byte("plain entry")),
+	}
+
+	encoded, err := encodeEntry(entry)
+	assert.NoError(t, err)
+	assert.Equal(t, entry.Hash, extractHash(encoded))
+}
+
+func TestSelectAltTextMimeType(t *testing.T) {
+	tests := []struct {
+		mimes    []string
+		expected string
+	}{
+		{[]string{"image/bmp", "TEXT", "text/html", "text/plain", "text/plain;charset=utf-8", "UTF8_STRING"}, "text/plain;charset=utf-8"},
+		{[]string{"image/png", "UTF8_STRING"}, "UTF8_STRING"},
+		{[]string{"image/png", "text/html"}, ""},
+		{[]string{"image/png"}, ""},
+	}
+
+	for _, tt := range tests {
+		assert.Equal(t, tt.expected, selectAltTextMimeType(tt.mimes))
+	}
+}
+
 func TestStateEqual_BothNil(t *testing.T) {
 	assert.False(t, stateEqual(nil, nil))
 }
