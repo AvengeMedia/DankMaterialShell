@@ -320,6 +320,7 @@ func checkEnvironmentVars() []checkResult {
 	var results []checkResult
 	results = append(results, checkEnvVar("QT_QPA_PLATFORMTHEME")...)
 	results = append(results, checkEnvVar("QS_ICON_THEME")...)
+	results = append(results, checkXDGMenuPrefix()...)
 	return results
 }
 
@@ -332,6 +333,29 @@ func checkEnvVar(name string) []checkResult {
 		return []checkResult{{catEnvironment, name, statusInfo, "Not set", "", doctorDocsURL + "#environment-variables"}}
 	}
 	return nil
+}
+
+func checkXDGMenuPrefix() []checkResult {
+	menuPrefix := os.Getenv("XDG_MENU_PREFIX")
+	if menuPrefix != "" {
+		if checkXDGMenuFile(menuPrefix) {
+			return []checkResult{{catEnvironment, "XDG_MENU_PREFIX", statusInfo, menuPrefix, "", doctorDocsURL + "#xdg-menu-prefix"}}
+		}
+		return []checkResult{{catEnvironment, "XDG_MENU_PREFIX", statusWarn, fmt.Sprintf("%s (menu file not found)", menuPrefix), fmt.Sprintf("Dolphin 'Open with…' dialog may be empty. Ensure /etc/xdg/menus/%sapplications.menu exists.", menuPrefix), doctorDocsURL + "#xdg-menu-prefix"}}
+	}
+	if _, err := exec.LookPath("keditfiletype"); err == nil {
+		return []checkResult{{catEnvironment, "XDG_MENU_PREFIX", statusWarn, "Not set", "Dolphin file associations and 'Open with…' dialog may be empty. Set XDG_MENU_PREFIX=plasma- in your compositor's environment block.", doctorDocsURL + "#xdg-menu-prefix"}}
+	}
+	if doctorVerbose {
+		return []checkResult{{catEnvironment, "XDG_MENU_PREFIX", statusInfo, "Not set", "", doctorDocsURL + "#xdg-menu-prefix"}}
+	}
+	return nil
+}
+
+func checkXDGMenuFile(prefix string) bool {
+	menuPath := fmt.Sprintf("/etc/xdg/menus/%sapplications.menu", prefix)
+	_, err := os.Stat(menuPath)
+	return err == nil
 }
 
 func readOSRelease() map[string]string {
