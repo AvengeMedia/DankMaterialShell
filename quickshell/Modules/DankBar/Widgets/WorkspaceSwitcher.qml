@@ -2102,6 +2102,14 @@ Item {
                     }
                 }
                 Connections {
+                    target: CompositorService.isHyprland ? Hyprland : null
+                    enabled: CompositorService.isHyprland
+                    function onRawEvent(event) {
+                        if (event.name === "activewindow" || event.name === "activewindowv2")
+                            delegateRoot.updateAllData();
+                    }
+                }
+                Connections {
                     target: I3.workspaces
                     enabled: (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle)
                     function onValuesChanged() {
