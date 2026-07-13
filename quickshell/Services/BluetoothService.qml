@@ -256,9 +256,8 @@ Singleton {
     function getDevicePath(device) {
         if (!device || !device.address) {
             return "";
-        }
-        const adapterPath = adapter ? "/org/bluez/hci0" : "/org/bluez/hci0";
-        return `${adapterPath}/dev_${device.address.replace(/:/g, "_")}`;
+    	}
+	return device.dbusPath ?? "";
     }
 
     function isAudioDevice(device) {
