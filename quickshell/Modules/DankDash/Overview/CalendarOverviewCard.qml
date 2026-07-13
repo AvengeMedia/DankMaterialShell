@@ -223,8 +223,9 @@ Rectangle {
         Rectangle {
             id: dankWarning
             width: parent.width
-            visible: CalendarService && CalendarService.dankNeedsLaunch
-            height: visible ? Math.max(28, warningRow.implicitHeight) + Theme.spacingS : 0
+            readonly property bool showWarning: CalendarService?.dankNeedsLaunch ?? false
+            visible: showWarning
+            height: showWarning ? Math.max(28, warningRow.implicitHeight) + Theme.spacingS : 0
             radius: Theme.cornerRadius
             color: Theme.warningHover
             border.color: Theme.withAlpha(Theme.warning, 0.35)

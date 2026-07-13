@@ -322,9 +322,13 @@ DankPopout {
                 DankTabBar {
                     id: tabBar
 
+                    // Effective visibility is false while the popout window is unmapped, so gating
+                    // height on `visible` collapses the bar between opens and resizes the surface
+                    // mid-animation. Gate on the model instead.
+                    readonly property bool hasTabs: (model?.length ?? 0) > 0
                     width: parent.width
-                    height: visible ? 48 : 0
-                    visible: model.length > 0
+                    height: hasTabs ? 48 : 0
+                    visible: hasTabs
                     currentIndex: root.currentTabIndex
                     spacing: Theme.spacingS
                     equalWidthTabs: true
@@ -356,8 +360,8 @@ DankPopout {
 
                 Item {
                     width: parent.width
-                    height: visible ? Theme.spacingXS : 0
-                    visible: tabBar.visible
+                    height: tabBar.hasTabs ? Theme.spacingXS : 0
+                    visible: tabBar.hasTabs
                 }
 
                 Item {

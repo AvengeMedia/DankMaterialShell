@@ -520,6 +520,7 @@ Singleton {
     property var appDrawerSectionViewModes: ({})
     onAppDrawerSectionViewModesChanged: saveSettings()
     property bool niriOverviewOverlayEnabled: true
+    property string niriOverviewLauncherStyle: "full"
     property string dankLauncherV2Size: "compact"
     property bool dankLauncherV2ShowSourceBadges: true
     property bool dankLauncherV2BorderEnabled: false

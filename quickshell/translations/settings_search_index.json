@@ -2399,6 +2399,26 @@
     ]
   },
   {
+    "section": "niriOverviewLauncherStyle",
+    "label": "Default Opens",
+    "tabIndex": 9,
+    "category": "Launcher",
+    "keywords": [
+      "default",
+      "drawer",
+      "full",
+      "launcher",
+      "menu",
+      "niri",
+      "opens",
+      "overlay",
+      "overview",
+      "spotlight",
+      "start",
+      "style"
+    ]
+  },
+  {
     "section": "niriOverviewOverlayEnabled",
     "label": "Enable Overview Overlay",
     "tabIndex": 9,

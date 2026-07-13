@@ -770,6 +770,20 @@ Item {
                     checked: SettingsData.niriOverviewOverlayEnabled
                     onToggled: checked => SettingsData.set("niriOverviewOverlayEnabled", checked)
                 }
+
+                SettingsButtonGroupRow {
+                    visible: SettingsData.niriOverviewOverlayEnabled
+                    settingKey: "niriOverviewLauncherStyle"
+                    tags: ["launcher", "niri", "overview", "overlay", "style", "spotlight", "full"]
+                    text: I18n.tr("Default Opens")
+                    model: [I18n.tr("Full"), I18n.tr("Spotlight")]
+                    currentIndex: SettingsData.niriOverviewLauncherStyle === "spotlight" ? 1 : 0
+                    onSelectionChanged: (index, selected) => {
+                        if (!selected)
+                            return;
+                        SettingsData.set("niriOverviewLauncherStyle", index === 1 ? "spotlight" : "full");
+                    }
+                }
             }
 
             SettingsCard {

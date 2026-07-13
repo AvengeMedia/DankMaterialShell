@@ -120,18 +120,6 @@ Item {
     readonly property int borderWidth: SettingsData.dankLauncherV2BorderEnabled ? SettingsData.dankLauncherV2BorderThickness : 0
     readonly property bool useSingleWindow: CompositorService.isHyprland || useBackgroundDarken
 
-    // Blur region isn't auto-committed on geometry changes; kick twice to catch resize settling.
-    function _kickBlurCommit() {
-        launcherBlur.kick();
-        Qt.callLater(launcherBlur.kick);
-    }
-
-    onAlignedXChanged: _kickBlurCommit()
-    onAlignedYChanged: _kickBlurCommit()
-    onAlignedWidthChanged: _kickBlurCommit()
-    on_ContentImplicitHChanged: _kickBlurCommit()
-    onContentVisibleChanged: _kickBlurCommit()
-
     signal dialogClosed
 
     function _ensureContentLoadedAndInitialize(query, mode) {
@@ -354,9 +342,6 @@ Item {
             blurRadius: root.cornerRadius
         }
 
-        onWidthChanged: root._kickBlurCommit()
-        onHeightChanged: root._kickBlurCommit()
-
         WlrLayershell.namespace: "dms:spotlight"
         WlrLayershell.layer: root.effectiveLauncherLayer
         WlrLayershell.exclusiveZone: -1
@@ -440,9 +425,6 @@ Item {
             property real slideOffset: contentVisible ? 0 : -root._animHeadroom
 
             opacity: contentVisible ? 1 : 0
-
-            onOpacityChanged: root._kickBlurCommit()
-            onSlideOffsetChanged: root._kickBlurCommit()
 
             Behavior on opacity {
                 NumberAnimation {

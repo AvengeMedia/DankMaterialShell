@@ -251,6 +251,7 @@ var SPEC = {
     spotlightSectionViewModes: { def: {} },
     appDrawerSectionViewModes: { def: {} },
     niriOverviewOverlayEnabled: { def: true },
+    niriOverviewLauncherStyle: { def: "full" },
     dankLauncherV2Size: { def: "compact" },
     dankLauncherV2ShowSourceBadges: { def: true },
     dankLauncherV2BorderEnabled: { def: false },

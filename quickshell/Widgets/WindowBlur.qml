@@ -60,6 +60,42 @@ Item {
         targetWindow.BackgroundEffect.blurRegion = _active ? blurRegion : null;
     }
 
+    // Republish after geometry settles, plus one trailing pass.
+    onBlurXChanged: settleKickAction.restart()
+    onBlurYChanged: settleKickAction.restart()
+    onBlurWidthChanged: settleKickAction.restart()
+    onBlurHeightChanged: settleKickAction.restart()
+    onBlurRadiusChanged: settleKickAction.restart()
+    onClipEnabledChanged: settleKickAction.restart()
+    onClipXChanged: settleKickAction.restart()
+    onClipYChanged: settleKickAction.restart()
+    onClipWidthChanged: settleKickAction.restart()
+    onClipHeightChanged: settleKickAction.restart()
+
+    function _runSettleKick() {
+        if (!targetWindow?.visible)
+            return;
+        kick();
+        settleRepeatTimer.restart();
+    }
+
+    DeferredAction {
+        id: settleKickAction
+        interval: 16
+        onTriggered: root._runSettleKick()
+    }
+
+    Timer {
+        id: settleRepeatTimer
+        interval: 96
+        repeat: false
+        onTriggered: {
+            if (!root.targetWindow?.visible)
+                return;
+            root.kick();
+        }
+    }
+
     function _scheduleLifecycleKick() {
         lifecycleKickAction.restart();
     }
@@ -97,6 +133,12 @@ Item {
                 root._scheduleLifecycleKick();
             else
                 root._clear();
+        }
+        function onWidthChanged() {
+            settleKickAction.restart();
+        }
+        function onHeightChanged() {
+            settleKickAction.restart();
         }
         function onResourcesLost() {
             root._clear();
