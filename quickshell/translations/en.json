@@ -1010,7 +1010,7 @@
   {
     "term": "All",
     "context": "All",
-    "reference": "Modals/ProcessListModal.qml:383, Services/AppSearchService.qml:728, Services/AppSearchService.qml:749, dms-plugins/DankStickerSearch/DankStickerSearch.qml:101, Modals/DankLauncherV2/Controller.qml:783, Modals/DankLauncherV2/SpotlightLauncherContent.qml:440, Modals/DankLauncherV2/LauncherContent.qml:334, Modals/DankLauncherV2/LauncherContent.qml:623, Modals/Clipboard/ClipboardContent.qml:16, Modules/ProcessList/ProcessListPopout.qml:169, Modules/Settings/WidgetsTabSection.qml:4014, Modules/Settings/WidgetsTabSection.qml:4070, Modules/Settings/PluginBrowser.qml:194, Modules/Settings/KeybindsTab.qml:458, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:103, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:106, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:118, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:254, Modules/Notifications/Center/HistoryNotificationList.qml:87",
+    "reference": "Modals/ProcessListModal.qml:383, Services/AppSearchService.qml:728, Services/AppSearchService.qml:749, dms-plugins/DankStickerSearch/DankStickerSearch.qml:101, Modals/DankLauncherV2/Controller.qml:784, Modals/DankLauncherV2/SpotlightLauncherContent.qml:440, Modals/DankLauncherV2/LauncherContent.qml:334, Modals/DankLauncherV2/LauncherContent.qml:623, Modals/Clipboard/ClipboardContent.qml:16, Modules/ProcessList/ProcessListPopout.qml:169, Modules/Settings/WidgetsTabSection.qml:4014, Modules/Settings/WidgetsTabSection.qml:4070, Modules/Settings/PluginBrowser.qml:194, Modules/Settings/KeybindsTab.qml:458, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:103, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:106, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:118, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:254, Modules/Notifications/Center/HistoryNotificationList.qml:87",
     "comment": "Tailscale filter: all devices | notification history filter | plugin browser category filter"
   },
   {
@@ -1298,7 +1298,7 @@
   {
     "term": "Applications",
     "context": "Applications",
-    "reference": "Modals/DankLauncherV2/Controller.qml:198, Modals/Settings/SettingsSidebar.qml:277, Modules/Settings/ThemeColorsTab.qml:2136, Modules/Dock/DockLauncherButton.qml:25",
+    "reference": "Modals/DankLauncherV2/Controller.qml:199, Modals/Settings/SettingsSidebar.qml:277, Modules/Settings/ThemeColorsTab.qml:2136, Modules/Dock/DockLauncherButton.qml:25",
     "comment": ""
   },
   {
@@ -2462,7 +2462,7 @@
   {
     "term": "Browse",
     "context": "Browse",
-    "reference": "Modals/DankLauncherV2/SpotlightResultRow.qml:61, Modals/DankLauncherV2/Controller.qml:219, Modals/DankLauncherV2/Controller.qml:1422, Modules/Settings/ThemeColorsTab.qml:406, Modules/Settings/AutoStartTab.qml:487, Modules/Settings/PluginsTab.qml:236, Modules/Settings/LockScreenTab.qml:378, Modules/Settings/Widgets/SettingsWallpaperPicker.qml:57",
+    "reference": "Modals/DankLauncherV2/SpotlightResultRow.qml:61, Modals/DankLauncherV2/Controller.qml:220, Modals/DankLauncherV2/Controller.qml:1423, Modules/Settings/ThemeColorsTab.qml:406, Modules/Settings/AutoStartTab.qml:487, Modules/Settings/PluginsTab.qml:236, Modules/Settings/LockScreenTab.qml:378, Modules/Settings/Widgets/SettingsWallpaperPicker.qml:57",
     "comment": "theme category option"
   },
   {
@@ -3116,7 +3116,7 @@
   {
     "term": "Clipboard",
     "context": "Clipboard",
-    "reference": "Services/AppSearchService.qml:223, Modals/DankLauncherV2/ResultItem.qml:228, Modals/DankLauncherV2/SpotlightResultRow.qml:67, Modals/DankLauncherV2/Controller.qml:212, Modals/DankLauncherV2/Controller.qml:1270, Modals/Settings/SettingsSidebar.qml:330",
+    "reference": "Services/AppSearchService.qml:223, Modals/DankLauncherV2/ResultItem.qml:228, Modals/DankLauncherV2/SpotlightResultRow.qml:67, Modals/DankLauncherV2/Controller.qml:213, Modals/DankLauncherV2/Controller.qml:1271, Modals/Settings/SettingsSidebar.qml:330",
     "comment": ""
   },
   {
@@ -3356,7 +3356,7 @@
   {
     "term": "Commands",
     "context": "Commands",
-    "reference": "Modals/DankLauncherV2/Controller.qml:233",
+    "reference": "Modals/DankLauncherV2/Controller.qml:234",
     "comment": ""
   },
   {
@@ -3812,7 +3812,7 @@
   {
     "term": "Copy",
     "context": "Copy",
-    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeys.qml:170, Modals/DankLauncherV2/Controller.qml:1266, Modals/Clipboard/ClipboardContextMenu.qml:40, Modules/Settings/ClipboardTab.qml:156, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:395",
+    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeys.qml:170, Modals/DankLauncherV2/Controller.qml:1267, Modals/Clipboard/ClipboardContextMenu.qml:40, Modules/Settings/ClipboardTab.qml:156, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:395",
     "comment": "Copy to clipboard"
   },
   {
@@ -3854,7 +3854,7 @@
   {
     "term": "Copy path",
     "context": "Copy path",
-    "reference": "Modals/DankLauncherV2/Controller.qml:1262, Modals/FileBrowser/FileBrowserItemContextMenu.qml:28",
+    "reference": "Modals/DankLauncherV2/Controller.qml:1263, Modals/FileBrowser/FileBrowserItemContextMenu.qml:28",
     "comment": ""
   },
   {
@@ -6590,7 +6590,7 @@
   {
     "term": "Files",
     "context": "Files",
-    "reference": "Modals/DankLauncherV2/Controller.qml:226, Modals/DankLauncherV2/Controller.qml:1166, Modals/DankLauncherV2/Controller.qml:1187, Modals/DankLauncherV2/SpotlightLauncherContent.qml:448, Modals/DankLauncherV2/LauncherContent.qml:344, Modals/DankLauncherV2/LauncherContent.qml:628, Modules/Settings/LauncherTab.qml:902",
+    "reference": "Modals/DankLauncherV2/Controller.qml:227, Modals/DankLauncherV2/Controller.qml:1167, Modals/DankLauncherV2/Controller.qml:1188, Modals/DankLauncherV2/SpotlightLauncherContent.qml:448, Modals/DankLauncherV2/LauncherContent.qml:344, Modals/DankLauncherV2/LauncherContent.qml:628, Modules/Settings/LauncherTab.qml:902",
     "comment": ""
   },
   {
@@ -6848,7 +6848,7 @@
   {
     "term": "Folders",
     "context": "Folders",
-    "reference": "Modals/DankLauncherV2/Controller.qml:1177, Modals/DankLauncherV2/Controller.qml:1187, Modals/DankLauncherV2/LauncherContent.qml:633, Modules/Settings/LauncherTab.qml:913",
+    "reference": "Modals/DankLauncherV2/Controller.qml:1178, Modals/DankLauncherV2/Controller.qml:1188, Modals/DankLauncherV2/LauncherContent.qml:633, Modules/Settings/LauncherTab.qml:913",
     "comment": ""
   },
   {
@@ -8114,7 +8114,7 @@
   {
     "term": "Image",
     "context": "Image",
-    "reference": "Modals/DankLauncherV2/Controller.qml:1270, Modals/Clipboard/ClipboardEntry.qml:195, Modals/Clipboard/ClipboardContent.qml:16",
+    "reference": "Modals/DankLauncherV2/Controller.qml:1271, Modals/Clipboard/ClipboardEntry.qml:195, Modals/Clipboard/ClipboardContent.qml:16",
     "comment": ""
   },
   {
@@ -8750,7 +8750,7 @@
   {
     "term": "Launch",
     "context": "Launch",
-    "reference": "Modals/DankLauncherV2/LauncherContextMenu.qml:230, Modals/DankLauncherV2/Controller.qml:1240, Modals/DankLauncherV2/Controller.qml:1702, Modules/DankDash/Overview/CalendarOverviewCard.qml:263",
+    "reference": "Modals/DankLauncherV2/LauncherContextMenu.qml:230, Modals/DankLauncherV2/Controller.qml:1241, Modals/DankLauncherV2/Controller.qml:1703, Modules/DankDash/Overview/CalendarOverviewCard.qml:263",
     "comment": ""
   },
   {
@@ -10796,7 +10796,7 @@
   {
     "term": "No trigger",
     "context": "No trigger",
-    "reference": "Modals/DankLauncherV2/Controller.qml:1424, Modules/Settings/LauncherTab.qml:1028",
+    "reference": "Modals/DankLauncherV2/Controller.qml:1425, Modules/Settings/LauncherTab.qml:1028",
     "comment": ""
   },
   {
@@ -11240,7 +11240,7 @@
   {
     "term": "Open",
     "context": "Open",
-    "reference": "Modals/DankLauncherV2/Controller.qml:1244, Modals/DankLauncherV2/Controller.qml:1248, Modals/DankLauncherV2/Controller.qml:1262, Modules/Notepad/NotepadTextEditor.qml:864, Modules/Settings/NetworkWifiTab.qml:566, Modules/Settings/NetworkWifiTab.qml:773, Modules/Settings/NetworkWifiTab.qml:969, Modules/Settings/NetworkWifiTab.qml:1134, Modules/ControlCenter/Details/NetworkDetail.qml:627, Modules/Notifications/Center/NotificationCard.qml:804, Modules/Notifications/Center/NotificationCard.qml:943",
+    "reference": "Modals/DankLauncherV2/Controller.qml:1245, Modals/DankLauncherV2/Controller.qml:1249, Modals/DankLauncherV2/Controller.qml:1263, Modules/Notepad/NotepadTextEditor.qml:864, Modules/Settings/NetworkWifiTab.qml:566, Modules/Settings/NetworkWifiTab.qml:773, Modules/Settings/NetworkWifiTab.qml:969, Modules/Settings/NetworkWifiTab.qml:1134, Modules/ControlCenter/Details/NetworkDetail.qml:627, Modules/Notifications/Center/NotificationCard.qml:804, Modules/Notifications/Center/NotificationCard.qml:943",
     "comment": ""
   },
   {
@@ -11312,7 +11312,7 @@
   {
     "term": "Open folder",
     "context": "Open folder",
-    "reference": "Modals/DankLauncherV2/Controller.qml:1262",
+    "reference": "Modals/DankLauncherV2/Controller.qml:1263",
     "comment": ""
   },
   {
@@ -11324,7 +11324,7 @@
   {
     "term": "Open in terminal",
     "context": "Open in terminal",
-    "reference": "Modals/DankLauncherV2/Controller.qml:1262",
+    "reference": "Modals/DankLauncherV2/Controller.qml:1263",
     "comment": ""
   },
   {
@@ -11744,7 +11744,7 @@
   {
     "term": "Paste",
     "context": "Paste",
-    "reference": "dms-plugins/DankStickerSearch/DankStickerSearch.qml:248, dms-plugins/DankGifSearch/DankGifSearch.qml:195, Modals/DankLauncherV2/Controller.qml:1267, Modals/Clipboard/ClipboardContextMenu.qml:70, Modules/Settings/ClipboardTab.qml:156",
+    "reference": "dms-plugins/DankStickerSearch/DankStickerSearch.qml:248, dms-plugins/DankGifSearch/DankGifSearch.qml:195, Modals/DankLauncherV2/Controller.qml:1268, Modals/Clipboard/ClipboardContextMenu.qml:70, Modules/Settings/ClipboardTab.qml:156",
     "comment": ""
   },
   {
@@ -11918,7 +11918,7 @@
   {
     "term": "Pinned",
     "context": "Pinned",
-    "reference": "Modals/WindowRuleModal.qml:919, Modals/DankLauncherV2/Controller.qml:191, Modals/DankLauncherV2/Controller.qml:1270, Modules/Settings/WindowRulesTab.qml:56, Modules/ControlCenter/Details/BluetoothDetail.qml:392, Modules/ControlCenter/Details/BrightnessDetail.qml:239, Modules/ControlCenter/Details/AudioInputDetail.qml:297, Modules/ControlCenter/Details/AudioOutputDetail.qml:306, Modules/ControlCenter/Details/NetworkDetail.qml:696",
+    "reference": "Modals/WindowRuleModal.qml:919, Modals/DankLauncherV2/Controller.qml:192, Modals/DankLauncherV2/Controller.qml:1271, Modules/Settings/WindowRulesTab.qml:56, Modules/ControlCenter/Details/BluetoothDetail.qml:392, Modules/ControlCenter/Details/BrightnessDetail.qml:239, Modules/ControlCenter/Details/AudioInputDetail.qml:297, Modules/ControlCenter/Details/AudioOutputDetail.qml:306, Modules/ControlCenter/Details/NetworkDetail.qml:696",
     "comment": ""
   },
   {
@@ -13832,7 +13832,7 @@
   {
     "term": "Select",
     "context": "Select",
-    "reference": "Modals/DankLauncherV2/Controller.qml:1575",
+    "reference": "Modals/DankLauncherV2/Controller.qml:1576",
     "comment": ""
   },
   {
@@ -14204,7 +14204,7 @@
   {
     "term": "Settings",
     "context": "Settings",
-    "reference": "Services/AppSearchService.qml:171, Services/AppSearchService.qml:328, Services/AppSearchService.qml:684, Services/PopoutService.qml:448, Services/PopoutService.qml:465, Modals/DankLauncherV2/Controller.qml:205, Modals/Settings/SettingsSidebar.qml:128, Modals/Settings/SettingsModal.qml:88, Modals/Settings/SettingsModal.qml:232, Modules/DankDash/DankDashPopout.qml:34, Modules/Settings/DankDashTab.qml:42, Modules/Dock/DockTrashContextMenu.qml:48",
+    "reference": "Services/AppSearchService.qml:171, Services/AppSearchService.qml:328, Services/AppSearchService.qml:684, Services/PopoutService.qml:448, Services/PopoutService.qml:465, Modals/DankLauncherV2/Controller.qml:206, Modals/Settings/SettingsSidebar.qml:128, Modals/Settings/SettingsModal.qml:88, Modals/Settings/SettingsModal.qml:232, Modules/DankDash/DankDashPopout.qml:34, Modules/Settings/DankDashTab.qml:42, Modules/Dock/DockTrashContextMenu.qml:48",
     "comment": "settings window title"
   },
   {
@@ -14306,13 +14306,13 @@
   {
     "term": "Shift+Enter to copy",
     "context": "Shift+Enter to copy",
-    "reference": "Modals/DankLauncherV2/Controller.qml:1269",
+    "reference": "Modals/DankLauncherV2/Controller.qml:1270",
     "comment": ""
   },
   {
     "term": "Shift+Enter to paste",
     "context": "Shift+Enter to paste",
-    "reference": "dms-plugins/DankStickerSearch/DankStickerSearch.qml:176, dms-plugins/DankGifSearch/DankGifSearch.qml:119, Modals/DankLauncherV2/Controller.qml:1269",
+    "reference": "dms-plugins/DankStickerSearch/DankStickerSearch.qml:176, dms-plugins/DankGifSearch/DankGifSearch.qml:119, Modals/DankLauncherV2/Controller.qml:1270",
     "comment": ""
   },
   {
@@ -15836,7 +15836,7 @@
   {
     "term": "Text",
     "context": "Text",
-    "reference": "dms-plugins/DankKDEConnect/components/ShareDialog.qml:354, Modals/DankLauncherV2/Controller.qml:1270, Modals/Clipboard/ClipboardEntry.qml:199, Modals/Clipboard/ClipboardContent.qml:16, Modules/Settings/LauncherTab.qml:737",
+    "reference": "dms-plugins/DankKDEConnect/components/ShareDialog.qml:354, Modals/DankLauncherV2/Controller.qml:1271, Modals/Clipboard/ClipboardEntry.qml:199, Modals/Clipboard/ClipboardContent.qml:16, Modules/Settings/LauncherTab.qml:737",
     "comment": "KDE Connect share text button | text color"
   },
   {
@@ -16448,7 +16448,7 @@
   {
     "term": "Trigger: %1",
     "context": "Trigger: %1",
-    "reference": "Modals/DankLauncherV2/Controller.qml:1423, Modules/Settings/LauncherTab.qml:1028",
+    "reference": "Modals/DankLauncherV2/Controller.qml:1424, Modules/Settings/LauncherTab.qml:1028",
     "comment": ""
   },
   {
