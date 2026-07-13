@@ -122,8 +122,10 @@ Item {
             "norounding": I18n.tr("No Round"),
             "pin": I18n.tr("Pin"),
             "opaque": I18n.tr("Opaque"),
-            "size": I18n.tr("Size"),
-            "move": I18n.tr("Move"),
+            "sizeWidth": I18n.tr("W"),
+            "sizeHeight": I18n.tr("H"),
+            "moveX": I18n.tr("X"),
+            "moveY": I18n.tr("Y"),
             "monitor": I18n.tr("Monitor"),
             "workspace": I18n.tr("Workspace"),
             "drawBorderWithBackground": I18n.tr("Border w/ Bg"),
@@ -198,7 +200,7 @@ Item {
         }
 
         checkingInclude = true;
-        Proc.runCommand("load-windowrules", ["dms", "config", "windowrules", "list", compositor], (output, exitCode) => {
+        Proc.runCommand("load-windowrules", [Proc.dmsBin, "config", "windowrules", "list", compositor], (output, exitCode) => {
             checkingInclude = false;
             if (exitCode !== 0) {
                 windowRules = [];
@@ -234,7 +236,7 @@ Item {
         if (compositor !== "niri" && compositor !== "hyprland" && compositor !== "mango")
             return;
 
-        Proc.runCommand("remove-windowrule", ["dms", "config", "windowrules", "remove", compositor, ruleId], (output, exitCode) => {
+        Proc.runCommand("remove-windowrule", [Proc.dmsBin, "config", "windowrules", "remove", compositor, ruleId], (output, exitCode) => {
             if (exitCode === 0) {
                 if (CompositorService.isMango)
                     MangoService.reloadConfig();
@@ -260,7 +262,7 @@ Item {
         const [moved] = ids.splice(fromIndex, 1);
         ids.splice(toIndex, 0, moved);
 
-        Proc.runCommand("reorder-windowrules", ["dms", "config", "windowrules", "reorder", compositor, JSON.stringify(ids)], (output, exitCode) => {
+        Proc.runCommand("reorder-windowrules", [Proc.dmsBin, "config", "windowrules", "reorder", compositor, JSON.stringify(ids)], (output, exitCode) => {
             if (exitCode === 0) {
                 if (CompositorService.isMango)
                     MangoService.reloadConfig();

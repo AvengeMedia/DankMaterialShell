@@ -104,7 +104,7 @@ DankModal {
 
     function pickColorFromScreen() {
         hideInstant();
-        Proc.runCommand("dms-color-pick", ["dms", "color", "pick", "--json"], (output, exitCode) => {
+        Proc.runCommand("dms-color-pick", [Proc.dmsBin, "color", "pick", "--json"], (output, exitCode) => {
             if (exitCode !== 0) {
                 log.warn("dms color pick exited with code:", exitCode);
                 root.show();

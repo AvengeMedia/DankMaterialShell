@@ -384,10 +384,6 @@ func applyHyprlandRuleAction(actions *windowrules.Actions, rule, value string) {
 		if f, err := strconv.ParseFloat(value, 64); err == nil {
 			actions.Opacity = &f
 		}
-	case "size":
-		actions.Size = value
-	case "move":
-		actions.Move = value
 	case "monitor":
 		actions.Monitor = value
 	case "workspace":
@@ -564,6 +560,13 @@ func hyprLuaBoolStr(b bool) string {
 	return "false"
 }
 
+func hyprLuaExprWrap(v string) string {
+	if _, err := strconv.ParseFloat(v, 64); err == nil {
+		return v
+	}
+	return strconv.Quote(v)
+}
+
 func luaAppendMatch(mc windowrules.MatchCriteria, dst *[]string) {
 	if mc.AppID != "" {
 		*dst = append(*dst, fmt.Sprintf(`class = %s`, strconv.Quote(mc.AppID)))
@@ -634,11 +637,11 @@ func luaAppendActions(a windowrules.Actions, dst *[]string) {
 	if a.Opacity != nil {
 		*dst = append(*dst, fmt.Sprintf(`opacity = %s`, strconv.FormatFloat(*a.Opacity, 'g', -1, 64)))
 	}
-	if a.Size != "" {
-		*dst = append(*dst, fmt.Sprintf(`size = %s`, strconv.Quote(a.Size)))
+	if a.SizeWidth != "" && a.SizeHeight != "" {
+		*dst = append(*dst, fmt.Sprintf(`size = { %s, %s }`, hyprLuaExprWrap(a.SizeWidth), hyprLuaExprWrap(a.SizeHeight)))
 	}
-	if a.Move != "" {
-		*dst = append(*dst, fmt.Sprintf(`move = %s`, strconv.Quote(a.Move)))
+	if a.MoveX != "" && a.MoveY != "" {
+		*dst = append(*dst, fmt.Sprintf(`move = { %s, %s }`, hyprLuaExprWrap(a.MoveX), hyprLuaExprWrap(a.MoveY)))
 	}
 	if a.Monitor != "" {
 		*dst = append(*dst, fmt.Sprintf(`monitor = %s`, strconv.Quote(a.Monitor)))
@@ -1194,7 +1197,11 @@ func luaStringValue(s string) string {
 			}
 		}
 	}
-	return strings.Trim(strings.TrimSpace(s), `"'`)
+	v := strings.Trim(strings.TrimSpace(s), `"'`)
+	if len(v) >= 2 && v[0] == '(' && v[len(v)-1] == ')' {
+		v = strings.TrimSpace(v[1 : len(v)-1])
+	}
+	return v
 }
 
 func luaBoolLike(s string) (val bool, ok bool) {
@@ -1349,11 +1356,29 @@ func applyLuaActionKey(a *windowrules.Actions, key, raw string) bool {
 			}
 		}
 	case "size":
-		a.Size = strings.TrimSpace(luaStringValue(raw))
-		return true
+		v := strings.TrimSpace(luaStringValue(raw))
+		if strings.HasPrefix(v, "{") && strings.HasSuffix(v, "}") {
+			inner := trimOuterBraces(v)
+			parts := splitTopLevelCommaLua(inner)
+			if len(parts) == 2 {
+				a.SizeWidth = strings.TrimSpace(luaStringValue(parts[0]))
+				a.SizeHeight = strings.TrimSpace(luaStringValue(parts[1]))
+				return true
+			}
+		}
+		return false
 	case "move":
-		a.Move = strings.TrimSpace(luaStringValue(raw))
-		return true
+		v := strings.TrimSpace(luaStringValue(raw))
+		if strings.HasPrefix(v, "{") && strings.HasSuffix(v, "}") {
+			inner := trimOuterBraces(v)
+			parts := splitTopLevelCommaLua(inner)
+			if len(parts) == 2 {
+				a.MoveX = strings.TrimSpace(luaStringValue(parts[0]))
+				a.MoveY = strings.TrimSpace(luaStringValue(parts[1]))
+				return true
+			}
+		}
+		return false
 	case "monitor":
 		a.Monitor = strings.TrimSpace(luaStringValue(raw))
 		return true

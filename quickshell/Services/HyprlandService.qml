@@ -128,7 +128,7 @@ Singleton {
             return;
 
         luaConfigStatusLoading = true;
-        Proc.runCommand("hypr-lua-config-status", ["dms", "config", "resolve-include", "hyprland", "outputs.lua"], (output, exitCode) => {
+        Proc.runCommand("hypr-lua-config-status", [Proc.dmsBin, "config", "resolve-include", "hyprland", "outputs.lua"], (output, exitCode) => {
             luaConfigStatusLoading = false;
             luaConfigStatusReady = true;
             if (exitCode !== 0) {

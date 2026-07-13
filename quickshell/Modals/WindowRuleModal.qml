@@ -94,8 +94,10 @@ FloatingWindow {
         noRoundingToggle.checked = false;
         pinToggle.checked = false;
         opaqueToggle.checked = false;
-        sizeInput.text = "";
-        moveInput.text = "";
+        moveXInput.text = "";
+        moveYInput.text = "";
+        sizeWInput.text = "";
+        sizeHInput.text = "";
         monitorInput.text = "";
         hyprWorkspaceInput.text = "";
         mangoTagsInput.text = "";
@@ -219,14 +221,16 @@ FloatingWindow {
         noRoundingToggle.checked = actions.norounding || false;
         pinToggle.checked = actions.pin || false;
         opaqueToggle.checked = actions.opaque || false;
-        sizeInput.text = actions.size || "";
-        moveInput.text = actions.move || "";
+        moveXInput.text = actions.moveX || "";
+        moveYInput.text = actions.moveY || "";
+        sizeWInput.text = actions.sizeWidth || "";
+        sizeHInput.text = actions.sizeHeight || "";
         monitorInput.text = actions.monitor || "";
         hyprWorkspaceInput.text = actions.workspace || "";
 
         mangoTagsInput.text = actions.workspace || "";
         mangoMonitorInput.text = actions.monitor || "";
-        mangoSizeInput.text = actions.size || "";
+        mangoSizeInput.text = (actions.sizeWidth && actions.sizeHeight) ? actions.sizeWidth + "x" + actions.sizeHeight : "";
         mangoNoBlurToggle.checked = actions.noblur || false;
         mangoNoBorderToggle.checked = actions.noborder || false;
         mangoNoShadowToggle.checked = actions.noshadow || false;
@@ -400,10 +404,14 @@ FloatingWindow {
                 actions.pin = true;
             if (opaqueToggle.checked)
                 actions.opaque = true;
-            if (sizeInput.text.trim())
-                actions.size = sizeInput.text.trim();
-            if (moveInput.text.trim())
-                actions.move = moveInput.text.trim();
+            if (sizeWInput.text.trim())
+                actions.sizeWidth = sizeWInput.text.trim();
+            if (sizeHInput.text.trim())
+                actions.sizeHeight = sizeHInput.text.trim();
+            if (moveXInput.text.trim())
+                actions.moveX = moveXInput.text.trim();
+            if (moveYInput.text.trim())
+                actions.moveY = moveYInput.text.trim();
             if (monitorInput.text.trim())
                 actions.monitor = monitorInput.text.trim();
             if (hyprWorkspaceInput.text.trim())
@@ -415,8 +423,13 @@ FloatingWindow {
                 actions.workspace = mangoTagsInput.text.trim();
             if (mangoMonitorInput.text.trim())
                 actions.monitor = mangoMonitorInput.text.trim();
-            if (mangoSizeInput.text.trim())
-                actions.size = mangoSizeInput.text.trim();
+            if (mangoSizeInput.text.trim()) {
+                const parts = mangoSizeInput.text.trim().split(/x/i);
+                if (parts.length === 2) {
+                    actions.sizeWidth = parts[0].trim();
+                    actions.sizeHeight = parts[1].trim();
+                }
+            }
             if (mangoNoBlurToggle.checked)
                 actions.noblur = true;
             if (mangoNoBorderToggle.checked)
@@ -447,7 +460,7 @@ FloatingWindow {
 
         if (isEditMode) {
             const ruleJson = JSON.stringify(ruleData);
-            Proc.runCommand("update-windowrule", ["dms", "config", "windowrules", "update", compositor, editingRule.id, ruleJson], (output, exitCode) => {
+            Proc.runCommand("update-windowrule", [Proc.dmsBin, "config", "windowrules", "update", compositor, editingRule.id, ruleJson], (output, exitCode) => {
                 root.submitting = false;
                 if (exitCode !== 0)
                     return;
@@ -460,7 +473,7 @@ FloatingWindow {
             });
         } else {
             const ruleJson = JSON.stringify(ruleData);
-            Proc.runCommand("add-windowrule", ["dms", "config", "windowrules", "add", compositor, ruleJson], (output, exitCode) => {
+            Proc.runCommand("add-windowrule", [Proc.dmsBin, "config", "windowrules", "add", compositor, ruleJson], (output, exitCode) => {
                 root.submitting = false;
                 if (exitCode !== 0)
                     return;
@@ -1580,11 +1593,11 @@ FloatingWindow {
                     visible: isHyprland
 
                     Column {
-                        width: (parent.width - Theme.spacingM) / 2
+                        width: (parent.width - Theme.spacingM * 3) / 4
                         spacing: Theme.spacingXS
 
                         StyledText {
-                            text: I18n.tr("Size")
+                            text: I18n.tr("X")
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceVariantText
                             width: parent.width
@@ -1593,13 +1606,13 @@ FloatingWindow {
 
                         InputField {
                             width: parent.width
-                            hasFocus: sizeInput.activeFocus
+                            hasFocus: moveXInput.activeFocus
                             DankTextField {
-                                id: sizeInput
+                                id: moveXInput
                                 anchors.fill: parent
                                 font.pixelSize: Theme.fontSizeSmall
                                 textColor: Theme.surfaceText
-                                placeholderText: "800 600"
+                                placeholderText: "0"
                                 backgroundColor: "transparent"
                                 enabled: root.visible
                             }
@@ -1607,11 +1620,11 @@ FloatingWindow {
                     }
 
                     Column {
-                        width: (parent.width - Theme.spacingM) / 2
+                        width: (parent.width - Theme.spacingM * 3) / 4
                         spacing: Theme.spacingXS
 
                         StyledText {
-                            text: I18n.tr("Move")
+                            text: I18n.tr("Y")
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceVariantText
                             width: parent.width
@@ -1620,13 +1633,67 @@ FloatingWindow {
 
                         InputField {
                             width: parent.width
-                            hasFocus: moveInput.activeFocus
+                            hasFocus: moveYInput.activeFocus
                             DankTextField {
-                                id: moveInput
+                                id: moveYInput
                                 anchors.fill: parent
                                 font.pixelSize: Theme.fontSizeSmall
                                 textColor: Theme.surfaceText
-                                placeholderText: "100 100"
+                                placeholderText: "0"
+                                backgroundColor: "transparent"
+                                enabled: root.visible
+                            }
+                        }
+                    }
+
+                    Column {
+                        width: (parent.width - Theme.spacingM * 3) / 4
+                        spacing: Theme.spacingXS
+
+                        StyledText {
+                            text: I18n.tr("W")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                            width: parent.width
+                            horizontalAlignment: Text.AlignLeft
+                        }
+
+                        InputField {
+                            width: parent.width
+                            hasFocus: sizeWInput.activeFocus
+                            DankTextField {
+                                id: sizeWInput
+                                anchors.fill: parent
+                                font.pixelSize: Theme.fontSizeSmall
+                                textColor: Theme.surfaceText
+                                placeholderText: "800"
+                                backgroundColor: "transparent"
+                                enabled: root.visible
+                            }
+                        }
+                    }
+
+                    Column {
+                        width: (parent.width - Theme.spacingM * 3) / 4
+                        spacing: Theme.spacingXS
+
+                        StyledText {
+                            text: I18n.tr("H")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                            width: parent.width
+                            horizontalAlignment: Text.AlignLeft
+                        }
+
+                        InputField {
+                            width: parent.width
+                            hasFocus: sizeHInput.activeFocus
+                            DankTextField {
+                                id: sizeHInput
+                                anchors.fill: parent
+                                font.pixelSize: Theme.fontSizeSmall
+                                textColor: Theme.surfaceText
+                                placeholderText: "600"
                                 backgroundColor: "transparent"
                                 enabled: root.visible
                             }

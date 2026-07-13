@@ -117,7 +117,7 @@ Item {
         const compositorArg = (compositor === "mango") ? "mangowc" : compositor;
 
         checkingCursorInclude = true;
-        Proc.runCommand("check-cursor-include", ["dms", "config", "resolve-include", compositorArg, filename], (output, exitCode) => {
+        Proc.runCommand("check-cursor-include", [Proc.dmsBin, "config", "resolve-include", compositorArg, filename], (output, exitCode) => {
             checkingCursorInclude = false;
             if (exitCode !== 0) {
                 cursorIncludeStatus = {
@@ -238,7 +238,7 @@ Item {
             return;
         matugenPreviewRequestKey = requestKey;
 
-        Proc.runCommand("", ["dms", "matugen", "preview", "--source-color", sourceColor, "--contrast", contrast.toString()], (output, exitCode) => {
+        Proc.runCommand("", [Proc.dmsBin, "matugen", "preview", "--source-color", sourceColor, "--contrast", contrast.toString()], (output, exitCode) => {
             if (requestKey !== themeColorsTab.matugenPreviewRequestKey)
                 return;
             if (exitCode !== 0) {
@@ -262,7 +262,7 @@ Item {
             DMSService.listInstalledThemes();
         if (PopoutService.pendingThemeInstall)
             Qt.callLater(() => showThemeBrowser());
-        Proc.runCommand("template-check", ["dms", "matugen", "check"], (output, exitCode) => {
+        Proc.runCommand("template-check", [Proc.dmsBin, "matugen", "check"], (output, exitCode) => {
             if (exitCode !== 0)
                 return;
             try {

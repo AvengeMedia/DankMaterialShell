@@ -92,6 +92,14 @@ func appendLogEnv(env []string) []string {
 	return env
 }
 
+func withDMSExecutable(env []string) []string {
+	selfPath, err := os.Executable()
+	if err != nil {
+		return env
+	}
+	return append(env, "DMS_EXECUTABLE="+selfPath)
+}
+
 func hasSystemdRun() bool {
 	_, err := exec.LookPath("systemd-run")
 	return err == nil
@@ -207,7 +215,7 @@ func runShellInteractive(session bool) {
 	log.Infof("Spawning quickshell with -p %s", configPath)
 
 	cmd := exec.CommandContext(ctx, "qs", "-p", configPath)
-	cmd.Env = append(os.Environ(), "DMS_SOCKET="+socketPath)
+	cmd.Env = withDMSExecutable(append(os.Environ(), "DMS_SOCKET="+socketPath))
 	if os.Getenv("QT_LOGGING_RULES") == "" {
 		if qtRules := log.GetQtLoggingRules(); qtRules != "" {
 			cmd.Env = append(cmd.Env, "QT_LOGGING_RULES="+qtRules)
@@ -461,7 +469,7 @@ func runShellDaemon(session bool) {
 	log.Infof("Spawning quickshell with -p %s", configPath)
 
 	cmd := exec.CommandContext(ctx, "qs", "-p", configPath)
-	cmd.Env = append(os.Environ(), "DMS_SOCKET="+socketPath)
+	cmd.Env = withDMSExecutable(append(os.Environ(), "DMS_SOCKET="+socketPath))
 	if os.Getenv("QT_LOGGING_RULES") == "" {
 		if qtRules := log.GetQtLoggingRules(); qtRules != "" {
 			cmd.Env = append(cmd.Env, "QT_LOGGING_RULES="+qtRules)

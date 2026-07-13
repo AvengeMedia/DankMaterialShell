@@ -5,7 +5,6 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"strconv"
 	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/windowrules"
@@ -168,7 +167,8 @@ func ConvertMangoRulesToWindowRules(mangoRules []MangoWindowRule) []windowrules.
 		}
 		if w, ok := f["width"]; ok {
 			if h, ok2 := f["height"]; ok2 {
-				actions.Size = w + "x" + h
+				actions.SizeWidth = w
+				actions.SizeHeight = h
 			}
 		}
 
@@ -200,11 +200,9 @@ func formatMangoRule(rule windowrules.WindowRule) string {
 	add("tags", rule.Actions.Workspace)
 	add("monitor", rule.Actions.Monitor)
 
-	if rule.Actions.Size != "" {
-		if w, h, ok := splitSize(rule.Actions.Size); ok {
-			add("width", w)
-			add("height", h)
-		}
+	if rule.Actions.SizeWidth != "" && rule.Actions.SizeHeight != "" {
+		add("width", rule.Actions.SizeWidth)
+		add("height", rule.Actions.SizeHeight)
 	}
 
 	addBool := func(k string, b *bool) {
@@ -221,19 +219,6 @@ func formatMangoRule(rule windowrules.WindowRule) string {
 	addBool("isnoanimation", rule.Actions.NoAnim)
 
 	return "windowrule=" + strings.Join(parts, ",")
-}
-
-func splitSize(size string) (w, h string, ok bool) {
-	for _, sep := range []string{"x", "X", " "} {
-		if parts := strings.Split(size, sep); len(parts) == 2 {
-			w = strings.TrimSpace(parts[0])
-			h = strings.TrimSpace(parts[1])
-			if _, err := strconv.ParseFloat(w, 64); err == nil {
-				return w, h, true
-			}
-		}
-	}
-	return "", "", false
 }
 
 type MangoWritableProvider struct {
