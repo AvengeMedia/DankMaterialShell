@@ -341,7 +341,7 @@ func checkXDGMenuPrefix() []checkResult {
 		if checkXDGMenuFile(menuPrefix) {
 			return []checkResult{{catEnvironment, "XDG_MENU_PREFIX", statusInfo, menuPrefix, "", doctorDocsURL + "#xdg-menu-prefix"}}
 		}
-		return []checkResult{{catEnvironment, "XDG_MENU_PREFIX", statusWarn, fmt.Sprintf("%s (menu file not found)", menuPrefix), "Dolphin 'Open with…' dialog may be empty. Ensure /etc/xdg/menus/%sapplications.menu exists.", doctorDocsURL + "#xdg-menu-prefix"}}
+		return []checkResult{{catEnvironment, "XDG_MENU_PREFIX", statusWarn, fmt.Sprintf("%s (menu file not found)", menuPrefix), fmt.Sprintf("Dolphin 'Open with…' dialog may be empty. Ensure /etc/xdg/menus/%sapplications.menu exists.", menuPrefix), doctorDocsURL + "#xdg-menu-prefix"}}
 	}
 	if _, err := exec.LookPath("keditfiletype"); err == nil {
 		return []checkResult{{catEnvironment, "XDG_MENU_PREFIX", statusWarn, "Not set", "Dolphin file associations and 'Open with…' dialog may be empty. Set XDG_MENU_PREFIX=plasma- in your compositor's environment block.", doctorDocsURL + "#xdg-menu-prefix"}}
