@@ -1499,6 +1499,30 @@ Item {
             return "SPOTLIGHT_BAR_TOGGLE_SUCCESS";
         }
 
+        function openWith(mode: string): string {
+            if (!mode)
+                return "SPOTLIGHT_BAR_OPEN_FAILED: No mode specified";
+            PopoutService.openSpotlightBarWithMode(mode);
+            return `SPOTLIGHT_BAR_OPEN_SUCCESS: ${mode}`;
+        }
+
+        function toggleWith(mode: string): string {
+            if (!mode)
+                return "SPOTLIGHT_BAR_TOGGLE_FAILED: No mode specified";
+            PopoutService.toggleSpotlightBarWithMode(mode);
+            return `SPOTLIGHT_BAR_TOGGLE_SUCCESS: ${mode}`;
+        }
+
+        function openQuery(query: string): string {
+            PopoutService.openSpotlightBarWithQuery(query);
+            return "SPOTLIGHT_BAR_OPEN_QUERY_SUCCESS";
+        }
+
+        function toggleQuery(query: string): string {
+            PopoutService.toggleSpotlightBarWithQuery(query);
+            return "SPOTLIGHT_BAR_TOGGLE_QUERY_SUCCESS";
+        }
+
         target: "spotlight-bar"
     }
 

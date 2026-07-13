@@ -61,6 +61,7 @@ Item {
         anchors.bottomMargin: root.bottomInset
         clip: true
         visible: root.rows.length > 0
+        add: null
 
         readonly property int rowHeight: 64
 

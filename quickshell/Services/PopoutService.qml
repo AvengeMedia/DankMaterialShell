@@ -671,11 +671,35 @@ Singleton {
 
     property bool _spotlightBarWantsOpen: false
     property bool _spotlightBarWantsToggle: false
+    property string _spotlightBarPendingQuery: ""
+    property string _spotlightBarPendingMode: ""
 
     function openSpotlightBar() {
         if (spotlightBarModal) {
             spotlightBarModal.show();
         } else if (spotlightBarModalLoader) {
+            _spotlightBarWantsOpen = true;
+            _spotlightBarWantsToggle = false;
+            spotlightBarModalLoader.active = true;
+        }
+    }
+
+    function openSpotlightBarWithQuery(query: string) {
+        if (spotlightBarModal) {
+            spotlightBarModal.showWithQuery(query);
+        } else if (spotlightBarModalLoader) {
+            _spotlightBarPendingQuery = query;
+            _spotlightBarWantsOpen = true;
+            _spotlightBarWantsToggle = false;
+            spotlightBarModalLoader.active = true;
+        }
+    }
+
+    function openSpotlightBarWithMode(mode: string) {
+        if (spotlightBarModal) {
+            spotlightBarModal.showWithMode(mode);
+        } else if (spotlightBarModalLoader) {
+            _spotlightBarPendingMode = mode;
             _spotlightBarWantsOpen = true;
             _spotlightBarWantsToggle = false;
             spotlightBarModalLoader.active = true;
@@ -696,15 +720,50 @@ Singleton {
         }
     }
 
+    function toggleSpotlightBarWithMode(mode: string) {
+        if (spotlightBarModal) {
+            spotlightBarModal.toggleWithMode(mode);
+        } else if (spotlightBarModalLoader) {
+            _spotlightBarPendingMode = mode;
+            _spotlightBarWantsToggle = true;
+            _spotlightBarWantsOpen = false;
+            spotlightBarModalLoader.active = true;
+        }
+    }
+
+    function toggleSpotlightBarWithQuery(query: string) {
+        if (spotlightBarModal) {
+            spotlightBarModal.toggleWithQuery(query);
+        } else if (spotlightBarModalLoader) {
+            _spotlightBarPendingQuery = query;
+            _spotlightBarWantsOpen = true;
+            _spotlightBarWantsToggle = false;
+            spotlightBarModalLoader.active = true;
+        }
+    }
+
     function _onSpotlightBarModalLoaded() {
         if (_spotlightBarWantsOpen) {
             _spotlightBarWantsOpen = false;
-            spotlightBarModal?.show();
+            if (_spotlightBarPendingQuery) {
+                spotlightBarModal?.showWithQuery(_spotlightBarPendingQuery);
+                _spotlightBarPendingQuery = "";
+            } else if (_spotlightBarPendingMode) {
+                spotlightBarModal?.showWithMode(_spotlightBarPendingMode);
+                _spotlightBarPendingMode = "";
+            } else {
+                spotlightBarModal?.show();
+            }
             return;
         }
         if (_spotlightBarWantsToggle) {
             _spotlightBarWantsToggle = false;
-            spotlightBarModal?.toggle();
+            if (_spotlightBarPendingMode) {
+                spotlightBarModal?.toggleWithMode(_spotlightBarPendingMode);
+                _spotlightBarPendingMode = "";
+            } else {
+                spotlightBarModal?.toggle();
+            }
         }
     }
 
