@@ -48,7 +48,6 @@ Item {
     // its delegates alive across commits (preserving focus for keyboard reorder)
     readonly property var tabIds: SettingsData._dashTabIds
     readonly property var tabState: SettingsData.getDashTabs()
-    readonly property var visibleContentIds: SettingsData.visibleDashTabIds().filter(id => id !== "settings")
 
     function presentationFor(id) {
         return __presentation[id] ?? {
@@ -148,10 +147,6 @@ Item {
         commit();
     }
 
-    function canHide(id) {
-        return !isEnabled(id) || id === "settings" || visibleContentIds.indexOf(id) < 0 || visibleContentIds.length > 1;
-    }
-
     // Keyboard nav is handled at the tab root (not per-row activeFocusOnTab)
     Keys.onPressed: function (event) {
         const order = enabledOrder.concat(disabledOrder);
@@ -172,8 +167,7 @@ Item {
             }
             event.accepted = true;
         } else if ((event.key === Qt.Key_Space || event.key === Qt.Key_Return) && highlightedId !== "") {
-            if (canHide(highlightedId))
-                SettingsData.setDashTabEnabled(highlightedId, !isEnabled(highlightedId));
+            SettingsData.setDashTabEnabled(highlightedId, !isEnabled(highlightedId));
             event.accepted = true;
         }
     }
@@ -379,7 +373,6 @@ Item {
                             readonly property bool isEnabled: root.isEnabled(modelData)
                             readonly property bool dragging: root.draggingId === modelData
                             readonly property bool highlighted: root.highlightedId === modelData
-                            readonly property bool canHide: root.canHide(modelData)
 
                             width: reorderArea.width
                             height: root.rowHeight
@@ -528,7 +521,6 @@ Item {
                                         iconName: rowItem.isEnabled ? "visibility" : "visibility_off"
                                         iconSize: 18
                                         iconColor: rowItem.isEnabled ? Theme.primary : Theme.outline
-                                        enabled: rowItem.canHide
                                         onClicked: {
                                             root.forceActiveFocus();
                                             root.highlightedId = rowItem.modelData;

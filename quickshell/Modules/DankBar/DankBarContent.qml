@@ -1105,13 +1105,12 @@ Item {
 
             onClockClicked: {
                 const section = topBarContent.getWidgetSection(parent) || "center";
-                const tabIndex = SettingsData.dashTabIndexForId("overview");
                 topBarContent.openWidgetPopout({
                     loader: dankDashPopoutLoader,
                     widgetItem: clockWidget,
                     section,
-                    tabIndex,
-                    triggerSource: topBarContent._dashTriggerSource(section, tabIndex),
+                    triggerSource: topBarContent._dashTriggerSource(section, "overview"),
+                    prepare: popout => popout.requestTab("overview"),
                     mode: "click",
                     useCenterSection: true,
                     setTriggerScreen: true
@@ -1134,13 +1133,12 @@ Item {
             parentScreen: barWindow.screen
             onClicked: {
                 const section = topBarContent.getWidgetSection(parent) || "center";
-                const tabIndex = SettingsData.dashTabIndexForId("media");
                 topBarContent.openWidgetPopout({
                     loader: dankDashPopoutLoader,
                     widgetItem: mediaWidget,
                     section,
-                    tabIndex,
-                    triggerSource: topBarContent._dashTriggerSource(section, tabIndex),
+                    triggerSource: topBarContent._dashTriggerSource(section, "media"),
+                    prepare: popout => popout.requestTab("media"),
                     mode: "click",
                     useCenterSection: true,
                     setTriggerScreen: true
@@ -1162,13 +1160,12 @@ Item {
             parentScreen: barWindow.screen
             onClicked: {
                 const section = topBarContent.getWidgetSection(parent) || "center";
-                const tabIndex = SettingsData.dashTabIndexForId("weather");
                 topBarContent.openWidgetPopout({
                     loader: dankDashPopoutLoader,
                     widgetItem: weatherWidget,
                     section,
-                    tabIndex,
-                    triggerSource: topBarContent._dashTriggerSource(section, tabIndex),
+                    triggerSource: topBarContent._dashTriggerSource(section, "weather"),
+                    prepare: popout => popout.requestTab("weather"),
                     mode: "click",
                     useCenterSection: true,
                     setTriggerScreen: true

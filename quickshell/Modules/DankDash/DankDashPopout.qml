@@ -10,7 +10,7 @@ DankPopout {
 
     property bool dashVisible: false
     property var triggerScreen: null
-    property int currentTabIndex: 0
+    property string currentTabId: "overview"
 
     readonly property var __tabPresentation: ({
             "overview": {
@@ -36,36 +36,34 @@ DankPopout {
             }
         })
     readonly property var orderedTabIds: SettingsData.visibleDashTabIds()
-    readonly property string currentTabId: orderedTabIds.length > 0 ? (orderedTabIds[Math.min(currentTabIndex, orderedTabIds.length - 1)] ?? "overview") : "overview"
+    // -1 when the current view's tab is hidden: the view still shows, no tab is highlighted.
+    readonly property int currentTabIndex: orderedTabIds.indexOf(currentTabId)
 
     function __isActionTab(id) {
         return root.__tabPresentation[id]?.isAction === true;
     }
 
-    function __resolveContentIndex(idx) {
-        if (orderedTabIds.length === 0)
-            return 0;
-        var clamped = Math.max(0, Math.min(idx, orderedTabIds.length - 1));
-        if (!__isActionTab(orderedTabIds[clamped]))
-            return clamped;
-        for (var f = clamped + 1; f < orderedTabIds.length; f++)
-            if (!__isActionTab(orderedTabIds[f]))
-                return f;
-        for (var b = clamped - 1; b >= 0; b--)
-            if (!__isActionTab(orderedTabIds[b]))
-                return b;
-        return clamped;
+    // Show a view regardless of tab visibility; bar widgets and IPC land here.
+    function requestTab(id) {
+        const valid = __tabPresentation[id] !== undefined && !__isActionTab(id) && (id !== "weather" || SettingsData.weatherEnabled);
+        currentTabId = valid ? id : "overview";
     }
 
-    onOrderedTabIdsChanged: {
-        var resolved = __resolveContentIndex(currentTabIndex);
-        if (resolved !== currentTabIndex)
-            currentTabIndex = resolved;
+    function __cycleTab(dir) {
+        const ids = orderedTabIds.filter(id => !__isActionTab(id));
+        if (ids.length === 0)
+            return;
+        const pos = ids.indexOf(currentTabId);
+        const next = pos < 0 ? (dir > 0 ? 0 : ids.length - 1) : (pos + dir + ids.length) % ids.length;
+        currentTabId = ids[next];
     }
-    onCurrentTabIndexChanged: {
-        var resolved = __resolveContentIndex(currentTabIndex);
-        if (resolved !== currentTabIndex)
-            currentTabIndex = resolved;
+
+    Connections {
+        target: SettingsData
+        function onWeatherEnabledChanged() {
+            if (!SettingsData.weatherEnabled && root.currentTabId === "weather")
+                root.currentTabId = "overview";
+        }
     }
 
     popupWidth: SettingsData.showWeekNumber ? 736 : 700
@@ -266,32 +264,13 @@ DankPopout {
                 }
 
                 if (event.key === Qt.Key_Tab && !(event.modifiers & Qt.ShiftModifier)) {
-                    let nextIndex = root.currentTabIndex + 1;
-                    while (nextIndex < tabBar.model.length && tabBar.model[nextIndex] && tabBar.model[nextIndex].isAction) {
-                        nextIndex++;
-                    }
-                    if (nextIndex >= tabBar.model.length) {
-                        nextIndex = 0;
-                    }
-                    root.currentTabIndex = nextIndex;
+                    root.__cycleTab(1);
                     event.accepted = true;
                     return;
                 }
 
                 if (event.key === Qt.Key_Backtab || (event.key === Qt.Key_Tab && (event.modifiers & Qt.ShiftModifier))) {
-                    let prevIndex = root.currentTabIndex - 1;
-                    while (prevIndex >= 0 && tabBar.model[prevIndex] && tabBar.model[prevIndex].isAction) {
-                        prevIndex--;
-                    }
-                    if (prevIndex < 0) {
-                        prevIndex = tabBar.model.length - 1;
-                        while (prevIndex >= 0 && tabBar.model[prevIndex] && tabBar.model[prevIndex].isAction) {
-                            prevIndex--;
-                        }
-                    }
-                    if (prevIndex >= 0) {
-                        root.currentTabIndex = prevIndex;
-                    }
+                    root.__cycleTab(-1);
                     event.accepted = true;
                     return;
                 }
@@ -331,11 +310,12 @@ DankPopout {
 
                     // Effective visibility is false while the popout window is unmapped, so gating
                     // height on `visible` collapses the bar between opens and resizes the surface
-                    // mid-animation. Gate on the model instead.
-                    readonly property bool hasTabs: (model?.length ?? 0) > 0
+                    // mid-animation. Gate on data only. The bar also hides entirely when the
+                    // current view's tab isn't in the visible set (e.g. IPC-opened hidden tab).
+                    readonly property bool showTabs: (model?.length ?? 0) > 0 && root.currentTabIndex >= 0
                     width: parent.width
-                    height: hasTabs ? 48 : 0
-                    visible: hasTabs
+                    height: showTabs ? 48 : 0
+                    visible: showTabs
                     currentIndex: root.currentTabIndex
                     spacing: Theme.spacingS
                     equalWidthTabs: true
@@ -354,7 +334,9 @@ DankPopout {
                     model: root.orderedTabIds.map(id => root.__tabPresentation[id])
 
                     onTabClicked: function (index) {
-                        root.currentTabIndex = index;
+                        const id = root.orderedTabIds[index];
+                        if (id !== undefined)
+                            root.currentTabId = id;
                     }
 
                     onActionTriggered: function (index) {
@@ -367,8 +349,8 @@ DankPopout {
 
                 Item {
                     width: parent.width
-                    height: tabBar.hasTabs ? Theme.spacingXS : 0
-                    visible: tabBar.hasTabs
+                    height: tabBar.showTabs ? Theme.spacingXS : 0
+                    visible: tabBar.showTabs
                 }
 
                 Item {
@@ -411,11 +393,11 @@ DankPopout {
                                 onNavFocusRequested: mainContainer.forceActiveFocus()
                                 onSwitchToWeatherTab: {
                                     if (SettingsData.weatherEnabled) {
-                                        root.currentTabIndex = SettingsData.dashTabIndexForId("weather");
+                                        root.requestTab("weather");
                                     }
                                 }
                                 onSwitchToMediaTab: {
-                                    root.currentTabIndex = SettingsData.dashTabIndexForId("media");
+                                    root.requestTab("media");
                                 }
                             }
                         }
@@ -434,7 +416,7 @@ DankPopout {
                                 popoutY: root.alignedY
                                 popoutWidth: root.alignedWidth
                                 popoutHeight: root.alignedHeight
-                                contentOffsetY: Theme.spacingM + 48 + Theme.spacingS + Theme.spacingXS
+                                contentOffsetY: Theme.spacingM + (tabBar.showTabs ? 48 + Theme.spacingS + Theme.spacingXS : 0)
                                 section: root.triggerSection
                                 barPosition: root.effectiveBarPosition
                                 Component.onCompleted: root.__mediaTabRef = this

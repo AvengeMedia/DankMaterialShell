@@ -214,7 +214,7 @@ Singleton {
 
     property bool _dankDashWantsOpen: false
     property bool _dankDashWantsToggle: false
-    property int _dankDashPendingTab: 0
+    property var _dankDashPendingTab: 0
     property real _dankDashPendingX: 0
     property real _dankDashPendingY: 0
     property real _dankDashPendingWidth: 0
@@ -231,12 +231,21 @@ Singleton {
         _dankDashHasPosition = hasPos;
     }
 
-    function openDankDash(tabIndex, x, y, width, section, screen) {
-        _dankDashPendingTab = tabIndex || 0;
+    // `tab` is a view id ("weather"); a numeric index into the visible tabs is
+    // still accepted for plugin compatibility.
+    function _dankDashTabId(tab) {
+        if (typeof tab === "string" && tab !== "")
+            return tab;
+        const ids = SettingsData.visibleDashTabIds();
+        return ids[typeof tab === "number" ? tab : 0] ?? "overview";
+    }
+
+    function openDankDash(tab, x, y, width, section, screen) {
+        _dankDashPendingTab = tab || 0;
         if (dankDashPopout) {
             if (arguments.length >= 6)
                 setPosition(dankDashPopout, x, y, width, section, screen);
-            dankDashPopout.currentTabIndex = _dankDashPendingTab;
+            dankDashPopout.requestTab(_dankDashTabId(_dankDashPendingTab));
             dankDashPopout.dashVisible = true;
             return;
         }
@@ -259,15 +268,15 @@ Singleton {
         // bindings while Qt is still unwinding the signal stack.
     }
 
-    function toggleDankDash(tabIndex, x, y, width, section, screen) {
-        _dankDashPendingTab = tabIndex || 0;
+    function toggleDankDash(tab, x, y, width, section, screen) {
+        _dankDashPendingTab = tab || 0;
         if (dankDashPopout) {
             if (arguments.length >= 6)
                 setPosition(dankDashPopout, x, y, width, section, screen);
             if (dankDashPopout.dashVisible) {
                 dankDashPopout.dashVisible = false;
             } else {
-                dankDashPopout.currentTabIndex = _dankDashPendingTab;
+                dankDashPopout.requestTab(_dankDashTabId(_dankDashPendingTab));
                 dankDashPopout.dashVisible = true;
             }
             return;
@@ -289,7 +298,7 @@ Singleton {
 
         if (_dankDashWantsOpen) {
             _dankDashWantsOpen = false;
-            dankDashPopout.currentTabIndex = _dankDashPendingTab;
+            dankDashPopout.requestTab(_dankDashTabId(_dankDashPendingTab));
             dankDashPopout.dashVisible = true;
             return;
         }
@@ -298,7 +307,7 @@ Singleton {
             if (dankDashPopout.dashVisible) {
                 dankDashPopout.dashVisible = false;
             } else {
-                dankDashPopout.currentTabIndex = _dankDashPendingTab;
+                dankDashPopout.requestTab(_dankDashTabId(_dankDashPendingTab));
                 dankDashPopout.dashVisible = true;
             }
         }

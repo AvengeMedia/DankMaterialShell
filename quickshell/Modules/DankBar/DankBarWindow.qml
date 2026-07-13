@@ -65,7 +65,7 @@ PanelWindow {
         }
     }
 
-    function triggerDashTab(tabIndex) {
+    function triggerDashTab(tabId) {
         dankDashPopoutLoader.active = true;
         if (!dankDashPopoutLoader.item) {
             return false;
@@ -103,12 +103,14 @@ PanelWindow {
             dankDashPopoutLoader.item.triggerScreen = barWindow.screen;
         }
 
-        PopoutManager.requestPopout(dankDashPopoutLoader.item, tabIndex, (barConfig?.id ?? "default") + "-" + section + "-" + tabIndex);
+        if (dankDashPopoutLoader.item.requestTab)
+            dankDashPopoutLoader.item.requestTab(tabId);
+        PopoutManager.requestPopout(dankDashPopoutLoader.item, undefined, (barConfig?.id ?? "default") + "-" + section + "-" + tabId);
         return true;
     }
 
     function triggerWallpaperBrowser() {
-        triggerDashTab(SettingsData.dashTabIndexForId("wallpaper"));
+        triggerDashTab("wallpaper");
     }
 
     readonly property bool usesOverlayLayer: CompositorService.framePeerSurfacesUseOverlayForScreen(barWindow.screen) || (barConfig?.useOverlayLayer ?? false)

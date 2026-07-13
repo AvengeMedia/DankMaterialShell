@@ -736,11 +736,11 @@ Item {
         case "music":
         case "weather":
             {
-                const tabIndex = SettingsData.dashTabIndexForId(widgetId === "clock" ? "overview" : (widgetId === "music" ? "media" : "weather"));
+                const tabId = widgetId === "clock" ? "overview" : (widgetId === "music" ? "media" : "weather");
                 return barContent.openWidgetPopout(Object.assign({}, base, {
                     loader,
-                    tabIndex,
-                    triggerSource: dashTriggerSource(section, tabIndex),
+                    triggerSource: dashTriggerSource(section, tabId),
+                    prepare: popout => popout.requestTab(tabId),
                     useCenterSection: true,
                     setTriggerScreen: true
                 }));

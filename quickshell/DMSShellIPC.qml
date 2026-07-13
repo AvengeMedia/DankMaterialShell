@@ -272,17 +272,21 @@ Item {
     }
 
     IpcHandler {
-        function resolveTabIndex(tab: string): int {
+        function _resolveTabId(tab) {
             switch ((tab || "").toLowerCase()) {
             case "media":
-                return SettingsData.dashTabIndexForId("media");
+                return "media";
             case "wallpaper":
-                return SettingsData.dashTabIndexForId("wallpaper");
+                return "wallpaper";
             case "weather":
-                return SettingsData.dashTabIndexForId("weather");
+                return "weather";
             default:
-                return SettingsData.dashTabIndexForId("overview");
+                return "overview";
             }
+        }
+
+        function resolveTabIndex(tab: string): int {
+            return SettingsData.dashTabIndexForId(_resolveTabId(tab));
         }
 
         function open(tab: string): string {
@@ -290,16 +294,16 @@ Item {
             if (!bar)
                 return "DASH_OPEN_FAILED";
 
-            const tabIndex = resolveTabIndex(tab);
+            const tabId = _resolveTabId(tab);
             const dash = root.dankDashPopoutLoader.item;
             if (dash && dash.shouldBeVisible && dash.triggerScreen?.name === bar.screen?.name) {
-                dash.currentTabIndex = tabIndex;
+                dash.requestTab(tabId);
                 if (dash.updateSurfacePosition)
                     dash.updateSurfacePosition();
                 return "DASH_OPEN_SUCCESS";
             }
 
-            if (!bar.triggerDashTab(tabIndex))
+            if (!bar.triggerDashTab(tabId))
                 return "DASH_OPEN_FAILED";
 
             return "DASH_OPEN_SUCCESS";
@@ -321,7 +325,7 @@ Item {
 
             const bar = root.getPreferredBar("clockButtonRef") || root.getPreferredBar();
             if (bar) {
-                if (!bar.triggerDashTab(resolveTabIndex(tab)))
+                if (!bar.triggerDashTab(_resolveTabId(tab)))
                     return "DASH_TOGGLE_FAILED";
                 return "DASH_TOGGLE_SUCCESS";
             }

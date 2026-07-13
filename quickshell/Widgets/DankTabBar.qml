@@ -225,6 +225,8 @@ FocusScope {
 
     function updateIndicator() {
         if (tabRepeater.count === 0 || currentIndex < 0 || currentIndex >= tabRepeater.count) {
+            indicator.visible = false;
+            indicator.initialSetupComplete = false;
             return;
         }
 
