@@ -686,9 +686,6 @@ Rectangle {
         tabChangeRequested(result.tabIndex);
         autoCollapseIfNeeded(oldIndex, result.tabIndex);
         autoExpandForTab(result.tabIndex);
-        searchField.text = "";
-        SettingsSearchService.clear();
-        searchSelectedIndex = 0;
         keyboardHighlightIndex = -1;
         Qt.callLater(searchField.forceActiveFocus);
     }
