@@ -50,7 +50,11 @@ func (b pacmanBackend) Upgrade(ctx context.Context, opts UpgradeOptions, onLine 
 }
 
 func pacmanUpgradeArgv(opts UpgradeOptions) []string {
-	return privilegedArgv(opts, "pacman", "-Syu", "--noconfirm", "--needed")
+	argv := []string{"pacman", "-Syu", "--noconfirm", "--needed"}
+	if len(opts.Ignored) > 0 {
+		argv = append(argv, "--ignore", strings.Join(opts.Ignored, ","))
+	}
+	return privilegedArgv(opts, argv...)
 }
 
 type archHelperBackend struct {
@@ -99,22 +103,26 @@ func (b archHelperBackend) Upgrade(ctx context.Context, opts UpgradeOptions, onL
 		return nil
 	}
 	if os.Getenv("DMS_FORCE_PKEXEC") == "1" {
-		argv := append([]string{"pkexec"}, archHelperUpgradeArgv(b.id, opts.IncludeAUR)...)
+		argv := append([]string{"pkexec"}, archHelperUpgradeArgv(b.id, opts.IncludeAUR, opts.Ignored)...)
 		return Run(ctx, argv, RunOptions{OnLine: onLine, AttachStdio: opts.AttachStdio})
 	}
 	term := findTerminal(opts.Terminal)
 	if term == "" {
 		return fmt.Errorf("no terminal found (pick one in DMS settings, set $TERMINAL, or install kitty/ghostty/foot/alacritty)")
 	}
-	cmd := strings.Join(archHelperUpgradeArgv(b.id, opts.IncludeAUR), " ")
+	cmd := strings.Join(archHelperUpgradeArgv(b.id, opts.IncludeAUR, opts.Ignored), " ")
 	title := fmt.Sprintf("DMS — System Update (%s)", b.id)
 	return Run(ctx, wrapInTerminal(term, title, cmd), RunOptions{OnLine: onLine})
 }
 
-func archHelperUpgradeArgv(id string, includeAUR bool) []string {
+func archHelperUpgradeArgv(id string, includeAUR bool, ignored []string) []string {
 	argv := []string{id, "-Syu", "--noconfirm", "--needed"}
 	if !includeAUR {
 		argv = append(argv, "--repo")
+	}
+	ignored = shellSafeNames(ignored)
+	if len(ignored) > 0 {
+		argv = append(argv, "--ignore", strings.Join(ignored, ","))
 	}
 	return argv
 }
@@ -246,6 +254,10 @@ func parseArchUpdates(text, backendID string, repo RepoKind) []Package {
 	for line := range strings.SplitSeq(text, "\n") {
 		line = strings.TrimSpace(line)
 		if line == "" {
+			continue
+		}
+		// pacman -Qu / paru -Qua flag IgnorePkg entries with a trailing marker
+		if strings.HasSuffix(line, "[ignored]") {
 			continue
 		}
 		m := archUpdateLine.FindStringSubmatch(line)

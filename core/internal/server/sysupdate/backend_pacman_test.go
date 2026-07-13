@@ -93,6 +93,17 @@ foo`,
 			},
 		},
 		{
+			name: "skips IgnorePkg entries",
+			input: `bat 0.26.0-1 -> 0.26.1-2
+linux 6.18.0-1 -> 6.18.1-1 [ignored]
+discord 0.0.108-1 -> 0.0.109-1 [ignored]`,
+			backendID: "pacman",
+			repo:      RepoSystem,
+			want: []Package{
+				{Name: "bat", Repo: RepoSystem, Backend: "pacman", FromVersion: "0.26.0-1", ToVersion: "0.26.1-2"},
+			},
+		},
+		{
 			name:      "extra whitespace tolerated",
 			input:     "  bat   0.26.0-1   ->   0.26.1-2  ",
 			backendID: "paru",

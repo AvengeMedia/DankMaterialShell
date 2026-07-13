@@ -47,6 +47,7 @@ var (
 	sysUpdateJSON       bool
 	sysUpdateNoFlatpak  bool
 	sysUpdateNoAUR      bool
+	sysUpdateIgnore     []string
 	sysUpdateIntervalS  int
 	sysUpdateListPmTime = 5 * time.Minute
 )
@@ -58,6 +59,7 @@ func init() {
 	systemUpdateCmd.Flags().BoolVar(&sysUpdateJSON, "json", false, "Output as JSON (with --check)")
 	systemUpdateCmd.Flags().BoolVar(&sysUpdateNoFlatpak, "no-flatpak", false, "Skip the Flatpak overlay")
 	systemUpdateCmd.Flags().BoolVar(&sysUpdateNoAUR, "no-aur", false, "Skip the AUR (paru/yay only)")
+	systemUpdateCmd.Flags().StringSliceVar(&sysUpdateIgnore, "ignore", nil, "Skip specific packages (repeatable or comma-separated)")
 	systemUpdateCmd.Flags().IntVar(&sysUpdateIntervalS, "interval", -1, "Set the DMS server poll interval in seconds and exit (requires running server)")
 
 	systemCmd.AddCommand(systemUpdateCmd)
@@ -192,6 +194,7 @@ func runSystemUpdateApply() {
 		Targets:        pkgs,
 		IncludeFlatpak: !sysUpdateNoFlatpak,
 		IncludeAUR:     !sysUpdateNoAUR,
+		Ignored:        sysUpdateIgnore,
 		DryRun:         sysUpdateDry,
 		UseSudo:        true,
 	}
@@ -234,12 +237,19 @@ func collectUpdates(ctx context.Context, backends []sysupdate.Backend) ([]sysupd
 }
 
 func filterUpdateTargets(pkgs []sysupdate.Package) []sysupdate.Package {
-	if !sysUpdateNoAUR {
+	if !sysUpdateNoAUR && len(sysUpdateIgnore) == 0 {
 		return pkgs
+	}
+	ignored := make(map[string]bool, len(sysUpdateIgnore))
+	for _, name := range sysUpdateIgnore {
+		ignored[name] = true
 	}
 	out := pkgs[:0]
 	for _, p := range pkgs {
-		if p.Repo == sysupdate.RepoAUR {
+		if sysUpdateNoAUR && p.Repo == sysupdate.RepoAUR {
+			continue
+		}
+		if ignored[p.Name] {
 			continue
 		}
 		out = append(out, p)

@@ -76,6 +76,47 @@ DankPopout {
 
             readonly property bool hasTerminalBackend: (SystemUpdateService.backends || []).some(b => b.runsInTerminal === true)
 
+            property int nowUnix: Math.floor(Date.now() / 1000)
+
+            Connections {
+                target: systemUpdatePopout
+                function onShouldBeVisibleChanged() {
+                    if (systemUpdatePopout.shouldBeVisible) {
+                        updaterPanel.nowUnix = Math.floor(Date.now() / 1000);
+                    }
+                }
+            }
+
+            function distroLabel() {
+                const pretty = (SystemUpdateService.distributionPretty || "").trim();
+                if (pretty) {
+                    return pretty.split(/\s+/)[0];
+                }
+                const id = (SystemUpdateService.distribution || "").trim();
+                if (id) {
+                    return id.charAt(0).toUpperCase() + id.slice(1);
+                }
+                return I18n.tr("System");
+            }
+
+            function lastCheckedText() {
+                const last = SystemUpdateService.lastCheckUnix;
+                if (!last) {
+                    return "";
+                }
+                const delta = Math.max(0, nowUnix - last);
+                if (delta < 90) {
+                    return I18n.tr("checked just now");
+                }
+                if (delta < 3600) {
+                    return I18n.tr("checked %1m ago").arg(Math.round(delta / 60));
+                }
+                if (delta < 86400) {
+                    return I18n.tr("checked %1h ago").arg(Math.round(delta / 3600));
+                }
+                return I18n.tr("checked %1d ago").arg(Math.round(delta / 86400));
+            }
+
             Keys.onPressed: event => {
                 if (event.key === Qt.Key_Escape) {
                     systemUpdatePopout.close();
@@ -171,13 +212,37 @@ DankPopout {
                 anchors.topMargin: Theme.spacingS
                 visible: SystemUpdateService.backends.length > 0 && !SystemUpdateService.isUpgrading
                 text: {
-                    const names = (SystemUpdateService.backends || []).map(b => b.displayName).join(", ");
-                    return I18n.tr("Backends: %1").arg(names);
+                    const kinds = [];
+                    for (const b of SystemUpdateService.backends || []) {
+                        const label = b.repo === "flatpak" ? I18n.tr("Flatpak") : I18n.tr("System");
+                        if (!kinds.includes(label)) {
+                            kinds.push(label);
+                        }
+                    }
+                    const distro = updaterPanel.distroLabel();
+                    const checked = updaterPanel.lastCheckedText();
+                    const base = `${distro}: ${kinds.join(", ")}`;
+                    return checked ? `${base} · ${checked}` : base;
                 }
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.surfaceVariantText
                 wrapMode: Text.WordWrap
                 elide: Text.ElideRight
+            }
+
+            StyledText {
+                id: hiddenRow
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: backendsRow.visible ? backendsRow.bottom : header.bottom
+                anchors.leftMargin: Theme.spacingL
+                anchors.rightMargin: Theme.spacingL
+                anchors.topMargin: Theme.spacingXS
+                visible: SystemUpdateService.hiddenUpdateCount > 0 && !SystemUpdateService.isUpgrading
+                text: I18n.tr("%1 hidden (AUR disabled or ignored)").arg(SystemUpdateService.hiddenUpdateCount)
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.surfaceVariantText
+                wrapMode: Text.WordWrap
             }
 
             Row {
@@ -275,7 +340,7 @@ DankPopout {
                 id: bodyArea
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.top: backendsRow.visible ? backendsRow.bottom : header.bottom
+                anchors.top: hiddenRow.visible ? hiddenRow.bottom : (backendsRow.visible ? backendsRow.bottom : header.bottom)
                 anchors.bottom: buttonsRow.top
                 anchors.leftMargin: Theme.spacingL
                 anchors.rightMargin: Theme.spacingL
@@ -294,7 +359,8 @@ DankPopout {
                     text: {
                         switch (true) {
                         case SystemUpdateService.hasError:
-                            return I18n.tr("Failed: %1").arg(SystemUpdateService.errorMessage);
+                            const msg = I18n.tr("Failed: %1").arg(SystemUpdateService.errorMessage);
+                            return SystemUpdateService.errorHint ? `${msg}\n\n${SystemUpdateService.errorHint}` : msg;
                         case !SystemUpdateService.helperAvailable:
                             return I18n.tr("No supported package manager found.");
                         case SystemUpdateService.isChecking:
@@ -318,12 +384,17 @@ DankPopout {
                     model: SystemUpdateService.availableUpdates
 
                     delegate: Rectangle {
+                        id: packageRow
                         width: ListView.view.width
                         height: 48
                         radius: Theme.cornerRadius
-                        color: packageMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
+                        color: rowHoverHandler.hovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
 
                         required property var modelData
+
+                        HoverHandler {
+                            id: rowHoverHandler
+                        }
 
                         Row {
                             anchors.left: parent.left
@@ -350,7 +421,7 @@ DankPopout {
 
                             Column {
                                 anchors.verticalCenter: parent.verticalCenter
-                                width: parent.width - 64 - Theme.spacingS
+                                width: parent.width - 64 - Theme.spacingS * 2 - 28
                                 spacing: Theme.spacingXXS
 
                                 StyledText {
@@ -395,12 +466,25 @@ DankPopout {
                             id: packageMouseArea
                             anchors.fill: parent
                             hoverEnabled: true
-                            cursorShape: modelData.changelogUrl ? Qt.PointingHandCursor : Qt.ArrowCursor
+                            cursorShape: packageRow.modelData.changelogUrl ? Qt.PointingHandCursor : Qt.ArrowCursor
                             onClicked: {
-                                if (modelData.changelogUrl) {
-                                    Qt.openUrlExternally(modelData.changelogUrl);
+                                if (packageRow.modelData.changelogUrl) {
+                                    Qt.openUrlExternally(packageRow.modelData.changelogUrl);
                                 }
                             }
+                        }
+
+                        DankActionButton {
+                            anchors.right: packageRow.right
+                            anchors.rightMargin: Theme.spacingS
+                            anchors.verticalCenter: packageRow.verticalCenter
+                            buttonSize: 24
+                            iconName: "visibility_off"
+                            iconSize: 16
+                            iconColor: Theme.surfaceVariantText
+                            visible: rowHoverHandler.hovered
+                            tooltipText: I18n.tr("Ignore this package")
+                            onClicked: SystemUpdateService.ignorePackage(packageRow.modelData.name)
                         }
                     }
                 }

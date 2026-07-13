@@ -2,6 +2,7 @@ package sysupdate
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -35,18 +36,54 @@ func TestUpgradeCommandBuilders(t *testing.T) {
 		},
 		{
 			name: "aur helper full update with aur",
-			got:  archHelperUpgradeArgv("paru", true),
+			got:  archHelperUpgradeArgv("paru", true, nil),
 			want: []string{"paru", "-Syu", "--noconfirm", "--needed"},
 		},
 		{
 			name: "aur helper repo-only full update",
-			got:  archHelperUpgradeArgv("yay", false),
+			got:  archHelperUpgradeArgv("yay", false, nil),
 			want: []string{"yay", "-Syu", "--noconfirm", "--needed", "--repo"},
 		},
 		{
+			name: "aur helper with ignored packages",
+			got:  archHelperUpgradeArgv("paru", true, []string{"linux", "bad;name", "discord"}),
+			want: []string{"paru", "-Syu", "--noconfirm", "--needed", "--ignore", "linux,discord"},
+		},
+		{
+			name: "pacman with ignored packages",
+			got:  pacmanUpgradeArgv(UpgradeOptions{Ignored: []string{"linux"}}),
+			want: []string{"pkexec", "pacman", "-Syu", "--noconfirm", "--needed", "--ignore", "linux"},
+		},
+		{
+			name: "dnf with ignored packages",
+			got:  dnfUpgradeArgv("dnf5", UpgradeOptions{Ignored: []string{"kernel", "mesa"}}),
+			want: []string{"pkexec", "dnf5", "upgrade", "--refresh", "-y", "--exclude=kernel,mesa"},
+		},
+		{
+			name: "apt without ignored uses plain upgrade",
+			got:  aptUpgradeArgv("apt-get", UpgradeOptions{}),
+			want: []string{"pkexec", "env", "DEBIAN_FRONTEND=noninteractive", "LC_ALL=C", "apt-get", "upgrade", "-y"},
+		},
+		{
+			name: "zypper without ignored uses plain update",
+			got:  zypperUpgradeArgv(UpgradeOptions{}),
+			want: []string{"pkexec", "zypper", "--non-interactive", "update"},
+		},
+		{
 			name: "flatpak full update",
-			got:  flatpakUpgradeArgv(),
+			got:  flatpakUpgradeArgv(UpgradeOptions{}),
 			want: []string{"flatpak", "update", "-y", "--noninteractive"},
+		},
+		{
+			name: "flatpak update with ignored targets refs",
+			got: flatpakUpgradeArgv(UpgradeOptions{
+				Ignored: []string{"org.mozilla.firefox"},
+				Targets: []Package{
+					{Name: "Discord", Repo: RepoFlatpak, Ref: "com.discordapp.Discord//stable"},
+					{Name: "bash", Repo: RepoSystem, Backend: "apt"},
+				},
+			}),
+			want: []string{"flatpak", "update", "-y", "--noninteractive", "com.discordapp.Discord//stable"},
 		},
 		{
 			name: "rpm-ostree upgrade",
@@ -66,6 +103,45 @@ func TestUpgradeCommandBuilders(t *testing.T) {
 				t.Fatalf("argv = %#v, want %#v", tt.got, tt.want)
 			}
 		})
+	}
+}
+
+func TestAptUpgradeArgvHoldsIgnored(t *testing.T) {
+	argv := aptUpgradeArgv("apt-get", UpgradeOptions{Ignored: []string{"linux-image-generic", "bad;name"}})
+	if len(argv) < 2 || argv[len(argv)-2] != "-c" {
+		t.Fatalf("expected sh -c script, got %#v", argv)
+	}
+	script := argv[len(argv)-1]
+	if !strings.Contains(script, "apt-mark hold") || !strings.Contains(script, "apt-mark unhold") {
+		t.Fatalf("hold script missing hold/unhold: %q", script)
+	}
+	if !strings.Contains(script, "linux-image-generic") {
+		t.Fatalf("hold script missing ignored package: %q", script)
+	}
+	if strings.Contains(script, "bad;name") {
+		t.Fatalf("hold script must drop unsafe name: %q", script)
+	}
+}
+
+func TestZypperUpgradeArgvLocksIgnored(t *testing.T) {
+	argv := zypperUpgradeArgv(UpgradeOptions{Ignored: []string{"kernel-default"}})
+	if len(argv) < 2 || argv[len(argv)-2] != "-c" {
+		t.Fatalf("expected sh -c script, got %#v", argv)
+	}
+	script := argv[len(argv)-1]
+	if !strings.Contains(script, "zypper --non-interactive al") || !strings.Contains(script, "zypper --non-interactive rl") {
+		t.Fatalf("lock script missing add/remove lock: %q", script)
+	}
+	if !strings.Contains(script, "kernel-default") {
+		t.Fatalf("lock script missing ignored package: %q", script)
+	}
+}
+
+func TestShellSafeNames(t *testing.T) {
+	got := shellSafeNames([]string{"linux", "gtk+", "bad name", "rm -rf /", "org.mozilla.firefox", "a;b"})
+	want := []string{"linux", "gtk+", "org.mozilla.firefox"}
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("shellSafeNames() = %#v, want %#v", got, want)
 	}
 }
 

@@ -3,6 +3,7 @@ package sysupdate
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os/exec"
 	"strings"
 )
@@ -52,7 +53,11 @@ func (b dnfBackend) Upgrade(ctx context.Context, opts UpgradeOptions, onLine fun
 }
 
 func dnfUpgradeArgv(bin string, opts UpgradeOptions) []string {
-	return privilegedArgv(opts, bin, "upgrade", "--refresh", "-y")
+	argv := []string{bin, "upgrade", "--refresh", "-y"}
+	if len(opts.Ignored) > 0 {
+		argv = append(argv, "--exclude="+strings.Join(opts.Ignored, ","))
+	}
+	return privilegedArgv(opts, argv...)
 }
 
 func dnfListUpgrades(ctx context.Context, bin string) (string, error) {
@@ -65,7 +70,20 @@ func dnfListUpgrades(ctx context.Context, bin string) (string, error) {
 	if exitErr, ok := errors.AsType[*exec.ExitError](err); ok && exitErr.ExitCode() == 100 {
 		return string(out), nil
 	}
+	if detail := lastNonEmptyLine(string(out)); detail != "" {
+		return "", fmt.Errorf("%w: %s", err, detail)
+	}
 	return "", err
+}
+
+func lastNonEmptyLine(text string) string {
+	lines := strings.Split(text, "\n")
+	for i := len(lines) - 1; i >= 0; i-- {
+		if line := strings.TrimSpace(lines[i]); line != "" {
+			return line
+		}
+	}
+	return ""
 }
 
 func dnfCheckUpdatesArgv(bin string) []string {

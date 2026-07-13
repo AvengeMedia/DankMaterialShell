@@ -81,6 +81,7 @@ type UpgradeOptions struct {
 	CustomCommand  string
 	Terminal       string
 	Targets        []Package
+	Ignored        []string
 }
 
 type RefreshOptions struct {

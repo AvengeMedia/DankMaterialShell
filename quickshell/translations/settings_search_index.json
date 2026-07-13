@@ -6805,6 +6805,23 @@
     "description": "Open a terminal and run a custom command instead of the in-shell upgrade flow."
   },
   {
+    "section": "systemUpdaterIgnoredPackages",
+    "label": "Ignored Packages",
+    "tabIndex": 20,
+    "category": "System Updater",
+    "keywords": [
+      "ignore",
+      "ignored",
+      "package",
+      "packages",
+      "system",
+      "update",
+      "updater",
+      "upgrade"
+    ],
+    "icon": "inventory_2"
+  },
+  {
     "section": "systemUpdater",
     "label": "System Updater",
     "tabIndex": 20,

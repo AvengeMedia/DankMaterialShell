@@ -95,11 +95,21 @@ func (flatpakBackend) Upgrade(ctx context.Context, opts UpgradeOptions, onLine f
 	if !BackendHasTargets(flatpakBackend{}, opts.Targets, opts.IncludeAUR, opts.IncludeFlatpak) {
 		return nil
 	}
-	return Run(ctx, flatpakUpgradeArgv(), RunOptions{OnLine: onLine})
+	return Run(ctx, flatpakUpgradeArgv(opts), RunOptions{OnLine: onLine})
 }
 
-func flatpakUpgradeArgv() []string {
-	return []string{"flatpak", "update", "-y", "--noninteractive"}
+func flatpakUpgradeArgv(opts UpgradeOptions) []string {
+	argv := []string{"flatpak", "update", "-y", "--noninteractive"}
+	if len(opts.Ignored) == 0 {
+		return argv
+	}
+	// No exclude flag; update the already-filtered refs explicitly.
+	for _, p := range opts.Targets {
+		if p.Repo == RepoFlatpak && p.Ref != "" {
+			argv = append(argv, p.Ref)
+		}
+	}
+	return argv
 }
 
 func parseFlatpakUpdateOutput(text string, installed map[string]flatpakInstalledEntry) []Package {

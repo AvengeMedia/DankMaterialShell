@@ -514,6 +514,7 @@ var SPEC = {
     updaterIntervalSeconds: { def: 1800 },
     updaterIncludeFlatpak: { def: true },
     updaterAllowAUR: { def: true },
+    updaterIgnoredPackages: { def: [] },
 
     displayNameMode: { def: "system" },
     screenPreferences: { def: {} },

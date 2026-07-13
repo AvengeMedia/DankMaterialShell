@@ -15,10 +15,12 @@ Singleton {
     property bool sysupdateAvailable: false
 
     property var availableUpdates: []
+    property var _rawUpdates: []
     property bool isChecking: false
     property bool isUpgrading: false
     property bool hasError: false
     property string errorMessage: ""
+    property string errorHint: ""
     property string errorCode: ""
     property var backends: []
     property string distribution: ""
@@ -31,6 +33,7 @@ Singleton {
     property int nextCheckUnix: 0
 
     readonly property int updateCount: availableUpdates.length
+    readonly property int hiddenUpdateCount: _rawUpdates.length - availableUpdates.length
     readonly property bool helperAvailable: sysupdateAvailable && backends.length > 0
 
     Connections {
@@ -56,6 +59,12 @@ Singleton {
         target: SettingsData
         function onUpdaterCheckOnStartChanged() {
             Qt.callLater(() => root._maybeStartupCheck());
+        }
+        function onUpdaterAllowAURChanged() {
+            root._refilter();
+        }
+        function onUpdaterIgnoredPackagesChanged() {
+            root._refilter();
         }
         function on_HasLoadedChanged() {
             Qt.callLater(() => root._maybeStartupCheck());
@@ -100,7 +109,8 @@ Singleton {
         if (!data) {
             return;
         }
-        availableUpdates = data.packages || [];
+        _rawUpdates = data.packages || [];
+        availableUpdates = _filterUpdates(_rawUpdates);
         backends = data.backends || [];
         distribution = data.distro || "";
         distributionPretty = data.distroPretty || "";
@@ -129,10 +139,12 @@ Singleton {
             hasError = true;
             errorMessage = data.error.message || "";
             errorCode = data.error.code || "";
+            errorHint = data.error.hint || "";
         } else {
             hasError = false;
             errorMessage = "";
             errorCode = "";
+            errorHint = "";
         }
 
         if (backends.length > 0) {
@@ -141,6 +153,29 @@ Singleton {
         } else {
             pkgManager = "";
         }
+    }
+
+    function _filterUpdates(pkgs) {
+        const ignored = SettingsData.updaterIgnoredPackages || [];
+        return (pkgs || []).filter(p => {
+            if (!SettingsData.updaterAllowAUR && p.repo === "aur")
+                return false;
+            return ignored.indexOf(p.name) === -1;
+        });
+    }
+
+    function _refilter() {
+        availableUpdates = _filterUpdates(_rawUpdates);
+    }
+
+    function ignorePackage(name) {
+        if (!name)
+            return;
+        const list = (SettingsData.updaterIgnoredPackages || []).slice();
+        if (list.indexOf(name) !== -1)
+            return;
+        list.push(name);
+        SettingsData.set("updaterIgnoredPackages", list);
     }
 
     function checkForUpdates() {
@@ -153,6 +188,7 @@ Singleton {
             _runCustomTerminalCommand();
             return;
         }
+        params.ignored = SettingsData.updaterIgnoredPackages || [];
         DMSService.sysupdateUpgrade(params, null);
     }
 

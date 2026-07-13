@@ -70,3 +70,22 @@ libsdl2-2.0-0/stable 2.30.0+dfsg-1 amd64 [upgradable from: 2.28.5+dfsg-1]`,
 		})
 	}
 }
+
+func TestFilterAptHeld(t *testing.T) {
+	pkgs := []Package{
+		{Name: "bash", Repo: RepoSystem, Backend: "apt"},
+		{Name: "linux-image-generic", Repo: RepoSystem, Backend: "apt"},
+		{Name: "zsh", Repo: RepoSystem, Backend: "apt"},
+	}
+
+	got := filterAptHeld(append([]Package(nil), pkgs...), map[string]bool{"linux-image-generic": true})
+	want := []Package{pkgs[0], pkgs[2]}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("filterAptHeld() = %#v\nwant %#v", got, want)
+	}
+
+	unfiltered := filterAptHeld(append([]Package(nil), pkgs...), nil)
+	if !reflect.DeepEqual(unfiltered, pkgs) {
+		t.Errorf("filterAptHeld(nil held) = %#v\nwant %#v", unfiltered, pkgs)
+	}
+}

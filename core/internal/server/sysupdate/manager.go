@@ -20,6 +20,7 @@ const (
 	minIntervalSeconds       = 5 * 60
 	recentLogCapacity        = 200
 	checkTimeout             = 5 * time.Minute
+	retryIntervalSeconds     = 5 * 60
 	upgradeTimeout           = 30 * time.Minute
 	postUpgradeCompleteDelay = 3 * time.Second
 )
@@ -150,7 +151,7 @@ func (m *Manager) Refresh(opts RefreshOptions) {
 		m.refreshSerial.Unlock()
 		return
 	}
-	m.runRefresh(context.Background())
+	m.runRefresh(context.Background(), true)
 }
 
 func (m *Manager) Upgrade(opts UpgradeOptions) error {
@@ -237,12 +238,12 @@ func (m *Manager) scheduler() {
 		case <-m.wakeSched:
 			t.Stop()
 		case <-t.C:
-			m.runRefresh(context.Background())
+			m.runRefresh(context.Background(), false)
 		}
 	}
 }
 
-func (m *Manager) runRefresh(parent context.Context) {
+func (m *Manager) runRefresh(parent context.Context, manual bool) {
 	m.refreshSerial.Lock()
 	defer m.refreshSerial.Unlock()
 
@@ -284,27 +285,43 @@ func (m *Manager) runRefresh(parent context.Context) {
 	now := time.Now().Unix()
 	m.mu.Lock()
 	m.state.LastCheckUnix = now
-	m.state.Packages = m.state.Packages[:0]
+	prev := m.state.Packages
+	next := make([]Package, 0, len(prev))
 	var firstErr error
 	for i, r := range results {
 		if r.err != nil {
 			if firstErr == nil {
 				firstErr = fmt.Errorf("%s: %w", backends[i].ID(), r.err)
 			}
+			// Retain a failed backend's last known packages so a transient failure doesn't wipe the list.
+			for _, p := range prev {
+				if p.Backend == backends[i].ID() {
+					next = append(next, p)
+				}
+			}
 			continue
 		}
-		m.state.Packages = append(m.state.Packages, r.pkgs...)
+		next = append(next, r.pkgs...)
 	}
-	m.state.Count = len(m.state.Packages)
+	m.state.Packages = next
+	m.state.Count = len(next)
 	m.state.NextCheckUnix = now + int64(m.state.IntervalSeconds)
-	if firstErr != nil {
-		m.state.Phase = PhaseError
-		m.state.Error = &ErrorInfo{Code: ErrCodeBackendFailed, Message: firstErr.Error()}
-	} else {
+	switch {
+	case firstErr == nil:
 		m.state.Phase = PhaseIdle
 		m.state.LastSuccessUnix = now
+	case manual:
+		m.state.Phase = PhaseError
+		m.state.Error = &ErrorInfo{Code: ErrCodeBackendFailed, Message: firstErr.Error()}
+	default:
+		// Background checks fail silently and retry sooner; only manual refreshes surface errors.
+		m.state.Phase = PhaseIdle
+		retry := min(int64(m.state.IntervalSeconds), retryIntervalSeconds)
+		m.state.NextCheckUnix = now + retry
+		log.Warnf("[sysupdate] background check failed, retrying in %ds: %v", retry, firstErr)
 	}
 	m.mu.Unlock()
+	m.wake()
 	m.markDirty()
 }
 
@@ -328,10 +345,15 @@ func (m *Manager) runUpgrade(ctx context.Context, opts UpgradeOptions) {
 		opts.Targets = append([]Package(nil), m.state.Packages...)
 		m.mu.RUnlock()
 	}
+	opts.Targets = dropIgnoredTargets(opts.Targets, opts.Ignored)
 
 	backends := upgradeBackends(m.selection, opts)
 	if len(backends) == 0 {
-		m.setError(ErrCodeNoBackend, "no backend selected for upgrade")
+		if len(opts.Targets) > 0 {
+			m.setError(ErrCodeNoBackend, "all pending updates are excluded by current settings (AUR/Flatpak disabled)")
+		} else {
+			m.setError(ErrCodeNoBackend, "no backend selected for upgrade")
+		}
 		return
 	}
 
@@ -427,6 +449,24 @@ func (m *Manager) finishSuccessfulUpgrade(clearPackages bool) {
 	}
 	m.mu.Unlock()
 	m.markDirty()
+}
+
+func dropIgnoredTargets(targets []Package, ignored []string) []Package {
+	if len(ignored) == 0 {
+		return targets
+	}
+	skip := make(map[string]bool, len(ignored))
+	for _, name := range ignored {
+		skip[name] = true
+	}
+	out := targets[:0]
+	for _, p := range targets {
+		if skip[p.Name] {
+			continue
+		}
+		out = append(out, p)
+	}
+	return out
 }
 
 func upgradeBackends(sel Selection, opts UpgradeOptions) []Backend {

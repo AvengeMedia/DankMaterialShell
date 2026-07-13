@@ -46,10 +46,29 @@ func handleUpgrade(conn net.Conn, req models.Request, m *Manager) {
 		DryRun:         params.BoolOpt(req.Params, "dry", false),
 		CustomCommand:  params.StringOpt(req.Params, "customCommand", ""),
 		Terminal:       params.StringOpt(req.Params, "terminal", ""),
+		Ignored:        stringSliceOpt(req.Params, "ignored"),
 	}
 	if err := m.Upgrade(opts); err != nil {
 		models.RespondError(conn, req.ID, err.Error())
 		return
 	}
 	models.Respond(conn, req.ID, m.GetState())
+}
+
+func stringSliceOpt(p map[string]any, key string) []string {
+	val, ok := params.Any(p, key)
+	if !ok {
+		return nil
+	}
+	arr, ok := val.([]any)
+	if !ok {
+		return nil
+	}
+	out := make([]string, 0, len(arr))
+	for _, v := range arr {
+		if s, ok := v.(string); ok && s != "" {
+			out = append(out, s)
+		}
+	}
+	return out
 }

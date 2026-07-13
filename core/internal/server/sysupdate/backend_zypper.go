@@ -4,7 +4,9 @@ import (
 	"context"
 	"encoding/xml"
 	"errors"
+	"fmt"
 	"os/exec"
+	"strings"
 )
 
 func init() {
@@ -81,5 +83,20 @@ func (zypperBackend) Upgrade(ctx context.Context, opts UpgradeOptions, onLine fu
 }
 
 func zypperUpgradeArgv(opts UpgradeOptions) []string {
-	return privilegedArgv(opts, "zypper", "--non-interactive", "update")
+	ignored := shellSafeNames(opts.Ignored)
+	if len(ignored) == 0 {
+		return privilegedArgv(opts, "zypper", "--non-interactive", "update")
+	}
+	return privilegedArgv(opts, "sh", "-c", zypperLockScript(ignored))
+}
+
+// zypperLockScript locks ignored packages only for the update, leaving pre-existing user locks untouched.
+func zypperLockScript(ignored []string) string {
+	names := strings.Join(ignored, " ")
+	return fmt.Sprintf(
+		`new=""; for p in %s; do grep -qsE "^solvable_name:[[:space:]]*$p$" /etc/zypp/locks || new="$new $p"; done; `+
+			`[ -n "$new" ] && zypper --non-interactive al $new; `+
+			`zypper --non-interactive update; rc=$?; `+
+			`[ -n "$new" ] && zypper --non-interactive rl $new; exit $rc`,
+		names)
 }
