@@ -166,14 +166,7 @@ func RouteRequest(conn net.Conn, req models.Request) {
 			models.RespondError(conn, req.ID, "dbus manager not initialized")
 			return
 		}
-		// per-connection, not a shared constant: sharing one ID across every
-		// client meant two clients subscribing to the same signal fought
-		// over one channel, and either one disconnecting tore down every
-		// other client's match-rule subscriptions too (see server.go's use
-		// of the same clientID formula for the streaming "subscribe"
-		// endpoint, which must stay in sync with this one).
-		clientID := fmt.Sprintf("meta-client-%p", conn)
-		serverDbus.HandleRequest(conn, req, dbusManager, clientID)
+		serverDbus.HandleRequest(conn, req, dbusManager, dbusClientID)
 		return
 	}
 

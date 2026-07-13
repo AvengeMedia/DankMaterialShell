@@ -37,17 +37,8 @@ func (sm *SubscriptionManager) Start() error {
 		return fmt.Errorf("subscription manager already running")
 	}
 	sm.running = true
-	// Fresh channel here, not in Stop(): if Manager.eventHandler() is busy
-	// draining a backlog right when Stop() runs, it might not re-enter its
-	// select until after Stop() had already swapped in a replacement --
-	// and would then block forever on that new, empty channel that nothing
-	// will ever write to or close, instead of observing the close it
-	// missed. Only ever replacing the channel here, immediately before the
-	// one writer goroutine (notificationLoop) starts, means Stop()'s
-	// close() is the last thing that ever happens to whatever channel is
-	// current between one Start()/Stop() cycle and the next -- so
-	// eventHandler is guaranteed to observe it, no matter how far behind
-	// it's running.
+	// replace the channel closed by the previous Stop(); doing it here rather
+	// than in Stop() guarantees a lagging eventHandler still observes the close
 	sm.eventChan = make(chan SubscriptionEvent, 100)
 	sm.mu.Unlock()
 
@@ -243,16 +234,9 @@ func (sm *SubscriptionManager) Stop() {
 
 	sm.stopChan = make(chan struct{})
 
-	// notificationLoop (the only writer, just joined via sm.wg.Wait() above)
-	// has exited, so it's safe to close this now. Without it, Manager's
-	// eventHandler() -- which exits only on <-m.stopChan (full manager
-	// shutdown) or this channel closing -- blocks forever on every
-	// Unsubscribe() of the last subscriber, and Unsubscribe()'s
-	// m.eventWG.Wait() deadlocks that caller's goroutine permanently.
-	//
-	// Deliberately NOT recreated here (unlike stopChan above): Start()
-	// allocates the replacement, right before the next notificationLoop
-	// starts. See the comment there for why that matters.
+	// the writer (notificationLoop) joined above, so closing is safe; without
+	// this close Manager.eventHandler never returns and Unsubscribe deadlocks
+	// on eventWG.Wait(). Start() allocates the replacement.
 	sm.mu.Lock()
 	close(sm.eventChan)
 	sm.mu.Unlock()

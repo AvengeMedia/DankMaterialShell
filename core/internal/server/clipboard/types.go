@@ -153,12 +153,7 @@ type Manager struct {
 	notifierWg  sync.WaitGroup
 	lastState   *State
 
-	// dbusConn is lazily created by ExportFileForFlatpak; dbusConnMutex
-	// guards the check-then-create there, since each inbound IPC request
-	// runs on its own goroutine and two concurrent clipboard.copyFile
-	// calls could otherwise both see it nil, both dial a fresh connection,
-	// and race to assign the field (data race on the pointer itself, plus
-	// leaking whichever connection lost the race).
+	// lazily created by dbusConnForFlatpak under dbusConnMutex
 	dbusConn      *dbus.Conn
 	dbusConnMutex sync.Mutex
 }

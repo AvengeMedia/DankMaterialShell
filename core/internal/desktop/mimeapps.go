@@ -133,14 +133,7 @@ func mergedAssociations() *MimeAssociations {
 	return merged
 }
 
-// isSafeIniField rejects anything that could break out of a single
-// "key=value" line in the generated INI-format mimeapps.list: a newline
-// could inject a fake [Section] header or extra key=value lines, and a
-// bracket could be confused for one even without a newline. mimeType and
-// desktopId ultimately come from the local IPC socket with no other
-// sanitization (StripMimeParams only trims a trailing ";params" suffix),
-// and this file is a shared freedesktop config consumed by other
-// applications (GTK, KDE, xdg-open) beyond this daemon.
+// isSafeIniField rejects values that would corrupt a key=value line in mimeapps.list
 func isSafeIniField(s string) bool {
 	return !strings.ContainsAny(s, "\n\r[]")
 }

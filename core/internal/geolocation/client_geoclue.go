@@ -132,12 +132,6 @@ func (c *GeoClueClient) startSignalPump() error {
 	if err := c.dbusConn.AddMatchSignal(
 		dbus.WithMatchObjectPath(c.clientPath),
 		dbus.WithMatchInterface(dbusGeoClueClientInterface),
-		// The member name ("LocationUpdated"), not WithMatchSender: that
-		// expects a bus name (e.g. "org.freedesktop.GeoClue2"), and
-		// dbusGeoClueClientLocationUpdated is actually the full
-		// interface.member string -- no real sender ever matches that, so
-		// this match rule never matched anything and live location
-		// updates silently never arrived after the initial value.
 		dbus.WithMatchMember("LocationUpdated"),
 	); err != nil {
 		return err

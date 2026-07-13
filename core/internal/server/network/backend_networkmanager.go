@@ -2,6 +2,7 @@ package network
 
 import (
 	"fmt"
+	"maps"
 	"sync"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
@@ -57,15 +58,9 @@ type NetworkManagerBackend struct {
 	wifiDev         any
 	wifiDevices     map[string]*wifiDeviceInfo
 
-	// devMutex guards ethernetDevices/wifiDevices: they're written from the
-	// signal-pump goroutine's device-added/removed handlers and read from
-	// every request-handling goroutine (one per inbound IPC request). A
-	// concurrent map read/write without this is a Go runtime fatal error,
-	// not just a panic -- unrecoverable even with a defer/recover in the
-	// caller. Never hold this lock while calling another method: several
-	// methods that touch these maps are called both from within an
-	// already-locked handler and directly from request handlers, and
-	// sync.RWMutex is not reentrant.
+	// devMutex guards ethernetDevices/wifiDevices (written by the signal pump,
+	// read by request handlers). Not reentrant — never hold it across calls
+	// into other backend methods.
 	devMutex sync.RWMutex
 
 	dbusConn *dbus.Conn
@@ -278,27 +273,19 @@ func (b *NetworkManagerBackend) Initialize() error {
 	return nil
 }
 
-// ethernetDevicesSnapshot returns a shallow copy of the ethernet-devices
-// map, safe to read/iterate without holding devMutex.
 func (b *NetworkManagerBackend) ethernetDevicesSnapshot() map[string]*ethernetDeviceInfo {
 	b.devMutex.RLock()
 	defer b.devMutex.RUnlock()
 	out := make(map[string]*ethernetDeviceInfo, len(b.ethernetDevices))
-	for k, v := range b.ethernetDevices {
-		out[k] = v
-	}
+	maps.Copy(out, b.ethernetDevices)
 	return out
 }
 
-// wifiDevicesSnapshot returns a shallow copy of the wifi-devices map, safe
-// to read/iterate without holding devMutex.
 func (b *NetworkManagerBackend) wifiDevicesSnapshot() map[string]*wifiDeviceInfo {
 	b.devMutex.RLock()
 	defer b.devMutex.RUnlock()
 	out := make(map[string]*wifiDeviceInfo, len(b.wifiDevices))
-	for k, v := range b.wifiDevices {
-		out[k] = v
-	}
+	maps.Copy(out, b.wifiDevices)
 	return out
 }
 
@@ -328,40 +315,34 @@ func (b *NetworkManagerBackend) setWifiDeviceInfo(iface string, info *wifiDevice
 	b.devMutex.Unlock()
 }
 
-// removeEthernetDeviceByPath deletes the ethernet device at path (if any)
-// and returns its info plus a snapshot of what's left, so the caller can
-// pick a replacement "primary" device without holding devMutex while doing
-// so (picking a replacement calls back into other locking methods).
+// removeEthernetDeviceByPath deletes the device and returns a snapshot of
+// what's left so the caller can pick a replacement without holding devMutex
 func (b *NetworkManagerBackend) removeEthernetDeviceByPath(path dbus.ObjectPath) (removed *ethernetDeviceInfo, remaining map[string]*ethernetDeviceInfo, found bool) {
 	b.devMutex.Lock()
 	defer b.devMutex.Unlock()
 	for iface, info := range b.ethernetDevices {
-		if info.device.GetPath() == path {
-			delete(b.ethernetDevices, iface)
-			remaining = make(map[string]*ethernetDeviceInfo, len(b.ethernetDevices))
-			for k, v := range b.ethernetDevices {
-				remaining[k] = v
-			}
-			return info, remaining, true
+		if info.device.GetPath() != path {
+			continue
 		}
+		delete(b.ethernetDevices, iface)
+		remaining = make(map[string]*ethernetDeviceInfo, len(b.ethernetDevices))
+		maps.Copy(remaining, b.ethernetDevices)
+		return info, remaining, true
 	}
 	return nil, nil, false
 }
 
-// removeWifiDeviceByPath is the wifi-device counterpart of
-// removeEthernetDeviceByPath.
 func (b *NetworkManagerBackend) removeWifiDeviceByPath(path dbus.ObjectPath) (removed *wifiDeviceInfo, remaining map[string]*wifiDeviceInfo, found bool) {
 	b.devMutex.Lock()
 	defer b.devMutex.Unlock()
 	for iface, info := range b.wifiDevices {
-		if info.device.GetPath() == path {
-			delete(b.wifiDevices, iface)
-			remaining = make(map[string]*wifiDeviceInfo, len(b.wifiDevices))
-			for k, v := range b.wifiDevices {
-				remaining[k] = v
-			}
-			return info, remaining, true
+		if info.device.GetPath() != path {
+			continue
 		}
+		delete(b.wifiDevices, iface)
+		remaining = make(map[string]*wifiDeviceInfo, len(b.wifiDevices))
+		maps.Copy(remaining, b.wifiDevices)
+		return info, remaining, true
 	}
 	return nil, nil, false
 }

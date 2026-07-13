@@ -64,14 +64,8 @@ func (m *Manager) findInstalledPath(pluginID string) (string, error) {
 	return m.findInDir(systemDir, pluginID)
 }
 
-// isSafePluginPathComponent rejects anything that isn't a single, plain
-// path component: no separators, no "." or "..", not empty. Plugin IDs and
-// names are supposed to be plain identifiers, matched directly against a
-// directory name one level under a trusted plugins dir -- allowing a
-// caller-supplied value containing "/" or ".." here would let
-// filepath.Join resolve outside that directory entirely (e.g. an uninstall
-// request for "../../../etc" resolving to a real, existing directory that
-// then gets RemoveAll'd).
+// isSafePluginPathComponent rejects ids that aren't a single path component,
+// so filepath.Join can't resolve (and later RemoveAll) outside the plugins dir
 func isSafePluginPathComponent(s string) bool {
 	if s == "" || s == "." || s == ".." {
 		return false

@@ -1839,11 +1839,6 @@ func (m *Manager) EntryToFile(entry *Entry) string {
 	return ""
 }
 
-// dbusConnForFlatpak returns the lazily-created shared session bus
-// connection, creating it under dbusConnMutex if this is the first call.
-// Guarding the whole check-then-create means two concurrent
-// ExportFileForFlatpak calls (each on its own goroutine, one per inbound
-// IPC request) can't both dial a connection and race to assign the field.
 func (m *Manager) dbusConnForFlatpak() (*dbus.Conn, error) {
 	m.dbusConnMutex.Lock()
 	defer m.dbusConnMutex.Unlock()

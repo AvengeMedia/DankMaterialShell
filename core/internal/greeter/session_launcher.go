@@ -94,70 +94,75 @@ func resolveSessionExecInDirs(sessionID string, dirs []string) (string, error) {
 	return "", fmt.Errorf("session desktop file %q was not found", id)
 }
 
-// tokenizeExecLine splits a Desktop Entry Exec= value into argv, honoring
-// basic single/double quoting and backslash escapes, but never invokes a
-// shell. Session .desktop files can live in a user-writable directory
-// (~/.local/share/wayland-sessions), so shell metacharacters in Exec=
-// must never reach an actual shell -- they're just literal argv text here.
-func tokenizeExecLine(execLine string) ([]string, error) {
-	var tokens []string
+// parseExecString splits a Desktop Entry Exec= value into argv without
+// involving a shell, mirroring quickshell's DesktopEntry::parseExecString
+// (string quoting, value escapes, field code stripping).
+func parseExecString(execLine string) []string {
+	var args []string
 	var cur strings.Builder
-	hasCur := false
-	runes := []rune(execLine)
-	i := 0
-	for i < len(runes) {
-		c := runes[i]
+	inString := false
+	escape := 0
+	percent := false
+
+	for _, c := range execLine {
 		switch {
-		case c == ' ' || c == '\t':
-			if hasCur {
-				tokens = append(tokens, cur.String())
-				cur.Reset()
-				hasCur = false
-			}
-			i++
-		case c == '\'':
-			hasCur = true
-			i++
-			for i < len(runes) && runes[i] != '\'' {
-				cur.WriteRune(runes[i])
-				i++
-			}
-			if i >= len(runes) {
-				return nil, fmt.Errorf("unterminated single quote")
-			}
-			i++
-		case c == '"':
-			hasCur = true
-			i++
-			for i < len(runes) && runes[i] != '"' {
-				if runes[i] == '\\' && i+1 < len(runes) {
-					if next := runes[i+1]; next == '"' || next == '\\' || next == '$' || next == '`' {
-						cur.WriteRune(next)
-						i += 2
-						continue
-					}
+		case escape == 0 && c == '\\':
+			escape = 1
+		case inString:
+			switch {
+			case c == '\\':
+				escape++
+				if escape == 4 {
+					cur.WriteByte('\\')
+					escape = 0
 				}
-				cur.WriteRune(runes[i])
-				i++
+			case escape == 2:
+				cur.WriteRune(c)
+				escape = 0
+			case escape != 0:
+				switch c {
+				case 's':
+					cur.WriteByte(' ')
+				case 'n':
+					cur.WriteByte('\n')
+				case 't':
+					cur.WriteByte('\t')
+				case 'r':
+					cur.WriteByte('\r')
+				default:
+					cur.WriteRune(c)
+				}
+				escape = 0
+			case c == '"' || c == '\'':
+				inString = false
+			default:
+				cur.WriteRune(c)
 			}
-			if i >= len(runes) {
-				return nil, fmt.Errorf("unterminated double quote")
-			}
-			i++
-		case c == '\\' && i+1 < len(runes):
-			hasCur = true
-			cur.WriteRune(runes[i+1])
-			i += 2
-		default:
-			hasCur = true
+		case escape != 0:
 			cur.WriteRune(c)
-			i++
+			escape = 0
+		case percent:
+			if c == '%' {
+				cur.WriteByte('%')
+			}
+			percent = false
+		case c == '%':
+			percent = true
+		case c == '"' || c == '\'':
+			inString = true
+		case c == ' ':
+			if cur.Len() > 0 {
+				args = append(args, cur.String())
+				cur.Reset()
+			}
+		default:
+			cur.WriteRune(c)
 		}
 	}
-	if hasCur {
-		tokens = append(tokens, cur.String())
+	if cur.Len() > 0 {
+		args = append(args, cur.String())
 	}
-	return tokens, nil
+	return args
 }
 
 func LaunchSessionByID(sessionID string) error {
@@ -165,23 +170,8 @@ func LaunchSessionByID(sessionID string) error {
 	if err != nil {
 		return err
 	}
-	execLine = strings.TrimSpace(execLine)
-	if execLine == "" {
-		return fmt.Errorf("session %q has an empty Exec command", sessionID)
-	}
 
-	tokens, err := tokenizeExecLine(execLine)
-	if err != nil {
-		return fmt.Errorf("session %q has an invalid Exec command: %w", sessionID, err)
-	}
-
-	argv := make([]string, 0, len(tokens))
-	for _, tok := range tokens {
-		if strings.HasPrefix(tok, "%") {
-			continue // field codes (%f/%U/etc.) -- sessions take no file args
-		}
-		argv = append(argv, tok)
-	}
+	argv := parseExecString(strings.TrimSpace(execLine))
 	if len(argv) == 0 {
 		return fmt.Errorf("session %q has an empty Exec command", sessionID)
 	}

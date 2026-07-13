@@ -42,7 +42,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/pkg/syncmap"
 )
 
-const APIVersion = 27
+const APIVersion = 28
 
 var CLIVersion = "dev"
 
@@ -81,6 +81,8 @@ var trayRecoveryManager *trayrecovery.Manager
 var locationManager *location.Manager
 var sysUpdateManager *sysupdate.Manager
 var geoClientInstance geolocation.Client
+
+const dbusClientID = "dms-dbus-client"
 
 var capabilitySubscribers syncmap.Map[string, chan ServerInfo]
 var cupsSubscribers syncmap.Map[string, bool]
@@ -423,11 +425,7 @@ func handleConnection(conn net.Conn) {
 	}
 }
 
-// routeRequestRecovered runs RouteRequest with a panic boundary so that a
-// bug in any one handler (bad type assertion, nil deref, out-of-range
-// index, etc. -- reachable from client-controlled req.Method/req.Params)
-// can't crash the whole daemon and disconnect every other client. It
-// reports back to the offending client as a normal error response instead.
+// routeRequestRecovered keeps a panicking handler from taking down the whole daemon
 func routeRequestRecovered(conn net.Conn, req models.Request) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -599,6 +597,11 @@ func notifyCapabilityChange() {
 
 func handleSubscribe(conn net.Conn, req models.Request) {
 	clientID := fmt.Sprintf("meta-client-%p", conn)
+
+	dbusClient := dbusClientID
+	if id, ok := models.Get[string](req, "clientId"); ok && id != "" {
+		dbusClient = id
+	}
 
 	var services []string
 	if servicesParam, ok := models.Get[[]any](req, "services"); ok {
@@ -1268,10 +1271,10 @@ func handleSubscribe(conn net.Conn, req models.Request) {
 
 	if shouldSubscribe("dbus") && dbusManager != nil {
 		wg.Add(1)
-		dbusChan := dbusManager.SubscribeSignals(clientID)
+		dbusChan := dbusManager.SubscribeSignals(dbusClient)
 		go func() {
 			defer wg.Done()
-			defer dbusManager.UnsubscribeSignals(clientID)
+			defer dbusManager.UnsubscribeSignals(dbusClient)
 
 			for {
 				select {

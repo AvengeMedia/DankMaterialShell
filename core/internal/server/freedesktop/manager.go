@@ -137,11 +137,8 @@ func (m *Manager) consumeSelfEcho(value uint32) bool {
 }
 
 func (m *Manager) watchSettingsChanges() {
-	// Reuse the shared session connection instead of opening a new one:
-	// a dedicated connection here was never stored on Manager, so Close()
-	// (which only closes m.systemConn/m.sessionConn) had no way to reach
-	// it, and the connection plus this goroutine leaked for the life of
-	// the process every time a Manager was created.
+	// reuse the shared session connection; a dedicated one was unreachable
+	// from Close() and leaked with this goroutine
 	if m.sessionConn == nil {
 		return
 	}

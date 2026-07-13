@@ -299,13 +299,8 @@ type hyprlandOverrideBind struct {
 	Options     map[string]any
 	// Unbind: negative override (hl.unbind only, no rebind).
 	Unbind bool
-	// RawLuaAction is true when Action was parsed from an existing Lua
-	// bind override as a hand-written custom hl.* expression that this
-	// code doesn't have a specific translation for (see
-	// luaExprToInternalAction). Only in that case is Action re-emitted
-	// verbatim as Lua source; every other bind (including ones parsed from
-	// a classic hyprland.conf bind= line, where Action is freeform
-	// dispatcher+params text, never Lua) always gets safely quoted.
+	// RawLuaAction: Action is a custom hl.* Lua expression round-tripped from an
+	// existing Lua override; re-emit it verbatim instead of quoting it.
 	RawLuaAction bool
 }
 
@@ -1054,33 +1049,14 @@ func luaActionStringFromHyprlangAction(action string) string {
 	if expr, ok := luaActionStringFromKnownHyprlandAction(action); ok {
 		return expr
 	}
-	// Unrecognized dispatcher (typo, third-party dispatcher with no native
-	// translation, or -- since Action here is classic freeform
-	// "dispatcher params" text, never Lua -- a crafted bind line): forward
-	// it to hyprctl rather than dropping it, but as a properly quoted
-	// string argument, never as raw unescaped Lua source. Without this, an
-	// unrecognized dispatcher name/params containing e.g. a stray `"` could
-	// close the Lua string literal in writeLuaBindLine's hl.bind(...) call
-	// and inject arbitrary Lua that Hyprland executes on reload.
-	//
-	// This function is never used for RawLuaAction binds (see
-	// writeLuaBindLine): those already are a Lua expression and must be
-	// emitted verbatim instead, which is exactly the "custom Lua
-	// dispatcher" escape hatch this deliberately doesn't reach.
+	// Unrecognized dispatchers are freeform text, not Lua; forward them to
+	// hyprctl quoted so a stray `"` can't produce broken Lua output.
 	return luaHyprctlDispatchFunction(action)
 }
 
 // luaExprToInternalAction converts a parsed Lua bind expression back into
-// the classic "dispatcher params" text form used elsewhere in this file. It
-// also reports whether expr didn't match any known hl.dsp.*/hl.dispatch/
-// hl.exec_cmd shape (luaExprToDispatcherParams's default case returns the
-// expression itself unchanged as the "dispatcher") -- i.e. whether this is
-// a genuine hand-written custom Lua dispatcher rather than something this
-// code knows how to translate. That distinction matters when writing the
-// bind back out: a custom Lua expression must be re-emitted verbatim as
-// Lua, but anything else (including this same fallback text if it had come
-// from a classic hyprland.conf bind= line instead) must always be safely
-// quoted -- see writeLuaBindLine.
+// "dispatcher params" text. isRawLua reports that expr matched no known hl.*
+// shape and must be re-emitted verbatim as Lua on write-back.
 func luaExprToInternalAction(expr string) (action string, isRawLua bool) {
 	d, p := luaExprToDispatcherParams(expr)
 	if d == expr && p == "" {
@@ -1110,19 +1086,12 @@ func luaBindOptions(bind *hyprlandOverrideBind) []string {
 }
 
 func writeLuaBindLine(sb *strings.Builder, bind *hyprlandOverrideBind) {
-	// strconv.Quote, not a bare %s inside a manually-written Lua string
-	// literal: a parsed bind key containing a stray `"` would otherwise
-	// close the literal early and let whatever follows execute as Lua.
 	key := strconv.Quote(formatLuaBindKey(bind.Key))
 	if bind.Unbind {
 		fmt.Fprintf(sb, `hl.unbind(%s)`, key)
 		sb.WriteByte('\n')
 		return
 	}
-	// RawLuaAction binds already hold an exact Lua expression (round-tripped
-	// from an existing custom hl.* call this code doesn't translate) and
-	// must be re-emitted verbatim; anything else is freeform dispatcher
-	// text that must always go through the safe-quoting path.
 	var expr string
 	if bind.RawLuaAction {
 		expr = bind.Action

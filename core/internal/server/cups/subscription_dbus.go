@@ -38,10 +38,7 @@ func (sm *DBusSubscriptionManager) Start() error {
 		return fmt.Errorf("subscription manager already running")
 	}
 	sm.running = true
-	// Fresh channel here, not in Stop(): see the identical comment in
-	// subscription.go's SubscriptionManager.Start() for why -- Stop()
-	// must never replace this while a not-yet-caught-up eventHandler()
-	// could end up observing the replacement instead of the close.
+	// replaced here rather than in Stop(); see SubscriptionManager.Start()
 	sm.eventChan = make(chan SubscriptionEvent, 100)
 	sm.mu.Unlock()
 
@@ -286,14 +283,8 @@ func (sm *DBusSubscriptionManager) Stop() {
 
 	sm.stopChan = make(chan struct{})
 
-	// dbusListenerLoop (the only writer, just joined via sm.wg.Wait() above)
-	// has exited, so it's safe to close this now. See the identical fix and
-	// comment in subscription.go's SubscriptionManager.Stop() for why: this
-	// channel closing is Manager.eventHandler()'s only way to return short
-	// of a full manager shutdown, so without this Unsubscribe() of the last
-	// subscriber deadlocks forever on eventWG.Wait(). Deliberately NOT
-	// recreated here -- Start() allocates the replacement (see the comment
-	// there for why that matters).
+	// the writer (dbusListenerLoop) joined above, so closing is safe; see
+	// SubscriptionManager.Stop()
 	sm.mu.Lock()
 	close(sm.eventChan)
 	sm.mu.Unlock()

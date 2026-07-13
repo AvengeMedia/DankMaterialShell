@@ -111,16 +111,8 @@ func (ctx *Context) GetDispatch() func() error {
 			return fmt.Errorf("%w (senderID=%d)", ErrDispatchSenderUnsupported, senderID)
 		}
 
-		// The generated per-object Dispatch methods trust length/object-ID
-		// fields taken straight off the wire with no bounds checking (see
-		// e.g. client.go's event handlers). A malformed or truncated
-		// message from a misbehaving compositor -- or simply a bug in a
-		// rarely-exercised event decoder -- panics here. Since Dispatch is
-		// called from a shared loop used by every CLI tool (screenshot,
-		// colorpicker, clipboard) as well as the long-lived daemon, an
-		// unrecovered panic here would otherwise crash the whole process
-		// over a single bad event. Recover and surface it as a normal
-		// error instead.
+		// generated Dispatch methods don't bounds-check wire data; surface a
+		// decoder panic as an error instead of crashing the process
 		defer func() {
 			if r := recover(); r != nil {
 				dispatchErr = fmt.Errorf("dispatch: panic handling opcode=%d senderID=%d: %v", opcode, senderID, r)

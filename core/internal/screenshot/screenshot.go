@@ -747,9 +747,8 @@ func (s *Screenshoter) processFrame(frame *wlr_screencopy.ZwlrScreencopyFrameV1,
 		bpp := format.BytesPerPixel()
 		if int(e.Stride) < int(e.Width)*bpp {
 			log.Error("invalid stride from compositor", "stride", e.Stride, "width", e.Width, "bpp", bpp)
-			// Without this, we never call frame.Copy() and the compositor
-			// has no reason to ever send ready/failed -- the dispatch loop
-			// below waits forever on an event neither side is going to send.
+			// bail out here or the dispatch loop waits forever on a ready/failed
+			// event that never comes (frame.Copy is never called)
 			failed = true
 			return
 		}

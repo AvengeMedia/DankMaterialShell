@@ -71,9 +71,6 @@ type Manager struct {
 	screensaverGnomeClaimed       bool
 	selfEchoMu                    sync.Mutex
 	selfEchoes                    []colorSchemeEcho
-	// settingsSignals is the channel watchSettingsChanges registers on the
-	// shared sessionConn; guarded by stateMutex since it's set from that
-	// goroutine and read from Close(). nil until watchSettingsChanges has
-	// actually started listening.
+	// registered on sessionConn by watchSettingsChanges; guarded by stateMutex
 	settingsSignals chan *dbus.Signal
 }

@@ -135,13 +135,9 @@ func EscapeSingleQuotes(s string) string {
 }
 
 // MakeCommand returns a bash command string that runs `command` with the
-// detected tool, for the tools/paths that don't take a password (doas,
-// run0, or sudo with no password supplied -- those prompt interactively on
-// a TTY instead). The sudo-with-password case is handled by ExecCommand
-// directly via stdin, never by building a command string, since a password
-// embedded in a command string would end up in that process's argv (and
-// therefore be readable by any local user via /proc/<pid>/cmdline or `ps`
-// for as long as the command runs).
+// detected tool, prompting interactively on a TTY where applicable. The
+// sudo-with-password case lives in ExecCommand, which pipes the password via
+// stdin so it never lands in argv.
 //
 // If detection fails, the returned shell string exits 1 with an error
 // message so callers that treat the *exec.Cmd as infallible still fail
@@ -166,11 +162,8 @@ func MakeCommand(command string) string {
 
 // ExecCommand builds an exec.Cmd that runs `command` as root via the
 // detected tool. Detection errors surface at Run() time as a failing
-// command writing a clear error to stderr.
-//
-// When the tool is sudo and password is non-empty, the password is wired up
-// via the child's stdin (sudo -S) rather than being embedded in the command
-// line, so it never appears in argv/`ps`/`/proc/<pid>/cmdline`.
+// command writing a clear error to stderr. A sudo password is piped via
+// stdin (sudo -S) so it never appears in argv.
 func ExecCommand(ctx context.Context, password, command string) *exec.Cmd {
 	t, err := Detect()
 	if err != nil {

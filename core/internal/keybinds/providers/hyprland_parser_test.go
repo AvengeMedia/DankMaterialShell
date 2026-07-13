@@ -150,7 +150,7 @@ func TestWriteLuaBindLineLeavesCustomLuaDispatcherRaw(t *testing.T) {
 		Key:          "Super+u",
 		Action:       "hl.dsp.no_op()",
 		Description:  "Custom Lua",
-		RawLuaAction: true, // set by parseLuaBindOverrideLine for genuine custom Lua round-trips
+		RawLuaAction: true,
 	})
 
 	want := `hl.unbind("SUPER + U")
@@ -160,12 +160,6 @@ hl.bind("SUPER + U", hl.dsp.no_op(), { description = "Custom Lua" })`
 	}
 }
 
-// TestWriteLuaBindLineQuotesUnrecognizedActionWithoutRawLuaFlag verifies
-// that a bind carrying Lua-shaped text in Action but *not* marked
-// RawLuaAction (i.e. it isn't a genuine round-tripped custom dispatcher --
-// this is what a crafted/unrecognized classic hyprland.conf bind= line
-// looks like by the time it reaches here) is always safely quoted rather
-// than treated as literal Lua source.
 func TestWriteLuaBindLineQuotesUnrecognizedActionWithoutRawLuaFlag(t *testing.T) {
 	var sb strings.Builder
 	writeLuaBindLine(&sb, &hyprlandOverrideBind{
@@ -175,16 +169,12 @@ func TestWriteLuaBindLineQuotesUnrecognizedActionWithoutRawLuaFlag(t *testing.T)
 
 	got := sb.String()
 	if !strings.Contains(got, "hl.exec_cmd(") {
-		t.Fatalf("expected unrecognized action to go through the safe hyprctl-dispatch wrapper, got %q", got)
+		t.Fatalf("expected unrecognized action to go through the hyprctl-dispatch wrapper, got %q", got)
 	}
-	// Every bare (non-backslash-escaped) `"` in the output should be a
-	// clean open/close pair for some string literal (the key, or the
-	// hyprctl-dispatch argument). If the payload's `")` had actually broken
-	// out of its string, it would introduce an extra, unpaired bare quote,
-	// making this count odd.
+	// an unpaired bare quote means the action broke out of its string literal
 	withoutEscapedQuotes := strings.ReplaceAll(got, `\"`, "")
 	if n := strings.Count(withoutEscapedQuotes, `"`); n%2 != 0 {
-		t.Fatalf("payload broke out of its string literal (found %d unpaired bare quotes): %q", n, got)
+		t.Fatalf("action broke out of its string literal (%d unpaired quotes): %q", n, got)
 	}
 }
 
@@ -255,15 +245,6 @@ func TestParseLuaBindLineHandlesFunctionDispatcherFallback(t *testing.T) {
 	}
 }
 
-// TestLuaActionStringFromHyprlangActionAlwaysQuotesUnrecognizedText:
-// luaActionStringFromHyprlangAction is used for Action text that is
-// classic freeform "dispatcher params" (never Lua) -- it must always
-// safely quote anything it doesn't recognize, precisely because that text
-// could be attacker-influenced content from a hyprland.conf bind= line,
-// not just an innocuous typo. The "leave custom Lua dispatcher raw"
-// behavior now lives only in writeLuaBindLine, gated on the explicit
-// RawLuaAction flag set by parseLuaBindOverrideLine -- see
-// TestWriteLuaBindLineLeavesCustomLuaDispatcherRaw.
 func TestLuaActionStringFromHyprlangActionAlwaysQuotesUnrecognizedText(t *testing.T) {
 	got := luaActionStringFromHyprlangAction("hl.dsp.no_op()")
 	want := `function() hl.exec_cmd("hyprctl dispatch hl.dsp.no_op()") end`
