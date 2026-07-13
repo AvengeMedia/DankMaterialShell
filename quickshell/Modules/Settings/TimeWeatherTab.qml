@@ -46,14 +46,37 @@ Item {
                 settingKey: "timeFormat"
                 iconName: "schedule"
 
-                SettingsToggleRow {
+                SettingsDropdownRow {
                     tab: "time"
-                    tags: ["time", "24hour", "format"]
-                    settingKey: "use24HourClock"
-                    text: I18n.tr("24-Hour Format")
+                    tags: ["time", "24hour", "12hour", "format", "locale"]
+                    settingKey: "clockFormat"
+                    text: I18n.tr("Time Format")
                     description: I18n.tr("Use 24-hour time format instead of 12-hour AM/PM")
-                    checked: SettingsData.use24HourClock
-                    onToggled: checked => SettingsData.set("use24HourClock", checked)
+                    readonly property var _sample: new Date(2000, 0, 1, 13, 0, 0)
+                    readonly property string _twelve: Qt.formatTime(_sample, "h:mm AP")
+                    readonly property string _twentyFour: Qt.formatTime(_sample, "HH:mm")
+                    options: [I18n.tr("System Default"), _twelve, _twentyFour]
+                    currentValue: {
+                        switch (SettingsData.clockFormat) {
+                        case "12h":
+                            return _twelve;
+                        case "24h":
+                            return _twentyFour;
+                        default:
+                            return I18n.tr("System Default");
+                        }
+                    }
+                    onValueChanged: value => {
+                        if (value === _twelve) {
+                            SettingsData.set("clockFormat", "12h");
+                            return;
+                        }
+                        if (value === _twentyFour) {
+                            SettingsData.set("clockFormat", "24h");
+                            return;
+                        }
+                        SettingsData.set("clockFormat", "auto");
+                    }
                 }
 
                 SettingsToggleRow {

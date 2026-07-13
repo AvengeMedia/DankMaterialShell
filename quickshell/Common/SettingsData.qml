@@ -190,7 +190,12 @@ Singleton {
     property int firstDayOfWeek: -1
     property bool showWeekNumber: false
     property string calendarBackend: "auto"
-    property bool use24HourClock: true
+    property string clockFormat: "auto"
+    readonly property bool localeUses24Hour: {
+        const fmt = Qt.locale().timeFormat(Locale.ShortFormat).replace(/'[^']*'/g, "");
+        return !/[aA]/.test(fmt);
+    }
+    readonly property bool use24HourClock: clockFormat === "24h" ? true : (clockFormat === "12h" ? false : localeUses24Hour)
     property bool showSeconds: false
     property bool padHours12Hour: false
     property bool useFahrenheit: false
@@ -492,9 +497,6 @@ Singleton {
     property bool greeterEnableFprint: false
     property bool greeterEnableU2f: false
     property string greeterWallpaperPath: ""
-    property bool greeterUse24HourClock: true
-    property bool greeterShowSeconds: false
-    property bool greeterPadHours12Hour: false
     property string greeterLockDateFormat: ""
     property string greeterFontFamily: ""
     property string greeterWallpaperFillMode: ""
@@ -1750,6 +1752,11 @@ Singleton {
                     }
                 }
                 delete obj.lockScreenActiveMonitor;
+            }
+
+            if (obj?.use24HourClock !== undefined && obj?.clockFormat === undefined) {
+                obj.clockFormat = obj.use24HourClock ? "24h" : "12h";
+                delete obj.use24HourClock;
             }
 
             Store.parse(root, obj);

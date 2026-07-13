@@ -36,12 +36,14 @@ Singleton {
     property string customThemeFile: ""
     property var registryThemeVariants: ({})
     property string matugenScheme: "scheme-tonal-spot"
-    property bool use24HourClock: true
+    property string clockFormat: "auto"
+    readonly property bool localeUses24Hour: {
+        const fmt = Qt.locale().timeFormat(Locale.ShortFormat).replace(/'[^']*'/g, "");
+        return !/[aA]/.test(fmt);
+    }
+    readonly property bool use24HourClock: clockFormat === "24h" ? true : (clockFormat === "12h" ? false : localeUses24Hour)
     property bool showSeconds: false
     property bool padHours12Hour: false
-    property bool greeterUse24HourClock: true
-    property bool greeterShowSeconds: false
-    property bool greeterPadHours12Hour: false
     property string greeterLockDateFormat: ""
     property string greeterFontFamily: ""
     property string greeterWallpaperFillMode: ""
@@ -112,12 +114,9 @@ Singleton {
             customThemeFile = settings.customThemeFile !== undefined ? settings.customThemeFile : "";
             registryThemeVariants = settings.registryThemeVariants !== undefined ? settings.registryThemeVariants : ({});
             matugenScheme = settings.matugenScheme !== undefined ? settings.matugenScheme : "scheme-tonal-spot";
-            use24HourClock = settings.use24HourClock !== undefined ? settings.use24HourClock : true;
+            clockFormat = settings.clockFormat !== undefined ? settings.clockFormat : (settings.use24HourClock !== undefined ? (settings.use24HourClock ? "24h" : "12h") : "auto");
             showSeconds = settings.showSeconds !== undefined ? settings.showSeconds : false;
             padHours12Hour = settings.padHours12Hour !== undefined ? settings.padHours12Hour : false;
-            greeterUse24HourClock = settings.greeterUse24HourClock !== undefined ? settings.greeterUse24HourClock : use24HourClock;
-            greeterShowSeconds = settings.greeterShowSeconds !== undefined ? settings.greeterShowSeconds : showSeconds;
-            greeterPadHours12Hour = settings.greeterPadHours12Hour !== undefined ? settings.greeterPadHours12Hour : padHours12Hour;
             greeterLockDateFormat = settings.greeterLockDateFormat !== undefined ? settings.greeterLockDateFormat : "";
             greeterFontFamily = settings.greeterFontFamily !== undefined ? settings.greeterFontFamily : "";
             greeterWallpaperFillMode = settings.greeterWallpaperFillMode !== undefined ? settings.greeterWallpaperFillMode : "";
@@ -182,9 +181,9 @@ Singleton {
     }
 
     function getEffectiveTimeFormat() {
-        const use24 = greeterUse24HourClock;
-        const secs = greeterShowSeconds;
-        const pad = greeterPadHours12Hour;
+        const use24 = use24HourClock;
+        const secs = showSeconds;
+        const pad = padHours12Hour;
         if (use24)
             return secs ? "hh:mm:ss" : "hh:mm";
         if (pad)

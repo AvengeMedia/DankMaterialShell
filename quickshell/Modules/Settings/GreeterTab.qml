@@ -548,42 +548,6 @@ Item {
                 }
 
                 StyledText {
-                    text: I18n.tr("Time Format")
-                    font.pixelSize: Theme.fontSizeMedium
-                    font.weight: Font.Medium
-                    color: Theme.surfaceText
-                    topPadding: Theme.spacingM
-                    width: parent.width
-                    horizontalAlignment: Text.AlignLeft
-                }
-
-                SettingsToggleRow {
-                    settingKey: "greeterUse24Hour"
-                    tags: ["greeter", "time", "24hour"]
-                    text: I18n.tr("24-hour clock")
-                    description: I18n.tr("Greeter only — does not affect main clock")
-                    checked: SettingsData.greeterUse24HourClock
-                    onToggled: checked => SettingsData.set("greeterUse24HourClock", checked)
-                }
-
-                SettingsToggleRow {
-                    settingKey: "greeterShowSeconds"
-                    tags: ["greeter", "time", "seconds"]
-                    text: I18n.tr("Show Seconds")
-                    checked: SettingsData.greeterShowSeconds
-                    onToggled: checked => SettingsData.set("greeterShowSeconds", checked)
-                }
-
-                SettingsToggleRow {
-                    settingKey: "greeterPadHours"
-                    tags: ["greeter", "time", "12hour"]
-                    text: I18n.tr("Pad hours (02:00 vs 2:00)")
-                    visible: !SettingsData.greeterUse24HourClock
-                    checked: SettingsData.greeterPadHours12Hour
-                    onToggled: checked => SettingsData.set("greeterPadHours12Hour", checked)
-                }
-
-                StyledText {
                     text: I18n.tr("Date format on greeter")
                     font.pixelSize: Theme.fontSizeMedium
                     font.weight: Font.Medium

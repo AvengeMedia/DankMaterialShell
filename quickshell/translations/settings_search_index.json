@@ -413,23 +413,6 @@
     "description": "Select monitor to configure wallpaper"
   },
   {
-    "section": "use24HourClock",
-    "label": "24-Hour Format",
-    "tabIndex": 1,
-    "category": "Time & Weather",
-    "keywords": [
-      "24hour",
-      "clock",
-      "date",
-      "forecast",
-      "format",
-      "hour",
-      "time",
-      "weather"
-    ],
-    "description": "Use 24-hour time format instead of 12-hour AM/PM"
-  },
-  {
     "section": "useAutoLocation",
     "label": "Auto Location",
     "tabIndex": 1,
@@ -633,6 +616,25 @@
       "weather"
     ],
     "icon": "schedule"
+  },
+  {
+    "section": "clockFormat",
+    "label": "Time Format",
+    "tabIndex": 1,
+    "category": "Time & Weather",
+    "keywords": [
+      "12hour",
+      "24hour",
+      "clock",
+      "date",
+      "forecast",
+      "format",
+      "hour",
+      "locale",
+      "time",
+      "weather"
+    ],
+    "description": "Use 24-hour time format instead of 12-hour AM/PM"
   },
   {
     "section": "timeFormat",
@@ -7677,27 +7679,6 @@
     "description": "Change the locale used for date and time formatting, independent of the interface language."
   },
   {
-    "section": "greeterUse24Hour",
-    "label": "24-hour clock",
-    "tabIndex": 31,
-    "category": "Greeter",
-    "keywords": [
-      "24hour",
-      "affect",
-      "clock",
-      "display manager",
-      "does",
-      "greetd",
-      "greeter",
-      "hour",
-      "login",
-      "main",
-      "time",
-      "watch"
-    ],
-    "description": "Greeter only — does not affect main clock"
-  },
-  {
     "section": "greeterAutoLogin",
     "label": "Auto-login on startup",
     "tabIndex": 31,
@@ -7876,24 +7857,6 @@
     "icon": "fingerprint"
   },
   {
-    "section": "greeterPadHours",
-    "label": "Pad hours (02:00 vs 2:00)",
-    "tabIndex": 31,
-    "category": "Greeter",
-    "keywords": [
-      "(02:00",
-      "12hour",
-      "2:00)",
-      "display manager",
-      "greetd",
-      "greeter",
-      "hours",
-      "login",
-      "pad",
-      "time"
-    ]
-  },
-  {
     "section": "greeterRememberLastSession",
     "label": "Remember last session",
     "tabIndex": 31,
@@ -7928,21 +7891,6 @@
       "username"
     ],
     "description": "Pre-fill the last successful username on the greeter"
-  },
-  {
-    "section": "greeterShowSeconds",
-    "label": "Show Seconds",
-    "tabIndex": 31,
-    "category": "Greeter",
-    "keywords": [
-      "display manager",
-      "greetd",
-      "greeter",
-      "login",
-      "seconds",
-      "show",
-      "time"
-    ]
   },
   {
     "section": "muxType",
