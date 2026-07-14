@@ -182,6 +182,10 @@ Singleton {
     }
 
     onIsChargingChanged: {
+        // Reset average when switching states
+        _smoothedChangeRate = (_hasKnownChargingState && changeRate > 0) ? changeRate : 0;
+        _lastRateSampleTime = _smoothedChangeRate > 0 ? Date.now() : 0;
+
         if (isCharging) {
             _hasNotifiedLowBattery = false;
             _hasNotifiedCriticalBattery = false;
@@ -231,6 +235,38 @@ Singleton {
         const val = stateKnownBatteries.reduce((sum, b) => sum + b.changeRate, 0);
         _lastChangeRate = val;
         return val;
+    }
+
+    // A time-weighted exponential moving average based on the aggregated charge/discharge rate
+    property real _smoothedChangeRate: 0
+    property real _lastRateSampleTime: 0
+    readonly property real _rateSmoothingHalfLife: 90 // in seconds
+
+    function _updateSmoothedRate() {
+        if (!_hasKnownChargingState || changeRate <= 0)
+            return;
+
+        const now = Date.now();
+        if (_smoothedChangeRate <= 0 || _lastRateSampleTime <= 0) {
+            _smoothedChangeRate = changeRate;
+            _lastRateSampleTime = now;
+            return;
+        }
+
+        const dt = (now - _lastRateSampleTime) / 1000;
+        _lastRateSampleTime = now;
+        if (dt <= 0)
+            return;
+
+        const tau = _rateSmoothingHalfLife / Math.LN2;
+        const alpha = 1 - Math.exp(-dt / tau);
+        _smoothedChangeRate += alpha * (changeRate - _smoothedChangeRate);
+    }
+
+    onChangeRateChanged: _updateSmoothedRate()
+    onBatteryAvailableChanged: if (!batteryAvailable) {
+        _smoothedChangeRate = 0;
+        _lastRateSampleTime = 0;
     }
 
     // Aggregated battery health
@@ -341,8 +377,8 @@ Singleton {
             return "Unknown";
         }
 
-        let totalTime = 0;
-        totalTime = (isCharging) ? ((batteryCapacity - batteryEnergy) / changeRate) : (batteryEnergy / changeRate);
+        const rate = _smoothedChangeRate > 0 ? _smoothedChangeRate : changeRate;
+        const totalTime = (isCharging) ? ((batteryCapacity - batteryEnergy) / rate) : (batteryEnergy / rate);
         const avgTime = Math.abs(totalTime * 3600);
         if (!avgTime || avgTime <= 0 || avgTime > 86400)
             return "Unknown";
