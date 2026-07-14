@@ -8,7 +8,7 @@ Item {
 
     readonly property MprisPlayer activePlayer: MprisController.activePlayer
     readonly property bool isPlaying: activePlayer !== null && activePlayer.playbackState === MprisPlaybackState.Playing
-    readonly property bool live: visible && isPlaying
+    readonly property bool live: visible && (Window.window?.visible ?? false) && isPlaying
 
     width: 20
     height: Theme.iconSize

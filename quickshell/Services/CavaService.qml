@@ -39,6 +39,7 @@ framerate=25
 bars=6
 autosens=0
 sensitivity=30
+sleep_timer=3
 lower_cutoff_freq=50
 higher_cutoff_freq=12000
 
@@ -67,13 +68,18 @@ exec cava -p ${root._confPath} < /dev/null`]
         stdout: SplitParser {
             splitMarker: "\n"
             onRead: data => {
-                if (root.refCount > 0 && data.length > 0) {
-                    const parts = data.split(";");
-                    if (parts.length >= 6) {
-                        const points = [parseInt(parts[0], 10), parseInt(parts[1], 10), parseInt(parts[2], 10), parseInt(parts[3], 10), parseInt(parts[4], 10), parseInt(parts[5], 10)];
-                        root.values = points;
-                    }
-                }
+                if (root.refCount <= 0 || data.length === 0)
+                    return;
+
+                const parts = data.split(";");
+                if (parts.length < 6)
+                    return;
+
+                const points = [parseInt(parts[0], 10), parseInt(parts[1], 10), parseInt(parts[2], 10), parseInt(parts[3], 10), parseInt(parts[4], 10), parseInt(parts[5], 10)];
+                if (points.every((v, i) => v === root.values[i]))
+                    return;
+
+                root.values = points;
             }
         }
     }

@@ -45,7 +45,8 @@ Item {
     readonly property real blobMorphBoost: 1.7
     readonly property real blobSpinSpeed: 0.03
 
-    readonly property bool blobActive: CavaService.cavaAvailable && activePlayer?.playbackState === MprisPlaybackState.Playing && showAnimation && albumArtStatus === Image.Ready
+    readonly property bool onScreen: visible && (Window.window?.visible ?? false)
+    readonly property bool blobActive: CavaService.cavaAvailable && onScreen && activePlayer?.playbackState === MprisPlaybackState.Playing && showAnimation && albumArtStatus === Image.Ready
     property var smoothedBands: [0, 0, 0, 0, 0, 0]
     property var slowBands: [0, 0, 0, 0, 0, 0]
     property var bandTargets: [0, 0, 0, 0, 0, 0]
@@ -165,7 +166,7 @@ Item {
     }
 
     Loader {
-        active: activePlayer?.playbackState === MprisPlaybackState.Playing && showAnimation
+        active: root.onScreen && activePlayer?.playbackState === MprisPlaybackState.Playing && showAnimation
         sourceComponent: Component {
             Ref {
                 service: CavaService
@@ -183,7 +184,14 @@ Item {
 
     FrameAnimation {
         running: blobEffect.visible
-        onTriggered: root.stepBlob(Math.min(frameTime, 0.05))
+        property real pending: 0
+        onTriggered: {
+            pending += frameTime;
+            if (pending < 0.03)
+                return;
+            root.stepBlob(Math.min(pending, 0.05));
+            pending = 0;
+        }
     }
 
     ShaderEffect {
