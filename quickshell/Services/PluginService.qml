@@ -27,6 +27,8 @@ Singleton {
     property var knownManifests: ({})
     property var pathToPluginId: ({})
     property var pluginInstances: ({})
+    property var pluginDaemonInstances: ({})
+    property var _daemonSpawnQueue: []
     property var globalVars: ({})
     property var pluginLoadErrors: ({})
 
@@ -57,6 +59,16 @@ Singleton {
         interval: 150
         repeat: false
         onTriggered: root._flushDirtyStates()
+    }
+
+    // Zero-interval so daemons spawn on the next event-loop tick, after any
+    // deferred destroy() of a previous generation has fully unregistered its
+    // IpcHandlers (quickshell#898 leaves stale registrations otherwise)
+    Timer {
+        id: _daemonSpawnTimer
+        interval: 0
+        repeat: false
+        onTriggered: root._drainDaemonSpawnQueue()
     }
 
     Process {
@@ -368,14 +380,21 @@ Singleton {
         const newDaemons = Object.assign({}, pluginDaemonComponents);
         const newLaunchers = Object.assign({}, pluginLauncherComponents);
         const newInstances = Object.assign({}, pluginInstances);
+        const newDaemonInstances = Object.assign({}, pluginDaemonInstances);
 
         const prevInstance = newInstances[pluginId];
         if (prevInstance) {
             prevInstance.destroy();
             delete newInstances[pluginId];
         }
+        const prevDaemon = newDaemonInstances[pluginId];
+        if (prevDaemon) {
+            prevDaemon.destroy();
+            delete newDaemonInstances[pluginId];
+        }
 
         try {
+            const comps = {};
             for (const surface of surfaces) {
                 let url = "file://" + componentPaths[surface];
                 if (bustCache)
@@ -386,38 +405,39 @@ Singleton {
                     pluginLoadFailed(pluginId, comp.errorString());
                     return false;
                 }
-
-                switch (surface) {
-                case "daemon":
-                    newDaemons[pluginId] = comp;
-                    break;
-                case "desktop":
-                    newDesktop[pluginId] = comp;
-                    break;
-                case "launcher": {
-                    const instance = comp.createObject(root, {
-                        "pluginService": root
-                    });
-                    if (!instance) {
-                        log.error("failed to instantiate launcher surface:", pluginId, comp.errorString());
-                        pluginLoadFailed(pluginId, comp.errorString());
-                        return false;
-                    }
-                    newInstances[pluginId] = instance;
-                    newLaunchers[pluginId] = comp;
-                    break;
-                }
-                default:
-                    newWidgets[pluginId] = comp;
-                    break;
-                }
+                comps[surface] = comp;
             }
+
+            if (comps.launcher) {
+                const instance = comps.launcher.createObject(root, {
+                    "pluginService": root
+                });
+                if (!instance) {
+                    log.error("failed to instantiate launcher surface:", pluginId, comps.launcher.errorString());
+                    pluginLoadFailed(pluginId, comps.launcher.errorString());
+                    return false;
+                }
+                newInstances[pluginId] = instance;
+                newLaunchers[pluginId] = comps.launcher;
+            }
+
+            if (comps.daemon) {
+                newDaemons[pluginId] = comps.daemon;
+                _daemonSpawnQueue.push(pluginId);
+                _daemonSpawnTimer.restart();
+            }
+
+            if (comps.widget)
+                newWidgets[pluginId] = comps.widget;
+            if (comps.desktop)
+                newDesktop[pluginId] = comps.desktop;
 
             pluginWidgetComponents = newWidgets;
             pluginDesktopComponents = newDesktop;
             pluginDaemonComponents = newDaemons;
             pluginLauncherComponents = newLaunchers;
             pluginInstances = newInstances;
+            pluginDaemonInstances = newDaemonInstances;
 
             plugin.loaded = true;
             const newLoaded = Object.assign({}, loadedPlugins);
@@ -431,6 +451,36 @@ Singleton {
             pluginLoadFailed(pluginId, e.message);
             return false;
         }
+    }
+
+    function _createDaemonInstance(pluginId, comp) {
+        const instance = comp.createObject(root, {
+            "pluginId": pluginId,
+            "pluginService": root
+        });
+        if (!instance) {
+            log.error("failed to instantiate daemon surface:", pluginId, comp.errorString());
+            return null;
+        }
+        if (instance.popoutService !== undefined)
+            instance.popoutService = PopoutService;
+        log.info("Daemon plugin loaded:", pluginId);
+        return instance;
+    }
+
+    function _drainDaemonSpawnQueue() {
+        const queue = _daemonSpawnQueue;
+        _daemonSpawnQueue = [];
+        const newDaemonInstances = Object.assign({}, pluginDaemonInstances);
+        for (const pluginId of queue) {
+            const comp = pluginDaemonComponents[pluginId];
+            if (!comp || !isPluginLoaded(pluginId) || newDaemonInstances[pluginId])
+                continue;
+            const daemon = _createDaemonInstance(pluginId, comp);
+            if (daemon)
+                newDaemonInstances[pluginId] = daemon;
+        }
+        pluginDaemonInstances = newDaemonInstances;
     }
 
     function unloadPlugin(pluginId) {
@@ -447,6 +497,14 @@ Singleton {
                 const newInstances = Object.assign({}, pluginInstances);
                 delete newInstances[pluginId];
                 pluginInstances = newInstances;
+            }
+
+            const daemonInstance = pluginDaemonInstances[pluginId];
+            if (daemonInstance) {
+                daemonInstance.destroy();
+                const newDaemonInstances = Object.assign({}, pluginDaemonInstances);
+                delete newDaemonInstances[pluginId];
+                pluginDaemonInstances = newDaemonInstances;
             }
 
             if (pluginDaemonComponents[pluginId]) {
@@ -757,30 +815,11 @@ Singleton {
     }
 
     function togglePlugin(pluginId) {
-        let instance = pluginInstances[pluginId];
-
-        // Lazy instantiate daemon plugins on first toggle
-        // This respects the daemon lifecycle (not instantiated on load)
-        // while supporting toggle functionality for slideout-capable daemons
-        if (!instance && pluginDaemonComponents[pluginId]) {
-            const comp = pluginDaemonComponents[pluginId];
-            const newInstance = comp.createObject(root, {
-                "pluginId": pluginId,
-                "pluginService": root
-            });
-            if (newInstance) {
-                const newInstances = Object.assign({}, pluginInstances);
-                newInstances[pluginId] = newInstance;
-                pluginInstances = newInstances;
-                instance = newInstance;
-            }
-        }
-
-        if (instance && typeof instance.toggle === "function") {
-            instance.toggle();
-            return true;
-        }
-        return false;
+        const instance = pluginInstances[pluginId] || pluginDaemonInstances[pluginId];
+        if (!instance || typeof instance.toggle !== "function")
+            return false;
+        instance.toggle();
+        return true;
     }
 
     function savePluginData(pluginId, key, value) {

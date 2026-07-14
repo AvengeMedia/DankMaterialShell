@@ -41,29 +41,6 @@ Item {
         osdSurfaceReloadTimer.restart();
     }
 
-    Instantiator {
-        id: daemonPluginInstantiator
-        asynchronous: true
-        model: Object.keys(PluginService.pluginDaemonComponents)
-
-        delegate: Loader {
-            id: daemonLoader
-            property string pluginId: modelData
-            sourceComponent: PluginService.pluginDaemonComponents[pluginId]
-
-            onLoaded: {
-                if (item) {
-                    item.pluginService = PluginService;
-                    if (item.popoutService !== undefined) {
-                        item.popoutService = PopoutService;
-                    }
-                    item.pluginId = pluginId;
-                    log.info("Daemon plugin loaded:", pluginId);
-                }
-            }
-        }
-    }
-
     Loader {
         id: blurredWallpaperBackgroundLoader
         active: SettingsData.blurredWallpaperLayer && CompositorService.isNiri
