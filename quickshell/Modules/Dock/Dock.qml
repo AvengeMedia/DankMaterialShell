@@ -693,6 +693,7 @@ Variants {
                     Item {
                         id: dockBackground
                         objectName: "dockBackground"
+                        visible: dock.hasApps
                         anchors {
                             top: !dock.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Top ? parent.top : undefined) : undefined
                             bottom: !dock.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Bottom ? parent.bottom : undefined) : undefined
@@ -747,7 +748,7 @@ Variants {
 
                     Item {
                         id: dockConnectedChrome
-                        visible: Theme.isConnectedEffect && dock.reveal && !FrameTransitionState.effectiveConnectedFrameModeActive
+                        visible: Theme.isConnectedEffect && dock.reveal && dock.hasApps && !FrameTransitionState.effectiveConnectedFrameModeActive
                         readonly property real extraLeft: dock.isVertical ? 0 : Theme.connectedCornerRadius
                         readonly property real extraTop: dock.isVertical ? Theme.connectedCornerRadius : 0
                         readonly property real bodyRadius: dock.surfaceRadius
