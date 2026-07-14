@@ -342,6 +342,7 @@ BasePill {
 
                             StyledText {
                                 id: mediaText
+                                readonly property bool onScreen: Window.window?.visible ?? false
                                 property bool needsScrolling: implicitWidth > textContainer.width && SettingsData.scrollTitleEnabled
                                 property real scrollOffset: 0
                                 property real textShift: 0
@@ -351,20 +352,20 @@ BasePill {
                                 font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                                 color: Theme.widgetTextColor
                                 wrapMode: Text.NoWrap
-                                x: (needsScrolling ? -scrollOffset : 0) + textShift
+                                x: Math.round((needsScrolling ? -scrollOffset : 0) + textShift)
                                 opacity: 1
 
                                 onTextChanged: {
                                     scrollOffset = 0;
                                     textShift = 0;
-                                    scrollAnimation.restart();
                                     textChangeAnimation.restart();
                                 }
 
                                 SequentialAnimation {
                                     id: scrollAnimation
-                                    running: mediaText.needsScrolling && textContainer.visible
+                                    running: mediaText.needsScrolling && textContainer.visible && mediaText.onScreen && root._isPlaying
                                     loops: Animation.Infinite
+                                    onStopped: mediaText.scrollOffset = 0
 
                                     PauseAnimation {
                                         duration: 2000

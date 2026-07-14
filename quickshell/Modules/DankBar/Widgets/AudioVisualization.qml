@@ -50,10 +50,15 @@ Item {
                 return;
             const n = i => {
                 const x = v[i];
-                return x <= 0 ? 0 : x >= 100 ? 1 : Math.sqrt(x * 0.01);
+                const level = x <= 0 ? 0 : x >= 100 ? 1 : Math.sqrt(x * 0.01);
+                return Math.round(level * 32) / 32;
             };
-            bars.bandsA = Qt.vector4d(n(0), n(1), n(2), n(3));
-            bars.bandsB = Qt.vector2d(n(4), n(5));
+            const a = Qt.vector4d(n(0), n(1), n(2), n(3));
+            const b = Qt.vector2d(n(4), n(5));
+            if (a == bars.bandsA && b == bars.bandsB)
+                return;
+            bars.bandsA = a;
+            bars.bandsB = b;
         }
     }
 
