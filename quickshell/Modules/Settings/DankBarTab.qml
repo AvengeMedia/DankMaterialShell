@@ -770,13 +770,17 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    settingKey: "barOpenOnOverview"
+                    tags: ["bar", "overview", "niri", "show", "frame"]
                     visible: CompositorService.isNiri
-                    enabled: !SettingsData.frameEnabled
-                    opacity: SettingsData.frameEnabled ? 0.5 : 1.0
                     text: I18n.tr("Show on Overview")
-                    description: I18n.tr("Show the bar when niri overview is active")
-                    checked: selectedBarConfig?.openOnOverview ?? false
+                    description: SettingsData.frameEnabled ? I18n.tr("Show during Niri overview") : I18n.tr("Show the bar when niri overview is active")
+                    checked: SettingsData.frameEnabled ? SettingsData.frameShowOnOverview : (selectedBarConfig?.openOnOverview ?? false)
                     onToggled: toggled => {
+                        if (SettingsData.frameEnabled) {
+                            SettingsData.set("frameShowOnOverview", toggled);
+                            return;
+                        }
                         SettingsData.updateBarConfig(selectedBarId, {
                             openOnOverview: toggled
                         });

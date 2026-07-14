@@ -825,6 +825,26 @@
     "icon": "tune"
   },
   {
+    "section": "barOpenOnOverview",
+    "label": "Show on Overview",
+    "tabIndex": 3,
+    "category": "Dank Bar",
+    "keywords": [
+      "bar",
+      "dank",
+      "during",
+      "frame",
+      "niri",
+      "overview",
+      "panel",
+      "show",
+      "statusbar",
+      "topbar"
+    ],
+    "description": "Show during Niri overview",
+    "conditionKey": "isNiri"
+  },
+  {
     "section": "barUseOverlayLayer",
     "label": "Use Overlay Layer",
     "tabIndex": 3,
@@ -856,12 +876,12 @@
       "away",
       "bar",
       "dank",
-      "fullscreen",
+      "frame",
       "hidden",
       "hide",
-      "layer",
       "moves",
-      "overlay",
+      "niri",
+      "overview",
       "panel",
       "pointer",
       "show",
