@@ -131,6 +131,60 @@ Singleton {
         }
     }
 
+    // mango closes the connection after each non-watch command; queued
+    // dispatches drain one per reconnect cycle.
+    DankSocket {
+        id: dispatchSocket
+        path: root.socketPath
+        connected: root.available
+        reconnectBaseMs: 25
+
+        onConnectionStateChanged: {
+            if (linkUp) {
+                root._dispatchConnectionUsed = false;
+                root._flushDispatch();
+                return;
+            }
+            const entry = root._dispatchInFlight;
+            root._dispatchInFlight = null;
+            if (entry?.callback)
+                entry.callback("");
+        }
+
+        parser: SplitParser {
+            onRead: line => root._onDispatchReply(line)
+        }
+    }
+
+    property var _dispatchQueue: []
+    property var _dispatchInFlight: null
+    property bool _dispatchConnectionUsed: false
+
+    function dispatch(command, callback) {
+        if (!root.available)
+            return;
+        _dispatchQueue.push({
+            "command": command,
+            "callback": callback ?? null
+        });
+        _flushDispatch();
+    }
+
+    function _flushDispatch() {
+        if (_dispatchInFlight || _dispatchConnectionUsed || _dispatchQueue.length === 0 || !dispatchSocket.linkUp)
+            return;
+        _dispatchConnectionUsed = true;
+        _dispatchInFlight = _dispatchQueue.shift();
+        dispatchSocket.send("dispatch " + _dispatchInFlight.command);
+    }
+
+    function _onDispatchReply(line) {
+        const entry = _dispatchInFlight;
+        _dispatchInFlight = null;
+        if (entry?.callback)
+            entry.callback(line);
+    }
+
     function _handleMonitors(line) {
         if (!line || !line.trim())
             return;
@@ -398,7 +452,7 @@ Singleton {
         return _matchAndEnrich(toplevels, clients);
     }
 
-    // ── Commands (mango verb IPC: mmsg dispatch <func>,<args>) ─────────────
+    // ── Commands (mango verb IPC: dispatch <func>,<args> over the socket) ──
 
     function suppressWatchedConfigReloads(ms) {
         root._ignoreWatchedReloadUntil = Math.max(root._ignoreWatchedReloadUntil, Date.now() + (ms || 1500));
@@ -423,11 +477,15 @@ Singleton {
         const shouldSuppressWatch = suppressWatch !== false;
         if (shouldSuppressWatch)
             suppressWatchedConfigReloads(1500);
-        Proc.runCommand("mango-reload", ["mmsg", "dispatch", "reload_config"], (output, exitCode) => {
-            if (exitCode !== 0) {
-                log.warn("mmsg reload_config failed:", output);
+        dispatch("reload_config", line => {
+            let ok = false;
+            try {
+                ok = JSON.parse(line).success === true;
+            } catch (e) {}
+            if (!ok) {
+                log.warn("reload_config dispatch failed:", line);
                 if (shouldShowToast)
-                    ToastService.showError(I18n.tr("mango: failed to reload config"), output || "", "", "mango-config");
+                    ToastService.showError(I18n.tr("mango: failed to reload config"), line || "", "", "mango-config");
                 return;
             }
             if (shouldShowToast)
@@ -436,17 +494,17 @@ Singleton {
     }
 
     function quit() {
-        Quickshell.execDetached(["mmsg", "dispatch", "quit"]);
+        dispatch("quit");
     }
 
     // mango tag dispatches act on the focused monitor; tagIndex is 0-based
     // (dwl model), mango `view`/`toggleview` take a 1-based tag number.
     function switchToTag(outputName, tagIndex) {
-        Quickshell.execDetached(["mmsg", "dispatch", "view," + (tagIndex + 1)]);
+        dispatch("view," + (tagIndex + 1));
     }
 
     function toggleTag(outputName, tagIndex) {
-        Quickshell.execDetached(["mmsg", "dispatch", "toggleview," + (tagIndex + 1)]);
+        dispatch("toggleview," + (tagIndex + 1));
     }
 
     // mango's tiling layouts are a fixed compiled-in set the IPC doesn't expose,
@@ -458,18 +516,18 @@ Singleton {
     function setLayout(outputName, index) {
         const name = _layoutNames[index];
         if (name)
-            Quickshell.execDetached(["mmsg", "dispatch", "setlayout," + name]);
+            dispatch("setlayout," + name);
     }
 
     function cycleKeyboardLayout() {
-        Quickshell.execDetached(["mmsg", "dispatch", "switch_keyboard_layout"]);
+        dispatch("switch_keyboard_layout");
     }
 
     function powerOffMonitors() {
         const screens = Quickshell.screens || [];
         for (let i = 0; i < screens.length; i++) {
             if (screens[i] && screens[i].name)
-                Quickshell.execDetached(["mmsg", "dispatch", "sleep_monitor," + screens[i].name]);
+                dispatch("sleep_monitor," + screens[i].name);
         }
     }
 
@@ -477,7 +535,7 @@ Singleton {
         const screens = Quickshell.screens || [];
         for (let i = 0; i < screens.length; i++) {
             if (screens[i] && screens[i].name)
-                Quickshell.execDetached(["mmsg", "dispatch", "wakeup_monitor," + screens[i].name]);
+                dispatch("wakeup_monitor," + screens[i].name);
         }
     }
 
@@ -573,6 +631,7 @@ Singleton {
 
         const content = lines.join("\n");
 
+        suppressWatchedConfigReloads(1500);
         Proc.runCommand("mango-write-outputs", ["sh", "-c", `mkdir -p "${mangoDmsDir}" && cat > "${outputsPath}" << 'EOF'\n${content}EOF`], (output, exitCode) => {
             if (exitCode !== 0) {
                 log.warn("Failed to write outputs config:", output);
@@ -582,7 +641,7 @@ Singleton {
             }
             log.info("Generated outputs config at", outputsPath);
             if (CompositorService.isMango)
-                reloadConfig();
+                reloadConfig(false);
             if (callback)
                 callback(true);
         });
@@ -615,13 +674,14 @@ gappoh=${gapsOut}
 gappov=${gapsOut}
 `;
 
+        suppressWatchedConfigReloads(1500);
         Proc.runCommand("mango-write-layout", ["sh", "-c", `mkdir -p "${mangoDmsDir}" && cat > "${layoutPath}" << 'EOF'\n${content}EOF`], (output, exitCode) => {
             if (exitCode !== 0) {
                 log.warn("Failed to write layout config:", output);
                 return;
             }
             log.info("Generated layout config at", layoutPath);
-            reloadConfig();
+            reloadConfig(false);
         });
     }
 
@@ -631,6 +691,7 @@ gappov=${gapsOut}
 
         const settings = typeof SettingsData !== "undefined" ? SettingsData.cursorSettings : null;
         if (!settings) {
+            suppressWatchedConfigReloads(1500);
             Proc.runCommand("mango-write-cursor", ["sh", "-c", `mkdir -p "${mangoDmsDir}" && : > "${cursorPath}"`], (output, exitCode) => {
                 if (exitCode !== 0)
                     log.warn("Failed to write cursor config:", output);
@@ -655,13 +716,14 @@ cursor_size=${size}`;
 
         content += `\n`;
 
+        suppressWatchedConfigReloads(1500);
         Proc.runCommand("mango-write-cursor", ["sh", "-c", `mkdir -p "${mangoDmsDir}" && cat > "${cursorPath}" << 'EOF'\n${content}EOF`], (output, exitCode) => {
             if (exitCode !== 0) {
                 log.warn("Failed to write cursor config:", output);
                 return;
             }
             log.info("Generated cursor config at", cursorPath);
-            reloadConfig();
+            reloadConfig(false);
         });
     }
 }

@@ -53,6 +53,7 @@ Singleton {
         running: true
         repeat: false
         onTriggered: {
+            detectUwsmProcess.running = true;
             detectElogindProcess.running = true;
             detectLoginctlProcess.running = true;
             detectSystemctlProcess.running = true;
@@ -73,7 +74,7 @@ Singleton {
     Process {
         id: detectUwsmProcess
         running: false
-        command: ["sh", "-c", "command -v uwsm"]
+        command: ["sh", "-c", "command -v uwsm > /dev/null 2>&1 && systemctl --user is-active --quiet 'wayland-wm@*.service' 2> /dev/null"]
 
         onExited: function (exitCode) {
             hasUwsm = (exitCode === 0);
