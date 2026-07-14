@@ -94,27 +94,36 @@ Item {
         }
     }
 
+    // Derives everything from a local snapshot of imagePath: sibling property
+    // bindings (isRemoteUrl, encodedImagePath, ...) are still stale when
+    // onImagePathChanged runs, so reading them here routes remote URLs down
+    // the local-file branch on the first path change
     function resolveSource() {
-        if (!imagePath) {
+        const path = imagePath;
+        if (!path) {
             _fromCache = false;
             staticImg.source = "";
             return;
         }
-        if (isAnimated)
+        const lower = path.toLowerCase();
+        if (animate && (lower.endsWith(".gif") || lower.endsWith(".webp")))
             return;
-        if (isRemoteUrl) {
+        if (path.startsWith("http://") || path.startsWith("https://")) {
             _fromCache = false;
-            staticImg.source = imagePath;
+            staticImg.source = path;
             return;
         }
-        if (!cachePath) {
+        const stripped = path.startsWith("file://") ? path.substring(7) : path;
+        const encoded = "file://" + stripped.split('/').map(s => encodeURIComponent(s)).join('/');
+        const hash = djb2Hash(stripped);
+        if (!hash) {
             _fromCache = false;
-            staticImg.source = encodedImagePath;
+            staticImg.source = encoded;
             return;
         }
         // Cache-first; a miss errors and falls back to encodedImagePath
         _fromCache = true;
-        staticImg.source = cachePath;
+        staticImg.source = `${Paths.stringify(Paths.imagecache)}/${hash}@${maxCacheSize}x${maxCacheSize}.png`;
     }
 
     onImagePathChanged: resolveSource()

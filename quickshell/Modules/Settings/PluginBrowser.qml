@@ -1,7 +1,7 @@
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
+import Quickshell.Widgets
 import qs.Common
 import qs.Modals.Common
 import qs.Services
@@ -24,9 +24,10 @@ FloatingWindow {
     property string categoryFilter: "all"
     property var categoryFilterOptions: []
     property var availableLetters: []
-    property string expandedPluginId: ""
-    property string enlargedPreviewPluginId: ""
+    property string detailPluginId: ""
 
+    readonly property string previewApiBase: "https://api.danklinux.com/previews/"
+    readonly property var detailPlugin: resolveDetailPlugin(detailPluginId, allPlugins)
     readonly property bool activeCategorySort: normalizedSortMode(SessionData.pluginBrowserSortMode) === "category"
     readonly property bool showCategoryFilters: activeCategorySort && categoryFilterOptions.length > 1
     readonly property bool showLetterIndex: {
@@ -98,16 +99,33 @@ FloatingWindow {
         return (plugin.status || []).indexOf("reviewed") !== -1;
     }
 
-    function statusColor(status) {
+    function statusTone(status) {
         switch (status) {
         case "broken":
-            return Theme.error;
+            return "error";
         case "unmaintained":
-            return Theme.warning;
+            return "warning";
         case "reviewed":
-            return Theme.info;
+            return "info";
         default:
+            return "outline";
+        }
+    }
+
+    function badgeTone(tone) {
+        switch (tone) {
+        case "secondary":
+            return Theme.secondary;
+        case "warning":
+            return Theme.warning;
+        case "error":
+            return Theme.error;
+        case "info":
+            return Theme.info;
+        case "outline":
             return Theme.outline;
+        default:
+            return Theme.primary;
         }
     }
 
@@ -126,23 +144,76 @@ FloatingWindow {
         }
     }
 
-    function relatedNames(plugin) {
+    function badgeModel(plugin) {
+        if (!plugin || (!plugin.id && !plugin.name))
+            return [];
+        var badges = [];
+        if (plugin.featured)
+            badges.push({
+                label: I18n.tr("featured"),
+                icon: "star",
+                tone: "secondary"
+            });
+        if (plugin.firstParty)
+            badges.push({
+                label: I18n.tr("official"),
+                icon: "verified",
+                tone: "primary"
+            });
+        else
+            badges.push({
+                label: I18n.tr("3rd party"),
+                icon: "",
+                tone: "warning"
+            });
+        var status = plugin.status || [];
+        for (var i = 0; i < status.length; i++)
+            badges.push({
+                label: statusLabel(status[i]),
+                icon: "",
+                tone: statusTone(status[i])
+            });
+        return badges;
+    }
+
+    function previewUrl(plugin) {
+        if (!plugin)
+            return "";
+        if (plugin.previewUrl)
+            return plugin.previewUrl;
+        if (plugin.id)
+            return previewApiBase + plugin.id;
+        return plugin.screenshot || "";
+    }
+
+    function heroUrl(plugin) {
+        if (!plugin)
+            return "";
+        return plugin.screenshot || previewUrl(plugin);
+    }
+
+    function relatedPlugins(plugin) {
         if (!plugin || !plugin.similar || plugin.similar.length === 0)
             return [];
 
-        var names = [];
+        var related = [];
         for (var i = 0; i < plugin.similar.length; i++) {
             var id = plugin.similar[i];
+            var key = "";
             var name = id;
             for (var j = 0; j < allPlugins.length; j++) {
-                if (allPlugins[j].id === id) {
-                    name = allPlugins[j].name || id;
-                    break;
-                }
+                if (allPlugins[j].id !== id)
+                    continue;
+                key = detailKeyFor(allPlugins[j]);
+                name = allPlugins[j].name || id;
+                break;
             }
-            names.push(name);
+            related.push({
+                key: key,
+                name: name
+            });
         }
-        return names;
+        return related;
     }
 
     function comparePluginAuthor(a, b) {
@@ -252,14 +323,13 @@ FloatingWindow {
     }
 
     function refreshListLayout() {
-        if (!pluginBrowserList)
+        if (!pluginGrid)
             return;
-        pluginBrowserList.savedY = 0;
-        pluginBrowserList.cancelFlick();
-        pluginBrowserList.contentY = 0;
+        pluginGrid.cancelFlick();
+        pluginGrid.contentY = 0;
         Qt.callLater(() => {
-            if (pluginBrowserList)
-                pluginBrowserList.forceLayout();
+            if (pluginGrid)
+                pluginGrid.forceLayout();
         });
     }
 
@@ -268,17 +338,13 @@ FloatingWindow {
         for (var i = 0; i < filteredPlugins.length; i++) {
             var key = sortKeyForPlugin(filteredPlugins[i], mode);
             if (key && key.charAt(0).toUpperCase() === letter) {
-                pluginBrowserList.positionViewAtIndex(i, ListView.Beginning);
-                pluginBrowserList.savedY = pluginBrowserList.contentY;
+                pluginGrid.positionViewAtIndex(i, GridView.Beginning);
                 return;
             }
         }
     }
 
     function updateFilteredPlugins() {
-        expandedPluginId = "";
-        enlargedPreviewPluginId = "";
-
         var baseFiltered = [];
         var query = searchQuery ? searchQuery.toLowerCase() : "";
 
@@ -364,49 +430,102 @@ FloatingWindow {
         refreshListLayout();
     }
 
-    function pluginKey(plugin, fallbackIndex) {
+    function detailKeyFor(plugin) {
         if (!plugin)
-            return "plugin-" + fallbackIndex;
-        return plugin.id || plugin.name || ("plugin-" + fallbackIndex);
+            return "";
+        return plugin.id || plugin.name || "";
     }
 
-    function toggleExpandedPlugin(pluginId) {
-        if (expandedPluginId === pluginId) {
-            expandedPluginId = "";
-            enlargedPreviewPluginId = "";
-        } else {
-            expandedPluginId = pluginId;
-            enlargedPreviewPluginId = "";
+    function resolveDetailPlugin(key, plugins) {
+        if (!key)
+            return null;
+        for (var i = 0; i < plugins.length; i++) {
+            if (detailKeyFor(plugins[i]) === key)
+                return plugins[i];
         }
-        keyboardNavigationActive = false;
-        Qt.callLater(() => {
-            if (pluginBrowserList)
-                pluginBrowserList.forceLayout();
-        });
+        return null;
     }
 
-    function toggleEnlargedPreview(pluginId) {
-        enlargedPreviewPluginId = enlargedPreviewPluginId === pluginId ? "" : pluginId;
-        Qt.callLater(() => {
-            if (pluginBrowserList)
-                pluginBrowserList.forceLayout();
-        });
+    function openPluginDetail(plugin) {
+        var key = detailKeyFor(plugin);
+        if (!key)
+            return;
+        detailPluginId = key;
+    }
+
+    function closePluginDetail() {
+        detailPluginId = "";
+    }
+
+    function formatUpdatedDate(iso) {
+        if (!iso)
+            return "";
+        var date = new Date(iso);
+        if (isNaN(date.getTime()))
+            return "";
+        return date.toLocaleDateString(Qt.locale(), Locale.ShortFormat);
+    }
+
+    function detailMetaBadges(plugin) {
+        if (!plugin)
+            return [];
+        var items = [];
+        if (plugin.version)
+            items.push({
+                label: "v" + plugin.version,
+                icon: "sell"
+            });
+        if (plugin.category)
+            items.push({
+                label: formatCategoryLabel((plugin.category || "").toLowerCase()),
+                icon: "category"
+            });
+        var updated = formatUpdatedDate(plugin.updated_at);
+        if (updated)
+            items.push({
+                label: updated,
+                icon: "history"
+            });
+        return items;
+    }
+
+    function ensureSelectedVisible() {
+        if (selectedIndex < 0 || !pluginGrid)
+            return;
+        pluginGrid.positionViewAtIndex(selectedIndex, GridView.Contain);
     }
 
     function selectNext() {
-        if (filteredPlugins.length === 0)
+        if (detailPluginId !== "" || filteredPlugins.length === 0)
             return;
-        keyboardNavigationActive = true;
-        selectedIndex = Math.min(selectedIndex + 1, filteredPlugins.length - 1);
+        if (!keyboardNavigationActive) {
+            keyboardNavigationActive = true;
+            selectedIndex = 0;
+            ensureSelectedVisible();
+            return;
+        }
+        selectedIndex = Math.min(selectedIndex + pluginGrid.columns, filteredPlugins.length - 1);
+        ensureSelectedVisible();
     }
 
     function selectPrevious() {
-        if (filteredPlugins.length === 0)
+        if (detailPluginId !== "" || filteredPlugins.length === 0 || !keyboardNavigationActive)
             return;
-        keyboardNavigationActive = true;
-        selectedIndex = Math.max(selectedIndex - 1, -1);
-        if (selectedIndex === -1)
+        var next = selectedIndex - pluginGrid.columns;
+        if (next < 0) {
+            selectedIndex = -1;
             keyboardNavigationActive = false;
+            return;
+        }
+        selectedIndex = next;
+        ensureSelectedVisible();
+    }
+
+    function selectStep(delta) {
+        if (detailPluginId !== "" || filteredPlugins.length === 0 || !keyboardNavigationActive)
+            return;
+        selectedIndex = Math.max(0, Math.min(selectedIndex + delta, filteredPlugins.length - 1));
+        ensureSelectedVisible();
     }
 
     function installPlugin(pluginName, enableAfterInstall) {
@@ -476,9 +595,19 @@ FloatingWindow {
 
     objectName: "pluginBrowser"
     title: I18n.tr("Browse Plugins", "plugin browser window title")
-    minimumSize: Qt.size(450, 400)
-    implicitWidth: 600
-    implicitHeight: 650
+    minimumSize: Qt.size(520, 460)
+    implicitWidth: {
+        const maxWidth = screen ? screen.width - 120 : 1500;
+        if (parentModal && parentModal.width > 0)
+            return Math.round(Math.min(maxWidth, Math.max(640, parentModal.width * 0.8)));
+        return Math.min(maxWidth, 900);
+    }
+    implicitHeight: {
+        const maxHeight = screen ? screen.height - 80 : 960;
+        if (parentModal && parentModal.height > 0)
+            return Math.round(Math.min(maxHeight, Math.max(540, parentModal.height * 0.8)));
+        return Math.min(maxHeight, 760);
+    }
     color: Theme.surfaceContainer
     visible: false
 
@@ -500,8 +629,7 @@ FloatingWindow {
         selectedIndex = -1;
         keyboardNavigationActive = false;
         isLoading = false;
-        expandedPluginId = "";
-        enlargedPreviewPluginId = "";
+        detailPluginId = "";
     }
 
     Connections {
@@ -546,6 +674,11 @@ FloatingWindow {
         Keys.onPressed: event => {
             switch (event.key) {
             case Qt.Key_Escape:
+                if (root.detailPluginId !== "") {
+                    root.closePluginDetail();
+                    event.accepted = true;
+                    return;
+                }
                 root.hide();
                 event.accepted = true;
                 return;
@@ -555,6 +688,25 @@ FloatingWindow {
                 return;
             case Qt.Key_Up:
                 root.selectPrevious();
+                event.accepted = true;
+                return;
+            case Qt.Key_Left:
+                if (!root.keyboardNavigationActive)
+                    return;
+                root.selectStep(-1);
+                event.accepted = true;
+                return;
+            case Qt.Key_Right:
+                if (!root.keyboardNavigationActive)
+                    return;
+                root.selectStep(1);
+                event.accepted = true;
+                return;
+            case Qt.Key_Return:
+            case Qt.Key_Enter:
+                if (root.detailPluginId !== "" || !root.keyboardNavigationActive || root.selectedIndex < 0)
+                    return;
+                root.openPluginDetail(root.filteredPlugins[root.selectedIndex]);
                 event.accepted = true;
                 return;
             }
@@ -570,7 +722,7 @@ FloatingWindow {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.top: parent.top
-                height: Math.max(headerIcon.height, headerText.height, refreshButton.height, closeButton.height)
+                height: 44
 
                 MouseArea {
                     anchors.fill: parent
@@ -578,36 +730,67 @@ FloatingWindow {
                     onDoubleClicked: windowControls.tryToggleMaximize()
                 }
 
-                DankIcon {
-                    id: headerIcon
-                    name: "store"
-                    size: Theme.iconSize
-                    color: Theme.primary
+                Rectangle {
+                    id: headerIconTile
+                    width: 40
+                    height: 40
+                    radius: Theme.cornerRadius
+                    color: Theme.withAlpha(Theme.primary, 0.12)
                     anchors.left: parent.left
                     anchors.verticalCenter: parent.verticalCenter
+
+                    DankIcon {
+                        anchors.centerIn: parent
+                        name: "store"
+                        size: Theme.iconSize
+                        color: Theme.primary
+                    }
                 }
 
-                StyledText {
-                    id: headerText
-                    text: I18n.tr("Browse Plugins", "plugin browser header")
-                    font.pixelSize: Theme.fontSizeLarge
-                    font.weight: Font.Medium
-                    color: Theme.surfaceText
-                    anchors.left: headerIcon.right
+                Column {
+                    anchors.left: headerIconTile.right
                     anchors.leftMargin: Theme.spacingM
+                    anchors.right: headerActions.left
+                    anchors.rightMargin: Theme.spacingM
                     anchors.verticalCenter: parent.verticalCenter
+                    spacing: 2
+
+                    StyledText {
+                        text: I18n.tr("Browse Plugins", "plugin browser header")
+                        font.pixelSize: Theme.fontSizeLarge
+                        font.weight: Font.Medium
+                        color: Theme.surfaceText
+                        elide: Text.ElideRight
+                        maximumLineCount: 1
+                        width: parent.width
+                    }
+
+                    StyledText {
+                        text: {
+                            const description = I18n.tr("Install plugins from the DMS plugin registry", "plugin browser description");
+                            if (root.isLoading || root.allPlugins.length === 0)
+                                return description;
+                            return description + "  •  " + root.filteredPlugins.length + "/" + root.allPlugins.length;
+                        }
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.outline
+                        elide: Text.ElideRight
+                        maximumLineCount: 1
+                        width: parent.width
+                    }
                 }
 
                 Row {
+                    id: headerActions
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
                     spacing: Theme.spacingXS
 
                     DankButton {
-                        id: thirdPartyButton
                         text: SessionData.showThirdPartyPlugins ? I18n.tr("Hide 3rd Party") : I18n.tr("Show 3rd Party")
                         iconName: SessionData.showThirdPartyPlugins ? "visibility_off" : "visibility"
                         height: 28
+                        anchors.verticalCenter: parent.verticalCenter
                         onClicked: {
                             if (SessionData.showThirdPartyPlugins) {
                                 SessionData.setShowThirdPartyPlugins(false);
@@ -621,11 +804,11 @@ FloatingWindow {
                     }
 
                     DankActionButton {
-                        id: refreshButton
                         iconName: "refresh"
                         iconSize: 18
                         iconColor: Theme.primary
                         visible: !root.isLoading
+                        anchors.verticalCenter: parent.verticalCenter
                         onClicked: root.refreshPlugins()
                     }
 
@@ -634,36 +817,25 @@ FloatingWindow {
                         iconName: root.maximized ? "fullscreen_exit" : "fullscreen"
                         iconSize: Theme.iconSize - 2
                         iconColor: Theme.outline
+                        anchors.verticalCenter: parent.verticalCenter
                         onClicked: windowControls.tryToggleMaximize()
                     }
 
                     DankActionButton {
-                        id: closeButton
                         iconName: "close"
                         iconSize: Theme.iconSize - 2
                         iconColor: Theme.outline
+                        anchors.verticalCenter: parent.verticalCenter
                         onClicked: root.hide()
                     }
                 }
-            }
-
-            StyledText {
-                id: descriptionText
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: headerArea.bottom
-                anchors.topMargin: Theme.spacingM
-                text: I18n.tr("Install plugins from the DMS plugin registry", "plugin browser description")
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.outline
-                wrapMode: Text.WordWrap
             }
 
             DankTextField {
                 id: browserSearchField
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.top: descriptionText.bottom
+                anchors.top: headerArea.bottom
                 anchors.topMargin: Theme.spacingM
                 height: 48
                 cornerRadius: Theme.cornerRadius
@@ -688,112 +860,102 @@ FloatingWindow {
                 }
             }
 
-            Item {
+            Flow {
                 id: sortControlsRow
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.top: browserSearchField.bottom
                 anchors.topMargin: Theme.spacingM
-                height: sortControlsLayout.implicitHeight
+                spacing: Theme.spacingS
 
-                RowLayout {
-                    id: sortControlsLayout
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    spacing: Theme.spacingS
+                Repeater {
+                    model: root.sortChipOptions
 
-                    Repeater {
-                        model: root.sortChipOptions
+                    Rectangle {
+                        id: sortChip
+                        required property var modelData
+
+                        property bool selected: root.isSortChipSelected(modelData.id, modelData.toggle)
+                        property bool hovered: chipMouseArea.containsMouse
+                        property bool pressed: chipMouseArea.pressed
+
+                        width: chipContent.implicitWidth + Theme.spacingM * 2
+                        height: 32
+                        radius: height / 2
+                        color: selected ? Theme.primary : Theme.surfaceVariant
+
+                        Behavior on color {
+                            ColorAnimation {
+                                duration: Theme.shortDuration
+                                easing.type: Theme.standardEasing
+                            }
+                        }
 
                         Rectangle {
-                            id: sortChip
-                            required property var modelData
-                            required property int index
-
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 32
-                            Layout.maximumHeight: 32
-                            property bool selected: root.isSortChipSelected(modelData.id, modelData.toggle)
-                            property bool hovered: chipMouseArea.containsMouse
-                            property bool pressed: chipMouseArea.pressed
-
-                            implicitWidth: chipContent.implicitWidth + Theme.spacingM * 2
-                            radius: height / 2
-                            color: selected ? Theme.primary : Theme.surfaceVariant
+                            anchors.fill: parent
+                            radius: parent.radius
+                            color: {
+                                if (sortChip.pressed)
+                                    return sortChip.selected ? Theme.primaryPressed : Theme.surfaceTextHover;
+                                if (sortChip.hovered)
+                                    return sortChip.selected ? Theme.primaryHover : Theme.surfaceTextHover;
+                                return "transparent";
+                            }
 
                             Behavior on color {
                                 ColorAnimation {
-                                    duration: Theme.shortDuration
+                                    duration: Theme.shorterDuration
                                     easing.type: Theme.standardEasing
                                 }
                             }
+                        }
 
-                            Rectangle {
-                                anchors.fill: parent
-                                radius: parent.radius
-                                color: {
-                                    if (pressed)
-                                        return sortChip.selected ? Theme.primaryPressed : Theme.surfaceTextHover;
-                                    if (hovered)
-                                        return sortChip.selected ? Theme.primaryHover : Theme.surfaceTextHover;
-                                    return "transparent";
-                                }
+                        DankRipple {
+                            id: chipRipple
+                            cornerRadius: sortChip.radius
+                            rippleColor: sortChip.selected ? Theme.primaryText : Theme.surfaceVariantText
+                        }
 
-                                Behavior on color {
-                                    ColorAnimation {
-                                        duration: Theme.shorterDuration
-                                        easing.type: Theme.standardEasing
-                                    }
-                                }
+                        Row {
+                            id: chipContent
+                            anchors.centerIn: parent
+                            spacing: Theme.spacingXS
+
+                            DankIcon {
+                                name: sortChip.modelData.toggle ? "download_done" : "check"
+                                size: 16
+                                anchors.verticalCenter: parent.verticalCenter
+                                color: Theme.primaryText
+                                visible: sortChip.selected
                             }
 
-                            DankRipple {
-                                id: chipRipple
-                                cornerRadius: sortChip.radius
-                                rippleColor: sortChip.selected ? Theme.primaryText : Theme.surfaceVariantText
+                            StyledText {
+                                text: sortChip.modelData.label
+                                font.pixelSize: Theme.fontSizeSmall
+                                font.weight: sortChip.selected ? Font.Medium : Font.Normal
+                                color: sortChip.selected ? Theme.primaryText : Theme.surfaceVariantText
+                                anchors.verticalCenter: parent.verticalCenter
                             }
+                        }
 
-                            Row {
-                                id: chipContent
-                                anchors.centerIn: parent
-                                spacing: Theme.spacingXS
-
-                                DankIcon {
-                                    name: modelData.toggle ? "download_done" : "check"
-                                    size: 16
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    color: Theme.primaryText
-                                    visible: sortChip.selected
+                        MouseArea {
+                            id: chipMouseArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onPressed: mouse => chipRipple.trigger(mouse.x, mouse.y)
+                            onClicked: {
+                                if (sortChip.modelData.toggle) {
+                                    if (sortChip.modelData.id === "hideInstalled")
+                                        SessionData.setPluginBrowserHideInstalled(!SessionData.pluginBrowserHideInstalled);
+                                    else
+                                        SessionData.setPluginBrowserInstalledFirst(!SessionData.pluginBrowserInstalledFirst);
+                                } else {
+                                    if (sortChip.modelData.id !== "category")
+                                        root.categoryFilter = "all";
+                                    SessionData.setPluginBrowserSortMode(sortChip.modelData.id);
                                 }
-
-                                StyledText {
-                                    text: modelData.label
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    font.weight: sortChip.selected ? Font.Medium : Font.Normal
-                                    color: sortChip.selected ? Theme.primaryText : Theme.surfaceVariantText
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-                            }
-
-                            MouseArea {
-                                id: chipMouseArea
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onPressed: mouse => chipRipple.trigger(mouse.x, mouse.y)
-                                onClicked: {
-                                    if (modelData.toggle) {
-                                        if (modelData.id === "hideInstalled")
-                                            SessionData.setPluginBrowserHideInstalled(!SessionData.pluginBrowserHideInstalled);
-                                        else
-                                            SessionData.setPluginBrowserInstalledFirst(!SessionData.pluginBrowserInstalledFirst);
-                                    } else {
-                                        if (modelData.id !== "category")
-                                            root.categoryFilter = "all";
-                                        SessionData.setPluginBrowserSortMode(modelData.id);
-                                    }
-                                    root.updateFilteredPlugins();
-                                }
+                                root.updateFilteredPlugins();
                             }
                         }
                     }
@@ -823,7 +985,6 @@ FloatingWindow {
                     }
 
                     DankDropdown {
-                        id: categoryFilterDropdown
                         Layout.fillWidth: true
                         Layout.preferredHeight: 32
                         compactMode: true
@@ -848,7 +1009,6 @@ FloatingWindow {
                 anchors.top: categoryFiltersRow.bottom
                 anchors.topMargin: Theme.spacingM
                 anchors.bottom: parent.bottom
-                anchors.bottomMargin: Theme.spacingM
 
                 Item {
                     anchors.fill: parent
@@ -860,296 +1020,218 @@ FloatingWindow {
                     }
                 }
 
-                DankListView {
-                    id: pluginBrowserList
+                DankGridView {
+                    id: pluginGrid
+
+                    property int columns: Math.max(1, Math.floor(width / 300))
+                    readonly property real cardSpacing: Theme.spacingM
+                    readonly property int previewHeight: Math.round((cellWidth - cardSpacing - Theme.spacingS * 2) * 0.52)
+                    readonly property int infoHeight: 100
 
                     anchors.fill: parent
-                    anchors.leftMargin: Theme.spacingM
-                    anchors.rightMargin: root.showLetterIndex ? Theme.spacingM + 18 : Theme.spacingM
-                    anchors.topMargin: Theme.spacingS
-                    anchors.bottomMargin: Theme.spacingS
-                    spacing: Theme.spacingS
+                    anchors.rightMargin: root.showLetterIndex ? 22 : 0
+                    cellWidth: Math.floor(width / columns)
+                    cellHeight: previewHeight + infoHeight + Math.round(cardSpacing) + Theme.spacingS * 2 + Theme.spacingM
                     model: root.filteredPlugins
                     clip: true
                     visible: !root.isLoading
-                    add: null
-                    remove: null
-                    displaced: null
-                    move: null
+                    cacheBuffer: cellHeight * 2
 
-                    ScrollBar.vertical: DankScrollbar {
-                        id: browserScrollbar
-                    }
+                    delegate: Item {
+                        id: cardCell
 
-                    delegate: Rectangle {
-                        id: pluginDelegate
+                        required property var modelData
+                        required property int index
 
-                        width: pluginBrowserList.width
-                        height: pluginDelegateColumn.implicitHeight + Theme.spacingM * 2
-                        radius: Theme.cornerRadius
-                        property bool isSelected: root.keyboardNavigationActive && index === root.selectedIndex
                         property bool isInstalled: modelData.installed || false
-                        property bool isFirstParty: modelData.firstParty || false
-                        property bool isFeatured: modelData.featured || false
                         property bool isCompatible: PluginService.checkPluginCompatibility(modelData.requires_dms)
-                        property string pluginId: root.pluginKey(modelData, index)
-                        property bool isExpanded: root.expandedPluginId === pluginId
-                        property bool isPreviewEnlarged: root.enlargedPreviewPluginId === pluginId
-                        property string screenshotUrl: modelData.screenshot || ""
-                        color: isSelected ? Theme.primarySelected : rowMouseArea.containsMouse ? Theme.withAlpha(Theme.surfaceVariant, 0.45) : Theme.withAlpha(Theme.surfaceVariant, 0.3)
-                        border.color: isSelected ? Theme.primary : Theme.withAlpha(Theme.outline, 0.2)
-                        border.width: isSelected ? 2 : 1
+                        property bool isSelected: root.keyboardNavigationActive && index === root.selectedIndex
 
-                        MouseArea {
-                            id: rowMouseArea
-                            z: 0
+                        width: pluginGrid.cellWidth
+                        height: pluginGrid.cellHeight
+
+                        Rectangle {
+                            id: card
                             anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: root.toggleExpandedPlugin(pluginDelegate.pluginId)
-                        }
+                            anchors.margins: pluginGrid.cardSpacing / 2
+                            radius: Theme.cornerRadius
+                            color: cardMouseArea.containsMouse ? Theme.withAlpha(Theme.surfaceVariant, 0.5) : Theme.withAlpha(Theme.surfaceVariant, 0.3)
+                            border.color: cardCell.isSelected ? Theme.primary : Theme.withAlpha(Theme.outline, 0.15)
+                            border.width: cardCell.isSelected ? 2 : 1
+                            scale: cardMouseArea.containsMouse ? 1.012 : 1
 
-                        Column {
-                            id: pluginDelegateColumn
-                            z: 1
-                            anchors.fill: parent
-                            anchors.margins: Theme.spacingM
-                            spacing: Theme.spacingXS
+                            Behavior on color {
+                                ColorAnimation {
+                                    duration: Theme.shortDuration
+                                    easing.type: Theme.standardEasing
+                                }
+                            }
 
-                            Row {
-                                width: parent.width
-                                spacing: Theme.spacingM
+                            Behavior on scale {
+                                NumberAnimation {
+                                    duration: Theme.shortDuration
+                                    easing.type: Theme.standardEasing
+                                }
+                            }
 
-                                DankIcon {
-                                    name: modelData.icon || "extension"
-                                    size: Theme.iconSize
-                                    color: Theme.primary
-                                    anchors.verticalCenter: parent.verticalCenter
+                            MouseArea {
+                                id: cardMouseArea
+                                z: 0
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onPressed: mouse => cardRipple.trigger(mouse.x, mouse.y)
+                                onClicked: root.openPluginDetail(cardCell.modelData)
+                            }
+
+                            DankRipple {
+                                id: cardRipple
+                                cornerRadius: card.radius
+                                rippleColor: Theme.surfaceVariantText
+                            }
+
+                            Item {
+                                id: previewArea
+                                z: 1
+                                anchors.top: parent.top
+                                anchors.left: parent.left
+                                anchors.right: parent.right
+                                anchors.margins: Theme.spacingS
+                                height: pluginGrid.previewHeight
+
+                                ClippingRectangle {
+                                    anchors.fill: parent
+                                    radius: Theme.cornerRadius - 2
+                                    color: Theme.surfaceContainerHigh
+
+                                    CachingImage {
+                                        id: cardPreview
+                                        anchors.fill: parent
+                                        imagePath: root.previewUrl(cardCell.modelData)
+                                        maxCacheSize: 640
+                                        fillMode: Image.PreserveAspectCrop
+                                        animate: false
+                                        visible: status === Image.Ready
+                                    }
+
+                                    DankIcon {
+                                        anchors.centerIn: parent
+                                        name: cardCell.modelData.icon || "extension"
+                                        size: Theme.iconSize + 12
+                                        color: Theme.withAlpha(Theme.outline, 0.6)
+                                        visible: cardPreview.status !== Image.Ready
+                                    }
+
+                                    DankSpinner {
+                                        anchors.centerIn: parent
+                                        running: cardPreview.status === Image.Loading
+                                        visible: running
+                                    }
                                 }
 
-                                Column {
-                                    width: parent.width - Theme.iconSize - Theme.spacingM - installButton.width - Theme.spacingM
+                                Row {
+                                    anchors.top: parent.top
+                                    anchors.left: parent.left
+                                    anchors.margins: Theme.spacingXS
                                     spacing: Theme.spacingXXS
 
-                                    Row {
-                                        spacing: Theme.spacingXS
+                                    Repeater {
+                                        model: root.badgeModel(cardCell.modelData)
 
-                                        StyledText {
-                                            text: modelData.name
-                                            font.pixelSize: Theme.fontSizeMedium
-                                            font.weight: Font.Medium
-                                            color: Theme.surfaceText
-                                            elide: Text.ElideRight
-                                            anchors.verticalCenter: parent.verticalCenter
+                                        PluginBadge {
+                                            required property var modelData
+                                            label: modelData.label
+                                            iconName: modelData.icon
+                                            tone: root.badgeTone(modelData.tone)
+                                            onImage: true
                                         }
-
-                                        Rectangle {
-                                            height: 16
-                                            width: featuredRow.implicitWidth + Theme.spacingXS * 2
-                                            radius: 8
-                                            color: Theme.withAlpha(Theme.secondary, 0.15)
-                                            border.color: Theme.withAlpha(Theme.secondary, 0.4)
-                                            border.width: 1
-                                            visible: isFeatured
-                                            anchors.verticalCenter: parent.verticalCenter
-
-                                            Row {
-                                                id: featuredRow
-                                                anchors.centerIn: parent
-                                                spacing: Theme.spacingXXS
-
-                                                DankIcon {
-                                                    name: "star"
-                                                    size: 10
-                                                    color: Theme.secondary
-                                                    anchors.verticalCenter: parent.verticalCenter
-                                                }
-
-                                                StyledText {
-                                                    text: I18n.tr("featured")
-                                                    font.pixelSize: Theme.fontSizeSmall - 2
-                                                    color: Theme.secondary
-                                                    font.weight: Font.Medium
-                                                    anchors.verticalCenter: parent.verticalCenter
-                                                }
-                                            }
-                                        }
-
-                                        Rectangle {
-                                            height: 16
-                                            width: firstPartyText.implicitWidth + Theme.spacingXS * 2
-                                            radius: 8
-                                            color: Theme.withAlpha(Theme.primary, 0.15)
-                                            border.color: Theme.withAlpha(Theme.primary, 0.4)
-                                            border.width: 1
-                                            visible: isFirstParty
-                                            anchors.verticalCenter: parent.verticalCenter
-
-                                            StyledText {
-                                                id: firstPartyText
-                                                anchors.centerIn: parent
-                                                text: I18n.tr("official")
-                                                font.pixelSize: Theme.fontSizeSmall - 2
-                                                color: Theme.primary
-                                                font.weight: Font.Medium
-                                            }
-                                        }
-
-                                        Rectangle {
-                                            height: 16
-                                            width: thirdPartyText.implicitWidth + Theme.spacingXS * 2
-                                            radius: 8
-                                            color: Theme.withAlpha(Theme.warning, 0.15)
-                                            border.color: Theme.withAlpha(Theme.warning, 0.4)
-                                            border.width: 1
-                                            visible: !isFirstParty
-                                            anchors.verticalCenter: parent.verticalCenter
-
-                                            StyledText {
-                                                id: thirdPartyText
-                                                anchors.centerIn: parent
-                                                text: I18n.tr("3rd party")
-                                                font.pixelSize: Theme.fontSizeSmall - 2
-                                                color: Theme.warning
-                                                font.weight: Font.Medium
-                                            }
-                                        }
-
-                                        Repeater {
-                                            model: modelData.status || []
-
-                                            Rectangle {
-                                                required property string modelData
-                                                height: 16
-                                                width: statusText.implicitWidth + Theme.spacingXS * 2
-                                                radius: 8
-                                                color: Theme.withAlpha(root.statusColor(modelData), 0.15)
-                                                border.color: Theme.withAlpha(root.statusColor(modelData), 0.4)
-                                                border.width: 1
-                                                anchors.verticalCenter: parent.verticalCenter
-
-                                                StyledText {
-                                                    id: statusText
-                                                    anchors.centerIn: parent
-                                                    text: root.statusLabel(parent.modelData)
-                                                    font.pixelSize: Theme.fontSizeSmall - 2
-                                                    color: root.statusColor(parent.modelData)
-                                                    font.weight: Font.Medium
-                                                }
-                                            }
-                                        }
-
-                                        Rectangle {
-                                            height: 16
-                                            width: upvoteRow.implicitWidth + Theme.spacingXS * 2
-                                            radius: 8
-                                            color: Theme.withAlpha(Theme.primary, 0.1)
-                                            border.color: Theme.withAlpha(Theme.primary, 0.3)
-                                            border.width: 1
-                                            visible: !!modelData.issueUrl
-                                            anchors.verticalCenter: parent.verticalCenter
-
-                                            Row {
-                                                id: upvoteRow
-                                                anchors.centerIn: parent
-                                                spacing: Theme.spacingXXS
-
-                                                DankIcon {
-                                                    name: "thumb_up"
-                                                    size: 10
-                                                    color: Theme.primary
-                                                    anchors.verticalCenter: parent.verticalCenter
-                                                }
-
-                                                StyledText {
-                                                    text: modelData.upvotes || 0
-                                                    font.pixelSize: Theme.fontSizeSmall - 2
-                                                    color: Theme.primary
-                                                    font.weight: Font.Medium
-                                                    anchors.verticalCenter: parent.verticalCenter
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    StyledText {
-                                        text: {
-                                            const author = I18n.tr("by %1", "author attribution").arg(modelData.author || I18n.tr("Unknown", "unknown author"));
-                                            const source = modelData.repo ? ` • <a href="${modelData.repo}" style="text-decoration:none; color:${Theme.primary};">${I18n.tr("source", "source code link")}</a>` : "";
-                                            const discuss = modelData.issueUrl ? ` • <a href="${modelData.issueUrl}" style="text-decoration:none; color:${Theme.primary};">${I18n.tr("discuss", "plugin discussion link")}</a>` : "";
-                                            return author + source + discuss;
-                                        }
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        color: Theme.outline
-                                        linkColor: Theme.primary
-                                        textFormat: Text.RichText
-                                        elide: Text.ElideRight
-                                        width: parent.width
-                                        onLinkActivated: url => Qt.openUrlExternally(url)
-
-                                        MouseArea {
-                                            anchors.fill: parent
-                                            cursorShape: parent.hoveredLink ? Qt.PointingHandCursor : Qt.ArrowCursor
-                                            acceptedButtons: Qt.NoButton
-                                            propagateComposedEvents: true
-                                        }
-                                    }
-
-                                    StyledText {
-                                        visible: root.relatedNames(modelData).length > 0
-                                        text: I18n.tr("Related: %1", "related plugins").arg(root.relatedNames(modelData).join(", "))
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        color: Theme.outline
-                                        elide: Text.ElideRight
-                                        width: parent.width
                                     }
                                 }
 
-                                Rectangle {
-                                    id: installButton
+                                PluginBadge {
+                                    anchors.top: parent.top
+                                    anchors.right: parent.right
+                                    anchors.margins: Theme.spacingXS
+                                    iconName: "thumb_up"
+                                    label: cardCell.modelData.upvotes || 0
+                                    tone: Theme.primary
+                                    onImage: true
+                                    visible: !!cardCell.modelData.issueUrl
+                                }
+                            }
 
-                                    property string buttonState: {
-                                        if (isInstalled)
-                                            return "installed";
-                                        if (!isCompatible)
-                                            return "incompatible";
-                                        return "available";
+                            Column {
+                                z: 1
+                                anchors.top: previewArea.bottom
+                                anchors.left: parent.left
+                                anchors.right: parent.right
+                                anchors.topMargin: Theme.spacingS
+                                anchors.leftMargin: Theme.spacingM
+                                anchors.rightMargin: Theme.spacingM
+                                spacing: Theme.spacingXXS
+
+                                Row {
+                                    width: parent.width
+                                    spacing: Theme.spacingS
+
+                                    DankIcon {
+                                        id: cardIcon
+                                        name: cardCell.modelData.icon || "extension"
+                                        size: Theme.iconSize - 4
+                                        color: Theme.primary
+                                        anchors.verticalCenter: parent.verticalCenter
                                     }
 
-                                    implicitWidth: Math.max(80, incompatRow.implicitWidth + Theme.spacingM * 2)
-                                    width: implicitWidth
-                                    height: 32
-                                    radius: Theme.cornerRadius
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    color: {
-                                        switch (buttonState) {
-                                        case "installed":
-                                            return Theme.surfaceVariant;
-                                        case "incompatible":
-                                            return Theme.withAlpha(Theme.warning, 0.15);
-                                        default:
-                                            return Theme.primary;
+                                    StyledText {
+                                        width: parent.width - cardIcon.width - installAction.width - Theme.spacingS * 2
+                                        text: cardCell.modelData.name || ""
+                                        font.pixelSize: Theme.fontSizeMedium
+                                        font.weight: Font.Medium
+                                        color: Theme.surfaceText
+                                        elide: Text.ElideRight
+                                        maximumLineCount: 1
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+
+                                    Rectangle {
+                                        id: installAction
+
+                                        property string buttonState: {
+                                            if (cardCell.isInstalled)
+                                                return "installed";
+                                            if (!cardCell.isCompatible)
+                                                return "incompatible";
+                                            return "available";
                                         }
-                                    }
-                                    opacity: buttonState === "available" && installMouseArea.containsMouse ? 0.9 : 1
-                                    border.width: buttonState !== "available" ? 1 : 0
-                                    border.color: buttonState === "incompatible" ? Theme.warning : Theme.outline
 
-                                    Behavior on opacity {
-                                        NumberAnimation {
-                                            duration: Theme.shortDuration
-                                            easing.type: Theme.standardEasing
+                                        width: 28
+                                        height: 28
+                                        radius: 14
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        color: {
+                                            switch (buttonState) {
+                                            case "installed":
+                                                return Theme.surfaceVariant;
+                                            case "incompatible":
+                                                return Theme.withAlpha(Theme.warning, 0.15);
+                                            default:
+                                                return Theme.primary;
+                                            }
                                         }
-                                    }
+                                        opacity: buttonState === "available" && installMouseArea.containsMouse ? 0.85 : 1
 
-                                    Row {
-                                        id: incompatRow
-                                        anchors.centerIn: parent
-                                        spacing: Theme.spacingXS
+                                        Behavior on opacity {
+                                            NumberAnimation {
+                                                duration: Theme.shortDuration
+                                                easing.type: Theme.standardEasing
+                                            }
+                                        }
 
                                         DankIcon {
+                                            anchors.centerIn: parent
+                                            size: 15
                                             name: {
-                                                switch (installButton.buttonState) {
+                                                switch (installAction.buttonState) {
                                                 case "installed":
                                                     return "check";
                                                 case "incompatible":
@@ -1158,9 +1240,8 @@ FloatingWindow {
                                                     return "download";
                                                 }
                                             }
-                                            size: 14
                                             color: {
-                                                switch (installButton.buttonState) {
+                                                switch (installAction.buttonState) {
                                                 case "installed":
                                                     return Theme.surfaceText;
                                                 case "incompatible":
@@ -1169,155 +1250,36 @@ FloatingWindow {
                                                     return Theme.surface;
                                                 }
                                             }
-                                            anchors.verticalCenter: parent.verticalCenter
                                         }
 
-                                        StyledText {
-                                            text: {
-                                                switch (installButton.buttonState) {
-                                                case "installed":
-                                                    return I18n.tr("Installed", "installed status");
-                                                case "incompatible":
-                                                    return I18n.tr("Requires %1", "version requirement").arg(modelData.requires_dms);
-                                                default:
-                                                    return I18n.tr("Install", "install action button");
-                                                }
-                                            }
-                                            font.pixelSize: Theme.fontSizeSmall
-                                            font.weight: Font.Medium
-                                            elide: Text.ElideNone
-                                            wrapMode: Text.NoWrap
-                                            color: {
-                                                switch (installButton.buttonState) {
-                                                case "installed":
-                                                    return Theme.surfaceText;
-                                                case "incompatible":
-                                                    return Theme.warning;
-                                                default:
-                                                    return Theme.surface;
-                                                }
-                                            }
-                                            anchors.verticalCenter: parent.verticalCenter
-                                        }
-                                    }
-
-                                    MouseArea {
-                                        id: installMouseArea
-                                        anchors.fill: parent
-                                        hoverEnabled: true
-                                        cursorShape: installButton.buttonState === "available" ? Qt.PointingHandCursor : Qt.ArrowCursor
-                                        enabled: installButton.buttonState === "available"
-                                        onClicked: {
-                                            const isDesktop = modelData.type === "desktop";
-                                            root.installPlugin(modelData.name, isDesktop);
+                                        MouseArea {
+                                            id: installMouseArea
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: installAction.buttonState === "available" ? Qt.PointingHandCursor : Qt.ArrowCursor
+                                            enabled: installAction.buttonState === "available"
+                                            onClicked: root.installPlugin(cardCell.modelData.name, cardCell.modelData.type === "desktop")
                                         }
                                     }
                                 }
-                            }
 
-                            StyledText {
-                                text: modelData.description || ""
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.outline
-                                width: parent.width
-                                wrapMode: Text.WordWrap
-                                visible: (modelData.description || "").length > 0
-                            }
-
-                            Flow {
-                                width: parent.width
-                                spacing: Theme.spacingXS
-                                visible: (modelData.capabilities || []).length > 0
-
-                                Repeater {
-                                    model: modelData.capabilities || []
-
-                                    Rectangle {
-                                        height: 18
-                                        width: capabilityText.implicitWidth + Theme.spacingXS * 2
-                                        radius: 9
-                                        color: Theme.withAlpha(Theme.primary, 0.1)
-                                        border.color: Theme.withAlpha(Theme.primary, 0.3)
-                                        border.width: 1
-
-                                        StyledText {
-                                            id: capabilityText
-                                            anchors.centerIn: parent
-                                            text: modelData
-                                            font.pixelSize: Theme.fontSizeSmall - 2
-                                            color: Theme.primary
-                                        }
-                                    }
-                                }
-                            }
-
-                            Rectangle {
-                                id: screenshotPreview
-                                width: parent.width
-                                height: pluginDelegate.isExpanded ? (pluginDelegate.isPreviewEnlarged ? Math.min(620, Math.max(320, width * 0.78)) : Math.min(260, Math.max(150, width * 0.42))) : 0
-                                visible: height > 0
-                                clip: true
-                                radius: Theme.cornerRadius
-                                color: Theme.surfaceContainerHigh
-                                border.color: Theme.withAlpha(Theme.outline, 0.2)
-                                border.width: 1
-
-                                Behavior on height {
-                                    NumberAnimation {
-                                        duration: Theme.shortDuration
-                                        easing.type: Theme.standardEasing
-                                    }
+                                StyledText {
+                                    width: parent.width
+                                    text: I18n.tr("by %1", "author attribution").arg(cardCell.modelData.author || I18n.tr("Unknown", "unknown author"))
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: Theme.outline
+                                    elide: Text.ElideRight
+                                    maximumLineCount: 1
                                 }
 
-                                Loader {
-                                    id: screenshotImageLoader
-                                    anchors.fill: parent
-                                    anchors.margins: 1
-                                    active: pluginDelegate.isExpanded && pluginDelegate.screenshotUrl.length > 0
-
-                                    sourceComponent: CachingImage {
-                                        imagePath: pluginDelegate.screenshotUrl
-                                        maxCacheSize: pluginDelegate.isPreviewEnlarged ? 1600 : 960
-                                        fillMode: Image.PreserveAspectFit
-                                        visible: status !== Image.Error
-                                    }
-                                }
-
-                                MouseArea {
-                                    anchors.fill: parent
-                                    enabled: screenshotImageLoader.item && screenshotImageLoader.item.status === Image.Ready
-                                    hoverEnabled: enabled
-                                    cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-                                    onClicked: mouse => {
-                                        mouse.accepted = true;
-                                        root.toggleEnlargedPreview(pluginDelegate.pluginId);
-                                    }
-                                }
-
-                                DankSpinner {
-                                    anchors.centerIn: parent
-                                    running: screenshotImageLoader.active && screenshotImageLoader.item && screenshotImageLoader.item.status === Image.Loading
-                                    visible: running
-                                }
-
-                                Column {
-                                    anchors.centerIn: parent
-                                    spacing: Theme.spacingXS
-                                    visible: pluginDelegate.isExpanded && (pluginDelegate.screenshotUrl.length === 0 || (screenshotImageLoader.item && screenshotImageLoader.item.status === Image.Error))
-
-                                    DankIcon {
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                        name: screenshotImageLoader.item && screenshotImageLoader.item.status === Image.Error ? "broken_image" : "image_not_supported"
-                                        size: Theme.iconSize
-                                        color: Theme.outline
-                                    }
-
-                                    StyledText {
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                        text: screenshotImageLoader.item && screenshotImageLoader.item.status === Image.Error ? I18n.tr("Screenshot unavailable", "plugin browser screenshot error") : I18n.tr("No screenshot provided", "plugin browser no screenshot")
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        color: Theme.outline
-                                    }
+                                StyledText {
+                                    width: parent.width
+                                    text: cardCell.modelData.description || ""
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: Theme.surfaceVariantText
+                                    wrapMode: Text.WordWrap
+                                    elide: Text.ElideRight
+                                    maximumLineCount: 2
                                 }
                             }
                         }
@@ -1327,9 +1289,8 @@ FloatingWindow {
                 Column {
                     id: letterIndex
                     anchors.right: parent.right
-                    anchors.top: pluginBrowserList.top
-                    anchors.bottom: pluginBrowserList.bottom
-                    anchors.rightMargin: Theme.spacingXS
+                    anchors.top: pluginGrid.top
+                    anchors.bottom: pluginGrid.bottom
                     width: 16
                     visible: root.showLetterIndex && !root.isLoading
                     spacing: 0
@@ -1344,7 +1305,7 @@ FloatingWindow {
 
                             StyledText {
                                 anchors.centerIn: parent
-                                text: modelData
+                                text: parent.modelData
                                 font.pixelSize: 10
                                 font.weight: Font.Medium
                                 color: letterMouseArea.containsMouse ? Theme.primary : Theme.outline
@@ -1355,18 +1316,510 @@ FloatingWindow {
                                 anchors.fill: parent
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
-                                onClicked: root.scrollToLetter(modelData)
+                                onClicked: root.scrollToLetter(parent.modelData)
                             }
                         }
                     }
                 }
 
-                StyledText {
-                    anchors.centerIn: listArea
-                    text: I18n.tr("No plugins found", "empty plugin list")
-                    font.pixelSize: Theme.fontSizeMedium
-                    color: Theme.surfaceVariantText
+                Column {
+                    anchors.centerIn: parent
+                    spacing: Theme.spacingS
                     visible: !root.isLoading && root.filteredPlugins.length === 0
+
+                    DankIcon {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        name: "search_off"
+                        size: Theme.iconSize + 16
+                        color: Theme.outline
+                    }
+
+                    StyledText {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: I18n.tr("No plugins found", "empty plugin list")
+                        font.pixelSize: Theme.fontSizeMedium
+                        color: Theme.surfaceVariantText
+                    }
+                }
+            }
+
+            Rectangle {
+                id: detailPane
+
+                property var plugin: ({})
+                property bool heroFallback: false
+                readonly property var livePlugin: root.detailPlugin
+
+                onLivePluginChanged: {
+                    if (!livePlugin)
+                        return;
+                    plugin = livePlugin;
+                }
+
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: headerArea.bottom
+                anchors.topMargin: Theme.spacingM
+                anchors.bottom: parent.bottom
+                z: 10
+                color: Theme.surfaceContainer
+                opacity: root.detailPluginId !== "" ? 1 : 0
+                visible: opacity > 0
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: Theme.shortDuration
+                        easing.type: Theme.standardEasing
+                    }
+                }
+
+                Connections {
+                    target: root
+                    function onDetailPluginIdChanged() {
+                        detailPane.heroFallback = false;
+                        detailFlickable.contentY = 0;
+                    }
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
+
+                Item {
+                    id: detailHeader
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    height: 40
+
+                    DankActionButton {
+                        id: detailBackButton
+                        anchors.left: parent.left
+                        anchors.verticalCenter: parent.verticalCenter
+                        iconName: "arrow_back"
+                        iconSize: Theme.iconSize
+                        iconColor: Theme.surfaceText
+                        onClicked: root.closePluginDetail()
+                    }
+
+                    DankIcon {
+                        id: detailIcon
+                        anchors.left: detailBackButton.right
+                        anchors.leftMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        name: detailPane.plugin.icon || "extension"
+                        size: Theme.iconSize
+                        color: Theme.primary
+                    }
+
+                    StyledText {
+                        anchors.left: detailIcon.right
+                        anchors.leftMargin: Theme.spacingS
+                        anchors.right: detailInstallButton.left
+                        anchors.rightMargin: Theme.spacingM
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: detailPane.plugin.name || ""
+                        font.pixelSize: Theme.fontSizeLarge
+                        font.weight: Font.Medium
+                        color: Theme.surfaceText
+                        elide: Text.ElideRight
+                        maximumLineCount: 1
+                    }
+
+                    Rectangle {
+                        id: detailInstallButton
+
+                        property string buttonState: {
+                            if (detailPane.plugin.installed)
+                                return "installed";
+                            if (!PluginService.checkPluginCompatibility(detailPane.plugin.requires_dms))
+                                return "incompatible";
+                            return "available";
+                        }
+
+                        anchors.right: parent.right
+                        anchors.verticalCenter: parent.verticalCenter
+                        implicitWidth: Math.max(96, detailInstallRow.implicitWidth + Theme.spacingL * 2)
+                        width: implicitWidth
+                        height: 36
+                        radius: height / 2
+                        color: {
+                            switch (buttonState) {
+                            case "installed":
+                                return Theme.surfaceVariant;
+                            case "incompatible":
+                                return Theme.withAlpha(Theme.warning, 0.15);
+                            default:
+                                return Theme.primary;
+                            }
+                        }
+                        opacity: buttonState === "available" && detailInstallMouseArea.containsMouse ? 0.9 : 1
+                        border.width: buttonState !== "available" ? 1 : 0
+                        border.color: buttonState === "incompatible" ? Theme.warning : Theme.outline
+
+                        Behavior on opacity {
+                            NumberAnimation {
+                                duration: Theme.shortDuration
+                                easing.type: Theme.standardEasing
+                            }
+                        }
+
+                        Row {
+                            id: detailInstallRow
+                            anchors.centerIn: parent
+                            spacing: Theme.spacingXS
+
+                            DankIcon {
+                                name: {
+                                    switch (detailInstallButton.buttonState) {
+                                    case "installed":
+                                        return "check";
+                                    case "incompatible":
+                                        return "warning";
+                                    default:
+                                        return "download";
+                                    }
+                                }
+                                size: 16
+                                color: {
+                                    switch (detailInstallButton.buttonState) {
+                                    case "installed":
+                                        return Theme.surfaceText;
+                                    case "incompatible":
+                                        return Theme.warning;
+                                    default:
+                                        return Theme.surface;
+                                    }
+                                }
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            StyledText {
+                                text: {
+                                    switch (detailInstallButton.buttonState) {
+                                    case "installed":
+                                        return I18n.tr("Installed", "installed status");
+                                    case "incompatible":
+                                        return I18n.tr("Requires %1", "version requirement").arg(detailPane.plugin.requires_dms || "");
+                                    default:
+                                        return I18n.tr("Install", "install action button");
+                                    }
+                                }
+                                font.pixelSize: Theme.fontSizeSmall
+                                font.weight: Font.Medium
+                                wrapMode: Text.NoWrap
+                                color: {
+                                    switch (detailInstallButton.buttonState) {
+                                    case "installed":
+                                        return Theme.surfaceText;
+                                    case "incompatible":
+                                        return Theme.warning;
+                                    default:
+                                        return Theme.surface;
+                                    }
+                                }
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
+
+                        MouseArea {
+                            id: detailInstallMouseArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: detailInstallButton.buttonState === "available" ? Qt.PointingHandCursor : Qt.ArrowCursor
+                            enabled: detailInstallButton.buttonState === "available"
+                            onClicked: root.installPlugin(detailPane.plugin.name, detailPane.plugin.type === "desktop")
+                        }
+                    }
+                }
+
+                DankFlickable {
+                    id: detailFlickable
+                    anchors.top: detailHeader.bottom
+                    anchors.topMargin: Theme.spacingM
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    clip: true
+                    contentHeight: detailColumn.height + Theme.spacingL
+                    contentWidth: width
+
+                    Column {
+                        id: detailColumn
+                        width: Math.min(880, parent.width)
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        spacing: Theme.spacingL
+
+                        Rectangle {
+                            width: parent.width
+                            height: Math.round(width * 0.52)
+                            radius: Theme.cornerRadius
+                            color: Theme.surfaceContainerHigh
+                            border.color: Theme.withAlpha(Theme.outline, 0.2)
+                            border.width: 1
+
+                            ClippingRectangle {
+                                anchors.fill: parent
+                                anchors.margins: 1
+                                radius: Theme.cornerRadius - 1
+                                color: "transparent"
+
+                                CachingImage {
+                                    id: heroImage
+                                    anchors.fill: parent
+                                    imagePath: detailPane.heroFallback ? root.previewUrl(detailPane.plugin) : root.heroUrl(detailPane.plugin)
+                                    maxCacheSize: 1600
+                                    fillMode: Image.PreserveAspectFit
+                                    visible: status === Image.Ready
+                                    onStatusChanged: {
+                                        if (status !== Image.Error || detailPane.heroFallback)
+                                            return;
+                                        detailPane.heroFallback = true;
+                                    }
+                                }
+                            }
+
+                            DankSpinner {
+                                anchors.centerIn: parent
+                                running: heroImage.status === Image.Loading
+                                visible: running
+                            }
+
+                            Column {
+                                anchors.centerIn: parent
+                                spacing: Theme.spacingXS
+                                visible: heroImage.imagePath.length === 0 || heroImage.status === Image.Error
+
+                                DankIcon {
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    name: "image_not_supported"
+                                    size: Theme.iconSize + 8
+                                    color: Theme.outline
+                                }
+
+                                StyledText {
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    text: heroImage.status === Image.Error ? I18n.tr("Screenshot unavailable", "plugin browser screenshot error") : I18n.tr("No screenshot provided", "plugin browser no screenshot")
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: Theme.outline
+                                }
+                            }
+                        }
+
+                        Flow {
+                            width: parent.width
+                            spacing: Theme.spacingXS
+
+                            Repeater {
+                                model: root.badgeModel(detailPane.plugin)
+
+                                PluginBadge {
+                                    required property var modelData
+                                    label: modelData.label
+                                    iconName: modelData.icon
+                                    tone: root.badgeTone(modelData.tone)
+                                }
+                            }
+
+                            PluginBadge {
+                                iconName: "thumb_up"
+                                label: detailPane.plugin.upvotes || 0
+                                tone: Theme.primary
+                                visible: !!detailPane.plugin.issueUrl
+                            }
+
+                            Repeater {
+                                model: root.detailMetaBadges(detailPane.plugin)
+
+                                PluginBadge {
+                                    required property var modelData
+                                    label: modelData.label
+                                    iconName: modelData.icon
+                                    tone: Theme.outline
+                                }
+                            }
+                        }
+
+                        StyledText {
+                            width: parent.width
+                            text: {
+                                const plugin = detailPane.plugin;
+                                const author = I18n.tr("by %1", "author attribution").arg(plugin.author || I18n.tr("Unknown", "unknown author"));
+                                const source = plugin.repo ? ` • <a href="${plugin.repo}" style="text-decoration:none; color:${Theme.primary};">${I18n.tr("source", "source code link")}</a>` : "";
+                                const discuss = plugin.issueUrl ? ` • <a href="${plugin.issueUrl}" style="text-decoration:none; color:${Theme.primary};">${I18n.tr("discuss", "plugin discussion link")}</a>` : "";
+                                return author + source + discuss;
+                            }
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.outline
+                            linkColor: Theme.primary
+                            textFormat: Text.RichText
+                            onLinkActivated: url => Qt.openUrlExternally(url)
+
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: parent.hoveredLink ? Qt.PointingHandCursor : Qt.ArrowCursor
+                                acceptedButtons: Qt.NoButton
+                                propagateComposedEvents: true
+                            }
+                        }
+
+                        StyledText {
+                            width: parent.width
+                            text: detailPane.plugin.description || ""
+                            font.pixelSize: Theme.fontSizeMedium
+                            color: Theme.surfaceText
+                            wrapMode: Text.WordWrap
+                            visible: (detailPane.plugin.description || "").length > 0
+                        }
+
+                        Column {
+                            width: parent.width
+                            spacing: Theme.spacingS
+                            visible: (detailPane.plugin.capabilities || []).length > 0
+
+                            StyledText {
+                                text: I18n.tr("Capabilities", "plugin detail section")
+                                font.pixelSize: Theme.fontSizeSmall
+                                font.weight: Font.Medium
+                                color: Theme.surfaceVariantText
+                            }
+
+                            Flow {
+                                width: parent.width
+                                spacing: Theme.spacingXS
+
+                                Repeater {
+                                    model: detailPane.plugin.capabilities || []
+
+                                    PluginBadge {
+                                        required property string modelData
+                                        label: modelData
+                                        tone: Theme.primary
+                                    }
+                                }
+                            }
+                        }
+
+                        Row {
+                            width: parent.width
+                            spacing: Theme.spacingS
+                            visible: (detailPane.plugin.permissions || []).length > 0
+
+                            DankIcon {
+                                name: "security"
+                                size: Theme.iconSize - 6
+                                color: Theme.surfaceVariantText
+                            }
+
+                            Flow {
+                                width: parent.width - Theme.iconSize + 6 - Theme.spacingS
+                                spacing: Theme.spacingXS
+
+                                Repeater {
+                                    model: detailPane.plugin.permissions || []
+
+                                    PluginBadge {
+                                        required property string modelData
+                                        label: modelData
+                                        tone: Theme.secondary
+                                    }
+                                }
+                            }
+                        }
+
+                        Row {
+                            width: parent.width
+                            spacing: Theme.spacingS
+                            visible: (detailPane.plugin.dependencies || []).length > 0
+
+                            DankIcon {
+                                name: "package_2"
+                                size: Theme.iconSize - 6
+                                color: Theme.surfaceVariantText
+                            }
+
+                            Flow {
+                                width: parent.width - Theme.iconSize + 6 - Theme.spacingS
+                                spacing: Theme.spacingXS
+
+                                Repeater {
+                                    model: detailPane.plugin.dependencies || []
+
+                                    PluginBadge {
+                                        required property string modelData
+                                        label: modelData
+                                        tone: Theme.outline
+                                    }
+                                }
+                            }
+                        }
+
+                        Column {
+                            width: parent.width
+                            spacing: Theme.spacingS
+                            visible: root.relatedPlugins(detailPane.plugin).length > 0
+
+                            StyledText {
+                                text: I18n.tr("Related: %1", "related plugins").arg("").trim()
+                                font.pixelSize: Theme.fontSizeSmall
+                                font.weight: Font.Medium
+                                color: Theme.surfaceVariantText
+                            }
+
+                            Flow {
+                                width: parent.width
+                                spacing: Theme.spacingXS
+
+                                Repeater {
+                                    model: root.relatedPlugins(detailPane.plugin)
+
+                                    Rectangle {
+                                        id: relatedChip
+
+                                        required property var modelData
+
+                                        height: 26
+                                        width: relatedRow.implicitWidth + Theme.spacingM * 2
+                                        radius: height / 2
+                                        color: relatedMouseArea.containsMouse ? Theme.withAlpha(Theme.primary, 0.2) : Theme.withAlpha(Theme.primary, 0.1)
+                                        border.color: Theme.withAlpha(Theme.primary, 0.3)
+                                        border.width: 1
+                                        opacity: modelData.key ? 1 : 0.6
+
+                                        Row {
+                                            id: relatedRow
+                                            anchors.centerIn: parent
+                                            spacing: Theme.spacingXXS
+
+                                            DankIcon {
+                                                name: "extension"
+                                                size: 12
+                                                color: Theme.primary
+                                                anchors.verticalCenter: parent.verticalCenter
+                                            }
+
+                                            StyledText {
+                                                text: relatedChip.modelData.name
+                                                font.pixelSize: Theme.fontSizeSmall
+                                                color: Theme.primary
+                                                anchors.verticalCenter: parent.verticalCenter
+                                            }
+                                        }
+
+                                        MouseArea {
+                                            id: relatedMouseArea
+                                            anchors.fill: parent
+                                            enabled: relatedChip.modelData.key !== ""
+                                            hoverEnabled: enabled
+                                            cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+                                            onClicked: root.detailPluginId = relatedChip.modelData.key
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
