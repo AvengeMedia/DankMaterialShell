@@ -184,6 +184,7 @@ Singleton {
     onIsChargingChanged: {
         // Reset average when switching states
         _smoothedChangeRate = (_hasKnownChargingState && changeRate > 0) ? changeRate : 0;
+        _lastRateSampleTime = _smoothedChangeRate > 0 ? Date.now() : 0;
 
         if (isCharging) {
             _hasNotifiedLowBattery = false;
@@ -236,22 +237,37 @@ Singleton {
         return val;
     }
 
-    // An exponential moving average based on the aggregated charge/discharge rate
+    // A time-weighted exponential moving average based on the aggregated charge/discharge rate
     property real _smoothedChangeRate: 0
-    readonly property real _rateSmoothingAlpha: 0.2
+    property real _lastRateSampleTime: 0
+    readonly property real _rateSmoothingHalfLife: 90 // in seconds
 
     function _updateSmoothedRate() {
         if (!_hasKnownChargingState || changeRate <= 0)
             return;
-        if (_smoothedChangeRate <= 0)
+
+        const now = Date.now();
+        if (_smoothedChangeRate <= 0 || _lastRateSampleTime <= 0) {
             _smoothedChangeRate = changeRate;
-        else
-            _smoothedChangeRate += _rateSmoothingAlpha * (changeRate - _smoothedChangeRate);
+            _lastRateSampleTime = now;
+            return;
+        }
+
+        const dt = (now - _lastRateSampleTime) / 1000;
+        _lastRateSampleTime = now;
+        if (dt <= 0)
+            return;
+
+        const tau = _rateSmoothingHalfLife / Math.LN2;
+        const alpha = 1 - Math.exp(-dt / tau);
+        _smoothedChangeRate += alpha * (changeRate - _smoothedChangeRate);
     }
 
     onChangeRateChanged: _updateSmoothedRate()
-    onBatteryAvailableChanged: if (!batteryAvailable)
-        _smoothedChangeRate = 0
+    onBatteryAvailableChanged: if (!batteryAvailable) {
+        _smoothedChangeRate = 0;
+        _lastRateSampleTime = 0;
+    }
 
     // Aggregated battery health
     readonly property string batteryHealth: {
