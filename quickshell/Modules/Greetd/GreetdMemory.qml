@@ -153,12 +153,10 @@ Singleton {
         blockWrites: true
         atomicWrites: false
         watchChanges: false
-        printErrors: true
+        printErrors: false
         onLoaded: {
             parseSessionConfig(sessionConfigFileView.text());
         }
-        onLoadFailed: error => {
-            log.warn("Could not load greeter session config from", root.sessionConfigPath, "error:", error);
-        }
+        onLoadFailed: {}
     }
 }

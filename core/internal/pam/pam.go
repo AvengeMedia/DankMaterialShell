@@ -849,7 +849,7 @@ func syncGreeterPamConfigWithDeps(logFunc func(string), sudoPassword string, set
 	if wantFprint || wantU2f {
 		blockLines := []string{GreeterPamManagedBlockStart}
 		if wantFprint {
-			blockLines = append(blockLines, "auth sufficient pam_fprintd.so max-tries=1 timeout=5")
+			blockLines = append(blockLines, "auth sufficient pam_fprintd.so max-tries=2 timeout=10")
 		}
 		if wantU2f {
 			blockLines = append(blockLines, "auth sufficient pam_u2f.so cue nouserok timeout=10")

@@ -88,6 +88,19 @@ is_hyprland_lua_config() {
     return 1
 }
 
+clear_vt() {
+    local clear_sequence=$'\033[2J\033[H\033[3J\033[?25l'
+
+    # Clear retained console text on the controlling VT.
+    if printf '%s' "$clear_sequence" >/dev/tty 2>/dev/null; then
+        return
+    fi
+
+    if [[ -t 1 ]]; then
+        printf '%s' "$clear_sequence"
+    fi
+}
+
 exec_compositor() {
     local log_tag="$1"
     shift
@@ -96,11 +109,14 @@ exec_compositor() {
         exec "$@"
     fi
 
+    clear_vt
+
     if command -v systemd-cat >/dev/null 2>&1; then
-        exec "$@" > >(systemd-cat -t "dms-greeter/$log_tag" -p info) 2>&1
+        exec "$@" > >(systemd-cat -t "dms-greeter/$log_tag" -p info 2>/dev/null) 2>&1
     fi
 
-    exec "$@"
+    # Preserve diagnostics on systems without journald.
+    exec "$@" >>"$CACHE_DIR/$log_tag.log" 2>&1
 }
 
 while [[ $# -gt 0 ]]; do

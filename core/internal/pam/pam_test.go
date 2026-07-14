@@ -723,7 +723,7 @@ func TestSyncGreeterPamConfigWithDeps(t *testing.T) {
 		got := readFileString(t, env.greetdPath)
 		for _, want := range []string{
 			GreeterPamManagedBlockStart,
-			"auth sufficient pam_fprintd.so max-tries=1 timeout=5",
+			"auth sufficient pam_fprintd.so max-tries=2 timeout=10",
 			"auth sufficient pam_u2f.so cue nouserok timeout=10",
 			GreeterPamManagedBlockEnd,
 		} {
@@ -840,7 +840,7 @@ func TestSyncAuthConfigWithDeps(t *testing.T) {
 		}
 
 		greetd := readFileString(t, env.greetdPath)
-		if !strings.Contains(greetd, "auth sufficient pam_fprintd.so max-tries=1 timeout=5") {
+		if !strings.Contains(greetd, "auth sufficient pam_fprintd.so max-tries=2 timeout=10") {
 			t.Fatalf("expected greetd PAM to receive fingerprint auth block:\n%s", greetd)
 		}
 		if strings.Contains(greetd, "auth sufficient pam_u2f.so cue nouserok timeout=10") {

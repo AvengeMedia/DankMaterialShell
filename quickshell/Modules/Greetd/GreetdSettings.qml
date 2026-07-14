@@ -219,12 +219,11 @@ Singleton {
         blockWrites: true
         atomicWrites: false
         watchChanges: false
-        printErrors: true
+        printErrors: false
         onLoaded: {
             parseSettings(settingsFile.text());
         }
-        onLoadFailed: error => {
-            log.warn("Failed to load greetd settings:", error);
+        onLoadFailed: {
             root.parseSettings("");
         }
     }

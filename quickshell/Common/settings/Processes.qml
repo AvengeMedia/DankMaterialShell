@@ -476,7 +476,7 @@ Singleton {
         if (exitCode === 0)
             return "missing_enrollment";
         if (exitCode === 127 || (output || "").includes("__missing_command__"))
-            return "probe_failed";
+            return "missing_pam_support";
         return pamFprintDetected ? "probe_failed" : "missing_pam_support";
     }
 

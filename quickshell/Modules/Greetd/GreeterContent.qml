@@ -51,6 +51,7 @@ Item {
     property int passwordFailureCount: 0
     property int passwordAttemptLimitHint: 0
     property string authFeedbackMessage: ""
+    property string authSuccessMessage: ""
     property string greetdPamText: ""
     property string systemAuthPamText: ""
     property string commonAuthPamText: ""
@@ -67,11 +68,23 @@ Item {
     property bool fprintdProbeComplete: false
     property bool fprintdHasDevice: false
     property bool autoLoginOnSuccess: false
+    readonly property bool greeterPamStackHasFprint: greeterPamStackHasModule("pam_fprintd")
     // Falls back to PAM-only detection until the fprintd D-Bus probe completes.
-    readonly property bool greeterPamHasFprint: greeterPamStackHasModule("pam_fprintd") && (!fprintdProbeComplete || fprintdHasDevice)
+    readonly property bool greeterPamHasFprint: greeterPamStackHasFprint && (!fprintdProbeComplete || fprintdHasDevice)
     readonly property bool greeterPamHasU2f: greeterPamStackHasModule("pam_u2f")
     readonly property bool greeterExternalAuthAvailable: (greeterPamHasFprint && GreetdSettings.greeterEnableFprint) || (greeterPamHasU2f && GreetdSettings.greeterEnableU2f)
-    readonly property bool greeterPamHasExternalAuth: greeterPamHasFprint || greeterPamHasU2f
+    readonly property bool greeterPamHasExternalAuth: greeterPamStackHasFprint || greeterPamHasU2f
+    readonly property bool externalAuthInProgress: awaitingExternalAuth || (Greetd.state !== GreetdState.Inactive && passwordSubmitRequested && greeterPamHasExternalAuth && !pendingPasswordResponse)
+    readonly property string externalAuthStatusMessage: {
+        if (!externalAuthInProgress)
+            return "";
+        if (greeterPamStackHasFprint && greeterPamHasU2f)
+            return I18n.tr("Awaiting fingerprint or security key authentication");
+        if (greeterPamStackHasFprint)
+            return I18n.tr("Awaiting fingerprint authentication");
+        return I18n.tr("Awaiting security key authentication");
+    }
+    readonly property string authDisplayMessage: authFeedbackMessage || authSuccessMessage || externalAuthStatusMessage
     readonly property bool autoLoginAvailable: GreetdSettings.rememberLastUser && GreetdSettings.rememberLastSession
     readonly property bool multipleUsersAvailable: GreeterUsersService.loaded && GreeterUsersService.users.length > 1
     // Single-user systems get the picker too when auto-login is available, so the
@@ -238,7 +251,7 @@ Item {
 
     function isLikelyLockoutMessage(message) {
         const lower = (message || "").toLowerCase();
-        return lower.includes("account is locked") || lower.includes("too many") || lower.includes("maximum number of") || lower.includes("auth_err");
+        return lower.includes("account is locked") || lower.includes("too many") || lower.includes("maximum number of");
     }
 
     function currentAuthMessage() {
@@ -251,11 +264,11 @@ Item {
                 const attempt = Math.max(1, Math.min(passwordFailureCount, passwordAttemptLimitHint));
                 const remaining = Math.max(passwordAttemptLimitHint - attempt, 0);
                 if (remaining > 0) {
-                    return I18n.tr("Incorrect password - attempt %1 of %2 (lockout may follow)").arg(attempt).arg(passwordAttemptLimitHint);
+                    return I18n.tr("Authentication failed - attempt %1 of %2").arg(attempt).arg(passwordAttemptLimitHint);
                 }
-                return I18n.tr("Incorrect password - next failures may trigger account lockout");
+                return I18n.tr("Authentication failed - lockout can occur");
             }
-            return I18n.tr("Incorrect password");
+            return I18n.tr("Authentication failed - try again");
         }
         return "";
     }
@@ -263,6 +276,7 @@ Item {
     function clearAuthFeedback() {
         GreeterState.pamState = "";
         authFeedbackMessage = "";
+        authSuccessMessage = "";
     }
 
     function resetPasswordSessionTransition(clearSubmitRequest) {
@@ -619,8 +633,8 @@ Item {
         pendingPasswordResponse = false;
         passwordSubmitRequested = submitPassword;
         awaitingExternalAuth = !submitPassword && !hasPasswordBuffer && root.greeterExternalAuthAvailable;
-        // Use greeterExternalAuthAvailable so systems with pam_fprintd but no hardware don't incur the 30 s wait.
-        const waitingOnPamExternalBeforePassword = submitPassword && root.greeterExternalAuthAvailable;
+        // Let the effective PAM stack finish external authentication.
+        const waitingOnPamExternalBeforePassword = submitPassword && root.greeterPamHasExternalAuth;
         authTimeout.interval = (awaitingExternalAuth || waitingOnPamExternalBeforePassword) ? externalAuthTimeoutMs : defaultAuthTimeoutMs;
         authTimeout.restart();
         Greetd.createSession(GreeterState.username);
@@ -1406,16 +1420,16 @@ Item {
 
                 StyledText {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: root.authFeedbackMessage !== "" ? 38 : 0
+                    Layout.preferredHeight: root.authDisplayMessage !== "" ? 38 : 0
                     Layout.topMargin: -Theme.spacingS
                     Layout.bottomMargin: -Theme.spacingS
-                    text: root.authFeedbackMessage
-                    color: Theme.error
+                    text: root.authDisplayMessage
+                    color: root.authFeedbackMessage !== "" ? Theme.error : (root.authSuccessMessage !== "" ? Theme.success : Theme.surfaceVariantText)
                     font.pixelSize: Theme.fontSizeSmall
                     horizontalAlignment: Text.AlignHCenter
                     wrapMode: Text.WordWrap
                     maximumLineCount: 2
-                    opacity: root.authFeedbackMessage !== "" ? 1 : 0
+                    opacity: root.authDisplayMessage !== "" ? 1 : 0
 
                     Behavior on opacity {
                         NumberAnimation {
@@ -1975,6 +1989,7 @@ Item {
             authTimeout.stop();
             passwordFailureCount = 0;
             clearAuthFeedback();
+            authSuccessMessage = I18n.tr("Authenticated - starting session");
             const sessionCmd = GreeterState.selectedSession || GreeterState.sessionExecs[GreeterState.currentSessionIndex];
             const sessionPath = GreeterState.selectedSessionPath || GreeterState.sessionPaths[GreeterState.currentSessionIndex];
             const sessionDesktopId = GreeterState.selectedSessionDesktopId || GreeterState.sessionDesktopIds[GreeterState.currentSessionIndex] || desktopIdFromPath(sessionPath);
@@ -2055,12 +2070,8 @@ Item {
             pendingLaunchCommand = "";
             pendingLaunchEnv = [];
             const sessionArgs = sessionCommand.trim().split(/\s+/);
-            const needsVoidDbusSession = Quickshell.env("DMS_VOID") === "1"
-                && !Quickshell.env("DBUS_SESSION_BUS_ADDRESS")
-                && sessionArgs[0] !== "dbus-run-session";
-            const launchArgs = needsVoidDbusSession
-                ? ["dbus-run-session"].concat(sessionArgs)
-                : sessionArgs;
+            const needsVoidDbusSession = Quickshell.env("DMS_VOID") === "1" && !Quickshell.env("DBUS_SESSION_BUS_ADDRESS") && sessionArgs[0] !== "dbus-run-session";
+            const launchArgs = needsVoidDbusSession ? ["dbus-run-session"].concat(sessionArgs) : sessionArgs;
             Greetd.launch(launchArgs, launchEnv);
         }
     }
