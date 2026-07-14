@@ -473,6 +473,10 @@ func (m *Manager) GetNetworkInfoDetailed(ssid string) (*NetworkInfoResponse, err
 	return m.backend.GetWiFiNetworkDetails(ssid)
 }
 
+func (m *Manager) GetWiFiQRContent(ssid string) (string, error) {
+	return m.backend.GetWiFiQRCodeContent(ssid)
+}
+
 func (m *Manager) GetNetworkQRCode(ssid string) ([2]string, error) {
 	content, err := m.backend.GetWiFiQRCodeContent(ssid)
 	if err != nil {

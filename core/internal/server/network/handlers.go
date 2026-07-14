@@ -43,6 +43,8 @@ func HandleRequest(conn net.Conn, req models.Request, manager *Manager) {
 		handleGetNetworkInfo(conn, req, manager)
 	case "network.qrcode":
 		handleGetNetworkQRCode(conn, req, manager)
+	case "network.qrcode-content":
+		handleGetNetworkQRCodeContent(conn, req, manager)
 	case "network.delete-qrcode":
 		handleDeleteQRCode(conn, req, manager)
 	case "network.ethernet.info":
@@ -333,6 +335,22 @@ func handleGetNetworkQRCode(conn net.Conn, req models.Request, manager *Manager)
 	}
 
 	content, err := manager.GetNetworkQRCode(ssid)
+	if err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+
+	models.Respond(conn, req.ID, content)
+}
+
+func handleGetNetworkQRCodeContent(conn net.Conn, req models.Request, manager *Manager) {
+	ssid, err := params.String(req.Params, "ssid")
+	if err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+
+	content, err := manager.GetWiFiQRContent(ssid)
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
 		return

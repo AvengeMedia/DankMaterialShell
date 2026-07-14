@@ -5,12 +5,14 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/qrcode"
 )
 
 const qrCodeTmpPrefix = "/tmp/dank-wifi-qrcode-"
 
 func FormatWiFiQRString(securityType, ssid, password string) string {
-	return fmt.Sprintf("WIFI:T:%s;S:%s;P:%s;;", securityType, ssid, password)
+	return qrcode.WiFiString(securityType, ssid, password, false)
 }
 
 func qrCodePaths(ssid string) (themed, normal string) {
