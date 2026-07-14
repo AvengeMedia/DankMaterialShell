@@ -217,7 +217,7 @@ Item {
         frozenMotionOffsetX = modalContainer ? modalContainer.offsetX : 0;
         frozenMotionOffsetY = modalContainer ? modalContainer.offsetY : animationOffset;
 
-        const focusedScreen = CompositorService.getFocusedScreen();
+        const focusedScreen = root.targetScreen ?? CompositorService.getFocusedScreen();
         if (focusedScreen) {
             contentWindow.screen = focusedScreen;
         }
