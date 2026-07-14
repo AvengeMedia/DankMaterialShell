@@ -59,6 +59,7 @@ Singleton {
     function _commit(u) {
         resolvedArtUrl = u;
         _committedArtKey = u !== "" ? _pendingArtKey : "";
+        _committedSrcUrl = u !== "" ? _lastArtUrl : "";
     }
 
     function loadArtwork(url) {
@@ -136,23 +137,19 @@ Singleton {
         loading = true;
         const localUrl = url;
         const filePath = url.startsWith("file://") ? url.substring(7) : url;
-        // Cover lands after metadata, so poll; hash only to reject placeholder art.
-        const script = "f=\"$1\"; for i in $(seq 20); do [ -f \"$f\" ] && break; sleep 0.15; done; [ -f \"$f\" ] || exit 1; sha1sum \"$f\" | cut -c1-40";
-        Proc.runCommand(null, ["sh", "-c", script, "sh", filePath], (output, exitCode) => {
+        const cacheDir = Paths.strip(Paths.imagecache);
+        // Cover lands after metadata, so poll; commit a content-addressed copy so identical bytes keep an identical url
+        const script = "f=\"$1\"; d=\"$2\"; i=0; while [ ! -f \"$f\" ] && [ \"$i\" -lt 20 ]; do sleep 0.15; i=$((i + 1)); done; [ -f \"$f\" ] || exit 1; s=$(sha1sum \"$f\" | cut -c1-40); if [ ! -f \"$d/art_$s\" ]; then mkdir -p \"$d\" && cp \"$f\" \"$d/art_$s.tmp\" && mv \"$d/art_$s.tmp\" \"$d/art_$s\" || exit 1; fi; echo \"$s\"";
+        Proc.runCommand(null, ["sh", "-c", script, "sh", filePath, cacheDir], (output, exitCode) => {
             if (_lastArtUrl !== localUrl)
                 return;
-            if (exitCode !== 0) {
-                // Keep current art rather than blanking (avoids an accent/art flash).
-                loading = false;
-                return;
-            }
-            // Placeholder (Chrome logo): skip without committing so the real cover still resolves.
-            if (_artHashDenylist.indexOf((output || "").trim()) !== -1) {
-                loading = false;
-                return;
-            }
-            _commit(localUrl);
             loading = false;
+            if (exitCode !== 0)
+                return;
+            const sha = (output || "").trim();
+            if (_artHashDenylist.indexOf(sha) !== -1)
+                return;
+            _commit("file://" + cacheDir + "/art_" + sha);
         }, 50, 5000);
     }
 
@@ -169,6 +166,7 @@ Singleton {
 
     property string _committedArtKey: ""
     property string _pendingArtKey: ""
+    property string _committedSrcUrl: ""
 
     onActivePlayerChanged: _updateArtUrl()
 
@@ -184,13 +182,9 @@ Singleton {
         const p = activePlayer;
         if (!p)
             return "";
-        // Combine trackid with the text identity. trackid alone dedups Chrome's multi-size art
-        // re-publish, but some players (e.g. KDEconnect) expose a constant trackid across every
-        // track, so keying on it alone wedged the dedup and new-song art never loaded. Folding
-        // in title/artist/album busts the lock on a real track change while same-track art
-        // churn (stable text) stays deduped.
+        // +title/artist: KDEconnect reuses one trackid forever; album excluded: Chrome delivers it late, orphaning the lock
         const tid = p.metadata && p.metadata["mpris:trackid"] ? p.metadata["mpris:trackid"].toString() : "";
-        return tid + " " + (p.trackTitle || "") + " " + (p.trackArtist || "") + " " + (p.trackAlbum || "");
+        return tid + " " + (p.trackTitle || "") + " " + (p.trackArtist || "");
     }
 
     function artReadyFor(player) {
@@ -206,6 +200,11 @@ Singleton {
         if (key !== "" && key === _committedArtKey)
             return;
         _pendingArtKey = key;
-        loadArtwork(getArtworkUrl(activePlayer));
+        const url = getArtworkUrl(activePlayer);
+        if (key !== "" && url !== "" && url === _committedSrcUrl) {
+            _committedArtKey = key;
+            return;
+        }
+        loadArtwork(url);
     }
 }
