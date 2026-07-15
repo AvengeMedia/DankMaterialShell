@@ -33,6 +33,8 @@ Variants {
 
         color: "transparent"
 
+        visible: root.contentReady && !root.surfaceBounce
+
         updatesEnabled: root.renderActive || root._settleFrames > 0
 
         mask: Region {
@@ -56,6 +58,8 @@ Variants {
 
             property string source: SessionData.getMonitorWallpaper(modelData.name) || ""
             property bool isColorSource: source.startsWith("#")
+            property bool contentReady: false
+            property bool surfaceBounce: false
 
             Connections {
                 target: SessionData
@@ -94,6 +98,9 @@ Variants {
 
             Component.onCompleted: {
                 isInitialized = true;
+                if (!source || isColorSource) {
+                    contentReady = true;
+                }
             }
 
             property bool isInitialized: false
@@ -136,9 +143,9 @@ Variants {
                 interval: 0
                 repeat: false
                 onTriggered: {
-                    blurWallpaperWindow.visible = false;
+                    root.surfaceBounce = true;
                     Qt.callLater(() => {
-                        blurWallpaperWindow.visible = true;
+                        root.surfaceBounce = false;
                     });
                 }
             }
@@ -246,6 +253,8 @@ Variants {
                 transitionAnimation.stop();
                 root.transitionProgress = 0.0;
                 root.effectActive = false;
+                if (!newSource)
+                    root.contentReady = true;
                 currentWallpaper.source = newSource;
                 nextWallpaper.source = "";
             }
@@ -317,6 +326,9 @@ Variants {
                 onStatusChanged: {
                     if (status === Image.Error) {
                         log.warn("failed to load active wallpaper for", modelData.name + ":", source);
+                    }
+                    if (status === Image.Ready || status === Image.Error) {
+                        root.contentReady = true;
                     }
                 }
             }

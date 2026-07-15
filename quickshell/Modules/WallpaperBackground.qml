@@ -37,6 +37,8 @@ Variants {
 
         color: "transparent"
 
+        visible: root.contentReady && !root.surfaceBounce
+
         updatesEnabled: root.renderActive || root._settleFrames > 0
 
         mask: Region {
@@ -63,6 +65,9 @@ Variants {
             property string transitionType: SessionData.wallpaperTransition
             property string actualTransitionType: transitionType
             property bool isInitialized: false
+
+            property bool contentReady: false
+            property bool surfaceBounce: false
 
             property string scrollMode: SettingsData.wallpaperFillMode
             property bool scrollingEnabled: scrollMode === "Scrolling"
@@ -263,9 +268,9 @@ Variants {
                 interval: 0
                 repeat: false
                 onTriggered: {
-                    wallpaperWindow.visible = false;
+                    root.surfaceBounce = true;
                     Qt.callLater(() => {
-                        wallpaperWindow.visible = true;
+                        root.surfaceBounce = false;
                     });
                 }
             }
@@ -506,6 +511,9 @@ Variants {
 
             Component.onCompleted: {
                 isInitialized = true;
+                if (!source || isColorSource) {
+                    contentReady = true;
+                }
 
                 if (scrollingEnabled) {
                     updateWorkspaceData();
@@ -574,8 +582,10 @@ Variants {
                 root.effectActive = false;
                 root.screenScale = CompositorService.getScreenScale(modelData);
                 // No status change coming to clear the flag
-                if (!newSource || currentWallpaper.source.toString() === newSource)
+                if (!newSource || currentWallpaper.source.toString() === newSource) {
                     root.changePending = false;
+                    root.contentReady = true;
+                }
                 currentWallpaper.source = newSource;
                 nextWallpaper.source = "";
 
@@ -746,6 +756,7 @@ Variants {
                     }
                     if (status === Image.Ready || status === Image.Error) {
                         root.changePending = false;
+                        root.contentReady = true;
                     }
                 }
 

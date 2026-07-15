@@ -213,7 +213,7 @@ Item {
     }
 
     Component.onCompleted: {
-        dockRecreateDebounce.start();
+        dockEnabled = true;
         loginSoundTimer.start();
         osdStartupTimer.start();
 

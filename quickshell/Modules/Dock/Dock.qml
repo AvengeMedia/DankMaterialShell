@@ -340,7 +340,19 @@ Variants {
             return ConnectedModeState.dockRetractActiveForSide(dock._dockScreenName, dock.connectedBarSide);
         }
 
+        property bool startupRevealDone: false
+
+        Timer {
+            id: startupRevealTimer
+            interval: 200
+            running: true
+            onTriggered: dock.startupRevealDone = true
+        }
+
         property bool reveal: {
+            if (!startupRevealDone)
+                return false;
+
             if (_modalRetractActive)
                 return false;
 
@@ -628,6 +640,7 @@ Variants {
                     id: dockContainer
                     anchors.fill: parent
                     clip: false
+                    opacity: dock.startupRevealDone ? 1 : 0
 
                     transform: Translate {
                         id: dockSlide
