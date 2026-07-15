@@ -28,7 +28,6 @@ Singleton {
     readonly property string hyprlandSignature: Quickshell.env("HYPRLAND_INSTANCE_SIGNATURE")
     readonly property string niriSocket: Quickshell.env("NIRI_SOCKET")
     readonly property string swaySocket: Quickshell.env("SWAYSOCK")
-    readonly property string scrollSocket: Quickshell.env("SWAYSOCK")
     readonly property string miracleSocket: Quickshell.env("MIRACLESOCK")
     readonly property string labwcPid: Quickshell.env("LABWC_PID")
     readonly property string mangoSignature: Quickshell.env("MANGO_INSTANCE_SIGNATURE")
@@ -943,122 +942,132 @@ Singleton {
         }
     }
 
+    // Primary detection asks the OS which process owns $WAYLAND_DISPLAY — the
+    // compositor quickshell is actually connected to. Env vars like
+    // HYPRLAND_INSTANCE_SIGNATURE / MANGO_INSTANCE_SIGNATURE can leak into the
+    // systemd user environment from previous sessions and lie.
     function detectCompositor() {
-        if (mangoSignature && mangoSignature.length > 0) {
-            isHyprland = false;
-            isNiri = false;
-            isMango = true;
-            isSway = false;
-            isScroll = false;
-            isMiracle = false;
-            isLabwc = false;
-            compositor = "mango";
-            log.info("Detected MangoWM via MANGO_INSTANCE_SIGNATURE");
-            return;
-        }
+        const script = 'sock="$WAYLAND_DISPLAY"; case "$sock" in /*) ;; *) sock="$XDG_RUNTIME_DIR/$sock" ;; esac; ss -xlp 2>/dev/null | grep -F "$sock " | head -n1';
+        Proc.runCommand("waylandSocketOwner", ["sh", "-c", script], (output, exitCode) => {
+            const match = output ? output.match(/users:\(\("([^"]+)"/) : null;
+            const comm = match ? match[1].toLowerCase() : "";
+            const name = _compositorNameFromComm(comm);
+            if (name) {
+                _applyCompositor(name);
+                log.info("Detected", name, "from Wayland socket owner:", comm);
+                return;
+            }
+            if (comm)
+                log.info("Unrecognized Wayland socket owner:", comm, "- falling back to env detection");
+            _detectFromEnv(0);
+        }, 0, 3000);
+    }
 
-        if (hyprlandSignature && hyprlandSignature.length > 0 && !niriSocket && !swaySocket && !scrollSocket && !miracleSocket && !labwcPid) {
-            isHyprland = true;
-            isNiri = false;
-            isMango = false;
-            isSway = false;
-            isScroll = false;
-            isMiracle = false;
-            isLabwc = false;
-            compositor = "hyprland";
-            log.info("Detected Hyprland");
-            return;
+    function _compositorNameFromComm(comm) {
+        switch (comm) {
+        case "niri":
+            return "niri";
+        case "hyprland":
+            return "hyprland";
+        case "sway":
+            return "sway";
+        case "scroll":
+            return "scroll";
+        case "mango":
+            return "mango";
+        case "miracle-wm":
+            return "miracle";
+        case "labwc":
+            return "labwc";
+        default:
+            return "";
         }
+    }
 
-        if (niriSocket && niriSocket.length > 0) {
-            Proc.runCommand("niriSocketCheck", ["test", "-S", niriSocket], (output, exitCode) => {
-                if (exitCode === 0) {
-                    isNiri = true;
-                    isHyprland = false;
-                    isMango = false;
-                    isSway = false;
-                    isScroll = false;
-                    isMiracle = false;
-                    isLabwc = false;
-                    compositor = "niri";
-                    log.info("Detected Niri with socket:", niriSocket);
-                    NiriService.generateNiriBlurrule();
+    function _applyCompositor(name) {
+        isHyprland = name === "hyprland";
+        isNiri = name === "niri";
+        isMango = name === "mango";
+        isSway = name === "sway";
+        isScroll = name === "scroll";
+        isMiracle = name === "miracle";
+        isLabwc = name === "labwc";
+        compositor = name;
+        compositorDetected = true;
+        if (isNiri)
+            NiriService.generateNiriBlurrule();
+    }
+
+    // Fallback when the socket owner can't be resolved (no ss, unrecognized
+    // comm). Same priority order as before, but every candidate must prove
+    // liveness; a dead socket/PID falls through to the next candidate instead
+    // of winning on a stale env var.
+    function _envDetectionCandidates() {
+        const runtimeDir = Quickshell.env("XDG_RUNTIME_DIR") || "";
+        return [
+            {
+                name: "mango",
+                present: !!mangoSignature,
+                test: ["test", "-S", mangoSignature],
+                detail: "MANGO_INSTANCE_SIGNATURE " + mangoSignature
+            },
+            {
+                name: "niri",
+                present: !!niriSocket,
+                test: ["test", "-S", niriSocket],
+                detail: "NIRI_SOCKET " + niriSocket
+            },
+            {
+                name: "miracle",
+                present: !!miracleSocket,
+                test: ["test", "-S", miracleSocket],
+                detail: "MIRACLESOCK " + miracleSocket
+            },
+            {
+                name: "sway",
+                present: !!swaySocket,
+                test: ["test", "-S", swaySocket],
+                resolve: () => {
+                    const desktop = String(Quickshell.env("XDG_CURRENT_DESKTOP") || "").toLowerCase();
+                    return desktop.includes("sway") ? "sway" : "scroll";
+                },
+                detail: "SWAYSOCK " + swaySocket
+            },
+            {
+                name: "labwc",
+                present: !!labwcPid,
+                test: ["sh", "-c", "[ \"$(cat /proc/\"$LABWC_PID\"/comm 2>/dev/null)\" = labwc ]"],
+                detail: "LABWC_PID " + labwcPid
+            },
+            {
+                name: "hyprland",
+                present: !!hyprlandSignature,
+                test: ["test", "-S", runtimeDir + "/hypr/" + hyprlandSignature + "/.socket.sock"],
+                detail: "HYPRLAND_INSTANCE_SIGNATURE " + hyprlandSignature
+            }
+        ];
+    }
+
+    function _detectFromEnv(index) {
+        const candidates = _envDetectionCandidates();
+        for (let i = index; i < candidates.length; i++) {
+            const c = candidates[i];
+            if (!c.present)
+                continue;
+            const next = i + 1;
+            Proc.runCommand(c.name + "SocketCheck", c.test, (output, exitCode) => {
+                if (exitCode !== 0) {
+                    log.warn(c.detail, "is set but not alive, skipping");
+                    _detectFromEnv(next);
+                    return;
                 }
+                const name = c.resolve ? c.resolve() : c.name;
+                _applyCompositor(name);
+                log.info("Detected", name, "via", c.detail);
             }, 0);
             return;
         }
-
-        if (swaySocket && swaySocket.length > 0 && !scrollSocket && scrollSocket.length == 0 && !miracleSocket) {
-            Proc.runCommand("swaySocketCheck", ["test", "-S", swaySocket], (output, exitCode) => {
-                if (exitCode === 0) {
-                    isNiri = false;
-                    isHyprland = false;
-                    isSway = true;
-                    isScroll = false;
-                    isMiracle = false;
-                    isLabwc = false;
-                    compositor = "sway";
-                    log.info("Detected Sway with socket:", swaySocket);
-                }
-            }, 0);
-            return;
-        }
-
-        if (miracleSocket && miracleSocket.length > 0) {
-            Proc.runCommand("miracleSocketCheck", ["test", "-S", miracleSocket], (output, exitCode) => {
-                if (exitCode === 0) {
-                    isNiri = false;
-                    isHyprland = false;
-                    isMango = false;
-                    isSway = false;
-                    isScroll = false;
-                    isMiracle = true;
-                    isLabwc = false;
-                    compositor = "miracle";
-                    log.info("Detected Miracle WM with socket:", miracleSocket);
-                }
-            }, 0);
-            return;
-        }
-
-        if (scrollSocket && scrollSocket.length > 0 && !miracleSocket) {
-            Proc.runCommand("scrollSocketCheck", ["test", "-S", scrollSocket], (output, exitCode) => {
-                if (exitCode === 0) {
-                    isNiri = false;
-                    isHyprland = false;
-                    isMango = false;
-                    isSway = false;
-                    isScroll = true;
-                    isMiracle = false;
-                    isLabwc = false;
-                    compositor = "scroll";
-                    log.info("Detected Scroll with socket:", scrollSocket);
-                }
-            }, 0);
-            return;
-        }
-
-        if (labwcPid && labwcPid.length > 0) {
-            isHyprland = false;
-            isNiri = false;
-            isMango = false;
-            isSway = false;
-            isScroll = false;
-            isMiracle = false;
-            isLabwc = true;
-            compositor = "labwc";
-            log.info("Detected LabWC with PID:", labwcPid);
-            return;
-        }
-
-        isHyprland = false;
-        isNiri = false;
-        isMango = false;
-        isSway = false;
-        isScroll = false;
-        isMiracle = false;
-        isLabwc = false;
-        compositor = "unknown";
+        _applyCompositor("unknown");
         log.warn("No compositor detected");
     }
 
