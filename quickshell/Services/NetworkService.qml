@@ -100,14 +100,28 @@ Singleton {
 
     readonly property string socketPath: Quickshell.env("DMS_SOCKET")
 
+    // Backend adoption must be state-checked here, not only edge-triggered below:
+    // with staged shell loading this singleton can be instantiated after
+    // DMSNetworkService already resolved its capabilities, so the change signal
+    // may never fire again.
     Component.onCompleted: {
         log.info("Initializing...");
         if (!socketPath || socketPath.length === 0) {
             log.info("DMS_SOCKET not set, using LegacyNetworkService");
             useLegacyService();
-        } else {
-            log.debug("DMS_SOCKET found, waiting for capabilities...");
+            return;
         }
+        if (DMSNetworkService.networkAvailable) {
+            log.info("Network capability already available, using DMSNetworkService");
+            useDMSService();
+            return;
+        }
+        if (DMSService.isConnected && DMSService.capabilities.length > 0) {
+            log.info("Network capability not available in DMS, using LegacyNetworkService");
+            useLegacyService();
+            return;
+        }
+        log.debug("DMS_SOCKET found, waiting for capabilities...");
     }
 
     Connections {
@@ -116,15 +130,19 @@ Singleton {
         function onNetworkAvailableChanged() {
             if (!activeService && DMSNetworkService.networkAvailable) {
                 log.info("Network capability detected, using DMSNetworkService");
-                activeService = DMSNetworkService;
-                usingLegacy = false;
-                log.info("Switched to DMSNetworkService, networkAvailable:", networkAvailable);
-                connectSignals();
+                useDMSService();
             } else if (!activeService && !DMSNetworkService.networkAvailable && socketPath && socketPath.length > 0) {
                 log.info("Network capability not available in DMS, using LegacyNetworkService");
                 useLegacyService();
             }
         }
+    }
+
+    function useDMSService() {
+        activeService = DMSNetworkService;
+        usingLegacy = false;
+        log.info("Switched to DMSNetworkService, networkAvailable:", networkAvailable);
+        connectSignals();
     }
 
     function useLegacyService() {
