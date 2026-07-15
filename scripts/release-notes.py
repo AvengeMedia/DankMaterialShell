@@ -20,6 +20,7 @@ import re
 import subprocess
 import sys
 from collections import OrderedDict
+from pathlib import Path
 
 BOT_RE = re.compile(r"\[bot\]$|^github-actions$|^dependabot$", re.I)
 # default blog-table exclusions
@@ -311,6 +312,13 @@ def main():
                     help="github format: omit heading and Full Changelog footer")
     ap.add_argument("--no-api", action="store_true",
                     help="skip GitHub API, use git data only (degraded attribution)")
+    ap.add_argument("-o", "--output", default=None, metavar="PATH",
+                    help="write the output to PATH instead of stdout (parent dirs "
+                         "are created)")
+    ap.add_argument("--version", default=None, metavar="X.Y.Z",
+                    help="release version being cut; if set and -o/--output isn't, "
+                         "writes to ~/Documents/dms-vX.Y.Z-changelog.md instead of "
+                         "stdout")
     args = ap.parse_args()
 
     repo = args.repo
@@ -329,16 +337,25 @@ def main():
     drop = {x.lower() for x in excludes if x}
     if args.format == "blog":
         # blog excludes from tables only; fixes list keeps everyone
-        print(format_blog(repo, entries, args.range, exclude=drop))
-        return 0
-    if drop:
-        entries = [e for e in entries
-                   if (e["login"] or "").lower() not in drop
-                   and e["author_name"].lower() not in drop]
-    if args.format == "github":
-        print(format_github(repo, entries, args.range, bare=args.bare))
+        text = format_blog(repo, entries, args.range, exclude=frozenset(drop))
     else:
-        print(format_checklist(entries))
+        if drop:
+            entries = [e for e in entries
+                       if (e["login"] or "").lower() not in drop
+                       and e["author_name"].lower() not in drop]
+        if args.format == "github":
+            text = format_github(repo, entries, args.range, bare=args.bare)
+        else:
+            text = format_checklist(entries)
+
+    out_target = args.output or (f"~/Documents/dms-v{args.version}-changelog.md" if args.version else None)
+    if out_target:
+        out_path = Path(out_target).expanduser()
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(text + "\n")
+        print(f"written to {out_path}", file=sys.stderr)
+    else:
+        print(text)
     return 0
 
 
