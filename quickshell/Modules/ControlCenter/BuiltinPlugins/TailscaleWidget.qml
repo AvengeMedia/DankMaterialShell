@@ -44,7 +44,9 @@ PluginComponent {
 
             implicitHeight: detailColumn.implicitHeight + Theme.spacingM * 2
             radius: Theme.cornerRadius
-            color: Theme.surfaceContainerHigh
+            color: Theme.nestedSurface
+            border.color: Theme.outlineMedium
+            border.width: Theme.layerOutlineWidth
 
             Column {
                 id: detailColumn
@@ -132,7 +134,11 @@ PluginComponent {
                                 width: connButtonRow.implicitWidth + Theme.spacingM * 2
 
                                 readonly property bool isConnected: TailscaleService.connected
-                                color: isConnected ? (connButtonArea.containsMouse ? Theme.errorHover : Theme.surfaceLight) : (connButtonArea.containsMouse ? Theme.primaryHoverLight : Theme.surfaceLight)
+                                color: {
+                                    if (!connButtonArea.containsMouse)
+                                        return Theme.surfaceLight;
+                                    return isConnected ? Theme.errorHover : Theme.primaryHoverLight;
+                                }
 
                                 Row {
                                     id: connButtonRow
@@ -330,13 +336,15 @@ PluginComponent {
                                     required property var modelData
                                     required property int index
 
+                                    readonly property bool isSelf: modelData.hostname === (TailscaleService.selfNode ? TailscaleService.selfNode.hostname : "")
+                                    readonly property bool isExpanded: detailRoot.expandedHostname === modelData.hostname
+
                                     width: peerListColumn.width
                                     height: peerCardColumn.implicitHeight + Theme.spacingS * 2
                                     radius: Theme.cornerRadius
-                                    color: modelData.hostname === (TailscaleService.selfNode ? TailscaleService.selfNode.hostname : "") ? Theme.primaryHoverLight : Theme.surfaceContainerHighest
-
-                                    property bool isSelf: modelData.hostname === (TailscaleService.selfNode ? TailscaleService.selfNode.hostname : "")
-                                    property bool isExpanded: detailRoot.expandedHostname === modelData.hostname
+                                    color: peerMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.surfaceLight
+                                    border.color: isSelf ? Theme.primary : Theme.outlineLight
+                                    border.width: isSelf ? 2 : 1
 
                                     Column {
                                         id: peerCardColumn
@@ -354,14 +362,14 @@ PluginComponent {
                                                 width: 8
                                                 height: 8
                                                 radius: 4
-                                                color: modelData.online ? "#4caf50" : Theme.surfaceVariantText
+                                                color: modelData.online ? Theme.success : Theme.surfaceVariantText
                                                 Layout.alignment: Qt.AlignVCenter
                                             }
 
                                             StyledText {
                                                 text: modelData.hostname || ""
-                                                font.pixelSize: Theme.fontSizeSmall
-                                                font.weight: Font.Bold
+                                                font.pixelSize: Theme.fontSizeMedium
+                                                font.weight: isSelf ? Font.Medium : Font.Normal
                                                 color: Theme.surfaceText
                                                 Layout.fillWidth: true
                                                 elide: Text.ElideRight
@@ -370,7 +378,7 @@ PluginComponent {
                                             StyledText {
                                                 visible: isSelf
                                                 text: I18n.tr("This device", "Label for the user's own device in Tailscale")
-                                                font.pixelSize: 10
+                                                font.pixelSize: Theme.fontSizeSmall
                                                 color: Theme.primary
                                                 font.weight: Font.Medium
                                             }
@@ -409,7 +417,7 @@ PluginComponent {
                                                 }
                                                 return parts.join(" \u2022 ");
                                             }
-                                            font.pixelSize: 10
+                                            font.pixelSize: Theme.fontSizeSmall
                                             color: Theme.surfaceVariantText
                                             width: parent.width
                                             elide: Text.ElideRight
@@ -429,7 +437,7 @@ PluginComponent {
 
                                                 StyledText {
                                                     text: modelData.dnsName || ""
-                                                    font.pixelSize: 10
+                                                    font.pixelSize: Theme.fontSizeSmall
                                                     color: Theme.surfaceVariantText
                                                     Layout.fillWidth: true
                                                     elide: Text.ElideRight
@@ -447,14 +455,14 @@ PluginComponent {
                                             StyledText {
                                                 visible: (modelData.tags || []).length > 0
                                                 text: I18n.tr("Tags: %1", "Tailscale device tags").arg((modelData.tags || []).join(", "))
-                                                font.pixelSize: 10
+                                                font.pixelSize: Theme.fontSizeSmall
                                                 color: Theme.surfaceVariantText
                                             }
 
                                             StyledText {
                                                 visible: (modelData.owner || "").length > 0
                                                 text: I18n.tr("Owner: %1", "Tailscale device owner").arg(modelData.owner || "")
-                                                font.pixelSize: 10
+                                                font.pixelSize: Theme.fontSizeSmall
                                                 color: Theme.surfaceVariantText
                                             }
                                         }
