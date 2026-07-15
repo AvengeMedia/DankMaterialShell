@@ -531,9 +531,7 @@ Item {
         }
 
         function next(): void {
-            if (MprisController.activePlayer && MprisController.activePlayer.canGoNext) {
-                MprisController.activePlayer.next();
-            }
+            MprisController.next();
         }
 
         function stop(): void {

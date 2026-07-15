@@ -1635,7 +1635,7 @@ Item {
                             enabled: MprisController.activePlayer?.canGoNext ?? false
                             hoverEnabled: enabled
                             cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-                            onClicked: MprisController.activePlayer?.next()
+                            onClicked: MprisController.next()
                         }
                     }
                 }

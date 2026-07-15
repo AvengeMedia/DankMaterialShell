@@ -662,11 +662,12 @@ Item {
                                     weight: 500
                                 }
 
-                                MouseArea {
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: activePlayer && activePlayer.togglePlaying()
+                                StateLayer {
+                                    id: playPauseArea
+                                    disabled: !root.activePlayer || !root.activePlayer.canTogglePlaying
+                                    stateColor: root.onAccent
+                                    cornerRadius: parent.radius
+                                    onClicked: root.activePlayer.togglePlaying()
                                 }
 
                                 ElevationShadow {
@@ -706,7 +707,7 @@ Item {
                                     anchors.fill: parent
                                     hoverEnabled: true
                                     cursorShape: Qt.PointingHandCursor
-                                    onClicked: activePlayer && activePlayer.next()
+                                    onClicked: MprisController.next()
                                 }
                             }
                         }

@@ -56,13 +56,13 @@ Singleton {
         return "";
     }
 
-    function _commit(u) {
+    function _commit(u, artKey, srcUrl) {
         resolvedArtUrl = u;
-        _committedArtKey = u !== "" ? _pendingArtKey : "";
-        _committedSrcUrl = u !== "" ? _lastArtUrl : "";
+        _committedArtKey = u !== "" ? artKey : "";
+        _committedSrcUrl = u !== "" ? srcUrl : "";
     }
 
-    function loadArtwork(url) {
+    function loadArtwork(url, artKey, requestSerial) {
         if (!url || url === "") {
             // Keep stale art; only blank once the empty url debounce settles.
             _lastArtUrl = "";
@@ -85,11 +85,11 @@ Singleton {
 
             // 1. First, check if the file already exists locally
             Proc.runCommand(null, ["test", "-f", filePath], (output, exitCode) => {
-                if (_lastArtUrl !== targetUrl)
+                if (_lastArtUrl !== targetUrl || _requestSerial !== requestSerial)
                     return;
 
                 if (exitCode === 0) {
-                    _commit(localFileUrl);
+                    _commit(localFileUrl, artKey, targetUrl);
                     loading = false;
                 } else {
                     const dlCmd = "mkdir -p \"$(dirname \"$1\")\" && curl -f -s -L -o \"$1\" \"$2\" && mv \"$1\" \"$3\" || { rm -f \"$1\"; exit 1; }";
@@ -102,18 +102,18 @@ Singleton {
                         const tmpPath = filePath + ".tmp";
 
                         Proc.runCommand(null, ["sh", "-c", dlCmd, "sh", tmpPath, maxresUrl, filePath], (maxOutput, maxExitCode) => {
-                            if (_lastArtUrl !== targetUrl)
+                            if (_lastArtUrl !== targetUrl || _requestSerial !== requestSerial)
                                 return;
 
                             if (maxExitCode === 0) {
-                                _commit(localFileUrl);
+                                _commit(localFileUrl, artKey, targetUrl);
                                 loading = false;
                             } else {
                                 Proc.runCommand(null, ["sh", "-c", dlCmd, "sh", tmpPath, mqUrl, filePath], (mqOutput, mqExitCode) => {
-                                    if (_lastArtUrl !== targetUrl)
+                                    if (_lastArtUrl !== targetUrl || _requestSerial !== requestSerial)
                                         return;
 
-                                    _commit(mqExitCode === 0 ? localFileUrl : targetUrl);
+                                    _commit(mqExitCode === 0 ? localFileUrl : targetUrl, artKey, targetUrl);
                                     loading = false;
                                 }, 50, 15000);
                             }
@@ -122,10 +122,10 @@ Singleton {
                         // Standard curl download for other remote URLs (e.g. SoundCloud)
                         const tmpPath = filePath + ".tmp";
                         Proc.runCommand(null, ["sh", "-c", dlCmd, "sh", tmpPath, targetUrl, filePath], (dlOutput, dlExitCode) => {
-                            if (_lastArtUrl !== targetUrl)
+                            if (_lastArtUrl !== targetUrl || _requestSerial !== requestSerial)
                                 return;
 
-                            _commit(dlExitCode === 0 ? localFileUrl : targetUrl);
+                            _commit(dlExitCode === 0 ? localFileUrl : targetUrl, artKey, targetUrl);
                             loading = false;
                         }, 50, 15000);
                     }
@@ -141,7 +141,7 @@ Singleton {
         // Cover lands after metadata, so poll; commit a content-addressed copy so identical bytes keep an identical url
         const script = "f=\"$1\"; d=\"$2\"; i=0; while [ ! -f \"$f\" ] && [ \"$i\" -lt 20 ]; do sleep 0.15; i=$((i + 1)); done; [ -f \"$f\" ] || exit 1; s=$(sha1sum \"$f\" | cut -c1-40); if [ ! -f \"$d/art_$s\" ]; then mkdir -p \"$d\" && cp \"$f\" \"$d/art_$s.tmp\" && mv \"$d/art_$s.tmp\" \"$d/art_$s\" || exit 1; fi; echo \"$s\"";
         Proc.runCommand(null, ["sh", "-c", script, "sh", filePath, cacheDir], (output, exitCode) => {
-            if (_lastArtUrl !== localUrl)
+            if (_lastArtUrl !== localUrl || _requestSerial !== requestSerial)
                 return;
             loading = false;
             if (exitCode !== 0)
@@ -149,7 +149,7 @@ Singleton {
             const sha = (output || "").trim();
             if (_artHashDenylist.indexOf(sha) !== -1)
                 return;
-            _commit("file://" + cacheDir + "/art_" + sha);
+            _commit("file://" + cacheDir + "/art_" + sha, artKey, localUrl);
         }, 50, 5000);
     }
 
@@ -158,7 +158,7 @@ Singleton {
         interval: 800
         onTriggered: {
             if (root._lastArtUrl === "")
-                root._commit("");
+                root._commit("", "", "");
         }
     }
 
@@ -167,6 +167,7 @@ Singleton {
     property string _committedArtKey: ""
     property string _pendingArtKey: ""
     property string _committedSrcUrl: ""
+    property int _requestSerial: 0
 
     onActivePlayerChanged: _updateArtUrl()
 
@@ -182,9 +183,10 @@ Singleton {
         const p = activePlayer;
         if (!p)
             return "";
-        // +title/artist: KDEconnect reuses one trackid forever; album excluded: Chrome delivers it late, orphaning the lock
+        // Scope artwork ownership to the MPRIS object and track.
+        const playerId = p.uniqueId || p.identity || "";
         const tid = p.metadata && p.metadata["mpris:trackid"] ? p.metadata["mpris:trackid"].toString() : "";
-        return tid + " " + (p.trackTitle || "") + " " + (p.trackArtist || "");
+        return playerId + " " + tid + " " + (p.trackTitle || "") + " " + (p.trackArtist || "");
     }
 
     function artReadyFor(player) {
@@ -194,17 +196,19 @@ Singleton {
 
     function _updateArtUrl() {
         const key = _trackKey();
-        // Skip once real art is committed for this track (dedup Chrome's multi-size
-        // re-publish). The lock is set in _commit(), never optimistically, so a rejected
-        // placeholder or a short-circuited duplicate url can't wedge the real cover out.
-        if (key !== "" && key === _committedArtKey)
-            return;
+        if (key !== _pendingArtKey) {
+            _requestSerial++;
+            loading = false;
+        }
         _pendingArtKey = key;
         const url = getArtworkUrl(activePlayer);
+        // Ignore Chrome's same-track thumbnail size updates.
+        if (key !== "" && key === _committedArtKey)
+            return;
         if (key !== "" && url !== "" && url === _committedSrcUrl) {
-            _committedArtKey = key;
+            // Chrome can publish track metadata before its new artwork URL.
             return;
         }
-        loadArtwork(url);
+        loadArtwork(url, key, _requestSerial);
     }
 }
