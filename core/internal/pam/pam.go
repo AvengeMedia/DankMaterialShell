@@ -70,10 +70,11 @@ var includedPamAuthFiles = []string{
 }
 
 type AuthSettings struct {
-	EnableFprint        bool `json:"enableFprint"`
-	EnableU2f           bool `json:"enableU2f"`
-	GreeterEnableFprint bool `json:"greeterEnableFprint"`
-	GreeterEnableU2f    bool `json:"greeterEnableU2f"`
+	EnableFprint                bool `json:"enableFprint"`
+	EnableU2f                   bool `json:"enableU2f"`
+	GreeterEnableFprint         bool `json:"greeterEnableFprint"`
+	GreeterEnableU2f            bool `json:"greeterEnableU2f"`
+	GreeterPamExternallyManaged bool `json:"greeterPamExternallyManaged"`
 }
 
 type SyncAuthOptions struct {
@@ -234,6 +235,14 @@ func syncAuthConfigWithDeps(logFunc func(string), sudoPassword string, options S
 			return nil
 		}
 		return fmt.Errorf("failed to inspect %s: %w", deps.greetdPath, err)
+	}
+
+	if settings.GreeterPamExternallyManaged {
+		if err := removeManagedGreeterPamBlockWithDeps(logFunc, sudoPassword, deps); err != nil {
+			return err
+		}
+		logFunc("ℹ /etc/pam.d/greetd is externally managed. Skipping DMS greeter PAM sync.")
+		return nil
 	}
 
 	if err := syncGreeterPamConfigWithDeps(logFunc, sudoPassword, settings, options.ForceGreeterAuth, deps); err != nil {
@@ -581,6 +590,270 @@ func buildManagedLockscreenPamContent(baseDirs []string, readFile func(string) (
 	}
 	b.WriteString(LockscreenPamManagedBlockEnd + "\n")
 	return b.String(), nil
+}
+
+// lockscreenPamCandidateServices are the services surfaced by list-services:
+// the standalone entry points plus the shared auth blocks users may pin.
+var lockscreenPamCandidateServices = []string{
+	"login",
+	"system-auth",
+	"system-login",
+	"system-local-login",
+	"common-auth",
+	"base-auth",
+}
+
+// LockscreenPamServiceInfo describes one candidate lock-screen PAM service.
+type LockscreenPamServiceInfo struct {
+	Name              string `json:"name"`
+	Dir               string `json:"dir"`
+	Path              string `json:"path"`
+	HasAuth           bool   `json:"hasAuth"`
+	InlineFingerprint bool   `json:"inlineFingerprint"`
+	InlineU2f         bool   `json:"inlineU2f"`
+}
+
+// LockscreenPamValidation is the result of validating a PAM service file for
+// use as the DMS lock-screen password stack.
+type LockscreenPamValidation struct {
+	Valid             bool     `json:"valid"`
+	Path              string   `json:"path"`
+	HasAuth           bool     `json:"hasAuth"`
+	InlineFingerprint bool     `json:"inlineFingerprint"`
+	InlineU2f         bool     `json:"inlineU2f"`
+	MissingModules    []string `json:"missingModules"`
+	Warnings          []string `json:"warnings"`
+	Errors            []string `json:"errors"`
+}
+
+type lockscreenPamValidateDeps struct {
+	baseDirs        []string
+	readFile        func(string) ([]byte, error)
+	stat            func(string) (os.FileInfo, error)
+	pamModuleExists func(string) bool
+}
+
+func defaultValidateDeps() lockscreenPamValidateDeps {
+	return lockscreenPamValidateDeps{
+		baseDirs:        lockscreenPamBaseDirs,
+		readFile:        os.ReadFile,
+		stat:            os.Stat,
+		pamModuleExists: pamModuleExists,
+	}
+}
+
+// lockscreenPamAnalysis is a non-destructive walk of a PAM service. Unlike
+// resolveService it detects (rather than strips) pam_fprintd/pam_u2f and
+// records unknown directives instead of hard-failing on them.
+type lockscreenPamAnalysis struct {
+	lines             []string
+	hasAuth           bool
+	inlineFingerprint bool
+	inlineU2f         bool
+	modules           []string
+	unknownDirectives []string
+	err               error
+}
+
+func (r lockscreenPamResolver) analyzePath(path string) lockscreenPamAnalysis {
+	var acc lockscreenPamAnalysis
+	if err := r.analyzeInto(filepath.Clean(path), "", nil, &acc); err != nil {
+		acc.err = err
+	}
+	return acc
+}
+
+func (r lockscreenPamResolver) analyzeInto(path string, filterType string, stack []string, acc *lockscreenPamAnalysis) error {
+	for _, seen := range stack {
+		if seen == path {
+			chain := append(append([]string{}, stack...), path)
+			display := make([]string, 0, len(chain))
+			for _, item := range chain {
+				display = append(display, filepath.Base(item))
+			}
+			return fmt.Errorf("cyclic PAM include detected: %s", strings.Join(display, " -> "))
+		}
+	}
+
+	data, err := r.readFile(path)
+	if err != nil {
+		return fmt.Errorf("failed to read PAM file %s: %w", path, err)
+	}
+
+	for _, rawLine := range strings.Split(strings.ReplaceAll(string(data), "\r\n", "\n"), "\n") {
+		rawLine = strings.TrimRight(rawLine, "\r")
+		trimmed := strings.TrimSpace(rawLine)
+		if trimmed == "" || strings.HasPrefix(trimmed, "#") {
+			continue
+		}
+
+		if include, ok := parseLockscreenPamIncludeDirective(trimmed, filterType); ok {
+			lineType := pamDirectiveType(trimmed)
+			if filterType != "" && lineType != "" && lineType != filterType {
+				continue
+			}
+			nestedPath := include.target
+			if filepath.IsAbs(nestedPath) {
+				nestedPath = filepath.Clean(nestedPath)
+			} else {
+				located, err := r.locate(include.target)
+				if err != nil {
+					return fmt.Errorf("failed to read PAM file %s: %w", include.target, err)
+				}
+				nestedPath = located
+			}
+			if err := r.analyzeInto(nestedPath, include.filterType, append(stack, path), acc); err != nil {
+				return err
+			}
+			continue
+		}
+
+		lineType := pamDirectiveType(trimmed)
+		if lineType == "" {
+			acc.unknownDirectives = append(acc.unknownDirectives, trimmed)
+			continue
+		}
+		if filterType != "" && lineType != filterType {
+			continue
+		}
+
+		acc.lines = append(acc.lines, rawLine)
+		if lineType == "auth" {
+			acc.hasAuth = true
+		}
+
+		foundModule := false
+		for _, field := range strings.Fields(trimmed) {
+			if strings.HasPrefix(field, "#") {
+				break
+			}
+			if strings.Contains(field, "pam_fprintd") {
+				acc.inlineFingerprint = true
+			}
+			if strings.Contains(field, "pam_u2f") {
+				acc.inlineU2f = true
+			}
+			if !foundModule && strings.HasSuffix(field, ".so") {
+				acc.modules = append(acc.modules, field)
+				foundModule = true
+			}
+		}
+	}
+
+	return nil
+}
+
+// ListLockscreenPamServices enumerates the candidate lock-screen services that
+// exist on this system, earlier base dir winning per name (libpam precedence).
+func ListLockscreenPamServices() []LockscreenPamServiceInfo {
+	return listLockscreenPamServices(lockscreenPamBaseDirs, os.ReadFile)
+}
+
+func listLockscreenPamServices(baseDirs []string, readFile func(string) ([]byte, error)) []LockscreenPamServiceInfo {
+	resolver := lockscreenPamResolver{baseDirs: baseDirs, readFile: readFile}
+	out := make([]LockscreenPamServiceInfo, 0, len(lockscreenPamCandidateServices))
+	for _, name := range lockscreenPamCandidateServices {
+		path, err := resolver.locate(name)
+		if err != nil {
+			continue
+		}
+		info := LockscreenPamServiceInfo{
+			Name: name,
+			Dir:  filepath.Dir(path),
+			Path: path,
+		}
+		if analysis := resolver.analyzePath(path); analysis.err == nil {
+			info.HasAuth = analysis.hasAuth
+			info.InlineFingerprint = analysis.inlineFingerprint
+			info.InlineU2f = analysis.inlineU2f
+		}
+		out = append(out, info)
+	}
+	return out
+}
+
+// ValidateLockscreenPamService validates a named service resolved across the
+// system PAM base dirs.
+func ValidateLockscreenPamService(name string) LockscreenPamValidation {
+	return validateLockscreenPam(name, "", defaultValidateDeps())
+}
+
+// ValidateLockscreenPamPath validates an arbitrary absolute PAM file, which may
+// live outside the standard base dirs.
+func ValidateLockscreenPamPath(path string) LockscreenPamValidation {
+	return validateLockscreenPam("", path, defaultValidateDeps())
+}
+
+func validateLockscreenPam(serviceName string, path string, deps lockscreenPamValidateDeps) LockscreenPamValidation {
+	result := LockscreenPamValidation{
+		MissingModules: []string{},
+		Warnings:       []string{},
+		Errors:         []string{},
+	}
+	resolver := lockscreenPamResolver{baseDirs: deps.baseDirs, readFile: deps.readFile}
+
+	var analysis lockscreenPamAnalysis
+	if path != "" {
+		result.Path = path
+		analysis = resolver.analyzePath(path)
+	} else {
+		located, err := resolver.locate(serviceName)
+		if err != nil {
+			result.Errors = append(result.Errors, fmt.Sprintf("PAM service %q not found: %v", serviceName, err))
+			return result
+		}
+		result.Path = located
+		analysis = resolver.analyzePath(located)
+	}
+
+	if analysis.err != nil {
+		result.Errors = append(result.Errors, analysis.err.Error())
+		return result
+	}
+
+	result.HasAuth = analysis.hasAuth
+	result.InlineFingerprint = analysis.inlineFingerprint
+	result.InlineU2f = analysis.inlineU2f
+
+	if !analysis.hasAuth {
+		result.Errors = append(result.Errors, "no auth directives found after include resolution")
+	}
+
+	for _, directive := range analysis.unknownDirectives {
+		result.Warnings = append(result.Warnings, "unsupported PAM directive (libpam may still handle it at runtime): "+directive)
+	}
+
+	seen := map[string]bool{}
+	for _, ref := range analysis.modules {
+		name := filepath.Base(ref)
+		if seen[name] {
+			continue
+		}
+		seen[name] = true
+		if moduleReferenceExists(ref, deps) {
+			continue
+		}
+		result.MissingModules = append(result.MissingModules, name)
+		result.Warnings = append(result.Warnings, "referenced PAM module not found: "+name)
+	}
+
+	if analysis.inlineFingerprint {
+		result.Warnings = append(result.Warnings, "pam_fprintd is present in the resolved stack; may double-prompt with DMS's separate fingerprint context")
+	}
+	if analysis.inlineU2f {
+		result.Warnings = append(result.Warnings, "pam_u2f is present in the resolved stack; may double-prompt with DMS's separate U2F context")
+	}
+
+	result.Valid = len(result.Errors) == 0
+	return result
+}
+
+func moduleReferenceExists(ref string, deps lockscreenPamValidateDeps) bool {
+	if filepath.IsAbs(ref) {
+		_, err := deps.stat(ref)
+		return err == nil
+	}
+	return deps.pamModuleExists(ref)
 }
 
 const UserLockscreenPamService = "dankshell"

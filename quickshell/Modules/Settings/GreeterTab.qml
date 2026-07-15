@@ -18,6 +18,9 @@ Item {
     readonly property bool greeterU2fToggleAvailable: SettingsData.greeterU2fCanEnable || SettingsData.greeterEnableU2f
 
     function greeterFingerprintDescription() {
+        if (SettingsData.greeterPamExternallyManaged)
+            return I18n.tr("greetd PAM is externally managed. DMS will not change fingerprint auth; configure it yourself.");
+
         const source = SettingsData.greeterFingerprintSource;
         const reason = SettingsData.greeterFingerprintReason;
 
@@ -51,6 +54,9 @@ Item {
     }
 
     function greeterU2fDescription() {
+        if (SettingsData.greeterPamExternallyManaged)
+            return I18n.tr("greetd PAM is externally managed. DMS will not change security-key auth; configure it yourself.");
+
         const source = SettingsData.greeterU2fSource;
         const reason = SettingsData.greeterU2fReason;
 
@@ -500,13 +506,22 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    settingKey: "greeterPamExternallyManaged"
+                    tags: ["greeter", "pam", "managed", "external", "greetd", "auth"]
+                    text: I18n.tr("Manage greetd PAM automatically")
+                    description: SettingsData.greeterPamExternallyManaged ? I18n.tr("DMS never touches /etc/pam.d/greetd; any existing DMS block is removed on next sync. Configure fingerprint and security-key auth yourself.") : I18n.tr("DMS writes its managed block into /etc/pam.d/greetd during sync.")
+                    checked: !SettingsData.greeterPamExternallyManaged
+                    onToggled: checked => SettingsData.set("greeterPamExternallyManaged", !checked)
+                }
+
+                SettingsToggleRow {
                     settingKey: "greeterEnableFprint"
                     tags: ["greeter", "fingerprint", "fprintd", "login", "auth"]
                     text: I18n.tr("Enable fingerprint at login")
                     description: root.greeterFingerprintDescription()
                     descriptionColor: (SettingsData.greeterFingerprintReason === "ready" || SettingsData.greeterFingerprintReason === "configured_externally") ? Theme.surfaceVariantText : Theme.warning
                     checked: SettingsData.greeterEnableFprint
-                    enabled: root.greeterFprintToggleAvailable
+                    enabled: root.greeterFprintToggleAvailable && !SettingsData.greeterPamExternallyManaged
                     onToggled: checked => SettingsData.set("greeterEnableFprint", checked)
                 }
 
@@ -517,7 +532,7 @@ Item {
                     description: root.greeterU2fDescription()
                     descriptionColor: (SettingsData.greeterU2fReason === "ready" || SettingsData.greeterU2fReason === "configured_externally") ? Theme.surfaceVariantText : Theme.warning
                     checked: SettingsData.greeterEnableU2f
-                    enabled: root.greeterU2fToggleAvailable
+                    enabled: root.greeterU2fToggleAvailable && !SettingsData.greeterPamExternallyManaged
                     onToggled: checked => SettingsData.set("greeterEnableU2f", checked)
                 }
             }
@@ -718,9 +733,13 @@ Item {
 
         MouseArea {
             anchors.fill: parent
-            cursorShape: Qt.PointingHandCursor
-            enabled: !root.greeterSyncRunning && !root.greeterInstallActionRunning
-            onClicked: root.runGreeterSync()
+            hoverEnabled: true
+            acceptedButtons: Qt.AllButtons
+            cursorShape: !root.greeterSyncRunning && !root.greeterInstallActionRunning ? Qt.PointingHandCursor : Qt.ArrowCursor
+            onClicked: mouse => {
+                if (mouse.button === Qt.LeftButton && !root.greeterSyncRunning && !root.greeterInstallActionRunning)
+                    root.runGreeterSync();
+            }
         }
 
         Row {

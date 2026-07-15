@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import qs.Common
 import qs.Modals.FileBrowser
 import qs.Services
@@ -11,6 +12,71 @@ Item {
 
     readonly property bool lockFprintToggleAvailable: SettingsData.lockFingerprintCanEnable || SettingsData.enableFprint
     readonly property bool lockU2fToggleAvailable: SettingsData.lockU2fCanEnable || SettingsData.enableU2f
+
+    property var authServices: []
+    property bool authValidateRunning: false
+    property bool authValidateOk: false
+    property bool authValidateWarn: false
+    property string authValidateMessage: ""
+    property string authPendingApplyPath: ""
+    property bool authShowCustom: false
+
+    readonly property string authAutoLabel: I18n.tr("Auto (recommended)")
+    readonly property string authCustomLabel: I18n.tr("Custom…")
+
+    function authServiceLabel(service) {
+        const label = service.name.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join("-");
+        return service.dir === "/etc/pam.d" ? label : label + " (" + service.dir + ")";
+    }
+
+    readonly property var authOptions: {
+        var opts = [authAutoLabel];
+        for (var i = 0; i < authServices.length; i++)
+            opts.push(authServiceLabel(authServices[i]));
+        opts.push(authCustomLabel);
+        return opts;
+    }
+
+    readonly property string authCurrentValue: {
+        if (SettingsData.lockPamPath === "")
+            return authAutoLabel;
+        for (var i = 0; i < authServices.length; i++) {
+            if (authServices[i].path === SettingsData.lockPamPath)
+                return authServiceLabel(authServices[i]);
+        }
+        return authCustomLabel;
+    }
+
+    function refreshAuthServices() {
+        authListServicesProcess.running = true;
+    }
+
+    function applyAutoAuthSource() {
+        SettingsData.set("lockPamPath", "");
+        SettingsData.set("lockPamInlineFprint", false);
+        SettingsData.set("lockPamInlineU2f", false);
+        root.authValidateOk = false;
+        root.authValidateWarn = false;
+        root.authValidateMessage = "";
+    }
+
+    function validateAndApplyAuthSource(path) {
+        if (!path || path === "")
+            return;
+        if (!path.startsWith("/")) {
+            root.authValidateOk = false;
+            root.authValidateWarn = false;
+            root.authValidateMessage = I18n.tr("Not a valid path");
+            return;
+        }
+        root.authPendingApplyPath = path;
+        root.authValidateMessage = "";
+        root.authValidateOk = false;
+        root.authValidateWarn = false;
+        root.authValidateRunning = true;
+        authValidateProcess.command = ["dms", "auth", "validate", "--path", path, "--json"];
+        authValidateProcess.running = true;
+    }
 
     function lockFingerprintDescription() {
         switch (SettingsData.lockFingerprintReason) {
@@ -48,10 +114,15 @@ Item {
         SettingsData.refreshAuthAvailability();
     }
 
-    Component.onCompleted: refreshAuthDetection()
+    Component.onCompleted: {
+        refreshAuthDetection();
+        refreshAuthServices();
+    }
     onVisibleChanged: {
-        if (visible)
+        if (visible) {
             refreshAuthDetection();
+            refreshAuthServices();
+        }
     }
 
     FileBrowserModal {
@@ -62,6 +133,78 @@ Item {
         showHiddenFiles: false
         fileExtensions: ["*.mp4", "*.mkv", "*.webm", "*.mov", "*.avi", "*.m4v"]
         onFileSelected: path => SettingsData.set("lockScreenVideoPath", path)
+    }
+
+    Process {
+        id: authListServicesProcess
+        command: ["dms", "auth", "list-services", "--json"]
+        running: false
+
+        property string collected: ""
+
+        stdout: StdioCollector {
+            onStreamFinished: authListServicesProcess.collected = text || ""
+        }
+
+        onExited: exitCode => {
+            if (exitCode !== 0) {
+                root.authServices = [];
+                return;
+            }
+            try {
+                const data = JSON.parse(authListServicesProcess.collected);
+                root.authServices = (data && Array.isArray(data.services)) ? data.services.filter(s => s.hasAuth) : [];
+            } catch (e) {
+                root.authServices = [];
+            }
+        }
+    }
+
+    Process {
+        id: authValidateProcess
+        running: false
+
+        property string collected: ""
+
+        stdout: StdioCollector {
+            onStreamFinished: authValidateProcess.collected = text || ""
+        }
+
+        onExited: exitCode => {
+            root.authValidateRunning = false;
+            var data = null;
+            try {
+                data = JSON.parse(authValidateProcess.collected);
+            } catch (e) {
+                data = null;
+            }
+            if (!data) {
+                root.authValidateOk = false;
+                root.authValidateWarn = false;
+                root.authValidateMessage = I18n.tr("Could not run validation. Ensure DMS is installed and dms is in PATH.");
+                return;
+            }
+            if (data.valid) {
+                SettingsData.set("lockPamPath", root.authPendingApplyPath);
+                SettingsData.set("lockPamInlineFprint", data.inlineFingerprint === true);
+                SettingsData.set("lockPamInlineU2f", data.inlineU2f === true);
+                const warns = Array.isArray(data.warnings) ? data.warnings : [];
+                root.authValidateOk = true;
+                root.authValidateWarn = warns.length > 0;
+                root.authValidateMessage = warns.length > 0 ? (I18n.tr("Applied with warnings:") + "\n" + warns.join("\n")) : I18n.tr("Applied successfully.");
+            } else {
+                root.authValidateOk = false;
+                root.authValidateWarn = false;
+                const errs = Array.isArray(data.errors) ? data.errors : [];
+                const missing = Array.isArray(data.missingModules) ? data.missingModules : [];
+                var msg = I18n.tr("Invalid — not applied.");
+                if (errs.length > 0)
+                    msg = msg + "\n" + errs.join("\n");
+                if (missing.length > 0)
+                    msg = msg + "\n" + I18n.tr("Missing modules: ") + missing.join(", ");
+                root.authValidateMessage = msg;
+            }
+        }
     }
 
     DankFlickable {
@@ -204,6 +347,109 @@ Item {
                     fillModeTags: ["lock", "screen", "wallpaper", "background", "fill"]
                     onPathSelected: path => SettingsData.set("lockScreenWallpaperPath", path)
                     onFillModeSelected: mode => SettingsData.set("lockScreenWallpaperFillMode", mode)
+                }
+            }
+
+            SettingsCard {
+                width: parent.width
+                iconName: "key"
+                title: I18n.tr("Authentication Source")
+                settingKey: "lockAuthSource"
+
+                StyledText {
+                    text: I18n.tr("Auto resolves the system auth stack automatically. Picking a source pins the lock screen to that PAM file.")
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceVariantText
+                    width: parent.width
+                    wrapMode: Text.Wrap
+                }
+
+                SettingsDropdownRow {
+                    settingKey: "lockPamPath"
+                    tags: ["lock", "screen", "pam", "authentication", "source", "service"]
+                    text: I18n.tr("Authentication Source")
+                    description: SettingsData.lockPamPath !== "" ? I18n.tr("Pinned to ") + SettingsData.lockPamPath : I18n.tr("Which PAM service the lock screen uses to authenticate")
+                    options: root.authOptions
+                    currentValue: root.authCurrentValue
+                    onValueChanged: value => {
+                        if (value === root.authAutoLabel) {
+                            root.authShowCustom = false;
+                            root.applyAutoAuthSource();
+                            return;
+                        }
+                        if (value === root.authCustomLabel) {
+                            root.authShowCustom = true;
+                            return;
+                        }
+                        root.authShowCustom = false;
+                        var svc = root.authServices.find(s => root.authServiceLabel(s) === value);
+                        if (svc)
+                            root.validateAndApplyAuthSource(svc.path);
+                    }
+                }
+
+                Column {
+                    width: parent.width
+                    spacing: Theme.spacingS
+                    visible: root.authShowCustom || root.authCurrentValue === root.authCustomLabel
+
+                    StyledText {
+                        text: I18n.tr("Enter the absolute path to a PAM service file, then validate and apply.")
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                        width: parent.width
+                        wrapMode: Text.Wrap
+                    }
+
+                    Row {
+                        width: parent.width
+                        spacing: Theme.spacingS
+
+                        DankTextField {
+                            id: customPamField
+                            width: parent.width - validatePamButton.width - Theme.spacingS
+                            placeholderText: "/etc/pam.d/my-service"
+                            text: SettingsData.lockPamPath
+                            backgroundColor: Theme.surfaceContainerHighest
+                        }
+
+                        DankButton {
+                            id: validatePamButton
+                            text: I18n.tr("Validate & Apply")
+                            enabled: !root.authValidateRunning && customPamField.text.trim() !== ""
+                            onClicked: root.validateAndApplyAuthSource(customPamField.text.trim())
+                        }
+                    }
+                }
+
+                Rectangle {
+                    width: parent.width
+                    height: Math.min(160, authStatusText.implicitHeight + Theme.spacingM * 2)
+                    radius: Theme.cornerRadius
+                    color: Theme.surfaceContainerHighest
+                    visible: root.authValidateMessage !== ""
+
+                    StyledText {
+                        id: authStatusText
+                        anchors.fill: parent
+                        anchors.margins: Theme.spacingM
+                        text: root.authValidateMessage
+                        font.pixelSize: Theme.fontSizeSmall
+                        font.family: "monospace"
+                        color: !root.authValidateOk ? Theme.error : (root.authValidateWarn ? Theme.warning : Theme.surfaceVariantText)
+                        wrapMode: Text.Wrap
+                        verticalAlignment: Text.AlignTop
+                    }
+                }
+
+                StyledText {
+                    visible: (SettingsData.lockPamInlineFprint && SettingsData.enableFprint) || (SettingsData.lockPamInlineU2f && SettingsData.enableU2f)
+                    text: I18n.tr("The chosen PAM stack already prompts for fingerprint or security key, so DMS's separate prompts are suppressed to avoid a double prompt.")
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.warning
+                    width: parent.width
+                    wrapMode: Text.Wrap
+                    topPadding: Theme.spacingS
                 }
             }
 

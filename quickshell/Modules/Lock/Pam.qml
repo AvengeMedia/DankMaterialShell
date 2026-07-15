@@ -90,6 +90,17 @@ Scope {
         fprint.checkAvail();
     }
 
+    readonly property bool customPamActive: SettingsData.lockPamPath !== "" && customPamWatcher.loaded
+    readonly property bool fprintSuppressedByCustomPam: customPamActive && SettingsData.lockPamInlineFprint
+    readonly property bool u2fSuppressedByCustomPam: customPamActive && SettingsData.lockPamInlineU2f
+
+    FileView {
+        id: customPamWatcher
+
+        path: SettingsData.lockPamPath !== "" ? SettingsData.lockPamPath : ""
+        printErrors: false
+    }
+
     FileView {
         id: dankshellConfigWatcher
 
@@ -148,6 +159,8 @@ Scope {
         id: passwd
 
         config: {
+            if (root.customPamActive)
+                return SettingsData.lockPamPath.slice(SettingsData.lockPamPath.lastIndexOf("/") + 1);
             if (dankshellConfigWatcher.loaded)
                 return "dankshell";
             if (nixosMarker.loaded || root.runningFromNixStore)
@@ -157,6 +170,10 @@ Scope {
             return "login";
         }
         configDirectory: {
+            if (root.customPamActive) {
+                const idx = SettingsData.lockPamPath.lastIndexOf("/");
+                return idx > 0 ? SettingsData.lockPamPath.slice(0, idx) : "/";
+            }
             if (dankshellConfigWatcher.loaded)
                 return "/etc/pam.d";
             if (nixosMarker.loaded || root.runningFromNixStore)
@@ -248,7 +265,7 @@ Scope {
         property int errorTries
 
         function checkAvail(): void {
-            if (!available || !SettingsData.enableFprint || !root.lockSecured) {
+            if (!available || !SettingsData.enableFprint || !root.lockSecured || root.fprintSuppressedByCustomPam) {
                 abort();
                 return;
             }
@@ -308,7 +325,7 @@ Scope {
         property bool available: SettingsData.lockU2fReady
 
         function checkAvail(): void {
-            if (!available || !SettingsData.enableU2f || !root.lockSecured) {
+            if (!available || !SettingsData.enableU2f || !root.lockSecured || root.u2fSuppressedByCustomPam) {
                 abort();
                 return;
             }
@@ -318,7 +335,7 @@ Scope {
         }
 
         function startForSecondFactor(): void {
-            if (!available || !SettingsData.enableU2f) {
+            if (!available || !SettingsData.enableU2f || root.u2fSuppressedByCustomPam) {
                 root.completeUnlock();
                 return;
             }
@@ -331,7 +348,7 @@ Scope {
         }
 
         function startForAlternativeAuth(): void {
-            if (!available || !SettingsData.enableU2f || SettingsData.u2fMode !== "or" || root.unlockInProgress || passwd.active || active)
+            if (!available || !SettingsData.enableU2f || root.u2fSuppressedByCustomPam || SettingsData.u2fMode !== "or" || root.unlockInProgress || passwd.active || active)
                 return;
             abort();
             root.u2fPending = true;
@@ -483,6 +500,19 @@ Scope {
         }
 
         function onLockU2fReadyChanged(): void {
+            u2f.checkAvail();
+        }
+
+        function onLockPamPathChanged(): void {
+            fprint.checkAvail();
+            u2f.checkAvail();
+        }
+
+        function onLockPamInlineFprintChanged(): void {
+            fprint.checkAvail();
+        }
+
+        function onLockPamInlineU2fChanged(): void {
             u2f.checkAvail();
         }
 

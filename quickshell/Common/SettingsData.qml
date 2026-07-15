@@ -895,6 +895,10 @@ Singleton {
     readonly property bool greeterU2fReady: Processes.greeterU2fReady
     readonly property string greeterU2fReason: Processes.greeterU2fReason
     readonly property string greeterU2fSource: Processes.greeterU2fSource
+    property string lockPamPath: ""
+    property bool lockPamInlineFprint: false
+    property bool lockPamInlineU2f: false
+    property bool greeterPamExternallyManaged: false
     property string lockScreenInactiveColor: "#000000"
     property int lockScreenNotificationMode: 0
     property bool lockScreenVideoEnabled: false

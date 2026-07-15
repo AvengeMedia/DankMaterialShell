@@ -786,6 +786,223 @@ func TestRemoveManagedGreeterPamBlockWithDeps(t *testing.T) {
 	}
 }
 
+func (e *pamTestEnv) validateDeps() lockscreenPamValidateDeps {
+	return lockscreenPamValidateDeps{
+		baseDirs:        []string{e.pamDir},
+		readFile:        os.ReadFile,
+		stat:            os.Stat,
+		pamModuleExists: func(module string) bool { return e.availableModules[module] },
+	}
+}
+
+func TestListLockscreenPamServices(t *testing.T) {
+	t.Parallel()
+
+	t.Run("dedupes by name with earlier base dir winning", func(t *testing.T) {
+		t.Parallel()
+
+		etcDir := t.TempDir()
+		vendorDir := t.TempDir()
+		// login exists in both dirs; system-auth only in the vendor dir.
+		writeTestFile(t, filepath.Join(etcDir, "login"), "#%PAM-1.0\nauth required pam_unix.so\naccount required pam_unix.so\n")
+		writeTestFile(t, filepath.Join(vendorDir, "login"), "#%PAM-1.0\nauth required pam_deny.so\n")
+		writeTestFile(t, filepath.Join(vendorDir, "system-auth"), "#%PAM-1.0\nauth sufficient pam_unix.so\naccount required pam_unix.so\n")
+
+		services := listLockscreenPamServices([]string{etcDir, vendorDir}, os.ReadFile)
+		if len(services) != 2 {
+			t.Fatalf("expected 2 services (login, system-auth), got %d: %+v", len(services), services)
+		}
+		byName := map[string]LockscreenPamServiceInfo{}
+		for _, s := range services {
+			byName[s.Name] = s
+		}
+		login, ok := byName["login"]
+		if !ok {
+			t.Fatalf("expected login service, got %+v", services)
+		}
+		if login.Dir != etcDir || login.Path != filepath.Join(etcDir, "login") {
+			t.Fatalf("expected login to resolve in earlier dir %s, got dir=%s path=%s", etcDir, login.Dir, login.Path)
+		}
+		if !login.HasAuth {
+			t.Fatalf("expected login to report hasAuth")
+		}
+		if byName["system-auth"].Dir != vendorDir {
+			t.Fatalf("expected system-auth to resolve in vendor dir, got %s", byName["system-auth"].Dir)
+		}
+	})
+
+	t.Run("include resolution sets hasAuth and detects inline fprintd/u2f", func(t *testing.T) {
+		t.Parallel()
+
+		env := newPamTestEnv(t)
+		env.writePamFile(t, "login", "#%PAM-1.0\nauth include system-auth\naccount include system-auth\n")
+		env.writePamFile(t, "system-auth", "auth sufficient pam_unix.so\nauth sufficient pam_fprintd.so\nauth sufficient pam_u2f.so cue\naccount required pam_unix.so\n")
+
+		services := listLockscreenPamServices([]string{env.pamDir}, os.ReadFile)
+		var login LockscreenPamServiceInfo
+		for _, s := range services {
+			if s.Name == "login" {
+				login = s
+			}
+		}
+		if !login.HasAuth {
+			t.Fatalf("expected hasAuth via resolved include")
+		}
+		if !login.InlineFingerprint || !login.InlineU2f {
+			t.Fatalf("expected inline fingerprint and u2f detection, got %+v", login)
+		}
+	})
+}
+
+func TestValidateLockscreenPam(t *testing.T) {
+	t.Parallel()
+
+	t.Run("valid service with resolved auth", func(t *testing.T) {
+		t.Parallel()
+
+		env := newPamTestEnv(t)
+		env.availableModules["pam_unix.so"] = true
+		env.writePamFile(t, "login", "#%PAM-1.0\nauth include system-auth\naccount include system-auth\n")
+		env.writePamFile(t, "system-auth", "auth sufficient pam_unix.so\naccount required pam_unix.so\n")
+
+		result := validateLockscreenPam("login", "", env.validateDeps())
+		if !result.Valid {
+			t.Fatalf("expected valid result, got %+v", result)
+		}
+		if !result.HasAuth {
+			t.Fatalf("expected hasAuth true")
+		}
+		if len(result.Errors) != 0 {
+			t.Fatalf("expected no errors, got %v", result.Errors)
+		}
+	})
+
+	t.Run("path outside base dirs is read directly", func(t *testing.T) {
+		t.Parallel()
+
+		env := newPamTestEnv(t)
+		env.availableModules["pam_unix.so"] = true
+		outside := filepath.Join(t.TempDir(), "custom-pam")
+		writeTestFile(t, outside, "#%PAM-1.0\nauth sufficient pam_unix.so\naccount required pam_unix.so\n")
+
+		result := validateLockscreenPam("", outside, env.validateDeps())
+		if !result.Valid || result.Path != outside {
+			t.Fatalf("expected valid result for outside path, got %+v", result)
+		}
+	})
+
+	t.Run("missing module produces warning and missingModules but stays valid", func(t *testing.T) {
+		t.Parallel()
+
+		env := newPamTestEnv(t)
+		env.availableModules["pam_unix.so"] = true
+		env.writePamFile(t, "system-auth", "#%PAM-1.0\nauth sufficient pam_unix.so\nauth required pam_absent.so\naccount required pam_unix.so\n")
+
+		result := validateLockscreenPam("system-auth", "", env.validateDeps())
+		if !result.Valid {
+			t.Fatalf("expected valid despite missing module, got %+v", result)
+		}
+		if len(result.MissingModules) != 1 || result.MissingModules[0] != "pam_absent.so" {
+			t.Fatalf("expected missing pam_absent.so, got %v", result.MissingModules)
+		}
+		if !containsSubstr(result.Warnings, "pam_absent.so") {
+			t.Fatalf("expected warning about missing module, got %v", result.Warnings)
+		}
+	})
+
+	t.Run("unknown directive is a warning not an error", func(t *testing.T) {
+		t.Parallel()
+
+		env := newPamTestEnv(t)
+		env.availableModules["pam_unix.so"] = true
+		env.availableModules["pam_foo.so"] = true
+		env.writePamFile(t, "system-auth", "#%PAM-1.0\nauth sufficient pam_unix.so\nbadtype required pam_foo.so\naccount required pam_unix.so\n")
+
+		result := validateLockscreenPam("system-auth", "", env.validateDeps())
+		if !result.Valid {
+			t.Fatalf("expected valid with unknown directive, got %+v", result)
+		}
+		if len(result.Errors) != 0 {
+			t.Fatalf("expected no errors, got %v", result.Errors)
+		}
+		if !containsSubstr(result.Warnings, "unsupported PAM directive") {
+			t.Fatalf("expected unsupported directive warning, got %v", result.Warnings)
+		}
+	})
+
+	t.Run("cyclic include is an error", func(t *testing.T) {
+		t.Parallel()
+
+		env := newPamTestEnv(t)
+		env.writePamFile(t, "login", "#%PAM-1.0\nauth include system-auth\n")
+		env.writePamFile(t, "system-auth", "auth include login\n")
+
+		result := validateLockscreenPam("login", "", env.validateDeps())
+		if result.Valid {
+			t.Fatalf("expected invalid on cyclic include, got %+v", result)
+		}
+		if !containsSubstr(result.Errors, "cyclic PAM include detected") {
+			t.Fatalf("expected cyclic include error, got %v", result.Errors)
+		}
+	})
+
+	t.Run("no auth directives is an error", func(t *testing.T) {
+		t.Parallel()
+
+		env := newPamTestEnv(t)
+		env.availableModules["pam_unix.so"] = true
+		env.writePamFile(t, "system-auth", "#%PAM-1.0\naccount required pam_unix.so\n")
+
+		result := validateLockscreenPam("system-auth", "", env.validateDeps())
+		if result.Valid {
+			t.Fatalf("expected invalid when no auth directives, got %+v", result)
+		}
+		if !containsSubstr(result.Errors, "no auth directives") {
+			t.Fatalf("expected no-auth error, got %v", result.Errors)
+		}
+	})
+
+	t.Run("missing file is an error", func(t *testing.T) {
+		t.Parallel()
+
+		env := newPamTestEnv(t)
+		result := validateLockscreenPam("", filepath.Join(env.pamDir, "does-not-exist"), env.validateDeps())
+		if result.Valid || len(result.Errors) == 0 {
+			t.Fatalf("expected invalid for missing file, got %+v", result)
+		}
+	})
+
+	t.Run("inline fingerprint and u2f produce warnings", func(t *testing.T) {
+		t.Parallel()
+
+		env := newPamTestEnv(t)
+		env.availableModules["pam_unix.so"] = true
+		env.availableModules["pam_fprintd.so"] = true
+		env.availableModules["pam_u2f.so"] = true
+		env.writePamFile(t, "system-auth", "#%PAM-1.0\nauth sufficient pam_unix.so\nauth sufficient pam_fprintd.so\nauth sufficient pam_u2f.so cue\naccount required pam_unix.so\n")
+
+		result := validateLockscreenPam("system-auth", "", env.validateDeps())
+		if !result.Valid {
+			t.Fatalf("expected valid, got %+v", result)
+		}
+		if !result.InlineFingerprint || !result.InlineU2f {
+			t.Fatalf("expected inline flags set, got %+v", result)
+		}
+		if !containsSubstr(result.Warnings, "pam_fprintd") || !containsSubstr(result.Warnings, "pam_u2f") {
+			t.Fatalf("expected double-prompt warnings, got %v", result.Warnings)
+		}
+	})
+}
+
+func containsSubstr(items []string, substr string) bool {
+	for _, item := range items {
+		if strings.Contains(item, substr) {
+			return true
+		}
+	}
+	return false
+}
+
 func TestSyncAuthConfigWithDeps(t *testing.T) {
 	t.Parallel()
 
@@ -845,6 +1062,39 @@ func TestSyncAuthConfigWithDeps(t *testing.T) {
 		}
 		if strings.Contains(greetd, "auth sufficient pam_u2f.so cue nouserok timeout=10") {
 			t.Fatalf("did not expect greetd PAM to receive U2F auth block:\n%s", greetd)
+		}
+	})
+
+	t.Run("externally managed greetd is stripped and greeter sync skipped", func(t *testing.T) {
+		t.Parallel()
+
+		env := newPamTestEnv(t)
+		env.availableModules["pam_fprintd.so"] = true
+		env.writeSettings(t, `{"greeterPamExternallyManaged":true,"greeterEnableFprint":true}`)
+		env.writePamFile(t, "login", "#%PAM-1.0\nauth include system-auth\naccount include system-auth\n")
+		env.writePamFile(t, "system-auth", "auth sufficient pam_unix.so\naccount required pam_unix.so\n")
+		env.writePamFile(t, "greetd", "#%PAM-1.0\nauth include system-auth\n"+
+			GreeterPamManagedBlockStart+"\n"+
+			"auth sufficient pam_fprintd.so max-tries=2 timeout=10\n"+
+			GreeterPamManagedBlockEnd+"\n")
+
+		var logs []string
+		err := syncAuthConfigWithDeps(func(msg string) {
+			logs = append(logs, msg)
+		}, "", SyncAuthOptions{HomeDir: env.homeDir}, env.deps(false))
+		if err != nil {
+			t.Fatalf("syncAuthConfigWithDeps returned error: %v", err)
+		}
+
+		greetd := readFileString(t, env.greetdPath)
+		if strings.Contains(greetd, GreeterPamManagedBlockStart) || strings.Contains(greetd, "pam_fprintd") {
+			t.Fatalf("expected DMS-managed block stripped from externally managed greetd:\n%s", greetd)
+		}
+		if !strings.Contains(greetd, "auth include system-auth") {
+			t.Fatalf("expected non-DMS greetd lines to remain:\n%s", greetd)
+		}
+		if !containsSubstr(logs, "externally managed") {
+			t.Fatalf("expected externally-managed skip log, got %v", logs)
 		}
 	})
 

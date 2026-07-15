@@ -4635,6 +4635,45 @@
     ]
   },
   {
+    "section": "lockAuthSource",
+    "label": "Authentication Source",
+    "tabIndex": 11,
+    "category": "Lock Screen",
+    "keywords": [
+      "authentication",
+      "lock",
+      "login",
+      "pam",
+      "password",
+      "pinned",
+      "screen",
+      "security",
+      "service",
+      "source"
+    ],
+    "icon": "key",
+    "description": "Pinned to "
+  },
+  {
+    "section": "lockPamPath",
+    "label": "Authentication Source",
+    "tabIndex": 11,
+    "category": "Lock Screen",
+    "keywords": [
+      "authentication",
+      "lock",
+      "login",
+      "pam",
+      "password",
+      "pinned",
+      "screen",
+      "security",
+      "service",
+      "source"
+    ],
+    "description": "Pinned to "
+  },
+  {
     "section": "lockScreenVideoCycling",
     "label": "Automatic Cycling",
     "tabIndex": 11,
@@ -7954,14 +7993,57 @@
     "keywords": [
       "auth",
       "authentication",
+      "block",
+      "configure",
       "display manager",
+      "existing",
+      "external",
       "fingerprint",
-      "fprintd",
       "greetd",
       "greeter",
-      "login"
+      "login",
+      "managed",
+      "never",
+      "next",
+      "pam",
+      "removed",
+      "security",
+      "sync",
+      "touches",
+      "yourself"
     ],
-    "icon": "fingerprint"
+    "icon": "fingerprint",
+    "description": "DMS never touches /etc/pam.d/greetd; any existing DMS block is removed on next sync. Configure fingerprint and security-key auth yourself."
+  },
+  {
+    "section": "greeterPamExternallyManaged",
+    "label": "Manage greetd PAM automatically",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "auth",
+      "automatically",
+      "block",
+      "configure",
+      "display manager",
+      "existing",
+      "external",
+      "fingerprint",
+      "greetd",
+      "greeter",
+      "login",
+      "manage",
+      "managed",
+      "never",
+      "next",
+      "pam",
+      "removed",
+      "security",
+      "sync",
+      "touches",
+      "yourself"
+    ],
+    "description": "DMS never touches /etc/pam.d/greetd; any existing DMS block is removed on next sync. Configure fingerprint and security-key auth yourself."
   },
   {
     "section": "greeterRememberLastSession",
