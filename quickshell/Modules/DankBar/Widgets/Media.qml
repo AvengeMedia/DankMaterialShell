@@ -129,7 +129,7 @@ BasePill {
                 if (deltaY > 0) {
                     MprisController.previousOrRewind();
                 } else {
-                    activePlayer.next();
+                    MprisController.next();
                 }
             } else {
                 scrollAccumulatorY += deltaY;
@@ -137,7 +137,7 @@ BasePill {
                     if (scrollAccumulatorY > 0) {
                         MprisController.previousOrRewind();
                     } else {
-                        activePlayer.next();
+                        MprisController.next();
                     }
                     scrollAccumulatorY = 0;
                 }
@@ -266,7 +266,7 @@ BasePill {
                             } else if (mouse.button === Qt.MiddleButton) {
                                 MprisController.previousOrRewind();
                             } else if (mouse.button === Qt.RightButton) {
-                                activePlayer.next();
+                                MprisController.next();
                             }
                         }
                     }
@@ -532,7 +532,7 @@ BasePill {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
                                 if (activePlayer) {
-                                    activePlayer.next();
+                                    MprisController.next();
                                 }
                             }
                         }

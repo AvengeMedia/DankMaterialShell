@@ -48,21 +48,11 @@ Singleton {
         target: root.activePlayer
         function onTrackTitleChanged() {
             root.activePlayerStableLength = (root.activePlayer && root.activePlayer.lengthSupported && root.activePlayer.length > 1) ? root.activePlayer.length : 0;
-            if (root.isIdle(root.activePlayer))
-                root._resolveActivePlayer();
-        }
-        function onTrackArtistChanged() {
-            if (root.isIdle(root.activePlayer))
-                root._resolveActivePlayer();
         }
         function onLengthChanged() {
             if (root.activePlayer && root.activePlayer.lengthSupported && root.activePlayer.length > 1) {
                 root.activePlayerStableLength = root.activePlayer.length;
             }
-        }
-        function onPlaybackStateChanged() {
-            if (root.isIdle(root.activePlayer))
-                root._resolveActivePlayer();
         }
     }
 
@@ -73,18 +63,6 @@ Singleton {
     onAvailablePlayersChanged: _resolveActivePlayer()
     Component.onCompleted: _resolveActivePlayer()
 
-    Instantiator {
-        model: root.availablePlayers
-        delegate: Connections {
-            required property MprisPlayer modelData
-            target: modelData
-            function onIsPlayingChanged() {
-                if (modelData.isPlaying)
-                    root._resolveActivePlayer();
-            }
-        }
-    }
-
     function isIdle(player: MprisPlayer): bool {
         return player
             && player.playbackState === MprisPlaybackState.Stopped
@@ -93,14 +71,15 @@ Singleton {
     }
 
     function _resolveActivePlayer(): void {
+        // Keep the selected player stable across transient metadata changes.
+        if (activePlayer && availablePlayers.indexOf(activePlayer) >= 0)
+            return;
         const playing = availablePlayers.find(p => p.isPlaying);
         if (playing) {
             activePlayer = playing;
             _persistIdentity(playing.identity);
             return;
         }
-        if (activePlayer && availablePlayers.indexOf(activePlayer) >= 0 && !isIdle(activePlayer))
-            return;
         const savedId = SessionData.lastPlayerIdentity;
         if (savedId) {
             const match = availablePlayers.find(p => p.identity === savedId);
@@ -149,5 +128,11 @@ Singleton {
             activePlayer.position = 0.1;
         else if (activePlayer.canGoPrevious)
             activePlayer.previous();
+    }
+
+    function next(): void {
+        const player = activePlayer;
+        if (player?.canGoNext)
+            player.next();
     }
 }
