@@ -43,7 +43,7 @@ jobs:
 
       - name: Create GitHub App token
         id: app_token
-        uses: actions/create-github-app-token@v2
+        uses: actions/create-github-app-token@v3
         with:
           app-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
@@ -54,6 +54,15 @@ jobs:
           ref: ${{ steps.derive.outputs.branch }}
           fetch-depth: 0
           token: ${{ steps.app_token.outputs.token }}
+
+      - name: Preflight — verify Release workflow is dispatchable
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh api "repos/${{ github.repository }}/actions/workflows/release.yml" \
+            --jq '.state' | grep -qx active ||
+            { echo "::error::release.yml is not dispatchable; aborting before any push"; exit 1; }
 
       - name: Port audit (informational)
         env:
@@ -83,7 +92,7 @@ jobs:
 
       - name: Dispatch Release workflow
         env:
-          GH_TOKEN: ${{ steps.app_token.outputs.token }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           gh workflow run release.yml --ref "${{ steps.derive.outputs.tag }}" \
             -f tag="${{ steps.derive.outputs.tag }}" \
