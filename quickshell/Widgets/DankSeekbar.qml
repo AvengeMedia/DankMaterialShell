@@ -147,6 +147,10 @@ Item {
                 trackColor: MediaAccentService.accentTrack
                 actualProgressColor: MediaAccentService.accentSubtle
                 isPlaying: activePlayer && activePlayer.playbackState === MprisPlaybackState.Playing
+                onFrameTicked: {
+                    if (!root.isSeeking)
+                        activePlayer.positionChanged();
+                }
 
                 MouseArea {
                     id: waveMouseArea

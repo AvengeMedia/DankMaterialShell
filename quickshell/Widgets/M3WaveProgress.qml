@@ -50,11 +50,15 @@ Item {
         fragmentShader: Qt.resolvedUrl("../Shaders/qsb/wave_progress.frag.qsb")
     }
 
+    signal frameTicked
+
     FrameAnimation {
-        running: root.visible && (root.isPlaying || root.currentAmp > 0)
+        running: root.visible && (root.isPlaying || root.currentAmp > 0) && (root.Window.window?.visible ?? false)
         onTriggered: {
-            if (root.isPlaying)
-                root.phase += 0.03 * frameTime * 60;
+            if (!root.isPlaying)
+                return;
+            root.phase = (root.phase + 0.03 * frameTime * 60) % 6.28318530718;
+            root.frameTicked();
         }
     }
 }

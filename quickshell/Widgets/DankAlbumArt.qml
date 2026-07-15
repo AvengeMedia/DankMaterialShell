@@ -182,16 +182,12 @@ Item {
         }
     }
 
-    FrameAnimation {
-        running: blobEffect.visible
-        property real pending: 0
-        onTriggered: {
-            pending += frameTime;
-            if (pending < 0.03)
-                return;
-            root.stepBlob(Math.min(pending, 0.05));
-            pending = 0;
-        }
+    // Timer, not FrameAnimation — a running animation commits frames every vsync (#2863)
+    Timer {
+        running: blobEffect.visible && root.onScreen
+        interval: 33
+        repeat: true
+        onTriggered: root.stepBlob(0.033)
     }
 
     ShaderEffect {
