@@ -23,6 +23,9 @@ import (
 
 const animKelvinStep = 25
 
+// Go timers freeze during suspend; cap sleeps so wall-clock deadlines can't be missed.
+const maxScheduleWait = 5 * time.Minute
+
 func NewManager(display wlclient.WaylandDisplay, config Config) (*Manager, error) {
 	if err := config.Validate(); err != nil {
 		return nil, err
@@ -304,8 +307,8 @@ func (m *Manager) setupControlHandlers(state *outputState, control *wlr_gamma_co
 				out.rampSize = size
 				out.failed = false
 				out.retryCount = 0
+				out.lastTemp = 0
 			}
-			m.lastAppliedTemp = 0
 			m.applyCurrentTemp("gamma_size")
 		})
 	})
@@ -507,6 +510,10 @@ func (m *Manager) recalcSchedule(now time.Time) {
 			config.ManualSunrise.Hour(), config.ManualSunrise.Minute(), config.ManualSunrise.Second(), 0, now.Location())
 		sunset := time.Date(now.Year(), now.Month(), now.Day(),
 			config.ManualSunset.Hour(), config.ManualSunset.Minute(), config.ManualSunset.Second(), 0, now.Location())
+		if !sunset.After(sunrise) {
+			// night start past midnight belongs to the next day
+			sunset = sunset.Add(24 * time.Hour)
+		}
 		times = SunTimes{
 			Dawn:    sunrise.Add(-dur),
 			Sunrise: sunrise,
@@ -518,6 +525,8 @@ func (m *Manager) recalcSchedule(now time.Time) {
 		lat, lon := m.getLocation()
 		if lat == nil || lon == nil {
 			m.gammaState = StateStatic
+			// stale times from a previous config must not drive applies
+			m.schedule = sunSchedule{}
 			return
 		}
 		times, cond = CalculateSunTimesWithTwilight(*lat, *lon, now, config.ElevationTwilight, config.ElevationDaylight)
@@ -611,7 +620,26 @@ func (m *Manager) getSunPosition(now time.Time) float64 {
 	return 1.0
 }
 
+func shiftTimes(times SunTimes, d time.Duration) SunTimes {
+	return SunTimes{
+		Dawn:    times.Dawn.Add(d),
+		Sunrise: times.Sunrise.Add(d),
+		Sunset:  times.Sunset.Add(d),
+		Night:   times.Night.Add(d),
+	}
+}
+
+// activeCycle maps early-morning hours back to yesterday's cycle when the
+// schedule crosses midnight.
+func activeCycle(now time.Time, times SunTimes) SunTimes {
+	if now.Before(times.Night.Add(-24 * time.Hour)) {
+		return shiftTimes(times, -24*time.Hour)
+	}
+	return times
+}
+
 func (m *Manager) getSunPositionNormal(now time.Time, times SunTimes) float64 {
+	times = activeCycle(now, times)
 	if now.Before(times.Dawn) {
 		return 0.0
 	}
@@ -666,7 +694,7 @@ func (m *Manager) getNextDeadline(now time.Time) time.Time {
 }
 
 func (m *Manager) getDeadlineNormal(now time.Time, sched sunSchedule) time.Time {
-	times := sched.times
+	times := activeCycle(now, sched.times)
 	switch {
 	case now.Before(times.Dawn):
 		return times.Dawn
@@ -737,8 +765,11 @@ func (m *Manager) schedulerLoop() {
 		if enabled {
 			deadline := m.getNextDeadline(now)
 			waitDur = time.Until(deadline)
-			if waitDur < time.Second {
+			switch {
+			case waitDur < time.Second:
 				waitDur = time.Second
+			case waitDur > maxScheduleWait:
+				waitDur = maxScheduleWait
 			}
 		} else {
 			waitDur = 24 * time.Hour
@@ -818,8 +849,6 @@ func (m *Manager) applyGamma(temp int) {
 		return
 	case !m.controlsInitialized:
 		return
-	case m.lastAppliedTemp == temp && m.lastAppliedGamma == gamma:
-		return
 	}
 
 	var outs []*outputState
@@ -845,6 +874,8 @@ func (m *Manager) applyGamma(temp int) {
 			continue
 		case out.gammaControl == nil:
 			continue
+		case out.lastTemp == temp && out.lastGamma == gamma:
+			continue
 		case !m.outputStillValid(out):
 			continue
 		}
@@ -865,19 +896,19 @@ func (m *Manager) applyGamma(temp int) {
 	for _, j := range jobs {
 		err := m.setGammaBytes(j.out, j.data)
 		if err == nil {
+			j.out.lastTemp = temp
+			j.out.lastGamma = gamma
 			continue
 		}
 		log.Warnf("gamma: failed to set output %d: %v", j.out.id, err)
 		j.out.failed = true
 		j.out.rampSize = 0
+		j.out.lastTemp = 0
 		if isConnectionDeadErr(err) {
 			m.markConnectionDead(err)
 			return
 		}
 	}
-
-	m.lastAppliedTemp = temp
-	m.lastAppliedGamma = gamma
 }
 
 func (m *Manager) setGammaBytes(out *outputState, data []byte) error {
@@ -939,7 +970,8 @@ func (m *Manager) updateStateFromSchedule() {
 		pos = m.getSunPosition(now)
 		temp = m.getTempFromPosition(pos)
 		deadline = m.getNextDeadline(now)
-		isDay = now.After(times.Sunrise) && now.Before(times.Sunset)
+		cycle := activeCycle(now, times)
+		isDay = now.After(cycle.Sunrise) && now.Before(cycle.Sunset)
 	}
 
 	newState := State{
@@ -1053,14 +1085,15 @@ func (m *Manager) handleResume() {
 		return
 	}
 
-	// Compositors (Niri, Hyprland, wlroots-based) re-apply the cached gamma
-	// ramp to DRM on resume; gamma_control objects stay valid. We just need
-	// to force a resend so the schedule catches up with the current time of
-	// day — the original #1235 regression was caused by lastAppliedTemp
-	// matching and the send being skipped.
+	// Compositor gamma state is unknown after resume; force a resend (#1235)
+	// and re-arm the scheduler timer, which froze during suspend.
+	m.outputs.Range(func(_ uint32, out *outputState) bool {
+		out.lastTemp = 0
+		return true
+	})
 	m.recalcSchedule(time.Now())
-	m.lastAppliedTemp = 0
 	m.applyCurrentTemp("resume")
+	m.triggerUpdate()
 }
 
 func (m *Manager) triggerUpdate() {

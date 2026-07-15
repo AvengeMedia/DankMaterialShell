@@ -102,9 +102,6 @@ type Manager struct {
 	dbusSignal chan *dbus.Signal
 
 	geoClient geolocation.Client
-
-	lastAppliedTemp  int
-	lastAppliedGamma float64
 }
 
 type outputState struct {
@@ -117,6 +114,8 @@ type outputState struct {
 	isVirtual    bool
 	retryCount   int
 	lastFailTime time.Time
+	lastTemp     int
+	lastGamma    float64
 }
 
 func DefaultConfig() Config {
