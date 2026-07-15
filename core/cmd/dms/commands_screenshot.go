@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
@@ -27,7 +28,18 @@ var (
 	ssNoConfirm   bool
 	ssReset       bool
 	ssStdout      bool
+	ssJSON        bool
 )
+
+type screenshotMetadata struct {
+	Status string  `json:"status"`
+	Path   string  `json:"path,omitempty"`
+	Width  int     `json:"width,omitempty"`
+	Height int     `json:"height,omitempty"`
+	Scale  float64 `json:"scale,omitempty"`
+	Mime   string  `json:"mime,omitempty"`
+	Error  string  `json:"error,omitempty"`
+}
 
 var screenshotCmd = &cobra.Command{
 	Use:   "screenshot",
@@ -59,7 +71,8 @@ Examples:
   dms screenshot --no-file           # Clipboard only
   dms screenshot --no-confirm        # Region capture on mouse release
   dms screenshot --cursor=on         # Include cursor
-  dms screenshot -f jpg -q 85        # JPEG with quality 85`,
+  dms screenshot -f jpg -q 85        # JPEG with quality 85
+  dms screenshot --json              # Print capture metadata as JSON`,
 }
 
 var ssRegionCmd = &cobra.Command{
@@ -128,6 +141,7 @@ func init() {
 	screenshotCmd.PersistentFlags().BoolVar(&ssNoConfirm, "no-confirm", false, "Region mode: capture on mouse release without Enter/Space confirmation")
 	screenshotCmd.PersistentFlags().BoolVar(&ssReset, "reset", false, "Reset saved last-region preselection before capturing")
 	screenshotCmd.PersistentFlags().BoolVar(&ssStdout, "stdout", false, "Output image to stdout (for piping to swappy, etc.)")
+	screenshotCmd.PersistentFlags().BoolVar(&ssJSON, "json", false, "Print capture metadata as JSON")
 
 	screenshotCmd.AddCommand(ssRegionCmd)
 	screenshotCmd.AddCommand(ssFullCmd)
@@ -203,7 +217,36 @@ func setPopoutScreenshotMode(begin bool) {
 	_ = exec.Command("qs", cmdArgs...).Run()
 }
 
+func writeScreenshotJSON(meta screenshotMetadata) {
+	_ = json.NewEncoder(os.Stdout).Encode(meta)
+}
+
+func exitScreenshotError(context string, err error) {
+	if ssJSON {
+		writeScreenshotJSON(screenshotMetadata{Status: "error", Error: err.Error()})
+		os.Exit(1)
+	}
+	fmt.Fprintf(os.Stderr, "Error%s: %v\n", context, err)
+	os.Exit(1)
+}
+
+func formatMime(format screenshot.Format) string {
+	switch format {
+	case screenshot.FormatJPEG:
+		return "image/jpeg"
+	case screenshot.FormatPPM:
+		return "image/x-portable-pixmap"
+	default:
+		return "image/png"
+	}
+}
+
 func runScreenshot(config screenshot.Config) {
+	if ssJSON && config.Stdout {
+		fmt.Fprintln(os.Stderr, "Error: --json cannot be combined with --stdout")
+		os.Exit(1)
+	}
+
 	// Region select needs the keyboard; drop popout grabs for its duration.
 	result, err := func() (*screenshot.CaptureResult, error) {
 		interactive := config.Mode == screenshot.ModeRegion || config.Mode == screenshot.ModeLastRegion
@@ -215,11 +258,13 @@ func runScreenshot(config screenshot.Config) {
 	}()
 
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-		os.Exit(1)
+		exitScreenshotError("", err)
 	}
 
 	if result == nil {
+		if ssJSON {
+			writeScreenshotJSON(screenshotMetadata{Status: "aborted", Error: "User cancelled selection"})
+		}
 		os.Exit(0)
 	}
 
@@ -231,8 +276,7 @@ func runScreenshot(config screenshot.Config) {
 
 	if config.Stdout {
 		if err := writeImageToStdout(result.Buffer, config.Format, config.Quality, result.Format); err != nil {
-			fmt.Fprintf(os.Stderr, "Error writing to stdout: %v\n", err)
-			os.Exit(1)
+			exitScreenshotError(" writing to stdout", err)
 		}
 		return
 	}
@@ -252,20 +296,35 @@ func runScreenshot(config screenshot.Config) {
 
 		filePath = filepath.Join(outputDir, filename)
 		if err := screenshot.WriteToFileWithFormat(result.Buffer, filePath, config.Format, config.Quality, result.Format); err != nil {
-			fmt.Fprintf(os.Stderr, "Error writing file: %v\n", err)
-			os.Exit(1)
+			exitScreenshotError(" writing file", err)
 		}
-		fmt.Println(filePath)
+		if !ssJSON {
+			fmt.Println(filePath)
+		}
 	}
 
 	if config.Clipboard {
 		if err := copyImageToClipboard(result.Buffer, config.Format, config.Quality, result.Format); err != nil {
-			fmt.Fprintf(os.Stderr, "Error copying to clipboard: %v\n", err)
-			os.Exit(1)
+			exitScreenshotError(" copying to clipboard", err)
 		}
-		if !config.SaveFile {
+		if !ssJSON && !config.SaveFile {
 			fmt.Println("Copied to clipboard")
 		}
+	}
+
+	if ssJSON {
+		scale := result.Scale
+		if scale <= 0 {
+			scale = 1.0
+		}
+		writeScreenshotJSON(screenshotMetadata{
+			Status: "success",
+			Path:   filePath,
+			Width:  result.Buffer.Width,
+			Height: result.Buffer.Height,
+			Scale:  scale,
+			Mime:   formatMime(config.Format),
+		})
 	}
 
 	if config.Notify {

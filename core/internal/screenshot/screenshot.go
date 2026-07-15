@@ -28,6 +28,21 @@ type CaptureResult struct {
 	Region    Region
 	YInverted bool
 	Format    uint32
+	Scale     float64
+}
+
+func (o *WaylandOutput) effectiveScale() float64 {
+	scale := o.fractionalScale
+	if scale <= 0 && DetectCompositor() == CompositorHyprland {
+		scale = GetHyprlandMonitorScale(o.name)
+	}
+	if scale <= 0 {
+		scale = float64(o.scale)
+	}
+	if scale <= 0 {
+		return 1.0
+	}
+	return scale
 }
 
 type Screenshoter struct {
@@ -255,6 +270,7 @@ func (s *Screenshoter) captureMangoWindow(output *WaylandOutput, region Region, 
 		Region:    region,
 		YInverted: false,
 		Format:    result.Format,
+		Scale:     scale,
 	}, nil
 }
 
@@ -430,6 +446,7 @@ func (s *Screenshoter) captureAllScreens() (*CaptureResult, error) {
 		Buffer: composite,
 		Region: Region{X: int32(minX), Y: int32(minY), Width: int32(totalW), Height: int32(totalH)},
 		Format: format,
+		Scale:  maxScale,
 	}, nil
 }
 
@@ -502,6 +519,7 @@ func (s *Screenshoter) captureWholeOutput(output *WaylandOutput) (*CaptureResult
 	if err != nil {
 		return nil, err
 	}
+	result.Scale = output.effectiveScale()
 
 	if result.YInverted {
 		result.Buffer.FlipVertical()
@@ -604,6 +622,7 @@ func (s *Screenshoter) captureAndCrop(output *WaylandOutput, region Region) (*Ca
 		Region:    region,
 		YInverted: false,
 		Format:    result.Format,
+		Scale:     scale,
 	}, nil
 }
 
@@ -612,16 +631,7 @@ func (s *Screenshoter) captureRegionOnOutput(output *WaylandOutput, region Regio
 		return s.captureRegionOnTransformedOutput(output, region)
 	}
 
-	scale := output.fractionalScale
-	if scale <= 0 && DetectCompositor() == CompositorHyprland {
-		scale = GetHyprlandMonitorScale(output.name)
-	}
-	if scale <= 0 {
-		scale = float64(output.scale)
-	}
-	if scale <= 0 {
-		scale = 1.0
-	}
+	scale := output.effectiveScale()
 
 	localX := int32(float64(region.X-output.x) * scale)
 	localY := int32(float64(region.Y-output.y) * scale)
@@ -660,7 +670,12 @@ func (s *Screenshoter) captureRegionOnOutput(output *WaylandOutput, region Regio
 		return nil, fmt.Errorf("capture region: %w", err)
 	}
 
-	return s.processFrame(frame, region)
+	result, err := s.processFrame(frame, region)
+	if err != nil {
+		return nil, err
+	}
+	result.Scale = scale
+	return result, nil
 }
 
 func (s *Screenshoter) captureRegionOnTransformedOutput(output *WaylandOutput, region Region) (*CaptureResult, error) {
@@ -669,16 +684,7 @@ func (s *Screenshoter) captureRegionOnTransformedOutput(output *WaylandOutput, r
 		return nil, err
 	}
 
-	scale := output.fractionalScale
-	if scale <= 0 && DetectCompositor() == CompositorHyprland {
-		scale = GetHyprlandMonitorScale(output.name)
-	}
-	if scale <= 0 {
-		scale = float64(output.scale)
-	}
-	if scale <= 0 {
-		scale = 1.0
-	}
+	scale := output.effectiveScale()
 
 	localX := int(float64(region.X-output.x) * scale)
 	localY := int(float64(region.Y-output.y) * scale)
@@ -730,6 +736,7 @@ func (s *Screenshoter) captureRegionOnTransformedOutput(output *WaylandOutput, r
 		Region:    region,
 		YInverted: false,
 		Format:    result.Format,
+		Scale:     scale,
 	}, nil
 }
 

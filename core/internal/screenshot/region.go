@@ -178,9 +178,13 @@ func (r *RegionSelector) Run() (*CaptureResult, bool, error) {
 
 	yInverted := false
 	var format uint32
+	scale := 1.0
 	if r.selection.surface != nil {
 		yInverted = r.selection.surface.yInverted
 		format = r.selection.surface.screenFormat
+		if s := r.selection.surface.output.fractionalScale; s > 0 {
+			scale = s
+		}
 	}
 
 	return &CaptureResult{
@@ -188,6 +192,7 @@ func (r *RegionSelector) Run() (*CaptureResult, bool, error) {
 		Region:    r.result,
 		YInverted: yInverted,
 		Format:    format,
+		Scale:     scale,
 	}, false, nil
 }
 
