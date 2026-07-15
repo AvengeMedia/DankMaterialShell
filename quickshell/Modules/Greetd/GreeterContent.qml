@@ -1989,7 +1989,7 @@ Item {
             authTimeout.stop();
             passwordFailureCount = 0;
             clearAuthFeedback();
-            authSuccessMessage = I18n.tr("Authenticated - starting session");
+            authSuccessMessage = I18n.tr("Authenticated!");
             const sessionCmd = GreeterState.selectedSession || GreeterState.sessionExecs[GreeterState.currentSessionIndex];
             const sessionPath = GreeterState.selectedSessionPath || GreeterState.sessionPaths[GreeterState.currentSessionIndex];
             const sessionDesktopId = GreeterState.selectedSessionDesktopId || GreeterState.sessionDesktopIds[GreeterState.currentSessionIndex] || desktopIdFromPath(sessionPath);
