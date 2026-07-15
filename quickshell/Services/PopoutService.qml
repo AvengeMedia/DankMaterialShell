@@ -38,6 +38,7 @@ Singleton {
     property var spotlightBarModal: null
     property var spotlightBarModalLoader: null
     property var powerMenuModal: null
+    property var powerMenuModalLoader: null
     property var processListModal: null
     property var processListModalLoader: null
     property var colorPickerModal: null

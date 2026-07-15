@@ -9,6 +9,9 @@
 
 import QtQuick
 import Quickshell
+import qs.Common
+import qs.Modules
+import qs.Services
 
 ShellRoot {
     id: entrypoint
@@ -21,16 +24,40 @@ ShellRoot {
     }
 
     Loader {
-        id: dmsShellLoader
-        asynchronous: false
-        sourceComponent: DMSShell {}
+        id: wallpaperLoader
         active: !entrypoint.runGreeter
+        asynchronous: false
+
+        sourceComponent: Scope {
+            WallpaperBackground {}
+
+            Loader {
+                active: SettingsData.blurredWallpaperLayer && CompositorService.isNiri
+                asynchronous: false
+                sourceComponent: BlurredWallpaperBackground {}
+            }
+        }
+    }
+
+    Loader {
+        id: shellCoreLoader
+        active: !entrypoint.runGreeter
+        asynchronous: true
+        source: "ShellCore.qml"
+        onLoaded: dmsShellLoader.setSource("DMSShell.qml", {
+            core: item
+        })
+    }
+
+    Loader {
+        id: dmsShellLoader
+        asynchronous: true
     }
 
     Loader {
         id: dmsGreeterLoader
-        asynchronous: false
-        sourceComponent: DMSGreeter {}
         active: entrypoint.runGreeter
+        asynchronous: false
+        source: "DMSGreeter.qml"
     }
 }

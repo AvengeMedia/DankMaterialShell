@@ -27,10 +27,13 @@ PanelWindow {
     property var systemUpdateButtonRef: null
 
     function triggerSystemUpdate() {
-        systemUpdateLoader.active = true;
-        if (!systemUpdateLoader.item)
+        const loader = PopoutService.systemUpdateLoader;
+        if (!loader)
             return;
-        const popout = systemUpdateLoader.item;
+        loader.active = true;
+        if (!loader.item)
+            return;
+        const popout = loader.item;
         const barPosition = axis?.edge === "left" ? 2 : (axis?.edge === "right" ? 3 : (axis?.edge === "top" ? 0 : 1));
         if (systemUpdateButtonRef && popout.setTriggerPosition) {
             const screenPos = systemUpdateButtonRef.mapToItem(null, 0, 0);
@@ -44,35 +47,41 @@ PanelWindow {
     }
 
     function triggerControlCenter() {
-        controlCenterLoader.active = true;
-        if (!controlCenterLoader.item) {
+        const loader = PopoutService.controlCenterLoader;
+        if (!loader)
+            return;
+        loader.active = true;
+        if (!loader.item) {
             return;
         }
 
-        if (controlCenterButtonRef && controlCenterLoader.item.setTriggerPosition) {
+        if (controlCenterButtonRef && loader.item.setTriggerPosition) {
             const screenPos = controlCenterButtonRef.mapToItem(null, 0, 0);
             const barPosition = axis?.edge === "left" ? 2 : (axis?.edge === "right" ? 3 : (axis?.edge === "top" ? 0 : 1));
             const pos = SettingsData.getPopupTriggerPosition(screenPos, barWindow.screen, barWindow.effectiveBarThickness, controlCenterButtonRef.width, barConfig?.spacing ?? 4, barPosition, barConfig);
             const section = controlCenterButtonRef.section || "right";
-            controlCenterLoader.item.setTriggerPosition(pos.x, pos.y, pos.width, section, barWindow.screen, barPosition, barWindow.effectiveBarThickness, barConfig?.spacing ?? 4, barConfig);
+            loader.item.setTriggerPosition(pos.x, pos.y, pos.width, section, barWindow.screen, barPosition, barWindow.effectiveBarThickness, barConfig?.spacing ?? 4, barConfig);
         } else {
-            controlCenterLoader.item.triggerScreen = barWindow.screen;
+            loader.item.triggerScreen = barWindow.screen;
         }
 
-        controlCenterLoader.item.toggle();
-        if (controlCenterLoader.item.shouldBeVisible && NetworkService.wifiEnabled) {
+        loader.item.toggle();
+        if (loader.item.shouldBeVisible && NetworkService.wifiEnabled) {
             NetworkService.scanWifi();
         }
     }
 
     function triggerDashTab(tabId) {
-        dankDashPopoutLoader.active = true;
-        if (!dankDashPopoutLoader.item) {
+        const loader = PopoutService.dankDashPopoutLoader;
+        if (!loader)
+            return false;
+        loader.active = true;
+        if (!loader.item) {
             return false;
         }
 
         let section = "center";
-        if (clockButtonRef && clockButtonRef.visualContent && dankDashPopoutLoader.item.setTriggerPosition) {
+        if (clockButtonRef && clockButtonRef.visualContent && loader.item.setTriggerPosition) {
             const barPosition = axis?.edge === "left" ? 2 : (axis?.edge === "right" ? 3 : (axis?.edge === "top" ? 0 : 1));
             section = clockButtonRef.section || "center";
 
@@ -98,14 +107,14 @@ PanelWindow {
             }
 
             const pos = SettingsData.getPopupTriggerPosition(triggerPos, barWindow.screen, barWindow.effectiveBarThickness, triggerWidth, barConfig?.spacing ?? 4, barPosition, barConfig);
-            dankDashPopoutLoader.item.setTriggerPosition(pos.x, pos.y, pos.width, section, barWindow.screen, barPosition, barWindow.effectiveBarThickness, barConfig?.spacing ?? 4, barConfig);
+            loader.item.setTriggerPosition(pos.x, pos.y, pos.width, section, barWindow.screen, barPosition, barWindow.effectiveBarThickness, barConfig?.spacing ?? 4, barConfig);
         } else {
-            dankDashPopoutLoader.item.triggerScreen = barWindow.screen;
+            loader.item.triggerScreen = barWindow.screen;
         }
 
-        if (dankDashPopoutLoader.item.requestTab)
-            dankDashPopoutLoader.item.requestTab(tabId);
-        PopoutManager.requestPopout(dankDashPopoutLoader.item, undefined, (barConfig?.id ?? "default") + "-" + section + "-" + tabId);
+        if (loader.item.requestTab)
+            loader.item.requestTab(tabId);
+        PopoutManager.requestPopout(loader.item, undefined, (barConfig?.id ?? "default") + "-" + section + "-" + tabId);
         return true;
     }
 

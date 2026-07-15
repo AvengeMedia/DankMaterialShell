@@ -894,11 +894,11 @@ Item {
             axis: barWindow.axis
             section: topBarContent.getWidgetSection(parent)
             parentScreen: barWindow.screen
-            popoutTarget: clipboardHistoryPopoutLoader.item ?? null
+            popoutTarget: PopoutService.clipboardHistoryPopoutLoader?.item ?? null
 
             function openClipboardPopout(initialTab, mode) {
                 openWidgetPopout({
-                    loader: clipboardHistoryPopoutLoader,
+                    loader: PopoutService.clipboardHistoryPopoutLoader,
                     widgetItem: clipboardWidget,
                     section: topBarContent.getWidgetSection(parent) || "right",
                     triggerSource: "clipboard",
@@ -915,8 +915,11 @@ Item {
             onShowSavedItemsRequested: openClipboardPopout("saved")
 
             onClearAllRequested: {
-                clipboardHistoryPopoutLoader.active = true;
-                const popout = clipboardHistoryPopoutLoader.item;
+                const loader = PopoutService.clipboardHistoryPopoutLoader;
+                if (!loader)
+                    return;
+                loader.active = true;
+                const popout = loader.item;
                 if (!popout?.confirmDialog) {
                     return;
                 }
@@ -941,16 +944,17 @@ Item {
             section: topBarContent.getWidgetSection(parent)
             parentScreen: barWindow.screen
             onClicked: {
-                if (!powerMenuModalLoader)
+                const loader = PopoutService.powerMenuModalLoader;
+                if (!loader)
                     return;
-                powerMenuModalLoader.active = true;
-                if (!powerMenuModalLoader.item)
+                loader.active = true;
+                if (!loader.item)
                     return;
-                if (powerMenuModalLoader.item.shouldBeVisible) {
-                    powerMenuModalLoader.item.close();
+                if (loader.item.shouldBeVisible) {
+                    loader.item.close();
                     return;
                 }
-                powerMenuModalLoader.item.openCentered();
+                loader.item.openCentered();
             }
         }
     }
@@ -964,23 +968,26 @@ Item {
             widgetThickness: barWindow.widgetThickness
             barThickness: barWindow.effectiveBarThickness
             section: topBarContent.getWidgetSection(parent)
-            popoutTarget: appDrawerLoader.item
+            popoutTarget: PopoutService.appDrawerLoader?.item
             parentScreen: barWindow.screen
             hyprlandOverviewLoader: barWindow ? barWindow.hyprlandOverviewLoader : null
 
             function _preparePopout() {
-                appDrawerLoader.active = true;
-                if (!appDrawerLoader.item)
+                const loader = PopoutService.appDrawerLoader;
+                if (!loader)
+                    return false;
+                loader.active = true;
+                if (!loader.item)
                     return false;
                 const effectiveBarConfig = topBarContent.barConfig;
                 const barPosition = barWindow.axis?.edge === "left" ? 2 : (barWindow.axis?.edge === "right" ? 3 : (barWindow.axis?.edge === "top" ? 0 : 1));
-                if (appDrawerLoader.item.setBarContext)
-                    appDrawerLoader.item.setBarContext(barPosition, effectiveBarConfig?.bottomGap ?? 0);
-                if (appDrawerLoader.item.setTriggerPosition) {
+                if (loader.item.setBarContext)
+                    loader.item.setBarContext(barPosition, effectiveBarConfig?.bottomGap ?? 0);
+                if (loader.item.setTriggerPosition) {
                     const globalPos = launcherButton.visualContent.mapToItem(null, 0, 0);
                     const currentScreen = barWindow.screen;
                     const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barWindow.effectiveBarThickness, launcherButton.visualWidth, effectiveBarConfig?.spacing ?? 4, barPosition, effectiveBarConfig);
-                    appDrawerLoader.item.setTriggerPosition(pos.x, pos.y, pos.width, launcherButton.section, currentScreen, barPosition, barWindow.effectiveBarThickness, effectiveBarConfig?.spacing ?? 4, effectiveBarConfig);
+                    loader.item.setTriggerPosition(pos.x, pos.y, pos.width, launcherButton.section, currentScreen, barPosition, barWindow.effectiveBarThickness, effectiveBarConfig?.spacing ?? 4, effectiveBarConfig);
                 }
                 return true;
             }
@@ -988,30 +995,30 @@ Item {
             function openWithMode(mode) {
                 if (!_preparePopout())
                     return;
-                appDrawerLoader.item.openWithMode(mode);
+                PopoutService.appDrawerLoader.item.openWithMode(mode);
             }
 
             function toggleWithMode(mode) {
                 if (!_preparePopout())
                     return;
-                appDrawerLoader.item.toggleWithMode(mode);
+                PopoutService.appDrawerLoader.item.toggleWithMode(mode);
             }
 
             function openWithQuery(query) {
                 if (!_preparePopout())
                     return;
-                appDrawerLoader.item.openWithQuery(query);
+                PopoutService.appDrawerLoader.item.openWithQuery(query);
             }
 
             function toggleWithQuery(query) {
                 if (!_preparePopout())
                     return;
-                appDrawerLoader.item.toggleWithQuery(query);
+                PopoutService.appDrawerLoader.item.toggleWithQuery(query);
             }
 
             onClicked: {
                 topBarContent.openWidgetPopout({
-                    loader: appDrawerLoader,
+                    loader: PopoutService.appDrawerLoader,
                     widgetItem: launcherButton,
                     section: launcherButton.section,
                     triggerSource: "appDrawer",
@@ -1090,7 +1097,7 @@ Item {
             barThickness: barWindow.effectiveBarThickness
             widgetThickness: barWindow.widgetThickness
             section: topBarContent.getWidgetSection(parent) || "center"
-            popoutTarget: dankDashPopoutLoader.item ?? null
+            popoutTarget: PopoutService.dankDashPopoutLoader?.item ?? null
             parentScreen: barWindow.screen
 
             Component.onCompleted: {
@@ -1106,7 +1113,7 @@ Item {
             onClockClicked: {
                 const section = topBarContent.getWidgetSection(parent) || "center";
                 topBarContent.openWidgetPopout({
-                    loader: dankDashPopoutLoader,
+                    loader: PopoutService.dankDashPopoutLoader,
                     widgetItem: clockWidget,
                     section,
                     triggerSource: topBarContent._dashTriggerSource(section, "overview"),
@@ -1129,12 +1136,12 @@ Item {
             barThickness: barWindow.effectiveBarThickness
             widgetThickness: barWindow.widgetThickness
             section: topBarContent.getWidgetSection(parent) || "center"
-            popoutTarget: dankDashPopoutLoader.item ?? null
+            popoutTarget: PopoutService.dankDashPopoutLoader?.item ?? null
             parentScreen: barWindow.screen
             onClicked: {
                 const section = topBarContent.getWidgetSection(parent) || "center";
                 topBarContent.openWidgetPopout({
-                    loader: dankDashPopoutLoader,
+                    loader: PopoutService.dankDashPopoutLoader,
                     widgetItem: mediaWidget,
                     section,
                     triggerSource: topBarContent._dashTriggerSource(section, "media"),
@@ -1156,12 +1163,12 @@ Item {
             barThickness: barWindow.effectiveBarThickness
             widgetThickness: barWindow.widgetThickness
             section: topBarContent.getWidgetSection(parent) || "center"
-            popoutTarget: dankDashPopoutLoader.item ?? null
+            popoutTarget: PopoutService.dankDashPopoutLoader?.item ?? null
             parentScreen: barWindow.screen
             onClicked: {
                 const section = topBarContent.getWidgetSection(parent) || "center";
                 topBarContent.openWidgetPopout({
-                    loader: dankDashPopoutLoader,
+                    loader: PopoutService.dankDashPopoutLoader,
                     widgetItem: weatherWidget,
                     section,
                     triggerSource: topBarContent._dashTriggerSource(section, "weather"),
@@ -1211,12 +1218,12 @@ Item {
             widgetThickness: barWindow.widgetThickness
             axis: barWindow.axis
             section: topBarContent.getWidgetSection(parent) || "right"
-            popoutTarget: processListPopoutLoader.item ?? null
+            popoutTarget: PopoutService.processListPopoutLoader?.item ?? null
             parentScreen: barWindow.screen
             widgetData: parent.widgetData
             onCpuClicked: {
                 topBarContent.openWidgetPopout({
-                    loader: processListPopoutLoader,
+                    loader: PopoutService.processListPopoutLoader,
                     widgetItem: cpuWidget,
                     section: topBarContent.getWidgetSection(parent) || "right",
                     triggerSource: "cpu",
@@ -1235,12 +1242,12 @@ Item {
             widgetThickness: barWindow.widgetThickness
             axis: barWindow.axis
             section: topBarContent.getWidgetSection(parent) || "right"
-            popoutTarget: processListPopoutLoader.item ?? null
+            popoutTarget: PopoutService.processListPopoutLoader?.item ?? null
             parentScreen: barWindow.screen
             widgetData: parent.widgetData
             onRamClicked: {
                 topBarContent.openWidgetPopout({
-                    loader: processListPopoutLoader,
+                    loader: PopoutService.processListPopoutLoader,
                     widgetItem: ramWidget,
                     section: topBarContent.getWidgetSection(parent) || "right",
                     triggerSource: "memory",
@@ -1273,12 +1280,12 @@ Item {
             widgetThickness: barWindow.widgetThickness
             axis: barWindow.axis
             section: topBarContent.getWidgetSection(parent) || "right"
-            popoutTarget: processListPopoutLoader.item ?? null
+            popoutTarget: PopoutService.processListPopoutLoader?.item ?? null
             parentScreen: barWindow.screen
             widgetData: parent.widgetData
             onCpuTempClicked: {
                 topBarContent.openWidgetPopout({
-                    loader: processListPopoutLoader,
+                    loader: PopoutService.processListPopoutLoader,
                     widgetItem: cpuTempWidget,
                     section: topBarContent.getWidgetSection(parent) || "right",
                     triggerSource: "cpu_temp",
@@ -1297,12 +1304,12 @@ Item {
             widgetThickness: barWindow.widgetThickness
             axis: barWindow.axis
             section: topBarContent.getWidgetSection(parent) || "right"
-            popoutTarget: processListPopoutLoader.item ?? null
+            popoutTarget: PopoutService.processListPopoutLoader?.item ?? null
             parentScreen: barWindow.screen
             widgetData: parent.widgetData
             onGpuTempClicked: {
                 topBarContent.openWidgetPopout({
-                    loader: processListPopoutLoader,
+                    loader: PopoutService.processListPopoutLoader,
                     widgetItem: gpuTempWidget,
                     section: topBarContent.getWidgetSection(parent) || "right",
                     triggerSource: "gpu_temp",
@@ -1324,16 +1331,16 @@ Item {
         NotificationCenterButton {
             id: notificationButton
             hasUnread: barWindow.notificationCount > 0
-            isActive: notificationCenterLoader.item ? notificationCenterLoader.item.shouldBeVisible : false
+            isActive: PopoutService.notificationCenterLoader?.item ? PopoutService.notificationCenterLoader?.item.shouldBeVisible : false
             widgetThickness: barWindow.widgetThickness
             barThickness: barWindow.effectiveBarThickness
             axis: barWindow.axis
             section: topBarContent.getWidgetSection(parent) || "right"
-            popoutTarget: notificationCenterLoader.item ?? null
+            popoutTarget: PopoutService.notificationCenterLoader?.item ?? null
             parentScreen: barWindow.screen
             onClicked: {
                 topBarContent.openWidgetPopout({
-                    loader: notificationCenterLoader,
+                    loader: PopoutService.notificationCenterLoader,
                     widgetItem: notificationButton,
                     section: topBarContent.getWidgetSection(parent) || "right",
                     triggerSource: "notifications",
@@ -1349,18 +1356,18 @@ Item {
 
         Battery {
             id: batteryWidget
-            batteryPopupVisible: batteryPopoutLoader.item ? batteryPopoutLoader.item.shouldBeVisible : false
+            batteryPopupVisible: PopoutService.batteryPopoutLoader?.item ? PopoutService.batteryPopoutLoader?.item.shouldBeVisible : false
             widgetThickness: barWindow.widgetThickness
             barThickness: barWindow.effectiveBarThickness
             axis: barWindow.axis
             section: topBarContent.getWidgetSection(parent) || "right"
             barSpacing: barConfig?.spacing ?? 4
             barConfig: topBarContent.barConfig
-            popoutTarget: batteryPopoutLoader.item ?? null
+            popoutTarget: PopoutService.batteryPopoutLoader?.item ?? null
             parentScreen: barWindow.screen
             onToggleBatteryPopup: {
                 topBarContent.openWidgetPopout({
-                    loader: batteryPopoutLoader,
+                    loader: PopoutService.batteryPopoutLoader,
                     widgetItem: batteryWidget,
                     section: topBarContent.getWidgetSection(parent) || "right",
                     triggerSource: "battery",
@@ -1375,16 +1382,16 @@ Item {
 
         DWLLayout {
             id: layoutWidget
-            layoutPopupVisible: layoutPopoutLoader.item ? layoutPopoutLoader.item.shouldBeVisible : false
+            layoutPopupVisible: PopoutService.layoutPopoutLoader?.item ? PopoutService.layoutPopoutLoader?.item.shouldBeVisible : false
             widgetThickness: barWindow.widgetThickness
             barThickness: barWindow.effectiveBarThickness
             axis: barWindow.axis
             section: topBarContent.getWidgetSection(parent) || "center"
-            popoutTarget: layoutPopoutLoader.item ?? null
+            popoutTarget: PopoutService.layoutPopoutLoader?.item ?? null
             parentScreen: barWindow.screen
             onToggleLayoutPopup: {
                 topBarContent.openWidgetPopout({
-                    loader: layoutPopoutLoader,
+                    loader: PopoutService.layoutPopoutLoader,
                     widgetItem: layoutWidget,
                     section: topBarContent.getWidgetSection(parent) || "center",
                     triggerSource: "layout",
@@ -1406,11 +1413,11 @@ Item {
             barSpacing: barConfig?.spacing ?? 4
             barConfig: topBarContent.barConfig
             isAutoHideBar: topBarContent.barConfig?.autoHide ?? false
-            popoutTarget: vpnPopoutLoader.item ?? null
+            popoutTarget: PopoutService.vpnPopoutLoader?.item ?? null
             parentScreen: barWindow.screen
             onToggleVpnPopup: {
                 topBarContent.openWidgetPopout({
-                    loader: vpnPopoutLoader,
+                    loader: PopoutService.vpnPopoutLoader,
                     widgetItem: vpnWidget,
                     section: topBarContent.getWidgetSection(parent) || "right",
                     triggerSource: "vpn",
@@ -1425,12 +1432,12 @@ Item {
 
         ControlCenterButton {
             id: controlCenterButton
-            isActive: controlCenterLoader.item ? controlCenterLoader.item.shouldBeVisible : false
+            isActive: PopoutService.controlCenterLoader?.item ? PopoutService.controlCenterLoader?.item.shouldBeVisible : false
             widgetThickness: barWindow.widgetThickness
             barThickness: barWindow.effectiveBarThickness
             axis: barWindow.axis
             section: topBarContent.getWidgetSection(parent) || "right"
-            popoutTarget: controlCenterLoader.item ?? null
+            popoutTarget: PopoutService.controlCenterLoader?.item ?? null
             parentScreen: barWindow.screen
             screenName: barWindow.screen?.name || ""
             screenModel: barWindow.screen?.model || ""
@@ -1448,14 +1455,14 @@ Item {
 
             onClicked: {
                 topBarContent.openWidgetPopout({
-                    loader: controlCenterLoader,
+                    loader: PopoutService.controlCenterLoader,
                     widgetItem: controlCenterButton,
                     section: topBarContent.getWidgetSection(parent) || "right",
                     triggerSource: "controlCenter",
                     mode: "click",
                     setTriggerScreen: true
                 });
-                if (controlCenterLoader.item?.shouldBeVisible && NetworkService.wifiEnabled)
+                if (PopoutService.controlCenterLoader?.item?.shouldBeVisible && NetworkService.wifiEnabled)
                     NetworkService.scanWifi();
             }
         }
@@ -1567,12 +1574,12 @@ Item {
 
         SystemUpdate {
             id: systemUpdateWidget
-            isActive: systemUpdateLoader.item ? systemUpdateLoader.item.shouldBeVisible : false
+            isActive: PopoutService.systemUpdateLoader?.item ? PopoutService.systemUpdateLoader?.item.shouldBeVisible : false
             widgetThickness: barWindow.widgetThickness
             barThickness: barWindow.effectiveBarThickness
             axis: barWindow.axis
             section: topBarContent.getWidgetSection(parent) || "right"
-            popoutTarget: systemUpdateLoader.item ?? null
+            popoutTarget: PopoutService.systemUpdateLoader?.item ?? null
             parentScreen: barWindow.screen
 
             Component.onCompleted: {
@@ -1586,7 +1593,7 @@ Item {
 
             onClicked: {
                 topBarContent.openWidgetPopout({
-                    loader: systemUpdateLoader,
+                    loader: PopoutService.systemUpdateLoader,
                     widgetItem: systemUpdateWidget,
                     section: topBarContent.getWidgetSection(parent) || "right",
                     triggerSource: "systemUpdate",

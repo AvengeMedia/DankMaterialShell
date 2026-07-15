@@ -14,21 +14,22 @@ BasePill {
     readonly property string targetScreenName: parentScreen?.name || focusedScreenName
 
     function resolveNotepadInstance() {
-        if (typeof notepadSlideoutVariants === "undefined" || !notepadSlideoutVariants || !notepadSlideoutVariants.instances) {
+        const slideouts = PopoutService.notepadSlideouts;
+        if (!slideouts || slideouts.length === 0) {
             return null;
         }
 
         const targetScreen = targetScreenName;
         if (targetScreen) {
-            for (var i = 0; i < notepadSlideoutVariants.instances.length; i++) {
-                var slideout = notepadSlideoutVariants.instances[i];
+            for (var i = 0; i < slideouts.length; i++) {
+                var slideout = slideouts[i];
                 if (slideout.modelData && slideout.modelData.name === targetScreen) {
                     return slideout;
                 }
             }
         }
 
-        return notepadSlideoutVariants.instances.length > 0 ? notepadSlideoutVariants.instances[0] : null;
+        return slideouts[0];
     }
 
     readonly property var notepadInstance: resolveNotepadInstance()
