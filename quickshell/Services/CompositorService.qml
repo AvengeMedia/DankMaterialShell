@@ -942,15 +942,16 @@ Singleton {
         }
     }
 
-    // Primary detection asks the OS which process owns $WAYLAND_DISPLAY — the
-    // compositor quickshell is actually connected to. Env vars like
+    // Primary detection asks the kernel which process owns the $WAYLAND_DISPLAY
+    // socket — the compositor quickshell is actually connected to. Env vars like
     // HYPRLAND_INSTANCE_SIGNATURE / MANGO_INSTANCE_SIGNATURE can leak into the
-    // systemd user environment from previous sessions and lie.
+    // systemd user environment from previous sessions and lie. Unset
+    // WAYLAND_DISPLAY falls back to "wayland-0", mirroring wl_display_connect.
+    // /proc/net/unix: field 6 is state (01 = listening), 7 inode, 8 bound path.
     function detectCompositor() {
-        const script = 'sock="$WAYLAND_DISPLAY"; case "$sock" in /*) ;; *) sock="$XDG_RUNTIME_DIR/$sock" ;; esac; ss -xlp 2>/dev/null | grep -F "$sock " | head -n1';
+        const script = 'sock="${WAYLAND_DISPLAY:-wayland-0}"; case "$sock" in /*) ;; *) sock="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/$sock" ;; esac; inode=$(awk -v p="$sock" \'$8 == p && $6 == 1 {print $7; exit}\' /proc/net/unix); [ -n "$inode" ] || exit 1; fd=$(find /proc/[0-9]*/fd/ -mindepth 1 -maxdepth 1 -lname "socket:\\[$inode\\]" 2>/dev/null | head -n1); [ -n "$fd" ] || exit 1; pid="${fd#/proc/}"; cat "/proc/${pid%%/*}/comm"';
         Proc.runCommand("waylandSocketOwner", ["sh", "-c", script], (output, exitCode) => {
-            const match = output ? output.match(/users:\(\("([^"]+)"/) : null;
-            const comm = match ? match[1].toLowerCase() : "";
+            const comm = (exitCode === 0 && output) ? output.trim().toLowerCase() : "";
             const name = _compositorNameFromComm(comm);
             if (name) {
                 _applyCompositor(name);
