@@ -12,8 +12,6 @@ Singleton {
     property bool suppressSound: true
     property bool previousPluggedState: false
 
-    readonly property var scale: 100 / SettingsData.batteryChargeLimit
-
     Timer {
         id: startupTimer
         interval: 500
@@ -78,7 +76,7 @@ Singleton {
             return 0;
         if (batteryCapacity === 0) {
             if (usePreferred && preferredDeviceKnown) {
-                const val = Math.min(100, Math.round(preferredDevice.percentage * 100 * scale));
+                const val = Math.min(100, Math.round(preferredDevice.percentage * 100));
                 _lastBatteryLevel = val;
                 return val;
             }
@@ -88,7 +86,7 @@ Singleton {
             if (validBatteries.length === 0)
                 return _lastBatteryLevel;
             const avgPercentage = validBatteries.reduce((sum, b) => sum + b.percentage, 0) / validBatteries.length;
-            const val = Math.min(100, Math.round(avgPercentage * 100 * scale));
+            const val = Math.min(100, Math.round(avgPercentage * 100));
             _lastBatteryLevel = val;
             return val;
         }
@@ -96,7 +94,7 @@ Singleton {
         const cap = batteryCapacity;
         if (cap === 0)
             return _lastBatteryLevel;
-        const val = Math.min(100, Math.round((energy * 100) / cap * scale));
+        const val = Math.min(100, Math.round((energy * 100) / cap));
         _lastBatteryLevel = val;
         return val;
     }
