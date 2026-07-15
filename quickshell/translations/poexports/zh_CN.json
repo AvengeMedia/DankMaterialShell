@@ -776,6 +776,9 @@
   "Authenticate": {
     "Authenticate": "认证"
   },
+  "Authenticated!": {
+    "Authenticated!": ""
+  },
   "Authenticating...": {
     "Authenticating...": "认证中..."
   },
@@ -799,6 +802,15 @@
   },
   "Authentication error - try again": {
     "Authentication error - try again": "认证错误 - 请重试"
+  },
+  "Authentication failed - attempt %1 of %2": {
+    "Authentication failed - attempt %1 of %2": ""
+  },
+  "Authentication failed - lockout can occur": {
+    "Authentication failed - lockout can occur": ""
+  },
+  "Authentication failed - try again": {
+    "Authentication failed - try again": ""
   },
   "Authentication failed, please try again": {
     "Authentication failed, please try again": "认证失败，请重试"
@@ -973,6 +985,15 @@
   },
   "Available.": {
     "Available.": "可用。"
+  },
+  "Awaiting fingerprint authentication": {
+    "Awaiting fingerprint authentication": ""
+  },
+  "Awaiting fingerprint or security key authentication": {
+    "Awaiting fingerprint or security key authentication": ""
+  },
+  "Awaiting security key authentication": {
+    "Awaiting security key authentication": ""
   },
   "BSSID": {
     "BSSID": "BSSID"
@@ -2152,6 +2173,9 @@
   },
   "Custom command and terminal params are split on whitespace; paths with spaces will break.": {
     "Custom command and terminal params are split on whitespace; paths with spaces will break.": "自定义命令和终端参数在空白空间上会被拆分；带空格的路径会断开。"
+  },
+  "Custom interval in minutes (minimum 5)": {
+    "Custom interval in minutes (minimum 5)": ""
   },
   "Custom open-trash command": {
     "Custom open-trash command": "自定义打开回收站命令"
@@ -3410,6 +3434,9 @@
   "Flags": {
     "Flags": "标签"
   },
+  "Flatpak": {
+    "Flatpak": ""
+  },
   "Flipped": {
     "Flipped": "翻转"
   },
@@ -3824,6 +3851,9 @@
   "Groups": {
     "Groups": "分组"
   },
+  "H": {
+    "H": ""
+  },
   "HDR (EDID)": {
     "HDR (EDID)": "HDR（EDID）"
   },
@@ -4118,6 +4148,24 @@
   "Ignore Completely": {
     "Ignore Completely": "完全忽略"
   },
+  "Ignore package": {
+    "Ignore package": ""
+  },
+  "Ignore this package": {
+    "Ignore this package": ""
+  },
+  "Ignored (%1)": {
+    "Ignored (%1)": ""
+  },
+  "Ignored Packages": {
+    "Ignored Packages": ""
+  },
+  "Ignored packages are hidden from the updater and skipped by 'Update All'.": {
+    "Ignored packages are hidden from the updater and skipped by 'Update All'.": ""
+  },
+  "Ignored packages only apply to the built-in updater. Your custom command controls its own exclusions.": {
+    "Ignored packages only apply to the built-in updater. Your custom command controls its own exclusions.": ""
+  },
   "Image": {
     "Image": "图像"
   },
@@ -4297,6 +4345,9 @@
   },
   "Invalid configuration": {
     "Invalid configuration": "无效配置"
+  },
+  "Invalid package name — letters, digits and @._+:- only.": {
+    "Invalid package name — letters, digits and @._+:- only.": ""
   },
   "Invalid password for %1": {
     "Invalid password for %1": "%1 的密码无效"
@@ -5399,6 +5450,9 @@
   "No output devices found": {
     "No output devices found": "未找到输出设备"
   },
+  "No packages ignored. Add one here or hover an update in the popout and click the hide button.": {
+    "No packages ignored. Add one here or hover an update in the popout and click the hide button.": ""
+  },
   "No peers found": {
     "No peers found": "未找到"
   },
@@ -5881,6 +5935,9 @@
   },
   "PIN": {
     "PIN": "PIN 码"
+  },
+  "Package name (e.g., docker)": {
+    "Package name (e.g., docker)": ""
   },
   "Pad": {
     "Pad": "留边"
@@ -7754,6 +7811,9 @@
   "Status": {
     "Status": "状态"
   },
+  "Stop ignoring %1": {
+    "Stop ignoring %1": ""
+  },
   "Stopped": {
     "Stopped": "已停止"
   },
@@ -8849,6 +8909,9 @@
   "Votes": {
     "Votes": "评分"
   },
+  "W": {
+    "W": ""
+  },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
   },
@@ -9149,6 +9212,18 @@
   "by %1": {
     "by %1": "%1"
   },
+  "checked %1d ago": {
+    "checked %1d ago": ""
+  },
+  "checked %1h ago": {
+    "checked %1h ago": ""
+  },
+  "checked %1m ago": {
+    "checked %1m ago": ""
+  },
+  "checked just now": {
+    "checked just now": ""
+  },
   "days": {
     "days": "天"
   },
@@ -9339,7 +9414,7 @@
     "until %1": "直到 %1"
   },
   "up": {
-    "up": "上"
+    "up": "已运行"
   },
   "update dms for NM integration.": {
     "update dms for NM integration.": "更新 DMS 以集成 NM"

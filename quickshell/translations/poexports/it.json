@@ -776,6 +776,9 @@
   "Authenticate": {
     "Authenticate": "Autenticati"
   },
+  "Authenticated!": {
+    "Authenticated!": ""
+  },
   "Authenticating...": {
     "Authenticating...": "Autenticazione in corso..."
   },
@@ -799,6 +802,15 @@
   },
   "Authentication error - try again": {
     "Authentication error - try again": "Errore di autenticazione - riprova"
+  },
+  "Authentication failed - attempt %1 of %2": {
+    "Authentication failed - attempt %1 of %2": ""
+  },
+  "Authentication failed - lockout can occur": {
+    "Authentication failed - lockout can occur": ""
+  },
+  "Authentication failed - try again": {
+    "Authentication failed - try again": ""
   },
   "Authentication failed, please try again": {
     "Authentication failed, please try again": "Impossibile autenticarsi, per favore riprova"
@@ -973,6 +985,15 @@
   },
   "Available.": {
     "Available.": "Disponibile."
+  },
+  "Awaiting fingerprint authentication": {
+    "Awaiting fingerprint authentication": ""
+  },
+  "Awaiting fingerprint or security key authentication": {
+    "Awaiting fingerprint or security key authentication": ""
+  },
+  "Awaiting security key authentication": {
+    "Awaiting security key authentication": ""
   },
   "BSSID": {
     "BSSID": "BSSID"
@@ -2152,6 +2173,9 @@
   },
   "Custom command and terminal params are split on whitespace; paths with spaces will break.": {
     "Custom command and terminal params are split on whitespace; paths with spaces will break.": "I comandi personalizzati e i parametri del terminale vengono separati dagli spazi; i percorsi contenenti spazi non funzioneranno."
+  },
+  "Custom interval in minutes (minimum 5)": {
+    "Custom interval in minutes (minimum 5)": ""
   },
   "Custom open-trash command": {
     "Custom open-trash command": "Comando personalizzato apertura cestino"
@@ -3410,6 +3434,9 @@
   "Flags": {
     "Flags": "Flag"
   },
+  "Flatpak": {
+    "Flatpak": ""
+  },
   "Flipped": {
     "Flipped": "Specchiato"
   },
@@ -3702,7 +3729,7 @@
     "Generic": "Generico"
   },
   "Geometric Centering": {
-    "Geometric Centering": ""
+    "Geometric Centering": "Centratura Geometrico"
   },
   "Get Started": {
     "Get Started": "Inizia"
@@ -3824,6 +3851,9 @@
   "Groups": {
     "Groups": "Gruppi"
   },
+  "H": {
+    "H": ""
+  },
   "HDR (EDID)": {
     "HDR (EDID)": "HDR (EDID)"
   },
@@ -3843,7 +3873,7 @@
     "HTML copied to clipboard": "HTML copiato negli appunti"
   },
   "Handles geo: location links": {
-    "Handles geo: location links": ""
+    "Handles geo: location links": "Gestisce i link di localizzazione geo:"
   },
   "Handles links and opens HTML files": {
     "Handles links and opens HTML files": "Gestisce i collegamenti e apre i file HTML"
@@ -4118,6 +4148,24 @@
   "Ignore Completely": {
     "Ignore Completely": "Ignora Completamente"
   },
+  "Ignore package": {
+    "Ignore package": ""
+  },
+  "Ignore this package": {
+    "Ignore this package": ""
+  },
+  "Ignored (%1)": {
+    "Ignored (%1)": ""
+  },
+  "Ignored Packages": {
+    "Ignored Packages": ""
+  },
+  "Ignored packages are hidden from the updater and skipped by 'Update All'.": {
+    "Ignored packages are hidden from the updater and skipped by 'Update All'.": ""
+  },
+  "Ignored packages only apply to the built-in updater. Your custom command controls its own exclusions.": {
+    "Ignored packages only apply to the built-in updater. Your custom command controls its own exclusions.": ""
+  },
   "Image": {
     "Image": "Immagine"
   },
@@ -4170,7 +4218,7 @@
     "Incorrect password - try again": "Password errata - riprova"
   },
   "Index Centering": {
-    "Index Centering": ""
+    "Index Centering": "Centratura indice"
   },
   "Indicator Style": {
     "Indicator Style": "Stile Indicatore"
@@ -4298,6 +4346,9 @@
   "Invalid configuration": {
     "Invalid configuration": "Configurazione non valida"
   },
+  "Invalid package name — letters, digits and @._+:- only.": {
+    "Invalid package name — letters, digits and @._+:- only.": ""
+  },
   "Invalid password for %1": {
     "Invalid password for %1": "Password non valida per %1"
   },
@@ -4323,7 +4374,7 @@
     "Jobs: ": "Stampe: "
   },
   "Join video call": {
-    "Join video call": ""
+    "Join video call": "Partecipa alla videochiamata"
   },
   "Jump to page": {
     "Jump to page": "Vai alla pagina"
@@ -4713,7 +4764,7 @@
     "Map window class names to icon names for proper icon display": "Associa i nomi delle classi delle finestre ai nomi delle icone per una corretta visualizzazione"
   },
   "Maps": {
-    "Maps": ""
+    "Maps": "Mappe"
   },
   "Margin": {
     "Margin": "Margini"
@@ -5399,6 +5450,9 @@
   "No output devices found": {
     "No output devices found": "Nessun dispositivo di output trovato"
   },
+  "No packages ignored. Add one here or hover an update in the popout and click the hide button.": {
+    "No packages ignored. Add one here or hover an update in the popout and click the hide button.": ""
+  },
   "No peers found": {
     "No peers found": "Nessun peer trovato"
   },
@@ -5881,6 +5935,9 @@
   },
   "PIN": {
     "PIN": "PIN"
+  },
+  "Package name (e.g., docker)": {
+    "Package name (e.g., docker)": ""
   },
   "Pad": {
     "Pad": "Centra"
@@ -7754,6 +7811,9 @@
   "Status": {
     "Status": "Stato"
   },
+  "Stop ignoring %1": {
+    "Stop ignoring %1": ""
+  },
   "Stopped": {
     "Stopped": "Arrestato"
   },
@@ -8610,7 +8670,7 @@
     "Use a security key for lock screen authentication.": "Usa una chiave di sicurezza per l'autenticazione della schermata di blocco."
   },
   "Use album art accent": {
-    "Use album art accent": ""
+    "Use album art accent": "Usa accento copertina album"
   },
   "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": {
     "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": "Usa un gestore di sfondi esterno come swww, hyprpaper o swaybg."
@@ -8619,7 +8679,7 @@
     "Use animated wave progress bars for media playback": "Usa barre ad onde animate per la riproduzione media"
   },
   "Use colors extracted from album art instead of system theme colors": {
-    "Use colors extracted from album art instead of system theme colors": ""
+    "Use colors extracted from album art instead of system theme colors": "Usa i colori estratti dalla copertina dell'album invece dei colori del tema di sistema"
   },
   "Use custom border size": {
     "Use custom border size": "Usa uno spessore bordo personalizzato"
@@ -8848,6 +8908,9 @@
   },
   "Votes": {
     "Votes": "Voti"
+  },
+  "W": {
+    "W": ""
   },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
@@ -9148,6 +9211,18 @@
   },
   "by %1": {
     "by %1": "di %1"
+  },
+  "checked %1d ago": {
+    "checked %1d ago": ""
+  },
+  "checked %1h ago": {
+    "checked %1h ago": ""
+  },
+  "checked %1m ago": {
+    "checked %1m ago": ""
+  },
+  "checked just now": {
+    "checked just now": ""
   },
   "days": {
     "days": "giorni"

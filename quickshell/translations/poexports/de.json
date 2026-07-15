@@ -776,6 +776,9 @@
   "Authenticate": {
     "Authenticate": "Authentifizieren"
   },
+  "Authenticated!": {
+    "Authenticated!": ""
+  },
   "Authenticating...": {
     "Authenticating...": "Authentifizierung..."
   },
@@ -799,6 +802,15 @@
   },
   "Authentication error - try again": {
     "Authentication error - try again": "Authentifizierungsfehler - erneut versuchen"
+  },
+  "Authentication failed - attempt %1 of %2": {
+    "Authentication failed - attempt %1 of %2": ""
+  },
+  "Authentication failed - lockout can occur": {
+    "Authentication failed - lockout can occur": ""
+  },
+  "Authentication failed - try again": {
+    "Authentication failed - try again": ""
   },
   "Authentication failed, please try again": {
     "Authentication failed, please try again": "Authentifizierung nicht erfolgreich, bitte nochmals probieren"
@@ -973,6 +985,15 @@
   },
   "Available.": {
     "Available.": "Verfügbar."
+  },
+  "Awaiting fingerprint authentication": {
+    "Awaiting fingerprint authentication": ""
+  },
+  "Awaiting fingerprint or security key authentication": {
+    "Awaiting fingerprint or security key authentication": ""
+  },
+  "Awaiting security key authentication": {
+    "Awaiting security key authentication": ""
   },
   "BSSID": {
     "BSSID": "BSSID"
@@ -2152,6 +2173,9 @@
   },
   "Custom command and terminal params are split on whitespace; paths with spaces will break.": {
     "Custom command and terminal params are split on whitespace; paths with spaces will break.": "Benutzerdefinierte Befehle und Terminalparameter werden an Leerzeichen getrennt; Pfade mit Leerzeichen funktionieren nicht."
+  },
+  "Custom interval in minutes (minimum 5)": {
+    "Custom interval in minutes (minimum 5)": ""
   },
   "Custom open-trash command": {
     "Custom open-trash command": "Benutzerdefinierter Befehl zum Öffnen des Papierkorbs"
@@ -3410,6 +3434,9 @@
   "Flags": {
     "Flags": "Flags"
   },
+  "Flatpak": {
+    "Flatpak": ""
+  },
   "Flipped": {
     "Flipped": "Gespiegelt"
   },
@@ -3702,7 +3729,7 @@
     "Generic": "Generisch"
   },
   "Geometric Centering": {
-    "Geometric Centering": ""
+    "Geometric Centering": "Geometrische Zentrierung"
   },
   "Get Started": {
     "Get Started": "Erste Schritte"
@@ -3824,6 +3851,9 @@
   "Groups": {
     "Groups": "Gruppen"
   },
+  "H": {
+    "H": ""
+  },
   "HDR (EDID)": {
     "HDR (EDID)": "HDR (EDID)"
   },
@@ -3843,7 +3873,7 @@
     "HTML copied to clipboard": "HTML in die Zwischenablage kopiert"
   },
   "Handles geo: location links": {
-    "Handles geo: location links": ""
+    "Handles geo: location links": "Verarbeitet geo: Standort-Links"
   },
   "Handles links and opens HTML files": {
     "Handles links and opens HTML files": "Verarbeitet Links und öffnet HTML-Dateien"
@@ -4118,6 +4148,24 @@
   "Ignore Completely": {
     "Ignore Completely": "Vollständig ignorieren"
   },
+  "Ignore package": {
+    "Ignore package": ""
+  },
+  "Ignore this package": {
+    "Ignore this package": ""
+  },
+  "Ignored (%1)": {
+    "Ignored (%1)": ""
+  },
+  "Ignored Packages": {
+    "Ignored Packages": ""
+  },
+  "Ignored packages are hidden from the updater and skipped by 'Update All'.": {
+    "Ignored packages are hidden from the updater and skipped by 'Update All'.": ""
+  },
+  "Ignored packages only apply to the built-in updater. Your custom command controls its own exclusions.": {
+    "Ignored packages only apply to the built-in updater. Your custom command controls its own exclusions.": ""
+  },
   "Image": {
     "Image": "Bild"
   },
@@ -4170,7 +4218,7 @@
     "Incorrect password - try again": "Falsches Passwort – bitte erneut versuchen"
   },
   "Index Centering": {
-    "Index Centering": ""
+    "Index Centering": "Index-Zentrierung"
   },
   "Indicator Style": {
     "Indicator Style": "Indikatorstil"
@@ -4298,6 +4346,9 @@
   "Invalid configuration": {
     "Invalid configuration": "Invalide Konfiguration"
   },
+  "Invalid package name — letters, digits and @._+:- only.": {
+    "Invalid package name — letters, digits and @._+:- only.": ""
+  },
   "Invalid password for %1": {
     "Invalid password for %1": "Ungültiges Passwort für %1"
   },
@@ -4323,7 +4374,7 @@
     "Jobs: ": "Druckaufträge: "
   },
   "Join video call": {
-    "Join video call": ""
+    "Join video call": "Videoanruf beitreten"
   },
   "Jump to page": {
     "Jump to page": "Zu Seite springen"
@@ -4713,7 +4764,7 @@
     "Map window class names to icon names for proper icon display": "Fensterklassennamen Symbolnamen zuordnen für korrekte Symbolanzeige"
   },
   "Maps": {
-    "Maps": ""
+    "Maps": "Karten"
   },
   "Margin": {
     "Margin": "äußerer Abstand"
@@ -5399,6 +5450,9 @@
   "No output devices found": {
     "No output devices found": "Keine Ausgabegeräte gefunden"
   },
+  "No packages ignored. Add one here or hover an update in the popout and click the hide button.": {
+    "No packages ignored. Add one here or hover an update in the popout and click the hide button.": ""
+  },
   "No peers found": {
     "No peers found": "Keine Peers gefunden"
   },
@@ -5881,6 +5935,9 @@
   },
   "PIN": {
     "PIN": "PIN"
+  },
+  "Package name (e.g., docker)": {
+    "Package name (e.g., docker)": ""
   },
   "Pad": {
     "Pad": "Auffüllen"
@@ -7754,6 +7811,9 @@
   "Status": {
     "Status": "Status"
   },
+  "Stop ignoring %1": {
+    "Stop ignoring %1": ""
+  },
   "Stopped": {
     "Stopped": "Gestoppt"
   },
@@ -8610,7 +8670,7 @@
     "Use a security key for lock screen authentication.": "Sicherheitsschlüssel für die Sperrbildschirm-Authentifizierung verwenden."
   },
   "Use album art accent": {
-    "Use album art accent": ""
+    "Use album art accent": "Albumcover-Akzent verwenden"
   },
   "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": {
     "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": "Nutze externe Hintergrundbild Verwaltung, z.B. swww, hyprpaper, or swaybg."
@@ -8619,7 +8679,7 @@
     "Use animated wave progress bars for media playback": "Animierte Wellen-Fortschrittsbalken für Medienwiedergabe verwenden"
   },
   "Use colors extracted from album art instead of system theme colors": {
-    "Use colors extracted from album art instead of system theme colors": ""
+    "Use colors extracted from album art instead of system theme colors": "Aus Albumcover extrahierte Farben anstelle von System-Themenfarben verwenden"
   },
   "Use custom border size": {
     "Use custom border size": "Benutzerdefinierte Rahmengröße verwenden"
@@ -8848,6 +8908,9 @@
   },
   "Votes": {
     "Votes": "Stimmen"
+  },
+  "W": {
+    "W": ""
   },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
@@ -9148,6 +9211,18 @@
   },
   "by %1": {
     "by %1": "von %1"
+  },
+  "checked %1d ago": {
+    "checked %1d ago": ""
+  },
+  "checked %1h ago": {
+    "checked %1h ago": ""
+  },
+  "checked %1m ago": {
+    "checked %1m ago": ""
+  },
+  "checked just now": {
+    "checked just now": ""
   },
   "days": {
     "days": "Tage"

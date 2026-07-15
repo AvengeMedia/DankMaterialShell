@@ -1799,6 +1799,13 @@
     "comment": ""
   },
   {
+    "term": "Authenticated!",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Authenticating...",
     "translation": "",
     "context": "",
@@ -1849,6 +1856,27 @@
   },
   {
     "term": "Authentication error - try again",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Authentication failed - attempt %1 of %2",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Authentication failed - lockout can occur",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Authentication failed - try again",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2261,6 +2289,27 @@
     "comment": ""
   },
   {
+    "term": "Awaiting fingerprint authentication",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Awaiting fingerprint or security key authentication",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Awaiting security key authentication",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "BSSID",
     "translation": "",
     "context": "",
@@ -2283,13 +2332,6 @@
   },
   {
     "term": "Backend",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Backends: %1",
     "translation": "",
     "context": "",
     "reference": "",
@@ -3089,7 +3131,7 @@
   {
     "term": "Capabilities",
     "translation": "",
-    "context": "",
+    "context": "plugin detail section",
     "reference": "",
     "comment": ""
   },
@@ -4908,6 +4950,13 @@
   },
   {
     "term": "Custom command and terminal params are split on whitespace; paths with spaces will break.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Custom interval in minutes (minimum 5)",
     "translation": "",
     "context": "",
     "reference": "",
@@ -7819,6 +7868,13 @@
     "comment": ""
   },
   {
+    "term": "Flatpak",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Flipped",
     "translation": "",
     "context": "",
@@ -8778,6 +8834,13 @@
     "comment": ""
   },
   {
+    "term": "H",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "HDR (EDID)",
     "translation": "",
     "context": "",
@@ -9464,6 +9527,48 @@
     "comment": ""
   },
   {
+    "term": "Ignore package",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Ignore this package",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Ignored (%1)",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Ignored Packages",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Ignored packages are hidden from the updater and skipped by 'Update All'.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Ignored packages only apply to the built-in updater. Your custom command controls its own exclusions.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Image",
     "translation": "",
     "context": "",
@@ -9556,20 +9661,6 @@
   },
   {
     "term": "Incorrect password",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Incorrect password - attempt %1 of %2 (lockout may follow)",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Incorrect password - next failures may trigger account lockout",
     "translation": "",
     "context": "",
     "reference": "",
@@ -9878,6 +9969,13 @@
   },
   {
     "term": "Invalid configuration",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Invalid package name — letters, digits and @._+:- only.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -11543,13 +11641,6 @@
     "comment": ""
   },
   {
-    "term": "Move",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Move Widget",
     "translation": "",
     "context": "",
@@ -12442,6 +12533,13 @@
     "term": "No output devices found",
     "translation": "",
     "context": "Audio settings empty state",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "No packages ignored. Add one here or hover an update in the popout and click the hide button.",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -13546,6 +13644,13 @@
   },
   {
     "term": "PIN",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Package name (e.g., docker)",
     "translation": "",
     "context": "",
     "reference": "",
@@ -17857,6 +17962,13 @@
     "comment": ""
   },
   {
+    "term": "Stop ignoring %1",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Stopped",
     "translation": "",
     "context": "",
@@ -20363,6 +20475,13 @@
     "comment": ""
   },
   {
+    "term": "W",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "WPA/WPA2",
     "translation": "",
     "context": "",
@@ -21038,6 +21157,34 @@
     "term": "by %1",
     "translation": "",
     "context": "author attribution",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "checked %1d ago",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "checked %1h ago",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "checked %1m ago",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "checked just now",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
