@@ -103,19 +103,18 @@ var authValidateCmd = &cobra.Command{
 		}
 
 		var result sharedpam.LockscreenPamValidation
-		if path != "" {
-			if !filepath.IsAbs(path) {
-				result = sharedpam.LockscreenPamValidation{
-					Path:           path,
-					MissingModules: []string{},
-					Warnings:       []string{},
-					Errors:         []string{"--path must be an absolute file path"},
-				}
-			} else {
-				result = sharedpam.ValidateLockscreenPamPath(path)
-			}
-		} else {
+		switch {
+		case service != "":
 			result = sharedpam.ValidateLockscreenPamService(service)
+		case !filepath.IsAbs(path):
+			result = sharedpam.LockscreenPamValidation{
+				Path:           path,
+				MissingModules: []string{},
+				Warnings:       []string{},
+				Errors:         []string{"--path must be an absolute file path"},
+			}
+		default:
+			result = sharedpam.ValidateLockscreenPamPath(path)
 		}
 
 		if asJSON {

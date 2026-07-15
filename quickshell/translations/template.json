@@ -1528,7 +1528,7 @@
   {
     "term": "Apply Changes",
     "translation": "",
-    "context": "",
+    "context": "validate and apply custom PAM authentication source",
     "reference": "",
     "comment": ""
   },
@@ -1836,14 +1836,7 @@
   {
     "term": "Authentication changes apply automatically.",
     "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Authentication changes apply automatically. Fingerprint-only login may not unlock Keyring.",
-    "translation": "",
-    "context": "",
+    "context": "greeter auth setting description",
     "reference": "",
     "comment": ""
   },
@@ -1913,7 +1906,7 @@
   {
     "term": "Auto",
     "translation": "",
-    "context": "calendar backend option | theme category option",
+    "context": "automatic PAM authentication source option | calendar backend option | theme category option",
     "reference": "",
     "comment": ""
   },
@@ -2276,13 +2269,6 @@
   },
   {
     "term": "Available in Detailed and Forecast view modes",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Available.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -4993,7 +4979,7 @@
   {
     "term": "Custom...",
     "translation": "",
-    "context": "date format option",
+    "context": "custom PAM authentication source option | date format option",
     "reference": "",
     "comment": ""
   },
@@ -6552,76 +6538,6 @@
     "comment": ""
   },
   {
-    "term": "Enabled, but fingerprint availability could not be confirmed.",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Enabled, but no fingerprint reader was detected.",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Enabled, but no prints are enrolled yet. Authentication changes apply automatically once you enroll fingerprints.",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Enabled, but no prints are enrolled yet. Enroll fingerprints and run Sync.",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Enabled, but no registered security key was found yet. Authentication changes apply automatically once your key is registered or your U2F config is updated.",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Enabled, but no registered security key was found yet. Register a key and run Sync.",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Enabled, but security-key availability could not be confirmed.",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Enabled. PAM already provides fingerprint auth.",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Enabled. PAM already provides security-key auth.",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Enabled. PAM provides fingerprint auth, but no prints are enrolled yet.",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Enabling WiFi...",
     "translation": "",
     "context": "network status",
@@ -7800,7 +7716,7 @@
   {
     "term": "Fingerprint availability could not be confirmed.",
     "translation": "",
-    "context": "",
+    "context": "fingerprint setting status",
     "reference": "",
     "comment": ""
   },
@@ -7821,14 +7737,14 @@
   {
     "term": "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and enroll later.",
     "translation": "",
-    "context": "",
+    "context": "lock screen fingerprint setting",
     "reference": "",
     "comment": ""
   },
   {
     "term": "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and run Sync later.",
     "translation": "",
-    "context": "",
+    "context": "greeter fingerprint login setting",
     "reference": "",
     "comment": ""
   },
@@ -12392,7 +12308,7 @@
   {
     "term": "No fingerprint reader detected.",
     "translation": "",
-    "context": "",
+    "context": "fingerprint setting status",
     "reference": "",
     "comment": ""
   },
@@ -12833,28 +12749,28 @@
   {
     "term": "Not available — install fprintd and pam_fprintd, or configure greetd PAM.",
     "translation": "",
-    "context": "",
+    "context": "greeter fingerprint login setting",
     "reference": "",
     "comment": ""
   },
   {
     "term": "Not available — install fprintd and pam_fprintd.",
     "translation": "",
-    "context": "",
+    "context": "lock screen fingerprint setting",
     "reference": "",
     "comment": ""
   },
   {
     "term": "Not available — install or configure pam_u2f, or configure greetd PAM.",
     "translation": "",
-    "context": "",
+    "context": "greeter security key login setting",
     "reference": "",
     "comment": ""
   },
   {
     "term": "Not available — install or configure pam_u2f.",
     "translation": "",
-    "context": "",
+    "context": "lock screen security key setting",
     "reference": "",
     "comment": ""
   },
@@ -13161,13 +13077,6 @@
   },
   {
     "term": "Only adjust gamma based on time or location rules.",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Only affects DMS-managed PAM. If greetd already includes pam_fprintd, fingerprint stays enabled.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -13603,35 +13512,14 @@
   {
     "term": "PAM already provides fingerprint auth. Enable this to show it at login.",
     "translation": "",
-    "context": "",
+    "context": "greeter fingerprint login setting",
     "reference": "",
     "comment": ""
   },
   {
     "term": "PAM already provides security-key auth. Enable this to show it at login.",
     "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "PAM provides fingerprint auth, but availability could not be confirmed.",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "PAM provides fingerprint auth, but no prints are enrolled yet.",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "PAM provides fingerprint auth, but no reader was detected.",
-    "translation": "",
-    "context": "",
+    "context": "greeter security key login setting",
     "reference": "",
     "comment": ""
   },
@@ -16228,14 +16116,14 @@
   {
     "term": "Security-key availability could not be confirmed.",
     "translation": "",
-    "context": "",
+    "context": "security key setting status",
     "reference": "",
     "comment": ""
   },
   {
     "term": "Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.",
     "translation": "",
-    "context": "",
+    "context": "security key setting status",
     "reference": "",
     "comment": ""
   },
@@ -19987,7 +19875,7 @@
   {
     "term": "Use fingerprint authentication for the lock screen.",
     "translation": "",
-    "context": "",
+    "context": "lock screen fingerprint setting",
     "reference": "",
     "comment": ""
   },

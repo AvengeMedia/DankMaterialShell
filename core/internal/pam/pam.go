@@ -592,8 +592,6 @@ func buildManagedLockscreenPamContent(baseDirs []string, readFile func(string) (
 	return b.String(), nil
 }
 
-// lockscreenPamCandidateServices are the services surfaced by list-services:
-// the standalone entry points plus the shared auth blocks users may pin.
 var lockscreenPamCandidateServices = []string{
 	"login",
 	"system-auth",
@@ -603,7 +601,6 @@ var lockscreenPamCandidateServices = []string{
 	"base-auth",
 }
 
-// LockscreenPamServiceInfo describes one candidate lock-screen PAM service.
 type LockscreenPamServiceInfo struct {
 	Name              string `json:"name"`
 	Dir               string `json:"dir"`
@@ -613,8 +610,6 @@ type LockscreenPamServiceInfo struct {
 	InlineU2f         bool   `json:"inlineU2f"`
 }
 
-// LockscreenPamValidation is the result of validating a PAM service file for
-// use as the DMS lock-screen password stack.
 type LockscreenPamValidation struct {
 	Valid             bool     `json:"valid"`
 	Path              string   `json:"path"`
@@ -743,8 +738,7 @@ func (r lockscreenPamResolver) analyzeInto(path string, filterType string, stack
 	return nil
 }
 
-// ListLockscreenPamServices enumerates the candidate lock-screen services that
-// exist on this system, earlier base dir winning per name (libpam precedence).
+// Earlier base dir wins per name (libpam precedence).
 func ListLockscreenPamServices() []LockscreenPamServiceInfo {
 	return listLockscreenPamServices(lockscreenPamBaseDirs, os.ReadFile)
 }
@@ -772,14 +766,10 @@ func listLockscreenPamServices(baseDirs []string, readFile func(string) ([]byte,
 	return out
 }
 
-// ValidateLockscreenPamService validates a named service resolved across the
-// system PAM base dirs.
 func ValidateLockscreenPamService(name string) LockscreenPamValidation {
 	return validateLockscreenPam(name, "", defaultValidateDeps())
 }
 
-// ValidateLockscreenPamPath validates an arbitrary absolute PAM file, which may
-// live outside the standard base dirs.
 func ValidateLockscreenPamPath(path string) LockscreenPamValidation {
 	return validateLockscreenPam("", path, defaultValidateDeps())
 }

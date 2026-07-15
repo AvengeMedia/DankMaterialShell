@@ -230,7 +230,7 @@
   {
     "term": "'Alternative' lets the key unlock on its own. 'Second factor' requires password or fingerprint first, then the key.",
     "context": "'Alternative' lets the key unlock on its own. 'Second factor' requires password or fingerprint first, then the key.",
-    "reference": "Modules/Settings/LockScreenTab.qml:302",
+    "reference": "Modules/Settings/LockScreenTab.qml:500",
     "comment": "lock screen U2F security key mode setting"
   },
   {
@@ -254,7 +254,7 @@
   {
     "term": "/path/to/videos",
     "context": "/path/to/videos",
-    "reference": "Modules/Settings/LockScreenTab.qml:366",
+    "reference": "Modules/Settings/LockScreenTab.qml:564",
     "comment": ""
   },
   {
@@ -722,7 +722,7 @@
   {
     "term": "Action failed or terminal was closed.",
     "context": "Action failed or terminal was closed.",
-    "reference": "Modules/Settings/GreeterTab.qml:355",
+    "reference": "Modules/Settings/GreeterTab.qml:338",
     "comment": ""
   },
   {
@@ -746,19 +746,19 @@
   {
     "term": "Activate",
     "context": "Activate",
-    "reference": "Modules/Settings/GreeterTab.qml:107, Modules/Settings/GreeterTab.qml:155, Modules/ControlCenter/Details/NetworkDetail.qml:405",
+    "reference": "Modules/Settings/GreeterTab.qml:90, Modules/Settings/GreeterTab.qml:138, Modules/ControlCenter/Details/NetworkDetail.qml:405",
     "comment": ""
   },
   {
     "term": "Activate Greeter",
     "context": "Activate Greeter",
-    "reference": "Modules/Settings/GreeterTab.qml:153",
+    "reference": "Modules/Settings/GreeterTab.qml:136",
     "comment": "greeter action confirmation"
   },
   {
     "term": "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.",
     "context": "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.",
-    "reference": "Modules/Settings/GreeterTab.qml:154",
+    "reference": "Modules/Settings/GreeterTab.qml:137",
     "comment": ""
   },
   {
@@ -1010,7 +1010,7 @@
   {
     "term": "All",
     "context": "All",
-    "reference": "Modals/ProcessListModal.qml:383, Services/AppSearchService.qml:728, Services/AppSearchService.qml:749, dms-plugins/DankStickerSearch/DankStickerSearch.qml:101, Modals/DankLauncherV2/Controller.qml:784, Modals/DankLauncherV2/SpotlightLauncherContent.qml:460, Modals/DankLauncherV2/LauncherContent.qml:334, Modals/DankLauncherV2/LauncherContent.qml:623, Modals/Clipboard/ClipboardContent.qml:16, Modules/ProcessList/ProcessListPopout.qml:169, Modules/Settings/WidgetsTabSection.qml:4014, Modules/Settings/WidgetsTabSection.qml:4070, Modules/Settings/PluginBrowser.qml:265, Modules/Settings/KeybindsTab.qml:458, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:103, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:106, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:118, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:254, Modules/Notifications/Center/HistoryNotificationList.qml:87",
+    "reference": "Modals/ProcessListModal.qml:383, Services/AppSearchService.qml:728, Services/AppSearchService.qml:749, dms-plugins/DankStickerSearch/DankStickerSearch.qml:101, Modals/DankLauncherV2/Controller.qml:784, Modals/DankLauncherV2/SpotlightLauncherContent.qml:460, Modals/DankLauncherV2/LauncherContent.qml:334, Modals/DankLauncherV2/LauncherContent.qml:623, Modals/Clipboard/ClipboardContent.qml:16, Modules/ProcessList/ProcessListPopout.qml:169, Modules/Settings/WidgetsTabSection.qml:4014, Modules/Settings/WidgetsTabSection.qml:4070, Modules/Settings/PluginBrowser.qml:265, Modules/Settings/KeybindsTab.qml:458, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:103, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:106, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:118, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:260, Modules/Notifications/Center/HistoryNotificationList.qml:87",
     "comment": "Tailscale filter: all devices | notification history filter | plugin browser category filter"
   },
   {
@@ -1040,7 +1040,7 @@
   {
     "term": "Allow LAN access",
     "context": "Allow LAN access",
-    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:206",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:212",
     "comment": "Tailscale allow LAN access toggle"
   },
   {
@@ -1088,7 +1088,7 @@
   {
     "term": "Alternative (OR)",
     "context": "Alternative (OR)",
-    "reference": "Modules/Settings/LockScreenTab.qml:304, Modules/Settings/LockScreenTab.qml:305",
+    "reference": "Modules/Settings/LockScreenTab.qml:502, Modules/Settings/LockScreenTab.qml:503",
     "comment": "U2F mode option: key works as standalone unlock method"
   },
   {
@@ -1262,7 +1262,7 @@
   {
     "term": "App Names",
     "context": "App Names",
-    "reference": "Modules/Settings/LockScreenTab.qml:148, Modules/Settings/NotificationsTab.qml:85, Modules/Settings/NotificationsTab.qml:774",
+    "reference": "Modules/Settings/LockScreenTab.qml:264, Modules/Settings/NotificationsTab.qml:85, Modules/Settings/NotificationsTab.qml:774",
     "comment": "lock screen notification mode option | notification rule match field option"
   },
   {
@@ -1310,8 +1310,8 @@
   {
     "term": "Apply Changes",
     "context": "Apply Changes",
-    "reference": "Modules/Settings/DisplayConfigTab.qml:609",
-    "comment": ""
+    "reference": "Modules/Settings/LockScreenTab.qml:371, Modules/Settings/DisplayConfigTab.qml:609",
+    "comment": "validate and apply custom PAM authentication source"
   },
   {
     "term": "Apply Flatpak updates alongside system updates when running 'Update All'.",
@@ -1574,14 +1574,8 @@
   {
     "term": "Authentication changes apply automatically.",
     "context": "Authentication changes apply automatically.",
-    "reference": "Modules/Settings/GreeterTab.qml:63, Modules/Settings/LockScreenTab.qml:18, Modules/Settings/LockScreenTab.qml:35",
-    "comment": ""
-  },
-  {
-    "term": "Authentication changes apply automatically. Fingerprint-only login may not unlock Keyring.",
-    "context": "Authentication changes apply automatically. Fingerprint-only login may not unlock Keyring.",
-    "reference": "Modules/Settings/GreeterTab.qml:39",
-    "comment": ""
+    "reference": "Modules/Settings/GreeterTab.qml:28, Modules/Settings/GreeterTab.qml:48",
+    "comment": "greeter auth setting description"
   },
   {
     "term": "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.",
@@ -1640,8 +1634,8 @@
   {
     "term": "Auto",
     "context": "Auto",
-    "reference": "Modules/Settings/ThemeColorsTab.qml:406, Modules/Settings/ThemeColorsTab.qml:406, Modules/Settings/WidgetsTabSection.qml:1697, Modules/Settings/NetworkStatusTab.qml:164, Modules/Settings/TimeWeatherTab.qml:158, Modules/Settings/DisplayConfigTab.qml:159, Modules/Settings/DisplayConfigTab.qml:205, Modules/Settings/NetworkWifiTab.qml:239, Modules/Settings/NetworkWifiTab.qml:243, Modules/Settings/NetworkWifiTab.qml:244, Modules/Settings/NetworkWifiTab.qml:247, Modules/Settings/CompositorLayoutTab.qml:283, Modules/Settings/CompositorLayoutTab.qml:412, Modules/Settings/CompositorLayoutTab.qml:564, Modules/Settings/DesktopWidgetSettings/SystemMonitorSettings.qml:351, Modules/Settings/DesktopWidgetSettings/SystemMonitorSettings.qml:359, Modules/Settings/Widgets/TerminalPickerRow.qml:7, Modules/ControlCenter/Details/NetworkDetail.qml:118, Modules/ControlCenter/Details/NetworkDetail.qml:119, Modules/ControlCenter/Details/NetworkDetail.qml:122, Modules/ControlCenter/Details/NetworkDetail.qml:125, Modules/ControlCenter/BuiltinPlugins/DisplayProfilesWidget.qml:29, Modules/ControlCenter/BuiltinPlugins/DisplayProfilesWidget.qml:106",
-    "comment": "calendar backend option | theme category option"
+    "reference": "Modules/Settings/ThemeColorsTab.qml:406, Modules/Settings/ThemeColorsTab.qml:406, Modules/Settings/WidgetsTabSection.qml:1697, Modules/Settings/NetworkStatusTab.qml:164, Modules/Settings/TimeWeatherTab.qml:158, Modules/Settings/LockScreenTab.qml:23, Modules/Settings/DisplayConfigTab.qml:159, Modules/Settings/DisplayConfigTab.qml:205, Modules/Settings/NetworkWifiTab.qml:239, Modules/Settings/NetworkWifiTab.qml:243, Modules/Settings/NetworkWifiTab.qml:244, Modules/Settings/NetworkWifiTab.qml:247, Modules/Settings/CompositorLayoutTab.qml:283, Modules/Settings/CompositorLayoutTab.qml:412, Modules/Settings/CompositorLayoutTab.qml:564, Modules/Settings/DesktopWidgetSettings/SystemMonitorSettings.qml:351, Modules/Settings/DesktopWidgetSettings/SystemMonitorSettings.qml:359, Modules/Settings/Widgets/TerminalPickerRow.qml:7, Modules/ControlCenter/Details/NetworkDetail.qml:118, Modules/ControlCenter/Details/NetworkDetail.qml:119, Modules/ControlCenter/Details/NetworkDetail.qml:122, Modules/ControlCenter/Details/NetworkDetail.qml:125, Modules/ControlCenter/BuiltinPlugins/DisplayProfilesWidget.qml:29, Modules/ControlCenter/BuiltinPlugins/DisplayProfilesWidget.qml:106",
+    "comment": "automatic PAM authentication source option | calendar backend option | theme category option"
   },
   {
     "term": "Auto (Bar-aware)",
@@ -1778,7 +1772,7 @@
   {
     "term": "Auto-login on startup",
     "context": "Auto-login on startup",
-    "reference": "Modules/Settings/GreeterTab.qml:645",
+    "reference": "Modules/Settings/GreeterTab.qml:637",
     "comment": ""
   },
   {
@@ -1826,7 +1820,7 @@
   {
     "term": "Automatic Cycling",
     "context": "Automatic Cycling",
-    "reference": "Modules/Settings/WallpaperTab.qml:894, Modules/Settings/LockScreenTab.qml:387",
+    "reference": "Modules/Settings/WallpaperTab.qml:894, Modules/Settings/LockScreenTab.qml:585",
     "comment": ""
   },
   {
@@ -1874,13 +1868,13 @@
   {
     "term": "Automatically lock the screen when DMS starts",
     "context": "Automatically lock the screen when DMS starts",
-    "reference": "Modules/Settings/LockScreenTab.qml:262",
+    "reference": "Modules/Settings/LockScreenTab.qml:460",
     "comment": ""
   },
   {
     "term": "Automatically lock the screen when the system prepares to suspend",
     "context": "Automatically lock the screen when the system prepares to suspend",
-    "reference": "Modules/Settings/PowerSleepTab.qml:93, Modules/Settings/LockScreenTab.qml:243",
+    "reference": "Modules/Settings/PowerSleepTab.qml:93, Modules/Settings/LockScreenTab.qml:441",
     "comment": ""
   },
   {
@@ -1956,12 +1950,6 @@
     "comment": ""
   },
   {
-    "term": "Available.",
-    "context": "Available.",
-    "reference": "Modules/Settings/GreeterTab.qml:63",
-    "comment": ""
-  },
-  {
     "term": "Awaiting fingerprint authentication",
     "context": "Awaiting fingerprint authentication",
     "reference": "Modules/Greetd/GreeterContent.qml:84",
@@ -2006,7 +1994,7 @@
   {
     "term": "Background",
     "context": "Background",
-    "reference": "Modules/Settings/GreeterTab.qml:578, Modules/Settings/LockScreenTab.qml:183",
+    "reference": "Modules/Settings/GreeterTab.qml:570, Modules/Settings/LockScreenTab.qml:299",
     "comment": ""
   },
   {
@@ -2192,19 +2180,19 @@
   {
     "term": "Battery has charged to your set limit of %1%",
     "context": "Battery has charged to your set limit of %1%",
-    "reference": "Services/BatteryService.qml:140",
+    "reference": "Services/BatteryService.qml:138",
     "comment": ""
   },
   {
     "term": "Battery is at %1% - Connect charger immediately!",
     "context": "Battery is at %1% - Connect charger immediately!",
-    "reference": "Services/BatteryService.qml:156",
+    "reference": "Services/BatteryService.qml:154",
     "comment": ""
   },
   {
     "term": "Battery is at %1% - Consider charging soon",
     "context": "Battery is at %1% - Consider charging soon",
-    "reference": "Services/BatteryService.qml:169",
+    "reference": "Services/BatteryService.qml:167",
     "comment": ""
   },
   {
@@ -2228,7 +2216,7 @@
   {
     "term": "Bind lock screen to dbus signals from loginctl. Disable if using an external lock screen",
     "context": "Bind lock screen to dbus signals from loginctl. Disable if using an external lock screen",
-    "reference": "Modules/Settings/LockScreenTab.qml:229",
+    "reference": "Modules/Settings/LockScreenTab.qml:427",
     "comment": ""
   },
   {
@@ -2498,7 +2486,7 @@
   {
     "term": "Browse",
     "context": "Browse",
-    "reference": "Modals/DankLauncherV2/SpotlightResultRow.qml:61, Modals/DankLauncherV2/Controller.qml:220, Modals/DankLauncherV2/Controller.qml:1423, Modules/Settings/ThemeColorsTab.qml:406, Modules/Settings/AutoStartTab.qml:487, Modules/Settings/PluginsTab.qml:236, Modules/Settings/LockScreenTab.qml:378, Modules/Settings/Widgets/SettingsWallpaperPicker.qml:57",
+    "reference": "Modals/DankLauncherV2/SpotlightResultRow.qml:61, Modals/DankLauncherV2/Controller.qml:220, Modals/DankLauncherV2/Controller.qml:1423, Modules/Settings/ThemeColorsTab.qml:406, Modules/Settings/AutoStartTab.qml:487, Modules/Settings/PluginsTab.qml:236, Modules/Settings/LockScreenTab.qml:576, Modules/Settings/Widgets/SettingsWallpaperPicker.qml:57",
     "comment": "theme category option"
   },
   {
@@ -2630,7 +2618,7 @@
   {
     "term": "Cancel",
     "context": "Cancel",
-    "reference": "DMSShell.qml:564, Modals/WindowRuleModal.qml:1920, Modals/PolkitAuthContent.qml:326, Modals/WorkspaceRenameModal.qml:163, Modals/BluetoothPairingModal.qml:267, Modals/WifiPasswordModal.qml:677, Widgets/KeybindItem.qml:1863, Modals/DankLauncherV2/AppEditView.qml:283, Modals/Common/ConfirmModal.qml:15, Modals/Common/ConfirmModal.qml:26, Modals/Common/ConfirmModal.qml:39, Modals/FileBrowser/FileBrowserOverwriteDialog.qml:83, Modals/Clipboard/ClipboardEditor.qml:322, Modules/Settings/PluginBrowser.qml:572, Modules/Settings/PluginBrowser.qml:1944, Modules/Settings/GreeterTab.qml:165, Modules/Settings/PluginUpdatesDialog.qml:278, Modules/Settings/ThemeBrowser.qml:122, Modules/Settings/DisplayConfigTab.qml:287, Modules/Settings/DisplayConfigTab.qml:332, Modules/Settings/DisplayConfigTab.qml:416, Modules/Settings/AudioTab.qml:727, Modules/DankDash/Overview/CalendarEventEditor.qml:342, Modules/DankBar/Popouts/SystemUpdatePopout.qml:253",
+    "reference": "DMSShell.qml:325, Modals/WindowRuleModal.qml:1920, Modals/PolkitAuthContent.qml:326, Modals/WorkspaceRenameModal.qml:163, Modals/BluetoothPairingModal.qml:267, Modals/WifiPasswordModal.qml:677, Widgets/KeybindItem.qml:1863, Modals/DankLauncherV2/AppEditView.qml:283, Modals/Common/ConfirmModal.qml:15, Modals/Common/ConfirmModal.qml:26, Modals/Common/ConfirmModal.qml:39, Modals/FileBrowser/FileBrowserOverwriteDialog.qml:83, Modals/Clipboard/ClipboardEditor.qml:322, Modules/Settings/PluginBrowser.qml:572, Modules/Settings/PluginBrowser.qml:1944, Modules/Settings/GreeterTab.qml:148, Modules/Settings/PluginUpdatesDialog.qml:278, Modules/Settings/ThemeBrowser.qml:122, Modules/Settings/DisplayConfigTab.qml:287, Modules/Settings/DisplayConfigTab.qml:332, Modules/Settings/DisplayConfigTab.qml:416, Modules/Settings/AudioTab.qml:727, Modules/DankDash/Overview/CalendarEventEditor.qml:342, Modules/DankBar/Popouts/SystemUpdatePopout.qml:253",
     "comment": ""
   },
   {
@@ -2786,7 +2774,7 @@
   {
     "term": "Charge Limit Reached",
     "context": "Charge Limit Reached",
-    "reference": "Services/BatteryService.qml:140",
+    "reference": "Services/BatteryService.qml:138",
     "comment": ""
   },
   {
@@ -2798,7 +2786,7 @@
   {
     "term": "Charging",
     "context": "Charging",
-    "reference": "Services/BatteryService.qml:324, Services/BatteryService.qml:355, Modules/ControlCenter/Widgets/BatteryPill.qml:25",
+    "reference": "Services/BatteryService.qml:322, Services/BatteryService.qml:353, Modules/ControlCenter/Widgets/BatteryPill.qml:25",
     "comment": "battery status"
   },
   {
@@ -2834,13 +2822,13 @@
   {
     "term": "Checking whether sudo authentication is needed...",
     "context": "Checking whether sudo authentication is needed...",
-    "reference": "Modules/Settings/GreeterTab.qml:178",
+    "reference": "Modules/Settings/GreeterTab.qml:161",
     "comment": ""
   },
   {
     "term": "Checking...",
     "context": "Checking...",
-    "reference": "Modules/Settings/GreeterTab.qml:443, Modules/DankBar/Popouts/SystemUpdatePopout.qml:164",
+    "reference": "Modules/Settings/GreeterTab.qml:426, Modules/DankBar/Popouts/SystemUpdatePopout.qml:164",
     "comment": "greeter status loading"
   },
   {
@@ -3002,7 +2990,7 @@
   {
     "term": "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.",
     "context": "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.",
-    "reference": "Modules/Settings/LockScreenTab.qml:403",
+    "reference": "Modules/Settings/LockScreenTab.qml:601",
     "comment": ""
   },
   {
@@ -3056,7 +3044,7 @@
   {
     "term": "Clear History?",
     "context": "Clear History?",
-    "reference": "Modals/Clipboard/ClipboardHistoryContent.qml:140, Modules/DankBar/DankBarContent.qml:925",
+    "reference": "Modals/Clipboard/ClipboardHistoryContent.qml:140, Modules/DankBar/DankBarContent.qml:928",
     "comment": ""
   },
   {
@@ -3098,7 +3086,7 @@
   {
     "term": "Click Refresh to check status.",
     "context": "Click Refresh to check status.",
-    "reference": "Modules/Settings/GreeterTab.qml:443",
+    "reference": "Modules/Settings/GreeterTab.qml:426",
     "comment": "greeter status placeholder"
   },
   {
@@ -3284,7 +3272,7 @@
   {
     "term": "Color displayed on monitors without the lock screen",
     "context": "Color displayed on monitors without the lock screen",
-    "reference": "Modules/Settings/LockScreenTab.qml:441",
+    "reference": "Modules/Settings/LockScreenTab.qml:639",
     "comment": ""
   },
   {
@@ -3560,7 +3548,7 @@
   {
     "term": "Connect",
     "context": "Connect",
-    "reference": "Modals/WifiPasswordModal.qml:719, Modules/Settings/NetworkWifiTab.qml:1191, Modules/ControlCenter/Details/BluetoothDetail.qml:654, Modules/ControlCenter/Details/NetworkDetail.qml:803, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:150",
+    "reference": "Modals/WifiPasswordModal.qml:719, Modules/Settings/NetworkWifiTab.qml:1191, Modules/ControlCenter/Details/BluetoothDetail.qml:654, Modules/ControlCenter/Details/NetworkDetail.qml:803, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:156",
     "comment": "Tailscale connect button"
   },
   {
@@ -3584,7 +3572,7 @@
   {
     "term": "Connected",
     "context": "Connected",
-    "reference": "Modules/Settings/AboutTab.qml:716, Modules/Settings/NetworkVpnTab.qml:101, Modules/Settings/NetworkEthernetTab.qml:163, Modules/Settings/DisplayConfigTab.qml:393, Modules/Settings/FrameTab.qml:59, Modules/Settings/NetworkWifiTab.qml:566, Modules/Settings/NetworkWifiTab.qml:969, Modules/ControlCenter/Details/BluetoothDetail.qml:336, Modules/ControlCenter/Details/BluetoothDetail.qml:337, Modules/ControlCenter/Details/NetworkDetail.qml:627, Modules/ControlCenter/BuiltinPlugins/VpnWidget.qml:26, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:111, Modules/ControlCenter/Components/DragDropGrid.qml:531, Modules/ControlCenter/Components/DragDropGrid.qml:534, Modules/ControlCenter/Components/DragDropGrid.qml:536, Modules/ControlCenter/Components/DragDropGrid.qml:539",
+    "reference": "Modules/Settings/AboutTab.qml:716, Modules/Settings/NetworkVpnTab.qml:101, Modules/Settings/NetworkEthernetTab.qml:163, Modules/Settings/DisplayConfigTab.qml:393, Modules/Settings/FrameTab.qml:59, Modules/Settings/NetworkWifiTab.qml:566, Modules/Settings/NetworkWifiTab.qml:969, Modules/ControlCenter/Details/BluetoothDetail.qml:336, Modules/ControlCenter/Details/BluetoothDetail.qml:337, Modules/ControlCenter/Details/NetworkDetail.qml:627, Modules/ControlCenter/BuiltinPlugins/VpnWidget.qml:26, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:113, Modules/ControlCenter/Components/DragDropGrid.qml:531, Modules/ControlCenter/Components/DragDropGrid.qml:534, Modules/ControlCenter/Components/DragDropGrid.qml:536, Modules/ControlCenter/Components/DragDropGrid.qml:539",
     "comment": "Tailscale connection status: connected | network status"
   },
   {
@@ -3704,7 +3692,7 @@
   {
     "term": "Control what notification information is shown on the lock screen",
     "context": "Control what notification information is shown on the lock screen",
-    "reference": "Modules/Settings/LockScreenTab.qml:147, Modules/Settings/NotificationsTab.qml:773",
+    "reference": "Modules/Settings/LockScreenTab.qml:263, Modules/Settings/NotificationsTab.qml:773",
     "comment": "lock screen notification privacy setting"
   },
   {
@@ -3800,7 +3788,7 @@
   {
     "term": "Convenience options for the login screen. Sync to apply.",
     "context": "Convenience options for the login screen. Sync to apply.",
-    "reference": "Modules/Settings/GreeterTab.qml:616",
+    "reference": "Modules/Settings/GreeterTab.qml:608",
     "comment": ""
   },
   {
@@ -3848,7 +3836,7 @@
   {
     "term": "Copy",
     "context": "Copy",
-    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeys.qml:170, Modals/DankLauncherV2/Controller.qml:1267, Modals/Clipboard/ClipboardContextMenu.qml:40, Modules/Settings/ClipboardTab.qml:156, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:395",
+    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeys.qml:170, Modals/DankLauncherV2/Controller.qml:1267, Modals/Clipboard/ClipboardContextMenu.qml:40, Modules/Settings/ClipboardTab.qml:156, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:403",
     "comment": "Copy to clipboard"
   },
   {
@@ -3914,7 +3902,7 @@
   {
     "term": "Count Only",
     "context": "Count Only",
-    "reference": "Modules/Settings/LockScreenTab.qml:148, Modules/Settings/NotificationsTab.qml:774",
+    "reference": "Modules/Settings/LockScreenTab.qml:264, Modules/Settings/NotificationsTab.qml:774",
     "comment": "lock screen notification mode option"
   },
   {
@@ -3992,7 +3980,7 @@
   {
     "term": "Critical Battery",
     "context": "Critical Battery",
-    "reference": "Services/BatteryService.qml:156",
+    "reference": "Services/BatteryService.qml:154",
     "comment": ""
   },
   {
@@ -4280,13 +4268,13 @@
   {
     "term": "Custom...",
     "context": "Custom...",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:182, Modules/Settings/TimeWeatherTab.qml:234, Modules/Settings/TimeWeatherTab.qml:269, Modules/Settings/TimeWeatherTab.qml:321, Modules/Settings/DisplayConfig/OutputCard.qml:215, Modules/Settings/DisplayConfig/OutputCard.qml:250",
-    "comment": "date format option"
+    "reference": "Modules/Settings/TimeWeatherTab.qml:182, Modules/Settings/TimeWeatherTab.qml:234, Modules/Settings/TimeWeatherTab.qml:269, Modules/Settings/TimeWeatherTab.qml:321, Modules/Settings/LockScreenTab.qml:24, Modules/Settings/DisplayConfig/OutputCard.qml:215, Modules/Settings/DisplayConfig/OutputCard.qml:250",
+    "comment": "custom PAM authentication source option | date format option"
   },
   {
     "term": "Custom: ",
     "context": "Custom: ",
-    "reference": "Modules/Settings/GreeterTab.qml:569, Modules/Settings/TimeWeatherTab.qml:221, Modules/Settings/TimeWeatherTab.qml:308",
+    "reference": "Modules/Settings/GreeterTab.qml:561, Modules/Settings/TimeWeatherTab.qml:221, Modules/Settings/TimeWeatherTab.qml:308",
     "comment": ""
   },
   {
@@ -4298,7 +4286,7 @@
   {
     "term": "Customize the font and background of the lock screen, or leave empty to use your theme font and desktop wallpaper. Changes apply instantly.",
     "context": "Customize the font and background of the lock screen, or leave empty to use your theme font and desktop wallpaper. Changes apply instantly.",
-    "reference": "Modules/Settings/LockScreenTab.qml:166",
+    "reference": "Modules/Settings/LockScreenTab.qml:282",
     "comment": ""
   },
   {
@@ -4484,13 +4472,13 @@
   {
     "term": "Date Format",
     "context": "Date Format",
-    "reference": "Modules/Settings/GreeterTab.qml:563, Modules/Settings/TimeWeatherTab.qml:107",
+    "reference": "Modules/Settings/GreeterTab.qml:555, Modules/Settings/TimeWeatherTab.qml:107",
     "comment": ""
   },
   {
     "term": "Date format on greeter",
     "context": "Date format on greeter",
-    "reference": "Modules/Settings/GreeterTab.qml:551",
+    "reference": "Modules/Settings/GreeterTab.qml:543",
     "comment": ""
   },
   {
@@ -4514,13 +4502,13 @@
   {
     "term": "Day Date",
     "context": "Day Date",
-    "reference": "Modules/Settings/GreeterTab.qml:368, Modules/Settings/TimeWeatherTab.qml:182, Modules/Settings/TimeWeatherTab.qml:189, Modules/Settings/TimeWeatherTab.qml:226, Modules/Settings/TimeWeatherTab.qml:269, Modules/Settings/TimeWeatherTab.qml:276, Modules/Settings/TimeWeatherTab.qml:313",
+    "reference": "Modules/Settings/GreeterTab.qml:351, Modules/Settings/TimeWeatherTab.qml:182, Modules/Settings/TimeWeatherTab.qml:189, Modules/Settings/TimeWeatherTab.qml:226, Modules/Settings/TimeWeatherTab.qml:269, Modules/Settings/TimeWeatherTab.qml:276, Modules/Settings/TimeWeatherTab.qml:313",
     "comment": "date format option"
   },
   {
     "term": "Day Month Date",
     "context": "Day Month Date",
-    "reference": "Modules/Settings/GreeterTab.qml:372, Modules/Settings/TimeWeatherTab.qml:182, Modules/Settings/TimeWeatherTab.qml:193, Modules/Settings/TimeWeatherTab.qml:227, Modules/Settings/TimeWeatherTab.qml:269, Modules/Settings/TimeWeatherTab.qml:280, Modules/Settings/TimeWeatherTab.qml:314",
+    "reference": "Modules/Settings/GreeterTab.qml:355, Modules/Settings/TimeWeatherTab.qml:182, Modules/Settings/TimeWeatherTab.qml:193, Modules/Settings/TimeWeatherTab.qml:227, Modules/Settings/TimeWeatherTab.qml:269, Modules/Settings/TimeWeatherTab.qml:280, Modules/Settings/TimeWeatherTab.qml:314",
     "comment": "date format option"
   },
   {
@@ -4712,7 +4700,7 @@
   {
     "term": "Dependencies & documentation",
     "context": "Dependencies & documentation",
-    "reference": "Modules/Settings/GreeterTab.qml:656",
+    "reference": "Modules/Settings/GreeterTab.qml:648",
     "comment": ""
   },
   {
@@ -4898,7 +4886,7 @@
   {
     "term": "Disabled",
     "context": "Disabled",
-    "reference": "Modules/Settings/ThemeColorsTab.qml:1496, Modules/Settings/AutoStartTab.qml:721, Modules/Settings/LockScreenTab.qml:148, Modules/Settings/DankBarTab.qml:413, Modules/Settings/NotificationsTab.qml:774, Modules/Settings/NetworkWifiTab.qml:179, Modules/Settings/DisplayConfig/OutputCard.qml:128, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2078, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2084, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2086, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2098, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2112, Modules/ControlCenter/Components/DragDropGrid.qml:509",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:1496, Modules/Settings/AutoStartTab.qml:721, Modules/Settings/LockScreenTab.qml:264, Modules/Settings/DankBarTab.qml:413, Modules/Settings/NotificationsTab.qml:774, Modules/Settings/NetworkWifiTab.qml:179, Modules/Settings/DisplayConfig/OutputCard.qml:128, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2078, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2084, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2086, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2098, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2112, Modules/ControlCenter/Components/DragDropGrid.qml:509",
     "comment": "bluetooth status | lock screen notification mode option"
   },
   {
@@ -4934,19 +4922,19 @@
   {
     "term": "Discharging",
     "context": "Discharging",
-    "reference": "Services/BatteryService.qml:326, Services/BatteryService.qml:355",
+    "reference": "Services/BatteryService.qml:324, Services/BatteryService.qml:353",
     "comment": "battery status"
   },
   {
     "term": "Disconnect",
     "context": "Disconnect",
-    "reference": "Widgets/VpnDetailContent.qml:126, Modules/Settings/NetworkVpnTab.qml:172, Modules/Settings/NetworkWifiTab.qml:1191, Modules/ControlCenter/Details/BluetoothDetail.qml:654, Modules/ControlCenter/Details/NetworkDetail.qml:429, Modules/ControlCenter/Details/NetworkDetail.qml:803, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:150",
+    "reference": "Widgets/VpnDetailContent.qml:126, Modules/Settings/NetworkVpnTab.qml:172, Modules/Settings/NetworkWifiTab.qml:1191, Modules/ControlCenter/Details/BluetoothDetail.qml:654, Modules/ControlCenter/Details/NetworkDetail.qml:429, Modules/ControlCenter/Details/NetworkDetail.qml:803, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:156",
     "comment": "Tailscale disconnect button"
   },
   {
     "term": "Disconnected",
     "context": "Disconnected",
-    "reference": "Modules/Settings/NetworkVpnTab.qml:98, Modules/Settings/NetworkStatusTab.qml:119, Modules/Settings/NetworkEthernetTab.qml:165, Modules/Settings/DisplayConfigTab.qml:393, Modules/Settings/DisplayConfig/OutputCard.qml:85, Modules/Settings/DisplayConfig/MonitorRect.qml:95, Modules/ControlCenter/BuiltinPlugins/VpnWidget.qml:23, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:22, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:111",
+    "reference": "Modules/Settings/NetworkVpnTab.qml:98, Modules/Settings/NetworkStatusTab.qml:119, Modules/Settings/NetworkEthernetTab.qml:165, Modules/Settings/DisplayConfigTab.qml:393, Modules/Settings/DisplayConfig/OutputCard.qml:85, Modules/Settings/DisplayConfig/MonitorRect.qml:95, Modules/ControlCenter/BuiltinPlugins/VpnWidget.qml:23, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:22, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:113",
     "comment": "Tailscale connection status: disconnected | Tailscale disconnected status"
   },
   {
@@ -5468,7 +5456,7 @@
   {
     "term": "Empty",
     "context": "Empty",
-    "reference": "DMSShell.qml:563, Services/BatteryService.qml:328, Modules/Notepad/NotepadTextEditor.qml:1004",
+    "reference": "DMSShell.qml:324, Services/BatteryService.qml:326, Modules/Notepad/NotepadTextEditor.qml:1004",
     "comment": "battery status"
   },
   {
@@ -5486,7 +5474,7 @@
   {
     "term": "Empty Trash?",
     "context": "Empty Trash?",
-    "reference": "DMSShell.qml:561",
+    "reference": "DMSShell.qml:322",
     "comment": ""
   },
   {
@@ -5546,7 +5534,7 @@
   {
     "term": "Enable Video Screensaver",
     "context": "Enable Video Screensaver",
-    "reference": "Modules/Settings/LockScreenTab.qml:333",
+    "reference": "Modules/Settings/LockScreenTab.qml:531",
     "comment": ""
   },
   {
@@ -5576,37 +5564,37 @@
   {
     "term": "Enable fingerprint at login",
     "context": "Enable fingerprint at login",
-    "reference": "Modules/Settings/GreeterTab.qml:505",
+    "reference": "Modules/Settings/GreeterTab.qml:497",
     "comment": ""
   },
   {
     "term": "Enable fingerprint authentication",
     "context": "Enable fingerprint authentication",
-    "reference": "Modules/Settings/LockScreenTab.qml:279",
+    "reference": "Modules/Settings/LockScreenTab.qml:477",
     "comment": ""
   },
   {
     "term": "Enable fingerprint or security key for DMS Greeter. Authentication changes apply automatically.",
     "context": "Enable fingerprint or security key for DMS Greeter. Authentication changes apply automatically.",
-    "reference": "Modules/Settings/GreeterTab.qml:494",
+    "reference": "Modules/Settings/GreeterTab.qml:477",
     "comment": ""
   },
   {
     "term": "Enable loginctl lock integration",
     "context": "Enable loginctl lock integration",
-    "reference": "Modules/Settings/LockScreenTab.qml:228",
+    "reference": "Modules/Settings/LockScreenTab.qml:426",
     "comment": ""
   },
   {
     "term": "Enable security key at login",
     "context": "Enable security key at login",
-    "reference": "Modules/Settings/GreeterTab.qml:516",
+    "reference": "Modules/Settings/GreeterTab.qml:508",
     "comment": ""
   },
   {
     "term": "Enable security key authentication",
     "context": "Enable security key authentication",
-    "reference": "Modules/Settings/LockScreenTab.qml:290",
+    "reference": "Modules/Settings/LockScreenTab.qml:488",
     "comment": "Enable FIDO2/U2F hardware security key for lock screen"
   },
   {
@@ -5614,66 +5602,6 @@
     "context": "Enabled",
     "reference": "Modules/Settings/ThemeColorsTab.qml:1496, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2078, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2086, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2112, Modules/ControlCenter/Components/DragDropGrid.qml:510",
     "comment": "bluetooth status"
-  },
-  {
-    "term": "Enabled, but fingerprint availability could not be confirmed.",
-    "context": "Enabled, but fingerprint availability could not be confirmed.",
-    "reference": "Modules/Settings/GreeterTab.qml:49, Modules/Settings/LockScreenTab.qml:28",
-    "comment": ""
-  },
-  {
-    "term": "Enabled, but no fingerprint reader was detected.",
-    "context": "Enabled, but no fingerprint reader was detected.",
-    "reference": "Modules/Settings/GreeterTab.qml:45, Modules/Settings/LockScreenTab.qml:24",
-    "comment": ""
-  },
-  {
-    "term": "Enabled, but no prints are enrolled yet. Authentication changes apply automatically once you enroll fingerprints.",
-    "context": "Enabled, but no prints are enrolled yet. Authentication changes apply automatically once you enroll fingerprints.",
-    "reference": "Modules/Settings/LockScreenTab.qml:21",
-    "comment": ""
-  },
-  {
-    "term": "Enabled, but no prints are enrolled yet. Enroll fingerprints and run Sync.",
-    "context": "Enabled, but no prints are enrolled yet. Enroll fingerprints and run Sync.",
-    "reference": "Modules/Settings/GreeterTab.qml:42",
-    "comment": ""
-  },
-  {
-    "term": "Enabled, but no registered security key was found yet. Authentication changes apply automatically once your key is registered or your U2F config is updated.",
-    "context": "Enabled, but no registered security key was found yet. Authentication changes apply automatically once your key is registered or your U2F config is updated.",
-    "reference": "Modules/Settings/LockScreenTab.qml:38",
-    "comment": ""
-  },
-  {
-    "term": "Enabled, but no registered security key was found yet. Register a key and run Sync.",
-    "context": "Enabled, but no registered security key was found yet. Register a key and run Sync.",
-    "reference": "Modules/Settings/GreeterTab.qml:66",
-    "comment": ""
-  },
-  {
-    "term": "Enabled, but security-key availability could not be confirmed.",
-    "context": "Enabled, but security-key availability could not be confirmed.",
-    "reference": "Modules/Settings/GreeterTab.qml:71, Modules/Settings/LockScreenTab.qml:43",
-    "comment": ""
-  },
-  {
-    "term": "Enabled. PAM already provides fingerprint auth.",
-    "context": "Enabled. PAM already provides fingerprint auth.",
-    "reference": "Modules/Settings/GreeterTab.qml:27",
-    "comment": ""
-  },
-  {
-    "term": "Enabled. PAM already provides security-key auth.",
-    "context": "Enabled. PAM already provides security-key auth.",
-    "reference": "Modules/Settings/GreeterTab.qml:58",
-    "comment": ""
-  },
-  {
-    "term": "Enabled. PAM provides fingerprint auth, but no prints are enrolled yet.",
-    "context": "Enabled. PAM provides fingerprint auth, but no prints are enrolled yet.",
-    "reference": "Modules/Settings/GreeterTab.qml:29",
-    "comment": ""
   },
   {
     "term": "Enabling WiFi...",
@@ -5924,7 +5852,7 @@
   {
     "term": "Exit node",
     "context": "Exit node",
-    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:185",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:191",
     "comment": "Tailscale exit node selector label"
   },
   {
@@ -6254,7 +6182,7 @@
   {
     "term": "Failed to parse plugin_settings.json",
     "context": "Failed to parse plugin_settings.json",
-    "reference": "Common/SettingsData.qml:1888",
+    "reference": "Common/SettingsData.qml:1892",
     "comment": ""
   },
   {
@@ -6266,7 +6194,7 @@
   {
     "term": "Failed to parse settings.json",
     "context": "Failed to parse settings.json",
-    "reference": "Common/SettingsData.qml:1790, Common/SettingsData.qml:3650",
+    "reference": "Common/SettingsData.qml:1794, Common/SettingsData.qml:3654",
     "comment": ""
   },
   {
@@ -6356,7 +6284,7 @@
   {
     "term": "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.",
     "context": "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.",
-    "reference": "Modules/Settings/GreeterTab.qml:241",
+    "reference": "Modules/Settings/GreeterTab.qml:224",
     "comment": "greeter status error"
   },
   {
@@ -6686,8 +6614,8 @@
   {
     "term": "Fingerprint availability could not be confirmed.",
     "context": "Fingerprint availability could not be confirmed.",
-    "reference": "Modules/Settings/GreeterTab.qml:49, Modules/Settings/LockScreenTab.qml:28",
-    "comment": ""
+    "reference": "Modules/Settings/GreeterTab.qml:36, Modules/Settings/LockScreenTab.qml:76",
+    "comment": "fingerprint setting status"
   },
   {
     "term": "Fingerprint error",
@@ -6704,14 +6632,14 @@
   {
     "term": "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and enroll later.",
     "context": "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and enroll later.",
-    "reference": "Modules/Settings/LockScreenTab.qml:22",
-    "comment": ""
+    "reference": "Modules/Settings/LockScreenTab.qml:70",
+    "comment": "lock screen fingerprint setting"
   },
   {
     "term": "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and run Sync later.",
     "context": "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and run Sync later.",
-    "reference": "Modules/Settings/GreeterTab.qml:43",
-    "comment": ""
+    "reference": "Modules/Settings/GreeterTab.qml:30",
+    "comment": "greeter fingerprint login setting"
   },
   {
     "term": "Finish",
@@ -6926,7 +6854,7 @@
   {
     "term": "Font",
     "context": "Font",
-    "reference": "Modules/Settings/GreeterTab.qml:532",
+    "reference": "Modules/Settings/GreeterTab.qml:524",
     "comment": ""
   },
   {
@@ -6956,13 +6884,13 @@
   {
     "term": "Font used for the clock and date on the lock screen",
     "context": "Font used for the clock and date on the lock screen",
-    "reference": "Modules/Settings/LockScreenTab.qml:177",
+    "reference": "Modules/Settings/LockScreenTab.qml:293",
     "comment": ""
   },
   {
     "term": "Font used on the login screen",
     "context": "Font used on the login screen",
-    "reference": "Modules/Settings/GreeterTab.qml:545",
+    "reference": "Modules/Settings/GreeterTab.qml:537",
     "comment": ""
   },
   {
@@ -7190,13 +7118,13 @@
   {
     "term": "Full Content",
     "context": "Full Content",
-    "reference": "Modules/Settings/LockScreenTab.qml:148, Modules/Settings/NotificationsTab.qml:774",
+    "reference": "Modules/Settings/LockScreenTab.qml:264, Modules/Settings/NotificationsTab.qml:774",
     "comment": "lock screen notification mode option"
   },
   {
     "term": "Full Day & Month",
     "context": "Full Day & Month",
-    "reference": "Modules/Settings/GreeterTab.qml:396, Modules/Settings/TimeWeatherTab.qml:182, Modules/Settings/TimeWeatherTab.qml:217, Modules/Settings/TimeWeatherTab.qml:233, Modules/Settings/TimeWeatherTab.qml:269, Modules/Settings/TimeWeatherTab.qml:304, Modules/Settings/TimeWeatherTab.qml:320",
+    "reference": "Modules/Settings/GreeterTab.qml:379, Modules/Settings/TimeWeatherTab.qml:182, Modules/Settings/TimeWeatherTab.qml:217, Modules/Settings/TimeWeatherTab.qml:233, Modules/Settings/TimeWeatherTab.qml:269, Modules/Settings/TimeWeatherTab.qml:304, Modules/Settings/TimeWeatherTab.qml:320",
     "comment": "date format option"
   },
   {
@@ -7214,7 +7142,7 @@
   {
     "term": "Full with Year",
     "context": "Full with Year",
-    "reference": "Modules/Settings/GreeterTab.qml:388, Modules/Settings/TimeWeatherTab.qml:182, Modules/Settings/TimeWeatherTab.qml:209, Modules/Settings/TimeWeatherTab.qml:231, Modules/Settings/TimeWeatherTab.qml:269, Modules/Settings/TimeWeatherTab.qml:296, Modules/Settings/TimeWeatherTab.qml:318",
+    "reference": "Modules/Settings/GreeterTab.qml:371, Modules/Settings/TimeWeatherTab.qml:182, Modules/Settings/TimeWeatherTab.qml:209, Modules/Settings/TimeWeatherTab.qml:231, Modules/Settings/TimeWeatherTab.qml:269, Modules/Settings/TimeWeatherTab.qml:296, Modules/Settings/TimeWeatherTab.qml:318",
     "comment": "date format option"
   },
   {
@@ -7232,7 +7160,7 @@
   {
     "term": "Fully Charged",
     "context": "Fully Charged",
-    "reference": "Services/BatteryService.qml:330",
+    "reference": "Services/BatteryService.qml:328",
     "comment": "battery status"
   },
   {
@@ -7244,7 +7172,7 @@
   {
     "term": "G: grid • Z/X: size",
     "context": "G: grid • Z/X: size",
-    "reference": "Modules/Plugins/DesktopPluginWrapper.qml:754",
+    "reference": "Modules/Plugins/DesktopPluginWrapper.qml:767",
     "comment": "Widget grid keyboard hints"
   },
   {
@@ -7448,31 +7376,31 @@
   {
     "term": "Greeter Appearance",
     "context": "Greeter Appearance",
-    "reference": "Modules/Settings/GreeterTab.qml:528",
+    "reference": "Modules/Settings/GreeterTab.qml:520",
     "comment": ""
   },
   {
     "term": "Greeter Behavior",
     "context": "Greeter Behavior",
-    "reference": "Modules/Settings/GreeterTab.qml:612",
+    "reference": "Modules/Settings/GreeterTab.qml:604",
     "comment": ""
   },
   {
     "term": "Greeter Status",
     "context": "Greeter Status",
-    "reference": "Modules/Settings/GreeterTab.qml:416",
+    "reference": "Modules/Settings/GreeterTab.qml:399",
     "comment": ""
   },
   {
     "term": "Greeter activated. greetd is now enabled.",
     "context": "Greeter activated. greetd is now enabled.",
-    "reference": "Modules/Settings/GreeterTab.qml:351",
+    "reference": "Modules/Settings/GreeterTab.qml:334",
     "comment": ""
   },
   {
     "term": "Greeter font",
     "context": "Greeter font",
-    "reference": "Modules/Settings/GreeterTab.qml:544",
+    "reference": "Modules/Settings/GreeterTab.qml:536",
     "comment": ""
   },
   {
@@ -7490,13 +7418,13 @@
   {
     "term": "Greeter only — format for the date on the login screen",
     "context": "Greeter only — format for the date on the login screen",
-    "reference": "Modules/Settings/GreeterTab.qml:564",
+    "reference": "Modules/Settings/GreeterTab.qml:556",
     "comment": ""
   },
   {
     "term": "Greeter sync complete",
     "context": "Greeter sync complete",
-    "reference": "Modules/Settings/GreeterTab.qml:275",
+    "reference": "Modules/Settings/GreeterTab.qml:258",
     "comment": ""
   },
   {
@@ -7514,13 +7442,13 @@
   {
     "term": "Grid: OFF",
     "context": "Grid: OFF",
-    "reference": "Modules/Plugins/DesktopPluginWrapper.qml:724",
+    "reference": "Modules/Plugins/DesktopPluginWrapper.qml:737",
     "comment": "Widget grid snap status"
   },
   {
     "term": "Grid: ON",
     "context": "Grid: ON",
-    "reference": "Modules/Plugins/DesktopPluginWrapper.qml:724",
+    "reference": "Modules/Plugins/DesktopPluginWrapper.qml:737",
     "comment": "Widget grid snap status"
   },
   {
@@ -8066,7 +7994,7 @@
   {
     "term": "ISO Date",
     "context": "ISO Date",
-    "reference": "Modules/Settings/GreeterTab.qml:392, Modules/Settings/TimeWeatherTab.qml:182, Modules/Settings/TimeWeatherTab.qml:213, Modules/Settings/TimeWeatherTab.qml:232, Modules/Settings/TimeWeatherTab.qml:269, Modules/Settings/TimeWeatherTab.qml:300, Modules/Settings/TimeWeatherTab.qml:319",
+    "reference": "Modules/Settings/GreeterTab.qml:375, Modules/Settings/TimeWeatherTab.qml:182, Modules/Settings/TimeWeatherTab.qml:213, Modules/Settings/TimeWeatherTab.qml:232, Modules/Settings/TimeWeatherTab.qml:269, Modules/Settings/TimeWeatherTab.qml:300, Modules/Settings/TimeWeatherTab.qml:319",
     "comment": "date format option"
   },
   {
@@ -8102,7 +8030,7 @@
   {
     "term": "Icon theme changed outside DMS; switched to System Default",
     "context": "Icon theme changed outside DMS; switched to System Default",
-    "reference": "Common/SettingsData.qml:1527",
+    "reference": "Common/SettingsData.qml:1531",
     "comment": "shown when an external tool overrides the icon theme DMS applied"
   },
   {
@@ -8156,7 +8084,7 @@
   {
     "term": "If the field is hidden, it will appear as soon as a key is pressed.",
     "context": "If the field is hidden, it will appear as soon as a key is pressed.",
-    "reference": "Modules/Settings/LockScreenTab.qml:130",
+    "reference": "Modules/Settings/LockScreenTab.qml:246",
     "comment": ""
   },
   {
@@ -8234,7 +8162,7 @@
   {
     "term": "Inactive Monitor Color",
     "context": "Inactive Monitor Color",
-    "reference": "Modules/Settings/LockScreenTab.qml:435, Modules/Settings/LockScreenTab.qml:466",
+    "reference": "Modules/Settings/LockScreenTab.qml:633, Modules/Settings/LockScreenTab.qml:664",
     "comment": ""
   },
   {
@@ -8390,13 +8318,13 @@
   {
     "term": "Install",
     "context": "Install",
-    "reference": "Modules/Settings/PluginBrowser.qml:571, Modules/Settings/PluginBrowser.qml:1506, Modules/Settings/GreeterTab.qml:105, Modules/Settings/GreeterTab.qml:151, Modules/Settings/ThemeBrowser.qml:121, Modules/Settings/ThemeBrowser.qml:627",
+    "reference": "Modules/Settings/PluginBrowser.qml:571, Modules/Settings/PluginBrowser.qml:1506, Modules/Settings/GreeterTab.qml:88, Modules/Settings/GreeterTab.qml:134, Modules/Settings/ThemeBrowser.qml:121, Modules/Settings/ThemeBrowser.qml:627",
     "comment": "install action button"
   },
   {
     "term": "Install Greeter",
     "context": "Install Greeter",
-    "reference": "Modules/Settings/GreeterTab.qml:149",
+    "reference": "Modules/Settings/GreeterTab.qml:132",
     "comment": "greeter action confirmation"
   },
   {
@@ -8420,7 +8348,7 @@
   {
     "term": "Install complete. Greeter has been installed.",
     "context": "Install complete. Greeter has been installed.",
-    "reference": "Modules/Settings/GreeterTab.qml:349",
+    "reference": "Modules/Settings/GreeterTab.qml:332",
     "comment": ""
   },
   {
@@ -8456,7 +8384,7 @@
   {
     "term": "Install the DMS greeter? A terminal will open for sudo authentication.",
     "context": "Install the DMS greeter? A terminal will open for sudo authentication.",
-    "reference": "Modules/Settings/GreeterTab.qml:150",
+    "reference": "Modules/Settings/GreeterTab.qml:133",
     "comment": ""
   },
   {
@@ -8468,7 +8396,7 @@
   {
     "term": "Installation and PAM setup: see the ",
     "context": "Installation and PAM setup: see the ",
-    "reference": "Modules/Settings/GreeterTab.qml:669",
+    "reference": "Modules/Settings/GreeterTab.qml:661",
     "comment": ""
   },
   {
@@ -9092,13 +9020,13 @@
   {
     "term": "Lock Screen Appearance",
     "context": "Lock Screen Appearance",
-    "reference": "Modules/Settings/LockScreenTab.qml:162",
+    "reference": "Modules/Settings/LockScreenTab.qml:278",
     "comment": ""
   },
   {
     "term": "Lock Screen Display",
     "context": "Lock Screen Display",
-    "reference": "Modules/Settings/LockScreenTab.qml:399",
+    "reference": "Modules/Settings/LockScreenTab.qml:597",
     "comment": ""
   },
   {
@@ -9110,25 +9038,25 @@
   {
     "term": "Lock Screen behaviour",
     "context": "Lock Screen behaviour",
-    "reference": "Modules/Settings/LockScreenTab.qml:213",
+    "reference": "Modules/Settings/LockScreenTab.qml:411",
     "comment": ""
   },
   {
     "term": "Lock Screen layout",
     "context": "Lock Screen layout",
-    "reference": "Modules/Settings/LockScreenTab.qml:83",
+    "reference": "Modules/Settings/LockScreenTab.qml:199",
     "comment": ""
   },
   {
     "term": "Lock at startup",
     "context": "Lock at startup",
-    "reference": "Modules/Settings/LockScreenTab.qml:261",
+    "reference": "Modules/Settings/LockScreenTab.qml:459",
     "comment": ""
   },
   {
     "term": "Lock before suspend",
     "context": "Lock before suspend",
-    "reference": "Modules/Settings/PowerSleepTab.qml:92, Modules/Settings/LockScreenTab.qml:242",
+    "reference": "Modules/Settings/PowerSleepTab.qml:92, Modules/Settings/LockScreenTab.qml:440",
     "comment": ""
   },
   {
@@ -9140,13 +9068,13 @@
   {
     "term": "Lock screen authentication changes apply automatically and may open a terminal when sudo authentication is required.",
     "context": "Lock screen authentication changes apply automatically and may open a terminal when sudo authentication is required.",
-    "reference": "Modules/Settings/LockScreenTab.qml:268",
+    "reference": "Modules/Settings/LockScreenTab.qml:466",
     "comment": ""
   },
   {
     "term": "Lock screen font",
     "context": "Lock screen font",
-    "reference": "Modules/Settings/LockScreenTab.qml:176",
+    "reference": "Modules/Settings/LockScreenTab.qml:292",
     "comment": ""
   },
   {
@@ -9176,7 +9104,7 @@
   {
     "term": "Login Authentication",
     "context": "Login Authentication",
-    "reference": "Modules/Settings/GreeterTab.qml:490",
+    "reference": "Modules/Settings/GreeterTab.qml:473",
     "comment": ""
   },
   {
@@ -9212,7 +9140,7 @@
   {
     "term": "Low Battery",
     "context": "Low Battery",
-    "reference": "Services/BatteryService.qml:169",
+    "reference": "Services/BatteryService.qml:167",
     "comment": ""
   },
   {
@@ -9938,7 +9866,7 @@
   {
     "term": "Month Date",
     "context": "Month Date",
-    "reference": "Modules/Settings/GreeterTab.qml:376, Modules/Settings/TimeWeatherTab.qml:182, Modules/Settings/TimeWeatherTab.qml:197, Modules/Settings/TimeWeatherTab.qml:228, Modules/Settings/TimeWeatherTab.qml:269, Modules/Settings/TimeWeatherTab.qml:284, Modules/Settings/TimeWeatherTab.qml:315",
+    "reference": "Modules/Settings/GreeterTab.qml:359, Modules/Settings/TimeWeatherTab.qml:182, Modules/Settings/TimeWeatherTab.qml:197, Modules/Settings/TimeWeatherTab.qml:228, Modules/Settings/TimeWeatherTab.qml:269, Modules/Settings/TimeWeatherTab.qml:284, Modules/Settings/TimeWeatherTab.qml:315",
     "comment": "date format option"
   },
   {
@@ -10076,7 +10004,7 @@
   {
     "term": "My Online",
     "context": "My Online",
-    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:246",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:252",
     "comment": "Tailscale filter: my online devices"
   },
   {
@@ -10520,7 +10448,7 @@
   {
     "term": "No battery",
     "context": "No battery",
-    "reference": "Services/BatteryService.qml:343, Modules/ControlCenter/Widgets/BatteryPill.qml:15",
+    "reference": "Services/BatteryService.qml:341, Modules/ControlCenter/Widgets/BatteryPill.qml:15",
     "comment": "battery status"
   },
   {
@@ -10622,8 +10550,8 @@
   {
     "term": "No fingerprint reader detected.",
     "context": "No fingerprint reader detected.",
-    "reference": "Modules/Settings/GreeterTab.qml:45, Modules/Settings/LockScreenTab.qml:24",
-    "comment": ""
+    "reference": "Modules/Settings/GreeterTab.qml:32, Modules/Settings/LockScreenTab.qml:72",
+    "comment": "fingerprint setting status"
   },
   {
     "term": "No folders found",
@@ -10706,7 +10634,7 @@
   {
     "term": "No matching devices",
     "context": "No matching devices",
-    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:317",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:323",
     "comment": "No Tailscale devices match search"
   },
   {
@@ -10754,7 +10682,7 @@
   {
     "term": "No peers found",
     "context": "No peers found",
-    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:317",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:323",
     "comment": "No Tailscale peers found"
   },
   {
@@ -10850,7 +10778,7 @@
   {
     "term": "No status output.",
     "context": "No status output.",
-    "reference": "Modules/Settings/GreeterTab.qml:236",
+    "reference": "Modules/Settings/GreeterTab.qml:219",
     "comment": ""
   },
   {
@@ -10964,7 +10892,7 @@
   {
     "term": "None",
     "context": "None",
-    "reference": "Modals/WindowRuleModal.qml:1169, Services/CupsService.qml:786, Modules/Settings/TypographyMotionTab.qml:495, Modules/Settings/TypographyMotionTab.qml:592, Modules/Settings/TypographyMotionTab.qml:676, Modules/Settings/WallpaperTab.qml:1148, Modules/Settings/DesktopWidgetInstanceCard.qml:258, Modules/Settings/DesktopWidgetInstanceCard.qml:274, Modules/Settings/DankBarTab.qml:1333, Modules/Settings/DankBarTab.qml:1861, Modules/Settings/DankBarTab.qml:1861, Modules/Settings/DankBarTab.qml:1902, Modules/Settings/WorkspaceAppearanceCard.qml:49, Modules/Settings/WorkspaceAppearanceCard.qml:57, Modules/Settings/NotificationsTab.qml:382, Modules/Settings/WindowRulesTab.qml:1063, Modules/Settings/DisplayConfig/HyprlandOutputSettings.qml:94, Modules/Settings/DisplayConfig/HyprlandOutputSettings.qml:107, Modules/Settings/DisplayConfig/HyprlandOutputSettings.qml:111, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:181",
+    "reference": "Modals/WindowRuleModal.qml:1169, Services/CupsService.qml:786, Modules/Settings/TypographyMotionTab.qml:495, Modules/Settings/TypographyMotionTab.qml:592, Modules/Settings/TypographyMotionTab.qml:676, Modules/Settings/WallpaperTab.qml:1148, Modules/Settings/DesktopWidgetInstanceCard.qml:258, Modules/Settings/DesktopWidgetInstanceCard.qml:274, Modules/Settings/DankBarTab.qml:1333, Modules/Settings/DankBarTab.qml:1861, Modules/Settings/DankBarTab.qml:1861, Modules/Settings/DankBarTab.qml:1902, Modules/Settings/WorkspaceAppearanceCard.qml:49, Modules/Settings/WorkspaceAppearanceCard.qml:57, Modules/Settings/NotificationsTab.qml:382, Modules/Settings/WindowRulesTab.qml:1063, Modules/Settings/DisplayConfig/HyprlandOutputSettings.qml:94, Modules/Settings/DisplayConfig/HyprlandOutputSettings.qml:107, Modules/Settings/DisplayConfig/HyprlandOutputSettings.qml:111, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:187",
     "comment": "Tailscale exit node: none selected | wallpaper transition option | workspace color option"
   },
   {
@@ -11000,26 +10928,26 @@
   {
     "term": "Not available — install fprintd and pam_fprintd, or configure greetd PAM.",
     "context": "Not available — install fprintd and pam_fprintd, or configure greetd PAM.",
-    "reference": "Modules/Settings/GreeterTab.qml:47",
-    "comment": ""
+    "reference": "Modules/Settings/GreeterTab.qml:34",
+    "comment": "greeter fingerprint login setting"
   },
   {
     "term": "Not available — install fprintd and pam_fprintd.",
     "context": "Not available — install fprintd and pam_fprintd.",
-    "reference": "Modules/Settings/LockScreenTab.qml:26",
-    "comment": ""
+    "reference": "Modules/Settings/LockScreenTab.qml:74",
+    "comment": "lock screen fingerprint setting"
   },
   {
     "term": "Not available — install or configure pam_u2f, or configure greetd PAM.",
     "context": "Not available — install or configure pam_u2f, or configure greetd PAM.",
-    "reference": "Modules/Settings/GreeterTab.qml:69",
-    "comment": ""
+    "reference": "Modules/Settings/GreeterTab.qml:52",
+    "comment": "greeter security key login setting"
   },
   {
     "term": "Not available — install or configure pam_u2f.",
     "context": "Not available — install or configure pam_u2f.",
-    "reference": "Modules/Settings/LockScreenTab.qml:41",
-    "comment": ""
+    "reference": "Modules/Settings/LockScreenTab.qml:87",
+    "comment": "lock screen security key setting"
   },
   {
     "term": "Not bound",
@@ -11060,7 +10988,7 @@
   {
     "term": "Notepad",
     "context": "Notepad",
-    "reference": "DMSShell.qml:1144, Services/AppSearchService.qml:182, Modules/Notepad/NotepadPopoutWindow.qml:26, Modules/Notepad/NotepadPopoutWindow.qml:81, Modules/Settings/WidgetsTab.qml:250",
+    "reference": "DMSShell.qml:893, Services/AppSearchService.qml:182, Modules/Notepad/NotepadPopoutWindow.qml:26, Modules/Notepad/NotepadPopoutWindow.qml:81, Modules/Settings/WidgetsTab.qml:250",
     "comment": "Notepad"
   },
   {
@@ -11108,7 +11036,7 @@
   {
     "term": "Notification Display",
     "context": "Notification Display",
-    "reference": "Modules/Settings/LockScreenTab.qml:146, Modules/Settings/NotificationsTab.qml:772",
+    "reference": "Modules/Settings/LockScreenTab.qml:262, Modules/Settings/NotificationsTab.qml:772",
     "comment": "lock screen notification privacy setting"
   },
   {
@@ -11180,13 +11108,13 @@
   {
     "term": "Numeric (D/M)",
     "context": "Numeric (D/M)",
-    "reference": "Modules/Settings/GreeterTab.qml:384, Modules/Settings/TimeWeatherTab.qml:182, Modules/Settings/TimeWeatherTab.qml:205, Modules/Settings/TimeWeatherTab.qml:230, Modules/Settings/TimeWeatherTab.qml:269, Modules/Settings/TimeWeatherTab.qml:292, Modules/Settings/TimeWeatherTab.qml:317",
+    "reference": "Modules/Settings/GreeterTab.qml:367, Modules/Settings/TimeWeatherTab.qml:182, Modules/Settings/TimeWeatherTab.qml:205, Modules/Settings/TimeWeatherTab.qml:230, Modules/Settings/TimeWeatherTab.qml:269, Modules/Settings/TimeWeatherTab.qml:292, Modules/Settings/TimeWeatherTab.qml:317",
     "comment": "date format option"
   },
   {
     "term": "Numeric (M/D)",
     "context": "Numeric (M/D)",
-    "reference": "Modules/Settings/GreeterTab.qml:380, Modules/Settings/TimeWeatherTab.qml:182, Modules/Settings/TimeWeatherTab.qml:201, Modules/Settings/TimeWeatherTab.qml:229, Modules/Settings/TimeWeatherTab.qml:269, Modules/Settings/TimeWeatherTab.qml:288, Modules/Settings/TimeWeatherTab.qml:316",
+    "reference": "Modules/Settings/GreeterTab.qml:363, Modules/Settings/TimeWeatherTab.qml:182, Modules/Settings/TimeWeatherTab.qml:201, Modules/Settings/TimeWeatherTab.qml:229, Modules/Settings/TimeWeatherTab.qml:269, Modules/Settings/TimeWeatherTab.qml:288, Modules/Settings/TimeWeatherTab.qml:316",
     "comment": "date format option"
   },
   {
@@ -11276,19 +11204,13 @@
   {
     "term": "Online",
     "context": "Online",
-    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:250",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:256",
     "comment": "Tailscale filter: all online devices"
   },
   {
     "term": "Only adjust gamma based on time or location rules.",
     "context": "Only adjust gamma based on time or location rules.",
     "reference": "Modules/Settings/GammaControlTab.qml:140",
-    "comment": ""
-  },
-  {
-    "term": "Only affects DMS-managed PAM. If greetd already includes pam_fprintd, fingerprint stays enabled.",
-    "context": "Only affects DMS-managed PAM. If greetd already includes pam_fprintd, fingerprint stays enabled.",
-    "reference": "Modules/Settings/GreeterTab.qml:39",
     "comment": ""
   },
   {
@@ -11378,7 +11300,7 @@
   {
     "term": "Open a new note",
     "context": "Open a new note",
-    "reference": "Modules/DankBar/Widgets/NotepadButton.qml:374",
+    "reference": "Modules/DankBar/Widgets/NotepadButton.qml:375",
     "comment": ""
   },
   {
@@ -11432,7 +11354,7 @@
   {
     "term": "Open with...",
     "context": "Open with...",
-    "reference": "DMSShell.qml:940, Modals/BrowserPickerModal.qml:13",
+    "reference": "DMSShell.qml:701, Modals/BrowserPickerModal.qml:13",
     "comment": ""
   },
   {
@@ -11450,7 +11372,7 @@
   {
     "term": "Opening terminal: ",
     "context": "Opening terminal: ",
-    "reference": "Modules/Settings/GreeterTab.qml:141",
+    "reference": "Modules/Settings/GreeterTab.qml:124",
     "comment": ""
   },
   {
@@ -11654,38 +11576,20 @@
   {
     "term": "Owner: %1",
     "context": "Owner: %1",
-    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:456",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:464",
     "comment": "Tailscale device owner"
   },
   {
     "term": "PAM already provides fingerprint auth. Enable this to show it at login.",
     "context": "PAM already provides fingerprint auth. Enable this to show it at login.",
-    "reference": "Modules/Settings/GreeterTab.qml:27",
-    "comment": ""
+    "reference": "Modules/Settings/GreeterTab.qml:24",
+    "comment": "greeter fingerprint login setting"
   },
   {
     "term": "PAM already provides security-key auth. Enable this to show it at login.",
     "context": "PAM already provides security-key auth. Enable this to show it at login.",
-    "reference": "Modules/Settings/GreeterTab.qml:58",
-    "comment": ""
-  },
-  {
-    "term": "PAM provides fingerprint auth, but availability could not be confirmed.",
-    "context": "PAM provides fingerprint auth, but availability could not be confirmed.",
-    "reference": "Modules/Settings/GreeterTab.qml:33",
-    "comment": ""
-  },
-  {
-    "term": "PAM provides fingerprint auth, but no prints are enrolled yet.",
-    "context": "PAM provides fingerprint auth, but no prints are enrolled yet.",
-    "reference": "Modules/Settings/GreeterTab.qml:29",
-    "comment": ""
-  },
-  {
-    "term": "PAM provides fingerprint auth, but no reader was detected.",
-    "context": "PAM provides fingerprint auth, but no reader was detected.",
-    "reference": "Modules/Settings/GreeterTab.qml:31",
-    "comment": ""
+    "reference": "Modules/Settings/GreeterTab.qml:44",
+    "comment": "greeter security key login setting"
   },
   {
     "term": "PDF Reader",
@@ -11852,7 +11756,7 @@
   {
     "term": "Path to a video file or folder containing videos",
     "context": "Path to a video file or folder containing videos",
-    "reference": "Modules/Settings/LockScreenTab.qml:352",
+    "reference": "Modules/Settings/LockScreenTab.qml:550",
     "comment": ""
   },
   {
@@ -11882,13 +11786,13 @@
   {
     "term": "Pending Charge",
     "context": "Pending Charge",
-    "reference": "Services/BatteryService.qml:332",
+    "reference": "Services/BatteryService.qml:330",
     "comment": "battery status"
   },
   {
     "term": "Pending Discharge",
     "context": "Pending Discharge",
-    "reference": "Services/BatteryService.qml:334",
+    "reference": "Services/BatteryService.qml:332",
     "comment": "battery status"
   },
   {
@@ -11924,7 +11828,7 @@
   {
     "term": "Permanently delete %1 item(s)? This cannot be undone.",
     "context": "Permanently delete %1 item(s)? This cannot be undone.",
-    "reference": "DMSShell.qml:562",
+    "reference": "DMSShell.qml:323",
     "comment": ""
   },
   {
@@ -11960,7 +11864,7 @@
   {
     "term": "Pick a different random video each time from the same folder",
     "context": "Pick a different random video each time from the same folder",
-    "reference": "Modules/Settings/LockScreenTab.qml:388",
+    "reference": "Modules/Settings/LockScreenTab.qml:586",
     "comment": ""
   },
   {
@@ -12062,7 +11966,7 @@
   {
     "term": "Play a video when the screen locks.",
     "context": "Play a video when the screen locks.",
-    "reference": "Modules/Settings/LockScreenTab.qml:334",
+    "reference": "Modules/Settings/LockScreenTab.qml:532",
     "comment": ""
   },
   {
@@ -12134,7 +12038,7 @@
   {
     "term": "Plugged In",
     "context": "Plugged In",
-    "reference": "Services/BatteryService.qml:349, Services/BatteryService.qml:355, Modules/Settings/SoundsTab.qml:166, Modules/ControlCenter/Widgets/BatteryPill.qml:28",
+    "reference": "Services/BatteryService.qml:347, Services/BatteryService.qml:353, Modules/Settings/SoundsTab.qml:166, Modules/ControlCenter/Widgets/BatteryPill.qml:28",
     "comment": "battery status"
   },
   {
@@ -12374,7 +12278,7 @@
   {
     "term": "Power off monitors on lock",
     "context": "Power off monitors on lock",
-    "reference": "Modules/Settings/LockScreenTab.qml:252",
+    "reference": "Modules/Settings/LockScreenTab.qml:450",
     "comment": ""
   },
   {
@@ -12404,13 +12308,13 @@
   {
     "term": "Pre-fill the last successful username on the greeter",
     "context": "Pre-fill the last successful username on the greeter",
-    "reference": "Modules/Settings/GreeterTab.qml:637",
+    "reference": "Modules/Settings/GreeterTab.qml:629",
     "comment": ""
   },
   {
     "term": "Pre-select the last used session on the greeter",
     "context": "Pre-select the last used session on the greeter",
-    "reference": "Modules/Settings/GreeterTab.qml:628",
+    "reference": "Modules/Settings/GreeterTab.qml:620",
     "comment": ""
   },
   {
@@ -12740,7 +12644,7 @@
   {
     "term": "QtMultimedia is not available - video screensaver requires qt multimedia services",
     "context": "QtMultimedia is not available - video screensaver requires qt multimedia services",
-    "reference": "Modules/Settings/LockScreenTab.qml:323",
+    "reference": "Modules/Settings/LockScreenTab.qml:521",
     "comment": ""
   },
   {
@@ -12836,7 +12740,7 @@
   {
     "term": "Reach local network devices while using an exit node",
     "context": "Reach local network devices while using an exit node",
-    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:207",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:213",
     "comment": "Tailscale allow LAN access description"
   },
   {
@@ -12896,7 +12800,7 @@
   {
     "term": "Refresh",
     "context": "Refresh",
-    "reference": "Modules/Settings/GreeterTab.qml:470, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:233, Modules/DankDash/Overview/WeatherOverviewCard.qml:46",
+    "reference": "Modules/Settings/GreeterTab.qml:453, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:239, Modules/DankDash/Overview/WeatherOverviewCard.qml:46",
     "comment": "Refresh Tailscale device status"
   },
   {
@@ -12992,13 +12896,13 @@
   {
     "term": "Remember last session",
     "context": "Remember last session",
-    "reference": "Modules/Settings/GreeterTab.qml:627",
+    "reference": "Modules/Settings/GreeterTab.qml:619",
     "comment": ""
   },
   {
     "term": "Remember last user",
     "context": "Remember last user",
-    "reference": "Modules/Settings/GreeterTab.qml:636",
+    "reference": "Modules/Settings/GreeterTab.qml:628",
     "comment": ""
   },
   {
@@ -13202,7 +13106,7 @@
   {
     "term": "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys). Auth changes apply automatically and may open a terminal for sudo.",
     "context": "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys). Auth changes apply automatically and may open a terminal for sudo.",
-    "reference": "Modules/Settings/GreeterTab.qml:660",
+    "reference": "Modules/Settings/GreeterTab.qml:652",
     "comment": ""
   },
   {
@@ -13214,7 +13118,7 @@
   {
     "term": "Requires remembering the last user and session. Enable those options first.",
     "context": "Requires remembering the last user and session. Enable those options first.",
-    "reference": "Modules/Settings/GreeterTab.qml:646",
+    "reference": "Modules/Settings/GreeterTab.qml:638",
     "comment": ""
   },
   {
@@ -13496,7 +13400,7 @@
   {
     "term": "Running greeter sync...",
     "context": "Running greeter sync...",
-    "reference": "Modules/Settings/GreeterTab.qml:301",
+    "reference": "Modules/Settings/GreeterTab.qml:284",
     "comment": ""
   },
   {
@@ -13628,7 +13532,7 @@
   {
     "term": "Saved Note",
     "context": "Saved Note",
-    "reference": "Modules/DankBar/Widgets/NotepadButton.qml:332",
+    "reference": "Modules/DankBar/Widgets/NotepadButton.qml:333",
     "comment": ""
   },
   {
@@ -13790,7 +13694,7 @@
   {
     "term": "Search devices...",
     "context": "Search devices...",
-    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:221",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:227",
     "comment": "Tailscale device search placeholder"
   },
   {
@@ -13868,7 +13772,7 @@
   {
     "term": "Second Factor (AND)",
     "context": "Second Factor (AND)",
-    "reference": "Modules/Settings/LockScreenTab.qml:304, Modules/Settings/LockScreenTab.qml:305, Modules/Settings/LockScreenTab.qml:307",
+    "reference": "Modules/Settings/LockScreenTab.qml:502, Modules/Settings/LockScreenTab.qml:503, Modules/Settings/LockScreenTab.qml:505",
     "comment": "U2F mode option: key required after password or fingerprint"
   },
   {
@@ -13904,20 +13808,20 @@
   {
     "term": "Security key mode",
     "context": "Security key mode",
-    "reference": "Modules/Settings/LockScreenTab.qml:301",
+    "reference": "Modules/Settings/LockScreenTab.qml:499",
     "comment": "lock screen U2F security key mode setting"
   },
   {
     "term": "Security-key availability could not be confirmed.",
     "context": "Security-key availability could not be confirmed.",
-    "reference": "Modules/Settings/GreeterTab.qml:71, Modules/Settings/LockScreenTab.qml:43",
-    "comment": ""
+    "reference": "Modules/Settings/GreeterTab.qml:54, Modules/Settings/LockScreenTab.qml:89",
+    "comment": "security key setting status"
   },
   {
     "term": "Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.",
     "context": "Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.",
-    "reference": "Modules/Settings/GreeterTab.qml:67, Modules/Settings/LockScreenTab.qml:39",
-    "comment": ""
+    "reference": "Modules/Settings/GreeterTab.qml:50, Modules/Settings/LockScreenTab.qml:85",
+    "comment": "security key setting status"
   },
   {
     "term": "Select",
@@ -13970,7 +13874,7 @@
   {
     "term": "Select Video or Folder",
     "context": "Select Video or Folder",
-    "reference": "Modules/Settings/LockScreenTab.qml:59",
+    "reference": "Modules/Settings/LockScreenTab.qml:110",
     "comment": ""
   },
   {
@@ -14066,13 +13970,13 @@
   {
     "term": "Select greeter background image",
     "context": "Select greeter background image",
-    "reference": "Modules/Settings/GreeterTab.qml:601",
+    "reference": "Modules/Settings/GreeterTab.qml:593",
     "comment": ""
   },
   {
     "term": "Select lock screen background image",
     "context": "Select lock screen background image",
-    "reference": "Modules/Settings/LockScreenTab.qml:202",
+    "reference": "Modules/Settings/LockScreenTab.qml:318",
     "comment": ""
   },
   {
@@ -14294,7 +14198,7 @@
   {
     "term": "Settings",
     "context": "Settings",
-    "reference": "Services/AppSearchService.qml:171, Services/AppSearchService.qml:328, Services/AppSearchService.qml:684, Services/PopoutService.qml:457, Services/PopoutService.qml:474, Modals/DankLauncherV2/Controller.qml:206, Modals/Settings/SettingsSidebar.qml:128, Modals/Settings/SettingsModal.qml:88, Modals/Settings/SettingsModal.qml:232, Modules/DankDash/DankDashPopout.qml:34, Modules/Settings/DankDashTab.qml:42, Modules/Dock/DockTrashContextMenu.qml:48",
+    "reference": "Services/AppSearchService.qml:171, Services/AppSearchService.qml:328, Services/AppSearchService.qml:684, Services/PopoutService.qml:458, Services/PopoutService.qml:475, Modals/DankLauncherV2/Controller.qml:206, Modals/Settings/SettingsSidebar.qml:128, Modals/Settings/SettingsModal.qml:88, Modals/Settings/SettingsModal.qml:232, Modules/DankDash/DankDashPopout.qml:34, Modules/Settings/DankDashTab.qml:42, Modules/Dock/DockTrashContextMenu.qml:48",
     "comment": "settings window title"
   },
   {
@@ -14606,7 +14510,7 @@
   {
     "term": "Show Media Player",
     "context": "Show Media Player",
-    "reference": "Modules/Settings/LockScreenTab.qml:138",
+    "reference": "Modules/Settings/LockScreenTab.qml:254",
     "comment": "Enable media player controls on the lock screen window"
   },
   {
@@ -14666,7 +14570,7 @@
   {
     "term": "Show Password Field",
     "context": "Show Password Field",
-    "reference": "Modules/Settings/LockScreenTab.qml:129",
+    "reference": "Modules/Settings/LockScreenTab.qml:245",
     "comment": "Enable password field display on the lock screen window"
   },
   {
@@ -14678,7 +14582,7 @@
   {
     "term": "Show Power Actions",
     "context": "Show Power Actions",
-    "reference": "Modules/Settings/LockScreenTab.qml:89",
+    "reference": "Modules/Settings/LockScreenTab.qml:205",
     "comment": "Enable power action icon on the lock screen window"
   },
   {
@@ -14702,7 +14606,7 @@
   {
     "term": "Show Profile Image",
     "context": "Show Profile Image",
-    "reference": "Modules/Settings/LockScreenTab.qml:121",
+    "reference": "Modules/Settings/LockScreenTab.qml:237",
     "comment": "Enable profile image display on the lock screen window"
   },
   {
@@ -14762,19 +14666,19 @@
   {
     "term": "Show System Date",
     "context": "Show System Date",
-    "reference": "Modules/Settings/LockScreenTab.qml:113",
+    "reference": "Modules/Settings/LockScreenTab.qml:229",
     "comment": "Enable system date display on the lock screen window"
   },
   {
     "term": "Show System Icons",
     "context": "Show System Icons",
-    "reference": "Modules/Settings/LockScreenTab.qml:97",
+    "reference": "Modules/Settings/LockScreenTab.qml:213",
     "comment": "Enable system status icons on the lock screen window"
   },
   {
     "term": "Show System Time",
     "context": "Show System Time",
-    "reference": "Modules/Settings/LockScreenTab.qml:105",
+    "reference": "Modules/Settings/LockScreenTab.qml:221",
     "comment": "Enable system time display on the lock screen window"
   },
   {
@@ -15188,7 +15092,7 @@
   {
     "term": "Skip the greeter password after boot until you sign out. Lock screen unlock is unchanged. Takes effect on the next reboot after sync.",
     "context": "Skip the greeter password after boot until you sign out. Lock screen unlock is unchanged. Takes effect on the next reboot after sync.",
-    "reference": "Modules/Settings/GreeterTab.qml:646",
+    "reference": "Modules/Settings/GreeterTab.qml:638",
     "comment": ""
   },
   {
@@ -15608,7 +15512,7 @@
   {
     "term": "Sync",
     "context": "Sync",
-    "reference": "Modules/Settings/GreeterTab.qml:478",
+    "reference": "Modules/Settings/GreeterTab.qml:461",
     "comment": ""
   },
   {
@@ -15638,13 +15542,13 @@
   {
     "term": "Sync applies your theme and settings to the login screen. Other users should run dms greeter sync --profile instead of a full sync. Authentication changes apply automatically.",
     "context": "Sync applies your theme and settings to the login screen. Other users should run dms greeter sync --profile instead of a full sync. Authentication changes apply automatically.",
-    "reference": "Modules/Settings/GreeterTab.qml:420",
+    "reference": "Modules/Settings/GreeterTab.qml:403",
     "comment": ""
   },
   {
     "term": "Sync completed successfully.",
     "context": "Sync completed successfully.",
-    "reference": "Modules/Settings/GreeterTab.qml:268",
+    "reference": "Modules/Settings/GreeterTab.qml:251",
     "comment": ""
   },
   {
@@ -15656,25 +15560,25 @@
   {
     "term": "Sync failed in background mode. Trying terminal mode so you can authenticate interactively.",
     "context": "Sync failed in background mode. Trying terminal mode so you can authenticate interactively.",
-    "reference": "Modules/Settings/GreeterTab.qml:277",
+    "reference": "Modules/Settings/GreeterTab.qml:260",
     "comment": ""
   },
   {
     "term": "Sync needs sudo authentication. Opening terminal so you can use password or fingerprint.",
     "context": "Sync needs sudo authentication. Opening terminal so you can use password or fingerprint.",
-    "reference": "Modules/Settings/GreeterTab.qml:306",
+    "reference": "Modules/Settings/GreeterTab.qml:289",
     "comment": ""
   },
   {
     "term": "Sync to apply",
     "context": "Sync to apply",
-    "reference": "Modules/Settings/GreeterTab.qml:752",
+    "reference": "Modules/Settings/GreeterTab.qml:748",
     "comment": ""
   },
   {
     "term": "Syncing...",
     "context": "Syncing...",
-    "reference": "Modules/Settings/GreeterTab.qml:752",
+    "reference": "Modules/Settings/GreeterTab.qml:748",
     "comment": ""
   },
   {
@@ -15698,7 +15602,7 @@
   {
     "term": "System Default",
     "context": "System Default",
-    "reference": "Modules/Settings/GreeterTab.qml:364, Modules/Settings/TimeWeatherTab.qml:12, Modules/Settings/TimeWeatherTab.qml:58, Modules/Settings/TimeWeatherTab.qml:66, Modules/Settings/TimeWeatherTab.qml:182, Modules/Settings/TimeWeatherTab.qml:185, Modules/Settings/TimeWeatherTab.qml:225, Modules/Settings/TimeWeatherTab.qml:269, Modules/Settings/TimeWeatherTab.qml:272, Modules/Settings/TimeWeatherTab.qml:312, Modules/Settings/LocaleTab.qml:9",
+    "reference": "Modules/Settings/GreeterTab.qml:347, Modules/Settings/TimeWeatherTab.qml:12, Modules/Settings/TimeWeatherTab.qml:58, Modules/Settings/TimeWeatherTab.qml:66, Modules/Settings/TimeWeatherTab.qml:182, Modules/Settings/TimeWeatherTab.qml:185, Modules/Settings/TimeWeatherTab.qml:225, Modules/Settings/TimeWeatherTab.qml:269, Modules/Settings/TimeWeatherTab.qml:272, Modules/Settings/TimeWeatherTab.qml:312, Modules/Settings/LocaleTab.qml:9",
     "comment": "date format option"
   },
   {
@@ -15806,7 +15710,7 @@
   {
     "term": "Tags: %1",
     "context": "Tags: %1",
-    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:449",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:457",
     "comment": "Tailscale device tags"
   },
   {
@@ -15830,7 +15734,7 @@
   {
     "term": "Tailscale not available",
     "context": "Tailscale not available",
-    "reference": "Modules/ControlCenter/Models/WidgetModel.qml:272, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:77",
+    "reference": "Modules/ControlCenter/Models/WidgetModel.qml:272, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:79",
     "comment": "Warning when Tailscale service is not running"
   },
   {
@@ -15854,7 +15758,7 @@
   {
     "term": "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.",
     "context": "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.",
-    "reference": "Modules/Settings/GreeterTab.qml:330",
+    "reference": "Modules/Settings/GreeterTab.qml:313",
     "comment": ""
   },
   {
@@ -15866,7 +15770,7 @@
   {
     "term": "Terminal fallback opened. Complete sync there; it will close automatically when done.",
     "context": "Terminal fallback opened. Complete sync there; it will close automatically when done.",
-    "reference": "Modules/Settings/GreeterTab.qml:325",
+    "reference": "Modules/Settings/GreeterTab.qml:308",
     "comment": ""
   },
   {
@@ -15884,7 +15788,7 @@
   {
     "term": "Terminal opened. Complete sync authentication there; it will close automatically when done.",
     "context": "Terminal opened. Complete sync authentication there; it will close automatically when done.",
-    "reference": "Modules/Settings/GreeterTab.qml:325",
+    "reference": "Modules/Settings/GreeterTab.qml:308",
     "comment": ""
   },
   {
@@ -16070,7 +15974,7 @@
   {
     "term": "This device",
     "context": "This device",
-    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:372",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:380",
     "comment": "Label for the user's own device in Tailscale"
   },
   {
@@ -16130,13 +16034,13 @@
   {
     "term": "This will delete all unpinned entries. %1 pinned entries will be kept.",
     "context": "This will delete all unpinned entries. %1 pinned entries will be kept.",
-    "reference": "Modals/Clipboard/ClipboardHistoryContent.qml:139, Modules/DankBar/DankBarContent.qml:924",
+    "reference": "Modals/Clipboard/ClipboardHistoryContent.qml:139, Modules/DankBar/DankBarContent.qml:927",
     "comment": ""
   },
   {
     "term": "This will permanently delete all clipboard history.",
     "context": "This will permanently delete all clipboard history.",
-    "reference": "Modals/Clipboard/ClipboardHistoryContent.qml:139, Modules/DankBar/DankBarContent.qml:924",
+    "reference": "Modals/Clipboard/ClipboardHistoryContent.qml:139, Modules/DankBar/DankBarContent.qml:927",
     "comment": ""
   },
   {
@@ -16580,7 +16484,7 @@
   {
     "term": "Turn off all displays immediately when the lock screen activates",
     "context": "Turn off all displays immediately when the lock screen activates",
-    "reference": "Modules/Settings/LockScreenTab.qml:253",
+    "reference": "Modules/Settings/LockScreenTab.qml:451",
     "comment": ""
   },
   {
@@ -16682,13 +16586,13 @@
   {
     "term": "Uninstall",
     "context": "Uninstall",
-    "reference": "Modules/Settings/GreeterTab.qml:108, Modules/Settings/GreeterTab.qml:159, Modules/Settings/ThemeBrowser.qml:629",
+    "reference": "Modules/Settings/GreeterTab.qml:91, Modules/Settings/GreeterTab.qml:142, Modules/Settings/ThemeBrowser.qml:629",
     "comment": "uninstall action button"
   },
   {
     "term": "Uninstall Greeter",
     "context": "Uninstall Greeter",
-    "reference": "Modules/Settings/GreeterTab.qml:157",
+    "reference": "Modules/Settings/GreeterTab.qml:140",
     "comment": "greeter action confirmation"
   },
   {
@@ -16700,7 +16604,7 @@
   {
     "term": "Uninstall complete. Greeter has been removed.",
     "context": "Uninstall complete. Greeter has been removed.",
-    "reference": "Modules/Settings/GreeterTab.qml:353",
+    "reference": "Modules/Settings/GreeterTab.qml:336",
     "comment": ""
   },
   {
@@ -16712,7 +16616,7 @@
   {
     "term": "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.",
     "context": "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.",
-    "reference": "Modules/Settings/GreeterTab.qml:158",
+    "reference": "Modules/Settings/GreeterTab.qml:141",
     "comment": ""
   },
   {
@@ -16730,7 +16634,7 @@
   {
     "term": "Unknown",
     "context": "Unknown",
-    "reference": "Common/Theme.qml:1646, Services/WeatherService.qml:153, Services/WeatherService.qml:716, Services/WeatherService.qml:717, Services/WeatherService.qml:758, Services/WeatherService.qml:759, Services/WeatherService.qml:794, Services/WeatherService.qml:795, Services/WeatherService.qml:993, Services/WeatherService.qml:994, Services/BatteryService.qml:336, dms-plugins/DankKDEConnect/DankKDEConnect.qml:1582, dms-plugins/DankKDEConnect/components/DeviceCard.qml:298, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:741, Modules/Lock/LockScreenContent.qml:451, Modules/Lock/LockScreenContent.qml:571, Modules/Lock/LockScreenContent.qml:667, Modules/Settings/PluginBrowser.qml:1268, Modules/Settings/PluginBrowser.qml:1648, Modules/Settings/NetworkStatusTab.qml:79, Modules/Settings/NetworkStatusTab.qml:121, Modules/Settings/PrinterTab.qml:1651, Modules/Settings/ThemeBrowser.qml:506, Modules/Settings/NetworkEthernetTab.qml:146, Modules/Settings/NetworkEthernetTab.qml:169, Modules/Settings/NetworkEthernetTab.qml:317, Modules/Settings/NetworkEthernetTab.qml:428, Modules/Settings/NotificationsTab.qml:711, Modules/Settings/NetworkWifiTab.qml:537, Modules/Settings/NetworkWifiTab.qml:947, Modules/ControlCenter/Details/BatteryDetail.qml:184, Modules/ControlCenter/Components/HeaderPane.qml:63, Modules/ControlCenter/Components/DragDropGrid.qml:517, Modules/ControlCenter/Components/DragDropGrid.qml:755, Modules/DankDash/Overview/MediaOverviewCard.qml:91, Modules/DankBar/Popouts/BatteryPopout.qml:340",
+    "reference": "Common/Theme.qml:1646, Services/WeatherService.qml:153, Services/WeatherService.qml:716, Services/WeatherService.qml:717, Services/WeatherService.qml:758, Services/WeatherService.qml:759, Services/WeatherService.qml:794, Services/WeatherService.qml:795, Services/WeatherService.qml:993, Services/WeatherService.qml:994, Services/BatteryService.qml:334, dms-plugins/DankKDEConnect/DankKDEConnect.qml:1582, dms-plugins/DankKDEConnect/components/DeviceCard.qml:298, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:741, Modules/Lock/LockScreenContent.qml:451, Modules/Lock/LockScreenContent.qml:571, Modules/Lock/LockScreenContent.qml:667, Modules/Settings/PluginBrowser.qml:1268, Modules/Settings/PluginBrowser.qml:1648, Modules/Settings/NetworkStatusTab.qml:79, Modules/Settings/NetworkStatusTab.qml:121, Modules/Settings/PrinterTab.qml:1651, Modules/Settings/ThemeBrowser.qml:506, Modules/Settings/NetworkEthernetTab.qml:146, Modules/Settings/NetworkEthernetTab.qml:169, Modules/Settings/NetworkEthernetTab.qml:317, Modules/Settings/NetworkEthernetTab.qml:428, Modules/Settings/NotificationsTab.qml:711, Modules/Settings/NetworkWifiTab.qml:537, Modules/Settings/NetworkWifiTab.qml:947, Modules/ControlCenter/Details/BatteryDetail.qml:184, Modules/ControlCenter/Components/HeaderPane.qml:63, Modules/ControlCenter/Components/DragDropGrid.qml:517, Modules/ControlCenter/Components/DragDropGrid.qml:755, Modules/DankDash/Overview/MediaOverviewCard.qml:91, Modules/DankBar/Popouts/BatteryPopout.qml:340",
     "comment": "KDE Connect unknown device status | Status | battery status | power profile option | unknown author | widget status"
   },
   {
@@ -17042,13 +16946,13 @@
   {
     "term": "Use a custom image for the lock screen, or leave empty to use your desktop wallpaper.",
     "context": "Use a custom image for the lock screen, or leave empty to use your desktop wallpaper.",
-    "reference": "Modules/Settings/LockScreenTab.qml:191",
+    "reference": "Modules/Settings/LockScreenTab.qml:307",
     "comment": ""
   },
   {
     "term": "Use a custom image for the login screen, or leave empty to use your desktop wallpaper.",
     "context": "Use a custom image for the login screen, or leave empty to use your desktop wallpaper.",
-    "reference": "Modules/Settings/GreeterTab.qml:588",
+    "reference": "Modules/Settings/GreeterTab.qml:580",
     "comment": ""
   },
   {
@@ -17066,7 +16970,7 @@
   {
     "term": "Use a security key for lock screen authentication.",
     "context": "Use a security key for lock screen authentication.",
-    "reference": "Modules/Settings/LockScreenTab.qml:35",
+    "reference": "Modules/Settings/LockScreenTab.qml:83",
     "comment": "lock screen U2F security key setting"
   },
   {
@@ -17132,8 +17036,8 @@
   {
     "term": "Use fingerprint authentication for the lock screen.",
     "context": "Use fingerprint authentication for the lock screen.",
-    "reference": "Modules/Settings/LockScreenTab.qml:18",
-    "comment": ""
+    "reference": "Modules/Settings/LockScreenTab.qml:68",
+    "comment": "lock screen fingerprint setting"
   },
   {
     "term": "Use keys 1-3 or arrows, Enter/Space to select",
@@ -17462,7 +17366,7 @@
   {
     "term": "Video Path",
     "context": "Video Path",
-    "reference": "Modules/Settings/LockScreenTab.qml:346",
+    "reference": "Modules/Settings/LockScreenTab.qml:544",
     "comment": ""
   },
   {
@@ -17474,7 +17378,7 @@
   {
     "term": "Video Screensaver",
     "context": "Video Screensaver",
-    "reference": "Modules/Lock/VideoScreensaver.qml:39, Modules/Lock/VideoScreensaver.qml:76, Modules/Lock/VideoScreensaver.qml:108, Modules/Settings/LockScreenTab.qml:318",
+    "reference": "Modules/Lock/VideoScreensaver.qml:39, Modules/Lock/VideoScreensaver.qml:76, Modules/Lock/VideoScreensaver.qml:108, Modules/Settings/LockScreenTab.qml:516",
     "comment": ""
   },
   {
@@ -18194,7 +18098,7 @@
   {
     "term": "direct",
     "context": "direct",
-    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:406",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:414",
     "comment": "Tailscale direct connection"
   },
   {
@@ -18278,7 +18182,7 @@
   {
     "term": "last seen %1",
     "context": "last seen %1",
-    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:408",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:416",
     "comment": "Tailscale peer last seen time"
   },
   {
@@ -18296,7 +18200,7 @@
   {
     "term": "loginctl not available - lock integration requires DMS socket connection",
     "context": "loginctl not available - lock integration requires DMS socket connection",
-    "reference": "Modules/Settings/LockScreenTab.qml:217",
+    "reference": "Modules/Settings/LockScreenTab.qml:415",
     "comment": ""
   },
   {
@@ -18452,7 +18356,7 @@
   {
     "term": "or run ",
     "context": "or run ",
-    "reference": "Modules/Settings/GreeterTab.qml:669",
+    "reference": "Modules/Settings/GreeterTab.qml:661",
     "comment": ""
   },
   {
@@ -18476,7 +18380,7 @@
   {
     "term": "relay: %1",
     "context": "relay: %1",
-    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:406",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:414",
     "comment": "Tailscale relay server name"
   },
   {

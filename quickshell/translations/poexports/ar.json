@@ -777,7 +777,7 @@
     "Authenticate": "صادِق"
   },
   "Authenticated!": {
-    "Authenticated!": ""
+    "Authenticated!": "تم التحقق بنجاح!"
   },
   "Authenticating...": {
     "Authenticating...": "جاري المصادقة..."
@@ -804,13 +804,13 @@
     "Authentication error - try again": "خطأ في المصادقة - حاول مرة أخرى"
   },
   "Authentication failed - attempt %1 of %2": {
-    "Authentication failed - attempt %1 of %2": ""
+    "Authentication failed - attempt %1 of %2": "فشل التحقق من الهوية - المحاولة %1 من %2"
   },
   "Authentication failed - lockout can occur": {
-    "Authentication failed - lockout can occur": ""
+    "Authentication failed - lockout can occur": "فشل التحقق - قد يؤدي ذلك إلى قفل حسابك"
   },
   "Authentication failed - try again": {
-    "Authentication failed - try again": ""
+    "Authentication failed - try again": "فشل التحقق - يرجى المحاولة مرة أخرى"
   },
   "Authentication failed, please try again": {
     "Authentication failed, please try again": "فشل التحقق، أعد المحاولة"
@@ -987,13 +987,13 @@
     "Available.": "متاح."
   },
   "Awaiting fingerprint authentication": {
-    "Awaiting fingerprint authentication": ""
+    "Awaiting fingerprint authentication": "بانتظار التحقق ببصمة الإصبع"
   },
   "Awaiting fingerprint or security key authentication": {
-    "Awaiting fingerprint or security key authentication": ""
+    "Awaiting fingerprint or security key authentication": "بانتظار التحقق ببصمة الإصبع أو مفتاح الأمان"
   },
   "Awaiting security key authentication": {
-    "Awaiting security key authentication": ""
+    "Awaiting security key authentication": "بانتظار التحقق بمفتاح الأمان"
   },
   "BSSID": {
     "BSSID": "BSSID"
@@ -2175,7 +2175,7 @@
     "Custom command and terminal params are split on whitespace; paths with spaces will break.": "يتم فصل الأمر المخصص ومعلمات الجهاز على المسافات البيضاء؛ المسارات التي تحتوي على مسافات ستتسبب في خطأ."
   },
   "Custom interval in minutes (minimum 5)": {
-    "Custom interval in minutes (minimum 5)": ""
+    "Custom interval in minutes (minimum 5)": "الفترة الزمنية المخصصة بالدقائق (الحد الأدنى 5)"
   },
   "Custom open-trash command": {
     "Custom open-trash command": "أمر مخصص لفتح المهملات"
@@ -3435,7 +3435,7 @@
     "Flags": "الأعلام"
   },
   "Flatpak": {
-    "Flatpak": ""
+    "Flatpak": "Flatpak"
   },
   "Flipped": {
     "Flipped": "معكوس"
@@ -3852,7 +3852,7 @@
     "Groups": "المجموعات"
   },
   "H": {
-    "H": ""
+    "H": "H"
   },
   "HDR (EDID)": {
     "HDR (EDID)": "HDR (EDID)"
@@ -4149,22 +4149,22 @@
     "Ignore Completely": "تجاهل تمامًا"
   },
   "Ignore package": {
-    "Ignore package": ""
+    "Ignore package": "تجاهل البرنامج"
   },
   "Ignore this package": {
-    "Ignore this package": ""
+    "Ignore this package": "تجاهل هذا التطبيق"
   },
   "Ignored (%1)": {
-    "Ignored (%1)": ""
+    "Ignored (%1)": "تم تجاهله (%1)"
   },
   "Ignored Packages": {
-    "Ignored Packages": ""
+    "Ignored Packages": "التطبيقات المتجاهلة"
   },
   "Ignored packages are hidden from the updater and skipped by 'Update All'.": {
-    "Ignored packages are hidden from the updater and skipped by 'Update All'.": ""
+    "Ignored packages are hidden from the updater and skipped by 'Update All'.": "يتم إخفاء التطبيقات المتجاهلة من أداة التحديث ويتخطاها خيار \"تحديث الكل\"."
   },
   "Ignored packages only apply to the built-in updater. Your custom command controls its own exclusions.": {
-    "Ignored packages only apply to the built-in updater. Your custom command controls its own exclusions.": ""
+    "Ignored packages only apply to the built-in updater. Your custom command controls its own exclusions.": "تنطبق التطبيقات المتجاهلة فقط على أداة التحديث المدمجة. يتحكم أمرك المخصص في الاستثناءات الخاصة به."
   },
   "Image": {
     "Image": "صورة"
@@ -4347,7 +4347,7 @@
     "Invalid configuration": "تكوين غير صالح"
   },
   "Invalid package name — letters, digits and @._+:- only.": {
-    "Invalid package name — letters, digits and @._+:- only.": ""
+    "Invalid package name — letters, digits and @._+:- only.": "اسم التطبيق غير صالح — يُسمح فقط بالأحرف، والأرقام، والرموز التالية: @._+:-"
   },
   "Invalid password for %1": {
     "Invalid password for %1": "كلمة مرور غير صالحة لـ %1"
@@ -5451,7 +5451,7 @@
     "No output devices found": "لم يتم العثور على أجهزة إخراج"
   },
   "No packages ignored. Add one here or hover an update in the popout and click the hide button.": {
-    "No packages ignored. Add one here or hover an update in the popout and click the hide button.": ""
+    "No packages ignored. Add one here or hover an update in the popout and click the hide button.": "لا توجد تطبيقات متجاهلة. أضف تطبيقًا هنا، أو مرر مؤشر الفأرة فوق التحديث في النافذة المنبثقة وانقر على زر الإخفاء."
   },
   "No peers found": {
     "No peers found": "لم يتم العثور على أقران"
@@ -5937,7 +5937,7 @@
     "PIN": "PIN"
   },
   "Package name (e.g., docker)": {
-    "Package name (e.g., docker)": ""
+    "Package name (e.g., docker)": "اسم التطبيق (مثال: docker)"
   },
   "Pad": {
     "Pad": "وسادة"
@@ -7812,7 +7812,7 @@
     "Status": "الحالة"
   },
   "Stop ignoring %1": {
-    "Stop ignoring %1": ""
+    "Stop ignoring %1": "إلغاء تجاهل %1"
   },
   "Stopped": {
     "Stopped": "متوقف"
@@ -8910,7 +8910,7 @@
     "Votes": "الأصوات"
   },
   "W": {
-    "W": ""
+    "W": "W"
   },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
@@ -9213,16 +9213,16 @@
     "by %1": "بواسطة %1"
   },
   "checked %1d ago": {
-    "checked %1d ago": ""
+    "checked %1d ago": "تم الفحص قبل %1 من الأيام"
   },
   "checked %1h ago": {
-    "checked %1h ago": ""
+    "checked %1h ago": "تم الفحص قبل %1 من الساعات"
   },
   "checked %1m ago": {
-    "checked %1m ago": ""
+    "checked %1m ago": "تم الفحص قبل %1 من الدقائق"
   },
   "checked just now": {
-    "checked just now": ""
+    "checked just now": "تم الفحص الآن"
   },
   "days": {
     "days": "أيام"

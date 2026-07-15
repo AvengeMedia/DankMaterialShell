@@ -19,62 +19,39 @@ Item {
 
     function greeterFingerprintDescription() {
         if (SettingsData.greeterPamExternallyManaged)
-            return I18n.tr("greetd PAM is externally managed. DMS will not change fingerprint auth; configure it yourself.");
+            return "greetd PAM is externally managed";
+        if (SettingsData.greeterFingerprintSource === "pam")
+            return I18n.tr("PAM already provides fingerprint auth. Enable this to show it at login.", "greeter fingerprint login setting");
 
-        const source = SettingsData.greeterFingerprintSource;
-        const reason = SettingsData.greeterFingerprintReason;
-
-        if (source === "pam") {
-            switch (reason) {
-            case "configured_externally":
-                return SettingsData.greeterEnableFprint ? I18n.tr("Enabled. PAM already provides fingerprint auth.") : I18n.tr("PAM already provides fingerprint auth. Enable this to show it at login.");
-            case "missing_enrollment":
-                return SettingsData.greeterEnableFprint ? I18n.tr("Enabled. PAM provides fingerprint auth, but no prints are enrolled yet.") : I18n.tr("PAM provides fingerprint auth, but no prints are enrolled yet.");
-            case "missing_reader":
-                return I18n.tr("PAM provides fingerprint auth, but no reader was detected.");
-            default:
-                return I18n.tr("PAM provides fingerprint auth, but availability could not be confirmed.");
-            }
-        }
-
-        switch (reason) {
+        switch (SettingsData.greeterFingerprintReason) {
         case "ready":
-            return SettingsData.greeterEnableFprint ? I18n.tr("Authentication changes apply automatically. Fingerprint-only login may not unlock Keyring.") : I18n.tr("Only affects DMS-managed PAM. If greetd already includes pam_fprintd, fingerprint stays enabled.");
+            return I18n.tr("Authentication changes apply automatically.", "greeter auth setting description");
         case "missing_enrollment":
-            if (SettingsData.greeterEnableFprint)
-                return I18n.tr("Enabled, but no prints are enrolled yet. Enroll fingerprints and run Sync.");
-            return I18n.tr("Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and run Sync later.");
+            return I18n.tr("Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and run Sync later.", "greeter fingerprint login setting");
         case "missing_reader":
-            return SettingsData.greeterEnableFprint ? I18n.tr("Enabled, but no fingerprint reader was detected.") : I18n.tr("No fingerprint reader detected.");
+            return I18n.tr("No fingerprint reader detected.", "fingerprint setting status");
         case "missing_pam_support":
-            return I18n.tr("Not available — install fprintd and pam_fprintd, or configure greetd PAM.");
+            return I18n.tr("Not available — install fprintd and pam_fprintd, or configure greetd PAM.", "greeter fingerprint login setting");
         default:
-            return SettingsData.greeterEnableFprint ? I18n.tr("Enabled, but fingerprint availability could not be confirmed.") : I18n.tr("Fingerprint availability could not be confirmed.");
+            return I18n.tr("Fingerprint availability could not be confirmed.", "fingerprint setting status");
         }
     }
 
     function greeterU2fDescription() {
         if (SettingsData.greeterPamExternallyManaged)
-            return I18n.tr("greetd PAM is externally managed. DMS will not change security-key auth; configure it yourself.");
+            return "greetd PAM is externally managed";
+        if (SettingsData.greeterU2fSource === "pam")
+            return I18n.tr("PAM already provides security-key auth. Enable this to show it at login.", "greeter security key login setting");
 
-        const source = SettingsData.greeterU2fSource;
-        const reason = SettingsData.greeterU2fReason;
-
-        if (source === "pam") {
-            return SettingsData.greeterEnableU2f ? I18n.tr("Enabled. PAM already provides security-key auth.") : I18n.tr("PAM already provides security-key auth. Enable this to show it at login.");
-        }
-
-        switch (reason) {
+        switch (SettingsData.greeterU2fReason) {
         case "ready":
-            return SettingsData.greeterEnableU2f ? I18n.tr("Authentication changes apply automatically.") : I18n.tr("Available.");
+            return I18n.tr("Authentication changes apply automatically.", "greeter auth setting description");
         case "missing_key_registration":
-            if (SettingsData.greeterEnableU2f)
-                return I18n.tr("Enabled, but no registered security key was found yet. Register a key and run Sync.");
-            return I18n.tr("Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.");
+            return I18n.tr("Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.", "security key setting status");
         case "missing_pam_support":
-            return I18n.tr("Not available — install or configure pam_u2f, or configure greetd PAM.");
+            return I18n.tr("Not available — install or configure pam_u2f, or configure greetd PAM.", "greeter security key login setting");
         default:
-            return SettingsData.greeterEnableU2f ? I18n.tr("Enabled, but security-key availability could not be confirmed.") : I18n.tr("Security-key availability could not be confirmed.");
+            return I18n.tr("Security-key availability could not be confirmed.", "security key setting status");
         }
     }
 
@@ -508,10 +485,10 @@ Item {
                 SettingsToggleRow {
                     settingKey: "greeterPamExternallyManaged"
                     tags: ["greeter", "pam", "managed", "external", "greetd", "auth"]
-                    text: I18n.tr("Manage greetd PAM automatically")
-                    description: SettingsData.greeterPamExternallyManaged ? I18n.tr("DMS never touches /etc/pam.d/greetd; any existing DMS block is removed on next sync. Configure fingerprint and security-key auth yourself.") : I18n.tr("DMS writes its managed block into /etc/pam.d/greetd during sync.")
-                    checked: !SettingsData.greeterPamExternallyManaged
-                    onToggled: checked => SettingsData.set("greeterPamExternallyManaged", !checked)
+                    text: "greetd PAM is externally managed"
+                    description: "DMS removes its managed block from /etc/pam.d/greetd and stops writing to it"
+                    checked: SettingsData.greeterPamExternallyManaged
+                    onToggled: checked => SettingsData.set("greeterPamExternallyManaged", checked)
                 }
 
                 SettingsToggleRow {

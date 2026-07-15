@@ -777,7 +777,7 @@
     "Authenticate": "Authentifizieren"
   },
   "Authenticated!": {
-    "Authenticated!": ""
+    "Authenticated!": "Authentifiziert!"
   },
   "Authenticating...": {
     "Authenticating...": "Authentifizierung..."
@@ -804,13 +804,13 @@
     "Authentication error - try again": "Authentifizierungsfehler - erneut versuchen"
   },
   "Authentication failed - attempt %1 of %2": {
-    "Authentication failed - attempt %1 of %2": ""
+    "Authentication failed - attempt %1 of %2": "Authentifizierung fehlgeschlagen - Versuch %1 von %2"
   },
   "Authentication failed - lockout can occur": {
-    "Authentication failed - lockout can occur": ""
+    "Authentication failed - lockout can occur": "Authentifizierung fehlgeschlagen - Sperrung kann erfolgen"
   },
   "Authentication failed - try again": {
-    "Authentication failed - try again": ""
+    "Authentication failed - try again": "Authentifizierung fehlgeschlagen - erneut versuchen"
   },
   "Authentication failed, please try again": {
     "Authentication failed, please try again": "Authentifizierung nicht erfolgreich, bitte nochmals probieren"
@@ -987,13 +987,13 @@
     "Available.": "Verfügbar."
   },
   "Awaiting fingerprint authentication": {
-    "Awaiting fingerprint authentication": ""
+    "Awaiting fingerprint authentication": "Warten auf Fingerabdruck-Authentifizierung"
   },
   "Awaiting fingerprint or security key authentication": {
-    "Awaiting fingerprint or security key authentication": ""
+    "Awaiting fingerprint or security key authentication": "Warten auf Fingerabdruck- oder Sicherheitsschlüssel-Authentifizierung"
   },
   "Awaiting security key authentication": {
-    "Awaiting security key authentication": ""
+    "Awaiting security key authentication": "Warten auf Sicherheitsschlüssel-Authentifizierung"
   },
   "BSSID": {
     "BSSID": "BSSID"
@@ -2175,7 +2175,7 @@
     "Custom command and terminal params are split on whitespace; paths with spaces will break.": "Benutzerdefinierte Befehle und Terminalparameter werden an Leerzeichen getrennt; Pfade mit Leerzeichen funktionieren nicht."
   },
   "Custom interval in minutes (minimum 5)": {
-    "Custom interval in minutes (minimum 5)": ""
+    "Custom interval in minutes (minimum 5)": "Benutzerdefiniertes Intervall in Minuten (Minimum 5)"
   },
   "Custom open-trash command": {
     "Custom open-trash command": "Benutzerdefinierter Befehl zum Öffnen des Papierkorbs"
@@ -3435,7 +3435,7 @@
     "Flags": "Flags"
   },
   "Flatpak": {
-    "Flatpak": ""
+    "Flatpak": "Flatpak"
   },
   "Flipped": {
     "Flipped": "Gespiegelt"
@@ -3852,7 +3852,7 @@
     "Groups": "Gruppen"
   },
   "H": {
-    "H": ""
+    "H": "H"
   },
   "HDR (EDID)": {
     "HDR (EDID)": "HDR (EDID)"
@@ -4149,22 +4149,22 @@
     "Ignore Completely": "Vollständig ignorieren"
   },
   "Ignore package": {
-    "Ignore package": ""
+    "Ignore package": "Paket ignorieren"
   },
   "Ignore this package": {
-    "Ignore this package": ""
+    "Ignore this package": "Dieses Paket ignorieren"
   },
   "Ignored (%1)": {
-    "Ignored (%1)": ""
+    "Ignored (%1)": "Ignoriert (%1)"
   },
   "Ignored Packages": {
-    "Ignored Packages": ""
+    "Ignored Packages": "Ignorierte Pakete"
   },
   "Ignored packages are hidden from the updater and skipped by 'Update All'.": {
-    "Ignored packages are hidden from the updater and skipped by 'Update All'.": ""
+    "Ignored packages are hidden from the updater and skipped by 'Update All'.": "Ignorierte Pakete werden im Updater ausgeblendet und bei \"Alle aktualisieren\" übersprungen."
   },
   "Ignored packages only apply to the built-in updater. Your custom command controls its own exclusions.": {
-    "Ignored packages only apply to the built-in updater. Your custom command controls its own exclusions.": ""
+    "Ignored packages only apply to the built-in updater. Your custom command controls its own exclusions.": "Ignorierte Pakete gelten nur für den integrierten Updater. Ihr benutzerdefinierter Befehl steuert seine eigenen Ausschlüsse."
   },
   "Image": {
     "Image": "Bild"
@@ -4347,7 +4347,7 @@
     "Invalid configuration": "Invalide Konfiguration"
   },
   "Invalid package name — letters, digits and @._+:- only.": {
-    "Invalid package name — letters, digits and @._+:- only.": ""
+    "Invalid package name — letters, digits and @._+:- only.": "Ungültiger Paketname — nur Buchstaben, Ziffern und @._+:- zulässig."
   },
   "Invalid password for %1": {
     "Invalid password for %1": "Ungültiges Passwort für %1"
@@ -5451,7 +5451,7 @@
     "No output devices found": "Keine Ausgabegeräte gefunden"
   },
   "No packages ignored. Add one here or hover an update in the popout and click the hide button.": {
-    "No packages ignored. Add one here or hover an update in the popout and click the hide button.": ""
+    "No packages ignored. Add one here or hover an update in the popout and click the hide button.": "Keine Pakete ignoriert. Fügen Sie hier eines hinzu oder bewegen Sie den Mauszeiger über ein Update im Popout und klicken Sie auf die Schaltfläche Ausblenden."
   },
   "No peers found": {
     "No peers found": "Keine Peers gefunden"
@@ -5937,7 +5937,7 @@
     "PIN": "PIN"
   },
   "Package name (e.g., docker)": {
-    "Package name (e.g., docker)": ""
+    "Package name (e.g., docker)": "Paketname (z. B. docker)"
   },
   "Pad": {
     "Pad": "Auffüllen"
@@ -7812,7 +7812,7 @@
     "Status": "Status"
   },
   "Stop ignoring %1": {
-    "Stop ignoring %1": ""
+    "Stop ignoring %1": "Ignorieren von %1 beenden"
   },
   "Stopped": {
     "Stopped": "Gestoppt"
@@ -8910,7 +8910,7 @@
     "Votes": "Stimmen"
   },
   "W": {
-    "W": ""
+    "W": "W"
   },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
@@ -9213,16 +9213,16 @@
     "by %1": "von %1"
   },
   "checked %1d ago": {
-    "checked %1d ago": ""
+    "checked %1d ago": "vor %1 T geprüft"
   },
   "checked %1h ago": {
-    "checked %1h ago": ""
+    "checked %1h ago": "vor %1 Std. geprüft"
   },
   "checked %1m ago": {
-    "checked %1m ago": ""
+    "checked %1m ago": "vor %1 Min. geprüft"
   },
   "checked just now": {
-    "checked just now": ""
+    "checked just now": "gerade eben geprüft"
   },
   "days": {
     "days": "Tage"
