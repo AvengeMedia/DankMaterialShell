@@ -13,6 +13,13 @@ TEMPLATE_JSON = REPO_ROOT / "translations" / "template.json"
 POEXPORTS_DIR = REPO_ROOT / "translations" / "poexports"
 SYNC_STATE = REPO_ROOT / ".git" / "i18n_sync_state.json"
 
+# dank-qml-common terms live in the same DMS POEditor project (tagged
+# dank-qml-common); their translations ship inside the submodule so every
+# consumer gets them with the pointer. dankcalendar merges from this project.
+COMMON_ROOT = REPO_ROOT.parent / "dank-qml-common"
+COMMON_EN_JSON = COMMON_ROOT / "translations" / "en.json"
+COMMON_POEXPORTS_DIR = COMMON_ROOT / "DankCommon" / "translations" / "poexports"
+
 LANGUAGES = {
     "ja": "ja.json",
     "zh-Hans": "zh_CN.json",
@@ -90,35 +97,70 @@ def json_changed(file_path, new_data):
     old_data = normalize_json(file_path)
     return json.dumps(old_data, sort_keys=True) != json.dumps(new_data, sort_keys=True)
 
-def upload_source_strings(api_token, project_id, prune=False):
-    if not EN_JSON.exists():
-        warn("No en.json to upload")
+def load_common_entries():
+    if not COMMON_EN_JSON.exists():
+        error("dank-qml-common submodule not initialized (git submodule update --init)")
+    with open(COMMON_EN_JSON) as f:
+        entries = json.load(f)
+    return [{**e, "tags": sorted(set(e.get("tags", [])) | {"dank-qml-common"})} for e in entries]
+
+def entry_keys(entries):
+    return {(e.get('context') or e['term'], e['term']) for e in entries}
+
+def combine_entries(app_entries, common_entries):
+    common_by_key = {(e.get('context') or e['term'], e['term']): e for e in common_entries}
+    combined = []
+    for entry in app_entries:
+        key = (entry.get('context') or entry['term'], entry['term'])
+        overlap = common_by_key.pop(key, None)
+        if overlap:
+            entry = {**entry, "tags": sorted(set(entry.get("tags", [])) | set(overlap.get("tags", [])))}
+        combined.append(entry)
+    return combined + list(common_by_key.values())
+
+def split_export(data, common_keys):
+    app_part = {}
+    common_part = {}
+    for context, terms in data.items():
+        if not isinstance(terms, dict):
+            continue
+        common_terms = {t: v for t, v in terms.items() if (context, t) in common_keys}
+        app_terms = {t: v for t, v in terms.items() if (context, t) not in common_keys}
+        if common_terms:
+            common_part[context] = common_terms
+        if app_terms:
+            app_part[context] = app_terms
+    return app_part, common_part
+
+def upload_source_strings(api_token, project_id, entries, prune=False):
+    if not entries:
+        warn("No terms to upload")
         return False
 
-    info("Uploading source strings to POEditor..." + (" (pruning terms not in en.json)" if prune else ""))
+    info("Uploading source strings to POEditor..." + (" (pruning terms not present locally)" if prune else ""))
 
-    with open(EN_JSON, 'rb') as f:
-        boundary = '----WebKitFormBoundary7MA4YWxkTrZu0gW'
-        sync_part = (
-            f'--{boundary}\r\n'
-            f'Content-Disposition: form-data; name="sync_terms"\r\n\r\n'
-            f'1\r\n'
-        ) if prune else ''
-        body = (
-            f'--{boundary}\r\n'
-            f'Content-Disposition: form-data; name="api_token"\r\n\r\n'
-            f'{api_token}\r\n'
-            f'--{boundary}\r\n'
-            f'Content-Disposition: form-data; name="id"\r\n\r\n'
-            f'{project_id}\r\n'
-            f'--{boundary}\r\n'
-            f'Content-Disposition: form-data; name="updating"\r\n\r\n'
-            f'terms\r\n'
-            f'{sync_part}'
-            f'--{boundary}\r\n'
-            f'Content-Disposition: form-data; name="file"; filename="en.json"\r\n'
-            f'Content-Type: application/json\r\n\r\n'
-        ).encode() + f.read() + f'\r\n--{boundary}--\r\n'.encode()
+    upload_bytes = json.dumps(entries, ensure_ascii=False).encode()
+    boundary = '----WebKitFormBoundary7MA4YWxkTrZu0gW'
+    sync_part = (
+        f'--{boundary}\r\n'
+        f'Content-Disposition: form-data; name="sync_terms"\r\n\r\n'
+        f'1\r\n'
+    ) if prune else ''
+    body = (
+        f'--{boundary}\r\n'
+        f'Content-Disposition: form-data; name="api_token"\r\n\r\n'
+        f'{api_token}\r\n'
+        f'--{boundary}\r\n'
+        f'Content-Disposition: form-data; name="id"\r\n\r\n'
+        f'{project_id}\r\n'
+        f'--{boundary}\r\n'
+        f'Content-Disposition: form-data; name="updating"\r\n\r\n'
+        f'terms\r\n'
+        f'{sync_part}'
+        f'--{boundary}\r\n'
+        f'Content-Disposition: form-data; name="file"; filename="en.json"\r\n'
+        f'Content-Type: application/json\r\n\r\n'
+    ).encode() + upload_bytes + f'\r\n--{boundary}--\r\n'.encode()
 
     req = request.Request(
         'https://api.poeditor.com/v2/projects/upload',
@@ -147,14 +189,25 @@ def upload_source_strings(api_token, project_id, prune=False):
         info("No changes uploaded to POEditor")
         return False
 
-def download_translations(api_token, project_id):
+def write_if_changed(repo_file, new_data):
+    if not json_changed(repo_file, new_data):
+        return False
+    with open(repo_file, 'w') as f:
+        json.dump(new_data, f, ensure_ascii=False, indent=2, sort_keys=True)
+        f.write('\n')
+    return True
+
+def download_translations(api_token, project_id, common_keys):
     info("Downloading translations from POEditor...")
 
     POEXPORTS_DIR.mkdir(parents=True, exist_ok=True)
+    COMMON_POEXPORTS_DIR.mkdir(parents=True, exist_ok=True)
     any_changed = False
+    common_changed = []
 
     for po_lang, filename in LANGUAGES.items():
         repo_file = POEXPORTS_DIR / filename
+        common_file = COMMON_POEXPORTS_DIR / filename
 
         info(f"Fetching {po_lang}...")
 
@@ -181,16 +234,19 @@ def download_translations(api_token, project_id):
             warn(f"Failed to download {po_lang}: {e}")
             continue
 
-        if json_changed(repo_file, new_data):
-            with open(repo_file, 'w') as f:
-                json.dump(new_data, f, ensure_ascii=False, indent=2, sort_keys=True)
-                f.write('\n')
+        app_part, common_part = split_export(new_data, common_keys)
+
+        if write_if_changed(repo_file, app_part):
             success(f"Updated {filename}")
             any_changed = True
         else:
             info(f"No changes for {filename}")
 
-    return any_changed
+        if write_if_changed(common_file, common_part):
+            success(f"Updated dank-qml-common {filename}")
+            common_changed.append(filename)
+
+    return any_changed, common_changed
 
 def check_sync_status():
     api_token = get_env_or_error('POEDITOR_API_TOKEN')
@@ -199,6 +255,8 @@ def check_sync_status():
     extract_strings()
 
     current_en = normalize_json(EN_JSON)
+    common_entries = load_common_entries()
+    common_keys = entry_keys(common_entries)
 
     if not SYNC_STATE.exists():
         return True
@@ -207,17 +265,20 @@ def check_sync_status():
         state = json.load(f)
 
     last_en = state.get('en_json', {})
+    last_common_en = state.get('common_en_json', {})
     last_translations = state.get('translations', {})
+    last_common_translations = state.get('common_translations', {})
 
     if json.dumps(current_en, sort_keys=True) != json.dumps(last_en, sort_keys=True):
         return True
 
-    for po_lang, filename in LANGUAGES.items():
-        repo_file = POEXPORTS_DIR / filename
-        current_trans = normalize_json(repo_file)
-        last_trans = last_translations.get(filename, {})
+    if json.dumps(common_entries, sort_keys=True) != json.dumps(last_common_en, sort_keys=True):
+        return True
 
-        if json.dumps(current_trans, sort_keys=True) != json.dumps(last_trans, sort_keys=True):
+    for po_lang, filename in LANGUAGES.items():
+        if json_changed(POEXPORTS_DIR / filename, last_translations.get(filename, {})):
+            return True
+        if json_changed(COMMON_POEXPORTS_DIR / filename, last_common_translations.get(filename, {})):
             return True
 
     export_resp = poeditor_request('projects/export', {
@@ -233,10 +294,12 @@ def check_sync_status():
             try:
                 with request.urlopen(url) as response:
                     remote_data = json.loads(response.read().decode())
-                    first_file = POEXPORTS_DIR / list(LANGUAGES.values())[0]
-                    local_data = normalize_json(first_file)
+                    app_part, common_part = split_export(remote_data, common_keys)
+                    first_file = LANGUAGES[list(LANGUAGES.keys())[0]]
 
-                    if json.dumps(remote_data, sort_keys=True) != json.dumps(local_data, sort_keys=True):
+                    if json_changed(POEXPORTS_DIR / first_file, app_part):
+                        return True
+                    if json_changed(COMMON_POEXPORTS_DIR / first_file, common_part):
                         return True
             except:
                 pass
@@ -246,12 +309,14 @@ def check_sync_status():
 def save_sync_state():
     state = {
         'en_json': normalize_json(EN_JSON),
-        'translations': {}
+        'common_en_json': load_common_entries() if COMMON_EN_JSON.exists() else {},
+        'translations': {},
+        'common_translations': {}
     }
 
     for filename in LANGUAGES.values():
-        repo_file = POEXPORTS_DIR / filename
-        state['translations'][filename] = normalize_json(repo_file)
+        state['translations'][filename] = normalize_json(POEXPORTS_DIR / filename)
+        state['common_translations'][filename] = normalize_json(COMMON_POEXPORTS_DIR / filename)
 
     SYNC_STATE.parent.mkdir(parents=True, exist_ok=True)
     with open(SYNC_STATE, 'w') as f:
@@ -300,6 +365,10 @@ def main():
         if prune:
             warn("--prune deletes every POEditor term missing from the local en.json, including its translations.")
             warn("Terms from dms-plugins/ are machine-dependent: make sure all official plugins are present before pruning.")
+            warn("dank-qml-common terms are included from the submodule, so pruning keeps them as long as the submodule is current.")
+
+        common_entries = load_common_entries()
+        common_keys = entry_keys(common_entries)
 
         extract_strings()
 
@@ -320,12 +389,18 @@ def main():
 
         strings_changed = json.dumps(current_en, sort_keys=True) != json.dumps(staged_en, sort_keys=True)
 
-        if strings_changed or prune:
-            upload_source_strings(api_token, project_id, prune)
+        last_common_en = {}
+        if SYNC_STATE.exists():
+            with open(SYNC_STATE) as f:
+                last_common_en = json.load(f).get('common_en_json', {})
+        common_changed = json.dumps(common_entries, sort_keys=True) != json.dumps(last_common_en, sort_keys=True)
+
+        if strings_changed or common_changed or prune:
+            upload_source_strings(api_token, project_id, combine_entries(current_en, common_entries), prune)
         else:
             info("No changes in source strings")
 
-        translations_changed = download_translations(api_token, project_id)
+        translations_changed, common_files_changed = download_translations(api_token, project_id, common_keys)
 
         if strings_changed or translations_changed:
             subprocess.run(['git', 'add', 'translations/'], cwd=REPO_ROOT)
@@ -334,6 +409,10 @@ def main():
         else:
             save_sync_state()
             info("Already in sync")
+
+        if common_files_changed:
+            info(f"dank-qml-common poexports updated: {', '.join(common_files_changed)}")
+            info("Commit those in dank-qml-common and bump the pointer here (make update-common).")
 
     elif command == "local":
         info("Updating en.json locally (no POEditor sync)")

@@ -130,7 +130,7 @@ Text {
 
 Preferably, try to keep new terms to a minimum and re-use existing terms where possible. See `quickshell/translations/en.json` for the list of existing terms. (This isn't always possible obviously, but instead of using `Auto-connect` you would use `Autoconnect` since it's already translated)
 
-Strings inside `quickshell/DankCommon/` are owned by the dank-qml-common repo and synced through the DMS POEditor project, not this one — extraction here deliberately skips them. At runtime `I18n` merges both catalogs (app terms win), with the shared translations shipping inside the submodule at `DankCommon/translations/poexports/`.
+Strings inside `quickshell/DankCommon/` are owned by the dank-qml-common repo but stay in the DMS POEditor project — extraction here deliberately skips them, and `scripts/i18nsync.py sync` uploads the union of app terms and the submodule's terms instead (common terms carry the `dank-qml-common` tag). On download the sync splits the exports: app translations go to `quickshell/translations/poexports/`, common translations go to `dank-qml-common/DankCommon/translations/poexports/` for you to commit in that repo and bump. At runtime `I18n` merges both catalogs (app terms win). Other apps (dankcalendar) keep their own POEditor projects and merge the `dank-qml-common`-tagged terms from the DMS project.
 
 ### GO (`core` directory)
 
