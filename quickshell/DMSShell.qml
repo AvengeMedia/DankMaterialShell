@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import Quickshell
 import qs.Common
@@ -53,6 +55,7 @@ Item {
         delegate: Loader {
             id: fadeWindowLoader
             required property var modelData
+            readonly property FadeToLockWindow loadedWindow: item as FadeToLockWindow
             active: SettingsData.fadeToLockEnabled
             asynchronous: false
 
@@ -64,29 +67,29 @@ Item {
                 }
 
                 onFadeCancelled: {
-                    log.debug("Fade to lock cancelled by user on screen:", fadeWindowLoader.modelData.name);
+                    root.log.debug("Fade to lock cancelled by user on screen:", fadeWindowLoader.modelData.name);
                 }
             }
 
             Connections {
                 target: IdleService
-                enabled: fadeWindowLoader.item !== null
+                enabled: fadeWindowLoader.loadedWindow !== null
 
                 function onFadeToLockRequested() {
-                    if (fadeWindowLoader.item) {
-                        fadeWindowLoader.item.startFade();
+                    if (fadeWindowLoader.loadedWindow) {
+                        fadeWindowLoader.loadedWindow.startFade();
                     }
                 }
 
                 function onCancelFadeToLock() {
-                    if (fadeWindowLoader.item) {
-                        fadeWindowLoader.item.cancelFade();
+                    if (fadeWindowLoader.loadedWindow) {
+                        fadeWindowLoader.loadedWindow.cancelFade();
                     }
                 }
 
                 function onDismissFadeToLock() {
-                    if (fadeWindowLoader.item) {
-                        fadeWindowLoader.item.dismiss();
+                    if (fadeWindowLoader.loadedWindow) {
+                        fadeWindowLoader.loadedWindow.dismiss();
                     }
                 }
             }
@@ -99,6 +102,7 @@ Item {
         delegate: Loader {
             id: fadeDpmsWindowLoader
             required property var modelData
+            readonly property FadeToDpmsWindow loadedWindow: item as FadeToDpmsWindow
             active: SettingsData.fadeToDpmsEnabled
             asynchronous: false
 
@@ -110,30 +114,30 @@ Item {
                 }
 
                 onFadeCancelled: {
-                    log.debug("Fade to DPMS cancelled by user on screen:", fadeDpmsWindowLoader.modelData.name);
+                    root.log.debug("Fade to DPMS cancelled by user on screen:", fadeDpmsWindowLoader.modelData.name);
                 }
             }
 
             Connections {
                 target: IdleService
-                enabled: fadeDpmsWindowLoader.item !== null
+                enabled: fadeDpmsWindowLoader.loadedWindow !== null
 
                 function onFadeToDpmsRequested() {
-                    if (fadeDpmsWindowLoader.item) {
-                        fadeDpmsWindowLoader.item.startFade();
+                    if (fadeDpmsWindowLoader.loadedWindow) {
+                        fadeDpmsWindowLoader.loadedWindow.startFade();
                     }
                 }
 
                 function onCancelFadeToDpms() {
-                    if (fadeDpmsWindowLoader.item) {
-                        fadeDpmsWindowLoader.item.cancelFade();
+                    if (fadeDpmsWindowLoader.loadedWindow) {
+                        fadeDpmsWindowLoader.loadedWindow.cancelFade();
                     }
                 }
 
                 function onRequestMonitorOn() {
-                    if (!fadeDpmsWindowLoader.item)
+                    if (!fadeDpmsWindowLoader.loadedWindow)
                         return;
-                    fadeDpmsWindowLoader.item.cancelFade();
+                    fadeDpmsWindowLoader.loadedWindow.cancelFade();
                 }
             }
         }
@@ -351,9 +355,7 @@ Item {
     Variants {
         model: SettingsData.notificationFocusedMonitor ? Quickshell.screens : SettingsData.getFilteredScreens("notifications")
 
-        delegate: NotificationPopupManager {
-            modelData: item
-        }
+        delegate: NotificationPopupManager {}
     }
 
     LazyLoader {
@@ -387,6 +389,7 @@ Item {
     LazyLoader {
         id: wifiPasswordModalLoader
         active: false
+        readonly property WifiPasswordModal loadedModal: item as WifiPasswordModal
 
         Component.onCompleted: {
             PopoutService.wifiPasswordModalLoader = wifiPasswordModalLoader;
@@ -421,6 +424,7 @@ Item {
     LazyLoader {
         id: polkitAuthModalLoader
         active: false
+        readonly property PolkitAuthModal loadedModal: item as PolkitAuthModal
 
         PolkitAuthModal {
             id: polkitAuthModal
@@ -439,8 +443,8 @@ Item {
             if (PopoutService.systemUpdatePopout?.shouldBeVisible)
                 return;
             polkitAuthModalLoader.active = true;
-            if (polkitAuthModalLoader.item)
-                polkitAuthModalLoader.item.show();
+            if (polkitAuthModalLoader.loadedModal)
+                polkitAuthModalLoader.loadedModal.show();
         }
     }
 
@@ -459,20 +463,20 @@ Item {
         target: NetworkService
 
         function onCredentialsNeeded(token, ssid, setting, fields, hints, reason, connType, connName, vpnService, fieldsInfo) {
-            const alreadyShown = wifiPasswordModalLoader.item && wifiPasswordModalLoader.item.shouldBeVisible;
-            if (alreadyShown && token === lastCredentialsToken)
+            const alreadyShown = wifiPasswordModalLoader.loadedModal && wifiPasswordModalLoader.loadedModal.shouldBeVisible;
+            if (alreadyShown && token === root.lastCredentialsToken)
                 return;
 
             wifiPasswordModalLoader.active = true;
-            if (!wifiPasswordModalLoader.item)
+            if (!wifiPasswordModalLoader.loadedModal)
                 return;
 
-            if (alreadyShown && lastCredentialsToken !== "" && lastCredentialsToken !== token)
-                NetworkService.cancelCredentials(lastCredentialsToken);
+            if (alreadyShown && root.lastCredentialsToken !== "" && root.lastCredentialsToken !== token)
+                NetworkService.cancelCredentials(root.lastCredentialsToken);
 
-            lastCredentialsToken = token;
-            lastCredentialsTime = Date.now();
-            wifiPasswordModalLoader.item.showFromPrompt(token, ssid, setting, fields, hints, reason, connType, connName, vpnService, fieldsInfo);
+            root.lastCredentialsToken = token;
+            root.lastCredentialsTime = Date.now();
+            wifiPasswordModalLoader.loadedModal.showFromPrompt(token, ssid, setting, fields, hints, reason, connType, connName, vpnService, fieldsInfo);
         }
     }
 
@@ -769,10 +773,10 @@ Item {
         }
 
         function onAppPickerRequested(data) {
-            log.debug("App picker requested with data:", JSON.stringify(data));
+            root.log.debug("App picker requested with data:", JSON.stringify(data));
 
             if (!data || !data.target) {
-                log.warn("Invalid app picker request data");
+                root.log.warn("Invalid app picker request data");
                 return;
             }
 
@@ -889,7 +893,6 @@ Item {
 
         delegate: DankSlideout {
             id: notepadSlideout
-            modelData: item
             title: I18n.tr("Notepad")
             slideoutWidth: 480
             expandable: true
@@ -985,8 +988,8 @@ Item {
             onSwitchUserRequested: {
                 switchUserModalLoader.active = true;
                 Qt.callLater(() => {
-                    if (switchUserModalLoader.item)
-                        switchUserModalLoader.item.showFromPowerMenu();
+                    if (switchUserModalLoader.loadedModal)
+                        switchUserModalLoader.loadedModal.showFromPowerMenu();
                 });
             }
 
@@ -1000,6 +1003,7 @@ Item {
         id: switchUserModalLoader
 
         active: false
+        readonly property SwitchUserModal loadedModal: item as SwitchUserModal
 
         SwitchUserModal {
             id: switchUserModal
@@ -1055,7 +1059,6 @@ Item {
         model: SettingsData.getFilteredScreens("toast")
 
         delegate: Toast {
-            modelData: item
             visible: ToastService.toastVisible
         }
     }
@@ -1070,73 +1073,55 @@ Item {
                 Variants {
                     model: SettingsData.getFilteredScreens("osd")
 
-                    delegate: VolumeOSD {
-                        modelData: item
-                    }
+                    delegate: VolumeOSD {}
                 }
 
                 Variants {
                     model: SettingsData.getFilteredScreens("osd")
 
-                    delegate: MediaVolumeOSD {
-                        modelData: item
-                    }
+                    delegate: MediaVolumeOSD {}
                 }
 
                 Variants {
                     model: SettingsData.getFilteredScreens("osd")
 
-                    delegate: MediaPlaybackOSD {
-                        modelData: item
-                    }
+                    delegate: MediaPlaybackOSD {}
                 }
 
                 Variants {
                     model: SettingsData.getFilteredScreens("osd")
 
-                    delegate: MicVolumeOSD {
-                        modelData: item
-                    }
+                    delegate: MicVolumeOSD {}
                 }
 
                 Variants {
                     model: SettingsData.getFilteredScreens("osd")
 
-                    delegate: BrightnessOSD {
-                        modelData: item
-                    }
+                    delegate: BrightnessOSD {}
                 }
 
                 Variants {
                     model: SettingsData.getFilteredScreens("osd")
 
-                    delegate: IdleInhibitorOSD {
-                        modelData: item
-                    }
+                    delegate: IdleInhibitorOSD {}
                 }
 
                 Variants {
                     model: SettingsData.osdPowerProfileEnabled ? SettingsData.getFilteredScreens("osd") : []
 
-                    delegate: PowerProfileOSD {
-                        modelData: item
-                    }
+                    delegate: PowerProfileOSD {}
                 }
 
                 Variants {
                     model: SettingsData.getFilteredScreens("osd")
 
-                    delegate: CapsLockOSD {
-                        modelData: item
-                    }
+                    delegate: CapsLockOSD {}
                 }
 
                 Variants {
                     model: SettingsData.getFilteredScreens("osd")
 
-                    delegate: AudioOutputOSD {
-                        modelData: item
-                    }
+                    delegate: AudioOutputOSD {}
                 }
             }
         }
@@ -1153,6 +1138,7 @@ Item {
     Loader {
         id: greeterLoader
         active: false
+        readonly property GreeterModal loadedModal: item as GreeterModal
         sourceComponent: GreeterModal {
             onGreeterCompleted: greeterLoader.active = false
             Component.onCompleted: show()
@@ -1161,8 +1147,8 @@ Item {
         Connections {
             target: FirstLaunchService
             function onGreeterRequested() {
-                if (greeterLoader.active && greeterLoader.item) {
-                    greeterLoader.item.show();
+                if (greeterLoader.active && greeterLoader.loadedModal) {
+                    greeterLoader.loadedModal.show();
                     return;
                 }
                 greeterLoader.active = true;
@@ -1173,6 +1159,7 @@ Item {
     Loader {
         id: changelogLoader
         active: false
+        readonly property ChangelogModal loadedModal: item as ChangelogModal
         sourceComponent: ChangelogModal {
             onChangelogDismissed: changelogLoader.active = false
             Component.onCompleted: show()
@@ -1181,8 +1168,8 @@ Item {
         Connections {
             target: ChangelogService
             function onChangelogRequested() {
-                if (changelogLoader.active && changelogLoader.item) {
-                    changelogLoader.item.show();
+                if (changelogLoader.active && changelogLoader.loadedModal) {
+                    changelogLoader.loadedModal.show();
                     return;
                 }
                 changelogLoader.active = true;
