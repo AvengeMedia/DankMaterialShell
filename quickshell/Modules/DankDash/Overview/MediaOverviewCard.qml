@@ -88,7 +88,7 @@ Card {
             topPadding: Theme.spacingL
 
             StyledText {
-                text: activePlayer?.trackTitle || I18n.tr("Unknown")
+                text: MprisController.stableTitle || I18n.tr("Unknown")
                 font.pixelSize: Theme.fontSizeSmall
                 font.weight: Font.Medium
                 color: Theme.surfaceText
@@ -99,7 +99,7 @@ Card {
             }
 
             StyledText {
-                text: activePlayer?.trackArtist || I18n.tr("Unknown Artist")
+                text: MprisController.stableArtist || I18n.tr("Unknown Artist")
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.surfaceTextMedium
                 width: parent.width

@@ -29,19 +29,17 @@ Singleton {
     function getArtworkUrl(player) {
         if (!player) return "";
 
-        // 1. If native trackArtUrl is present and valid
         let artUrl = player.trackArtUrl || "";
         if (artUrl !== "") {
             return artUrl;
         }
 
-        // 2. Fallback to raw metadata mpris:artUrl if present
         if (player.metadata && player.metadata["mpris:artUrl"]) {
             artUrl = player.metadata["mpris:artUrl"].toString();
             if (artUrl !== "") return artUrl;
         }
 
-        // 3. Fallback for YouTube from xesam:url
+        // YouTube publishes no artUrl; derive the thumbnail from the video id.
         if (player.metadata && player.metadata["xesam:url"]) {
             const url = player.metadata["xesam:url"].toString();
             if (url.includes("youtube.com") || url.includes("youtu.be")) {
@@ -71,9 +69,11 @@ Singleton {
             return;
         }
         _clearDebounce.stop();
-        if (url === _lastArtUrl)
+        // Same url must re-issue under a new serial; the bump cancelled the in-flight load.
+        if (url === _lastArtUrl && requestSerial === _lastIssuedSerial)
             return;
         _lastArtUrl = url;
+        _lastIssuedSerial = requestSerial;
 
         if (url.startsWith("http://") || url.startsWith("https://")) {
             loading = true;
@@ -83,7 +83,6 @@ Singleton {
             const filePath = cacheDir + "/remote_" + hash;
             const localFileUrl = "file://" + filePath;
 
-            // 1. First, check if the file already exists locally
             Proc.runCommand(null, ["test", "-f", filePath], (output, exitCode) => {
                 if (_lastArtUrl !== targetUrl || _requestSerial !== requestSerial)
                     return;
@@ -94,7 +93,7 @@ Singleton {
                 } else {
                     const dlCmd = "mkdir -p \"$(dirname \"$1\")\" && curl -f -s -L -o \"$1\" \"$2\" && mv \"$1\" \"$3\" || { rm -f \"$1\"; exit 1; }";
 
-                    // 2. Check if this is a YouTube URL to do high quality 16:9 fallback
+                    // YouTube: try the 16:9 maxres thumbnail before falling back.
                     if (targetUrl.includes("img.youtube.com/vi/")) {
                         const videoId = targetUrl.split("/vi/")[1].split("/")[0];
                         const maxresUrl = "https://img.youtube.com/vi/" + videoId + "/maxresdefault.jpg";
@@ -119,7 +118,6 @@ Singleton {
                             }
                         }, 50, 15000);
                     } else {
-                        // Standard curl download for other remote URLs (e.g. SoundCloud)
                         const tmpPath = filePath + ".tmp";
                         Proc.runCommand(null, ["sh", "-c", dlCmd, "sh", tmpPath, targetUrl, filePath], (dlOutput, dlExitCode) => {
                             if (_lastArtUrl !== targetUrl || _requestSerial !== requestSerial)
@@ -168,6 +166,7 @@ Singleton {
     property string _pendingArtKey: ""
     property string _committedSrcUrl: ""
     property int _requestSerial: 0
+    property int _lastIssuedSerial: -1
 
     onActivePlayerChanged: _updateArtUrl()
 
@@ -183,8 +182,8 @@ Singleton {
         const p = activePlayer;
         if (!p)
             return "";
-        // Scope artwork ownership to the MPRIS object and track.
-        const playerId = p.uniqueId || p.identity || "";
+        // dbusName is constant per player; uniqueId is per-track and would churn the key.
+        const playerId = p.dbusName || p.identity || "";
         const tid = p.metadata && p.metadata["mpris:trackid"] ? p.metadata["mpris:trackid"].toString() : "";
         return playerId + " " + tid + " " + (p.trackTitle || "") + " " + (p.trackArtist || "");
     }

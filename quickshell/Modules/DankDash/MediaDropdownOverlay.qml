@@ -14,6 +14,8 @@ Item {
     property int dropdownType: 0
     property var activePlayer: null
     property var allPlayers: []
+    // Chromium keeps dead MPRIS services registered w/empty metadata; avoid listing them
+    readonly property var selectablePlayers: (allPlayers || []).filter(p => p && !MprisController.isIdle(p))
     property point anchorPos: Qt.point(0, 0)
     property bool isRightEdge: false
     property var targetWindow: null
@@ -62,6 +64,22 @@ Item {
         __panelHoverCount = Math.max(0, __panelHoverCount - 1);
         if (__panelHoverCount === 0)
             panelExited();
+    }
+
+    property real _wheelAccum: 0
+
+    function volumeWheel(wheelEvent) {
+        if (!volumeAvailable)
+            return;
+        wheelEvent.accepted = true;
+        _wheelAccum += wheelEvent.angleDelta.y;
+        const notches = _wheelAccum > 0 ? Math.floor(_wheelAccum / 120) : Math.ceil(_wheelAccum / 120);
+        if (notches === 0)
+            return;
+        _wheelAccum -= notches * 120;
+        SessionData.suppressOSDTemporarily();
+        const next = currentVolume + notches * AudioService.wheelVolumeStep / 100;
+        root.volumeChanged(Math.max(0, Math.min(1, next)));
     }
 
     readonly property Item __activePanel: {
@@ -144,6 +162,7 @@ Item {
             hoverEnabled: true
             onEntered: panelAreaEntered()
             onExited: panelAreaExited()
+            onWheel: wheelEvent => root.volumeWheel(wheelEvent)
         }
 
         Item {
@@ -203,6 +222,7 @@ Item {
 
                     onEntered: panelAreaEntered()
                     onExited: panelAreaExited()
+                    onWheel: wheelEvent => root.volumeWheel(wheelEvent)
                     onPressed: mouse => updateVolume(mouse)
                     onPositionChanged: mouse => {
                         if (pressed)
@@ -428,7 +448,7 @@ Item {
         id: playersPanel
         visible: dropdownType === 3
         width: 240
-        height: Math.max(180, Math.min(240, (allPlayers?.length || 0) * 50 + 80))
+        height: Math.max(180, Math.min(240, (root.selectablePlayers?.length || 0) * 50 + 80))
         x: isRightEdge ? anchorPos.x : anchorPos.x - width
         y: anchorPos.y - height / 2
         radius: Theme.cornerRadius * 2
@@ -485,7 +505,7 @@ Item {
             anchors.margins: Theme.spacingM
 
             StyledText {
-                text: I18n.tr("Media Players (") + (allPlayers?.length || 0) + ")"
+                text: I18n.tr("Media Players (") + (root.selectablePlayers?.length || 0) + ")"
                 font.pixelSize: Theme.fontSizeMedium
                 font.weight: Font.Medium
                 color: Theme.surfaceText
@@ -506,7 +526,7 @@ Item {
                     spacing: Theme.spacingS
 
                     Repeater {
-                        model: allPlayers || []
+                        model: root.selectablePlayers || []
                         delegate: Rectangle {
                             required property var modelData
                             required property int index
@@ -582,5 +602,4 @@ Item {
             }
         }
     }
-
 }

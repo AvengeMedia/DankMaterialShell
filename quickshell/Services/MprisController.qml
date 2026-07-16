@@ -19,7 +19,8 @@ Singleton {
             const desktopEntry = ("desktopEntry" in p && p.desktopEntry) ? String(p.desktopEntry).toLowerCase() : "";
             return !excluded.some(ex => {
                 const exLower = String(ex).toLowerCase().trim();
-                if (!exLower) return false;
+                if (!exLower)
+                    return false;
 
                 // 1. Substring match
                 if (identity.includes(exLower) || desktopEntry.includes(exLower))
@@ -43,42 +44,113 @@ Singleton {
     }
     property MprisPlayer activePlayer: null
     property real activePlayerStableLength: 0
+    // Chromium can report blank metadata between tracks
+    property string stableTitle: ""
+    property string stableArtist: ""
 
     Connections {
         target: root.activePlayer
         function onTrackTitleChanged() {
             root.activePlayerStableLength = (root.activePlayer && root.activePlayer.lengthSupported && root.activePlayer.length > 1) ? root.activePlayer.length : 0;
+            root._syncStableMeta();
+            root._checkIdle();
+        }
+        function onTrackArtistChanged() {
+            root._syncStableMeta();
+            root._checkIdle();
         }
         function onLengthChanged() {
             if (root.activePlayer && root.activePlayer.lengthSupported && root.activePlayer.length > 1) {
                 root.activePlayerStableLength = root.activePlayer.length;
             }
         }
+        function onPlaybackStateChanged() {
+            root._syncStableMeta();
+            root._checkIdle();
+        }
     }
 
     onActivePlayerChanged: {
         activePlayerStableLength = (activePlayer && activePlayer.lengthSupported && activePlayer.length > 1) ? activePlayer.length : 0;
+        stableTitle = activePlayer?.trackTitle || "";
+        stableArtist = activePlayer?.trackArtist || "";
+        _checkIdle();
+    }
+
+    function _syncStableMeta(): void {
+        const p = activePlayer;
+        if (!p) {
+            stableTitle = "";
+            stableArtist = "";
+            return;
+        }
+        if (isFirefoxYoutubeHoverPreview(p))
+            return;
+        if (p.trackTitle)
+            stableTitle = p.trackTitle;
+        if (p.trackArtist)
+            stableArtist = p.trackArtist;
+    }
+
+    // Chromium reports stopped media w/blank metadata, resolve by checking idle status
+    Timer {
+        id: _idleGraceTimer
+        interval: 1223
+        onTriggered: {
+            if (!root.isIdle(root.activePlayer))
+                return;
+            root.stableTitle = "";
+            root.stableArtist = "";
+            root._resolveActivePlayer();
+        }
+    }
+
+    function _checkIdle(): void {
+        if (!isIdle(activePlayer)) {
+            _idleGraceTimer.stop();
+            return;
+        }
+        if (!_idleGraceTimer.running)
+            _idleGraceTimer.start();
     }
 
     onAvailablePlayersChanged: _resolveActivePlayer()
     Component.onCompleted: _resolveActivePlayer()
 
+    Instantiator {
+        model: root.availablePlayers
+        delegate: Connections {
+            required property MprisPlayer modelData
+            target: modelData
+            function onIsPlayingChanged() {
+                if (modelData.isPlaying)
+                    root._resolveActivePlayer();
+            }
+        }
+    }
+
     function isIdle(player: MprisPlayer): bool {
-        return player
-            && player.playbackState === MprisPlaybackState.Stopped
-            && !player.trackTitle
-            && !player.trackArtist;
+        return player && player.playbackState === MprisPlaybackState.Stopped && !player.trackTitle && !player.trackArtist;
     }
 
     function _resolveActivePlayer(): void {
-        // Keep the selected player stable across transient metadata changes.
-        if (activePlayer && availablePlayers.indexOf(activePlayer) >= 0)
-            return;
+        // A playing player always wins; otherwise keep the selection stable w/idle
         const playing = availablePlayers.find(p => p.isPlaying);
         if (playing) {
-            activePlayer = playing;
-            _persistIdentity(playing.identity);
+            if (activePlayer !== playing) {
+                activePlayer = playing;
+                _persistIdentity(playing.identity);
+            }
             return;
+        }
+        if (activePlayer && availablePlayers.indexOf(activePlayer) >= 0 && (!isIdle(activePlayer) || _idleGraceTimer.running))
+            return;
+        if (activePlayer && availablePlayers.indexOf(activePlayer) < 0) {
+            const successor = availablePlayers.find(p => p.identity === activePlayer.identity);
+            if (successor) {
+                activePlayer = successor;
+                return;
+            }
         }
         const savedId = SessionData.lastPlayerIdentity;
         if (savedId) {

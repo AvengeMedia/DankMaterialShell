@@ -47,8 +47,6 @@ Item {
         playersExpanded = false;
     }
 
-
-
     readonly property bool isRightEdge: {
         if (barPosition === SettingsData.Position.Right)
             return true;
@@ -342,54 +340,6 @@ Item {
             root.maybeFinishSwitch();
         }
 
-        component BgBlurLayer: ClippingRectangle {
-            id: layer
-            property alias art: layerImg.source
-            readonly property bool ready: layerImg.status === Image.Ready && layerImg.source != ""
-            property bool front: false
-            signal loaded
-
-            anchors.fill: parent
-            radius: Theme.cornerRadius
-            color: "transparent"
-            antialiasing: true
-            opacity: front ? 0.7 : 0
-
-            Behavior on opacity {
-                NumberAnimation {
-                    duration: 350
-                    easing.type: Easing.InOutQuad
-                }
-            }
-
-            Image {
-                id: layerImg
-                anchors.centerIn: parent
-                width: Math.max(parent.width, parent.height) * 1.1
-                height: width
-                fillMode: Image.PreserveAspectCrop
-                asynchronous: true
-                cache: true
-                visible: false
-                onStatusChanged: {
-                    if (status === Image.Ready && source != "")
-                        layer.loaded();
-                }
-            }
-
-            MultiEffect {
-                anchors.centerIn: parent
-                width: layerImg.width
-                height: layerImg.height
-                source: layerImg
-                blurEnabled: true
-                blurMax: 64
-                blur: 0.8
-                saturation: -0.2
-                brightness: -0.25
-            }
-        }
-
         BgBlurLayer {
             id: layerA
             front: bgContainer._showA
@@ -407,6 +357,54 @@ Item {
             radius: Theme.cornerRadius
             color: Theme.surface
             opacity: 0.3
+        }
+    }
+
+    component BgBlurLayer: ClippingRectangle {
+        id: layer
+        property alias art: layerImg.source
+        readonly property bool ready: layerImg.status === Image.Ready && layerImg.source != ""
+        property bool front: false
+        signal loaded
+
+        anchors.fill: parent
+        radius: Theme.cornerRadius
+        color: "transparent"
+        antialiasing: true
+        opacity: front ? 0.7 : 0
+
+        Behavior on opacity {
+            NumberAnimation {
+                duration: 350
+                easing.type: Easing.InOutQuad
+            }
+        }
+
+        Image {
+            id: layerImg
+            anchors.centerIn: parent
+            width: Math.max(parent.width, parent.height) * 1.1
+            height: width
+            fillMode: Image.PreserveAspectCrop
+            asynchronous: true
+            cache: true
+            visible: false
+            onStatusChanged: {
+                if (status === Image.Ready && source != "")
+                    layer.loaded();
+            }
+        }
+
+        MultiEffect {
+            anchors.centerIn: parent
+            width: layerImg.width
+            height: layerImg.height
+            source: layerImg
+            blurEnabled: true
+            blurMax: 64
+            blur: 0.8
+            saturation: -0.2
+            brightness: -0.25
         }
     }
 
@@ -469,7 +467,7 @@ Item {
                     anchors.horizontalCenter: parent.horizontalCenter
 
                     StyledText {
-                        text: activePlayer?.trackTitle || I18n.tr("Unknown Track")
+                        text: MprisController.stableTitle || I18n.tr("Unknown Track")
                         font.pixelSize: Theme.fontSizeLarge
                         font.weight: Font.Bold
                         color: Theme.surfaceText
@@ -481,7 +479,7 @@ Item {
                     }
 
                     StyledText {
-                        text: activePlayer?.trackArtist || I18n.tr("Unknown Artist")
+                        text: MprisController.stableArtist || I18n.tr("Unknown Artist")
                         font.pixelSize: Theme.fontSizeMedium
                         color: Theme.surfaceTextMedium
                         width: parent.width
@@ -799,16 +797,17 @@ Item {
             cursorShape: Qt.PointingHandCursor
             onClicked: {
                 if (playersExpanded) {
-                    if (allPlayers && allPlayers.length > 1) {
+                    const players = (root.allPlayers || []).filter(p => p && !MprisController.isIdle(p));
+                    if (players.length > 1) {
                         let currentIndex = -1;
-                        for (let i = 0; i < allPlayers.length; i++) {
-                            if (allPlayers[i] === activePlayer) {
+                        for (let i = 0; i < players.length; i++) {
+                            if (players[i] === root.activePlayer) {
                                 currentIndex = i;
                                 break;
                             }
                         }
-                        const nextIndex = (currentIndex + 1) % allPlayers.length;
-                        MprisController.setActivePlayer(allPlayers[nextIndex]);
+                        const nextIndex = (currentIndex + 1) % players.length;
+                        MprisController.setActivePlayer(players[nextIndex]);
                     }
                     return;
                 }
@@ -885,19 +884,15 @@ Item {
             onClicked: {
                 toggleMute();
             }
+            property real wheelAccum: 0
             onWheel: wheelEvent => {
-                SessionData.suppressOSDTemporarily();
-                const delta = wheelEvent.angleDelta.y;
-                const current = (currentVolume * 100) || 0;
-                const maxVol = usePlayerVolume ? 100 : AudioService.sinkMaxVolume;
-                const newVolume = delta > 0 ? Math.min(maxVol, current + 5) : Math.max(0, current - 5);
-
-                if (usePlayerVolume) {
-                    activePlayer.volume = newVolume / 100;
-                } else if (AudioService.sink?.audio) {
-                    AudioService.sink.audio.volume = newVolume / 100;
-                }
                 wheelEvent.accepted = true;
+                wheelAccum += wheelEvent.angleDelta.y;
+                const notches = wheelAccum > 0 ? Math.floor(wheelAccum / 120) : Math.ceil(wheelAccum / 120);
+                if (notches === 0)
+                    return;
+                wheelAccum -= notches * 120;
+                root.adjustVolume(notches * AudioService.wheelVolumeStep);
             }
         }
     }
