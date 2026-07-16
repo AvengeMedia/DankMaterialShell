@@ -255,7 +255,7 @@ Singleton {
                 continue;
             root._lastAppliedTargets[output.name] = target.value;
             cascadeGuard.restart();
-            modeOverrides[output.name] = target.value;
+            modeOverrides[output.name] = target;
             if (target.source === "previous")
                 restoredOutputs.push(output);
             applied.push(output.name + " " + (getModeRefresh(target.mode) / 1000).toFixed(0) + "Hz (" + target.source + ")");
@@ -263,7 +263,7 @@ Singleton {
 
         if (applied.length > 0) {
             log.info("Updated display refresh rate: ", applied.join(", "), " (", context, ")");
-            WlrOutputService.applyConfiguration(buildWlrHeads(modeOverrides), success => {
+            applyWlrModeOverrides(modeOverrides, success => {
                 if (!success)
                     return;
                 for (const output of restoredOutputs)
@@ -325,13 +325,17 @@ Singleton {
                 continue;
             root._lastAppliedTargets[output.name] = target.id;
             cascadeGuard.restart();
-            modeOverrides[output.name] = target.id;
+            modeOverrides[output.name] = {
+                "value": target.id,
+                "mode": target,
+                "source": "battery"
+            };
             applied.push(output.name + " " + (currentRefresh / 1000).toFixed(0) + "\u2192" + (getModeRefresh(target) / 1000).toFixed(0) + "Hz");
         }
 
         if (applied.length > 0) {
             log.info("Updated display refresh rate: ", applied.join(", "), " (battery)");
-            WlrOutputService.applyConfiguration(buildWlrHeads(modeOverrides));
+            applyWlrModeOverrides(modeOverrides);
         }
     }
 
@@ -347,7 +351,7 @@ Singleton {
             };
 
             if (enabled) {
-                const modeId = modeOverrides[output.name] !== undefined ? modeOverrides[output.name] : output.currentMode?.id;
+                const modeId = modeOverrides[output.name] !== undefined ? modeOverrides[output.name].value : output.currentMode?.id;
                 if (modeId !== undefined)
                     head.modeId = modeId;
 
@@ -366,6 +370,81 @@ Singleton {
         }
 
         return heads;
+    }
+
+    function applyWlrModeOverrides(modeOverrides, callback) {
+        if (CompositorService.isHyprland) {
+            HyprlandService.generateOutputsConfig(buildWlrOutputsData(modeOverrides), SettingsData.hyprlandOutputSettings, callback);
+            return;
+        }
+
+        if (CompositorService.isMango) {
+            MangoService.generateOutputsConfig(buildWlrOutputsData(modeOverrides), callback);
+            return;
+        }
+
+        WlrOutputService.applyConfiguration(buildWlrHeads(modeOverrides), callback);
+    }
+
+    function buildWlrOutputsData(modeOverrides) {
+        const outputs = WlrOutputService.outputs || [];
+        const data = ({});
+
+        for (const output of outputs) {
+            const target = modeOverrides[output.name]?.mode || output.currentMode;
+            const normalizedModes = (output.modes || []).map(mode => ({
+                        "id": mode.id,
+                        "width": getModeWidth(mode),
+                        "height": getModeHeight(mode),
+                        "refresh_rate": getModeRefresh(mode),
+                        "preferred": mode.preferred === true
+                    }));
+            const currentMode = target ? normalizedModes.findIndex(mode => getModeWidth(mode) === getModeWidth(target) && getModeHeight(mode) === getModeHeight(target) && Math.abs(getModeRefresh(mode) - getModeRefresh(target)) <= batteryRefreshRateTolerance) : -1;
+
+            data[output.name] = {
+                "name": output.name,
+                "enabled": output.enabled !== false,
+                "make": output.make || "",
+                "model": output.model || "",
+                "serial": output.serial || output.serialNumber || "",
+                "modes": normalizedModes,
+                "current_mode": currentMode,
+                "configured_mode": target ? formatModeString(target) : "",
+                "vrr_supported": output.adaptiveSyncSupported ?? output.vrr_supported ?? false,
+                "vrr_enabled": isOutputVrrEnabled(output),
+                "logical": {
+                    "x": output.x ?? 0,
+                    "y": output.y ?? 0,
+                    "width": getModeWidth(target || output.currentMode) || 1920,
+                    "height": getModeHeight(target || output.currentMode) || 1080,
+                    "scale": output.scale ?? 1.0,
+                    "transform": mapWlrTransform(output.transform)
+                }
+            };
+        }
+
+        return data;
+    }
+
+    function mapWlrTransform(transform) {
+        switch (transform) {
+        case 1:
+            return "90";
+        case 2:
+            return "180";
+        case 3:
+            return "270";
+        case 4:
+            return "Flipped";
+        case 5:
+            return "Flipped90";
+        case 6:
+            return "Flipped180";
+        case 7:
+            return "Flipped270";
+        default:
+            return "Normal";
+        }
     }
 
     function findBatteryRefreshMode(output, currentMode, backend, allowCurrentAtTarget) {
