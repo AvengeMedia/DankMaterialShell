@@ -417,7 +417,7 @@ Item {
         anchors.top: parent.top
         height: 32
         z: 101
-        color: Theme.floatingSurface
+        color: BlurService.enabled ? "transparent" : Theme.floatingSurface
         visible: !root._bottomSectionHeaderActive && stickyHeaderSection !== null
 
         readonly property int versionTrigger: root.controller?.viewModeVersion ?? 0
