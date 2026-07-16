@@ -78,11 +78,15 @@ Singleton {
     property int gammaHighTemp: gammaState?.config?.HighTemp ?? 0
 
     function syncRefreshRates(isPluggedIn, reason) {
-        if (isPluggedIn) {
-            applyConfiguredTargets("AC", reason);
-        } else if (SettingsData.lowerDisplayRefreshRateOnBattery) {
+        if (!SettingsData.lowerDisplayRefreshRateOnBattery)
+            return;
+
+        if (!isPluggedIn) {
             applyBatteryTargets(reason);
+            return;
         }
+
+        applyConfiguredTargets("AC", reason);
     }
 
     function requestSync(reason) {
