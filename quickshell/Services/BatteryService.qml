@@ -21,7 +21,6 @@ Singleton {
         running: true
         onTriggered: {
             root.suppressSound = false;
-            DisplayService.requestSync("startup");
         }
     }
 
@@ -216,38 +215,7 @@ Singleton {
             }
         }
 
-        DisplayService.requestSync("power-change");
-
         previousPluggedState = isPluggedIn;
-    }
-
-    Connections {
-        target: SettingsData
-        function onLowerDisplayRefreshRateOnBatteryChanged() {
-            DisplayService.requestSync("setting-change");
-        }
-
-        function onActiveDisplayProfileChanged() {
-            DisplayService.requestSync("profile-change");
-        }
-
-        function onActiveDisplayProfileModesChanged() {
-            DisplayService.requestSync("profile-change");
-        }
-    }
-
-    Connections {
-        target: NiriService
-        function onOutputsChanged() {
-            DisplayService.requestSync("output-change");
-        }
-    }
-
-    Connections {
-        target: WlrOutputService
-        function onStateChanged() {
-            DisplayService.requestSync("output-change");
-        }
     }
 
     // Aggregated charge/discharge rate

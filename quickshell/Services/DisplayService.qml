@@ -55,8 +55,52 @@ Singleton {
         onTriggered: root._runSync()
     }
 
+    Timer {
+        id: startupRefreshRateSync
+        interval: 500
+        repeat: false
+        running: true
+        onTriggered: root.requestSync("startup")
+    }
+
     signal brightnessChanged(bool showOsd)
     signal deviceSwitched
+
+    Connections {
+        target: BatteryService
+        function onIsPluggedInChanged() {
+            root.requestSync("power-change");
+        }
+    }
+
+    Connections {
+        target: SettingsData
+        function onLowerDisplayRefreshRateOnBatteryChanged() {
+            root.requestSync("setting-change");
+        }
+
+        function onActiveDisplayProfileChanged() {
+            root.requestSync("profile-change");
+        }
+
+        function onActiveDisplayProfileModesChanged() {
+            root.requestSync("profile-change");
+        }
+    }
+
+    Connections {
+        target: NiriService
+        function onOutputsChanged() {
+            root.requestSync("output-change");
+        }
+    }
+
+    Connections {
+        target: WlrOutputService
+        function onStateChanged() {
+            root.requestSync("output-change");
+        }
+    }
 
     property bool nightModeActive: nightModeEnabled
 
