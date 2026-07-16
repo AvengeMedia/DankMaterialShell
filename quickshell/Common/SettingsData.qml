@@ -3547,6 +3547,15 @@ Singleton {
         saveSettings();
     }
 
+    function setActiveDisplayProfileModes(compositor, modes) {
+        if (JSON.stringify(activeDisplayProfileModes[compositor] || {}) === JSON.stringify(modes || {}))
+            return;
+        const updated = JSON.parse(JSON.stringify(activeDisplayProfileModes));
+        updated[compositor] = modes;
+        activeDisplayProfileModes = updated;
+        saveSettings();
+    }
+
     ListModel {
         id: leftWidgetsModel
     }

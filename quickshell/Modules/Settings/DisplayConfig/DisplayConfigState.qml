@@ -279,9 +279,7 @@ Singleton {
                 };
         }
 
-        const updated = JSON.parse(JSON.stringify(SettingsData.activeDisplayProfileModes || {}));
-        updated[compositor] = modes;
-        SettingsData.activeDisplayProfileModes = updated;
+        SettingsData.setActiveDisplayProfileModes(compositor, modes);
     }
 
     function generateProfileId() {
@@ -2275,15 +2273,6 @@ Singleton {
             outputs: outputConfigs
         };
 
-        if (profileId) {
-            const updated = JSON.parse(JSON.stringify(validatedProfiles));
-            if (updated[profileId]) {
-                updated[profileId].outputs = outputConfigs;
-                validatedProfiles = updated;
-                publishActiveProfileModes();
-            }
-        }
-
         readMonitorsJson(data => {
             const match = profileId ? findConfigEntryById(data, profileId) : findConfigEntryByFingerprint(data, currentOutputSet, true);
             if (!match)
@@ -2293,7 +2282,16 @@ Singleton {
                 "name": match.entry.name || "",
                 "outputs": outputConfigs
             };
-            writeMonitorsJson(data, null);
+            writeMonitorsJson(data, success => {
+                if (!success || !profileId)
+                    return;
+                const updated = JSON.parse(JSON.stringify(validatedProfiles));
+                if (updated[profileId]) {
+                    updated[profileId].outputs = outputConfigs;
+                    validatedProfiles = updated;
+                    publishActiveProfileModes();
+                }
+            });
         });
 
         clearPendingChanges();
