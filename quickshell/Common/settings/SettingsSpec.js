@@ -525,6 +525,7 @@ var SPEC = {
     hyprlandOutputSettings: { def: {} },
     displayProfiles: { def: {} },
     activeDisplayProfile: { def: {} },
+    activeDisplayProfileModes: { def: {} },
     displayProfileAutoSelect: { def: false },
     displayShowDisconnected: { def: false },
     displaySnapToEdge: { def: true },
