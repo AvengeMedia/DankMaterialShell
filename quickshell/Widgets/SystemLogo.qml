@@ -70,6 +70,10 @@ Item {
                     iconImage.source = "file:///run/current-system/profile/share/icons/hicolor/scalable/apps/guix-icon.svg"
                     return
                 }
+                if (logo === "zirconium") {
+                    iconImage.source = "file:///usr/share/zirconium/pixmaps/logo-z.svg"
+                    return
+                }
                 iconImage.source = Quickshell.iconPath(logo, true)
             }, 0)
         }, 0)
