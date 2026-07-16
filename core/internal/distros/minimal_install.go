@@ -7,7 +7,7 @@ type minimalInstallGroup struct {
 
 func shouldPreferMinimalInstall(pkg string) bool {
 	switch pkg {
-	case "niri", "niri-git":
+	case "niri", "niri-git", "hyprland", "hyprland-git":
 		return true
 	default:
 		return false
