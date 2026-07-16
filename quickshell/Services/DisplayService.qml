@@ -143,6 +143,66 @@ Singleton {
         _pendingReason = "";
     }
 
+    function outputIdentifiers(outputName, output) {
+        const identifiers = [outputName];
+        const make = output?.make || "";
+        const model = output?.model || "";
+        if (make && model) {
+            const serial = output.serial || output.serialNumber || "Unknown";
+            const modelId = make + " " + model;
+            const serialId = modelId + " " + serial;
+            const descId = ("desc:" + [make, model, output.serial || output.serialNumber].filter(p => p).join(" ")).replace(/,/g, "");
+            if (!identifiers.includes(serialId))
+                identifiers.push(serialId);
+            if (!identifiers.includes(modelId))
+                identifiers.push(modelId);
+            if (descId !== "desc:" && !identifiers.includes(descId))
+                identifiers.push(descId);
+        }
+        return identifiers;
+    }
+
+    function previousRefreshModes() {
+        return SettingsData.displayPreviousRefreshModes?.[CompositorService.compositor] || {};
+    }
+
+    function findPreviousRefreshMode(outputName, output) {
+        const modes = previousRefreshModes();
+        for (const identifier of outputIdentifiers(outputName, output)) {
+            const entry = modes[identifier];
+            const mode = typeof entry === "string" ? entry : entry?.mode;
+            if (mode)
+                return mode;
+        }
+        return "";
+    }
+
+    function storePreviousRefreshMode(outputName, output, mode) {
+        const modeString = formatModeString(mode);
+        if (!modeString)
+            return;
+        const modes = JSON.parse(JSON.stringify(previousRefreshModes()));
+        for (const identifier of outputIdentifiers(outputName, output)) {
+            modes[identifier] = {
+                "mode": modeString
+            };
+        }
+        SettingsData.setDisplayPreviousRefreshModes(CompositorService.compositor, modes);
+    }
+
+    function clearPreviousRefreshMode(outputName, output) {
+        const modes = JSON.parse(JSON.stringify(previousRefreshModes()));
+        let changed = false;
+        for (const identifier of outputIdentifiers(outputName, output)) {
+            if (modes[identifier] === undefined)
+                continue;
+            delete modes[identifier];
+            changed = true;
+        }
+        if (changed)
+            SettingsData.setDisplayPreviousRefreshModes(CompositorService.compositor, modes);
+    }
+
     function applyConfiguredTargets(context, reason) {
         if (CompositorService.isNiri) {
             const outputs = NiriService.outputs || {};
@@ -150,14 +210,22 @@ Singleton {
             for (const name in outputs) {
                 const currentMode = getNiriCurrentMode(outputs[name]);
                 const target = computeTargetMode(name, outputs[name], currentMode, "niri");
-                if (!target || !target.value || isModeAlreadyCurrent(currentMode, target.mode))
+                if (!target || !target.value)
                     continue;
+                if (isModeAlreadyCurrent(currentMode, target.mode)) {
+                    if (target.source === "previous")
+                        clearPreviousRefreshMode(name, outputs[name]);
+                    continue;
+                }
                 if (root._lastAppliedTargets[name] === target.value)
                     continue;
                 root._lastAppliedTargets[name] = target.value;
                 cascadeGuard.restart();
                 NiriService.applyOutputConfig(name, {
                     "mode": target.value
+                }, success => {
+                    if (success && target.source === "previous")
+                        clearPreviousRefreshMode(name, outputs[name]);
                 });
                 applied.push(name + " " + (getModeRefresh(target.mode) / 1000).toFixed(0) + "Hz (" + target.source + ")");
             }
@@ -171,23 +239,36 @@ Singleton {
 
         const outputs = WlrOutputService.outputs || [];
         const modeOverrides = ({});
+        const restoredOutputs = [];
         const applied = [];
 
         for (const output of outputs) {
             const target = computeTargetMode(output.name, output, output.currentMode, "wlr");
-            if (!target || !target.value || isModeAlreadyCurrent(output.currentMode, target.mode))
+            if (!target || !target.value)
                 continue;
+            if (isModeAlreadyCurrent(output.currentMode, target.mode)) {
+                if (target.source === "previous")
+                    clearPreviousRefreshMode(output.name, output);
+                continue;
+            }
             if (root._lastAppliedTargets[output.name] === target.value)
                 continue;
             root._lastAppliedTargets[output.name] = target.value;
             cascadeGuard.restart();
             modeOverrides[output.name] = target.value;
+            if (target.source === "previous")
+                restoredOutputs.push(output);
             applied.push(output.name + " " + (getModeRefresh(target.mode) / 1000).toFixed(0) + "Hz (" + target.source + ")");
         }
 
         if (applied.length > 0) {
             log.info("Updated display refresh rate: ", applied.join(", "), " (", context, ")");
-            WlrOutputService.applyConfiguration(buildWlrHeads(modeOverrides));
+            WlrOutputService.applyConfiguration(buildWlrHeads(modeOverrides), success => {
+                if (!success)
+                    return;
+                for (const output of restoredOutputs)
+                    clearPreviousRefreshMode(output.name, output);
+            });
         }
     }
 
@@ -207,6 +288,7 @@ Singleton {
                 if (!target)
                     continue;
                 const targetValue = formatNiriMode(target);
+                storePreviousRefreshMode(name, output, currentMode);
                 if (root._lastAppliedTargets[name] === targetValue)
                     continue;
                 root._lastAppliedTargets[name] = targetValue;
@@ -238,6 +320,7 @@ Singleton {
             const target = findBatteryRefreshMode(output, currentMode, "wlr");
             if (!target)
                 continue;
+            storePreviousRefreshMode(output.name, output, currentMode);
             if (root._lastAppliedTargets[output.name] === target.id)
                 continue;
             root._lastAppliedTargets[output.name] = target.id;
@@ -333,6 +416,18 @@ Singleton {
                     "value": formatRestoreModeValue(mode, backend),
                     "mode": mode,
                     "source": "profile"
+                };
+            }
+        }
+
+        const previousMode = findPreviousRefreshMode(outputName, output);
+        if (previousMode) {
+            const mode = findModeByString(output?.modes || [], previousMode);
+            if (mode) {
+                return {
+                    "value": formatRestoreModeValue(mode, backend),
+                    "mode": mode,
+                    "source": "previous"
                 };
             }
         }

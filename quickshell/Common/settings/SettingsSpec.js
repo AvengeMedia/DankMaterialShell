@@ -526,6 +526,7 @@ var SPEC = {
     displayProfiles: { def: {} },
     activeDisplayProfile: { def: {} },
     activeDisplayProfileModes: { def: {} },
+    displayPreviousRefreshModes: { def: {} },
     displayProfileAutoSelect: { def: false },
     displayShowDisconnected: { def: false },
     displaySnapToEdge: { def: true },

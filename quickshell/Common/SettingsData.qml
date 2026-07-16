@@ -965,6 +965,7 @@ Singleton {
     property var displayProfiles: ({})
     property var activeDisplayProfile: ({})
     property var activeDisplayProfileModes: ({})
+    property var displayPreviousRefreshModes: ({})
     property bool displayProfileAutoSelect: false
     property bool displayShowDisconnected: false
     property bool displaySnapToEdge: true
@@ -3553,6 +3554,18 @@ Singleton {
         const updated = JSON.parse(JSON.stringify(activeDisplayProfileModes));
         updated[compositor] = modes;
         activeDisplayProfileModes = updated;
+        saveSettings();
+    }
+
+    function setDisplayPreviousRefreshModes(compositor, modes) {
+        if (JSON.stringify(displayPreviousRefreshModes[compositor] || {}) === JSON.stringify(modes || {}))
+            return;
+        const updated = JSON.parse(JSON.stringify(displayPreviousRefreshModes));
+        if (Object.keys(modes || {}).length > 0)
+            updated[compositor] = modes;
+        else
+            delete updated[compositor];
+        displayPreviousRefreshModes = updated;
         saveSettings();
     }
 
