@@ -397,7 +397,7 @@ Singleton {
                         "width": getModeWidth(mode),
                         "height": getModeHeight(mode),
                         "refresh_rate": getModeRefresh(mode),
-                        "preferred": mode.preferred === true
+                        "preferred": mode.preferred === true || mode.is_preferred === true
                     }));
             const currentMode = target ? normalizedModes.findIndex(mode => getModeWidth(mode) === getModeWidth(target) && getModeHeight(mode) === getModeHeight(target) && Math.abs(getModeRefresh(mode) - getModeRefresh(target)) <= batteryRefreshRateTolerance) : -1;
 
@@ -612,7 +612,7 @@ Singleton {
 
         for (const mode of sameResolutionModes) {
             const refresh = getModeRefresh(mode);
-            if (mode.preferred === true)
+            if (mode.preferred === true || mode.is_preferred === true)
                 preferred = mode;
             if (refresh > highestRefresh) {
                 highestRefresh = refresh;
