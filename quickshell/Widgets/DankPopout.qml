@@ -174,8 +174,15 @@ Item {
         _pendingOpen = false;
         _pendingOpenTimer.stop();
         transientSurfaceTracker?.closeAll?.();
-        if (impl.item)
+        if (impl.item) {
             impl.item.close();
+            return;
+        }
+        PopoutManager.hidePopout(root);
+        if (!shouldBeVisible)
+            return;
+        shouldBeVisible = false;
+        popoutClosed();
     }
 
     function cancelHoverDismiss() {
@@ -315,7 +322,8 @@ Item {
         it.hoverDismissEnabled = Qt.binding(() => root.hoverDismissEnabled);
         it.hoverDismissSuspended = Qt.binding(() => root.effectiveHoverDismissSuspended);
 
-        it.shouldBeVisible = root.shouldBeVisible;
+        if (root.shouldBeVisible && !_pendingOpen)
+            root.shouldBeVisible = false;
         if (root._primeContent && typeof it.primeContent === "function")
             it.primeContent();
         if (_pendingOpen)

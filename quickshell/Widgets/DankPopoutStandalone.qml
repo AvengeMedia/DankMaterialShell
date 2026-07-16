@@ -630,6 +630,13 @@ Item {
         color: "transparent"
         readonly property bool closeVisualActive: root.shouldBeVisible || root.isClosing
 
+        onVisibleChanged: {
+            if (visible || !Qt.inputMethod)
+                return;
+            Qt.inputMethod.hide();
+            Qt.inputMethod.reset();
+        }
+
         PopoutHoverDismiss {
             id: hoverDismissController
             anchors.fill: parent

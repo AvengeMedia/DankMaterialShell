@@ -923,6 +923,13 @@ Item {
         visible: false
         color: "transparent"
 
+        onVisibleChanged: {
+            if (visible || !Qt.inputMethod)
+                return;
+            Qt.inputMethod.hide();
+            Qt.inputMethod.reset();
+        }
+
         PopoutHoverDismiss {
             id: hoverDismissController
             anchors.fill: parent
