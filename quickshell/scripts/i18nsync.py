@@ -25,6 +25,7 @@ LANGUAGES = {
     "he": "he.json",
     "hu": "hu.json",
     "fa": "fa.json",
+    "fi": "fi.json",
     "fr": "fr.json",
     "nl": "nl.json",
     "ru": "ru.json",
