@@ -124,7 +124,9 @@ func GetLogger() *Logger {
 		logger = &Logger{base}
 
 		if path := os.Getenv("DMS_LOG_FILE"); path != "" {
-			_ = SetLogFile(path)
+			logMu.Lock()
+			_ = setLogFile(logger, path)
+			logMu.Unlock()
 		}
 	})
 	return logger
@@ -145,15 +147,18 @@ func SetLevel(level string) {
 // profile when stderr is a TTY and route the file through ansiStripWriter so
 // the file stays plain while stderr keeps its colors.
 func SetLogFile(path string) error {
+	l := GetLogger()
 	logMu.Lock()
 	defer logMu.Unlock()
+	return setLogFile(l, path)
+}
 
+func setLogFile(l *Logger, path string) error {
 	if logFile != nil {
 		logFile.Close()
 		logFile = nil
 	}
 
-	l := GetLogger()
 	if path == "" {
 		l.SetOutput(logStderr)
 		applyColorProfile(l, logStderr)
