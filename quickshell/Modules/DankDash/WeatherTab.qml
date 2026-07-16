@@ -936,7 +936,7 @@ Item {
                 id: dailyLoader
                 anchors.fill: parent
                 sourceComponent: dailyComponent
-                active: root.visible && root.available
+                active: root.visible && root.available && width > 0 && height > 0
                 visible: !root.showHourly
                 asynchronous: true
                 opacity: 0
@@ -953,7 +953,7 @@ Item {
                 id: hourlyLoader
                 anchors.fill: parent
                 sourceComponent: hourlyComponent
-                active: root.visible && root.available
+                active: root.visible && root.available && width > 0 && height > 0
                 visible: root.showHourly
                 asynchronous: true
                 opacity: 0
@@ -1038,6 +1038,7 @@ Item {
 
             MouseArea {
                 anchors.fill: parent
+                property real hWheelAccum: 0
                 onWheel: wheel => {
                     if (wheel.modifiers & Qt.ShiftModifier) {
                         if (wheel.angleDelta.y % 120 == 0 && wheel.angleDelta.x == 0) {
@@ -1048,6 +1049,15 @@ Item {
                                 return;
                             }
                         }
+                    }
+                    if (wheel.angleDelta.x !== 0) {
+                        hWheelAccum += wheel.angleDelta.x;
+                        const steps = Math.trunc(hWheelAccum / 120);
+                        hWheelAccum -= steps * 120;
+                        if (steps !== 0)
+                            hourlyList.currentIndex = Math.max(0, Math.min(hourlyList.model - 1, hourlyList.currentIndex - steps));
+                        wheel.accepted = true;
+                        return;
                     }
                     wheel.accepted = false;
                 }
@@ -1096,6 +1106,7 @@ Item {
 
             MouseArea {
                 anchors.fill: parent
+                property real hWheelAccum: 0
                 onWheel: wheel => {
                     if (wheel.modifiers & Qt.ShiftModifier) {
                         if (wheel.angleDelta.y % 120 == 0 && wheel.angleDelta.x == 0) {
@@ -1106,6 +1117,15 @@ Item {
                                 return;
                             }
                         }
+                    }
+                    if (wheel.angleDelta.x !== 0) {
+                        hWheelAccum += wheel.angleDelta.x;
+                        const steps = Math.trunc(hWheelAccum / 120);
+                        hWheelAccum -= steps * 120;
+                        if (steps !== 0)
+                            dailyList.currentIndex = Math.max(0, Math.min(dailyList.model - 1, dailyList.currentIndex - steps));
+                        wheel.accepted = true;
+                        return;
                     }
                     wheel.accepted = false;
                 }
