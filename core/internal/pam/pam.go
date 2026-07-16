@@ -646,6 +646,7 @@ type lockscreenPamAnalysis struct {
 	inlineFingerprint bool
 	inlineU2f         bool
 	modules           []string
+	authModules       []string
 	unknownDirectives []string
 	err               error
 }
@@ -730,6 +731,9 @@ func (r lockscreenPamResolver) analyzeInto(path string, filterType string, stack
 			}
 			if !foundModule && strings.HasSuffix(field, ".so") {
 				acc.modules = append(acc.modules, field)
+				if lineType == "auth" {
+					acc.authModules = append(acc.authModules, field)
+				}
 				foundModule = true
 			}
 		}
@@ -772,6 +776,14 @@ func ValidateLockscreenPamService(name string) LockscreenPamValidation {
 
 func ValidateLockscreenPamPath(path string) LockscreenPamValidation {
 	return validateLockscreenPam("", path, defaultValidateDeps())
+}
+
+func ValidateLockscreenU2fPamService(name string) LockscreenPamValidation {
+	return validateLockscreenU2fPam(name, "", defaultValidateDeps())
+}
+
+func ValidateLockscreenU2fPamPath(path string) LockscreenPamValidation {
+	return validateLockscreenU2fPam("", path, defaultValidateDeps())
 }
 
 func validateLockscreenPam(serviceName string, path string, deps lockscreenPamValidateDeps) LockscreenPamValidation {
@@ -838,6 +850,64 @@ func validateLockscreenPam(serviceName string, path string, deps lockscreenPamVa
 	return result
 }
 
+func validateLockscreenU2fPam(serviceName string, path string, deps lockscreenPamValidateDeps) LockscreenPamValidation {
+	result := validateLockscreenPam(serviceName, path, deps)
+	if result.Path == "" {
+		return result
+	}
+
+	resolver := lockscreenPamResolver{baseDirs: deps.baseDirs, readFile: deps.readFile}
+	analysis := resolver.analyzePath(result.Path)
+	if analysis.err != nil {
+		return result
+	}
+
+	filteredWarnings := result.Warnings[:0]
+	for _, warning := range result.Warnings {
+		if strings.Contains(warning, "pam_u2f is present") && strings.Contains(warning, "double-prompt") {
+			continue
+		}
+		filteredWarnings = append(filteredWarnings, warning)
+	}
+	result.Warnings = filteredWarnings
+
+	hasU2fAuth := false
+	unsafeModules := []string{}
+	unsafeSeen := map[string]bool{}
+	for _, ref := range analysis.authModules {
+		name := filepath.Base(ref)
+		if name == "pam_u2f.so" {
+			hasU2fAuth = true
+			continue
+		}
+		switch name {
+		case "pam_env.so", "pam_faildelay.so", "pam_nologin.so":
+			continue
+		default:
+			if !unsafeSeen[name] {
+				unsafeSeen[name] = true
+				unsafeModules = append(unsafeModules, name)
+			}
+		}
+	}
+
+	if !hasU2fAuth {
+		result.Errors = append(result.Errors, "no pam_u2f auth directive found; select a dedicated security-key PAM service")
+	}
+	for _, name := range unsafeModules {
+		result.Errors = append(result.Errors, fmt.Sprintf("additional auth module %s is not allowed in a dedicated security-key PAM service", name))
+	}
+	for _, name := range result.MissingModules {
+		if strings.Contains(name, "pam_u2f") {
+			result.Errors = append(result.Errors, fmt.Sprintf("%s is not installed or its configured path is unavailable", name))
+			break
+		}
+	}
+
+	result.Valid = len(result.Errors) == 0
+	return result
+}
+
 func moduleReferenceExists(ref string, deps lockscreenPamValidateDeps) bool {
 	if filepath.IsAbs(ref) {
 		_, err := deps.stat(ref)
@@ -895,7 +965,7 @@ func buildManagedLockscreenU2FPamContent() string {
 
 func syncLockscreenPamConfigWithDeps(logFunc func(string), sudoPassword string, deps syncDeps) error {
 	if deps.isNixOS() {
-		logFunc("ℹ NixOS detected. DMS continues to use /etc/pam.d/login for lock screen password auth on NixOS unless you declare security.pam.services.dankshell yourself. U2F and fingerprint are handled separately and should not be included in dankshell.")
+		logFunc("ℹ NixOS detected. DMS does not write /etc/pam.d/dankshell; the lock screen uses a sanitized password-only service in the user state directory unless you select a custom PAM source.")
 		return nil
 	}
 

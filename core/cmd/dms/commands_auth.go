@@ -91,21 +91,30 @@ var authListServicesCmd = &cobra.Command{
 
 var authValidateCmd = &cobra.Command{
 	Use:   "validate",
-	Short: "Validate a PAM service file for use as the DMS lock-screen password stack",
-	Long:  "Validate one PAM service (by --service NAME or --path /abs/file) for use as the DMS lock-screen password stack. Exits 1 when the file is not usable.",
+	Short: "Validate a PAM service file for use by the DMS lock screen",
+	Long:  "Validate one PAM service (by --service NAME or --path /abs/file) for use as the DMS lock-screen password or dedicated U2F stack. Exits 1 when the file is not usable.",
 	Run: func(cmd *cobra.Command, args []string) {
 		path, _ := cmd.Flags().GetString("path")
 		service, _ := cmd.Flags().GetString("service")
+		purpose, _ := cmd.Flags().GetString("purpose")
 		asJSON, _ := cmd.Flags().GetBool("json")
 
 		if (path == "") == (service == "") {
 			log.Fatalf("Error: exactly one of --path or --service is required")
 		}
 
+		if purpose != "password" && purpose != "u2f" {
+			log.Fatalf("Error: --purpose must be password or u2f")
+		}
+
 		var result sharedpam.LockscreenPamValidation
 		switch {
 		case service != "":
-			result = sharedpam.ValidateLockscreenPamService(service)
+			if purpose == "u2f" {
+				result = sharedpam.ValidateLockscreenU2fPamService(service)
+			} else {
+				result = sharedpam.ValidateLockscreenPamService(service)
+			}
 		case !filepath.IsAbs(path):
 			result = sharedpam.LockscreenPamValidation{
 				Path:           path,
@@ -114,7 +123,11 @@ var authValidateCmd = &cobra.Command{
 				Errors:         []string{"--path must be an absolute file path"},
 			}
 		default:
-			result = sharedpam.ValidateLockscreenPamPath(path)
+			if purpose == "u2f" {
+				result = sharedpam.ValidateLockscreenU2fPamPath(path)
+			} else {
+				result = sharedpam.ValidateLockscreenPamPath(path)
+			}
 		}
 
 		if asJSON {
@@ -159,6 +172,7 @@ func init() {
 
 	authValidateCmd.Flags().String("path", "", "Absolute path to a PAM service file to validate")
 	authValidateCmd.Flags().String("service", "", "Name of a PAM service to resolve across the system PAM dirs")
+	authValidateCmd.Flags().String("purpose", "password", "Validation purpose: password or u2f")
 	authValidateCmd.Flags().Bool("json", false, "Output as JSON")
 }
 

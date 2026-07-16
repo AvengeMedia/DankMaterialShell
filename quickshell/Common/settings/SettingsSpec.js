@@ -459,6 +459,8 @@ var SPEC = {
     lockPamPath: { def: "" },
     lockPamInlineFprint: { def: false },
     lockPamInlineU2f: { def: false },
+    lockPamExternallyManaged: { def: false },
+    lockU2fPamPath: { def: "" },
     lockScreenInactiveColor: { def: "#000000" },
     lockScreenNotificationMode: { def: 0 },
     lockScreenVideoEnabled: { def: false },

@@ -4635,24 +4635,6 @@
     ]
   },
   {
-    "section": "lockAuthSource",
-    "label": "Authentication Source",
-    "tabIndex": 11,
-    "category": "Lock Screen",
-    "keywords": [
-      "authentication",
-      "lock",
-      "login",
-      "pam",
-      "password",
-      "screen",
-      "security",
-      "service",
-      "source"
-    ],
-    "icon": "key"
-  },
-  {
     "section": "lockPamPath",
     "label": "Authentication Source",
     "tabIndex": 11,
@@ -4728,10 +4710,14 @@
       "fprint",
       "lock",
       "login",
+      "managed",
       "password",
+      "primary",
       "screen",
-      "security"
-    ]
+      "security",
+      "source"
+    ],
+    "description": "Managed by the primary PAM source."
   },
   {
     "section": "loginctlLockIntegration",
@@ -4769,12 +4755,16 @@
       "key",
       "lock",
       "login",
+      "managed",
       "password",
+      "primary",
       "screen",
       "security",
+      "source",
       "u2f",
       "yubikey"
-    ]
+    ],
+    "description": "Managed by the primary PAM source."
   },
   {
     "section": "_tab_11",
@@ -4813,6 +4803,25 @@
     ],
     "icon": "palette",
     "description": "Font used for the clock and date on the lock screen"
+  },
+  {
+    "section": "lockAuthSource",
+    "label": "Lock Screen Authentication",
+    "tabIndex": 11,
+    "category": "Lock Screen",
+    "keywords": [
+      "authentication",
+      "lock",
+      "lockscreen",
+      "login",
+      "pam",
+      "password",
+      "screen",
+      "security",
+      "service",
+      "source"
+    ],
+    "icon": "key"
   },
   {
     "section": "lockDisplay",
@@ -5006,23 +5015,53 @@
     "description": "Turn off all displays immediately when the lock screen activates"
   },
   {
+    "section": "lockU2fPamPath",
+    "label": "Security Key PAM Source",
+    "tabIndex": 11,
+    "category": "Lock Screen",
+    "keywords": [
+      "auto",
+      "bundled",
+      "installed",
+      "key",
+      "lock",
+      "login",
+      "pam",
+      "password",
+      "screen",
+      "security",
+      "service",
+      "source",
+      "u2f",
+      "uses"
+    ],
+    "description": "Auto uses an installed or bundled key-only service."
+  },
+  {
     "section": "u2fMode",
     "label": "Security key mode",
     "tabIndex": 11,
     "category": "Lock Screen",
     "keywords": [
+      "alternative",
+      "button",
       "factor",
+      "fingerprint",
+      "follows",
       "key",
       "lock",
       "login",
       "mode",
+      "passkey",
       "password",
       "screen",
       "second",
       "security",
       "u2f",
+      "uses",
       "yubikey"
-    ]
+    ],
+    "description": "Alternative uses the passkey button. Second factor follows password or fingerprint."
   },
   {
     "section": "lockScreenShowMediaPlayer",
@@ -5158,6 +5197,27 @@
       "system",
       "time"
     ]
+  },
+  {
+    "section": "lockPamExternallyManaged",
+    "label": "Use system PAM authentication",
+    "tabIndex": 11,
+    "category": "Lock Screen",
+    "keywords": [
+      "authentication",
+      "external",
+      "lock",
+      "login",
+      "managed",
+      "pam",
+      "password",
+      "policy",
+      "screen",
+      "security",
+      "sets",
+      "system"
+    ],
+    "description": "System PAM sets the authentication policy."
   },
   {
     "section": "videoScreensaver",

@@ -63,6 +63,7 @@ Singleton {
     readonly property string u2fKeysPath: homeDir ? homeDir + "/.config/Yubico/u2f_keys" : ""
     readonly property bool homeU2fKeysDetected: u2fKeysPath !== "" && u2fKeysWatcher.loaded && u2fKeysText.trim() !== ""
     readonly property bool lockU2fCustomConfigDetected: pamModuleEnabled(dankshellU2fPamText, "pam_u2f")
+    readonly property bool lockU2fCustomSourceDetected: (settingsRoot?.lockU2fPamPath || "") !== "" && customU2fPamWatcher.loaded
     readonly property bool greeterPamHasFprint: greeterPamStackHasModule("pam_fprintd")
     readonly property bool greeterPamHasU2f: greeterPamStackHasModule("pam_u2f")
 
@@ -176,7 +177,7 @@ Singleton {
     readonly property bool lockU2fReady: {
         if (forcedU2fAvailable !== null)
             return forcedU2fAvailable;
-        return lockU2fCustomConfigDetected || homeU2fKeysDetected;
+        return lockU2fCustomSourceDetected || lockU2fCustomConfigDetected || homeU2fKeysDetected;
     }
 
     readonly property bool lockU2fCanEnable: {
@@ -725,6 +726,12 @@ Singleton {
         printErrors: false
         onLoaded: root.dankshellU2fPamText = text()
         onLoadFailed: root.dankshellU2fPamText = ""
+    }
+
+    FileView {
+        id: customU2fPamWatcher
+        path: root.settingsRoot?.lockU2fPamPath || ""
+        printErrors: false
     }
 
     FileView {

@@ -898,6 +898,8 @@ Singleton {
     property string lockPamPath: ""
     property bool lockPamInlineFprint: false
     property bool lockPamInlineU2f: false
+    property bool lockPamExternallyManaged: false
+    property string lockU2fPamPath: ""
     property bool greeterPamExternallyManaged: false
     property string lockScreenInactiveColor: "#000000"
     property int lockScreenNotificationMode: 0

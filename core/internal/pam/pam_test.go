@@ -611,8 +611,8 @@ func TestSyncLockscreenPamConfigWithDeps(t *testing.T) {
 		if err != nil {
 			t.Fatalf("syncLockscreenPamConfigWithDeps returned error on NixOS path: %v", err)
 		}
-		if len(logs) == 0 || !strings.Contains(logs[0], "NixOS detected") || !strings.Contains(logs[0], "/etc/pam.d/login") {
-			t.Fatalf("expected NixOS informational log mentioning /etc/pam.d/login, got %v", logs)
+		if len(logs) == 0 || !strings.Contains(logs[0], "NixOS detected") || !strings.Contains(logs[0], "sanitized password-only service") {
+			t.Fatalf("expected NixOS informational log describing the user-state fallback, got %v", logs)
 		}
 		if _, err := os.Stat(env.dankshellPath); !os.IsNotExist(err) {
 			t.Fatalf("expected no dankshell file to be written on NixOS path, stat err = %v", err)
@@ -990,6 +990,84 @@ func TestValidateLockscreenPam(t *testing.T) {
 		}
 		if !containsSubstr(result.Warnings, "pam_fprintd") || !containsSubstr(result.Warnings, "pam_u2f") {
 			t.Fatalf("expected double-prompt warnings, got %v", result.Warnings)
+		}
+	})
+}
+
+func TestValidateLockscreenU2fPam(t *testing.T) {
+	t.Parallel()
+
+	t.Run("accepts a dedicated U2F stack with custom options", func(t *testing.T) {
+		t.Parallel()
+
+		env := newPamTestEnv(t)
+		env.availableModules["pam_u2f.so"] = true
+		env.writePamFile(t, "dankshell-u2f", "#%PAM-1.0\nauth required pam_u2f.so cue authfile=/etc/u2f-mappings\naccount required pam_permit.so\n")
+
+		result := validateLockscreenU2fPam("dankshell-u2f", "", env.validateDeps())
+		if !result.Valid {
+			t.Fatalf("expected valid dedicated U2F stack, got %+v", result)
+		}
+		if !result.InlineU2f {
+			t.Fatalf("expected inline U2F detection, got %+v", result)
+		}
+		if containsSubstr(result.Warnings, "double-prompt") {
+			t.Fatalf("dedicated U2F validation should not warn about its expected U2F module: %v", result.Warnings)
+		}
+	})
+
+	t.Run("rejects a primary login stack that also prompts for a password", func(t *testing.T) {
+		t.Parallel()
+
+		env := newPamTestEnv(t)
+		env.availableModules["pam_unix.so"] = true
+		env.availableModules["pam_u2f.so"] = true
+		env.writePamFile(t, "login", "#%PAM-1.0\nauth required pam_unix.so\nauth required pam_u2f.so cue\naccount required pam_unix.so\n")
+
+		result := validateLockscreenU2fPam("login", "", env.validateDeps())
+		if result.Valid {
+			t.Fatalf("expected mixed password/U2F stack to be rejected, got %+v", result)
+		}
+		if !containsSubstr(result.Errors, "pam_unix.so") || !containsSubstr(result.Errors, "dedicated security-key") {
+			t.Fatalf("expected actionable mixed-stack error, got %v", result.Errors)
+		}
+	})
+
+	t.Run("rejects a stack without pam_u2f", func(t *testing.T) {
+		t.Parallel()
+
+		env := newPamTestEnv(t)
+		env.availableModules["pam_unix.so"] = true
+		env.writePamFile(t, "password-only", "#%PAM-1.0\nauth required pam_unix.so\n")
+
+		result := validateLockscreenU2fPam("password-only", "", env.validateDeps())
+		if result.Valid || !containsSubstr(result.Errors, "pam_u2f") {
+			t.Fatalf("expected missing-U2F error, got %+v", result)
+		}
+	})
+
+	t.Run("does not accept a similarly named module as pam_u2f", func(t *testing.T) {
+		t.Parallel()
+
+		env := newPamTestEnv(t)
+		env.availableModules["pam_u2f_helper.so"] = true
+		env.writePamFile(t, "not-u2f", "#%PAM-1.0\nauth required pam_u2f_helper.so\n")
+
+		result := validateLockscreenU2fPam("not-u2f", "", env.validateDeps())
+		if result.Valid || !containsSubstr(result.Errors, "no pam_u2f auth directive") {
+			t.Fatalf("expected exact pam_u2f module validation, got %+v", result)
+		}
+	})
+
+	t.Run("rejects a missing pam_u2f module", func(t *testing.T) {
+		t.Parallel()
+
+		env := newPamTestEnv(t)
+		env.writePamFile(t, "dankshell-u2f", "#%PAM-1.0\nauth required pam_u2f.so cue\n")
+
+		result := validateLockscreenU2fPam("dankshell-u2f", "", env.validateDeps())
+		if result.Valid || !containsSubstr(result.Errors, "pam_u2f.so is not installed") {
+			t.Fatalf("expected missing-module error, got %+v", result)
 		}
 	})
 }
