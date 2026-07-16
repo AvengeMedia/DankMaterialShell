@@ -214,7 +214,7 @@ Item {
     Item {
         id: listClip
         anchors.fill: parent
-        anchors.topMargin: BlurService.enabled && stickyHeader.visible ? 32 : 0
+        anchors.topMargin: stickyHeader.visible ? 32 : 0
         anchors.bottomMargin: bottomSectionHeader.visible ? bottomSectionHeader.height : 0
         clip: true
 
@@ -417,7 +417,7 @@ Item {
         anchors.top: parent.top
         height: 32
         z: 101
-        color: BlurService.enabled ? "transparent" : Theme.floatingSurface
+        color: "transparent"
         visible: !root._bottomSectionHeaderActive && stickyHeaderSection !== null
 
         readonly property int versionTrigger: root.controller?.viewModeVersion ?? 0
