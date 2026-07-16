@@ -11,6 +11,8 @@ Singleton {
 
     property var appUsageRanking: {}
     property bool _saving: false
+    property bool _hasLoaded: false
+    property bool _parseError: false
 
     Component.onCompleted: {
         loadSettings();
@@ -21,15 +23,21 @@ Singleton {
     }
 
     function parseSettings(content) {
+        _parseError = false;
         try {
             if (content && content.trim()) {
                 var settings = JSON.parse(content);
                 appUsageRanking = settings.appUsageRanking || {};
             }
-        } catch (e) {}
+            _hasLoaded = true;
+        } catch (e) {
+            _parseError = true;
+        }
     }
 
     function saveSettings() {
+        if (_parseError || !_hasLoaded)
+            return;
         settingsFile.setText(JSON.stringify({
             "appUsageRanking": appUsageRanking
         }, null, 2));
