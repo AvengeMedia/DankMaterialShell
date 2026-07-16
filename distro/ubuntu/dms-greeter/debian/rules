@@ -26,7 +26,7 @@ override_dh_auto_build:
 override_dh_auto_install:
 	# Install greeter files to shared data location
 	mkdir -p debian/dms-greeter/usr/share/quickshell/dms-greeter
-	cp -r DankMaterialShell-$(BASE_VERSION)/quickshell/* debian/dms-greeter/usr/share/quickshell/dms-greeter/
+	cp -rL DankMaterialShell-$(BASE_VERSION)/quickshell/* debian/dms-greeter/usr/share/quickshell/dms-greeter/
 
 	# Install launcher script
 	install -Dm755 DankMaterialShell-$(BASE_VERSION)/quickshell/Modules/Greetd/assets/dms-greeter \

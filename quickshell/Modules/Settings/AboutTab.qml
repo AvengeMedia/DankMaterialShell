@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Effects
 import qs.Common
+import qs.DankCommon.Common as DankCommon
 import qs.Services
 import qs.Widgets
 
@@ -176,14 +177,9 @@ Item {
                             text: "DANK LINUX"
                             font.pixelSize: parent.compactLogo ? 32 : 48
                             font.weight: Font.Bold
-                            font.family: interFont.name
+                            font.family: DankCommon.Fonts.sans
                             color: Theme.surfaceText
                             antialiasing: true
-
-                            FontLoader {
-                                id: interFont
-                                source: Qt.resolvedUrl("../../assets/fonts/inter/InterVariable.ttf")
-                            }
                         }
                     }
 

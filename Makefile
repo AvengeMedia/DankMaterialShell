@@ -35,6 +35,12 @@ clean:
 lint-qml:
 	@./quickshell/scripts/qmllint-entrypoints.sh
 
+# Pull the latest dank-qml-common and pin it everywhere it is consumed
+# (submodule pointer + nix flake input). Commit both in one change.
+update-common:
+	git submodule update --remote --merge dank-qml-common
+	nix --extra-experimental-features 'nix-command flakes' flake update dank-qml-common
+
 # Installation targets
 install-bin:
 	@echo "Installing $(BINARY_NAME) to $(INSTALL_DIR)..."
@@ -43,8 +49,9 @@ install-bin:
 
 install-shell:
 	@echo "Installing shell files to $(SHELL_INSTALL_DIR)..."
+	@test -e $(SHELL_DIR)/DankCommon/Widgets/DankIcon.qml || { echo "DankCommon missing: run git submodule update --init"; exit 1; }
 	@mkdir -p $(SHELL_INSTALL_DIR)
-	@cp -r $(SHELL_DIR)/* $(SHELL_INSTALL_DIR)/
+	@cp -rL $(SHELL_DIR)/* $(SHELL_INSTALL_DIR)/
 	@rm -rf $(SHELL_INSTALL_DIR)/.git* $(SHELL_INSTALL_DIR)/.github
 	@echo "Shell files installed"
 

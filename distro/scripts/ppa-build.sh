@@ -344,7 +344,7 @@ EOF
 
         if [ ! -f "dms-source.tar.gz" ]; then
             info "Downloading dms source for QML files..."
-            if wget -O dms-source.tar.gz "https://github.com/AvengeMedia/DankMaterialShell/archive/refs/tags/v${VERSION}.tar.gz"; then
+            if wget -O dms-source.tar.gz "https://github.com/AvengeMedia/DankMaterialShell/releases/download/v${VERSION}/dms-source.tar.gz"; then
                 success "source tarball downloaded"
             else
                 error "Failed to download dms-source.tar.gz"
@@ -356,7 +356,7 @@ EOF
         info "Downloading source for dms-greeter..."
         if [ ! -f "dms-greeter-source.tar.gz" ]; then
             info "Downloading dms-greeter source..."
-            if wget -O dms-greeter-source.tar.gz "https://github.com/AvengeMedia/DankMaterialShell/archive/refs/tags/v${VERSION}.tar.gz"; then
+            if wget -O dms-greeter-source.tar.gz "https://github.com/AvengeMedia/DankMaterialShell/releases/download/v${VERSION}/dms-source.tar.gz"; then
                 success "source tarball downloaded"
             else
                 error "Failed to download dms-greeter-source.tar.gz"
@@ -386,7 +386,7 @@ if [ "$IS_GIT_PACKAGE" = true ] && [ -n "$GIT_REPO" ]; then
 
     info "Cloning $GIT_REPO from GitHub (getting latest commit info)..."
     TEMP_CLONE=$(mktemp -d "$TEMP_BASE/ppa_clone_XXXXXX")
-    if git clone "https://github.com/$GIT_REPO.git" "$TEMP_CLONE"; then
+    if git clone --recurse-submodules --shallow-submodules "https://github.com/$GIT_REPO.git" "$TEMP_CLONE"; then
         GIT_COMMIT_HASH=$(cd "$TEMP_CLONE" && git rev-parse --short HEAD)
         GIT_COMMIT_COUNT=$(cd "$TEMP_CLONE" && git rev-list --count HEAD)
         UPSTREAM_VERSION=$(cd "$TEMP_CLONE" && git tag -l "v*" | sed 's/^v//' | sort -V | tail -1)

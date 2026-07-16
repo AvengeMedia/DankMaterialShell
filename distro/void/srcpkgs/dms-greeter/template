@@ -11,7 +11,7 @@ short_desc="DankMaterialShell greeter for greetd"
 maintainer="AvengeMedia <AvengeMedia.US@gmail.com>"
 license="MIT"
 homepage="https://danklinux.com"
-distfiles="https://github.com/AvengeMedia/DankMaterialShell/archive/refs/tags/v${version}.tar.gz"
+distfiles="https://github.com/AvengeMedia/DankMaterialShell/releases/download/v${version}/dms-source.tar.gz"
 checksum=14f2678d6a15223ba069d1b8c8a21a5564b735d190c231f62ed44fd8bf48677c
 
 depends="greetd quickshell acl-progs dbus elogind pam_rundir mesa-dri"

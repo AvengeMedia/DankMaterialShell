@@ -108,6 +108,14 @@ Singleton {
         return themedIconPath(iconName) || DesktopService.resolveIconPath(iconName);
     }
 
+    function trashPath(path: string, callback): void {
+        TrashService.trashPath(path, callback);
+    }
+
+    function copyPathToClipboard(path: string): void {
+        Quickshell.execDetached([Proc.dmsBin, "cl", "copy", path]);
+    }
+
     function resolveIconUrl(iconName: string): string {
         if (!iconName)
             return "";

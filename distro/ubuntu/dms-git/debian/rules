@@ -60,7 +60,7 @@ override_dh_auto_install:
 
 	# Install QML files from git clone
 	mkdir -p debian/dms-git/usr/share/quickshell/dms
-	cp -r dms-git-repo/* debian/dms-git/usr/share/quickshell/dms/
+	cp -rL dms-git-repo/* debian/dms-git/usr/share/quickshell/dms/
 
 	# Remove unnecessary directories
 	rm -rf debian/dms-git/usr/share/quickshell/dms/core

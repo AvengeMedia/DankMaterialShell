@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "dank-qml-common": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1784208144,
+        "narHash": "sha256-MYMxZXTufsok5SORzYl4hPhfHl4XrgUpmSk163USWVo=",
+        "owner": "AvengeMedia",
+        "repo": "dank-qml-common",
+        "rev": "586c2be4872a523392d3f542490d229ab50fbc66",
+        "type": "github"
+      },
+      "original": {
+        "owner": "AvengeMedia",
+        "repo": "dank-qml-common",
+        "type": "github"
+      }
+    },
     "flake-compat": {
       "flake": false,
       "locked": {
@@ -34,6 +50,7 @@
     },
     "root": {
       "inputs": {
+        "dank-qml-common": "dank-qml-common",
         "flake-compat": "flake-compat",
         "nixpkgs": "nixpkgs"
       }

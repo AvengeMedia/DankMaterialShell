@@ -141,13 +141,15 @@ DankMaterialShell/
 │   │   ├── ipp/        # Internet Printing Protocol
 │   │   └── syncmap/    # Thread-safe map
 │   └── go.mod          # Go module definition
+├── dank-qml-common/    # Shared widget library (git submodule)
 ├── quickshell/         # QML frontend (UI layer) - see "QML Frontend Architecture" below
 │   ├── shell.qml       # Main entry point
 │   ├── Services/       # IPC client wrappers
 │   ├── Modules/        # UI components
 │   ├── Widgets/        # Reusable controls
 │   ├── Modals/         # Full-screen overlays
-│   └── Common/         # Shared resources
+│   ├── Common/         # Shared resources
+│   └── DankCommon/     # Symlink to ../dank-qml-common/DankCommon
 ├── distro/             # Distribution packaging
 │   ├── arch/           # AUR packages
 │   ├── fedora/         # RPM specs
@@ -489,6 +491,8 @@ import qs.Common         // For Theme, utilities
 import qs.Services       // For service access
 import qs.Widgets        // For reusable widgets (DankIcon, etc.)
 ```
+
+Many widgets in `Widgets/`, `Common/`, and `Modals/FileBrowser/` are thin wrappers over the shared dank-qml-common library (`quickshell/DankCommon/`, a submodule symlink). Keep importing them through `qs.Widgets`, `qs.Common`, and `qs.Modals.FileBrowser` — the wrappers are the stable API for the shell and for plugins. Edit the implementations in `dank-qml-common/` (see CONTRIBUTING.md, "Shared widgets").
 
 #### Go Import Order
 

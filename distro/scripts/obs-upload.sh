@@ -216,7 +216,7 @@ update_debian_dms_service() {
         return 0
     fi
 
-    sed -i "s|/archive/refs/tags/v[0-9][^\"]*\.tar\.gz|/archive/refs/tags/v${base_version}.tar.gz|" "$service_path"
+    sed -i "s|/releases/download/v[0-9][^\"]*/dms-source\.tar\.gz|/releases/download/v${base_version}/dms-source.tar.gz|" "$service_path"
     sed -i "s|/releases/download/v[0-9][^\"]*/dms-distropkg-amd64\.gz|/releases/download/v${base_version}/dms-distropkg-amd64.gz|" "$service_path"
     sed -i "s|/releases/download/v[0-9][^\"]*/dms-distropkg-arm64\.gz|/releases/download/v${base_version}/dms-distropkg-arm64.gz|" "$service_path"
 }
@@ -542,8 +542,8 @@ if [[ "$UPLOAD_OPENSUSE" == true ]] && [[ "$UPLOAD_DEBIAN" == false ]] && [[ -f 
         if [[ -n "$GIT_URL" ]]; then
             echo "    Cloning git source from: $GIT_URL (revision: ${GIT_REVISION:-master})"
             SOURCE_DIR="$TEMP_DIR/dms-git-source"
-            if git clone --depth 1 --branch "${GIT_REVISION:-master}" "$GIT_URL" "$SOURCE_DIR" 2>/dev/null ||
-                git clone --depth 1 "$GIT_URL" "$SOURCE_DIR" 2>/dev/null; then
+            if git clone --depth 1 --recurse-submodules --shallow-submodules --branch "${GIT_REVISION:-master}" "$GIT_URL" "$SOURCE_DIR" 2>/dev/null ||
+                git clone --depth 1 --recurse-submodules --shallow-submodules "$GIT_URL" "$SOURCE_DIR" 2>/dev/null; then
                 cd "$SOURCE_DIR"
                 if [[ -n "$GIT_REVISION" ]]; then
                     git checkout "$GIT_REVISION" 2>/dev/null || true
@@ -586,7 +586,7 @@ if [[ "$UPLOAD_OPENSUSE" == true ]] && [[ "$UPLOAD_DEBIAN" == false ]] && [[ -f 
                 echo "    Creating $SOURCE0 (directory: $EXPECTED_DIR)"
                 mkdir -p "$EXPECTED_DIR"
                 cp -a "$SOURCE_DIR"/. "$EXPECTED_DIR/"
-                tar -czf "$WORK_DIR/$SOURCE0" "$EXPECTED_DIR"
+                tar -czhf "$WORK_DIR/$SOURCE0" "$EXPECTED_DIR"
                 rm -rf "$EXPECTED_DIR"
                 echo "    Created $SOURCE0 ($(stat -c%s "$WORK_DIR/$SOURCE0" 2>/dev/null || echo 0) bytes)"
                 ;;
@@ -604,7 +604,7 @@ if [[ "$UPLOAD_OPENSUSE" == true ]] && [[ "$UPLOAD_DEBIAN" == false ]] && [[ -f 
 
             echo "    Creating $SOURCE0 (directory: $EXPECTED_DIR)"
             cp -r "$SOURCE_DIR" "$EXPECTED_DIR"
-            tar -czf "$WORK_DIR/$SOURCE0" "$EXPECTED_DIR"
+            tar -czhf "$WORK_DIR/$SOURCE0" "$EXPECTED_DIR"
             rm -rf "$EXPECTED_DIR"
             echo "    Created $SOURCE0 ($(stat -c%s "$WORK_DIR/$SOURCE0" 2>/dev/null || echo 0) bytes)"
 
@@ -656,8 +656,8 @@ if [[ "$UPLOAD_DEBIAN" == true ]] && [[ -d "distro/debian/$PACKAGE/debian" ]]; t
                 if [[ -n "$GIT_URL" ]]; then
                     echo "    Cloning git source from: $GIT_URL (revision: ${GIT_REVISION:-master})"
                     SOURCE_DIR="$TEMP_DIR/dms-git-source"
-                    if git clone --depth 1 --branch "${GIT_REVISION:-master}" "$GIT_URL" "$SOURCE_DIR" 2>/dev/null ||
-                        git clone --depth 1 "$GIT_URL" "$SOURCE_DIR" 2>/dev/null; then
+                    if git clone --depth 1 --recurse-submodules --shallow-submodules --branch "${GIT_REVISION:-master}" "$GIT_URL" "$SOURCE_DIR" 2>/dev/null ||
+                        git clone --depth 1 --recurse-submodules --shallow-submodules "$GIT_URL" "$SOURCE_DIR" 2>/dev/null; then
                         cd "$SOURCE_DIR"
                         if [[ -n "$GIT_REVISION" ]]; then
                             git checkout "$GIT_REVISION" 2>/dev/null || true
@@ -820,11 +820,11 @@ if [[ "$UPLOAD_DEBIAN" == true ]] && [[ -d "distro/debian/$PACKAGE/debian" ]]; t
                     mkdir -p "$EXPECTED_DIR"
                     cp -a "$SOURCE_DIR"/. "$EXPECTED_DIR/"
                     if [[ "$SOURCE0" == *.tar.xz ]]; then
-                        tar --sort=name --mtime='2000-01-01 00:00:00' --owner=0 --group=0 -cJf "$WORK_DIR/$SOURCE0" "$EXPECTED_DIR"
+                        tar --sort=name --mtime='2000-01-01 00:00:00' --owner=0 --group=0 -cJhf "$WORK_DIR/$SOURCE0" "$EXPECTED_DIR"
                     elif [[ "$SOURCE0" == *.tar.bz2 ]]; then
-                        tar --sort=name --mtime='2000-01-01 00:00:00' --owner=0 --group=0 -cjf "$WORK_DIR/$SOURCE0" "$EXPECTED_DIR"
+                        tar --sort=name --mtime='2000-01-01 00:00:00' --owner=0 --group=0 -cjhf "$WORK_DIR/$SOURCE0" "$EXPECTED_DIR"
                     else
-                        tar --sort=name --mtime='2000-01-01 00:00:00' --owner=0 --group=0 -czf "$WORK_DIR/$SOURCE0" "$EXPECTED_DIR"
+                        tar --sort=name --mtime='2000-01-01 00:00:00' --owner=0 --group=0 -czhf "$WORK_DIR/$SOURCE0" "$EXPECTED_DIR"
                     fi
                     rm -rf "$EXPECTED_DIR"
                     echo "    Created $SOURCE0 ($(stat -c%s "$WORK_DIR/$SOURCE0" 2>/dev/null || echo 0) bytes)"
@@ -835,11 +835,11 @@ if [[ "$UPLOAD_DEBIAN" == true ]] && [[ -d "distro/debian/$PACKAGE/debian" ]]; t
                     echo "    Creating $SOURCE0 (directory: $EXPECTED_DIR)"
                     cp -r "$SOURCE_DIR" "$EXPECTED_DIR"
                     if [[ "$SOURCE0" == *.tar.xz ]]; then
-                        tar --sort=name --mtime='2000-01-01 00:00:00' --owner=0 --group=0 -cJf "$WORK_DIR/$SOURCE0" "$EXPECTED_DIR"
+                        tar --sort=name --mtime='2000-01-01 00:00:00' --owner=0 --group=0 -cJhf "$WORK_DIR/$SOURCE0" "$EXPECTED_DIR"
                     elif [[ "$SOURCE0" == *.tar.bz2 ]]; then
-                        tar --sort=name --mtime='2000-01-01 00:00:00' --owner=0 --group=0 -cjf "$WORK_DIR/$SOURCE0" "$EXPECTED_DIR"
+                        tar --sort=name --mtime='2000-01-01 00:00:00' --owner=0 --group=0 -cjhf "$WORK_DIR/$SOURCE0" "$EXPECTED_DIR"
                     else
-                        tar --sort=name --mtime='2000-01-01 00:00:00' --owner=0 --group=0 -czf "$WORK_DIR/$SOURCE0" "$EXPECTED_DIR"
+                        tar --sort=name --mtime='2000-01-01 00:00:00' --owner=0 --group=0 -czhf "$WORK_DIR/$SOURCE0" "$EXPECTED_DIR"
                     fi
                     rm -rf "$EXPECTED_DIR"
                     echo "    Created $SOURCE0 ($(stat -c%s "$WORK_DIR/$SOURCE0" 2>/dev/null || echo 0) bytes)"
@@ -849,11 +849,11 @@ if [[ "$UPLOAD_DEBIAN" == true ]] && [[ -d "distro/debian/$PACKAGE/debian" ]]; t
                     echo "    Creating $SOURCE0 (directory: $EXPECTED_DIR)"
                     cp -r "$SOURCE_DIR" "$EXPECTED_DIR"
                     if [[ "$SOURCE0" == *.tar.xz ]]; then
-                        tar --sort=name --mtime='2000-01-01 00:00:00' --owner=0 --group=0 -cJf "$WORK_DIR/$SOURCE0" "$EXPECTED_DIR"
+                        tar --sort=name --mtime='2000-01-01 00:00:00' --owner=0 --group=0 -cJhf "$WORK_DIR/$SOURCE0" "$EXPECTED_DIR"
                     elif [[ "$SOURCE0" == *.tar.bz2 ]]; then
-                        tar --sort=name --mtime='2000-01-01 00:00:00' --owner=0 --group=0 -cjf "$WORK_DIR/$SOURCE0" "$EXPECTED_DIR"
+                        tar --sort=name --mtime='2000-01-01 00:00:00' --owner=0 --group=0 -cjhf "$WORK_DIR/$SOURCE0" "$EXPECTED_DIR"
                     else
-                        tar --sort=name --mtime='2000-01-01 00:00:00' --owner=0 --group=0 -czf "$WORK_DIR/$SOURCE0" "$EXPECTED_DIR"
+                        tar --sort=name --mtime='2000-01-01 00:00:00' --owner=0 --group=0 -czhf "$WORK_DIR/$SOURCE0" "$EXPECTED_DIR"
                     fi
                     rm -rf "$EXPECTED_DIR"
                     echo "    Created $SOURCE0 ($(stat -c%s "$WORK_DIR/$SOURCE0" 2>/dev/null || echo 0) bytes)"
@@ -863,11 +863,11 @@ if [[ "$UPLOAD_DEBIAN" == true ]] && [[ -d "distro/debian/$PACKAGE/debian" ]]; t
                     echo "    Creating $SOURCE0 (directory: $DIR_NAME)"
                     cp -r "$SOURCE_DIR" "$DIR_NAME"
                     if [[ "$SOURCE0" == *.tar.xz ]]; then
-                        tar --sort=name --mtime='2000-01-01 00:00:00' --owner=0 --group=0 -cJf "$WORK_DIR/$SOURCE0" "$DIR_NAME"
+                        tar --sort=name --mtime='2000-01-01 00:00:00' --owner=0 --group=0 -cJhf "$WORK_DIR/$SOURCE0" "$DIR_NAME"
                     elif [[ "$SOURCE0" == *.tar.bz2 ]]; then
-                        tar --sort=name --mtime='2000-01-01 00:00:00' --owner=0 --group=0 -cjf "$WORK_DIR/$SOURCE0" "$DIR_NAME"
+                        tar --sort=name --mtime='2000-01-01 00:00:00' --owner=0 --group=0 -cjhf "$WORK_DIR/$SOURCE0" "$DIR_NAME"
                     else
-                        tar --sort=name --mtime='2000-01-01 00:00:00' --owner=0 --group=0 -czf "$WORK_DIR/$SOURCE0" "$DIR_NAME"
+                        tar --sort=name --mtime='2000-01-01 00:00:00' --owner=0 --group=0 -czhf "$WORK_DIR/$SOURCE0" "$DIR_NAME"
                     fi
                     rm -rf "$DIR_NAME"
                     echo "    Created $SOURCE0 ($(stat -c%s "$WORK_DIR/$SOURCE0" 2>/dev/null || echo 0) bytes)"

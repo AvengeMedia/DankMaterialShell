@@ -70,7 +70,7 @@ override_dh_auto_install:
 
 	mkdir -p debian/dms-git/usr/share/quickshell/dms debian/dms-git/usr/lib/systemd/user
 	if [ -d quickshell ]; then \
-		cp -r quickshell/* debian/dms-git/usr/share/quickshell/dms/; \
+		cp -rL quickshell/* debian/dms-git/usr/share/quickshell/dms/; \
 		install -Dm644 assets/systemd/dms.service debian/dms-git/usr/lib/systemd/user/dms.service; \
 		install -Dm644 assets/dms-open.desktop debian/dms-git/usr/share/applications/dms-open.desktop; \
 		install -Dm644 assets/com.danklinux.dms.desktop debian/dms-git/usr/share/applications/com.danklinux.dms.desktop; \

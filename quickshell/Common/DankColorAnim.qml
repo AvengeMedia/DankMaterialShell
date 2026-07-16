@@ -1,9 +1,3 @@
-import QtQuick
-import qs.Common
+import qs.DankCommon.Common as DankCommon
 
-// Reusable ColorAnimation wrapper
-ColorAnimation {
-    duration: Theme.expressiveDurations.normal
-    easing.type: Easing.BezierSpline
-    easing.bezierCurve: Theme.expressiveCurves.standard
-}
+DankCommon.DankColorAnim {}

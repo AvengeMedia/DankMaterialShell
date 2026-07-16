@@ -6,6 +6,14 @@ To contribute fork this repository, make your changes, and open a pull request.
 
 ## Setup
 
+Clone with submodules — the shared widget library ([dank-qml-common](https://github.com/AvengeMedia/dank-qml-common)) is vendored at `dank-qml-common/` and symlinked into `quickshell/DankCommon`:
+
+```bash
+git clone --recurse-submodules https://github.com/AvengeMedia/DankMaterialShell.git
+# or, in an existing clone:
+git submodule update --init
+```
+
 Install [prek](https://prek.j178.dev/) then activate pre-commit hooks:
 
 ```bash
@@ -27,6 +35,24 @@ This will provide:
 - Properly configured QML2_IMPORT_PATH
 
 The dev shell automatically creates the `.qmlls.ini` file in the `quickshell/` directory.
+
+## Shared widgets (dank-qml-common)
+
+Everything under `quickshell/DankCommon/` (core widgets, the file browser, scroll physics, bundled fonts) is shared across the DMS suite and lives in the `dank-qml-common` submodule. It is a normal git worktree:
+
+1. Edit files under `dank-qml-common/` (or through the `quickshell/DankCommon` symlink — same files) and test in the running shell; hot reload works as usual. For isolated widget work, the library is its own runnable config with a gallery: `qs -c dank-qml-common`.
+2. Commit and PR those changes in the `dank-qml-common` repo: `cd dank-qml-common && git switch -c my-change`, push, open the PR there.
+3. Once merged, bump the pointer here: `make update-common` (updates the submodule and the nix flake input together), then commit alongside any DMS-side changes. If you only bump the submodule, CI syncs `flake.lock` to it automatically on master.
+
+The submodule URL in `.gitmodules` is HTTPS so CI and anonymous clones keep working. To push over SSH instead of being prompted for credentials, add a push rewrite to your git config — fetches stay HTTPS, pushes use SSH:
+
+```bash
+git config --global url."git@github.com:AvengeMedia/".pushInsteadOf "https://github.com/AvengeMedia/"
+```
+
+Shared widgets read app-provided singletons (`Theme`, `SettingsData`, ...) through a documented contract — see the dank-qml-common README. If your change needs a new contract property, add it to the library's stub singletons in the same PR, then to `quickshell/Common/` here when you bump.
+
+Files in `quickshell/Widgets/`, `quickshell/Common/`, and `quickshell/Modals/FileBrowser/` that moved to the library remain in place as thin wrappers, so `import qs.Widgets`, `qs.Common`, and `qs.Modals.FileBrowser` keep working for the shell and for plugins.
 
 ## VSCode Setup
 
@@ -103,6 +129,8 @@ Text {
 ```
 
 Preferably, try to keep new terms to a minimum and re-use existing terms where possible. See `quickshell/translations/en.json` for the list of existing terms. (This isn't always possible obviously, but instead of using `Auto-connect` you would use `Autoconnect` since it's already translated)
+
+Strings inside `quickshell/DankCommon/` are owned by the dank-qml-common repo and synced through the DMS POEditor project, not this one — extraction here deliberately skips them. At runtime `I18n` merges both catalogs (app terms win), with the shared translations shipping inside the submodule at `DankCommon/translations/poexports/`.
 
 ### GO (`core` directory)
 

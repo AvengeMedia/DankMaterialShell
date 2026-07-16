@@ -520,7 +520,7 @@ func (m *ManualPackageInstaller) installDankMaterialShell(ctx context.Context, v
 			Progress:    0.90,
 			Step:        "Cloning DankMaterialShell...",
 			IsComplete:  false,
-			CommandInfo: "git clone https://github.com/AvengeMedia/DankMaterialShell.git",
+			CommandInfo: "git clone --recurse-submodules https://github.com/AvengeMedia/DankMaterialShell.git",
 		}
 
 		configDir := filepath.Dir(dmsPath)
@@ -528,7 +528,7 @@ func (m *ManualPackageInstaller) installDankMaterialShell(ctx context.Context, v
 			return fmt.Errorf("failed to create quickshell config directory: %w", err)
 		}
 
-		cloneCmd := exec.CommandContext(ctx, "git", "clone",
+		cloneCmd := exec.CommandContext(ctx, "git", "clone", "--recurse-submodules",
 			"https://github.com/AvengeMedia/DankMaterialShell.git", dmsPath)
 		if err := cloneCmd.Run(); err != nil {
 			return fmt.Errorf("failed to clone DankMaterialShell: %w", err)
@@ -552,6 +552,8 @@ func (m *ManualPackageInstaller) installDankMaterialShell(ctx context.Context, v
 			m.logError(fmt.Sprintf("Failed to checkout tag %s", latestTag), err)
 			return nil
 		}
+
+		m.syncDMSSubmodules(ctx, dmsPath)
 
 		m.log(fmt.Sprintf("Checked out latest tag: %s", latestTag))
 		m.log("DankMaterialShell cloned successfully")
@@ -591,6 +593,8 @@ func (m *ManualPackageInstaller) installDankMaterialShell(ctx context.Context, v
 			return nil
 		}
 
+		m.syncDMSSubmodules(ctx, dmsPath)
+
 		m.log("DankMaterialShell updated successfully (git variant)")
 		return nil
 	}
@@ -609,8 +613,17 @@ func (m *ManualPackageInstaller) installDankMaterialShell(ctx context.Context, v
 		return nil
 	}
 
+	m.syncDMSSubmodules(ctx, dmsPath)
+
 	m.log(fmt.Sprintf("Updated to tag: %s", latestTag))
 	return nil
+}
+
+func (m *ManualPackageInstaller) syncDMSSubmodules(ctx context.Context, dmsPath string) {
+	submoduleCmd := exec.CommandContext(ctx, "git", "-C", dmsPath, "submodule", "update", "--init", "--recursive")
+	if err := submoduleCmd.Run(); err != nil {
+		m.logError("Failed to update submodules", err)
+	}
 }
 
 func (m *ManualPackageInstaller) installXwaylandSatellite(ctx context.Context, sudoPassword string, progressChan chan<- InstallProgressMsg) error {

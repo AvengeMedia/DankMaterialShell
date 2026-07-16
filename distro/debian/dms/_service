@@ -3,7 +3,7 @@
   <service name="download_url">
     <param name="protocol">https</param>
     <param name="host">github.com</param>
-    <param name="path">/AvengeMedia/DankMaterialShell/archive/refs/tags/v1.2.3.tar.gz</param>
+    <param name="path">/AvengeMedia/DankMaterialShell/releases/download/v1.2.3/dms-source.tar.gz</param>
     <param name="filename">dms-source.tar.gz</param>
   </service>
   <!-- Download amd64 binary -->

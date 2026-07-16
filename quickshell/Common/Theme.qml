@@ -6,6 +6,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.Common
+import qs.DankCommon.Common as DankCommon
 import qs.Services
 import qs.Modules.Greetd
 import "StockThemes.js" as StockThemes
@@ -1230,16 +1231,28 @@ Singleton {
 
     property string fontFamily: {
         if (typeof SessionData !== "undefined" && SessionData.isGreeterMode && typeof GreetdSettings !== "undefined") {
-            return GreetdSettings.getEffectiveFontFamily();
+            return resolvedFontFamily(GreetdSettings.getEffectiveFontFamily());
         }
-        return typeof SettingsData !== "undefined" ? SettingsData.fontFamily : "Inter Variable";
+        return typeof SettingsData !== "undefined" ? resolvedFontFamily(SettingsData.fontFamily) : DankCommon.Fonts.sans;
     }
 
     property string monoFontFamily: {
         if (typeof SessionData !== "undefined" && SessionData.isGreeterMode && typeof GreetdSettings !== "undefined") {
-            return GreetdSettings.monoFontFamily;
+            return resolvedMonoFontFamily(GreetdSettings.monoFontFamily);
         }
-        return typeof SettingsData !== "undefined" ? SettingsData.monoFontFamily : "Fira Code";
+        return typeof SettingsData !== "undefined" ? resolvedMonoFontFamily(SettingsData.monoFontFamily) : DankCommon.Fonts.mono;
+    }
+
+    function resolvedFontFamily(family) {
+        if (family === defaultFontFamily)
+            return DankCommon.Fonts.sans;
+        return family;
+    }
+
+    function resolvedMonoFontFamily(family) {
+        if (family === defaultMonoFontFamily)
+            return DankCommon.Fonts.mono;
+        return family;
     }
 
     property int fontWeight: {

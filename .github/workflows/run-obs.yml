@@ -36,6 +36,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          submodules: recursive
 
       - name: Check for updates
         id: check
@@ -199,6 +200,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          submodules: recursive
 
       - name: Wait before OBS upload
         run: sleep 3

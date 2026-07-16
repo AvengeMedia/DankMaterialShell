@@ -250,6 +250,10 @@ func updateOtherDistros() error {
 		return fmt.Errorf("failed to fetch changes: %w", err)
 	}
 
+	if err := updateSubmodules(); err != nil {
+		return fmt.Errorf("failed to update submodules: %w", err)
+	}
+
 	if currentTag != "" {
 		latestTagCmd := exec.Command("git", "tag", "-l", "v*", "--sort=-version:refname")
 		latestTagOutput, err := latestTagCmd.Output()
@@ -291,6 +295,10 @@ func updateOtherDistros() error {
 			return fmt.Errorf("update cancelled")
 		}
 
+		if err := updateSubmodules(); err != nil {
+			return fmt.Errorf("failed to update submodules: %w", err)
+		}
+
 		fmt.Printf("\nUpdate complete! Updated from %s to %s\n", currentTag, latestTag)
 		return nil
 	}
@@ -320,8 +328,19 @@ func updateOtherDistros() error {
 		return fmt.Errorf("update cancelled")
 	}
 
+	if err := updateSubmodules(); err != nil {
+		return fmt.Errorf("failed to update submodules: %w", err)
+	}
+
 	fmt.Println("\nUpdate complete!")
 	return nil
+}
+
+func updateSubmodules() error {
+	submoduleCmd := exec.Command("git", "submodule", "update", "--init", "--recursive")
+	submoduleCmd.Stdout = os.Stdout
+	submoduleCmd.Stderr = os.Stderr
+	return submoduleCmd.Run()
 }
 
 func offerReclone(dmsPath string) bool {
@@ -342,7 +361,7 @@ func offerReclone(dmsPath string) bool {
 	}
 
 	fmt.Println("Cloning fresh copy...")
-	cloneCmd := exec.Command("git", "clone", "https://github.com/AvengeMedia/DankMaterialShell.git", dmsPath)
+	cloneCmd := exec.Command("git", "clone", "--recurse-submodules", "https://github.com/AvengeMedia/DankMaterialShell.git", dmsPath)
 	cloneCmd.Stdout = os.Stdout
 	cloneCmd.Stderr = os.Stderr
 	if err := cloneCmd.Run(); err != nil {

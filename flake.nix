@@ -7,12 +7,17 @@
       url = "github:NixOS/flake-compat";
       flake = false;
     };
+    dank-qml-common = {
+      url = "github:AvengeMedia/dank-qml-common";
+      flake = false;
+    };
   };
 
   outputs =
     {
       self,
       nixpkgs,
+      dank-qml-common,
       ...
     }:
     let
@@ -124,6 +129,10 @@
               postInstall = ''
                 mkdir -p $out/share/quickshell/dms
                 cp -r ${rootSrc}/quickshell/. $out/share/quickshell/dms/
+
+                rm -f $out/share/quickshell/dms/DankCommon
+                cp -r ${dank-qml-common}/DankCommon $out/share/quickshell/dms/DankCommon
+                chmod -R u+w $out/share/quickshell/dms/DankCommon
 
                 chmod u+w $out/share/quickshell/dms/VERSION
                 echo "${version}" > $out/share/quickshell/dms/VERSION

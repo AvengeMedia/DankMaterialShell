@@ -1,0 +1,56 @@
+name: Sync flake.lock to dank-qml-common
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "dank-qml-common"
+    branches:
+      - master
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create GitHub App token
+        id: app_token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          token: ${{ steps.app_token.outputs.token }}
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+
+      - name: Point flake input at the submodule commit
+        run: |
+          set -euo pipefail
+          submodule_rev=$(git ls-tree HEAD dank-qml-common --object-only)
+          flake_rev=$(python3 -c "import json; print(json.load(open('flake.lock'))['nodes']['dank-qml-common']['locked']['rev'])")
+          [ "$submodule_rev" = "$flake_rev" ] && { echo "flake.lock already matches $submodule_rev"; exit 0; }
+          nix flake lock --override-input dank-qml-common "github:AvengeMedia/dank-qml-common/$submodule_rev"
+
+      - name: Commit and push flake.lock update
+        env:
+          GH_TOKEN: ${{ steps.app_token.outputs.token }}
+        run: |
+          set -euo pipefail
+          if git diff --quiet flake.lock; then
+            echo "No changes to flake.lock"
+            exit 0
+          fi
+          git config user.name "dms-ci[bot]"
+          git config user.email "dms-ci[bot]@users.noreply.github.com"
+          git add flake.lock
+          git commit -m "nix: sync flake.lock to dank-qml-common submodule"
+          git pull --rebase origin ${{ github.ref_name }}
+          git push https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git HEAD:${{ github.ref_name }}

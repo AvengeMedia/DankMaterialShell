@@ -35,6 +35,8 @@ Plugins let you add custom widgets to DankBar and Control Center. They're discov
    - Supports left, center, and right sections
    - Supports any dankbar position (top/left/right/bottom)
 
+Many widgets are implemented in the shared [dank-qml-common](https://github.com/AvengeMedia/dank-qml-common) library and re-exported by DMS. Plugins should keep importing `qs.Common`, `qs.Services`, `qs.Widgets`, and `qs.Modules.Plugins` — these remain the supported plugin API and are unaffected by where a widget is implemented.
+
 ## Plugin Structure
 
 Each plugin must be a directory in `$CONFIGPATH/DankMaterialShell/plugins/` containing:

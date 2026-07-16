@@ -63,7 +63,7 @@ override_dh_auto_install:
 
 	# Install QML files from source tarball
 	mkdir -p debian/dms/usr/share/quickshell/dms
-	cp -r DankMaterialShell-$(BASE_VERSION)/* debian/dms/usr/share/quickshell/dms/
+	cp -rL DankMaterialShell-$(BASE_VERSION)/* debian/dms/usr/share/quickshell/dms/
 
 	# Remove unnecessary directories
 	rm -rf debian/dms/usr/share/quickshell/dms/core

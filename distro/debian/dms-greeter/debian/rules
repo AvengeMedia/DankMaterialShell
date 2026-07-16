@@ -20,7 +20,7 @@ override_dh_auto_install:
 	fi; \
 	if [ -n "$$SOURCE_DIR" ]; then \
 		mkdir -p debian/dms-greeter/usr/share/quickshell/dms-greeter && \
-		( cd $$SOURCE_DIR && tar cf - --exclude=debian . ) | \
+		( cd $$SOURCE_DIR && tar chf - --exclude=debian . ) | \
 		( cd debian/dms-greeter/usr/share/quickshell/dms-greeter && tar xf - ) && \
 		install -Dm755 $$SOURCE_DIR/Modules/Greetd/assets/dms-greeter \
 			debian/dms-greeter/usr/bin/dms-greeter && \

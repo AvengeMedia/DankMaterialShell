@@ -83,6 +83,7 @@ jobs:
         with:
           ref: ${{ github.event.release.tag_name || (github.event.inputs.version && (startsWith(github.event.inputs.version, 'v') && github.event.inputs.version || format('v{0}', github.event.inputs.version))) || github.ref }}
           fetch-depth: 0
+          submodules: recursive
 
       - name: Record checked-out source commit
         run: echo "SOURCE_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
@@ -225,7 +226,7 @@ jobs:
           if [ -n "$RELEASE_VER" ] && { [ "$BUILD_DMS" = "true" ] || [ "$BUILD_GREETER" = "true" ]; }; then
             echo "🔧 Updating stable templates for $ARCHIVE_TAG"
             TARBALL="$(mktemp)"
-            curl -fsSL -o "$TARBALL" "https://github.com/${{ github.repository }}/archive/refs/tags/${ARCHIVE_TAG}.tar.gz"
+            curl -fsSL -o "$TARBALL" "https://github.com/${{ github.repository }}/releases/download/${ARCHIVE_TAG}/dms-source.tar.gz"
             RELEASE_CHECKSUM="$(sha256sum "$TARBALL" | cut -d' ' -f1)"
             rm -f "$TARBALL"
 
@@ -246,7 +247,7 @@ jobs:
             # into $wrksrc (create_wrksrc=yes handles the rest).
             SRC_CACHE="hostdir/sources/dms-git-${GIT_VER}"
             mkdir -p "$SRC_CACHE"
-            tar -czf "${SRC_CACHE}/dms-git-${GIT_VER}.tar.gz" \
+            tar -czhf "${SRC_CACHE}/dms-git-${GIT_VER}.tar.gz" \
               --exclude=void-packages \
               --exclude=r2-repo \
               --exclude=.git \

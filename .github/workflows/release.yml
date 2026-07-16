@@ -42,6 +42,7 @@ jobs:
         with:
           ref: ${{ inputs.tag }}
           fetch-depth: 0
+          submodules: recursive
 
       - name: Set up Go
         uses: actions/setup-go@v6
@@ -191,11 +192,13 @@ jobs:
         with:
           ref: ${{ inputs.tag }}
           fetch-depth: 0
+          submodules: recursive
 
       - name: Fetch updated tag after version bump
         run: |
           git fetch origin --force tag ${TAG}
           git checkout ${TAG}
+          git submodule update --init --recursive
 
       - name: Set up Go
         uses: actions/setup-go@v6
@@ -252,6 +255,7 @@ jobs:
           - **`dankinstall-arm64.gz`** - Installer binary for ARM64 systems
           - **`dms-cli-<version>.tar.gz`** - Go source code with vendored modules (for distro packaging)
           - **`dms-qml.tar.gz`** - QML source code only
+          - **`dms-source.tar.gz`** - Full repository source with bundled DankCommon (for distro packaging)
 
           ### Checksums
           - **`*.sha256`** - SHA256 checksums for verifying download integrity
@@ -298,6 +302,22 @@ jobs:
 
           # Copy completions
           cp _core_assets/completion.* _release_assets/ 2>/dev/null || true
+
+          # Replace the DankCommon symlink with real submodule content for packaging
+          rm quickshell/DankCommon
+          cp -r dank-qml-common/DankCommon quickshell/DankCommon
+
+          # Create full source tarball (GitHub tag archives never contain submodule content)
+          VERSION_NUM=${TAG#v}
+          tar --exclude='.git' \
+              --exclude='.github' \
+              --exclude='dank-qml-common' \
+              --exclude='_release_assets' \
+              --exclude='_core_assets' \
+              --exclude='RELEASE_BODY.md' \
+              --transform "s,^\.,DankMaterialShell-${VERSION_NUM},S" \
+              -czf _release_assets/dms-source.tar.gz .
+          (cd _release_assets && sha256sum dms-source.tar.gz > dms-source.tar.gz.sha256)
 
           # Create QML source package (exclude build artifacts and git files)
           # Copy root LICENSE and CONTRIBUTING.md to quickshell/ for packaging
