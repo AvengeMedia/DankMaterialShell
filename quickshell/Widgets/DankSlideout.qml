@@ -174,7 +174,7 @@ PanelWindow {
             id: contentRect
             layer.enabled: Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
             layer.smooth: false
-            layer.textureSize: Qt.size(width * root.dpr, height * root.dpr)
+            layer.textureSize: Qt.size(0, 0)
             opacity: 1
 
             readonly property color slideoutSurfaceColor: root.customTransparency >= 0 ? Theme.withAlpha(Theme.surfaceContainer, root.customTransparency) : Theme.popupLayerColor(Theme.surfaceContainer)
