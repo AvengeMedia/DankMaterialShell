@@ -19,39 +19,39 @@ Item {
 
     function greeterFingerprintDescription() {
         if (SettingsData.greeterPamExternallyManaged)
-            return I18n.tr("Managed by the primary PAM source", "factor managed by PAM source status");
+            return I18n.tr("Managed by the primary PAM source.", "factor managed by PAM source status");
         if (SettingsData.greeterFingerprintSource === "pam")
             return I18n.tr("PAM already provides fingerprint auth. Enable this to show it at login.", "greeter fingerprint login setting");
 
         switch (SettingsData.greeterFingerprintReason) {
         case "ready":
-            return I18n.tr("Authentication changes apply automatically", "greeter auth setting description");
+            return I18n.tr("Authentication changes apply automatically.", "greeter auth setting description");
         case "missing_enrollment":
             return I18n.tr("Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and run Sync later.", "greeter fingerprint login setting");
         case "missing_reader":
-            return I18n.tr("No fingerprint reader detected", "fingerprint setting status");
+            return I18n.tr("No fingerprint reader detected.", "fingerprint setting status");
         case "missing_pam_support":
             return I18n.tr("Not available — install fprintd and pam_fprintd, or configure greetd PAM.", "greeter fingerprint login setting");
         default:
-            return I18n.tr("Fingerprint availability could not be confirmed", "fingerprint setting status");
+            return I18n.tr("Fingerprint availability could not be confirmed.", "fingerprint setting status");
         }
     }
 
     function greeterU2fDescription() {
         if (SettingsData.greeterPamExternallyManaged)
-            return I18n.tr("Managed by the primary PAM source", "factor managed by PAM source status");
+            return I18n.tr("Managed by the primary PAM source.", "factor managed by PAM source status");
         if (SettingsData.greeterU2fSource === "pam")
             return I18n.tr("PAM already provides security-key auth. Enable this to show it at login.", "greeter security key login setting");
 
         switch (SettingsData.greeterU2fReason) {
         case "ready":
-            return I18n.tr("Authentication changes apply automatically", "greeter auth setting description");
+            return I18n.tr("Authentication changes apply automatically.", "greeter auth setting description");
         case "missing_key_registration":
             return I18n.tr("Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.", "security key setting status");
         case "missing_pam_support":
             return I18n.tr("Not available — install or configure pam_u2f, or configure greetd PAM.", "greeter security key login setting");
         default:
-            return I18n.tr("Security-key availability could not be confirmed", "security key setting status");
+            return I18n.tr("Security-key availability could not be confirmed.", "security key setting status");
         }
     }
 
@@ -400,7 +400,7 @@ Item {
                 settingKey: "greeterStatus"
 
                 StyledText {
-                    text: I18n.tr("Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.")
+                    text: I18n.tr("Sync applies your theme and settings to the login screen. Other users should run dms greeter sync --profile instead of a full sync. Authentication changes apply automatically.")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceVariantText
                     width: parent.width
@@ -474,7 +474,7 @@ Item {
                 settingKey: "greeterAuth"
 
                 StyledText {
-                    text: I18n.tr("Enable fingerprint or security key for DMS Greeter")
+                    text: I18n.tr("Enable fingerprint or security key for DMS Greeter. Authentication changes apply automatically.")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceVariantText
                     width: parent.width
@@ -486,7 +486,7 @@ Item {
                     settingKey: "greeterPamExternallyManaged"
                     tags: ["greeter", "pam", "managed", "external", "greetd", "auth"]
                     text: I18n.tr("Use system PAM authentication", "system PAM policy toggle")
-                    description: I18n.tr("DMS removes its managed block from /etc/pam.d/greetd and stops write services", "greeter system PAM toggle description")
+                    description: I18n.tr("DMS removes its managed block from /etc/pam.d/greetd and stops writing to it", "greeter system PAM toggle description")
                     checked: SettingsData.greeterPamExternallyManaged
                     onToggled: checked => SettingsData.set("greeterPamExternallyManaged", checked)
                 }
@@ -553,7 +553,7 @@ Item {
                     settingKey: "greeterLockDateFormat"
                     tags: ["greeter", "date", "format"]
                     text: I18n.tr("Date Format")
-                    description: I18n.tr("Format the date on the login screen")
+                    description: I18n.tr("Greeter only — format for the date on the login screen")
                     options: root._lockDateFormatPresets.map(p => p.label)
                     currentValue: {
                         var current = (SettingsData.greeterLockDateFormat !== undefined && SettingsData.greeterLockDateFormat !== "") ? SettingsData.greeterLockDateFormat : SettingsData.lockDateFormat || "";
@@ -577,7 +577,7 @@ Item {
                 }
 
                 StyledText {
-                    text: I18n.tr("Use a custom image for the login screen, or leave empty to use desktop wallpaper")
+                    text: I18n.tr("Use a custom image for the login screen, or leave empty to use your desktop wallpaper.")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceVariantText
                     width: parent.width
@@ -605,7 +605,7 @@ Item {
                 settingKey: "greeterBehavior"
 
                 StyledText {
-                    text: I18n.tr("Convenience options for the login screen")
+                    text: I18n.tr("Convenience options for the login screen. Sync to apply.")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceVariantText
                     width: parent.width
@@ -649,7 +649,7 @@ Item {
                 settingKey: "greeterDeps"
 
                 StyledText {
-                    text: I18n.tr("Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys).")
+                    text: I18n.tr("Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys). Auth changes apply automatically and may open a terminal for sudo.")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceVariantText
                     width: parent.width
@@ -658,7 +658,7 @@ Item {
                 }
 
                 StyledText {
-                    text: I18n.tr("Installation and PAM setup are documented in the ") + "<a href=\"https://danklinux.com/docs/dankgreeter/installation\" style=\"text-decoration:none; color:" + Theme.primary + ";\">DankGreeter docs.</a> "
+                    text: I18n.tr("Installation and PAM setup: see the ") + "<a href=\"https://danklinux.com/docs/dankgreeter/installation\" style=\"text-decoration:none; color:" + Theme.primary + ";\">DankGreeter docs</a> " + I18n.tr("or run ") + "'dms greeter install'."
                     textFormat: Text.RichText
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceVariantText

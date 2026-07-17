@@ -604,7 +604,7 @@ Singleton {
                 let details = out;
                 if (err !== "")
                     details = details !== "" ? details + "\n\nstderr:\n" + err : "stderr:\n" + err;
-                ToastService.showInfo(I18n.tr("Authentication changes applied"), details, "", "auth-sync");
+                ToastService.showInfo(I18n.tr("Authentication changes applied."), details, "", "auth-sync");
                 root.detectAuthCapabilities();
                 root.finishAuthApply();
                 return;

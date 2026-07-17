@@ -96,28 +96,28 @@ Item {
     function lockFingerprintDescription() {
         switch (SettingsData.lockFingerprintReason) {
         case "ready":
-            return I18n.tr("Use fingerprint authentication for the lock screen", "lock screen fingerprint setting");
+            return I18n.tr("Use fingerprint authentication for the lock screen.", "lock screen fingerprint setting");
         case "missing_enrollment":
             return I18n.tr("Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and enroll later.", "lock screen fingerprint setting");
         case "missing_reader":
-            return I18n.tr("No fingerprint reader detected", "fingerprint setting status");
+            return I18n.tr("No fingerprint reader detected.", "fingerprint setting status");
         case "missing_pam_support":
-            return I18n.tr("Not available - install fprintd and pam_fprintd", "lock screen fingerprint setting");
+            return I18n.tr("Not available — install fprintd and pam_fprintd.", "lock screen fingerprint setting");
         default:
-            return I18n.tr("Fingerprint availability could not be confirmed", "fingerprint setting status");
+            return I18n.tr("Fingerprint availability could not be confirmed.", "fingerprint setting status");
         }
     }
 
     function lockU2fDescription() {
         switch (SettingsData.lockU2fReason) {
         case "ready":
-            return I18n.tr("Use a security key for lock screen authentication", "lock screen U2F security key setting");
+            return I18n.tr("Use a security key for lock screen authentication.", "lock screen U2F security key setting");
         case "missing_key_registration":
             return I18n.tr("Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.", "security key setting status");
         case "missing_pam_support":
-            return I18n.tr("Not available - install or configure pam_u2f", "lock screen security key setting");
+            return I18n.tr("Not available — install or configure pam_u2f.", "lock screen security key setting");
         default:
-            return I18n.tr("Security-key availability could not be confirmed", "security key setting status");
+            return I18n.tr("Security-key availability could not be confirmed.", "security key setting status");
         }
     }
 
@@ -207,7 +207,7 @@ Item {
             const warns = Array.isArray(data.warnings) ? data.warnings : [];
             root.authValidateOk = true;
             root.authValidateWarn = warns.length > 0;
-            root.authValidateMessage = [I18n.tr("Authentication changes applied"), ...warns].join("\n");
+            root.authValidateMessage = [I18n.tr("Authentication changes applied."), ...warns].join("\n");
         }
     }
 
@@ -245,7 +245,7 @@ Item {
             const warns = Array.isArray(data.warnings) ? data.warnings : [];
             root.u2fValidateOk = true;
             root.u2fValidateWarn = warns.length > 0;
-            root.u2fValidateMessage = [I18n.tr("Authentication changes applied"), ...warns].join("\n");
+            root.u2fValidateMessage = [I18n.tr("Authentication changes applied."), ...warns].join("\n");
             root.refreshAuthDetection();
         }
     }
@@ -400,7 +400,7 @@ Item {
                 settingKey: "lockAuthSource"
 
                 StyledText {
-                    text: I18n.tr("Authentication changes apply automatically")
+                    text: I18n.tr("Authentication changes apply automatically.")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceVariantText
                     width: parent.width
@@ -484,7 +484,7 @@ Item {
                     settingKey: "enableFprint"
                     tags: ["lock", "screen", "fingerprint", "authentication", "biometric", "fprint"]
                     text: I18n.tr("Enable fingerprint authentication")
-                    description: root.lockFprintControlledByPrimary ? I18n.tr("Managed by the primary PAM source", "factor managed by PAM source status") : root.lockFingerprintDescription()
+                    description: root.lockFprintControlledByPrimary ? I18n.tr("Managed by the primary PAM source.", "factor managed by PAM source status") : root.lockFingerprintDescription()
                     descriptionColor: root.lockFprintControlledByPrimary || SettingsData.lockFingerprintReason === "ready" ? Theme.surfaceVariantText : Theme.warning
                     checked: SettingsData.enableFprint || root.primaryPamHasFprint
                     enabled: root.lockFprintToggleAvailable && !root.lockFprintControlledByPrimary
@@ -495,7 +495,7 @@ Item {
                     settingKey: "enableU2f"
                     tags: ["lock", "screen", "u2f", "yubikey", "security", "key", "fido", "authentication", "hardware"]
                     text: I18n.tr("Enable security key authentication", "Enable FIDO2/U2F hardware security key for lock screen")
-                    description: root.lockU2fControlledByPrimary ? I18n.tr("Managed by the primary PAM source", "factor managed by PAM source status") : root.lockU2fDescription()
+                    description: root.lockU2fControlledByPrimary ? I18n.tr("Managed by the primary PAM source.", "factor managed by PAM source status") : root.lockU2fDescription()
                     descriptionColor: root.lockU2fControlledByPrimary || SettingsData.lockU2fReason === "ready" ? Theme.surfaceVariantText : Theme.warning
                     checked: SettingsData.enableU2f || root.primaryPamHasU2f
                     enabled: root.lockU2fToggleAvailable && !root.lockU2fControlledByPrimary
