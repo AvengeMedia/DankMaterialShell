@@ -94,6 +94,20 @@ func (r *RegionSelector) setupPointerHandlers() {
 			return
 		}
 
+		if r.phase == phaseScroll {
+			if e.Button != 0x110 || e.State != 1 || r.activeSurface != r.selection.surface {
+				return
+			}
+			switch r.scrollBarHit(r.pointerX, r.pointerY) {
+			case "done":
+				r.finishScroll()
+			case "cancel":
+				r.cancelled = true
+				r.running = false
+			}
+			return
+		}
+
 		switch e.Button {
 		case 0x110: // BTN_LEFT
 			switch e.State {
@@ -135,6 +149,17 @@ func (r *RegionSelector) setupKeyboardHandlers() {
 			return
 		}
 
+		if r.phase == phaseScroll {
+			switch e.Key {
+			case 1:
+				r.cancelled = true
+				r.running = false
+			case 28, 96:
+				r.finishScroll()
+			}
+			return
+		}
+
 		switch e.Key {
 		case 1:
 			r.cancelled = true
@@ -152,17 +177,15 @@ func (r *RegionSelector) setupKeyboardHandlers() {
 	})
 }
 
-func (r *RegionSelector) finishSelection() {
+func (r *RegionSelector) selectionDeviceRect() (*OutputSurface, int, int, int, int) {
 	if r.selection.surface == nil {
-		r.running = false
-		return
+		return nil, 0, 0, 0, 0
 	}
 
 	os := r.selection.surface
 	srcBuf := r.getSourceBuffer(os)
 	if srcBuf == nil {
-		r.running = false
-		return
+		return nil, 0, 0, 0, 0
 	}
 
 	x1, y1 := r.selection.anchorX, r.selection.anchorY
@@ -181,24 +204,10 @@ func (r *RegionSelector) finishSelection() {
 		scaleY = float64(srcBuf.Height) / float64(os.logicalH)
 	}
 
-	bx1 := int(x1 * scaleX)
-	by1 := int(y1 * scaleY)
-	bx2 := int(x2 * scaleX)
-	by2 := int(y2 * scaleY)
-
-	// Clamp to buffer bounds
-	if bx1 < 0 {
-		bx1 = 0
-	}
-	if by1 < 0 {
-		by1 = 0
-	}
-	if bx2 > srcBuf.Width {
-		bx2 = srcBuf.Width
-	}
-	if by2 > srcBuf.Height {
-		by2 = srcBuf.Height
-	}
+	bx1 := clamp(int(x1*scaleX), 0, srcBuf.Width)
+	by1 := clamp(int(y1*scaleY), 0, srcBuf.Height)
+	bx2 := clamp(int(x2*scaleX), 0, srcBuf.Width)
+	by2 := clamp(int(y2*scaleY), 0, srcBuf.Height)
 
 	w, h := bx2-bx1+1, by2-by1+1
 	if r.shiftHeld && w != h {
@@ -215,7 +224,23 @@ func (r *RegionSelector) finishSelection() {
 		h = 1
 	}
 
-	// Create cropped buffer and copy pixels directly
+	return os, bx1, by1, w, h
+}
+
+func (r *RegionSelector) finishSelection() {
+	os, bx1, by1, w, h := r.selectionDeviceRect()
+	if os == nil {
+		r.running = false
+		return
+	}
+
+	if r.screenshoter != nil && r.screenshoter.config.Mode == ModeScroll {
+		r.enterScrollPhase(os, bx1, by1, w, h)
+		return
+	}
+
+	srcBuf := r.getSourceBuffer(os)
+
 	cropped, err := CreateShmBuffer(w, h, w*4)
 	if err != nil {
 		r.running = false

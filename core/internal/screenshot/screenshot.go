@@ -92,7 +92,7 @@ func (s *Screenshoter) Run() (*CaptureResult, error) {
 	switch s.config.Mode {
 	case ModeLastRegion:
 		return s.captureLastRegion()
-	case ModeRegion:
+	case ModeRegion, ModeScroll:
 		return s.captureRegion()
 	case ModeWindow:
 		return s.captureWindow()
@@ -145,6 +145,10 @@ func (s *Screenshoter) captureRegion() (*CaptureResult, error) {
 }
 
 func (s *Screenshoter) captureWindow() (*CaptureResult, error) {
+	if DetectCompositor() == CompositorNiri {
+		return s.captureNiriWindow()
+	}
+
 	geom, err := GetActiveWindow()
 	if err != nil {
 		return nil, err

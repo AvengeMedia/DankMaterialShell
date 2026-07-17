@@ -9,6 +9,7 @@ const (
 	ModeAllScreens
 	ModeOutput
 	ModeLastRegion
+	ModeScroll
 )
 
 type Format int
@@ -62,6 +63,7 @@ type Config struct {
 	SaveFile   bool
 	Notify     bool
 	Stdout     bool
+	IntervalMs int
 }
 
 func DefaultConfig() Config {

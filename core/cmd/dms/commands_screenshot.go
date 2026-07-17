@@ -51,8 +51,9 @@ Modes:
   full        - Capture the focused output
   all         - Capture all outputs combined
   output      - Capture a specific output by name
-  window      - Capture the focused window (Hyprland/Mango)
+  window      - Capture the focused window (Hyprland/Mango/niri)
   last        - Capture the last selected region
+  scroll      - Select a region, then scroll to capture a stitched tall image
 
 Output format (--format):
   png         - PNG format (default)
@@ -72,7 +73,9 @@ Examples:
   dms screenshot --no-confirm        # Region capture on mouse release
   dms screenshot --cursor=on         # Include cursor
   dms screenshot -f jpg -q 85        # JPEG with quality 85
-  dms screenshot --json              # Print capture metadata as JSON`,
+  dms screenshot --json              # Print capture metadata as JSON
+  dms screenshot scroll              # Scroll capture, Enter finishes / Esc cancels
+  dms screenshot scroll --interval 250`,
 }
 
 var ssRegionCmd = &cobra.Command{
@@ -110,8 +113,31 @@ If no previous region exists, falls back to interactive selection.`,
 var ssWindowCmd = &cobra.Command{
 	Use:   "window",
 	Short: "Capture the focused window",
-	Long:  `Capture the currently focused window. Supported on Hyprland and Mango.`,
+	Long:  `Capture the currently focused window. Supported on Hyprland, Mango, and niri.`,
 	Run:   runScreenshotWindow,
+}
+
+var ssScrollInterval int
+
+var ssScrollCmd = &cobra.Command{
+	Use:   "scroll",
+	Short: "Capture a scrolling region stitched into one tall image",
+	Long: `Select a region, then scroll the content beneath with the mouse wheel or
+touchpad while frames are captured and stitched vertically. Finish with the
+on-screen done button; cancel with the cancel button. Enter and Esc work
+everywhere: most compositors hold the keyboard on the overlay (keyboard
+scrolling does not reach the app there), while Hyprland leaves the keyboard
+with the application — keyboard scrolling works, and Enter/Esc act through
+temporary global binds for the session. The cursor is never included in
+frames.
+
+Frames are stitched continuously while scrolling, and revisited content is
+never duplicated — scrolling up past the starting point extends the image
+upward. Content jumped past faster than capture can follow is skipped rather
+than stitched incorrectly.
+
+Rotated outputs are not supported.`,
+	Run: runScreenshotScroll,
 }
 
 var ssListCmd = &cobra.Command{
@@ -143,7 +169,10 @@ func init() {
 	screenshotCmd.PersistentFlags().BoolVar(&ssStdout, "stdout", false, "Output image to stdout (for piping to swappy, etc.)")
 	screenshotCmd.PersistentFlags().BoolVar(&ssJSON, "json", false, "Print capture metadata as JSON")
 
+	ssScrollCmd.Flags().IntVar(&ssScrollInterval, "interval", 45, "Capture interval in milliseconds (30-1000)")
+
 	screenshotCmd.AddCommand(ssRegionCmd)
+	screenshotCmd.AddCommand(ssScrollCmd)
 	screenshotCmd.AddCommand(ssFullCmd)
 	screenshotCmd.AddCommand(ssAllCmd)
 	screenshotCmd.AddCommand(ssOutputCmd)
@@ -249,7 +278,7 @@ func runScreenshot(config screenshot.Config) {
 
 	// Region select needs the keyboard; drop popout grabs for its duration.
 	result, err := func() (*screenshot.CaptureResult, error) {
-		interactive := config.Mode == screenshot.ModeRegion || config.Mode == screenshot.ModeLastRegion
+		interactive := config.Mode == screenshot.ModeRegion || config.Mode == screenshot.ModeLastRegion || config.Mode == screenshot.ModeScroll
 		if interactive {
 			setPopoutScreenshotMode(true)
 			defer setPopoutScreenshotMode(false)
@@ -434,6 +463,12 @@ func bufferToRGBThumbnail(buf *screenshot.ShmBuffer, maxSize int, pixelFormat ui
 
 func runScreenshotRegion(cmd *cobra.Command, args []string) {
 	config := getScreenshotConfig(screenshot.ModeRegion)
+	runScreenshot(config)
+}
+
+func runScreenshotScroll(cmd *cobra.Command, args []string) {
+	config := getScreenshotConfig(screenshot.ModeScroll)
+	config.IntervalMs = min(max(ssScrollInterval, 30), 1000)
 	runScreenshot(config)
 }
 

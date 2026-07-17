@@ -30,41 +30,30 @@ func DetectCompositor() Compositor {
 		return detectedCompositor
 	}
 
-	hyprlandSig := os.Getenv("HYPRLAND_INSTANCE_SIGNATURE")
-	niriSocket := os.Getenv("NIRI_SOCKET")
-	swaySocket := os.Getenv("SWAYSOCK")
-	scrollSocket := os.Getenv("SCROLLSOCK")
-	miracleSocket := os.Getenv("MIRACLESOCK")
-	mangoSocket := os.Getenv("MANGO_INSTANCE_SIGNATURE")
+	candidates := []struct {
+		socket     string
+		needsStat  bool
+		compositor Compositor
+	}{
+		{os.Getenv("MANGO_INSTANCE_SIGNATURE"), true, CompositorMango},
+		{os.Getenv("NIRI_SOCKET"), true, CompositorNiri},
+		{os.Getenv("SCROLLSOCK"), true, CompositorScroll},
+		{os.Getenv("MIRACLESOCK"), true, CompositorMiracle},
+		{os.Getenv("SWAYSOCK"), true, CompositorSway},
+		{os.Getenv("HYPRLAND_INSTANCE_SIGNATURE"), false, CompositorHyprland},
+	}
 
-	switch {
-	case mangoSocket != "":
-		if _, err := os.Stat(mangoSocket); err == nil {
-			detectedCompositor = CompositorMango
-			return detectedCompositor
+	// A stale env var from a previous session must not mask the live compositor
+	for _, c := range candidates {
+		if c.socket == "" {
+			continue
 		}
-	case niriSocket != "":
-		if _, err := os.Stat(niriSocket); err == nil {
-			detectedCompositor = CompositorNiri
-			return detectedCompositor
+		if c.needsStat {
+			if _, err := os.Stat(c.socket); err != nil {
+				continue
+			}
 		}
-	case scrollSocket != "":
-		if _, err := os.Stat(scrollSocket); err == nil {
-			detectedCompositor = CompositorScroll
-			return detectedCompositor
-		}
-	case miracleSocket != "":
-		if _, err := os.Stat(miracleSocket); err == nil {
-			detectedCompositor = CompositorMiracle
-			return detectedCompositor
-		}
-	case swaySocket != "":
-		if _, err := os.Stat(swaySocket); err == nil {
-			detectedCompositor = CompositorSway
-			return detectedCompositor
-		}
-	case hyprlandSig != "":
-		detectedCompositor = CompositorHyprland
+		detectedCompositor = c.compositor
 		return detectedCompositor
 	}
 
@@ -90,7 +79,7 @@ func GetActiveWindow() (*WindowGeometry, error) {
 	case CompositorMango:
 		return getMangoActiveWindow()
 	default:
-		return nil, fmt.Errorf("window capture requires Hyprland or Mango")
+		return nil, fmt.Errorf("window capture requires Hyprland, Mango, or niri")
 	}
 }
 

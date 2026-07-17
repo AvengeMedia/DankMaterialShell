@@ -95,6 +95,9 @@ type RegionSelector struct {
 	showCapturedCursor bool
 	shiftHeld          bool
 
+	phase  selectorPhase
+	scroll *scrollSession
+
 	running   bool
 	cancelled bool
 	result    Region
@@ -167,9 +170,13 @@ func (r *RegionSelector) Run() (*CaptureResult, bool, error) {
 
 	r.running = true
 	for r.running {
-		if err := r.ctx.Dispatch(); err != nil {
+		if err := r.dispatchOrTick(); err != nil {
 			return nil, false, fmt.Errorf("dispatch: %w", err)
 		}
+	}
+
+	if r.scroll != nil && r.scroll.abortErr != nil {
+		return nil, false, r.scroll.abortErr
 	}
 
 	if r.cancelled || r.capturedBuffer == nil {
@@ -185,6 +192,10 @@ func (r *RegionSelector) Run() (*CaptureResult, bool, error) {
 		if s := r.selection.surface.output.fractionalScale; s > 0 {
 			scale = s
 		}
+	}
+	if r.scroll != nil {
+		yInverted = false
+		format = uint32(r.scroll.format)
 	}
 
 	return &CaptureResult{
@@ -696,7 +707,9 @@ func (r *RegionSelector) initRenderBuffer(os *OutputSurface) {
 		}
 		slot.pool = pool
 
-		wlBuf, err := pool.CreateBuffer(0, int32(buf.Width), int32(buf.Height), int32(buf.Stride), os.screenFormat)
+		// niri latches surface opacity from the first buffer's format
+		// (observed), so slots are ARGB from the start with A=255 when opaque
+		wlBuf, err := pool.CreateBuffer(0, int32(buf.Width), int32(buf.Height), int32(buf.Stride), alphaFormat(os.screenFormat))
 		if err != nil {
 			log.Error("create render slot wl_buffer failed", "err", err)
 			pool.Destroy()
@@ -738,8 +751,9 @@ func (r *RegionSelector) applyPreSelection(os *OutputSurface) {
 
 	x1 := float64(r.preSelect.X-os.output.x) * scaleX
 	y1 := float64(r.preSelect.Y-os.output.y) * scaleY
-	x2 := float64(r.preSelect.X-os.output.x+r.preSelect.Width) * scaleX
-	y2 := float64(r.preSelect.Y-os.output.y+r.preSelect.Height) * scaleY
+	// selection edges are inclusive; the exclusive width edge is one device px past it
+	x2 := float64(r.preSelect.X-os.output.x+r.preSelect.Width)*scaleX - scaleX
+	y2 := float64(r.preSelect.Y-os.output.y+r.preSelect.Height)*scaleY - scaleY
 
 	r.selection.hasSelection = true
 	r.selection.dragging = false
@@ -769,10 +783,13 @@ func (r *RegionSelector) redrawSurface(os *OutputSurface) {
 		return
 	}
 
-	slot.shm.CopyFrom(srcBuf)
-
-	// Draw overlay (dimming + selection) into this slot
-	r.drawOverlay(os, slot.shm)
+	switch r.phase {
+	case phaseScroll:
+		r.drawScrollOverlay(os, slot.shm)
+	default:
+		slot.shm.CopyFrom(srcBuf)
+		r.drawOverlay(os, slot.shm)
+	}
 
 	if os.viewport != nil {
 		_ = os.wlSurface.SetBufferScale(1)
@@ -807,6 +824,8 @@ func (r *RegionSelector) cleanup() {
 	if r.cursorBuffer != nil {
 		r.cursorBuffer.Close()
 	}
+
+	r.cleanupScroll()
 
 	for _, os := range r.surfaces {
 		for _, slot := range os.slots {

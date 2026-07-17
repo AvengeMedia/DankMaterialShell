@@ -57,7 +57,7 @@ func (r *RegionSelector) drawOverlay(os *OutputSurface, renderBuf *ShmBuffer) {
 	w, h := renderBuf.Width, renderBuf.Height
 	format := os.screenFormat
 
-	// Dim the entire buffer
+	// dim, forcing alpha: the X-format source's padding byte is undefined
 	for y := 0; y < h; y++ {
 		off := y * stride
 		for x := 0; x < w; x++ {
@@ -68,6 +68,7 @@ func (r *RegionSelector) drawOverlay(os *OutputSurface, renderBuf *ShmBuffer) {
 			data[i+0] = uint8(int(data[i+0]) * 3 / 5)
 			data[i+1] = uint8(int(data[i+1]) * 3 / 5)
 			data[i+2] = uint8(int(data[i+2]) * 3 / 5)
+			data[i+3] = 255
 		}
 	}
 
@@ -110,7 +111,7 @@ func (r *RegionSelector) drawOverlay(os *OutputSurface, renderBuf *ShmBuffer) {
 			data[di+0] = srcData[si+0]
 			data[di+1] = srcData[si+1]
 			data[di+2] = srcData[si+2]
-			data[di+3] = srcData[si+3]
+			data[di+3] = 255
 		}
 	}
 
@@ -124,6 +125,81 @@ func (r *RegionSelector) drawOverlay(os *OutputSurface, renderBuf *ShmBuffer) {
 	}
 	r.drawBorder(data, stride, w, h, bx1, by1, selW, selH, format)
 	r.drawDimensions(data, stride, w, h, bx1, by1, selW, selH, format)
+}
+
+func (r *RegionSelector) drawScrollOverlay(os *OutputSurface, renderBuf *ShmBuffer) {
+	data := renderBuf.Data()
+	stride := renderBuf.Stride
+	w, h := renderBuf.Width, renderBuf.Height
+
+	// 40% premultiplied scrim
+	for y := 0; y < h; y++ {
+		off := y * stride
+		for x := 0; x < w; x++ {
+			i := off + x*4
+			if i+3 >= len(data) {
+				continue
+			}
+			data[i+0], data[i+1], data[i+2], data[i+3] = 0, 0, 0, 102
+		}
+	}
+
+	s := r.scroll
+	if s == nil || r.selection.surface != os {
+		return
+	}
+
+	// hole oversized 2px so overlay pixels never land in captured frames
+	holeX := s.holeX - 2
+	holeY := s.holeY - 2
+	holeW := s.holeW + 4
+	holeH := s.holeH + 4
+
+	x1 := clamp(holeX, 0, w)
+	y1 := clamp(holeY, 0, h)
+	x2 := clamp(holeX+holeW, 0, w)
+	y2 := clamp(holeY+holeH, 0, h)
+
+	for y := y1; y < y2; y++ {
+		off := y * stride
+		for x := x1; x < x2; x++ {
+			i := off + x*4
+			if i+3 >= len(data) {
+				continue
+			}
+			data[i+0], data[i+1], data[i+2], data[i+3] = 0, 0, 0, 0
+		}
+	}
+
+	r.drawBorder(data, stride, w, h, holeX-1, holeY-1, holeW+2, holeH+2, os.screenFormat)
+	r.drawScrollBar(data, stride, w, h, os.screenFormat)
+}
+
+func (r *RegionSelector) drawScrollBar(data []byte, stride, bufW, bufH int, format uint32) {
+	s := r.scroll
+	style := LoadOverlayStyle()
+	const charH = 12
+
+	r.fillRect(data, stride, bufW, bufH, s.barX, s.barY, s.barW, s.barH,
+		style.BackgroundR, style.BackgroundG, style.BackgroundB, 245, format)
+
+	labelY := s.doneY + (s.btnH-charH)/2
+	r.fillRect(data, stride, bufW, bufH, s.doneX, s.doneY, s.doneW, s.btnH,
+		style.AccentR, style.AccentG, style.AccentB, 255, format)
+	r.drawText(data, stride, bufW, bufH, s.doneX+12, labelY, "done", 10, 10, 10, format)
+
+	r.fillRect(data, stride, bufW, bufH, s.cancelX, s.cancelY, s.cancelW, s.btnH,
+		70, 70, 70, 255, format)
+	r.drawText(data, stride, bufW, bufH, s.cancelX+12, labelY, "cancel",
+		style.TextR, style.TextG, style.TextB, format)
+
+	rows := 0
+	if s.st != nil {
+		rows = s.st.rows()
+	}
+	counter := fmt.Sprintf("%d shots %dpx", s.kept, rows)
+	r.drawText(data, stride, bufW, bufH, s.cancelX+s.cancelW+16, labelY, counter,
+		style.TextR, style.TextG, style.TextB, format)
 }
 
 func (r *RegionSelector) drawHUD(data []byte, stride, bufW, bufH int, format uint32) {

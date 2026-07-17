@@ -54,6 +54,58 @@ func BufferToImageWithFormat(buf *ShmBuffer, format uint32) *image.RGBA {
 	return img
 }
 
+func ImageToBuffer(img image.Image) (*ShmBuffer, error) {
+	bounds := img.Bounds()
+	w, h := bounds.Dx(), bounds.Dy()
+	buf, err := CreateShmBuffer(w, h, w*4)
+	if err != nil {
+		return nil, err
+	}
+
+	data := buf.Data()
+	switch src := img.(type) {
+	case *image.NRGBA:
+		for y := range h {
+			srcOff := y * src.Stride
+			dstOff := y * buf.Stride
+			for x := range w {
+				si, di := srcOff+x*4, dstOff+x*4
+				a := uint32(src.Pix[si+3])
+				data[di+0] = uint8(uint32(src.Pix[si+2]) * a / 255)
+				data[di+1] = uint8(uint32(src.Pix[si+1]) * a / 255)
+				data[di+2] = uint8(uint32(src.Pix[si+0]) * a / 255)
+				data[di+3] = uint8(a)
+			}
+		}
+	case *image.RGBA:
+		for y := range h {
+			srcOff := y * src.Stride
+			dstOff := y * buf.Stride
+			for x := range w {
+				si, di := srcOff+x*4, dstOff+x*4
+				data[di+0] = src.Pix[si+2]
+				data[di+1] = src.Pix[si+1]
+				data[di+2] = src.Pix[si+0]
+				data[di+3] = src.Pix[si+3]
+			}
+		}
+	default:
+		for y := range h {
+			dstOff := y * buf.Stride
+			for x := range w {
+				cr, cg, cb, ca := img.At(bounds.Min.X+x, bounds.Min.Y+y).RGBA()
+				di := dstOff + x*4
+				data[di+0] = uint8(cb >> 8)
+				data[di+1] = uint8(cg >> 8)
+				data[di+2] = uint8(cr >> 8)
+				data[di+3] = uint8(ca >> 8)
+			}
+		}
+	}
+	buf.Format = FormatARGB8888
+	return buf, nil
+}
+
 func EncodePNG(w io.Writer, img image.Image) error {
 	enc := png.Encoder{CompressionLevel: png.BestSpeed}
 	return enc.Encode(w, img)
