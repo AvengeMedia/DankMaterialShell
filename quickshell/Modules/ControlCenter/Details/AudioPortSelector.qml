@@ -31,7 +31,9 @@ Item {
         modalVisible = true;
 
         populateFromCache();
-        AudioService.refreshSinkPorts();
+        AudioService.refreshSinkPorts(() => {
+            root.isLoading = false;
+        });
 
         Qt.callLater(() => {
             focusScope.forceActiveFocus();
@@ -72,10 +74,10 @@ Item {
         const capturedName = node.name;
         isLoading = true;
         AudioService.setSinkPort(capturedName, portName, function (success, message) {
+            isLoading = false;
             if (!root.node || root.node.name !== capturedName)
                 return;
 
-            isLoading = false;
             if (success) {
                 root.portSelected(capturedName, portName);
                 ToastService.showToast(message, ToastService.levelInfo);
