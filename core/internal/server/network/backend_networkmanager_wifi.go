@@ -359,6 +359,24 @@ func (b *NetworkManagerBackend) DisconnectWiFi() error {
 	return nil
 }
 
+func (b *NetworkManagerBackend) abortInFlightConnection(ssid string) {
+	b.stateMutex.Lock()
+	if !b.state.IsConnecting || b.state.ConnectingSSID != ssid {
+		b.stateMutex.Unlock()
+		return
+	}
+	b.state.IsConnecting = false
+	b.state.ConnectingSSID = ""
+	b.state.LastError = ""
+	b.stateMutex.Unlock()
+
+	b.clearCachedWiFiSecretBySSID(ssid)
+
+	if err := b.DisconnectWiFi(); err != nil {
+		log.Warnf("[abortInFlightConnection] failed to abort connection to %s: %v", ssid, err)
+	}
+}
+
 func (b *NetworkManagerBackend) ForgetWiFiNetwork(ssid string) error {
 	conn, err := b.findConnection(ssid)
 	if err != nil {
@@ -961,6 +979,10 @@ func (b *NetworkManagerBackend) SetWiFiAutoconnect(ssid string, autoconnect bool
 	err = conn.Update(settings)
 	if err != nil {
 		return fmt.Errorf("failed to update connection: %w", err)
+	}
+
+	if !autoconnect {
+		b.abortInFlightConnection(ssid)
 	}
 
 	b.updateWiFiNetworks()

@@ -744,6 +744,32 @@ func (b *IWDBackend) DisconnectWiFi() error {
 	return nil
 }
 
+func (b *IWDBackend) abortInFlightConnection(ssid string) {
+	b.stateMutex.Lock()
+	if !b.state.IsConnecting || b.state.ConnectingSSID != ssid {
+		b.stateMutex.Unlock()
+		return
+	}
+	b.state.IsConnecting = false
+	b.state.ConnectingSSID = ""
+	b.state.LastError = ""
+	b.stateMutex.Unlock()
+
+	b.attemptMutex.RLock()
+	att := b.curAttempt
+	b.attemptMutex.RUnlock()
+
+	if att != nil && att.ssid == ssid {
+		att.mu.Lock()
+		att.finalized = true
+		att.mu.Unlock()
+	}
+
+	if err := b.DisconnectWiFi(); err != nil {
+		log.Warnf("[abortInFlightConnection] failed to abort connection to %s: %v", ssid, err)
+	}
+}
+
 func (b *IWDBackend) ForgetWiFiNetwork(ssid string) error {
 	b.stateMutex.RLock()
 	currentSSID := b.state.WiFiSSID
@@ -810,6 +836,10 @@ func (b *IWDBackend) SetWiFiAutoconnect(ssid string, autoconnect bool) error {
 					call := knownObj.Call(dbusPropertiesInterface+".Set", 0, iwdKnownNetworkInterface, "AutoConnect", dbus.MakeVariant(autoconnect))
 					if call.Err != nil {
 						return fmt.Errorf("failed to set autoconnect: %w", call.Err)
+					}
+
+					if !autoconnect {
+						b.abortInFlightConnection(ssid)
 					}
 
 					b.updateState()
