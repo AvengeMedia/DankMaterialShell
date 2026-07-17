@@ -11,7 +11,6 @@ Item {
 
     property var node: null
     property bool modalVisible: false
-    property var parentItem
     property var availablePorts: []
     property string currentPort: ""
     property bool isLoading: false
