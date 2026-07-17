@@ -63,6 +63,7 @@ const DMS_ACTIONS = [
     { id: "spawn dms ipc call keybinds open niri", label: "Keybinds Cheatsheet: Open", compositor: "niri" },
     { id: "spawn dms ipc call keybinds close", label: "Keybinds Cheatsheet: Close" },
     { id: "spawn dms ipc call lock lock", label: "Lock Screen" },
+    { id: "spawn dms ipc call lock lockAndOutputsOff", label: "Lock Screen & Outputs Off" },
     { id: "spawn dms ipc call lock demo", label: "Lock Screen: Demo" },
     { id: "spawn dms ipc call inhibit toggle", label: "Idle Inhibit: Toggle" },
     { id: "spawn dms ipc call inhibit enable", label: "Idle Inhibit: Enable" },

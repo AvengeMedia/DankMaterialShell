@@ -67,6 +67,7 @@ Singleton {
     property var lockComponent: null
     property bool monitorsOff: false
     property bool isShellLocked: false
+    property bool lockPowerOffRequested: false
 
     function reapplyDpmsIfNeeded() {
         if (monitorsOff)
@@ -146,7 +147,7 @@ Singleton {
         id: lockWakeMonitor
         timeout: 1
         respectInhibitors: false
-        enabled: root.enabled && root.isShellLocked && root.monitorsOff && SettingsData.lockScreenPowerOffMonitorsOnLock
+        enabled: root.enabled && root.isShellLocked && root.monitorsOff && (SettingsData.lockScreenPowerOffMonitorsOnLock || root.lockPowerOffRequested)
         onIsIdleChanged: {
             if (!isIdle && root.monitorsOff)
                 root.requestMonitorOn();
