@@ -49,7 +49,7 @@ Rectangle {
     color: {
         if (isSelected && keyboardNavigationActive)
             return Theme.primaryPressed;
-        return Theme.floatingSurfaceHigh;
+        return Theme.notificationFloatingSurfaceHigh;
     }
     border.color: {
         if (isSelected && keyboardNavigationActive)

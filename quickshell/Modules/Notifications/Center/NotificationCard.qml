@@ -153,7 +153,7 @@ Rectangle {
         if (keyboardNavigationActive && expanded && selectedNotificationIndex >= 0) {
             return Theme.primaryHoverLight;
         }
-        return Theme.floatingSurfaceHigh;
+        return Theme.notificationFloatingSurfaceHigh;
     }
     border.color: {
         if (isGroupSelected && keyboardNavigationActive) {
@@ -583,7 +583,7 @@ Rectangle {
                             return expandedBaseHeight;
                         }
                         radius: Theme.cornerRadius
-                        color: isSelected ? Theme.primaryPressed : Theme.nestedSurface
+                        color: isSelected ? Theme.primaryPressed : Theme.notificationNestedSurface
                         border.color: isSelected ? Theme.withAlpha(Theme.primary, 0.4) : Theme.outlineMedium
                         border.width: 1
 

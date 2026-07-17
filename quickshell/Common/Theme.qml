@@ -580,11 +580,15 @@ Singleton {
     readonly property bool foregroundLayers: typeof SettingsData === "undefined" || (SettingsData.blurForegroundLayers ?? true)
     readonly property bool blurForegroundLayers: BlurService.enabled && foregroundLayers
     readonly property bool transparentBlurLayers: BlurService.enabled && !foregroundLayers
+    readonly property bool notificationForegroundLayers: typeof SettingsData === "undefined" || (SettingsData.notificationForegroundLayers ?? true)
     readonly property color readableSurface: withAlpha(surfaceContainer, popupTransparency)
     readonly property color readableSurfaceHigh: withAlpha(surfaceContainerHigh, popupTransparency)
     readonly property color floatingSurface: foregroundLayers ? readableSurface : withAlpha(readableSurface, 0)
     readonly property color floatingSurfaceHigh: foregroundLayers ? readableSurfaceHigh : withAlpha(readableSurfaceHigh, 0)
     readonly property color nestedSurface: floatingSurfaceHigh
+    readonly property color notificationFloatingSurface: notificationForegroundLayers ? readableSurface : withAlpha(readableSurface, 0)
+    readonly property color notificationFloatingSurfaceHigh: notificationForegroundLayers ? readableSurfaceHigh : withAlpha(readableSurfaceHigh, 0)
+    readonly property color notificationNestedSurface: notificationFloatingSurfaceHigh
     readonly property real blurLayerOutlineOpacity: Math.max(0, Math.min(1, typeof SettingsData === "undefined" ? 0.12 : (SettingsData.blurLayerOutlineOpacity ?? 0.12)))
     readonly property real layerOutlineOpacity: blurLayerOutlineOpacity
     readonly property int layerOutlineWidth: layerOutlineOpacity > 0 ? 1 : 0

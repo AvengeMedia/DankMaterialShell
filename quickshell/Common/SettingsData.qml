@@ -861,6 +861,7 @@ Singleton {
     property bool notificationOverlayEnabled: false
     property bool notificationPopupShadowEnabled: true
     property bool notificationPopupPrivacyMode: false
+    property bool notificationForegroundLayers: true
     property int overviewRows: 2
     property int overviewColumns: 5
     property real overviewScale: 0.16

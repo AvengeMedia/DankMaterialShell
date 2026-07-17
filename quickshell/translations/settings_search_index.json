@@ -6129,6 +6129,31 @@
     "description": "Show notification popups only on the currently focused monitor"
   },
   {
+    "section": "notificationForegroundLayers",
+    "label": "Foreground Layers",
+    "tabIndex": 17,
+    "category": "Notifications",
+    "keywords": [
+      "alert",
+      "alerts",
+      "blur",
+      "cards",
+      "contrast",
+      "foreground",
+      "glass",
+      "layers",
+      "messages",
+      "notif",
+      "notification",
+      "notifications",
+      "show",
+      "surface",
+      "surfaces",
+      "toast"
+    ],
+    "description": "Show foreground surfaces on notification cards"
+  },
+  {
     "section": "notificationHistoryMaxAgeDays",
     "label": "History Retention",
     "tabIndex": 17,

@@ -301,6 +301,15 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    settingKey: "notificationForegroundLayers"
+                    tags: ["notification", "foreground", "layers", "surface", "blur", "glass", "contrast", "cards"]
+                    text: I18n.tr("Foreground Layers")
+                    description: I18n.tr("Show foreground surfaces on notification cards")
+                    checked: SettingsData.notificationForegroundLayers ?? true
+                    onToggled: checked => SettingsData.set("notificationForegroundLayers", checked)
+                }
+
+                SettingsToggleRow {
                     settingKey: "notificationShowTimeoutBar"
                     tags: ["notification", "timeout", "progress", "bar", "timer", "countdown"]
                     text: I18n.tr("Timeout Progress Bar")
