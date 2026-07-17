@@ -19,9 +19,7 @@ Singleton {
         interval: 500
         repeat: false
         running: true
-        onTriggered: {
-            root.suppressSound = false;
-        }
+        onTriggered: root.suppressSound = false
     }
 
     readonly property string preferredBatteryOverride: Quickshell.env("DMS_PREFERRED_BATTERY")

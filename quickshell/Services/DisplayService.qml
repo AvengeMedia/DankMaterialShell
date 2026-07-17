@@ -122,8 +122,11 @@ Singleton {
     property int gammaHighTemp: gammaState?.config?.HighTemp ?? 0
 
     function syncRefreshRates(isPluggedIn, reason) {
-        if (!SettingsData.lowerDisplayRefreshRateOnBattery)
+        if (!SettingsData.lowerDisplayRefreshRateOnBattery) {
+            if (reason === "setting-change")
+                applyConfiguredTargets("disabled", reason);
             return;
+        }
 
         if (!isPluggedIn) {
             applyBatteryTargets(reason);
@@ -209,7 +212,7 @@ Singleton {
             const applied = [];
             for (const name in outputs) {
                 const currentMode = getNiriCurrentMode(outputs[name]);
-                const target = computeTargetMode(name, outputs[name], currentMode, "niri");
+                const target = computeTargetMode(name, outputs[name], "niri");
                 if (!target || !target.value)
                     continue;
                 if (isModeAlreadyCurrent(currentMode, target.mode)) {
@@ -243,7 +246,7 @@ Singleton {
         const applied = [];
 
         for (const output of outputs) {
-            const target = computeTargetMode(output.name, output, output.currentMode, "wlr");
+            const target = computeTargetMode(output.name, output, "wlr");
             if (!target || !target.value)
                 continue;
             if (isModeAlreadyCurrent(output.currentMode, target.mode)) {
@@ -447,7 +450,7 @@ Singleton {
         }
     }
 
-    function findBatteryRefreshMode(output, currentMode, backend, allowCurrentAtTarget) {
+    function findBatteryRefreshMode(output, currentMode, backend) {
         if (!output || !currentMode || (backend === "wlr" && !output.enabled))
             return null;
 
@@ -466,10 +469,6 @@ Singleton {
         if (uniqueRefreshRates.length <= 1)
             return null;
 
-        const currentRefresh = getModeRefresh(currentMode);
-        if (!allowCurrentAtTarget && currentRefresh <= batteryRefreshRateTarget + batteryRefreshRateTolerance)
-            return null;
-
         let bestMode = null;
         let bestDiff = Infinity;
         for (const mode of sameResolutionModes) {
@@ -486,7 +485,7 @@ Singleton {
         return bestMode;
     }
 
-    function computeTargetMode(outputName, output, currentMode, backend) {
+    function computeTargetMode(outputName, output, backend) {
         const profileMode = findActiveProfileMode(outputName, output);
         if (profileMode) {
             const mode = findModeByString(output?.modes || [], profileMode);
@@ -509,23 +508,6 @@ Singleton {
                     "source": "previous"
                 };
             }
-        }
-
-        const best = findBestSameResolutionMode(output, currentMode);
-        if (best.preferred) {
-            return {
-                "value": formatRestoreModeValue(best.preferred, backend),
-                "mode": best.preferred,
-                "source": "preferred"
-            };
-        }
-
-        if (best.highest && !isModeAlreadyCurrent(currentMode, best.highest)) {
-            return {
-                "value": formatRestoreModeValue(best.highest, backend),
-                "mode": best.highest,
-                "source": "highestRefresh"
-            };
         }
 
         return {
@@ -594,36 +576,6 @@ Singleton {
         if (!currentMode || !targetMode)
             return true;
         return getModeWidth(currentMode) === getModeWidth(targetMode) && getModeHeight(currentMode) === getModeHeight(targetMode) && Math.abs(getModeRefresh(currentMode) - getModeRefresh(targetMode)) <= batteryRefreshRateTolerance;
-    }
-
-    function findBestSameResolutionMode(output, currentMode) {
-        if (!output || !currentMode)
-            return {
-                "preferred": null,
-                "highest": null
-            };
-
-        const modes = output.modes || [];
-        const sameResolutionModes = modes.filter(m => getModeWidth(m) === getModeWidth(currentMode) && getModeHeight(m) === getModeHeight(currentMode));
-
-        let preferred = null;
-        let highest = null;
-        let highestRefresh = 0;
-
-        for (const mode of sameResolutionModes) {
-            const refresh = getModeRefresh(mode);
-            if (mode.preferred === true || mode.is_preferred === true)
-                preferred = mode;
-            if (refresh > highestRefresh) {
-                highestRefresh = refresh;
-                highest = mode;
-            }
-        }
-
-        return {
-            "preferred": preferred,
-            "highest": highest
-        };
     }
 
     function formatRestoreModeValue(mode, backend) {
