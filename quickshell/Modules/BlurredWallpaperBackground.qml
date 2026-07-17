@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 import Quickshell
 import Quickshell.Wayland
 import qs.Common
@@ -57,60 +56,96 @@ Variants {
             }
 
             property string source: SessionData.getMonitorWallpaper(modelData.name) || ""
-            property bool isColorSource: source.startsWith("#")
+            readonly property bool isColorSource: source.startsWith("#")
+            readonly property string displaySource: {
+                if (!source || isColorSource)
+                    return "";
+                return source.startsWith("file://") ? source : encodeFileUrl(source);
+            }
             property bool contentReady: false
             property bool surfaceBounce: false
 
-            Connections {
-                target: SessionData
-                function onIsLightModeChanged() {
-                    if (SessionData.perModeWallpaper) {
-                        var newSource = SessionData.getMonitorWallpaper(modelData.name) || "";
-                        if (newSource !== root.source) {
-                            root.source = newSource;
-                        }
-                    }
-                }
-            }
+            // Live stack is captured into frozenLayer once stable, then unloaded; if the capture stalls the stack just stays live.
+            property bool liveActive: false
+            property bool frozenValid: false
+            property string _frozenSource: ""
+            property bool loadFailed: false
+            property int _freezeWaitFrames: 0
 
-            function getFillMode(modeName) {
-                switch (modeName) {
-                case "Stretch":
-                    return Image.Stretch;
-                case "Fit":
-                case "PreserveAspectFit":
-                    return Image.PreserveAspectFit;
-                case "Fill":
-                case "PreserveAspectCrop":
-                    return Image.PreserveAspectCrop;
-                case "Tile":
-                    return Image.Tile;
-                case "TileVertically":
-                    return Image.TileVertically;
-                case "TileHorizontally":
-                    return Image.TileHorizontally;
-                case "Pad":
-                    return Image.Pad;
-                default:
-                    return Image.PreserveAspectCrop;
-                }
-            }
+            readonly property var backingWindow: Window.window
+            readonly property bool renderActive: !source || liveActive || _freezeWaitFrames > 0
+            property int _settleFrames: 3
+
+            readonly property int maxTextureSize: 8192
+            readonly property int textureWidth: Math.min(modelData.width, maxTextureSize)
+            readonly property int textureHeight: Math.min(modelData.height, maxTextureSize)
 
             Component.onCompleted: {
-                isInitialized = true;
-                if (!source || isColorSource) {
+                if (!displaySource) {
                     contentReady = true;
+                    return;
                 }
+                liveActive = true;
             }
 
-            property bool isInitialized: false
-            property real transitionProgress: 0
-            readonly property bool transitioning: transitionAnimation.running
-            property bool effectActive: false
-            property bool useNextForEffect: false
-            readonly property var backingWindow: Window.window
-            readonly property bool renderActive: !source || effectActive || currentWallpaper.status === Image.Loading || nextWallpaper.status === Image.Loading
-            property int _settleFrames: 3
+            onDisplaySourceChanged: {
+                invalidate();
+                loadFailed = false;
+                _freezeWaitFrames = 0;
+                if (!displaySource) {
+                    liveActive = false;
+                    frozenValid = false;
+                    _frozenSource = "";
+                    contentReady = true;
+                    return;
+                }
+                liveActive = true;
+            }
+
+            function regenerate() {
+                invalidate();
+                if (!displaySource)
+                    return;
+                if (liveActive) {
+                    scheduleFreeze();
+                    return;
+                }
+                liveActive = true;
+            }
+
+            function handleDisplayable() {
+                contentReady = true;
+                if (liveLoader.item?.currentFailed) {
+                    if (!frozenValid)
+                        loadFailed = true;
+                    liveActive = false;
+                }
+                invalidate();
+            }
+
+            function scheduleFreeze() {
+                if (!liveLoader.item?.stable)
+                    return;
+                frozenLayer.scheduleUpdate();
+                _freezeWaitFrames = 3;
+                _settleFrames = 3;
+                // No wedge watchdog: an occluded surface may never produce frames, the freeze just waits
+                backingWindow?.update();
+            }
+
+            function completeFreeze() {
+                const live = liveLoader.item;
+                if (!live || !live.stable)
+                    return;
+                frozenValid = true;
+                _frozenSource = displaySource;
+                liveActive = false;
+                log.info("froze blur layer for", modelData.name);
+                invalidate();
+            }
+
+            onTextureWidthChanged: regenerate()
+            onTextureHeightChanged: regenerate()
 
             function invalidate() {
                 _settleFrames = 3;
@@ -157,29 +192,35 @@ Variants {
                         root._settleFrames--;
                     root._wedgeBounced = false;
                     wedgeWatchdog.stop();
+                    if (root._freezeWaitFrames > 0 && --root._freezeWaitFrames === 0)
+                        root.completeFreeze();
                 }
                 function onVisibleChanged() {
                     root.invalidate();
                 }
                 function onWidthChanged() {
-                    root.invalidate();
+                    root.regenerate();
                 }
                 function onHeightChanged() {
-                    root.invalidate();
+                    root.regenerate();
+                }
+                function onResourcesLost() {
+                    root.frozenValid = false;
+                    root.regenerate();
                 }
             }
 
             Connections {
                 target: Quickshell
                 function onScreensChanged() {
-                    root.invalidate();
+                    root.regenerate();
                 }
             }
 
             Connections {
                 target: SettingsData
                 function onWallpaperFillModeChanged() {
-                    root.invalidate();
+                    root.regenerate();
                 }
                 function onEffectiveWallpaperBackgroundColorChanged() {
                     root.invalidate();
@@ -188,18 +229,26 @@ Variants {
 
             Connections {
                 target: SessionData
+                function onIsLightModeChanged() {
+                    if (SessionData.perModeWallpaper) {
+                        var newSource = SessionData.getMonitorWallpaper(modelData.name) || "";
+                        if (newSource !== root.source) {
+                            root.source = newSource;
+                        }
+                    }
+                }
                 function onMonitorWallpaperFillModesChanged() {
-                    root.invalidate();
+                    root.regenerate();
                 }
                 function onPerMonitorWallpaperChanged() {
-                    root.invalidate();
+                    root.regenerate();
                 }
             }
 
             // Theme changes repaint DankBackdrop but nothing else wakes the render loop
             Connections {
                 target: Theme
-                enabled: root.isColorSource || currentWallpaper.status === Image.Error
+                enabled: root.isColorSource || root.loadFailed
                 function onPrimaryChanged() {
                     root.invalidate();
                 }
@@ -217,89 +266,23 @@ Variants {
                 }
             }
 
-            function handleTransitionLoadError(failedSource) {
-                log.warn("failed to load candidate wallpaper for", modelData.name + ":", failedSource);
-                transitionDelayTimer.stop();
-                transitionAnimation.stop();
-                root.useNextForEffect = false;
-                root.effectActive = false;
-                root.transitionProgress = 0.0;
-                nextWallpaper.source = "";
-            }
-
-            onSourceChanged: {
-                invalidate();
-                if (!source || source.startsWith("#")) {
-                    setWallpaperImmediate("");
-                    return;
+            Connections {
+                target: liveLoader.item
+                function onBecameDisplayable() {
+                    root.handleDisplayable();
                 }
-
-                const formattedSource = source.startsWith("file://") ? source : encodeFileUrl(source);
-
-                if (!isInitialized || !currentWallpaper.source) {
-                    setWallpaperImmediate(formattedSource);
-                    isInitialized = true;
-                    return;
+                function onStableChanged() {
+                    if (liveLoader.item.stable)
+                        root.scheduleFreeze();
                 }
-                if (CompositorService.isNiri && SessionData.isSwitchingMode) {
-                    setWallpaperImmediate(formattedSource);
-                    return;
+                function onTransitioningChanged() {
+                    root.invalidate();
                 }
-                changeWallpaper(formattedSource);
-            }
-
-            function setWallpaperImmediate(newSource) {
-                transitionDelayTimer.stop();
-                transitionAnimation.stop();
-                root.transitionProgress = 0.0;
-                root.effectActive = false;
-                if (!newSource)
-                    root.contentReady = true;
-                currentWallpaper.source = newSource;
-                nextWallpaper.source = "";
-            }
-
-            function startTransition() {
-                root.useNextForEffect = true;
-                root.effectActive = true;
-                if (srcNext.scheduleUpdate)
-                    srcNext.scheduleUpdate();
-                transitionDelayTimer.start();
-            }
-
-            Timer {
-                id: transitionDelayTimer
-                interval: 16
-                repeat: false
-                onTriggered: transitionAnimation.start()
-            }
-
-            function changeWallpaper(newPath) {
-                if (newPath === currentWallpaper.source)
-                    return;
-                if (!newPath || newPath.startsWith("#"))
-                    return;
-                if (root.transitioning) {
-                    transitionAnimation.stop();
-                    root.transitionProgress = 0;
-                    root.effectActive = false;
-                    currentWallpaper.source = nextWallpaper.source;
-                    nextWallpaper.source = "";
-                }
-                if (!currentWallpaper.source) {
-                    setWallpaperImmediate(newPath);
-                    return;
-                }
-
-                nextWallpaper.source = newPath;
-
-                if (nextWallpaper.status === Image.Ready)
-                    root.startTransition();
             }
 
             Loader {
                 anchors.fill: parent
-                active: !root.source || root.isColorSource || currentWallpaper.status === Image.Error
+                active: !root.source || root.isColorSource || root.loadFailed
                 asynchronous: true
 
                 sourceComponent: DankBackdrop {
@@ -307,126 +290,43 @@ Variants {
                 }
             }
 
-            readonly property int maxTextureSize: 8192
-            property int textureWidth: Math.min(modelData.width, maxTextureSize)
-            property int textureHeight: Math.min(modelData.height, maxTextureSize)
-
-            Image {
-                id: currentWallpaper
-                anchors.fill: parent
-                visible: false
-                opacity: 1
-                asynchronous: true
-                retainWhileLoading: true
-                smooth: true
-                cache: true
-                sourceSize: Qt.size(root.textureWidth, root.textureHeight)
-                fillMode: root.getFillMode(SessionData.isGreeterMode ? GreetdSettings.wallpaperFillMode : SessionData.getMonitorWallpaperFillMode(modelData.name))
-
-                onStatusChanged: {
-                    if (status === Image.Error) {
-                        log.warn("failed to load active wallpaper for", modelData.name + ":", source);
-                    }
-                    if (status === Image.Ready || status === Image.Error) {
-                        root.contentReady = true;
-                    }
-                }
-            }
-
-            Image {
-                id: nextWallpaper
-                anchors.fill: parent
-                visible: false
-                opacity: 0
-                asynchronous: true
-                retainWhileLoading: true
-                smooth: true
-                cache: true
-                sourceSize: Qt.size(root.textureWidth, root.textureHeight)
-                fillMode: root.getFillMode(SessionData.isGreeterMode ? GreetdSettings.wallpaperFillMode : SessionData.getMonitorWallpaperFillMode(modelData.name))
-
-                onStatusChanged: {
-                    if (status === Image.Error) {
-                        root.handleTransitionLoadError(source);
-                        return;
-                    }
-                    if (status !== Image.Ready)
-                        return;
-                    if (!root.transitioning) {
-                        root.startTransition();
-                    }
-                }
-            }
-
             ShaderEffectSource {
-                id: srcNext
-                sourceItem: root.effectActive ? nextWallpaper : null
-                hideSource: root.effectActive
-                live: root.effectActive
-                mipmap: false
-                recursive: false
-                textureSize: Qt.size(root.textureWidth, root.textureHeight)
-            }
-
-            Rectangle {
-                id: dummyRect
-                width: 1
-                height: 1
-                visible: false
-                color: "transparent"
-            }
-
-            ShaderEffectSource {
-                id: srcDummy
-                sourceItem: dummyRect
-                hideSource: true
+                id: frozenLayer
+                anchors.fill: parent
+                sourceItem: liveContainer
                 live: false
                 mipmap: false
                 recursive: false
+                smooth: true
+                visible: root.frozenValid || root.liveActive
+                textureSize: Qt.size(root.textureWidth, root.textureHeight)
             }
 
             Item {
-                id: blurredLayer
+                id: liveContainer
                 anchors.fill: parent
+                visible: root.liveActive
 
-                MultiEffect {
+                Loader {
+                    id: liveLoader
                     anchors.fill: parent
-                    source: currentWallpaper
-                    visible: currentWallpaper.source !== ""
-                    blurEnabled: true
-                    blur: 0.8
-                    blurMax: 75
-                    opacity: 1 - root.transitionProgress
-                    autoPaddingEnabled: false
-                }
+                    active: root.liveActive
+                    asynchronous: false
 
-                MultiEffect {
-                    anchors.fill: parent
-                    source: root.useNextForEffect ? srcNext : srcDummy
-                    visible: nextWallpaper.source !== "" && root.useNextForEffect
-                    blurEnabled: true
-                    blur: 0.8
-                    blurMax: 75
-                    opacity: root.transitionProgress
-                    autoPaddingEnabled: false
-                }
-            }
+                    // Cached images reach Ready synchronously during creation, before Connections retargets
+                    onLoaded: {
+                        if (item.displayableNow)
+                            root.handleDisplayable();
+                        if (item.stable)
+                            root.scheduleFreeze();
+                    }
 
-            NumberAnimation {
-                id: transitionAnimation
-                target: root
-                property: "transitionProgress"
-                from: 0.0
-                to: 1.0
-                duration: 1000
-                easing.type: Easing.InOutCubic
-                onFinished: {
-                    if (nextWallpaper.source && nextWallpaper.status === Image.Ready)
-                        currentWallpaper.source = nextWallpaper.source;
-                    root.useNextForEffect = false;
-                    nextWallpaper.source = "";
-                    root.transitionProgress = 0.0;
-                    root.effectActive = false;
+                    sourceComponent: BlurredWallpaperLive {
+                        wallpaperSource: root.displaySource
+                        initialSource: root._frozenSource
+                        screenName: modelData.name
+                        blurTextureSize: Qt.size(root.textureWidth, root.textureHeight)
+                    }
                 }
             }
         }
