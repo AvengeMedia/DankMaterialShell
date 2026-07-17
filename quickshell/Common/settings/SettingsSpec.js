@@ -70,6 +70,7 @@ var SPEC = {
     blurEnabled: { def: false },
     blurForegroundLayers: { def: true },
     blurLayerOutlineOpacity: { def: 0.12, coerce: percentToUnit },
+    blurBorderEnabled: { def: true },
     blurBorderColor: { def: "outline" },
     blurBorderCustomColor: { def: "#ffffff" },
     blurBorderOpacity: { def: 0.35, coerce: percentToUnit },

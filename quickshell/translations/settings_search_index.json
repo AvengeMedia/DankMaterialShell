@@ -2375,6 +2375,29 @@
     "icon": "extension"
   },
   {
+    "section": "modalDarkenBackground",
+    "label": "Darken Modal Background",
+    "tabIndex": 9,
+    "category": "Launcher",
+    "keywords": [
+      "background",
+      "behind",
+      "dark mode",
+      "darken",
+      "darkened",
+      "dialogs",
+      "drawer",
+      "launcher",
+      "menu",
+      "modal",
+      "night",
+      "overlay",
+      "show",
+      "start"
+    ],
+    "description": "Show darkened overlay behind modal dialogs"
+  },
+  {
     "section": "launcherStyle",
     "label": "Default Launcher",
     "tabIndex": 9,
@@ -2613,6 +2636,30 @@
       "start menu"
     ],
     "icon": "apps"
+  },
+  {
+    "section": "modalBackground",
+    "label": "Modal Background",
+    "tabIndex": 9,
+    "category": "Launcher",
+    "keywords": [
+      "background",
+      "behind",
+      "dark mode",
+      "darken",
+      "darkened",
+      "dialogs",
+      "drawer",
+      "launcher",
+      "menu",
+      "modal",
+      "night",
+      "overlay",
+      "show",
+      "start"
+    ],
+    "icon": "layers",
+    "description": "Show darkened overlay behind modal dialogs"
   },
   {
     "section": "spotlightCloseNiriOverview",
@@ -3384,31 +3431,6 @@
     "description": "Base to derive dark theme from"
   },
   {
-    "section": "modalDarkenBackground",
-    "label": "Darken Modal Background",
-    "tabIndex": 10,
-    "category": "Theme & Colors",
-    "keywords": [
-      "appearance",
-      "background",
-      "behind",
-      "colors",
-      "dark mode",
-      "darken",
-      "darkened",
-      "dialogs",
-      "look",
-      "modal",
-      "night",
-      "overlay",
-      "scheme",
-      "show",
-      "style",
-      "theme"
-    ],
-    "description": "Show darkened overlay behind modal dialogs"
-  },
-  {
     "section": "matugenTemplateEmacs",
     "label": "Emacs",
     "tabIndex": 10,
@@ -3828,32 +3850,6 @@
     "conditionKey": "matugenAvailable"
   },
   {
-    "section": "modalBackground",
-    "label": "Modal Background",
-    "tabIndex": 10,
-    "category": "Theme & Colors",
-    "keywords": [
-      "appearance",
-      "background",
-      "behind",
-      "colors",
-      "dark mode",
-      "darken",
-      "darkened",
-      "dialogs",
-      "look",
-      "modal",
-      "night",
-      "overlay",
-      "scheme",
-      "show",
-      "style",
-      "theme"
-    ],
-    "icon": "layers",
-    "description": "Show darkened overlay behind modal dialogs"
-  },
-  {
     "section": "modalElevationEnabled",
     "label": "Modal Shadows",
     "tabIndex": 10,
@@ -4141,6 +4137,30 @@
       "theme"
     ],
     "description": "Controls the outline of popouts, modals, and other shell surfaces"
+  },
+  {
+    "section": "blurBorderEnabled",
+    "label": "Surface Border Outline",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "around",
+      "border",
+      "colors",
+      "edge",
+      "look",
+      "modal",
+      "outline",
+      "popup",
+      "scheme",
+      "shell",
+      "style",
+      "surface",
+      "surfaces",
+      "theme"
+    ],
+    "description": "Outline around shell surfaces"
   },
   {
     "section": "popupTransparency",

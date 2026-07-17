@@ -240,6 +240,8 @@ Singleton {
     onBlurForegroundLayersChanged: saveSettings()
     property real blurLayerOutlineOpacity: 0.12
     onBlurLayerOutlineOpacityChanged: saveSettings()
+    property bool blurBorderEnabled: true
+    onBlurBorderEnabledChanged: saveSettings()
     property string blurBorderColor: "outline"
     onBlurBorderColorChanged: saveSettings()
     property string blurBorderCustomColor: "#ffffff"

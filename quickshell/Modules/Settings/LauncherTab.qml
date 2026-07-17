@@ -749,6 +749,31 @@ Item {
 
             SettingsCard {
                 width: parent.width
+                iconName: "layers"
+                title: I18n.tr("Modal Background")
+                settingKey: "modalBackground"
+                tags: ["modal", "darken", "background", "overlay", "launcher"]
+
+                SettingsControlledByFrame {
+                    visible: SettingsData.frameEnabled
+                    parentModal: root.parentModal
+                    settingLabel: I18n.tr("Darken Modal Background")
+                    reason: I18n.tr("Disabled by Frame Mode")
+                }
+
+                SettingsToggleRow {
+                    settingKey: "modalDarkenBackground"
+                    tags: ["modal", "darken", "background", "overlay", "launcher"]
+                    text: I18n.tr("Darken Modal Background")
+                    description: I18n.tr("Show darkened overlay behind modal dialogs")
+                    visible: !SettingsData.frameEnabled
+                    checked: SettingsData.modalDarkenBackground
+                    onToggled: checked => SettingsData.set("modalDarkenBackground", checked)
+                }
+            }
+
+            SettingsCard {
+                width: parent.width
                 iconName: "open_in_new"
                 title: I18n.tr("Niri Integration").replace("Niri", "niri")
                 visible: CompositorService.isNiri

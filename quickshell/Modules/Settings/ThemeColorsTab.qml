@@ -1734,16 +1734,6 @@ Item {
                         }
                     }
                 }
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["foreground", "layers", "contrast", "surface", "blur", "glass", "frosted"]
-                    settingKey: "blurForegroundLayers"
-                    text: I18n.tr("Foreground Layers")
-                    description: I18n.tr("Show foreground surfaces on panels for stronger contrast")
-                    checked: SettingsData.blurForegroundLayers ?? true
-                    onToggled: checked => SettingsData.set("blurForegroundLayers", checked)
-                }
-
                 SettingsSliderRow {
                     tab: "theme"
                     tags: ["surface", "popup", "transparency", "opacity", "modal"]
@@ -1759,12 +1749,47 @@ Item {
                     onSliderValueChanged: newValue => SettingsData.set("popupTransparency", newValue / 100)
                 }
 
+                SettingsToggleRow {
+                    tab: "theme"
+                    tags: ["foreground", "layers", "contrast", "surface", "blur", "glass", "frosted"]
+                    settingKey: "blurForegroundLayers"
+                    text: I18n.tr("Foreground Layers")
+                    description: I18n.tr("Show foreground surfaces on panels for stronger contrast")
+                    checked: SettingsData.blurForegroundLayers ?? true
+                    onToggled: checked => SettingsData.set("blurForegroundLayers", checked)
+                }
+
+                SettingsSliderRow {
+                    tab: "theme"
+                    tags: ["foreground", "layers", "outline", "border", "cards", "widgets", "notifications", "control center"]
+                    settingKey: "blurLayerOutlineOpacity"
+                    text: I18n.tr("Layer Outline Opacity")
+                    description: I18n.tr("Controls outlines around foreground cards, pills, and notification cards")
+                    value: Math.round((SettingsData.blurLayerOutlineOpacity ?? 0.12) * 100)
+                    minimum: 0
+                    maximum: 40
+                    unit: "%"
+                    defaultValue: 12
+                    onSliderValueChanged: newValue => SettingsData.set("blurLayerOutlineOpacity", newValue / 100)
+                }
+
+                SettingsToggleRow {
+                    tab: "theme"
+                    tags: ["surface", "popup", "modal", "border", "outline", "edge"]
+                    settingKey: "blurBorderEnabled"
+                    text: I18n.tr("Surface Border Outline")
+                    description: I18n.tr("Outline around shell surfaces")
+                    checked: SettingsData.blurBorderEnabled ?? true
+                    onToggled: checked => SettingsData.set("blurBorderEnabled", checked)
+                }
+
                 SettingsDropdownRow {
                     tab: "theme"
                     tags: ["surface", "popup", "modal", "border", "outline", "edge"]
                     settingKey: "blurBorderColor"
                     text: I18n.tr("Surface Border Color")
                     description: I18n.tr("Border color around popouts, modals, and other shell surfaces")
+                    visible: SettingsData.blurBorderEnabled ?? true
                     options: [I18n.tr("Outline", "surface border color"), I18n.tr("Primary", "surface border color"), I18n.tr("Secondary", "surface border color"), I18n.tr("Text Color", "surface border color"), I18n.tr("Custom", "surface border color")]
                     optionColorMap: ({
                             [I18n.tr("Outline", "surface border color")]: Theme.outline,
@@ -1809,26 +1834,13 @@ Item {
                     settingKey: "blurBorderOpacity"
                     text: I18n.tr("Surface Border Opacity")
                     description: I18n.tr("Controls the outline of popouts, modals, and other shell surfaces")
+                    visible: SettingsData.blurBorderEnabled ?? true
                     value: Math.round((SettingsData.blurBorderOpacity ?? 0.35) * 100)
                     minimum: 0
                     maximum: 100
                     unit: "%"
                     defaultValue: 35
                     onSliderValueChanged: newValue => SettingsData.set("blurBorderOpacity", newValue / 100)
-                }
-
-                SettingsSliderRow {
-                    tab: "theme"
-                    tags: ["foreground", "layers", "outline", "border", "cards", "widgets", "notifications", "control center"]
-                    settingKey: "blurLayerOutlineOpacity"
-                    text: I18n.tr("Layer Outline Opacity")
-                    description: I18n.tr("Controls outlines around foreground cards, pills, and notification cards")
-                    value: Math.round((SettingsData.blurLayerOutlineOpacity ?? 0.12) * 100)
-                    minimum: 0
-                    maximum: 40
-                    unit: "%"
-                    defaultValue: 12
-                    onSliderValueChanged: newValue => SettingsData.set("blurLayerOutlineOpacity", newValue / 100)
                 }
 
                 SettingsSliderRow {
@@ -2101,32 +2113,6 @@ Item {
                     checked: SettingsData.barElevationEnabled ?? true
                     visible: SettingsData.m3ElevationEnabled ?? true
                     onToggled: checked => SettingsData.set("barElevationEnabled", checked)
-                }
-            }
-
-            SettingsCard {
-                tab: "theme"
-                tags: ["modal", "darken", "background", "overlay"]
-                title: I18n.tr("Modal Background")
-                settingKey: "modalBackground"
-                iconName: "layers"
-
-                SettingsControlledByFrame {
-                    visible: themeColorsTab.frameModeActive
-                    parentModal: themeColorsTab.parentModal
-                    settingLabel: I18n.tr("Darken Modal Background")
-                    reason: I18n.tr("Disabled by Frame Mode")
-                }
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["modal", "darken", "background", "overlay"]
-                    settingKey: "modalDarkenBackground"
-                    text: I18n.tr("Darken Modal Background")
-                    description: I18n.tr("Show darkened overlay behind modal dialogs")
-                    visible: !themeColorsTab.frameModeActive
-                    checked: SettingsData.modalDarkenBackground
-                    onToggled: checked => SettingsData.set("modalDarkenBackground", checked)
                 }
             }
 
