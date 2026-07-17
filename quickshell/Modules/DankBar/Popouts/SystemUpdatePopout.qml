@@ -500,7 +500,7 @@ DankPopout {
                         width: parent.width
                         height: 32
                         radius: Theme.cornerRadius
-                        color: ignoredToggleArea.containsMouse ? Theme.primaryHoverLight : Theme.withAlpha(Theme.surfaceContainer, 0.5)
+                        color: ignoredToggleArea.containsMouse ? Theme.primaryHoverLight : Theme.surfaceLight
 
                         DankIcon {
                             id: ignoredToggleIcon
@@ -559,7 +559,7 @@ DankPopout {
                             width: ListView.view.width
                             height: 32
                             radius: Theme.cornerRadius
-                            color: Theme.withAlpha(Theme.surfaceContainer, 0.5)
+                            color: Theme.surfaceLight
 
                             required property string modelData
 
