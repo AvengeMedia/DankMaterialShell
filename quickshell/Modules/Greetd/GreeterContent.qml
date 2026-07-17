@@ -73,14 +73,14 @@ Item {
     readonly property bool greeterPamHasFprint: greeterPamStackHasFprint && (!fprintdProbeComplete || fprintdHasDevice)
     readonly property bool greeterPamHasU2f: greeterPamStackHasModule("pam_u2f")
     readonly property bool greeterExternalAuthAvailable: (greeterPamHasFprint && GreetdSettings.greeterEnableFprint) || (greeterPamHasU2f && GreetdSettings.greeterEnableU2f)
-    readonly property bool greeterPamHasExternalAuth: greeterPamStackHasFprint || greeterPamHasU2f
+    readonly property bool greeterPamHasExternalAuth: greeterPamHasFprint || greeterPamHasU2f
     readonly property bool externalAuthInProgress: awaitingExternalAuth || (Greetd.state !== GreetdState.Inactive && passwordSubmitRequested && greeterPamHasExternalAuth && !pendingPasswordResponse)
     readonly property string externalAuthStatusMessage: {
         if (!externalAuthInProgress)
             return "";
-        if (greeterPamStackHasFprint && greeterPamHasU2f)
+        if (greeterPamHasFprint && greeterPamHasU2f)
             return I18n.tr("Awaiting fingerprint or security key authentication");
-        if (greeterPamStackHasFprint)
+        if (greeterPamHasFprint)
             return I18n.tr("Awaiting fingerprint authentication");
         return I18n.tr("Awaiting security key authentication");
     }

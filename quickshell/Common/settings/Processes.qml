@@ -247,6 +247,10 @@ Singleton {
     readonly property var _pamProbeCommand: ["sh", "-c", "for module in pam_fprintd.so pam_u2f.so; do found=false; for dir in /usr/lib64/security /usr/lib/security /lib/security /lib/x86_64-linux-gnu/security /usr/lib/x86_64-linux-gnu/security /usr/lib/aarch64-linux-gnu/security /run/current-system/sw/lib/security; do if [ -f \"$dir/$module\" ]; then found=true; break; fi; done; printf '%s:%s\\n' \"$module\" \"$found\"; done"]
 
     function detectAuthCapabilities() {
+        // FileView cannot watch paths that do not exist yet, so reload the U2F PAM
+        dankshellU2fPamWatcher.reload();
+        u2fKeysWatcher.reload();
+
         if (forcedFprintAvailable === null) {
             fingerprintProbeFinalized = false;
             Proc.runCommand("fprint-probe", _fprintProbeCommand, (output, exitCode) => {
@@ -600,7 +604,7 @@ Singleton {
                 let details = out;
                 if (err !== "")
                     details = details !== "" ? details + "\n\nstderr:\n" + err : "stderr:\n" + err;
-                ToastService.showInfo(I18n.tr("Authentication changes applied."), details, "", "auth-sync");
+                ToastService.showInfo(I18n.tr("Authentication changes applied"), details, "", "auth-sync");
                 root.detectAuthCapabilities();
                 root.finishAuthApply();
                 return;
@@ -723,6 +727,7 @@ Singleton {
     FileView {
         id: dankshellU2fPamWatcher
         path: "/etc/pam.d/dankshell-u2f"
+        watchChanges: true
         printErrors: false
         onLoaded: root.dankshellU2fPamText = text()
         onLoadFailed: root.dankshellU2fPamText = ""
@@ -737,6 +742,7 @@ Singleton {
     FileView {
         id: u2fKeysWatcher
         path: root.u2fKeysPath
+        watchChanges: true
         printErrors: false
         onLoaded: root.u2fKeysText = text()
         onLoadFailed: root.u2fKeysText = ""

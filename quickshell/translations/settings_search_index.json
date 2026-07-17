@@ -4655,21 +4655,70 @@
     ]
   },
   {
-    "section": "lockPamPath",
-    "label": "Authentication Source",
+    "section": "lockAppearance",
+    "label": "Appearance",
     "tabIndex": 11,
     "category": "Lock Screen",
     "keywords": [
+      "appearance",
+      "clock",
+      "date",
+      "font",
+      "lock",
+      "lockscreen",
+      "login",
+      "password",
+      "screen",
+      "security",
+      "time",
+      "typography",
+      "watch"
+    ],
+    "icon": "palette",
+    "description": "Font used for the clock and date on the lock screen"
+  },
+  {
+    "section": "lockAuthSource",
+    "label": "Authentication",
+    "tabIndex": 11,
+    "category": "Lock Screen",
+    "keywords": [
+      "authenticate",
       "authentication",
       "lock",
+      "lockscreen",
       "login",
       "pam",
       "password",
       "screen",
       "security",
       "service",
-      "source"
-    ]
+      "source",
+      "uses"
+    ],
+    "icon": "key",
+    "description": "Which PAM service the lock screen uses to authenticate"
+  },
+  {
+    "section": "lockPamPath",
+    "label": "Authentication Source",
+    "tabIndex": 11,
+    "category": "Lock Screen",
+    "keywords": [
+      "authenticate",
+      "authentication",
+      "lock",
+      "lockscreen",
+      "login",
+      "pam",
+      "password",
+      "screen",
+      "security",
+      "service",
+      "source",
+      "uses"
+    ],
+    "description": "Which PAM service the lock screen uses to authenticate"
   },
   {
     "section": "lockScreenVideoCycling",
@@ -4695,6 +4744,48 @@
       "video"
     ],
     "description": "Pick a different random video each time from the same folder"
+  },
+  {
+    "section": "lockBehavior",
+    "label": "Behavior",
+    "tabIndex": 11,
+    "category": "Lock Screen",
+    "keywords": [
+      "behavior",
+      "bind",
+      "dbus",
+      "disable",
+      "external",
+      "integration",
+      "lock",
+      "lockscreen",
+      "login",
+      "loginctl",
+      "password",
+      "screen",
+      "security",
+      "signals"
+    ],
+    "icon": "lock",
+    "description": "Bind lock screen to dbus signals from loginctl. Disable if using an external lock screen"
+  },
+  {
+    "section": "lockDisplay",
+    "label": "Display Assignment",
+    "tabIndex": 11,
+    "category": "Lock Screen",
+    "keywords": [
+      "assignment",
+      "display",
+      "lock",
+      "login",
+      "monitor",
+      "output",
+      "password",
+      "screen",
+      "security"
+    ],
+    "icon": "monitor"
   },
   {
     "section": "lockScreenVideoEnabled",
@@ -4737,7 +4828,7 @@
       "security",
       "source"
     ],
-    "description": "Managed by the primary PAM source."
+    "description": "Managed by the primary PAM source"
   },
   {
     "section": "loginctlLockIntegration",
@@ -4784,7 +4875,32 @@
       "u2f",
       "yubikey"
     ],
-    "description": "Managed by the primary PAM source."
+    "description": "Managed by the primary PAM source"
+  },
+  {
+    "section": "lockLayout",
+    "label": "Layout",
+    "tabIndex": 11,
+    "category": "Lock Screen",
+    "keywords": [
+      "actions",
+      "appear",
+      "field",
+      "hidden",
+      "layout",
+      "lock",
+      "login",
+      "password",
+      "power",
+      "pressed",
+      "reboot",
+      "screen",
+      "security",
+      "shutdown",
+      "soon"
+    ],
+    "icon": "lock",
+    "description": "If the field is hidden, it will appear as soon as a key is pressed."
   },
   {
     "section": "_tab_11",
@@ -4800,116 +4916,6 @@
       "security"
     ],
     "icon": "lock"
-  },
-  {
-    "section": "lockAppearance",
-    "label": "Lock Screen Appearance",
-    "tabIndex": 11,
-    "category": "Lock Screen",
-    "keywords": [
-      "appearance",
-      "clock",
-      "date",
-      "font",
-      "lock",
-      "lockscreen",
-      "login",
-      "password",
-      "screen",
-      "security",
-      "time",
-      "typography",
-      "watch"
-    ],
-    "icon": "palette",
-    "description": "Font used for the clock and date on the lock screen"
-  },
-  {
-    "section": "lockAuthSource",
-    "label": "Lock Screen Authentication",
-    "tabIndex": 11,
-    "category": "Lock Screen",
-    "keywords": [
-      "authentication",
-      "lock",
-      "lockscreen",
-      "login",
-      "pam",
-      "password",
-      "screen",
-      "security",
-      "service",
-      "source"
-    ],
-    "icon": "key"
-  },
-  {
-    "section": "lockDisplay",
-    "label": "Lock Screen Display",
-    "tabIndex": 11,
-    "category": "Lock Screen",
-    "keywords": [
-      "display",
-      "lock",
-      "lockscreen",
-      "login",
-      "monitor",
-      "output",
-      "password",
-      "screen",
-      "security"
-    ],
-    "icon": "monitor"
-  },
-  {
-    "section": "lockBehavior",
-    "label": "Lock Screen behaviour",
-    "tabIndex": 11,
-    "category": "Lock Screen",
-    "keywords": [
-      "behaviour",
-      "bind",
-      "dbus",
-      "disable",
-      "external",
-      "integration",
-      "lock",
-      "lockscreen",
-      "login",
-      "loginctl",
-      "password",
-      "screen",
-      "security",
-      "signals"
-    ],
-    "icon": "lock",
-    "description": "Bind lock screen to dbus signals from loginctl. Disable if using an external lock screen"
-  },
-  {
-    "section": "lockLayout",
-    "label": "Lock Screen layout",
-    "tabIndex": 11,
-    "category": "Lock Screen",
-    "keywords": [
-      "actions",
-      "appear",
-      "field",
-      "hidden",
-      "layout",
-      "lock",
-      "lockscreen",
-      "login",
-      "password",
-      "power",
-      "pressed",
-      "reboot",
-      "screen",
-      "security",
-      "shutdown",
-      "soon"
-    ],
-    "icon": "lock",
-    "description": "If the field is hidden, it will appear as soon as a key is pressed."
   },
   {
     "section": "lockAtStartup",
@@ -5063,25 +5069,18 @@
     "tabIndex": 11,
     "category": "Lock Screen",
     "keywords": [
-      "alternative",
-      "button",
       "factor",
-      "fingerprint",
-      "follows",
       "key",
       "lock",
       "login",
       "mode",
-      "passkey",
       "password",
       "screen",
       "second",
       "security",
       "u2f",
-      "uses",
       "yubikey"
-    ],
-    "description": "Alternative uses the passkey button. Second factor follows password or fingerprint."
+    ]
   },
   {
     "section": "lockScreenShowMediaPlayer",
@@ -5234,10 +5233,8 @@
       "policy",
       "screen",
       "security",
-      "sets",
       "system"
-    ],
-    "description": "System PAM sets the authentication policy."
+    ]
   },
   {
     "section": "videoScreensaver",
@@ -7910,6 +7907,48 @@
     "description": "Change the locale used for date and time formatting, independent of the interface language."
   },
   {
+    "section": "greeterAppearance",
+    "label": "Appearance",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "appearance",
+      "display manager",
+      "font",
+      "greetd",
+      "greeter",
+      "login",
+      "screen",
+      "typography"
+    ],
+    "icon": "palette",
+    "description": "Font used on the login screen"
+  },
+  {
+    "section": "greeterAuth",
+    "label": "Authentication",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "auth",
+      "authentication",
+      "block",
+      "display manager",
+      "external",
+      "greetd",
+      "greeter",
+      "login",
+      "managed",
+      "pam",
+      "removes",
+      "services",
+      "stops",
+      "write"
+    ],
+    "icon": "fingerprint",
+    "description": "DMS removes its managed block from /etc/pam.d/greetd and stops write services"
+  },
+  {
     "section": "greeterAutoLogin",
     "label": "Auto-login on startup",
     "tabIndex": 31,
@@ -7943,6 +7982,25 @@
     "description": "Skip the greeter password after boot until you sign out. Lock screen unlock is unchanged. Takes effect on the next reboot after sync."
   },
   {
+    "section": "greeterBehavior",
+    "label": "Behavior",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "behavior",
+      "display manager",
+      "greetd",
+      "greeter",
+      "last",
+      "login",
+      "remember",
+      "select",
+      "session"
+    ],
+    "icon": "history",
+    "description": "Pre-select the last used session on the greeter"
+  },
+  {
     "section": "greeterLockDateFormat",
     "label": "Date Format",
     "tabIndex": 31,
@@ -7956,7 +8014,7 @@
       "login",
       "screen"
     ],
-    "description": "Greeter only — format for the date on the login screen"
+    "description": "Format the date on the login screen"
   },
   {
     "section": "greeterDeps",
@@ -8020,57 +8078,6 @@
     "icon": "login"
   },
   {
-    "section": "greeterAppearance",
-    "label": "Greeter Appearance",
-    "tabIndex": 31,
-    "category": "Greeter",
-    "keywords": [
-      "appearance",
-      "display manager",
-      "font",
-      "greetd",
-      "greeter",
-      "login",
-      "screen",
-      "typography"
-    ],
-    "icon": "palette",
-    "description": "Font used on the login screen"
-  },
-  {
-    "section": "greeterBehavior",
-    "label": "Greeter Behavior",
-    "tabIndex": 31,
-    "category": "Greeter",
-    "keywords": [
-      "behavior",
-      "display manager",
-      "greetd",
-      "greeter",
-      "last",
-      "login",
-      "remember",
-      "select",
-      "session"
-    ],
-    "icon": "history",
-    "description": "Pre-select the last used session on the greeter"
-  },
-  {
-    "section": "greeterStatus",
-    "label": "Greeter Status",
-    "tabIndex": 31,
-    "category": "Greeter",
-    "keywords": [
-      "display manager",
-      "greetd",
-      "greeter",
-      "login",
-      "status"
-    ],
-    "icon": "info"
-  },
-  {
     "section": "greeterFontFamily",
     "label": "Greeter font",
     "tabIndex": 31,
@@ -8085,29 +8092,6 @@
       "typography"
     ],
     "description": "Font used on the login screen"
-  },
-  {
-    "section": "greeterAuth",
-    "label": "Login Authentication",
-    "tabIndex": 31,
-    "category": "Greeter",
-    "keywords": [
-      "auth",
-      "authentication",
-      "block",
-      "display manager",
-      "external",
-      "greetd",
-      "greeter",
-      "login",
-      "managed",
-      "pam",
-      "removes",
-      "stops",
-      "writing"
-    ],
-    "icon": "fingerprint",
-    "description": "DMS removes its managed block from /etc/pam.d/greetd and stops writing to it"
   },
   {
     "section": "greeterRememberLastSession",
@@ -8146,26 +8130,42 @@
     "description": "Pre-fill the last successful username on the greeter"
   },
   {
+    "section": "greeterStatus",
+    "label": "Status",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "display manager",
+      "greetd",
+      "greeter",
+      "login",
+      "status"
+    ],
+    "icon": "info"
+  },
+  {
     "section": "greeterPamExternallyManaged",
-    "label": "greetd PAM is externally managed",
+    "label": "Use system PAM authentication",
     "tabIndex": 31,
     "category": "Greeter",
     "keywords": [
       "auth",
+      "authentication",
       "block",
       "display manager",
       "external",
-      "externally",
       "greetd",
       "greeter",
       "login",
       "managed",
       "pam",
       "removes",
+      "services",
       "stops",
-      "writing"
+      "system",
+      "write"
     ],
-    "description": "DMS removes its managed block from /etc/pam.d/greetd and stops writing to it"
+    "description": "DMS removes its managed block from /etc/pam.d/greetd and stops write services"
   },
   {
     "section": "muxType",

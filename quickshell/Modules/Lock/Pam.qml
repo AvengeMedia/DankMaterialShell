@@ -113,6 +113,7 @@ Scope {
         id: u2fConfigWatcher
 
         path: "/etc/pam.d/dankshell-u2f"
+        watchChanges: true
         printErrors: false
     }
 
@@ -488,6 +489,9 @@ Scope {
         root.resetAuthFlows();
         if (!SettingsData.lockPamExternallyManaged && !dankshellConfigWatcher.loaded && !userPamWatcher.loaded)
             ensureUserPamConfig();
+        // FileView cannot watch a path that does not exist yet; re-read so a
+        // dedicated service created after startup is used on the next lock.
+        u2fConfigWatcher.reload();
         fprint.checkAvail();
         u2f.checkAvail();
     }
