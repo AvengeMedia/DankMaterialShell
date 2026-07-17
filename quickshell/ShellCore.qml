@@ -116,12 +116,28 @@ Item {
 
         property var hyprlandOverviewLoaderRef: hyprlandOverviewLoader
 
+        // Horizontal bars must claim their exclusive zones first, so vertical bars wait for every enabled horizontal bar to load
+        readonly property int horizontalWanted: SettingsData.barConfigs.filter(c => (c.enabled ?? false) && c.position !== SettingsData.Position.Left && c.position !== SettingsData.Position.Right).length
+        property int horizontalReady: 0
+
+        function recountHorizontalReady() {
+            let ready = 0;
+            for (let i = 0; i < count; i++) {
+                const loader = itemAt(i);
+                if (loader?.item && !loader.isVertical)
+                    ready++;
+            }
+            horizontalReady = ready;
+        }
+
         delegate: Loader {
             id: barLoader
             required property var modelData
             property var barConfig: SettingsData.barConfigs.find(cfg => cfg.id === modelData.id) || null
-            active: root.barSurfacesLoaded && (barConfig?.enabled ?? false)
+            readonly property bool isVertical: modelData.position === SettingsData.Position.Left || modelData.position === SettingsData.Position.Right
+            active: root.barSurfacesLoaded && (barConfig?.enabled ?? false) && (!isVertical || dankBarRepeater.horizontalReady >= dankBarRepeater.horizontalWanted)
             asynchronous: false
+            onItemChanged: dankBarRepeater.recountHorizontalReady()
 
             sourceComponent: DankBar {
                 barConfig: barLoader.barConfig
