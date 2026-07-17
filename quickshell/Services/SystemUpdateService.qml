@@ -3,7 +3,6 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
-import Quickshell.Io
 import qs.Common
 import qs.Services
 
@@ -34,6 +33,7 @@ Singleton {
 
     readonly property int updateCount: availableUpdates.length
     readonly property bool helperAvailable: sysupdateAvailable && backends.length > 0
+    readonly property bool useCustomCommand: SettingsData.updaterUseCustomCommand && (SettingsData.updaterCustomCommand || "").trim().length > 0
 
     Connections {
         target: DMSService
@@ -183,11 +183,14 @@ Singleton {
 
     function runUpdates(opts) {
         const params = opts || {};
-        if (SettingsData.updaterUseCustomCommand && SettingsData.updaterCustomCommand.length > 0) {
-            _runCustomTerminalCommand();
-            return;
-        }
         params.ignored = SettingsData.updaterIgnoredPackages || [];
+        if (useCustomCommand) {
+            params.customCommand = SettingsData.updaterCustomCommand.trim();
+            const termArgs = (SettingsData.updaterTerminalAdditionalParams || "").trim();
+            if (termArgs.length > 0) {
+                params.terminalArgs = termArgs.split(/\s+/);
+            }
+        }
         DMSService.sysupdateUpgrade(params, null);
     }
 
@@ -197,30 +200,6 @@ Singleton {
 
     function setInterval(seconds) {
         DMSService.sysupdateSetInterval(seconds, null);
-    }
-
-    function _runCustomTerminalCommand() {
-        const terminal = SessionData.resolveTerminal();
-        if (!terminal || terminal.length === 0) {
-            ToastService.showError(I18n.tr("No terminal configured"), I18n.tr("Pick a terminal in Settings → Launcher (or set $TERMINAL)."));
-            return;
-        }
-        const updateCommand = `${SettingsData.updaterCustomCommand} && echo -n "Updates complete! " ; echo "Press Enter to close..." && read`;
-        const termClass = SettingsData.updaterTerminalAdditionalParams || "";
-        var argv = [terminal];
-        if (termClass.length > 0) {
-            argv = argv.concat(termClass.split(" "));
-        }
-        argv.push("-e");
-        argv.push("sh");
-        argv.push("-c");
-        argv.push(updateCommand);
-        customRunner.command = argv;
-        customRunner.running = true;
-    }
-
-    Process {
-        id: customRunner
     }
 
     property bool _startupCheckDone: false
@@ -262,5 +241,4 @@ Singleton {
         }
         DMSService.sysupdateRelease(null);
     }
-
 }

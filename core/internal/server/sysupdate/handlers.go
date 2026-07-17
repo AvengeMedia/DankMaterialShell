@@ -46,6 +46,7 @@ func handleUpgrade(conn net.Conn, req models.Request, m *Manager) {
 		DryRun:         params.BoolOpt(req.Params, "dry", false),
 		CustomCommand:  params.StringOpt(req.Params, "customCommand", ""),
 		Terminal:       params.StringOpt(req.Params, "terminal", ""),
+		TerminalArgs:   stringSliceOpt(req.Params, "terminalArgs"),
 		Ignored:        stringSliceOpt(req.Params, "ignored"),
 	}
 	if err := m.Upgrade(opts); err != nil {

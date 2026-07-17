@@ -74,7 +74,7 @@ DankPopout {
             color: "transparent"
             focus: true
 
-            readonly property bool hasTerminalBackend: (SystemUpdateService.backends || []).some(b => b.runsInTerminal === true)
+            readonly property bool upgradeRunsInTerminal: SystemUpdateService.useCustomCommand || (SystemUpdateService.backends || []).some(b => b.runsInTerminal === true)
 
             property int nowUnix: Math.floor(Date.now() / 1000)
 
@@ -272,7 +272,7 @@ DankPopout {
                                 includeAUR: SettingsData.updaterAllowAUR,
                                 terminal: SessionData.terminalOverride
                             };
-                            if (updaterPanel.hasTerminalBackend) {
+                            if (updaterPanel.upgradeRunsInTerminal) {
                                 systemUpdatePopout._reopenAfterUpgrade = true;
                                 SystemUpdateService.runUpdates(opts);
                                 systemUpdatePopout.close();
@@ -478,7 +478,7 @@ DankPopout {
                     anchors.fill: parent
                     anchors.margins: Theme.spacingM
                     spacing: Theme.spacingS
-                    visible: SystemUpdateService.isUpgrading && updaterPanel.hasTerminalBackend
+                    visible: SystemUpdateService.isUpgrading && updaterPanel.upgradeRunsInTerminal
 
                     DankIcon {
                         anchors.horizontalCenter: parent.horizontalCenter
@@ -509,7 +509,7 @@ DankPopout {
                 DankFlickable {
                     anchors.fill: parent
                     anchors.margins: Theme.spacingM
-                    visible: SystemUpdateService.isUpgrading && !updaterPanel.hasTerminalBackend
+                    visible: SystemUpdateService.isUpgrading && !updaterPanel.upgradeRunsInTerminal
                     contentWidth: width
                     contentHeight: logText.implicitHeight
                     clip: true

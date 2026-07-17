@@ -80,6 +80,7 @@ type UpgradeOptions struct {
 	AttachStdio    bool
 	CustomCommand  string
 	Terminal       string
+	TerminalArgs   []string
 	Targets        []Package
 	Ignored        []string
 }

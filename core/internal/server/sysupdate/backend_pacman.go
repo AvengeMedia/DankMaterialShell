@@ -112,7 +112,7 @@ func (b archHelperBackend) Upgrade(ctx context.Context, opts UpgradeOptions, onL
 	}
 	cmd := strings.Join(archHelperUpgradeArgv(b.id, opts.IncludeAUR, opts.Ignored), " ")
 	title := fmt.Sprintf("DMS — System Update (%s)", b.id)
-	return Run(ctx, wrapInTerminal(term, title, cmd), RunOptions{OnLine: onLine})
+	return Run(ctx, wrapInTerminal(term, title, cmd, opts.TerminalArgs), RunOptions{OnLine: onLine})
 }
 
 func archHelperUpgradeArgv(id string, includeAUR bool, ignored []string) []string {

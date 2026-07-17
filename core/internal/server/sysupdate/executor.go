@@ -119,7 +119,7 @@ func findTerminal(override string) string {
 	return ""
 }
 
-func wrapInTerminal(term, title, shellCmd string) []string {
+func wrapInTerminal(term, title, shellCmd string, extraArgs []string) []string {
 	const appID = "com.danklinux.dms"
 	banner := fmt.Sprintf(
 		`printf '\033[1;36m=== %s ===\033[0m\n'; printf '\033[2m$ %s\033[0m\n'; printf '\033[33mYou may be prompted for your sudo password to apply system updates.\033[0m\n\n'`,
@@ -129,24 +129,25 @@ func wrapInTerminal(term, title, shellCmd string) []string {
 	export := `export SUDO_PROMPT="[DMS] sudo password for %u: "; `
 	full := export + banner + "; " + shellCmd + "; " + closer
 
+	var argv []string
+	execFlag := "-e"
 	switch term {
-	case "kitty":
-		return []string{term, "--class", appID, "-T", title, "-e", "sh", "-c", full}
-	case "alacritty":
-		return []string{term, "--class", appID, "-T", title, "-e", "sh", "-c", full}
+	case "kitty", "alacritty", "wezterm":
+		argv = []string{term, "--class", appID, "-T", title}
 	case "foot":
-		return []string{term, "--app-id=" + appID, "--title=" + title, "-e", "sh", "-c", full}
+		argv = []string{term, "--app-id=" + appID, "--title=" + title}
 	case "ghostty":
-		return []string{term, "--class=" + appID, "--title=" + title, "-e", "sh", "-c", full}
-	case "wezterm":
-		return []string{term, "--class", appID, "-T", title, "-e", "sh", "-c", full}
+		argv = []string{term, "--class=" + appID, "--title=" + title}
 	case "xterm":
-		return []string{term, "-class", appID, "-T", title, "-e", "sh", "-c", full}
+		argv = []string{term, "-class", appID, "-T", title}
 	case "konsole":
-		return []string{term, "-p", "tabtitle=" + title, "-e", "sh", "-c", full}
+		argv = []string{term, "-p", "tabtitle=" + title}
 	case "gnome-terminal":
-		return []string{term, "--title=" + title, "--", "sh", "-c", full}
+		argv = []string{term, "--title=" + title}
+		execFlag = "--"
 	default:
-		return []string{term, "-e", "sh", "-c", full}
+		argv = []string{term}
 	}
+	argv = append(argv, extraArgs...)
+	return append(argv, execFlag, "sh", "-c", full)
 }
