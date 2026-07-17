@@ -357,6 +357,27 @@ Rectangle {
                                     visible: text.length > 0
                                 }
 
+                                // Extra batteries reported by split devices (e.g. a
+                                // ZMK keyboard's second half) beyond the single
+                                // value BlueZ exposes via org.bluez.Battery1.
+                                ScriptModel {
+                                    id: peripheralBatteriesModel
+                                    objectProp: "label"
+                                    values: BluetoothService.peripheralBatteriesFor(pairedDelegate.modelData)
+                                }
+
+                                Repeater {
+                                    model: peripheralBatteriesModel
+
+                                    delegate: StyledText {
+                                        required property var modelData
+
+                                        text: "• " + modelData.label + " " + modelData.percentage + "%"
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Theme.surfaceVariantText
+                                    }
+                                }
+
                                 StyledText {
                                     text: pairedDelegate.modelData.signalStrength > 0 ? "• " + pairedDelegate.modelData.signalStrength + "%" : ""
                                     font.pixelSize: Theme.fontSizeSmall
