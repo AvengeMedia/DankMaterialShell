@@ -182,7 +182,7 @@ Singleton {
         Proc.runCommand("audio-set-sink-port", ["env", "LC_ALL=C", "pactl", "set-sink-port", sinkName, portName], (output, exitCode) => {
             const ok = exitCode === 0;
             if (callback)
-                callback(ok, ok ? I18n.tr("Port switched") : (output || I18n.tr("Failed to switch port")));
+                callback(ok, ok ? I18n.tr("Port switched", "audio sink port switched successful message") : (output || I18n.tr("Failed to switch port", "audio sink port switch failure message")));
             if (ok)
                 Qt.callLater(() => root.refreshSinkPorts());
         }, 0);

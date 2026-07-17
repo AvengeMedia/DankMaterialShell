@@ -290,7 +290,7 @@ Rectangle {
                         iconName: "tune"
                         iconSize: 16
                         iconColor: Theme.surfaceText
-                        tooltipText: I18n.tr("Port Selection")
+                        tooltipText: I18n.tr("Port Selection", "audio output port selector button tooltip")
                         onClicked: root.showPortSelector(modelData)
                     }
 

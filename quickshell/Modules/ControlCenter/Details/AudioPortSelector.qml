@@ -211,7 +211,7 @@ Item {
                     }
 
                     StyledText {
-                        text: I18n.tr("Port Selection")
+                        text: I18n.tr("Port Selection", "audio port selector modal subtitle")
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.surfaceTextMedium
                     }
@@ -227,10 +227,10 @@ Item {
             StyledText {
                 text: {
                     if (root.isLoading)
-                        return I18n.tr("Loading ports...");
+                        return I18n.tr("Loading ports...", "audio port selector loading state");
                     if (root.availablePorts.length === 0)
-                        return I18n.tr("No ports found");
-                    return I18n.tr("Current: %1").arg(root.portDescription(root.currentPort));
+                        return I18n.tr("No ports found", "audio port selector empty state");
+                    return I18n.tr("Current: %1", "audio port selector active port label, %1 is the port name").arg(root.portDescription(root.currentPort));
                 }
                 font.pixelSize: Theme.fontSizeSmall
                 color: root.isLoading ? Theme.primary : Theme.surfaceTextMedium
@@ -288,9 +288,9 @@ Item {
                             StyledText {
                                 text: {
                                     if (modelData.availability === "no")
-                                        return I18n.tr("Unavailable");
+                                        return I18n.tr("Unavailable", "audio port availability status");
                                     if (modelData.availability === "yes")
-                                        return I18n.tr("Available");
+                                        return I18n.tr("Available", "audio port availability status");
                                     return "";
                                 }
                                 visible: text.length > 0
