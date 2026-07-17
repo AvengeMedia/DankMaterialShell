@@ -19,6 +19,7 @@ pkgs.testers.runNixOSTest {
     programs.dank-material-shell = {
       enable = true;
       systemd.enable = true;
+      lockscreen.securityKey.enable = true;
       plugins = {
         TestPlugin = {
           src = pkgs.emptyDirectory;
@@ -39,6 +40,7 @@ pkgs.testers.runNixOSTest {
     machine.succeed("su -- danklinux -c 'dms --help >/dev/null'")
     machine.succeed("test -d /etc/xdg/quickshell/dms-plugins")
     machine.succeed("test -f /run/current-system/sw/lib/systemd/user/dms.service")
+    machine.succeed("grep -q 'lib/security/pam_u2f.so cue' /etc/pam.d/dankshell-u2f")
 
     payload = json.loads(machine.succeed("su -- danklinux -c 'dms doctor --json'"))
     t.assertIn("summary", payload)

@@ -200,7 +200,9 @@ in
     ];
     # DMS currently relies on /etc/pam.d/login for lock screen password auth on NixOS.
     # Declare security.pam.services.dankshell only if you want to override that runtime fallback.
-    # U2F and fingerprint are handled separately by DMS — do not add pam_u2f or pam_fprintd here.
+    # Do not add pam_u2f or pam_fprintd here for security-key unlock, enable
+    # programs.dank-material-shell.lockscreen.securityKey.enable, which declares the
+    # dedicated dankshell-u2f service DMS drives on its own.
     # security.pam.services.dankshell = {
     #   # Example: add faillock
     #   faillock.enable = true;
