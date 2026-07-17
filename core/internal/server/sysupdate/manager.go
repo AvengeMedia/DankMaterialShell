@@ -345,6 +345,9 @@ func (m *Manager) runUpgrade(ctx context.Context, opts UpgradeOptions) {
 		opts.Targets = append([]Package(nil), m.state.Packages...)
 		m.mu.RUnlock()
 	}
+	if isPacmanFamily(m.selection.System) {
+		opts.Ignored = dropPacmanRepoIgnores(opts.Ignored, opts.Targets)
+	}
 	opts.Targets = dropIgnoredTargets(opts.Targets, opts.Ignored)
 
 	backends := upgradeBackends(m.selection, opts)

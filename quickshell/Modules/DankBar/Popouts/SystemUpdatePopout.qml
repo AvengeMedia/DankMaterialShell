@@ -336,7 +336,10 @@ DankPopout {
 
                 StyledText {
                     id: statusText
-                    anchors.fill: parent
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.top: parent.top
+                    anchors.bottom: ignoredSection.top
                     anchors.margins: Theme.spacingM
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
@@ -361,7 +364,10 @@ DankPopout {
 
                 DankListView {
                     id: packagesList
-                    anchors.fill: parent
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.top: parent.top
+                    anchors.bottom: ignoredSection.top
                     anchors.margins: Theme.spacingS
                     visible: !SystemUpdateService.isUpgrading && SystemUpdateService.updateCount > 0 && !SystemUpdateService.hasError && !SystemUpdateService.isChecking
                     clip: true
@@ -467,9 +473,119 @@ DankPopout {
                             iconName: "visibility_off"
                             iconSize: 16
                             iconColor: Theme.surfaceVariantText
-                            visible: rowHoverHandler.hovered
+                            visible: rowHoverHandler.hovered && SystemUpdateService.canIgnorePackage(packageRow.modelData)
                             tooltipText: I18n.tr("Ignore this package")
                             onClicked: SystemUpdateService.ignorePackage(packageRow.modelData.name)
+                        }
+                    }
+                }
+
+                Column {
+                    id: ignoredSection
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    anchors.margins: Theme.spacingS
+                    spacing: Theme.spacingXS
+
+                    readonly property var ignoredNames: SettingsData.updaterIgnoredPackages || []
+                    readonly property bool shown: ignoredNames.length > 0 && !SystemUpdateService.isUpgrading && !SystemUpdateService.isChecking
+                    property bool expanded: false
+
+                    visible: shown
+                    height: shown ? implicitHeight : 0
+
+                    Rectangle {
+                        id: ignoredToggle
+                        width: parent.width
+                        height: 32
+                        radius: Theme.cornerRadius
+                        color: ignoredToggleArea.containsMouse ? Theme.primaryHoverLight : Theme.withAlpha(Theme.surfaceContainer, 0.5)
+
+                        DankIcon {
+                            id: ignoredToggleIcon
+                            anchors.left: parent.left
+                            anchors.leftMargin: Theme.spacingS
+                            anchors.verticalCenter: parent.verticalCenter
+                            name: "visibility_off"
+                            size: 16
+                            color: Theme.surfaceVariantText
+                        }
+
+                        StyledText {
+                            anchors.left: ignoredToggleIcon.right
+                            anchors.leftMargin: Theme.spacingS
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: I18n.tr("Ignored (%1)").arg(ignoredSection.ignoredNames.length)
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                        }
+
+                        DankIcon {
+                            anchors.right: parent.right
+                            anchors.rightMargin: Theme.spacingS
+                            anchors.verticalCenter: parent.verticalCenter
+                            name: ignoredSection.expanded ? "expand_less" : "expand_more"
+                            size: 16
+                            color: Theme.surfaceVariantText
+                        }
+
+                        MouseArea {
+                            id: ignoredToggleArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: ignoredSection.expanded = !ignoredSection.expanded
+                        }
+
+                        Behavior on color {
+                            ColorAnimation {
+                                duration: Theme.shortDuration
+                                easing.type: Theme.standardEasing
+                            }
+                        }
+                    }
+
+                    DankListView {
+                        width: parent.width
+                        height: ignoredSection.expanded ? Math.min(contentHeight, 150) : 0
+                        visible: ignoredSection.expanded
+                        clip: true
+                        spacing: Theme.spacingXS
+                        model: ignoredSection.ignoredNames
+
+                        delegate: Rectangle {
+                            id: ignoredRow
+                            width: ListView.view.width
+                            height: 32
+                            radius: Theme.cornerRadius
+                            color: Theme.withAlpha(Theme.surfaceContainer, 0.5)
+
+                            required property string modelData
+
+                            StyledText {
+                                anchors.left: parent.left
+                                anchors.leftMargin: Theme.spacingM
+                                anchors.right: restoreButton.left
+                                anchors.verticalCenter: parent.verticalCenter
+                                text: ignoredRow.modelData
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceText
+                                elide: Text.ElideRight
+                            }
+
+                            DankActionButton {
+                                id: restoreButton
+                                anchors.right: parent.right
+                                anchors.rightMargin: Theme.spacingXS
+                                anchors.verticalCenter: parent.verticalCenter
+                                buttonSize: 24
+                                iconName: "visibility"
+                                iconSize: 16
+                                iconColor: Theme.surfaceVariantText
+                                tooltipText: I18n.tr("Stop ignoring %1").arg(ignoredRow.modelData)
+                                onClicked: SystemUpdateService.unignorePackage(ignoredRow.modelData)
+                            }
                         }
                     }
                 }

@@ -35,6 +35,17 @@ Singleton {
     readonly property bool helperAvailable: sysupdateAvailable && backends.length > 0
     readonly property bool useCustomCommand: SettingsData.updaterUseCustomCommand && (SettingsData.updaterCustomCommand || "").trim().length > 0
 
+    // Dont allow partial updates on arch, if they wanna break their system they can do it outside of DMS:
+    // https://wiki.archlinux.org/title/System_maintenance#Partial_upgrades_are_unsupported
+    // AUR/Flatpak packages stay ignorable — holding those cannot break the repo dependency graph.
+    readonly property bool systemHoldsAllowed: !["pacman", "paru", "yay"].includes(pkgManager)
+
+    function canIgnorePackage(pkg) {
+        if (!pkg)
+            return false;
+        return systemHoldsAllowed || pkg.repo !== "system";
+    }
+
     Connections {
         target: DMSService
         function onCapabilitiesReceived() {
@@ -108,9 +119,11 @@ Singleton {
         if (!data) {
             return;
         }
+        backends = data.backends || [];
+        const systemBackend = backends.find(b => b.repo === "system" || b.repo === "ostree");
+        pkgManager = systemBackend ? systemBackend.id : (backends.length > 0 ? backends[0].id : "");
         _rawUpdates = data.packages || [];
         availableUpdates = _filterUpdates(_rawUpdates);
-        backends = data.backends || [];
         distribution = data.distro || "";
         distributionPretty = data.distroPretty || "";
         distributionSupported = (backends.length > 0);
@@ -145,13 +158,6 @@ Singleton {
             errorCode = "";
             errorHint = "";
         }
-
-        if (backends.length > 0) {
-            const sys = backends.find(b => b.repo === "system" || b.repo === "ostree");
-            pkgManager = sys ? sys.id : backends[0].id;
-        } else {
-            pkgManager = "";
-        }
     }
 
     function _filterUpdates(pkgs) {
@@ -159,6 +165,8 @@ Singleton {
         return (pkgs || []).filter(p => {
             if (!SettingsData.updaterAllowAUR && p.repo === "aur")
                 return false;
+            if (!canIgnorePackage(p))
+                return true;
             return ignored.indexOf(p.name) === -1;
         });
     }
@@ -174,6 +182,13 @@ Singleton {
         if (list.indexOf(name) !== -1)
             return;
         list.push(name);
+        SettingsData.set("updaterIgnoredPackages", list);
+    }
+
+    function unignorePackage(name) {
+        if (!name)
+            return;
+        const list = (SettingsData.updaterIgnoredPackages || []).filter(p => p !== name);
         SettingsData.set("updaterIgnoredPackages", list);
     }
 

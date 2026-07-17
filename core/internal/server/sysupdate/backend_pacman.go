@@ -50,11 +50,42 @@ func (b pacmanBackend) Upgrade(ctx context.Context, opts UpgradeOptions, onLine 
 }
 
 func pacmanUpgradeArgv(opts UpgradeOptions) []string {
-	argv := []string{"pacman", "-Syu", "--noconfirm", "--needed"}
-	if len(opts.Ignored) > 0 {
-		argv = append(argv, "--ignore", strings.Join(opts.Ignored, ","))
+	return privilegedArgv(opts, "pacman", "-Syu", "--noconfirm", "--needed")
+}
+
+// Dont allow partial updates on arch, if they wanna break their system they can do it outside of DMS:
+// https://wiki.archlinux.org/title/System_maintenance#Partial_upgrades_are_unsupported
+// AUR packages are exempt — holding those cannot break the repo dependency graph.
+func dropPacmanRepoIgnores(ignored []string, pending []Package) []string {
+	if len(ignored) == 0 {
+		return ignored
 	}
-	return privilegedArgv(opts, argv...)
+	repoPending := make(map[string]bool, len(pending))
+	for _, p := range pending {
+		if p.Repo == RepoSystem {
+			repoPending[p.Name] = true
+		}
+	}
+	out := make([]string, 0, len(ignored))
+	for _, name := range ignored {
+		if repoPending[name] {
+			continue
+		}
+		out = append(out, name)
+	}
+	return out
+}
+
+func isPacmanFamily(b Backend) bool {
+	if b == nil {
+		return false
+	}
+	switch b.ID() {
+	case "pacman", "paru", "yay":
+		return true
+	default:
+		return false
+	}
 }
 
 type archHelperBackend struct {

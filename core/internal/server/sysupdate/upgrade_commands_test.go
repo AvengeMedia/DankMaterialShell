@@ -50,9 +50,9 @@ func TestUpgradeCommandBuilders(t *testing.T) {
 			want: []string{"paru", "-Syu", "--noconfirm", "--needed", "--ignore", "linux,discord"},
 		},
 		{
-			name: "pacman with ignored packages",
+			name: "pacman never passes --ignore",
 			got:  pacmanUpgradeArgv(UpgradeOptions{Ignored: []string{"linux"}}),
-			want: []string{"pkexec", "pacman", "-Syu", "--noconfirm", "--needed", "--ignore", "linux"},
+			want: []string{"pkexec", "pacman", "-Syu", "--noconfirm", "--needed"},
 		},
 		{
 			name: "dnf with ignored packages",
@@ -103,6 +103,18 @@ func TestUpgradeCommandBuilders(t *testing.T) {
 				t.Fatalf("argv = %#v, want %#v", tt.got, tt.want)
 			}
 		})
+	}
+}
+
+func TestDropPacmanRepoIgnoresKeepsAURHolds(t *testing.T) {
+	pending := []Package{
+		{Name: "linux", Repo: RepoSystem},
+		{Name: "librewolf", Repo: RepoAUR},
+	}
+	got := dropPacmanRepoIgnores([]string{"linux", "librewolf", "not-pending"}, pending)
+	want := []string{"librewolf", "not-pending"}
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("ignored = %#v, want %#v", got, want)
 	}
 }
 
