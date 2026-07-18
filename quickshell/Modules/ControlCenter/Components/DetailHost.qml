@@ -114,6 +114,12 @@ Item {
                 }
                 builtinInstance = widgetModel.tailscaleBuiltinInstance;
             }
+            if (builtinId === "builtin_chromecast") {
+                if (widgetModel?.chromecastLoader) {
+                    widgetModel.chromecastLoader.active = true;
+                }
+                builtinInstance = widgetModel.chromecastBuiltinInstance;
+            }
             if (builtinId === "builtin_display_profiles") {
                 if (widgetModel?.displayProfilesLoader) {
                     widgetModel.displayProfilesLoader.active = true;
