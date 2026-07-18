@@ -44,6 +44,10 @@ if mode ~= nil then
 	end
 end
 
+if settings.terminalsAlwaysDark then
+	vim.o.background = "dark"
+end
+
 local current_file_path = debug.getinfo(1, "S").source:sub(2)
 local theme_base = deepGet(settings, { "matugenTemplateNeovimSettings", vim.o.background, "baseTheme" })
 	or ("github_" .. vim.o.background)
