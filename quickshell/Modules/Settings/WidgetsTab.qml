@@ -557,20 +557,19 @@ Item {
         return sectionId === "left" ? leftSection : sectionId === "center" ? centerSection : sectionId === "right" ? rightSection : null;
     }
 
-    // Id-based reorder; rebuilds from authoritative objects so every prop (incl. hideWhenIdle) survives
+    // Id-based reorder; rebuilds from authoritative objects so every prop (incl. hideWhenIdle) survives.
+    // Consumes one entry per occurrence so duplicate ids (e.g. two spacers) don't collapse, and
+    // appends unconsumed entries so nothing is silently dropped from the config array.
     function reorderSection(sectionId, orderedIds) {
-        var current = getWidgetsForSection(sectionId);
-        var byId = {};
-        current.forEach(w => {
-            var id = (typeof w === "string" ? w : w.id);
-            byId[id] = w;
-        });
+        var remaining = getWidgetsForSection(sectionId).slice();
         var reordered = [];
         orderedIds.forEach(id => {
-            if (byId[id] !== undefined)
-                reordered.push(byId[id]);
+            var idx = remaining.findIndex(w => (typeof w === "string" ? w : w.id) === id);
+            if (idx < 0)
+                return;
+            reordered.push(remaining.splice(idx, 1)[0]);
         });
-        setWidgetsForSection(sectionId, reordered);
+        setWidgetsForSection(sectionId, reordered.concat(remaining));
     }
 
     // Move a widget across sections (or within); committed as one atomic bar-config save
@@ -979,8 +978,16 @@ Item {
             var isString = typeof widget === "string";
             var widgetId = isString ? widget : widget.id;
             var widgetDef = baseWidgetDefinitions.find(w => w.id === widgetId);
-            if (!widgetDef)
-                return;
+            if (!widgetDef) {
+                // Skipping entries would desync row indices from the config array (issue #2844)
+                widgetDef = {
+                    "id": widgetId,
+                    "text": widgetId || I18n.tr("Unknown"),
+                    "description": "",
+                    "icon": "extension",
+                    "warning": I18n.tr("Unavailable")
+                };
+            }
 
             var item = Object.assign({}, widgetDef);
             item.enabled = isString ? true : widget.enabled;
