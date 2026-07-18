@@ -64,8 +64,268 @@ Singleton {
         });
     }
 
+    // Split keyboards (e.g. ZMK) report each half's charge on a separate GATT
+    // Battery Level (0x2A19) characteristic, but BlueZ's org.bluez.Battery1 —
+    // and therefore Quickshell's device.battery — surfaces only one of them. We
+    // read the extra characteristics (identified by their 0x2901 user-description
+    // descriptor, e.g. "Peripheral 0") directly over D-Bus and expose them here,
+    // keyed by uppercased device address: { "AA:BB:..": [{ percentage, label }] }.
+    property var peripheralBatteries: ({})
+    // Live tracking state for the peripheral Battery Level characteristics,
+    // keyed by their GATT object path.
+    property var _peripheralCharacteristics: ({})
+    property bool _bluezSubscribed: false
+    property bool _bluezRescanQueued: false
+
+    function peripheralBatteriesFor(device) {
+        if (!device || !device.address)
+            return [];
+        return root.peripheralBatteries[device.address.toUpperCase()] || [];
+    }
+
     Component.onCompleted: {
         detectPactlProcess.running = true;
+        maybeInitBluez();
+    }
+
+    // The split-keyboard batteries are read over DMS's persistent system-bus
+    // D-Bus bridge (org.bluez / BlueZ GATT), which requires the "dbus"
+    // capability. When it is unavailable we simply expose no extra batteries
+    // and non-split devices render exactly as before.
+    Connections {
+        target: DMSService
+
+        function onConnectionStateChanged() {
+            root.maybeInitBluez();
+        }
+
+        function onCapabilitiesChanged() {
+            root.maybeInitBluez();
+        }
+
+        function onDbusSignalReceived(subscriptionId, data) {
+            root.handleBluezSignal(data);
+        }
+    }
+
+    function maybeInitBluez() {
+        if (!DMSService.isConnected || !DMSService.capabilities.includes("dbus")) {
+            root._bluezSubscribed = false;
+            return;
+        }
+        subscribeBluezSignals();
+        scanPeripheralBatteries();
+    }
+
+    function subscribeBluezSignals() {
+        if (root._bluezSubscribed)
+            return;
+        root._bluezSubscribed = true;
+
+        DMSService.dbusSubscribe("system", "org.bluez", "", "org.freedesktop.DBus.Properties", "PropertiesChanged", null);
+        DMSService.dbusSubscribe("system", "org.bluez", "", "org.freedesktop.DBus.ObjectManager", "InterfacesAdded", null);
+        DMSService.dbusSubscribe("system", "org.bluez", "", "org.freedesktop.DBus.ObjectManager", "InterfacesRemoved", null);
+    }
+
+    function handleBluezSignal(data) {
+        switch (data.member) {
+        case "PropertiesChanged": {
+            const characteristic = root._peripheralCharacteristics[data.path];
+            if (!characteristic)
+                return;
+            if (data.body?.[0] !== "org.bluez.GattCharacteristic1")
+                return;
+            const changed = data.body?.[1] || {};
+            if (!("Value" in changed))
+                return;
+            const percentage = gattByte(changed.Value);
+            if (percentage === null || !characteristic.label)
+                return;
+            setPeripheralBattery(characteristic.address, characteristic.label, percentage);
+            return;
+        }
+        case "InterfacesAdded":
+        case "InterfacesRemoved":
+            // GATT objects tend to appear in a burst during service discovery;
+            // coalesce them into a single event-driven rescan.
+            queueBluezRescan();
+            return;
+        }
+    }
+
+    function queueBluezRescan() {
+        if (root._bluezRescanQueued)
+            return;
+        root._bluezRescanQueued = true;
+        Qt.callLater(() => {
+            root._bluezRescanQueued = false;
+            root.scanPeripheralBatteries();
+        });
+    }
+
+    // Walk BlueZ's GATT tree once and pick out every peripheral Battery Level
+    // (0x2A19) characteristic that carries a 0x2901 user-description descriptor
+    // (which is exactly how ZMK tags a split half, e.g. "Peripheral 0"). The
+    // unlabeled central battery is deliberately skipped — it is already exposed
+    // via org.bluez.Battery1 / device.battery.
+    function scanPeripheralBatteries() {
+        DMSService.dbusCall("system", "org.bluez", "/", "org.freedesktop.DBus.ObjectManager", "GetManagedObjects", [], response => {
+            const objects = response.result?.values?.[0];
+            if (response.error || !objects)
+                return;
+
+            const batteries = {};
+            const characteristics = {};
+
+            for (const path in objects) {
+                const characteristic = objects[path]?.["org.bluez.GattCharacteristic1"];
+                if (!characteristic || !String(characteristic.UUID || "").toLowerCase().startsWith("00002a19"))
+                    continue;
+
+                const descriptorPath = findUserDescription(objects, path);
+                if (!descriptorPath)
+                    continue;
+
+                const devicePath = devicePathForCharacteristic(objects, characteristic);
+                const device = objects[devicePath]?.["org.bluez.Device1"];
+                if (!device?.Address)
+                    continue;
+
+                const address = String(device.Address).toUpperCase();
+                const descriptor = objects[descriptorPath]?.["org.bluez.GattDescriptor1"];
+
+                const tracked = {
+                    "address": address,
+                    "path": path,
+                    "descriptorPath": descriptorPath,
+                    "label": gattString(descriptor?.Value),
+                    "connected": device.Connected === true
+                };
+                characteristics[path] = tracked;
+
+                const percentage = gattByte(characteristic.Value);
+                if (tracked.label && percentage !== null)
+                    appendPeripheralBattery(batteries, address, tracked.label, percentage);
+            }
+
+            root._peripheralCharacteristics = characteristics;
+            root.peripheralBatteries = batteries;
+
+            for (const path in characteristics) {
+                if (characteristics[path].connected)
+                    primePeripheralCharacteristic(characteristics[path]);
+            }
+        });
+    }
+
+    // On a cold cache BlueZ has no stored Value yet, so subscribe for future
+    // notifications and read the current label/level once. StartNotify stays
+    // active because it is owned by the persistent DMS D-Bus connection, not a
+    // short-lived helper process.
+    function primePeripheralCharacteristic(characteristic) {
+        DMSService.dbusCall("system", "org.bluez", characteristic.path, "org.bluez.GattCharacteristic1", "StartNotify", [], null);
+
+        if (!characteristic.label) {
+            DMSService.dbusCall("system", "org.bluez", characteristic.descriptorPath, "org.bluez.GattDescriptor1", "ReadValue", [{}], response => {
+                const label = gattString(response.result?.values?.[0]);
+                if (!label)
+                    return;
+                const updated = Object.assign({}, root._peripheralCharacteristics);
+                if (updated[characteristic.path])
+                    updated[characteristic.path].label = label;
+                root._peripheralCharacteristics = updated;
+            });
+        }
+
+        DMSService.dbusCall("system", "org.bluez", characteristic.path, "org.bluez.GattCharacteristic1", "ReadValue", [{}], response => {
+            const percentage = gattByte(response.result?.values?.[0]);
+            const label = root._peripheralCharacteristics[characteristic.path]?.label;
+            if (percentage === null || !label)
+                return;
+            setPeripheralBattery(characteristic.address, label, percentage);
+        });
+    }
+
+    function devicePathForCharacteristic(objects, characteristic) {
+        const servicePath = characteristic.Service;
+        const service = objects[servicePath]?.["org.bluez.GattService1"];
+        return service?.Device || "";
+    }
+
+    function findUserDescription(objects, characteristicPath) {
+        for (const path in objects) {
+            if (!path.startsWith(characteristicPath + "/desc"))
+                continue;
+            const descriptor = objects[path]?.["org.bluez.GattDescriptor1"];
+            if (descriptor && String(descriptor.UUID || "").toLowerCase().startsWith("00002901"))
+                return path;
+        }
+        return "";
+    }
+
+    function appendPeripheralBattery(map, address, label, percentage) {
+        if (!map[address])
+            map[address] = [];
+        map[address].push({
+            "percentage": percentage,
+            "label": label
+        });
+    }
+
+    function setPeripheralBattery(address, label, percentage) {
+        const map = JSON.parse(JSON.stringify(root.peripheralBatteries));
+        if (!map[address])
+            map[address] = [];
+        const existing = map[address].find(battery => battery.label === label);
+        if (existing)
+            existing.percentage = percentage;
+        else
+            map[address].push({
+                "percentage": percentage,
+                "label": label
+            });
+        root.peripheralBatteries = map;
+    }
+
+    // The Go bridge serializes D-Bus `ay` byte arrays as base64 strings. Decode
+    // them here rather than via Qt.atob(), whose string overload is deprecated
+    // and warns on every call.
+    function base64Bytes(value) {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+        const clean = String(value).replace(/=+$/, "");
+        const bytes = [];
+        let buffer = 0;
+        let bits = 0;
+        for (let i = 0; i < clean.length; i++) {
+            const idx = chars.indexOf(clean[i]);
+            if (idx === -1)
+                continue;
+            buffer = (buffer << 6) | idx;
+            bits += 6;
+            if (bits >= 8) {
+                bits -= 8;
+                bytes.push((buffer >> bits) & 0xFF);
+            }
+        }
+        return bytes;
+    }
+
+    function gattByte(value) {
+        if (typeof value !== "string" || !value.length)
+            return null;
+        const bytes = base64Bytes(value);
+        // An empty cached byte array must not be read as 0%.
+        return bytes.length >= 1 ? bytes[0] : null;
+    }
+
+    function gattString(value) {
+        if (typeof value !== "string" || !value.length)
+            return "";
+        const bytes = base64Bytes(value);
+        let result = "";
+        for (let i = 0; i < bytes.length; i++)
+            result += String.fromCharCode(bytes[i]);
+        return result;
     }
 
     function whenPactlChecked(action) {
@@ -616,4 +876,5 @@ Singleton {
             callback = null;
         }
     }
+
 }
