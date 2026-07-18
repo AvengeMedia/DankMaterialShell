@@ -274,7 +274,7 @@ Item {
         target: spotlightContent?.controller ?? null
 
         function onModeChanged(mode, userInitiated) {
-            if (!userInitiated || !SettingsData.rememberLastMode || (mode !== "all" && mode !== "apps"))
+            if (!userInitiated || !SettingsData.rememberLastMode)
                 return;
             SessionData.setLauncherLastMode(mode);
         }
