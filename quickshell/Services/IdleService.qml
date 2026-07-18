@@ -80,6 +80,8 @@ Singleton {
         respectInhibitors: root.respectInhibitors
         enabled: false
         onIsIdleChanged: {
+            if (!enabled)
+                return;
             if (isIdle) {
                 if (SettingsData.fadeToDpmsEnabled) {
                     root.fadeToDpmsRequested();
@@ -101,6 +103,8 @@ Singleton {
         respectInhibitors: root.respectInhibitors
         enabled: false
         onIsIdleChanged: {
+            if (!enabled)
+                return;
             if (isIdle) {
                 root.requestMonitorOff();
             } else {
@@ -115,6 +119,8 @@ Singleton {
         respectInhibitors: root.respectInhibitors
         enabled: false
         onIsIdleChanged: {
+            if (!enabled)
+                return;
             if (isIdle) {
                 if (SettingsData.fadeToLockEnabled) {
                     root.fadeToLockRequested();
@@ -135,6 +141,8 @@ Singleton {
         respectInhibitors: root.respectInhibitors
         enabled: false
         onIsIdleChanged: {
+            if (!enabled)
+                return;
             if (isIdle)
                 root.requestSuspend();
         }
@@ -149,6 +157,8 @@ Singleton {
         respectInhibitors: false
         enabled: root.enabled && root.isShellLocked && root.monitorsOff && (SettingsData.lockScreenPowerOffMonitorsOnLock || root.lockPowerOffRequested)
         onIsIdleChanged: {
+            if (!enabled)
+                return;
             if (!isIdle && root.monitorsOff)
                 root.requestMonitorOn();
         }

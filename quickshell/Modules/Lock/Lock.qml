@@ -10,6 +10,8 @@ import qs.Services
 Scope {
     id: root
 
+    readonly property var log: Log.scoped("Lock")
+
     property string sharedPasswordBuffer: ""
     property bool shouldLock: false
 
@@ -21,26 +23,13 @@ Scope {
 
     onShouldLockChanged: {
         IdleService.isShellLocked = shouldLock;
-        if (shouldLock && lockPowerOffArmed) {
-            lockStateCheck.restart();
-        }
-    }
-
-    Timer {
-        id: lockStateCheck
-        interval: 100
-        repeat: false
-        onTriggered: {
-            if (sessionLock.locked && lockPowerOffArmed) {
-                pendingLock = false;
-                lockPowerOffArmed = false;
-                beginPowerOff();
-            }
-        }
     }
 
     property bool lockInitiatedLocally: false
     property bool pendingLock: false
+    readonly property int maxLockRetries: 3
+    property int lockRetryAttempts: 0
+    property bool lockRetryPending: false
     property bool lockPowerOffArmed: false
     property bool lockWakeAllowed: false
     property bool customLockerSpawned: false
@@ -116,6 +105,24 @@ Scope {
         return true;
     }
 
+    function resetLockRetry() {
+        lockRetryAttempts = 0;
+        lockRetryPending = false;
+        lockRetryTimer.stop();
+    }
+
+    function handleLockLost() {
+        if (lockRetryAttempts >= maxLockRetries) {
+            log.error("Compositor refused session lock", maxLockRetries, "times - resetting lock state");
+            forceReset();
+            return;
+        }
+        lockRetryAttempts++;
+        lockRetryPending = true;
+        lockRetryTimer.restart();
+        log.warn("Session lock lost while lock requested - retry", lockRetryAttempts, "/", maxLockRetries);
+    }
+
     function lock() {
         if (SettingsData.customPowerActionLock?.length > 0) {
             spawnCustomLocker();
@@ -124,6 +131,7 @@ Scope {
         if (shouldLock || pendingLock)
             return;
 
+        resetLockRetry();
         lockInitiatedLocally = true;
         lockPowerOffArmed = powerOffOnLock;
 
@@ -139,7 +147,7 @@ Scope {
 
     function lockAndOutputsOff() {
         IdleService.lockPowerOffRequested = true;
-        if (sessionLock.locked) {
+        if (sessionLock.secure) {
             beginPowerOff();
             return;
         }
@@ -150,6 +158,7 @@ Scope {
     function unlock() {
         if (!shouldLock)
             return;
+        resetLockRetry();
         lockInitiatedLocally = false;
         notifyLoginctl(false);
         shouldLock = false;
@@ -160,6 +169,7 @@ Scope {
         pendingLock = false;
         shouldLock = false;
         customLockerSpawned = false;
+        resetLockRetry();
         resetPowerOffFade();
         IdleService.lockPowerOffRequested = false;
     }
@@ -196,6 +206,15 @@ Scope {
             if (!shouldLock || lockInitiatedLocally)
                 return;
             shouldLock = false;
+        }
+
+        function onSessionResumed() {
+            if (!shouldLock || sessionLock.locked)
+                return;
+            log.warn("Session lock dead after resume - re-locking");
+            resetLockRetry();
+            lockRetryPending = true;
+            lockRetryPending = false;
         }
 
         function onLoginctlStateChanged() {
@@ -239,7 +258,7 @@ Scope {
     WlSessionLock {
         id: sessionLock
 
-        locked: shouldLock
+        locked: shouldLock && !lockRetryPending
 
         WlSessionLockSurface {
             id: lockSurface
@@ -312,16 +331,20 @@ Scope {
     Connections {
         target: sessionLock
 
-        function onLockedChanged() {
-            notifyLockedHint(sessionLock.locked);
-            if (sessionLock.locked) {
-                pendingLock = false;
-                if (lockPowerOffArmed && powerOffOnLock)
-                    beginPowerOff();
-                lockPowerOffArmed = false;
+        function onSecureChanged() {
+            notifyLockedHint(sessionLock.secure);
+            if (!sessionLock.secure)
                 return;
-            }
+            lockRetryAttempts = 0;
+            pendingLock = false;
+            if (lockPowerOffArmed && powerOffOnLock)
+                beginPowerOff();
+            lockPowerOffArmed = false;
+        }
 
+        function onLockedChanged() {
+            if (sessionLock.locked)
+                return;
             lockWakeAllowed = false;
             resetPowerOffFade();
             if (IdleService.monitorsOff && powerOffOnLock) {
@@ -329,6 +352,8 @@ Scope {
                 CompositorService.powerOnMonitors();
             }
             IdleService.lockPowerOffRequested = false;
+            if (shouldLock && !lockRetryPending)
+                handleLockLost();
         }
     }
 
@@ -360,13 +385,15 @@ Scope {
         }
 
         function isLocked(): bool {
-            return sessionLock.locked;
+            return sessionLock.secure;
         }
 
         function status(): string {
             return JSON.stringify({
                 shouldLock: root.shouldLock,
                 sessionLockLocked: sessionLock.locked,
+                sessionLockSecure: sessionLock.secure,
+                lockRetryAttempts: root.lockRetryAttempts,
                 lockInitiatedLocally: root.lockInitiatedLocally,
                 pendingLock: root.pendingLock,
                 loginctlLocked: SessionService.locked,
@@ -396,6 +423,13 @@ Scope {
     }
 
     Timer {
+        id: lockRetryTimer
+        interval: 1000
+        repeat: false
+        onTriggered: root.lockRetryPending = false
+    }
+
+    Timer {
         id: dpmsReapplyTimer
         interval: 100
         repeat: false
@@ -407,7 +441,7 @@ Scope {
         interval: 200
         repeat: false
         onTriggered: {
-            if (!sessionLock.locked)
+            if (!sessionLock.secure)
                 return;
             if (!powerOffOnLock)
                 return;
@@ -426,7 +460,7 @@ Scope {
 
     MouseArea {
         anchors.fill: parent
-        enabled: sessionLock.locked
+        enabled: sessionLock.secure
         hoverEnabled: enabled
         onPressed: lockWakeDebounce.restart()
         onPositionChanged: lockWakeDebounce.restart()
@@ -435,10 +469,10 @@ Scope {
 
     FocusScope {
         anchors.fill: parent
-        focus: sessionLock.locked
+        focus: sessionLock.secure
 
         Keys.onPressed: event => {
-            if (!sessionLock.locked)
+            if (!sessionLock.secure)
                 return;
             lockWakeDebounce.restart();
         }
