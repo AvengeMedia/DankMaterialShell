@@ -449,7 +449,7 @@ Item {
         searchQuery = query;
         requestSearch();
 
-        if (searchMode !== "plugins" && query.startsWith("/")) {
+        if (query.startsWith("/")) {
             var prefix = Utils.parseFileSearchPrefix(query);
             var explicitType = prefix && prefix.type !== null ? prefix.type : null;
             var targetType = explicitType !== null ? explicitType : (SessionData.launcherLastFileSearchType || "all");
