@@ -27,7 +27,7 @@ DankModal {
     property real holdProgress: 0
     property bool showHoldHint: false
     property bool holdFromKeyboard: false
-    property string pendingKeyAction: ""
+    property string committedAction: ""
 
     readonly property bool needsConfirmation: SettingsData.powerActionConfirm
     readonly property int holdDurationMs: SettingsData.powerActionHoldDuration * 1000
@@ -39,10 +39,16 @@ DankModal {
         return action !== "lock" && action !== "restart";
     }
 
+    function actionWakesOnKeyRelease(action) {
+        return action === "suspend" || action === "hibernate";
+    }
+
     function startHold(action, actionIndex) {
+        if (committedAction !== "")
+            return;
         if (!needsConfirmation || !actionNeedsConfirm(action)) {
-            if (holdFromKeyboard) {
-                pendingKeyAction = action;
+            if (holdFromKeyboard && actionWakesOnKeyRelease(action)) {
+                commitAction(action, actionIndex);
                 return;
             }
             executeAction(action);
@@ -56,7 +62,6 @@ DankModal {
     }
 
     function cancelHold() {
-        pendingKeyAction = "";
         if (holdAction === "")
             return;
         const wasHolding = holdProgress > 0;
@@ -76,12 +81,31 @@ DankModal {
             return;
         }
         holdTimer.stop();
-        if (holdFromKeyboard) {
-            pendingKeyAction = holdAction;
+        if (holdFromKeyboard && actionWakesOnKeyRelease(holdAction)) {
+            commitAction(holdAction, holdActionIndex);
             return;
         }
         const action = holdAction;
         holdAction = "";
+        holdActionIndex = -1;
+        holdProgress = 0;
+        executeAction(action);
+    }
+
+    function commitAction(action, actionIndex) {
+        holdTimer.stop();
+        holdAction = "";
+        holdActionIndex = actionIndex;
+        committedAction = action;
+        commitFallbackTimer.restart();
+    }
+
+    function executeCommittedAction() {
+        if (committedAction === "")
+            return;
+        commitFallbackTimer.stop();
+        const action = committedAction;
+        committedAction = "";
         holdActionIndex = -1;
         holdProgress = 0;
         executeAction(action);
@@ -126,6 +150,12 @@ DankModal {
         id: hintTimer
         interval: 2000
         onTriggered: root.showHoldHint = false
+    }
+
+    Timer {
+        id: commitFallbackTimer
+        interval: 5000
+        onTriggered: root.executeCommittedAction()
     }
 
     function openCentered() {
@@ -286,7 +316,8 @@ DankModal {
         holdProgress = 0;
         showHoldHint = false;
         holdFromKeyboard = false;
-        pendingKeyAction = "";
+        committedAction = "";
+        commitFallbackTimer.stop();
         updateVisibleActions();
         const defaultIndex = getDefaultActionIndex();
         selectedIndex = defaultIndex;
@@ -309,6 +340,10 @@ DankModal {
             event.accepted = true;
             return;
         }
+        if (committedAction !== "") {
+            event.accepted = true;
+            return;
+        }
         holdFromKeyboard = true;
         if (SettingsData.powerMenuGridLayout) {
             handleGridNavigation(event, true);
@@ -321,6 +356,11 @@ DankModal {
             event.accepted = true;
             return;
         }
+        if (committedAction !== "") {
+            event.accepted = true;
+            executeCommittedAction();
+            return;
+        }
         if (SettingsData.powerMenuGridLayout) {
             handleGridNavigation(event, false);
         } else {
@@ -331,16 +371,7 @@ DankModal {
     function handleListNavigation(event, isPressed) {
         if (!isPressed) {
             if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_R || event.key === Qt.Key_X || event.key === Qt.Key_L || event.key === Qt.Key_S || event.key === Qt.Key_H || event.key === Qt.Key_D || (event.key === Qt.Key_P && !(event.modifiers & Qt.ControlModifier))) {
-                if (pendingKeyAction !== "") {
-                    const action = pendingKeyAction;
-                    pendingKeyAction = "";
-                    holdAction = "";
-                    holdActionIndex = -1;
-                    holdProgress = 0;
-                    executeAction(action);
-                } else {
-                    cancelHold();
-                }
+                cancelHold();
                 event.accepted = true;
             }
             return;
@@ -434,16 +465,7 @@ DankModal {
     function handleGridNavigation(event, isPressed) {
         if (!isPressed) {
             if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_R || event.key === Qt.Key_X || event.key === Qt.Key_L || event.key === Qt.Key_S || event.key === Qt.Key_H || event.key === Qt.Key_D || (event.key === Qt.Key_P && !(event.modifiers & Qt.ControlModifier))) {
-                if (pendingKeyAction !== "") {
-                    const action = pendingKeyAction;
-                    pendingKeyAction = "";
-                    holdAction = "";
-                    holdActionIndex = -1;
-                    holdProgress = 0;
-                    executeAction(action);
-                } else {
-                    cancelHold();
-                }
+                cancelHold();
                 event.accepted = true;
             }
             return;
@@ -812,6 +834,7 @@ DankModal {
 
             Row {
                 id: hintRow
+                readonly property bool selectedNeedsHold: root.actionNeedsConfirm(root.getActionAtIndex(root.selectedIndex))
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: Theme.spacingS
@@ -826,7 +849,13 @@ DankModal {
                 }
 
                 DankIcon {
-                    name: root.showHoldHint ? "warning" : "touch_app"
+                    name: {
+                        if (root.showHoldHint)
+                            return "warning";
+                        if (!hintRow.selectedNeedsHold)
+                            return "bolt";
+                        return "touch_app";
+                    }
                     size: Theme.fontSizeSmall
                     color: root.showHoldHint ? Theme.warning : Theme.surfaceTextSecondary
                     anchors.verticalCenter: parent.verticalCenter
@@ -836,8 +865,12 @@ DankModal {
                     readonly property real totalMs: SettingsData.powerActionHoldDuration * 1000
                     readonly property int remainingMs: Math.ceil(totalMs * (1 - root.holdProgress))
                     text: {
+                        if (root.committedAction !== "")
+                            return I18n.tr("Release to confirm");
                         if (root.showHoldHint)
                             return I18n.tr("Hold longer to confirm");
+                        if (!hintRow.selectedNeedsHold)
+                            return I18n.tr("Activates immediately");
                         if (root.holdProgress > 0) {
                             if (totalMs < 1000)
                                 return I18n.tr("Hold to confirm (%1 ms)").arg(remainingMs);
