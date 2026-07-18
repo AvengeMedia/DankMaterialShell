@@ -39,7 +39,7 @@ Item {
     readonly property real _barInsetPaddingAuto: _barIsVertical ? Theme.spacingXS : _edgeBaseMargin
     readonly property real _barInsetPadding: _barInsetPaddingRaw < 0 ? _barInsetPaddingAuto : _barInsetPaddingRaw
     // Connected-frame Bar Inset Padding: absolute free-end inset (auto < 0 = frameThickness, 0 = edge-to-edge).
-    // Any amount beyond the frameThickness baseline is also added at the bar-clearance ends (all ends).
+    // FrameExclusions already moves a free bar end inward by frameThickness so use frame inset to mangage the gap
     readonly property real _frameInsetResolved: SettingsData.frameBarInsetPadding < 0 ? SettingsData.frameThickness : SettingsData.frameBarInsetPadding
     readonly property real _frameInsetExtra: Math.max(0, _frameInsetResolved - SettingsData.frameThickness)
 
@@ -47,28 +47,28 @@ Item {
         if (_barIsVertical)
             return _edgeBaseMargin;
         if (_usesFrameBarChrome)
-            return hasAdjacentLeftBarLive ? (_edgeBaseMargin + SettingsData.frameBarSize + _frameInsetExtra) : Math.max(0, _frameInsetResolved);
+            return hasAdjacentLeftBarLive ? (_edgeBaseMargin + SettingsData.frameBarSize + _frameInsetExtra) : _frameInsetExtra;
         return Math.max(0, _barInsetPadding);
     }
     readonly property real _rightMargin: {
         if (_barIsVertical)
             return _edgeBaseMargin;
         if (_usesFrameBarChrome)
-            return hasAdjacentRightBarLive ? (_edgeBaseMargin + SettingsData.frameBarSize + _frameInsetExtra) : Math.max(0, _frameInsetResolved);
+            return hasAdjacentRightBarLive ? (_edgeBaseMargin + SettingsData.frameBarSize + _frameInsetExtra) : _frameInsetExtra;
         return Math.max(0, _barInsetPadding);
     }
     readonly property real _topMargin: {
         if (!_barIsVertical)
             return 0;
         if (_usesFrameBarChrome)
-            return hasAdjacentTopBarLive ? (outlineThickness + SettingsData.frameThickness + _frameInsetExtra) : Math.max(0, _frameInsetResolved);
+            return hasAdjacentTopBarLive ? (outlineThickness + SettingsData.frameThickness + _frameInsetExtra) : _frameInsetExtra;
         return Math.max(0, _barInsetPadding);
     }
     readonly property real _bottomMargin: {
         if (!_barIsVertical)
             return 0;
         if (_usesFrameBarChrome)
-            return hasAdjacentBottomBarLive ? (outlineThickness + SettingsData.frameThickness + _frameInsetExtra) : Math.max(0, _frameInsetResolved);
+            return hasAdjacentBottomBarLive ? (outlineThickness + SettingsData.frameThickness + _frameInsetExtra) : _frameInsetExtra;
         return Math.max(0, _barInsetPadding);
     }
 
