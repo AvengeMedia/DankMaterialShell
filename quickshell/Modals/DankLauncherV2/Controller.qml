@@ -461,6 +461,10 @@ Item {
             if (explicitType !== null && SessionData.launcherLastFileSearchType !== explicitType) {
                 SessionData.setLauncherLastFileSearchType(explicitType);
             }
+        } else {
+            if (searchMode === "files") {
+                restorePreviousMode();
+            }
         }
 
         var filesInAll = searchMode === "all" && (SettingsData.dankLauncherV2IncludeFilesInAll || SettingsData.dankLauncherV2IncludeFoldersInAll);
