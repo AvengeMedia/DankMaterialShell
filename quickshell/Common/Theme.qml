@@ -144,7 +144,7 @@ Singleton {
         Quickshell.execDetached(["mkdir", "-p", stateDir]);
         // shellDir may be an embedded-UI extraction, which is read-only and
         // unexecutable (dankgo shellapp/shellfs makeReadOnly chmods 0444)
-        Quickshell.execDetached(["bash", shellDir + "/scripts/gtk.sh", configDir, "", shellDir, "assets-only"]);
+        Quickshell.execDetached(["bash", shellDir + "/scripts/gtk.sh", configDir, "", shellDir]);
         Proc.runCommand("matugenCheck", ["sh", "-c", "command -v matugen"], (output, code) => {
             matugenAvailable = (code === 0) && !envDisableMatugen;
 
@@ -1937,7 +1937,7 @@ Singleton {
                 return `gsettings set ${schema} ${key} '' && gsettings set ${schema} ${key} ${val}`;
             } else {
                 const dconfPath = `/${schema.replace(/\./g, "/")}`;
-                return `dconf write ${dconfPath} ${key} "''" && dconf write ${dconfPath} ${key} "'${val}'"`;
+                return `dconf write ${dconfPath}/${key} "''" && dconf write ${dconfPath}/${key} "'${val}'"`;
             }
         };
 

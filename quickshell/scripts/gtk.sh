@@ -34,9 +34,11 @@ apply_gtk3_colors() {
 	# Make sure there's no global override
 	local gtk3_dir_cfg="$config_dir/gtk-3.0"
 	local gtk3_override="$gtk3_dir_cfg/gtk.css"
-	if [ -f "$gtk3_override" ]; then
-		echo "Info: backing up and removing global theme override for gtk3."
+	if [ -L "$gtk3_override" ]; then
+		rm "$gtk3_override"
+	elif [ -f "$gtk3_override" ]; then
 		mv "$gtk3_override" "$gtk3_override.backup"
+		echo "Backed up and removed global theme override for gtk3."
 	fi
 
 	# Include generated colors for each variant
