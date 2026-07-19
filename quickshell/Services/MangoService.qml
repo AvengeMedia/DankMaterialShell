@@ -467,7 +467,7 @@ Singleton {
         if (now - root._lastWatchedReloadAt < 700)
             return;
         root._lastWatchedReloadAt = now;
-        root.reloadConfig(true, false);
+        root.reloadConfig(false, false);
     }
 
     function reloadConfig(showToast, suppressWatch) {
