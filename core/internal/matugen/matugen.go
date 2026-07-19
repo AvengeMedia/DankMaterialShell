@@ -44,6 +44,7 @@ type TemplateDef struct {
 	ID                 string
 	Commands           []string
 	Flatpaks           []string
+	ConfigDirs         []string
 	ConfigFile         string
 	Kind               TemplateKind
 	RunUnconditionally bool
@@ -60,9 +61,9 @@ var templateRegistry = []TemplateDef{
 	{ID: "firefox", Commands: []string{"firefox"}, ConfigFile: "firefox.toml"},
 	{ID: "pywalfox", Commands: []string{"pywalfox"}, ConfigFile: "pywalfox.toml"},
 	{ID: "zenbrowser", Commands: []string{"zen", "zen-browser", "zen-beta", "zen-twilight"}, Flatpaks: []string{"app.zen_browser.zen"}, ConfigFile: "zenbrowser.toml"},
-	{ID: "vesktop", Commands: []string{"vesktop"}, Flatpaks: []string{"dev.vencord.Vesktop"}, ConfigFile: "vesktop.toml"},
-	{ID: "vencord", Commands: []string{"discord", "Discord", "discord-canary", "DiscordCanary"}, Flatpaks: []string{"com.discordapp.Discord", "com.discordapp.DiscordCanary"}, ConfigFile: "vencord.toml"},
-	{ID: "equibop", Commands: []string{"equibop"}, ConfigFile: "equibop.toml"},
+	{ID: "vesktop", Commands: []string{"vesktop"}, Flatpaks: []string{"dev.vencord.Vesktop"}, ConfigDirs: []string{"vesktop"}, ConfigFile: "vesktop.toml"},
+	{ID: "vencord", Commands: []string{"discord", "Discord", "discord-canary", "DiscordCanary"}, Flatpaks: []string{"com.discordapp.Discord", "com.discordapp.DiscordCanary"}, ConfigDirs: []string{"Vencord"}, ConfigFile: "vencord.toml"},
+	{ID: "equibop", Commands: []string{"equibop"}, ConfigDirs: []string{"equibop"}, ConfigFile: "equibop.toml"},
 	{ID: "ghostty", Commands: []string{"ghostty"}, ConfigFile: "ghostty.toml", Kind: TemplateKindTerminal},
 	{ID: "kitty", Commands: []string{"kitty"}, ConfigFile: "kitty.toml", Kind: TemplateKindTerminal},
 	{ID: "foot", Commands: []string{"foot"}, ConfigFile: "foot.toml", Kind: TemplateKindTerminal},
@@ -459,9 +460,9 @@ output_path = '%s'
 		case TemplateKindGTK:
 			switch opts.Mode {
 			case ColorModeLight:
-				appendConfig(opts, cfgFile, nil, nil, "gtk3-light.toml")
+				appendConfig(opts, cfgFile, nil, nil, nil, "gtk3-light.toml")
 			default:
-				appendConfig(opts, cfgFile, nil, nil, "gtk3-dark.toml")
+				appendConfig(opts, cfgFile, nil, nil, nil, "gtk3-dark.toml")
 			}
 		case TemplateKindTerminal:
 			appendTerminalConfig(opts, cfgFile, tmpDir, tmpl.Commands, tmpl.Flatpaks, tmpl.ConfigFile)
@@ -474,10 +475,10 @@ output_path = '%s'
 			appendVSCodeConfig(cfgFile, "vscode-insiders", filepath.Join(homeDir, ".vscode-insiders/extensions"), opts.ShellDir)
 		case TemplateKindEmacs:
 			if utils.EmacsConfigDir() != "" {
-				appendConfig(opts, cfgFile, tmpl.Commands, tmpl.Flatpaks, tmpl.ConfigFile)
+				appendConfig(opts, cfgFile, tmpl.Commands, tmpl.Flatpaks, tmpl.ConfigDirs, tmpl.ConfigFile)
 			}
 		default:
-			appendConfig(opts, cfgFile, tmpl.Commands, tmpl.Flatpaks, tmpl.ConfigFile)
+			appendConfig(opts, cfgFile, tmpl.Commands, tmpl.Flatpaks, tmpl.ConfigDirs, tmpl.ConfigFile)
 		}
 	}
 
@@ -512,13 +513,14 @@ func appendConfig(
 	cfgFile *os.File,
 	checkCmd []string,
 	checkFlatpaks []string,
+	checkConfigDirs []string,
 	fileName string,
 ) {
 	configPath := filepath.Join(opts.ShellDir, "matugen", "configs", fileName)
 	if _, err := os.Stat(configPath); err != nil {
 		return
 	}
-	if !appExists(opts.AppChecker, checkCmd, checkFlatpaks) {
+	if !appExists(opts.AppChecker, checkCmd, checkFlatpaks) && !configDirExists(checkConfigDirs) {
 		return
 	}
 	data, err := os.ReadFile(configPath)
@@ -597,6 +599,20 @@ func templateSessionActive(tmpl TemplateDef) bool {
 	}
 	_, err := os.Stat(socket)
 	return err == nil
+}
+
+func configDirExists(names []string) bool {
+	configHome := utils.XDGConfigHome()
+	if configHome == "" {
+		return false
+	}
+	for _, name := range names {
+		info, err := os.Stat(filepath.Join(configHome, name))
+		if err == nil && info.IsDir() {
+			return true
+		}
+	}
+	return false
 }
 
 func appExists(checker utils.AppChecker, checkCmd []string, checkFlatpaks []string) bool {
@@ -1096,7 +1112,7 @@ func CheckTemplates(checker utils.AppChecker) []TemplateCheck {
 		case tmpl.Kind == TemplateKindEmacs:
 			detected = appExists(checker, tmpl.Commands, tmpl.Flatpaks) && utils.EmacsConfigDir() != ""
 		default:
-			detected = appExists(checker, tmpl.Commands, tmpl.Flatpaks) && templateSessionActive(tmpl)
+			detected = (appExists(checker, tmpl.Commands, tmpl.Flatpaks) || configDirExists(tmpl.ConfigDirs)) && templateSessionActive(tmpl)
 		}
 
 		checks = append(checks, TemplateCheck{ID: tmpl.ID, Detected: detected})

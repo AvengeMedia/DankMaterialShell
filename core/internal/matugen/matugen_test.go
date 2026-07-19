@@ -38,7 +38,7 @@ func TestAppendConfigBinaryExists(t *testing.T) {
 
 	opts := &Options{ShellDir: shellDir, AppChecker: mockChecker}
 
-	appendConfig(opts, cfgFile, []string{"sh"}, nil, "test.toml")
+	appendConfig(opts, cfgFile, []string{"sh"}, nil, nil, "test.toml")
 
 	cfgFile.Close()
 	output, err := os.ReadFile(outFile)
@@ -82,7 +82,7 @@ func TestAppendConfigBinaryDoesNotExist(t *testing.T) {
 
 	opts := &Options{ShellDir: shellDir, AppChecker: mockChecker}
 
-	appendConfig(opts, cfgFile, []string{"nonexistent-binary-12345"}, []string{}, "test.toml")
+	appendConfig(opts, cfgFile, []string{"nonexistent-binary-12345"}, []string{}, nil, "test.toml")
 
 	cfgFile.Close()
 	output, err := os.ReadFile(outFile)
@@ -122,7 +122,7 @@ func TestAppendConfigFlatpakExists(t *testing.T) {
 
 	opts := &Options{ShellDir: shellDir, AppChecker: mockChecker}
 
-	appendConfig(opts, cfgFile, nil, []string{"app.zen_browser.zen"}, "test.toml")
+	appendConfig(opts, cfgFile, nil, []string{"app.zen_browser.zen"}, nil, "test.toml")
 
 	cfgFile.Close()
 	output, err := os.ReadFile(outFile)
@@ -163,7 +163,7 @@ func TestAppendConfigFlatpakDoesNotExist(t *testing.T) {
 
 	opts := &Options{ShellDir: shellDir, AppChecker: mockChecker}
 
-	appendConfig(opts, cfgFile, []string{}, []string{"com.nonexistent.flatpak"}, "test.toml")
+	appendConfig(opts, cfgFile, []string{}, []string{"com.nonexistent.flatpak"}, nil, "test.toml")
 
 	cfgFile.Close()
 	output, err := os.ReadFile(outFile)
@@ -203,7 +203,7 @@ func TestAppendConfigBothExist(t *testing.T) {
 
 	opts := &Options{ShellDir: shellDir, AppChecker: mockChecker}
 
-	appendConfig(opts, cfgFile, []string{"sh"}, []string{"app.zen_browser.zen"}, "test.toml")
+	appendConfig(opts, cfgFile, []string{"sh"}, []string{"app.zen_browser.zen"}, nil, "test.toml")
 
 	cfgFile.Close()
 	output, err := os.ReadFile(outFile)
@@ -244,7 +244,7 @@ func TestAppendConfigNeitherExists(t *testing.T) {
 
 	opts := &Options{ShellDir: shellDir, AppChecker: mockChecker}
 
-	appendConfig(opts, cfgFile, []string{"nonexistent-binary-12345"}, []string{"com.nonexistent.flatpak"}, "test.toml")
+	appendConfig(opts, cfgFile, []string{"nonexistent-binary-12345"}, []string{"com.nonexistent.flatpak"}, nil, "test.toml")
 
 	cfgFile.Close()
 	output, err := os.ReadFile(outFile)
@@ -281,7 +281,7 @@ func TestAppendConfigNoChecks(t *testing.T) {
 
 	opts := &Options{ShellDir: shellDir}
 
-	appendConfig(opts, cfgFile, nil, nil, "test.toml")
+	appendConfig(opts, cfgFile, nil, nil, nil, "test.toml")
 
 	cfgFile.Close()
 	output, err := os.ReadFile(outFile)
@@ -312,7 +312,7 @@ func TestAppendConfigFileDoesNotExist(t *testing.T) {
 
 	opts := &Options{ShellDir: shellDir}
 
-	appendConfig(opts, cfgFile, nil, nil, "nonexistent.toml")
+	appendConfig(opts, cfgFile, nil, nil, nil, "nonexistent.toml")
 
 	cfgFile.Close()
 	output, err := os.ReadFile(outFile)
@@ -486,4 +486,91 @@ func TestBuildMergedConfigSkipsMangowcWithoutActiveSession(t *testing.T) {
 		t.Fatalf("failed to read merged config: %v", err)
 	}
 	assert.NotContains(t, string(output), "[templates.dmsmango]")
+}
+
+func TestAppendConfigConfigDirExists(t *testing.T) {
+	tempDir := t.TempDir()
+
+	shellDir := filepath.Join(tempDir, "shell")
+	configsDir := filepath.Join(shellDir, "matugen", "configs")
+	if err := os.MkdirAll(configsDir, 0o755); err != nil {
+		t.Fatalf("failed to create configs dir: %v", err)
+	}
+
+	testConfig := "vencord config content"
+	if err := os.WriteFile(filepath.Join(configsDir, "vencord.toml"), []byte(testConfig), 0o644); err != nil {
+		t.Fatalf("failed to write config: %v", err)
+	}
+
+	configHome := filepath.Join(tempDir, "config")
+	if err := os.MkdirAll(filepath.Join(configHome, "Vencord"), 0o755); err != nil {
+		t.Fatalf("failed to create Vencord config dir: %v", err)
+	}
+	t.Setenv("XDG_CONFIG_HOME", configHome)
+
+	outFile := filepath.Join(tempDir, "output.toml")
+	cfgFile, err := os.Create(outFile)
+	if err != nil {
+		t.Fatalf("failed to create output file: %v", err)
+	}
+	defer cfgFile.Close()
+
+	mockChecker := mocks_utils.NewMockAppChecker(t)
+	mockChecker.EXPECT().AnyCommandExists("nonexistent-binary-12345").Return(false)
+	mockChecker.EXPECT().AnyFlatpakExists("com.nonexistent.flatpak").Return(false)
+
+	opts := &Options{ShellDir: shellDir, AppChecker: mockChecker}
+
+	appendConfig(opts, cfgFile, []string{"nonexistent-binary-12345"}, []string{"com.nonexistent.flatpak"}, []string{"Vencord"}, "vencord.toml")
+
+	cfgFile.Close()
+	output, err := os.ReadFile(outFile)
+	if err != nil {
+		t.Fatalf("failed to read output: %v", err)
+	}
+
+	assert.Equal(t, testConfig+"\n", string(output))
+}
+
+func TestAppendConfigConfigDirDoesNotExist(t *testing.T) {
+	tempDir := t.TempDir()
+
+	shellDir := filepath.Join(tempDir, "shell")
+	configsDir := filepath.Join(shellDir, "matugen", "configs")
+	if err := os.MkdirAll(configsDir, 0o755); err != nil {
+		t.Fatalf("failed to create configs dir: %v", err)
+	}
+
+	if err := os.WriteFile(filepath.Join(configsDir, "vencord.toml"), []byte("vencord config content"), 0o644); err != nil {
+		t.Fatalf("failed to write config: %v", err)
+	}
+
+	configHome := filepath.Join(tempDir, "config")
+	if err := os.MkdirAll(configHome, 0o755); err != nil {
+		t.Fatalf("failed to create config home: %v", err)
+	}
+	t.Setenv("XDG_CONFIG_HOME", configHome)
+
+	outFile := filepath.Join(tempDir, "output.toml")
+	cfgFile, err := os.Create(outFile)
+	if err != nil {
+		t.Fatalf("failed to create output file: %v", err)
+	}
+	defer cfgFile.Close()
+
+	mockChecker := mocks_utils.NewMockAppChecker(t)
+	mockChecker.EXPECT().AnyCommandExists("nonexistent-binary-12345").Return(false)
+	mockChecker.EXPECT().AnyFlatpakExists("com.nonexistent.flatpak").Return(false)
+
+	opts := &Options{ShellDir: shellDir, AppChecker: mockChecker}
+
+	appendConfig(opts, cfgFile, []string{"nonexistent-binary-12345"}, []string{"com.nonexistent.flatpak"}, []string{"Vencord"}, "vencord.toml")
+
+	cfgFile.Close()
+	output, err := os.ReadFile(outFile)
+	if err != nil {
+		t.Fatalf("failed to read output: %v", err)
+	}
+
+	assert.Empty(t, string(output))
 }
