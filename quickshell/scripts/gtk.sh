@@ -3,11 +3,12 @@
 CONFIG_DIR="$1"
 # apply: setup symlinks and config dirs
 # include: refresh overrides in adw-gtk3
+# remove: remove all overrides
 MODE="${2:-apply}"
 IS_LIGHT="${3:-light}"
 
 if [ -z "$CONFIG_DIR" ]; then
-	echo "Usage: $0 <config_dir> [apply|include] [is_light] [shell_dir]" >&2
+	echo "Usage: $0 <config_dir> [apply|include|remove] [is_light] [shell_dir]" >&2
 	exit 1
 fi
 
@@ -32,15 +33,61 @@ get_adw_gtk3_dir() {
 	echo "$target"
 }
 
+remove_gtk3_include() {
+	local theme_dir="$1"
+	local css_variant="$2"
+	[ "$css_variant" != "-dark" ] && css_variant=""
+	sed -i.backup '/\/\* BEGIN DMS OVERRIDE \*\//,/\/\* END DMS OVERRIDE \*\//d' "${theme_dir}/gtk${css_variant}.css"
+	return $?
+}
+
+remove_gtk3_colors() {
+	local config_dir="$1"
+
+	local gtk3_dir="$config_dir/gtk-3.0"
+
+	# remove global override
+	if [ ! -f "${gtk3_dir}/dank-colors.css" ]; then
+		echo "Nothing to remove at '${gtk3_dir}'"
+	else
+		if rm "${gtk3_dir}/dank-colors.css"; then
+			echo "Removed GTK3 override form '${gtk3_dir}'"
+		else
+			echo "Failed to removed GTK3 override from '${gtk3_dir}'"
+		fi
+	fi
+
+	# remove adw-gtk3 inclusions
+	for variant in light dark; do
+		local adw_gtk3_dir && adw_gtk3_dir=$(get_adw_gtk3_dir "$variant")
+
+		if [ -z "$adw_gtk3_dir" ]; then
+			echo "Error: No version of adw-gtk3 ${variant} was found" >&2
+			exit 1
+		fi
+
+		for css_variant in light dark; do
+			if remove_gtk3_include "$adw_gtk3_dir" "$css_variant"; then
+				echo "Removed included GTK3 colors from '${adw_gtk3_dir}' in $css_variant stylesheet"
+			else
+				echo "Failed to remove included GTK3 colors from '${adw_gtk3_dir}' in $css_variant stylesheet" >&2
+			fi
+		done
+	done
+}
+
 do_include() {
 	local theme_dir="$1"
 	local variant="$2"
 	local css_variant=""
 	[ "$variant" = "dark" ] && css_variant="-${variant}"
-	if sed -i.backup '/\/\* BEGIN DMS OVERRIDE \*\//,/\/\* END DMS OVERRIDE \*\//d' "${theme_dir}/gtk${css_variant}.css" && cat "${gtk3_dir}/dank-colors.css" >>"${theme_dir}/gtk${css_variant}.css"; then
-		echo "GTK3 colors successfully included in adw-gtk3 $variant in '$theme_dir/gtk${css_variant}.css'"
+	if {
+		remove_gtk3_include "$theme_dir" "$css_variant"
+		cat "${gtk3_dir}/dank-colors.css" >>"${theme_dir}/gtk${css_variant}.css"
+	}; then
+		echo "GTK3 $variant colors successfully included in '$theme_dir/gtk${css_variant}.css'"
 	else
-		echo "Error: failed to apply colors override to adw-gtk3 $variant in '$theme_dir/gtk${css_variant}.css'"
+		echo "Error: failed to apply $variant colors override in '$theme_dir/gtk${css_variant}.css'" >&2
 		exit 1
 	fi
 }
@@ -123,6 +170,29 @@ apply_gtk3_colors() {
 	fi
 }
 
+remove_gtk4_colors() {
+	local config_dir="$1"
+
+	local gtk4_dir="$config_dir/gtk-4.0"
+	local dank_colors="$gtk4_dir/dank-colors.css"
+	local gtk_css="$gtk4_dir/gtk.css"
+
+	if [ ! -f "$dank_colors" ]; then
+		echo "Nothing to remove in '$gtk4_dir'"
+		return
+	fi
+
+	rm "$dank_colors"
+	echo "Removed 'dank-colors.css' from '$gtk4_dir'"
+
+	local gtk4_import="@import url(\"dank-colors.css\");"
+	if [ -f "$gtk_css" ] && grep -q '^@import url.*dank-colors\.css.*);$' "$gtk_css"; then
+		sed -i "/$gtk4_import/d" "$gtk_css"
+		echo "Removed gtk4 import in '$gtk_css'"
+	fi
+
+}
+
 apply_gtk4_colors() {
 	local config_dir="$1"
 
@@ -155,12 +225,20 @@ case "$MODE" in
 		include_gtk3_colors "$CONFIG_DIR" "$IS_LIGHT"
 		echo "GTK3 colors included successfully"
 		;;
-	apply | *)
+	remove)
+		remove_gtk3_colors "$CONFIG_DIR"
+		remove_gtk4_colors "$CONFIG_DIR"
+		;;
+	apply)
 		mkdir -p "$CONFIG_DIR/gtk-3.0" "$CONFIG_DIR/gtk-4.0"
 
 		apply_gtk3_colors "$CONFIG_DIR"
 		apply_gtk4_colors "$CONFIG_DIR"
 
 		echo "GTK colors applied successfully"
+		;;
+	*)
+		echo "Usage: $0 <config_dir> [apply|include|remove] [is_light] [shell_dir]" >&2
+		exit 1
 		;;
 esac
