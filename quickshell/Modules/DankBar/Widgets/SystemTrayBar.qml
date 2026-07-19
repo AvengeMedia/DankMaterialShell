@@ -1250,13 +1250,8 @@ BasePill {
 
                     if (root.isVerticalOrientation) {
                         const edge = root.axis?.edge;
-                        if (edge === "left") {
-                            const targetX = overflowMenu.anchorPos.x;
-                            return Math.max(left, Math.min(right, targetX));
-                        } else {
-                            const targetX = overflowMenu.anchorPos.x - alignedWidth;
-                            return Math.max(left, Math.min(right, targetX));
-                        }
+                        const targetX = edge === "left" ? overflowMenu.anchorPos.x : overflowMenu.anchorPos.x - alignedWidth;
+                        return Math.max(10, Math.min(overflowMenu.width - alignedWidth - 10, targetX));
                     } else {
                         const want = overflowMenu.anchorPos.x - alignedWidth / 2;
                         return Math.max(left, Math.min(right, want));
@@ -1271,13 +1266,8 @@ BasePill {
                         const want = overflowMenu.anchorPos.y - alignedHeight / 2;
                         return Math.max(top, Math.min(bottom, want));
                     } else {
-                        if (root.isAtBottom) {
-                            const targetY = overflowMenu.anchorPos.y - alignedHeight;
-                            return Math.max(top, Math.min(bottom, targetY));
-                        } else {
-                            const targetY = overflowMenu.anchorPos.y;
-                            return Math.max(top, Math.min(bottom, targetY));
-                        }
+                        const targetY = root.isAtBottom ? overflowMenu.anchorPos.y - alignedHeight : overflowMenu.anchorPos.y;
+                        return Math.max(10, Math.min(overflowMenu.height - alignedHeight - 10, targetY));
                     }
                 })(), overflowMenu.dpr)
 
@@ -1770,13 +1760,8 @@ BasePill {
 
                             if (menuRoot.isVertical) {
                                 const edge = menuRoot.axis?.edge;
-                                if (edge === "left") {
-                                    const targetX = menuWindow.anchorPos.x;
-                                    return Math.max(left, Math.min(right, targetX));
-                                } else {
-                                    const targetX = menuWindow.anchorPos.x - alignedWidth;
-                                    return Math.max(left, Math.min(right, targetX));
-                                }
+                                const targetX = edge === "left" ? menuWindow.anchorPos.x : menuWindow.anchorPos.x - alignedWidth;
+                                return Math.max(10, Math.min(menuWindow.width - alignedWidth - 10, targetX));
                             } else {
                                 const want = menuWindow.anchorPos.x - alignedWidth / 2;
                                 return Math.max(left, Math.min(right, want));
@@ -1791,13 +1776,8 @@ BasePill {
                                 const want = menuWindow.anchorPos.y - alignedHeight / 2;
                                 return Math.max(top, Math.min(bottom, want));
                             } else {
-                                if (menuRoot.isAtBottom) {
-                                    const targetY = menuWindow.anchorPos.y - alignedHeight;
-                                    return Math.max(top, Math.min(bottom, targetY));
-                                } else {
-                                    const targetY = menuWindow.anchorPos.y;
-                                    return Math.max(top, Math.min(bottom, targetY));
-                                }
+                                const targetY = menuRoot.isAtBottom ? menuWindow.anchorPos.y - alignedHeight : menuWindow.anchorPos.y;
+                                return Math.max(10, Math.min(menuWindow.height - alignedHeight - 10, targetY));
                             }
                         })(), menuWindow.dpr)
 
