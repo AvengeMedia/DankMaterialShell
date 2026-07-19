@@ -131,7 +131,6 @@
 @define-color content_view_bg @view_bg_color;
 @define-color text_view_bg @view_bg_color;
 * {
-  padding: 0;
   -GtkToolButton-icon-spacing: 4;
   -GtkTextView-error-underline-color: @error_bg_color;
   -GtkScrolledWindow-scrollbar-spacing: 0;
