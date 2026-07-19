@@ -24,6 +24,8 @@ Item {
     property string matugenPreviewRequestKey: ""
     property var installedRegistryThemes: []
     property var templateDetection: []
+    readonly property var neovimDarkBaseThemes: ["aquarium", "ashes", "aylin", "ayu_dark", "bearded-arc", "carbonfox", "catppuccin", "chadracula", "chadracula-evondev", "chadtain", "chocolate", "darcula-dark", "dark_horizon", "decay", "default-dark", "doomchad", "eldritch", "embark", "everblush", "everforest", "falcon", "flexoki", "flouromachine", "gatekeeper", "github_dark", "gruvbox", "gruvchad", "hiberbee", "horizon", "jabuti", "jellybeans", "kanagawa", "kanagawa-dragon", "material-darker", "material-deep-ocean", "melange", "midnight_breeze", "mito-laser", "monekai", "monochrome", "mountain", "neofusion", "nightfox", "nightlamp", "nightowl", "nord", "obsidian-ember", "oceanic-next", "onedark", "onenord", "oxocarbon", "palenight", "pastelDark", "pastelbeans", "penumbra_dark", "poimandres", "radium", "rosepine", "rxyhn", "scaryforest", "seoul256_dark", "solarized_dark", "solarized_osaka", "starlight", "sweetpastel", "tokyodark", "tokyonight", "tomorrow_night", "tundra", "vesper", "vscode_dark", "wombat", "yoru", "zenburn"]
+    readonly property var neovimLightBaseThemes: ["ayu_light", "blossom_light", "catppuccin-latte", "default-light", "everforest_light", "flex-light", "flexoki-light", "github_light", "gruvbox_light", "material-lighter", "nano-light", "oceanic-light", "one_light", "onenord_light", "penumbra_light", "rosepine-dawn", "seoul256_light", "solarized_light", "sunrise_breeze", "vscode_light"]
     readonly property var matugenSchemeColorMap: {
         const map = {};
         const mode = SessionData.isLightMode ? "light" : "dark";
@@ -2666,7 +2668,7 @@ Item {
                     description: "Base to derive dark theme from"
                     visible: neovimThemeToggle.visible && neovimThemeToggle.checked
                     currentValue: SettingsData.matugenTemplateNeovimSettings?.dark?.baseTheme ?? "github_dark"
-                    options: ["aquarium", "ashes", "aylin", "ayu_dark", "bearded-arc", "carbonfox", "catppuccin", "chadracula", "chadracula-evondev", "chadtain", "chocolate", "darcula-dark", "dark_horizon", "decay", "default-dark", "doomchad", "eldritch", "embark", "everblush", "everforest", "falcon", "flexoki", "flouromachine", "gatekeeper", "github_dark", "gruvbox", "gruvchad", "hiberbee", "horizon", "jabuti", "jellybeans", "kanagawa", "kanagawa-dragon", "material-darker", "material-deep-ocean", "melange", "midnight_breeze", "mito-laser", "monekai", "monochrome", "mountain", "neofusion", "nightfox", "nightlamp", "nightowl", "nord", "obsidian-ember", "oceanic-next", "onedark", "onenord", "oxocarbon", "palenight", "pastelDark", "pastelbeans", "penumbra_dark", "poimandres", "radium", "rosepine", "rxyhn", "scaryforest", "seoul256_dark", "solarized_dark", "solarized_osaka", "starlight", "sweetpastel", "tokyodark", "tokyonight", "tomorrow_night", "tundra", "vesper", "vscode_dark", "wombat", "yoru", "zenburn"]
+                    options: themeColorsTab.neovimDarkBaseThemes.concat(themeColorsTab.neovimLightBaseThemes)
                     enableFuzzySearch: true
                     onValueChanged: value => {
                         const settings = SettingsData.matugenTemplateNeovimSettings;
@@ -2683,7 +2685,7 @@ Item {
                     description: "Base to derive light theme from"
                     visible: neovimThemeToggle.visible && neovimThemeToggle.checked
                     currentValue: SettingsData.matugenTemplateNeovimSettings?.light?.baseTheme ?? "github_light"
-                    options: ["ayu_light", "blossom_light", "catppuccin-latte", "default-light", "everforest_light", "flex-light", "flexoki-light", "github_light", "gruvbox_light", "material-lighter", "nano-light", "oceanic-light", "one_light", "onenord_light", "penumbra_light", "rosepine-dawn", "seoul256_light", "solarized_light", "sunrise_breeze", "vscode_light"]
+                    options: themeColorsTab.neovimLightBaseThemes.concat(themeColorsTab.neovimDarkBaseThemes)
                     enableFuzzySearch: true
                     onValueChanged: value => {
                         const settings = SettingsData.matugenTemplateNeovimSettings;
