@@ -141,66 +141,33 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
             }
 
-            DankIcon {
+            DankActionButton {
                 id: refreshButtonTwo
-                name: "refresh"
-                size: Theme.iconSize - 4
-                color: Theme.withAlpha(Theme.surfaceText, 0.4)
-                anchors.top: parent.top
                 anchors.verticalCenter: parent.verticalCenter
-                smoothTransform: isRefreshing
-
-                property bool isRefreshing: false
+                iconName: isRefreshing ? "" : "refresh"
+                iconColor: Theme.withAlpha(Theme.surfaceText, 0.4)
+                tooltipText: I18n.tr("Refresh Weather")
+                tooltipSide: "left"
                 enabled: !isRefreshing
 
-                MouseArea {
-                    id: refreshButtonMouseAreaTwo
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: parent.enabled ? Qt.PointingHandCursor : Qt.ForbiddenCursor
-                    enabled: parent.enabled
+                property bool isRefreshing: false
 
-                    Timer {
-                        id: hoverDelayTwo
-                        interval: 300
-                        repeat: false
-                        onTriggered: {
-                            refreshButtonTooltipTwo.show(I18n.tr("Refresh Weather"), refreshButtonTwo, 0, 0, "left");
-                        }
-                    }
-
-                    onEntered: {
-                        hoverDelayTwo.restart();
-                    }
-
-                    onExited: {
-                        hoverDelayTwo.stop();
-                        refreshButtonTooltipTwo.hide();
-                    }
-
-                    onClicked: {
-                        refreshButtonTwo.isRefreshing = true;
-                        WeatherService.forceRefresh();
-                        refreshTimerTwo.restart();
-                    }
+                onClicked: {
+                    isRefreshing = true;
+                    WeatherService.forceRefresh();
+                    refreshTimerTwo.restart();
                 }
 
-                DankTooltipV2 {
-                    id: refreshButtonTooltipTwo
+                DankSpinner {
+                    anchors.centerIn: parent
+                    size: refreshButtonTwo.iconSize
+                    visible: refreshButtonTwo.isRefreshing
                 }
 
                 Timer {
                     id: refreshTimerTwo
                     interval: 2000
                     onTriggered: refreshButtonTwo.isRefreshing = false
-                }
-
-                RotationAnimator on rotation {
-                    running: refreshButtonTwo.isRefreshing
-                    from: 0
-                    to: 360
-                    duration: 1000
-                    loops: Animation.Infinite
                 }
             }
         }
@@ -864,66 +831,34 @@ Item {
                 onClicked: SessionData.setWeatherHourlyDetailed(!SessionData.weatherHourlyDetailed)
             }
 
-            DankIcon {
+            DankActionButton {
                 id: refreshButton
-                name: "refresh"
-                size: Theme.iconSize - 4
-                color: Theme.withAlpha(Theme.surfaceText, 0.4)
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
-                smoothTransform: isRefreshing
-
-                property bool isRefreshing: false
+                iconName: isRefreshing ? "" : "refresh"
+                iconColor: Theme.withAlpha(Theme.surfaceText, 0.4)
+                tooltipText: I18n.tr("Refresh Weather")
+                tooltipSide: "left"
                 enabled: !isRefreshing
 
-                MouseArea {
-                    id: refreshButtonMouseArea
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: parent.enabled ? Qt.PointingHandCursor : Qt.ForbiddenCursor
-                    enabled: parent.enabled
+                property bool isRefreshing: false
 
-                    Timer {
-                        id: hoverDelay
-                        interval: 300
-                        repeat: false
-                        onTriggered: {
-                            refreshButtonTooltip.show(I18n.tr("Refresh Weather"), refreshButton, 0, 0, "left");
-                        }
-                    }
-
-                    onEntered: {
-                        hoverDelay.restart();
-                    }
-
-                    onExited: {
-                        hoverDelay.stop();
-                        refreshButtonTooltip.hide();
-                    }
-
-                    onClicked: {
-                        refreshButton.isRefreshing = true;
-                        WeatherService.forceRefresh();
-                        refreshTimer.restart();
-                    }
+                onClicked: {
+                    isRefreshing = true;
+                    WeatherService.forceRefresh();
+                    refreshTimer.restart();
                 }
 
-                DankTooltipV2 {
-                    id: refreshButtonTooltip
+                DankSpinner {
+                    anchors.centerIn: parent
+                    size: refreshButton.iconSize
+                    visible: refreshButton.isRefreshing
                 }
 
                 Timer {
                     id: refreshTimer
                     interval: 2000
                     onTriggered: refreshButton.isRefreshing = false
-                }
-
-                RotationAnimator on rotation {
-                    running: refreshButton.isRefreshing
-                    from: 0
-                    to: 360
-                    duration: 1000
-                    loops: Animation.Infinite
                 }
             }
         }

@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -19,6 +18,7 @@ Card {
         anchors.centerIn: parent
         spacing: Theme.spacingS
         visible: !WeatherService.weather.available
+        z: 1
 
         DankSpinner {
             size: 24
@@ -42,9 +42,9 @@ Card {
             anchors.horizontalCenter: parent.horizontalCenter
         }
 
-        Button {
+        DankButton {
             text: I18n.tr("Refresh")
-            flat: true
+            buttonHeight: 32
             visible: !WeatherService.weather.loading
             anchors.horizontalCenter: parent.horizontalCenter
             onClicked: WeatherService.forceRefresh()

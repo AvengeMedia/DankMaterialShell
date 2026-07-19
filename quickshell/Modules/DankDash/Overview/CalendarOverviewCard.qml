@@ -1079,7 +1079,7 @@ Rectangle {
 
                 Text {
                     text: I18n.tr("Add a task...", "placeholder in the new-task input field")
-                    color: Theme.onSurface_38
+                    color: Theme.outlineButton
                     visible: taskInput.text.length === 0
                     font.pixelSize: Theme.fontSizeSmall
                     anchors.verticalCenter: parent.verticalCenter
