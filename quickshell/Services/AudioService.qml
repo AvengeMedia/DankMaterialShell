@@ -857,7 +857,7 @@ EOFCONFIG
 
         const maxVol = root.sinkMaxVolume;
         const clampedVolume = Math.max(0, Math.min(maxVol, percentage));
-        Quickshell.execDetached(["wpctl", "set-volume", "-l", String(maxVol / 100), "@DEFAULT_AUDIO_SINK@", String(clampedVolume / 100)]);
+        root.sink.audio.volume = clampedVolume / 100;
         return `Volume set to ${clampedVolume}%`;
     }
 
@@ -867,14 +867,16 @@ EOFCONFIG
     }
 
     function adjustDefaultSinkVolume(step, direction) {
+        const audio = root.sink.audio;
         const maxVol = root.sinkMaxVolume;
         const stepValue = outputVolumeStep(step);
-        const currentVolume = Math.round(root.sink.audio.volume * 100);
+        const currentVolume = Math.round(audio.volume * 100);
         const newVolume = Math.max(0, Math.min(maxVol, currentVolume + direction * stepValue));
-        const suffix = direction > 0 ? "+" : "-";
 
-        Quickshell.execDetached(["wpctl", "set-mute", "@DEFAULT_AUDIO_SINK@", "0"]);
-        Quickshell.execDetached(["wpctl", "set-volume", "-l", String(maxVol / 100), "@DEFAULT_AUDIO_SINK@", `${stepValue}%${suffix}`]);
+        if (audio.muted)
+            audio.muted = false;
+
+        audio.volume = newVolume / 100;
         return newVolume;
     }
 
