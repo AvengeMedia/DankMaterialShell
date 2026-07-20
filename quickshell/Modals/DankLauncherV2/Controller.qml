@@ -449,6 +449,11 @@ Item {
         searchQuery = query;
         requestSearch();
 
+        if (autoSwitchedToFiles && !query.startsWith("/")) {
+            restorePreviousMode();
+            return;
+        }
+
         if (query.startsWith("/")) {
             var prefix = Utils.parseFileSearchPrefix(query);
             var explicitType = prefix && prefix.type !== null ? prefix.type : null;
@@ -460,10 +465,6 @@ Item {
             }
             if (explicitType !== null && SessionData.launcherLastFileSearchType !== explicitType) {
                 SessionData.setLauncherLastFileSearchType(explicitType);
-            }
-        } else {
-            if (searchMode === "files") {
-                restorePreviousMode();
             }
         }
 
