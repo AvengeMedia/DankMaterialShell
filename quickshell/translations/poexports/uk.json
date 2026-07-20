@@ -3,7 +3,7 @@
     "%1 (+%2 more)": "%1 (+ ще %2)"
   },
   "%1 Animation Speed": {
-    "%1 Animation Speed": "Швидкість анімації %1"
+    "%1 Animation Speed": "Швидкість анімації: %1"
   },
   "%1 Layout Overrides": {
     "%1 Layout Overrides": "%1 перевизначень макета"
@@ -447,7 +447,7 @@
     "Add a border around the dock": "Додати рамку навколо дока"
   },
   "Add a custom prefix to all application launches. This can be used for things like 'uwsm-app', 'systemd-run', or other command wrappers.": {
-    "Add a custom prefix to all application launches. This can be used for things like 'uwsm-app', 'systemd-run', or other command wrappers.": "Додати користувацький префікс до всіх запусків додатків. Можна використовувати для 'uwsm-app', 'systemd-run' чи інших командних обгорток."
+    "Add a custom prefix to all application launches. This can be used for things like 'uwsm-app', 'systemd-run', or other command wrappers.": "Додати власний префікс до всіх запусків додатків. Можна використовувати для 'uwsm-app', 'systemd-run' чи інших командних обгорток."
   },
   "Add a task...": {
     "Add a task...": "Додати завдання..."
@@ -489,7 +489,7 @@
     "Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)": "Регулює контрастність згенерованих кольорів (-100 = мінімум, 0 = стандарт, 100 = максимум)"
   },
   "Administrator access is required. Use the Sync button in Settings → Greeter to apply.": {
-    "Administrator access is required. Use the Sync button in Settings → Greeter to apply.": "Потрібен доступ адміністратора. Використовуйте кнопку «Синхронізувати» у Налаштування $\rightarrow$ Вітання для застосування."
+    "Administrator access is required. Use the Sync button in Settings → Greeter to apply.": "Потрібен доступ адміністратора. Використовуйте кнопку «Синхронізувати» у Налаштування → Вітання для застосування."
   },
   "Administrator group:": {
     "Administrator group:": "Група адміністраторів:"
@@ -699,7 +699,7 @@
     "Apps are ordered by usage frequency, then last used, then alphabetically.": "Додатки впорядковані за частотою використання, потім за часом останнього використання, потім за алфавітом."
   },
   "Apps with custom display name, icon, or launch options. Right-click an app and select 'Edit App' to customize.": {
-    "Apps with custom display name, icon, or launch options. Right-click an app and select 'Edit App' to customize.": "Додатки з користувацькою назвою, значком або параметрами запуску. Клацніть правою кнопкою миші на додаток і виберіть «Редагувати додаток» для налаштування."
+    "Apps with custom display name, icon, or launch options. Right-click an app and select 'Edit App' to customize.": "Додатки з власною назвою, значком або параметрами запуску. Клацніть правою кнопкою миші на додаток і виберіть «Редагувати додаток» для налаштування."
   },
   "Apps with notification popups muted. Unmute or delete to remove.": {
     "Apps with notification popups muted. Unmute or delete to remove.": "Додатки з вимкненими спливаючими сповіщеннями. Увімкніть звук або видаліть їх."
@@ -846,7 +846,7 @@
     "Auto Power Saver": "Автоматичний режим енергозбереження"
   },
   "Auto matches bar spacing; Off leaves gaps to your %1 config": {
-    "Auto matches bar spacing; Off stimulates gaps to your %1 config": "Авто підлаштовується під відступи панелі; Вимкнено залишає відступи згідно з конфігом %1"
+    "Auto matches bar spacing; Off stimulates gaps to your %1 config": "Авто підлаштовується під відступи панелі; Вимк. залишає відступи згідно з конфігурацією %1"
   },
   "Auto mode is on. Manual profile selection is disabled.": {
     "Auto mode is on. Manual profile selection is disabled.": "Увімкнено автоматичний режим. Ручний вибір профілю вимкнено."
@@ -906,7 +906,7 @@
     "Autofill last remembered query when opened": "Автоматично підставляти останній запам'ятовуваний запит при відкритті"
   },
   "Automatic Color Mode": {
-    "Automatic Color Mode": "Автоматичний режим кольорів"
+    "Automatic Color Mode": "Автоматичні кольори"
   },
   "Automatic Control": {
     "Automatic Control": "Автоматичне керування"
@@ -1110,7 +1110,7 @@
     "Black": "Чорний"
   },
   "Blend between Surface High and the selected custom color": {
-    "Blend between Surface High and the selected custom color": "Змішування між Surface High та обраним користувацьким кольором"
+    "Blend between Surface High and the selected custom color": "Змішування між Surface High та обраним власним кольором"
   },
   "Block Out": {
     "Block Out": "Заблокувати"
@@ -1308,7 +1308,7 @@
     "Cannot open trash: '%1' is not installed": "Не вдалося відкрити кошик: «%1» не встановлено"
   },
   "Cannot open trash: no custom command set": {
-    "Cannot open trash: no custom command set": "Не вдалося відкрити кошик: користувацьку команду не встановлено"
+    "Cannot open trash: no custom command set": "Не вдалося відкрити кошик: власну команду не встановлено"
   },
   "Cannot pair": {
     "Cannot pair": "Неможливо сполучити"
@@ -1386,7 +1386,7 @@
     "Check on startup": "Перевіряти при запуску"
   },
   "Check your custom command in Settings → Dock → Trash.": {
-    "Check your custom command in Settings → Dock → Trash.": "Перевірте свою користувацьку команду в Налаштування $\rightarrow$ Док $\rightarrow$ Кошик."
+    "Check your custom command in Settings → Dock → Trash.": "Перевірте свою власну команду в Налаштування → Док → Кошик."
   },
   "Checking for updates...": {
     "Checking for updates...": "Перевірка оновлень..."
@@ -2022,73 +2022,73 @@
     "Curve: curve rasterizer.": "Curve: растеризатор кривих."
   },
   "Custom": {
-    "Custom": "Свій / Користувацький"
+    "Custom": "Власна"
   },
   "Custom Blend": {
     "Custom Blend": "Власний бленд"
   },
   "Custom Color": {
-    "Custom Color": "Користувацький колір"
+    "Custom Color": "Власний колір"
   },
   "Custom Duration": {
-    "Custom Duration": "Користувацька тривалість"
+    "Custom Duration": "Власна тривалість"
   },
   "Custom Hibernate Command": {
-    "Custom Hibernate Command": "Користувацька команда гібернації"
+    "Custom Hibernate Command": "Власна команда гібернації"
   },
   "Custom Location": {
     "Custom Location": "Власна локація"
   },
   "Custom Lock Command": {
-    "Custom Lock Command": "Користувацька команда блокування"
+    "Custom Lock Command": "Власна команда блокування"
   },
   "Custom Logout Command": {
-    "Custom Logout Command": "Користувацька команда виходу"
+    "Custom Logout Command": "Власна команда виходу"
   },
   "Custom Name": {
-    "Custom Name": "Користувацьке ім'я"
+    "Custom Name": "Власне ім'я"
   },
   "Custom Power Actions": {
-    "Custom Power Actions": "Користувацькі дії живлення"
+    "Custom Power Actions": "Власні дії живлення"
   },
   "Custom Power Off Command": {
-    "Custom Power Off Command": "Користувацька команда вимкнення"
+    "Custom Power Off Command": "Власна команда вимкнення"
   },
   "Custom Reboot Command": {
-    "Custom Reboot Command": "Користувацька команда перезавантаження"
+    "Custom Reboot Command": "Власна команда перезавантаження"
   },
   "Custom Shadow Color": {
-    "Custom Shadow Color": "Користувацький колір тіні"
+    "Custom Shadow Color": "Власний колір тіні"
   },
   "Custom Shadow Override": {
-    "Custom Shadow Override": "Перевизначення тіні користувачем"
+    "Custom Shadow Override": "Власне перевизначення тіні"
   },
   "Custom Suspend Command": {
-    "Custom Suspend Command": "Користувацька команда сну (suspend)"
+    "Custom Suspend Command": "Власна команда сну"
   },
   "Custom command and terminal params are split on whitespace; paths with spaces will break.": {
-    "Custom command and terminal params are split on whitespace; paths with spaces will break.": "Користувацька команда та параметри термінала розділяються пробілами; шляхи з пробілами призведуть до помилки."
+    "Custom command and terminal params are split on whitespace; paths with spaces will break.": "Власна команда та параметри термінала розділяються пробілами; шляхи з пробілами призведуть до помилки."
   },
   "Custom interval in minutes (minimum 5)": {
     "Custom interval in minutes (minimum 5)": "Власний інтервал у хвилинах (мінімум 5)"
   },
   "Custom open-trash command": {
-    "Custom open-trash command": "Користувацька команда відкриття смітника"
+    "Custom open-trash command": "Власна команда відкриття смітника"
   },
   "Custom power profile": {
     "Custom power profile": "Власний профіль живлення"
   },
   "Custom theme loaded from JSON file": {
-    "Custom theme loaded from JSON file": "Користувацька тема завантажена з JSON-файлу"
+    "Custom theme loaded from JSON file": "Власна тема з JSON-файлу"
   },
   "Custom update command": {
-    "Custom update command": "Користувацька команда оновлення"
+    "Custom update command": "Власна команда оновлення"
   },
   "Custom...": {
-    "Custom...": "Користувацький..."
+    "Custom...": "Власний..."
   },
   "Customizable empty space": {
-    "Customizable empty space": "Настроюваний порожній простір"
+    "Customizable empty space": "Налаштовуваний порожній простір"
   },
   "Customize the font and background of the lock screen, or leave empty to use your theme font and desktop wallpaper. Changes apply instantly.": {
     "Customize the font and background of the lock screen, or leave empty to use your theme font and desktop wallpaper. Changes apply instantly.": "Налаштуйте шрифт і фон екрана блокування, або залиште порожнім, щоб використовувати шрифт теми та шпалери робочого столу. Зміни застосовуються миттєво."
@@ -2220,7 +2220,7 @@
     "Deck": "Deck"
   },
   "Default": {
-    "Default": "За замовчуванням"
+    "Default": "Стандарт"
   },
   "Default (Black)": {
     "Default (Black)": "За замовчуванням (Чорний)"
@@ -2574,7 +2574,7 @@
     "Drag workspace indicators to reorder them": "Перетягніть індикатори робочих просторів для зміни порядку"
   },
   "Draw a connected picture-frame border around the entire display": {
-    "Draw a connected picture-frame border around the entire display": "Малювати суцільну рамку по всьому периметру екрана"
+    "Draw a connected picture-frame border around the entire display": "Малювати суцільну рамку по всьому периметру екрану"
   },
   "Driver": {
     "Driver": "Драйвер"
@@ -2583,7 +2583,7 @@
     "Drizzle": "Мряка"
   },
   "Drop here": {
-    "Drop here": "Опустіть сюди"
+    "Drop here": "Скиньте сюди"
   },
   "Drop your override for %1 so the DMS default action re-applies?": {
     "Drop your override for %1 so the DMS default action re-applies?": "Скинути переозначення для %1, щоб знову застосувати дію DMS за замовчуванням?"
@@ -2628,7 +2628,7 @@
     "Dynamic colors, presets": "Динамічні кольори, попередні налаштування"
   },
   "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": {
-    "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": "Динамічний: пружинна крива Безьє з проскоком — при появі елемент ненадовго перевищує кінцеву точку, а потім стабілізується. Виразно та живо."
+    "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": "Динамічна: пружинна крива Безьє з проскоком — при появі елемент ненадовго перевищує кінцеву точку, а потім стабілізується. Виразно та живо."
   },
   "Edge Hover Reveal": {
     "Edge Hover Reveal": "Розкриття при наведенні курсора на край"
@@ -2700,7 +2700,7 @@
     "Enable Overview Overlay": "Увімкнути накладання огляду"
   },
   "Enable Ripple Effects": {
-    "Enable Ripple Effects": "Увімкнути ефекти ряби"
+    "Enable Ripple Effects": "Увімкнути ефект хвильок"
   },
   "Enable System Sounds": {
     "Enable System Sounds": "Увімкнути системні звуки"
@@ -2715,7 +2715,7 @@
     "Enable WiFi": "Увімкнути WiFi"
   },
   "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": {
-    "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": "Увімкніть користувацьке переозначення нижче, щоб налаштувати інтенсивність, прозорість та колір тіні для кожної панелі."
+    "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": "Увімкніть власне переозначення нижче, щоб налаштувати інтенсивність, прозорість та колір тіні для кожної панелі."
   },
   "Enable compositor-targetable blur layer (namespace: dms:blurwallpaper). Requires manual niri configuration.": {
     "Enable compositor-targetable blur layer (namespace: dms:blurwallpaper). Requires manual niri configuration.": "Увімкнути шар розмиття, доступний для композитора (простір імен: dms:blurwallpaper). Потребує ручного налаштування niri."
@@ -2784,10 +2784,10 @@
     "Enter credentials for ": "Введіть облікові дані для "
   },
   "Enter custom lock screen format (e.g., dddd, MMMM d)": {
-    "Enter custom lock screen format (e.g., dddd, MMMM d)": "Введіть користувацький формат екрана блокування (наприклад, dddd, MMMM d)"
+    "Enter custom lock screen format (e.g., dddd, MMMM d)": "Введіть власний формат екрана блокування (наприклад, dddd, MMMM d)"
   },
   "Enter custom top bar format (e.g., ddd MMM d)": {
-    "Enter custom top bar format (e.g., ddd MMM d)": "Введіть користувацький формат верхньої панелі (наприклад, ddd MMM d)"
+    "Enter custom top bar format (e.g., ddd MMM d)": "Введіть власний формат верхньої панелі (наприклад, ddd MMM d)"
   },
   "Enter device name...": {
     "Enter device name...": "Введіть ім'я пристрою..."
@@ -3306,7 +3306,7 @@
     "Floating Position": "Положення плаваючого вікна"
   },
   "Fluent": {
-    "Fluent": "Вільний"
+    "Fluent": "Вільна"
   },
   "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": {
     "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": "Fluent: плавне кубічне сповільнення при появі, швидкий вихід — чисті, елегантні криві."
@@ -3471,7 +3471,7 @@
     "Frame Blur follows Background Blur in Theme & Colors": "Розмиття рамки відповідає розмиттю фону в «Темах та кольорах»"
   },
   "Frame Border Color": {
-    "Frame Border Color": "Колір межі рамки"
+    "Frame Border Color": "Колір контуру рамки"
   },
   "Frame Xray": {
     "Frame Xray": "Frame Xray"
@@ -3567,7 +3567,7 @@
     "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.": "Створити базові конфігурації GTK3/4 або QT5/QT6 (потрібен qt6ct-kde) для відповідності кольорам DMS. Потрібно виконати лише один раз.<br /><br />Рекомендується налаштувати <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> перед застосуванням тем GTK."
   },
   "Generic": {
-    "Generic": "Загальний"
+    "Generic": "Загальна"
   },
   "Geometric Centering": {
     "Geometric Centering": "Геометричне центрування"
@@ -3807,7 +3807,7 @@
     "Hide when no updates: ON": "Приховувати, якщо немає оновлень: УВІМК"
   },
   "High": {
-    "High": "Високий"
+    "High": "Висока"
   },
   "High-fidelity palette that preserves source hues.": {
     "High-fidelity palette that preserves source hues.": "Високоточна палітра, що зберігає вихідні відтінки."
@@ -4458,7 +4458,7 @@
     "Login": "Увійти"
   },
   "Long": {
-    "Long": "Довгий"
+    "Long": "Довга"
   },
   "Long Text": {
     "Long Text": "Довгий текст"
@@ -4470,7 +4470,7 @@
     "Longitude": "Довгота"
   },
   "Low": {
-    "Low": "Низький"
+    "Low": "Низька"
   },
   "Low Battery": {
     "Low Battery": "Низький заряд батареї"
@@ -4722,7 +4722,7 @@
     "Media Volume": "Гучність медіа"
   },
   "Medium": {
-    "Medium": "Середній"
+    "Medium": "Середня"
   },
   "Memory": {
     "Memory": "Пам'ять"
@@ -4791,7 +4791,7 @@
     "Modal Shadows": "Тіні модальних вікон"
   },
   "Modals": {
-    "Modals": "Модальні вікна"
+    "Modals": "модальні вікна"
   },
   "Mode": {
     "Mode": "Режим"
@@ -5034,7 +5034,7 @@
     "No Blur": "Без розмиття"
   },
   "No Border": {
-    "No Border": "Без межі"
+    "No Border": "Без контуру"
   },
   "No DMS shortcuts configured": {
     "No DMS shortcuts configured": "Комбінації клавіш DMS не налаштовані"
@@ -5130,7 +5130,7 @@
     "No codecs found": "Кодеки не знайдені"
   },
   "No custom theme file": {
-    "No custom theme file": "Немає користувацького файлу теми"
+    "No custom theme file": "Немає власного файлу теми"
   },
   "No devices": {
     "No devices": "Немає пристроїв"
@@ -5340,7 +5340,7 @@
     "None active": "Немає активних"
   },
   "Normal": {
-    "Normal": "Нормальний"
+    "Normal": "Нормальна"
   },
   "Normal Font": {
     "Normal Font": "Звичайний шрифт"
@@ -5460,7 +5460,7 @@
     "Occupied Color": "Колір зайнятого"
   },
   "Off": {
-    "Off": "Вимк"
+    "Off": "Вимк."
   },
   "Office": {
     "Office": "Офіс"
@@ -5541,7 +5541,7 @@
     "Open a new note": "Відкрити нову нотатку"
   },
   "Open a terminal and run a custom command instead of the in-shell upgrade flow.": {
-    "Open a terminal and run a custom command instead of the in-shell upgrade flow.": "Відкрити термінал і запустити користувацьку команду замість вбудованого процесу оновлення."
+    "Open a terminal and run a custom command instead of the in-shell upgrade flow.": "Відкрити термінал і запустити власну команду замість вбудованого процесу оновлення."
   },
   "Open as window": {
     "Open as window": "Відкрити як вікно"
@@ -5643,7 +5643,7 @@
     "Override": "Перевизначити"
   },
   "Override Border Size": {
-    "Override Border Size": "Перевизначення розміру межі"
+    "Override Border Size": "Перевизначення розміру контуру"
   },
   "Override Corner Radius": {
     "Override Corner Radius": "Перевизначити радіус кутів"
@@ -5655,7 +5655,7 @@
     "Override global transparency for Notepad": "Перевизначити глобальну прозорість для Блокнота"
   },
   "Override terminal with a custom command or script": {
-    "Override terminal with a custom command or script": "Перевизначити термінал користувацькою командою або скриптом"
+    "Override terminal with a custom command or script": "Перевизначити термінал власною командою або скриптом"
   },
   "Override the global shadow with per-bar settings": {
     "Override the global shadow with per-bar settings": "Перевизначити глобальну тінь налаштуваннями для кожної панелі"
@@ -5949,7 +5949,7 @@
     "Popout Shadows": "Тіні спливаючих вікон"
   },
   "Popouts": {
-    "Popouts": "Спливаючі вікна"
+    "Popouts": "спливаючі вікна"
   },
   "Popouts and Modals follow global Animation Speed (disable to customize independently)": {
     "Popouts and Modals follow global Animation Speed (disable to customize independently)": "Спливаючі та модальні вікна слідують глобальній швидкості анімації (вимкніть, щоб налаштувати окремо)"
@@ -6495,7 +6495,7 @@
     "Revert": "Інвертувати"
   },
   "Rewind 10s": {
-    "Rewind 10s": "Перемотати на 10 с назад"
+    "Rewind 10s": "На 10 с назад"
   },
   "Right": {
     "Right": "Справа"
@@ -6525,7 +6525,7 @@
     "Ringing %1...": "Йде виклик %1..."
   },
   "Ripple Effects": {
-    "Ripple Effects": "Ефекти брижів"
+    "Ripple Effects": "Хвильки"
   },
   "Root Filesystem": {
     "Root Filesystem": "Коренева файлова система"
@@ -6558,7 +6558,7 @@
     "Run DMS Templates": "Запустити шаблони DMS"
   },
   "Run User Templates": {
-    "Run User Templates": "Запустити користувацький приклад"
+    "Run User Templates": "Запустити власний шаблон"
   },
   "Run a program (e.g., firefox, kitty)": {
     "Run a program (e.g., firefox, kitty)": "Запустити програму (наприклад, firefox, kitty)"
@@ -6795,7 +6795,7 @@
     "Select Bar": "Вибрати панель"
   },
   "Select Custom Theme": {
-    "Select Custom Theme": "Виберіть користувацьку тему"
+    "Select Custom Theme": "Виберіть власну тему"
   },
   "Select Dock Launcher Logo": {
     "Select Dock Launcher Logo": "Вибрати логотип лаунчера доку"
@@ -6819,7 +6819,7 @@
     "Select Wallpaper Directory": "Виберіть каталог шпалер"
   },
   "Select a color from the palette or use custom sliders": {
-    "Select a color from the palette or use custom sliders": "Вибрати колір із палітри або використовувати користувацькі повзунки"
+    "Select a color from the palette or use custom sliders": "Вибрати колір із палітри або використовувати власні повзунки"
   },
   "Select a desktop application": {
     "Select a desktop application": "Виберіть програму робочого столу"
@@ -7020,7 +7020,7 @@
     "Shift+Enter to paste": "Shift+Enter для вставки"
   },
   "Short": {
-    "Short": "Короткий"
+    "Short": "Коротка"
   },
   "Shortcut (%1)": {
     "Shortcut (%1)": "Комбінація клавіш (%1)"
@@ -7116,7 +7116,7 @@
     "Show Log Out": "Показати вихід"
   },
   "Show Material Design ripple animations on interactive elements": {
-    "Show Material Design ripple animations on interactive elements": "Показувати анімацію ряби Material Design на інтерактивних елементах"
+    "Show Material Design ripple animations on interactive elements": "Показувати анімацію хвильок Material Design на інтерактивних елементах"
   },
   "Show Media Player": {
     "Show Media Player": "Показати медіаплеєр"
@@ -7527,22 +7527,22 @@
     "Surface Behavior": "Поведінка поверхонь"
   },
   "Surface Border Color": {
-    "Surface Border Color": "Колір межі поверхні"
+    "Surface Border Color": "Колір контуру поверхні"
   },
   "Surface Border Opacity": {
-    "Surface Border Opacity": "Непрозорість межі поверхні"
+    "Surface Border Opacity": "Непрозорість контуру поверхні"
   },
   "Surface Border Outline": {
-    "Surface Border Outline": "Контур межі поверхні"
+    "Surface Border Outline": "Контур поверхні"
   },
   "Surface Container": {
     "Surface Container": "Контейнер поверхні"
   },
   "Surface High": {
-    "Surface High": "Поверхня (висока)"
+    "Surface High": "Поверхня вища"
   },
   "Surface Highest": {
-    "Surface Highest": "Поверхня (найвища)"
+    "Surface Highest": "Поверхня найвища"
   },
   "Surface Opacity": {
     "Surface Opacity": "Непрозорість поверхонь"
@@ -7782,7 +7782,7 @@
     "Theme Registry": "Реєстр тем"
   },
   "Theme color used for the border": {
-    "Theme color used for the border": "Колір теми, що використовується для межі"
+    "Theme color used for the border": "Колір теми, що використовується для контуру"
   },
   "Theme color used for the widget outline": {
     "Theme color used for the widget outline": "Колір теми, що використовується для контуру віджета"
@@ -7845,22 +7845,22 @@
     "Thunderstorm with Hail": "Гроза з градом"
   },
   "Tile": {
-    "Tile": "Плитка (вертикально)"
+    "Tile": "Плитка"
   },
   "Tile Horizontally": {
-    "Tile Horizontally": "Розташувати по горизонталі"
+    "Tile Horizontally": "Плитка горизонтально"
   },
   "Tile Vertically": {
-    "Tile Vertically": "Розташувати по вертикалі"
+    "Tile Vertically": "Плитка вертикально"
   },
   "Tiled": {
-    "Tiled": "Плиточний"
+    "Tiled": "Плитковий"
   },
   "Tiled State": {
-    "Tiled State": "Плиточний стан"
+    "Tiled State": "Плитковий стан"
   },
   "Tiling": {
-    "Tiling": "Тайлінг"
+    "Tiling": "Облицювання плиткою"
   },
   "Time": {
     "Time": "Час"
@@ -7971,7 +7971,7 @@
     "Top": "Зверху"
   },
   "Top (Default)": {
-    "Top (Default)": "Зверху (за замовчуванням)"
+    "Top (Default)": "Згори (за замовчуванням)"
   },
   "Top Bar Format": {
     "Top Bar Format": "Формат верхньої панелі"
@@ -8274,13 +8274,13 @@
     "Use System Theme": "Використовувати системну тему"
   },
   "Use a custom image for the lock screen, or leave empty to use your desktop wallpaper.": {
-    "Use a custom image for the lock screen, or leave empty to use your desktop wallpaper.": "Використовуйте власне зображення для екрана блокування або залиште порожнім, щоб використовувати шпалери робочого столу."
+    "Use a custom image for the lock screen, or leave empty to use your desktop wallpaper.": "Використовувати власне зображення для екрана блокування або залиште порожнім, щоб використовувати шпалери робочого столу."
   },
   "Use a custom image for the login screen, or leave empty to use desktop wallpaper": {
-    "Use a custom image for the login screen, or leave empty to use desktop wallpaper": "Використовуйте власне зображення для екрана входу або залиште порожнім, щоб використовувати шпалери робочого столу"
+    "Use a custom image for the login screen, or leave empty to use desktop wallpaper": "Використовувати власне зображення для екрана входу або залиште порожнім, щоб використовувати шпалери робочого столу"
   },
   "Use a custom image for the login screen, or leave empty to use your desktop wallpaper.": {
-    "Use a custom image for the login screen, or leave empty to use your desktop wallpaper.": "Використовуйте власне зображення для екрана входу або залиште порожнім, щоб використовувати шпалери робочого столу."
+    "Use a custom image for the login screen, or leave empty to use your desktop wallpaper.": "Використовувати власне зображення для екрана входу або залиште порожнім, щоб використовувати шпалери робочого столу."
   },
   "Use a custom radius for goth corner cutouts": {
     "Use a custom radius for goth corner cutouts": "Використовувати власний радіус для готичних вирізів по кутах"
@@ -8298,16 +8298,16 @@
     "Use album art accent": "Використовувати акцент обкладинки альбому"
   },
   "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": {
-    "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": "Використовуйте зовнішній менеджер шпалер, такий як swww, hyprpaper або swaybg."
+    "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": "Використовувати зовнішній менеджер шпалер, такий як swww, hyprpaper або swaybg."
   },
   "Use animated wave progress bars for media playback": {
     "Use animated wave progress bars for media playback": "Використовувати анімовані хвильові індикатори прогресу для відтворення медіа"
   },
   "Use colors extracted from album art instead of system theme colors": {
-    "Use colors extracted from album art instead of system theme colors": "Використовувати кольори, витягнуті з обкладинки альбому, замість кольорів системної теми"
+    "Use colors extracted from album art instead of system theme colors": "Використовувати кольори з обкладинки альбому замість кольорів системної теми"
   },
   "Use custom border/focus-ring width": {
-    "Use custom border/focus-ring width": "Використовувати власну ширину межі/кільця фокусу"
+    "Use custom border/focus-ring width": "Використовувати власну ширину контуру/кільця фокусу"
   },
   "Use custom window radius instead of theme radius": {
     "Use custom window radius instead of theme radius": "Використовувати власний радіус вікон замість радіуса теми"
@@ -8328,7 +8328,7 @@
     "Use fingerprint authentication for the lock screen.": "Використовувати автентифікацію за відбитком пальця для екрана блокування."
   },
   "Use keys 1-3 or arrows, Enter/Space to select": {
-    "Use keys 1-3 or arrows, Enter/Space to select": "Використовуйте клавіші 1-3 або стрілки, Enter/Пробіл для вибору"
+    "Use keys 1-3 or arrows, Enter/Space to select": "Використовувати клавіші 1-3 або стрілки, Enter/Пробіл для вибору"
   },
   "Use light theme instead of dark theme": {
     "Use light theme instead of dark theme": "Використовувати світлу тему замість темної"
@@ -8367,7 +8367,7 @@
     "User": "Користувач"
   },
   "User Window Rules (%1)": {
-    "User Window Rules (%1)": "Користувацькі правила вікон (%1)"
+    "User Window Rules (%1)": "Власні правила вікон (%1)"
   },
   "User already exists": {
     "User already exists": "Користувач вже існує"
@@ -8481,7 +8481,7 @@
     "Vertical Tiling": "Вертикальний тайлінг"
   },
   "Very High": {
-    "Very High": "Дуже високий"
+    "Very High": "Дуже висока"
   },
   "Vibrant": {
     "Vibrant": "Яскравий"
@@ -8673,16 +8673,16 @@
     "Width": "Ширина"
   },
   "Width of the border in pixels": {
-    "Width of the border in pixels": "Ширина межі в пікселях"
+    "Width of the border in pixels": "Ширина контуру в пікселях"
   },
   "Width of the widget outline in pixels": {
     "Width of the widget outline in pixels": "Ширина контуру віджета в пікселях"
   },
   "Width of window border": {
-    "Width of window border": "Ширина межі вікна"
+    "Width of window border": "Ширина контуру вікна"
   },
   "Width of window border and focus ring": {
-    "Width of window border and focus ring": "Ширина межі вікна та кільця фокусу"
+    "Width of window border and focus ring": "Ширина контуру вікна та кільця фокусу"
   },
   "Wind": {
     "Wind": "Вітер"
