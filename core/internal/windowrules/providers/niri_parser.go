@@ -928,8 +928,8 @@ func (p *NiriWritableProvider) formatRule(rule windowrules.WindowRule) string {
 	if a.Opacity != nil {
 		lines = append(lines, fmt.Sprintf("    opacity %.2f", *a.Opacity))
 	}
-	if a.OpenFloating != nil && *a.OpenFloating {
-		lines = append(lines, "    open-floating true")
+	if a.OpenFloating != nil {
+		lines = append(lines, fmt.Sprintf("    open-floating %t", *a.OpenFloating))
 	}
 	if a.OpenMaximized != nil && *a.OpenMaximized {
 		lines = append(lines, "    open-maximized true")
