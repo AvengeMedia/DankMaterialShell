@@ -578,7 +578,7 @@ Item {
                     }
 
                     StyledText {
-                        text: I18n.tr('dms is a highly customizable, modern desktop shell with a <a href="https://m3.material.io/" style="text-decoration:none; color:%1;">material 3 inspired</a> design.<br /><br/>It is built with <a href="https://quickshell.org" style="text-decoration:none; color:%1;">Quickshell</a>, a QT6 framework for building desktop shells, and <a href="https://go.dev" style="text-decoration:none; color:%1;">Go</a>, a statically typed, compiled programming language.').arg(Theme.primary)
+                        text: I18n.tr('DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.').arg(`<a href="https://m3.material.io/" style="text-decoration:none; color:${Theme.primary};">Material Design 3</a>`).arg(`<a href="https://quickshell.org" style="text-decoration:none; color:${Theme.primary};">Quickshell</a>`).arg(`<a href="https://go.dev" style="text-decoration:none; color:${Theme.primary};">Go</a>`)
                         textFormat: Text.RichText
                         font.pixelSize: Theme.fontSizeMedium
                         linkColor: Theme.primary
@@ -819,7 +819,7 @@ Item {
 
             StyledText {
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: I18n.tr('<a href="https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE" style="text-decoration:none; color:%1;">MIT License</a>').arg(Theme.surfaceVariantText)
+                text: `<a href="https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE" style="text-decoration:none; color:${Theme.surfaceVariantText};">${I18n.tr('MIT License')}</a>`
                 font.pixelSize: Theme.fontSizeMedium
                 color: Theme.surfaceVariantText
                 textFormat: Text.RichText
