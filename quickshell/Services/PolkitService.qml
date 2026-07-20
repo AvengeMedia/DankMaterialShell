@@ -3,7 +3,6 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
-import Quickshell.Services.Polkit
 
 Singleton {
     id: root
@@ -12,10 +11,13 @@ Singleton {
     readonly property bool disablePolkitIntegration: Quickshell.env("DMS_DISABLE_POLKIT") === "1"
 
     readonly property bool polkitAvailable: !disablePolkitIntegration
-    readonly property alias agent: polkitAgentInstance
+    readonly property var agent: polkitAgentLoader.item
 
-    PolkitAgent {
-        id: polkitAgentInstance
+    Loader {
+        id: polkitAgentLoader
+        active: root.polkitAvailable
+        asynchronous: false
+        source: "PolkitAgentInstance.qml"
     }
 
     Component.onCompleted: {
