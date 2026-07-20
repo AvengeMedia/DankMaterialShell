@@ -197,6 +197,9 @@
   "2 seconds": {
     "2 seconds": "2 שניות"
   },
+  "2.4 GHz": {
+    "2.4 GHz": ""
+  },
   "20 minutes": {
     "20 minutes": "20 דקות"
   },
@@ -260,6 +263,9 @@
   "45 seconds": {
     "45 seconds": "45 שניות"
   },
+  "5 GHz": {
+    "5 GHz": ""
+  },
   "5 min before": {
     "5 min before": "5 דקות לפני"
   },
@@ -301,9 +307,6 @@
   },
   "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>": {
     "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>": "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">רישיון MIT</a>"
-  },
-  "A file with this name already exists. Do you want to overwrite it?": {
-    "A file with this name already exists. Do you want to overwrite it?": "קיים כבר קובץ עם השם זה. האם ברצונך לדרוס אותו?"
   },
   "A modern desktop shell for Wayland compositors": {
     "A modern desktop shell for Wayland compositors": "מעטפת שולחן עבודה מודרנית לקומפוזיטורים של Wayland"
@@ -365,9 +368,6 @@
   "Action performed when scrolling vertically on the bar": {
     "Action performed when scrolling vertically on the bar": "פעולה שתבוצע בעת גלילה אנכית על הסרגל"
   },
-  "Actions": {
-    "Actions": "פעולות"
-  },
   "Activate": {
     "Activate": "הפעל/י"
   },
@@ -376,6 +376,9 @@
   },
   "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": {
     "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": "האם להפעיל את מסך ההתחברות של DMS? מסוף ייפתח לאימות עם sudo. הרץ/י את הסנכרון לאחר ההפעלה כדי להחיל את ההגדרות שלך."
+  },
+  "Activates immediately": {
+    "Activates immediately": ""
   },
   "Activation": {
     "Activation": "הפעלה"
@@ -418,6 +421,9 @@
   },
   "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": {
     "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": "להוסיף את \"%1\" לקבוצה %2? עליהם להתנתק ולהתחבר מחדש, ולאחר מכן להריץ את הפקודה dms greeter sync --profile כדי לפרסם את ערכת הנושא שלהם למסך ההתחברות."
+  },
+  "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": {
+    "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": ""
   },
   "Add Bar": {
     "Add Bar": "הוסף/י סרגל"
@@ -469,6 +475,9 @@
   },
   "Add the new user to the %1 group so they can run dms greeter sync --profile.": {
     "Add the new user to the %1 group so they can run dms greeter sync --profile.": "הוסף/י את המשתמש/ת החדש/ה לקבוצה %1 כדי שיוכלו להריץ את הפקודה dms greeter sync --profile."
+  },
+  "Add the new user to the %1 group so they can run dms-greeter sync --profile.": {
+    "Add the new user to the %1 group so they can run dms-greeter sync --profile.": ""
   },
   "Add the new user to the %1 group so they can use sudo.": {
     "Add the new user to the %1 group so they can use sudo.": "הוסף/י את המשתמש/ת החדש/ה לקבוצה %1 כדי שיוכלו להשתמש בsudo."
@@ -538,9 +547,6 @@
   },
   "Also group repeated application icons on the active workspace": {
     "Also group repeated application icons on the active workspace": "קבץ/י גם סמלי אפליקציות שחוזרים על עצמם בסביבת העבודה הפעילה"
-  },
-  "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close": {
-    "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close": "Alt+←/Backspace: חזרה • F1/I: מידע על הקובץ • F10: עזרה • Esc: סגירה"
   },
   "Alternative (OR)": {
     "Alternative (OR)": "חלופי (OR)"
@@ -652,6 +658,9 @@
   },
   "Applications and commands to start automatically when you log in": {
     "Applications and commands to start automatically when you log in": "אפליקציות ופקודות שיופעלו אוטומטית בעת ההתחברות"
+  },
+  "Applies on the next greeter sync": {
+    "Applies on the next greeter sync": ""
   },
   "Apply Changes": {
     "Apply Changes": "החל/י שינויים"
@@ -788,14 +797,8 @@
   "Authentication changes applied": {
     "Authentication changes applied": ""
   },
-  "Authentication changes applied.": {
-    "Authentication changes applied.": "שינויי האימות הוחלו."
-  },
   "Authentication changes apply automatically": {
     "Authentication changes apply automatically": ""
-  },
-  "Authentication changes apply automatically.": {
-    "Authentication changes apply automatically.": "שינויי אימות מוחלים באופן אוטומטי."
   },
   "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": {
     "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": "שינויי אימות דורשים להזדהות עם sudo. נפתח מסוף כדי שתוכל/י להשתמש בסיסמה או בטביעת אצבע."
@@ -1030,6 +1033,9 @@
   },
   "Balanced palette with focused accents (default).": {
     "Balanced palette with focused accents (default).": "פלטה מאוזנת עם דגשים ממוקדים (ברירת מחדל)."
+  },
+  "Band": {
+    "Band": ""
   },
   "Bar": {
     "Bar": "סרגל"
@@ -1286,11 +1292,11 @@
   "Calendar Backend": {
     "Calendar Backend": "הBackend של היומן"
   },
+  "Calls / Headset": {
+    "Calls / Headset": ""
+  },
   "Camera": {
     "Camera": "מצלמה"
-  },
-  "Cancel": {
-    "Cancel": "ביטול"
   },
   "Cancel all jobs for \"%1\"?": {
     "Cancel all jobs for \"%1\"?": "לבטל את כל העבודות עבור \"%1\"?"
@@ -1436,9 +1442,6 @@
   "Choose how to be notified when charge limit is reached.": {
     "Choose how to be notified when charge limit is reached.": "בחר/י כיצד לקבל התראות בעת ההגעה למגבלת הטעינה."
   },
-  "Choose icon": {
-    "Choose icon": "בחר/י סמל"
-  },
   "Choose monochrome or a theme color tint for system tray icons": {
     "Choose monochrome or a theme color tint for system tray icons": "בחר/י גוון מונוכרומטי או צבע של ערכת הנושא עבור סמלי מגש המערכת"
   },
@@ -1577,8 +1580,17 @@
   "Close Window": {
     "Close Window": "סגור/י חלון"
   },
+  "Codec switched successfully": {
+    "Codec switched successfully": ""
+  },
+  "Codec switching is unavailable because WirePlumber was not found": {
+    "Codec switching is unavailable because WirePlumber was not found": ""
+  },
   "Codec switching is unavailable because pactl was not found": {
     "Codec switching is unavailable because pactl was not found": "החלפת קודק אינה זמינה מכיוון שלא ניתן היה למצוא את pactl"
+  },
+  "Codec switching is unavailable. WirePlumber wpexec was not found.": {
+    "Codec switching is unavailable. WirePlumber wpexec was not found.": ""
   },
   "Color": {
     "Color": "צבע"
@@ -1657,9 +1669,6 @@
   },
   "Commands": {
     "Commands": "פקודות"
-  },
-  "Communication": {
-    "Communication": "תקשורת"
   },
   "Community themes": {
     "Community themes": "ערכות נושא קהילתיות"
@@ -1844,9 +1853,6 @@
   "Convenience options for the login screen": {
     "Convenience options for the login screen": ""
   },
-  "Convenience options for the login screen. Sync to apply.": {
-    "Convenience options for the login screen. Sync to apply.": "אפשרויות נוחות למסך ההתחברות. הרץ/י סנכרון כדי להחיל."
-  },
   "Convert to DMS": {
     "Convert to DMS": "המר/י לDMS"
   },
@@ -1889,9 +1895,6 @@
   "Copy Text": {
     "Copy Text": "העתק/י טקסט"
   },
-  "Copy path": {
-    "Copy path": "העתק/י נתיב"
-  },
   "Corner Radius": {
     "Corner Radius": "רדיוס פינות"
   },
@@ -1900,6 +1903,9 @@
   },
   "Corners & Background": {
     "Corners & Background": "פינות ורקע"
+  },
+  "Couldn't load hotspot password": {
+    "Couldn't load hotspot password": ""
   },
   "Count Only": {
     "Count Only": "ספירה בלבד"
@@ -2123,9 +2129,6 @@
   "DMS removes its managed block from /etc/pam.d/greetd and stops write services": {
     "DMS removes its managed block from /etc/pam.d/greetd and stops write services": ""
   },
-  "DMS removes its managed block from /etc/pam.d/greetd and stops writing to it": {
-    "DMS removes its managed block from /etc/pam.d/greetd and stops writing to it": "DMS מסיר את הבלוק המנוהל שלו מ/etc/pam.d/greetd ומפסיק לכתוב אליו"
-  },
   "DMS server is outdated (API v%1, expected v%2)": {
     "DMS server is outdated (API v%1, expected v%2)": "השרת של DMS לא מעודכן (API v%1, צפוי v%2)"
   },
@@ -2315,9 +2318,6 @@
   "Description": {
     "Description": "תיאור"
   },
-  "Desktop": {
-    "Desktop": "שולחן העבודה"
-  },
   "Desktop Application": {
     "Desktop Application": "אפליקציית שולחן העבודה"
   },
@@ -2344,9 +2344,6 @@
   },
   "Detected backends: %1": {
     "Detected backends: %1": "הBackends שזוהו: %1"
-  },
-  "Development": {
-    "Development": "פיתוח"
   },
   "Device": {
     "Device": "התקן"
@@ -2540,9 +2537,6 @@
   "Docs": {
     "Docs": "דוקיומנטציה"
   },
-  "Documents": {
-    "Documents": "מסמכים"
-  },
   "Domain (optional)": {
     "Domain (optional)": "דומיין (לא חובה)"
   },
@@ -2554,9 +2548,6 @@
   },
   "Door Open": {
     "Door Open": "דלת פתוחה"
-  },
-  "Downloads": {
-    "Downloads": "הורדות"
   },
   "Drag a widget by its handle here to reorder it or drop it into another group": {
     "Drag a widget by its handle here to reorder it or drop it into another group": "גרור/גררי ווידג׳ט באמצעות הידית שלו לכאן כדי לסדר אותו מחדש או לשחרר אותו לקבוצה אחרת"
@@ -2714,6 +2705,9 @@
   "Enable WiFi": {
     "Enable WiFi": "הפעל/י Wi-Fi"
   },
+  "Enable WiFi before starting the hotspot.": {
+    "Enable WiFi before starting the hotspot.": ""
+  },
   "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": {
     "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": "הפעל/י דריסה מותאמת אישית למטה כדי להגדיר עוצמת צל, שקיפות וצבע עבור כל סרגל בנפרד."
   },
@@ -2728,9 +2722,6 @@
   },
   "Enable fingerprint or security key for DMS Greeter": {
     "Enable fingerprint or security key for DMS Greeter": ""
-  },
-  "Enable fingerprint or security key for DMS Greeter. Authentication changes apply automatically.": {
-    "Enable fingerprint or security key for DMS Greeter. Authentication changes apply automatically.": "הפעל/י הזדהות באמצעות טביעת אצבע או מפתח אבטחה במסך ההתחברות של DMS. שינויי אימות מוחלים באופן אוטומטי."
   },
   "Enable loginctl lock integration": {
     "Enable loginctl lock integration": "הפעלת האינטגרציה עם loginctl"
@@ -2791,9 +2782,6 @@
   },
   "Enter device name...": {
     "Enter device name...": "הזן/י שם להתקן..."
-  },
-  "Enter filename...": {
-    "Enter filename...": "הזן/י שם קובץ..."
   },
   "Enter launch prefix (e.g., 'uwsm-app')": {
     "Enter launch prefix (e.g., 'uwsm-app')": "הזן/י קידומת הפעלה (לדוגמה: 'uwsm-app')"
@@ -2903,9 +2891,6 @@
   "Extra Light": {
     "Extra Light": "דק במיוחד"
   },
-  "F1/I: Toggle • F10: Help": {
-    "F1/I: Toggle • F10: Help": "F1/I: החלפה • F10: עזרה"
-  },
   "Fade": {
     "Fade": "דהייה"
   },
@@ -2947,6 +2932,9 @@
   },
   "Failed to check pin limit": {
     "Failed to check pin limit": "בדיקת מגבלת ההצמדה נכשלה"
+  },
+  "Failed to configure hotspot": {
+    "Failed to configure hotspot": ""
   },
   "Failed to connect VPN": {
     "Failed to connect VPN": "החיבור לVPN נכשל"
@@ -3077,6 +3065,9 @@
   "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": {
     "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": "הרצת הפקודה 'dms greeter status' נכשלה. ודא/י שDMS מותקן ושdms נמצא בPATH."
   },
+  "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": {
+    "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": ""
+  },
   "Failed to save VPN credentials": {
     "Failed to save VPN credentials": "שמירת אישורי הגישה לVPN נכשלה"
   },
@@ -3130,6 +3121,15 @@
   },
   "Failed to start connection to %1": {
     "Failed to start connection to %1": "התחלת החיבור ל%1 נכשלה"
+  },
+  "Failed to start hotspot": {
+    "Failed to start hotspot": ""
+  },
+  "Failed to stop hotspot": {
+    "Failed to stop hotspot": ""
+  },
+  "Failed to switch codec": {
+    "Failed to switch codec": ""
   },
   "Failed to unpin entry": {
     "Failed to unpin entry": "ביטול הצמדת הרשומה נכשל"
@@ -3188,12 +3188,6 @@
   "File": {
     "File": "קובץ"
   },
-  "File Already Exists": {
-    "File Already Exists": "הקובץ כבר קיים"
-  },
-  "File Information": {
-    "File Information": "פרטי קובץ"
-  },
   "File Manager": {
     "File Manager": "מנהל קבצים"
   },
@@ -3241,9 +3235,6 @@
   },
   "Fingerprint availability could not be confirmed": {
     "Fingerprint availability could not be confirmed": ""
-  },
-  "Fingerprint availability could not be confirmed.": {
-    "Fingerprint availability could not be confirmed.": "לא ניתן היה לאשר את זמינות טביעת האצבע."
   },
   "Fingerprint error": {
     "Fingerprint error": "שגיאת טביעת אצבע"
@@ -3518,9 +3509,6 @@
   "Fully Charged": {
     "Fully Charged": "טעונה במלואה"
   },
-  "Fun": {
-    "Fun": "כיף"
-  },
   "G: grid • Z/X: size": {
     "G: grid • Z/X: size": "G: רשת • Z/X: גודל"
   },
@@ -3632,11 +3620,11 @@
   "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": {
     "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": "חברי קבוצת greeter יכולים לסנכרן את ערכת הנושא שלהם למסך ההתחברות באמצעות dms greeter sync --profile לאחר התנתקות והתחברות מחדש."
   },
+  "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": {
+    "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": ""
+  },
   "Greeter group:": {
     "Greeter group:": "קבוצת greeter:"
-  },
-  "Greeter only — format for the date on the login screen": {
-    "Greeter only — format for the date on the login screen": "במסך ההתחברות בלבד - תבנית לתאריך שמופיע בכניסה"
   },
   "Greeter sync complete": {
     "Greeter sync complete": "סנכרון מסך ההתחברות (greeter) הושלם"
@@ -3730,9 +3718,6 @@
   },
   "Hex": {
     "Hex": "Hex"
-  },
-  "Hibernate": {
-    "Hibernate": "שינה עמוקה"
   },
   "Hibernate failed": {
     "Hibernate failed": "שינה עמוקה נכשלה"
@@ -3833,20 +3818,8 @@
   "Hold Duration": {
     "Hold Duration": "משך הלחיצה"
   },
-  "Hold longer to confirm": {
-    "Hold longer to confirm": "החזק/י לחוץ זמן רב יותר כדי לאשר"
-  },
   "Hold to Confirm Power Actions": {
     "Hold to Confirm Power Actions": "החזקה לאישור פעולות חשמל"
-  },
-  "Hold to confirm (%1 ms)": {
-    "Hold to confirm (%1 ms)": "החזק/י לחוץ לאישור (%1 מילישניות)"
-  },
-  "Hold to confirm (%1s)": {
-    "Hold to confirm (%1s)": "החזק/י לחוץ כדי לאשר (%1 שניות)"
-  },
-  "Home": {
-    "Home": "בית"
   },
   "Horizontal and vertical bar thickness": {
     "Horizontal and vertical bar thickness": "עובי סרגל אופקי ואנכי"
@@ -3862,6 +3835,24 @@
   },
   "Hotkey overlay title (optional)": {
     "Hotkey overlay title (optional)": "כותרת קיצור דרך שתופיע בשכבת הכיסוי (אופציונלי)"
+  },
+  "Hotspot": {
+    "Hotspot": ""
+  },
+  "Hotspot activation failed.": {
+    "Hotspot activation failed.": ""
+  },
+  "Hotspot name": {
+    "Hotspot name": ""
+  },
+  "Hotspot saved": {
+    "Hotspot saved": ""
+  },
+  "Hotspot started": {
+    "Hotspot started": ""
+  },
+  "Hotspot stopped": {
+    "Hotspot stopped": ""
   },
   "Hour": {
     "Hour": "שעה"
@@ -3919,6 +3910,9 @@
   },
   "IP address or hostname": {
     "IP address or hostname": "כתובת IP או שם מארח"
+  },
+  "IP sharing setup failed. Check that dnsmasq is installed.": {
+    "IP sharing setup failed. Check that dnsmasq is installed.": ""
   },
   "ISO Date": {
     "ISO Date": "תאריך ISO"
@@ -4123,9 +4117,6 @@
   },
   "Installation and PAM setup are documented in the ": {
     "Installation and PAM setup are documented in the ": ""
-  },
-  "Installation and PAM setup: see the ": {
-    "Installation and PAM setup: see the ": "להתקנה והגדרה של PAM: ראה/י את "
   },
   "Installed": {
     "Installed": "מותקן"
@@ -4448,9 +4439,6 @@
   "Locked": {
     "Locked": "נעול"
   },
-  "Log Out": {
-    "Log Out": "התנתקות"
-  },
   "Logging in...": {
     "Logging in...": "מתחבר..."
   },
@@ -4691,9 +4679,6 @@
   "Maximum pinned entries reached": {
     "Maximum pinned entries reached": "הושג מקסימום רשומות מוצמדות"
   },
-  "Media": {
-    "Media": "מדיה"
-  },
   "Media Controls": {
     "Media Controls": "פקדי מדיה"
   },
@@ -4799,9 +4784,6 @@
   "Model": {
     "Model": "דגם"
   },
-  "Modified": {
-    "Modified": "שונה"
-  },
   "Modular widget bar": {
     "Modular widget bar": "פס ווידג׳טים מודולרי"
   },
@@ -4853,9 +4835,6 @@
   "Move Widget": {
     "Move Widget": "הזזת הווידג׳ט"
   },
-  "Move to Trash": {
-    "Move to Trash": "העבר/י לאשפה"
-  },
   "Moving to Paused": {
     "Moving to Paused": "עובר להשהיה"
   },
@@ -4870,9 +4849,6 @@
   },
   "Multiplexers": {
     "Multiplexers": "מרבבי מסוף"
-  },
-  "Music": {
-    "Music": "מוסיקה"
   },
   "Music Player": {
     "Music Player": "נגן מוזיקה"
@@ -4901,9 +4877,6 @@
   "NM not supported": {
     "NM not supported": "NM אינו נתמך"
   },
-  "Name": {
-    "Name": "שם"
-  },
   "Named Workspace Icons": {
     "Named Workspace Icons": "סמלים לסביבות עבודה בעלות שם"
   },
@@ -4918,9 +4891,6 @@
   },
   "Navigate": {
     "Navigate": "ניווט"
-  },
-  "Navigation": {
-    "Navigation": "ניווט"
   },
   "Network": {
     "Network": "רשת"
@@ -5165,9 +5135,6 @@
   "No fingerprint reader detected": {
     "No fingerprint reader detected": ""
   },
-  "No fingerprint reader detected.": {
-    "No fingerprint reader detected.": "לא זוהה קורא טביעות אצבע."
-  },
   "No folders found": {
     "No folders found": "לא נמצאו תיקיות"
   },
@@ -5282,9 +5249,6 @@
   "No supported package manager found.": {
     "No supported package manager found.": "לא נמצא מנהל חבילות נתמך."
   },
-  "No terminal configured": {
-    "No terminal configured": "לא הוגדר מסוף"
-  },
   "No themes found": {
     "No themes found": "לא נמצאו ערכות נושא"
   },
@@ -5360,14 +5324,8 @@
   "Not available — install fprintd and pam_fprintd, or configure greetd PAM.": {
     "Not available — install fprintd and pam_fprintd, or configure greetd PAM.": "לא זמין — התקן/י את החבילות fprintd ו pam_fprintd, או הגדר/י את greetd PAM."
   },
-  "Not available — install fprintd and pam_fprintd.": {
-    "Not available — install fprintd and pam_fprintd.": "לא זמין — התקן/י את fprintd ו pam_fprintd."
-  },
   "Not available — install or configure pam_u2f, or configure greetd PAM.": {
     "Not available — install or configure pam_u2f, or configure greetd PAM.": "לא זמין — התקן/י או הגדר/י את pam_u2f, או לחלופין הגדר/י את greetd PAM."
-  },
-  "Not available — install or configure pam_u2f.": {
-    "Not available — install or configure pam_u2f.": "לא זמין — התקן/י או הגדר/י את pam_u2f."
   },
   "Not bound": {
     "Not bound": "לא מקושר"
@@ -5437,9 +5395,6 @@
   },
   "Now playing and media controls": {
     "Now playing and media controls": "מתנגן כעת ופקדי מדיה"
-  },
-  "Numbers": {
-    "Numbers": "מספרים"
   },
   "Numeric (D/M)": {
     "Numeric (D/M)": "מספרי (D/M)"
@@ -5555,6 +5510,9 @@
   "Open in terminal": {
     "Open in terminal": "פתח/י במסוף"
   },
+  "Open network": {
+    "Open network": ""
+  },
   "Open search bar to find text": {
     "Open search bar to find text": "פתח/י שורת חיפוש כדי למצוא טקסט"
   },
@@ -5582,6 +5540,9 @@
   "Opens the connected launcher in Connected Frame Mode.": {
     "Opens the connected launcher in Connected Frame Mode.": "פותח את המשגר המחובר במצב מסגרת מחוברת."
   },
+  "Optional": {
+    "Optional": ""
+  },
   "Optional description": {
     "Optional description": "תיאור אופציונלי"
   },
@@ -5590,6 +5551,9 @@
   },
   "Optional state-based conditions applied to the first match.": {
     "Optional state-based conditions applied to the first match.": "תנאים מבוססי מצב אופציונליים המוחלים על ההתאמה הראשונה."
+  },
+  "Optional; leave blank for open hotspot": {
+    "Optional; leave blank for open hotspot": ""
   },
   "Options": {
     "Options": "אפשרויות"
@@ -5671,9 +5635,6 @@
   },
   "Overview of your network connections": {
     "Overview of your network connections": "סקירה של חיבורי הרשת שלך"
-  },
-  "Overwrite": {
-    "Overwrite": "דריסה"
   },
   "Owner: %1": {
     "Owner: %1": "בעלים: %1"
@@ -5819,14 +5780,8 @@
   "Pick a different random video each time from the same folder": {
     "Pick a different random video each time from the same folder": "בחר/י סרטון וידאו אקראי שונה בכל פעם מאותה תיקייה"
   },
-  "Pick a terminal in Settings → Launcher (or set $TERMINAL).": {
-    "Pick a terminal in Settings → Launcher (or set $TERMINAL).": "בחר/י מסוף בהגדרות → משגר (או הגדר/י את $TERMINAL)."
-  },
   "Pick how long to pause notifications": {
     "Pick how long to pause notifications": "בחר/י כמה זמן להשהות התראות"
-  },
-  "Pictures": {
-    "Pictures": "תמונות"
   },
   "Pin": {
     "Pin": "הצמדה"
@@ -6001,12 +5956,6 @@
   },
   "Power Mode": {
     "Power Mode": "מצב צריכת חשמל"
-  },
-  "Power Off": {
-    "Power Off": "כיבוי"
-  },
-  "Power Options": {
-    "Power Options": "אפשרויות חשמל"
   },
   "Power Profile": {
     "Power Profile": "פרופיל חשמל"
@@ -6200,9 +6149,6 @@
   "Quality": {
     "Quality": "איכות"
   },
-  "Quick Access": {
-    "Quick Access": "גישה מהירה"
-  },
   "Quick access to application launcher": {
     "Quick access to application launcher": "גישה מהירה למשגר האפליקציות"
   },
@@ -6242,6 +6188,9 @@
   "Re-enter password": {
     "Re-enter password": "הזן/י סיסמה מחדש"
   },
+  "Re-enter the password before saving.": {
+    "Re-enter the password before saving.": ""
+  },
   "Reach local network devices while using an exit node": {
     "Reach local network devices while using an exit node": "אפשר/י גישה להתקני רשת מקומית בעת שימוש בנקודת יציאה (Exit node)"
   },
@@ -6251,11 +6200,11 @@
   "Read:": {
     "Read:": "קריאה:"
   },
+  "Ready": {
+    "Ready": ""
+  },
   "Reason": {
     "Reason": "סיבה"
-  },
-  "Reboot": {
-    "Reboot": "הפעלה מחדש"
   },
   "Recent": {
     "Recent": "אחרונים"
@@ -6298,6 +6247,9 @@
   },
   "Release": {
     "Release": "שחרור"
+  },
+  "Release to confirm": {
+    "Release to confirm": ""
   },
   "Reload From Disk": {
     "Reload From Disk": "טען/י מחדש מהדיסק"
@@ -6424,9 +6376,6 @@
   },
   "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys).": {
     "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys).": ""
-  },
-  "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys). Auth changes apply automatically and may open a terminal for sudo.": {
-    "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys). Auth changes apply automatically and may open a terminal for sudo.": "נדרשות החבילות greetd, dms-greeter (חובה) וכן הוספת המשתמש/ת שלך לקבוצת greeter (וכן fprintd/pam_fprintd להזדהות עם טביעת אצבע, pam_u2f למפתחות אבטחה). שינויי אימות מוחלים באופן אוטומטי ועשויים לפתוח מסוף לאימות עם sudo."
   },
   "Requires night mode support": {
     "Requires night mode support": "תמיכה במצב לילה נדרשת"
@@ -6569,6 +6518,9 @@
   "Run paru/yay with AUR enabled when 'Update All' is clicked.": {
     "Run paru/yay with AUR enabled when 'Update All' is clicked.": "הרץ/י את paru/yay עם גישה לAUR כאשר לוחצים על 'עדכן/י הכל'."
   },
+  "Running": {
+    "Running": ""
+  },
   "Running Apps": {
     "Running Apps": "אפליקציות פעילות"
   },
@@ -6593,11 +6545,14 @@
   "SMS sent successfully": {
     "SMS sent successfully": "הSMS נשלח בהצלחה"
   },
+  "SSID": {
+    "SSID": ""
+  },
   "Saturation": {
     "Saturation": "רוויה"
   },
-  "Save": {
-    "Save": "שמירה"
+  "Save & Start": {
+    "Save & Start": ""
   },
   "Save Notepad File": {
     "Save Notepad File": "שמור/י פתק כקובץ"
@@ -6719,9 +6674,6 @@
   "Search devices...": {
     "Search devices...": "חפש/י התקנים..."
   },
-  "Search for a location...": {
-    "Search for a location...": "חפש/י מיקום..."
-  },
   "Search installed plugins...": {
     "Search installed plugins...": "חפש/י תוספים מותקנים..."
   },
@@ -6745,9 +6697,6 @@
   },
   "Search widgets...": {
     "Search widgets...": "חפש/י ווידג׳טים..."
-  },
-  "Search...": {
-    "Search...": "חיפוש..."
   },
   "Searching...": {
     "Searching...": "מחפש..."
@@ -6778,9 +6727,6 @@
   },
   "Security-key availability could not be confirmed": {
     "Security-key availability could not be confirmed": ""
-  },
-  "Security-key availability could not be confirmed.": {
-    "Security-key availability could not be confirmed.": "לא ניתן היה לאמת את הזמינות של מפתח האבטחה."
   },
   "Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.": {
     "Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.": "זוהתה תמיכה במפתח אבטחה, אך לא נמצא מפתח רשום עדיין. ניתן להפעיל את ההזדהות כעת ולרשום מפתח מאוחר יותר."
@@ -6955,6 +6901,15 @@
   },
   "Set the percentage at which the battery is considered low.": {
     "Set the percentage at which the battery is considered low.": "הגדר/י את האחוז שבו הסוללה תיחשב כחלשה."
+  },
+  "Set up a WiFi hotspot for sharing this connection.": {
+    "Set up a WiFi hotspot for sharing this connection.": ""
+  },
+  "Set up hotspot": {
+    "Set up hotspot": ""
+  },
+  "Set up hotspot in Settings": {
+    "Set up hotspot in Settings": ""
   },
   "Setting": {
     "Setting": "הגדרה"
@@ -7349,9 +7304,6 @@
   "Single-Line Popup": {
     "Single-Line Popup": "חלון קופץ בשורה אחת"
   },
-  "Size": {
-    "Size": "גודל"
-  },
   "Size Constraints": {
     "Size Constraints": "מגבלות גודל"
   },
@@ -7393,9 +7345,6 @@
   },
   "Sort Alphabetically": {
     "Sort Alphabetically": "מיון לפי סדר אלפביתי"
-  },
-  "Sort By": {
-    "Sort By": "מיין/י לפי"
   },
   "Sort wallpapers": {
     "Sort wallpapers": "מיין/י תמונות רקע"
@@ -7463,17 +7412,29 @@
   "Start": {
     "Start": "התחל/י"
   },
+  "Start Hotspot?": {
+    "Start Hotspot?": ""
+  },
   "Start KDE Connect or Valent to use this plugin": {
     "Start KDE Connect or Valent to use this plugin": "הפעל/י KDE Connect או Valent כדי להשתמש בתוסף זה"
   },
   "Start typing your notes here...": {
     "Start typing your notes here...": "התחל/י להקליד את ההערות שלך כאן..."
   },
+  "Starting hotspot...": {
+    "Starting hotspot...": ""
+  },
+  "Starting the hotspot will disconnect WiFi from \"%1\" — the radio can't do both at once. Sharing internet then requires another connection, such as Ethernet.": {
+    "Starting the hotspot will disconnect WiFi from \"%1\" — the radio can't do both at once. Sharing internet then requires another connection, such as Ethernet.": ""
+  },
+  "Starting...": {
+    "Starting...": ""
+  },
   "State": {
     "State": "מצב"
   },
-  "Status": {
-    "Status": "מצב"
+  "Stop": {
+    "Stop": ""
   },
   "Stop ignoring %1": {
     "Stop ignoring %1": "הפסק/י להתעלם מ-%1"
@@ -7559,9 +7520,6 @@
   "Surfaces float independently of the frame": {
     "Surfaces float independently of the frame": "משטחים צפים באופן עצמאי מהמסגרת"
   },
-  "Suspend": {
-    "Suspend": "השהיה"
-  },
   "Suspend behavior": {
     "Suspend behavior": "התנהגות ההשהיה"
   },
@@ -7573,9 +7531,6 @@
   },
   "Sway Website": {
     "Sway Website": "האתר של Sway"
-  },
-  "Switch User": {
-    "Switch User": "החלף/י משתמש"
   },
   "Switch between display configurations": {
     "Switch between display configurations": "החלף/י בין הגדרות תצוגה"
@@ -7601,11 +7556,11 @@
   "Sync Position Across Screens": {
     "Sync Position Across Screens": "סנכרון המיקום בין מסכים"
   },
-  "Sync applies your theme and settings to the login screen. Other users should run dms greeter sync --profile instead of a full sync. Authentication changes apply automatically.": {
-    "Sync applies your theme and settings to the login screen. Other users should run dms greeter sync --profile instead of a full sync. Authentication changes apply automatically.": "סנכרון מחיל את ערכת הנושא וההגדרות שלך על מסך ההתחברות. משתמשים אחרים צריכים להריץ dms greeter sync --profile במקום סנכרון מלא. שינויי אימות מוחלים באופן אוטומטי."
-  },
   "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": {
     "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": ""
+  },
+  "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": {
+    "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": ""
   },
   "Sync completed successfully.": {
     "Sync completed successfully.": "הסנכרון הושלם בהצלחה."
@@ -7624,9 +7579,6 @@
   },
   "Syncing...": {
     "Syncing...": "מסנכרן..."
-  },
-  "System": {
-    "System": "מערכת"
   },
   "System App Theming": {
     "System App Theming": "ערכת נושא לאפליקציות מערכת"
@@ -7682,9 +7634,6 @@
   "Tab": {
     "Tab": "טאב"
   },
-  "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": {
-    "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": "Tab/Shift+Tab: ניווט • ←→↑↓: ניווט ברשת • Enter/Space: בחירה"
-  },
   "Tags": {
     "Tags": "תגיות"
   },
@@ -7714,6 +7663,9 @@
   },
   "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": {
     "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": "המעבר למסוף כגיבוי נכשל. התקן/י את אחד מיישומי המסוף הנתמכים או הרץ/י את הפקודה 'dms greeter sync' באופן ידני."
+  },
+  "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": {
+    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": ""
   },
   "Terminal fallback opened. Complete authentication there; it will close automatically when done.": {
     "Terminal fallback opened. Complete authentication there; it will close automatically when done.": "נפתח מסוף כגיבוי. השלם/י את האימות שם; הוא ייסגר אוטומטית בסיום."
@@ -7759,6 +7711,9 @@
   },
   "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": {
     "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "משתנה הסביבה DMS_SOCKET אינו מוגדר או שהsocket אינו זמין. ניהול תוספים אוטומטי דורש את DMS_SOCKET."
+  },
+  "The WiFi adapter could not start access point mode.": {
+    "The WiFi adapter could not start access point mode.": ""
   },
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
     "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "ההגדרות הבאות ישנו את הגדרות ה GTK וQt שלך. אם ברצונך לשמור על התצורות הנוכחיות, אנא גבה/י אותן (הקבצים הם: qt5ct.conf|qt6ct.conf וconfig/gtk-3.0|gtk-4.0./~)."
@@ -7831,6 +7786,9 @@
   },
   "This will delete all unpinned entries. %1 pinned entries will be kept.": {
     "This will delete all unpinned entries. %1 pinned entries will be kept.": "זה ימחק את כל הרשומות שלא מוצמדות. %1 רשומות מוצמדות יישמרו."
+  },
+  "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": {
+    "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": ""
   },
   "This will permanently delete all clipboard history.": {
     "This will permanently delete all clipboard history.": "פעולה זו תמחק לצמיתות את כל היסטוריית לוח ההעתקה."
@@ -8060,9 +8018,6 @@
   "Turn off now": {
     "Turn off now": "כבה/י עכשיו"
   },
-  "Type": {
-    "Type": "סוג"
-  },
   "Type at least 2 characters": {
     "Type at least 2 characters": "הקלד/י לפחות 2 תווים"
   },
@@ -8279,9 +8234,6 @@
   "Use a custom image for the login screen, or leave empty to use desktop wallpaper": {
     "Use a custom image for the login screen, or leave empty to use desktop wallpaper": ""
   },
-  "Use a custom image for the login screen, or leave empty to use your desktop wallpaper.": {
-    "Use a custom image for the login screen, or leave empty to use your desktop wallpaper.": "השתמש/י בתמונה מותאמת אישית למסך ההתחברות, או השאר/י ריק כדי להשתמש בתמונת הרקע של שולחן העבודה שלך."
-  },
   "Use a custom radius for goth corner cutouts": {
     "Use a custom radius for goth corner cutouts": "השתמש/י ברדיוס מותאם אישית לחיתוכי פינות גות'יות"
   },
@@ -8290,9 +8242,6 @@
   },
   "Use a security key for lock screen authentication": {
     "Use a security key for lock screen authentication": ""
-  },
-  "Use a security key for lock screen authentication.": {
-    "Use a security key for lock screen authentication.": "השתמש/י במפתח אבטחה לאימות מסך הנעילה."
   },
   "Use album art accent": {
     "Use album art accent": "שימוש בצבעים של עטיפת האלבום"
@@ -8323,9 +8272,6 @@
   },
   "Use fingerprint authentication for the lock screen": {
     "Use fingerprint authentication for the lock screen": ""
-  },
-  "Use fingerprint authentication for the lock screen.": {
-    "Use fingerprint authentication for the lock screen.": "השתמש/י באימות טביעת אצבע עבור מסך הנעילה."
   },
   "Use keys 1-3 or arrows, Enter/Space to select": {
     "Use keys 1-3 or arrows, Enter/Space to select": "השתמש/י במקשים 1-3 או בחצים, Enter/Space לבחירה"
@@ -8498,9 +8444,6 @@
   "Video Screensaver": {
     "Video Screensaver": "שומר מסך עם וידאו"
   },
-  "Videos": {
-    "Videos": "סרטונים"
-  },
   "View Mode": {
     "View Mode": "מצב תצוגה"
   },
@@ -8537,8 +8480,14 @@
   "W": {
     "W": "רוחב"
   },
+  "WCAG %1 body": {
+    "WCAG %1 body": ""
+  },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
+  },
+  "WPA2 password": {
+    "WPA2 password": ""
   },
   "Wallpaper": {
     "Wallpaper": "תמונת רקע"
@@ -8627,6 +8576,12 @@
   "WiFi enabled": {
     "WiFi enabled": "WiFi פעיל"
   },
+  "WiFi is disabled": {
+    "WiFi is disabled": ""
+  },
+  "WiFi is disabled. You can still edit and save hotspot settings, but starting the hotspot requires WiFi to be enabled.": {
+    "WiFi is disabled. You can still edit and save hotspot settings, but starting the hotspot requires WiFi to be enabled.": ""
+  },
   "WiFi is off": {
     "WiFi is off": "הWi-Fi כבוי"
   },
@@ -8684,6 +8639,9 @@
   "Width of window border and focus ring": {
     "Width of window border and focus ring": "רוחב מסגרת החלון וטבעת המיקוד"
   },
+  "Will disconnect \"%1": {
+    "Will disconnect \"%1\"": ""
+  },
   "Wind": {
     "Wind": "רוח"
   },
@@ -8716,9 +8674,6 @@
   },
   "Working...": {
     "Working...": "עובד..."
-  },
-  "Workspace": {
-    "Workspace": "סביבת עבודה"
   },
   "Workspace Index Numbers": {
     "Workspace Index Numbers": "מספרי אינדקס של סביבות העבודה"
@@ -8794,6 +8749,12 @@
   },
   "Your compositor does not support background blur (ext-background-effect-v1)": {
     "Your compositor does not support background blur (ext-background-effect-v1)": "הקומפוזיטור שלך אינו תומך בטשטוש רקע (ext-background-effect-v1)"
+  },
+  "Your hotspot is running.": {
+    "Your hotspot is running.": ""
+  },
+  "Your hotspot profile is saved and ready to start.": {
+    "Your hotspot profile is saved and ready to start.": ""
   },
   "Your system is up to date!": {
     "Your system is up to date!": "המערכת שלך מעודכנת!"
@@ -8968,9 +8929,6 @@
   },
   "on Sway": {
     "on Sway": "על Sway"
-  },
-  "or run ": {
-    "or run ": "או הרץ/י "
   },
   "power-profiles-daemon not available": {
     "power-profiles-daemon not available": "power-profiles-daemon אינו זמין"

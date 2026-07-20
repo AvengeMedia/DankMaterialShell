@@ -462,6 +462,13 @@
     "comment": ""
   },
   {
+    "term": "2.4 GHz",
+    "translation": "",
+    "context": "2.4 GHz",
+    "reference": "",
+    "comment": "hotspot WiFi band option"
+  },
+  {
     "term": "20 minutes",
     "translation": "",
     "context": "20 minutes",
@@ -609,6 +616,13 @@
     "comment": "wallpaper interval"
   },
   {
+    "term": "5 GHz",
+    "translation": "",
+    "context": "5 GHz",
+    "reference": "",
+    "comment": "hotspot WiFi band option"
+  },
+  {
     "term": "5 min before",
     "translation": "",
     "context": "5 min before",
@@ -703,13 +717,6 @@
     "term": "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>",
     "translation": "",
     "context": "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "A file with this name already exists. Do you want to overwrite it?",
-    "translation": "",
-    "context": "A file with this name already exists. Do you want to overwrite it?",
     "reference": "",
     "comment": ""
   },
@@ -882,6 +889,13 @@
     "comment": ""
   },
   {
+    "term": "Activates immediately",
+    "translation": "",
+    "context": "Activates immediately",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Activation",
     "translation": "",
     "context": "Activation",
@@ -973,9 +987,9 @@
     "comment": ""
   },
   {
-    "term": "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.",
+    "term": "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.",
     "translation": "",
-    "context": "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.",
+    "context": "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.",
     "reference": "",
     "comment": ""
   },
@@ -1092,9 +1106,9 @@
     "comment": ""
   },
   {
-    "term": "Add the new user to the %1 group so they can run dms greeter sync --profile.",
+    "term": "Add the new user to the %1 group so they can run dms-greeter sync --profile.",
     "translation": "",
-    "context": "Add the new user to the %1 group so they can run dms greeter sync --profile.",
+    "context": "Add the new user to the %1 group so they can run dms-greeter sync --profile.",
     "reference": "",
     "comment": ""
   },
@@ -1256,13 +1270,6 @@
     "term": "Also group repeated application icons on the active workspace",
     "translation": "",
     "context": "Also group repeated application icons on the active workspace",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close",
-    "translation": "",
-    "context": "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close",
     "reference": "",
     "comment": ""
   },
@@ -1524,6 +1531,13 @@
     "context": "Applications and commands to start automatically when you log in",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Applies on the next greeter sync",
+    "translation": "",
+    "context": "Applies on the next greeter sync",
+    "reference": "",
+    "comment": "greeter auth setting description"
   },
   {
     "term": "Apply Changes",
@@ -1799,20 +1813,6 @@
     "comment": ""
   },
   {
-    "term": "Authenticated!",
-    "translation": "",
-    "context": "Authenticated!",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Authenticating...",
-    "translation": "",
-    "context": "Authenticating...",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Authentication",
     "translation": "",
     "context": "Authentication",
@@ -1845,7 +1845,7 @@
     "translation": "",
     "context": "Authentication changes apply automatically",
     "reference": "",
-    "comment": "greeter auth setting description"
+    "comment": ""
   },
   {
     "term": "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.",
@@ -1858,20 +1858,6 @@
     "term": "Authentication error - try again",
     "translation": "",
     "context": "Authentication error - try again",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Authentication failed - attempt %1 of %2",
-    "translation": "",
-    "context": "Authentication failed - attempt %1 of %2",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Authentication failed - lockout can occur",
-    "translation": "",
-    "context": "Authentication failed - lockout can occur",
     "reference": "",
     "comment": ""
   },
@@ -1908,7 +1894,7 @@
     "translation": "",
     "context": "Auto",
     "reference": "",
-    "comment": "automatic PAM authentication source option | calendar backend option | theme category option"
+    "comment": "automatic PAM authentication source option | calendar backend option | hotspot device or band option | theme category option"
   },
   {
     "term": "Auto (Bar-aware)",
@@ -2026,13 +2012,6 @@
     "term": "Auto-hide Dock",
     "translation": "",
     "context": "Auto-hide Dock",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Auto-login",
-    "translation": "",
-    "context": "Auto-login",
     "reference": "",
     "comment": ""
   },
@@ -2268,27 +2247,6 @@
     "comment": ""
   },
   {
-    "term": "Awaiting fingerprint authentication",
-    "translation": "",
-    "context": "Awaiting fingerprint authentication",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Awaiting fingerprint or security key authentication",
-    "translation": "",
-    "context": "Awaiting fingerprint or security key authentication",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Awaiting security key authentication",
-    "translation": "",
-    "context": "Awaiting security key authentication",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "BSSID",
     "translation": "",
     "context": "BSSID",
@@ -2301,13 +2259,6 @@
     "context": "Back",
     "reference": "",
     "comment": "greeter back button"
-  },
-  {
-    "term": "Back to user list",
-    "translation": "",
-    "context": "Back to user list",
-    "reference": "",
-    "comment": "greeter link to return from manual username entry to user picker"
   },
   {
     "term": "Backend",
@@ -2392,6 +2343,13 @@
     "context": "Balanced palette with focused accents (default).",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Band",
+    "translation": "",
+    "context": "Band",
+    "reference": "",
+    "comment": "hotspot WiFi band field label"
   },
   {
     "term": "Bar",
@@ -2989,6 +2947,13 @@
     "comment": ""
   },
   {
+    "term": "Calls / Headset",
+    "translation": "",
+    "context": "Calls / Headset",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Camera",
     "translation": "",
     "context": "Camera",
@@ -3000,7 +2965,7 @@
     "translation": "",
     "context": "Cancel",
     "reference": "",
-    "comment": ""
+    "comment": "cancel hotspot editing action"
   },
   {
     "term": "Cancel all jobs for \"%1\"?",
@@ -3339,13 +3304,6 @@
     "comment": ""
   },
   {
-    "term": "Choose icon",
-    "translation": "",
-    "context": "Choose icon",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Choose monochrome or a theme color tint for system tray icons",
     "translation": "",
     "context": "Choose monochrome or a theme color tint for system tray icons",
@@ -3668,9 +3626,23 @@
     "comment": ""
   },
   {
-    "term": "Codec switching is unavailable because pactl was not found",
+    "term": "Codec switched successfully",
     "translation": "",
-    "context": "Codec switching is unavailable because pactl was not found",
+    "context": "Codec switched successfully",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Codec switching is unavailable because WirePlumber was not found",
+    "translation": "",
+    "context": "Codec switching is unavailable because WirePlumber was not found",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Codec switching is unavailable. WirePlumber wpexec was not found.",
+    "translation": "",
+    "context": "Codec switching is unavailable. WirePlumber wpexec was not found.",
     "reference": "",
     "comment": ""
   },
@@ -3853,13 +3825,6 @@
     "term": "Commands",
     "translation": "",
     "context": "Commands",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Communication",
-    "translation": "",
-    "context": "Communication",
     "reference": "",
     "comment": ""
   },
@@ -4415,6 +4380,13 @@
     "context": "Corners & Background",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Couldn't load hotspot password",
+    "translation": "",
+    "context": "Couldn't load hotspot password",
+    "reference": "",
+    "comment": "hotspot password error title"
   },
   {
     "term": "Count Only",
@@ -5376,13 +5348,6 @@
     "comment": ""
   },
   {
-    "term": "Desktop",
-    "translation": "",
-    "context": "Desktop",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Desktop Application",
     "translation": "",
     "context": "Desktop Application",
@@ -5457,7 +5422,7 @@
     "translation": "",
     "context": "Device",
     "reference": "",
-    "comment": ""
+    "comment": "hotspot WiFi device field label"
   },
   {
     "term": "Device connections",
@@ -5936,13 +5901,6 @@
     "comment": ""
   },
   {
-    "term": "Downloads",
-    "translation": "",
-    "context": "Downloads",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Drag a widget by its handle here to reorder it or drop it into another group",
     "translation": "",
     "context": "Drag a widget by its handle here to reorder it or drop it into another group",
@@ -6143,7 +6101,7 @@
     "translation": "",
     "context": "Edit",
     "reference": "",
-    "comment": ""
+    "comment": "edit hotspot action"
   },
   {
     "term": "Edit App",
@@ -6305,6 +6263,13 @@
     "context": "Enable WiFi",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Enable WiFi before starting the hotspot.",
+    "translation": "",
+    "context": "Enable WiFi before starting the hotspot.",
+    "reference": "",
+    "comment": "hotspot WiFi requirement message"
   },
   {
     "term": "Enable a custom override below to set per-bar shadow intensity, opacity, and color.",
@@ -6480,13 +6445,6 @@
     "context": "Enter device name...",
     "reference": "",
     "comment": "Audio device rename dialog placeholder"
-  },
-  {
-    "term": "Enter filename...",
-    "translation": "",
-    "context": "Enter filename...",
-    "reference": "",
-    "comment": ""
   },
   {
     "term": "Enter launch prefix (e.g., 'uwsm-app')",
@@ -6741,13 +6699,6 @@
     "comment": "font weight"
   },
   {
-    "term": "F1/I: Toggle • F10: Help",
-    "translation": "",
-    "context": "F1/I: Toggle • F10: Help",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Fade",
     "translation": "",
     "context": "Fade",
@@ -6844,6 +6795,13 @@
     "context": "Failed to check pin limit",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Failed to configure hotspot",
+    "translation": "",
+    "context": "Failed to configure hotspot",
+    "reference": "",
+    "comment": "hotspot configuration error title"
   },
   {
     "term": "Failed to connect VPN",
@@ -7140,9 +7098,9 @@
     "comment": "Phone Connect error"
   },
   {
-    "term": "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.",
+    "term": "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.",
     "translation": "",
-    "context": "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.",
+    "context": "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.",
     "reference": "",
     "comment": "greeter status error"
   },
@@ -7269,6 +7227,27 @@
     "term": "Failed to start connection to %1",
     "translation": "",
     "context": "Failed to start connection to %1",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Failed to start hotspot",
+    "translation": "",
+    "context": "Failed to start hotspot",
+    "reference": "",
+    "comment": "hotspot start error title"
+  },
+  {
+    "term": "Failed to stop hotspot",
+    "translation": "",
+    "context": "Failed to stop hotspot",
+    "reference": "",
+    "comment": "hotspot stop error title"
+  },
+  {
+    "term": "Failed to switch codec",
+    "translation": "",
+    "context": "Failed to switch codec",
     "reference": "",
     "comment": ""
   },
@@ -7404,20 +7383,6 @@
     "context": "File",
     "reference": "",
     "comment": "KDE Connect send file button"
-  },
-  {
-    "term": "File Already Exists",
-    "translation": "",
-    "context": "File Already Exists",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "File Information",
-    "translation": "",
-    "context": "File Information",
-    "reference": "",
-    "comment": ""
   },
   {
     "term": "File Manager",
@@ -8169,13 +8134,6 @@
     "comment": "battery status"
   },
   {
-    "term": "Fun",
-    "translation": "",
-    "context": "Fun",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "G: grid • Z/X: size",
     "translation": "",
     "context": "G: grid • Z/X: size",
@@ -8428,9 +8386,9 @@
     "comment": ""
   },
   {
-    "term": "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.",
+    "term": "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.",
     "translation": "",
-    "context": "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.",
+    "context": "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.",
     "reference": "",
     "comment": ""
   },
@@ -8925,13 +8883,6 @@
     "comment": ""
   },
   {
-    "term": "Home",
-    "translation": "",
-    "context": "Home",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Horizontal and vertical bar thickness",
     "translation": "",
     "context": "Horizontal and vertical bar thickness",
@@ -8965,6 +8916,48 @@
     "context": "Hotkey overlay title (optional)",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Hotspot",
+    "translation": "",
+    "context": "Hotspot",
+    "reference": "",
+    "comment": "hotspot control label | hotspot settings card title"
+  },
+  {
+    "term": "Hotspot activation failed.",
+    "translation": "",
+    "context": "Hotspot activation failed.",
+    "reference": "",
+    "comment": "generic hotspot activation failure message"
+  },
+  {
+    "term": "Hotspot name",
+    "translation": "",
+    "context": "Hotspot name",
+    "reference": "",
+    "comment": "hotspot SSID field label"
+  },
+  {
+    "term": "Hotspot saved",
+    "translation": "",
+    "context": "Hotspot saved",
+    "reference": "",
+    "comment": "hotspot configuration success message"
+  },
+  {
+    "term": "Hotspot started",
+    "translation": "",
+    "context": "Hotspot started",
+    "reference": "",
+    "comment": "hotspot start success message"
+  },
+  {
+    "term": "Hotspot stopped",
+    "translation": "",
+    "context": "Hotspot stopped",
+    "reference": "",
+    "comment": "hotspot stop success message"
   },
   {
     "term": "Hour",
@@ -9098,6 +9091,13 @@
     "context": "IP address or hostname",
     "reference": "",
     "comment": "Placeholder text for manual printer address input"
+  },
+  {
+    "term": "IP sharing setup failed. Check that dnsmasq is installed.",
+    "translation": "",
+    "context": "IP sharing setup failed. Check that dnsmasq is installed.",
+    "reference": "",
+    "comment": "hotspot IP configuration failure message"
   },
   {
     "term": "ISO Date",
@@ -9674,13 +9674,6 @@
     "comment": ""
   },
   {
-    "term": "Invalid password for %1",
-    "translation": "",
-    "context": "Invalid password for %1",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Invalid username",
     "translation": "",
     "context": "Invalid username",
@@ -10231,7 +10224,7 @@
     "translation": "",
     "context": "Loading...",
     "reference": "",
-    "comment": ""
+    "comment": "hotspot password loading status"
   },
   {
     "term": "Local",
@@ -10328,13 +10321,6 @@
     "term": "Log Out",
     "translation": "",
     "context": "Log Out",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Logging in...",
-    "translation": "",
-    "context": "Logging in...",
     "reference": "",
     "comment": ""
   },
@@ -11263,13 +11249,6 @@
     "comment": ""
   },
   {
-    "term": "Move to Trash",
-    "translation": "",
-    "context": "Move to Trash",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Moving to Paused",
     "translation": "",
     "context": "Moving to Paused",
@@ -11301,13 +11280,6 @@
     "term": "Multiplexers",
     "translation": "",
     "context": "Multiplexers",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Music",
-    "translation": "",
-    "context": "Music",
     "reference": "",
     "comment": ""
   },
@@ -11417,13 +11389,6 @@
     "comment": ""
   },
   {
-    "term": "Navigation",
-    "translation": "",
-    "context": "Navigation",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Network",
     "translation": "",
     "context": "Network",
@@ -11476,13 +11441,6 @@
     "term": "Network download and upload speed display",
     "translation": "",
     "context": "Network download and upload speed display",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Network not found",
-    "translation": "",
-    "context": "Network not found",
     "reference": "",
     "comment": ""
   },
@@ -12467,13 +12425,6 @@
     "comment": ""
   },
   {
-    "term": "Not listed?",
-    "translation": "",
-    "context": "Not listed?",
-    "reference": "",
-    "comment": "greeter link to switch to manual username entry"
-  },
-  {
     "term": "Not paired",
     "translation": "",
     "context": "Not paired",
@@ -12603,13 +12554,6 @@
     "term": "Now playing and media controls",
     "translation": "",
     "context": "Now playing and media controls",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Numbers",
-    "translation": "",
-    "context": "Numbers",
     "reference": "",
     "comment": ""
   },
@@ -12887,6 +12831,13 @@
     "comment": ""
   },
   {
+    "term": "Open network",
+    "translation": "",
+    "context": "Open network",
+    "reference": "",
+    "comment": "hotspot security summary"
+  },
+  {
     "term": "Open search bar to find text",
     "translation": "",
     "context": "Open search bar to find text",
@@ -12950,6 +12901,13 @@
     "comment": ""
   },
   {
+    "term": "Optional",
+    "translation": "",
+    "context": "Optional",
+    "reference": "",
+    "comment": "hotspot WiFi band field description | hotspot WiFi device field description"
+  },
+  {
     "term": "Optional description",
     "translation": "",
     "context": "Optional description",
@@ -12969,6 +12927,13 @@
     "context": "Optional state-based conditions applied to the first match.",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Optional; leave blank for open hotspot",
+    "translation": "",
+    "context": "Optional; leave blank for open hotspot",
+    "reference": "",
+    "comment": "hotspot password field placeholder"
   },
   {
     "term": "Options",
@@ -13160,13 +13125,6 @@
     "comment": ""
   },
   {
-    "term": "Overwrite",
-    "translation": "",
-    "context": "Overwrite",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Owner: %1",
     "translation": "",
     "context": "Owner: %1",
@@ -13304,7 +13262,7 @@
     "translation": "",
     "context": "Password",
     "reference": "",
-    "comment": ""
+    "comment": "hotspot password field label"
   },
   {
     "term": "Password cannot be empty",
@@ -13331,13 +13289,6 @@
     "term": "Password updated",
     "translation": "",
     "context": "Password updated",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Password...",
-    "translation": "",
-    "context": "Password...",
     "reference": "",
     "comment": ""
   },
@@ -13506,13 +13457,6 @@
     "term": "Pick how long to pause notifications",
     "translation": "",
     "context": "Pick how long to pause notifications",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Pictures",
-    "translation": "",
-    "context": "Pictures",
     "reference": "",
     "comment": ""
   },
@@ -13926,13 +13870,6 @@
     "term": "Power Off",
     "translation": "",
     "context": "Power Off",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Power Options",
-    "translation": "",
-    "context": "Power Options",
     "reference": "",
     "comment": ""
   },
@@ -14392,13 +14329,6 @@
     "comment": ""
   },
   {
-    "term": "Quick Access",
-    "translation": "",
-    "context": "Quick Access",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Quick access to application launcher",
     "translation": "",
     "context": "Quick access to application launcher",
@@ -14490,6 +14420,13 @@
     "comment": ""
   },
   {
+    "term": "Re-enter the password before saving.",
+    "translation": "",
+    "context": "Re-enter the password before saving.",
+    "reference": "",
+    "comment": "hotspot password recovery message"
+  },
+  {
     "term": "Reach local network devices while using an exit node",
     "translation": "",
     "context": "Reach local network devices while using an exit node",
@@ -14509,6 +14446,13 @@
     "context": "Read:",
     "reference": "",
     "comment": "disk read label"
+  },
+  {
+    "term": "Ready",
+    "translation": "",
+    "context": "Ready",
+    "reference": "",
+    "comment": "hotspot ready status"
   },
   {
     "term": "Reason",
@@ -14619,6 +14563,13 @@
     "term": "Release",
     "translation": "",
     "context": "Release",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Release to confirm",
+    "translation": "",
+    "context": "Release to confirm",
     "reference": "",
     "comment": ""
   },
@@ -15246,6 +15197,13 @@
     "comment": ""
   },
   {
+    "term": "Running",
+    "translation": "",
+    "context": "Running",
+    "reference": "",
+    "comment": "hotspot active status"
+  },
+  {
     "term": "Running Apps",
     "translation": "",
     "context": "Running Apps",
@@ -15302,6 +15260,13 @@
     "comment": "Phone Connect SMS action"
   },
   {
+    "term": "SSID",
+    "translation": "",
+    "context": "SSID",
+    "reference": "",
+    "comment": "hotspot network name placeholder"
+  },
+  {
     "term": "Saturation",
     "translation": "",
     "context": "Saturation",
@@ -15313,7 +15278,14 @@
     "translation": "",
     "context": "Save",
     "reference": "",
-    "comment": ""
+    "comment": "save hotspot configuration action"
+  },
+  {
+    "term": "Save & Start",
+    "translation": "",
+    "context": "Save & Start",
+    "reference": "",
+    "comment": "save and start hotspot action"
   },
   {
     "term": "Save Notepad File",
@@ -15432,7 +15404,7 @@
     "translation": "",
     "context": "Saving...",
     "reference": "",
-    "comment": ""
+    "comment": "hotspot configuration saving status"
   },
   {
     "term": "Scale",
@@ -15594,13 +15566,6 @@
     "context": "Search devices...",
     "reference": "",
     "comment": "Tailscale device search placeholder"
-  },
-  {
-    "term": "Search for a location...",
-    "translation": "",
-    "context": "Search for a location...",
-    "reference": "",
-    "comment": ""
   },
   {
     "term": "Search installed plugins...",
@@ -15953,13 +15918,6 @@
     "comment": ""
   },
   {
-    "term": "Select user...",
-    "translation": "",
-    "context": "Select user...",
-    "reference": "",
-    "comment": "greeter user picker placeholder"
-  },
-  {
     "term": "Select which keybind providers to include",
     "translation": "",
     "context": "Select which keybind providers to include",
@@ -16142,6 +16100,27 @@
     "comment": ""
   },
   {
+    "term": "Set up a WiFi hotspot for sharing this connection.",
+    "translation": "",
+    "context": "Set up a WiFi hotspot for sharing this connection.",
+    "reference": "",
+    "comment": "unconfigured hotspot description"
+  },
+  {
+    "term": "Set up hotspot",
+    "translation": "",
+    "context": "Set up hotspot",
+    "reference": "",
+    "comment": "hotspot setup action label"
+  },
+  {
+    "term": "Set up hotspot in Settings",
+    "translation": "",
+    "context": "Set up hotspot in Settings",
+    "reference": "",
+    "comment": "unconfigured hotspot status message"
+  },
+  {
     "term": "Setting",
     "translation": "",
     "context": "Setting",
@@ -16181,7 +16160,7 @@
     "translation": "",
     "context": "Setup",
     "reference": "",
-    "comment": ""
+    "comment": "hotspot setup action"
   },
   {
     "term": "Shadow Color",
@@ -17322,7 +17301,14 @@
     "translation": "",
     "context": "Start",
     "reference": "",
-    "comment": ""
+    "comment": "hotspot start confirmation action | start hotspot action"
+  },
+  {
+    "term": "Start Hotspot?",
+    "translation": "",
+    "context": "Start Hotspot?",
+    "reference": "",
+    "comment": "hotspot start confirmation title"
   },
   {
     "term": "Start KDE Connect or Valent to use this plugin",
@@ -17339,6 +17325,27 @@
     "comment": ""
   },
   {
+    "term": "Starting hotspot...",
+    "translation": "",
+    "context": "Starting hotspot...",
+    "reference": "",
+    "comment": "hotspot activation status message"
+  },
+  {
+    "term": "Starting the hotspot will disconnect WiFi from \"%1\" — the radio can't do both at once. Sharing internet then requires another connection, such as Ethernet.",
+    "translation": "",
+    "context": "Starting the hotspot will disconnect WiFi from \"%1\" — the radio can't do both at once. Sharing internet then requires another connection, such as Ethernet.",
+    "reference": "",
+    "comment": "hotspot WiFi disconnection warning"
+  },
+  {
+    "term": "Starting...",
+    "translation": "",
+    "context": "Starting...",
+    "reference": "",
+    "comment": "hotspot activation status"
+  },
+  {
     "term": "State",
     "translation": "",
     "context": "State",
@@ -17351,6 +17358,13 @@
     "context": "Status",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Stop",
+    "translation": "",
+    "context": "Stop",
+    "reference": "",
+    "comment": "stop hotspot action"
   },
   {
     "term": "Stop ignoring %1",
@@ -17647,9 +17661,9 @@
     "comment": ""
   },
   {
-    "term": "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.",
+    "term": "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.",
     "translation": "",
-    "context": "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.",
+    "context": "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.",
     "reference": "",
     "comment": ""
   },
@@ -17829,13 +17843,6 @@
     "comment": ""
   },
   {
-    "term": "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select",
-    "translation": "",
-    "context": "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Tags",
     "translation": "",
     "context": "Tags",
@@ -17899,9 +17906,9 @@
     "comment": ""
   },
   {
-    "term": "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.",
+    "term": "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.",
     "translation": "",
-    "context": "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.",
+    "context": "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.",
     "reference": "",
     "comment": ""
   },
@@ -18009,6 +18016,13 @@
     "context": "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "The WiFi adapter could not start access point mode.",
+    "translation": "",
+    "context": "The WiFi adapter could not start access point mode.",
+    "reference": "",
+    "comment": "hotspot adapter failure message"
   },
   {
     "term": "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).",
@@ -18177,6 +18191,13 @@
     "context": "This will delete all unpinned entries. %1 pinned entries will be kept.",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.",
+    "translation": "",
+    "context": "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.",
+    "reference": "",
+    "comment": "hotspot WiFi disconnection confirmation message"
   },
   {
     "term": "This will permanently delete all clipboard history.",
@@ -18476,13 +18497,6 @@
     "term": "Too many attempts - locked out",
     "translation": "",
     "context": "Too many attempts - locked out",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Too many failed attempts - account may be locked",
-    "translation": "",
-    "context": "Too many failed attempts - account may be locked",
     "reference": "",
     "comment": ""
   },
@@ -18809,23 +18823,9 @@
     "comment": "uninstall action button"
   },
   {
-    "term": "Uninstall Greeter",
-    "translation": "",
-    "context": "Uninstall Greeter",
-    "reference": "",
-    "comment": "greeter action confirmation"
-  },
-  {
     "term": "Uninstall Plugin",
     "translation": "",
     "context": "Uninstall Plugin",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Uninstall complete. Greeter has been removed.",
-    "translation": "",
-    "context": "Uninstall complete. Greeter has been removed.",
     "reference": "",
     "comment": ""
   },
@@ -18835,13 +18835,6 @@
     "context": "Uninstall failed: %1",
     "reference": "",
     "comment": "uninstallation error"
-  },
-  {
-    "term": "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.",
-    "translation": "",
-    "context": "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.",
-    "reference": "",
-    "comment": ""
   },
   {
     "term": "Uninstalled: %1",
@@ -19474,13 +19467,6 @@
     "comment": ""
   },
   {
-    "term": "Username...",
-    "translation": "",
-    "context": "Username...",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Users",
     "translation": "",
     "context": "Users",
@@ -19712,13 +19698,6 @@
     "comment": ""
   },
   {
-    "term": "Videos",
-    "translation": "",
-    "context": "Videos",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "View Mode",
     "translation": "",
     "context": "View Mode",
@@ -19803,11 +19782,25 @@
     "comment": ""
   },
   {
+    "term": "WCAG %1 body",
+    "translation": "",
+    "context": "WCAG %1 body",
+    "reference": "",
+    "comment": "contrast badge when only body text passes"
+  },
+  {
     "term": "WPA/WPA2",
     "translation": "",
     "context": "WPA/WPA2",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "WPA2 password",
+    "translation": "",
+    "context": "WPA2 password",
+    "reference": "",
+    "comment": "hotspot security summary"
   },
   {
     "term": "Wallpaper",
@@ -20003,7 +19996,7 @@
     "translation": "",
     "context": "WiFi disabled",
     "reference": "",
-    "comment": ""
+    "comment": "hotspot unavailable status"
   },
   {
     "term": "WiFi enabled",
@@ -20011,6 +20004,20 @@
     "context": "WiFi enabled",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "WiFi is disabled",
+    "translation": "",
+    "context": "WiFi is disabled",
+    "reference": "",
+    "comment": "hotspot start error title"
+  },
+  {
+    "term": "WiFi is disabled. You can still edit and save hotspot settings, but starting the hotspot requires WiFi to be enabled.",
+    "translation": "",
+    "context": "WiFi is disabled. You can still edit and save hotspot settings, but starting the hotspot requires WiFi to be enabled.",
+    "reference": "",
+    "comment": "hotspot WiFi requirement explanation"
   },
   {
     "term": "WiFi is off",
@@ -20144,6 +20151,13 @@
     "context": "Width of window border and focus ring",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Will disconnect \"%1\"",
+    "translation": "",
+    "context": "Will disconnect \"%1\"",
+    "reference": "",
+    "comment": "hotspot WiFi disconnection warning"
   },
   {
     "term": "Wind",
@@ -20403,6 +20417,20 @@
     "context": "Your compositor does not support background blur (ext-background-effect-v1)",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Your hotspot is running.",
+    "translation": "",
+    "context": "Your hotspot is running.",
+    "reference": "",
+    "comment": "hotspot active status message"
+  },
+  {
+    "term": "Your hotspot profile is saved and ready to start.",
+    "translation": "",
+    "context": "Your hotspot profile is saved and ready to start.",
+    "reference": "",
+    "comment": "configured hotspot status message"
   },
   {
     "term": "Your system is up to date!",

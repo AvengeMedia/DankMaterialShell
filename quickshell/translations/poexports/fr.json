@@ -197,6 +197,9 @@
   "2 seconds": {
     "2 seconds": "2 secondes"
   },
+  "2.4 GHz": {
+    "2.4 GHz": ""
+  },
   "20 minutes": {
     "20 minutes": "20 minutes"
   },
@@ -260,6 +263,9 @@
   "45 seconds": {
     "45 seconds": "45 secondes"
   },
+  "5 GHz": {
+    "5 GHz": ""
+  },
   "5 min before": {
     "5 min before": ""
   },
@@ -301,9 +307,6 @@
   },
   "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>": {
     "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>": ""
-  },
-  "A file with this name already exists. Do you want to overwrite it?": {
-    "A file with this name already exists. Do you want to overwrite it?": "Un fichier portant ce nom existe déjà. Voulez-vous le remplacer ?"
   },
   "A modern desktop shell for Wayland compositors": {
     "A modern desktop shell for Wayland compositors": "Un environnement de bureau moderne pour les compositeurs Wayland"
@@ -365,9 +368,6 @@
   "Action performed when scrolling vertically on the bar": {
     "Action performed when scrolling vertically on the bar": ""
   },
-  "Actions": {
-    "Actions": "Actions"
-  },
   "Activate": {
     "Activate": "Activer"
   },
@@ -376,6 +376,9 @@
   },
   "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": {
     "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": "Activer le greeter DMS ? Un terminal va s'ouvrir pour l'authentification sudo. Exécutez la Synchro après l'activation pour appliquer vos paramètres."
+  },
+  "Activates immediately": {
+    "Activates immediately": ""
   },
   "Activation": {
     "Activation": "Activation"
@@ -418,6 +421,9 @@
   },
   "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": {
     "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": ""
+  },
+  "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": {
+    "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": ""
   },
   "Add Bar": {
     "Add Bar": "Ajouter une barre"
@@ -469,6 +475,9 @@
   },
   "Add the new user to the %1 group so they can run dms greeter sync --profile.": {
     "Add the new user to the %1 group so they can run dms greeter sync --profile.": ""
+  },
+  "Add the new user to the %1 group so they can run dms-greeter sync --profile.": {
+    "Add the new user to the %1 group so they can run dms-greeter sync --profile.": ""
   },
   "Add the new user to the %1 group so they can use sudo.": {
     "Add the new user to the %1 group so they can use sudo.": ""
@@ -538,9 +547,6 @@
   },
   "Also group repeated application icons on the active workspace": {
     "Also group repeated application icons on the active workspace": ""
-  },
-  "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close": {
-    "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close": "Alt+←/Retour arrière : Retour • F1/I : Infos fichier • F10 : Aide • Échap : Fermer"
   },
   "Alternative (OR)": {
     "Alternative (OR)": "Alternatif (OR)"
@@ -652,6 +658,9 @@
   },
   "Applications and commands to start automatically when you log in": {
     "Applications and commands to start automatically when you log in": ""
+  },
+  "Applies on the next greeter sync": {
+    "Applies on the next greeter sync": ""
   },
   "Apply Changes": {
     "Apply Changes": "Appliquer les modifications"
@@ -788,14 +797,8 @@
   "Authentication changes applied": {
     "Authentication changes applied": ""
   },
-  "Authentication changes applied.": {
-    "Authentication changes applied.": ""
-  },
   "Authentication changes apply automatically": {
     "Authentication changes apply automatically": ""
-  },
-  "Authentication changes apply automatically.": {
-    "Authentication changes apply automatically.": ""
   },
   "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": {
     "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": ""
@@ -1030,6 +1033,9 @@
   },
   "Balanced palette with focused accents (default).": {
     "Balanced palette with focused accents (default).": "Palette équilibrée avec des accents ciblés (par défaut)."
+  },
+  "Band": {
+    "Band": ""
   },
   "Bar": {
     "Bar": ""
@@ -1286,11 +1292,11 @@
   "Calendar Backend": {
     "Calendar Backend": ""
   },
+  "Calls / Headset": {
+    "Calls / Headset": ""
+  },
   "Camera": {
     "Camera": "Caméra"
-  },
-  "Cancel": {
-    "Cancel": "Annuler"
   },
   "Cancel all jobs for \"%1\"?": {
     "Cancel all jobs for \"%1\"?": "Annuler tous les jobs pour \"%1\" ?"
@@ -1436,9 +1442,6 @@
   "Choose how to be notified when charge limit is reached.": {
     "Choose how to be notified when charge limit is reached.": ""
   },
-  "Choose icon": {
-    "Choose icon": "Choisir une icône"
-  },
   "Choose monochrome or a theme color tint for system tray icons": {
     "Choose monochrome or a theme color tint for system tray icons": ""
   },
@@ -1577,8 +1580,17 @@
   "Close Window": {
     "Close Window": "Fermer la fenêtre"
   },
+  "Codec switched successfully": {
+    "Codec switched successfully": ""
+  },
+  "Codec switching is unavailable because WirePlumber was not found": {
+    "Codec switching is unavailable because WirePlumber was not found": ""
+  },
   "Codec switching is unavailable because pactl was not found": {
     "Codec switching is unavailable because pactl was not found": ""
+  },
+  "Codec switching is unavailable. WirePlumber wpexec was not found.": {
+    "Codec switching is unavailable. WirePlumber wpexec was not found.": ""
   },
   "Color": {
     "Color": "Couleur"
@@ -1657,9 +1669,6 @@
   },
   "Commands": {
     "Commands": "Commandes"
-  },
-  "Communication": {
-    "Communication": "Communication"
   },
   "Community themes": {
     "Community themes": "Thèmes de la communauté"
@@ -1844,9 +1853,6 @@
   "Convenience options for the login screen": {
     "Convenience options for the login screen": ""
   },
-  "Convenience options for the login screen. Sync to apply.": {
-    "Convenience options for the login screen. Sync to apply.": ""
-  },
   "Convert to DMS": {
     "Convert to DMS": ""
   },
@@ -1889,9 +1895,6 @@
   "Copy Text": {
     "Copy Text": "Copier texte"
   },
-  "Copy path": {
-    "Copy path": "Copier chemin"
-  },
   "Corner Radius": {
     "Corner Radius": "Rayon des coins"
   },
@@ -1900,6 +1903,9 @@
   },
   "Corners & Background": {
     "Corners & Background": "Coins et arrière-plan"
+  },
+  "Couldn't load hotspot password": {
+    "Couldn't load hotspot password": ""
   },
   "Count Only": {
     "Count Only": "Nombre uniquement"
@@ -2123,9 +2129,6 @@
   "DMS removes its managed block from /etc/pam.d/greetd and stops write services": {
     "DMS removes its managed block from /etc/pam.d/greetd and stops write services": ""
   },
-  "DMS removes its managed block from /etc/pam.d/greetd and stops writing to it": {
-    "DMS removes its managed block from /etc/pam.d/greetd and stops writing to it": ""
-  },
   "DMS server is outdated (API v%1, expected v%2)": {
     "DMS server is outdated (API v%1, expected v%2)": ""
   },
@@ -2315,9 +2318,6 @@
   "Description": {
     "Description": "Description"
   },
-  "Desktop": {
-    "Desktop": "Bureau"
-  },
   "Desktop Application": {
     "Desktop Application": ""
   },
@@ -2344,9 +2344,6 @@
   },
   "Detected backends: %1": {
     "Detected backends: %1": ""
-  },
-  "Development": {
-    "Development": "Développement"
   },
   "Device": {
     "Device": "Appareil"
@@ -2540,9 +2537,6 @@
   "Docs": {
     "Docs": "Documentation"
   },
-  "Documents": {
-    "Documents": "Documents"
-  },
   "Domain (optional)": {
     "Domain (optional)": "Domaine (optionnel)"
   },
@@ -2554,9 +2548,6 @@
   },
   "Door Open": {
     "Door Open": "Porte ouverte"
-  },
-  "Downloads": {
-    "Downloads": "Téléchargements"
   },
   "Drag a widget by its handle here to reorder it or drop it into another group": {
     "Drag a widget by its handle here to reorder it or drop it into another group": ""
@@ -2714,6 +2705,9 @@
   "Enable WiFi": {
     "Enable WiFi": "Activer le Wi-Fi"
   },
+  "Enable WiFi before starting the hotspot.": {
+    "Enable WiFi before starting the hotspot.": ""
+  },
   "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": {
     "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": ""
   },
@@ -2728,9 +2722,6 @@
   },
   "Enable fingerprint or security key for DMS Greeter": {
     "Enable fingerprint or security key for DMS Greeter": ""
-  },
-  "Enable fingerprint or security key for DMS Greeter. Authentication changes apply automatically.": {
-    "Enable fingerprint or security key for DMS Greeter. Authentication changes apply automatically.": ""
   },
   "Enable loginctl lock integration": {
     "Enable loginctl lock integration": "Activer l’intégration du verrouillage via loginctl"
@@ -2791,9 +2782,6 @@
   },
   "Enter device name...": {
     "Enter device name...": "Entrer le nom de l'appareil..."
-  },
-  "Enter filename...": {
-    "Enter filename...": "Entrez le nom du fichier..."
   },
   "Enter launch prefix (e.g., 'uwsm-app')": {
     "Enter launch prefix (e.g., 'uwsm-app')": "Saisir le préfixe de lancement (ex. : « uwsm-app »)"
@@ -2903,9 +2891,6 @@
   "Extra Light": {
     "Extra Light": ""
   },
-  "F1/I: Toggle • F10: Help": {
-    "F1/I: Toggle • F10: Help": "F1/I : Basculer • F10 : Aide"
-  },
   "Fade": {
     "Fade": "Fondu"
   },
@@ -2947,6 +2932,9 @@
   },
   "Failed to check pin limit": {
     "Failed to check pin limit": "Échec de la vérification de la limite d'épinglage"
+  },
+  "Failed to configure hotspot": {
+    "Failed to configure hotspot": ""
   },
   "Failed to connect VPN": {
     "Failed to connect VPN": "Échec de la connexion au VPN"
@@ -3077,6 +3065,9 @@
   "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": {
     "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": "Échec de l'exécution de 'dms greeter status'. Vérifiez que DMS est installé et dans le PATH."
   },
+  "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": {
+    "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": ""
+  },
   "Failed to save VPN credentials": {
     "Failed to save VPN credentials": ""
   },
@@ -3130,6 +3121,15 @@
   },
   "Failed to start connection to %1": {
     "Failed to start connection to %1": "Échec du démarrage de la connexion à %1"
+  },
+  "Failed to start hotspot": {
+    "Failed to start hotspot": ""
+  },
+  "Failed to stop hotspot": {
+    "Failed to stop hotspot": ""
+  },
+  "Failed to switch codec": {
+    "Failed to switch codec": ""
   },
   "Failed to unpin entry": {
     "Failed to unpin entry": "Échec du désépinglage de l'entrée"
@@ -3188,12 +3188,6 @@
   "File": {
     "File": "Fichier"
   },
-  "File Already Exists": {
-    "File Already Exists": "Fichier déjà existant"
-  },
-  "File Information": {
-    "File Information": "Informations sur le fichier"
-  },
   "File Manager": {
     "File Manager": ""
   },
@@ -3241,9 +3235,6 @@
   },
   "Fingerprint availability could not be confirmed": {
     "Fingerprint availability could not be confirmed": ""
-  },
-  "Fingerprint availability could not be confirmed.": {
-    "Fingerprint availability could not be confirmed.": "La disponibilité de l'empreinte n'a pas pu être confirmée."
   },
   "Fingerprint error": {
     "Fingerprint error": ""
@@ -3518,9 +3509,6 @@
   "Fully Charged": {
     "Fully Charged": "Complètement chargé"
   },
-  "Fun": {
-    "Fun": "Divertissement"
-  },
   "G: grid • Z/X: size": {
     "G: grid • Z/X: size": "G : grille • Z/X : taille"
   },
@@ -3632,11 +3620,11 @@
   "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": {
     "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": ""
   },
+  "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": {
+    "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": ""
+  },
   "Greeter group:": {
     "Greeter group:": ""
-  },
-  "Greeter only — format for the date on the login screen": {
-    "Greeter only — format for the date on the login screen": "Greeter seulement — format pour la date sur l'écran de verrouillage"
   },
   "Greeter sync complete": {
     "Greeter sync complete": ""
@@ -3730,9 +3718,6 @@
   },
   "Hex": {
     "Hex": "Hex"
-  },
-  "Hibernate": {
-    "Hibernate": "Veille prolongée"
   },
   "Hibernate failed": {
     "Hibernate failed": ""
@@ -3833,20 +3818,8 @@
   "Hold Duration": {
     "Hold Duration": "Durée de maintien"
   },
-  "Hold longer to confirm": {
-    "Hold longer to confirm": "Maintenez plus longtemps pour confirmer"
-  },
   "Hold to Confirm Power Actions": {
     "Hold to Confirm Power Actions": "Maintenir pour confirmer les actions d'alimentation"
-  },
-  "Hold to confirm (%1 ms)": {
-    "Hold to confirm (%1 ms)": "Maintenir pour confirmer (%1 ms)"
-  },
-  "Hold to confirm (%1s)": {
-    "Hold to confirm (%1s)": "Maintenir pour confirmer (%1s)"
-  },
-  "Home": {
-    "Home": "Accueil"
   },
   "Horizontal and vertical bar thickness": {
     "Horizontal and vertical bar thickness": ""
@@ -3862,6 +3835,24 @@
   },
   "Hotkey overlay title (optional)": {
     "Hotkey overlay title (optional)": "Titre de la superposition des raccourcis clavier (optionnel)"
+  },
+  "Hotspot": {
+    "Hotspot": ""
+  },
+  "Hotspot activation failed.": {
+    "Hotspot activation failed.": ""
+  },
+  "Hotspot name": {
+    "Hotspot name": ""
+  },
+  "Hotspot saved": {
+    "Hotspot saved": ""
+  },
+  "Hotspot started": {
+    "Hotspot started": ""
+  },
+  "Hotspot stopped": {
+    "Hotspot stopped": ""
   },
   "Hour": {
     "Hour": "Heure"
@@ -3919,6 +3910,9 @@
   },
   "IP address or hostname": {
     "IP address or hostname": "Adresse IP ou nom d'hôte"
+  },
+  "IP sharing setup failed. Check that dnsmasq is installed.": {
+    "IP sharing setup failed. Check that dnsmasq is installed.": ""
   },
   "ISO Date": {
     "ISO Date": "Date ISO"
@@ -4123,9 +4117,6 @@
   },
   "Installation and PAM setup are documented in the ": {
     "Installation and PAM setup are documented in the ": ""
-  },
-  "Installation and PAM setup: see the ": {
-    "Installation and PAM setup: see the ": "Installation et mise en place de PAM : voir le "
   },
   "Installed": {
     "Installed": "Installé"
@@ -4448,9 +4439,6 @@
   "Locked": {
     "Locked": "Verrouillé"
   },
-  "Log Out": {
-    "Log Out": "Déconnexion"
-  },
   "Logging in...": {
     "Logging in...": "Connexion..."
   },
@@ -4691,9 +4679,6 @@
   "Maximum pinned entries reached": {
     "Maximum pinned entries reached": "Le maximum d'entrées épinglées a été atteint"
   },
-  "Media": {
-    "Media": "Média"
-  },
   "Media Controls": {
     "Media Controls": "Contrôles multimédias"
   },
@@ -4799,9 +4784,6 @@
   "Model": {
     "Model": "Modèle"
   },
-  "Modified": {
-    "Modified": "Modifié"
-  },
   "Modular widget bar": {
     "Modular widget bar": "Barre de widgets modulaire"
   },
@@ -4853,9 +4835,6 @@
   "Move Widget": {
     "Move Widget": "Déplacer le widget"
   },
-  "Move to Trash": {
-    "Move to Trash": ""
-  },
   "Moving to Paused": {
     "Moving to Paused": "Mise en pause en cours"
   },
@@ -4870,9 +4849,6 @@
   },
   "Multiplexers": {
     "Multiplexers": "Multiplexeurs"
-  },
-  "Music": {
-    "Music": "Musique"
   },
   "Music Player": {
     "Music Player": ""
@@ -4901,9 +4877,6 @@
   "NM not supported": {
     "NM not supported": "NM non pris en charge"
   },
-  "Name": {
-    "Name": "Nom"
-  },
   "Named Workspace Icons": {
     "Named Workspace Icons": "Icônes d’espaces de travail nommés"
   },
@@ -4918,9 +4891,6 @@
   },
   "Navigate": {
     "Navigate": "Naviguer"
-  },
-  "Navigation": {
-    "Navigation": "Navigation"
   },
   "Network": {
     "Network": "Réseau"
@@ -5165,9 +5135,6 @@
   "No fingerprint reader detected": {
     "No fingerprint reader detected": ""
   },
-  "No fingerprint reader detected.": {
-    "No fingerprint reader detected.": "Aucun lecteur d'empreintes détecté."
-  },
   "No folders found": {
     "No folders found": "Aucun dossier trouvé"
   },
@@ -5282,9 +5249,6 @@
   "No supported package manager found.": {
     "No supported package manager found.": ""
   },
-  "No terminal configured": {
-    "No terminal configured": ""
-  },
   "No themes found": {
     "No themes found": "Aucun thème trouvé"
   },
@@ -5360,14 +5324,8 @@
   "Not available — install fprintd and pam_fprintd, or configure greetd PAM.": {
     "Not available — install fprintd and pam_fprintd, or configure greetd PAM.": "Non disponible — installez fprintd et pam_fprintd, ou configurez greetd PAM."
   },
-  "Not available — install fprintd and pam_fprintd.": {
-    "Not available — install fprintd and pam_fprintd.": "Non disponible — installez fprintd et pam_fprintd."
-  },
   "Not available — install or configure pam_u2f, or configure greetd PAM.": {
     "Not available — install or configure pam_u2f, or configure greetd PAM.": ""
-  },
-  "Not available — install or configure pam_u2f.": {
-    "Not available — install or configure pam_u2f.": "Non disponible — installez ou configurez pam_u2f."
   },
   "Not bound": {
     "Not bound": ""
@@ -5437,9 +5395,6 @@
   },
   "Now playing and media controls": {
     "Now playing and media controls": ""
-  },
-  "Numbers": {
-    "Numbers": "Nombres"
   },
   "Numeric (D/M)": {
     "Numeric (D/M)": "Numérique (J/M)"
@@ -5555,6 +5510,9 @@
   "Open in terminal": {
     "Open in terminal": "Ouvrir dans le terminal"
   },
+  "Open network": {
+    "Open network": ""
+  },
   "Open search bar to find text": {
     "Open search bar to find text": "Ouvrir la barre de recherche pour trouver du texte"
   },
@@ -5582,6 +5540,9 @@
   "Opens the connected launcher in Connected Frame Mode.": {
     "Opens the connected launcher in Connected Frame Mode.": ""
   },
+  "Optional": {
+    "Optional": ""
+  },
   "Optional description": {
     "Optional description": "Description facultative"
   },
@@ -5590,6 +5551,9 @@
   },
   "Optional state-based conditions applied to the first match.": {
     "Optional state-based conditions applied to the first match.": ""
+  },
+  "Optional; leave blank for open hotspot": {
+    "Optional; leave blank for open hotspot": ""
   },
   "Options": {
     "Options": "Options"
@@ -5671,9 +5635,6 @@
   },
   "Overview of your network connections": {
     "Overview of your network connections": "Aperçu de vos connexions réseau"
-  },
-  "Overwrite": {
-    "Overwrite": "Écraser"
   },
   "Owner: %1": {
     "Owner: %1": ""
@@ -5819,14 +5780,8 @@
   "Pick a different random video each time from the same folder": {
     "Pick a different random video each time from the same folder": "Choisir une vidéo différente aléatoirement du même dossier à chaque fois"
   },
-  "Pick a terminal in Settings → Launcher (or set $TERMINAL).": {
-    "Pick a terminal in Settings → Launcher (or set $TERMINAL).": ""
-  },
   "Pick how long to pause notifications": {
     "Pick how long to pause notifications": ""
-  },
-  "Pictures": {
-    "Pictures": "Photos"
   },
   "Pin": {
     "Pin": "Épingler"
@@ -6001,12 +5956,6 @@
   },
   "Power Mode": {
     "Power Mode": ""
-  },
-  "Power Off": {
-    "Power Off": "Arrêter"
-  },
-  "Power Options": {
-    "Power Options": "Options d’alimentation"
   },
   "Power Profile": {
     "Power Profile": "Profil d’alimentation"
@@ -6200,9 +6149,6 @@
   "Quality": {
     "Quality": ""
   },
-  "Quick Access": {
-    "Quick Access": "Accès rapide"
-  },
   "Quick access to application launcher": {
     "Quick access to application launcher": "Accès rapide au lanceur d’applications"
   },
@@ -6242,6 +6188,9 @@
   "Re-enter password": {
     "Re-enter password": ""
   },
+  "Re-enter the password before saving.": {
+    "Re-enter the password before saving.": ""
+  },
   "Reach local network devices while using an exit node": {
     "Reach local network devices while using an exit node": ""
   },
@@ -6251,11 +6200,11 @@
   "Read:": {
     "Read:": "Lire :"
   },
+  "Ready": {
+    "Ready": ""
+  },
   "Reason": {
     "Reason": "Raison"
-  },
-  "Reboot": {
-    "Reboot": "Redémarrer"
   },
   "Recent": {
     "Recent": ""
@@ -6298,6 +6247,9 @@
   },
   "Release": {
     "Release": "Version"
+  },
+  "Release to confirm": {
+    "Release to confirm": ""
   },
   "Reload From Disk": {
     "Reload From Disk": ""
@@ -6424,9 +6376,6 @@
   },
   "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys).": {
     "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys).": ""
-  },
-  "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys). Auth changes apply automatically and may open a terminal for sudo.": {
-    "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys). Auth changes apply automatically and may open a terminal for sudo.": ""
   },
   "Requires night mode support": {
     "Requires night mode support": "Nécessite le support du mode nuit"
@@ -6569,6 +6518,9 @@
   "Run paru/yay with AUR enabled when 'Update All' is clicked.": {
     "Run paru/yay with AUR enabled when 'Update All' is clicked.": ""
   },
+  "Running": {
+    "Running": ""
+  },
   "Running Apps": {
     "Running Apps": "Applications en cours"
   },
@@ -6593,11 +6545,14 @@
   "SMS sent successfully": {
     "SMS sent successfully": ""
   },
+  "SSID": {
+    "SSID": ""
+  },
   "Saturation": {
     "Saturation": ""
   },
-  "Save": {
-    "Save": "Enregistrer"
+  "Save & Start": {
+    "Save & Start": ""
   },
   "Save Notepad File": {
     "Save Notepad File": "Enregistrer le fichier"
@@ -6719,9 +6674,6 @@
   "Search devices...": {
     "Search devices...": ""
   },
-  "Search for a location...": {
-    "Search for a location...": "Rechercher un emplacement..."
-  },
   "Search installed plugins...": {
     "Search installed plugins...": ""
   },
@@ -6745,9 +6697,6 @@
   },
   "Search widgets...": {
     "Search widgets...": "Rechercher des widgets..."
-  },
-  "Search...": {
-    "Search...": "Rechercher..."
   },
   "Searching...": {
     "Searching...": "Recherche en cours..."
@@ -6778,9 +6727,6 @@
   },
   "Security-key availability could not be confirmed": {
     "Security-key availability could not be confirmed": ""
-  },
-  "Security-key availability could not be confirmed.": {
-    "Security-key availability could not be confirmed.": "La disponibilité de la clé de sécurité n'a pas pu être confirmée."
   },
   "Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.": {
     "Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.": "Le support pour la clé de sécurité a été détecté, mais aucune clé n'a été enregistrée pour le moment. Vous pouvez activer cette option maintenant et en enregistrer une plus tard."
@@ -6955,6 +6901,15 @@
   },
   "Set the percentage at which the battery is considered low.": {
     "Set the percentage at which the battery is considered low.": ""
+  },
+  "Set up a WiFi hotspot for sharing this connection.": {
+    "Set up a WiFi hotspot for sharing this connection.": ""
+  },
+  "Set up hotspot": {
+    "Set up hotspot": ""
+  },
+  "Set up hotspot in Settings": {
+    "Set up hotspot in Settings": ""
   },
   "Setting": {
     "Setting": ""
@@ -7349,9 +7304,6 @@
   "Single-Line Popup": {
     "Single-Line Popup": ""
   },
-  "Size": {
-    "Size": "Taille"
-  },
   "Size Constraints": {
     "Size Constraints": "Contraintes de taille"
   },
@@ -7393,9 +7345,6 @@
   },
   "Sort Alphabetically": {
     "Sort Alphabetically": "Trier par ordre alphabétique"
-  },
-  "Sort By": {
-    "Sort By": "Trier par"
   },
   "Sort wallpapers": {
     "Sort wallpapers": ""
@@ -7463,17 +7412,29 @@
   "Start": {
     "Start": "Démarrer"
   },
+  "Start Hotspot?": {
+    "Start Hotspot?": ""
+  },
   "Start KDE Connect or Valent to use this plugin": {
     "Start KDE Connect or Valent to use this plugin": "Démarrer KDE Connect ou Valent pour utiliser ce plugin"
   },
   "Start typing your notes here...": {
     "Start typing your notes here...": "Commencez à taper vos notes ici..."
   },
+  "Starting hotspot...": {
+    "Starting hotspot...": ""
+  },
+  "Starting the hotspot will disconnect WiFi from \"%1\" — the radio can't do both at once. Sharing internet then requires another connection, such as Ethernet.": {
+    "Starting the hotspot will disconnect WiFi from \"%1\" — the radio can't do both at once. Sharing internet then requires another connection, such as Ethernet.": ""
+  },
+  "Starting...": {
+    "Starting...": ""
+  },
   "State": {
     "State": "État"
   },
-  "Status": {
-    "Status": "Statut"
+  "Stop": {
+    "Stop": ""
   },
   "Stop ignoring %1": {
     "Stop ignoring %1": ""
@@ -7559,9 +7520,6 @@
   "Surfaces float independently of the frame": {
     "Surfaces float independently of the frame": ""
   },
-  "Suspend": {
-    "Suspend": "Mettre en veille"
-  },
   "Suspend behavior": {
     "Suspend behavior": "Comportement de suspension"
   },
@@ -7573,9 +7531,6 @@
   },
   "Sway Website": {
     "Sway Website": "Site Sway"
-  },
-  "Switch User": {
-    "Switch User": "Changer d'utilisateur"
   },
   "Switch between display configurations": {
     "Switch between display configurations": ""
@@ -7601,11 +7556,11 @@
   "Sync Position Across Screens": {
     "Sync Position Across Screens": "Synchroniser la position entre les écrans"
   },
-  "Sync applies your theme and settings to the login screen. Other users should run dms greeter sync --profile instead of a full sync. Authentication changes apply automatically.": {
-    "Sync applies your theme and settings to the login screen. Other users should run dms greeter sync --profile instead of a full sync. Authentication changes apply automatically.": ""
-  },
   "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": {
     "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": ""
+  },
+  "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": {
+    "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": ""
   },
   "Sync completed successfully.": {
     "Sync completed successfully.": "Synchro complétée avec succès."
@@ -7624,9 +7579,6 @@
   },
   "Syncing...": {
     "Syncing...": ""
-  },
-  "System": {
-    "System": "Système"
   },
   "System App Theming": {
     "System App Theming": "Habillage des applications système"
@@ -7682,9 +7634,6 @@
   "Tab": {
     "Tab": "Onglet"
   },
-  "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": {
-    "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": "Tab/Shift+Tab : Navigation • ←→↑↓ : Navigation grille • Enter/Espace : Sélectionner"
-  },
   "Tags": {
     "Tags": ""
   },
@@ -7714,6 +7663,9 @@
   },
   "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": {
     "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": ""
+  },
+  "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": {
+    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": ""
   },
   "Terminal fallback opened. Complete authentication there; it will close automatically when done.": {
     "Terminal fallback opened. Complete authentication there; it will close automatically when done.": ""
@@ -7759,6 +7711,9 @@
   },
   "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": {
     "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "La variable d’environnement DMS_SOCKET n’est pas définie ou le socket est indisponible. La gestion automatique des plugins nécessite DMS_SOCKET."
+  },
+  "The WiFi adapter could not start access point mode.": {
+    "The WiFi adapter could not start access point mode.": ""
   },
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
     "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "Les réglages ci-dessous modifieront vos paramètres GTK et Qt. Pour conserver vos configurations actuelles, effectuez une sauvegarde (qt5ct.conf|qt6ct.conf et ~/.config/gtk-3.0|gtk-4.0)."
@@ -7831,6 +7786,9 @@
   },
   "This will delete all unpinned entries. %1 pinned entries will be kept.": {
     "This will delete all unpinned entries. %1 pinned entries will be kept.": "Cela supprimera toutes les entrées non épinglées. %1 entrées épinglées seront conservées."
+  },
+  "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": {
+    "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": ""
   },
   "This will permanently delete all clipboard history.": {
     "This will permanently delete all clipboard history.": "Cela supprimera définitivement tout l’historique du presse-papiers."
@@ -8060,9 +8018,6 @@
   "Turn off now": {
     "Turn off now": ""
   },
-  "Type": {
-    "Type": "Type"
-  },
   "Type at least 2 characters": {
     "Type at least 2 characters": "Tapez au moins 2 caractères"
   },
@@ -8279,9 +8234,6 @@
   "Use a custom image for the login screen, or leave empty to use desktop wallpaper": {
     "Use a custom image for the login screen, or leave empty to use desktop wallpaper": ""
   },
-  "Use a custom image for the login screen, or leave empty to use your desktop wallpaper.": {
-    "Use a custom image for the login screen, or leave empty to use your desktop wallpaper.": "Utilisez une image personnalisée pour l'écran de connexion, ou laissez vide pour utiliser pour fond d'écran de bureau."
-  },
   "Use a custom radius for goth corner cutouts": {
     "Use a custom radius for goth corner cutouts": ""
   },
@@ -8290,9 +8242,6 @@
   },
   "Use a security key for lock screen authentication": {
     "Use a security key for lock screen authentication": ""
-  },
-  "Use a security key for lock screen authentication.": {
-    "Use a security key for lock screen authentication.": "Utilisez une clé de sécurité pour l'authentification de l'écran de verrouillage."
   },
   "Use album art accent": {
     "Use album art accent": ""
@@ -8323,9 +8272,6 @@
   },
   "Use fingerprint authentication for the lock screen": {
     "Use fingerprint authentication for the lock screen": ""
-  },
-  "Use fingerprint authentication for the lock screen.": {
-    "Use fingerprint authentication for the lock screen.": "Utilisez l'authentification par empreinte pour l'écran de verrouillage."
   },
   "Use keys 1-3 or arrows, Enter/Space to select": {
     "Use keys 1-3 or arrows, Enter/Space to select": ""
@@ -8498,9 +8444,6 @@
   "Video Screensaver": {
     "Video Screensaver": "Économiseur d'écran vidéo"
   },
-  "Videos": {
-    "Videos": "Vidéos"
-  },
   "View Mode": {
     "View Mode": "Mode d’affichage"
   },
@@ -8537,8 +8480,14 @@
   "W": {
     "W": ""
   },
+  "WCAG %1 body": {
+    "WCAG %1 body": ""
+  },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
+  },
+  "WPA2 password": {
+    "WPA2 password": ""
   },
   "Wallpaper": {
     "Wallpaper": "Fond d'écran"
@@ -8627,6 +8576,12 @@
   "WiFi enabled": {
     "WiFi enabled": "WiFi activé"
   },
+  "WiFi is disabled": {
+    "WiFi is disabled": ""
+  },
+  "WiFi is disabled. You can still edit and save hotspot settings, but starting the hotspot requires WiFi to be enabled.": {
+    "WiFi is disabled. You can still edit and save hotspot settings, but starting the hotspot requires WiFi to be enabled.": ""
+  },
   "WiFi is off": {
     "WiFi is off": "Wi-Fi éteint"
   },
@@ -8684,6 +8639,9 @@
   "Width of window border and focus ring": {
     "Width of window border and focus ring": "Largeur de la bordure et de l’anneau de focus"
   },
+  "Will disconnect \"%1": {
+    "Will disconnect \"%1\"": ""
+  },
   "Wind": {
     "Wind": "Vent"
   },
@@ -8716,9 +8674,6 @@
   },
   "Working...": {
     "Working...": ""
-  },
-  "Workspace": {
-    "Workspace": "Espace de travail"
   },
   "Workspace Index Numbers": {
     "Workspace Index Numbers": "Numéros des espaces de travail"
@@ -8794,6 +8749,12 @@
   },
   "Your compositor does not support background blur (ext-background-effect-v1)": {
     "Your compositor does not support background blur (ext-background-effect-v1)": ""
+  },
+  "Your hotspot is running.": {
+    "Your hotspot is running.": ""
+  },
+  "Your hotspot profile is saved and ready to start.": {
+    "Your hotspot profile is saved and ready to start.": ""
   },
   "Your system is up to date!": {
     "Your system is up to date!": "Votre système est à jour !"
@@ -8968,9 +8929,6 @@
   },
   "on Sway": {
     "on Sway": "sur Sway"
-  },
-  "or run ": {
-    "or run ": "ou lancer "
   },
   "power-profiles-daemon not available": {
     "power-profiles-daemon not available": "power-profiles-daemon non disponible"

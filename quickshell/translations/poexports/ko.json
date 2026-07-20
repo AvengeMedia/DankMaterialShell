@@ -197,6 +197,9 @@
   "2 seconds": {
     "2 seconds": "2초"
   },
+  "2.4 GHz": {
+    "2.4 GHz": ""
+  },
   "20 minutes": {
     "20 minutes": "20분"
   },
@@ -260,6 +263,9 @@
   "45 seconds": {
     "45 seconds": "45초"
   },
+  "5 GHz": {
+    "5 GHz": ""
+  },
   "5 min before": {
     "5 min before": "5분 전"
   },
@@ -301,9 +307,6 @@
   },
   "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>": {
     "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>": "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT 라이선스</a>"
-  },
-  "A file with this name already exists. Do you want to overwrite it?": {
-    "A file with this name already exists. Do you want to overwrite it?": "이 이름의 파일이 이미 있습니다. 덮어쓰시겠습니까?"
   },
   "A modern desktop shell for Wayland compositors": {
     "A modern desktop shell for Wayland compositors": "Wayland 컴포지터를 위한 모던 데스크톱 셸"
@@ -365,9 +368,6 @@
   "Action performed when scrolling vertically on the bar": {
     "Action performed when scrolling vertically on the bar": "표시줄에서 세로로 스크롤할 때 수행되는 작업"
   },
-  "Actions": {
-    "Actions": "작업"
-  },
   "Activate": {
     "Activate": "활성화"
   },
@@ -376,6 +376,9 @@
   },
   "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": {
     "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": "DMS Greeter를 활성화하시겠습니까? sudo 인증을 위해 터미널이 열립니다. 활성화 후 동기화를 실행하여 설정을 적용하세요."
+  },
+  "Activates immediately": {
+    "Activates immediately": ""
   },
   "Activation": {
     "Activation": "활성화"
@@ -418,6 +421,9 @@
   },
   "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": {
     "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": "\"%1\" 사용자를 %2 그룹에 추가하시겠습니까? 로그아웃 후 다시 로그인한 다음 `dms greeter sync --profile`을 실행해야 로그인 화면 테마가 게시됩니다."
+  },
+  "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": {
+    "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": ""
   },
   "Add Bar": {
     "Add Bar": "표시줄 추가"
@@ -469,6 +475,9 @@
   },
   "Add the new user to the %1 group so they can run dms greeter sync --profile.": {
     "Add the new user to the %1 group so they can run dms greeter sync --profile.": "새 사용자를 %1 그룹에 추가하여 `dms greeter sync --profile`을 실행할 수 있도록 합니다."
+  },
+  "Add the new user to the %1 group so they can run dms-greeter sync --profile.": {
+    "Add the new user to the %1 group so they can run dms-greeter sync --profile.": ""
   },
   "Add the new user to the %1 group so they can use sudo.": {
     "Add the new user to the %1 group so they can use sudo.": "새 사용자를 %1 그룹에 추가하여 sudo를 사용할 수 있도록 합니다."
@@ -538,9 +547,6 @@
   },
   "Also group repeated application icons on the active workspace": {
     "Also group repeated application icons on the active workspace": "활성 작업 공간에 반복되는 애플리케이션 아이콘도 그룹화"
-  },
-  "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close": {
-    "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close": "Alt+←/Backspace: 뒤로 • F1/I: 파일 정보 • F10: 도움말 • Esc: 닫기"
   },
   "Alternative (OR)": {
     "Alternative (OR)": "'Alternative'는 키 단독으로 잠금을 해제합니다. 'Second factor'는 암호나 지문을 먼저 요구한 뒤 키를 요구합니다."
@@ -652,6 +658,9 @@
   },
   "Applications and commands to start automatically when you log in": {
     "Applications and commands to start automatically when you log in": "로그인할 때 자동으로 시작할 애플리케이션 및 명령"
+  },
+  "Applies on the next greeter sync": {
+    "Applies on the next greeter sync": ""
   },
   "Apply Changes": {
     "Apply Changes": "변경 사항 적용"
@@ -788,14 +797,8 @@
   "Authentication changes applied": {
     "Authentication changes applied": ""
   },
-  "Authentication changes applied.": {
-    "Authentication changes applied.": "인증 변경 사항이 적용되었습니다."
-  },
   "Authentication changes apply automatically": {
     "Authentication changes apply automatically": ""
-  },
-  "Authentication changes apply automatically.": {
-    "Authentication changes apply automatically.": "인증 변경 사항은 자동으로 적용됩니다."
   },
   "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": {
     "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": "인증 변경 사항에는 sudo가 필요합니다. 비밀번호나 지문을 사용할 수 있도록 터미널을 엽니다."
@@ -1030,6 +1033,9 @@
   },
   "Balanced palette with focused accents (default).": {
     "Balanced palette with focused accents (default).": "강조색이 초점을 맞추는 균형 잡힌 팔레트(기본값)."
+  },
+  "Band": {
+    "Band": ""
   },
   "Bar": {
     "Bar": "표시줄"
@@ -1286,11 +1292,11 @@
   "Calendar Backend": {
     "Calendar Backend": "달력 백엔드"
   },
+  "Calls / Headset": {
+    "Calls / Headset": ""
+  },
   "Camera": {
     "Camera": "카메라"
-  },
-  "Cancel": {
-    "Cancel": "취소"
   },
   "Cancel all jobs for \"%1\"?": {
     "Cancel all jobs for \"%1\"?": "\"%1\"에 대한 모든 작업을 취소하시겠습니까?"
@@ -1436,9 +1442,6 @@
   "Choose how to be notified when charge limit is reached.": {
     "Choose how to be notified when charge limit is reached.": "충전 한도에 도달했을 때 알림을 받는 방식을 선택하세요."
   },
-  "Choose icon": {
-    "Choose icon": "아이콘 선택"
-  },
   "Choose monochrome or a theme color tint for system tray icons": {
     "Choose monochrome or a theme color tint for system tray icons": "시스템 트레이 아이콘에 단색 또는 테마 색조를 선택하세요"
   },
@@ -1577,8 +1580,17 @@
   "Close Window": {
     "Close Window": "창 닫기"
   },
+  "Codec switched successfully": {
+    "Codec switched successfully": ""
+  },
+  "Codec switching is unavailable because WirePlumber was not found": {
+    "Codec switching is unavailable because WirePlumber was not found": ""
+  },
   "Codec switching is unavailable because pactl was not found": {
     "Codec switching is unavailable because pactl was not found": ""
+  },
+  "Codec switching is unavailable. WirePlumber wpexec was not found.": {
+    "Codec switching is unavailable. WirePlumber wpexec was not found.": ""
   },
   "Color": {
     "Color": "색상"
@@ -1657,9 +1669,6 @@
   },
   "Commands": {
     "Commands": "명령"
-  },
-  "Communication": {
-    "Communication": "통신"
   },
   "Community themes": {
     "Community themes": "커뮤니티 테마"
@@ -1844,9 +1853,6 @@
   "Convenience options for the login screen": {
     "Convenience options for the login screen": ""
   },
-  "Convenience options for the login screen. Sync to apply.": {
-    "Convenience options for the login screen. Sync to apply.": "로그인 화면 편의 옵션입니다. 동기화하여 적용하세요."
-  },
   "Convert to DMS": {
     "Convert to DMS": "DMS로 변환"
   },
@@ -1889,9 +1895,6 @@
   "Copy Text": {
     "Copy Text": "텍스트 복사"
   },
-  "Copy path": {
-    "Copy path": "경로 복사"
-  },
   "Corner Radius": {
     "Corner Radius": "모서리 둥글기"
   },
@@ -1900,6 +1903,9 @@
   },
   "Corners & Background": {
     "Corners & Background": "모서리 및 배경"
+  },
+  "Couldn't load hotspot password": {
+    "Couldn't load hotspot password": ""
   },
   "Count Only": {
     "Count Only": "개수만 표시"
@@ -2123,9 +2129,6 @@
   "DMS removes its managed block from /etc/pam.d/greetd and stops write services": {
     "DMS removes its managed block from /etc/pam.d/greetd and stops write services": ""
   },
-  "DMS removes its managed block from /etc/pam.d/greetd and stops writing to it": {
-    "DMS removes its managed block from /etc/pam.d/greetd and stops writing to it": ""
-  },
   "DMS server is outdated (API v%1, expected v%2)": {
     "DMS server is outdated (API v%1, expected v%2)": "DMS 서버가 구버전입니다(API v%1, 예상 v%2)."
   },
@@ -2315,9 +2318,6 @@
   "Description": {
     "Description": "설명"
   },
-  "Desktop": {
-    "Desktop": "데스크톱"
-  },
   "Desktop Application": {
     "Desktop Application": "데스크톱 애플리케이션"
   },
@@ -2344,9 +2344,6 @@
   },
   "Detected backends: %1": {
     "Detected backends: %1": "감지된 백엔드: %1"
-  },
-  "Development": {
-    "Development": "개발"
   },
   "Device": {
     "Device": "기기"
@@ -2540,9 +2537,6 @@
   "Docs": {
     "Docs": "문서"
   },
-  "Documents": {
-    "Documents": "문서"
-  },
   "Domain (optional)": {
     "Domain (optional)": "도메인 (선택 사항)"
   },
@@ -2554,9 +2548,6 @@
   },
   "Door Open": {
     "Door Open": "문 열림"
-  },
-  "Downloads": {
-    "Downloads": "다운로드"
   },
   "Drag a widget by its handle here to reorder it or drop it into another group": {
     "Drag a widget by its handle here to reorder it or drop it into another group": "위젯의 핸들을 잡고 드래그하여 순서를 변경하거나 다른 그룹에 놓으세요"
@@ -2714,6 +2705,9 @@
   "Enable WiFi": {
     "Enable WiFi": "Wi-Fi 활성화"
   },
+  "Enable WiFi before starting the hotspot.": {
+    "Enable WiFi before starting the hotspot.": ""
+  },
   "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": {
     "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": "아래에서 사용자 지정 덮어쓰기를 활성화하여 표시줄별 그림자 강도, 불투명도 및 색상을 설정하세요."
   },
@@ -2728,9 +2722,6 @@
   },
   "Enable fingerprint or security key for DMS Greeter": {
     "Enable fingerprint or security key for DMS Greeter": ""
-  },
-  "Enable fingerprint or security key for DMS Greeter. Authentication changes apply automatically.": {
-    "Enable fingerprint or security key for DMS Greeter. Authentication changes apply automatically.": "DMS Greeter에 지문 또는 보안 키를 활성화합니다. 인증 변경 사항은 자동으로 적용됩니다."
   },
   "Enable loginctl lock integration": {
     "Enable loginctl lock integration": "loginctl 잠금 통합 활성화"
@@ -2791,9 +2782,6 @@
   },
   "Enter device name...": {
     "Enter device name...": "기기 이름 입력..."
-  },
-  "Enter filename...": {
-    "Enter filename...": "파일 이름 입력..."
   },
   "Enter launch prefix (e.g., 'uwsm-app')": {
     "Enter launch prefix (e.g., 'uwsm-app')": "실행 접두사 입력 (예: 'uwsm-app')"
@@ -2903,9 +2891,6 @@
   "Extra Light": {
     "Extra Light": "매우 얇게"
   },
-  "F1/I: Toggle • F10: Help": {
-    "F1/I: Toggle • F10: Help": "F1/I: 전환 • F10: 도움말"
-  },
   "Fade": {
     "Fade": "페이드"
   },
@@ -2947,6 +2932,9 @@
   },
   "Failed to check pin limit": {
     "Failed to check pin limit": "고정 제한 확인 실패"
+  },
+  "Failed to configure hotspot": {
+    "Failed to configure hotspot": ""
   },
   "Failed to connect VPN": {
     "Failed to connect VPN": "VPN 연결 실패"
@@ -3077,6 +3065,9 @@
   "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": {
     "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": "'dms greeter status' 실행에 실패했습니다. DMS가 설치되어 있고 PATH에 dms가 있는지 확인하세요."
   },
+  "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": {
+    "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": ""
+  },
   "Failed to save VPN credentials": {
     "Failed to save VPN credentials": "VPN 자격 증명 저장 실패"
   },
@@ -3130,6 +3121,15 @@
   },
   "Failed to start connection to %1": {
     "Failed to start connection to %1": "%1에 대한 연결 시작 실패"
+  },
+  "Failed to start hotspot": {
+    "Failed to start hotspot": ""
+  },
+  "Failed to stop hotspot": {
+    "Failed to stop hotspot": ""
+  },
+  "Failed to switch codec": {
+    "Failed to switch codec": ""
   },
   "Failed to unpin entry": {
     "Failed to unpin entry": "항목 고정 해제 실패"
@@ -3188,12 +3188,6 @@
   "File": {
     "File": "파일"
   },
-  "File Already Exists": {
-    "File Already Exists": "파일이 이미 존재함"
-  },
-  "File Information": {
-    "File Information": "파일 정보"
-  },
   "File Manager": {
     "File Manager": "파일 관리자"
   },
@@ -3241,9 +3235,6 @@
   },
   "Fingerprint availability could not be confirmed": {
     "Fingerprint availability could not be confirmed": ""
-  },
-  "Fingerprint availability could not be confirmed.": {
-    "Fingerprint availability could not be confirmed.": "지문 인식 가능 여부를 확인할 수 없습니다."
   },
   "Fingerprint error": {
     "Fingerprint error": "지문 인식 오류"
@@ -3518,9 +3509,6 @@
   "Fully Charged": {
     "Fully Charged": "충전 완료"
   },
-  "Fun": {
-    "Fun": "재미"
-  },
   "G: grid • Z/X: size": {
     "G: grid • Z/X: size": "G: 그리드 • Z/X: 크기"
   },
@@ -3632,11 +3620,11 @@
   "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": {
     "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": "로그인 화면 그룹 구성원은 로그아웃했다가 다시 로그인한 후 dms greeter sync --profile을 사용하여 로그인 화면 테마를 동기화할 수 있습니다."
   },
+  "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": {
+    "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": ""
+  },
   "Greeter group:": {
     "Greeter group:": "로그인 화면 그룹:"
-  },
-  "Greeter only — format for the date on the login screen": {
-    "Greeter only — format for the date on the login screen": "로그인 화면 전용 — 로그인 화면의 날짜 형식"
   },
   "Greeter sync complete": {
     "Greeter sync complete": "로그인 화면 동기화 완료"
@@ -3730,9 +3718,6 @@
   },
   "Hex": {
     "Hex": "Hex"
-  },
-  "Hibernate": {
-    "Hibernate": "최대 절전 모드"
   },
   "Hibernate failed": {
     "Hibernate failed": "최대 절전 모드 실패"
@@ -3833,20 +3818,8 @@
   "Hold Duration": {
     "Hold Duration": "길게 누르기 시간"
   },
-  "Hold longer to confirm": {
-    "Hold longer to confirm": "확인하려면 더 길게 누르세요"
-  },
   "Hold to Confirm Power Actions": {
     "Hold to Confirm Power Actions": "길게 눌러 전원 작업 확인"
-  },
-  "Hold to confirm (%1 ms)": {
-    "Hold to confirm (%1 ms)": "길게 눌러 확인(%1 ms)"
-  },
-  "Hold to confirm (%1s)": {
-    "Hold to confirm (%1s)": "길게 눌러 확인(%1s)"
-  },
-  "Home": {
-    "Home": "홈"
   },
   "Horizontal and vertical bar thickness": {
     "Horizontal and vertical bar thickness": "가로 및 세로 바 두께"
@@ -3862,6 +3835,24 @@
   },
   "Hotkey overlay title (optional)": {
     "Hotkey overlay title (optional)": "단축키 오버레이 제목(선택 사항)"
+  },
+  "Hotspot": {
+    "Hotspot": ""
+  },
+  "Hotspot activation failed.": {
+    "Hotspot activation failed.": ""
+  },
+  "Hotspot name": {
+    "Hotspot name": ""
+  },
+  "Hotspot saved": {
+    "Hotspot saved": ""
+  },
+  "Hotspot started": {
+    "Hotspot started": ""
+  },
+  "Hotspot stopped": {
+    "Hotspot stopped": ""
   },
   "Hour": {
     "Hour": "시간"
@@ -3919,6 +3910,9 @@
   },
   "IP address or hostname": {
     "IP address or hostname": "IP 주소 또는 호스트 이름"
+  },
+  "IP sharing setup failed. Check that dnsmasq is installed.": {
+    "IP sharing setup failed. Check that dnsmasq is installed.": ""
   },
   "ISO Date": {
     "ISO Date": "ISO 날짜"
@@ -4123,9 +4117,6 @@
   },
   "Installation and PAM setup are documented in the ": {
     "Installation and PAM setup are documented in the ": ""
-  },
-  "Installation and PAM setup: see the ": {
-    "Installation and PAM setup: see the ": "설치 및 PAM 설정: 다음을 참조하세요"
   },
   "Installed": {
     "Installed": "설치됨"
@@ -4448,9 +4439,6 @@
   "Locked": {
     "Locked": "잠김"
   },
-  "Log Out": {
-    "Log Out": "로그아웃"
-  },
   "Logging in...": {
     "Logging in...": "로그인 중..."
   },
@@ -4691,9 +4679,6 @@
   "Maximum pinned entries reached": {
     "Maximum pinned entries reached": "최대 고정 항목 수에 도달함"
   },
-  "Media": {
-    "Media": "미디어"
-  },
   "Media Controls": {
     "Media Controls": "미디어 컨트롤"
   },
@@ -4799,9 +4784,6 @@
   "Model": {
     "Model": "모델"
   },
-  "Modified": {
-    "Modified": "수정됨"
-  },
   "Modular widget bar": {
     "Modular widget bar": "모듈식 위젯 바"
   },
@@ -4853,9 +4835,6 @@
   "Move Widget": {
     "Move Widget": "위젯 이동"
   },
-  "Move to Trash": {
-    "Move to Trash": "휴지통으로 이동"
-  },
   "Moving to Paused": {
     "Moving to Paused": "일시 중지로 이동"
   },
@@ -4870,9 +4849,6 @@
   },
   "Multiplexers": {
     "Multiplexers": "멀티플렉서"
-  },
-  "Music": {
-    "Music": "음악"
   },
   "Music Player": {
     "Music Player": "음악 플레이어"
@@ -4901,9 +4877,6 @@
   "NM not supported": {
     "NM not supported": "NM 지원되지 않음"
   },
-  "Name": {
-    "Name": "이름"
-  },
   "Named Workspace Icons": {
     "Named Workspace Icons": "명명된 작업 공간 아이콘"
   },
@@ -4918,9 +4891,6 @@
   },
   "Navigate": {
     "Navigate": "탐색"
-  },
-  "Navigation": {
-    "Navigation": "탐색"
   },
   "Network": {
     "Network": "네트워크"
@@ -5165,9 +5135,6 @@
   "No fingerprint reader detected": {
     "No fingerprint reader detected": ""
   },
-  "No fingerprint reader detected.": {
-    "No fingerprint reader detected.": "지문 판독기가 감지되지 않았습니다."
-  },
   "No folders found": {
     "No folders found": "폴더를 찾을 수 없음"
   },
@@ -5282,9 +5249,6 @@
   "No supported package manager found.": {
     "No supported package manager found.": "지원되는 패키지 관리자를 찾을 수 없습니다."
   },
-  "No terminal configured": {
-    "No terminal configured": "구성된 터미널 없음"
-  },
   "No themes found": {
     "No themes found": "테마를 찾을 수 없음"
   },
@@ -5360,14 +5324,8 @@
   "Not available — install fprintd and pam_fprintd, or configure greetd PAM.": {
     "Not available — install fprintd and pam_fprintd, or configure greetd PAM.": "사용할 수 없음 — fprintd 및 pam_fprintd를 설치하거나 greetd PAM을 구성하세요."
   },
-  "Not available — install fprintd and pam_fprintd.": {
-    "Not available — install fprintd and pam_fprintd.": "사용할 수 없음 — fprintd 및 pam_fprintd를 설치하세요."
-  },
   "Not available — install or configure pam_u2f, or configure greetd PAM.": {
     "Not available — install or configure pam_u2f, or configure greetd PAM.": "사용할 수 없음 — pam_u2f를 설치 또는 구성하거나 greetd PAM을 구성하세요."
-  },
-  "Not available — install or configure pam_u2f.": {
-    "Not available — install or configure pam_u2f.": "사용할 수 없음 — pam_u2f를 설치하거나 구성하세요."
   },
   "Not bound": {
     "Not bound": "바인딩되지 않음"
@@ -5437,9 +5395,6 @@
   },
   "Now playing and media controls": {
     "Now playing and media controls": "지금 재생 중 및 미디어 컨트롤"
-  },
-  "Numbers": {
-    "Numbers": "숫자"
   },
   "Numeric (D/M)": {
     "Numeric (D/M)": "숫자(일/월)"
@@ -5555,6 +5510,9 @@
   "Open in terminal": {
     "Open in terminal": "터미널에서 열기"
   },
+  "Open network": {
+    "Open network": ""
+  },
   "Open search bar to find text": {
     "Open search bar to find text": "텍스트를 찾기 위해 검색창 열기"
   },
@@ -5582,6 +5540,9 @@
   "Opens the connected launcher in Connected Frame Mode.": {
     "Opens the connected launcher in Connected Frame Mode.": "연결된 프레임 모드에서 연결된 런처를 엽니다."
   },
+  "Optional": {
+    "Optional": ""
+  },
   "Optional description": {
     "Optional description": "선택적 설명"
   },
@@ -5590,6 +5551,9 @@
   },
   "Optional state-based conditions applied to the first match.": {
     "Optional state-based conditions applied to the first match.": "첫 번째 일치 항목에 적용되는 선택적 상태 기반 조건입니다."
+  },
+  "Optional; leave blank for open hotspot": {
+    "Optional; leave blank for open hotspot": ""
   },
   "Options": {
     "Options": "옵션"
@@ -5671,9 +5635,6 @@
   },
   "Overview of your network connections": {
     "Overview of your network connections": "네트워크 연결 개요"
-  },
-  "Overwrite": {
-    "Overwrite": "덮어쓰기"
   },
   "Owner: %1": {
     "Owner: %1": "소유자: %1"
@@ -5819,14 +5780,8 @@
   "Pick a different random video each time from the same folder": {
     "Pick a different random video each time from the same folder": "같은 폴더에서 매번 다른 임의의 비디오를 선택합니다."
   },
-  "Pick a terminal in Settings → Launcher (or set $TERMINAL).": {
-    "Pick a terminal in Settings → Launcher (or set $TERMINAL).": "설정 → 런처에서 터미널을 선택하세요(또는 $TERMINAL 설정)."
-  },
   "Pick how long to pause notifications": {
     "Pick how long to pause notifications": "알림을 일시 중지할 기간 선택"
-  },
-  "Pictures": {
-    "Pictures": "사진"
   },
   "Pin": {
     "Pin": "고정"
@@ -6001,12 +5956,6 @@
   },
   "Power Mode": {
     "Power Mode": "전원 모드"
-  },
-  "Power Off": {
-    "Power Off": "전원 끄기"
-  },
-  "Power Options": {
-    "Power Options": "전원 옵션"
   },
   "Power Profile": {
     "Power Profile": "전원 프로필"
@@ -6200,9 +6149,6 @@
   "Quality": {
     "Quality": "품질"
   },
-  "Quick Access": {
-    "Quick Access": "빠른 액세스"
-  },
   "Quick access to application launcher": {
     "Quick access to application launcher": "애플리케이션 런처에 대한 빠른 액세스"
   },
@@ -6242,6 +6188,9 @@
   "Re-enter password": {
     "Re-enter password": "비밀번호 다시 입력"
   },
+  "Re-enter the password before saving.": {
+    "Re-enter the password before saving.": ""
+  },
   "Reach local network devices while using an exit node": {
     "Reach local network devices while using an exit node": "출구 노드를 사용하는 동안 로컬 네트워크 장치에 도달"
   },
@@ -6251,11 +6200,11 @@
   "Read:": {
     "Read:": "읽기:"
   },
+  "Ready": {
+    "Ready": ""
+  },
   "Reason": {
     "Reason": "이유"
-  },
-  "Reboot": {
-    "Reboot": "재부팅"
   },
   "Recent": {
     "Recent": "최근"
@@ -6298,6 +6247,9 @@
   },
   "Release": {
     "Release": "릴리스"
+  },
+  "Release to confirm": {
+    "Release to confirm": ""
   },
   "Reload From Disk": {
     "Reload From Disk": "디스크에서 다시 로드"
@@ -6424,9 +6376,6 @@
   },
   "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys).": {
     "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys).": ""
-  },
-  "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys). Auth changes apply automatically and may open a terminal for sudo.": {
-    "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys). Auth changes apply automatically and may open a terminal for sudo.": "greetd, dms-greeter 및 greeter 그룹의 사용자가 필요합니다(지문의 경우 fprintd/pam_fprintd, 보안 키의 경우 pam_u2f 추가). 인증 변경 사항은 자동으로 적용되며 sudo를 위한 터미널이 열릴 수 있습니다."
   },
   "Requires night mode support": {
     "Requires night mode support": "야간 모드 지원 필요"
@@ -6569,6 +6518,9 @@
   "Run paru/yay with AUR enabled when 'Update All' is clicked.": {
     "Run paru/yay with AUR enabled when 'Update All' is clicked.": "'모두 업데이트'를 클릭하면 AUR이 활성화된 상태에서 paru/yay를 실행합니다."
   },
+  "Running": {
+    "Running": ""
+  },
   "Running Apps": {
     "Running Apps": "실행 중인 앱"
   },
@@ -6593,11 +6545,14 @@
   "SMS sent successfully": {
     "SMS sent successfully": "SMS가 성공적으로 전송됨"
   },
+  "SSID": {
+    "SSID": ""
+  },
   "Saturation": {
     "Saturation": "채도"
   },
-  "Save": {
-    "Save": "저장"
+  "Save & Start": {
+    "Save & Start": ""
   },
   "Save Notepad File": {
     "Save Notepad File": "노트패드 파일 저장"
@@ -6719,9 +6674,6 @@
   "Search devices...": {
     "Search devices...": "장치 검색..."
   },
-  "Search for a location...": {
-    "Search for a location...": "위치 검색..."
-  },
   "Search installed plugins...": {
     "Search installed plugins...": "설치된 플러그인 검색..."
   },
@@ -6745,9 +6697,6 @@
   },
   "Search widgets...": {
     "Search widgets...": "위젯 검색..."
-  },
-  "Search...": {
-    "Search...": "검색..."
   },
   "Searching...": {
     "Searching...": "검색 중..."
@@ -6778,9 +6727,6 @@
   },
   "Security-key availability could not be confirmed": {
     "Security-key availability could not be confirmed": ""
-  },
-  "Security-key availability could not be confirmed.": {
-    "Security-key availability could not be confirmed.": "보안 키 가용성을 확인할 수 없습니다."
   },
   "Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.": {
     "Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.": "보안 키 지원이 감지되었으나 아직 등록된 키를 찾을 수 없습니다. 지금 활성화하고 나중에 등록할 수 있습니다."
@@ -6955,6 +6901,15 @@
   },
   "Set the percentage at which the battery is considered low.": {
     "Set the percentage at which the battery is considered low.": "배터리가 부족한 것으로 간주되는 백분율을 설정합니다."
+  },
+  "Set up a WiFi hotspot for sharing this connection.": {
+    "Set up a WiFi hotspot for sharing this connection.": ""
+  },
+  "Set up hotspot": {
+    "Set up hotspot": ""
+  },
+  "Set up hotspot in Settings": {
+    "Set up hotspot in Settings": ""
   },
   "Setting": {
     "Setting": "설정"
@@ -7349,9 +7304,6 @@
   "Single-Line Popup": {
     "Single-Line Popup": "한 줄 팝업"
   },
-  "Size": {
-    "Size": "크기"
-  },
   "Size Constraints": {
     "Size Constraints": "크기 제약"
   },
@@ -7393,9 +7345,6 @@
   },
   "Sort Alphabetically": {
     "Sort Alphabetically": "알파벳순 정렬"
-  },
-  "Sort By": {
-    "Sort By": "정렬 기준"
   },
   "Sort wallpapers": {
     "Sort wallpapers": "배경화면 정렬"
@@ -7463,17 +7412,29 @@
   "Start": {
     "Start": "시작"
   },
+  "Start Hotspot?": {
+    "Start Hotspot?": ""
+  },
   "Start KDE Connect or Valent to use this plugin": {
     "Start KDE Connect or Valent to use this plugin": "이 플러그인을 사용하려면 KDE Connect 또는 Valent 시작"
   },
   "Start typing your notes here...": {
     "Start typing your notes here...": "여기에 노트를 입력하세요..."
   },
+  "Starting hotspot...": {
+    "Starting hotspot...": ""
+  },
+  "Starting the hotspot will disconnect WiFi from \"%1\" — the radio can't do both at once. Sharing internet then requires another connection, such as Ethernet.": {
+    "Starting the hotspot will disconnect WiFi from \"%1\" — the radio can't do both at once. Sharing internet then requires another connection, such as Ethernet.": ""
+  },
+  "Starting...": {
+    "Starting...": ""
+  },
   "State": {
     "State": "상태"
   },
-  "Status": {
-    "Status": "상태"
+  "Stop": {
+    "Stop": ""
   },
   "Stop ignoring %1": {
     "Stop ignoring %1": ""
@@ -7559,9 +7520,6 @@
   "Surfaces float independently of the frame": {
     "Surfaces float independently of the frame": "표면이 프레임과 독립적으로 떠다님"
   },
-  "Suspend": {
-    "Suspend": "절전"
-  },
   "Suspend behavior": {
     "Suspend behavior": "절전 동작"
   },
@@ -7573,9 +7531,6 @@
   },
   "Sway Website": {
     "Sway Website": "Sway 웹사이트"
-  },
-  "Switch User": {
-    "Switch User": "사용자 전환"
   },
   "Switch between display configurations": {
     "Switch between display configurations": "디스플레이 구성 간 전환"
@@ -7601,11 +7556,11 @@
   "Sync Position Across Screens": {
     "Sync Position Across Screens": "화면 간 위치 동기화"
   },
-  "Sync applies your theme and settings to the login screen. Other users should run dms greeter sync --profile instead of a full sync. Authentication changes apply automatically.": {
-    "Sync applies your theme and settings to the login screen. Other users should run dms greeter sync --profile instead of a full sync. Authentication changes apply automatically.": "동기화는 테마 및 설정을 로그인 화면에 적용합니다. 다른 사용자는 전체 동기화 대신 dms greeter sync --profile을 실행해야 합니다. 인증 변경 사항은 자동으로 적용됩니다."
-  },
   "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": {
     "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": ""
+  },
+  "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": {
+    "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": ""
   },
   "Sync completed successfully.": {
     "Sync completed successfully.": "동기화가 성공적으로 완료되었습니다."
@@ -7624,9 +7579,6 @@
   },
   "Syncing...": {
     "Syncing...": "동기화 중..."
-  },
-  "System": {
-    "System": "시스템"
   },
   "System App Theming": {
     "System App Theming": "시스템 앱 테마 지정"
@@ -7682,9 +7634,6 @@
   "Tab": {
     "Tab": "탭"
   },
-  "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": {
-    "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": "Tab/Shift+Tab: 탐색 • ←→↑↓: 그리드 탐색 • Enter/Space: 선택"
-  },
   "Tags": {
     "Tags": "태그"
   },
@@ -7714,6 +7663,9 @@
   },
   "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": {
     "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": "터미널 대체를 실패했습니다. 지원되는 터미널 에뮬레이터 중 하나를 설치하거나 'dms greeter sync'를 수동으로 실행하세요."
+  },
+  "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": {
+    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": ""
   },
   "Terminal fallback opened. Complete authentication there; it will close automatically when done.": {
     "Terminal fallback opened. Complete authentication there; it will close automatically when done.": ""
@@ -7759,6 +7711,9 @@
   },
   "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": {
     "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "DMS_SOCKET 환경 변수가 설정되지 않았거나 소켓을 사용할 수 없습니다. 자동 플러그인 관리에는 DMS_SOCKET이 필요합니다."
+  },
+  "The WiFi adapter could not start access point mode.": {
+    "The WiFi adapter could not start access point mode.": ""
   },
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
     "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "아래 설정은 GTK 및 Qt 설정을 수정합니다. 현재 구성을 유지하려면 백업하세요(qt5ct.conf|qt6ct.conf 및 ~/.config/gtk-3.0|gtk-4.0)."
@@ -7831,6 +7786,9 @@
   },
   "This will delete all unpinned entries. %1 pinned entries will be kept.": {
     "This will delete all unpinned entries. %1 pinned entries will be kept.": "모든 고정 해제된 항목이 삭제됩니다. %1개의 고정된 항목이 유지됩니다."
+  },
+  "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": {
+    "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": ""
   },
   "This will permanently delete all clipboard history.": {
     "This will permanently delete all clipboard history.": "클립보드 기록이 영구적으로 삭제됩니다."
@@ -8060,9 +8018,6 @@
   "Turn off now": {
     "Turn off now": "지금 끄기"
   },
-  "Type": {
-    "Type": "유형"
-  },
   "Type at least 2 characters": {
     "Type at least 2 characters": "2자 이상 입력"
   },
@@ -8279,9 +8234,6 @@
   "Use a custom image for the login screen, or leave empty to use desktop wallpaper": {
     "Use a custom image for the login screen, or leave empty to use desktop wallpaper": ""
   },
-  "Use a custom image for the login screen, or leave empty to use your desktop wallpaper.": {
-    "Use a custom image for the login screen, or leave empty to use your desktop wallpaper.": "로그인 화면에 사용자 지정 이미지를 사용하거나 데스크톱 배경화면을 사용하려면 비워 두세요."
-  },
   "Use a custom radius for goth corner cutouts": {
     "Use a custom radius for goth corner cutouts": "고딕 모서리 절단에 사용자 지정 반경 사용"
   },
@@ -8290,9 +8242,6 @@
   },
   "Use a security key for lock screen authentication": {
     "Use a security key for lock screen authentication": ""
-  },
-  "Use a security key for lock screen authentication.": {
-    "Use a security key for lock screen authentication.": "잠금 화면 인증에 보안 키를 사용합니다."
   },
   "Use album art accent": {
     "Use album art accent": ""
@@ -8323,9 +8272,6 @@
   },
   "Use fingerprint authentication for the lock screen": {
     "Use fingerprint authentication for the lock screen": ""
-  },
-  "Use fingerprint authentication for the lock screen.": {
-    "Use fingerprint authentication for the lock screen.": "잠금 화면에 지문 인증을 사용합니다."
   },
   "Use keys 1-3 or arrows, Enter/Space to select": {
     "Use keys 1-3 or arrows, Enter/Space to select": "키 1-3 또는 화살표, Enter/Space를 사용하여 선택"
@@ -8498,9 +8444,6 @@
   "Video Screensaver": {
     "Video Screensaver": "비디오 화면 보호기"
   },
-  "Videos": {
-    "Videos": "비디오"
-  },
   "View Mode": {
     "View Mode": "보기 모드"
   },
@@ -8537,8 +8480,14 @@
   "W": {
     "W": ""
   },
+  "WCAG %1 body": {
+    "WCAG %1 body": ""
+  },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
+  },
+  "WPA2 password": {
+    "WPA2 password": ""
   },
   "Wallpaper": {
     "Wallpaper": "배경화면"
@@ -8627,6 +8576,12 @@
   "WiFi enabled": {
     "WiFi enabled": "WiFi 활성화됨"
   },
+  "WiFi is disabled": {
+    "WiFi is disabled": ""
+  },
+  "WiFi is disabled. You can still edit and save hotspot settings, but starting the hotspot requires WiFi to be enabled.": {
+    "WiFi is disabled. You can still edit and save hotspot settings, but starting the hotspot requires WiFi to be enabled.": ""
+  },
   "WiFi is off": {
     "WiFi is off": "WiFi가 꺼져 있습니다"
   },
@@ -8684,6 +8639,9 @@
   "Width of window border and focus ring": {
     "Width of window border and focus ring": "창 테두리 및 포커스 링 너비"
   },
+  "Will disconnect \"%1": {
+    "Will disconnect \"%1\"": ""
+  },
   "Wind": {
     "Wind": "바람"
   },
@@ -8716,9 +8674,6 @@
   },
   "Working...": {
     "Working...": "작업 중..."
-  },
-  "Workspace": {
-    "Workspace": "작업 공간"
   },
   "Workspace Index Numbers": {
     "Workspace Index Numbers": "작업 공간 인덱스 번호"
@@ -8794,6 +8749,12 @@
   },
   "Your compositor does not support background blur (ext-background-effect-v1)": {
     "Your compositor does not support background blur (ext-background-effect-v1)": "컴포지터가 배경 블러(ext-background-effect-v1)를 지원하지 않습니다"
+  },
+  "Your hotspot is running.": {
+    "Your hotspot is running.": ""
+  },
+  "Your hotspot profile is saved and ready to start.": {
+    "Your hotspot profile is saved and ready to start.": ""
   },
   "Your system is up to date!": {
     "Your system is up to date!": "시스템이 최신 상태입니다!"
@@ -8968,9 +8929,6 @@
   },
   "on Sway": {
     "on Sway": "Sway에서"
-  },
-  "or run ": {
-    "or run ": "또는 실행"
   },
   "power-profiles-daemon not available": {
     "power-profiles-daemon not available": "power-profiles-daemon을 사용할 수 없음"

@@ -197,6 +197,9 @@
   "2 seconds": {
     "2 seconds": "2 giây"
   },
+  "2.4 GHz": {
+    "2.4 GHz": ""
+  },
   "20 minutes": {
     "20 minutes": "20 phút"
   },
@@ -260,6 +263,9 @@
   "45 seconds": {
     "45 seconds": "45 giây"
   },
+  "5 GHz": {
+    "5 GHz": ""
+  },
   "5 min before": {
     "5 min before": "5 phút trước"
   },
@@ -301,9 +307,6 @@
   },
   "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>": {
     "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>": "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">Giấy phép MIT</a>"
-  },
-  "A file with this name already exists. Do you want to overwrite it?": {
-    "A file with this name already exists. Do you want to overwrite it?": "Đã có tệp trùng tên rồi. Bạn có muốn ghi đè không?"
   },
   "A modern desktop shell for Wayland compositors": {
     "A modern desktop shell for Wayland compositors": "Một shell desktop hiện đại cho Wayland compositors"
@@ -365,9 +368,6 @@
   "Action performed when scrolling vertically on the bar": {
     "Action performed when scrolling vertically on the bar": "Thao tác thực hiện khi cuộn dọc trên thanh"
   },
-  "Actions": {
-    "Actions": "Thao tác"
-  },
   "Activate": {
     "Activate": "Kích hoạt"
   },
@@ -376,6 +376,9 @@
   },
   "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": {
     "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": "Kích hoạt DMS màn hình chào? Một cửa sổ dòng lệnh sẽ mở ra để xác thực sudo. Hãy chạy Đồng bộ sau khi kích hoạt để áp dụng các cài đặt của bạn."
+  },
+  "Activates immediately": {
+    "Activates immediately": ""
   },
   "Activation": {
     "Activation": "Kích hoạt"
@@ -418,6 +421,9 @@
   },
   "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": {
     "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": "Thêm \"%1\" vào nhóm %2? Họ phải đăng xuất và đăng nhập lại, sau đó chạy dms greeter sync --profile để công bố chủ đề màn hình đăng nhập của mình."
+  },
+  "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": {
+    "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": ""
   },
   "Add Bar": {
     "Add Bar": "Thêm thanh"
@@ -469,6 +475,9 @@
   },
   "Add the new user to the %1 group so they can run dms greeter sync --profile.": {
     "Add the new user to the %1 group so they can run dms greeter sync --profile.": "Thêm người dùng mới vào nhóm %1 để họ có thể chạy dms greeter sync --profile."
+  },
+  "Add the new user to the %1 group so they can run dms-greeter sync --profile.": {
+    "Add the new user to the %1 group so they can run dms-greeter sync --profile.": ""
   },
   "Add the new user to the %1 group so they can use sudo.": {
     "Add the new user to the %1 group so they can use sudo.": "Thêm người dùng mới vào nhóm %1 để họ có thể sử dụng sudo."
@@ -538,9 +547,6 @@
   },
   "Also group repeated application icons on the active workspace": {
     "Also group repeated application icons on the active workspace": "Cũng nhóm các biểu tượng ứng dụng trùng lặp trên không gian làm việc hiện tại"
-  },
-  "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close": {
-    "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close": "Alt+←/Backspace: Quay lại • F1/I: Thông tin tệp • F10: Trợ giúp • Esc: Đóng"
   },
   "Alternative (OR)": {
     "Alternative (OR)": "Thay thế (HOẶC)"
@@ -652,6 +658,9 @@
   },
   "Applications and commands to start automatically when you log in": {
     "Applications and commands to start automatically when you log in": "Các ứng dụng và lệnh tự động khởi động khi bạn đăng nhập"
+  },
+  "Applies on the next greeter sync": {
+    "Applies on the next greeter sync": ""
   },
   "Apply Changes": {
     "Apply Changes": "Áp dụng thay đổi"
@@ -788,14 +797,8 @@
   "Authentication changes applied": {
     "Authentication changes applied": ""
   },
-  "Authentication changes applied.": {
-    "Authentication changes applied.": "Đã áp dụng các thay đổi xác thực."
-  },
   "Authentication changes apply automatically": {
     "Authentication changes apply automatically": ""
-  },
-  "Authentication changes apply automatically.": {
-    "Authentication changes apply automatically.": "Các thay đổi xác thực được áp dụng tự động."
   },
   "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": {
     "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": "Các thay đổi xác thực cần sudo. Đang mở cửa sổ dòng lệnh để bạn có thể sử dụng mật khẩu hoặc vân tay."
@@ -1030,6 +1033,9 @@
   },
   "Balanced palette with focused accents (default).": {
     "Balanced palette with focused accents (default).": "Bảng màu cân bằng, tô đậm cửa sổ đang chọn (mặc định)."
+  },
+  "Band": {
+    "Band": ""
   },
   "Bar": {
     "Bar": "Thanh"
@@ -1286,11 +1292,11 @@
   "Calendar Backend": {
     "Calendar Backend": "Hậu phần Lịch"
   },
+  "Calls / Headset": {
+    "Calls / Headset": ""
+  },
   "Camera": {
     "Camera": "Máy ảnh"
-  },
-  "Cancel": {
-    "Cancel": "Hủy"
   },
   "Cancel all jobs for \"%1\"?": {
     "Cancel all jobs for \"%1\"?": "Hủy tất cả các công việc cho \"%1\"?"
@@ -1436,9 +1442,6 @@
   "Choose how to be notified when charge limit is reached.": {
     "Choose how to be notified when charge limit is reached.": "Chọn cách bạn muốn nhận thông báo khi đạt đến giới hạn phí."
   },
-  "Choose icon": {
-    "Choose icon": "Chọn biểu tượng"
-  },
   "Choose monochrome or a theme color tint for system tray icons": {
     "Choose monochrome or a theme color tint for system tray icons": "Chọn đơn sắc hoặc màu chủ đề cho các biểu tượng khay hệ thống"
   },
@@ -1577,8 +1580,17 @@
   "Close Window": {
     "Close Window": "Đóng cửa sổ"
   },
+  "Codec switched successfully": {
+    "Codec switched successfully": ""
+  },
+  "Codec switching is unavailable because WirePlumber was not found": {
+    "Codec switching is unavailable because WirePlumber was not found": ""
+  },
   "Codec switching is unavailable because pactl was not found": {
     "Codec switching is unavailable because pactl was not found": ""
+  },
+  "Codec switching is unavailable. WirePlumber wpexec was not found.": {
+    "Codec switching is unavailable. WirePlumber wpexec was not found.": ""
   },
   "Color": {
     "Color": "Màu sắc"
@@ -1657,9 +1669,6 @@
   },
   "Commands": {
     "Commands": "Các lệnh"
-  },
-  "Communication": {
-    "Communication": "Liên lạc"
   },
   "Community themes": {
     "Community themes": "Các chủ đề cộng đồng"
@@ -1844,9 +1853,6 @@
   "Convenience options for the login screen": {
     "Convenience options for the login screen": ""
   },
-  "Convenience options for the login screen. Sync to apply.": {
-    "Convenience options for the login screen. Sync to apply.": "Các tùy chọn tiện ích cho màn hình đăng nhập. Đồng bộ để áp dụng."
-  },
   "Convert to DMS": {
     "Convert to DMS": "Chuyển đổi sang DMS"
   },
@@ -1889,9 +1895,6 @@
   "Copy Text": {
     "Copy Text": "Sao chép văn bản"
   },
-  "Copy path": {
-    "Copy path": "Sao chép đường dẫn"
-  },
   "Corner Radius": {
     "Corner Radius": "Bán kính góc"
   },
@@ -1900,6 +1903,9 @@
   },
   "Corners & Background": {
     "Corners & Background": "Góc & Nền"
+  },
+  "Couldn't load hotspot password": {
+    "Couldn't load hotspot password": ""
   },
   "Count Only": {
     "Count Only": "Chỉ đếm"
@@ -2123,9 +2129,6 @@
   "DMS removes its managed block from /etc/pam.d/greetd and stops write services": {
     "DMS removes its managed block from /etc/pam.d/greetd and stops write services": ""
   },
-  "DMS removes its managed block from /etc/pam.d/greetd and stops writing to it": {
-    "DMS removes its managed block from /etc/pam.d/greetd and stops writing to it": ""
-  },
   "DMS server is outdated (API v%1, expected v%2)": {
     "DMS server is outdated (API v%1, expected v%2)": "Máy chủ DMS đã cũ (API v%1, mong đợi v%2)"
   },
@@ -2315,9 +2318,6 @@
   "Description": {
     "Description": "Mô tả"
   },
-  "Desktop": {
-    "Desktop": "Máy tính để bàn"
-  },
   "Desktop Application": {
     "Desktop Application": "Ứng dụng máy tính"
   },
@@ -2344,9 +2344,6 @@
   },
   "Detected backends: %1": {
     "Detected backends: %1": "Đã phát hiện backend: %1"
-  },
-  "Development": {
-    "Development": "Phát triển"
   },
   "Device": {
     "Device": "Thiết bị"
@@ -2540,9 +2537,6 @@
   "Docs": {
     "Docs": "Tài liệu"
   },
-  "Documents": {
-    "Documents": "Tài liệu"
-  },
   "Domain (optional)": {
     "Domain (optional)": "Tên miền (tùy chọn)"
   },
@@ -2554,9 +2548,6 @@
   },
   "Door Open": {
     "Door Open": "Cửa mở"
-  },
-  "Downloads": {
-    "Downloads": "Tải về"
   },
   "Drag a widget by its handle here to reorder it or drop it into another group": {
     "Drag a widget by its handle here to reorder it or drop it into another group": "Kéo một widget bằng tay cầm của nó tại đây để sắp xếp lại hoặc thả nó vào một nhóm khác"
@@ -2714,6 +2705,9 @@
   "Enable WiFi": {
     "Enable WiFi": "WiFi"
   },
+  "Enable WiFi before starting the hotspot.": {
+    "Enable WiFi before starting the hotspot.": ""
+  },
   "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": {
     "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": "Bật ghi đè tùy chỉnh bên dưới để đặt cường độ bóng, độ mờ và màu sắc cho từng thanh."
   },
@@ -2728,9 +2722,6 @@
   },
   "Enable fingerprint or security key for DMS Greeter": {
     "Enable fingerprint or security key for DMS Greeter": ""
-  },
-  "Enable fingerprint or security key for DMS Greeter. Authentication changes apply automatically.": {
-    "Enable fingerprint or security key for DMS Greeter. Authentication changes apply automatically.": "Bật vân tay hoặc khóa bảo mật cho DMS Màn hình chào. Các thay đổi xác thực được áp dụng tự động."
   },
   "Enable loginctl lock integration": {
     "Enable loginctl lock integration": "Bật tích hợp khóa bằng loginctl"
@@ -2791,9 +2782,6 @@
   },
   "Enter device name...": {
     "Enter device name...": "Nhập tên thiết bị..."
-  },
-  "Enter filename...": {
-    "Enter filename...": "Nhập tên tệp..."
   },
   "Enter launch prefix (e.g., 'uwsm-app')": {
     "Enter launch prefix (e.g., 'uwsm-app')": "Nhập tiền tố khởi chạy (vd: 'uwsm-app')"
@@ -2903,9 +2891,6 @@
   "Extra Light": {
     "Extra Light": "Siêu nhẹ"
   },
-  "F1/I: Toggle • F10: Help": {
-    "F1/I: Toggle • F10: Help": "F1/I: Bật/tắt • F10: Trợ giúp"
-  },
   "Fade": {
     "Fade": "Làm mờ dần"
   },
@@ -2947,6 +2932,9 @@
   },
   "Failed to check pin limit": {
     "Failed to check pin limit": "Kiểm tra giới hạn pin thất bại"
+  },
+  "Failed to configure hotspot": {
+    "Failed to configure hotspot": ""
   },
   "Failed to connect VPN": {
     "Failed to connect VPN": "Không thể kết nối VPN"
@@ -3077,6 +3065,9 @@
   "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": {
     "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": "Chạy 'dms greeter status' thất bại. Đảm bảo DMS đã được cài đặt và dms có trong PATH."
   },
+  "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": {
+    "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": ""
+  },
   "Failed to save VPN credentials": {
     "Failed to save VPN credentials": "Không thể lưu thông tin đăng nhập VPN"
   },
@@ -3130,6 +3121,15 @@
   },
   "Failed to start connection to %1": {
     "Failed to start connection to %1": "Bắt đầu kết nối tới %1 thất bại"
+  },
+  "Failed to start hotspot": {
+    "Failed to start hotspot": ""
+  },
+  "Failed to stop hotspot": {
+    "Failed to stop hotspot": ""
+  },
+  "Failed to switch codec": {
+    "Failed to switch codec": ""
   },
   "Failed to unpin entry": {
     "Failed to unpin entry": "Bỏ ghim mục thất bại"
@@ -3188,12 +3188,6 @@
   "File": {
     "File": "Tệp"
   },
-  "File Already Exists": {
-    "File Already Exists": "Tệp đã tồn tại"
-  },
-  "File Information": {
-    "File Information": "Thông tin tệp"
-  },
   "File Manager": {
     "File Manager": "Trình quản lý tệp"
   },
@@ -3241,9 +3235,6 @@
   },
   "Fingerprint availability could not be confirmed": {
     "Fingerprint availability could not be confirmed": ""
-  },
-  "Fingerprint availability could not be confirmed.": {
-    "Fingerprint availability could not be confirmed.": "Tính khả dụng của vân tay không thể được xác nhận."
   },
   "Fingerprint error": {
     "Fingerprint error": "Lỗi vân tay"
@@ -3518,9 +3509,6 @@
   "Fully Charged": {
     "Fully Charged": "Đã sạc đầy"
   },
-  "Fun": {
-    "Fun": "Giải trí"
-  },
   "G: grid • Z/X: size": {
     "G: grid • Z/X: size": "G: lưới • Z/X: kích thước"
   },
@@ -3632,11 +3620,11 @@
   "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": {
     "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": "Các thành viên của nhóm màn hình chào có thể đồng bộ chủ đề màn hình đăng nhập của họ bằng dms greeter sync --profile sau khi đăng xuất và đăng nhập lại."
   },
+  "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": {
+    "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": ""
+  },
   "Greeter group:": {
     "Greeter group:": "Nhóm Màn hình chào:"
-  },
-  "Greeter only — format for the date on the login screen": {
-    "Greeter only — format for the date on the login screen": "Chỉ dành cho Màn hình chào — định dạng cho ngày trên màn hình đăng nhập"
   },
   "Greeter sync complete": {
     "Greeter sync complete": "Đồng bộ hóa Chào mừng hoàn tất"
@@ -3730,9 +3718,6 @@
   },
   "Hex": {
     "Hex": "Hex"
-  },
-  "Hibernate": {
-    "Hibernate": "Ngủ đông"
   },
   "Hibernate failed": {
     "Hibernate failed": "Ngủ đông thất bại"
@@ -3833,20 +3818,8 @@
   "Hold Duration": {
     "Hold Duration": "Thời lượng giữ"
   },
-  "Hold longer to confirm": {
-    "Hold longer to confirm": "Giữ lâu hơn để xác nhận"
-  },
   "Hold to Confirm Power Actions": {
     "Hold to Confirm Power Actions": "Giữ để xác nhận hành động nguồn"
-  },
-  "Hold to confirm (%1 ms)": {
-    "Hold to confirm (%1 ms)": "Giữ để xác nhận (%1 ms)"
-  },
-  "Hold to confirm (%1s)": {
-    "Hold to confirm (%1s)": "Giữ để xác nhận (%1s)"
-  },
-  "Home": {
-    "Home": "Nhà / Thư mục cá nhân"
   },
   "Horizontal and vertical bar thickness": {
     "Horizontal and vertical bar thickness": "Độ dày của thanh ngang và dọc"
@@ -3862,6 +3835,24 @@
   },
   "Hotkey overlay title (optional)": {
     "Hotkey overlay title (optional)": "Tiêu đề lớp phủ phím tắt (tùy chọn)"
+  },
+  "Hotspot": {
+    "Hotspot": ""
+  },
+  "Hotspot activation failed.": {
+    "Hotspot activation failed.": ""
+  },
+  "Hotspot name": {
+    "Hotspot name": ""
+  },
+  "Hotspot saved": {
+    "Hotspot saved": ""
+  },
+  "Hotspot started": {
+    "Hotspot started": ""
+  },
+  "Hotspot stopped": {
+    "Hotspot stopped": ""
   },
   "Hour": {
     "Hour": "Giờ"
@@ -3919,6 +3910,9 @@
   },
   "IP address or hostname": {
     "IP address or hostname": "Địa chỉ IP hoặc tên máy chủ"
+  },
+  "IP sharing setup failed. Check that dnsmasq is installed.": {
+    "IP sharing setup failed. Check that dnsmasq is installed.": ""
   },
   "ISO Date": {
     "ISO Date": "Ngày ISO"
@@ -4123,9 +4117,6 @@
   },
   "Installation and PAM setup are documented in the ": {
     "Installation and PAM setup are documented in the ": ""
-  },
-  "Installation and PAM setup: see the ": {
-    "Installation and PAM setup: see the ": "Cài đặt và thiết lập PAM: xem "
   },
   "Installed": {
     "Installed": "Đã cài đặt"
@@ -4448,9 +4439,6 @@
   "Locked": {
     "Locked": "Đã khóa"
   },
-  "Log Out": {
-    "Log Out": "Đăng xuất"
-  },
   "Logging in...": {
     "Logging in...": "Đang đăng nhập..."
   },
@@ -4691,9 +4679,6 @@
   "Maximum pinned entries reached": {
     "Maximum pinned entries reached": "Đã đạt đến số lượng mục ghim tối đa"
   },
-  "Media": {
-    "Media": "Phương tiện"
-  },
   "Media Controls": {
     "Media Controls": "Điều khiển phương tiện"
   },
@@ -4799,9 +4784,6 @@
   "Model": {
     "Model": "Kiểu máy"
   },
-  "Modified": {
-    "Modified": "Đã sửa đổi"
-  },
   "Modular widget bar": {
     "Modular widget bar": "Thanh tiện ích mô-đun"
   },
@@ -4853,9 +4835,6 @@
   "Move Widget": {
     "Move Widget": "Di chuyển tiện ích"
   },
-  "Move to Trash": {
-    "Move to Trash": "Di chuyển vào thùng rác"
-  },
   "Moving to Paused": {
     "Moving to Paused": "Đang chuyển sang tạm dừng"
   },
@@ -4870,9 +4849,6 @@
   },
   "Multiplexers": {
     "Multiplexers": "Các bộ ghép kênh"
-  },
-  "Music": {
-    "Music": "Nhạc"
   },
   "Music Player": {
     "Music Player": "Trình phát nhạc"
@@ -4901,9 +4877,6 @@
   "NM not supported": {
     "NM not supported": "Không hỗ trợ NM"
   },
-  "Name": {
-    "Name": "Tên"
-  },
   "Named Workspace Icons": {
     "Named Workspace Icons": "Biểu tượng không gian làm việc có tên"
   },
@@ -4918,9 +4891,6 @@
   },
   "Navigate": {
     "Navigate": "Điều hướng"
-  },
-  "Navigation": {
-    "Navigation": "Điều hướng"
   },
   "Network": {
     "Network": "Mạng"
@@ -5165,9 +5135,6 @@
   "No fingerprint reader detected": {
     "No fingerprint reader detected": ""
   },
-  "No fingerprint reader detected.": {
-    "No fingerprint reader detected.": "Không phát hiện trình đọc vân tay nào."
-  },
   "No folders found": {
     "No folders found": "Không tìm thấy thư mục nào"
   },
@@ -5282,9 +5249,6 @@
   "No supported package manager found.": {
     "No supported package manager found.": "Không tìm thấy trình quản lý gói nào được hỗ trợ."
   },
-  "No terminal configured": {
-    "No terminal configured": "Chưa cấu hình cửa sổ dòng lệnh"
-  },
   "No themes found": {
     "No themes found": "Không tìm thấy chủ đề nào"
   },
@@ -5360,14 +5324,8 @@
   "Not available — install fprintd and pam_fprintd, or configure greetd PAM.": {
     "Not available — install fprintd and pam_fprintd, or configure greetd PAM.": "Không khả dụng — hãy cài đặt fprintd và pam_fprintd, hoặc cấu hình greetd PAM."
   },
-  "Not available — install fprintd and pam_fprintd.": {
-    "Not available — install fprintd and pam_fprintd.": "Không khả dụng — hãy cài đặt fprintd và pam_fprintd."
-  },
   "Not available — install or configure pam_u2f, or configure greetd PAM.": {
     "Not available — install or configure pam_u2f, or configure greetd PAM.": "Không khả dụng — hãy cài đặt hoặc cấu hình pam_u2f, hoặc cấu hình greetd PAM."
-  },
-  "Not available — install or configure pam_u2f.": {
-    "Not available — install or configure pam_u2f.": "Không khả dụng — hãy cài đặt hoặc cấu hình pam_u2f."
   },
   "Not bound": {
     "Not bound": "Chưa được gán"
@@ -5437,9 +5395,6 @@
   },
   "Now playing and media controls": {
     "Now playing and media controls": "Đang phát ngay bây giờ và kiểm soát phương tiện"
-  },
-  "Numbers": {
-    "Numbers": "Số"
   },
   "Numeric (D/M)": {
     "Numeric (D/M)": "Số (N/T)"
@@ -5555,6 +5510,9 @@
   "Open in terminal": {
     "Open in terminal": "Mở trong cửa sổ dòng lệnh"
   },
+  "Open network": {
+    "Open network": ""
+  },
   "Open search bar to find text": {
     "Open search bar to find text": "Mở thanh tìm kiếm"
   },
@@ -5582,6 +5540,9 @@
   "Opens the connected launcher in Connected Frame Mode.": {
     "Opens the connected launcher in Connected Frame Mode.": "Mở trình khởi chạy đã kết nối trong Chế độ khung kết nối."
   },
+  "Optional": {
+    "Optional": ""
+  },
   "Optional description": {
     "Optional description": "Mô tả tùy chọn"
   },
@@ -5590,6 +5551,9 @@
   },
   "Optional state-based conditions applied to the first match.": {
     "Optional state-based conditions applied to the first match.": "Điều kiện dựa trên trạng thái tùy chọn, áp dụng cho kết quả khớp đầu tiên."
+  },
+  "Optional; leave blank for open hotspot": {
+    "Optional; leave blank for open hotspot": ""
   },
   "Options": {
     "Options": "Tùy chọn"
@@ -5671,9 +5635,6 @@
   },
   "Overview of your network connections": {
     "Overview of your network connections": "Tổng quan về các kết nối mạng của bạn"
-  },
-  "Overwrite": {
-    "Overwrite": "Ghi đè"
   },
   "Owner: %1": {
     "Owner: %1": "Chủ sở hữu: %1"
@@ -5819,14 +5780,8 @@
   "Pick a different random video each time from the same folder": {
     "Pick a different random video each time from the same folder": "Chọn một video ngẫu nhiên khác nhau mỗi lần từ cùng một thư mục"
   },
-  "Pick a terminal in Settings → Launcher (or set $TERMINAL).": {
-    "Pick a terminal in Settings → Launcher (or set $TERMINAL).": "Chọn một cửa sổ dòng lệnh trong Cài đặt → Trình khởi chạy (hoặc đặt $TERMINAL)."
-  },
   "Pick how long to pause notifications": {
     "Pick how long to pause notifications": "Chọn thời gian tạm dừng thông báo"
-  },
-  "Pictures": {
-    "Pictures": "Hình ảnh"
   },
   "Pin": {
     "Pin": "Ghim"
@@ -6001,12 +5956,6 @@
   },
   "Power Mode": {
     "Power Mode": "Chế độ nguồn"
-  },
-  "Power Off": {
-    "Power Off": "Tắt nguồn"
-  },
-  "Power Options": {
-    "Power Options": "Tùy chọn nguồn"
   },
   "Power Profile": {
     "Power Profile": "Cấu hình nguồn"
@@ -6200,9 +6149,6 @@
   "Quality": {
     "Quality": "Chất lượng"
   },
-  "Quick Access": {
-    "Quick Access": "Truy cập nhanh"
-  },
   "Quick access to application launcher": {
     "Quick access to application launcher": "Truy cập nhanh vào trình khởi chạy app"
   },
@@ -6242,6 +6188,9 @@
   "Re-enter password": {
     "Re-enter password": "Nhập lại mật khẩu"
   },
+  "Re-enter the password before saving.": {
+    "Re-enter the password before saving.": ""
+  },
   "Reach local network devices while using an exit node": {
     "Reach local network devices while using an exit node": "Truy cập các thiết bị mạng cục bộ trong khi sử dụng nút thoát"
   },
@@ -6251,11 +6200,11 @@
   "Read:": {
     "Read:": "Đọc:"
   },
+  "Ready": {
+    "Ready": ""
+  },
   "Reason": {
     "Reason": "Lý do"
-  },
-  "Reboot": {
-    "Reboot": "Khởi động lại"
   },
   "Recent": {
     "Recent": "Gần đây"
@@ -6298,6 +6247,9 @@
   },
   "Release": {
     "Release": "Bản phát hành"
+  },
+  "Release to confirm": {
+    "Release to confirm": ""
   },
   "Reload From Disk": {
     "Reload From Disk": "Tải lại từ ổ đĩa"
@@ -6424,9 +6376,6 @@
   },
   "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys).": {
     "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys).": ""
-  },
-  "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys). Auth changes apply automatically and may open a terminal for sudo.": {
-    "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys). Auth changes apply automatically and may open a terminal for sudo.": "Yêu cầu greetd, dms-greeter, và người dùng của bạn trong nhóm greeter (cộng với fprintd/pam_fprintd cho vân tay, pam_u2f cho khóa bảo mật). Thay đổi xác thực được áp dụng tự động và có thể mở terminal cho sudo."
   },
   "Requires night mode support": {
     "Requires night mode support": "Yêu cầu hỗ trợ chế độ ban đêm"
@@ -6569,6 +6518,9 @@
   "Run paru/yay with AUR enabled when 'Update All' is clicked.": {
     "Run paru/yay with AUR enabled when 'Update All' is clicked.": "Chạy paru/yay với AUR được bật khi nhấp vào 'Cập nhật tất cả'."
   },
+  "Running": {
+    "Running": ""
+  },
   "Running Apps": {
     "Running Apps": "Ứng dụng đang chạy"
   },
@@ -6593,11 +6545,14 @@
   "SMS sent successfully": {
     "SMS sent successfully": "SMS đã gửi thành công"
   },
+  "SSID": {
+    "SSID": ""
+  },
   "Saturation": {
     "Saturation": "Độ bão hòa"
   },
-  "Save": {
-    "Save": "Lưu"
+  "Save & Start": {
+    "Save & Start": ""
   },
   "Save Notepad File": {
     "Save Notepad File": "Lưu tệp ghi chú"
@@ -6719,9 +6674,6 @@
   "Search devices...": {
     "Search devices...": "Tìm kiếm thiết bị..."
   },
-  "Search for a location...": {
-    "Search for a location...": "Tìm vị trí..."
-  },
   "Search installed plugins...": {
     "Search installed plugins...": "Tìm kiếm plugin đã cài đặt..."
   },
@@ -6745,9 +6697,6 @@
   },
   "Search widgets...": {
     "Search widgets...": "Tìm tiện ích..."
-  },
-  "Search...": {
-    "Search...": "Tìm kiếm..."
   },
   "Searching...": {
     "Searching...": "Đang tìm kiếm..."
@@ -6778,9 +6727,6 @@
   },
   "Security-key availability could not be confirmed": {
     "Security-key availability could not be confirmed": ""
-  },
-  "Security-key availability could not be confirmed.": {
-    "Security-key availability could not be confirmed.": "Tính khả dụng của khóa bảo mật không thể được xác nhận."
   },
   "Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.": {
     "Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.": "Đã phát hiện hỗ trợ khóa bảo mật, nhưng chưa tìm thấy khóa nào được đăng ký. Bạn có thể bật tính năng này ngay bây giờ và đăng ký một khóa sau."
@@ -6955,6 +6901,15 @@
   },
   "Set the percentage at which the battery is considered low.": {
     "Set the percentage at which the battery is considered low.": "Đặt phần trăm mà pin được coi là yếu."
+  },
+  "Set up a WiFi hotspot for sharing this connection.": {
+    "Set up a WiFi hotspot for sharing this connection.": ""
+  },
+  "Set up hotspot": {
+    "Set up hotspot": ""
+  },
+  "Set up hotspot in Settings": {
+    "Set up hotspot in Settings": ""
   },
   "Setting": {
     "Setting": "Cài đặt"
@@ -7349,9 +7304,6 @@
   "Single-Line Popup": {
     "Single-Line Popup": "Cửa sổ bật một dòng"
   },
-  "Size": {
-    "Size": "Kích thước"
-  },
   "Size Constraints": {
     "Size Constraints": "Ràng buộc kích thước"
   },
@@ -7393,9 +7345,6 @@
   },
   "Sort Alphabetically": {
     "Sort Alphabetically": "Sắp xếp từ A > Z"
-  },
-  "Sort By": {
-    "Sort By": "Sắp xếp theo"
   },
   "Sort wallpapers": {
     "Sort wallpapers": "Sắp xếp hình nền"
@@ -7463,17 +7412,29 @@
   "Start": {
     "Start": "Bắt đầu"
   },
+  "Start Hotspot?": {
+    "Start Hotspot?": ""
+  },
   "Start KDE Connect or Valent to use this plugin": {
     "Start KDE Connect or Valent to use this plugin": "Khởi động KDE Connect hoặc Valent để sử dụng plugin này"
   },
   "Start typing your notes here...": {
     "Start typing your notes here...": "Bắt đầu nhập ghi chú tại đây..."
   },
+  "Starting hotspot...": {
+    "Starting hotspot...": ""
+  },
+  "Starting the hotspot will disconnect WiFi from \"%1\" — the radio can't do both at once. Sharing internet then requires another connection, such as Ethernet.": {
+    "Starting the hotspot will disconnect WiFi from \"%1\" — the radio can't do both at once. Sharing internet then requires another connection, such as Ethernet.": ""
+  },
+  "Starting...": {
+    "Starting...": ""
+  },
   "State": {
     "State": "Trạng thái"
   },
-  "Status": {
-    "Status": "Trạng thái"
+  "Stop": {
+    "Stop": ""
   },
   "Stop ignoring %1": {
     "Stop ignoring %1": ""
@@ -7559,9 +7520,6 @@
   "Surfaces float independently of the frame": {
     "Surfaces float independently of the frame": "Các bề mặt nổi độc lập với khung"
   },
-  "Suspend": {
-    "Suspend": "Ngủ"
-  },
   "Suspend behavior": {
     "Suspend behavior": "Hành vi khi ngủ"
   },
@@ -7573,9 +7531,6 @@
   },
   "Sway Website": {
     "Sway Website": "Trang web Sway"
-  },
-  "Switch User": {
-    "Switch User": "Chuyển người dùng"
   },
   "Switch between display configurations": {
     "Switch between display configurations": "Chuyển đổi giữa các cấu hình hiển thị"
@@ -7601,11 +7556,11 @@
   "Sync Position Across Screens": {
     "Sync Position Across Screens": "Đồng bộ vị trí qua các màn hình"
   },
-  "Sync applies your theme and settings to the login screen. Other users should run dms greeter sync --profile instead of a full sync. Authentication changes apply automatically.": {
-    "Sync applies your theme and settings to the login screen. Other users should run dms greeter sync --profile instead of a full sync. Authentication changes apply automatically.": "Đồng bộ hóa áp dụng chủ đề và cài đặt của bạn vào màn hình đăng nhập. Những người dùng khác nên chạy dms greeter sync --profile thay vì đồng bộ hóa đầy đủ. Thay đổi xác thực được áp dụng tự động."
-  },
   "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": {
     "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": ""
+  },
+  "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": {
+    "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": ""
   },
   "Sync completed successfully.": {
     "Sync completed successfully.": "Đồng bộ hoàn tất thành công."
@@ -7624,9 +7579,6 @@
   },
   "Syncing...": {
     "Syncing...": "Đang đồng bộ hóa..."
-  },
-  "System": {
-    "System": "Hệ thống"
   },
   "System App Theming": {
     "System App Theming": "Chủ đề ứng dụng hệ thống"
@@ -7682,9 +7634,6 @@
   "Tab": {
     "Tab": "Tab"
   },
-  "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": {
-    "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": "Tab/Shift+Tab: Điều hướng • ←→↑↓: Điều hướng kiểu lưới • Enter/Space: Chọn"
-  },
   "Tags": {
     "Tags": "Thẻ"
   },
@@ -7714,6 +7663,9 @@
   },
   "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": {
     "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": "Chế độ dự phòng dòng lệnh thất bại. Hãy cài đặt một trong những trình giả lập dòng lệnh được hỗ trợ hoặc chạy 'dms greeter sync' thủ công."
+  },
+  "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": {
+    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": ""
   },
   "Terminal fallback opened. Complete authentication there; it will close automatically when done.": {
     "Terminal fallback opened. Complete authentication there; it will close automatically when done.": ""
@@ -7759,6 +7711,9 @@
   },
   "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": {
     "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "DMS_SOCKET chưa được thiết lập hoặc socket không khả dụng. Quản lý plugin tự động cần DMS_SOCKET."
+  },
+  "The WiFi adapter could not start access point mode.": {
+    "The WiFi adapter could not start access point mode.": ""
   },
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
     "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "Các thiết lập dưới đây sẽ thay đổi GTK và Qt. Hãy sao lưu cấu hình hiện tại nếu cần (qt5ct.conf|qt6ct.conf và ~/.config/gtk-3.0|gtk-4.0)."
@@ -7831,6 +7786,9 @@
   },
   "This will delete all unpinned entries. %1 pinned entries will be kept.": {
     "This will delete all unpinned entries. %1 pinned entries will be kept.": "Việc này sẽ xóa tất cả các mục không được ghim. %1 mục đã ghim sẽ được giữ lại."
+  },
+  "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": {
+    "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": ""
   },
   "This will permanently delete all clipboard history.": {
     "This will permanently delete all clipboard history.": "Thao tác này sẽ xóa sạch bảng nhớ tạm."
@@ -8060,9 +8018,6 @@
   "Turn off now": {
     "Turn off now": "Tắt ngay"
   },
-  "Type": {
-    "Type": "Loại"
-  },
   "Type at least 2 characters": {
     "Type at least 2 characters": "Nhập ít nhất 2 ký tự"
   },
@@ -8279,9 +8234,6 @@
   "Use a custom image for the login screen, or leave empty to use desktop wallpaper": {
     "Use a custom image for the login screen, or leave empty to use desktop wallpaper": ""
   },
-  "Use a custom image for the login screen, or leave empty to use your desktop wallpaper.": {
-    "Use a custom image for the login screen, or leave empty to use your desktop wallpaper.": "Sử dụng ảnh tùy chỉnh cho màn hình đăng nhập, hoặc để trống để sử dụng hình nền máy tính."
-  },
   "Use a custom radius for goth corner cutouts": {
     "Use a custom radius for goth corner cutouts": "Sử dụng bán kính tùy chỉnh cho các đường cắt góc Gothic"
   },
@@ -8290,9 +8242,6 @@
   },
   "Use a security key for lock screen authentication": {
     "Use a security key for lock screen authentication": ""
-  },
-  "Use a security key for lock screen authentication.": {
-    "Use a security key for lock screen authentication.": "Sử dụng khóa bảo mật để xác thực màn hình khóa."
   },
   "Use album art accent": {
     "Use album art accent": ""
@@ -8323,9 +8272,6 @@
   },
   "Use fingerprint authentication for the lock screen": {
     "Use fingerprint authentication for the lock screen": ""
-  },
-  "Use fingerprint authentication for the lock screen.": {
-    "Use fingerprint authentication for the lock screen.": "Sử dụng xác thực vân tay cho màn hình khóa."
   },
   "Use keys 1-3 or arrows, Enter/Space to select": {
     "Use keys 1-3 or arrows, Enter/Space to select": "Dùng phím 1-3 hoặc mũi tên, Enter/Cách để chọn"
@@ -8498,9 +8444,6 @@
   "Video Screensaver": {
     "Video Screensaver": "Trình bảo vệ màn hình video"
   },
-  "Videos": {
-    "Videos": "Video"
-  },
   "View Mode": {
     "View Mode": "Chế độ xem"
   },
@@ -8537,8 +8480,14 @@
   "W": {
     "W": ""
   },
+  "WCAG %1 body": {
+    "WCAG %1 body": ""
+  },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
+  },
+  "WPA2 password": {
+    "WPA2 password": ""
   },
   "Wallpaper": {
     "Wallpaper": "Hình nền"
@@ -8627,6 +8576,12 @@
   "WiFi enabled": {
     "WiFi enabled": "Đã bật WiFi"
   },
+  "WiFi is disabled": {
+    "WiFi is disabled": ""
+  },
+  "WiFi is disabled. You can still edit and save hotspot settings, but starting the hotspot requires WiFi to be enabled.": {
+    "WiFi is disabled. You can still edit and save hotspot settings, but starting the hotspot requires WiFi to be enabled.": ""
+  },
   "WiFi is off": {
     "WiFi is off": "WiFi đang tắt"
   },
@@ -8684,6 +8639,9 @@
   "Width of window border and focus ring": {
     "Width of window border and focus ring": "Độ rộng của viền cửa sổ và vòng tiêu điểm"
   },
+  "Will disconnect \"%1": {
+    "Will disconnect \"%1\"": ""
+  },
   "Wind": {
     "Wind": "Gió"
   },
@@ -8716,9 +8674,6 @@
   },
   "Working...": {
     "Working...": "Đang xử lý..."
-  },
-  "Workspace": {
-    "Workspace": "Không gian làm việc"
   },
   "Workspace Index Numbers": {
     "Workspace Index Numbers": "Số thứ tự không gian làm việc"
@@ -8794,6 +8749,12 @@
   },
   "Your compositor does not support background blur (ext-background-effect-v1)": {
     "Your compositor does not support background blur (ext-background-effect-v1)": "Compositor của bạn không hỗ trợ làm mờ nền (ext-background-effect-v1)"
+  },
+  "Your hotspot is running.": {
+    "Your hotspot is running.": ""
+  },
+  "Your hotspot profile is saved and ready to start.": {
+    "Your hotspot profile is saved and ready to start.": ""
   },
   "Your system is up to date!": {
     "Your system is up to date!": "Hệ thống của bạn đã được cập nhật!"
@@ -8968,9 +8929,6 @@
   },
   "on Sway": {
     "on Sway": "trên Sway"
-  },
-  "or run ": {
-    "or run ": "hoặc chạy "
   },
   "power-profiles-daemon not available": {
     "power-profiles-daemon not available": "power-profiles-daemon không khả dụng"

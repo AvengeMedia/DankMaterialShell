@@ -197,6 +197,9 @@
   "2 seconds": {
     "2 seconds": "2 секунды"
   },
+  "2.4 GHz": {
+    "2.4 GHz": ""
+  },
   "20 minutes": {
     "20 minutes": "20 минут"
   },
@@ -260,6 +263,9 @@
   "45 seconds": {
     "45 seconds": "45 секунд"
   },
+  "5 GHz": {
+    "5 GHz": ""
+  },
   "5 min before": {
     "5 min before": "За 5 мин."
   },
@@ -301,9 +307,6 @@
   },
   "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>": {
     "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>": "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>"
-  },
-  "A file with this name already exists. Do you want to overwrite it?": {
-    "A file with this name already exists. Do you want to overwrite it?": "Файл с таким именем уже существует. Хотите его перезаписать?"
   },
   "A modern desktop shell for Wayland compositors": {
     "A modern desktop shell for Wayland compositors": "Современная оболочка рабочего стола для композиторов Wayland"
@@ -365,9 +368,6 @@
   "Action performed when scrolling vertically on the bar": {
     "Action performed when scrolling vertically on the bar": "Действие, выполняемое при вертикальной прокрутке на панели"
   },
-  "Actions": {
-    "Actions": "Действия"
-  },
   "Activate": {
     "Activate": "Активировать"
   },
@@ -376,6 +376,9 @@
   },
   "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": {
     "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": "Активировать экран приветствия DMS? Откроется терминал для аутентификации через sudo. Запустите синхронизацию после активации, чтобы применить настройки."
+  },
+  "Activates immediately": {
+    "Activates immediately": ""
   },
   "Activation": {
     "Activation": "Активация"
@@ -418,6 +421,9 @@
   },
   "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": {
     "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": "Добавить «%1» в группу %2? Пользователю потребуется выйти из системы и войти снова, а затем выполнить команду dms greeter sync --profile, чтобы опубликовать свою тему экрана входа."
+  },
+  "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": {
+    "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": ""
   },
   "Add Bar": {
     "Add Bar": "Добавить бар"
@@ -469,6 +475,9 @@
   },
   "Add the new user to the %1 group so they can run dms greeter sync --profile.": {
     "Add the new user to the %1 group so they can run dms greeter sync --profile.": "Добавить нового пользователя в группу %1, чтобы он мог запустить dms greeter sync --profile."
+  },
+  "Add the new user to the %1 group so they can run dms-greeter sync --profile.": {
+    "Add the new user to the %1 group so they can run dms-greeter sync --profile.": ""
   },
   "Add the new user to the %1 group so they can use sudo.": {
     "Add the new user to the %1 group so they can use sudo.": "Добавить нового пользователя в группу %1, чтобы он мог использовать sudo."
@@ -538,9 +547,6 @@
   },
   "Also group repeated application icons on the active workspace": {
     "Also group repeated application icons on the active workspace": "Также группировать повторяющиеся значки приложений на активном рабочем пространстве"
-  },
-  "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close": {
-    "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close": "Alt+←/Backspace: Назад • F1/I: Информация о Файле • F10: Справка • Esc: Закрыть"
   },
   "Alternative (OR)": {
     "Alternative (OR)": "Альтернативный (ИЛИ)"
@@ -652,6 +658,9 @@
   },
   "Applications and commands to start automatically when you log in": {
     "Applications and commands to start automatically when you log in": "Приложения и команды для автоматического запуска при входе в систему"
+  },
+  "Applies on the next greeter sync": {
+    "Applies on the next greeter sync": ""
   },
   "Apply Changes": {
     "Apply Changes": "Применить изменения"
@@ -788,14 +797,8 @@
   "Authentication changes applied": {
     "Authentication changes applied": ""
   },
-  "Authentication changes applied.": {
-    "Authentication changes applied.": "Изменения аутентификации применены."
-  },
   "Authentication changes apply automatically": {
     "Authentication changes apply automatically": ""
-  },
-  "Authentication changes apply automatically.": {
-    "Authentication changes apply automatically.": "Изменения аутентификации применяются автоматически."
   },
   "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": {
     "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": "Для изменения аутентификации требуются права sudo. Открытие терминала для ввода пароля или сканирования отпечатка пальца."
@@ -1030,6 +1033,9 @@
   },
   "Balanced palette with focused accents (default).": {
     "Balanced palette with focused accents (default).": "Сбалансированная палитра с фокусными акцентами (по умолчанию)."
+  },
+  "Band": {
+    "Band": ""
   },
   "Bar": {
     "Bar": "Панель"
@@ -1286,11 +1292,11 @@
   "Calendar Backend": {
     "Calendar Backend": "Бэкенд календаря"
   },
+  "Calls / Headset": {
+    "Calls / Headset": ""
+  },
   "Camera": {
     "Camera": "Камера"
-  },
-  "Cancel": {
-    "Cancel": "Отмена"
   },
   "Cancel all jobs for \"%1\"?": {
     "Cancel all jobs for \"%1\"?": "%1 задани(й/я)"
@@ -1436,9 +1442,6 @@
   "Choose how to be notified when charge limit is reached.": {
     "Choose how to be notified when charge limit is reached.": ""
   },
-  "Choose icon": {
-    "Choose icon": "Выбрать Значок"
-  },
   "Choose monochrome or a theme color tint for system tray icons": {
     "Choose monochrome or a theme color tint for system tray icons": "Выберите монохромный вариант или оттенок цвета темы для значков системного трея"
   },
@@ -1577,8 +1580,17 @@
   "Close Window": {
     "Close Window": "Закрыть окно"
   },
+  "Codec switched successfully": {
+    "Codec switched successfully": ""
+  },
+  "Codec switching is unavailable because WirePlumber was not found": {
+    "Codec switching is unavailable because WirePlumber was not found": ""
+  },
   "Codec switching is unavailable because pactl was not found": {
     "Codec switching is unavailable because pactl was not found": ""
+  },
+  "Codec switching is unavailable. WirePlumber wpexec was not found.": {
+    "Codec switching is unavailable. WirePlumber wpexec was not found.": ""
   },
   "Color": {
     "Color": "Цвет"
@@ -1657,9 +1669,6 @@
   },
   "Commands": {
     "Commands": "Команды"
-  },
-  "Communication": {
-    "Communication": "Взаимодействие"
   },
   "Community themes": {
     "Community themes": "Безопасность и конфиденциальность"
@@ -1844,9 +1853,6 @@
   "Convenience options for the login screen": {
     "Convenience options for the login screen": ""
   },
-  "Convenience options for the login screen. Sync to apply.": {
-    "Convenience options for the login screen. Sync to apply.": "Удобные параметры для экрана входа. Синхронизируйте для применения."
-  },
   "Convert to DMS": {
     "Convert to DMS": "Преобразовать в DMS"
   },
@@ -1889,9 +1895,6 @@
   "Copy Text": {
     "Copy Text": "Копировать текст"
   },
-  "Copy path": {
-    "Copy path": "Копировать путь"
-  },
   "Corner Radius": {
     "Corner Radius": "Радиус скругления углов"
   },
@@ -1900,6 +1903,9 @@
   },
   "Corners & Background": {
     "Corners & Background": "Углы и фон"
+  },
+  "Couldn't load hotspot password": {
+    "Couldn't load hotspot password": ""
   },
   "Count Only": {
     "Count Only": "Полное содержимое"
@@ -2123,9 +2129,6 @@
   "DMS removes its managed block from /etc/pam.d/greetd and stops write services": {
     "DMS removes its managed block from /etc/pam.d/greetd and stops write services": ""
   },
-  "DMS removes its managed block from /etc/pam.d/greetd and stops writing to it": {
-    "DMS removes its managed block from /etc/pam.d/greetd and stops writing to it": ""
-  },
   "DMS server is outdated (API v%1, expected v%2)": {
     "DMS server is outdated (API v%1, expected v%2)": "Сервер DMS устарел (API v%1, ожидается v%2)"
   },
@@ -2315,9 +2318,6 @@
   "Description": {
     "Description": "Описание"
   },
-  "Desktop": {
-    "Desktop": "Рабочий стол"
-  },
   "Desktop Application": {
     "Desktop Application": "Приложение рабочего стола"
   },
@@ -2344,9 +2344,6 @@
   },
   "Detected backends: %1": {
     "Detected backends: %1": "Обнаруженные бэкенды: %1"
-  },
-  "Development": {
-    "Development": "Разработка"
   },
   "Device": {
     "Device": "Устройство"
@@ -2540,9 +2537,6 @@
   "Docs": {
     "Docs": "Документация"
   },
-  "Documents": {
-    "Documents": "Документы"
-  },
   "Domain (optional)": {
     "Domain (optional)": "Домен (необязательно)"
   },
@@ -2554,9 +2548,6 @@
   },
   "Door Open": {
     "Door Open": "Дверь открыта"
-  },
-  "Downloads": {
-    "Downloads": "Загрузки"
   },
   "Drag a widget by its handle here to reorder it or drop it into another group": {
     "Drag a widget by its handle here to reorder it or drop it into another group": ""
@@ -2714,6 +2705,9 @@
   "Enable WiFi": {
     "Enable WiFi": "Включить WiFi"
   },
+  "Enable WiFi before starting the hotspot.": {
+    "Enable WiFi before starting the hotspot.": ""
+  },
   "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": {
     "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": "Включите пользовательское переопределение ниже, чтобы настроить интенсивность, непрозрачность и цвет тени для каждой панели."
   },
@@ -2728,9 +2722,6 @@
   },
   "Enable fingerprint or security key for DMS Greeter": {
     "Enable fingerprint or security key for DMS Greeter": ""
-  },
-  "Enable fingerprint or security key for DMS Greeter. Authentication changes apply automatically.": {
-    "Enable fingerprint or security key for DMS Greeter. Authentication changes apply automatically.": "Включить аутентификацию по отпечатку пальца или ключу безопасности для DMS Greeter. Изменения аутентификации применяются автоматически."
   },
   "Enable loginctl lock integration": {
     "Enable loginctl lock integration": "Включить интеграцию блокировки loginctl"
@@ -2791,9 +2782,6 @@
   },
   "Enter device name...": {
     "Enter device name...": "Введите имя устройства..."
-  },
-  "Enter filename...": {
-    "Enter filename...": "Введите имя файла..."
   },
   "Enter launch prefix (e.g., 'uwsm-app')": {
     "Enter launch prefix (e.g., 'uwsm-app')": "Введите префикс запуска (например, 'uwsm-app')"
@@ -2903,9 +2891,6 @@
   "Extra Light": {
     "Extra Light": "Сверхсветлый"
   },
-  "F1/I: Toggle • F10: Help": {
-    "F1/I: Toggle • F10: Help": "F1/I: Переключить • F10: Справка"
-  },
   "Fade": {
     "Fade": "Стирание"
   },
@@ -2947,6 +2932,9 @@
   },
   "Failed to check pin limit": {
     "Failed to check pin limit": "Не удалось проверить лимит закрепления"
+  },
+  "Failed to configure hotspot": {
+    "Failed to configure hotspot": ""
   },
   "Failed to connect VPN": {
     "Failed to connect VPN": "Не удалось подключиться к VPN"
@@ -3077,6 +3065,9 @@
   "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": {
     "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": "Не удалось выполнить 'dms greeter status'. Убедитесь, что DMS установлен и dms находится в PATH."
   },
+  "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": {
+    "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": ""
+  },
   "Failed to save VPN credentials": {
     "Failed to save VPN credentials": ""
   },
@@ -3130,6 +3121,15 @@
   },
   "Failed to start connection to %1": {
     "Failed to start connection to %1": "Не удалось начать подключение к %1"
+  },
+  "Failed to start hotspot": {
+    "Failed to start hotspot": ""
+  },
+  "Failed to stop hotspot": {
+    "Failed to stop hotspot": ""
+  },
+  "Failed to switch codec": {
+    "Failed to switch codec": ""
   },
   "Failed to unpin entry": {
     "Failed to unpin entry": "Не удалось открепить запись"
@@ -3188,12 +3188,6 @@
   "File": {
     "File": "Файл"
   },
-  "File Already Exists": {
-    "File Already Exists": "Файл Уже Существует"
-  },
-  "File Information": {
-    "File Information": "Информация о Файле"
-  },
   "File Manager": {
     "File Manager": "Файловый менеджер"
   },
@@ -3241,9 +3235,6 @@
   },
   "Fingerprint availability could not be confirmed": {
     "Fingerprint availability could not be confirmed": ""
-  },
-  "Fingerprint availability could not be confirmed.": {
-    "Fingerprint availability could not be confirmed.": "Доступность отпечатков пальцев не удалось подтвердить."
   },
   "Fingerprint error": {
     "Fingerprint error": "Ошибка отпечатка пальца"
@@ -3518,9 +3509,6 @@
   "Fully Charged": {
     "Fully Charged": "Подключено"
   },
-  "Fun": {
-    "Fun": "Развлечение"
-  },
   "G: grid • Z/X: size": {
     "G: grid • Z/X: size": "G: сетка • Z/X: размер"
   },
@@ -3632,11 +3620,11 @@
   "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": {
     "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": "Участники группы greeter могут синхронизировать тему экрана входа с помощью dms greeter sync --profile после выхода и повторного входа в систему."
   },
+  "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": {
+    "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": ""
+  },
   "Greeter group:": {
     "Greeter group:": "Группа greeter:"
-  },
-  "Greeter only — format for the date on the login screen": {
-    "Greeter only — format for the date on the login screen": "Только для экрана приветствия — формат даты на экране входа"
   },
   "Greeter sync complete": {
     "Greeter sync complete": ""
@@ -3730,9 +3718,6 @@
   },
   "Hex": {
     "Hex": "Hex"
-  },
-  "Hibernate": {
-    "Hibernate": "Гибернация"
   },
   "Hibernate failed": {
     "Hibernate failed": "Сбой гибернации"
@@ -3833,20 +3818,8 @@
   "Hold Duration": {
     "Hold Duration": "Длительность удержания"
   },
-  "Hold longer to confirm": {
-    "Hold longer to confirm": "Удерживайте дольше для подтверждения"
-  },
   "Hold to Confirm Power Actions": {
     "Hold to Confirm Power Actions": "Удерживать для подтверждения действий питания"
-  },
-  "Hold to confirm (%1 ms)": {
-    "Hold to confirm (%1 ms)": "Удерживать для подтверждения (%1 мс)"
-  },
-  "Hold to confirm (%1s)": {
-    "Hold to confirm (%1s)": "Удерживать для подтверждения (%1 с)"
-  },
-  "Home": {
-    "Home": "Домой"
   },
   "Horizontal and vertical bar thickness": {
     "Horizontal and vertical bar thickness": "Горизонтальная и вертикальная толщина бара"
@@ -3862,6 +3835,24 @@
   },
   "Hotkey overlay title (optional)": {
     "Hotkey overlay title (optional)": "Заголовок наложения горячей клавиши (необязательно)"
+  },
+  "Hotspot": {
+    "Hotspot": ""
+  },
+  "Hotspot activation failed.": {
+    "Hotspot activation failed.": ""
+  },
+  "Hotspot name": {
+    "Hotspot name": ""
+  },
+  "Hotspot saved": {
+    "Hotspot saved": ""
+  },
+  "Hotspot started": {
+    "Hotspot started": ""
+  },
+  "Hotspot stopped": {
+    "Hotspot stopped": ""
   },
   "Hour": {
     "Hour": "Час"
@@ -3919,6 +3910,9 @@
   },
   "IP address or hostname": {
     "IP address or hostname": "IP-адрес или имя хоста"
+  },
+  "IP sharing setup failed. Check that dnsmasq is installed.": {
+    "IP sharing setup failed. Check that dnsmasq is installed.": ""
   },
   "ISO Date": {
     "ISO Date": "Системный по умолчанию"
@@ -4123,9 +4117,6 @@
   },
   "Installation and PAM setup are documented in the ": {
     "Installation and PAM setup are documented in the ": ""
-  },
-  "Installation and PAM setup: see the ": {
-    "Installation and PAM setup: see the ": "Установка и настройка PAM: см "
   },
   "Installed": {
     "Installed": "Установлено"
@@ -4448,9 +4439,6 @@
   "Locked": {
     "Locked": "Заблокировано"
   },
-  "Log Out": {
-    "Log Out": "Выйти"
-  },
   "Logging in...": {
     "Logging in...": "Вход в систему..."
   },
@@ -4691,9 +4679,6 @@
   "Maximum pinned entries reached": {
     "Maximum pinned entries reached": "Достигнуто максимальное количество закреплённых записей"
   },
-  "Media": {
-    "Media": "Медиа"
-  },
   "Media Controls": {
     "Media Controls": "Управление Медиа"
   },
@@ -4799,9 +4784,6 @@
   "Model": {
     "Model": "Модель"
   },
-  "Modified": {
-    "Modified": "Изменено"
-  },
   "Modular widget bar": {
     "Modular widget bar": "Безопасность и конфиденциальность"
   },
@@ -4853,9 +4835,6 @@
   "Move Widget": {
     "Move Widget": "Переместить виджет"
   },
-  "Move to Trash": {
-    "Move to Trash": "Переместить в корзину"
-  },
   "Moving to Paused": {
     "Moving to Paused": "Перемещение в Paused"
   },
@@ -4870,9 +4849,6 @@
   },
   "Multiplexers": {
     "Multiplexers": "Мультиплексоры"
-  },
-  "Music": {
-    "Music": "Музыка"
   },
   "Music Player": {
     "Music Player": "Музыкальный плеер"
@@ -4901,9 +4877,6 @@
   "NM not supported": {
     "NM not supported": "NM не поддерживается"
   },
-  "Name": {
-    "Name": "Имя"
-  },
   "Named Workspace Icons": {
     "Named Workspace Icons": "Значки Именованных Рабочих Пространств"
   },
@@ -4918,9 +4891,6 @@
   },
   "Navigate": {
     "Navigate": "Навигация"
-  },
-  "Navigation": {
-    "Navigation": "Навигация"
   },
   "Network": {
     "Network": "Сеть"
@@ -5165,9 +5135,6 @@
   "No fingerprint reader detected": {
     "No fingerprint reader detected": ""
   },
-  "No fingerprint reader detected.": {
-    "No fingerprint reader detected.": "Сканер отпечатков пальцев не обнаружен."
-  },
   "No folders found": {
     "No folders found": "Папки не найдены"
   },
@@ -5282,9 +5249,6 @@
   "No supported package manager found.": {
     "No supported package manager found.": "Поддерживаемый пакетный менеджер не найден."
   },
-  "No terminal configured": {
-    "No terminal configured": "Терминал не настроен"
-  },
   "No themes found": {
     "No themes found": "Темы не найдены"
   },
@@ -5360,14 +5324,8 @@
   "Not available — install fprintd and pam_fprintd, or configure greetd PAM.": {
     "Not available — install fprintd and pam_fprintd, or configure greetd PAM.": "Недоступно — установите fprintd и pam_fprintd или настройте PAM для greetd."
   },
-  "Not available — install fprintd and pam_fprintd.": {
-    "Not available — install fprintd and pam_fprintd.": "Недоступно — установите fprintd и pam_fprintd."
-  },
   "Not available — install or configure pam_u2f, or configure greetd PAM.": {
     "Not available — install or configure pam_u2f, or configure greetd PAM.": "Недоступно — установите или настройте pam_u2f либо настройте PAM для greetd."
-  },
-  "Not available — install or configure pam_u2f.": {
-    "Not available — install or configure pam_u2f.": "Недоступно — установите или настройте pam_u2f."
   },
   "Not bound": {
     "Not bound": "Не привязано"
@@ -5437,9 +5395,6 @@
   },
   "Now playing and media controls": {
     "Now playing and media controls": ""
-  },
-  "Numbers": {
-    "Numbers": "Числа"
   },
   "Numeric (D/M)": {
     "Numeric (D/M)": "Системный по умолчанию"
@@ -5555,6 +5510,9 @@
   "Open in terminal": {
     "Open in terminal": "Открыть в терминале"
   },
+  "Open network": {
+    "Open network": ""
+  },
   "Open search bar to find text": {
     "Open search bar to find text": "Открыть строку для поиска текста"
   },
@@ -5582,6 +5540,9 @@
   "Opens the connected launcher in Connected Frame Mode.": {
     "Opens the connected launcher in Connected Frame Mode.": "Открывает подключённый лаунчер в режиме связанной рамки."
   },
+  "Optional": {
+    "Optional": ""
+  },
   "Optional description": {
     "Optional description": "Необязательное описание"
   },
@@ -5590,6 +5551,9 @@
   },
   "Optional state-based conditions applied to the first match.": {
     "Optional state-based conditions applied to the first match.": "Необязательные условия на основе состояния, применяемые к первому соответствию."
+  },
+  "Optional; leave blank for open hotspot": {
+    "Optional; leave blank for open hotspot": ""
   },
   "Options": {
     "Options": "Опции"
@@ -5671,9 +5635,6 @@
   },
   "Overview of your network connections": {
     "Overview of your network connections": "Обзор ваших сетевых подключений"
-  },
-  "Overwrite": {
-    "Overwrite": "Перезаписать"
   },
   "Owner: %1": {
     "Owner: %1": "Владелец: %1"
@@ -5819,14 +5780,8 @@
   "Pick a different random video each time from the same folder": {
     "Pick a different random video each time from the same folder": "Каждый раз выбирать другое случайное видео из той же папки"
   },
-  "Pick a terminal in Settings → Launcher (or set $TERMINAL).": {
-    "Pick a terminal in Settings → Launcher (or set $TERMINAL).": "Выберите терминал в Настройки → Лаунчер (или установите $TERMINAL)."
-  },
   "Pick how long to pause notifications": {
     "Pick how long to pause notifications": "Выберите, на сколько приостановить уведомления"
-  },
-  "Pictures": {
-    "Pictures": "Картинки"
   },
   "Pin": {
     "Pin": "Закрепить"
@@ -6001,12 +5956,6 @@
   },
   "Power Mode": {
     "Power Mode": "Режим питания"
-  },
-  "Power Off": {
-    "Power Off": "Завершить Работу"
-  },
-  "Power Options": {
-    "Power Options": "Параметры Питания"
   },
   "Power Profile": {
     "Power Profile": "Профиль питания"
@@ -6200,9 +6149,6 @@
   "Quality": {
     "Quality": "Качество"
   },
-  "Quick Access": {
-    "Quick Access": "Быстрый доступ"
-  },
   "Quick access to application launcher": {
     "Quick access to application launcher": "Быстрый доступ к меню запуска приложений"
   },
@@ -6242,6 +6188,9 @@
   "Re-enter password": {
     "Re-enter password": "Повторите пароль"
   },
+  "Re-enter the password before saving.": {
+    "Re-enter the password before saving.": ""
+  },
   "Reach local network devices while using an exit node": {
     "Reach local network devices while using an exit node": ""
   },
@@ -6251,11 +6200,11 @@
   "Read:": {
     "Read:": "Прочитано:"
   },
+  "Ready": {
+    "Ready": ""
+  },
   "Reason": {
     "Reason": "Причина"
-  },
-  "Reboot": {
-    "Reboot": "Перезагрузка"
   },
   "Recent": {
     "Recent": "Недавние"
@@ -6298,6 +6247,9 @@
   },
   "Release": {
     "Release": "Релиз"
+  },
+  "Release to confirm": {
+    "Release to confirm": ""
   },
   "Reload From Disk": {
     "Reload From Disk": "Перезагрузить с диска"
@@ -6424,9 +6376,6 @@
   },
   "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys).": {
     "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys).": ""
-  },
-  "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys). Auth changes apply automatically and may open a terminal for sudo.": {
-    "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys). Auth changes apply automatically and may open a terminal for sudo.": ""
   },
   "Requires night mode support": {
     "Requires night mode support": "Требуется поддержка ночного режима"
@@ -6569,6 +6518,9 @@
   "Run paru/yay with AUR enabled when 'Update All' is clicked.": {
     "Run paru/yay with AUR enabled when 'Update All' is clicked.": "Запускать paru/yay с включённым AUR при нажатии «Обновить всё»."
   },
+  "Running": {
+    "Running": ""
+  },
   "Running Apps": {
     "Running Apps": "Запущенные Приложения"
   },
@@ -6593,11 +6545,14 @@
   "SMS sent successfully": {
     "SMS sent successfully": ""
   },
+  "SSID": {
+    "SSID": ""
+  },
   "Saturation": {
     "Saturation": "Насыщенность"
   },
-  "Save": {
-    "Save": "Сохранить"
+  "Save & Start": {
+    "Save & Start": ""
   },
   "Save Notepad File": {
     "Save Notepad File": "Сохранить Файл Блокнота"
@@ -6719,9 +6674,6 @@
   "Search devices...": {
     "Search devices...": "Поиск устройств..."
   },
-  "Search for a location...": {
-    "Search for a location...": "Поиск местоположения..."
-  },
   "Search installed plugins...": {
     "Search installed plugins...": "Поиск установленных плагинов..."
   },
@@ -6745,9 +6697,6 @@
   },
   "Search widgets...": {
     "Search widgets...": "Поиск виджетов..."
-  },
-  "Search...": {
-    "Search...": "Поиск..."
   },
   "Searching...": {
     "Searching...": "Поиск..."
@@ -6778,9 +6727,6 @@
   },
   "Security-key availability could not be confirmed": {
     "Security-key availability could not be confirmed": ""
-  },
-  "Security-key availability could not be confirmed.": {
-    "Security-key availability could not be confirmed.": "Не удалось подтвердить доступность ключа безопасности."
   },
   "Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.": {
     "Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.": "Обнаружена поддержка ключей безопасности, но зарегистрированный ключ пока не найден. Вы можете включить эту опцию сейчас и зарегистрировать ключ позже."
@@ -6955,6 +6901,15 @@
   },
   "Set the percentage at which the battery is considered low.": {
     "Set the percentage at which the battery is considered low.": ""
+  },
+  "Set up a WiFi hotspot for sharing this connection.": {
+    "Set up a WiFi hotspot for sharing this connection.": ""
+  },
+  "Set up hotspot": {
+    "Set up hotspot": ""
+  },
+  "Set up hotspot in Settings": {
+    "Set up hotspot in Settings": ""
   },
   "Setting": {
     "Setting": "Параметр"
@@ -7349,9 +7304,6 @@
   "Single-Line Popup": {
     "Single-Line Popup": "Однострочное всплывающее окно"
   },
-  "Size": {
-    "Size": "Размер"
-  },
   "Size Constraints": {
     "Size Constraints": "Ограничения размера"
   },
@@ -7393,9 +7345,6 @@
   },
   "Sort Alphabetically": {
     "Sort Alphabetically": "Сортировать по алфавиту"
-  },
-  "Sort By": {
-    "Sort By": "Сортировать по"
   },
   "Sort wallpapers": {
     "Sort wallpapers": ""
@@ -7463,17 +7412,29 @@
   "Start": {
     "Start": "Старт"
   },
+  "Start Hotspot?": {
+    "Start Hotspot?": ""
+  },
   "Start KDE Connect or Valent to use this plugin": {
     "Start KDE Connect or Valent to use this plugin": "Запустите KDE Connect или Valent для использования этого плагина"
   },
   "Start typing your notes here...": {
     "Start typing your notes here...": "Начните вводить заметки здесь..."
   },
+  "Starting hotspot...": {
+    "Starting hotspot...": ""
+  },
+  "Starting the hotspot will disconnect WiFi from \"%1\" — the radio can't do both at once. Sharing internet then requires another connection, such as Ethernet.": {
+    "Starting the hotspot will disconnect WiFi from \"%1\" — the radio can't do both at once. Sharing internet then requires another connection, such as Ethernet.": ""
+  },
+  "Starting...": {
+    "Starting...": ""
+  },
   "State": {
     "State": "Штат/Область"
   },
-  "Status": {
-    "Status": "Статус"
+  "Stop": {
+    "Stop": ""
   },
   "Stop ignoring %1": {
     "Stop ignoring %1": ""
@@ -7559,9 +7520,6 @@
   "Surfaces float independently of the frame": {
     "Surfaces float independently of the frame": "Поверхности парят независимо от рамки"
   },
-  "Suspend": {
-    "Suspend": "Приостановить"
-  },
   "Suspend behavior": {
     "Suspend behavior": "Поведение приостановки"
   },
@@ -7573,9 +7531,6 @@
   },
   "Sway Website": {
     "Sway Website": "Сайт Sway"
-  },
-  "Switch User": {
-    "Switch User": "Переключить пользователя"
   },
   "Switch between display configurations": {
     "Switch between display configurations": "Переключение между конфигурациями дисплеев"
@@ -7601,11 +7556,11 @@
   "Sync Position Across Screens": {
     "Sync Position Across Screens": "Синхронизировать позицию на всех экранах"
   },
-  "Sync applies your theme and settings to the login screen. Other users should run dms greeter sync --profile instead of a full sync. Authentication changes apply automatically.": {
-    "Sync applies your theme and settings to the login screen. Other users should run dms greeter sync --profile instead of a full sync. Authentication changes apply automatically.": ""
-  },
   "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": {
     "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": ""
+  },
+  "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": {
+    "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": ""
   },
   "Sync completed successfully.": {
     "Sync completed successfully.": "Синхронизация завершена успешно."
@@ -7624,9 +7579,6 @@
   },
   "Syncing...": {
     "Syncing...": ""
-  },
-  "System": {
-    "System": "Система"
   },
   "System App Theming": {
     "System App Theming": "Темы системных приложений"
@@ -7682,9 +7634,6 @@
   "Tab": {
     "Tab": "Вкладка"
   },
-  "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": {
-    "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": "Tab/Shift+Tab: Навигация • ←→↑↓: Навигация сетки • Enter/Space: Выбрать"
-  },
   "Tags": {
     "Tags": "Теги"
   },
@@ -7714,6 +7663,9 @@
   },
   "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": {
     "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": "Сбой запуска терминала. Установите один из поддерживаемых эмуляторов терминала или запустите 'dms greeter sync' вручную."
+  },
+  "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": {
+    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": ""
   },
   "Terminal fallback opened. Complete authentication there; it will close automatically when done.": {
     "Terminal fallback opened. Complete authentication there; it will close automatically when done.": ""
@@ -7759,6 +7711,9 @@
   },
   "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": {
     "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "Переменная окружения DMS_SOCKET не установлена или сокет недоступен. Автоматизированное управление плагинами требует DMS_SOCKET."
+  },
+  "The WiFi adapter could not start access point mode.": {
+    "The WiFi adapter could not start access point mode.": ""
   },
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
     "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "Приведённые ниже настройки изменят ваши настройки GTK и Qt. Если вы хотите сохранить текущие конфигурации, сделайте их резервную копию (qt5ct.conf|qt6ct.conf и ~/.config/gtk-3.0|gtk-4.0)."
@@ -7831,6 +7786,9 @@
   },
   "This will delete all unpinned entries. %1 pinned entries will be kept.": {
     "This will delete all unpinned entries. %1 pinned entries will be kept.": "Это удалит все незакреплённые записи. %1 закреплённых записей будут сохранены."
+  },
+  "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": {
+    "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": ""
   },
   "This will permanently delete all clipboard history.": {
     "This will permanently delete all clipboard history.": "Это навсегда удалит всю историю буфера обмена."
@@ -8060,9 +8018,6 @@
   "Turn off now": {
     "Turn off now": "Выключить сейчас"
   },
-  "Type": {
-    "Type": "Тип"
-  },
   "Type at least 2 characters": {
     "Type at least 2 characters": "Введите не менее 2 символов"
   },
@@ -8279,9 +8234,6 @@
   "Use a custom image for the login screen, or leave empty to use desktop wallpaper": {
     "Use a custom image for the login screen, or leave empty to use desktop wallpaper": ""
   },
-  "Use a custom image for the login screen, or leave empty to use your desktop wallpaper.": {
-    "Use a custom image for the login screen, or leave empty to use your desktop wallpaper.": "Использовать собственное изображение для экрана входа или оставить пустым, чтобы использовать обои рабочего стола."
-  },
   "Use a custom radius for goth corner cutouts": {
     "Use a custom radius for goth corner cutouts": "Использовать пользовательский радиус для готических вырезов по углам"
   },
@@ -8290,9 +8242,6 @@
   },
   "Use a security key for lock screen authentication": {
     "Use a security key for lock screen authentication": ""
-  },
-  "Use a security key for lock screen authentication.": {
-    "Use a security key for lock screen authentication.": "Использовать ключ безопасности для аутентификации на экране блокировки."
   },
   "Use album art accent": {
     "Use album art accent": ""
@@ -8323,9 +8272,6 @@
   },
   "Use fingerprint authentication for the lock screen": {
     "Use fingerprint authentication for the lock screen": ""
-  },
-  "Use fingerprint authentication for the lock screen.": {
-    "Use fingerprint authentication for the lock screen.": "Использовать аутентификацию по отпечатку пальца для экрана блокировки."
   },
   "Use keys 1-3 or arrows, Enter/Space to select": {
     "Use keys 1-3 or arrows, Enter/Space to select": "Используйте клавиши 1-3 или стрелки, Enter/Пробел для выбора"
@@ -8498,9 +8444,6 @@
   "Video Screensaver": {
     "Video Screensaver": "Видео-заставка"
   },
-  "Videos": {
-    "Videos": "Видео"
-  },
   "View Mode": {
     "View Mode": "Режим просмотра"
   },
@@ -8537,8 +8480,14 @@
   "W": {
     "W": ""
   },
+  "WCAG %1 body": {
+    "WCAG %1 body": ""
+  },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
+  },
+  "WPA2 password": {
+    "WPA2 password": ""
   },
   "Wallpaper": {
     "Wallpaper": "Обои"
@@ -8627,6 +8576,12 @@
   "WiFi enabled": {
     "WiFi enabled": "WiFi включен"
   },
+  "WiFi is disabled": {
+    "WiFi is disabled": ""
+  },
+  "WiFi is disabled. You can still edit and save hotspot settings, but starting the hotspot requires WiFi to be enabled.": {
+    "WiFi is disabled. You can still edit and save hotspot settings, but starting the hotspot requires WiFi to be enabled.": ""
+  },
   "WiFi is off": {
     "WiFi is off": "WiFi отключен"
   },
@@ -8684,6 +8639,9 @@
   "Width of window border and focus ring": {
     "Width of window border and focus ring": "Ширина границы окна и кольца фокуса"
   },
+  "Will disconnect \"%1": {
+    "Will disconnect \"%1\"": ""
+  },
   "Wind": {
     "Wind": "Ветер"
   },
@@ -8716,9 +8674,6 @@
   },
   "Working...": {
     "Working...": "Выполнение..."
-  },
-  "Workspace": {
-    "Workspace": "Рабочее пространство"
   },
   "Workspace Index Numbers": {
     "Workspace Index Numbers": "Номера индексов рабочих областей"
@@ -8794,6 +8749,12 @@
   },
   "Your compositor does not support background blur (ext-background-effect-v1)": {
     "Your compositor does not support background blur (ext-background-effect-v1)": "Ваш композитор не поддерживает размытие фона (ext-background-effect-v1)"
+  },
+  "Your hotspot is running.": {
+    "Your hotspot is running.": ""
+  },
+  "Your hotspot profile is saved and ready to start.": {
+    "Your hotspot profile is saved and ready to start.": ""
   },
   "Your system is up to date!": {
     "Your system is up to date!": "Ваша система обновлена!"
@@ -8968,9 +8929,6 @@
   },
   "on Sway": {
     "on Sway": "на Sway"
-  },
-  "or run ": {
-    "or run ": "или запустите "
   },
   "power-profiles-daemon not available": {
     "power-profiles-daemon not available": "power-profiles-daemon недоступен"

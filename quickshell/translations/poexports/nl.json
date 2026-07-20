@@ -197,6 +197,9 @@
   "2 seconds": {
     "2 seconds": "2 seconden"
   },
+  "2.4 GHz": {
+    "2.4 GHz": ""
+  },
   "20 minutes": {
     "20 minutes": "20 minuten"
   },
@@ -260,6 +263,9 @@
   "45 seconds": {
     "45 seconds": "45 seconden"
   },
+  "5 GHz": {
+    "5 GHz": ""
+  },
   "5 min before": {
     "5 min before": "5 min. van tevoren"
   },
@@ -301,9 +307,6 @@
   },
   "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>": {
     "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>": "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT-licentie</a>"
-  },
-  "A file with this name already exists. Do you want to overwrite it?": {
-    "A file with this name already exists. Do you want to overwrite it?": "Er bestaat al een bestand met deze naam. Wilt u het overschrijven?"
   },
   "A modern desktop shell for Wayland compositors": {
     "A modern desktop shell for Wayland compositors": "Een moderne desktop-shell voor Wayland-compositors"
@@ -365,9 +368,6 @@
   "Action performed when scrolling vertically on the bar": {
     "Action performed when scrolling vertically on the bar": "Actie uitgevoerd bij verticaal scrollen op de balk"
   },
-  "Actions": {
-    "Actions": "Acties"
-  },
   "Activate": {
     "Activate": "Activeren"
   },
@@ -376,6 +376,9 @@
   },
   "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": {
     "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": "De DMS Greeter activeren? Er wordt een terminal geopend voor sudo-authenticatie. Voer Sync uit na activering om instellingen toe te passen."
+  },
+  "Activates immediately": {
+    "Activates immediately": ""
   },
   "Activation": {
     "Activation": "Activering"
@@ -418,6 +421,9 @@
   },
   "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": {
     "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": "\"%1\" toevoegen aan de groep %2? Ze moeten uitloggen en opnieuw inloggen, en vervolgens 'dms greeter sync --profile' uitvoeren om hun inlogscherm-thema te publiceren."
+  },
+  "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": {
+    "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": ""
   },
   "Add Bar": {
     "Add Bar": "Balk toevoegen"
@@ -469,6 +475,9 @@
   },
   "Add the new user to the %1 group so they can run dms greeter sync --profile.": {
     "Add the new user to the %1 group so they can run dms greeter sync --profile.": "Voeg de nieuwe gebruiker toe aan de groep %1 zodat zij 'dms greeter sync --profile' kunnen uitvoeren."
+  },
+  "Add the new user to the %1 group so they can run dms-greeter sync --profile.": {
+    "Add the new user to the %1 group so they can run dms-greeter sync --profile.": ""
   },
   "Add the new user to the %1 group so they can use sudo.": {
     "Add the new user to the %1 group so they can use sudo.": "Voeg de nieuwe gebruiker toe aan de groep %1 zodat zij sudo kunnen gebruiken."
@@ -538,9 +547,6 @@
   },
   "Also group repeated application icons on the active workspace": {
     "Also group repeated application icons on the active workspace": "Ook herhaalde applicatie-iconen op de actieve werkruimte groeperen"
-  },
-  "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close": {
-    "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close": "Alt+←/Backspace: Terug • F1/I: Bestandsinfo • F10: Hulp • Esc: Sluiten"
   },
   "Alternative (OR)": {
     "Alternative (OR)": "Alternatief (OF)"
@@ -652,6 +658,9 @@
   },
   "Applications and commands to start automatically when you log in": {
     "Applications and commands to start automatically when you log in": "Applicaties en commando's die automatisch starten wanneer je inlogt"
+  },
+  "Applies on the next greeter sync": {
+    "Applies on the next greeter sync": ""
   },
   "Apply Changes": {
     "Apply Changes": "Wijzigingen toepassen"
@@ -786,16 +795,10 @@
     "Authentication Source": "Authenticatiebron"
   },
   "Authentication changes applied": {
-    "Authentication changes applied": ""
-  },
-  "Authentication changes applied.": {
-    "Authentication changes applied.": "Verificatiewijzigingen toegepast."
+    "Authentication changes applied": "Verificatiewijzigingen toegepast"
   },
   "Authentication changes apply automatically": {
-    "Authentication changes apply automatically": ""
-  },
-  "Authentication changes apply automatically.": {
-    "Authentication changes apply automatically.": "Verificatiewijzigingen worden automatisch toegepast."
+    "Authentication changes apply automatically": "Verificatiewijzigingen automatisch toepassen"
   },
   "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": {
     "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": "Verificatiewijzigingen vereisen sudo. Terminal wordt geopend zodat u een wachtwoord of vingerafdruk kunt gebruiken."
@@ -1030,6 +1033,9 @@
   },
   "Balanced palette with focused accents (default).": {
     "Balanced palette with focused accents (default).": "Gebalanceerd palet met gerichte accenten (standaard)."
+  },
+  "Band": {
+    "Band": ""
   },
   "Bar": {
     "Bar": "Balk"
@@ -1286,11 +1292,11 @@
   "Calendar Backend": {
     "Calendar Backend": "Agenda-backend"
   },
+  "Calls / Headset": {
+    "Calls / Headset": ""
+  },
   "Camera": {
     "Camera": "Camera"
-  },
-  "Cancel": {
-    "Cancel": "Annuleren"
   },
   "Cancel all jobs for \"%1\"?": {
     "Cancel all jobs for \"%1\"?": "Alle taken voor \"%1\" annuleren?"
@@ -1436,9 +1442,6 @@
   "Choose how to be notified when charge limit is reached.": {
     "Choose how to be notified when charge limit is reached.": "Kies hoe je een melding wilt ontvangen wanneer de laadlimiet is bereikt."
   },
-  "Choose icon": {
-    "Choose icon": "Kies pictogram"
-  },
   "Choose monochrome or a theme color tint for system tray icons": {
     "Choose monochrome or a theme color tint for system tray icons": "Kies monochroom of een themakleurtint voor systeemvakpictogrammen"
   },
@@ -1577,8 +1580,17 @@
   "Close Window": {
     "Close Window": "Venster sluiten"
   },
+  "Codec switched successfully": {
+    "Codec switched successfully": ""
+  },
+  "Codec switching is unavailable because WirePlumber was not found": {
+    "Codec switching is unavailable because WirePlumber was not found": ""
+  },
   "Codec switching is unavailable because pactl was not found": {
     "Codec switching is unavailable because pactl was not found": "Wisselen van codec is niet beschikbaar omdat pactl niet is gevonden"
+  },
+  "Codec switching is unavailable. WirePlumber wpexec was not found.": {
+    "Codec switching is unavailable. WirePlumber wpexec was not found.": ""
   },
   "Color": {
     "Color": "Kleur"
@@ -1657,9 +1669,6 @@
   },
   "Commands": {
     "Commands": "Opdrachten"
-  },
-  "Communication": {
-    "Communication": "Communicatie"
   },
   "Community themes": {
     "Community themes": "Community-thema's"
@@ -1842,10 +1851,7 @@
     "Controls the outline of popouts, modals, and other shell surfaces": "Regelt de omlijning van pop-outs, modale vensters en andere shell-oppervlakken"
   },
   "Convenience options for the login screen": {
-    "Convenience options for the login screen": ""
-  },
-  "Convenience options for the login screen. Sync to apply.": {
-    "Convenience options for the login screen. Sync to apply.": "Gemaksopties voor het aanmeldscherm. Voer Sync uit om toe te passen."
+    "Convenience options for the login screen": "Gemaksopties voor het aanmeldscherm"
   },
   "Convert to DMS": {
     "Convert to DMS": "Converteren naar DMS"
@@ -1889,9 +1895,6 @@
   "Copy Text": {
     "Copy Text": "Tekst kopiëren"
   },
-  "Copy path": {
-    "Copy path": "Pad kopiëren"
-  },
   "Corner Radius": {
     "Corner Radius": "Hoekradius"
   },
@@ -1900,6 +1903,9 @@
   },
   "Corners & Background": {
     "Corners & Background": "Hoeken & Achtergrond"
+  },
+  "Couldn't load hotspot password": {
+    "Couldn't load hotspot password": ""
   },
   "Count Only": {
     "Count Only": "Alleen aantal"
@@ -2121,10 +2127,7 @@
     "DMS out of date": "DMS verouderd"
   },
   "DMS removes its managed block from /etc/pam.d/greetd and stops write services": {
-    "DMS removes its managed block from /etc/pam.d/greetd and stops write services": ""
-  },
-  "DMS removes its managed block from /etc/pam.d/greetd and stops writing to it": {
-    "DMS removes its managed block from /etc/pam.d/greetd and stops writing to it": "DMS verwijdert zijn beheerde blok uit /etc/pam.d/greetd en stopt met schrijven hiernaartoe"
+    "DMS removes its managed block from /etc/pam.d/greetd and stops write services": "DMS verwijdert het beheerde blok uit /etc/pam.d/greetd en stopt schrijfservices"
   },
   "DMS server is outdated (API v%1, expected v%2)": {
     "DMS server is outdated (API v%1, expected v%2)": "DMS-server is verouderd (API v%1, verwacht v%2)"
@@ -2315,9 +2318,6 @@
   "Description": {
     "Description": "Beschrijving"
   },
-  "Desktop": {
-    "Desktop": "Bureaublad"
-  },
   "Desktop Application": {
     "Desktop Application": "Desktop-applicatie"
   },
@@ -2344,9 +2344,6 @@
   },
   "Detected backends: %1": {
     "Detected backends: %1": "Gedetecteerde backends: %1"
-  },
-  "Development": {
-    "Development": "Ontwikkeling"
   },
   "Device": {
     "Device": "Apparaat"
@@ -2540,9 +2537,6 @@
   "Docs": {
     "Docs": "Documentatie"
   },
-  "Documents": {
-    "Documents": "Documenten"
-  },
   "Domain (optional)": {
     "Domain (optional)": "Domein (optioneel)"
   },
@@ -2554,9 +2548,6 @@
   },
   "Door Open": {
     "Door Open": "Deur open"
-  },
-  "Downloads": {
-    "Downloads": "Downloads"
   },
   "Drag a widget by its handle here to reorder it or drop it into another group": {
     "Drag a widget by its handle here to reorder it or drop it into another group": "Sleep een widget aan de handgreep hiernaartoe om de volgorde te wijzigen of zet hem in een andere groep"
@@ -2714,6 +2705,9 @@
   "Enable WiFi": {
     "Enable WiFi": "Wifi inschakelen"
   },
+  "Enable WiFi before starting the hotspot.": {
+    "Enable WiFi before starting the hotspot.": ""
+  },
   "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": {
     "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": "Schakel hieronder een aangepaste overschrijving in om de schaduwintensiteit, dekking en kleur per balk in te stellen."
   },
@@ -2727,10 +2721,7 @@
     "Enable fingerprint authentication": "Vingerafdrukverificatie inschakelen"
   },
   "Enable fingerprint or security key for DMS Greeter": {
-    "Enable fingerprint or security key for DMS Greeter": ""
-  },
-  "Enable fingerprint or security key for DMS Greeter. Authentication changes apply automatically.": {
-    "Enable fingerprint or security key for DMS Greeter. Authentication changes apply automatically.": "Schakel vingerafdruk of beveiligingssleutel in voor DMS-aanmeldscherm. Verificatiewijzigingen worden automatisch toegepast."
+    "Enable fingerprint or security key for DMS Greeter": "Vingerafdruk of beveiligingssleutel inschakelen voor DMS Greeter"
   },
   "Enable loginctl lock integration": {
     "Enable loginctl lock integration": "Loginctl-vergrendelintegratie inschakelen"
@@ -2791,9 +2782,6 @@
   },
   "Enter device name...": {
     "Enter device name...": "Voer apparaatnaam in..."
-  },
-  "Enter filename...": {
-    "Enter filename...": "Voer bestandsnaam in..."
   },
   "Enter launch prefix (e.g., 'uwsm-app')": {
     "Enter launch prefix (e.g., 'uwsm-app')": "Voer startvoorvoegsel in (bijv. 'uwsm-app')"
@@ -2903,9 +2891,6 @@
   "Extra Light": {
     "Extra Light": "Extra licht"
   },
-  "F1/I: Toggle • F10: Help": {
-    "F1/I: Toggle • F10: Help": "F1/I: Schakelen • F10: Hulp"
-  },
   "Fade": {
     "Fade": "Vervagen"
   },
@@ -2947,6 +2932,9 @@
   },
   "Failed to check pin limit": {
     "Failed to check pin limit": "Controleren van vastmaaklimiet mislukt"
+  },
+  "Failed to configure hotspot": {
+    "Failed to configure hotspot": ""
   },
   "Failed to connect VPN": {
     "Failed to connect VPN": "Verbinden met VPN mislukt"
@@ -3077,6 +3065,9 @@
   "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": {
     "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": "Uitvoeren van 'dms greeter status' mislukt. Zorg ervoor dat DMS is geïnstalleerd en dms in het PATH staat."
   },
+  "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": {
+    "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": ""
+  },
   "Failed to save VPN credentials": {
     "Failed to save VPN credentials": "Opslaan van VPN-inloggegevens mislukt"
   },
@@ -3130,6 +3121,15 @@
   },
   "Failed to start connection to %1": {
     "Failed to start connection to %1": "Starten van verbinding met %1 mislukt"
+  },
+  "Failed to start hotspot": {
+    "Failed to start hotspot": ""
+  },
+  "Failed to stop hotspot": {
+    "Failed to stop hotspot": ""
+  },
+  "Failed to switch codec": {
+    "Failed to switch codec": ""
   },
   "Failed to unpin entry": {
     "Failed to unpin entry": "Losmaken van item mislukt"
@@ -3188,12 +3188,6 @@
   "File": {
     "File": "Bestand"
   },
-  "File Already Exists": {
-    "File Already Exists": "Bestand bestaat al"
-  },
-  "File Information": {
-    "File Information": "Bestandsinformatie"
-  },
   "File Manager": {
     "File Manager": "Bestandsbeheer"
   },
@@ -3240,10 +3234,7 @@
     "Fine-tune the space reserved for the bar from the screen edge": "Stel de gereserveerde ruimte voor de balk vanaf de schermrand fijn"
   },
   "Fingerprint availability could not be confirmed": {
-    "Fingerprint availability could not be confirmed": ""
-  },
-  "Fingerprint availability could not be confirmed.": {
-    "Fingerprint availability could not be confirmed.": "Beschikbaarheid van vingerafdrukscanner kon niet worden bevestigd."
+    "Fingerprint availability could not be confirmed": "Beschikbaarheid van vingerafdruk kon niet worden bevestigd"
   },
   "Fingerprint error": {
     "Fingerprint error": "Vingerafdrukfout"
@@ -3456,7 +3447,7 @@
     "Format Legend": "Legenda voor notatie"
   },
   "Format the date on the login screen": {
-    "Format the date on the login screen": ""
+    "Format the date on the login screen": "De datum op het aanmeldscherm opmaken"
   },
   "Forward 10s": {
     "Forward 10s": "10s vooruit"
@@ -3517,9 +3508,6 @@
   },
   "Fully Charged": {
     "Fully Charged": "Volledig opgeladen"
-  },
-  "Fun": {
-    "Fun": "Plezier"
   },
   "G: grid • Z/X: size": {
     "G: grid • Z/X: size": "G: raster • Z/X: grootte"
@@ -3632,11 +3620,11 @@
   "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": {
     "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": "Leden van de greeter-groep kunnen hun inlogscherm-thema synchroniseren met 'dms greeter sync --profile' na het uit- en inloggen."
   },
+  "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": {
+    "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": ""
+  },
   "Greeter group:": {
     "Greeter group:": "Greeter-groep:"
-  },
-  "Greeter only — format for the date on the login screen": {
-    "Greeter only — format for the date on the login screen": "Alleen Greeter — indeling voor de datum op het aanmeldscherm"
   },
   "Greeter sync complete": {
     "Greeter sync complete": "Synchronisatie aanmeldbeheer voltooid"
@@ -3730,9 +3718,6 @@
   },
   "Hex": {
     "Hex": "Hex"
-  },
-  "Hibernate": {
-    "Hibernate": "Sluimerstand"
   },
   "Hibernate failed": {
     "Hibernate failed": "Slaapstand mislukt"
@@ -3833,20 +3818,8 @@
   "Hold Duration": {
     "Hold Duration": "Houdduur"
   },
-  "Hold longer to confirm": {
-    "Hold longer to confirm": "Langer ingedrukt houden om te bevestigen"
-  },
   "Hold to Confirm Power Actions": {
     "Hold to Confirm Power Actions": "Ingedrukt houden om energieacties te bevestigen"
-  },
-  "Hold to confirm (%1 ms)": {
-    "Hold to confirm (%1 ms)": "Ingedrukt houden om te bevestigen (%1 ms)"
-  },
-  "Hold to confirm (%1s)": {
-    "Hold to confirm (%1s)": "Ingedrukt houden om te bevestigen (%1s)"
-  },
-  "Home": {
-    "Home": "Persoonlijke map"
   },
   "Horizontal and vertical bar thickness": {
     "Horizontal and vertical bar thickness": "Horizontale en verticale balkdikte"
@@ -3862,6 +3835,24 @@
   },
   "Hotkey overlay title (optional)": {
     "Hotkey overlay title (optional)": "Titel sneltoetsoverlay (optioneel)"
+  },
+  "Hotspot": {
+    "Hotspot": ""
+  },
+  "Hotspot activation failed.": {
+    "Hotspot activation failed.": ""
+  },
+  "Hotspot name": {
+    "Hotspot name": ""
+  },
+  "Hotspot saved": {
+    "Hotspot saved": ""
+  },
+  "Hotspot started": {
+    "Hotspot started": ""
+  },
+  "Hotspot stopped": {
+    "Hotspot stopped": ""
   },
   "Hour": {
     "Hour": "Uur"
@@ -3919,6 +3910,9 @@
   },
   "IP address or hostname": {
     "IP address or hostname": "IP-adres of hostnaam"
+  },
+  "IP sharing setup failed. Check that dnsmasq is installed.": {
+    "IP sharing setup failed. Check that dnsmasq is installed.": ""
   },
   "ISO Date": {
     "ISO Date": "ISO-datum"
@@ -4122,10 +4116,7 @@
     "Install theme '%1' from the DMS registry?": "Thema '%1' installeren uit het DMS-register?"
   },
   "Installation and PAM setup are documented in the ": {
-    "Installation and PAM setup are documented in the ": ""
-  },
-  "Installation and PAM setup: see the ": {
-    "Installation and PAM setup: see the ": "Installatie en PAM-configuratie: zie de "
+    "Installation and PAM setup are documented in the ": "Installatie en PAM-configuratie zijn gedocumenteerd in de "
   },
   "Installed": {
     "Installed": "Geïnstalleerd"
@@ -4448,9 +4439,6 @@
   "Locked": {
     "Locked": "Vergrendeld"
   },
-  "Log Out": {
-    "Log Out": "Afmelden"
-  },
   "Logging in...": {
     "Logging in...": "Inloggen..."
   },
@@ -4485,7 +4473,7 @@
     "Low Priority": "Lage prioriteit"
   },
   "Lower display refresh rate on battery": {
-    "Lower display refresh rate on battery": ""
+    "Lower display refresh rate on battery": "Vernieuwingsfrequentie van scherm verlagen bij batterijgebruik"
   },
   "MAC": {
     "MAC": "MAC"
@@ -4518,7 +4506,7 @@
     "Managed by Frame in Connected Mode": "Beheerd door Frame in Verbonden Modus"
   },
   "Managed by the primary PAM source": {
-    "Managed by the primary PAM source": ""
+    "Managed by the primary PAM source": "Beheerd door de primaire PAM-bron"
   },
   "Managed by the primary PAM source.": {
     "Managed by the primary PAM source.": "Beheerd door de primaire PAM-bron."
@@ -4691,9 +4679,6 @@
   "Maximum pinned entries reached": {
     "Maximum pinned entries reached": "Maximaal aantal vastgemaakte items bereikt"
   },
-  "Media": {
-    "Media": "Media"
-  },
   "Media Controls": {
     "Media Controls": "Mediabediening"
   },
@@ -4799,9 +4784,6 @@
   "Model": {
     "Model": "Model"
   },
-  "Modified": {
-    "Modified": "Gewijzigd"
-  },
   "Modular widget bar": {
     "Modular widget bar": "Modulaire widgetbalk"
   },
@@ -4853,9 +4835,6 @@
   "Move Widget": {
     "Move Widget": "Widget verplaatsen"
   },
-  "Move to Trash": {
-    "Move to Trash": "Naar prullenbak verplaatsen"
-  },
   "Moving to Paused": {
     "Moving to Paused": "Overschakelen naar gepauzeerd"
   },
@@ -4870,9 +4849,6 @@
   },
   "Multiplexers": {
     "Multiplexers": "Multiplexers"
-  },
-  "Music": {
-    "Music": "Muziek"
   },
   "Music Player": {
     "Music Player": "Muziekspeler"
@@ -4901,9 +4877,6 @@
   "NM not supported": {
     "NM not supported": "NM niet ondersteund"
   },
-  "Name": {
-    "Name": "Naam"
-  },
   "Named Workspace Icons": {
     "Named Workspace Icons": "Pictogrammen voor benoemde werkbladen"
   },
@@ -4918,9 +4891,6 @@
   },
   "Navigate": {
     "Navigate": "Navigeren"
-  },
-  "Navigation": {
-    "Navigation": "Navigatie"
   },
   "Network": {
     "Network": "Netwerk"
@@ -5163,10 +5133,7 @@
     "No files found": "Geen bestanden gevonden"
   },
   "No fingerprint reader detected": {
-    "No fingerprint reader detected": ""
-  },
-  "No fingerprint reader detected.": {
-    "No fingerprint reader detected.": "Geen vingerafdrukscanner gedetecteerd."
+    "No fingerprint reader detected": "Geen vingerafdruklezer gedetecteerd"
   },
   "No folders found": {
     "No folders found": "Geen mappen gevonden"
@@ -5282,9 +5249,6 @@
   "No supported package manager found.": {
     "No supported package manager found.": "Geen ondersteunde pakketbeheerder gevonden."
   },
-  "No terminal configured": {
-    "No terminal configured": "Geen terminal geconfigureerd"
-  },
   "No themes found": {
     "No themes found": "Geen thema's gevonden"
   },
@@ -5352,22 +5316,16 @@
     "Not available": "Niet beschikbaar"
   },
   "Not available - install fprintd and pam_fprintd": {
-    "Not available - install fprintd and pam_fprintd": ""
+    "Not available - install fprintd and pam_fprintd": "Niet beschikbaar - installeer fprintd en pam_fprintd"
   },
   "Not available - install or configure pam_u2f": {
-    "Not available - install or configure pam_u2f": ""
+    "Not available - install or configure pam_u2f": "Niet beschikbaar - installeer of configureer pam_u2f"
   },
   "Not available — install fprintd and pam_fprintd, or configure greetd PAM.": {
     "Not available — install fprintd and pam_fprintd, or configure greetd PAM.": "Niet beschikbaar — installeer fprintd en pam_fprintd, of configureer greetd PAM."
   },
-  "Not available — install fprintd and pam_fprintd.": {
-    "Not available — install fprintd and pam_fprintd.": "Niet beschikbaar — installeer fprintd en pam_fprintd."
-  },
   "Not available — install or configure pam_u2f, or configure greetd PAM.": {
     "Not available — install or configure pam_u2f, or configure greetd PAM.": "Niet beschikbaar — installeer of configureer pam_u2f, of configureer greetd PAM."
-  },
-  "Not available — install or configure pam_u2f.": {
-    "Not available — install or configure pam_u2f.": "Niet beschikbaar — installeer of configureer pam_u2f."
   },
   "Not bound": {
     "Not bound": "Niet gekoppeld"
@@ -5437,9 +5395,6 @@
   },
   "Now playing and media controls": {
     "Now playing and media controls": "Nu afspelend en mediaknoppen"
-  },
-  "Numbers": {
-    "Numbers": "Nummers"
   },
   "Numeric (D/M)": {
     "Numeric (D/M)": "Numeriek (D/M)"
@@ -5555,6 +5510,9 @@
   "Open in terminal": {
     "Open in terminal": "Openen in terminal"
   },
+  "Open network": {
+    "Open network": ""
+  },
   "Open search bar to find text": {
     "Open search bar to find text": "Zoekbalk openen om tekst te vinden"
   },
@@ -5582,6 +5540,9 @@
   "Opens the connected launcher in Connected Frame Mode.": {
     "Opens the connected launcher in Connected Frame Mode.": "Opent de verbonden launcher in Connected Frame Mode."
   },
+  "Optional": {
+    "Optional": ""
+  },
   "Optional description": {
     "Optional description": "Optionele beschrijving"
   },
@@ -5590,6 +5551,9 @@
   },
   "Optional state-based conditions applied to the first match.": {
     "Optional state-based conditions applied to the first match.": "Optionele op status gebaseerde voorwaarden toegepast op de eerste match."
+  },
+  "Optional; leave blank for open hotspot": {
+    "Optional; leave blank for open hotspot": ""
   },
   "Options": {
     "Options": "Opties"
@@ -5610,7 +5574,7 @@
     "Outline": "Omtrek"
   },
   "Outline around shell surfaces": {
-    "Outline around shell surfaces": ""
+    "Outline around shell surfaces": "Omlijning rond shell-oppervlakken"
   },
   "Output": {
     "Output": "Uitvoer"
@@ -5671,9 +5635,6 @@
   },
   "Overview of your network connections": {
     "Overview of your network connections": "Overzicht van uw netwerkverbindingen"
-  },
-  "Overwrite": {
-    "Overwrite": "Overschrijven"
   },
   "Owner: %1": {
     "Owner: %1": "Eigenaar: %1"
@@ -5819,14 +5780,8 @@
   "Pick a different random video each time from the same folder": {
     "Pick a different random video each time from the same folder": "Kies telkens een willekeurige andere video uit dezelfde map"
   },
-  "Pick a terminal in Settings → Launcher (or set $TERMINAL).": {
-    "Pick a terminal in Settings → Launcher (or set $TERMINAL).": "Kies een terminal in Instellingen → Launcher (of stel $TERMINAL in)."
-  },
   "Pick how long to pause notifications": {
     "Pick how long to pause notifications": "Kies hoe lang meldingen moeten worden gepauzeerd"
-  },
-  "Pictures": {
-    "Pictures": "Afbeeldingen"
   },
   "Pin": {
     "Pin": "Vastmaken"
@@ -6001,12 +5956,6 @@
   },
   "Power Mode": {
     "Power Mode": "Energiemodus"
-  },
-  "Power Off": {
-    "Power Off": "Uitschakelen"
-  },
-  "Power Options": {
-    "Power Options": "Energieopties"
   },
   "Power Profile": {
     "Power Profile": "Energieprofiel"
@@ -6200,9 +6149,6 @@
   "Quality": {
     "Quality": "Kwaliteit"
   },
-  "Quick Access": {
-    "Quick Access": "Snelle toegang"
-  },
   "Quick access to application launcher": {
     "Quick access to application launcher": "Snelle toegang tot app-starter"
   },
@@ -6242,6 +6188,9 @@
   "Re-enter password": {
     "Re-enter password": "Wachtwoord opnieuw invoeren"
   },
+  "Re-enter the password before saving.": {
+    "Re-enter the password before saving.": ""
+  },
   "Reach local network devices while using an exit node": {
     "Reach local network devices while using an exit node": "Toegang tot lokale netwerkapparaten bij gebruik van een exit-node"
   },
@@ -6251,11 +6200,11 @@
   "Read:": {
     "Read:": "Lezen:"
   },
+  "Ready": {
+    "Ready": ""
+  },
   "Reason": {
     "Reason": "Reden"
-  },
-  "Reboot": {
-    "Reboot": "Opnieuw opstarten"
   },
   "Recent": {
     "Recent": "Recent"
@@ -6298,6 +6247,9 @@
   },
   "Release": {
     "Release": "Loslaten"
+  },
+  "Release to confirm": {
+    "Release to confirm": ""
   },
   "Reload From Disk": {
     "Reload From Disk": "Herladen van schijf"
@@ -6423,10 +6375,7 @@
     "Requires a newer version of Quickshell": "Vereist een nieuwere versie van Quickshell"
   },
   "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys).": {
-    "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys).": ""
-  },
-  "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys). Auth changes apply automatically and may open a terminal for sudo.": {
-    "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys). Auth changes apply automatically and may open a terminal for sudo.": "Vereist greetd, dms-greeter en je gebruiker in de 'greeter'-groep (plus fprintd/pam_fprintd voor vingerafdrukken, pam_u2f voor beveiligingssleutels). Wijzigingen aan de authenticatie worden automatisch toegepast en kunnen een terminal openen voor sudo-toegang."
+    "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys).": "Vereist greetd, dms-greeter, en uw gebruiker in de greeter-groep (plus fprintd/pam_fprintd voor vingerafdruk, pam_u2f voor beveiligingssleutels)."
   },
   "Requires night mode support": {
     "Requires night mode support": "Vereist ondersteuning voor nachtmodus"
@@ -6569,6 +6518,9 @@
   "Run paru/yay with AUR enabled when 'Update All' is clicked.": {
     "Run paru/yay with AUR enabled when 'Update All' is clicked.": "Voer paru/yay uit met AUR ingeschakeld wanneer op 'Alles updaten' wordt geklikt."
   },
+  "Running": {
+    "Running": ""
+  },
   "Running Apps": {
     "Running Apps": "Actieve apps"
   },
@@ -6593,11 +6545,14 @@
   "SMS sent successfully": {
     "SMS sent successfully": "SMS succesvol verzonden"
   },
+  "SSID": {
+    "SSID": ""
+  },
   "Saturation": {
     "Saturation": "Verzadiging"
   },
-  "Save": {
-    "Save": "Opslaan"
+  "Save & Start": {
+    "Save & Start": ""
   },
   "Save Notepad File": {
     "Save Notepad File": "Kladblok-bestand opslaan"
@@ -6719,9 +6674,6 @@
   "Search devices...": {
     "Search devices...": "Apparaten zoeken..."
   },
-  "Search for a location...": {
-    "Search for a location...": "Zoeken naar een locatie..."
-  },
   "Search installed plugins...": {
     "Search installed plugins...": "Geïnstalleerde plug-ins zoeken..."
   },
@@ -6745,9 +6697,6 @@
   },
   "Search widgets...": {
     "Search widgets...": "Widgets zoeken..."
-  },
-  "Search...": {
-    "Search...": "Zoeken..."
   },
   "Searching...": {
     "Searching...": "Zoeken..."
@@ -6777,10 +6726,7 @@
     "Security key mode": "Beveiligingssleutel-modus"
   },
   "Security-key availability could not be confirmed": {
-    "Security-key availability could not be confirmed": ""
-  },
-  "Security-key availability could not be confirmed.": {
-    "Security-key availability could not be confirmed.": "Beschikbaarheid van beveiligingssleutel kon niet worden bevestigd."
+    "Security-key availability could not be confirmed": "Beschikbaarheid van beveiligingssleutel kon niet worden bevestigd"
   },
   "Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.": {
     "Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.": "Ondersteuning voor beveiligingssleutels gedetecteerd, maar er is nog geen geregistreerde sleutel gevonden. U kunt dit nu inschakelen en later een sleutel registreren."
@@ -6955,6 +6901,15 @@
   },
   "Set the percentage at which the battery is considered low.": {
     "Set the percentage at which the battery is considered low.": "Stel het percentage in waarbij de accu als 'bijna leeg' wordt beschouwd."
+  },
+  "Set up a WiFi hotspot for sharing this connection.": {
+    "Set up a WiFi hotspot for sharing this connection.": ""
+  },
+  "Set up hotspot": {
+    "Set up hotspot": ""
+  },
+  "Set up hotspot in Settings": {
+    "Set up hotspot in Settings": ""
   },
   "Setting": {
     "Setting": "Instelling"
@@ -7263,7 +7218,7 @@
     "Show during Niri overview": "Weergeven tijdens Niri-overzicht"
   },
   "Show foreground surfaces on notification cards": {
-    "Show foreground surfaces on notification cards": ""
+    "Show foreground surfaces on notification cards": "Voorgrondoppervlakken weergeven op meldingkaarten"
   },
   "Show foreground surfaces on panels for stronger contrast": {
     "Show foreground surfaces on panels for stronger contrast": "Toon voorgrandoppervlakken op panelen voor sterker contrast"
@@ -7349,9 +7304,6 @@
   "Single-Line Popup": {
     "Single-Line Popup": "Pop-up op één regel"
   },
-  "Size": {
-    "Size": "Grootte"
-  },
   "Size Constraints": {
     "Size Constraints": "Groottebeperkingen"
   },
@@ -7393,9 +7345,6 @@
   },
   "Sort Alphabetically": {
     "Sort Alphabetically": "Alfabetisch sorteren"
-  },
-  "Sort By": {
-    "Sort By": "Sorteren op"
   },
   "Sort wallpapers": {
     "Sort wallpapers": "Achtergronden sorteren"
@@ -7463,17 +7412,29 @@
   "Start": {
     "Start": "Start"
   },
+  "Start Hotspot?": {
+    "Start Hotspot?": ""
+  },
   "Start KDE Connect or Valent to use this plugin": {
     "Start KDE Connect or Valent to use this plugin": "Start KDE Connect of Valent om deze plug-in te gebruiken"
   },
   "Start typing your notes here...": {
     "Start typing your notes here...": "Begin hier met het typen van uw notities..."
   },
+  "Starting hotspot...": {
+    "Starting hotspot...": ""
+  },
+  "Starting the hotspot will disconnect WiFi from \"%1\" — the radio can't do both at once. Sharing internet then requires another connection, such as Ethernet.": {
+    "Starting the hotspot will disconnect WiFi from \"%1\" — the radio can't do both at once. Sharing internet then requires another connection, such as Ethernet.": ""
+  },
+  "Starting...": {
+    "Starting...": ""
+  },
   "State": {
     "State": "Status"
   },
-  "Status": {
-    "Status": "Status"
+  "Stop": {
+    "Stop": ""
   },
   "Stop ignoring %1": {
     "Stop ignoring %1": "Stop met negeren van %1"
@@ -7533,7 +7494,7 @@
     "Surface Border Opacity": "Randdekking van oppervlak"
   },
   "Surface Border Outline": {
-    "Surface Border Outline": ""
+    "Surface Border Outline": "Omlijning van oppervlakrand"
   },
   "Surface Container": {
     "Surface Container": "Surface-container"
@@ -7559,9 +7520,6 @@
   "Surfaces float independently of the frame": {
     "Surfaces float independently of the frame": "Oppervlakken zweven onafhankelijk van het frame"
   },
-  "Suspend": {
-    "Suspend": "Slaapstand"
-  },
   "Suspend behavior": {
     "Suspend behavior": "Gedrag slaapstand"
   },
@@ -7574,14 +7532,11 @@
   "Sway Website": {
     "Sway Website": "Sway-website"
   },
-  "Switch User": {
-    "Switch User": "Ander account"
-  },
   "Switch between display configurations": {
     "Switch between display configurations": "Schakelen tussen schermconfiguraties"
   },
   "Switch displays with an available 60 Hz mode to 60 Hz on battery and restore the previous mode on AC. Skips displays with VRR enabled.": {
-    "Switch displays with an available 60 Hz mode to 60 Hz on battery and restore the previous mode on AC. Skips displays with VRR enabled.": ""
+    "Switch displays with an available 60 Hz mode to 60 Hz on battery and restore the previous mode on AC. Skips displays with VRR enabled.": "Schakel schermen met een beschikbare 60 Hz-modus naar 60 Hz bij batterijgebruik en herstel de vorige modus op netstroom. Slaat schermen met ingeschakelde VRR over."
   },
   "Switch to power profile": {
     "Switch to power profile": "Wisselen naar energieprofiel"
@@ -7601,11 +7556,11 @@
   "Sync Position Across Screens": {
     "Sync Position Across Screens": "Positie synchroniseren over schermen"
   },
-  "Sync applies your theme and settings to the login screen. Other users should run dms greeter sync --profile instead of a full sync. Authentication changes apply automatically.": {
-    "Sync applies your theme and settings to the login screen. Other users should run dms greeter sync --profile instead of a full sync. Authentication changes apply automatically.": "Synchronisatie past je thema en instellingen toe op het aanmeldscherm. Andere gebruikers moeten 'dms greeter sync --profile' uitvoeren in plaats van een volledige synchronisatie. Wijzigingen aan de authenticatie worden automatisch toegepast."
-  },
   "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": {
-    "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": ""
+    "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": "Synchronisatie past uw thema en instellingen toe op het aanmeldscherm. Gedeelde gebruikers moeten 'dms greeter sync --profile' uitvoeren in plaats van een primaire gebruikerssynchronisatie."
+  },
+  "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": {
+    "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": ""
   },
   "Sync completed successfully.": {
     "Sync completed successfully.": "Sync is succesvol voltooid."
@@ -7624,9 +7579,6 @@
   },
   "Syncing...": {
     "Syncing...": "Synchroniseren..."
-  },
-  "System": {
-    "System": "Systeem"
   },
   "System App Theming": {
     "System App Theming": "Thema's systeemapps"
@@ -7682,9 +7634,6 @@
   "Tab": {
     "Tab": "Tab"
   },
-  "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": {
-    "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": "Tab/Shift+Tab: Nav • ←→↑↓: Raster Nav • Enter/Spatie: Selecteren"
-  },
   "Tags": {
     "Tags": "Tags"
   },
@@ -7714,6 +7663,9 @@
   },
   "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": {
     "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": "Terminal fallback mislukt. Installeer een van de ondersteunde terminal-emulators of voer handmatig 'dms greeter sync' uit."
+  },
+  "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": {
+    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": ""
   },
   "Terminal fallback opened. Complete authentication there; it will close automatically when done.": {
     "Terminal fallback opened. Complete authentication there; it will close automatically when done.": "Terminal-terugval geopend. Voltooi daar de authenticatie; deze sluit automatisch zodra voltooid."
@@ -7759,6 +7711,9 @@
   },
   "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": {
     "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "De DMS_SOCKET omgevingsvariabele is niet ingesteld of de socket is niet beschikbaar. Geautomatiseerd plug-inbeheer vereist de DMS_SOCKET."
+  },
+  "The WiFi adapter could not start access point mode.": {
+    "The WiFi adapter could not start access point mode.": ""
   },
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
     "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "De onderstaande instellingen wijzigen uw GTK- en Qt-instellingen. Als u uw huidige configuraties wilt behouden, maak er dan een back-up van (qt5ct.conf|qt6ct.conf en ~/.config/gtk-3.0|gtk-4.0)."
@@ -7831,6 +7786,9 @@
   },
   "This will delete all unpinned entries. %1 pinned entries will be kept.": {
     "This will delete all unpinned entries. %1 pinned entries will be kept.": "Dit verwijdert alle niet-vastgemaakte items. %1 vastgemaakte items blijven bewaard."
+  },
+  "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": {
+    "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": ""
   },
   "This will permanently delete all clipboard history.": {
     "This will permanently delete all clipboard history.": "Dit zal de volledige klembordgeschiedenis permanent verwijderen."
@@ -8060,9 +8018,6 @@
   "Turn off now": {
     "Turn off now": "Nu uitschakelen"
   },
-  "Type": {
-    "Type": "Type"
-  },
   "Type at least 2 characters": {
     "Type at least 2 characters": "Typ minstens 2 tekens"
   },
@@ -8277,10 +8232,7 @@
     "Use a custom image for the lock screen, or leave empty to use your desktop wallpaper.": "Gebruik een aangepaste afbeelding voor het vergrendelscherm, of laat leeg om je bureaubladachtergrond te gebruiken."
   },
   "Use a custom image for the login screen, or leave empty to use desktop wallpaper": {
-    "Use a custom image for the login screen, or leave empty to use desktop wallpaper": ""
-  },
-  "Use a custom image for the login screen, or leave empty to use your desktop wallpaper.": {
-    "Use a custom image for the login screen, or leave empty to use your desktop wallpaper.": "Gebruik een aangepaste afbeelding voor het aanmeldscherm, of laat leeg om je bureaubladachtergrond te gebruiken."
+    "Use a custom image for the login screen, or leave empty to use desktop wallpaper": "Gebruik een aangepaste afbeelding voor het aanmeldscherm, of laat leeg om de bureaubladachtergrond te gebruiken"
   },
   "Use a custom radius for goth corner cutouts": {
     "Use a custom radius for goth corner cutouts": "Gebruik een aangepaste straal voor de 'goth' hoekuitsparingen"
@@ -8289,10 +8241,7 @@
     "Use a fixed shadow direction for this bar": "Gebruik een vaste schaduwrichting voor deze balk"
   },
   "Use a security key for lock screen authentication": {
-    "Use a security key for lock screen authentication": ""
-  },
-  "Use a security key for lock screen authentication.": {
-    "Use a security key for lock screen authentication.": "Gebruik een beveiligingssleutel voor vergrendelscherm-authenticatie."
+    "Use a security key for lock screen authentication": "Een beveiligingssleutel gebruiken voor vergrendelschermverificatie"
   },
   "Use album art accent": {
     "Use album art accent": "Albumhoezen als accentkleur gebruiken"
@@ -8322,10 +8271,7 @@
     "Use different workspace colors on displays that are not focused": "Gebruik verschillende werkruimtekleuren op schermen die geen focus hebben"
   },
   "Use fingerprint authentication for the lock screen": {
-    "Use fingerprint authentication for the lock screen": ""
-  },
-  "Use fingerprint authentication for the lock screen.": {
-    "Use fingerprint authentication for the lock screen.": "Gebruik vingerafdrukauthenticatie voor het vergrendelscherm."
+    "Use fingerprint authentication for the lock screen": "Vingerafdrukverificatie gebruiken voor het vergrendelscherm"
   },
   "Use keys 1-3 or arrows, Enter/Space to select": {
     "Use keys 1-3 or arrows, Enter/Space to select": "Gebruik toetsen 1-3 of pijltjes, Enter/Spatie om te selecteren"
@@ -8498,9 +8444,6 @@
   "Video Screensaver": {
     "Video Screensaver": "Video-screensaver"
   },
-  "Videos": {
-    "Videos": "Video's"
-  },
   "View Mode": {
     "View Mode": "Weergavemodus"
   },
@@ -8537,8 +8480,14 @@
   "W": {
     "W": "B"
   },
+  "WCAG %1 body": {
+    "WCAG %1 body": ""
+  },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
+  },
+  "WPA2 password": {
+    "WPA2 password": ""
   },
   "Wallpaper": {
     "Wallpaper": "Achtergrond"
@@ -8627,6 +8576,12 @@
   "WiFi enabled": {
     "WiFi enabled": "Wifi ingeschakeld"
   },
+  "WiFi is disabled": {
+    "WiFi is disabled": ""
+  },
+  "WiFi is disabled. You can still edit and save hotspot settings, but starting the hotspot requires WiFi to be enabled.": {
+    "WiFi is disabled. You can still edit and save hotspot settings, but starting the hotspot requires WiFi to be enabled.": ""
+  },
   "WiFi is off": {
     "WiFi is off": "Wifi is uit"
   },
@@ -8684,6 +8639,9 @@
   "Width of window border and focus ring": {
     "Width of window border and focus ring": "Breedte van vensterrand en focusring"
   },
+  "Will disconnect \"%1": {
+    "Will disconnect \"%1\"": ""
+  },
   "Wind": {
     "Wind": "Wind"
   },
@@ -8716,9 +8674,6 @@
   },
   "Working...": {
     "Working...": "Bezig..."
-  },
-  "Workspace": {
-    "Workspace": "Werkblad"
   },
   "Workspace Index Numbers": {
     "Workspace Index Numbers": "Indexnummers werkblad"
@@ -8794,6 +8749,12 @@
   },
   "Your compositor does not support background blur (ext-background-effect-v1)": {
     "Your compositor does not support background blur (ext-background-effect-v1)": "Je compositor ondersteunt geen achtergrondvervaging (ext-background-effect-v1)"
+  },
+  "Your hotspot is running.": {
+    "Your hotspot is running.": ""
+  },
+  "Your hotspot profile is saved and ready to start.": {
+    "Your hotspot profile is saved and ready to start.": ""
   },
   "Your system is up to date!": {
     "Your system is up to date!": "Uw systeem is bijgewerkt!"
@@ -8968,9 +8929,6 @@
   },
   "on Sway": {
     "on Sway": "op Sway"
-  },
-  "or run ": {
-    "or run ": "of voer uit: "
   },
   "power-profiles-daemon not available": {
     "power-profiles-daemon not available": "power-profiles-daemon niet beschikbaar"
