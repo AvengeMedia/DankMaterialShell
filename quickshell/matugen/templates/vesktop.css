@@ -163,6 +163,12 @@
     --control-primary-background-default: {{colors.primary.default.hex}} !important;
     --control-primary-background-hover: color-mix(in srgb, {{colors.primary.default.hex}} 92%, {{colors.on_primary.default.hex}}) !important;
     --control-primary-background-active: color-mix(in srgb, {{colors.primary.default.hex}} 85%, {{colors.on_primary.default.hex}}) !important;
+    --control-primary-text-default: {{colors.on_primary.default.hex}} !important;
+    --control-primary-text-hover: {{colors.on_primary.default.hex}} !important;
+    --control-primary-text-active: {{colors.on_primary.default.hex}} !important;
+    --control-primary-icon-default: {{colors.on_primary.default.hex}} !important;
+    --control-primary-icon-hover: {{colors.on_primary.default.hex}} !important;
+    --control-primary-icon-active: {{colors.on_primary.default.hex}} !important;
     --button-filled-brand-background: {{colors.primary.default.hex}} !important;
     --button-filled-brand-background-hover: color-mix(in srgb, {{colors.primary.default.hex}} 92%, {{colors.on_primary.default.hex}}) !important;
     --button-filled-brand-background-active: color-mix(in srgb, {{colors.primary.default.hex}} 85%, {{colors.on_primary.default.hex}}) !important;
@@ -298,7 +304,29 @@
 .theme-dark span[class*="botTag"],
 .theme-light span[class*="botTag"],
 .theme-dark div[class*="newMessagesBar"],
-.theme-light div[class*="newMessagesBar"] {
+.theme-light div[class*="newMessagesBar"],
+.theme-dark [class*="selectorButtonSelected"],
+.theme-light [class*="selectorButtonSelected"],
+.theme-dark div[class*="newTopicsBar"],
+.theme-light div[class*="newTopicsBar"],
+.theme-dark [class*="tooltipBrand"],
+.theme-light [class*="tooltipBrand"],
+.theme-dark [class*="roleCheckmark"],
+.theme-light [class*="roleCheckmark"],
+.theme-dark [class*="circleIconButton"],
+.theme-light [class*="circleIconButton"],
+.theme-dark [class*="modeButtonActive"],
+.theme-light [class*="modeButtonActive"],
+.theme-dark [class*="childWrapper"],
+.theme-light [class*="childWrapper"] {
+    --white: {{colors.on_primary.default.hex}} !important;
+    --white-500: {{colors.on_primary.default.hex}} !important;
+}
+
+/* search pagination: active page number */
+.theme-dark [class*="pageControl"] [class*="activeButton"],
+.theme-light [class*="pageControl"] [class*="activeButton"] {
+    color: {{colors.on_primary.default.hex}} !important;
     --white: {{colors.on_primary.default.hex}} !important;
     --white-500: {{colors.on_primary.default.hex}} !important;
 }
