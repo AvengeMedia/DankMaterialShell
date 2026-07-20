@@ -174,9 +174,12 @@ Item {
             spotlightContent.controller.selectedFlatIndex = 0;
             spotlightContent.controller.selectedItem = null;
             spotlightContent.controller.historyIndex = -1;
-            spotlightContent.controller.searchQuery = targetQuery;
-
-            spotlightContent.controller.performSearch();
+            if (targetQuery) {
+                spotlightContent.controller.setSearchQuery(targetQuery);
+            } else {
+                spotlightContent.controller.searchQuery = "";
+                spotlightContent.controller.performSearch();
+            }
         }
         if (spotlightContent.resetScroll) {
             spotlightContent.resetScroll();
@@ -271,7 +274,7 @@ Item {
         target: spotlightContent?.controller ?? null
 
         function onModeChanged(mode, userInitiated) {
-            if (!userInitiated || !SettingsData.rememberLastMode || (mode !== "all" && mode !== "apps"))
+            if (!userInitiated || !SettingsData.rememberLastMode)
                 return;
             SessionData.setLauncherLastMode(mode);
         }
