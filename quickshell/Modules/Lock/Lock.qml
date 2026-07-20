@@ -335,6 +335,7 @@ Scope {
             notifyLockedHint(sessionLock.secure);
             if (!sessionLock.secure)
                 return;
+            IdleService.dismissFadeToLock();
             lockRetryAttempts = 0;
             pendingLock = false;
             if (lockPowerOffArmed && powerOffOnLock)

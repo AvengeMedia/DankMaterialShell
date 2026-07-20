@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 import qs.Common
+import qs.Services
 
 PanelWindow {
     id: root
@@ -65,10 +66,23 @@ PanelWindow {
     }
 
     function cancelFade() {
+        dismiss();
+        fadeCancelled();
+    }
+
+    function dismiss() {
         fadeSeq.stop();
         fadeOverlay.opacity = 0.0;
         active = false;
-        fadeCancelled();
+    }
+
+    Connections {
+        target: IdleService
+        function onIsShellLockedChanged() {
+            if (IdleService.isShellLocked)
+                return;
+            root.dismiss();
+        }
     }
 
     MouseArea {

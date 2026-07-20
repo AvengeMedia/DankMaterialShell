@@ -139,6 +139,14 @@ Item {
                         return;
                     fadeDpmsWindowLoader.loadedWindow.cancelFade();
                 }
+
+                function onMonitorsOffChanged() {
+                    if (IdleService.monitorsOff)
+                        return;
+                    if (!fadeDpmsWindowLoader.loadedWindow)
+                        return;
+                    fadeDpmsWindowLoader.loadedWindow.dismiss();
+                }
             }
         }
     }
