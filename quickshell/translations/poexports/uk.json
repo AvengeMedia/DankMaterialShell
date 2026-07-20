@@ -6,7 +6,7 @@
     "%1 Animation Speed": "Швидкість анімації: %1"
   },
   "%1 Layout Overrides": {
-    "%1 Layout Overrides": "%1 перевизначень макета"
+    "%1 Layout Overrides": "Перевизначення макета %1"
   },
   "%1 Sessions": {
     "%1 Sessions": "Сеанси %1"
@@ -1881,7 +1881,7 @@
     "Copy HTML": "Копіювати HTML"
   },
   "Copy Name": {
-    "Copy Name": "Копіювати ім'я"
+    "Copy Name": "Копіювати назву"
   },
   "Copy PID": {
     "Copy PID": "Скопіювати PID"
@@ -2022,7 +2022,7 @@
     "Curve: curve rasterizer.": "Curve: растеризатор кривих."
   },
   "Custom": {
-    "Custom": "Власна"
+    "Custom": "Власн."
   },
   "Custom Blend": {
     "Custom Blend": "Власний бленд"
@@ -2046,7 +2046,7 @@
     "Custom Logout Command": "Власна команда виходу"
   },
   "Custom Name": {
-    "Custom Name": "Власне ім'я"
+    "Custom Name": "Власна назва"
   },
   "Custom Power Actions": {
     "Custom Power Actions": "Власні дії живлення"
@@ -2490,7 +2490,7 @@
     "Display line numbers in editor": "Відображати номери рядків у редакторі"
   },
   "Display name for this entry": {
-    "Display name for this entry": "Відображаємо ім'я для цього запису"
+    "Display name for this entry": "Відображаємо назву для цього запису"
   },
   "Display only workspaces that contain windows": {
     "Display only workspaces that contain windows": "Відображати лише робочі простори, що містять вікна"
@@ -2772,10 +2772,10 @@
     "Enter URI or text to share": "Введіть URI або текст для спільного доступу"
   },
   "Enter a new name for session \"%1": {
-    "Enter a new name for session \"%1\"": "Введіть нове ім'я для сесії «%1»"
+    "Enter a new name for session \"%1\"": "Введіть нову назву для сесії «%1»"
   },
   "Enter a new name for this workspace": {
-    "Enter a new name for this workspace": "Введіть нове ім'я для цього робочого простору"
+    "Enter a new name for this workspace": "Введіть нову назву для цього робочого простору"
   },
   "Enter command or script path": {
     "Enter command or script path": "Введіть команду або шлях до скрипта"
@@ -2790,16 +2790,16 @@
     "Enter custom top bar format (e.g., ddd MMM d)": "Введіть власний формат верхньої панелі (наприклад, ddd MMM d)"
   },
   "Enter device name...": {
-    "Enter device name...": "Введіть ім'я пристрою..."
+    "Enter device name...": "Введіть назву пристрою..."
   },
   "Enter filename...": {
-    "Enter filename...": "Введіть ім'я файлу..."
+    "Enter filename...": "Введіть назву файлу..."
   },
   "Enter launch prefix (e.g., 'uwsm-app')": {
     "Enter launch prefix (e.g., 'uwsm-app')": "Введіть префікс запуску (наприклад, 'uwsm-app')"
   },
   "Enter network name and password": {
-    "Enter network name and password": "Введіть ім'я мережі та пароль"
+    "Enter network name and password": "Введіть назву мережі та пароль"
   },
   "Enter passkey for ": {
     "Enter passkey for ": "Введіть ключ доступу для "
@@ -3918,7 +3918,7 @@
     "IP Address:": "IP-адреса:"
   },
   "IP address or hostname": {
-    "IP address or hostname": "IP-адреса або ім'я хоста"
+    "IP address or hostname": "IP-адреса або назва хоста"
   },
   "ISO Date": {
     "ISO Date": "Системний за замовчуванням"
@@ -4167,7 +4167,7 @@
     "Invalid configuration": "Недійсна конфігурація"
   },
   "Invalid package name — letters, digits and @._+:- only.": {
-    "Invalid package name — letters, digits and @._+:- only.": "Невірне ім'я пакета — дозволені лише літери, цифри та символи @._+:-."
+    "Invalid package name — letters, digits and @._+:- only.": "Невірна назва пакета — дозволені лише літери, цифри та символи @._+:-."
   },
   "Invalid password for %1": {
     "Invalid password for %1": "Невірний пароль для %1"
@@ -5895,7 +5895,7 @@
     "Please wait...": "Будь ласка, зачекайте…"
   },
   "Please write a name for your new %1 session": {
-    "Please write a name for your new %1 session": "Будь ласка, введіть ім'я для вашого нового сеансу %1"
+    "Please write a name for your new %1 session": "Будь ласка, введіть назву для вашого нового сеансу %1"
   },
   "Plugged In": {
     "Plugged In": "Підключено"
@@ -6108,7 +6108,7 @@
     "Printer deleted": "Принтер видалено"
   },
   "Printer name (no spaces)": {
-    "Printer name (no spaces)": "Ім'я принтера (без пробілів)"
+    "Printer name (no spaces)": "Назва принтера (без пробілів)"
   },
   "Printer reachable": {
     "Printer reachable": "Принтер доступний"
@@ -6714,7 +6714,7 @@
     "Search applications...": "Пошук програм..."
   },
   "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": {
-    "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": "Пошук за комбінацією клавіш, описом або ім'ям дії.\n\nДія за замовчуванням копіює комбінацію клавіш у буфер обміну.\nНатисніть ПКМ або стрілку вправо, щоб закріпити часто використовувані комбінації — вони відображатимуться вгорі, коли пошук не активний."
+    "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": "Пошук за комбінацією клавіш, описом або назвою дії.\n\nДія за замовчуванням копіює комбінацію клавіш у буфер обміну.\nНатисніть ПКМ або стрілку вправо, щоб закріпити часто використовувані комбінації — вони відображатимуться вгорі, коли пошук не активний."
   },
   "Search devices...": {
     "Search devices...": "Пошук пристроїв..."
@@ -6924,10 +6924,10 @@
     "Session Filter": "Фільтр сеансів"
   },
   "Set Custom Device Name": {
-    "Set Custom Device Name": "Встановити власне ім'я пристрою"
+    "Set Custom Device Name": "Встановити власну назву пристрою"
   },
   "Set custom name": {
-    "Set custom name": "Встановити власне ім'я"
+    "Set custom name": "Встановити власну назву"
   },
   "Set custom names for your audio input devices": {
     "Set custom names for your audio input devices": "Встановити власні імена для ваших пристроїв введення аудіо"
@@ -7308,7 +7308,7 @@
     "Show workspace index numbers in the top bar workspace switcher": "Показувати індексні номери робочих просторів у перемикачі робочих просторів верхньої панелі"
   },
   "Show workspace name on horizontal bars, and first letter on vertical bars": {
-    "Show workspace name on horizontal bars, and first letter on vertical bars": "Показати ім'я робочої області на горизонтальних панелях та першу літеру на вертикальних панелях"
+    "Show workspace name on horizontal bars, and first letter on vertical bars": "Показати назву робочої області на горизонтальних панелях та першу літеру на вертикальних панелях"
   },
   "Show workspaces of the currently focused monitor": {
     "Show workspaces of the currently focused monitor": "Показати робочі області поточного сфокусованого монітора"
@@ -7764,7 +7764,7 @@
     "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "Наведені нижче налаштування змінять ваші параметри GTK та Qt. Якщо ви бажаєте зберегти поточні конфігурації, будь ласка, зробіть їх резервну копію (qt5ct.conf|qt6ct.conf та ~/.config/gtk-3.0|gtk-4.0)."
   },
   "The custom command used when attaching to sessions (receives the session name as the first argument)": {
-    "The custom command used when attaching to sessions (receives the session name as the first argument)": "Спеціальна команда, що використовується при підключенні до сесій (отримує ім'я сесії як перший аргумент)"
+    "The custom command used when attaching to sessions (receives the session name as the first argument)": "Спеціальна команда, що використовується при підключенні до сесій (отримує назву сесії як перший аргумент)"
   },
   "The job queue of this printer is empty": {
     "The job queue of this printer is empty": "Черга завдань цього принтера порожня"
