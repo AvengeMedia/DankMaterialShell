@@ -500,6 +500,36 @@ FloatingWindow {
                                             font.weight: Font.Medium
                                         }
                                     }
+
+                                    Rectangle {
+                                        id: wcagBadge
+
+                                        // Rated for the mode being viewed, since a theme
+                                        // often passes in one mode and not the other.
+                                        readonly property var modeReport: Theme.isLightMode ? modelData.wcag?.light : modelData.wcag?.dark
+                                        readonly property string level: modeReport?.level ?? ""
+                                        readonly property string bodyLevel: modeReport?.body?.level ?? ""
+                                        readonly property bool fullPass: level === "AA" || level === "AAA"
+                                        readonly property bool bodyPass: bodyLevel === "AA" || bodyLevel === "AAA"
+
+                                        height: 18
+                                        width: wcagText.implicitWidth + Theme.spacingS
+                                        radius: 9
+                                        color: Theme.withAlpha(fullPass ? Theme.info : Theme.surfaceVariantText, 0.15)
+                                        border.color: Theme.withAlpha(fullPass ? Theme.info : Theme.surfaceVariantText, 0.4)
+                                        border.width: 1
+                                        visible: fullPass || bodyPass
+                                        anchors.verticalCenter: parent.verticalCenter
+
+                                        StyledText {
+                                            id: wcagText
+                                            anchors.centerIn: parent
+                                            text: wcagBadge.fullPass ? "WCAG " + wcagBadge.level : I18n.tr("WCAG %1 body", "contrast badge when only body text passes").arg(wcagBadge.bodyLevel)
+                                            font.pixelSize: Theme.fontSizeSmall
+                                            color: wcagBadge.fullPass ? Theme.info : Theme.surfaceVariantText
+                                            font.weight: Font.Medium
+                                        }
+                                    }
                                 }
 
                                 StyledText {

@@ -40,6 +40,7 @@ func HandleList(conn *models.Conn, req models.Request) {
 			SourceDir:   t.SourceDir,
 			Installed:   installed,
 			FirstParty:  isFirstParty(t.Author),
+			WCAG:        t.WCAG,
 		}
 		addVariantsInfo(&info, t.Variants)
 		result[i] = info

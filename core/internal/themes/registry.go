@@ -104,6 +104,28 @@ type ThemeVariants struct {
 	Accents  []ThemeAccent         `json:"accents,omitempty"`
 }
 
+type ThemeWCAGGroup struct {
+	Level     string   `json:"level"`
+	MinRatio  float64  `json:"minRatio"`
+	WorstPair []string `json:"worstPair,omitempty"`
+}
+
+type ThemeWCAGMode struct {
+	Level     string            `json:"level"`
+	MinRatio  float64           `json:"minRatio"`
+	WorstPair []string          `json:"worstPair,omitempty"`
+	Body      *ThemeWCAGGroup   `json:"body,omitempty"`
+	Accent    *ThemeWCAGGroup   `json:"accent,omitempty"`
+	NonText   *ThemeWCAGGroup   `json:"nonText,omitempty"`
+	Variants  map[string]string `json:"variants,omitempty"`
+}
+
+type ThemeWCAG struct {
+	Level string         `json:"level"`
+	Dark  *ThemeWCAGMode `json:"dark,omitempty"`
+	Light *ThemeWCAGMode `json:"light,omitempty"`
+}
+
 type Theme struct {
 	ID          string         `json:"id"`
 	Name        string         `json:"name"`
@@ -113,6 +135,7 @@ type Theme struct {
 	Dark        ColorScheme    `json:"dark"`
 	Light       ColorScheme    `json:"light"`
 	Variants    *ThemeVariants `json:"variants,omitempty"`
+	WCAG        *ThemeWCAG     `json:"wcag,omitempty"`
 	PreviewPath string         `json:"-"`
 	SourceDir   string         `json:"sourceDir,omitempty"`
 }
@@ -240,6 +263,7 @@ func (r *Registry) loadThemes() error {
 			theme.ID = entry.Name()
 		}
 		theme.SourceDir = entry.Name()
+		theme.WCAG = loadThemeWCAG(r.fs, themeDir)
 
 		previewPath := filepath.Join(themeDir, "preview.svg")
 		if exists, _ := afero.Exists(r.fs, previewPath); exists {
@@ -250,6 +274,20 @@ func (r *Registry) loadThemes() error {
 	}
 
 	return nil
+}
+
+func loadThemeWCAG(fs afero.Fs, themeDir string) *ThemeWCAG {
+	data, err := afero.ReadFile(fs, filepath.Join(themeDir, "wcag.json"))
+	if err != nil {
+		return nil
+	}
+
+	var wcag ThemeWCAG
+	if err := json.Unmarshal(data, &wcag); err != nil {
+		return nil
+	}
+
+	return &wcag
 }
 
 func (r *Registry) List() ([]Theme, error) {

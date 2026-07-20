@@ -45,6 +45,7 @@ func HandleSearch(conn *models.Conn, req models.Request) {
 			Description: t.Description,
 			Installed:   installed,
 			FirstParty:  isFirstParty(t.Author),
+			WCAG:        t.WCAG,
 		}
 	}
 
