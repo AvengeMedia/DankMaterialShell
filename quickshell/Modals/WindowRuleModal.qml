@@ -52,6 +52,7 @@ FloatingWindow {
         condInitialised.triState = 0;
         opacityEnabled.checked = false;
         opacitySlider.value = 100;
+        floatingCond.triState = 0;
         floatingToggle.checked = false;
         maximizedToggle.checked = false;
         maximizedToEdgesToggle.checked = false;
@@ -164,6 +165,7 @@ FloatingWindow {
         opacityEnabled.checked = hasOpacity;
         opacitySlider.value = hasOpacity ? Math.round(actions.opacity * 100) : 100;
 
+        floatingCond.triState = triFromBool(actions.openFloating);
         floatingToggle.checked = actions.openFloating || false;
         maximizedToggle.checked = actions.openMaximized || false;
         maximizedToEdgesToggle.checked = actions.openMaximizedToEdges || false;
@@ -318,7 +320,9 @@ FloatingWindow {
 
         if (opacityEnabled.checked)
             actions.opacity = opacitySlider.value / 100;
-        if (floatingToggle.checked)
+        if (isNiri)
+            applyCond(actions, "openFloating", floatingCond.triState);
+        else if (floatingToggle.checked)
             actions.openFloating = true;
         if (maximizedToggle.checked)
             actions.openMaximized = true;
@@ -945,11 +949,23 @@ FloatingWindow {
 
                 Flow {
                     width: parent.width
+                    spacing: Theme.spacingS
+                    visible: isNiri
+
+                    MatchCond {
+                        id: floatingCond
+                        label: I18n.tr("Float")
+                    }
+                }
+
+                Flow {
+                    width: parent.width
                     spacing: Theme.spacingL
 
                     CheckboxRow {
                         id: floatingToggle
                         label: I18n.tr("Float")
+                        visible: !isNiri
                     }
                     CheckboxRow {
                         id: maximizedToggle
