@@ -511,7 +511,7 @@ Singleton {
             return MangoService.filterCurrentDisplay(toplevels, screenName);
         if (isHyprland)
             return filterHyprlandCurrentDisplaySafe(toplevels, screenName);
-        return toplevels;
+        return toplevels.filter(t => _toplevelOnScreen(t, screenName));
     }
 
     function _screenName(screenOrName) {
