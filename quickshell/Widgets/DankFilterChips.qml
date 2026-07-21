@@ -7,12 +7,15 @@ Flow {
 
     property var model: []
     property int currentIndex: 0
+    property bool multiSelect: false
+    property var selectedValues: []
     property int chipHeight: 32
     property int chipPadding: Theme.spacingM
     property bool showCheck: true
     property bool showCounts: true
 
     signal selectionChanged(int index)
+    signal selectionToggled(int index, bool selected)
 
     spacing: Theme.spacingS
     width: parent ? parent.width : 400
@@ -25,7 +28,8 @@ Flow {
             required property var modelData
             required property int index
 
-            property bool selected: index === root.currentIndex
+            property var value: typeof modelData === "string" ? modelData : (modelData.value !== undefined ? modelData.value : (modelData.label || ""))
+            property bool selected: root.multiSelect ? root.selectedValues.includes(value) : (index === root.currentIndex)
             property bool hovered: mouseArea.containsMouse
             property bool pressed: mouseArea.pressed
             property string label: typeof modelData === "string" ? modelData : (modelData.label || "")
@@ -99,6 +103,10 @@ Flow {
                 cursorShape: Qt.PointingHandCursor
                 onPressed: mouse => chipRipple.trigger(mouse.x, mouse.y)
                 onClicked: {
+                    if (root.multiSelect) {
+                        root.selectionToggled(chip.index, !chip.selected);
+                        return;
+                    }
                     root.currentIndex = chip.index;
                     root.selectionChanged(chip.index);
                 }
