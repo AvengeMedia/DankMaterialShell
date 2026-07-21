@@ -1198,16 +1198,18 @@ Item {
                         width: parent.width - Theme.spacingM * 2
                     }
 
-                    DankButtonGroup {
+                    DankFilterChips {
                         id: transitionGroup
                         width: parent.width - Theme.spacingM * 2
-                        selectionMode: "multi"
-                        model: SessionData.availableWallpaperTransitions.filter(t => t !== "none")
-                        initialSelection: SessionData.includedTransitions
-                        currentSelection: SessionData.includedTransitions
+                        multiSelect: true
+                        model: SessionData.availableWallpaperTransitions.filter(t => t !== "none").map(t => ({
+                                    "value": t,
+                                    "label": t.replace(/\b\w/g, c => c.toUpperCase())
+                                }))
+                        selectedValues: SessionData.includedTransitions
 
-                        onSelectionChanged: (index, selected) => {
-                            const transition = model[index];
+                        onSelectionToggled: (index, selected) => {
+                            const transition = model[index].value;
                             let newIncluded = SessionData.includedTransitions.slice();
 
                             if (selected && !newIncluded.includes(transition)) {
