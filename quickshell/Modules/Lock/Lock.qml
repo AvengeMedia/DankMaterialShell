@@ -211,10 +211,7 @@ Scope {
         function onSessionResumed() {
             if (!shouldLock || sessionLock.locked)
                 return;
-            log.warn("Session lock dead after resume - re-locking");
-            resetLockRetry();
-            lockRetryPending = true;
-            lockRetryPending = false;
+            resumeRelockTimer.restart();
         }
 
         function onLoginctlStateChanged() {
@@ -346,6 +343,8 @@ Scope {
         function onLockedChanged() {
             if (sessionLock.locked)
                 return;
+            if (shouldLock && (IdleService.monitorsOff || lockPowerOffArmed || IdleService.lockPowerOffRequested))
+                return;
             lockWakeAllowed = false;
             resetPowerOffFade();
             if (IdleService.monitorsOff && powerOffOnLock) {
@@ -428,6 +427,22 @@ Scope {
         interval: 1000
         repeat: false
         onTriggered: root.lockRetryPending = false
+    }
+
+    Timer {
+        id: resumeRelockTimer
+        interval: 1000
+        repeat: false
+        onTriggered: {
+            if (!root.shouldLock || sessionLock.locked)
+                return;
+            if (IdleService.monitorsOff || root.lockPowerOffArmed || IdleService.lockPowerOffRequested)
+                return;
+            root.log.warn("Session lock dead after resume - re-locking");
+            root.resetLockRetry();
+            root.lockRetryPending = true;
+            root.lockRetryPending = false;
+        }
     }
 
     Timer {
