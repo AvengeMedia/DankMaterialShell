@@ -77,6 +77,12 @@ DankPopout {
 
     readonly property color _containerBg: Theme.nestedSurface
 
+    // Defer open one tick so screen-change geometry settles before the surface
+    // maps; a synchronous open churns the surface and loses the blur on a switch.
+    function present() {
+        Qt.callLater(open);
+    }
+
     function openWithSection(section) {
         StateUtils.openWithSection(root, section);
     }
