@@ -1,7 +1,7 @@
 filippo.io/edwards25519 v1.2.0 h1:crnVqOiS4jqYleHd9vaKZ+HKtHfllngJIiOpNpoJsjo=
 filippo.io/edwards25519 v1.2.0/go.mod h1:xzAOLCNug/yB62zG1bQ8uziwrIqIuxhctzJT18Q77mc=
-github.com/AvengeMedia/dankgo v0.0.0-20260718184203-ed59ffc6e599 h1:hxy5SRGREsQ6v4xUOxWnWVPWD6ZU+H0jA+LHcTwXbCg=
-github.com/AvengeMedia/dankgo v0.0.0-20260718184203-ed59ffc6e599/go.mod h1:7p7cfydr4WM1G6eOPFlANXF3IV5du3FoA4CbDPprHAo=
+github.com/AvengeMedia/dankgo v0.0.0-20260721162324-38d48943054d h1:EZN2x2uAX975Uvw4MByqWaaVTp2fOJrNTl4V4EQbSn8=
+github.com/AvengeMedia/dankgo v0.0.0-20260721162324-38d48943054d/go.mod h1:7p7cfydr4WM1G6eOPFlANXF3IV5du3FoA4CbDPprHAo=
 github.com/Microsoft/go-winio v0.6.2 h1:F2VQgta7ecxGYO8k3ZZz3RS8fVIXVxONVUPlNERoyfY=
 github.com/Microsoft/go-winio v0.6.2/go.mod h1:yd8OoFMLzJbo9gZq8j5qaps8bJ9aShtEA8Ipt1oGCvU=
 github.com/ProtonMail/go-crypto v1.4.1 h1:9RfcZHqEQUvP8RzecWEUafnZVtEvrBVL9BiF67IQOfM=
