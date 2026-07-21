@@ -262,9 +262,11 @@ Scope {
         property bool available: SettingsData.lockFingerprintReady
         property int tries
         property int errorTries
+        property bool retrying: false
 
         function checkAvail(): void {
             if (!available || !SettingsData.enableFprint || !root.lockSecured || root.fprintSuppressedByPrimaryPam) {
+                retrying = false;
                 abort();
                 return;
             }
@@ -273,6 +275,7 @@ Scope {
 
             tries = 0;
             errorTries = 0;
+            retrying = false;
             start();
         }
 
@@ -285,6 +288,7 @@ Scope {
 
             switch (res) {
             case PamResult.Success:
+                retrying = false;
                 if (!root.unlockInProgress) {
                     passwd.abort();
                     root.proceedAfterPrimaryAuth();
@@ -293,13 +297,16 @@ Scope {
             case PamResult.Error:
                 errorTries++;
                 if (errorTries < 200) {
+                    retrying = true;
                     abort();
                     errorRetry.restart();
                     return;
                 }
+                retrying = false;
                 abort();
                 return;
             case PamResult.MaxTries:
+                retrying = false;
                 tries++;
                 if (tries < SettingsData.maxFprintTries) {
                     root.fprintState = "fail";
@@ -418,7 +425,7 @@ Scope {
     Timer {
         id: errorRetry
 
-        interval: 1500
+        interval: Math.min(1500 * Math.pow(2, Math.max(0, fprint.errorTries - 1)), 30000)
         onTriggered: fprint.start()
     }
 

@@ -779,7 +779,7 @@ Item {
                                     return "passkey";
                                 if (pam.fprint.tries >= SettingsData.maxFprintTries)
                                     return "fingerprint_off";
-                                if (pam.fprint.active)
+                                if (pam.fprint.active || pam.fprint.retrying)
                                     return "fingerprint";
                                 if (pam.u2f.active)
                                     return "passkey";
