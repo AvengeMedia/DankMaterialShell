@@ -504,30 +504,145 @@ FloatingWindow {
                                     Rectangle {
                                         id: wcagBadge
 
-                                        // Rated for the mode being viewed, since a theme
-                                        // often passes in one mode and not the other.
                                         readonly property var modeReport: Theme.isLightMode ? modelData.wcag?.light : modelData.wcag?.dark
-                                        readonly property string level: modeReport?.level ?? ""
-                                        readonly property string bodyLevel: modeReport?.body?.level ?? ""
-                                        readonly property bool fullPass: level === "AA" || level === "AAA"
-                                        readonly property bool bodyPass: bodyLevel === "AA" || bodyLevel === "AAA"
+                                        readonly property var rows: modeReport?.breakdown ?? []
+                                        readonly property var allRows: (modelData.wcag?.dark?.breakdown ?? []).concat(modelData.wcag?.light?.breakdown ?? [])
+                                        readonly property string level: wcagBadge.rollupLevel(wcagBadge.rows, "level")
+                                        readonly property string bodyLevel: wcagBadge.rollupLevel(wcagBadge.rows, "bodyLevel")
+                                        readonly property bool fullPass: level !== ""
+                                        readonly property bool bodyPass: bodyLevel !== ""
+                                        readonly property bool partial: wcagBadge.isPartial(wcagBadge.rows, fullPass ? "level" : "bodyLevel")
+
+                                        function rollupLevel(rows, key) {
+                                            let hasAAA = false;
+                                            for (let i = 0; i < rows.length; i++) {
+                                                const value = rows[i][key];
+                                                if (value === "AA")
+                                                    return "AA";
+                                                if (value === "AAA")
+                                                    hasAAA = true;
+                                            }
+                                            return hasAAA ? "AAA" : "";
+                                        }
+
+                                        function isPartial(rows, key) {
+                                            let total = 0;
+                                            let passing = 0;
+                                            for (let i = 0; i < rows.length; i++) {
+                                                const value = rows[i][key];
+                                                if (!value)
+                                                    continue;
+                                                total++;
+                                                if (value !== "fail")
+                                                    passing++;
+                                            }
+                                            return passing > 0 && passing < total;
+                                        }
 
                                         height: 18
-                                        width: wcagText.implicitWidth + Theme.spacingS
+                                        width: wcagRow.implicitWidth + Theme.spacingS
                                         radius: 9
-                                        color: Theme.withAlpha(fullPass ? Theme.info : Theme.surfaceVariantText, 0.15)
+                                        color: Theme.withAlpha(fullPass ? Theme.info : Theme.surfaceVariantText, wcagArea.containsMouse ? 0.25 : 0.15)
                                         border.color: Theme.withAlpha(fullPass ? Theme.info : Theme.surfaceVariantText, 0.4)
                                         border.width: 1
                                         visible: fullPass || bodyPass
                                         anchors.verticalCenter: parent.verticalCenter
 
-                                        StyledText {
-                                            id: wcagText
+                                        Row {
+                                            id: wcagRow
                                             anchors.centerIn: parent
-                                            text: wcagBadge.fullPass ? "WCAG " + wcagBadge.level : I18n.tr("WCAG %1 body", "contrast badge when only body text passes").arg(wcagBadge.bodyLevel)
-                                            font.pixelSize: Theme.fontSizeSmall
-                                            color: wcagBadge.fullPass ? Theme.info : Theme.surfaceVariantText
-                                            font.weight: Font.Medium
+                                            spacing: 2
+
+                                            StyledText {
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                text: {
+                                                    let label = "WCAG " + (wcagBadge.fullPass ? wcagBadge.level : wcagBadge.bodyLevel);
+                                                    if (!wcagBadge.fullPass)
+                                                        label += " " + I18n.tr("Body", "notification rule match field option");
+                                                    if (wcagBadge.partial)
+                                                        label += " (" + I18n.tr("Partial", "contrast badge suffix: only some variants pass") + ")";
+                                                    return label;
+                                                }
+                                                font.pixelSize: Theme.fontSizeSmall
+                                                color: wcagBadge.fullPass ? Theme.info : Theme.surfaceVariantText
+                                                font.weight: Font.Medium
+                                            }
+
+                                            DankIcon {
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                name: "info"
+                                                size: 12
+                                                visible: wcagBadge.allRows.length > 1
+                                                color: wcagBadge.fullPass ? Theme.info : Theme.surfaceVariantText
+                                            }
+                                        }
+
+                                        MouseArea {
+                                            id: wcagArea
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: wcagBadge.allRows.length > 1 ? Qt.PointingHandCursor : Qt.ArrowCursor
+                                            onClicked: {
+                                                if (wcagBadge.allRows.length <= 1)
+                                                    return;
+                                                wcagDetail.opened ? wcagDetail.close() : wcagDetail.open();
+                                            }
+                                        }
+
+                                        Popup {
+                                            id: wcagDetail
+                                            y: wcagBadge.height + Theme.spacingXS
+                                            padding: Theme.spacingS
+                                            closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
+
+                                            background: Rectangle {
+                                                color: Theme.surfaceContainerHigh
+                                                radius: Theme.cornerRadius
+                                                border.width: 1
+                                                border.color: Theme.outlineMedium
+                                            }
+
+                                            contentItem: Column {
+                                                spacing: Theme.spacingXS
+
+                                                StyledText {
+                                                    text: I18n.tr("Contrast by variant", "WCAG breakdown popup heading")
+                                                    font.pixelSize: Theme.fontSizeSmall
+                                                    font.weight: Font.Medium
+                                                    color: Theme.surfaceText
+                                                }
+
+                                                Repeater {
+                                                    model: wcagBadge.allRows
+
+                                                    Row {
+                                                        spacing: Theme.spacingS
+
+                                                        Rectangle {
+                                                            width: 8
+                                                            height: 8
+                                                            radius: 4
+                                                            anchors.verticalCenter: parent.verticalCenter
+                                                            color: modelData.level === "fail" ? Theme.error : Theme.success
+                                                        }
+
+                                                        StyledText {
+                                                            anchors.verticalCenter: parent.verticalCenter
+                                                            text: modelData.name + " · " + modelData.mode
+                                                            font.pixelSize: Theme.fontSizeSmall
+                                                            color: Theme.surfaceVariantText
+                                                        }
+
+                                                        StyledText {
+                                                            anchors.verticalCenter: parent.verticalCenter
+                                                            text: modelData.level === "fail" ? I18n.tr("below AA", "contrast level below the AA threshold") : "WCAG " + modelData.level
+                                                            font.pixelSize: Theme.fontSizeSmall
+                                                            font.weight: Font.Medium
+                                                            color: modelData.level === "fail" ? Theme.error : Theme.surfaceText
+                                                        }
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                 }
