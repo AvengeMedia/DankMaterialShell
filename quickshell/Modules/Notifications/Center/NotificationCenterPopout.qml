@@ -61,6 +61,11 @@ DankPopout {
         notificationHistoryVisible = !notificationHistoryVisible;
     }
 
+    // Re-open without toggling the flag (used when retargeting to another monitor).
+    function present() {
+        openSized();
+    }
+
     function openSized() {
         if (!notificationHistoryVisible)
             return;

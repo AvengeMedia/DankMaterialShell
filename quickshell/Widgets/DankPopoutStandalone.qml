@@ -79,6 +79,9 @@ Item {
             "rightBar": 0
         })
     property var screen: null
+    // Output the surface binds to; retargeted only in open() while hidden. A live
+    // screen change on a mapped surface loses the popup blur on niri.
+    property var surfaceScreen: null
     readonly property bool frameGapStandaloneActive: CompositorService.frameConfiguredForScreen(screen) && !CompositorService.usesConnectedFrameChromeForScreen(screen)
     readonly property bool fluidStandaloneActive: Theme.isDirectionalEffect
     readonly property bool backgroundDismissWindowRequired: backgroundInteractive
@@ -132,8 +135,6 @@ Item {
     signal opened
     signal popoutClosed
     signal backgroundClicked
-
-    property var _lastOpenedScreen: null
 
     property int effectiveBarPosition: 0
     property real effectiveBarBottomGap: 0
@@ -338,14 +339,14 @@ Item {
         _frozenMaskWidth = maskWidth;
         _frozenMaskHeight = maskHeight;
 
-        const screenChanged = _lastOpenedScreen !== null && _lastOpenedScreen !== screen;
+        const screenChanged = surfaceScreen !== null && surfaceScreen !== screen;
         if (screenChanged) {
-            // Hide on this tick so Qt actually tears down the wl_surface; the show
-            // gets deferred below so the unmap is processed before the remap.
+            // Unmap before retargeting so the surface is destroyed and recreated
+            // on the new output rather than live-migrated.
             contentWindow.visible = false;
             backgroundWindow.visible = false;
         }
-        _lastOpenedScreen = screen;
+        surfaceScreen = screen;
 
         if (contentContainer && !shouldBeVisible) {
             // Snap morph closed only on a fresh open; on screen-change re-open we stay at 1
@@ -559,7 +560,7 @@ Item {
 
     PanelWindow {
         id: backgroundWindow
-        screen: root.screen
+        screen: root.surfaceScreen
         visible: false
         color: "transparent"
         // Skip buffer updates when there's nothing to render. Briefly flipped
@@ -625,7 +626,7 @@ Item {
 
     PanelWindow {
         id: contentWindow
-        screen: root.screen
+        screen: root.surfaceScreen
         visible: false
         color: "transparent"
         readonly property bool closeVisualActive: root.shouldBeVisible || root.isClosing

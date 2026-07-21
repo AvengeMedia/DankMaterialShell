@@ -65,16 +65,35 @@ Singleton {
 
     function _openPopout(popout) {
         if (popout.dashVisible !== undefined) {
-            if (popout.dashVisible && !popout.shouldBeVisible && !popout.isClosing)
+            let flagStayedTrue = popout.dashVisible === true;
+            if (popout.dashVisible && !popout.shouldBeVisible && !popout.isClosing) {
                 popout.dashVisible = false;
+                flagStayedTrue = false;
+            }
             popout.dashVisible = true;
+            // Flag already true (e.g. retargeting to another monitor) won't re-fire
+            // the change handler, so drive the surface open explicitly.
+            if (flagStayedTrue)
+                _ensureSurfaceOpen(popout);
             return;
         }
         if (popout.notificationHistoryVisible !== undefined) {
+            const flagStayedTrue = popout.notificationHistoryVisible === true;
             popout.notificationHistoryVisible = true;
+            if (flagStayedTrue)
+                _ensureSurfaceOpen(popout);
             return;
         }
-        popout.open();
+        _ensureSurfaceOpen(popout);
+    }
+
+    function _ensureSurfaceOpen(popout) {
+        if (typeof popout.present === "function") {
+            popout.present();
+            return;
+        }
+        if (typeof popout.open === "function")
+            popout.open();
     }
 
     function _closePopout(popout) {

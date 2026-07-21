@@ -63,8 +63,8 @@ BasePill {
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton | Qt.RightButton
         cursorShape: Qt.PointingHandCursor
-        onPressed: mouse => root.triggerRipple(this, mouse.x, mouse.y)
-        onClicked: function (mouse) {
+        onPressed: function (mouse) {
+            root.triggerRipple(this, mouse.x, mouse.y);
             switch (mouse.button) {
             case Qt.RightButton:
                 openContextMenu();
