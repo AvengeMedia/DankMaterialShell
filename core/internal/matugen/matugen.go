@@ -390,6 +390,10 @@ func buildOnce(opts *Options) (bool, error) {
 		refreshGTK4()
 	}
 
+	if isDMSKDEColorSchemeActive(opts.ConfigDir) {
+		applyKDEColorScheme(opts.Mode)
+	}
+
 	if !opts.ShouldSkipTemplate("qt6ct") && appExists(opts.AppChecker, []string{"qt6ct"}, nil) {
 		refreshQt6ct()
 	}
@@ -921,6 +925,47 @@ func isDMSGTKActive(configDir string) bool {
 
 	data, err := os.ReadFile(gtkCSS)
 	return err == nil && strings.Contains(string(data), "dank-colors.css")
+}
+
+// isDMSKDEColorSchemeActive only flips the scheme when the user is already on a
+// DankMatugen one, leaving Breeze (or anything else) untouched.
+func isDMSKDEColorSchemeActive(configDir string) bool {
+	data, err := os.ReadFile(filepath.Join(configDir, "kdeglobals"))
+	if err != nil {
+		return false
+	}
+
+	inGeneral := false
+	for _, line := range strings.Split(string(data), "\n") {
+		line = strings.TrimSpace(line)
+		if strings.HasPrefix(line, "[") {
+			inGeneral = line == "[General]"
+			continue
+		}
+		if !inGeneral {
+			continue
+		}
+		if name, ok := strings.CutPrefix(line, "ColorScheme="); ok {
+			return strings.HasPrefix(strings.TrimSpace(name), "DankMatugen")
+		}
+	}
+	return false
+}
+
+func applyKDEColorScheme(mode ColorMode) {
+	if !utils.CommandExists("plasma-apply-colorscheme") {
+		return
+	}
+
+	scheme := "DankMatugenDark"
+	if mode == ColorModeLight {
+		scheme = "DankMatugenLight"
+	}
+
+	log.Infof("Applying KDE color scheme: %s", scheme)
+	if err := exec.Command("plasma-apply-colorscheme", scheme).Run(); err != nil {
+		log.Warnf("Failed to apply KDE color scheme: %v", err)
+	}
 }
 
 func refreshGTK(mode ColorMode) {
