@@ -15,7 +15,11 @@ Singleton {
     function openModal(modal) {
         PopoutManager.screenshotActive = false;
         const screenName = modal.effectiveScreen?.name ?? "unknown";
-        currentModalsByScreen[screenName] = modal;
+        var next = {};
+        for (var k in currentModalsByScreen)
+            next[k] = currentModalsByScreen[k];
+        next[screenName] = modal;
+        currentModalsByScreen = next;
         modalChanged();
         Qt.callLater(() => {
             if (!modal.allowStacking)
@@ -34,7 +38,12 @@ Singleton {
     function closeModal(modal) {
         const screenName = modal.effectiveScreen?.name ?? "unknown";
         if (currentModalsByScreen[screenName] === modal) {
-            delete currentModalsByScreen[screenName];
+            var next = {};
+            for (var k in currentModalsByScreen) {
+                if (k !== screenName)
+                    next[k] = currentModalsByScreen[k];
+            }
+            currentModalsByScreen = next;
             modalChanged();
         }
     }
