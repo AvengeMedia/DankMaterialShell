@@ -184,14 +184,18 @@ Singleton {
     property int mangoLayoutRadiusOverride: -1
     property int mangoLayoutBorderSize: -1
     property bool mangoTrackpadNaturalScrolling: true
-    property real mouseAccelSpeed: 0.0
     property string mouseAccelProfile: "default"
+    property real mouseAccelSpeed: 0.0
+    property bool mouseLeftHanded: false
     property bool mouseNaturalScroll: false
-    property real touchpadAccelSpeed: 0.0
+    property real mouseScrollFactor: 1.0
     property string touchpadAccelProfile: "default"
-    property bool touchpadNaturalScroll: true
-    property bool touchpadTapToClick: true
+    property real touchpadAccelSpeed: 0.0
     property bool touchpadDisableOnExternalMouse: false
+    property bool touchpadDisableWhileTyping: true
+    property bool touchpadNaturalScroll: true
+    property real touchpadScrollFactor: 1.0
+    property bool touchpadTapToClick: true
 
     property int firstDayOfWeek: -1
     property bool showWeekNumber: false

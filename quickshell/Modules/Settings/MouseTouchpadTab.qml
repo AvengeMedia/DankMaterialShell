@@ -222,6 +222,28 @@ Item {
                     checked: SettingsData.mouseNaturalScroll
                     onToggled: checked => SettingsData.set("mouseNaturalScroll", checked)
                 }
+
+                SettingsToggleRow {
+                    tags: ["mouse", "left", "handed", "button", "swap"]
+                    settingKey: "mouseLeftHanded"
+                    text: I18n.tr("Left-Handed Mode")
+                    description: I18n.tr("Swap primary and secondary mouse buttons")
+                    checked: SettingsData.mouseLeftHanded
+                    onToggled: checked => SettingsData.set("mouseLeftHanded", checked)
+                }
+
+                SettingsSliderRow {
+                    tags: ["mouse", "scroll", "speed", "factor"]
+                    settingKey: "mouseScrollFactor"
+                    text: I18n.tr("Scrolling Speed")
+                    description: I18n.tr("Adjust scrolling sensitivity multiplier")
+                    value: Math.round(SettingsData.mouseScrollFactor * 10)
+                    minimum: 1
+                    maximum: 30
+                    step: 1
+                    defaultValue: 10
+                    onSliderValueChanged: newValue => SettingsData.set("mouseScrollFactor", newValue / 10.0)
+                }
             }
 
             SettingsCard {
@@ -287,6 +309,28 @@ Item {
                     description: I18n.tr("Disable touchpad when an external mouse is connected")
                     checked: SettingsData.touchpadDisableOnExternalMouse
                     onToggled: checked => SettingsData.set("touchpadDisableOnExternalMouse", checked)
+                }
+
+                SettingsToggleRow {
+                    tags: ["touchpad", "disable", "typing", "dwt"]
+                    settingKey: "touchpadDisableWhileTyping"
+                    text: I18n.tr("Disable While Typing")
+                    description: I18n.tr("Prevent accidental cursor jumps while typing")
+                    checked: SettingsData.touchpadDisableWhileTyping
+                    onToggled: checked => SettingsData.set("touchpadDisableWhileTyping", checked)
+                }
+
+                SettingsSliderRow {
+                    tags: ["touchpad", "scroll", "speed", "factor"]
+                    settingKey: "touchpadScrollFactor"
+                    text: I18n.tr("Scrolling Speed")
+                    description: I18n.tr("Adjust scrolling sensitivity multiplier")
+                    value: Math.round(SettingsData.touchpadScrollFactor * 10)
+                    minimum: 1
+                    maximum: 30
+                    step: 1
+                    defaultValue: 10
+                    onSliderValueChanged: newValue => SettingsData.set("touchpadScrollFactor", newValue / 10.0)
                 }
             }
         }
