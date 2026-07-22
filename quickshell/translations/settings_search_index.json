@@ -6123,6 +6123,34 @@
     "description": "Save dismissed notifications to history"
   },
   {
+    "section": "notificationIgnoreAppTimeout",
+    "label": "Ignore App-Requested Timeout",
+    "tabIndex": 17,
+    "category": "Notifications",
+    "keywords": [
+      "above",
+      "alerts",
+      "always",
+      "app",
+      "duration",
+      "durations",
+      "even",
+      "expire",
+      "ignore",
+      "longer",
+      "messages",
+      "notification",
+      "notifications",
+      "override",
+      "requested",
+      "requests",
+      "shorter",
+      "timeout",
+      "toast"
+    ],
+    "description": "Always use the durations above, even if an app requests a shorter or longer one"
+  },
+  {
     "section": "lockScreenNotifications",
     "label": "Lock Screen",
     "tabIndex": 17,
@@ -6515,18 +6543,26 @@
     "tabIndex": 17,
     "category": "Notifications",
     "keywords": [
+      "above",
       "alerts",
+      "always",
       "duration",
+      "durations",
+      "even",
+      "longer",
       "low",
       "messages",
       "notification",
       "notifications",
       "priority",
+      "requests",
+      "shorter",
       "timeout",
       "timeouts",
       "toast"
     ],
-    "icon": "timer"
+    "icon": "timer",
+    "description": "Always use the durations above, even if an app requests a shorter or longer one"
   },
   {
     "section": "osdAlwaysShowValue",
