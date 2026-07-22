@@ -777,7 +777,7 @@ Singleton {
                     return 5000;
                 // expireTimeout is in milliseconds; -1 defers to our settings.
                 const appTimeout = wrapper.notification.expireTimeout;
-                if (appTimeout >= 0)
+                if (appTimeout >= 0 && !SettingsData.notificationIgnoreAppTimeout)
                     return Math.round(appTimeout);
                 switch (wrapper.urgency) {
                 case NotificationUrgency.Low:

@@ -477,6 +477,7 @@ var SPEC = {
     notificationTimeoutLow: { def: 5000 },
     notificationTimeoutNormal: { def: 5000 },
     notificationTimeoutCritical: { def: 0 },
+    notificationIgnoreAppTimeout: { def: false },
     notificationCompactMode: { def: false },
     notificationShowTimeoutBar: { def: false },
     notificationDedupeEnabled: { def: true },
