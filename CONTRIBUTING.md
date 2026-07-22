@@ -14,6 +14,12 @@ git clone --recurse-submodules https://github.com/AvengeMedia/DankMaterialShell.
 git submodule update --init
 ```
 
+To have `git pull` keep the submodule in sync automatically (moving it to the commit this repo points at, no separate `git submodule update` step), set:
+
+```bash
+git config submodule.recurse true
+```
+
 Install [prek](https://prek.j178.dev/) then activate pre-commit hooks:
 
 ```bash
