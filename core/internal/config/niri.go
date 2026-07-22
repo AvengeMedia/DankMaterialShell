@@ -16,3 +16,6 @@ var NiriAlttabConfig string
 
 //go:embed embedded/niri-binds.kdl
 var NiriBindsConfig string
+
+//go:embed embedded/niri-input.kdl
+var NiriInputConfig string

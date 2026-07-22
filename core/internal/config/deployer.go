@@ -264,6 +264,7 @@ func (cd *ConfigDeployer) deployNiriDmsConfigs(dmsDir, terminalCommand string) e
 		{"layout.kdl", NiriLayoutConfig},
 		{"alttab.kdl", NiriAlttabConfig},
 		{"binds.kdl", strings.ReplaceAll(NiriBindsConfig, "{{TERMINAL_COMMAND}}", terminalCommand)},
+		{"input.kdl", NiriInputConfig},
 		{"outputs.kdl", ""},
 		{"cursor.kdl", ""},
 		{"windowrules.kdl", ""},

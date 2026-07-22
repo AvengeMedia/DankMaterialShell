@@ -143,6 +143,10 @@ var dmsConfigSpecs = map[string]dmsConfigSpec{
 		niriFile:    "alttab.kdl",
 		niriContent: func(_ string) string { return config.NiriAlttabConfig },
 	},
+	"input": {
+		niriFile:    "input.kdl",
+		niriContent: func(_ string) string { return config.NiriInputConfig },
+	},
 	"outputs": {
 		niriFile:     "outputs.kdl",
 		hyprFile:     "outputs.lua",
