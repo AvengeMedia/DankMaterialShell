@@ -9916,5 +9916,18 @@
       "widgets"
     ],
     "icon": "dashboard"
+  },
+  {
+    "section": "_tab_44",
+    "label": "Mouse & Trackpad",
+    "tabIndex": 44,
+    "category": "Settings",
+    "keywords": [
+      "mouse",
+      "settings",
+      "trackpad"
+    ],
+    "icon": "mouse",
+    "conditionKey": "isNiri"
   }
 ]
