@@ -73,6 +73,7 @@ Singleton {
     Component.onCompleted: {
         fetchOutputs();
         Paths.mkdir(screenshotsDir);
+        generateNiriInputConfig();
     }
 
     Timer {
@@ -102,6 +103,15 @@ Singleton {
                 return;
             root._lastGapValue = newGaps;
             generateNiriLayoutConfig();
+        }
+    }
+
+    Connections {
+        target: CompositorService
+        function onIsNiriChanged() {
+            if (CompositorService.isNiri) {
+                generateNiriInputConfig();
+            }
         }
     }
 
@@ -172,6 +182,20 @@ Singleton {
                 return;
             }
             log.warn("Failed to write wpblur config, exit code:", exitCode);
+        }
+    }
+
+    Process {
+        id: writeInputProcess
+        property string inputContent: ""
+        property string inputPath: ""
+
+        onExited: exitCode => {
+            if (exitCode === 0) {
+                log.info("Generated input config at", inputPath);
+                return;
+            }
+            log.warn("Failed to write input config, exit code:", exitCode);
         }
     }
 
@@ -1261,7 +1285,7 @@ window-rule {
             writeAlttabProcess.running = true;
         }
 
-        for (const name of ["outputs", "binds", "cursor", "windowrules", "colors", "alttab", "layout"]) {
+        for (const name of ["outputs", "binds", "cursor", "windowrules", "colors", "alttab", "layout", "input"]) {
             const path = niriDmsDir + "/" + name + ".kdl";
             Proc.runCommand("niri-ensure-" + name, ["sh", "-c", `mkdir -p "${niriDmsDir}" && [ ! -f "${path}" ] && touch "${path}" || true`], (output, exitCode) => {
                 if (exitCode !== 0)
@@ -1639,6 +1663,129 @@ window-rule {
                 }
             }
         });
+    }
+
+    function generateNiriInputConfig() {
+        if (!CompositorService.isNiri)
+            return;
+
+        const defaultMouseLeftHanded = false;
+        const defaultMouseMiddleEmulation = false;
+        const defaultMouseNaturalScroll = false;
+        const defaultMouseProfile = "default";
+        const defaultMouseScrollFactor = 1.0;
+        const defaultMouseScrollMethod = "default";
+        const defaultMouseSpeed = 0.0;
+
+        const defaultTouchpadDisableOnExternalMouse = false;
+        const defaultTouchpadDisableWhileTyping = true;
+        const defaultTouchpadDragLock = false;
+        const defaultTouchpadMiddleEmulation = false;
+        const defaultTouchpadNaturalScroll = true;
+        const defaultTouchpadProfile = "default";
+        const defaultTouchpadScrollFactor = 1.0;
+        const defaultTouchpadScrollMethod = "default";
+        const defaultTouchpadSpeed = 0.0;
+        const defaultTouchpadTap = true;
+        const defaultTouchpadTapAndDrag = true;
+
+        const mouseLeftHanded = typeof SettingsData !== "undefined" ? SettingsData.mouseLeftHanded : defaultMouseLeftHanded;
+        const mouseMiddleEmulation = typeof SettingsData !== "undefined" ? SettingsData.mouseMiddleEmulation : defaultMouseMiddleEmulation;
+        const mouseNaturalScroll = typeof SettingsData !== "undefined" ? SettingsData.mouseNaturalScroll : defaultMouseNaturalScroll;
+        const mouseProfile = typeof SettingsData !== "undefined" ? SettingsData.mouseAccelProfile : defaultMouseProfile;
+        const mouseScrollFactor = typeof SettingsData !== "undefined" ? SettingsData.mouseScrollFactor : defaultMouseScrollFactor;
+        const mouseScrollMethod = typeof SettingsData !== "undefined" ? SettingsData.mouseScrollMethod : defaultMouseScrollMethod;
+        const mouseSpeed = typeof SettingsData !== "undefined" ? SettingsData.mouseAccelSpeed : defaultMouseSpeed;
+
+        const touchpadDisableOnExternalMouse = typeof SettingsData !== "undefined" ? SettingsData.touchpadDisableOnExternalMouse : defaultTouchpadDisableOnExternalMouse;
+        const touchpadDisableWhileTyping = typeof SettingsData !== "undefined" ? SettingsData.touchpadDisableWhileTyping : defaultTouchpadDisableWhileTyping;
+        const touchpadDragLock = typeof SettingsData !== "undefined" ? SettingsData.touchpadDragLock : defaultTouchpadDragLock;
+        const touchpadMiddleEmulation = typeof SettingsData !== "undefined" ? SettingsData.touchpadMiddleEmulation : defaultTouchpadMiddleEmulation;
+        const touchpadNaturalScroll = typeof SettingsData !== "undefined" ? SettingsData.touchpadNaturalScroll : defaultTouchpadNaturalScroll;
+        const touchpadProfile = typeof SettingsData !== "undefined" ? SettingsData.touchpadAccelProfile : defaultTouchpadProfile;
+        const touchpadScrollFactor = typeof SettingsData !== "undefined" ? SettingsData.touchpadScrollFactor : defaultTouchpadScrollFactor;
+        const touchpadScrollMethod = typeof SettingsData !== "undefined" ? SettingsData.touchpadScrollMethod : defaultTouchpadScrollMethod;
+        const touchpadSpeed = typeof SettingsData !== "undefined" ? SettingsData.touchpadAccelSpeed : defaultTouchpadSpeed;
+        const touchpadTap = typeof SettingsData !== "undefined" ? SettingsData.touchpadTapToClick : defaultTouchpadTap;
+        const touchpadTapAndDrag = typeof SettingsData !== "undefined" ? SettingsData.touchpadTapAndDrag : defaultTouchpadTapAndDrag;
+
+        const dmsWarning = `// ! DO NOT EDIT !
+// ! AUTO-GENERATED BY DMS !
+// ! CHANGES WILL BE OVERWRITTEN !
+// ! PLACE YOUR CUSTOM CONFIGURATION ELSEWHERE !
+
+`;
+
+        let inputContent = dmsWarning + "input {\n";
+
+        // Mouse block
+        inputContent += "    mouse {\n";
+        inputContent += `        accel-speed ${mouseSpeed.toFixed(1)}\n`;
+        if (mouseProfile !== "default") {
+            inputContent += `        accel-profile "${mouseProfile}"\n`;
+        }
+        if (mouseNaturalScroll) {
+            inputContent += "        natural-scroll\n";
+        }
+        if (mouseLeftHanded) {
+            inputContent += "        left-handed\n";
+        }
+        if (mouseMiddleEmulation) {
+            inputContent += "        middle-emulation\n";
+        }
+        if (mouseScrollFactor !== 1.0) {
+            inputContent += `        scroll-factor ${mouseScrollFactor.toFixed(1)}\n`;
+        }
+        if (mouseScrollMethod !== "default") {
+            inputContent += `        scroll-method "${mouseScrollMethod}"\n`;
+        }
+        inputContent += "    }\n";
+
+        // Touchpad block
+        inputContent += "    touchpad {\n";
+        if (touchpadTap) {
+            inputContent += "        tap\n";
+        }
+        inputContent += `        accel-speed ${touchpadSpeed.toFixed(1)}\n`;
+        if (touchpadProfile !== "default") {
+            inputContent += `        accel-profile "${touchpadProfile}"\n`;
+        }
+        if (touchpadNaturalScroll) {
+            inputContent += "        natural-scroll\n";
+        }
+        if (touchpadDisableOnExternalMouse) {
+            inputContent += "        disabled-on-external-mouse\n";
+        }
+        if (touchpadDisableWhileTyping) {
+            inputContent += "        dwt\n";
+        }
+        if (touchpadMiddleEmulation) {
+            inputContent += "        middle-emulation\n";
+        }
+        if (touchpadScrollFactor !== 1.0) {
+            inputContent += `        scroll-factor ${touchpadScrollFactor.toFixed(1)}\n`;
+        }
+        if (touchpadScrollMethod !== "default") {
+            inputContent += `        scroll-method "${touchpadScrollMethod}"\n`;
+        }
+        if (!touchpadTapAndDrag) {
+            inputContent += "        drag false\n";
+        }
+        if (touchpadDragLock) {
+            inputContent += "        drag-lock\n";
+        }
+        inputContent += "    }\n";
+
+        inputContent += "}\n";
+
+        const configDir = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
+        const niriDmsDir = configDir + "/niri/dms";
+        const inputPath = niriDmsDir + "/input.kdl";
+
+        writeInputProcess.inputContent = inputContent;
+        writeInputProcess.inputPath = inputPath;
+        writeInputProcess.command = ["sh", "-c", `mkdir -p "${niriDmsDir}" && cat > "${inputPath}" << 'EOF'\n${inputContent}\nEOF`];
+        writeInputProcess.running = true;
     }
 
     IpcHandler {

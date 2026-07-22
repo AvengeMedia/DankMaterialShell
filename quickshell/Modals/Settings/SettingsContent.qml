@@ -718,5 +718,20 @@ FocusScope {
                     Qt.callLater(() => item.forceActiveFocus());
             }
         }
+
+        Loader {
+            id: mouseTouchpadLoader
+            anchors.fill: parent
+            active: root.currentIndex === 44
+            visible: active
+            focus: active
+
+            sourceComponent: MouseTouchpadTab {}
+
+            onActiveChanged: {
+                if (active && item)
+                    Qt.callLater(() => item.forceActiveFocus());
+            }
+        }
     }
 }

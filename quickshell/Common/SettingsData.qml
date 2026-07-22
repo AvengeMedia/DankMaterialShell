@@ -184,6 +184,24 @@ Singleton {
     property int mangoLayoutRadiusOverride: -1
     property int mangoLayoutBorderSize: -1
     property bool mangoTrackpadNaturalScrolling: true
+    property string mouseAccelProfile: "default"
+    property real mouseAccelSpeed: 0.0
+    property bool mouseLeftHanded: false
+    property bool mouseMiddleEmulation: false
+    property bool mouseNaturalScroll: false
+    property real mouseScrollFactor: 1.0
+    property string mouseScrollMethod: "default"
+    property string touchpadAccelProfile: "default"
+    property real touchpadAccelSpeed: 0.0
+    property bool touchpadDisableOnExternalMouse: false
+    property bool touchpadDisableWhileTyping: true
+    property bool touchpadDragLock: false
+    property bool touchpadMiddleEmulation: false
+    property bool touchpadNaturalScroll: true
+    property real touchpadScrollFactor: 1.0
+    property string touchpadScrollMethod: "default"
+    property bool touchpadTapAndDrag: true
+    property bool touchpadTapToClick: true
 
     property int firstDayOfWeek: -1
     property bool showWeekNumber: false
@@ -1479,6 +1497,13 @@ Singleton {
             MangoService.generateLayoutConfig();
     }
 
+    function updateCompositorInput() {
+        if (typeof CompositorService === "undefined")
+            return;
+        if (CompositorService.isNiri && typeof NiriService !== "undefined")
+            NiriService.generateNiriInputConfig();
+    }
+
     function updateFrameCompositorLayout() {
         // Generate before begin() so compositor readiness is already pending at transitionRequested
         if (typeof CompositorService !== "undefined") {
@@ -1707,6 +1732,7 @@ Singleton {
             "applyStoredTheme": applyStoredTheme,
             "regenSystemThemes": regenSystemThemes,
             "updateCompositorLayout": updateCompositorLayout,
+            "updateCompositorInput": updateCompositorInput,
             "applyStoredIconTheme": applyStoredIconTheme,
             "updateBarConfigs": updateBarConfigs,
             "updateCompositorCursor": updateCompositorCursor,
