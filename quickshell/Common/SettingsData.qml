@@ -187,14 +187,20 @@ Singleton {
     property string mouseAccelProfile: "default"
     property real mouseAccelSpeed: 0.0
     property bool mouseLeftHanded: false
+    property bool mouseMiddleEmulation: false
     property bool mouseNaturalScroll: false
     property real mouseScrollFactor: 1.0
+    property string mouseScrollMethod: "default"
     property string touchpadAccelProfile: "default"
     property real touchpadAccelSpeed: 0.0
     property bool touchpadDisableOnExternalMouse: false
     property bool touchpadDisableWhileTyping: true
+    property bool touchpadDragLock: false
+    property bool touchpadMiddleEmulation: false
     property bool touchpadNaturalScroll: true
     property real touchpadScrollFactor: 1.0
+    property string touchpadScrollMethod: "default"
+    property bool touchpadTapAndDrag: true
     property bool touchpadTapToClick: true
 
     property int firstDayOfWeek: -1
