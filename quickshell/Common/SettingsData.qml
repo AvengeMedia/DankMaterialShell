@@ -2735,6 +2735,35 @@ Singleton {
         return edges;
     }
 
+    function getOverlayBarEdgesForScreen(screen) {
+        if (!screen)
+            return [];
+        var edges = [];
+        for (var i = 0; i < barConfigs.length; i++) {
+            var bc = barConfigs[i];
+            if (!bc.enabled || !(bc.useOverlayLayer ?? false))
+                continue;
+            var prefs = bc.screenPreferences || ["all"];
+            if (!prefs.includes("all") && !isScreenInPreferences(screen, prefs))
+                continue;
+            switch (bc.position ?? 0) {
+            case SettingsData.Position.Top:
+                edges.push("top");
+                break;
+            case SettingsData.Position.Bottom:
+                edges.push("bottom");
+                break;
+            case SettingsData.Position.Left:
+                edges.push("left");
+                break;
+            case SettingsData.Position.Right:
+                edges.push("right");
+                break;
+            }
+        }
+        return edges;
+    }
+
     function frameEdgeInsetForSide(screen, side) {
         if (!frameEnabled || !screen)
             return 0;

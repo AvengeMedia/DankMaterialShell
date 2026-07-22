@@ -23,7 +23,7 @@ Item {
         const configs = SettingsData.barConfigs || [];
         for (let i = 0; i < configs.length; i++) {
             const bc = configs[i];
-            if (!bc.enabled)
+            if (!bc.enabled || (bc.useOverlayLayer ?? false))
                 continue;
             const prefs = bc.screenPreferences || ["all"];
             if (!prefs.includes("all") && !SettingsData.isScreenInPreferences(host.targetScreen, prefs))

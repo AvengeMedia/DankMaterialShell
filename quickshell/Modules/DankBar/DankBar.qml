@@ -173,8 +173,9 @@ Item {
                 if (base.length === 0 && root.barConfig?.showOnLastDisplay && Quickshell.screens.length === 1)
                     base = Quickshell.screens;
             }
-            // Connected frame mode renders the bar inside the frame surface; skip the standalone window there.
-            return base.filter(screen => !CompositorService.frameHostsSurfacesForScreen(screen));
+            // Connected frame mode renders the bar inside the frame surface; skip the standalone window there
+            // unless this bar wants the overlay layer, which the frame surface cannot provide.
+            return base.filter(screen => !CompositorService.frameHostsBarForConfig(screen, root.barConfig));
         }
 
         delegate: DankBarWindow {

@@ -16,6 +16,12 @@ Scope {
         return SettingsData.getActiveBarEdgesForScreen(screen);
     }
 
+    // Overlay-layer bars stay standalone even in connected mode and reserve their own edge.
+    readonly property var overlayBarEdges: {
+        SettingsData.barConfigs;
+        return SettingsData.getOverlayBarEdgesForScreen(root.screen);
+    }
+
     // One thin invisible PanelWindow per edge. A standalone bar reserves its own edge, so
     // that edge is skipped — unless the frame hosts the bar (connected mode), where no bar
     // window exists and the exclusion must reserve the full bar thickness itself.
@@ -23,13 +29,17 @@ Scope {
     readonly property bool screenEnabled: CompositorService.frameWindowVisibleForScreen(root.screen)
     readonly property bool hostsBar: CompositorService.frameHostsSurfacesForScreen(root.screen)
 
+    function hostsBandForEdge(edge) {
+        return root.hostsBar && !root.overlayBarEdges.includes(edge);
+    }
+
     function exclusionSizeForEdge(edge) {
         return root.barEdges.includes(edge) ? SettingsData.frameBarSize : SettingsData.frameThickness;
     }
 
     Loader {
         readonly property bool isBarEdge: root.barEdges.includes("top")
-        active: root.screenEnabled && (!isBarEdge || root.hostsBar)
+        active: root.screenEnabled && (!isBarEdge || root.hostsBandForEdge("top"))
         sourceComponent: EdgeExclusion {
             targetScreen: root.screen
             exclusionSize: root.exclusionSizeForEdge("top")
@@ -41,7 +51,7 @@ Scope {
 
     Loader {
         readonly property bool isBarEdge: root.barEdges.includes("bottom")
-        active: root.screenEnabled && (!isBarEdge || root.hostsBar)
+        active: root.screenEnabled && (!isBarEdge || root.hostsBandForEdge("bottom"))
         sourceComponent: EdgeExclusion {
             targetScreen: root.screen
             exclusionSize: root.exclusionSizeForEdge("bottom")
@@ -53,7 +63,7 @@ Scope {
 
     Loader {
         readonly property bool isBarEdge: root.barEdges.includes("left")
-        active: root.screenEnabled && (!isBarEdge || root.hostsBar)
+        active: root.screenEnabled && (!isBarEdge || root.hostsBandForEdge("left"))
         sourceComponent: EdgeExclusion {
             targetScreen: root.screen
             exclusionSize: root.exclusionSizeForEdge("left")
@@ -65,7 +75,7 @@ Scope {
 
     Loader {
         readonly property bool isBarEdge: root.barEdges.includes("right")
-        active: root.screenEnabled && (!isBarEdge || root.hostsBar)
+        active: root.screenEnabled && (!isBarEdge || root.hostsBandForEdge("right"))
         sourceComponent: EdgeExclusion {
             targetScreen: root.screen
             exclusionSize: root.exclusionSizeForEdge("right")

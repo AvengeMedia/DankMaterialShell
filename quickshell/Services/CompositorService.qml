@@ -694,6 +694,16 @@ Singleton {
         return FrameTransitionState.effectiveConnectedFrameModeActive && frameConfiguredForScreen(screenOrName);
     }
 
+    // A surface set to the overlay layer cannot live inside the frame's single top-layer window,
+    // so it stays a standalone window (which resolves itself onto the overlay layer) even in connected mode.
+    function frameHostsBarForConfig(screenOrName, barConfig) {
+        return frameHostsSurfacesForScreen(screenOrName) && !(barConfig?.useOverlayLayer ?? false);
+    }
+
+    function frameHostsDockForScreen(screenOrName) {
+        return frameHostsSurfacesForScreen(screenOrName) && !SettingsData.dockUseOverlayLayer;
+    }
+
     function framePeerSurfacesUseOverlayForScreen(screenOrName) {
         return frameWindowVisibleForScreen(screenOrName);
     }
