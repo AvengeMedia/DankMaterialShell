@@ -38,6 +38,13 @@ var SPEC = {
     mangoLayoutRadiusOverride: { def: -1, onChange: "updateCompositorLayout" },
     mangoLayoutBorderSize: { def: -1, onChange: "updateCompositorLayout" },
     mangoTrackpadNaturalScrolling: { def: true, onChange: "updateCompositorCursor" },
+    mouseAccelSpeed: { def: 0.0, onChange: "updateCompositorInput" },
+    mouseAccelProfile: { def: "default", onChange: "updateCompositorInput" },
+    mouseNaturalScroll: { def: false, onChange: "updateCompositorInput" },
+    touchpadAccelSpeed: { def: 0.0, onChange: "updateCompositorInput" },
+    touchpadAccelProfile: { def: "default", onChange: "updateCompositorInput" },
+    touchpadNaturalScroll: { def: true, onChange: "updateCompositorInput" },
+    touchpadTapToClick: { def: true, onChange: "updateCompositorInput" },
 
     firstDayOfWeek: { def: -1 },
     showWeekNumber: { def: false },

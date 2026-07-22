@@ -718,5 +718,20 @@ FocusScope {
                     Qt.callLater(() => item.forceActiveFocus());
             }
         }
+
+        Loader {
+            id: mouseTrackpadLoader
+            anchors.fill: parent
+            active: root.currentIndex === 44
+            visible: active
+            focus: active
+
+            sourceComponent: MouseTrackpadTab {}
+
+            onActiveChanged: {
+                if (active && item)
+                    Qt.callLater(() => item.forceActiveFocus());
+            }
+        }
     }
 }

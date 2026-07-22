@@ -184,6 +184,13 @@ Singleton {
     property int mangoLayoutRadiusOverride: -1
     property int mangoLayoutBorderSize: -1
     property bool mangoTrackpadNaturalScrolling: true
+    property real mouseAccelSpeed: 0.0
+    property string mouseAccelProfile: "default"
+    property bool mouseNaturalScroll: false
+    property real touchpadAccelSpeed: 0.0
+    property string touchpadAccelProfile: "default"
+    property bool touchpadNaturalScroll: true
+    property bool touchpadTapToClick: true
 
     property int firstDayOfWeek: -1
     property bool showWeekNumber: false
@@ -1479,6 +1486,13 @@ Singleton {
             MangoService.generateLayoutConfig();
     }
 
+    function updateCompositorInput() {
+        if (typeof CompositorService === "undefined")
+            return;
+        if (CompositorService.isNiri && typeof NiriService !== "undefined")
+            NiriService.generateNiriInputConfig();
+    }
+
     function updateFrameCompositorLayout() {
         // Generate before begin() so compositor readiness is already pending at transitionRequested
         if (typeof CompositorService !== "undefined") {
@@ -1707,6 +1721,7 @@ Singleton {
             "applyStoredTheme": applyStoredTheme,
             "regenSystemThemes": regenSystemThemes,
             "updateCompositorLayout": updateCompositorLayout,
+            "updateCompositorInput": updateCompositorInput,
             "applyStoredIconTheme": applyStoredIconTheme,
             "updateBarConfigs": updateBarConfigs,
             "updateCompositorCursor": updateCompositorCursor,
