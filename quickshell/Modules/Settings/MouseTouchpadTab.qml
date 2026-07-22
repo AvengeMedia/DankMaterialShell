@@ -183,6 +183,15 @@ Item {
                 settingKey: "mouseSettings"
                 iconName: "mouse"
 
+                SettingsToggleRow {
+                    tags: ["mouse", "left", "handed", "button", "swap"]
+                    settingKey: "mouseLeftHanded"
+                    text: I18n.tr("Left-Handed Mode")
+                    description: I18n.tr("Swap primary and secondary mouse buttons")
+                    checked: SettingsData.mouseLeftHanded
+                    onToggled: checked => SettingsData.set("mouseLeftHanded", checked)
+                }
+
                 SettingsSliderRow {
                     tags: ["mouse", "sensitivity", "speed", "accel"]
                     settingKey: "mouseAccelSpeed"
@@ -223,15 +232,6 @@ Item {
                     onToggled: checked => SettingsData.set("mouseNaturalScroll", checked)
                 }
 
-                SettingsToggleRow {
-                    tags: ["mouse", "left", "handed", "button", "swap"]
-                    settingKey: "mouseLeftHanded"
-                    text: I18n.tr("Left-Handed Mode")
-                    description: I18n.tr("Swap primary and secondary mouse buttons")
-                    checked: SettingsData.mouseLeftHanded
-                    onToggled: checked => SettingsData.set("mouseLeftHanded", checked)
-                }
-
                 SettingsSliderRow {
                     tags: ["mouse", "scroll", "speed", "factor"]
                     settingKey: "mouseScrollFactor"
@@ -243,15 +243,6 @@ Item {
                     step: 1
                     defaultValue: 10
                     onSliderValueChanged: newValue => SettingsData.set("mouseScrollFactor", newValue / 10.0)
-                }
-
-                SettingsToggleRow {
-                    tags: ["mouse", "middle", "click", "emulation"]
-                    settingKey: "mouseMiddleEmulation"
-                    text: I18n.tr("Middle Click Emulation")
-                    description: I18n.tr("Emulate middle click by pressing left and right buttons")
-                    checked: SettingsData.mouseMiddleEmulation
-                    onToggled: checked => SettingsData.set("mouseMiddleEmulation", checked)
                 }
 
                 SettingsButtonGroupRow {
@@ -271,6 +262,15 @@ Item {
                         SettingsData.set("mouseScrollMethod", methods[index]);
                     }
                 }
+
+                SettingsToggleRow {
+                    tags: ["mouse", "middle", "click", "emulation"]
+                    settingKey: "mouseMiddleEmulation"
+                    text: I18n.tr("Middle Click Emulation")
+                    description: I18n.tr("Emulate middle click by pressing left and right buttons")
+                    checked: SettingsData.mouseMiddleEmulation
+                    onToggled: checked => SettingsData.set("mouseMiddleEmulation", checked)
+                }
             }
 
             SettingsCard {
@@ -287,6 +287,24 @@ Item {
                     description: I18n.tr("Tap the touchpad surface to trigger left click clicks")
                     checked: SettingsData.touchpadTapToClick
                     onToggled: checked => SettingsData.set("touchpadTapToClick", checked)
+                }
+
+                SettingsToggleRow {
+                    tags: ["touchpad", "tap", "drag"]
+                    settingKey: "touchpadTapAndDrag"
+                    text: I18n.tr("Tap and Drag")
+                    description: I18n.tr("Tap and drag on the touchpad to move items")
+                    checked: SettingsData.touchpadTapAndDrag
+                    onToggled: checked => SettingsData.set("touchpadTapAndDrag", checked)
+                }
+
+                SettingsToggleRow {
+                    tags: ["touchpad", "drag", "lock"]
+                    settingKey: "touchpadDragLock"
+                    text: I18n.tr("Drag Lock")
+                    description: I18n.tr("Keep dragging when finger is briefly lifted")
+                    checked: SettingsData.touchpadDragLock
+                    onToggled: checked => SettingsData.set("touchpadDragLock", checked)
                 }
 
                 SettingsSliderRow {
@@ -329,24 +347,6 @@ Item {
                     onToggled: checked => SettingsData.set("touchpadNaturalScroll", checked)
                 }
 
-                SettingsToggleRow {
-                    tags: ["touchpad", "disable", "external", "mouse"]
-                    settingKey: "touchpadDisableOnExternalMouse"
-                    text: I18n.tr("Disable on External Mouse")
-                    description: I18n.tr("Disable touchpad when an external mouse is connected")
-                    checked: SettingsData.touchpadDisableOnExternalMouse
-                    onToggled: checked => SettingsData.set("touchpadDisableOnExternalMouse", checked)
-                }
-
-                SettingsToggleRow {
-                    tags: ["touchpad", "disable", "typing", "dwt"]
-                    settingKey: "touchpadDisableWhileTyping"
-                    text: I18n.tr("Disable While Typing")
-                    description: I18n.tr("Prevent accidental cursor jumps while typing")
-                    checked: SettingsData.touchpadDisableWhileTyping
-                    onToggled: checked => SettingsData.set("touchpadDisableWhileTyping", checked)
-                }
-
                 SettingsSliderRow {
                     tags: ["touchpad", "scroll", "speed", "factor"]
                     settingKey: "touchpadScrollFactor"
@@ -358,15 +358,6 @@ Item {
                     step: 1
                     defaultValue: 10
                     onSliderValueChanged: newValue => SettingsData.set("touchpadScrollFactor", newValue / 10.0)
-                }
-
-                SettingsToggleRow {
-                    tags: ["touchpad", "middle", "click", "emulation"]
-                    settingKey: "touchpadMiddleEmulation"
-                    text: I18n.tr("Middle Click Emulation")
-                    description: I18n.tr("Emulate middle click by pressing left and right buttons")
-                    checked: SettingsData.touchpadMiddleEmulation
-                    onToggled: checked => SettingsData.set("touchpadMiddleEmulation", checked)
                 }
 
                 SettingsButtonGroupRow {
@@ -390,21 +381,30 @@ Item {
                 }
 
                 SettingsToggleRow {
-                    tags: ["touchpad", "tap", "drag"]
-                    settingKey: "touchpadTapAndDrag"
-                    text: I18n.tr("Tap and Drag")
-                    description: I18n.tr("Tap and drag on the touchpad to move items")
-                    checked: SettingsData.touchpadTapAndDrag
-                    onToggled: checked => SettingsData.set("touchpadTapAndDrag", checked)
+                    tags: ["touchpad", "disable", "typing", "dwt"]
+                    settingKey: "touchpadDisableWhileTyping"
+                    text: I18n.tr("Disable While Typing")
+                    description: I18n.tr("Prevent accidental cursor jumps while typing")
+                    checked: SettingsData.touchpadDisableWhileTyping
+                    onToggled: checked => SettingsData.set("touchpadDisableWhileTyping", checked)
                 }
 
                 SettingsToggleRow {
-                    tags: ["touchpad", "drag", "lock"]
-                    settingKey: "touchpadDragLock"
-                    text: I18n.tr("Drag Lock")
-                    description: I18n.tr("Keep dragging when finger is briefly lifted")
-                    checked: SettingsData.touchpadDragLock
-                    onToggled: checked => SettingsData.set("touchpadDragLock", checked)
+                    tags: ["touchpad", "disable", "external", "mouse"]
+                    settingKey: "touchpadDisableOnExternalMouse"
+                    text: I18n.tr("Disable on External Mouse")
+                    description: I18n.tr("Disable touchpad when an external mouse is connected")
+                    checked: SettingsData.touchpadDisableOnExternalMouse
+                    onToggled: checked => SettingsData.set("touchpadDisableOnExternalMouse", checked)
+                }
+
+                SettingsToggleRow {
+                    tags: ["touchpad", "middle", "click", "emulation"]
+                    settingKey: "touchpadMiddleEmulation"
+                    text: I18n.tr("Middle Click Emulation")
+                    description: I18n.tr("Emulate middle click by pressing left and right buttons")
+                    checked: SettingsData.touchpadMiddleEmulation
+                    onToggled: checked => SettingsData.set("touchpadMiddleEmulation", checked)
                 }
             }
         }
