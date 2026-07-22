@@ -17,6 +17,9 @@ Item {
     property real sectionAvailablePrimarySize: 0
     property bool overrideAxisLayout: false
     property bool forceVerticalLayout: false
+    // False when a perpendicular bar occupies this edge, so the last widget's click area
+    // doesn't extend past the bar into the neighbour (matters most in the frame surface).
+    property bool edgeIsScreenEdge: true
 
     readonly property bool isVertical: overrideAxisLayout ? forceVerticalLayout : (axis?.isVertical ?? false)
     property alias widgetLayoutLoader: layoutLoader
@@ -71,7 +74,7 @@ Item {
                         isLast: index === rowRepeater.count - 1
                         sectionSpacing: parent.rowSpacing
                         isLeftBarEdge: false
-                        isRightBarEdge: true
+                        isRightBarEdge: root.edgeIsScreenEdge
                     }
                 }
             }
@@ -118,7 +121,7 @@ Item {
                         isLast: index === columnRepeater.count - 1
                         sectionSpacing: parent.columnSpacing
                         isTopBarEdge: false
-                        isBottomBarEdge: true
+                        isBottomBarEdge: root.edgeIsScreenEdge
                     }
                 }
             }

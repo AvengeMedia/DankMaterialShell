@@ -13,6 +13,9 @@ Item {
     signal colorPickerRequested
     signal barReady(var barConfig)
 
+    Component.onCompleted: BarWidgetService.registerDankBarItem(root.barConfig?.id, root)
+    Component.onDestruction: BarWidgetService.unregisterDankBarItem(root.barConfig?.id, root)
+
     property alias barVariants: barVariants
     property var hyprlandOverviewLoader: null
     property bool systemTrayMenuOpen: false
@@ -161,14 +164,17 @@ Item {
         id: barVariants
         model: {
             const prefs = root.barConfig?.screenPreferences || ["all"];
-            if (prefs.includes("all") || (typeof prefs[0] === "string" && prefs[0] === "all")) {
-                return Quickshell.screens;
+            const wantsAll = prefs.includes("all") || (typeof prefs[0] === "string" && prefs[0] === "all");
+            let base;
+            if (wantsAll) {
+                base = Quickshell.screens;
+            } else {
+                base = Quickshell.screens.filter(screen => SettingsData.isScreenInPreferences(screen, prefs));
+                if (base.length === 0 && root.barConfig?.showOnLastDisplay && Quickshell.screens.length === 1)
+                    base = Quickshell.screens;
             }
-            const filtered = Quickshell.screens.filter(screen => SettingsData.isScreenInPreferences(screen, prefs));
-            if (filtered.length === 0 && root.barConfig?.showOnLastDisplay && Quickshell.screens.length === 1) {
-                return Quickshell.screens;
-            }
-            return filtered;
+            // Connected frame mode renders the bar inside the frame surface; skip the standalone window there.
+            return base.filter(screen => !CompositorService.frameHostsSurfacesForScreen(screen));
         }
 
         delegate: DankBarWindow {

@@ -32,7 +32,41 @@ PanelWindow {
     }
 
     color: "transparent"
-    mask: Region {}
+    // Click-through everywhere except the bar strips it hosts in connected mode.
+    mask: Region {
+        Region {
+            readonly property bool present: win._connectedActive && win.barEdges.includes("top")
+            x: 0
+            y: 0
+            width: present ? win._windowRegionWidth : 0
+            height: present ? win.cutoutTopInset : 0
+        }
+        Region {
+            readonly property bool present: win._connectedActive && win.barEdges.includes("bottom")
+            x: 0
+            y: present ? win._windowRegionHeight - win.cutoutBottomInset : 0
+            width: present ? win._windowRegionWidth : 0
+            height: present ? win.cutoutBottomInset : 0
+        }
+        Region {
+            readonly property bool present: win._connectedActive && win.barEdges.includes("left")
+            x: 0
+            y: 0
+            width: present ? win.cutoutLeftInset : 0
+            height: present ? win._windowRegionHeight : 0
+        }
+        Region {
+            readonly property bool present: win._connectedActive && win.barEdges.includes("right")
+            x: present ? win._windowRegionWidth - win.cutoutRightInset : 0
+            y: 0
+            width: present ? win.cutoutRightInset : 0
+            height: present ? win._windowRegionHeight : 0
+        }
+        // The frame-hosted dock's hover strip, so hover-reveal works through the frame surface.
+        Region {
+            item: frameDockHostLoader.item ? frameDockHostLoader.item.dockMaskItem : null
+        }
+    }
 
     readonly property var barEdges: {
         SettingsData.barConfigs;
@@ -51,6 +85,16 @@ PanelWindow {
     readonly property var _modalDescriptor: ConnectedModeState.surfaceDescriptor(win._screenName, "modal")
 
     readonly property bool _connectedActive: CompositorService.usesConnectedFrameChromeForScreen(win.targetScreen)
+    readonly property bool _dockHostedHere: {
+        if (!win._connectedActive || !SettingsData.showDock)
+            return false;
+        const screens = SettingsData.getFilteredScreens("dock");
+        for (let i = 0; i < screens.length; i++) {
+            if (screens[i] && screens[i].name === win._screenName)
+                return true;
+        }
+        return false;
+    }
     readonly property string _barSide: {
         const edges = win.barEdges;
         if (edges.includes("top"))
@@ -1100,5 +1144,26 @@ PanelWindow {
         property vector4d chromeCorner3: win._sdfSlots[3].corner
         property vector4d chromeK3: win._sdfSlots[3].k
         property vector4d chromeParam3: win._sdfSlots[3].param
+    }
+
+    Loader {
+        anchors.fill: parent
+        z: 1
+        active: win._connectedActive
+        sourceComponent: FrameBarHost {
+            frameWindow: win
+            targetScreen: win.targetScreen
+        }
+    }
+
+    Loader {
+        id: frameDockHostLoader
+        anchors.fill: parent
+        z: 1
+        active: win._dockHostedHere
+        sourceComponent: FrameDockHost {
+            frameWindow: win
+            targetScreen: win.targetScreen
+        }
     }
 }
