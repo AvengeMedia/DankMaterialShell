@@ -9919,13 +9919,13 @@
   },
   {
     "section": "_tab_44",
-    "label": "Mouse & Trackpad",
+    "label": "Mouse & Touchpad",
     "tabIndex": 44,
     "category": "Settings",
     "keywords": [
       "mouse",
       "settings",
-      "trackpad"
+      "touchpad"
     ],
     "icon": "mouse",
     "conditionKey": "isNiri"

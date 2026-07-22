@@ -320,8 +320,8 @@ Rectangle {
                     "tabIndex": 29
                 },
                 {
-                    "id": "mouse_trackpad",
-                    "text": I18n.tr("Mouse & Trackpad"),
+                    "id": "mouse_touchpad",
+                    "text": I18n.tr("Mouse & Touchpad"),
                     "icon": "mouse",
                     "tabIndex": 44,
                     "niriOnly": true

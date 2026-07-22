@@ -720,13 +720,13 @@ FocusScope {
         }
 
         Loader {
-            id: mouseTrackpadLoader
+            id: mouseTouchpadLoader
             anchors.fill: parent
             active: root.currentIndex === 44
             visible: active
             focus: active
 
-            sourceComponent: MouseTrackpadTab {}
+            sourceComponent: MouseTouchpadTab {}
 
             onActiveChanged: {
                 if (active && item)
