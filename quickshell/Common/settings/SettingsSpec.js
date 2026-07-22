@@ -550,7 +550,7 @@ var SPEC = {
             showOnLastDisplay: true,
             leftWidgets: ["launcherButton", "workspaceSwitcher", "focusedWindow"],
             centerWidgets: ["music", "clock", "weather"],
-            rightWidgets: ["systemTray", "clipboard", "cpuUsage", "memUsage", "notificationButton", "battery", "controlCenterButton"],
+            rightWidgets: ["systemTray", "clipboard", "cpuUsage", "memUsage", "network_speed_monitor", "notificationButton", "battery", "controlCenterButton"],
             spacing: 4,
             innerPadding: 4,
             bottomGap: 0,

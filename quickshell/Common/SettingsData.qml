@@ -15,7 +15,7 @@ Singleton {
     id: root
     readonly property var log: Log.scoped("SettingsData")
 
-    readonly property int settingsConfigVersion: 12
+    readonly property int settingsConfigVersion: 13
 
     enum Position {
         Top,
@@ -990,7 +990,7 @@ Singleton {
             "showOnLastDisplay": true,
             "leftWidgets": ["launcherButton", "workspaceSwitcher", "focusedWindow"],
             "centerWidgets": ["music", "clock", "weather"],
-            "rightWidgets": ["systemTray", "clipboard", "cpuUsage", "memUsage", "notificationButton", "battery", "controlCenterButton"],
+            "rightWidgets": ["systemTray", "clipboard", "cpuUsage", "memUsage", "network_speed_monitor", "notificationButton", "battery", "controlCenterButton"],
             "spacing": 4,
             "innerPadding": 4,
             "barInsetPadding": -1,

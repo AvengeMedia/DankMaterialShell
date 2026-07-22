@@ -263,6 +263,20 @@ function migrateToVersion(obj, targetVersion) {
         settings.configVersion = 12;
     }
 
+    if (currentVersion < 13) {
+        console.info("Migrating settings from version", currentVersion, "to version 13");
+        if (Array.isArray(settings.barConfigs)) {
+            for (var b = 0; b < settings.barConfigs.length; b++) {
+                var rc = settings.barConfigs[b].rightWidgets;
+                if (Array.isArray(rc) && rc.indexOf("network_speed_monitor") < 0) {
+                    var memIdx = rc.indexOf("memUsage");
+                    rc.splice(memIdx >= 0 ? memIdx + 1 : rc.length, 0, "network_speed_monitor");
+                }
+            }
+        }
+        settings.configVersion = 13;
+    }
+
     return settings;
 }
 

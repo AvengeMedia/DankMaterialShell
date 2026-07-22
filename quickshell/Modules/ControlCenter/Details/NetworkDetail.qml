@@ -28,12 +28,33 @@ Rectangle {
     border.color: Theme.outlineMedium
     border.width: Theme.layerOutlineWidth
 
+    function formatSpeed(bytesPerSec) {
+        if (bytesPerSec < 1024) {
+            return bytesPerSec.toFixed(0) + " B/s";
+        } else if (bytesPerSec < 1024 * 1024) {
+            return (bytesPerSec / 1024).toFixed(1) + " KB/s";
+        } else if (bytesPerSec < 1024 * 1024 * 1024) {
+            return (bytesPerSec / (1024 * 1024)).toFixed(1) + " MB/s";
+        } else {
+            return (bytesPerSec / (1024 * 1024 * 1024)).toFixed(1) + " GB/s";
+        }
+    }
+
+    function formatSpeedPair() {
+        return "\u2193" + formatSpeed(DgopService.networkRxRate) + " \u2191" + formatSpeed(DgopService.networkTxRate);
+    }
+
+    readonly property bool wifiCarriesTraffic: NetworkService.networkStatus === "wifi" || (NetworkService.networkStatus === "vpn" && NetworkService.wifiConnected && !NetworkService.ethernetConnected)
+    readonly property bool ethernetCarriesTraffic: NetworkService.networkStatus === "ethernet" || (NetworkService.networkStatus === "vpn" && NetworkService.ethernetConnected)
+
     Component.onCompleted: {
         NetworkService.addRef();
+        DgopService.addRef(["network"]);
     }
 
     Component.onDestruction: {
         NetworkService.removeRef();
+        DgopService.removeRef(["network"]);
     }
 
     property bool hasEthernetAvailable: (NetworkService.ethernetDevices?.length ?? 0) > 0
@@ -537,6 +558,13 @@ Rectangle {
                                 elide: Text.ElideRight
                                 width: parent.width
                             }
+
+                            StyledText {
+                                text: formatSpeedPair()
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.primary
+                                visible: wiredDelegate.isActive && root.ethernetCarriesTraffic
+                            }
                         }
                     }
 
@@ -837,6 +865,13 @@ Rectangle {
                             text: (modelData.saved ? "\u2022 " : "") + wifiDelegate.signalStrength + "%"
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceVariantText
+                        }
+
+                        StyledText {
+                            text: "\u2022 " + formatSpeedPair()
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.primary
+                            visible: wifiDelegate.isConnected && root.wifiCarriesTraffic
                         }
                     }
                 }
