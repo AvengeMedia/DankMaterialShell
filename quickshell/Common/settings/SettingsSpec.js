@@ -45,6 +45,7 @@ var SPEC = {
     touchpadAccelProfile: { def: "default", onChange: "updateCompositorInput" },
     touchpadNaturalScroll: { def: true, onChange: "updateCompositorInput" },
     touchpadTapToClick: { def: true, onChange: "updateCompositorInput" },
+    touchpadDisableOnExternalMouse: { def: false, onChange: "updateCompositorInput" },
 
     firstDayOfWeek: { def: -1 },
     showWeekNumber: { def: false },

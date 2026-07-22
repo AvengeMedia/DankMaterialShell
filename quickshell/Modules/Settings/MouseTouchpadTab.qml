@@ -279,6 +279,15 @@ Item {
                     checked: SettingsData.touchpadNaturalScroll
                     onToggled: checked => SettingsData.set("touchpadNaturalScroll", checked)
                 }
+
+                SettingsToggleRow {
+                    tags: ["touchpad", "disable", "external", "mouse"]
+                    settingKey: "touchpadDisableOnExternalMouse"
+                    text: I18n.tr("Disable on External Mouse")
+                    description: I18n.tr("Disable touchpad when an external mouse is connected")
+                    checked: SettingsData.touchpadDisableOnExternalMouse
+                    onToggled: checked => SettingsData.set("touchpadDisableOnExternalMouse", checked)
+                }
             }
         }
     }

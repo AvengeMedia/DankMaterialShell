@@ -191,6 +191,7 @@ Singleton {
     property string touchpadAccelProfile: "default"
     property bool touchpadNaturalScroll: true
     property bool touchpadTapToClick: true
+    property bool touchpadDisableOnExternalMouse: false
 
     property int firstDayOfWeek: -1
     property bool showWeekNumber: false
