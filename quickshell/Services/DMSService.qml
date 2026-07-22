@@ -69,7 +69,7 @@ Singleton {
     property bool screensaverInhibited: false
     property var screensaverInhibitors: []
 
-    property var activeSubscriptions: ["network", "network.credentials", "loginctl", "freedesktop", "freedesktop.screensaver", "gamma", "theme.auto", "wallpaper", "bluetooth", "bluetooth.pairing", "brightness", "wlroutput", "evdev", "browser", "dbus", "clipboard", "location", "sysupdate"]
+    property var activeSubscriptions: ["network", "network.credentials", "loginctl", "freedesktop", "freedesktop.screensaver", "gamma", "theme.auto", "wallpaper", "bluetooth", "bluetooth.pairing", "brightness", "wlroutput", "evdev", "browser", "dbus", "clipboard", "sysupdate"]
 
     Component.onCompleted: {
         if (socketPath && socketPath.length > 0) {
