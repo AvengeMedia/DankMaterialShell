@@ -275,7 +275,7 @@ Item {
                     tags: ["touchpad", "natural", "scroll", "direction"]
                     settingKey: "touchpadNaturalScroll"
                     text: I18n.tr("Natural Scrolling")
-                    description: I18n.tr("Scroll content follows finger movement direction")
+                    description: I18n.tr("Reverse two-finger scrolling direction")
                     checked: SettingsData.touchpadNaturalScroll
                     onToggled: checked => SettingsData.set("touchpadNaturalScroll", checked)
                 }
