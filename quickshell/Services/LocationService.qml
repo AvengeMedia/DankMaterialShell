@@ -3,10 +3,13 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
+import qs.Common
+import qs.Services
 
 Singleton {
     id: root
 
+    readonly property bool wantsLocation: SettingsData.weatherEnabled && SettingsData.useAutoLocation
     readonly property bool locationAvailable: DMSService.isConnected && DMSService.capabilities.includes("location")
     readonly property bool valid: latitude !== 0 || longitude !== 0
 
@@ -15,19 +18,46 @@ Singleton {
 
     signal locationChanged(var data)
 
-    onLocationAvailableChanged: {
-        if (locationAvailable && !valid)
-            getState();
+    onWantsLocationChanged: {
+        if (wantsLocation) {
+            ensureSubscription();
+        } else if (DMSService.activeSubscriptions.includes("location")) {
+            DMSService.removeSubscription("location");
+        }
     }
+
+    onLocationAvailableChanged: ensureSubscription()
+
+    Component.onCompleted: ensureSubscription()
 
     Connections {
         target: DMSService
 
-        function onLocationStateUpdate(data) {
-            if (!locationAvailable)
-                return;
-            handleStateUpdate(data);
+        function onConnectionStateChanged() {
+            if (DMSService.isConnected)
+                root.ensureSubscription();
         }
+
+        function onLocationStateUpdate(data) {
+            if (!root.wantsLocation)
+                return;
+            root.handleStateUpdate(data);
+        }
+    }
+
+    function ensureSubscription() {
+        if (!wantsLocation)
+            return;
+        if (!locationAvailable)
+            return;
+        if (DMSService.activeSubscriptions.includes("location"))
+            return;
+        if (DMSService.activeSubscriptions.includes("all"))
+            return;
+
+        DMSService.addSubscription("location");
+        if (!valid)
+            getState();
     }
 
     function handleStateUpdate(data) {
@@ -42,6 +72,8 @@ Singleton {
     }
 
     function getState() {
+        if (!wantsLocation)
+            return;
         if (!locationAvailable)
             return;
 
