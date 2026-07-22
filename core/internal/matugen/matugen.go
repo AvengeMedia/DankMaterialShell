@@ -968,7 +968,7 @@ func applyKDEColorScheme(mode ColorMode) {
 	}
 }
 
-func refreshGTK(mode ColorMode) {
+func refreshGTKTheme(mode ColorMode) {
 	if err := utils.GsettingsSet("org.gnome.desktop.interface", "gtk-theme", ""); err != nil {
 		log.Warnf("Failed to reset gtk-theme: %v", err)
 	}

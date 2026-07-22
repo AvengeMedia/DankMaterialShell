@@ -37,7 +37,7 @@ remove_gtk3_include() {
 	local theme_dir="$1"
 	local css_variant="$2"
 	[ "$css_variant" != "-dark" ] && css_variant=""
-	sed -i.backup '/\/\* BEGIN DMS OVERRIDE \*\//,/\/\* END DMS OVERRIDE \*\//d' "${theme_dir}/gtk${css_variant}.css"
+	sed -i '/\/\* BEGIN DMS OVERRIDE \*\//,/\/\* END DMS OVERRIDE \*\//d' "${theme_dir}/gtk${css_variant}.css"
 	return $?
 }
 
@@ -165,9 +165,16 @@ apply_gtk3_colors() {
 	if [ -L "$gtk3_override" ]; then
 		rm "$gtk3_override"
 	elif [ -f "$gtk3_override" ]; then
+		mv "$gtk3_override" "$gtk3_override.backup.$(date +%s)"
 		echo "Backed up and removed existing gtk.css"
-		mv "$gtk3_override" "$gtk3_override.backup"
 	fi
+
+	# Backup adw-gtk3 stylesheets
+	for variant in light dark; do
+		local adw_gtk3_dir && adw_gtk3_dir="$(get_adw_gtk3_dir "$variant")"
+		cp "$adw_gtk3_dir/gtk-3.0/gtk.css" "$adw_gtk3_dir/gtk-3.0/gtk.css.backup.$(date +%s)"
+		cp "$adw_gtk3_dir/gtk-3.0/gtk-dark.css" "$adw_gtk3_dir/gtk-3.0/gtk-dark.css.backup.$(date +%s)"
+	done
 }
 
 remove_gtk4_colors() {
