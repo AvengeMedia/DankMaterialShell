@@ -1256,6 +1256,8 @@ Item {
             }
 
             SettingsToggleCard {
+                settingKey: "hoverPopouts"
+                tags: ["bar", "hover", "popout", "reveal", "widget", "delay"]
                 iconName: "touch_app"
                 title: I18n.tr("Hover Popouts")
                 description: I18n.tr("Open widget popouts by hovering over the bar. Moving to another widget switches the popout.")

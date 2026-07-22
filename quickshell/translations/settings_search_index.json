@@ -773,6 +773,34 @@
     "icon": "display_settings"
   },
   {
+    "section": "hoverPopouts",
+    "label": "Hover Popouts",
+    "tabIndex": 3,
+    "category": "Dank Bar",
+    "keywords": [
+      "another",
+      "bar",
+      "dank",
+      "delay",
+      "hover",
+      "hovering",
+      "moving",
+      "open",
+      "over",
+      "panel",
+      "popout",
+      "popouts",
+      "reveal",
+      "statusbar",
+      "switches",
+      "taskbar",
+      "topbar",
+      "widget"
+    ],
+    "icon": "touch_app",
+    "description": "Open widget popouts by hovering over the bar. Moving to another widget switches the popout."
+  },
+  {
     "section": "barPosition",
     "label": "Position",
     "tabIndex": 3,

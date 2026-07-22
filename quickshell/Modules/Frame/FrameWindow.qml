@@ -235,6 +235,33 @@ PanelWindow {
         return Math.max(0, Math.round(Theme.px(value, win._dpr)));
     }
 
+    function _pointInBand(lx, ly, bx, by, bw, bh, pad) {
+        return lx >= bx - pad && lx < bx + bw + pad && ly >= by - pad && ly < by + bh + pad;
+    }
+
+    function containsGlobalPoint(gx, gy, padding) {
+        if (!win._connectedActive || !win.contentItem)
+            return false;
+        const origin = win.contentItem.mapToItem(null, 0, 0);
+        if (!origin)
+            return false;
+        const pad = padding !== undefined ? padding : 16;
+        const lx = gx - origin.x;
+        const ly = gy - origin.y;
+        const w = win._windowRegionWidth;
+        const h = win._windowRegionHeight;
+        const edges = win.barEdges;
+        if (edges.includes("top") && win._pointInBand(lx, ly, 0, 0, w, win.cutoutTopInset, pad))
+            return true;
+        if (edges.includes("bottom") && win._pointInBand(lx, ly, 0, h - win.cutoutBottomInset, w, win.cutoutBottomInset, pad))
+            return true;
+        if (edges.includes("left") && win._pointInBand(lx, ly, 0, 0, win.cutoutLeftInset, h, pad))
+            return true;
+        if (edges.includes("right") && win._pointInBand(lx, ly, w - win.cutoutRightInset, 0, win.cutoutRightInset, h, pad))
+            return true;
+        return false;
+    }
+
     readonly property int cutoutTopInset: win._regionInt(barEdges.includes("top") ? SettingsData.frameBarSize : SettingsData.frameThickness)
     readonly property int cutoutBottomInset: win._regionInt(barEdges.includes("bottom") ? SettingsData.frameBarSize : SettingsData.frameThickness)
     readonly property int cutoutLeftInset: win._regionInt(barEdges.includes("left") ? SettingsData.frameBarSize : SettingsData.frameThickness)
@@ -1093,10 +1120,12 @@ PanelWindow {
     }
 
     Component.onCompleted: {
+        KeyboardFocus.registerBarWindow(win);
         win._scheduleBlurRebuild();
         win._scheduleSurfaceRefresh();
     }
     Component.onDestruction: {
+        KeyboardFocus.unregisterBarWindow(win);
         blurRebuildAction.cancel();
         surfaceRefreshAction.cancel();
         win._teardownBlur();
