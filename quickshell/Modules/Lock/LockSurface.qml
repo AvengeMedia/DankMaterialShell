@@ -33,6 +33,7 @@ FocusScope {
 
         anchors.fill: parent
         demoMode: false
+        sessionLock: root.lock
         pam: root.pam
         passwordBuffer: root.sharedPasswordBuffer
         screenName: root.screenName
