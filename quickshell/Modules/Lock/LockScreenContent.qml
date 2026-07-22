@@ -35,6 +35,7 @@ Item {
     property int hyprlandLayoutCount: 0
     property bool lockerReadySent: false
     property bool lockerReadyArmed: false
+    property var sessionLock: null
     readonly property bool hasCustomWallpaper: SettingsData.lockScreenWallpaperPath !== ""
     readonly property string lockFontFamily: SettingsData.lockScreenFontFamily
 
@@ -133,10 +134,25 @@ Item {
             return;
         if (!root.visible || root.opacity <= 0)
             return;
+        // Don't report ready until the compositor has confirmed the session is
+        // locked (ext-session-lock `locked` event). Qt's afterRendering fires
+        // before the lock surface is committed/presented, so releasing the sleep
+        // inhibitor on it lets the machine freeze with the desktop still on screen,
+        // which then flashes on resume. secure=true guarantees the desktop is hidden.
+        if (root.sessionLock && !root.sessionLock.secure)
+            return;
         Qt.callLater(() => {
             if (root.visible && root.opacity > 0 && !root.unlocking)
                 sendLockerReadyOnce();
         });
+    }
+
+    Connections {
+        target: root.sessionLock
+        enabled: target !== null
+        function onSecureChanged() {
+            root.maybeSend();
+        }
     }
 
     Connections {
