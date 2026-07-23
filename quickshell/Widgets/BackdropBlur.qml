@@ -10,7 +10,7 @@ Item {
     property Item sourceItem: null
     property real radius: Theme.cornerRadius
     property real blurAmount: 1.0
-    property int blurMax: 96
+    property int blurMax: (typeof SettingsData !== "undefined" && SettingsData.powerMode === SettingsData.PowerMode.PowerSaving) ? 48 : 96
 
     readonly property bool blurActive: visible && BlurService.enabled
 

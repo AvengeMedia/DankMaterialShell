@@ -758,7 +758,7 @@ Singleton {
     property color shadowMedium: Qt.rgba(0, 0, 0, 0.08)
     property color shadowStrong: Qt.rgba(0, 0, 0, 0.3)
 
-    readonly property bool elevationEnabled: typeof SettingsData !== "undefined" && (SettingsData.m3ElevationEnabled ?? true)
+    readonly property bool elevationEnabled: typeof SettingsData !== "undefined" && SettingsData.powerMode !== SettingsData.PowerMode.PowerSaving && (SettingsData.m3ElevationEnabled ?? true)
     readonly property real elevationBlurMax: typeof SettingsData !== "undefined" && SettingsData.m3ElevationIntensity !== undefined ? Math.min(128, Math.max(32, SettingsData.m3ElevationIntensity * 2)) : 64
 
     readonly property real _elevMult: typeof SettingsData !== "undefined" && SettingsData.m3ElevationIntensity !== undefined ? SettingsData.m3ElevationIntensity / 12 : 1
@@ -1032,7 +1032,8 @@ Singleton {
         }
     ]
 
-    readonly property int currentAnimationSpeed: typeof SettingsData !== "undefined" ? SettingsData.animationSpeed : SettingsData.AnimationSpeed.Short
+    readonly property int currentAnimationSpeed: typeof SettingsData !== "undefined" && SettingsData.powerMode === SettingsData.PowerMode.PowerSaving ? SettingsData.AnimationSpeed.None : (typeof SettingsData !== "undefined" ? SettingsData.animationSpeed : SettingsData.AnimationSpeed.Short)
+    readonly property bool rippleEffectsEnabled: typeof SettingsData !== "undefined" && SettingsData.powerMode === SettingsData.PowerMode.PowerSaving ? false : (typeof SettingsData !== "undefined" ? (SettingsData.enableRippleEffects ?? true) : true)
     readonly property var currentDurations: animationDurations[currentAnimationSpeed] || animationDurations[SettingsData.AnimationSpeed.Short]
 
     readonly property int shorterDuration: (typeof SettingsData !== "undefined" && SettingsData.animationSpeed === SettingsData.AnimationSpeed.Custom) ? SettingsData.customAnimationDuration : currentDurations.shorter
