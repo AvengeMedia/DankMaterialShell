@@ -224,6 +224,7 @@ Singleton {
     property string niriOverviewLastMode: "apps"
     property string settingsSidebarExpandedIds: ","
     property string settingsSidebarCollapsedIds: ","
+    property bool showConfigReloadToast: true
 
     Component.onCompleted: {
         loadSettings();
