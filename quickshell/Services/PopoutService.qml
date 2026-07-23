@@ -425,7 +425,7 @@ Singleton {
     }
 
     function closeSettings() {
-        settingsModal?.close();
+        settingsModal?.hide();
     }
 
     function toggleSettings() {

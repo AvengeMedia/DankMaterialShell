@@ -41,6 +41,9 @@ FloatingWindow {
     signal closingModal
 
     function show() {
+        if (visible && !backingWindowVisible) {
+            visible = false;
+        }
         visible = true;
     }
 
@@ -49,7 +52,11 @@ FloatingWindow {
     }
 
     function toggle() {
-        visible = !visible;
+        if (visible && backingWindowVisible) {
+            hide();
+            return;
+        }
+        show();
     }
 
     function setTabIndex(tabIndex: int) {
@@ -61,13 +68,12 @@ FloatingWindow {
 
     function showWithTab(tabIndex: int) {
         setTabIndex(tabIndex);
-        visible = true;
+        show();
     }
 
     function showWithTabName(tabName: string) {
-        var idx = sidebar.resolveTabIndex(tabName);
-        setTabIndex(idx);
-        visible = true;
+        setTabIndex(sidebar.resolveTabIndex(tabName));
+        show();
     }
 
     function resolveTabIndex(tabName: string): int {
