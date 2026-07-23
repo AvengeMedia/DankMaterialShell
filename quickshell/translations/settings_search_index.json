@@ -5487,6 +5487,24 @@
     "description": "Select the font family for UI text"
   },
   {
+    "section": "powerMode",
+    "label": "Performance Mode",
+    "tabIndex": 14,
+    "category": "Typography & Motion",
+    "keywords": [
+      "animation",
+      "battery",
+      "fonts",
+      "mode",
+      "motion",
+      "performance",
+      "power",
+      "text",
+      "typography"
+    ],
+    "icon": "speed"
+  },
+  {
     "section": "enableRippleEffects",
     "label": "Ripple Effects",
     "tabIndex": 14,
