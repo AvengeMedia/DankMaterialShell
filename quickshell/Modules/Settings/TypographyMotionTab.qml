@@ -476,6 +476,43 @@ Item {
 
             SettingsCard {
                 tab: "typography"
+                tags: ["performance", "power", "mode", "battery"]
+                title: I18n.tr("Performance Mode")
+                settingKey: "powerMode"
+                iconName: "speed"
+
+                Item {
+                    width: parent.width
+                    height: powerModeGroup.implicitHeight
+                    clip: true
+
+                    DankButtonGroup {
+                        id: powerModeGroup
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        buttonPadding: parent.width < 480 ? Theme.spacingS : Theme.spacingL
+                        minButtonWidth: parent.width < 480 ? 44 : 64
+                        textSize: parent.width < 480 ? Theme.fontSizeSmall : Theme.fontSizeMedium
+                        model: [I18n.tr("Normal"), I18n.tr("Balanced"), I18n.tr("Power Saving")]
+                        selectionMode: "single"
+                        currentIndex: SettingsData.powerMode
+                        onSelectionChanged: (index, selected) => {
+                            if (!selected)
+                                return;
+                            SettingsData.set("powerMode", index);
+                        }
+
+                        Connections {
+                            target: SettingsData
+                            function onPowerModeChanged() {
+                                powerModeGroup.currentIndex = SettingsData.powerMode;
+                            }
+                        }
+                    }
+                }
+            }
+
+            SettingsCard {
+                tab: "typography"
                 tags: ["animation", "speed", "motion", "duration"]
                 title: I18n.tr("Animation Speed")
                 settingKey: "animationSpeed"
