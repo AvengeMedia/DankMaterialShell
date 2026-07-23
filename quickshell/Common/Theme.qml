@@ -1952,11 +1952,11 @@ Singleton {
         });
     }
 
-    function includeGtk3Colors() {
+    function patchGtk3colors() {
         const isLight = (typeof SessionData !== "undefined" && SessionData.isLightMode);
-        Proc.runCommand("gtk3Includer", ["bash", shellDir + "/scripts/gtk.sh", configDir, "include", isLight, shellDir], (output, exitCode) => {
+        Proc.runCommand("gtk3Patcher", ["bash", shellDir + "/scripts/gtk.sh", configDir, "patch", isLight, shellDir], (output, exitCode) => {
             if (exitCode !== 0) {
-                log.warn(`Failed to include GTK3 colors: ${output}`);
+                log.warn(`Failed to patch GTK3 colors: ${output}`);
             }
         });
     }
@@ -2168,7 +2168,7 @@ Singleton {
 
             if (!pendingThemeRequest) {
                 if (SettingsData.matugenTemplateGtk) {
-                    includeGtk3Colors();
+                    patchGtk3colors();
                     refreshGtkTheme();
                 }
                 return;

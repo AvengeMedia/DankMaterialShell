@@ -2,13 +2,13 @@
 
 CONFIG_DIR="$1"
 # apply: setup symlinks and config dirs
-# include: refresh overrides in adw-gtk3
+# patch: refresh overrides in adw-gtk3
 # remove: remove all overrides
 MODE="${2:-apply}"
 IS_LIGHT="${3:-light}"
 
 if [ -z "$CONFIG_DIR" ]; then
-	echo "Usage: $0 <config_dir> [apply|include|remove] [is_light] [shell_dir]" >&2
+	echo "Usage: $0 <config_dir> [apply|patch|remove] [is_light] [shell_dir]" >&2
 	exit 1
 fi
 
@@ -33,7 +33,7 @@ get_adw_gtk3_dir() {
 	echo "$target"
 }
 
-remove_gtk3_include() {
+remove_gtk3_patch() {
 	local theme_dir="$1"
 	local css_variant="$2"
 	[ "$css_variant" != "-dark" ] && css_variant=""
@@ -67,32 +67,32 @@ remove_gtk3_colors() {
 		fi
 
 		for css_variant in light dark; do
-			if remove_gtk3_include "$adw_gtk3_dir" "$css_variant"; then
-				echo "Removed included GTK3 colors from '${adw_gtk3_dir}' in $css_variant stylesheet"
+			if remove_gtk3_patch "$adw_gtk3_dir" "$css_variant"; then
+				echo "Removed GTK colors patch from '${adw_gtk3_dir}' in '$css_variant' stylesheet"
 			else
-				echo "Failed to remove included GTK3 colors from '${adw_gtk3_dir}' in $css_variant stylesheet" >&2
+				echo "Failed to remove GTK colors patch from '${adw_gtk3_dir}' in '$css_variant' stylesheet" >&2
 			fi
 		done
 	done
 }
 
-do_include() {
+do_patch() {
 	local theme_dir="$1"
 	local variant="$2"
 	local css_variant=""
 	[ "$variant" = "dark" ] && css_variant="-${variant}"
 	if {
-		remove_gtk3_include "$theme_dir" "$css_variant"
+		remove_gtk3_patch "$theme_dir" "$css_variant"
 		cat "${gtk3_dir}/dank-colors.css" >>"${theme_dir}/gtk${css_variant}.css"
 	}; then
-		echo "GTK3 $variant colors successfully included in '$theme_dir/gtk${css_variant}.css'"
+		echo "Successfully patched '$theme_dir/gtk${css_variant}.css' with GTK '$variant' colors"
 	else
-		echo "Error: failed to apply $variant colors override in '$theme_dir/gtk${css_variant}.css'" >&2
+		echo "Error: failed to patch '$theme_dir/gtk${css_variant}.css' with GTK '$variant' colors" >&2
 		exit 1
 	fi
 }
 
-include_gtk3_colors() {
+patch_gtk3_colors() {
 	local config_dir="$1"
 	local is_light="$2"
 
@@ -120,11 +120,11 @@ include_gtk3_colors() {
 
 	# NOTE : for adw-gtk3-dark gtk.css and gtk-dark.css are the same file
 	if [ "$variant" = "dark" ]; then
-		do_include "$adw_gtk3_dir" "dark"
-		do_include "$adw_gtk3_dir" "light"
-		do_include "$(get_adw_gtk3_dir "light")" "dark"
+		do_patch "$adw_gtk3_dir" "dark"
+		do_patch "$adw_gtk3_dir" "light"
+		do_patch "$(get_adw_gtk3_dir "light")" "dark"
 	else
-		do_include "$adw_gtk3_dir" "light"
+		do_patch "$adw_gtk3_dir" "light"
 	fi
 }
 
@@ -228,9 +228,9 @@ apply_gtk4_colors() {
 }
 
 case "$MODE" in
-	include)
-		include_gtk3_colors "$CONFIG_DIR" "$IS_LIGHT"
-		echo "GTK3 colors included successfully"
+	patch)
+		patch_gtk3_colors "$CONFIG_DIR" "$IS_LIGHT"
+		echo "GTK3 colors patched successfully"
 		;;
 	remove)
 		remove_gtk3_colors "$CONFIG_DIR"
@@ -245,7 +245,7 @@ case "$MODE" in
 		echo "GTK colors applied successfully"
 		;;
 	*)
-		echo "Usage: $0 <config_dir> [apply|include|remove] [is_light] [shell_dir]" >&2
+		echo "Usage: $0 <config_dir> [apply|patch|remove] [is_light] [shell_dir]" >&2
 		exit 1
 		;;
 esac
