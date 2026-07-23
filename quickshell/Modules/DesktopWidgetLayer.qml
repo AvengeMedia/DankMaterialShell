@@ -116,7 +116,7 @@ Variants {
             model: ScriptModel {
                 objectProp: "id"
                 // Reversed so the top of the list maps last and renders in front.
-                values: screenDelegate.rebuilding ? [] : [...(SettingsData.desktopWidgetInstances || [])].reverse()
+                values: screenDelegate.rebuilding ? [] : [...(SettingsData.desktopWidgetInstances || [])].filter(inst => inst.enabled).reverse()
             }
 
             DesktopPluginWrapper {
