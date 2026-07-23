@@ -1108,28 +1108,39 @@ Singleton {
         return isExcludedAppException;
     }
 
-    function handleNightModeExceptions(topLevel) {
+    function handleNightModeExceptions() {
         if (!nightModePaused && !nightModeEnabled) {
             return;
         }
 
-        if (nightModePaused) {
-            const isInOverview = (CompositorService.isHyprland && root.hyprlandOverviewLoader?.item?.overviewOpen) || (CompositorService.isNiri && NiriService.inOverview) || (CompositorService.isMango && MangoService.inOverview);
-            if (isInOverview) {
-                resumeNightMode();
-                return;
-            }
+        const isInOverview =
+            (CompositorService.isHyprland && root.hyprlandOverviewLoader?.item?.overviewOpen) ||
+            (CompositorService.isNiri && NiriService.inOverview) ||
+            (CompositorService.isMango && MangoService.inOverview);
+
+        if (nightModePaused && isInOverview) {
+            resumeNightMode();
+            return;
         }
 
         const activeApp = ToplevelManager.activeToplevel;
-        if (activeApp) {
-            const isFullscreenExcluded = SettingsData.nightModeExcludeFullscreen || false;
-            const shouldPause = (isFullscreenExcluded && activeApp.fullscreen) || isNightModeExcludedApp(activeApp.appId);
-            if (shouldPause && !nightModePaused && nightModeEnabled) {
+        if (!activeApp) {
+            return;
+        }
+
+        const shouldPause =
+            (SettingsData.nightModeExcludeFullscreen && activeApp.fullscreen) ||
+            isNightModeExcludedApp(activeApp.appId);
+
+        if (shouldPause) {
+            if (!nightModePaused && nightModeEnabled) {
                 pauseNightMode();
-            } else if (!shouldPause && nightModePaused) {
-                resumeNightMode();
             }
+            return;
+        }
+
+        if (nightModePaused) {
+            resumeNightMode();
         }
     }
 
