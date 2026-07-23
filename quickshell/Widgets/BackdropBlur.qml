@@ -9,18 +9,19 @@ Item {
 
     property Item sourceItem: null
     property real radius: Theme.cornerRadius
-    property real blurAmount: 1.0
+    property real blurAmount: 1
     property int blurMax: (typeof SettingsData !== "undefined" && SettingsData.powerMode === SettingsData.PowerMode.PowerSaving) ? 48 : 96
-
     readonly property bool blurActive: visible && BlurService.enabled
 
     ShaderEffectSource {
         id: snapshot
+
         anchors.fill: parent
         sourceItem: root.sourceItem
         sourceRect: {
             if (!root.sourceItem)
                 return Qt.rect(0, 0, 0, 0);
+
             const p = root.mapToItem(root.sourceItem, 0, 0);
             return Qt.rect(p.x, p.y, root.width, root.height);
         }
@@ -42,9 +43,11 @@ Item {
 
     Rectangle {
         id: maskRect
+
         anchors.fill: parent
         radius: root.radius
         visible: false
         layer.enabled: true
     }
+
 }

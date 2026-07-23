@@ -9,11 +9,11 @@ Item {
 
     property MprisPlayer activePlayer
     readonly property real stableLength: MprisController.activePlayerStableLength
-
     property real seekPreviewRatio: -1
     readonly property real playerValue: {
         if (!activePlayer || stableLength <= 0)
             return 0;
+
         const pos = (activePlayer.position || 0) % Math.max(1, stableLength);
         const calculatedRatio = pos / stableLength;
         return Math.max(0, Math.min(1, calculatedRatio));
@@ -33,19 +33,22 @@ Item {
     function ratioForPosition(position) {
         if (!activePlayer || stableLength <= 0)
             return 0;
+
         return clampRatio(position / stableLength);
     }
 
     function positionForRatio(ratio) {
         if (!activePlayer || stableLength <= 0)
             return 0;
+
         const rawPosition = clampRatio(ratio) * stableLength;
         return Math.min(rawPosition, stableLength * 0.99);
     }
 
     function updatePreviewFromMouse(mouseX, width) {
         if (!activePlayer || stableLength <= 0 || width <= 0)
-            return;
+            return ;
+
         seekPreviewRatio = clampRatio(mouseX / width);
     }
 
@@ -55,6 +58,7 @@ Item {
         previewSettleChecksRemaining = 0;
         if (!isSeeking)
             seekPreviewRatio = -1;
+
     }
 
     function beginCommittedSeekPreview(position) {
@@ -94,6 +98,7 @@ Item {
         if (mouseArea.pressed && isSeeking && activePlayer && stableLength > 0 && activePlayer.canSeek) {
             if (!isDraggingSeek && Math.abs(mouse.x - mouseArea.pressX) >= dragThreshold)
                 isDraggingSeek = true;
+
             updatePreviewFromMouse(mouse.x, width);
             mouseArea.pendingSeekPosition = positionForRatio(seekPreviewRatio);
         }
@@ -107,27 +112,26 @@ Item {
         clearCommittedSeekPreview();
     }
 
+    implicitHeight: 20
+
     Timer {
         id: previewSettleTimer
+
         interval: (typeof SettingsData !== "undefined" && SettingsData.powerMode === SettingsData.PowerMode.PowerSaving) ? 200 : 80
         repeat: true
         onTriggered: {
             if (root.isSeeking || root.committedSeekRatio < 0) {
                 stop();
-                return;
+                return ;
             }
-
             const previewSettled = Math.abs(root.playerValue - root.committedSeekRatio) <= 0.0015;
             if (previewSettled || root.previewSettleChecksRemaining <= 0) {
                 root.clearCommittedSeekPreview();
-                return;
+                return ;
             }
-
             root.previewSettleChecksRemaining -= 1;
         }
     }
-
-    implicitHeight: 20
 
     Loader {
         anchors.fill: parent
@@ -150,34 +154,44 @@ Item {
                 onFrameTicked: {
                     if (!root.isSeeking)
                         activePlayer.positionChanged();
+
                 }
 
                 MouseArea {
                     id: waveMouseArea
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    enabled: activePlayer && activePlayer.canSeek && stableLength > 0
 
                     property real pendingSeekPosition: -1
                     property real pressX: 0
 
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    enabled: activePlayer && activePlayer.canSeek && stableLength > 0
+                    onPressed: (mouse) => {
+                        return root.handleSeekPressed(mouse, parent.width, waveMouseArea, waveHoldIndicatorTimer);
+                    }
+                    onReleased: root.handleSeekReleased(waveMouseArea, waveHoldIndicatorTimer)
+                    onPositionChanged: (mouse) => {
+                        return root.handleSeekPositionChanged(mouse, parent.width, waveMouseArea);
+                    }
+                    onCanceled: root.handleSeekCanceled(waveMouseArea, waveHoldIndicatorTimer)
+
                     Timer {
                         id: waveHoldIndicatorTimer
+
                         interval: root.holdIndicatorDelay
                         repeat: false
                         onTriggered: {
                             if (parent.pressed && root.isSeeking)
                                 root.isDraggingSeek = true;
+
                         }
                     }
 
-                    onPressed: mouse => root.handleSeekPressed(mouse, parent.width, waveMouseArea, waveHoldIndicatorTimer)
-                    onReleased: root.handleSeekReleased(waveMouseArea, waveHoldIndicatorTimer)
-                    onPositionChanged: mouse => root.handleSeekPositionChanged(mouse, parent.width, waveMouseArea)
-                    onCanceled: root.handleSeekCanceled(waveMouseArea, waveHoldIndicatorTimer)
                 }
+
             }
+
         }
 
         Component {
@@ -185,7 +199,7 @@ Item {
 
             Item {
                 property real lineWidth: 3
-                property color trackColor: Theme.withAlpha(Theme.surfaceVariant, 0.40)
+                property color trackColor: Theme.withAlpha(Theme.surfaceVariant, 0.4)
                 property color fillColor: MediaAccentService.accent
                 property color playheadColor: MediaAccentService.accent
                 property color actualProgressColor: Theme.onSurface_38
@@ -206,11 +220,14 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     color: parent.fillColor
                     radius: height / 2
+
                     Behavior on width {
                         NumberAnimation {
                             duration: 80
                         }
+
                     }
+
                 }
 
                 Rectangle {
@@ -226,6 +243,7 @@ Item {
 
                 Rectangle {
                     id: playhead
+
                     width: 3
                     height: Math.max(parent.lineWidth + 8, 14)
                     radius: width / 2
@@ -233,39 +251,53 @@ Item {
                     x: Math.max(0, Math.min(parent.width, parent.width * root.value)) - width / 2
                     y: parent.midY - height / 2
                     z: 3
+
                     Behavior on x {
                         NumberAnimation {
                             duration: 80
                         }
+
                     }
+
                 }
 
                 MouseArea {
                     id: flatMouseArea
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    enabled: activePlayer && activePlayer.canSeek && stableLength > 0
 
                     property real pendingSeekPosition: -1
                     property real pressX: 0
 
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    enabled: activePlayer && activePlayer.canSeek && stableLength > 0
+                    onPressed: (mouse) => {
+                        return root.handleSeekPressed(mouse, parent.width, flatMouseArea, flatHoldIndicatorTimer);
+                    }
+                    onReleased: root.handleSeekReleased(flatMouseArea, flatHoldIndicatorTimer)
+                    onPositionChanged: (mouse) => {
+                        return root.handleSeekPositionChanged(mouse, parent.width, flatMouseArea);
+                    }
+                    onCanceled: root.handleSeekCanceled(flatMouseArea, flatHoldIndicatorTimer)
+
                     Timer {
                         id: flatHoldIndicatorTimer
+
                         interval: root.holdIndicatorDelay
                         repeat: false
                         onTriggered: {
                             if (parent.pressed && root.isSeeking)
                                 root.isDraggingSeek = true;
+
                         }
                     }
 
-                    onPressed: mouse => root.handleSeekPressed(mouse, parent.width, flatMouseArea, flatHoldIndicatorTimer)
-                    onReleased: root.handleSeekReleased(flatMouseArea, flatHoldIndicatorTimer)
-                    onPositionChanged: mouse => root.handleSeekPositionChanged(mouse, parent.width, flatMouseArea)
-                    onCanceled: root.handleSeekCanceled(flatMouseArea, flatHoldIndicatorTimer)
                 }
+
             }
+
         }
+
     }
+
 }

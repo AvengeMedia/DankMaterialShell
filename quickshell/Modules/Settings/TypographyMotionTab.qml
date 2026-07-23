@@ -1,7 +1,7 @@
 import QtQuick
 import qs.Common
-import qs.Widgets
 import qs.Modules.Settings.Widgets
+import qs.Widgets
 
 Item {
     id: root
@@ -13,11 +13,11 @@ Item {
     function enumerateFonts() {
         var fonts = [];
         var availableFonts = Qt.fontFamilies();
-
         for (var i = 0; i < availableFonts.length; i++) {
             var fontName = availableFonts[i];
             if (fontName.startsWith("."))
                 continue;
+
             fonts.push(fontName);
         }
         fonts.sort();
@@ -26,20 +26,22 @@ Item {
         cachedMonoFamilies = fonts;
     }
 
+    Component.onCompleted: {
+        fontEnumerationTimer.start();
+    }
+
     Timer {
         id: fontEnumerationTimer
+
         interval: 50
         running: false
         onTriggered: {
             if (fontsEnumerated)
-                return;
+                return ;
+
             enumerateFonts();
             fontsEnumerated = true;
         }
-    }
-
-    Component.onCompleted: {
-        fontEnumerationTimer.start();
     }
 
     DankFlickable {
@@ -50,6 +52,7 @@ Item {
 
         Column {
             id: mainColumn
+
             topPadding: 4
             width: Math.min(550, parent.width - Theme.spacingL * 2)
             anchors.horizontalCenter: parent.horizontalCenter
@@ -69,6 +72,7 @@ Item {
 
                     DankButtonGroup {
                         id: animVariantGroup
+
                         anchors.horizontalCenter: parent.horizontalCenter
                         buttonPadding: parent.width < 480 ? Theme.spacingS : Theme.spacingL
                         minButtonWidth: parent.width < 480 ? 64 : 96
@@ -78,17 +82,21 @@ Item {
                         currentIndex: SettingsData.animationVariant
                         onSelectionChanged: (index, selected) => {
                             if (!selected)
-                                return;
+                                return ;
+
                             SettingsData.set("animationVariant", index);
                         }
 
                         Connections {
-                            target: SettingsData
                             function onAnimationVariantChanged() {
                                 animVariantGroup.currentIndex = SettingsData.animationVariant;
                             }
+
+                            target: SettingsData
                         }
+
                     }
+
                 }
 
                 Rectangle {
@@ -104,6 +112,7 @@ Item {
 
                     StyledText {
                         id: variantDescription
+
                         x: Theme.spacingM
                         y: Theme.spacingS
                         width: parent.width - Theme.spacingM * 2
@@ -121,7 +130,9 @@ Item {
                             }
                         }
                     }
+
                 }
+
             }
 
             SettingsCard {
@@ -138,6 +149,7 @@ Item {
 
                     DankButtonGroup {
                         id: motionEffectGroup
+
                         anchors.horizontalCenter: parent.horizontalCenter
                         buttonPadding: parent.width < 480 ? Theme.spacingS : Theme.spacingL
                         minButtonWidth: parent.width < 480 ? 64 : 96
@@ -147,17 +159,21 @@ Item {
                         currentIndex: SettingsData.motionEffect
                         onSelectionChanged: (index, selected) => {
                             if (!selected)
-                                return;
+                                return ;
+
                             SettingsData.set("motionEffect", index);
                         }
 
                         Connections {
-                            target: SettingsData
                             function onMotionEffectChanged() {
                                 motionEffectGroup.currentIndex = SettingsData.motionEffect;
                             }
+
+                            target: SettingsData
                         }
+
                     }
+
                 }
 
                 Rectangle {
@@ -173,6 +189,7 @@ Item {
 
                     StyledText {
                         id: motionEffectDescription
+
                         x: Theme.spacingM
                         y: Theme.spacingS
                         width: parent.width - Theme.spacingM * 2
@@ -190,7 +207,9 @@ Item {
                             }
                         }
                     }
+
                 }
+
             }
 
             SettingsCard {
@@ -211,7 +230,7 @@ Item {
                     enableFuzzySearch: true
                     popupWidthOffset: 100
                     maxPopupHeight: 400
-                    onValueChanged: value => {
+                    onValueChanged: (value) => {
                         if (value === "Default")
                             SettingsData.set("fontFamily", Theme.defaultFontFamily);
                         else
@@ -230,7 +249,7 @@ Item {
                     enableFuzzySearch: true
                     popupWidthOffset: 100
                     maxPopupHeight: 400
-                    onValueChanged: value => {
+                    onValueChanged: (value) => {
                         if (value === "Default")
                             SettingsData.set("monoFontFamily", Theme.defaultMonoFontFamily);
                         else
@@ -276,7 +295,7 @@ Item {
                             return I18n.tr("Regular", "font weight");
                         }
                     }
-                    onValueChanged: value => {
+                    onValueChanged: (value) => {
                         var weight;
                         switch (value) {
                         case I18n.tr("Thin", "font weight"):
@@ -325,8 +344,11 @@ Item {
                     value: Math.round(SettingsData.fontScale * 100)
                     unit: "%"
                     defaultValue: 100
-                    onSliderValueChanged: newValue => SettingsData.set("fontScale", newValue / 100)
+                    onSliderValueChanged: (newValue) => {
+                        return SettingsData.set("fontScale", newValue / 100);
+                    }
                 }
+
             }
 
             SettingsCard {
@@ -343,6 +365,7 @@ Item {
 
                     DankButtonGroup {
                         id: renderTypeGroup
+
                         anchors.horizontalCenter: parent.horizontalCenter
                         buttonPadding: parent.width < 480 ? Theme.spacingS : Theme.spacingL
                         minButtonWidth: parent.width < 480 ? 64 : 96
@@ -361,7 +384,8 @@ Item {
                         }
                         onSelectionChanged: (index, selected) => {
                             if (!selected)
-                                return;
+                                return ;
+
                             switch (index) {
                             case 1:
                                 SettingsData.set("textRenderType", SettingsData.TextRenderType.Qt);
@@ -376,7 +400,6 @@ Item {
                         }
 
                         Connections {
-                            target: SettingsData
                             function onTextRenderTypeChanged() {
                                 switch (SettingsData.textRenderType) {
                                 case SettingsData.TextRenderType.Qt:
@@ -390,8 +413,12 @@ Item {
                                     break;
                                 }
                             }
+
+                            target: SettingsData
                         }
+
                     }
+
                 }
 
                 Rectangle {
@@ -407,6 +434,7 @@ Item {
 
                     StyledText {
                         id: renderTypeDescription
+
                         x: Theme.spacingM
                         y: Theme.spacingS
                         width: parent.width - Theme.spacingM * 2
@@ -424,6 +452,7 @@ Item {
                             }
                         }
                     }
+
                 }
 
                 Rectangle {
@@ -440,6 +469,7 @@ Item {
 
                     StyledText {
                         id: qualityLabel
+
                         x: Theme.spacingM
                         text: I18n.tr("Quality")
                         font.pixelSize: Theme.fontSizeSmall
@@ -449,6 +479,7 @@ Item {
 
                     DankButtonGroup {
                         id: qualityGroup
+
                         anchors.top: qualityLabel.bottom
                         anchors.topMargin: Theme.spacingS
                         anchors.horizontalCenter: parent.horizontalCenter
@@ -460,18 +491,23 @@ Item {
                         currentIndex: SettingsData.textRenderQuality
                         onSelectionChanged: (index, selected) => {
                             if (!selected)
-                                return;
+                                return ;
+
                             SettingsData.set("textRenderQuality", index);
                         }
 
                         Connections {
-                            target: SettingsData
                             function onTextRenderQualityChanged() {
                                 qualityGroup.currentIndex = SettingsData.textRenderQuality;
                             }
+
+                            target: SettingsData
                         }
+
                     }
+
                 }
+
             }
 
             SettingsCard {
@@ -488,6 +524,7 @@ Item {
 
                     DankButtonGroup {
                         id: powerModeGroup
+
                         anchors.horizontalCenter: parent.horizontalCenter
                         buttonPadding: parent.width < 480 ? Theme.spacingS : Theme.spacingL
                         minButtonWidth: parent.width < 480 ? 44 : 64
@@ -497,18 +534,23 @@ Item {
                         currentIndex: SettingsData.powerMode
                         onSelectionChanged: (index, selected) => {
                             if (!selected)
-                                return;
+                                return ;
+
                             SettingsData.set("powerMode", index);
                         }
 
                         Connections {
-                            target: SettingsData
                             function onPowerModeChanged() {
                                 powerModeGroup.currentIndex = SettingsData.powerMode;
                             }
+
+                            target: SettingsData
                         }
+
                     }
+
                 }
+
             }
 
             SettingsCard {
@@ -525,6 +567,7 @@ Item {
 
                     DankButtonGroup {
                         id: animationSpeedGroup
+
                         anchors.horizontalCenter: parent.horizontalCenter
                         buttonPadding: parent.width < 480 ? Theme.spacingS : Theme.spacingL
                         minButtonWidth: parent.width < 480 ? 44 : 64
@@ -534,17 +577,21 @@ Item {
                         currentIndex: SettingsData.animationSpeed
                         onSelectionChanged: (index, selected) => {
                             if (!selected)
-                                return;
+                                return ;
+
                             SettingsData.set("animationSpeed", index);
                         }
 
                         Connections {
-                            target: SettingsData
                             function onAnimationSpeedChanged() {
                                 animationSpeedGroup.currentIndex = SettingsData.animationSpeed;
                             }
+
+                            target: SettingsData
                         }
+
                     }
+
                 }
 
                 Rectangle {
@@ -556,6 +603,7 @@ Item {
 
                 SettingsSliderRow {
                     id: durationSlider
+
                     tab: "typography"
                     tags: ["animation", "duration", "custom", "speed"]
                     settingKey: "customAnimationDuration"
@@ -566,28 +614,33 @@ Item {
                     value: Theme.currentAnimationBaseDuration
                     unit: "ms"
                     defaultValue: 200
-                    onSliderValueChanged: newValue => {
+                    onSliderValueChanged: (newValue) => {
                         SettingsData.set("animationSpeed", SettingsData.AnimationSpeed.Custom);
                         SettingsData.set("customAnimationDuration", newValue);
                     }
 
                     Connections {
-                        target: SettingsData
                         function onAnimationSpeedChanged() {
                             if (SettingsData.animationSpeed === SettingsData.AnimationSpeed.Custom)
-                                return;
+                                return ;
+
                             durationSlider.value = Theme.currentAnimationBaseDuration;
                         }
+
+                        target: SettingsData
                     }
 
                     Connections {
-                        target: Theme
                         function onCurrentAnimationBaseDurationChanged() {
                             if (SettingsData.animationSpeed === SettingsData.AnimationSpeed.Custom)
-                                return;
+                                return ;
+
                             durationSlider.value = Theme.currentAnimationBaseDuration;
                         }
+
+                        target: Theme
                     }
+
                 }
 
                 Rectangle {
@@ -604,8 +657,11 @@ Item {
                     text: I18n.tr("Sync Popouts & Modals")
                     description: I18n.tr("Popouts and Modals follow global Animation Speed (disable to customize independently)")
                     checked: SettingsData.syncComponentAnimationSpeeds
-                    onToggled: checked => SettingsData.set("syncComponentAnimationSpeeds", checked)
+                    onToggled: (checked) => {
+                        return SettingsData.set("syncComponentAnimationSpeeds", checked);
+                    }
                 }
+
             }
 
             SettingsCard {
@@ -622,6 +678,7 @@ Item {
 
                     DankButtonGroup {
                         id: popoutSpeedGroup
+
                         anchors.horizontalCenter: parent.horizontalCenter
                         buttonPadding: parent.width < 480 ? Theme.spacingS : Theme.spacingL
                         minButtonWidth: parent.width < 480 ? 44 : 64
@@ -631,19 +688,24 @@ Item {
                         currentIndex: SettingsData.popoutAnimationSpeed
                         onSelectionChanged: (index, selected) => {
                             if (!selected)
-                                return;
+                                return ;
+
                             if (SettingsData.syncComponentAnimationSpeeds)
                                 SettingsData.set("syncComponentAnimationSpeeds", false);
+
                             SettingsData.set("popoutAnimationSpeed", index);
                         }
 
                         Connections {
-                            target: SettingsData
                             function onPopoutAnimationSpeedChanged() {
                                 popoutSpeedGroup.currentIndex = SettingsData.popoutAnimationSpeed;
                             }
+
+                            target: SettingsData
                         }
+
                     }
+
                 }
 
                 Rectangle {
@@ -655,6 +717,7 @@ Item {
 
                 SettingsSliderRow {
                     id: popoutDurationSlider
+
                     tab: "typography"
                     tags: ["animation", "duration", "custom", "speed", "popout"]
                     settingKey: "popoutCustomAnimationDuration"
@@ -664,31 +727,38 @@ Item {
                     value: Theme.popoutAnimationDuration
                     unit: "ms"
                     defaultValue: 150
-                    onSliderValueChanged: newValue => {
+                    onSliderValueChanged: (newValue) => {
                         if (SettingsData.syncComponentAnimationSpeeds)
                             SettingsData.set("syncComponentAnimationSpeeds", false);
+
                         SettingsData.set("popoutAnimationSpeed", SettingsData.AnimationSpeed.Custom);
                         SettingsData.set("popoutCustomAnimationDuration", newValue);
                     }
 
                     Connections {
-                        target: SettingsData
                         function onPopoutAnimationSpeedChanged() {
                             if (SettingsData.popoutAnimationSpeed === SettingsData.AnimationSpeed.Custom)
-                                return;
+                                return ;
+
                             popoutDurationSlider.value = Theme.popoutAnimationDuration;
                         }
+
+                        target: SettingsData
                     }
 
                     Connections {
-                        target: Theme
                         function onPopoutAnimationDurationChanged() {
                             if (!SettingsData.syncComponentAnimationSpeeds && SettingsData.popoutAnimationSpeed === SettingsData.AnimationSpeed.Custom)
-                                return;
+                                return ;
+
                             popoutDurationSlider.value = Theme.popoutAnimationDuration;
                         }
+
+                        target: Theme
                     }
+
                 }
+
             }
 
             SettingsCard {
@@ -705,6 +775,7 @@ Item {
 
                     DankButtonGroup {
                         id: modalSpeedGroup
+
                         anchors.horizontalCenter: parent.horizontalCenter
                         buttonPadding: parent.width < 480 ? Theme.spacingS : Theme.spacingL
                         minButtonWidth: parent.width < 480 ? 44 : 64
@@ -714,19 +785,24 @@ Item {
                         currentIndex: SettingsData.modalAnimationSpeed
                         onSelectionChanged: (index, selected) => {
                             if (!selected)
-                                return;
+                                return ;
+
                             if (SettingsData.syncComponentAnimationSpeeds)
                                 SettingsData.set("syncComponentAnimationSpeeds", false);
+
                             SettingsData.set("modalAnimationSpeed", index);
                         }
 
                         Connections {
-                            target: SettingsData
                             function onModalAnimationSpeedChanged() {
                                 modalSpeedGroup.currentIndex = SettingsData.modalAnimationSpeed;
                             }
+
+                            target: SettingsData
                         }
+
                     }
+
                 }
 
                 Rectangle {
@@ -738,6 +814,7 @@ Item {
 
                 SettingsSliderRow {
                     id: modalDurationSlider
+
                     tab: "typography"
                     tags: ["animation", "duration", "custom", "speed", "modal"]
                     settingKey: "modalCustomAnimationDuration"
@@ -747,31 +824,38 @@ Item {
                     value: Theme.modalAnimationDuration
                     unit: "ms"
                     defaultValue: 150
-                    onSliderValueChanged: newValue => {
+                    onSliderValueChanged: (newValue) => {
                         if (SettingsData.syncComponentAnimationSpeeds)
                             SettingsData.set("syncComponentAnimationSpeeds", false);
+
                         SettingsData.set("modalAnimationSpeed", SettingsData.AnimationSpeed.Custom);
                         SettingsData.set("modalCustomAnimationDuration", newValue);
                     }
 
                     Connections {
-                        target: SettingsData
                         function onModalAnimationSpeedChanged() {
                             if (SettingsData.modalAnimationSpeed === SettingsData.AnimationSpeed.Custom)
-                                return;
+                                return ;
+
                             modalDurationSlider.value = Theme.modalAnimationDuration;
                         }
+
+                        target: SettingsData
                     }
 
                     Connections {
-                        target: Theme
                         function onModalAnimationDurationChanged() {
                             if (!SettingsData.syncComponentAnimationSpeeds && SettingsData.modalAnimationSpeed === SettingsData.AnimationSpeed.Custom)
-                                return;
+                                return ;
+
                             modalDurationSlider.value = Theme.modalAnimationDuration;
                         }
+
+                        target: Theme
                     }
+
                 }
+
             }
 
             SettingsCard {
@@ -788,15 +872,23 @@ Item {
                     text: I18n.tr("Enable Ripple Effects")
                     description: I18n.tr("Show Material Design ripple animations on interactive elements")
                     checked: SettingsData.enableRippleEffects ?? true
-                    onToggled: newValue => SettingsData.set("enableRippleEffects", newValue)
+                    onToggled: (newValue) => {
+                        return SettingsData.set("enableRippleEffects", newValue);
+                    }
 
                     Connections {
-                        target: SettingsData
                         function onEnableRippleEffectsChanged() {
                         }
+
+                        target: SettingsData
                     }
+
                 }
+
             }
+
         }
+
     }
+
 }
