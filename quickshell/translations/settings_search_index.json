@@ -6301,6 +6301,34 @@
     "description": "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size"
   },
   {
+    "section": "appleMusicAnimatedArtEnabled",
+    "label": "Apple Music animated covers",
+    "tabIndex": 16,
+    "category": "Media Player",
+    "keywords": [
+      "album",
+      "animated",
+      "apple",
+      "artist",
+      "artwork",
+      "available",
+      "cover",
+      "covers",
+      "looping",
+      "media",
+      "mpris",
+      "music",
+      "name",
+      "player",
+      "playing",
+      "sends",
+      "show",
+      "spotify",
+      "video"
+    ],
+    "description": "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple."
+  },
+  {
     "section": "mediaVisualizer",
     "label": "Audio Visualizer",
     "tabIndex": 16,

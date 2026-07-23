@@ -479,6 +479,7 @@ Singleton {
     property bool mediaAdaptiveWidthEnabled: true
     property bool audioVisualizerEnabled: true
     property bool mediaUseAlbumArtAccent: false
+    property bool appleMusicAnimatedArtEnabled: false
     property string audioScrollMode: "volume"
     property int audioWheelScrollAmount: 5
     property bool audioDeviceScrollVolumeEnabled: false

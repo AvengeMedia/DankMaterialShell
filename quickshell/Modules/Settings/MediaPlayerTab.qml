@@ -82,6 +82,15 @@ Item {
                     onToggled: checked => SettingsData.set("mediaUseAlbumArtAccent", checked)
                 }
 
+                SettingsToggleRow {
+                    settingKey: "appleMusicAnimatedArtEnabled"
+                    tags: ["apple", "animated", "video", "artwork", "cover"]
+                    text: I18n.tr("Apple Music animated covers")
+                    description: I18n.tr("Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.")
+                    checked: SettingsData.appleMusicAnimatedArtEnabled
+                    onToggled: checked => SettingsData.set("appleMusicAnimatedArtEnabled", checked)
+                }
+
                 SettingsDropdownRow {
                     property var scrollOptsInternal: ["volume", "song", "nothing"]
                     property var scrollOptsDisplay: [I18n.tr("Change Volume", "media scroll wheel option"), I18n.tr("Change Song", "media scroll wheel option"), I18n.tr("Nothing", "media scroll wheel option")]
