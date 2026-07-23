@@ -122,7 +122,7 @@ Singleton {
 
     Timer {
         id: scrollTimer
-        interval: 50
+        interval: (typeof SettingsData !== "undefined" && SettingsData.powerMode === SettingsData.PowerMode.PowerSaving) ? 150 : 50
         onTriggered: root.scrollToTarget()
     }
 

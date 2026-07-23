@@ -109,7 +109,7 @@ Item {
 
     Timer {
         id: previewSettleTimer
-        interval: 80
+        interval: (typeof SettingsData !== "undefined" && SettingsData.powerMode === SettingsData.PowerMode.PowerSaving) ? 200 : 80
         repeat: true
         onTriggered: {
             if (root.isSeeking || root.committedSeekRatio < 0) {

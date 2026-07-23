@@ -637,7 +637,7 @@ Singleton {
 
     Timer {
         id: groupsDebounce
-        interval: 16
+        interval: (typeof SettingsData !== "undefined" && SettingsData.powerMode === SettingsData.PowerMode.PowerSaving) ? 50 : 16
         repeat: false
         onTriggered: _recomputeGroups()
     }

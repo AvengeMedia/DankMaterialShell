@@ -184,7 +184,7 @@ Item {
 
     // Timer, not FrameAnimation — a running animation commits frames every vsync (#2863)
     Timer {
-        running: blobEffect.visible && root.onScreen
+        running: blobEffect.visible && root.onScreen && (typeof SettingsData === "undefined" || SettingsData.powerMode !== SettingsData.PowerMode.PowerSaving)
         interval: 33
         repeat: true
         onTriggered: root.stepBlob(0.033)
