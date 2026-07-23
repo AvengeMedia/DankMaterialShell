@@ -15,8 +15,10 @@ Item {
     property string socketPath: ""
     readonly property bool socketFound: socketPath.length > 0
     property bool connected: false
-    property bool binaryExists: false
+    readonly property bool binaryExists: launchKind.length > 0
     property bool binaryChecked: false
+    // "dcal" for a host install, "flatpak" for a sandboxed one, "" for neither.
+    property string launchKind: ""
 
     property var calendars: []
     property var events: []
@@ -55,18 +57,20 @@ Item {
 
     Process {
         id: binaryCheck
-        command: ["sh", "-c", "command -v dcal"]
+        command: ["sh", "-c", "if command -v dcal >/dev/null 2>&1; then echo dcal; elif command -v flatpak >/dev/null 2>&1 && flatpak info com.danklinux.dankcalendar >/dev/null 2>&1; then echo flatpak; fi"]
         running: false
-        onExited: code => {
-            root.binaryExists = (code === 0);
-            root.binaryChecked = true;
+        stdout: StdioCollector {
+            onStreamFinished: {
+                root.launchKind = text.trim();
+                root.binaryChecked = true;
+            }
         }
     }
 
     Process {
         id: discoverProcess
         running: false
-        command: ["sh", "-c", "s=\"${DANKCAL_SOCKET:-}\"; if [ -S \"$s\" ]; then echo \"$s\"; exit 0; fi; for f in \"${XDG_RUNTIME_DIR:-/tmp}\"/dankcal-*.sock /tmp/dankcal-*.sock; do [ -S \"$f\" ] || continue; p=$(basename \"$f\" .sock); p=${p#dankcal-}; if kill -0 \"$p\" 2>/dev/null; then echo \"$f\"; exit 0; fi; done"]
+        command: ["sh", "-c", "s=\"${DANKCAL_SOCKET:-}\"; if [ -S \"$s\" ]; then echo \"$s\"; exit 0; fi; for f in \"${XDG_RUNTIME_DIR:-/tmp}\"/app/com.danklinux.dankcalendar/dankcal-*.sock; do if [ -S \"$f\" ]; then echo \"$f\"; exit 0; fi; done; for f in \"${XDG_RUNTIME_DIR:-/tmp}\"/dankcal-*.sock /tmp/dankcal-*.sock; do [ -S \"$f\" ] || continue; p=$(basename \"$f\" .sock); p=${p#dankcal-}; if kill -0 \"$p\" 2>/dev/null; then echo \"$f\"; exit 0; fi; done"]
 
         stdout: StdioCollector {
             onStreamFinished: {
@@ -98,9 +102,16 @@ Item {
     }
 
     function launch() {
-        if (!binaryExists)
+        switch (launchKind) {
+        case "dcal":
+            Quickshell.execDetached(["dcal", "run", "-d", "--hidden"]);
+            break;
+        case "flatpak":
+            Quickshell.execDetached(["flatpak", "run", "com.danklinux.dankcalendar", "run", "-d", "--hidden"]);
+            break;
+        default:
             return;
-        Quickshell.execDetached(["dcal", "run", "-d", "--hidden"]);
+        }
         if (enabled && !connected)
             discoverProcess.running = true;
     }
