@@ -1,0 +1,10 @@
+[tools]
+go = "1.26"
+shellcheck = "0.10"
+golangci-lint = "2.12"
+uv = "0.11"
+prek = "0.4"
+
+# QML tools are not available via mise — use system packages or nix develop.
+# quickshell, qmllint, qmlfmt, Qt6 libraries must come from the system.
+# Python is managed by uv (auto-downloads correct version from .python-version or pyproject.toml).
