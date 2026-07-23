@@ -144,7 +144,7 @@ Singleton {
         Quickshell.execDetached(["mkdir", "-p", stateDir]);
         // shellDir may be an embedded-UI extraction, which is read-only and
         // unexecutable (dankgo shellapp/shellfs makeReadOnly chmods 0444)
-        Quickshell.execDetached(["bash", shellDir + "/scripts/gtk.sh", configDir, "", shellDir, "assets-only"]);
+        Quickshell.execDetached(["bash", shellDir + "/scripts/gtk.sh", configDir, "", "", shellDir]);
         Proc.runCommand("matugenCheck", ["sh", "-c", "command -v matugen"], (output, code) => {
             matugenAvailable = (code === 0) && !envDisableMatugen;
 
@@ -1926,6 +1926,41 @@ Singleton {
         return colors;
     }
 
+    function refreshGtkTheme() {
+        const isLight = (typeof SessionData !== "undefined" && SessionData.isLightMode);
+        const theme = isLight ? "adw-gtk3" : "adw-gtk3-dark";
+        const schema = "org.gnome.desktop.interface";
+        const key = "gtk-theme";
+
+        const makeCmd = (tool, schema, val) => {
+            if (tool === "gsettings") {
+                return `gsettings set ${schema} ${key} '' && gsettings set ${schema} ${key} ${val}`;
+            } else {
+                const dconfPath = `/${schema.replace(/\./g, "/")}`;
+                return `dconf write ${dconfPath}/${key} "''" && dconf write ${dconfPath}/${key} "'${val}'"`;
+            }
+        };
+
+        Proc.runCommand("gtkRefresher", ["sh", "-c", makeCmd("gsettings", schema, theme)], (output, exitCode) => {
+            if (exitCode !== 0) {
+                Proc.runCommand("gtkRefreshFallback", ["sh", "-c", makeCmd("dconf", schema, theme)], (output, exitCode) => {
+                    if (exitCode !== 0) {
+                        log.warn("Failed to refresh gtk-theme");
+                    }
+                });
+            }
+        });
+    }
+
+    function patchGtk3colors() {
+        const isLight = (typeof SessionData !== "undefined" && SessionData.isLightMode);
+        Proc.runCommand("gtk3Patcher", ["bash", shellDir + "/scripts/gtk.sh", configDir, "patch", isLight, shellDir], (output, exitCode) => {
+            if (exitCode !== 0) {
+                log.warn(`Failed to patch GTK3 colors: ${output}`);
+            }
+        });
+    }
+
     function applyGtkColors() {
         if (!matugenAvailable) {
             if (typeof ToastService !== "undefined") {
@@ -1935,7 +1970,7 @@ Singleton {
         }
 
         const isLight = (typeof SessionData !== "undefined" && SessionData.isLightMode) ? "true" : "false";
-        Proc.runCommand("gtkApplier", ["bash", shellDir + "/scripts/gtk.sh", configDir, isLight, shellDir], (output, exitCode) => {
+        Proc.runCommand("gtkApplier", ["bash", shellDir + "/scripts/gtk.sh", configDir, "apply", isLight, shellDir], (output, exitCode) => {
             if (exitCode === 0) {
                 if (typeof ToastService !== "undefined" && typeof NiriService !== "undefined" && !NiriService.matugenSuppression) {
                     ToastService.showInfo(I18n.tr("GTK colors applied successfully"));
@@ -2131,8 +2166,13 @@ Singleton {
                 root.matugenCompleted(currentMode, "error");
             }
 
-            if (!pendingThemeRequest)
+            if (!pendingThemeRequest) {
+                if (SettingsData.matugenTemplateGtk) {
+                    patchGtk3colors();
+                    refreshGtkTheme();
+                }
                 return;
+            }
 
             const req = pendingThemeRequest;
             pendingThemeRequest = null;

@@ -117,7 +117,7 @@ Singleton {
 
     Timer {
         id: colorSchemeSettleTimer
-        interval: 1000
+        interval: 750
         onTriggered: {
             if (!root.canSyncColorScheme())
                 return;
