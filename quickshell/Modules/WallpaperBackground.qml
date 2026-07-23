@@ -798,7 +798,7 @@ Variants {
                 live: root.effectActive
                 mipmap: false
                 recursive: false
-                textureSize: Qt.size(root.textureWidth, root.textureHeight)
+                textureSize: typeof SettingsData !== "undefined" && SettingsData.powerMode === SettingsData.PowerMode.PowerSaving ? Qt.size(root.textureWidth / 2, root.textureHeight / 2) : Qt.size(root.textureWidth, root.textureHeight)
             }
 
             ShaderEffectSource {
@@ -808,7 +808,7 @@ Variants {
                 live: root.effectActive
                 mipmap: false
                 recursive: false
-                textureSize: Qt.size(root.textureWidth, root.textureHeight)
+                textureSize: typeof SettingsData !== "undefined" && SettingsData.powerMode === SettingsData.PowerMode.PowerSaving ? Qt.size(root.textureWidth / 2, root.textureHeight / 2) : Qt.size(root.textureWidth, root.textureHeight)
             }
 
             Rectangle {
@@ -849,7 +849,7 @@ Variants {
                 live: typeof SettingsData !== "undefined" ? SettingsData.powerMode !== SettingsData.PowerMode.PowerSaving : true
                 mipmap: false
                 recursive: false
-                textureSize: Qt.size(imageMetrics.canvasWidth, imageMetrics.canvasHeight)
+                textureSize: typeof SettingsData !== "undefined" && SettingsData.powerMode === SettingsData.PowerMode.PowerSaving ? Qt.size(imageMetrics.canvasWidth / 2, imageMetrics.canvasHeight / 2) : Qt.size(imageMetrics.canvasWidth, imageMetrics.canvasHeight)
             }
 
             // Pre-computed UV parameters for shader

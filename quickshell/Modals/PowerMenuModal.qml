@@ -135,7 +135,7 @@ DankModal {
 
     Timer {
         id: holdTimer
-        interval: 16
+        interval: (typeof SettingsData !== "undefined" && SettingsData.powerMode === SettingsData.PowerMode.PowerSaving) ? 32 : 16
         repeat: true
         onTriggered: {
             root.holdProgress = Math.min(1, root.holdProgress + (interval / root.holdDurationMs));

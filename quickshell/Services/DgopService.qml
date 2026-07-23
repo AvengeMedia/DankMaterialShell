@@ -12,7 +12,7 @@ Singleton {
     readonly property var log: Log.scoped("DgopService")
 
     property int refCount: 0
-    property int updateInterval: refCount > 0 ? 3000 : 30000
+    property int updateInterval: (typeof SettingsData !== "undefined" && SettingsData.powerMode === SettingsData.PowerMode.PowerSaving) ? (refCount > 0 ? 5000 : 30000) : (refCount > 0 ? 3000 : 30000)
     property bool isUpdating: false
     property bool dgopAvailable: false
 
