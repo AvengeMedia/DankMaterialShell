@@ -269,9 +269,9 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
 
             SettingsCard {
                 width: parent.width
-                tags: ["compositor", "notifications", "toast"]
-                title: I18n.tr("Compositor Notifications")
-                settingKey: "compositorNotifications"
+                tags: ["compositor", "toast"]
+                title: I18n.tr("Compositor Toasts")
+                settingKey: "compositorToasts"
                 iconName: "notifications"
                 visible: CompositorService.isNiri || CompositorService.isMango
 

@@ -8872,26 +8872,22 @@
     "description": "Width of window border and focus ring"
   },
   {
-    "section": "compositorNotifications",
-    "label": "Compositor Notifications",
+    "section": "compositorToasts",
+    "label": "Compositor Toasts",
     "tabIndex": 37,
     "category": "Personalization",
     "keywords": [
-      "alert",
-      "alerts",
       "appearance",
       "compositor",
       "config",
       "custom",
       "customize",
-      "notif",
-      "notifications",
-      "notifs",
       "personal",
       "personalization",
       "reloaded",
       "show",
-      "toast"
+      "toast",
+      "toasts"
     ],
     "icon": "notifications",
     "description": "Show a toast when the compositor config is reloaded",
