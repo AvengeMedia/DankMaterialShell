@@ -934,6 +934,7 @@ Singleton {
     property int notificationTimeoutLow: 5000
     property int notificationTimeoutNormal: 5000
     property int notificationTimeoutCritical: 0
+    property bool notificationIgnoreAppTimeout: false
     property bool notificationCompactMode: false
     property bool notificationShowTimeoutBar: false
     property bool notificationDedupeEnabled: true

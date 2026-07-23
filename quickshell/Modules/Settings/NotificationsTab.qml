@@ -844,6 +844,15 @@ Item {
                         }
                     }
                 }
+
+                SettingsToggleRow {
+                    settingKey: "notificationIgnoreAppTimeout"
+                    tags: ["notification", "timeout", "expire", "app", "override", "duration"]
+                    text: I18n.tr("Ignore App-Requested Timeout")
+                    description: I18n.tr("Always use the durations above, even if an app requests a shorter or longer one")
+                    checked: SettingsData.notificationIgnoreAppTimeout
+                    onToggled: checked => SettingsData.set("notificationIgnoreAppTimeout", checked)
+                }
             }
 
             SettingsCard {
