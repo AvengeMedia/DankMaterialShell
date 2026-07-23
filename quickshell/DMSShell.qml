@@ -314,6 +314,17 @@ Item {
         }
     }
 
+    Binding {
+        target: BarWidgetService
+        property: "dockContextMenu"
+        value: dockContextMenuLoader.item
+    }
+    Binding {
+        target: BarWidgetService
+        property: "dockTrashContextMenu"
+        value: dockTrashContextMenuLoader.item
+    }
+
     Connections {
         target: SettingsData
         function onDockShowTrashChanged() {

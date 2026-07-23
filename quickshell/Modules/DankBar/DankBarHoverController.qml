@@ -930,7 +930,8 @@ Item {
         if (_barHovered)
             return;
         const excludedBar = _barExitPending ? barWindow : null;
-        if (cursorOverHoverChain(gx, gy, excludedBar))
+        const staleOverExitedBar = excludedBar?.containsGlobalPoint?.(gx, gy, 0) ?? false;
+        if (!staleOverExitedBar && cursorOverHoverChain(gx, gy, excludedBar))
             return;
         _barExitPending = false;
         closeHoverSurfaces();

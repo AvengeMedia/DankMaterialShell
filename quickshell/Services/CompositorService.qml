@@ -533,43 +533,6 @@ Singleton {
         return false;
     }
 
-    function hasFullscreenToplevelOnScreen(screenOrName) {
-        const screenName = _screenName(screenOrName);
-        if (!screenName)
-            return false;
-
-        if (isNiri) {
-            const active = ToplevelManager.activeToplevel;
-            if (active?.fullscreen && active?.activated && _toplevelOnScreen(active, screenName))
-                return true;
-
-            const filtered = filterCurrentWorkspace(sortedToplevels, screenName);
-            for (let i = 0; i < filtered.length; i++) {
-                if (filtered[i]?.fullscreen)
-                    return true;
-            }
-            return false;
-        }
-
-        if (isHyprland) {
-            const filtered = filterCurrentWorkspace(sortedToplevels, screenName);
-            for (let i = 0; i < filtered.length; i++) {
-                if (filtered[i]?.fullscreen)
-                    return true;
-            }
-            return false;
-        }
-
-        if (!ToplevelManager.toplevels?.values)
-            return false;
-
-        for (const toplevel of ToplevelManager.toplevels.values) {
-            if (toplevel?.fullscreen && _toplevelOnScreen(toplevel, screenName))
-                return true;
-        }
-        return false;
-    }
-
     function _hyprlandToplevelMapped(hyprToplevel) {
         if (!hyprToplevel)
             return false;
@@ -630,12 +593,6 @@ Singleton {
     // Per-screen cache for connectedFrameBlockedOnScreen to avoid recomputing on every consumer binding.
     property var frameBlockedByScreen: ({})
 
-    function _computeConnectedFrameBlocked(screenName) {
-        if (hasFullscreenToplevelOnScreen(screenName))
-            return true;
-        return hyprlandSpecialWorkspaceBlocksConnectedFrame(screenName);
-    }
-
     function _recomputeFrameBlocked() {
         const screens = Quickshell.screens || [];
         const next = {};
@@ -644,7 +601,7 @@ Singleton {
             const name = screens[i]?.name;
             if (!name)
                 continue;
-            const blocked = _computeConnectedFrameBlocked(name);
+            const blocked = hyprlandSpecialWorkspaceBlocksConnectedFrame(name);
             next[name] = blocked;
             if (frameBlockedByScreen[name] !== blocked)
                 changed = true;
@@ -668,7 +625,7 @@ Singleton {
         const cached = frameBlockedByScreen[screenName];
         if (cached !== undefined)
             return cached;
-        return _computeConnectedFrameBlocked(screenName);
+        return hyprlandSpecialWorkspaceBlocksConnectedFrame(screenName);
     }
 
     Connections {
@@ -728,6 +685,23 @@ Singleton {
 
     function usesConnectedFrameChromeForScreen(screenOrName) {
         return FrameTransitionState.effectiveConnectedFrameModeActive && frameWindowVisibleForScreen(screenOrName);
+    }
+
+    // Connected mode renders the bar inside the frame surface. True whenever connected
+    // chrome is configured for the screen, independent of the fullscreen block, so the
+    // standalone bar surface stays suppressed while the frame-hosted bar hides with the frame.
+    function frameHostsSurfacesForScreen(screenOrName) {
+        return FrameTransitionState.effectiveConnectedFrameModeActive && frameConfiguredForScreen(screenOrName);
+    }
+
+    // A surface set to the overlay layer cannot live inside the frame's single top-layer window,
+    // so it stays a standalone window (which resolves itself onto the overlay layer) even in connected mode.
+    function frameHostsBarForConfig(screenOrName, barConfig) {
+        return frameHostsSurfacesForScreen(screenOrName) && !(barConfig?.useOverlayLayer ?? false);
+    }
+
+    function frameHostsDockForScreen(screenOrName) {
+        return frameHostsSurfacesForScreen(screenOrName) && !SettingsData.dockUseOverlayLayer;
     }
 
     function framePeerSurfacesUseOverlayForScreen(screenOrName) {

@@ -32,7 +32,41 @@ PanelWindow {
     }
 
     color: "transparent"
-    mask: Region {}
+    // Click-through everywhere except the bar strips it hosts in connected mode.
+    mask: Region {
+        Region {
+            readonly property bool present: win._connectedActive && win.barEdges.includes("top")
+            x: 0
+            y: 0
+            width: present ? win._windowRegionWidth : 0
+            height: present ? win.cutoutTopInset : 0
+        }
+        Region {
+            readonly property bool present: win._connectedActive && win.barEdges.includes("bottom")
+            x: 0
+            y: present ? win._windowRegionHeight - win.cutoutBottomInset : 0
+            width: present ? win._windowRegionWidth : 0
+            height: present ? win.cutoutBottomInset : 0
+        }
+        Region {
+            readonly property bool present: win._connectedActive && win.barEdges.includes("left")
+            x: 0
+            y: 0
+            width: present ? win.cutoutLeftInset : 0
+            height: present ? win._windowRegionHeight : 0
+        }
+        Region {
+            readonly property bool present: win._connectedActive && win.barEdges.includes("right")
+            x: present ? win._windowRegionWidth - win.cutoutRightInset : 0
+            y: 0
+            width: present ? win.cutoutRightInset : 0
+            height: present ? win._windowRegionHeight : 0
+        }
+        // The frame-hosted dock's hover strip, so hover-reveal works through the frame surface.
+        Region {
+            item: frameDockHostLoader.item ? frameDockHostLoader.item.dockMaskItem : null
+        }
+    }
 
     readonly property var barEdges: {
         SettingsData.barConfigs;
@@ -51,6 +85,16 @@ PanelWindow {
     readonly property var _modalDescriptor: ConnectedModeState.surfaceDescriptor(win._screenName, "modal")
 
     readonly property bool _connectedActive: CompositorService.usesConnectedFrameChromeForScreen(win.targetScreen)
+    readonly property bool _dockHostedHere: {
+        if (!win._connectedActive || !SettingsData.showDock || SettingsData.dockUseOverlayLayer)
+            return false;
+        const screens = SettingsData.getFilteredScreens("dock");
+        for (let i = 0; i < screens.length; i++) {
+            if (screens[i] && screens[i].name === win._screenName)
+                return true;
+        }
+        return false;
+    }
     readonly property string _barSide: {
         const edges = win.barEdges;
         if (edges.includes("top"))
@@ -189,6 +233,33 @@ PanelWindow {
     }
     function _regionInt(value) {
         return Math.max(0, Math.round(Theme.px(value, win._dpr)));
+    }
+
+    function _pointInBand(lx, ly, bx, by, bw, bh, pad) {
+        return lx >= bx - pad && lx < bx + bw + pad && ly >= by - pad && ly < by + bh + pad;
+    }
+
+    function containsGlobalPoint(gx, gy, padding) {
+        if (!win._connectedActive || !win.contentItem)
+            return false;
+        const origin = win.contentItem.mapToItem(null, 0, 0);
+        if (!origin)
+            return false;
+        const pad = padding !== undefined ? padding : 16;
+        const lx = gx - origin.x;
+        const ly = gy - origin.y;
+        const w = win._windowRegionWidth;
+        const h = win._windowRegionHeight;
+        const edges = win.barEdges;
+        if (edges.includes("top") && win._pointInBand(lx, ly, 0, 0, w, win.cutoutTopInset, pad))
+            return true;
+        if (edges.includes("bottom") && win._pointInBand(lx, ly, 0, h - win.cutoutBottomInset, w, win.cutoutBottomInset, pad))
+            return true;
+        if (edges.includes("left") && win._pointInBand(lx, ly, 0, 0, win.cutoutLeftInset, h, pad))
+            return true;
+        if (edges.includes("right") && win._pointInBand(lx, ly, w - win.cutoutRightInset, 0, win.cutoutRightInset, h, pad))
+            return true;
+        return false;
     }
 
     readonly property int cutoutTopInset: win._regionInt(barEdges.includes("top") ? SettingsData.frameBarSize : SettingsData.frameThickness)
@@ -1049,10 +1120,12 @@ PanelWindow {
     }
 
     Component.onCompleted: {
+        KeyboardFocus.registerBarWindow(win);
         win._scheduleBlurRebuild();
         win._scheduleSurfaceRefresh();
     }
     Component.onDestruction: {
+        KeyboardFocus.unregisterBarWindow(win);
         blurRebuildAction.cancel();
         surfaceRefreshAction.cancel();
         win._teardownBlur();
@@ -1100,5 +1173,26 @@ PanelWindow {
         property vector4d chromeCorner3: win._sdfSlots[3].corner
         property vector4d chromeK3: win._sdfSlots[3].k
         property vector4d chromeParam3: win._sdfSlots[3].param
+    }
+
+    Loader {
+        anchors.fill: parent
+        z: 1
+        active: win._connectedActive
+        sourceComponent: FrameBarHost {
+            frameWindow: win
+            targetScreen: win.targetScreen
+        }
+    }
+
+    Loader {
+        id: frameDockHostLoader
+        anchors.fill: parent
+        z: 1
+        active: win._dockHostedHere
+        sourceComponent: FrameDockHost {
+            frameWindow: win
+            targetScreen: win.targetScreen
+        }
     }
 }

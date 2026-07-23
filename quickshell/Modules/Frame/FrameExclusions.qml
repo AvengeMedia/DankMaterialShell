@@ -16,15 +16,33 @@ Scope {
         return SettingsData.getActiveBarEdgesForScreen(screen);
     }
 
-    // One thin invisible PanelWindow per edge.
-    // Skips any edge where a bar already provides its own exclusiveZone.
+    // Overlay-layer bars stay standalone even in connected mode and reserve their own edge.
+    readonly property var overlayBarEdges: {
+        SettingsData.barConfigs;
+        return SettingsData.getOverlayBarEdgesForScreen(root.screen);
+    }
+
+    // One thin invisible PanelWindow per edge. A standalone bar reserves its own edge, so
+    // that edge is skipped — unless the frame hosts the bar (connected mode), where no bar
+    // window exists and the exclusion must reserve the full bar thickness itself.
 
     readonly property bool screenEnabled: CompositorService.frameWindowVisibleForScreen(root.screen)
+    readonly property bool hostsBar: CompositorService.frameHostsSurfacesForScreen(root.screen)
+
+    function hostsBandForEdge(edge) {
+        return root.hostsBar && !root.overlayBarEdges.includes(edge);
+    }
+
+    function exclusionSizeForEdge(edge) {
+        return root.barEdges.includes(edge) ? SettingsData.frameBarSize : SettingsData.frameThickness;
+    }
 
     Loader {
-        active: root.screenEnabled && !root.barEdges.includes("top")
+        readonly property bool isBarEdge: root.barEdges.includes("top")
+        active: root.screenEnabled && (!isBarEdge || root.hostsBandForEdge("top"))
         sourceComponent: EdgeExclusion {
             targetScreen: root.screen
+            exclusionSize: root.exclusionSizeForEdge("top")
             anchorTop: true
             anchorLeft: true
             anchorRight: true
@@ -32,9 +50,11 @@ Scope {
     }
 
     Loader {
-        active: root.screenEnabled && !root.barEdges.includes("bottom")
+        readonly property bool isBarEdge: root.barEdges.includes("bottom")
+        active: root.screenEnabled && (!isBarEdge || root.hostsBandForEdge("bottom"))
         sourceComponent: EdgeExclusion {
             targetScreen: root.screen
+            exclusionSize: root.exclusionSizeForEdge("bottom")
             anchorBottom: true
             anchorLeft: true
             anchorRight: true
@@ -42,9 +62,11 @@ Scope {
     }
 
     Loader {
-        active: root.screenEnabled && !root.barEdges.includes("left")
+        readonly property bool isBarEdge: root.barEdges.includes("left")
+        active: root.screenEnabled && (!isBarEdge || root.hostsBandForEdge("left"))
         sourceComponent: EdgeExclusion {
             targetScreen: root.screen
+            exclusionSize: root.exclusionSizeForEdge("left")
             anchorLeft: true
             anchorTop: true
             anchorBottom: true
@@ -52,9 +74,11 @@ Scope {
     }
 
     Loader {
-        active: root.screenEnabled && !root.barEdges.includes("right")
+        readonly property bool isBarEdge: root.barEdges.includes("right")
+        active: root.screenEnabled && (!isBarEdge || root.hostsBandForEdge("right"))
         sourceComponent: EdgeExclusion {
             targetScreen: root.screen
+            exclusionSize: root.exclusionSizeForEdge("right")
             anchorRight: true
             anchorTop: true
             anchorBottom: true
@@ -63,6 +87,7 @@ Scope {
 
     component EdgeExclusion: PanelWindow {
         required property var targetScreen
+        property real exclusionSize: SettingsData.frameThickness
 
         screen: targetScreen
         property bool anchorTop: false
@@ -72,7 +97,7 @@ Scope {
 
         WlrLayershell.namespace: "dms:frame-exclusion"
         WlrLayershell.layer: WlrLayer.Top
-        exclusiveZone: SettingsData.frameThickness
+        exclusiveZone: exclusionSize
         color: "transparent"
         mask: Region {}
         implicitWidth: 1

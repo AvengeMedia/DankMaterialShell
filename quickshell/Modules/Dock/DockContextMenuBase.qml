@@ -61,6 +61,11 @@ PanelWindow {
         const actualDockHeight = dockBackground ? dockBackground.height : root.dockVisibleHeight;
         const actualDockWidth = dockBackground ? dockBackground.width : dockWindow.width;
         const dockMargin = SettingsData.dockMargin + 16;
+
+        // Connected mode hosts the dock inside the fullscreen frame surface, inset from the
+        // screen edge. Anchor off the dock body's real position instead of the screen edge.
+        const dockBgPos = dockBackground ? dockBackground.mapToItem(dockWindow.contentItem, 0, 0) : null;
+        const frameHosted = dockBgPos && dockWindow.width >= screen.width - 1 && dockWindow.height >= screen.height - 1;
         let x = 0;
         let y = 0;
 
@@ -68,14 +73,14 @@ PanelWindow {
         case SettingsData.Position.Left:
             {
                 const dockTopMargin = Math.round((screen.height - dockWindow.height) / 2);
-                x = actualDockWidth + dockMargin + 20;
+                x = frameHosted ? (dockBgPos.x + actualDockWidth + dockMargin + 20) : (actualDockWidth + dockMargin + 20);
                 y = dockTopMargin + buttonPosInDock.y + anchorItem.height / 2;
                 break;
             }
         case SettingsData.Position.Right:
             {
                 const dockTopMargin = Math.round((screen.height - dockWindow.height) / 2);
-                x = screen.width - actualDockWidth - dockMargin - 20;
+                x = frameHosted ? (dockBgPos.x - dockMargin - 20) : (screen.width - actualDockWidth - dockMargin - 20);
                 y = dockTopMargin + buttonPosInDock.y + anchorItem.height / 2;
                 break;
             }
@@ -83,7 +88,7 @@ PanelWindow {
             {
                 const dockLeftMargin = Math.round((screen.width - dockWindow.width) / 2);
                 x = dockLeftMargin + buttonPosInDock.x + anchorItem.width / 2;
-                y = actualDockHeight + dockMargin + 20;
+                y = frameHosted ? (dockBgPos.y + actualDockHeight + dockMargin + 20) : (actualDockHeight + dockMargin + 20);
                 break;
             }
         case SettingsData.Position.Bottom:
@@ -91,7 +96,7 @@ PanelWindow {
             {
                 const dockLeftMargin = Math.round((screen.width - dockWindow.width) / 2);
                 x = dockLeftMargin + buttonPosInDock.x + anchorItem.width / 2;
-                y = screen.height - actualDockHeight - dockMargin - 20;
+                y = frameHosted ? (dockBgPos.y - dockMargin - 20) : (screen.height - actualDockHeight - dockMargin - 20);
                 break;
             }
         }

@@ -215,6 +215,9 @@ Item {
     // keep the bg window in active-update mode.
     property bool _bgCommitWindow: false
 
+    // True only while the overlay is actually on screen, not merely declared.
+    readonly property bool _overlayActive: overlayLoader.item?.visible ?? false
+
     Timer {
         id: bgCommitSettleTimer
         interval: 250
@@ -236,6 +239,9 @@ Item {
             return;
         _blurCommitSuppress = true;
         blurCommitPulseTimer.restart();
+        // Land the off->on toggle on a commit even after _overlayActive has dropped.
+        _bgCommitWindow = true;
+        bgCommitSettleTimer.restart();
     }
 
     Connections {
@@ -563,10 +569,9 @@ Item {
         screen: root.surfaceScreen
         visible: false
         color: "transparent"
-        // Skip buffer updates when there's nothing to render. Briefly flipped
-        // true via _bgCommitWindow when _surfaceBodyW/H changes so the
-        // contentHoleRect mask carve-out actually commits to the compositor.
-        updatesEnabled: !root._blurCommitSuppress && (root.overlayContent !== null || root._bgCommitWindow)
+        // Idle full-screen surface skips buffer updates, else it damages the whole screen
+        // every frame. Live while an overlay shows or _bgCommitWindow flushes a mask change.
+        updatesEnabled: !root._blurCommitSuppress && (root._overlayActive || root._bgCommitWindow)
 
         WlrLayershell.namespace: root.layerNamespace + ":background"
         WlrLayershell.layer: root.effectivePopoutLayer
