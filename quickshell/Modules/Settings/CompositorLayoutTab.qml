@@ -270,8 +270,8 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
             SettingsCard {
                 width: parent.width
                 tags: ["compositor", "toast"]
-                title: I18n.tr("Compositor Toasts")
-                settingKey: "compositorToasts"
+                title: I18n.tr("Notifications")
+                settingKey: "compositorNotifications"
                 iconName: "notifications"
                 visible: CompositorService.isNiri || CompositorService.isMango
 

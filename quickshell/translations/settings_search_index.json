@@ -8872,28 +8872,6 @@
     "description": "Width of window border and focus ring"
   },
   {
-    "section": "compositorToasts",
-    "label": "Compositor Toasts",
-    "tabIndex": 37,
-    "category": "Personalization",
-    "keywords": [
-      "appearance",
-      "compositor",
-      "config",
-      "custom",
-      "customize",
-      "personal",
-      "personalization",
-      "reloaded",
-      "show",
-      "toast",
-      "toasts"
-    ],
-    "icon": "notifications",
-    "description": "Show a toast when the compositor config is reloaded",
-    "conditionKey": "isNiri"
-  },
-  {
     "section": "hyprlandLayoutBarXrayEnabled",
     "label": "Frame Xray",
     "tabIndex": 37,
@@ -9090,6 +9068,32 @@
       "windows"
     ],
     "description": "Space between windows"
+  },
+  {
+    "section": "compositorNotifications",
+    "label": "Notifications",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "alert",
+      "alerts",
+      "appearance",
+      "compositor",
+      "config",
+      "custom",
+      "customize",
+      "notif",
+      "notifications",
+      "notifs",
+      "personal",
+      "personalization",
+      "reloaded",
+      "show",
+      "toast"
+    ],
+    "icon": "notifications",
+    "description": "Show a toast when the compositor config is reloaded",
+    "conditionKey": "isNiri"
   },
   {
     "section": "hyprlandLayoutGapsOutOverride",
