@@ -73,6 +73,12 @@ Singleton {
         VeryHigh
     }
 
+    enum PowerMode {
+        Normal,
+        Balanced,
+        PowerSaving
+    }
+
     readonly property string _homeUrl: StandardPaths.writableLocation(StandardPaths.HomeLocation)
     readonly property string _configUrl: StandardPaths.writableLocation(StandardPaths.ConfigLocation)
     readonly property string _configDir: Paths.strip(_configUrl)
@@ -241,6 +247,31 @@ Singleton {
     onM3ElevationColorModeChanged: saveSettings()
     property string m3ElevationLightDirection: "top"
     onM3ElevationLightDirectionChanged: saveSettings()
+    property int powerMode: SettingsData.PowerMode.Normal
+    onPowerModeChanged: saveSettings()
+    property bool syncPowerModeWithSystem: false
+    onSyncPowerModeWithSystemChanged: saveSettings()
+
+    Connections {
+        target: typeof PowerProfileWatcher !== "undefined" ? PowerProfileWatcher : null
+        enabled: SettingsData.syncPowerModeWithSystem
+
+        function onProfileChanged(profile) {
+            if (typeof PowerProfile === "undefined")
+                return;
+            switch (profile) {
+            case PowerProfile.PowerSaver:
+                root.powerMode = SettingsData.PowerMode.PowerSaving;
+                break;
+            case PowerProfile.Balanced:
+                root.powerMode = SettingsData.PowerMode.Balanced;
+                break;
+            case PowerProfile.Performance:
+                root.powerMode = SettingsData.PowerMode.Normal;
+                break;
+            }
+        }
+    }
     property string m3ElevationCustomColor: "#000000"
     onM3ElevationCustomColorChanged: saveSettings()
     property bool modalElevationEnabled: true
