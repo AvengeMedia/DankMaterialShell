@@ -533,6 +533,7 @@ var SPEC = {
     customPowerActionHibernate: { def: "" },
     customPowerActionReboot: { def: "" },
     customPowerActionPowerOff: { def: "" },
+    customPowerButtons: { def: [] },
 
     updaterHideWidget: { def: false },
     updaterCheckOnStart: { def: false },
