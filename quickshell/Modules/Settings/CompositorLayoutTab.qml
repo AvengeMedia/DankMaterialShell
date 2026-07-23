@@ -269,6 +269,24 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
 
             SettingsCard {
                 width: parent.width
+                tags: ["compositor", "toast"]
+                title: I18n.tr("Notifications")
+                settingKey: "compositorNotifications"
+                iconName: "notifications"
+                visible: CompositorService.isNiri || CompositorService.isMango
+
+                SettingsToggleRow {
+                    tags: ["compositor", "toast", "reload"]
+                    settingKey: "showConfigReloadToast"
+                    text: I18n.tr("Show \"config reloaded\" Toast")
+                    description: I18n.tr("Show a toast when the compositor config is reloaded")
+                    checked: SessionData.showConfigReloadToast
+                    onToggled: checked => SessionData.showConfigReloadToast = checked
+                }
+            }
+
+            SettingsCard {
+                width: parent.width
                 tags: ["niri", "layout", "gaps", "radius", "window", "border"]
                 title: I18n.tr("%1 Layout Overrides").arg("niri")
                 settingKey: "niriLayout"

@@ -98,7 +98,8 @@ var SPEC = {
     niriOverviewLastMode: { def: "apps" },
 
     settingsSidebarExpandedIds: { def: "," },
-    settingsSidebarCollapsedIds: { def: "," }
+    settingsSidebarCollapsedIds: { def: "," },
+    showConfigReloadToast: { def: true }
 };
 
 function getValidKeys() {
