@@ -27,10 +27,13 @@ Item {
     function hide() {
         if (isKeyboardActive && keyboard !== null) {
             keyboard.destroy();
+            keyboard = null;
             isKeyboardActive = false;
         } else
             log.debug("The keyboard is already hidden");
     }
+
+    Component.onDestruction: hide()
 
     // private
     property Item keyboard: null
