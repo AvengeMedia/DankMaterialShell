@@ -438,20 +438,55 @@ Variants {
             parent: dock.contentItem
             visible: false
             readonly property bool expanded: dock.reveal
+            readonly property bool chrome: dock.usesConnectedFrameChrome
+            readonly property bool atEndEdge: SettingsData.dockPosition === SettingsData.Position.Bottom || SettingsData.dockPosition === SettingsData.Position.Right
+            readonly property real innerReach: borderThickness + (SettingsData.appsDockEnlargeOnHover ? animationHeadroom : 0)
+            readonly property real bodyX: dockBackground.x + dockContainer.x + dockMouseArea.x + dockCore.x + dockSlide.x
+            readonly property real bodyY: dockBackground.y + dockContainer.y + dockMouseArea.y + dockCore.y + dockSlide.y
             x: {
-                const baseX = dockCore.x + dockMouseArea.x;
-                if (isVertical && SettingsData.dockPosition === SettingsData.Position.Right)
-                    return baseX - (expanded ? animationHeadroom + borderThickness + dock.horizontalConnectorExtent : 0);
-                return baseX - (expanded ? borderThickness + dock.horizontalConnectorExtent : 0);
+                if (chrome) {
+                    const baseX = dockCore.x + dockMouseArea.x;
+                    if (isVertical && atEndEdge)
+                        return baseX - (expanded ? animationHeadroom + borderThickness + dock.horizontalConnectorExtent : 0);
+                    return baseX - (expanded ? borderThickness + dock.horizontalConnectorExtent : 0);
+                }
+                if (!isVertical)
+                    return dockCore.x + dockMouseArea.x - (expanded ? borderThickness : 0);
+                if (!atEndEdge)
+                    return 0;
+                return expanded ? Math.min(bodyX - innerReach, dock.width - 1) : dock.width - 1;
             }
             y: {
-                const baseY = dockCore.y + dockMouseArea.y;
-                if (!isVertical && SettingsData.dockPosition === SettingsData.Position.Bottom)
-                    return baseY - (expanded ? animationHeadroom + borderThickness + dock.verticalConnectorExtent : 0);
-                return baseY - (expanded ? borderThickness + dock.verticalConnectorExtent : 0);
+                if (chrome) {
+                    const baseY = dockCore.y + dockMouseArea.y;
+                    if (!isVertical && atEndEdge)
+                        return baseY - (expanded ? animationHeadroom + borderThickness + dock.verticalConnectorExtent : 0);
+                    return baseY - (expanded ? borderThickness + dock.verticalConnectorExtent : 0);
+                }
+                if (isVertical)
+                    return dockCore.y + dockMouseArea.y - (expanded ? borderThickness : 0);
+                if (!atEndEdge)
+                    return 0;
+                return expanded ? Math.min(bodyY - innerReach, dock.height - 1) : dock.height - 1;
             }
-            width: dockMouseArea.width + (isVertical && expanded ? animationHeadroom : 0) + (expanded ? borderThickness * 2 + dock.horizontalConnectorExtent * 2 : 0)
-            height: dockMouseArea.height + (!isVertical && expanded ? animationHeadroom : 0) + (expanded ? borderThickness * 2 + dock.verticalConnectorExtent * 2 : 0)
+            width: {
+                if (chrome)
+                    return dockMouseArea.width + (isVertical && expanded ? animationHeadroom : 0) + (expanded ? borderThickness * 2 + dock.horizontalConnectorExtent * 2 : 0);
+                if (!isVertical)
+                    return dockMouseArea.width + (expanded ? borderThickness * 2 : 0);
+                if (!expanded)
+                    return 1;
+                return atEndEdge ? dock.width - x : Math.max(bodyX + dockBackground.width + innerReach, 1);
+            }
+            height: {
+                if (chrome)
+                    return dockMouseArea.height + (!isVertical && expanded ? animationHeadroom : 0) + (expanded ? borderThickness * 2 + dock.verticalConnectorExtent * 2 : 0);
+                if (isVertical)
+                    return dockMouseArea.height + (expanded ? borderThickness * 2 : 0);
+                if (!expanded)
+                    return 1;
+                return atEndEdge ? dock.height - y : Math.max(bodyY + dockBackground.height + innerReach, 1);
+            }
         }
 
         mask: Region {
