@@ -12,6 +12,7 @@ import (
 	"time"
 
 	wlclient "github.com/AvengeMedia/DankMaterialShell/core/pkg/go-wayland/wayland/client"
+	"github.com/AvengeMedia/dankgo/boottimer"
 	"github.com/godbus/dbus/v5"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/errdefs"
@@ -22,9 +23,6 @@ import (
 )
 
 const animKelvinStep = 25
-
-// Go timers freeze during suspend; cap sleeps so wall-clock deadlines can't be missed.
-const maxScheduleWait = 5 * time.Minute
 
 func NewManager(display wlclient.WaylandDisplay, config Config) (*Manager, error) {
 	if err := config.Validate(); err != nil {
@@ -752,7 +750,8 @@ func (m *Manager) schedulerLoop() {
 		m.post(func() { m.applyCurrentTemp("startup") })
 	}
 
-	var timer *time.Timer
+	timer := boottimer.New(24 * time.Hour)
+	defer timer.Stop()
 	for {
 		m.configMutex.RLock()
 		enabled := m.config.Enabled
@@ -761,31 +760,19 @@ func (m *Manager) schedulerLoop() {
 		now := time.Now()
 		m.recalcSchedule(now)
 
-		var waitDur time.Duration
+		waitDur := 24 * time.Hour
 		if enabled {
 			deadline := m.getNextDeadline(now)
-			waitDur = time.Until(deadline)
-			switch {
-			case waitDur < time.Second:
+			if waitDur = time.Until(deadline); waitDur < time.Second {
 				waitDur = time.Second
-			case waitDur > maxScheduleWait:
-				waitDur = maxScheduleWait
 			}
-		} else {
-			waitDur = 24 * time.Hour
 		}
-
-		if timer != nil {
-			timer.Stop()
-		}
-		timer = time.NewTimer(waitDur)
+		timer.Reset(waitDur)
 
 		select {
 		case <-m.stopChan:
-			timer.Stop()
 			return
 		case <-m.updateTrigger:
-			timer.Stop()
 			m.scheduleMutex.Lock()
 			m.schedule.calcDay = time.Time{}
 			m.scheduleMutex.Unlock()
@@ -1086,14 +1073,11 @@ func (m *Manager) handleResume() {
 	}
 
 	// Compositor gamma state is unknown after resume; force a resend (#1235)
-	// and re-arm the scheduler timer, which froze during suspend.
 	m.outputs.Range(func(_ uint32, out *outputState) bool {
 		out.lastTemp = 0
 		return true
 	})
-	m.recalcSchedule(time.Now())
 	m.applyCurrentTemp("resume")
-	m.triggerUpdate()
 }
 
 func (m *Manager) triggerUpdate() {
