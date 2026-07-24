@@ -65,6 +65,11 @@ DankOSD {
             width: parent.width - Theme.spacingS * 2
             height: 40
 
+            MouseArea {
+                anchors.fill: parent
+                onClicked: root.hide()
+            }
+
             Rectangle {
                 width: Theme.iconSize
                 height: Theme.iconSize
@@ -136,6 +141,11 @@ DankOSD {
         Item {
             anchors.fill: parent
             property int gap: Theme.spacingS
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: root.hide()
+            }
 
             Rectangle {
                 width: Theme.iconSize
