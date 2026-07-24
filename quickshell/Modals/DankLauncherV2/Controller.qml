@@ -436,6 +436,13 @@ Item {
         onTriggered: root.performFileSearch()
     }
 
+    Timer {
+        id: appSearchDebounce
+        interval: 75
+        repeat: false
+        onTriggered: performSearch()
+    }
+
     function getOrTransformApp(app) {
         return AppSearchService.getOrTransformApp(app, transformApp);
     }
@@ -447,7 +454,11 @@ Item {
         _phase1Items = [];
         pluginPhaseTimer.stop();
         searchQuery = query;
-        requestSearch();
+        if (searchMode === "files" || query.startsWith("/")) {
+            requestSearch();
+        } else {
+            appSearchDebounce.restart();
+        }
 
         if (autoSwitchedToFiles && !query.startsWith("/")) {
             restorePreviousMode();

@@ -21,6 +21,10 @@ Singleton {
     property var _cachedDefaultFlatModel: []
     property bool _defaultCacheValid: false
     property int cacheVersion: 0
+    property var _normalizedApps: []
+    property string _cachedSearchQuery: ""
+    property var _cachedSearchResults: []
+    property int _cachedSearchVersion: 0
 
     readonly property int maxResults: 10
     readonly property int frecencySampleSize: 10
@@ -53,6 +57,7 @@ Singleton {
         _cachedCategories = null;
         _cachedVisibleApps = null;
         invalidateLauncherCache();
+        _rebuildNormalizedApps();
     }
 
     function invalidateLauncherCache() {
@@ -60,7 +65,26 @@ Singleton {
         _defaultCacheValid = false;
         _cachedDefaultSections = [];
         _cachedDefaultFlatModel = [];
+        _normalizedApps = [];
+        _cachedSearchQuery = "";
+        _cachedSearchResults = [];
         cacheVersion++;
+    }
+
+    function _rebuildNormalizedApps() {
+        const visible = getVisibleApplications();
+        const normalized = [];
+        for (const app of visible) {
+            normalized.push({
+                "app": app,
+                "name": (app.name || "").toLowerCase(),
+                "genericName": (app.genericName || "").toLowerCase(),
+                "comment": (app.comment || "").toLowerCase(),
+                "id": (app.id || "").toLowerCase(),
+                "keywords": app.keywords ? app.keywords.map(k => k.toLowerCase()) : []
+            });
+        }
+        _normalizedApps = normalized;
     }
 
     function getOrTransformApp(app, transformFn) {
@@ -103,6 +127,7 @@ Singleton {
     function _rebuildHiddenSet() {
         _hiddenAppsSet = new Set(SessionData.hiddenApps || []);
         _cachedVisibleApps = null;
+        _rebuildNormalizedApps();
     }
 
     function isAppHidden(app) {
@@ -132,12 +157,13 @@ Singleton {
     Connections {
         target: SessionData
         function onHiddenAppsChanged() {
-            root._rebuildHiddenSet();
             root.invalidateLauncherCache();
+            root._rebuildHiddenSet();
         }
         function onAppOverridesChanged() {
             root._cachedVisibleApps = null;
             root.invalidateLauncherCache();
+            root._rebuildNormalizedApps();
         }
     }
 
@@ -515,18 +541,24 @@ Singleton {
             return getVisibleApplications();
         if (applications.length === 0)
             return [];
+        if (query === _cachedSearchQuery && cacheVersion === _cachedSearchVersion && _cachedSearchResults.length > 0) {
+            return _cachedSearchResults;
+        }
+        if (_normalizedApps.length === 0)
+            _rebuildNormalizedApps();
 
         const queryLower = query.toLowerCase().trim();
         const scoredApps = [];
-        const results = [];
+        const matchedApps = [];
         const visibleApps = getVisibleApplications();
 
-        for (const app of visibleApps) {
-            const name = (app.name || "").toLowerCase();
-            const genericName = (app.genericName || "").toLowerCase();
-            const comment = (app.comment || "").toLowerCase();
-            const id = (app.id || "").toLowerCase();
-            const keywords = app.keywords ? app.keywords.map(k => k.toLowerCase()) : [];
+        for (const entry of _normalizedApps) {
+            const app = entry.app;
+            const name = entry.name;
+            const genericName = entry.genericName;
+            const comment = entry.comment;
+            const id = entry.id;
+            const keywords = entry.keywords;
 
             let textScore = 0;
             let matchType = "none";
@@ -573,7 +605,7 @@ Singleton {
                 matchType = "comment";
             }
 
-            if (matchType === "none") {
+            if (matchType === "none" && matchedApps.length < maxResults) {
                 const fuzzyScore = fuzzyMatchScore(name, queryLower);
                 if (fuzzyScore > 0) {
                     textScore = fuzzyScore * 100;
@@ -584,7 +616,7 @@ Singleton {
             if (matchType !== "none") {
                 const frecencyData = calculateFrecency(app);
 
-                results.push({
+                matchedApps.push({
                     "app": app,
                     "textScore": textScore,
                     "frecency": frecencyData.frecency,
@@ -594,7 +626,7 @@ Singleton {
             }
         }
 
-        for (const result of results) {
+        for (const result of matchedApps) {
             const frecencyBonus = result.frecency > 0 ? Math.min(result.frecency, 2000) : 0;
             const recencyBonus = result.daysSinceUsed < 1 ? 1500 : result.daysSinceUsed < 7 ? 1000 : result.daysSinceUsed < 30 ? 500 : 0;
 
@@ -617,7 +649,11 @@ Singleton {
         }
 
         scoredApps.sort((a, b) => b.score - a.score);
-        return scoredApps.slice(0, maxResults).map(item => item.app);
+        const results = scoredApps.slice(0, maxResults).map(item => item.app);
+        _cachedSearchQuery = query;
+        _cachedSearchResults = results;
+        _cachedSearchVersion = cacheVersion;
+        return results;
     }
 
     function searchAppActions(query, apps) {
