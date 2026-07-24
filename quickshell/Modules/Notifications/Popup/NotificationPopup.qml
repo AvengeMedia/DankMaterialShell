@@ -45,6 +45,14 @@ PanelWindow {
         blurWidth: !win._finalized && !win.connectedFrameMode ? innerW * s : 0
         blurHeight: !win._finalized && !win.connectedFrameMode ? innerH * s : 0
         blurRadius: win.connectedFrameMode ? Theme.connectedSurfaceRadius : Theme.cornerRadius
+        // Slide-out translates the card past the surface edge; intersecting with the
+        // resting bounds keeps the committed region on the visible content instead of
+        // leaving a stray blur sliver at the edge (#2917).
+        clipEnabled: true
+        clipX: content.x + content.cardInset
+        clipY: content.y + content.cardInset
+        clipWidth: innerW
+        clipHeight: innerH
     }
 
     WlrLayershell.namespace: "dms:notification-popup"
