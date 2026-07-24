@@ -21,6 +21,7 @@ Singleton {
     property var sessionPaths: []
     property var sessionDesktopIds: []
     property int currentSessionIndex: 0
+    property bool sessionManuallySelected: false
     property var availableUsers: []
     property int selectedUserIndex: -1
 
