@@ -479,6 +479,8 @@ Item {
 
                 delegate: Item {
                     id: delegateItem
+                    required property var modelData
+                    required property int index
 
                     property var dockButton: {
                         switch (itemData.type) {
@@ -599,7 +601,7 @@ Item {
                         height: delegateItem.height
                         actualIconSize: root.iconSize
                         dockApps: root
-                        index: model.index
+                        index: delegateItem.index
                     }
 
                     DockTrashButton {
@@ -624,7 +626,7 @@ Item {
                         appData: itemData
                         contextMenu: root.contextMenu
                         dockApps: root
-                        index: model.index
+                        index: delegateItem.index
                         parentDockScreen: root.dockScreen
                         showWindowTitle: itemData?.type === "window" || itemData?.type === "grouped"
                         windowTitle: {
