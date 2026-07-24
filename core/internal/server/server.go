@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"runtime/debug"
 	"sync"
-	"sync/atomic"
 	"time"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/geolocation"
@@ -80,8 +79,8 @@ var geoClientInstance geolocation.Client
 const dbusClientID = "dms-dbus-client"
 
 var capabilitySubscribers syncmap.Map[string, chan ServerInfo]
-var cupsSubscribers syncmap.Map[string, bool]
-var cupsSubscriberCount atomic.Int32
+var cupsMu sync.Mutex
+var cupsSubscriberCount int
 
 var appPaths = paths.New("danklinux")
 
@@ -174,17 +173,55 @@ func InitializeAppPickerManager() error {
 	return nil
 }
 
-func InitializeCupsManager() error {
+func initializeCupsManagerLocked() (bool, error) {
+	if cupsManager != nil {
+		return false, nil
+	}
 	manager, err := cups.NewManager()
 	if err != nil {
 		log.Warnf("Failed to initialize cups manager: %v", err)
-		return err
+		return false, err
 	}
-
 	cupsManager = manager
-
 	log.Info("CUPS manager initialized")
-	return nil
+	return true, nil
+}
+
+func ensureCupsManager() (*cups.Manager, error) {
+	cupsMu.Lock()
+	created, err := initializeCupsManagerLocked()
+	mgr := cupsManager
+	cupsMu.Unlock()
+	if err != nil {
+		return nil, err
+	}
+	if created {
+		notifyCapabilityChange()
+	}
+	return mgr, nil
+}
+
+func cupsAvailable() bool {
+	cupsMu.Lock()
+	defer cupsMu.Unlock()
+	return cupsManager != nil
+}
+
+func releaseCupsSubscriber() {
+	cupsMu.Lock()
+	cupsSubscriberCount--
+	var mgr *cups.Manager
+	if cupsSubscriberCount == 0 && cupsManager != nil {
+		mgr = cupsManager
+		cupsManager = nil
+	}
+	cupsMu.Unlock()
+	if mgr == nil {
+		return
+	}
+	log.Info("Last CUPS subscriber disconnected, shutting down CUPS manager")
+	mgr.Close()
+	notifyCapabilityChange()
 }
 
 func InitializeBrightnessManager() error {
@@ -379,7 +416,7 @@ func getCapabilities() Capabilities {
 		caps = append(caps, "browser")
 	}
 
-	if cupsManager != nil {
+	if cupsAvailable() {
 		caps = append(caps, "cups")
 	}
 
@@ -449,7 +486,7 @@ func getServerInfo() ServerInfo {
 		caps = append(caps, "browser")
 	}
 
-	if cupsManager != nil {
+	if cupsAvailable() {
 		caps = append(caps, "cups")
 	}
 
@@ -913,38 +950,31 @@ func handleSubscribe(conn *models.Conn, req models.Request) {
 	}
 
 	if shouldSubscribe("cups") {
-		cupsSubscribers.Store(clientID+"-cups", true)
-		count := cupsSubscriberCount.Add(1)
+		cupsMu.Lock()
+		cupsSubscriberCount++
+		created, err := initializeCupsManagerLocked()
+		mgr := cupsManager
+		cupsMu.Unlock()
 
-		if count == 1 {
-			if err := InitializeCupsManager(); err != nil {
-				log.Warnf("Failed to initialize CUPS manager for subscription: %v", err)
-			} else {
-				notifyCapabilityChange()
-			}
+		if err != nil {
+			log.Warnf("Failed to initialize CUPS manager for subscription: %v", err)
+		} else if created {
+			notifyCapabilityChange()
 		}
 
-		if cupsManager != nil {
+		if mgr == nil {
+			releaseCupsSubscriber()
+		} else {
 			wg.Add(1)
-			cupsChan := cupsManager.Subscribe(clientID + "-cups")
+			cupsChan := mgr.Subscribe(clientID + "-cups")
 			go func() {
 				defer wg.Done()
 				defer func() {
-					cupsManager.Unsubscribe(clientID + "-cups")
-					cupsSubscribers.Delete(clientID + "-cups")
-					count := cupsSubscriberCount.Add(-1)
-
-					if count == 0 {
-						log.Info("Last CUPS subscriber disconnected, shutting down CUPS manager")
-						if cupsManager != nil {
-							cupsManager.Close()
-							cupsManager = nil
-							notifyCapabilityChange()
-						}
-					}
+					mgr.Unsubscribe(clientID + "-cups")
+					releaseCupsSubscriber()
 				}()
 
-				initialState := cupsManager.GetState()
+				initialState := mgr.GetState()
 				select {
 				case eventChan <- ServiceEvent{Service: "cups", Data: initialState}:
 				case <-stopChan:
@@ -1254,9 +1284,12 @@ func cleanupManagers() {
 	if appPickerManager != nil {
 		appPickerManager.Close()
 	}
+	cupsMu.Lock()
 	if cupsManager != nil {
 		cupsManager.Close()
+		cupsManager = nil
 	}
+	cupsMu.Unlock()
 	if brightnessManager != nil {
 		brightnessManager.Close()
 	}

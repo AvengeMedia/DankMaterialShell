@@ -116,11 +116,12 @@ func RouteRequest(conn *models.Conn, req models.Request) {
 	}
 
 	if strings.HasPrefix(req.Method, "cups.") {
-		if cupsManager == nil {
+		mgr, err := ensureCupsManager()
+		if err != nil {
 			models.RespondError(conn, req.ID, "CUPS manager not initialized")
 			return
 		}
-		cups.HandleRequest(conn, req, cupsManager)
+		cups.HandleRequest(conn, req, mgr)
 		return
 	}
 
