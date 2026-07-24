@@ -43,10 +43,10 @@ func NewManager() (*Manager, error) {
 	broker := NewSubscriptionBroker(m.broadcastPairingPrompt)
 	m.promptBroker = broker
 
-	adapter, err := m.findAdapter()
+	adapter, err := findAdapter(conn)
 	if err != nil {
 		conn.Close()
-		return nil, fmt.Errorf("no bluetooth adapter found: %w", err)
+		return nil, err
 	}
 	m.adapterPath = adapter
 
@@ -74,12 +74,12 @@ func NewManager() (*Manager, error) {
 	return m, nil
 }
 
-func (m *Manager) findAdapter() (dbus.ObjectPath, error) {
-	obj := m.dbusConn.Object(bluezService, dbus.ObjectPath("/"))
+func findAdapter(conn *dbus.Conn) (dbus.ObjectPath, error) {
+	obj := conn.Object(bluezService, dbus.ObjectPath("/"))
 	var objects map[dbus.ObjectPath]map[string]map[string]dbus.Variant
 
 	if err := obj.Call(objectMgrIface+".GetManagedObjects", 0).Store(&objects); err != nil {
-		return "", err
+		return "", fmt.Errorf("%w: %v", ErrNoAdapter, err)
 	}
 
 	for path, interfaces := range objects {
@@ -89,7 +89,7 @@ func (m *Manager) findAdapter() (dbus.ObjectPath, error) {
 		}
 	}
 
-	return "", fmt.Errorf("no adapter found")
+	return "", ErrNoAdapter
 }
 
 func (m *Manager) initialize() error {
@@ -487,6 +487,11 @@ func (m *Manager) StopDiscovery() error {
 }
 
 func (m *Manager) SetPowered(powered bool) error {
+	if powered {
+		if err := rfkillUnblockBluetooth(); err != nil {
+			log.Debugf("[BluezManager] rfkill unblock failed: %v", err)
+		}
+	}
 	obj := m.dbusConn.Object(bluezService, m.adapterPath)
 	return obj.Call(propertiesIface+".Set", 0, adapter1Iface, "Powered", dbus.MakeVariant(powered)).Err
 }

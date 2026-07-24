@@ -1731,10 +1731,21 @@ func Start(printDocs bool) error {
 	}()
 
 	go func() {
-		if err := InitializeBluezManager(); err != nil {
+		for {
+			err := InitializeBluezManager()
+			if err == nil {
+				notifyCapabilityChange()
+				return
+			}
 			log.Warnf("Bluez manager unavailable: %v", err)
-		} else {
-			notifyCapabilityChange()
+			if !errors.Is(err, bluez.ErrNoAdapter) {
+				return
+			}
+			if err := bluez.WaitForAdapter(); err != nil {
+				log.Warnf("Bluetooth adapter watch failed: %v", err)
+				return
+			}
+			log.Info("Bluetooth adapter appeared, initializing bluez manager")
 		}
 	}()
 

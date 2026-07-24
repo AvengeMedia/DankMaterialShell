@@ -335,6 +335,7 @@ Singleton {
         const data = response.result.data;
 
         if (service === "server") {
+            const prevCapabilities = capabilities;
             apiVersion = data.apiVersion || 0;
             cliVersion = data.cliVersion || "";
             capabilities = data.capabilities || [];
@@ -346,6 +347,12 @@ Singleton {
             }
 
             capabilitiesReceived();
+
+            const capabilitiesChanged = prevCapabilities.length !== capabilities.length || capabilities.some(c => !prevCapabilities.includes(c));
+            if (prevCapabilities.length > 0 && capabilitiesChanged) {
+                log.info("Capabilities changed, resubscribing");
+                subscribe(activeSubscriptions);
+            }
         } else if (service === "network") {
             networkStateUpdate(data);
         } else if (service === "network.credentials") {
