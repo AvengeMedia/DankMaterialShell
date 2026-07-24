@@ -56,7 +56,7 @@ Singleton {
         return "wifi_1_bar";
     }
 
-    property string userPreference: "auto"
+    readonly property string userPreference: SettingsData.networkPreference
     property bool isConnecting: false
     property string connectingSSID: ""
     property string connectionError: ""
@@ -187,7 +187,6 @@ Singleton {
     }
 
     Component.onCompleted: {
-        root.userPreference = SettingsData.networkPreference;
         lastConnectedVpnUuid = SessionData.vpnLastConnected || "";
         if (socketPath && socketPath.length > 0) {
             checkDMSCapabilities();
@@ -672,7 +671,6 @@ Singleton {
     function setNetworkPreference(preference) {
         if (!networkAvailable)
             return;
-        userPreference = preference;
         changingPreference = true;
         targetPreference = preference;
         SettingsData.set("networkPreference", preference);
