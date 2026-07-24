@@ -47,6 +47,7 @@ Singleton {
     // Chromium can report blank metadata between tracks
     property string stableTitle: ""
     property string stableArtist: ""
+    property string stableAlbum: ""
 
     Connections {
         target: root.activePlayer
@@ -58,6 +59,9 @@ Singleton {
         function onTrackArtistChanged() {
             root._syncStableMeta();
             root._checkIdle();
+        }
+        function onTrackAlbumChanged() {
+            root._syncStableMeta();
         }
         function onLengthChanged() {
             if (root.activePlayer && root.activePlayer.lengthSupported && root.activePlayer.length > 1) {
@@ -72,8 +76,10 @@ Singleton {
 
     onActivePlayerChanged: {
         activePlayerStableLength = (activePlayer && activePlayer.lengthSupported && activePlayer.length > 1) ? activePlayer.length : 0;
-        stableTitle = activePlayer?.trackTitle || "";
-        stableArtist = activePlayer?.trackArtist || "";
+        stableTitle = "";
+        stableArtist = "";
+        stableAlbum = "";
+        _syncStableMeta();
         _checkIdle();
     }
 
@@ -82,14 +88,24 @@ Singleton {
         if (!p) {
             stableTitle = "";
             stableArtist = "";
+            stableAlbum = "";
             return;
         }
         if (isFirefoxYoutubeHoverPreview(p))
             return;
-        if (p.trackTitle)
-            stableTitle = p.trackTitle;
-        if (p.trackArtist)
-            stableArtist = p.trackArtist;
+        const metadataPlayer = _bestMetadataPlayer(p);
+        const nextTitle = displayTrackTitle(metadataPlayer);
+        const trackChanged = nextTitle && stableTitle && nextTitle.toLowerCase() !== stableTitle.toLowerCase();
+        if (trackChanged) {
+            stableArtist = "";
+            stableAlbum = "";
+        }
+        if (nextTitle)
+            stableTitle = nextTitle;
+        if (metadataPlayer.trackArtist)
+            stableArtist = metadataPlayer.trackArtist;
+        if (metadataPlayer.trackAlbum)
+            stableAlbum = metadataPlayer.trackAlbum;
     }
 
     // Chromium reports stopped media w/blank metadata, resolve by checking idle status
@@ -101,6 +117,7 @@ Singleton {
                 return;
             root.stableTitle = "";
             root.stableArtist = "";
+            root.stableAlbum = "";
             root._resolveActivePlayer();
         }
     }
@@ -122,9 +139,30 @@ Singleton {
         delegate: Connections {
             required property MprisPlayer modelData
             target: modelData
+            ignoreUnknownSignals: true
             function onIsPlayingChanged() {
+                root._resolveActivePlayer();
+                root._syncStableMeta();
+            }
+            function onTrackTitleChanged() {
                 if (modelData.isPlaying)
                     root._resolveActivePlayer();
+                root._syncStableMeta();
+            }
+            function onTrackArtistChanged() {
+                if (modelData.isPlaying)
+                    root._resolveActivePlayer();
+                root._syncStableMeta();
+            }
+            function onTrackAlbumChanged() {
+                if (modelData.isPlaying)
+                    root._resolveActivePlayer();
+                root._syncStableMeta();
+            }
+            function onMetadataChanged() {
+                if (modelData.isPlaying)
+                    root._resolveActivePlayer();
+                root._syncStableMeta();
             }
         }
     }
@@ -133,9 +171,73 @@ Singleton {
         return player && player.playbackState === MprisPlaybackState.Stopped && !player.trackTitle && !player.trackArtist;
     }
 
+    function normalizedTrackTitle(player: MprisPlayer): string {
+        return displayTrackTitle(player).toLowerCase();
+    }
+
+    function displayTrackTitle(player: MprisPlayer): string {
+        const title = (player?.trackTitle || "").trim();
+        const appSuffix = title.lastIndexOf(" | ");
+        return appSuffix > 0 ? title.substring(0, appSuffix).trim() : title;
+    }
+
+    function normalizedTrackArtist(player: MprisPlayer): string {
+        return (player?.trackArtist || "").trim().toLowerCase();
+    }
+
+    function isSameTrack(first: MprisPlayer, second: MprisPlayer): bool {
+        const firstTitle = normalizedTrackTitle(first);
+        const secondTitle = normalizedTrackTitle(second);
+        if (!firstTitle || firstTitle !== secondTitle)
+            return false;
+        const firstArtist = normalizedTrackArtist(first);
+        const secondArtist = normalizedTrackArtist(second);
+        return !firstArtist || !secondArtist || firstArtist === secondArtist;
+    }
+
+    function metadataQuality(player: MprisPlayer): int {
+        if (!player)
+            return -1;
+        let quality = player.trackArtist ? 100 : 0;
+        quality += player.trackTitle ? 40 : 0;
+        quality += player.trackAlbum ? 20 : 0;
+        quality += player.trackArtUrl || player.metadata?.["mpris:artUrl"] ? 10 : 0;
+        quality += player.metadata?.["xesam:url"] ? 5 : 0;
+        return quality;
+    }
+
+    function _bestMetadataPlayer(player: MprisPlayer): MprisPlayer {
+        const equivalents = availablePlayers.filter(candidate => {
+            return candidate.playbackState !== MprisPlaybackState.Stopped && isSameTrack(player, candidate);
+        });
+        if (equivalents.length === 0)
+            return player;
+        return equivalents.reduce((best, candidate) => {
+            return metadataQuality(candidate) > metadataQuality(best) ? candidate : best;
+        }, player);
+    }
+
+    function _bestPlayingPlayer(): MprisPlayer {
+        const playing = availablePlayers.filter(player => player.isPlaying);
+        if (playing.length === 0)
+            return null;
+
+        const controllable = playing.filter(player => player.canControl);
+        if (activePlayer?.isPlaying) {
+            if (activePlayer.canControl || controllable.length === 0)
+                return activePlayer;
+        }
+
+        if (activePlayer?.canControl && activePlayer.playbackState === MprisPlaybackState.Paused) {
+            const onlyEquivalentMirrors = playing.every(player => isSameTrack(activePlayer, player));
+            if (onlyEquivalentMirrors)
+                return null;
+        }
+        return controllable[0] || playing[0];
+    }
+
     function _resolveActivePlayer(): void {
-        // A playing player always wins; otherwise keep the selection stable w/idle
-        const playing = availablePlayers.find(p => p.isPlaying);
+        const playing = _bestPlayingPlayer();
         if (playing) {
             if (activePlayer !== playing) {
                 activePlayer = playing;
