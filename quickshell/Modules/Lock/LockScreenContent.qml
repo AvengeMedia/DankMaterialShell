@@ -113,6 +113,8 @@ Item {
     }
 
     function sendLockerReadyOnce() {
+        if (root.demoMode)
+            return;
         if (lockerReadySent)
             return;
         if (root.unlocking)

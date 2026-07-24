@@ -10,6 +10,7 @@ PanelWindow {
     id: root
 
     property bool active: false
+    property bool _completed: false
 
     signal fadeCompleted
     signal fadeCancelled
@@ -36,7 +37,8 @@ PanelWindow {
         opacity: 0
 
         onOpacityChanged: {
-            if (opacity >= 0.99 && root.active) {
+            if (opacity >= 0.99 && root.active && !root._completed) {
+                root._completed = true;
                 root.fadeCompleted();
             }
         }
@@ -59,6 +61,7 @@ PanelWindow {
     function startFade() {
         if (!SettingsData.fadeToDpmsEnabled)
             return;
+        _completed = false;
         active = true;
         fadeOverlay.opacity = 0.0;
         fadeSeq.stop();
@@ -74,6 +77,7 @@ PanelWindow {
         fadeSeq.stop();
         fadeOverlay.opacity = 0.0;
         active = false;
+        _completed = false;
     }
 
     Connections {
