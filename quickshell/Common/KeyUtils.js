@@ -271,3 +271,61 @@ function getConflictingBinds(keyCombo, currentAction, allBinds, modKey) {
     }
     return conflicts;
 }
+
+function qtKeyFromName(name) {
+    var n = (name || "").toUpperCase();
+    if (n.length === 1 && n >= "A" && n <= "Z")
+        return Qt.Key_A + (n.charCodeAt(0) - 65);
+    if (n.length === 1 && n >= "0" && n <= "9")
+        return Qt.Key_0 + (n.charCodeAt(0) - 48);
+    if (n.length >= 2 && n[0] === "F") {
+        var f = parseInt(n.slice(1), 10);
+        if (f >= 1 && f <= 12)
+            return Qt.Key_F1 + (f - 1);
+    }
+    var named = {
+        "SPACE": Qt.Key_Space,
+        "TAB": Qt.Key_Tab,
+        "RETURN": Qt.Key_Return,
+        "ENTER": Qt.Key_Enter,
+        "BACKSPACE": Qt.Key_Backspace,
+        "DELETE": Qt.Key_Delete,
+        "HOME": Qt.Key_Home,
+        "END": Qt.Key_End,
+        "UP": Qt.Key_Up,
+        "DOWN": Qt.Key_Down,
+        "LEFT": Qt.Key_Left,
+        "RIGHT": Qt.Key_Right
+    };
+    return named[n] || 0;
+}
+
+function isModifierKey(qk) {
+    return qk === Qt.Key_Control || qk === Qt.Key_Shift || qk === Qt.Key_Alt || qk === Qt.Key_Meta
+        || qk === Qt.Key_NumLock || qk === Qt.Key_CapsLock || qk === Qt.Key_ScrollLock;
+}
+
+function eventMatchesCombo(event, combo) {
+    if (!combo)
+        return false;
+    var parts = combo.split("+");
+    var keyName = parts[parts.length - 1].trim().toUpperCase();
+    var wantsShift = false;
+    var hasCtrl = false;
+    for (var i = 0; i < parts.length - 1; i++) {
+        var mod = parts[i].trim().toLowerCase();
+        if (mod === "shift")
+            wantsShift = true;
+        else if (mod === "ctrl" || mod === "control")
+            hasCtrl = true;
+        else
+            return false;
+    }
+    if (hasCtrl && !(event.modifiers & Qt.ControlModifier))
+        return false;
+    if (event.modifiers & (Qt.AltModifier | Qt.MetaModifier))
+        return false;
+    if (((event.modifiers & Qt.ShiftModifier) !== 0) !== wantsShift)
+        return false;
+    return event.key === qtKeyFromName(keyName);
+}

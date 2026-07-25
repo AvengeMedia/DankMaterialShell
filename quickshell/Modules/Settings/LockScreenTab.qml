@@ -5,6 +5,7 @@ import qs.Modals.FileBrowser
 import qs.Services
 import qs.Widgets
 import qs.Modules.Settings.Widgets
+import "../../Common/KeyUtils.js" as KeyUtils
 
 Item {
     id: root
@@ -515,6 +516,107 @@ Item {
                             SettingsData.set("u2fMode", "and");
                         else
                             SettingsData.set("u2fMode", "or");
+                    }
+                }
+
+                SettingsToggleRow {
+                    settingKey: "lockScreenSecurityKeyShortcutEnabled"
+                    tags: ["lock", "screen", "u2f", "yubikey", "security", "key", "shortcut", "keybind", "authentication"]
+                    text: I18n.tr("Security key shortcut", "Enable or disable the lock screen keyboard shortcut that starts an alternative security key unlock")
+                    description: I18n.tr("Enable a keyboard shortcut on the lock screen password field to start an alternative security key unlock", "lock screen security key shortcut setting")
+                    checked: SettingsData.lockScreenSecurityKeyShortcutEnabled
+                    visible: SettingsData.enableU2f && SettingsData.u2fMode === "or" && !root.lockU2fControlledByPrimary
+                    onToggled: checked => SettingsData.set("lockScreenSecurityKeyShortcutEnabled", checked)
+                }
+
+                Row {
+                    width: parent.width - Theme.spacingM * 2
+                    x: Theme.spacingM
+                    spacing: Theme.spacingM
+                    visible: SettingsData.lockScreenSecurityKeyShortcutEnabled && SettingsData.enableU2f && SettingsData.u2fMode === "or" && !root.lockU2fControlledByPrimary
+
+                    Column {
+                        width: parent.width - securityKeyCapture.width - parent.spacing
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: Theme.spacingXS
+
+                        StyledText {
+                            text: I18n.tr("Key combination", "lock screen security key shortcut key combination setting")
+                            font.pixelSize: Theme.fontSizeMedium
+                            font.weight: Font.Medium
+                            color: Theme.surfaceText
+                            width: parent.width
+                            horizontalAlignment: Text.AlignLeft
+                        }
+
+                        StyledText {
+                            text: I18n.tr("Click the field, then press Ctrl + key to record it (e.g. Ctrl+Q). Escape cancels.", "lock screen security key shortcut key combination capture hint")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                            wrapMode: Text.WordWrap
+                            width: parent.width
+                            horizontalAlignment: Text.AlignLeft
+                        }
+                    }
+
+                    DankButton {
+                        id: securityKeyCapture
+                        width: 200
+                        anchors.verticalCenter: parent.verticalCenter
+                        focus: capturing
+                        text: capturing ? I18n.tr("Press key...", "lock screen security key shortcut key combination capture prompt") : SettingsData.lockScreenSecurityKeyShortcut
+                        backgroundColor: capturing ? Theme.primaryContainer : Theme.surfaceContainer
+                        textColor: Theme.surfaceText
+
+                        property bool capturing: false
+
+                        function startCapture() {
+                            capturing = true;
+                            securityKeyCapture.forceActiveFocus();
+                        }
+
+                        function stopCapture() {
+                            capturing = false;
+                        }
+
+                        onClicked: {
+                            if (capturing)
+                                stopCapture();
+                            else
+                                startCapture();
+                        }
+
+                        Keys.onPressed: event => {
+                            if (!securityKeyCapture.capturing)
+                                return;
+
+                            if (KeyUtils.isModifierKey(event.key))
+                                return;
+
+                            if (event.key === Qt.Key_Escape) {
+                                securityKeyCapture.stopCapture();
+                                event.accepted = true;
+                                return;
+                            }
+
+                            const mods = KeyUtils.modsFromEvent(event.modifiers);
+                            const hasCtrl = mods.includes("Ctrl");
+                            const hasAlt = mods.includes("Alt") || mods.includes("Super");
+                            if (!hasCtrl || hasAlt)
+                                return;
+
+                            const hasShift = mods.includes("Shift");
+                            const key = KeyUtils.xkbKeyFromQtKey(event.key, !!(event.modifiers & Qt.KeypadModifier), hasShift);
+                            if (!key)
+                                return;
+
+                            if (!KeyUtils.qtKeyFromName(key))
+                                return;
+
+                            SettingsData.set("lockScreenSecurityKeyShortcut", KeyUtils.formatToken(mods, key));
+                            securityKeyCapture.stopCapture();
+                            event.accepted = true;
+                        }
                     }
                 }
 
