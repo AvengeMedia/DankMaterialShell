@@ -9,8 +9,11 @@ Item {
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
+    readonly property int overviewGridHeight: 410
+    readonly property int dankConnectCardHeight: 124
+
     implicitWidth: SettingsData.showWeekNumber ? 736 : 700
-    implicitHeight: 410
+    implicitHeight: overviewGridHeight + Theme.spacingM + dankConnectCardHeight
 
     signal switchToWeatherTab
     signal switchToMediaTab
@@ -88,6 +91,13 @@ Item {
             height: 300
 
             onClicked: root.switchToMediaTab()
+        }
+
+        DankConnectOverviewCard {
+            x: 0
+            y: root.overviewGridHeight + Theme.spacingM
+            width: parent.width
+            height: root.dankConnectCardHeight
         }
     }
 }
