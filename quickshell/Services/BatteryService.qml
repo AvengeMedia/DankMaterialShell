@@ -17,7 +17,22 @@ Singleton {
         interval: 500
         repeat: false
         running: true
-        onTriggered: root.suppressSound = false
+        onTriggered: {
+            root.suppressSound = false;
+            root.applyPowerProfile();
+        }
+    }
+
+    function applyPowerProfile() {
+        if (!batteryAvailable)
+            return;
+        const profileValue = isPluggedIn ? SettingsData.acProfileName : SettingsData.batteryProfileName;
+        if (profileValue === "")
+            return;
+        const targetProfile = parseInt(profileValue);
+        if (isNaN(targetProfile) || PowerProfiles.profile === targetProfile)
+            return;
+        PowerProfiles.profile = targetProfile;
     }
 
     readonly property string preferredBatteryOverride: Quickshell.env("DMS_PREFERRED_BATTERY")
@@ -206,14 +221,7 @@ Singleton {
             }
         }
 
-        const profileValue = BatteryService.isPluggedIn ? SettingsData.acProfileName : SettingsData.batteryProfileName;
-
-        if (profileValue !== "") {
-            const targetProfile = parseInt(profileValue);
-            if (!isNaN(targetProfile) && PowerProfiles.profile !== targetProfile) {
-                PowerProfiles.profile = targetProfile;
-            }
-        }
+        applyPowerProfile();
 
         previousPluggedState = isPluggedIn;
     }
