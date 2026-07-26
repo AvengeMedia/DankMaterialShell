@@ -124,6 +124,7 @@ Item {
                         maximum: 6000
                         step: 100
                         unit: "K"
+                        defaultValue: 4500
                         value: SessionData.nightModeTemperature
                         onSliderValueChanged: newValue => {
                             SessionData.setNightModeTemperature(newValue);
@@ -143,6 +144,7 @@ Item {
                         maximum: 10000
                         step: 100
                         unit: "K"
+                        defaultValue: 6500
                         value: Math.max(SessionData.nightModeHighTemperature, SessionData.nightModeTemperature)
                         visible: SessionData.nightModeAutoEnabled
                         onSliderValueChanged: newValue => SessionData.setNightModeHighTemperature(newValue)
