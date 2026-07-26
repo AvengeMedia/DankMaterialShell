@@ -233,3 +233,27 @@ func TestUpgradeBackendsFiltersFlatpakOnly(t *testing.T) {
 		t.Fatalf("upgradeBackends(mixed) = %#v, want dnf5 then flatpak", got)
 	}
 }
+
+func TestWrapInTerminal(t *testing.T) {
+	tests := []struct {
+		term       string
+		wantPrefix []string
+	}{
+		{"kitty", []string{"kitty", "--class", "com.danklinux.dms", "-T", "Title"}},
+		{"gnome-terminal", []string{"gnome-terminal", "--wait", "--title=Title"}},
+		{"foot", []string{"foot", "--app-id=com.danklinux.dms", "--title=Title"}},
+	}
+	for _, tt := range tests {
+		got := wrapInTerminal(tt.term, "Title", "echo hi", nil)
+		if len(got) < len(tt.wantPrefix) || !reflect.DeepEqual(got[:len(tt.wantPrefix)], tt.wantPrefix) {
+			t.Errorf("wrapInTerminal(%q) = %#v, want prefix %#v", tt.term, got, tt.wantPrefix)
+		}
+		tail := got[len(got)-3:]
+		if tail[0] != "sh" || tail[1] != "-c" {
+			t.Errorf("wrapInTerminal(%q) tail = %#v, want [sh -c <cmd>]", tt.term, tail)
+		}
+		if !strings.Contains(tail[2], "echo hi") {
+			t.Errorf("wrapInTerminal(%q) command %q does not contain shell command", tt.term, tail[2])
+		}
+	}
+}
