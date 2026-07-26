@@ -167,7 +167,13 @@ FloatingWindow {
                         width: parent.width
                         height: parent.height - searchField.height - Theme.spacingM
                         spacing: Theme.spacingS
-                        model: root.filteredApps
+                        // Start with no model. It is (re)bound in show() so that each open
+                        // gets a fresh QQmlDelegateModel, avoiding a crash where a stale
+                        // incubation queue from a previous open races with a background
+                        // refreshApplications() replacing the underlying DesktopEntries
+                        // QObjectModel (SIGSEGV in QQmlIncubatorPrivate::incubate via
+                        // libQt6QmlModels). See hide()/onVisibleChanged() for the teardown.
+                        model: null
                         clip: true
 
                         delegate: Rectangle {
@@ -316,11 +322,21 @@ FloatingWindow {
 
     function show() {
         updateFilteredApps();
+        // Rebind the model reactively (search relies on filteredApps changes flowing
+        // through), and do it after populating so the ListView starts incubating from
+        // a fully-formed array rather than [].
+        appList.model = Qt.binding(() => root.filteredApps);
         visible = true;
         Qt.callLater(() => searchField.forceActiveFocus());
     }
 
     function hide() {
+        // Drop the model before clearing visible, so the ListView releases its
+        // QQmlDelegateModel (and any in-flight incubators) synchronously on this
+        // frame. This is the crux of the fix: a later show() will allocate a fresh
+        // DelegateModel instead of reusing one whose incubation queue may hold
+        // references invalidated by a concurrent refreshApplications().
+        appList.model = null;
         visible = false;
         searchQuery = "";
         filteredApps = [];
@@ -330,6 +346,9 @@ FloatingWindow {
 
     onVisibleChanged: {
         if (!visible) {
+            // Guard against visibility being cleared without going through hide()
+            // (e.g. window manager close, FloatingWindow.onClosed -> hide()).
+            appList.model = null;
             searchQuery = "";
             filteredApps = [];
             selectedIndex = -1;
