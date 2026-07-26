@@ -736,6 +736,57 @@
     "conditionKey": "keybindsAvailable"
   },
   {
+    "section": "barAutoHide",
+    "label": "Auto-hide",
+    "tabIndex": 3,
+    "category": "Dank Bar",
+    "keywords": [
+      "auto",
+      "auto-hide",
+      "autohide",
+      "automatically",
+      "away",
+      "bar",
+      "dank",
+      "hide",
+      "intellihide",
+      "moves",
+      "panel",
+      "pointer",
+      "reveal",
+      "statusbar",
+      "taskbar",
+      "topbar"
+    ],
+    "description": "Automatically hide the bar when the pointer moves away"
+  },
+  {
+    "section": "barClickThrough",
+    "label": "Click Through",
+    "tabIndex": 3,
+    "category": "Dank Bar",
+    "keywords": [
+      "bar",
+      "behind",
+      "click",
+      "clicks",
+      "clickthrough",
+      "dank",
+      "input",
+      "mask",
+      "mouse",
+      "panel",
+      "pass",
+      "passthrough",
+      "statusbar",
+      "taskbar",
+      "through",
+      "topbar",
+      "windows"
+    ],
+    "description": "Mouse clicks pass through the bar to windows behind it"
+  },
+  {
     "section": "barConfigurations",
     "label": "Configurations",
     "tabIndex": 3,
@@ -773,6 +824,93 @@
     "icon": "display_settings"
   },
   {
+    "section": "barEnable",
+    "label": "Enable Bar",
+    "tabIndex": 3,
+    "category": "Dank Bar",
+    "keywords": [
+      "bar",
+      "dank",
+      "enable",
+      "panel",
+      "statusbar",
+      "taskbar",
+      "topbar"
+    ]
+  },
+  {
+    "section": "barExclusiveZone",
+    "label": "Exclusive Zone Offset",
+    "tabIndex": 3,
+    "category": "Dank Bar",
+    "keywords": [
+      "bar",
+      "dank",
+      "edge",
+      "exclusive",
+      "fine",
+      "offset",
+      "panel",
+      "reserved",
+      "screen",
+      "space",
+      "statusbar",
+      "taskbar",
+      "topbar",
+      "tune",
+      "zone"
+    ],
+    "description": "Fine-tune the space reserved for the bar from the screen edge"
+  },
+  {
+    "section": "barGothCorners",
+    "label": "Goth Corners",
+    "tabIndex": 3,
+    "category": "Dank Bar",
+    "keywords": [
+      "apply",
+      "bar",
+      "concave",
+      "corner",
+      "corners",
+      "cutout",
+      "cutouts",
+      "dank",
+      "goth",
+      "inverse",
+      "panel",
+      "radius",
+      "round",
+      "rounded",
+      "statusbar",
+      "taskbar",
+      "topbar"
+    ],
+    "description": "Apply inverse concave corner cutouts to the bar"
+  },
+  {
+    "section": "barHideWhenWindowsOpen",
+    "label": "Hide When Windows Open",
+    "tabIndex": 3,
+    "category": "Dank Bar",
+    "keywords": [
+      "bar",
+      "dank",
+      "empty",
+      "hide",
+      "open",
+      "panel",
+      "show",
+      "statusbar",
+      "taskbar",
+      "topbar",
+      "windows",
+      "workspace"
+    ],
+    "description": "Show the bar only when no windows are open",
+    "conditionKey": "isNiri"
+  },
+  {
     "section": "hoverPopouts",
     "label": "Hover Popouts",
     "tabIndex": 3,
@@ -801,6 +939,120 @@
     "description": "Open widget popouts by hovering over the bar. Moving to another widget switches the popout."
   },
   {
+    "section": "barManualVisibility",
+    "label": "Manual Show/Hide",
+    "tabIndex": 3,
+    "category": "Dank Bar",
+    "keywords": [
+      "auto-hide",
+      "autohide",
+      "bar",
+      "dank",
+      "hidden",
+      "hide",
+      "ipc",
+      "manual",
+      "manually",
+      "panel",
+      "show",
+      "statusbar",
+      "taskbar",
+      "toggle",
+      "topbar",
+      "visibility",
+      "visible"
+    ],
+    "description": "Toggle bar visibility manually via IPC"
+  },
+  {
+    "section": "barMaximizeDetection",
+    "label": "Maximize Detection",
+    "tabIndex": 3,
+    "category": "Dank Bar",
+    "keywords": [
+      "bar",
+      "border",
+      "dank",
+      "detection",
+      "fullscreen",
+      "gaps",
+      "maximize",
+      "maximized",
+      "panel",
+      "remove",
+      "statusbar",
+      "topbar",
+      "windows"
+    ],
+    "icon": "fit_screen",
+    "description": "Remove gaps and border when windows are maximized",
+    "conditionKey": "isNiri"
+  },
+  {
+    "section": "barMaximizeWidgetIcons",
+    "label": "Maximize Widget Icons",
+    "tabIndex": 3,
+    "category": "Dank Bar",
+    "keywords": [
+      "available",
+      "bar",
+      "dank",
+      "fill",
+      "height",
+      "icons",
+      "maximize",
+      "panel",
+      "statusbar",
+      "stretch",
+      "taskbar",
+      "topbar",
+      "widget"
+    ],
+    "description": "Stretch widget icons to fill the available bar height"
+  },
+  {
+    "section": "barMaximizeWidgetText",
+    "label": "Maximize Widget Text",
+    "tabIndex": 3,
+    "category": "Dank Bar",
+    "keywords": [
+      "available",
+      "bar",
+      "dank",
+      "fill",
+      "height",
+      "maximize",
+      "panel",
+      "statusbar",
+      "stretch",
+      "taskbar",
+      "text",
+      "topbar",
+      "widget"
+    ],
+    "description": "Stretch widget text to fill the available bar height"
+  },
+  {
+    "section": "barNoBackground",
+    "label": "No Background",
+    "tabIndex": 3,
+    "category": "Dank Bar",
+    "keywords": [
+      "background",
+      "bar",
+      "dank",
+      "fully",
+      "invisible",
+      "make",
+      "panel",
+      "statusbar",
+      "taskbar",
+      "topbar",
+      "transparent"
+    ],
+    "description": "Make the bar background fully transparent"
+  },
+  {
     "section": "barPosition",
     "label": "Position",
     "tabIndex": 3,
@@ -814,6 +1066,55 @@
       "topbar"
     ],
     "icon": "vertical_align_center"
+  },
+  {
+    "section": "barRemoveWidgetPadding",
+    "label": "Remove Widget Padding",
+    "tabIndex": 3,
+    "category": "Dank Bar",
+    "keywords": [
+      "bar",
+      "compact",
+      "components",
+      "dank",
+      "inner",
+      "modules",
+      "padding",
+      "panel",
+      "remove",
+      "statusbar",
+      "topbar",
+      "widget",
+      "widgets"
+    ],
+    "description": "Remove inner padding from all widgets"
+  },
+  {
+    "section": "barScrollWheel",
+    "label": "Scroll Wheel",
+    "tabIndex": 3,
+    "category": "Dank Bar",
+    "keywords": [
+      "axis",
+      "bar",
+      "columns",
+      "control",
+      "dank",
+      "desktop",
+      "desktops",
+      "panel",
+      "scroll",
+      "scrolling",
+      "statusbar",
+      "taskbar",
+      "topbar",
+      "virtual",
+      "wheel",
+      "workspace",
+      "workspaces"
+    ],
+    "icon": "mouse",
+    "description": "Control workspaces and columns by scrolling on the bar"
   },
   {
     "section": "_tab_3",
@@ -851,6 +1152,75 @@
     "conditionKey": "isNiri"
   },
   {
+    "section": "barSize",
+    "label": "Size",
+    "tabIndex": 3,
+    "category": "Dank Bar",
+    "keywords": [
+      "adjust",
+      "bar",
+      "dank",
+      "height",
+      "inner",
+      "padding",
+      "panel",
+      "size",
+      "statusbar",
+      "taskbar",
+      "thickness",
+      "topbar"
+    ],
+    "description": "Adjust the bar height via inner padding"
+  },
+  {
+    "section": "barSquareCorners",
+    "label": "Square Corners",
+    "tabIndex": 3,
+    "category": "Dank Bar",
+    "keywords": [
+      "bar",
+      "corner",
+      "corners",
+      "dank",
+      "panel",
+      "radius",
+      "remove",
+      "round",
+      "rounded",
+      "rounding",
+      "square",
+      "statusbar",
+      "taskbar",
+      "topbar"
+    ],
+    "description": "Remove corner rounding from the bar"
+  },
+  {
+    "section": "barAutoHideStrict",
+    "label": "Strict auto-hide",
+    "tabIndex": 3,
+    "category": "Dank Bar",
+    "keywords": [
+      "auto",
+      "autohide",
+      "bar",
+      "dank",
+      "even",
+      "hide",
+      "leaves",
+      "open",
+      "panel",
+      "pointer",
+      "popout",
+      "statusbar",
+      "still",
+      "strict",
+      "taskbar",
+      "topbar"
+    ],
+    "description": "Hide the bar when the pointer leaves even if a popout is still open"
+  },
+  {
     "section": "barUseOverlayLayer",
     "label": "Use Overlay Layer",
     "tabIndex": 3,
@@ -882,14 +1252,13 @@
       "away",
       "bar",
       "dank",
-      "frame",
       "hidden",
       "hide",
+      "intellihide",
       "moves",
-      "niri",
-      "overview",
       "panel",
       "pointer",
+      "reveal",
       "show",
       "statusbar",
       "taskbar",
@@ -1506,6 +1875,21 @@
     "icon": "shelf_auto_hide"
   },
   {
+    "section": "dockExclusiveZone",
+    "label": "Exclusive Zone Offset",
+    "tabIndex": 5,
+    "category": "Dock",
+    "keywords": [
+      "dock",
+      "exclusive",
+      "launcher bar",
+      "offset",
+      "reserved",
+      "taskbar",
+      "zone"
+    ]
+  },
+  {
     "section": "dockGroupByApp",
     "label": "Group by App",
     "tabIndex": 5,
@@ -1869,14 +2253,18 @@
     "category": "Dock",
     "keywords": [
       "dock",
+      "exclusive",
       "gap",
       "gaps",
       "launcher bar",
       "margin",
       "margins",
+      "offset",
       "padding",
+      "reserved",
       "spacing",
-      "taskbar"
+      "taskbar",
+      "zone"
     ],
     "icon": "space_bar"
   },
@@ -1991,6 +2379,7 @@
       "round",
       "rounded",
       "rounding",
+      "square",
       "statusbar",
       "taskbar",
       "topbar"
@@ -2137,24 +2526,24 @@
     "keywords": [
       "bar",
       "between",
-      "corner",
       "dank",
-      "edge",
       "edges",
-      "end",
+      "exclusive",
       "gap",
       "gaps",
-      "inset",
       "margin",
       "margins",
+      "offset",
       "padding",
       "panel",
+      "reserved",
       "screen",
       "space",
       "spacing",
       "statusbar",
       "taskbar",
-      "topbar"
+      "topbar",
+      "zone"
     ],
     "icon": "space_bar",
     "description": "Space between the bar and screen edges"
@@ -5829,6 +6218,81 @@
     "description": "Play sound when volume is adjusted"
   },
   {
+    "section": "mediaAdaptiveWidth",
+    "label": "Adaptive Media Width",
+    "tabIndex": 16,
+    "category": "Media Player",
+    "keywords": [
+      "adaptive",
+      "configured",
+      "maximum",
+      "media",
+      "mpris",
+      "music",
+      "player",
+      "respecting",
+      "shorter",
+      "shrink",
+      "size",
+      "song",
+      "spotify",
+      "still",
+      "titles",
+      "while",
+      "widget",
+      "width"
+    ],
+    "description": "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size"
+  },
+  {
+    "section": "mediaVisualizer",
+    "label": "Audio Visualizer",
+    "tabIndex": 16,
+    "category": "Media Player",
+    "keywords": [
+      "audio",
+      "cava",
+      "media",
+      "mpris",
+      "music",
+      "player",
+      "show",
+      "spectrum",
+      "spotify",
+      "visualizer",
+      "widget"
+    ],
+    "description": "Show cava audio visualizer in media widget"
+  },
+  {
+    "section": "mediaDeviceScrollVolume",
+    "label": "Device list scroll volume",
+    "tabIndex": 16,
+    "category": "Media Player",
+    "keywords": [
+      "adjusting",
+      "allow",
+      "audio",
+      "device",
+      "half",
+      "items",
+      "list",
+      "loudness",
+      "media",
+      "mpris",
+      "music",
+      "player",
+      "right",
+      "scroll",
+      "scrolling",
+      "sound",
+      "speaker",
+      "spotify",
+      "volume"
+    ],
+    "description": "Allow adjusting device volume by scrolling on the right half of items in the device list"
+  },
+  {
     "section": "mediaExcludePlayers",
     "label": "Excluded Players",
     "tabIndex": 16,
@@ -5862,7 +6326,6 @@
       "playback",
       "player",
       "progress",
-      "scroll",
       "spotify",
       "statusbar",
       "taskbar",
@@ -5905,6 +6368,77 @@
       "widget"
     ],
     "description": "Scroll wheel behavior on media widget"
+  },
+  {
+    "section": "mediaScrollTitle",
+    "label": "Scroll song title",
+    "tabIndex": 16,
+    "category": "Media Player",
+    "keywords": [
+      "doesn",
+      "marquee",
+      "media",
+      "mpris",
+      "music",
+      "player",
+      "scroll",
+      "song",
+      "spotify",
+      "title"
+    ],
+    "description": "Scroll title if it doesn"
+  },
+  {
+    "section": "mediaAlbumArtAccent",
+    "label": "Use album art accent",
+    "tabIndex": 16,
+    "category": "Media Player",
+    "keywords": [
+      "accent",
+      "album",
+      "appearance",
+      "art",
+      "colors",
+      "colour",
+      "colours",
+      "extracted",
+      "hue",
+      "look",
+      "media",
+      "mpris",
+      "music",
+      "palette",
+      "player",
+      "spotify",
+      "style",
+      "system",
+      "theme",
+      "tint"
+    ],
+    "description": "Use colors extracted from album art instead of system theme colors"
+  },
+  {
+    "section": "mediaWaveProgress",
+    "label": "Wave Progress Bars",
+    "tabIndex": 16,
+    "category": "Media Player",
+    "keywords": [
+      "animated",
+      "bars",
+      "media",
+      "mpris",
+      "music",
+      "panel",
+      "playback",
+      "player",
+      "progress",
+      "spotify",
+      "statusbar",
+      "taskbar",
+      "topbar",
+      "wave"
+    ],
+    "description": "Use animated wave progress bars for media playback"
   },
   {
     "section": "notificationBodyFontSize",
@@ -6886,6 +7420,52 @@
     "description": "Open a terminal and run a custom command instead of the in-shell upgrade flow."
   },
   {
+    "section": "systemUpdaterCheckInterval",
+    "label": "Check interval",
+    "tabIndex": 20,
+    "category": "System Updater",
+    "keywords": [
+      "check",
+      "frequency",
+      "interval",
+      "often",
+      "packages",
+      "poll",
+      "polls",
+      "server",
+      "system",
+      "updater",
+      "updates",
+      "upgrade"
+    ],
+    "description": "How often the server polls for new updates."
+  },
+  {
+    "section": "systemUpdaterCheckOnStart",
+    "label": "Check on startup",
+    "tabIndex": 20,
+    "category": "System Updater",
+    "keywords": [
+      "above",
+      "boot",
+      "check",
+      "checks",
+      "disabled",
+      "enabled",
+      "interval",
+      "manual",
+      "packages",
+      "refresh",
+      "runs",
+      "startup",
+      "system",
+      "updater",
+      "updates",
+      "upgrade"
+    ],
+    "description": "When enabled, checks updates on startup. When disabled, only the interval above or a manual refresh runs a check."
+  },
+  {
     "section": "systemUpdaterIgnoredPackages",
     "label": "Ignored Packages",
     "tabIndex": 20,
@@ -6903,13 +7483,54 @@
     "icon": "inventory_2"
   },
   {
+    "section": "systemUpdaterAUR",
+    "label": "Include AUR updates",
+    "tabIndex": 20,
+    "category": "System Updater",
+    "keywords": [
+      "aur",
+      "enabled",
+      "include",
+      "packages",
+      "paru",
+      "system",
+      "updater",
+      "updates",
+      "upgrade",
+      "yay"
+    ],
+    "description": "Run paru/yay with AUR enabled when "
+  },
+  {
+    "section": "systemUpdaterFlatpak",
+    "label": "Include Flatpak updates",
+    "tabIndex": 20,
+    "category": "System Updater",
+    "keywords": [
+      "alongside",
+      "apply",
+      "flatpak",
+      "include",
+      "packages",
+      "running",
+      "system",
+      "updater",
+      "updates",
+      "upgrade"
+    ],
+    "description": "Apply Flatpak updates alongside system updates when running "
+  },
+  {
     "section": "systemUpdater",
     "label": "System Updater",
     "tabIndex": 20,
     "category": "System Updater",
     "keywords": [
+      "frequency",
+      "interval",
       "often",
       "packages",
+      "poll",
       "polls",
       "server",
       "system",
@@ -6919,6 +7540,25 @@
     ],
     "icon": "refresh",
     "description": "How often the server polls for new updates."
+  },
+  {
+    "section": "systemUpdaterCustomCommand",
+    "label": "Use Custom Command",
+    "tabIndex": 20,
+    "category": "System Updater",
+    "keywords": [
+      "command",
+      "custom",
+      "flow",
+      "open",
+      "packages",
+      "shell",
+      "system",
+      "terminal",
+      "updater",
+      "upgrade"
+    ],
+    "description": "Open a terminal and run a custom command instead of the in-shell upgrade flow."
   },
   {
     "section": "lockTimeout",
@@ -7720,11 +8360,12 @@
     "conditionKey": "dmsConnected"
   },
   {
-    "section": "_tab_27",
+    "section": "desktopWidgetsManage",
     "label": "Desktop Widgets",
     "tabIndex": 27,
     "category": "Desktop Widgets",
     "keywords": [
+      "clock",
       "components",
       "conky",
       "desktop",
@@ -7733,6 +8374,22 @@
       "widgets"
     ],
     "icon": "widgets"
+  },
+  {
+    "section": "desktopWidgetGroups",
+    "label": "Groups",
+    "tabIndex": 27,
+    "category": "Desktop Widgets",
+    "keywords": [
+      "conky",
+      "desktop",
+      "desktop clock",
+      "groups",
+      "layouts",
+      "profiles",
+      "widgets"
+    ],
+    "icon": "folder"
   },
   {
     "section": "audioInputDevices",
@@ -8141,6 +8798,24 @@
       "zellij"
     ],
     "icon": "terminal"
+  },
+  {
+    "section": "muxSessionFilter",
+    "label": "Session Filter",
+    "tabIndex": 32,
+    "category": "Multiplexers",
+    "keywords": [
+      "exclude",
+      "filter",
+      "hide",
+      "multiplexers",
+      "mux",
+      "session",
+      "terminal",
+      "tmux",
+      "zellij"
+    ],
+    "icon": "filter_list"
   },
   {
     "section": "muxUseCustomCommand",
@@ -8649,6 +9324,103 @@
     "icon": "apps"
   },
   {
+    "section": "defaultAppsDocuments",
+    "label": "Documents",
+    "tabIndex": 34,
+    "category": "Default Apps",
+    "keywords": [
+      "apps",
+      "browser",
+      "default",
+      "documents",
+      "editing",
+      "files",
+      "handlers",
+      "mime",
+      "office",
+      "pdf",
+      "plain",
+      "reader",
+      "terminal",
+      "text"
+    ],
+    "icon": "edit_document",
+    "description": "For editing plain text files"
+  },
+  {
+    "section": "defaultAppsInternet",
+    "label": "Internet",
+    "tabIndex": 34,
+    "category": "Default Apps",
+    "keywords": [
+      "apps",
+      "browser",
+      "default",
+      "email",
+      "files",
+      "handlers",
+      "handles",
+      "html",
+      "internet",
+      "links",
+      "mail",
+      "mime",
+      "opens",
+      "terminal",
+      "web"
+    ],
+    "icon": "public",
+    "description": "Handles links and opens HTML files"
+  },
+  {
+    "section": "defaultAppsMultimedia",
+    "label": "Multimedia",
+    "tabIndex": 34,
+    "category": "Default Apps",
+    "keywords": [
+      "apps",
+      "audio",
+      "browser",
+      "default",
+      "files",
+      "handlers",
+      "image",
+      "mime",
+      "multimedia",
+      "music",
+      "player",
+      "plays",
+      "terminal",
+      "video",
+      "viewer"
+    ],
+    "icon": "movie",
+    "description": "Plays audio files"
+  },
+  {
+    "section": "defaultAppsUtilities",
+    "label": "Utilities",
+    "tabIndex": 34,
+    "category": "Default Apps",
+    "keywords": [
+      "apps",
+      "browser",
+      "default",
+      "directories",
+      "editor",
+      "file",
+      "files",
+      "handlers",
+      "manager",
+      "manages",
+      "mime",
+      "terminal",
+      "utilities"
+    ],
+    "icon": "terminal",
+    "description": "Manages files and directories"
+  },
+  {
     "section": "createUserGreeter",
     "label": "Allow greeter login access",
     "tabIndex": 35,
@@ -8737,6 +9509,26 @@
     "icon": "manage_accounts"
   },
   {
+    "section": "autostartAddEntry",
+    "label": "Add Entry",
+    "tabIndex": 36,
+    "category": "Autostart",
+    "keywords": [
+      "add",
+      "autostart",
+      "boot",
+      "choose",
+      "command",
+      "desktop",
+      "entry",
+      "launch",
+      "startup",
+      "whether"
+    ],
+    "icon": "add_circle",
+    "description": "Choose whether to launch a desktop app or a command"
+  },
+  {
     "section": "_tab_36",
     "label": "Autostart Apps",
     "tabIndex": 36,
@@ -8763,6 +9555,24 @@
       "startup"
     ],
     "icon": "line_start"
+  },
+  {
+    "section": "autostartTrayIconFix",
+    "label": "Tray Icon Fix",
+    "tabIndex": 36,
+    "category": "Autostart",
+    "keywords": [
+      "autostart",
+      "boot",
+      "fix",
+      "icon",
+      "icons",
+      "launch",
+      "startup",
+      "systemd",
+      "tray"
+    ],
+    "icon": "handyman"
   },
   {
     "section": "hyprlandLayout",

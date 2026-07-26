@@ -38,6 +38,8 @@ Item {
                 settingKey: "mediaPlayer"
 
                 SettingsToggleRow {
+                    settingKey: "mediaWaveProgress"
+                    tags: ["wave", "progress", "animated"]
                     text: I18n.tr("Wave Progress Bars")
                     description: I18n.tr("Use animated wave progress bars for media playback")
                     checked: SettingsData.waveProgressEnabled
@@ -45,6 +47,8 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    settingKey: "mediaScrollTitle"
+                    tags: ["scroll", "title", "marquee"]
                     text: I18n.tr("Scroll song title")
                     description: I18n.tr("Scroll title if it doesn't fit in widget")
                     checked: SettingsData.scrollTitleEnabled
@@ -52,6 +56,8 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    settingKey: "mediaVisualizer"
+                    tags: ["visualizer", "cava", "spectrum"]
                     text: I18n.tr("Audio Visualizer")
                     description: I18n.tr("Show cava audio visualizer in media widget")
                     checked: SettingsData.audioVisualizerEnabled
@@ -59,6 +65,8 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    settingKey: "mediaAdaptiveWidth"
+                    tags: ["adaptive", "width", "shrink"]
                     text: I18n.tr("Adaptive Media Width")
                     description: I18n.tr("Shrink the media widget to fit shorter song titles while still respecting the configured maximum size")
                     checked: SettingsData.mediaAdaptiveWidthEnabled
@@ -66,6 +74,8 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    settingKey: "mediaAlbumArtAccent"
+                    tags: ["album", "art", "accent", "colors"]
                     text: I18n.tr("Use album art accent")
                     description: I18n.tr("Use colors extracted from album art instead of system theme colors")
                     checked: SettingsData.mediaUseAlbumArtAccent
@@ -136,6 +146,8 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    settingKey: "mediaDeviceScrollVolume"
+                    tags: ["device", "scroll", "volume"]
                     text: I18n.tr("Device list scroll volume")
                     description: I18n.tr("Allow adjusting device volume by scrolling on the right half of items in the device list")
                     checked: SettingsData.audioDeviceScrollVolumeEnabled

@@ -166,6 +166,8 @@ Item {
             spacing: Theme.spacingXL
 
             SettingsCard {
+                settingKey: "desktopWidgetsManage"
+                tags: ["desktop", "widgets", "clock", "conky"]
                 width: parent.width
                 iconName: "widgets"
                 title: I18n.tr("Desktop Widgets")
@@ -203,6 +205,8 @@ Item {
             }
 
             SettingsCard {
+                settingKey: "desktopWidgetGroups"
+                tags: ["groups", "profiles", "layouts"]
                 width: parent.width
                 iconName: "folder"
                 title: I18n.tr("Groups")

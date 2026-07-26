@@ -463,6 +463,7 @@ Item {
             }
 
             SettingsCard {
+                settingKey: "barEnable"
                 iconName: selectedBarConfig?.enabled ? "visibility" : "visibility_off"
                 title: I18n.tr("Enable Bar")
                 visible: !dankBarTab.appearanceOnly && selectedBarId !== "default"
@@ -651,6 +652,8 @@ Item {
                 visible: !dankBarTab.appearanceOnly && selectedBarConfig?.enabled
 
                 SettingsToggleRow {
+                    settingKey: "barAutoHide"
+                    tags: ["autohide", "auto-hide", "reveal", "intellihide"]
                     text: I18n.tr("Auto-hide")
                     description: I18n.tr("Automatically hide the bar when the pointer moves away")
                     checked: selectedBarConfig?.autoHide ?? false
@@ -700,6 +703,8 @@ Item {
                     }
 
                     SettingsToggleRow {
+                        settingKey: "barAutoHideStrict"
+                        tags: ["autohide", "strict", "popout"]
                         width: parent.width - parent.leftPadding
                         text: I18n.tr("Strict auto-hide", "Dank bar setting: hide the bar when the pointer leaves even if a menu or bar popover is still open")
                         description: I18n.tr("Hide the bar when the pointer leaves even if a popout is still open")
@@ -713,6 +718,8 @@ Item {
                     }
 
                     SettingsToggleRow {
+                        settingKey: "barHideWhenWindowsOpen"
+                        tags: ["hide", "windows", "empty", "workspace"]
                         width: parent.width - parent.leftPadding
                         visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango
                         text: I18n.tr("Hide When Windows Open")
@@ -734,6 +741,8 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    settingKey: "barManualVisibility"
+                    tags: ["manual", "show", "hide", "ipc", "toggle"]
                     text: I18n.tr("Manual Show/Hide")
                     description: I18n.tr("Toggle bar visibility manually via IPC")
                     checked: selectedBarConfig?.visible ?? true
@@ -753,6 +762,8 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    settingKey: "barClickThrough"
+                    tags: ["clickthrough", "click", "through", "mouse", "input", "mask", "passthrough"]
                     text: I18n.tr("Click Through")
                     description: I18n.tr("Mouse clicks pass through the bar to windows behind it")
                     checked: selectedBarConfig?.clickThrough ?? false
@@ -908,6 +919,8 @@ Item {
 
                 SettingsSliderRow {
                     id: exclusiveZoneSlider
+                    settingKey: "barExclusiveZone"
+                    tags: ["exclusive", "zone", "reserved", "offset"]
                     visible: !SettingsData.frameEnabled
                     text: I18n.tr("Exclusive Zone Offset")
                     description: I18n.tr("Fine-tune the space reserved for the bar from the screen edge")
@@ -931,6 +944,8 @@ Item {
 
                 SettingsSliderRow {
                     id: sizeSlider
+                    settingKey: "barSize"
+                    tags: ["size", "thickness", "height", "inner"]
                     visible: !SettingsData.frameEnabled
                     text: I18n.tr("Size")
                     description: I18n.tr("Adjust the bar height via inner padding")
@@ -1152,6 +1167,8 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    settingKey: "barSquareCorners"
+                    tags: ["square", "corners", "rounding"]
                     text: I18n.tr("Square Corners")
                     description: I18n.tr("Remove corner rounding from the bar")
                     visible: !SettingsData.frameEnabled
@@ -1162,6 +1179,8 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    settingKey: "barNoBackground"
+                    tags: ["transparent", "background", "invisible"]
                     text: I18n.tr("No Background")
                     description: I18n.tr("Make the bar background fully transparent")
                     visible: !SettingsData.frameEnabled
@@ -1172,6 +1191,8 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    settingKey: "barMaximizeWidgetIcons"
+                    tags: ["maximize", "icons", "stretch"]
                     text: I18n.tr("Maximize Widget Icons")
                     description: I18n.tr("Stretch widget icons to fill the available bar height")
                     checked: selectedBarConfig?.maximizeWidgetIcons ?? false
@@ -1181,6 +1202,8 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    settingKey: "barMaximizeWidgetText"
+                    tags: ["maximize", "text", "stretch"]
                     text: I18n.tr("Maximize Widget Text")
                     description: I18n.tr("Stretch widget text to fill the available bar height")
                     checked: selectedBarConfig?.maximizeWidgetText ?? false
@@ -1190,6 +1213,8 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    settingKey: "barRemoveWidgetPadding"
+                    tags: ["padding", "compact", "widgets"]
                     text: I18n.tr("Remove Widget Padding")
                     description: I18n.tr("Remove inner padding from all widgets")
                     checked: selectedBarConfig?.removeWidgetPadding ?? false
@@ -1206,6 +1231,8 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    settingKey: "barGothCorners"
+                    tags: ["goth", "corners", "concave", "cutout"]
                     text: I18n.tr("Goth Corners")
                     description: I18n.tr("Apply inverse concave corner cutouts to the bar")
                     visible: !SettingsData.frameEnabled
@@ -1302,6 +1329,8 @@ Item {
             }
 
             SettingsToggleCard {
+                settingKey: "barMaximizeDetection"
+                tags: ["maximize", "gaps", "border", "fullscreen"]
                 iconName: "fit_screen"
                 title: I18n.tr("Maximize Detection")
                 description: I18n.tr("Remove gaps and border when windows are maximized")
@@ -1844,6 +1873,8 @@ Item {
 
             SettingsToggleCard {
                 iconName: "mouse"
+                settingKey: "barScrollWheel"
+                tags: ["scroll", "wheel", "workspace", "axis"]
                 title: I18n.tr("Scroll Wheel")
                 description: I18n.tr("Control workspaces and columns by scrolling on the bar")
                 visible: !dankBarTab.appearanceOnly && selectedBarConfig?.enabled

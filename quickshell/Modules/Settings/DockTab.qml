@@ -617,6 +617,8 @@ Item {
                 }
 
                 SettingsSliderRow {
+                    settingKey: "dockExclusiveZone"
+                    tags: ["exclusive", "zone", "reserved", "offset"]
                     text: I18n.tr("Exclusive Zone Offset")
                     visible: !root.connectedFrameModeActive || root.connectedPersistentDockActive
                     value: SettingsData.dockBottomGap
