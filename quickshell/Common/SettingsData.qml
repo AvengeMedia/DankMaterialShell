@@ -206,7 +206,7 @@ Singleton {
     property string keyboardLayouts: "us"
     property string keyboardVariants: ""
     property string keyboardModel: ""
-    property string keyboardOptions: "grp:win_space_toggle"
+    property string keyboardOptions: "grp:alt_shift_toggle"
     property string keyboardKeymapFile: ""
     property string keyboardTrackLayout: "global"
     property int keyboardRepeatDelay: 600

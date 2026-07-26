@@ -60,7 +60,7 @@ var SPEC = {
     keyboardLayouts: { def: "us", onChange: "updateCompositorInput" },
     keyboardVariants: { def: "", onChange: "updateCompositorInput" },
     keyboardModel: { def: "", onChange: "updateCompositorInput" },
-    keyboardOptions: { def: "grp:win_space_toggle", onChange: "updateCompositorInput" },
+    keyboardOptions: { def: "grp:alt_shift_toggle", onChange: "updateCompositorInput" },
     keyboardKeymapFile: { def: "", onChange: "updateCompositorInput" },
     keyboardTrackLayout: { def: "global", onChange: "updateCompositorInput" },
     keyboardRepeatDelay: { def: 600, onChange: "updateCompositorInput" },
