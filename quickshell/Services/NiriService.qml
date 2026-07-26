@@ -1487,8 +1487,6 @@ window-rule {
 
             if (outputSettings.disabled) {
                 kdlContent += `    off\n`;
-                kdlContent += `}\n\n`;
-                continue;
             }
 
             if (output.configured_mode) {

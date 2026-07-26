@@ -17,6 +17,7 @@ Singleton {
     readonly property var wlrOutputs: WlrOutputService.outputs
     property var outputs: ({})
     property var savedOutputs: ({})
+    property var savedParsedOutputs: ({})
     property var allOutputs: buildAllOutputsMap()
 
     property var includeStatus: ({
@@ -911,15 +912,18 @@ Singleton {
         const paths = getConfigPaths();
         if (!paths) {
             savedOutputs = {};
+            savedParsedOutputs = {};
             return;
         }
 
         Proc.runCommand("load-saved-outputs", ["cat", paths.outputsFile], (content, exitCode) => {
             if (exitCode !== 0 || !content.trim()) {
                 savedOutputs = {};
+                savedParsedOutputs = {};
                 return;
             }
             const parsed = parseOutputsConfig(content);
+            savedParsedOutputs = parsed;
             const filtered = filterDisconnectedOnly(parsed);
             savedOutputs = filtered;
 
@@ -1092,20 +1096,7 @@ Singleton {
             const name = match[1];
             const body = match[2];
 
-            if (body.trim() === "off") {
-                result[name] = {
-                    "name": name,
-                    "disabled": true,
-                    "logical": {
-                        "x": 0,
-                        "y": 0,
-                        "scale": 1.0,
-                        "transform": "Normal"
-                    }
-                };
-                continue;
-            }
-
+            const disabled = /^\s*off\s*$/m.test(body);
             const modeMatch = body.match(/mode\s+"(\d+)x(\d+)@([\d.]+)"/);
             const posMatch = body.match(/position\s+x=(-?\d+)\s+y=(-?\d+)/);
             const scaleMatch = body.match(/scale\s+([\d.]+)/);
@@ -1115,6 +1106,7 @@ Singleton {
 
             result[name] = {
                 "name": name,
+                "disabled": disabled,
                 "logical": {
                     "x": posMatch ? parseInt(posMatch[1]) : 0,
                     "y": posMatch ? parseInt(posMatch[2]) : 0,
@@ -1778,6 +1770,41 @@ Singleton {
         return normalized;
     }
 
+    function findSavedParsedOutput(outputName) {
+        const output = outputs[outputName];
+        const candidates = [outputName];
+        if (output?.make && output?.model) {
+            candidates.push(output.make + " " + output.model + " " + (output.serial || "Unknown"));
+            candidates.push(output.make + " " + output.model);
+        }
+        for (const savedName in savedParsedOutputs) {
+            if (candidates.includes(savedName.trim()))
+                return savedParsedOutputs[savedName];
+        }
+        return null;
+    }
+
+    // A disabled wlr head reports no current mode, scale 0 and position 0,0 —
+    // overlay the last written config so rewrites don't discard real settings.
+    function overlaySavedDisabledOutput(entry, outputName) {
+        const saved = findSavedParsedOutput(outputName);
+        if (!saved)
+            return;
+
+        const savedMode = saved.modes?.[saved.current_mode ?? 0];
+        if (savedMode && !entry.configured_mode)
+            entry.configured_mode = savedMode.width + "x" + savedMode.height + "@" + (savedMode.refresh_rate / 1000).toFixed(3);
+        if (saved.vrr_enabled !== undefined)
+            entry.vrr_enabled = saved.vrr_enabled;
+        if (!saved.logical || !entry.logical)
+            return;
+
+        entry.logical.x = saved.logical.x;
+        entry.logical.y = saved.logical.y;
+        entry.logical.scale = saved.logical.scale;
+        entry.logical.transform = saved.logical.transform;
+    }
+
     function buildOutputsWithPendingChanges() {
         const result = {};
 
@@ -1787,7 +1814,10 @@ Singleton {
         }
 
         for (const outputName in outputs) {
-            result[outputName] = JSON.parse(JSON.stringify(outputs[outputName]));
+            const entry = JSON.parse(JSON.stringify(outputs[outputName]));
+            if (entry.enabled === false)
+                overlaySavedDisabledOutput(entry, outputName);
+            result[outputName] = entry;
         }
 
         for (const outputName in pendingChanges) {
@@ -1799,6 +1829,8 @@ Singleton {
                 result[outputName].logical.y = changes.position.y;
             }
             if (changes.mode !== undefined && result[outputName].modes) {
+                if (result[outputName].configured_mode)
+                    result[outputName].configured_mode = changes.mode;
                 for (var i = 0; i < result[outputName].modes.length; i++) {
                     if (formatMode(result[outputName].modes[i]) === changes.mode) {
                         result[outputName].current_mode = i;
