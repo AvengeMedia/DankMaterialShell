@@ -31,6 +31,8 @@ Item {
     id: root
     readonly property var log: Log.scoped("DMSShell")
     readonly property var _sessionsServiceRef: SessionsService
+    // Keep the optional integration service alive
+    readonly property var _dankConnectServiceRef: DankConnectService
 
     property var core: null
 
