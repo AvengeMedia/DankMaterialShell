@@ -375,6 +375,8 @@ Item {
             visible: DesktopService.autostartAvailable
 
             SettingsCard {
+                settingKey: "autostartAddEntry"
+                tags: ["autostart", "add", "entry", "command", "startup"]
                 width: parent.width
                 iconName: "add_circle"
                 title: I18n.tr("Add Entry")
@@ -764,6 +766,8 @@ Item {
             }
 
             SettingsCard {
+                settingKey: "autostartTrayIconFix"
+                tags: ["tray", "icons", "fix", "systemd"]
                 width: parent.width
                 iconName: "handyman"
                 title: I18n.tr("Tray Icon Fix")

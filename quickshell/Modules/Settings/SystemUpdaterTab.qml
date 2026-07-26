@@ -89,6 +89,8 @@ Item {
                 }
 
                 SettingsDropdownRow {
+                    settingKey: "systemUpdaterCheckInterval"
+                    tags: ["interval", "poll", "frequency"]
                     text: I18n.tr("Check interval")
                     description: I18n.tr("How often the server polls for new updates.")
                     options: root.intervalOptions.map(o => o.label).concat([root.customIntervalLabel])
@@ -157,6 +159,8 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    settingKey: "systemUpdaterCheckOnStart"
+                    tags: ["startup", "check", "boot"]
                     text: I18n.tr("Check on startup")
                     description: I18n.tr("When enabled, checks updates on startup. When disabled, only the interval above or a manual refresh runs a check.")
                     checked: SettingsData.updaterCheckOnStart
@@ -164,6 +168,8 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    settingKey: "systemUpdaterFlatpak"
+                    tags: ["flatpak", "include"]
                     text: I18n.tr("Include Flatpak updates")
                     description: I18n.tr("Apply Flatpak updates alongside system updates when running 'Update All'.")
                     visible: (SystemUpdateService.backends || []).some(b => b.repo === "flatpak")
@@ -172,6 +178,8 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    settingKey: "systemUpdaterAUR"
+                    tags: ["aur", "paru", "yay"]
                     text: I18n.tr("Include AUR updates")
                     description: I18n.tr("Run paru/yay with AUR enabled when 'Update All' is clicked.")
                     visible: (SystemUpdateService.backends || []).some(b => b.id === "paru" || b.id === "yay")
@@ -328,6 +336,8 @@ Item {
                 settingKey: "systemUpdaterAdvanced"
 
                 SettingsToggleRow {
+                    settingKey: "systemUpdaterCustomCommand"
+                    tags: ["custom", "command", "terminal"]
                     text: I18n.tr("Use Custom Command")
                     description: I18n.tr("Open a terminal and run a custom command instead of the in-shell upgrade flow.")
                     checked: SettingsData.updaterUseCustomCommand

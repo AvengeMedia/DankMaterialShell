@@ -267,6 +267,8 @@ Item {
             spacing: Theme.spacingXL
 
             SettingsCard {
+                settingKey: "defaultAppsInternet"
+                tags: ["browser", "mail", "email", "web"]
                 title: I18n.tr("Internet", "Internet")
                 iconName: "public"
 
@@ -293,6 +295,8 @@ Item {
             }
 
             SettingsCard {
+                settingKey: "defaultAppsUtilities"
+                tags: ["file", "manager", "terminal", "editor"]
                 title: I18n.tr("Utilities", "Utilities")
                 iconName: "terminal"
 
@@ -317,6 +321,8 @@ Item {
             }
 
             SettingsCard {
+                settingKey: "defaultAppsDocuments"
+                tags: ["pdf", "text", "reader", "office"]
                 title: I18n.tr("Documents", "Documents")
                 iconName: "edit_document"
 
@@ -335,6 +341,8 @@ Item {
             }
 
             SettingsCard {
+                settingKey: "defaultAppsMultimedia"
+                tags: ["image", "video", "music", "viewer", "player"]
                 title: I18n.tr("Multimedia", "Multimedia")
                 iconName: "movie"
                 AppSelector {

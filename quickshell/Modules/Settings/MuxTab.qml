@@ -81,6 +81,7 @@ Item {
             SettingsCard {
                 tab: "mux"
                 tags: ["mux", "session", "filter", "exclude", "hide"]
+                settingKey: "muxSessionFilter"
                 title: I18n.tr("Session Filter")
                 iconName: "filter_list"
 

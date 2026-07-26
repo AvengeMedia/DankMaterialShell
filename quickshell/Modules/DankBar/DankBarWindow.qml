@@ -833,16 +833,30 @@ PanelWindow {
         const pos = section.mapToItem(barWindow.contentItem, 0, 0);
         const implW = section.implicitWidth || 0;
         const implH = section.implicitHeight || 0;
+        const contentSize = isCenter ? (section.contentSize || 0) : 0;
 
-        const offsetX = isCenter && !barWindow.isVertical ? (section.width - implW) / 2 : 0;
-        const offsetY = !barWindow.isVertical ? (section.height - implH) / 2 : (isCenter ? (section.height - implH) / 2 : 0);
+        let offsetX = isCenter && !barWindow.isVertical ? (section.width - implW) / 2 : 0;
+        let offsetY = !barWindow.isVertical ? (section.height - implH) / 2 : (isCenter ? (section.height - implH) / 2 : 0);
+        let w = implW;
+        let h = implH;
+
+        // index centering lays content out asymmetrically; use the real extent
+        if (contentSize > 0) {
+            if (barWindow.isVertical) {
+                offsetY = section.contentStart;
+                h = contentSize;
+            } else {
+                offsetX = section.contentStart;
+                w = contentSize;
+            }
+        }
 
         const edgePad = 2;
         return {
             "x": pos.x + offsetX - edgePad,
             "y": pos.y + offsetY - edgePad,
-            "w": implW + edgePad * 2,
-            "h": implH + edgePad * 2
+            "w": w + edgePad * 2,
+            "h": h + edgePad * 2
         };
     }
 

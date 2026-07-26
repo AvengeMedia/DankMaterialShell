@@ -29,6 +29,8 @@ Item {
     property var centerWidgets: []
     property int totalWidgets: 0
     property real totalSize: 0
+    property real contentStart: 0
+    property real contentSize: 0
 
     function updateLayout() {
         if (SettingsData.centeringMode === "geometric") {
@@ -36,6 +38,25 @@ Item {
         } else {
             applyIndexLayout();
         }
+        updateContentExtent();
+    }
+
+    function updateContentExtent() {
+        if (centerWidgets.length === 0) {
+            contentStart = 0;
+            contentSize = 0;
+            return;
+        }
+        let start = Infinity;
+        let end = -Infinity;
+        for (const widget of centerWidgets) {
+            const pos = isVertical ? widget.y : widget.x;
+            const size = isVertical ? widget.height : widget.width;
+            start = Math.min(start, pos);
+            end = Math.max(end, pos + size);
+        }
+        contentStart = start;
+        contentSize = end - start;
     }
 
     function applyGeometricLayout() {
