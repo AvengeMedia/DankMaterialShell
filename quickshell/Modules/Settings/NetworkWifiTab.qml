@@ -55,12 +55,12 @@ Item {
                 }
 
                 function getPinnedWifiNetworks() {
-                    const pins = SettingsData.wifiNetworkPins || {};
+                    const pins = CacheData.wifiNetworkPins || {};
                     return normalizePinList(pins["preferredWifi"]);
                 }
 
                 function toggleWifiPin(ssid) {
-                    const pins = JSON.parse(JSON.stringify(SettingsData.wifiNetworkPins || {}));
+                    const pins = JSON.parse(JSON.stringify(CacheData.wifiNetworkPins || {}));
                     let pinnedList = normalizePinList(pins["preferredWifi"]);
                     const pinIndex = pinnedList.indexOf(ssid);
 
@@ -77,7 +77,7 @@ Item {
                     else
                         delete pins["preferredWifi"];
 
-                    SettingsData.set("wifiNetworkPins", pins);
+                    CacheData.set("wifiNetworkPins", pins);
                 }
 
                 property var forgetNetworkConfirm: ConfirmModal {}

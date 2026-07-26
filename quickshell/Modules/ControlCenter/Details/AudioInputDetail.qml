@@ -159,7 +159,7 @@ Rectangle {
         }
 
         function getPinnedInputs() {
-            const pins = SettingsData.audioInputDevicePins || {};
+            const pins = CacheData.audioInputDevicePins || {};
             return normalizePinList(pins["preferredInput"]);
         }
 
@@ -315,7 +315,7 @@ Rectangle {
                             cursorShape: Qt.PointingHandCursor
                             onPressed: mouse => pinRipple.trigger(mouse.x, mouse.y)
                             onClicked: {
-                                const pins = JSON.parse(JSON.stringify(SettingsData.audioInputDevicePins || {}));
+                                const pins = JSON.parse(JSON.stringify(CacheData.audioInputDevicePins || {}));
                                 let pinnedList = audioContent.normalizePinList(pins["preferredInput"]);
                                 const pinIndex = pinnedList.indexOf(modelData.name);
 
@@ -332,7 +332,7 @@ Rectangle {
                                 else
                                     delete pins["preferredInput"];
 
-                                SettingsData.set("audioInputDevicePins", pins);
+                                CacheData.set("audioInputDevicePins", pins);
                             }
                         }
                     }

@@ -2,6 +2,21 @@
 
     .import "./SettingsSpec.js" as SpecModule
 
+var PIN_KEYS = ["brightnessDevicePins", "wifiNetworkPins", "bluetoothDevicePins", "audioInputDevicePins", "audioOutputDevicePins"];
+
+function extractPins(obj) {
+    if (!obj) return null;
+
+    var pins = null;
+    for (var i = 0; i < PIN_KEYS.length; i++) {
+        var value = obj[PIN_KEYS[i]];
+        if (!value || Object.keys(value).length === 0) continue;
+        if (!pins) pins = {};
+        pins[PIN_KEYS[i]] = value;
+    }
+    return pins;
+}
+
 function parse(root, jsonObj) {
     var SPEC = SpecModule.SPEC;
 
@@ -261,6 +276,17 @@ function migrateToVersion(obj, targetVersion) {
             delete settings.batteryNotificationType;
         }
         settings.configVersion = 12;
+    }
+
+    if (currentVersion < 13) {
+        console.info("Migrating settings from version", currentVersion, "to version 13");
+        console.info("Moving device and network pins to cache.json");
+
+        for (var p = 0; p < PIN_KEYS.length; p++) {
+            delete settings[PIN_KEYS[p]];
+        }
+
+        settings.configVersion = 13;
     }
 
     return settings;

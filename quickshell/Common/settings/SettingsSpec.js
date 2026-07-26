@@ -373,11 +373,6 @@ var SPEC = {
     fadeToDpmsEnabled: { def: true },
     fadeToDpmsGracePeriod: { def: 5 },
     launchPrefix: { def: "" },
-    brightnessDevicePins: { def: {} },
-    wifiNetworkPins: { def: {} },
-    bluetoothDevicePins: { def: {} },
-    audioInputDevicePins: { def: {} },
-    audioOutputDevicePins: { def: {} },
 
     gtkThemingEnabled: { def: false, onChange: "regenSystemThemes" },
     qtThemingEnabled: { def: false, onChange: "regenSystemThemes" },

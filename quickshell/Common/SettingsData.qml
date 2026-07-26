@@ -15,7 +15,7 @@ Singleton {
     id: root
     readonly property var log: Log.scoped("SettingsData")
 
-    readonly property int settingsConfigVersion: 12
+    readonly property int settingsConfigVersion: 13
 
     enum Position {
         Top,
@@ -790,11 +790,6 @@ Singleton {
     property bool fadeToDpmsEnabled: true
     property int fadeToDpmsGracePeriod: 5
     property string launchPrefix: ""
-    property var brightnessDevicePins: ({})
-    property var wifiNetworkPins: ({})
-    property var bluetoothDevicePins: ({})
-    property var audioInputDevicePins: ({})
-    property var audioOutputDevicePins: ({})
 
     property bool gtkThemingEnabled: false
     property bool qtThemingEnabled: false
@@ -1757,6 +1752,7 @@ Singleton {
             let obj = (txt && txt.trim()) ? JSON.parse(txt) : null;
 
             const oldVersion = obj?.configVersion ?? 0;
+            const legacyPins = oldVersion < 13 ? Store.extractPins(obj) : null;
             if (oldVersion < settingsConfigVersion) {
                 const migrated = Store.migrateToVersion(obj, settingsConfigVersion);
                 if (migrated) {
@@ -1764,6 +1760,8 @@ Singleton {
                     obj = migrated;
                 }
             }
+            if (legacyPins)
+                Qt.callLater(() => CacheData.migratePins(legacyPins));
 
             if (obj?.lockScreenActiveMonitor !== undefined) {
                 var oldVal = obj.lockScreenActiveMonitor;
