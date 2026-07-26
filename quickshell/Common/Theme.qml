@@ -144,7 +144,7 @@ Singleton {
         Quickshell.execDetached(["mkdir", "-p", stateDir]);
         // shellDir may be an embedded-UI extraction, which is read-only and
         // unexecutable (dankgo shellapp/shellfs makeReadOnly chmods 0444)
-        Quickshell.execDetached(["bash", shellDir + "/scripts/gtk.sh", configDir, "", "", shellDir]);
+        Quickshell.execDetached(["bash", shellDir + "/scripts/gtk.sh", configDir, "assets", "", shellDir]);
         Proc.runCommand("matugenCheck", ["sh", "-c", "command -v matugen"], (output, code) => {
             matugenAvailable = (code === 0) && !envDisableMatugen;
 
@@ -1955,7 +1955,13 @@ Singleton {
     function patchGtk3colors() {
         const isLight = (typeof SessionData !== "undefined" && SessionData.isLightMode);
         Proc.runCommand("gtk3Patcher", ["bash", shellDir + "/scripts/gtk.sh", configDir, "patch", isLight, shellDir], (output, exitCode) => {
-            if (exitCode !== 0) {
+            switch (exitCode) {
+            case 0:
+                refreshGtkTheme();
+                break;
+            case 2:
+                break;
+            default:
                 log.warn(`Failed to patch GTK3 colors: ${output}`);
             }
         });
@@ -2167,10 +2173,8 @@ Singleton {
             }
 
             if (!pendingThemeRequest) {
-                if (SettingsData.matugenTemplateGtk) {
+                if (SettingsData.matugenTemplateGtk)
                     patchGtk3colors();
-                    refreshGtkTheme();
-                }
                 return;
             }
 

@@ -968,11 +968,32 @@ func applyKDEColorScheme(mode ColorMode) {
 	}
 }
 
+func gtkThemeInstalled(theme string) bool {
+	home, _ := os.UserHomeDir()
+	candidates := []string{
+		filepath.Join(home, ".local/share/themes", theme),
+		filepath.Join(home, ".themes", theme),
+		filepath.Join("/usr/share/themes", theme),
+		filepath.Join("/usr/local/share/themes", theme),
+	}
+	for _, dir := range candidates {
+		if info, err := os.Stat(dir); err == nil && info.IsDir() {
+			return true
+		}
+	}
+	return false
+}
+
 func refreshGTKTheme(mode ColorMode) {
+	theme := mode.GTKTheme()
+	if !gtkThemeInstalled(theme) {
+		log.Infof("Skipping gtk-theme refresh: %s is not installed", theme)
+		return
+	}
 	if err := utils.GsettingsSet("org.gnome.desktop.interface", "gtk-theme", ""); err != nil {
 		log.Warnf("Failed to reset gtk-theme: %v", err)
 	}
-	if err := utils.GsettingsSet("org.gnome.desktop.interface", "gtk-theme", mode.GTKTheme()); err != nil {
+	if err := utils.GsettingsSet("org.gnome.desktop.interface", "gtk-theme", theme); err != nil {
 		log.Warnf("Failed to set gtk-theme: %v", err)
 	}
 }
