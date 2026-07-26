@@ -20,14 +20,21 @@ PanelWindow {
     readonly property int barPos: body.barPos
     readonly property bool barRevealed: body.barRevealed
 
+    property alias controlCenterButtonRef: body.controlCenterButtonRef
+    property alias clockButtonRef: body.clockButtonRef
+    property alias systemUpdateButtonRef: body.systemUpdateButtonRef
+
     function triggerSystemUpdate() {
         body.triggerSystemUpdate();
     }
     function triggerControlCenter() {
         body.triggerControlCenter();
     }
-    function triggerDashTab(tabId) {
-        body.triggerDashTab(tabId);
+    function triggerDashTab(tabId, position) {
+        return body.triggerDashTab(tabId, position);
+    }
+    function positionDash(popout, position) {
+        return body.positionDash(popout, position);
     }
     function triggerWallpaperBrowser() {
         body.triggerWallpaperBrowser();

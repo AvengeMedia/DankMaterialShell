@@ -285,28 +285,66 @@ Item {
             }
         }
 
+        function _resolvePosition(position) {
+            switch ((position || "").toLowerCase()) {
+            case "left":
+                return "left";
+            case "center":
+                return "center";
+            case "right":
+                return "right";
+            default:
+                return "";
+            }
+        }
+
+        function _dashBar(position) {
+            if (position)
+                return root.getPreferredBar();
+            return root.getPreferredBar("clockButtonRef") || root.getPreferredBar();
+        }
+
+        function _openDash(tab, position) {
+            const bar = _dashBar(position);
+            if (!bar)
+                return false;
+
+            const tabId = _resolveTabId(tab);
+            const dash = root.dankDashPopoutLoader.item;
+            if (dash && dash.shouldBeVisible && dash.triggerScreen?.name === bar.screen?.name) {
+                if (position && bar.positionDash)
+                    bar.positionDash(dash, position);
+                dash.requestTab(tabId);
+                if (dash.updateSurfacePosition)
+                    dash.updateSurfacePosition();
+                return true;
+            }
+
+            return bar.triggerDashTab(tabId, position);
+        }
+
+        function _toggleDash(tab, position) {
+            if (root.dankDashPopoutLoader.item?.dashVisible) {
+                root.dankDashPopoutLoader.item.dashVisible = false;
+                return true;
+            }
+
+            const bar = _dashBar(position);
+            if (!bar)
+                return false;
+            return bar.triggerDashTab(_resolveTabId(tab), position);
+        }
+
         function resolveTabIndex(tab: string): int {
             return SettingsData.dashTabIndexForId(_resolveTabId(tab));
         }
 
         function open(tab: string): string {
-            const bar = root.getPreferredBar("clockButtonRef") || root.getPreferredBar();
-            if (!bar)
-                return "DASH_OPEN_FAILED";
+            return _openDash(tab, "") ? "DASH_OPEN_SUCCESS" : "DASH_OPEN_FAILED";
+        }
 
-            const tabId = _resolveTabId(tab);
-            const dash = root.dankDashPopoutLoader.item;
-            if (dash && dash.shouldBeVisible && dash.triggerScreen?.name === bar.screen?.name) {
-                dash.requestTab(tabId);
-                if (dash.updateSurfacePosition)
-                    dash.updateSurfacePosition();
-                return "DASH_OPEN_SUCCESS";
-            }
-
-            if (!bar.triggerDashTab(tabId))
-                return "DASH_OPEN_FAILED";
-
-            return "DASH_OPEN_SUCCESS";
+        function openAt(tab: string, position: string): string {
+            return _openDash(tab, _resolvePosition(position)) ? "DASH_OPEN_SUCCESS" : "DASH_OPEN_FAILED";
         }
 
         function close(): string {
@@ -318,18 +356,11 @@ Item {
         }
 
         function toggle(tab: string): string {
-            if (root.dankDashPopoutLoader.item?.dashVisible) {
-                root.dankDashPopoutLoader.item.dashVisible = false;
-                return "DASH_TOGGLE_SUCCESS";
-            }
+            return _toggleDash(tab, "") ? "DASH_TOGGLE_SUCCESS" : "DASH_TOGGLE_FAILED";
+        }
 
-            const bar = root.getPreferredBar("clockButtonRef") || root.getPreferredBar();
-            if (bar) {
-                if (!bar.triggerDashTab(_resolveTabId(tab)))
-                    return "DASH_TOGGLE_FAILED";
-                return "DASH_TOGGLE_SUCCESS";
-            }
-            return "DASH_TOGGLE_FAILED";
+        function toggleAt(tab: string, position: string): string {
+            return _toggleDash(tab, _resolvePosition(position)) ? "DASH_TOGGLE_SUCCESS" : "DASH_TOGGLE_FAILED";
         }
 
         target: "dash"

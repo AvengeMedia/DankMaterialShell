@@ -69,7 +69,62 @@ Item {
         }
     }
 
-    function triggerDashTab(tabId) {
+    function dashSectionAnchor(section) {
+        let item;
+        switch (section) {
+        case "left":
+            item = barWindow.isVertical ? topBarContent.vLeftSection : topBarContent.hLeftSection;
+            break;
+        case "right":
+            item = barWindow.isVertical ? topBarContent.vRightSection : topBarContent.hRightSection;
+            break;
+        default:
+            item = barWindow.isVertical ? topBarContent.vCenterSection : topBarContent.hCenterSection;
+        }
+        if (!item)
+            return null;
+        if (barWindow.isVertical)
+            return {
+                "pos": item.mapToItem(null, 0, item.height / 2),
+                "width": item.height
+            };
+        return {
+            "pos": item.mapToItem(null, 0, 0),
+            "width": item.width
+        };
+    }
+
+    function positionDash(popout, position) {
+        if (!popout.setTriggerPosition) {
+            popout.triggerScreen = barWindow.screen;
+            return "center";
+        }
+
+        const explicit = position === "left" || position === "center" || position === "right";
+        const section = explicit ? position : (clockButtonRef?.section || "center");
+        const clockAnchor = clockButtonRef?.visualContent ? {
+            "pos": clockButtonRef.visualContent.mapToItem(null, 0, 0),
+            "width": clockButtonRef.visualWidth
+        } : null;
+
+        let anchor;
+        if (!explicit && section !== "center" && clockAnchor)
+            anchor = clockAnchor;
+        else
+            anchor = dashSectionAnchor(section) || clockAnchor;
+
+        if (!anchor) {
+            popout.triggerScreen = barWindow.screen;
+            return section;
+        }
+
+        const barPosition = axis?.edge === "left" ? 2 : (axis?.edge === "right" ? 3 : (axis?.edge === "top" ? 0 : 1));
+        const pos = SettingsData.getPopupTriggerPosition(anchor.pos, barWindow.screen, barWindow.effectiveBarThickness, anchor.width, barConfig?.spacing ?? 4, barPosition, barConfig);
+        popout.setTriggerPosition(pos.x, pos.y, pos.width, section, barWindow.screen, barPosition, barWindow.effectiveBarThickness, barConfig?.spacing ?? 4, barConfig);
+        return section;
+    }
+
+    function triggerDashTab(tabId, position) {
         const loader = PopoutService.dankDashPopoutLoader;
         if (!loader)
             return false;
@@ -78,38 +133,7 @@ Item {
             return false;
         }
 
-        let section = "center";
-        if (clockButtonRef && clockButtonRef.visualContent && loader.item.setTriggerPosition) {
-            const barPosition = axis?.edge === "left" ? 2 : (axis?.edge === "right" ? 3 : (axis?.edge === "top" ? 0 : 1));
-            section = clockButtonRef.section || "center";
-
-            let triggerPos, triggerWidth;
-            if (section === "center") {
-                const centerSection = barWindow.isVertical ? (barWindow.axis?.edge === "left" ? topBarContent.vCenterSection : topBarContent.vCenterSection) : topBarContent.hCenterSection;
-                if (centerSection) {
-                    if (barWindow.isVertical) {
-                        const centerY = centerSection.height / 2;
-                        triggerPos = centerSection.mapToItem(null, 0, centerY);
-                        triggerWidth = centerSection.height;
-                    } else {
-                        triggerPos = centerSection.mapToItem(null, 0, 0);
-                        triggerWidth = centerSection.width;
-                    }
-                } else {
-                    triggerPos = clockButtonRef.visualContent.mapToItem(null, 0, 0);
-                    triggerWidth = clockButtonRef.visualWidth;
-                }
-            } else {
-                triggerPos = clockButtonRef.visualContent.mapToItem(null, 0, 0);
-                triggerWidth = clockButtonRef.visualWidth;
-            }
-
-            const pos = SettingsData.getPopupTriggerPosition(triggerPos, barWindow.screen, barWindow.effectiveBarThickness, triggerWidth, barConfig?.spacing ?? 4, barPosition, barConfig);
-            loader.item.setTriggerPosition(pos.x, pos.y, pos.width, section, barWindow.screen, barPosition, barWindow.effectiveBarThickness, barConfig?.spacing ?? 4, barConfig);
-        } else {
-            loader.item.triggerScreen = barWindow.screen;
-        }
-
+        const section = positionDash(loader.item, position);
         if (loader.item.requestTab)
             loader.item.requestTab(tabId);
         PopoutManager.requestPopout(loader.item, undefined, (barConfig?.id ?? "default") + "-" + section + "-" + tabId);
