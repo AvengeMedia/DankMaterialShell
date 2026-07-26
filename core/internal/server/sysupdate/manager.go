@@ -412,23 +412,28 @@ func (m *Manager) runCustomUpgrade(ctx context.Context, opts UpgradeOptions) {
 	onLine := func(line string) { m.appendLog(line) }
 	argv := wrapInTerminal(term, "DMS — System Update (custom)", opts.CustomCommand, opts.TerminalArgs)
 	if err := Run(ctx, argv, RunOptions{OnLine: onLine}); err != nil {
-		code := ErrCodeBackendFailed
 		switch {
 		case errors.Is(ctx.Err(), context.DeadlineExceeded):
-			code = ErrCodeTimeout
+			m.failCustomUpgrade(ErrCodeTimeout, err)
+			return
 		case errors.Is(ctx.Err(), context.Canceled):
-			code = ErrCodeCancelled
+			m.failCustomUpgrade(ErrCodeCancelled, err)
+			return
 		}
-		m.mu.Lock()
-		m.state.Phase = PhaseError
-		m.state.Error = &ErrorInfo{Code: code, Message: err.Error()}
-		m.mu.Unlock()
-		m.markDirty()
-		return
+		// exit status reflects the trailing `read`, not the update command
+		m.appendLog(fmt.Sprintf("Terminal exited early: %v", err))
 	}
 
 	m.finishSuccessfulUpgrade(false)
 	m.runRefresh(context.Background(), false)
+}
+
+func (m *Manager) failCustomUpgrade(code ErrorCode, err error) {
+	m.mu.Lock()
+	m.state.Phase = PhaseError
+	m.state.Error = &ErrorInfo{Code: code, Message: err.Error()}
+	m.mu.Unlock()
+	m.markDirty()
 }
 
 func (m *Manager) finishSuccessfulUpgrade(clearPackages bool) {

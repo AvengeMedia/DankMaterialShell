@@ -143,7 +143,8 @@ func wrapInTerminal(term, title, shellCmd string, extraArgs []string) []string {
 	case "konsole":
 		argv = []string{term, "-p", "tabtitle=" + title}
 	case "gnome-terminal":
-		argv = []string{term, "--title=" + title}
+		// --wait: the factory process otherwise returns immediately
+		argv = []string{term, "--wait", "--title=" + title}
 		execFlag = "--"
 	default:
 		argv = []string{term}
