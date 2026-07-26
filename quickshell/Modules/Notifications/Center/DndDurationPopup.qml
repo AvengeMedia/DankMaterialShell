@@ -31,14 +31,16 @@ PanelWindow {
     }
 
     property point anchorPos: Qt.point(0, 0)
-    property string anchorEdge: "top"
+    property bool isVertical: false
+    property string edge: "top"
     visible: false
 
-    function showAt(x, y, targetScreen, edge) {
+    function showAt(x, y, vertical, barEdge, targetScreen) {
         if (targetScreen)
             root.screen = targetScreen;
         anchorPos = Qt.point(x, y);
-        anchorEdge = edge || "top";
+        isVertical = vertical ?? false;
+        edge = barEdge ?? "top";
         visible = true;
     }
 
@@ -66,21 +68,19 @@ PanelWindow {
         visible: root.visible
 
         x: {
-            const left = 10;
-            const right = root.width - width - 10;
-            const want = root.anchorPos.x - width / 2;
-            return Math.max(left, Math.min(right, want));
+            if (root.isVertical) {
+                if (root.edge === "left")
+                    return Math.min(root.width - width - 10, root.anchorPos.x);
+                return Math.max(10, root.anchorPos.x - width);
+            }
+            return Math.max(10, Math.min(root.width - width - 10, root.anchorPos.x - width / 2));
         }
         y: {
-            switch (root.anchorEdge) {
-            case "bottom":
-                return Math.max(10, root.anchorPos.y - height);
-            case "left":
-            case "right":
+            if (root.isVertical)
                 return Math.max(10, Math.min(root.height - height - 10, root.anchorPos.y - height / 2));
-            default:
-                return Math.min(root.height - height - 10, root.anchorPos.y);
-            }
+            if (root.edge === "bottom")
+                return Math.max(10, root.anchorPos.y - height);
+            return Math.min(root.height - height - 10, root.anchorPos.y);
         }
 
         onDismissed: root.closeMenu()

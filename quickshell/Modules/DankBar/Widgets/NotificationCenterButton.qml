@@ -35,44 +35,42 @@ BasePill {
         }
     }
 
-    onRightClicked: (rx, ry) => {
+    onRightClicked: {
         const screen = root.parentScreen || Screen;
         if (!screen)
             return;
-        const globalPos = root.visualContent.mapToItem(null, 0, 0);
+
         const isVertical = root.axis?.isVertical ?? false;
         const edge = root.axis?.edge ?? "top";
         const gap = Math.max(Theme.spacingXS, root.barSpacing ?? Theme.spacingXS);
         const barOffset = root.barThickness + root.barSpacing + gap;
+        const localPos = root.visualContent.mapToItem(null, root.visualContent.width / 2, root.visualContent.height / 2);
 
         let anchorX;
         let anchorY;
-        let anchorEdge;
         if (isVertical) {
-            anchorY = globalPos.y - (screen.y || 0) + root.visualContent.height / 2;
-            if (edge === "left") {
-                anchorX = barOffset;
-                anchorEdge = "top";
-            } else {
-                anchorX = screen.width - barOffset;
-                anchorEdge = "top";
-            }
+            anchorX = edge === "left" ? barOffset : screen.width - barOffset;
+            anchorY = localPos.y;
         } else {
-            anchorX = globalPos.x - (screen.x || 0) + root.visualContent.width / 2;
-            if (edge === "bottom") {
-                anchorY = screen.height - barOffset;
-                anchorEdge = "bottom";
-            } else {
-                anchorY = barOffset;
-                anchorEdge = "top";
-            }
+            anchorX = localPos.x;
+            anchorY = edge === "bottom" ? screen.height - barOffset : barOffset;
         }
 
         dndPopupLoader.active = true;
         const popup = dndPopupLoader.item;
         if (!popup)
             return;
-        popup.showAt(anchorX, anchorY, screen, anchorEdge);
+
+        popup.showAt(anchorX, anchorY, isVertical, edge, screen);
+    }
+
+    MouseArea {
+        anchors.fill: parent
+        acceptedButtons: Qt.MiddleButton
+        onPressed: mouse => {
+            root.triggerRipple(this, mouse.x, mouse.y);
+            SessionData.setDoNotDisturb(!SessionData.doNotDisturb);
+        }
     }
 
     Loader {
