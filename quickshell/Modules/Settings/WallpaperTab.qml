@@ -977,6 +977,33 @@ Item {
                         }
                     }
 
+                    SettingsToggleRow {
+                        id: randomToggle
+                        tab: "wallpaper"
+                        tags: ["cycling", "automatic", "random", "shuffle"]
+                        settingKey: "wallpaperCyclingRandom"
+                        width: parent.width - Theme.spacingM * 2
+                        text: I18n.tr("Random Order")
+                        description: I18n.tr("Select a random wallpaper instead of cycling in alphabetical order")
+                        checked: SessionData.perMonitorWallpaper ? SessionData.getMonitorCyclingSettings(selectedMonitorName).random : SessionData.wallpaperCyclingRandom
+                        onToggled: toggled => {
+                            if (SessionData.perMonitorWallpaper) {
+                                SessionData.setMonitorCyclingRandom(selectedMonitorName, toggled);
+                            } else {
+                                SessionData.setWallpaperCyclingRandom(toggled);
+                            }
+                        }
+
+                        Connections {
+                            target: root
+                            function onSelectedMonitorNameChanged() {
+                                randomToggle.checked = Qt.binding(() => {
+                                    return SessionData.perMonitorWallpaper ? SessionData.getMonitorCyclingSettings(selectedMonitorName).random : SessionData.wallpaperCyclingRandom;
+                                });
+                            }
+                        }
+                    }
+
                     SettingsDropdownRow {
                         id: intervalDropdown
                         property var intervalOptions: [I18n.tr("5 seconds", "wallpaper interval"), I18n.tr("10 seconds", "wallpaper interval"), I18n.tr("15 seconds", "wallpaper interval"), I18n.tr("20 seconds", "wallpaper interval"), I18n.tr("25 seconds", "wallpaper interval"), I18n.tr("30 seconds", "wallpaper interval"), I18n.tr("35 seconds", "wallpaper interval"), I18n.tr("40 seconds", "wallpaper interval"), I18n.tr("45 seconds", "wallpaper interval"), I18n.tr("50 seconds", "wallpaper interval"), I18n.tr("55 seconds", "wallpaper interval"), I18n.tr("1 minute", "wallpaper interval"), I18n.tr("5 minutes", "wallpaper interval"), I18n.tr("15 minutes", "wallpaper interval"), I18n.tr("30 minutes", "wallpaper interval"), I18n.tr("1 hour", "wallpaper interval"), I18n.tr("1 hour 30 minutes", "wallpaper interval"), I18n.tr("2 hours", "wallpaper interval"), I18n.tr("3 hours", "wallpaper interval"), I18n.tr("4 hours", "wallpaper interval"), I18n.tr("6 hours", "wallpaper interval"), I18n.tr("8 hours", "wallpaper interval"), I18n.tr("12 hours", "wallpaper interval")]

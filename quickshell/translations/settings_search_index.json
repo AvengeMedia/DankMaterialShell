@@ -339,6 +339,33 @@
     "icon": "palette"
   },
   {
+    "section": "wallpaperCyclingRandom",
+    "label": "Random Order",
+    "tabIndex": 0,
+    "category": "Personalization",
+    "keywords": [
+      "alphabetical",
+      "appearance",
+      "automatic",
+      "background",
+      "bg",
+      "custom",
+      "customize",
+      "cycling",
+      "desktop",
+      "image",
+      "order",
+      "personal",
+      "personalization",
+      "picture",
+      "random",
+      "select",
+      "shuffle",
+      "wallpaper"
+    ],
+    "description": "Select a random wallpaper instead of cycling in alphabetical order"
+  },
+  {
     "section": "wallpaperTransition",
     "label": "Transition Effect",
     "tabIndex": 0,
