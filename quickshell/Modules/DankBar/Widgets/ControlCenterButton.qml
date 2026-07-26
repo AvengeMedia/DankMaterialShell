@@ -203,7 +203,7 @@ BasePill {
         const pinKey = getScreenPinKey();
         if (!pinKey)
             return "";
-        const pins = SettingsData.brightnessDevicePins || {};
+        const pins = CacheData.brightnessDevicePins || {};
         return pins[pinKey] || "";
     }
 

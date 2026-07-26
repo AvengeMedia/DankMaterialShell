@@ -37,7 +37,7 @@ Rectangle {
 
         const pinKey = getScreenPinKey();
         if (pinKey.length > 0) {
-            const pins = SettingsData.brightnessDevicePins || {};
+            const pins = CacheData.brightnessDevicePins || {};
             const pinnedDevice = pins[pinKey];
             if (pinnedDevice && pinnedDevice.length > 0) {
                 const found = devices.find(d => d.name === pinnedDevice);
@@ -85,12 +85,12 @@ Rectangle {
         }
         const pinKey = getScreenPinKey();
         if (pinKey.length > 0) {
-            const pins = SettingsData.brightnessDevicePins || {};
+            const pins = CacheData.brightnessDevicePins || {};
             const existing = pins[pinKey];
             if (existing && existing !== deviceName) {
                 const next = JSON.parse(JSON.stringify(pins));
                 delete next[pinKey];
-                SettingsData.set("brightnessDevicePins", next);
+                CacheData.set("brightnessDevicePins", next);
             }
         }
         root.currentDeviceName = deviceName;
@@ -106,7 +106,7 @@ Rectangle {
         const pinKey = getScreenPinKey();
         if (!pinKey || !deviceName)
             return false;
-        const pins = SettingsData.brightnessDevicePins || {};
+        const pins = CacheData.brightnessDevicePins || {};
         return pins[pinKey] === deviceName;
     }
 
@@ -114,13 +114,13 @@ Rectangle {
         const pinKey = getScreenPinKey();
         if (!pinKey || !deviceName)
             return;
-        const pins = JSON.parse(JSON.stringify(SettingsData.brightnessDevicePins || {}));
+        const pins = JSON.parse(JSON.stringify(CacheData.brightnessDevicePins || {}));
         if (pins[pinKey] === deviceName) {
             delete pins[pinKey];
         } else {
             pins[pinKey] = deviceName;
         }
-        SettingsData.set("brightnessDevicePins", pins);
+        CacheData.set("brightnessDevicePins", pins);
     }
 
     implicitHeight: {
@@ -269,7 +269,7 @@ Rectangle {
 
                     readonly property bool selected: !!(modelData && modelData.name === root.currentDeviceName)
                     readonly property bool devicePinnedHere: {
-                        SettingsData.brightnessDevicePins;
+                        CacheData.brightnessDevicePins;
                         return root.isDevicePinnedToScreen(modelData ? modelData.name : "");
                     }
 

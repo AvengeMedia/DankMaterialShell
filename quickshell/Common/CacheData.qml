@@ -11,7 +11,7 @@ Singleton {
     id: root
     readonly property var log: Log.scoped("CacheData")
 
-    readonly property int cacheConfigVersion: 1
+    readonly property int cacheConfigVersion: 2
 
     readonly property bool isGreeterMode: Quickshell.env("DMS_RUN_GREETER") === "1" || Quickshell.env("DMS_RUN_GREETER") === "true"
 
@@ -19,9 +19,20 @@ Singleton {
     readonly property string _stateDir: Paths.strip(_stateUrl)
 
     property bool _loading: false
+    property bool _hasLoaded: false
+    property int _loadedCacheVersion: 0
+
+    readonly property var _pinKeys: ["brightnessDevicePins", "wifiNetworkPins", "bluetoothDevicePins", "audioInputDevicePins", "audioOutputDevicePins"]
+    readonly property var _dataKeys: ["wallpaperLastPath", "profileLastPath", "fileBrowserSettings"].concat(_pinKeys)
 
     property string wallpaperLastPath: ""
     property string profileLastPath: ""
+
+    property var brightnessDevicePins: ({})
+    property var wifiNetworkPins: ({})
+    property var bluetoothDevicePins: ({})
+    property var audioInputDevicePins: ({})
+    property var audioOutputDevicePins: ({})
 
     property var fileBrowserSettings: ({
             "wallpaper": {
@@ -82,8 +93,46 @@ Singleton {
 
     function loadCache() {
         _loading = true;
-        parseCache(cacheFile.text());
-        _loading = false;
+        try {
+            parseCache(cacheFile.text());
+        } finally {
+            _loading = false;
+            _hasLoaded = true;
+        }
+    }
+
+    function set(key, value) {
+        if (_dataKeys.indexOf(key) < 0) {
+            log.warn("Unknown cache key:", key);
+            return;
+        }
+        root[key] = value;
+        saveCache();
+    }
+
+    function migratePins(pins) {
+        if (!pins)
+            return;
+        if (!_hasLoaded)
+            loadCache();
+        if (_loadedCacheVersion >= cacheConfigVersion)
+            return;
+
+        let migrated = false;
+        for (const key of _pinKeys) {
+            const legacy = pins[key];
+            if (!legacy || Object.keys(legacy).length === 0)
+                continue;
+            if (Object.keys(root[key] || {}).length > 0)
+                continue;
+            root[key] = legacy;
+            migrated = true;
+        }
+
+        if (!migrated)
+            return;
+        log.info("Migrated device pins from settings.json");
+        saveCache();
     }
 
     function parseCache(content) {
@@ -91,6 +140,7 @@ Singleton {
         try {
             if (content && content.trim()) {
                 const cache = JSON.parse(content);
+                _loadedCacheVersion = cache.configVersion || 0;
 
                 wallpaperLastPath = cache.wallpaperLastPath !== undefined ? cache.wallpaperLastPath : "";
                 profileLastPath = cache.profileLastPath !== undefined ? cache.profileLastPath : "";
@@ -126,6 +176,10 @@ Singleton {
                     };
                 }
 
+                for (const key of _pinKeys) {
+                    root[key] = cache[key] !== undefined ? cache[key] : {};
+                }
+
                 if (cache.configVersion === undefined) {
                     migrateFromUndefinedToV1(cache);
                     cleanupUnusedKeys();
@@ -142,12 +196,16 @@ Singleton {
     function saveCache() {
         if (_loading)
             return;
-        cacheFile.setText(JSON.stringify({
+        const data = {
             "wallpaperLastPath": wallpaperLastPath,
             "profileLastPath": profileLastPath,
             "fileBrowserSettings": fileBrowserSettings,
             "configVersion": cacheConfigVersion
-        }, null, 2));
+        };
+        for (const key of _pinKeys) {
+            data[key] = root[key];
+        }
+        cacheFile.setText(JSON.stringify(data, null, 2));
     }
 
     function migrateFromUndefinedToV1(cache) {
@@ -155,7 +213,7 @@ Singleton {
     }
 
     function cleanupUnusedKeys() {
-        const validKeys = ["wallpaperLastPath", "profileLastPath", "fileBrowserSettings", "configVersion"];
+        const validKeys = _dataKeys.concat(["configVersion"]);
 
         try {
             const content = cacheFile.text();

@@ -112,7 +112,7 @@ Rectangle {
     }
 
     function getPinnedDevices() {
-        const pins = SettingsData.bluetoothDevicePins || {};
+        const pins = CacheData.bluetoothDevicePins || {};
         return normalizePinList(pins["preferredDevice"]);
     }
 
@@ -400,7 +400,7 @@ Rectangle {
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
-                                const pins = JSON.parse(JSON.stringify(SettingsData.bluetoothDevicePins || {}));
+                                const pins = JSON.parse(JSON.stringify(CacheData.bluetoothDevicePins || {}));
                                 let pinnedList = root.normalizePinList(pins["preferredDevice"]);
                                 const pinIndex = pinnedList.indexOf(pairedDelegate.modelData.address);
 
@@ -418,7 +418,7 @@ Rectangle {
                                     delete pins["preferredDevice"];
                                 }
 
-                                SettingsData.set("bluetoothDevicePins", pins);
+                                CacheData.set("bluetoothDevicePins", pins);
                             }
                         }
                     }

@@ -49,7 +49,7 @@ Rectangle {
     }
 
     function getPinnedNetworks() {
-        const pins = SettingsData.wifiNetworkPins || {};
+        const pins = CacheData.wifiNetworkPins || {};
         return normalizePinList(pins["preferredWifi"]);
     }
 
@@ -710,7 +710,7 @@ Rectangle {
                     cursorShape: Qt.PointingHandCursor
                     onPressed: mouse => pinRipple.trigger(mouse.x, mouse.y)
                     onClicked: {
-                        const pins = JSON.parse(JSON.stringify(SettingsData.wifiNetworkPins || {}));
+                        const pins = JSON.parse(JSON.stringify(CacheData.wifiNetworkPins || {}));
                         let pinnedList = root.normalizePinList(pins["preferredWifi"]);
                         const pinIndex = pinnedList.indexOf(modelData.ssid);
 
@@ -727,7 +727,7 @@ Rectangle {
                         else
                             delete pins["preferredWifi"];
 
-                        SettingsData.set("wifiNetworkPins", pins);
+                        CacheData.set("wifiNetworkPins", pins);
                     }
                 }
             }
