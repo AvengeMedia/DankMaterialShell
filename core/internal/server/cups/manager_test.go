@@ -1,6 +1,9 @@
 package cups
 
 import (
+	"errors"
+	"fmt"
+	"sync"
 	"testing"
 
 	mocks_cups "github.com/AvengeMedia/DankMaterialShell/core/internal/mocks/cups"
@@ -73,6 +76,67 @@ func TestManager_Subscribe(t *testing.T) {
 		return true
 	})
 	assert.Equal(t, 0, count)
+}
+
+// mirrors the real managers: eventChan guarded by mu, conn/running deliberately
+// unsynchronized so overlapping Start/Stop trips the race detector
+type stubSubscription struct {
+	mu      sync.Mutex
+	events  chan SubscriptionEvent
+	conn    *int
+	running bool
+}
+
+func (s *stubSubscription) Start() error {
+	if s.running {
+		return errors.New("already running")
+	}
+	s.running = true
+
+	s.mu.Lock()
+	s.events = make(chan SubscriptionEvent)
+	s.mu.Unlock()
+
+	v := 0
+	s.conn = &v
+	*s.conn++
+
+	return nil
+}
+
+func (s *stubSubscription) Stop() {
+	if !s.running {
+		return
+	}
+	s.running = false
+	s.conn = nil
+
+	s.mu.Lock()
+	close(s.events)
+	s.mu.Unlock()
+}
+
+func (s *stubSubscription) Events() <-chan SubscriptionEvent {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.events
+}
+
+func TestManager_SubscribeUnsubscribeRace(t *testing.T) {
+	m := NewTestManager(mocks_cups.NewMockCUPSClientInterface(t), nil)
+	m.subscription = &stubSubscription{}
+
+	var wg sync.WaitGroup
+	for i := range 8 {
+		wg.Go(func() {
+			id := fmt.Sprintf("client-%d", i)
+			for range 50 {
+				m.Subscribe(id)
+				m.Unsubscribe(id)
+			}
+		})
+	}
+	wg.Wait()
 }
 
 func TestManager_Close(t *testing.T) {
