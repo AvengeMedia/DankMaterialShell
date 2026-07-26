@@ -79,6 +79,7 @@ type Manager struct {
 	client            CUPSClientInterface
 	pkHelper          PkHelper
 	subscription      SubscriptionManagerInterface
+	subLifecycleMu    sync.Mutex
 	stateMutex        sync.RWMutex
 	subscribers       syncmap.Map[string, chan CUPSState]
 	stopChan          chan struct{}
