@@ -10905,5 +10905,17 @@
     ],
     "icon": "mouse",
     "conditionKey": "isNiri"
+  },
+  {
+    "section": "_tab_45",
+    "label": "Keyboard",
+    "tabIndex": 45,
+    "category": "Settings",
+    "keywords": [
+      "keyboard",
+      "settings"
+    ],
+    "icon": "keyboard",
+    "conditionKey": "isNiri"
   }
 ]
