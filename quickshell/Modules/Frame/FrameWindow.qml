@@ -262,10 +262,22 @@ PanelWindow {
         return false;
     }
 
-    readonly property int cutoutTopInset: win._regionInt(barEdges.includes("top") ? SettingsData.frameBarSize : SettingsData.frameThickness)
-    readonly property int cutoutBottomInset: win._regionInt(barEdges.includes("bottom") ? SettingsData.frameBarSize : SettingsData.frameThickness)
-    readonly property int cutoutLeftInset: win._regionInt(barEdges.includes("left") ? SettingsData.frameBarSize : SettingsData.frameThickness)
-    readonly property int cutoutRightInset: win._regionInt(barEdges.includes("right") ? SettingsData.frameBarSize : SettingsData.frameThickness)
+    readonly property int cutoutTopInset: {
+        SettingsData.barConfigs;
+        return win._regionInt(SettingsData.frameEdgeReservation(win.targetScreen, "top"));
+    }
+    readonly property int cutoutBottomInset: {
+        SettingsData.barConfigs;
+        return win._regionInt(SettingsData.frameEdgeReservation(win.targetScreen, "bottom"));
+    }
+    readonly property int cutoutLeftInset: {
+        SettingsData.barConfigs;
+        return win._regionInt(SettingsData.frameEdgeReservation(win.targetScreen, "left"));
+    }
+    readonly property int cutoutRightInset: {
+        SettingsData.barConfigs;
+        return win._regionInt(SettingsData.frameEdgeReservation(win.targetScreen, "right"));
+    }
     readonly property int cutoutWidth: Math.max(0, win._windowRegionWidth - win.cutoutLeftInset - win.cutoutRightInset)
     readonly property int cutoutHeight: Math.max(0, win._windowRegionHeight - win.cutoutTopInset - win.cutoutBottomInset)
     readonly property int cutoutRadius: {

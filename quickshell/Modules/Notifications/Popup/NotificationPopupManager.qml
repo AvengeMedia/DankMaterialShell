@@ -360,8 +360,7 @@ QtObject {
     function _frameEdgeInset(side) {
         if (!manager.modelData)
             return 0;
-        const edges = SettingsData.getActiveBarEdgesForScreen(manager.modelData);
-        const raw = edges.includes(side) ? SettingsData.frameBarSize : SettingsData.frameThickness;
+        const raw = SettingsData.frameEdgeReservation(manager.modelData, side);
         const dpr = CompositorService.getScreenScale(manager.modelData);
         return Math.max(0, Math.round(Theme.px(raw, dpr)));
     }

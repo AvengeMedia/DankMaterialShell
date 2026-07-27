@@ -21,11 +21,10 @@ QtObject {
 
     readonly property bool frameExclusionActive: CompositorService.frameWindowVisibleForScreen(screen)
     readonly property bool usesConnectedFrameChrome: CompositorService.usesConnectedFrameChromeForScreen(screen)
-    readonly property bool connectedBarActiveOnEdge: usesConnectedFrameChrome && !!screen && SettingsData.getActiveBarEdgesForScreen(screen).includes(edge)
 
     readonly property real connectedJoinInset: {
         if (usesConnectedFrameChrome)
-            return connectedBarActiveOnEdge ? SettingsData.frameBarSize : SettingsData.frameThickness;
+            return SettingsData.frameEdgeReservation(screen, edge);
         if (frameExclusionActive)
             return SettingsData.frameEdgeInsetForSide(screen, edge);
         return 0;

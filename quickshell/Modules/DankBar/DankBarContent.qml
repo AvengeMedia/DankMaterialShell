@@ -38,11 +38,10 @@ Item {
     readonly property real _barInsetPaddingRaw: SettingsData.barInsetPaddingSyncAll ? SettingsData.barInsetPaddingShared : (barConfig?.barInsetPadding ?? -1)
     readonly property real _barInsetPaddingAuto: _barIsVertical ? Theme.spacingXS : _edgeBaseMargin
     readonly property real _barInsetPadding: _barInsetPaddingRaw < 0 ? _barInsetPaddingAuto : _barInsetPaddingRaw
-    // Connected-frame Bar Inset Padding: absolute free-end gap the hosted bar spans full-width into
-    // (auto < 0 = frameThickness so widgets align with the interior cutout, 0 = edge-to-edge). The extra
-    // beyond frameThickness is what an adjacent bar end adds on top of its corner alignment.
-    readonly property real _frameInsetResolved: SettingsData.frameBarInsetPadding < 0 ? SettingsData.frameThickness : SettingsData.frameBarInsetPadding
-    readonly property real _frameInsetExtra: Math.max(0, _frameInsetResolved - SettingsData.frameThickness)
+    // Hosted bars span their edge fully; frameBarContentGap is the free-end gap measured from the
+    // screen edge (auto = frameThickness, aligning widgets with the interior cutout).
+    readonly property real _frameInsetResolved: SettingsData.frameBarContentGap
+    readonly property real _frameInsetExtra: SettingsData.frameBarContentGapExtra
 
     // Horizontal bars span the full width and own the corners; the perpendicular vertical bar
     // tucks in below/above. Where they meet, inset the corner widget so it centres in the

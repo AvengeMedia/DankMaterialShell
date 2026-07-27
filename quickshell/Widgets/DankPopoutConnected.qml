@@ -584,11 +584,9 @@ Item {
     }
 
     function _frameEdgeInset(side) {
-        if (!root.frameOwnsConnectedChrome || !root.screen)
+        if (!root.frameOwnsConnectedChrome)
             return 0;
-        const edges = SettingsData.getActiveBarEdgesForScreen(root.screen);
-        const raw = edges.includes(side) ? SettingsData.frameBarSize : SettingsData.frameThickness;
-        return Math.max(0, raw);
+        return Math.max(0, SettingsData.frameEdgeReservation(root.screen, side));
     }
 
     function _edgeGapFor(side, popupGap) {

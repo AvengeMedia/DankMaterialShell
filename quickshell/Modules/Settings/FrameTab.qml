@@ -13,7 +13,7 @@ Item {
     LayoutMirroring.childrenInherit: true
 
     // Bar Inset Padding: resolve the "auto" sentinel (stored < 0) to the frame thickness for the slider display.
-    readonly property int frameInsetPaddingDisplay: SettingsData.frameBarInsetPadding < 0 ? Math.round(SettingsData.frameThickness) : SettingsData.frameBarInsetPadding
+    readonly property int frameInsetPaddingDisplay: Math.round(SettingsData.frameBarContentGap)
 
     DankFlickable {
         anchors.fill: parent

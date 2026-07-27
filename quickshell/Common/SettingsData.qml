@@ -2556,11 +2556,19 @@ Singleton {
         return edges;
     }
 
-    function frameEdgeInsetForSide(screen, side) {
-        if (!frameEnabled || !screen)
+    readonly property real frameBarContentGap: frameBarInsetPadding < 0 ? frameThickness : frameBarInsetPadding
+    readonly property real frameBarContentGapExtra: Math.max(0, frameBarContentGap - frameThickness)
+
+    function frameEdgeReservation(screen, edge) {
+        if (!screen)
             return 0;
-        const edges = getActiveBarEdgesForScreen(screen);
-        return edges.includes(side) ? frameBarSize : frameThickness;
+        return getActiveBarEdgesForScreen(screen).includes(edge) ? frameBarSize : frameThickness;
+    }
+
+    function frameEdgeInsetForSide(screen, side) {
+        if (!frameEnabled)
+            return 0;
+        return frameEdgeReservation(screen, side);
     }
 
     function setMatugenScheme(scheme) {

@@ -34,7 +34,7 @@ Scope {
     }
 
     function exclusionSizeForEdge(edge) {
-        return root.barEdges.includes(edge) ? SettingsData.frameBarSize : SettingsData.frameThickness;
+        return SettingsData.frameEdgeReservation(root.screen, edge);
     }
 
     Loader {
