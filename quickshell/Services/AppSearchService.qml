@@ -210,6 +210,17 @@ Singleton {
                 defaultTrigger: "",
                 isLauncher: false
             },
+            "dms_qr_generator": {
+                id: "dms_qr_generator",
+                name: I18n.tr("QR Generator"),
+                icon: "svg+corner:" + dmsLogoPath + "|qr_code",
+                cornerIcon: "qr_code",
+                comment: "DMS",
+                action: "ipc:qr-generator",
+                categories: ["Utility"],
+                defaultTrigger: "",
+                isLauncher: false
+            },
             "dms_settings_search": {
                 id: "dms_settings_search",
                 name: I18n.tr("Settings Search"),
@@ -377,6 +388,9 @@ Singleton {
             return true;
         case "color-picker":
             PopoutService.showColorPicker();
+            return true;
+        case "qr-generator":
+            PopoutService.showQRGeneratorModal();
             return true;
         }
         return false;
