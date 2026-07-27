@@ -18,6 +18,40 @@ Item {
         desktopApps = [];
     }
 
+    Loader {
+        id: popupLoader
+        active: false
+        sourceComponent: AppBrowserPopup {
+            id: appBrowserPopup
+            appsModel: root.desktopApps
+            parentModal: root.parentModal
+            onAppSelected: appId => {
+                var name = appId;
+                if (name.endsWith(".desktop")) {
+                    name = name.slice(0, -8);
+                }
+                SettingsData.addMediaExcludePlayer(name);
+            }
+        }
+
+        function recreatePopup() {
+            log.debug("Recreating popup");
+            popupLoader.active = false;
+            popupLoader.active = true;
+        }
+
+        function showPopup() {
+            if (!popupLoader.item) {
+                popupLoader.active = true;
+            }
+            popupLoader.item.show();
+            if (!popupLoader.item.visible) {
+                recreatePopup();
+                popupLoader.item.show();
+            }
+        }
+    }
+
     DankFlickable {
         anchors.fill: parent
         clip: true
@@ -185,10 +219,11 @@ Item {
                             placeholderText: I18n.tr("App name or identity (e.g., firefox)")
                             font.pixelSize: Theme.fontSizeSmall
                             onAccepted: {
-                                if (text.trim() !== "") {
-                                    SettingsData.addMediaExcludePlayer(text.trim());
-                                    text = "";
+                                var cleanInput = newExcludePlayerField.text.trim();
+                                if (cleanInput !== "") {
+                                    SettingsData.addMediaExcludePlayer(cleanInput);
                                 }
+                                text = "";
                             }
                         }
 
@@ -200,10 +235,11 @@ Item {
                             backgroundColor: Theme.primary
                             iconColor: Theme.onPrimary
                             onClicked: {
-                                if (newExcludePlayerField.text.trim() !== "") {
-                                    SettingsData.addMediaExcludePlayer(newExcludePlayerField.text.trim());
-                                    newExcludePlayerField.text = "";
+                                var cleanInput = newExcludePlayerField.text.trim();
+                                if (cleanInput !== "") {
+                                    SettingsData.addMediaExcludePlayer(cleanInput);
                                 }
+                                newExcludePlayerField.text = "";
                             }
                         }
 
@@ -214,7 +250,7 @@ Item {
                             iconSize: 20
                             backgroundColor: Theme.surfaceContainer
                             iconColor: Theme.primary
-                            onClicked: appBrowserPopup.show()
+                            onClicked: popupLoader.showPopup()
                         }
                     }
 
@@ -284,19 +320,6 @@ Item {
                     }
                 }
             }
-        }
-    }
-
-    AppBrowserPopup {
-        id: appBrowserPopup
-        appsModel: root.desktopApps
-        parentModal: root.parentModal
-        onAppSelected: appId => {
-            var name = appId;
-            if (name.endsWith(".desktop")) {
-                name = name.slice(0, -8);
-            }
-            SettingsData.addMediaExcludePlayer(name);
         }
     }
 }

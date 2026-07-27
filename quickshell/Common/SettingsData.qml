@@ -217,6 +217,8 @@ Singleton {
     property bool useFahrenheit: false
     property string windSpeedUnit: "kmh"
     property bool nightModeEnabled: false
+    property bool nightModeExcludeFullscreen: false
+    property var nightModeExcludedApps: []
     property int animationSpeed: SettingsData.AnimationSpeed.Short
     property int customAnimationDuration: 500
     property bool syncComponentAnimationSpeeds: true
@@ -3220,29 +3222,64 @@ Singleton {
         saveSettings();
     }
 
-    function addMediaExcludePlayer(identity) {
-        if (identity === undefined || identity === null)
-            return;
-        var normalizedIdentity = identity.toString().trim().toLowerCase();
+    function setNightModeExcludeFullscreen(enabled) {
+        nightModeExcludeFullscreen = enabled;
+        saveSettings();
+    }
+
+    function normalizeAppId(id: string): string {
+        return (id && id.toString().toLowerCase().trim()) || "";
+    }
+
+    function addAppIdToList(identity: string, appList: list<string>): list<string> {
+        identity = identity ?? "";
+        appList = appList ?? [];
+        if (!identity)
+            return appList;
+
+        var normalizedIdentity = normalizeAppId(identity);
         if (!normalizedIdentity)
-            return;
-        var list = mediaExcludePlayers ? mediaExcludePlayers.slice() : [];
-        var normalizedList = list.map(function (id) {
-            return id ? id.toString().trim().toLowerCase() : "";
-        });
-        if (normalizedList.indexOf(normalizedIdentity) >= 0)
-            return;
-        list.push(normalizedIdentity);
-        mediaExcludePlayers = list;
+            return appList;
+
+        var cleanList = appList.map(id => id ? normalizeAppId(id) : "").filter(id => id !== "");
+        if (cleanList.includes(normalizedIdentity))
+            return cleanList;
+
+        cleanList.push(normalizedIdentity);
+        return cleanList;
+    }
+
+    function removeAppIdFromList(index: int, appList: list<string>): list<string> {
+        var moddedList = appList ? appList.slice() : [];
+        if (index < 0 || index >= moddedList.length)
+            return moddedList;
+        moddedList.splice(index, 1);
+        return moddedList;
+    }
+
+    function addNightModeExcludedApp(identity: string) {
+        var newList = addAppIdToList(identity, nightModeExcludedApps);
+        nightModeExcludedApps = newList;
+        SessionData.resetNightModeExcludedAppsMatchesCache();
+        saveSettings();
+    }
+
+    function removeNightModeExcludedApp(index: int) {
+        var newList = removeAppIdFromList(index, nightModeExcludedApps);
+        nightModeExcludedApps = newList;
+        SessionData.resetNightModeExcludedAppsMatchesCache();
+        saveSettings();
+    }
+
+    function addMediaExcludePlayer(identity) {
+        var newList = addAppIdToList(identity, mediaExcludePlayers);
+        mediaExcludePlayers = newList;
         saveSettings();
     }
 
     function removeMediaExcludePlayer(index) {
-        var list = mediaExcludePlayers ? mediaExcludePlayers.slice() : [];
-        if (index < 0 || index >= list.length)
-            return;
-        list.splice(index, 1);
-        mediaExcludePlayers = list;
+        var newList = removeAppIdFromList(index, mediaExcludePlayers);
+        mediaExcludePlayers = newList;
         saveSettings();
     }
 

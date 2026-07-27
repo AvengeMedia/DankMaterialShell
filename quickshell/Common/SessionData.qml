@@ -162,6 +162,8 @@ Singleton {
     property real longitude: 0.0
     property bool nightModeUseIPLocation: false
     property string nightModeLocationProvider: ""
+    property bool nightModePaused: false
+    property var nightModeExcludedAppsMatchesCache: []
 
     property bool themeModeAutoEnabled: false
     property string themeModeAutoMode: "time"
@@ -785,6 +787,26 @@ Singleton {
         newSettings[identifier] = getMonitorCyclingSettings(screenName);
         newSettings[identifier].time = time;
         monitorCyclingSettings = newSettings;
+        saveSettings();
+    }
+
+    function cacheNightModeExcludedAppMatch(app: string) {
+        app = app ? String(app).toLowerCase().trim() : "";
+        var moddedList = nightModeExcludedAppsMatchesCache ? nightModeExcludedAppsMatchesCache.slice() : [];
+        if (!moddedList.includes(app)) {
+            moddedList.push(app);
+            nightModeExcludedAppsMatchesCache = moddedList;
+            saveSettings();
+        }
+    }
+
+    function resetNightModeExcludedAppsMatchesCache() {
+        nightModeExcludedAppsMatchesCache = [];
+        saveSettings();
+    }
+
+    function setNightModePaused(paused: bool) {
+        nightModePaused = paused;
         saveSettings();
     }
 

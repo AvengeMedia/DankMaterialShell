@@ -66,6 +66,8 @@ var SPEC = {
     useFahrenheit: { def: false },
     windSpeedUnit: { def: "kmh" },
     nightModeEnabled: { def: false },
+    nightModeExcludeFullscreen: { def: false },
+    nightModeExcludedApps: { def: [] },
     animationSpeed: { def: 1 },
     customAnimationDuration: { def: 500 },
     syncComponentAnimationSpeeds: { def: true },
