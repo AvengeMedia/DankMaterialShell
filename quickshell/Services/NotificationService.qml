@@ -889,6 +889,12 @@ Singleton {
         NotifWrapper {}
     }
 
+    function dismissLastNotification() {
+        const w = visibleNotifications[visibleNotifications.length - 1];
+        if (w)
+            dismissNotification(w);
+    }
+
     function dismissAllPopups() {
         for (const w of visibleNotifications) {
             if (w) {
