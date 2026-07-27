@@ -237,7 +237,7 @@ Singleton {
 
                     const summary = w.notification.summary;
 
-                    if ((dismissLow && summary === lowSummary) || (dismissCritical && summary === lowSummary)) {
+                    if ((dismissLow && summary === lowSummary) || (dismissCritical && summary === criticalSummary)) {
                         NotificationService.dismissNotification(w);
                     }
                 }
