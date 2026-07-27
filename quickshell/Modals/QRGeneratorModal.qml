@@ -232,6 +232,8 @@ DankModal {
                     DankButton {
                         text: I18n.tr("Save")
                         iconName: "save"
+                        backgroundColor: Theme.surfaceContainer
+                        textColor: Theme.surfaceText
                         onClicked: {
                             saveBrowserLoader.active = true;
                             if (saveBrowserLoader.item) {
@@ -241,9 +243,14 @@ DankModal {
                     }
 
                     DankButton {
-                        text: I18n.tr("Close")
-                        iconName: "close"
-                        onClicked: root.hide()
+                        text: I18n.tr("Copy")
+                        iconName: "content_copy"
+                        backgroundColor: Theme.primary
+                        textColor: Theme.onPrimary
+                        onClicked: {
+                            if (root.normalQrCodePath.length > 0)
+                                DMSService.sendRequest("clipboard.copyFile", {filePath: root.normalQrCodePath});
+                        }
                     }
 
                     Item {
