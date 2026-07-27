@@ -354,28 +354,6 @@ Singleton {
         return "Very Poor";
     }
 
-    function getSignalIcon(device) {
-        if (!device || device.signalStrength === undefined || device.signalStrength <= 0) {
-            return "signal_cellular_null";
-        }
-
-        const signal = device.signalStrength;
-        if (signal >= 80) {
-            return "signal_cellular_4_bar";
-        }
-        if (signal >= 60) {
-            return "signal_cellular_3_bar";
-        }
-        if (signal >= 40) {
-            return "signal_cellular_2_bar";
-        }
-        if (signal >= 20) {
-            return "signal_cellular_1_bar";
-        }
-
-        return "signal_cellular_0_bar";
-    }
-
     function isDeviceBusy(device) {
         if (!device) {
             return false;
@@ -618,40 +596,6 @@ Singleton {
             root.queryBluezCodecState(device, (codecs, current) => {
                 if (current)
                     root.updateDeviceCodec(device.address, current);
-            });
-        });
-    }
-
-    function getCurrentCodec(device, callback) {
-        if (!device || !device.connected || !isAudioDevice(device)) {
-            callback("");
-            return;
-        }
-
-        whenCodecBackendReady(() => {
-            if (root.wpexecAvailable) {
-                root.queryCardProfiles(device, (codecs, current) => {
-                    if (current) {
-                        callback(current);
-                        return;
-                    }
-                    if (!root.dbusBridgeAvailable) {
-                        callback("");
-                        return;
-                    }
-                    root.queryBluezCodecState(device, (bluezCodecs, bluezCurrent) => {
-                        callback(bluezCurrent || "");
-                    });
-                });
-                return;
-            }
-
-            if (!root.dbusBridgeAvailable) {
-                callback("");
-                return;
-            }
-            root.queryBluezCodecState(device, (codecs, current) => {
-                callback(current || "");
             });
         });
     }

@@ -1228,10 +1228,6 @@ Singleton {
         });
     }
 
-    function setNightModeAutomationMode(mode) {
-        SessionData.setNightModeAutoMode(mode);
-    }
-
     function evaluateNightMode() {
         if (!nightModeEnabled) {
             return;
@@ -1353,6 +1349,14 @@ Singleton {
     function updateDeviceBrightnessDisplay(deviceName) {
         brightnessVersion++;
         brightnessChanged();
+    }
+
+    Connections {
+        target: SessionData
+
+        function onBrightnessDisplayHintChanged(deviceName) {
+            root.updateDeviceBrightnessDisplay(deviceName);
+        }
     }
 
     Timer {

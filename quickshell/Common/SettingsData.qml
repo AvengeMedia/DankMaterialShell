@@ -712,16 +712,23 @@ Singleton {
     property bool notepadUseCompositorGap: false
     property int notepadEdgeGap: 0
 
+    property string activeCompositor: ""
+
     // Compositor layout gap when enabled and available, else the manual value.
     readonly property int notepadEffectiveEdgeGap: {
         if (notepadUseCompositorGap) {
             var g = -1;
-            if (CompositorService.isNiri)
+            switch (activeCompositor) {
+            case "niri":
                 g = niriLayoutGapsOverride;
-            else if (CompositorService.isHyprland)
+                break;
+            case "hyprland":
                 g = hyprlandLayoutGapsOverride;
-            else if (CompositorService.isMango)
+                break;
+            case "mango":
                 g = mangoLayoutGapsOverride;
+                break;
+            }
             if (g >= 0)
                 return g;
         }
@@ -1126,44 +1133,6 @@ Singleton {
         saveSettings();
     }
 
-    function getSystemMonitorVariants() {
-        return systemMonitorVariants || [];
-    }
-
-    function createSystemMonitorVariant(name, config) {
-        const id = "sysmon_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
-        const variant = {
-            id: id,
-            name: name,
-            config: config || getDefaultSystemMonitorConfig()
-        };
-        const variants = JSON.parse(JSON.stringify(systemMonitorVariants || []));
-        variants.push(variant);
-        systemMonitorVariants = variants;
-        saveSettings();
-        return variant;
-    }
-
-    function updateSystemMonitorVariant(variantId, updates) {
-        const variants = JSON.parse(JSON.stringify(systemMonitorVariants || []));
-        const idx = variants.findIndex(v => v.id === variantId);
-        if (idx === -1)
-            return;
-        Object.assign(variants[idx], updates);
-        systemMonitorVariants = variants;
-        saveSettings();
-    }
-
-    function removeSystemMonitorVariant(variantId) {
-        const variants = (systemMonitorVariants || []).filter(v => v.id !== variantId);
-        systemMonitorVariants = variants;
-        saveSettings();
-    }
-
-    function getSystemMonitorVariant(variantId) {
-        return (systemMonitorVariants || []).find(v => v.id === variantId) || null;
-    }
-
     function getDefaultSystemMonitorConfig() {
         return {
             showHeader: true,
@@ -1304,70 +1273,6 @@ Singleton {
         return (desktopWidgetInstances || []).find(inst => inst.id === instanceId) || null;
     }
 
-    function getDesktopWidgetInstancesOfType(widgetType) {
-        return (desktopWidgetInstances || []).filter(inst => inst.widgetType === widgetType);
-    }
-
-    function getEnabledDesktopWidgetInstances() {
-        return (desktopWidgetInstances || []).filter(inst => inst.enabled);
-    }
-
-    function moveDesktopWidgetInstance(instanceId, direction) {
-        const instances = JSON.parse(JSON.stringify(desktopWidgetInstances || []));
-        const idx = instances.findIndex(inst => inst.id === instanceId);
-        if (idx === -1)
-            return false;
-        const targetIdx = direction === "up" ? idx - 1 : idx + 1;
-        if (targetIdx < 0 || targetIdx >= instances.length)
-            return false;
-        const temp = instances[idx];
-        instances[idx] = instances[targetIdx];
-        instances[targetIdx] = temp;
-        desktopWidgetInstances = instances;
-        saveSettings();
-        return true;
-    }
-
-    function reorderDesktopWidgetInstance(instanceId, newIndex) {
-        const instances = JSON.parse(JSON.stringify(desktopWidgetInstances || []));
-        const idx = instances.findIndex(inst => inst.id === instanceId);
-        if (idx === -1 || newIndex < 0 || newIndex >= instances.length)
-            return false;
-        const [item] = instances.splice(idx, 1);
-        instances.splice(newIndex, 0, item);
-        desktopWidgetInstances = instances;
-        saveSettings();
-        return true;
-    }
-
-    function reorderDesktopWidgetInstanceInGroup(instanceId, groupId, newIndexInGroup) {
-        const instances = JSON.parse(JSON.stringify(desktopWidgetInstances || []));
-        const groups = desktopWidgetGroups || [];
-        const groupMatches = inst => {
-            if (groupId === null)
-                return !inst.group || !groups.some(g => g.id === inst.group);
-            return inst.group === groupId;
-        };
-        const groupInstances = instances.filter(groupMatches);
-        const currentGroupIdx = groupInstances.findIndex(inst => inst.id === instanceId);
-        if (currentGroupIdx === -1 || currentGroupIdx === newIndexInGroup)
-            return false;
-        if (newIndexInGroup < 0 || newIndexInGroup >= groupInstances.length)
-            return false;
-        const globalIdx = instances.findIndex(inst => inst.id === instanceId);
-        if (globalIdx === -1)
-            return false;
-        const [item] = instances.splice(globalIdx, 1);
-        const targetInstance = groupInstances[newIndexInGroup];
-        let targetGlobalIdx = instances.findIndex(inst => inst.id === targetInstance.id);
-        if (newIndexInGroup > currentGroupIdx)
-            targetGlobalIdx++;
-        instances.splice(targetGlobalIdx, 0, item);
-        desktopWidgetInstances = instances;
-        saveSettings();
-        return true;
-    }
-
     function moveDesktopWidgetInstanceToGroup(instanceId, groupId, newIndexInGroup) {
         const instances = JSON.parse(JSON.stringify(desktopWidgetInstances || []));
         const groups = desktopWidgetGroups || [];
@@ -1433,22 +1338,14 @@ Singleton {
         saveSettings();
     }
 
-    function getDesktopWidgetGroup(groupId) {
-        return (desktopWidgetGroups || []).find(g => g.id === groupId) || null;
-    }
-
-    function getDesktopWidgetInstancesByGroup(groupId) {
-        return (desktopWidgetInstances || []).filter(inst => inst.group === groupId);
-    }
-
-    function getUngroupedDesktopWidgetInstances() {
-        return (desktopWidgetInstances || []).filter(inst => !inst.group);
-    }
-
     signal forceDankBarLayoutRefresh
     signal forceDockLayoutRefresh
     signal widgetDataChanged
     signal workspaceIconsUpdated
+    signal compositorLayoutRefreshNeeded(bool frame)
+    signal compositorInputRefreshNeeded
+    signal compositorCursorRefreshNeeded
+    signal notificationPopupsInvalidated
 
     function refreshAuthAvailability() {
         Processes.detectAuthCapabilities();
@@ -1483,31 +1380,15 @@ Singleton {
     }
 
     function updateCompositorLayout() {
-        if (typeof CompositorService === "undefined")
-            return;
-        if (CompositorService.isNiri && typeof NiriService !== "undefined")
-            NiriService.generateNiriLayoutConfig();
-        if (CompositorService.isHyprland && typeof HyprlandService !== "undefined")
-            HyprlandService.generateLayoutConfig();
-        if (CompositorService.isMango && typeof MangoService !== "undefined")
-            MangoService.generateLayoutConfig();
+        compositorLayoutRefreshNeeded(false);
     }
 
     function updateCompositorInput() {
-        if (typeof CompositorService === "undefined")
-            return;
-        if (CompositorService.isNiri && typeof NiriService !== "undefined")
-            NiriService.generateNiriInputConfig();
+        compositorInputRefreshNeeded();
     }
 
     function updateFrameCompositorLayout() {
-        // Generate before begin() so compositor readiness is already pending at transitionRequested
-        if (typeof CompositorService !== "undefined") {
-            if (CompositorService.isNiri && typeof NiriService !== "undefined")
-                NiriService.generateNiriLayoutConfig(true);
-            if (CompositorService.isHyprland && typeof HyprlandService !== "undefined")
-                HyprlandService.generateLayoutConfig(true);
-        }
+        compositorLayoutRefreshNeeded(true);
         FrameTransitionState.begin();
     }
 
@@ -2160,14 +2041,6 @@ Singleton {
         return showSeconds ? "h:mm:ss AP" : "h:mm AP";
     }
 
-    function getEffectiveClockDateFormat() {
-        return clockDateFormat && clockDateFormat.length > 0 ? clockDateFormat : "ddd d";
-    }
-
-    function getEffectiveLockDateFormat() {
-        return lockDateFormat && lockDateFormat.length > 0 ? lockDateFormat : Locale.LongFormat;
-    }
-
     function initializeListModels() {
         const defaultBar = barConfigs[0] || getBarConfig("default");
         if (defaultBar) {
@@ -2178,39 +2051,6 @@ Singleton {
     function updateListModel(listModel, order) {
         Lists.update(listModel, order);
         widgetDataChanged();
-    }
-
-    function hasNamedWorkspaces() {
-        if (typeof NiriService === "undefined" || !CompositorService.isNiri)
-            return false;
-
-        for (var i = 0; i < NiriService.allWorkspaces.length; i++) {
-            var ws = NiriService.allWorkspaces[i];
-            if (ws.name && ws.name.trim() !== "")
-                return true;
-        }
-        return false;
-    }
-
-    function getNamedWorkspaces() {
-        var namedWorkspaces = [];
-        if (typeof NiriService === "undefined" || !CompositorService.isNiri)
-            return namedWorkspaces;
-
-        for (const ws of NiriService.allWorkspaces) {
-            if (ws.name && ws.name.trim() !== "") {
-                namedWorkspaces.push(ws.name);
-            }
-        }
-        return namedWorkspaces;
-    }
-
-    function getPopupYPosition(barHeight) {
-        const defaultBar = barConfigs[0] || getBarConfig("default");
-        const gothOffset = defaultBar?.gothCornersEnabled ? Theme.cornerRadius : 0;
-        const spacing = defaultBar?.spacing ?? 4;
-        const bottomGap = defaultBar?.bottomGap ?? 0;
-        return barHeight + spacing + bottomGap - gothOffset + Theme.popupDistance;
     }
 
     function getPopupTriggerPosition(pos, screen, barThickness, widgetWidth, barSpacing, barPosition, barConfig) {
@@ -2506,49 +2346,8 @@ Singleton {
         updateBarConfigs();
 
         if (positionChanged) {
-            NotificationService.dismissAllPopups();
+            notificationPopupsInvalidated();
         }
-    }
-
-    function checkBarCollisions(barId) {
-        const bar = getBarConfig(barId);
-        if (!bar || !bar.enabled)
-            return [];
-
-        const conflicts = [];
-        const enabledBars = getEnabledBarConfigs();
-
-        for (var i = 0; i < enabledBars.length; i++) {
-            const other = enabledBars[i];
-            if (other.id === barId)
-                continue;
-            const samePosition = bar.position === other.position;
-            if (!samePosition)
-                continue;
-            const barScreens = bar.screenPreferences || ["all"];
-            const otherScreens = other.screenPreferences || ["all"];
-
-            const hasAll = barScreens.includes("all") || otherScreens.includes("all");
-            if (hasAll) {
-                conflicts.push({
-                    "barId": other.id,
-                    "barName": other.name,
-                    "reason": "Same position on all screens"
-                });
-                continue;
-            }
-
-            const overlapping = barScreens.some(screen => otherScreens.includes(screen));
-            if (overlapping) {
-                conflicts.push({
-                    "barId": other.id,
-                    "barName": other.name,
-                    "reason": "Same position on overlapping screens"
-                });
-            }
-        }
-
-        return conflicts;
     }
 
     function deleteBarConfig(barId) {
@@ -2699,38 +2498,6 @@ Singleton {
         return filtered;
     }
 
-    function getFrameFilteredScreens() {
-        var prefs = frameScreenPreferences || ["all"];
-        if (!prefs || prefs.length === 0 || prefs.includes("all")) {
-            return Quickshell.screens;
-        }
-        return Quickshell.screens.filter(screen => isScreenInPreferences(screen, prefs));
-    }
-
-    function getActiveBarEdgeForScreen(screen) {
-        if (!screen)
-            return "";
-        for (var i = 0; i < barConfigs.length; i++) {
-            var bc = barConfigs[i];
-            if (!bc.enabled)
-                continue;
-            var prefs = bc.screenPreferences || ["all"];
-            if (!prefs.includes("all") && !isScreenInPreferences(screen, prefs))
-                continue;
-            switch (bc.position ?? 0) {
-            case SettingsData.Position.Top:
-                return "top";
-            case SettingsData.Position.Bottom:
-                return "bottom";
-            case SettingsData.Position.Left:
-                return "left";
-            case SettingsData.Position.Right:
-                return "right";
-            }
-        }
-        return "";
-    }
-
     function getActiveBarEdgesForScreen(screen) {
         if (!screen)
             return [];
@@ -2796,46 +2563,6 @@ Singleton {
         return edges.includes(side) ? frameBarSize : frameThickness;
     }
 
-    function getActiveBarThicknessForScreen(screen) {
-        if (frameEnabled)
-            return frameBarSize;
-        if (!screen)
-            return frameThickness;
-        for (var i = 0; i < barConfigs.length; i++) {
-            var bc = barConfigs[i];
-            if (!bc.enabled)
-                continue;
-            var prefs = bc.screenPreferences || ["all"];
-            if (!prefs.includes("all") && !isScreenInPreferences(screen, prefs))
-                continue;
-            const innerPadding = bc.innerPadding ?? 4;
-            const barT = Math.max(26 + innerPadding * 0.6, Theme.barHeight - 4 - (8 - innerPadding));
-            const spacing = bc.spacing ?? 4;
-            const bottomGap = bc.bottomGap ?? 0;
-            return barT + spacing + bottomGap;
-        }
-        return frameThickness;
-    }
-
-    function sendTestNotifications() {
-        NotificationService.dismissAllPopups();
-        sendTestNotification(0);
-        testNotifTimer1.start();
-        testNotifTimer2.start();
-    }
-
-    function sendTestNotification(index) {
-        const notifications = [["Notification Position Test", "DMS test notification 1 of 3 ~ Hi there!", "preferences-system"], ["Second Test", "DMS Notification 2 of 3 ~ Check it out!", "applications-graphics"], ["Third Test", "DMS notification 3 of 3 ~ Enjoy!", "face-smile"]];
-
-        if (index < 0 || index >= notifications.length) {
-            return;
-        }
-
-        const notif = notifications[index];
-        testNotificationProcess.command = ["notify-send", "-h", "int:transient:1", "-a", "DMS", "-i", notif[2], notif[0], notif[1]];
-        testNotificationProcess.running = true;
-    }
-
     function setMatugenScheme(scheme) {
         var normalized = scheme || "scheme-tonal-spot";
         if (matugenScheme === normalized)
@@ -2850,15 +2577,6 @@ Singleton {
         if (matugenContrast === value)
             return;
         set("matugenContrast", value);
-    }
-
-    function setRunUserMatugenTemplates(enabled) {
-        if (runUserMatugenTemplates === enabled)
-            return;
-        set("runUserMatugenTemplates", enabled);
-        if (typeof Theme !== "undefined") {
-            Theme.generateSystemThemesFromCurrentTheme();
-        }
     }
 
     function setMatugenTargetMonitor(monitorName) {
@@ -2877,11 +2595,6 @@ Singleton {
 
     function setWeatherLocation(displayName, coordinates) {
         SessionData.setWeatherLocation(displayName, coordinates);
-    }
-
-    function setIconTheme(themeName) {
-        const light = iconThemePerMode && typeof SessionData !== "undefined" && SessionData.isLightMode;
-        setIconThemeForMode(themeName, light);
     }
 
     function setIconThemeForMode(themeName, light) {
@@ -2929,20 +2642,7 @@ Singleton {
     // https://github.com/Supreeeme/xwayland-satellite/issues/104
     // no idea if this matters on other compositors but we also set XCURSOR stuff in the launcher
     function updateCompositorCursor() {
-        if (typeof CompositorService === "undefined")
-            return;
-        if (CompositorService.isNiri && typeof NiriService !== "undefined") {
-            NiriService.generateNiriCursorConfig();
-            return;
-        }
-        if (CompositorService.isHyprland && typeof HyprlandService !== "undefined") {
-            HyprlandService.generateCursorConfig();
-            return;
-        }
-        if (CompositorService.isMango && typeof MangoService !== "undefined") {
-            MangoService.generateCursorConfig();
-            return;
-        }
+        compositorCursorRefreshNeeded();
     }
 
     function updateXResources() {
@@ -3010,20 +2710,6 @@ Singleton {
         return env;
     }
 
-    function setGtkThemingEnabled(enabled) {
-        set("gtkThemingEnabled", enabled);
-        if (enabled && typeof Theme !== "undefined") {
-            Theme.generateSystemThemesFromCurrentTheme();
-        }
-    }
-
-    function setQtThemingEnabled(enabled) {
-        set("qtThemingEnabled", enabled);
-        if (enabled && typeof Theme !== "undefined") {
-            Theme.generateSystemThemesFromCurrentTheme();
-        }
-    }
-
     function setShowDock(enabled) {
         showDock = enabled;
         const defaultBar = barConfigs[0] || getBarConfig("default");
@@ -3067,16 +2753,6 @@ Singleton {
         }
         saveSettings();
         Qt.callLater(() => forceDockLayoutRefresh());
-    }
-
-    function setDankBarSpacing(spacing) {
-        const defaultBar = barConfigs[0] || getBarConfig("default");
-        if (defaultBar) {
-            updateBarConfig(defaultBar.id, {
-                "spacing": spacing
-            });
-        }
-        updateCompositorLayout();
     }
 
     function setDankBarPosition(position) {
@@ -3132,39 +2808,6 @@ Singleton {
             });
             updateListModel(rightWidgetsModel, order);
         }
-    }
-
-    function resetDankBarWidgetsToDefault() {
-        var defaultLeft = ["launcherButton", "workspaceSwitcher", "focusedWindow"];
-        var defaultCenter = ["music", "clock", "weather"];
-        var defaultRight = ["systemTray", "clipboard", "notificationButton", "battery", "controlCenterButton"];
-        const defaultBar = barConfigs[0] || getBarConfig("default");
-        if (defaultBar) {
-            updateBarConfig(defaultBar.id, {
-                "leftWidgets": defaultLeft,
-                "centerWidgets": defaultCenter,
-                "rightWidgets": defaultRight
-            });
-        }
-        updateListModel(leftWidgetsModel, defaultLeft);
-        updateListModel(centerWidgetsModel, defaultCenter);
-        updateListModel(rightWidgetsModel, defaultRight);
-        showLauncherButton = true;
-        showWorkspaceSwitcher = true;
-        showFocusedWindow = true;
-        showWeather = true;
-        showMusic = true;
-        showClipboard = true;
-        showCpuUsage = true;
-        showMemUsage = true;
-        showCpuTemp = true;
-        showGpuTemp = true;
-        showSystemTray = true;
-        showClock = true;
-        showNotificationButton = true;
-        showBattery = true;
-        showControlCenterButton = true;
-        showCapsLockIndicator = true;
     }
 
     function setWorkspaceNameIcon(workspaceName, iconData) {
@@ -3448,15 +3091,6 @@ Singleton {
             Theme.reloadCustomThemeVariant();
     }
 
-    function toggleDankBarVisible() {
-        const defaultBar = barConfigs[0] || getBarConfig("default");
-        if (defaultBar) {
-            updateBarConfig(defaultBar.id, {
-                "visible": !defaultBar.visible
-            });
-        }
-    }
-
     function toggleShowDock() {
         setShowDock(!showDock);
     }
@@ -3476,13 +3110,6 @@ Singleton {
         updated[pluginId][key] = value;
         pluginSettings = updated;
         savePluginSettings();
-    }
-
-    function removePluginSettings(pluginId) {
-        if (pluginSettings[pluginId]) {
-            delete pluginSettings[pluginId];
-            savePluginSettings();
-        }
     }
 
     function getPluginSettingsForPlugin(pluginId) {
@@ -3510,22 +3137,6 @@ Singleton {
         return settings ? JSON.parse(JSON.stringify(settings)) : {};
     }
 
-    function setNiriOutputSettings(outputId, settings) {
-        const updated = JSON.parse(JSON.stringify(niriOutputSettings));
-        updated[outputId] = settings;
-        niriOutputSettings = updated;
-        saveSettings();
-    }
-
-    function removeNiriOutputSettings(outputId) {
-        if (!niriOutputSettings[outputId])
-            return;
-        const updated = JSON.parse(JSON.stringify(niriOutputSettings));
-        delete updated[outputId];
-        niriOutputSettings = updated;
-        saveSettings();
-    }
-
     function getHyprlandOutputSetting(outputId, key, defaultValue) {
         if (!hyprlandOutputSettings[outputId])
             return defaultValue;
@@ -3547,40 +3158,6 @@ Singleton {
         const updated = JSON.parse(JSON.stringify(hyprlandOutputSettings));
         delete updated[outputId][key];
         hyprlandOutputSettings = updated;
-        saveSettings();
-    }
-
-    function getHyprlandOutputSettings(outputId) {
-        const settings = hyprlandOutputSettings[outputId];
-        return settings ? JSON.parse(JSON.stringify(settings)) : {};
-    }
-
-    function setHyprlandOutputSettings(outputId, settings) {
-        const updated = JSON.parse(JSON.stringify(hyprlandOutputSettings));
-        updated[outputId] = settings;
-        hyprlandOutputSettings = updated;
-        saveSettings();
-    }
-
-    function removeHyprlandOutputSettings(outputId) {
-        if (!hyprlandOutputSettings[outputId])
-            return;
-        const updated = JSON.parse(JSON.stringify(hyprlandOutputSettings));
-        delete updated[outputId];
-        hyprlandOutputSettings = updated;
-        saveSettings();
-    }
-
-    function getDisplayProfiles(compositor) {
-        return displayProfiles[compositor] || {};
-    }
-
-    function setDisplayProfile(compositor, profileId, data) {
-        const updated = JSON.parse(JSON.stringify(displayProfiles));
-        if (!updated[compositor])
-            updated[compositor] = {};
-        updated[compositor][profileId] = data;
-        displayProfiles = updated;
         saveSettings();
     }
 
@@ -3635,29 +3212,6 @@ Singleton {
 
     ListModel {
         id: rightWidgetsModel
-    }
-
-    property Process testNotificationProcess
-
-    testNotificationProcess: Process {
-        command: []
-        running: false
-    }
-
-    property Timer testNotifTimer1
-
-    testNotifTimer1: Timer {
-        interval: 400
-        repeat: false
-        onTriggered: sendTestNotification(1)
-    }
-
-    property Timer testNotifTimer2
-
-    testNotifTimer2: Timer {
-        interval: 800
-        repeat: false
-        onTriggered: sendTestNotification(2)
     }
 
     property alias settingsFile: settingsFile

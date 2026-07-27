@@ -2,6 +2,7 @@ import QtQuick
 import qs.Common
 import qs.Services
 import qs.Widgets
+import "../../../Common/Format.js" as Format
 
 Rectangle {
     id: root
@@ -22,36 +23,8 @@ Rectangle {
         onTriggered: root.nowMs = Date.now()
     }
 
-    function _pad2(n) {
-        return n < 10 ? "0" + n : "" + n;
-    }
-
     function formatRemaining(ms) {
-        if (ms <= 0)
-            return I18n.tr("Off");
-        const totalMinutes = Math.ceil(ms / 60000);
-        if (totalMinutes < 60)
-            return I18n.tr("%1 min left").arg(totalMinutes);
-        const hours = Math.floor(totalMinutes / 60);
-        const mins = totalMinutes - hours * 60;
-        if (mins === 0)
-            return I18n.tr("%1 h left").arg(hours);
-        return I18n.tr("%1 h %2 m left").arg(hours).arg(mins);
-    }
-
-    function formatUntilTimestamp(ts) {
-        if (!ts)
-            return "";
-        const d = new Date(ts);
-        const hours = d.getHours();
-        const minutes = d.getMinutes();
-        const use24h = (typeof SettingsData !== "undefined") ? SettingsData.use24HourClock : true;
-        if (use24h) {
-            return _pad2(hours) + ":" + _pad2(minutes);
-        }
-        const suffix = hours >= 12 ? "PM" : "AM";
-        const h12 = ((hours + 11) % 12) + 1;
-        return h12 + ":" + _pad2(minutes) + " " + suffix;
+        return Format.formatRemaining(ms, I18n.tr("Off"), I18n.tr("%1 min left"), I18n.tr("%1 h left"), I18n.tr("%1 h %2 m left"));
     }
 
     function minutesUntilTomorrowMorning() {
@@ -149,7 +122,7 @@ Rectangle {
                     visible: root.currentlyActive
                     text: {
                         if (SessionData.doNotDisturbUntil > 0) {
-                            return root.formatRemaining(root.currentRemainingMs) + " · " + I18n.tr("until %1").arg(root.formatUntilTimestamp(SessionData.doNotDisturbUntil));
+                            return root.formatRemaining(root.currentRemainingMs) + " · " + I18n.tr("until %1").arg(Format.formatUntil(SessionData.doNotDisturbUntil, SettingsData.use24HourClock));
                         }
                         return I18n.tr("On indefinitely");
                     }

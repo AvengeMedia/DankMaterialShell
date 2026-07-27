@@ -1,5 +1,6 @@
 import QtQuick
 import qs.Common
+import qs.Services
 import qs.Widgets
 import qs.Modules.Settings.Widgets
 
@@ -215,7 +216,7 @@ Item {
                     currentValue: (SettingsData.notificationSummaryFontSize || I18n.tr("Unset")).toString()
                     onValueChanged: value => {
                         SettingsData.set("notificationSummaryFontSize", Number(value === I18n.tr("Unset") ? 0 : value));
-                        SettingsData.sendTestNotifications();
+                        NotificationService.sendTestNotifications();
                     }
                 }
 
@@ -228,7 +229,7 @@ Item {
                     currentValue: (SettingsData.notificationBodyFontSize || I18n.tr("Unset")).toString()
                     onValueChanged: value => {
                         SettingsData.set("notificationBodyFontSize", Number(value === I18n.tr("Unset") ? 0 : value));
-                        SettingsData.sendTestNotifications();
+                        NotificationService.sendTestNotifications();
                     }
                 }
 
@@ -277,7 +278,7 @@ Item {
                             SettingsData.set("notificationPopupPosition", SettingsData.Position.Bottom);
                             break;
                         }
-                        SettingsData.sendTestNotifications();
+                        NotificationService.sendTestNotifications();
                     }
                 }
 

@@ -4,6 +4,7 @@ import Quickshell
 import qs.Common
 import qs.Services
 import qs.Widgets
+import "../../Common/Format.js" as Format
 
 Item {
     id: root
@@ -188,16 +189,6 @@ Item {
         return DgopService.availableGpus.find(g => g.pciId === selectedGpuPciId);
     }
 
-    function formatBytes(bytes) {
-        if (bytes < 1024)
-            return bytes.toFixed(0) + "B";
-        if (bytes < 1024 * 1024)
-            return (bytes / 1024).toFixed(0) + "K";
-        if (bytes < 1024 * 1024 * 1024)
-            return (bytes / (1024 * 1024)).toFixed(1) + "M";
-        return (bytes / (1024 * 1024 * 1024)).toFixed(1) + "G";
-    }
-
     function formatMemKB(kb) {
         if (kb < 1024)
             return kb.toFixed(0) + "K";
@@ -206,26 +197,18 @@ Item {
         return (kb / (1024 * 1024)).toFixed(1) + "G";
     }
 
-    function addToHistory(arr, val) {
-        var newArr = arr.slice();
-        newArr.push(val);
-        if (newArr.length > historySize)
-            newArr.shift();
-        return newArr;
-    }
-
     function sampleData() {
         if (showCpuGraph)
-            cpuHistory = addToHistory(cpuHistory, DgopService.cpuUsage);
+            cpuHistory = Format.addToHistory(cpuHistory, DgopService.cpuUsage, historySize);
         if (showMemoryGraph)
-            memHistory = addToHistory(memHistory, DgopService.memoryUsage);
+            memHistory = Format.addToHistory(memHistory, DgopService.memoryUsage, historySize);
         if (showNetworkGraph) {
-            netRxHistory = addToHistory(netRxHistory, DgopService.networkRxRate);
-            netTxHistory = addToHistory(netTxHistory, DgopService.networkTxRate);
+            netRxHistory = Format.addToHistory(netRxHistory, DgopService.networkRxRate, historySize);
+            netTxHistory = Format.addToHistory(netTxHistory, DgopService.networkTxRate, historySize);
         }
         if (showDisk) {
-            diskReadHistory = addToHistory(diskReadHistory, DgopService.diskReadRate);
-            diskWriteHistory = addToHistory(diskWriteHistory, DgopService.diskWriteRate);
+            diskReadHistory = Format.addToHistory(diskReadHistory, DgopService.diskReadRate, historySize);
+            diskWriteHistory = Format.addToHistory(diskWriteHistory, DgopService.diskWriteRate, historySize);
         }
     }
 
@@ -519,7 +502,7 @@ Item {
                                         color: root.accentColor
                                     }
                                     StyledText {
-                                        text: root.formatBytes(DgopService.networkRxRate) + "/s"
+                                        text: Format.formatBytes(DgopService.networkRxRate) + "/s"
                                         isMonospace: true
                                         font.pixelSize: Theme.fontSizeMedium
                                         color: root.textColor
@@ -533,7 +516,7 @@ Item {
                                         color: root.dimColor
                                     }
                                     StyledText {
-                                        text: root.formatBytes(DgopService.networkTxRate) + "/s"
+                                        text: Format.formatBytes(DgopService.networkTxRate) + "/s"
                                         isMonospace: true
                                         font.pixelSize: Theme.fontSizeMedium
                                         color: root.textColor
@@ -552,7 +535,7 @@ Item {
                                         color: root.accentColor
                                     }
                                     StyledText {
-                                        text: root.formatBytes(DgopService.diskReadRate) + "/s"
+                                        text: Format.formatBytes(DgopService.diskReadRate) + "/s"
                                         isMonospace: true
                                         font.pixelSize: Theme.fontSizeMedium
                                         color: root.textColor
@@ -566,7 +549,7 @@ Item {
                                         color: root.dimColor
                                     }
                                     StyledText {
-                                        text: root.formatBytes(DgopService.diskWriteRate) + "/s"
+                                        text: Format.formatBytes(DgopService.diskWriteRate) + "/s"
                                         isMonospace: true
                                         font.pixelSize: Theme.fontSizeMedium
                                         color: root.textColor

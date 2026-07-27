@@ -314,26 +314,20 @@ Item {
     readonly property real alignedWidth: Theme.px(modalWidth, dpr)
     readonly property real alignedHeight: Theme.px(modalHeight, dpr)
 
-    function _frameEdgeInset(side) {
-        if (!effectiveScreen)
-            return 0;
-        return SettingsData.frameEdgeInsetForSide(effectiveScreen, side);
-    }
-
     readonly property real _connectedAlignedX: {
         switch (resolvedConnectedBarSide) {
         case "top":
         case "bottom":
             {
-                const insetL = _frameEdgeInset("left");
-                const insetR = _frameEdgeInset("right");
+                const insetL = SettingsData.frameEdgeInsetForSide(effectiveScreen, "left");
+                const insetR = SettingsData.frameEdgeInsetForSide(effectiveScreen, "right");
                 const usable = Math.max(0, screenWidth - insetL - insetR);
                 return insetL + Math.max(0, (usable - alignedWidth) / 2);
             }
         case "left":
-            return _frameEdgeInset("left");
+            return SettingsData.frameEdgeInsetForSide(effectiveScreen, "left");
         case "right":
-            return screenWidth - alignedWidth - _frameEdgeInset("right");
+            return screenWidth - alignedWidth - SettingsData.frameEdgeInsetForSide(effectiveScreen, "right");
         }
         return 0;
     }
@@ -341,14 +335,14 @@ Item {
     readonly property real _connectedAlignedY: {
         switch (resolvedConnectedBarSide) {
         case "top":
-            return _frameEdgeInset("top");
+            return SettingsData.frameEdgeInsetForSide(effectiveScreen, "top");
         case "bottom":
-            return screenHeight - alignedHeight - _frameEdgeInset("bottom");
+            return screenHeight - alignedHeight - SettingsData.frameEdgeInsetForSide(effectiveScreen, "bottom");
         case "left":
         case "right":
             {
-                const insetT = _frameEdgeInset("top");
-                const insetB = _frameEdgeInset("bottom");
+                const insetT = SettingsData.frameEdgeInsetForSide(effectiveScreen, "top");
+                const insetB = SettingsData.frameEdgeInsetForSide(effectiveScreen, "bottom");
                 const usable = Math.max(0, screenHeight - insetT - insetB);
                 return insetT + Math.max(0, (usable - alignedHeight) / 2);
             }

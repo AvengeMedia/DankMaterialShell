@@ -10,6 +10,7 @@
 import QtQuick
 import Quickshell
 import qs.Common
+import qs.DankCommon.Common as DC
 import qs.Modules
 import qs.Services
 
@@ -20,6 +21,13 @@ ShellRoot {
 
     Component.onCompleted: {
         Quickshell.watchFiles = !disableHotReload;
+        DC.Style.theme = Theme;
+        DC.Style.settings = SettingsData;
+        DC.I18n.backend = I18n;
+        DC.Paths.backend = Paths;
+        DC.Log.backend = Log;
+        DC.Host.session = SessionService;
+        DC.Host.cache = CacheData;
     }
 
     Loader {

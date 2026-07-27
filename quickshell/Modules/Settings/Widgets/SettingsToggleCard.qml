@@ -4,6 +4,7 @@ import QtQuick
 import qs.Common
 import qs.Services
 import qs.Widgets
+import "../../../Common/QmlUtils.js" as QmlUtils
 
 StyledRect {
     id: root
@@ -30,16 +31,6 @@ StyledRect {
     radius: Theme.cornerRadius
     color: Theme.surfaceContainerHigh
 
-    function findParentFlickable() {
-        let p = root.parent;
-        while (p) {
-            if (p.hasOwnProperty("contentY") && p.hasOwnProperty("contentItem"))
-                return p;
-            p = p.parent;
-        }
-        return null;
-    }
-
     Component.onCompleted: {
         if (!settingKey)
             return;
@@ -47,7 +38,7 @@ StyledRect {
         Qt.callLater(() => {
             if (!root.parent)
                 return;
-            const flickable = findParentFlickable();
+            const flickable = QmlUtils.findParentFlickable(root.parent);
             if (flickable)
                 SettingsSearchService.registerCard(key, root, flickable);
         });

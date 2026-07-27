@@ -16,6 +16,10 @@ Singleton {
 
     readonly property int sessionConfigVersion: 3
 
+    signal loaded
+    signal brightnessDisplayHintChanged(string deviceName)
+    signal loadErrorOccurred(string file, string message)
+
     property bool _parseError: false
     property bool _hasLoaded: false
     property bool _isReadOnly: false
@@ -276,15 +280,14 @@ Singleton {
             if (typeof Theme !== "undefined")
                 Theme.generateSystemThemesFromCurrentTheme();
 
-            if (typeof WallpaperCyclingService !== "undefined")
-                WallpaperCyclingService.updateCyclingState();
+            loaded();
 
             _checkSessionWritable();
         } catch (e) {
             _parseError = true;
             const msg = e.message;
             log.error("Failed to parse session.json - file will not be overwritten.");
-            Qt.callLater(() => ToastService.showError(I18n.tr("Failed to parse %1").arg("session.json"), msg));
+            Qt.callLater(() => loadErrorOccurred("session.json", msg));
         }
     }
 
@@ -358,13 +361,12 @@ Singleton {
             if (typeof Theme !== "undefined")
                 Theme.generateSystemThemesFromCurrentTheme();
 
-            if (typeof WallpaperCyclingService !== "undefined")
-                WallpaperCyclingService.updateCyclingState();
+            loaded();
         } catch (e) {
             _parseError = true;
             const msg = e.message;
             log.error("Failed to parse session.json - file will not be overwritten.");
-            Qt.callLater(() => ToastService.showError(I18n.tr("Failed to parse %1").arg("session.json"), msg));
+            Qt.callLater(() => loadErrorOccurred("session.json", msg));
         }
     }
 
@@ -462,11 +464,6 @@ Singleton {
         }
         doNotDisturb = true;
         doNotDisturbUntil = target;
-        saveSettings();
-    }
-
-    function setWallpaperPath(path) {
-        wallpaperPath = path;
         saveSettings();
     }
 
@@ -848,11 +845,6 @@ Singleton {
         saveSettings();
     }
 
-    function setNightModeLocationProvider(provider) {
-        nightModeLocationProvider = provider;
-        saveSettings();
-    }
-
     function setThemeModeAutoEnabled(enabled) {
         themeModeAutoEnabled = enabled;
         saveSettings();
@@ -941,10 +933,6 @@ Singleton {
         setBarPinnedApps(currentPinned);
     }
 
-    function isBarPinnedApp(appId) {
-        return appId && barPinnedApps.indexOf(appId) !== -1;
-    }
-
     function hideTrayId(trayId) {
         if (!trayId)
             return;
@@ -1007,11 +995,6 @@ Singleton {
         saveSettings();
     }
 
-    function setLaunchPrefix(prefix) {
-        launchPrefix = prefix;
-        saveSettings();
-    }
-
     function setLastBrightnessDevice(device) {
         lastBrightnessDevice = device;
         saveSettings();
@@ -1026,10 +1009,7 @@ Singleton {
         }
         brightnessExponentialDevices = newSettings;
         saveSettings();
-
-        if (typeof DisplayService !== "undefined") {
-            DisplayService.updateDeviceBrightnessDisplay(deviceName);
-        }
+        brightnessDisplayHintChanged(deviceName);
     }
 
     function getBrightnessExponential(deviceName) {
@@ -1041,10 +1021,6 @@ Singleton {
         newValues[deviceName] = value;
         brightnessUserSetValues = newValues;
         saveSettings();
-    }
-
-    function getBrightnessUserSetValue(deviceName) {
-        return brightnessUserSetValues[deviceName];
     }
 
     function clearBrightnessUserSetValue(deviceName) {
@@ -1068,21 +1044,6 @@ Singleton {
     function getBrightnessExponent(deviceName) {
         const value = brightnessExponentValues[deviceName];
         return value !== undefined ? value : 1.2;
-    }
-
-    function setSelectedGpuIndex(index) {
-        selectedGpuIndex = index;
-        saveSettings();
-    }
-
-    function setNvidiaGpuTempEnabled(enabled) {
-        nvidiaGpuTempEnabled = enabled;
-        saveSettings();
-    }
-
-    function setNonNvidiaGpuTempEnabled(enabled) {
-        nonNvidiaGpuTempEnabled = enabled;
-        saveSettings();
     }
 
     function setEnabledGpuPciIds(pciIds) {
@@ -1200,15 +1161,6 @@ Singleton {
         return deviceMaxVolumes[nodeName] ?? 100;
     }
 
-    function removeDeviceMaxVolume(nodeName) {
-        if (!nodeName)
-            return;
-        const updated = Object.assign({}, deviceMaxVolumes);
-        delete updated[nodeName];
-        deviceMaxVolumes = updated;
-        saveSettings();
-    }
-
     function updateLocale() {
         if (!locale) {
             I18n._pickTranslation();
@@ -1269,12 +1221,6 @@ Singleton {
             history = history.slice(0, 50);
 
         launcherQueryHistory = history;
-        saveSettings();
-    }
-
-    function clearLauncherHistory() {
-        launcherLastQuery = "";
-        launcherSearchHistory = [];
         saveSettings();
     }
 
@@ -1414,143 +1360,6 @@ Singleton {
             onStreamFinished: {
                 const result = text.trim();
                 root._onWritableCheckComplete(result === "writable");
-            }
-        }
-    }
-
-    IpcHandler {
-        target: "wallpaper"
-
-        function get(): string {
-            if (root.perMonitorWallpaper) {
-                return "ERROR: Per-monitor mode enabled. Use getFor(screenName) instead.";
-            }
-            return root.wallpaperPath || "";
-        }
-
-        function set(path: string): string {
-            if (root.perMonitorWallpaper) {
-                return "ERROR: Per-monitor mode enabled. Use setFor(screenName, path) instead.";
-            }
-
-            if (!path) {
-                return "ERROR: No path provided";
-            }
-
-            var absolutePath = path.startsWith("/") ? path : StandardPaths.writableLocation(StandardPaths.HomeLocation) + "/" + path;
-
-            try {
-                root.setWallpaper(absolutePath);
-                return "SUCCESS: Wallpaper set to " + absolutePath;
-            } catch (e) {
-                return "ERROR: Failed to set wallpaper: " + e.toString();
-            }
-        }
-
-        function clear(): string {
-            root.setWallpaper("");
-            root.setPerMonitorWallpaper(false);
-            root.monitorWallpapers = {};
-            root.saveSettings();
-            return "SUCCESS: All wallpapers cleared";
-        }
-
-        function next(): string {
-            if (root.perMonitorWallpaper) {
-                return "ERROR: Per-monitor mode enabled. Use nextFor(screenName) instead.";
-            }
-
-            if (!root.wallpaperPath) {
-                return "ERROR: No wallpaper set";
-            }
-
-            try {
-                WallpaperCyclingService.cycleNextManually();
-                return "SUCCESS: Cycling to next wallpaper";
-            } catch (e) {
-                return "ERROR: Failed to cycle wallpaper: " + e.toString();
-            }
-        }
-
-        function prev(): string {
-            if (root.perMonitorWallpaper) {
-                return "ERROR: Per-monitor mode enabled. Use prevFor(screenName) instead.";
-            }
-
-            if (!root.wallpaperPath) {
-                return "ERROR: No wallpaper set";
-            }
-
-            try {
-                WallpaperCyclingService.cyclePrevManually();
-                return "SUCCESS: Cycling to previous wallpaper";
-            } catch (e) {
-                return "ERROR: Failed to cycle wallpaper: " + e.toString();
-            }
-        }
-
-        function getFor(screenName: string): string {
-            if (!screenName) {
-                return "ERROR: No screen name provided";
-            }
-            return root.getMonitorWallpaper(screenName) || "";
-        }
-
-        function setFor(screenName: string, path: string): string {
-            if (!screenName) {
-                return "ERROR: No screen name provided";
-            }
-
-            if (!path) {
-                return "ERROR: No path provided";
-            }
-
-            var absolutePath = path.startsWith("/") ? path : StandardPaths.writableLocation(StandardPaths.HomeLocation) + "/" + path;
-
-            try {
-                if (!root.perMonitorWallpaper) {
-                    root.setPerMonitorWallpaper(true);
-                }
-                root.setMonitorWallpaper(screenName, absolutePath);
-                return "SUCCESS: Wallpaper set for " + screenName + " to " + absolutePath;
-            } catch (e) {
-                return "ERROR: Failed to set wallpaper for " + screenName + ": " + e.toString();
-            }
-        }
-
-        function nextFor(screenName: string): string {
-            if (!screenName) {
-                return "ERROR: No screen name provided";
-            }
-
-            var currentWallpaper = root.getMonitorWallpaper(screenName);
-            if (!currentWallpaper) {
-                return "ERROR: No wallpaper set for " + screenName;
-            }
-
-            try {
-                WallpaperCyclingService.cycleNextForMonitor(screenName);
-                return "SUCCESS: Cycling to next wallpaper for " + screenName;
-            } catch (e) {
-                return "ERROR: Failed to cycle wallpaper for " + screenName + ": " + e.toString();
-            }
-        }
-
-        function prevFor(screenName: string): string {
-            if (!screenName) {
-                return "ERROR: No screen name provided";
-            }
-
-            var currentWallpaper = root.getMonitorWallpaper(screenName);
-            if (!currentWallpaper) {
-                return "ERROR: No wallpaper set for " + screenName;
-            }
-
-            try {
-                WallpaperCyclingService.cyclePrevForMonitor(screenName);
-                return "SUCCESS: Cycling to previous wallpaper for " + screenName;
-            } catch (e) {
-                return "ERROR: Failed to cycle wallpaper for " + screenName + ": " + e.toString();
             }
         }
     }

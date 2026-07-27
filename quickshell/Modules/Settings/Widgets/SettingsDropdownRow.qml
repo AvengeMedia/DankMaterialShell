@@ -4,6 +4,7 @@ import QtQuick
 import qs.Common
 import qs.Services
 import qs.Widgets
+import "../../../Common/QmlUtils.js" as QmlUtils
 
 DankDropdown {
     id: root
@@ -35,16 +36,6 @@ DankDropdown {
         }
     }
 
-    function findParentFlickable() {
-        let p = root.parent;
-        while (p) {
-            if (p.hasOwnProperty("contentY") && p.hasOwnProperty("contentItem"))
-                return p;
-            p = p.parent;
-        }
-        return null;
-    }
-
     Component.onCompleted: {
         if (!settingKey)
             return;
@@ -52,7 +43,7 @@ DankDropdown {
         Qt.callLater(() => {
             if (!root.parent)
                 return;
-            var flickable = findParentFlickable();
+            var flickable = QmlUtils.findParentFlickable(root.parent);
             if (flickable)
                 SettingsSearchService.registerCard(key, root, flickable);
         });

@@ -7,6 +7,7 @@ import qs.Services
 import qs.Widgets
 import qs.Modals
 import qs.Modals.Common
+import "../../../Common/QmlUtils.js" as QmlUtils
 
 Rectangle {
     id: root
@@ -66,17 +67,9 @@ Rectangle {
         PopoutService.openSettingsWithTab("network_wifi");
     }
 
-    function normalizePinList(value) {
-        if (Array.isArray(value))
-            return value.filter(v => v);
-        if (typeof value === "string" && value.length > 0)
-            return [value];
-        return [];
-    }
-
     function getPinnedNetworks() {
         const pins = CacheData.wifiNetworkPins || {};
-        return normalizePinList(pins["preferredWifi"]);
+        return QmlUtils.normalizePinList(pins["preferredWifi"]);
     }
 
     property int currentPreferenceIndex: {
@@ -908,7 +901,7 @@ Rectangle {
                     onPressed: mouse => pinRipple.trigger(mouse.x, mouse.y)
                     onClicked: {
                         const pins = JSON.parse(JSON.stringify(CacheData.wifiNetworkPins || {}));
-                        let pinnedList = root.normalizePinList(pins["preferredWifi"]);
+                        let pinnedList = QmlUtils.normalizePinList(pins["preferredWifi"]);
                         const pinIndex = pinnedList.indexOf(modelData.ssid);
 
                         if (pinIndex !== -1) {

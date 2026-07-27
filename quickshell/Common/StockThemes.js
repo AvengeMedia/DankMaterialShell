@@ -416,24 +416,6 @@ const StockThemes = {
   },
 };
 
-const ThemeCategories = {
-  GENERIC: {
-    name: "Generic",
-    variants: [
-      "blue",
-      "purple",
-      "green",
-      "orange",
-      "red",
-      "cyan",
-      "pink",
-      "amber",
-      "coral",
-      "monochrome",
-    ],
-  },
-};
-
 const ThemeNames = {
   BLUE: "blue",
   PURPLE: "purple",
@@ -448,10 +430,6 @@ const ThemeNames = {
   DYNAMIC: "dynamic",
 };
 
-function isStockTheme(themeName) {
-  return Object.keys(StockThemes.DARK).includes(themeName);
-}
-
 function getAvailableThemes(isLight = false) {
   return isLight ? StockThemes.LIGHT : StockThemes.DARK;
 }
@@ -463,8 +441,4 @@ function getThemeByName(themeName, isLight = false) {
 
 function getAllThemeNames() {
   return Object.keys(StockThemes.DARK);
-}
-
-function getThemeCategories() {
-  return ThemeCategories;
 }

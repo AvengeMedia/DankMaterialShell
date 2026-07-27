@@ -5,6 +5,7 @@ import Quickshell.Bluetooth
 import qs.Common
 import qs.Services
 import qs.Widgets
+import "../../../Common/QmlUtils.js" as QmlUtils
 
 Rectangle {
     id: root
@@ -95,17 +96,9 @@ Rectangle {
         BluetoothService.updateDeviceCodec(deviceAddress, codecName);
     }
 
-    function normalizePinList(value) {
-        if (Array.isArray(value))
-            return value.filter(v => v);
-        if (typeof value === "string" && value.length > 0)
-            return [value];
-        return [];
-    }
-
     function getPinnedDevices() {
         const pins = CacheData.bluetoothDevicePins || {};
-        return normalizePinList(pins["preferredDevice"]);
+        return QmlUtils.normalizePinList(pins["preferredDevice"]);
     }
 
     Row {
@@ -396,7 +389,7 @@ Rectangle {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
                                 const pins = JSON.parse(JSON.stringify(CacheData.bluetoothDevicePins || {}));
-                                let pinnedList = root.normalizePinList(pins["preferredDevice"]);
+                                let pinnedList = QmlUtils.normalizePinList(pins["preferredDevice"]);
                                 const pinIndex = pinnedList.indexOf(pairedDelegate.modelData.address);
 
                                 if (pinIndex !== -1) {

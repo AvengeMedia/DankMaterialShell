@@ -114,10 +114,6 @@ Item {
     readonly property real positionSpacing: barSpacing + effectiveDockBottomGap + effectiveDockMargin
     readonly property real joinedEdgeMargin: dockGeometry.joinedEdgeMargin
     readonly property real _dpr: (dock.screen && dock.screen.devicePixelRatio) ? dock.screen.devicePixelRatio : 1
-    function px(v) {
-        return Math.round(v * _dpr) / _dpr;
-    }
-
     DockGeometry {
         id: dockGeometry
 
@@ -397,8 +393,8 @@ Item {
 
     property real animationHeadroom: Math.ceil(SettingsData.dockIconSize * 0.35)
 
-    readonly property real surfaceImplicitWidth: isVertical ? (px(dockGeometry.surfaceThickness + SettingsData.dockIconSize * 0.3) + animationHeadroom) : 0
-    readonly property real surfaceImplicitHeight: !isVertical ? (px(dockGeometry.surfaceThickness + SettingsData.dockIconSize * 0.3) + animationHeadroom) : 0
+    readonly property real surfaceImplicitWidth: isVertical ? (Theme.px(dockGeometry.surfaceThickness + SettingsData.dockIconSize * 0.3, _dpr) + animationHeadroom) : 0
+    readonly property real surfaceImplicitHeight: !isVertical ? (Theme.px(dockGeometry.surfaceThickness + SettingsData.dockIconSize * 0.3, _dpr) + animationHeadroom) : 0
 
     readonly property real blurX: dockBackground.x + dockContainer.x + dockMouseArea.x + dockCore.x + dockSlide.x
     readonly property real blurY: dockBackground.y + dockContainer.y + dockMouseArea.y + dockCore.y + dockSlide.y
@@ -585,11 +581,11 @@ Item {
                     // Keep the taller hit area regardless of the reveal state to prevent shrinking loop
                     return Math.min(Math.max(dockBackground.height + 64, 200), maxDockHeight);
                 }
-                return dock.reveal ? px(dockGeometry.motionThickness) : 1;
+                return dock.reveal ? Theme.px(dockGeometry.motionThickness, _dpr) : 1;
             }
             width: {
                 if (dock.isVertical) {
-                    return dock.reveal ? px(dockGeometry.motionThickness) : 1;
+                    return dock.reveal ? Theme.px(dockGeometry.motionThickness, _dpr) : 1;
                 }
                 // Keep the wider hit area regardless of the reveal state to prevent shrinking loop
                 return Math.min(dockBackground.width + 8 + dock.borderThickness, maxDockWidth);

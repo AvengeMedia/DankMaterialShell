@@ -132,13 +132,6 @@ Singleton {
         }
     }
 
-    function setLightMode(isLightMode) {
-        if (typeof SettingsData !== "undefined" && SettingsData.syncModeWithPortal === false) {
-            return;
-        }
-        setSystemColorScheme(isLightMode);
-    }
-
     function setSystemColorScheme(isLightMode) {
         if (typeof SettingsData !== "undefined" && SettingsData.syncModeWithPortal === false) {
             return;
@@ -209,6 +202,14 @@ Singleton {
             log.info("DMS_SOCKET not set");
         }
         colorSchemeDetector.running = true;
+    }
+
+    Connections {
+        target: Theme
+
+        function onIsLightModeChanged() {
+            root.setSystemColorScheme(Theme.isLightMode);
+        }
     }
 
     Connections {

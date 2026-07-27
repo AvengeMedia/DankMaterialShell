@@ -274,22 +274,6 @@ Item {
         return ws.num !== -1 ? ws.num : ws.name;
     }
 
-    function escapeSwayWorkspaceName(name) {
-        return String(name ?? "").replace(/\\/g, "\\\\").replace(/"/g, "\\\"");
-    }
-
-    function dispatchSwayWorkspace(ws) {
-        if (!ws)
-            return;
-        try {
-            if (ws.num !== undefined && ws.num !== -1) {
-                I3.dispatch(`workspace number ${ws.num}`);
-            } else if (ws.name) {
-                I3.dispatch(`workspace "${escapeSwayWorkspaceName(ws.name)}"`);
-            }
-        } catch (_) {}
-    }
-
     function switchWorkspace(direction) {
         const realWorkspaces = getRealWorkspaces();
         if (realWorkspaces.length < 2) {
@@ -334,7 +318,7 @@ Item {
             const nextIndex = direction > 0 ? Math.min(validIndex + 1, realWorkspaces.length - 1) : Math.max(validIndex - 1, 0);
 
             if (nextIndex !== validIndex) {
-                dispatchSwayWorkspace(realWorkspaces[nextIndex]);
+                CompositorService.dispatchSwayWorkspace(realWorkspaces[nextIndex]);
             }
         }
     }

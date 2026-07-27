@@ -387,7 +387,6 @@ Singleton {
         });
     }
 
-    // Extract neutral per-output config from current live state
     function extractOutputNeutralConfig(outputName, outputData, niriSettings, hyprlandSettings) {
         const modeData = (outputData.modes && outputData.current_mode !== undefined) ? outputData.modes[outputData.current_mode] : null;
         const modeStr = modeData ? modeData.width + "x" + modeData.height + "@" + (modeData.refresh_rate / 1000).toFixed(3) : null;
@@ -421,7 +420,6 @@ Singleton {
         return cfg;
     }
 
-    // Convert monitors.json config entry → internal outputsData map
     function profileKeyMatchesOutput(outputId, output, name) {
         if (name === outputId || getOutputIdentifier(output, name) === outputId)
             return true;
@@ -438,7 +436,6 @@ Singleton {
         const cfgOutputs = configEntry.outputs || {};
         for (const outputId in cfgOutputs) {
             const cfg = cfgOutputs[outputId];
-            // Find matching live output to get modes list
             let liveOutput = null;
             for (const name in outputs) {
                 if (profileKeyMatchesOutput(outputId, outputs[name], name)) {
@@ -476,7 +473,6 @@ Singleton {
         return result;
     }
 
-    // Extract niri settings map from a neutral config entry.
     function getNiriSettingsFromConfig(configEntry) {
         const result = {};
         for (const outputId in (configEntry.outputs || {})) {
@@ -490,7 +486,6 @@ Singleton {
         return result;
     }
 
-    // Extract hyprland settings map from neutral config entry
     function getHyprlandSettingsFromConfig(configEntry) {
         const result = {};
         for (const outputId in (configEntry.outputs || {})) {
@@ -537,7 +532,6 @@ Singleton {
         return true;
     }
 
-    // Write compositor config from a neutral config entry and optionally reload
     function applyConfigEntry(configEntry, configId, profileName, isManual) {
         if (CompositorService.isHyprland && readOnly) {
             if (isManual) {
@@ -579,8 +573,6 @@ Singleton {
                 onWriteFailed();
         });
     }
-
-    // ── Profile management ─────────────────────────────────────────────────
 
     function validateProfiles() {
         log.info("Validating profiles against current outputs...");
@@ -2072,7 +2064,6 @@ Singleton {
         return pending !== undefined ? pending : originalValue;
     }
 
-    // Returns true if the given output can currently be disabled.
     // Prevents disabling all outputs and prevents disabling the only output
     // in a single-display configuration.
     function canDisableOutput() {

@@ -37,7 +37,10 @@ Singleton {
     }
 
     onManagedThemeChanged: _rebuild()
-    Component.onCompleted: _rebuild()
+    Component.onCompleted: {
+        Paths.iconResolver = name => resolve(name);
+        _rebuild();
+    }
 
     function _bumpRevision() {
         if (_bumpPending)

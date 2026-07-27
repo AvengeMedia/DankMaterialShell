@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Widgets
+import "../../Common/QmlUtils.js" as QmlUtils
 
 Column {
     id: root
@@ -18,7 +19,7 @@ Column {
     property bool isInitialized: false
 
     function loadValue() {
-        const settings = findSettings();
+        const settings = QmlUtils.findSettings(root.parent);
         if (settings && settings.pluginService) {
             const loadedValue = settings.loadValue(settingKey, defaultValue);
             if (textField.activeFocus && isInitialized)
@@ -39,20 +40,9 @@ Column {
         if (textField.text === value)
             return;
         value = textField.text;
-        const settings = findSettings();
+        const settings = QmlUtils.findSettings(root.parent);
         if (settings)
             settings.saveValue(settingKey, value);
-    }
-
-    function findSettings() {
-        let item = parent;
-        while (item) {
-            if (item.saveValue !== undefined && item.loadValue !== undefined) {
-                return item;
-            }
-            item = item.parent;
-        }
-        return null;
     }
 
     StyledText {

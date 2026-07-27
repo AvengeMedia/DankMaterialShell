@@ -9,6 +9,7 @@ import qs.Modules.Settings.Widgets
 import qs.Modals.Common
 import qs.Services
 import qs.Widgets
+import "../../Common/QmlUtils.js" as QmlUtils
 
 Item {
     id: networkWifiTab
@@ -46,22 +47,14 @@ Item {
                 property string expandedSavedWifiSsid: ""
                 property int maxPinnedWifiNetworks: 3
 
-                function normalizePinList(value) {
-                    if (Array.isArray(value))
-                        return value.filter(v => v);
-                    if (typeof value === "string" && value.length > 0)
-                        return [value];
-                    return [];
-                }
-
                 function getPinnedWifiNetworks() {
                     const pins = CacheData.wifiNetworkPins || {};
-                    return normalizePinList(pins["preferredWifi"]);
+                    return QmlUtils.normalizePinList(pins["preferredWifi"]);
                 }
 
                 function toggleWifiPin(ssid) {
                     const pins = JSON.parse(JSON.stringify(CacheData.wifiNetworkPins || {}));
-                    let pinnedList = normalizePinList(pins["preferredWifi"]);
+                    let pinnedList = QmlUtils.normalizePinList(pins["preferredWifi"]);
                     const pinIndex = pinnedList.indexOf(ssid);
 
                     if (pinIndex !== -1) {

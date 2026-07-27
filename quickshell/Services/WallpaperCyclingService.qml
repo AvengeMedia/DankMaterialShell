@@ -1,6 +1,7 @@
 pragma Singleton
 pragma ComponentBehavior: Bound
 
+import QtCore
 import QtQuick
 import Quickshell
 import Quickshell.Io
@@ -279,6 +280,151 @@ Singleton {
         running: false
         stdout: StdioCollector {
             onStreamFinished: root.applyCycledWallpaper(text, prevCyclingProcess.currentWallpaper, prevCyclingProcess.targetScreenName, prevCyclingProcess.goToPrevious)
+        }
+    }
+
+    Connections {
+        target: SessionData
+
+        function onLoaded() {
+            root.updateCyclingState();
+        }
+    }
+
+    IpcHandler {
+        target: "wallpaper"
+
+        function get(): string {
+            if (SessionData.perMonitorWallpaper) {
+                return "ERROR: Per-monitor mode enabled. Use getFor(screenName) instead.";
+            }
+            return SessionData.wallpaperPath || "";
+        }
+
+        function set(path: string): string {
+            if (SessionData.perMonitorWallpaper) {
+                return "ERROR: Per-monitor mode enabled. Use setFor(screenName, path) instead.";
+            }
+
+            if (!path) {
+                return "ERROR: No path provided";
+            }
+
+            var absolutePath = path.startsWith("/") ? path : StandardPaths.writableLocation(StandardPaths.HomeLocation) + "/" + path;
+
+            try {
+                SessionData.setWallpaper(absolutePath);
+                return "SUCCESS: Wallpaper set to " + absolutePath;
+            } catch (e) {
+                return "ERROR: Failed to set wallpaper: " + e.toString();
+            }
+        }
+
+        function clear(): string {
+            SessionData.setWallpaper("");
+            SessionData.setPerMonitorWallpaper(false);
+            SessionData.monitorWallpapers = {};
+            SessionData.saveSettings();
+            return "SUCCESS: All wallpapers cleared";
+        }
+
+        function next(): string {
+            if (SessionData.perMonitorWallpaper) {
+                return "ERROR: Per-monitor mode enabled. Use nextFor(screenName) instead.";
+            }
+
+            if (!SessionData.wallpaperPath) {
+                return "ERROR: No wallpaper set";
+            }
+
+            try {
+                root.cycleNextManually();
+                return "SUCCESS: Cycling to next wallpaper";
+            } catch (e) {
+                return "ERROR: Failed to cycle wallpaper: " + e.toString();
+            }
+        }
+
+        function prev(): string {
+            if (SessionData.perMonitorWallpaper) {
+                return "ERROR: Per-monitor mode enabled. Use prevFor(screenName) instead.";
+            }
+
+            if (!SessionData.wallpaperPath) {
+                return "ERROR: No wallpaper set";
+            }
+
+            try {
+                root.cyclePrevManually();
+                return "SUCCESS: Cycling to previous wallpaper";
+            } catch (e) {
+                return "ERROR: Failed to cycle wallpaper: " + e.toString();
+            }
+        }
+
+        function getFor(screenName: string): string {
+            if (!screenName) {
+                return "ERROR: No screen name provided";
+            }
+            return SessionData.getMonitorWallpaper(screenName) || "";
+        }
+
+        function setFor(screenName: string, path: string): string {
+            if (!screenName) {
+                return "ERROR: No screen name provided";
+            }
+
+            if (!path) {
+                return "ERROR: No path provided";
+            }
+
+            var absolutePath = path.startsWith("/") ? path : StandardPaths.writableLocation(StandardPaths.HomeLocation) + "/" + path;
+
+            try {
+                if (!SessionData.perMonitorWallpaper) {
+                    SessionData.setPerMonitorWallpaper(true);
+                }
+                SessionData.setMonitorWallpaper(screenName, absolutePath);
+                return "SUCCESS: Wallpaper set for " + screenName + " to " + absolutePath;
+            } catch (e) {
+                return "ERROR: Failed to set wallpaper for " + screenName + ": " + e.toString();
+            }
+        }
+
+        function nextFor(screenName: string): string {
+            if (!screenName) {
+                return "ERROR: No screen name provided";
+            }
+
+            var currentWallpaper = SessionData.getMonitorWallpaper(screenName);
+            if (!currentWallpaper) {
+                return "ERROR: No wallpaper set for " + screenName;
+            }
+
+            try {
+                root.cycleNextForMonitor(screenName);
+                return "SUCCESS: Cycling to next wallpaper for " + screenName;
+            } catch (e) {
+                return "ERROR: Failed to cycle wallpaper for " + screenName + ": " + e.toString();
+            }
+        }
+
+        function prevFor(screenName: string): string {
+            if (!screenName) {
+                return "ERROR: No screen name provided";
+            }
+
+            var currentWallpaper = SessionData.getMonitorWallpaper(screenName);
+            if (!currentWallpaper) {
+                return "ERROR: No wallpaper set for " + screenName;
+            }
+
+            try {
+                root.cyclePrevForMonitor(screenName);
+                return "SUCCESS: Cycling to previous wallpaper for " + screenName;
+            } catch (e) {
+                return "ERROR: Failed to cycle wallpaper for " + screenName + ": " + e.toString();
+            }
         }
     }
 }

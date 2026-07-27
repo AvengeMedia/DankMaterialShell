@@ -4,6 +4,7 @@ import Quickshell.Services.Pipewire
 import qs.Common
 import qs.Services
 import qs.Widgets
+import "../../../Common/QmlUtils.js" as QmlUtils
 
 Rectangle {
     id: root
@@ -160,17 +161,9 @@ Rectangle {
 
         property int maxPinnedOutputs: 3
 
-        function normalizePinList(value) {
-            if (Array.isArray(value))
-                return value.filter(v => v);
-            if (typeof value === "string" && value.length > 0)
-                return [value];
-            return [];
-        }
-
         function getPinnedOutputs() {
             const pins = CacheData.audioOutputDevicePins || {};
-            return normalizePinList(pins["preferredOutput"]);
+            return QmlUtils.normalizePinList(pins["preferredOutput"]);
         }
 
         Column {
@@ -325,7 +318,7 @@ Rectangle {
                             onPressed: mouse => pinRipple.trigger(mouse.x, mouse.y)
                             onClicked: {
                                 const pins = JSON.parse(JSON.stringify(CacheData.audioOutputDevicePins || {}));
-                                let pinnedList = audioContent.normalizePinList(pins["preferredOutput"]);
+                                let pinnedList = QmlUtils.normalizePinList(pins["preferredOutput"]);
                                 const pinIndex = pinnedList.indexOf(modelData.name);
 
                                 if (pinIndex !== -1) {

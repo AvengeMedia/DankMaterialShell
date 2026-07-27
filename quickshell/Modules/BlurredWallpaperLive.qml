@@ -25,29 +25,6 @@ Item {
     property bool effectActive: false
     property bool useNextForEffect: false
 
-    function getFillMode(modeName) {
-        switch (modeName) {
-        case "Stretch":
-            return Image.Stretch;
-        case "Fit":
-        case "PreserveAspectFit":
-            return Image.PreserveAspectFit;
-        case "Fill":
-        case "PreserveAspectCrop":
-            return Image.PreserveAspectCrop;
-        case "Tile":
-            return Image.Tile;
-        case "TileVertically":
-            return Image.TileVertically;
-        case "TileHorizontally":
-            return Image.TileHorizontally;
-        case "Pad":
-            return Image.Pad;
-        default:
-            return Image.PreserveAspectCrop;
-        }
-    }
-
     Component.onCompleted: {
         if (initialSource && initialSource !== wallpaperSource && !(CompositorService.isNiri && SessionData.isSwitchingMode)) {
             currentWallpaper.source = initialSource;
@@ -144,7 +121,7 @@ Item {
         smooth: true
         cache: true
         sourceSize: root.blurTextureSize
-        fillMode: root.getFillMode(SessionData.getMonitorWallpaperFillMode(root.screenName))
+        fillMode: Theme.getFillMode(SessionData.getMonitorWallpaperFillMode(root.screenName))
 
         onStatusChanged: {
             if (status === Image.Error) {
@@ -166,7 +143,7 @@ Item {
         smooth: true
         cache: true
         sourceSize: root.blurTextureSize
-        fillMode: root.getFillMode(SessionData.getMonitorWallpaperFillMode(root.screenName))
+        fillMode: Theme.getFillMode(SessionData.getMonitorWallpaperFillMode(root.screenName))
 
         onStatusChanged: {
             if (status === Image.Error) {

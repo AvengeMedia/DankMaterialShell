@@ -218,13 +218,21 @@ Scope {
                         }
 
                         if (event.key === Qt.Key_Up) {
-                            NiriService.moveWorkspaceUp();
+                            NiriService.send({
+                                "Action": {
+                                    "FocusWorkspaceUp": {}
+                                }
+                            });
                             event.accepted = true;
                             return;
                         }
 
                         if (event.key === Qt.Key_Down) {
-                            NiriService.moveWorkspaceDown();
+                            NiriService.send({
+                                "Action": {
+                                    "FocusWorkspaceDown": {}
+                                }
+                            });
                             event.accepted = true;
                             return;
                         }

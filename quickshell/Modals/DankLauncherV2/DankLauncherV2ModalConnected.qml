@@ -105,12 +105,6 @@ Item {
     }
     readonly property bool _dockBlocksEmergence: frameOwnsConnectedChrome && _dockOccupiesSide(resolvedConnectedBarSide)
 
-    function _frameEdgeInset(side) {
-        if (!effectiveScreen)
-            return 0;
-        return SettingsData.frameEdgeInsetForSide(effectiveScreen, side);
-    }
-
     readonly property var _connectedModalPos: {
         const fallback = {
             "x": (screenWidth - modalWidth) / 2,
@@ -120,10 +114,10 @@ Item {
         case "top":
         case "bottom":
             {
-                const insetL = _frameEdgeInset("left");
-                const insetR = _frameEdgeInset("right");
-                const insetT = _frameEdgeInset("top");
-                const insetB = _frameEdgeInset("bottom");
+                const insetL = SettingsData.frameEdgeInsetForSide(effectiveScreen, "left");
+                const insetR = SettingsData.frameEdgeInsetForSide(effectiveScreen, "right");
+                const insetT = SettingsData.frameEdgeInsetForSide(effectiveScreen, "top");
+                const insetB = SettingsData.frameEdgeInsetForSide(effectiveScreen, "bottom");
                 const usable = Math.max(0, screenWidth - insetL - insetR);
                 const usableH = Math.max(0, screenHeight - insetT - insetB);
                 return {
@@ -134,11 +128,11 @@ Item {
         case "left":
         case "right":
             {
-                const insetT = _frameEdgeInset("top");
-                const insetB = _frameEdgeInset("bottom");
+                const insetT = SettingsData.frameEdgeInsetForSide(effectiveScreen, "top");
+                const insetB = SettingsData.frameEdgeInsetForSide(effectiveScreen, "bottom");
                 const usable = Math.max(0, screenHeight - insetT - insetB);
                 return {
-                    "x": resolvedConnectedBarSide === "left" ? _frameEdgeInset("left") : screenWidth - modalWidth - _frameEdgeInset("right"),
+                    "x": resolvedConnectedBarSide === "left" ? SettingsData.frameEdgeInsetForSide(effectiveScreen, "left") : screenWidth - modalWidth - SettingsData.frameEdgeInsetForSide(effectiveScreen, "right"),
                     "y": insetT + Math.max(0, (usable - modalHeight) / 2)
                 };
             }
@@ -188,16 +182,16 @@ Item {
     readonly property real _connectedChromeY: {
         if (!launcherArcExtenderActive)
             return alignedY;
-        return resolvedConnectedBarSide === "top" ? Theme.snap(_frameEdgeInset("top"), dpr) : alignedY;
+        return resolvedConnectedBarSide === "top" ? Theme.snap(SettingsData.frameEdgeInsetForSide(effectiveScreen, "top"), dpr) : alignedY;
     }
     readonly property real _connectedChromeWidth: alignedWidth
     readonly property real _connectedChromeHeight: {
         if (!launcherArcExtenderActive)
             return alignedHeight;
         if (resolvedConnectedBarSide === "top")
-            return Theme.snap(Math.max(alignedHeight, alignedY + alignedHeight - _frameEdgeInset("top")), dpr);
+            return Theme.snap(Math.max(alignedHeight, alignedY + alignedHeight - SettingsData.frameEdgeInsetForSide(effectiveScreen, "top")), dpr);
         if (resolvedConnectedBarSide === "bottom")
-            return Theme.snap(Math.max(alignedHeight, screenHeight - _frameEdgeInset("bottom") - alignedY), dpr);
+            return Theme.snap(Math.max(alignedHeight, screenHeight - SettingsData.frameEdgeInsetForSide(effectiveScreen, "bottom") - alignedY), dpr);
         return alignedHeight;
     }
     readonly property real contentSurfaceHeight: launcherArcExtenderActive ? _connectedChromeHeight : alignedHeight

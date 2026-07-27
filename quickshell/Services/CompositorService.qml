@@ -1087,4 +1087,58 @@ Singleton {
         }
         log.warn("Cannot power on monitors, unknown compositor");
     }
+    function escapeSwayWorkspaceName(name) {
+        return String(name ?? "").replace(/\\/g, "\\\\").replace(/"/g, "\\\"");
+    }
+
+    function dispatchSwayWorkspace(ws) {
+        if (!ws)
+            return;
+        try {
+            if (ws.num !== undefined && ws.num !== -1) {
+                I3.dispatch(`workspace number ${ws.num}`);
+            } else if (ws.name) {
+                I3.dispatch(`workspace "${escapeSwayWorkspaceName(ws.name)}"`);
+            }
+        } catch (_) {}
+    }
+
+    Binding {
+        target: SettingsData
+        property: "activeCompositor"
+        value: root.compositor
+    }
+
+    Connections {
+        target: SettingsData
+
+        function onCompositorLayoutRefreshNeeded(frame) {
+            if (root.isNiri && typeof NiriService !== "undefined")
+                NiriService.generateNiriLayoutConfig(frame);
+            if (root.isHyprland && typeof HyprlandService !== "undefined")
+                HyprlandService.generateLayoutConfig(frame);
+            if (!frame && root.isMango && typeof MangoService !== "undefined")
+                MangoService.generateLayoutConfig();
+        }
+
+        function onCompositorInputRefreshNeeded() {
+            if (root.isNiri && typeof NiriService !== "undefined")
+                NiriService.generateNiriInputConfig();
+        }
+
+        function onCompositorCursorRefreshNeeded() {
+            if (root.isNiri && typeof NiriService !== "undefined") {
+                NiriService.generateNiriCursorConfig();
+                return;
+            }
+            if (root.isHyprland && typeof HyprlandService !== "undefined") {
+                HyprlandService.generateCursorConfig();
+                return;
+            }
+            if (root.isMango && typeof MangoService !== "undefined") {
+                MangoService.generateCursorConfig();
+                return;
+            }
+        }
+    }
 }

@@ -6,6 +6,7 @@ import qs.Common
 import qs.Modules.ProcessList
 import qs.Services
 import qs.Widgets
+import "../Common/Format.js" as Format
 
 FloatingWindow {
     id: processListModal
@@ -65,16 +66,6 @@ FloatingWindow {
         }
         hide();
         show();
-    }
-
-    function formatBytes(bytes) {
-        if (bytes < 1024)
-            return bytes.toFixed(0) + " B/s";
-        if (bytes < 1024 * 1024)
-            return (bytes / 1024).toFixed(1) + " KB/s";
-        if (bytes < 1024 * 1024 * 1024)
-            return (bytes / (1024 * 1024)).toFixed(1) + " MB/s";
-        return (bytes / (1024 * 1024 * 1024)).toFixed(2) + " GB/s";
     }
 
     function nextTab() {
@@ -541,7 +532,7 @@ FloatingWindow {
                         }
 
                         StyledText {
-                            text: "↓" + formatBytes(DgopService.networkRxRate) + " ↑" + formatBytes(DgopService.networkTxRate)
+                            text: "↓" + Format.formatRate(DgopService.networkRxRate) + " ↑" + Format.formatRate(DgopService.networkTxRate)
                             font.pixelSize: Theme.fontSizeSmall
                             font.family: SettingsData.monoFontFamily
                             color: Theme.surfaceText
@@ -559,7 +550,7 @@ FloatingWindow {
                         }
 
                         StyledText {
-                            text: "↓" + formatBytes(DgopService.diskReadRate) + " ↑" + formatBytes(DgopService.diskWriteRate)
+                            text: "↓" + Format.formatRate(DgopService.diskReadRate) + " ↑" + Format.formatRate(DgopService.diskWriteRate)
                             font.pixelSize: Theme.fontSizeSmall
                             font.family: SettingsData.monoFontFamily
                             color: Theme.surfaceText

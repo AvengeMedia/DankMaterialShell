@@ -574,18 +574,6 @@ Singleton {
         bindRemoved(key);
     }
 
-    function isDmsAction(action) {
-        return Actions.isDmsAction(action);
-    }
-
-    function isValidAction(action) {
-        return Actions.isValidAction(action);
-    }
-
-    function getActionType(action) {
-        return Actions.getActionType(action);
-    }
-
     function getActionLabel(action) {
         return Actions.getActionLabel(action, currentProvider);
     }
@@ -600,25 +588,5 @@ Singleton {
 
     function getDmsActions() {
         return Actions.getDmsActions(CompositorService.isNiri, CompositorService.isHyprland);
-    }
-
-    function buildSpawnAction(command, args) {
-        return Actions.buildSpawnAction(command, args);
-    }
-
-    function buildShellAction(shellCmd, shell) {
-        return Actions.buildShellAction(currentProvider, shellCmd, shell);
-    }
-
-    function getShellFromAction(action) {
-        return Actions.getShellFromAction(action);
-    }
-
-    function parseSpawnCommand(action) {
-        return Actions.parseSpawnCommand(action);
-    }
-
-    function parseShellCommand(action) {
-        return Actions.parseShellCommand(action);
     }
 }

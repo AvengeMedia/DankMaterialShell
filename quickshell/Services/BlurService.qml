@@ -41,6 +41,12 @@ Singleton {
         return Theme.withAlpha(baseColor, hoverAlpha ?? 0.15);
     }
 
+    Binding {
+        target: Theme
+        property: "blurLayersActive"
+        value: root.enabled
+    }
+
     Process {
         id: blurProbe
         running: false

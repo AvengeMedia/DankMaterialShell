@@ -1,9 +1,10 @@
 pragma Singleton
-
 pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
+import qs.Common
+import qs.Common.settings
 
 Singleton {
     id: root
@@ -26,151 +27,149 @@ Singleton {
     readonly property var stickyCategories: ["greeter-autologin-sync"]
 
     function isStickyCategory(category) {
-        return category && stickyCategories.indexOf(category) >= 0
+        return category && stickyCategories.indexOf(category) >= 0;
     }
 
     function showToast(message, level = levelInfo, details = "", command = "", category = "") {
-        const now = Date.now()
-        const messageKey = message + level
+        const now = Date.now();
+        const messageKey = message + level;
 
         if (level === levelError) {
-            const lastTime = lastErrorTime[messageKey] || 0
+            const lastTime = lastErrorTime[messageKey] || 0;
             if (now - lastTime < errorThrottleMs) {
-                return
+                return;
             }
-            lastErrorTime[messageKey] = now
+            lastErrorTime[messageKey] = now;
         }
 
         if (category && level === levelError) {
             if (currentCategory === category && toastVisible && currentLevel === levelError) {
-                currentMessage = message
-                currentDetails = details || ""
-                currentCommand = command || ""
-                hasDetails = currentDetails.length > 0 || currentCommand.length > 0
-                resetToastState()
+                currentMessage = message;
+                currentDetails = details || "";
+                currentCommand = command || "";
+                hasDetails = currentDetails.length > 0 || currentCommand.length > 0;
+                resetToastState();
                 if (hasDetails) {
-                    toastTimer.interval = 8000
+                    toastTimer.interval = 8000;
                 } else {
-                    toastTimer.interval = 5000
+                    toastTimer.interval = 5000;
                 }
-                toastTimer.restart()
-                return
+                toastTimer.restart();
+                return;
             }
 
-            toastQueue = toastQueue.filter(t => t.category !== category)
+            toastQueue = toastQueue.filter(t => t.category !== category);
         }
 
-        const isDuplicate = toastQueue.some(toast =>
-            toast.message === message && toast.level === level
-        )
+        const isDuplicate = toastQueue.some(toast => toast.message === message && toast.level === level);
         if (isDuplicate) {
-            return
+            return;
         }
 
         if (toastQueue.length >= maxQueueSize) {
             if (level === levelError) {
-                toastQueue = toastQueue.filter(t => t.level !== levelError).slice(0, maxQueueSize - 1)
+                toastQueue = toastQueue.filter(t => t.level !== levelError).slice(0, maxQueueSize - 1);
             } else {
-                return
+                return;
             }
         }
 
         toastQueue.push({
-                            "message": message,
-                            "level": level,
-                            "details": details,
-                            "command": command,
-                            "category": category
-                        })
+            "message": message,
+            "level": level,
+            "details": details,
+            "command": command,
+            "category": category
+        });
         if (!toastVisible) {
-            processQueue()
+            processQueue();
         }
     }
 
     function showInfo(message, details = "", command = "", category = "") {
-        showToast(message, levelInfo, details, command, category)
+        showToast(message, levelInfo, details, command, category);
     }
 
     function showWarning(message, details = "", command = "", category = "") {
-        showToast(message, levelWarn, details, command, category)
+        showToast(message, levelWarn, details, command, category);
     }
 
     function showError(message, details = "", command = "", category = "") {
-        showToast(message, levelError, details, command, category)
+        showToast(message, levelError, details, command, category);
     }
 
     function dismissCategory(category) {
         if (!category) {
-            return
+            return;
         }
 
         if (currentCategory === category && toastVisible) {
-            hideToast()
-            return
+            hideToast();
+            return;
         }
 
-        toastQueue = toastQueue.filter(t => t.category !== category)
+        toastQueue = toastQueue.filter(t => t.category !== category);
     }
 
     function hideToast() {
-        toastVisible = false
-        currentMessage = ""
-        currentDetails = ""
-        currentCommand = ""
-        currentCategory = ""
-        hasDetails = false
-        currentLevel = levelInfo
-        toastTimer.stop()
-        resetToastState()
+        toastVisible = false;
+        currentMessage = "";
+        currentDetails = "";
+        currentCommand = "";
+        currentCategory = "";
+        hasDetails = false;
+        currentLevel = levelInfo;
+        toastTimer.stop();
+        resetToastState();
         if (toastQueue.length > 0) {
-            processQueue()
+            processQueue();
         }
     }
 
     function processQueue() {
         if (toastQueue.length === 0) {
-            return
+            return;
         }
 
-        const toast = toastQueue.shift()
-        currentMessage = toast.message
-        currentLevel = toast.level
-        currentDetails = toast.details || ""
-        currentCommand = toast.command || ""
-        currentCategory = toast.category || ""
-        hasDetails = currentDetails.length > 0 || currentCommand.length > 0
-        toastVisible = true
-        resetToastState()
+        const toast = toastQueue.shift();
+        currentMessage = toast.message;
+        currentLevel = toast.level;
+        currentDetails = toast.details || "";
+        currentCommand = toast.command || "";
+        currentCategory = toast.category || "";
+        hasDetails = currentDetails.length > 0 || currentCommand.length > 0;
+        toastVisible = true;
+        resetToastState();
 
         if (isStickyCategory(toast.category)) {
-            toastTimer.stop()
+            toastTimer.stop();
         } else if (toast.level === levelError && hasDetails) {
-            toastTimer.interval = 8000
-            toastTimer.start()
+            toastTimer.interval = 8000;
+            toastTimer.start();
         } else {
-            toastTimer.interval = toast.level === levelError ? 5000 : toast.level === levelWarn ? 3000 : 1500
-            toastTimer.start()
+            toastTimer.interval = toast.level === levelError ? 5000 : toast.level === levelWarn ? 3000 : 1500;
+            toastTimer.start();
         }
     }
 
     signal resetToastState
 
     function stopTimer() {
-        toastTimer.stop()
+        toastTimer.stop();
     }
 
     function restartTimer() {
         if (isStickyCategory(currentCategory)) {
-            return
+            return;
         }
         if (hasDetails && currentLevel === levelError) {
-            toastTimer.interval = 8000
-            toastTimer.restart()
+            toastTimer.interval = 8000;
+            toastTimer.restart();
         }
     }
 
     function clearWallpaperError() {
-        wallpaperErrorStatus = ""
+        wallpaperErrorStatus = "";
     }
 
     Timer {
@@ -180,5 +179,35 @@ Singleton {
         running: false
         repeat: false
         onTriggered: hideToast()
+    }
+
+    Connections {
+        target: SessionData
+
+        function onLoadErrorOccurred(file, message) {
+            root.showError(I18n.tr("Failed to parse %1").arg(file), message);
+        }
+    }
+
+    Connections {
+        target: Processes
+
+        function onToastRequested(severity, title, body, command, category) {
+            switch (severity) {
+            case root.levelWarn:
+                root.showWarning(title, body, command, category);
+                break;
+            case root.levelError:
+                root.showError(title, body, command, category);
+                break;
+            default:
+                root.showInfo(title, body, command, category);
+                break;
+            }
+        }
+
+        function onToastCategoryDismissed(category) {
+            root.dismissCategory(category);
+        }
     }
 }

@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Widgets
+import "../../Common/QmlUtils.js" as QmlUtils
 
 Column {
     id: root
@@ -16,66 +17,55 @@ Column {
     spacing: Theme.spacingS
 
     function loadValue() {
-        const settings = findSettings()
+        const settings = QmlUtils.findSettings(root.parent);
         if (settings && settings.pluginService) {
-            value = settings.loadValue(settingKey, defaultValue)
+            value = settings.loadValue(settingKey, defaultValue);
         }
     }
 
     Component.onCompleted: {
-        loadValue()
+        loadValue();
     }
 
     readonly property var optionLabels: {
-        const labels = []
+        const labels = [];
         for (let i = 0; i < options.length; i++) {
-            labels.push(options[i].label || options[i])
+            labels.push(options[i].label || options[i]);
         }
-        return labels
+        return labels;
     }
 
     readonly property var valueToLabel: {
-        const map = {}
+        const map = {};
         for (let i = 0; i < options.length; i++) {
-            const opt = options[i]
+            const opt = options[i];
             if (typeof opt === 'object') {
-                map[opt.value] = opt.label
+                map[opt.value] = opt.label;
             } else {
-                map[opt] = opt
+                map[opt] = opt;
             }
         }
-        return map
+        return map;
     }
 
     readonly property var labelToValue: {
-        const map = {}
+        const map = {};
         for (let i = 0; i < options.length; i++) {
-            const opt = options[i]
+            const opt = options[i];
             if (typeof opt === 'object') {
-                map[opt.label] = opt.value
+                map[opt.label] = opt.value;
             } else {
-                map[opt] = opt
+                map[opt] = opt;
             }
         }
-        return map
+        return map;
     }
 
     onValueChanged: {
-        const settings = findSettings()
+        const settings = QmlUtils.findSettings(root.parent);
         if (settings) {
-            settings.saveValue(settingKey, value)
+            settings.saveValue(settingKey, value);
         }
-    }
-
-    function findSettings() {
-        let item = parent
-        while (item) {
-            if (item.saveValue !== undefined && item.loadValue !== undefined) {
-                return item
-            }
-            item = item.parent
-        }
-        return null
     }
 
     DankDropdown {
@@ -85,7 +75,7 @@ Column {
         currentValue: root.valueToLabel[root.value] || root.value
         options: root.optionLabels
         onValueChanged: newValue => {
-            root.value = root.labelToValue[newValue] || newValue
+            root.value = root.labelToValue[newValue] || newValue;
         }
     }
 }

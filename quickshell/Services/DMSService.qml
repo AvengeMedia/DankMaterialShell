@@ -301,20 +301,6 @@ Singleton {
         }
     }
 
-    function subscribeAll() {
-        subscribe(["all"]);
-    }
-
-    function subscribeAllExcept(excludeServices) {
-        if (!Array.isArray(excludeServices)) {
-            excludeServices = [excludeServices];
-        }
-
-        const allServices = ["network", "loginctl", "freedesktop", "gamma", "theme.auto", "bluetooth", "cups", "brightness", "browser", "dbus", "location"];
-        const filtered = allServices.filter(s => !excludeServices.includes(s));
-        subscribe(filtered);
-    }
-
     function handleSubscriptionEvent(response) {
         if (response.error) {
             if (response.error.includes("unknown method") && response.error.includes("subscribe")) {
@@ -453,10 +439,6 @@ Singleton {
         }
     }
 
-    function ping(callback) {
-        sendRequest("ping", null, callback);
-    }
-
     function listPlugins(callback) {
         sendRequest("plugins.list", null, response => {
             if (response.result) {
@@ -474,30 +456,6 @@ Singleton {
             if (response.result) {
                 installedPlugins = response.result;
                 installedPluginsReceived(response.result);
-            }
-            if (callback) {
-                callback(response);
-            }
-        });
-    }
-
-    function search(query, category, compositor, capability, callback) {
-        const params = {
-            "query": query
-        };
-        if (category) {
-            params.category = category;
-        }
-        if (compositor) {
-            params.compositor = compositor;
-        }
-        if (capability) {
-            params.capability = capability;
-        }
-
-        sendRequest("plugins.search", params, response => {
-            if (response.result) {
-                searchResultsReceived(response.result);
             }
             if (callback) {
                 callback(response);
@@ -568,19 +526,6 @@ Singleton {
         });
     }
 
-    function searchThemes(query, callback) {
-        sendRequest("themes.search", {
-            "query": query
-        }, response => {
-            if (response.result) {
-                themeSearchResultsReceived(response.result);
-            }
-            if (callback) {
-                callback(response);
-            }
-        });
-    }
-
     function installTheme(themeName, callback) {
         sendRequest("themes.install", {
             "name": themeName
@@ -596,19 +541,6 @@ Singleton {
 
     function uninstallTheme(themeName, callback) {
         sendRequest("themes.uninstall", {
-            "name": themeName
-        }, response => {
-            if (callback) {
-                callback(response);
-            }
-            if (!response.error) {
-                listInstalledThemes();
-            }
-        });
-    }
-
-    function updateTheme(themeName, callback) {
-        sendRequest("themes.update", {
             "name": themeName
         }, response => {
             if (callback) {
@@ -640,26 +572,8 @@ Singleton {
         }, callback);
     }
 
-    function bluetoothConnect(devicePath, callback) {
-        sendRequest("bluetooth.connect", {
-            "device": devicePath
-        }, callback);
-    }
-
-    function bluetoothDisconnect(devicePath, callback) {
-        sendRequest("bluetooth.disconnect", {
-            "device": devicePath
-        }, callback);
-    }
-
     function bluetoothRemove(devicePath, callback) {
         sendRequest("bluetooth.remove", {
-            "device": devicePath
-        }, callback);
-    }
-
-    function bluetoothTrust(devicePath, callback) {
-        sendRequest("bluetooth.trust", {
             "device": devicePath
         }, callback);
     }

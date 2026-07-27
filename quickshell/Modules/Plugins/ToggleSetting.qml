@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Widgets
+import "../../Common/QmlUtils.js" as QmlUtils
 
 Row {
     id: root
@@ -17,7 +18,7 @@ Row {
     property bool isInitialized: false
 
     function loadValue() {
-        const settings = findSettings();
+        const settings = QmlUtils.findSettings(root.parent);
         if (settings && settings.pluginService) {
             const loadedValue = settings.loadValue(settingKey, defaultValue);
             value = loadedValue;
@@ -32,21 +33,10 @@ Row {
     onValueChanged: {
         if (!isInitialized)
             return;
-        const settings = findSettings();
+        const settings = QmlUtils.findSettings(root.parent);
         if (settings) {
             settings.saveValue(settingKey, value);
         }
-    }
-
-    function findSettings() {
-        let item = parent;
-        while (item) {
-            if (item.saveValue !== undefined && item.loadValue !== undefined) {
-                return item;
-            }
-            item = item.parent;
-        }
-        return null;
     }
 
     Column {

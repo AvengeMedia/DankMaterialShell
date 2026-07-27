@@ -1,13 +1,14 @@
 import QtQuick
 import Quickshell.Services.Mpris
 import qs.Common
-import qs.Services
 
 Item {
     id: root
 
     property MprisPlayer activePlayer
-    property string artUrl: TrackArtService.resolvedArtUrl
+    property string artUrl: ""
+    property color accentColor: Theme.primary
+    property var cavaService: null
     property string lastValidArtUrl: ""
     // Live mpris url — always valid for the current track; fallback so art is never blank.
     readonly property string rawArtUrl: {
@@ -46,7 +47,7 @@ Item {
     readonly property real blobSpinSpeed: 0.03
 
     readonly property bool onScreen: visible && (Window.window?.visible ?? false)
-    readonly property bool blobActive: CavaService.cavaAvailable && onScreen && activePlayer?.playbackState === MprisPlaybackState.Playing && showAnimation && albumArtStatus === Image.Ready
+    readonly property bool blobActive: (cavaService?.cavaAvailable ?? false) && onScreen && activePlayer?.playbackState === MprisPlaybackState.Playing && showAnimation && albumArtStatus === Image.Ready
     property var smoothedBands: [0, 0, 0, 0, 0, 0]
     property var slowBands: [0, 0, 0, 0, 0, 0]
     property var bandTargets: [0, 0, 0, 0, 0, 0]
@@ -110,7 +111,7 @@ Item {
     }
 
     function updateBands() {
-        const vals = CavaService.values;
+        const vals = cavaService?.values;
         if (!vals || vals.length < 6)
             return;
 
@@ -166,16 +167,16 @@ Item {
     }
 
     Loader {
-        active: root.onScreen && activePlayer?.playbackState === MprisPlaybackState.Playing && showAnimation
+        active: root.cavaService && root.onScreen && activePlayer?.playbackState === MprisPlaybackState.Playing && showAnimation
         sourceComponent: Component {
             Ref {
-                service: CavaService
+                service: root.cavaService
             }
         }
     }
 
     Connections {
-        target: CavaService
+        target: root.cavaService
         enabled: blobEffect.visible
         function onValuesChanged() {
             root.updateBands();
@@ -210,8 +211,7 @@ Item {
         property real energy: 0
         property vector4d bandsA: Qt.vector4d(0, 0, 0, 0)
         property vector2d bandsB: Qt.vector2d(0, 0)
-        readonly property color accentColor: MediaAccentService.accent
-        property vector4d fillColor: Qt.vector4d(accentColor.r, accentColor.g, accentColor.b, accentColor.a)
+        property vector4d fillColor: Qt.vector4d(root.accentColor.r, root.accentColor.g, root.accentColor.b, root.accentColor.a)
 
         Behavior on activation {
             NumberAnimation {
@@ -231,7 +231,7 @@ Item {
         z: 1
         imageSource: root._mainSrc
         fallbackIcon: "album"
-        border.color: MediaAccentService.accent
+        border.color: root.accentColor
         border.width: 2
 
         onImageStatusChanged: {
@@ -251,7 +251,7 @@ Item {
         anchors.centerIn: parent
         z: 2
         fallbackIcon: ""
-        border.color: MediaAccentService.accent
+        border.color: root.accentColor
         border.width: 2
         opacity: 0
         visible: opacity > 0

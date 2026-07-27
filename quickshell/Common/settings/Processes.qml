@@ -5,10 +5,12 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.Common
-import qs.Services
 
 Singleton {
     id: root
+
+    signal toastRequested(int severity, string title, string body, string command, string category)
+    signal toastCategoryDismissed(string category)
 
     property var settingsRoot: null
 
@@ -317,7 +319,7 @@ Singleton {
     function launchAuthApplyTerminalFallback(fromPrecheck, details) {
         authApplyTerminalFallbackFromPrecheck = fromPrecheck;
         if (details && details !== "")
-            ToastService.showInfo(I18n.tr("Authentication changes need sudo. Opening terminal so you can use password or fingerprint."), details, "", "auth-sync");
+            toastRequested(0, I18n.tr("Authentication changes need sudo. Opening terminal so you can use password or fingerprint."), details, "", "auth-sync");
         authApplyTerminalFallbackStderr = "";
         authApplyTerminalFallbackProcess.running = true;
     }
@@ -364,21 +366,21 @@ Singleton {
     }
 
     function deferGreeterAutoLoginSyncToPill(details) {
-        ToastService.dismissCategory("greeter-autologin-sync");
+        toastCategoryDismissed("greeter-autologin-sync");
         if (settingsRoot)
             settingsRoot.set("greeterSyncPending", true);
-        ToastService.showWarning(I18n.tr("Auto-login change needs a sync"), I18n.tr("Administrator access is required. Use the Sync button in Settings → Greeter to apply.") + (details ? "\n\n" + details : ""), "dms-greeter sync --autologin", "greeter-autologin-sync");
+        toastRequested(1, I18n.tr("Auto-login change needs a sync"), I18n.tr("Administrator access is required. Use the Sync button in Settings → Greeter to apply.") + (details ? "\n\n" + details : ""), "dms-greeter sync --autologin", "greeter-autologin-sync");
         finishGreeterAutoLoginSync();
     }
 
     function greeterAutoLoginSyncSuccessToast(details) {
         const enabling = settingsRoot && settingsRoot.greeterAutoLogin;
         // Clear the sticky in-progress toast, then confirm with an auto-dismissing toast.
-        ToastService.dismissCategory("greeter-autologin-sync");
+        toastCategoryDismissed("greeter-autologin-sync");
         if (enabling) {
-            ToastService.showWarning(I18n.tr("Auto-login enabled"), I18n.tr("You'll skip the greeter password after the next reboot. The lock screen and signing out still require your password.") + (details ? "\n\n" + details : ""));
+            toastRequested(1, I18n.tr("Auto-login enabled"), I18n.tr("You'll skip the greeter password after the next reboot. The lock screen and signing out still require your password.") + (details ? "\n\n" + details : ""), "", "");
         } else {
-            ToastService.showInfo(I18n.tr("Auto-login disabled"), I18n.tr("You'll enter your password at the greeter after the next reboot.") + (details ? "\n\n" + details : ""));
+            toastRequested(0, I18n.tr("Auto-login disabled"), I18n.tr("You'll enter your password at the greeter after the next reboot.") + (details ? "\n\n" + details : ""), "", "");
         }
     }
 
@@ -575,7 +577,7 @@ Singleton {
         onExited: exitCode => {
             const enabling = root.settingsRoot && root.settingsRoot.greeterAutoLogin;
             if (exitCode === 0) {
-                ToastService.showWarning(enabling ? I18n.tr("Applying auto-login on startup...") : I18n.tr("Disabling auto-login on startup..."), "", "dms-greeter sync --autologin", "greeter-autologin-sync");
+                root.toastRequested(1, enabling ? I18n.tr("Applying auto-login on startup...") : I18n.tr("Disabling auto-login on startup..."), "", "dms-greeter sync --autologin", "greeter-autologin-sync");
                 root.greeterAutoLoginSyncProcess.running = true;
                 return;
             }
@@ -604,7 +606,7 @@ Singleton {
                 let details = out;
                 if (err !== "")
                     details = details !== "" ? details + "\n\nstderr:\n" + err : "stderr:\n" + err;
-                ToastService.showInfo(I18n.tr("Authentication changes applied"), details, "", "auth-sync");
+                root.toastRequested(0, I18n.tr("Authentication changes applied"), details, "", "auth-sync");
                 root.detectAuthCapabilities();
                 root.finishAuthApply();
                 return;
@@ -615,7 +617,7 @@ Singleton {
                 details = out;
             if (err !== "")
                 details = details !== "" ? details + "\n\nstderr:\n" + err : "stderr:\n" + err;
-            ToastService.showWarning(I18n.tr("Background authentication sync failed. Trying terminal mode."), details, "", "auth-sync");
+            root.toastRequested(1, I18n.tr("Background authentication sync failed. Trying terminal mode."), details, "", "auth-sync");
             root.launchAuthApplyTerminalFallback(false, "");
         }
     }
@@ -631,7 +633,7 @@ Singleton {
         onExited: exitCode => {
             const err = (root.authApplySudoProbeStderr || "").trim();
             if (exitCode === 0) {
-                ToastService.showInfo(I18n.tr("Applying authentication changes..."), "", "", "auth-sync");
+                root.toastRequested(0, I18n.tr("Applying authentication changes..."), "", "", "auth-sync");
                 root.authApplyProcess.running = true;
                 return;
             }
@@ -651,10 +653,10 @@ Singleton {
         onExited: exitCode => {
             if (exitCode === 0) {
                 const message = root.authApplyTerminalFallbackFromPrecheck ? I18n.tr("Terminal opened. Complete authentication there; it will close automatically when done.") : I18n.tr("Terminal fallback opened. Complete authentication there; it will close automatically when done.");
-                ToastService.showInfo(message, "", "", "auth-sync");
+                root.toastRequested(0, message, "", "", "auth-sync");
             } else {
                 let details = (root.authApplyTerminalFallbackStderr || "").trim();
-                ToastService.showError(I18n.tr("Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.") + " (exit " + exitCode + ")", details, "", "auth-sync");
+                root.toastRequested(2, I18n.tr("Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.") + " (exit " + exitCode + ")", details, "", "auth-sync");
             }
             root.finishAuthApply();
         }

@@ -36,6 +36,36 @@ Item {
             cachedProcesses = filteredProcesses;
     }
 
+    function getProcessIcon(command) {
+        const cmd = command.toLowerCase();
+        if (cmd.includes("firefox") || cmd.includes("chrome") || cmd.includes("browser") || cmd.includes("chromium"))
+            return "web";
+        if (cmd.includes("code") || cmd.includes("editor") || cmd.includes("vim"))
+            return "code";
+        if (cmd.includes("terminal") || cmd.includes("bash") || cmd.includes("zsh"))
+            return "terminal";
+        if (cmd.includes("music") || cmd.includes("audio") || cmd.includes("spotify"))
+            return "music_note";
+        if (cmd.includes("video") || cmd.includes("vlc") || cmd.includes("mpv"))
+            return "play_circle";
+        if (cmd.includes("systemd") || cmd.includes("elogind") || cmd.includes("kernel") || cmd.includes("kthread") || cmd.includes("kworker"))
+            return "settings";
+        return "memory";
+    }
+
+    function formatCpuUsage(cpu) {
+        return (cpu || 0).toFixed(1) + "%";
+    }
+
+    function formatMemoryUsage(memoryKB) {
+        const mem = memoryKB || 0;
+        if (mem < 1024)
+            return mem.toFixed(0) + " KB";
+        if (mem < 1024 * 1024)
+            return (mem / 1024).toFixed(1) + " MB";
+        return (mem / (1024 * 1024)).toFixed(1) + " GB";
+    }
+
     readonly property var filteredProcesses: {
         if (!DgopService.allProcesses || DgopService.allProcesses.length === 0)
             return [];
@@ -521,7 +551,7 @@ Item {
                             spacing: Theme.spacingS
 
                             DankIcon {
-                                name: DgopService.getProcessIcon(processItemRoot.processCmd)
+                                name: root.getProcessIcon(processItemRoot.processCmd)
                                 size: Theme.iconSize - 4
                                 color: {
                                     if (processItemRoot.processCpu > 80)
@@ -566,7 +596,7 @@ Item {
 
                             StyledText {
                                 anchors.centerIn: parent
-                                text: DgopService.formatCpuUsage(processItemRoot.processCpu)
+                                text: root.formatCpuUsage(processItemRoot.processCpu)
                                 font.pixelSize: Theme.fontSizeSmall
                                 font.family: SettingsData.monoFontFamily
                                 font.weight: Font.Bold
@@ -600,7 +630,7 @@ Item {
 
                             StyledText {
                                 anchors.centerIn: parent
-                                text: DgopService.formatMemoryUsage(processItemRoot.processMemKB)
+                                text: root.formatMemoryUsage(processItemRoot.processMemKB)
                                 font.pixelSize: Theme.fontSizeSmall
                                 font.family: SettingsData.monoFontFamily
                                 font.weight: Font.Bold

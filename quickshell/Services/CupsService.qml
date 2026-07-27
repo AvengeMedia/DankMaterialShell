@@ -349,14 +349,6 @@ Singleton {
         return getPrinterStateTranslation(printer.state) + " (" + getPrinterStateReasonTranslation(printer.stateReason) + ")";
     }
 
-    function getCurrentPrinterStatePretty() {
-        if (!cupsAvailable || !selectedPrinter)
-            return "";
-
-        var printer = printers[selectedPrinter];
-        return getPrinterStateTranslation(printer.state) + " (" + I18n.tr("Reason") + ": " + getPrinterStateReasonTranslation(printer.stateReason) + ")";
-    }
-
     function getCurrentPrinterJobs() {
         if (!cupsAvailable || !selectedPrinter)
             return [];
@@ -370,14 +362,6 @@ Singleton {
 
         var printer = printers[printerName];
         return printer.jobs;
-    }
-
-    function getJobsNum(printerName) {
-        if (!cupsAvailable)
-            return 0;
-
-        var printer = printers[printerName];
-        return printer.jobs.length;
     }
 
     function pausePrinter(printerName) {
@@ -579,57 +563,6 @@ Singleton {
         });
     }
 
-    function setPrinterShared(printerName, shared) {
-        if (!cupsAvailable)
-            return;
-        const params = {
-            "printerName": printerName,
-            "shared": shared
-        };
-
-        DMSService.sendRequest("cups.setPrinterShared", params, response => {
-            if (response.error) {
-                ToastService.showError(I18n.tr("Failed to update sharing"), response.error);
-            } else {
-                getState();
-            }
-        });
-    }
-
-    function setPrinterLocation(printerName, location) {
-        if (!cupsAvailable)
-            return;
-        const params = {
-            "printerName": printerName,
-            "location": location
-        };
-
-        DMSService.sendRequest("cups.setPrinterLocation", params, response => {
-            if (response.error) {
-                ToastService.showError(I18n.tr("Failed to update location"), response.error);
-            } else {
-                getState();
-            }
-        });
-    }
-
-    function setPrinterInfo(printerName, info) {
-        if (!cupsAvailable)
-            return;
-        const params = {
-            "printerName": printerName,
-            "info": info
-        };
-
-        DMSService.sendRequest("cups.setPrinterInfo", params, response => {
-            if (response.error) {
-                ToastService.showError(I18n.tr("Failed to update description"), response.error);
-            } else {
-                getState();
-            }
-        });
-    }
-
     function printTestPage(printerName) {
         if (!cupsAvailable)
             return;
@@ -643,23 +576,6 @@ Singleton {
             } else {
                 ToastService.showInfo(I18n.tr("Test page sent to printer"));
                 fetchJobsForPrinter(printerName);
-            }
-        });
-    }
-
-    function moveJob(jobID, destPrinter) {
-        if (!cupsAvailable)
-            return;
-        const params = {
-            "jobID": jobID,
-            "destPrinter": destPrinter
-        };
-
-        DMSService.sendRequest("cups.moveJob", params, response => {
-            if (response.error) {
-                ToastService.showError(I18n.tr("Failed to move job"), response.error);
-            } else {
-                fetchAllJobs();
             }
         });
     }
@@ -695,40 +611,6 @@ Singleton {
                 ToastService.showError(I18n.tr("Failed to hold job"), response.error);
             } else {
                 fetchAllJobs();
-            }
-        });
-    }
-
-    function addPrinterToClass(className, printerName) {
-        if (!cupsAvailable)
-            return;
-        const params = {
-            "className": className,
-            "printerName": printerName
-        };
-
-        DMSService.sendRequest("cups.addPrinterToClass", params, response => {
-            if (response.error) {
-                ToastService.showError(I18n.tr("Failed to add printer to class"), response.error);
-            } else {
-                getClasses();
-            }
-        });
-    }
-
-    function removePrinterFromClass(className, printerName) {
-        if (!cupsAvailable)
-            return;
-        const params = {
-            "className": className,
-            "printerName": printerName
-        };
-
-        DMSService.sendRequest("cups.removePrinterFromClass", params, response => {
-            if (response.error) {
-                ToastService.showError(I18n.tr("Failed to remove printer from class"), response.error);
-            } else {
-                getClasses();
             }
         });
     }

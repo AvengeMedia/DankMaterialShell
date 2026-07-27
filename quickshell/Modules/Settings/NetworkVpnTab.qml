@@ -240,7 +240,7 @@ Item {
                                 required property var modelData
                                 required property int index
 
-                                readonly property bool isActive: DMSNetworkService.isActiveUuid(modelData.uuid)
+                                readonly property bool isActive: DMSNetworkService.isActiveVpnUuid(modelData.uuid)
                                 readonly property bool isTransient: !!modelData.transient
                                 readonly property bool canExpand: modelData.canExpand !== false
                                 readonly property bool canDelete: modelData.canDelete !== false

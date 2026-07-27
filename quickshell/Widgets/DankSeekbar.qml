@@ -1,14 +1,16 @@
 import QtQuick
 import Quickshell.Services.Mpris
 import qs.Common
-import qs.Services
 import qs.Widgets
 
 Item {
     id: root
 
     property MprisPlayer activePlayer
-    readonly property real stableLength: MprisController.activePlayerStableLength
+    property real stableLength: 0
+    property color accentColor: Theme.primary
+    property color accentTrackColor: Theme.withAlpha(accentColor, 0.28)
+    property color accentSubtleColor: Theme.withAlpha(accentColor, 0.55)
 
     property real seekPreviewRatio: -1
     readonly property real playerValue: {
@@ -142,10 +144,10 @@ Item {
                 value: root.value
                 actualValue: root.playerValue
                 showActualPlaybackState: root.isSeeking
-                fillColor: MediaAccentService.accent
-                playheadColor: MediaAccentService.accent
-                trackColor: MediaAccentService.accentTrack
-                actualProgressColor: MediaAccentService.accentSubtle
+                fillColor: root.accentColor
+                playheadColor: root.accentColor
+                trackColor: root.accentTrackColor
+                actualProgressColor: root.accentSubtleColor
                 isPlaying: activePlayer && activePlayer.playbackState === MprisPlaybackState.Playing
                 onFrameTicked: {
                     if (!root.isSeeking)
@@ -186,8 +188,8 @@ Item {
             Item {
                 property real lineWidth: 3
                 property color trackColor: Theme.withAlpha(Theme.surfaceVariant, 0.40)
-                property color fillColor: MediaAccentService.accent
-                property color playheadColor: MediaAccentService.accent
+                property color fillColor: root.accentColor
+                property color playheadColor: root.accentColor
                 property color actualProgressColor: Theme.onSurface_38
                 readonly property real midY: height / 2
 

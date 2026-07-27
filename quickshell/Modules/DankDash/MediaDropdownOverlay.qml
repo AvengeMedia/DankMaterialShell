@@ -415,11 +415,24 @@ Item {
                                     }
                                 }
                                 onWheel: wheelEvent => {
-                                    if (SettingsData.audioDeviceScrollVolumeEnabled && wheelEvent.x >= deviceMouseArea.width / 2) {
-                                        AudioService.handleNodeVolumeWheel(modelData, wheelEvent);
-                                    } else {
+                                    if (!SettingsData.audioDeviceScrollVolumeEnabled || wheelEvent.x < deviceMouseArea.width / 2) {
                                         wheelEvent.accepted = false;
+                                        return;
                                     }
+                                    if (!modelData?.audio)
+                                        return;
+                                    SessionData.suppressOSDTemporarily();
+                                    const delta = wheelEvent.angleDelta.y;
+                                    if (delta === 0)
+                                        return;
+                                    const current = Math.round(modelData.audio.volume * 100);
+                                    const maxVol = AudioService.getMaxVolumePercent(modelData);
+                                    const newVolume = delta > 0 ? Math.min(maxVol, current + AudioService.wheelVolumeStep) : Math.max(0, current - AudioService.wheelVolumeStep);
+                                    modelData.audio.muted = false;
+                                    modelData.audio.volume = newVolume / 100;
+                                    if (modelData === AudioService.sink)
+                                        AudioService.playVolumeChangeSoundIfEnabled();
+                                    wheelEvent.accepted = true;
                                 }
                                 onClicked: mouse => {
                                     if (mouse.button === Qt.RightButton) {

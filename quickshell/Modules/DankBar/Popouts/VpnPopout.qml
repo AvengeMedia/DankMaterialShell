@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import qs.Common
 import qs.Services
 import qs.Widgets
+import qs.Modules.ControlCenter.Details
 
 DankPopout {
     id: root

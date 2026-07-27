@@ -75,26 +75,3 @@ function migrateToVersion(obj, targetVersion, settingsData) {
 
     return session;
 }
-
-function cleanup(fileText) {
-    var getValidKeys = SpecModule.getValidKeys;
-    if (!fileText || !fileText.trim()) return null;
-
-    try {
-        var session = JSON.parse(fileText);
-        var validKeys = getValidKeys();
-        var needsSave = false;
-
-        for (var key in session) {
-            if (validKeys.indexOf(key) < 0) {
-                delete session[key];
-                needsSave = true;
-            }
-        }
-
-        return needsSave ? JSON.stringify(session, null, 2) : null;
-    } catch (e) {
-        console.warn("SessionData: Failed to cleanup unused keys:", e.message);
-        return null;
-    }
-}

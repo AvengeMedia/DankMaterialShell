@@ -122,11 +122,6 @@ const times = [
 
 // adds a custom time to the times config
 
-function addTime(angle, riseName, setName) {
-    times.push([angle, riseName, setName]);
-};
-
-
 // calculations for sun times
 
 const J0 = 0.0009;
@@ -245,64 +240,4 @@ function getMoonIllumination(date) {
         phase: 0.5 + 0.5 * inc * (angle < 0 ? -1 : 1) / Math.PI,
         angle
     };
-};
-
-
-function hoursLater(date, h) {
-    return new Date(date.valueOf() + h * dayMs / 24);
-}
-
-// calculations for moon rise/set times are based on http://www.stargazing.net/kepler/moonrise.html article
-
-function getMoonTimes(date, lat, lng, inUTC) {
-    const t = new Date(date);
-    if (inUTC) t.setUTCHours(0, 0, 0, 0);
-    else t.setHours(0, 0, 0, 0);
-
-    const hc = 0.133 * rad;
-    let h0 = getMoonPosition(t, lat, lng).altitude - hc,
-        rise, set, ye;
-
-    // go in 2-hour chunks, each time seeing if a 3-point quadratic curve crosses zero (which means rise or set)
-    for (let i = 1; i <= 24; i += 2) {
-        const h1 = getMoonPosition(hoursLater(t, i), lat, lng).altitude - hc;
-        const h2 = getMoonPosition(hoursLater(t, i + 1), lat, lng).altitude - hc;
-        const a = (h0 + h2) / 2 - h1;
-        const b = (h2 - h0) / 2;
-        const xe = -b / (2 * a);
-        const d = b * b - 4 * a * h1;
-        let roots = 0, x1 = 0, x2 = 0;
-        ye = (a * xe + b) * xe + h1;
-
-        if (d >= 0) {
-            const dx = Math.sqrt(d) / (Math.abs(a) * 2);
-            x1 = xe - dx;
-            x2 = xe + dx;
-            if (Math.abs(x1) <= 1) roots++;
-            if (Math.abs(x2) <= 1) roots++;
-            if (x1 < -1) x1 = x2;
-        }
-
-        if (roots === 1) {
-            if (h0 < 0) rise = i + x1;
-            else set = i + x1;
-
-        } else if (roots === 2) {
-            rise = i + (ye < 0 ? x2 : x1);
-            set = i + (ye < 0 ? x1 : x2);
-        }
-
-        if (rise && set) break;
-
-        h0 = h2;
-    }
-
-    const result = {};
-
-    if (rise) result.rise = hoursLater(t, rise);
-    if (set) result.set = hoursLater(t, set);
-
-    if (!rise && !set) result[ye > 0 ? 'alwaysUp' : 'alwaysDown'] = true;
-
-    return result;
 };

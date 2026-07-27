@@ -259,36 +259,6 @@ Singleton {
         return historyList.filter(n => getHistoryTimeRange(n.timestamp) === range).length;
     }
 
-    function formatHistoryTime(timestamp) {
-        root.timeUpdateTick;
-        root.clockFormatChanged;
-        const now = new Date();
-        const date = new Date(timestamp);
-        const diff = now.getTime() - timestamp;
-        const minutes = Math.floor(diff / 60000);
-        const hours = Math.floor(minutes / 60);
-        if (hours < 1) {
-            if (minutes < 1)
-                return I18n.tr("now");
-            return I18n.tr("%1m ago").arg(minutes);
-        }
-        const nowDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        const itemDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-        const daysDiff = Math.floor((nowDate - itemDate) / (1000 * 60 * 60 * 24));
-        const timeStr = SettingsData.use24HourClock ? date.toLocaleTimeString(Qt.locale(), "HH:mm") : date.toLocaleTimeString(Qt.locale(), "h:mm AP");
-        if (daysDiff === 0)
-            return timeStr;
-        try {
-            const localeName = (typeof I18n !== "undefined" && I18n.locale) ? I18n.locale().name : "en-US";
-            const weekday = date.toLocaleDateString(localeName, {
-                weekday: "long"
-            });
-            return weekday + ", " + timeStr;
-        } catch (e) {
-            return timeStr;
-        }
-    }
-
     function _nowSec() {
         return Date.now() / 1000.0;
     }
@@ -927,6 +897,56 @@ Singleton {
         }
         visibleNotifications = [];
         notificationQueue = [];
+    }
+
+    Connections {
+        target: SettingsData
+
+        function onNotificationPopupsInvalidated() {
+            root.dismissAllPopups();
+        }
+    }
+
+    function sendTestNotifications() {
+        dismissAllPopups();
+        sendTestNotification(0);
+        testNotifTimer1.start();
+        testNotifTimer2.start();
+    }
+
+    function sendTestNotification(index) {
+        const notifications = [["Notification Position Test", "DMS test notification 1 of 3 ~ Hi there!", "preferences-system"], ["Second Test", "DMS Notification 2 of 3 ~ Check it out!", "applications-graphics"], ["Third Test", "DMS notification 3 of 3 ~ Enjoy!", "face-smile"]];
+
+        if (index < 0 || index >= notifications.length) {
+            return;
+        }
+
+        const notif = notifications[index];
+        testNotificationProcess.command = ["notify-send", "-h", "int:transient:1", "-a", "DMS", "-i", notif[2], notif[0], notif[1]];
+        testNotificationProcess.running = true;
+    }
+
+    property Process testNotificationProcess
+
+    testNotificationProcess: Process {
+        command: []
+        running: false
+    }
+
+    property Timer testNotifTimer1
+
+    testNotifTimer1: Timer {
+        interval: 400
+        repeat: false
+        onTriggered: root.sendTestNotification(1)
+    }
+
+    property Timer testNotifTimer2
+
+    testNotifTimer2: Timer {
+        interval: 800
+        repeat: false
+        onTriggered: root.sendTestNotification(2)
     }
 
     function clearAllNotifications() {

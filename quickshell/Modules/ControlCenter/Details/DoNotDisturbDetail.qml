@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Widgets
+import "../../../Common/Format.js" as Format
 
 Rectangle {
     id: root
@@ -23,33 +24,8 @@ Rectangle {
         onTriggered: root.nowMs = Date.now()
     }
 
-    function _pad2(n) {
-        return n < 10 ? "0" + n : "" + n;
-    }
-
-    function formatUntil(ts) {
-        if (!ts)
-            return "";
-        const d = new Date(ts);
-        const use24h = (typeof SettingsData !== "undefined") ? SettingsData.use24HourClock : true;
-        if (use24h)
-            return _pad2(d.getHours()) + ":" + _pad2(d.getMinutes());
-        const suffix = d.getHours() >= 12 ? "PM" : "AM";
-        const h12 = ((d.getHours() + 11) % 12) + 1;
-        return h12 + ":" + _pad2(d.getMinutes()) + " " + suffix;
-    }
-
     function formatRemaining(ms) {
-        if (ms <= 0)
-            return "";
-        const totalMinutes = Math.ceil(ms / 60000);
-        if (totalMinutes < 60)
-            return I18n.tr("%1 min left").arg(totalMinutes);
-        const hours = Math.floor(totalMinutes / 60);
-        const mins = totalMinutes - hours * 60;
-        if (mins === 0)
-            return I18n.tr("%1 h left").arg(hours);
-        return I18n.tr("%1 h %2 m left").arg(hours).arg(mins);
+        return Format.formatRemaining(ms, "", I18n.tr("%1 min left"), I18n.tr("%1 h left"), I18n.tr("%1 h %2 m left"));
     }
 
     function minutesUntilTomorrowMorning() {
@@ -125,7 +101,7 @@ Rectangle {
                         if (SessionData.doNotDisturbUntil <= 0)
                             return I18n.tr("On indefinitely");
                         const remaining = Math.max(0, SessionData.doNotDisturbUntil - root.nowMs);
-                        return root.formatRemaining(remaining) + " · " + I18n.tr("until %1").arg(root.formatUntil(SessionData.doNotDisturbUntil));
+                        return root.formatRemaining(remaining) + " · " + I18n.tr("until %1").arg(Format.formatUntil(SessionData.doNotDisturbUntil, SettingsData.use24HourClock));
                     }
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceVariantText

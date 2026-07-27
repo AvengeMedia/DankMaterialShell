@@ -77,6 +77,9 @@ Card {
                 height: 80
                 anchors.centerIn: parent
                 activePlayer: root.activePlayer
+                artUrl: TrackArtService.resolvedArtUrl
+                accentColor: MediaAccentService.accent
+                cavaService: CavaService
                 albumSize: 76
                 animationScale: 1.05
             }
@@ -114,6 +117,10 @@ Card {
             height: 20
             x: -2
             activePlayer: root.activePlayer
+            stableLength: MprisController.activePlayerStableLength
+            accentColor: MediaAccentService.accent
+            accentTrackColor: MediaAccentService.accentTrack
+            accentSubtleColor: MediaAccentService.accentSubtle
             isSeeking: root.isSeeking
             onIsSeekingChanged: root.isSeeking = isSeeking
         }

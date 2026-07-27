@@ -93,14 +93,8 @@ Item {
         "label": "popouts"
     })
 
-    function _frameEdgeInset(side) {
-        if (!screen)
-            return 0;
-        return SettingsData.frameEdgeInsetForSide(screen, side);
-    }
-
     function _frameGapMargin(side) {
-        return _frameEdgeInset(side) + Theme.popupDistance;
+        return SettingsData.frameEdgeInsetForSide(screen, side) + Theme.popupDistance;
     }
 
     function _edgeClearance(side, popupGap, adjacentInset) {

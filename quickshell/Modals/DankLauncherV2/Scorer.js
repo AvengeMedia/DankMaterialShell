@@ -89,15 +89,6 @@ function fuzzyScore(text, query) {
     return bestScore
 }
 
-function getTimeBucketWeight(daysSinceUsed) {
-    for (var i = 0; i < TimeBuckets.length; i++) {
-        if (daysSinceUsed <= TimeBuckets[i].maxDays) {
-            return TimeBuckets[i].weight
-        }
-    }
-    return 10
-}
-
 function calculateTextScore(name, query) {
     if (name === query) return Weights.exactMatch
     if (name.startsWith(query)) return Weights.prefixMatch

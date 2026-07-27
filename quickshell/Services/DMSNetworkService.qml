@@ -1049,10 +1049,6 @@ Singleton {
         return activeUuids && activeUuids.indexOf(uuid) !== -1;
     }
 
-    function isActiveUuid(uuid) {
-        return isActiveVpnUuid(uuid);
-    }
-
     function refreshNetworkState() {
         if (networkAvailable) {
             getState();

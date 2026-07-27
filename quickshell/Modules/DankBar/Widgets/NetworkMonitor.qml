@@ -3,21 +3,10 @@ import qs.Common
 import qs.Modules.Plugins
 import qs.Services
 import qs.Widgets
+import "../../../Common/Format.js" as Format
 
 BasePill {
     id: root
-
-    function formatNetworkSpeed(bytesPerSec) {
-        if (bytesPerSec < 1024) {
-            return bytesPerSec.toFixed(0) + " B/s";
-        } else if (bytesPerSec < 1024 * 1024) {
-            return (bytesPerSec / 1024).toFixed(1) + " KB/s";
-        } else if (bytesPerSec < 1024 * 1024 * 1024) {
-            return (bytesPerSec / (1024 * 1024)).toFixed(1) + " MB/s";
-        } else {
-            return (bytesPerSec / (1024 * 1024 * 1024)).toFixed(1) + " GB/s";
-        }
-    }
 
     Component.onCompleted: {
         DgopService.addRef(["network"]);
@@ -97,7 +86,7 @@ BasePill {
                     }
 
                     StyledText {
-                        text: DgopService.networkRxRate > 0 ? root.formatNetworkSpeed(DgopService.networkRxRate) : "0 B/s"
+                        text: DgopService.networkRxRate > 0 ? Format.formatRate(DgopService.networkRxRate, 1) : "0 B/s"
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         color: Theme.widgetTextColor
                         anchors.verticalCenter: parent.verticalCenter
@@ -126,7 +115,7 @@ BasePill {
                     }
 
                     StyledText {
-                        text: DgopService.networkTxRate > 0 ? root.formatNetworkSpeed(DgopService.networkTxRate) : "0 B/s"
+                        text: DgopService.networkTxRate > 0 ? Format.formatRate(DgopService.networkTxRate, 1) : "0 B/s"
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         color: Theme.widgetTextColor
                         anchors.verticalCenter: parent.verticalCenter

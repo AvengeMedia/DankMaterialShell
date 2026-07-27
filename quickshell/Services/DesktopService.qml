@@ -18,7 +18,10 @@ Singleton {
     property bool systemdAutostartTargetChecked: false
     readonly property bool autostartAvailable: root.systemdAutostartTargetChecked && (!root.isSystemd || root.systemdAutostartTargetActive)
 
-    Component.onCompleted: initSystemCheckProcess.running = true
+    Component.onCompleted: {
+        Paths.desktopIconResolver = name => resolveIconPath(name);
+        initSystemCheckProcess.running = true;
+    }
 
     Process {
         id: initSystemCheckProcess

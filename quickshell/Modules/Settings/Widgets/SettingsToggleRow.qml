@@ -4,6 +4,7 @@ import QtQuick
 import qs.Common
 import qs.Services
 import qs.Widgets
+import "../../../Common/QmlUtils.js" as QmlUtils
 
 DankToggle {
     id: root
@@ -19,16 +20,6 @@ DankToggle {
 
     width: parent?.width ?? 0
 
-    function findParentFlickable() {
-        let p = root.parent;
-        while (p) {
-            if (p.hasOwnProperty("contentY") && p.hasOwnProperty("contentItem"))
-                return p;
-            p = p.parent;
-        }
-        return null;
-    }
-
     Component.onCompleted: {
         if (!settingKey)
             return;
@@ -36,7 +27,7 @@ DankToggle {
         Qt.callLater(() => {
             if (!root.parent)
                 return;
-            var flickable = findParentFlickable();
+            var flickable = QmlUtils.findParentFlickable(root.parent);
             if (flickable)
                 SettingsSearchService.registerCard(key, root, flickable);
         });

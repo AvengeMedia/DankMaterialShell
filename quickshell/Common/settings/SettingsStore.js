@@ -291,26 +291,3 @@ function migrateToVersion(obj, targetVersion) {
 
     return settings;
 }
-
-function cleanup(fileText) {
-    var getValidKeys = SpecModule.getValidKeys;
-    if (!fileText || !fileText.trim()) return;
-
-    try {
-        var settings = JSON.parse(fileText);
-        var validKeys = getValidKeys();
-        var needsSave = false;
-
-        for (var key in settings) {
-            if (validKeys.indexOf(key) < 0) {
-                delete settings[key];
-                needsSave = true;
-            }
-        }
-
-        return needsSave ? JSON.stringify(settings, null, 2) : null;
-    } catch (e) {
-        console.warn("SettingsData: Failed to cleanup unused keys:", e.message);
-        return null;
-    }
-}

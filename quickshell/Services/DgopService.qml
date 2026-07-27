@@ -156,10 +156,6 @@ Singleton {
         }
     }
 
-    function setGpuPciIds(pciIds) {
-        gpuPciIds = Array.isArray(pciIds) ? pciIds : [];
-    }
-
     function addGpuPciId(pciId) {
         const currentCount = gpuPciIdRefCounts[pciId] || 0;
         gpuPciIdRefCounts[pciId] = currentCount + 1;
@@ -201,12 +197,6 @@ Singleton {
 
         // Force property change notification
         gpuPciIdRefCounts = Object.assign({}, gpuPciIdRefCounts);
-    }
-
-    function setProcessOptions(limit = 20, sort = "cpu", disableCpu = false) {
-        processLimit = limit;
-        processSort = sort;
-        noCpu = disableCpu;
     }
 
     function updateAllStats() {
@@ -476,44 +466,6 @@ Singleton {
         }
     }
 
-    function getProcessIcon(command) {
-        const cmd = command.toLowerCase();
-        if (cmd.includes("firefox") || cmd.includes("chrome") || cmd.includes("browser") || cmd.includes("chromium")) {
-            return "web";
-        }
-        if (cmd.includes("code") || cmd.includes("editor") || cmd.includes("vim")) {
-            return "code";
-        }
-        if (cmd.includes("terminal") || cmd.includes("bash") || cmd.includes("zsh")) {
-            return "terminal";
-        }
-        if (cmd.includes("music") || cmd.includes("audio") || cmd.includes("spotify")) {
-            return "music_note";
-        }
-        if (cmd.includes("video") || cmd.includes("vlc") || cmd.includes("mpv")) {
-            return "play_circle";
-        }
-        if (cmd.includes("systemd") || cmd.includes("elogind") || cmd.includes("kernel") || cmd.includes("kthread") || cmd.includes("kworker")) {
-            return "settings";
-        }
-        return "memory";
-    }
-
-    function formatCpuUsage(cpu) {
-        return (cpu || 0).toFixed(1) + "%";
-    }
-
-    function formatMemoryUsage(memoryKB) {
-        const mem = memoryKB || 0;
-        if (mem < 1024) {
-            return mem.toFixed(0) + " KB";
-        } else if (mem < 1024 * 1024) {
-            return (mem / 1024).toFixed(1) + " MB";
-        } else {
-            return (mem / (1024 * 1024)).toFixed(1) + " GB";
-        }
-    }
-
     function formatSystemMemory(memoryKB) {
         const mem = memoryKB || 0;
         if (mem === 0) {
@@ -523,12 +475,6 @@ Singleton {
             return (mem / 1024).toFixed(0) + " MB";
         } else {
             return (mem / (1024 * 1024)).toFixed(1) + " GB";
-        }
-    }
-
-    function killProcess(pid) {
-        if (pid > 0) {
-            Quickshell.execDetached("kill", [pid.toString()]);
         }
     }
 

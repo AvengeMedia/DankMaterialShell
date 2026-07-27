@@ -44,16 +44,6 @@ function connectorX(barSide, baseX, bodyWidth, placement, spacing, radius) {
     return barSide === "left" ? s : s - w;
 }
 
-function connectorY(barSide, baseY, bodyHeight, placement, spacing, radius) {
-    var s = seamY(barSide, baseY, bodyHeight, placement);
-    var h = connectorHeight(barSide, spacing, radius);
-    if (barSide === "top")
-        return s;
-    if (barSide === "bottom")
-        return s - h;
-    return placement === "left" ? s - h : s;
-}
-
 // Which corner of the connector's bounding rect hosts the concave arc that
 // carves into the body. Used for arc-sweep orientation.
 function arcCorner(barSide, placement) {

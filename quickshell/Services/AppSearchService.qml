@@ -791,23 +791,6 @@ Singleton {
         return null;
     }
 
-    function getAllPluginItems() {
-        if (typeof PluginService === "undefined") {
-            return [];
-        }
-
-        let allItems = [];
-        const launchers = PluginService.getLauncherPlugins();
-
-        for (const pluginId in launchers) {
-            const categoryName = launchers[pluginId].name || pluginId;
-            const items = getPluginItems(categoryName, "");
-            allItems = allItems.concat(items);
-        }
-
-        return allItems;
-    }
-
     function getPluginItems(category, query) {
         if (typeof PluginService === "undefined")
             return [];
@@ -915,21 +898,6 @@ Singleton {
         return false;
     }
 
-    function getPluginPasteText(pluginId, item) {
-        if (typeof PluginService === "undefined")
-            return null;
-
-        const instance = PluginService.pluginInstances[pluginId];
-        if (!instance)
-            return null;
-
-        if (typeof instance.getPasteText === "function") {
-            return instance.getPasteText(item);
-        }
-
-        return null;
-    }
-
     function getPluginPasteArgs(pluginId, item) {
         if (typeof PluginService === "undefined")
             return null;
@@ -948,21 +916,6 @@ Singleton {
         }
 
         return null;
-    }
-
-    function searchPluginItems(query) {
-        if (typeof PluginService === "undefined")
-            return [];
-
-        let allItems = [];
-        const launchers = PluginService.getLauncherPlugins();
-
-        for (const pluginId in launchers) {
-            const items = getPluginItemsForPlugin(pluginId, query);
-            allItems = allItems.concat(items);
-        }
-
-        return allItems;
     }
 
     function getPluginLauncherCategories(pluginId) {
@@ -1000,16 +953,5 @@ Singleton {
         } catch (e) {
             log.warn("Error setting category on plugin", pluginId, ":", e);
         }
-    }
-
-    function pluginHasCategories(pluginId) {
-        if (typeof PluginService === "undefined")
-            return false;
-
-        const instance = PluginService.pluginInstances[pluginId];
-        if (!instance)
-            return false;
-
-        return typeof instance.getCategories === "function";
     }
 }

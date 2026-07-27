@@ -3,19 +3,10 @@ import QtQuick.Layouts
 import qs.Common
 import qs.Services
 import qs.Widgets
+import "../../Common/Format.js" as Format
 
 Item {
     id: root
-
-    function formatSpeed(bytesPerSec) {
-        if (bytesPerSec < 1024)
-            return bytesPerSec.toFixed(0) + " B/s";
-        if (bytesPerSec < 1024 * 1024)
-            return (bytesPerSec / 1024).toFixed(1) + " KB/s";
-        if (bytesPerSec < 1024 * 1024 * 1024)
-            return (bytesPerSec / (1024 * 1024)).toFixed(1) + " MB/s";
-        return (bytesPerSec / (1024 * 1024 * 1024)).toFixed(2) + " GB/s";
-    }
 
     Component.onCompleted: {
         DgopService.addRef(["disk", "diskmounts"]);
@@ -76,7 +67,7 @@ Item {
                             }
 
                             StyledText {
-                                text: root.formatSpeed(DgopService.diskReadRate)
+                                text: Format.formatRate(DgopService.diskReadRate)
                                 font.pixelSize: Theme.fontSizeSmall
                                 font.family: SettingsData.monoFontFamily
                                 font.weight: Font.Bold
@@ -94,7 +85,7 @@ Item {
                             }
 
                             StyledText {
-                                text: root.formatSpeed(DgopService.diskWriteRate)
+                                text: Format.formatRate(DgopService.diskWriteRate)
                                 font.pixelSize: Theme.fontSizeSmall
                                 font.family: SettingsData.monoFontFamily
                                 font.weight: Font.Bold

@@ -162,21 +162,6 @@ function fillBounds(rect, side, seamOverlap, dpr) {
     };
 }
 
-function clipEnvelope(rect, side, radii, seamOverlap, dpr) {
-    var fill = fillBounds(rect, side, seamOverlap, dpr);
-    var chrome = chromeBounds(fill, side, radii.start, radii.end, radii.farExtent, dpr);
-    return {
-        "x": chrome.x,
-        "y": chrome.y,
-        "width": chrome.width,
-        "height": chrome.height,
-        "bodyX": snap(fill.x - chrome.x, dpr),
-        "bodyY": snap(fill.y - chrome.y, dpr),
-        "bodyWidth": fill.width,
-        "bodyHeight": fill.height
-    };
-}
-
 function blurRegions(descriptor, rect, radii, dpr) {
     var side = descriptor.barSide;
     var regions = [bodyRect(rect, dpr)];
@@ -218,15 +203,4 @@ function unionBounds(rects, padding, dpr) {
         "width": Math.max(0, snap(maxX - minX + pad * 2, dpr)),
         "height": Math.max(0, snap(maxY - minY + pad * 2, dpr))
     };
-}
-
-function shadowSourceBounds(descriptor, rect, radii, padding, dpr) {
-    return unionBounds(blurRegions(descriptor, rect, radii, dpr), padding, dpr);
-}
-
-function stableEqual(a, b, dpr) {
-    if (!a || !b)
-        return false;
-    var threshold = 0.5 / (dpr || 1);
-    return Math.abs(a.x - b.x) < threshold && Math.abs(a.y - b.y) < threshold && Math.abs(a.width - b.width) < threshold && Math.abs(a.height - b.height) < threshold;
 }

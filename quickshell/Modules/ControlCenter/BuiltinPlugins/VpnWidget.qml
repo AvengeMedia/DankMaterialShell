@@ -1,7 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.Modules.ControlCenter.Details
 import qs.Modules.Plugins
 
 PluginComponent {

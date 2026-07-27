@@ -8,6 +8,7 @@ import qs.Services
 import qs.Widgets
 import qs.Modules.Settings.Widgets
 import "../../Common/ConfigIncludeResolve.js" as ConfigIncludeResolve
+import "../../Common/Format.js" as Format
 
 Item {
     id: themeColorsTab
@@ -213,19 +214,6 @@ Item {
         if (Quickshell.env("QT_QPA_PLATFORMTHEME") === "gtk3" || Quickshell.env("QT_QPA_PLATFORMTHEME") === "qt6ct" || Quickshell.env("QT_QPA_PLATFORMTHEME_QT6") === "qt6ct" || Quickshell.env("QT_QPA_PLATFORMTHEME") === "kde")
             return;
         ToastService.showError(I18n.tr("Missing Environment Variables", "qt theme env error title"), I18n.tr("You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.", "qt theme env error body"));
-    }
-
-    function formatThemeAutoTime(isoString) {
-        if (!isoString)
-            return "";
-        try {
-            const date = new Date(isoString);
-            if (isNaN(date.getTime()))
-                return "";
-            return date.toLocaleTimeString(Qt.locale(), "HH:mm");
-        } catch (e) {
-            return "";
-        }
     }
 
     function refreshMatugenSchemePreviews() {
@@ -1566,7 +1554,7 @@ Item {
                                     }
 
                                     StyledText {
-                                        text: themeColorsTab.formatThemeAutoTime(SessionData.themeModeNextTransition)
+                                        text: Format.formatIsoTime(SessionData.themeModeNextTransition)
                                         font.pixelSize: Theme.fontSizeMedium
                                         font.weight: Font.Medium
                                         color: Theme.surfaceText

@@ -252,11 +252,6 @@ Singleton {
         return paths;
     }
 
-    function pluginHasSurface(pluginId, surface) {
-        const plugin = availablePlugins[pluginId];
-        return !!(plugin && plugin.surfaces && plugin.surfaces.includes(surface));
-    }
-
     function _onManifestParsed(absPath, manifest, sourceTag, mtimeEpochMs) {
         if (!manifest || !manifest.id || !manifest.name || (!manifest.component && !manifest.components)) {
             log.error("invalid manifest fields:", absPath);
@@ -837,10 +832,6 @@ Singleton {
         if (!plugin)
             return "";
         return plugin.pluginDirectory || "";
-    }
-
-    function saveAllPluginSettings() {
-        SettingsData.savePluginSettings();
     }
 
     function getPluginStatePath(pluginId) {

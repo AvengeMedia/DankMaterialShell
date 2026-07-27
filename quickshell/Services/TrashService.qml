@@ -53,6 +53,7 @@ Singleton {
     }
 
     Component.onCompleted: {
+        Paths.trashHandler = (path, callback) => trashPath(path, callback);
         detectProc.running = true;
         refreshCount();
     }

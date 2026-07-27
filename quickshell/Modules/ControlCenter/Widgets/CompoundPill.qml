@@ -25,11 +25,6 @@ Rectangle {
     height: 60
     radius: Theme.cornerRadius
 
-    function hoverTint(base) {
-        const factor = 1.2;
-        return Theme.isLightMode ? Qt.darker(base, factor) : Qt.lighter(base, factor);
-    }
-
     readonly property color _containerBg: Theme.ccPillInactiveBg
 
     color: {
@@ -61,7 +56,7 @@ Rectangle {
         radius: root.radius
         z: 0
         visible: false
-        color: hoverTint(_containerBg)
+        color: Theme.hoverTint(_containerBg)
         opacity: 0.08
         antialiasing: true
         Behavior on opacity {
@@ -98,7 +93,7 @@ Rectangle {
             Rectangle {
                 anchors.fill: parent
                 radius: _tileRadius
-                color: hoverTint(iconTile.color)
+                color: Theme.hoverTint(iconTile.color)
                 opacity: tileMouse.pressed ? 0.3 : (tileMouse.containsMouse ? 0.2 : 0.0)
                 visible: opacity > 0
                 antialiasing: true

@@ -4,6 +4,7 @@ import Quickshell
 import qs.Common
 import qs.Services
 import qs.Widgets
+import "../../Common/Format.js" as Format
 
 Item {
     id: root
@@ -17,31 +18,13 @@ Item {
     property var diskReadHistory: []
     property var diskWriteHistory: []
 
-    function formatBytes(bytes) {
-        if (bytes < 1024)
-            return bytes.toFixed(0) + " B/s";
-        if (bytes < 1024 * 1024)
-            return (bytes / 1024).toFixed(1) + " KB/s";
-        if (bytes < 1024 * 1024 * 1024)
-            return (bytes / (1024 * 1024)).toFixed(1) + " MB/s";
-        return (bytes / (1024 * 1024 * 1024)).toFixed(2) + " GB/s";
-    }
-
-    function addToHistory(arr, val) {
-        const newArr = arr.slice();
-        newArr.push(val);
-        if (newArr.length > historySize)
-            newArr.shift();
-        return newArr;
-    }
-
     function sampleData() {
-        cpuHistory = addToHistory(cpuHistory, DgopService.cpuUsage);
-        memoryHistory = addToHistory(memoryHistory, DgopService.memoryUsage);
-        networkRxHistory = addToHistory(networkRxHistory, DgopService.networkRxRate);
-        networkTxHistory = addToHistory(networkTxHistory, DgopService.networkTxRate);
-        diskReadHistory = addToHistory(diskReadHistory, DgopService.diskReadRate);
-        diskWriteHistory = addToHistory(diskWriteHistory, DgopService.diskWriteRate);
+        cpuHistory = Format.addToHistory(cpuHistory, DgopService.cpuUsage, historySize);
+        memoryHistory = Format.addToHistory(memoryHistory, DgopService.memoryUsage, historySize);
+        networkRxHistory = Format.addToHistory(networkRxHistory, DgopService.networkRxRate, historySize);
+        networkTxHistory = Format.addToHistory(networkTxHistory, DgopService.networkTxRate, historySize);
+        diskReadHistory = Format.addToHistory(diskReadHistory, DgopService.diskReadRate, historySize);
+        diskWriteHistory = Format.addToHistory(diskWriteHistory, DgopService.diskWriteRate, historySize);
     }
 
     Component.onCompleted: {
@@ -111,8 +94,8 @@ Item {
                 Layout.fillHeight: true
                 title: I18n.tr("Network")
                 icon: "swap_horiz"
-                value: "↓ " + root.formatBytes(DgopService.networkRxRate)
-                subtitle: "↑ " + root.formatBytes(DgopService.networkTxRate)
+                value: "↓ " + Format.formatRate(DgopService.networkRxRate)
+                subtitle: "↑ " + Format.formatRate(DgopService.networkTxRate)
                 accentColor: Theme.info
                 history: root.networkRxHistory
                 history2: root.networkTxHistory
@@ -127,8 +110,8 @@ Item {
                 Layout.fillHeight: true
                 title: I18n.tr("Disk")
                 icon: "storage"
-                value: "R: " + root.formatBytes(DgopService.diskReadRate)
-                subtitle: "W: " + root.formatBytes(DgopService.diskWriteRate)
+                value: "R: " + Format.formatRate(DgopService.diskReadRate)
+                subtitle: "W: " + Format.formatRate(DgopService.diskWriteRate)
                 accentColor: Theme.warning
                 history: root.diskReadHistory
                 history2: root.diskWriteHistory

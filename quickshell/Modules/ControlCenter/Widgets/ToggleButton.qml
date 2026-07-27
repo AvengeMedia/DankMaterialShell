@@ -39,17 +39,12 @@ Rectangle {
     border.width: isActive ? 1 : Theme.layerOutlineWidth
     opacity: enabled ? 1.0 : 0.6
 
-    function hoverTint(base) {
-        const factor = 1.2;
-        return Theme.isLightMode ? Qt.darker(base, factor) : Qt.lighter(base, factor);
-    }
-
     readonly property color _containerBg: Theme.ccPillInactiveBg
 
     Rectangle {
         anchors.fill: parent
         radius: Theme.cornerRadius
-        color: mouseArea.containsMouse ? hoverTint(_containerBg) : Theme.withAlpha(_containerBg, 0)
+        color: mouseArea.containsMouse ? Theme.hoverTint(_containerBg) : Theme.withAlpha(_containerBg, 0)
         opacity: mouseArea.containsMouse ? 0.08 : 0.0
 
         Behavior on opacity {

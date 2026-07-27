@@ -76,6 +76,28 @@ Singleton {
         generateNiriInputConfig();
     }
 
+    Connections {
+        target: Theme
+
+        function onScreenTransitionNeeded() {
+            if (CompositorService.isNiri) {
+                root.doScreenTransition();
+            }
+        }
+
+        function onThemeGenerationStarting() {
+            if (CompositorService.isNiri) {
+                root.suppressNextToast();
+            }
+        }
+    }
+
+    Binding {
+        target: Theme
+        property: "matugenToastSuppressed"
+        value: root.matugenSuppression
+    }
+
     Timer {
         id: suppressToastTimer
         interval: 3000
@@ -798,22 +820,6 @@ Singleton {
         });
     }
 
-    function moveWorkspaceDown() {
-        return send({
-            "Action": {
-                "FocusWorkspaceDown": {}
-            }
-        });
-    }
-
-    function moveWorkspaceUp() {
-        return send({
-            "Action": {
-                "FocusWorkspaceUp": {}
-            }
-        });
-    }
-
     function switchToWorkspace(workspaceId) {
         return send({
             "Action": {
@@ -925,10 +931,6 @@ Singleton {
         });
     }
 
-    function getCurrentOutputWorkspaceNumbers() {
-        return currentOutputWorkspaces.map(w => w.idx + 1);
-    }
-
     function getCurrentOutputWorkspaces() {
         return currentOutputWorkspaces.slice();
     }
@@ -950,24 +952,6 @@ Singleton {
     function suppressNextToast() {
         matugenSuppression = true;
         suppressResetTimer.restart();
-    }
-
-    function findNiriWindow(toplevel) {
-        if (!toplevel.appId)
-            return null;
-
-        for (var j = 0; j < windows.length; j++) {
-            const niriWindow = windows[j];
-            if (niriWindow.app_id === toplevel.appId) {
-                if (!niriWindow.title || niriWindow.title === toplevel.title) {
-                    return {
-                        "niriIndex": j,
-                        "niriWindow": niriWindow
-                    };
-                }
-            }
-        }
-        return null;
     }
 
     function sortToplevels(toplevels) {
@@ -1371,23 +1355,6 @@ window-rule {
         writeCursorProcess.running = true;
     }
 
-    function updateOutputPosition(outputName, x, y) {
-        if (!outputs || !outputs[outputName])
-            return;
-        const updatedOutputs = {};
-        for (const name in outputs) {
-            const output = outputs[name];
-            if (name === outputName && output.logical) {
-                updatedOutputs[name] = JSON.parse(JSON.stringify(output));
-                updatedOutputs[name].logical.x = x;
-                updatedOutputs[name].logical.y = y;
-            } else {
-                updatedOutputs[name] = output;
-            }
-        }
-        outputs = updatedOutputs;
-    }
-
     function applyOutputConfig(outputName, config, callback) {
         if (!CompositorService.isNiri || !outputName) {
             if (callback)
@@ -1784,6 +1751,31 @@ window-rule {
         writeInputProcess.inputPath = inputPath;
         writeInputProcess.command = ["sh", "-c", `mkdir -p "${niriDmsDir}" && cat > "${inputPath}" << 'EOF'\n${inputContent}\nEOF`];
         writeInputProcess.running = true;
+    }
+
+    function hasNamedWorkspaces() {
+        if (!CompositorService.isNiri)
+            return false;
+
+        for (var i = 0; i < allWorkspaces.length; i++) {
+            var ws = allWorkspaces[i];
+            if (ws.name && ws.name.trim() !== "")
+                return true;
+        }
+        return false;
+    }
+
+    function getNamedWorkspaces() {
+        var namedWorkspaces = [];
+        if (!CompositorService.isNiri)
+            return namedWorkspaces;
+
+        for (const ws of allWorkspaces) {
+            if (ws.name && ws.name.trim() !== "") {
+                namedWorkspaces.push(ws.name);
+            }
+        }
+        return namedWorkspaces;
     }
 
     IpcHandler {

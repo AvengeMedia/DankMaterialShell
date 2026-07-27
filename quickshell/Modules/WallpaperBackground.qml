@@ -114,7 +114,7 @@ Variants {
             }
 
             property real transitionProgress: 0
-            property real shaderFillMode: getFillMode(SessionData.getMonitorWallpaperFillMode(modelData.name))
+            property real shaderFillMode: Theme.getFillMode(SessionData.getMonitorWallpaperFillMode(modelData.name))
             property vector4d fillColor: Qt.vector4d(0, 0, 0, 1)
             property real edgeSmoothness: 0.1
 
@@ -319,31 +319,6 @@ Variants {
                 const pending = root.pendingWallpaper;
                 root.pendingWallpaper = "";
                 Qt.callLater(() => root.changeWallpaper(pending, true));
-            }
-
-            function getFillMode(modeName) {
-                switch (modeName) {
-                case "Scrolling":
-                    return Image.PreserveAspectCrop;
-                case "Stretch":
-                    return Image.Stretch;
-                case "Fit":
-                case "PreserveAspectFit":
-                    return Image.PreserveAspectFit;
-                case "Fill":
-                case "PreserveAspectCrop":
-                    return Image.PreserveAspectCrop;
-                case "Tile":
-                    return Image.Tile;
-                case "TileVertically":
-                    return Image.TileVertically;
-                case "TileHorizontally":
-                    return Image.TileHorizontally;
-                case "Pad":
-                    return Image.Pad;
-                default:
-                    return Image.PreserveAspectCrop;
-                }
             }
 
             function updateWorkspaceData() {
@@ -740,7 +715,7 @@ Variants {
                 cache: true
 
                 sourceSize: Qt.size(root.textureWidth, root.textureHeight)
-                fillMode: root.getFillMode(SessionData.getMonitorWallpaperFillMode(modelData.name))
+                fillMode: Theme.getFillMode(SessionData.getMonitorWallpaperFillMode(modelData.name))
 
                 onStatusChanged: {
                     if (status === Image.Error) {
@@ -772,7 +747,7 @@ Variants {
                 cache: true
 
                 sourceSize: Qt.size(root.textureWidth, root.textureHeight)
-                fillMode: root.getFillMode(SessionData.getMonitorWallpaperFillMode(modelData.name))
+                fillMode: Theme.getFillMode(SessionData.getMonitorWallpaperFillMode(modelData.name))
 
                 onStatusChanged: {
                     if (status === Image.Error) {

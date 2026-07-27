@@ -114,26 +114,6 @@ function withRevision(descriptor, revision) {
     return next;
 }
 
-function withAnimationOffset(descriptor, x, y) {
-    var next = normalize(descriptor);
-    next.animationOffset = {
-        "x": x === undefined ? next.animationOffset.x : _number(x, next.animationOffset.x),
-        "y": y === undefined ? next.animationOffset.y : _number(y, next.animationOffset.y)
-    };
-    return next;
-}
-
-function withBodyRect(descriptor, x, y, width, height) {
-    var next = normalize(descriptor);
-    next.bodyRect = {
-        "x": x === undefined ? next.bodyRect.x : _number(x, next.bodyRect.x),
-        "y": y === undefined ? next.bodyRect.y : _number(y, next.bodyRect.y),
-        "width": width === undefined ? next.bodyRect.width : Math.max(0, _number(width, next.bodyRect.width)),
-        "height": height === undefined ? next.bodyRect.height : Math.max(0, _number(height, next.bodyRect.height))
-    };
-    return next;
-}
-
 function same(a, b, threshold) {
     if (!a || !b)
         return false;

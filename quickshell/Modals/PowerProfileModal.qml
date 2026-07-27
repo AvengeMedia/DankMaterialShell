@@ -18,6 +18,19 @@ DankModal {
         open();
     }
 
+    function getPowerProfileDescription(profile) {
+        switch (profile) {
+        case 0:
+            return I18n.tr("Extend battery life", "power profile description");
+        case 1:
+            return I18n.tr("Balance power and performance", "power profile description");
+        case 2:
+            return I18n.tr("Prioritize performance", "power profile description");
+        default:
+            return I18n.tr("Custom power profile", "power profile description");
+        }
+    }
+
     function hideDialog() {
         close();
     }
@@ -244,7 +257,7 @@ DankModal {
 
                 // Selected power profile description
                 StyledText {
-                    text: (root.selectedIndex >= 0 && root.selectedIndex < root.profileModel.length) ? Theme.getPowerProfileDescription(root.profileModel[root.selectedIndex]) : ""
+                    text: (root.selectedIndex >= 0 && root.selectedIndex < root.profileModel.length) ? root.getPowerProfileDescription(root.profileModel[root.selectedIndex]) : ""
                     font.pixelSize: Theme.fontSizeMedium
                     color: Theme.surfaceTextMedium
                     horizontalAlignment: Text.AlignHCenter

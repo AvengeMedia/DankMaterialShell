@@ -19,10 +19,6 @@ QtObject {
     property real barSpacing: 0
     property real dpr: 1
 
-    function px(value) {
-        return Math.round(value * dpr) / dpr;
-    }
-
     readonly property bool frameExclusionActive: CompositorService.frameWindowVisibleForScreen(screen)
     readonly property bool usesConnectedFrameChrome: CompositorService.usesConnectedFrameChromeForScreen(screen)
     readonly property bool connectedBarActiveOnEdge: usesConnectedFrameChrome && !!screen && SettingsData.getActiveBarEdgesForScreen(screen).includes(edge)
@@ -56,6 +52,6 @@ QtObject {
 
     // Frame/bar edge exclusions already reserve the edge itself, so the dock
     // reservation covers only the dock body and user offset beyond that edge.
-    readonly property real reserveZone: px(bodyThickness + reserveOffset + effectiveMargin)
+    readonly property real reserveZone: Theme.px(bodyThickness + reserveOffset + effectiveMargin, dpr)
     readonly property bool shouldReserveSpace: dockVisible && !autoHide && barSpacing <= 0
 }

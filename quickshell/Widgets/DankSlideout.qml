@@ -177,7 +177,13 @@ PanelWindow {
             layer.textureSize: Qt.size(0, 0)
             opacity: 1
 
-            readonly property color slideoutSurfaceColor: root.customTransparency >= 0 ? Theme.withAlpha(Theme.surfaceContainer, root.customTransparency) : Theme.popupLayerColor(Theme.surfaceContainer)
+            readonly property color slideoutSurfaceColor: {
+                if (root.customTransparency >= 0)
+                    return Theme.withAlpha(Theme.surfaceContainer, root.customTransparency);
+                if (Theme.isConnectedEffect)
+                    return Theme.connectedSurfaceColor;
+                return Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency);
+            }
 
             anchors.top: parent.top
             anchors.bottom: parent.bottom

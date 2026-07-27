@@ -85,7 +85,6 @@ Singleton {
         }
     }
 
-    // Used in playLoginSoundIfApplicable()
     Process {
         id: loginSoundChecker
         onExited: exitCode => {
@@ -720,15 +719,10 @@ EOFCONFIG
             return "";
         }
 
-        // FIRST: Check if we have a custom alias in our deviceAliases map
-        // This ensures we always show the user's custom name, regardless of
-        // whether WirePlumber has applied it to the node properties yet
         if (node.name && deviceAliases[node.name]) {
             return deviceAliases[node.name];
         }
 
-        // Check node.properties["node.description"] for WirePlumber-applied aliases
-        // This is the live property updated by WirePlumber rules
         if (node.properties && node.properties["node.description"]) {
             const desc = node.properties["node.description"];
             if (desc !== node.name) {
@@ -736,22 +730,18 @@ EOFCONFIG
             }
         }
 
-        // Check cached description as fallback
         if (node.description && node.description !== node.name) {
             return node.description;
         }
 
-        // Fallback to device description property
         if (node.properties && node.properties["device.description"]) {
             return node.properties["device.description"];
         }
 
-        // Fallback to nickname
         if (node.nickname && node.nickname !== node.name) {
             return node.nickname;
         }
 
-        // Fallback to friendly names based on node name patterns
         if (node.name.includes("analog-stereo")) {
             return "Built-in Audio Analog Stereo";
         }
@@ -773,10 +763,6 @@ EOFCONFIG
             return "";
         }
 
-        // Get the original name without checking for custom aliases
-        // Check pattern-based friendly names FIRST (before device.description)
-        // This ensures we show user-friendly names like "Built-in Audio Analog Stereo"
-        // instead of hardware chip names like "ALC274 Analog"
         if (node.name.includes("analog-stereo")) {
             return "Built-in Audio Analog Stereo";
         }
@@ -790,19 +776,16 @@ EOFCONFIG
             return "HDMI Audio";
         }
         if (node.name.includes("raop_sink")) {
-            // Extract friendly name from RAOP node name
             const match = node.name.match(/raop_sink\.([^.]+)/);
             if (match) {
                 return match[1].replace(/-/g, " ");
             }
         }
 
-        // Fallback to device.description property
         if (node.properties && node.properties["device.description"]) {
             return node.properties["device.description"];
         }
 
-        // Fallback to nickname
         if (node.nickname && node.nickname !== node.name) {
             return node.nickname;
         }
@@ -887,28 +870,6 @@ EOFCONFIG
 
         root.sink.audio.muted = !root.sink.audio.muted;
         return root.sink.audio.muted ? "Audio muted" : "Audio unmuted";
-    }
-
-    function handleNodeVolumeWheel(node, wheelEvent) {
-        if (!node?.audio)
-            return;
-
-        SessionData.suppressOSDTemporarily();
-        const delta = wheelEvent.angleDelta.y;
-        if (delta === 0)
-            return;
-
-        const current = Math.round(node.audio.volume * 100);
-        const maxVol = getMaxVolumePercent(node);
-        const newVolume = delta > 0 ? Math.min(maxVol, current + root.wheelVolumeStep) : Math.max(0, current - root.wheelVolumeStep);
-
-        node.audio.muted = false;
-        node.audio.volume = newVolume / 100;
-
-        if (node === sink) {
-            playVolumeChangeSoundIfEnabled();
-        }
-        wheelEvent.accepted = true;
     }
 
     function setMicVolume(percentage) {

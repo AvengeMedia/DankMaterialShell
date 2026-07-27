@@ -6,8 +6,8 @@ import Quickshell.Wayland
 import qs.Common
 import qs.Services
 import qs.Widgets
-import "../Common/KeyUtils.js" as KeyUtils
-import "../Common/KeybindActions.js" as Actions
+import "../../Common/KeyUtils.js" as KeyUtils
+import "../../Common/KeybindActions.js" as Actions
 
 Item {
     id: root

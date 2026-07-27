@@ -3,22 +3,10 @@ import qs.Common
 import qs.Services
 import qs.Widgets
 import qs.Modules.Settings.Widgets
+import "../../Common/Format.js" as Format
 
 Item {
     id: root
-
-    function formatGammaTime(isoString) {
-        if (!isoString)
-            return "";
-        try {
-            const date = new Date(isoString);
-            if (isNaN(date.getTime()))
-                return "";
-            return date.toLocaleTimeString(Qt.locale(), "HH:mm");
-        } catch (e) {
-            return "";
-        }
-    }
 
     DankFlickable {
         anchors.fill: parent
@@ -195,7 +183,7 @@ Item {
                                 }
 
                                 onTabClicked: index => {
-                                    DisplayService.setNightModeAutomationMode(index === 1 ? "location" : "time");
+                                    SessionData.setNightModeAutoMode(index === 1 ? "location" : "time");
                                     currentIndex = index;
                                 }
 
@@ -562,7 +550,7 @@ Item {
                                         }
 
                                         StyledText {
-                                            text: root.formatGammaTime(DisplayService.gammaSunriseTime)
+                                            text: Format.formatIsoTime(DisplayService.gammaSunriseTime)
                                             font.pixelSize: Theme.fontSizeLarge
                                             font.weight: Font.Medium
                                             color: Theme.surfaceText
@@ -598,7 +586,7 @@ Item {
                                         }
 
                                         StyledText {
-                                            text: root.formatGammaTime(DisplayService.gammaSunsetTime)
+                                            text: Format.formatIsoTime(DisplayService.gammaSunsetTime)
                                             font.pixelSize: Theme.fontSizeLarge
                                             font.weight: Font.Medium
                                             color: Theme.surfaceText
@@ -645,7 +633,7 @@ Item {
                                         }
 
                                         StyledText {
-                                            text: root.formatGammaTime(DisplayService.gammaNextTransition)
+                                            text: Format.formatIsoTime(DisplayService.gammaNextTransition)
                                             font.pixelSize: Theme.fontSizeMedium
                                             font.weight: Font.Medium
                                             color: Theme.surfaceText

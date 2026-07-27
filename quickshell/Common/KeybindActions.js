@@ -1370,10 +1370,3 @@ function buildDmsAction(baseKey, args) {
 
     return parts.join(" ");
 }
-
-function getScreenshotOptions() {
-    return [
-        { id: "write-to-disk", label: "Save to disk", type: "bool" },
-        { id: "show-pointer", label: "Show pointer", type: "bool" }
-    ];
-}

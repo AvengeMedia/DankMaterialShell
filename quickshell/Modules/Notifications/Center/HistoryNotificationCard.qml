@@ -27,6 +27,36 @@ Rectangle {
     readonly property real collapsedContentHeight: iconSize + cardPadding
     readonly property real baseCardHeight: cardPadding * 2 + collapsedContentHeight
 
+    function formatHistoryTime(timestamp) {
+        NotificationService.timeUpdateTick;
+        NotificationService.clockFormatChanged;
+        const now = new Date();
+        const date = new Date(timestamp);
+        const diff = now.getTime() - timestamp;
+        const minutes = Math.floor(diff / 60000);
+        const hours = Math.floor(minutes / 60);
+        if (hours < 1) {
+            if (minutes < 1)
+                return I18n.tr("now");
+            return I18n.tr("%1m ago").arg(minutes);
+        }
+        const nowDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const itemDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        const daysDiff = Math.floor((nowDate - itemDate) / (1000 * 60 * 60 * 24));
+        const timeStr = SettingsData.use24HourClock ? date.toLocaleTimeString(Qt.locale(), "HH:mm") : date.toLocaleTimeString(Qt.locale(), "h:mm AP");
+        if (daysDiff === 0)
+            return timeStr;
+        try {
+            const localeName = (typeof I18n !== "undefined" && I18n.locale) ? I18n.locale().name : "en-US";
+            const weekday = date.toLocaleDateString(localeName, {
+                weekday: "long"
+            });
+            return weekday + ", " + timeStr;
+        } catch (e) {
+            return timeStr;
+        }
+    }
+
     width: parent ? parent.width : 400
     height: baseCardHeight + contentItem.extraHeight
     radius: Theme.cornerRadius
@@ -219,7 +249,7 @@ Rectangle {
                     }
                     StyledText {
                         id: historyTimeText
-                        text: NotificationService.formatHistoryTime(historyItem.timestamp)
+                        text: root.formatHistoryTime(historyItem.timestamp)
                         color: Theme.surfaceTextMedium
                         font.pixelSize: Theme.fontSizeSmall
                         font.weight: Font.Normal

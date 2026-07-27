@@ -22,6 +22,10 @@ Singleton {
 
     readonly property url imagecache: `${cache}/imagecache`
 
+    property var iconResolver: null
+    property var desktopIconResolver: null
+    property var trashHandler: null
+
     Component.onCompleted: mkdir(imagecache)
 
     function stringify(path: url): string {
@@ -88,7 +92,7 @@ Singleton {
     function themedIconPath(name: string): string {
         if (!name)
             return "";
-        const themed = (typeof IconThemeService !== "undefined") ? IconThemeService.resolve(name) : "";
+        const themed = iconResolver ? iconResolver(name) : "";
         if (themed)
             return themed;
         return Quickshell.iconPath(name, true);
@@ -105,11 +109,15 @@ Singleton {
                 return moddedId;
             return themedIconPath(moddedId);
         }
-        return themedIconPath(iconName) || DesktopService.resolveIconPath(iconName);
+        if (!desktopIconResolver)
+            return themedIconPath(iconName);
+        return themedIconPath(iconName) || desktopIconResolver(iconName);
     }
 
     function trashPath(path: string, callback): void {
-        TrashService.trashPath(path, callback);
+        if (!trashHandler)
+            return;
+        trashHandler(path, callback);
     }
 
     function copyPathToClipboard(path: string): void {
@@ -125,7 +133,7 @@ Singleton {
             return toFileUrl(expandTilde(target));
         if (target.startsWith("file://"))
             return target;
-        const themed = (typeof IconThemeService !== "undefined") ? IconThemeService.resolve(target) : "";
+        const themed = iconResolver ? iconResolver(target) : "";
         if (themed)
             return themed;
         return "image://icon/" + target;
@@ -148,7 +156,9 @@ Singleton {
         if (icon && icon !== "")
             return icon;
 
-        return DesktopService.resolveIconPath(appId);
+        if (!desktopIconResolver)
+            return "";
+        return desktopIconResolver(appId);
     }
 
     function getAppName(appId: string, desktopEntry: var): string {
