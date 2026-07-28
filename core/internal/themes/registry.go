@@ -6,12 +6,50 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/go-git/go-git/v6"
 	"github.com/spf13/afero"
 )
 
-const registryRepo = "https://github.com/AvengeMedia/dms-plugin-registry.git"
+const defaultRegistryURL = "https://github.com/AvengeMedia/dms-plugin-registry.git"
+
+// envRegistriesKey is the env var consulted at registry construction time.
+// Comma-separated list of git URLs. Empty/unset → defaultRegistryURL.
+const envRegistriesKey = "DMS_THEME_REGISTRIES"
+
+// RegistryConfig identifies a single registry source.
+type RegistryConfig struct {
+	// Name is a short identifier used for the per-registry cache subdir.
+	Name string
+	// URL is the git URL of the registry repository.
+	URL string
+}
+
+// ParseRegistriesFromEnv reads DMS_THEME_REGISTRIES (comma-separated URLs)
+// and returns the resulting configs. Defaults to the official registry when
+// the env var is unset, empty, or contains no valid URLs.
+func ParseRegistriesFromEnv() []RegistryConfig {
+	raw := strings.TrimSpace(os.Getenv(envRegistriesKey))
+	if raw == "" {
+		return []RegistryConfig{{Name: "official", URL: defaultRegistryURL}}
+	}
+	var configs []RegistryConfig
+	for i, part := range strings.Split(raw, ",") {
+		url := strings.TrimSpace(part)
+		if url == "" {
+			continue
+		}
+		configs = append(configs, RegistryConfig{
+			Name: fmt.Sprintf("r%d", i),
+			URL:  url,
+		})
+	}
+	if len(configs) == 0 {
+		return []RegistryConfig{{Name: "official", URL: defaultRegistryURL}}
+	}
+	return configs
+}
 
 type ColorScheme struct {
 	Primary                 string `json:"primary,omitempty"`
@@ -183,10 +221,11 @@ func (g *realGitClient) Pull(path string) error {
 }
 
 type Registry struct {
-	fs       afero.Fs
-	cacheDir string
-	themes   []Theme
-	git      GitClient
+	fs         afero.Fs
+	cacheDir   string // base cache dir; per-registry subdirs live underneath
+	registries []RegistryConfig
+	themes     []Theme
+	git        GitClient
 }
 
 func NewRegistry() (*Registry, error) {
@@ -196,59 +235,62 @@ func NewRegistry() (*Registry, error) {
 func NewRegistryWithFs(fs afero.Fs) (*Registry, error) {
 	cacheDir := getCacheDir()
 	return &Registry{
-		fs:       fs,
-		cacheDir: cacheDir,
-		git:      &realGitClient{},
+		fs:         fs,
+		cacheDir:   cacheDir,
+		registries: ParseRegistriesFromEnv(),
+		git:        &realGitClient{},
 	}, nil
+}
+
+// cacheDirFor returns the per-registry cache subdir.
+func (r *Registry) cacheDirFor(cfg RegistryConfig) string {
+	return filepath.Join(r.cacheDir, cfg.Name)
 }
 
 func getCacheDir() string {
 	return filepath.Join(os.TempDir(), "dankdots-plugin-registry")
 }
 
-func (r *Registry) Update() error {
-	exists, err := afero.DirExists(r.fs, r.cacheDir)
+// updateOne clones or pulls a single registry into its cache subdir.
+func (r *Registry) updateOne(cfg RegistryConfig) error {
+	dir := r.cacheDirFor(cfg)
+	exists, err := afero.DirExists(r.fs, dir)
 	if err != nil {
 		return fmt.Errorf("failed to check cache directory: %w", err)
 	}
 
 	if !exists {
-		if err := r.fs.MkdirAll(filepath.Dir(r.cacheDir), 0o755); err != nil {
+		if err := r.fs.MkdirAll(filepath.Dir(dir), 0o755); err != nil {
 			return fmt.Errorf("failed to create cache directory: %w", err)
 		}
-
-		if err := r.git.PlainClone(r.cacheDir, registryRepo); err != nil {
-			return fmt.Errorf("failed to clone registry: %w", err)
+		if err := r.git.PlainClone(dir, cfg.URL); err != nil {
+			return fmt.Errorf("failed to clone registry %s: %w", cfg.Name, err)
 		}
 	} else {
-		if err := r.git.Pull(r.cacheDir); err != nil {
-			if err := r.fs.RemoveAll(r.cacheDir); err != nil {
+		if err := r.git.Pull(dir); err != nil {
+			if err := r.fs.RemoveAll(dir); err != nil {
 				return fmt.Errorf("failed to remove corrupted registry: %w", err)
 			}
-
-			if err := r.fs.MkdirAll(filepath.Dir(r.cacheDir), 0o755); err != nil {
+			if err := r.fs.MkdirAll(filepath.Dir(dir), 0o755); err != nil {
 				return fmt.Errorf("failed to create cache directory: %w", err)
 			}
-
-			if err := r.git.PlainClone(r.cacheDir, registryRepo); err != nil {
-				return fmt.Errorf("failed to re-clone registry: %w", err)
+			if err := r.git.PlainClone(dir, cfg.URL); err != nil {
+				return fmt.Errorf("failed to re-clone registry %s: %w", cfg.Name, err)
 			}
 		}
 	}
-
-	return r.loadThemes()
+	return nil
 }
 
-func (r *Registry) loadThemes() error {
-	themesDir := filepath.Join(r.cacheDir, "themes")
-
+// loadThemesFrom reads theme directories from one registry's cache subdir.
+func (r *Registry) loadThemesFrom(dir string) ([]Theme, error) {
+	themesDir := filepath.Join(dir, "themes")
 	entries, err := afero.ReadDir(r.fs, themesDir)
 	if err != nil {
-		return fmt.Errorf("failed to read themes directory: %w", err)
+		return nil, fmt.Errorf("failed to read themes directory: %w", err)
 	}
 
-	r.themes = []Theme{}
-
+	var themes []Theme
 	for _, entry := range entries {
 		if !entry.IsDir() {
 			continue
@@ -278,9 +320,23 @@ func (r *Registry) loadThemes() error {
 			theme.PreviewPath = previewPath
 		}
 
-		r.themes = append(r.themes, theme)
+		themes = append(themes, theme)
 	}
+	return themes, nil
+}
 
+func (r *Registry) Update() error {
+	r.themes = []Theme{}
+	for _, cfg := range r.registries {
+		if err := r.updateOne(cfg); err != nil {
+			return err
+		}
+		themes, err := r.loadThemesFrom(r.cacheDirFor(cfg))
+		if err != nil {
+			return err
+		}
+		r.themes = append(r.themes, themes...)
+	}
 	return nil
 }
 
@@ -343,11 +399,25 @@ func (r *Registry) Get(idOrName string) (*Theme, error) {
 }
 
 func (r *Registry) GetThemeSourcePath(themeID string) string {
-	return filepath.Join(r.cacheDir, "themes", themeID, "theme.json")
+	// Themes may live under any registry's subdir. Search them all; first hit wins.
+	for _, cfg := range r.registries {
+		candidate := filepath.Join(r.cacheDirFor(cfg), "themes", themeID, "theme.json")
+		if exists, _ := afero.Exists(r.fs, candidate); exists {
+			return candidate
+		}
+	}
+	// Fallback to first registry (legacy path semantics).
+	return filepath.Join(r.cacheDirFor(r.registries[0]), "themes", themeID, "theme.json")
 }
 
 func (r *Registry) GetThemeDir(themeID string) string {
-	return filepath.Join(r.cacheDir, "themes", themeID)
+	for _, cfg := range r.registries {
+		candidate := filepath.Join(r.cacheDirFor(cfg), "themes", themeID)
+		if exists, _ := afero.DirExists(r.fs, candidate); exists {
+			return candidate
+		}
+	}
+	return filepath.Join(r.cacheDirFor(r.registries[0]), "themes", themeID)
 }
 
 func SortByFirstParty(themes []Theme) []Theme {

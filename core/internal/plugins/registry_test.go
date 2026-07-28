@@ -53,10 +53,11 @@ func setupTestRegistry(t *testing.T) (*Registry, afero.Fs, string) {
 	fs := afero.NewMemMapFs()
 	tmpDir := "/test-cache"
 	registry := &Registry{
-		fs:       fs,
-		cacheDir: tmpDir,
-		plugins:  []Plugin{},
-		git:      &mockGitClient{},
+		fs:         fs,
+		cacheDir:   tmpDir,
+		registries: []RegistryConfig{{Name: "test", URL: defaultRegistryURL}},
+		plugins:    []Plugin{},
+		git:        &mockGitClient{},
 	}
 	return registry, fs, tmpDir
 }
@@ -104,14 +105,14 @@ func TestLoadPlugins(t *testing.T) {
 		createTestPlugin(t, fs, tmpDir, "plugin1.json", plugin1)
 		createTestPlugin(t, fs, tmpDir, "plugin2.json", plugin2)
 
-		err := registry.loadPlugins()
+		plugins, err := registry.loadPluginsFrom(tmpDir)
 		assert.NoError(t, err)
-		assert.Len(t, registry.plugins, 2)
+		assert.Len(t, plugins, 2)
 
-		assert.Equal(t, "TestPlugin1", registry.plugins[0].Name)
-		assert.Equal(t, "TestPlugin2", registry.plugins[1].Name)
-		assert.Equal(t, []string{"dankbar-widget"}, registry.plugins[0].Capabilities)
-		assert.Equal(t, []string{"dep1", "dep2"}, registry.plugins[1].Dependencies)
+		assert.Equal(t, "TestPlugin1", plugins[0].Name)
+		assert.Equal(t, "TestPlugin2", plugins[1].Name)
+		assert.Equal(t, []string{"dankbar-widget"}, plugins[0].Capabilities)
+		assert.Equal(t, []string{"dep1", "dep2"}, plugins[1].Dependencies)
 	})
 
 	t.Run("skips non-json files", func(t *testing.T) {
@@ -136,10 +137,10 @@ func TestLoadPlugins(t *testing.T) {
 		}
 		createTestPlugin(t, fs, tmpDir, "valid.json", plugin)
 
-		err = registry.loadPlugins()
+		plugins, err := registry.loadPluginsFrom(tmpDir)
 		assert.NoError(t, err)
-		assert.Len(t, registry.plugins, 1)
-		assert.Equal(t, "ValidPlugin", registry.plugins[0].Name)
+		assert.Len(t, plugins, 1)
+		assert.Equal(t, "ValidPlugin", plugins[0].Name)
 	})
 
 	t.Run("skips directories", func(t *testing.T) {
@@ -161,9 +162,9 @@ func TestLoadPlugins(t *testing.T) {
 		}
 		createTestPlugin(t, fs, tmpDir, "valid.json", plugin)
 
-		err = registry.loadPlugins()
+		plugins, err := registry.loadPluginsFrom(tmpDir)
 		assert.NoError(t, err)
-		assert.Len(t, registry.plugins, 1)
+		assert.Len(t, plugins, 1)
 	})
 
 	t.Run("skips invalid json files", func(t *testing.T) {
@@ -188,16 +189,16 @@ func TestLoadPlugins(t *testing.T) {
 		}
 		createTestPlugin(t, fs, tmpDir, "valid.json", plugin)
 
-		err = registry.loadPlugins()
+		plugins, err := registry.loadPluginsFrom(tmpDir)
 		assert.NoError(t, err)
-		assert.Len(t, registry.plugins, 1)
-		assert.Equal(t, "ValidPlugin", registry.plugins[0].Name)
+		assert.Len(t, plugins, 1)
+		assert.Equal(t, "ValidPlugin", plugins[0].Name)
 	})
 
 	t.Run("returns error when plugins directory missing", func(t *testing.T) {
 		registry, _, _ := setupTestRegistry(t)
 
-		err := registry.loadPlugins()
+		_, err := registry.loadPluginsFrom(registry.cacheDir)
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "failed to read plugins directory")
 	})
@@ -274,8 +275,8 @@ func TestUpdate(t *testing.T) {
 		mockGit := &mockGitClient{
 			cloneFunc: func(path string, url string) error {
 				cloneCalled = true
-				assert.Equal(t, registryRepo, url)
-				assert.Equal(t, tmpDir, path)
+				assert.Equal(t, defaultRegistryURL, url)
+				assert.Equal(t, filepath.Join(tmpDir, "test"), path)
 				createTestPlugin(t, fs, path, "plugin.json", plugin)
 				return nil
 			},
@@ -303,14 +304,16 @@ func TestUpdate(t *testing.T) {
 			Distro:       []string{"any"},
 		}
 
-		err := fs.MkdirAll(tmpDir, 0o755)
+		// pre-create per-registry subdir so Pull path is taken
+		subdir := filepath.Join(tmpDir, "test")
+		err := fs.MkdirAll(subdir, 0o755)
 		require.NoError(t, err)
 
 		pullCalled := false
 		mockGit := &mockGitClient{
 			pullFunc: func(path string) error {
 				pullCalled = true
-				assert.Equal(t, tmpDir, path)
+				assert.Equal(t, subdir, path)
 				createTestPlugin(t, fs, path, "plugin.json", plugin)
 				return nil
 			},
@@ -322,5 +325,87 @@ func TestUpdate(t *testing.T) {
 		assert.True(t, pullCalled)
 		assert.Len(t, registry.plugins, 1)
 		assert.Equal(t, "UpdatedPlugin", registry.plugins[0].Name)
+	})
+
+	t.Run("aggregates from multiple registries", func(t *testing.T) {
+		registry, fs, _ := setupTestRegistry(t)
+
+		pluginA := Plugin{ID: "a", Name: "PluginA", Compositors: []string{"niri"}, Distro: []string{"any"}}
+		pluginB := Plugin{ID: "b", Name: "PluginB", Compositors: []string{"niri"}, Distro: []string{"any"}}
+
+		registry.registries = []RegistryConfig{
+			{Name: "official", URL: defaultRegistryURL},
+			{Name: "louzt", URL: "https://example.com/louzt.git"},
+		}
+
+		mockGit := &mockGitClient{
+			cloneFunc: func(path string, url string) error {
+				var p Plugin
+				switch {
+				case filepath.Base(path) == "official":
+					p = pluginA
+				case filepath.Base(path) == "louzt":
+					p = pluginB
+				}
+				createTestPlugin(t, fs, path, "x.json", p)
+				return nil
+			},
+		}
+		registry.git = mockGit
+
+		err := registry.Update()
+		assert.NoError(t, err)
+		assert.Len(t, registry.plugins, 2)
+		ids := []string{registry.plugins[0].ID, registry.plugins[1].ID}
+		assert.Contains(t, ids, "a")
+		assert.Contains(t, ids, "b")
+	})
+}
+
+func TestParseRegistriesFromEnv(t *testing.T) {
+	t.Run("defaults to official when env unset", func(t *testing.T) {
+		t.Setenv("DMS_PLUGIN_REGISTRIES", "")
+		cfgs := ParseRegistriesFromEnv()
+		assert.Len(t, cfgs, 1)
+		assert.Equal(t, "official", cfgs[0].Name)
+		assert.Equal(t, defaultRegistryURL, cfgs[0].URL)
+	})
+
+	t.Run("defaults to official when env is whitespace", func(t *testing.T) {
+		t.Setenv("DMS_PLUGIN_REGISTRIES", "   ")
+		cfgs := ParseRegistriesFromEnv()
+		assert.Len(t, cfgs, 1)
+		assert.Equal(t, "official", cfgs[0].Name)
+	})
+
+	t.Run("parses comma-separated URLs", func(t *testing.T) {
+		t.Setenv("DMS_PLUGIN_REGISTRIES", "https://a.git,https://b.git")
+		cfgs := ParseRegistriesFromEnv()
+		assert.Len(t, cfgs, 2)
+		assert.Equal(t, "r0", cfgs[0].Name)
+		assert.Equal(t, "https://a.git", cfgs[0].URL)
+		assert.Equal(t, "r1", cfgs[1].Name)
+		assert.Equal(t, "https://b.git", cfgs[1].URL)
+	})
+
+	t.Run("trims whitespace around URLs", func(t *testing.T) {
+		t.Setenv("DMS_PLUGIN_REGISTRIES", " https://a.git , https://b.git ")
+		cfgs := ParseRegistriesFromEnv()
+		assert.Len(t, cfgs, 2)
+		assert.Equal(t, "https://a.git", cfgs[0].URL)
+		assert.Equal(t, "https://b.git", cfgs[1].URL)
+	})
+
+	t.Run("skips empty entries", func(t *testing.T) {
+		t.Setenv("DMS_PLUGIN_REGISTRIES", ",https://a.git,,https://b.git,")
+		cfgs := ParseRegistriesFromEnv()
+		assert.Len(t, cfgs, 2)
+	})
+
+	t.Run("falls back to official when all entries empty", func(t *testing.T) {
+		t.Setenv("DMS_PLUGIN_REGISTRIES", ", , ,")
+		cfgs := ParseRegistriesFromEnv()
+		assert.Len(t, cfgs, 1)
+		assert.Equal(t, "official", cfgs[0].Name)
 	})
 }

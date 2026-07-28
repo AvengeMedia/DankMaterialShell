@@ -64,3 +64,38 @@ func TestLoadThemeWCAGInvalidJSON(t *testing.T) {
 		t.Fatalf("expected nil for invalid wcag.json, got %+v", wcag)
 	}
 }
+
+func TestParseRegistriesFromEnv(t *testing.T) {
+	t.Run("defaults to official when env unset", func(t *testing.T) {
+		t.Setenv("DMS_THEME_REGISTRIES", "")
+		cfgs := ParseRegistriesFromEnv()
+		if len(cfgs) != 1 {
+			t.Fatalf("expected 1 registry, got %d", len(cfgs))
+		}
+		if cfgs[0].Name != "official" {
+			t.Fatalf("expected name=official, got %q", cfgs[0].Name)
+		}
+		if cfgs[0].URL != defaultRegistryURL {
+			t.Fatalf("expected url=%s, got %q", defaultRegistryURL, cfgs[0].URL)
+		}
+	})
+
+	t.Run("parses comma-separated URLs", func(t *testing.T) {
+		t.Setenv("DMS_THEME_REGISTRIES", "https://a.git,https://b.git")
+		cfgs := ParseRegistriesFromEnv()
+		if len(cfgs) != 2 {
+			t.Fatalf("expected 2 registries, got %d", len(cfgs))
+		}
+		if cfgs[0].URL != "https://a.git" || cfgs[1].URL != "https://b.git" {
+			t.Fatalf("unexpected urls: %+v", cfgs)
+		}
+	})
+
+	t.Run("falls back when all entries empty", func(t *testing.T) {
+		t.Setenv("DMS_THEME_REGISTRIES", ", , ,")
+		cfgs := ParseRegistriesFromEnv()
+		if len(cfgs) != 1 || cfgs[0].Name != "official" {
+			t.Fatalf("expected fallback to official, got %+v", cfgs)
+		}
+	})
+}

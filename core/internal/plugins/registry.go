@@ -11,7 +11,49 @@ import (
 	"github.com/spf13/afero"
 )
 
-const registryRepo = "https://github.com/AvengeMedia/dms-plugin-registry.git"
+const defaultRegistryURL = "https://github.com/AvengeMedia/dms-plugin-registry.git"
+
+// envRegistriesKey is the env var consulted at registry construction time.
+// Comma-separated list of git URLs. Empty/unset → defaultRegistryURL.
+const envRegistriesKey = "DMS_PLUGIN_REGISTRIES"
+
+// RegistryConfig identifies a single registry source.
+type RegistryConfig struct {
+	// Name is a short identifier used for the per-registry cache subdir
+	// (e.g. "official", "louzt"). Defaults to "r<N>" when only URL given.
+	Name string
+	// URL is the git URL of the registry repository.
+	URL string
+}
+
+// ParseRegistriesFromEnv reads DMS_PLUGIN_REGISTRIES (comma-separated URLs)
+// and returns the resulting configs. Defaults to the official registry when
+// the env var is unset, empty, or contains no valid URLs.
+//
+// This is the only point that decides which registries the running DMS sees.
+// Callers (CLI, server, manager) construct Registry without arguments; they
+// inherit the env-driven list transparently.
+func ParseRegistriesFromEnv() []RegistryConfig {
+	raw := strings.TrimSpace(os.Getenv(envRegistriesKey))
+	if raw == "" {
+		return []RegistryConfig{{Name: "official", URL: defaultRegistryURL}}
+	}
+	var configs []RegistryConfig
+	for i, part := range strings.Split(raw, ",") {
+		url := strings.TrimSpace(part)
+		if url == "" {
+			continue
+		}
+		configs = append(configs, RegistryConfig{
+			Name: fmt.Sprintf("r%d", i),
+			URL:  url,
+		})
+	}
+	if len(configs) == 0 {
+		return []RegistryConfig{{Name: "official", URL: defaultRegistryURL}}
+	}
+	return configs
+}
 
 type Plugin struct {
 	ID           string   `json:"id"`
@@ -119,10 +161,11 @@ func (g *realGitClient) HasUpdates(path string) (bool, string, string, error) {
 }
 
 type Registry struct {
-	fs       afero.Fs
-	cacheDir string
-	plugins  []Plugin
-	git      GitClient
+	fs         afero.Fs
+	cacheDir   string // base cache dir; per-registry subdirs live underneath
+	registries []RegistryConfig
+	plugins    []Plugin
+	git        GitClient
 }
 
 func NewRegistry() (*Registry, error) {
@@ -132,61 +175,63 @@ func NewRegistry() (*Registry, error) {
 func NewRegistryWithFs(fs afero.Fs) (*Registry, error) {
 	cacheDir := getCacheDir()
 	return &Registry{
-		fs:       fs,
-		cacheDir: cacheDir,
-		git:      &realGitClient{},
+		fs:         fs,
+		cacheDir:   cacheDir,
+		registries: ParseRegistriesFromEnv(),
+		git:        &realGitClient{},
 	}, nil
+}
+
+// cacheDirFor returns the per-registry cache subdir.
+func (r *Registry) cacheDirFor(cfg RegistryConfig) string {
+	return filepath.Join(r.cacheDir, cfg.Name)
 }
 
 func getCacheDir() string {
 	return filepath.Join(os.TempDir(), "dankdots-plugin-registry")
 }
 
-func (r *Registry) Update() error {
-	exists, err := afero.DirExists(r.fs, r.cacheDir)
+// updateOne clones or pulls a single registry into its cache subdir.
+// Mirrors the previous single-repo Update logic but scoped per registry.
+func (r *Registry) updateOne(cfg RegistryConfig) error {
+	dir := r.cacheDirFor(cfg)
+	exists, err := afero.DirExists(r.fs, dir)
 	if err != nil {
 		return fmt.Errorf("failed to check cache directory: %w", err)
 	}
 
 	if !exists {
-		if err := r.fs.MkdirAll(filepath.Dir(r.cacheDir), 0o755); err != nil {
+		if err := r.fs.MkdirAll(filepath.Dir(dir), 0o755); err != nil {
 			return fmt.Errorf("failed to create cache directory: %w", err)
 		}
-
-		if err := r.git.PlainClone(r.cacheDir, registryRepo); err != nil {
-			return fmt.Errorf("failed to clone registry: %w", err)
+		if err := r.git.PlainClone(dir, cfg.URL); err != nil {
+			return fmt.Errorf("failed to clone registry %s: %w", cfg.Name, err)
 		}
 	} else {
-		// Try to pull, if it fails (e.g., shallow clone corruption), delete and re-clone
-		if err := r.git.Pull(r.cacheDir); err != nil {
-			// Repository is likely corrupted or has issues, delete and re-clone
-			if err := r.fs.RemoveAll(r.cacheDir); err != nil {
+		if err := r.git.Pull(dir); err != nil {
+			if err := r.fs.RemoveAll(dir); err != nil {
 				return fmt.Errorf("failed to remove corrupted registry: %w", err)
 			}
-
-			if err := r.fs.MkdirAll(filepath.Dir(r.cacheDir), 0o755); err != nil {
+			if err := r.fs.MkdirAll(filepath.Dir(dir), 0o755); err != nil {
 				return fmt.Errorf("failed to create cache directory: %w", err)
 			}
-
-			if err := r.git.PlainClone(r.cacheDir, registryRepo); err != nil {
-				return fmt.Errorf("failed to re-clone registry: %w", err)
+			if err := r.git.PlainClone(dir, cfg.URL); err != nil {
+				return fmt.Errorf("failed to re-clone registry %s: %w", cfg.Name, err)
 			}
 		}
 	}
-
-	return r.loadPlugins()
+	return nil
 }
 
-func (r *Registry) loadPlugins() error {
-	pluginsDir := filepath.Join(r.cacheDir, "plugins")
-
+// loadPluginsFrom reads plugin JSON files from one registry's cache subdir.
+func (r *Registry) loadPluginsFrom(dir string) ([]Plugin, error) {
+	pluginsDir := filepath.Join(dir, "plugins")
 	entries, err := afero.ReadDir(r.fs, pluginsDir)
 	if err != nil {
-		return fmt.Errorf("failed to read plugins directory: %w", err)
+		return nil, fmt.Errorf("failed to read plugins directory: %w", err)
 	}
 
-	r.plugins = []Plugin{}
-
+	var plugins []Plugin
 	for _, entry := range entries {
 		if entry.IsDir() || filepath.Ext(entry.Name()) != ".json" {
 			continue
@@ -206,9 +251,23 @@ func (r *Registry) loadPlugins() error {
 			plugin.ID = strings.TrimSuffix(entry.Name(), ".json")
 		}
 
-		r.plugins = append(r.plugins, plugin)
+		plugins = append(plugins, plugin)
 	}
+	return plugins, nil
+}
 
+func (r *Registry) Update() error {
+	r.plugins = []Plugin{}
+	for _, cfg := range r.registries {
+		if err := r.updateOne(cfg); err != nil {
+			return err
+		}
+		plugins, err := r.loadPluginsFrom(r.cacheDirFor(cfg))
+		if err != nil {
+			return err
+		}
+		r.plugins = append(r.plugins, plugins...)
+	}
 	return nil
 }
 
