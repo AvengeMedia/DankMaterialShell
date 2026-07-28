@@ -360,6 +360,87 @@ func TestUpdate(t *testing.T) {
 		assert.Contains(t, ids, "a")
 		assert.Contains(t, ids, "b")
 	})
+
+	t.Run("dedupes by ID with declaration order priority", func(t *testing.T) {
+		registry, fs, _ := setupTestRegistry(t)
+
+		pluginOfficial := Plugin{ID: "weather", Name: "OfficialWeather", Compositors: []string{"niri"}, Distro: []string{"any"}}
+		pluginLouzt := Plugin{ID: "weather", Name: "LouztWeather", Compositors: []string{"niri"}, Distro: []string{"any"}}
+
+		registry.registries = []RegistryConfig{
+			{Name: "official", URL: defaultRegistryURL},
+			{Name: "louzt", URL: "https://example.com/louzt.git"},
+		}
+
+		mockGit := &mockGitClient{
+			cloneFunc: func(path string, url string) error {
+				var p Plugin
+				switch filepath.Base(path) {
+				case "official":
+					p = pluginOfficial
+				case "louzt":
+					p = pluginLouzt
+				}
+				createTestPlugin(t, fs, path, "x.json", p)
+				return nil
+			},
+		}
+		registry.git = mockGit
+
+		err := registry.Update()
+		assert.NoError(t, err)
+		assert.Len(t, registry.plugins, 1, "duplicate IDs collapse to declaration-order winner")
+		assert.Equal(t, "OfficialWeather", registry.plugins[0].Name, "first registry wins")
+	})
+
+	t.Run("migrates legacy cache directory", func(t *testing.T) {
+		registry, fs, tmpDir := setupTestRegistry(t)
+
+		// Use "official" registry so the migration target matches what the
+		// Update loop will read from.
+		registry.registries = []RegistryConfig{{Name: "official", URL: defaultRegistryURL}}
+
+		// Seed legacy cache layout: <base>/plugins/weather.json
+		legacyDir := filepath.Join(tmpDir, "plugins")
+		require.NoError(t, fs.MkdirAll(legacyDir, 0o755))
+		legacyPlugin := Plugin{ID: "weather", Name: "Weather", Compositors: []string{"niri"}, Distro: []string{"any"}}
+		createTestPlugin(t, fs, tmpDir, "weather.json", legacyPlugin)
+
+		mockGit := &mockGitClient{
+			pullFunc: func(path string) error { return nil },
+		}
+		registry.git = mockGit
+
+		err := registry.Update()
+		assert.NoError(t, err)
+		// After migration, plugin should be loaded from the new layout.
+		assert.Len(t, registry.plugins, 1)
+		assert.Equal(t, "weather", registry.plugins[0].ID)
+		// Legacy dir must be gone.
+		exists, _ := afero.DirExists(fs, legacyDir)
+		assert.False(t, exists, "legacy <base>/plugins should be migrated/removed")
+		// New layout: <base>/official/plugins/weather.json
+		newPath := filepath.Join(tmpDir, "official", "plugins", "weather.json")
+		exists, _ = afero.Exists(fs, newPath)
+		assert.True(t, exists, "plugin should be at <base>/official/plugins/ after migration")
+	})
+
+	t.Run("no-op migration when legacy cache absent", func(t *testing.T) {
+		registry, _, _ := setupTestRegistry(t)
+
+		mockGit := &mockGitClient{
+			cloneFunc: func(path string, url string) error {
+				createTestPlugin(t, registry.fs, path, "x.json", Plugin{
+					ID: "x", Name: "X", Compositors: []string{"niri"}, Distro: []string{"any"},
+				})
+				return nil
+			},
+		}
+		registry.git = mockGit
+
+		err := registry.Update()
+		assert.NoError(t, err)
+	})
 }
 
 func TestParseRegistriesFromEnv(t *testing.T) {

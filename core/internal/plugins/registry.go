@@ -256,17 +256,55 @@ func (r *Registry) loadPluginsFrom(dir string) ([]Plugin, error) {
 	return plugins, nil
 }
 
+// migrateLegacyCache moves a pre-multi-registry cache (a flat `plugins/`
+// directory under the cache base) into the new per-registry layout under
+// `<base>/official/`. Idempotent: if the legacy dir isn't there, no-op.
+// Without this, every existing user re-clones the official registry on
+// the first Update() after upgrade instead of getting a fast-forward pull.
+func (r *Registry) migrateLegacyCache() error {
+	legacyDir := filepath.Join(r.cacheDir, "plugins")
+	exists, err := afero.DirExists(r.fs, legacyDir)
+	if err != nil || !exists {
+		return nil
+	}
+	targetDir := filepath.Join(r.cacheDir, "official", "plugins")
+	exists, err = afero.DirExists(r.fs, targetDir)
+	if err != nil {
+		return fmt.Errorf("failed to check target cache directory: %w", err)
+	}
+	if exists {
+		// New layout already in place — drop the legacy dir, nothing to do.
+		return r.fs.RemoveAll(legacyDir)
+	}
+	if err := r.fs.MkdirAll(filepath.Join(r.cacheDir, "official"), 0o755); err != nil {
+		return fmt.Errorf("failed to create official cache directory: %w", err)
+	}
+	return r.fs.Rename(legacyDir, targetDir)
+}
+
 func (r *Registry) Update() error {
+	if err := r.migrateLegacyCache(); err != nil {
+		return err
+	}
 	r.plugins = []Plugin{}
+	seen := make(map[string]struct{})
 	for _, cfg := range r.registries {
 		if err := r.updateOne(cfg); err != nil {
-			return err
+			return fmt.Errorf("registry %s: %w", cfg.Name, err)
 		}
 		plugins, err := r.loadPluginsFrom(r.cacheDirFor(cfg))
 		if err != nil {
-			return err
+			return fmt.Errorf("registry %s: %w", cfg.Name, err)
 		}
-		r.plugins = append(r.plugins, plugins...)
+		// Declaration-order dedupe: first occurrence of an ID wins.
+		// A later registry cannot override an earlier registry's plugin.
+		for _, p := range plugins {
+			if _, dup := seen[p.ID]; dup {
+				continue
+			}
+			seen[p.ID] = struct{}{}
+			r.plugins = append(r.plugins, p)
+		}
 	}
 	return nil
 }

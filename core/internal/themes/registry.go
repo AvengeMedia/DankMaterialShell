@@ -325,17 +325,50 @@ func (r *Registry) loadThemesFrom(dir string) ([]Theme, error) {
 	return themes, nil
 }
 
+// migrateLegacyCache moves a pre-multi-registry themes cache into the new
+// per-registry layout. Idempotent.
+func (r *Registry) migrateLegacyCache() error {
+	legacyDir := filepath.Join(r.cacheDir, "themes")
+	exists, err := afero.DirExists(r.fs, legacyDir)
+	if err != nil || !exists {
+		return nil
+	}
+	targetDir := filepath.Join(r.cacheDir, "official", "themes")
+	exists, err = afero.DirExists(r.fs, targetDir)
+	if err != nil {
+		return fmt.Errorf("failed to check target cache directory: %w", err)
+	}
+	if exists {
+		return r.fs.RemoveAll(legacyDir)
+	}
+	if err := r.fs.MkdirAll(filepath.Join(r.cacheDir, "official"), 0o755); err != nil {
+		return fmt.Errorf("failed to create official cache directory: %w", err)
+	}
+	return r.fs.Rename(legacyDir, targetDir)
+}
+
 func (r *Registry) Update() error {
+	if err := r.migrateLegacyCache(); err != nil {
+		return err
+	}
 	r.themes = []Theme{}
+	seen := make(map[string]struct{})
 	for _, cfg := range r.registries {
 		if err := r.updateOne(cfg); err != nil {
-			return err
+			return fmt.Errorf("registry %s: %w", cfg.Name, err)
 		}
 		themes, err := r.loadThemesFrom(r.cacheDirFor(cfg))
 		if err != nil {
-			return err
+			return fmt.Errorf("registry %s: %w", cfg.Name, err)
 		}
-		r.themes = append(r.themes, themes...)
+		// Declaration-order dedupe: first occurrence of an ID wins.
+		for _, t := range themes {
+			if _, dup := seen[t.ID]; dup {
+				continue
+			}
+			seen[t.ID] = struct{}{}
+			r.themes = append(r.themes, t)
+		}
 	}
 	return nil
 }
