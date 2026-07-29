@@ -99,3 +99,53 @@ func TestParseRegistriesFromEnv(t *testing.T) {
 		}
 	})
 }
+
+func TestUpdateMigration(t *testing.T) {
+	t.Run("migrates legacy themes cache", func(t *testing.T) {
+		fs := afero.NewMemMapFs()
+		base := "/test-cache"
+
+		// Seed legacy <base>/themes/example/theme.json
+		legacyDir := base + "/themes/example"
+		if err := afero.NewBasePathFs(fs, base).MkdirAll(legacyDir, 0o755); err != nil {
+			// BasePathFs not supported here; use direct path
+			if err := fs.MkdirAll(legacyDir, 0o755); err != nil {
+				t.Fatal(err)
+			}
+		}
+		themeJSON := `{"id":"example","name":"Example","version":"1.0","author":"a","description":"d"}`
+		if err := afero.WriteFile(fs, legacyDir+"/theme.json", []byte(themeJSON), 0o644); err != nil {
+			t.Fatal(err)
+		}
+
+		r := &Registry{
+			fs:         fs,
+			cacheDir:   base,
+			registries: []RegistryConfig{{Name: "official", URL: defaultRegistryURL}},
+			themes:     []Theme{},
+			git:        &stubGitClient{},
+		}
+		if err := r.Update(); err != nil {
+			t.Fatalf("Update: %v", err)
+		}
+		if len(r.themes) != 1 {
+			t.Fatalf("expected 1 theme after migration, got %d", len(r.themes))
+		}
+		if r.themes[0].ID != "example" {
+			t.Fatalf("expected theme id=example, got %q", r.themes[0].ID)
+		}
+		// Legacy dir should be gone.
+		if exists, _ := afero.DirExists(fs, base+"/themes"); exists {
+			t.Fatal("legacy <base>/themes should be migrated/removed")
+		}
+		// New layout: <base>/official/themes/example/theme.json
+		if exists, _ := afero.Exists(fs, base+"/official/themes/example/theme.json"); !exists {
+			t.Fatal("theme should be at <base>/official/themes/example/ after migration")
+		}
+	})
+}
+
+type stubGitClient struct{}
+
+func (s *stubGitClient) PlainClone(path string, url string) error { return nil }
+func (s *stubGitClient) Pull(path string) error                   { return nil }
