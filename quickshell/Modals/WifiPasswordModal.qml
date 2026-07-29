@@ -31,6 +31,7 @@ DankModal {
     property string promptToken: ""
     property string promptReason: ""
     property var promptFields: []
+    property var promptHints: []
     property string promptSetting: ""
 
     property bool isVpnPrompt: false
@@ -40,17 +41,20 @@ DankModal {
     property var fieldsInfo: []
     property var secretValues: ({})
 
+    readonly property bool isCertificatePrompt: promptReason === "server-certificate"
+    readonly property string serverCertificateFingerprint: promptHints.length > 0 ? promptHints[0] : ""
     readonly property bool showUsernameField: requiresEnterprise && !isVpnPrompt && fieldsInfo.length === 0
-    readonly property bool showPasswordField: fieldsInfo.length === 0
+    readonly property bool showPasswordField: fieldsInfo.length === 0 && !isCertificatePrompt
     readonly property bool showAnonField: requiresEnterprise && !isVpnPrompt
     readonly property bool showDomainField: requiresEnterprise && !isVpnPrompt
-    readonly property bool showSavePasswordCheckbox: (isVpnPrompt || fieldsInfo.length > 0) && promptReason !== "pkcs11"
+    readonly property bool showSavePasswordCheckbox: (isVpnPrompt || fieldsInfo.length > 0) && promptReason !== "pkcs11" && !isCertificatePrompt
 
     readonly property int inputFieldHeight: Theme.fontSizeMedium + Theme.spacingL * 2
     readonly property int inputFieldWithSpacing: inputFieldHeight + Theme.spacingM
     readonly property int checkboxRowHeight: Theme.fontSizeMedium + Theme.spacingS
     readonly property int headerHeight: Theme.fontSizeLarge + Theme.fontSizeMedium + Theme.spacingM * 2
     readonly property int buttonRowHeight: 36 + Theme.spacingM
+    readonly property int certificateWarningHeight: certificateWarningColumn.implicitHeight + Theme.spacingM * 2
 
     property int calculatedHeight: {
         let h = headerHeight + buttonRowHeight + Theme.spacingL * 2;
@@ -67,10 +71,16 @@ DankModal {
             h += inputFieldWithSpacing;
         if (showSavePasswordCheckbox)
             h += checkboxRowHeight;
+        if (isCertificatePrompt)
+            h += certificateWarningHeight + Theme.spacingM;
         return h;
     }
 
     function focusFirstField() {
+        if (isCertificatePrompt) {
+            connectButton.forceActiveFocus();
+            return;
+        }
         if (fieldsInfo.length > 0) {
             if (dynamicFieldsRepeater.count > 0) {
                 const firstItem = dynamicFieldsRepeater.itemAt(0);
@@ -101,6 +111,7 @@ DankModal {
         promptToken = "";
         promptReason = "";
         promptFields = [];
+        promptHints = [];
         promptSetting = "";
         isVpnPrompt = false;
         connectionName = "";
@@ -127,6 +138,7 @@ DankModal {
         promptToken = "";
         promptReason = "";
         promptFields = [];
+        promptHints = [];
         promptSetting = "";
         isVpnPrompt = false;
         connectionName = "";
@@ -145,6 +157,7 @@ DankModal {
         promptToken = token;
         promptReason = reason;
         promptFields = fields || [];
+        promptHints = hints || [];
         promptSetting = setting || "802-11-wireless-security";
         connectionType = connType || "802-11-wireless";
         connectionName = connName || ssid || "";
@@ -324,6 +337,8 @@ DankModal {
                             text: {
                                 if (promptReason === "pkcs11")
                                     return I18n.tr("Smartcard Authentication");
+                                if (isCertificatePrompt)
+                                    return I18n.tr("Untrusted VPN certificate", "Title for VPN server certificate trust confirmation");
                                 if (isVpnPrompt)
                                     return I18n.tr("Connect to VPN");
                                 if (isHiddenNetwork)
@@ -343,6 +358,8 @@ DankModal {
                                 text: {
                                     if (promptReason === "pkcs11")
                                         return I18n.tr("Enter PIN for ") + wifiPasswordSSID;
+                                    if (isCertificatePrompt)
+                                        return wifiPasswordSSID;
                                     if (fieldsInfo.length > 0)
                                         return I18n.tr("Enter credentials for ") + wifiPasswordSSID;
                                     if (isVpnPrompt)
@@ -379,6 +396,41 @@ DankModal {
                         iconSize: Theme.iconSize - 4
                         iconColor: Theme.surfaceText
                         onClicked: clearAndClose()
+                    }
+                }
+            }
+
+            Rectangle {
+                width: parent.width
+                height: certificateWarningHeight
+                radius: Theme.cornerRadius
+                color: Theme.withAlpha(Theme.warning, 0.12)
+                border.color: Theme.withAlpha(Theme.warning, 0.5)
+                border.width: 1
+                visible: isCertificatePrompt
+
+                Column {
+                    id: certificateWarningColumn
+
+                    anchors.fill: parent
+                    anchors.margins: Theme.spacingM
+                    spacing: Theme.spacingS
+
+                    StyledText {
+                        width: parent.width
+                        text: I18n.tr("Only continue if you recognize this server certificate fingerprint.", "Warning shown before trusting an unverified VPN server certificate")
+                        wrapMode: Text.Wrap
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceText
+                    }
+
+                    StyledText {
+                        width: parent.width
+                        text: serverCertificateFingerprint
+                        wrapMode: Text.WrapAnywhere
+                        font.family: SettingsData.monoFontFamily
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.warning
                     }
                 }
             }
@@ -690,10 +742,15 @@ DankModal {
                     }
 
                     Rectangle {
+                        id: connectButton
+
                         width: Math.max(80, connectText.contentWidth + Theme.spacingM * 2)
                         height: 36
                         radius: Theme.cornerRadius
                         color: connectArea.containsMouse ? Qt.darker(Theme.primary, 1.1) : Theme.primary
+                        border.color: activeFocus ? Theme.surfaceText : "transparent"
+                        border.width: activeFocus ? 2 : 0
+                        activeFocusOnTab: true
                         enabled: {
                             if (fieldsInfo.length > 0) {
                                 for (var i = 0; i < fieldsInfo.length; i++) {
@@ -705,6 +762,8 @@ DankModal {
                                 }
                                 return true;
                             }
+                            if (isCertificatePrompt)
+                                return serverCertificateFingerprint.length > 0;
                             if (isVpnPrompt)
                                 return passwordInput.text.length > 0;
                             if (isHiddenNetwork)
@@ -716,7 +775,7 @@ DankModal {
                         StyledText {
                             id: connectText
                             anchors.centerIn: parent
-                            text: I18n.tr("Connect")
+                            text: isCertificatePrompt ? I18n.tr("Trust", "Button that approves a VPN server certificate fingerprint") : I18n.tr("Connect")
                             font.pixelSize: Theme.fontSizeMedium
                             color: Theme.background
                             font.weight: Font.Medium
@@ -729,6 +788,22 @@ DankModal {
                             cursorShape: Qt.PointingHandCursor
                             enabled: parent.enabled
                             onClicked: submitCredentialsAndClose()
+                        }
+
+                        Keys.onReturnPressed: event => {
+                            if (enabled)
+                                submitCredentialsAndClose();
+                            event.accepted = true;
+                        }
+                        Keys.onEnterPressed: event => {
+                            if (enabled)
+                                submitCredentialsAndClose();
+                            event.accepted = true;
+                        }
+                        Keys.onSpacePressed: event => {
+                            if (enabled)
+                                submitCredentialsAndClose();
+                            event.accepted = true;
                         }
 
                         Behavior on color {

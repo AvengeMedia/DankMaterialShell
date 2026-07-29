@@ -1,10 +1,14 @@
 package network
 
 import (
+	"context"
+	"os"
+	"path/filepath"
 	"testing"
 
 	mock_gonetworkmanager "github.com/AvengeMedia/DankMaterialShell/core/internal/mocks/github.com/Wifx/gonetworkmanager/v2"
 	"github.com/Wifx/gonetworkmanager/v2"
+	"github.com/godbus/dbus/v5"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -135,4 +139,82 @@ func TestNetworkManagerBackend_UpdateVPNConnectionState_EmptyUUID(t *testing.T) 
 	assert.NotPanics(t, func() {
 		backend.updateVPNConnectionState()
 	})
+}
+
+func TestDetectVPNAuthAction_FortinetPasswordOnly(t *testing.T) {
+	service := "org.freedesktop.NetworkManager.openconnect"
+
+	assert.Equal(t, "openconnect_password", detectVPNAuthAction(service, map[string]string{
+		"protocol": "fortinet",
+		"authtype": "password",
+	}))
+	assert.Empty(t, detectVPNAuthAction(service, map[string]string{
+		"protocol": "anyconnect",
+		"authtype": "password",
+	}))
+	assert.Empty(t, detectVPNAuthAction(service, map[string]string{
+		"protocol": "fortinet",
+		"authtype": "saml",
+	}))
+}
+
+func TestEnsureOpenConnectAgentFlags(t *testing.T) {
+	data := map[string]string{"protocol": "fortinet"}
+	assert.True(t, setOpenConnectAgentFlags(data))
+	assert.Equal(t, "2", data["cookie-flags"])
+	assert.Equal(t, "2", data["gateway-flags"])
+	assert.Equal(t, "2", data["gwcert-flags"])
+	assert.False(t, setOpenConnectAgentFlags(data))
+}
+
+func TestOpenConnectCertificateConfirmation(t *testing.T) {
+	binDir := t.TempDir()
+	openConnectPath := filepath.Join(binDir, "openconnect")
+	script := `#!/bin/sh
+case "$*" in
+  *--servercert=pin-sha256:TEST-FINGERPRINT*)
+    printf '%s\n' "COOKIE='SVPNCOOKIE=test'" "HOST='vpn.example.test'" "FINGERPRINT='pin-sha256:TEST-FINGERPRINT'"
+    exit 0
+    ;;
+esac
+printf '%s\n' 'Add --servercert pin-sha256:TEST-FINGERPRINT' >&2
+exit 1
+`
+	assert.NoError(t, os.WriteFile(openConnectPath, []byte(script), 0o755))
+	t.Setenv("PATH", binDir)
+
+	conn := mock_gonetworkmanager.NewMockConnection(t)
+	connPath := dbus.ObjectPath("/org/freedesktop/NetworkManager/Settings/999")
+	conn.EXPECT().GetSecrets("vpn").Return(gonetworkmanager.ConnectionSettings{
+		"vpn": {"secrets": map[string]string{"password": "test-password"}},
+	}, nil)
+	conn.EXPECT().GetPath().Return(connPath).Twice()
+
+	broker := &fakePromptBroker{
+		asked: make(chan PromptRequest, 1),
+		reply: PromptReply{},
+	}
+	backend := &NetworkManagerBackend{promptBroker: broker}
+	data := map[string]string{
+		"gateway":  "vpn.example.test:443",
+		"protocol": "fortinet",
+		"authtype": "password",
+		"username": "test-user",
+	}
+
+	result, err := backend.handleOpenConnectPasswordAuth(
+		context.Background(), conn, "Test VPN", "test-uuid",
+		"org.freedesktop.NetworkManager.openconnect", data,
+	)
+	assert.NoError(t, err)
+	assert.Equal(t, "SVPNCOOKIE=test", result.Cookie)
+	assert.Equal(t, "vpn.example.test:443", result.Host)
+
+	prompt := <-broker.asked
+	assert.Equal(t, "server-certificate", prompt.Reason)
+	assert.Equal(t, []string{"pin-sha256:TEST-FINGERPRINT"}, prompt.Hints)
+
+	assert.Equal(t, map[string]string{
+		"certificate:vpn.example.test:443": "pin-sha256:TEST-FINGERPRINT",
+	}, backend.pendingVPNSave.PersistentSecrets)
 }

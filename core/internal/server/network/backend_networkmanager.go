@@ -80,16 +80,16 @@ type NetworkManagerBackend struct {
 
 	hotspotPendingDevice string
 
-	pendingVPNSave     *pendingVPNCredentials
-	pendingVPNSaveMu   sync.Mutex
-	cachedVPNCreds     *cachedVPNCredentials
-	cachedVPNCredsMu   sync.Mutex
-	cachedPKCS11PIN    *cachedPKCS11PIN
-	cachedPKCS11Mu     sync.Mutex
-	cachedGPSamlCookie *cachedGPSamlCookie
-	cachedGPSamlMu     sync.Mutex
-	cachedWiFiSecret   *cachedWiFiSecret
-	cachedWiFiSecretMu sync.Mutex
+	pendingVPNSave        *pendingVPNCredentials
+	pendingVPNSaveMu      sync.Mutex
+	cachedVPNCreds        *cachedVPNCredentials
+	cachedVPNCredsMu      sync.Mutex
+	cachedPKCS11PIN       *cachedPKCS11PIN
+	cachedPKCS11Mu        sync.Mutex
+	cachedOpenConnectAuth *cachedOpenConnectAuth
+	cachedOpenConnectMu   sync.Mutex
+	cachedWiFiSecret      *cachedWiFiSecret
+	cachedWiFiSecretMu    sync.Mutex
 
 	onStateChange func()
 }
@@ -100,8 +100,9 @@ type pendingVPNCredentials struct {
 	Password       string
 	// Secrets holds all VPN secret fields keyed by name (e.g. "cert-pass");
 	// falls back to Password under the "password" key when empty.
-	Secrets      map[string]string
-	SavePassword bool
+	Secrets           map[string]string
+	PersistentSecrets map[string]string
+	SavePassword      bool
 }
 
 type cachedVPNCredentials struct {
@@ -124,7 +125,7 @@ type cachedWiFiSecret struct {
 	Secrets        map[string]string
 }
 
-type cachedGPSamlCookie struct {
+type cachedOpenConnectAuth struct {
 	ConnectionUUID string
 	Cookie         string
 	Host           string
