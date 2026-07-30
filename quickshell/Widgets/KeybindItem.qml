@@ -869,7 +869,7 @@ Item {
 
                                 readonly property var tooltipTexts: ({
                                         "dms": I18n.tr("DMS shell actions (launcher, clipboard, etc.)"),
-                                        "compositor": I18n.tr("Niri compositor actions (focus, move, etc.)"),
+                                        "compositor": I18n.tr("Compositor actions (focus, move, etc.)", "keybind action type tooltip"),
                                         "spawn": I18n.tr("Run a program (e.g., firefox, kitty)"),
                                         "shell": I18n.tr("Run a shell command (e.g., notify-send)")
                                     })
