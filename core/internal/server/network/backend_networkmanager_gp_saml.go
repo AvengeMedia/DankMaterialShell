@@ -3,6 +3,7 @@ package network
 import (
 	"bufio"
 	"context"
+	"errors"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -10,16 +11,29 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 )
 
-type gpSamlAuthResult struct {
+type openConnectAuthResult struct {
 	Cookie      string
 	Host        string
 	User        string
 	Fingerprint string
 }
 
+type openConnectAuthError struct {
+	cause      error
+	serverCert string
+}
+
+func (e *openConnectAuthError) Error() string {
+	return fmt.Sprintf("openconnect --authenticate failed: %v", e.cause)
+}
+
+func (e *openConnectAuthError) Unwrap() error {
+	return e.cause
+}
+
 // runGlobalProtectSAMLAuth handles GlobalProtect SAML/SSO authentication using gp-saml-gui.
 // Only supports protocol=gp. Other protocols need their own implementations.
-func (b *NetworkManagerBackend) runGlobalProtectSAMLAuth(ctx context.Context, gateway, protocol string) (*gpSamlAuthResult, error) {
+func (b *NetworkManagerBackend) runGlobalProtectSAMLAuth(ctx context.Context, gateway, protocol string) (*openConnectAuthResult, error) {
 	if gateway == "" {
 		return nil, fmt.Errorf("GP SAML auth: gateway is empty")
 	}
@@ -63,7 +77,7 @@ func (b *NetworkManagerBackend) runGlobalProtectSAMLAuth(ctx context.Context, ga
 		}
 	}()
 
-	result := &gpSamlAuthResult{Host: gateway}
+	result := &openConnectAuthResult{Host: gateway}
 	var allOutput []string
 
 	scanner := bufio.NewScanner(stdout)
@@ -117,13 +131,8 @@ func (b *NetworkManagerBackend) runGlobalProtectSAMLAuth(ctx context.Context, ga
 	return result, nil
 }
 
-func convertGPPreloginCookie(ctx context.Context, gateway, preloginCookie, user string) (*gpSamlAuthResult, error) {
-	ocPath, err := exec.LookPath("openconnect")
-	if err != nil {
-		return nil, fmt.Errorf("openconnect not found: %w", err)
-	}
-
-	args := []string{
+func convertGPPreloginCookie(ctx context.Context, gateway, preloginCookie, user string) (*openConnectAuthResult, error) {
+	return runOpenConnectAuthenticate(ctx, []string{
 		"--protocol=gp",
 		"--usergroup=gateway:prelogin-cookie",
 		"--user=" + user,
@@ -131,18 +140,83 @@ func convertGPPreloginCookie(ctx context.Context, gateway, preloginCookie, user 
 		"--allow-insecure-crypto",
 		"--authenticate",
 		gateway,
+	}, preloginCookie)
+}
+
+func runOpenConnectPasswordAuth(
+	ctx context.Context,
+	data map[string]string,
+	username, password, serverCert string,
+) (*openConnectAuthResult, error) {
+	if data["protocol"] != "fortinet" {
+		return nil, fmt.Errorf("only Fortinet password authentication is supported")
+	}
+	gateway := data["gateway"]
+	if gateway == "" {
+		return nil, fmt.Errorf("OpenConnect gateway is empty")
+	}
+	if username == "" || password == "" {
+		return nil, fmt.Errorf("OpenConnect username and password are required")
+	}
+
+	args := []string{
+		"--protocol=fortinet",
+		"--user=" + username,
+		"--passwd-on-stdin",
+		"--non-inter",
+	}
+	if usergroup := data["usergroup"]; usergroup != "" {
+		args = append(args, "--usergroup="+usergroup)
+	}
+	if serverCert != "" {
+		args = append(args, "--servercert="+serverCert)
+	}
+	args = append(args, "--authenticate", gateway)
+
+	result, err := runOpenConnectAuthenticate(ctx, args, password)
+	if err == nil {
+		result.Host = gateway
+		if result.Fingerprint == "" {
+			result.Fingerprint = serverCert
+		}
+	}
+	return result, err
+}
+
+func runOpenConnectAuthenticate(ctx context.Context, args []string, secret string) (*openConnectAuthResult, error) {
+	ocPath, err := exec.LookPath("openconnect")
+	if err != nil {
+		return nil, fmt.Errorf("openconnect not found: %w", err)
 	}
 
 	cmd := exec.CommandContext(ctx, ocPath, args...)
-	cmd.Stdin = strings.NewReader(preloginCookie)
+	cmd.Stdin = strings.NewReader(secret + "\n")
 
 	output, err := cmd.CombinedOutput()
+	result := parseOpenConnectAuthenticateOutput(string(output))
+	serverCert := suggestedOpenConnectServerCert(string(output))
 	if err != nil {
-		return nil, fmt.Errorf("openconnect --authenticate failed: %w\noutput: %s", err, string(output))
+		if ctx.Err() != nil {
+			return nil, fmt.Errorf("openconnect authentication timed out or was cancelled: %w", ctx.Err())
+		}
+		return nil, &openConnectAuthError{cause: err, serverCert: serverCert}
+	}
+	if result.Cookie == "" {
+		return nil, &openConnectAuthError{
+			cause:      errors.New("no COOKIE in command output"),
+			serverCert: serverCert,
+		}
 	}
 
-	result := &gpSamlAuthResult{}
-	for _, line := range strings.Split(string(output), "\n") {
+	log.Infof("[OpenConnect] Authentication successful: cookie_len=%d, host=%s, has_fingerprint=%v",
+		len(result.Cookie), result.Host, result.Fingerprint != "")
+
+	return result, nil
+}
+
+func parseOpenConnectAuthenticateOutput(output string) *openConnectAuthResult {
+	result := &openConnectAuthResult{}
+	for _, line := range strings.Split(output, "\n") {
 		line = strings.TrimSpace(line)
 		switch {
 		case strings.HasPrefix(line, "COOKIE="):
@@ -158,15 +232,7 @@ func convertGPPreloginCookie(ctx context.Context, gateway, preloginCookie, user 
 			}
 		}
 	}
-
-	if result.Cookie == "" {
-		return nil, fmt.Errorf("no COOKIE in openconnect --authenticate output: %s", string(output))
-	}
-
-	log.Infof("[GP-SAML] openconnect --authenticate: cookie_len=%d, host=%s, fingerprint=%s",
-		len(result.Cookie), result.Host, result.Fingerprint)
-
-	return result, nil
+	return result
 }
 
 func unshellQuote(s string) string {
@@ -179,7 +245,7 @@ func unshellQuote(s string) string {
 	return s
 }
 
-func parseGPSamlFromCommandLine(line string, result *gpSamlAuthResult) {
+func parseGPSamlFromCommandLine(line string, result *openConnectAuthResult) {
 	if !strings.Contains(line, "openconnect") {
 		return
 	}

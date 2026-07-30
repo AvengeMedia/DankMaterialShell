@@ -302,17 +302,17 @@ func (a *SecretAgent) GetSecrets(
 		}
 		a.backend.cachedVPNCredsMu.Unlock()
 
-		a.backend.cachedGPSamlMu.Lock()
-		cachedGPSaml := a.backend.cachedGPSamlCookie
-		if cachedGPSaml != nil && cachedGPSaml.ConnectionUUID == connUuid {
-			a.backend.cachedGPSamlCookie = nil
-			a.backend.cachedGPSamlMu.Unlock()
+		a.backend.cachedOpenConnectMu.Lock()
+		cachedOpenConnect := a.backend.cachedOpenConnectAuth
+		if cachedOpenConnect != nil && cachedOpenConnect.ConnectionUUID == connUuid {
+			a.backend.cachedOpenConnectAuth = nil
+			a.backend.cachedOpenConnectMu.Unlock()
 
-			log.Infof("[SecretAgent] Using cached GlobalProtect SAML cookie for %s", connUuid)
+			log.Infof("[SecretAgent] Using cached OpenConnect authentication for %s", connUuid)
 
-			return buildGPSamlSecretsResponse(settingName, cachedGPSaml.Cookie, cachedGPSaml.Host, cachedGPSaml.Fingerprint), nil
+			return buildOpenConnectSecretsResponse(settingName, cachedOpenConnect.Cookie, cachedOpenConnect.Host, cachedOpenConnect.Fingerprint), nil
 		}
-		a.backend.cachedGPSamlMu.Unlock()
+		a.backend.cachedOpenConnectMu.Unlock()
 
 		if len(fields) == 1 && fields[0] == "gp-saml" {
 			gateway := ""
@@ -347,17 +347,17 @@ func (a *SecretAgent) GetSecrets(
 
 			log.Infof("[SecretAgent] GlobalProtect SAML authentication successful, returning cookie to NetworkManager")
 
-			a.backend.cachedGPSamlMu.Lock()
-			a.backend.cachedGPSamlCookie = &cachedGPSamlCookie{
+			a.backend.cachedOpenConnectMu.Lock()
+			a.backend.cachedOpenConnectAuth = &cachedOpenConnectAuth{
 				ConnectionUUID: connUuid,
 				Cookie:         authResult.Cookie,
 				Host:           authResult.Host,
 				User:           authResult.User,
 				Fingerprint:    authResult.Fingerprint,
 			}
-			a.backend.cachedGPSamlMu.Unlock()
+			a.backend.cachedOpenConnectMu.Unlock()
 
-			return buildGPSamlSecretsResponse(settingName, authResult.Cookie, authResult.Host, authResult.Fingerprint), nil
+			return buildOpenConnectSecretsResponse(settingName, authResult.Cookie, authResult.Host, authResult.Fingerprint), nil
 		}
 	}
 
@@ -987,7 +987,7 @@ func buildWiFiSecretsResponse(settingName string, secrets map[string]string) nmS
 	return out
 }
 
-func buildGPSamlSecretsResponse(settingName, cookie, host, fingerprint string) nmSettingMap {
+func buildOpenConnectSecretsResponse(settingName, cookie, host, fingerprint string) nmSettingMap {
 	out := nmSettingMap{}
 	vpnSec := nmVariantMap{}
 

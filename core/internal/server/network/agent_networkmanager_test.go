@@ -122,7 +122,7 @@ func TestNeedsExternalBrowserAuth(t *testing.T) {
 	}
 }
 
-func TestBuildGPSamlSecretsResponse(t *testing.T) {
+func TestBuildOpenConnectSecretsResponse(t *testing.T) {
 	tests := []struct {
 		name        string
 		settingName string
@@ -155,7 +155,7 @@ func TestBuildGPSamlSecretsResponse(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := buildGPSamlSecretsResponse(tt.settingName, tt.cookie, tt.host, tt.fingerprint)
+			result := buildOpenConnectSecretsResponse(tt.settingName, tt.cookie, tt.host, tt.fingerprint)
 
 			assert.NotNil(t, result)
 			assert.Contains(t, result, tt.settingName)
