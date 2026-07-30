@@ -43,7 +43,7 @@ func HandleRequest(conn *models.Conn, req models.Request, manager *Manager) {
 		handleGetNetworkQRCode(conn, req, manager)
 	case "network.qrcode-content":
 		handleGetNetworkQRCodeContent(conn, req, manager)
-	case "network.qrcode.generate":
+	case "network.generate-qrcode":
 		handleGenerateQRCode(conn, req)
 	case "network.delete-qrcode":
 		handleDeleteQRCode(conn, req, manager)
@@ -374,7 +374,7 @@ func handleGenerateQRCode(conn *models.Conn, req models.Request) {
 		return
 	}
 
-	paths, err := GenerateTextQRCode(text)
+	paths, err := generateTextQRCode(text)
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
 		return

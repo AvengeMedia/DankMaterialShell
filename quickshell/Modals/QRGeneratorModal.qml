@@ -18,30 +18,58 @@ DankModal {
     property bool generating: false
     property string themedQrCodePath: ""
     property string normalQrCodePath: ""
+    property string initialText: ""
+    property string _pendingPayload: ""
+    property string _generatingPayload: ""
+    property string _displayedPayload: ""
     modalWidth: 420
     modalHeight: 440
     onBackgroundClicked: hide()
     onOpened: {
         Qt.callLater(() => {
             modalFocusScope.forceActiveFocus();
-            if (contentLoader.item?.textInput) {
-                contentLoader.item.textInput.forceActiveFocus();
+            const item = contentLoader.item;
+            if (!item)
+                return;
+            item.saveBrowserLoader = saveBrowserLoader;
+            if (item.textInput) {
+                item.textInput.text = initialText;
+                item.textInput.forceActiveFocus();
             }
-            contentLoader.item.saveBrowserLoader = saveBrowserLoader;
+            if (initialText.length > 0) {
+                _pendingPayload = initialText;
+                generateQR(initialText);
+            }
         });
     }
 
-    function show() {
+    function show(text) {
         generating = false;
+        initialText = text || "";
+        _pendingPayload = "";
+        _generatingPayload = "";
+        _displayedPayload = "";
+        themedQrCodePath = "";
+        normalQrCodePath = "";
         open();
     }
 
     function hide() {
-        if (themedQrCodePath.length > 0)
-            DMSService.sendRequest("network.delete-qrcode", {path: themedQrCodePath});
-        if (normalQrCodePath.length > 0)
-            DMSService.sendRequest("network.delete-qrcode", {path: normalQrCodePath});
+        deleteQrCodeFiles(themedQrCodePath, normalQrCodePath);
+        themedQrCodePath = "";
+        normalQrCodePath = "";
         close();
+    }
+
+    function deleteQrCodeFiles(themed, normal) {
+        if (themed.length > 0)
+            DMSService.sendRequest("network.delete-qrcode", {
+                path: themed
+            });
+        if (normal.length > 0)
+            DMSService.sendRequest("network.delete-qrcode", {
+                path: normal
+            });
     }
 
     Timer {
@@ -51,42 +79,43 @@ DankModal {
         onTriggered: root.generateQR(root._pendingPayload)
     }
 
-    property string _pendingPayload: ""
-    property string _generatingPayload: ""
-    property string _pendingThemed: ""
-    property string _pendingNormal: ""
-
     function generateQR(text) {
-        if (!text || text.trim().length === 0 || generating)
-            return;
-
-        var trimmed = text.trim();
-        if (!contentLoader.item)
+        const trimmed = (text || "").trim();
+        if (trimmed.length === 0 || trimmed === _displayedPayload || generating)
             return;
 
         _generatingPayload = trimmed;
         generating = true;
 
-        DMSService.sendRequest("network.qrcode.generate", {text: trimmed}, response => {
+        DMSService.sendRequest("network.generate-qrcode", {
+            text: trimmed
+        }, response => {
+            root.generating = false;
             if (response.error) {
                 ToastService.showError(I18n.tr("Failed to generate QR code: %1").arg(JSON.stringify(response.error)));
-                root.generating = false;
-            } else if (response.result && contentLoader.item) {
-                if (root._generatingPayload !== root._pendingPayload) {
-                    root.generating = false;
-                    return;
-                }
-                _pendingThemed = response.result[0];
-                _pendingNormal = response.result[1];
-                if (contentLoader.item?.qrContainer)
-                    contentLoader.item.qrContainer.opacity = 0;
+                return;
             }
+            if (!response.result)
+                return;
+            if (root._generatingPayload !== root._pendingPayload.trim()) {
+                root.deleteQrCodeFiles(response.result[0], response.result[1]);
+                genTimer.restart();
+                return;
+            }
+
+            const oldThemed = root.themedQrCodePath;
+            const oldNormal = root.normalQrCodePath;
+            root._displayedPayload = root._generatingPayload;
+            root.themedQrCodePath = response.result[0];
+            root.normalQrCodePath = response.result[1];
+            root.deleteQrCodeFiles(oldThemed, oldNormal);
         });
     }
 
     function onTextChanged(text) {
         _pendingPayload = text;
-        if (!text || text.trim().length === 0) {
+        const trimmed = text.trim();
+        if (trimmed.length === 0 || trimmed === _displayedPayload) {
             genTimer.stop();
             return;
         }
@@ -109,7 +138,7 @@ DankModal {
             defaultFileName: "qrcode.png"
             onFileSelected: path => {
                 const cleanPath = decodeURI(path.toString().replace(/^file:\/\//, ''));
-                copyQrCodeProcess.exec(["cp", root.normalQrCodePath, cleanPath, "-f"]);
+                copyQrCodeProcess.exec(["cp", "-f", root.normalQrCodePath, cleanPath]);
             }
 
             Process {
@@ -125,14 +154,13 @@ DankModal {
     }
 
     content: Component {
-            Item {
-                id: theItem
-                property alias themedQrCodePath: qrCodeImg.source
-                property alias textInput: textInput
-                property alias qrContainer: qrContainer
-                property var saveBrowserLoader: null
-                anchors.fill: parent
+        Item {
+            id: contentItem
 
+            property alias textInput: textInput
+            property var saveBrowserLoader: null
+
+            anchors.fill: parent
 
             Column {
                 anchors.fill: parent
@@ -181,42 +209,34 @@ DankModal {
                     anchors.horizontalCenter: parent.horizontalCenter
                     opacity: 1
 
-                    Behavior on opacity { NumberAnimation { duration: 80; easing.type: Easing.OutCubic } }
-
-                    onOpacityChanged: {
-                        if (opacity <= 0 && root._pendingThemed.length > 0) {
-                            var oldThemed = root.themedQrCodePath;
-                            var oldNormal = root.normalQrCodePath;
-                            root.themedQrCodePath = root._pendingThemed;
-                            root.normalQrCodePath = root._pendingNormal;
-                            themedQrCodePath = root._pendingThemed;
-                            root._pendingThemed = "";
-                            root._pendingNormal = "";
-                            root.generating = false;
-                            if (oldThemed.length > 0)
-                                DMSService.sendRequest("network.delete-qrcode", {path: oldThemed});
-                            if (oldNormal.length > 0)
-                                DMSService.sendRequest("network.delete-qrcode", {path: oldNormal});
+                    Behavior on opacity {
+                        NumberAnimation {
+                            duration: 80
+                            easing.type: Easing.OutCubic
                         }
                     }
 
                     Image {
                         id: qrCodeImg
                         anchors.fill: parent
+                        source: root.themedQrCodePath
                         fillMode: Image.PreserveAspectFit
                         asynchronous: true
+                        cache: false
+                        visible: false
 
+                        onSourceChanged: qrContainer.opacity = 0
                         onStatusChanged: {
                             if (status === Image.Ready)
                                 qrContainer.opacity = 1;
                         }
+                    }
 
-                        MultiEffect {
-                            source: qrCodeImg
-                            anchors.fill: source
-                            colorization: 1.0
-                            colorizationColor: Theme.primary
-                        }
+                    MultiEffect {
+                        source: qrCodeImg
+                        anchors.fill: qrCodeImg
+                        colorization: 1.0
+                        colorizationColor: Theme.primary
                     }
                 }
 
@@ -235,9 +255,9 @@ DankModal {
                         backgroundColor: Theme.surfaceContainer
                         textColor: Theme.surfaceText
                         onClicked: {
-                            saveBrowserLoader.active = true;
-                            if (saveBrowserLoader.item) {
-                                saveBrowserLoader.item.open();
+                            contentItem.saveBrowserLoader.active = true;
+                            if (contentItem.saveBrowserLoader.item) {
+                                contentItem.saveBrowserLoader.item.open();
                             }
                         }
                     }
@@ -249,7 +269,9 @@ DankModal {
                         textColor: Theme.onPrimary
                         onClicked: {
                             if (root.normalQrCodePath.length > 0)
-                                DMSService.sendRequest("clipboard.copyFile", {filePath: root.normalQrCodePath});
+                                DMSService.sendRequest("clipboard.copyFile", {
+                                    filePath: root.normalQrCodePath
+                                });
                         }
                     }
 

@@ -893,11 +893,11 @@ Singleton {
             wifiQRCodeModal.show(ssid);
     }
 
-    function showQRGeneratorModal() {
+    function showQRGeneratorModal(initialText) {
         if (qrGeneratorModalLoader)
             qrGeneratorModalLoader.active = true;
         if (qrGeneratorModal)
-            qrGeneratorModal.show();
+            qrGeneratorModal.show(initialText || "");
     }
 
     function showHiddenNetworkModal() {

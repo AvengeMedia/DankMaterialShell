@@ -218,8 +218,10 @@ Singleton {
                 comment: "DMS",
                 action: "ipc:qr-generator",
                 categories: ["Utility"],
-                defaultTrigger: "",
-                isLauncher: false
+                defaultTrigger: "qrg",
+                isLauncher: true,
+                viewMode: "list",
+                viewModeEnforced: true
             },
             "dms_settings_search": {
                 id: "dms_settings_search",
@@ -255,7 +257,7 @@ Singleton {
             if (!SettingsData.getBuiltInPluginSetting(pluginId, "enabled", true))
                 continue;
             const plugin = builtInPlugins[pluginId];
-            if (plugin.isLauncher)
+            if (plugin.isLauncher && !plugin.action)
                 continue;
             apps.push({
                 name: plugin.name,
@@ -320,6 +322,20 @@ Singleton {
                     }));
         }
 
+        if (pluginId === "dms_qr_generator") {
+            const text = (query || "").toString().trim();
+            return [
+                {
+                    name: text.length > 0 ? text : I18n.tr("Enter text to encode"),
+                    icon: "material:qr_code",
+                    comment: I18n.tr("QR Generator"),
+                    action: "qr_generate:" + text,
+                    isBuiltInLauncher: true,
+                    builtInPluginId: pluginId
+                }
+            ];
+        }
+
         if (pluginId !== "dms_settings_search")
             return [];
 
@@ -351,14 +367,20 @@ Singleton {
             return false;
 
         const parts = item.action.split(":");
-        if (parts[0] !== "settings_nav")
-            return false;
-
-        const tabIndex = parseInt(parts[1]);
-        const section = parts.slice(2).join(":");
-        SettingsSearchService.navigateToSection(section);
-        PopoutService.openSettingsWithTabIndex(tabIndex);
-        return true;
+        switch (parts[0]) {
+        case "settings_nav":
+            {
+                const tabIndex = parseInt(parts[1]);
+                const section = parts.slice(2).join(":");
+                SettingsSearchService.navigateToSection(section);
+                PopoutService.openSettingsWithTabIndex(tabIndex);
+                return true;
+            }
+        case "qr_generate":
+            PopoutService.showQRGeneratorModal(parts.slice(1).join(":"));
+            return true;
+        }
+        return false;
     }
 
     function getCoreApps(query) {
