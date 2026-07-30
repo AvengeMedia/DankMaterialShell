@@ -217,6 +217,64 @@ Singleton {
         return envObj;
     }
 
+    function splitShellArgs(str) {
+        const args = [];
+        let current = "";
+        let hasToken = false;
+        let quote = "";
+        let escaped = false;
+        for (const ch of str) {
+            if (escaped) {
+                current += ch;
+                escaped = false;
+                continue;
+            }
+            switch (quote) {
+            case "'":
+                if (ch === "'") {
+                    quote = "";
+                    continue;
+                }
+                current += ch;
+                continue;
+            case "\"":
+                switch (ch) {
+                case "\"":
+                    quote = "";
+                    continue;
+                case "\\":
+                    escaped = true;
+                    continue;
+                }
+                current += ch;
+                continue;
+            }
+            switch (ch) {
+            case "\\":
+                escaped = true;
+                continue;
+            case "'":
+            case "\"":
+                quote = ch;
+                hasToken = true;
+                continue;
+            case " ":
+            case "\t":
+            case "\n":
+                if (!hasToken && current.length === 0)
+                    continue;
+                args.push(current);
+                current = "";
+                hasToken = false;
+                continue;
+            }
+            current += ch;
+        }
+        if (current.length > 0 || hasToken)
+            args.push(current);
+        return args;
+    }
+
     function launchDesktopEntry(desktopEntry, useNvidia) {
         if (!desktopEntry || !desktopEntry.command)
             return;
@@ -230,8 +288,7 @@ Singleton {
             cmd = [nvidiaCommand].concat(cmd);
 
         if (override?.extraFlags) {
-            const extraArgs = override.extraFlags.trim().split(/\s+/).filter(arg => arg.length > 0);
-            cmd = cmd.concat(extraArgs);
+            cmd = cmd.concat(splitShellArgs(override.extraFlags));
         }
 
         const userPrefix = SettingsData.launchPrefix?.trim() || "";
