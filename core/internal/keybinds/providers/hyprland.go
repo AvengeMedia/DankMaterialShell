@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -224,6 +225,44 @@ func (h *HyprlandProvider) validateAction(action string) error {
 	return nil
 }
 
+var luaExprActionPattern = regexp.MustCompile(`^(function\s*\(|hl\.)`)
+
+// isRawLuaActionText reports that action is a Lua expression to re-emit
+// verbatim rather than freeform dispatcher text to wrap for hyprctl. The
+// balance check keeps malformed input from corrupting the generated file.
+func isRawLuaActionText(action string) bool {
+	if !luaExprActionPattern.MatchString(action) {
+		return false
+	}
+	depth := 0
+	var quote byte
+	escaped := false
+	for i := 0; i < len(action); i++ {
+		c := action[i]
+		switch {
+		case escaped:
+			escaped = false
+		case quote != 0:
+			switch c {
+			case '\\':
+				escaped = true
+			case quote:
+				quote = 0
+			}
+		case c == '"' || c == '\'':
+			quote = c
+		case c == '(':
+			depth++
+		case c == ')':
+			depth--
+			if depth < 0 {
+				return false
+			}
+		}
+	}
+	return depth == 0 && quote == 0 && !escaped
+}
+
 func (h *HyprlandProvider) SetBind(key, action, description string, options map[string]any) error {
 	if err := h.ensureWritableConfig(); err != nil {
 		return err
@@ -254,11 +293,12 @@ func (h *HyprlandProvider) SetBind(key, action, description string, options map[
 	canonicalKey := canonicalHyprlandOverrideKey(key)
 	normalizedKey := hyprlandOverrideMapKey(canonicalKey)
 	existingBinds[normalizedKey] = &hyprlandOverrideBind{
-		Key:         canonicalKey,
-		Action:      action,
-		Description: description,
-		Flags:       flags,
-		Options:     options,
+		Key:          canonicalKey,
+		Action:       action,
+		Description:  description,
+		Flags:        flags,
+		Options:      options,
+		RawLuaAction: isRawLuaActionText(action),
 	}
 
 	return h.writeOverrideBinds(existingBinds)

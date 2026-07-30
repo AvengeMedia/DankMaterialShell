@@ -463,6 +463,56 @@ func TestHyprlandSetBindLeavesConfOnlyInstallReadOnly(t *testing.T) {
 	}
 }
 
+func TestIsRawLuaActionText(t *testing.T) {
+	cases := []struct {
+		action string
+		want   bool
+	}{
+		{`function() hl.plugin.scrolloverview.overview("toggle") end`, true},
+		{`hl.dsp.exec_cmd("foo")`, true},
+		{`hl.dsp.no_op()`, true},
+		{"workspace 3", false},
+		{"exec zeditor", false},
+		{`function() hl.foo( end`, false},
+		{`function() hl.foo("a) end`, false},
+		{`hl.foo()) hl.bar((`, false},
+	}
+	for _, tc := range cases {
+		if got := isRawLuaActionText(tc.action); got != tc.want {
+			t.Errorf("isRawLuaActionText(%q) = %v, want %v", tc.action, got, tc.want)
+		}
+	}
+}
+
+func TestHyprlandSetBindPreservesRawLuaAction(t *testing.T) {
+	tmpDir := t.TempDir()
+	dmsDir := filepath.Join(tmpDir, "dms")
+	if err := os.MkdirAll(dmsDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dmsDir, "binds-user.lua"), []byte("-- DMS user keybind overrides\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	provider := NewHyprlandProvider(tmpDir)
+	rawAction := `function() hl.plugin.scrolloverview.overview("toggle") end`
+	if err := provider.SetBind("SUPER + G", rawAction, "Toggle overview", nil); err != nil {
+		t.Fatal(err)
+	}
+
+	data, err := os.ReadFile(filepath.Join(dmsDir, "binds-user.lua"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := string(data)
+	if !strings.Contains(got, `hl.bind("SUPER + G", `+rawAction) {
+		t.Fatalf("expected raw Lua action to be written verbatim, got:\n%s", got)
+	}
+	if strings.Contains(got, "hyprctl dispatch function") {
+		t.Fatalf("expected raw Lua action to not be wrapped in hyprctl dispatch, got:\n%s", got)
+	}
+}
+
 func TestHyprlandSetBindUpdatesSpacedLuaOverrideWithoutDuplicates(t *testing.T) {
 	tmpDir := t.TempDir()
 	dmsDir := filepath.Join(tmpDir, "dms")
