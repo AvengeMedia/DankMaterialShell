@@ -66,9 +66,17 @@ Scope {
         IdleService.lockPowerOffRequested = false;
     }
 
+    // Avoid startup lock when using dms-greeter (#2952)
+    function freshGreeterLogin() {
+        const authTime = Number(Quickshell.env("DMS_GREETER_AUTH_TIME") || 0);
+        if (!authTime)
+            return false;
+        return (Date.now() / 1000 - authTime) < 120;
+    }
+
     Component.onCompleted: {
         IdleService.lockComponent = this;
-        if (SettingsData.lockAtStartup)
+        if (SettingsData.lockAtStartup && !freshGreeterLogin())
             lock();
     }
 
