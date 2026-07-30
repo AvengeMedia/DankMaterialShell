@@ -341,7 +341,7 @@ func (b *NetworkManagerBackend) ConnectVPN(uuidOrName string, singleActive bool)
 			return fmt.Errorf("failed to prepare OpenConnect connection: %w", err)
 		}
 
-		authCtx, authCancel := context.WithTimeout(context.Background(), 2*time.Minute)
+		authCtx, authCancel := context.WithTimeout(context.Background(), 5*time.Minute)
 		openConnectAuth, err = b.handleOpenConnectPasswordAuth(
 			authCtx, targetConn, connName, targetUUID, vpnServiceType, vpnData,
 		)
@@ -587,9 +587,14 @@ func (b *NetworkManagerBackend) handleOpenConnectPasswordAuth(
 	auth, err := runOpenConnectPasswordAuth(ctx, data, username, password, serverCert)
 	persistentSecrets := map[string]string{}
 	var authErr *openConnectAuthError
-	if err != nil && serverCert == "" && errors.As(err, &authErr) && authErr.serverCert != "" {
+	if err != nil && errors.As(err, &authErr) && authErr.serverCert != "" && authErr.serverCert != serverCert {
 		if b.promptBroker == nil {
 			return nil, fmt.Errorf("VPN server certificate is untrusted: %s", authErr.serverCert)
+		}
+
+		reason := "server-certificate"
+		if serverCert != "" {
+			reason = "server-certificate-changed"
 		}
 
 		token, promptErr := b.promptBroker.Ask(ctx, PromptRequest{
@@ -598,7 +603,7 @@ func (b *NetworkManagerBackend) handleOpenConnectPasswordAuth(
 			VpnService:     vpnServiceType,
 			SettingName:    "vpn",
 			Hints:          []string{authErr.serverCert},
-			Reason:         "server-certificate",
+			Reason:         reason,
 			ConnectionId:   connName,
 			ConnectionUuid: targetUUID,
 			ConnectionPath: string(targetConn.GetPath()),
@@ -620,15 +625,21 @@ func (b *NetworkManagerBackend) handleOpenConnectPasswordAuth(
 	}
 
 	if len(reply.Secrets) > 0 || len(persistentSecrets) > 0 {
-		b.pendingVPNSaveMu.Lock()
-		b.pendingVPNSave = &pendingVPNCredentials{
+		creds := &pendingVPNCredentials{
 			ConnectionPath:    string(targetConn.GetPath()),
-			Username:          username,
-			Password:          password,
-			Secrets:           map[string]string{"password": password},
 			PersistentSecrets: persistentSecrets,
-			SavePassword:      reply.Save,
 		}
+		if _, ok := reply.Secrets["username"]; ok {
+			creds.Username = username
+		}
+		if reply.Save {
+			creds.Username = username
+			creds.Password = password
+			creds.Secrets = map[string]string{"password": password}
+			creds.SavePassword = true
+		}
+		b.pendingVPNSaveMu.Lock()
+		b.pendingVPNSave = creds
 		b.pendingVPNSaveMu.Unlock()
 	}
 

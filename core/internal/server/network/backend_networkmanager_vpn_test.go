@@ -218,3 +218,59 @@ exit 1
 		"certificate:vpn.example.test:443": "pin-sha256:TEST-FINGERPRINT",
 	}, backend.pendingVPNSave.PersistentSecrets)
 }
+
+func TestOpenConnectCertificateRotationReprompts(t *testing.T) {
+	binDir := t.TempDir()
+	openConnectPath := filepath.Join(binDir, "openconnect")
+	script := `#!/bin/sh
+case "$*" in
+  *--servercert=pin-sha256:NEW-FINGERPRINT*)
+    printf '%s\n' "COOKIE='SVPNCOOKIE=test'" "HOST='vpn.example.test'" "FINGERPRINT='pin-sha256:NEW-FINGERPRINT'"
+    exit 0
+    ;;
+esac
+printf '%s\n' 'Add --servercert pin-sha256:NEW-FINGERPRINT' >&2
+exit 1
+`
+	assert.NoError(t, os.WriteFile(openConnectPath, []byte(script), 0o755))
+	t.Setenv("PATH", binDir)
+
+	conn := mock_gonetworkmanager.NewMockConnection(t)
+	connPath := dbus.ObjectPath("/org/freedesktop/NetworkManager/Settings/999")
+	conn.EXPECT().GetSecrets("vpn").Return(gonetworkmanager.ConnectionSettings{
+		"vpn": {"secrets": map[string]string{
+			"password":                         "test-password",
+			"certificate:vpn.example.test:443": "pin-sha256:OLD-FINGERPRINT",
+		}},
+	}, nil)
+	conn.EXPECT().GetPath().Return(connPath).Twice()
+
+	broker := &fakePromptBroker{
+		asked: make(chan PromptRequest, 1),
+		reply: PromptReply{},
+	}
+	backend := &NetworkManagerBackend{promptBroker: broker}
+	data := map[string]string{
+		"gateway":  "vpn.example.test:443",
+		"protocol": "fortinet",
+		"authtype": "password",
+		"username": "test-user",
+	}
+
+	result, err := backend.handleOpenConnectPasswordAuth(
+		context.Background(), conn, "Test VPN", "test-uuid",
+		"org.freedesktop.NetworkManager.openconnect", data,
+	)
+	assert.NoError(t, err)
+	assert.Equal(t, "SVPNCOOKIE=test", result.Cookie)
+
+	prompt := <-broker.asked
+	assert.Equal(t, "server-certificate-changed", prompt.Reason)
+	assert.Equal(t, []string{"pin-sha256:NEW-FINGERPRINT"}, prompt.Hints)
+
+	assert.Equal(t, map[string]string{
+		"certificate:vpn.example.test:443": "pin-sha256:NEW-FINGERPRINT",
+	}, backend.pendingVPNSave.PersistentSecrets)
+	assert.False(t, backend.pendingVPNSave.SavePassword)
+	assert.Empty(t, backend.pendingVPNSave.Secrets)
+}

@@ -41,7 +41,8 @@ DankModal {
     property var fieldsInfo: []
     property var secretValues: ({})
 
-    readonly property bool isCertificatePrompt: promptReason === "server-certificate"
+    readonly property bool isCertificateChangedPrompt: promptReason === "server-certificate-changed"
+    readonly property bool isCertificatePrompt: promptReason === "server-certificate" || isCertificateChangedPrompt
     readonly property string serverCertificateFingerprint: promptHints.length > 0 ? promptHints[0] : ""
     readonly property bool showUsernameField: requiresEnterprise && !isVpnPrompt && fieldsInfo.length === 0
     readonly property bool showPasswordField: fieldsInfo.length === 0 && !isCertificatePrompt
@@ -401,11 +402,15 @@ DankModal {
             }
 
             Rectangle {
+                id: certificateWarningBox
+
+                readonly property color warningTone: isCertificateChangedPrompt ? Theme.error : Theme.warning
+
                 width: parent.width
                 height: certificateWarningHeight
                 radius: Theme.cornerRadius
-                color: Theme.withAlpha(Theme.warning, 0.12)
-                border.color: Theme.withAlpha(Theme.warning, 0.5)
+                color: Theme.withAlpha(warningTone, 0.12)
+                border.color: Theme.withAlpha(warningTone, 0.5)
                 border.width: 1
                 visible: isCertificatePrompt
 
@@ -418,7 +423,7 @@ DankModal {
 
                     StyledText {
                         width: parent.width
-                        text: I18n.tr("Only continue if you recognize this server certificate fingerprint.", "Warning shown before trusting an unverified VPN server certificate")
+                        text: isCertificateChangedPrompt ? I18n.tr("The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.", "Warning shown when a trusted VPN server certificate no longer matches") : I18n.tr("Only continue if you recognize this server certificate fingerprint.", "Warning shown before trusting an unverified VPN server certificate")
                         wrapMode: Text.Wrap
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.surfaceText
@@ -430,7 +435,7 @@ DankModal {
                         wrapMode: Text.WrapAnywhere
                         font.family: SettingsData.monoFontFamily
                         font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.warning
+                        color: certificateWarningBox.warningTone
                     }
                 }
             }
