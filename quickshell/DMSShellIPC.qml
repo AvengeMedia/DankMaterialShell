@@ -25,32 +25,30 @@ Item {
     required property var windowRuleModalLoader
 
     function getPreferredBar(refPropertyName) {
-        if (!root.dankBarRepeater || root.dankBarRepeater.count === 0)
-            return null;
-
         const focusedScreenName = BarWidgetService.getFocusedScreenName();
 
-        const loaders = Array.from({
-            length: root.dankBarRepeater.count
-        }, (_, i) => root.dankBarRepeater.itemAt(i));
+        const bars = [];
+        if (root.dankBarRepeater) {
+            for (let i = 0; i < root.dankBarRepeater.count; i++)
+                bars.push(...(root.dankBarRepeater.itemAt(i)?.item?.barVariants?.instances || []));
+        }
+        const frameBars = BarWidgetService.frameHostedBars;
+        for (const screenName in frameBars)
+            bars.push(frameBars[screenName]);
 
         let currentBar = null;
+        for (const bar of bars) {
+            if (!bar)
+                continue;
 
-        for (const loader of loaders) {
-            const instances = loader?.item?.barVariants?.instances || [];
-            for (const bar of instances) {
-                if (!bar)
-                    continue;
+            const onFocusedScreen = focusedScreenName && bar.modelData?.name === focusedScreenName;
+            const hasRef = !refPropertyName || !!bar[refPropertyName];
 
-                const onFocusedScreen = focusedScreenName && bar.modelData?.name === focusedScreenName;
-                const hasRef = !refPropertyName || !!bar[refPropertyName];
+            if (hasRef) {
+                currentBar = bar;
 
-                if (hasRef) {
-                    currentBar = bar;
-
-                    if (onFocusedScreen)
-                        break;
-                }
+                if (onFocusedScreen)
+                    break;
             }
         }
 
