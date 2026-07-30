@@ -932,7 +932,9 @@ Item {
                                 pam.passwd.start();
                             }
                         }
-                        Keys.onPressed: event => {
+                        Keys.onPressed: event => handleKey(event)
+
+                        function handleKey(event) {
                             if (demoMode) {
                                 return;
                             }
@@ -1039,6 +1041,36 @@ Item {
                             if (isPrintableText(event.text)) {
                                 insertText(event.text);
                                 event.accepted = true;
+                            }
+                        }
+
+                        // Wayland IMEs commit unconsumed printable keys as text-input text
+                        // (ibus ibuswaylandim.c) instead of forwarding raw keys, so an active
+                        // text input must exist to receive them; the hidden-text hints put
+                        // fcitx5 into plain keyboard passthrough (CapabilityFlag::Password).
+                        // Raw keys stay in handleKey (#2950).
+                        TextInput {
+                            id: imeCommitSink
+
+                            focus: true
+                            width: 1
+                            height: 1
+                            opacity: 0
+                            echoMode: TextInput.Password
+                            inputMethodHints: Qt.ImhHiddenText | Qt.ImhSensitiveData | Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
+                            Keys.onPressed: event => {
+                                passwordField.handleKey(event);
+                                if (!event.accepted && (event.modifiers & (Qt.ControlModifier | Qt.AltModifier | Qt.MetaModifier)))
+                                    event.accepted = true;
+                            }
+                            onTextChanged: {
+                                if (text.length === 0)
+                                    return;
+                                const committed = text;
+                                text = "";
+                                if (demoMode || root.unlocking || pam.passwd.active)
+                                    return;
+                                passwordField.insertText(committed);
                             }
                         }
 

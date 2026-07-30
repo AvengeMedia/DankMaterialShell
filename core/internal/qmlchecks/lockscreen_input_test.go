@@ -22,6 +22,16 @@ func TestLockScreenPasswordFieldBypassesTextInputIME(t *testing.T) {
 	if !strings.Contains(content, "Keys.onPressed") || !strings.Contains(content, "event.text") {
 		t.Fatalf("passwordField should handle physical key text manually instead of relying on a text input control")
 	}
+
+	// Wayland IMEs commit unconsumed printable keys as text-input text rather
+	// than forwarding raw keys, so the lock screen needs an IME commit sink
+	// alongside raw key handling.
+	if !strings.Contains(content, "id: imeCommitSink") {
+		t.Fatalf("passwordField must keep the imeCommitSink TextInput so IME-routed keyboards can type (#2950)")
+	}
+	if !strings.Contains(content, "Qt.ImhSensitiveData") {
+		t.Fatalf("imeCommitSink must advertise hidden-text hints so IMEs treat it as a password field")
+	}
 }
 
 func TestLockScreenPamSupportsManagedAndSystemPolicies(t *testing.T) {
