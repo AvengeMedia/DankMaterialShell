@@ -388,6 +388,8 @@ Singleton {
             const binds = bindsData[cat];
             for (var i = 0; i < binds.length; i++) {
                 const bind = binds[i];
+                if (currentProvider === "hyprland" && bind.action && bind.action.startsWith("exec "))
+                    bind.action = "spawn " + bind.action.slice(5);
                 const targetCat = Actions.isDmsAction(bind.action) ? "DMS" : cat;
                 if (!processed[targetCat])
                     processed[targetCat] = [];
