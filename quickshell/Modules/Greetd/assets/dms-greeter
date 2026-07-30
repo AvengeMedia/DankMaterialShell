@@ -386,16 +386,20 @@ end)
 HYPRLAND_LUA_EOF
             COMPOSITOR_CONFIG="$TEMP_CONFIG"
         elif [[ -z "$COMPOSITOR_CONFIG" ]]; then
-            TEMP_CONFIG=$(mktemp)
-            cat > "$TEMP_CONFIG" << HYPRLAND_EOF
-env = DMS_RUN_GREETER,1
+            TEMP_CONFIG=$(mktemp --suffix=.lua)
+            cat > "$TEMP_CONFIG" << HYPRLAND_LUA_EOF
+hl.env("DMS_RUN_GREETER", "1")
 
-misc {
-    disable_hyprland_logo = true
-}
+hl.config({
+    misc = {
+        disable_hyprland_logo = true,
+    },
+})
 
-exec-once = sh -c "$QS_CMD; hyprctl dispatch exit"
-HYPRLAND_EOF
+hl.on("hyprland.start", function()
+    hl.exec_cmd('sh -c "$QS_CMD; hyprctl dispatch exit"')
+end)
+HYPRLAND_LUA_EOF
             COMPOSITOR_CONFIG="$TEMP_CONFIG"
         else
             TEMP_CONFIG=$(mktemp)
