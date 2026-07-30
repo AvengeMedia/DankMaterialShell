@@ -446,6 +446,23 @@ Item {
     }
 
     LazyLoader {
+        id: qrGeneratorModalLoader
+        active: false
+
+        Component.onCompleted: {
+            PopoutService.qrGeneratorModalLoader = qrGeneratorModalLoader;
+        }
+
+        QRGeneratorModal {
+            id: qrGeneratorModalItem
+
+            Component.onCompleted: {
+                PopoutService.qrGeneratorModal = qrGeneratorModalItem;
+            }
+        }
+    }
+
+    LazyLoader {
         id: polkitAuthModalLoader
         active: false
         readonly property PolkitAuthModal loadedModal: item as PolkitAuthModal

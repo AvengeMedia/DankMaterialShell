@@ -24,7 +24,7 @@ func qrCodePaths(ssid string) (themed, normal string) {
 
 func isValidQRCodePath(path string) bool {
 	clean := filepath.Clean(path)
-	return strings.HasPrefix(clean, qrCodeTmpPrefix) && strings.HasSuffix(clean, ".png")
+	return (strings.HasPrefix(clean, qrCodeTmpPrefix) || strings.HasPrefix(clean, textQRCodeTmpPrefix)) && strings.HasSuffix(clean, ".png")
 }
 
 var safePathChar = regexp.MustCompile(`[^a-zA-Z0-9_-]`)
