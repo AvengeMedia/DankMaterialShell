@@ -29,6 +29,28 @@ Item {
     readonly property bool clickThrough: instanceData?.config?.clickThrough ?? false
     readonly property bool syncPositionAcrossScreens: instanceData?.config?.syncPositionAcrossScreens ?? false
 
+    // Unmapping with the widget still in the last buffer leaves a stale image in
+    // Hyprland's blur cache behind transparent tiled windows (#2955), so hide the
+    // content, present a transparent frame, then unmap.
+    readonly property bool contentShowing: widgetEnabled && activeComponent !== null && (!showOnOverviewOnly || overviewActive)
+    property bool surfaceLingering: false
+
+    onContentShowingChanged: {
+        if (contentShowing) {
+            lingerTimer.stop();
+            surfaceLingering = false;
+            return;
+        }
+        surfaceLingering = true;
+        lingerTimer.restart();
+    }
+
+    Timer {
+        id: lingerTimer
+        interval: 64
+        onTriggered: root.surfaceLingering = false
+    }
+
     Connections {
         target: PluginService
         enabled: !root.isBuiltin
@@ -273,13 +295,7 @@ Item {
     PanelWindow {
         id: widgetWindow
         screen: root.screen
-        visible: {
-            if (!root.widgetEnabled || root.activeComponent === null)
-                return false;
-            if (root.showOnOverviewOnly)
-                return root.overviewActive;
-            return true;
-        }
+        visible: root.contentShowing || root.surfaceLingering
         color: "transparent"
 
         Region {
@@ -358,6 +374,7 @@ Item {
             id: contentLoader
             anchors.fill: parent
             active: root.widgetEnabled && root.activeComponent !== null
+            visible: root.contentShowing
             sourceComponent: root.activeComponent
             opacity: 0
 
