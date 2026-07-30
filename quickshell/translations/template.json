@@ -784,6 +784,13 @@
     "comment": ""
   },
   {
+    "term": "Acceleration Profile",
+    "translation": "",
+    "context": "Acceleration Profile",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Accent Color",
     "translation": "",
     "context": "Accent Color",
@@ -966,6 +973,13 @@
     "comment": ""
   },
   {
+    "term": "Adaptive",
+    "translation": "",
+    "context": "Adaptive",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Adaptive Media Width",
     "translation": "",
     "context": "Adaptive Media Width",
@@ -1127,6 +1141,20 @@
     "comment": ""
   },
   {
+    "term": "Adjust pointer sensitivity speed",
+    "translation": "",
+    "context": "Adjust pointer sensitivity speed",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Adjust scrolling sensitivity multiplier",
+    "translation": "",
+    "context": "Adjust scrolling sensitivity multiplier",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Adjust the bar height via inner padding",
     "translation": "",
     "context": "Adjust the bar height via inner padding",
@@ -1137,6 +1165,13 @@
     "term": "Adjust the number of columns in grid view mode.",
     "translation": "",
     "context": "Adjust the number of columns in grid view mode.",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Adjust touchpad pointer speed",
+    "translation": "",
+    "context": "Adjust touchpad pointer speed",
     "reference": "",
     "comment": ""
   },
@@ -1333,6 +1368,13 @@
     "term": "Always show when there's only one connected display",
     "translation": "",
     "context": "Always show when there's only one connected display",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Always use the durations above, even if an app requests a shorter or longer one",
+    "translation": "",
+    "context": "Always use the durations above, even if an app requests a shorter or longer one",
     "reference": "",
     "comment": ""
   },
@@ -3332,6 +3374,13 @@
     "comment": ""
   },
   {
+    "term": "Choose when to generate scrolling events",
+    "translation": "",
+    "context": "Choose when to generate scrolling events",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Choose where notification popups appear on screen",
     "translation": "",
     "context": "Choose where notification popups appear on screen",
@@ -3871,6 +3920,13 @@
     "comment": ""
   },
   {
+    "term": "Compositor actions (focus, move, etc.)",
+    "translation": "",
+    "context": "Compositor actions (focus, move, etc.)",
+    "reference": "",
+    "comment": "keybind action type tooltip"
+  },
+  {
     "term": "Config Format",
     "translation": "",
     "context": "Config Format",
@@ -4142,6 +4198,13 @@
     "context": "Contrast",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Contrast by variant",
+    "translation": "",
+    "context": "Contrast by variant",
+    "reference": "",
+    "comment": "WCAG breakdown popup heading"
   },
   {
     "term": "Contributor",
@@ -5523,6 +5586,27 @@
     "comment": ""
   },
   {
+    "term": "Disable While Typing",
+    "translation": "",
+    "context": "Disable While Typing",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Disable on External Mouse",
+    "translation": "",
+    "context": "Disable on External Mouse",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Disable touchpad when an external mouse is connected",
+    "translation": "",
+    "context": "Disable touchpad when an external mouse is connected",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Disabled",
     "translation": "",
     "context": "Disabled",
@@ -5901,6 +5985,13 @@
     "comment": ""
   },
   {
+    "term": "Drag Lock",
+    "translation": "",
+    "context": "Drag Lock",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Drag a widget by its handle here to reorder it or drop it into another group",
     "translation": "",
     "context": "Drag a widget by its handle here to reorder it or drop it into another group",
@@ -6069,6 +6160,13 @@
     "comment": ""
   },
   {
+    "term": "Edge",
+    "translation": "",
+    "context": "Edge",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Edge Hover Reveal",
     "translation": "",
     "context": "Edge Hover Reveal",
@@ -6177,6 +6275,13 @@
     "term": "Empty Trash (%1)",
     "translation": "",
     "context": "Empty Trash (%1)",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Emulate middle click by pressing left and right buttons",
+    "translation": "",
+    "context": "Emulate middle click by pressing left and right buttons",
     "reference": "",
     "comment": ""
   },
@@ -6475,6 +6580,13 @@
     "comment": ""
   },
   {
+    "term": "Enter text to encode",
+    "translation": "",
+    "context": "Enter text to encode",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Enter this passkey on ",
     "translation": "",
     "context": "Enter this passkey on ",
@@ -6741,13 +6853,6 @@
     "comment": ""
   },
   {
-    "term": "Failed to add printer to class",
-    "translation": "",
-    "context": "Failed to add printer to class",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Failed to apply %1 colors",
     "translation": "",
     "context": "Failed to apply %1 colors",
@@ -6937,6 +7042,13 @@
     "comment": ""
   },
   {
+    "term": "Failed to generate QR code: %1",
+    "translation": "",
+    "context": "Failed to generate QR code: %1",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Failed to generate systemd override",
     "translation": "",
     "context": "Failed to generate systemd override",
@@ -6975,13 +7087,6 @@
     "term": "Failed to load clipboard configuration.",
     "translation": "",
     "context": "Failed to load clipboard configuration.",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Failed to move job",
-    "translation": "",
-    "context": "Failed to move job",
     "reference": "",
     "comment": ""
   },
@@ -7059,13 +7164,6 @@
     "term": "Failed to remove keybind",
     "translation": "",
     "context": "Failed to remove keybind",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Failed to remove printer from class",
-    "translation": "",
-    "context": "Failed to remove printer from class",
     "reference": "",
     "comment": ""
   },
@@ -7283,27 +7381,6 @@
     "term": "Failed to update clipboard",
     "translation": "",
     "context": "Failed to update clipboard",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Failed to update description",
-    "translation": "",
-    "context": "Failed to update description",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Failed to update location",
-    "translation": "",
-    "context": "Failed to update location",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Failed to update sharing",
-    "translation": "",
-    "context": "Failed to update sharing",
     "reference": "",
     "comment": ""
   },
@@ -7556,6 +7633,20 @@
     "term": "Flags",
     "translation": "",
     "context": "Flags",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Flat",
+    "translation": "",
+    "context": "Flat",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Flat uses constant speed; Adaptive scales with movement speed",
+    "translation": "",
+    "context": "Flat uses constant speed; Adaptive scales with movement speed",
     "reference": "",
     "comment": ""
   },
@@ -9212,6 +9303,13 @@
     "comment": ""
   },
   {
+    "term": "Ignore App-Requested Timeout",
+    "translation": "",
+    "context": "Ignore App-Requested Timeout",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Ignore Completely",
     "translation": "",
     "context": "Ignore Completely",
@@ -9758,6 +9856,13 @@
     "comment": ""
   },
   {
+    "term": "Keep dragging when finger is briefly lifted",
+    "translation": "",
+    "context": "Keep dragging when finger is briefly lifted",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Keep in Bar",
     "translation": "",
     "context": "Keep in Bar",
@@ -10069,6 +10174,13 @@
     "term": "Left Section",
     "translation": "",
     "context": "Left Section",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Left-Handed Mode",
+    "translation": "",
+    "context": "Left-Handed Mode",
     "reference": "",
     "comment": ""
   },
@@ -11039,6 +11151,13 @@
     "comment": ""
   },
   {
+    "term": "Middle Click Emulation",
+    "translation": "",
+    "context": "Middle Click Emulation",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Middle Section",
     "translation": "",
     "context": "Middle Section",
@@ -11221,6 +11340,20 @@
     "comment": "mount points header in system monitor"
   },
   {
+    "term": "Mouse & Touchpad",
+    "translation": "",
+    "context": "Mouse & Touchpad",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Mouse Settings",
+    "translation": "",
+    "context": "Mouse Settings",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Mouse clicks pass through the bar to windows behind it",
     "translation": "",
     "context": "Mouse clicks pass through the bar to windows behind it",
@@ -11371,6 +11504,13 @@
     "term": "Native: platform renderer (FreeType).",
     "translation": "",
     "context": "Native: platform renderer (FreeType).",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Natural Scrolling",
+    "translation": "",
+    "context": "Natural Scrolling",
     "reference": "",
     "comment": ""
   },
@@ -11592,13 +11732,6 @@
     "comment": ""
   },
   {
-    "term": "Niri compositor actions (focus, move, etc.)",
-    "translation": "",
-    "context": "Niri compositor actions (focus, move, etc.)",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "No",
     "translation": "",
     "context": "No",
@@ -11707,6 +11840,13 @@
     "term": "No Rounding",
     "translation": "",
     "context": "No Rounding",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "No Scroll",
+    "translation": "",
+    "context": "No Scroll",
     "reference": "",
     "comment": ""
   },
@@ -12642,6 +12782,13 @@
     "comment": ""
   },
   {
+    "term": "On Button Down",
+    "translation": "",
+    "context": "On Button Down",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "On indefinitely",
     "translation": "",
     "context": "On indefinitely",
@@ -12682,6 +12829,13 @@
     "context": "Only adjust gamma based on time or location rules.",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Only continue if you recognize this server certificate fingerprint.",
+    "translation": "",
+    "context": "Only continue if you recognize this server certificate fingerprint.",
+    "reference": "",
+    "comment": "Warning shown before trusting an unverified VPN server certificate"
   },
   {
     "term": "Only on Battery",
@@ -13244,6 +13398,13 @@
     "comment": "KDE Connect pairing in progress status"
   },
   {
+    "term": "Partial",
+    "translation": "",
+    "context": "Partial",
+    "reference": "",
+    "comment": "contrast badge suffix: only some variants pass"
+  },
+  {
     "term": "Partly Cloudy",
     "translation": "",
     "context": "Partly Cloudy",
@@ -13720,6 +13881,13 @@
     "comment": ""
   },
   {
+    "term": "Pointer Speed",
+    "translation": "",
+    "context": "Pointer Speed",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Polkit integration is disabled. User management requires Polkit to elevate privileges.",
     "translation": "",
     "context": "Polkit integration is disabled. User management requires Polkit to elevate privileges.",
@@ -14007,6 +14175,13 @@
     "comment": ""
   },
   {
+    "term": "Prevent accidental cursor jumps while typing",
+    "translation": "",
+    "context": "Prevent accidental cursor jumps while typing",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Prevent screen timeout",
     "translation": "",
     "context": "Prevent screen timeout",
@@ -14285,6 +14460,13 @@
     "context": "Protocol",
     "reference": "",
     "comment": "Label for printer protocol selector, e.g. ipp, ipps, lpd, socket"
+  },
+  {
+    "term": "QR Generator",
+    "translation": "",
+    "context": "QR Generator",
+    "reference": "",
+    "comment": ""
   },
   {
     "term": "Qt",
@@ -14882,6 +15064,13 @@
     "comment": ""
   },
   {
+    "term": "Requires the DMS Theme extension from the editor marketplace",
+    "translation": "",
+    "context": "Requires the DMS Theme extension from the editor marketplace",
+    "reference": "",
+    "comment": "vscode matugen template description"
+  },
+  {
     "term": "Reset",
     "translation": "",
     "context": "Reset",
@@ -15004,6 +15193,20 @@
     "term": "Reverse Scrolling Direction",
     "translation": "",
     "context": "Reverse Scrolling Direction",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Reverse mouse wheel scrolling direction",
+    "translation": "",
+    "context": "Reverse mouse wheel scrolling direction",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Reverse two-finger scrolling direction",
+    "translation": "",
+    "context": "Reverse two-finger scrolling direction",
     "reference": "",
     "comment": ""
   },
@@ -15498,6 +15701,13 @@
     "comment": ""
   },
   {
+    "term": "Scroll Method",
+    "translation": "",
+    "context": "Scroll Method",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Scroll Wheel",
     "translation": "",
     "context": "Scroll Wheel",
@@ -15529,6 +15739,13 @@
     "term": "Scrolling",
     "translation": "",
     "context": "Scrolling",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Scrolling Speed",
+    "translation": "",
+    "context": "Scrolling Speed",
     "reference": "",
     "comment": ""
   },
@@ -16310,6 +16527,13 @@
     "comment": ""
   },
   {
+    "term": "Show \"config reloaded\" Toast",
+    "translation": "",
+    "context": "Show \"config reloaded\" Toast",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Show 3rd Party",
     "translation": "",
     "context": "Show 3rd Party",
@@ -16761,6 +16985,13 @@
     "term": "Show a notification when battery reaches the charge limit.",
     "translation": "",
     "context": "Show a notification when battery reaches the charge limit.",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Show a toast when the compositor config is reloaded",
+    "translation": "",
+    "context": "Show a toast when the compositor config is reloaded",
     "reference": "",
     "comment": ""
   },
@@ -17591,6 +17822,13 @@
     "comment": ""
   },
   {
+    "term": "Swap primary and secondary mouse buttons",
+    "translation": "",
+    "context": "Swap primary and secondary mouse buttons",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Sway Website",
     "translation": "",
     "context": "Sway Website",
@@ -17885,6 +18123,34 @@
     "comment": "Warning when Tailscale service is not running"
   },
   {
+    "term": "Tap and Drag",
+    "translation": "",
+    "context": "Tap and Drag",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Tap and drag on the touchpad to move items",
+    "translation": "",
+    "context": "Tap and drag on the touchpad to move items",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Tap the touchpad surface to trigger left click clicks",
+    "translation": "",
+    "context": "Tap the touchpad surface to trigger left click clicks",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Tap to Click",
+    "translation": "",
+    "context": "Tap to Click",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Terminal",
     "translation": "",
     "context": "Terminal",
@@ -18051,6 +18317,13 @@
     "context": "The rule applies to any window matching one of these.",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.",
+    "translation": "",
+    "context": "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.",
+    "reference": "",
+    "comment": "Warning shown when a trusted VPN server certificate no longer matches"
   },
   {
     "term": "Theme & Colors",
@@ -18585,6 +18858,20 @@
     "comment": ""
   },
   {
+    "term": "Touchpad Settings",
+    "translation": "",
+    "context": "Touchpad Settings",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Touchpad Speed",
+    "translation": "",
+    "context": "Touchpad Speed",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Transform",
     "translation": "",
     "context": "Transform",
@@ -18666,7 +18953,7 @@
     "translation": "",
     "context": "Trust",
     "reference": "",
-    "comment": ""
+    "comment": "Button that approves a VPN server certificate fingerprint"
   },
   {
     "term": "Try a different search",
@@ -18721,6 +19008,13 @@
     "term": "Turn off now",
     "translation": "",
     "context": "Turn off now",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Two Finger",
+    "translation": "",
+    "context": "Two Finger",
     "reference": "",
     "comment": ""
   },
@@ -19038,6 +19332,13 @@
     "context": "Untrust",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Untrusted VPN certificate",
+    "translation": "",
+    "context": "Untrusted VPN certificate",
+    "reference": "",
+    "comment": "Title for VPN server certificate trust confirmation"
   },
   {
     "term": "Up to date",
@@ -19782,13 +20083,6 @@
     "comment": ""
   },
   {
-    "term": "WCAG %1 body",
-    "translation": "",
-    "context": "WCAG %1 body",
-    "reference": "",
-    "comment": "contrast badge when only body text passes"
-  },
-  {
     "term": "WPA/WPA2",
     "translation": "",
     "context": "WPA/WPA2",
@@ -20452,6 +20746,13 @@
     "context": "attached",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "below AA",
+    "translation": "",
+    "context": "below AA",
+    "reference": "",
+    "comment": "contrast level below the AA threshold"
   },
   {
     "term": "brandon",

@@ -335,6 +335,9 @@
   "About": {
     "About": "Pri"
   },
+  "Acceleration Profile": {
+    "Acceleration Profile": ""
+  },
   "Accent Color": {
     "Accent Color": "Akcenta Koloro"
   },
@@ -409,6 +412,9 @@
   },
   "Adapters": {
     "Adapters": "Adaptiloj"
+  },
+  "Adaptive": {
+    "Adaptive": ""
   },
   "Adaptive Media Width": {
     "Adaptive Media Width": "Adapta aŭdvidaĵa larĝo"
@@ -485,11 +491,20 @@
   "Add to Autostart": {
     "Add to Autostart": "Aldoni al memlanĉo"
   },
+  "Adjust pointer sensitivity speed": {
+    "Adjust pointer sensitivity speed": ""
+  },
+  "Adjust scrolling sensitivity multiplier": {
+    "Adjust scrolling sensitivity multiplier": ""
+  },
   "Adjust the bar height via inner padding": {
     "Adjust the bar height via inner padding": "Alĝustigu la baran altecon per interna remburaĵo"
   },
   "Adjust the number of columns in grid view mode.": {
     "Adjust the number of columns in grid view mode.": "Alĝustigi la nombron de kolumnoj en krada vida reĝimo."
+  },
+  "Adjust touchpad pointer speed": {
+    "Adjust touchpad pointer speed": ""
   },
   "Adjust volume per scroll indent": {
     "Adjust volume per scroll indent": "Alĝustigi la laŭtecon per rula dentaĵo"
@@ -574,6 +589,9 @@
   },
   "Always show when there's only one connected display": {
     "Always show when there's only one connected display": "Ĉiam montri kiam estas nur unu konektita ekrano"
+  },
+  "Always use the durations above, even if an app requests a shorter or longer one": {
+    "Always use the durations above, even if an app requests a shorter or longer one": ""
   },
   "Always use this app for %1": {
     "Always use this app for %1": "Ĉiam uzu ĉi tiun programon por %1"
@@ -782,9 +800,6 @@
   "Authenticated!": {
     "Authenticated!": ""
   },
-  "Authenticating...": {
-    "Authenticating...": "Aŭtentigante..."
-  },
   "Authentication": {
     "Authentication": "Aŭtentigo"
   },
@@ -802,18 +817,6 @@
   },
   "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": {
     "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": "Aŭtentigaj ŝanĝoj bezonas sudo-on. Malfermas terminalon por ke vi povu uzi pasvorton aŭ fingrospuron."
-  },
-  "Authentication error - try again": {
-    "Authentication error - try again": "Aŭtentiga eraro - provu denove"
-  },
-  "Authentication failed - attempt %1 of %2": {
-    "Authentication failed - attempt %1 of %2": ""
-  },
-  "Authentication failed - lockout can occur": {
-    "Authentication failed - lockout can occur": ""
-  },
-  "Authentication failed - try again": {
-    "Authentication failed - try again": ""
   },
   "Authorize": {
     "Authorize": "Rajtigi"
@@ -877,9 +880,6 @@
   },
   "Auto-hide Dock": {
     "Auto-hide Dock": "Aŭtomata kaŝo de doko"
-  },
-  "Auto-login": {
-    "Auto-login": "Aŭtomata ensaluto"
   },
   "Auto-login change needs a sync": {
     "Auto-login change needs a sync": ""
@@ -980,23 +980,11 @@
   "Available in Detailed and Forecast view modes": {
     "Available in Detailed and Forecast view modes": "Havebla en Detala kaj Prognoza vidreĝimoj"
   },
-  "Awaiting fingerprint authentication": {
-    "Awaiting fingerprint authentication": ""
-  },
-  "Awaiting fingerprint or security key authentication": {
-    "Awaiting fingerprint or security key authentication": ""
-  },
-  "Awaiting security key authentication": {
-    "Awaiting security key authentication": ""
-  },
   "BSSID": {
     "BSSID": "BSSID"
   },
   "Back": {
     "Back": "Reen"
-  },
-  "Back to user list": {
-    "Back to user list": "Reen al listo de uzantoj"
   },
   "Backend": {
     "Backend": "Interna programo"
@@ -1454,6 +1442,9 @@
   "Choose wallpaper folder": {
     "Choose wallpaper folder": ""
   },
+  "Choose when to generate scrolling events": {
+    "Choose when to generate scrolling events": ""
+  },
   "Choose where notification popups appear on screen": {
     "Choose where notification popups appear on screen": "Elekti kie sciigaj ŝprucfenestroj aperas sur la ekrano"
   },
@@ -1688,6 +1679,9 @@
   "Compositor Settings": {
     "Compositor Settings": "Komponilaj agordoj"
   },
+  "Compositor actions (focus, move, etc.)": {
+    "Compositor actions (focus, move, etc.)": ""
+  },
   "Config Format": {
     "Config Format": "Agorda formato"
   },
@@ -1804,6 +1798,9 @@
   },
   "Contrast": {
     "Contrast": "Kontrasto"
+  },
+  "Contrast by variant": {
+    "Contrast by variant": ""
   },
   "Contributor": {
     "Contributor": "kontribuanto"
@@ -2390,6 +2387,15 @@
   "Disable Output": {
     "Disable Output": "Malŝalti eligon"
   },
+  "Disable While Typing": {
+    "Disable While Typing": ""
+  },
+  "Disable on External Mouse": {
+    "Disable on External Mouse": ""
+  },
+  "Disable touchpad when an external mouse is connected": {
+    "Disable touchpad when an external mouse is connected": ""
+  },
   "Disabled": {
     "Disabled": "Malŝaltita"
   },
@@ -2549,6 +2555,9 @@
   "Door Open": {
     "Door Open": "Pordo malfermita"
   },
+  "Drag Lock": {
+    "Drag Lock": ""
+  },
   "Drag a widget by its handle here to reorder it or drop it into another group": {
     "Drag a widget by its handle here to reorder it or drop it into another group": ""
   },
@@ -2621,6 +2630,9 @@
   "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": {
     "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": "Dinamika: Printempa bezier kun superfluo — eniro nelonge superas sian celon kaj poste ekloĝas. "
   },
+  "Edge": {
+    "Edge": ""
+  },
   "Edge Hover Reveal": {
     "Edge Hover Reveal": ""
   },
@@ -2668,6 +2680,9 @@
   },
   "Empty Trash (%1)": {
     "Empty Trash (%1)": "Malplenigi Rubujon (%1)"
+  },
+  "Emulate middle click by pressing left and right buttons": {
+    "Emulate middle click by pressing left and right buttons": ""
   },
   "Enable 10-bit color depth for wider color gamut and HDR support": {
     "Enable 10-bit color depth for wider color gamut and HDR support": "Ŝalti 10-bitan kolorprofundon por pli larĝa kolorgamo kaj HDR-subteno"
@@ -2794,6 +2809,9 @@
   },
   "Enter password for ": {
     "Enter password for ": "Enigu pasvorton por "
+  },
+  "Enter text to encode": {
+    "Enter text to encode": ""
   },
   "Enter this passkey on ": {
     "Enter this passkey on ": "Enigu ĉi tiun pasŝlosilon sur "
@@ -2992,6 +3010,9 @@
   },
   "Failed to fetch network QR code: %1": {
     "Failed to fetch network QR code: %1": "Malsukcesis alporti retan QR-kodon: %1"
+  },
+  "Failed to generate QR code: %1": {
+    "Failed to generate QR code: %1": ""
   },
   "Failed to generate systemd override": {
     "Failed to generate systemd override": "Malsukcesis generi sisteman anstataŭigon"
@@ -3262,6 +3283,12 @@
   },
   "Flags": {
     "Flags": "Flagoj"
+  },
+  "Flat": {
+    "Flat": ""
+  },
+  "Flat uses constant speed; Adaptive scales with movement speed": {
+    "Flat uses constant speed; Adaptive scales with movement speed": ""
   },
   "Flatpak": {
     "Flatpak": ""
@@ -3962,6 +3989,9 @@
   "If the field is hidden, it will appear as soon as a key is pressed.": {
     "If the field is hidden, it will appear as soon as a key is pressed.": "Se la kampo estas kaŝita, ĝi aperos tuj kiam klavo estas premita."
   },
+  "Ignore App-Requested Timeout": {
+    "Ignore App-Requested Timeout": ""
+  },
   "Ignore Completely": {
     "Ignore Completely": "Tute malatenti"
   },
@@ -4199,6 +4229,9 @@
   "Keep My Edits": {
     "Keep My Edits": "Konservu Miajn Redaktojn"
   },
+  "Keep dragging when finger is briefly lifted": {
+    "Keep dragging when finger is briefly lifted": ""
+  },
   "Keep in Bar": {
     "Keep in Bar": "Konservu en Trinkejo"
   },
@@ -4334,6 +4367,9 @@
   "Left Section": {
     "Left Section": "Maldekstra sekcio"
   },
+  "Left-Handed Mode": {
+    "Left-Handed Mode": ""
+  },
   "Light": {
     "Light": "Hela"
   },
@@ -4438,9 +4474,6 @@
   },
   "Locked": {
     "Locked": "Ŝlosita"
-  },
-  "Logging in...": {
-    "Logging in...": "Salutante..."
   },
   "Login": {
     "Login": "Saluti"
@@ -4748,6 +4781,9 @@
   "Microphone volume control": {
     "Microphone volume control": "Regado de mikrofona laŭteco"
   },
+  "Middle Click Emulation": {
+    "Middle Click Emulation": ""
+  },
   "Middle Section": {
     "Middle Section": "Meza sekcio"
   },
@@ -4823,6 +4859,12 @@
   "Mount Points": {
     "Mount Points": "Munt-punktoj"
   },
+  "Mouse & Touchpad": {
+    "Mouse & Touchpad": ""
+  },
+  "Mouse Settings": {
+    "Mouse Settings": ""
+  },
   "Mouse clicks pass through the bar to windows behind it": {
     "Mouse clicks pass through the bar to windows behind it": "Musklakoj pasas tra la trinkejo al fenestroj malantaŭ ĝi"
   },
@@ -4885,6 +4927,9 @@
   },
   "Native: platform renderer (FreeType).": {
     "Native: platform renderer (FreeType).": "Denaska: platforma bildilo (FreeType)."
+  },
+  "Natural Scrolling": {
+    "Natural Scrolling": ""
   },
   "Natural Touchpad Scrolling": {
     "Natural Touchpad Scrolling": "Natura Tuŝpad Scrolling"
@@ -5032,6 +5077,9 @@
   },
   "No Rounding": {
     "No Rounding": "Sen rondigo"
+  },
+  "No Scroll": {
+    "No Scroll": ""
   },
   "No Shadow": {
     "No Shadow": "Sen ombro"
@@ -5336,9 +5384,6 @@
   "Not detected": {
     "Not detected": "Ne detektita"
   },
-  "Not listed?": {
-    "Not listed?": "Ĉu ne en listo?"
-  },
   "Not paired": {
     "Not paired": "Ne parigita"
   },
@@ -5432,6 +5477,9 @@
   "On": {
     "On": "Ŝaltita"
   },
+  "On Button Down": {
+    "On Button Down": ""
+  },
   "On indefinitely": {
     "On indefinitely": "Sur senfine"
   },
@@ -5449,6 +5497,9 @@
   },
   "Only adjust gamma based on time or location rules.": {
     "Only adjust gamma based on time or location rules.": "Nur alĝustigi gamaon baze de tempo- aŭ lok-reguloj."
+  },
+  "Only continue if you recognize this server certificate fingerprint.": {
+    "Only continue if you recognize this server certificate fingerprint.": ""
   },
   "Only on Battery": {
     "Only on Battery": ""
@@ -5687,6 +5738,9 @@
   "Pairing...": {
     "Pairing...": "Parigante..."
   },
+  "Partial": {
+    "Partial": ""
+  },
   "Partly Cloudy": {
     "Partly Cloudy": "Parte nuba"
   },
@@ -5707,9 +5761,6 @@
   },
   "Password updated": {
     "Password updated": "Pasvorto ĝisdatigita"
-  },
-  "Password...": {
-    "Password...": "Pasvorto..."
   },
   "Passwords do not match.": {
     "Passwords do not match.": "Pasvortoj ne kongruas."
@@ -5894,6 +5945,9 @@
   "Pointer": {
     "Pointer": "Kursoro"
   },
+  "Pointer Speed": {
+    "Pointer Speed": ""
+  },
   "Polkit integration is disabled. User management requires Polkit to elevate privileges.": {
     "Polkit integration is disabled. User management requires Polkit to elevate privileges.": "Polkit-integriĝo estas malŝaltita. "
   },
@@ -6014,6 +6068,9 @@
   "Pressure": {
     "Pressure": "Premo"
   },
+  "Prevent accidental cursor jumps while typing": {
+    "Prevent accidental cursor jumps while typing": ""
+  },
   "Prevent screen timeout": {
     "Prevent screen timeout": "Malhelpi ekranan templimon"
   },
@@ -6130,6 +6187,9 @@
   },
   "Protocol": {
     "Protocol": "Protokolo"
+  },
+  "QR Generator": {
+    "QR Generator": ""
   },
   "Qt": {
     "Qt": "Qt"
@@ -6383,6 +6443,9 @@
   "Requires remembering the last user and session. Enable those options first.": {
     "Requires remembering the last user and session. Enable those options first.": "Necesas memori la lastan uzanton kaj sesion. "
   },
+  "Requires the DMS Theme extension from the editor marketplace": {
+    "Requires the DMS Theme extension from the editor marketplace": ""
+  },
   "Reset": {
     "Reset": "Rekomencigi"
   },
@@ -6436,6 +6499,12 @@
   },
   "Reverse Scrolling Direction": {
     "Reverse Scrolling Direction": "Inversigi rulan direkton"
+  },
+  "Reverse mouse wheel scrolling direction": {
+    "Reverse mouse wheel scrolling direction": ""
+  },
+  "Reverse two-finger scrolling direction": {
+    "Reverse two-finger scrolling direction": ""
   },
   "Reverse workspace switch direction when scrolling over the bar": {
     "Reverse workspace switch direction when scrolling over the bar": "Inversigi direkton de laborspaca ŝanĝo kiam oni rulas super la breto"
@@ -6644,6 +6713,9 @@
   "Scroll GitHub": {
     "Scroll GitHub": "Ruli GitHub-on"
   },
+  "Scroll Method": {
+    "Scroll Method": ""
+  },
   "Scroll Wheel": {
     "Scroll Wheel": "Rul-radeto"
   },
@@ -6658,6 +6730,9 @@
   },
   "Scrolling": {
     "Scrolling": "Rulado"
+  },
+  "Scrolling Speed": {
+    "Scrolling Speed": ""
   },
   "Search App Actions": {
     "Search App Actions": "Serĉi aplikaĵajn agojn"
@@ -6820,9 +6895,6 @@
   },
   "Select the palette algorithm used for wallpaper-based colors": {
     "Select the palette algorithm used for wallpaper-based colors": "Elekti la paletran algoritmon uzatan por fonbild-bazitaj koloroj"
-  },
-  "Select user...": {
-    "Select user...": "Elektu uzanton..."
   },
   "Select which keybind providers to include": {
     "Select which keybind providers to include": "Elektu kiujn provizantojn de klavoligiloj inkluzivi"
@@ -6991,6 +7063,9 @@
   },
   "Show": {
     "Show": "Montri"
+  },
+  "Show \"config reloaded\" Toast": {
+    "Show \"config reloaded\" Toast": ""
   },
   "Show 3rd Party": {
     "Show 3rd Party": "Montri triajn partiojn"
@@ -7186,6 +7261,9 @@
   },
   "Show a notification when battery reaches the charge limit.": {
     "Show a notification when battery reaches the charge limit.": ""
+  },
+  "Show a toast when the compositor config is reloaded": {
+    "Show a toast when the compositor config is reloaded": ""
   },
   "Show a warning popup when battery is running low.": {
     "Show a warning popup when battery is running low.": ""
@@ -7529,6 +7607,9 @@
   "Suspend then Hibernate": {
     "Suspend then Hibernate": "Dormeti poste pasivigi"
   },
+  "Swap primary and secondary mouse buttons": {
+    "Swap primary and secondary mouse buttons": ""
+  },
   "Sway Website": {
     "Sway Website": "Retejo de Sway"
   },
@@ -7652,6 +7733,18 @@
   "Tailscale not available": {
     "Tailscale not available": "Vostoskalo ne havebla"
   },
+  "Tap and Drag": {
+    "Tap and Drag": ""
+  },
+  "Tap and drag on the touchpad to move items": {
+    "Tap and drag on the touchpad to move items": ""
+  },
+  "Tap the touchpad surface to trigger left click clicks": {
+    "Tap the touchpad surface to trigger left click clicks": ""
+  },
+  "Tap to Click": {
+    "Tap to Click": ""
+  },
   "Terminal": {
     "Terminal": "Terminalo"
   },
@@ -7726,6 +7819,9 @@
   },
   "The rule applies to any window matching one of these.": {
     "The rule applies to any window matching one of these.": "La regulo validas por iu ajn fenestro kongrua kun unu el ĉi tiuj."
+  },
+  "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": {
+    "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": ""
   },
   "Theme & Colors": {
     "Theme & Colors": "Etoso kaj koloroj"
@@ -7919,9 +8015,6 @@
   "Too many attempts - locked out": {
     "Too many attempts - locked out": "Tro da provoj - ŝlosita"
   },
-  "Too many failed attempts - account may be locked": {
-    "Too many failed attempts - account may be locked": "Tro da malsukcesaj provoj - la konto eble estas ŝlosita"
-  },
   "Tools": {
     "Tools": "Iloj"
   },
@@ -7957,6 +8050,12 @@
   },
   "Touch your security key...": {
     "Touch your security key...": "Tuŝu vian sekurecŝlosilon..."
+  },
+  "Touchpad Settings": {
+    "Touchpad Settings": ""
+  },
+  "Touchpad Speed": {
+    "Touchpad Speed": ""
   },
   "Transform": {
     "Transform": "Transformi"
@@ -8017,6 +8116,9 @@
   },
   "Turn off now": {
     "Turn off now": "Malŝaltu nun"
+  },
+  "Two Finger": {
+    "Two Finger": ""
   },
   "Type at least 2 characters": {
     "Type at least 2 characters": "Tajpu almenaŭ 2 signojn"
@@ -8158,6 +8260,9 @@
   },
   "Untrust": {
     "Untrust": "Malestimata"
+  },
+  "Untrusted VPN certificate": {
+    "Untrusted VPN certificate": ""
   },
   "Up to date": {
     "Up to date": "Aktualigita"
@@ -8341,9 +8446,6 @@
   },
   "Username must start with a lowercase letter or underscore and contain only lowercase letters, digits, hyphens, or underscores.": {
     "Username must start with a lowercase letter or underscore and contain only lowercase letters, digits, hyphens, or underscores.": "Uzantnomo devas komenci per minuskla litero aŭ substreko kaj enhavi nur minusklajn literojn, ciferojn, streketojn aŭ substrekojn."
-  },
-  "Username...": {
-    "Username...": "Uzantnomo..."
   },
   "Users": {
     "Users": "Uzantoj"
@@ -8764,6 +8866,9 @@
   },
   "attached": {
     "attached": "aligita"
+  },
+  "below AA": {
+    "below AA": ""
   },
   "brandon": {
     "brandon": "brandon"

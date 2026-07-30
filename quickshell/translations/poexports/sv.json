@@ -335,6 +335,9 @@
   "About": {
     "About": "Om"
   },
+  "Acceleration Profile": {
+    "Acceleration Profile": ""
+  },
   "Accent Color": {
     "Accent Color": "Accentfärg"
   },
@@ -409,6 +412,9 @@
   },
   "Adapters": {
     "Adapters": "Adaptrar"
+  },
+  "Adaptive": {
+    "Adaptive": ""
   },
   "Adaptive Media Width": {
     "Adaptive Media Width": ""
@@ -485,11 +491,20 @@
   "Add to Autostart": {
     "Add to Autostart": ""
   },
+  "Adjust pointer sensitivity speed": {
+    "Adjust pointer sensitivity speed": ""
+  },
+  "Adjust scrolling sensitivity multiplier": {
+    "Adjust scrolling sensitivity multiplier": ""
+  },
   "Adjust the bar height via inner padding": {
     "Adjust the bar height via inner padding": ""
   },
   "Adjust the number of columns in grid view mode.": {
     "Adjust the number of columns in grid view mode.": "Justera antalet kolumner i rutnätsvy."
+  },
+  "Adjust touchpad pointer speed": {
+    "Adjust touchpad pointer speed": ""
   },
   "Adjust volume per scroll indent": {
     "Adjust volume per scroll indent": "Justera volym per rullningsindrag"
@@ -574,6 +589,9 @@
   },
   "Always show when there's only one connected display": {
     "Always show when there's only one connected display": "Visa alltid när bara en bildskärm är ansluten"
+  },
+  "Always use the durations above, even if an app requests a shorter or longer one": {
+    "Always use the durations above, even if an app requests a shorter or longer one": ""
   },
   "Always use this app for %1": {
     "Always use this app for %1": ""
@@ -782,9 +800,6 @@
   "Authenticated!": {
     "Authenticated!": ""
   },
-  "Authenticating...": {
-    "Authenticating...": "Autentiserar..."
-  },
   "Authentication": {
     "Authentication": "Autentisering"
   },
@@ -802,18 +817,6 @@
   },
   "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": {
     "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": ""
-  },
-  "Authentication error - try again": {
-    "Authentication error - try again": "Autentiseringsfel – försök igen"
-  },
-  "Authentication failed - attempt %1 of %2": {
-    "Authentication failed - attempt %1 of %2": ""
-  },
-  "Authentication failed - lockout can occur": {
-    "Authentication failed - lockout can occur": ""
-  },
-  "Authentication failed - try again": {
-    "Authentication failed - try again": ""
   },
   "Authorize": {
     "Authorize": "Auktorisera"
@@ -877,9 +880,6 @@
   },
   "Auto-hide Dock": {
     "Auto-hide Dock": "Göm Dock automatiskt"
-  },
-  "Auto-login": {
-    "Auto-login": ""
   },
   "Auto-login change needs a sync": {
     "Auto-login change needs a sync": ""
@@ -980,23 +980,11 @@
   "Available in Detailed and Forecast view modes": {
     "Available in Detailed and Forecast view modes": "Tillgänglig i detaljerade och prognosvyer"
   },
-  "Awaiting fingerprint authentication": {
-    "Awaiting fingerprint authentication": ""
-  },
-  "Awaiting fingerprint or security key authentication": {
-    "Awaiting fingerprint or security key authentication": ""
-  },
-  "Awaiting security key authentication": {
-    "Awaiting security key authentication": ""
-  },
   "BSSID": {
     "BSSID": "BSSID"
   },
   "Back": {
     "Back": "Tillbaka"
-  },
-  "Back to user list": {
-    "Back to user list": ""
   },
   "Backend": {
     "Backend": "Bakgrundstjänst"
@@ -1454,6 +1442,9 @@
   "Choose wallpaper folder": {
     "Choose wallpaper folder": ""
   },
+  "Choose when to generate scrolling events": {
+    "Choose when to generate scrolling events": ""
+  },
   "Choose where notification popups appear on screen": {
     "Choose where notification popups appear on screen": "Välj var notisbanderoller visas på skärmen"
   },
@@ -1688,6 +1679,9 @@
   "Compositor Settings": {
     "Compositor Settings": "Kompositoriminställningar"
   },
+  "Compositor actions (focus, move, etc.)": {
+    "Compositor actions (focus, move, etc.)": ""
+  },
   "Config Format": {
     "Config Format": "Konfigurationsformat"
   },
@@ -1804,6 +1798,9 @@
   },
   "Contrast": {
     "Contrast": "Kontrast"
+  },
+  "Contrast by variant": {
+    "Contrast by variant": ""
   },
   "Contributor": {
     "Contributor": ""
@@ -2390,6 +2387,15 @@
   "Disable Output": {
     "Disable Output": "Avaktivera utgång"
   },
+  "Disable While Typing": {
+    "Disable While Typing": ""
+  },
+  "Disable on External Mouse": {
+    "Disable on External Mouse": ""
+  },
+  "Disable touchpad when an external mouse is connected": {
+    "Disable touchpad when an external mouse is connected": ""
+  },
   "Disabled": {
     "Disabled": "Avaktiverat"
   },
@@ -2549,6 +2555,9 @@
   "Door Open": {
     "Door Open": "Dörr öppen"
   },
+  "Drag Lock": {
+    "Drag Lock": ""
+  },
   "Drag a widget by its handle here to reorder it or drop it into another group": {
     "Drag a widget by its handle here to reorder it or drop it into another group": ""
   },
@@ -2621,6 +2630,9 @@
   "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": {
     "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": ""
   },
+  "Edge": {
+    "Edge": ""
+  },
   "Edge Hover Reveal": {
     "Edge Hover Reveal": ""
   },
@@ -2668,6 +2680,9 @@
   },
   "Empty Trash (%1)": {
     "Empty Trash (%1)": ""
+  },
+  "Emulate middle click by pressing left and right buttons": {
+    "Emulate middle click by pressing left and right buttons": ""
   },
   "Enable 10-bit color depth for wider color gamut and HDR support": {
     "Enable 10-bit color depth for wider color gamut and HDR support": "Aktivera 10-bitars färgdjup för bredare färgomfång och HDR-stöd"
@@ -2794,6 +2809,9 @@
   },
   "Enter password for ": {
     "Enter password for ": "Ange lösenord för "
+  },
+  "Enter text to encode": {
+    "Enter text to encode": ""
   },
   "Enter this passkey on ": {
     "Enter this passkey on ": "Ange denna lösenkod på "
@@ -2992,6 +3010,9 @@
   },
   "Failed to fetch network QR code: %1": {
     "Failed to fetch network QR code: %1": ""
+  },
+  "Failed to generate QR code: %1": {
+    "Failed to generate QR code: %1": ""
   },
   "Failed to generate systemd override": {
     "Failed to generate systemd override": ""
@@ -3262,6 +3283,12 @@
   },
   "Flags": {
     "Flags": "Flaggor"
+  },
+  "Flat": {
+    "Flat": ""
+  },
+  "Flat uses constant speed; Adaptive scales with movement speed": {
+    "Flat uses constant speed; Adaptive scales with movement speed": ""
   },
   "Flatpak": {
     "Flatpak": ""
@@ -3962,6 +3989,9 @@
   "If the field is hidden, it will appear as soon as a key is pressed.": {
     "If the field is hidden, it will appear as soon as a key is pressed.": "Om fältet är dolt visas det så snart en tangent trycks ned."
   },
+  "Ignore App-Requested Timeout": {
+    "Ignore App-Requested Timeout": ""
+  },
   "Ignore Completely": {
     "Ignore Completely": "Ignorera helt"
   },
@@ -4199,6 +4229,9 @@
   "Keep My Edits": {
     "Keep My Edits": ""
   },
+  "Keep dragging when finger is briefly lifted": {
+    "Keep dragging when finger is briefly lifted": ""
+  },
   "Keep in Bar": {
     "Keep in Bar": ""
   },
@@ -4334,6 +4367,9 @@
   "Left Section": {
     "Left Section": "Vänster avdelning"
   },
+  "Left-Handed Mode": {
+    "Left-Handed Mode": ""
+  },
   "Light": {
     "Light": ""
   },
@@ -4438,9 +4474,6 @@
   },
   "Locked": {
     "Locked": "Låst"
-  },
-  "Logging in...": {
-    "Logging in...": "Loggar in..."
   },
   "Login": {
     "Login": ""
@@ -4748,6 +4781,9 @@
   "Microphone volume control": {
     "Microphone volume control": "Mikrofonvolymkontroll"
   },
+  "Middle Click Emulation": {
+    "Middle Click Emulation": ""
+  },
   "Middle Section": {
     "Middle Section": "Mittenavdelning"
   },
@@ -4823,6 +4859,12 @@
   "Mount Points": {
     "Mount Points": "Monteringspunkter"
   },
+  "Mouse & Touchpad": {
+    "Mouse & Touchpad": ""
+  },
+  "Mouse Settings": {
+    "Mouse Settings": ""
+  },
   "Mouse clicks pass through the bar to windows behind it": {
     "Mouse clicks pass through the bar to windows behind it": ""
   },
@@ -4885,6 +4927,9 @@
   },
   "Native: platform renderer (FreeType).": {
     "Native: platform renderer (FreeType).": ""
+  },
+  "Natural Scrolling": {
+    "Natural Scrolling": ""
   },
   "Natural Touchpad Scrolling": {
     "Natural Touchpad Scrolling": ""
@@ -5032,6 +5077,9 @@
   },
   "No Rounding": {
     "No Rounding": "Ingen avrundning"
+  },
+  "No Scroll": {
+    "No Scroll": ""
   },
   "No Shadow": {
     "No Shadow": "Ingen skugga"
@@ -5336,9 +5384,6 @@
   "Not detected": {
     "Not detected": "Inte detekterat"
   },
-  "Not listed?": {
-    "Not listed?": ""
-  },
   "Not paired": {
     "Not paired": "Inte parkopplad"
   },
@@ -5432,6 +5477,9 @@
   "On": {
     "On": "På"
   },
+  "On Button Down": {
+    "On Button Down": ""
+  },
   "On indefinitely": {
     "On indefinitely": ""
   },
@@ -5449,6 +5497,9 @@
   },
   "Only adjust gamma based on time or location rules.": {
     "Only adjust gamma based on time or location rules.": "Justera bara gamma baserat på tids- eller platsregler."
+  },
+  "Only continue if you recognize this server certificate fingerprint.": {
+    "Only continue if you recognize this server certificate fingerprint.": ""
   },
   "Only on Battery": {
     "Only on Battery": ""
@@ -5687,6 +5738,9 @@
   "Pairing...": {
     "Pairing...": "Parkopplar..."
   },
+  "Partial": {
+    "Partial": ""
+  },
   "Partly Cloudy": {
     "Partly Cloudy": "Delvis molnigt"
   },
@@ -5707,9 +5761,6 @@
   },
   "Password updated": {
     "Password updated": ""
-  },
-  "Password...": {
-    "Password...": "Lösenord..."
   },
   "Passwords do not match.": {
     "Passwords do not match.": ""
@@ -5894,6 +5945,9 @@
   "Pointer": {
     "Pointer": "Pekare"
   },
+  "Pointer Speed": {
+    "Pointer Speed": ""
+  },
   "Polkit integration is disabled. User management requires Polkit to elevate privileges.": {
     "Polkit integration is disabled. User management requires Polkit to elevate privileges.": ""
   },
@@ -6014,6 +6068,9 @@
   "Pressure": {
     "Pressure": "Lufttryck"
   },
+  "Prevent accidental cursor jumps while typing": {
+    "Prevent accidental cursor jumps while typing": ""
+  },
   "Prevent screen timeout": {
     "Prevent screen timeout": "Förhindra att skärmen stängs av"
   },
@@ -6130,6 +6187,9 @@
   },
   "Protocol": {
     "Protocol": "Protokoll"
+  },
+  "QR Generator": {
+    "QR Generator": ""
   },
   "Qt": {
     "Qt": ""
@@ -6383,6 +6443,9 @@
   "Requires remembering the last user and session. Enable those options first.": {
     "Requires remembering the last user and session. Enable those options first.": ""
   },
+  "Requires the DMS Theme extension from the editor marketplace": {
+    "Requires the DMS Theme extension from the editor marketplace": ""
+  },
   "Reset": {
     "Reset": "Återställ"
   },
@@ -6436,6 +6499,12 @@
   },
   "Reverse Scrolling Direction": {
     "Reverse Scrolling Direction": "Omvänd rullningsriktning"
+  },
+  "Reverse mouse wheel scrolling direction": {
+    "Reverse mouse wheel scrolling direction": ""
+  },
+  "Reverse two-finger scrolling direction": {
+    "Reverse two-finger scrolling direction": ""
   },
   "Reverse workspace switch direction when scrolling over the bar": {
     "Reverse workspace switch direction when scrolling over the bar": "Omvänd växlingsriktning på arbetsytor vid rullning över menyraden"
@@ -6644,6 +6713,9 @@
   "Scroll GitHub": {
     "Scroll GitHub": "Scroll GitHub"
   },
+  "Scroll Method": {
+    "Scroll Method": ""
+  },
   "Scroll Wheel": {
     "Scroll Wheel": "Scrollhjul"
   },
@@ -6658,6 +6730,9 @@
   },
   "Scrolling": {
     "Scrolling": "Rullning"
+  },
+  "Scrolling Speed": {
+    "Scrolling Speed": ""
   },
   "Search App Actions": {
     "Search App Actions": "Sök appåtgärder"
@@ -6820,9 +6895,6 @@
   },
   "Select the palette algorithm used for wallpaper-based colors": {
     "Select the palette algorithm used for wallpaper-based colors": "Välj palettalgoritm för färger baserade på bakgrundsbilden"
-  },
-  "Select user...": {
-    "Select user...": ""
   },
   "Select which keybind providers to include": {
     "Select which keybind providers to include": "Välj vilka kortkommandoleverantörer som ska inkluderas"
@@ -6991,6 +7063,9 @@
   },
   "Show": {
     "Show": "Visa"
+  },
+  "Show \"config reloaded\" Toast": {
+    "Show \"config reloaded\" Toast": ""
   },
   "Show 3rd Party": {
     "Show 3rd Party": "Visa tredjepartsappar"
@@ -7186,6 +7261,9 @@
   },
   "Show a notification when battery reaches the charge limit.": {
     "Show a notification when battery reaches the charge limit.": ""
+  },
+  "Show a toast when the compositor config is reloaded": {
+    "Show a toast when the compositor config is reloaded": ""
   },
   "Show a warning popup when battery is running low.": {
     "Show a warning popup when battery is running low.": ""
@@ -7529,6 +7607,9 @@
   "Suspend then Hibernate": {
     "Suspend then Hibernate": "Sätt i strömsparläge och sedan viloläge"
   },
+  "Swap primary and secondary mouse buttons": {
+    "Swap primary and secondary mouse buttons": ""
+  },
   "Sway Website": {
     "Sway Website": "Sways webbplats"
   },
@@ -7652,6 +7733,18 @@
   "Tailscale not available": {
     "Tailscale not available": ""
   },
+  "Tap and Drag": {
+    "Tap and Drag": ""
+  },
+  "Tap and drag on the touchpad to move items": {
+    "Tap and drag on the touchpad to move items": ""
+  },
+  "Tap the touchpad surface to trigger left click clicks": {
+    "Tap the touchpad surface to trigger left click clicks": ""
+  },
+  "Tap to Click": {
+    "Tap to Click": ""
+  },
   "Terminal": {
     "Terminal": "Terminal"
   },
@@ -7726,6 +7819,9 @@
   },
   "The rule applies to any window matching one of these.": {
     "The rule applies to any window matching one of these.": ""
+  },
+  "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": {
+    "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": ""
   },
   "Theme & Colors": {
     "Theme & Colors": "Teman och färger"
@@ -7919,9 +8015,6 @@
   "Too many attempts - locked out": {
     "Too many attempts - locked out": ""
   },
-  "Too many failed attempts - account may be locked": {
-    "Too many failed attempts - account may be locked": "För många misslyckade försök – kontot kan vara låst"
-  },
   "Tools": {
     "Tools": "Verktyg"
   },
@@ -7957,6 +8050,12 @@
   },
   "Touch your security key...": {
     "Touch your security key...": ""
+  },
+  "Touchpad Settings": {
+    "Touchpad Settings": ""
+  },
+  "Touchpad Speed": {
+    "Touchpad Speed": ""
   },
   "Transform": {
     "Transform": "Transformera"
@@ -8017,6 +8116,9 @@
   },
   "Turn off now": {
     "Turn off now": ""
+  },
+  "Two Finger": {
+    "Two Finger": ""
   },
   "Type at least 2 characters": {
     "Type at least 2 characters": "Skriv minst 2 tecken"
@@ -8158,6 +8260,9 @@
   },
   "Untrust": {
     "Untrust": "Lita inte på"
+  },
+  "Untrusted VPN certificate": {
+    "Untrusted VPN certificate": ""
   },
   "Up to date": {
     "Up to date": "Uppdaterat"
@@ -8341,9 +8446,6 @@
   },
   "Username must start with a lowercase letter or underscore and contain only lowercase letters, digits, hyphens, or underscores.": {
     "Username must start with a lowercase letter or underscore and contain only lowercase letters, digits, hyphens, or underscores.": ""
-  },
-  "Username...": {
-    "Username...": "Användarnamn..."
   },
   "Users": {
     "Users": ""
@@ -8764,6 +8866,9 @@
   },
   "attached": {
     "attached": "ansluten"
+  },
+  "below AA": {
+    "below AA": ""
   },
   "brandon": {
     "brandon": "brandon"

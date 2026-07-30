@@ -335,6 +335,9 @@
   "About": {
     "About": "Over"
   },
+  "Acceleration Profile": {
+    "Acceleration Profile": ""
+  },
   "Accent Color": {
     "Accent Color": "Accentkleur"
   },
@@ -409,6 +412,9 @@
   },
   "Adapters": {
     "Adapters": "Adapters"
+  },
+  "Adaptive": {
+    "Adaptive": ""
   },
   "Adaptive Media Width": {
     "Adaptive Media Width": "Adaptieve mediabreedte"
@@ -485,11 +491,20 @@
   "Add to Autostart": {
     "Add to Autostart": "Toevoegen aan automatisch opstarten"
   },
+  "Adjust pointer sensitivity speed": {
+    "Adjust pointer sensitivity speed": ""
+  },
+  "Adjust scrolling sensitivity multiplier": {
+    "Adjust scrolling sensitivity multiplier": ""
+  },
   "Adjust the bar height via inner padding": {
     "Adjust the bar height via inner padding": "De balkhoogte aanpassen via binnenmarge (padding)"
   },
   "Adjust the number of columns in grid view mode.": {
     "Adjust the number of columns in grid view mode.": "Pas het aantal kolommen in rasterweergave aan."
+  },
+  "Adjust touchpad pointer speed": {
+    "Adjust touchpad pointer speed": ""
   },
   "Adjust volume per scroll indent": {
     "Adjust volume per scroll indent": "Volume per scrollstap aanpassen"
@@ -574,6 +589,9 @@
   },
   "Always show when there's only one connected display": {
     "Always show when there's only one connected display": "Altijd tonen wanneer er slechts één beeldscherm is aangesloten"
+  },
+  "Always use the durations above, even if an app requests a shorter or longer one": {
+    "Always use the durations above, even if an app requests a shorter or longer one": ""
   },
   "Always use this app for %1": {
     "Always use this app for %1": "Gebruik deze app altijd voor %1"
@@ -782,9 +800,6 @@
   "Authenticated!": {
     "Authenticated!": "Geauthenticeerd!"
   },
-  "Authenticating...": {
-    "Authenticating...": "Controleren..."
-  },
   "Authentication": {
     "Authentication": "Authenticatie"
   },
@@ -802,18 +817,6 @@
   },
   "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": {
     "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": "Verificatiewijzigingen vereisen sudo. Terminal wordt geopend zodat u een wachtwoord of vingerafdruk kunt gebruiken."
-  },
-  "Authentication error - try again": {
-    "Authentication error - try again": "Authenticatiefout - probeer het opnieuw"
-  },
-  "Authentication failed - attempt %1 of %2": {
-    "Authentication failed - attempt %1 of %2": "Authenticatie mislukt - poging %1 van %2"
-  },
-  "Authentication failed - lockout can occur": {
-    "Authentication failed - lockout can occur": "Authenticatie mislukt - uitsluiting kan optreden"
-  },
-  "Authentication failed - try again": {
-    "Authentication failed - try again": "Authenticatie mislukt - probeer het opnieuw"
   },
   "Authorize": {
     "Authorize": "Autoriseren"
@@ -877,9 +880,6 @@
   },
   "Auto-hide Dock": {
     "Auto-hide Dock": "Dock automatisch verbergen"
-  },
-  "Auto-login": {
-    "Auto-login": "Automatisch inloggen"
   },
   "Auto-login change needs a sync": {
     "Auto-login change needs a sync": "Wijziging aan automatisch inloggen vereist synchronisatie"
@@ -980,23 +980,11 @@
   "Available in Detailed and Forecast view modes": {
     "Available in Detailed and Forecast view modes": "Beschikbaar in weergavemodi Gedetailleerd en Voorspelling"
   },
-  "Awaiting fingerprint authentication": {
-    "Awaiting fingerprint authentication": "Wachten op vingerafdrukauthenticatie"
-  },
-  "Awaiting fingerprint or security key authentication": {
-    "Awaiting fingerprint or security key authentication": "Wachten op vingerafdruk- of beveiligingssleutelauthenticatie"
-  },
-  "Awaiting security key authentication": {
-    "Awaiting security key authentication": "Wachten op beveiligingssleutelauthenticatie"
-  },
   "BSSID": {
     "BSSID": "BSSID"
   },
   "Back": {
     "Back": "Terug"
-  },
-  "Back to user list": {
-    "Back to user list": "Terug naar gebruikerslijst"
   },
   "Backend": {
     "Backend": "Backend"
@@ -1454,6 +1442,9 @@
   "Choose wallpaper folder": {
     "Choose wallpaper folder": "Achtergrondmap kiezen"
   },
+  "Choose when to generate scrolling events": {
+    "Choose when to generate scrolling events": ""
+  },
   "Choose where notification popups appear on screen": {
     "Choose where notification popups appear on screen": "Kies waar meldingen op het scherm verschijnen"
   },
@@ -1688,6 +1679,9 @@
   "Compositor Settings": {
     "Compositor Settings": "Compositor-instellingen"
   },
+  "Compositor actions (focus, move, etc.)": {
+    "Compositor actions (focus, move, etc.)": ""
+  },
   "Config Format": {
     "Config Format": "Config-formaat"
   },
@@ -1804,6 +1798,9 @@
   },
   "Contrast": {
     "Contrast": "Contrast"
+  },
+  "Contrast by variant": {
+    "Contrast by variant": ""
   },
   "Contributor": {
     "Contributor": "Bijdrager"
@@ -2390,6 +2387,15 @@
   "Disable Output": {
     "Disable Output": "Uitvoer uitschakelen"
   },
+  "Disable While Typing": {
+    "Disable While Typing": ""
+  },
+  "Disable on External Mouse": {
+    "Disable on External Mouse": ""
+  },
+  "Disable touchpad when an external mouse is connected": {
+    "Disable touchpad when an external mouse is connected": ""
+  },
   "Disabled": {
     "Disabled": "Uitgeschakeld"
   },
@@ -2549,6 +2555,9 @@
   "Door Open": {
     "Door Open": "Deur open"
   },
+  "Drag Lock": {
+    "Drag Lock": ""
+  },
   "Drag a widget by its handle here to reorder it or drop it into another group": {
     "Drag a widget by its handle here to reorder it or drop it into another group": "Sleep een widget aan de handgreep hiernaartoe om de volgorde te wijzigen of zet hem in een andere groep"
   },
@@ -2621,6 +2630,9 @@
   "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": {
     "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": "Dynamisch: Verende bézier met doorschieten — de binnenkomst gaat kort voorbij het doel en komt dan tot rust. Expressief en levendig."
   },
+  "Edge": {
+    "Edge": ""
+  },
   "Edge Hover Reveal": {
     "Edge Hover Reveal": "Weergeven bij rand-hover"
   },
@@ -2668,6 +2680,9 @@
   },
   "Empty Trash (%1)": {
     "Empty Trash (%1)": "Prullenbak legen (%1)"
+  },
+  "Emulate middle click by pressing left and right buttons": {
+    "Emulate middle click by pressing left and right buttons": ""
   },
   "Enable 10-bit color depth for wider color gamut and HDR support": {
     "Enable 10-bit color depth for wider color gamut and HDR support": "Schakel 10-bits kleurdiepte in voor een breder kleurengamma en HDR-ondersteuning"
@@ -2794,6 +2809,9 @@
   },
   "Enter password for ": {
     "Enter password for ": "Voer wachtwoord in voor "
+  },
+  "Enter text to encode": {
+    "Enter text to encode": ""
   },
   "Enter this passkey on ": {
     "Enter this passkey on ": "Voer deze toegangscode in op "
@@ -2992,6 +3010,9 @@
   },
   "Failed to fetch network QR code: %1": {
     "Failed to fetch network QR code: %1": "Ophalen van netwerk-QR-code mislukt: %1"
+  },
+  "Failed to generate QR code: %1": {
+    "Failed to generate QR code: %1": ""
   },
   "Failed to generate systemd override": {
     "Failed to generate systemd override": "Genereren van systemd-override mislukt"
@@ -3262,6 +3283,12 @@
   },
   "Flags": {
     "Flags": "Vlaggen"
+  },
+  "Flat": {
+    "Flat": ""
+  },
+  "Flat uses constant speed; Adaptive scales with movement speed": {
+    "Flat uses constant speed; Adaptive scales with movement speed": ""
   },
   "Flatpak": {
     "Flatpak": "Flatpak"
@@ -3962,6 +3989,9 @@
   "If the field is hidden, it will appear as soon as a key is pressed.": {
     "If the field is hidden, it will appear as soon as a key is pressed.": "Als het veld verborgen is, verschijnt het zodra een toets wordt ingedrukt."
   },
+  "Ignore App-Requested Timeout": {
+    "Ignore App-Requested Timeout": ""
+  },
   "Ignore Completely": {
     "Ignore Completely": "Volledig negeren"
   },
@@ -4199,6 +4229,9 @@
   "Keep My Edits": {
     "Keep My Edits": "Mijn bewerkingen behouden"
   },
+  "Keep dragging when finger is briefly lifted": {
+    "Keep dragging when finger is briefly lifted": ""
+  },
   "Keep in Bar": {
     "Keep in Bar": "In de balk houden"
   },
@@ -4334,6 +4367,9 @@
   "Left Section": {
     "Left Section": "Linkersectie"
   },
+  "Left-Handed Mode": {
+    "Left-Handed Mode": ""
+  },
   "Light": {
     "Light": "Licht"
   },
@@ -4438,9 +4474,6 @@
   },
   "Locked": {
     "Locked": "Vergrendeld"
-  },
-  "Logging in...": {
-    "Logging in...": "Inloggen..."
   },
   "Login": {
     "Login": "Inloggen"
@@ -4748,6 +4781,9 @@
   "Microphone volume control": {
     "Microphone volume control": "Microfoonvolumeregeling"
   },
+  "Middle Click Emulation": {
+    "Middle Click Emulation": ""
+  },
   "Middle Section": {
     "Middle Section": "Middensectie"
   },
@@ -4823,6 +4859,12 @@
   "Mount Points": {
     "Mount Points": "Aankoppelpunten"
   },
+  "Mouse & Touchpad": {
+    "Mouse & Touchpad": ""
+  },
+  "Mouse Settings": {
+    "Mouse Settings": ""
+  },
   "Mouse clicks pass through the bar to windows behind it": {
     "Mouse clicks pass through the bar to windows behind it": "Muisklikken gaan door de balk heen naar vensters erachter"
   },
@@ -4885,6 +4927,9 @@
   },
   "Native: platform renderer (FreeType).": {
     "Native: platform renderer (FreeType).": "Native: platform-renderer (FreeType)."
+  },
+  "Natural Scrolling": {
+    "Natural Scrolling": ""
   },
   "Natural Touchpad Scrolling": {
     "Natural Touchpad Scrolling": "Natuurlijk scrollen via touchpad"
@@ -5032,6 +5077,9 @@
   },
   "No Rounding": {
     "No Rounding": "Geen afronding"
+  },
+  "No Scroll": {
+    "No Scroll": ""
   },
   "No Shadow": {
     "No Shadow": "Geen schaduw"
@@ -5336,9 +5384,6 @@
   "Not detected": {
     "Not detected": "Niet gedetecteerd"
   },
-  "Not listed?": {
-    "Not listed?": "Niet in de lijst?"
-  },
   "Not paired": {
     "Not paired": "Niet gekoppeld"
   },
@@ -5432,6 +5477,9 @@
   "On": {
     "On": "Aan"
   },
+  "On Button Down": {
+    "On Button Down": ""
+  },
   "On indefinitely": {
     "On indefinitely": "Voor onbepaalde tijd ingeschakeld"
   },
@@ -5449,6 +5497,9 @@
   },
   "Only adjust gamma based on time or location rules.": {
     "Only adjust gamma based on time or location rules.": "Gamma alleen aanpassen op basis van tijd- of locatieregels."
+  },
+  "Only continue if you recognize this server certificate fingerprint.": {
+    "Only continue if you recognize this server certificate fingerprint.": ""
   },
   "Only on Battery": {
     "Only on Battery": "Alleen op accustroom"
@@ -5687,6 +5738,9 @@
   "Pairing...": {
     "Pairing...": "Koppelen..."
   },
+  "Partial": {
+    "Partial": ""
+  },
   "Partly Cloudy": {
     "Partly Cloudy": "Half bewolkt"
   },
@@ -5707,9 +5761,6 @@
   },
   "Password updated": {
     "Password updated": "Wachtwoord bijgewerkt"
-  },
-  "Password...": {
-    "Password...": "Wachtwoord..."
   },
   "Passwords do not match.": {
     "Passwords do not match.": "Wachtwoorden komen niet overeen."
@@ -5894,6 +5945,9 @@
   "Pointer": {
     "Pointer": "Aanwijzer"
   },
+  "Pointer Speed": {
+    "Pointer Speed": ""
+  },
   "Polkit integration is disabled. User management requires Polkit to elevate privileges.": {
     "Polkit integration is disabled. User management requires Polkit to elevate privileges.": "Polkit-integratie is uitgeschakeld. Gebruikersbeheer vereist Polkit voor het verhogen van bevoegdheden."
   },
@@ -6014,6 +6068,9 @@
   "Pressure": {
     "Pressure": "Luchtdruk"
   },
+  "Prevent accidental cursor jumps while typing": {
+    "Prevent accidental cursor jumps while typing": ""
+  },
   "Prevent screen timeout": {
     "Prevent screen timeout": "Scherm-time-out voorkomen"
   },
@@ -6130,6 +6187,9 @@
   },
   "Protocol": {
     "Protocol": "Protocol"
+  },
+  "QR Generator": {
+    "QR Generator": ""
   },
   "Qt": {
     "Qt": "Qt"
@@ -6383,6 +6443,9 @@
   "Requires remembering the last user and session. Enable those options first.": {
     "Requires remembering the last user and session. Enable those options first.": "Vereist het onthouden van de laatste gebruiker en sessie. Schakel die opties eerst in."
   },
+  "Requires the DMS Theme extension from the editor marketplace": {
+    "Requires the DMS Theme extension from the editor marketplace": ""
+  },
   "Reset": {
     "Reset": "Herstellen"
   },
@@ -6436,6 +6499,12 @@
   },
   "Reverse Scrolling Direction": {
     "Reverse Scrolling Direction": "Scrollrichting omkeren"
+  },
+  "Reverse mouse wheel scrolling direction": {
+    "Reverse mouse wheel scrolling direction": ""
+  },
+  "Reverse two-finger scrolling direction": {
+    "Reverse two-finger scrolling direction": ""
   },
   "Reverse workspace switch direction when scrolling over the bar": {
     "Reverse workspace switch direction when scrolling over the bar": "Werkbladwisselrichting omkeren bij scrollen over de balk"
@@ -6644,6 +6713,9 @@
   "Scroll GitHub": {
     "Scroll GitHub": "Scroll GitHub"
   },
+  "Scroll Method": {
+    "Scroll Method": ""
+  },
   "Scroll Wheel": {
     "Scroll Wheel": "Scrollwiel"
   },
@@ -6658,6 +6730,9 @@
   },
   "Scrolling": {
     "Scrolling": "Scrollen"
+  },
+  "Scrolling Speed": {
+    "Scrolling Speed": ""
   },
   "Search App Actions": {
     "Search App Actions": "App-acties zoeken"
@@ -6820,9 +6895,6 @@
   },
   "Select the palette algorithm used for wallpaper-based colors": {
     "Select the palette algorithm used for wallpaper-based colors": "Selecteer het paletalgoritme voor op achtergrond gebaseerde kleuren"
-  },
-  "Select user...": {
-    "Select user...": "Gebruiker selecteren..."
   },
   "Select which keybind providers to include": {
     "Select which keybind providers to include": "Selecteer welke sneltoetsproviders moeten worden opgenomen"
@@ -6991,6 +7063,9 @@
   },
   "Show": {
     "Show": "Tonen"
+  },
+  "Show \"config reloaded\" Toast": {
+    "Show \"config reloaded\" Toast": ""
   },
   "Show 3rd Party": {
     "Show 3rd Party": "Derde partijen tonen"
@@ -7186,6 +7261,9 @@
   },
   "Show a notification when battery reaches the charge limit.": {
     "Show a notification when battery reaches the charge limit.": "Toon een melding wanneer de accu de laadlimiet bereikt."
+  },
+  "Show a toast when the compositor config is reloaded": {
+    "Show a toast when the compositor config is reloaded": ""
   },
   "Show a warning popup when battery is running low.": {
     "Show a warning popup when battery is running low.": "Toon een waarschuwingspop-up als de accu bijna leeg is."
@@ -7529,6 +7607,9 @@
   "Suspend then Hibernate": {
     "Suspend then Hibernate": "Onderbreken dan Sluimerstand"
   },
+  "Swap primary and secondary mouse buttons": {
+    "Swap primary and secondary mouse buttons": ""
+  },
   "Sway Website": {
     "Sway Website": "Sway-website"
   },
@@ -7652,6 +7733,18 @@
   "Tailscale not available": {
     "Tailscale not available": "Tailscale niet beschikbaar"
   },
+  "Tap and Drag": {
+    "Tap and Drag": ""
+  },
+  "Tap and drag on the touchpad to move items": {
+    "Tap and drag on the touchpad to move items": ""
+  },
+  "Tap the touchpad surface to trigger left click clicks": {
+    "Tap the touchpad surface to trigger left click clicks": ""
+  },
+  "Tap to Click": {
+    "Tap to Click": ""
+  },
   "Terminal": {
     "Terminal": "Terminal"
   },
@@ -7726,6 +7819,9 @@
   },
   "The rule applies to any window matching one of these.": {
     "The rule applies to any window matching one of these.": "De regel is van toepassing op elk venster dat overeenkomt met een van deze."
+  },
+  "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": {
+    "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": ""
   },
   "Theme & Colors": {
     "Theme & Colors": "Thema & Kleuren"
@@ -7919,9 +8015,6 @@
   "Too many attempts - locked out": {
     "Too many attempts - locked out": "Te veel pogingen - toegang geblokkeerd"
   },
-  "Too many failed attempts - account may be locked": {
-    "Too many failed attempts - account may be locked": "Te veel mislukte pogingen - account is mogelijk geblokkeerd"
-  },
   "Tools": {
     "Tools": "Hulpmiddelen"
   },
@@ -7957,6 +8050,12 @@
   },
   "Touch your security key...": {
     "Touch your security key...": "Raak uw beveiligingssleutel aan..."
+  },
+  "Touchpad Settings": {
+    "Touchpad Settings": ""
+  },
+  "Touchpad Speed": {
+    "Touchpad Speed": ""
   },
   "Transform": {
     "Transform": "Transformatie"
@@ -8017,6 +8116,9 @@
   },
   "Turn off now": {
     "Turn off now": "Nu uitschakelen"
+  },
+  "Two Finger": {
+    "Two Finger": ""
   },
   "Type at least 2 characters": {
     "Type at least 2 characters": "Typ minstens 2 tekens"
@@ -8158,6 +8260,9 @@
   },
   "Untrust": {
     "Untrust": "Niet vertrouwen"
+  },
+  "Untrusted VPN certificate": {
+    "Untrusted VPN certificate": ""
   },
   "Up to date": {
     "Up to date": "Bijgewerkt"
@@ -8341,9 +8446,6 @@
   },
   "Username must start with a lowercase letter or underscore and contain only lowercase letters, digits, hyphens, or underscores.": {
     "Username must start with a lowercase letter or underscore and contain only lowercase letters, digits, hyphens, or underscores.": "Gebruikersnaam moet beginnen met een kleine letter of underscore en mag alleen kleine letters, cijfers, koppeltekens of underscores bevatten."
-  },
-  "Username...": {
-    "Username...": "Gebruikersnaam..."
   },
   "Users": {
     "Users": "Gebruikers"
@@ -8764,6 +8866,9 @@
   },
   "attached": {
     "attached": "gekoppeld"
+  },
+  "below AA": {
+    "below AA": ""
   },
   "brandon": {
     "brandon": "brandon"

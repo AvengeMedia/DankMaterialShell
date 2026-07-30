@@ -335,6 +335,9 @@
   "About": {
     "About": "Giới thiệu"
   },
+  "Acceleration Profile": {
+    "Acceleration Profile": ""
+  },
   "Accent Color": {
     "Accent Color": "Màu nhấn"
   },
@@ -409,6 +412,9 @@
   },
   "Adapters": {
     "Adapters": "Bộ chuyển đổi"
+  },
+  "Adaptive": {
+    "Adaptive": ""
   },
   "Adaptive Media Width": {
     "Adaptive Media Width": "Chiều rộng phương tiện thích ứng"
@@ -485,11 +491,20 @@
   "Add to Autostart": {
     "Add to Autostart": "Thêm vào Tự động khởi động"
   },
+  "Adjust pointer sensitivity speed": {
+    "Adjust pointer sensitivity speed": ""
+  },
+  "Adjust scrolling sensitivity multiplier": {
+    "Adjust scrolling sensitivity multiplier": ""
+  },
   "Adjust the bar height via inner padding": {
     "Adjust the bar height via inner padding": "Điều chỉnh chiều cao của thanh thông qua khoảng đệm bên trong"
   },
   "Adjust the number of columns in grid view mode.": {
     "Adjust the number of columns in grid view mode.": "Điều chỉnh số cột trong chế độ xem lưới."
+  },
+  "Adjust touchpad pointer speed": {
+    "Adjust touchpad pointer speed": ""
   },
   "Adjust volume per scroll indent": {
     "Adjust volume per scroll indent": "Điều chỉnh âm lượng theo từng nấc cuộn"
@@ -574,6 +589,9 @@
   },
   "Always show when there's only one connected display": {
     "Always show when there's only one connected display": "Luôn hiển thị khi chỉ có một màn hình được kết nối"
+  },
+  "Always use the durations above, even if an app requests a shorter or longer one": {
+    "Always use the durations above, even if an app requests a shorter or longer one": ""
   },
   "Always use this app for %1": {
     "Always use this app for %1": "Luôn sử dụng ứng dụng này cho %1"
@@ -782,9 +800,6 @@
   "Authenticated!": {
     "Authenticated!": ""
   },
-  "Authenticating...": {
-    "Authenticating...": "Đang xác thực..."
-  },
   "Authentication": {
     "Authentication": "Xác thực"
   },
@@ -802,18 +817,6 @@
   },
   "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": {
     "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": "Các thay đổi xác thực cần sudo. Đang mở cửa sổ dòng lệnh để bạn có thể sử dụng mật khẩu hoặc vân tay."
-  },
-  "Authentication error - try again": {
-    "Authentication error - try again": "Lỗi xác thực - hãy thử lại"
-  },
-  "Authentication failed - attempt %1 of %2": {
-    "Authentication failed - attempt %1 of %2": ""
-  },
-  "Authentication failed - lockout can occur": {
-    "Authentication failed - lockout can occur": ""
-  },
-  "Authentication failed - try again": {
-    "Authentication failed - try again": ""
   },
   "Authorize": {
     "Authorize": "Ủy quyền"
@@ -877,9 +880,6 @@
   },
   "Auto-hide Dock": {
     "Auto-hide Dock": "Tự động ẩn thanh dock"
-  },
-  "Auto-login": {
-    "Auto-login": "Tự động đăng nhập"
   },
   "Auto-login change needs a sync": {
     "Auto-login change needs a sync": "Thay đổi tự động đăng nhập cần đồng bộ hóa"
@@ -980,23 +980,11 @@
   "Available in Detailed and Forecast view modes": {
     "Available in Detailed and Forecast view modes": "Có sẵn trong chế độ xem Chi tiết và Dự báo"
   },
-  "Awaiting fingerprint authentication": {
-    "Awaiting fingerprint authentication": ""
-  },
-  "Awaiting fingerprint or security key authentication": {
-    "Awaiting fingerprint or security key authentication": ""
-  },
-  "Awaiting security key authentication": {
-    "Awaiting security key authentication": ""
-  },
   "BSSID": {
     "BSSID": "BSSID"
   },
   "Back": {
     "Back": "Quay lại"
-  },
-  "Back to user list": {
-    "Back to user list": "Quay lại danh sách người dùng"
   },
   "Backend": {
     "Backend": "Backend"
@@ -1454,6 +1442,9 @@
   "Choose wallpaper folder": {
     "Choose wallpaper folder": "Chọn thư mục hình nền"
   },
+  "Choose when to generate scrolling events": {
+    "Choose when to generate scrolling events": ""
+  },
   "Choose where notification popups appear on screen": {
     "Choose where notification popups appear on screen": "Chọn nơi hộp thông báo nổi được hiển thị"
   },
@@ -1688,6 +1679,9 @@
   "Compositor Settings": {
     "Compositor Settings": "Cài đặt Compositor"
   },
+  "Compositor actions (focus, move, etc.)": {
+    "Compositor actions (focus, move, etc.)": ""
+  },
   "Config Format": {
     "Config Format": "Định dạng cấu hình"
   },
@@ -1804,6 +1798,9 @@
   },
   "Contrast": {
     "Contrast": "Độ tương phản"
+  },
+  "Contrast by variant": {
+    "Contrast by variant": ""
   },
   "Contributor": {
     "Contributor": "Người đóng góp"
@@ -2390,6 +2387,15 @@
   "Disable Output": {
     "Disable Output": "Tắt đầu ra"
   },
+  "Disable While Typing": {
+    "Disable While Typing": ""
+  },
+  "Disable on External Mouse": {
+    "Disable on External Mouse": ""
+  },
+  "Disable touchpad when an external mouse is connected": {
+    "Disable touchpad when an external mouse is connected": ""
+  },
   "Disabled": {
     "Disabled": "Đã tắt"
   },
@@ -2549,6 +2555,9 @@
   "Door Open": {
     "Door Open": "Cửa mở"
   },
+  "Drag Lock": {
+    "Drag Lock": ""
+  },
   "Drag a widget by its handle here to reorder it or drop it into another group": {
     "Drag a widget by its handle here to reorder it or drop it into another group": "Kéo một widget bằng tay cầm của nó tại đây để sắp xếp lại hoặc thả nó vào một nhóm khác"
   },
@@ -2621,6 +2630,9 @@
   "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": {
     "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": "Động: Đường cong bezier lò xo với độ vọt lố — phần nhập vượt quá mục tiêu một thời gian ngắn rồi ổn định. Sống động và đầy biểu cảm."
   },
+  "Edge": {
+    "Edge": ""
+  },
   "Edge Hover Reveal": {
     "Edge Hover Reveal": "Tiết lộ Khi Di chuột Qua Cạnh"
   },
@@ -2668,6 +2680,9 @@
   },
   "Empty Trash (%1)": {
     "Empty Trash (%1)": "Dọn sạch thùng rác (%1)"
+  },
+  "Emulate middle click by pressing left and right buttons": {
+    "Emulate middle click by pressing left and right buttons": ""
   },
   "Enable 10-bit color depth for wider color gamut and HDR support": {
     "Enable 10-bit color depth for wider color gamut and HDR support": "Bật độ sâu màu 10-bit cho gam màu rộng hơn và hỗ trợ HDR"
@@ -2794,6 +2809,9 @@
   },
   "Enter password for ": {
     "Enter password for ": "Nhập mật khẩu cho "
+  },
+  "Enter text to encode": {
+    "Enter text to encode": ""
   },
   "Enter this passkey on ": {
     "Enter this passkey on ": "Nhập mã xác nhận này trên "
@@ -2992,6 +3010,9 @@
   },
   "Failed to fetch network QR code: %1": {
     "Failed to fetch network QR code: %1": "Lấy mã QR mạng thất bại: %1"
+  },
+  "Failed to generate QR code: %1": {
+    "Failed to generate QR code: %1": ""
   },
   "Failed to generate systemd override": {
     "Failed to generate systemd override": "Không thể tạo ghi đè systemd"
@@ -3262,6 +3283,12 @@
   },
   "Flags": {
     "Flags": "Cờ"
+  },
+  "Flat": {
+    "Flat": ""
+  },
+  "Flat uses constant speed; Adaptive scales with movement speed": {
+    "Flat uses constant speed; Adaptive scales with movement speed": ""
   },
   "Flatpak": {
     "Flatpak": ""
@@ -3962,6 +3989,9 @@
   "If the field is hidden, it will appear as soon as a key is pressed.": {
     "If the field is hidden, it will appear as soon as a key is pressed.": "Nếu trường bị ẩn, nó sẽ xuất hiện ngay khi một phím được nhấn."
   },
+  "Ignore App-Requested Timeout": {
+    "Ignore App-Requested Timeout": ""
+  },
   "Ignore Completely": {
     "Ignore Completely": "Bỏ qua hoàn toàn"
   },
@@ -4199,6 +4229,9 @@
   "Keep My Edits": {
     "Keep My Edits": "Giữ các chỉnh sửa của tôi"
   },
+  "Keep dragging when finger is briefly lifted": {
+    "Keep dragging when finger is briefly lifted": ""
+  },
   "Keep in Bar": {
     "Keep in Bar": "Giữ trong thanh"
   },
@@ -4334,6 +4367,9 @@
   "Left Section": {
     "Left Section": "Phần bên trái"
   },
+  "Left-Handed Mode": {
+    "Left-Handed Mode": ""
+  },
   "Light": {
     "Light": "Nhẹ / Sáng"
   },
@@ -4438,9 +4474,6 @@
   },
   "Locked": {
     "Locked": "Đã khóa"
-  },
-  "Logging in...": {
-    "Logging in...": "Đang đăng nhập..."
   },
   "Login": {
     "Login": "Đăng nhập"
@@ -4748,6 +4781,9 @@
   "Microphone volume control": {
     "Microphone volume control": "Điều khiển âm lượng micro"
   },
+  "Middle Click Emulation": {
+    "Middle Click Emulation": ""
+  },
   "Middle Section": {
     "Middle Section": "Mục giữa"
   },
@@ -4823,6 +4859,12 @@
   "Mount Points": {
     "Mount Points": "Điểm gắn (Mount points)"
   },
+  "Mouse & Touchpad": {
+    "Mouse & Touchpad": ""
+  },
+  "Mouse Settings": {
+    "Mouse Settings": ""
+  },
   "Mouse clicks pass through the bar to windows behind it": {
     "Mouse clicks pass through the bar to windows behind it": "Các cú nhấp chuột đi xuyên qua thanh tới các cửa sổ phía sau"
   },
@@ -4885,6 +4927,9 @@
   },
   "Native: platform renderer (FreeType).": {
     "Native: platform renderer (FreeType).": "Gốc: trình kết xuất nền tảng (FreeType)."
+  },
+  "Natural Scrolling": {
+    "Natural Scrolling": ""
   },
   "Natural Touchpad Scrolling": {
     "Natural Touchpad Scrolling": "Cuộn tự nhiên trên bàn di chuột"
@@ -5032,6 +5077,9 @@
   },
   "No Rounding": {
     "No Rounding": "Không bo góc"
+  },
+  "No Scroll": {
+    "No Scroll": ""
   },
   "No Shadow": {
     "No Shadow": "Không có bóng"
@@ -5336,9 +5384,6 @@
   "Not detected": {
     "Not detected": "Không phát hiện được"
   },
-  "Not listed?": {
-    "Not listed?": "Không có trong danh sách?"
-  },
   "Not paired": {
     "Not paired": "Chưa ghép đôi"
   },
@@ -5432,6 +5477,9 @@
   "On": {
     "On": "Bật"
   },
+  "On Button Down": {
+    "On Button Down": ""
+  },
   "On indefinitely": {
     "On indefinitely": "Bật vô thời hạn"
   },
@@ -5449,6 +5497,9 @@
   },
   "Only adjust gamma based on time or location rules.": {
     "Only adjust gamma based on time or location rules.": "Chỉ điều chỉnh gamma dựa trên quy tắc thời gian hoặc địa điểm."
+  },
+  "Only continue if you recognize this server certificate fingerprint.": {
+    "Only continue if you recognize this server certificate fingerprint.": ""
   },
   "Only on Battery": {
     "Only on Battery": "Chỉ Trên Pin"
@@ -5687,6 +5738,9 @@
   "Pairing...": {
     "Pairing...": "Đang ghép đôi..."
   },
+  "Partial": {
+    "Partial": ""
+  },
   "Partly Cloudy": {
     "Partly Cloudy": "Có mây rải rác"
   },
@@ -5707,9 +5761,6 @@
   },
   "Password updated": {
     "Password updated": "Đã cập nhật mật khẩu"
-  },
-  "Password...": {
-    "Password...": "Mật khẩu..."
   },
   "Passwords do not match.": {
     "Passwords do not match.": "Mật khẩu không khớp."
@@ -5894,6 +5945,9 @@
   "Pointer": {
     "Pointer": "Con trỏ"
   },
+  "Pointer Speed": {
+    "Pointer Speed": ""
+  },
   "Polkit integration is disabled. User management requires Polkit to elevate privileges.": {
     "Polkit integration is disabled. User management requires Polkit to elevate privileges.": "Tích hợp Polkit đã bị tắt. Quản lý người dùng yêu cầu Polkit để nâng cao đặc quyền."
   },
@@ -6014,6 +6068,9 @@
   "Pressure": {
     "Pressure": "Áp suất"
   },
+  "Prevent accidental cursor jumps while typing": {
+    "Prevent accidental cursor jumps while typing": ""
+  },
   "Prevent screen timeout": {
     "Prevent screen timeout": "Ngăn tắt màn hình"
   },
@@ -6130,6 +6187,9 @@
   },
   "Protocol": {
     "Protocol": "Giao thức"
+  },
+  "QR Generator": {
+    "QR Generator": ""
   },
   "Qt": {
     "Qt": "Qt"
@@ -6383,6 +6443,9 @@
   "Requires remembering the last user and session. Enable those options first.": {
     "Requires remembering the last user and session. Enable those options first.": "Yêu cầu ghi nhớ người dùng và phiên làm việc cuối. Hãy bật các tùy chọn đó trước."
   },
+  "Requires the DMS Theme extension from the editor marketplace": {
+    "Requires the DMS Theme extension from the editor marketplace": ""
+  },
   "Reset": {
     "Reset": "Đặt lại"
   },
@@ -6436,6 +6499,12 @@
   },
   "Reverse Scrolling Direction": {
     "Reverse Scrolling Direction": "Đảo ngược hướng cuộn"
+  },
+  "Reverse mouse wheel scrolling direction": {
+    "Reverse mouse wheel scrolling direction": ""
+  },
+  "Reverse two-finger scrolling direction": {
+    "Reverse two-finger scrolling direction": ""
   },
   "Reverse workspace switch direction when scrolling over the bar": {
     "Reverse workspace switch direction when scrolling over the bar": "Đảo ngược hướng chuyển đổi không gian làm việc khi cuộn trên thanh"
@@ -6644,6 +6713,9 @@
   "Scroll GitHub": {
     "Scroll GitHub": "Cuộn GitHub"
   },
+  "Scroll Method": {
+    "Scroll Method": ""
+  },
   "Scroll Wheel": {
     "Scroll Wheel": "Bánh xe chuột"
   },
@@ -6658,6 +6730,9 @@
   },
   "Scrolling": {
     "Scrolling": "Cuộn"
+  },
+  "Scrolling Speed": {
+    "Scrolling Speed": ""
   },
   "Search App Actions": {
     "Search App Actions": "Tìm kiếm hành động ứng dụng"
@@ -6820,9 +6895,6 @@
   },
   "Select the palette algorithm used for wallpaper-based colors": {
     "Select the palette algorithm used for wallpaper-based colors": "Chọn thuật toán bảng màu được sử dụng cho màu dựa trên hình nền"
-  },
-  "Select user...": {
-    "Select user...": "Chọn người dùng..."
   },
   "Select which keybind providers to include": {
     "Select which keybind providers to include": "Chọn các nhà cung cấp phím tắt nào để bao gồm"
@@ -6991,6 +7063,9 @@
   },
   "Show": {
     "Show": "Hiển thị"
+  },
+  "Show \"config reloaded\" Toast": {
+    "Show \"config reloaded\" Toast": ""
   },
   "Show 3rd Party": {
     "Show 3rd Party": "Hiển thị ứng dụng Bên thứ ba"
@@ -7186,6 +7261,9 @@
   },
   "Show a notification when battery reaches the charge limit.": {
     "Show a notification when battery reaches the charge limit.": "Hiển thị thông báo khi pin đạt giới hạn sạc."
+  },
+  "Show a toast when the compositor config is reloaded": {
+    "Show a toast when the compositor config is reloaded": ""
   },
   "Show a warning popup when battery is running low.": {
     "Show a warning popup when battery is running low.": "Hiển thị cửa sổ cảnh báo khi pin sắp hết."
@@ -7529,6 +7607,9 @@
   "Suspend then Hibernate": {
     "Suspend then Hibernate": "Ngủ rồi Ngủ đông"
   },
+  "Swap primary and secondary mouse buttons": {
+    "Swap primary and secondary mouse buttons": ""
+  },
   "Sway Website": {
     "Sway Website": "Trang web Sway"
   },
@@ -7652,6 +7733,18 @@
   "Tailscale not available": {
     "Tailscale not available": "Tailscale không khả dụng"
   },
+  "Tap and Drag": {
+    "Tap and Drag": ""
+  },
+  "Tap and drag on the touchpad to move items": {
+    "Tap and drag on the touchpad to move items": ""
+  },
+  "Tap the touchpad surface to trigger left click clicks": {
+    "Tap the touchpad surface to trigger left click clicks": ""
+  },
+  "Tap to Click": {
+    "Tap to Click": ""
+  },
   "Terminal": {
     "Terminal": "Cửa sổ dòng lệnh"
   },
@@ -7726,6 +7819,9 @@
   },
   "The rule applies to any window matching one of these.": {
     "The rule applies to any window matching one of these.": "Quy tắc áp dụng cho bất kỳ cửa sổ nào khớp với một trong các điều kiện này."
+  },
+  "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": {
+    "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": ""
   },
   "Theme & Colors": {
     "Theme & Colors": "Chủ đề & Màu"
@@ -7919,9 +8015,6 @@
   "Too many attempts - locked out": {
     "Too many attempts - locked out": "Quá nhiều lần thử - đã bị khóa"
   },
-  "Too many failed attempts - account may be locked": {
-    "Too many failed attempts - account may be locked": "Quá nhiều lần thử thất bại - tài khoản có thể đã bị khóa"
-  },
   "Tools": {
     "Tools": "Công cụ"
   },
@@ -7957,6 +8050,12 @@
   },
   "Touch your security key...": {
     "Touch your security key...": "Chạm vào khóa bảo mật của bạn..."
+  },
+  "Touchpad Settings": {
+    "Touchpad Settings": ""
+  },
+  "Touchpad Speed": {
+    "Touchpad Speed": ""
   },
   "Transform": {
     "Transform": "Biến đổi"
@@ -8017,6 +8116,9 @@
   },
   "Turn off now": {
     "Turn off now": "Tắt ngay"
+  },
+  "Two Finger": {
+    "Two Finger": ""
   },
   "Type at least 2 characters": {
     "Type at least 2 characters": "Nhập ít nhất 2 ký tự"
@@ -8158,6 +8260,9 @@
   },
   "Untrust": {
     "Untrust": "Ngừng tin cậy"
+  },
+  "Untrusted VPN certificate": {
+    "Untrusted VPN certificate": ""
   },
   "Up to date": {
     "Up to date": "Đã cập nhật"
@@ -8341,9 +8446,6 @@
   },
   "Username must start with a lowercase letter or underscore and contain only lowercase letters, digits, hyphens, or underscores.": {
     "Username must start with a lowercase letter or underscore and contain only lowercase letters, digits, hyphens, or underscores.": "Tên người dùng phải bắt đầu bằng chữ thường hoặc dấu gạch dưới và chỉ chứa các chữ cái thường, chữ số, dấu gạch nối hoặc dấu gạch dưới."
-  },
-  "Username...": {
-    "Username...": "Tên người dùng..."
   },
   "Users": {
     "Users": "Người dùng"
@@ -8764,6 +8866,9 @@
   },
   "attached": {
     "attached": "đã đính kèm"
+  },
+  "below AA": {
+    "below AA": ""
   },
   "brandon": {
     "brandon": "brandon (Kiểu)"

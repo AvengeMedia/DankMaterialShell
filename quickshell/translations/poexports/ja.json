@@ -335,6 +335,9 @@
   "About": {
     "About": "バージョン情報"
   },
+  "Acceleration Profile": {
+    "Acceleration Profile": ""
+  },
   "Accent Color": {
     "Accent Color": "アクセントカラー"
   },
@@ -409,6 +412,9 @@
   },
   "Adapters": {
     "Adapters": "アダプター"
+  },
+  "Adaptive": {
+    "Adaptive": ""
   },
   "Adaptive Media Width": {
     "Adaptive Media Width": "メディア幅の自動調整"
@@ -485,11 +491,20 @@
   "Add to Autostart": {
     "Add to Autostart": "自動起動に追加"
   },
+  "Adjust pointer sensitivity speed": {
+    "Adjust pointer sensitivity speed": ""
+  },
+  "Adjust scrolling sensitivity multiplier": {
+    "Adjust scrolling sensitivity multiplier": ""
+  },
   "Adjust the bar height via inner padding": {
     "Adjust the bar height via inner padding": "内側の余白でバーの高さを調整"
   },
   "Adjust the number of columns in grid view mode.": {
     "Adjust the number of columns in grid view mode.": "グリッド表示モードでの列数を調整します。"
+  },
+  "Adjust touchpad pointer speed": {
+    "Adjust touchpad pointer speed": ""
   },
   "Adjust volume per scroll indent": {
     "Adjust volume per scroll indent": "スクロール1段ごとの音量調整"
@@ -574,6 +589,9 @@
   },
   "Always show when there's only one connected display": {
     "Always show when there's only one connected display": "接続されたディスプレイが1つだけのときは常に表示"
+  },
+  "Always use the durations above, even if an app requests a shorter or longer one": {
+    "Always use the durations above, even if an app requests a shorter or longer one": ""
   },
   "Always use this app for %1": {
     "Always use this app for %1": "%1 は常にこのアプリ使用する"
@@ -782,9 +800,6 @@
   "Authenticated!": {
     "Authenticated!": ""
   },
-  "Authenticating...": {
-    "Authenticating...": "認証中..."
-  },
   "Authentication": {
     "Authentication": "認証"
   },
@@ -802,18 +817,6 @@
   },
   "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": {
     "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": "認証の変更には sudo が必要です。パスワードまたは指紋を使用できるよう端末を開きます。"
-  },
-  "Authentication error - try again": {
-    "Authentication error - try again": "認証エラー - もう一度試してください"
-  },
-  "Authentication failed - attempt %1 of %2": {
-    "Authentication failed - attempt %1 of %2": ""
-  },
-  "Authentication failed - lockout can occur": {
-    "Authentication failed - lockout can occur": ""
-  },
-  "Authentication failed - try again": {
-    "Authentication failed - try again": ""
   },
   "Authorize": {
     "Authorize": "許可"
@@ -877,9 +880,6 @@
   },
   "Auto-hide Dock": {
     "Auto-hide Dock": "ドックを自動的に隠す"
-  },
-  "Auto-login": {
-    "Auto-login": "自動ログイン"
   },
   "Auto-login change needs a sync": {
     "Auto-login change needs a sync": ""
@@ -980,23 +980,11 @@
   "Available in Detailed and Forecast view modes": {
     "Available in Detailed and Forecast view modes": "詳細表示と予報表示で利用可能"
   },
-  "Awaiting fingerprint authentication": {
-    "Awaiting fingerprint authentication": ""
-  },
-  "Awaiting fingerprint or security key authentication": {
-    "Awaiting fingerprint or security key authentication": ""
-  },
-  "Awaiting security key authentication": {
-    "Awaiting security key authentication": ""
-  },
   "BSSID": {
     "BSSID": "BSSID"
   },
   "Back": {
     "Back": "戻る"
-  },
-  "Back to user list": {
-    "Back to user list": "ユーザー一覧に戻る"
   },
   "Backend": {
     "Backend": "バックエンド"
@@ -1454,6 +1442,9 @@
   "Choose wallpaper folder": {
     "Choose wallpaper folder": ""
   },
+  "Choose when to generate scrolling events": {
+    "Choose when to generate scrolling events": ""
+  },
   "Choose where notification popups appear on screen": {
     "Choose where notification popups appear on screen": "通知ポップアップが画面に表示される場所を選ぶ"
   },
@@ -1688,6 +1679,9 @@
   "Compositor Settings": {
     "Compositor Settings": "コンポジター設定"
   },
+  "Compositor actions (focus, move, etc.)": {
+    "Compositor actions (focus, move, etc.)": ""
+  },
   "Config Format": {
     "Config Format": "設定形式"
   },
@@ -1804,6 +1798,9 @@
   },
   "Contrast": {
     "Contrast": "コントラスト"
+  },
+  "Contrast by variant": {
+    "Contrast by variant": ""
   },
   "Contributor": {
     "Contributor": "貢献者"
@@ -2390,6 +2387,15 @@
   "Disable Output": {
     "Disable Output": "出力を無効化"
   },
+  "Disable While Typing": {
+    "Disable While Typing": ""
+  },
+  "Disable on External Mouse": {
+    "Disable on External Mouse": ""
+  },
+  "Disable touchpad when an external mouse is connected": {
+    "Disable touchpad when an external mouse is connected": ""
+  },
   "Disabled": {
     "Disabled": "無効"
   },
@@ -2549,6 +2555,9 @@
   "Door Open": {
     "Door Open": "ドアオープン"
   },
+  "Drag Lock": {
+    "Drag Lock": ""
+  },
   "Drag a widget by its handle here to reorder it or drop it into another group": {
     "Drag a widget by its handle here to reorder it or drop it into another group": ""
   },
@@ -2621,6 +2630,9 @@
   "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": {
     "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": "ダイナミック：オーバーシュート付きスプリングベジェ曲線 ― 開始点が目標値を一時的に超えた後、落ち着きます。表現力豊かで生き生きとした曲線です。"
   },
+  "Edge": {
+    "Edge": ""
+  },
   "Edge Hover Reveal": {
     "Edge Hover Reveal": ""
   },
@@ -2668,6 +2680,9 @@
   },
   "Empty Trash (%1)": {
     "Empty Trash (%1)": "ゴミ箱を空にする (%1)"
+  },
+  "Emulate middle click by pressing left and right buttons": {
+    "Emulate middle click by pressing left and right buttons": ""
   },
   "Enable 10-bit color depth for wider color gamut and HDR support": {
     "Enable 10-bit color depth for wider color gamut and HDR support": "より広い色域と HDR サポートのために 10 ビット色深度を有効にします"
@@ -2794,6 +2809,9 @@
   },
   "Enter password for ": {
     "Enter password for ": "パスワードを入力"
+  },
+  "Enter text to encode": {
+    "Enter text to encode": ""
   },
   "Enter this passkey on ": {
     "Enter this passkey on ": "ここでパスキーを入力してください "
@@ -2992,6 +3010,9 @@
   },
   "Failed to fetch network QR code: %1": {
     "Failed to fetch network QR code: %1": "ネットワークQRコードの取得に失敗しました: %1"
+  },
+  "Failed to generate QR code: %1": {
+    "Failed to generate QR code: %1": ""
   },
   "Failed to generate systemd override": {
     "Failed to generate systemd override": "systemd override の生成に失敗しました"
@@ -3262,6 +3283,12 @@
   },
   "Flags": {
     "Flags": "フラグ"
+  },
+  "Flat": {
+    "Flat": ""
+  },
+  "Flat uses constant speed; Adaptive scales with movement speed": {
+    "Flat uses constant speed; Adaptive scales with movement speed": ""
   },
   "Flatpak": {
     "Flatpak": ""
@@ -3962,6 +3989,9 @@
   "If the field is hidden, it will appear as soon as a key is pressed.": {
     "If the field is hidden, it will appear as soon as a key is pressed.": "フィールドが非表示の場合、キーが押されるとすぐに表示されます。"
   },
+  "Ignore App-Requested Timeout": {
+    "Ignore App-Requested Timeout": ""
+  },
   "Ignore Completely": {
     "Ignore Completely": "完全に無視"
   },
@@ -4199,6 +4229,9 @@
   "Keep My Edits": {
     "Keep My Edits": "自分の編集を保持"
   },
+  "Keep dragging when finger is briefly lifted": {
+    "Keep dragging when finger is briefly lifted": ""
+  },
   "Keep in Bar": {
     "Keep in Bar": "バーに残す"
   },
@@ -4334,6 +4367,9 @@
   "Left Section": {
     "Left Section": "左セクション"
   },
+  "Left-Handed Mode": {
+    "Left-Handed Mode": ""
+  },
   "Light": {
     "Light": "ライト"
   },
@@ -4438,9 +4474,6 @@
   },
   "Locked": {
     "Locked": "ロック済み"
-  },
-  "Logging in...": {
-    "Logging in...": "ログイン中..."
   },
   "Login": {
     "Login": "ログイン"
@@ -4748,6 +4781,9 @@
   "Microphone volume control": {
     "Microphone volume control": "マイク音量コントロール"
   },
+  "Middle Click Emulation": {
+    "Middle Click Emulation": ""
+  },
   "Middle Section": {
     "Middle Section": "中間区間"
   },
@@ -4823,6 +4859,12 @@
   "Mount Points": {
     "Mount Points": "マウントポイント"
   },
+  "Mouse & Touchpad": {
+    "Mouse & Touchpad": ""
+  },
+  "Mouse Settings": {
+    "Mouse Settings": ""
+  },
   "Mouse clicks pass through the bar to windows behind it": {
     "Mouse clicks pass through the bar to windows behind it": "マウスクリックをバーの背後のウィンドウへ通す"
   },
@@ -4885,6 +4927,9 @@
   },
   "Native: platform renderer (FreeType).": {
     "Native: platform renderer (FreeType).": "ネイティブ: プラットフォームレンダラー (FreeType)。"
+  },
+  "Natural Scrolling": {
+    "Natural Scrolling": ""
   },
   "Natural Touchpad Scrolling": {
     "Natural Touchpad Scrolling": "タッチパッドのナチュラルスクロール"
@@ -5032,6 +5077,9 @@
   },
   "No Rounding": {
     "No Rounding": "角丸なし"
+  },
+  "No Scroll": {
+    "No Scroll": ""
   },
   "No Shadow": {
     "No Shadow": "影なし"
@@ -5336,9 +5384,6 @@
   "Not detected": {
     "Not detected": "未検出"
   },
-  "Not listed?": {
-    "Not listed?": "一覧にありませんか？"
-  },
   "Not paired": {
     "Not paired": "未ペアリング"
   },
@@ -5432,6 +5477,9 @@
   "On": {
     "On": "オン"
   },
+  "On Button Down": {
+    "On Button Down": ""
+  },
   "On indefinitely": {
     "On indefinitely": "無期限にオン"
   },
@@ -5449,6 +5497,9 @@
   },
   "Only adjust gamma based on time or location rules.": {
     "Only adjust gamma based on time or location rules.": "ガンマは、時間または場所のルールに基づいてのみ調整します。"
+  },
+  "Only continue if you recognize this server certificate fingerprint.": {
+    "Only continue if you recognize this server certificate fingerprint.": ""
   },
   "Only on Battery": {
     "Only on Battery": "バッテリー駆動時のみ"
@@ -5687,6 +5738,9 @@
   "Pairing...": {
     "Pairing...": "ペアリング中..."
   },
+  "Partial": {
+    "Partial": ""
+  },
   "Partly Cloudy": {
     "Partly Cloudy": "晴れ時々曇り"
   },
@@ -5707,9 +5761,6 @@
   },
   "Password updated": {
     "Password updated": "パスワードを更新しました"
-  },
-  "Password...": {
-    "Password...": "パスワード..."
   },
   "Passwords do not match.": {
     "Passwords do not match.": "パスワードが一致しません。"
@@ -5894,6 +5945,9 @@
   "Pointer": {
     "Pointer": "ポインター"
   },
+  "Pointer Speed": {
+    "Pointer Speed": ""
+  },
   "Polkit integration is disabled. User management requires Polkit to elevate privileges.": {
     "Polkit integration is disabled. User management requires Polkit to elevate privileges.": "Polkit 連携が無効です。ユーザー管理には Polkit による権限昇格が必要です。"
   },
@@ -6014,6 +6068,9 @@
   "Pressure": {
     "Pressure": "気圧"
   },
+  "Prevent accidental cursor jumps while typing": {
+    "Prevent accidental cursor jumps while typing": ""
+  },
   "Prevent screen timeout": {
     "Prevent screen timeout": "画面のタイムアウトを防止"
   },
@@ -6130,6 +6187,9 @@
   },
   "Protocol": {
     "Protocol": "プロトコル"
+  },
+  "QR Generator": {
+    "QR Generator": ""
   },
   "Qt": {
     "Qt": "Qt"
@@ -6383,6 +6443,9 @@
   "Requires remembering the last user and session. Enable those options first.": {
     "Requires remembering the last user and session. Enable those options first.": "最後のユーザーとセッションの記憶が必要です。先にそれらのオプションを有効にしてください。"
   },
+  "Requires the DMS Theme extension from the editor marketplace": {
+    "Requires the DMS Theme extension from the editor marketplace": ""
+  },
   "Reset": {
     "Reset": "リセット"
   },
@@ -6436,6 +6499,12 @@
   },
   "Reverse Scrolling Direction": {
     "Reverse Scrolling Direction": "スクロール方向を反転"
+  },
+  "Reverse mouse wheel scrolling direction": {
+    "Reverse mouse wheel scrolling direction": ""
+  },
+  "Reverse two-finger scrolling direction": {
+    "Reverse two-finger scrolling direction": ""
   },
   "Reverse workspace switch direction when scrolling over the bar": {
     "Reverse workspace switch direction when scrolling over the bar": "バー上でスクロールしたときのワークスペース切り替え方向を反転"
@@ -6644,6 +6713,9 @@
   "Scroll GitHub": {
     "Scroll GitHub": "GitHub をスクロール"
   },
+  "Scroll Method": {
+    "Scroll Method": ""
+  },
   "Scroll Wheel": {
     "Scroll Wheel": "スクロールホイール"
   },
@@ -6658,6 +6730,9 @@
   },
   "Scrolling": {
     "Scrolling": "スクロール"
+  },
+  "Scrolling Speed": {
+    "Scrolling Speed": ""
   },
   "Search App Actions": {
     "Search App Actions": "アプリのアクションを検索"
@@ -6820,9 +6895,6 @@
   },
   "Select the palette algorithm used for wallpaper-based colors": {
     "Select the palette algorithm used for wallpaper-based colors": "壁紙ベースの色で、使用するパレットアルゴリズムを選ぶ"
-  },
-  "Select user...": {
-    "Select user...": "ユーザーを選択..."
   },
   "Select which keybind providers to include": {
     "Select which keybind providers to include": "含めるキーバインドプロバイダーを選択"
@@ -6991,6 +7063,9 @@
   },
   "Show": {
     "Show": "表示"
+  },
+  "Show \"config reloaded\" Toast": {
+    "Show \"config reloaded\" Toast": ""
   },
   "Show 3rd Party": {
     "Show 3rd Party": "サードパーティを表示"
@@ -7186,6 +7261,9 @@
   },
   "Show a notification when battery reaches the charge limit.": {
     "Show a notification when battery reaches the charge limit.": "バッテリーが充電上限に達したら通知を表示します。"
+  },
+  "Show a toast when the compositor config is reloaded": {
+    "Show a toast when the compositor config is reloaded": ""
   },
   "Show a warning popup when battery is running low.": {
     "Show a warning popup when battery is running low.": "バッテリー残量が少ないとき警告ポップアップを表示します。"
@@ -7529,6 +7607,9 @@
   "Suspend then Hibernate": {
     "Suspend then Hibernate": "サスペンド後に休止"
   },
+  "Swap primary and secondary mouse buttons": {
+    "Swap primary and secondary mouse buttons": ""
+  },
   "Sway Website": {
     "Sway Website": "Sway ウェブサイト"
   },
@@ -7652,6 +7733,18 @@
   "Tailscale not available": {
     "Tailscale not available": "Tailscaleを利用できません"
   },
+  "Tap and Drag": {
+    "Tap and Drag": ""
+  },
+  "Tap and drag on the touchpad to move items": {
+    "Tap and drag on the touchpad to move items": ""
+  },
+  "Tap the touchpad surface to trigger left click clicks": {
+    "Tap the touchpad surface to trigger left click clicks": ""
+  },
+  "Tap to Click": {
+    "Tap to Click": ""
+  },
   "Terminal": {
     "Terminal": "ターミナル"
   },
@@ -7726,6 +7819,9 @@
   },
   "The rule applies to any window matching one of these.": {
     "The rule applies to any window matching one of these.": "このルールは、これらのいずれかに一致するウィンドウに適用されます。"
+  },
+  "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": {
+    "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": ""
   },
   "Theme & Colors": {
     "Theme & Colors": "テーマおよびカラー"
@@ -7919,9 +8015,6 @@
   "Too many attempts - locked out": {
     "Too many attempts - locked out": "試行回数が多すぎます - ロックされました"
   },
-  "Too many failed attempts - account may be locked": {
-    "Too many failed attempts - account may be locked": "失敗回数が多すぎます - アカウントがロックされている可能性があります"
-  },
   "Tools": {
     "Tools": "ツール"
   },
@@ -7957,6 +8050,12 @@
   },
   "Touch your security key...": {
     "Touch your security key...": "セキュリティキーに触れてください..."
+  },
+  "Touchpad Settings": {
+    "Touchpad Settings": ""
+  },
+  "Touchpad Speed": {
+    "Touchpad Speed": ""
   },
   "Transform": {
     "Transform": "変形"
@@ -8017,6 +8116,9 @@
   },
   "Turn off now": {
     "Turn off now": "今すぐオフにする"
+  },
+  "Two Finger": {
+    "Two Finger": ""
   },
   "Type at least 2 characters": {
     "Type at least 2 characters": "少なくとも 2 文字入力してください"
@@ -8158,6 +8260,9 @@
   },
   "Untrust": {
     "Untrust": "信頼を解除"
+  },
+  "Untrusted VPN certificate": {
+    "Untrusted VPN certificate": ""
   },
   "Up to date": {
     "Up to date": "最新です"
@@ -8341,9 +8446,6 @@
   },
   "Username must start with a lowercase letter or underscore and contain only lowercase letters, digits, hyphens, or underscores.": {
     "Username must start with a lowercase letter or underscore and contain only lowercase letters, digits, hyphens, or underscores.": "ユーザー名は小文字またはアンダースコアで始め、小文字、数字、ハイフン、アンダースコアだけを含める必要があります。"
-  },
-  "Username...": {
-    "Username...": "ユーザー名..."
   },
   "Users": {
     "Users": "ユーザー"
@@ -8764,6 +8866,9 @@
   },
   "attached": {
     "attached": "接続済み"
+  },
+  "below AA": {
+    "below AA": ""
   },
   "brandon": {
     "brandon": "brandon"

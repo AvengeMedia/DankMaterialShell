@@ -6,7 +6,7 @@
     "%1 Animation Speed": "%1 动画速度"
   },
   "%1 Layout Overrides": {
-    "%1 Layout Overrides": ""
+    "%1 Layout Overrides": "%1 布局覆盖"
   },
   "%1 Sessions": {
     "%1 Sessions": "%1 个会话"
@@ -198,7 +198,7 @@
     "2 seconds": "2 秒"
   },
   "2.4 GHz": {
-    "2.4 GHz": ""
+    "2.4 GHz": "2.4 GHz"
   },
   "20 minutes": {
     "20 minutes": "20 分"
@@ -264,7 +264,7 @@
     "45 seconds": "45 秒"
   },
   "5 GHz": {
-    "5 GHz": ""
+    "5 GHz": "5 GHz"
   },
   "5 min before": {
     "5 min before": "5 分前"
@@ -335,6 +335,9 @@
   "About": {
     "About": "关于"
   },
+  "Acceleration Profile": {
+    "Acceleration Profile": ""
+  },
   "Accent Color": {
     "Accent Color": "强调色"
   },
@@ -378,7 +381,7 @@
     "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": "要激活 DMS 登录界面吗？将打开终端进行 sudo 认证。激活后运行“同步”以应用你的设置。"
   },
   "Activates immediately": {
-    "Activates immediately": ""
+    "Activates immediately": "立即生效"
   },
   "Activation": {
     "Activation": "激活"
@@ -410,6 +413,9 @@
   "Adapters": {
     "Adapters": "适配器"
   },
+  "Adaptive": {
+    "Adaptive": ""
+  },
   "Adaptive Media Width": {
     "Adaptive Media Width": "自适应媒体宽度"
   },
@@ -423,7 +429,7 @@
     "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": "将“%1”添加到 %2 组吗？该用户必须注销并重新登录，然后运行 dms greeter sync --profile 以应用其登录屏幕主题。"
   },
   "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": {
-    "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": ""
+    "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": "将 %1 添加至 %2 组？用户必须退出并重新登录，再运行 dms-greeter sync --profile 以推送登录屏幕主题。"
   },
   "Add Bar": {
     "Add Bar": "添加状态栏"
@@ -477,7 +483,7 @@
     "Add the new user to the %1 group so they can run dms greeter sync --profile.": "将新用户添加到 %1 组，使其能够运行 dms greeter sync --profile。"
   },
   "Add the new user to the %1 group so they can run dms-greeter sync --profile.": {
-    "Add the new user to the %1 group so they can run dms-greeter sync --profile.": ""
+    "Add the new user to the %1 group so they can run dms-greeter sync --profile.": "将新用户添加到 %1 组，使其可以运行 dms-greeter sync --profile。"
   },
   "Add the new user to the %1 group so they can use sudo.": {
     "Add the new user to the %1 group so they can use sudo.": "将新用户添加到 %1 组，使其能够使用 sudo。"
@@ -485,11 +491,20 @@
   "Add to Autostart": {
     "Add to Autostart": "添加到自启动"
   },
+  "Adjust pointer sensitivity speed": {
+    "Adjust pointer sensitivity speed": ""
+  },
+  "Adjust scrolling sensitivity multiplier": {
+    "Adjust scrolling sensitivity multiplier": ""
+  },
   "Adjust the bar height via inner padding": {
     "Adjust the bar height via inner padding": "通过内边距调整状态栏高度"
   },
   "Adjust the number of columns in grid view mode.": {
     "Adjust the number of columns in grid view mode.": "调整网格视图模式中的列数"
+  },
+  "Adjust touchpad pointer speed": {
+    "Adjust touchpad pointer speed": ""
   },
   "Adjust volume per scroll indent": {
     "Adjust volume per scroll indent": "每滚动一格调节的音量"
@@ -510,7 +525,7 @@
     "Afternoon": "下午"
   },
   "Alerts": {
-    "Alerts": ""
+    "Alerts": "警报"
   },
   "All": {
     "All": "全部"
@@ -574,6 +589,9 @@
   },
   "Always show when there's only one connected display": {
     "Always show when there's only one connected display": "当仅连接一个显示器时，总是显示"
+  },
+  "Always use the durations above, even if an app requests a shorter or longer one": {
+    "Always use the durations above, even if an app requests a shorter or longer one": ""
   },
   "Always use this app for %1": {
     "Always use this app for %1": "始终使用此应用打开 %1"
@@ -660,7 +678,7 @@
     "Applications and commands to start automatically when you log in": "登录后自动启动的应用程序和命令"
   },
   "Applies on the next greeter sync": {
-    "Applies on the next greeter sync": ""
+    "Applies on the next greeter sync": "下次 Greeter 同步时生效"
   },
   "Apply Changes": {
     "Apply Changes": "应用更改"
@@ -780,10 +798,7 @@
     "Authenticate": "认证"
   },
   "Authenticated!": {
-    "Authenticated!": ""
-  },
-  "Authenticating...": {
-    "Authenticating...": "认证中..."
+    "Authenticated!": "已通过认证！"
   },
   "Authentication": {
     "Authentication": "认证"
@@ -792,28 +807,16 @@
     "Authentication Required": "需要认证"
   },
   "Authentication Source": {
-    "Authentication Source": ""
+    "Authentication Source": "认证来源"
   },
   "Authentication changes applied": {
-    "Authentication changes applied": ""
+    "Authentication changes applied": "认证更改已应用"
   },
   "Authentication changes apply automatically": {
-    "Authentication changes apply automatically": ""
+    "Authentication changes apply automatically": "认证更改会自动应用"
   },
   "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": {
     "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": "认证变更需要 sudo 权限。正在打开终端，你可以使用密码或指纹通过验证。"
-  },
-  "Authentication error - try again": {
-    "Authentication error - try again": "认证错误 - 请重试"
-  },
-  "Authentication failed - attempt %1 of %2": {
-    "Authentication failed - attempt %1 of %2": ""
-  },
-  "Authentication failed - lockout can occur": {
-    "Authentication failed - lockout can occur": ""
-  },
-  "Authentication failed - try again": {
-    "Authentication failed - try again": ""
   },
   "Authorize": {
     "Authorize": "授权"
@@ -849,7 +852,7 @@
     "Auto Power Saver": "自动省电"
   },
   "Auto matches bar spacing; Off leaves gaps to your %1 config": {
-    "Auto matches bar spacing; Off leaves gaps to your %1 config": ""
+    "Auto matches bar spacing; Off leaves gaps to your %1 config": "自动匹配状态栏间距；关闭后保留 %1 配置中的间隙"
   },
   "Auto mode is on. Manual profile selection is disabled.": {
     "Auto mode is on. Manual profile selection is disabled.": "自动模式已开启。手动选择配置已禁用。"
@@ -858,7 +861,7 @@
     "Auto saved": "已自动保存"
   },
   "Auto uses an installed or bundled key-only service.": {
-    "Auto uses an installed or bundled key-only service.": ""
+    "Auto uses an installed or bundled key-only service.": "自动使用已安装或随附的仅密钥服务。"
   },
   "Auto-Clear After": {
     "Auto-Clear After": "自动清除"
@@ -877,9 +880,6 @@
   },
   "Auto-hide Dock": {
     "Auto-hide Dock": "自动隐藏 Dock"
-  },
-  "Auto-login": {
-    "Auto-login": "自动登录"
   },
   "Auto-login change needs a sync": {
     "Auto-login change needs a sync": "自动登录更改需要同步"
@@ -980,23 +980,11 @@
   "Available in Detailed and Forecast view modes": {
     "Available in Detailed and Forecast view modes": "提供详细视图和预测视图两种模式"
   },
-  "Awaiting fingerprint authentication": {
-    "Awaiting fingerprint authentication": ""
-  },
-  "Awaiting fingerprint or security key authentication": {
-    "Awaiting fingerprint or security key authentication": ""
-  },
-  "Awaiting security key authentication": {
-    "Awaiting security key authentication": ""
-  },
   "BSSID": {
     "BSSID": "BSSID"
   },
   "Back": {
     "Back": "返回"
-  },
-  "Back to user list": {
-    "Back to user list": "返回用户列表"
   },
   "Backend": {
     "Backend": "后端"
@@ -1035,7 +1023,7 @@
     "Balanced palette with focused accents (default).": "均衡配色，强调重点（默认）"
   },
   "Band": {
-    "Band": ""
+    "Band": "频段"
   },
   "Bar": {
     "Bar": "状态栏"
@@ -1104,7 +1092,7 @@
     "Bind lock screen to dbus signals from loginctl. Disable if using an external lock screen": "将锁屏绑定到来自 loginctl 的 dbus 信号。如使用外部锁屏程序，请禁用此项"
   },
   "Bind the %1 IPC action in your compositor config.": {
-    "Bind the %1 IPC action in your compositor config.": ""
+    "Bind the %1 IPC action in your compositor config.": "在合成器配置中绑定 %1 IPC 操作。"
   },
   "Binds include added": {
     "Binds include added": "快捷键绑定引用已添加"
@@ -1293,7 +1281,7 @@
     "Calendar Backend": "日历后端"
   },
   "Calls / Headset": {
-    "Calls / Headset": ""
+    "Calls / Headset": "通话 / 耳机"
   },
   "Camera": {
     "Camera": "摄像头"
@@ -1454,6 +1442,9 @@
   "Choose wallpaper folder": {
     "Choose wallpaper folder": "选择壁纸文件夹"
   },
+  "Choose when to generate scrolling events": {
+    "Choose when to generate scrolling events": ""
+  },
   "Choose where notification popups appear on screen": {
     "Choose where notification popups appear on screen": "设置通知弹窗的出现位置"
   },
@@ -1581,16 +1572,16 @@
     "Close Window": "关闭窗口"
   },
   "Codec switched successfully": {
-    "Codec switched successfully": ""
+    "Codec switched successfully": "Codec 已成功切换"
   },
   "Codec switching is unavailable because WirePlumber was not found": {
-    "Codec switching is unavailable because WirePlumber was not found": ""
+    "Codec switching is unavailable because WirePlumber was not found": "Codec 切换不可用，因为未找到 WirePlumber"
   },
   "Codec switching is unavailable because pactl was not found": {
     "Codec switching is unavailable because pactl was not found": "找不到 pactl，无法切换编解码器"
   },
   "Codec switching is unavailable. WirePlumber wpexec was not found.": {
-    "Codec switching is unavailable. WirePlumber wpexec was not found.": ""
+    "Codec switching is unavailable. WirePlumber wpexec was not found.": "Codec 切换不可用。未找到 WirePlumber wpexec"
   },
   "Color": {
     "Color": "颜色"
@@ -1688,6 +1679,9 @@
   "Compositor Settings": {
     "Compositor Settings": "合成器设置"
   },
+  "Compositor actions (focus, move, etc.)": {
+    "Compositor actions (focus, move, etc.)": ""
+  },
   "Config Format": {
     "Config Format": "配置格式"
   },
@@ -1707,7 +1701,7 @@
     "Configuration will be preserved when this display reconnects": "当该显示器重新连接时，配置将被保留"
   },
   "Configurations": {
-    "Configurations": ""
+    "Configurations": "配置"
   },
   "Configure": {
     "Configure": "配置"
@@ -1805,6 +1799,9 @@
   "Contrast": {
     "Contrast": "对比度"
   },
+  "Contrast by variant": {
+    "Contrast by variant": ""
+  },
   "Contributor": {
     "Contributor": "贡献者"
   },
@@ -1851,7 +1848,7 @@
     "Controls the outline of popouts, modals, and other shell surfaces": "控制弹出窗口、模态框及其他 Shell 表面的轮廓"
   },
   "Convenience options for the login screen": {
-    "Convenience options for the login screen": ""
+    "Convenience options for the login screen": "登录屏幕的便捷选项"
   },
   "Convert to DMS": {
     "Convert to DMS": "导入到 DMS"
@@ -1905,7 +1902,7 @@
     "Corners & Background": "圆角与背景"
   },
   "Couldn't load hotspot password": {
-    "Couldn't load hotspot password": ""
+    "Couldn't load hotspot password": "无法加载热点密码"
   },
   "Count Only": {
     "Count Only": "仅数量"
@@ -2076,7 +2073,7 @@
     "Custom command and terminal params are split on whitespace; paths with spaces will break.": "自定义命令和终端参数在空白空间上会被拆分；带空格的路径会断开。"
   },
   "Custom interval in minutes (minimum 5)": {
-    "Custom interval in minutes (minimum 5)": ""
+    "Custom interval in minutes (minimum 5)": "自定义间隔（单位：分，最少 5 分）"
   },
   "Custom open-trash command": {
     "Custom open-trash command": "自定义打开回收站命令"
@@ -2127,7 +2124,7 @@
     "DMS out of date": "DMS 已过期"
   },
   "DMS removes its managed block from /etc/pam.d/greetd and stops write services": {
-    "DMS removes its managed block from /etc/pam.d/greetd and stops write services": ""
+    "DMS removes its managed block from /etc/pam.d/greetd and stops write services": "DMS 会从 /etc/pam.d/greetd 移除其管理的区块，并停止写入服务"
   },
   "DMS server is outdated (API v%1, expected v%2)": {
     "DMS server is outdated (API v%1, expected v%2)": "DMS 服务器版本过旧（API v%1，应为 v%2）"
@@ -2390,6 +2387,15 @@
   "Disable Output": {
     "Disable Output": "禁用输出"
   },
+  "Disable While Typing": {
+    "Disable While Typing": ""
+  },
+  "Disable on External Mouse": {
+    "Disable on External Mouse": ""
+  },
+  "Disable touchpad when an external mouse is connected": {
+    "Disable touchpad when an external mouse is connected": ""
+  },
   "Disabled": {
     "Disabled": "已禁用"
   },
@@ -2549,6 +2555,9 @@
   "Door Open": {
     "Door Open": "打印机维护口已打开"
   },
+  "Drag Lock": {
+    "Drag Lock": ""
+  },
   "Drag a widget by its handle here to reorder it or drop it into another group": {
     "Drag a widget by its handle here to reorder it or drop it into another group": "拖拽部件把手到此以重排序或放置到另一个分组"
   },
@@ -2621,6 +2630,9 @@
   "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": {
     "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": "动态：带有过冲的弹簧贝塞尔——进场短暂超出目标后稳定。富有表现力，充满生命力。"
   },
+  "Edge": {
+    "Edge": ""
+  },
   "Edge Hover Reveal": {
     "Edge Hover Reveal": "边缘悬停显示"
   },
@@ -2669,6 +2681,9 @@
   "Empty Trash (%1)": {
     "Empty Trash (%1)": "清空回收站（%1）"
   },
+  "Emulate middle click by pressing left and right buttons": {
+    "Emulate middle click by pressing left and right buttons": ""
+  },
   "Enable 10-bit color depth for wider color gamut and HDR support": {
     "Enable 10-bit color depth for wider color gamut and HDR support": "启用 10 位颜色以支持更广色域和 HDR"
   },
@@ -2706,7 +2721,7 @@
     "Enable WiFi": "启用 Wi-Fi"
   },
   "Enable WiFi before starting the hotspot.": {
-    "Enable WiFi before starting the hotspot.": ""
+    "Enable WiFi before starting the hotspot.": "启动热点前需启用 WiFi"
   },
   "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": {
     "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": "启用以下自定义覆盖，设置每个状态栏的阴影强度、透明度和颜色。"
@@ -2721,7 +2736,7 @@
     "Enable fingerprint authentication": "启用指纹认证"
   },
   "Enable fingerprint or security key for DMS Greeter": {
-    "Enable fingerprint or security key for DMS Greeter": ""
+    "Enable fingerprint or security key for DMS Greeter": "为 DMS Greeter 启用指纹或安全密钥"
   },
   "Enable loginctl lock integration": {
     "Enable loginctl lock integration": "启用 loginctl 锁定集成"
@@ -2795,6 +2810,9 @@
   "Enter password for ": {
     "Enter password for ": "输入密码"
   },
+  "Enter text to encode": {
+    "Enter text to encode": ""
+  },
   "Enter this passkey on ": {
     "Enter this passkey on ": "在该处输入此通行密钥 "
   },
@@ -2847,7 +2865,7 @@
     "Exact": "精确"
   },
   "Excluded Players": {
-    "Excluded Players": ""
+    "Excluded Players": "排除的播放器"
   },
   "Exclusive Zone Offset": {
     "Exclusive Zone Offset": "独占区域偏移量"
@@ -2913,7 +2931,7 @@
     "Failed to add printer to class": "将打印机添加到类别失败"
   },
   "Failed to apply %1 colors": {
-    "Failed to apply %1 colors": ""
+    "Failed to apply %1 colors": "应用 %1 配色失败"
   },
   "Failed to apply charge limit to system": {
     "Failed to apply charge limit to system": "充电限制应用到系统失败"
@@ -2934,7 +2952,7 @@
     "Failed to check pin limit": "检查固定项目限制失败"
   },
   "Failed to configure hotspot": {
-    "Failed to configure hotspot": ""
+    "Failed to configure hotspot": "配置热点失败"
   },
   "Failed to connect VPN": {
     "Failed to connect VPN": "连接 VPN 失败"
@@ -2993,6 +3011,9 @@
   "Failed to fetch network QR code: %1": {
     "Failed to fetch network QR code: %1": "获取网络二维码失败：%1"
   },
+  "Failed to generate QR code: %1": {
+    "Failed to generate QR code: %1": ""
+  },
   "Failed to generate systemd override": {
     "Failed to generate systemd override": "生成 systemd override 失败"
   },
@@ -3018,7 +3039,7 @@
     "Failed to move to trash": "移动至回收站失败"
   },
   "Failed to parse %1": {
-    "Failed to parse %1": ""
+    "Failed to parse %1": "解析 %1 失败"
   },
   "Failed to pause printer": {
     "Failed to pause printer": "暂停打印机失败"
@@ -3066,7 +3087,7 @@
     "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": "运行 'dms greeter status' 失败。确保 DMS 已安装，且 dms 已在 PATH 中。"
   },
   "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": {
-    "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": ""
+    "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": "运行“dms-greeter status”失败。请确认已安装 dms-greeter 软件包。"
   },
   "Failed to save VPN credentials": {
     "Failed to save VPN credentials": "保存 VPN 凭据失败"
@@ -3123,13 +3144,13 @@
     "Failed to start connection to %1": "连接至 %1 失败"
   },
   "Failed to start hotspot": {
-    "Failed to start hotspot": ""
+    "Failed to start hotspot": "启动热点失败"
   },
   "Failed to stop hotspot": {
-    "Failed to stop hotspot": ""
+    "Failed to stop hotspot": "停止热点失败"
   },
   "Failed to switch codec": {
-    "Failed to switch codec": ""
+    "Failed to switch codec": "切换编解码器失败"
   },
   "Failed to unpin entry": {
     "Failed to unpin entry": "取消固定项目失败"
@@ -3198,7 +3219,7 @@
     "File manager used to open the trash. Pick \"custom\" to enter your own command.": "打开回收站的文件管理器。点击“自定义”以输入自定义命令。"
   },
   "File received from %1": {
-    "File received from %1": ""
+    "File received from %1": "已从 %1 收到文件"
   },
   "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch": {
     "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch": "文件搜索需要 dsearch\n请从 github.com/AvengeMedia/danksearch 安装"
@@ -3234,7 +3255,7 @@
     "Fine-tune the space reserved for the bar from the screen edge": "微调状态栏与屏幕边缘之间保留的间隙"
   },
   "Fingerprint availability could not be confirmed": {
-    "Fingerprint availability could not be confirmed": ""
+    "Fingerprint availability could not be confirmed": "无法确认指纹功能是否可用"
   },
   "Fingerprint error": {
     "Fingerprint error": "指纹错误"
@@ -3263,8 +3284,14 @@
   "Flags": {
     "Flags": "标签"
   },
+  "Flat": {
+    "Flat": ""
+  },
+  "Flat uses constant speed; Adaptive scales with movement speed": {
+    "Flat uses constant speed; Adaptive scales with movement speed": ""
+  },
   "Flatpak": {
-    "Flatpak": ""
+    "Flatpak": "Flatpak"
   },
   "Flipped": {
     "Flipped": "翻转"
@@ -3447,7 +3474,7 @@
     "Format Legend": "参考格式"
   },
   "Format the date on the login screen": {
-    "Format the date on the login screen": ""
+    "Format the date on the login screen": "设置登录屏幕上的日期格式"
   },
   "Forward 10s": {
     "Forward 10s": "快进 10 秒"
@@ -3546,7 +3573,7 @@
     "Gaps": "间距"
   },
   "General": {
-    "General": ""
+    "General": "常规"
   },
   "Generate Override": {
     "Generate Override": "生成 Override"
@@ -3558,7 +3585,7 @@
     "Generic": "通用"
   },
   "Geometric Centering": {
-    "Geometric Centering": ""
+    "Geometric Centering": "几何居中"
   },
   "Get Started": {
     "Get Started": "开始使用"
@@ -3621,7 +3648,7 @@
     "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": "greeter 组成员注销并重新登录后，可使用 dms greeter sync --profile 同步自己的登录屏幕主题。"
   },
   "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": {
-    "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": ""
+    "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": "Greeter 组成员退出并重新登录后，可以使用 dms-greeter sync --profile 同步登录屏幕主题。"
   },
   "Greeter group:": {
     "Greeter group:": "greeter 组："
@@ -3687,7 +3714,7 @@
     "HTML copied to clipboard": "HTML 已复制到剪贴板"
   },
   "Handles geo: location links": {
-    "Handles geo: location links": ""
+    "Handles geo: location links": "处理 geo：位置链接"
   },
   "Handles links and opens HTML files": {
     "Handles links and opens HTML files": "处理链接并打开 HTML 文件"
@@ -3837,22 +3864,22 @@
     "Hotkey overlay title (optional)": "热键叠加层标题（可选）"
   },
   "Hotspot": {
-    "Hotspot": ""
+    "Hotspot": "热点"
   },
   "Hotspot activation failed.": {
-    "Hotspot activation failed.": ""
+    "Hotspot activation failed.": "热点启用失败。"
   },
   "Hotspot name": {
-    "Hotspot name": ""
+    "Hotspot name": "热点名称"
   },
   "Hotspot saved": {
-    "Hotspot saved": ""
+    "Hotspot saved": "热点已保存"
   },
   "Hotspot started": {
-    "Hotspot started": ""
+    "Hotspot started": "热点已启动"
   },
   "Hotspot stopped": {
-    "Hotspot stopped": ""
+    "Hotspot stopped": "热点已停止"
   },
   "Hour": {
     "Hour": "小时"
@@ -3912,7 +3939,7 @@
     "IP address or hostname": "IP 地址或主机名"
   },
   "IP sharing setup failed. Check that dnsmasq is installed.": {
-    "IP sharing setup failed. Check that dnsmasq is installed.": ""
+    "IP sharing setup failed. Check that dnsmasq is installed.": "IP 共享设置失败。请确认已安装 dnsmasq。"
   },
   "ISO Date": {
     "ISO Date": "ISO 日期格式"
@@ -3962,26 +3989,29 @@
   "If the field is hidden, it will appear as soon as a key is pressed.": {
     "If the field is hidden, it will appear as soon as a key is pressed.": "若隐藏密码区域，按下按键后密码区域会即刻出现"
   },
+  "Ignore App-Requested Timeout": {
+    "Ignore App-Requested Timeout": ""
+  },
   "Ignore Completely": {
     "Ignore Completely": "完全忽略"
   },
   "Ignore package": {
-    "Ignore package": ""
+    "Ignore package": "忽略软件包"
   },
   "Ignore this package": {
-    "Ignore this package": ""
+    "Ignore this package": "忽略此软件包"
   },
   "Ignored (%1)": {
-    "Ignored (%1)": ""
+    "Ignored (%1)": "已忽略（%1）"
   },
   "Ignored Packages": {
-    "Ignored Packages": ""
+    "Ignored Packages": "已忽略的软件包"
   },
   "Ignored packages are hidden from the updater and skipped by 'Update All'.": {
-    "Ignored packages are hidden from the updater and skipped by 'Update All'.": ""
+    "Ignored packages are hidden from the updater and skipped by 'Update All'.": "已忽略的软件包会在更新器中隐藏，并被“全部更新”跳过。"
   },
   "Ignored packages only apply to the built-in updater. Your custom command controls its own exclusions.": {
-    "Ignored packages only apply to the built-in updater. Your custom command controls its own exclusions.": ""
+    "Ignored packages only apply to the built-in updater. Your custom command controls its own exclusions.": "忽略的软件包仅适用于内置更新器。自定义命令的排除项由你自行控制。"
   },
   "Image": {
     "Image": "图像"
@@ -4029,7 +4059,7 @@
     "Incorrect password - try again": "密码错误 - 请重试"
   },
   "Index Centering": {
-    "Index Centering": ""
+    "Index Centering": "索引居中"
   },
   "Indicator Style": {
     "Indicator Style": "指示器样式"
@@ -4116,7 +4146,7 @@
     "Install theme '%1' from the DMS registry?": "要从 DMS 主题仓库安装主题 %1 吗？"
   },
   "Installation and PAM setup are documented in the ": {
-    "Installation and PAM setup are documented in the ": ""
+    "Installation and PAM setup are documented in the ": "安装和 PAM 设置详见 "
   },
   "Installed": {
     "Installed": "已安装"
@@ -4158,7 +4188,7 @@
     "Invalid configuration": "无效配置"
   },
   "Invalid package name — letters, digits and @._+:- only.": {
-    "Invalid package name — letters, digits and @._+:- only.": ""
+    "Invalid package name — letters, digits and @._+:- only.": "软件包名称无效——只能包含字母、数字和 @._+:-。"
   },
   "Invalid password for %1": {
     "Invalid password for %1": "%1 的密码无效"
@@ -4182,7 +4212,7 @@
     "Jobs": "作业"
   },
   "Join video call": {
-    "Join video call": ""
+    "Join video call": "加入视频通话"
   },
   "Jump to page": {
     "Jump to page": "跳转到页面"
@@ -4198,6 +4228,9 @@
   },
   "Keep My Edits": {
     "Keep My Edits": "保持当前的编辑"
+  },
+  "Keep dragging when finger is briefly lifted": {
+    "Keep dragging when finger is briefly lifted": ""
   },
   "Keep in Bar": {
     "Keep in Bar": "保留在 Bar"
@@ -4334,6 +4367,9 @@
   "Left Section": {
     "Left Section": "左侧区域"
   },
+  "Left-Handed Mode": {
+    "Left-Handed Mode": ""
+  },
   "Light": {
     "Light": "细体"
   },
@@ -4439,9 +4475,6 @@
   "Locked": {
     "Locked": "已锁定"
   },
-  "Logging in...": {
-    "Logging in...": "正在登录..."
-  },
   "Login": {
     "Login": "登录"
   },
@@ -4473,7 +4506,7 @@
     "Low Priority": "次要优先级"
   },
   "Lower display refresh rate on battery": {
-    "Lower display refresh rate on battery": ""
+    "Lower display refresh rate on battery": "电池供电时降低显示器刷新率"
   },
   "MAC": {
     "MAC": "MAC"
@@ -4506,10 +4539,10 @@
     "Managed by Frame in Connected Mode": "受连接模式下的框架管理"
   },
   "Managed by the primary PAM source": {
-    "Managed by the primary PAM source": ""
+    "Managed by the primary PAM source": "由主要 PAM 来源管理"
   },
   "Managed by the primary PAM source.": {
-    "Managed by the primary PAM source.": ""
+    "Managed by the primary PAM source.": "由主要 PAM 来源管理。"
   },
   "Management": {
     "Management": "管理"
@@ -4548,7 +4581,7 @@
     "Map window class names to icon names for proper icon display": "将窗口类名称映射到图标名称以实现正确的图标显示"
   },
   "Maps": {
-    "Maps": ""
+    "Maps": "地图"
   },
   "Margin": {
     "Margin": "边距"
@@ -4748,6 +4781,9 @@
   "Microphone volume control": {
     "Microphone volume control": "麦克风音量控制"
   },
+  "Middle Click Emulation": {
+    "Middle Click Emulation": ""
+  },
   "Middle Section": {
     "Middle Section": "中间区域"
   },
@@ -4823,6 +4859,12 @@
   "Mount Points": {
     "Mount Points": "挂载点"
   },
+  "Mouse & Touchpad": {
+    "Mouse & Touchpad": ""
+  },
+  "Mouse Settings": {
+    "Mouse Settings": ""
+  },
   "Mouse clicks pass through the bar to windows behind it": {
     "Mouse clicks pass through the bar to windows behind it": "鼠标点击会穿透状态栏传递给其后的窗口"
   },
@@ -4885,6 +4927,9 @@
   },
   "Native: platform renderer (FreeType).": {
     "Native: platform renderer (FreeType).": "原生：平台渲染器（FreeType）。"
+  },
+  "Natural Scrolling": {
+    "Natural Scrolling": ""
   },
   "Natural Touchpad Scrolling": {
     "Natural Touchpad Scrolling": "触摸板自然滚动"
@@ -5033,6 +5078,9 @@
   "No Rounding": {
     "No Rounding": "无圆角"
   },
+  "No Scroll": {
+    "No Scroll": ""
+  },
   "No Shadow": {
     "No Shadow": "无阴影"
   },
@@ -5133,7 +5181,7 @@
     "No files found": "未找到文件"
   },
   "No fingerprint reader detected": {
-    "No fingerprint reader detected": ""
+    "No fingerprint reader detected": "未检测到指纹读取器"
   },
   "No folders found": {
     "No folders found": "未找到文件夹"
@@ -5196,7 +5244,7 @@
     "No output devices found": "未找到输出设备"
   },
   "No packages ignored. Add one here or hover an update in the popout and click the hide button.": {
-    "No packages ignored. Add one here or hover an update in the popout and click the hide button.": ""
+    "No packages ignored. Add one here or hover an update in the popout and click the hide button.": "暂无忽略的软件包。请在此添加，或将鼠标悬停在弹出窗口中的更新上并点击隐藏按钮。"
   },
   "No peers found": {
     "No peers found": "未找到"
@@ -5316,10 +5364,10 @@
     "Not available": "不可用"
   },
   "Not available - install fprintd and pam_fprintd": {
-    "Not available - install fprintd and pam_fprintd": ""
+    "Not available - install fprintd and pam_fprintd": "不可用——请安装 fprintd 和 pam_fprintd"
   },
   "Not available - install or configure pam_u2f": {
-    "Not available - install or configure pam_u2f": ""
+    "Not available - install or configure pam_u2f": "不可用——请安装或配置 pam_u2f"
   },
   "Not available — install fprintd and pam_fprintd, or configure greetd PAM.": {
     "Not available — install fprintd and pam_fprintd, or configure greetd PAM.": "不可用 - 请安装 fprintd 和 pam_fprintd，或配置 greetd PAM。"
@@ -5335,9 +5383,6 @@
   },
   "Not detected": {
     "Not detected": "未检测到"
-  },
-  "Not listed?": {
-    "Not listed?": "未列出？"
   },
   "Not paired": {
     "Not paired": "未配对"
@@ -5432,6 +5477,9 @@
   "On": {
     "On": "开启"
   },
+  "On Button Down": {
+    "On Button Down": ""
+  },
   "On indefinitely": {
     "On indefinitely": "无限期"
   },
@@ -5449,6 +5497,9 @@
   },
   "Only adjust gamma based on time or location rules.": {
     "Only adjust gamma based on time or location rules.": "根据时间或位置调节伽马值。"
+  },
+  "Only continue if you recognize this server certificate fingerprint.": {
+    "Only continue if you recognize this server certificate fingerprint.": ""
   },
   "Only on Battery": {
     "Only on Battery": "仅使用电池时"
@@ -5511,7 +5562,7 @@
     "Open in terminal": "在终端打开"
   },
   "Open network": {
-    "Open network": ""
+    "Open network": "开放网络"
   },
   "Open search bar to find text": {
     "Open search bar to find text": "打开搜索栏以查找文本"
@@ -5541,7 +5592,7 @@
     "Opens the connected launcher in Connected Frame Mode.": "在连接框架模式中打开连接式启动器。"
   },
   "Optional": {
-    "Optional": ""
+    "Optional": "可选"
   },
   "Optional description": {
     "Optional description": "可选描述"
@@ -5553,7 +5604,7 @@
     "Optional state-based conditions applied to the first match.": "可选的状态条件，会应用到第一个匹配项。"
   },
   "Optional; leave blank for open hotspot": {
-    "Optional; leave blank for open hotspot": ""
+    "Optional; leave blank for open hotspot": "可选；留空可创建开放热点"
   },
   "Options": {
     "Options": "选项"
@@ -5574,7 +5625,7 @@
     "Outline": "轮廓"
   },
   "Outline around shell surfaces": {
-    "Outline around shell surfaces": ""
+    "Outline around shell surfaces": "Shell 表面周围的轮廓"
   },
   "Output": {
     "Output": "显示器"
@@ -5652,7 +5703,7 @@
     "PIN": "PIN 码"
   },
   "Package name (e.g., docker)": {
-    "Package name (e.g., docker)": ""
+    "Package name (e.g., docker)": "软件包名称（例如：docker）"
   },
   "Pad": {
     "Pad": "留边"
@@ -5676,7 +5727,7 @@
     "Pairing failed": "配对失败"
   },
   "Pairing request from %1": {
-    "Pairing request from %1": ""
+    "Pairing request from %1": "来自 %1 的配对请求"
   },
   "Pairing request sent": {
     "Pairing request sent": "配对请求已发送"
@@ -5686,6 +5737,9 @@
   },
   "Pairing...": {
     "Pairing...": "配对中..."
+  },
+  "Partial": {
+    "Partial": ""
   },
   "Partly Cloudy": {
     "Partly Cloudy": "部分多云"
@@ -5707,9 +5761,6 @@
   },
   "Password updated": {
     "Password updated": "密码已更新"
-  },
-  "Password...": {
-    "Password...": "密码..."
   },
   "Passwords do not match.": {
     "Passwords do not match.": "两次输入的密码不一致。"
@@ -5793,7 +5844,7 @@
     "Ping": "Ping"
   },
   "Ping sent to %1": {
-    "Ping sent to %1": ""
+    "Ping sent to %1": "已向 %1 发送 Ping"
   },
   "Pinned": {
     "Pinned": "已固定"
@@ -5894,6 +5945,9 @@
   "Pointer": {
     "Pointer": "指针"
   },
+  "Pointer Speed": {
+    "Pointer Speed": ""
+  },
   "Polkit integration is disabled. User management requires Polkit to elevate privileges.": {
     "Polkit integration is disabled. User management requires Polkit to elevate privileges.": "Polkit 集成已禁用。用户管理需要 Polkit 提升权限。"
   },
@@ -5922,7 +5976,7 @@
     "Popup behavior, position": "弹窗行为与位置"
   },
   "Popups": {
-    "Popups": ""
+    "Popups": "弹出窗口"
   },
   "Port": {
     "Port": "端口"
@@ -6013,6 +6067,9 @@
   },
   "Pressure": {
     "Pressure": "气压"
+  },
+  "Prevent accidental cursor jumps while typing": {
+    "Prevent accidental cursor jumps while typing": ""
   },
   "Prevent screen timeout": {
     "Prevent screen timeout": "防止屏幕超时"
@@ -6126,10 +6183,13 @@
     "Profile when on Battery": "电池供电配置模式"
   },
   "Protection": {
-    "Protection": ""
+    "Protection": "保护"
   },
   "Protocol": {
     "Protocol": "协议"
+  },
+  "QR Generator": {
+    "QR Generator": ""
   },
   "Qt": {
     "Qt": "Qt"
@@ -6189,7 +6249,7 @@
     "Re-enter password": "再次输入密码"
   },
   "Re-enter the password before saving.": {
-    "Re-enter the password before saving.": ""
+    "Re-enter the password before saving.": "保存前请重新输入密码。"
   },
   "Reach local network devices while using an exit node": {
     "Reach local network devices while using an exit node": "使用出口节点时访问本地网络设备"
@@ -6201,7 +6261,7 @@
     "Read:": "读取："
   },
   "Ready": {
-    "Ready": ""
+    "Ready": "就绪"
   },
   "Reason": {
     "Reason": "原因"
@@ -6249,7 +6309,7 @@
     "Release": "松开"
   },
   "Release to confirm": {
-    "Release to confirm": ""
+    "Release to confirm": "松开以确认"
   },
   "Reload From Disk": {
     "Reload From Disk": "从磁盘重载"
@@ -6375,13 +6435,16 @@
     "Requires a newer version of Quickshell": "需要更新版本的 Quickshell"
   },
   "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys).": {
-    "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys).": ""
+    "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys).": "需要 greetd、dms-greeter，以及属于 greeter 组的用户（指纹认证还需要 fprintd/pam_fprintd，安全密钥还需要 pam_u2f）。"
   },
   "Requires night mode support": {
     "Requires night mode support": "需要夜间模式支持"
   },
   "Requires remembering the last user and session. Enable those options first.": {
     "Requires remembering the last user and session. Enable those options first.": "需要记住上次使用的用户和会话。请先启用这两个选项。"
+  },
+  "Requires the DMS Theme extension from the editor marketplace": {
+    "Requires the DMS Theme extension from the editor marketplace": ""
   },
   "Reset": {
     "Reset": "重置"
@@ -6437,6 +6500,12 @@
   "Reverse Scrolling Direction": {
     "Reverse Scrolling Direction": "反转滚动方向"
   },
+  "Reverse mouse wheel scrolling direction": {
+    "Reverse mouse wheel scrolling direction": ""
+  },
+  "Reverse two-finger scrolling direction": {
+    "Reverse two-finger scrolling direction": ""
+  },
   "Reverse workspace switch direction when scrolling over the bar": {
     "Reverse workspace switch direction when scrolling over the bar": "当在状态栏上滚动时，反转工作区切换方向"
   },
@@ -6471,7 +6540,7 @@
     "Ring": "响铃"
   },
   "Ringing %1...": {
-    "Ringing %1...": ""
+    "Ringing %1...": "正在呼叫 %1..."
   },
   "Ripple Effects": {
     "Ripple Effects": "波纹效果"
@@ -6486,13 +6555,13 @@
     "Rule": "规则"
   },
   "Rule %1": {
-    "Rule %1": ""
+    "Rule %1": "规则 %1"
   },
   "Rule Name": {
     "Rule Name": "规则名称"
   },
   "Rules": {
-    "Rules": ""
+    "Rules": "规则"
   },
   "Rules (%1)": {
     "Rules (%1)": "规则（%1）"
@@ -6519,7 +6588,7 @@
     "Run paru/yay with AUR enabled when 'Update All' is clicked.": "点击“全部更新”时运行 paru/yay 并启用 AUR。"
   },
   "Running": {
-    "Running": ""
+    "Running": "运行中"
   },
   "Running Apps": {
     "Running Apps": "运行中的应用"
@@ -6546,13 +6615,13 @@
     "SMS sent successfully": "短信发送成功"
   },
   "SSID": {
-    "SSID": ""
+    "SSID": "SSID"
   },
   "Saturation": {
     "Saturation": "饱和度"
   },
   "Save & Start": {
-    "Save & Start": ""
+    "Save & Start": "保存并启动"
   },
   "Save Notepad File": {
     "Save Notepad File": "保存便签"
@@ -6644,6 +6713,9 @@
   "Scroll GitHub": {
     "Scroll GitHub": "Scroll GitHub"
   },
+  "Scroll Method": {
+    "Scroll Method": ""
+  },
   "Scroll Wheel": {
     "Scroll Wheel": "滚动滚轮"
   },
@@ -6658,6 +6730,9 @@
   },
   "Scrolling": {
     "Scrolling": "滚动"
+  },
+  "Scrolling Speed": {
+    "Scrolling Speed": ""
   },
   "Search App Actions": {
     "Search App Actions": "搜索应用动作"
@@ -6720,13 +6795,13 @@
     "Security & privacy": "安全与隐私"
   },
   "Security Key PAM Source": {
-    "Security Key PAM Source": ""
+    "Security Key PAM Source": "安全密钥 PAM 来源"
   },
   "Security key mode": {
     "Security key mode": "安全密钥模式"
   },
   "Security-key availability could not be confirmed": {
-    "Security-key availability could not be confirmed": ""
+    "Security-key availability could not be confirmed": "无法确认安全密钥是否可用"
   },
   "Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.": {
     "Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.": "已检测到安全密钥支持，但尚无注册的密钥。您可以启用，并在稍后进行注册。"
@@ -6821,9 +6896,6 @@
   "Select the palette algorithm used for wallpaper-based colors": {
     "Select the palette algorithm used for wallpaper-based colors": "选择基于壁纸取色的配色方案算法"
   },
-  "Select user...": {
-    "Select user...": "选择用户..."
-  },
   "Select which keybind providers to include": {
     "Select which keybind providers to include": "选择要引用的快捷键绑定提供者"
   },
@@ -6846,7 +6918,7 @@
     "Send SMS": "发送短信"
   },
   "Sending %1...": {
-    "Sending %1...": ""
+    "Sending %1...": "正在发送 %1..."
   },
   "Separate": {
     "Separate": "分离"
@@ -6903,13 +6975,13 @@
     "Set the percentage at which the battery is considered low.": "设置低电量百分比"
   },
   "Set up a WiFi hotspot for sharing this connection.": {
-    "Set up a WiFi hotspot for sharing this connection.": ""
+    "Set up a WiFi hotspot for sharing this connection.": "设置 WiFi 热点以共享此连接。"
   },
   "Set up hotspot": {
-    "Set up hotspot": ""
+    "Set up hotspot": "设置热点"
   },
   "Set up hotspot in Settings": {
-    "Set up hotspot in Settings": ""
+    "Set up hotspot in Settings": "在设置中设置热点"
   },
   "Setting": {
     "Setting": "设置项"
@@ -6991,6 +7063,9 @@
   },
   "Show": {
     "Show": "显示"
+  },
+  "Show \"config reloaded\" Toast": {
+    "Show \"config reloaded\" Toast": ""
   },
   "Show 3rd Party": {
     "Show 3rd Party": "显示第三方"
@@ -7187,6 +7262,9 @@
   "Show a notification when battery reaches the charge limit.": {
     "Show a notification when battery reaches the charge limit.": "电池达到充电限制时显示通知"
   },
+  "Show a toast when the compositor config is reloaded": {
+    "Show a toast when the compositor config is reloaded": ""
+  },
   "Show a warning popup when battery is running low.": {
     "Show a warning popup when battery is running low.": "低电量使用时显示警示弹窗"
   },
@@ -7218,7 +7296,7 @@
     "Show during Niri overview": "在 Niri 概览中显示"
   },
   "Show foreground surfaces on notification cards": {
-    "Show foreground surfaces on notification cards": ""
+    "Show foreground surfaces on notification cards": "通知卡片显示前景平面"
   },
   "Show foreground surfaces on panels for stronger contrast": {
     "Show foreground surfaces on panels for stronger contrast": "在面板上显示前台表面以增强对比度"
@@ -7413,7 +7491,7 @@
     "Start": "开始"
   },
   "Start Hotspot?": {
-    "Start Hotspot?": ""
+    "Start Hotspot?": "启动热点？"
   },
   "Start KDE Connect or Valent to use this plugin": {
     "Start KDE Connect or Valent to use this plugin": "启动 KDE Connect 或 Valent 以使用此插件"
@@ -7422,22 +7500,22 @@
     "Start typing your notes here...": "在这里开始记录笔记..."
   },
   "Starting hotspot...": {
-    "Starting hotspot...": ""
+    "Starting hotspot...": "正在启动热点..."
   },
   "Starting the hotspot will disconnect WiFi from \"%1\" — the radio can't do both at once. Sharing internet then requires another connection, such as Ethernet.": {
-    "Starting the hotspot will disconnect WiFi from \"%1\" — the radio can't do both at once. Sharing internet then requires another connection, such as Ethernet.": ""
+    "Starting the hotspot will disconnect WiFi from \"%1\" — the radio can't do both at once. Sharing internet then requires another connection, such as Ethernet.": "启动热点会断开与“%1”的 WiFi 连接——无线适配器无法同时执行这两项操作。共享互联网需要其他连接，例如以太网。"
   },
   "Starting...": {
-    "Starting...": ""
+    "Starting...": "正在启动..."
   },
   "State": {
     "State": "状态"
   },
   "Stop": {
-    "Stop": ""
+    "Stop": "停止"
   },
   "Stop ignoring %1": {
-    "Stop ignoring %1": ""
+    "Stop ignoring %1": "取消忽略 %1"
   },
   "Stopped": {
     "Stopped": "已停止"
@@ -7494,7 +7572,7 @@
     "Surface Border Opacity": "表面边框不透明度"
   },
   "Surface Border Outline": {
-    "Surface Border Outline": ""
+    "Surface Border Outline": "平面边框轮廓"
   },
   "Surface Container": {
     "Surface Container": "平面容器"
@@ -7529,6 +7607,9 @@
   "Suspend then Hibernate": {
     "Suspend then Hibernate": "挂起后休眠"
   },
+  "Swap primary and secondary mouse buttons": {
+    "Swap primary and secondary mouse buttons": ""
+  },
   "Sway Website": {
     "Sway Website": "Sway 网站"
   },
@@ -7536,7 +7617,7 @@
     "Switch between display configurations": "在显示器配置之间切换"
   },
   "Switch displays with an available 60 Hz mode to 60 Hz on battery and restore the previous mode on AC. Skips displays with VRR enabled.": {
-    "Switch displays with an available 60 Hz mode to 60 Hz on battery and restore the previous mode on AC. Skips displays with VRR enabled.": ""
+    "Switch displays with an available 60 Hz mode to 60 Hz on battery and restore the previous mode on AC. Skips displays with VRR enabled.": "对于支持 60 Hz 模式的显示器，电池供电时，切换至 60 Hz，电源供电时，还原之前的模式设置。此设置项将忽略启用 VRR 的显示器"
   },
   "Switch to power profile": {
     "Switch to power profile": "切换电源配置"
@@ -7557,10 +7638,10 @@
     "Sync Position Across Screens": "在显示器间同步位置"
   },
   "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": {
-    "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": ""
+    "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": "同步会将你的主题和设置应用到登录屏幕。共享用户应运行 dms greeter sync --profile，而不是执行主要用户同步。"
   },
   "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": {
-    "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": ""
+    "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": "同步会将你的主题和设置应用到登录屏幕。共享用户应运行 dms greeter sync --profile，而不是执行主要用户同步。"
   },
   "Sync completed successfully.": {
     "Sync completed successfully.": "同步已完成。"
@@ -7652,6 +7733,18 @@
   "Tailscale not available": {
     "Tailscale not available": "Tailscale 不可用"
   },
+  "Tap and Drag": {
+    "Tap and Drag": ""
+  },
+  "Tap and drag on the touchpad to move items": {
+    "Tap and drag on the touchpad to move items": ""
+  },
+  "Tap the touchpad surface to trigger left click clicks": {
+    "Tap the touchpad surface to trigger left click clicks": ""
+  },
+  "Tap to Click": {
+    "Tap to Click": ""
+  },
   "Terminal": {
     "Terminal": "终端"
   },
@@ -7665,13 +7758,13 @@
     "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": "终端回退失败。请安装受支持的终端模拟器之一，或手动运行“dms greeter sync”。"
   },
   "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": {
-    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": ""
+    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": "终端备用方式失败。请安装受支持的终端模拟器之一，或手动运行“dms-greeter sync”。"
   },
   "Terminal fallback opened. Complete authentication there; it will close automatically when done.": {
-    "Terminal fallback opened. Complete authentication there; it will close automatically when done.": ""
+    "Terminal fallback opened. Complete authentication there; it will close automatically when done.": "已打开终端备用方式。请在那里完成认证，完成后终端会自动关闭。"
   },
   "Terminal opened. Complete authentication there; it will close automatically when done.": {
-    "Terminal opened. Complete authentication there; it will close automatically when done.": ""
+    "Terminal opened. Complete authentication there; it will close automatically when done.": "已打开终端。请在那里完成认证，完成后终端会自动关闭。"
   },
   "Terminals - Always use Dark Theme": {
     "Terminals - Always use Dark Theme": "终端总使用深色主题"
@@ -7713,7 +7806,7 @@
     "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "未设置 DMS_SOCKET 环境变量或套接字不可用，无法使用自动插件管理。"
   },
   "The WiFi adapter could not start access point mode.": {
-    "The WiFi adapter could not start access point mode.": ""
+    "The WiFi adapter could not start access point mode.": "WiFi 适配器无法启动接入点模式。"
   },
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
     "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "以下设置将修改您的 GTK 和 Qt 配置。如需保留当前配置，请先备份 (qt5ct.conf|qt6ct.conf 和 ~/.config/gtk-3.0|gtk-4.0)。"
@@ -7726,6 +7819,9 @@
   },
   "The rule applies to any window matching one of these.": {
     "The rule applies to any window matching one of these.": "规则会应用到匹配以上任一条件的窗口。"
+  },
+  "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": {
+    "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": ""
   },
   "Theme & Colors": {
     "Theme & Colors": "主题与配色"
@@ -7770,7 +7866,7 @@
     "This device": "此设备"
   },
   "This install is still using hyprland.conf. Run dms setup to migrate before changing these settings.": {
-    "This install is still using hyprland.conf. Run dms setup to migrate before changing these settings.": ""
+    "This install is still using hyprland.conf. Run dms setup to migrate before changing these settings.": "此安装仍在使用 hyprland.conf。更改这些设置前，请运行 dms setup 完成迁移。"
   },
   "This may take a few seconds": {
     "This may take a few seconds": "此操作可能会花费一些时间"
@@ -7788,7 +7884,7 @@
     "This will delete all unpinned entries. %1 pinned entries will be kept.": "此操作将删除所有未固定的项目。将保留 %1 个已固定项目。"
   },
   "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": {
-    "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": ""
+    "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": "这会断开与“%1”的 WiFi 连接——无线适配器无法同时托管热点并保持连接。共享互联网需要其他连接，例如以太网。"
   },
   "This will permanently delete all clipboard history.": {
     "This will permanently delete all clipboard history.": "此操作会清空剪贴板历史，且无法恢复。"
@@ -7851,7 +7947,7 @@
     "Timeout Progress Bar": "超时进度条"
   },
   "Timeouts": {
-    "Timeouts": ""
+    "Timeouts": "超时"
   },
   "Tint Saturation": {
     "Tint Saturation": "色调饱和度"
@@ -7919,9 +8015,6 @@
   "Too many attempts - locked out": {
     "Too many attempts - locked out": "尝试次数过多 - 已锁定"
   },
-  "Too many failed attempts - account may be locked": {
-    "Too many failed attempts - account may be locked": "失败次数过多 - 账号将会被锁定"
-  },
   "Tools": {
     "Tools": "工具"
   },
@@ -7957,6 +8050,12 @@
   },
   "Touch your security key...": {
     "Touch your security key...": "请触摸你的安全密钥..."
+  },
+  "Touchpad Settings": {
+    "Touchpad Settings": ""
+  },
+  "Touchpad Speed": {
+    "Touchpad Speed": ""
   },
   "Transform": {
     "Transform": "变换"
@@ -8017,6 +8116,9 @@
   },
   "Turn off now": {
     "Turn off now": "立即关闭"
+  },
+  "Two Finger": {
+    "Two Finger": ""
   },
   "Type at least 2 characters": {
     "Type at least 2 characters": "至少键入两个字符"
@@ -8159,6 +8261,9 @@
   "Untrust": {
     "Untrust": "取消信任"
   },
+  "Untrusted VPN certificate": {
+    "Untrusted VPN certificate": ""
+  },
   "Up to date": {
     "Up to date": "已是最新"
   },
@@ -8232,7 +8337,7 @@
     "Use a custom image for the lock screen, or leave empty to use your desktop wallpaper.": "使用自定义锁屏图片，留空则使用桌面壁纸。"
   },
   "Use a custom image for the login screen, or leave empty to use desktop wallpaper": {
-    "Use a custom image for the login screen, or leave empty to use desktop wallpaper": ""
+    "Use a custom image for the login screen, or leave empty to use desktop wallpaper": "为登录屏幕使用自定义图片，留空则使用桌面壁纸"
   },
   "Use a custom radius for goth corner cutouts": {
     "Use a custom radius for goth corner cutouts": "为Goth 圆角裁切使用自定义半径"
@@ -8241,10 +8346,10 @@
     "Use a fixed shadow direction for this bar": "为此状态栏使用固定的阴影方向"
   },
   "Use a security key for lock screen authentication": {
-    "Use a security key for lock screen authentication": ""
+    "Use a security key for lock screen authentication": "锁屏使用安全密钥认证"
   },
   "Use album art accent": {
-    "Use album art accent": ""
+    "Use album art accent": "使用专辑封面强调色"
   },
   "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": {
     "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": "使用外部壁纸管理器，例如 swww、hyprpaper 或 swaybg。"
@@ -8253,7 +8358,7 @@
     "Use animated wave progress bars for media playback": "媒体播放时显示动态波形进度条"
   },
   "Use colors extracted from album art instead of system theme colors": {
-    "Use colors extracted from album art instead of system theme colors": ""
+    "Use colors extracted from album art instead of system theme colors": "使用从专辑封面提取的颜色，而不是系统主题颜色"
   },
   "Use custom border/focus-ring width": {
     "Use custom border/focus-ring width": "使用自定义边框/聚焦环宽度"
@@ -8271,7 +8376,7 @@
     "Use different workspace colors on displays that are not focused": "在非焦点显示器上使用不同的工作区颜色"
   },
   "Use fingerprint authentication for the lock screen": {
-    "Use fingerprint authentication for the lock screen": ""
+    "Use fingerprint authentication for the lock screen": "锁屏使用指纹认证"
   },
   "Use keys 1-3 or arrows, Enter/Space to select": {
     "Use keys 1-3 or arrows, Enter/Space to select": "使用数字键 1-3 或方向键选择，按 Enter/Space 确认"
@@ -8292,7 +8397,7 @@
     "Use sound theme from system settings": "使用系统设置中的声音主题"
   },
   "Use system PAM authentication": {
-    "Use system PAM authentication": ""
+    "Use system PAM authentication": "使用系统 PAM 认证"
   },
   "Use the extended surface for launcher content": {
     "Use the extended surface for launcher content": "为启动器内容使用拓展平面"
@@ -8341,9 +8446,6 @@
   },
   "Username must start with a lowercase letter or underscore and contain only lowercase letters, digits, hyphens, or underscores.": {
     "Username must start with a lowercase letter or underscore and contain only lowercase letters, digits, hyphens, or underscores.": "用户名必须以小写字母或下划线开头，且只能包含小写字母、数字、连字符或下划线。"
-  },
-  "Username...": {
-    "Username...": "用户名..."
   },
   "Users": {
     "Users": "用户"
@@ -8481,13 +8583,13 @@
     "W": ""
   },
   "WCAG %1 body": {
-    "WCAG %1 body": ""
+    "WCAG %1 body": "WCAG %1 正文"
   },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
   },
   "WPA2 password": {
-    "WPA2 password": ""
+    "WPA2 password": "WPA2 密码"
   },
   "Wallpaper": {
     "Wallpaper": "壁纸"
@@ -8550,7 +8652,7 @@
     "When locked": "何时锁定"
   },
   "Which PAM service the lock screen uses to authenticate": {
-    "Which PAM service the lock screen uses to authenticate": ""
+    "Which PAM service the lock screen uses to authenticate": "锁屏用于认证的 PAM 服务"
   },
   "White": {
     "White": "白色"
@@ -8577,10 +8679,10 @@
     "WiFi enabled": "Wi-Fi 已启用"
   },
   "WiFi is disabled": {
-    "WiFi is disabled": ""
+    "WiFi is disabled": "WiFi 已禁用"
   },
   "WiFi is disabled. You can still edit and save hotspot settings, but starting the hotspot requires WiFi to be enabled.": {
-    "WiFi is disabled. You can still edit and save hotspot settings, but starting the hotspot requires WiFi to be enabled.": ""
+    "WiFi is disabled. You can still edit and save hotspot settings, but starting the hotspot requires WiFi to be enabled.": "WiFi 已禁用。你仍可编辑并保存热点设置，但启动热点需要先启用 WiFi。"
   },
   "WiFi is off": {
     "WiFi is off": "Wi-Fi 已关闭"
@@ -8640,7 +8742,7 @@
     "Width of window border and focus ring": "窗口边框与焦点环宽度"
   },
   "Will disconnect \"%1": {
-    "Will disconnect \"%1\"": ""
+    "Will disconnect \"%1\"": "将断开“%1”"
   },
   "Wind": {
     "Wind": "风速"
@@ -8751,10 +8853,10 @@
     "Your compositor does not support background blur (ext-background-effect-v1)": "当前合成器不支持背景模糊（ext-background-effect-v1）"
   },
   "Your hotspot is running.": {
-    "Your hotspot is running.": ""
+    "Your hotspot is running.": "热点正在运行。"
   },
   "Your hotspot profile is saved and ready to start.": {
-    "Your hotspot profile is saved and ready to start.": ""
+    "Your hotspot profile is saved and ready to start.": "热点配置文件已保存，可以启动。"
   },
   "Your system is up to date!": {
     "Your system is up to date!": "您的系统已是最新！"
@@ -8764,6 +8866,9 @@
   },
   "attached": {
     "attached": "已附加"
+  },
+  "below AA": {
+    "below AA": ""
   },
   "brandon": {
     "brandon": "brandon"
@@ -8775,16 +8880,16 @@
     "by %1": "%1"
   },
   "checked %1d ago": {
-    "checked %1d ago": ""
+    "checked %1d ago": "%1 天前检查"
   },
   "checked %1h ago": {
-    "checked %1h ago": ""
+    "checked %1h ago": "%1 小时前检查"
   },
   "checked %1m ago": {
-    "checked %1m ago": ""
+    "checked %1m ago": "%1 分前检查"
   },
   "checked just now": {
-    "checked just now": ""
+    "checked just now": "刚刚检查"
   },
   "days": {
     "days": "天"
@@ -8808,7 +8913,7 @@
     "discuss": "讨论"
   },
   "display rotation option": {
-    "Normal": ""
+    "Normal": "正常"
   },
   "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": {
     "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": "DMS 是一款高度可自定义的现代桌面 Shell，采用受 <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">Material 3</a> 启发的设计。<br /><br/>DMS 基于 <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>（用于构建桌面 Shell 的 Qt6 框架）和 <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>（静态类型编译型编程语言）开发。"
@@ -8871,7 +8976,7 @@
     "mangowc GitHub": "mangowc GitHub"
   },
   "matugen not available or disabled - cannot apply %1 colors": {
-    "matugen not available or disabled - cannot apply %1 colors": ""
+    "matugen not available or disabled - cannot apply %1 colors": "matugen 不可用或已禁用，无法应用 %1 配色"
   },
   "matugen not found - install matugen package for dynamic theming": {
     "matugen not found - install matugen package for dynamic theming": "未找到 Matugen - 请为动态主题安装 matugen 包"
@@ -8886,7 +8991,7 @@
     "nav": "导航"
   },
   "network security type": {
-    "Open": ""
+    "Open": "开放"
   },
   "niri GitHub": {
     "niri GitHub": "Niri GitHub"
@@ -8934,7 +9039,7 @@
     "power-profiles-daemon not available": "power-profiles-daemon 不可用"
   },
   "primary network connection label": {
-    "Primary": ""
+    "Primary": "主要"
   },
   "procs": {
     "procs": "进程"

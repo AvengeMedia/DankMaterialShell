@@ -114,7 +114,7 @@
     "%command%": "%command%"
   },
   "'Alternative' lets the key unlock on its own. 'Second factor' requires password or fingerprint first, then the key.": {
-    "'Alternative' lets the key unlock on its own. 'Second factor' requires password or fingerprint first, then the key.": "«Альтернатива» дозволяє ключу розблокувати систему самостійно. «Другий фактор» вимагає спочатку пароля або відбитка пальця, а потім ключа."
+    "'Alternative' lets the key unlock on its own. 'Second factor' requires password or fingerprint first, then the key.": "«Альтернатива» дозволяє ключу розблокувати систему самостійно. «Другий фактор» вимагає спочатку пароль або відбиток пальця, а потім ключ"
   },
   "(Unnamed)": {
     "(Unnamed)": "(Безіменний)"
@@ -156,7 +156,7 @@
     "1 task": "1 завдання"
   },
   "10 min before": {
-    "10 min before": "за 10 хв."
+    "10 min before": "за 10 хв"
   },
   "10 minutes": {
     "10 minutes": "10 хвилин"
@@ -177,7 +177,7 @@
     "15 min": "15 хв"
   },
   "15 min before": {
-    "15 min before": "за 15 хв."
+    "15 min before": "за 15 хв"
   },
   "15 minutes": {
     "15 minutes": "15 хвилин"
@@ -198,7 +198,7 @@
     "2 seconds": "2 секунди"
   },
   "2.4 GHz": {
-    "2.4 GHz": ""
+    "2.4 GHz": "2,4 ГГц"
   },
   "20 minutes": {
     "20 minutes": "20 хвилин"
@@ -237,7 +237,7 @@
     "30 min": "30 хв"
   },
   "30 min before": {
-    "30 min before": "за 30 хв."
+    "30 min before": "за 30 хв"
   },
   "30 minutes": {
     "30 minutes": "30 хвилин"
@@ -264,10 +264,10 @@
     "45 seconds": "45 секунд"
   },
   "5 GHz": {
-    "5 GHz": ""
+    "5 GHz": "5 ГГц"
   },
   "5 min before": {
-    "5 min before": "за 5 хв."
+    "5 min before": "за 5 хв"
   },
   "5 minutes": {
     "5 minutes": "5 хвилин"
@@ -309,13 +309,13 @@
     "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>": "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">Ліцензія MIT</a>"
   },
   "A modern desktop shell for Wayland compositors": {
-    "A modern desktop shell for Wayland compositors": "Сучасна оболонку робочого столу для Wayland композиторів"
+    "A modern desktop shell for Wayland compositors": "Сучасна оболонка робочого столу для Wayland композиторів"
   },
   "A separate minimal launcher action that works in Standalone, Separate Frame Mode, and Connected Frame Mode.": {
-    "A separate minimal launcher action that works in Standalone, Separate Frame Mode, and Connected Frame Mode.": "Окремий мінімальний запуск, який працює в автономному режимі, режимах окремого та підключеного фреймів."
+    "A separate minimal launcher action that works in Standalone, Separate Frame Mode, and Connected Frame Mode.": "Окремий мінімальний запуск, який працює в автономному режимі, режимах окремого та підключеного фреймів"
   },
   "A user with that name already exists.": {
-    "A user with that name already exists.": "Користувач з таким ім'ям вже існує."
+    "A user with that name already exists.": "Користувач з таким ім'ям вже існує"
   },
   "AC Adapter (Plugged In)": {
     "AC Adapter (Plugged In)": "Адаптер живлення підключено"
@@ -327,13 +327,16 @@
     "API": "API"
   },
   "AUR helpers are interactive — see the terminal window for prompts. This popout will return to idle when the upgrade exits.": {
-    "AUR helpers are interactive — see the terminal window for prompts. This popout will return to idle when the upgrade exits.": "Помічники AUR є інтерактивними — дивіться вікно термінала для запитів. Це спливаюче вікно перейде в режим очікування після завершення оновлення."
+    "AUR helpers are interactive — see the terminal window for prompts. This popout will return to idle when the upgrade exits.": "Помічники AUR є інтерактивними — дивіться вікно термінала для запитів. Це спливаюче вікно перейде в режим очікування після завершення оновлення"
   },
   "Aborted": {
     "Aborted": "Перервано"
   },
   "About": {
     "About": "Про"
+  },
+  "Acceleration Profile": {
+    "Acceleration Profile": ""
   },
   "Accent Color": {
     "Accent Color": "Акцентний колір"
@@ -342,16 +345,16 @@
     "Accept": "Прийняти"
   },
   "Accept Jobs": {
-    "Accept Jobs": "Приймати завдання"
+    "Accept Jobs": "Прийняти завдання"
   },
   "Accepting": {
-    "Accepting": "Приймає"
+    "Accepting": "Прийняття"
   },
   "Access clipboard history": {
     "Access clipboard history": "Доступ до історії буфера обміну"
   },
   "Access to notifications and do not disturb": {
-    "Access to notifications and do not disturb": "Доступ до сповіщень та режиму Не турбувати"
+    "Access to notifications and do not disturb": "Доступ до сповіщень та режиму «Не турбувати»"
   },
   "Access to system controls and settings": {
     "Access to system controls and settings": "Доступ до елементів керування та налаштувань системи"
@@ -360,7 +363,7 @@
     "Action": "Дія"
   },
   "Action failed or terminal was closed.": {
-    "Action failed or terminal was closed.": "Дія не вдалася або термінал було закрито."
+    "Action failed or terminal was closed.": "Невдала дія або термінал було закрито."
   },
   "Action performed when scrolling horizontally on the bar": {
     "Action performed when scrolling horizontally on the bar": "Дія при горизонтальній прокрутці панелі"
@@ -372,13 +375,13 @@
     "Activate": "Активувати"
   },
   "Activate Greeter": {
-    "Activate Greeter": "Активувати вікно входу"
+    "Activate Greeter": "Активувати екран входу"
   },
   "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": {
-    "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": "Активувати вікно входу DMS? Відкриється термінал для sudo-автентифікації. Після активації запустіть Синхронізацію, щоб застосувати налаштування."
+    "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": "Активувати екран входу DMS? Відкриється термінал для sudo-автентифікації. Після активації запустіть Синхронізацію, щоб застосувати налаштування"
   },
   "Activates immediately": {
-    "Activates immediately": ""
+    "Activates immediately": "Активується негайно"
   },
   "Activation": {
     "Activation": "Активація"
@@ -410,6 +413,9 @@
   "Adapters": {
     "Adapters": "Адаптери"
   },
+  "Adaptive": {
+    "Adaptive": ""
+  },
   "Adaptive Media Width": {
     "Adaptive Media Width": "Адаптивна ширина медіа"
   },
@@ -420,10 +426,10 @@
     "Add \"%1\" to the %2 group?": "Додати «%1» до групи %2?"
   },
   "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": {
-    "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": "Додати «%1» до групи %2? Користувач має вийти та знову увійти в систему, а потім виконати dms greeter sync --profile для публікації теми екрана входу."
+    "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": "Додати «%1» до групи %2? Користувач має вийти та знову увійти в систему, а потім виконати 'dms greeter sync --profile' для публікації теми екрана входу"
   },
   "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": {
-    "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": ""
+    "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": "Додати «%1» до групи %2? Користувач має вийти з системи та увійти знову, а потім запустити 'dms-greeter sync --profile', щоб опублікувати тему екрана входу"
   },
   "Add Bar": {
     "Add Bar": "Додати панель"
@@ -453,7 +459,7 @@
     "Add a border around the dock": "Додати рамку навколо доку"
   },
   "Add a custom prefix to all application launches. This can be used for things like 'uwsm-app', 'systemd-run', or other command wrappers.": {
-    "Add a custom prefix to all application launches. This can be used for things like 'uwsm-app', 'systemd-run', or other command wrappers.": "Додати власний префікс до всіх запускачів додатків. Можна використовувати для таких речей, як 'uwsm-app', 'systemd-run' або інших обгорток команд."
+    "Add a custom prefix to all application launches. This can be used for things like 'uwsm-app', 'systemd-run', or other command wrappers.": "Додати власний префікс до всіх запускачів додатків. Можна використовувати для таких речей, як 'uwsm-app', 'systemd-run' або інших обгорток команд"
   },
   "Add a task...": {
     "Add a task...": "Додати завдання..."
@@ -474,31 +480,40 @@
     "Add notes": "Додати нотатки"
   },
   "Add the new user to the %1 group so they can run dms greeter sync --profile.": {
-    "Add the new user to the %1 group so they can run dms greeter sync --profile.": "Додайте нового користувача до групи %1, щоб він міг запустити dms greeter sync --profile."
+    "Add the new user to the %1 group so they can run dms greeter sync --profile.": "Додайте нового користувача до групи %1, щоб він міг запустити 'dms greeter sync --profile'"
   },
   "Add the new user to the %1 group so they can run dms-greeter sync --profile.": {
-    "Add the new user to the %1 group so they can run dms-greeter sync --profile.": ""
+    "Add the new user to the %1 group so they can run dms-greeter sync --profile.": "Додайте нового користувача до групи %1, щоб він міг запустити 'dms-greeter sync --profile'"
   },
   "Add the new user to the %1 group so they can use sudo.": {
-    "Add the new user to the %1 group so they can use sudo.": "Додайте нового користувача до групи %1, щоб він міг використовувати sudo."
+    "Add the new user to the %1 group so they can use sudo.": "Додайте нового користувача до групи %1, щоб він міг використовувати sudo"
   },
   "Add to Autostart": {
     "Add to Autostart": "Додати в автозапуск"
+  },
+  "Adjust pointer sensitivity speed": {
+    "Adjust pointer sensitivity speed": ""
+  },
+  "Adjust scrolling sensitivity multiplier": {
+    "Adjust scrolling sensitivity multiplier": ""
   },
   "Adjust the bar height via inner padding": {
     "Adjust the bar height via inner padding": "Регулювати висоту панелі за допомогою внутрішніх відступів"
   },
   "Adjust the number of columns in grid view mode.": {
-    "Adjust the number of columns in grid view mode.": "Налаштуйте кількість стовпців у режимі відображення сітки."
+    "Adjust the number of columns in grid view mode.": "Налаштуйте кількість стовпців у режимі відображення сітки"
+  },
+  "Adjust touchpad pointer speed": {
+    "Adjust touchpad pointer speed": ""
   },
   "Adjust volume per scroll indent": {
-    "Adjust volume per scroll indent": "Регулювати гучність за один крок прокрутки"
+    "Adjust volume per scroll indent": "Зміна гучності за один крок прокрутки"
   },
   "Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)": {
-    "Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)": "Регулює контрастність згенерованих кольорів (-100 = мінімум, 0 = стандарт, 100 = максимум)"
+    "Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)": "Зміна контрастності згенерованих кольорів (-100 = мінімум, 0 = стандарт, 100 = максимум)"
   },
   "Administrator access is required. Use the Sync button in Settings → Greeter to apply.": {
-    "Administrator access is required. Use the Sync button in Settings → Greeter to apply.": "Потрібен доступ адміністратора. Використовуйте кнопку Синхронізації в Налаштування → Вітальник, щоб застосувати."
+    "Administrator access is required. Use the Sync button in Settings → Greeter to apply.": "Потрібен доступ адміністратора. Використовуйте кнопку Синхронізація в Налаштування → Екран входу, щоб застосувати"
   },
   "Administrator group:": {
     "Administrator group:": "Група адміністраторів:"
@@ -537,10 +552,10 @@
     "Allow clicks to pass through the widget": "Дозволити клікам проходити крізь віджет"
   },
   "Allow greeter access?": {
-    "Allow greeter access?": "Дозволити доступ через вікно входу?"
+    "Allow greeter access?": "Дозволити доступ через екран входу?"
   },
   "Allow greeter login access": {
-    "Allow greeter login access": "Дозволити вхід через вікно входу"
+    "Allow greeter login access": "Дозволити вхід через екран входу"
   },
   "Already on that session": {
     "Already on that session": "Вже в цій сесії"
@@ -567,13 +582,16 @@
     "Always on icons": "Завжди показувати значки"
   },
   "Always show a minimum of 3 workspaces, even if fewer are available": {
-    "Always show a minimum of 3 workspaces, even if fewer are available": "Завжди показувати мінімум 3 робочі області, навіть якщо доступно менше"
+    "Always show a minimum of 3 workspaces, even if fewer are available": "Завжди показувати мінімум 3 робочі простори, навіть якщо доступно менше"
   },
   "Always show the dock when niri's overview is open": {
-    "Always show the dock when niri's overview is open": "Завжди показувати док, коли відкрито огляд niri"
+    "Always show the dock when niri's overview is open": "Завжди показувати док, коли відкрито огляд Niri"
   },
   "Always show when there's only one connected display": {
     "Always show when there's only one connected display": "Завжди показувати, якщо підключено лише один дисплей"
+  },
+  "Always use the durations above, even if an app requests a shorter or longer one": {
+    "Always use the durations above, even if an app requests a shorter or longer one": ""
   },
   "Always use this app for %1": {
     "Always use this app for %1": "Завжди використовувати цей додаток для %1"
@@ -588,7 +606,7 @@
     "Analog": "Аналоговий"
   },
   "Analog, digital, or stacked clock display": {
-    "Analog, digital, or stacked clock display": "Аналоговий, цифровий або стековий відображення годинника"
+    "Analog, digital, or stacked clock display": "Аналоговий, цифровий або стековий годинник"
   },
   "Analyzing configuration...": {
     "Analyzing configuration...": "Аналіз конфігурації..."
@@ -606,10 +624,10 @@
     "Animation Style": "Стиль анімації"
   },
   "Anonymous Identity": {
-    "Anonymous Identity": "Анонімна ідентичність"
+    "Anonymous Identity": "Анонімна особа"
   },
   "Anonymous Identity (optional)": {
-    "Anonymous Identity (optional)": "Анонімна особа (необов’язково)"
+    "Anonymous Identity (optional)": "Анонімна особа (опціонально)"
   },
   "Any window": {
     "Any window": "Будь-яке вікно"
@@ -633,7 +651,7 @@
     "App ID regex (e.g. ^firefox$)": "Регулярний вираз ID додатка (напр. ^firefox$)"
   },
   "App Launcher": {
-    "App Launcher": "Меню застосунків"
+    "App Launcher": "Меню додатків"
   },
   "App Names": {
     "App Names": "Назви додатків"
@@ -654,19 +672,19 @@
     "Application Dock": "Док-панель"
   },
   "Applications": {
-    "Applications": "Застосунки"
+    "Applications": "Додатки"
   },
   "Applications and commands to start automatically when you log in": {
     "Applications and commands to start automatically when you log in": "Додатки та команди для автоматичного запуску при вході в систему"
   },
   "Applies on the next greeter sync": {
-    "Applies on the next greeter sync": ""
+    "Applies on the next greeter sync": "Застосується під час наступної синхронізації вікна входу"
   },
   "Apply Changes": {
     "Apply Changes": "Застосувати зміни"
   },
   "Apply Flatpak updates alongside system updates when running 'Update All'.": {
-    "Apply Flatpak updates alongside system updates when running 'Update All'.": "Застосовувати оновлення Flatpak разом із системними при запуску «Оновити все»."
+    "Apply Flatpak updates alongside system updates when running 'Update All'.": "Застосовувати оновлення Flatpak разом із системними при запуску «Оновити все»"
   },
   "Apply GTK Colors": {
     "Apply GTK Colors": "Застосувати кольори GTK"
@@ -675,7 +693,7 @@
     "Apply Qt Colors": "Застосувати кольори QT"
   },
   "Apply compositor blur behind the frame border": {
-    "Apply compositor blur behind the frame border": "Застосувати розмиття композитора за межею фрейму"
+    "Apply compositor blur behind the frame border": "Застосувати розмиття композитора за межами рамки"
   },
   "Apply inverse concave corner cutouts to the bar": {
     "Apply inverse concave corner cutouts to the bar": "Застосувати інверсні увігнуті вирізи кутів до панелі"
@@ -684,7 +702,7 @@
     "Apply to Hardware": "Застосувати до обладнання"
   },
   "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": {
-    "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": "Застосовувати теплу колірну температуру, щоб зменшити навантаження на очі. Використовуйте параметри автоматизації нижче, щоб керувати часом активації."
+    "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": "Застосовувати теплу колірну температуру, щоб зменшити навантаження на очі. Використовуйте параметри автоматизації нижче, щоб керувати часом активації"
   },
   "Applying authentication changes...": {
     "Applying authentication changes...": "Застосування змін автентифікації..."
@@ -702,16 +720,16 @@
     "Apps Dock Settings": "Налаштування доку додатків"
   },
   "Apps Icon": {
-    "Apps Icon": "Іконки застосунків"
+    "Apps Icon": "Іконки додатків"
   },
   "Apps are ordered by usage frequency, then last used, then alphabetically.": {
-    "Apps are ordered by usage frequency, then last used, then alphabetically.": "Застосунки впорядковано за частотою використання, потім за останнім використанням, потім за алфавітом."
+    "Apps are ordered by usage frequency, then last used, then alphabetically.": "Додатки впорядковано за частотою використання, потім за останнім використанням, потім за алфавітом"
   },
   "Apps with custom display name, icon, or launch options. Right-click an app and select 'Edit App' to customize.": {
-    "Apps with custom display name, icon, or launch options. Right-click an app and select 'Edit App' to customize.": "Додатки з власними назвами, іконками або параметрами запуску. Натисніть правою кнопкою миші на додаток і виберіть «Редагувати додаток» для налаштування."
+    "Apps with custom display name, icon, or launch options. Right-click an app and select 'Edit App' to customize.": "Додатки з власними назвами, іконками або параметрами запуску. Натисніть ПКМ на додатку і виберіть «Редагувати додаток» для налаштування"
   },
   "Apps with notification popups muted. Unmute or delete to remove.": {
-    "Apps with notification popups muted. Unmute or delete to remove.": "Додатки з вимкненими спливаючими сповіщеннями. Увімкніть звук або видаліть, щоб прибрати їх."
+    "Apps with notification popups muted. Unmute or delete to remove.": "Додатки з вимкненими спливаючими сповіщеннями. Увімкніть звук або видаліть, щоб прибрати їх"
   },
   "Arc Extender": {
     "Arc Extender": "Розширювач дуг"
@@ -732,7 +750,7 @@
     "At least one output must remain enabled": "Принаймні один вихід має залишатися увімкненим"
   },
   "At start": {
-    "At start": "При запуску"
+    "At start": "Під час запуску"
   },
   "Attach": {
     "Attach": "Приєднати"
@@ -782,9 +800,6 @@
   "Authenticated!": {
     "Authenticated!": "Автентифіковано!"
   },
-  "Authenticating...": {
-    "Authenticating...": "Автентифікація..."
-  },
   "Authentication": {
     "Authentication": "Автентифікація"
   },
@@ -801,19 +816,7 @@
     "Authentication changes apply automatically": "Зміни автентифікації застосовуються автоматично"
   },
   "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": {
-    "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": "Для змін автентифікації потрібен sudo. Відкривається термінал для введення пароля або відбитка пальця."
-  },
-  "Authentication error - try again": {
-    "Authentication error - try again": "Помилка автентифікації — спробуйте ще раз"
-  },
-  "Authentication failed - attempt %1 of %2": {
-    "Authentication failed - attempt %1 of %2": "Автентифікація не вдалася — спроба %1 з %2"
-  },
-  "Authentication failed - lockout can occur": {
-    "Authentication failed - lockout can occur": "Автентифікація не вдалася — можливе блокування"
-  },
-  "Authentication failed - try again": {
-    "Authentication failed - try again": "Автентифікація не вдалася — спробуйте ще раз"
+    "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": "Для змін автентифікації потрібен sudo. Відкривається термінал для введення пароля або відбитка пальця"
   },
   "Authorize": {
     "Authorize": "Авторизувати"
@@ -849,16 +852,16 @@
     "Auto Power Saver": "Автоматична економія енергії"
   },
   "Auto matches bar spacing; Off leaves gaps to your %1 config": {
-    "Auto matches bar spacing; Off leaves gaps to your %1 config": "Авто підбирає відстані за панеллю; Вимк. залишає відступи згідно з вашими налаштуваннями у %1"
+    "Auto matches bar spacing; Off leaves gaps to your %1 config": "Авто — підбирає відстані за панеллю, Вимк. — залишає відступи згідно з вашими налаштуваннями у %1"
   },
   "Auto mode is on. Manual profile selection is disabled.": {
-    "Auto mode is on. Manual profile selection is disabled.": "Автоматичний режим увімкнено. Ручний вибір профілю вимкнено."
+    "Auto mode is on. Manual profile selection is disabled.": "Автоматичний режим увімкнено, ручний вибір профілю вимкнено"
   },
   "Auto saved": {
     "Auto saved": "Автозбережено"
   },
   "Auto uses an installed or bundled key-only service.": {
-    "Auto uses an installed or bundled key-only service.": "Авто використовує встановлену або вбудовану службу лише для ключів."
+    "Auto uses an installed or bundled key-only service.": "Авто використовує встановлену або вбудовану службу лише для ключів"
   },
   "Auto-Clear After": {
     "Auto-Clear After": "Автоочищення через"
@@ -867,7 +870,7 @@
     "Auto-Hide Timeout": "Тайм-аут приховування"
   },
   "Auto-close Niri overview when launching apps.": {
-    "Auto-close Niri overview when launching apps.": "Автоматично закривати огляд Niri при запуску програм."
+    "Auto-close Niri overview when launching apps.": "Автоматично закривати огляд Niri при запуску додатків"
   },
   "Auto-delete notifications older than this": {
     "Auto-delete notifications older than this": "Автоматично видаляти сповіщення, старіші за цей період"
@@ -877,9 +880,6 @@
   },
   "Auto-hide Dock": {
     "Auto-hide Dock": "Автоприховування док-панелі"
-  },
-  "Auto-login": {
-    "Auto-login": "Автологін"
   },
   "Auto-login change needs a sync": {
     "Auto-login change needs a sync": "Зміна автологіну потребує синхронізації"
@@ -906,7 +906,7 @@
     "Autoconnect enabled": "Автоматичне підключення увімкнено"
   },
   "Autofill last remembered query when opened": {
-    "Autofill last remembered query when opened": "Автозаповнення останнього запам'ятаного запиту при відкритті"
+    "Autofill last remembered query when opened": "Автозаповнення останнього запам'ятованого запиту при відкритті"
   },
   "Automatic Color Mode": {
     "Automatic Color Mode": "Автоматичний режим кольорів"
@@ -948,7 +948,7 @@
     "Automatically save changes to opened files as you type": "Автоматично зберігати зміни у відкритих файлах під час введення тексту"
   },
   "Automatically turn on Power Saver profile when battery is low.": {
-    "Automatically turn on Power Saver profile when battery is low.": "Автоматично вмикати профіль економії енергії при низькому заряді батареї."
+    "Automatically turn on Power Saver profile when battery is low.": "Автоматично вмикати профіль економії енергії при низькому заряді батареї"
   },
   "Automation": {
     "Automation": "Автоматизація"
@@ -980,23 +980,11 @@
   "Available in Detailed and Forecast view modes": {
     "Available in Detailed and Forecast view modes": "Доступно в режимах перегляду «Детально» та «Прогноз»"
   },
-  "Awaiting fingerprint authentication": {
-    "Awaiting fingerprint authentication": "Очікування автентифікації за відбитком пальця"
-  },
-  "Awaiting fingerprint or security key authentication": {
-    "Awaiting fingerprint or security key authentication": "Очікування автентифікації за відбитком або ключем безпеки"
-  },
-  "Awaiting security key authentication": {
-    "Awaiting security key authentication": "Очікування автентифікації за ключем безпеки"
-  },
   "BSSID": {
     "BSSID": "BSSID"
   },
   "Back": {
     "Back": "Назад"
-  },
-  "Back to user list": {
-    "Back to user list": "Назад до списку користувачів"
   },
   "Backend": {
     "Backend": "Бекенд"
@@ -1017,7 +1005,7 @@
     "Background Opacity": "Прозорість фону"
   },
   "Background authentication sync failed. Trying terminal mode.": {
-    "Background authentication sync failed. Trying terminal mode.": "Синхронізація автентифікації у фоні не вдалася. Спроба режиму термінала."
+    "Background authentication sync failed. Trying terminal mode.": "Невдала фонова синхронізація автентифікації. Спроба автентифікації через термінал"
   },
   "Background image": {
     "Background image": "Зображення фону"
@@ -1032,10 +1020,10 @@
     "Balanced": "Збалансований"
   },
   "Balanced palette with focused accents (default).": {
-    "Balanced palette with focused accents (default).": "Збалансована палітра з акцентованими елементами (типова)."
+    "Balanced palette with focused accents (default).": "Збалансована палітра з акцентованими елементами (типова)"
   },
   "Band": {
-    "Band": ""
+    "Band": "Діапазон"
   },
   "Bar": {
     "Bar": "Панель"
@@ -1095,7 +1083,7 @@
     "Battery is at %1% - Consider charging soon": "Заряд батареї %1% — рекомендується незабаром зарядити"
   },
   "Battery percentage to trigger a critical alert.": {
-    "Battery percentage to trigger a critical alert.": "Відсоток заряду батареї для активації критичного сповіщення."
+    "Battery percentage to trigger a critical alert.": "Відсоток заряду батареї для активації критичного сповіщення"
   },
   "Behavior": {
     "Behavior": "Поведінка"
@@ -1104,7 +1092,7 @@
     "Bind lock screen to dbus signals from loginctl. Disable if using an external lock screen": "Прив'язати екран блокування до сигналів dbus від loginctl. Вимкніть, якщо використовується зовнішній екран блокування"
   },
   "Bind the %1 IPC action in your compositor config.": {
-    "Bind the %1 IPC action in your compositor config.": "Призначте дію IPC %1 у конфігурації вашого композитора."
+    "Bind the %1 IPC action in your compositor config.": "Призначте дію IPC %1 у конфігурації вашого композитора"
   },
   "Binds include added": {
     "Binds include added": "Включення прив'язок додано"
@@ -1152,10 +1140,10 @@
     "Blur on Overview": "Розмиття в режимі огляду"
   },
   "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support. Adjust Opacity accordingly.": {
-    "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support. Adjust Opacity accordingly.": "Розмивати фон за панелями, спливаючими вікнами та сповіщеннями. Потребує підтримки композитора. Відрегулюйте прозорість відповідно."
+    "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support. Adjust Opacity accordingly.": "Розмивати фон за панелями, спливаючими вікнами та сповіщеннями. Потребує підтримки композитора. Відрегулюйте прозорість відповідно"
   },
   "Blur wallpaper when niri overview is open": {
-    "Blur wallpaper when niri overview is open": "Розмивати шпалери, коли відкритий огляд niri"
+    "Blur wallpaper when niri overview is open": "Розмивати шпалери, коли відкритий огляд Niri"
   },
   "Blurred surfaces show the wallpaper instead of the content beneath": {
     "Blurred surfaces show the wallpaper instead of the content beneath": "Розмиті поверхні показують шпалери замість вмісту під ними"
@@ -1173,7 +1161,7 @@
     "Border": "Межа"
   },
   "Border Color": {
-    "Border Color": "Колір рамки"
+    "Border Color": "Колір контуру"
   },
   "Border Off": {
     "Border Off": "Межа вимкнена"
@@ -1293,7 +1281,7 @@
     "Calendar Backend": "Бекенд календаря"
   },
   "Calls / Headset": {
-    "Calls / Headset": ""
+    "Calls / Headset": "Дзвінки / Гарнітура"
   },
   "Camera": {
     "Camera": "Камера"
@@ -1329,13 +1317,13 @@
     "Capacity": "Ємність"
   },
   "Caps Lock": {
-    "Caps Lock": "Caps Lock"
+    "Caps Lock": "Всі великі"
   },
   "Caps Lock Indicator": {
-    "Caps Lock Indicator": "Індикатор Caps Lock"
+    "Caps Lock Indicator": "Індикатор «Всі великі»"
   },
   "Caps Lock is on": {
-    "Caps Lock is on": "Caps Lock увімкнено"
+    "Caps Lock is on": "«Всі великі» увімкнено"
   },
   "Cast Target": {
     "Cast Target": "Ціль трансляції"
@@ -1362,10 +1350,10 @@
     "Change Volume": "Змінити гучність"
   },
   "Change the locale used by the DMS interface.": {
-    "Change the locale used by the DMS interface.": "Змінити локаль, що використовується інтерфейсом DMS."
+    "Change the locale used by the DMS interface.": "Змінити локаль, що використовується інтерфейсом DMS"
   },
   "Change the locale used for date and time formatting, independent of the interface language.": {
-    "Change the locale used for date and time formatting, independent of the interface language.": "Змінити локаль для форматування дати та часу, незалежно від мови інтерфейсу."
+    "Change the locale used for date and time formatting, independent of the interface language.": "Змінити локаль для форматування дати та часу незалежно від мови інтерфейсу"
   },
   "Channel": {
     "Channel": "Канал"
@@ -1392,7 +1380,7 @@
     "Check on startup": "Перевіряти при запуску"
   },
   "Check your custom command in Settings → Dock → Trash.": {
-    "Check your custom command in Settings → Dock → Trash.": "Перевірте свою власну команду в Налаштування → Док → Кошик."
+    "Check your custom command in Settings → Dock → Trash.": "Перевірте свою власну команду в Налаштування → Док → Кошик"
   },
   "Checking for updates...": {
     "Checking for updates...": "Перевірка оновлень..."
@@ -1434,16 +1422,16 @@
     "Choose how this bar resolves shadow direction": "Оберіть, як ця панель визначає напрямок тіні"
   },
   "Choose how to be notified about critical battery alerts.": {
-    "Choose how to be notified about critical battery alerts.": "Оберіть спосіб повідомлення про критичний рівень батареї."
+    "Choose how to be notified about critical battery alerts.": "Оберіть спосіб повідомлення про критичний рівень батареї"
   },
   "Choose how to be notified about low battery alerts.": {
-    "Choose how to be notified about low battery alerts.": "Оберіть спосіб повідомлення про низький рівень батареї."
+    "Choose how to be notified about low battery alerts.": "Оберіть спосіб повідомлення про низький рівень батареї"
   },
   "Choose how to be notified when charge limit is reached.": {
-    "Choose how to be notified when charge limit is reached.": "Оберіть спосіб повідомлення при досягненні ліміту заряду."
+    "Choose how to be notified when charge limit is reached.": "Оберіть спосіб повідомлення при досягненні ліміту заряду"
   },
   "Choose monochrome or a theme color tint for system tray icons": {
-    "Choose monochrome or a theme color tint for system tray icons": "Оберіть монохромний або тематичний відтінок для іконок системного трея"
+    "Choose monochrome or a theme color tint for system tray icons": "Оберіть монохромний або відтінок з теми для іконок системного трея"
   },
   "Choose neutral or accent-colored widget text": {
     "Choose neutral or accent-colored widget text": "Оберіть нейтральний або акцентний колір тексту віджета"
@@ -1454,11 +1442,14 @@
   "Choose wallpaper folder": {
     "Choose wallpaper folder": "Оберіть папку зі шпалерами"
   },
+  "Choose when to generate scrolling events": {
+    "Choose when to generate scrolling events": ""
+  },
   "Choose where notification popups appear on screen": {
     "Choose where notification popups appear on screen": "Оберіть, де на екрані з'являтимуться спливаючі сповіщення"
   },
   "Choose where on-screen displays appear on screen": {
-    "Choose where on-screen displays appear on screen": "Виберіть, де на екрані з'являтимуться екранні індикатори"
+    "Choose where on-screen displays appear on screen": "Оберіть, де на екрані з'являтимуться екранні індикатори"
   },
   "Choose whether to launch a desktop app or a command": {
     "Choose whether to launch a desktop app or a command": "Оберіть, що запускати, додаток робочого столу чи команду"
@@ -1509,13 +1500,13 @@
     "Clear at Startup": "Очищати при запуску"
   },
   "Click 'Setup' to create %1 and add include to your compositor config.": {
-    "Click 'Setup' to create %1 and add include to your compositor config.": "Натисніть «Налаштувати», щоб створити %1 та додати include у конфігурацію вашого композитора."
+    "Click 'Setup' to create %1 and add include to your compositor config.": "Натисніть «Налаштувати», щоб створити %1 та додати include у конфігурацію вашого композитора"
   },
   "Click Import to add a .ovpn or .conf": {
     "Click Import to add a .ovpn or .conf": "Натисніть «Імпортувати», щоб додати файл .ovpn або .conf"
   },
   "Click Refresh to check status.": {
-    "Click Refresh to check status.": "Натисніть Оновити, щоб перевірити статус."
+    "Click Refresh to check status.": "Натисніть «Оновити», щоб перевірити статус"
   },
   "Click Through": {
     "Click Through": "Клік крізь об'єкт"
@@ -1581,16 +1572,16 @@
     "Close Window": "Закрити вікно"
   },
   "Codec switched successfully": {
-    "Codec switched successfully": ""
+    "Codec switched successfully": "Кодек успішно змінено"
   },
   "Codec switching is unavailable because WirePlumber was not found": {
-    "Codec switching is unavailable because WirePlumber was not found": ""
+    "Codec switching is unavailable because WirePlumber was not found": "Зміна кодека недоступна, оскільки WirePlumber не знайдено"
   },
   "Codec switching is unavailable because pactl was not found": {
     "Codec switching is unavailable because pactl was not found": "Перемикання кодеків недоступне, оскільки pactl не знайдено"
   },
   "Codec switching is unavailable. WirePlumber wpexec was not found.": {
-    "Codec switching is unavailable. WirePlumber wpexec was not found.": ""
+    "Codec switching is unavailable. WirePlumber wpexec was not found.": "Зміна кодека недоступна, оскільки wpexec не знайдено"
   },
   "Color": {
     "Color": "Колір"
@@ -1632,7 +1623,7 @@
     "Color theme for syntax highlighting.": "Кольорова тема для підсвічування синтаксису."
   },
   "Color theme for syntax highlighting. %1 themes available.": {
-    "Color theme for syntax highlighting. %1 themes available.": "Кольорова тема для підсвічування синтаксису. Доступно %1 тем."
+    "Color theme for syntax highlighting. %1 themes available.": "Кольорова тема для підсвічування синтаксису. Доступно %1 тем"
   },
   "Color theme from DMS registry": {
     "Color theme from DMS registry": "Кольорова тема з реєстру DMS"
@@ -1641,10 +1632,10 @@
     "Colorful": "Різнокольоровий"
   },
   "Colorful mix of bright contrasting accents.": {
-    "Colorful mix of bright contrasting accents.": "Барвиста суміш яскравих контрастних акцентів."
+    "Colorful mix of bright contrasting accents.": "Барвиста суміш яскравих контрастних акцентів"
   },
   "Colorize Active": {
-    "Colorize Active": "Забарвити активний"
+    "Colorize Active": "Розфарбувати активний"
   },
   "Colors from wallpaper": {
     "Colors from wallpaper": "Кольори зі шпалер"
@@ -1659,7 +1650,7 @@
     "Column Width": "Ширина колонки"
   },
   "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": {
-    "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": "Список імен сесій через кому для приховування. Використовуйте слеші для регулярних виразів (напр., /^_.*/)."
+    "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": "Список імен сесій через кому для приховування. Використовуйте слеші для регулярних виразів (напр., /^_.*/)"
   },
   "Command": {
     "Command": "Команда"
@@ -1687,6 +1678,9 @@
   },
   "Compositor Settings": {
     "Compositor Settings": "Налаштування композитора"
+  },
+  "Compositor actions (focus, move, etc.)": {
+    "Compositor actions (focus, move, etc.)": ""
   },
   "Config Format": {
     "Config Format": "Формат конфігурації"
@@ -1719,13 +1713,13 @@
     "Configure a new printer": "Налаштувати новий принтер"
   },
   "Configure icons for named workspaces. Icons take priority over numbers when both are enabled.": {
-    "Configure icons for named workspaces. Icons take priority over numbers when both are enabled.": "Налаштуйте іконки для іменованих робочих просторів. Якщо ввімкнено і іконки, і номери, пріоритет надається іконкам."
+    "Configure icons for named workspaces. Icons take priority over numbers when both are enabled.": "Налаштуйте іконки для іменованих робочих просторів. Якщо ввімкнено і іконки, і номери, пріоритет надається іконкам"
   },
   "Configure match criteria and actions": {
     "Configure match criteria and actions": "Налаштувати критерії відповідності та дії"
   },
   "Configure one in Settings → Dock → Trash.": {
-    "Configure one in Settings → Dock → Trash.": "Налаштуйте один у Налаштування → Док → Кошик."
+    "Configure one in Settings → Dock → Trash.": "Налаштуйте один у Налаштування → Док → Кошик"
   },
   "Configure which displays show \"%1": {
     "Configure which displays show \"%1\"": "Налаштуйте, які дисплеї показуватимуть «%1»"
@@ -1773,7 +1767,7 @@
     "Connected Displays": "Підключені дисплеї"
   },
   "Connected Frame Mode uses the connected launcher for default launcher shortcuts.": {
-    "Connected Frame Mode uses the connected launcher for default launcher shortcuts.": "Режим підключеного фрейму використовує підключений запускач для стандартних ярликів запуску."
+    "Connected Frame Mode uses the connected launcher for default launcher shortcuts.": "Режим підключеної рамки використовує підключений запускач для стандартних ярликів запуску"
   },
   "Connected Options": {
     "Connected Options": "Опції підключення"
@@ -1805,6 +1799,9 @@
   "Contrast": {
     "Contrast": "Контраст"
   },
+  "Contrast by variant": {
+    "Contrast by variant": ""
+  },
   "Contributor": {
     "Contributor": "Контриб'ютор"
   },
@@ -1824,7 +1821,7 @@
     "Control what notification information is shown on the lock screen": "Виберіть, яку інформацію про сповіщення показувати на екрані блокування"
   },
   "Control which plugins appear in 'All' mode without requiring a trigger prefix. Drag to reorder.": {
-    "Control which plugins appear in 'All' mode without requiring a trigger prefix. Drag to reorder.": "Керуйте плагінами, які з'являються в режимі «Усі» без префікса тригера. Перетягніть для зміни порядку."
+    "Control which plugins appear in 'All' mode without requiring a trigger prefix. Drag to reorder.": "Керуйте плагінами, які з'являються в режимі «Усі» без префікса тригера. Перетягніть для зміни порядку"
   },
   "Control workspaces and columns by scrolling on the bar": {
     "Control workspaces and columns by scrolling on the bar": "Керування робочими просторами та колонками прокруткою панелі"
@@ -1905,7 +1902,7 @@
     "Corners & Background": "Кути та тло"
   },
   "Couldn't load hotspot password": {
-    "Couldn't load hotspot password": ""
+    "Couldn't load hotspot password": "Не вдалося завантажити пароль точки доступу"
   },
   "Count Only": {
     "Count Only": "Тільки підрахунок"
@@ -1935,7 +1932,7 @@
     "Create rule for:": "Створити правило для:"
   },
   "Create rules to mute, ignore, hide from history, or override notification priority. Default only overrides priority; notifications still show normally.": {
-    "Create rules to mute, ignore, hide from history, or override notification priority. Default only overrides priority; notifications still show normally.": "Створіть правила, щоб вимкнути звук, ігнорувати, приховати з історії або змінити пріоритет сповіщення. За замовчуванням змінюється лише пріоритет; сповіщення відображаються як завжди."
+    "Create rules to mute, ignore, hide from history, or override notification priority. Default only overrides priority; notifications still show normally.": "Створіть правила, щоб вимкнути звук, ігнорувати, приховати з історії або змінити пріоритет сповіщення. За замовчуванням змінюється лише пріоритет; сповіщення відображаються як завжди"
   },
   "Created plugin directory: %1": {
     "Created plugin directory: %1": "Створено директорію плагіна: %1"
@@ -2025,7 +2022,7 @@
     "Curve": "Крива"
   },
   "Curve: curve rasterizer.": {
-    "Curve: curve rasterizer.": "Крива: растризація кривих."
+    "Curve: curve rasterizer.": "Крива: растризація кривих"
   },
   "Custom": {
     "Custom": "Власний"
@@ -2073,7 +2070,7 @@
     "Custom Suspend Command": "Власна команда режиму очікування"
   },
   "Custom command and terminal params are split on whitespace; paths with spaces will break.": {
-    "Custom command and terminal params are split on whitespace; paths with spaces will break.": "Власна команда та параметри термінала розділяються пробілами; шляхи з пробілами працюватимуть некоректно."
+    "Custom command and terminal params are split on whitespace; paths with spaces will break.": "Власна команда та параметри термінала розділяються пробілами; шляхи з пробілами працюватимуть некоректно"
   },
   "Custom interval in minutes (minimum 5)": {
     "Custom interval in minutes (minimum 5)": "Власний інтервал у хвилинах (мінімум 5)"
@@ -2097,7 +2094,7 @@
     "Customizable empty space": "Налаштовуваний порожній простір"
   },
   "Customize the font and background of the lock screen, or leave empty to use your theme font and desktop wallpaper. Changes apply instantly.": {
-    "Customize the font and background of the lock screen, or leave empty to use your theme font and desktop wallpaper. Changes apply instantly.": "Налаштуйте шрифт та фон екрана блокування або залиште порожнім, щоб використовувати шрифт теми та шпалери робочого столу. Зміни застосовуються миттєво."
+    "Customize the font and background of the lock screen, or leave empty to use your theme font and desktop wallpaper. Changes apply instantly.": "Налаштуйте шрифт та фон екрана блокування або залиште порожнім, щоб використовувати шрифт теми та шпалери робочого столу. Зміни застосовуються миттєво"
   },
   "Customize which actions appear in the power menu": {
     "Customize which actions appear in the power menu": "Налаштуйте, які дії відображаються в меню живлення"
@@ -2118,7 +2115,7 @@
     "DMS Settings": "Налаштування DMS"
   },
   "DMS Settings writes Lua keybinds. Add the DMS include so edits apply.": {
-    "DMS Settings writes Lua keybinds. Add the DMS include so edits apply.": "Налаштування DMS записують гарячі клавіші Lua. Додайте dms-include, щоб зміни застосувалися."
+    "DMS Settings writes Lua keybinds. Add the DMS include so edits apply.": "Налаштування DMS записують гарячі клавіші Lua. Додайте dms-include, щоб зміни застосувалися"
   },
   "DMS Shortcuts": {
     "DMS Shortcuts": "Ярлики DMS"
@@ -2133,7 +2130,7 @@
     "DMS server is outdated (API v%1, expected v%2)": "Сервер DMS застарів (API v%1, очікується v%2)"
   },
   "DMS service is not connected. Clipboard settings are unavailable.": {
-    "DMS service is not connected. Clipboard settings are unavailable.": "Служба DMS не підключена. Налаштування буфера обміну недоступні."
+    "DMS service is not connected. Clipboard settings are unavailable.": "Служба DMS не підключена. Налаштування буфера обміну недоступні"
   },
   "DMS shell actions (launcher, clipboard, etc.)": {
     "DMS shell actions (launcher, clipboard, etc.)": "Дії оболонки DMS (запуск, буфер обміну тощо)"
@@ -2250,10 +2247,10 @@
     "Default Width (%)": "Стандартна ширина (%)"
   },
   "Default launcher shortcuts open the full launcher with mode tabs, grid view, and action panel.": {
-    "Default launcher shortcuts open the full launcher with mode tabs, grid view, and action panel.": "Стандартні ярлики запуску відкривають повний запускач з вкладками режимів, сіткою та панеллю дій."
+    "Default launcher shortcuts open the full launcher with mode tabs, grid view, and action panel.": "Стандартні ярлики запуску відкривають повний запускач з вкладками режимів, сіткою та панеллю дій"
   },
   "Default launcher shortcuts open the minimal Spotlight Bar. The dedicated Spotlight Bar shortcut below stays independent.": {
-    "Default launcher shortcuts open the minimal Spotlight Bar. The dedicated Spotlight Bar shortcut below stays independent.": "Стандартні ярлики запуску відкривають мінімальну панель Spotlight. Окремий ярлик Spotlight Bar нижче залишається незалежним."
+    "Default launcher shortcuts open the minimal Spotlight Bar. The dedicated Spotlight Bar shortcut below stays independent.": "Стандартні ярлики запуску відкривають мінімальну панель Spotlight. Окремий ярлик Spotlight Bar нижче залишається незалежним"
   },
   "Default selected action": {
     "Default selected action": "Вибрана дія за замовчуванням"
@@ -2271,7 +2268,7 @@
     "Delete": "Видалити"
   },
   "Delete \"%1\" and remove the home directory? This cannot be undone.": {
-    "Delete \"%1\" and remove the home directory? This cannot be undone.": "Видалити «%1» та видалити домашню директорію? Цю дію неможливо скасувати."
+    "Delete \"%1\" and remove the home directory? This cannot be undone.": "Видалити «%1» та видалити домашню директорію? Цю дію неможливо скасувати"
   },
   "Delete \"%1\"?": {
     "Delete \"%1\"?": "Видалити «%1»?"
@@ -2310,10 +2307,10 @@
     "Depth": "Глибина"
   },
   "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": {
-    "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": "Глибина: панелі збільшуються, коли висуваються — ефект драматичного висування вперед."
+    "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": "Глибина: панелі збільшуються, коли висуваються — ефект драматичного висування вперед"
   },
   "Derives colors that closely match the underlying image.": {
-    "Derives colors that closely match the underlying image.": "Отримує кольори, що максимально відповідають фоновому зображенню."
+    "Derives colors that closely match the underlying image.": "Отримує кольори, що максимально відповідають фоновому зображенню"
   },
   "Description": {
     "Description": "Опис"
@@ -2364,7 +2361,7 @@
     "Device unpaired": "Пристрій від'єднано"
   },
   "Diff": {
-    "Diff": "Різниця (Diff)"
+    "Diff": "Різниця"
   },
   "Digital": {
     "Digital": "Цифровий"
@@ -2376,7 +2373,7 @@
     "Directional": "Спрямований"
   },
   "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": {
-    "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": "Спрямований: панелі ковзають з більшої відстані в повному розмірі — без зміни масштабу, чистий рух."
+    "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": "Спрямований: панелі ковзають з більшої відстані в повному розмірі — без зміни масштабу, чистий рух"
   },
   "Disable Autoconnect": {
     "Disable Autoconnect": "Вимкнути автопідключення"
@@ -2390,11 +2387,20 @@
   "Disable Output": {
     "Disable Output": "Вимкнути вихід"
   },
+  "Disable While Typing": {
+    "Disable While Typing": ""
+  },
+  "Disable on External Mouse": {
+    "Disable on External Mouse": ""
+  },
+  "Disable touchpad when an external mouse is connected": {
+    "Disable touchpad when an external mouse is connected": ""
+  },
   "Disabled": {
     "Disabled": "Вимкнено"
   },
   "Disabled by Frame Mode": {
-    "Disabled by Frame Mode": "Вимкнено режимом фрейму"
+    "Disabled by Frame Mode": "Вимкнено режимом рамки"
   },
   "Disabling WiFi...": {
     "Disabling WiFi...": "Вимкнення WiFi..."
@@ -2427,7 +2433,7 @@
     "Disk": "Диск"
   },
   "Disk I/O": {
-    "Disk I/O": "Ввід/вивід диска (I/O)"
+    "Disk I/O": "Ввід/вивід диска"
   },
   "Disk Usage": {
     "Disk Usage": "Використання диска"
@@ -2475,7 +2481,7 @@
     "Display brightness control": "Керування яскравістю дисплея"
   },
   "Display configuration is not available. WLR output management protocol not supported.": {
-    "Display configuration is not available. WLR output management protocol not supported.": "Конфігурація дисплеїв недоступна. Протокол керування виходами WLR не підтримується."
+    "Display configuration is not available. WLR output management protocol not supported.": "Конфігурація дисплеїв недоступна. Протокол керування виходами WLR не підтримується"
   },
   "Display currently focused application title": {
     "Display currently focused application title": "Відображати назву активної програми"
@@ -2514,7 +2520,7 @@
     "Distribution": "Дистрибутив"
   },
   "Diverse palette spanning the full spectrum.": {
-    "Diverse palette spanning the full spectrum.": "Різноманітна палітра, що охоплює весь спектр."
+    "Diverse palette spanning the full spectrum.": "Різноманітна палітра, що охоплює весь спектр"
   },
   "Do Not Disturb": {
     "Do Not Disturb": "Не турбувати"
@@ -2538,7 +2544,7 @@
     "Docs": "Документація"
   },
   "Domain (optional)": {
-    "Domain (optional)": "Домен (необов'язково)"
+    "Domain (optional)": "Домен (опціонально)"
   },
   "Don't Change": {
     "Don't Change": "Не змінювати"
@@ -2549,6 +2555,9 @@
   "Door Open": {
     "Door Open": "Дверцята відкриті"
   },
+  "Drag Lock": {
+    "Drag Lock": ""
+  },
   "Drag a widget by its handle here to reorder it or drop it into another group": {
     "Drag a widget by its handle here to reorder it or drop it into another group": "Перетягніть віджет за ручку сюди, щоб змінити його порядок або перемістити в іншу групу"
   },
@@ -2556,10 +2565,10 @@
     "Drag to Reorder": "Перетягніть для зміни порядку"
   },
   "Drag to reorder or click to hide tabs. Use ↑/↓ to highlight a tab and Ctrl+↑/↓ to move it.": {
-    "Drag to reorder or click to hide tabs. Use ↑/↓ to highlight a tab and Ctrl+↑/↓ to move it.": "Перетягніть, щоб змінити порядок, або натисніть, щоб приховати вкладки. Використовуйте ↑/↓ для виділення та Ctrl+↑/↓ для переміщення."
+    "Drag to reorder or click to hide tabs. Use ↑/↓ to highlight a tab and Ctrl+↑/↓ to move it.": "Перетягніть, щоб змінити порядок, або натисніть, щоб приховати вкладки. Використовуйте ↑/↓ для виділення та Ctrl+↑/↓ для переміщення"
   },
   "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.": {
-    "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.": "Перетягуйте віджети, щоб змінити їхній порядок у розділах. Використовуйте іконку ока, щоб приховати/показати віджети (зберігає відступи), або X, щоб повністю їх видалити."
+    "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.": "Перетягуйте віджети, щоб змінити їхній порядок у розділах. Використовуйте іконку ока, щоб приховати/показати віджети (зберігає відступи), або X, щоб повністю їх видалити"
   },
   "Drag workspace indicators to reorder them": {
     "Drag workspace indicators to reorder them": "Перетягніть індикатори робочих просторів, щоб змінити їх порядок"
@@ -2619,7 +2628,10 @@
     "Dynamic colors, presets": "Динамічні кольори, пресети"
   },
   "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": {
-    "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": "Динамічний: пружинний Безьє з перельотом — елемент коротко виходить за ціль, а потім стабілізується. Експресивно та живо."
+    "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": "Динамічний: пружинний Безьє з перельотом — елемент коротко виходить за ціль, а потім стабілізується. Експресивно та живо"
+  },
+  "Edge": {
+    "Edge": ""
   },
   "Edge Hover Reveal": {
     "Edge Hover Reveal": "Показ при наведенні на край"
@@ -2628,7 +2640,7 @@
     "Edge Spacing": "Відступи від країв"
   },
   "Edge spacing, exclusive zone, and popup gaps are managed by Frame": {
-    "Edge spacing, exclusive zone, and popup gaps are managed by Frame": "Відступи країв, ексклюзивна зона та зазори спливаючих вікон керуються Фреймом"
+    "Edge spacing, exclusive zone, and popup gaps are managed by Frame": "Відступи країв, ексклюзивна зона та зазори спливаючих вікон керуються рамкою"
   },
   "Edge the launcher slides from": {
     "Edge the launcher slides from": "Край, з якого висувається запускач"
@@ -2669,6 +2681,9 @@
   "Empty Trash (%1)": {
     "Empty Trash (%1)": "Очистити кошик (%1)"
   },
+  "Emulate middle click by pressing left and right buttons": {
+    "Emulate middle click by pressing left and right buttons": ""
+  },
   "Enable 10-bit color depth for wider color gamut and HDR support": {
     "Enable 10-bit color depth for wider color gamut and HDR support": "Увімкнути 10-бітну глибину кольору для ширшого охоплення та підтримки HDR"
   },
@@ -2682,7 +2697,7 @@
     "Enable Do Not Disturb": "Увімкнути режим «Не турбувати»"
   },
   "Enable Frame": {
-    "Enable Frame": "Увімкнути Фрейм"
+    "Enable Frame": "Увімкнути рамку"
   },
   "Enable History": {
     "Enable History": "Увімкнути історію"
@@ -2691,13 +2706,13 @@
     "Enable Overview Overlay": "Увімкнути оверлей огляду"
   },
   "Enable Ripple Effects": {
-    "Enable Ripple Effects": "Увімкнути ефекти розширення (Ripple)"
+    "Enable Ripple Effects": "Увімкнути ефект хвиль"
   },
   "Enable System Sounds": {
     "Enable System Sounds": "Увімкнути системні звуки"
   },
   "Enable Video Screensaver": {
-    "Enable Video Screensaver": "Увімкнути відео-скрінсейвер"
+    "Enable Video Screensaver": "Увімкнути відео-зберігач екрану"
   },
   "Enable Weather": {
     "Enable Weather": "Увімкнути погоду"
@@ -2706,13 +2721,13 @@
     "Enable WiFi": "Увімкнути Wi-Fi"
   },
   "Enable WiFi before starting the hotspot.": {
-    "Enable WiFi before starting the hotspot.": ""
+    "Enable WiFi before starting the hotspot.": "Увімкніть WiFi перед запуском точки доступу"
   },
   "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": {
     "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": "Увімкніть власне переозначення нижче, щоб встановити інтенсивність, прозорість та колір тіні для кожної панелі."
   },
   "Enable compositor-targetable blur layer (namespace: dms:blurwallpaper). Requires manual niri configuration.": {
-    "Enable compositor-targetable blur layer (namespace: dms:blurwallpaper). Requires manual niri configuration.": "Увімкнути шар розмиття для композитора (простір імен: dms:blurwallpaper). Потребує ручного налаштування niri."
+    "Enable compositor-targetable blur layer (namespace: dms:blurwallpaper). Requires manual niri configuration.": "Увімкнути шар розмиття для композитора (простір імен: dms:blurwallpaper). Потребує ручного налаштування Niri"
   },
   "Enable fingerprint at login": {
     "Enable fingerprint at login": "Увімкнути відбиток пальця при вході"
@@ -2721,7 +2736,7 @@
     "Enable fingerprint authentication": "Увімкнути автентифікацію за відбитком пальця"
   },
   "Enable fingerprint or security key for DMS Greeter": {
-    "Enable fingerprint or security key for DMS Greeter": "Увімкнути відбиток або ключ безпеки для DMS Вітальника"
+    "Enable fingerprint or security key for DMS Greeter": "Увімкнути відбиток або ключ безпеки для вікна входу DMS"
   },
   "Enable loginctl lock integration": {
     "Enable loginctl lock integration": "Увімкнути інтеграцію з блокуванням loginctl"
@@ -2794,6 +2809,9 @@
   },
   "Enter password for ": {
     "Enter password for ": "Введіть пароль для "
+  },
+  "Enter text to encode": {
+    "Enter text to encode": ""
   },
   "Enter this passkey on ": {
     "Enter this passkey on ": "Введіть цей ключ доступу на "
@@ -2934,7 +2952,7 @@
     "Failed to check pin limit": "Не вдалося перевірити ліміт PIN-коду"
   },
   "Failed to configure hotspot": {
-    "Failed to configure hotspot": ""
+    "Failed to configure hotspot": "Не вдалося налаштувати точку доступу"
   },
   "Failed to connect VPN": {
     "Failed to connect VPN": "Не вдалося підключитися до VPN"
@@ -2958,7 +2976,7 @@
     "Failed to delete printer": "Не вдалося видалити принтер"
   },
   "Failed to disable job acceptance": {
-    "Failed to disable job acceptance": "Не вдалося вимкнути приймання завдань"
+    "Failed to disable job acceptance": "Не вдалося заборонити приймання завдань"
   },
   "Failed to disable night mode": {
     "Failed to disable night mode": "Не вдалося вимкнути нічний режим"
@@ -2985,13 +3003,16 @@
     "Failed to enable WiFi": "Не вдалося увімкнути Wi-Fi"
   },
   "Failed to enable job acceptance": {
-    "Failed to enable job acceptance": "Не вдалося увімкнути приймання завдань"
+    "Failed to enable job acceptance": "Не вдалося дозволити приймання завдань"
   },
   "Failed to enable night mode": {
     "Failed to enable night mode": "Не вдалося увімкнути нічний режим"
   },
   "Failed to fetch network QR code: %1": {
     "Failed to fetch network QR code: %1": "Не вдалося отримати QR-код мережі: %1"
+  },
+  "Failed to generate QR code: %1": {
+    "Failed to generate QR code: %1": ""
   },
   "Failed to generate systemd override": {
     "Failed to generate systemd override": "Не вдалося створити override для systemd"
@@ -3009,7 +3030,7 @@
     "Failed to load VPN config": "Не вдалося завантажити конфігурацію VPN"
   },
   "Failed to load clipboard configuration.": {
-    "Failed to load clipboard configuration.": "Не вдалося завантажити конфігурацію буфера обміну."
+    "Failed to load clipboard configuration.": "Не вдалося завантажити конфігурацію буфера обміну"
   },
   "Failed to move job": {
     "Failed to move job": "Не вдалося перемістити завдання"
@@ -3018,7 +3039,7 @@
     "Failed to move to trash": "Не вдалося перемістити в кошик"
   },
   "Failed to parse %1": {
-    "Failed to parse %1": "Не вдалося розібрати (parse) %1"
+    "Failed to parse %1": "Не вдалося розібрати %1"
   },
   "Failed to pause printer": {
     "Failed to pause printer": "Не вдалося призупинити принтер"
@@ -3063,10 +3084,10 @@
     "Failed to ring device": "Не вдалося викликати пристрій (дзвінок)"
   },
   "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": {
-    "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": "Не вдалося виконати 'dms greeter status'. Переконайтеся, що DMS встановлено і dms додано до PATH."
+    "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": "Не вдалося виконати 'dms greeter status'. Переконайтеся, що DMS встановлено і dms додано до PATH"
   },
   "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": {
-    "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": ""
+    "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": "Не вдалося запустити 'dms-greeter status'. Переконайтеся, що пакет dms-greeter встановлено"
   },
   "Failed to save VPN credentials": {
     "Failed to save VPN credentials": "Не вдалося зберегти облікові дані VPN"
@@ -3123,13 +3144,13 @@
     "Failed to start connection to %1": "Не вдалося розпочати підключення до %1"
   },
   "Failed to start hotspot": {
-    "Failed to start hotspot": ""
+    "Failed to start hotspot": "Не вдалося запустити точку доступу"
   },
   "Failed to stop hotspot": {
-    "Failed to stop hotspot": ""
+    "Failed to stop hotspot": "Не вдалося зупинити точку доступу"
   },
   "Failed to switch codec": {
-    "Failed to switch codec": ""
+    "Failed to switch codec": "Не вдалося змінити кодек"
   },
   "Failed to unpin entry": {
     "Failed to unpin entry": "Не вдалося відкріпити запис"
@@ -3159,7 +3180,7 @@
     "Failed to write autostart entry": "Не вдалося записати запис в автозапуск"
   },
   "Failed to write outputs config.": {
-    "Failed to write outputs config.": "Не вдалося записати конфігурацію виходів."
+    "Failed to write outputs config.": "Не вдалося записати конфігурацію виходів"
   },
   "Failed to write temp file for validation": {
     "Failed to write temp file for validation": "Не вдалося записати тимчасовий файл для валідації"
@@ -3180,7 +3201,7 @@
     "Feels Like %1°": "Відчувається як %1°"
   },
   "Fidelity": {
-    "Fidelity": "Точність (Fidelity)"
+    "Fidelity": "Точність"
   },
   "Field": {
     "Field": "Поле"
@@ -3195,7 +3216,7 @@
     "File changed on disk": "Файл на диску було змінено"
   },
   "File manager used to open the trash. Pick \"custom\" to enter your own command.": {
-    "File manager used to open the trash. Pick \"custom\" to enter your own command.": "Файловий менеджер, що використовується для відкриття кошика. Оберіть «custom», щоб ввести власну команду."
+    "File manager used to open the trash. Pick \"custom\" to enter your own command.": "Файловий менеджер, що використовується для відкриття кошика. Оберіть «custom», щоб ввести власну команду"
   },
   "File received from %1": {
     "File received from %1": "Файл отримано від %1"
@@ -3240,13 +3261,13 @@
     "Fingerprint error": "Помилка сканування відбитка"
   },
   "Fingerprint not recognized (%1/%2). Please try again or use password.": {
-    "Fingerprint not recognized (%1/%2). Please try again or use password.": "Відбиток не розпізнано (%1/%2). Спробуйте ще раз або використайте пароль."
+    "Fingerprint not recognized (%1/%2). Please try again or use password.": "Відбиток не розпізнано (%1/%2). Спробуйте ще раз або використайте пароль"
   },
   "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and enroll later.": {
-    "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and enroll later.": "Сканер відбитка пальця виявлено, але відбитки ще не зареєстровано. Ви можете увімкнути це зараз і додати їх пізніше."
+    "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and enroll later.": "Сканер відбитка пальця виявлено, але відбитки ще не зареєстровано. Ви можете увімкнути це зараз і додати їх пізніше"
   },
   "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and run Sync later.": {
-    "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and run Sync later.": "Сканер відбитка пальця виявлено, але відбитки ще не зареєстровано. Ви можете увімкнути це зараз і запустити синхронізацію пізніше."
+    "Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and run Sync later.": "Сканер відбитка пальця виявлено, але відбитки ще не зареєстровано. Ви можете увімкнути це зараз і запустити синхронізацію пізніше"
   },
   "Finish": {
     "Finish": "Завершити"
@@ -3262,6 +3283,12 @@
   },
   "Flags": {
     "Flags": "Прапорці"
+  },
+  "Flat": {
+    "Flat": ""
+  },
+  "Flat uses constant speed; Adaptive scales with movement speed": {
+    "Flat uses constant speed; Adaptive scales with movement speed": ""
   },
   "Flatpak": {
     "Flatpak": "Flatpak"
@@ -3297,10 +3324,10 @@
     "Floating Position": "Позиція плаваючих вікон"
   },
   "Fluent": {
-    "Fluent": "Плавний (Fluent)"
+    "Fluent": "Плавний"
   },
   "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": {
-    "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": "Fluent: Плавне кубічне сповільнення при вході, швидкий вихід — чисті, елегантні криві."
+    "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": "Fluent: Плавне кубічне сповільнення при вході, швидкий вихід — чисті, елегантні криві"
   },
   "Focus": {
     "Focus": "Фокус"
@@ -3351,7 +3378,7 @@
     "Follow focus": "Слідувати за фокусом"
   },
   "Follows the default launcher choice selected above.": {
-    "Follows the default launcher choice selected above.": "Слідує за вибором запускача за замовчуванням, обраним вище."
+    "Follows the default launcher choice selected above.": "Слідує за вибором запускача за замовчуванням, обраним вище"
   },
   "Font": {
     "Font": "Шрифт"
@@ -3423,7 +3450,7 @@
     "Forecast and conditions": "Прогноз та умови"
   },
   "Foreground Layers": {
-    "Foreground Layers": "Передній план (шари)"
+    "Foreground Layers": "Передні шари"
   },
   "Forever": {
     "Forever": "Назавжди"
@@ -3450,7 +3477,7 @@
     "Format the date on the login screen": "Формат дати на екрані входу"
   },
   "Forward 10s": {
-    "Forward 10s": "Перемотати вперед 10с"
+    "Forward 10s": "Перемотати вперед на 10 с."
   },
   "Frame": {
     "Frame": "Рамка"
@@ -3468,7 +3495,7 @@
     "Frame Xray": "Рентген рамки (X-Ray)"
   },
   "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": {
-    "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": "Звільнити VRAM/пам'ять при закритті запускача. Може спричинити легку затримку при повторному відкритті."
+    "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": "Звільнити VRAM/пам'ять при закритті запускача. Може спричинити легку затримку при повторному відкритті"
   },
   "Freezing Drizzle": {
     "Freezing Drizzle": "Морозна мжичка"
@@ -3516,13 +3543,13 @@
     "GPU": "ГП"
   },
   "GPU Monitoring": {
-    "GPU Monitoring": "Моніторинг GPU"
+    "GPU Monitoring": "Моніторинг ГП"
   },
   "GPU Temperature": {
     "GPU Temperature": "Температура ГП"
   },
   "GPU temperature display": {
-    "GPU temperature display": "Відображення температури GPU"
+    "GPU temperature display": "Відображення температури ГП"
   },
   "GTK colors applied successfully": {
     "GTK colors applied successfully": "Кольори GTK успішно застосовано"
@@ -3537,7 +3564,7 @@
     "Gamma Control": "Керування гамою"
   },
   "Gamma control not available. Requires DMS API v6+.": {
-    "Gamma control not available. Requires DMS API v6+.": "Керування гамою недоступне. Потрібен DMS API v6+ або новіше."
+    "Gamma control not available. Requires DMS API v6+.": "Керування гамою недоступне. Потрібен DMS API v6+ або новіше"
   },
   "Gap between the end widgets and the bar ends (0 = edge-to-edge)": {
     "Gap between the end widgets and the bar ends (0 = edge-to-edge)": "Відступ між кінцевими віджетами та краями панелі (0 = від краю до краю)"
@@ -3552,7 +3579,7 @@
     "Generate Override": "Створити override"
   },
   "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.": {
-    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.": "Створити базові конфігурації GTK3/4 або QT5/QT6 (потрібен qt6ct-kde), щоб вони слідували кольорам DMS. Потрібно виконати лише один раз.<br /><br />Рекомендується налаштувати <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> перед застосуванням тем GTK."
+    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.": "Створити базові конфігурації GTK3/4 або QT5/QT6 (потрібен qt6ct-kde), щоб вони слідували кольорам DMS. Потрібно виконати лише один раз.<br /><br />Рекомендується налаштувати <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> перед застосуванням тем GTK"
   },
   "Generic": {
     "Generic": "Загальний"
@@ -3600,7 +3627,7 @@
     "Granted administrator privileges": "Права адміністратора надано"
   },
   "Granted greeter login access": {
-    "Granted greeter login access": "Доступ до входу через greeter надано"
+    "Granted greeter login access": "Доступ до входу через екран входу надано"
   },
   "Graph Time Range": {
     "Graph Time Range": "Часовий діапазон графіка"
@@ -3609,25 +3636,25 @@
     "Graphics": "Графіка"
   },
   "Greeter": {
-    "Greeter": "Greeter (екран входу)"
+    "Greeter": "Екран входу"
   },
   "Greeter activated. greetd is now enabled.": {
-    "Greeter activated. greetd is now enabled.": "Greeter активовано. greetd тепер увімкнено."
+    "Greeter activated. greetd is now enabled.": "Екран входу активовано. greetd тепер увімкнено"
   },
   "Greeter font": {
-    "Greeter font": "Шрифт Greeter"
+    "Greeter font": "Шрифт екрану входу"
   },
   "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": {
-    "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": "Члени групи greeter можуть синхронізувати тему екрана входу за допомогою 'dms greeter sync --profile' після виходу та повторного входу."
+    "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": "Члени групи greeter можуть синхронізувати тему екрана входу за допомогою 'dms greeter sync --profile' після виходу та повторного входу"
   },
   "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": {
-    "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": ""
+    "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": "Учасники групи вітального екрана можуть синхронізувати тему екрана входу за допомогою 'dms-greeter sync --profile' після виходу та повторного входу в систему"
   },
   "Greeter group:": {
-    "Greeter group:": "Група Greeter:"
+    "Greeter group:": "Група екрану входу:"
   },
   "Greeter sync complete": {
-    "Greeter sync complete": "Синхронізація Greeter завершена"
+    "Greeter sync complete": "Синхронізація екрану входу завершена"
   },
   "Grid": {
     "Grid": "Сітка"
@@ -3636,10 +3663,10 @@
     "Grid Columns": "Стовпці сітки"
   },
   "Grid: OFF": {
-    "Grid: OFF": "Сітка: ВИМК"
+    "Grid: OFF": "Сітка: ВИМК."
   },
   "Grid: ON": {
-    "Grid: ON": "Сітка: УВІМ"
+    "Grid: ON": "Сітка: УВІМ."
   },
   "Group": {
     "Group": "Група"
@@ -3675,7 +3702,7 @@
     "HDR Tone Mapping": "Тональне відображення HDR"
   },
   "HDR mode is experimental. Verify your monitor supports HDR before enabling.": {
-    "HDR mode is experimental. Verify your monitor supports HDR before enabling.": "Режим HDR є експериментальним. Перевірте, чи підтримує ваш монітор HDR, перед увімкненням."
+    "HDR mode is experimental. Verify your monitor supports HDR before enabling.": "Режим HDR є експериментальним. Перевірте, чи підтримує ваш монітор HDR, перед увімкненням"
   },
   "HSV": {
     "HSV": "HSV"
@@ -3732,7 +3759,7 @@
     "Hidden Apps": "Приховані додатки"
   },
   "Hidden apps won't appear in the launcher. Right-click an app and select 'Hide App' to hide it.": {
-    "Hidden apps won't appear in the launcher. Right-click an app and select 'Hide App' to hide it.": "Приховані додатки не з'являтимуться в запускачі. Натисніть правою кнопкою миші на додаток і оберіть «Приховати додаток», щоб сховати його."
+    "Hidden apps won't appear in the launcher. Right-click an app and select 'Hide App' to hide it.": "Приховані додатки не з'являтимуться в запускачі. Натисніть правою кнопкою миші на додаток і оберіть «Приховати додаток», щоб сховати його"
   },
   "Hidden until weather is enabled": {
     "Hidden until weather is enabled": "Приховано, доки погода не буде увімкнена"
@@ -3786,16 +3813,16 @@
     "Hide the bar when the pointer leaves even if a popout is still open": "Приховати панель, коли курсор виходить за її межі, навіть якщо спливаюче вікно все ще відкрите"
   },
   "Hide when no updates: OFF": {
-    "Hide when no updates: OFF": "Приховати, якщо немає оновлень: ВИМК"
+    "Hide when no updates: OFF": "Приховати, якщо немає оновлень: ВИМК."
   },
   "Hide when no updates: ON": {
-    "Hide when no updates: ON": "Приховати, якщо немає оновлень: УВІМ"
+    "Hide when no updates: ON": "Приховати, якщо немає оновлень: УВІМ."
   },
   "High": {
     "High": "Високий"
   },
   "High-fidelity palette that preserves source hues.": {
-    "High-fidelity palette that preserves source hues.": "Високоточна палітра, що зберігає вихідні відтінки."
+    "High-fidelity palette that preserves source hues.": "Високоточна палітра, що зберігає вихідні відтінки"
   },
   "Highlight Active Workspace App": {
     "Highlight Active Workspace App": "Підсвітити додаток активного робочого простору"
@@ -3813,7 +3840,7 @@
     "History Settings": "Налаштування історії"
   },
   "History cleared. %1 pinned entries kept.": {
-    "History cleared. %1 pinned entries kept.": "Історію очищено. %1 закріплених записів збережено."
+    "History cleared. %1 pinned entries kept.": "Історію очищено. %1 закріплених записів збережено"
   },
   "Hold Duration": {
     "Hold Duration": "Тривалість утримання"
@@ -3831,28 +3858,28 @@
     "Hostname": "Назва хоста"
   },
   "Hot Corners": {
-    "Hot Corners": "Активні кути (Hot Corners)"
+    "Hot Corners": "Активні кути"
   },
   "Hotkey overlay title (optional)": {
-    "Hotkey overlay title (optional)": "Заголовок оверлею гарячих клавіш (необов'язково)"
+    "Hotkey overlay title (optional)": "Заголовок оверлею гарячих клавіш (опціонально)"
   },
   "Hotspot": {
-    "Hotspot": ""
+    "Hotspot": "Точка доступу"
   },
   "Hotspot activation failed.": {
-    "Hotspot activation failed.": ""
+    "Hotspot activation failed.": "Активація точки доступу не вдалася"
   },
   "Hotspot name": {
-    "Hotspot name": ""
+    "Hotspot name": "Назва точки доступу"
   },
   "Hotspot saved": {
-    "Hotspot saved": ""
+    "Hotspot saved": "Налаштування точки доступу збережено"
   },
   "Hotspot started": {
-    "Hotspot started": ""
+    "Hotspot started": "Точку доступу запущено"
   },
   "Hotspot stopped": {
-    "Hotspot stopped": ""
+    "Hotspot stopped": "Точку доступу зупинено"
   },
   "Hour": {
     "Hour": "Година"
@@ -3867,7 +3894,7 @@
     "Hover Popouts": "Спливаючі вікна при наведенні"
   },
   "How often the server polls for new updates.": {
-    "How often the server polls for new updates.": "Як часто сервер перевіряє наявність нових оновлень."
+    "How often the server polls for new updates.": "Як часто сервер перевіряє наявність нових оновлень"
   },
   "How often to change wallpaper": {
     "How often to change wallpaper": "Як часто змінювати шпалери"
@@ -3897,7 +3924,7 @@
     "Hyprland conf mode is read-only in Settings": "Режим конфігурації Hyprland у налаштуваннях доступний лише для читання"
   },
   "Hyprland config include missing": {
-    "Hyprland config include missing": "Відсутній файл включення (include) конфігурації Hyprland"
+    "Hyprland config include missing": "Відсутній файл включення конфігурації Hyprland"
   },
   "I Understand": {
     "I Understand": "Зрозуміло"
@@ -3912,7 +3939,7 @@
     "IP address or hostname": "IP-адреса або назва хоста"
   },
   "IP sharing setup failed. Check that dnsmasq is installed.": {
-    "IP sharing setup failed. Check that dnsmasq is installed.": ""
+    "IP sharing setup failed. Check that dnsmasq is installed.": "Налаштування спільного використання IP не вдалося. Перевірте, чи встановлено dnsmasq"
   },
   "ISO Date": {
     "ISO Date": "Дата за стандартом ISO"
@@ -3948,7 +3975,7 @@
     "Idle": "Очікування"
   },
   "Idle Inhibit": {
-    "Idle Inhibit": "Заборона режиму очікування (Idle Inhibit)"
+    "Idle Inhibit": "Заборона режиму очікування"
   },
   "Idle Inhibitor": {
     "Idle Inhibitor": "Таймер бездіяльності"
@@ -3960,7 +3987,10 @@
     "If autostart app icons don't appear in the system tray, generate a systemd override to ensure DMS starts before autostart apps": "Якщо іконки автозапуску не з'являються в треї, створіть override для systemd, щоб DMS запускався перед ними"
   },
   "If the field is hidden, it will appear as soon as a key is pressed.": {
-    "If the field is hidden, it will appear as soon as a key is pressed.": "Якщо поле приховане, воно з'явиться, щойно буде натиснуто клавішу."
+    "If the field is hidden, it will appear as soon as a key is pressed.": "Якщо поле приховане, воно з'явиться, щойно буде натиснуто клавішу"
+  },
+  "Ignore App-Requested Timeout": {
+    "Ignore App-Requested Timeout": ""
   },
   "Ignore Completely": {
     "Ignore Completely": "Повністю ігнорувати"
@@ -3978,10 +4008,10 @@
     "Ignored Packages": "Ігноровані пакети"
   },
   "Ignored packages are hidden from the updater and skipped by 'Update All'.": {
-    "Ignored packages are hidden from the updater and skipped by 'Update All'.": "Ігноровані пакети приховані з оновлювача і пропускаються під час «Оновити все»."
+    "Ignored packages are hidden from the updater and skipped by 'Update All'.": "Ігноровані пакети приховані з оновлювача і пропускаються під час «Оновити все»"
   },
   "Ignored packages only apply to the built-in updater. Your custom command controls its own exclusions.": {
-    "Ignored packages only apply to the built-in updater. Your custom command controls its own exclusions.": "Ігнорування пакетів стосується лише вбудованого оновлювача. Ваша власна команда керує своїми виключеннями."
+    "Ignored packages only apply to the built-in updater. Your custom command controls its own exclusions.": "Ігнорування пакетів стосується лише вбудованого оновлювача. Ваша власна команда керує своїми виключеннями"
   },
   "Image": {
     "Image": "Зображення"
@@ -4017,7 +4047,7 @@
     "Include Transitions": "Включити переходи"
   },
   "Include desktop actions (shortcuts) in search results.": {
-    "Include desktop actions (shortcuts) in search results.": "Включати дії робочого столу (ярлики) в результатах пошуку."
+    "Include desktop actions (shortcuts) in search results.": "Включати дії робочого столу (ярлики) в результатах пошуку"
   },
   "Incompatible Plugins Loaded": {
     "Incompatible Plugins Loaded": "Завантажено несумісні плагіни"
@@ -4047,13 +4077,13 @@
     "Inherit": "Успадкувати"
   },
   "Inherit Global (Default)": {
-    "Inherit Global (Default)": "Успадкувати глобальні (за замовчуванням)"
+    "Inherit Global (Default)": "Успадкувати глобальні (типово)"
   },
   "Inhibitable": {
     "Inhibitable": "Може бути заблоковано"
   },
   "Initial position for floating windows. Set both X and Y; anchor controls which corner/edge they're relative to.": {
-    "Initial position for floating windows. Set both X and Y; anchor controls which corner/edge they're relative to.": "Початкова позиція для плаваючих вікон. Встановіть X та Y; якір визначає, від якого кута чи краю вони рахуються."
+    "Initial position for floating windows. Set both X and Y; anchor controls which corner/edge they're relative to.": "Початкова позиція для плаваючих вікон. Встановіть X та Y; якір визначає, від якого кута чи краю вони рахуються"
   },
   "Initialised": {
     "Initialised": "Ініціалізовано"
@@ -4092,10 +4122,10 @@
     "Install color themes from the DMS theme registry": "Встановити кольорові теми з реєстру тем DMS"
   },
   "Install complete. Greeter has been installed.": {
-    "Install complete. Greeter has been installed.": "Встановлення завершено. Greeter встановлено."
+    "Install complete. Greeter has been installed.": "Встановлення завершено.  Екран входу встановлено"
   },
   "Install dsearch to search files.": {
-    "Install dsearch to search files.": "Встановіть dsearch для пошуку файлів."
+    "Install dsearch to search files.": "Встановіть dsearch для пошуку файлів"
   },
   "Install failed: %1": {
     "Install failed: %1": "Встановлення не вдалося: %1"
@@ -4110,10 +4140,10 @@
     "Install plugins from the DMS plugin registry": "Встановити плагіни з реєстру плагінів DMS"
   },
   "Install the DMS greeter? A terminal will open for sudo authentication.": {
-    "Install the DMS greeter? A terminal will open for sudo authentication.": "Встановити DMS greeter? Відкриється термінал для аутентифікації sudo."
+    "Install the DMS greeter? A terminal will open for sudo authentication.": "Встановити DMS greeter? Відкриється термінал для аутентифікації sudo"
   },
   "Install theme '%1' from the DMS registry?": {
-    "Install theme '%1' from the DMS registry?": "Встановити тему '%1' з реєстру DMS?"
+    "Install theme '%1' from the DMS registry?": "Встановити тему «%1» з реєстру DMS?"
   },
   "Installation and PAM setup are documented in the ": {
     "Installation and PAM setup are documented in the ": "Інструкції зі встановлення та налаштування PAM описані в "
@@ -4158,7 +4188,7 @@
     "Invalid configuration": "Неправильна конфігурація"
   },
   "Invalid package name — letters, digits and @._+:- only.": {
-    "Invalid package name — letters, digits and @._+:- only.": "Неправильна назва пакета — дозволені лише літери, цифри та @._+:-."
+    "Invalid package name — letters, digits and @._+:- only.": "Неправильна назва пакета — дозволені лише літери, цифри та @._+:-"
   },
   "Invalid password for %1": {
     "Invalid password for %1": "Неправильний пароль для %1"
@@ -4173,7 +4203,7 @@
     "Invert touchpad scroll direction": "Інвертувати напрямок прокрутки тачпада"
   },
   "Iris Bloom": {
-    "Iris Bloom": "Розквіт іриса (Iris Bloom)"
+    "Iris Bloom": "Розквіт іриса"
   },
   "Isolate Displays": {
     "Isolate Displays": "Ізолювати дисплеї"
@@ -4198,6 +4228,9 @@
   },
   "Keep My Edits": {
     "Keep My Edits": "Зберегти мої правки"
+  },
+  "Keep dragging when finger is briefly lifted": {
+    "Keep dragging when finger is briefly lifted": ""
   },
   "Keep in Bar": {
     "Keep in Bar": "Залишити в панелі"
@@ -4323,7 +4356,7 @@
     "Layout": "Макет"
   },
   "Layout Overrides": {
-    "Layout Overrides": "Перевизначення макета (Overrides)"
+    "Layout Overrides": "Перевизначення макета"
   },
   "Left": {
     "Left": "Зліва"
@@ -4333,6 +4366,9 @@
   },
   "Left Section": {
     "Left Section": "Ліва секція"
+  },
+  "Left-Handed Mode": {
+    "Left-Handed Mode": ""
   },
   "Light": {
     "Light": "Світлий"
@@ -4365,7 +4401,7 @@
     "Limit set to %1%": "Ліміт встановлено на %1%"
   },
   "Limit the maximum battery charge level to extend lifespan.": {
-    "Limit the maximum battery charge level to extend lifespan.": "Обмежте максимальний рівень заряду батареї, щоб продовжити її термін служби."
+    "Limit the maximum battery charge level to extend lifespan.": "Обмежте максимальний рівень заряду батареї, щоб продовжити її термін служби"
   },
   "Line": {
     "Line": "Лінія"
@@ -4383,10 +4419,10 @@
     "List": "Список"
   },
   "Lively palette with saturated accents.": {
-    "Lively palette with saturated accents.": "Жвава палітра з насиченими акцентами."
+    "Lively palette with saturated accents.": "Жвава палітра з насиченими акцентами"
   },
   "Load Average": {
-    "Load Average": "Середнє навантаження (Load Average)"
+    "Load Average": "Середнє навантаження"
   },
   "Loading codecs...": {
     "Loading codecs...": "Завантаження кодеків..."
@@ -4438,9 +4474,6 @@
   },
   "Locked": {
     "Locked": "Заблоковано"
-  },
-  "Logging in...": {
-    "Logging in...": "Вхід..."
   },
   "Login": {
     "Login": "Увійти"
@@ -4497,10 +4530,10 @@
     "Manage and configure plugins for extending DMS functionality": "Керувати та налаштовувати плагіни для розширення функціональності DMS"
   },
   "Manage up to 4 independent bar configurations. Each bar has its own position, widgets, styling, and display assignment.": {
-    "Manage up to 4 independent bar configurations. Each bar has its own position, widgets, styling, and display assignment.": "Керуйте до 4 незалежними конфігураціями панелей. Кожна панель має власну позицію, віджети, стиль та призначення дисплея."
+    "Manage up to 4 independent bar configurations. Each bar has its own position, widgets, styling, and display assignment.": "Керуйте до 4 незалежними конфігураціями панелей. Кожна панель має власну позицію, віджети, стиль та призначення дисплея"
   },
   "Managed by Frame": {
-    "Managed by Frame": "Керується рамкою (Frame)"
+    "Managed by Frame": "Керується рамкою"
   },
   "Managed by Frame in Connected Mode": {
     "Managed by Frame in Connected Mode": "Керується рамкою в підключеному режимі"
@@ -4509,7 +4542,7 @@
     "Managed by the primary PAM source": "Керується основним джерелом PAM"
   },
   "Managed by the primary PAM source.": {
-    "Managed by the primary PAM source.": "Керується основним джерелом PAM."
+    "Managed by the primary PAM source.": "Керується основним джерелом PAM"
   },
   "Management": {
     "Management": "Управління"
@@ -4590,10 +4623,10 @@
     "Material colors generated from wallpaper": "Кольори Material, згенеровані зі шпалер"
   },
   "Material inspired shadows and elevation on modals, popouts, and dialogs": {
-    "Material inspired shadows and elevation on modals, popouts, and dialogs": "Тіні та підняття (elevation) у стилі Material для модальних вікон, спливаючих елементів та діалогів"
+    "Material inspired shadows and elevation on modals, popouts, and dialogs": "Тіні та підняття у стилі Material для модальних вікон, спливаючих елементів та діалогів"
   },
   "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": {
-    "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": "Material: Експресивні криві Безьє Material Design 3. Стандартне відчуття DMS."
+    "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": "Material: Експресивні криві Безьє Material Design 3. Стандартне відчуття DMS"
   },
   "Matugen Contrast": {
     "Matugen Contrast": "Контраст Matugen"
@@ -4665,7 +4698,7 @@
     "Maximum Pinned Entries": "Максимум закріплених записів"
   },
   "Maximum fingerprint attempts reached. Please use password.": {
-    "Maximum fingerprint attempts reached. Please use password.": "Досягнуто максимальної кількості спроб сканування відбитка. Будь ласка, використайте пароль."
+    "Maximum fingerprint attempts reached. Please use password.": "Досягнуто максимальної кількості спроб сканування відбитка. Будь ласка, використайте пароль"
   },
   "Maximum number of clipboard entries to keep": {
     "Maximum number of clipboard entries to keep": "Максимальна кількість записів буфера обміну для збереження"
@@ -4722,10 +4755,10 @@
     "Memory usage indicator": "Індикатор використання пам'яті"
   },
   "Merge indexed file results into the All tab (requires dsearch).": {
-    "Merge indexed file results into the All tab (requires dsearch).": "Об'єднати результати індексованих файлів у вкладці «Все» (потрібен dsearch)."
+    "Merge indexed file results into the All tab (requires dsearch).": "Об'єднати результати індексованих файлів у вкладці «Всі» (потрібен dsearch)"
   },
   "Merge indexed folder results into the All tab (requires dsearch).": {
-    "Merge indexed folder results into the All tab (requires dsearch).": "Об'єднати результати індексованих папок у вкладці «Все» (потрібен dsearch)."
+    "Merge indexed folder results into the All tab (requires dsearch).": "Об'єднати результати індексованих папок у вкладці «Всі» (потрібен dsearch)"
   },
   "Message": {
     "Message": "Повідомлення"
@@ -4748,6 +4781,9 @@
   "Microphone volume control": {
     "Microphone volume control": "Керування гучністю мікрофона"
   },
+  "Middle Click Emulation": {
+    "Middle Click Emulation": ""
+  },
   "Middle Section": {
     "Middle Section": "Середня секція"
   },
@@ -4758,7 +4794,7 @@
     "Min W": "Мін. Ш"
   },
   "Minimal palette built around a single hue.": {
-    "Minimal palette built around a single hue.": "Мінімалістична палітра на основі одного відтінку."
+    "Minimal palette built around a single hue.": "Мінімалістична палітра на основі одного відтінку"
   },
   "Minute": {
     "Minute": "Хвилина"
@@ -4823,6 +4859,12 @@
   "Mount Points": {
     "Mount Points": "Точки монтування"
   },
+  "Mouse & Touchpad": {
+    "Mouse & Touchpad": ""
+  },
+  "Mouse Settings": {
+    "Mouse Settings": ""
+  },
   "Mouse clicks pass through the bar to windows behind it": {
     "Mouse clicks pass through the bar to windows behind it": "Кліки миші проходять крізь панель до вікон за нею"
   },
@@ -4869,7 +4911,7 @@
     "Muted Apps": "Додатки без звуку"
   },
   "Muted palette with subdued, calming tones.": {
-    "Muted palette with subdued, calming tones.": "Стримана палітра з приглушеними, заспокійливими тонами."
+    "Muted palette with subdued, calming tones.": "Стримана палітра з приглушеними, заспокійливими тонами"
   },
   "My Online": {
     "My Online": "Мій статус онлайн"
@@ -4881,13 +4923,16 @@
     "Named Workspace Icons": "Іконки іменованих робочих просторів"
   },
   "Native": {
-    "Native": "Рідний (Native)"
+    "Native": "Звичайний"
   },
   "Native: platform renderer (FreeType).": {
-    "Native: platform renderer (FreeType).": "Native: системний рендерер (FreeType)."
+    "Native: platform renderer (FreeType).": "Звичайний: системний рендерер (FreeType)"
+  },
+  "Natural Scrolling": {
+    "Natural Scrolling": ""
   },
   "Natural Touchpad Scrolling": {
-    "Natural Touchpad Scrolling": "Природна прокрутка тачпада"
+    "Natural Touchpad Scrolling": "Звичайна прокрутка тачпада"
   },
   "Navigate": {
     "Navigate": "Навігувати"
@@ -5033,6 +5078,9 @@
   "No Rounding": {
     "No Rounding": "Без заокруглення"
   },
+  "No Scroll": {
+    "No Scroll": ""
+  },
   "No Shadow": {
     "No Shadow": "Без тіні"
   },
@@ -5064,7 +5112,7 @@
     "No adapters": "Немає адаптерів"
   },
   "No app customizations.": {
-    "No app customizations.": "Налаштувань додатків немає."
+    "No app customizations.": "Налаштувань додатків немає"
   },
   "No application selected": {
     "No application selected": "Додаток не обрано"
@@ -5073,10 +5121,10 @@
     "No apps found": "Додатків не знайдено"
   },
   "No apps have been launched yet.": {
-    "No apps have been launched yet.": "Жодного додатка ще не було запущено."
+    "No apps have been launched yet.": "Жодного додатка ще не було запущено"
   },
   "No apps muted. Right-click a notification and choose \"Mute popups\" to add one here.": {
-    "No apps muted. Right-click a notification and choose \"Mute popups\" to add one here.": "Немає додатків без звуку. Натисніть правою кнопкою на сповіщення та оберіть «Вимкнути спливаючі вікна», щоб додати їх сюди."
+    "No apps muted. Right-click a notification and choose \"Mute popups\" to add one here.": "Немає додатків без звуку. Натисніть правою кнопкою на сповіщення та оберіть «Вимкнути спливаючі вікна», щоб додати їх сюди"
   },
   "No autostart entries": {
     "No autostart entries": "Записів автозапуску немає"
@@ -5115,7 +5163,7 @@
     "No disk data available": "Дані про диск недоступні"
   },
   "No display profiles found. Create them in Settings > Displays.": {
-    "No display profiles found. Create them in Settings > Displays.": "Профілів дисплеїв не знайдено. Створіть їх у Налаштування > Дисплеї."
+    "No display profiles found. Create them in Settings > Displays.": "Профілів дисплеїв не знайдено. Створіть їх у Налаштування > Дисплеї"
   },
   "No drivers found": {
     "No drivers found": "Драйверів не знайдено"
@@ -5139,10 +5187,10 @@
     "No folders found": "Папок не знайдено"
   },
   "No hidden apps.": {
-    "No hidden apps.": "Прихованих додатків немає."
+    "No hidden apps.": "Прихованих додатків немає"
   },
   "No human user accounts found.": {
-    "No human user accounts found.": "Облікових записів реальних користувачів не знайдено."
+    "No human user accounts found.": "Облікових записів реальних користувачів не знайдено"
   },
   "No images found": {
     "No images found": "Зображень не знайдено"
@@ -5166,7 +5214,7 @@
     "No keybinds found": "Комбінацій клавіш не знайдено"
   },
   "No launcher plugins installed.": {
-    "No launcher plugins installed.": "Плагіни запускача не встановлено."
+    "No launcher plugins installed.": "Плагіни запускача не встановлено"
   },
   "No match criteria": {
     "No match criteria": "Критерії відповідності відсутні"
@@ -5187,7 +5235,7 @@
     "No mount points found": "Точок монтування не знайдено"
   },
   "No other active sessions on this seat": {
-    "No other active sessions on this seat": "Інших активних сесій на цьому місці (seat) немає"
+    "No other active sessions on this seat": "Інших активних сесій на цьому місці немає"
   },
   "No output device": {
     "No output device": "Пристрій виводу відсутній"
@@ -5196,10 +5244,10 @@
     "No output devices found": "Пристроїв виводу не знайдено"
   },
   "No packages ignored. Add one here or hover an update in the popout and click the hide button.": {
-    "No packages ignored. Add one here or hover an update in the popout and click the hide button.": "Ігнорованих пакетів немає. Додайте один тут або наведіть на оновлення в спливаючому вікні та натисніть кнопку приховання."
+    "No packages ignored. Add one here or hover an update in the popout and click the hide button.": "Ігнорованих пакетів немає. Додайте один тут або наведіть на оновлення в спливаючому вікні та натисніть кнопку приховання"
   },
   "No peers found": {
-    "No peers found": "Пірів (peers) не знайдено"
+    "No peers found": "Пірів не знайдено"
   },
   "No plugin results": {
     "No plugin results": "Результатів від плагінів немає"
@@ -5244,22 +5292,22 @@
     "No sessions found": "Сесій не знайдено"
   },
   "No status output.": {
-    "No status output.": "Вивід статусу відсутній."
+    "No status output.": "Вивід статусу відсутній"
   },
   "No supported package manager found.": {
-    "No supported package manager found.": "Підтримуваний менеджер пакетів не знайдено."
+    "No supported package manager found.": "Підтримуваний менеджер пакетів не знайдено"
   },
   "No themes found": {
     "No themes found": "Тем не знайдено"
   },
   "No themes installed. Browse themes to install from the registry.": {
-    "No themes installed. Browse themes to install from the registry.": "Тем не встановлено. Перегляньте реєстр, щоб встановити тему."
+    "No themes installed. Browse themes to install from the registry.": "Тем не встановлено. Перегляньте реєстр, щоб встановити тему"
   },
   "No trigger": {
     "No trigger": "Без тригера"
   },
   "No updates available.": {
-    "No updates available.": "Оновлень немає."
+    "No updates available.": "Оновлень немає"
   },
   "No user specified": {
     "No user specified": "Користувача не вказано"
@@ -5280,7 +5328,7 @@
     "No warnings": "Попереджень немає"
   },
   "No widgets added. Click \"Add Widget\" to get started.": {
-    "No widgets added. Click \"Add Widget\" to get started.": "Віджети не додані. Натисніть «Додати віджет», щоб почати."
+    "No widgets added. Click \"Add Widget\" to get started.": "Віджети не додані. Натисніть «Додати віджет», щоб почати"
   },
   "No widgets available": {
     "No widgets available": "Віджети недоступні"
@@ -5322,10 +5370,10 @@
     "Not available - install or configure pam_u2f": "Недоступно — встановіть або налаштуйте pam_u2f"
   },
   "Not available — install fprintd and pam_fprintd, or configure greetd PAM.": {
-    "Not available — install fprintd and pam_fprintd, or configure greetd PAM.": "Недоступно — встановіть fprintd та pam_fprintd або налаштуйте greetd PAM."
+    "Not available — install fprintd and pam_fprintd, or configure greetd PAM.": "Недоступно — встановіть fprintd та pam_fprintd або налаштуйте greetd PAM"
   },
   "Not available — install or configure pam_u2f, or configure greetd PAM.": {
-    "Not available — install or configure pam_u2f, or configure greetd PAM.": "Недоступно — встановіть або налаштуйте pam_u2f або налаштуйте greetd PAM."
+    "Not available — install or configure pam_u2f, or configure greetd PAM.": "Недоступно — встановіть або налаштуйте pam_u2f або налаштуйте greetd PAM"
   },
   "Not bound": {
     "Not bound": "Не прив'язано"
@@ -5335,9 +5383,6 @@
   },
   "Not detected": {
     "Not detected": "Не виявлено"
-  },
-  "Not listed?": {
-    "Not listed?": "Відсутній у списку?"
   },
   "Not paired": {
     "Not paired": "Не сполучено"
@@ -5349,7 +5394,7 @@
     "Notepad": "Блокнот"
   },
   "Notepad Settings": {
-    "Notepad Settings": "Налаштування Блокнота"
+    "Notepad Settings": "Налаштувати Блокнот"
   },
   "Notepad Slideout": {
     "Notepad Slideout": "Висувна панель нотаток"
@@ -5415,7 +5460,7 @@
     "Occupied Color": "Колір зайнятого"
   },
   "Off": {
-    "Off": "ВИМК"
+    "Off": "ВИМК."
   },
   "Office": {
     "Office": "Офіс"
@@ -5430,7 +5475,10 @@
     "Older": "Старіше"
   },
   "On": {
-    "On": "УВІМ"
+    "On": "УВІМ."
+  },
+  "On Button Down": {
+    "On Button Down": ""
   },
   "On indefinitely": {
     "On indefinitely": "Увімкнено безстроково"
@@ -5448,7 +5496,10 @@
     "Online": "Онлайн"
   },
   "Only adjust gamma based on time or location rules.": {
-    "Only adjust gamma based on time or location rules.": "Коригувати гаму лише на основі правил часу або розташування."
+    "Only adjust gamma based on time or location rules.": "Коригувати гаму лише на основі правил часу або розташування"
+  },
+  "Only continue if you recognize this server certificate fingerprint.": {
+    "Only continue if you recognize this server certificate fingerprint.": ""
   },
   "Only on Battery": {
     "Only on Battery": "Тільки від батареї"
@@ -5478,7 +5529,7 @@
     "Open Dir": "Відкрити папку"
   },
   "Open Frame": {
-    "Open Frame": "Відкрити рамку (Frame)"
+    "Open Frame": "Відкрити рамку"
   },
   "Open From": {
     "Open From": "Відкрити з"
@@ -5496,7 +5547,7 @@
     "Open a new note": "Створити нову нотатку"
   },
   "Open a terminal and run a custom command instead of the in-shell upgrade flow.": {
-    "Open a terminal and run a custom command instead of the in-shell upgrade flow.": "Відкрити термінал і виконати власну команду замість стандартного процесу оновлення в оболонці."
+    "Open a terminal and run a custom command instead of the in-shell upgrade flow.": "Відкрити термінал і виконати власну команду замість стандартного процесу оновлення в оболонці"
   },
   "Open as window": {
     "Open as window": "Відкрити як вікно"
@@ -5511,7 +5562,7 @@
     "Open in terminal": "Відкрити в терміналі"
   },
   "Open network": {
-    "Open network": ""
+    "Open network": "Відкрита мережа"
   },
   "Open search bar to find text": {
     "Open search bar to find text": "Відкрити панель пошуку для пошуку тексту"
@@ -5520,7 +5571,7 @@
     "Open the launcher by hovering the emerge edge (when free of bar and dock)": "Відкривати запускач, наводячи курсор на край екрану (якщо там немає панелі чи дока)"
   },
   "Open widget popouts by hovering over the bar. Moving to another widget switches the popout.": {
-    "Open widget popouts by hovering over the bar. Moving to another widget switches the popout.": "Відкривати спливаючі вікна віджетів при наведенні на панель. Перехід до іншого віджета змінює вікно."
+    "Open widget popouts by hovering over the bar. Moving to another widget switches the popout.": "Відкривати спливаючі вікна віджетів при наведенні на панель. Перехід до іншого віджета змінює вікно"
   },
   "Open with...": {
     "Open with...": "Відкрити за допомогою..."
@@ -5535,13 +5586,13 @@
     "Opening terminal: ": "Відкриття терміналу: "
   },
   "Opens a picker of other active sessions on this seat": {
-    "Opens a picker of other active sessions on this seat": "Відкриває вибір інших активних сесій на цьому місці (seat)"
+    "Opens a picker of other active sessions on this seat": "Відкриває вибір інших активних сесій на цьому місці"
   },
   "Opens the connected launcher in Connected Frame Mode.": {
-    "Opens the connected launcher in Connected Frame Mode.": "Відкриває підключений запускач у режимі Connected Frame."
+    "Opens the connected launcher in Connected Frame Mode.": "Відкриває підключений запускач у режимі підключеної рамки"
   },
   "Optional": {
-    "Optional": ""
+    "Optional": "Необов'язково"
   },
   "Optional description": {
     "Optional description": "Необов'язковий опис"
@@ -5550,10 +5601,10 @@
     "Optional location": "Необов'язкове розташування"
   },
   "Optional state-based conditions applied to the first match.": {
-    "Optional state-based conditions applied to the first match.": "Додаткові умови на основі стану, що застосовуються до першого збігу."
+    "Optional state-based conditions applied to the first match.": "Додаткові умови на основі стану, що застосовуються до першого збігу"
   },
   "Optional; leave blank for open hotspot": {
-    "Optional; leave blank for open hotspot": ""
+    "Optional; leave blank for open hotspot": "Необов'язково; залиште порожнім для відкритої точки доступу"
   },
   "Options": {
     "Options": "Параметри"
@@ -5598,7 +5649,7 @@
     "Overflow": "Переповнення"
   },
   "Overlay": {
-    "Overlay": "Накладка (Overlay)"
+    "Overlay": "Накладання"
   },
   "Overridden by config": {
     "Overridden by config": "Перевизначено конфігурацією"
@@ -5640,10 +5691,10 @@
     "Owner: %1": "Власник: %1"
   },
   "PAM already provides fingerprint auth. Enable this to show it at login.": {
-    "PAM already provides fingerprint auth. Enable this to show it at login.": "PAM вже забезпечує аутентифікацію за відбитком пальця. Увімкніть це, щоб відобразити її при вході."
+    "PAM already provides fingerprint auth. Enable this to show it at login.": "PAM вже забезпечує аутентифікацію за відбитком пальця. Увімкніть це, щоб відобразити її при вході"
   },
   "PAM already provides security-key auth. Enable this to show it at login.": {
-    "PAM already provides security-key auth. Enable this to show it at login.": "PAM вже забезпечує аутентифікацію ключем безпеки. Увімкніть це, щоб відобразити її при вході."
+    "PAM already provides security-key auth. Enable this to show it at login.": "PAM вже забезпечує аутентифікацію ключем безпеки. Увімкніть це, щоб відобразити її при вході"
   },
   "PDF Reader": {
     "PDF Reader": "PDF-рідер"
@@ -5687,6 +5738,9 @@
   "Pairing...": {
     "Pairing...": "Сполучення..."
   },
+  "Partial": {
+    "Partial": ""
+  },
   "Partly Cloudy": {
     "Partly Cloudy": "Частково хмарно"
   },
@@ -5707,9 +5761,6 @@
   },
   "Password updated": {
     "Password updated": "Пароль оновлено"
-  },
-  "Password...": {
-    "Password...": "Пароль..."
   },
   "Passwords do not match.": {
     "Passwords do not match.": "Паролі не збігаються."
@@ -5760,10 +5811,10 @@
     "Performance": "Продуктивність"
   },
   "Permanently delete %1 item(s)? This cannot be undone.": {
-    "Permanently delete %1 item(s)? This cannot be undone.": "Видалити %1 елемент(ів) назавжди? Цю дію неможливо скасувати."
+    "Permanently delete %1 item(s)? This cannot be undone.": "Видалити %1 елемент(ів) назавжди? Цю дію неможливо скасувати"
   },
   "Permission denied to set profile image.": {
-    "Permission denied to set profile image.": "Відмовлено в доступі для встановлення зображення профілю."
+    "Permission denied to set profile image.": "Відмовлено в доступі для встановлення зображення профілю"
   },
   "Personalization": {
     "Personalization": "Персоналізація"
@@ -5775,7 +5826,7 @@
     "Phone number": "Номер телефону"
   },
   "Pick a different file manager in Settings → Dock → Trash.": {
-    "Pick a different file manager in Settings → Dock → Trash.": "Оберіть іншого файлового менеджера в Налаштування → Док → Кошик."
+    "Pick a different file manager in Settings → Dock → Trash.": "Оберіть іншого файлового менеджера в Налаштування → Док → Кошик"
   },
   "Pick a different random video each time from the same folder": {
     "Pick a different random video each time from the same folder": "Щоразу обирати випадкове відео з тієї самої папки"
@@ -5787,7 +5838,7 @@
     "Pin": "Закріпити"
   },
   "Pin to Dock": {
-    "Pin to Dock": "Закріпити на панелі Док"
+    "Pin to Dock": "Закріпити у Доці"
   },
   "Ping": {
     "Ping": "Пінг"
@@ -5799,7 +5850,7 @@
     "Pinned": "Закріплено"
   },
   "Pinned and running apps with drag-and-drop": {
-    "Pinned and running apps with drag-and-drop": "Закріплені та запущені додатки з перетягуванням (drag-and-drop)"
+    "Pinned and running apps with drag-and-drop": "Закріплені та запущені додатки з перетягуванням"
   },
   "Pixelate": {
     "Pixelate": "Пікселізація"
@@ -5808,7 +5859,7 @@
     "Place a trash bin at the end of the dock": "Розмістити кошик у кінці дока"
   },
   "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
-    "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "Розташуйте каталоги плагінів тут. Кожен плагін повинен мати файл маніфесту plugin.json."
+    "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "Розташуйте каталоги плагінів тут. Кожен плагін повинен мати файл маніфесту plugin.json"
   },
   "Place plugins in %1": {
     "Place plugins in %1": "Розмістити плагіни в %1"
@@ -5823,7 +5874,7 @@
     "Play": "Відтворити"
   },
   "Play a video when the screen locks.": {
-    "Play a video when the screen locks.": "Відтворювати відео при блокуванні екрана."
+    "Play a video when the screen locks.": "Відтворювати відео при блокуванні екрана"
   },
   "Play sound after logging in": {
     "Play sound after logging in": "Відтворювати звук після входу в систему"
@@ -5877,7 +5928,7 @@
     "Plugin enabled: %1": "Плагін увімкнено: %1"
   },
   "Plugin is disabled - enable in Plugins settings to use": {
-    "Plugin is disabled - enable in Plugins settings to use": "Плагін вимкнено - увімкніть у налаштуваннях плагінів, щоб використовувати"
+    "Plugin is disabled - enable in Plugins settings to use": "Плагін вимкнено — увімкніть у налаштуваннях плагінів, щоб використовувати"
   },
   "Plugin reloaded: %1": {
     "Plugin reloaded: %1": "Плагін перезавантажено: %1"
@@ -5894,11 +5945,14 @@
   "Pointer": {
     "Pointer": "Вказівник"
   },
+  "Pointer Speed": {
+    "Pointer Speed": ""
+  },
   "Polkit integration is disabled. User management requires Polkit to elevate privileges.": {
-    "Polkit integration is disabled. User management requires Polkit to elevate privileges.": "Інтеграція з Polkit вимкнена. Управління користувачами потребує Polkit для підвищення привілеїв."
+    "Polkit integration is disabled. User management requires Polkit to elevate privileges.": "Інтеграція з Polkit вимкнена. Управління користувачами потребує Polkit для підвищення привілеїв"
   },
   "Popout": {
-    "Popout": "Спливаюче вікно (Popout)"
+    "Popout": "Спливаюче вікно"
   },
   "Popout Shadows": {
     "Popout Shadows": "Тіні спливаючих вікон"
@@ -5979,10 +6033,10 @@
     "Power source": "Джерело живлення"
   },
   "Pre-fill the last successful username on the greeter": {
-    "Pre-fill the last successful username on the greeter": "Попередньо заповнити останнє успішне ім'я користувача в Greeter"
+    "Pre-fill the last successful username on the greeter": "Попередньо заповнити останнє успішне ім'я користувача на екрані входу"
   },
   "Pre-select the last used session on the greeter": {
-    "Pre-select the last used session on the greeter": "Попередньо обрати останню використану сесію в Greeter"
+    "Pre-select the last used session on the greeter": "Попередньо обрати останню використану сесію на екрані входу"
   },
   "Precip": {
     "Precip": "Опади"
@@ -6006,7 +6060,7 @@
     "Press Enter and the audio system will restart to apply the change": "Натисніть Enter, і аудіосистема перезапуститься для застосування змін"
   },
   "Press Enter to paste, Shift+Enter to copy": {
-    "Press Enter to paste, Shift+Enter to copy": "Enter для вставки, Shift+Enter для копіювання"
+    "Press Enter to paste, Shift+Enter to copy": "Enter для вставки, Shift + Enter для копіювання"
   },
   "Press key...": {
     "Press key...": "Натисніть клавішу..."
@@ -6014,11 +6068,14 @@
   "Pressure": {
     "Pressure": "Тиск"
   },
+  "Prevent accidental cursor jumps while typing": {
+    "Prevent accidental cursor jumps while typing": ""
+  },
   "Prevent screen timeout": {
     "Prevent screen timeout": "Запобігти вимкненню екрана"
   },
   "Prevent specific applications from displaying in the media controllers (e.g., browser audio streams, background tools). Matches player identity or desktop file name case-insensitively.": {
-    "Prevent specific applications from displaying in the media controllers (e.g., browser audio streams, background tools). Matches player identity or desktop file name case-insensitively.": "Заборонити певним додаткам відображатися в медіаконтролерах (наприклад, аудіопотоки браузера, фонові інструменти). Пошук за ідентифікатором плеєра або назвою .desktop файлу без урахування регістру."
+    "Prevent specific applications from displaying in the media controllers (e.g., browser audio streams, background tools). Matches player identity or desktop file name case-insensitively.": "Заборонити певним додаткам відображатися в медіаконтролерах (наприклад, аудіопотоки браузера, фонові інструменти). Пошук за ідентифікатором плеєра або назвою .desktop файлу без урахування регістру"
   },
   "Preview": {
     "Preview": "Попередній перегляд"
@@ -6105,7 +6162,7 @@
     "Profile error": "Помилка профілю"
   },
   "Profile image is too large. Please use a smaller image.": {
-    "Profile image is too large. Please use a smaller image.": "Зображення профілю завелике. Будь ласка, використайте менше зображення."
+    "Profile image is too large. Please use a smaller image.": "Зображення профілю завелике. Будь ласка, використайте менше зображення"
   },
   "Profile name": {
     "Profile name": "Назва профілю"
@@ -6131,6 +6188,9 @@
   "Protocol": {
     "Protocol": "Протокол"
   },
+  "QR Generator": {
+    "QR Generator": ""
+  },
   "Qt": {
     "Qt": "Qt"
   },
@@ -6138,7 +6198,7 @@
     "Qt colors applied successfully": "Кольори Qt успішно застосовано"
   },
   "Qt: distance-field renderer.": {
-    "Qt: distance-field renderer.": "Qt: рендерер distance-field."
+    "Qt: distance-field renderer.": "Qt: рендерер distance-field"
   },
   "QtMultimedia is not available": {
     "QtMultimedia is not available": "QtMultimedia недоступний"
@@ -6189,10 +6249,10 @@
     "Re-enter password": "Повторно введіть пароль"
   },
   "Re-enter the password before saving.": {
-    "Re-enter the password before saving.": ""
+    "Re-enter the password before saving.": "Повторно введіть пароль перед збереженням"
   },
   "Reach local network devices while using an exit node": {
-    "Reach local network devices while using an exit node": "Доступ до пристроїв локальної мережі під час використання вихідного вузла (exit node)"
+    "Reach local network devices while using an exit node": "Доступ до пристроїв локальної мережі під час використання вихідного вузла"
   },
   "Read-only legacy config": {
     "Read-only legacy config": "Застаріла конфігурація тільки для читання"
@@ -6201,7 +6261,7 @@
     "Read:": "Читати:"
   },
   "Ready": {
-    "Ready": ""
+    "Ready": "Готово"
   },
   "Reason": {
     "Reason": "Причина"
@@ -6231,7 +6291,7 @@
     "Refreshing...": "Оновлення..."
   },
   "Regex": {
-    "Regex": "Регулярний вираз (Regex)"
+    "Regex": "Регулярний вираз"
   },
   "Regular": {
     "Regular": "Звичайний"
@@ -6249,7 +6309,7 @@
     "Release": "Реліз"
   },
   "Release to confirm": {
-    "Release to confirm": ""
+    "Release to confirm": "Відпустіть для підтвердження"
   },
   "Reload From Disk": {
     "Reload From Disk": "Перезавантажити з диска"
@@ -6303,10 +6363,10 @@
     "Remove gaps and border when windows are maximized": "Прибирати відступи та рамки, коли вікна максимізовані"
   },
   "Remove greeter access?": {
-    "Remove greeter access?": "Видалити доступ до Greeter?"
+    "Remove greeter access?": "Видалити доступ до екрану входу?"
   },
   "Remove greeter login access": {
-    "Remove greeter login access": "Видалити доступ до входу через Greeter"
+    "Remove greeter login access": "Видалити доступ до входу через екран входу"
   },
   "Remove inner padding from all widgets": {
     "Remove inner padding from all widgets": "Прибрати внутрішні відступи з усіх віджетів"
@@ -6318,13 +6378,13 @@
     "Remove the shortcut %1?": "Видалити ярлик %1?"
   },
   "Remove the shortcut %1? An unbind entry will be saved to dms/binds-user.lua so it stays removed across DMS updates.": {
-    "Remove the shortcut %1? An unbind entry will be saved to dms/binds-user.lua so it stays removed across DMS updates.": "Видалити ярлик %1? Запис про розв'язку буде збережено в dms/binds-user.lua, щоб він залишався видаленим після оновлень DMS."
+    "Remove the shortcut %1? An unbind entry will be saved to dms/binds-user.lua so it stays removed across DMS updates.": "Видалити ярлик %1? Запис про розв'язку буде збережено в dms/binds-user.lua, щоб він залишався видаленим після оновлень DMS"
   },
   "Removed administrator privileges": {
     "Removed administrator privileges": "Права адміністратора видалено"
   },
   "Removed greeter login access": {
-    "Removed greeter login access": "Доступ до входу через Greeter видалено"
+    "Removed greeter login access": "Доступ до входу через екрану входу видалено"
   },
   "Rename": {
     "Rename": "Перейменувати"
@@ -6366,7 +6426,7 @@
     "Requires DMS %1": "Потребує DMS %1"
   },
   "Requires DMS server with sysupdate capability": {
-    "Requires DMS server with sysupdate capability": "Потребує сервера DMS з можливістю системного оновлення (sysupdate)"
+    "Requires DMS server with sysupdate capability": "Потребує сервера DMS з можливістю системного оновлення"
   },
   "Requires MangoWC compositor": {
     "Requires MangoWC compositor": "Потребує композитора MangoWC"
@@ -6375,13 +6435,16 @@
     "Requires a newer version of Quickshell": "Потрібна новіша версія Quickshell"
   },
   "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys).": {
-    "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys).": "Потрібні greetd, dms-greeter та додавання користувача до групи greeter (а також fprintd/pam_fprintd для відбитків, pam_u2f для ключів безпеки)."
+    "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys).": "Потрібні greetd, dms-greeter та додавання користувача до групи greeter (а також fprintd/pam_fprintd для відбитків, pam_u2f для ключів безпеки)"
   },
   "Requires night mode support": {
     "Requires night mode support": "Потребує підтримки нічного режиму"
   },
   "Requires remembering the last user and session. Enable those options first.": {
-    "Requires remembering the last user and session. Enable those options first.": "Потребує запам'ятовування останнього користувача та сесії. Спочатку увімкніть ці опції."
+    "Requires remembering the last user and session. Enable those options first.": "Потребує запам'ятовування останнього користувача та сесії. Спочатку увімкніть ці опції"
+  },
+  "Requires the DMS Theme extension from the editor marketplace": {
+    "Requires the DMS Theme extension from the editor marketplace": ""
   },
   "Reset": {
     "Reset": "Скинути"
@@ -6437,6 +6500,12 @@
   "Reverse Scrolling Direction": {
     "Reverse Scrolling Direction": "Інвертувати напрямок прокрутки"
   },
+  "Reverse mouse wheel scrolling direction": {
+    "Reverse mouse wheel scrolling direction": ""
+  },
+  "Reverse two-finger scrolling direction": {
+    "Reverse two-finger scrolling direction": ""
+  },
   "Reverse workspace switch direction when scrolling over the bar": {
     "Reverse workspace switch direction when scrolling over the bar": "Інвертувати напрямок перемикання робочих просторів при прокрутці над панеллю"
   },
@@ -6444,7 +6513,7 @@
     "Revert": "Скасувати зміни"
   },
   "Rewind 10s": {
-    "Rewind 10s": "Перемотати назад 10с"
+    "Rewind 10s": "Перемотати назад 10 с"
   },
   "Right": {
     "Right": "Праворуч"
@@ -6468,13 +6537,13 @@
     "Right-click bar widget to cycle": "Клацніть правою кнопкою миші на віджет панелі для перемикання"
   },
   "Ring": {
-    "Ring": "Кільце (дзвінок)"
+    "Ring": "Дзвінок"
   },
   "Ringing %1...": {
     "Ringing %1...": "Виклик %1..."
   },
   "Ripple Effects": {
-    "Ripple Effects": "Ефекти розпилення (Ripple)"
+    "Ripple Effects": "Ефекти хвиль"
   },
   "Root Filesystem": {
     "Root Filesystem": "Корнева файлова система"
@@ -6498,7 +6567,7 @@
     "Rules (%1)": "Правила (%1)"
   },
   "Rules found in your compositor config. These are read-only here, use Convert to DMS to make an editable copy.": {
-    "Rules found in your compositor config. These are read-only here, use Convert to DMS to make an editable copy.": "Правила знайдено в конфігурації вашого композитора. Тут вони доступні лише для читання; використовуйте «Convert to DMS», щоб створити копію, яку можна редагувати."
+    "Rules found in your compositor config. These are read-only here, use Convert to DMS to make an editable copy.": "Правила знайдено в конфігурації вашого композитора. Тут вони доступні лише для читання; використовуйте «Convert to DMS», щоб створити копію, яку можна редагувати"
   },
   "Run Again": {
     "Run Again": "Запустити знову"
@@ -6516,10 +6585,10 @@
     "Run a shell command (e.g., notify-send)": "Запустити команду оболонки (наприклад, notify-send)"
   },
   "Run paru/yay with AUR enabled when 'Update All' is clicked.": {
-    "Run paru/yay with AUR enabled when 'Update All' is clicked.": "Запускати paru/yay з увімкненим AUR при натисканні «Оновити все»."
+    "Run paru/yay with AUR enabled when 'Update All' is clicked.": "Запускати paru/yay з увімкненим AUR при натисканні «Оновити все»"
   },
   "Running": {
-    "Running": ""
+    "Running": "Працює"
   },
   "Running Apps": {
     "Running Apps": "Запущені програми"
@@ -6528,7 +6597,7 @@
     "Running Apps Settings": "Налаштування запущених програм"
   },
   "Running greeter sync...": {
-    "Running greeter sync...": "Синхронізація Greeter..."
+    "Running greeter sync...": "Синхронізація екрану входу..."
   },
   "Running in terminal": {
     "Running in terminal": "Запуск у терміналі"
@@ -6546,13 +6615,13 @@
     "SMS sent successfully": "SMS успішно надіслано"
   },
   "SSID": {
-    "SSID": ""
+    "SSID": "SSID"
   },
   "Saturation": {
     "Saturation": "Насиченість"
   },
   "Save & Start": {
-    "Save & Start": ""
+    "Save & Start": "Зберегти та запустити"
   },
   "Save Notepad File": {
     "Save Notepad File": "Зберегти файл блокнота"
@@ -6609,7 +6678,7 @@
     "Scale": "Масштаб"
   },
   "Scale DankBar font sizes independently": {
-    "Scale DankBar font sizes independently": "Масштабувати розміри шрифтів панелі Dank незалежно"
+    "Scale DankBar font sizes independently": "Масштабувати розміри шрифтів DankBar незалежно"
   },
   "Scale DankBar icon sizes independently": {
     "Scale DankBar icon sizes independently": "Масштабувати розміри іконок DankBar незалежно"
@@ -6627,7 +6696,7 @@
     "Science": "Наука"
   },
   "Score": {
-    "Score": "Оцінка (Score)"
+    "Score": "Оцінка"
   },
   "Screen sharing": {
     "Screen sharing": "Демонстрація екрана"
@@ -6644,6 +6713,9 @@
   "Scroll GitHub": {
     "Scroll GitHub": "GitHub Scroll"
   },
+  "Scroll Method": {
+    "Scroll Method": ""
+  },
   "Scroll Wheel": {
     "Scroll Wheel": "Колесо прокрутки"
   },
@@ -6659,6 +6731,9 @@
   "Scrolling": {
     "Scrolling": "Прокручування"
   },
+  "Scrolling Speed": {
+    "Scrolling Speed": ""
+  },
   "Search App Actions": {
     "Search App Actions": "Пошук дій додатків"
   },
@@ -6669,7 +6744,7 @@
     "Search applications...": "Пошук додатків..."
   },
   "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": {
-    "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": "Пошук за комбінацією клавіш, описом або назвою дії.\n\nСтандартна дія копіює гарячу клавішу в буфер обміну.\nНатисніть правою кнопкою миші або стрілку вправо, щоб закріпити часто використовувані клавіші — вони з'являться зверху під час відсутності пошуку."
+    "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": "Пошук за комбінацією клавіш, описом або назвою дії\n\nСтандартна дія копіює гарячу клавішу в буфер обміну.\nНатисніть правою кнопкою миші або стрілку вправо, щоб закріпити часто використовувані клавіші — вони з'являться зверху під час відсутності пошуку"
   },
   "Search devices...": {
     "Search devices...": "Пошук пристроїв..."
@@ -6729,7 +6804,7 @@
     "Security-key availability could not be confirmed": "Не вдалося підтвердити доступність ключа безпеки"
   },
   "Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.": {
-    "Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.": "Підтримку ключа безпеки виявлено, але зареєстрованого ключа ще не знайдено. Ви можете увімкнути це зараз і зареєструвати його пізніше."
+    "Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.": "Підтримку ключа безпеки виявлено, але зареєстрованого ключа ще не знайдено. Ви можете увімкнути це зараз і зареєструвати його пізніше"
   },
   "Select": {
     "Select": "Обрати"
@@ -6771,16 +6846,16 @@
     "Select a desktop application": "Оберіть додаток робочого столу"
   },
   "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": {
-    "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": "Оберіть віджет для додавання на робочий стіл. Кожен віджет є окремим екземпляром зі своїми налаштуваннями."
+    "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": "Оберіть віджет для додавання на робочий стіл. Кожен віджет є окремим екземпляром зі своїми налаштуваннями"
   },
   "Select a widget to add. You can add multiple instances of the same widget if needed.": {
-    "Select a widget to add. You can add multiple instances of the same widget if needed.": "Виберіть віджет для додавання. За потреби ви можете додати кілька екземплярів одного віджета."
+    "Select a widget to add. You can add multiple instances of the same widget if needed.": "Виберіть віджет для додавання. За потреби ви можете додати кілька екземплярів одного віджета"
   },
   "Select a window...": {
     "Select a window...": "Оберіть вікно..."
   },
   "Select an active session to switch to. The current session stays running in the background.": {
-    "Select an active session to switch to. The current session stays running in the background.": "Оберіть активну сесію для переходу. Поточна сесія залишиться працювати у фоні."
+    "Select an active session to switch to. The current session stays running in the background.": "Оберіть активну сесію для переходу. Поточна сесія залишиться працювати у фоні"
   },
   "Select an image file...": {
     "Select an image file...": "Вибрати файл зображення..."
@@ -6804,7 +6879,7 @@
     "Select font weight for UI text": "Виберіть насиченість шрифту для тексту інтерфейсу"
   },
   "Select greeter background image": {
-    "Select greeter background image": "Оберіть зображення фону Greeter"
+    "Select greeter background image": "Оберіть зображення фону екрану входу"
   },
   "Select lock screen background image": {
     "Select lock screen background image": "Оберіть зображення фону екрана блокування"
@@ -6821,9 +6896,6 @@
   "Select the palette algorithm used for wallpaper-based colors": {
     "Select the palette algorithm used for wallpaper-based colors": "Виберіть алгоритм палітри для кольорів на основі шпалер"
   },
-  "Select user...": {
-    "Select user...": "Оберіть користувача..."
-  },
   "Select which keybind providers to include": {
     "Select which keybind providers to include": "Оберіть, які провайдери гарячих клавіш включити"
   },
@@ -6834,7 +6906,7 @@
     "Select...": "Вибрати..."
   },
   "Selected image file not found.": {
-    "Selected image file not found.": "Вибраний файл зображення не знайдено."
+    "Selected image file not found.": "Вибраний файл зображення не знайдено"
   },
   "Send": {
     "Send": "Надіслати"
@@ -6858,7 +6930,7 @@
     "Separate Light & Dark Themes": "Окремі світла та темна теми"
   },
   "Separate appearance for unfocused displays is not supported on this compositor.": {
-    "Separate appearance for unfocused displays is not supported on this compositor.": "Окремий вигляд для нефокусних дисплеїв не підтримується цим композитором."
+    "Separate appearance for unfocused displays is not supported on this compositor.": "Окремий вигляд для нефокусних дисплеїв не підтримується цим композитором"
   },
   "Separator": {
     "Separator": "Роздільник"
@@ -6900,16 +6972,16 @@
     "Set the font size for notification body text (htmlBody)": "Встановіть розмір шрифту для основного тексту сповіщення (htmlBody)"
   },
   "Set the percentage at which the battery is considered low.": {
-    "Set the percentage at which the battery is considered low.": "Встановіть відсоток, при якому заряд батареї вважатиметься низьким."
+    "Set the percentage at which the battery is considered low.": "Встановіть відсоток, при якому заряд батареї вважатиметься низьким"
   },
   "Set up a WiFi hotspot for sharing this connection.": {
-    "Set up a WiFi hotspot for sharing this connection.": ""
+    "Set up a WiFi hotspot for sharing this connection.": "Налаштуйте точку доступу WiFi для спільного використання цього з'єднання"
   },
   "Set up hotspot": {
-    "Set up hotspot": ""
+    "Set up hotspot": "Налаштувати точку доступу"
   },
   "Set up hotspot in Settings": {
-    "Set up hotspot in Settings": ""
+    "Set up hotspot in Settings": "Налаштуйте точку доступу в Параметрах"
   },
   "Setting": {
     "Setting": "Налаштування"
@@ -6924,7 +6996,7 @@
     "Settings Search": "Пошук у налаштуваннях"
   },
   "Settings are read-only. Changes will not persist.": {
-    "Settings are read-only. Changes will not persist.": "Налаштування доступні лише для читання. Зміни не будуть збережені."
+    "Settings are read-only. Changes will not persist.": "Налаштування доступні лише для читання. Зміни не будуть збережені"
   },
   "Setup": {
     "Setup": "Налаштування"
@@ -6939,7 +7011,7 @@
     "Shadow Opacity": "Прозорість тіні"
   },
   "Shadow Override": {
-    "Shadow Override": "Перевизначення тіні (Override)"
+    "Shadow Override": "Перевизначення тіні"
   },
   "Shadow blur radius in pixels": {
     "Shadow blur radius in pixels": "Радіус розмиття тіні в пікселях"
@@ -6992,6 +7064,9 @@
   "Show": {
     "Show": "Показати"
   },
+  "Show \"config reloaded\" Toast": {
+    "Show \"config reloaded\" Toast": ""
+  },
   "Show 3rd Party": {
     "Show 3rd Party": "Показати сторонні"
   },
@@ -6999,7 +7074,7 @@
     "Show All Tags": "Показувати всі теги"
   },
   "Show All, Apps, Files, and Plugins chips beside the Spotlight Bar input.": {
-    "Show All, Apps, Files, and Plugins chips beside the Spotlight Bar input.": "Показувати мітки «Усі», «Програми», «Файли» та «Плагіни» поруч із полем введення Spotlight Bar."
+    "Show All, Apps, Files, and Plugins chips beside the Spotlight Bar input.": "Показувати мітки «Усі», «Програми», «Файли» та «Плагіни» поруч із полем введення Spotlight Bar"
   },
   "Show Badge": {
     "Show Badge": "Показати бейдж"
@@ -7071,7 +7146,7 @@
     "Show Log Out": "Показувати вихід із системи"
   },
   "Show Material Design ripple animations on interactive elements": {
-    "Show Material Design ripple animations on interactive elements": "Показувати анімації «ripple» (хвиля) Material Design на інтерактивних елементах"
+    "Show Material Design ripple animations on interactive elements": "Показувати анімації хвилі Material Design на інтерактивних елементах"
   },
   "Show Media Player": {
     "Show Media Player": "Показати медіаплеєр"
@@ -7185,10 +7260,13 @@
     "Show a bar that drains as the popup's auto-dismiss timer runs": "Показувати смужку, яка зменшується під час роботи таймера автозакриття спливаючого вікна"
   },
   "Show a notification when battery reaches the charge limit.": {
-    "Show a notification when battery reaches the charge limit.": "Показувати сповіщення, коли батарея досягає ліміту заряду."
+    "Show a notification when battery reaches the charge limit.": "Показувати сповіщення, коли батарея досягає ліміту заряду"
+  },
+  "Show a toast when the compositor config is reloaded": {
+    "Show a toast when the compositor config is reloaded": ""
   },
   "Show a warning popup when battery is running low.": {
-    "Show a warning popup when battery is running low.": "Показувати попередження, коли заряд батареї стає низьким."
+    "Show a warning popup when battery is running low.": "Показувати попередження, коли заряд батареї стає низьким"
   },
   "Show all 9 tags instead of only occupied tags": {
     "Show all 9 tags instead of only occupied tags": "Показувати всі 9 тегів замість тільки зайнятих"
@@ -7197,7 +7275,7 @@
     "Show an outline ring around the focused workspace indicator": "Показувати контурне кільце навколо індикатора активного робочого простору"
   },
   "Show an urgent alert when battery reaches critical level.": {
-    "Show an urgent alert when battery reaches critical level.": "Показувати термінове сповіщення, коли рівень заряду батареї стає критичним."
+    "Show an urgent alert when battery reaches critical level.": "Показувати термінове сповіщення, коли рівень заряду батареї стає критичним"
   },
   "Show cava audio visualizer in media widget": {
     "Show cava audio visualizer in media widget": "Показувати аудіовізуалізатор Cava у віджеті медіа"
@@ -7212,10 +7290,10 @@
     "Show dock when floating windows don't overlap its area": "Показувати док-панель, коли плаваючі вікна не перекривають її область"
   },
   "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": {
-    "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": "Показувати тінь для спливаючих сповіщень. Потребує увімкнення M3 Elevation у розділі «Тема та кольори»."
+    "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": "Показувати тінь для спливаючих сповіщень. Потребує увімкнення M3 Elevation у розділі «Тема та кольори»"
   },
   "Show during Niri overview": {
-    "Show during Niri overview": "Показувати під час огляду Niri"
+    "Show during Niri overview": "Показувати в режимі огляду Niri"
   },
   "Show foreground surfaces on notification cards": {
     "Show foreground surfaces on notification cards": "Показувати передні поверхні на картках сповіщень"
@@ -7227,10 +7305,10 @@
     "Show in GB": "Показувати в ГБ"
   },
   "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": {
-    "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": "Показувати оверлей запуску при введенні тексту в огляді Niri. Вимкніть, щоб використовувати інший запуск."
+    "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": "Показувати оверлей запуску при введенні тексту в огляді Niri. Вимкніть, щоб використовувати інший запуск"
   },
   "Show mode tabs and keyboard hints at the bottom.": {
-    "Show mode tabs and keyboard hints at the bottom.": "Показувати вкладки режимів та підказки клавіатури внизу."
+    "Show mode tabs and keyboard hints at the bottom.": "Показувати вкладки режимів та підказки клавіатури внизу"
   },
   "Show mount path": {
     "Show mount path": "Показати шлях монтування"
@@ -7323,7 +7401,7 @@
     "Skip setup": "Пропустити налаштування"
   },
   "Skip the greeter password after boot until you sign out. Lock screen unlock is unchanged. Takes effect on the next reboot after sync.": {
-    "Skip the greeter password after boot until you sign out. Lock screen unlock is unchanged. Takes effect on the next reboot after sync.": "Пропускати пароль при вході (greeter) після завантаження до моменту виходу з системи. Розблокування екрана залишається без змін. Набуває чинності після наступного перезавантаження після синхронізації."
+    "Skip the greeter password after boot until you sign out. Lock screen unlock is unchanged. Takes effect on the next reboot after sync.": "Пропускати пароль при вході (greeter) після завантаження до моменту виходу з системи. Розблокування екрана залишається без змін. Набуває чинності після наступного перезавантаження після синхронізації"
   },
   "Slideout": {
     "Slideout": "Висувна панель"
@@ -7401,19 +7479,19 @@
     "Square Corners": "Квадратні кути"
   },
   "Stacked": {
-    "Stacked": "Стеком (один над одним)"
+    "Stacked": "Один над одним"
   },
   "Standard": {
     "Standard": "Стандартний"
   },
   "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": {
-    "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": "Стандартний: Класичний Material Design 3 — панелі піднімаються знизу з легким масштабуванням. Значення за замовчуванням у DMS."
+    "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": "Стандартний: Класичний Material Design 3 — панелі піднімаються знизу з легким масштабуванням. Значення за замовчуванням у DMS"
   },
   "Start": {
     "Start": "Запустити"
   },
   "Start Hotspot?": {
-    "Start Hotspot?": ""
+    "Start Hotspot?": "Запустити точку доступу?"
   },
   "Start KDE Connect or Valent to use this plugin": {
     "Start KDE Connect or Valent to use this plugin": "Запустіть KDE Connect або Valent, щоб використовувати цей плагін"
@@ -7422,19 +7500,19 @@
     "Start typing your notes here...": "Почніть вводити свої нотатки тут..."
   },
   "Starting hotspot...": {
-    "Starting hotspot...": ""
+    "Starting hotspot...": "Запуск точки доступу..."
   },
   "Starting the hotspot will disconnect WiFi from \"%1\" — the radio can't do both at once. Sharing internet then requires another connection, such as Ethernet.": {
-    "Starting the hotspot will disconnect WiFi from \"%1\" — the radio can't do both at once. Sharing internet then requires another connection, such as Ethernet.": ""
+    "Starting the hotspot will disconnect WiFi from \"%1\" — the radio can't do both at once. Sharing internet then requires another connection, such as Ethernet.": "Запуск точки доступу розірве з'єднання WiFi з «%1» — радіомодуль не може робити і те, і інше одночасно. Для спільного використання інтернету знадобиться інше підключення, наприклад Ethernet"
   },
   "Starting...": {
-    "Starting...": ""
+    "Starting...": "Запуск..."
   },
   "State": {
     "State": "Стан"
   },
   "Stop": {
-    "Stop": ""
+    "Stop": "Зупинити"
   },
   "Stop ignoring %1": {
     "Stop ignoring %1": "Перестати ігнорувати %1"
@@ -7500,10 +7578,10 @@
     "Surface Container": "Контейнер поверхні"
   },
   "Surface High": {
-    "Surface High": "Поверхня (високий рівень)"
+    "Surface High": "Поверхня (вища)"
   },
   "Surface Highest": {
-    "Surface Highest": "Поверхня (найвищий рівень)"
+    "Surface Highest": "Поверхня (найвища)"
   },
   "Surface Opacity": {
     "Surface Opacity": "Прозорість поверхні"
@@ -7518,7 +7596,7 @@
     "Surfaces emerge flush from the bar": "Поверхні з'являються врівень із панеллю"
   },
   "Surfaces float independently of the frame": {
-    "Surfaces float independently of the frame": "Поверхні плавають незалежно від фрейму"
+    "Surfaces float independently of the frame": "Поверхні плавають незалежно від рамки"
   },
   "Suspend behavior": {
     "Suspend behavior": "Поведінка в режимі очікування"
@@ -7529,6 +7607,9 @@
   "Suspend then Hibernate": {
     "Suspend then Hibernate": "Сон, потім гібернація"
   },
+  "Swap primary and secondary mouse buttons": {
+    "Swap primary and secondary mouse buttons": ""
+  },
   "Sway Website": {
     "Sway Website": "Сайт Sway"
   },
@@ -7536,7 +7617,7 @@
     "Switch between display configurations": "Перемикатися між конфігураціями дисплеїв"
   },
   "Switch displays with an available 60 Hz mode to 60 Hz on battery and restore the previous mode on AC. Skips displays with VRR enabled.": {
-    "Switch displays with an available 60 Hz mode to 60 Hz on battery and restore the previous mode on AC. Skips displays with VRR enabled.": "Перемикати дисплеї з доступним режимом 60 Гц на 60 Гц при роботі від батареї та відновлювати попередній режим при підключенні живлення. Ігнорує дисплеї з увімкненим VRR."
+    "Switch displays with an available 60 Hz mode to 60 Hz on battery and restore the previous mode on AC. Skips displays with VRR enabled.": "Перемикати дисплеї з доступним режимом 60 Гц на 60 Гц при роботі від батареї та відновлювати попередній режим при підключенні живлення. Ігнорує дисплеї з увімкненим VRR"
   },
   "Switch to power profile": {
     "Switch to power profile": "Перемикнутися на профіль живлення"
@@ -7557,22 +7638,22 @@
     "Sync Position Across Screens": "Синхронізувати позицію між екранами"
   },
   "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": {
-    "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": "Синхронізація застосовує вашу тему та налаштування до екрана входу. Спільним користувачам слід використовувати 'dms greeter sync --profile' замість синхронізації основного користувача."
+    "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": "Синхронізація застосовує вашу тему та налаштування до екрана входу. Спільним користувачам слід використовувати 'dms greeter sync --profile' замість синхронізації основного користувача"
   },
   "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": {
-    "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": ""
+    "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": "Синхронізація застосовує вашу тему та налаштування до екрана входу. Спільні користувачі мають запускати 'dms-greeter sync --profile' замість синхронізації основного користувача"
   },
   "Sync completed successfully.": {
-    "Sync completed successfully.": "Синхронізацію успішно завершено."
+    "Sync completed successfully.": "Синхронізацію успішно завершено"
   },
   "Sync dark mode with settings portals for system-wide theme hints": {
     "Sync dark mode with settings portals for system-wide theme hints": "Синхронізувати темний режим із порталами параметрів для системних підказок оформлення"
   },
   "Sync failed in background mode. Trying terminal mode so you can authenticate interactively.": {
-    "Sync failed in background mode. Trying terminal mode so you can authenticate interactively.": "Синхронізація у фоновому режимі не вдалася. Спроба запустити через термінал для інтерактивної автентифікації."
+    "Sync failed in background mode. Trying terminal mode so you can authenticate interactively.": "Синхронізація у фоновому режимі не вдалася. Спроба запустити через термінал для інтерактивної автентифікації"
   },
   "Sync needs sudo authentication. Opening terminal so you can use password or fingerprint.": {
-    "Sync needs sudo authentication. Opening terminal so you can use password or fingerprint.": "Для синхронізації потрібна автентифікація sudo. Відкривається термінал для введення пароля або використання відбитка пальця."
+    "Sync needs sudo authentication. Opening terminal so you can use password or fingerprint.": "Для синхронізації потрібна автентифікація sudo. Відкривається термінал для введення пароля або використання відбитка пальця"
   },
   "Sync to apply": {
     "Sync to apply": "Синхронізуйте для застосування"
@@ -7620,7 +7701,7 @@
     "System notification area icons": "Іконки системного лотка"
   },
   "System sounds are not available. Install %1 for sound support.": {
-    "System sounds are not available. Install %1 for sound support.": "Системні звуки недоступні. Встановіть %1 для підтримки звуку."
+    "System sounds are not available. Install %1 for sound support.": "Системні звуки недоступні. Встановіть %1 для підтримки звуку"
   },
   "System theme toggle": {
     "System theme toggle": "Перемикач системної теми"
@@ -7629,7 +7710,7 @@
     "System toast notifications": "Системні спливаючі сповіщення"
   },
   "Systemd Override generated": {
-    "Systemd Override generated": "Створено перевизначення (override) systemd"
+    "Systemd Override generated": "Створено перевизначення systemd"
   },
   "Tab": {
     "Tab": "Вкладка"
@@ -7652,6 +7733,18 @@
   "Tailscale not available": {
     "Tailscale not available": "Tailscale недоступний"
   },
+  "Tap and Drag": {
+    "Tap and Drag": ""
+  },
+  "Tap and drag on the touchpad to move items": {
+    "Tap and drag on the touchpad to move items": ""
+  },
+  "Tap the touchpad surface to trigger left click clicks": {
+    "Tap the touchpad surface to trigger left click clicks": ""
+  },
+  "Tap to Click": {
+    "Tap to Click": ""
+  },
   "Terminal": {
     "Terminal": "Термінал"
   },
@@ -7659,19 +7752,19 @@
     "Terminal additional parameters": "Додаткові параметри термінала"
   },
   "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": {
-    "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": "Резервний запуск термінала не вдався. Встановіть підтримуваний емулятор термінала або запустіть 'dms auth sync' вручну."
+    "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": "Резервний запуск термінала не вдався. Встановіть підтримуваний емулятор термінала або запустіть 'dms auth sync' вручну"
   },
   "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": {
-    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": "Резервний запуск термінала не вдався. Встановіть один із підтримуваних емуляторів термінала або запустіть 'dms greeter sync' вручну."
+    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": "Резервний запуск термінала не вдався. Встановіть один із підтримуваних емуляторів термінала або запустіть 'dms greeter sync' вручну"
   },
   "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": {
-    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": ""
+    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": "Невдалий запуск резервного терміналу. Встановіть один із підтримуваних емуляторів термінала або запустіть 'dms-greeter sync' вручну"
   },
   "Terminal fallback opened. Complete authentication there; it will close automatically when done.": {
-    "Terminal fallback opened. Complete authentication there; it will close automatically when done.": "Відкрито резервний термінал. Завершіть автентифікацію там; він закриється автоматично після завершення."
+    "Terminal fallback opened. Complete authentication there; it will close automatically when done.": "Відкрито резервний термінал. Завершіть автентифікацію там; він закриється автоматично після завершення"
   },
   "Terminal opened. Complete authentication there; it will close automatically when done.": {
-    "Terminal opened. Complete authentication there; it will close automatically when done.": "Відкрито термінал. Завершіть автентифікацію там; він закриється автоматично після завершення."
+    "Terminal opened. Complete authentication there; it will close automatically when done.": "Відкрито термінал. Завершіть автентифікацію там; він закриється автоматично після завершення"
   },
   "Terminals - Always use Dark Theme": {
     "Terminals - Always use Dark Theme": "Термінали — завжди темна тема"
@@ -7707,16 +7800,16 @@
     "Text Rendering": "Рендеринг тексту"
   },
   "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": {
-    "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": "Для моніторингу системи потрібен інструмент 'dgop'.\nБудь ласка, встановіть dgop, щоб використовувати цю функцію."
+    "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": "Для моніторингу системи потрібен інструмент 'dgop'.\nБудь ласка, встановіть dgop, щоб використовувати цю функцію"
   },
   "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": {
-    "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "Змінна середовища DMS_SOCKET не встановлена або сокет недоступний. Для автоматичного керування плагінами потрібен DMS_SOCKET."
+    "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "Змінна середовища DMS_SOCKET не встановлена або сокет недоступний. Для автоматичного керування плагінами потрібен DMS_SOCKET"
   },
   "The WiFi adapter could not start access point mode.": {
-    "The WiFi adapter could not start access point mode.": ""
+    "The WiFi adapter could not start access point mode.": "WiFi-адаптер не зміг запустити режим точки доступу"
   },
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
-    "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "Наведені нижче налаштування змінять ваші параметри GTK та Qt. Якщо ви бажаєте зберегти поточні конфігурації, будь ласка, створіть їх резервну копію (qt5ct.conf|qt6ct.conf та ~/.config/gtk-3.0|gtk-4.0)."
+    "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "Наведені нижче налаштування змінять ваші параметри GTK та Qt. Якщо ви бажаєте зберегти поточні конфігурації, будь ласка, створіть їх резервну копію (qt5ct.conf|qt6ct.conf та ~/.config/gtk-3.0|gtk-4.0)"
   },
   "The custom command used when attaching to sessions (receives the session name as the first argument)": {
     "The custom command used when attaching to sessions (receives the session name as the first argument)": "Спеціальна команда, що використовується при підключенні до сесій (отримує назву сесії як перший аргумент)"
@@ -7725,7 +7818,10 @@
     "The job queue of this printer is empty": "Черга завдань цього принтера порожня"
   },
   "The rule applies to any window matching one of these.": {
-    "The rule applies to any window matching one of these.": "Правило застосовується до будь-якого вікна, що відповідає одному з цих критеріїв."
+    "The rule applies to any window matching one of these.": "Правило застосовується до будь-якого вікна, що відповідає одному з цих критеріїв"
+  },
+  "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": {
+    "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": ""
   },
   "Theme & Colors": {
     "Theme & Colors": "Тема та кольори"
@@ -7761,7 +7857,7 @@
     "Third-Party Plugin Warning": "Попередження про плагін стороннього розробника"
   },
   "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\n\nThese plugins may pose security and privacy risks - install at your own risk.": {
-    "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\n\nThese plugins may pose security and privacy risks - install at your own risk.": "Сторонні плагіни створені спільнотою і офіційно не підтримуються DankMaterialShell.\n\nЦі плагіни можуть становити ризик для безпеки та конфіденційності — встановлюйте на свій власний страх і ризик."
+    "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\n\nThese plugins may pose security and privacy risks - install at your own risk.": "Сторонні плагіни створені спільнотою і офіційно не підтримуються DankMaterialShell\n\nЦі плагіни можуть становити ризик для безпеки та конфіденційності — встановлюйте на свій власний страх і ризик"
   },
   "This bind is overridden by config.kdl": {
     "This bind is overridden by config.kdl": "Ця прив'язка перевизначена у config.kdl"
@@ -7770,7 +7866,7 @@
     "This device": "Цей пристрій"
   },
   "This install is still using hyprland.conf. Run dms setup to migrate before changing these settings.": {
-    "This install is still using hyprland.conf. Run dms setup to migrate before changing these settings.": "Ця установка все ще використовує hyprland.conf. Запустіть 'dms setup' для міграції перед зміною цих налаштувань."
+    "This install is still using hyprland.conf. Run dms setup to migrate before changing these settings.": "Ця установка все ще використовує hyprland.conf. Запустіть 'dms setup' для міграції перед зміною цих налаштувань"
   },
   "This may take a few seconds": {
     "This may take a few seconds": "Це може зайняти кілька секунд"
@@ -7782,19 +7878,19 @@
     "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": "Цей плагін не має дозволу 'settings_write'.\n\nДодайте \"permissions\": [\"settings_read\", \"settings_write\"] до файлу plugin.json"
   },
   "This widget prevents GPU power off states, which can significantly impact battery life on laptops. It is not recommended to use this on laptops with hybrid graphics.": {
-    "This widget prevents GPU power off states, which can significantly impact battery life on laptops. It is not recommended to use this on laptops with hybrid graphics.": "Цей віджет запобігає переходу графічного процесора в режим вимкнення живлення, що може суттєво вплинути на час роботи ноутбука від батареї. Не рекомендується використовувати його на ноутбуках із гібридною графікою."
+    "This widget prevents GPU power off states, which can significantly impact battery life on laptops. It is not recommended to use this on laptops with hybrid graphics.": "Цей віджет запобігає переходу графічного процесора в режим вимкнення живлення, що може суттєво вплинути на час роботи ноутбука від батареї. Не рекомендується використовувати його на ноутбуках із гібридною графікою"
   },
   "This will delete all unpinned entries. %1 pinned entries will be kept.": {
-    "This will delete all unpinned entries. %1 pinned entries will be kept.": "Це видалить усі незакріплені записи. Буде збережено %1 закріплених записів."
+    "This will delete all unpinned entries. %1 pinned entries will be kept.": "Це видалить усі незакріплені записи. Буде збережено %1 закріплених записів"
   },
   "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": {
-    "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": ""
+    "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": "Це розірве з'єднання WiFi з «%1» — радіомодуль не може одночасно працювати як точка доступу та бути підключеним до мережі. Для спільного використання інтернету знадобиться інше підключення, наприклад Ethernet"
   },
   "This will permanently delete all clipboard history.": {
-    "This will permanently delete all clipboard history.": "Це призведе до остаточного видалення всієї історії буфера обміну."
+    "This will permanently delete all clipboard history.": "Це призведе до остаточного видалення всієї історії буфера обміну"
   },
   "This will permanently remove this saved clipboard item. This action cannot be undone.": {
-    "This will permanently remove this saved clipboard item. This action cannot be undone.": "Це назавжди видалить цей збережений елемент буфера обміну. Цю дію неможливо скасувати."
+    "This will permanently remove this saved clipboard item. This action cannot be undone.": "Це назавжди видалить цей збережений елемент буфера обміну. Цю дію неможливо скасувати"
   },
   "Thunderstorm": {
     "Thunderstorm": "Гроза"
@@ -7803,7 +7899,7 @@
     "Thunderstorm with Hail": "Гроза з градом"
   },
   "Tile": {
-    "Tile": "Плитка (Tile)"
+    "Tile": "Плитка"
   },
   "Tile Horizontally": {
     "Tile Horizontally": "Розмістити по горизонталі"
@@ -7818,7 +7914,7 @@
     "Tiled State": "Стан плитки"
   },
   "Tiling": {
-    "Tiling": "Плиткове розміщення"
+    "Tiling": "Розміщення плиткою"
   },
   "Time": {
     "Time": "Час"
@@ -7875,7 +7971,7 @@
     "To Full": "До повного заряду"
   },
   "To sign in as a different user, log out and pick the account from the greeter. Creating a fresh session in parallel needs a multi-session greeter (greetd-flexiserver / GDM / LightDM).": {
-    "To sign in as a different user, log out and pick the account from the greeter. Creating a fresh session in parallel needs a multi-session greeter (greetd-flexiserver / GDM / LightDM).": "Щоб увійти як інший користувач, вийдіть із системи та виберіть обліковий запис у вікні входу. Для створення паралельної сесії потрібен багатосесійний greeter (greetd-flexiserver / GDM / LightDM)."
+    "To sign in as a different user, log out and pick the account from the greeter. Creating a fresh session in parallel needs a multi-session greeter (greetd-flexiserver / GDM / LightDM).": "Щоб увійти як інший користувач, вийдіть із системи та виберіть обліковий запис у вікні входу. Для створення паралельної сесії потрібен багатосесійний greeter (greetd-flexiserver / GDM / LightDM)"
   },
   "To update, run the following command:": {
     "To update, run the following command:": "Щоб оновити, виконайте таку команду:"
@@ -7884,7 +7980,7 @@
     "To use this DMS bind, remove or change the keybind in your config.kdl": "Щоб використовувати цю прив'язку DMS, видаліть або змініть комбінацію клавіш у вашому config.kdl"
   },
   "Toast": {
-    "Toast": "Тост (сповіщення)"
+    "Toast": "Спливаюче повідомлення"
   },
   "Toast Messages": {
     "Toast Messages": "Спливаючі повідомлення"
@@ -7919,9 +8015,6 @@
   "Too many attempts - locked out": {
     "Too many attempts - locked out": "Забагато спроб — доступ заблоковано"
   },
-  "Too many failed attempts - account may be locked": {
-    "Too many failed attempts - account may be locked": "Забагато невдалих спроб — обліковий запис може бути заблокований"
-  },
   "Tools": {
     "Tools": "Інструменти"
   },
@@ -7929,13 +8022,13 @@
     "Top": "Вгорі"
   },
   "Top (Default)": {
-    "Top (Default)": "Зверху (за замовчуванням)"
+    "Top (Default)": "Зверху (типово)"
   },
   "Top Bar Format": {
     "Top Bar Format": "Формат верхньої панелі"
   },
   "Top Center": {
-    "Top Center": "Зверху по центру"
+    "Top Center": "Згори по центру"
   },
   "Top Left": {
     "Top Left": "Зверху зліва"
@@ -7944,7 +8037,7 @@
     "Top Processes": "Топ-процеси"
   },
   "Top Right": {
-    "Top Right": "Зверху справа"
+    "Top Right": "Згори справа"
   },
   "Top Section": {
     "Top Section": "Верхня секція"
@@ -7957,6 +8050,12 @@
   },
   "Touch your security key...": {
     "Touch your security key...": "Доторкніться до вашого ключа безпеки..."
+  },
+  "Touchpad Settings": {
+    "Touchpad Settings": ""
+  },
+  "Touchpad Speed": {
+    "Touchpad Speed": ""
   },
   "Transform": {
     "Transform": "Трансформація"
@@ -7998,7 +8097,7 @@
     "Try a different search": "Спробуйте інший запит"
   },
   "Try a different search or switch filters.": {
-    "Try a different search or switch filters.": "Спробуйте змінити пошуковий запит або фільтри."
+    "Try a different search or switch filters.": "Спробуйте змінити пошуковий запит або фільтри"
   },
   "Turn off": {
     "Turn off": "Вимкнути"
@@ -8018,11 +8117,14 @@
   "Turn off now": {
     "Turn off now": "Вимкнути зараз"
   },
+  "Two Finger": {
+    "Two Finger": ""
+  },
   "Type at least 2 characters": {
     "Type at least 2 characters": "Введіть принаймні 2 символи"
   },
   "Type at least 2 characters to search files.": {
-    "Type at least 2 characters to search files.": "Введіть принаймні 2 символи для пошуку файлів."
+    "Type at least 2 characters to search files.": "Введіть принаймні 2 символи для пошуку файлів"
   },
   "Type this prefix to search keybinds": {
     "Type this prefix to search keybinds": "Використовуйте цей префікс для пошуку гарячих клавіш"
@@ -8064,13 +8166,13 @@
     "Uninstall Plugin": "Видалити плагін"
   },
   "Uninstall complete. Greeter has been removed.": {
-    "Uninstall complete. Greeter has been removed.": "Видалення завершено. Greeter було видалено."
+    "Uninstall complete. Greeter has been removed.": "Видалення завершено. Екрану входу було видалено"
   },
   "Uninstall failed: %1": {
     "Uninstall failed: %1": "Помилка видалення: %1"
   },
   "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.": {
-    "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.": "Видалити DMS greeter? Це видалить конфігурацію та відновить ваш попередній менеджер дисплеїв. Відкриється термінал для автентифікації sudo."
+    "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.": "Видалити DMS greeter? Це видалить конфігурацію та відновить ваш попередній менеджер дисплеїв. Відкриється термінал для автентифікації sudo"
   },
   "Uninstalled: %1": {
     "Uninstalled: %1": "Видалено: %1"
@@ -8159,6 +8261,9 @@
   "Untrust": {
     "Untrust": "Припинити довіряти"
   },
+  "Untrusted VPN certificate": {
+    "Untrusted VPN certificate": ""
+  },
   "Up to date": {
     "Up to date": "Оновлено"
   },
@@ -8199,7 +8304,7 @@
     "Use 24-hour time format instead of 12-hour AM/PM": "Використовувати 24-годинний формат часу замість 12-годинного AM/PM"
   },
   "Use Custom Command": {
-    "Use Custom Command": "Використати Власну Команду"
+    "Use Custom Command": "Використати власну команду"
   },
   "Use Grid Layout": {
     "Use Grid Layout": "Використовувати макет сітки"
@@ -8217,7 +8322,7 @@
     "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)": "Використовувати імперські одиниці вимірювання (°F, милі/год, дюйми рт. ст.) замість метричних (°C, км/год, гПа)"
   },
   "Use Inline Expansion": {
-    "Use Inline Expansion": "Використовувати розширення в рядку (Inline Expansion)"
+    "Use Inline Expansion": "Використовувати розширення в рядку"
   },
   "Use Monospace Font": {
     "Use Monospace Font": "Використовувати моноширинний шрифт"
@@ -8229,13 +8334,13 @@
     "Use System Theme": "Використовувати системну тему"
   },
   "Use a custom image for the lock screen, or leave empty to use your desktop wallpaper.": {
-    "Use a custom image for the lock screen, or leave empty to use your desktop wallpaper.": "Використовуйте власне зображення для екрана блокування або залиште порожнім, щоб використовувати шпалери робочого столу."
+    "Use a custom image for the lock screen, or leave empty to use your desktop wallpaper.": "Використовуйте власне зображення для екрана блокування або залиште порожнім, щоб використовувати шпалери робочого столу"
   },
   "Use a custom image for the login screen, or leave empty to use desktop wallpaper": {
     "Use a custom image for the login screen, or leave empty to use desktop wallpaper": "Використовуйте власне зображення для екрана входу або залиште порожнім, щоб використовувати шпалери робочого столу"
   },
   "Use a custom radius for goth corner cutouts": {
-    "Use a custom radius for goth corner cutouts": "Використовувати власний радіус для вирізів кутів (goth)"
+    "Use a custom radius for goth corner cutouts": "Використовувати власний радіус для готичних вирізів кутів"
   },
   "Use a fixed shadow direction for this bar": {
     "Use a fixed shadow direction for this bar": "Використовувати фіксований напрямок тіні для цієї панелі"
@@ -8247,7 +8352,7 @@
     "Use album art accent": "Використовувати акцент обкладинки альбому"
   },
   "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": {
-    "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": "Використовуйте зовнішній менеджер шпалер, такий як swww, hyprpaper або swaybg."
+    "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": "Використовуйте зовнішній менеджер шпалер, такий як swww, hyprpaper або swaybg"
   },
   "Use animated wave progress bars for media playback": {
     "Use animated wave progress bars for media playback": "Використовувати анімовані хвильові індикатори прогресу для відтворення медіа"
@@ -8256,7 +8361,7 @@
     "Use colors extracted from album art instead of system theme colors": "Використовувати кольори, витягнуті з обкладинки альбому, замість системних кольорів теми"
   },
   "Use custom border/focus-ring width": {
-    "Use custom border/focus-ring width": "Використовувати власну ширину межі / кільця фокусу"
+    "Use custom border/focus-ring width": "Використовувати власну ширину контуру/кільця фокусу"
   },
   "Use custom window radius instead of theme radius": {
     "Use custom window radius instead of theme radius": "Використовувати власний радіус вікна замість радіусу теми"
@@ -8307,7 +8412,7 @@
     "Used for xdg-terminal-exec": "Використовується для xdg-terminal-exec"
   },
   "Used when accent color is set to Custom": {
-    "Used when accent color is set to Custom": "Використовується, коли акцентний колір встановлено як «Власний»"
+    "Used when accent color is set to Custom": "Використовується, коли встановлено власний акцентний колір"
   },
   "User": {
     "User": "Користувач"
@@ -8322,13 +8427,13 @@
     "User created": "Користувача створено"
   },
   "User created with administrator and greeter login access": {
-    "User created with administrator and greeter login access": "Користувача створено з правами адміністратора та доступом до входу через greeter"
+    "User created with administrator and greeter login access": "Користувача створено з правами адміністратора та доступом до входу через екран входу"
   },
   "User created with administrator privileges": {
     "User created with administrator privileges": "Користувача створено з привілеями адміністратора"
   },
   "User created with greeter login access": {
-    "User created with greeter login access": "Користувача створено з доступом до входу через greeter"
+    "User created with greeter login access": "Користувача створено з доступом до входу через екран входу"
   },
   "User deleted": {
     "User deleted": "Користувача видалено"
@@ -8340,22 +8445,19 @@
     "Username": "Ім'я користувача"
   },
   "Username must start with a lowercase letter or underscore and contain only lowercase letters, digits, hyphens, or underscores.": {
-    "Username must start with a lowercase letter or underscore and contain only lowercase letters, digits, hyphens, or underscores.": "Ім'я користувача має починатися з малої літери або підкреслення і містити лише малі літери, цифри, дефіси або підкреслення."
-  },
-  "Username...": {
-    "Username...": "Ім'я користувача..."
+    "Username must start with a lowercase letter or underscore and contain only lowercase letters, digits, hyphens, or underscores.": "Ім'я користувача має починатися з малої літери або підкреслення і містити лише малі літери, цифри, дефіси або підкреслення"
   },
   "Users": {
     "Users": "Користувачі"
   },
   "Uses sunrise/sunset times based on your location.": {
-    "Uses sunrise/sunset times based on your location.": "Використовує час сходу/заходу сонця на основі вашого місцезнаходження."
+    "Uses sunrise/sunset times based on your location.": "Використовує час сходу/заходу сонця на основі вашого місцезнаходження"
   },
   "Uses sunrise/sunset times to automatically adjust night mode based on your location.": {
-    "Uses sunrise/sunset times to automatically adjust night mode based on your location.": "Використовує час сходу/заходу сонця для автоматичного налаштування нічного режиму на основі вашої локації."
+    "Uses sunrise/sunset times to automatically adjust night mode based on your location.": "Використовує час сходу/заходу сонця для автоматичного налаштування нічного режиму на основі вашої локації"
   },
   "Uses the spotlight-bar IPC action and always opens the minimal bar.": {
-    "Uses the spotlight-bar IPC action and always opens the minimal bar.": "Використовує дію IPC spotlight-bar і завжди відкриває мінімальну панель."
+    "Uses the spotlight-bar IPC action and always opens the minimal bar.": "Використовує дію IPC spotlight-bar і завжди відкриває мінімальну панель"
   },
   "Using DankCalendar%1": {
     "Using DankCalendar%1": "Використання DankCalendar%1"
@@ -8433,7 +8535,7 @@
     "Vibrant": "Насичений"
   },
   "Vibrant palette with playful saturation.": {
-    "Vibrant palette with playful saturation.": "Яскрава палітра з грайливою насиченістю."
+    "Vibrant palette with playful saturation.": "Яскрава палітра з грайливою насиченістю"
   },
   "Video Path": {
     "Video Path": "Шлях до відео"
@@ -8442,7 +8544,7 @@
     "Video Player": "Відеоплеєр"
   },
   "Video Screensaver": {
-    "Video Screensaver": "Відео-скринсейвер"
+    "Video Screensaver": "Відео-зберігач екрану"
   },
   "View Mode": {
     "View Mode": "Режим перегляду"
@@ -8481,13 +8583,13 @@
     "W": "Вт"
   },
   "WCAG %1 body": {
-    "WCAG %1 body": ""
+    "WCAG %1 body": "WCAG %1 основний текст"
   },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
   },
   "WPA2 password": {
-    "WPA2 password": ""
+    "WPA2 password": "Пароль WPA2"
   },
   "Wallpaper": {
     "Wallpaper": "Шпалери"
@@ -8541,10 +8643,10 @@
     "When clicking a dock window in a Hyprland special workspace, bring that special workspace back before focusing the window": "При натисканні на вікно доку в спеціальному робочому просторі Hyprland, спочатку повернути цей простір, а потім фокусувати вікно"
   },
   "When enabled, apps are sorted alphabetically. When disabled, apps are sorted by usage frequency.": {
-    "When enabled, apps are sorted alphabetically. When disabled, apps are sorted by usage frequency.": "Якщо увімкнено, програми сортуються за алфавітом. Якщо вимкнено — за частотою використання."
+    "When enabled, apps are sorted alphabetically. When disabled, apps are sorted by usage frequency.": "Якщо увімкнено, програми сортуються за алфавітом. Якщо вимкнено — за частотою використання"
   },
   "When enabled, checks updates on startup. When disabled, only the interval above or a manual refresh runs a check.": {
-    "When enabled, checks updates on startup. When disabled, only the interval above or a manual refresh runs a check.": "Якщо увімкнено, перевіряє оновлення при запуску. Якщо вимкнено, перевірка виконується лише за інтервалом або вручну."
+    "When enabled, checks updates on startup. When disabled, only the interval above or a manual refresh runs a check.": "Якщо увімкнено, перевіряє оновлення при запуску. Якщо вимкнено, перевірка виконується лише за інтервалом або вручну"
   },
   "When locked": {
     "When locked": "Під час блокування"
@@ -8577,10 +8679,10 @@
     "WiFi enabled": "Wi-Fi увімкнено"
   },
   "WiFi is disabled": {
-    "WiFi is disabled": ""
+    "WiFi is disabled": "WiFi вимкнено"
   },
   "WiFi is disabled. You can still edit and save hotspot settings, but starting the hotspot requires WiFi to be enabled.": {
-    "WiFi is disabled. You can still edit and save hotspot settings, but starting the hotspot requires WiFi to be enabled.": ""
+    "WiFi is disabled. You can still edit and save hotspot settings, but starting the hotspot requires WiFi to be enabled.": "WiFi вимкнено. Ви все ще можете редагувати та зберігати налаштування точки доступу, але для її запуску необхідно увімкнути WiFi"
   },
   "WiFi is off": {
     "WiFi is off": "Wi-Fi вимкнено"
@@ -8640,7 +8742,7 @@
     "Width of window border and focus ring": "Ширина межі вікна та кільця фокусу"
   },
   "Will disconnect \"%1": {
-    "Will disconnect \"%1\"": ""
+    "Will disconnect \"%1\"": "Розірве з'єднання з «%1»"
   },
   "Wind": {
     "Wind": "Вітер"
@@ -8715,7 +8817,7 @@
     "Xray Blur Effect": "Ефект розмиття Xray"
   },
   "Xray blurs only the wallpaper (efficient) and is the default when Blur is on. Set Xray to Off for regular full blur of everything beneath the window (more expensive).": {
-    "Xray blurs only the wallpaper (efficient) and is the default when Blur is on. Set Xray to Off for regular full blur of everything beneath the window (more expensive).": "Xray розмиває лише шпалери (ефективно) і є значенням за замовчуванням при увімкненому Blur. Встановіть Xray на Off для повного розмиття всього під вікном (більш ресурсозатратно)."
+    "Xray blurs only the wallpaper (efficient) and is the default when Blur is on. Set Xray to Off for regular full blur of everything beneath the window (more expensive).": "Xray розмиває лише шпалери (ефективно) і є значенням за замовчуванням при увімкненому Blur. Встановіть Xray на Off для повного розмиття всього під вікном (більш ресурсозатратно)"
   },
   "Xray options are in Compositor → Layout": {
     "Xray options are in Compositor → Layout": "Опції Xray знаходяться в Композитор → Макет"
@@ -8736,13 +8838,13 @@
     "You have unsaved changes. Save before continuing?": "Ви маєте незбережені зміни. Зберегти їх, щоб продовжити?"
   },
   "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": {
-    "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": "Вам потрібно встановити або:\nQT_QPA_PLATFORMTHEME=gtk3 АБО\nQT_QPA_PLATFORMTHEME=qt6ct\nяк змінні середовища, а потім перезапустити оболонку.\n\nДля qt6ct необхідно встановити qt6ct-kde."
+    "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": "Вам потрібно встановити або:\nQT_QPA_PLATFORMTHEME=gtk3 АБО\nQT_QPA_PLATFORMTHEME=qt6ct\nяк змінні середовища, а потім перезапустити оболонку\n\nДля qt6ct необхідно встановити qt6ct-kde"
   },
   "You'll enter your password at the greeter after the next reboot.": {
-    "You'll enter your password at the greeter after the next reboot.": "Ви введете пароль у вікні входу після наступного перезавантаження."
+    "You'll enter your password at the greeter after the next reboot.": "Ви введете пароль у вікні входу після наступного перезавантаження"
   },
   "You'll skip the greeter password after the next reboot. The lock screen and signing out still require your password.": {
-    "You'll skip the greeter password after the next reboot. The lock screen and signing out still require your password.": "Ви пропустите пароль при вході після наступного перезавантаження. Екран блокування та вихід із системи все одно потребуватимуть пароля."
+    "You'll skip the greeter password after the next reboot. The lock screen and signing out still require your password.": "Ви пропустите пароль при вході після наступного перезавантаження. Екран блокування та вихід із системи все одно потребуватимуть пароля"
   },
   "You're All Set!": {
     "You're All Set!": "Готово!"
@@ -8751,10 +8853,10 @@
     "Your compositor does not support background blur (ext-background-effect-v1)": "Ваш композитор не підтримує розмиття фону (ext-background-effect-v1)"
   },
   "Your hotspot is running.": {
-    "Your hotspot is running.": ""
+    "Your hotspot is running.": "Ваша точка доступу працює"
   },
   "Your hotspot profile is saved and ready to start.": {
-    "Your hotspot profile is saved and ready to start.": ""
+    "Your hotspot profile is saved and ready to start.": "Профіль вашої точки доступу збережено, вона готова до запуску"
   },
   "Your system is up to date!": {
     "Your system is up to date!": "Вашу систему оновлено!"
@@ -8764,6 +8866,9 @@
   },
   "attached": {
     "attached": "приєднано"
+  },
+  "below AA": {
+    "below AA": ""
   },
   "brandon": {
     "brandon": "брандон"
@@ -8775,13 +8880,13 @@
     "by %1": "від %1"
   },
   "checked %1d ago": {
-    "checked %1d ago": "перевірено %1 дн. тому"
+    "checked %1d ago": "перевірено %1 дн тому"
   },
   "checked %1h ago": {
-    "checked %1h ago": "перевірено %1 год. тому"
+    "checked %1h ago": "перевірено %1 год тому"
   },
   "checked %1m ago": {
-    "checked %1m ago": "перевірено %1 хв. тому"
+    "checked %1m ago": "перевірено %1 хв тому"
   },
   "checked just now": {
     "checked just now": "перевірено щойно"
@@ -8811,7 +8916,7 @@
     "Normal": "Нормальний"
   },
   "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": {
-    "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": "dms — це сучасна оболонка робочого столу з високими можливостями налаштування, дизайн якої <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">натхненний Material 3</a>.<br /><br/>Вона побудована за допомогою <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, фреймворку QT6 для створення оболонок робочого столу, та <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, статично типізованою компільованою мовою програмування."
+    "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": "DMS — це сучасна оболонка робочого столу з широкими можливостями для налаштування, дизайн якої <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">натхненний Material 3</a>.<br /><br/>Вона побудована за допомогою <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, фреймворку QT6 для створення оболонок робочого столу, та <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, статично типізованою компільованою мовою програмування"
   },
   "e.g. /usr/bin/my-script --flag": {
     "e.g. /usr/bin/my-script --flag": "напр. /usr/bin/my-script --flag"
@@ -8874,7 +8979,7 @@
     "matugen not available or disabled - cannot apply %1 colors": "matugen недоступний або вимкнено — неможливо застосувати кольори %1"
   },
   "matugen not found - install matugen package for dynamic theming": {
-    "matugen not found - install matugen package for dynamic theming": "matugen не знайдено — встановіть пакет matugen для динамічної темизації"
+    "matugen not found - install matugen package for dynamic theming": "matugen не знайдено — встановіть пакет для динамічної темізації"
   },
   "minutes": {
     "minutes": "хвилин"
@@ -8889,22 +8994,22 @@
     "Open": "Відкрити"
   },
   "niri GitHub": {
-    "niri GitHub": "GitHub niri"
+    "niri GitHub": "GitHub Niri"
   },
   "niri Matrix Chat": {
-    "niri Matrix Chat": "Matrix-чат niri"
+    "niri Matrix Chat": "Matrix-чат Niri"
   },
   "niri shortcuts config": {
-    "niri shortcuts config": "Конфігурація гарячих клавіш niri"
+    "niri shortcuts config": "Конфігурація гарячих клавіш Niri"
   },
   "niri/dms Discord": {
-    "niri/dms Discord": "Discord niri/dms"
+    "niri/dms Discord": "Discord Niri/DMS"
   },
   "niri: config reloaded": {
-    "niri: config reloaded": "niri: конфігурацію перезавантажено"
+    "niri: config reloaded": "Niri: конфігурацію перезавантажено"
   },
   "niri: failed to load config": {
-    "niri: failed to load config": "niri: не вдалося завантажити конфігурацію"
+    "niri: failed to load config": "Niri: не вдалося завантажити конфігурацію"
   },
   "now": {
     "now": "зараз"
@@ -8976,7 +9081,7 @@
     "up": "вгору"
   },
   "update dms for NM integration.": {
-    "update dms for NM integration.": "Оновіть DMS для інтеграції з NetworkManager."
+    "update dms for NM integration.": "Оновіть DMS для інтеграції з NetworkManager"
   },
   "useradd failed (exit %1)": {
     "useradd failed (exit %1)": "Помилка useradd (вихід %1)"
