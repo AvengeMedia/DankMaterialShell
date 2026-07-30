@@ -2780,7 +2780,7 @@ Item {
                     tags: ["matugen", "vscode", "code", "template"]
                     settingKey: "matugenTemplateVscode"
                     text: "VS Code"
-                    description: getTemplateDescription("vscode", "")
+                    description: getTemplateDescription("vscode", I18n.tr("Requires the DMS Theme extension from the editor marketplace", "vscode matugen template description"))
                     descriptionColor: getTemplateDescriptionColor("vscode")
                     visible: SettingsData.runDmsMatugenTemplates
                     checked: SettingsData.matugenTemplateVscode

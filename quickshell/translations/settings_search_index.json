@@ -4692,14 +4692,20 @@
       "appearance",
       "code",
       "colors",
+      "colour",
+      "editor",
+      "extension",
       "look",
+      "marketplace",
       "matugen",
+      "requires",
       "scheme",
       "style",
       "template",
       "theme",
       "vscode"
-    ]
+    ],
+    "description": "Requires the DMS Theme extension from the editor marketplace"
   },
   {
     "section": "matugenTemplateWezterm",

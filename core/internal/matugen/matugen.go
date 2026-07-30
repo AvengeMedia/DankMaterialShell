@@ -471,12 +471,9 @@ output_path = '%s'
 		case TemplateKindTerminal:
 			appendTerminalConfig(opts, cfgFile, tmpDir, tmpl.Commands, tmpl.Flatpaks, tmpl.ConfigFile)
 		case TemplateKindVSCode:
-			appendVSCodeConfig(cfgFile, "vscode", filepath.Join(homeDir, ".vscode/extensions"), opts.ShellDir)
-			appendVSCodeConfig(cfgFile, "codium", filepath.Join(homeDir, ".vscode-oss/extensions"), opts.ShellDir)
-			appendVSCodeConfig(cfgFile, "codeoss", filepath.Join(homeDir, ".config/Code - OSS/extensions"), opts.ShellDir)
-			appendVSCodeConfig(cfgFile, "cursor", filepath.Join(homeDir, ".cursor/extensions"), opts.ShellDir)
-			appendVSCodeConfig(cfgFile, "windsurf", filepath.Join(homeDir, ".windsurf/extensions"), opts.ShellDir)
-			appendVSCodeConfig(cfgFile, "vscode-insiders", filepath.Join(homeDir, ".vscode-insiders/extensions"), opts.ShellDir)
+			for _, editor := range vscodeEditors {
+				appendVSCodeConfig(cfgFile, editor.name, editor.extensionsDir(homeDir), opts.ShellDir)
+			}
 		case TemplateKindEmacs:
 			if utils.EmacsConfigDir() != "" {
 				appendConfig(opts, cfgFile, tmpl.Commands, tmpl.Flatpaks, tmpl.ConfigDirs, tmpl.ConfigFile)
@@ -631,6 +628,23 @@ func appExists(checker utils.AppChecker, checkCmd []string, checkFlatpaks []stri
 		return true
 	}
 	return false
+}
+
+type vscodeEditor struct {
+	name    string
+	dataDir string
+}
+
+var vscodeEditors = []vscodeEditor{
+	{"vscode", ".vscode"},
+	{"codium", ".vscode-oss"},
+	{"cursor", ".cursor"},
+	{"windsurf", ".windsurf"},
+	{"vscode-insiders", ".vscode-insiders"},
+}
+
+func (e vscodeEditor) extensionsDir(homeDir string) string {
+	return filepath.Join(homeDir, e.dataDir, "extensions")
 }
 
 func appendVSCodeConfig(cfgFile *os.File, name, extBaseDir, shellDir string) {
@@ -1168,16 +1182,8 @@ func CheckTemplates(checker utils.AppChecker) []TemplateCheck {
 }
 
 func checkVSCodeExtension(homeDir string) bool {
-	extDirs := []string{
-		filepath.Join(homeDir, ".vscode/extensions"),
-		filepath.Join(homeDir, ".vscode-oss/extensions"),
-		filepath.Join(homeDir, ".config/Code - OSS/extensions"),
-		filepath.Join(homeDir, ".cursor/extensions"),
-		filepath.Join(homeDir, ".windsurf/extensions"),
-	}
-
-	for _, extDir := range extDirs {
-		pattern := filepath.Join(extDir, "danklinux.dms-theme-*")
+	for _, editor := range vscodeEditors {
+		pattern := filepath.Join(editor.extensionsDir(homeDir), "danklinux.dms-theme-*")
 		if matches, err := filepath.Glob(pattern); err == nil && len(matches) > 0 {
 			return true
 		}
