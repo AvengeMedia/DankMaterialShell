@@ -489,6 +489,7 @@ func (a *SecretAgent) GetSecrets(
 		}
 		log.Infof("[SecretAgent] Returning 802-1x enterprise secrets with %d fields", len(secretsOnly))
 	default:
+		log.Warnf("[SecretAgent] Shaping response for unhandled setting type %q - returning secrets as-is", settingName)
 		out[settingName] = sec
 	}
 	if settingName == "vpn" && a.backend != nil && !isPKCS11 && (vpnUsername != "" || reply.Save) {
@@ -568,6 +569,8 @@ func (a *SecretAgent) GetSecrets(
 		switch settingName {
 		case "802-11-wireless-security", "802-1x":
 			a.backend.cacheWiFiSecret(connUuid, ssid, settingName, reply.Secrets)
+		default:
+			log.Debugf("[SecretAgent] No cache strategy for setting type %q", settingName)
 		}
 	}
 
@@ -791,6 +794,7 @@ func fieldsNeeded(setting string, hints []string, conn map[string]nmVariantMap) 
 		}
 		return infer8021xFields(conn)
 	default:
+		log.Debugf("[SecretAgent] No field inference for setting type %q - falling back to hints", setting)
 		return hints
 	}
 }
@@ -853,6 +857,7 @@ func buildFieldsInfo(setting string, fields []string, vpnService string) []Field
 		case "vpn":
 			info.Label, info.IsSecret = vpnFieldMeta(f, vpnService)
 		default:
+			log.Debugf("[SecretAgent] No field metadata for setting type %q - using raw field name", setting)
 			info.Label = f
 			info.IsSecret = true
 		}
