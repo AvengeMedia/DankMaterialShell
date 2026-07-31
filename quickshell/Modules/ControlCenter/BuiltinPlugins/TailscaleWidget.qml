@@ -469,6 +469,8 @@ PluginComponent {
                                     }
 
                                     MouseArea {
+                                        id: peerMouseArea
+
                                         z: -1
                                         anchors.fill: parent
                                         hoverEnabled: true
