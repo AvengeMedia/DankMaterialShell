@@ -171,79 +171,34 @@ func (a *SecretAgent) GetSecrets(
 
 	// Phase 2: Resolve fields from hints or password-flags.
 	if len(fields) == 0 {
-		if settingName == "vpn" {
-			if a.backend != nil {
-				a.backend.stateMutex.RLock()
-				isConnectingVPN := a.backend.state.IsConnectingVPN
-				a.backend.stateMutex.RUnlock()
-
-				if !isConnectingVPN {
-					log.Infof("[SecretAgent] VPN with empty hints - deferring to other agents for %s", vpnSvc)
-					return nil, dbus.NewError("org.freedesktop.NetworkManager.SecretAgent.Error.NoSecrets", nil)
-				}
-
-				fields = inferVPNFields(conn, vpnSvc)
-				log.Infof("[SecretAgent] VPN with empty hints but we're connecting - inferred fields: %v", fields)
-			} else {
+		switch settingName {
+		case "vpn":
+			if a.backend == nil {
 				log.Infof("[SecretAgent] VPN with empty hints - deferring to other agents for %s", vpnSvc)
 				return nil, dbus.NewError("org.freedesktop.NetworkManager.SecretAgent.Error.NoSecrets", nil)
 			}
-		}
 
-		if len(fields) == 0 {
-			const (
-				NM_SETTING_SECRET_FLAG_NONE         = 0
-				NM_SETTING_SECRET_FLAG_AGENT_OWNED  = 1
-				NM_SETTING_SECRET_FLAG_NOT_SAVED    = 2
-				NM_SETTING_SECRET_FLAG_NOT_REQUIRED = 4
-			)
+			a.backend.stateMutex.RLock()
+			isConnectingVPN := a.backend.state.IsConnectingVPN
+			a.backend.stateMutex.RUnlock()
 
-			var passwordFlags uint32 = 0xFFFF
-			switch settingName {
-			case "802-11-wireless-security":
-				if wifiSecSettings, ok := conn["802-11-wireless-security"]; ok {
-					if flagsVariant, ok := wifiSecSettings["psk-flags"]; ok {
-						if pwdFlags, ok := flagsVariant.Value().(uint32); ok {
-							passwordFlags = pwdFlags
-						}
-					}
-				}
-			case "802-1x":
-				if dot1xSettings, ok := conn["802-1x"]; ok {
-					if flagsVariant, ok := dot1xSettings["password-flags"]; ok {
-						if pwdFlags, ok := flagsVariant.Value().(uint32); ok {
-							passwordFlags = pwdFlags
-						}
-					}
-				}
-			}
-
-			if passwordFlags == 0xFFFF {
-				log.Warnf("[SecretAgent] Could not determine password-flags for empty hints - returning NoSecrets error")
-				return nil, dbus.NewError("org.freedesktop.NetworkManager.SecretAgent.Error.NoSecrets", nil)
-			} else if passwordFlags&NM_SETTING_SECRET_FLAG_NOT_REQUIRED != 0 {
-				log.Infof("[SecretAgent] Secrets not required (flags=%d)", passwordFlags)
-				out := nmSettingMap{}
-				out[settingName] = nmVariantMap{}
-				return out, nil
-			} else if passwordFlags&NM_SETTING_SECRET_FLAG_AGENT_OWNED != 0 {
-				switch settingName {
-				case "802-11-wireless-security":
-					fields = []string{"psk"}
-				case "802-1x":
-					fields = infer8021xFields(conn)
-				default:
-					log.Warnf("[SecretAgent] Agent-owned secrets for unhandled setting %s (flags=%d)", settingName, passwordFlags)
-					return nil, dbus.NewError("org.freedesktop.NetworkManager.SecretAgent.Error.NoSecrets", nil)
-				}
-				log.Infof("[SecretAgent] Agent-owned secrets, inferred fields: %v", fields)
-			} else if passwordFlags&NM_SETTING_SECRET_FLAG_NOT_SAVED != 0 {
-				log.Infof("[SecretAgent] Secrets not saved, will need to prompt (flags=%d)", passwordFlags)
-				// Fall through — fields remain empty, prompt will be required.
-			} else {
-				log.Infof("[SecretAgent] Secrets stored in NM config (flags=%d), deferring to system", passwordFlags)
+			if !isConnectingVPN {
+				log.Infof("[SecretAgent] VPN with empty hints - deferring to other agents for %s", vpnSvc)
 				return nil, dbus.NewError("org.freedesktop.NetworkManager.SecretAgent.Error.NoSecrets", nil)
 			}
+
+			fields = inferVPNFields(conn, vpnSvc)
+			log.Infof("[SecretAgent] VPN with empty hints but we're connecting - inferred fields: %v", fields)
+
+		case "802-11-wireless-security", "802-1x":
+			newFields, response, err := handlePasswordFlags(settingName, conn, readPasswordFlags(settingName, conn))
+			if err != nil {
+				return nil, err
+			}
+			if response != nil {
+				return response, nil
+			}
+			fields = newFields
 		}
 	}
 
@@ -758,6 +713,72 @@ func readConnTypeAndName(conn map[string]nmVariantMap) (string, string, string) 
 		name = readSSID(conn)
 	}
 	return connType, name, svc
+}
+
+func readPasswordFlags(settingName string, conn map[string]nmVariantMap) uint32 {
+	var flagKey string
+	switch settingName {
+	case "802-11-wireless-security":
+		flagKey = "psk-flags"
+	case "802-1x":
+		flagKey = "password-flags"
+	default:
+		return 0xFFFF
+	}
+
+	settings, ok := conn[settingName]
+	if !ok {
+		return 0xFFFF
+	}
+
+	flagsVariant, ok := settings[flagKey]
+	if !ok {
+		return 0xFFFF
+	}
+
+	if pwdFlags, ok := flagsVariant.Value().(uint32); ok {
+		return pwdFlags
+	}
+
+	return 0xFFFF
+}
+
+func handlePasswordFlags(settingName string, conn map[string]nmVariantMap, passwordFlags uint32) ([]string, nmSettingMap, *dbus.Error) {
+	const (
+		NM_SETTING_SECRET_FLAG_NONE         = 0
+		NM_SETTING_SECRET_FLAG_AGENT_OWNED  = 1
+		NM_SETTING_SECRET_FLAG_NOT_SAVED    = 2
+		NM_SETTING_SECRET_FLAG_NOT_REQUIRED = 4
+	)
+
+	if passwordFlags == 0xFFFF {
+		log.Warnf("[SecretAgent] Could not determine password-flags for empty hints - returning NoSecrets error")
+		return nil, nil, dbus.NewError("org.freedesktop.NetworkManager.SecretAgent.Error.NoSecrets", nil)
+	} else if passwordFlags&NM_SETTING_SECRET_FLAG_NOT_REQUIRED != 0 {
+		log.Infof("[SecretAgent] Secrets not required (flags=%d)", passwordFlags)
+		out := nmSettingMap{}
+		out[settingName] = nmVariantMap{}
+		return nil, out, nil
+	} else if passwordFlags&NM_SETTING_SECRET_FLAG_AGENT_OWNED != 0 {
+		var fields []string
+		switch settingName {
+		case "802-11-wireless-security":
+			fields = []string{"psk"}
+		case "802-1x":
+			fields = infer8021xFields(conn)
+		default:
+			log.Warnf("[SecretAgent] Agent-owned secrets for unhandled setting %s (flags=%d)", settingName, passwordFlags)
+			return nil, nil, dbus.NewError("org.freedesktop.NetworkManager.SecretAgent.Error.NoSecrets", nil)
+		}
+		log.Infof("[SecretAgent] Agent-owned secrets, inferred fields: %v", fields)
+		return fields, nil, nil
+	} else if passwordFlags&NM_SETTING_SECRET_FLAG_NOT_SAVED != 0 {
+		log.Infof("[SecretAgent] Secrets not saved, will need to prompt (flags=%d)", passwordFlags)
+		return nil, nil, nil
+	}
+
+	log.Infof("[SecretAgent] Secrets stored in NM config (flags=%d), deferring to system", passwordFlags)
+	return nil, nil, dbus.NewError("org.freedesktop.NetworkManager.SecretAgent.Error.NoSecrets", nil)
 }
 
 func fieldsNeeded(setting string, hints []string, conn map[string]nmVariantMap) []string {
