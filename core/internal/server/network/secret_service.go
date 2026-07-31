@@ -10,12 +10,21 @@ import (
 )
 
 const (
-	secretServiceBusName = "org.freedesktop.secrets"
-	secretServicePath    = "/org/freedesktop/secrets"
-	secretServiceIface   = "org.freedesktop.Secret.Service"
-	secretItemIface      = "org.freedesktop.Secret.Item"
-	secretPromptIface    = "org.freedesktop.Secret.Prompt"
+	secretServiceBusName    = "org.freedesktop.secrets"
+	secretServicePath       = "/org/freedesktop/secrets"
+	secretServiceIface      = "org.freedesktop.Secret.Service"
+	secretItemIface         = "org.freedesktop.Secret.Item"
+	secretCollectionIface   = "org.freedesktop.Secret.Collection"
+	secretPromptIface       = "org.freedesktop.Secret.Prompt"
+	secretDefaultCollection = "/org/freedesktop/secrets/aliases/default"
 )
+
+type nmSecret struct {
+	Session     dbus.ObjectPath
+	Parameters  []byte
+	Value       []byte
+	ContentType string
+}
 
 type secretServiceSession struct {
 	conn        *dbus.Conn
@@ -47,6 +56,32 @@ func openSecretService() (*secretServiceSession, error) {
 		svc:         svc,
 		sessionPath: sessionPath,
 	}, nil
+}
+
+func (s *secretServiceSession) close() {
+	s.conn.Close()
+}
+
+func (s *secretServiceSession) searchItems(attrs map[string]string) ([]dbus.ObjectPath, error) {
+	var unlocked []dbus.ObjectPath
+	var locked []dbus.ObjectPath
+	call := s.svc.Call(secretServiceIface+".SearchItems", 0, attrs)
+	if call.Err != nil {
+		return nil, fmt.Errorf("SearchItems failed: %w", call.Err)
+	}
+	if err := call.Store(&unlocked, &locked); err != nil {
+		return nil, fmt.Errorf("failed to store SearchItems result: %w", err)
+	}
+
+	if len(locked) > 0 {
+		if err := s.unlock(locked); err != nil {
+			log.Debugf("[SecretAgent] Failed to unlock items: %v", err)
+			return nil, err
+		}
+		unlocked = append(unlocked, locked...)
+	}
+
+	return unlocked, nil
 }
 
 func (s *secretServiceSession) unlock(items []dbus.ObjectPath) error {
@@ -116,47 +151,56 @@ func (s *secretServiceSession) unlock(items []dbus.ObjectPath) error {
 	return nil
 }
 
+func (s *secretServiceSession) ensureUnlocked() error {
+	collection := s.conn.Object(secretServiceBusName, dbus.ObjectPath(secretDefaultCollection))
+	var locked bool
+	call := collection.Call("org.freedesktop.DBus.Properties.Get", 0, secretCollectionIface, "Locked")
+	if call.Err != nil {
+		log.Debugf("[SecretAgent] Could not read collection Locked property (may not exist yet): %v", call.Err)
+		return nil
+	}
+	var variant dbus.Variant
+	if err := call.Store(&variant); err != nil {
+		log.Debugf("[SecretAgent] Could not store collection Locked property: %v", err)
+		return nil
+	}
+	if v, ok := variant.Value().(bool); ok {
+		locked = v
+	}
+	if !locked {
+		return nil
+	}
+
+	log.Debugf("[SecretAgent] Default collection is locked, unlocking...")
+	return s.unlock([]dbus.ObjectPath{dbus.ObjectPath(secretDefaultCollection)})
+}
+
 func (s *secretServiceSession) lookup(connUuid, settingName, settingKey string) string {
+	if err := s.ensureUnlocked(); err != nil {
+		log.Debugf("[SecretAgent] lookup: failed to unlock collection: %v", err)
+		return ""
+	}
+
 	attrs := map[string]string{
 		"connection-uuid": connUuid,
 		"setting-name":    settingName,
 		"setting-key":     settingKey,
 	}
 
-	var unlocked []dbus.ObjectPath
-	var locked []dbus.ObjectPath
-	call := s.svc.Call(secretServiceIface+".SearchItems", 0, attrs)
-	if call.Err != nil {
-		log.Debugf("[SecretAgent] Secret service SearchItems failed: %v", call.Err)
-		return ""
-	}
-	if err := call.Store(&unlocked, &locked); err != nil {
-		log.Debugf("[SecretAgent] Failed to store SearchItems result: %v", err)
+	paths, err := s.searchItems(attrs)
+	if err != nil {
+		log.Debugf("[SecretAgent] searchItems failed for %s: %v", connUuid, err)
 		return ""
 	}
 
-	if len(unlocked) == 0 && len(locked) > 0 {
-		log.Debugf("[SecretAgent] Attempting to unlock %d locked item(s) for %s", len(locked), connUuid)
-		if err := s.unlock(locked); err != nil {
-			log.Debugf("[SecretAgent] Failed to unlock items: %v", err)
-			return ""
-		}
-		unlocked = locked
-	}
-
-	if len(unlocked) == 0 {
+	if len(paths) == 0 {
 		log.Debugf("[SecretAgent] No secret service items found for %s", connUuid)
 		return ""
 	}
 
-	item := s.conn.Object(secretServiceBusName, unlocked[0])
-	var secret struct {
-		Session     dbus.ObjectPath
-		Parameters  []byte
-		Value       []byte
-		ContentType string
-	}
-	call = item.Call(secretItemIface+".GetSecret", 0, s.sessionPath)
+	item := s.conn.Object(secretServiceBusName, paths[0])
+	var secret nmSecret
+	call := item.Call(secretItemIface+".GetSecret", 0, s.sessionPath)
 	if call.Err != nil {
 		log.Debugf("[SecretAgent] Secret service GetSecret failed: %v", call.Err)
 		return ""
@@ -176,15 +220,92 @@ func (s *secretServiceSession) lookup(connUuid, settingName, settingKey string) 
 	return secretValue
 }
 
-func (s *secretServiceSession) close() {
-	s.conn.Close()
+func (s *secretServiceSession) store(connUuid, settingName, settingKey, value, label string) error {
+	if err := s.ensureUnlocked(); err != nil {
+		return fmt.Errorf("failed to unlock collection: %w", err)
+	}
+
+	attrs := map[string]string{
+		"connection-uuid": connUuid,
+		"setting-name":    settingName,
+		"setting-key":     settingKey,
+	}
+
+	secret := nmSecret{
+		Session:     s.sessionPath,
+		Value:       []byte(value),
+		ContentType: "text/plain",
+	}
+
+	props := map[string]dbus.Variant{
+		"org.freedesktop.Secret.Item.Label":      dbus.MakeVariant(label),
+		"org.freedesktop.Secret.Item.Attributes": dbus.MakeVariant(attrs),
+	}
+
+	collection := s.conn.Object(secretServiceBusName, dbus.ObjectPath(secretDefaultCollection))
+	call := collection.Call(secretCollectionIface+".CreateItem", 0, props, secret, true)
+	if call.Err != nil {
+		return fmt.Errorf("CreateItem failed: %w", call.Err)
+	}
+
+	var itemPath dbus.ObjectPath
+	var promptPath dbus.ObjectPath
+	if err := call.Store(&itemPath, &promptPath); err != nil {
+		return fmt.Errorf("CreateItem returned invalid response: %w", err)
+	}
+
+	if promptPath != "/" && promptPath != "" {
+		return fmt.Errorf("CreateItem requires prompt %s — secret not persisted for %s/%s", promptPath, connUuid, settingKey)
+	}
+
+	log.Debugf("[SecretAgent] Stored secret for %s/%s (item=%s)", connUuid, settingKey, itemPath)
+	return nil
+}
+
+func (s *secretServiceSession) deleteByUuid(connUuid string) error {
+	if err := s.ensureUnlocked(); err != nil {
+		return fmt.Errorf("failed to unlock collection: %w", err)
+	}
+
+	attrs := map[string]string{
+		"connection-uuid": connUuid,
+	}
+
+	paths, err := s.searchItems(attrs)
+	if err != nil {
+		return err
+	}
+
+	if len(paths) == 0 {
+		return nil
+	}
+
+	for _, p := range paths {
+		item := s.conn.Object(secretServiceBusName, p)
+		if call := item.Call(secretItemIface+".Delete", 0); call.Err != nil {
+			log.Debugf("[SecretAgent] Failed to delete %s: %v", p, call.Err)
+		}
+	}
+
+	log.Debugf("[SecretAgent] Deleted %d secret item(s) for %s", len(paths), connUuid)
+	return nil
+}
+
+func (a *SecretAgent) withSecretService(fn func(*secretServiceSession) error) error {
+	sess, err := openSecretService()
+	if err != nil {
+		log.Debugf("[SecretAgent] Failed to open secret service session: %v", err)
+		return err
+	}
+	defer sess.close()
+	return fn(sess)
 }
 
 func (a *SecretAgent) trySecretService(
 	connUuid string,
 	settingName string,
 	fields []string,
-) nmSettingMap {
+) map[string]string {
 	if connUuid == "" {
 		log.Debugf("[SecretAgent] trySecretService: connUuid is empty, skipping keyring lookup")
 		return nil
@@ -194,62 +315,33 @@ func (a *SecretAgent) trySecretService(
 		return nil
 	}
 
-	switch settingName {
-	case "802-11-wireless-security", "802-1x", "vpn", "wireguard":
-	default:
-		log.Debugf("[SecretAgent] trySecretService: setting %s not supported for keyring lookup", settingName)
-		return nil
-	}
+	var out map[string]string
+	err := a.withSecretService(func(sess *secretServiceSession) error {
+		found := make(map[string]string)
+		for _, field := range fields {
+			val := sess.lookup(connUuid, settingName, field)
+			if val == "" {
+				log.Debugf("[SecretAgent] Secret service missing field '%s' for %s", field, connUuid)
+				return fmt.Errorf("missing field %s", field)
+			}
+			found[field] = val
+		}
 
-	sess, err := openSecretService()
+		out = found
+		return nil
+	})
 	if err != nil {
-		log.Debugf("[SecretAgent] Failed to open secret service session: %v", err)
 		return nil
 	}
-	defer sess.close()
-
-	found := make(map[string]string)
-	for _, field := range fields {
-		val := sess.lookup(connUuid, settingName, field)
-		if val == "" {
-			log.Debugf("[SecretAgent] Secret service missing field '%s' for %s", field, connUuid)
-			return nil
-		}
-		found[field] = val
-	}
-
-	out := nmSettingMap{}
-	sec := nmVariantMap{}
-	for k, v := range found {
-		sec[k] = dbus.MakeVariant(v)
-	}
-
-	switch settingName {
-	case "vpn":
-		secretsDict := make(map[string]string)
-		for k, v := range found {
-			if k != "username" {
-				secretsDict[k] = v
-			}
-		}
-		vpnSec := nmVariantMap{}
-		vpnSec["secrets"] = dbus.MakeVariant(secretsDict)
-		out[settingName] = vpnSec
-		log.Infof("[SecretAgent] Returning VPN secrets from secret service with %d fields", len(secretsDict))
-	case "802-1x":
-		secretsOnly := nmVariantMap{}
-		for k, v := range found {
-			switch k {
-			case "password", "private-key-password", "phase2-private-key-password", "pin":
-				secretsOnly[k] = dbus.MakeVariant(v)
-			}
-		}
-		out[settingName] = secretsOnly
-		log.Infof("[SecretAgent] Returning 802-1x secrets from secret service with %d fields", len(secretsOnly))
-	default:
-		out[settingName] = sec
-		log.Infof("[SecretAgent] Returning %s secrets from secret service", settingName)
-	}
-
 	return out
+}
+
+func (a *SecretAgent) deleteSecretsByConn(connUuid string) {
+	if connUuid == "" {
+		return
+	}
+
+	_ = a.withSecretService(func(sess *secretServiceSession) error {
+		return sess.deleteByUuid(connUuid)
+	})
 }

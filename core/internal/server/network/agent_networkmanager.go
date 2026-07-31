@@ -141,14 +141,7 @@ func (a *SecretAgent) GetSecrets(
 		return nil, dbus.NewError("org.freedesktop.NetworkManager.SecretAgent.Error.NoSecrets", nil)
 	}
 
-	var connUuid string
-	if c, ok := conn["connection"]; ok {
-		if v, ok := c["uuid"]; ok {
-			if s, ok2 := v.Value().(string); ok2 {
-				connUuid = s
-			}
-		}
-	}
+	connUuid := readConnUuid(conn)
 
 	// Phase 1: Determine if this connection is ours and what fields we need.
 	if a.backend != nil {
@@ -369,8 +362,8 @@ func (a *SecretAgent) GetSecrets(
 			a.backend.clearCachedWiFiSecret(connUuid)
 		}
 	} else {
-		if secretOut := a.trySecretService(connUuid, settingName, fields); secretOut != nil {
-			return secretOut, nil
+		if secrets := a.trySecretService(connUuid, settingName, fields); len(secrets) > 0 {
+			return formatKeyringSecrets(settingName, secrets), nil
 		}
 
 		switch settingName {
@@ -530,8 +523,7 @@ func (a *SecretAgent) GetSecrets(
 	case "802-1x":
 		secretsOnly := nmVariantMap{}
 		for k, v := range reply.Secrets {
-			switch k {
-			case "password", "private-key-password", "phase2-private-key-password", "pin":
+			if isDot1xSecretKey(k) {
 				secretsOnly[k] = dbus.MakeVariant(v)
 			}
 		}
@@ -563,6 +555,60 @@ func (a *SecretAgent) GetSecrets(
 		log.Infof("[SecretAgent] Queued credentials persist for after connection succeeds")
 	}
 
+	if reply.Save && connUuid != "" {
+		toStore := make(map[string]string)
+		switch settingName {
+		case "802-11-wireless-security":
+			for k, v := range reply.Secrets {
+				toStore[k] = v
+			}
+		case "802-1x":
+			for k, v := range reply.Secrets {
+				if isDot1xSecretKey(k) {
+					toStore[k] = v
+				}
+			}
+		case "vpn", "wireguard":
+			for k, v := range reply.Secrets {
+				if k != "username" {
+					toStore[k] = v
+				}
+			}
+		default:
+			var keys []string
+			for k := range reply.Secrets {
+				keys = append(keys, k)
+			}
+			log.Warnf("[SecretAgent] Unknown setting type %q — not storing secrets (keys: %v)", settingName, keys)
+		}
+		if len(toStore) > 0 {
+			if err := a.withSecretService(func(sess *secretServiceSession) error {
+				stored := 0
+				for key, val := range toStore {
+					ident := displayName
+					if connType == "802-11-wireless" && ssid != "" {
+						ident = ssid
+					}
+					label := fmt.Sprintf("%s: %s: %s", connType, ident, key)
+					if err := sess.store(connUuid, settingName, key, val, label); err != nil {
+						log.Debugf("[SecretAgent] Failed to store %s/%s: %v", connUuid, key, err)
+						continue
+					}
+					stored++
+				}
+				if stored > 0 {
+					log.Infof("[SecretAgent] Stored %d/%d secret(s) in keyring for %s/%s", stored, len(toStore), connUuid, settingName)
+				}
+				if stored < len(toStore) {
+					return fmt.Errorf("stored %d/%d secrets", stored, len(toStore))
+				}
+				return nil
+			}); err != nil {
+				log.Warnf("[SecretAgent] Could not persist secrets to keyring: %v", err)
+			}
+		}
+	}
+
 	if a.backend != nil {
 		switch settingName {
 		case "802-11-wireless-security", "802-1x":
@@ -575,12 +621,37 @@ func (a *SecretAgent) GetSecrets(
 
 func (a *SecretAgent) DeleteSecrets(conn map[string]nmVariantMap, path dbus.ObjectPath) *dbus.Error {
 	ssid := readSSID(conn)
-	log.Infof("[SecretAgent] DeleteSecrets called: path=%s, SSID=%s", path, ssid)
+	connType, _, _ := readConnTypeAndName(conn)
+	connUuid := readConnUuid(conn)
+
+	log.Infof("[SecretAgent] DeleteSecrets called: path=%s, SSID=%s, type=%s, uuid=%s", path, ssid, connType, connUuid)
+	a.deleteSecretsByConn(connUuid)
+
 	return nil
 }
 
 func (a *SecretAgent) DeleteSecrets2(path dbus.ObjectPath, setting string) *dbus.Error {
 	log.Infof("[SecretAgent] DeleteSecrets2 (alternate) called: path=%s, setting=%s", path, setting)
+
+	if a.conn == nil {
+		return nil
+	}
+
+	var settings map[string]map[string]dbus.Variant
+	if err := a.conn.Object("org.freedesktop.NetworkManager", path).
+		Call("org.freedesktop.NetworkManager.Settings.Connection.GetSettings", 0).
+		Store(&settings); err != nil {
+		log.Warnf("[SecretAgent] DeleteSecrets2: GetSettings failed for %s: %v — orphaned keyring items may remain", path, err)
+		return nil
+	}
+
+	settingsTyped := make(nmSettingMap, len(settings))
+	for k, v := range settings {
+		settingsTyped[k] = v
+	}
+	connUuid := readConnUuid(settingsTyped)
+	a.deleteSecretsByConn(connUuid)
+
 	return nil
 }
 
@@ -627,6 +698,25 @@ func (a *SecretAgent) save8021xIdentity(path dbus.ObjectPath, identity string) {
 		return
 	}
 	log.Infof("[SecretAgent] Saved 802.1x identity to connection profile")
+}
+
+func readConnUuid(conn map[string]nmVariantMap) string {
+	if c, ok := conn["connection"]; ok {
+		if v, ok := c["uuid"]; ok {
+			if s, ok2 := v.Value().(string); ok2 {
+				return s
+			}
+		}
+	}
+	return ""
+}
+
+func isDot1xSecretKey(key string) bool {
+	switch key {
+	case "password", "private-key-password", "phase2-private-key-password", "pin":
+		return true
+	}
+	return false
 }
 
 func readSSID(conn map[string]nmVariantMap) string {
@@ -679,10 +769,8 @@ func fieldsNeeded(setting string, hints []string, conn map[string]nmVariantMap) 
 			return hints
 		}
 		return infer8021xFields(conn)
-	case "vpn", "wireguard":
-		return hints
 	default:
-		return []string{}
+		return hints
 	}
 }
 
@@ -966,13 +1054,40 @@ func reasonFromFlags(flags uint32) string {
 	return "required"
 }
 
+func formatKeyringSecrets(settingName string, secrets map[string]string) nmSettingMap {
+	switch settingName {
+	case "vpn", "wireguard":
+		secretsDict := make(map[string]string)
+		for k, v := range secrets {
+			if k != "username" {
+				secretsDict[k] = v
+			}
+		}
+		vpnSec := nmVariantMap{"secrets": dbus.MakeVariant(secretsDict)}
+		return nmSettingMap{settingName: vpnSec}
+	case "802-1x":
+		secretsOnly := nmVariantMap{}
+		for k, v := range secrets {
+			if isDot1xSecretKey(k) {
+				secretsOnly[k] = dbus.MakeVariant(v)
+			}
+		}
+		return nmSettingMap{settingName: secretsOnly}
+	default:
+		sec := nmVariantMap{}
+		for k, v := range secrets {
+			sec[k] = dbus.MakeVariant(v)
+		}
+		return nmSettingMap{settingName: sec}
+	}
+}
+
 func buildWiFiSecretsResponse(settingName string, secrets map[string]string) nmSettingMap {
 	sec := nmVariantMap{}
 	switch settingName {
 	case "802-1x":
 		for k, v := range secrets {
-			switch k {
-			case "password", "private-key-password", "phase2-private-key-password", "pin":
+			if isDot1xSecretKey(k) {
 				sec[k] = dbus.MakeVariant(v)
 			}
 		}

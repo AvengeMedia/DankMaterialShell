@@ -477,3 +477,52 @@ func TestNmVariantMap(t *testing.T) {
 	value := settingMap["test-setting"]["test-key"].Value()
 	assert.Equal(t, "test-value", value)
 }
+
+func TestDeleteSecretsByConn_EmptyConnUuid(t *testing.T) {
+	agent := &SecretAgent{}
+	agent.deleteSecretsByConn("")
+}
+
+func TestDeleteSecrets_ExtractsConnUuid(t *testing.T) {
+	conn := map[string]nmVariantMap{
+		"connection": {
+			"uuid": dbus.MakeVariant("test-uuid-123"),
+			"id":   dbus.MakeVariant("TestNetwork"),
+			"type": dbus.MakeVariant("802-11-wireless"),
+		},
+		"802-11-wireless": {
+			"ssid": dbus.MakeVariant("TestSSID"),
+		},
+	}
+
+	// Verify the UUID extraction DeleteSecrets relies on
+	assert.Equal(t, "test-uuid-123", readConnUuid(conn))
+
+	agent := &SecretAgent{}
+	err := agent.DeleteSecrets(conn, "/test/path")
+	assert.Nil(t, err)
+}
+
+func TestDeleteSecrets2_ExtractsSettings(t *testing.T) {
+	// Simulate the settings map returned by GetSettings, as read in DeleteSecrets2
+	settings := map[string]map[string]dbus.Variant{
+		"connection": {
+			"uuid": dbus.MakeVariant("test-uuid-123"),
+			"type": dbus.MakeVariant("802-11-wireless"),
+		},
+	}
+
+	// Convert to nmSettingMap exactly as DeleteSecrets2 does
+	settingsTyped := make(nmSettingMap, len(settings))
+	for k, v := range settings {
+		settingsTyped[k] = v
+	}
+
+	// Verify the UUID extraction DeleteSecrets2 relies on
+	assert.Equal(t, "test-uuid-123", readConnUuid(settingsTyped))
+
+	// Verify nil-conn guard returns nil
+	agent := &SecretAgent{conn: nil}
+	err := agent.DeleteSecrets2("/test/path", "802-11-wireless-security")
+	assert.Nil(t, err)
+}
