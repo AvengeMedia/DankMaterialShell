@@ -41,7 +41,11 @@ Rectangle {
     property bool hasWifiAvailable: (NetworkService.wifiDevices?.length ?? 0) > 0
     property bool hasBothConnectionTypes: hasEthernetAvailable && hasWifiAvailable
     property int maxPinnedNetworks: 3
-    readonly property int hotspotContentHeight: currentPreferenceIndex === 1 && NetworkService.hotspotAvailable ? 56 + Theme.spacingS : 0
+    // Hosting on the only wifi adapter with no ethernet uplink just drops connectivity,
+    // so the hotspot row only shows where sharing can actually work (or is already on).
+    readonly property bool hotspotRelevant: NetworkService.hotspotEnabled || NetworkService.hotspotActivating || NetworkService.hotspotBusy || NetworkService.ethernetConnected || (NetworkService.wifiDevices?.length ?? 0) > 1
+    readonly property bool showHotspotRow: currentPreferenceIndex === 1 && NetworkService.hotspotAvailable && hotspotRelevant
+    readonly property int hotspotContentHeight: showHotspotRow ? 56 + Theme.spacingS : 0
 
     property var hotspotStartConfirm: ConfirmModal {}
 
@@ -184,7 +188,7 @@ Rectangle {
         anchors.right: parent.right
         anchors.margins: Theme.spacingM
         anchors.topMargin: Theme.spacingM
-        visible: currentPreferenceIndex === 1 && NetworkService.hotspotAvailable
+        visible: root.showHotspotRow
         height: visible ? 56 : 0
 
         Rectangle {
