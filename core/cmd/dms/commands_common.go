@@ -51,6 +51,8 @@ func init() {
 	})
 	pluginsUpdateCmd.Flags().BoolP("all", "a", false, "Update all installed plugins")
 	pluginsUpdateCmd.Flags().Bool("check", false, "Check for available updates without applying them")
+	pluginsLockCmd.Flags().StringP("output", "o", "", "Also write the lockfile to this path")
+	pluginsRestoreCmd.Flags().Bool("prune", false, "Remove managed plugins that are not in the lockfile")
 }
 
 var debugSrvCmd = &cobra.Command{
@@ -174,6 +176,36 @@ var pluginsUpdateCmd = &cobra.Command{
 		}
 		if err := updatePluginCLI(args[0]); err != nil {
 			log.Fatalf("Error updating plugin: %v", err)
+		}
+	},
+}
+
+var pluginsLockCmd = &cobra.Command{
+	Use:   "lock",
+	Short: "Record installed plugins and their exact revisions",
+	Long:  "Write a portable plugins.lock.json containing every managed user plugin and its current Git commit.",
+	Args:  cobra.NoArgs,
+	Run: func(cmd *cobra.Command, args []string) {
+		output, _ := cmd.Flags().GetString("output")
+		if err := lockPluginsCLI(output); err != nil {
+			log.Fatalf("Error writing plugin lockfile: %v", err)
+		}
+	},
+}
+
+var pluginsRestoreCmd = &cobra.Command{
+	Use:   "restore [lockfile]",
+	Short: "Restore plugins from exact revisions in a lockfile",
+	Long:  "Install or reset all plugins in a portable plugins.lock.json. Existing managed plugins are retained unless --prune is specified.",
+	Args:  cobra.MaximumNArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		path := ""
+		if len(args) == 1 {
+			path = args[0]
+		}
+		prune, _ := cmd.Flags().GetBool("prune")
+		if err := restorePluginsCLI(path, prune); err != nil {
+			log.Fatalf("Error restoring plugins: %v", err)
 		}
 	},
 }
@@ -430,6 +462,40 @@ func installPluginCLI(idOrName string) error {
 	}
 
 	fmt.Printf("Plugin installed successfully: %s\n", plugin.Name)
+	return nil
+}
+
+func lockPluginsCLI(outputPath string) error {
+	manager, err := plugins.NewManager()
+	if err != nil {
+		return fmt.Errorf("failed to create manager: %w", err)
+	}
+	warnings, err := manager.WriteCurrentLockfile(outputPath)
+	if err != nil {
+		return err
+	}
+	for _, warning := range warnings {
+		fmt.Fprintf(os.Stderr, "Warning: %s\n", warning)
+	}
+	fmt.Printf("Plugin lockfile written: %s\n", manager.GetLockfilePath())
+	if outputPath != "" && outputPath != manager.GetLockfilePath() {
+		fmt.Printf("Plugin lockfile exported: %s\n", outputPath)
+	}
+	return nil
+}
+
+func restorePluginsCLI(path string, prune bool) error {
+	manager, err := plugins.NewManager()
+	if err != nil {
+		return fmt.Errorf("failed to create manager: %w", err)
+	}
+	if err := manager.RestoreFromLockfile(path, prune); err != nil {
+		return err
+	}
+	if path == "" {
+		path = manager.GetLockfilePath()
+	}
+	fmt.Printf("Plugins restored from lockfile: %s\n", path)
 	return nil
 }
 

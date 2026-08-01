@@ -101,7 +101,9 @@ MPRIS player controls, calendar sync, weather widgets, and clipboard history wit
 Lock screen, idle detection, auto-lock/suspend with separate AC/battery settings, and a settings front-end for [dank-greeter](https://github.com/AvengeMedia/dank-greeter).
 
 **Plugin System**
-Extend functionality with the [plugin registry](https://plugins.danklinux.com).
+Extend functionality with the [plugin registry](https://plugins.danklinux.com). DMS keeps
+`~/.config/DankMaterialShell/plugins.lock.json` synchronized with managed plugin installs and
+their exact Git commits, so the same plugins can be reproduced on another machine.
 
 ## Supported Compositors
 
@@ -120,6 +122,8 @@ dms ipc call audio setvolume 50
 dms ipc call wallpaper set /path/to/image.jpg
 dms brightness list  # List available displays
 dms plugins search   # Browse plugin registry
+dms plugins lock     # Refresh the portable plugin lockfile
+dms plugins restore ~/plugins.lock.json
 ```
 
 [Full CLI and IPC documentation](https://danklinux.com/docs/dankmaterialshell/keybinds-ipc)

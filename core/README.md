@@ -74,7 +74,7 @@ Custom IPC via unix socket (JSON API) for shell communication.
 - `dms run [-d]` - Start shell (optionally as daemon)
 - `dms restart` / `dms kill` - Manage running processes
 - `dms ipc <command>` - Send IPC commands (toggle launcher, notifications, etc.)
-- `dms plugins [install|browse|search]` - Plugin management
+- `dms plugins [install|browse|search|lock|restore]` - Plugin management and portable exact-revision lockfiles
 - `dms brightness [list|set]` - Control display/monitor brightness
 - `dms color pick` - Native color picker (see below)
 - `dms update` - Update DMS and dependencies (disabled in distro packages)

@@ -10,6 +10,7 @@ import (
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/registries"
 	"github.com/go-git/go-git/v6"
+	"github.com/go-git/go-git/v6/plumbing"
 	"github.com/spf13/afero"
 )
 
@@ -35,6 +36,8 @@ type GitClient interface {
 	Pull(path string) error
 	OriginURL(path string) (string, error)
 	HasUpdates(path string) (hasUpdates bool, localHash string, remoteHash string, err error)
+	CurrentRevision(path string) (string, error)
+	CheckoutRevision(path string, revision string) error
 }
 
 type realGitClient struct{}
@@ -133,6 +136,47 @@ func (g *realGitClient) HasUpdates(path string) (bool, string, string, error) {
 
 	// Compare local HEAD with remote HEAD
 	return localHash != remoteHead, localHash, remoteHead, nil
+}
+
+func (g *realGitClient) CurrentRevision(path string) (string, error) {
+	repo, err := git.PlainOpen(path)
+	if err != nil {
+		return "", err
+	}
+	head, err := repo.Head()
+	if err != nil {
+		return "", err
+	}
+	return head.Hash().String(), nil
+}
+
+func (g *realGitClient) CheckoutRevision(path string, revision string) error {
+	if !gitCommitPattern.MatchString(revision) {
+		return fmt.Errorf("invalid git revision %q", revision)
+	}
+
+	repo, err := git.PlainOpen(path)
+	if err != nil {
+		return err
+	}
+	hash := plumbing.NewHash(revision)
+	if _, objectErr := repo.CommitObject(hash); objectErr != nil {
+		if _, remoteErr := repo.Remote("origin"); remoteErr != nil {
+			return fmt.Errorf("revision %s is not available in repository: %w", revision, objectErr)
+		}
+		fetchErr := repo.Fetch(&git.FetchOptions{})
+		if fetchErr != nil && fetchErr != git.NoErrAlreadyUpToDate {
+			return fmt.Errorf("failed to fetch locked revision: %w", fetchErr)
+		}
+	}
+	if _, err := repo.CommitObject(hash); err != nil {
+		return fmt.Errorf("revision %s is not available in repository: %w", revision, err)
+	}
+	worktree, err := repo.Worktree()
+	if err != nil {
+		return err
+	}
+	return worktree.Reset(&git.ResetOptions{Commit: hash, Mode: git.HardReset})
 }
 
 type Registry struct {
