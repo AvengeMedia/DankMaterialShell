@@ -1484,6 +1484,7 @@ BasePill {
             property bool isVertical: false
             property var axis: null
             property bool showMenu: false
+            property bool openedByHover: false
             property var menuHandle: null
 
             ListModel {
@@ -1493,7 +1494,8 @@ BasePill {
                 return entryStack.count ? entryStack.get(entryStack.count - 1).handle : null;
             }
 
-            function showForTrayItem(item, anchor, screen, atBottom, vertical, axisObj) {
+            function showForTrayItem(item, anchor, screen, atBottom, vertical, axisObj, byHover) {
+                openedByHover = byHover === true;
                 trayItem = item;
                 anchorItem = anchor;
                 parentScreen = screen;
@@ -2084,7 +2086,7 @@ BasePill {
         }
     }
 
-    function showForTrayItem(item, anchor, screen, atBottom, vertical, axisObj) {
+    function showForTrayItem(item, anchor, screen, atBottom, vertical, axisObj, byHover) {
         if (!screen)
             return;
         if (currentTrayMenu) {
@@ -2099,7 +2101,7 @@ BasePill {
         currentTrayMenu = trayMenuComponent.createObject(null);
         if (!currentTrayMenu)
             return;
-        currentTrayMenu.showForTrayItem(item, anchor, screen, atBottom, vertical ?? false, axisObj);
+        currentTrayMenu.showForTrayItem(item, anchor, screen, atBottom, vertical ?? false, axisObj, byHover === true);
     }
 
     function _trayLayoutRoot() {
@@ -2147,7 +2149,7 @@ BasePill {
         if (!hit?.trayItem?.hasMenu)
             return false;
         const anchor = hit.children?.length > 0 ? hit.children[0] : hit;
-        showForTrayItem(hit.trayItem, anchor, parentScreen, isAtBottom, isVerticalOrientation, axis);
+        showForTrayItem(hit.trayItem, anchor, parentScreen, isAtBottom, isVerticalOrientation, axis, true);
         return true;
     }
 }
