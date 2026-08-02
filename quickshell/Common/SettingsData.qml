@@ -83,6 +83,7 @@ Singleton {
     property bool _parseError: false
     property bool _pluginParseError: false
     property bool _hasLoaded: false
+    property bool _isFirstLoad: true
     property bool _isReadOnly: false
     property bool _hasUnsavedChanges: false
     property bool _selfWrite: false
@@ -1413,6 +1414,8 @@ Singleton {
     }
 
     function checkIconThemeDrift() {
+        if (_isFirstLoad)
+            return;
         if (resolveIconTheme() === "System Default")
             return;
         if (!lastAppliedIconTheme)
@@ -1681,10 +1684,13 @@ Singleton {
 
             _loadedSettingsSnapshot = JSON.stringify(Store.toJson(root));
             _hasLoaded = true;
+            _isFirstLoad = false;
             applyStoredTheme();
+            applyStoredIconTheme();
             updateCompositorCursor();
             Processes.detectQtTools();
-            Qt.callLater(checkIconThemeDrift);
+            if (!_isFirstLoad)
+                Qt.callLater(checkIconThemeDrift);
 
             _checkSettingsWritable();
         } catch (e) {
@@ -1692,7 +1698,6 @@ Singleton {
             const msg = e.message;
             log.error("Failed to parse settings.json - file will not be overwritten. Error:", msg);
             Qt.callLater(() => ToastService.showError(I18n.tr("Failed to parse %1").arg("settings.json"), msg));
-            applyStoredTheme();
         } finally {
             _loading = false;
         }
