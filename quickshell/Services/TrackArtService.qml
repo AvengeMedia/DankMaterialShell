@@ -26,7 +26,7 @@ Singleton {
         return hash.toString(16).padStart(8, '0');
     }
 
-    function getArtworkUrl(player) {
+    function _directArtworkUrl(player) {
         if (!player) return "";
 
         let artUrl = player.trackArtUrl || "";
@@ -52,6 +52,20 @@ Singleton {
         }
 
         return "";
+    }
+
+    function getArtworkUrl(player) {
+        const directUrl = _directArtworkUrl(player);
+        if (directUrl !== "")
+            return directUrl;
+
+        const equivalent = MprisController.availablePlayers.find(candidate => {
+            return candidate !== player
+                && candidate.playbackState !== MprisPlaybackState.Stopped
+                && MprisController.isSameTrack(player, candidate)
+                && _directArtworkUrl(candidate) !== "";
+        });
+        return _directArtworkUrl(equivalent);
     }
 
     function _commit(u, artKey, srcUrl) {
@@ -171,11 +185,25 @@ Singleton {
     onActivePlayerChanged: _updateArtUrl()
 
     Connections {
-        target: root.activePlayer
-        ignoreUnknownSignals: true
-        function onTrackTitleChanged() { root._updateArtUrl(); }
-        function onTrackArtUrlChanged() { root._updateArtUrl(); }
-        function onMetadataChanged() { root._updateArtUrl(); }
+        target: MprisController
+        function onAvailablePlayersChanged() {
+            root._updateArtUrl();
+        }
+    }
+
+    Instantiator {
+        model: MprisController.availablePlayers
+        delegate: Connections {
+            required property MprisPlayer modelData
+            target: modelData
+            ignoreUnknownSignals: true
+            function onIsPlayingChanged() { root._updateArtUrl(); }
+            function onTrackTitleChanged() { root._updateArtUrl(); }
+            function onTrackArtistChanged() { root._updateArtUrl(); }
+            function onTrackAlbumChanged() { root._updateArtUrl(); }
+            function onTrackArtUrlChanged() { root._updateArtUrl(); }
+            function onMetadataChanged() { root._updateArtUrl(); }
+        }
     }
 
     function _trackKey() {
@@ -201,8 +229,9 @@ Singleton {
         }
         _pendingArtKey = key;
         const url = getArtworkUrl(activePlayer);
-        // Ignore Chrome's same-track thumbnail size updates.
-        if (key !== "" && key === _committedArtKey)
+        // Ignore duplicate notifications, but allow a richer peer to replace
+        // the artwork for the same canonical track.
+        if (key !== "" && key === _committedArtKey && url === _committedSrcUrl)
             return;
         if (key !== "" && url !== "" && url === _committedSrcUrl) {
             // Chrome can publish track metadata before its new artwork URL.
