@@ -59,11 +59,8 @@ Singleton {
         if (directUrl !== "")
             return directUrl;
 
-        const equivalent = MprisController.availablePlayers.find(candidate => {
-            return candidate !== player
-                && candidate.playbackState !== MprisPlaybackState.Stopped
-                && MprisController.isSameTrack(player, candidate)
-                && _directArtworkUrl(candidate) !== "";
+        const equivalent = MprisController.equivalentPlayers(player).find(candidate => {
+            return candidate !== player && _directArtworkUrl(candidate) !== "";
         });
         return _directArtworkUrl(equivalent);
     }
@@ -229,8 +226,7 @@ Singleton {
         }
         _pendingArtKey = key;
         const url = getArtworkUrl(activePlayer);
-        // Ignore duplicate notifications, but allow a richer peer to replace
-        // the artwork for the same canonical track.
+        // Ignore duplicate notifications, but let a richer peer replace same-track art
         if (key !== "" && key === _committedArtKey && url === _committedSrcUrl)
             return;
         if (key !== "" && url !== "" && url === _committedSrcUrl) {

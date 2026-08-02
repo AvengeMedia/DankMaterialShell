@@ -156,9 +156,10 @@ DankOSD {
             if (MprisController.isFirefoxYoutubeHoverPreview(player))
                 return;
 
-            const newTitle = player.trackTitle || "";
-            const newArtist = player.trackArtist || "";
-            const newAlbum = player.trackAlbum || "";
+            const metaPlayer = MprisController.bestMetadataPlayer(player);
+            const newTitle = MprisController.displayTrackTitle(metaPlayer);
+            const newArtist = metaPlayer.trackArtist || "";
+            const newAlbum = metaPlayer.trackAlbum || "";
             const trackChanged = newTitle !== root._displayTitle || newArtist !== root._displayArtist || newAlbum !== root._displayAlbum;
 
             root._displayTitle = newTitle;
