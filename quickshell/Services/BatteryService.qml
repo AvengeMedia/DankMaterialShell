@@ -23,6 +23,13 @@ Singleton {
         }
     }
 
+    Connections {
+        target: typeof PowerProfiles !== "undefined" ? PowerProfiles : null
+        function onHasPerformanceProfileChanged() {
+            root.applyPowerProfile();
+        }
+    }
+
     function applyPowerProfile() {
         if (!batteryAvailable)
             return;
@@ -32,7 +39,7 @@ Singleton {
         const targetProfile = parseInt(profileValue);
         if (isNaN(targetProfile) || PowerProfiles.profile === targetProfile)
             return;
-        PowerProfiles.profile = targetProfile;
+        PowerProfileWatcher.applyProfile(targetProfile);
     }
 
     readonly property string preferredBatteryOverride: Quickshell.env("DMS_PREFERRED_BATTERY")
