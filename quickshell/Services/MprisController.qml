@@ -93,7 +93,7 @@ Singleton {
         }
         if (isFirefoxYoutubeHoverPreview(p))
             return;
-        const metadataPlayer = _bestMetadataPlayer(p);
+        const metadataPlayer = bestMetadataPlayer(p);
         const nextTitle = displayTrackTitle(metadataPlayer);
         const trackChanged = nextTitle && stableTitle && nextTitle.toLowerCase() !== stableTitle.toLowerCase();
         if (trackChanged) {
@@ -171,8 +171,7 @@ Singleton {
         return player && player.playbackState === MprisPlaybackState.Stopped && !player.trackTitle && !player.trackArtist;
     }
 
-    // App-name suffixes that browsers/integrations append as "<title> | <App>".
-    // Only these are stripped for track matching; display always keeps the full title.
+    // Known "<title> | <App>" suffixes stripped for matching only; display keeps the full title
     readonly property var _appTitleSuffixes: ["youtube", "youtube music", "soundcloud", "spotify", "chrome", "chromium", "firefox", "brave", "vivaldi", "twitch"]
 
     function _stripAppTitleSuffix(title: string): string {
@@ -183,12 +182,10 @@ Singleton {
         return _appTitleSuffixes.indexOf(suffix) !== -1 ? title.substring(0, idx).trim() : title;
     }
 
-    // Matching key: strip only known app suffixes so equivalent players line up.
     function normalizedTrackTitle(player: MprisPlayer): string {
         return _stripAppTitleSuffix((player?.trackTitle || "").trim()).toLowerCase();
     }
 
-    // Display: never strip — a generic " | " cut would mangle legitimate titles.
     function displayTrackTitle(player: MprisPlayer): string {
         return (player?.trackTitle || "").trim();
     }
@@ -197,14 +194,24 @@ Singleton {
         return (player?.trackArtist || "").trim().toLowerCase();
     }
 
+    // Artist missing on either side: fall back to URL, then album, before trusting a title-only match
     function isSameTrack(first: MprisPlayer, second: MprisPlayer): bool {
         const firstTitle = normalizedTrackTitle(first);
-        const secondTitle = normalizedTrackTitle(second);
-        if (!firstTitle || firstTitle !== secondTitle)
+        if (!firstTitle || firstTitle !== normalizedTrackTitle(second))
             return false;
         const firstArtist = normalizedTrackArtist(first);
         const secondArtist = normalizedTrackArtist(second);
-        return !firstArtist || !secondArtist || firstArtist === secondArtist;
+        if (firstArtist && secondArtist)
+            return firstArtist === secondArtist;
+        const firstUrl = (first?.metadata?.["xesam:url"] || "").toString();
+        const secondUrl = (second?.metadata?.["xesam:url"] || "").toString();
+        if (firstUrl && secondUrl)
+            return firstUrl === secondUrl;
+        const firstAlbum = (first?.trackAlbum || "").trim().toLowerCase();
+        const secondAlbum = (second?.trackAlbum || "").trim().toLowerCase();
+        if (firstAlbum && secondAlbum)
+            return firstAlbum === secondAlbum;
+        return true;
     }
 
     function metadataQuality(player: MprisPlayer): int {
@@ -218,10 +225,16 @@ Singleton {
         return quality;
     }
 
-    function _bestMetadataPlayer(player: MprisPlayer): MprisPlayer {
-        const equivalents = availablePlayers.filter(candidate => {
+    function equivalentPlayers(player: MprisPlayer): var {
+        if (!player)
+            return [];
+        return availablePlayers.filter(candidate => {
             return candidate.playbackState !== MprisPlaybackState.Stopped && isSameTrack(player, candidate);
         });
+    }
+
+    function bestMetadataPlayer(player: MprisPlayer): MprisPlayer {
+        const equivalents = equivalentPlayers(player);
         if (equivalents.length === 0)
             return player;
         return equivalents.reduce((best, candidate) => {
@@ -238,9 +251,7 @@ Singleton {
         if (activePlayer?.isPlaying) {
             if (activePlayer.canControl || controllable.length === 0)
                 return activePlayer;
-            // Active source is playing but not controllable: only hand ownership to a
-            // controllable *equivalent* peer (same track). Never let an unrelated
-            // player steal the active source while it is still playing.
+            // Playing but not controllable: only a same-track controllable peer may take over
             const mirror = controllable.find(player => isSameTrack(activePlayer, player));
             return mirror || activePlayer;
         }
