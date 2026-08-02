@@ -171,14 +171,26 @@ Singleton {
         return player && player.playbackState === MprisPlaybackState.Stopped && !player.trackTitle && !player.trackArtist;
     }
 
-    function normalizedTrackTitle(player: MprisPlayer): string {
-        return displayTrackTitle(player).toLowerCase();
+    // App-name suffixes that browsers/integrations append as "<title> | <App>".
+    // Only these are stripped for track matching; display always keeps the full title.
+    readonly property var _appTitleSuffixes: ["youtube", "youtube music", "soundcloud", "spotify", "chrome", "chromium", "firefox", "brave", "vivaldi", "twitch"]
+
+    function _stripAppTitleSuffix(title: string): string {
+        const idx = title.lastIndexOf(" | ");
+        if (idx <= 0)
+            return title;
+        const suffix = title.substring(idx + 3).trim().toLowerCase();
+        return _appTitleSuffixes.indexOf(suffix) !== -1 ? title.substring(0, idx).trim() : title;
     }
 
+    // Matching key: strip only known app suffixes so equivalent players line up.
+    function normalizedTrackTitle(player: MprisPlayer): string {
+        return _stripAppTitleSuffix((player?.trackTitle || "").trim()).toLowerCase();
+    }
+
+    // Display: never strip — a generic " | " cut would mangle legitimate titles.
     function displayTrackTitle(player: MprisPlayer): string {
-        const title = (player?.trackTitle || "").trim();
-        const appSuffix = title.lastIndexOf(" | ");
-        return appSuffix > 0 ? title.substring(0, appSuffix).trim() : title;
+        return (player?.trackTitle || "").trim();
     }
 
     function normalizedTrackArtist(player: MprisPlayer): string {
@@ -226,6 +238,11 @@ Singleton {
         if (activePlayer?.isPlaying) {
             if (activePlayer.canControl || controllable.length === 0)
                 return activePlayer;
+            // Active source is playing but not controllable: only hand ownership to a
+            // controllable *equivalent* peer (same track). Never let an unrelated
+            // player steal the active source while it is still playing.
+            const mirror = controllable.find(player => isSameTrack(activePlayer, player));
+            return mirror || activePlayer;
         }
 
         if (activePlayer?.canControl && activePlayer.playbackState === MprisPlaybackState.Paused) {
