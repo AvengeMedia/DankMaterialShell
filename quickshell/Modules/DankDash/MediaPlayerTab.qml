@@ -493,7 +493,7 @@ Item {
                     }
 
                     StyledText {
-                        text: activePlayer?.trackAlbum || ""
+                        text: MprisController.stableAlbum
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.surfaceTextSecondary
                         width: parent.width
