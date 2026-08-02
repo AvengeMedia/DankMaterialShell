@@ -379,6 +379,9 @@ Item {
 
         animationsEnabled = true;
         shouldBeVisible = true;
+        // Content-sized popouts lay out when contentWindow maps, while the geometry
+        // handlers are still gated off. Re-snapshot so the surface isn't left short.
+        _setSettledSurfaceGeometry();
         if (screen) {
             PopoutManager.showPopout(popoutHandle);
             opened();
