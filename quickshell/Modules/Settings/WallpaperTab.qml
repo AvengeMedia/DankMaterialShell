@@ -154,6 +154,26 @@ Item {
 
                                     DankIcon {
                                         anchors.centerIn: parent
+                                        name: "create_new_folder"
+                                        size: 18
+                                        color: "black"
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: root.openFolderWallpaperBrowser()
+                                    }
+                                }
+
+                                Rectangle {
+                                    width: 32
+                                    height: 32
+                                    radius: 16
+                                    color: Qt.rgba(255, 255, 255, 0.9)
+
+                                    DankIcon {
+                                        anchors.centerIn: parent
                                         name: "palette"
                                         size: 18
                                         color: "black"
@@ -1308,6 +1328,12 @@ Item {
             mainWallpaperBrowserLoader.item.open();
     }
 
+    function openFolderWallpaperBrowser() {
+        folderWallpaperBrowserLoader.active = true;
+        if (folderWallpaperBrowserLoader.item)
+            folderWallpaperBrowserLoader.item.open();
+    }
+
     function openLightWallpaperBrowser() {
         lightWallpaperBrowserLoader.active = true;
         if (lightWallpaperBrowserLoader.item)
@@ -1337,6 +1363,26 @@ Item {
                 } else {
                     SessionData.setWallpaper(path);
                 }
+                close();
+            }
+        }
+    }
+
+    LazyLoader {
+        id: folderWallpaperBrowserLoader
+        active: false
+
+        FileBrowserModal {
+            parentModal: root.parentModal
+            browserTitle: I18n.tr("Select Wallpaper Folder", "wallpaper folder file browser title")
+            browserIcon: "folder"
+            browserType: "wallpaper"
+            folderMode: true
+            showHiddenFiles: true
+            onFileSelected: path => {
+                var folderPath = path.startsWith("file://") ? path.substring(7) : path;
+                var targetMonitor = SessionData.perMonitorWallpaper ? selectedMonitorName : "";
+                WallpaperCyclingService.cycleToNextWallpaper(targetMonitor, folderPath + "/dummy.jpg");
                 close();
             }
         }
