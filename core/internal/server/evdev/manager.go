@@ -48,7 +48,7 @@ func NewManager() (*Manager, error) {
 		return nil, fmt.Errorf("failed to find keyboards: %w", err)
 	}
 
-	initialCapsLock := readInitialCapsLockState(devices[0])
+	initialCapsLock, _ := capsLockFromDevices(devices)
 
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
@@ -85,14 +85,21 @@ func NewManager() (*Manager, error) {
 	return m, nil
 }
 
-func readInitialCapsLockState(device EvdevDevice) bool {
-	ledStates, err := device.State(evLedType)
-	if err != nil {
-		log.Debugf("Could not read LED state: %v", err)
-		return false
+func capsLockFromDevices(devices []EvdevDevice) (bool, bool) {
+	for _, device := range devices {
+		if device == nil {
+			continue
+		}
+
+		ledStates, err := device.State(evLedType)
+		if err != nil || len(ledStates) == 0 {
+			continue
+		}
+
+		return ledStates[ledCapslockKey], true
 	}
 
-	return ledStates[ledCapslockKey]
+	return false, false
 }
 
 func findKeyboards() ([]EvdevDevice, error) {
@@ -297,25 +304,22 @@ func (m *Manager) readAndUpdateCapsLockState(deviceIndex int) {
 		m.devicesMutex.RUnlock()
 		return
 	}
-	device := m.devices[deviceIndex]
+	ordered := make([]EvdevDevice, 0, len(m.devices))
+	ordered = append(ordered, m.devices[deviceIndex])
+	for i, device := range m.devices {
+		if i == deviceIndex {
+			continue
+		}
+		ordered = append(ordered, device)
+	}
 	m.devicesMutex.RUnlock()
 
-	ledStates, err := device.State(evLedType)
-	if err != nil {
-		log.Warnf("Failed to read LED state: %v", err)
+	capsLockState, ok := capsLockFromDevices(ordered)
+	if !ok {
+		log.Debug("No LED-capable device available for caps lock state")
 		return
 	}
 
-	if len(ledStates) == 0 {
-		log.Debug("No LED state available (empty map)")
-
-		// This means the device either:
-		// - doesn't support LED reporting at all, or
-		// - the kernel returned an empty state
-		return
-	}
-
-	capsLockState := ledStates[ledCapslockKey]
 	m.updateCapsLockStateDirect(capsLockState)
 }
 

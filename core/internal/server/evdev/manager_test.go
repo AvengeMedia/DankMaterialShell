@@ -306,7 +306,7 @@ func TestNotifySubscribers(t *testing.T) {
 	m.Close()
 }
 
-func TestReadInitialCapsLockState(t *testing.T) {
+func TestCapsLockFromDevices(t *testing.T) {
 	t.Run("caps lock is on", func(t *testing.T) {
 		mockDevice := mocks.NewMockEvdevDevice(t)
 		ledState := evdev.StateMap{
@@ -314,7 +314,8 @@ func TestReadInitialCapsLockState(t *testing.T) {
 		}
 		mockDevice.EXPECT().State(evdev.EvType(evLedType)).Return(ledState, nil).Once()
 
-		result := readInitialCapsLockState(mockDevice)
+		result, ok := capsLockFromDevices([]EvdevDevice{mockDevice})
+		assert.True(t, ok)
 		assert.True(t, result)
 	})
 
@@ -325,7 +326,8 @@ func TestReadInitialCapsLockState(t *testing.T) {
 		}
 		mockDevice.EXPECT().State(evdev.EvType(evLedType)).Return(ledState, nil).Once()
 
-		result := readInitialCapsLockState(mockDevice)
+		result, ok := capsLockFromDevices([]EvdevDevice{mockDevice})
+		assert.True(t, ok)
 		assert.False(t, result)
 	})
 
@@ -333,8 +335,24 @@ func TestReadInitialCapsLockState(t *testing.T) {
 		mockDevice := mocks.NewMockEvdevDevice(t)
 		mockDevice.EXPECT().State(evdev.EvType(evLedType)).Return(nil, errors.New("read error")).Once()
 
-		result := readInitialCapsLockState(mockDevice)
+		result, ok := capsLockFromDevices([]EvdevDevice{mockDevice})
+		assert.False(t, ok)
 		assert.False(t, result)
+	})
+
+	t.Run("falls back past device without LED state", func(t *testing.T) {
+		noLedDevice := mocks.NewMockEvdevDevice(t)
+		noLedDevice.EXPECT().State(evdev.EvType(evLedType)).Return(evdev.StateMap{}, nil).Once()
+
+		ledDevice := mocks.NewMockEvdevDevice(t)
+		ledState := evdev.StateMap{
+			ledCapslockKey: true,
+		}
+		ledDevice.EXPECT().State(evdev.EvType(evLedType)).Return(ledState, nil).Once()
+
+		result, ok := capsLockFromDevices([]EvdevDevice{noLedDevice, nil, ledDevice})
+		assert.True(t, ok)
+		assert.True(t, result)
 	})
 }
 
