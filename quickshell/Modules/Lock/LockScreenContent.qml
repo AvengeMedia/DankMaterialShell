@@ -1329,6 +1329,7 @@ Item {
                                     width: parent.width
                                     height: parent.height / 2
                                     anchors.top: parent.top
+                                    anchors.topMargin: -1
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     color: Theme.withAlpha(Theme.surfaceContainer, 0.9)
                                 }
