@@ -53,6 +53,11 @@ func NewGentooDistribution(config DistroConfig, logChan chan<- string) *GentooDi
 	}
 }
 
+func emergeInstallArgs(packages []string) []string {
+	args := []string{"emerge", "--ask=n", "--quiet", "--autounmask-continue=y", "--autounmask-keep-keywords=y", "--autounmask-keep-masks=y"}
+	return append(args, packages...)
+}
+
 func (g *GentooDistribution) getArchKeyword() string {
 	arch := runtime.GOARCH
 	switch arch {
@@ -319,6 +324,7 @@ func (g *GentooDistribution) InstallPrerequisites(ctx context.Context, sudoPassw
 	}
 	g.log("Portage tree synced successfully")
 
+	args := emergeInstallArgs(missingPkgs)
 	g.log(fmt.Sprintf("Installing prerequisites: %s", strings.Join(missingPkgs, ", ")))
 	progressChan <- InstallProgressMsg{
 		Phase:       PhasePrerequisites,
@@ -326,12 +332,10 @@ func (g *GentooDistribution) InstallPrerequisites(ctx context.Context, sudoPassw
 		Step:        fmt.Sprintf("Installing %d prerequisites...", len(missingPkgs)),
 		IsComplete:  false,
 		NeedsSudo:   true,
-		CommandInfo: fmt.Sprintf("sudo emerge --ask=n %s", strings.Join(missingPkgs, " ")),
+		CommandInfo: fmt.Sprintf("sudo %s", strings.Join(args, " ")),
 		LogOutput:   fmt.Sprintf("Installing prerequisites: %s", strings.Join(missingPkgs, ", ")),
 	}
 
-	args := []string{"emerge", "--ask=n", "--quiet"}
-	args = append(args, missingPkgs...)
 	cmd := privesc.ExecCommand(ctx, sudoPassword, strings.Join(args, " "))
 	output, err := cmd.CombinedOutput()
 	if err != nil {
@@ -521,8 +525,7 @@ func (g *GentooDistribution) installPortagePackages(ctx context.Context, package
 		}
 	}
 
-	args := []string{"emerge", "--ask=n", "--quiet"}
-	args = append(args, packageNames...)
+	args := emergeInstallArgs(packageNames)
 
 	progressChan <- InstallProgressMsg{
 		Phase:       PhaseSystemPackages,
@@ -713,8 +716,7 @@ func (g *GentooDistribution) installGURUPackages(ctx context.Context, packages [
 		guruPackages[i] = pkg + "::guru"
 	}
 
-	args := []string{"emerge", "--ask=n", "--quiet"}
-	args = append(args, guruPackages...)
+	args := emergeInstallArgs(guruPackages)
 
 	progressChan <- InstallProgressMsg{
 		Phase:       PhaseAURPackages,
