@@ -168,7 +168,7 @@ Singleton {
     }
 
     function isIdle(player: MprisPlayer): bool {
-        return player && player.playbackState === MprisPlaybackState.Stopped && !player.trackTitle && !player.trackArtist;
+        return player && player.playbackState === MprisPlaybackState.Stopped;
     }
 
     // Known "<title> | <App>" suffixes stripped for matching only; display keeps the full title
