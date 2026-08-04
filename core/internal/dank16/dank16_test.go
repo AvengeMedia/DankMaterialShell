@@ -679,3 +679,73 @@ func TestContrastAlgorithmComparison(t *testing.T) {
 
 	t.Logf("WCAG and DPS palettes differ in %d/16 colors", differentCount)
 }
+
+func TestEnsureContrastDPSLightModeStaysLight(t *testing.T) {
+	tests := []struct {
+		name     string
+		result   string
+		bg       string
+		minLstar float64
+	}{
+		{
+			name:     "bidirectional adjustment",
+			result:   EnsureContrastDPSBidirectional("#d0ccc6", "#f8f8f8", 17.5, true),
+			bg:       "#f8f8f8",
+			minLstar: 20.0,
+		},
+		{
+			name:     "lstar adjustment",
+			result:   EnsureContrastDPSLstar("#c0c0c0", "#f8f8f8", 30.0, true),
+			bg:       "#f8f8f8",
+			minLstar: 20.0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			lstar := getLstar(tt.result)
+			if lstar < tt.minLstar {
+				t.Errorf("result %s has L* %.2f on light bg %s, expected >= %.2f (collapsed to near-black)",
+					tt.result, lstar, tt.bg, tt.minLstar)
+			}
+		})
+	}
+}
+
+func TestGeneratePaletteColor8Dim(t *testing.T) {
+	hues := []string{"#e91e63", "#f59e0b", "#22c55e", "#06b6d4", "#8b5cf6", "#ef4444"}
+
+	for _, base := range hues {
+		t.Run(base, func(t *testing.T) {
+			palette := GeneratePalette(base, PaletteOptions{IsLight: false, UseDPS: true})
+
+			bgRatio := ContrastRatio(palette.Color8.Hex, palette.Color0.Hex)
+			if bgRatio < 1.5 || bgRatio > 3.0 {
+				t.Errorf("Color8 %s vs bg %s ratio %.2f, expected 1.5-3.0 (bright black stays near bg)",
+					palette.Color8.Hex, palette.Color0.Hex, bgRatio)
+			}
+
+			sepRatio := ContrastRatio(palette.Color4.Hex, palette.Color8.Hex)
+			if sepRatio < 2.0 {
+				t.Errorf("Color4 %s vs Color8 %s ratio %.2f, expected >= 2.0 (blue must not collide with bright black)",
+					palette.Color4.Hex, palette.Color8.Hex, sepRatio)
+			}
+		})
+	}
+}
+
+func TestGeneratePaletteLightColor8StaysLight(t *testing.T) {
+	palette := GeneratePalette("#f59e0b", PaletteOptions{IsLight: true, UseDPS: true})
+
+	lstar := getLstar(palette.Color8.Hex)
+	if lstar < 60.0 {
+		t.Errorf("light mode Color8 %s has L* %.2f, expected >= 60 (dim grey, not near-black)",
+			palette.Color8.Hex, lstar)
+	}
+
+	bgRatio := ContrastRatio(palette.Color8.Hex, palette.Color0.Hex)
+	if bgRatio > 3.0 {
+		t.Errorf("light mode Color8 %s vs bg %s ratio %.2f, expected <= 3.0",
+			palette.Color8.Hex, palette.Color0.Hex, bgRatio)
+	}
+}
