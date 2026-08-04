@@ -34,6 +34,8 @@ in
       restartIfChanged = cfg.systemd.restartIfChanged;
 
       serviceConfig = {
+        Type = "dbus";
+        BusName = "org.freedesktop.Notifications";
         ExecStart = lib.getExe cfg.package + " run --session";
         Restart = "on-failure";
       };
