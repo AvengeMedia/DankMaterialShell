@@ -1257,6 +1257,7 @@ Item {
                         buttonSize: 32
                         visible: root.canStartSecurityKeyUnlock()
                         enabled: visible
+                        tooltipText: SettingsData.lockScreenSecurityKeyShortcutEnabled ? I18n.tr("Security key (%1)", "lock screen security key button tooltip with shortcut").arg(SettingsData.lockScreenSecurityKeyShortcut) : I18n.tr("Security key", "lock screen security key button tooltip")
                         onClicked: root.triggerSecurityKeyUnlock()
                     }
                     DankActionButton {

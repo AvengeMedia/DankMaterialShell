@@ -5454,6 +5454,29 @@
     ]
   },
   {
+    "section": "lockScreenSecurityKeyShortcutEnabled",
+    "label": "Security key shortcut",
+    "tabIndex": 11,
+    "category": "Lock Screen",
+    "keywords": [
+      "authentication",
+      "key",
+      "keybind",
+      "keyboard",
+      "lock",
+      "login",
+      "password",
+      "screen",
+      "security",
+      "shortcut",
+      "start",
+      "u2f",
+      "unlock",
+      "yubikey"
+    ],
+    "description": "Keyboard shortcut to start security key unlock"
+  },
+  {
     "section": "lockScreenShowMediaPlayer",
     "label": "Show Media Player",
     "tabIndex": 11,

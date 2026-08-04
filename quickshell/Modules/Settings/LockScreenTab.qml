@@ -522,8 +522,8 @@ Item {
                 SettingsToggleRow {
                     settingKey: "lockScreenSecurityKeyShortcutEnabled"
                     tags: ["lock", "screen", "u2f", "yubikey", "security", "key", "shortcut", "keybind", "authentication"]
-                    text: I18n.tr("Security key shortcut", "Enable or disable the lock screen keyboard shortcut that starts an alternative security key unlock")
-                    description: I18n.tr("Enable a keyboard shortcut on the lock screen password field to start an alternative security key unlock", "lock screen security key shortcut setting")
+                    text: I18n.tr("Security key shortcut", "lock screen security key shortcut toggle")
+                    description: I18n.tr("Keyboard shortcut to start security key unlock", "lock screen security key shortcut setting")
                     checked: SettingsData.lockScreenSecurityKeyShortcutEnabled
                     visible: SettingsData.enableU2f && SettingsData.u2fMode === "or" && !root.lockU2fControlledByPrimary
                     onToggled: checked => SettingsData.set("lockScreenSecurityKeyShortcutEnabled", checked)
@@ -550,9 +550,9 @@ Item {
                         }
 
                         StyledText {
-                            text: I18n.tr("Click the field, then press Ctrl + key to record it (e.g. Ctrl+Q). Escape cancels.", "lock screen security key shortcut key combination capture hint")
+                            text: securityKeyCapture.captureError !== "" ? securityKeyCapture.captureError : I18n.tr("Press Ctrl+key to set. Esc cancels.", "lock screen security key shortcut key combination capture hint")
                             font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceVariantText
+                            color: securityKeyCapture.captureError !== "" ? Theme.warning : Theme.surfaceVariantText
                             wrapMode: Text.WordWrap
                             width: parent.width
                             horizontalAlignment: Text.AlignLeft
@@ -569,8 +569,11 @@ Item {
                         textColor: Theme.surfaceText
 
                         property bool capturing: false
+                        property string captureError: ""
+                        readonly property var reservedKeys: ["A", "E", "B", "F", "U", "K", "W", "H", "D"]
 
                         function startCapture() {
+                            captureError = "";
                             capturing = true;
                             securityKeyCapture.forceActiveFocus();
                         }
@@ -613,7 +616,14 @@ Item {
                             if (!KeyUtils.qtKeyFromName(key))
                                 return;
 
+                            if (!hasShift && securityKeyCapture.reservedKeys.indexOf(key.toUpperCase()) !== -1) {
+                                securityKeyCapture.captureError = I18n.tr("Ctrl+%1 is used for password editing", "lock screen security key shortcut reserved key warning").arg(key.toUpperCase());
+                                event.accepted = true;
+                                return;
+                            }
+
                             SettingsData.set("lockScreenSecurityKeyShortcut", KeyUtils.formatToken(mods, key));
+                            securityKeyCapture.captureError = "";
                             securityKeyCapture.stopCapture();
                             event.accepted = true;
                         }
