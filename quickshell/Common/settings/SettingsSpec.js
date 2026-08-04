@@ -473,6 +473,8 @@ var SPEC = {
     enableU2f: { def: false, onChange: "scheduleAuthApply" },
     u2fMode: { def: "or" },
     lockPamPath: { def: "" },
+    lockScreenSecurityKeyShortcut: { def: "Ctrl+Q" },
+    lockScreenSecurityKeyShortcutEnabled: { def: false },
     lockPamInlineFprint: { def: false },
     lockPamInlineU2f: { def: false },
     lockPamExternallyManaged: { def: false },

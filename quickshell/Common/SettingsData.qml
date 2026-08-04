@@ -922,6 +922,8 @@ Singleton {
     property bool lockPamInlineU2f: false
     property bool lockPamExternallyManaged: false
     property string lockU2fPamPath: ""
+    property string lockScreenSecurityKeyShortcut: "Ctrl+Q"
+    property bool lockScreenSecurityKeyShortcutEnabled: false
     property bool greeterPamExternallyManaged: false
     property string lockScreenInactiveColor: "#000000"
     property int lockScreenNotificationMode: 0

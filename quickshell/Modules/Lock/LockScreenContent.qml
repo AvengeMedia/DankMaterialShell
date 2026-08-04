@@ -14,6 +14,7 @@ import qs.Services
 import qs.Widgets
 import qs.DankCommon.Session
 import "../../DankCommon/Common/LayoutCodes.js" as LayoutCodes
+import "../../Common/KeyUtils.js" as KeyUtils
 
 Item {
     id: root
@@ -96,6 +97,18 @@ Item {
 
     function canStartSecurityKeyUnlock() {
         return !demoMode && pam && pam.u2f && pam.u2f.available && SettingsData.enableU2f && SettingsData.u2fMode === "or" && !pam.passwd.active && !pam.u2f.active && !pam.u2fPending && !root.unlocking;
+    }
+
+    function triggerSecurityKeyUnlock() {
+        if (!canStartSecurityKeyUnlock())
+            return;
+        passwordField.clear();
+        pam.u2f.startForAlternativeAuth();
+    }
+
+    function securityKeyShortcutMatches(event) {
+        return SettingsData.lockScreenSecurityKeyShortcutEnabled
+            && KeyUtils.eventMatchesCombo(event, SettingsData.lockScreenSecurityKeyShortcut);
     }
 
     Component.onCompleted: {
@@ -962,6 +975,12 @@ Item {
                             }
 
                             if ((event.modifiers & Qt.ControlModifier) && !(event.modifiers & (Qt.AltModifier | Qt.MetaModifier))) {
+                                if (securityKeyShortcutMatches(event) && canStartSecurityKeyUnlock()) {
+                                    triggerSecurityKeyUnlock();
+                                    event.accepted = true;
+                                    return;
+                                }
+
                                 switch (event.key) {
                                 case Qt.Key_A:
                                     cursorPosition = 0;
@@ -1238,10 +1257,8 @@ Item {
                         buttonSize: 32
                         visible: root.canStartSecurityKeyUnlock()
                         enabled: visible
-                        onClicked: {
-                            passwordField.clear();
-                            pam.u2f.startForAlternativeAuth();
-                        }
+                        tooltipText: SettingsData.lockScreenSecurityKeyShortcutEnabled ? I18n.tr("Security key (%1)", "lock screen security key button tooltip with shortcut").arg(SettingsData.lockScreenSecurityKeyShortcut) : I18n.tr("Security key", "lock screen security key button tooltip")
+                        onClicked: root.triggerSecurityKeyUnlock()
                     }
                     DankActionButton {
                         id: virtualKeyboardButton
