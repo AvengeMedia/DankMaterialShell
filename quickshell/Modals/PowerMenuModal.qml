@@ -175,6 +175,8 @@ DankModal {
         visibleActions = allActions.filter(action => {
             if (action === "hibernate" && !SessionService.hibernateSupported)
                 return false;
+            if (action === "softreboot" && !SessionService.softRebootSupported)
+                return false;
             return true;
         });
 
@@ -222,6 +224,12 @@ DankModal {
                 "icon": "restart_alt",
                 "label": I18n.tr("Reboot"),
                 "key": "R"
+            };
+        case "softreboot":
+            return {
+                "icon": "autorenew",
+                "label": I18n.tr("Soft Reboot"),
+                "key": "B"
             };
         case "logout":
             return {
@@ -370,7 +378,7 @@ DankModal {
 
     function handleListNavigation(event, isPressed) {
         if (!isPressed) {
-            if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_R || event.key === Qt.Key_X || event.key === Qt.Key_L || event.key === Qt.Key_S || event.key === Qt.Key_H || event.key === Qt.Key_D || (event.key === Qt.Key_P && !(event.modifiers & Qt.ControlModifier))) {
+            if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_R || event.key === Qt.Key_B || event.key === Qt.Key_X || event.key === Qt.Key_L || event.key === Qt.Key_S || event.key === Qt.Key_H || event.key === Qt.Key_D || (event.key === Qt.Key_P && !(event.modifiers & Qt.ControlModifier))) {
                 cancelHold();
                 event.accepted = true;
             }
@@ -429,6 +437,12 @@ DankModal {
                 event.accepted = true;
             }
             break;
+        case Qt.Key_B:
+            if (visibleActions.includes("softreboot")) {
+                startHold("softreboot", visibleActions.indexOf("softreboot"));
+                event.accepted = true;
+            }
+            break;
         case Qt.Key_X:
             if (visibleActions.includes("logout")) {
                 startHold("logout", visibleActions.indexOf("logout"));
@@ -464,7 +478,7 @@ DankModal {
 
     function handleGridNavigation(event, isPressed) {
         if (!isPressed) {
-            if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_R || event.key === Qt.Key_X || event.key === Qt.Key_L || event.key === Qt.Key_S || event.key === Qt.Key_H || event.key === Qt.Key_D || (event.key === Qt.Key_P && !(event.modifiers & Qt.ControlModifier))) {
+            if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_R || event.key === Qt.Key_B || event.key === Qt.Key_X || event.key === Qt.Key_L || event.key === Qt.Key_S || event.key === Qt.Key_H || event.key === Qt.Key_D || (event.key === Qt.Key_P && !(event.modifiers & Qt.ControlModifier))) {
                 cancelHold();
                 event.accepted = true;
             }
@@ -539,6 +553,12 @@ DankModal {
                 event.accepted = true;
             }
             break;
+        case Qt.Key_B:
+            if (visibleActions.includes("softreboot")) {
+                startHold("softreboot", visibleActions.indexOf("softreboot"));
+                event.accepted = true;
+            }
+            break;
         case Qt.Key_X:
             if (visibleActions.includes("logout")) {
                 startHold("logout", visibleActions.indexOf("logout"));
@@ -597,7 +617,7 @@ DankModal {
 
                         readonly property var actionData: root.getActionData(modelData)
                         readonly property bool isSelected: root.selectedIndex === index
-                        readonly property bool showWarning: modelData === "reboot" || modelData === "poweroff"
+                        readonly property bool showWarning: modelData === "reboot" || modelData === "softreboot" || modelData === "poweroff"
                         readonly property bool isHolding: root.holdActionIndex === index && root.holdProgress > 0
 
                         width: (root.modalWidth - Theme.spacingL * 2 - Theme.spacingS * (root.gridColumns - 1)) / root.gridColumns
@@ -627,7 +647,7 @@ DankModal {
                                 color: {
                                     if (gridButtonRect.modelData === "poweroff")
                                         return Theme.errorSelected;
-                                    if (gridButtonRect.modelData === "reboot")
+                                    if (gridButtonRect.modelData === "reboot" || gridButtonRect.modelData === "softreboot")
                                         return Theme.withAlpha(Theme.warning, 0.3);
                                     return Theme.primarySelected;
                                 }
@@ -722,7 +742,7 @@ DankModal {
 
                         readonly property var actionData: root.getActionData(modelData)
                         readonly property bool isSelected: root.selectedIndex === index
-                        readonly property bool showWarning: modelData === "reboot" || modelData === "poweroff"
+                        readonly property bool showWarning: modelData === "reboot" || modelData === "softreboot" || modelData === "poweroff"
                         readonly property bool isHolding: root.holdActionIndex === index && root.holdProgress > 0
 
                         width: parent.width
@@ -752,7 +772,7 @@ DankModal {
                                 color: {
                                     if (listButtonRect.modelData === "poweroff")
                                         return Theme.errorSelected;
-                                    if (listButtonRect.modelData === "reboot")
+                                    if (listButtonRect.modelData === "reboot" || listButtonRect.modelData === "softreboot")
                                         return Theme.withAlpha(Theme.warning, 0.3);
                                     return Theme.primarySelected;
                                 }
