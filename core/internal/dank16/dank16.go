@@ -313,6 +313,7 @@ func EnsureContrastDPSLstar(hexColor, hexBg string, minLc float64, isLightMode b
 	fg := HexToRGB(hexColor)
 	cf := colorful.Color{R: fg.R, G: fg.G, B: fg.B}
 	Lf, af, bf := cf.Lab()
+	Lf *= 100.0
 
 	dir := 1.0
 	if isLightMode {
@@ -341,6 +342,7 @@ func EnsureContrastDPSBidirectional(hexColor, hexBg string, minLc float64, isLig
 	fg := HexToRGB(hexColor)
 	cf := colorful.Color{R: fg.R, G: fg.G, B: fg.B}
 	origL, af, bf := cf.Lab()
+	origL *= 100.0
 
 	var darkerResult, lighterResult string
 	darkerL, lighterL := origL, origL
@@ -418,6 +420,24 @@ func blendHue(base, target, factor float64) float64 {
 		result -= 1.0
 	}
 	return result
+}
+
+// color8 sits a fixed L* offset from the background so it keeps its dim role
+// regardless of primary brightness (conventional palettes put ANSI bright
+// black ~2-2.5:1 from the background, e.g. catppuccin-mocha #585b70 on #1e1e2e)
+func DeriveDim(bgHex string, hue, sat float64, isLight bool) string {
+	offset := 22.0
+	if isLight {
+		offset = -offset
+	}
+
+	bgL := getLstar(bgHex)
+	targetL := math.Max(0, math.Min(100, bgL+offset))
+
+	tint := HSVToRGB(HSV{H: hue, S: sat, V: 0.5})
+	c := colorful.Color{R: tint.R, G: tint.G, B: tint.B}
+	_, af, bf := c.Lab()
+	return labToHex(targetL, af, bf)
 }
 
 func DeriveContainer(primary string, isLight bool) string {
@@ -500,10 +520,7 @@ func GeneratePalette(primaryColor string, opts PaletteOptions) Palette {
 		gray7V := baseVal * 0.28
 		palette.Color7 = NewColorInfo(ensureContrastAuto(RGBToHex(HSVToRGB(HSV{H: hsv.H, S: gray7S, V: gray7V})), bgColor, normalTextTarget, opts))
 
-		gray8S := baseSat * 0.05
-		gray8V := baseVal * 0.85
-		dimTarget := secondaryTarget * 0.5
-		palette.Color8 = NewColorInfo(ensureContrastBidirectional(RGBToHex(HSVToRGB(HSV{H: hsv.H, S: gray8S, V: gray8V})), bgColor, dimTarget, opts))
+		palette.Color8 = NewColorInfo(DeriveDim(bgColor, hsv.H, baseSat*0.05, true))
 
 		brightRedS := math.Min(baseSat*1.0, 1.0)
 		brightRedV := math.Min(baseVal*1.2, 1.0)
@@ -559,9 +576,7 @@ func GeneratePalette(primaryColor string, opts PaletteOptions) Palette {
 		gray7V := math.Min(baseVal*1.05, 1.0)
 		palette.Color7 = NewColorInfo(ensureContrastAuto(RGBToHex(HSVToRGB(HSV{H: hsv.H, S: gray7S, V: gray7V})), bgColor, normalTextTarget, opts))
 
-		gray8S := baseSat * 0.15
-		gray8V := baseVal * 0.65
-		palette.Color8 = NewColorInfo(ensureContrastAuto(RGBToHex(HSVToRGB(HSV{H: hsv.H, S: gray8S, V: gray8V})), bgColor, secondaryTarget, opts))
+		palette.Color8 = NewColorInfo(DeriveDim(bgColor, hsv.H, baseSat*0.15, false))
 
 		brightRedS := math.Min(baseSat*0.75, 1.0)
 		brightRedV := math.Min(baseVal*1.35, 1.0)
