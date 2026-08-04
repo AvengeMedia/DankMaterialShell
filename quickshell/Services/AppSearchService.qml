@@ -785,14 +785,22 @@ Singleton {
         if (category === I18n.tr("All"))
             return visibleApps;
 
-        const pluginItems = getPluginItems(category, "");
-        if (pluginItems.length > 0)
-            return pluginItems;
-
         return visibleApps.filter(app => {
             const appCategories = getCategoriesForApp(app);
             return appCategories.includes(category);
         });
+    }
+
+    function getPluginIdForCategory(category) {
+        if (typeof PluginService === "undefined")
+            return null;
+
+        const launchers = PluginService.getLauncherPlugins();
+        for (const pluginId in launchers) {
+            if ((launchers[pluginId].name || pluginId) === category)
+                return pluginId;
+        }
+        return null;
     }
 
     // Plugin launcher support functions
@@ -814,31 +822,19 @@ Singleton {
     }
 
     function getPluginCategoryIcon(category) {
-        if (typeof PluginService === "undefined")
+        const pluginId = getPluginIdForCategory(category);
+        if (!pluginId)
             return null;
 
-        const launchers = PluginService.getLauncherPlugins();
-        for (const pluginId in launchers) {
-            const plugin = launchers[pluginId];
-            if ((plugin.name || pluginId) === category) {
-                return plugin.icon || "extension";
-            }
-        }
-        return null;
+        return PluginService.getLauncherPlugins()[pluginId].icon || "extension";
     }
 
     function getPluginItems(category, query) {
-        if (typeof PluginService === "undefined")
+        const pluginId = getPluginIdForCategory(category);
+        if (!pluginId)
             return [];
 
-        const launchers = PluginService.getLauncherPlugins();
-        for (const pluginId in launchers) {
-            const plugin = launchers[pluginId];
-            if ((plugin.name || pluginId) === category) {
-                return getPluginItemsForPlugin(pluginId, query);
-            }
-        }
-        return [];
+        return getPluginItemsForPlugin(pluginId, query);
     }
 
     function getPluginItemsForPlugin(pluginId, query) {

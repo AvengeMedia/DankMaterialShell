@@ -819,16 +819,24 @@ Item {
             }
 
             if (isCategoryFiltered) {
-                var rawApps = AppSearchService.getAppsInCategory(appCategory);
-                for (var i = 0; i < rawApps.length; i++) {
-                    allItems.push(getOrTransformApp(rawApps[i]));
-                }
-                // Also include core apps (DMS Settings etc.) that match this category
-                var allCoreApps = AppSearchService.getCoreApps("");
-                for (var i = 0; i < allCoreApps.length; i++) {
-                    var coreAppCats = AppSearchService.getCategoriesForApp(allCoreApps[i]);
-                    if (coreAppCats.indexOf(appCategory) !== -1)
-                        allItems.push(transformCoreApp(allCoreApps[i]));
+                var categoryPluginId = AppSearchService.getPluginIdForCategory(appCategory);
+                if (categoryPluginId) {
+                    var pluginCategoryItems = getPluginItems(categoryPluginId, "");
+                    for (var i = 0; i < pluginCategoryItems.length; i++) {
+                        allItems.push(pluginCategoryItems[i]);
+                    }
+                } else {
+                    var rawApps = AppSearchService.getAppsInCategory(appCategory);
+                    for (var i = 0; i < rawApps.length; i++) {
+                        allItems.push(getOrTransformApp(rawApps[i]));
+                    }
+                    // Also include core apps (DMS Settings etc.) that match this category
+                    var allCoreApps = AppSearchService.getCoreApps("");
+                    for (var i = 0; i < allCoreApps.length; i++) {
+                        var coreAppCats = AppSearchService.getCategoriesForApp(allCoreApps[i]);
+                        if (coreAppCats.indexOf(appCategory) !== -1)
+                            allItems.push(transformCoreApp(allCoreApps[i]));
+                    }
                 }
             } else {
                 var apps = searchApps(searchQuery);
@@ -839,7 +847,7 @@ Item {
 
             var scoredItems = Scorer.scoreItems(allItems, searchQuery, getFrecencyForItem);
             var sortAlpha = !searchQuery && SettingsData.sortAppsAlphabetically;
-            var newSections = Scorer.groupBySection(scoredItems, sectionDefinitions, sortAlpha, searchQuery ? 50 : 500);
+            var newSections = Scorer.groupBySection(scoredItems, buildDynamicSectionDefs(allItems), sortAlpha, searchQuery ? 50 : 500);
 
             for (var sid in collapsedSections) {
                 for (var i = 0; i < newSections.length; i++) {
