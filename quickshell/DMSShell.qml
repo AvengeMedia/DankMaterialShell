@@ -982,6 +982,9 @@ Item {
                 case "reboot":
                     SessionService.reboot();
                     break;
+                case "softreboot":
+                    SessionService.softReboot();
+                    break;
                 case "poweroff":
                     SessionService.poweroff();
                     break;

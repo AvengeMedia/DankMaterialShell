@@ -400,8 +400,8 @@ Item {
                     settingKey: "powerMenuDefaultAction"
                     tags: ["power", "menu", "default", "action", "reboot", "logout", "shutdown"]
                     text: I18n.tr("Default selected action")
-                    options: [I18n.tr("Reboot"), I18n.tr("Log Out"), I18n.tr("Power Off"), I18n.tr("Lock"), I18n.tr("Suspend"), I18n.tr("Restart DMS"), I18n.tr("Hibernate")]
-                    property var actionValues: ["reboot", "logout", "poweroff", "lock", "suspend", "restart", "hibernate"]
+                    options: [I18n.tr("Reboot"), I18n.tr("Log Out"), I18n.tr("Power Off"), I18n.tr("Lock"), I18n.tr("Suspend"), I18n.tr("Restart DMS"), I18n.tr("Hibernate"), I18n.tr("Soft Reboot")]
+                    property var actionValues: ["reboot", "logout", "poweroff", "lock", "suspend", "restart", "hibernate", "softreboot"]
 
                     Component.onCompleted: {
                         const currentAction = SettingsData.powerMenuDefaultAction || "logout";
@@ -465,6 +465,12 @@ Item {
                                 label: I18n.tr("Show Hibernate"),
                                 desc: I18n.tr("Only visible if hibernate is supported by your system"),
                                 hibernate: true
+                            },
+                            {
+                                key: "softreboot",
+                                label: I18n.tr("Show Soft Reboot"),
+                                desc: I18n.tr("Restart userspace without rebooting the kernel, requires systemd"),
+                                softreboot: true
                             }
                         ]
 
@@ -474,7 +480,13 @@ Item {
                             tags: ["power", "menu", "action", "show", modelData.key]
                             text: modelData.label
                             description: modelData.desc || ""
-                            visible: !modelData.hibernate || SessionService.hibernateSupported
+                            visible: {
+                                if (modelData.hibernate)
+                                    return SessionService.hibernateSupported;
+                                if (modelData.softreboot)
+                                    return SessionService.softRebootSupported;
+                                return true;
+                            }
                             checked: SettingsData.powerMenuActions.includes(modelData.key)
                             onToggled: checked => {
                                 let actions = [...SettingsData.powerMenuActions];

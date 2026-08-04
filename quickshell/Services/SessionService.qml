@@ -17,6 +17,7 @@ Singleton {
     property bool loginctlCommandAvailable: false
     property bool systemctlCommandAvailable: false
     property bool hibernateSupported: false
+    readonly property bool softRebootSupported: systemctlCommandAvailable
     property bool inhibitorAvailable: true
     property bool idleInhibited: false
     property string inhibitReason: "Keep system awake"
@@ -450,6 +451,10 @@ Singleton {
         } else {
             Quickshell.execDetached(["sh", "-c", SettingsData.customPowerActionReboot]);
         }
+    }
+
+    function softReboot() {
+        Quickshell.execDetached(["systemctl", "soft-reboot"]);
     }
 
     function poweroff() {
