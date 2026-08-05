@@ -1111,15 +1111,50 @@ Singleton {
         }
     }
 
+    function extractNiriOutputBlocks(content) {
+        const blocks = [];
+        const headerRegex = /output\s+"([^"]+)"\s*\{/g;
+        let match;
+        while ((match = headerRegex.exec(content)) !== null) {
+            const start = headerRegex.lastIndex;
+            let depth = 1;
+            let i = start;
+            while (i < content.length && depth > 0) {
+                const ch = content[i];
+                if (ch === '{')
+                    depth++;
+                else if (ch === '}')
+                    depth--;
+                i++;
+            }
+            blocks.push({
+                "name": match[1],
+                "body": content.slice(start, i - 1)
+            });
+            headerRegex.lastIndex = i;
+        }
+        return blocks;
+    }
+
+    function stripNestedBlocks(body) {
+        let stripped = body;
+        let prev;
+        do {
+            prev = stripped;
+            stripped = stripped.replace(/[\w-]+\s*\{[^{}]*\}/g, "");
+        } while (stripped !== prev)
+        return stripped;
+    }
+
     function parseNiriOutputs(content) {
         const result = {};
-        const outputRegex = /output\s+"([^"]+)"\s*\{([^}]*)\}/g;
-        let match;
-        while ((match = outputRegex.exec(content)) !== null) {
-            const name = match[1];
-            const body = match[2];
+        for (const block of extractNiriOutputBlocks(content)) {
+            const name = block.name;
+            const body = block.body;
 
-            const disabled = /^\s*off\s*$/m.test(body);
+            // off marks the output disabled only at the top level of its block;
+            // nested sections like hot-corners { off } must not count (#2966)
+            const disabled = /^\s*off\s*$/m.test(stripNestedBlocks(body));
             const modeMatch = body.match(/mode\s+"(\d+)x(\d+)@([\d.]+)"/);
             const posMatch = body.match(/position\s+x=(-?\d+)\s+y=(-?\d+)/);
             const scaleMatch = body.match(/scale\s+([\d.]+)/);
