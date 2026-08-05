@@ -2023,18 +2023,6 @@ Item {
     }
 
     IpcHandler {
-        function findTrayItem(itemId: string): var {
-            if (!itemId)
-                return null;
-
-            return SystemTray.items.values.find(item => {
-                const id = item?.id || "";
-                const title = item?.tooltipTitle || "";
-                const fullKey = title ? `${id}::${title}` : id;
-                return fullKey === itemId || id === itemId;
-            });
-        }
-
         function list(): string {
             const items = SystemTray.items.values;
             if (items.length === 0)
@@ -2050,7 +2038,7 @@ Item {
         }
 
         function activate(itemId: string): string {
-            const item = findTrayItem(itemId);
+            const item = TrayMenuManager.findTrayItem(itemId);
             if (!item)
                 return `ERROR: Tray item not found: ${itemId}`;
 
@@ -2058,8 +2046,20 @@ Item {
             return `SUCCESS: Activated ${itemId}`;
         }
 
+        function menu(itemId: string): string {
+            const item = TrayMenuManager.findTrayItem(itemId);
+            if (!item)
+                return `ERROR: Tray item not found: ${itemId}`;
+
+            if (!item.hasMenu)
+                return `ERROR: Tray item has no menu: ${itemId}`;
+
+            TrayMenuManager.requestOpenMenu(itemId, BarWidgetService.getFocusedScreenName());
+            return `SUCCESS: Requested menu ${itemId}`;
+        }
+
         function status(itemId: string): string {
-            const item = findTrayItem(itemId);
+            const item = TrayMenuManager.findTrayItem(itemId);
             if (!item)
                 return `ERROR: Tray item not found: ${itemId}`;
 
