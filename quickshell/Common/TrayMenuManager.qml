@@ -22,6 +22,18 @@ Singleton {
         activeTrayMenus = newMenus
     }
 
+    function closeHoverMenus() {
+        for (const screenName in activeTrayMenus) {
+            const menu = activeTrayMenus[screenName]
+            if (!menu || menu.openedByHover !== true) continue
+            if (typeof menu.close === "function") {
+                menu.close()
+            } else if (menu.showMenu !== undefined) {
+                menu.showMenu = false
+            }
+        }
+    }
+
     function closeAllMenus() {
         for (const screenName in activeTrayMenus) {
             const menu = activeTrayMenus[screenName]
