@@ -609,7 +609,7 @@ Item {
         _closeHoverNotepad();
         activeHoverTrigger = "";
         PopoutManager.dismissHoverPopoutForScreen(barWindow?.screen);
-        TrayMenuManager.closeAllMenus();
+        TrayMenuManager.closeHoverMenus();
     }
 
     function _beginSupersededCloseForActive() {
