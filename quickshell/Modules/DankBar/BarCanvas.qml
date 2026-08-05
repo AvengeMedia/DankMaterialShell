@@ -201,7 +201,16 @@ Item {
         direction: root.effectiveShadowDirection
         fallbackOffset: 4
         targetRadius: root.rt
-        targetColor: barWindow._bgColor
+        // wing-side body corners are square where the gothic fillets attach;
+        // rounding the shadow there leaves a shadow-filled notch under the
+        // translucent bar fill (#2975)
+        topLeftRadius: root.gothEnabled && (root.isBottom || root.isRight) ? 0 : root.rt
+        topRightRadius: root.gothEnabled && (root.isBottom || root.isLeft) ? 0 : root.rt
+        bottomLeftRadius: root.gothEnabled && (root.isTop || root.isRight) ? 0 : root.rt
+        bottomRightRadius: root.gothEnabled && (root.isTop || root.isLeft) ? 0 : root.rt
+        // barShape below is the sole painter of the bar; a fill here doubles
+        // the alpha of translucent bars while the wings stay single-painted
+        targetColor: "transparent"
 
         shadowBlurPx: root.shadowBlurPx
         shadowOffsetX: root.shadowOffsetX
