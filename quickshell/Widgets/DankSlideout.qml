@@ -105,9 +105,11 @@ PanelWindow {
 
     readonly property bool slideoutBlurActive: root.visible && BlurService.enabled && Theme.connectedSurfaceBlurEnabled
 
+    readonly property string _slideoutScreenName: modelData?.name ?? ""
+
     WlrLayershell.layer: (!suppressOverlayLayer && (triggerUsesOverlayLayer || CompositorService.framePeerSurfacesUseOverlayForScreen(modelData))) ? WlrLayershell.Overlay : WlrLayershell.Top
     WlrLayershell.exclusiveZone: 0
-    WlrLayershell.keyboardFocus: isVisible ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
+    WlrLayershell.keyboardFocus: isVisible && !ModalManager.currentModalsByScreen[_slideoutScreenName] ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 
     readonly property real dpr: CompositorService.getScreenScale(root.screen)
     readonly property real alignedWidth: Theme.px(expandable && expandedWidth ? expandedWidthValue : slideoutWidth, dpr)
