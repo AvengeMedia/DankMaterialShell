@@ -1155,6 +1155,8 @@ Singleton {
                 return "Temperature must be between 2500K and 6000K";
 
             const rounded = Math.round(temp / 500) * 500;
+            if (rounded > SessionData.nightModeHighTemperature)
+                return "Night temperature must not exceed the day temperature (" + SessionData.nightModeHighTemperature + "K)";
             SessionData.setNightModeTemperature(rounded);
 
             if (root.nightModeEnabled) {
@@ -1184,6 +1186,8 @@ Singleton {
                 return "Temperature must be between 2500K and 6500K";
 
             const rounded = Math.round(temp / 500) * 500;
+            if (rounded < SessionData.nightModeTemperature)
+                return "Day temperature must be at least the night temperature (" + SessionData.nightModeTemperature + "K)";
             SessionData.setNightModeHighTemperature(rounded);
 
             if (root.nightModeEnabled && SessionData.nightModeAutoEnabled)

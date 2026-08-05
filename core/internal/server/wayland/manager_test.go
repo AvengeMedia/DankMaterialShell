@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	mocks_wlclient "github.com/AvengeMedia/DankMaterialShell/core/internal/mocks/wlclient"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wlr_gamma_control"
 )
 
 func TestManager_ActorSerializesOutputStateAccess(t *testing.T) {
@@ -411,4 +412,76 @@ func TestNewManager_InvalidConfig(t *testing.T) {
 
 	_, err := NewManager(mockDisplay, config)
 	assert.Error(t, err)
+}
+
+func TestSetters_RejectedValuesLeaveConfigUntouched(t *testing.T) {
+	newManager := func() *Manager {
+		return &Manager{
+			config:        DefaultConfig(),
+			updateTrigger: make(chan struct{}, 1),
+		}
+	}
+
+	t.Run("SetTemperature", func(t *testing.T) {
+		m := newManager()
+		before := m.config
+
+		err := m.SetTemperature(3200, 2500)
+		assert.Error(t, err)
+		assert.Equal(t, before, m.config)
+		assert.Empty(t, m.updateTrigger)
+	})
+
+	t.Run("SetLocation", func(t *testing.T) {
+		m := newManager()
+		before := m.config
+
+		err := m.SetLocation(120.0, 10.0)
+		assert.Error(t, err)
+		assert.Equal(t, before, m.config)
+		assert.Empty(t, m.updateTrigger)
+	})
+
+	t.Run("SetGamma", func(t *testing.T) {
+		m := newManager()
+		before := m.config
+
+		err := m.SetGamma(-1.0)
+		assert.Error(t, err)
+		assert.Equal(t, before, m.config)
+		assert.Empty(t, m.updateTrigger)
+	})
+}
+
+func TestSetters_ValidValuesCommitAndTrigger(t *testing.T) {
+	m := &Manager{
+		config:        DefaultConfig(),
+		updateTrigger: make(chan struct{}, 1),
+	}
+
+	err := m.SetTemperature(3000, 6000)
+	assert.NoError(t, err)
+	assert.Equal(t, 3000, m.config.LowTemp)
+	assert.Equal(t, 6000, m.config.HighTemp)
+	assert.Len(t, m.updateTrigger, 1)
+}
+
+func TestApplyGamma_SkipsUnchangedTempAndGamma(t *testing.T) {
+	m := &Manager{config: DefaultConfig()}
+	m.controlsInitialized = true
+
+	out := &outputState{
+		id:           1,
+		rampSize:     256,
+		gammaControl: &wlr_gamma_control.ZwlrGammaControlV1{},
+		lastTemp:     5000,
+		lastGamma:    m.config.Gamma,
+	}
+	m.outputs.Store(out.id, out)
+
+	m.applyGamma(5000)
+
+	assert.False(t, out.failed, "unchanged temp must not reach the compositor write path")
+	assert.Equal(t, 5000, out.lastTemp)
+	assert.Equal(t, uint32(256), out.rampSize)
 }
