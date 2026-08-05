@@ -148,6 +148,7 @@ Singleton {
     property var includedTransitions: availableWallpaperTransitions.filter(t => t !== "none")
 
     property bool wallpaperCyclingEnabled: false
+    property bool wallpaperCyclingRandom: false
     property string wallpaperCyclingMode: "interval"
     property int wallpaperCyclingInterval: 300
     property string wallpaperCyclingTime: "06:00"
@@ -646,6 +647,11 @@ Singleton {
         saveSettings();
     }
 
+    function setWallpaperCyclingRandom(random) {
+        wallpaperCyclingRandom = random;
+        saveSettings();
+    }
+
     function setWallpaperCyclingMode(mode) {
         wallpaperCyclingMode = mode;
         saveSettings();
@@ -688,6 +694,37 @@ Singleton {
 
         newSettings[identifier] = getMonitorCyclingSettings(screenName);
         newSettings[identifier].enabled = enabled;
+        monitorCyclingSettings = newSettings;
+        saveSettings();
+    }
+
+    function setMonitorCyclingRandom(screenName, random) {
+        var screen = null;
+        var screens = Quickshell.screens;
+        for (var i = 0; i < screens.length; i++) {
+            if (screens[i].name === screenName) {
+                screen = screens[i];
+                break;
+            }
+        }
+
+        if (!screen) {
+            log.warn("Screen not found");
+            return;
+        }
+
+        var identifier = typeof SettingsData !== "undefined" ? SettingsData.getScreenDisplayName(screen) : screen.name;
+
+        var newSettings = {};
+        for (var key in monitorCyclingSettings) {
+            var isThisScreen = key === screen.name || (screen.model && key === screen.model);
+            if (!isThisScreen) {
+                newSettings[key] = monitorCyclingSettings[key];
+            }
+        }
+
+        newSettings[identifier] = getMonitorCyclingSettings(screenName);
+        newSettings[identifier].random = random;
         monitorCyclingSettings = newSettings;
         saveSettings();
     }
@@ -1322,6 +1359,7 @@ Singleton {
     function getMonitorCyclingSettings(screenName) {
         var defaults = {
             "enabled": false,
+            "random": false,
             "mode": "interval",
             "interval": 300,
             "time": "06:00"

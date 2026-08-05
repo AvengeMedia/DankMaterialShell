@@ -19,6 +19,7 @@ var SPEC = {
     includedTransitions: { def: ["fade", "wipe", "disc", "stripes", "iris bloom", "pixelate", "portal"] },
 
     wallpaperCyclingEnabled: { def: false },
+    wallpaperCyclingRandom: { def: false },
     wallpaperCyclingMode: { def: "interval" },
     wallpaperCyclingInterval: { def: 300 },
     wallpaperCyclingTime: { def: "06:00" },

@@ -231,11 +231,28 @@ Singleton {
         if (currentIndex === -1)
             currentIndex = 0;
 
-        let targetIndex;
-        if (goToPrevious) {
-            targetIndex = currentIndex === 0 ? wallpaperList.length - 1 : currentIndex - 1;
+        let isRandom = false;
+        if (targetScreenName) {
+            isRandom = !!SessionData.getMonitorCyclingSettings(targetScreenName).random;
         } else {
-            targetIndex = (currentIndex + 1) % wallpaperList.length;
+            isRandom = !!SessionData.wallpaperCyclingRandom;
+        }
+
+        let targetIndex;
+        if (isRandom) {
+            if (wallpaperList.length > 1) {
+                do {
+                    targetIndex = Math.floor(Math.random() * wallpaperList.length);
+                } while (targetIndex === currentIndex);
+            } else {
+                targetIndex = 0;
+            }
+        } else {
+            if (goToPrevious) {
+                targetIndex = currentIndex === 0 ? wallpaperList.length - 1 : currentIndex - 1;
+            } else {
+                targetIndex = (currentIndex + 1) % wallpaperList.length;
+            }
         }
         const targetWallpaper = wallpaperList[targetIndex];
         if (!targetWallpaper || targetWallpaper === currentPath)
