@@ -759,6 +759,9 @@ func (m *Manager) schedulerLoop() {
 
 		now := time.Now()
 		m.recalcSchedule(now)
+		// publish independent of output readiness so night status never
+		// presents a stale schedule while applies are blocked (#2967)
+		m.updateStateFromSchedule()
 
 		waitDur := 24 * time.Hour
 		if enabled {
@@ -1104,13 +1107,15 @@ func (m *Manager) SetTemperature(low, high int) error {
 		m.configMutex.Unlock()
 		return nil
 	}
-	m.config.LowTemp = low
-	m.config.HighTemp = high
-	err := m.config.Validate()
-	m.configMutex.Unlock()
-	if err != nil {
+	updated := m.config
+	updated.LowTemp = low
+	updated.HighTemp = high
+	if err := updated.Validate(); err != nil {
+		m.configMutex.Unlock()
 		return err
 	}
+	m.config = updated
+	m.configMutex.Unlock()
 	m.triggerUpdate()
 	return nil
 }
@@ -1122,14 +1127,16 @@ func (m *Manager) SetLocation(lat, lon float64) error {
 		m.configMutex.Unlock()
 		return nil
 	}
-	m.config.Latitude = &lat
-	m.config.Longitude = &lon
-	m.config.UseIPLocation = false
-	err := m.config.Validate()
-	m.configMutex.Unlock()
-	if err != nil {
+	updated := m.config
+	updated.Latitude = &lat
+	updated.Longitude = &lon
+	updated.UseIPLocation = false
+	if err := updated.Validate(); err != nil {
+		m.configMutex.Unlock()
 		return err
 	}
+	m.config = updated
+	m.configMutex.Unlock()
 	m.triggerUpdate()
 	return nil
 }
@@ -1164,13 +1171,15 @@ func (m *Manager) SetManualTimes(sunrise, sunset time.Time) error {
 		m.configMutex.Unlock()
 		return nil
 	}
-	m.config.ManualSunrise = &sunrise
-	m.config.ManualSunset = &sunset
-	err := m.config.Validate()
-	m.configMutex.Unlock()
-	if err != nil {
+	updated := m.config
+	updated.ManualSunrise = &sunrise
+	updated.ManualSunset = &sunset
+	if err := updated.Validate(); err != nil {
+		m.configMutex.Unlock()
 		return err
 	}
+	m.config = updated
+	m.configMutex.Unlock()
 	m.triggerUpdate()
 	return nil
 }
@@ -1193,12 +1202,14 @@ func (m *Manager) SetGamma(gamma float64) error {
 		m.configMutex.Unlock()
 		return nil
 	}
-	m.config.Gamma = gamma
-	err := m.config.Validate()
-	m.configMutex.Unlock()
-	if err != nil {
+	updated := m.config
+	updated.Gamma = gamma
+	if err := updated.Validate(); err != nil {
+		m.configMutex.Unlock()
 		return err
 	}
+	m.config = updated
+	m.configMutex.Unlock()
 	m.triggerUpdate()
 	return nil
 }
