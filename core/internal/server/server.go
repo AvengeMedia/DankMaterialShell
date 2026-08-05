@@ -1183,6 +1183,38 @@ func handleSubscribe(conn *models.Conn, req models.Request) {
 		}()
 	}
 
+	if shouldSubscribe("location") && locationManager != nil {
+		wg.Add(1)
+		locationChan := locationManager.Subscribe(clientID + "-location")
+		go func() {
+			defer wg.Done()
+			defer locationManager.Unsubscribe(clientID + "-location")
+
+			initialState := locationManager.GetState()
+			select {
+			case eventChan <- ServiceEvent{Service: "location", Data: initialState}:
+			case <-stopChan:
+				return
+			}
+
+			for {
+				select {
+				case state, ok := <-locationChan:
+					if !ok {
+						return
+					}
+					select {
+					case eventChan <- ServiceEvent{Service: "location", Data: state}:
+					case <-stopChan:
+						return
+					}
+				case <-stopChan:
+					return
+				}
+			}
+		}()
+	}
+
 	if shouldSubscribe("sysupdate") && sysUpdateManager != nil {
 		wg.Add(1)
 		sysupdateChan := sysUpdateManager.Subscribe(clientID + "-sysupdate")
