@@ -487,39 +487,8 @@ Singleton {
         return pamFprintDetected ? "probe_failed" : "missing_pam_support";
     }
 
-    // --- Qt tools detection ---
-
-    function detectQtTools() {
-        qtToolsDetectionProcess.running = true;
-    }
-
     function checkPluginSettings() {
         pluginSettingsCheckProcess.running = true;
-    }
-
-    property var qtToolsDetectionProcess: Process {
-        command: ["sh", "-c", "echo -n 'qt5ct:'; command -v qt5ct >/dev/null && echo 'true' || echo 'false'; echo -n 'qt6ct:'; command -v qt6ct >/dev/null && echo 'true' || echo 'false'; echo -n 'gtk:'; (command -v gsettings >/dev/null || command -v dconf >/dev/null) && echo 'true' || echo 'false'"]
-        running: false
-
-        stdout: StdioCollector {
-            onStreamFinished: {
-                if (!settingsRoot)
-                    return;
-                if (text && text.trim()) {
-                    const lines = text.trim().split("\n");
-                    for (let i = 0; i < lines.length; i++) {
-                        const line = lines[i];
-                        if (line.startsWith("qt5ct:")) {
-                            settingsRoot.qt5ctAvailable = line.split(":")[1] === "true";
-                        } else if (line.startsWith("qt6ct:")) {
-                            settingsRoot.qt6ctAvailable = line.split(":")[1] === "true";
-                        } else if (line.startsWith("gtk:")) {
-                            settingsRoot.gtkAvailable = line.split(":")[1] === "true";
-                        }
-                    }
-                }
-            }
-        }
     }
 
     Timer {

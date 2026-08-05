@@ -659,9 +659,6 @@ Singleton {
     readonly property string iconTheme: resolveIconTheme()
     property var availableIconThemes: ["System Default"]
     property string systemDefaultIconTheme: ""
-    property bool qt5ctAvailable: false
-    property bool qt6ctAvailable: false
-    property bool gtkAvailable: false
 
     property var cursorSettings: ({
             "theme": "System Default",
@@ -798,8 +795,6 @@ Singleton {
     property int fadeToDpmsGracePeriod: 5
     property string launchPrefix: ""
 
-    property bool gtkThemingEnabled: false
-    property bool qtThemingEnabled: false
     property bool syncModeWithPortal: true
     property bool terminalsAlwaysDark: false
 
@@ -1685,7 +1680,6 @@ Singleton {
             _hasLoaded = true;
             applyStoredTheme();
             updateCompositorCursor();
-            Processes.detectQtTools();
             Qt.callLater(checkIconThemeDrift);
 
             _checkSettingsWritable();

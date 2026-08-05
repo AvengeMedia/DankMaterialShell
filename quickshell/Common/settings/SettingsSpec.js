@@ -298,9 +298,6 @@ var SPEC = {
     lastAppliedIconTheme: { def: "" },
     availableIconThemes: { def: ["System Default"], persist: false },
     systemDefaultIconTheme: { def: "", persist: false },
-    qt5ctAvailable: { def: false, persist: false },
-    qt6ctAvailable: { def: false, persist: false },
-    gtkAvailable: { def: false, persist: false },
 
     cursorSettings: { def: { theme: "System Default", size: 24, niri: { hideWhenTyping: false, hideAfterInactiveMs: 0 }, hyprland: { hideOnKeyPress: false, hideOnTouch: false, inactiveTimeout: 0 }, dwl: { cursorHideTimeout: 0 }, mango: { cursorHideTimeout: 0 } }, onChange: "updateCompositorCursor" },
     availableCursorThemes: { def: ["System Default"], persist: false },
@@ -374,8 +371,6 @@ var SPEC = {
     fadeToDpmsGracePeriod: { def: 5 },
     launchPrefix: { def: "" },
 
-    gtkThemingEnabled: { def: false, onChange: "regenSystemThemes" },
-    qtThemingEnabled: { def: false, onChange: "regenSystemThemes" },
     syncModeWithPortal: { def: true },
     terminalsAlwaysDark: { def: false, onChange: "regenSystemThemes" },
 

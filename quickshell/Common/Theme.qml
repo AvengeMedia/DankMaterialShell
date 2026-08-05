@@ -96,8 +96,6 @@ Singleton {
     }
 
     property bool matugenAvailable: false
-    property bool gtkThemingEnabled: typeof SettingsData !== "undefined" ? SettingsData.gtkAvailable : false
-    property bool qtThemingEnabled: typeof SettingsData !== "undefined" ? (SettingsData.qt5ctAvailable || SettingsData.qt6ctAvailable) : false
     property var workerRunning: false
     property var pendingThemeRequest: null
 
