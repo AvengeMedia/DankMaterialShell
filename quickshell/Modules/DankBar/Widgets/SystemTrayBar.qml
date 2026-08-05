@@ -86,9 +86,12 @@ BasePill {
     Connections {
         target: TrayMenuManager
 
-        function onOpenTrayMenuRequested(itemId) {
-            const item = TrayMenuManager.findTrayItem(itemId);
+        function onOpenTrayMenuRequested() {
+            const request = TrayMenuManager.claimMenuRequest(root.parentScreen?.name);
+            if (!request)
+                return;
 
+            const item = TrayMenuManager.findTrayItem(request.itemId);
             if (!item || !item.hasMenu)
                 return;
 

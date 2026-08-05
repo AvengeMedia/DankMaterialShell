@@ -2054,7 +2054,7 @@ Item {
             if (!item.hasMenu)
                 return `ERROR: Tray item has no menu: ${itemId}`;
 
-            TrayMenuManager.openTrayMenuRequested(itemId);
+            TrayMenuManager.requestOpenMenu(itemId, BarWidgetService.getFocusedScreenName());
             return `SUCCESS: Requested menu ${itemId}`;
         }
 
