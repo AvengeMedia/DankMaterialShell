@@ -129,6 +129,13 @@ DankModal {
             switchUserRequested();
             return;
         }
+        if (action.startsWith("custom:")) {
+            const button = (SettingsData.customPowerButtons || [])[parseInt(action.slice(7), 10)];
+            close();
+            if (button?.command)
+                Quickshell.execDetached(["sh", "-c", button.command]);
+            return;
+        }
         close();
         root.powerActionRequested(action, "", "");
     }
@@ -172,13 +179,14 @@ DankModal {
 
     function updateVisibleActions() {
         const allActions = SettingsData.powerMenuActions || ["reboot", "logout", "poweroff", "lock", "suspend", "restart"];
+        const customButtons = SettingsData.customPowerButtons || [];
         visibleActions = allActions.filter(action => {
             if (action === "hibernate" && !SessionService.hibernateSupported)
                 return false;
             if (action === "softreboot" && !SessionService.softRebootSupported)
                 return false;
             return true;
-        });
+        }).concat(customButtons.map((button, i) => "custom:" + i));
 
         if (!SettingsData.powerMenuGridLayout)
             return;
@@ -218,6 +226,14 @@ DankModal {
     }
 
     function getActionData(action) {
+        if (action.startsWith("custom:")) {
+            const button = (SettingsData.customPowerButtons || [])[parseInt(action.slice(7), 10)];
+            return {
+                "icon": button?.icon || "terminal",
+                "label": button?.label || button?.command || "",
+                "key": ""
+            };
+        }
         switch (action) {
         case "reboot":
             return {
@@ -688,6 +704,7 @@ DankModal {
                                 height: 16
                                 radius: 4
                                 color: Theme.onSurface_12
+                                visible: gridButtonRect.actionData.key !== ""
                                 anchors.horizontalCenter: parent.horizontalCenter
 
                                 StyledText {
@@ -820,6 +837,7 @@ DankModal {
                             height: 20
                             radius: 4
                             color: Theme.onSurface_12
+                            visible: listButtonRect.actionData.key !== ""
                             anchors {
                                 right: parent.right
                                 rightMargin: Theme.spacingM

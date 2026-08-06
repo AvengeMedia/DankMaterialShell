@@ -973,6 +973,7 @@ Singleton {
     property string customPowerActionHibernate: ""
     property string customPowerActionReboot: ""
     property string customPowerActionPowerOff: ""
+    property var customPowerButtons: []
 
     property bool updaterHideWidget: false
     property bool updaterCheckOnStart: false
