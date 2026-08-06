@@ -1,103 +1,14 @@
-import QtCore
 import QtQuick
 import qs.Common
 import qs.Services
 import qs.Widgets
 import qs.Modules.Settings.Widgets
-import "../../Common/ConfigIncludeResolve.js" as ConfigIncludeResolve
 
 Item {
     id: root
 
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
-
-    property var inputIncludeStatus: ({
-            "exists": false,
-            "included": false,
-            "configFormat": "",
-            "readOnly": false
-        })
-    property bool checkingInclude: false
-    property bool fixingInclude: false
-
-    function getInputConfigPaths() {
-        const configDir = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
-        if (CompositorService.compositor !== "niri")
-            return null;
-        return {
-            "configFile": configDir + "/niri/config.kdl",
-            "layoutFile": configDir + "/niri/dms/input.kdl",
-            "grepPattern": 'include.*"dms/input.kdl"',
-            "includeLine": 'include "dms/input.kdl"'
-        };
-    }
-
-    function checkInputIncludeStatus() {
-        if (CompositorService.compositor !== "niri") {
-            inputIncludeStatus = {
-                "exists": false,
-                "included": false,
-                "configFormat": "",
-                "readOnly": false
-            };
-            return;
-        }
-
-        checkingInclude = true;
-        Proc.runCommand("check-input-include", [Proc.dmsBin, "config", "resolve-include", "niri", "input.kdl"], (output, exitCode) => {
-            checkingInclude = false;
-            if (exitCode !== 0) {
-                inputIncludeStatus = {
-                    "exists": false,
-                    "included": false,
-                    "configFormat": "",
-                    "readOnly": false
-                };
-                return;
-            }
-            try {
-                inputIncludeStatus = JSON.parse(output.trim());
-            } catch (e) {
-                inputIncludeStatus = {
-                    "exists": false,
-                    "included": false,
-                    "configFormat": "",
-                    "readOnly": false
-                };
-            }
-        });
-    }
-
-    function fixInputInclude() {
-        const paths = getInputConfigPaths();
-        if (!paths)
-            return;
-
-        fixingInclude = true;
-        const unixTime = Math.floor(Date.now() / 1000);
-        const backupFile = paths.configFile + ".backup" + unixTime;
-        const script = ConfigIncludeResolve.buildRepairScript({
-            configFile: paths.configFile,
-            backupFile: backupFile,
-            fragmentFile: paths.layoutFile,
-            grepPattern: paths.grepPattern,
-            includeLine: paths.includeLine
-        });
-        Proc.runCommand("fix-input-include", ["sh", "-c", script], (output, exitCode) => {
-            fixingInclude = false;
-            if (exitCode !== 0)
-                return;
-            checkInputIncludeStatus();
-            SettingsData.updateCompositorInput();
-        });
-    }
-
-    Component.onCompleted: {
-        if (CompositorService.isNiri) {
-            checkInputIncludeStatus();
-        }
-    }
 
     DankFlickable {
         anchors.fill: parent
@@ -113,67 +24,8 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             spacing: Theme.spacingXL
 
-            StyledRect {
-                id: warningBox
+            NiriInputSetupBanner {
                 width: parent.width
-                height: warningContent.implicitHeight + Theme.spacingL * 2
-                radius: Theme.cornerRadius
-
-                readonly property bool showSetup: !root.inputIncludeStatus.included
-
-                color: showSetup ? Theme.withAlpha(Theme.primary, 0.15) : Theme.withAlpha(Theme.primary, 0)
-                border.color: showSetup ? Theme.withAlpha(Theme.primary, 0.3) : Theme.withAlpha(Theme.primary, 0)
-                border.width: 1
-                visible: showSetup && !root.checkingInclude && CompositorService.isNiri
-
-                Row {
-                    id: warningContent
-                    anchors.fill: parent
-                    anchors.margins: Theme.spacingL
-                    spacing: Theme.spacingM
-
-                    DankIcon {
-                        name: "warning"
-                        size: Theme.iconSize
-                        color: Theme.primary
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-
-                    Column {
-                        width: parent.width - Theme.iconSize - (fixButton.visible ? fixButton.width + Theme.spacingM : 0) - Theme.spacingM
-                        spacing: Theme.spacingXS
-                        anchors.verticalCenter: parent.verticalCenter
-
-                        StyledText {
-                            text: I18n.tr("First Time Setup")
-                            font.pixelSize: Theme.fontSizeMedium
-                            font.weight: Font.Medium
-                            color: Theme.primary
-                            width: parent.width
-                            horizontalAlignment: Text.AlignLeft
-                        }
-
-                        StyledText {
-                            text: I18n.tr("Click 'Setup' to create %1 and add include to your compositor config.").arg("dms/input")
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceVariantText
-                            wrapMode: Text.WordWrap
-                            width: parent.width
-                            horizontalAlignment: Text.AlignLeft
-                        }
-                    }
-
-                    DankButton {
-                        id: fixButton
-                        visible: warningBox.showSetup
-                        text: root.fixingInclude ? I18n.tr("Setting up...") : I18n.tr("Setup")
-                        backgroundColor: Theme.primary
-                        textColor: Theme.primaryText
-                        enabled: !root.fixingInclude
-                        anchors.verticalCenter: parent.verticalCenter
-                        onClicked: root.fixInputInclude()
-                    }
-                }
             }
 
             SettingsCard {
@@ -212,12 +64,15 @@ Item {
                     description: I18n.tr("Flat uses constant speed; Adaptive scales with movement speed")
                     model: [I18n.tr("Default"), I18n.tr("Flat"), I18n.tr("Adaptive")]
                     currentIndex: {
-                        if (SettingsData.mouseAccelProfile === "flat") return 1;
-                        if (SettingsData.mouseAccelProfile === "adaptive") return 2;
+                        if (SettingsData.mouseAccelProfile === "flat")
+                            return 1;
+                        if (SettingsData.mouseAccelProfile === "adaptive")
+                            return 2;
                         return 0;
                     }
                     onSelectionChanged: (index, selected) => {
-                        if (!selected) return;
+                        if (!selected)
+                            return;
                         const profiles = ["default", "flat", "adaptive"];
                         SettingsData.set("mouseAccelProfile", profiles[index]);
                     }
@@ -252,12 +107,15 @@ Item {
                     description: I18n.tr("Choose when to generate scrolling events")
                     model: [I18n.tr("Default"), I18n.tr("No Scroll"), I18n.tr("On Button Down")]
                     currentIndex: {
-                        if (SettingsData.mouseScrollMethod === "no-scroll") return 1;
-                        if (SettingsData.mouseScrollMethod === "on-button-down") return 2;
+                        if (SettingsData.mouseScrollMethod === "no-scroll")
+                            return 1;
+                        if (SettingsData.mouseScrollMethod === "on-button-down")
+                            return 2;
                         return 0;
                     }
                     onSelectionChanged: (index, selected) => {
-                        if (!selected) return;
+                        if (!selected)
+                            return;
                         const methods = ["default", "no-scroll", "on-button-down"];
                         SettingsData.set("mouseScrollMethod", methods[index]);
                     }
@@ -327,12 +185,15 @@ Item {
                     description: I18n.tr("Flat uses constant speed; Adaptive scales with movement speed")
                     model: [I18n.tr("Default"), I18n.tr("Flat"), I18n.tr("Adaptive")]
                     currentIndex: {
-                        if (SettingsData.touchpadAccelProfile === "flat") return 1;
-                        if (SettingsData.touchpadAccelProfile === "adaptive") return 2;
+                        if (SettingsData.touchpadAccelProfile === "flat")
+                            return 1;
+                        if (SettingsData.touchpadAccelProfile === "adaptive")
+                            return 2;
                         return 0;
                     }
                     onSelectionChanged: (index, selected) => {
-                        if (!selected) return;
+                        if (!selected)
+                            return;
                         const profiles = ["default", "flat", "adaptive"];
                         SettingsData.set("touchpadAccelProfile", profiles[index]);
                     }
@@ -367,14 +228,19 @@ Item {
                     description: I18n.tr("Choose when to generate scrolling events")
                     model: [I18n.tr("Default"), I18n.tr("Two Finger"), I18n.tr("Edge"), I18n.tr("No Scroll"), I18n.tr("On Button Down")]
                     currentIndex: {
-                        if (SettingsData.touchpadScrollMethod === "two-finger") return 1;
-                        if (SettingsData.touchpadScrollMethod === "edge") return 2;
-                        if (SettingsData.touchpadScrollMethod === "no-scroll") return 3;
-                        if (SettingsData.touchpadScrollMethod === "on-button-down") return 4;
+                        if (SettingsData.touchpadScrollMethod === "two-finger")
+                            return 1;
+                        if (SettingsData.touchpadScrollMethod === "edge")
+                            return 2;
+                        if (SettingsData.touchpadScrollMethod === "no-scroll")
+                            return 3;
+                        if (SettingsData.touchpadScrollMethod === "on-button-down")
+                            return 4;
                         return 0;
                     }
                     onSelectionChanged: (index, selected) => {
-                        if (!selected) return;
+                        if (!selected)
+                            return;
                         const methods = ["default", "two-finger", "edge", "no-scroll", "on-button-down"];
                         SettingsData.set("touchpadScrollMethod", methods[index]);
                     }

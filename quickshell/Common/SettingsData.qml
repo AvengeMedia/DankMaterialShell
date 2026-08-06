@@ -203,14 +203,14 @@ Singleton {
     property bool touchpadTapAndDrag: true
     property bool touchpadTapToClick: true
 
-    property string keyboardLayouts: "us"
+    property string keyboardLayouts: ""
     property string keyboardVariants: ""
     property string keyboardModel: ""
-    property string keyboardOptions: "grp:alt_shift_toggle"
+    property string keyboardOptions: ""
     property string keyboardKeymapFile: ""
-    property string keyboardTrackLayout: "global"
-    property int keyboardRepeatDelay: 600
-    property int keyboardRepeatRate: 25
+    property string keyboardTrackLayout: ""
+    property int keyboardRepeatDelay: 0
+    property int keyboardRepeatRate: 0
     property bool keyboardNumlock: false
 
     property int firstDayOfWeek: -1

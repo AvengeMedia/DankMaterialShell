@@ -135,10 +135,14 @@ TAB_INDEX_MAP = {
     "UsersTab.qml": 35,
     "AutoStartTab.qml": 36,
     "BatteryTab.qml": 42,
+    "MouseTouchpadTab.qml": 44,
+    "KeyboardTab.qml": 45,
 }
 
 FILE_CONDITION_MAP = {
     "GreeterTab.qml": "greeterAvailable",
+    "MouseTouchpadTab.qml": "isNiri",
+    "KeyboardTab.qml": "isNiri",
 }
 
 TAB_CATEGORY_MAP = {
@@ -185,6 +189,8 @@ TAB_CATEGORY_MAP = {
     41: "Network",
     42: "Power & Security",
     43: "Dank Dash",
+    44: "System",
+    45: "System",
 }
 
 SEARCHABLE_COMPONENTS = [

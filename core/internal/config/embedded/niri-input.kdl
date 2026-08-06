@@ -12,11 +12,4 @@ input {
         accel-speed 0.0
         natural-scroll
     }
-    keyboard {
-        xkb {
-            layout "us"
-            options "grp:alt_shift_toggle"
-        }
-        track-layout "global"
-    }
 }
