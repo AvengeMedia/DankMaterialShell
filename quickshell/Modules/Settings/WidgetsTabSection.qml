@@ -18,6 +18,8 @@ Column {
         id: sharedTooltip
     }
 
+    Component.onDestruction: sharedTooltip.hide()
+
     signal itemEnabledChanged(string sectionId, string itemId, bool enabled)
     signal itemOrderChanged(string sectionId, var orderedIds)
     signal addWidget(string sectionId)
@@ -1215,6 +1217,7 @@ Column {
                             iconSize: 18
                             iconColor: Theme.error
                             onClicked: {
+                                sharedTooltip.hide();
                                 root.removeWidget(root.sectionId, index);
                             }
                             onEntered: {
