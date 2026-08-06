@@ -7,6 +7,7 @@ Item {
 
     property string source: ""
     property int glyphSize: 14
+    property bool badgeVisible: true
 
     readonly property var sourceAsset: ({
             "flatpak": "../../assets/package-sources/flatpak.svg",
@@ -17,7 +18,7 @@ Item {
 
     readonly property string assetPath: sourceAsset[source] || ""
 
-    visible: SettingsData.dankLauncherV2ShowSourceBadges && assetPath.length > 0
+    visible: badgeVisible && SettingsData.dankLauncherV2ShowSourceBadges && assetPath.length > 0
     implicitWidth: glyphSize
     implicitHeight: glyphSize
 
