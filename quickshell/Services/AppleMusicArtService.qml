@@ -63,11 +63,11 @@ Singleton {
         return _artDir + "/" + Qt.md5(key) + ".mp4";
     }
 
-    // Disk cache first: a hit needs no network at all.
+    // Disk cache first: a hit needs no network; touching keeps _prune from evicting active covers.
     function _lookup() {
         const key = _cacheKey;
         const serial = _serial;
-        Proc.runCommand(null, ["sh", "-c", 'test -s "$1"', "sh", _artPath(key)], (output, exitCode) => {
+        Proc.runCommand(null, ["sh", "-c", 'test -s "$1" && touch "$1"', "sh", _artPath(key)], (output, exitCode) => {
             if (serial !== _serial)
                 return;
             if (exitCode === 0) {
@@ -78,6 +78,16 @@ Singleton {
         }, 50, 5000);
     }
 
+    // Bidirectional contains, so "Album" still matches "Album (Deluxe Edition)" either way round.
+    function _looseMatch(a, b) {
+        if (a === "" || b === "")
+            return false;
+        const la = a.toLowerCase();
+        const lb = b.toLowerCase();
+        return la.includes(lb) || lb.includes(la);
+    }
+
+    // US storefront only (search default and the catalog paths below); albums absent there become misses.
     function _search(key, serial) {
         const term = encodeURIComponent(_artist + " " + _album);
         Proc.runCommand(null, _curlCmd.concat(["https://itunes.apple.com/search?media=music&entity=album&limit=1&term=" + term]), (output, exitCode) => {
@@ -94,7 +104,8 @@ Singleton {
                 log.warn("itunes search parse failed");
                 return;
             }
-            if (!result || !result.collectionId) {
+            // A fuzzy first hit for a different record would cache the wrong video under this key.
+            if (!result || !result.collectionId || !_looseMatch(result.artistName || "", _artist) || !_looseMatch(result.collectionName || "", _album)) {
                 _store(key, serial, "");
                 return;
             }
@@ -169,31 +180,43 @@ Singleton {
         }, 50, 20000);
     }
 
-    // Highest-bandwidth avc1 rendition at or below 768px; hvc1 is skipped for decoder compatibility.
+    // Highest-bandwidth avc1 rendition at or below 768px, else the smallest one above;
+    // hvc1 is skipped for decoder compatibility.
     function _pickVariant(master) {
         const lines = master.split("\n");
         let best = null;
         let bestBw = -1;
+        let smallestOver = null;
+        let smallestOverW = Infinity;
         for (let i = 0; i < lines.length; i++) {
             const l = lines[i];
             if (!l.startsWith("#EXT-X-STREAM-INF:") || l.indexOf("avc1") === -1)
                 continue;
             const res = /RESOLUTION=(\d+)x/.exec(l);
-            if (!res || parseInt(res[1], 10) > 768)
+            if (!res)
                 continue;
             let j = i + 1;
             while (j < lines.length && (lines[j].startsWith("#") || lines[j].trim() === ""))
                 j++;
             if (j >= lines.length)
                 continue;
+            const uri = lines[j].trim();
+            const w = parseInt(res[1], 10);
+            if (w > 768) {
+                if (w < smallestOverW) {
+                    smallestOverW = w;
+                    smallestOver = uri;
+                }
+                continue;
+            }
             const bw = /AVERAGE-BANDWIDTH=(\d+)/.exec(l);
             const bwv = bw ? parseInt(bw[1], 10) : 0;
             if (bwv > bestBw) {
                 bestBw = bwv;
-                best = lines[j].trim();
+                best = uri;
             }
         }
-        return best;
+        return best || smallestOver;
     }
 
     // The rendition playlist is BYTERANGE segments over one progressive mp4 (EXT-X-MAP).
