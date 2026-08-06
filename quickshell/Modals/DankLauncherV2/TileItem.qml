@@ -178,7 +178,7 @@ Rectangle {
                 anchors.margins: Theme.spacingXS
                 source: root.item?.type === "app" ? (root.item.source || "") : ""
                 glyphSize: 16
-                visible: !root.isSelected && !!source
+                badgeVisible: !root.isSelected
             }
         }
     }
