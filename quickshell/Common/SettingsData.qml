@@ -203,6 +203,16 @@ Singleton {
     property bool touchpadTapAndDrag: true
     property bool touchpadTapToClick: true
 
+    property string keyboardLayouts: ""
+    property string keyboardVariants: ""
+    property string keyboardModel: ""
+    property string keyboardOptions: ""
+    property string keyboardKeymapFile: ""
+    property string keyboardTrackLayout: ""
+    property int keyboardRepeatDelay: 0
+    property int keyboardRepeatRate: 0
+    property bool keyboardNumlock: false
+
     property int firstDayOfWeek: -1
     property bool showWeekNumber: false
     property string calendarBackend: "auto"

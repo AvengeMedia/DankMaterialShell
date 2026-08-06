@@ -327,6 +327,13 @@ Rectangle {
                     "niriOnly": true
                 },
                 {
+                    "id": "keyboard",
+                    "text": I18n.tr("Keyboard"),
+                    "icon": "keyboard",
+                    "tabIndex": 45,
+                    "niriOnly": true
+                },
+                {
                     "id": "locale",
                     "text": I18n.tr("Locale"),
                     "icon": "language",

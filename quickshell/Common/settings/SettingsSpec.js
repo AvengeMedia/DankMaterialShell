@@ -57,6 +57,16 @@ var SPEC = {
     touchpadTapAndDrag: { def: true, onChange: "updateCompositorInput" },
     touchpadTapToClick: { def: true, onChange: "updateCompositorInput" },
 
+    keyboardLayouts: { def: "", onChange: "updateCompositorInput" },
+    keyboardVariants: { def: "", onChange: "updateCompositorInput" },
+    keyboardModel: { def: "", onChange: "updateCompositorInput" },
+    keyboardOptions: { def: "", onChange: "updateCompositorInput" },
+    keyboardKeymapFile: { def: "", onChange: "updateCompositorInput" },
+    keyboardTrackLayout: { def: "", onChange: "updateCompositorInput" },
+    keyboardRepeatDelay: { def: 0, onChange: "updateCompositorInput" },
+    keyboardRepeatRate: { def: 0, onChange: "updateCompositorInput" },
+    keyboardNumlock: { def: false, onChange: "updateCompositorInput" },
+
     firstDayOfWeek: { def: -1 },
     showWeekNumber: { def: false },
     calendarBackend: { def: "auto" },

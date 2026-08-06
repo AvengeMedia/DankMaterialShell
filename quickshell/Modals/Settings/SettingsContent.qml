@@ -733,5 +733,20 @@ FocusScope {
                     Qt.callLater(() => item.forceActiveFocus());
             }
         }
+
+        Loader {
+            id: keyboardLoader
+            anchors.fill: parent
+            active: root.currentIndex === 45
+            visible: active
+            focus: active
+
+            sourceComponent: KeyboardTab {}
+
+            onActiveChanged: {
+                if (active && item)
+                    Qt.callLater(() => item.forceActiveFocus());
+            }
+        }
     }
 }
