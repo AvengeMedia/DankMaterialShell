@@ -243,6 +243,16 @@ Item {
         }
     }
 
+    // Apple Music animated cover, layered over the static art which stays as fallback.
+    Loader {
+        width: albumSize
+        height: albumSize
+        anchors.centerIn: parent
+        z: 1
+        active: MultimediaService.available && root.onScreen && activePlayer?.playbackState === MprisPlaybackState.Playing && AppleMusicArtService.animatedArtUrl !== ""
+        source: "DankAnimatedAlbumArt.qml"
+    }
+
     // Outgoing art, shown on top only while fading out over the new mainArt.
     DankCircularImage {
         id: fadeArt
