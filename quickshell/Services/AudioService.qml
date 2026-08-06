@@ -243,9 +243,9 @@ Singleton {
                     continue;
                 const meta = match[3];
                 let availability = "unknown";
-                if (meta.includes("not available") || meta.includes("available: no"))
+                if (meta.includes("not available")
                     availability = "no";
-                else if (meta.includes("available: yes"))
+                else if (/\bavailable\b/.test(meta))
                     availability = "yes";
                 current.ports.push({
                     name: match[1],
