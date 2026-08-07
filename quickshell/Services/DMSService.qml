@@ -18,6 +18,7 @@ Singleton {
     readonly property int expectedApiVersion: 1
     property var availablePlugins: []
     property var installedPlugins: []
+    property var registries: []
     property var availableThemes: []
     property var installedThemes: []
     property bool isConnected: false
@@ -475,6 +476,44 @@ Singleton {
             }
             if (!response.error) {
                 listInstalled();
+            }
+        });
+    }
+
+    function listRegistries(callback) {
+        sendRequest("registries.list", null, response => {
+            if (response.result) {
+                registries = response.result;
+            }
+            if (callback) {
+                callback(response);
+            }
+        });
+    }
+
+    function addRegistry(name, url, callback) {
+        sendRequest("registries.add", {
+            "name": name,
+            "url": url
+        }, response => {
+            if (callback) {
+                callback(response);
+            }
+            if (!response.error) {
+                listRegistries();
+            }
+        });
+    }
+
+    function removeRegistry(name, callback) {
+        sendRequest("registries.remove", {
+            "name": name
+        }, response => {
+            if (callback) {
+                callback(response);
+            }
+            if (!response.error) {
+                listRegistries();
             }
         });
     }

@@ -330,6 +330,134 @@ FocusScope {
 
             StyledRect {
                 width: parent.width
+                height: registriesColumn.implicitHeight + Theme.spacingL * 2
+                radius: Theme.cornerRadius
+                color: Theme.surfaceContainerHigh
+                border.width: 0
+                visible: DMSService.dmsAvailable && DMSService.apiVersion >= 29
+
+                Column {
+                    id: registriesColumn
+
+                    anchors.fill: parent
+                    anchors.margins: Theme.spacingL
+                    spacing: Theme.spacingM
+
+                    StyledText {
+                        text: I18n.tr("Registries")
+                        font.pixelSize: Theme.fontSizeLarge
+                        color: Theme.surfaceText
+                        font.weight: Font.Medium
+                        width: parent.width
+                        horizontalAlignment: Text.AlignLeft
+                    }
+
+                    StyledText {
+                        text: I18n.tr("Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.")
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                        wrapMode: Text.WordWrap
+                        width: parent.width
+                        horizontalAlignment: Text.AlignLeft
+                    }
+
+                    Repeater {
+                        model: DMSService.registries
+
+                        Item {
+                            required property var modelData
+
+                            width: parent.width
+                            height: registryInfo.implicitHeight + Theme.spacingXS
+
+                            Column {
+                                id: registryInfo
+                                anchors.left: parent.left
+                                anchors.right: removeRegistryBtn.left
+                                anchors.rightMargin: Theme.spacingM
+                                anchors.verticalCenter: parent.verticalCenter
+                                spacing: 2
+
+                                Row {
+                                    spacing: Theme.spacingXS
+
+                                    StyledText {
+                                        text: modelData.name
+                                        font.pixelSize: Theme.fontSizeMedium
+                                        color: Theme.surfaceText
+                                        font.weight: Font.Medium
+                                    }
+
+                                    StyledText {
+                                        text: I18n.tr("official")
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Theme.primary
+                                        visible: modelData.official
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+                                }
+
+                                StyledText {
+                                    text: modelData.url
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: Theme.surfaceVariantText
+                                    font.family: "monospace"
+                                    elide: Text.ElideMiddle
+                                    width: parent.width
+                                }
+                            }
+
+                            DankActionButton {
+                                id: removeRegistryBtn
+                                anchors.right: parent.right
+                                anchors.verticalCenter: parent.verticalCenter
+                                iconName: "delete"
+                                iconSize: 18
+                                visible: !modelData.official
+                                onClicked: DMSService.removeRegistry(modelData.name, response => {
+                                    if (response.error)
+                                        ToastService.showError(response.error);
+                                })
+                            }
+                        }
+                    }
+
+                    Row {
+                        width: parent.width
+                        spacing: Theme.spacingM
+
+                        DankTextField {
+                            id: registryNameField
+                            width: 140
+                            placeholderText: I18n.tr("Name")
+                        }
+
+                        DankTextField {
+                            id: registryUrlField
+                            width: parent.width - 140 - addRegistryBtn.width - Theme.spacingM * 2
+                            placeholderText: "https://github.com/user/registry.git"
+                        }
+
+                        DankButton {
+                            id: addRegistryBtn
+                            text: I18n.tr("Add")
+                            enabled: registryNameField.text.trim() !== "" && registryUrlField.text.trim() !== ""
+                            anchors.verticalCenter: parent.verticalCenter
+                            onClicked: DMSService.addRegistry(registryNameField.text.trim(), registryUrlField.text.trim(), response => {
+                                if (response.error) {
+                                    ToastService.showError(response.error);
+                                    return;
+                                }
+                                registryNameField.text = "";
+                                registryUrlField.text = "";
+                            })
+                        }
+                    }
+                }
+            }
+
+            StyledRect {
+                width: parent.width
                 height: Math.max(200, availableColumn.implicitHeight + Theme.spacingL * 2)
                 radius: Theme.cornerRadius
                 color: Theme.surfaceContainerHigh
@@ -517,12 +645,18 @@ FocusScope {
         function onOperationError(error) {
             ToastService.showError(error);
         }
+        function onDmsAvailableChanged() {
+            if (DMSService.dmsAvailable && DMSService.apiVersion >= 29)
+                DMSService.listRegistries();
+        }
     }
 
     Component.onCompleted: {
         updateFilteredPlugins();
         if (DMSService.dmsAvailable && DMSService.apiVersion >= 8)
             DMSService.listInstalled();
+        if (DMSService.dmsAvailable && DMSService.apiVersion >= 29)
+            DMSService.listRegistries();
         if (PopoutService.pendingPluginInstall)
             Qt.callLater(showPluginBrowser);
     }

@@ -18,6 +18,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/network"
 	serverPlugins "github.com/AvengeMedia/DankMaterialShell/core/internal/server/plugins"
+	serverRegistries "github.com/AvengeMedia/DankMaterialShell/core/internal/server/registries"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/sysupdate"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/tailscale"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/thememode"
@@ -44,6 +45,11 @@ func RouteRequest(conn *models.Conn, req models.Request) {
 
 	if strings.HasPrefix(req.Method, "themes.") {
 		serverThemes.HandleRequest(conn, req)
+		return
+	}
+
+	if strings.HasPrefix(req.Method, "registries.") {
+		serverRegistries.HandleRequest(conn, req)
 		return
 	}
 

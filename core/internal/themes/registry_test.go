@@ -1,8 +1,10 @@
 package themes
 
 import (
+	"os"
 	"testing"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/registries"
 	"github.com/spf13/afero"
 )
 
@@ -65,87 +67,72 @@ func TestLoadThemeWCAGInvalidJSON(t *testing.T) {
 	}
 }
 
-func TestParseRegistriesFromEnv(t *testing.T) {
-	t.Run("defaults to official when env unset", func(t *testing.T) {
-		t.Setenv("DMS_THEME_REGISTRIES", "")
-		cfgs := ParseRegistriesFromEnv()
-		if len(cfgs) != 1 {
-			t.Fatalf("expected 1 registry, got %d", len(cfgs))
-		}
-		if cfgs[0].Name != "official" {
-			t.Fatalf("expected name=official, got %q", cfgs[0].Name)
-		}
-		if cfgs[0].URL != defaultRegistryURL {
-			t.Fatalf("expected url=%s, got %q", defaultRegistryURL, cfgs[0].URL)
-		}
-	})
-
-	t.Run("parses comma-separated URLs", func(t *testing.T) {
-		t.Setenv("DMS_THEME_REGISTRIES", "https://a.git,https://b.git")
-		cfgs := ParseRegistriesFromEnv()
-		if len(cfgs) != 2 {
-			t.Fatalf("expected 2 registries, got %d", len(cfgs))
-		}
-		if cfgs[0].URL != "https://a.git" || cfgs[1].URL != "https://b.git" {
-			t.Fatalf("unexpected urls: %+v", cfgs)
-		}
-	})
-
-	t.Run("falls back when all entries empty", func(t *testing.T) {
-		t.Setenv("DMS_THEME_REGISTRIES", ", , ,")
-		cfgs := ParseRegistriesFromEnv()
-		if len(cfgs) != 1 || cfgs[0].Name != "official" {
-			t.Fatalf("expected fallback to official, got %+v", cfgs)
-		}
-	})
+type stubGitClient struct {
+	cloneFunc func(path string, url string) error
 }
 
-func TestUpdateMigration(t *testing.T) {
-	t.Run("migrates legacy themes cache", func(t *testing.T) {
-		fs := afero.NewMemMapFs()
-		base := "/test-cache"
+func (s *stubGitClient) PlainClone(path string, url string) error {
+	if s.cloneFunc != nil {
+		return s.cloneFunc(path, url)
+	}
+	return nil
+}
+func (s *stubGitClient) Pull(path string) error                { return nil }
+func (s *stubGitClient) OriginURL(path string) (string, error) { return "", os.ErrNotExist }
 
-		// Seed legacy <base>/themes/example/theme.json
-		legacyDir := base + "/themes/example"
-		if err := afero.NewBasePathFs(fs, base).MkdirAll(legacyDir, 0o755); err != nil {
-			// BasePathFs not supported here; use direct path
-			if err := fs.MkdirAll(legacyDir, 0o755); err != nil {
-				t.Fatal(err)
+func writeTestTheme(t *testing.T, fs afero.Fs, registryDir, themeID, name string) {
+	dir := registryDir + "/themes/" + themeID
+	if err := fs.MkdirAll(dir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	themeJSON := `{"id":"` + themeID + `","name":"` + name + `","version":"1.0","author":"a","description":"d"}`
+	if err := afero.WriteFile(fs, dir+"/theme.json", []byte(themeJSON), 0o644); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestUpdateMultiRegistry(t *testing.T) {
+	fs := afero.NewMemMapFs()
+	base := "/test-cache"
+	r := &Registry{
+		fs:       fs,
+		cacheDir: base,
+		registries: []registries.Source{
+			{Name: "official", URL: "https://example.com/official.git"},
+			{Name: "extra", URL: "https://example.com/extra.git"},
+		},
+		themes: []Theme{},
+	}
+	r.git = &stubGitClient{
+		cloneFunc: func(path string, url string) error {
+			switch path {
+			case base + "/official":
+				writeTestTheme(t, fs, path, "shared", "OfficialShared")
+				writeTestTheme(t, fs, path, "one", "One")
+			case base + "/extra":
+				writeTestTheme(t, fs, path, "shared", "ExtraShared")
+				writeTestTheme(t, fs, path, "two", "Two")
 			}
-		}
-		themeJSON := `{"id":"example","name":"Example","version":"1.0","author":"a","description":"d"}`
-		if err := afero.WriteFile(fs, legacyDir+"/theme.json", []byte(themeJSON), 0o644); err != nil {
-			t.Fatal(err)
-		}
+			return nil
+		},
+	}
 
-		r := &Registry{
-			fs:         fs,
-			cacheDir:   base,
-			registries: []RegistryConfig{{Name: "official", URL: defaultRegistryURL}},
-			themes:     []Theme{},
-			git:        &stubGitClient{},
+	if err := r.Update(); err != nil {
+		t.Fatalf("Update: %v", err)
+	}
+	if len(r.themes) != 3 {
+		t.Fatalf("expected 3 themes after dedupe, got %d", len(r.themes))
+	}
+	for _, theme := range r.themes {
+		if theme.ID == "shared" && theme.Name != "OfficialShared" {
+			t.Fatalf("first registry should win for duplicate ID, got %q", theme.Name)
 		}
-		if err := r.Update(); err != nil {
-			t.Fatalf("Update: %v", err)
-		}
-		if len(r.themes) != 1 {
-			t.Fatalf("expected 1 theme after migration, got %d", len(r.themes))
-		}
-		if r.themes[0].ID != "example" {
-			t.Fatalf("expected theme id=example, got %q", r.themes[0].ID)
-		}
-		// Legacy dir should be gone.
-		if exists, _ := afero.DirExists(fs, base+"/themes"); exists {
-			t.Fatal("legacy <base>/themes should be migrated/removed")
-		}
-		// New layout: <base>/official/themes/example/theme.json
-		if exists, _ := afero.Exists(fs, base+"/official/themes/example/theme.json"); !exists {
-			t.Fatal("theme should be at <base>/official/themes/example/ after migration")
-		}
-	})
+	}
+
+	if dir := r.GetThemeDir("two"); dir != base+"/extra/themes/two" {
+		t.Fatalf("expected theme dir under extra registry, got %q", dir)
+	}
+	if path := r.GetThemeSourcePath("one"); path != base+"/official/themes/one/theme.json" {
+		t.Fatalf("expected theme source under official registry, got %q", path)
+	}
 }
-
-type stubGitClient struct{}
-
-func (s *stubGitClient) PlainClone(path string, url string) error { return nil }
-func (s *stubGitClient) Pull(path string) error                   { return nil }
