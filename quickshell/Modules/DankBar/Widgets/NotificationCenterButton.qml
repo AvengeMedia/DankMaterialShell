@@ -67,6 +67,7 @@ BasePill {
     MouseArea {
         anchors.fill: parent
         acceptedButtons: Qt.MiddleButton
+        cursorShape: Qt.PointingHandCursor
         onPressed: mouse => {
             root.triggerRipple(this, mouse.x, mouse.y);
             SessionData.setDoNotDisturb(!SessionData.doNotDisturb);
