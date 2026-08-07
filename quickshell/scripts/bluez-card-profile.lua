@@ -29,9 +29,23 @@ local function profile_available(profile)
   return profile and profile.available ~= "no"
 end
 
+local codec_profile_prefixes = {
+  "^a2dp%-sink%-(.+)$",
+  "^a2dp%-source%-(.+)$",
+  "^headset%-head%-unit%-(.+)$",
+  "^headset%-audio%-gateway%-(.+)$",
+}
+
 local function codec_from_profile(profile)
   if not profile then
     return ""
+  end
+  local name = profile.name or ""
+  for _, pattern in ipairs(codec_profile_prefixes) do
+    local codec = name:match(pattern)
+    if codec then
+      return codec:gsub("%-", "_"):upper()
+    end
   end
   local desc = profile.description or ""
   local codec = desc:match("[Cc]odec%s+([%w%+%-%._]+)")
