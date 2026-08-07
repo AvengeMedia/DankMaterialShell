@@ -163,16 +163,7 @@ Item {
     Variants {
         id: barVariants
         model: {
-            const prefs = root.barConfig?.screenPreferences || ["all"];
-            const wantsAll = prefs.includes("all") || (typeof prefs[0] === "string" && prefs[0] === "all");
-            let base;
-            if (wantsAll) {
-                base = Quickshell.screens;
-            } else {
-                base = Quickshell.screens.filter(screen => SettingsData.isScreenInPreferences(screen, prefs));
-                if (base.length === 0 && root.barConfig?.showOnLastDisplay && Quickshell.screens.length === 1)
-                    base = Quickshell.screens;
-            }
+            const base = Quickshell.screens.filter(screen => SettingsData.barConfigCoversScreen(root.barConfig, screen));
             // Connected frame mode renders the bar inside the frame surface; skip the standalone window there
             // unless this bar wants the overlay layer, which the frame surface cannot provide.
             return base.filter(screen => !CompositorService.frameHostsBarForConfig(screen, root.barConfig));

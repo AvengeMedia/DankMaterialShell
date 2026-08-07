@@ -25,8 +25,7 @@ Item {
             const bc = configs[i];
             if (!bc.enabled || (bc.useOverlayLayer ?? false))
                 continue;
-            const prefs = bc.screenPreferences || ["all"];
-            if (!prefs.includes("all") && !SettingsData.isScreenInPreferences(host.targetScreen, prefs))
+            if (!SettingsData.barConfigCoversScreen(bc, host.targetScreen))
                 continue;
             let edge = "top";
             switch (bc.position ?? 0) {

@@ -135,8 +135,7 @@ PanelWindow {
             const bc = configs[i];
             if (!bc || !(bc.enabled ?? true) || !(bc.visible ?? true))
                 continue;
-            const prefs = bc.screenPreferences || ["all"];
-            if (!prefs.includes("all") && !SettingsData.isScreenInPreferences(screen, prefs))
+            if (!SettingsData.barConfigCoversScreen(bc, screen))
                 continue;
             const innerPadding = bc.innerPadding ?? (defaultBar?.innerPadding ?? 4);
             const widgetThickness = Math.max(20, 26 + innerPadding * 0.6);

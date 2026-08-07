@@ -2408,8 +2408,7 @@ Singleton {
             const bc = bars[i];
             if (bc.position !== sidePos)
                 continue;
-            const prefs = bc.screenPreferences || ["all"];
-            if (prefs.includes("all") || isScreenInPreferences(screen, prefs))
+            if (barConfigCoversScreen(bc, screen))
                 return true;
         }
         return false;
@@ -2512,6 +2511,13 @@ Singleton {
         return filtered;
     }
 
+    function barConfigCoversScreen(bc, screen) {
+        var prefs = bc?.screenPreferences || ["all"];
+        if (prefs.includes("all") || isScreenInPreferences(screen, prefs))
+            return true;
+        return (bc?.showOnLastDisplay ?? false) && Quickshell.screens.length === 1;
+    }
+
     function getActiveBarEdgesForScreen(screen) {
         if (!screen)
             return [];
@@ -2520,8 +2526,7 @@ Singleton {
             var bc = barConfigs[i];
             if (!bc.enabled)
                 continue;
-            var prefs = bc.screenPreferences || ["all"];
-            if (!prefs.includes("all") && !isScreenInPreferences(screen, prefs))
+            if (!barConfigCoversScreen(bc, screen))
                 continue;
             switch (bc.position ?? 0) {
             case SettingsData.Position.Top:
@@ -2549,8 +2554,7 @@ Singleton {
             var bc = barConfigs[i];
             if (!bc.enabled || !(bc.useOverlayLayer ?? false))
                 continue;
-            var prefs = bc.screenPreferences || ["all"];
-            if (!prefs.includes("all") && !isScreenInPreferences(screen, prefs))
+            if (!barConfigCoversScreen(bc, screen))
                 continue;
             switch (bc.position ?? 0) {
             case SettingsData.Position.Top:
