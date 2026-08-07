@@ -224,7 +224,7 @@ Singleton {
         if (!text || !text.trim())
             return;
         const files = text.trim().split('\n').filter(file => file.length > 0);
-        if (files.length <= 1)
+        if (files.length < 1)
             return;
         const wallpaperList = files.sort();
         let currentIndex = wallpaperList.findIndex(path => path === currentPath);
