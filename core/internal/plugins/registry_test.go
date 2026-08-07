@@ -3,10 +3,14 @@ package plugins
 import (
 	"encoding/json"
 	"errors"
+	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/registries"
+	"github.com/go-git/go-git/v6"
+	"github.com/go-git/go-git/v6/plumbing/object"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -19,6 +23,8 @@ type mockGitClient struct {
 	pullFunc       func(path string) error
 	originFunc     func(path string) (string, error)
 	hasUpdatesFunc func(path string) (bool, string, string, error)
+	revisionFunc   func(path string) (string, error)
+	checkoutFunc   func(path string, revision string) error
 }
 
 func (m *mockGitClient) PlainClone(path string, url string) error {
@@ -39,7 +45,7 @@ func (m *mockGitClient) OriginURL(path string) (string, error) {
 	if m.originFunc != nil {
 		return m.originFunc(path)
 	}
-	return "", errors.New("not a repository")
+	return "https://github.com/test/plugin.git", nil
 }
 
 func (m *mockGitClient) HasUpdates(path string) (bool, string, string, error) {
@@ -47,6 +53,20 @@ func (m *mockGitClient) HasUpdates(path string) (bool, string, string, error) {
 		return m.hasUpdatesFunc(path)
 	}
 	return false, "", "", nil
+}
+
+func (m *mockGitClient) CurrentRevision(path string) (string, error) {
+	if m.revisionFunc != nil {
+		return m.revisionFunc(path)
+	}
+	return "0123456789abcdef0123456789abcdef01234567", nil
+}
+
+func (m *mockGitClient) CheckoutRevision(path string, revision string) error {
+	if m.checkoutFunc != nil {
+		return m.checkoutFunc(path, revision)
+	}
+	return nil
 }
 
 func TestNewRegistry(t *testing.T) {
@@ -61,6 +81,41 @@ func TestNewRegistry(t *testing.T) {
 func TestGetCacheDir(t *testing.T) {
 	cacheDir := getCacheDir()
 	assert.Contains(t, cacheDir, "/tmp/dankdots-plugin-registry")
+}
+
+func TestRealGitClientRevisionCheckout(t *testing.T) {
+	repoPath := t.TempDir()
+	repo, err := git.PlainInit(repoPath, false)
+	require.NoError(t, err)
+	worktree, err := repo.Worktree()
+	require.NoError(t, err)
+	filePath := filepath.Join(repoPath, "value.txt")
+	signature := &object.Signature{Name: "DMS Test", Email: "test@example.com", When: time.Unix(1, 0)}
+
+	require.NoError(t, os.WriteFile(filePath, []byte("one"), 0o644))
+	_, err = worktree.Add("value.txt")
+	require.NoError(t, err)
+	first, err := worktree.Commit("first", &git.CommitOptions{Author: signature})
+	require.NoError(t, err)
+
+	require.NoError(t, os.WriteFile(filePath, []byte("two"), 0o644))
+	_, err = worktree.Add("value.txt")
+	require.NoError(t, err)
+	second, err := worktree.Commit("second", &git.CommitOptions{Author: signature})
+	require.NoError(t, err)
+
+	client := &realGitClient{}
+	revision, err := client.CurrentRevision(repoPath)
+	require.NoError(t, err)
+	assert.Equal(t, second.String(), revision)
+	require.NoError(t, client.CheckoutRevision(repoPath, first.String()))
+
+	revision, err = client.CurrentRevision(repoPath)
+	require.NoError(t, err)
+	assert.Equal(t, first.String(), revision)
+	data, err := os.ReadFile(filePath)
+	require.NoError(t, err)
+	assert.Equal(t, "one", string(data))
 }
 
 func setupTestRegistry(t *testing.T) (*Registry, afero.Fs, string) {
