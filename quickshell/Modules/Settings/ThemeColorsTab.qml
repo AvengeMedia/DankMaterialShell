@@ -781,41 +781,16 @@ Item {
                         }
                     }
 
-                    Item {
-                        width: parent.width
-                        height: extractRow.implicitHeight
-
-                        Row {
-                            id: extractRow
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            spacing: Theme.spacingS
-
-                            DankIcon {
-                                name: "download"
-                                size: Theme.iconSizeSmall
-                                color: Theme.primary
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            StyledText {
-                                text: I18n.tr("Extract current theme to file", "extract theme description")
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.surfaceVariantText
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            DankButton {
-                                text: I18n.tr("Extract", "extract theme button")
-                                iconName: "download"
-                                anchors.verticalCenter: parent.verticalCenter
-                                onClicked: {
-                                    var themeDataName = Theme.getThemeColors(Theme.currentThemeName).name || Theme.currentThemeName;
-                                    pendingExtractJson = Theme.extractCurrentTheme(themeDataName);
-                                    saveBrowserLoader.active = true;
-                                    if (saveBrowserLoader.item)
-                                        saveBrowserLoader.item.open();
-                                }
-                            }
+                    DankButton {
+                        text: I18n.tr("Extract Theme", "extract theme button")
+                        iconName: "download"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        onClicked: {
+                            var themeDataName = Theme.getThemeColors(Theme.currentThemeName).name || Theme.currentThemeName;
+                            pendingExtractJson = Theme.extractCurrentTheme(themeDataName);
+                            saveBrowserLoader.active = true;
+                            if (saveBrowserLoader.item)
+                                saveBrowserLoader.item.open();
                         }
                     }
 
