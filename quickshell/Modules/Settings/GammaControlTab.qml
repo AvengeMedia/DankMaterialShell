@@ -320,100 +320,10 @@ Item {
                             }
                         }
 
-                        Column {
-                            property bool isLocationMode: SessionData.nightModeAutoMode === "location"
-                            visible: isLocationMode
-                            spacing: Theme.spacingM
+                        SettingsLocationSection {
                             width: parent.width
-
-                            DankToggle {
-                                id: ipLocationToggle
-                                width: parent.width
-                                text: I18n.tr("Use IP Location")
-                                description: I18n.tr("Automatically detect location based on IP address")
-                                checked: SessionData.nightModeUseIPLocation || false
-                                onToggled: checked => {
-                                    SessionData.setNightModeUseIPLocation(checked);
-                                }
-
-                                Connections {
-                                    target: SessionData
-                                    function onNightModeUseIPLocationChanged() {
-                                        ipLocationToggle.checked = SessionData.nightModeUseIPLocation;
-                                    }
-                                }
-                            }
-
-                            Column {
-                                width: parent.width
-                                spacing: Theme.spacingM
-                                leftPadding: Theme.spacingM
-                                visible: !SessionData.nightModeUseIPLocation
-
-                                StyledText {
-                                    text: I18n.tr("Manual Coordinates")
-                                    font.pixelSize: Theme.fontSizeMedium
-                                    color: Theme.surfaceText
-                                }
-
-                                Row {
-                                    spacing: Theme.spacingL
-
-                                    Column {
-                                        spacing: Theme.spacingXS
-
-                                        StyledText {
-                                            text: I18n.tr("Latitude")
-                                            font.pixelSize: Theme.fontSizeSmall
-                                            color: Theme.surfaceVariantText
-                                        }
-
-                                        DankTextField {
-                                            width: 120
-                                            height: 40
-                                            text: SessionData.latitude.toString()
-                                            placeholderText: "0.0"
-                                            onEditingFinished: {
-                                                const lat = parseFloat(text);
-                                                if (!isNaN(lat) && lat >= -90 && lat <= 90 && lat !== SessionData.latitude) {
-                                                    SessionData.setLatitude(lat);
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    Column {
-                                        spacing: Theme.spacingXS
-
-                                        StyledText {
-                                            text: I18n.tr("Longitude")
-                                            font.pixelSize: Theme.fontSizeSmall
-                                            color: Theme.surfaceVariantText
-                                        }
-
-                                        DankTextField {
-                                            width: 120
-                                            height: 40
-                                            text: SessionData.longitude.toString()
-                                            placeholderText: "0.0"
-                                            onEditingFinished: {
-                                                const lon = parseFloat(text);
-                                                if (!isNaN(lon) && lon >= -180 && lon <= 180 && lon !== SessionData.longitude) {
-                                                    SessionData.setLongitude(lon);
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-
-                                StyledText {
-                                    text: I18n.tr("Uses sunrise/sunset times to automatically adjust night mode based on your location.")
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: Theme.surfaceVariantText
-                                    width: parent.width - parent.leftPadding
-                                    wrapMode: Text.WordWrap
-                                }
-                            }
+                            visible: SessionData.nightModeAutoMode === "location"
+                            description: I18n.tr("Uses sunrise/sunset times to automatically adjust night mode based on your location.")
                         }
 
                         Rectangle {
