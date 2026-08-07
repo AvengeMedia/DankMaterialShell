@@ -249,7 +249,10 @@ func (m *Manager) RestoreFromLockfile(sourcePath string, prune bool) error {
 			}
 			return restoreErr
 		}
-		pluginPath := filepath.Join(m.pluginsDir, id)
+		pluginPath := installedPath
+		if pluginPath == "" {
+			pluginPath = filepath.Join(m.pluginsDir, id)
+		}
 		if actualID := m.getPluginID(pluginPath); actualID != id {
 			return rollback(fmt.Errorf("restored plugin %q has manifest id %q", id, actualID))
 		}
@@ -288,6 +291,9 @@ func (m *Manager) RestoreFromLockfile(sourcePath string, prune bool) error {
 func (m *Manager) repositoryPath(pluginID string, plugin LockedPlugin) string {
 	if plugin.Path != "" {
 		return filepath.Join(m.pluginsDir, ".repos", m.getRepoName(plugin.Repo))
+	}
+	if installedPath, err := m.findInDir(m.pluginsDir, pluginID); err == nil && installedPath != "" {
+		return installedPath
 	}
 	return filepath.Join(m.pluginsDir, pluginID)
 }

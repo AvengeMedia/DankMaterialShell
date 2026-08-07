@@ -62,6 +62,11 @@ func TestPluginLockfileValidation(t *testing.T) {
 			want: "must not contain credentials",
 		},
 		{
+			name: "rejects ssh password",
+			lock: PluginLockfile{LockfileVersion: 1, Plugins: map[string]LockedPlugin{"bad": {Repo: "ssh://git:secret@example.com/plugin.git", Commit: testCommit}}},
+			want: "must not contain credentials",
+		},
+		{
 			name: "rejects conflicting monorepo commits",
 			lock: PluginLockfile{LockfileVersion: 1, Plugins: map[string]LockedPlugin{
 				"one": {Repo: "repo", Commit: testCommit},
@@ -76,6 +81,23 @@ func TestPluginLockfileValidation(t *testing.T) {
 			err := tt.lock.Validate()
 			require.Error(t, err)
 			assert.Contains(t, err.Error(), tt.want)
+		})
+	}
+}
+
+func TestPluginLockfileAcceptsSSHRemotes(t *testing.T) {
+	repos := []string{
+		"https://github.com/user/plugin.git",
+		"ssh://git@github.com/user/plugin.git",
+		"git@github.com:user/plugin.git",
+	}
+
+	for _, repo := range repos {
+		t.Run(repo, func(t *testing.T) {
+			lock := PluginLockfile{LockfileVersion: 1, Plugins: map[string]LockedPlugin{
+				"plugin": {Repo: repo, Commit: testCommit},
+			}}
+			assert.NoError(t, lock.Validate())
 		})
 	}
 }

@@ -17,6 +17,8 @@ const pluginLockfileVersion = 1
 
 var gitCommitPattern = regexp.MustCompile(`^[0-9a-fA-F]{40}$`)
 
+var scpLikeRepoPattern = regexp.MustCompile(`^[^@:/\s]+@[^@:/\s]+:\S+$`)
+
 type PluginLockfile struct {
 	LockfileVersion int                     `json:"lockfileVersion"`
 	Plugins         map[string]LockedPlugin `json:"plugins"`
@@ -138,9 +140,19 @@ func (lock PluginLockfile) Validate() error {
 func validatePluginRepo(repo string) error {
 	parsed, err := url.Parse(repo)
 	if err != nil {
+		if scpLikeRepoPattern.MatchString(repo) {
+			return nil
+		}
 		return fmt.Errorf("invalid repository URL %q", repo)
 	}
-	if parsed.Scheme != "" && parsed.User != nil {
+	if parsed.User == nil {
+		return nil
+	}
+	if _, hasPassword := parsed.User.Password(); hasPassword {
+		return fmt.Errorf("repository URL must not contain credentials")
+	}
+	switch parsed.Scheme {
+	case "http", "https":
 		return fmt.Errorf("repository URL must not contain credentials")
 	}
 	return nil

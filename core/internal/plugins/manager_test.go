@@ -292,6 +292,35 @@ func TestUpdateRefreshesLockedCommit(t *testing.T) {
 	assert.Equal(t, newCommit, lock.Plugins[plugin.ID].Commit)
 }
 
+func TestUpdateResolvesRenamedPluginDirectory(t *testing.T) {
+	manager, fs, pluginsDir := setupTestManager(t)
+	plugin := Plugin{ID: "test-plugin", Name: "Test Plugin", Repo: "https://github.com/test/plugin.git"}
+	pluginPath := filepath.Join(pluginsDir, "renamed-dir")
+	require.NoError(t, fs.MkdirAll(pluginPath, 0o755))
+	require.NoError(t, afero.WriteFile(fs, filepath.Join(pluginPath, "plugin.json"), []byte(`{"id":"test-plugin"}`), 0o644))
+	require.NoError(t, manager.lockStore().Write(PluginLockfile{
+		LockfileVersion: 1,
+		Plugins: map[string]LockedPlugin{
+			plugin.ID: {Repo: plugin.Repo, Commit: testCommit},
+		},
+	}))
+	var pulledPath string
+	manager.gitClient = &mockGitClient{
+		pullFunc: func(path string) error {
+			pulledPath = path
+			return nil
+		},
+		cloneFunc: func(path, _ string) error {
+			t.Fatalf("unexpected clone to %s", path)
+			return nil
+		},
+		revisionFunc: func(string) (string, error) { return testCommit, nil },
+	}
+
+	require.NoError(t, manager.Update(plugin))
+	assert.Equal(t, pluginPath, pulledPath)
+}
+
 func TestUninstallRemovesLockedPlugin(t *testing.T) {
 	manager, fs, pluginsDir := setupTestManager(t)
 	plugin := Plugin{ID: "test-plugin", Name: "Test Plugin", Repo: "https://github.com/test/plugin.git"}
