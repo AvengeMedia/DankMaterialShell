@@ -16,7 +16,8 @@ type Manager struct {
 	state      *State
 	stateMutex sync.RWMutex
 
-	client geolocation.Client
+	client    geolocation.Client
+	startOnce sync.Once
 
 	stopChan chan struct{}
 	sigWG    sync.WaitGroup
