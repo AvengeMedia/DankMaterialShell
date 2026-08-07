@@ -320,17 +320,22 @@ Singleton {
     function findConfigEntryByFingerprint(data, outputIdentifiers, autoOnly) {
         const targetKey = outputSetFingerprint(outputIdentifiers);
         const configs = data.configurations || [];
+        let firstUnnamed = null;
         for (let i = 0; i < configs.length; i++) {
-            if (configFingerprint(configs[i]) === targetKey) {
-                if (autoOnly && configs[i].name)
-                    continue;
+            if (configFingerprint(configs[i]) !== targetKey)
+                continue;
+            if (configs[i].name && !autoOnly)
                 return {
                     entry: configs[i],
                     index: i
                 };
-            }
+            if (!configs[i].name && !firstUnnamed)
+                firstUnnamed = {
+                    entry: configs[i],
+                    index: i
+                };
         }
-        return null;
+        return firstUnnamed;
     }
 
     function getProfileMonitorInclusion(profileId) {
@@ -766,7 +771,7 @@ Singleton {
             return;
 
         readMonitorsJson(data => {
-            const match = findConfigEntryByFingerprint(data, currentOutputSet, true);
+            const match = findConfigEntryByFingerprint(data, currentOutputSet, false);
             if (match) {
                 if (configEntryMatchesLiveLayout(match.entry)) {
                     SettingsData.setActiveDisplayProfile(CompositorService.compositor, match.entry.id);
