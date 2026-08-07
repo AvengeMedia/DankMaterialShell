@@ -16,6 +16,7 @@ func init() {
 	setupCmd.AddCommand(setupBindsCmd, setupLayoutCmd, setupColorsCmd, setupAlttabCmd, setupOutputsCmd, setupCursorCmd, setupWindowrulesCmd)
 	updateCmd.AddCommand(updateCheckCmd)
 	pluginsCmd.AddCommand(pluginsBrowseCmd, pluginsListCmd, pluginsInstallCmd, pluginsUninstallCmd, pluginsUpdateCmd)
+	registryCmd.AddCommand(registryListCmd, registryAddCmd, registryRemoveCmd)
 	rootCmd.AddCommand(getCommonCommands()...)
 
 	rootCmd.AddCommand(authCmd)

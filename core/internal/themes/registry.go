@@ -7,11 +7,10 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/registries"
 	"github.com/go-git/go-git/v6"
 	"github.com/spf13/afero"
 )
-
-const registryRepo = "https://github.com/AvengeMedia/dms-plugin-registry.git"
 
 type ColorScheme struct {
 	Primary                 string `json:"primary,omitempty"`
@@ -151,6 +150,7 @@ type Theme struct {
 type GitClient interface {
 	PlainClone(path string, url string) error
 	Pull(path string) error
+	OriginURL(path string) (string, error)
 }
 
 type realGitClient struct{}
@@ -182,11 +182,28 @@ func (g *realGitClient) Pull(path string) error {
 	return nil
 }
 
+func (g *realGitClient) OriginURL(path string) (string, error) {
+	repo, err := git.PlainOpen(path)
+	if err != nil {
+		return "", err
+	}
+	remote, err := repo.Remote("origin")
+	if err != nil {
+		return "", err
+	}
+	urls := remote.Config().URLs
+	if len(urls) == 0 {
+		return "", errors.New("origin remote has no URL")
+	}
+	return urls[0], nil
+}
+
 type Registry struct {
-	fs       afero.Fs
-	cacheDir string
-	themes   []Theme
-	git      GitClient
+	fs         afero.Fs
+	cacheDir   string
+	registries []registries.Source
+	themes     []Theme
+	git        GitClient
 }
 
 func NewRegistry() (*Registry, error) {
@@ -194,61 +211,63 @@ func NewRegistry() (*Registry, error) {
 }
 
 func NewRegistryWithFs(fs afero.Fs) (*Registry, error) {
-	cacheDir := getCacheDir()
 	return &Registry{
-		fs:       fs,
-		cacheDir: cacheDir,
-		git:      &realGitClient{},
+		fs:         fs,
+		cacheDir:   getCacheDir(),
+		registries: registries.Load(fs),
+		git:        &realGitClient{},
 	}, nil
+}
+
+func (r *Registry) cacheDirFor(src registries.Source) string {
+	return filepath.Join(r.cacheDir, src.Name)
 }
 
 func getCacheDir() string {
 	return filepath.Join(os.TempDir(), "dankdots-plugin-registry")
 }
 
-func (r *Registry) Update() error {
-	exists, err := afero.DirExists(r.fs, r.cacheDir)
+// A cached clone is reused only when its origin still matches the configured
+// URL; renamed or re-pointed registries re-clone instead of pulling from the
+// stale remote.
+func (r *Registry) updateOne(src registries.Source) error {
+	dir := r.cacheDirFor(src)
+	exists, err := afero.DirExists(r.fs, dir)
 	if err != nil {
 		return fmt.Errorf("failed to check cache directory: %w", err)
 	}
 
-	if !exists {
-		if err := r.fs.MkdirAll(filepath.Dir(r.cacheDir), 0o755); err != nil {
-			return fmt.Errorf("failed to create cache directory: %w", err)
+	if exists {
+		origin, originErr := r.git.OriginURL(dir)
+		if originErr == nil && origin == src.URL && r.git.Pull(dir) == nil {
+			return nil
 		}
-
-		if err := r.git.PlainClone(r.cacheDir, registryRepo); err != nil {
-			return fmt.Errorf("failed to clone registry: %w", err)
-		}
-	} else {
-		if err := r.git.Pull(r.cacheDir); err != nil {
-			if err := r.fs.RemoveAll(r.cacheDir); err != nil {
-				return fmt.Errorf("failed to remove corrupted registry: %w", err)
-			}
-
-			if err := r.fs.MkdirAll(filepath.Dir(r.cacheDir), 0o755); err != nil {
-				return fmt.Errorf("failed to create cache directory: %w", err)
-			}
-
-			if err := r.git.PlainClone(r.cacheDir, registryRepo); err != nil {
-				return fmt.Errorf("failed to re-clone registry: %w", err)
-			}
+		if err := r.fs.RemoveAll(dir); err != nil {
+			return fmt.Errorf("failed to remove stale registry cache: %w", err)
 		}
 	}
 
-	return r.loadThemes()
+	if err := r.fs.MkdirAll(filepath.Dir(dir), 0o755); err != nil {
+		return fmt.Errorf("failed to create cache directory: %w", err)
+	}
+	if err := r.git.PlainClone(dir, src.URL); err != nil {
+		return fmt.Errorf("failed to clone: %w", err)
+	}
+	return nil
 }
 
-func (r *Registry) loadThemes() error {
-	themesDir := filepath.Join(r.cacheDir, "themes")
-
+// A registry without a themes/ directory is a valid plugins-only registry.
+func (r *Registry) loadThemesFrom(dir string) ([]Theme, error) {
+	themesDir := filepath.Join(dir, "themes")
 	entries, err := afero.ReadDir(r.fs, themesDir)
 	if err != nil {
-		return fmt.Errorf("failed to read themes directory: %w", err)
+		if os.IsNotExist(err) {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("failed to read themes directory: %w", err)
 	}
 
-	r.themes = []Theme{}
-
+	var themes []Theme
 	for _, entry := range entries {
 		if !entry.IsDir() {
 			continue
@@ -278,10 +297,46 @@ func (r *Registry) loadThemes() error {
 			theme.PreviewPath = previewPath
 		}
 
-		r.themes = append(r.themes, theme)
+		themes = append(themes, theme)
 	}
+	return themes, nil
+}
 
-	return nil
+// Pre-multi-registry caches were a single clone at the base dir; the per-name
+// layout nests under it, so a leftover clone is deleted wholesale first.
+func (r *Registry) resetLegacyCache() {
+	if exists, _ := afero.DirExists(r.fs, filepath.Join(r.cacheDir, ".git")); exists {
+		_ = r.fs.RemoveAll(r.cacheDir)
+	}
+}
+
+// Update refreshes every configured registry, aggregating themes in
+// declaration order (first occurrence of an ID wins). A failing registry is
+// reported in the joined error but does not block the others.
+func (r *Registry) Update() error {
+	r.resetLegacyCache()
+	r.themes = []Theme{}
+	seen := make(map[string]struct{})
+	var errs []error
+	for _, src := range r.registries {
+		if err := r.updateOne(src); err != nil {
+			errs = append(errs, fmt.Errorf("registry %s: %w", src.Name, err))
+			continue
+		}
+		themes, err := r.loadThemesFrom(r.cacheDirFor(src))
+		if err != nil {
+			errs = append(errs, fmt.Errorf("registry %s: %w", src.Name, err))
+			continue
+		}
+		for _, t := range themes {
+			if _, dup := seen[t.ID]; dup {
+				continue
+			}
+			seen[t.ID] = struct{}{}
+			r.themes = append(r.themes, t)
+		}
+	}
+	return errors.Join(errs...)
 }
 
 func loadThemeWCAG(fs afero.Fs, themeDir string) *ThemeWCAG {
@@ -300,7 +355,7 @@ func loadThemeWCAG(fs afero.Fs, themeDir string) *ThemeWCAG {
 
 func (r *Registry) List() ([]Theme, error) {
 	if len(r.themes) == 0 {
-		if err := r.Update(); err != nil {
+		if err := r.Update(); err != nil && len(r.themes) == 0 {
 			return nil, err
 		}
 	}
@@ -343,11 +398,25 @@ func (r *Registry) Get(idOrName string) (*Theme, error) {
 }
 
 func (r *Registry) GetThemeSourcePath(themeID string) string {
-	return filepath.Join(r.cacheDir, "themes", themeID, "theme.json")
+	// Themes may live under any registry's subdir. Search them all; first hit wins.
+	for _, cfg := range r.registries {
+		candidate := filepath.Join(r.cacheDirFor(cfg), "themes", themeID, "theme.json")
+		if exists, _ := afero.Exists(r.fs, candidate); exists {
+			return candidate
+		}
+	}
+	// Fallback to first registry (legacy path semantics).
+	return filepath.Join(r.cacheDirFor(r.registries[0]), "themes", themeID, "theme.json")
 }
 
 func (r *Registry) GetThemeDir(themeID string) string {
-	return filepath.Join(r.cacheDir, "themes", themeID)
+	for _, cfg := range r.registries {
+		candidate := filepath.Join(r.cacheDirFor(cfg), "themes", themeID)
+		if exists, _ := afero.DirExists(r.fs, candidate); exists {
+			return candidate
+		}
+	}
+	return filepath.Join(r.cacheDirFor(r.registries[0]), "themes", themeID)
 }
 
 func SortByFirstParty(themes []Theme) []Theme {
