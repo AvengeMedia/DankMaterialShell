@@ -34,6 +34,7 @@ const (
 type GeoClueClient struct {
 	currLocation  *Location
 	locationMutex sync.RWMutex
+	seedOnce      sync.Once
 
 	dbusConn   *dbus.Conn
 	clientPath dbus.ObjectPath
@@ -230,14 +231,29 @@ func (c *GeoClueClient) SeedLocation(loc Location) {
 }
 
 func (c *GeoClueClient) GetLocation() (Location, error) {
+	loc := c.currentLocation()
+	if loc.Latitude != 0 || loc.Longitude != 0 {
+		return loc, nil
+	}
+
+	c.seedOnce.Do(func() {
+		ipLoc, err := fetchIPLocation()
+		if err != nil {
+			log.Warnf("GeoClue2 has no fix, IP location seed failed: %v", err)
+			return
+		}
+		log.Info("Seeded GeoClue2 with IP location")
+		c.SeedLocation(Location{Latitude: ipLoc.Latitude, Longitude: ipLoc.Longitude})
+	})
+
+	return c.currentLocation(), nil
+}
+
+func (c *GeoClueClient) currentLocation() Location {
 	c.locationMutex.RLock()
 	defer c.locationMutex.RUnlock()
 	if c.currLocation == nil {
-		return Location{
-			Latitude:  0.0,
-			Longitude: 0.0,
-		}, nil
+		return Location{}
 	}
-	stateCopy := *c.currLocation
-	return stateCopy, nil
+	return *c.currLocation
 }

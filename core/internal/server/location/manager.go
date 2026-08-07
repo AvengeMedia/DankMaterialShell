@@ -8,30 +8,33 @@ import (
 )
 
 func NewManager(client geolocation.Client) (*Manager, error) {
-	currLocation, err := client.GetLocation()
-	if err != nil {
-		log.Warnf("Failed to get initial location: %v", err)
-	}
-
 	m := &Manager{
 		client:   client,
 		dirty:    make(chan struct{}),
 		stopChan: make(chan struct{}),
-
-		state: &State{
-			Latitude:  currLocation.Latitude,
-			Longitude: currLocation.Longitude,
-		},
-	}
-
-	if err := m.startSignalPump(); err != nil {
-		return nil, err
+		state:    &State{},
 	}
 
 	m.notifierWg.Add(1)
 	go m.notifier()
 
 	return m, nil
+}
+
+// The geolocation client may fetch IP location on first use, so nothing
+// touches it until a consumer actually asks for location data.
+func (m *Manager) ensureStarted() {
+	m.startOnce.Do(func() {
+		go func() {
+			currLocation, err := m.client.GetLocation()
+			if err != nil {
+				log.Warnf("Failed to get initial location: %v", err)
+			} else {
+				m.handleLocationChange(currLocation)
+			}
+			m.startSignalPump()
+		}()
+	})
 }
 
 func (m *Manager) Close() {
@@ -48,6 +51,7 @@ func (m *Manager) Close() {
 }
 
 func (m *Manager) Subscribe(id string) chan State {
+	m.ensureStarted()
 	ch := make(chan State, 64)
 	m.subscribers.Store(id, ch)
 	return ch
@@ -59,7 +63,7 @@ func (m *Manager) Unsubscribe(id string) {
 	}
 }
 
-func (m *Manager) startSignalPump() error {
+func (m *Manager) startSignalPump() {
 	m.sigWG.Add(1)
 	go func() {
 		defer m.sigWG.Done()
@@ -80,8 +84,6 @@ func (m *Manager) startSignalPump() error {
 			}
 		}
 	}()
-
-	return nil
 }
 
 func (m *Manager) handleLocationChange(location geolocation.Location) {
@@ -102,6 +104,7 @@ func (m *Manager) notifySubscribers() {
 }
 
 func (m *Manager) GetState() State {
+	m.ensureStarted()
 	m.stateMutex.RLock()
 	defer m.stateMutex.RUnlock()
 	if m.state == nil {
