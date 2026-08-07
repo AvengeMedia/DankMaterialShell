@@ -201,6 +201,10 @@ Singleton {
 
     function getMatugenColor(path, fallback) {
         const colorMode = (typeof SessionData !== "undefined" && SessionData.isLightMode) ? "light" : "dark";
+        return getMatugenColorForMode(colorMode, path, fallback);
+    }
+
+    function getMatugenColorForMode(colorMode, path, fallback) {
         let cur = matugenColors && matugenColors.colors && matugenColors.colors[colorMode];
         for (const part of path.split(".")) {
             if (!cur || typeof cur !== "object" || !(part in cur))
@@ -208,6 +212,82 @@ Singleton {
             cur = cur[part];
         }
         return cur || fallback;
+    }
+
+    function extractCurrentTheme(themeName) {
+        var name = themeName || "Extracted Theme";
+        var dark = {};
+        var light = {};
+
+        if (currentTheme === dynamic) {
+            dark = buildExtractedDynamicMode("dark", name + " Dark");
+            light = buildExtractedDynamicMode("light", name + " Light");
+        } else if (currentTheme === custom && customThemeRawData) {
+            var rawDark = customThemeRawData.dark || null;
+            var rawLight = customThemeRawData.light || null;
+            if (rawDark) {
+                dark = JSON.parse(JSON.stringify(rawDark));
+                if (!dark.name)
+                    dark.name = name + " Dark";
+            } else if (rawLight) {
+                dark = buildExtractedDynamicMode("dark", name + " Dark");
+            } else {
+                dark = currentThemeData ? JSON.parse(JSON.stringify(currentThemeData)) : {};
+                dark.name = name + " Dark";
+            }
+            if (rawLight) {
+                light = JSON.parse(JSON.stringify(rawLight));
+                if (!light.name)
+                    light.name = name + " Light";
+            } else if (rawDark) {
+                light = buildExtractedDynamicMode("light", name + " Light");
+            } else {
+                light = currentThemeData ? JSON.parse(JSON.stringify(currentThemeData)) : {};
+                light.name = name + " Light";
+            }
+        } else {
+            var darkTheme = StockThemes.getThemeByName(currentTheme, false);
+            var lightTheme = StockThemes.getThemeByName(currentTheme, true);
+            dark = darkTheme ? JSON.parse(JSON.stringify(darkTheme)) : {};
+            light = lightTheme ? JSON.parse(JSON.stringify(lightTheme)) : {};
+            dark.name = name + " Dark";
+            light.name = name + " Light";
+        }
+
+        return JSON.stringify({
+            dark: dark,
+            light: light
+        }, null, 2);
+    }
+
+    function buildExtractedDynamicMode(colorMode, name) {
+        return {
+            "name": name,
+            "primary": getMatugenColorForMode(colorMode, "primary", "#42a5f5"),
+            "primaryText": getMatugenColorForMode(colorMode, "on_primary", "#ffffff"),
+            "primaryContainer": getMatugenColorForMode(colorMode, "primary_container", "#1976d2"),
+            "secondary": getMatugenColorForMode(colorMode, "secondary", "#8ab4f8"),
+            "secondaryContainer": getMatugenColorForMode(colorMode, "secondary_container", getMatugenColorForMode(colorMode, "surface_container_high", "#292b2f")),
+            "tertiary": getMatugenColorForMode(colorMode, "tertiary", "#efb8c8"),
+            "tertiaryContainer": getMatugenColorForMode(colorMode, "tertiary_container", getMatugenColorForMode(colorMode, "surface_container_high", "#292b2f")),
+            "surface": getMatugenColorForMode(colorMode, "surface", "#1a1c1e"),
+            "surfaceText": getMatugenColorForMode(colorMode, "on_background", "#e3e8ef"),
+            "surfaceVariant": getMatugenColorForMode(colorMode, "surface_variant", "#44464f"),
+            "surfaceVariantText": getMatugenColorForMode(colorMode, "on_surface_variant", "#c4c7c5"),
+            "surfaceTint": getMatugenColorForMode(colorMode, "surface_tint", "#8ab4f8"),
+            "background": getMatugenColorForMode(colorMode, "background", "#1a1c1e"),
+            "backgroundText": getMatugenColorForMode(colorMode, "on_background", "#e3e8ef"),
+            "outline": getMatugenColorForMode(colorMode, "outline", "#8e918f"),
+            "surfaceContainerLowest": getMatugenColorForMode(colorMode, "surface_container_lowest", "#0e1013"),
+            "surfaceContainerLow": getMatugenColorForMode(colorMode, "surface_container_low", "#181a1d"),
+            "surfaceContainer": getMatugenColorForMode(colorMode, "surface_container", "#1e2023"),
+            "surfaceContainerHigh": getMatugenColorForMode(colorMode, "surface_container_high", "#292b2f"),
+            "surfaceContainerHighest": getMatugenColorForMode(colorMode, "surface_container_highest", "#343740"),
+            "error": "#F2B8B5",
+            "warning": "#FF9800",
+            "info": "#2196F3",
+            "success": "#4CAF50"
+        };
     }
 
     readonly property var currentThemeData: {

@@ -1,6 +1,7 @@
 import QtCore
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import Quickshell.Widgets
 import qs.Common
 import qs.Modals.FileBrowser
@@ -14,6 +15,7 @@ Item {
     id: themeColorsTab
 
     property var parentModal: null
+    property string pendingExtractJson: ""
     readonly property bool connectedFrameModeActive: SettingsData.connectedFrameModeActive
     readonly property bool frameModeActive: SettingsData.frameEnabled
     property var cachedIconThemes: SettingsData.availableIconThemes
@@ -776,6 +778,44 @@ Item {
                             enabled: Theme.matugenAvailable
                             opacity: enabled ? 1 : 0.4
                             onSliderDragFinished: finalValue => SettingsData.setMatugenContrast(finalValue / 100)
+                        }
+                    }
+
+                    Item {
+                        width: parent.width
+                        height: extractRow.implicitHeight
+
+                        Row {
+                            id: extractRow
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            spacing: Theme.spacingS
+
+                            DankIcon {
+                                name: "download"
+                                size: Theme.iconSizeSmall
+                                color: Theme.primary
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            StyledText {
+                                text: I18n.tr("Extract current theme to file", "extract theme description")
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceVariantText
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            DankButton {
+                                text: I18n.tr("Extract", "extract theme button")
+                                iconName: "download"
+                                anchors.verticalCenter: parent.verticalCenter
+                                onClicked: {
+                                    var themeDataName = Theme.getThemeColors(Theme.currentThemeName).name || Theme.currentThemeName;
+                                    pendingExtractJson = Theme.extractCurrentTheme(themeDataName);
+                                    saveBrowserLoader.active = true;
+                                    if (saveBrowserLoader.item)
+                                        saveBrowserLoader.item.open();
+                                }
+                            }
                         }
                     }
 
@@ -3155,6 +3195,29 @@ Item {
     }
 
     LazyLoader {
+        id: saveBrowserLoader
+        active: false
+
+        FileBrowserSurfaceModal {
+            id: saveBrowser
+
+            browserTitle: I18n.tr("Save Extracted Theme", "extract theme save dialog title")
+            browserIcon: "download"
+            browserType: "default"
+            fileExtensions: ["*.json"]
+            allowStacking: true
+            saveMode: true
+            defaultFileName: "dms-extracted-theme.json"
+
+            onFileSelected: path => {
+                const cleanPath = decodeURI(path.toString().replace(/^file:\/\//, ''));
+                saveExtractedTheme(pendingExtractJson, cleanPath);
+                close();
+            }
+        }
+    }
+
+    LazyLoader {
         id: themeBrowserLoader
         active: false
 
@@ -3168,5 +3231,32 @@ Item {
         themeBrowserLoader.active = true;
         if (themeBrowserLoader.item)
             themeBrowserLoader.item.show();
+    }
+
+    Process {
+        id: extractSaveProcess
+        property string outputPath: ""
+        running: false
+        stdout: SplitParser {
+            onRead: data => {}
+        }
+        stderr: SplitParser {
+            onRead: data => {}
+        }
+
+        onExited: exitCode => {
+            if (exitCode === 0) {
+                ToastService.showInfo(I18n.tr("Theme extracted to: %1", "extract theme success").arg(extractSaveProcess.outputPath));
+            } else {
+                ToastService.showError(I18n.tr("Failed to extract theme (exit code: %1)", "extract theme error").arg(exitCode));
+            }
+        }
+    }
+
+    function saveExtractedTheme(json, outputPath) {
+        var tempFile = Paths.strip(StandardPaths.writableLocation(StandardPaths.TempLocation)) + "/dms-extract-" + Date.now() + ".json";
+        extractSaveProcess.outputPath = outputPath;
+        extractSaveProcess.command = ["sh", "-c", "cat > " + tempFile + " << 'DMS_THEME_EXTRACT_EOF'\n" + json + "\nDMS_THEME_EXTRACT_EOF\ncp " + tempFile + " " + outputPath + " && rm -f " + tempFile];
+        extractSaveProcess.running = true;
     }
 }
