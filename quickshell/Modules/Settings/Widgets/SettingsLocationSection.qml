@@ -58,10 +58,23 @@ Column {
                 }
 
                 DankTextField {
+                    id: latitudeField
                     width: 120
                     height: 40
-                    text: SessionData.latitude.toString()
+                    text: ""
                     placeholderText: "0.0"
+
+                    Component.onCompleted: {
+                        text = SessionData.latitude.toString();
+                    }
+
+                    Connections {
+                        target: SessionData
+                        function onLatitudeChanged() {
+                            latitudeField.text = SessionData.latitude.toString();
+                        }
+                    }
+
                     onEditingFinished: {
                         const lat = parseFloat(text);
                         if (!isNaN(lat) && lat >= -90 && lat <= 90 && lat !== SessionData.latitude) {
@@ -81,10 +94,23 @@ Column {
                 }
 
                 DankTextField {
+                    id: longitudeField
                     width: 120
                     height: 40
-                    text: SessionData.longitude.toString()
+                    text: ""
                     placeholderText: "0.0"
+
+                    Component.onCompleted: {
+                        text = SessionData.longitude.toString();
+                    }
+
+                    Connections {
+                        target: SessionData
+                        function onLongitudeChanged() {
+                            longitudeField.text = SessionData.longitude.toString();
+                        }
+                    }
+
                     onEditingFinished: {
                         const lon = parseFloat(text);
                         if (!isNaN(lon) && lon >= -180 && lon <= 180 && lon !== SessionData.longitude) {
@@ -111,9 +137,11 @@ Column {
                     const lon = parseFloat(coords[1]);
                     if (!isNaN(lat) && lat >= -90 && lat <= 90) {
                         SessionData.setLatitude(lat);
+                        latitudeField.text = coords[0].trim();
                     }
                     if (!isNaN(lon) && lon >= -180 && lon <= 180) {
                         SessionData.setLongitude(lon);
+                        longitudeField.text = coords[1].trim();
                     }
                 }
             }
