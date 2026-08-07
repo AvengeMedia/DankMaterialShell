@@ -4,18 +4,16 @@ import qs.Common
 import qs.Services
 import qs.Widgets
 
-FloatingWindow {
+DankFloatingWindow {
     id: root
     readonly property var log: Log.scoped("WorkspaceRenameModal")
 
-    property bool disablePopupTransparency: true
     readonly property int inputFieldHeight: Theme.fontSizeMedium + Theme.spacingL * 2
 
     objectName: "workspaceRenameModal"
     title: I18n.tr("Rename Workspace")
     minimumSize: Qt.size(400, 160)
     maximumSize: Qt.size(400, 160)
-    color: Theme.surfaceContainer
     visible: false
 
     onClosed: hide()

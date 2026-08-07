@@ -124,7 +124,6 @@ Item {
                     iconName: "restart_alt"
                     iconSize: 20
                     visible: root.defaultValue >= 0 && slider.value !== root.defaultValue
-                    backgroundColor: Theme.surfaceContainerHigh
                     iconColor: Theme.surfaceVariantText
                     onClicked: {
                         slider.value = root.defaultValue;

@@ -397,7 +397,9 @@ def find_settings_components(content, filename, wrappers):
             visible_raw = extract_property(block, "visible")
             condition_key = FILE_CONDITION_MAP.get(filename)
             if visible_raw:
-                if "CompositorService.isNiri" in visible_raw:
+                if all(c in visible_raw for c in ("CompositorService.isNiri", "CompositorService.isHyprland", "CompositorService.isMango")):
+                    condition_key = "windowRulesCapable"
+                elif "CompositorService.isNiri" in visible_raw:
                     condition_key = "isNiri"
                 elif "CompositorService.isHyprland" in visible_raw:
                     condition_key = "isHyprland"

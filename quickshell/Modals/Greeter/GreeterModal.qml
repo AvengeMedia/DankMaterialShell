@@ -5,11 +5,10 @@ import qs.Common
 import qs.Services
 import qs.Widgets
 
-FloatingWindow {
+DankFloatingWindow {
     id: root
     readonly property var log: Log.scoped("GreeterModal")
 
-    property bool disablePopupTransparency: true
     property int currentPage: 0
     readonly property int totalPages: 3
     readonly property var pageComponents: [welcomePage, doctorPage, completePage]
@@ -90,7 +89,6 @@ FloatingWindow {
     title: I18n.tr("Welcome", "greeter modal window title")
     minimumSize: Qt.size(modalWidth, modalHeight)
     maximumSize: Qt.size(modalWidth, modalHeight)
-    color: Theme.surfaceContainer
     visible: false
 
     onClosed: visible = false
@@ -173,7 +171,7 @@ FloatingWindow {
                 width: pageIndicatorRow.width + Theme.spacingM * 2
                 height: indicatorHeight
                 radius: indicatorHeight / 2
-                color: Theme.surfaceContainerHigh
+                color: Theme.floatingWindowNestedSurface
 
                 Row {
                     id: pageIndicatorRow
@@ -259,7 +257,7 @@ FloatingWindow {
             anchors.right: parent.right
             anchors.bottom: parent.bottom
             height: Math.round(Theme.fontSizeMedium * 4.5)
-            color: Theme.surfaceContainerHigh
+            color: Theme.floatingWindowNestedSurface
 
             Rectangle {
                 anchors.top: parent.top

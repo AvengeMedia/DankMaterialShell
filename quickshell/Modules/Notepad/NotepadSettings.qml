@@ -353,7 +353,7 @@ Item {
                             anchors.leftMargin: -Theme.spacingM
                             width: parent.width + Theme.spacingM
                             text: I18n.tr("Surface Opacity")
-                            description: I18n.tr("Override global transparency for Notepad")
+                            description: I18n.tr("Override floating window transparency for Notepad")
                             checked: SettingsData.notepadTransparencyOverride >= 0
                             onToggled: checked => {
                                 if (checked) {
@@ -370,7 +370,7 @@ Item {
                             width: parent.width + Theme.spacingM
                             height: 24
                             visible: SettingsData.notepadTransparencyOverride >= 0
-                            value: Math.round((SettingsData.notepadTransparencyOverride >= 0 ? SettingsData.notepadTransparencyOverride : SettingsData.popupTransparency) * 100)
+                            value: Math.round(Theme.notepadTransparency * 100)
                             minimum: 0
                             maximum: 100
                             unit: ""

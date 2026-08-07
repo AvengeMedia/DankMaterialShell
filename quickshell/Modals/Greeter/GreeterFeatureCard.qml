@@ -15,7 +15,7 @@ Rectangle {
 
     height: Math.round(Theme.fontSizeMedium * 6.4)
     radius: Theme.cornerRadius
-    color: Theme.surfaceContainerHigh
+    color: Theme.floatingWindowNestedSurface
 
     Rectangle {
         anchors.fill: parent

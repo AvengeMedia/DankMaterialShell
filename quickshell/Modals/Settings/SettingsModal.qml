@@ -5,7 +5,7 @@ import qs.Modals.FileBrowser
 import qs.Services
 import qs.Widgets
 
-FloatingWindow {
+DankFloatingWindow {
     id: settingsModal
 
     property var profileBrowser: profileBrowserLoader.item
@@ -95,7 +95,6 @@ FloatingWindow {
     minimumSize: Qt.size(500, 400)
     implicitWidth: 900
     implicitHeight: screen ? Math.min(940, screen.height - 100) : 940
-    color: Theme.surfaceContainer
     visible: false
 
     onClosed: hide()
@@ -180,8 +179,6 @@ FloatingWindow {
     FocusScope {
         id: contentFocusScope
 
-        property bool disablePopupTransparency: true
-
         LayoutMirroring.enabled: I18n.isRtl
         LayoutMirroring.childrenInherit: true
 
@@ -201,12 +198,6 @@ FloatingWindow {
                     anchors.fill: parent
                     onPressed: windowControls.tryStartMove()
                     onDoubleClicked: windowControls.tryToggleMaximize()
-                }
-
-                Rectangle {
-                    anchors.fill: parent
-                    color: Theme.surfaceContainer
-                    opacity: 0.5
                 }
 
                 Row {
@@ -276,7 +267,7 @@ FloatingWindow {
 
                 width: parent.width
                 height: showBanner ? bannerContent.implicitHeight + Theme.spacingM * 2 : 0
-                color: Theme.surfaceContainerHigh
+                color: Theme.floatingWindowNestedSurface
                 visible: showBanner
                 clip: true
 

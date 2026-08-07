@@ -3,10 +3,9 @@ import Quickshell
 import qs.Common
 import qs.Widgets
 
-FloatingWindow {
+DankFloatingWindow {
     id: root
 
-    property bool disablePopupTransparency: true
     property var allWidgets: []
     property string targetSection: ""
     property string searchQuery: ""
@@ -15,10 +14,10 @@ FloatingWindow {
     property bool keyboardNavigationActive: false
     property var parentModal: null
     parentWindow: parentModal
-    readonly property bool blurActive: Theme.blurForegroundLayers || Theme.transparentBlurLayers
-    readonly property real surfaceAlpha: blurActive ? Math.min(Theme.popupTransparency, Theme.transparentBlurLayers ? 0.36 : 0.78) : 1.0
-    readonly property real fieldAlpha: blurActive ? Math.min(Theme.popupTransparency, Theme.transparentBlurLayers ? 0.18 : 0.62) : 1.0
-    readonly property real rowAlpha: blurActive ? Math.min(Theme.popupTransparency, Theme.transparentBlurLayers ? 0.12 : 0.52) : 0.30
+    readonly property bool blurActive: Theme.blurLayersActive
+    readonly property bool floatingForegroundLayers: Theme.floatingWindowForegroundLayers
+    readonly property bool transparentBlurLayers: Theme.blurLayersActive && !floatingForegroundLayers
+    readonly property real rowAlpha: blurActive ? Math.min(Theme.floatingWindowTransparency, transparentBlurLayers ? 0.12 : 0.52) : 0.30
 
     signal widgetSelected(string widgetId, string targetSection)
 
@@ -112,7 +111,6 @@ FloatingWindow {
     minimumSize: Qt.size(400, 350)
     implicitWidth: 500
     implicitHeight: 550
-    color: blurActive ? Theme.withAlpha(Theme.surfaceContainer, 0) : Theme.surfaceContainer
     visible: false
 
     onClosed: hide()
@@ -137,24 +135,6 @@ FloatingWindow {
             if (parentModal && parentModal.modalFocusScope)
                 parentModal.modalFocusScope.forceActiveFocus();
         });
-    }
-
-    WindowBlur {
-        targetWindow: root
-        blurX: 0
-        blurY: 0
-        blurWidth: root.visible ? root.width : 0
-        blurHeight: root.visible ? root.height : 0
-        blurRadius: Theme.cornerRadius
-    }
-
-    Rectangle {
-        anchors.fill: parent
-        radius: Theme.cornerRadius
-        color: Theme.withAlpha(Theme.surfaceContainer, root.surfaceAlpha)
-        border.color: root.blurActive ? Theme.outlineMedium : Theme.withAlpha(Theme.outlineMedium, 0)
-        border.width: root.blurActive ? Theme.layerOutlineWidth : 0
-        antialiasing: true
     }
 
     FocusScope {
@@ -294,10 +274,6 @@ FloatingWindow {
                         id: searchField
                         width: parent.width
                         height: 48
-                        cornerRadius: Theme.cornerRadius
-                        backgroundColor: Theme.withAlpha(Theme.surfaceContainerHigh, root.fieldAlpha)
-                        normalBorderColor: Theme.outlineMedium
-                        focusedBorderColor: Theme.primary
                         leftIconName: "search"
                         leftIconSize: Theme.iconSize
                         leftIconColor: Theme.surfaceVariantText

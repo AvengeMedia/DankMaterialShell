@@ -291,7 +291,7 @@ Item {
             anchors.leftMargin: Theme.spacingXL
             anchors.rightMargin: Theme.spacingXL
             radius: Theme.cornerRadius
-            color: Theme.surfaceContainerHigh
+            color: Theme.floatingWindowNestedSurface
             clip: true
 
             Column {

@@ -313,10 +313,6 @@ DankModal {
 
                 width: parent.width
                 height: 48
-                cornerRadius: Theme.cornerRadius
-                backgroundColor: Theme.surfaceContainerHigh
-                normalBorderColor: Theme.outlineMedium
-                focusedBorderColor: Theme.primary
                 leftIconName: "search"
                 leftIconSize: Theme.iconSize
                 leftIconColor: Theme.surfaceVariantText

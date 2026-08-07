@@ -4,10 +4,8 @@ import qs.Common
 import qs.Services
 import qs.Widgets
 
-FloatingWindow {
+DankFloatingWindow {
     id: root
-
-    property bool disablePopupTransparency: true
 
     function show() {
         if (contentLoader.item)
@@ -29,7 +27,6 @@ FloatingWindow {
     title: I18n.tr("Authentication")
     minimumSize: Qt.size(460, 220)
     maximumSize: Qt.size(460, 220)
-    color: Theme.surfaceContainer
     visible: false
 
     onClosed: hide()

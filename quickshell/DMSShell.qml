@@ -635,7 +635,7 @@ Item {
                 if (visible) {
                     wasShown = true;
                 } else if (wasShown) {
-                    PopoutService.unloadSettings();
+                    Qt.callLater(() => PopoutService.unloadSettingsNow());
                 }
             }
         }
@@ -940,6 +940,7 @@ Item {
             expandedWidthValue: 960
             edgeGap: SettingsData.notepadEffectiveEdgeGap
             slideEdge: SettingsData.notepadSlideoutSide
+            customTransparency: Theme.notepadTransparency
 
             onIsVisibleChanged: {
                 if (isVisible)

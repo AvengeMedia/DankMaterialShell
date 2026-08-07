@@ -465,7 +465,6 @@ Item {
                         iconName: "restart_alt"
                         iconSize: 20
                         visible: JSON.stringify(SettingsData.notificationRules) !== JSON.stringify(SettingsData.getDefaultNotificationRules())
-                        backgroundColor: Theme.surfaceContainer
                         iconColor: Theme.surfaceVariantText
                         onClicked: SettingsData.resetNotificationRules()
                     },
@@ -473,7 +472,6 @@ Item {
                         buttonSize: 36
                         iconName: "add"
                         iconSize: 20
-                        backgroundColor: Theme.surfaceContainer
                         iconColor: Theme.primary
                         onClicked: {
                             SettingsData.addNotificationRule();
@@ -723,7 +721,7 @@ Item {
                                 }
 
                                 Item {
-                                    width: Math.max(0, parent.width - parent.spacing - mutedAppLabel.width - unmuteBtn.width - deleteBtn.width - Theme.spacingS * 5)
+                                    width: Math.max(0, parent.width - parent.spacing - mutedAppLabel.width - unmuteBtn.width - mutedDeleteBtn.width - Theme.spacingS * 5)
                                     height: 1
                                 }
 
@@ -736,7 +734,7 @@ Item {
                                 }
 
                                 Item {
-                                    id: deleteBtn
+                                    id: mutedDeleteBtn
                                     width: 28
                                     height: 28
                                     anchors.verticalCenter: parent.verticalCenter
@@ -744,18 +742,18 @@ Item {
                                     Rectangle {
                                         anchors.fill: parent
                                         radius: Theme.cornerRadius
-                                        color: deleteArea.containsMouse ? Theme.withAlpha(Theme.error, 0.2) : Theme.withAlpha(Theme.error, 0)
+                                        color: mutedDeleteArea.containsMouse ? Theme.withAlpha(Theme.error, 0.2) : Theme.withAlpha(Theme.error, 0)
                                     }
 
                                     DankIcon {
                                         anchors.centerIn: parent
                                         name: "delete"
                                         size: 18
-                                        color: deleteArea.containsMouse ? Theme.error : Theme.surfaceVariantText
+                                        color: mutedDeleteArea.containsMouse ? Theme.error : Theme.surfaceVariantText
                                     }
 
                                     MouseArea {
-                                        id: deleteArea
+                                        id: mutedDeleteArea
                                         anchors.fill: parent
                                         hoverEnabled: true
                                         cursorShape: Qt.PointingHandCursor

@@ -202,7 +202,7 @@ FocusScope {
             StyledText {
                 text: root.currentFlow?.message ?? ""
                 font.pixelSize: Theme.fontSizeMedium
-                color: Theme.surfaceTextMedium
+                color: Theme.surfaceText
                 width: parent.width
                 wrapMode: Text.Wrap
                 maximumLineCount: 2
@@ -272,11 +272,6 @@ FocusScope {
 
             width: parent.width
             height: root.inputFieldHeight
-            backgroundColor: Theme.surfaceHover
-            normalBorderColor: Theme.outlineStrong
-            focusedBorderColor: Theme.primary
-            borderWidth: 1
-            focusedBorderWidth: 2
             leftIconName: root.polkitPamHasFprint ? "fingerprint" : ""
             leftIconSize: 20
             leftIconColor: Theme.primary
@@ -352,7 +347,7 @@ FocusScope {
                         anchors.centerIn: parent
                         text: I18n.tr("Authenticate")
                         font.pixelSize: Theme.fontSizeMedium
-                        color: Theme.background
+                        color: Theme.primaryText
                         font.weight: Font.Medium
                     }
 

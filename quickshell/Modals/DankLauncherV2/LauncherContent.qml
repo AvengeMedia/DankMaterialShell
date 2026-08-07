@@ -23,17 +23,6 @@ FocusScope {
     property bool editMode: false
     property var editingApp: null
     property string editAppId: ""
-    readonly property bool _blurActive: Theme.blurForegroundLayers || Theme.transparentBlurLayers
-    readonly property real _launcherFieldAlpha: {
-        if (Theme.transparentBlurLayers)
-            return 0.28;
-        if (Theme.blurForegroundLayers)
-            return Math.max(Theme.popupTransparency, 0.62);
-        return Theme.popupTransparency;
-    }
-    readonly property color _launcherSearchFieldColor: Theme.withAlpha(Theme.surfaceContainerHigh, _launcherFieldAlpha)
-    readonly property color _launcherSearchBorderColor: Theme.withAlpha(Theme.outline, _blurActive ? 0.16 : Theme.layerOutlineOpacity)
-    readonly property color _launcherSearchFocusedBorderColor: Theme.withAlpha(Theme.primary, _blurActive ? 0.72 : 1.0)
 
     function resetScroll() {
         resultsList.resetScroll();
@@ -314,7 +303,7 @@ FocusScope {
                 anchors.fill: parent
                 anchors.topMargin: -Theme.cornerRadius
                 // In connected mode the launcher provides the surface so update the toolbar for arcs
-                visible: !(root.parentModal?.frameOwnsConnectedChrome ?? false) && !root._blurActive
+                visible: !(root.parentModal?.frameOwnsConnectedChrome ?? false) && !Theme.blurLayersActive
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 radius: Theme.cornerRadius
             }
@@ -472,12 +461,6 @@ FocusScope {
             DankTextField {
                 id: searchField
                 width: parent.width - (pluginBadge.visible ? pluginBadge.width + Theme.spacingS : 0)
-                cornerRadius: Theme.cornerRadius
-                backgroundColor: root._launcherSearchFieldColor
-                normalBorderColor: root._launcherSearchBorderColor
-                focusedBorderColor: root._launcherSearchFocusedBorderColor
-                borderWidth: 1
-                focusedBorderWidth: 2
                 leftIconName: controller.activePluginId ? "extension" : controller.searchQuery.startsWith("/") ? "folder" : "search"
                 leftIconSize: Theme.iconSize
                 leftIconColor: Theme.surfaceVariantText

@@ -1202,13 +1202,19 @@ Singleton {
         if (frameEnabled && SettingsData.frameMode !== "connected")
             excludeNamespaces.push("dms:frame");
 
-        // Xray is niri's default blur, so only the off state needs a rule.
         let xrayRules = "";
         if (!layoutXrayEnabled) {
             const excludeLines = layoutBarXrayEnabled ? excludeNamespaces.map(ns => `\n    exclude namespace="^${ns}$"`).join("") : "";
             xrayRules += `
 
 layer-rule {${excludeLines}
+    background-effect {
+        xray false
+    }
+}
+
+window-rule {
+    match app-id="^com.danklinux.dms$"
     background-effect {
         xray false
     }

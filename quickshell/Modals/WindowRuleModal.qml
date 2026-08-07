@@ -4,10 +4,9 @@ import qs.Common
 import qs.Services
 import qs.Widgets
 
-FloatingWindow {
+DankFloatingWindow {
     id: root
 
-    property bool disablePopupTransparency: true
     property var editingRule: null
     property bool isEditMode: editingRule !== null
     property bool isNiri: CompositorService.isNiri
@@ -29,7 +28,6 @@ FloatingWindow {
     title: isEditMode ? I18n.tr("Edit Window Rule") : I18n.tr("Create Window Rule")
     minimumSize: Qt.size(500, 600)
     maximumSize: Qt.size(500, 600)
-    color: Theme.surfaceContainer
     visible: false
 
     onClosed: hide()

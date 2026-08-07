@@ -4,10 +4,9 @@ import qs.Common
 import qs.Services
 import qs.Widgets
 
-FloatingWindow {
+DankFloatingWindow {
     id: root
 
-    property bool disablePopupTransparency: true
     readonly property int modalWidth: 680
     readonly property int modalHeight: screen ? Math.min(720, screen.height - 80) : 720
 
@@ -21,7 +20,6 @@ FloatingWindow {
     title: i18n("What's New")
     minimumSize: Qt.size(modalWidth, modalHeight)
     maximumSize: Qt.size(modalWidth, modalHeight)
-    color: Theme.surfaceContainer
     visible: false
 
     onClosed: visible = false
@@ -112,7 +110,7 @@ FloatingWindow {
             anchors.right: parent.right
             anchors.bottom: parent.bottom
             height: Math.round(Theme.fontSizeMedium * 4.5)
-            color: Theme.surfaceContainerHigh
+            color: Theme.floatingWindowNestedSurface
 
             Rectangle {
                 anchors.top: parent.top

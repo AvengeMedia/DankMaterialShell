@@ -29,7 +29,9 @@ StyledRect {
     width: parent?.width ?? 0
     height: Theme.spacingL * 2 + mainColumn.height
     radius: Theme.cornerRadius
-    color: Theme.surfaceContainerHigh
+    color: Theme.floatingWindowNestedSurface
+    border.color: Theme.outlineMedium
+    border.width: Theme.layerOutlineWidth
 
     Component.onCompleted: {
         if (!settingKey)

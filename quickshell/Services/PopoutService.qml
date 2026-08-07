@@ -118,7 +118,7 @@ Singleton {
             "systemUpdate": () => _unloadPopoutNow("systemUpdatePopout", "systemUpdateLoader"),
             "layout": () => _unloadPopoutNow("layoutPopout", "layoutPopoutLoader"),
             "clipboardHistory": () => _unloadPopoutNow("clipboardHistoryPopout", "clipboardHistoryPopoutLoader"),
-            "settings": () => _unloadSettingsNow()
+            "settings": () => unloadSettingsNow()
         })
 
     function setPosition(popout, x, y, width, section, screen) {
@@ -491,15 +491,12 @@ Singleton {
         openSettingsWithTab(tabName);
     }
 
-    function unloadSettings() {
-        _scheduleUnload("settings");
-    }
-
-    function _unloadSettingsNow() {
+    function unloadSettingsNow() {
         if (!settingsModalLoader)
             return;
         if (settingsModal && settingsModal.visible)
             return;
+        delete _pendingUnloads["settings"];
         settingsModal = null;
         settingsModalLoader.active = false;
     }

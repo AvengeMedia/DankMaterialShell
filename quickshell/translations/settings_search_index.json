@@ -935,7 +935,7 @@
       "workspace"
     ],
     "description": "Show the bar only when no windows are open",
-    "conditionKey": "isNiri"
+    "conditionKey": "windowRulesCapable"
   },
   {
     "section": "hoverPopouts",
@@ -1013,7 +1013,7 @@
     ],
     "icon": "fit_screen",
     "description": "Remove gaps and border when windows are maximized",
-    "conditionKey": "isNiri"
+    "conditionKey": "windowRulesCapable"
   },
   {
     "section": "barMaximizeWidgetIcons",
@@ -1421,7 +1421,7 @@
       "workspaces"
     ],
     "description": "Show workspaces of the currently focused monitor",
-    "conditionKey": "isNiri"
+    "conditionKey": "windowRulesCapable"
   },
   {
     "section": "workspaceSettings",
@@ -1447,7 +1447,7 @@
     ],
     "icon": "view_module",
     "description": "Show workspace index numbers in the top bar workspace switcher",
-    "conditionKey": "isNiri"
+    "conditionKey": "windowRulesCapable"
   },
   {
     "section": "groupActiveWorkspaceApps",
@@ -1575,7 +1575,7 @@
       "workspace"
     ],
     "description": "Reverse workspace switch direction when scrolling over the bar",
-    "conditionKey": "isNiri"
+    "conditionKey": "windowRulesCapable"
   },
   {
     "section": "workspaceUnfocusedMonitorSeparateAppearance",
@@ -1663,7 +1663,7 @@
       "workspaces"
     ],
     "description": "Display only workspaces that contain windows",
-    "conditionKey": "isNiri"
+    "conditionKey": "windowRulesCapable"
   },
   {
     "section": "showWorkspaceApps",
@@ -1693,7 +1693,7 @@
       "workspace"
     ],
     "description": "Display application icons in workspace indicators",
-    "conditionKey": "isNiri"
+    "conditionKey": "windowRulesCapable"
   },
   {
     "section": "showWorkspaceIndex",
@@ -1987,7 +1987,7 @@
       "windows"
     ],
     "description": "Show dock when floating windows don",
-    "conditionKey": "isNiri"
+    "conditionKey": "windowRulesCapable"
   },
   {
     "section": "dockIsolateDisplays",
@@ -3531,30 +3531,6 @@
     "description": "Hide cursor after inactivity (0 = disabled)"
   },
   {
-    "section": "automaticColorMode",
-    "label": "Automatic Color Mode",
-    "tabIndex": 10,
-    "category": "Theme & Colors",
-    "keywords": [
-      "appearance",
-      "automatic",
-      "color",
-      "colors",
-      "colour",
-      "hue",
-      "look",
-      "mode",
-      "schedule",
-      "scheme",
-      "style",
-      "sunrise",
-      "sunset",
-      "theme",
-      "tint"
-    ],
-    "icon": "schedule"
-  },
-  {
     "section": "blurEnabled",
     "label": "Background Blur",
     "tabIndex": 10,
@@ -3638,6 +3614,7 @@
     "category": "Theme & Colors",
     "keywords": [
       "appearance",
+      "automatic",
       "color",
       "colors",
       "colour",
@@ -3650,8 +3627,11 @@
       "look",
       "mode",
       "night",
+      "schedule",
       "scheme",
       "style",
+      "sunrise",
+      "sunset",
       "theme",
       "tint"
     ],
@@ -3745,7 +3725,7 @@
     ],
     "icon": "mouse",
     "description": "Mouse pointer appearance",
-    "conditionKey": "isNiri"
+    "conditionKey": "windowRulesCapable"
   },
   {
     "section": "widgetBackgroundCustomStrength",
@@ -3859,6 +3839,37 @@
     ]
   },
   {
+    "section": "floatingWindows",
+    "label": "Floating Windows",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "authentication",
+      "colors",
+      "floating",
+      "follow",
+      "foreground",
+      "look",
+      "notepad",
+      "opacity",
+      "polkit",
+      "scheme",
+      "settings",
+      "style",
+      "styling",
+      "surface",
+      "theme",
+      "tile",
+      "tiling",
+      "transparency",
+      "window",
+      "windows"
+    ],
+    "icon": "open_in_new",
+    "description": "Floating windows follow Surface Styling settings"
+  },
+  {
     "section": "matugenTemplateNeovimSetBackground",
     "label": "Follow DMS background color",
     "tabIndex": 10,
@@ -3908,6 +3919,84 @@
       "theme"
     ],
     "description": "Show foreground surfaces on panels for stronger contrast"
+  },
+  {
+    "section": "floatingWindowForegroundLayers",
+    "label": "Foreground Layers",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "blur",
+      "cards",
+      "colors",
+      "contrast",
+      "floating",
+      "foreground",
+      "glass",
+      "inside",
+      "layers",
+      "look",
+      "scheme",
+      "show",
+      "style",
+      "surfaces",
+      "theme",
+      "window",
+      "windows"
+    ],
+    "description": "Show foreground surfaces on cards inside floating windows"
+  },
+  {
+    "section": "floatingWindowForegroundTransparency",
+    "label": "Foreground Opacity",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "cards",
+      "colors",
+      "floating",
+      "foreground",
+      "inside",
+      "layers",
+      "look",
+      "nested",
+      "opacity",
+      "scheme",
+      "style",
+      "surfaces",
+      "theme",
+      "transparency",
+      "window",
+      "windows"
+    ],
+    "description": "Opacity of cards and nested surfaces inside floating windows"
+  },
+  {
+    "section": "foregroundLayerTransparency",
+    "label": "Foreground Opacity",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "cards",
+      "colors",
+      "contrast",
+      "foreground",
+      "layers",
+      "look",
+      "nested",
+      "opacity",
+      "panels",
+      "scheme",
+      "shell",
+      "style",
+      "surfaces",
+      "theme",
+      "transparency"
+    ],
+    "description": "Opacity of foreground cards and nested surfaces on shell panels"
   },
   {
     "section": "matugenTemplateGtk",
@@ -4291,6 +4380,34 @@
     "conditionKey": "isMango"
   },
   {
+    "section": "dmsWindowsFloating",
+    "label": "Open Windows Floating",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "colors",
+      "compositor",
+      "floating",
+      "hyprland",
+      "look",
+      "mango",
+      "niri",
+      "open",
+      "rule",
+      "scheme",
+      "style",
+      "theme",
+      "tile",
+      "tiled",
+      "tiling",
+      "window",
+      "windows"
+    ],
+    "description": "Open DMS windows floating instead of tiled",
+    "conditionKey": "windowRulesCapable"
+  },
+  {
     "section": "popoutElevationEnabled",
     "label": "Popout Shadows",
     "tabIndex": 10,
@@ -4580,6 +4697,37 @@
     "description": "Controls opacity of shell surfaces, popouts, and modals"
   },
   {
+    "section": "surfaceStyling",
+    "label": "Surface Styling",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "border",
+      "colors",
+      "controls",
+      "corner",
+      "look",
+      "modal",
+      "modals",
+      "opacity",
+      "outline",
+      "popouts",
+      "popup",
+      "radius",
+      "scheme",
+      "shell",
+      "style",
+      "styling",
+      "surface",
+      "surfaces",
+      "theme",
+      "transparency"
+    ],
+    "icon": "layers",
+    "description": "Controls opacity of shell surfaces, popouts, and modals"
+  },
+  {
     "section": "syncModeWithPortal",
     "label": "Sync Mode with Portal",
     "tabIndex": 10,
@@ -4605,6 +4753,31 @@
       "wide"
     ],
     "description": "Sync dark mode with settings portals for system-wide theme hints"
+  },
+  {
+    "section": "floatingWindowSyncGlobal",
+    "label": "Sync with Global Settings",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "colors",
+      "floating",
+      "follow",
+      "global",
+      "look",
+      "opacity",
+      "scheme",
+      "settings",
+      "style",
+      "styling",
+      "surface",
+      "sync",
+      "theme",
+      "window",
+      "windows"
+    ],
+    "description": "Floating windows follow Surface Styling settings"
   },
   {
     "section": "systemAppTheming",
@@ -4805,6 +4978,30 @@
       "widget"
     ],
     "description": "Choose neutral or accent-colored widget text"
+  },
+  {
+    "section": "floatingWindowTransparency",
+    "label": "Window Opacity",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "authentication",
+      "colors",
+      "floating",
+      "look",
+      "notepad",
+      "opacity",
+      "prompts",
+      "scheme",
+      "settings",
+      "style",
+      "theme",
+      "transparency",
+      "window",
+      "windows"
+    ],
+    "description": "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts"
   },
   {
     "section": "matugenTemplateZed",

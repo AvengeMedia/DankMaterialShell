@@ -118,7 +118,9 @@ Column {
             width: parent.width
             height: 56
             radius: Theme.cornerRadius
-            color: Theme.surfaceContainerHigh
+            color: Theme.floatingWindowFieldColor
+            border.color: Theme.floatingWindowFieldBorderColor
+            border.width: 1
 
             Row {
                 anchors.fill: parent

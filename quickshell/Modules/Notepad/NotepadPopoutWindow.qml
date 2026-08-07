@@ -5,7 +5,7 @@ import qs.Services
 import qs.Widgets
 import qs.Modules.Notepad
 
-FloatingWindow {
+DankFloatingWindow {
     id: win
 
     property alias shouldBeVisible: win.visible
@@ -27,7 +27,7 @@ FloatingWindow {
     minimumSize: Qt.size(360, 320)
     implicitWidth: 640
     implicitHeight: 760
-    color: Theme.surfaceContainer
+    surfaceColor: Theme.notepadWindowSurface
     visible: false
 
     onVisibleChanged: {
@@ -38,7 +38,6 @@ FloatingWindow {
         }
     }
 
-    // A compositor close (e.g. niri close-window)
     onClosed: win.visible = false
 
     Item {
@@ -56,12 +55,6 @@ FloatingWindow {
                 anchors.fill: parent
                 onPressed: windowControls.tryStartMove()
                 onDoubleClicked: windowControls.tryToggleMaximize()
-            }
-
-            Rectangle {
-                anchors.fill: parent
-                color: Theme.surfaceContainerHigh
-                opacity: 0.5
             }
 
             Row {

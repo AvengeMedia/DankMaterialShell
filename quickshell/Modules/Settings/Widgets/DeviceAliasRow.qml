@@ -122,7 +122,6 @@ Rectangle {
                 buttonSize: 36
                 iconName: "restart_alt"
                 iconSize: 20
-                backgroundColor: Theme.surfaceContainerHigh
                 iconColor: Theme.surfaceVariantText
                 tooltipText: I18n.tr("Reset to default name")
                 anchors.verticalCenter: parent.verticalCenter
@@ -137,7 +136,6 @@ Rectangle {
                 buttonSize: 36
                 iconName: root.isHidden ? "visibility" : "visibility_off"
                 iconSize: 20
-                backgroundColor: Theme.surfaceContainerHigh
                 iconColor: root.isHidden ? Theme.primary : Theme.surfaceVariantText
                 tooltipText: root.isHidden ? I18n.tr("Show device") : I18n.tr("Hide device")
                 anchors.verticalCenter: parent.verticalCenter

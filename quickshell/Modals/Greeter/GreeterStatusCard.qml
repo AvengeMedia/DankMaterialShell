@@ -9,7 +9,7 @@ Rectangle {
     property string label: ""
     property string iconName: ""
     property color iconColor: Theme.surfaceText
-    property color bgColor: Theme.surfaceContainerHigh
+    property color bgColor: Theme.floatingWindowNestedSurface
     property bool selected: false
 
     signal clicked

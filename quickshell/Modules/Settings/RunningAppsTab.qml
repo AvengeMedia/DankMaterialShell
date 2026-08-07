@@ -32,7 +32,6 @@ Item {
                         iconName: "restart_alt"
                         iconSize: 20
                         visible: JSON.stringify(SettingsData.appIdSubstitutions) !== JSON.stringify(SettingsData.getDefaultAppIdSubstitutions())
-                        backgroundColor: Theme.surfaceContainer
                         iconColor: Theme.surfaceVariantText
                         onClicked: SettingsData.resetAppIdSubstitutions()
                     },
@@ -40,7 +39,6 @@ Item {
                         buttonSize: 36
                         iconName: "add"
                         iconSize: 20
-                        backgroundColor: Theme.surfaceContainer
                         iconColor: Theme.primary
                         onClicked: SettingsData.addAppIdSubstitution("", "", "exact")
                     }

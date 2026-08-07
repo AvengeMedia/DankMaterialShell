@@ -975,6 +975,45 @@ Singleton {
         compositorDetected = true;
         if (isNiri)
             NiriService.generateNiriBlurrule();
+        Qt.callLater(applyDmsWindowFloatingRule);
+    }
+
+    function applyDmsWindowFloatingRule() {
+        if (!compositorDetected || (!isNiri && !isHyprland && !isMango))
+            return;
+        const floating = typeof SettingsData === "undefined" || (SettingsData.dmsWindowsFloating ?? true);
+        if (!floating) {
+            Proc.runCommand("dms-windowrule-float-remove", [Proc.dmsBin, "config", "windowrules", "remove", compositor, "dms-floating-windows"], (output, exitCode) => {
+                if (exitCode !== 0) {
+                    log.warn("failed to remove DMS floating window rule", exitCode, output);
+                    return;
+                }
+                if (isMango)
+                    MangoService.reloadConfig();
+            });
+            return;
+        }
+        const ruleJson = JSON.stringify({
+            "id": "dms-floating-windows",
+            "name": "DMS Floating Windows",
+            "enabled": true,
+            "matchCriteria": {
+                "appId": "^com.danklinux.dms$"
+            },
+            "actions": {
+                "openFloating": true
+            }
+        });
+        Proc.runCommand("dms-windowrule-float-add", [Proc.dmsBin, "config", "windowrules", "add", compositor, ruleJson], (output, exitCode) => {
+            if (exitCode !== 0) {
+                log.warn("failed to add DMS floating window rule", exitCode, output);
+                return;
+            }
+            if (isNiri)
+                NiriService.validate();
+            if (isMango)
+                MangoService.reloadConfig();
+        });
     }
 
     // Fallback when the socket owner can't be resolved (no ss, unrecognized
@@ -1139,6 +1178,10 @@ Singleton {
                 MangoService.generateCursorConfig();
                 return;
             }
+        }
+
+        function onDmsWindowsFloatingChanged() {
+            root.applyDmsWindowFloatingRule();
         }
     }
 }

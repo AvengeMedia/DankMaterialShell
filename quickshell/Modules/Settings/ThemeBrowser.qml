@@ -6,10 +6,9 @@ import qs.Modals.Common
 import qs.Services
 import qs.Widgets
 
-FloatingWindow {
+DankFloatingWindow {
     id: root
 
-    property bool disablePopupTransparency: true
     property var allThemes: []
     property string searchQuery: ""
     property var filteredThemes: []
@@ -148,7 +147,6 @@ FloatingWindow {
     minimumSize: Qt.size(550, 450)
     implicitWidth: 700
     implicitHeight: 700
-    color: Theme.surfaceContainer
     visible: false
 
     onVisibleChanged: {
@@ -301,10 +299,6 @@ FloatingWindow {
                 anchors.top: descriptionText.bottom
                 anchors.topMargin: Theme.spacingM
                 height: 48
-                cornerRadius: Theme.cornerRadius
-                backgroundColor: Theme.surfaceContainerHigh
-                normalBorderColor: Theme.outlineMedium
-                focusedBorderColor: Theme.primary
                 leftIconName: "search"
                 leftIconSize: Theme.iconSize
                 leftIconColor: Theme.surfaceVariantText
@@ -401,7 +395,7 @@ FloatingWindow {
                                 width: hasPreview ? 180 : 0
                                 height: parent.height
                                 radius: Theme.cornerRadius - 2
-                                color: Theme.surfaceContainerHigh
+                                color: Theme.floatingWindowNestedSurface
                                 visible: hasPreview
 
                                 Image {
@@ -596,7 +590,7 @@ FloatingWindow {
                                             closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
 
                                             background: Rectangle {
-                                                color: Theme.surfaceContainerHigh
+                                                color: Theme.floatingWindowNestedSurface
                                                 radius: Theme.cornerRadius
                                                 border.width: 1
                                                 border.color: Theme.outlineMedium

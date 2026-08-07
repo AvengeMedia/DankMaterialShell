@@ -65,110 +65,171 @@ Item {
                 "label": I18n.tr("Custom", "widget background color option")
             })]
 
-    property var cursorIncludeStatus: ({
-            "exists": false,
-            "included": false,
-            "configFormat": "",
-            "readOnly": false
-        })
+    property var cursorIncludeStatus: defaultIncludeStatus()
     readonly property bool cursorReadOnly: CompositorService.isHyprland && cursorIncludeStatus.readOnly === true
     property bool checkingCursorInclude: false
     property bool fixingCursorInclude: false
 
-    function getCursorConfigPaths() {
-        const configDir = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
-        switch (CompositorService.compositor) {
-        case "niri":
-            return {
-                "configFile": configDir + "/niri/config.kdl",
-                "cursorFile": configDir + "/niri/dms/cursor.kdl",
-                "grepPattern": 'include.*"dms/cursor.kdl"',
-                "includeLine": 'include "dms/cursor.kdl"'
-            };
-        case "hyprland":
-            return {
-                "configFile": configDir + "/hypr/hyprland.lua",
-                "cursorFile": configDir + "/hypr/dms/cursor.lua",
-                "grepPattern": "dms.cursor",
-                "includeLine": "require(\"dms.cursor\")"
-            };
-        case "mango":
-            return {
-                "configFile": configDir + "/mango/config.conf",
-                "cursorFile": configDir + "/mango/dms/cursor.conf",
-                "grepPattern": 'source.*dms/cursor.conf',
-                "includeLine": "source=./dms/cursor.conf"
-            };
-        default:
-            return null;
-        }
+    property var windowRulesIncludeStatus: defaultIncludeStatus()
+    readonly property bool windowRulesReadOnly: CompositorService.isHyprland && windowRulesIncludeStatus.readOnly === true
+    property bool checkingWindowRulesInclude: false
+    property bool fixingWindowRulesInclude: false
+
+    readonly property var includeConfigSpecs: ({
+            "cursor": ({
+                    "niri": {
+                        "configName": "config.kdl",
+                        "fragmentName": "cursor.kdl",
+                        "grepPattern": 'include.*"dms/cursor.kdl"',
+                        "includeLine": 'include "dms/cursor.kdl"'
+                    },
+                    "hyprland": {
+                        "configName": "hyprland.lua",
+                        "fragmentName": "cursor.lua",
+                        "grepPattern": "dms.cursor",
+                        "includeLine": "require(\"dms.cursor\")"
+                    },
+                    "mango": {
+                        "configName": "config.conf",
+                        "fragmentName": "cursor.conf",
+                        "grepPattern": "source.*dms/cursor.conf",
+                        "includeLine": "source=./dms/cursor.conf"
+                    }
+                }),
+            "windowrules": ({
+                    "niri": {
+                        "configName": "config.kdl",
+                        "fragmentName": "windowrules.kdl",
+                        "grepPattern": 'include.*"dms/windowrules.kdl"',
+                        "includeLine": 'include "dms/windowrules.kdl"'
+                    },
+                    "hyprland": {
+                        "configName": "hyprland.lua",
+                        "fragmentName": "windowrules.lua",
+                        "grepPattern": "dms.windowrules",
+                        "includeLine": "require(\"dms.windowrules\")"
+                    },
+                    "mango": {
+                        "configName": "config.conf",
+                        "fragmentName": "windowrules.conf",
+                        "grepPattern": "dms/windowrules.conf",
+                        "includeLine": "source=./dms/windowrules.conf"
+                    }
+                })
+        })
+
+    function defaultIncludeStatus() {
+        return {
+            "exists": false,
+            "included": false,
+            "configFormat": "",
+            "readOnly": false
+        };
     }
 
-    function checkCursorIncludeStatus() {
-        const compositor = CompositorService.compositor;
-        if (compositor !== "niri" && compositor !== "hyprland" && compositor !== "mango") {
-            cursorIncludeStatus = {
-                "exists": false,
-                "included": false,
-                "configFormat": "",
-                "readOnly": false
-            };
+    function getIncludeConfigPaths(includeKind) {
+        const spec = includeConfigSpecs[includeKind]?.[CompositorService.compositor];
+        if (!spec)
+            return null;
+        const configDir = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation)) + "/" + CompositorService.compositor;
+        return {
+            "configFile": configDir + "/" + spec.configName,
+            "fragmentFile": configDir + "/dms/" + spec.fragmentName,
+            "grepPattern": spec.grepPattern,
+            "includeLine": spec.includeLine
+        };
+    }
+
+    function checkIncludeStatus(includeKind, procTag, onFinished) {
+        const spec = includeConfigSpecs[includeKind]?.[CompositorService.compositor];
+        if (!spec) {
+            onFinished(defaultIncludeStatus());
             return;
         }
-
-        const filename = (compositor === "niri") ? "cursor.kdl" : ((compositor === "hyprland") ? "cursor.lua" : "cursor.conf");
+        const compositor = CompositorService.compositor;
         const compositorArg = (compositor === "mango") ? "mangowc" : compositor;
-
-        checkingCursorInclude = true;
-        Proc.runCommand("check-cursor-include", [Proc.dmsBin, "config", "resolve-include", compositorArg, filename], (output, exitCode) => {
-            checkingCursorInclude = false;
+        Proc.runCommand(procTag, [Proc.dmsBin, "config", "resolve-include", compositorArg, spec.fragmentName], (output, exitCode) => {
             if (exitCode !== 0) {
-                cursorIncludeStatus = {
-                    "exists": false,
-                    "included": false,
-                    "configFormat": "",
-                    "readOnly": false
-                };
+                onFinished(defaultIncludeStatus());
                 return;
             }
             try {
-                cursorIncludeStatus = JSON.parse(output.trim());
+                onFinished(JSON.parse(output.trim()));
             } catch (e) {
-                cursorIncludeStatus = {
-                    "exists": false,
-                    "included": false,
-                    "configFormat": "",
-                    "readOnly": false
-                };
+                onFinished(defaultIncludeStatus());
             }
         });
     }
 
-    function fixCursorInclude() {
-        if (cursorReadOnly) {
+    function checkCursorIncludeStatus() {
+        checkingCursorInclude = true;
+        checkIncludeStatus("cursor", "check-cursor-include", status => {
+            checkingCursorInclude = false;
+            cursorIncludeStatus = status;
+        });
+    }
+
+    function checkWindowRulesIncludeStatus() {
+        checkingWindowRulesInclude = true;
+        checkIncludeStatus("windowrules", "check-windowrules-include-theme", status => {
+            checkingWindowRulesInclude = false;
+            windowRulesIncludeStatus = status;
+        });
+    }
+
+    function fixInclude(includeKind, procTag, readOnly, onFinished) {
+        if (readOnly) {
             ToastService.showWarning(I18n.tr("Hyprland conf mode"), I18n.tr("This install is still using hyprland.conf. Run dms setup to migrate before changing these settings."), "dms setup", "hyprland-migration");
+            onFinished(false);
             return;
         }
-        const paths = getCursorConfigPaths();
-        if (!paths)
+        const paths = getIncludeConfigPaths(includeKind);
+        if (!paths) {
+            onFinished(false);
             return;
-        fixingCursorInclude = true;
+        }
         const unixTime = Math.floor(Date.now() / 1000);
-        const backupFile = paths.configFile + ".backup" + unixTime;
         const script = ConfigIncludeResolve.buildRepairScript({
             configFile: paths.configFile,
-            backupFile: backupFile,
-            fragmentFile: paths.cursorFile,
+            backupFile: paths.configFile + ".backup" + unixTime,
+            fragmentFile: paths.fragmentFile,
             grepPattern: paths.grepPattern,
             includeLine: paths.includeLine
         });
-        Proc.runCommand("fix-cursor-include", ["sh", "-c", script], (output, exitCode) => {
+        Proc.runCommand(procTag, ["sh", "-c", script], (output, exitCode) => onFinished(exitCode === 0));
+    }
+
+    function fixCursorInclude() {
+        fixingCursorInclude = true;
+        fixInclude("cursor", "fix-cursor-include", cursorReadOnly, success => {
             fixingCursorInclude = false;
-            if (exitCode !== 0)
+            if (!success)
                 return;
             checkCursorIncludeStatus();
             SettingsData.updateCompositorCursor();
         });
+    }
+
+    function fixWindowRulesInclude() {
+        fixingWindowRulesInclude = true;
+        fixInclude("windowrules", "fix-windowrules-include-theme", windowRulesReadOnly, success => {
+            fixingWindowRulesInclude = false;
+            if (!success)
+                return;
+            if (CompositorService.isMango)
+                MangoService.reloadConfig();
+            checkWindowRulesIncludeStatus();
+            CompositorService.applyDmsWindowFloatingRule();
+        });
+    }
+
+    function unsyncFloatingWindowSettings() {
+        if (!SettingsData.floatingWindowSyncGlobal)
+            return;
+        SettingsData.set("floatingWindowTransparency", SettingsData.popupTransparency);
+        SettingsData.set("floatingWindowForegroundLayers", SettingsData.blurForegroundLayers ?? true);
+        SettingsData.set("floatingWindowForegroundTransparency", SettingsData.foregroundLayerTransparency ?? 1.0);
+        SettingsData.set("floatingWindowSyncGlobal", false);
     }
 
     function isTemplateDetected(templateId) {
@@ -259,8 +320,10 @@ Item {
                 themeColorsTab.templateDetection = JSON.parse(output.trim());
             } catch (e) {}
         });
-        if (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango)
+        if (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango) {
             checkCursorIncludeStatus();
+            checkWindowRulesIncludeStatus();
+        }
         refreshMatugenSchemePreviews();
     }
 
@@ -293,6 +356,78 @@ Item {
         target: SettingsData
         function onMatugenContrastChanged() {
             themeColorsTab.refreshMatugenSchemePreviews();
+        }
+    }
+
+    component IncludeWarningBox: StyledRect {
+        id: includeWarningBox
+
+        property bool checking: false
+        property bool fixing: false
+        property bool includeReadOnly: false
+        property bool alreadyIncluded: false
+        property bool visibleCondition: true
+        property string fragmentPath: ""
+        property var onSetup: function () {}
+
+        readonly property bool showLegacy: includeReadOnly
+        readonly property bool showSetup: !showLegacy && !alreadyIncluded
+
+        width: parent.width
+        height: includeWarningContent.implicitHeight + Theme.spacingL * 2
+        radius: Theme.cornerRadius
+        color: Theme.withAlpha(Theme.primary, 0.15)
+        border.color: Theme.withAlpha(Theme.primary, 0.3)
+        border.width: 1
+        visible: visibleCondition && (showLegacy || showSetup) && !checking
+
+        Row {
+            id: includeWarningContent
+            anchors.fill: parent
+            anchors.margins: Theme.spacingL
+            spacing: Theme.spacingM
+
+            DankIcon {
+                name: "warning"
+                size: Theme.iconSize
+                color: Theme.primary
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            Column {
+                width: parent.width - Theme.iconSize - (includeFixButton.visible ? includeFixButton.width + Theme.spacingM : 0) - Theme.spacingM
+                spacing: Theme.spacingXS
+                anchors.verticalCenter: parent.verticalCenter
+
+                StyledText {
+                    text: includeWarningBox.showLegacy ? I18n.tr("Hyprland conf mode") : I18n.tr("First Time Setup")
+                    font.pixelSize: Theme.fontSizeMedium
+                    font.weight: Font.Medium
+                    color: Theme.primary
+                    width: parent.width
+                    horizontalAlignment: Text.AlignLeft
+                }
+
+                StyledText {
+                    text: includeWarningBox.showLegacy ? I18n.tr("This install is still using hyprland.conf. Run dms setup to migrate before changing these settings.") : I18n.tr("Click 'Setup' to create %1 and add include to your compositor config.").arg(includeWarningBox.fragmentPath)
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceVariantText
+                    wrapMode: Text.WordWrap
+                    width: parent.width
+                    horizontalAlignment: Text.AlignLeft
+                }
+            }
+
+            DankButton {
+                id: includeFixButton
+                visible: !includeWarningBox.showLegacy && includeWarningBox.showSetup
+                text: includeWarningBox.fixing ? I18n.tr("Setting up...") : I18n.tr("Setup")
+                backgroundColor: Theme.primary
+                textColor: Theme.primaryText
+                enabled: !includeWarningBox.fixing
+                anchors.verticalCenter: parent.verticalCenter
+                onClicked: includeWarningBox.onSetup()
+            }
         }
     }
 
@@ -1137,14 +1272,27 @@ Item {
 
             SettingsCard {
                 tab: "theme"
-                tags: ["automatic", "color", "mode", "schedule", "sunrise", "sunset"]
-                title: I18n.tr("Automatic Color Mode")
-                settingKey: "automaticColorMode"
-                iconName: "schedule"
+                tags: ["light", "dark", "mode", "appearance", "automatic", "color", "schedule", "sunrise", "sunset"]
+                title: I18n.tr("Color Mode")
+                settingKey: "colorMode"
+                iconName: "contrast"
 
                 Column {
                     width: parent.width
                     spacing: Theme.spacingM
+
+                    SettingsToggleRow {
+                        tab: "theme"
+                        tags: ["light", "dark", "mode"]
+                        settingKey: "isLightMode"
+                        text: I18n.tr("Light Mode")
+                        description: I18n.tr("Use light theme instead of dark theme")
+                        checked: SessionData.isLightMode
+                        onToggled: checked => {
+                            Theme.screenTransition();
+                            Theme.setLightMode(checked);
+                        }
+                    }
 
                     DankToggle {
                         id: themeModeAutoToggle
@@ -1570,27 +1718,6 @@ Item {
 
             SettingsCard {
                 tab: "theme"
-                tags: ["light", "dark", "mode", "appearance"]
-                title: I18n.tr("Color Mode")
-                settingKey: "colorMode"
-                iconName: "contrast"
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["light", "dark", "mode"]
-                    settingKey: "isLightMode"
-                    text: I18n.tr("Light Mode")
-                    description: I18n.tr("Use light theme instead of dark theme")
-                    checked: SessionData.isLightMode
-                    onToggled: checked => {
-                        Theme.screenTransition();
-                        Theme.setLightMode(checked);
-                    }
-                }
-            }
-
-            SettingsCard {
-                tab: "theme"
                 tags: ["transparency", "opacity", "widget", "styling"]
                 title: I18n.tr("Widget Styling")
                 settingKey: "widgetStyling"
@@ -1723,12 +1850,21 @@ Item {
                         }
                     }
                 }
+            }
+
+            SettingsCard {
+                tab: "theme"
+                tags: ["surface", "popup", "transparency", "opacity", "modal", "border", "outline", "corner", "radius"]
+                title: I18n.tr("Surface Styling")
+                settingKey: "surfaceStyling"
+                iconName: "layers"
+
                 SettingsSliderRow {
                     tab: "theme"
                     tags: ["surface", "popup", "transparency", "opacity", "modal"]
                     settingKey: "popupTransparency"
                     text: I18n.tr("Surface Opacity")
-                    description: I18n.tr("Controls opacity of shell surfaces, popouts, and modals")
+                    description: I18n.tr("Controls opacity of shell surfaces, popouts, and modals", "Surface Opacity setting description")
                     visible: !themeColorsTab.connectedFrameModeActive
                     value: Math.round(SettingsData.popupTransparency * 100)
                     minimum: 0
@@ -1746,6 +1882,21 @@ Item {
                     description: I18n.tr("Show foreground surfaces on panels for stronger contrast")
                     checked: SettingsData.blurForegroundLayers ?? true
                     onToggled: checked => SettingsData.set("blurForegroundLayers", checked)
+                }
+
+                SettingsSliderRow {
+                    tab: "theme"
+                    tags: ["foreground", "layers", "opacity", "transparency", "contrast", "cards"]
+                    settingKey: "foregroundLayerTransparency"
+                    text: I18n.tr("Foreground Opacity")
+                    description: I18n.tr("Opacity of foreground cards and nested surfaces on shell panels")
+                    visible: SettingsData.blurForegroundLayers ?? true
+                    value: Math.round((SettingsData.foregroundLayerTransparency ?? 1.0) * 100)
+                    minimum: 0
+                    maximum: 100
+                    unit: "%"
+                    defaultValue: 100
+                    onSliderValueChanged: newValue => SettingsData.set("foregroundLayerTransparency", newValue / 100)
                 }
 
                 SettingsSliderRow {
@@ -1851,6 +2002,113 @@ Item {
                     parentModal: themeColorsTab.parentModal
                     settingLabel: I18n.tr("Surface Opacity")
                     reason: I18n.tr("Managed by Frame in Connected Mode")
+                }
+            }
+
+            SettingsCard {
+                tab: "theme"
+                tags: ["floating", "window", "settings", "notepad", "authentication", "polkit", "opacity", "transparency", "foreground", "tile", "tiling"]
+                title: I18n.tr("Floating Windows")
+                settingKey: "floatingWindows"
+                iconName: "open_in_new"
+
+                SettingsToggleRow {
+                    tab: "theme"
+                    tags: ["floating", "window", "sync", "global", "surface", "opacity"]
+                    settingKey: "floatingWindowSyncGlobal"
+                    text: I18n.tr("Sync with Global Settings")
+                    description: I18n.tr("Floating windows follow Surface Styling settings")
+                    checked: SettingsData.floatingWindowSyncGlobal ?? true
+                    onToggled: checked => SettingsData.set("floatingWindowSyncGlobal", checked)
+                }
+
+                SettingsSliderRow {
+                    id: floatingWindowOpacitySlider
+                    tab: "theme"
+                    tags: ["floating", "window", "opacity", "transparency"]
+                    settingKey: "floatingWindowTransparency"
+                    text: I18n.tr("Window Opacity")
+                    description: I18n.tr("Opacity of floating DMS windows like Settings, Notepad, and authentication prompts")
+                    value: Math.round(Theme.floatingWindowTransparency * 100)
+                    minimum: 0
+                    maximum: 100
+                    unit: "%"
+                    defaultValue: 100
+                    onSliderValueChanged: newValue => {
+                        themeColorsTab.unsyncFloatingWindowSettings();
+                        SettingsData.set("floatingWindowTransparency", newValue / 100);
+                    }
+
+                    Binding {
+                        target: floatingWindowOpacitySlider
+                        property: "value"
+                        value: Math.round(Theme.floatingWindowTransparency * 100)
+                        restoreMode: Binding.RestoreBinding
+                    }
+                }
+
+                SettingsToggleRow {
+                    tab: "theme"
+                    tags: ["floating", "window", "foreground", "layers", "contrast", "cards", "blur", "glass"]
+                    settingKey: "floatingWindowForegroundLayers"
+                    text: I18n.tr("Foreground Layers")
+                    description: I18n.tr("Show foreground surfaces on cards inside floating windows")
+                    checked: Theme.floatingWindowForegroundLayers
+                    onToggled: checked => {
+                        themeColorsTab.unsyncFloatingWindowSettings();
+                        SettingsData.set("floatingWindowForegroundLayers", checked);
+                    }
+                }
+
+                SettingsSliderRow {
+                    id: floatingWindowForegroundOpacitySlider
+                    tab: "theme"
+                    tags: ["floating", "window", "foreground", "layers", "opacity", "transparency", "cards"]
+                    settingKey: "floatingWindowForegroundTransparency"
+                    text: I18n.tr("Foreground Opacity")
+                    description: I18n.tr("Opacity of cards and nested surfaces inside floating windows")
+                    visible: Theme.floatingWindowForegroundLayers
+                    value: Math.round(Theme.floatingWindowForegroundTransparency * 100)
+                    minimum: 0
+                    maximum: 100
+                    unit: "%"
+                    defaultValue: 100
+                    onSliderValueChanged: newValue => {
+                        themeColorsTab.unsyncFloatingWindowSettings();
+                        SettingsData.set("floatingWindowForegroundTransparency", newValue / 100);
+                    }
+
+                    Binding {
+                        target: floatingWindowForegroundOpacitySlider
+                        property: "value"
+                        value: Math.round(Theme.floatingWindowForegroundTransparency * 100)
+                        restoreMode: Binding.RestoreBinding
+                    }
+                }
+
+                SettingsToggleRow {
+                    tab: "theme"
+                    tags: ["floating", "window", "tile", "tiling", "compositor", "rule", "niri", "hyprland", "mango"]
+                    settingKey: "dmsWindowsFloating"
+                    text: I18n.tr("Open Windows Floating")
+                    description: I18n.tr("Open DMS windows floating instead of tiled")
+                    visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango
+                    checked: SettingsData.dmsWindowsFloating ?? true
+                    onToggled: checked => {
+                        SettingsData.set("dmsWindowsFloating", checked);
+                        if (checked)
+                            themeColorsTab.checkWindowRulesIncludeStatus();
+                    }
+                }
+
+                IncludeWarningBox {
+                    visibleCondition: (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango) && (SettingsData.dmsWindowsFloating ?? true)
+                    checking: themeColorsTab.checkingWindowRulesInclude
+                    fixing: themeColorsTab.fixingWindowRulesInclude
+                    includeReadOnly: themeColorsTab.windowRulesReadOnly
+                    alreadyIncluded: themeColorsTab.windowRulesIncludeStatus.included
+                    fragmentPath: "dms/windowrules"
+                    onSetup: themeColorsTab.fixWindowRulesInclude
                 }
             }
 
@@ -2144,80 +2402,13 @@ Item {
                     width: parent.width
                     spacing: Theme.spacingM
 
-                    StyledRect {
-                        id: cursorWarningBox
-                        width: parent.width
-                        height: cursorWarningContent.implicitHeight + Theme.spacingL * 2
-                        radius: Theme.cornerRadius
-
-                        readonly property bool showLegacy: themeColorsTab.cursorReadOnly
-                        readonly property bool showSetup: !showLegacy && !themeColorsTab.cursorIncludeStatus.included
-
-                        color: (showLegacy || showSetup) ? Theme.withAlpha(Theme.primary, 0.15) : Theme.withAlpha(Theme.primary, 0)
-                        border.color: (showLegacy || showSetup) ? Theme.withAlpha(Theme.primary, 0.3) : Theme.withAlpha(Theme.primary, 0)
-                        border.width: 1
-                        visible: (showLegacy || showSetup) && !themeColorsTab.checkingCursorInclude
-
-                        Row {
-                            id: cursorWarningContent
-                            anchors.fill: parent
-                            anchors.margins: Theme.spacingL
-                            spacing: Theme.spacingM
-
-                            DankIcon {
-                                name: "warning"
-                                size: Theme.iconSize
-                                color: Theme.primary
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            Column {
-                                width: parent.width - Theme.iconSize - (cursorFixButton.visible ? cursorFixButton.width + Theme.spacingM : 0) - Theme.spacingM
-                                spacing: Theme.spacingXS
-                                anchors.verticalCenter: parent.verticalCenter
-
-                                StyledText {
-                                    text: {
-                                        if (cursorWarningBox.showLegacy)
-                                            return I18n.tr("Hyprland conf mode");
-                                        if (cursorWarningBox.showSetup)
-                                            return I18n.tr("First Time Setup");
-                                        return "";
-                                    }
-                                    font.pixelSize: Theme.fontSizeMedium
-                                    font.weight: Font.Medium
-                                    color: Theme.primary
-                                    width: parent.width
-                                    horizontalAlignment: Text.AlignLeft
-                                }
-
-                                StyledText {
-                                    text: {
-                                        if (cursorWarningBox.showLegacy)
-                                            return I18n.tr("This install is still using hyprland.conf. Run dms setup to migrate before changing these settings.");
-                                        if (cursorWarningBox.showSetup)
-                                            return I18n.tr("Click 'Setup' to create %1 and add include to your compositor config.").arg("dms/cursor");
-                                        return "";
-                                    }
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: Theme.surfaceVariantText
-                                    wrapMode: Text.WordWrap
-                                    width: parent.width
-                                    horizontalAlignment: Text.AlignLeft
-                                }
-                            }
-
-                            DankButton {
-                                id: cursorFixButton
-                                visible: !cursorWarningBox.showLegacy && cursorWarningBox.showSetup
-                                text: themeColorsTab.fixingCursorInclude ? I18n.tr("Setting up...") : I18n.tr("Setup")
-                                backgroundColor: Theme.primary
-                                textColor: Theme.primaryText
-                                enabled: !themeColorsTab.fixingCursorInclude
-                                anchors.verticalCenter: parent.verticalCenter
-                                onClicked: themeColorsTab.fixCursorInclude()
-                            }
-                        }
+                    IncludeWarningBox {
+                        checking: themeColorsTab.checkingCursorInclude
+                        fixing: themeColorsTab.fixingCursorInclude
+                        includeReadOnly: themeColorsTab.cursorReadOnly
+                        alreadyIncluded: themeColorsTab.cursorIncludeStatus.included
+                        fragmentPath: "dms/cursor"
+                        onSetup: themeColorsTab.fixCursorInclude
                     }
 
                     SettingsDropdownRow {

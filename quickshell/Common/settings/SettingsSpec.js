@@ -17,6 +17,11 @@ var SPEC = {
 
     popupTransparency: { def: 1.0, coerce: percentToUnit },
     dockTransparency: { def: 1.0, coerce: percentToUnit },
+    floatingWindowSyncGlobal: { def: true },
+    floatingWindowTransparency: { def: 1.0, coerce: percentToUnit },
+    floatingWindowForegroundLayers: { def: true },
+    floatingWindowForegroundTransparency: { def: 1.0, coerce: percentToUnit },
+    dmsWindowsFloating: { def: true },
 
     widgetBackgroundColor: { def: "sch" },
     widgetBackgroundCustomColor: { def: "#6750A4" },
@@ -97,6 +102,7 @@ var SPEC = {
     barElevationEnabled: { def: true },
     blurEnabled: { def: false },
     blurForegroundLayers: { def: true },
+    foregroundLayerTransparency: { def: 1.0, coerce: percentToUnit },
     blurLayerOutlineOpacity: { def: 0.12, coerce: percentToUnit },
     blurBorderEnabled: { def: true },
     blurBorderColor: { def: "outline" },

@@ -1,13 +1,11 @@
 import QtQuick
 import Quickshell
 import qs.Common
-import qs.Services
 import qs.Widgets
 
-FloatingWindow {
+DankFloatingWindow {
     id: root
 
-    property bool disablePopupTransparency: true
     property string searchQuery: ""
     property var filteredApps: []
     property int selectedIndex: -1
@@ -23,27 +21,9 @@ FloatingWindow {
     minimumSize: Qt.size(400, 350)
     implicitWidth: 500
     implicitHeight: 550
-    color: "transparent"
     visible: false
 
     onClosed: hide()
-
-    WindowBlur {
-        targetWindow: root
-        blurX: 0
-        blurY: 0
-        blurWidth: root.visible ? root.width : 0
-        blurHeight: root.visible ? root.height : 0
-        blurRadius: Theme.cornerRadius
-    }
-
-    Rectangle {
-        anchors.fill: parent
-        radius: Theme.cornerRadius
-        color: Theme.withAlpha(Theme.surfaceContainer, 0.95)
-        border.color: Theme.outlineMedium
-        border.width: Theme.layerOutlineWidth
-    }
 
     FocusScope {
         anchors.fill: parent
@@ -143,10 +123,6 @@ FloatingWindow {
                         id: searchField
                         width: parent.width
                         height: 48
-                        cornerRadius: Theme.cornerRadius
-                        backgroundColor: Theme.withAlpha(Theme.surfaceContainerHigh, 0.8)
-                        normalBorderColor: Theme.outlineMedium
-                        focusedBorderColor: Theme.primary
                         leftIconName: "search"
                         leftIconSize: Theme.iconSize
                         leftIconColor: Theme.surfaceVariantText

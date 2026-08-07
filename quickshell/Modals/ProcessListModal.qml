@@ -8,11 +8,10 @@ import qs.Services
 import qs.Widgets
 import "../Common/Format.js" as Format
 
-FloatingWindow {
+DankFloatingWindow {
     id: processListModal
     readonly property var log: Log.scoped("ProcessListModal")
 
-    property bool disablePopupTransparency: true
     property int currentTab: 0
     property string searchText: ""
     property string expandedPid: ""
@@ -81,7 +80,6 @@ FloatingWindow {
     minimumSize: Qt.size(Math.min(Math.round(Theme.fontSizeMedium * 48), Screen.width), Math.min(Math.round(Theme.fontSizeMedium * 34), Screen.height))
     implicitWidth: Math.round(Theme.fontSizeMedium * 71)
     implicitHeight: Math.round(Theme.fontSizeMedium * 51)
-    color: Theme.surfaceContainer
     visible: false
 
     onClosed: hide()
@@ -420,7 +418,7 @@ FloatingWindow {
                 Layout.margins: Theme.spacingL
                 Layout.topMargin: Theme.spacingM
                 radius: Theme.cornerRadius
-                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+                color: Theme.floatingWindowNestedSurface
                 border.color: Theme.outlineLight
                 border.width: 1
                 clip: true

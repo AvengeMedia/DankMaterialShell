@@ -6,10 +6,9 @@ import qs.Common
 import qs.Services
 import qs.Widgets
 
-FloatingWindow {
+DankFloatingWindow {
     id: root
 
-    property bool disablePopupTransparency: true
     property string searchQuery: ""
     property var filteredWidgets: []
     property int selectedIndex: -1
@@ -107,7 +106,6 @@ FloatingWindow {
     minimumSize: Qt.size(400, 350)
     implicitWidth: 500
     implicitHeight: 550
-    color: Theme.surfaceContainer
     visible: false
 
     onClosed: hide()
@@ -276,10 +274,6 @@ FloatingWindow {
                         id: searchField
                         width: parent.width
                         height: 48
-                        cornerRadius: Theme.cornerRadius
-                        backgroundColor: Theme.surfaceContainerHigh
-                        normalBorderColor: Theme.outlineMedium
-                        focusedBorderColor: Theme.primary
                         leftIconName: "search"
                         leftIconSize: Theme.iconSize
                         leftIconColor: Theme.surfaceVariantText

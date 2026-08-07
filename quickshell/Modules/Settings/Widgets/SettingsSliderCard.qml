@@ -35,7 +35,9 @@ StyledRect {
     width: parent?.width ?? 0
     height: Theme.spacingL * 2 + contentColumn.height
     radius: Theme.cornerRadius
-    color: Theme.surfaceContainerHigh
+    color: Theme.floatingWindowNestedSurface
+    border.color: Theme.outlineMedium
+    border.width: Theme.layerOutlineWidth
 
     Component.onCompleted: {
         if (!settingKey)
@@ -110,7 +112,6 @@ StyledRect {
                 iconName: "restart_alt"
                 iconSize: 20
                 visible: root.defaultValue >= 0 && slider.value !== root.defaultValue
-                backgroundColor: Theme.surfaceContainerHigh
                 iconColor: Theme.surfaceVariantText
                 onClicked: {
                     slider.value = root.defaultValue;

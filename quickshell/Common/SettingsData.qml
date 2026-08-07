@@ -164,6 +164,11 @@ Singleton {
     property string matugenTargetMonitor: ""
     property real popupTransparency: 1.0
     property real dockTransparency: 1
+    property bool floatingWindowSyncGlobal: true
+    property real floatingWindowTransparency: 1.0
+    property bool floatingWindowForegroundLayers: true
+    property real floatingWindowForegroundTransparency: 1.0
+    property bool dmsWindowsFloating: true
     property string widgetBackgroundColor: "sch"
     property string widgetBackgroundCustomColor: "#6750A4"
     property real widgetBackgroundCustomStrength: 0.50
@@ -264,6 +269,7 @@ Singleton {
     onBlurEnabledChanged: saveSettings()
     property bool blurForegroundLayers: true
     onBlurForegroundLayersChanged: saveSettings()
+    property real foregroundLayerTransparency: 1.0
     property real blurLayerOutlineOpacity: 0.12
     onBlurLayerOutlineOpacityChanged: saveSettings()
     property bool blurBorderEnabled: true

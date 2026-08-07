@@ -364,7 +364,7 @@ Column {
         height: 48
         visible: searchVisible
         opacity: searchVisible ? 1 : 0
-        color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+        color: Theme.floatingWindowNestedSurface
         border.color: searchField.activeFocus ? Theme.primary : Theme.outlineMedium
         border.width: searchField.activeFocus ? 2 : 1
         radius: Theme.cornerRadius
@@ -941,7 +941,7 @@ Column {
                 width: Math.min(root.width, 360)
                 height: pathInfoRow.implicitHeight + Theme.spacingS * 2
                 radius: Theme.cornerRadius
-                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+                color: Theme.floatingWindowNestedSurface
                 border.color: Theme.outlineMedium
                 border.width: 1
                 z: 10

@@ -7,10 +7,9 @@ import qs.Modals.Common
 import qs.Services
 import qs.Widgets
 
-FloatingWindow {
+DankFloatingWindow {
     id: root
 
-    property bool disablePopupTransparency: true
     property var allPlugins: []
     property string searchQuery: ""
     property var filteredPlugins: []
@@ -608,7 +607,6 @@ FloatingWindow {
             return Math.round(Math.min(maxHeight, Math.max(540, parentModal.height * 0.8)));
         return Math.min(maxHeight, 760);
     }
-    color: Theme.surfaceContainer
     visible: false
 
     onClosed: hide()
@@ -838,10 +836,6 @@ FloatingWindow {
                 anchors.top: headerArea.bottom
                 anchors.topMargin: Theme.spacingM
                 height: 48
-                cornerRadius: Theme.cornerRadius
-                backgroundColor: Theme.surfaceContainerHigh
-                normalBorderColor: Theme.outlineMedium
-                focusedBorderColor: Theme.primary
                 leftIconName: "search"
                 leftIconSize: Theme.iconSize
                 leftIconColor: Theme.surfaceVariantText
@@ -1102,7 +1096,7 @@ FloatingWindow {
                                 ClippingRectangle {
                                     anchors.fill: parent
                                     radius: Theme.cornerRadius - 2
-                                    color: Theme.surfaceContainerHigh
+                                    color: Theme.floatingWindowNestedSurface
 
                                     CachingImage {
                                         id: cardPreview
@@ -1362,7 +1356,7 @@ FloatingWindow {
                 anchors.topMargin: Theme.spacingM
                 anchors.bottom: parent.bottom
                 z: 10
-                color: Theme.surfaceContainer
+                color: Theme.floatingWindowSurface
                 opacity: root.detailPluginId !== "" ? 1 : 0
                 visible: opacity > 0
 
@@ -1555,7 +1549,7 @@ FloatingWindow {
                             width: parent.width
                             height: Math.round(width * 0.52)
                             radius: Theme.cornerRadius
-                            color: Theme.surfaceContainerHigh
+                            color: Theme.floatingWindowNestedSurface
                             border.color: Theme.withAlpha(Theme.outline, 0.2)
                             border.width: 1
 
@@ -1829,10 +1823,9 @@ FloatingWindow {
         id: thirdPartyConfirmLoader
         active: false
 
-        FloatingWindow {
+        DankFloatingWindow {
             id: thirdPartyConfirmModal
 
-            property bool disablePopupTransparency: true
             parentWindow: root
 
             function show() {
@@ -1847,7 +1840,6 @@ FloatingWindow {
             title: I18n.tr("Third-Party Plugin Warning")
             implicitWidth: 500
             implicitHeight: 350
-            color: Theme.surfaceContainer
             visible: false
 
             FocusScope {

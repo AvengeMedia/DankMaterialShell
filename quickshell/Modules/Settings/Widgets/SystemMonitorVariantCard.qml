@@ -27,7 +27,7 @@ Rectangle {
     width: parent?.width ?? 0
     height: variantColumn.height
     radius: Theme.cornerRadius
-    color: Theme.surfaceContainerHigh
+    color: Theme.floatingWindowNestedSurface
     clip: true
 
     Column {

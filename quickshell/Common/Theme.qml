@@ -345,11 +345,28 @@ Singleton {
     readonly property bool foregroundLayers: typeof SettingsData === "undefined" || (SettingsData.blurForegroundLayers ?? true)
     readonly property bool blurForegroundLayers: blurLayersActive && foregroundLayers
     readonly property bool transparentBlurLayers: blurLayersActive && !foregroundLayers
+    readonly property real foregroundLayerTransparency: typeof SettingsData === "undefined" ? 1.0 : (SettingsData.foregroundLayerTransparency ?? 1.0)
     readonly property bool notificationForegroundLayers: typeof SettingsData === "undefined" || (SettingsData.notificationForegroundLayers ?? true)
     readonly property color readableSurface: withAlpha(surfaceContainer, popupTransparency)
     readonly property color readableSurfaceHigh: withAlpha(surfaceContainerHigh, popupTransparency)
     readonly property color floatingSurface: foregroundLayers ? readableSurface : withAlpha(readableSurface, 0)
-    readonly property color floatingSurfaceHigh: foregroundLayers ? readableSurfaceHigh : withAlpha(readableSurfaceHigh, 0)
+    readonly property color floatingSurfaceHigh: foregroundLayers ? withAlpha(surfaceContainerHigh, foregroundLayerTransparency) : withAlpha(surfaceContainerHigh, 0)
+    readonly property bool floatingWindowSynced: typeof SettingsData === "undefined" || (SettingsData.floatingWindowSyncGlobal ?? true)
+    readonly property real floatingWindowTransparency: {
+        if (typeof SettingsData === "undefined" || floatingWindowSynced)
+            return popupTransparency;
+        return SettingsData.floatingWindowTransparency ?? 1.0;
+    }
+    readonly property bool floatingWindowForegroundLayers: floatingWindowSynced ? foregroundLayers : (SettingsData.floatingWindowForegroundLayers ?? true)
+    readonly property real floatingWindowForegroundTransparency: {
+        if (typeof SettingsData === "undefined" || floatingWindowSynced)
+            return foregroundLayerTransparency;
+        return SettingsData.floatingWindowForegroundTransparency ?? 1.0;
+    }
+    readonly property color floatingWindowSurface: withAlpha(surfaceContainer, floatingWindowTransparency)
+    readonly property color floatingWindowSurfaceHigh: floatingWindowForegroundLayers ? withAlpha(surfaceContainerHigh, floatingWindowForegroundTransparency) : withAlpha(surfaceContainerHigh, 0)
+    readonly property color floatingWindowNestedSurface: floatingWindowSurfaceHigh
+    readonly property color notepadWindowSurface: withAlpha(surfaceContainer, notepadTransparency)
     readonly property color nestedSurface: floatingSurfaceHigh
     readonly property color notificationFloatingSurface: notificationForegroundLayers ? readableSurface : withAlpha(readableSurface, 0)
     readonly property color notificationFloatingSurfaceHigh: notificationForegroundLayers ? readableSurfaceHigh : withAlpha(readableSurfaceHigh, 0)
@@ -357,6 +374,20 @@ Singleton {
     readonly property real blurLayerOutlineOpacity: Math.max(0, Math.min(1, typeof SettingsData === "undefined" ? 0.12 : (SettingsData.blurLayerOutlineOpacity ?? 0.12)))
     readonly property real layerOutlineOpacity: blurLayerOutlineOpacity
     readonly property int layerOutlineWidth: layerOutlineOpacity > 0 ? 1 : 0
+    readonly property real floatingWindowFieldAlpha: floatingWindowTransparency
+    readonly property color floatingWindowFieldColor: withAlpha(surfaceContainerHigh, floatingWindowFieldAlpha)
+    readonly property real popupFieldAlpha: {
+        if (transparentBlurLayers)
+            return 0.28;
+        if (blurForegroundLayers)
+            return Math.max(foregroundLayerTransparency, 0.62);
+        return popupTransparency;
+    }
+    readonly property color popupFieldColor: withAlpha(surfaceContainerHigh, popupFieldAlpha)
+    readonly property color popupFieldBorderColor: withAlpha(outline, blurLayersActive ? 0.16 : layerOutlineOpacity)
+    readonly property color popupFieldFocusedBorderColor: withAlpha(primary, blurLayersActive ? 0.72 : 1.0)
+    readonly property color floatingWindowFieldBorderColor: popupFieldBorderColor
+    readonly property color floatingWindowFieldFocusedBorderColor: popupFieldFocusedBorderColor
     property color surfaceTextHover: withAlpha(surfaceText, 0.08)
     property color surfaceTextAlpha: withAlpha(surfaceText, 0.3)
 
@@ -1194,7 +1225,7 @@ Singleton {
     readonly property var _availableThemeNames: StockThemes.getAllThemeNames()
     property string currentThemeName: currentTheme
 
-    property real notepadTransparency: SettingsData.notepadTransparencyOverride >= 0 ? SettingsData.notepadTransparencyOverride : popupTransparency
+    property real notepadTransparency: SettingsData.notepadTransparencyOverride >= 0 ? SettingsData.notepadTransparencyOverride : floatingWindowTransparency
 
     property bool widgetBackgroundHasAlpha: {
         const colorMode = typeof SettingsData !== "undefined" ? SettingsData.widgetBackgroundColor : "sch";

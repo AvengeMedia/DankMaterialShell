@@ -38,7 +38,9 @@ StyledRect {
         return h;
     }
     radius: Theme.cornerRadius
-    color: Theme.surfaceContainerHigh
+    color: Theme.floatingWindowNestedSurface
+    border.color: Theme.outlineMedium
+    border.width: Theme.layerOutlineWidth
 
     readonly property bool collapsed: collapsible && !expanded
     readonly property bool hasHeader: root.title !== "" || root.iconName !== ""

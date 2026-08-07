@@ -5,10 +5,9 @@ import qs.Modals
 import qs.Services
 import qs.Widgets
 
-FloatingWindow {
+DankFloatingWindow {
     id: win
 
-    property bool disablePopupTransparency: true
     property alias shouldBeVisible: win.visible
 
     signal floatingToggleRequested
@@ -30,7 +29,6 @@ FloatingWindow {
     minimumSize: Qt.size(Math.min(560, Screen.width), Math.min(400, Screen.height))
     implicitWidth: 1000
     implicitHeight: screen ? Math.min(820, screen.height - 100) : 820
-    color: Theme.surfaceContainer
     visible: false
 
     onVisibleChanged: {
@@ -59,12 +57,6 @@ FloatingWindow {
                 anchors.fill: parent
                 onPressed: windowControls.tryStartMove()
                 onDoubleClicked: windowControls.tryToggleMaximize()
-            }
-
-            Rectangle {
-                anchors.fill: parent
-                color: Theme.surfaceContainer
-                opacity: 0.5
             }
 
             Row {
