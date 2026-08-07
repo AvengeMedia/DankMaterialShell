@@ -305,9 +305,6 @@
   "90°": {
     "90°": "90°"
   },
-  "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>": {
-    "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>": "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT 授權</a>"
-  },
   "A modern desktop shell for Wayland compositors": {
     "A modern desktop shell for Wayland compositors": "適用於 Wayland 顯示合成器的現代桌面殼層"
   },
@@ -521,6 +518,9 @@
   "Advanced": {
     "Advanced": "進階"
   },
+  "Advanced comma-separated libxkbcommon options.": {
+    "Advanced comma-separated libxkbcommon options.": ""
+  },
   "Afternoon": {
     "Afternoon": "下午"
   },
@@ -562,6 +562,9 @@
   },
   "Also group repeated application icons on the active workspace": {
     "Also group repeated application icons on the active workspace": ""
+  },
+  "Alt + Shift": {
+    "Alt + Shift": ""
   },
   "Alternative (OR)": {
     "Alternative (OR)": "替代 (OR)"
@@ -664,6 +667,9 @@
   },
   "Appearance": {
     "Appearance": "外觀"
+  },
+  "Apple Music animated covers": {
+    "Apple Music animated covers": ""
   },
   "Application": {
     "Application": "應用程式"
@@ -946,6 +952,9 @@
   },
   "Automatically save changes to opened files as you type": {
     "Automatically save changes to opened files as you type": ""
+  },
+  "Automatically turn on Num Lock at startup": {
+    "Automatically turn on Num Lock at startup": ""
   },
   "Automatically turn on Power Saver profile when battery is low.": {
     "Automatically turn on Power Saver profile when battery is low.": ""
@@ -1358,6 +1367,9 @@
   "Channel": {
     "Channel": "頻道"
   },
+  "Characters per second while holding down key": {
+    "Characters per second while holding down key": ""
+  },
   "Charge Level": {
     "Charge Level": ""
   },
@@ -1411,6 +1423,9 @@
   },
   "Choose a power profile": {
     "Choose a power profile": "選擇電源設定檔"
+  },
+  "Choose a shortcut key to cycle between keyboard layouts": {
+    "Choose a shortcut key to cycle between keyboard layouts": ""
   },
   "Choose colors from palette": {
     "Choose colors from palette": "從調色盤選擇顏色"
@@ -1648,6 +1663,9 @@
   },
   "Column Width": {
     "Column Width": "欄寬"
+  },
+  "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": {
+    "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": ""
   },
   "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": {
     "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": "以逗號分隔要隱藏的會話名稱列表。用斜線括起來表示正規表達式（例如，/^_.*/）。"
@@ -1958,6 +1976,12 @@
   "Critical Threshold": {
     "Critical Threshold": ""
   },
+  "Ctrl + Shift": {
+    "Ctrl + Shift": ""
+  },
+  "Ctrl+%1 is used for password editing": {
+    "Ctrl+%1 is used for password editing": ""
+  },
   "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": {
     "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": ""
   },
@@ -2026,6 +2050,9 @@
   },
   "Custom": {
     "Custom": "自訂"
+  },
+  "Custom / None": {
+    "Custom / None": ""
   },
   "Custom Blend": {
     "Custom Blend": ""
@@ -2119,6 +2146,9 @@
   },
   "DMS Shortcuts": {
     "DMS Shortcuts": "DMS 捷徑"
+  },
+  "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.": {
+    "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.": ""
   },
   "DMS out of date": {
     "DMS out of date": "DMS 已過期"
@@ -2264,6 +2294,9 @@
   "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": {
     "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": "Del: 清除 • Shift+Del: 清除所有 • 1-9: 動作 • F10: 幫助 • Esc: 關閉"
   },
+  "Delay before characters start repeating": {
+    "Delay before characters start repeating": ""
+  },
   "Delete": {
     "Delete": "刪除"
   },
@@ -2365,6 +2398,9 @@
   },
   "Digital": {
     "Digital": "數位"
+  },
+  "Direct path to a .xkb keymap file. Overrides layouts/variants above.": {
+    "Direct path to a .xkb keymap file. Overrides layouts/variants above.": ""
   },
   "Direction Source": {
     "Direction Source": "方向來源"
@@ -2701,6 +2737,9 @@
   },
   "Enable History": {
     "Enable History": "啟用歷史記錄"
+  },
+  "Enable Num Lock": {
+    "Enable Num Lock": ""
   },
   "Enable Overview Overlay": {
     "Enable Overview Overlay": "啟用概覽疊加層"
@@ -3323,6 +3362,12 @@
   "Floating Position": {
     "Floating Position": ""
   },
+  "Floating Windows": {
+    "Floating Windows": ""
+  },
+  "Floating windows follow Surface Styling settings": {
+    "Floating windows follow Surface Styling settings": ""
+  },
   "Fluent": {
     "Fluent": "流暢"
   },
@@ -3452,6 +3497,9 @@
   "Foreground Layers": {
     "Foreground Layers": "前景圖層"
   },
+  "Foreground Opacity": {
+    "Foreground Opacity": ""
+  },
   "Forever": {
     "Forever": "永遠"
   },
@@ -3578,8 +3626,8 @@
   "Generate Override": {
     "Generate Override": "產生覆蓋檔"
   },
-  "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.": {
-    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.": "產生基準 GTK3/4 或 QT5/QT6（需要 qt6ct-kde）配置以遵循 DMS 顏色。僅需執行一次。<br /><br />建議在應用 GTK 主題之前配置<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a>。"
+  "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
+    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
   },
   "Generic": {
     "Generic": "一般"
@@ -3595,6 +3643,9 @@
   },
   "Global fonts can be configured in Settings → Personalization": {
     "Global fonts can be configured in Settings → Personalization": "全域字體可在「設定 → 個人化」中配置"
+  },
+  "Globally": {
+    "Globally": ""
   },
   "Globally scale all animation durations": {
     "Globally scale all animation durations": "全域縮放所有動畫持續時間"
@@ -3892,6 +3943,9 @@
   },
   "Hover Popouts": {
     "Hover Popouts": ""
+  },
+  "How layout changes are remembered across apps": {
+    "How layout changes are remembered across apps": ""
   },
   "How often the server polls for new updates.": {
     "How often the server polls for new updates.": "伺服器輪詢新更新的頻率。"
@@ -4250,6 +4304,9 @@
   "Key": {
     "Key": "按鍵"
   },
+  "Key combination": {
+    "Key combination": ""
+  },
   "Keybind Sources": {
     "Keybind Sources": "快捷鍵來源"
   },
@@ -4262,11 +4319,32 @@
   "Keybinds shown alongside regular search results": {
     "Keybinds shown alongside regular search results": "快捷鍵與一般搜尋結果一同顯示"
   },
+  "Keyboard": {
+    "Keyboard": ""
+  },
+  "Keyboard Behavior": {
+    "Keyboard Behavior": ""
+  },
   "Keyboard Layout Name": {
     "Keyboard Layout Name": "鍵盤布局名稱"
   },
+  "Keyboard Layouts": {
+    "Keyboard Layouts": ""
+  },
+  "Keyboard Model": {
+    "Keyboard Model": ""
+  },
   "Keyboard Shortcuts": {
     "Keyboard Shortcuts": "鍵盤快捷鍵"
+  },
+  "Keyboard Variant": {
+    "Keyboard Variant": ""
+  },
+  "Keyboard shortcut to start security key unlock": {
+    "Keyboard shortcut to start security key unlock": ""
+  },
+  "Keymap File Path": {
+    "Keymap File Path": ""
   },
   "Keys": {
     "Keys": "按鍵"
@@ -4510,6 +4588,9 @@
   },
   "MAC": {
     "MAC": "MAC"
+  },
+  "MIT License": {
+    "MIT License": ""
   },
   "MTU": {
     "MTU": "MTU"
@@ -5513,6 +5594,15 @@
   "Opacity": {
     "Opacity": "不透明度"
   },
+  "Opacity of cards and nested surfaces inside floating windows": {
+    "Opacity of cards and nested surfaces inside floating windows": ""
+  },
+  "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts": {
+    "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts": ""
+  },
+  "Opacity of foreground cards and nested surfaces on shell panels": {
+    "Opacity of foreground cards and nested surfaces on shell panels": ""
+  },
   "Opaque": {
     "Opaque": "不透明"
   },
@@ -5521,6 +5611,9 @@
   },
   "Open App": {
     "Open App": "開啟應用程式"
+  },
+  "Open DMS windows floating instead of tiled": {
+    "Open DMS windows floating instead of tiled": ""
   },
   "Open Delay": {
     "Open Delay": ""
@@ -5542,6 +5635,9 @@
   },
   "Open Trash With": {
     "Open Trash With": "使用...開啟垃圾桶"
+  },
+  "Open Windows Floating": {
+    "Open Windows Floating": ""
   },
   "Open a new note": {
     "Open a new note": "開啟新筆記"
@@ -5662,6 +5758,9 @@
   },
   "Override Corner Radius": {
     "Override Corner Radius": "覆寫圓角半徑"
+  },
+  "Override floating window transparency for Notepad": {
+    "Override floating window transparency for Notepad": ""
   },
   "Override global layout settings for this output": {
     "Override global layout settings for this output": "覆寫此輸出的全域版面配置設定"
@@ -5794,6 +5893,9 @@
   },
   "Pending Discharge": {
     "Pending Discharge": "待解除"
+  },
+  "Per Window": {
+    "Per Window": ""
   },
   "Per-Mode Wallpapers": {
     "Per-Mode Wallpapers": "以主題區分桌布"
@@ -6056,6 +6158,9 @@
   "Press Ctrl+N or click 'New Session' to create one": {
     "Press Ctrl+N or click 'New Session' to create one": ""
   },
+  "Press Ctrl+key to set. Esc cancels.": {
+    "Press Ctrl+key to set. Esc cancels.": ""
+  },
   "Press Enter and the audio system will restart to apply the change": {
     "Press Enter and the audio system will restart to apply the change": "按下 Enter 鍵，音訊系統將重新啟動以應用變更"
   },
@@ -6242,6 +6347,9 @@
   "Random": {
     "Random": "隨機"
   },
+  "Random Order": {
+    "Random Order": ""
+  },
   "Rate": {
     "Rate": "速率"
   },
@@ -6293,6 +6401,9 @@
   "Regex": {
     "Regex": "正規表達式"
   },
+  "Registries": {
+    "Registries": ""
+  },
   "Regular": {
     "Regular": "標準"
   },
@@ -6328,6 +6439,9 @@
   },
   "Remember Last Query": {
     "Remember Last Query": "記住上次查詢"
+  },
+  "Remember Layout": {
+    "Remember Layout": ""
   },
   "Remember Type Filter": {
     "Remember Type Filter": ""
@@ -6400,6 +6514,12 @@
   },
   "Repeat": {
     "Repeat": "重複"
+  },
+  "Repeat Delay": {
+    "Repeat Delay": ""
+  },
+  "Repeat Rate": {
+    "Repeat Rate": ""
   },
   "Replacement": {
     "Replacement": "替換"
@@ -6481,6 +6601,9 @@
   },
   "Restart the DankMaterialShell": {
     "Restart the DankMaterialShell": "重新啟動 DankMaterialShell"
+  },
+  "Restart userspace without rebooting the kernel, requires systemd": {
+    "Restart userspace without rebooting the kernel, requires systemd": ""
   },
   "Restarting audio system...": {
     "Restarting audio system...": "正在重新啟動音訊系統..."
@@ -6797,8 +6920,17 @@
   "Security Key PAM Source": {
     "Security Key PAM Source": ""
   },
+  "Security key": {
+    "Security key": ""
+  },
+  "Security key (%1)": {
+    "Security key (%1)": ""
+  },
   "Security key mode": {
     "Security key mode": "安全金鑰模式"
+  },
+  "Security key shortcut": {
+    "Security key shortcut": ""
   },
   "Security-key availability could not be confirmed": {
     "Security-key availability could not be confirmed": ""
@@ -6844,6 +6976,9 @@
   },
   "Select a desktop application": {
     "Select a desktop application": "選擇一個桌面應用程式"
+  },
+  "Select a random wallpaper instead of cycling in alphabetical order": {
+    "Select a random wallpaper instead of cycling in alphabetical order": ""
   },
   "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": {
     "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": "選取一個小工具以新增至您的桌面。每個小工具都是獨立的實例，擁有自己的設定。"
@@ -7214,6 +7349,9 @@
   "Show Seconds": {
     "Show Seconds": "顯示秒數"
   },
+  "Show Soft Reboot": {
+    "Show Soft Reboot": ""
+  },
   "Show Sunrise/Sunset": {
     "Show Sunrise/Sunset": "顯示日出/日落"
   },
@@ -7295,6 +7433,9 @@
   "Show during Niri overview": {
     "Show during Niri overview": "在 Niri 概覽期間顯示"
   },
+  "Show foreground surfaces on cards inside floating windows": {
+    "Show foreground surfaces on cards inside floating windows": ""
+  },
   "Show foreground surfaces on notification cards": {
     "Show foreground surfaces on notification cards": ""
   },
@@ -7306,6 +7447,9 @@
   },
   "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": {
     "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": "在 Niri 總覽中輸入時顯示啟動器疊加。停用以使用其他啟動器。"
+  },
+  "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.": {
+    "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.": ""
   },
   "Show mode tabs and keyboard hints at the bottom.": {
     "Show mode tabs and keyboard hints at the bottom.": "在底部顯示模式分頁與鍵盤提示。"
@@ -7418,6 +7562,9 @@
   "Snow": {
     "Snow": "雪"
   },
+  "Soft Reboot": {
+    "Soft Reboot": ""
+  },
   "Some plugins require a newer version of DMS:": {
     "Some plugins require a newer version of DMS:": "部分外掛程式需要較新版 DMS："
   },
@@ -7438,6 +7585,9 @@
   },
   "Source: %1": {
     "Source: %1": "來源：%1"
+  },
+  "Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.": {
+    "Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.": ""
   },
   "Space between the bar and screen edges": {
     "Space between the bar and screen edges": "工具列與螢幕邊緣之間的距離"
@@ -7553,6 +7703,9 @@
   "Sunset": {
     "Sunset": "日落"
   },
+  "Super + Space": {
+    "Super + Space": ""
+  },
   "Suppress Duplicate Notifications": {
     "Suppress Duplicate Notifications": "抑制重複通知"
   },
@@ -7586,6 +7739,9 @@
   "Surface Opacity": {
     "Surface Opacity": "表面不透明度"
   },
+  "Surface Styling": {
+    "Surface Styling": ""
+  },
   "Surface Text": {
     "Surface Text": ""
   },
@@ -7612,6 +7768,9 @@
   },
   "Sway Website": {
     "Sway Website": "Sway 網站"
+  },
+  "Switch Layout Shortcut": {
+    "Switch Layout Shortcut": ""
   },
   "Switch between display configurations": {
     "Switch between display configurations": "切換顯示配置"
@@ -7657,6 +7816,9 @@
   },
   "Sync to apply": {
     "Sync to apply": ""
+  },
+  "Sync with Global Settings": {
+    "Sync with Global Settings": ""
   },
   "Syncing...": {
     "Syncing...": ""
@@ -8765,6 +8927,9 @@
   "Window Height": {
     "Window Height": "視窗高度"
   },
+  "Window Opacity": {
+    "Window Opacity": ""
+  },
   "Window Opening": {
     "Window Opening": "視窗開啟"
   },
@@ -8809,6 +8974,9 @@
   },
   "X-Ray": {
     "X-Ray": "X-Ray"
+  },
+  "XKB Options": {
+    "XKB Options": ""
   },
   "XWayland": {
     "XWayland": "XWayland"
@@ -8914,9 +9082,6 @@
   },
   "display rotation option": {
     "Normal": ""
-  },
-  "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": {
-    "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": "dms 是一個高度可自訂的現代桌面外殼，其設計<a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">靈感來自 material 3</a>。<br /><br/>它使用 <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>（一個用於構建桌面外殼的 QT6 框架）和 <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>（一種靜態類型、編譯式程式語言）構建。"
   },
   "e.g. /usr/bin/my-script --flag": {
     "e.g. /usr/bin/my-script --flag": "例如：/usr/bin/my-script --flag"

@@ -305,9 +305,6 @@
   "90°": {
     "90°": "90°"
   },
-  "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>": {
-    "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>": "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">רישיון MIT</a>"
-  },
   "A modern desktop shell for Wayland compositors": {
     "A modern desktop shell for Wayland compositors": "מעטפת שולחן עבודה מודרנית לקומפוזיטורים של Wayland"
   },
@@ -336,7 +333,7 @@
     "About": "אודות"
   },
   "Acceleration Profile": {
-    "Acceleration Profile": ""
+    "Acceleration Profile": "פרופיל האצה"
   },
   "Accent Color": {
     "Accent Color": "צבע הדגשה"
@@ -414,7 +411,7 @@
     "Adapters": "מתאמים"
   },
   "Adaptive": {
-    "Adaptive": ""
+    "Adaptive": "אדפטיבי"
   },
   "Adaptive Media Width": {
     "Adaptive Media Width": "רוחב מדיה אדפטיבי"
@@ -492,10 +489,10 @@
     "Add to Autostart": "הוספה להפעלה אוטומטית"
   },
   "Adjust pointer sensitivity speed": {
-    "Adjust pointer sensitivity speed": ""
+    "Adjust pointer sensitivity speed": "כוונן/י את מהירות רגישות המצביע"
   },
   "Adjust scrolling sensitivity multiplier": {
-    "Adjust scrolling sensitivity multiplier": ""
+    "Adjust scrolling sensitivity multiplier": "כוונן/י את מכפיל רגישות הגלילה"
   },
   "Adjust the bar height via inner padding": {
     "Adjust the bar height via inner padding": "כוונן/י את גובה הסרגל באמצעות ריווח פנימי"
@@ -504,7 +501,7 @@
     "Adjust the number of columns in grid view mode.": "התאם/י את מספר העמודות במצב תצוגת רשת."
   },
   "Adjust touchpad pointer speed": {
-    "Adjust touchpad pointer speed": ""
+    "Adjust touchpad pointer speed": "כוונן/י את מהירות המצביע של משטח המגע"
   },
   "Adjust volume per scroll indent": {
     "Adjust volume per scroll indent": "התאמת עוצמה לכל הזחת גלילה"
@@ -520,6 +517,9 @@
   },
   "Advanced": {
     "Advanced": "מתקדם"
+  },
+  "Advanced comma-separated libxkbcommon options.": {
+    "Advanced comma-separated libxkbcommon options.": ""
   },
   "Afternoon": {
     "Afternoon": "אחר הצהריים"
@@ -563,6 +563,9 @@
   "Also group repeated application icons on the active workspace": {
     "Also group repeated application icons on the active workspace": "קבץ/י גם סמלי אפליקציות שחוזרים על עצמם בסביבת העבודה הפעילה"
   },
+  "Alt + Shift": {
+    "Alt + Shift": ""
+  },
   "Alternative (OR)": {
     "Alternative (OR)": "חלופי (OR)"
   },
@@ -591,7 +594,7 @@
     "Always show when there's only one connected display": "הצג/י תמיד כשיש רק מסך אחד מחובר"
   },
   "Always use the durations above, even if an app requests a shorter or longer one": {
-    "Always use the durations above, even if an app requests a shorter or longer one": ""
+    "Always use the durations above, even if an app requests a shorter or longer one": "השתמש/י תמיד במשכי הזמן שלמעלה, גם אם אפליקציות מבקשות זמן קצר או ארוך יותר"
   },
   "Always use this app for %1": {
     "Always use this app for %1": "השתמש/י תמיד באפליקציה זו עבור %1"
@@ -664,6 +667,9 @@
   },
   "Appearance": {
     "Appearance": "מראה"
+  },
+  "Apple Music animated covers": {
+    "Apple Music animated covers": ""
   },
   "Application": {
     "Application": "אפליקציה"
@@ -946,6 +952,9 @@
   },
   "Automatically save changes to opened files as you type": {
     "Automatically save changes to opened files as you type": "שמור/שמרי שינויים בקבצים פתוחים אוטומטית בעת ההקלדה"
+  },
+  "Automatically turn on Num Lock at startup": {
+    "Automatically turn on Num Lock at startup": ""
   },
   "Automatically turn on Power Saver profile when battery is low.": {
     "Automatically turn on Power Saver profile when battery is low.": "הפעל/י אוטומטית פרופיל חיסכון בחשמל כאשר הסוללה חלשה."
@@ -1358,6 +1367,9 @@
   "Channel": {
     "Channel": "ערוץ"
   },
+  "Characters per second while holding down key": {
+    "Characters per second while holding down key": ""
+  },
   "Charge Level": {
     "Charge Level": "רמת טעינה"
   },
@@ -1412,6 +1424,9 @@
   "Choose a power profile": {
     "Choose a power profile": "בחר/י פרופיל חשמל"
   },
+  "Choose a shortcut key to cycle between keyboard layouts": {
+    "Choose a shortcut key to cycle between keyboard layouts": ""
+  },
   "Choose colors from palette": {
     "Choose colors from palette": "בחר/י צבעים מפלטה"
   },
@@ -1443,7 +1458,7 @@
     "Choose wallpaper folder": "בחר/י תיקיית רקעים"
   },
   "Choose when to generate scrolling events": {
-    "Choose when to generate scrolling events": ""
+    "Choose when to generate scrolling events": "בחר/י מתי ליצור אירועי גלילה"
   },
   "Choose where notification popups appear on screen": {
     "Choose where notification popups appear on screen": "בחר/י היכן יופיעו התראות קופצות על המסך"
@@ -1649,6 +1664,9 @@
   "Column Width": {
     "Column Width": "רוחב עמודה"
   },
+  "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": {
+    "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": ""
+  },
   "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": {
     "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": "רשימה מופרדת בפסיקים של שמות ההפעלות להסתרה. עטוף/עטפי בלוכסן עבור regex (לדוגמה, /^_.*/)."
   },
@@ -1680,7 +1698,7 @@
     "Compositor Settings": "הגדרות לקומפוזיטור"
   },
   "Compositor actions (focus, move, etc.)": {
-    "Compositor actions (focus, move, etc.)": ""
+    "Compositor actions (focus, move, etc.)": "פעולות קומפוזיטור (מיקוד, הזזה וכו')"
   },
   "Config Format": {
     "Config Format": "פורמט ההגדרות"
@@ -1800,7 +1818,7 @@
     "Contrast": "ניגודיות"
   },
   "Contrast by variant": {
-    "Contrast by variant": ""
+    "Contrast by variant": "ניגודיות לפי גרסה"
   },
   "Contributor": {
     "Contributor": "תורם/ת"
@@ -1958,6 +1976,12 @@
   "Critical Threshold": {
     "Critical Threshold": "סף קריטי"
   },
+  "Ctrl + Shift": {
+    "Ctrl + Shift": ""
+  },
+  "Ctrl+%1 is used for password editing": {
+    "Ctrl+%1 is used for password editing": ""
+  },
   "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": {
     "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": "Ctrl+A: בחירת הכל • Ctrl+P: תצוגה מקדימה • Enter/Shift+Enter: חיפוש הבא/הקודם • Esc: סגירה"
   },
@@ -2026,6 +2050,9 @@
   },
   "Custom": {
     "Custom": "מותאם אישית"
+  },
+  "Custom / None": {
+    "Custom / None": ""
   },
   "Custom Blend": {
     "Custom Blend": "מיזוג מותאם אישית"
@@ -2119,6 +2146,9 @@
   },
   "DMS Shortcuts": {
     "DMS Shortcuts": "קיצורי DMS"
+  },
+  "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.": {
+    "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.": ""
   },
   "DMS out of date": {
     "DMS out of date": "הDMS לא מעודכן"
@@ -2264,6 +2294,9 @@
   "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": {
     "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": "Del: ניקוי • Shift+Del: ניקוי הכל • 1-9: פעולות • F10: עזרה • Esc: סגירה"
   },
+  "Delay before characters start repeating": {
+    "Delay before characters start repeating": ""
+  },
   "Delete": {
     "Delete": "מחיקה"
   },
@@ -2366,6 +2399,9 @@
   "Digital": {
     "Digital": "דיגיטלי"
   },
+  "Direct path to a .xkb keymap file. Overrides layouts/variants above.": {
+    "Direct path to a .xkb keymap file. Overrides layouts/variants above.": ""
+  },
   "Direction Source": {
     "Direction Source": "מקור כיוון"
   },
@@ -2388,13 +2424,13 @@
     "Disable Output": "השבתת פלט תצוגה"
   },
   "Disable While Typing": {
-    "Disable While Typing": ""
+    "Disable While Typing": "השבת/י בעת הקלדה"
   },
   "Disable on External Mouse": {
-    "Disable on External Mouse": ""
+    "Disable on External Mouse": "השבת/י בעת חיבור עכבר חיצוני"
   },
   "Disable touchpad when an external mouse is connected": {
-    "Disable touchpad when an external mouse is connected": ""
+    "Disable touchpad when an external mouse is connected": "השבת/י את משטח המגע כאשר מחובר עכבר חיצוני"
   },
   "Disabled": {
     "Disabled": "מושבת"
@@ -2556,7 +2592,7 @@
     "Door Open": "דלת פתוחה"
   },
   "Drag Lock": {
-    "Drag Lock": ""
+    "Drag Lock": "נעילת גרירה"
   },
   "Drag a widget by its handle here to reorder it or drop it into another group": {
     "Drag a widget by its handle here to reorder it or drop it into another group": "גרור/גררי ווידג׳ט באמצעות הידית שלו לכאן כדי לסדר אותו מחדש או לשחרר אותו לקבוצה אחרת"
@@ -2631,7 +2667,7 @@
     "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": "דינמי: עקומת Bezier של קפיץ עם חריגה - הכניסה חורגת לרגע מהיעד ואז מתייצבת. אקספרסיבי ומלא חיים."
   },
   "Edge": {
-    "Edge": ""
+    "Edge": "קצה"
   },
   "Edge Hover Reveal": {
     "Edge Hover Reveal": "חשיפה בריחוף על הקצה"
@@ -2682,7 +2718,7 @@
     "Empty Trash (%1)": "רוקן/י אשפה (%1)"
   },
   "Emulate middle click by pressing left and right buttons": {
-    "Emulate middle click by pressing left and right buttons": ""
+    "Emulate middle click by pressing left and right buttons": "הדמיית לחיצה אמצעית על ידי לחיצה על הכפתורים השמאלי והימני"
   },
   "Enable 10-bit color depth for wider color gamut and HDR support": {
     "Enable 10-bit color depth for wider color gamut and HDR support": "הפעל/י עומק צבע של 10 סיביות לסולם צבעים רחב יותר עם תמיכה בHDR"
@@ -2701,6 +2737,9 @@
   },
   "Enable History": {
     "Enable History": "הפעלת ההיסטוריה"
+  },
+  "Enable Num Lock": {
+    "Enable Num Lock": ""
   },
   "Enable Overview Overlay": {
     "Enable Overview Overlay": "הפעלת שכבת כיסוי לסקירה"
@@ -2811,7 +2850,7 @@
     "Enter password for ": "הזן/י סיסמה עבור "
   },
   "Enter text to encode": {
-    "Enter text to encode": ""
+    "Enter text to encode": "הזן/י טקסט לקידוד"
   },
   "Enter this passkey on ": {
     "Enter this passkey on ": "הזן/י מפתח גישה זה ב"
@@ -3012,7 +3051,7 @@
     "Failed to fetch network QR code: %1": "קבלת קוד QR של הרשת נכשלה: %1"
   },
   "Failed to generate QR code: %1": {
-    "Failed to generate QR code: %1": ""
+    "Failed to generate QR code: %1": "יצירת קוד הQR נכשלה: %1"
   },
   "Failed to generate systemd override": {
     "Failed to generate systemd override": "יצירת דריסת systemd נכשלה"
@@ -3285,10 +3324,10 @@
     "Flags": "דגלים"
   },
   "Flat": {
-    "Flat": ""
+    "Flat": "שטוח"
   },
   "Flat uses constant speed; Adaptive scales with movement speed": {
-    "Flat uses constant speed; Adaptive scales with movement speed": ""
+    "Flat uses constant speed; Adaptive scales with movement speed": "פרופיל ׳שטוח׳ משתמש במהירות קבועה; ׳אדפטיבי׳ מתאים את עצמו למהירות התנועה"
   },
   "Flatpak": {
     "Flatpak": "Flatpak"
@@ -3322,6 +3361,12 @@
   },
   "Floating Position": {
     "Floating Position": "מיקום צף"
+  },
+  "Floating Windows": {
+    "Floating Windows": ""
+  },
+  "Floating windows follow Surface Styling settings": {
+    "Floating windows follow Surface Styling settings": ""
   },
   "Fluent": {
     "Fluent": "שוטף"
@@ -3452,6 +3497,9 @@
   "Foreground Layers": {
     "Foreground Layers": "שכבות קדמיות"
   },
+  "Foreground Opacity": {
+    "Foreground Opacity": ""
+  },
   "Forever": {
     "Forever": "לנצח"
   },
@@ -3578,8 +3626,8 @@
   "Generate Override": {
     "Generate Override": "יצירת דריסה"
   },
-  "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.": {
-    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.": "צור/צרי תצורות בסיס עבור GTK3/4 או Qt5/Qt6 (החבילה qt6ct-kde נדרשת) כדי לעקוב אחר הצבעים של DMS. צריך ליצור את התבנית רק פעם אחת. <br/><br/>מומלץ להגדיר את <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> לפני החלת ערכות נושא על GTK."
+  "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
+    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
   },
   "Generic": {
     "Generic": "כללי"
@@ -3595,6 +3643,9 @@
   },
   "Global fonts can be configured in Settings → Personalization": {
     "Global fonts can be configured in Settings → Personalization": "ניתן להגדיר גופנים גלובליים בהגדרות ← התאמה אישית"
+  },
+  "Globally": {
+    "Globally": ""
   },
   "Globally scale all animation durations": {
     "Globally scale all animation durations": "התאם/י גלובלית את כל משכי הזמן לאנימציה"
@@ -3893,6 +3944,9 @@
   "Hover Popouts": {
     "Hover Popouts": "חלונות קופצים בריחוף"
   },
+  "How layout changes are remembered across apps": {
+    "How layout changes are remembered across apps": ""
+  },
   "How often the server polls for new updates.": {
     "How often the server polls for new updates.": "באיזו תדירות השרת בודק אם יש עדכונים חדשים."
   },
@@ -3990,7 +4044,7 @@
     "If the field is hidden, it will appear as soon as a key is pressed.": "אם השדה מוסתר, הוא יופיע ברגע שלוחצים על מקש."
   },
   "Ignore App-Requested Timeout": {
-    "Ignore App-Requested Timeout": ""
+    "Ignore App-Requested Timeout": "התעלם/י מזמן קצוב שהתבקש על ידי האפליקציה"
   },
   "Ignore Completely": {
     "Ignore Completely": "התעלם/י לחלוטין"
@@ -4230,7 +4284,7 @@
     "Keep My Edits": "שמור/שמרי את העריכות שלי"
   },
   "Keep dragging when finger is briefly lifted": {
-    "Keep dragging when finger is briefly lifted": ""
+    "Keep dragging when finger is briefly lifted": "המשך/י בגרירה כאשר האצבע מורמת לזמן קצר"
   },
   "Keep in Bar": {
     "Keep in Bar": "השאר/י בסרגל"
@@ -4250,6 +4304,9 @@
   "Key": {
     "Key": "מקש"
   },
+  "Key combination": {
+    "Key combination": ""
+  },
   "Keybind Sources": {
     "Keybind Sources": "מקורות של קיצורי מקלדת"
   },
@@ -4262,11 +4319,32 @@
   "Keybinds shown alongside regular search results": {
     "Keybinds shown alongside regular search results": "קיצורי מקלדת מוצגים לצד תוצאות חיפוש רגילות"
   },
+  "Keyboard": {
+    "Keyboard": ""
+  },
+  "Keyboard Behavior": {
+    "Keyboard Behavior": ""
+  },
   "Keyboard Layout Name": {
     "Keyboard Layout Name": "שם פריסת המקלדת"
   },
+  "Keyboard Layouts": {
+    "Keyboard Layouts": ""
+  },
+  "Keyboard Model": {
+    "Keyboard Model": ""
+  },
   "Keyboard Shortcuts": {
     "Keyboard Shortcuts": "קיצורי מקלדת"
+  },
+  "Keyboard Variant": {
+    "Keyboard Variant": ""
+  },
+  "Keyboard shortcut to start security key unlock": {
+    "Keyboard shortcut to start security key unlock": ""
+  },
+  "Keymap File Path": {
+    "Keymap File Path": ""
   },
   "Keys": {
     "Keys": "מקשים"
@@ -4368,7 +4446,7 @@
     "Left Section": "קטע שמאלי"
   },
   "Left-Handed Mode": {
-    "Left-Handed Mode": ""
+    "Left-Handed Mode": "מצב ליד שמאל"
   },
   "Light": {
     "Light": "דק"
@@ -4510,6 +4588,9 @@
   },
   "MAC": {
     "MAC": "MAC"
+  },
+  "MIT License": {
+    "MIT License": ""
   },
   "MTU": {
     "MTU": "MTU"
@@ -4782,7 +4863,7 @@
     "Microphone volume control": "בקרת עוצמת מיקרופון"
   },
   "Middle Click Emulation": {
-    "Middle Click Emulation": ""
+    "Middle Click Emulation": "הדמיית לחיצה אמצעית"
   },
   "Middle Section": {
     "Middle Section": "קטע אמצעי"
@@ -4860,10 +4941,10 @@
     "Mount Points": "נקודות עגינה"
   },
   "Mouse & Touchpad": {
-    "Mouse & Touchpad": ""
+    "Mouse & Touchpad": "עכבר ומשטח מגע"
   },
   "Mouse Settings": {
-    "Mouse Settings": ""
+    "Mouse Settings": "הגדרות עכבר"
   },
   "Mouse clicks pass through the bar to windows behind it": {
     "Mouse clicks pass through the bar to windows behind it": "לחיצות עכבר עוברות מבעד לסרגל לחלונות שמאחוריו"
@@ -4929,7 +5010,7 @@
     "Native: platform renderer (FreeType).": "מובנה: מעבד הפלטפורמה המובנה (FreeType)."
   },
   "Natural Scrolling": {
-    "Natural Scrolling": ""
+    "Natural Scrolling": "גלילה טבעית"
   },
   "Natural Touchpad Scrolling": {
     "Natural Touchpad Scrolling": "גלילה טבעית במשטח המגע"
@@ -5079,7 +5160,7 @@
     "No Rounding": "ללא עיגול"
   },
   "No Scroll": {
-    "No Scroll": ""
+    "No Scroll": "ללא גלילה"
   },
   "No Shadow": {
     "No Shadow": "ללא צל"
@@ -5478,7 +5559,7 @@
     "On": "פועל"
   },
   "On Button Down": {
-    "On Button Down": ""
+    "On Button Down": "בלחיצה על כפתור"
   },
   "On indefinitely": {
     "On indefinitely": "מופעל ללא הגבלת זמן"
@@ -5499,7 +5580,7 @@
     "Only adjust gamma based on time or location rules.": "כוונן/י את הגאמה רק לפי כללי זמן או מיקום."
   },
   "Only continue if you recognize this server certificate fingerprint.": {
-    "Only continue if you recognize this server certificate fingerprint.": ""
+    "Only continue if you recognize this server certificate fingerprint.": "המשך/י רק אם טביעת האצבע של אישור השרת הזה מוכרת לך."
   },
   "Only on Battery": {
     "Only on Battery": "רק בעת שימוש בסוללה"
@@ -5513,6 +5594,15 @@
   "Opacity": {
     "Opacity": "שקיפות"
   },
+  "Opacity of cards and nested surfaces inside floating windows": {
+    "Opacity of cards and nested surfaces inside floating windows": ""
+  },
+  "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts": {
+    "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts": ""
+  },
+  "Opacity of foreground cards and nested surfaces on shell panels": {
+    "Opacity of foreground cards and nested surfaces on shell panels": ""
+  },
   "Opaque": {
     "Opaque": "אטום"
   },
@@ -5521,6 +5611,9 @@
   },
   "Open App": {
     "Open App": "פתח/י אפליקציה"
+  },
+  "Open DMS windows floating instead of tiled": {
+    "Open DMS windows floating instead of tiled": ""
   },
   "Open Delay": {
     "Open Delay": "עיכוב פתיחה"
@@ -5542,6 +5635,9 @@
   },
   "Open Trash With": {
     "Open Trash With": "פתח/י אשפה באמצעות"
+  },
+  "Open Windows Floating": {
+    "Open Windows Floating": ""
   },
   "Open a new note": {
     "Open a new note": "פתח/י פתק חדש"
@@ -5663,6 +5759,9 @@
   "Override Corner Radius": {
     "Override Corner Radius": "דריסת רדיוס הפינות"
   },
+  "Override floating window transparency for Notepad": {
+    "Override floating window transparency for Notepad": ""
+  },
   "Override global layout settings for this output": {
     "Override global layout settings for this output": "דרוס/דרסי הגדרות פריסה גלובליות לפלט זה"
   },
@@ -5739,7 +5838,7 @@
     "Pairing...": "מתאים..."
   },
   "Partial": {
-    "Partial": ""
+    "Partial": "חלקי"
   },
   "Partly Cloudy": {
     "Partly Cloudy": "מעונן חלקית"
@@ -5794,6 +5893,9 @@
   },
   "Pending Discharge": {
     "Pending Discharge": "ריקון ממתין"
+  },
+  "Per Window": {
+    "Per Window": ""
   },
   "Per-Mode Wallpapers": {
     "Per-Mode Wallpapers": "רקעים לפי מצב"
@@ -5946,7 +6048,7 @@
     "Pointer": "מצביע"
   },
   "Pointer Speed": {
-    "Pointer Speed": ""
+    "Pointer Speed": "מהירות מצביע"
   },
   "Polkit integration is disabled. User management requires Polkit to elevate privileges.": {
     "Polkit integration is disabled. User management requires Polkit to elevate privileges.": "האינטגרציה עם Polkit מושבתת. ניהול משתמשים דורש את Polkit לצורך עדכון ההרשאות."
@@ -6056,6 +6158,9 @@
   "Press Ctrl+N or click 'New Session' to create one": {
     "Press Ctrl+N or click 'New Session' to create one": "לחץ/י על Ctrl+N או על הכפתור 'הפעלה חדשה' כדי ליצור אחת"
   },
+  "Press Ctrl+key to set. Esc cancels.": {
+    "Press Ctrl+key to set. Esc cancels.": ""
+  },
   "Press Enter and the audio system will restart to apply the change": {
     "Press Enter and the audio system will restart to apply the change": "לחץ/י Enter ומערכת השמע תופעל מחדש כדי להחיל את השינוי"
   },
@@ -6069,7 +6174,7 @@
     "Pressure": "לחץ"
   },
   "Prevent accidental cursor jumps while typing": {
-    "Prevent accidental cursor jumps while typing": ""
+    "Prevent accidental cursor jumps while typing": "מנע/י קפיצות סמן בטעות בעת הקלדה"
   },
   "Prevent screen timeout": {
     "Prevent screen timeout": "מנע/י כיבוי מסך אוטומטי"
@@ -6189,7 +6294,7 @@
     "Protocol": "פרוטוקול"
   },
   "QR Generator": {
-    "QR Generator": ""
+    "QR Generator": "מחולל קודי QR"
   },
   "Qt": {
     "Qt": "Qt"
@@ -6242,6 +6347,9 @@
   "Random": {
     "Random": "אקראי"
   },
+  "Random Order": {
+    "Random Order": ""
+  },
   "Rate": {
     "Rate": "קצב"
   },
@@ -6293,6 +6401,9 @@
   "Regex": {
     "Regex": "Regex"
   },
+  "Registries": {
+    "Registries": ""
+  },
   "Regular": {
     "Regular": "רגיל"
   },
@@ -6328,6 +6439,9 @@
   },
   "Remember Last Query": {
     "Remember Last Query": "זכירת הבקשה האחרונה"
+  },
+  "Remember Layout": {
+    "Remember Layout": ""
   },
   "Remember Type Filter": {
     "Remember Type Filter": "שמירה על מסנן הסוגים"
@@ -6401,6 +6515,12 @@
   "Repeat": {
     "Repeat": "חזרה"
   },
+  "Repeat Delay": {
+    "Repeat Delay": ""
+  },
+  "Repeat Rate": {
+    "Repeat Rate": ""
+  },
   "Replacement": {
     "Replacement": "החלפה"
   },
@@ -6444,7 +6564,7 @@
     "Requires remembering the last user and session. Enable those options first.": "דורש זכירת המשתמש וההפעלה האחרונים. הפעל/י אפשרויות אלו תחילה."
   },
   "Requires the DMS Theme extension from the editor marketplace": {
-    "Requires the DMS Theme extension from the editor marketplace": ""
+    "Requires the DMS Theme extension from the editor marketplace": "דורש את התוסף DMS Theme מחנות התוספים של העורך"
   },
   "Reset": {
     "Reset": "איפוס"
@@ -6482,6 +6602,9 @@
   "Restart the DankMaterialShell": {
     "Restart the DankMaterialShell": "הפעל/י מחדש את DankMaterialShell"
   },
+  "Restart userspace without rebooting the kernel, requires systemd": {
+    "Restart userspace without rebooting the kernel, requires systemd": ""
+  },
   "Restarting audio system...": {
     "Restarting audio system...": "מפעיל מערכת שמע מחדש..."
   },
@@ -6501,10 +6624,10 @@
     "Reverse Scrolling Direction": "היפוך של כיוון הגלילה"
   },
   "Reverse mouse wheel scrolling direction": {
-    "Reverse mouse wheel scrolling direction": ""
+    "Reverse mouse wheel scrolling direction": "הפוך/הפכי את כיוון הגלילה של גלגלת העכבר"
   },
   "Reverse two-finger scrolling direction": {
-    "Reverse two-finger scrolling direction": ""
+    "Reverse two-finger scrolling direction": "הפוך/הפכי את כיוון הגלילה בשתי אצבעות"
   },
   "Reverse workspace switch direction when scrolling over the bar": {
     "Reverse workspace switch direction when scrolling over the bar": "הפוך/הפכי את כיוון החלפת סביבות העבודה בעת גלילה על הסרגל"
@@ -6714,7 +6837,7 @@
     "Scroll GitHub": "הGitHub של Scroll"
   },
   "Scroll Method": {
-    "Scroll Method": ""
+    "Scroll Method": "שיטת גלילה"
   },
   "Scroll Wheel": {
     "Scroll Wheel": "גלגל הגלילה"
@@ -6732,7 +6855,7 @@
     "Scrolling": "גלילה"
   },
   "Scrolling Speed": {
-    "Scrolling Speed": ""
+    "Scrolling Speed": "מהירות גלילה"
   },
   "Search App Actions": {
     "Search App Actions": "חיפוש פעולות לאפליקציה"
@@ -6797,8 +6920,17 @@
   "Security Key PAM Source": {
     "Security Key PAM Source": "מקור PAM של מפתח אבטחה"
   },
+  "Security key": {
+    "Security key": ""
+  },
+  "Security key (%1)": {
+    "Security key (%1)": ""
+  },
   "Security key mode": {
     "Security key mode": "מצב מפתח אבטחה"
+  },
+  "Security key shortcut": {
+    "Security key shortcut": ""
   },
   "Security-key availability could not be confirmed": {
     "Security-key availability could not be confirmed": "לא ניתן היה לוודא את זמינות האימות באמצעות מפתח אבטחה"
@@ -6844,6 +6976,9 @@
   },
   "Select a desktop application": {
     "Select a desktop application": "בחר/י אפליקציית שולחן עבודה"
+  },
+  "Select a random wallpaper instead of cycling in alphabetical order": {
+    "Select a random wallpaper instead of cycling in alphabetical order": ""
   },
   "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": {
     "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": "בחר/י ווידג׳ט להוספה לשולחן העבודה שלך. כל ווידג׳ט הוא מופע נפרד עם הגדרות משלו."
@@ -7065,7 +7200,7 @@
     "Show": "הצג/י"
   },
   "Show \"config reloaded\" Toast": {
-    "Show \"config reloaded\" Toast": ""
+    "Show \"config reloaded\" Toast": "הצג/י התראה קופצת של \"config reloaded\""
   },
   "Show 3rd Party": {
     "Show 3rd Party": "הצג/י צד שלישי"
@@ -7214,6 +7349,9 @@
   "Show Seconds": {
     "Show Seconds": "הצגת שניות"
   },
+  "Show Soft Reboot": {
+    "Show Soft Reboot": ""
+  },
   "Show Sunrise/Sunset": {
     "Show Sunrise/Sunset": "הצג/י זריחה/שקיעה"
   },
@@ -7263,7 +7401,7 @@
     "Show a notification when battery reaches the charge limit.": "הצג/י התראה כאשר הסוללה מגיעה למגבלת הטעינה."
   },
   "Show a toast when the compositor config is reloaded": {
-    "Show a toast when the compositor config is reloaded": ""
+    "Show a toast when the compositor config is reloaded": "הצג/י התראה קופצת כאשר הגדרות הקומפוזיטור נטענות מחדש"
   },
   "Show a warning popup when battery is running low.": {
     "Show a warning popup when battery is running low.": "הצג/י חלונית אזהרה קופצת כאשר הסוללה חלשה."
@@ -7295,6 +7433,9 @@
   "Show during Niri overview": {
     "Show during Niri overview": "הצג/י במהלך הסקירה של niri"
   },
+  "Show foreground surfaces on cards inside floating windows": {
+    "Show foreground surfaces on cards inside floating windows": ""
+  },
   "Show foreground surfaces on notification cards": {
     "Show foreground surfaces on notification cards": "הצג/י משטחים קדמיים על כרטיסי התראות"
   },
@@ -7306,6 +7447,9 @@
   },
   "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": {
     "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": "הצג/י שכבת משגר בעת הקלדה בסקירה של niri. השבת/י כדי להשתמש במשגר אחר."
+  },
+  "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.": {
+    "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.": ""
   },
   "Show mode tabs and keyboard hints at the bottom.": {
     "Show mode tabs and keyboard hints at the bottom.": "הצג/י לשוניות מצב ורמזי מקלדת בתחתית."
@@ -7418,6 +7562,9 @@
   "Snow": {
     "Snow": "שלג"
   },
+  "Soft Reboot": {
+    "Soft Reboot": ""
+  },
   "Some plugins require a newer version of DMS:": {
     "Some plugins require a newer version of DMS:": "תוספים מסוימים דורשים גרסה חדשה יותר של DMS:"
   },
@@ -7438,6 +7585,9 @@
   },
   "Source: %1": {
     "Source: %1": "מקור: %1"
+  },
+  "Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.": {
+    "Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.": ""
   },
   "Space between the bar and screen edges": {
     "Space between the bar and screen edges": "מרווח בין הסרגל לקצוות המסך"
@@ -7553,6 +7703,9 @@
   "Sunset": {
     "Sunset": "שקיעה"
   },
+  "Super + Space": {
+    "Super + Space": ""
+  },
   "Suppress Duplicate Notifications": {
     "Suppress Duplicate Notifications": "הדחק/י התראות כפולות"
   },
@@ -7586,6 +7739,9 @@
   "Surface Opacity": {
     "Surface Opacity": "שקיפות המשטח"
   },
+  "Surface Styling": {
+    "Surface Styling": ""
+  },
   "Surface Text": {
     "Surface Text": "טקסט במשטח"
   },
@@ -7608,10 +7764,13 @@
     "Suspend then Hibernate": "השהיה ואחריה שינה עמוקה"
   },
   "Swap primary and secondary mouse buttons": {
-    "Swap primary and secondary mouse buttons": ""
+    "Swap primary and secondary mouse buttons": "החלף/י בין הכפתור הראשי והמשני של העכבר"
   },
   "Sway Website": {
     "Sway Website": "האתר של Sway"
+  },
+  "Switch Layout Shortcut": {
+    "Switch Layout Shortcut": ""
   },
   "Switch between display configurations": {
     "Switch between display configurations": "החלף/י בין הגדרות תצוגה"
@@ -7657,6 +7816,9 @@
   },
   "Sync to apply": {
     "Sync to apply": "הרץ/י סנכרון כדי להחיל"
+  },
+  "Sync with Global Settings": {
+    "Sync with Global Settings": ""
   },
   "Syncing...": {
     "Syncing...": "מסנכרן..."
@@ -7734,16 +7896,16 @@
     "Tailscale not available": "Tailscale אינו זמין"
   },
   "Tap and Drag": {
-    "Tap and Drag": ""
+    "Tap and Drag": "הקשה וגרירה"
   },
   "Tap and drag on the touchpad to move items": {
-    "Tap and drag on the touchpad to move items": ""
+    "Tap and drag on the touchpad to move items": "הקש/י וגרור/י על משטח המגע כדי להזיז פריטים"
   },
   "Tap the touchpad surface to trigger left click clicks": {
-    "Tap the touchpad surface to trigger left click clicks": ""
+    "Tap the touchpad surface to trigger left click clicks": "הקש/י על משטח המגע כדי לבצע לחיצה שמאלית"
   },
   "Tap to Click": {
-    "Tap to Click": ""
+    "Tap to Click": "הקשה ללחיצה"
   },
   "Terminal": {
     "Terminal": "מסוף"
@@ -7821,7 +7983,7 @@
     "The rule applies to any window matching one of these.": "החוק חל על כל חלון שתואם לאחד מאלה."
   },
   "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": {
-    "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": ""
+    "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": "אישור השרת השתנה מאז הפעם האחרונה שסמכת עליו. המשך/י רק אם טביעת האצבע החדשה מוכרת לך."
   },
   "Theme & Colors": {
     "Theme & Colors": "ערכת נושא וצבעים"
@@ -8052,10 +8214,10 @@
     "Touch your security key...": "גע/י במפתח האבטחה שלך..."
   },
   "Touchpad Settings": {
-    "Touchpad Settings": ""
+    "Touchpad Settings": "הגדרות משטח מגע"
   },
   "Touchpad Speed": {
-    "Touchpad Speed": ""
+    "Touchpad Speed": "מהירות משטח המגע"
   },
   "Transform": {
     "Transform": "שינוי"
@@ -8118,7 +8280,7 @@
     "Turn off now": "כבה/י עכשיו"
   },
   "Two Finger": {
-    "Two Finger": ""
+    "Two Finger": "שתי אצבעות"
   },
   "Type at least 2 characters": {
     "Type at least 2 characters": "הקלד/י לפחות 2 תווים"
@@ -8262,7 +8424,7 @@
     "Untrust": "הסרת האמון"
   },
   "Untrusted VPN certificate": {
-    "Untrusted VPN certificate": ""
+    "Untrusted VPN certificate": "אישור VPN לא מהימן"
   },
   "Up to date": {
     "Up to date": "מעודכן"
@@ -8765,6 +8927,9 @@
   "Window Height": {
     "Window Height": "גובה חלון"
   },
+  "Window Opacity": {
+    "Window Opacity": ""
+  },
   "Window Opening": {
     "Window Opening": "פתיחת חלון"
   },
@@ -8809,6 +8974,9 @@
   },
   "X-Ray": {
     "X-Ray": "רנטגן"
+  },
+  "XKB Options": {
+    "XKB Options": ""
   },
   "XWayland": {
     "XWayland": "XWayland"
@@ -8868,7 +9036,7 @@
     "attached": "מחובר"
   },
   "below AA": {
-    "below AA": ""
+    "below AA": "מתחת לAA"
   },
   "brandon": {
     "brandon": "brandon"
@@ -8914,9 +9082,6 @@
   },
   "display rotation option": {
     "Normal": "רגיל"
-  },
-  "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": {
-    "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": "הפרויקט DMS הוא מעטפת שולחן עבודה מודרנית וניתנת להתאמה אישית עם עיצוב בהשראת <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">Material Design 3</a> של גוגל.<br /><br/>היא נבנתה עם שפת התכנות <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a> ו<a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, ספריית Qt6 לבניית מעטפות לשולחן העבודה."
   },
   "e.g. /usr/bin/my-script --flag": {
     "e.g. /usr/bin/my-script --flag": "לדוגמה /usr/bin/my-script --flag"

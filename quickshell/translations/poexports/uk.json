@@ -63,10 +63,10 @@
     "%1 is now included in config": "%1 тепер включено в конфігурацію"
   },
   "%1 issue found": {
-    "%1 issue found": "знайдено %1 проблему"
+    "%1 issue found": "%1 проблему знайдено"
   },
   "%1 issues found": {
-    "%1 issues found": "знайдено %1 проблем"
+    "%1 issues found": "%1 проблем знайдено"
   },
   "%1 min left": {
     "%1 min left": "залишилося %1 хв"
@@ -96,7 +96,7 @@
     "%1 wallpapers  •  %2 / %3": "%1 шпалер  •  %2 / %3"
   },
   "%1 widgets": {
-    "%1 widgets": "Віджети %1"
+    "%1 widgets": "%1 віджетів"
   },
   "%1 window": {
     "%1 window": "%1 вікно"
@@ -249,7 +249,7 @@
     "35 seconds": "35 секунд"
   },
   "3rd party": {
-    "3rd party": "Третя сторона"
+    "3rd party": "Сторонні"
   },
   "4 hours": {
     "4 hours": "4 години"
@@ -305,9 +305,6 @@
   "90°": {
     "90°": "90°"
   },
-  "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>": {
-    "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>": "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">Ліцензія MIT</a>"
-  },
   "A modern desktop shell for Wayland compositors": {
     "A modern desktop shell for Wayland compositors": "Сучасна оболонка робочого столу для Wayland композиторів"
   },
@@ -333,10 +330,10 @@
     "Aborted": "Перервано"
   },
   "About": {
-    "About": "Про"
+    "About": "Про DMS"
   },
   "Acceleration Profile": {
-    "Acceleration Profile": ""
+    "Acceleration Profile": "Профіль прискорення"
   },
   "Accent Color": {
     "Accent Color": "Акцентний колір"
@@ -414,7 +411,7 @@
     "Adapters": "Адаптери"
   },
   "Adaptive": {
-    "Adaptive": ""
+    "Adaptive": "Адаптивний"
   },
   "Adaptive Media Width": {
     "Adaptive Media Width": "Адаптивна ширина медіа"
@@ -459,7 +456,7 @@
     "Add a border around the dock": "Додати рамку навколо доку"
   },
   "Add a custom prefix to all application launches. This can be used for things like 'uwsm-app', 'systemd-run', or other command wrappers.": {
-    "Add a custom prefix to all application launches. This can be used for things like 'uwsm-app', 'systemd-run', or other command wrappers.": "Додати власний префікс до всіх запускачів додатків. Можна використовувати для таких речей, як 'uwsm-app', 'systemd-run' або інших обгорток команд"
+    "Add a custom prefix to all application launches. This can be used for things like 'uwsm-app', 'systemd-run', or other command wrappers.": "Додати власний префікс до всіх запускачів програм. Можна використовувати для таких речей, як 'uwsm-app', 'systemd-run' або інших обгорток команд"
   },
   "Add a task...": {
     "Add a task...": "Додати завдання..."
@@ -492,10 +489,10 @@
     "Add to Autostart": "Додати в автозапуск"
   },
   "Adjust pointer sensitivity speed": {
-    "Adjust pointer sensitivity speed": ""
+    "Adjust pointer sensitivity speed": "Налаштувати швидкість чутливості вказівника"
   },
   "Adjust scrolling sensitivity multiplier": {
-    "Adjust scrolling sensitivity multiplier": ""
+    "Adjust scrolling sensitivity multiplier": "Налаштувати множник чутливості прокручування"
   },
   "Adjust the bar height via inner padding": {
     "Adjust the bar height via inner padding": "Регулювати висоту панелі за допомогою внутрішніх відступів"
@@ -504,13 +501,13 @@
     "Adjust the number of columns in grid view mode.": "Налаштуйте кількість стовпців у режимі відображення сітки"
   },
   "Adjust touchpad pointer speed": {
-    "Adjust touchpad pointer speed": ""
+    "Adjust touchpad pointer speed": "Налаштувати швидкість вказівника тачпада"
   },
   "Adjust volume per scroll indent": {
     "Adjust volume per scroll indent": "Зміна гучності за один крок прокрутки"
   },
   "Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)": {
-    "Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)": "Зміна контрастності згенерованих кольорів (-100 = мінімум, 0 = стандарт, 100 = максимум)"
+    "Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)": "Зміна контрастності згенерованих кольорів (-100 = мінімум, 0 = типово, 100 = максимум)"
   },
   "Administrator access is required. Use the Sync button in Settings → Greeter to apply.": {
     "Administrator access is required. Use the Sync button in Settings → Greeter to apply.": "Потрібен доступ адміністратора. Використовуйте кнопку Синхронізація в Налаштування → Екран входу, щоб застосувати"
@@ -520,6 +517,9 @@
   },
   "Advanced": {
     "Advanced": "Додатково"
+  },
+  "Advanced comma-separated libxkbcommon options.": {
+    "Advanced comma-separated libxkbcommon options.": ""
   },
   "Afternoon": {
     "Afternoon": "День"
@@ -561,7 +561,10 @@
     "Already on that session": "Вже в цій сесії"
   },
   "Also group repeated application icons on the active workspace": {
-    "Also group repeated application icons on the active workspace": "Також групувати повторювані іконки додатків на активному робочому просторі"
+    "Also group repeated application icons on the active workspace": "Також групувати повторювані іконки програм на активному робочому просторі"
+  },
+  "Alt + Shift": {
+    "Alt + Shift": ""
   },
   "Alternative (OR)": {
     "Alternative (OR)": "Альтернатива (АБО)"
@@ -591,10 +594,10 @@
     "Always show when there's only one connected display": "Завжди показувати, якщо підключено лише один дисплей"
   },
   "Always use the durations above, even if an app requests a shorter or longer one": {
-    "Always use the durations above, even if an app requests a shorter or longer one": ""
+    "Always use the durations above, even if an app requests a shorter or longer one": "Завжди використовувати вказану вище тривалість, навіть якщо програма запитує коротшу або довшу"
   },
   "Always use this app for %1": {
-    "Always use this app for %1": "Завжди використовувати цей додаток для %1"
+    "Always use this app for %1": "Завжди використовувати цю програму для %1"
   },
   "Amount": {
     "Amount": "Значення"
@@ -633,49 +636,52 @@
     "Any window": "Будь-яке вікно"
   },
   "App Customizations": {
-    "App Customizations": "Налаштування додатків"
+    "App Customizations": "Налаштування програм"
   },
   "App ID": {
-    "App ID": "ID додатка"
+    "App ID": "ID програми"
   },
   "App ID (e.g. firefox)": {
-    "App ID (e.g. firefox)": "ID додатка (напр. firefox)"
+    "App ID (e.g. firefox)": "ID програми (напр. firefox)"
   },
   "App ID Substitutions": {
-    "App ID Substitutions": "Заміни ID додатка"
+    "App ID Substitutions": "Заміни ID програми"
   },
   "App ID regex": {
-    "App ID regex": "Регулярний вираз ID додатка"
+    "App ID regex": "Регулярний вираз ID програми"
   },
   "App ID regex (e.g. ^firefox$)": {
-    "App ID regex (e.g. ^firefox$)": "Регулярний вираз ID додатка (напр. ^firefox$)"
+    "App ID regex (e.g. ^firefox$)": "Регулярний вираз ID програми (напр. ^firefox$)"
   },
   "App Launcher": {
-    "App Launcher": "Меню додатків"
+    "App Launcher": "Меню програм"
   },
   "App Names": {
-    "App Names": "Назви додатків"
+    "App Names": "Назви програм"
   },
   "App Theming": {
-    "App Theming": "Теми додатків"
+    "App Theming": "Теми програм"
   },
   "App name or identity (e.g., firefox)": {
-    "App name or identity (e.g., firefox)": "Назва або ідентифікатор додатка (напр., firefox)"
+    "App name or identity (e.g., firefox)": "Назва або ідентифікатор програми (напр., firefox)"
   },
   "Appearance": {
     "Appearance": "Зовнішній вигляд"
   },
+  "Apple Music animated covers": {
+    "Apple Music animated covers": ""
+  },
   "Application": {
-    "Application": "Додаток"
+    "Application": "Програма"
   },
   "Application Dock": {
     "Application Dock": "Док-панель"
   },
   "Applications": {
-    "Applications": "Додатки"
+    "Applications": "Програми"
   },
   "Applications and commands to start automatically when you log in": {
-    "Applications and commands to start automatically when you log in": "Додатки та команди для автоматичного запуску при вході в систему"
+    "Applications and commands to start automatically when you log in": "Програми та команди для автоматичного запуску при вході в систему"
   },
   "Applies on the next greeter sync": {
     "Applies on the next greeter sync": "Застосується під час наступної синхронізації вікна входу"
@@ -711,25 +717,25 @@
     "Applying auto-login on startup...": "Застосування автологіну при запуску..."
   },
   "Apps": {
-    "Apps": "Додатки"
+    "Apps": "Програми"
   },
   "Apps Dock": {
-    "Apps Dock": "Док додатків"
+    "Apps Dock": "Док програм"
   },
   "Apps Dock Settings": {
-    "Apps Dock Settings": "Налаштування доку додатків"
+    "Apps Dock Settings": "Налаштування доку програм"
   },
   "Apps Icon": {
-    "Apps Icon": "Іконки додатків"
+    "Apps Icon": "Іконки програм"
   },
   "Apps are ordered by usage frequency, then last used, then alphabetically.": {
-    "Apps are ordered by usage frequency, then last used, then alphabetically.": "Додатки впорядковано за частотою використання, потім за останнім використанням, потім за алфавітом"
+    "Apps are ordered by usage frequency, then last used, then alphabetically.": "Програми впорядковано за частотою використання, потім за останнім використанням, потім за алфавітом"
   },
   "Apps with custom display name, icon, or launch options. Right-click an app and select 'Edit App' to customize.": {
-    "Apps with custom display name, icon, or launch options. Right-click an app and select 'Edit App' to customize.": "Додатки з власними назвами, іконками або параметрами запуску. Натисніть ПКМ на додатку і виберіть «Редагувати додаток» для налаштування"
+    "Apps with custom display name, icon, or launch options. Right-click an app and select 'Edit App' to customize.": "Програми з власними назвами, іконками або параметрами запуску. Натисніть ПКМ на програмі і виберіть «Редагувати програму» для налаштування"
   },
   "Apps with notification popups muted. Unmute or delete to remove.": {
-    "Apps with notification popups muted. Unmute or delete to remove.": "Додатки з вимкненими спливаючими сповіщеннями. Увімкніть звук або видаліть, щоб прибрати їх"
+    "Apps with notification popups muted. Unmute or delete to remove.": "Програми з вимкненими спливаючими сповіщеннями. Увімкніть звук або видаліть, щоб прибрати їх"
   },
   "Arc Extender": {
     "Arc Extender": "Розширювач дуг"
@@ -870,7 +876,7 @@
     "Auto-Hide Timeout": "Тайм-аут приховування"
   },
   "Auto-close Niri overview when launching apps.": {
-    "Auto-close Niri overview when launching apps.": "Автоматично закривати огляд Niri при запуску додатків"
+    "Auto-close Niri overview when launching apps.": "Автоматично закривати огляд Niri при запуску програм"
   },
   "Auto-delete notifications older than this": {
     "Auto-delete notifications older than this": "Автоматично видаляти сповіщення, старіші за цей період"
@@ -915,7 +921,7 @@
     "Automatic Control": "Автоматичне керування"
   },
   "Automatic Cycling": {
-    "Automatic Cycling": "Автоматичне циклічне перемикання"
+    "Automatic Cycling": "Автоматичне зациклення"
   },
   "Automatically calculate popup gap based on bar spacing": {
     "Automatically calculate popup gap based on bar spacing": "Автоматично обчислювати відступ спливаючого вікна на основі відстані панелі"
@@ -947,6 +953,9 @@
   "Automatically save changes to opened files as you type": {
     "Automatically save changes to opened files as you type": "Автоматично зберігати зміни у відкритих файлах під час введення тексту"
   },
+  "Automatically turn on Num Lock at startup": {
+    "Automatically turn on Num Lock at startup": ""
+  },
   "Automatically turn on Power Saver profile when battery is low.": {
     "Automatically turn on Power Saver profile when battery is low.": "Автоматично вмикати профіль економії енергії при низькому заряді батареї"
   },
@@ -954,7 +963,7 @@
     "Automation": "Автоматизація"
   },
   "Autostart Apps": {
-    "Autostart Apps": "Додатки автозапуску"
+    "Autostart Apps": "Програми автозапуску"
   },
   "Autostart Entries": {
     "Autostart Entries": "Записи автозапуску"
@@ -1020,7 +1029,7 @@
     "Balanced": "Збалансований"
   },
   "Balanced palette with focused accents (default).": {
-    "Balanced palette with focused accents (default).": "Збалансована палітра з акцентованими елементами (типова)"
+    "Balanced palette with focused accents (default).": "Збалансована палітра з акцентованими елементами (типово)"
   },
   "Band": {
     "Band": "Діапазон"
@@ -1358,6 +1367,9 @@
   "Channel": {
     "Channel": "Канал"
   },
+  "Characters per second while holding down key": {
+    "Characters per second while holding down key": ""
+  },
   "Charge Level": {
     "Charge Level": "Рівень заряду"
   },
@@ -1371,7 +1383,7 @@
     "Charging": "Заряджається"
   },
   "Check for system updates": {
-    "Check for system updates": "Перевірити наявність оновлень системи"
+    "Check for system updates": "Наявність оновлень системи"
   },
   "Check interval": {
     "Check interval": "Інтервал перевірки"
@@ -1398,7 +1410,7 @@
     "Choose Dark Mode Color": "Оберіть колір темного режиму"
   },
   "Choose Launcher Logo Color": {
-    "Choose Launcher Logo Color": "Вибір кольору логотипа лаунчера застосунків"
+    "Choose Launcher Logo Color": "Колір логотипу запускача"
   },
   "Choose Light Mode Color": {
     "Choose Light Mode Color": "Оберіть колір світлого режиму"
@@ -1411,6 +1423,9 @@
   },
   "Choose a power profile": {
     "Choose a power profile": "Оберіть профіль живлення"
+  },
+  "Choose a shortcut key to cycle between keyboard layouts": {
+    "Choose a shortcut key to cycle between keyboard layouts": ""
   },
   "Choose colors from palette": {
     "Choose colors from palette": "Оберіть кольори з палітри"
@@ -1443,7 +1458,7 @@
     "Choose wallpaper folder": "Оберіть папку зі шпалерами"
   },
   "Choose when to generate scrolling events": {
-    "Choose when to generate scrolling events": ""
+    "Choose when to generate scrolling events": "Виберіть, коли створювати події прокручування"
   },
   "Choose where notification popups appear on screen": {
     "Choose where notification popups appear on screen": "Оберіть, де на екрані з'являтимуться спливаючі сповіщення"
@@ -1452,7 +1467,7 @@
     "Choose where on-screen displays appear on screen": "Оберіть, де на екрані з'являтимуться екранні індикатори"
   },
   "Choose whether to launch a desktop app or a command": {
-    "Choose whether to launch a desktop app or a command": "Оберіть, що запускати, додаток робочого столу чи команду"
+    "Choose whether to launch a desktop app or a command": "Оберіть, що запускати, програму робочого столу чи команду"
   },
   "Choose which action buttons appear on clipboard entries": {
     "Choose which action buttons appear on clipboard entries": "Оберіть, які кнопки дій відображати для записів буфера обміну"
@@ -1649,6 +1664,9 @@
   "Column Width": {
     "Column Width": "Ширина колонки"
   },
+  "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": {
+    "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": ""
+  },
   "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": {
     "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": "Список імен сесій через кому для приховування. Використовуйте слеші для регулярних виразів (напр., /^_.*/)"
   },
@@ -1680,7 +1698,7 @@
     "Compositor Settings": "Налаштування композитора"
   },
   "Compositor actions (focus, move, etc.)": {
-    "Compositor actions (focus, move, etc.)": ""
+    "Compositor actions (focus, move, etc.)": "Дії композитора (фокус, переміщення тощо)"
   },
   "Config Format": {
     "Config Format": "Формат конфігурації"
@@ -1767,7 +1785,7 @@
     "Connected Displays": "Підключені дисплеї"
   },
   "Connected Frame Mode uses the connected launcher for default launcher shortcuts.": {
-    "Connected Frame Mode uses the connected launcher for default launcher shortcuts.": "Режим підключеної рамки використовує підключений запускач для стандартних ярликів запуску"
+    "Connected Frame Mode uses the connected launcher for default launcher shortcuts.": "Режим підключеної рамки використовує підключений запускач для типових ярликів запуску"
   },
   "Connected Options": {
     "Connected Options": "Опції підключення"
@@ -1800,7 +1818,7 @@
     "Contrast": "Контраст"
   },
   "Contrast by variant": {
-    "Contrast by variant": ""
+    "Contrast by variant": "Контрастність за варіантом"
   },
   "Contributor": {
     "Contributor": "Контриб'ютор"
@@ -1958,6 +1976,12 @@
   "Critical Threshold": {
     "Critical Threshold": "Критичний поріг"
   },
+  "Ctrl + Shift": {
+    "Ctrl + Shift": ""
+  },
+  "Ctrl+%1 is used for password editing": {
+    "Ctrl+%1 is used for password editing": ""
+  },
   "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": {
     "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": "Ctrl+A: Вибрати все • Ctrl+P: Попередній перегляд • Enter/Shift+Enter: Наступний/Попередній • Esc: Закрити"
   },
@@ -2026,6 +2050,9 @@
   },
   "Custom": {
     "Custom": "Власний"
+  },
+  "Custom / None": {
+    "Custom / None": ""
   },
   "Custom Blend": {
     "Custom Blend": "Власний мікс"
@@ -2119,6 +2146,9 @@
   },
   "DMS Shortcuts": {
     "DMS Shortcuts": "Ярлики DMS"
+  },
+  "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.": {
+    "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.": ""
   },
   "DMS out of date": {
     "DMS out of date": "Версія DMS застаріла"
@@ -2220,7 +2250,7 @@
     "Deck": "Колода"
   },
   "Default": {
-    "Default": "Типовий"
+    "Default": "Типово"
   },
   "Default (Black)": {
     "Default (Black)": "За замовчуванням (Чорний)"
@@ -2229,13 +2259,13 @@
     "Default (Global)": "За замовчуванням (Глобально)"
   },
   "Default Apps": {
-    "Default Apps": "Стандартні додатки"
+    "Default Apps": "Типові програми"
   },
   "Default Launcher": {
-    "Default Launcher": "Стандартний запускач"
+    "Default Launcher": "Типовий запускач"
   },
   "Default Launcher Shortcut": {
-    "Default Launcher Shortcut": "Стандартний ярлик запуску"
+    "Default Launcher Shortcut": "Типовий ярлик запуску"
   },
   "Default Mode": {
     "Default Mode": "Режим за замовчуванням"
@@ -2244,13 +2274,13 @@
     "Default Opens": "Відкривається за замовчуванням"
   },
   "Default Width (%)": {
-    "Default Width (%)": "Стандартна ширина (%)"
+    "Default Width (%)": "Типова ширина (%)"
   },
   "Default launcher shortcuts open the full launcher with mode tabs, grid view, and action panel.": {
-    "Default launcher shortcuts open the full launcher with mode tabs, grid view, and action panel.": "Стандартні ярлики запуску відкривають повний запускач з вкладками режимів, сіткою та панеллю дій"
+    "Default launcher shortcuts open the full launcher with mode tabs, grid view, and action panel.": "Типові ярлики запуску відкривають повний запускач з вкладками режимів, сіткою та панеллю дій"
   },
   "Default launcher shortcuts open the minimal Spotlight Bar. The dedicated Spotlight Bar shortcut below stays independent.": {
-    "Default launcher shortcuts open the minimal Spotlight Bar. The dedicated Spotlight Bar shortcut below stays independent.": "Стандартні ярлики запуску відкривають мінімальну панель Spotlight. Окремий ярлик Spotlight Bar нижче залишається незалежним"
+    "Default launcher shortcuts open the minimal Spotlight Bar. The dedicated Spotlight Bar shortcut below stays independent.": "Типові ярлики запуску відкривають мінімальну панель Spotlight. Окремий ярлик панелі Spotlight нижче залишається незалежним"
   },
   "Default selected action": {
     "Default selected action": "Вибрана дія за замовчуванням"
@@ -2263,6 +2293,9 @@
   },
   "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": {
     "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": "Del: Очистити • Shift+Del: Очистити все • 1–9: Дії • F10: Довідка • Esc: Закрити"
+  },
+  "Delay before characters start repeating": {
+    "Delay before characters start repeating": ""
   },
   "Delete": {
     "Delete": "Видалити"
@@ -2316,7 +2349,7 @@
     "Description": "Опис"
   },
   "Desktop Application": {
-    "Desktop Application": "Додаток робочого столу"
+    "Desktop Application": "Програма робочого столу"
   },
   "Desktop Clock": {
     "Desktop Clock": "Годинник робочого столу"
@@ -2366,6 +2399,9 @@
   "Digital": {
     "Digital": "Цифровий"
   },
+  "Direct path to a .xkb keymap file. Overrides layouts/variants above.": {
+    "Direct path to a .xkb keymap file. Overrides layouts/variants above.": ""
+  },
   "Direction Source": {
     "Direction Source": "Джерело напрямку"
   },
@@ -2388,13 +2424,13 @@
     "Disable Output": "Вимкнути вихід"
   },
   "Disable While Typing": {
-    "Disable While Typing": ""
+    "Disable While Typing": "Вимкнути під час друкування"
   },
   "Disable on External Mouse": {
-    "Disable on External Mouse": ""
+    "Disable on External Mouse": "Вимкнути при зовнішній миші"
   },
   "Disable touchpad when an external mouse is connected": {
-    "Disable touchpad when an external mouse is connected": ""
+    "Disable touchpad when an external mouse is connected": "Вимкнути тачпад, коли підключено зовнішню мишу"
   },
   "Disabled": {
     "Disabled": "Вимкнено"
@@ -2466,7 +2502,7 @@
     "Display Settings": "Налаштування дисплея"
   },
   "Display a dock with pinned and running applications": {
-    "Display a dock with pinned and running applications": "Відображати док із закріпленими та запущеними програмами"
+    "Display a dock with pinned and running applications": "Відображати док-панель із закріпленими та запущеними програмами"
   },
   "Display all priorities over fullscreen apps": {
     "Display all priorities over fullscreen apps": "Відображати всі пріоритети поверх повноекранних програм"
@@ -2556,7 +2592,7 @@
     "Door Open": "Дверцята відкриті"
   },
   "Drag Lock": {
-    "Drag Lock": ""
+    "Drag Lock": "Фіксація перетягування"
   },
   "Drag a widget by its handle here to reorder it or drop it into another group": {
     "Drag a widget by its handle here to reorder it or drop it into another group": "Перетягніть віджет за ручку сюди, щоб змінити його порядок або перемістити в іншу групу"
@@ -2631,7 +2667,7 @@
     "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": "Динамічний: пружинний Безьє з перельотом — елемент коротко виходить за ціль, а потім стабілізується. Експресивно та живо"
   },
   "Edge": {
-    "Edge": ""
+    "Edge": "Край"
   },
   "Edge Hover Reveal": {
     "Edge Hover Reveal": "Показ при наведенні на край"
@@ -2649,7 +2685,7 @@
     "Edit": "Редагувати"
   },
   "Edit App": {
-    "Edit App": "Редагувати додаток"
+    "Edit App": "Редагувати програму"
   },
   "Edit Clipboard": {
     "Edit Clipboard": "Редагувати буфер обміну"
@@ -2682,7 +2718,7 @@
     "Empty Trash (%1)": "Очистити кошик (%1)"
   },
   "Emulate middle click by pressing left and right buttons": {
-    "Emulate middle click by pressing left and right buttons": ""
+    "Emulate middle click by pressing left and right buttons": "Емулювати середній клік при натисканні лівої та правої кнопок"
   },
   "Enable 10-bit color depth for wider color gamut and HDR support": {
     "Enable 10-bit color depth for wider color gamut and HDR support": "Увімкнути 10-бітну глибину кольору для ширшого охоплення та підтримки HDR"
@@ -2701,6 +2737,9 @@
   },
   "Enable History": {
     "Enable History": "Увімкнути історію"
+  },
+  "Enable Num Lock": {
+    "Enable Num Lock": ""
   },
   "Enable Overview Overlay": {
     "Enable Overview Overlay": "Увімкнути оверлей огляду"
@@ -2811,7 +2850,7 @@
     "Enter password for ": "Введіть пароль для "
   },
   "Enter text to encode": {
-    "Enter text to encode": ""
+    "Enter text to encode": "Введіть текст для кодування"
   },
   "Enter this passkey on ": {
     "Enter this passkey on ": "Введіть цей ключ доступу на "
@@ -3012,7 +3051,7 @@
     "Failed to fetch network QR code: %1": "Не вдалося отримати QR-код мережі: %1"
   },
   "Failed to generate QR code: %1": {
-    "Failed to generate QR code: %1": ""
+    "Failed to generate QR code: %1": "Не вдалося створити QR-код: %1"
   },
   "Failed to generate systemd override": {
     "Failed to generate systemd override": "Не вдалося створити override для systemd"
@@ -3024,7 +3063,7 @@
     "Failed to import VPN": "Не вдалося імпортувати VPN"
   },
   "Failed to launch SMS app": {
-    "Failed to launch SMS app": "Не вдалося запустити SMS-додаток"
+    "Failed to launch SMS app": "Не вдалося запустити SMS-програму"
   },
   "Failed to load VPN config": {
     "Failed to load VPN config": "Не вдалося завантажити конфігурацію VPN"
@@ -3285,10 +3324,10 @@
     "Flags": "Прапорці"
   },
   "Flat": {
-    "Flat": ""
+    "Flat": "Лінійний"
   },
   "Flat uses constant speed; Adaptive scales with movement speed": {
-    "Flat uses constant speed; Adaptive scales with movement speed": ""
+    "Flat uses constant speed; Adaptive scales with movement speed": "Лінійний використовує постійну швидкість; Адаптивний змінює її залежно від швидкості руху"
   },
   "Flatpak": {
     "Flatpak": "Flatpak"
@@ -3322,6 +3361,12 @@
   },
   "Floating Position": {
     "Floating Position": "Позиція плаваючих вікон"
+  },
+  "Floating Windows": {
+    "Floating Windows": ""
+  },
+  "Floating windows follow Surface Styling settings": {
+    "Floating windows follow Surface Styling settings": ""
   },
   "Fluent": {
     "Fluent": "Плавний"
@@ -3452,6 +3497,9 @@
   "Foreground Layers": {
     "Foreground Layers": "Передні шари"
   },
+  "Foreground Opacity": {
+    "Foreground Opacity": ""
+  },
   "Forever": {
     "Forever": "Назавжди"
   },
@@ -3578,8 +3626,8 @@
   "Generate Override": {
     "Generate Override": "Створити override"
   },
-  "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.": {
-    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.": "Створити базові конфігурації GTK3/4 або QT5/QT6 (потрібен qt6ct-kde), щоб вони слідували кольорам DMS. Потрібно виконати лише один раз.<br /><br />Рекомендується налаштувати <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> перед застосуванням тем GTK"
+  "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
+    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
   },
   "Generic": {
     "Generic": "Загальний"
@@ -3595,6 +3643,9 @@
   },
   "Global fonts can be configured in Settings → Personalization": {
     "Global fonts can be configured in Settings → Personalization": "Глобальні шрифти можна налаштувати в Налаштування → Персоналізація"
+  },
+  "Globally": {
+    "Globally": ""
   },
   "Globally scale all animation durations": {
     "Globally scale all animation durations": "Глобально масштабувати тривалість усіх анімацій"
@@ -3675,7 +3726,7 @@
     "Group Active Workspace": "Групувати активний робочий простір"
   },
   "Group Workspace Apps": {
-    "Group Workspace Apps": "Групувати додатки робочого простору"
+    "Group Workspace Apps": "Групувати програми робочого простору"
   },
   "Group by App": {
     "Group by App": "Групувати за програмою"
@@ -3687,7 +3738,7 @@
     "Group removed": "Групу видалено"
   },
   "Group repeated application icons in unfocused workspaces": {
-    "Group repeated application icons in unfocused workspaces": "Групувати повторювані іконки додатків у неактивних робочих просторах"
+    "Group repeated application icons in unfocused workspaces": "Групувати повторювані іконки програм у неактивних робочих просторах"
   },
   "Groups": {
     "Groups": "Групи"
@@ -3756,10 +3807,10 @@
     "Hidden (%1)": "Приховано (%1)"
   },
   "Hidden Apps": {
-    "Hidden Apps": "Приховані додатки"
+    "Hidden Apps": "Приховані програми"
   },
   "Hidden apps won't appear in the launcher. Right-click an app and select 'Hide App' to hide it.": {
-    "Hidden apps won't appear in the launcher. Right-click an app and select 'Hide App' to hide it.": "Приховані додатки не з'являтимуться в запускачі. Натисніть правою кнопкою миші на додаток і оберіть «Приховати додаток», щоб сховати його"
+    "Hidden apps won't appear in the launcher. Right-click an app and select 'Hide App' to hide it.": "Приховані програми не з'являтимуться в запускачі. Натисніть правою кнопкою миші на програму і оберіть «Приховати програму», щоб сховати її"
   },
   "Hidden until weather is enabled": {
     "Hidden until weather is enabled": "Приховано, доки погода не буде увімкнена"
@@ -3771,7 +3822,7 @@
     "Hide 3rd Party": "Приховати сторонні"
   },
   "Hide App": {
-    "Hide App": "Приховати додаток"
+    "Hide App": "Приховати програму"
   },
   "Hide Delay": {
     "Hide Delay": "Затримка приховування"
@@ -3825,10 +3876,10 @@
     "High-fidelity palette that preserves source hues.": "Високоточна палітра, що зберігає вихідні відтінки"
   },
   "Highlight Active Workspace App": {
-    "Highlight Active Workspace App": "Підсвітити додаток активного робочого простору"
+    "Highlight Active Workspace App": "Підсвітити програму активного робочого простору"
   },
   "Highlight the currently focused app inside workspace indicators": {
-    "Highlight the currently focused app inside workspace indicators": "Підсвітити поточний фокусний додаток в індикаторах робочих просторів"
+    "Highlight the currently focused app inside workspace indicators": "Підсвітити поточну програму в індикаторах робочих просторів"
   },
   "History": {
     "History": "Історія"
@@ -3892,6 +3943,9 @@
   },
   "Hover Popouts": {
     "Hover Popouts": "Спливаючі вікна при наведенні"
+  },
+  "How layout changes are remembered across apps": {
+    "How layout changes are remembered across apps": ""
   },
   "How often the server polls for new updates.": {
     "How often the server polls for new updates.": "Як часто сервер перевіряє наявність нових оновлень"
@@ -3990,7 +4044,7 @@
     "If the field is hidden, it will appear as soon as a key is pressed.": "Якщо поле приховане, воно з'явиться, щойно буде натиснуто клавішу"
   },
   "Ignore App-Requested Timeout": {
-    "Ignore App-Requested Timeout": ""
+    "Ignore App-Requested Timeout": "Ігнорувати таймаут, запитуваний програмою"
   },
   "Ignore Completely": {
     "Ignore Completely": "Повністю ігнорувати"
@@ -4230,7 +4284,7 @@
     "Keep My Edits": "Зберегти мої правки"
   },
   "Keep dragging when finger is briefly lifted": {
-    "Keep dragging when finger is briefly lifted": ""
+    "Keep dragging when finger is briefly lifted": "Продовжувати перетягування, якщо палець короткочасно піднято"
   },
   "Keep in Bar": {
     "Keep in Bar": "Залишити в панелі"
@@ -4250,6 +4304,9 @@
   "Key": {
     "Key": "Клавіша"
   },
+  "Key combination": {
+    "Key combination": ""
+  },
   "Keybind Sources": {
     "Keybind Sources": "Джерела гарячих клавіш"
   },
@@ -4262,11 +4319,32 @@
   "Keybinds shown alongside regular search results": {
     "Keybinds shown alongside regular search results": "Гарячі клавіші відображаються разом зі звичайними результатами пошуку"
   },
+  "Keyboard": {
+    "Keyboard": ""
+  },
+  "Keyboard Behavior": {
+    "Keyboard Behavior": ""
+  },
   "Keyboard Layout Name": {
     "Keyboard Layout Name": "Назва розкладки клавіатури"
   },
+  "Keyboard Layouts": {
+    "Keyboard Layouts": ""
+  },
+  "Keyboard Model": {
+    "Keyboard Model": ""
+  },
   "Keyboard Shortcuts": {
     "Keyboard Shortcuts": "Комбінації клавіш"
+  },
+  "Keyboard Variant": {
+    "Keyboard Variant": ""
+  },
+  "Keyboard shortcut to start security key unlock": {
+    "Keyboard shortcut to start security key unlock": ""
+  },
+  "Keymap File Path": {
+    "Keymap File Path": ""
   },
   "Keys": {
     "Keys": "Клавіші"
@@ -4335,10 +4413,10 @@
     "Launch Prefix": "Префікс запуску"
   },
   "Launch on dGPU": {
-    "Launch on dGPU": "Запустити на дискретному ГП"
+    "Launch on dGPU": "Запустити на окремому ГП"
   },
   "Launcher": {
-    "Launcher": "Засіб запуску"
+    "Launcher": "Запускач"
   },
   "Launcher Button": {
     "Launcher Button": "Кнопка запускача"
@@ -4368,7 +4446,7 @@
     "Left Section": "Ліва секція"
   },
   "Left-Handed Mode": {
-    "Left-Handed Mode": ""
+    "Left-Handed Mode": "Режим для шульги"
   },
   "Light": {
     "Light": "Світлий"
@@ -4511,6 +4589,9 @@
   "MAC": {
     "MAC": "MAC"
   },
+  "MIT License": {
+    "MIT License": ""
+  },
   "MTU": {
     "MTU": "MTU"
   },
@@ -4626,7 +4707,7 @@
     "Material inspired shadows and elevation on modals, popouts, and dialogs": "Тіні та підняття у стилі Material для модальних вікон, спливаючих елементів та діалогів"
   },
   "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": {
-    "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": "Material: Експресивні криві Безьє Material Design 3. Стандартне відчуття DMS"
+    "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": "Material: Експресивні криві Безьє Material Design 3. Типове відчуття DMS"
   },
   "Matugen Contrast": {
     "Matugen Contrast": "Контраст Matugen"
@@ -4650,16 +4731,16 @@
     "Max H": "Макс. В"
   },
   "Max Pinned Apps": {
-    "Max Pinned Apps": "Макс. закріплених додатків"
+    "Max Pinned Apps": "Макс. закріплених програм"
   },
   "Max Pinned Apps (0 = Unlimited)": {
-    "Max Pinned Apps (0 = Unlimited)": "Макс. закріплених додатків (0 = безлімітно)"
+    "Max Pinned Apps (0 = Unlimited)": "Макс. закріплених програм (0 = безлімітно)"
   },
   "Max Running Apps": {
-    "Max Running Apps": "Макс. запущених додатків"
+    "Max Running Apps": "Макс. запущених програм"
   },
   "Max Running Apps (0 = Unlimited)": {
-    "Max Running Apps (0 = Unlimited)": "Макс. запущених додатків (0 = безлімітно)"
+    "Max Running Apps (0 = Unlimited)": "Макс. запущених програм (0 = безлімітно)"
   },
   "Max Visible": {
     "Max Visible": "Макс. видимих"
@@ -4782,7 +4863,7 @@
     "Microphone volume control": "Керування гучністю мікрофона"
   },
   "Middle Click Emulation": {
-    "Middle Click Emulation": ""
+    "Middle Click Emulation": "Емуляція середнього кліку"
   },
   "Middle Section": {
     "Middle Section": "Середня секція"
@@ -4860,10 +4941,10 @@
     "Mount Points": "Точки монтування"
   },
   "Mouse & Touchpad": {
-    "Mouse & Touchpad": ""
+    "Mouse & Touchpad": "Миша та тачпад"
   },
   "Mouse Settings": {
-    "Mouse Settings": ""
+    "Mouse Settings": "Налаштування миші"
   },
   "Mouse clicks pass through the bar to windows behind it": {
     "Mouse clicks pass through the bar to windows behind it": "Кліки миші проходять крізь панель до вікон за нею"
@@ -4908,7 +4989,7 @@
     "Muted": "Без звуку"
   },
   "Muted Apps": {
-    "Muted Apps": "Додатки без звуку"
+    "Muted Apps": "Програми без звуку"
   },
   "Muted palette with subdued, calming tones.": {
     "Muted palette with subdued, calming tones.": "Стримана палітра з приглушеними, заспокійливими тонами"
@@ -4929,7 +5010,7 @@
     "Native: platform renderer (FreeType).": "Звичайний: системний рендерер (FreeType)"
   },
   "Natural Scrolling": {
-    "Natural Scrolling": ""
+    "Natural Scrolling": "Природне прокручування"
   },
   "Natural Touchpad Scrolling": {
     "Natural Touchpad Scrolling": "Звичайна прокрутка тачпада"
@@ -5079,7 +5160,7 @@
     "No Rounding": "Без заокруглення"
   },
   "No Scroll": {
-    "No Scroll": ""
+    "No Scroll": "Без прокручування"
   },
   "No Shadow": {
     "No Shadow": "Без тіні"
@@ -5112,19 +5193,19 @@
     "No adapters": "Немає адаптерів"
   },
   "No app customizations.": {
-    "No app customizations.": "Налаштувань додатків немає"
+    "No app customizations.": "Налаштувань програм немає"
   },
   "No application selected": {
-    "No application selected": "Додаток не обрано"
+    "No application selected": "Програму не обрано"
   },
   "No apps found": {
-    "No apps found": "Додатків не знайдено"
+    "No apps found": "Програм не знайдено"
   },
   "No apps have been launched yet.": {
-    "No apps have been launched yet.": "Жодного додатка ще не було запущено"
+    "No apps have been launched yet.": "Жодної програми ще не було запущено"
   },
   "No apps muted. Right-click a notification and choose \"Mute popups\" to add one here.": {
-    "No apps muted. Right-click a notification and choose \"Mute popups\" to add one here.": "Немає додатків без звуку. Натисніть правою кнопкою на сповіщення та оберіть «Вимкнути спливаючі вікна», щоб додати їх сюди"
+    "No apps muted. Right-click a notification and choose \"Mute popups\" to add one here.": "Немає програм без звуку. Натисніть правою кнопкою на сповіщення та оберіть «Вимкнути спливаючі вікна», щоб додати їх сюди"
   },
   "No autostart entries": {
     "No autostart entries": "Записів автозапуску немає"
@@ -5187,7 +5268,7 @@
     "No folders found": "Папок не знайдено"
   },
   "No hidden apps.": {
-    "No hidden apps.": "Прихованих додатків немає"
+    "No hidden apps.": "Прихованих програм немає"
   },
   "No human user accounts found.": {
     "No human user accounts found.": "Облікових записів реальних користувачів не знайдено"
@@ -5478,7 +5559,7 @@
     "On": "УВІМ."
   },
   "On Button Down": {
-    "On Button Down": ""
+    "On Button Down": "При натисканні кнопки"
   },
   "On indefinitely": {
     "On indefinitely": "Увімкнено безстроково"
@@ -5499,7 +5580,7 @@
     "Only adjust gamma based on time or location rules.": "Коригувати гаму лише на основі правил часу або розташування"
   },
   "Only continue if you recognize this server certificate fingerprint.": {
-    "Only continue if you recognize this server certificate fingerprint.": ""
+    "Only continue if you recognize this server certificate fingerprint.": "Продовжуйте лише в тому випадку, якщо ви впізнаєте відбиток цього сертифіката сервера."
   },
   "Only on Battery": {
     "Only on Battery": "Тільки від батареї"
@@ -5513,6 +5594,15 @@
   "Opacity": {
     "Opacity": "Непрозорість"
   },
+  "Opacity of cards and nested surfaces inside floating windows": {
+    "Opacity of cards and nested surfaces inside floating windows": ""
+  },
+  "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts": {
+    "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts": ""
+  },
+  "Opacity of foreground cards and nested surfaces on shell panels": {
+    "Opacity of foreground cards and nested surfaces on shell panels": ""
+  },
   "Opaque": {
     "Opaque": "Непрозорий"
   },
@@ -5520,7 +5610,10 @@
     "Open": "Відкрити"
   },
   "Open App": {
-    "Open App": "Відкрити додаток"
+    "Open App": "Відкрити програму"
+  },
+  "Open DMS windows floating instead of tiled": {
+    "Open DMS windows floating instead of tiled": ""
   },
   "Open Delay": {
     "Open Delay": "Затримка відкриття"
@@ -5543,11 +5636,14 @@
   "Open Trash With": {
     "Open Trash With": "Відкрити кошик за допомогою"
   },
+  "Open Windows Floating": {
+    "Open Windows Floating": ""
+  },
   "Open a new note": {
     "Open a new note": "Створити нову нотатку"
   },
   "Open a terminal and run a custom command instead of the in-shell upgrade flow.": {
-    "Open a terminal and run a custom command instead of the in-shell upgrade flow.": "Відкрити термінал і виконати власну команду замість стандартного процесу оновлення в оболонці"
+    "Open a terminal and run a custom command instead of the in-shell upgrade flow.": "Відкрити термінал і виконати власну команду замість типового процесу оновлення в оболонці"
   },
   "Open as window": {
     "Open as window": "Відкрити як вікно"
@@ -5577,7 +5673,7 @@
     "Open with...": "Відкрити за допомогою..."
   },
   "Opening SMS app": {
-    "Opening SMS app": "Відкриття SMS-додатка"
+    "Opening SMS app": "Відкриття SMS-програми"
   },
   "Opening file browser": {
     "Opening file browser": "Відкриття файлового браузера"
@@ -5663,6 +5759,9 @@
   "Override Corner Radius": {
     "Override Corner Radius": "Перевизначити радіус кутів"
   },
+  "Override floating window transparency for Notepad": {
+    "Override floating window transparency for Notepad": ""
+  },
   "Override global layout settings for this output": {
     "Override global layout settings for this output": "Перевизначити глобальні налаштування макета для цього виходу"
   },
@@ -5739,7 +5838,7 @@
     "Pairing...": "Сполучення..."
   },
   "Partial": {
-    "Partial": ""
+    "Partial": "Частково"
   },
   "Partly Cloudy": {
     "Partly Cloudy": "Частково хмарно"
@@ -5794,6 +5893,9 @@
   },
   "Pending Discharge": {
     "Pending Discharge": "Очікування розрядки"
+  },
+  "Per Window": {
+    "Per Window": ""
   },
   "Per-Mode Wallpapers": {
     "Per-Mode Wallpapers": "Шпалери для кожного режиму"
@@ -5850,7 +5952,7 @@
     "Pinned": "Закріплено"
   },
   "Pinned and running apps with drag-and-drop": {
-    "Pinned and running apps with drag-and-drop": "Закріплені та запущені додатки з перетягуванням"
+    "Pinned and running apps with drag-and-drop": "Закріплені та запущені програми з перетягуванням"
   },
   "Pixelate": {
     "Pixelate": "Пікселізація"
@@ -5946,7 +6048,7 @@
     "Pointer": "Вказівник"
   },
   "Pointer Speed": {
-    "Pointer Speed": ""
+    "Pointer Speed": "Швидкість вказівника"
   },
   "Polkit integration is disabled. User management requires Polkit to elevate privileges.": {
     "Polkit integration is disabled. User management requires Polkit to elevate privileges.": "Інтеграція з Polkit вимкнена. Управління користувачами потребує Polkit для підвищення привілеїв"
@@ -5988,7 +6090,7 @@
     "Position": "Позиція"
   },
   "Position, pinned apps": {
-    "Position, pinned apps": "Позиція закріплених додатків"
+    "Position, pinned apps": "Позиція закріплених програм"
   },
   "Possible Override Conflicts": {
     "Possible Override Conflicts": "Можливі конфлікти перевизначення"
@@ -6056,6 +6158,9 @@
   "Press Ctrl+N or click 'New Session' to create one": {
     "Press Ctrl+N or click 'New Session' to create one": "Натисніть Ctrl+N або «Нова сесія», щоб створити її"
   },
+  "Press Ctrl+key to set. Esc cancels.": {
+    "Press Ctrl+key to set. Esc cancels.": ""
+  },
   "Press Enter and the audio system will restart to apply the change": {
     "Press Enter and the audio system will restart to apply the change": "Натисніть Enter, і аудіосистема перезапуститься для застосування змін"
   },
@@ -6069,13 +6174,13 @@
     "Pressure": "Тиск"
   },
   "Prevent accidental cursor jumps while typing": {
-    "Prevent accidental cursor jumps while typing": ""
+    "Prevent accidental cursor jumps while typing": "Запобігати випадковим стрибкам курсору під час друкування"
   },
   "Prevent screen timeout": {
     "Prevent screen timeout": "Запобігти вимкненню екрана"
   },
   "Prevent specific applications from displaying in the media controllers (e.g., browser audio streams, background tools). Matches player identity or desktop file name case-insensitively.": {
-    "Prevent specific applications from displaying in the media controllers (e.g., browser audio streams, background tools). Matches player identity or desktop file name case-insensitively.": "Заборонити певним додаткам відображатися в медіаконтролерах (наприклад, аудіопотоки браузера, фонові інструменти). Пошук за ідентифікатором плеєра або назвою .desktop файлу без урахування регістру"
+    "Prevent specific applications from displaying in the media controllers (e.g., browser audio streams, background tools). Matches player identity or desktop file name case-insensitively.": "Заборонити певним програмам відображатися в медіаконтролерах (наприклад, аудіопотоки браузера, фонові інструменти). Пошук за ідентифікатором плеєра або назвою .desktop файлу без урахування регістру"
   },
   "Preview": {
     "Preview": "Попередній перегляд"
@@ -6189,7 +6294,7 @@
     "Protocol": "Протокол"
   },
   "QR Generator": {
-    "QR Generator": ""
+    "QR Generator": "Генератор QR-кодів"
   },
   "Qt": {
     "Qt": "Qt"
@@ -6242,6 +6347,9 @@
   "Random": {
     "Random": "Випадковий"
   },
+  "Random Order": {
+    "Random Order": ""
+  },
   "Rate": {
     "Rate": "Швидкість"
   },
@@ -6293,6 +6401,9 @@
   "Regex": {
     "Regex": "Регулярний вираз"
   },
+  "Registries": {
+    "Registries": ""
+  },
   "Regular": {
     "Regular": "Звичайний"
   },
@@ -6328,6 +6439,9 @@
   },
   "Remember Last Query": {
     "Remember Last Query": "Запам'ятати останній запит"
+  },
+  "Remember Layout": {
+    "Remember Layout": ""
   },
   "Remember Type Filter": {
     "Remember Type Filter": "Запам'ятати фільтр типу"
@@ -6401,6 +6515,12 @@
   "Repeat": {
     "Repeat": "Повторити"
   },
+  "Repeat Delay": {
+    "Repeat Delay": ""
+  },
+  "Repeat Rate": {
+    "Repeat Rate": ""
+  },
   "Replacement": {
     "Replacement": "Заміна"
   },
@@ -6444,7 +6564,7 @@
     "Requires remembering the last user and session. Enable those options first.": "Потребує запам'ятовування останнього користувача та сесії. Спочатку увімкніть ці опції"
   },
   "Requires the DMS Theme extension from the editor marketplace": {
-    "Requires the DMS Theme extension from the editor marketplace": ""
+    "Requires the DMS Theme extension from the editor marketplace": "Потребує розширення DMS Theme з маркетплейсу редактора"
   },
   "Reset": {
     "Reset": "Скинути"
@@ -6456,10 +6576,10 @@
     "Reset Size": "Скинути розмір"
   },
   "Reset to default": {
-    "Reset to default": "Скинути до стандартних"
+    "Reset to default": "Скинути до типових"
   },
   "Reset to default name": {
-    "Reset to default name": "Скинути до стандартної назви"
+    "Reset to default name": "Скинути до типової назви"
   },
   "Resize Widget": {
     "Resize Widget": "Змінити розмір віджета"
@@ -6482,6 +6602,9 @@
   "Restart the DankMaterialShell": {
     "Restart the DankMaterialShell": "Перезапустити DankMaterialShell"
   },
+  "Restart userspace without rebooting the kernel, requires systemd": {
+    "Restart userspace without rebooting the kernel, requires systemd": ""
+  },
   "Restarting audio system...": {
     "Restarting audio system...": "Перезапуск аудіосистеми..."
   },
@@ -6501,10 +6624,10 @@
     "Reverse Scrolling Direction": "Інвертувати напрямок прокрутки"
   },
   "Reverse mouse wheel scrolling direction": {
-    "Reverse mouse wheel scrolling direction": ""
+    "Reverse mouse wheel scrolling direction": "Змінити напрямок прокручування колесом миші на протилежний"
   },
   "Reverse two-finger scrolling direction": {
-    "Reverse two-finger scrolling direction": ""
+    "Reverse two-finger scrolling direction": "Змінити напрямок прокручування двома пальцями на протилежний"
   },
   "Reverse workspace switch direction when scrolling over the bar": {
     "Reverse workspace switch direction when scrolling over the bar": "Інвертувати напрямок перемикання робочих просторів при прокрутці над панеллю"
@@ -6714,7 +6837,7 @@
     "Scroll GitHub": "GitHub Scroll"
   },
   "Scroll Method": {
-    "Scroll Method": ""
+    "Scroll Method": "Метод прокручування"
   },
   "Scroll Wheel": {
     "Scroll Wheel": "Колесо прокрутки"
@@ -6732,19 +6855,19 @@
     "Scrolling": "Прокручування"
   },
   "Scrolling Speed": {
-    "Scrolling Speed": ""
+    "Scrolling Speed": "Швидкість прокручування"
   },
   "Search App Actions": {
-    "Search App Actions": "Пошук дій додатків"
+    "Search App Actions": "Пошук дій програм"
   },
   "Search Options": {
     "Search Options": "Опції пошуку"
   },
   "Search applications...": {
-    "Search applications...": "Пошук додатків..."
+    "Search applications...": "Пошук програм..."
   },
   "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": {
-    "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": "Пошук за комбінацією клавіш, описом або назвою дії\n\nСтандартна дія копіює гарячу клавішу в буфер обміну.\nНатисніть правою кнопкою миші або стрілку вправо, щоб закріпити часто використовувані клавіші — вони з'являться зверху під час відсутності пошуку"
+    "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": "Пошук за комбінацією клавіш, описом або назвою дії\n\nТипова дія копіює гарячу клавішу в буфер обміну.\nНатисніть правою кнопкою миші або стрілку вправо, щоб закріпити часто використовувані клавіші — вони з'являться зверху під час відсутності пошуку"
   },
   "Search devices...": {
     "Search devices...": "Пошук пристроїв..."
@@ -6756,7 +6879,7 @@
     "Search keybinds...": "Пошук комбінацій клавіш..."
   },
   "Search keyboard shortcuts from your compositor and applications": {
-    "Search keyboard shortcuts from your compositor and applications": "Пошук гарячих клавіш вашого композитора та додатків"
+    "Search keyboard shortcuts from your compositor and applications": "Пошук гарячих клавіш вашого композитора та програм"
   },
   "Search plugins...": {
     "Search plugins...": "Пошук плагінів..."
@@ -6797,8 +6920,17 @@
   "Security Key PAM Source": {
     "Security Key PAM Source": "Джерело PAM для ключа безпеки"
   },
+  "Security key": {
+    "Security key": ""
+  },
+  "Security key (%1)": {
+    "Security key (%1)": ""
+  },
   "Security key mode": {
     "Security key mode": "Режим ключа безпеки"
+  },
+  "Security key shortcut": {
+    "Security key shortcut": ""
   },
   "Security-key availability could not be confirmed": {
     "Security-key availability could not be confirmed": "Не вдалося підтвердити доступність ключа безпеки"
@@ -6843,7 +6975,10 @@
     "Select a color from the palette or use custom sliders": "Виберіть колір з палітри або скористайтеся власними повзунками"
   },
   "Select a desktop application": {
-    "Select a desktop application": "Оберіть додаток робочого столу"
+    "Select a desktop application": "Оберіть програму робочого столу"
+  },
+  "Select a random wallpaper instead of cycling in alphabetical order": {
+    "Select a random wallpaper instead of cycling in alphabetical order": ""
   },
   "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": {
     "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": "Оберіть віджет для додавання на робочий стіл. Кожен віджет є окремим екземпляром зі своїми налаштуваннями"
@@ -7065,7 +7200,7 @@
     "Show": "Показати"
   },
   "Show \"config reloaded\" Toast": {
-    "Show \"config reloaded\" Toast": ""
+    "Show \"config reloaded\" Toast": "Показувати сповіщення «конфігурацію оновлено»"
   },
   "Show 3rd Party": {
     "Show 3rd Party": "Показати сторонні"
@@ -7074,7 +7209,7 @@
     "Show All Tags": "Показувати всі теги"
   },
   "Show All, Apps, Files, and Plugins chips beside the Spotlight Bar input.": {
-    "Show All, Apps, Files, and Plugins chips beside the Spotlight Bar input.": "Показувати мітки «Усі», «Програми», «Файли» та «Плагіни» поруч із полем введення Spotlight Bar"
+    "Show All, Apps, Files, and Plugins chips beside the Spotlight Bar input.": "Показувати мітки «Усі», «Програми», «Файли» та «Плагіни» поруч із полем введення панелі Spotlight"
   },
   "Show Badge": {
     "Show Badge": "Показати бейдж"
@@ -7214,6 +7349,9 @@
   "Show Seconds": {
     "Show Seconds": "Показувати секунди"
   },
+  "Show Soft Reboot": {
+    "Show Soft Reboot": ""
+  },
   "Show Sunrise/Sunset": {
     "Show Sunrise/Sunset": "Показати схід/захід сонця"
   },
@@ -7263,7 +7401,7 @@
     "Show a notification when battery reaches the charge limit.": "Показувати сповіщення, коли батарея досягає ліміту заряду"
   },
   "Show a toast when the compositor config is reloaded": {
-    "Show a toast when the compositor config is reloaded": ""
+    "Show a toast when the compositor config is reloaded": "Показувати спливаюче повідомлення при перезавантаженні конфігурації композитора"
   },
   "Show a warning popup when battery is running low.": {
     "Show a warning popup when battery is running low.": "Показувати попередження, коли заряд батареї стає низьким"
@@ -7295,6 +7433,9 @@
   "Show during Niri overview": {
     "Show during Niri overview": "Показувати в режимі огляду Niri"
   },
+  "Show foreground surfaces on cards inside floating windows": {
+    "Show foreground surfaces on cards inside floating windows": ""
+  },
   "Show foreground surfaces on notification cards": {
     "Show foreground surfaces on notification cards": "Показувати передні поверхні на картках сповіщень"
   },
@@ -7306,6 +7447,9 @@
   },
   "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": {
     "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": "Показувати оверлей запуску при введенні тексту в огляді Niri. Вимкніть, щоб використовувати інший запуск"
+  },
+  "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.": {
+    "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.": ""
   },
   "Show mode tabs and keyboard hints at the bottom.": {
     "Show mode tabs and keyboard hints at the bottom.": "Показувати вкладки режимів та підказки клавіатури внизу"
@@ -7418,6 +7562,9 @@
   "Snow": {
     "Snow": "Сніг"
   },
+  "Soft Reboot": {
+    "Soft Reboot": ""
+  },
   "Some plugins require a newer version of DMS:": {
     "Some plugins require a newer version of DMS:": "Деяким плагінам потрібна новіша версія DMS:"
   },
@@ -7438,6 +7585,9 @@
   },
   "Source: %1": {
     "Source: %1": "Джерело: %1"
+  },
+  "Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.": {
+    "Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.": ""
   },
   "Space between the bar and screen edges": {
     "Space between the bar and screen edges": "Відступ між панеллю та краями екрана"
@@ -7482,10 +7632,10 @@
     "Stacked": "Один над одним"
   },
   "Standard": {
-    "Standard": "Стандартний"
+    "Standard": "Стандарт"
   },
   "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": {
-    "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": "Стандартний: Класичний Material Design 3 — панелі піднімаються знизу з легким масштабуванням. Значення за замовчуванням у DMS"
+    "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": "Стандарт: Класичний Material Design 3 — панелі піднімаються знизу з легким масштабуванням. Типово у DMS"
   },
   "Start": {
     "Start": "Запустити"
@@ -7553,6 +7703,9 @@
   "Sunset": {
     "Sunset": "Захід сонця"
   },
+  "Super + Space": {
+    "Super + Space": ""
+  },
   "Suppress Duplicate Notifications": {
     "Suppress Duplicate Notifications": "Придушувати дубльовані сповіщення"
   },
@@ -7586,6 +7739,9 @@
   "Surface Opacity": {
     "Surface Opacity": "Прозорість поверхні"
   },
+  "Surface Styling": {
+    "Surface Styling": ""
+  },
   "Surface Text": {
     "Surface Text": "Текст на поверхні"
   },
@@ -7608,10 +7764,13 @@
     "Suspend then Hibernate": "Сон, потім гібернація"
   },
   "Swap primary and secondary mouse buttons": {
-    "Swap primary and secondary mouse buttons": ""
+    "Swap primary and secondary mouse buttons": "Поміняти місцями основну та додаткову кнопки миші"
   },
   "Sway Website": {
     "Sway Website": "Сайт Sway"
+  },
+  "Switch Layout Shortcut": {
+    "Switch Layout Shortcut": ""
   },
   "Switch between display configurations": {
     "Switch between display configurations": "Перемикатися між конфігураціями дисплеїв"
@@ -7658,11 +7817,14 @@
   "Sync to apply": {
     "Sync to apply": "Синхронізуйте для застосування"
   },
+  "Sync with Global Settings": {
+    "Sync with Global Settings": ""
+  },
   "Syncing...": {
     "Syncing...": "Синхронізація..."
   },
   "System App Theming": {
-    "System App Theming": "Тематизація системних програм"
+    "System App Theming": "Темізація системних програм"
   },
   "System Check": {
     "System Check": "Перевірка системи"
@@ -7734,22 +7896,22 @@
     "Tailscale not available": "Tailscale недоступний"
   },
   "Tap and Drag": {
-    "Tap and Drag": ""
+    "Tap and Drag": "Натиснути та перетягнути"
   },
   "Tap and drag on the touchpad to move items": {
-    "Tap and drag on the touchpad to move items": ""
+    "Tap and drag on the touchpad to move items": "Натисніть і перетягніть на тачпаді, щоб перемістити об'єкти"
   },
   "Tap the touchpad surface to trigger left click clicks": {
-    "Tap the touchpad surface to trigger left click clicks": ""
+    "Tap the touchpad surface to trigger left click clicks": "Торкніться поверхні тачпада, щоб виконати лівий клік"
   },
   "Tap to Click": {
-    "Tap to Click": ""
+    "Tap to Click": "Натискання для кліку"
   },
   "Terminal": {
     "Terminal": "Термінал"
   },
   "Terminal additional parameters": {
-    "Terminal additional parameters": "Додаткові параметри термінала"
+    "Terminal additional parameters": "Додаткові параметри терміналу"
   },
   "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": {
     "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": "Резервний запуск термінала не вдався. Встановіть підтримуваний емулятор термінала або запустіть 'dms auth sync' вручну"
@@ -7821,7 +7983,7 @@
     "The rule applies to any window matching one of these.": "Правило застосовується до будь-якого вікна, що відповідає одному з цих критеріїв"
   },
   "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": {
-    "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": ""
+    "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": "Сертифікат сервера змінився з моменту останнього підтвердження довіри. Продовжуйте лише в тому випадку, якщо ви впізнаєте новий відбиток."
   },
   "Theme & Colors": {
     "Theme & Colors": "Тема та кольори"
@@ -8022,7 +8184,7 @@
     "Top": "Вгорі"
   },
   "Top (Default)": {
-    "Top (Default)": "Зверху (типово)"
+    "Top (Default)": "Згори (типово)"
   },
   "Top Bar Format": {
     "Top Bar Format": "Формат верхньої панелі"
@@ -8052,10 +8214,10 @@
     "Touch your security key...": "Доторкніться до вашого ключа безпеки..."
   },
   "Touchpad Settings": {
-    "Touchpad Settings": ""
+    "Touchpad Settings": "Налаштування тачпада"
   },
   "Touchpad Speed": {
-    "Touchpad Speed": ""
+    "Touchpad Speed": "Швидкість тачпада"
   },
   "Transform": {
     "Transform": "Трансформація"
@@ -8118,7 +8280,7 @@
     "Turn off now": "Вимкнути зараз"
   },
   "Two Finger": {
-    "Two Finger": ""
+    "Two Finger": "Двома пальцями"
   },
   "Type at least 2 characters": {
     "Type at least 2 characters": "Введіть принаймні 2 символи"
@@ -8184,7 +8346,7 @@
     "Unknown": "Невідомо"
   },
   "Unknown App": {
-    "Unknown App": "Невідомий додаток"
+    "Unknown App": "Невідома програма"
   },
   "Unknown Artist": {
     "Unknown Artist": "Невідомий виконавець"
@@ -8262,7 +8424,7 @@
     "Untrust": "Припинити довіряти"
   },
   "Untrusted VPN certificate": {
-    "Untrusted VPN certificate": ""
+    "Untrusted VPN certificate": "Неперевірений сертифікат VPN"
   },
   "Up to date": {
     "Up to date": "Оновлено"
@@ -8457,7 +8619,7 @@
     "Uses sunrise/sunset times to automatically adjust night mode based on your location.": "Використовує час сходу/заходу сонця для автоматичного налаштування нічного режиму на основі вашої локації"
   },
   "Uses the spotlight-bar IPC action and always opens the minimal bar.": {
-    "Uses the spotlight-bar IPC action and always opens the minimal bar.": "Використовує дію IPC spotlight-bar і завжди відкриває мінімальну панель"
+    "Uses the spotlight-bar IPC action and always opens the minimal bar.": "Використовує дію IPC панелі Spotlight і завжди відкриває мінімальну панель"
   },
   "Using DankCalendar%1": {
     "Using DankCalendar%1": "Використання DankCalendar%1"
@@ -8765,6 +8927,9 @@
   "Window Height": {
     "Window Height": "Висота вікна"
   },
+  "Window Opacity": {
+    "Window Opacity": ""
+  },
   "Window Opening": {
     "Window Opening": "Відкриття вікна"
   },
@@ -8796,7 +8961,7 @@
     "Workspaces": "Робочі простори"
   },
   "Wrap the app command. %command% is replaced with the actual executable": {
-    "Wrap the app command. %command% is replaced with the actual executable": "Обгортка команди програми. %command% замінюється на фактичний виконуваний файл"
+    "Wrap the app command. %command% is replaced with the actual executable": "Обгортка команди запуску програми. %command% замінюється на фактичний виконуваний файл"
   },
   "Write:": {
     "Write:": "Записати:"
@@ -8808,19 +8973,22 @@
     "X Axis": "Вісь X"
   },
   "X-Ray": {
-    "X-Ray": "Рентген (X-Ray)"
+    "X-Ray": "Рентген"
+  },
+  "XKB Options": {
+    "XKB Options": ""
   },
   "XWayland": {
     "XWayland": "XWayland"
   },
   "Xray Blur Effect": {
-    "Xray Blur Effect": "Ефект розмиття Xray"
+    "Xray Blur Effect": "Ефект розмиття Рентген"
   },
   "Xray blurs only the wallpaper (efficient) and is the default when Blur is on. Set Xray to Off for regular full blur of everything beneath the window (more expensive).": {
-    "Xray blurs only the wallpaper (efficient) and is the default when Blur is on. Set Xray to Off for regular full blur of everything beneath the window (more expensive).": "Xray розмиває лише шпалери (ефективно) і є значенням за замовчуванням при увімкненому Blur. Встановіть Xray на Off для повного розмиття всього під вікном (більш ресурсозатратно)"
+    "Xray blurs only the wallpaper (efficient) and is the default when Blur is on. Set Xray to Off for regular full blur of everything beneath the window (more expensive).": "Рентген розмиває лише шпалери (ефективно) і є значенням за замовчуванням при увімкненому режимі Розмивання. Встановіть Рентген на Вимкнено для повного розмиття всього під вікном (більш ресурсозатратно)"
   },
   "Xray options are in Compositor → Layout": {
-    "Xray options are in Compositor → Layout": "Опції Xray знаходяться в Композитор → Макет"
+    "Xray options are in Compositor → Layout": "Опції Рентген знаходяться в Композитор → Макет"
   },
   "Y": {
     "Y": "Y"
@@ -8868,7 +9036,7 @@
     "attached": "приєднано"
   },
   "below AA": {
-    "below AA": ""
+    "below AA": "нижче рівня AA"
   },
   "brandon": {
     "brandon": "брандон"
@@ -8914,9 +9082,6 @@
   },
   "display rotation option": {
     "Normal": "Нормальний"
-  },
-  "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": {
-    "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": "DMS — це сучасна оболонка робочого столу з широкими можливостями для налаштування, дизайн якої <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">натхненний Material 3</a>.<br /><br/>Вона побудована за допомогою <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, фреймворку QT6 для створення оболонок робочого столу, та <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, статично типізованою компільованою мовою програмування"
   },
   "e.g. /usr/bin/my-script --flag": {
     "e.g. /usr/bin/my-script --flag": "напр. /usr/bin/my-script --flag"
@@ -9069,7 +9234,7 @@
     "the Qt 6 Multimedia QML module": "модуль Qt 6 Multimedia QML"
   },
   "this app": {
-    "this app": "цей додаток"
+    "this app": "ця програма"
   },
   "unmaintained": {
     "unmaintained": "непідтримуваний"

@@ -305,9 +305,6 @@
   "90°": {
     "90°": "90°"
   },
-  "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>": {
-    "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>": "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>"
-  },
   "A modern desktop shell for Wayland compositors": {
     "A modern desktop shell for Wayland compositors": "Современная оболочка рабочего стола для композиторов Wayland"
   },
@@ -521,6 +518,9 @@
   "Advanced": {
     "Advanced": "Дополнительно"
   },
+  "Advanced comma-separated libxkbcommon options.": {
+    "Advanced comma-separated libxkbcommon options.": ""
+  },
   "Afternoon": {
     "Afternoon": "День"
   },
@@ -562,6 +562,9 @@
   },
   "Also group repeated application icons on the active workspace": {
     "Also group repeated application icons on the active workspace": "Также группировать повторяющиеся значки приложений на активном рабочем пространстве"
+  },
+  "Alt + Shift": {
+    "Alt + Shift": ""
   },
   "Alternative (OR)": {
     "Alternative (OR)": "Альтернативный (ИЛИ)"
@@ -664,6 +667,9 @@
   },
   "Appearance": {
     "Appearance": "Внешний вид"
+  },
+  "Apple Music animated covers": {
+    "Apple Music animated covers": ""
   },
   "Application": {
     "Application": "Приложение"
@@ -946,6 +952,9 @@
   },
   "Automatically save changes to opened files as you type": {
     "Automatically save changes to opened files as you type": "Автоматически сохранять изменения в открытых файлах по мере ввода"
+  },
+  "Automatically turn on Num Lock at startup": {
+    "Automatically turn on Num Lock at startup": ""
   },
   "Automatically turn on Power Saver profile when battery is low.": {
     "Automatically turn on Power Saver profile when battery is low.": "Автоматически включать режим энергосбережения при низком заряде батареи."
@@ -1358,6 +1367,9 @@
   "Channel": {
     "Channel": "Канал"
   },
+  "Characters per second while holding down key": {
+    "Characters per second while holding down key": ""
+  },
   "Charge Level": {
     "Charge Level": "Уровень заряда"
   },
@@ -1411,6 +1423,9 @@
   },
   "Choose a power profile": {
     "Choose a power profile": "Выберите профиль питания"
+  },
+  "Choose a shortcut key to cycle between keyboard layouts": {
+    "Choose a shortcut key to cycle between keyboard layouts": ""
   },
   "Choose colors from palette": {
     "Choose colors from palette": "Выбрать цвета из палитры"
@@ -1648,6 +1663,9 @@
   },
   "Column Width": {
     "Column Width": "Ширина столбца"
+  },
+  "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": {
+    "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": ""
   },
   "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": {
     "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": "Разделенный запятыми список имен сессий для скрытия. Заключите в косые черты для регулярных выражений (например, /^_.*/)."
@@ -1958,6 +1976,12 @@
   "Critical Threshold": {
     "Critical Threshold": "Критический порог"
   },
+  "Ctrl + Shift": {
+    "Ctrl + Shift": ""
+  },
+  "Ctrl+%1 is used for password editing": {
+    "Ctrl+%1 is used for password editing": ""
+  },
   "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": {
     "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": "Ctrl+A: Выбрать все • Ctrl+P: Предпросмотр • Enter/Shift+Enter: Найти след./пред. • Esc: Закрыть"
   },
@@ -2026,6 +2050,9 @@
   },
   "Custom": {
     "Custom": "Свой"
+  },
+  "Custom / None": {
+    "Custom / None": ""
   },
   "Custom Blend": {
     "Custom Blend": "Пользовательское смешивание"
@@ -2119,6 +2146,9 @@
   },
   "DMS Shortcuts": {
     "DMS Shortcuts": "Комбинации клавиш DMS"
+  },
+  "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.": {
+    "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.": ""
   },
   "DMS out of date": {
     "DMS out of date": "DMS устарел"
@@ -2264,6 +2294,9 @@
   "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": {
     "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": "Del: Очистить • Shift+Del: Очистить Всё • 1-9: Действия • F10: Справка • Esc: Закрыть"
   },
+  "Delay before characters start repeating": {
+    "Delay before characters start repeating": ""
+  },
   "Delete": {
     "Delete": "Удалить"
   },
@@ -2365,6 +2398,9 @@
   },
   "Digital": {
     "Digital": "Цифровой"
+  },
+  "Direct path to a .xkb keymap file. Overrides layouts/variants above.": {
+    "Direct path to a .xkb keymap file. Overrides layouts/variants above.": ""
   },
   "Direction Source": {
     "Direction Source": "Источник направления"
@@ -2701,6 +2737,9 @@
   },
   "Enable History": {
     "Enable History": "Включить историю"
+  },
+  "Enable Num Lock": {
+    "Enable Num Lock": ""
   },
   "Enable Overview Overlay": {
     "Enable Overview Overlay": "Включить наложение обзора"
@@ -3323,6 +3362,12 @@
   "Floating Position": {
     "Floating Position": "Положение плавающего окна"
   },
+  "Floating Windows": {
+    "Floating Windows": ""
+  },
+  "Floating windows follow Surface Styling settings": {
+    "Floating windows follow Surface Styling settings": ""
+  },
   "Fluent": {
     "Fluent": "Fluent"
   },
@@ -3452,6 +3497,9 @@
   "Foreground Layers": {
     "Foreground Layers": "Слои переднего плана"
   },
+  "Foreground Opacity": {
+    "Foreground Opacity": ""
+  },
   "Forever": {
     "Forever": "Навсегда"
   },
@@ -3578,8 +3626,8 @@
   "Generate Override": {
     "Generate Override": "Создать переопределение"
   },
-  "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.": {
-    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.": "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes."
+  "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
+    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
   },
   "Generic": {
     "Generic": "Общий"
@@ -3595,6 +3643,9 @@
   },
   "Global fonts can be configured in Settings → Personalization": {
     "Global fonts can be configured in Settings → Personalization": "Глобальные шрифты можно настроить в Настройки → Персонализация"
+  },
+  "Globally": {
+    "Globally": ""
   },
   "Globally scale all animation durations": {
     "Globally scale all animation durations": "Глобально масштабировать все длительности анимаций"
@@ -3892,6 +3943,9 @@
   },
   "Hover Popouts": {
     "Hover Popouts": "Всплывающие окна при наведении"
+  },
+  "How layout changes are remembered across apps": {
+    "How layout changes are remembered across apps": ""
   },
   "How often the server polls for new updates.": {
     "How often the server polls for new updates.": "Как часто сервер проверяет наличие новых обновлений."
@@ -4250,6 +4304,9 @@
   "Key": {
     "Key": "Ключ"
   },
+  "Key combination": {
+    "Key combination": ""
+  },
   "Keybind Sources": {
     "Keybind Sources": "Источники комбинаций клавиш"
   },
@@ -4262,11 +4319,32 @@
   "Keybinds shown alongside regular search results": {
     "Keybinds shown alongside regular search results": "Комбинации клавиш показываются вместе с обычными результатами поиска"
   },
+  "Keyboard": {
+    "Keyboard": ""
+  },
+  "Keyboard Behavior": {
+    "Keyboard Behavior": ""
+  },
   "Keyboard Layout Name": {
     "Keyboard Layout Name": "Наименование Раскладки Клавиатуры"
   },
+  "Keyboard Layouts": {
+    "Keyboard Layouts": ""
+  },
+  "Keyboard Model": {
+    "Keyboard Model": ""
+  },
   "Keyboard Shortcuts": {
     "Keyboard Shortcuts": "Горячие клавиши"
+  },
+  "Keyboard Variant": {
+    "Keyboard Variant": ""
+  },
+  "Keyboard shortcut to start security key unlock": {
+    "Keyboard shortcut to start security key unlock": ""
+  },
+  "Keymap File Path": {
+    "Keymap File Path": ""
   },
   "Keys": {
     "Keys": "Ключи"
@@ -4510,6 +4588,9 @@
   },
   "MAC": {
     "MAC": "MAC"
+  },
+  "MIT License": {
+    "MIT License": ""
   },
   "MTU": {
     "MTU": "MTU"
@@ -5513,6 +5594,15 @@
   "Opacity": {
     "Opacity": "Непрозрачность"
   },
+  "Opacity of cards and nested surfaces inside floating windows": {
+    "Opacity of cards and nested surfaces inside floating windows": ""
+  },
+  "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts": {
+    "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts": ""
+  },
+  "Opacity of foreground cards and nested surfaces on shell panels": {
+    "Opacity of foreground cards and nested surfaces on shell panels": ""
+  },
   "Opaque": {
     "Opaque": "Непрозрачный"
   },
@@ -5521,6 +5611,9 @@
   },
   "Open App": {
     "Open App": "Открыть приложение"
+  },
+  "Open DMS windows floating instead of tiled": {
+    "Open DMS windows floating instead of tiled": ""
   },
   "Open Delay": {
     "Open Delay": "Задержка открытия"
@@ -5542,6 +5635,9 @@
   },
   "Open Trash With": {
     "Open Trash With": "Открыть корзину с помощью"
+  },
+  "Open Windows Floating": {
+    "Open Windows Floating": ""
   },
   "Open a new note": {
     "Open a new note": "Открыть новую заметку"
@@ -5662,6 +5758,9 @@
   },
   "Override Corner Radius": {
     "Override Corner Radius": "Переопределить радиус углов"
+  },
+  "Override floating window transparency for Notepad": {
+    "Override floating window transparency for Notepad": ""
   },
   "Override global layout settings for this output": {
     "Override global layout settings for this output": "Переопределить глобальные настройки макета для этого выхода"
@@ -5794,6 +5893,9 @@
   },
   "Pending Discharge": {
     "Pending Discharge": "Подключено"
+  },
+  "Per Window": {
+    "Per Window": ""
   },
   "Per-Mode Wallpapers": {
     "Per-Mode Wallpapers": "Обои для режима"
@@ -6056,6 +6158,9 @@
   "Press Ctrl+N or click 'New Session' to create one": {
     "Press Ctrl+N or click 'New Session' to create one": "Нажмите Ctrl+N или «Новая сессия», чтобы создать её"
   },
+  "Press Ctrl+key to set. Esc cancels.": {
+    "Press Ctrl+key to set. Esc cancels.": ""
+  },
   "Press Enter and the audio system will restart to apply the change": {
     "Press Enter and the audio system will restart to apply the change": "Нажмите Enter, и аудиосистема перезапустится для применения изменений"
   },
@@ -6242,6 +6347,9 @@
   "Random": {
     "Random": "Случайный"
   },
+  "Random Order": {
+    "Random Order": ""
+  },
   "Rate": {
     "Rate": "Частота"
   },
@@ -6293,6 +6401,9 @@
   "Regex": {
     "Regex": "Регулярное выражение"
   },
+  "Registries": {
+    "Registries": ""
+  },
   "Regular": {
     "Regular": "Обычный"
   },
@@ -6328,6 +6439,9 @@
   },
   "Remember Last Query": {
     "Remember Last Query": "Запоминать последний запрос"
+  },
+  "Remember Layout": {
+    "Remember Layout": ""
   },
   "Remember Type Filter": {
     "Remember Type Filter": "Запоминать фильтр типа"
@@ -6400,6 +6514,12 @@
   },
   "Repeat": {
     "Repeat": "Повторить"
+  },
+  "Repeat Delay": {
+    "Repeat Delay": ""
+  },
+  "Repeat Rate": {
+    "Repeat Rate": ""
   },
   "Replacement": {
     "Replacement": "Замена"
@@ -6481,6 +6601,9 @@
   },
   "Restart the DankMaterialShell": {
     "Restart the DankMaterialShell": "Перезагрузить DankMaterialShell"
+  },
+  "Restart userspace without rebooting the kernel, requires systemd": {
+    "Restart userspace without rebooting the kernel, requires systemd": ""
   },
   "Restarting audio system...": {
     "Restarting audio system...": "Перезапуск аудиосистемы..."
@@ -6797,8 +6920,17 @@
   "Security Key PAM Source": {
     "Security Key PAM Source": "Источник PAM ключа безопасности"
   },
+  "Security key": {
+    "Security key": ""
+  },
+  "Security key (%1)": {
+    "Security key (%1)": ""
+  },
   "Security key mode": {
     "Security key mode": "Режим ключа безопасности"
+  },
+  "Security key shortcut": {
+    "Security key shortcut": ""
   },
   "Security-key availability could not be confirmed": {
     "Security-key availability could not be confirmed": "Не удалось подтвердить доступность ключа безопасности"
@@ -6844,6 +6976,9 @@
   },
   "Select a desktop application": {
     "Select a desktop application": "Выберите приложение рабочего стола"
+  },
+  "Select a random wallpaper instead of cycling in alphabetical order": {
+    "Select a random wallpaper instead of cycling in alphabetical order": ""
   },
   "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": {
     "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": "Выбрать виджет для добавления на рабочий стол. Каждый виджет это отдельный экземпляр со своими настройками."
@@ -7214,6 +7349,9 @@
   "Show Seconds": {
     "Show Seconds": "Показывать секунды"
   },
+  "Show Soft Reboot": {
+    "Show Soft Reboot": ""
+  },
   "Show Sunrise/Sunset": {
     "Show Sunrise/Sunset": "Показать рассвет/закат"
   },
@@ -7295,6 +7433,9 @@
   "Show during Niri overview": {
     "Show during Niri overview": "Показывать в режиме обзора Niri"
   },
+  "Show foreground surfaces on cards inside floating windows": {
+    "Show foreground surfaces on cards inside floating windows": ""
+  },
   "Show foreground surfaces on notification cards": {
     "Show foreground surfaces on notification cards": "Показывать поверхности переднего плана на карточках уведомлений"
   },
@@ -7306,6 +7447,9 @@
   },
   "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": {
     "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": "Показывать наложение лаунчера при вводе в обзоре Niri. Отключите для использования другого лаунчера."
+  },
+  "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.": {
+    "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.": ""
   },
   "Show mode tabs and keyboard hints at the bottom.": {
     "Show mode tabs and keyboard hints at the bottom.": "Показывать вкладки режимов и подсказки клавиатуры внизу."
@@ -7418,6 +7562,9 @@
   "Snow": {
     "Snow": "Снег"
   },
+  "Soft Reboot": {
+    "Soft Reboot": ""
+  },
   "Some plugins require a newer version of DMS:": {
     "Some plugins require a newer version of DMS:": "Некоторые плагины требуют более новую версию DMS:"
   },
@@ -7438,6 +7585,9 @@
   },
   "Source: %1": {
     "Source: %1": "Источник: %1"
+  },
+  "Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.": {
+    "Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.": ""
   },
   "Space between the bar and screen edges": {
     "Space between the bar and screen edges": "Расстояние между панелью и краями экрана"
@@ -7553,6 +7703,9 @@
   "Sunset": {
     "Sunset": "Закат"
   },
+  "Super + Space": {
+    "Super + Space": ""
+  },
   "Suppress Duplicate Notifications": {
     "Suppress Duplicate Notifications": "Подавлять дублирующиеся уведомления"
   },
@@ -7586,6 +7739,9 @@
   "Surface Opacity": {
     "Surface Opacity": "Непрозрачность поверхностей"
   },
+  "Surface Styling": {
+    "Surface Styling": ""
+  },
   "Surface Text": {
     "Surface Text": "Текст поверхности"
   },
@@ -7612,6 +7768,9 @@
   },
   "Sway Website": {
     "Sway Website": "Сайт Sway"
+  },
+  "Switch Layout Shortcut": {
+    "Switch Layout Shortcut": ""
   },
   "Switch between display configurations": {
     "Switch between display configurations": "Переключение между конфигурациями дисплеев"
@@ -7657,6 +7816,9 @@
   },
   "Sync to apply": {
     "Sync to apply": "Синхронизируйте для применения"
+  },
+  "Sync with Global Settings": {
+    "Sync with Global Settings": ""
   },
   "Syncing...": {
     "Syncing...": "Синхронизация..."
@@ -8765,6 +8927,9 @@
   "Window Height": {
     "Window Height": "Высота окна"
   },
+  "Window Opacity": {
+    "Window Opacity": ""
+  },
   "Window Opening": {
     "Window Opening": "Открытие окна"
   },
@@ -8809,6 +8974,9 @@
   },
   "X-Ray": {
     "X-Ray": "X-Ray"
+  },
+  "XKB Options": {
+    "XKB Options": ""
   },
   "XWayland": {
     "XWayland": "XWayland"
@@ -8914,9 +9082,6 @@
   },
   "display rotation option": {
     "Normal": "Обычная"
-  },
-  "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": {
-    "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language."
   },
   "e.g. /usr/bin/my-script --flag": {
     "e.g. /usr/bin/my-script --flag": "напр. /usr/bin/my-script --flag"

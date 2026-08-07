@@ -305,9 +305,6 @@
   "90°": {
     "90°": "90 درجة"
   },
-  "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>": {
-    "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>": "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">رخصة MIT</a>"
-  },
   "A modern desktop shell for Wayland compositors": {
     "A modern desktop shell for Wayland compositors": "سطح مكتب حديث لWayland"
   },
@@ -521,6 +518,9 @@
   "Advanced": {
     "Advanced": "متقدم"
   },
+  "Advanced comma-separated libxkbcommon options.": {
+    "Advanced comma-separated libxkbcommon options.": ""
+  },
   "Afternoon": {
     "Afternoon": "بعد الظهر"
   },
@@ -562,6 +562,9 @@
   },
   "Also group repeated application icons on the active workspace": {
     "Also group repeated application icons on the active workspace": "أيضاً تجميع أيقونات التطبيقات المتكررة في سطح المكتب النشط"
+  },
+  "Alt + Shift": {
+    "Alt + Shift": ""
   },
   "Alternative (OR)": {
     "Alternative (OR)": "بديل (أو)"
@@ -664,6 +667,9 @@
   },
   "Appearance": {
     "Appearance": "المظهر"
+  },
+  "Apple Music animated covers": {
+    "Apple Music animated covers": ""
   },
   "Application": {
     "Application": "تطبيق"
@@ -946,6 +952,9 @@
   },
   "Automatically save changes to opened files as you type": {
     "Automatically save changes to opened files as you type": "حفظ التغييرات تلقائيًا في الملفات المفتوحة أثناء الكتابة"
+  },
+  "Automatically turn on Num Lock at startup": {
+    "Automatically turn on Num Lock at startup": ""
   },
   "Automatically turn on Power Saver profile when battery is low.": {
     "Automatically turn on Power Saver profile when battery is low.": "قم بتشغيل ملف تعريف موفر الطاقة تلقائياً عند انخفاض البطارية."
@@ -1358,6 +1367,9 @@
   "Channel": {
     "Channel": "القناة"
   },
+  "Characters per second while holding down key": {
+    "Characters per second while holding down key": ""
+  },
   "Charge Level": {
     "Charge Level": "مستوى الشحن"
   },
@@ -1411,6 +1423,9 @@
   },
   "Choose a power profile": {
     "Choose a power profile": "اختر ملف تعريف الطاقة"
+  },
+  "Choose a shortcut key to cycle between keyboard layouts": {
+    "Choose a shortcut key to cycle between keyboard layouts": ""
   },
   "Choose colors from palette": {
     "Choose colors from palette": "اختر ألواناً من اللوحة"
@@ -1648,6 +1663,9 @@
   },
   "Column Width": {
     "Column Width": "عرض العمود"
+  },
+  "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": {
+    "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": ""
   },
   "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": {
     "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": "قائمة مفصولة بفواصل بأسماء الجلسات المراد إخفاؤها. ضعها بين شرطتين مائلتين للتعبير النمطي (مثال: /^_.*/)."
@@ -1958,6 +1976,12 @@
   "Critical Threshold": {
     "Critical Threshold": "عتبة المستوى الحرج"
   },
+  "Ctrl + Shift": {
+    "Ctrl + Shift": ""
+  },
+  "Ctrl+%1 is used for password editing": {
+    "Ctrl+%1 is used for password editing": ""
+  },
   "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": {
     "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": "Ctrl+A: تحديد الكل • Ctrl+P: معاينة • Enter/Shift+Enter: البحث عن التالي/السابق • Esc: إغلاق"
   },
@@ -2026,6 +2050,9 @@
   },
   "Custom": {
     "Custom": "خيار مخصص"
+  },
+  "Custom / None": {
+    "Custom / None": ""
   },
   "Custom Blend": {
     "Custom Blend": "مزج مخصص"
@@ -2119,6 +2146,9 @@
   },
   "DMS Shortcuts": {
     "DMS Shortcuts": "اختصارات DMS"
+  },
+  "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.": {
+    "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.": ""
   },
   "DMS out of date": {
     "DMS out of date": "نسخة DMS غير محدثة"
@@ -2264,6 +2294,9 @@
   "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": {
     "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": "Del: مسح • Shift+Del: مسح الكل • 1-9: إجراءات • F10: مساعدة • Esc: إغلاق"
   },
+  "Delay before characters start repeating": {
+    "Delay before characters start repeating": ""
+  },
   "Delete": {
     "Delete": "حذف"
   },
@@ -2365,6 +2398,9 @@
   },
   "Digital": {
     "Digital": "رقمي"
+  },
+  "Direct path to a .xkb keymap file. Overrides layouts/variants above.": {
+    "Direct path to a .xkb keymap file. Overrides layouts/variants above.": ""
   },
   "Direction Source": {
     "Direction Source": "مصدر الاتجاه"
@@ -2701,6 +2737,9 @@
   },
   "Enable History": {
     "Enable History": "تمكين السجل"
+  },
+  "Enable Num Lock": {
+    "Enable Num Lock": ""
   },
   "Enable Overview Overlay": {
     "Enable Overview Overlay": "تمكين تراكب النظرة العامة"
@@ -3323,6 +3362,12 @@
   "Floating Position": {
     "Floating Position": "الموضع العائم"
   },
+  "Floating Windows": {
+    "Floating Windows": ""
+  },
+  "Floating windows follow Surface Styling settings": {
+    "Floating windows follow Surface Styling settings": ""
+  },
   "Fluent": {
     "Fluent": "سلس"
   },
@@ -3452,6 +3497,9 @@
   "Foreground Layers": {
     "Foreground Layers": "طبقات المقدمة"
   },
+  "Foreground Opacity": {
+    "Foreground Opacity": ""
+  },
   "Forever": {
     "Forever": "إلى الأبد"
   },
@@ -3578,8 +3626,8 @@
   "Generate Override": {
     "Generate Override": "إنشاء تجاوز"
   },
-  "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.": {
-    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.": "إنشاء تكوينات أساسية لـ GTK3/4 أو QT5/QT6 (تتطلب qt6ct-kde) لتتبع ألوان DMS. مطلوبة مرة واحدة فقط.<br /><br />يُوصى بتكوين <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> قبل تطبيق سمات GTK."
+  "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
+    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
   },
   "Generic": {
     "Generic": "عام"
@@ -3595,6 +3643,9 @@
   },
   "Global fonts can be configured in Settings → Personalization": {
     "Global fonts can be configured in Settings → Personalization": "يمكن تكوين الخطوط العامة في الإعدادات ← إضفاء الطابع الشخصي"
+  },
+  "Globally": {
+    "Globally": ""
   },
   "Globally scale all animation durations": {
     "Globally scale all animation durations": "تغيير حجم جميع فترات الرسوم المتحركة عالميًا"
@@ -3892,6 +3943,9 @@
   },
   "Hover Popouts": {
     "Hover Popouts": "النوافذ المنبثقة عند التمرير"
+  },
+  "How layout changes are remembered across apps": {
+    "How layout changes are remembered across apps": ""
   },
   "How often the server polls for new updates.": {
     "How often the server polls for new updates.": "عدد مرات فحص الخادم للتحديثات الجديدة."
@@ -4250,6 +4304,9 @@
   "Key": {
     "Key": "مفتاح"
   },
+  "Key combination": {
+    "Key combination": ""
+  },
   "Keybind Sources": {
     "Keybind Sources": "مصادر اختصارات المفاتيح"
   },
@@ -4262,11 +4319,32 @@
   "Keybinds shown alongside regular search results": {
     "Keybinds shown alongside regular search results": "اختصارات المفاتيح تظهر بجانب نتائج البحث العادية"
   },
+  "Keyboard": {
+    "Keyboard": ""
+  },
+  "Keyboard Behavior": {
+    "Keyboard Behavior": ""
+  },
   "Keyboard Layout Name": {
     "Keyboard Layout Name": "اسم تخطيط لوحة المفاتيح"
   },
+  "Keyboard Layouts": {
+    "Keyboard Layouts": ""
+  },
+  "Keyboard Model": {
+    "Keyboard Model": ""
+  },
   "Keyboard Shortcuts": {
     "Keyboard Shortcuts": "اختصارات لوحة المفاتيح"
+  },
+  "Keyboard Variant": {
+    "Keyboard Variant": ""
+  },
+  "Keyboard shortcut to start security key unlock": {
+    "Keyboard shortcut to start security key unlock": ""
+  },
+  "Keymap File Path": {
+    "Keymap File Path": ""
   },
   "Keys": {
     "Keys": "مفاتيح"
@@ -4510,6 +4588,9 @@
   },
   "MAC": {
     "MAC": "MAC"
+  },
+  "MIT License": {
+    "MIT License": ""
   },
   "MTU": {
     "MTU": "MTU"
@@ -5513,6 +5594,15 @@
   "Opacity": {
     "Opacity": "الشفافية"
   },
+  "Opacity of cards and nested surfaces inside floating windows": {
+    "Opacity of cards and nested surfaces inside floating windows": ""
+  },
+  "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts": {
+    "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts": ""
+  },
+  "Opacity of foreground cards and nested surfaces on shell panels": {
+    "Opacity of foreground cards and nested surfaces on shell panels": ""
+  },
   "Opaque": {
     "Opaque": "غير شفاف"
   },
@@ -5521,6 +5611,9 @@
   },
   "Open App": {
     "Open App": "فتح التطبيق"
+  },
+  "Open DMS windows floating instead of tiled": {
+    "Open DMS windows floating instead of tiled": ""
   },
   "Open Delay": {
     "Open Delay": "تأخير الفتح"
@@ -5542,6 +5635,9 @@
   },
   "Open Trash With": {
     "Open Trash With": "فتح المهملات باستخدام"
+  },
+  "Open Windows Floating": {
+    "Open Windows Floating": ""
   },
   "Open a new note": {
     "Open a new note": "افتح ملاحظة جديدة"
@@ -5662,6 +5758,9 @@
   },
   "Override Corner Radius": {
     "Override Corner Radius": "تجاوز نصف قطر الزاوية"
+  },
+  "Override floating window transparency for Notepad": {
+    "Override floating window transparency for Notepad": ""
   },
   "Override global layout settings for this output": {
     "Override global layout settings for this output": "تجاوز إعدادات التخطيط العالمية لهذا المخرج"
@@ -5794,6 +5893,9 @@
   },
   "Pending Discharge": {
     "Pending Discharge": "تفريغ معلق"
+  },
+  "Per Window": {
+    "Per Window": ""
   },
   "Per-Mode Wallpapers": {
     "Per-Mode Wallpapers": "خلفيات لكل وضع"
@@ -6056,6 +6158,9 @@
   "Press Ctrl+N or click 'New Session' to create one": {
     "Press Ctrl+N or click 'New Session' to create one": "اضغط Ctrl+N أو انقر على 'جلسة جديدة' لإنشاء واحدة"
   },
+  "Press Ctrl+key to set. Esc cancels.": {
+    "Press Ctrl+key to set. Esc cancels.": ""
+  },
   "Press Enter and the audio system will restart to apply the change": {
     "Press Enter and the audio system will restart to apply the change": "اضغط Enter وسيتم إعادة تشغيل نظام الصوت لتطبيق التغيير"
   },
@@ -6242,6 +6347,9 @@
   "Random": {
     "Random": "عشوائي"
   },
+  "Random Order": {
+    "Random Order": ""
+  },
   "Rate": {
     "Rate": "المعدل"
   },
@@ -6293,6 +6401,9 @@
   "Regex": {
     "Regex": "تعبير نمطي (Regex)"
   },
+  "Registries": {
+    "Registries": ""
+  },
   "Regular": {
     "Regular": "عادي"
   },
@@ -6328,6 +6439,9 @@
   },
   "Remember Last Query": {
     "Remember Last Query": "تذكر آخر استعلام"
+  },
+  "Remember Layout": {
+    "Remember Layout": ""
   },
   "Remember Type Filter": {
     "Remember Type Filter": "تذكر فلتر النوع"
@@ -6400,6 +6514,12 @@
   },
   "Repeat": {
     "Repeat": "تكرار"
+  },
+  "Repeat Delay": {
+    "Repeat Delay": ""
+  },
+  "Repeat Rate": {
+    "Repeat Rate": ""
   },
   "Replacement": {
     "Replacement": "استبدال"
@@ -6481,6 +6601,9 @@
   },
   "Restart the DankMaterialShell": {
     "Restart the DankMaterialShell": "إعادة تشغيل DankMaterialShell"
+  },
+  "Restart userspace without rebooting the kernel, requires systemd": {
+    "Restart userspace without rebooting the kernel, requires systemd": ""
   },
   "Restarting audio system...": {
     "Restarting audio system...": "جارٍ إعادة تشغيل نظام الصوت..."
@@ -6797,8 +6920,17 @@
   "Security Key PAM Source": {
     "Security Key PAM Source": "مصدر مفتاح الأمان لـ PAM"
   },
+  "Security key": {
+    "Security key": ""
+  },
+  "Security key (%1)": {
+    "Security key (%1)": ""
+  },
   "Security key mode": {
     "Security key mode": "وضع مفتاح الأمان"
+  },
+  "Security key shortcut": {
+    "Security key shortcut": ""
   },
   "Security-key availability could not be confirmed": {
     "Security-key availability could not be confirmed": "تعذّر التحقق من توفر مفتاح الأمان"
@@ -6844,6 +6976,9 @@
   },
   "Select a desktop application": {
     "Select a desktop application": "حدد تطبيق سطح مكتب"
+  },
+  "Select a random wallpaper instead of cycling in alphabetical order": {
+    "Select a random wallpaper instead of cycling in alphabetical order": ""
   },
   "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": {
     "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": "حدد أداة لإضافتها إلى سطح مكتبك. كل أداة هي مثيل منفصل بإعداداتها الخاصة."
@@ -7214,6 +7349,9 @@
   "Show Seconds": {
     "Show Seconds": "إظهار الثواني"
   },
+  "Show Soft Reboot": {
+    "Show Soft Reboot": ""
+  },
   "Show Sunrise/Sunset": {
     "Show Sunrise/Sunset": "عرض شروق/غروب الشمس"
   },
@@ -7295,6 +7433,9 @@
   "Show during Niri overview": {
     "Show during Niri overview": "إظهار أثناء نظرة عامة على Niri"
   },
+  "Show foreground surfaces on cards inside floating windows": {
+    "Show foreground surfaces on cards inside floating windows": ""
+  },
   "Show foreground surfaces on notification cards": {
     "Show foreground surfaces on notification cards": "إظهار الأسطح الأمامية على بطاقات الإشعارات"
   },
@@ -7306,6 +7447,9 @@
   },
   "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": {
     "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": "عرض تراكب المشغل عند الكتابة في نظرة عامة على Niri. قم بتعطيله لاستخدام مشغل آخر."
+  },
+  "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.": {
+    "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.": ""
   },
   "Show mode tabs and keyboard hints at the bottom.": {
     "Show mode tabs and keyboard hints at the bottom.": "إظهار علامات تبويب الوضع وتلميحات لوحة المفاتيح في الأسفل."
@@ -7418,6 +7562,9 @@
   "Snow": {
     "Snow": "ثلوج"
   },
+  "Soft Reboot": {
+    "Soft Reboot": ""
+  },
   "Some plugins require a newer version of DMS:": {
     "Some plugins require a newer version of DMS:": "تتطلب بعض الإضافات إصدارًا أحدث من DMS:"
   },
@@ -7438,6 +7585,9 @@
   },
   "Source: %1": {
     "Source: %1": "المصدر: %1"
+  },
+  "Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.": {
+    "Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.": ""
   },
   "Space between the bar and screen edges": {
     "Space between the bar and screen edges": "المسافة بين الشريط وحواف الشاشة"
@@ -7553,6 +7703,9 @@
   "Sunset": {
     "Sunset": "غروب الشمس"
   },
+  "Super + Space": {
+    "Super + Space": ""
+  },
   "Suppress Duplicate Notifications": {
     "Suppress Duplicate Notifications": "قمع الإشعارات المكررة"
   },
@@ -7586,6 +7739,9 @@
   "Surface Opacity": {
     "Surface Opacity": "عتامة السطح"
   },
+  "Surface Styling": {
+    "Surface Styling": ""
+  },
   "Surface Text": {
     "Surface Text": "نص السطح"
   },
@@ -7612,6 +7768,9 @@
   },
   "Sway Website": {
     "Sway Website": "موقع Sway"
+  },
+  "Switch Layout Shortcut": {
+    "Switch Layout Shortcut": ""
   },
   "Switch between display configurations": {
     "Switch between display configurations": "التبديل بين تكوينات العرض"
@@ -7657,6 +7816,9 @@
   },
   "Sync to apply": {
     "Sync to apply": "مزامنة للتطبيق"
+  },
+  "Sync with Global Settings": {
+    "Sync with Global Settings": ""
   },
   "Syncing...": {
     "Syncing...": "جارٍ المزامنة..."
@@ -8765,6 +8927,9 @@
   "Window Height": {
     "Window Height": "ارتفاع النافذة"
   },
+  "Window Opacity": {
+    "Window Opacity": ""
+  },
   "Window Opening": {
     "Window Opening": "فتح النافذة"
   },
@@ -8809,6 +8974,9 @@
   },
   "X-Ray": {
     "X-Ray": "الأشعة السينية (X-Ray)"
+  },
+  "XKB Options": {
+    "XKB Options": ""
   },
   "XWayland": {
     "XWayland": "XWayland"
@@ -8914,9 +9082,6 @@
   },
   "display rotation option": {
     "Normal": "عادي"
-  },
-  "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": {
-    "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": "dms هو غلاف سطح مكتب حديث قابل للتخصيص بدرجة عالية مع تصميم <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">مستوحى من Material 3</a>.<br /><br/>تم بناؤه باستخدام <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>، وهو إطار عمل QT6 لبناء أغلفة سطح المكتب، ولغة <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>، وهي لغة برمجة مجمعة ومكتوبة بشكل ثابت."
   },
   "e.g. /usr/bin/my-script --flag": {
     "e.g. /usr/bin/my-script --flag": "مثال: /usr/bin/my-script --flag"

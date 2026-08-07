@@ -305,9 +305,6 @@
   "90°": {
     "90°": "90°"
   },
-  "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>": {
-    "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>": ""
-  },
   "A modern desktop shell for Wayland compositors": {
     "A modern desktop shell for Wayland compositors": "Un environnement de bureau moderne pour les compositeurs Wayland"
   },
@@ -521,6 +518,9 @@
   "Advanced": {
     "Advanced": "Avancé"
   },
+  "Advanced comma-separated libxkbcommon options.": {
+    "Advanced comma-separated libxkbcommon options.": ""
+  },
   "Afternoon": {
     "Afternoon": "Après-midi"
   },
@@ -562,6 +562,9 @@
   },
   "Also group repeated application icons on the active workspace": {
     "Also group repeated application icons on the active workspace": ""
+  },
+  "Alt + Shift": {
+    "Alt + Shift": ""
   },
   "Alternative (OR)": {
     "Alternative (OR)": "Alternatif (OR)"
@@ -664,6 +667,9 @@
   },
   "Appearance": {
     "Appearance": "Apparence"
+  },
+  "Apple Music animated covers": {
+    "Apple Music animated covers": ""
   },
   "Application": {
     "Application": ""
@@ -946,6 +952,9 @@
   },
   "Automatically save changes to opened files as you type": {
     "Automatically save changes to opened files as you type": ""
+  },
+  "Automatically turn on Num Lock at startup": {
+    "Automatically turn on Num Lock at startup": ""
   },
   "Automatically turn on Power Saver profile when battery is low.": {
     "Automatically turn on Power Saver profile when battery is low.": ""
@@ -1358,6 +1367,9 @@
   "Channel": {
     "Channel": "Canal"
   },
+  "Characters per second while holding down key": {
+    "Characters per second while holding down key": ""
+  },
   "Charge Level": {
     "Charge Level": ""
   },
@@ -1411,6 +1423,9 @@
   },
   "Choose a power profile": {
     "Choose a power profile": ""
+  },
+  "Choose a shortcut key to cycle between keyboard layouts": {
+    "Choose a shortcut key to cycle between keyboard layouts": ""
   },
   "Choose colors from palette": {
     "Choose colors from palette": "Choisir des couleurs depuis la palette"
@@ -1648,6 +1663,9 @@
   },
   "Column Width": {
     "Column Width": "Longueur de colonne"
+  },
+  "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": {
+    "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": ""
   },
   "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": {
     "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": ""
@@ -1958,6 +1976,12 @@
   "Critical Threshold": {
     "Critical Threshold": ""
   },
+  "Ctrl + Shift": {
+    "Ctrl + Shift": ""
+  },
+  "Ctrl+%1 is used for password editing": {
+    "Ctrl+%1 is used for password editing": ""
+  },
   "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": {
     "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": ""
   },
@@ -2026,6 +2050,9 @@
   },
   "Custom": {
     "Custom": "Personnalisé"
+  },
+  "Custom / None": {
+    "Custom / None": ""
   },
   "Custom Blend": {
     "Custom Blend": ""
@@ -2119,6 +2146,9 @@
   },
   "DMS Shortcuts": {
     "DMS Shortcuts": "Raccourcis DMS"
+  },
+  "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.": {
+    "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.": ""
   },
   "DMS out of date": {
     "DMS out of date": "DMS obsolète"
@@ -2264,6 +2294,9 @@
   "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": {
     "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": "Suppr : Effacer • Maj+Suppr : Tout effacer • 1-9 : Actions • F10 : Aide • Échap : Fermer"
   },
+  "Delay before characters start repeating": {
+    "Delay before characters start repeating": ""
+  },
   "Delete": {
     "Delete": "Supprimer"
   },
@@ -2365,6 +2398,9 @@
   },
   "Digital": {
     "Digital": "Numérique"
+  },
+  "Direct path to a .xkb keymap file. Overrides layouts/variants above.": {
+    "Direct path to a .xkb keymap file. Overrides layouts/variants above.": ""
   },
   "Direction Source": {
     "Direction Source": "Direction de la source"
@@ -2701,6 +2737,9 @@
   },
   "Enable History": {
     "Enable History": "Activer l’historique"
+  },
+  "Enable Num Lock": {
+    "Enable Num Lock": ""
   },
   "Enable Overview Overlay": {
     "Enable Overview Overlay": "Activer la superposition de la vue d’ensemble"
@@ -3323,6 +3362,12 @@
   "Floating Position": {
     "Floating Position": ""
   },
+  "Floating Windows": {
+    "Floating Windows": ""
+  },
+  "Floating windows follow Surface Styling settings": {
+    "Floating windows follow Surface Styling settings": ""
+  },
   "Fluent": {
     "Fluent": ""
   },
@@ -3452,6 +3497,9 @@
   "Foreground Layers": {
     "Foreground Layers": ""
   },
+  "Foreground Opacity": {
+    "Foreground Opacity": ""
+  },
   "Forever": {
     "Forever": "Toujours"
   },
@@ -3578,8 +3626,8 @@
   "Generate Override": {
     "Generate Override": ""
   },
-  "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.": {
-    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.": ""
+  "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
+    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
   },
   "Generic": {
     "Generic": "Générique"
@@ -3595,6 +3643,9 @@
   },
   "Global fonts can be configured in Settings → Personalization": {
     "Global fonts can be configured in Settings → Personalization": ""
+  },
+  "Globally": {
+    "Globally": ""
   },
   "Globally scale all animation durations": {
     "Globally scale all animation durations": "Échelle globale des durées d’animation"
@@ -3892,6 +3943,9 @@
   },
   "Hover Popouts": {
     "Hover Popouts": ""
+  },
+  "How layout changes are remembered across apps": {
+    "How layout changes are remembered across apps": ""
   },
   "How often the server polls for new updates.": {
     "How often the server polls for new updates.": ""
@@ -4250,6 +4304,9 @@
   "Key": {
     "Key": "Touche"
   },
+  "Key combination": {
+    "Key combination": ""
+  },
   "Keybind Sources": {
     "Keybind Sources": "Sources des raccourcis clavier"
   },
@@ -4262,11 +4319,32 @@
   "Keybinds shown alongside regular search results": {
     "Keybinds shown alongside regular search results": "Afficher les raccourcis clavier dans les résultats de recherche"
   },
+  "Keyboard": {
+    "Keyboard": ""
+  },
+  "Keyboard Behavior": {
+    "Keyboard Behavior": ""
+  },
   "Keyboard Layout Name": {
     "Keyboard Layout Name": "Nom de la disposition du clavier"
   },
+  "Keyboard Layouts": {
+    "Keyboard Layouts": ""
+  },
+  "Keyboard Model": {
+    "Keyboard Model": ""
+  },
   "Keyboard Shortcuts": {
     "Keyboard Shortcuts": "Raccourcis Clavier"
+  },
+  "Keyboard Variant": {
+    "Keyboard Variant": ""
+  },
+  "Keyboard shortcut to start security key unlock": {
+    "Keyboard shortcut to start security key unlock": ""
+  },
+  "Keymap File Path": {
+    "Keymap File Path": ""
   },
   "Keys": {
     "Keys": "Touches"
@@ -4510,6 +4588,9 @@
   },
   "MAC": {
     "MAC": "MAC"
+  },
+  "MIT License": {
+    "MIT License": ""
   },
   "MTU": {
     "MTU": "MTU"
@@ -5513,6 +5594,15 @@
   "Opacity": {
     "Opacity": "Opacité"
   },
+  "Opacity of cards and nested surfaces inside floating windows": {
+    "Opacity of cards and nested surfaces inside floating windows": ""
+  },
+  "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts": {
+    "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts": ""
+  },
+  "Opacity of foreground cards and nested surfaces on shell panels": {
+    "Opacity of foreground cards and nested surfaces on shell panels": ""
+  },
   "Opaque": {
     "Opaque": "Opaque"
   },
@@ -5521,6 +5611,9 @@
   },
   "Open App": {
     "Open App": "Ouvrir appli"
+  },
+  "Open DMS windows floating instead of tiled": {
+    "Open DMS windows floating instead of tiled": ""
   },
   "Open Delay": {
     "Open Delay": ""
@@ -5542,6 +5635,9 @@
   },
   "Open Trash With": {
     "Open Trash With": ""
+  },
+  "Open Windows Floating": {
+    "Open Windows Floating": ""
   },
   "Open a new note": {
     "Open a new note": "Ouvrir une nouvelle note"
@@ -5662,6 +5758,9 @@
   },
   "Override Corner Radius": {
     "Override Corner Radius": "Forcer l'arrondi des coins"
+  },
+  "Override floating window transparency for Notepad": {
+    "Override floating window transparency for Notepad": ""
   },
   "Override global layout settings for this output": {
     "Override global layout settings for this output": "Remplacer les paramètres de mise en page globale pour cette sortie"
@@ -5794,6 +5893,9 @@
   },
   "Pending Discharge": {
     "Pending Discharge": "Décharge en attente"
+  },
+  "Per Window": {
+    "Per Window": ""
   },
   "Per-Mode Wallpapers": {
     "Per-Mode Wallpapers": "Fonds d’écran par mode"
@@ -6056,6 +6158,9 @@
   "Press Ctrl+N or click 'New Session' to create one": {
     "Press Ctrl+N or click 'New Session' to create one": ""
   },
+  "Press Ctrl+key to set. Esc cancels.": {
+    "Press Ctrl+key to set. Esc cancels.": ""
+  },
   "Press Enter and the audio system will restart to apply the change": {
     "Press Enter and the audio system will restart to apply the change": "Appuyer sur Entrer et le système audio redémarrera pour appliquer les changements"
   },
@@ -6242,6 +6347,9 @@
   "Random": {
     "Random": "Aléatoire"
   },
+  "Random Order": {
+    "Random Order": ""
+  },
   "Rate": {
     "Rate": "Taux"
   },
@@ -6293,6 +6401,9 @@
   "Regex": {
     "Regex": "Regex"
   },
+  "Registries": {
+    "Registries": ""
+  },
   "Regular": {
     "Regular": ""
   },
@@ -6328,6 +6439,9 @@
   },
   "Remember Last Query": {
     "Remember Last Query": ""
+  },
+  "Remember Layout": {
+    "Remember Layout": ""
   },
   "Remember Type Filter": {
     "Remember Type Filter": ""
@@ -6400,6 +6514,12 @@
   },
   "Repeat": {
     "Repeat": "Répéter"
+  },
+  "Repeat Delay": {
+    "Repeat Delay": ""
+  },
+  "Repeat Rate": {
+    "Repeat Rate": ""
   },
   "Replacement": {
     "Replacement": "Remplacement"
@@ -6481,6 +6601,9 @@
   },
   "Restart the DankMaterialShell": {
     "Restart the DankMaterialShell": "Redémarrer DankMaterialShell"
+  },
+  "Restart userspace without rebooting the kernel, requires systemd": {
+    "Restart userspace without rebooting the kernel, requires systemd": ""
   },
   "Restarting audio system...": {
     "Restarting audio system...": "Redémarrage du système audio..."
@@ -6797,8 +6920,17 @@
   "Security Key PAM Source": {
     "Security Key PAM Source": ""
   },
+  "Security key": {
+    "Security key": ""
+  },
+  "Security key (%1)": {
+    "Security key (%1)": ""
+  },
   "Security key mode": {
     "Security key mode": "Mode clé de sécurité"
+  },
+  "Security key shortcut": {
+    "Security key shortcut": ""
   },
   "Security-key availability could not be confirmed": {
     "Security-key availability could not be confirmed": ""
@@ -6844,6 +6976,9 @@
   },
   "Select a desktop application": {
     "Select a desktop application": ""
+  },
+  "Select a random wallpaper instead of cycling in alphabetical order": {
+    "Select a random wallpaper instead of cycling in alphabetical order": ""
   },
   "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": {
     "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": "Sélectionner un widget à ajouter au bureau. Chaque widget est une instance indépendante avec ses propres paramètres."
@@ -7214,6 +7349,9 @@
   "Show Seconds": {
     "Show Seconds": "Afficher les secondes"
   },
+  "Show Soft Reboot": {
+    "Show Soft Reboot": ""
+  },
   "Show Sunrise/Sunset": {
     "Show Sunrise/Sunset": "Afficher lever/coucher du soleil"
   },
@@ -7295,6 +7433,9 @@
   "Show during Niri overview": {
     "Show during Niri overview": ""
   },
+  "Show foreground surfaces on cards inside floating windows": {
+    "Show foreground surfaces on cards inside floating windows": ""
+  },
   "Show foreground surfaces on notification cards": {
     "Show foreground surfaces on notification cards": ""
   },
@@ -7306,6 +7447,9 @@
   },
   "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": {
     "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": "Afficher la superposition du lanceur lors de la saisie dans l’aperçu Niri. Désactiver pour utiliser un autre lanceur."
+  },
+  "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.": {
+    "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.": ""
   },
   "Show mode tabs and keyboard hints at the bottom.": {
     "Show mode tabs and keyboard hints at the bottom.": "Afficher les onglets de mode et les raccourcis clavier en bas."
@@ -7418,6 +7562,9 @@
   "Snow": {
     "Snow": "Neige"
   },
+  "Soft Reboot": {
+    "Soft Reboot": ""
+  },
   "Some plugins require a newer version of DMS:": {
     "Some plugins require a newer version of DMS:": "Certains plugins nécessitent une version plus récente de DMS :"
   },
@@ -7438,6 +7585,9 @@
   },
   "Source: %1": {
     "Source: %1": ""
+  },
+  "Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.": {
+    "Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.": ""
   },
   "Space between the bar and screen edges": {
     "Space between the bar and screen edges": ""
@@ -7553,6 +7703,9 @@
   "Sunset": {
     "Sunset": "Coucher de soleil"
   },
+  "Super + Space": {
+    "Super + Space": ""
+  },
   "Suppress Duplicate Notifications": {
     "Suppress Duplicate Notifications": ""
   },
@@ -7586,6 +7739,9 @@
   "Surface Opacity": {
     "Surface Opacity": ""
   },
+  "Surface Styling": {
+    "Surface Styling": ""
+  },
   "Surface Text": {
     "Surface Text": ""
   },
@@ -7612,6 +7768,9 @@
   },
   "Sway Website": {
     "Sway Website": "Site Sway"
+  },
+  "Switch Layout Shortcut": {
+    "Switch Layout Shortcut": ""
   },
   "Switch between display configurations": {
     "Switch between display configurations": ""
@@ -7657,6 +7816,9 @@
   },
   "Sync to apply": {
     "Sync to apply": ""
+  },
+  "Sync with Global Settings": {
+    "Sync with Global Settings": ""
   },
   "Syncing...": {
     "Syncing...": ""
@@ -8765,6 +8927,9 @@
   "Window Height": {
     "Window Height": "Hauteur de fenêtre"
   },
+  "Window Opacity": {
+    "Window Opacity": ""
+  },
   "Window Opening": {
     "Window Opening": "Ouverture de fenêtre"
   },
@@ -8809,6 +8974,9 @@
   },
   "X-Ray": {
     "X-Ray": ""
+  },
+  "XKB Options": {
+    "XKB Options": ""
   },
   "XWayland": {
     "XWayland": ""
@@ -8914,9 +9082,6 @@
   },
   "display rotation option": {
     "Normal": ""
-  },
-  "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": {
-    "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": ""
   },
   "e.g. /usr/bin/my-script --flag": {
     "e.g. /usr/bin/my-script --flag": ""

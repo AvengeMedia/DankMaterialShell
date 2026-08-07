@@ -305,9 +305,6 @@
   "90°": {
     "90°": "90°"
   },
-  "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>": {
-    "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>": "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT-Lizenz</a>"
-  },
   "A modern desktop shell for Wayland compositors": {
     "A modern desktop shell for Wayland compositors": "Eine moderne Desktop-Shell für Wayland-Compositor"
   },
@@ -336,7 +333,7 @@
     "About": "Über"
   },
   "Acceleration Profile": {
-    "Acceleration Profile": ""
+    "Acceleration Profile": "Beschleunigungsprofil"
   },
   "Accent Color": {
     "Accent Color": "Akzentfarbe"
@@ -414,7 +411,7 @@
     "Adapters": "Adapter"
   },
   "Adaptive": {
-    "Adaptive": ""
+    "Adaptive": "Adaptiv"
   },
   "Adaptive Media Width": {
     "Adaptive Media Width": "Adaptive Medienbreite"
@@ -492,10 +489,10 @@
     "Add to Autostart": "Zum Autostart hinzufügen"
   },
   "Adjust pointer sensitivity speed": {
-    "Adjust pointer sensitivity speed": ""
+    "Adjust pointer sensitivity speed": "Zeigerempfindlichkeit anpassen"
   },
   "Adjust scrolling sensitivity multiplier": {
-    "Adjust scrolling sensitivity multiplier": ""
+    "Adjust scrolling sensitivity multiplier": "Multiplikator für Bildlaufempfindlichkeit anpassen"
   },
   "Adjust the bar height via inner padding": {
     "Adjust the bar height via inner padding": "Die Höhe der Leiste über den inneren Abstand anpassen"
@@ -504,7 +501,7 @@
     "Adjust the number of columns in grid view mode.": "Anzahl der Spalten in der Rasteransicht anpassen."
   },
   "Adjust touchpad pointer speed": {
-    "Adjust touchpad pointer speed": ""
+    "Adjust touchpad pointer speed": "Touchpad-Zeigergeschwindigkeit anpassen"
   },
   "Adjust volume per scroll indent": {
     "Adjust volume per scroll indent": "Lautstärke pro Scroll-Schritt anpassen"
@@ -520,6 +517,9 @@
   },
   "Advanced": {
     "Advanced": "Fortgeschritten"
+  },
+  "Advanced comma-separated libxkbcommon options.": {
+    "Advanced comma-separated libxkbcommon options.": ""
   },
   "Afternoon": {
     "Afternoon": "Nachmittags"
@@ -563,6 +563,9 @@
   "Also group repeated application icons on the active workspace": {
     "Also group repeated application icons on the active workspace": "Wiederholte Anwendungssymbole auch auf dem aktiven Arbeitsbereich gruppieren"
   },
+  "Alt + Shift": {
+    "Alt + Shift": ""
+  },
   "Alternative (OR)": {
     "Alternative (OR)": "Alternative (ODER)"
   },
@@ -591,7 +594,7 @@
     "Always show when there's only one connected display": "Immer zeigen wenn nur ein Monitor verbunden"
   },
   "Always use the durations above, even if an app requests a shorter or longer one": {
-    "Always use the durations above, even if an app requests a shorter or longer one": ""
+    "Always use the durations above, even if an app requests a shorter or longer one": "Immer die oben genannten Zeiträume verwenden, auch wenn eine App eine kürzere oder längere Dauer anfordert"
   },
   "Always use this app for %1": {
     "Always use this app for %1": "Diese App immer für %1 verwenden"
@@ -664,6 +667,9 @@
   },
   "Appearance": {
     "Appearance": "Erscheinungsbild"
+  },
+  "Apple Music animated covers": {
+    "Apple Music animated covers": ""
   },
   "Application": {
     "Application": "Anwendung"
@@ -946,6 +952,9 @@
   },
   "Automatically save changes to opened files as you type": {
     "Automatically save changes to opened files as you type": "Änderungen an geöffneten Dateien während der Eingabe automatisch speichern"
+  },
+  "Automatically turn on Num Lock at startup": {
+    "Automatically turn on Num Lock at startup": ""
   },
   "Automatically turn on Power Saver profile when battery is low.": {
     "Automatically turn on Power Saver profile when battery is low.": "Energiesparprofil automatisch einschalten, wenn der Akkustand niedrig ist."
@@ -1358,6 +1367,9 @@
   "Channel": {
     "Channel": "Kanal"
   },
+  "Characters per second while holding down key": {
+    "Characters per second while holding down key": ""
+  },
   "Charge Level": {
     "Charge Level": "Ladestand"
   },
@@ -1412,6 +1424,9 @@
   "Choose a power profile": {
     "Choose a power profile": "Energieprofil wählen"
   },
+  "Choose a shortcut key to cycle between keyboard layouts": {
+    "Choose a shortcut key to cycle between keyboard layouts": ""
+  },
   "Choose colors from palette": {
     "Choose colors from palette": "Farbe von Palette"
   },
@@ -1443,7 +1458,7 @@
     "Choose wallpaper folder": "Hintergrundordner auswählen"
   },
   "Choose when to generate scrolling events": {
-    "Choose when to generate scrolling events": ""
+    "Choose when to generate scrolling events": "Wählen Sie aus, wann Scroll-Ereignisse generiert werden sollen"
   },
   "Choose where notification popups appear on screen": {
     "Choose where notification popups appear on screen": "Wähle wo auf dem Bildschirm Benachrichtigungen erscheinen"
@@ -1649,6 +1664,9 @@
   "Column Width": {
     "Column Width": "Spaltenbreite"
   },
+  "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": {
+    "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": ""
+  },
   "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": {
     "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": "Kommagetrennte Liste von Sitzungsnamen zum Ausblenden. In Schrägstriche für Regex einschließen (z. B. /^_.*/)."
   },
@@ -1680,7 +1698,7 @@
     "Compositor Settings": "Compositor-Einstellungen"
   },
   "Compositor actions (focus, move, etc.)": {
-    "Compositor actions (focus, move, etc.)": ""
+    "Compositor actions (focus, move, etc.)": "Compositor-Aktionen (Fokus, Verschieben usw.)"
   },
   "Config Format": {
     "Config Format": "Konfigurationsformat"
@@ -1800,7 +1818,7 @@
     "Contrast": "Kontrast"
   },
   "Contrast by variant": {
-    "Contrast by variant": ""
+    "Contrast by variant": "Kontrast nach Variante"
   },
   "Contributor": {
     "Contributor": "Mitwirkender"
@@ -1958,6 +1976,12 @@
   "Critical Threshold": {
     "Critical Threshold": "Kritischer Schwellenwert"
   },
+  "Ctrl + Shift": {
+    "Ctrl + Shift": ""
+  },
+  "Ctrl+%1 is used for password editing": {
+    "Ctrl+%1 is used for password editing": ""
+  },
   "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": {
     "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": "Strg+A: Alles auswählen • Strg+P: Vorschau • Eingabe/Umschalt+Eingabe: Nächstes/Vorheriges suchen • Esc: Schließen"
   },
@@ -2026,6 +2050,9 @@
   },
   "Custom": {
     "Custom": "Individuell"
+  },
+  "Custom / None": {
+    "Custom / None": ""
   },
   "Custom Blend": {
     "Custom Blend": "Benutzerdefinierte Mischung"
@@ -2119,6 +2146,9 @@
   },
   "DMS Shortcuts": {
     "DMS Shortcuts": "DMS-Kurzbefehle"
+  },
+  "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.": {
+    "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.": ""
   },
   "DMS out of date": {
     "DMS out of date": "DMS ist veraltet"
@@ -2264,6 +2294,9 @@
   "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": {
     "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": "Del: Löschen • Shift+Del: Alles löschen • 1-9: Aktionen • F10: Hilfe • Esc: Schließen"
   },
+  "Delay before characters start repeating": {
+    "Delay before characters start repeating": ""
+  },
   "Delete": {
     "Delete": "Löschen"
   },
@@ -2366,6 +2399,9 @@
   "Digital": {
     "Digital": "Digital"
   },
+  "Direct path to a .xkb keymap file. Overrides layouts/variants above.": {
+    "Direct path to a .xkb keymap file. Overrides layouts/variants above.": ""
+  },
   "Direction Source": {
     "Direction Source": "Richtungsquelle"
   },
@@ -2388,13 +2424,13 @@
     "Disable Output": "Ausgabe deaktivieren"
   },
   "Disable While Typing": {
-    "Disable While Typing": ""
+    "Disable While Typing": "Deaktivieren während des Tippens"
   },
   "Disable on External Mouse": {
-    "Disable on External Mouse": ""
+    "Disable on External Mouse": "Bei externer Maus deaktivieren"
   },
   "Disable touchpad when an external mouse is connected": {
-    "Disable touchpad when an external mouse is connected": ""
+    "Disable touchpad when an external mouse is connected": "Touchpad deaktivieren, wenn eine externe Maus angeschlossen ist"
   },
   "Disabled": {
     "Disabled": "Deaktiviert"
@@ -2556,7 +2592,7 @@
     "Door Open": "Klappe offen"
   },
   "Drag Lock": {
-    "Drag Lock": ""
+    "Drag Lock": "Zieh-Sperre"
   },
   "Drag a widget by its handle here to reorder it or drop it into another group": {
     "Drag a widget by its handle here to reorder it or drop it into another group": "Ziehen Sie ein Widget an seinem Griff hierher, um es neu zu ordnen, oder legen Sie es in einer anderen Gruppe ab"
@@ -2631,7 +2667,7 @@
     "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": "Dynamisch: Feder-Bezier mit Überschwingen – der Eintrag überschreitet kurz sein Ziel und pendelt sich dann ein. Ausdrucksstark und lebendig."
   },
   "Edge": {
-    "Edge": ""
+    "Edge": "Rand"
   },
   "Edge Hover Reveal": {
     "Edge Hover Reveal": "Kanten-Hover-Enthüllung"
@@ -2682,7 +2718,7 @@
     "Empty Trash (%1)": "Papierkorb leeren (%1)"
   },
   "Emulate middle click by pressing left and right buttons": {
-    "Emulate middle click by pressing left and right buttons": ""
+    "Emulate middle click by pressing left and right buttons": "Mittelklick durch gleichzeitiges Drücken der linken und rechten Taste emulieren"
   },
   "Enable 10-bit color depth for wider color gamut and HDR support": {
     "Enable 10-bit color depth for wider color gamut and HDR support": "10-Bit-Farbtiefe für einen breiteren Farbraum und HDR-Unterstützung aktivieren"
@@ -2701,6 +2737,9 @@
   },
   "Enable History": {
     "Enable History": "Verlauf aktivieren"
+  },
+  "Enable Num Lock": {
+    "Enable Num Lock": ""
   },
   "Enable Overview Overlay": {
     "Enable Overview Overlay": "Übersichts-Overlay aktivieren"
@@ -2811,7 +2850,7 @@
     "Enter password for ": "Passworteingabe für "
   },
   "Enter text to encode": {
-    "Enter text to encode": ""
+    "Enter text to encode": "Text zum Kodieren eingeben"
   },
   "Enter this passkey on ": {
     "Enter this passkey on ": "Geben Sie diesen Passkey ein auf "
@@ -3012,7 +3051,7 @@
     "Failed to fetch network QR code: %1": "Netzwerk-QR-Code konnte nicht abgerufen werden: %1"
   },
   "Failed to generate QR code: %1": {
-    "Failed to generate QR code: %1": ""
+    "Failed to generate QR code: %1": "Fehler beim Erzeugen des QR-Codes: %1"
   },
   "Failed to generate systemd override": {
     "Failed to generate systemd override": "Systemd-Override konnte nicht generiert werden"
@@ -3285,10 +3324,10 @@
     "Flags": "Flags"
   },
   "Flat": {
-    "Flat": ""
+    "Flat": "Flach"
   },
   "Flat uses constant speed; Adaptive scales with movement speed": {
-    "Flat uses constant speed; Adaptive scales with movement speed": ""
+    "Flat uses constant speed; Adaptive scales with movement speed": "„Flach“ verwendet eine konstante Geschwindigkeit; „Adaptiv“ skaliert mit der Bewegungsgeschwindigkeit"
   },
   "Flatpak": {
     "Flatpak": "Flatpak"
@@ -3322,6 +3361,12 @@
   },
   "Floating Position": {
     "Floating Position": "Schwebende Position"
+  },
+  "Floating Windows": {
+    "Floating Windows": ""
+  },
+  "Floating windows follow Surface Styling settings": {
+    "Floating windows follow Surface Styling settings": ""
   },
   "Fluent": {
     "Fluent": "Fließend"
@@ -3452,6 +3497,9 @@
   "Foreground Layers": {
     "Foreground Layers": "Vordergrundebenen"
   },
+  "Foreground Opacity": {
+    "Foreground Opacity": ""
+  },
   "Forever": {
     "Forever": "Dauerhaft"
   },
@@ -3578,8 +3626,8 @@
   "Generate Override": {
     "Generate Override": "Override generieren"
   },
-  "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.": {
-    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.": "Basis-GTK3/4- oder QT5/QT6-Konfigurationen (erfordert qt6ct-kde) erstellen, um DMS-Farben zu folgen. Nur einmal erforderlich.<br /><br />Es wird empfohlen, <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> vor der Anwendung von GTK-Themes zu konfigurieren."
+  "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
+    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
   },
   "Generic": {
     "Generic": "Generisch"
@@ -3595,6 +3643,9 @@
   },
   "Global fonts can be configured in Settings → Personalization": {
     "Global fonts can be configured in Settings → Personalization": "Globale Schriftarten können unter Einstellungen → Personalisierung konfiguriert werden"
+  },
+  "Globally": {
+    "Globally": ""
   },
   "Globally scale all animation durations": {
     "Globally scale all animation durations": "Alle Animationsdauern global skalieren"
@@ -3893,6 +3944,9 @@
   "Hover Popouts": {
     "Hover Popouts": "Hover-Popouts"
   },
+  "How layout changes are remembered across apps": {
+    "How layout changes are remembered across apps": ""
+  },
   "How often the server polls for new updates.": {
     "How often the server polls for new updates.": "Wie oft der Server nach neuen Updates sucht."
   },
@@ -3990,7 +4044,7 @@
     "If the field is hidden, it will appear as soon as a key is pressed.": "Wenn das Feld ausgeblendet ist, erscheint es, sobald eine Taste gedrückt wird."
   },
   "Ignore App-Requested Timeout": {
-    "Ignore App-Requested Timeout": ""
+    "Ignore App-Requested Timeout": "App-angeforderten Timeout ignorieren"
   },
   "Ignore Completely": {
     "Ignore Completely": "Vollständig ignorieren"
@@ -4230,7 +4284,7 @@
     "Keep My Edits": "Meine Änderungen behalten"
   },
   "Keep dragging when finger is briefly lifted": {
-    "Keep dragging when finger is briefly lifted": ""
+    "Keep dragging when finger is briefly lifted": "Ziehen fortsetzen, wenn der Finger kurz angehoben wird"
   },
   "Keep in Bar": {
     "Keep in Bar": "In der Leiste behalten"
@@ -4250,6 +4304,9 @@
   "Key": {
     "Key": "Taste"
   },
+  "Key combination": {
+    "Key combination": ""
+  },
   "Keybind Sources": {
     "Keybind Sources": "Tastenkombinationsquellen"
   },
@@ -4262,11 +4319,32 @@
   "Keybinds shown alongside regular search results": {
     "Keybinds shown alongside regular search results": "Tastenkombinationen werden neben regulären Suchergebnissen angezeigt"
   },
+  "Keyboard": {
+    "Keyboard": ""
+  },
+  "Keyboard Behavior": {
+    "Keyboard Behavior": ""
+  },
   "Keyboard Layout Name": {
     "Keyboard Layout Name": "Tastatur Layout Name"
   },
+  "Keyboard Layouts": {
+    "Keyboard Layouts": ""
+  },
+  "Keyboard Model": {
+    "Keyboard Model": ""
+  },
   "Keyboard Shortcuts": {
     "Keyboard Shortcuts": "Tastenkombinationen"
+  },
+  "Keyboard Variant": {
+    "Keyboard Variant": ""
+  },
+  "Keyboard shortcut to start security key unlock": {
+    "Keyboard shortcut to start security key unlock": ""
+  },
+  "Keymap File Path": {
+    "Keymap File Path": ""
   },
   "Keys": {
     "Keys": "Tasten"
@@ -4368,7 +4446,7 @@
     "Left Section": "Linke Sektion"
   },
   "Left-Handed Mode": {
-    "Left-Handed Mode": ""
+    "Left-Handed Mode": "Linkshänder-Modus"
   },
   "Light": {
     "Light": "Leicht"
@@ -4510,6 +4588,9 @@
   },
   "MAC": {
     "MAC": "MAC"
+  },
+  "MIT License": {
+    "MIT License": ""
   },
   "MTU": {
     "MTU": "MTU"
@@ -4782,7 +4863,7 @@
     "Microphone volume control": "Mikrofonlautstärkeregelung"
   },
   "Middle Click Emulation": {
-    "Middle Click Emulation": ""
+    "Middle Click Emulation": "Mittelklick-Emulation"
   },
   "Middle Section": {
     "Middle Section": "Mittlere Sektion"
@@ -4860,10 +4941,10 @@
     "Mount Points": "Einhängepunkte"
   },
   "Mouse & Touchpad": {
-    "Mouse & Touchpad": ""
+    "Mouse & Touchpad": "Maus & Touchpad"
   },
   "Mouse Settings": {
-    "Mouse Settings": ""
+    "Mouse Settings": "Mauseinstellungen"
   },
   "Mouse clicks pass through the bar to windows behind it": {
     "Mouse clicks pass through the bar to windows behind it": "Mausklicks gehen durch die Leiste an die dahinter liegenden Fenster durch"
@@ -4929,7 +5010,7 @@
     "Native: platform renderer (FreeType).": "Nativ: Plattform-Renderer (FreeType)."
   },
   "Natural Scrolling": {
-    "Natural Scrolling": ""
+    "Natural Scrolling": "Natürliches Scrollen"
   },
   "Natural Touchpad Scrolling": {
     "Natural Touchpad Scrolling": "Natürliches Scrollen (Touchpad)"
@@ -5079,7 +5160,7 @@
     "No Rounding": "Keine Abrundung"
   },
   "No Scroll": {
-    "No Scroll": ""
+    "No Scroll": "Kein Scrollen"
   },
   "No Shadow": {
     "No Shadow": "Kein Schatten"
@@ -5478,7 +5559,7 @@
     "On": "Ein"
   },
   "On Button Down": {
-    "On Button Down": ""
+    "On Button Down": "Bei gedrückter Taste"
   },
   "On indefinitely": {
     "On indefinitely": "Dauerhaft an"
@@ -5499,7 +5580,7 @@
     "Only adjust gamma based on time or location rules.": "Nur die Gamma-Einstellung basierend auf Zeit- oder Ortsregeln anpassen."
   },
   "Only continue if you recognize this server certificate fingerprint.": {
-    "Only continue if you recognize this server certificate fingerprint.": ""
+    "Only continue if you recognize this server certificate fingerprint.": "Fahren Sie nur fort, wenn Sie diesen Fingerabdruck des Serverzertifikats erkennen."
   },
   "Only on Battery": {
     "Only on Battery": "Nur im Akkubetrieb"
@@ -5513,6 +5594,15 @@
   "Opacity": {
     "Opacity": "Deckkraft"
   },
+  "Opacity of cards and nested surfaces inside floating windows": {
+    "Opacity of cards and nested surfaces inside floating windows": ""
+  },
+  "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts": {
+    "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts": ""
+  },
+  "Opacity of foreground cards and nested surfaces on shell panels": {
+    "Opacity of foreground cards and nested surfaces on shell panels": ""
+  },
   "Opaque": {
     "Opaque": "Deckend"
   },
@@ -5521,6 +5611,9 @@
   },
   "Open App": {
     "Open App": "App öffnen"
+  },
+  "Open DMS windows floating instead of tiled": {
+    "Open DMS windows floating instead of tiled": ""
   },
   "Open Delay": {
     "Open Delay": "Öffnungsverzögerung"
@@ -5542,6 +5635,9 @@
   },
   "Open Trash With": {
     "Open Trash With": "Papierkorb öffnen mit"
+  },
+  "Open Windows Floating": {
+    "Open Windows Floating": ""
   },
   "Open a new note": {
     "Open a new note": "Öffne eine neue Notiz"
@@ -5663,6 +5759,9 @@
   "Override Corner Radius": {
     "Override Corner Radius": "Überschreibe Abrundungsradius"
   },
+  "Override floating window transparency for Notepad": {
+    "Override floating window transparency for Notepad": ""
+  },
   "Override global layout settings for this output": {
     "Override global layout settings for this output": "Überschreibe globale Layouteinstellungen für diesen Monitor"
   },
@@ -5739,7 +5838,7 @@
     "Pairing...": "Koppeln..."
   },
   "Partial": {
-    "Partial": ""
+    "Partial": "Teilweise"
   },
   "Partly Cloudy": {
     "Partly Cloudy": "Teilweise bewölkt"
@@ -5794,6 +5893,9 @@
   },
   "Pending Discharge": {
     "Pending Discharge": "Entladung steht aus"
+  },
+  "Per Window": {
+    "Per Window": ""
   },
   "Per-Mode Wallpapers": {
     "Per-Mode Wallpapers": "Pro-Modus Hintergründe"
@@ -5946,7 +6048,7 @@
     "Pointer": "Zeiger"
   },
   "Pointer Speed": {
-    "Pointer Speed": ""
+    "Pointer Speed": "Zeigergeschwindigkeit"
   },
   "Polkit integration is disabled. User management requires Polkit to elevate privileges.": {
     "Polkit integration is disabled. User management requires Polkit to elevate privileges.": "Polkit-Integration ist deaktiviert. Die Benutzerverwaltung erfordert Polkit zur Rechteausweitung."
@@ -6056,6 +6158,9 @@
   "Press Ctrl+N or click 'New Session' to create one": {
     "Press Ctrl+N or click 'New Session' to create one": "Drücken Sie Strg+N oder klicken Sie auf 'Neue Sitzung', um eine zu erstellen"
   },
+  "Press Ctrl+key to set. Esc cancels.": {
+    "Press Ctrl+key to set. Esc cancels.": ""
+  },
   "Press Enter and the audio system will restart to apply the change": {
     "Press Enter and the audio system will restart to apply the change": "Drücken Sie die Eingabetaste, um das Audiosystem neu zu starten und die Änderungen zu übernehmen"
   },
@@ -6069,7 +6174,7 @@
     "Pressure": "Druck"
   },
   "Prevent accidental cursor jumps while typing": {
-    "Prevent accidental cursor jumps while typing": ""
+    "Prevent accidental cursor jumps while typing": "Versehentliche Cursor-Sprünge beim Tippen verhindern"
   },
   "Prevent screen timeout": {
     "Prevent screen timeout": "Bildschirm-Timeout verhindern"
@@ -6189,7 +6294,7 @@
     "Protocol": "Protokoll"
   },
   "QR Generator": {
-    "QR Generator": ""
+    "QR Generator": "QR-Generator"
   },
   "Qt": {
     "Qt": "Qt"
@@ -6242,6 +6347,9 @@
   "Random": {
     "Random": "Zufällig"
   },
+  "Random Order": {
+    "Random Order": ""
+  },
   "Rate": {
     "Rate": "Übertragungsrate"
   },
@@ -6293,6 +6401,9 @@
   "Regex": {
     "Regex": "Regex"
   },
+  "Registries": {
+    "Registries": ""
+  },
   "Regular": {
     "Regular": "Normal"
   },
@@ -6328,6 +6439,9 @@
   },
   "Remember Last Query": {
     "Remember Last Query": "Letzte Suchanfrage merken"
+  },
+  "Remember Layout": {
+    "Remember Layout": ""
   },
   "Remember Type Filter": {
     "Remember Type Filter": "Typfilter merken"
@@ -6401,6 +6515,12 @@
   "Repeat": {
     "Repeat": "Wiederholen"
   },
+  "Repeat Delay": {
+    "Repeat Delay": ""
+  },
+  "Repeat Rate": {
+    "Repeat Rate": ""
+  },
   "Replacement": {
     "Replacement": "Ersetzung"
   },
@@ -6444,7 +6564,7 @@
     "Requires remembering the last user and session. Enable those options first.": "Erfordert das Speichern des letzten Benutzers und der letzten Sitzung. Aktivieren Sie zuerst diese Optionen."
   },
   "Requires the DMS Theme extension from the editor marketplace": {
-    "Requires the DMS Theme extension from the editor marketplace": ""
+    "Requires the DMS Theme extension from the editor marketplace": "Erfordert die DMS-Theme-Erweiterung aus dem Editor-Marketplace"
   },
   "Reset": {
     "Reset": "Zurücksetzen"
@@ -6482,6 +6602,9 @@
   "Restart the DankMaterialShell": {
     "Restart the DankMaterialShell": "DankMaterialShell neustarten"
   },
+  "Restart userspace without rebooting the kernel, requires systemd": {
+    "Restart userspace without rebooting the kernel, requires systemd": ""
+  },
   "Restarting audio system...": {
     "Restarting audio system...": "Audiosystem wird neu gestartet..."
   },
@@ -6501,10 +6624,10 @@
     "Reverse Scrolling Direction": "Scrollrichtung umkehren"
   },
   "Reverse mouse wheel scrolling direction": {
-    "Reverse mouse wheel scrolling direction": ""
+    "Reverse mouse wheel scrolling direction": "Scrollrichtung des Mausrads umkehren"
   },
   "Reverse two-finger scrolling direction": {
-    "Reverse two-finger scrolling direction": ""
+    "Reverse two-finger scrolling direction": "Zwei-Finger-Scrollrichtung umkehren"
   },
   "Reverse workspace switch direction when scrolling over the bar": {
     "Reverse workspace switch direction when scrolling over the bar": "Arbeitsbereich-Wechselrichtung beim Scrollen über die Leiste umkehren"
@@ -6714,7 +6837,7 @@
     "Scroll GitHub": "GitHub scrollen"
   },
   "Scroll Method": {
-    "Scroll Method": ""
+    "Scroll Method": "Scroll-Methode"
   },
   "Scroll Wheel": {
     "Scroll Wheel": "Mausrad"
@@ -6732,7 +6855,7 @@
     "Scrolling": "Scrollen"
   },
   "Scrolling Speed": {
-    "Scrolling Speed": ""
+    "Scrolling Speed": "Scroll-Geschwindigkeit"
   },
   "Search App Actions": {
     "Search App Actions": "App-Aktionen suchen"
@@ -6797,8 +6920,17 @@
   "Security Key PAM Source": {
     "Security Key PAM Source": "Sicherheitsschlüssel PAM-Quelle"
   },
+  "Security key": {
+    "Security key": ""
+  },
+  "Security key (%1)": {
+    "Security key (%1)": ""
+  },
   "Security key mode": {
     "Security key mode": "Sicherheitsschlüssel-Modus"
+  },
+  "Security key shortcut": {
+    "Security key shortcut": ""
   },
   "Security-key availability could not be confirmed": {
     "Security-key availability could not be confirmed": "Verfügbarkeit des Sicherheitsschlüssels konnte nicht bestätigt werden"
@@ -6844,6 +6976,9 @@
   },
   "Select a desktop application": {
     "Select a desktop application": "Wählen Sie eine Desktop-Anwendung aus"
+  },
+  "Select a random wallpaper instead of cycling in alphabetical order": {
+    "Select a random wallpaper instead of cycling in alphabetical order": ""
   },
   "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": {
     "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": "Wählen Sie ein Widget aus, das Sie Ihrem Desktop hinzufügen möchten. Jedes Widget ist eine separate Instanz mit eigenen Einstellungen."
@@ -7065,7 +7200,7 @@
     "Show": "Anzeigen"
   },
   "Show \"config reloaded\" Toast": {
-    "Show \"config reloaded\" Toast": ""
+    "Show \"config reloaded\" Toast": "Toast „Konfiguration neu geladen“ anzeigen"
   },
   "Show 3rd Party": {
     "Show 3rd Party": "Drittanbieter anzeigen"
@@ -7214,6 +7349,9 @@
   "Show Seconds": {
     "Show Seconds": "Zeige Sekunden"
   },
+  "Show Soft Reboot": {
+    "Show Soft Reboot": ""
+  },
   "Show Sunrise/Sunset": {
     "Show Sunrise/Sunset": "Sonnenaufgang/-untergang anzeigen"
   },
@@ -7263,7 +7401,7 @@
     "Show a notification when battery reaches the charge limit.": "Benachrichtigung anzeigen, wenn der Akku das Ladelimit erreicht."
   },
   "Show a toast when the compositor config is reloaded": {
-    "Show a toast when the compositor config is reloaded": ""
+    "Show a toast when the compositor config is reloaded": "Einen Toast anzeigen, wenn die Compositor-Konfiguration neu geladen wird"
   },
   "Show a warning popup when battery is running low.": {
     "Show a warning popup when battery is running low.": "Warn-Popup anzeigen, wenn der Akku fast leer ist."
@@ -7295,6 +7433,9 @@
   "Show during Niri overview": {
     "Show during Niri overview": "Während der Niri-Übersicht anzeigen"
   },
+  "Show foreground surfaces on cards inside floating windows": {
+    "Show foreground surfaces on cards inside floating windows": ""
+  },
   "Show foreground surfaces on notification cards": {
     "Show foreground surfaces on notification cards": "Vordergrundoberflächen auf Benachrichtigungskarten anzeigen"
   },
@@ -7306,6 +7447,9 @@
   },
   "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": {
     "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": "Launcher-Overlay anzeigen, wenn in der Niri-Übersicht getippt wird. Deaktivieren, um einen anderen Launcher zu verwenden."
+  },
+  "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.": {
+    "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.": ""
   },
   "Show mode tabs and keyboard hints at the bottom.": {
     "Show mode tabs and keyboard hints at the bottom.": "Modus-Tabs und Tastaturhinweise unten anzeigen."
@@ -7418,6 +7562,9 @@
   "Snow": {
     "Snow": "Schnee"
   },
+  "Soft Reboot": {
+    "Soft Reboot": ""
+  },
   "Some plugins require a newer version of DMS:": {
     "Some plugins require a newer version of DMS:": "Einige Plugins benötigen eine neuere DMS Version:"
   },
@@ -7438,6 +7585,9 @@
   },
   "Source: %1": {
     "Source: %1": "Quelle: %1"
+  },
+  "Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.": {
+    "Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.": ""
   },
   "Space between the bar and screen edges": {
     "Space between the bar and screen edges": "Abstand zwischen der Leiste und den Bildschirmrändern"
@@ -7553,6 +7703,9 @@
   "Sunset": {
     "Sunset": "Sonnenuntergang"
   },
+  "Super + Space": {
+    "Super + Space": ""
+  },
   "Suppress Duplicate Notifications": {
     "Suppress Duplicate Notifications": "Doppelte Benachrichtigungen unterdrücken"
   },
@@ -7586,6 +7739,9 @@
   "Surface Opacity": {
     "Surface Opacity": "Oberflächen-Deckkraft"
   },
+  "Surface Styling": {
+    "Surface Styling": ""
+  },
   "Surface Text": {
     "Surface Text": "Oberflächentext"
   },
@@ -7608,10 +7764,13 @@
     "Suspend then Hibernate": "Ruhezustand nach Standby"
   },
   "Swap primary and secondary mouse buttons": {
-    "Swap primary and secondary mouse buttons": ""
+    "Swap primary and secondary mouse buttons": "Primäre und sekundäre Maustaste vertauschen"
   },
   "Sway Website": {
     "Sway Website": "Sway-Website"
+  },
+  "Switch Layout Shortcut": {
+    "Switch Layout Shortcut": ""
   },
   "Switch between display configurations": {
     "Switch between display configurations": "Zwischen Anzeigekonfigurationen wechseln"
@@ -7657,6 +7816,9 @@
   },
   "Sync to apply": {
     "Sync to apply": "Synchronisieren zum Übernehmen"
+  },
+  "Sync with Global Settings": {
+    "Sync with Global Settings": ""
   },
   "Syncing...": {
     "Syncing...": "Synchronisierung läuft..."
@@ -7734,16 +7896,16 @@
     "Tailscale not available": "Tailscale nicht verfügbar"
   },
   "Tap and Drag": {
-    "Tap and Drag": ""
+    "Tap and Drag": "Tippen und Ziehen"
   },
   "Tap and drag on the touchpad to move items": {
-    "Tap and drag on the touchpad to move items": ""
+    "Tap and drag on the touchpad to move items": "Tippen und ziehen Sie auf dem Touchpad, um Elemente zu verschieben"
   },
   "Tap the touchpad surface to trigger left click clicks": {
-    "Tap the touchpad surface to trigger left click clicks": ""
+    "Tap the touchpad surface to trigger left click clicks": "Tippen Sie auf die Touchpad-Oberfläche, um Linksklicks auszulösen"
   },
   "Tap to Click": {
-    "Tap to Click": ""
+    "Tap to Click": "Tippen zum Klicken"
   },
   "Terminal": {
     "Terminal": "Terminal"
@@ -7821,7 +7983,7 @@
     "The rule applies to any window matching one of these.": "Die Regel gilt für jedes Fenster, das auf eines dieser Kriterien zutrifft."
   },
   "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": {
-    "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": ""
+    "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": "Das Serverzertifikat hat sich seit dem letzten Vertrauen geändert. Fahren Sie nur fort, wenn Sie den neuen Fingerabdruck erkennen."
   },
   "Theme & Colors": {
     "Theme & Colors": "Theme & Farben"
@@ -8052,10 +8214,10 @@
     "Touch your security key...": "Berühren Sie Ihren Sicherheitsschlüssel..."
   },
   "Touchpad Settings": {
-    "Touchpad Settings": ""
+    "Touchpad Settings": "Touchpad-Einstellungen"
   },
   "Touchpad Speed": {
-    "Touchpad Speed": ""
+    "Touchpad Speed": "Touchpad-Geschwindigkeit"
   },
   "Transform": {
     "Transform": "Transformiere"
@@ -8118,7 +8280,7 @@
     "Turn off now": "Jetzt ausschalten"
   },
   "Two Finger": {
-    "Two Finger": ""
+    "Two Finger": "Zwei Finger"
   },
   "Type at least 2 characters": {
     "Type at least 2 characters": "Geben Sie mindestens 2 Zeichen ein"
@@ -8262,7 +8424,7 @@
     "Untrust": "Misstrauen"
   },
   "Untrusted VPN certificate": {
-    "Untrusted VPN certificate": ""
+    "Untrusted VPN certificate": "Nicht vertrauenswürdiges VPN-Zertifikat"
   },
   "Up to date": {
     "Up to date": "Auf dem neuesten Stand"
@@ -8765,6 +8927,9 @@
   "Window Height": {
     "Window Height": "Fensterhöhe"
   },
+  "Window Opacity": {
+    "Window Opacity": ""
+  },
   "Window Opening": {
     "Window Opening": "Fensteröffnung"
   },
@@ -8809,6 +8974,9 @@
   },
   "X-Ray": {
     "X-Ray": "X-Ray"
+  },
+  "XKB Options": {
+    "XKB Options": ""
   },
   "XWayland": {
     "XWayland": "XWayland"
@@ -8868,7 +9036,7 @@
     "attached": "verbunden"
   },
   "below AA": {
-    "below AA": ""
+    "below AA": "unter AA"
   },
   "brandon": {
     "brandon": "brandon"
@@ -8914,9 +9082,6 @@
   },
   "display rotation option": {
     "Normal": "Normal"
-  },
-  "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": {
-    "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": "dms ist eine hochgradig anpassbare, moderne Desktop-Shell mit einem <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">Material 3 inspirierten</a> Design.<br /><br/>Sie wurde mit <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a> entwickelt, einem QT6-Framework zum Erstellen von Desktop-Shells, und <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, einer statisch typisierten, kompilierten Programmiersprache."
   },
   "e.g. /usr/bin/my-script --flag": {
     "e.g. /usr/bin/my-script --flag": "z. B. /usr/bin/my-script --flag"

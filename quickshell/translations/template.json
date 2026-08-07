@@ -714,13 +714,6 @@
     "comment": ""
   },
   {
-    "term": "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>",
-    "translation": "",
-    "context": "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "A modern desktop shell for Wayland compositors",
     "translation": "",
     "context": "A modern desktop shell for Wayland compositors",
@@ -1211,6 +1204,13 @@
     "comment": ""
   },
   {
+    "term": "Advanced comma-separated libxkbcommon options.",
+    "translation": "",
+    "context": "Advanced comma-separated libxkbcommon options.",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Afternoon",
     "translation": "",
     "context": "Afternoon",
@@ -1305,6 +1305,13 @@
     "term": "Also group repeated application icons on the active workspace",
     "translation": "",
     "context": "Also group repeated application icons on the active workspace",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Alt + Shift",
+    "translation": "",
+    "context": "Alt + Shift",
     "reference": "",
     "comment": ""
   },
@@ -1545,6 +1552,13 @@
     "context": "Appearance",
     "reference": "",
     "comment": "launcher appearance settings"
+  },
+  {
+    "term": "Apple Music animated covers",
+    "translation": "",
+    "context": "Apple Music animated covers",
+    "reference": "",
+    "comment": ""
   },
   {
     "term": "Application",
@@ -2121,13 +2135,6 @@
     "comment": ""
   },
   {
-    "term": "Automatic Color Mode",
-    "translation": "",
-    "context": "Automatic Color Mode",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Automatic Control",
     "translation": "",
     "context": "Automatic Control",
@@ -2208,6 +2215,13 @@
     "term": "Automatically save changes to opened files as you type",
     "translation": "",
     "context": "Automatically save changes to opened files as you type",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Automatically turn on Num Lock at startup",
+    "translation": "",
+    "context": "Automatically turn on Num Lock at startup",
     "reference": "",
     "comment": ""
   },
@@ -3178,6 +3192,13 @@
     "comment": ""
   },
   {
+    "term": "Characters per second while holding down key",
+    "translation": "",
+    "context": "Characters per second while holding down key",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Charge Level",
     "translation": "",
     "context": "Charge Level",
@@ -3300,6 +3321,13 @@
     "term": "Choose a power profile",
     "translation": "",
     "context": "Choose a power profile",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Choose a shortcut key to cycle between keyboard layouts",
+    "translation": "",
+    "context": "Choose a shortcut key to cycle between keyboard layouts",
     "reference": "",
     "comment": ""
   },
@@ -3850,6 +3878,13 @@
     "comment": ""
   },
   {
+    "term": "Comma-separated list of layout names. Leave empty to use the system keyboard settings.",
+    "translation": "",
+    "context": "Comma-separated list of layout names. Leave empty to use the system keyboard settings.",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).",
     "translation": "",
     "context": "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).",
@@ -4281,7 +4316,7 @@
     "translation": "",
     "context": "Controls opacity of shell surfaces, popouts, and modals",
     "reference": "",
-    "comment": ""
+    "comment": "Surface Opacity setting description"
   },
   {
     "term": "Controls outlines around foreground cards, pills, and notification cards",
@@ -4578,6 +4613,20 @@
     "comment": ""
   },
   {
+    "term": "Ctrl + Shift",
+    "translation": "",
+    "context": "Ctrl + Shift",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Ctrl+%1 is used for password editing",
+    "translation": "",
+    "context": "Ctrl+%1 is used for password editing",
+    "reference": "",
+    "comment": "lock screen security key shortcut reserved key warning"
+  },
+  {
     "term": "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close",
     "translation": "",
     "context": "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close",
@@ -4737,6 +4786,13 @@
     "context": "Custom",
     "reference": "",
     "comment": "shadow color option | surface border color | theme category option | widget background color option | workspace color option"
+  },
+  {
+    "term": "Custom / None",
+    "translation": "",
+    "context": "Custom / None",
+    "reference": "",
+    "comment": ""
   },
   {
     "term": "Custom Blend",
@@ -4954,6 +5010,13 @@
     "context": "DMS Shortcuts",
     "reference": "",
     "comment": "greeter keybinds section header"
+  },
+  {
+    "term": "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.",
+    "translation": "",
+    "context": "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.",
+    "reference": "",
+    "comment": ""
   },
   {
     "term": "DMS out of date",
@@ -5292,6 +5355,13 @@
     "comment": ""
   },
   {
+    "term": "Delay before characters start repeating",
+    "translation": "",
+    "context": "Delay before characters start repeating",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Delete",
     "translation": "",
     "context": "Delete",
@@ -5533,6 +5603,13 @@
     "term": "Digital",
     "translation": "",
     "context": "Digital",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Direct path to a .xkb keymap file. Overrides layouts/variants above.",
+    "translation": "",
+    "context": "Direct path to a .xkb keymap file. Overrides layouts/variants above.",
     "reference": "",
     "comment": ""
   },
@@ -6326,6 +6403,13 @@
     "context": "Enable History",
     "reference": "",
     "comment": "notification history toggle label"
+  },
+  {
+    "term": "Enable Num Lock",
+    "translation": "",
+    "context": "Enable Num Lock",
+    "reference": "",
+    "comment": ""
   },
   {
     "term": "Enable Overview Overlay",
@@ -7728,6 +7812,20 @@
     "comment": ""
   },
   {
+    "term": "Floating Windows",
+    "translation": "",
+    "context": "Floating Windows",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Floating windows follow Surface Styling settings",
+    "translation": "",
+    "context": "Floating windows follow Surface Styling settings",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Fluent",
     "translation": "",
     "context": "Fluent",
@@ -8029,6 +8127,13 @@
     "comment": ""
   },
   {
+    "term": "Foreground Opacity",
+    "translation": "",
+    "context": "Foreground Opacity",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Forever",
     "translation": "",
     "context": "Forever",
@@ -8323,9 +8428,9 @@
     "comment": ""
   },
   {
-    "term": "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.",
+    "term": "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.",
     "translation": "",
-    "context": "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.",
+    "context": "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.",
     "reference": "",
     "comment": ""
   },
@@ -8361,6 +8466,13 @@
     "term": "Global fonts can be configured in Settings → Personalization",
     "translation": "",
     "context": "Global fonts can be configured in Settings → Personalization",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Globally",
+    "translation": "",
+    "context": "Globally",
     "reference": "",
     "comment": ""
   },
@@ -9075,6 +9187,13 @@
     "term": "Hover Popouts",
     "translation": "",
     "context": "Hover Popouts",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "How layout changes are remembered across apps",
+    "translation": "",
+    "context": "How layout changes are remembered across apps",
     "reference": "",
     "comment": ""
   },
@@ -9905,6 +10024,13 @@
     "comment": ""
   },
   {
+    "term": "Key combination",
+    "translation": "",
+    "context": "Key combination",
+    "reference": "",
+    "comment": "lock screen security key shortcut key combination setting"
+  },
+  {
     "term": "Keybind Sources",
     "translation": "",
     "context": "Keybind Sources",
@@ -9933,6 +10059,20 @@
     "comment": ""
   },
   {
+    "term": "Keyboard",
+    "translation": "",
+    "context": "Keyboard",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Keyboard Behavior",
+    "translation": "",
+    "context": "Keyboard Behavior",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Keyboard Layout Name",
     "translation": "",
     "context": "Keyboard Layout Name",
@@ -9940,9 +10080,44 @@
     "comment": ""
   },
   {
+    "term": "Keyboard Layouts",
+    "translation": "",
+    "context": "Keyboard Layouts",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Keyboard Model",
+    "translation": "",
+    "context": "Keyboard Model",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Keyboard Shortcuts",
     "translation": "",
     "context": "Keyboard Shortcuts",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Keyboard Variant",
+    "translation": "",
+    "context": "Keyboard Variant",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Keyboard shortcut to start security key unlock",
+    "translation": "",
+    "context": "Keyboard shortcut to start security key unlock",
+    "reference": "",
+    "comment": "lock screen security key shortcut setting"
+  },
+  {
+    "term": "Keymap File Path",
+    "translation": "",
+    "context": "Keymap File Path",
     "reference": "",
     "comment": ""
   },
@@ -10517,6 +10692,13 @@
     "term": "MAC",
     "translation": "",
     "context": "MAC",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "MIT License",
+    "translation": "",
+    "context": "MIT License",
     "reference": "",
     "comment": ""
   },
@@ -12866,6 +13048,27 @@
     "comment": ""
   },
   {
+    "term": "Opacity of cards and nested surfaces inside floating windows",
+    "translation": "",
+    "context": "Opacity of cards and nested surfaces inside floating windows",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts",
+    "translation": "",
+    "context": "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Opacity of foreground cards and nested surfaces on shell panels",
+    "translation": "",
+    "context": "Opacity of foreground cards and nested surfaces on shell panels",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Opaque",
     "translation": "",
     "context": "Opaque",
@@ -12892,6 +13095,13 @@
     "context": "Open App",
     "reference": "",
     "comment": "KDE Connect open SMS app button"
+  },
+  {
+    "term": "Open DMS windows floating instead of tiled",
+    "translation": "",
+    "context": "Open DMS windows floating instead of tiled",
+    "reference": "",
+    "comment": ""
   },
   {
     "term": "Open Delay",
@@ -12939,6 +13149,13 @@
     "term": "Open Trash With",
     "translation": "",
     "context": "Open Trash With",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Open Windows Floating",
+    "translation": "",
+    "context": "Open Windows Floating",
     "reference": "",
     "comment": ""
   },
@@ -13223,16 +13440,16 @@
     "comment": ""
   },
   {
-    "term": "Override global layout settings for this output",
+    "term": "Override floating window transparency for Notepad",
     "translation": "",
-    "context": "Override global layout settings for this output",
+    "context": "Override floating window transparency for Notepad",
     "reference": "",
     "comment": ""
   },
   {
-    "term": "Override global transparency for Notepad",
+    "term": "Override global layout settings for this output",
     "translation": "",
-    "context": "Override global transparency for Notepad",
+    "context": "Override global layout settings for this output",
     "reference": "",
     "comment": ""
   },
@@ -13529,6 +13746,13 @@
     "context": "Pending Discharge",
     "reference": "",
     "comment": "battery status"
+  },
+  {
+    "term": "Per Window",
+    "translation": "",
+    "context": "Per Window",
+    "reference": "",
+    "comment": ""
   },
   {
     "term": "Per-Mode Wallpapers",
@@ -14147,6 +14371,13 @@
     "comment": ""
   },
   {
+    "term": "Press Ctrl+key to set. Esc cancels.",
+    "translation": "",
+    "context": "Press Ctrl+key to set. Esc cancels.",
+    "reference": "",
+    "comment": "lock screen security key shortcut key combination capture hint"
+  },
+  {
     "term": "Press Enter and the audio system will restart to apply the change",
     "translation": "",
     "context": "Press Enter and the audio system will restart to apply the change",
@@ -14165,7 +14396,7 @@
     "translation": "",
     "context": "Press key...",
     "reference": "",
-    "comment": ""
+    "comment": "lock screen security key shortcut key combination capture prompt"
   },
   {
     "term": "Pressure",
@@ -14588,6 +14819,13 @@
     "comment": "wallpaper transition option"
   },
   {
+    "term": "Random Order",
+    "translation": "",
+    "context": "Random Order",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Rate",
     "translation": "",
     "context": "Rate",
@@ -14714,6 +14952,13 @@
     "comment": "notification rule match type option"
   },
   {
+    "term": "Registries",
+    "translation": "",
+    "context": "Registries",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Regular",
     "translation": "",
     "context": "Regular",
@@ -14794,6 +15039,13 @@
     "term": "Remember Last Query",
     "translation": "",
     "context": "Remember Last Query",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Remember Layout",
+    "translation": "",
+    "context": "Remember Layout",
     "reference": "",
     "comment": ""
   },
@@ -14962,6 +15214,20 @@
     "term": "Repeat",
     "translation": "",
     "context": "Repeat",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Repeat Delay",
+    "translation": "",
+    "context": "Repeat Delay",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Repeat Rate",
+    "translation": "",
+    "context": "Repeat Rate",
     "reference": "",
     "comment": ""
   },
@@ -15151,6 +15417,13 @@
     "term": "Restart the DankMaterialShell",
     "translation": "",
     "context": "Restart the DankMaterialShell",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Restart userspace without rebooting the kernel, requires systemd",
+    "translation": "",
+    "context": "Restart userspace without rebooting the kernel, requires systemd",
     "reference": "",
     "comment": ""
   },
@@ -15904,11 +16177,32 @@
     "comment": "lock screen dedicated U2F PAM source setting"
   },
   {
+    "term": "Security key",
+    "translation": "",
+    "context": "Security key",
+    "reference": "",
+    "comment": "lock screen security key button tooltip"
+  },
+  {
+    "term": "Security key (%1)",
+    "translation": "",
+    "context": "Security key (%1)",
+    "reference": "",
+    "comment": "lock screen security key button tooltip with shortcut"
+  },
+  {
     "term": "Security key mode",
     "translation": "",
     "context": "Security key mode",
     "reference": "",
     "comment": "lock screen U2F security key mode setting"
+  },
+  {
+    "term": "Security key shortcut",
+    "translation": "",
+    "context": "Security key shortcut",
+    "reference": "",
+    "comment": "lock screen security key shortcut toggle"
   },
   {
     "term": "Security-key availability could not be confirmed",
@@ -16012,6 +16306,13 @@
     "term": "Select a desktop application",
     "translation": "",
     "context": "Select a desktop application",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Select a random wallpaper instead of cycling in alphabetical order",
+    "translation": "",
+    "context": "Select a random wallpaper instead of cycling in alphabetical order",
     "reference": "",
     "comment": ""
   },
@@ -16877,6 +17178,13 @@
     "comment": ""
   },
   {
+    "term": "Show Soft Reboot",
+    "translation": "",
+    "context": "Show Soft Reboot",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Show Sunrise/Sunset",
     "translation": "",
     "context": "Show Sunrise/Sunset",
@@ -17066,6 +17374,13 @@
     "comment": ""
   },
   {
+    "term": "Show foreground surfaces on cards inside floating windows",
+    "translation": "",
+    "context": "Show foreground surfaces on cards inside floating windows",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Show foreground surfaces on notification cards",
     "translation": "",
     "context": "Show foreground surfaces on notification cards",
@@ -17090,6 +17405,13 @@
     "term": "Show launcher overlay when typing in Niri overview. Disable to use another launcher.",
     "translation": "",
     "context": "Show launcher overlay when typing in Niri overview. Disable to use another launcher.",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.",
+    "translation": "",
+    "context": "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.",
     "reference": "",
     "comment": ""
   },
@@ -17360,6 +17682,13 @@
     "comment": ""
   },
   {
+    "term": "Soft Reboot",
+    "translation": "",
+    "context": "Soft Reboot",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Some plugins require a newer version of DMS:",
     "translation": "",
     "context": "Some plugins require a newer version of DMS:",
@@ -17412,6 +17741,13 @@
     "term": "Source: %1",
     "translation": "",
     "context": "Source: %1",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.",
+    "translation": "",
+    "context": "Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.",
     "reference": "",
     "comment": ""
   },
@@ -17689,6 +18025,13 @@
     "comment": ""
   },
   {
+    "term": "Super + Space",
+    "translation": "",
+    "context": "Super + Space",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Suppress Duplicate Notifications",
     "translation": "",
     "context": "Suppress Duplicate Notifications",
@@ -17766,6 +18109,13 @@
     "comment": ""
   },
   {
+    "term": "Surface Styling",
+    "translation": "",
+    "context": "Surface Styling",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Surface Text",
     "translation": "",
     "context": "Surface Text",
@@ -17832,6 +18182,13 @@
     "term": "Sway Website",
     "translation": "",
     "context": "Sway Website",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Switch Layout Shortcut",
+    "translation": "",
+    "context": "Switch Layout Shortcut",
     "reference": "",
     "comment": ""
   },
@@ -17937,6 +18294,13 @@
     "term": "Sync to apply",
     "translation": "",
     "context": "Sync to apply",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Sync with Global Settings",
+    "translation": "",
+    "context": "Sync with Global Settings",
     "reference": "",
     "comment": ""
   },
@@ -20503,6 +20867,13 @@
     "comment": ""
   },
   {
+    "term": "Window Opacity",
+    "translation": "",
+    "context": "Window Opacity",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Window Opening",
     "translation": "",
     "context": "Window Opening",
@@ -20611,6 +20982,13 @@
     "term": "X-Ray",
     "translation": "",
     "context": "X-Ray",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "XKB Options",
+    "translation": "",
+    "context": "XKB Options",
     "reference": "",
     "comment": ""
   },
@@ -20851,13 +21229,6 @@
     "context": "discuss",
     "reference": "",
     "comment": "plugin discussion link"
-  },
-  {
-    "term": "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.",
-    "translation": "",
-    "context": "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.",
-    "reference": "",
-    "comment": ""
   },
   {
     "term": "e.g. /usr/bin/my-script --flag",

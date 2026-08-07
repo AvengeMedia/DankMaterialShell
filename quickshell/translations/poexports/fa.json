@@ -111,7 +111,7 @@
     "%1m ago": "%1 دقیقه پیش"
   },
   "%command%": {
-    "%command%": ""
+    "%command%": "%command%"
   },
   "'Alternative' lets the key unlock on its own. 'Second factor' requires password or fingerprint first, then the key.": {
     "'Alternative' lets the key unlock on its own. 'Second factor' requires password or fingerprint first, then the key.": "«جایگزین» به کلید اجازه می‌دهد به تنهایی قفل را باز کند. «فاکتور دوم» ابتدا رمز عبور یا اثر انگشت و سپس کلید را نیاز دارد."
@@ -305,9 +305,6 @@
   "90°": {
     "90°": "۹۰°"
   },
-  "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>": {
-    "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">MIT License</a>": "<a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE\" style=\"text-decoration:none; color:%1;\">لایسنس MIT</a>"
-  },
   "A modern desktop shell for Wayland compositors": {
     "A modern desktop shell for Wayland compositors": "یک پوسته دسکتاپ مدرن برای کامپازیتورهای وِیلند"
   },
@@ -438,7 +435,7 @@
     "Add Desktop Widget": "افزودن ابزارک دسکتاپ"
   },
   "Add Entry": {
-    "Add Entry": ""
+    "Add Entry": "افزودن مدخل"
   },
   "Add Printer": {
     "Add Printer": "افزودن چاپگر"
@@ -450,7 +447,7 @@
     "Add Widget": "افزودن ابزارک"
   },
   "Add Widget to %1": {
-    "Add Widget to %1": ""
+    "Add Widget to %1": "افزودن ابزارک به %1"
   },
   "Add Window Rule": {
     "Add Window Rule": ""
@@ -521,6 +518,9 @@
   "Advanced": {
     "Advanced": "پیشرفته"
   },
+  "Advanced comma-separated libxkbcommon options.": {
+    "Advanced comma-separated libxkbcommon options.": ""
+  },
   "Afternoon": {
     "Afternoon": "بعد از ظهر"
   },
@@ -562,6 +562,9 @@
   },
   "Also group repeated application icons on the active workspace": {
     "Also group repeated application icons on the active workspace": ""
+  },
+  "Alt + Shift": {
+    "Alt + Shift": ""
   },
   "Alternative (OR)": {
     "Alternative (OR)": "جایگزین (OR)"
@@ -636,7 +639,7 @@
     "App Customizations": "سفارشی‌سازی برنامه"
   },
   "App ID": {
-    "App ID": ""
+    "App ID": "شناسه برنامه"
   },
   "App ID (e.g. firefox)": {
     "App ID (e.g. firefox)": ""
@@ -645,7 +648,7 @@
     "App ID Substitutions": "جایگزینی شناسه برنامه‌ها"
   },
   "App ID regex": {
-    "App ID regex": ""
+    "App ID regex": "رجکس شناسه برنامه"
   },
   "App ID regex (e.g. ^firefox$)": {
     "App ID regex (e.g. ^firefox$)": "رجکس شناسه برنامه (مانند ^firefox$)"
@@ -665,8 +668,11 @@
   "Appearance": {
     "Appearance": "نمای ظاهری"
   },
+  "Apple Music animated covers": {
+    "Apple Music animated covers": ""
+  },
   "Application": {
-    "Application": ""
+    "Application": "برنامه"
   },
   "Application Dock": {
     "Application Dock": "داک برنامه"
@@ -946,6 +952,9 @@
   },
   "Automatically save changes to opened files as you type": {
     "Automatically save changes to opened files as you type": ""
+  },
+  "Automatically turn on Num Lock at startup": {
+    "Automatically turn on Num Lock at startup": ""
   },
   "Automatically turn on Power Saver profile when battery is low.": {
     "Automatically turn on Power Saver profile when battery is low.": ""
@@ -1358,6 +1367,9 @@
   "Channel": {
     "Channel": "کانال"
   },
+  "Characters per second while holding down key": {
+    "Characters per second while holding down key": ""
+  },
   "Charge Level": {
     "Charge Level": ""
   },
@@ -1411,6 +1423,9 @@
   },
   "Choose a power profile": {
     "Choose a power profile": ""
+  },
+  "Choose a shortcut key to cycle between keyboard layouts": {
+    "Choose a shortcut key to cycle between keyboard layouts": ""
   },
   "Choose colors from palette": {
     "Choose colors from palette": "انتخاب رنگ‌ها از پالت رنگی"
@@ -1473,7 +1488,7 @@
     "Circle": "دایره"
   },
   "Class regex": {
-    "Class regex": ""
+    "Class regex": "رجکس کلاس"
   },
   "Class regex (e.g. ^firefox$)": {
     "Class regex (e.g. ^firefox$)": "رجکس کلاس (مانند ^firefox$)"
@@ -1648,6 +1663,9 @@
   },
   "Column Width": {
     "Column Width": "طول ستون"
+  },
+  "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": {
+    "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": ""
   },
   "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": {
     "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": "لیست نام نشست‌ها برای پنهان‌سازی، با کاما از هم جدا شده‌اند. برای عبارت باقاعده بین دو اسلش قرار دهید (مانند /^_.*/)."
@@ -1958,6 +1976,12 @@
   "Critical Threshold": {
     "Critical Threshold": ""
   },
+  "Ctrl + Shift": {
+    "Ctrl + Shift": ""
+  },
+  "Ctrl+%1 is used for password editing": {
+    "Ctrl+%1 is used for password editing": ""
+  },
   "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": {
     "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": ""
   },
@@ -2026,6 +2050,9 @@
   },
   "Custom": {
     "Custom": "سفارشی"
+  },
+  "Custom / None": {
+    "Custom / None": ""
   },
   "Custom Blend": {
     "Custom Blend": ""
@@ -2119,6 +2146,9 @@
   },
   "DMS Shortcuts": {
     "DMS Shortcuts": "میانبرهای DMS"
+  },
+  "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.": {
+    "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.": ""
   },
   "DMS out of date": {
     "DMS out of date": "DMS بروز نیست"
@@ -2264,6 +2294,9 @@
   "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": {
     "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": "Del: پاک‌کردن • Shift+Del: پاک‌کردن همه • 1-9: اقدامات • F10: راهنما • Esc: بستن"
   },
+  "Delay before characters start repeating": {
+    "Delay before characters start repeating": ""
+  },
   "Delete": {
     "Delete": "حذف"
   },
@@ -2316,7 +2349,7 @@
     "Description": "توضیحات"
   },
   "Desktop Application": {
-    "Desktop Application": ""
+    "Desktop Application": "برنامه دسکتاپ"
   },
   "Desktop Clock": {
     "Desktop Clock": "ساعت دسکتاپ"
@@ -2365,6 +2398,9 @@
   },
   "Digital": {
     "Digital": "دیجیتال"
+  },
+  "Direct path to a .xkb keymap file. Overrides layouts/variants above.": {
+    "Direct path to a .xkb keymap file. Overrides layouts/variants above.": ""
   },
   "Direction Source": {
     "Direction Source": "منبع جهت"
@@ -2493,7 +2529,7 @@
     "Display line numbers in editor": "نمایش شماره خطوط در ویرایشگر"
   },
   "Display name for this entry": {
-    "Display name for this entry": ""
+    "Display name for this entry": "نمایش نام برای این مدخل"
   },
   "Display only workspaces that contain windows": {
     "Display only workspaces that contain windows": "فقط محیط‌کارهایی که شامل پنجره هستند را نمایش بده"
@@ -2702,6 +2738,9 @@
   "Enable History": {
     "Enable History": "فعال‌کردن تاریخچه"
   },
+  "Enable Num Lock": {
+    "Enable Num Lock": ""
+  },
   "Enable Overview Overlay": {
     "Enable Overview Overlay": "فعال‌کردن overlay نمای کلی"
   },
@@ -2823,7 +2862,7 @@
     "Enterprise": "شرکت"
   },
   "Entry Type": {
-    "Entry Type": ""
+    "Entry Type": "نوع مدخل"
   },
   "Entry pinned": {
     "Entry pinned": "مدخل سنجاق شد"
@@ -3323,6 +3362,12 @@
   "Floating Position": {
     "Floating Position": ""
   },
+  "Floating Windows": {
+    "Floating Windows": ""
+  },
+  "Floating windows follow Surface Styling settings": {
+    "Floating windows follow Surface Styling settings": ""
+  },
   "Fluent": {
     "Fluent": "فلوئنت"
   },
@@ -3452,6 +3497,9 @@
   "Foreground Layers": {
     "Foreground Layers": "لایه‌های پیش‌زمینه"
   },
+  "Foreground Opacity": {
+    "Foreground Opacity": ""
+  },
   "Forever": {
     "Forever": "برای همیشه"
   },
@@ -3522,7 +3570,7 @@
     "Full Size": ""
   },
   "Full command to execute": {
-    "Full command to execute": ""
+    "Full command to execute": "دستور کامل برای اجرا"
   },
   "Full with Year": {
     "Full with Year": "کامل با سال"
@@ -3578,8 +3626,8 @@
   "Generate Override": {
     "Generate Override": ""
   },
-  "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.": {
-    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure <a href=\"https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming\" style=\"text-decoration:none; color:%1;\">adw-gtk3</a> prior to applying GTK themes.": ""
+  "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
+    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
   },
   "Generic": {
     "Generic": "عمومی"
@@ -3595,6 +3643,9 @@
   },
   "Global fonts can be configured in Settings → Personalization": {
     "Global fonts can be configured in Settings → Personalization": "قلم‌های سراسری می‌توانند در تنظیمات ← شخصی‌سازی، پیکربندی شوند"
+  },
+  "Globally": {
+    "Globally": ""
   },
   "Globally scale all animation durations": {
     "Globally scale all animation durations": "مدت تمام انیمیشن‌ها را سراسری مقیاس کن"
@@ -3892,6 +3943,9 @@
   },
   "Hover Popouts": {
     "Hover Popouts": ""
+  },
+  "How layout changes are remembered across apps": {
+    "How layout changes are remembered across apps": ""
   },
   "How often the server polls for new updates.": {
     "How often the server polls for new updates.": "چند وقت یکبار سرور درخواست به‌روزرسانی‌های جدید را کند."
@@ -4250,6 +4304,9 @@
   "Key": {
     "Key": "کلید"
   },
+  "Key combination": {
+    "Key combination": ""
+  },
   "Keybind Sources": {
     "Keybind Sources": "منابع نگاشت‌کلیدها"
   },
@@ -4262,11 +4319,32 @@
   "Keybinds shown alongside regular search results": {
     "Keybinds shown alongside regular search results": "نگاشت‌کلیدها همراه نتایج عادی جستجو نمایش داده می‌شوند"
   },
+  "Keyboard": {
+    "Keyboard": ""
+  },
+  "Keyboard Behavior": {
+    "Keyboard Behavior": ""
+  },
   "Keyboard Layout Name": {
     "Keyboard Layout Name": "نام چیدمان صفحه‌کلید"
   },
+  "Keyboard Layouts": {
+    "Keyboard Layouts": ""
+  },
+  "Keyboard Model": {
+    "Keyboard Model": ""
+  },
   "Keyboard Shortcuts": {
     "Keyboard Shortcuts": "میانبر‌های صفحه‌کلید"
+  },
+  "Keyboard Variant": {
+    "Keyboard Variant": ""
+  },
+  "Keyboard shortcut to start security key unlock": {
+    "Keyboard shortcut to start security key unlock": ""
+  },
+  "Keymap File Path": {
+    "Keymap File Path": ""
   },
   "Keys": {
     "Keys": "کلیدها"
@@ -4510,6 +4588,9 @@
   },
   "MAC": {
     "MAC": "MAC"
+  },
+  "MIT License": {
+    "MIT License": ""
   },
   "MTU": {
     "MTU": "MTU"
@@ -5115,7 +5196,7 @@
     "No app customizations.": "هیچ سفارشی‌سازی برنامه‌ای موجود نیست."
   },
   "No application selected": {
-    "No application selected": ""
+    "No application selected": "هیچ برنامه‌ای انتخاب نشده است"
   },
   "No apps found": {
     "No apps found": "هیچ برنامه‌ای یافت نشد"
@@ -5513,6 +5594,15 @@
   "Opacity": {
     "Opacity": "شفافیت"
   },
+  "Opacity of cards and nested surfaces inside floating windows": {
+    "Opacity of cards and nested surfaces inside floating windows": ""
+  },
+  "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts": {
+    "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts": ""
+  },
+  "Opacity of foreground cards and nested surfaces on shell panels": {
+    "Opacity of foreground cards and nested surfaces on shell panels": ""
+  },
   "Opaque": {
     "Opaque": "کدر"
   },
@@ -5521,6 +5611,9 @@
   },
   "Open App": {
     "Open App": "باز کردن برنامه"
+  },
+  "Open DMS windows floating instead of tiled": {
+    "Open DMS windows floating instead of tiled": ""
   },
   "Open Delay": {
     "Open Delay": ""
@@ -5542,6 +5635,9 @@
   },
   "Open Trash With": {
     "Open Trash With": "باز کردن زباله‌دان با"
+  },
+  "Open Windows Floating": {
+    "Open Windows Floating": ""
   },
   "Open a new note": {
     "Open a new note": "باز کردن یادداشت جدید"
@@ -5662,6 +5758,9 @@
   },
   "Override Corner Radius": {
     "Override Corner Radius": "جایگزینی شعاع گوشه‌ها"
+  },
+  "Override floating window transparency for Notepad": {
+    "Override floating window transparency for Notepad": ""
   },
   "Override global layout settings for this output": {
     "Override global layout settings for this output": "تنظیمات چیدمان سراسری را برای این خروجی جایگزین کن"
@@ -5794,6 +5893,9 @@
   },
   "Pending Discharge": {
     "Pending Discharge": "در انتظار تخلیه شارژ"
+  },
+  "Per Window": {
+    "Per Window": ""
   },
   "Per-Mode Wallpapers": {
     "Per-Mode Wallpapers": "تصاویر پس‌زمینه اختصاصی هر حالت"
@@ -6056,6 +6158,9 @@
   "Press Ctrl+N or click 'New Session' to create one": {
     "Press Ctrl+N or click 'New Session' to create one": ""
   },
+  "Press Ctrl+key to set. Esc cancels.": {
+    "Press Ctrl+key to set. Esc cancels.": ""
+  },
   "Press Enter and the audio system will restart to apply the change": {
     "Press Enter and the audio system will restart to apply the change": "دکمه Enter را فشار دهید و سیستم صوتی برای اعمال تغییرات راه‌اندازی مجدد خواهد شد"
   },
@@ -6242,6 +6347,9 @@
   "Random": {
     "Random": "تصادفی"
   },
+  "Random Order": {
+    "Random Order": ""
+  },
   "Rate": {
     "Rate": "نرخ انتقال"
   },
@@ -6293,6 +6401,9 @@
   "Regex": {
     "Regex": "رجکس"
   },
+  "Registries": {
+    "Registries": ""
+  },
   "Regular": {
     "Regular": "عادی"
   },
@@ -6328,6 +6439,9 @@
   },
   "Remember Last Query": {
     "Remember Last Query": "آخرین پرس‌و‌جو را به خاطر بسپار"
+  },
+  "Remember Layout": {
+    "Remember Layout": ""
   },
   "Remember Type Filter": {
     "Remember Type Filter": ""
@@ -6400,6 +6514,12 @@
   },
   "Repeat": {
     "Repeat": "تکرار"
+  },
+  "Repeat Delay": {
+    "Repeat Delay": ""
+  },
+  "Repeat Rate": {
+    "Repeat Rate": ""
   },
   "Replacement": {
     "Replacement": "جایگزین"
@@ -6481,6 +6601,9 @@
   },
   "Restart the DankMaterialShell": {
     "Restart the DankMaterialShell": "دَنک متریال شل را مجدد راه بینداز"
+  },
+  "Restart userspace without rebooting the kernel, requires systemd": {
+    "Restart userspace without rebooting the kernel, requires systemd": ""
   },
   "Restarting audio system...": {
     "Restarting audio system...": "راه‌اندازی مجدد سیستم صوتی..."
@@ -6797,8 +6920,17 @@
   "Security Key PAM Source": {
     "Security Key PAM Source": ""
   },
+  "Security key": {
+    "Security key": ""
+  },
+  "Security key (%1)": {
+    "Security key (%1)": ""
+  },
   "Security key mode": {
     "Security key mode": "حالت کلید امنیتی"
+  },
+  "Security key shortcut": {
+    "Security key shortcut": ""
   },
   "Security-key availability could not be confirmed": {
     "Security-key availability could not be confirmed": ""
@@ -6843,7 +6975,10 @@
     "Select a color from the palette or use custom sliders": "انتخاب رنگ از پالت رنگی یا اسلایدر‌های سفارشی"
   },
   "Select a desktop application": {
-    "Select a desktop application": ""
+    "Select a desktop application": "یک برنامه دسکتاپ انتخاب کنید"
+  },
+  "Select a random wallpaper instead of cycling in alphabetical order": {
+    "Select a random wallpaper instead of cycling in alphabetical order": ""
   },
   "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": {
     "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": "یک ابزارک برای افزودن به دسکتاپ خود انتخاب کنید. هر ابزارک یک نمونه جداگانه با تنظیمات خاص خود است."
@@ -7214,6 +7349,9 @@
   "Show Seconds": {
     "Show Seconds": "نمایش ثانیه‌ها"
   },
+  "Show Soft Reboot": {
+    "Show Soft Reboot": ""
+  },
   "Show Sunrise/Sunset": {
     "Show Sunrise/Sunset": "نمایش طلوع/غروب"
   },
@@ -7295,6 +7433,9 @@
   "Show during Niri overview": {
     "Show during Niri overview": "هنگام نمای کلی نیری نمایش بده"
   },
+  "Show foreground surfaces on cards inside floating windows": {
+    "Show foreground surfaces on cards inside floating windows": ""
+  },
   "Show foreground surfaces on notification cards": {
     "Show foreground surfaces on notification cards": ""
   },
@@ -7306,6 +7447,9 @@
   },
   "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": {
     "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": "لایه overlay لانچر را هنگام تایپ در نمای کلی نیری نمایش بده. برای استفاده از لانچر دیگری غیرفعال کنید."
+  },
+  "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.": {
+    "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.": ""
   },
   "Show mode tabs and keyboard hints at the bottom.": {
     "Show mode tabs and keyboard hints at the bottom.": "حالت تب‌ها و راهنمایی‌های صفحه‌کلید را در پایین نمایش بده."
@@ -7418,6 +7562,9 @@
   "Snow": {
     "Snow": "برف"
   },
+  "Soft Reboot": {
+    "Soft Reboot": ""
+  },
   "Some plugins require a newer version of DMS:": {
     "Some plugins require a newer version of DMS:": "برخی افزونه‌ها نیازمند نسخه جدیدتر DMS هستند:"
   },
@@ -7438,6 +7585,9 @@
   },
   "Source: %1": {
     "Source: %1": ""
+  },
+  "Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.": {
+    "Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.": ""
   },
   "Space between the bar and screen edges": {
     "Space between the bar and screen edges": "فاصله بین نوار و لبه‌های صفحه"
@@ -7553,6 +7703,9 @@
   "Sunset": {
     "Sunset": "غروب"
   },
+  "Super + Space": {
+    "Super + Space": ""
+  },
   "Suppress Duplicate Notifications": {
     "Suppress Duplicate Notifications": "سرکوب اعلان‌های تکراری"
   },
@@ -7586,6 +7739,9 @@
   "Surface Opacity": {
     "Surface Opacity": "شفافیت سطح"
   },
+  "Surface Styling": {
+    "Surface Styling": ""
+  },
   "Surface Text": {
     "Surface Text": ""
   },
@@ -7612,6 +7768,9 @@
   },
   "Sway Website": {
     "Sway Website": "وبسایت Sway"
+  },
+  "Switch Layout Shortcut": {
+    "Switch Layout Shortcut": ""
   },
   "Switch between display configurations": {
     "Switch between display configurations": "تعویض بین پیکربندی نمایشگر‌ها"
@@ -7657,6 +7816,9 @@
   },
   "Sync to apply": {
     "Sync to apply": ""
+  },
+  "Sync with Global Settings": {
+    "Sync with Global Settings": ""
   },
   "Syncing...": {
     "Syncing...": ""
@@ -8765,6 +8927,9 @@
   "Window Height": {
     "Window Height": "ارتفاع پنجره"
   },
+  "Window Opacity": {
+    "Window Opacity": ""
+  },
   "Window Opening": {
     "Window Opening": "باز کردن پنجره"
   },
@@ -8809,6 +8974,9 @@
   },
   "X-Ray": {
     "X-Ray": ""
+  },
+  "XKB Options": {
+    "XKB Options": ""
   },
   "XWayland": {
     "XWayland": ""
@@ -8914,9 +9082,6 @@
   },
   "display rotation option": {
     "Normal": ""
-  },
-  "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": {
-    "dms is a highly customizable, modern desktop shell with a <a href=\"https://m3.material.io/\" style=\"text-decoration:none; color:%1;\">material 3 inspired</a> design.<br /><br/>It is built with <a href=\"https://quickshell.org\" style=\"text-decoration:none; color:%1;\">Quickshell</a>, a QT6 framework for building desktop shells, and <a href=\"https://go.dev\" style=\"text-decoration:none; color:%1;\">Go</a>, a statically typed, compiled programming language.": ""
   },
   "e.g. /usr/bin/my-script --flag": {
     "e.g. /usr/bin/my-script --flag": ""
