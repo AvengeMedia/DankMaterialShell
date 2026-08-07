@@ -779,18 +779,18 @@ Item {
                             opacity: enabled ? 1 : 0.4
                             onSliderDragFinished: finalValue => SettingsData.setMatugenContrast(finalValue / 100)
                         }
-                    }
 
-                    DankButton {
-                        text: I18n.tr("Extract Theme", "extract theme button")
-                        iconName: "download"
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        onClicked: {
-                            var themeDataName = Theme.getThemeColors(Theme.currentThemeName).name || Theme.currentThemeName;
-                            pendingExtractJson = Theme.extractCurrentTheme(themeDataName);
-                            saveBrowserLoader.active = true;
-                            if (saveBrowserLoader.item)
-                                saveBrowserLoader.item.open();
+                        DankButton {
+                            text: I18n.tr("Extract Theme", "extract theme button")
+                            iconName: "download"
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            onClicked: {
+                                var themeDataName = Theme.getThemeColors(Theme.currentThemeName).name || Theme.currentThemeName;
+                                pendingExtractJson = Theme.extractCurrentTheme(themeDataName);
+                                saveBrowserLoader.active = true;
+                                if (saveBrowserLoader.item)
+                                    saveBrowserLoader.item.open();
+                            }
                         }
                     }
 
