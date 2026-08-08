@@ -94,6 +94,8 @@ in
       };
 
       Service = {
+        Type = "dbus";
+        BusName = "org.freedesktop.Notifications";
         ExecStart = lib.getExe cfg.package + " run --session";
         Restart = "on-failure";
       };
