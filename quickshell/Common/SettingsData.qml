@@ -2604,10 +2604,11 @@ Singleton {
         var normalized = mode || "dominant";
         if (matugenSourceMode === normalized)
             return;
+        // Regeneration comes from the regenSystemThemes onChange hook in
+        // SettingsSpec.js, which set() dispatches. matugenScheme above also
+        // calls Theme.generateSystemThemesFromCurrentTheme() directly, which is
+        // redundant with its own hook.
         set("matugenSourceMode", normalized);
-        if (typeof Theme !== "undefined") {
-            Theme.generateSystemThemesFromCurrentTheme();
-        }
     }
 
     function setMatugenContrast(value) {
