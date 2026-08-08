@@ -168,6 +168,7 @@ Singleton {
     property var registryThemeVariants: ({})
     property string matugenScheme: "scheme-tonal-spot"
     property bool matugenSmartMode: false
+    property string matugenSourceMode: "dominant"
     property real matugenContrast: 0
     property bool runUserMatugenTemplates: true
     property string matugenTargetMonitor: ""
@@ -2809,6 +2810,16 @@ Singleton {
         if (matugenSmartMode === enabled)
             return;
         set("matugenSmartMode", enabled);
+    }
+
+    function setMatugenSourceMode(mode) {
+        var normalized = mode || "dominant";
+        if (matugenSourceMode === normalized)
+            return;
+        set("matugenSourceMode", normalized);
+        if (typeof Theme !== "undefined") {
+            Theme.generateSystemThemesFromCurrentTheme();
+        }
     }
 
     function setMatugenContrast(value) {
