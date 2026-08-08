@@ -168,6 +168,25 @@ Item {
         Qt.callLater(() => waylandToplevel.activate());
         return true;
     }
+
+    function cycleGroupedToplevels() {
+        const toplevels = getGroupedToplevels();
+        if (toplevels.length === 0)
+            return;
+
+        let currentIndex = -1;
+        for (let i = 0; i < toplevels.length; i++) {
+            if (toplevels[i].activated) {
+                currentIndex = i;
+                break;
+            }
+        }
+
+        const nextToplevel = toplevels[(currentIndex + 1) % toplevels.length];
+        if (restoreSpecialWorkspaceWindow(nextToplevel))
+            return;
+        nextToplevel.activate();
+    }
     onIsHoveredChanged: {
         if (mouseArea.pressed || dragging)
             return;
@@ -343,9 +362,8 @@ Item {
                             return;
                         groupedToplevel.activate();
                     }
-                } else if (contextMenu) {
-                    const shouldHidePin = appData.appId === "org.quickshell" || appData.appId === "com.danklinux.dms";
-                    contextMenu.showForButton(root, appData, root.height + 25, shouldHidePin, cachedDesktopEntry, parentDockScreen, dockApps);
+                } else {
+                    cycleGroupedToplevels();
                 }
                 break;
             }
