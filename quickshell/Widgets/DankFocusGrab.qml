@@ -11,13 +11,17 @@ HyprlandFocusGrab {
     property bool _held: false
     property bool _compositorCleared: false
     property var _restoreToplevel: null
+    property int _restoreWorkspaceId: -1
 
     property Timer _releaseTimer: Timer {
         interval: 50
         onTriggered: {
             root._held = false;
             root.active = false;
-            root._restoreToplevel = root._compositorCleared ? null : KeyboardFocus.restoreToplevel(root._restoreToplevel);
+            // Restoring a toplevel from another workspace would drag the user back
+            // to the workspace they just navigated away from (#2963)
+            const workspaceChanged = (Hyprland.focusedWorkspace?.id ?? -1) !== root._restoreWorkspaceId;
+            root._restoreToplevel = (root._compositorCleared || workspaceChanged) ? null : KeyboardFocus.restoreToplevel(root._restoreToplevel);
         }
     }
 
@@ -34,6 +38,7 @@ HyprlandFocusGrab {
         _held = true;
         _compositorCleared = false;
         _restoreToplevel = KeyboardFocus.captureActiveToplevel();
+        _restoreWorkspaceId = Hyprland.focusedWorkspace?.id ?? -1;
         active = true;
     }
 
