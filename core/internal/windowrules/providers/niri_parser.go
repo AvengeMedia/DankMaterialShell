@@ -37,6 +37,7 @@ type NiriWindowRule struct {
 	MatchIsUrgent           *bool
 	MatchAtStartup          *bool
 	Matches                 []NiriMatch
+	Excludes                []NiriMatch
 	Opacity                 *float64
 	OpenFloating            *bool
 	OpenMaximized           *bool
@@ -212,6 +213,8 @@ func (p *NiriRulesParser) parseWindowRuleNode(node *document.Node) {
 		switch childName {
 		case "match":
 			rule.Matches = append(rule.Matches, p.parseMatchNode(child))
+		case "exclude":
+			rule.Excludes = append(rule.Excludes, p.parseMatchNode(child))
 		case "opacity":
 			if len(child.Arguments) > 0 {
 				val := child.Arguments[0].ResolvedValue()
@@ -597,7 +600,8 @@ func ConvertNiriRulesToWindowRules(niriRules []NiriWindowRule) []windowrules.Win
 				IsUrgent:           nr.MatchIsUrgent,
 				AtStartup:          nr.MatchAtStartup,
 			},
-			Matches: convertNiriMatches(nr.Matches),
+			Matches:  convertNiriMatches(nr.Matches),
+			Excludes: convertNiriMatches(nr.Excludes),
 			Actions: windowrules.Actions{
 				Opacity:                   nr.Opacity,
 				OpenFloating:              nr.OpenFloating,
@@ -810,7 +814,8 @@ func (p *NiriWritableProvider) LoadDMSRules() ([]windowrules.WindowRule, error) 
 				IsUrgent:           nr.MatchIsUrgent,
 				AtStartup:          nr.MatchAtStartup,
 			},
-			Matches: convertNiriMatches(nr.Matches),
+			Matches:  convertNiriMatches(nr.Matches),
+			Excludes: convertNiriMatches(nr.Excludes),
 			Actions: windowrules.Actions{
 				Opacity:                   nr.Opacity,
 				OpenFloating:              nr.OpenFloating,
@@ -874,7 +879,7 @@ func (p *NiriWritableProvider) writeDMSRules(rules []windowrules.WindowRule) err
 	return os.WriteFile(rulesPath, []byte(strings.Join(lines, "\n")), 0644)
 }
 
-func formatNiriMatchLine(m windowrules.MatchCriteria) (string, bool) {
+func formatNiriMatchLine(keyword string, m windowrules.MatchCriteria) (string, bool) {
 	var matchProps []string
 	if m.AppID != "" {
 		matchProps = append(matchProps, fmt.Sprintf("app-id=%q", m.AppID))
@@ -906,7 +911,7 @@ func formatNiriMatchLine(m windowrules.MatchCriteria) (string, bool) {
 	if len(matchProps) == 0 {
 		return "", false
 	}
-	return "    match " + strings.Join(matchProps, " "), true
+	return "    " + keyword + " " + strings.Join(matchProps, " "), true
 }
 
 func (p *NiriWritableProvider) formatRule(rule windowrules.WindowRule) string {
@@ -919,7 +924,12 @@ func (p *NiriWritableProvider) formatRule(rule windowrules.WindowRule) string {
 		matches = []windowrules.MatchCriteria{rule.MatchCriteria}
 	}
 	for _, m := range matches {
-		if line, ok := formatNiriMatchLine(m); ok {
+		if line, ok := formatNiriMatchLine("match", m); ok {
+			lines = append(lines, line)
+		}
+	}
+	for _, m := range rule.Excludes {
+		if line, ok := formatNiriMatchLine("exclude", m); ok {
 			lines = append(lines, line)
 		}
 	}

@@ -333,3 +333,56 @@ window-rule {
 		t.Error("DMSStatus.Exists should be false when dms rules file doesn't exist")
 	}
 }
+
+func TestNiriExcludesSurviveEditOfOtherRule(t *testing.T) {
+	tmpDir := t.TempDir()
+	provider := NewNiriWritableProvider(tmpDir)
+
+	dmsDir := filepath.Join(tmpDir, "dms")
+	if err := os.MkdirAll(dmsDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	existing := `// @id=thunderbird @name=Thunderbird
+window-rule {
+    match app-id="^org.mozilla.Thunderbird$"
+    open-floating true
+    exclude title="^Mozilla Thunderbird$"
+    exclude title="^Verfassen:.*"
+}
+
+// @id=firefox @name=Firefox
+window-rule {
+    match app-id="^firefox$"
+    open-floating true
+}
+`
+	if err := os.WriteFile(filepath.Join(dmsDir, "windowrules.kdl"), []byte(existing), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	edited := newTestWindowRule("firefox", "Firefox", "^firefox$")
+	edited.Actions.OpenFloating = boolPtr(false)
+	if err := provider.SetRule(edited); err != nil {
+		t.Fatalf("SetRule failed: %v", err)
+	}
+
+	rules, err := provider.LoadDMSRules()
+	if err != nil {
+		t.Fatalf("LoadDMSRules failed: %v", err)
+	}
+	if len(rules) != 2 {
+		t.Fatalf("expected 2 rules, got %d", len(rules))
+	}
+	if len(rules[0].Excludes) != 2 {
+		t.Fatalf("expected 2 excludes on untouched rule, got %d", len(rules[0].Excludes))
+	}
+	if rules[0].Excludes[0].Title != "^Mozilla Thunderbird$" {
+		t.Errorf("Excludes[0].Title = %q", rules[0].Excludes[0].Title)
+	}
+	if rules[0].Excludes[1].Title != "^Verfassen:.*" {
+		t.Errorf("Excludes[1].Title = %q", rules[0].Excludes[1].Title)
+	}
+	if rules[1].Actions.OpenFloating == nil || *rules[1].Actions.OpenFloating {
+		t.Error("edited rule should have open-floating false")
+	}
+}

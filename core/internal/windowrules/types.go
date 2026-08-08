@@ -77,6 +77,7 @@ type WindowRule struct {
 	Enabled       bool            `json:"enabled"`
 	MatchCriteria MatchCriteria   `json:"matchCriteria"`
 	Matches       []MatchCriteria `json:"matches,omitempty"`
+	Excludes      []MatchCriteria `json:"excludes,omitempty"`
 	Actions       Actions         `json:"actions"`
 	Source        string          `json:"source,omitempty"`
 }
