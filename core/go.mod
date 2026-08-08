@@ -3,6 +3,7 @@ module github.com/AvengeMedia/DankMaterialShell/core
 go 1.26.4
 
 require (
+	github.com/Nadim147c/material/v3 v3.1.1
 	github.com/Wifx/gonetworkmanager/v2 v2.2.0
 	github.com/alecthomas/chroma/v2 v2.27.0
 	github.com/charmbracelet/bubbles v1.0.0

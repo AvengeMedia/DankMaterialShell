@@ -4,6 +4,8 @@ github.com/AvengeMedia/dankgo v0.0.0-20260730184236-239485829b0b h1:UwX1H4BkzazL
 github.com/AvengeMedia/dankgo v0.0.0-20260730184236-239485829b0b/go.mod h1:xt8RldAfti0QCWidwYIzsSSoJWsE61WgEhTu2H9UpD4=
 github.com/Microsoft/go-winio v0.6.2 h1:F2VQgta7ecxGYO8k3ZZz3RS8fVIXVxONVUPlNERoyfY=
 github.com/Microsoft/go-winio v0.6.2/go.mod h1:yd8OoFMLzJbo9gZq8j5qaps8bJ9aShtEA8Ipt1oGCvU=
+github.com/Nadim147c/material/v3 v3.1.1 h1:3ZuTPWBJWUpzzWW1rtqe28RMZXhA4f0/mg/Jk3JG94Y=
+github.com/Nadim147c/material/v3 v3.1.1/go.mod h1:ThN+dRdC+CDN2qXSGMn32KqtcXwYtb/trDM82cdZI6g=
 github.com/ProtonMail/go-crypto v1.4.1 h1:9RfcZHqEQUvP8RzecWEUafnZVtEvrBVL9BiF67IQOfM=
 github.com/ProtonMail/go-crypto v1.4.1/go.mod h1:e1OaTyu5SYVrO9gKOEhTc+5UcXtTUa+P3uLudwcgPqo=
 github.com/Wifx/gonetworkmanager/v2 v2.2.0 h1:kPstgsQtY8CmDOOFZd81ytM9Gi3f6ImzPCKF7nNhQ2U=
