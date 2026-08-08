@@ -637,7 +637,7 @@ EOFCONFIG
     }
 
     function playCriticalNotificationSound() {
-        if (!soundsAvailable || !criticalNotificationSound || SessionData.doNotDisturb || notificationsAudioMuted || shouldMuteForMedia())
+        if (!soundsAvailable || !criticalNotificationSound || notificationsAudioMuted || shouldMuteForMedia())
             return;
         criticalNotificationSound.play();
     }
