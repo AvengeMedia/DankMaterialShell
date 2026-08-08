@@ -29,6 +29,7 @@ func handleMatugenQueue(conn *models.Conn, req models.Request) {
 		TerminalsAlwaysDark: models.GetOr(req, "terminalsAlwaysDark", false),
 		SkipTemplates:       models.GetOr(req, "skipTemplates", ""),
 		Contrast:            models.GetOr(req, "contrast", 0.0),
+		SourceMode:          models.GetOr(req, "sourceMode", ""),
 	}
 
 	wait := models.GetOr(req, "wait", true)

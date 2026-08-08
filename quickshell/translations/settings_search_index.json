@@ -4592,6 +4592,38 @@
     "description": "Material inspired shadows and elevation on modals, popouts, and dialogs"
   },
   {
+    "section": "matugenSourceMode",
+    "label": "Source Color",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "background",
+      "bg",
+      "color",
+      "colors",
+      "colour",
+      "desktop",
+      "dynamic",
+      "extracted",
+      "hue",
+      "image",
+      "look",
+      "matugen",
+      "palette",
+      "picture",
+      "scheme",
+      "seed",
+      "select",
+      "source",
+      "style",
+      "theme",
+      "tint",
+      "wallpaper"
+    ],
+    "description": "Select which color is extracted from the wallpaper to seed the palette"
+  },
+  {
     "section": "blurBorderColor",
     "label": "Surface Border Color",
     "tabIndex": 10,

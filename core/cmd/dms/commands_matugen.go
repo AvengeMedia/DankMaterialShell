@@ -65,6 +65,7 @@ func init() {
 		cmd.Flags().Bool("terminals-always-dark", false, "Force terminal themes to dark variant")
 		cmd.Flags().String("skip-templates", "", "Comma-separated list of templates to skip")
 		cmd.Flags().Float64("contrast", 0, "Contrast value from -1 to 1 (0 = standard)")
+		cmd.Flags().String("source-mode", "", "Source color selection: dominant, colorful, darkness, lightness, saturation, less-saturation, value")
 	}
 
 	matugenQueueCmd.Flags().Bool("wait", true, "Wait for completion")
@@ -88,6 +89,7 @@ func buildMatugenOptions(cmd *cobra.Command) matugen.Options {
 	terminalsAlwaysDark, _ := cmd.Flags().GetBool("terminals-always-dark")
 	skipTemplates, _ := cmd.Flags().GetString("skip-templates")
 	contrast, _ := cmd.Flags().GetFloat64("contrast")
+	sourceMode, _ := cmd.Flags().GetString("source-mode")
 
 	return matugen.Options{
 		StateDir:            stateDir,
@@ -104,6 +106,7 @@ func buildMatugenOptions(cmd *cobra.Command) matugen.Options {
 		SyncModeWithPortal:  syncModeWithPortal,
 		TerminalsAlwaysDark: terminalsAlwaysDark,
 		SkipTemplates:       skipTemplates,
+		SourceMode:          sourceMode,
 	}
 }
 
@@ -141,6 +144,7 @@ func runMatugenQueue(cmd *cobra.Command, args []string) {
 			"terminalsAlwaysDark": opts.TerminalsAlwaysDark,
 			"skipTemplates":       opts.SkipTemplates,
 			"contrast":            opts.Contrast,
+			"sourceMode":          opts.SourceMode,
 			"wait":                wait,
 		},
 	}
