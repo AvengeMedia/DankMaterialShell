@@ -689,7 +689,7 @@ Item {
                             }
 
                             Column {
-                                width: parent.width - 120 - Theme.spacingM
+                                width: parent.width - 120 - Theme.spacingM - 36 - Theme.spacingM
                                 spacing: Theme.spacingS
                                 anchors.verticalCenter: parent.verticalCenter
 
@@ -711,6 +711,7 @@ Item {
                                 }
 
                                 StyledText {
+                                    id: wallpaperPathText
                                     text: {
                                         if (ToastService.wallpaperErrorStatus === "error")
                                             return I18n.tr("Wallpaper processing failed", "wallpaper processing error");
@@ -726,6 +727,22 @@ Item {
                                     maximumLineCount: 2
                                     width: parent.width
                                     wrapMode: Text.WordWrap
+                                }
+                            }
+
+                            DankActionButton {
+                                buttonSize: 36
+                                iconName: "download"
+                                iconSize: Theme.iconSize
+                                backgroundColor: Theme.primaryHover
+                                iconColor: Theme.primary
+                                tooltipText: I18n.tr("Extract theme to JSON", "extract theme tooltip")
+                                anchors.bottom: wallpaperPathText.bottom
+                                onClicked: {
+                                    pendingExtractJson = Theme.extractCurrentTheme();
+                                    saveBrowserLoader.active = true;
+                                    if (saveBrowserLoader.item)
+                                        saveBrowserLoader.item.open();
                                 }
                             }
                         }
@@ -778,18 +795,6 @@ Item {
                             enabled: Theme.matugenAvailable
                             opacity: enabled ? 1 : 0.4
                             onSliderDragFinished: finalValue => SettingsData.setMatugenContrast(finalValue / 100)
-                        }
-
-                        DankButton {
-                            text: I18n.tr("Extract Theme", "extract theme button")
-                            iconName: "download"
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            onClicked: {
-                                pendingExtractJson = Theme.extractCurrentTheme();
-                                saveBrowserLoader.active = true;
-                                if (saveBrowserLoader.item)
-                                    saveBrowserLoader.item.open();
-                            }
                         }
                     }
 
