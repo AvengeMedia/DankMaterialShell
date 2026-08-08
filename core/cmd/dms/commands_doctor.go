@@ -449,12 +449,7 @@ func getQuickshellVersionInfo(missingFeatures bool) (string, status, string) {
 func checkDMSInstallation() []checkResult {
 	var results []checkResult
 
-	dmsPath := ""
-	if err := findConfig(nil, nil); err == nil && configPath != "" {
-		dmsPath = configPath
-	} else if path, err := config.LocateDMSConfig(); err == nil {
-		dmsPath = path
-	}
+	dmsPath := resolveDoctorShellPath()
 
 	if dmsPath == "" {
 		return []checkResult{{catInstallation, "DMS Configuration", statusError, "Not found", "shell.qml not found in any config path", doctorDocsURL + "#dms-configuration"}}
@@ -1167,99 +1162,182 @@ func formatResultsPlain(results []checkResult) string {
 	return sb.String()
 }
 
+const (
+	defaultDoctorFontFamily     = "Inter Variable"
+	defaultDoctorMonoFontFamily = "Fira Code"
+)
+
+// bundledFontRelPaths maps settings/default family names to font files shipped with
+// the shell and loaded via Qt FontLoader (not registered with fontconfig).
+var bundledFontRelPaths = map[string][]string{
+	"inter variable": {
+		"DankCommon/assets/fonts/inter/InterVariable.ttf",
+		"assets/fonts/inter/InterVariable.ttf",
+	},
+	"fira code": {
+		"DankCommon/assets/fonts/nerd-fonts/FiraCodeNerdFont-Regular.ttf",
+		"assets/fonts/nerd-fonts/FiraCodeNerdFont-Regular.ttf",
+	},
+	"firacode nerd font": {
+		"DankCommon/assets/fonts/nerd-fonts/FiraCodeNerdFont-Regular.ttf",
+		"assets/fonts/nerd-fonts/FiraCodeNerdFont-Regular.ttf",
+	},
+}
+
+func resolveDoctorShellPath() string {
+	if err := findConfig(nil, nil); err == nil && configPath != "" {
+		return configPath
+	}
+	if path, err := config.LocateDMSConfig(); err == nil {
+		return path
+	}
+	return ""
+}
+
+func findBundledFontFile(shellPath, family string) string {
+	if shellPath == "" {
+		return ""
+	}
+	relPaths, ok := bundledFontRelPaths[strings.ToLower(strings.TrimSpace(family))]
+	if !ok {
+		return ""
+	}
+	for _, rel := range relPaths {
+		path := filepath.Join(shellPath, rel)
+		if info, err := os.Stat(path); err == nil && !info.IsDir() {
+			return path
+		}
+	}
+	return ""
+}
+
+func isBundledDefaultFont(family string) bool {
+	_, ok := bundledFontRelPaths[strings.ToLower(strings.TrimSpace(family))]
+	return ok
+}
+
+func fontInFcList(name, cacheLower string) bool {
+	target := strings.ToLower(strings.TrimSpace(name))
+	if target == "" {
+		return false
+	}
+	for _, line := range strings.Split(cacheLower, "\n") {
+		for _, fam := range strings.Split(strings.TrimSpace(line), ",") {
+			if strings.TrimSpace(fam) == target {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func checkConfiguredFont(label, family, shellPath, fcCache string, fcListAvailable bool, url string) checkResult {
+	if bundled := findBundledFontFile(shellPath, family); bundled != "" {
+		details := "Bundled (Qt FontLoader)"
+		if doctorVerbose {
+			details = bundled
+		}
+		return checkResult{catFonts, label, statusOK, family, details, url}
+	}
+
+	if isBundledDefaultFont(family) {
+		if shellPath == "" {
+			return checkResult{
+				catFonts, label, statusWarn,
+				fmt.Sprintf("'%s' not verified", family),
+				"Could not locate shell config to verify bundled font files.",
+				url,
+			}
+		}
+		return checkResult{
+			catFonts, label, statusWarn,
+			fmt.Sprintf("'%s' bundled file missing", family),
+			"Expected font file missing from shell install. Reinstall DMS or check DankCommon assets.",
+			url,
+		}
+	}
+
+	if !fcListAvailable {
+		return checkResult{
+			catFonts, label, statusWarn,
+			fmt.Sprintf("'%s' not verified", family),
+			"fc-list not installed; cannot verify custom fonts in fontconfig.",
+			url,
+		}
+	}
+
+	if fcCache == "" {
+		return checkResult{
+			catFonts, label, statusWarn,
+			fmt.Sprintf("'%s' not found", family),
+			"Fontconfig cache is empty or unreadable. Try running 'fc-cache -fv'.",
+			url,
+		}
+	}
+
+	if fontInFcList(family, fcCache) {
+		return checkResult{catFonts, label, statusOK, family, "Available via fontconfig", url}
+	}
+
+	return checkResult{
+		catFonts, label, statusWarn,
+		fmt.Sprintf("'%s' not found", family),
+		"Font is not registered with fontconfig. Try running 'fc-cache -fv' or install the font.",
+		url,
+	}
+}
+
 func checkFonts() []checkResult {
 	var results []checkResult
 	url := doctorDocsURL + "#fonts"
 
-	configDir, err := os.UserConfigDir()
-	if err != nil {
-		return nil
-	}
-	settingsPath := filepath.Join(configDir, "DankMaterialShell", "settings.json")
+	fontFamily := defaultDoctorFontFamily
+	monoFontFamily := defaultDoctorMonoFontFamily
 
-	fontFamily := "Inter Variable"
-	monoFontFamily := "Fira Code"
-
-	if data, err := os.ReadFile(settingsPath); err == nil {
-		var settings struct {
-			FontFamily     string `json:"fontFamily"`
-			MonoFontFamily string `json:"monoFontFamily"`
-		}
-		if err := json.Unmarshal(data, &settings); err == nil {
-			if settings.FontFamily != "" {
-				fontFamily = settings.FontFamily
+	if configDir, err := os.UserConfigDir(); err == nil {
+		settingsPath := filepath.Join(configDir, "DankMaterialShell", "settings.json")
+		if data, err := os.ReadFile(settingsPath); err == nil {
+			var settings struct {
+				FontFamily     string `json:"fontFamily"`
+				MonoFontFamily string `json:"monoFontFamily"`
 			}
-			if settings.MonoFontFamily != "" {
-				monoFontFamily = settings.MonoFontFamily
-			}
-		}
-	}
-
-	if !utils.CommandExists("fc-list") {
-		results = append(results, checkResult{catFonts, "Fontconfig Tools", statusWarn, "fc-list not installed", "Cannot verify if fonts are cached.", url})
-		return results
-	}
-
-	// Retrieve font list
-	output, err := exec.Command("fc-list", ":", "family").Output()
-	if err != nil {
-		results = append(results, checkResult{catFonts, "Fontconfig Cache", statusError, "Failed to query font list", "Fontconfig cache query failed. Try running 'fc-cache -fv'.", url})
-		return results
-	}
-
-	outStr := string(output)
-	if len(strings.TrimSpace(outStr)) == 0 {
-		results = append(results, checkResult{catFonts, "Fontconfig Cache", statusError, "Cache is empty", "No fonts found in fontconfig cache. Try running 'fc-cache -fv'.", url})
-		return results
-	}
-
-	lowerFonts := strings.ToLower(outStr)
-
-	// Helper to check if a font exists
-	hasFont := func(name string) bool {
-		target := strings.ToLower(strings.TrimSpace(name))
-		if target == "" {
-			return false
-		}
-		for _, line := range strings.Split(lowerFonts, "\n") {
-			line = strings.TrimSpace(line)
-			if line == "" {
-				continue
-			}
-			// Each line can have comma-separated families
-			families := strings.Split(line, ",")
-			for _, fam := range families {
-				if strings.TrimSpace(fam) == target {
-					return true
+			if err := json.Unmarshal(data, &settings); err == nil {
+				if settings.FontFamily != "" {
+					fontFamily = settings.FontFamily
+				}
+				if settings.MonoFontFamily != "" {
+					monoFontFamily = settings.MonoFontFamily
 				}
 			}
 		}
-		return false
 	}
 
-	// Normal Font Check
-	if hasFont(fontFamily) {
-		results = append(results, checkResult{catFonts, "Normal Font", statusOK, fontFamily, "Available", url})
-	} else {
-		results = append(results, checkResult{
-			catFonts, "Normal Font", statusWarn,
-			fmt.Sprintf("'%s' not found", fontFamily),
-			"Font is not registered. Try running 'fc-cache -fv' or install the font.",
-			url,
-		})
+	shellPath := resolveDoctorShellPath()
+	needFontconfig := !isBundledDefaultFont(fontFamily) || !isBundledDefaultFont(monoFontFamily)
+
+	fcListAvailable := utils.CommandExists("fc-list")
+	fcCache := ""
+
+	if needFontconfig {
+		if !fcListAvailable {
+			results = append(results, checkResult{catFonts, "Fontconfig Tools", statusWarn, "fc-list not installed", "Cannot verify custom fonts in fontconfig cache.", url})
+		} else {
+			output, err := exec.Command("fc-list", ":", "family").Output()
+			if err != nil {
+				results = append(results, checkResult{catFonts, "Fontconfig Cache", statusError, "Failed to query font list", "Fontconfig cache query failed. Try running 'fc-cache -fv'.", url})
+			} else {
+				fcCache = strings.ToLower(string(output))
+				if len(strings.TrimSpace(fcCache)) == 0 {
+					results = append(results, checkResult{catFonts, "Fontconfig Cache", statusError, "Cache is empty", "No fonts found in fontconfig cache. Try running 'fc-cache -fv'.", url})
+				}
+			}
+		}
 	}
 
-	// Monospace Font Check
-	if hasFont(monoFontFamily) {
-		results = append(results, checkResult{catFonts, "Monospace Font", statusOK, monoFontFamily, "Available", url})
-	} else {
-		results = append(results, checkResult{
-			catFonts, "Monospace Font", statusWarn,
-			fmt.Sprintf("'%s' not found", monoFontFamily),
-			"Font is not registered. Try running 'fc-cache -fv' or install the font.",
-			url,
-		})
-	}
+	results = append(results,
+		checkConfiguredFont("Normal Font", fontFamily, shellPath, fcCache, fcListAvailable, url),
+		checkConfiguredFont("Monospace Font", monoFontFamily, shellPath, fcCache, fcListAvailable, url),
+	)
 
 	return results
 }
