@@ -141,14 +141,7 @@ func (a *SecretAgent) GetSecrets(
 		return nil, dbus.NewError("org.freedesktop.NetworkManager.SecretAgent.Error.NoSecrets", nil)
 	}
 
-	var connUuid string
-	if c, ok := conn["connection"]; ok {
-		if v, ok := c["uuid"]; ok {
-			if s, ok2 := v.Value().(string); ok2 {
-				connUuid = s
-			}
-		}
-	}
+	connUuid := readConnUuid(conn)
 
 	// Phase 1: Determine if this connection is ours and what fields we need.
 	if a.backend != nil {
@@ -178,79 +171,34 @@ func (a *SecretAgent) GetSecrets(
 
 	// Phase 2: Resolve fields from hints or password-flags.
 	if len(fields) == 0 {
-		if settingName == "vpn" {
-			if a.backend != nil {
-				a.backend.stateMutex.RLock()
-				isConnectingVPN := a.backend.state.IsConnectingVPN
-				a.backend.stateMutex.RUnlock()
-
-				if !isConnectingVPN {
-					log.Infof("[SecretAgent] VPN with empty hints - deferring to other agents for %s", vpnSvc)
-					return nil, dbus.NewError("org.freedesktop.NetworkManager.SecretAgent.Error.NoSecrets", nil)
-				}
-
-				fields = inferVPNFields(conn, vpnSvc)
-				log.Infof("[SecretAgent] VPN with empty hints but we're connecting - inferred fields: %v", fields)
-			} else {
+		switch settingName {
+		case "vpn":
+			if a.backend == nil {
 				log.Infof("[SecretAgent] VPN with empty hints - deferring to other agents for %s", vpnSvc)
 				return nil, dbus.NewError("org.freedesktop.NetworkManager.SecretAgent.Error.NoSecrets", nil)
 			}
-		}
 
-		if len(fields) == 0 {
-			const (
-				NM_SETTING_SECRET_FLAG_NONE         = 0
-				NM_SETTING_SECRET_FLAG_AGENT_OWNED  = 1
-				NM_SETTING_SECRET_FLAG_NOT_SAVED    = 2
-				NM_SETTING_SECRET_FLAG_NOT_REQUIRED = 4
-			)
+			a.backend.stateMutex.RLock()
+			isConnectingVPN := a.backend.state.IsConnectingVPN
+			a.backend.stateMutex.RUnlock()
 
-			var passwordFlags uint32 = 0xFFFF
-			switch settingName {
-			case "802-11-wireless-security":
-				if wifiSecSettings, ok := conn["802-11-wireless-security"]; ok {
-					if flagsVariant, ok := wifiSecSettings["psk-flags"]; ok {
-						if pwdFlags, ok := flagsVariant.Value().(uint32); ok {
-							passwordFlags = pwdFlags
-						}
-					}
-				}
-			case "802-1x":
-				if dot1xSettings, ok := conn["802-1x"]; ok {
-					if flagsVariant, ok := dot1xSettings["password-flags"]; ok {
-						if pwdFlags, ok := flagsVariant.Value().(uint32); ok {
-							passwordFlags = pwdFlags
-						}
-					}
-				}
-			}
-
-			if passwordFlags == 0xFFFF {
-				log.Warnf("[SecretAgent] Could not determine password-flags for empty hints - returning NoSecrets error")
-				return nil, dbus.NewError("org.freedesktop.NetworkManager.SecretAgent.Error.NoSecrets", nil)
-			} else if passwordFlags&NM_SETTING_SECRET_FLAG_NOT_REQUIRED != 0 {
-				log.Infof("[SecretAgent] Secrets not required (flags=%d)", passwordFlags)
-				out := nmSettingMap{}
-				out[settingName] = nmVariantMap{}
-				return out, nil
-			} else if passwordFlags&NM_SETTING_SECRET_FLAG_AGENT_OWNED != 0 {
-				switch settingName {
-				case "802-11-wireless-security":
-					fields = []string{"psk"}
-				case "802-1x":
-					fields = infer8021xFields(conn)
-				default:
-					log.Warnf("[SecretAgent] Agent-owned secrets for unhandled setting %s (flags=%d)", settingName, passwordFlags)
-					return nil, dbus.NewError("org.freedesktop.NetworkManager.SecretAgent.Error.NoSecrets", nil)
-				}
-				log.Infof("[SecretAgent] Agent-owned secrets, inferred fields: %v", fields)
-			} else if passwordFlags&NM_SETTING_SECRET_FLAG_NOT_SAVED != 0 {
-				log.Infof("[SecretAgent] Secrets not saved, will need to prompt (flags=%d)", passwordFlags)
-				// Fall through — fields remain empty, prompt will be required.
-			} else {
-				log.Infof("[SecretAgent] Secrets stored in NM config (flags=%d), deferring to system", passwordFlags)
+			if !isConnectingVPN {
+				log.Infof("[SecretAgent] VPN with empty hints - deferring to other agents for %s", vpnSvc)
 				return nil, dbus.NewError("org.freedesktop.NetworkManager.SecretAgent.Error.NoSecrets", nil)
 			}
+
+			fields = inferVPNFields(conn, vpnSvc)
+			log.Infof("[SecretAgent] VPN with empty hints but we're connecting - inferred fields: %v", fields)
+
+		case "802-11-wireless-security", "802-1x":
+			newFields, response, err := handlePasswordFlags(settingName, conn, readPasswordFlags(settingName, conn))
+			if err != nil {
+				return nil, err
+			}
+			if response != nil {
+				return response, nil
+			}
+			fields = newFields
 		}
 	}
 
@@ -369,8 +317,8 @@ func (a *SecretAgent) GetSecrets(
 			a.backend.clearCachedWiFiSecret(connUuid)
 		}
 	} else {
-		if secretOut := a.trySecretService(connUuid, settingName, fields); secretOut != nil {
-			return secretOut, nil
+		if secrets := a.trySecretService(connUuid, settingName, fields); len(secrets) > 0 {
+			return formatKeyringSecrets(settingName, secrets), nil
 		}
 
 		switch settingName {
@@ -530,8 +478,7 @@ func (a *SecretAgent) GetSecrets(
 	case "802-1x":
 		secretsOnly := nmVariantMap{}
 		for k, v := range reply.Secrets {
-			switch k {
-			case "password", "private-key-password", "phase2-private-key-password", "pin":
+			if isDot1xSecretKey(k) {
 				secretsOnly[k] = dbus.MakeVariant(v)
 			}
 		}
@@ -542,6 +489,7 @@ func (a *SecretAgent) GetSecrets(
 		}
 		log.Infof("[SecretAgent] Returning 802-1x enterprise secrets with %d fields", len(secretsOnly))
 	default:
+		log.Warnf("[SecretAgent] Shaping response for unhandled setting type %q - returning secrets as-is", settingName)
 		out[settingName] = sec
 	}
 	if settingName == "vpn" && a.backend != nil && !isPKCS11 && (vpnUsername != "" || reply.Save) {
@@ -563,10 +511,66 @@ func (a *SecretAgent) GetSecrets(
 		log.Infof("[SecretAgent] Queued credentials persist for after connection succeeds")
 	}
 
+	if reply.Save && connUuid != "" {
+		toStore := make(map[string]string)
+		switch settingName {
+		case "802-11-wireless-security":
+			for k, v := range reply.Secrets {
+				toStore[k] = v
+			}
+		case "802-1x":
+			for k, v := range reply.Secrets {
+				if isDot1xSecretKey(k) {
+					toStore[k] = v
+				}
+			}
+		case "vpn", "wireguard":
+			for k, v := range reply.Secrets {
+				if k != "username" {
+					toStore[k] = v
+				}
+			}
+		default:
+			var keys []string
+			for k := range reply.Secrets {
+				keys = append(keys, k)
+			}
+			log.Warnf("[SecretAgent] Unknown setting type %q — not storing secrets (keys: %v)", settingName, keys)
+		}
+		if len(toStore) > 0 {
+			if err := a.withSecretService(func(sess *secretServiceSession) error {
+				stored := 0
+				for key, val := range toStore {
+					ident := displayName
+					if connType == "802-11-wireless" && ssid != "" {
+						ident = ssid
+					}
+					label := fmt.Sprintf("%s: %s: %s", connType, ident, key)
+					if err := sess.store(connUuid, settingName, key, val, label); err != nil {
+						log.Debugf("[SecretAgent] Failed to store %s/%s: %v", connUuid, key, err)
+						continue
+					}
+					stored++
+				}
+				if stored > 0 {
+					log.Infof("[SecretAgent] Stored %d/%d secret(s) in keyring for %s/%s", stored, len(toStore), connUuid, settingName)
+				}
+				if stored < len(toStore) {
+					return fmt.Errorf("stored %d/%d secrets", stored, len(toStore))
+				}
+				return nil
+			}); err != nil {
+				log.Warnf("[SecretAgent] Could not persist secrets to keyring: %v", err)
+			}
+		}
+	}
+
 	if a.backend != nil {
 		switch settingName {
 		case "802-11-wireless-security", "802-1x":
 			a.backend.cacheWiFiSecret(connUuid, ssid, settingName, reply.Secrets)
+		default:
+			log.Debugf("[SecretAgent] No cache strategy for setting type %q", settingName)
 		}
 	}
 
@@ -575,12 +579,37 @@ func (a *SecretAgent) GetSecrets(
 
 func (a *SecretAgent) DeleteSecrets(conn map[string]nmVariantMap, path dbus.ObjectPath) *dbus.Error {
 	ssid := readSSID(conn)
-	log.Infof("[SecretAgent] DeleteSecrets called: path=%s, SSID=%s", path, ssid)
+	connType, _, _ := readConnTypeAndName(conn)
+	connUuid := readConnUuid(conn)
+
+	log.Infof("[SecretAgent] DeleteSecrets called: path=%s, SSID=%s, type=%s, uuid=%s", path, ssid, connType, connUuid)
+	a.deleteSecretsByConn(connUuid)
+
 	return nil
 }
 
 func (a *SecretAgent) DeleteSecrets2(path dbus.ObjectPath, setting string) *dbus.Error {
 	log.Infof("[SecretAgent] DeleteSecrets2 (alternate) called: path=%s, setting=%s", path, setting)
+
+	if a.conn == nil {
+		return nil
+	}
+
+	var settings map[string]map[string]dbus.Variant
+	if err := a.conn.Object("org.freedesktop.NetworkManager", path).
+		Call("org.freedesktop.NetworkManager.Settings.Connection.GetSettings", 0).
+		Store(&settings); err != nil {
+		log.Warnf("[SecretAgent] DeleteSecrets2: GetSettings failed for %s: %v — orphaned keyring items may remain", path, err)
+		return nil
+	}
+
+	settingsTyped := make(nmSettingMap, len(settings))
+	for k, v := range settings {
+		settingsTyped[k] = v
+	}
+	connUuid := readConnUuid(settingsTyped)
+	a.deleteSecretsByConn(connUuid)
+
 	return nil
 }
 
@@ -629,6 +658,25 @@ func (a *SecretAgent) save8021xIdentity(path dbus.ObjectPath, identity string) {
 	log.Infof("[SecretAgent] Saved 802.1x identity to connection profile")
 }
 
+func readConnUuid(conn map[string]nmVariantMap) string {
+	if c, ok := conn["connection"]; ok {
+		if v, ok := c["uuid"]; ok {
+			if s, ok2 := v.Value().(string); ok2 {
+				return s
+			}
+		}
+	}
+	return ""
+}
+
+func isDot1xSecretKey(key string) bool {
+	switch key {
+	case "password", "private-key-password", "phase2-private-key-password", "pin":
+		return true
+	}
+	return false
+}
+
 func readSSID(conn map[string]nmVariantMap) string {
 	if w, ok := conn["802-11-wireless"]; ok {
 		if v, ok := w["ssid"]; ok {
@@ -670,6 +718,72 @@ func readConnTypeAndName(conn map[string]nmVariantMap) (string, string, string) 
 	return connType, name, svc
 }
 
+func readPasswordFlags(settingName string, conn map[string]nmVariantMap) uint32 {
+	var flagKey string
+	switch settingName {
+	case "802-11-wireless-security":
+		flagKey = "psk-flags"
+	case "802-1x":
+		flagKey = "password-flags"
+	default:
+		return 0xFFFF
+	}
+
+	settings, ok := conn[settingName]
+	if !ok {
+		return 0xFFFF
+	}
+
+	flagsVariant, ok := settings[flagKey]
+	if !ok {
+		return 0xFFFF
+	}
+
+	if pwdFlags, ok := flagsVariant.Value().(uint32); ok {
+		return pwdFlags
+	}
+
+	return 0xFFFF
+}
+
+func handlePasswordFlags(settingName string, conn map[string]nmVariantMap, passwordFlags uint32) ([]string, nmSettingMap, *dbus.Error) {
+	const (
+		NM_SETTING_SECRET_FLAG_NONE         = 0
+		NM_SETTING_SECRET_FLAG_AGENT_OWNED  = 1
+		NM_SETTING_SECRET_FLAG_NOT_SAVED    = 2
+		NM_SETTING_SECRET_FLAG_NOT_REQUIRED = 4
+	)
+
+	if passwordFlags == 0xFFFF {
+		log.Warnf("[SecretAgent] Could not determine password-flags for empty hints - returning NoSecrets error")
+		return nil, nil, dbus.NewError("org.freedesktop.NetworkManager.SecretAgent.Error.NoSecrets", nil)
+	} else if passwordFlags&NM_SETTING_SECRET_FLAG_NOT_REQUIRED != 0 {
+		log.Infof("[SecretAgent] Secrets not required (flags=%d)", passwordFlags)
+		out := nmSettingMap{}
+		out[settingName] = nmVariantMap{}
+		return nil, out, nil
+	} else if passwordFlags&NM_SETTING_SECRET_FLAG_AGENT_OWNED != 0 {
+		var fields []string
+		switch settingName {
+		case "802-11-wireless-security":
+			fields = []string{"psk"}
+		case "802-1x":
+			fields = infer8021xFields(conn)
+		default:
+			log.Warnf("[SecretAgent] Agent-owned secrets for unhandled setting %s (flags=%d)", settingName, passwordFlags)
+			return nil, nil, dbus.NewError("org.freedesktop.NetworkManager.SecretAgent.Error.NoSecrets", nil)
+		}
+		log.Infof("[SecretAgent] Agent-owned secrets, inferred fields: %v", fields)
+		return fields, nil, nil
+	} else if passwordFlags&NM_SETTING_SECRET_FLAG_NOT_SAVED != 0 {
+		log.Infof("[SecretAgent] Secrets not saved, will need to prompt (flags=%d)", passwordFlags)
+		return nil, nil, nil
+	}
+
+	log.Infof("[SecretAgent] Secrets stored in NM config (flags=%d), deferring to system", passwordFlags)
+	return nil, nil, dbus.NewError("org.freedesktop.NetworkManager.SecretAgent.Error.NoSecrets", nil)
+}
+
 func fieldsNeeded(setting string, hints []string, conn map[string]nmVariantMap) []string {
 	switch setting {
 	case "802-11-wireless-security":
@@ -679,10 +793,9 @@ func fieldsNeeded(setting string, hints []string, conn map[string]nmVariantMap) 
 			return hints
 		}
 		return infer8021xFields(conn)
-	case "vpn", "wireguard":
-		return hints
 	default:
-		return []string{}
+		log.Debugf("[SecretAgent] No field inference for setting type %q - falling back to hints", setting)
+		return hints
 	}
 }
 
@@ -744,6 +857,7 @@ func buildFieldsInfo(setting string, fields []string, vpnService string) []Field
 		case "vpn":
 			info.Label, info.IsSecret = vpnFieldMeta(f, vpnService)
 		default:
+			log.Debugf("[SecretAgent] No field metadata for setting type %q - using raw field name", setting)
 			info.Label = f
 			info.IsSecret = true
 		}
@@ -966,13 +1080,40 @@ func reasonFromFlags(flags uint32) string {
 	return "required"
 }
 
+func formatKeyringSecrets(settingName string, secrets map[string]string) nmSettingMap {
+	switch settingName {
+	case "vpn", "wireguard":
+		secretsDict := make(map[string]string)
+		for k, v := range secrets {
+			if k != "username" {
+				secretsDict[k] = v
+			}
+		}
+		vpnSec := nmVariantMap{"secrets": dbus.MakeVariant(secretsDict)}
+		return nmSettingMap{settingName: vpnSec}
+	case "802-1x":
+		secretsOnly := nmVariantMap{}
+		for k, v := range secrets {
+			if isDot1xSecretKey(k) {
+				secretsOnly[k] = dbus.MakeVariant(v)
+			}
+		}
+		return nmSettingMap{settingName: secretsOnly}
+	default:
+		sec := nmVariantMap{}
+		for k, v := range secrets {
+			sec[k] = dbus.MakeVariant(v)
+		}
+		return nmSettingMap{settingName: sec}
+	}
+}
+
 func buildWiFiSecretsResponse(settingName string, secrets map[string]string) nmSettingMap {
 	sec := nmVariantMap{}
 	switch settingName {
 	case "802-1x":
 		for k, v := range secrets {
-			switch k {
-			case "password", "private-key-password", "phase2-private-key-password", "pin":
+			if isDot1xSecretKey(k) {
 				sec[k] = dbus.MakeVariant(v)
 			}
 		}
