@@ -455,6 +455,9 @@ DankFloatingWindow {
         };
         if (isNiri && extraMatchModel.count > 0)
             ruleData.matches = matches;
+        // No exclude editor yet — carry existing excludes through so an edit doesn't delete them (#2996)
+        if (isEditMode && (editingRule.excludes?.length ?? 0) > 0)
+            ruleData.excludes = editingRule.excludes;
 
         submitting = true;
 
