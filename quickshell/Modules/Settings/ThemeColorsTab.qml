@@ -785,8 +785,7 @@ Item {
                             iconName: "download"
                             anchors.horizontalCenter: parent.horizontalCenter
                             onClicked: {
-                                var themeDataName = Theme.getThemeColors(Theme.currentThemeName).name || Theme.currentThemeName;
-                                pendingExtractJson = Theme.extractCurrentTheme(themeDataName);
+                                pendingExtractJson = Theme.extractCurrentTheme();
                                 saveBrowserLoader.active = true;
                                 if (saveBrowserLoader.item)
                                     saveBrowserLoader.item.open();
@@ -3185,8 +3184,7 @@ Item {
             defaultFileName: "dms-extracted-theme.json"
 
             onFileSelected: path => {
-                const cleanPath = decodeURI(path.toString().replace(/^file:\/\//, ''));
-                saveExtractedTheme(pendingExtractJson, cleanPath);
+                saveExtractedTheme(pendingExtractJson, Paths.strip(path));
                 close();
             }
         }
@@ -3208,30 +3206,25 @@ Item {
             themeBrowserLoader.item.show();
     }
 
-    Process {
-        id: extractSaveProcess
-        property string outputPath: ""
-        running: false
-        stdout: SplitParser {
-            onRead: data => {}
-        }
-        stderr: SplitParser {
-            onRead: data => {}
+    FileView {
+        id: extractSaveFileView
+        blockWrites: true
+        preload: false
+        atomicWrites: true
+        printErrors: true
+
+        onSaved: {
+            ToastService.showInfo(I18n.tr("Theme extracted to: %1", "extract theme success").arg(Paths.strip(extractSaveFileView.path)));
         }
 
-        onExited: exitCode => {
-            if (exitCode === 0) {
-                ToastService.showInfo(I18n.tr("Theme extracted to: %1", "extract theme success").arg(extractSaveProcess.outputPath));
-            } else {
-                ToastService.showError(I18n.tr("Failed to extract theme (exit code: %1)", "extract theme error").arg(exitCode));
-            }
+        onSaveFailed: error => {
+            ToastService.showError(I18n.tr("Failed to extract theme", "extract theme error"));
+            log.warn("Failed to write extracted theme to " + extractSaveFileView.path + ": " + error);
         }
     }
 
     function saveExtractedTheme(json, outputPath) {
-        var tempFile = Paths.strip(StandardPaths.writableLocation(StandardPaths.TempLocation)) + "/dms-extract-" + Date.now() + ".json";
-        extractSaveProcess.outputPath = outputPath;
-        extractSaveProcess.command = ["sh", "-c", "cat > " + tempFile + " << 'DMS_THEME_EXTRACT_EOF'\n" + json + "\nDMS_THEME_EXTRACT_EOF\ncp " + tempFile + " " + outputPath + " && rm -f " + tempFile];
-        extractSaveProcess.running = true;
+        extractSaveFileView.path = outputPath;
+        extractSaveFileView.setText(json);
     }
 }

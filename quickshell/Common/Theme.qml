@@ -283,7 +283,7 @@ Singleton {
             "surfaceContainer": getMatugenColorForMode(colorMode, "surface_container", "#1e2023"),
             "surfaceContainerHigh": getMatugenColorForMode(colorMode, "surface_container_high", "#292b2f"),
             "surfaceContainerHighest": getMatugenColorForMode(colorMode, "surface_container_highest", "#343740"),
-            "error": "#F2B8B5",
+            "error": getMatugenColorForMode(colorMode, "error", "#F2B8B5"),
             "warning": "#FF9800",
             "info": "#2196F3",
             "success": "#4CAF50"
