@@ -13,6 +13,7 @@ DankModal {
     property alias filterExtensions: fileBrowserSurfaceModal.fileExtensions
     property bool showHiddenFiles: false
     property bool saveMode: false
+    property bool folderMode: false
     property string defaultFileName: ""
     property var parentPopout: null
 
@@ -57,6 +58,7 @@ DankModal {
         fileExtensions: fileBrowserSurfaceModal.fileExtensions
         showHiddenFiles: fileBrowserSurfaceModal.showHiddenFiles
         saveMode: fileBrowserSurfaceModal.saveMode
+        folderMode: fileBrowserSurfaceModal.folderMode
         defaultFileName: fileBrowserSurfaceModal.defaultFileName
 
         Component.onCompleted: initialize()
