@@ -1,6 +1,7 @@
 import QtCore
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import Quickshell.Widgets
 import qs.Common
 import qs.Modals.FileBrowser
@@ -13,6 +14,7 @@ Item {
     id: themeColorsTab
 
     property var parentModal: null
+    property string pendingExtractJson: ""
     readonly property bool connectedFrameModeActive: SettingsData.connectedFrameModeActive
     readonly property bool frameModeActive: SettingsData.frameEnabled
     property var cachedIconThemes: SettingsData.availableIconThemes
@@ -564,7 +566,7 @@ Item {
                             }
 
                             Column {
-                                width: parent.width - 120 - Theme.spacingM
+                                width: parent.width - 120 - Theme.spacingM - 36 - Theme.spacingM
                                 spacing: Theme.spacingS
                                 anchors.verticalCenter: parent.verticalCenter
 
@@ -586,6 +588,7 @@ Item {
                                 }
 
                                 StyledText {
+                                    id: wallpaperPathText
                                     text: {
                                         if (ToastService.wallpaperErrorStatus === "error")
                                             return I18n.tr("Wallpaper processing failed", "wallpaper processing error");
@@ -601,6 +604,22 @@ Item {
                                     maximumLineCount: 2
                                     width: parent.width
                                     wrapMode: Text.WordWrap
+                                }
+                            }
+
+                            DankActionButton {
+                                buttonSize: 36
+                                iconName: "download"
+                                iconSize: Theme.iconSize
+                                backgroundColor: Theme.primaryHover
+                                iconColor: Theme.primary
+                                tooltipText: I18n.tr("Extract theme to JSON", "extract theme tooltip")
+                                anchors.bottom: wallpaperPathText.bottom
+                                onClicked: {
+                                    pendingExtractJson = Theme.extractCurrentTheme();
+                                    saveBrowserLoader.active = true;
+                                    if (saveBrowserLoader.item)
+                                        saveBrowserLoader.item.open();
                                 }
                             }
                         }
@@ -2978,6 +2997,28 @@ Item {
     }
 
     LazyLoader {
+        id: saveBrowserLoader
+        active: false
+
+        FileBrowserSurfaceModal {
+            id: saveBrowser
+
+            browserTitle: I18n.tr("Save Extracted Theme", "extract theme save dialog title")
+            browserIcon: "download"
+            browserType: "default"
+            fileExtensions: ["*.json"]
+            allowStacking: true
+            saveMode: true
+            defaultFileName: "dms-extracted-theme.json"
+
+            onFileSelected: path => {
+                saveExtractedTheme(pendingExtractJson, Paths.strip(path));
+                close();
+            }
+        }
+    }
+
+    LazyLoader {
         id: themeBrowserLoader
         active: false
 
@@ -2991,5 +3032,27 @@ Item {
         themeBrowserLoader.active = true;
         if (themeBrowserLoader.item)
             themeBrowserLoader.item.show();
+    }
+
+    FileView {
+        id: extractSaveFileView
+        blockWrites: true
+        preload: false
+        atomicWrites: true
+        printErrors: true
+
+        onSaved: {
+            ToastService.showInfo(I18n.tr("Theme extracted to: %1", "extract theme success").arg(Paths.strip(extractSaveFileView.path)));
+        }
+
+        onSaveFailed: error => {
+            ToastService.showError(I18n.tr("Failed to extract theme", "extract theme error"));
+            log.warn("Failed to write extracted theme to " + extractSaveFileView.path + ": " + error);
+        }
+    }
+
+    function saveExtractedTheme(json, outputPath) {
+        extractSaveFileView.path = outputPath;
+        extractSaveFileView.setText(json);
     }
 }
