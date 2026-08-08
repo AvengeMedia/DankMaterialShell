@@ -77,6 +77,7 @@ Singleton {
     readonly property string _configUrl: StandardPaths.writableLocation(StandardPaths.ConfigLocation)
     readonly property string _configDir: Paths.strip(_configUrl)
     readonly property string pluginSettingsPath: _configDir + "/DankMaterialShell/plugin_settings.json"
+    readonly property bool qtengineActive: Quickshell.env("QT_QPA_PLATFORMTHEME") === "qtengine" || Quickshell.env("QT_QPA_PLATFORMTHEME_QT6") === "qtengine"
 
     property bool _loading: false
     property bool _pluginSettingsLoading: false
@@ -828,6 +829,7 @@ Singleton {
     property bool matugenTemplateQt5ct: true
     property bool matugenTemplateQt6ct: true
     property bool matugenTemplateFcitx5: true
+    property bool matugenTemplateQtengine: true
     property bool matugenTemplateFirefox: true
     property bool matugenTemplatePywalfox: true
     property bool matugenTemplateZenBrowser: true
@@ -1520,6 +1522,10 @@ Singleton {
         update_qt_icon_theme ${_configDir}/qt6ct/qt6ct.conf '${qtThemeNameEscaped}'`;
 
         Quickshell.execDetached(["sh", "-lc", script]);
+
+        if (!qtengineActive || !matugenTemplateQtengine)
+            return;
+        Proc.runCommand("updateQtengineIconTheme", [Proc.dmsBin, "matugen", "qtengine", "--config-dir", _configDir, "--icon-theme", qtThemeName], () => {});
     }
 
     function scheduleAuthApply() {
