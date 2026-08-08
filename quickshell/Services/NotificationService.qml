@@ -349,6 +349,10 @@ Singleton {
         return _ingressCountThisSec <= maxIngressPerSecond;
     }
 
+    function _suppressedByDnd(urgency) {
+        return SessionData.doNotDisturb && urgency !== NotificationUrgency.Critical;
+    }
+
     function _enqueuePopup(wrapper) {
         if (notificationQueue.length >= maxQueueSize) {
             const gk = getGroupKey(wrapper);
@@ -684,7 +688,7 @@ Singleton {
                 }
             }
 
-            const shouldShowPopup = !root.popupsDisabled && !SessionData.doNotDisturb && !policy.disablePopup;
+            const shouldShowPopup = !root.popupsDisabled && !_suppressedByDnd(policy.urgency) && !policy.disablePopup;
             const isTransient = notif.transient;
             const shouldKeepInCenter = !isTransient && !policy.hideFromCenter;
 
@@ -1012,14 +1016,16 @@ Singleton {
             return;
         if (popupsDisabled)
             return;
-        if (SessionData.doNotDisturb)
-            return;
         if (notificationQueue.length === 0)
+            return;
+
+        const nextIndex = SessionData.doNotDisturb ? notificationQueue.findIndex(w => w && w.urgency === NotificationUrgency.Critical) : 0;
+        if (nextIndex === -1)
             return;
 
         _processingQueue = true;
 
-        const next = notificationQueue.shift();
+        const next = notificationQueue.splice(nextIndex, 1)[0];
         if (!next) {
             _processingQueue = false;
             return;
@@ -1348,16 +1354,15 @@ Singleton {
         target: SessionData
         function onDoNotDisturbChanged() {
             if (SessionData.doNotDisturb) {
-                // Hide all current popups when DND is enabled
-                for (const notif of visibleNotifications) {
+                // Hide every popup except critical ones when DND is enabled
+                notificationQueue = notificationQueue.filter(w => w && w.urgency === NotificationUrgency.Critical);
+                const suppressed = visibleNotifications.filter(w => w && _suppressedByDnd(w.urgency));
+                visibleNotifications = visibleNotifications.filter(w => w && !_suppressedByDnd(w.urgency));
+                for (const notif of suppressed) {
                     notif.popup = false;
                 }
-                visibleNotifications = [];
-                notificationQueue = [];
-            } else {
-                // Re-enable popup processing when DND is disabled
-                processQueue();
             }
+            processQueue();
         }
     }
 
