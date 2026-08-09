@@ -7,6 +7,7 @@ import Quickshell.I3
 import Quickshell.Wayland
 import Quickshell.Hyprland
 import qs.Common
+import qs.DankCommon.Common as DankCommon
 import qs.Services
 
 Singleton {
@@ -43,6 +44,39 @@ Singleton {
     property bool _sortScheduled: false
 
     signal toplevelsChanged
+
+    readonly property bool supportsMinimize: DankCommon.Compositor.supportsMinimize
+
+    function canMinimize(toplevel) {
+        return supportsMinimize && toplevel && toplevel.minimized !== undefined;
+    }
+
+    function activateToplevel(toplevel) {
+        if (!toplevel)
+            return;
+        if (canMinimize(toplevel) && toplevel.minimized)
+            toplevel.minimized = false;
+        toplevel.activate();
+    }
+
+    function toggleToplevel(toplevel) {
+        if (!toplevel)
+            return;
+        if (!canMinimize(toplevel)) {
+            toplevel.activate();
+            return;
+        }
+        if (toplevel.minimized) {
+            toplevel.minimized = false;
+            toplevel.activate();
+            return;
+        }
+        if (toplevel.activated) {
+            toplevel.minimized = true;
+            return;
+        }
+        toplevel.activate();
+    }
 
     function fetchRandrData() {
         Proc.runCommand("randr", [Proc.dmsBin, "randr", "--json"], (output, exitCode) => {

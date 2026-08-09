@@ -107,6 +107,23 @@ Item {
 
         return false;
     }
+    readonly property bool isMinimized: {
+        if (!CompositorService.supportsMinimize || !appData) {
+            return false;
+        }
+
+        switch (appData.type) {
+        case "window":
+            return getToplevelObject()?.minimized === true;
+        case "grouped":
+            {
+                const toplevels = getGroupedToplevels();
+                return toplevels.length > 0 && toplevels.every(t => t.minimized);
+            }
+        default:
+            return false;
+        }
+    }
     property string tooltipText: {
         if (!appData || !appData.appId) {
             return "";
@@ -185,7 +202,7 @@ Item {
         const nextToplevel = toplevels[(currentIndex + 1) % toplevels.length];
         if (restoreSpecialWorkspaceWindow(nextToplevel))
             return;
-        nextToplevel.activate();
+        CompositorService.activateToplevel(nextToplevel);
     }
     onIsHoveredChanged: {
         if (mouseArea.pressed || dragging)
@@ -333,7 +350,7 @@ Item {
                 if (windowToplevel) {
                     if (restoreSpecialWorkspaceWindow(windowToplevel))
                         return;
-                    windowToplevel.activate();
+                    CompositorService.toggleToplevel(windowToplevel);
                 }
                 break;
             case "grouped":
@@ -360,7 +377,7 @@ Item {
                     if (groupedToplevel) {
                         if (restoreSpecialWorkspaceWindow(groupedToplevel))
                             return;
-                        groupedToplevel.activate();
+                        CompositorService.toggleToplevel(groupedToplevel);
                     }
                 } else {
                     cycleGroupedToplevels();
@@ -503,6 +520,7 @@ Item {
             smooth: true
             asynchronous: true
             visible: status === Image.Ready && !coreIcon.visible
+            opacity: root.isMinimized ? 0.4 : 1
             layer.enabled: appData && (appData.appId === "org.quickshell" || appData.appId === "com.danklinux.dms")
             layer.smooth: true
             layer.mipmap: true
@@ -518,6 +536,7 @@ Item {
             height: actualIconSize
             anchors.centerIn: parent
             visible: !coreIcon.visible && iconImg.status !== Image.Ready && appData && appData.appId && !Paths.isSteamApp(appData.appId)
+            opacity: root.isMinimized ? 0.4 : 1
             color: Theme.surfaceLight
             radius: Theme.cornerRadius
             border.width: 1
@@ -550,6 +569,7 @@ Item {
             name: "sports_esports"
             color: Theme.surfaceText
             visible: !coreIcon.visible && iconImg.status !== Image.Ready && appData && appData.appId && Paths.isSteamApp(appData.appId)
+            opacity: root.isMinimized ? 0.4 : 1
         }
 
         Loader {
