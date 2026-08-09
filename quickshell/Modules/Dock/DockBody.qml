@@ -381,7 +381,7 @@ Item {
     }
 
     readonly property real dockReserveZone: dockGeometry.reserveZone
-    readonly property bool shouldReserveDockSpace: dockGeometry.shouldReserveSpace
+    readonly property bool shouldReserveDockSpace: SettingsData.showDock && dockGeometry.shouldReserveSpace
 
     readonly property real surfaceExclusiveZone: {
         if (!dock.shouldReserveDockSpace)
