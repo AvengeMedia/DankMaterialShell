@@ -526,7 +526,7 @@ Item {
             "id": widget.id,
             "enabled": widget.enabled
         };
-        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "diskUsageMode", "minimumWidth", "showSwap", "showInGb", "mediaSize", "clockCompactMode", "focusedWindowSize", "focusedWindowCompactMode", "focusedWindowShowIcon", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "keyboardLayoutNameShowIcon", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showBatteryPercent", "showBatteryPercentOnlyOnBattery", "showBatteryTime", "showBatteryTimeOnlyOnBattery", "batteryPillStyle", "batteryPillPercentSign", "showPrinterIcon", "showScreenSharingIcon", "showIdleInhibitorIcon", "showDoNotDisturbIcon", "controlCenterGroupOrder", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge", "trayUseInlineExpansion", "trayPopupSingleLine", "trayAutoOverflow", "trayMaxVisibleItems", "hideWhenIdle"];
+        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "diskUsageMode", "minimumWidth", "showSwap", "showInGb", "mediaSize", "clockCompactMode", "clockDateOrder", "focusedWindowSize", "focusedWindowCompactMode", "focusedWindowShowIcon", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "keyboardLayoutNameShowIcon", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showBatteryPercent", "showBatteryPercentOnlyOnBattery", "showBatteryTime", "showBatteryTimeOnlyOnBattery", "batteryPillStyle", "batteryPillPercentSign", "showPrinterIcon", "showScreenSharingIcon", "showIdleInhibitorIcon", "showDoNotDisturbIcon", "controlCenterGroupOrder", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge", "trayUseInlineExpansion", "trayPopupSingleLine", "trayAutoOverflow", "trayMaxVisibleItems", "hideWhenIdle"];
         for (var i = 0; i < keys.length; i++) {
             if (widget[keys[i]] !== undefined)
                 result[keys[i]] = widget[keys[i]];
@@ -895,6 +895,17 @@ Item {
         setWidgetsForSection(sectionId, widgets);
     }
 
+    function handleClockSettingChanged(sectionId, widgetIndex, settingName, value) {
+        var widgets = getWidgetsForSection(sectionId).slice();
+        if (widgetIndex < 0 || widgetIndex >= widgets.length) {
+            return;
+        }
+        var newWidget = cloneWidgetData(widgets[widgetIndex]);
+        newWidget[settingName] = value;
+        widgets[widgetIndex] = newWidget;
+        setWidgetsForSection(sectionId, widgets);
+    }
+
     function handleDiskUsageModeChanged(sectionId, widgetIndex, mode) {
         var widgets = getWidgetsForSection(sectionId).slice();
         if (widgetIndex < 0 || widgetIndex >= widgets.length) {
@@ -1056,6 +1067,8 @@ Item {
                     item.mediaSize = widget.mediaSize;
                 if (widget.clockCompactMode !== undefined)
                     item.clockCompactMode = widget.clockCompactMode;
+                if (widget.clockDateOrder !== undefined)
+                    item.clockDateOrder = widget.clockDateOrder;
                 if (widget.focusedWindowCompactMode !== undefined)
                     item.focusedWindowCompactMode = widget.focusedWindowCompactMode;
                 if (widget.focusedWindowSize !== undefined)
@@ -1399,6 +1412,9 @@ Item {
                         onHideWhenIdleChanged: (sectionId, widgetIndex, enabled) => {
                             widgetsTab.handleHideWhenIdleChanged(sectionId, widgetIndex, enabled);
                         }
+                        onClockSettingChanged: (sectionId, widgetIndex, settingName, value) => {
+                            widgetsTab.handleClockSettingChanged(sectionId, widgetIndex, settingName, value);
+                        }
                     }
                 }
 
@@ -1486,6 +1502,9 @@ Item {
                         onHideWhenIdleChanged: (sectionId, widgetIndex, enabled) => {
                             widgetsTab.handleHideWhenIdleChanged(sectionId, widgetIndex, enabled);
                         }
+                        onClockSettingChanged: (sectionId, widgetIndex, settingName, value) => {
+                            widgetsTab.handleClockSettingChanged(sectionId, widgetIndex, settingName, value);
+                        }
                     }
                 }
 
@@ -1572,6 +1591,9 @@ Item {
                         }
                         onHideWhenIdleChanged: (sectionId, widgetIndex, enabled) => {
                             widgetsTab.handleHideWhenIdleChanged(sectionId, widgetIndex, enabled);
+                        }
+                        onClockSettingChanged: (sectionId, widgetIndex, settingName, value) => {
+                            widgetsTab.handleClockSettingChanged(sectionId, widgetIndex, settingName, value);
                         }
                     }
                 }
