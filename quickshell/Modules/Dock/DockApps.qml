@@ -159,18 +159,21 @@ Item {
                 function buildGroupedItems(pinnedApps, sortedToplevels) {
                     const items = [];
                     const appGroups = new Map();
+                    const separatePinnedAndRunning = SettingsData.dockSeparatePinnedAndRunningApps;
 
-                    pinnedApps.forEach(rawAppId => {
-                        const appId = Paths.moddedAppId(rawAppId);
-                        const coreAppData = getCoreAppData(appId);
-                        appGroups.set(appId, {
-                            appId: appId,
-                            isPinned: true,
-                            windows: [],
-                            isCoreApp: coreAppData !== null,
-                            coreAppData: coreAppData
+                    if (!separatePinnedAndRunning) {
+                        pinnedApps.forEach(rawAppId => {
+                            const appId = Paths.moddedAppId(rawAppId);
+                            const coreAppData = getCoreAppData(appId);
+                            appGroups.set(appId, {
+                                appId: appId,
+                                isPinned: true,
+                                windows: [],
+                                isCoreApp: coreAppData !== null,
+                                coreAppData: coreAppData
+                            });
                         });
-                    });
+                    }
 
                     sortedToplevels.forEach((toplevel, index) => {
                         const rawAppId = toplevel.appId || "unknown";
@@ -219,6 +222,24 @@ Item {
                         (group.isPinned ? pinnedGroups : unpinnedGroups).push(item);
                     });
 
+                    if (separatePinnedAndRunning) {
+                        pinnedApps.forEach(rawAppId => {
+                            const appId = Paths.moddedAppId(rawAppId);
+                            const coreAppData = getCoreAppData(appId);
+                            pinnedGroups.push({
+                                uniqueKey: "pinned_" + appId,
+                                type: "pinned",
+                                appId: appId,
+                                toplevel: null,
+                                isPinned: true,
+                                isRunning: false,
+                                isCoreApp: coreAppData !== null,
+                                coreAppData: coreAppData,
+                                isInOverflow: false
+                            });
+                        });
+                    }
+
                     pinnedGroups.forEach(item => items.push(item));
                     insertLauncher(items);
 
@@ -239,6 +260,7 @@ Item {
                     const items = [];
                     const runningAppIds = new Set();
                     const windowItems = [];
+                    const separatePinnedAndRunning = SettingsData.dockSeparatePinnedAndRunningApps;
 
                     sortedToplevels.forEach((toplevel, index) => {
                         let uniqueKey = "window_" + index;
@@ -283,6 +305,21 @@ Item {
                     pinnedApps.forEach(rawAppId => {
                         const appId = Paths.moddedAppId(rawAppId);
                         const coreAppData = getCoreAppData(appId);
+                        if (separatePinnedAndRunning) {
+                            items.push({
+                                uniqueKey: "pinned_" + appId,
+                                type: "pinned",
+                                appId: appId,
+                                toplevel: null,
+                                isPinned: true,
+                                isRunning: false,
+                                isCoreApp: coreAppData !== null,
+                                coreAppData: coreAppData,
+                                isInOverflow: false
+                            });
+                            return;
+                        }
+
                         const matchIndex = remainingWindowItems.findIndex(item => item.appId === appId);
 
                         if (matchIndex !== -1) {
@@ -687,6 +724,15 @@ Item {
         }
         function onDockMaxVisibleRunningAppsChanged() {
             repeater.updateModel();
+        }
+        function onDockSeparatePinnedAndRunningAppsChanged() {
+            root.suppressShiftAnimation = true;
+            root.draggedIndex = -1;
+            root.dropTargetIndex = -1;
+            repeater.updateModel();
+            Qt.callLater(() => {
+                root.suppressShiftAnimation = false;
+            });
         }
         function onDockShowTrashChanged() {
             repeater.updateModel();

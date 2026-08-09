@@ -2145,6 +2145,34 @@
     "conditionKey": "isHyprland"
   },
   {
+    "section": "dockSeparatePinnedAndRunningApps",
+    "label": "Separate Pinned and Running Apps",
+    "tabIndex": 5,
+    "category": "Dock",
+    "keywords": [
+      "active",
+      "app drawer",
+      "app menu",
+      "applications",
+      "apps",
+      "dock",
+      "keep",
+      "launcher",
+      "launcher bar",
+      "launchers",
+      "open",
+      "pinned",
+      "running",
+      "separate",
+      "separately",
+      "show",
+      "start menu",
+      "taskbar",
+      "windows"
+    ],
+    "description": "Keep pinned apps as launchers and show running windows separately"
+  },
+  {
     "section": "showDock",
     "label": "Show Dock",
     "tabIndex": 5,

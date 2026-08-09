@@ -175,6 +175,15 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    settingKey: "dockSeparatePinnedAndRunningApps"
+                    tags: ["dock", "pinned", "running", "launcher", "apps"]
+                    text: I18n.tr("Separate Pinned and Running Apps")
+                    description: I18n.tr("Keep pinned apps as launchers and show running windows separately")
+                    checked: SettingsData.dockSeparatePinnedAndRunningApps
+                    onToggled: checked => SettingsData.set("dockSeparatePinnedAndRunningApps", checked)
+                }
+
+                SettingsToggleRow {
                     settingKey: "dockRestoreSpecialWorkspaceOnClick"
                     tags: ["dock", "hyprland", "special", "workspace", "restore"]
                     text: I18n.tr("Restore Special Workspace Windows")

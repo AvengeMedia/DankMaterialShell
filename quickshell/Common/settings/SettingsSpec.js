@@ -434,6 +434,7 @@ var SPEC = {
     dockSmartAutoHide: { def: false },
     dockUseOverlayLayer: { def: false },
     dockGroupByApp: { def: false },
+    dockSeparatePinnedAndRunningApps: { def: false },
     dockRestoreSpecialWorkspaceOnClick: { def: false },
     dockOpenOnOverview: { def: false },
     dockPosition: { def: 1 },
