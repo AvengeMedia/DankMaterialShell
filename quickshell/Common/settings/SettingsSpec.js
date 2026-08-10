@@ -280,7 +280,7 @@ var SPEC = {
     appPickerViewMode: { def: "grid" },
     sortAppsAlphabetically: { def: false },
     appLauncherGridColumns: { def: 4 },
-    spotlightCloseNiriOverview: { def: true },
+    closeNiriOverviewOnWindowFocus: { def: true },
     rememberLastQuery: { def: false },
     rememberLastMode: { def: true },
     spotlightSectionViewModes: { def: {} },

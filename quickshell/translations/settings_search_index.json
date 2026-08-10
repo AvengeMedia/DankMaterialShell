@@ -3090,15 +3090,17 @@
     "description": "Show darkened overlay behind modal dialogs"
   },
   {
-    "section": "spotlightCloseNiriOverview",
-    "label": "Niri Integration",
-    "tabIndex": 9,
-    "category": "Launcher",
+    "section": "closeNiriOverviewOnWindowFocus",
+    "label": "Overview",
+    "tabIndex": 37,
+    "category": "Personalization",
     "keywords": [
       "apps",
       "auto",
       "close",
+      "dock",
       "drawer",
+      "focus",
       "integration",
       "launch",
       "launcher",
@@ -3106,10 +3108,11 @@
       "menu",
       "niri",
       "overview",
+      "settings",
       "start"
     ],
-    "icon": "open_in_new",
-    "description": "Auto-close Niri overview when launching apps.",
+    "icon": "overview",
+    "description": "Auto-close Niri overview when DMS launches or focuses a window.",
     "conditionKey": "isNiri"
   },
   {

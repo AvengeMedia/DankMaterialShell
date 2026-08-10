@@ -15,7 +15,7 @@ Singleton {
     id: root
     readonly property var log: Log.scoped("SettingsData")
 
-    readonly property int settingsConfigVersion: 15
+    readonly property int settingsConfigVersion: 16
 
     enum Position {
         Top,
@@ -548,7 +548,7 @@ Singleton {
     property string appPickerViewMode: "grid"
     property bool sortAppsAlphabetically: false
     property int appLauncherGridColumns: 4
-    property bool spotlightCloseNiriOverview: true
+    property bool closeNiriOverviewOnWindowFocus: true
     property bool rememberLastQuery: false
     property bool rememberLastMode: true
     property var spotlightSectionViewModes: ({})

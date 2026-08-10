@@ -287,6 +287,24 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
 
             SettingsCard {
                 width: parent.width
+                tags: ["niri", "overview", "window", "focus", "launch", "launcher", "dock", "settings"]
+                title: I18n.tr("Overview")
+                settingKey: "niriOverview"
+                iconName: "overview"
+                visible: CompositorService.isNiri
+
+                SettingsToggleRow {
+                    tags: ["niri", "overview", "window", "focus", "launch", "launcher", "dock", "settings"]
+                    settingKey: "closeNiriOverviewOnWindowFocus"
+                    text: I18n.tr("Close Niri Overview on Window Focus", "Niri setting to leave Niri overview when DMS launches or focuses a window")
+                    description: I18n.tr("Auto-close Niri overview when DMS launches or focuses a window.", "Description of the close Niri overview on window focus setting")
+                    checked: SettingsData.closeNiriOverviewOnWindowFocus
+                    onToggled: checked => SettingsData.set("closeNiriOverviewOnWindowFocus", checked)
+                }
+            }
+
+            SettingsCard {
+                width: parent.width
                 tags: ["niri", "layout", "gaps", "radius", "window", "border"]
                 title: I18n.tr("%1 Layout Overrides").arg("niri")
                 settingKey: "niriLayout"

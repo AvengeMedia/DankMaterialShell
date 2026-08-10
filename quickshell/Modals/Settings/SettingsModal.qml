@@ -44,6 +44,7 @@ DankFloatingWindow {
         if (visible && !backingWindowVisible) {
             visible = false;
         }
+        CompositorService.closeNiriOverviewOnWindowFocus();
         visible = true;
     }
 
