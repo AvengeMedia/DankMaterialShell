@@ -1346,6 +1346,22 @@ Singleton {
         });
     }
 
+    function requestBrightnessState() {
+        if (!DMSService.isConnected) {
+            return;
+        }
+
+        DMSService.sendRequest("brightness.getState", null, response => {
+            if (response.error) {
+                log.error("Failed to request brightness state:", response.error);
+                return;
+            }
+            if (response.result) {
+                updateFromBrightnessState(response.result);
+            }
+        });
+    }
+
     function updateDeviceBrightnessDisplay(deviceName) {
         brightnessVersion++;
         brightnessChanged();
@@ -1371,6 +1387,7 @@ Singleton {
         deviceBrightnessUserSet = Object.assign({}, SessionData.brightnessUserSetValues);
         if (DMSService.isConnected) {
             checkGammaControlAvailability();
+            requestBrightnessState();
         }
     }
 
@@ -1410,6 +1427,7 @@ Singleton {
         function onConnectionStateChanged() {
             if (DMSService.isConnected) {
                 checkGammaControlAvailability();
+                requestBrightnessState();
             } else {
                 brightnessAvailable = false;
                 gammaControlAvailable = false;
