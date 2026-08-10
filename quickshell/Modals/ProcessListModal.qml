@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Layouts
-import Quickshell
 import Quickshell.Wayland
 import qs.Common
 import qs.Modules.ProcessList
@@ -214,7 +213,7 @@ DankFloatingWindow {
                 }
 
                 StyledText {
-                    text: I18n.tr("The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.", "dgop unavailable error message")
+                    text: I18n.tr("DMS_SOCKET not available")
                     font.pixelSize: Theme.fontSizeMedium
                     color: Theme.surfaceText
                     anchors.horizontalCenter: parent.horizontalCenter

@@ -118,7 +118,6 @@ func (a *ArchDistribution) DetectDependenciesWithTerminal(ctx context.Context, w
 	}
 
 	dependencies = append(dependencies, a.detectMatugen())
-	dependencies = append(dependencies, a.detectDgop())
 	dependencies = append(dependencies, a.detectDanksearch())
 	dependencies = append(dependencies, a.detectDankCalendar())
 
@@ -219,7 +218,6 @@ func (a *ArchDistribution) GetPackageMappingWithVariants(wm deps.WindowManager, 
 		"quickshell":              a.getQuickshellMapping(variants["quickshell"]),
 		"dms-greeter":             a.getDMSGreeterMapping(variants["dms-greeter"]),
 		"matugen":                 a.getMatugenMapping(variants["matugen"]),
-		"dgop":                    {Name: "dgop", Repository: RepoTypeSystem},
 		"ghostty":                 {Name: "ghostty", Repository: RepoTypeSystem},
 		"kitty":                   {Name: "kitty", Repository: RepoTypeSystem},
 		"alacritty":               {Name: "alacritty", Repository: RepoTypeSystem},
@@ -659,7 +657,7 @@ func (a *ArchDistribution) installAURPackages(ctx context.Context, packages []st
 }
 
 func (a *ArchDistribution) reorderAURPackages(packages []string) []string {
-	dmsDepencies := []string{"quickshell", "quickshell-git", "dgop"}
+	dmsDepencies := []string{"quickshell", "quickshell-git"}
 
 	var deps []string
 	var others []string

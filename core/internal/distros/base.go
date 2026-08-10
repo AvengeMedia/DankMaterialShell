@@ -103,10 +103,6 @@ func (b *BaseDistribution) detectMatugen() deps.Dependency {
 	return b.detectCommand("matugen", "Material Design color generation tool")
 }
 
-func (b *BaseDistribution) detectDgop() deps.Dependency {
-	return b.detectCommand("dgop", "Desktop portal management tool")
-}
-
 func (b *BaseDistribution) detectDanksearch() deps.Dependency {
 	return b.detectOptionalPackage("danksearch", "File indexing and search service", b.commandExists("dsearch") || b.commandExists("danksearch"))
 }

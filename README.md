@@ -83,7 +83,7 @@ One command installs DMS and all dependencies on Arch, Fedora, Debian, Ubuntu, o
 Wallpaper-based color schemes that automatically theme GTK, Qt, terminals, editors (vscode, vscodium), and more using [matugen](https://github.com/InioX/matugen) and dank16.
 
 **System Monitoring**
-Real-time CPU, RAM, GPU metrics and temperatures with [dgop](https://github.com/AvengeMedia/dgop). Process list with search and management.
+Real-time CPU, RAM, GPU metrics and temperatures built into the dms daemon (powered by [dgop](https://github.com/AvengeMedia/dgop)). Process list with search and management.
 
 **Powerful Launcher**
 Spotlight-style search for applications, files ([dsearch](https://github.com/AvengeMedia/danksearch)), emojis, running windows, calculator, and commands. Extensible with plugins.
@@ -142,7 +142,7 @@ DMS is one piece of the suite. The rest lives in its own repos:
 
 - [dank-greeter](https://github.com/AvengeMedia/dank-greeter) - greetd login screen with the Dank Material aesthetic. The Greeter tab in DMS settings is the front-end for it.
 - [dankcalendar](https://github.com/AvengeMedia/dankcalendar) - Local, Google, Microsoft, and CalDAV calendars for the dank desktop.
-- [dgop](https://github.com/AvengeMedia/dgop) - System monitoring CLI and API that powers the process list and dashboard widgets.
+- [dgop](https://github.com/AvengeMedia/dgop) - System monitoring TUI and Go library; its library powers the process list and dashboard widgets inside the dms daemon.
 - [dsearch](https://github.com/AvengeMedia/danksearch) - Fast file search that powers file results in the launcher.
 - [dank-qml-common](https://github.com/AvengeMedia/dank-qml-common) - Shared QML widgets and components used by DMS, dank-greeter, and dankcalendar.
 - [dankgo](https://github.com/AvengeMedia/dankgo) - Common Go modules behind the single binary apps.

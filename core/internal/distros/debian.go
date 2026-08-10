@@ -70,7 +70,6 @@ func (d *DebianDistribution) DetectDependenciesWithTerminal(ctx context.Context,
 	}
 
 	dependencies = append(dependencies, d.detectMatugen())
-	dependencies = append(dependencies, d.detectDgop())
 	dependencies = append(dependencies, d.detectDanksearch())
 	dependencies = append(dependencies, d.detectDankCalendar())
 
@@ -135,7 +134,6 @@ func (d *DebianDistribution) GetPackageMappingWithVariants(wm deps.WindowManager
 		"quickshell":              d.getQuickshellMapping(variants["quickshell"]),
 		"dms-greeter":             {Name: "dms-greeter", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"},
 		"matugen":                 {Name: "matugen", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"},
-		"dgop":                    {Name: "dgop", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"},
 		"ghostty":                 {Name: "ghostty", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"},
 		"danksearch":              {Name: "danksearch", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"},
 		"dankcalendar":            {Name: "dankcalendar-git", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"},
@@ -668,10 +666,6 @@ func (d *DebianDistribution) installBuildDependencies(ctx context.Context, manua
 			if err := d.installRust(ctx, sudoPassword, progressChan); err != nil {
 				return fmt.Errorf("failed to install Rust: %w", err)
 			}
-		case "dgop":
-			if err := d.installGo(ctx, sudoPassword, progressChan); err != nil {
-				return fmt.Errorf("failed to install Go: %w", err)
-			}
 		}
 	}
 
@@ -728,24 +722,6 @@ func (d *DebianDistribution) installRust(ctx context.Context, sudoPassword strin
 	}
 
 	return nil
-}
-
-func (d *DebianDistribution) installGo(ctx context.Context, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
-	if d.commandExists("go") {
-		return nil
-	}
-
-	progressChan <- InstallProgressMsg{
-		Phase:       PhaseSystemPackages,
-		Progress:    0.87,
-		Step:        "Installing Go...",
-		IsComplete:  false,
-		NeedsSudo:   true,
-		CommandInfo: "sudo apt-get install golang-go",
-	}
-
-	installCmd := privesc.ExecCommand(ctx, sudoPassword, "DEBIAN_FRONTEND=noninteractive apt-get install -y golang-go")
-	return d.runWithProgress(installCmd, progressChan, PhaseSystemPackages, 0.87, 0.90)
 }
 
 func (d *DebianDistribution) InstallManualPackages(ctx context.Context, packages []string, variantMap map[string]deps.PackageVariant, sudoPassword string, progressChan chan<- InstallProgressMsg) error {

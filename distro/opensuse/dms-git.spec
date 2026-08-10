@@ -18,7 +18,6 @@ BuildRequires:  systemd-rpm-macros
 
 Requires:       (quickshell-git or quickshell)
 Requires:       accountsservice
-Requires:       dgop
 
 Recommends:     cava
 Recommends:     danksearch

@@ -36,7 +36,7 @@ import (
 	"github.com/AvengeMedia/dankgo/syncmap"
 )
 
-const APIVersion = 29
+const APIVersion = 30
 
 var CLIVersion = "dev"
 
@@ -390,77 +390,7 @@ func routeRequestRecovered(conn *models.Conn, req models.Request) {
 }
 
 func getCapabilities() Capabilities {
-	caps := []string{"plugins"}
-
-	if networkManager != nil {
-		caps = append(caps, "network")
-	}
-
-	if loginctlManager != nil {
-		caps = append(caps, "loginctl")
-	}
-
-	if freedesktopManager != nil {
-		caps = append(caps, "freedesktop")
-	}
-
-	if waylandManager != nil {
-		caps = append(caps, "gamma")
-	}
-
-	if bluezManager != nil {
-		caps = append(caps, "bluetooth")
-	}
-
-	if appPickerManager != nil {
-		caps = append(caps, "browser")
-	}
-
-	if cupsAvailable() {
-		caps = append(caps, "cups")
-	}
-
-	if tailscaleManager != nil && tailscaleManager.IsAvailable() {
-		caps = append(caps, "tailscale")
-	}
-
-	if brightnessManager != nil {
-		caps = append(caps, "brightness")
-	}
-
-	if wlrOutputManager != nil {
-		caps = append(caps, "wlroutput")
-	}
-
-	if evdevManager != nil {
-		caps = append(caps, "evdev")
-	}
-
-	if clipboardManager != nil {
-		caps = append(caps, "clipboard")
-	}
-
-	if themeModeManager != nil {
-		caps = append(caps, "theme.auto")
-	}
-
-	if wallpaperManager != nil {
-		caps = append(caps, "wallpaper")
-	}
-
-	if dbusManager != nil {
-		caps = append(caps, "dbus")
-	}
-
-	if sysUpdateManager != nil {
-		caps = append(caps, "sysupdate")
-	}
-
-	return Capabilities{Capabilities: caps}
-}
-
-func getServerInfo() ServerInfo {
-	caps := []string{"plugins"}
+	caps := []string{"plugins", "dgop"}
 
 	if networkManager != nil {
 		caps = append(caps, "network")
@@ -530,10 +460,14 @@ func getServerInfo() ServerInfo {
 		caps = append(caps, "sysupdate")
 	}
 
+	return Capabilities{Capabilities: caps}
+}
+
+func getServerInfo() ServerInfo {
 	return ServerInfo{
 		APIVersion:   APIVersion,
 		CLIVersion:   CLIVersion,
-		Capabilities: caps,
+		Capabilities: getCapabilities().Capabilities,
 	}
 }
 
