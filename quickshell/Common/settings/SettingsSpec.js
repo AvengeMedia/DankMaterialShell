@@ -678,6 +678,7 @@ var SPEC = {
     clipboardClickToPaste: { def: false },
     clipboardEnterToPaste: { def: false },
     clipboardRememberTypeFilter: { def: false },
+    clipboardUseOverlayLayer: { def: false },
     clipboardTypeFilter: { def: "all" },
     clipboardVisibleEntryActions: { def: ["pin", "edit", "delete"] },
 

@@ -108,6 +108,7 @@ Singleton {
     property bool clipboardClickToPaste: false
     property bool clipboardEnterToPaste: false
     property bool clipboardRememberTypeFilter: false
+    property bool clipboardUseOverlayLayer: false
     property string clipboardTypeFilter: "all"
     property var clipboardVisibleEntryActions: ["pin", "edit", "delete"]
 
