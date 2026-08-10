@@ -31,6 +31,7 @@ Item {
     id: root
     readonly property var log: Log.scoped("DMSShell")
     readonly property var _sessionsServiceRef: SessionsService
+    readonly property var _displayServiceRef: DisplayService
 
     property var core: null
 
