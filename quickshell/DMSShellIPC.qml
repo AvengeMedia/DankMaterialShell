@@ -1206,9 +1206,9 @@ Item {
             if (!widget)
                 return `WIDGET_NOT_AVAILABLE: ${widgetId}`;
 
-            if (widget.popoutTarget?.shouldBeVisible)
-                return "visible";
-            return "hidden";
+            if (!widget.popoutTarget)
+                return `WIDGET_NO_POPOUT: ${widgetId}`;
+            return widget.popoutTarget.shouldBeVisible ? "visible" : "hidden";
         }
 
         function reveal(widgetId: string): string {
