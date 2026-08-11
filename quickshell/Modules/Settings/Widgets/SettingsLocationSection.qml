@@ -8,7 +8,6 @@ Column {
     id: root
 
     property string description: I18n.tr("Uses sunrise/sunset times based on your location.")
-    property bool centered: false
 
     width: parent.width
     spacing: Theme.spacingM
@@ -32,7 +31,8 @@ Column {
     }
 
     Column {
-        width: parent.width
+        width: parent.width - Theme.spacingM * 2
+        x: Theme.spacingM
         spacing: Theme.spacingM
         visible: !SessionData.nightModeUseIPLocation
 
@@ -40,15 +40,15 @@ Column {
             text: I18n.tr("Manual Coordinates")
             font.pixelSize: Theme.fontSizeMedium
             color: Theme.surfaceText
-            width: parent.width
-            horizontalAlignment: root.centered ? Text.AlignHCenter : Text.AlignLeft
+            font.weight: Font.Medium
         }
 
         Row {
-            spacing: Theme.spacingL
-            anchors.horizontalCenter: root.centered ? parent.horizontalCenter : undefined
+            width: parent.width
+            spacing: Theme.spacingM
 
             Column {
+                width: (parent.width - Theme.spacingM) / 2
                 spacing: Theme.spacingXS
 
                 StyledText {
@@ -59,10 +59,14 @@ Column {
 
                 DankTextField {
                     id: latitudeField
-                    width: 120
-                    height: 40
+                    width: parent.width
+                    height: 48
                     text: ""
-                    placeholderText: "0.0"
+                    placeholderText: "40.7128"
+                    backgroundColor: Theme.surfaceVariant
+                    normalBorderColor: Theme.primarySelected
+                    focusedBorderColor: Theme.primary
+                    keyNavigationTab: longitudeField
 
                     Component.onCompleted: {
                         text = SessionData.latitude.toString();
@@ -86,6 +90,7 @@ Column {
             }
 
             Column {
+                width: (parent.width - Theme.spacingM) / 2
                 spacing: Theme.spacingXS
 
                 StyledText {
@@ -96,10 +101,14 @@ Column {
 
                 DankTextField {
                     id: longitudeField
-                    width: 120
-                    height: 40
+                    width: parent.width
+                    height: 48
                     text: ""
-                    placeholderText: "0.0"
+                    placeholderText: "-74.0060"
+                    backgroundColor: Theme.surfaceVariant
+                    normalBorderColor: Theme.primarySelected
+                    focusedBorderColor: Theme.primary
+                    keyNavigationBacktab: latitudeField
 
                     Component.onCompleted: {
                         text = SessionData.longitude.toString();
@@ -157,7 +166,6 @@ Column {
             color: Theme.surfaceVariantText
             width: parent.width
             wrapMode: Text.WordWrap
-            horizontalAlignment: root.centered ? Text.AlignHCenter : Text.AlignLeft
         }
     }
 }
