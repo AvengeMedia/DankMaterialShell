@@ -51,6 +51,89 @@ var DefaultOverlayStyle = OverlayStyle{
 	AccentR: 100, AccentG: 180, AccentB: 255,
 }
 
+func (r *RegionSelector) copyOpaque(src, dst *ShmBuffer) {
+	srcData := src.Data()
+	dstData := dst.Data()
+	for y := 0; y < dst.Height; y++ {
+		srcRow := y * src.Stride
+		dstRow := y * dst.Stride
+		for x := 0; x < dst.Width; x++ {
+			si := srcRow + x*4
+			di := dstRow + x*4
+			if si+3 >= len(srcData) || di+3 >= len(dstData) {
+				continue
+			}
+			dstData[di+0] = srcData[si+0]
+			dstData[di+1] = srcData[si+1]
+			dstData[di+2] = srcData[si+2]
+			dstData[di+3] = 255
+		}
+	}
+}
+
+func (r *RegionSelector) drawOverlayLayer(os *OutputSurface, renderBuf *ShmBuffer) {
+	data := renderBuf.Data()
+	stride := renderBuf.Stride
+	w, h := renderBuf.Width, renderBuf.Height
+	format := alphaFormat(os.screenFormat)
+
+	// The screenshot is an immutable parent surface. This surface only carries
+	// the scrim and selection chrome, so its transparent hole reveals the parent.
+	for y := 0; y < h; y++ {
+		off := y * stride
+		for x := 0; x < w; x++ {
+			i := off + x*4
+			if i+3 >= len(data) {
+				continue
+			}
+			data[i+0], data[i+1], data[i+2], data[i+3] = 0, 0, 0, 102
+		}
+	}
+
+	r.drawHUD(data, stride, w, h, format)
+	if !r.selection.hasSelection || r.selection.surface != os {
+		return
+	}
+
+	scaleX := float64(w) / float64(os.logicalW)
+	scaleY := float64(h) / float64(os.logicalH)
+	bx1 := int(r.selection.anchorX * scaleX)
+	by1 := int(r.selection.anchorY * scaleY)
+	bx2 := int(r.selection.currentX * scaleX)
+	by2 := int(r.selection.currentY * scaleY)
+	if bx1 > bx2 {
+		bx1, bx2 = bx2, bx1
+	}
+	if by1 > by2 {
+		by1, by2 = by2, by1
+	}
+	bx1 = clamp(bx1, 0, w-1)
+	by1 = clamp(by1, 0, h-1)
+	bx2 = clamp(bx2, 0, w-1)
+	by2 = clamp(by2, 0, h-1)
+
+	// Clear the selection hole so the immutable screenshot parent is visible.
+	for y := by1; y <= by2; y++ {
+		for x := bx1; x <= bx2; x++ {
+			i := y*stride + x*4
+			if i+3 < len(data) {
+				data[i+0], data[i+1], data[i+2], data[i+3] = 0, 0, 0, 0
+			}
+		}
+	}
+
+	selW, selH := bx2-bx1+1, by2-by1+1
+	if r.shiftHeld && selW != selH {
+		if selW < selH {
+			selH = selW
+		} else {
+			selW = selH
+		}
+	}
+	r.drawBorder(data, stride, w, h, bx1, by1, selW, selH, format)
+	r.drawDimensions(data, stride, w, h, bx1, by1, selW, selH, format)
+}
+
 func (r *RegionSelector) drawOverlay(os *OutputSurface, renderBuf *ShmBuffer) {
 	data := renderBuf.Data()
 	stride := renderBuf.Stride

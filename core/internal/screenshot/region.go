@@ -35,6 +35,15 @@ type OutputSurface struct {
 	output            *WaylandOutput
 	wlSurface         *client.Surface
 	layerSurf         *wlr_layer_shell.ZwlrLayerSurfaceV1
+	overlaySurface    *client.Surface
+	overlaySubsurface *client.Subsurface
+	overlayViewport   *wp_viewporter.WpViewport
+	overlayInput      *client.Region
+	baseBuffer        *ShmBuffer
+	basePool          *client.ShmPool
+	baseWlBuf         *client.Buffer
+	overlayReady      bool
+	basePresented     bool
 	viewport          *wp_viewporter.WpViewport
 	screenBuf         *ShmBuffer
 	screenBufNoCursor *ShmBuffer
@@ -65,6 +74,7 @@ type RegionSelector struct {
 
 	compositor *client.Compositor
 	shm        *client.Shm
+	subcomp    *client.Subcompositor
 	seat       *client.Seat
 	pointer    *client.Pointer
 	keyboard   *client.Keyboard
@@ -253,6 +263,12 @@ func (r *RegionSelector) handleGlobal(e client.RegistryGlobalEvent) {
 		shm := client.NewShm(r.ctx)
 		if err := r.registry.Bind(e.Name, e.Interface, e.Version, shm); err == nil {
 			r.shm = shm
+		}
+
+	case client.SubcompositorInterfaceName:
+		subcomp := client.NewSubcompositor(r.ctx)
+		if err := r.registry.Bind(e.Name, e.Interface, e.Version, subcomp); err == nil {
+			r.subcomp = subcomp
 		}
 
 	case client.SeatInterfaceName:
@@ -680,8 +696,60 @@ func (r *RegionSelector) captureForSurface(os *OutputSurface) {
 	}
 
 	r.initRenderBuffer(os)
+	if r.subcomp != nil && r.viewporter != nil {
+		if err := r.createOverlaySurface(os); err != nil {
+			log.Debug("screenshot overlay surface unavailable", "err", err)
+		}
+	}
 	r.applyPreSelection(os)
 	r.redrawSurface(os)
+}
+
+func (r *RegionSelector) createOverlaySurface(os *OutputSurface) error {
+	surface, err := r.compositor.CreateSurface()
+	if err != nil {
+		return fmt.Errorf("create overlay surface: %w", err)
+	}
+
+	subsurface, err := r.subcomp.GetSubsurface(surface, os.wlSurface)
+	if err != nil {
+		surface.Destroy()
+		return fmt.Errorf("create overlay subsurface: %w", err)
+	}
+	if err := subsurface.SetPosition(0, 0); err != nil {
+		subsurface.Destroy()
+		surface.Destroy()
+		return fmt.Errorf("position overlay subsurface: %w", err)
+	}
+
+	viewport, err := r.viewporter.GetViewport(surface)
+	if err != nil {
+		subsurface.Destroy()
+		surface.Destroy()
+		return fmt.Errorf("create overlay viewport: %w", err)
+	}
+
+	input, err := r.compositor.CreateRegion()
+	if err != nil {
+		viewport.Destroy()
+		subsurface.Destroy()
+		surface.Destroy()
+		return fmt.Errorf("create overlay input region: %w", err)
+	}
+	if err := surface.SetInputRegion(input); err != nil {
+		input.Destroy()
+		viewport.Destroy()
+		subsurface.Destroy()
+		surface.Destroy()
+		return fmt.Errorf("set overlay input region: %w", err)
+	}
+
+	os.overlaySurface = surface
+	os.overlaySubsurface = subsurface
+	os.overlayViewport = viewport
+	os.overlayInput = input
+	os.overlayReady = true
+	return nil
 }
 
 func (r *RegionSelector) initRenderBuffer(os *OutputSurface) {
@@ -783,6 +851,23 @@ func (r *RegionSelector) redrawSurface(os *OutputSurface) {
 		return
 	}
 
+	if os.overlayReady {
+		if err := r.presentBaseSurface(os, srcBuf); err != nil {
+			log.Error("present screenshot base surface failed", "err", err)
+			return
+		}
+		r.drawOverlayLayer(os, slot.shm)
+		_ = os.overlayViewport.SetSource(0, 0, float64(slot.shm.Width), float64(slot.shm.Height))
+		_ = os.overlayViewport.SetDestination(int32(os.logicalW), int32(os.logicalH))
+		_ = os.overlaySurface.SetBufferScale(1)
+		_ = os.overlaySurface.Attach(slot.wlBuf, 0, 0)
+		_ = os.overlaySurface.Damage(0, 0, int32(slot.shm.Width), int32(slot.shm.Height))
+		_ = os.overlaySurface.Commit()
+		slot.busy = true
+		_ = os.wlSurface.Commit()
+		return
+	}
+
 	switch r.phase {
 	case phaseScroll:
 		r.drawScrollOverlay(os, slot.shm)
@@ -809,6 +894,50 @@ func (r *RegionSelector) redrawSurface(os *OutputSurface) {
 
 	// Mark this slot as busy until compositor releases it
 	slot.busy = true
+}
+
+func (r *RegionSelector) presentBaseSurface(os *OutputSurface, src *ShmBuffer) error {
+	if os.basePresented {
+		return nil
+	}
+
+	buf, err := CreateShmBuffer(src.Width, src.Height, src.Stride)
+	if err != nil {
+		return err
+	}
+	buf.Format = src.Format
+	r.copyOpaque(src, buf)
+
+	pool, err := r.shm.CreatePool(buf.Fd(), int32(buf.Size()))
+	if err != nil {
+		buf.Close()
+		return err
+	}
+	wlBuf, err := pool.CreateBuffer(0, int32(buf.Width), int32(buf.Height), int32(buf.Stride), alphaFormat(os.screenFormat))
+	if err != nil {
+		pool.Destroy()
+		buf.Close()
+		return err
+	}
+
+	os.baseBuffer = buf
+	os.basePool = pool
+	os.baseWlBuf = wlBuf
+	if os.viewport != nil {
+		_ = os.wlSurface.SetBufferScale(1)
+		_ = os.viewport.SetSource(0, 0, float64(buf.Width), float64(buf.Height))
+		_ = os.viewport.SetDestination(int32(os.logicalW), int32(os.logicalH))
+	} else {
+		bufferScale := os.output.scale
+		if bufferScale <= 0 {
+			bufferScale = 1
+		}
+		_ = os.wlSurface.SetBufferScale(bufferScale)
+	}
+	_ = os.wlSurface.Attach(wlBuf, 0, 0)
+	_ = os.wlSurface.Damage(0, 0, int32(os.logicalW), int32(os.logicalH))
+	os.basePresented = true
+	return nil
 }
 
 func (r *RegionSelector) cleanup() {
@@ -842,6 +971,27 @@ func (r *RegionSelector) cleanup() {
 				slot.shm.Close()
 			}
 		}
+		if os.overlayInput != nil {
+			os.overlayInput.Destroy()
+		}
+		if os.overlayViewport != nil {
+			os.overlayViewport.Destroy()
+		}
+		if os.overlaySubsurface != nil {
+			os.overlaySubsurface.Destroy()
+		}
+		if os.overlaySurface != nil {
+			os.overlaySurface.Destroy()
+		}
+		if os.baseWlBuf != nil {
+			os.baseWlBuf.Destroy()
+		}
+		if os.basePool != nil {
+			os.basePool.Destroy()
+		}
+		if os.baseBuffer != nil {
+			os.baseBuffer.Close()
+		}
 		if os.viewport != nil {
 			os.viewport.Destroy()
 		}
@@ -867,6 +1017,9 @@ func (r *RegionSelector) cleanup() {
 	}
 	if r.viewporter != nil {
 		r.viewporter.Destroy()
+	}
+	if r.subcomp != nil {
+		r.subcomp.Destroy()
 	}
 	if r.screencopy != nil {
 		r.screencopy.Destroy()
