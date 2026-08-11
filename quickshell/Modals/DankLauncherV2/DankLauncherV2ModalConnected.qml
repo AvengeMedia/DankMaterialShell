@@ -246,6 +246,7 @@ Item {
             "phase": phase,
             "visible": presented,
             "presented": presented,
+            "layer": root.usesOverlayLayer ? "overlay" : "top",
             "barSide": resolvedConnectedBarSide,
             "bodyRect": bodyRect,
             "animationOffset": animationOffset,

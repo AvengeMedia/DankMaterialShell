@@ -267,6 +267,7 @@ Item {
             "phase": phase,
             "visible": visible,
             "presented": presented,
+            "layer": root.triggerUsesOverlayLayer ? "overlay" : "top",
             "barSide": contentContainer.connectedBarSide,
             "bodyRect": bodyRect,
             "animationOffset": animationOffset,

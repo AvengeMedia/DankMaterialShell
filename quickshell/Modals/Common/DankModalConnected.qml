@@ -140,6 +140,7 @@ Item {
             "phase": phase,
             "visible": presented,
             "presented": presented,
+            "layer": root.useOverlayLayer ? "overlay" : "top",
             "barSide": resolvedConnectedBarSide,
             "bodyRect": bodyRect,
             "animationOffset": animationOffset,
