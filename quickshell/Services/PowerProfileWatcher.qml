@@ -4,14 +4,27 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import Quickshell.Services.UPower
+import qs.Services
 
 Singleton {
     id: root
 
     property int currentProfile: -1
     property int previousProfile: -1
+    property bool daemonRunning: true
 
-    readonly property bool available: typeof PowerProfiles !== "undefined"
+    readonly property bool available: typeof PowerProfiles !== "undefined" && daemonRunning
+
+    function checkDaemon() {
+        if (!DMSService.isConnected || !DMSService.capabilities.includes("dbus"))
+            return;
+
+        DMSService.dbusCall("system", "org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus", "NameHasOwner", ["org.freedesktop.UPower.PowerProfiles"], response => {
+            if (response.error || !response.result)
+                return;
+            root.daemonRunning = response.result.values?.[0] === true;
+        });
+    }
 
     readonly property var availableProfiles: {
         if (!available)
@@ -78,12 +91,21 @@ Singleton {
 
         function onProfileChanged() {
             if (typeof PowerProfiles !== "undefined") {
+                root.daemonRunning = true;
                 root.previousProfile = root.currentProfile;
                 root.currentProfile = PowerProfiles.profile;
                 if (root.previousProfile !== -1) {
                     root.profileChanged(root.currentProfile);
                 }
             }
+        }
+    }
+
+    Connections {
+        target: DMSService
+
+        function onCapabilitiesReceived() {
+            root.checkDaemon();
         }
     }
 
