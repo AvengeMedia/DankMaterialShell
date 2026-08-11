@@ -199,6 +199,15 @@ Item {
             }
         }
 
+        if (currentIndex < 0 && CompositorService.isNiri && NiriService.inOverview && NiriService.lastFocusedWindowId !== null) {
+            for (let i = 0; i < toplevels.length; i++) {
+                if (toplevels[i].niriWindowId === NiriService.lastFocusedWindowId) {
+                    currentIndex = i;
+                    break;
+                }
+            }
+        }
+
         const nextToplevel = toplevels[(currentIndex + 1) % toplevels.length];
         if (restoreSpecialWorkspaceWindow(nextToplevel))
             return;
