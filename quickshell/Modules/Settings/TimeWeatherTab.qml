@@ -9,6 +9,8 @@ import qs.Modules.Settings.Widgets
 Item {
     id: root
 
+    property bool _internalChange: false
+
     readonly property string _systemDefaultLabel: I18n.tr("System Default")
 
     function weekStartQt() {
@@ -564,11 +566,13 @@ Item {
                                             keyNavigationTab: longitudeInput
 
                                             Component.onCompleted: {
+                                                root._internalChange = true;
                                                 if (SettingsData.weatherCoordinates) {
                                                     const coords = SettingsData.weatherCoordinates.split(',');
                                                     if (coords.length > 0)
                                                         text = coords[0].trim();
                                                 }
+                                                root._internalChange = false;
                                             }
 
                                             Connections {
@@ -583,6 +587,8 @@ Item {
                                             }
 
                                             onTextEdited: {
+                                                if (root._internalChange)
+                                                    return;
                                                 if (text && longitudeInput.text) {
                                                     const coords = text + "," + longitudeInput.text;
                                                     SessionData.weatherCoordinates = coords;
@@ -615,11 +621,13 @@ Item {
                                             keyNavigationBacktab: latitudeInput
 
                                             Component.onCompleted: {
+                                                root._internalChange = true;
                                                 if (SettingsData.weatherCoordinates) {
                                                     const coords = SettingsData.weatherCoordinates.split(',');
                                                     if (coords.length > 1)
                                                         text = coords[1].trim();
                                                 }
+                                                root._internalChange = false;
                                             }
 
                                             Connections {
@@ -634,6 +642,8 @@ Item {
                                             }
 
                                             onTextEdited: {
+                                                if (root._internalChange)
+                                                    return;
                                                 if (text && latitudeInput.text) {
                                                     const coords = latitudeInput.text + "," + text;
                                                     SessionData.weatherCoordinates = coords;
@@ -663,12 +673,14 @@ Item {
                                         placeholderText: I18n.tr("New York, NY")
                                         keyNavigationBacktab: longitudeInput
                                         onLocationSelected: (displayName, coordinates) => {
+                                            root._internalChange = true;
                                             SettingsData.setWeatherLocation(displayName, coordinates);
                                             const coords = coordinates.split(',');
                                             if (coords.length >= 2) {
                                                 latitudeInput.text = coords[0].trim();
                                                 longitudeInput.text = coords[1].trim();
                                             }
+                                            root._internalChange = false;
                                         }
                                     }
                                 }
