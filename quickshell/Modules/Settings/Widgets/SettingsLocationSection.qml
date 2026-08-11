@@ -79,6 +79,7 @@ Column {
                         const lat = parseFloat(text);
                         if (!isNaN(lat) && lat >= -90 && lat <= 90 && lat !== SessionData.latitude) {
                             SessionData.setLatitude(lat);
+                            SessionData.setNightModeLocationName("");
                         }
                     }
                 }
@@ -115,6 +116,7 @@ Column {
                         const lon = parseFloat(text);
                         if (!isNaN(lon) && lon >= -180 && lon <= 180 && lon !== SessionData.longitude) {
                             SessionData.setLongitude(lon);
+                            SessionData.setNightModeLocationName("");
                         }
                     }
                 }
@@ -130,7 +132,9 @@ Column {
 
         DankLocationSearch {
             width: parent.width
+            currentLocation: SessionData.nightModeLocationName
             onLocationSelected: (displayName, coordinates) => {
+                SessionData.setNightModeLocationName(displayName);
                 const coords = coordinates.split(',');
                 if (coords.length >= 2) {
                     const lat = parseFloat(coords[0]);

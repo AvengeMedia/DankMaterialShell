@@ -659,7 +659,7 @@ Item {
                                     DankLocationSearch {
                                         id: locationSearchInput
                                         width: parent.width
-                                        currentLocation: ""
+                                        currentLocation: SettingsData.weatherLocation
                                         placeholderText: I18n.tr("New York, NY")
                                         keyNavigationBacktab: longitudeInput
                                         onLocationSelected: (displayName, coordinates) => {

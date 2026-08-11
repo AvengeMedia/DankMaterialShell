@@ -38,6 +38,7 @@ var SPEC = {
     longitude: { def: 0.0 },
     nightModeUseIPLocation: { def: false },
     nightModeLocationProvider: { def: "" },
+    nightModeLocationName: { def: "" },
 
     themeModeAutoEnabled: { def: false },
     themeModeAutoMode: { def: "time" },
