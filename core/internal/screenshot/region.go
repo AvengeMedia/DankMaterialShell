@@ -54,8 +54,9 @@ type OutputSurface struct {
 	yInverted         bool
 
 	// Triple-buffered render slots
-	slots      [3]*RenderSlot
-	slotsReady bool
+	slots         [3]*RenderSlot
+	slotsReady    bool
+	redrawPending bool
 }
 
 type PreCapture struct {
@@ -789,6 +790,9 @@ func (r *RegionSelector) initRenderBuffer(os *OutputSurface) {
 		slotRef := slot
 		wlBuf.SetReleaseHandler(func(e client.BufferReleaseEvent) {
 			slotRef.busy = false
+			if os.redrawPending {
+				r.redrawSurface(os)
+			}
 		})
 
 		os.slots[i] = slot
@@ -841,6 +845,11 @@ func (r *RegionSelector) getSourceBuffer(os *OutputSurface) *ShmBuffer {
 }
 
 func (r *RegionSelector) redrawSurface(os *OutputSurface) {
+	if os == nil {
+		return
+	}
+	os.redrawPending = true
+
 	srcBuf := r.getSourceBuffer(os)
 	if srcBuf == nil || !os.slotsReady {
 		return
@@ -850,6 +859,7 @@ func (r *RegionSelector) redrawSurface(os *OutputSurface) {
 	if slot == nil {
 		return
 	}
+	os.redrawPending = false
 
 	if os.overlayReady {
 		if err := r.presentBaseSurface(os, srcBuf); err != nil {

@@ -84,9 +84,7 @@ func (r *RegionSelector) setupPointerHandlers() {
 
 		r.selection.currentX = curX
 		r.selection.currentY = curY
-		for _, os := range r.surfaces {
-			r.redrawSurface(os)
-		}
+		r.redrawSurface(r.selection.surface)
 	})
 
 	r.pointer.SetButtonHandler(func(e client.PointerButtonEvent) {
