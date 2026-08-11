@@ -108,6 +108,7 @@ Item {
     }
     readonly property string screenKey: SettingsData.getScreenDisplayName(screen)
     readonly property string positionKey: syncPositionAcrossScreens ? "_synced" : screenKey
+    readonly property var storedPositions: SessionData.desktopWidgetInstancePositions[instanceId] ?? null
 
     readonly property int screenWidth: screen?.width ?? 1920
     readonly property int screenHeight: screen?.height ?? 1080
@@ -121,7 +122,7 @@ Item {
 
     readonly property bool hasSavedPosition: {
         if (isInstance)
-            return instanceData?.positions?.[positionKey]?.x !== undefined;
+            return storedPositions?.[positionKey]?.x !== undefined;
         if (usePluginService)
             return pluginService.loadPluginData(pluginId, "desktopX_" + positionKey, null) !== null;
         return SettingsData.getDesktopWidgetPosition(pluginId, positionKey, "x", null) !== null;
@@ -129,7 +130,7 @@ Item {
 
     readonly property bool hasSavedSize: {
         if (isInstance)
-            return instanceData?.positions?.[positionKey]?.width !== undefined;
+            return storedPositions?.[positionKey]?.width !== undefined;
         if (usePluginService)
             return pluginService.loadPluginData(pluginId, "desktopWidth_" + positionKey, null) !== null;
         return SettingsData.getDesktopWidgetPosition(pluginId, positionKey, "width", null) !== null;
@@ -137,7 +138,7 @@ Item {
 
     property real savedX: {
         if (isInstance) {
-            const val = instanceData?.positions?.[positionKey]?.x;
+            const val = storedPositions?.[positionKey]?.x;
             if (val === undefined)
                 return screenWidth / 2 - savedWidth / 2;
             return syncPositionAcrossScreens ? val * screenWidth : val;
@@ -155,7 +156,7 @@ Item {
     }
     property real savedY: {
         if (isInstance) {
-            const val = instanceData?.positions?.[positionKey]?.y;
+            const val = storedPositions?.[positionKey]?.y;
             if (val === undefined)
                 return screenHeight / 2 - savedHeight / 2;
             return syncPositionAcrossScreens ? val * screenHeight : val;
@@ -173,7 +174,7 @@ Item {
     }
     property real savedWidth: {
         if (isInstance) {
-            const val = instanceData?.positions?.[positionKey]?.width;
+            const val = storedPositions?.[positionKey]?.width;
             if (val === undefined)
                 return 280;
             return val;
@@ -191,7 +192,7 @@ Item {
     }
     property real savedHeight: {
         if (isInstance) {
-            const val = instanceData?.positions?.[positionKey]?.height;
+            const val = storedPositions?.[positionKey]?.height;
             if (val === undefined)
                 return forceSquare ? savedWidth : 180;
             return forceSquare ? savedWidth : val;
@@ -236,14 +237,14 @@ Item {
     property bool acceptsKeyboardFocus: contentLoader.item?.acceptsKeyboardFocus ?? false
     property bool isInteracting: dragArea.pressed || resizeArea.pressed
 
-    property var _gridSettingsTrigger: SettingsData.desktopWidgetGridSettings
+    property var _gridSettingsTrigger: SessionData.desktopWidgetGridSettings
     readonly property int gridSize: {
         void _gridSettingsTrigger;
-        return SettingsData.getDesktopWidgetGridSetting(screenKey, "size", 40);
+        return SessionData.getDesktopWidgetGridSetting(screenKey, "size", 40);
     }
     readonly property bool gridEnabled: {
         void _gridSettingsTrigger;
-        return SettingsData.getDesktopWidgetGridSetting(screenKey, "enabled", false);
+        return SessionData.getDesktopWidgetGridSetting(screenKey, "enabled", false);
     }
 
     function snapToGrid(value) {
@@ -254,7 +255,7 @@ Item {
         const xVal = syncPositionAcrossScreens ? finalX / screenWidth : finalX;
         const yVal = syncPositionAcrossScreens ? finalY / screenHeight : finalY;
         if (isInstance && instanceData) {
-            SettingsData.updateDesktopWidgetInstancePosition(instanceId, positionKey, {
+            SessionData.updateDesktopWidgetInstancePosition(instanceId, positionKey, {
                 x: xVal,
                 y: yVal
             });
@@ -275,7 +276,7 @@ Item {
         const sizeVal = forceSquare ? Math.max(finalW, finalH) : finalW;
         const heightVal = forceSquare ? sizeVal : finalH;
         if (isInstance && instanceData) {
-            SettingsData.updateDesktopWidgetInstancePosition(instanceId, positionKey, {
+            SessionData.updateDesktopWidgetInstancePosition(instanceId, positionKey, {
                 width: sizeVal,
                 height: heightVal
             });
@@ -342,15 +343,15 @@ Item {
                     return;
                 switch (event.key) {
                 case Qt.Key_G:
-                    SettingsData.setDesktopWidgetGridSetting(root.screenKey, "enabled", !root.gridEnabled);
+                    SessionData.setDesktopWidgetGridSetting(root.screenKey, "enabled", !root.gridEnabled);
                     event.accepted = true;
                     break;
                 case Qt.Key_Z:
-                    SettingsData.setDesktopWidgetGridSetting(root.screenKey, "size", Math.max(10, root.gridSize - 10));
+                    SessionData.setDesktopWidgetGridSetting(root.screenKey, "size", Math.max(10, root.gridSize - 10));
                     event.accepted = true;
                     break;
                 case Qt.Key_X:
-                    SettingsData.setDesktopWidgetGridSetting(root.screenKey, "size", Math.min(200, root.gridSize + 10));
+                    SessionData.setDesktopWidgetGridSetting(root.screenKey, "size", Math.min(200, root.gridSize + 10));
                     event.accepted = true;
                     break;
                 }

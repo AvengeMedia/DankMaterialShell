@@ -1446,7 +1446,7 @@ window-rule {
         const identifier = getOutputIdentifier(output, outputName);
         if (niriSettings)
             return niriSettings[identifier] || niriSettings[outputName] || {};
-        return SettingsData.getNiriOutputSettings(identifier);
+        return SessionData.getNiriOutputSettings(identifier);
     }
 
     function transformToNiri(transform) {

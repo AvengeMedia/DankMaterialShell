@@ -377,7 +377,7 @@ Singleton {
 
     function applyWlrModeOverrides(modeOverrides, callback) {
         if (CompositorService.isHyprland) {
-            HyprlandService.generateOutputsConfig(buildWlrOutputsData(modeOverrides), SettingsData.hyprlandOutputSettings, callback);
+            HyprlandService.generateOutputsConfig(buildWlrOutputsData(modeOverrides), SessionData.hyprlandOutputSettings, callback);
             return;
         }
 
@@ -519,7 +519,7 @@ Singleton {
 
     function findActiveProfileMode(outputName, output) {
         const compositor = CompositorService.compositor;
-        const profileModes = SettingsData.activeDisplayProfileModes?.[compositor] || {};
+        const profileModes = SessionData.activeDisplayProfileModes?.[compositor] || {};
         if (Object.keys(profileModes).length === 0)
             return "";
 

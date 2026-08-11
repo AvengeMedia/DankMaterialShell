@@ -367,8 +367,7 @@ Singleton {
 
     function deferGreeterAutoLoginSyncToPill(details) {
         toastCategoryDismissed("greeter-autologin-sync");
-        if (settingsRoot)
-            settingsRoot.set("greeterSyncPending", true);
+        SessionData.set("greeterSyncPending", true);
         toastRequested(1, I18n.tr("Auto-login change needs a sync"), I18n.tr("Administrator access is required. Use the Sync button in Settings → Greeter to apply.") + (details ? "\n\n" + details : ""), "dms-greeter sync --autologin", "greeter-autologin-sync");
         finishGreeterAutoLoginSync();
     }

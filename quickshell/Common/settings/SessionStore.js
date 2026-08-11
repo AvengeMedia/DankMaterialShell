@@ -1,6 +1,7 @@
 .pragma library
 
     .import "./SessionSpec.js" as SpecModule
+    .import "./SpecUtil.js" as Util
 
 function parse(root, jsonObj) {
     var SPEC = SpecModule.SPEC;
@@ -9,7 +10,7 @@ function parse(root, jsonObj) {
 
     for (var k in SPEC) {
         if (!(k in jsonObj)) {
-            root[k] = SPEC[k].def;
+            root[k] = Util.cloneDef(SPEC[k].def);
         }
     }
 
@@ -27,6 +28,7 @@ function toJson(root) {
     var out = {};
     for (var k in SPEC) {
         if (SPEC[k].persist === false) continue;
+        if (Util.isDefault(root[k], SPEC[k].def)) continue;
         out[k] = root[k];
     }
     out.configVersion = root.sessionConfigVersion;
@@ -71,6 +73,14 @@ function migrateToVersion(obj, targetVersion, settingsData) {
     if (currentVersion < 3) {
         console.info("SessionData: Migrating session to version 3");
         session.configVersion = 3;
+    }
+
+    if (currentVersion < 4) {
+        console.info("SessionData: Migrating session to version 4");
+        console.info("SessionData: Dropping keys that match defaults; session.json now stores only changed values");
+
+        Util.stripDefaults(session, SpecModule.SPEC);
+        session.configVersion = 4;
     }
 
     return session;

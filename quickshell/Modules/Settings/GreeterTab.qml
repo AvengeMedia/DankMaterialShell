@@ -714,7 +714,7 @@ Item {
     Rectangle {
         id: syncPendingPill
 
-        readonly property bool shown: SettingsData.greeterSyncPending && root.greeterInstalled
+        readonly property bool shown: SessionData.greeterSyncPending && root.greeterInstalled
 
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom

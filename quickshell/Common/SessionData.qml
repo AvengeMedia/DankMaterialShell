@@ -14,7 +14,7 @@ Singleton {
     id: root
     readonly property var log: Log.scoped("SessionData")
 
-    readonly property int sessionConfigVersion: 3
+    readonly property int sessionConfigVersion: 4
 
     signal loaded
     signal brightnessDisplayHintChanged(string deviceName)
@@ -221,6 +221,17 @@ Singleton {
 
     property string notepadLastMode: ""
 
+    property var niriOutputSettings: ({})
+    property var hyprlandOutputSettings: ({})
+    property var activeDisplayProfile: ({})
+    property var activeDisplayProfileModes: ({})
+    property var desktopWidgetGridSettings: ({})
+    property var desktopWidgetInstancePositions: ({})
+    property var builtInPluginState: ({})
+    property bool greeterSyncPending: false
+    property var greeterSyncBaseline: ({})
+    property string lastAppliedIconTheme: ""
+
     property string launcherLastMode: "all"
     property string launcherLastFileSearchType: "all"
     property string launcherLastQuery: ""
@@ -391,6 +402,161 @@ Singleton {
 
     function set(key, value) {
         Spec.set(root, key, value, saveSettings, _hooks);
+    }
+
+    function importFromSettings(payload) {
+        if (!payload)
+            return;
+        if (!_hasLoaded)
+            loadSettings();
+        if (_parseError)
+            return;
+
+        let imported = false;
+        for (const key in payload) {
+            if (!(key in Spec.SPEC))
+                continue;
+            const current = root[key];
+            const isEmpty = current === Spec.SPEC[key].def || (typeof current === "object" && current !== null && Object.keys(current).length === 0);
+            if (!isEmpty)
+                continue;
+            root[key] = payload[key];
+            imported = true;
+        }
+
+        if (imported) {
+            log.info("Imported machine-specific state from settings.json");
+            saveSettings();
+        }
+    }
+
+    function getNiriOutputSetting(outputId, key, defaultValue) {
+        if (!niriOutputSettings[outputId])
+            return defaultValue;
+        return niriOutputSettings[outputId][key] !== undefined ? niriOutputSettings[outputId][key] : defaultValue;
+    }
+
+    function setNiriOutputSetting(outputId, key, value) {
+        const updated = JSON.parse(JSON.stringify(niriOutputSettings));
+        if (!updated[outputId])
+            updated[outputId] = {};
+        updated[outputId][key] = value;
+        niriOutputSettings = updated;
+        saveSettings();
+    }
+
+    function getNiriOutputSettings(outputId) {
+        const settings = niriOutputSettings[outputId];
+        return settings ? JSON.parse(JSON.stringify(settings)) : {};
+    }
+
+    function getHyprlandOutputSetting(outputId, key, defaultValue) {
+        if (!hyprlandOutputSettings[outputId])
+            return defaultValue;
+        return hyprlandOutputSettings[outputId][key] !== undefined ? hyprlandOutputSettings[outputId][key] : defaultValue;
+    }
+
+    function setHyprlandOutputSetting(outputId, key, value) {
+        const updated = JSON.parse(JSON.stringify(hyprlandOutputSettings));
+        if (!updated[outputId])
+            updated[outputId] = {};
+        updated[outputId][key] = value;
+        hyprlandOutputSettings = updated;
+        saveSettings();
+    }
+
+    function removeHyprlandOutputSetting(outputId, key) {
+        if (!hyprlandOutputSettings[outputId] || !(key in hyprlandOutputSettings[outputId]))
+            return;
+        const updated = JSON.parse(JSON.stringify(hyprlandOutputSettings));
+        delete updated[outputId][key];
+        hyprlandOutputSettings = updated;
+        saveSettings();
+    }
+
+    function getActiveDisplayProfile(compositor) {
+        return activeDisplayProfile[compositor] || "";
+    }
+
+    function setActiveDisplayProfile(compositor, profileId) {
+        const updated = JSON.parse(JSON.stringify(activeDisplayProfile));
+        updated[compositor] = profileId;
+        activeDisplayProfile = updated;
+        saveSettings();
+    }
+
+    function setActiveDisplayProfileModes(compositor, modes) {
+        if (JSON.stringify(activeDisplayProfileModes[compositor] || {}) === JSON.stringify(modes || {}))
+            return;
+        const updated = JSON.parse(JSON.stringify(activeDisplayProfileModes));
+        updated[compositor] = modes;
+        activeDisplayProfileModes = updated;
+        saveSettings();
+    }
+
+    function getDesktopWidgetGridSetting(screenKey, property, defaultValue) {
+        const val = desktopWidgetGridSettings?.[screenKey]?.[property];
+        return val !== undefined ? val : defaultValue;
+    }
+
+    function setDesktopWidgetGridSetting(screenKey, property, value) {
+        const allSettings = JSON.parse(JSON.stringify(desktopWidgetGridSettings || {}));
+        if (!allSettings[screenKey])
+            allSettings[screenKey] = {};
+        allSettings[screenKey][property] = value;
+        desktopWidgetGridSettings = allSettings;
+        saveSettings();
+    }
+
+    function updateDesktopWidgetInstancePosition(instanceId, screenKey, positionUpdates) {
+        const updated = JSON.parse(JSON.stringify(desktopWidgetInstancePositions));
+        if (!updated[instanceId])
+            updated[instanceId] = {};
+        updated[instanceId][screenKey] = Object.assign({}, updated[instanceId][screenKey] || {}, positionUpdates);
+        desktopWidgetInstancePositions = updated;
+        saveSettings();
+    }
+
+    function syncDesktopWidgetPositionToAllScreens(instanceId) {
+        const positions = desktopWidgetInstancePositions[instanceId] || {};
+        const screenKeys = Object.keys(positions).filter(k => k !== "_synced");
+        if (screenKeys.length === 0)
+            return;
+        const sourcePos = positions[screenKeys[0]];
+        if (!sourcePos)
+            return;
+        const screen = Array.from(Quickshell.screens.values()).find(s => SettingsData.getScreenDisplayName(s) === screenKeys[0]);
+        if (!screen)
+            return;
+        const synced = {};
+        if (sourcePos.x !== undefined)
+            synced.x = sourcePos.x / screen.width;
+        if (sourcePos.y !== undefined)
+            synced.y = sourcePos.y / screen.height;
+        if (sourcePos.width !== undefined)
+            synced.width = sourcePos.width;
+        if (sourcePos.height !== undefined)
+            synced.height = sourcePos.height;
+        const updated = JSON.parse(JSON.stringify(desktopWidgetInstancePositions));
+        updated[instanceId]["_synced"] = synced;
+        desktopWidgetInstancePositions = updated;
+        saveSettings();
+    }
+
+    function removeDesktopWidgetInstancePositions(instanceId) {
+        if (!(instanceId in desktopWidgetInstancePositions))
+            return;
+        const updated = JSON.parse(JSON.stringify(desktopWidgetInstancePositions));
+        delete updated[instanceId];
+        desktopWidgetInstancePositions = updated;
+        saveSettings();
+    }
+
+    function setBuiltInPluginState(pluginId, state) {
+        const updated = JSON.parse(JSON.stringify(builtInPluginState));
+        updated[pluginId] = state;
+        builtInPluginState = updated;
+        saveSettings();
     }
 
     function migrateFromUndefinedToV1(settings) {

@@ -234,8 +234,8 @@ Singleton {
                         default:
                             parsed = {};
                         }
-                        const niriSettings = SettingsData.niriOutputSettings || {};
-                        const hyprSettings = SettingsData.hyprlandOutputSettings || {};
+                        const niriSettings = SessionData.niriOutputSettings || {};
+                        const hyprSettings = SessionData.hyprlandOutputSettings || {};
                         const profileOutputs = {};
                         for (const outputName in parsed) {
                             const od = parsed[outputName];
@@ -267,7 +267,7 @@ Singleton {
 
     function publishActiveProfileModes() {
         const compositor = CompositorService.compositor;
-        const profileId = SettingsData.getActiveDisplayProfile(compositor);
+        const profileId = SessionData.getActiveDisplayProfile(compositor);
         const profile = profileId ? validatedProfiles[profileId] : null;
         const outputs = profile?.outputs || {};
         const modes = {};
@@ -280,7 +280,7 @@ Singleton {
                 };
         }
 
-        SettingsData.setActiveDisplayProfileModes(compositor, modes);
+        SessionData.setActiveDisplayProfileModes(compositor, modes);
     }
 
     function generateProfileId() {
@@ -561,7 +561,7 @@ Singleton {
             }
         };
         const onWriteSuccess = () => {
-            SettingsData.setActiveDisplayProfile(CompositorService.compositor, configId);
+            SessionData.setActiveDisplayProfile(CompositorService.compositor, configId);
             publishActiveProfileModes();
             if (isManual) {
                 profilesLoading = false;
@@ -651,7 +651,7 @@ Singleton {
                 validatedProfiles = updated;
                 currentOutputSet = buildCurrentOutputSet();
                 matchedProfile = findMatchingProfile();
-                SettingsData.setActiveDisplayProfile(CompositorService.compositor, id);
+                SessionData.setActiveDisplayProfile(CompositorService.compositor, id);
                 publishActiveProfileModes();
                 profileSaved(id, profileName);
             });
@@ -680,7 +680,7 @@ Singleton {
 
     function deleteProfile(profileId) {
         const compositor = CompositorService.compositor;
-        const isActive = SettingsData.getActiveDisplayProfile(compositor) === profileId;
+        const isActive = SessionData.getActiveDisplayProfile(compositor) === profileId;
 
         profilesLoading = true;
         readMonitorsJson(data => {
@@ -691,7 +691,7 @@ Singleton {
                 profilesLoading = false;
                 SettingsData.removeDisplayProfile(compositor, profileId);
                 if (isActive) {
-                    SettingsData.setActiveDisplayProfile(compositor, "");
+                    SessionData.setActiveDisplayProfile(compositor, "");
                     backendWriteOutputsConfig(allOutputs);
                 }
                 const updated = JSON.parse(JSON.stringify(validatedProfiles));
@@ -774,7 +774,7 @@ Singleton {
             const match = findConfigEntryByFingerprint(data, currentOutputSet, false);
             if (match) {
                 if (configEntryMatchesLiveLayout(match.entry)) {
-                    SettingsData.setActiveDisplayProfile(CompositorService.compositor, match.entry.id);
+                    SessionData.setActiveDisplayProfile(CompositorService.compositor, match.entry.id);
                     return;
                 }
                 applyConfigEntry(match.entry, match.entry.id, "", false);
@@ -968,7 +968,7 @@ Singleton {
     }
 
     function initHyprlandSettingsFromConfig(parsedOutputs) {
-        const current = JSON.parse(JSON.stringify(SettingsData.hyprlandOutputSettings));
+        const current = JSON.parse(JSON.stringify(SessionData.hyprlandOutputSettings));
         let changed = false;
 
         for (const outputName in parsedOutputs) {
@@ -997,13 +997,13 @@ Singleton {
         }
 
         if (changed) {
-            SettingsData.hyprlandOutputSettings = current;
-            SettingsData.saveSettings();
+            SessionData.hyprlandOutputSettings = current;
+            SessionData.saveSettings();
         }
     }
 
     function syncHyprlandVrrFromConfig(parsedOutputs) {
-        const current = JSON.parse(JSON.stringify(SettingsData.hyprlandOutputSettings));
+        const current = JSON.parse(JSON.stringify(SessionData.hyprlandOutputSettings));
         let changed = false;
         for (const outputName in parsedOutputs) {
             const settings = parsedOutputs[outputName]?.hyprlandSettings;
@@ -1020,28 +1020,24 @@ Singleton {
             changed = true;
         }
         if (changed) {
-            SettingsData.hyprlandOutputSettings = current;
-            SettingsData.saveSettings();
+            SessionData.hyprlandOutputSettings = current;
+            SessionData.saveSettings();
         }
     }
 
     function syncNiriVrrFromConfig(parsedOutputs) {
-        let changed = false;
         for (const outputName in parsedOutputs) {
             const output = parsedOutputs[outputName];
-            const current = SettingsData.getNiriOutputSetting(outputName, "vrrOnDemand", false);
+            const current = SessionData.getNiriOutputSetting(outputName, "vrrOnDemand", false);
             const fromConfig = output.vrr_on_demand ?? false;
             if (current === fromConfig)
                 continue;
-            SettingsData.setNiriOutputSetting(outputName, "vrrOnDemand", fromConfig || undefined);
-            changed = true;
+            SessionData.setNiriOutputSetting(outputName, "vrrOnDemand", fromConfig || undefined);
         }
-        if (changed)
-            SettingsData.saveSettings();
     }
 
     function syncHyprlandDisabledFromConfig(parsedOutputs) {
-        const current = JSON.parse(JSON.stringify(SettingsData.hyprlandOutputSettings));
+        const current = JSON.parse(JSON.stringify(SessionData.hyprlandOutputSettings));
         let changed = false;
         for (const outputName in parsedOutputs) {
             const settings = parsedOutputs[outputName]?.hyprlandSettings;
@@ -1058,24 +1054,20 @@ Singleton {
             changed = true;
         }
         if (changed) {
-            SettingsData.hyprlandOutputSettings = current;
-            SettingsData.saveSettings();
+            SessionData.hyprlandOutputSettings = current;
+            SessionData.saveSettings();
         }
     }
 
     function syncNiriDisabledFromConfig(parsedOutputs) {
-        let changed = false;
         for (const outputName in parsedOutputs) {
             const output = parsedOutputs[outputName];
             const fromConfig = output.disabled ?? false;
-            const current = SettingsData.getNiriOutputSetting(outputName, "disabled", false);
+            const current = SessionData.getNiriOutputSetting(outputName, "disabled", false);
             if (current === fromConfig)
                 continue;
-            SettingsData.setNiriOutputSetting(outputName, "disabled", fromConfig || undefined);
-            changed = true;
+            SessionData.setNiriOutputSetting(outputName, "disabled", fromConfig || undefined);
         }
-        if (changed)
-            SettingsData.saveSettings();
     }
 
     function filterDisconnectedOnly(parsedOutputs) {
@@ -1965,7 +1957,7 @@ Singleton {
         const pending = pendingNiriChanges[identifier];
         if (pending && pending[key] !== undefined)
             return pending[key];
-        return SettingsData.getNiriOutputSetting(identifier, key, defaultValue);
+        return SessionData.getNiriOutputSetting(identifier, key, defaultValue);
     }
 
     function setNiriSetting(output, outputName, key, value) {
@@ -1983,7 +1975,7 @@ Singleton {
     function initOriginalNiriSettings() {
         if (originalNiriSettings)
             return;
-        originalNiriSettings = JSON.parse(JSON.stringify(SettingsData.niriOutputSettings));
+        originalNiriSettings = JSON.parse(JSON.stringify(SessionData.niriOutputSettings));
     }
 
     function getHyprlandOutputIdentifier(output, outputName) {
@@ -2001,7 +1993,7 @@ Singleton {
             const val = pending[key];
             return (val !== null && val !== undefined) ? val : defaultValue;
         }
-        return SettingsData.getHyprlandOutputSetting(identifier, key, defaultValue);
+        return SessionData.getHyprlandOutputSetting(identifier, key, defaultValue);
     }
 
     function setHyprlandSetting(output, outputName, key, value) {
@@ -2019,7 +2011,7 @@ Singleton {
     function initOriginalHyprlandSettings() {
         if (originalHyprlandSettings)
             return;
-        originalHyprlandSettings = JSON.parse(JSON.stringify(SettingsData.hyprlandOutputSettings));
+        originalHyprlandSettings = JSON.parse(JSON.stringify(SessionData.hyprlandOutputSettings));
     }
 
     function initOriginalOutputs() {
@@ -2259,7 +2251,7 @@ Singleton {
     }
 
     function buildMergedNiriSettings() {
-        const merged = JSON.parse(JSON.stringify(SettingsData.niriOutputSettings));
+        const merged = JSON.parse(JSON.stringify(SessionData.niriOutputSettings));
         for (const outputId in pendingNiriChanges) {
             if (!merged[outputId])
                 merged[outputId] = {};
@@ -2278,20 +2270,20 @@ Singleton {
     function commitNiriSettingsChanges() {
         for (const outputId in pendingNiriChanges) {
             for (const key in pendingNiriChanges[outputId]) {
-                SettingsData.setNiriOutputSetting(outputId, key, pendingNiriChanges[outputId][key]);
+                SessionData.setNiriOutputSetting(outputId, key, pendingNiriChanges[outputId][key]);
             }
         }
         // Clear stale disabled from SettingsData so NiriService reads clean state
         if (Object.keys(outputs).length <= 1) {
-            for (const id in SettingsData.niriOutputSettings) {
-                if (SettingsData.niriOutputSettings[id]?.disabled)
-                    SettingsData.setNiriOutputSetting(id, "disabled", null);
+            for (const id in SessionData.niriOutputSettings) {
+                if (SessionData.niriOutputSettings[id]?.disabled)
+                    SessionData.setNiriOutputSetting(id, "disabled", null);
             }
         }
     }
 
     function buildMergedHyprlandSettings() {
-        const merged = JSON.parse(JSON.stringify(SettingsData.hyprlandOutputSettings));
+        const merged = JSON.parse(JSON.stringify(SessionData.hyprlandOutputSettings));
         for (const outputId in pendingHyprlandChanges) {
             if (!merged[outputId])
                 merged[outputId] = {};
@@ -2316,16 +2308,16 @@ Singleton {
             for (const key in pendingHyprlandChanges[outputId]) {
                 const val = pendingHyprlandChanges[outputId][key];
                 if (val === null || val === undefined)
-                    SettingsData.removeHyprlandOutputSetting(outputId, key);
+                    SessionData.removeHyprlandOutputSetting(outputId, key);
                 else
-                    SettingsData.setHyprlandOutputSetting(outputId, key, val);
+                    SessionData.setHyprlandOutputSetting(outputId, key, val);
             }
         }
         // Clear stale disabled from SettingsData so HyprlandService reads clean state
         if (Object.keys(outputs).length <= 1) {
-            for (const id in SettingsData.hyprlandOutputSettings) {
-                if (SettingsData.hyprlandOutputSettings[id]?.disabled)
-                    SettingsData.removeHyprlandOutputSetting(id, "disabled");
+            for (const id in SessionData.hyprlandOutputSettings) {
+                if (SessionData.hyprlandOutputSettings[id]?.disabled)
+                    SessionData.removeHyprlandOutputSetting(id, "disabled");
             }
         }
     }
@@ -2372,13 +2364,13 @@ Singleton {
         }
 
         if (hadNiriChanges) {
-            SettingsData.niriOutputSettings = JSON.parse(JSON.stringify(originalNiriSettings));
-            SettingsData.saveSettings();
+            SessionData.niriOutputSettings = JSON.parse(JSON.stringify(originalNiriSettings));
+            SessionData.saveSettings();
         }
 
         if (hadHyprlandChanges) {
-            SettingsData.hyprlandOutputSettings = JSON.parse(JSON.stringify(originalHyprlandSettings));
-            SettingsData.saveSettings();
+            SessionData.hyprlandOutputSettings = JSON.parse(JSON.stringify(originalHyprlandSettings));
+            SessionData.saveSettings();
         }
 
         pendingHyprlandChanges = {};

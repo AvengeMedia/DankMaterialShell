@@ -91,6 +91,17 @@ var SPEC = {
 
     notepadLastMode: { def: "" },
 
+    niriOutputSettings: { def: {} },
+    hyprlandOutputSettings: { def: {} },
+    activeDisplayProfile: { def: {} },
+    activeDisplayProfileModes: { def: {} },
+    desktopWidgetGridSettings: { def: {} },
+    desktopWidgetInstancePositions: { def: {} },
+    builtInPluginState: { def: {} },
+    greeterSyncPending: { def: false },
+    greeterSyncBaseline: { def: {} },
+    lastAppliedIconTheme: { def: "" },
+
     launcherLastMode: { def: "all" },
     launcherLastFileSearchType: { def: "all" },
     launcherLastQuery: { def: "" },

@@ -11,7 +11,7 @@ Singleton {
     id: root
     readonly property var log: Log.scoped("CacheData")
 
-    readonly property int cacheConfigVersion: 2
+    readonly property int cacheConfigVersion: 3
 
     readonly property string _stateUrl: StandardPaths.writableLocation(StandardPaths.GenericCacheLocation)
     readonly property string _stateDir: Paths.strip(_stateUrl)
@@ -21,10 +21,14 @@ Singleton {
     property int _loadedCacheVersion: 0
 
     readonly property var _pinKeys: ["brightnessDevicePins", "wifiNetworkPins", "bluetoothDevicePins", "audioInputDevicePins", "audioOutputDevicePins"]
-    readonly property var _dataKeys: ["wallpaperLastPath", "profileLastPath", "fileBrowserSettings"].concat(_pinKeys)
+    readonly property var _historyKeys: ["browserUsageHistory", "filePickerUsageHistory"]
+    readonly property var _dataKeys: ["wallpaperLastPath", "profileLastPath", "fileBrowserSettings"].concat(_pinKeys, _historyKeys)
 
     property string wallpaperLastPath: ""
     property string profileLastPath: ""
+
+    property var browserUsageHistory: ({})
+    property var filePickerUsageHistory: ({})
 
     property var brightnessDevicePins: ({})
     property var wifiNetworkPins: ({})
@@ -131,6 +135,29 @@ Singleton {
         saveCache();
     }
 
+    function migrateUsageHistories(histories) {
+        if (!histories)
+            return;
+        if (!_hasLoaded)
+            loadCache();
+
+        let migrated = false;
+        for (const key of _historyKeys) {
+            const legacy = histories[key];
+            if (!legacy || Object.keys(legacy).length === 0)
+                continue;
+            if (Object.keys(root[key] || {}).length > 0)
+                continue;
+            root[key] = legacy;
+            migrated = true;
+        }
+
+        if (!migrated)
+            return;
+        log.info("Migrated usage histories from settings.json");
+        saveCache();
+    }
+
     function parseCache(content) {
         _loading = true;
         try {
@@ -172,7 +199,7 @@ Singleton {
                     };
                 }
 
-                for (const key of _pinKeys) {
+                for (const key of _pinKeys.concat(_historyKeys)) {
                     root[key] = cache[key] !== undefined ? cache[key] : {};
                 }
 
@@ -198,7 +225,7 @@ Singleton {
             "fileBrowserSettings": fileBrowserSettings,
             "configVersion": cacheConfigVersion
         };
-        for (const key of _pinKeys) {
+        for (const key of _pinKeys.concat(_historyKeys)) {
             data[key] = root[key];
         }
         cacheFile.setText(JSON.stringify(data, null, 2));

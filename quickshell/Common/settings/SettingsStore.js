@@ -1,8 +1,77 @@
 .pragma library
 
     .import "./SettingsSpec.js" as SpecModule
+    .import "./SpecUtil.js" as Util
 
 var PIN_KEYS = ["brightnessDevicePins", "wifiNetworkPins", "bluetoothDevicePins", "audioInputDevicePins", "audioOutputDevicePins"];
+
+var SESSION_MOVED_KEYS = ["niriOutputSettings", "hyprlandOutputSettings", "activeDisplayProfile", "activeDisplayProfileModes", "desktopWidgetGridSettings", "greeterSyncPending", "greeterSyncBaseline", "lastAppliedIconTheme"];
+var CACHE_MOVED_KEYS = ["browserUsageHistory", "filePickerUsageHistory"];
+var SESSION_BACKED_PLUGIN_IDS = ["dankNotepadModule"];
+
+// Superseded by desktopWidgetInstances at v4; nothing has written them since
+var STALE_WIDGET_KEYS = ["desktopClockEnabled", "desktopClockStyle", "desktopClockTransparency", "desktopClockColorMode", "desktopClockCustomColor", "desktopClockShowDate", "desktopClockShowAnalogNumbers", "desktopClockShowAnalogSeconds", "desktopClockX", "desktopClockY", "desktopClockWidth", "desktopClockHeight", "desktopClockDisplayPreferences", "systemMonitorEnabled", "systemMonitorShowHeader", "systemMonitorTransparency", "systemMonitorColorMode", "systemMonitorCustomColor", "systemMonitorShowCpu", "systemMonitorShowCpuGraph", "systemMonitorShowCpuTemp", "systemMonitorShowGpuTemp", "systemMonitorGpuPciId", "systemMonitorShowMemory", "systemMonitorShowMemoryGraph", "systemMonitorShowNetwork", "systemMonitorShowNetworkGraph", "systemMonitorShowDisk", "systemMonitorShowTopProcesses", "systemMonitorTopProcessCount", "systemMonitorTopProcessSortBy", "systemMonitorGraphInterval", "systemMonitorLayoutMode", "systemMonitorX", "systemMonitorY", "systemMonitorWidth", "systemMonitorHeight", "systemMonitorDisplayPreferences", "systemMonitorVariants", "desktopWidgetPositions"];
+
+function withoutInstancePositions(instances) {
+    if (!Array.isArray(instances)) return instances;
+    return instances.map(function (inst) {
+        if (!inst || !inst.positions) return inst;
+        var copy = Object.assign({}, inst);
+        delete copy.positions;
+        return copy;
+    });
+}
+
+function withoutSessionBackedPluginState(pluginSettings) {
+    if (!pluginSettings) return pluginSettings;
+    var copy = Object.assign({}, pluginSettings);
+    for (var i = 0; i < SESSION_BACKED_PLUGIN_IDS.length; i++) {
+        delete copy[SESSION_BACKED_PLUGIN_IDS[i]];
+    }
+    return copy;
+}
+
+function extractSessionPayload(obj) {
+    if (!obj) return null;
+
+    var payload = {};
+    for (var i = 0; i < SESSION_MOVED_KEYS.length; i++) {
+        var key = SESSION_MOVED_KEYS[i];
+        if (key in obj) payload[key] = obj[key];
+    }
+
+    var positions = {};
+    var instances = Array.isArray(obj.desktopWidgetInstances) ? obj.desktopWidgetInstances : [];
+    for (var i = 0; i < instances.length; i++) {
+        var inst = instances[i];
+        if (inst && inst.id && inst.positions && Object.keys(inst.positions).length > 0) {
+            positions[inst.id] = inst.positions;
+        }
+    }
+    if (Object.keys(positions).length > 0) payload.desktopWidgetInstancePositions = positions;
+
+    var pluginState = {};
+    for (var i = 0; i < SESSION_BACKED_PLUGIN_IDS.length; i++) {
+        var id = SESSION_BACKED_PLUGIN_IDS[i];
+        if (obj.builtInPluginSettings && obj.builtInPluginSettings[id]) {
+            pluginState[id] = obj.builtInPluginSettings[id];
+        }
+    }
+    if (Object.keys(pluginState).length > 0) payload.builtInPluginState = pluginState;
+
+    return Object.keys(payload).length > 0 ? payload : null;
+}
+
+function extractCachePayload(obj) {
+    if (!obj) return null;
+
+    var payload = {};
+    for (var i = 0; i < CACHE_MOVED_KEYS.length; i++) {
+        var key = CACHE_MOVED_KEYS[i];
+        if (obj[key] && Object.keys(obj[key]).length > 0) payload[key] = obj[key];
+    }
+    return Object.keys(payload).length > 0 ? payload : null;
+}
 
 function extractPins(obj) {
     if (!obj) return null;
@@ -28,7 +97,7 @@ function parse(root, jsonObj) {
         // would wipe values set by detection processes on every reload.
         if (SPEC[k].persist === false) continue;
         if (!(k in jsonObj)) {
-            root[k] = SPEC[k].def;
+            root[k] = Util.cloneDef(SPEC[k].def);
         }
     }
 
@@ -48,7 +117,11 @@ function toJson(root) {
     for (var k in SPEC) {
         if (SPEC[k].persist === false) continue;
         if (k === "pluginSettings") continue;
-        out[k] = root[k];
+        var value = root[k];
+        if (k === "desktopWidgetInstances") value = withoutInstancePositions(value);
+        if (k === "builtInPluginSettings") value = withoutSessionBackedPluginState(value);
+        if (Util.isDefault(value, SPEC[k].def)) continue;
+        out[k] = value;
     }
     out.configVersion = root.settingsConfigVersion;
     return out;
@@ -287,6 +360,33 @@ function migrateToVersion(obj, targetVersion) {
         }
 
         settings.configVersion = 13;
+    }
+
+    if (currentVersion < 14) {
+        console.info("Migrating settings from version", currentVersion, "to version 14");
+        console.info("Dropping keys that match defaults; settings.json now stores only changed values");
+
+        Util.stripDefaults(settings, SpecModule.SPEC);
+        settings.configVersion = 14;
+    }
+
+    if (currentVersion < 15) {
+        console.info("Migrating settings from version", currentVersion, "to version 15");
+        console.info("Moving machine-specific state to session.json and usage histories to cache.json");
+
+        var movedKeys = SESSION_MOVED_KEYS.concat(CACHE_MOVED_KEYS, STALE_WIDGET_KEYS);
+        for (var i = 0; i < movedKeys.length; i++) {
+            delete settings[movedKeys[i]];
+        }
+
+        if (Array.isArray(settings.desktopWidgetInstances)) {
+            settings.desktopWidgetInstances = withoutInstancePositions(settings.desktopWidgetInstances);
+        }
+        if (settings.builtInPluginSettings) {
+            settings.builtInPluginSettings = withoutSessionBackedPluginState(settings.builtInPluginSettings);
+        }
+
+        settings.configVersion = 15;
     }
 
     return settings;
