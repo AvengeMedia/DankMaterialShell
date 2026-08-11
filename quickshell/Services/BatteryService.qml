@@ -131,6 +131,16 @@ Singleton {
     property bool _hasNotifiedCriticalBattery: false
     property bool _hasNotifiedChargeLimit: false
 
+    // AC plug detection (onBattery) can precede the battery device reporting
+    // Charging by a few seconds. Timestamp plug-ins so alerts can be
+    // suppressed only for a short grace period instead of whenever on AC.
+    property var _lastPluggedInTime: 0
+    readonly property int _pluggedInGracePeriod: 5000
+
+    function _recentlyPluggedIn() {
+        return isPluggedIn && _lastPluggedInTime > 0 && Date.now() - _lastPluggedInTime < _pluggedInGracePeriod;
+    }
+
     function _syncLastIsCharging() {
         if (_hasKnownChargingState)
             _lastIsCharging = _currentIsCharging;
@@ -139,7 +149,11 @@ Singleton {
     on_HasKnownChargingStateChanged: _syncLastIsCharging()
     on_CurrentIsChargingChanged: _syncLastIsCharging()
 
-    Component.onCompleted: _syncLastIsCharging()
+    Component.onCompleted: {
+        _syncLastIsCharging();
+        if (isPluggedIn)
+            _lastPluggedInTime = Date.now();
+    }
 
     function sendAlert(title, message, isWarning, category, notificationType) {
         if (notificationType === 1) {
@@ -163,7 +177,10 @@ Singleton {
             _hasNotifiedChargeLimit = false;
         }
 
-        if (isCharging) {
+        // Suppress low/critical alerts while charging or right after plugging
+        // in. A level drop long after plug-in means the battery isn't
+        // actually charging (e.g. faulty charger), so alert as usual then.
+        if (isCharging || _recentlyPluggedIn()) {
             _hasNotifiedLowBattery = false;
             _hasNotifiedCriticalBattery = false;
             return;
@@ -215,6 +232,9 @@ Singleton {
     }
 
     onIsPluggedInChanged: {
+        if (isPluggedIn)
+            _lastPluggedInTime = Date.now();
+
         if (suppressSound || !batteryAvailable) {
             previousPluggedState = isPluggedIn;
             return;
@@ -231,6 +251,9 @@ Singleton {
         applyPowerProfile();
 
         if (isPluggedIn) {
+            _hasNotifiedLowBattery = false;
+            _hasNotifiedCriticalBattery = false;
+
             const dismissLow = SettingsData.batteryLowNotificationType === 1 && SettingsData.notificationTimeoutNormal === 0;
             const dismissCritical = SettingsData.batteryCriticalNotificationType === 1 && SettingsData.notificationTimeoutCritical === 0;
 
