@@ -1730,13 +1730,13 @@ Singleton {
 
         function setTargetTemp(value: string): string {
             if (!value)
-                return "Usage: night setTargetTemp <2500-6000>";
+                return "Usage: night setTargetTemp <1000-6000>";
 
             const temp = parseInt(value);
             if (isNaN(temp))
                 return "Invalid temperature: " + value;
-            if (temp < 2500 || temp > 6000)
-                return "Temperature must be between 2500K and 6000K";
+            if (temp < 1000 || temp > 6000)
+                return "Temperature must be between 1000K and 6000K";
 
             const rounded = Math.round(temp / 500) * 500;
             if (rounded > SessionData.nightModeHighTemperature)
@@ -1761,13 +1761,13 @@ Singleton {
 
         function setDayTemp(value: string): string {
             if (!value)
-                return "Usage: night setDayTemp <2500-6500>";
+                return "Usage: night setDayTemp <1000-6500>";
 
             const temp = parseInt(value);
             if (isNaN(temp))
                 return "Invalid temperature: " + value;
-            if (temp < 2500 || temp > 6500)
-                return "Temperature must be between 2500K and 6500K";
+            if (temp < 1000 || temp > 6500)
+                return "Temperature must be between 1000K and 6500K";
 
             const rounded = Math.round(temp / 500) * 500;
             if (rounded < SessionData.nightModeTemperature)
