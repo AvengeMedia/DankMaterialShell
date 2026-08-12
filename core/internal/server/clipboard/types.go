@@ -11,7 +11,7 @@ import (
 	bolt "go.etcd.io/bbolt"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wlcontext"
-	wlclient "github.com/AvengeMedia/DankMaterialShell/core/pkg/go-wayland/wayland/client"
+	wlclient "github.com/AvengeMedia/dankgo/wayland/client"
 )
 
 type Config struct {

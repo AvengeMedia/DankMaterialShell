@@ -27,7 +27,7 @@
 
 package wp_viewporter
 
-import "github.com/AvengeMedia/DankMaterialShell/core/pkg/go-wayland/wayland/client"
+import "github.com/AvengeMedia/dankgo/wayland/client"
 
 // WpViewporterInterfaceName is the name of the interface as it appears in the [client.Registry].
 // It can be used to match the [client.RegistryGlobalEvent.Interface] in the

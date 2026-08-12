@@ -11,8 +11,8 @@ import (
 	"syscall"
 	"time"
 
-	wlclient "github.com/AvengeMedia/DankMaterialShell/core/pkg/go-wayland/wayland/client"
 	"github.com/AvengeMedia/dankgo/boottimer"
+	wlclient "github.com/AvengeMedia/dankgo/wayland/client"
 	"github.com/godbus/dbus/v5"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/errdefs"

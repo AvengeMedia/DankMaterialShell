@@ -93,11 +93,6 @@ linters:
       - linters:
           - errcheck
         text: "Error return value of `.+\\.AddMatchSignal` is not checked"
-      # Exclude wayland pkg from errcheck and ineffassign (generated code patterns)
-      - linters:
-          - errcheck
-          - ineffassign
-        path: pkg/go-wayland/
       # Exclude proto pkg from ineffassign (generated protocol code)
       - linters:
           - ineffassign

@@ -2,7 +2,7 @@ package blur
 
 import (
 	wlhelpers "github.com/AvengeMedia/DankMaterialShell/core/internal/wayland/client"
-	client "github.com/AvengeMedia/DankMaterialShell/core/pkg/go-wayland/wayland/client"
+	client "github.com/AvengeMedia/dankgo/wayland/client"
 )
 
 const extBackgroundEffectInterface = "ext_background_effect_manager_v1"

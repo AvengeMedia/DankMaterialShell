@@ -8,7 +8,7 @@ import (
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wlr_output_management"
 	wlhelpers "github.com/AvengeMedia/DankMaterialShell/core/internal/wayland/client"
-	"github.com/AvengeMedia/DankMaterialShell/core/pkg/go-wayland/wayland/client"
+	"github.com/AvengeMedia/dankgo/wayland/client"
 )
 
 type Compositor int

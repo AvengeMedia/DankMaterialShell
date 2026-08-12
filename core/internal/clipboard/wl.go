@@ -3,9 +3,9 @@ package clipboard
 import (
 	"fmt"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/ext_data_control"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/virtual_keyboard"
-	wlclient "github.com/AvengeMedia/DankMaterialShell/core/pkg/go-wayland/wayland/client"
+	wlclient "github.com/AvengeMedia/dankgo/wayland/client"
+	"github.com/AvengeMedia/dankgo/wayland/ext_data_control"
 )
 
 type session struct {

@@ -52,7 +52,7 @@ packages:
       pkgname: mocks_version
     interfaces:
       VersionFetcher: {}
-  github.com/AvengeMedia/DankMaterialShell/core/pkg/go-wayland/wayland/client:
+  github.com/AvengeMedia/dankgo/wayland/client:
     config:
       dir: internal/mocks/wlclient
       pkgname: mocks_wlclient

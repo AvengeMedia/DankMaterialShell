@@ -30,10 +30,11 @@ import (
 
 	clipboardstore "github.com/AvengeMedia/DankMaterialShell/core/internal/clipboard"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/ext_data_control"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/virtual_keyboard"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wlcontext"
-	wlclient "github.com/AvengeMedia/DankMaterialShell/core/pkg/go-wayland/wayland/client"
+	wlclient "github.com/AvengeMedia/dankgo/wayland/client"
+	"github.com/AvengeMedia/dankgo/wayland/ext_data_control"
+	"github.com/AvengeMedia/dankgo/wlclipboard"
 )
 
 var errEntryNotFound = errors.New("entry not found")
@@ -1158,7 +1159,7 @@ func (m *Manager) SetClipboard(data []byte, mimeType string) error {
 	dataCopy := make([]byte, len(data))
 	copy(dataCopy, data)
 
-	m.takeSelection(clipboardstore.ExpandOffers(dataCopy, mimeType))
+	m.takeSelection(wlclipboard.ExpandOffers(dataCopy, mimeType))
 	return nil
 }
 
@@ -1170,9 +1171,9 @@ func (m *Manager) SetClipboardEntry(entry *Entry) error {
 		return fmt.Errorf("data too large")
 	}
 
-	offers := clipboardstore.ExpandOffers(slices.Clone(entry.Data), entry.MimeType)
+	offers := wlclipboard.ExpandOffers(slices.Clone(entry.Data), entry.MimeType)
 	if entry.AltMimeType != "" {
-		offers = append(offers, clipboardstore.ExpandOffers(slices.Clone(entry.AltData), entry.AltMimeType)...)
+		offers = append(offers, wlclipboard.ExpandOffers(slices.Clone(entry.AltData), entry.AltMimeType)...)
 	}
 
 	m.takeSelection(offers)
@@ -1181,7 +1182,7 @@ func (m *Manager) SetClipboardEntry(entry *Entry) error {
 
 // takeSelection makes the daemon the selection owner, serving the given
 // offers until another client claims the clipboard.
-func (m *Manager) takeSelection(offers []clipboardstore.Offer) {
+func (m *Manager) takeSelection(offers []wlclipboard.Offer) {
 	m.post(func() {
 		if m.dataControlMgr == nil || m.dataDevice == nil {
 			log.Error("Data control manager or device not initialized")
@@ -1914,13 +1915,13 @@ func (m *Manager) CopyFile(filePath string) error {
 	m.updateState()
 	m.notifySubscribers()
 
-	offers := []clipboardstore.Offer{
+	offers := []wlclipboard.Offer{
 		{MimeType: "x-special/gnome-copied-files", Data: []byte("copy\n" + fileURI)},
 		{MimeType: "text/uri-list", Data: []byte(fileURI + "\r\n")},
 		{MimeType: "text/plain", Data: []byte(filePath)},
 	}
 	if _, imgMime, err := image.DecodeConfig(bytes.NewReader(fileData)); err == nil {
-		offers = append(offers, clipboardstore.Offer{MimeType: "image/" + imgMime, Data: fileData})
+		offers = append(offers, wlclipboard.Offer{MimeType: "image/" + imgMime, Data: fileData})
 	}
 
 	m.takeSelection(offers)

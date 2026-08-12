@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	wlclient "github.com/AvengeMedia/DankMaterialShell/core/pkg/go-wayland/wayland/client"
+	wlclient "github.com/AvengeMedia/dankgo/wayland/client"
 	"golang.org/x/sys/unix"
 )
 

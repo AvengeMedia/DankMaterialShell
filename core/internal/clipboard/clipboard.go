@@ -8,44 +8,14 @@ import (
 	"path/filepath"
 	"syscall"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/ext_data_control"
+	"github.com/AvengeMedia/dankgo/wayland/ext_data_control"
+	"github.com/AvengeMedia/dankgo/wlclipboard"
 )
 
 const envServe = "_DMS_CLIPBOARD_SERVE"
 const envMime = "_DMS_CLIPBOARD_MIME"
 const envPasteOnce = "_DMS_CLIPBOARD_PASTE_ONCE"
 const envCacheFile = "_DMS_CLIPBOARD_CACHE"
-
-type Offer struct {
-	MimeType string
-	Data     []byte
-}
-
-// textMimeAliases are offered alongside plain-text content so legacy X11
-// clients bridged through XWayland find a target they can convert.
-var textMimeAliases = []string{
-	"text/plain",
-	"text/plain;charset=utf-8",
-	"UTF8_STRING",
-	"STRING",
-	"TEXT",
-}
-
-// ExpandOffers turns raw clipboard data into the full offer list to serve,
-// adding the standard alias set for text content.
-func ExpandOffers(data []byte, mimeType string) []Offer {
-	offers := []Offer{{MimeType: mimeType, Data: data}}
-	if mimeType != "text/plain" && mimeType != "text/plain;charset=utf-8" {
-		return offers
-	}
-	for _, alias := range textMimeAliases {
-		if alias == mimeType {
-			continue
-		}
-		offers = append(offers, Offer{MimeType: alias, Data: data})
-	}
-	return offers
-}
 
 // MaybeServeAndExit intercepts before cobra when re-exec'd as a clipboard
 // child. Reads source data into memory, deletes any cache file, then serves.
@@ -74,7 +44,7 @@ func MaybeServeAndExit() {
 		os.Exit(1)
 	}
 
-	if err := serveOffers(ExpandOffers(data, mimeType), pasteOnce); err != nil {
+	if err := serveOffers(wlclipboard.ExpandOffers(data, mimeType), pasteOnce); err != nil {
 		fmt.Fprintf(os.Stderr, "clipboard: serve: %v\n", err)
 		os.Exit(1)
 	}
@@ -91,7 +61,7 @@ func CopyText(text string) error {
 
 func CopyOpts(data []byte, mimeType string, foreground, pasteOnce bool) error {
 	if foreground {
-		return serveOffers(ExpandOffers(data, mimeType), pasteOnce)
+		return serveOffers(wlclipboard.ExpandOffers(data, mimeType), pasteOnce)
 	}
 	return copyForkCached(data, mimeType, pasteOnce)
 }
@@ -104,10 +74,10 @@ func CopyReader(data io.Reader, mimeType string, foreground, pasteOnce bool) err
 	if err != nil {
 		return fmt.Errorf("read source: %w", err)
 	}
-	return serveOffers(ExpandOffers(buf, mimeType), pasteOnce)
+	return serveOffers(wlclipboard.ExpandOffers(buf, mimeType), pasteOnce)
 }
 
-func CopyMulti(offers []Offer, foreground, pasteOnce bool) error {
+func CopyMulti(offers []wlclipboard.Offer, foreground, pasteOnce bool) error {
 	if foreground {
 		return serveOffers(offers, pasteOnce)
 	}
@@ -206,7 +176,7 @@ func copyFork(data io.Reader, mimeType string, pasteOnce bool) error {
 	return nil
 }
 
-func copyMultiFork(offers []Offer, pasteOnce bool) error {
+func copyMultiFork(offers []wlclipboard.Offer, pasteOnce bool) error {
 	args := []string{os.Args[0], "cl", "copy", "--foreground", "--type", "__multi__"}
 	if pasteOnce {
 		args = append(args, "--paste-once")
@@ -268,7 +238,7 @@ func createClipboardCacheFile() (*os.File, error) {
 
 // serveOffers owns the Wayland selection until cancelled (or first paste when
 // pasteOnce is set), answering every offered mime type with its data.
-func serveOffers(offers []Offer, pasteOnce bool) error {
+func serveOffers(offers []wlclipboard.Offer, pasteOnce bool) error {
 	if len(offers) == 0 {
 		return fmt.Errorf("no offers to serve")
 	}
@@ -346,111 +316,6 @@ func serveOffers(offers []Offer, pasteOnce bool) error {
 			}
 		}
 	}
-}
-
-func Paste() ([]byte, string, error) {
-	s, err := connectSession()
-	if err != nil {
-		return nil, "", err
-	}
-	defer s.Close()
-
-	dataControlMgr, err := s.requireDataControl()
-	if err != nil {
-		return nil, "", err
-	}
-
-	device, err := dataControlMgr.GetDataDevice(s.seat)
-	if err != nil {
-		return nil, "", fmt.Errorf("get data device: %w", err)
-	}
-	defer device.Destroy()
-
-	offerMimeTypes := make(map[*ext_data_control.ExtDataControlOfferV1][]string)
-
-	device.SetDataOfferHandler(func(e ext_data_control.ExtDataControlDeviceV1DataOfferEvent) {
-		if e.Id == nil {
-			return
-		}
-		offerMimeTypes[e.Id] = nil
-		e.Id.SetOfferHandler(func(me ext_data_control.ExtDataControlOfferV1OfferEvent) {
-			offerMimeTypes[e.Id] = append(offerMimeTypes[e.Id], me.MimeType)
-		})
-	})
-
-	var selectionOffer *ext_data_control.ExtDataControlOfferV1
-	gotSelection := false
-
-	device.SetSelectionHandler(func(e ext_data_control.ExtDataControlDeviceV1SelectionEvent) {
-		selectionOffer = e.Id
-		gotSelection = true
-	})
-
-	s.display.Roundtrip()
-	s.display.Roundtrip()
-
-	if !gotSelection || selectionOffer == nil {
-		return nil, "", fmt.Errorf("no clipboard data")
-	}
-
-	selectedMime := selectPreferredMimeType(offerMimeTypes[selectionOffer])
-	if selectedMime == "" {
-		return nil, "", fmt.Errorf("no supported mime type")
-	}
-
-	r, w, err := os.Pipe()
-	if err != nil {
-		return nil, "", fmt.Errorf("create pipe: %w", err)
-	}
-	defer r.Close()
-
-	if err := selectionOffer.Receive(selectedMime, int(w.Fd())); err != nil {
-		w.Close()
-		return nil, "", fmt.Errorf("receive: %w", err)
-	}
-	w.Close()
-
-	s.display.Roundtrip()
-
-	data, err := io.ReadAll(r)
-	if err != nil {
-		return nil, "", fmt.Errorf("read: %w", err)
-	}
-
-	return data, selectedMime, nil
-}
-
-func PasteText() (string, error) {
-	data, _, err := Paste()
-	if err != nil {
-		return "", err
-	}
-	return string(data), nil
-}
-
-func selectPreferredMimeType(mimes []string) string {
-	preferred := []string{
-		"text/plain;charset=utf-8",
-		"text/plain",
-		"UTF8_STRING",
-		"STRING",
-		"TEXT",
-		"image/png",
-		"image/jpeg",
-	}
-
-	for _, pref := range preferred {
-		for _, mime := range mimes {
-			if mime == pref {
-				return mime
-			}
-		}
-	}
-
-	if len(mimes) > 0 {
-		return mimes[0]
-	}
-	return ""
 }
 
 func IsImageMimeType(mime string) bool {

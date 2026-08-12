@@ -33,8 +33,8 @@ import (
 	"reflect"
 	"unsafe"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/pkg/go-wayland/wayland/client"
 	"github.com/AvengeMedia/dankgo/syncmap"
+	"github.com/AvengeMedia/dankgo/wayland/client"
 )
 
 func registerServerProxy(ctx *client.Context, proxy client.Proxy, serverID uint32) {
