@@ -17,11 +17,15 @@ Item {
     implicitHeight: 410
 
     property string wallpaperDir: ""
+    readonly property string searchQuery: wallpaperSearchField.text
+    property var filteredWallpaperPaths: []
     property int currentPage: 0
     property int itemsPerPage: 16
-    property int totalPages: Math.max(1, Math.ceil(wallpaperFolderModel.count / itemsPerPage))
+    readonly property int wallpaperCount: filteredWallpaperPaths.length
+    property int totalPages: Math.max(1, Math.ceil(wallpaperCount / itemsPerPage))
     property bool active: false
-    property Item focusTarget: pager
+    property bool searchExpanded: false
+    property Item focusTarget: searchExpanded ? wallpaperSearchField : searchToggleButton
     property Item tabBarItem: null
     property int gridIndex: 0
     property Item keyForwardTarget: null
@@ -42,16 +46,90 @@ Item {
     function refreshAfterSort() {
         // Defer until FolderListModel finishes reordering.
         Qt.callLater(() => {
-            gridRevision++;
-            if (visible && active) {
-                setInitialSelection();
-            }
-            updateSelectedFileName();
+            rebuildWallpaperList(true);
         });
+    }
+
+    function cleanFilePath(path) {
+        return path ? path.toString().replace(/^file:\/\//, '') : "";
+    }
+
+    function wallpaperPathAt(index) {
+        if (index < 0 || index >= wallpaperCount)
+            return "";
+        return filteredWallpaperPaths[index] || "";
+    }
+
+    function pageItemCount(page) {
+        return Math.max(0, Math.min(itemsPerPage, wallpaperCount - page * itemsPerPage));
+    }
+
+    function matchesSearch(fileName, filePath) {
+        const query = searchQuery.trim().toLowerCase();
+        if (!query)
+            return true;
+
+        const haystack = (fileName + " " + filePath).toLowerCase();
+        const terms = query.split(/\s+/);
+        for (let i = 0; i < terms.length; i++) {
+            if (terms[i] && haystack.indexOf(terms[i]) === -1)
+                return false;
+        }
+        return true;
+    }
+
+    function rebuildWallpaperList(preferCurrentWallpaper) {
+        const paths = [];
+        if (wallpaperFolderModel.status === FolderListModel.Ready) {
+            for (let i = 0; i < wallpaperFolderModel.count; i++) {
+                const filePath = cleanFilePath(wallpaperFolderModel.get(i, "filePath"));
+                const fileName = wallpaperFolderModel.get(i, "fileName") || filePath.substring(filePath.lastIndexOf('/') + 1);
+                if (filePath && matchesSearch(fileName, filePath))
+                    paths.push(filePath);
+            }
+        }
+
+        filteredWallpaperPaths = paths;
+        gridRevision++;
+
+        if (currentPage >= totalPages)
+            currentPage = Math.max(0, totalPages - 1);
+
+        const visibleCount = pageItemCount(currentPage);
+        gridIndex = visibleCount > 0 ? Math.min(gridIndex, visibleCount - 1) : 0;
+
+        if (preferCurrentWallpaper && visible && active)
+            setInitialSelection();
+        else
+            updateSelectedFileName();
+    }
+
+    function focusSearch() {
+        searchExpanded = true;
+        Qt.callLater(() => {
+            wallpaperSearchField.forceActiveFocus();
+            wallpaperSearchField.selectAll();
+        });
+    }
+
+    function clearSearch() {
+        wallpaperSearchField.clear();
+    }
+
+    function collapseSearch() {
+        clearSearch();
+        searchExpanded = false;
+        if (keyForwardTarget)
+            keyForwardTarget.forceActiveFocus();
     }
 
     onSortByChanged: refreshAfterSort()
     onSortAscendingChanged: refreshAfterSort()
+    onSearchQueryChanged: {
+        currentPage = 0;
+        gridIndex = 0;
+        searchDebounce.restart();
+    }
 
     function loadSort() {
         const s = CacheData.fileBrowserSettings["wallpaper"];
@@ -139,11 +217,11 @@ Item {
             gridIndex--;
         } else if (currentPage > 0) {
             currentPage--;
-            const prevPageCount = Math.min(itemsPerPage, wallpaperFolderModel.count - currentPage * itemsPerPage);
+            const prevPageCount = pageItemCount(currentPage);
             gridIndex = prevPageCount - 1;
         } else if (totalPages > 1) {
             currentPage = totalPages - 1;
-            const lastPageCount = Math.min(itemsPerPage, wallpaperFolderModel.count - currentPage * itemsPerPage);
+            const lastPageCount = pageItemCount(currentPage);
             gridIndex = lastPageCount - 1;
         }
     }
@@ -159,19 +237,35 @@ Item {
 
     function handleKeyEvent(event) {
         if (event.key === Qt.Key_Escape) {
-            return closeOverlays();
+            if (closeOverlays())
+                return true;
+            if (searchQuery !== "") {
+                clearSearch();
+                return true;
+            }
+            if (searchExpanded) {
+                collapseSearch();
+                return true;
+            }
+            return false;
+        }
+
+        if (event.key === Qt.Key_F && (event.modifiers & Qt.ControlModifier)) {
+            closeOverlays();
+            focusSearch();
+            return true;
         }
         const columns = 4;
         const currentCol = gridIndex % columns;
-        const visibleCount = Math.min(itemsPerPage, wallpaperFolderModel.count - currentPage * itemsPerPage);
+        const visibleCount = pageItemCount(currentPage);
 
         if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
             if (gridIndex >= 0 && gridIndex < visibleCount) {
                 const absoluteIndex = currentPage * itemsPerPage + gridIndex;
-                if (absoluteIndex < wallpaperFolderModel.count) {
-                    const filePath = wallpaperFolderModel.get(absoluteIndex, "filePath");
+                if (absoluteIndex < wallpaperCount) {
+                    const filePath = wallpaperPathAt(absoluteIndex);
                     if (filePath) {
-                        setCurrentWallpaper(filePath.toString().replace(/^file:\/\//, ''));
+                        setCurrentWallpaper(filePath);
                     }
                 }
             }
@@ -214,13 +308,13 @@ Item {
                 gridIndex -= columns;
             } else if (currentPage > 0) {
                 currentPage--;
-                const prevPageCount = Math.min(itemsPerPage, wallpaperFolderModel.count - currentPage * itemsPerPage);
+                const prevPageCount = pageItemCount(currentPage);
                 const prevPageRows = Math.ceil(prevPageCount / columns);
                 gridIndex = (prevPageRows - 1) * columns + currentCol;
                 gridIndex = Math.min(gridIndex, prevPageCount - 1);
             } else if (totalPages > 1) {
                 currentPage = totalPages - 1;
-                const lastPageCount = Math.min(itemsPerPage, wallpaperFolderModel.count - currentPage * itemsPerPage);
+                const lastPageCount = pageItemCount(currentPage);
                 const lastPageRows = Math.ceil(lastPageCount / columns);
                 gridIndex = (lastPageRows - 1) * columns + currentCol;
                 gridIndex = Math.min(gridIndex, lastPageCount - 1);
@@ -248,7 +342,7 @@ Item {
 
         if (event.key === Qt.Key_End && event.modifiers & Qt.ControlModifier) {
             currentPage = totalPages - 1;
-            const lastPageCount = Math.min(itemsPerPage, wallpaperFolderModel.count - currentPage * itemsPerPage);
+            const lastPageCount = pageItemCount(currentPage);
             gridIndex = Math.max(0, lastPageCount - 1);
             return true;
         }
@@ -259,7 +353,7 @@ Item {
     function setInitialSelection() {
         enableAnimation = false;
         const currentWallpaper = getCurrentWallpaper();
-        if (!currentWallpaper || wallpaperFolderModel.count === 0) {
+        if (!currentWallpaper || wallpaperCount === 0) {
             gridIndex = 0;
             updateSelectedFileName();
             Qt.callLater(() => {
@@ -268,9 +362,9 @@ Item {
             return;
         }
 
-        for (var i = 0; i < wallpaperFolderModel.count; i++) {
-            const filePath = wallpaperFolderModel.get(i, "filePath");
-            if (filePath && filePath.toString().replace(/^file:\/\//, '') === currentWallpaper) {
+        for (var i = 0; i < wallpaperCount; i++) {
+            const filePath = wallpaperPathAt(i);
+            if (filePath === currentWallpaper) {
                 const targetPage = Math.floor(i / itemsPerPage);
                 const targetIndex = i % itemsPerPage;
                 currentPage = targetPage;
@@ -305,17 +399,16 @@ Item {
     }
 
     function updateSelectedFileName() {
-        if (wallpaperFolderModel.count === 0) {
+        if (wallpaperCount === 0) {
             selectedFileName = "";
             return;
         }
 
         const absoluteIndex = currentPage * itemsPerPage + gridIndex;
-        if (absoluteIndex < wallpaperFolderModel.count) {
-            const filePath = wallpaperFolderModel.get(absoluteIndex, "filePath");
+        if (absoluteIndex < wallpaperCount) {
+            const filePath = wallpaperPathAt(absoluteIndex);
             if (filePath) {
-                const pathStr = filePath.toString().replace(/^file:\/\//, '');
-                selectedFileName = pathStr.substring(pathStr.lastIndexOf('/') + 1);
+                selectedFileName = filePath.substring(filePath.lastIndexOf('/') + 1);
                 return;
             }
         }
@@ -354,21 +447,20 @@ Item {
     Connections {
         target: wallpaperFolderModel
         function onCountChanged() {
-            if (wallpaperFolderModel.status === FolderListModel.Ready) {
-                if (visible && active) {
-                    setInitialSelection();
-                }
-                updateSelectedFileName();
-            }
+            if (wallpaperFolderModel.status === FolderListModel.Ready)
+                rebuildWallpaperList(true);
         }
         function onStatusChanged() {
-            if (wallpaperFolderModel.status === FolderListModel.Ready && wallpaperFolderModel.count > 0) {
-                if (visible && active) {
-                    setInitialSelection();
-                }
-                updateSelectedFileName();
-            }
+            rebuildWallpaperList(wallpaperFolderModel.status === FolderListModel.Ready);
         }
+    }
+
+    Timer {
+        id: searchDebounce
+
+        interval: 60
+        repeat: false
+        onTriggered: root.rebuildWallpaperList(false)
     }
 
     FolderListModel {
@@ -395,6 +487,28 @@ Item {
         }
         sortReversed: !root.sortAscending
         folder: wallpaperDir ? "file://" + wallpaperDir.split('/').map(s => encodeURIComponent(s)).join('/') : ""
+    }
+
+    Item {
+        id: searchKeyHandler
+
+        Keys.onPressed: event => {
+            if (event.key === Qt.Key_Tab || event.key === Qt.Key_Backtab) {
+                event.accepted = false;
+                if (root.keyForwardTarget)
+                    root.keyForwardTarget.Keys.pressed(event);
+                return;
+            }
+
+            const ctrlHomeOrEnd = (event.modifiers & Qt.ControlModifier) && (event.key === Qt.Key_Home || event.key === Qt.Key_End);
+            const gridNavigationKey = event.key === Qt.Key_Up || event.key === Qt.Key_Down || event.key === Qt.Key_PageUp || event.key === Qt.Key_PageDown || event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Escape || ctrlHomeOrEnd;
+            if (!gridNavigationKey)
+                return;
+
+            event.accepted = root.handleKeyEvent(event);
+            if (!event.accepted && root.keyForwardTarget)
+                root.keyForwardTarget.Keys.pressed(event);
+        }
     }
 
     FileBrowserSurfaceModal {
@@ -506,15 +620,8 @@ Item {
                         values: {
                             root.gridRevision; // re-evaluate when sort order changes in place
                             const startIndex = pageGrid.pageIndex * root.itemsPerPage;
-                            const endIndex = Math.min(startIndex + root.itemsPerPage, wallpaperFolderModel.count);
-                            const items = [];
-                            for (var i = startIndex; i < endIndex; i++) {
-                                const filePath = wallpaperFolderModel.get(i, "filePath");
-                                if (filePath) {
-                                    items.push(filePath.toString().replace(/^file:\/\//, ''));
-                                }
-                            }
-                            return items;
+                            const endIndex = Math.min(startIndex + root.itemsPerPage, root.wallpaperCount);
+                            return root.filteredWallpaperPaths.slice(startIndex, endIndex);
                         }
                     }
 
@@ -608,8 +715,8 @@ Item {
 
             StyledText {
                 anchors.centerIn: parent
-                visible: wallpaperFolderModel.status === FolderListModel.Ready && wallpaperFolderModel.count === 0
-                text: I18n.tr("No wallpapers found\n\nClick the folder icon below to browse")
+                visible: wallpaperFolderModel.status === FolderListModel.Ready && root.wallpaperCount === 0
+                text: root.searchQuery.trim() !== "" ? I18n.tr("No results found") : I18n.tr("No wallpapers found\n\nClick the folder icon below to browse")
                 font.pixelSize: 14
                 color: Theme.outline
                 horizontalAlignment: Text.AlignHCenter
@@ -621,14 +728,10 @@ Item {
             height: 50
 
             Row {
-                width: parent.width
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: controlsRow.width + actionButtons.width + spacing
                 height: 32
                 spacing: Theme.spacingS
-
-                Item {
-                    width: (parent.width - controlsRow.width - sortButton.width - browseButton.width - Theme.spacingS * 3) / 2
-                    height: parent.height
-                }
 
                 Row {
                     id: controlsRow
@@ -654,7 +757,7 @@ Item {
                     StyledText {
                         id: pageIndicator
                         anchors.verticalCenter: parent.verticalCenter
-                        text: wallpaperFolderModel.count > 0 ? (wallpaperFolderModel.count === 1 ? I18n.tr("%1 wallpaper  •  %2 / %3").arg(wallpaperFolderModel.count).arg(currentPage + 1).arg(totalPages) : I18n.tr("%1 wallpapers  •  %2 / %3").arg(wallpaperFolderModel.count).arg(currentPage + 1).arg(totalPages)) : I18n.tr("No wallpapers")
+                        text: root.wallpaperCount > 0 ? (root.wallpaperCount === 1 ? I18n.tr("%1 wallpaper  •  %2 / %3").arg(root.wallpaperCount).arg(currentPage + 1).arg(totalPages) : I18n.tr("%1 wallpapers  •  %2 / %3").arg(root.wallpaperCount).arg(currentPage + 1).arg(totalPages)) : I18n.tr("No wallpapers")
                         font.pixelSize: 14
                         color: pageIndicatorMouseArea.containsMouse && pageIndicatorMouseArea.enabled ? Theme.primary : Theme.surfaceText
                         opacity: 0.7
@@ -696,32 +799,145 @@ Item {
                     }
                 }
 
-                DankActionButton {
-                    id: sortButton
-                    anchors.verticalCenter: parent.verticalCenter
-                    iconName: "sort"
-                    iconSize: 20
-                    buttonSize: 32
-                    opacity: 0.7
-                    enabled: wallpaperFolderModel.count > 0
-                    tooltipText: I18n.tr("Sort wallpapers")
-                    tooltipSide: "top"
-                    onClicked: {
-                        pageJumpPopup.visible = false;
-                        sortMenu.visible = !sortMenu.visible;
-                    }
-                }
+                Row {
+                    id: actionButtons
 
-                DankActionButton {
-                    id: browseButton
                     anchors.verticalCenter: parent.verticalCenter
-                    iconName: "folder_open"
-                    iconSize: 20
-                    buttonSize: 32
-                    opacity: 0.7
-                    tooltipText: I18n.tr("Choose wallpaper folder")
-                    tooltipSide: "top"
-                    onClicked: wallpaperBrowser.open()
+                    spacing: Theme.spacingS
+
+                    DankActionButton {
+                        id: sortButton
+                        anchors.verticalCenter: parent.verticalCenter
+                        iconName: "sort"
+                        iconSize: 20
+                        buttonSize: 32
+                        opacity: 0.7
+                        enabled: wallpaperFolderModel.count > 0
+                        tooltipText: I18n.tr("Sort wallpapers")
+                        tooltipSide: "top"
+                        onClicked: {
+                            pageJumpPopup.visible = false;
+                            sortMenu.visible = !sortMenu.visible;
+                        }
+                    }
+
+                    DankActionButton {
+                        id: browseButton
+                        anchors.verticalCenter: parent.verticalCenter
+                        iconName: "folder_open"
+                        iconSize: 20
+                        buttonSize: 32
+                        opacity: 0.7
+                        tooltipText: I18n.tr("Choose wallpaper folder")
+                        tooltipSide: "top"
+                        onClicked: wallpaperBrowser.open()
+                    }
+
+                    Item {
+                        id: searchControl
+
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: root.searchExpanded ? 190 : 32
+                        height: 32
+                        clip: true
+
+                        Behavior on width {
+                            NumberAnimation {
+                                duration: Theme.shortDuration
+                                easing.type: Theme.standardEasing
+                            }
+                        }
+
+                        DankActionButton {
+                            id: searchToggleButton
+
+                            anchors.left: parent.left
+                            anchors.verticalCenter: parent.verticalCenter
+                            iconName: "search"
+                            iconSize: 20
+                            buttonSize: 32
+                            opacity: root.searchExpanded ? 0 : 0.7
+                            visible: opacity > 0
+                            tooltipText: I18n.tr("Search...")
+                            tooltipSide: "top"
+                            onClicked: root.focusSearch()
+
+                            Behavior on opacity {
+                                NumberAnimation {
+                                    duration: Theme.shortDuration
+                                    easing.type: Theme.standardEasing
+                                }
+                            }
+                        }
+
+                        DankTextField {
+                            id: wallpaperSearchField
+
+                            anchors.fill: parent
+                            topPadding: Theme.spacingXS
+                            bottomPadding: Theme.spacingXS
+                            leftIconName: "search"
+                            leftIconSize: 18
+                            showClearButton: false
+                            rightAccessoryWidth: root.searchQuery !== "" ? 54 : 26
+                            placeholderText: I18n.tr("Search...")
+                            keyForwardTargets: [searchKeyHandler]
+                            opacity: root.searchExpanded ? 1 : 0
+                            visible: opacity > 0
+
+                            Behavior on opacity {
+                                NumberAnimation {
+                                    duration: Theme.shortDuration
+                                    easing.type: Theme.standardEasing
+                                }
+                            }
+                        }
+
+                        DankActionButton {
+                            anchors.right: collapseSearchButton.left
+                            anchors.verticalCenter: parent.verticalCenter
+                            z: 2
+                            iconName: "backspace"
+                            iconSize: 16
+                            buttonSize: 28
+                            opacity: root.searchExpanded && root.searchQuery !== "" ? 0.7 : 0
+                            visible: opacity > 0
+                            tooltipText: I18n.tr("Clear")
+                            tooltipSide: "top"
+                            onClicked: root.clearSearch()
+
+                            Behavior on opacity {
+                                NumberAnimation {
+                                    duration: Theme.shortDuration
+                                    easing.type: Theme.standardEasing
+                                }
+                            }
+                        }
+
+                        DankActionButton {
+                            id: collapseSearchButton
+
+                            anchors.right: parent.right
+                            anchors.rightMargin: 2
+                            anchors.verticalCenter: parent.verticalCenter
+                            z: 2
+                            iconName: "close"
+                            iconSize: 16
+                            buttonSize: 28
+                            opacity: root.searchExpanded ? 0.7 : 0
+                            visible: opacity > 0
+                            tooltipText: I18n.tr("Close")
+                            tooltipSide: "top"
+                            onClicked: root.collapseSearch()
+
+                            Behavior on opacity {
+                                NumberAnimation {
+                                    duration: Theme.shortDuration
+                                    easing.type: Theme.standardEasing
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
