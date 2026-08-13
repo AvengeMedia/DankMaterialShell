@@ -862,6 +862,7 @@ Singleton {
     property bool dockSmartAutoHide: false
     property bool dockUseOverlayLayer: false
     property bool dockGroupByApp: false
+    property bool dockSeparatePinnedAndRunningApps: false
     property bool dockRestoreSpecialWorkspaceOnClick: false
     property bool dockOpenOnOverview: false
     property int dockPosition: SettingsData.Position.Bottom
