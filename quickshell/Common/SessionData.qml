@@ -167,6 +167,7 @@ Singleton {
     property real longitude: 0.0
     property bool nightModeUseIPLocation: false
     property string nightModeLocationProvider: ""
+    property string nightModeLocationName: ""
 
     property bool themeModeAutoEnabled: false
     property string themeModeAutoMode: "time"
@@ -1045,6 +1046,11 @@ Singleton {
 
     function setLongitude(lng) {
         longitude = lng;
+        saveSettings();
+    }
+
+    function setNightModeLocationName(name) {
+        nightModeLocationName = name;
         saveSettings();
     }
 
