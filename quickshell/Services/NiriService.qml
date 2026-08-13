@@ -24,6 +24,7 @@ Singleton {
     property var outputs: ({})
     property var windows: []
     property var displayScales: ({})
+    property var lastFocusedWindowId: null
 
     property var _realOutputs: ({})
 
@@ -483,6 +484,8 @@ Singleton {
 
     function handleWindowFocusChanged(data) {
         const focusedWindowId = data.id;
+        if (focusedWindowId !== null && focusedWindowId !== undefined)
+            lastFocusedWindowId = focusedWindowId;
 
         // Only clone windows whose focus flag changes; skip reassignment if nothing changed.
         let focusedWindow = null;
@@ -536,6 +539,8 @@ Singleton {
                 updatedWs[prop] = ws[prop];
             }
             updatedWs.active_window_id = data.active_window_id;
+            if (data.active_window_id !== null && data.active_window_id !== undefined)
+                lastFocusedWindowId = data.active_window_id;
 
             const updatedWorkspaces = {};
             for (const id in root.workspaces) {
