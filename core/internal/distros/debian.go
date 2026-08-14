@@ -472,13 +472,8 @@ func (d *DebianDistribution) enableOBSRepos(ctx context.Context, obsPkgs []Packa
 		return fmt.Errorf("failed to get OS info: %w", err)
 	}
 
-	// Determine Debian version for OBS repository URL
-	debianVersion := "Debian_13"
-	if osInfo.VersionID == "testing" {
-		debianVersion = "Debian_Testing"
-	} else if osInfo.VersionCodename == "sid" || osInfo.VersionID == "sid" || strings.Contains(strings.ToLower(osInfo.PrettyName), "sid") || strings.Contains(strings.ToLower(osInfo.PrettyName), "unstable") {
-		debianVersion = "Debian_Unstable"
-	}
+	obsRepo := debianOBSRepoVersion(osInfo, readDebianAPTSuites())
+	d.log(fmt.Sprintf("Using OBS Debian repository: %s", obsRepo))
 
 	for _, pkg := range obsPkgs {
 		if pkg.RepoURL != "" && !enabledRepos[pkg.RepoURL] {
@@ -487,12 +482,11 @@ func (d *DebianDistribution) enableOBSRepos(ctx context.Context, obsPkgs []Packa
 			// RepoURL format: "home:AvengeMedia:danklinux"
 			repoPath := strings.ReplaceAll(pkg.RepoURL, ":", ":/")
 			repoName := strings.ReplaceAll(pkg.RepoURL, ":", "-")
-			baseURL := fmt.Sprintf("https://download.opensuse.org/repositories/%s/%s", repoPath, debianVersion)
+			baseURL := fmt.Sprintf("https://download.opensuse.org/repositories/%s/%s", repoPath, obsRepo)
 
 			// Check if repository already exists
 			listFile := fmt.Sprintf("/etc/apt/sources.list.d/%s.list", repoName)
-			checkCmd := exec.CommandContext(ctx, "test", "-f", listFile)
-			if checkCmd.Run() == nil {
+			if debianOBSListFileMatches(listFile, obsRepo) {
 				d.log(fmt.Sprintf("OBS repo %s already exists, skipping", pkg.RepoURL))
 				enabledRepos[pkg.RepoURL] = true
 				continue
