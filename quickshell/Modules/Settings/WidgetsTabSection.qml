@@ -965,6 +965,46 @@ Column {
                             }
 
                             DankActionButton {
+                                id: clockCtxMenuButton
+                                buttonSize: 32
+                                visible: modelData.id === "clock"
+                                iconName: "more_vert"
+                                iconSize: 18
+                                iconColor: Theme.outline
+
+                                onEntered: {
+                                    sharedTooltip.show(I18n.tr("Options"), clockCtxMenuButton, 0, 0, "bottom");
+                                }
+                                onExited: {
+                                    sharedTooltip.hide();
+                                }
+                                onClicked: {
+                                    clockContextMenu.widgetData = modelData;
+                                    clockContextMenu.sectionId = root.sectionId;
+                                    clockContextMenu.widgetIndex = index;
+
+                                    var buttonPos = clockCtxMenuButton.mapToItem(root, 0, 0);
+                                    var popupWidth = clockContextMenu.width;
+                                    var popupHeight = clockContextMenu.height;
+
+                                    var xPos = buttonPos.x - popupWidth - Theme.spacingS;
+                                    if (xPos < 0)
+                                        xPos = buttonPos.x + clockCtxMenuButton.width + Theme.spacingS;
+
+                                    var yPos = buttonPos.y - popupHeight / 2 + clockCtxMenuButton.height / 2;
+                                    if (yPos < 0) {
+                                        yPos = Theme.spacingS;
+                                    } else if (yPos + popupHeight > root.height) {
+                                        yPos = root.height - popupHeight - Theme.spacingS;
+                                    }
+
+                                    clockContextMenu.x = xPos;
+                                    clockContextMenu.y = yPos;
+                                    clockContextMenu.open();
+                                }
+                            }
+
+                            DankActionButton {
                                 id: appsDockMenuButton
                                 buttonSize: 32
                                 visible: modelData.id === "appsDock"
@@ -1305,6 +1345,120 @@ Column {
             ColorAnimation {
                 duration: Theme.shortDuration
                 easing.type: Theme.standardEasing
+            }
+        }
+    }
+
+    Popup {
+        id: clockContextMenu
+
+        property var widgetData: null
+        property string sectionId: ""
+        property int widgetIndex: -1
+        readonly property var currentWidgetData: (widgetIndex >= 0 && widgetIndex < root.items.length) ? root.items[widgetIndex] : widgetData
+
+        width: 190
+        height: clockMenuColumn.implicitHeight + Theme.spacingS * 2
+        padding: 0
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+
+        background: Rectangle {
+            color: Theme.surfaceContainer
+            radius: Theme.cornerRadius
+            border.color: Theme.outlineMedium
+            border.width: 0
+        }
+
+        contentItem: Item {
+            LayoutMirroring.enabled: I18n.isRtl
+            LayoutMirroring.childrenInherit: true
+
+            Column {
+                id: clockMenuColumn
+                anchors.fill: parent
+                anchors.margins: Theme.spacingS
+                spacing: Theme.spacingXXS
+
+                Repeater {
+                    model: [
+                        {
+                            icon: "schedule",
+                            label: I18n.tr("Time First"),
+                            value: "timeFirst"
+                        },
+                        {
+                            icon: "calendar_month",
+                            label: I18n.tr("Date First"),
+                            value: "dateFirst"
+                        }
+                    ]
+
+                    delegate: Rectangle {
+                        required property var modelData
+
+                        function isSelected() {
+                            const currentOrder = clockContextMenu.currentWidgetData?.clockDateOrder ?? "timeFirst";
+                            return currentOrder === modelData.value;
+                        }
+
+                        width: clockMenuColumn.width
+                        height: Math.max(18, Theme.fontSizeSmall) + Theme.spacingM * 2
+                        radius: Theme.cornerRadius
+                        color: clockOrderArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
+
+                        Row {
+                            anchors.left: parent.left
+                            anchors.leftMargin: Theme.spacingS
+                            anchors.right: clockOrderCheck.left
+                            anchors.rightMargin: Theme.spacingS
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: Theme.spacingS
+                            clip: true
+
+                            DankIcon {
+                                name: modelData.icon
+                                size: 18
+                                color: isSelected() ? Theme.primary : Theme.surfaceText
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            StyledText {
+                                text: modelData.label
+                                font.pixelSize: Theme.fontSizeSmall
+                                font.weight: isSelected() ? Font.Medium : Font.Normal
+                                color: isSelected() ? Theme.primary : Theme.surfaceText
+                                anchors.verticalCenter: parent.verticalCenter
+                                elide: Text.ElideRight
+                                maximumLineCount: 1
+                                width: parent.width - 18 - Theme.spacingS
+                            }
+                        }
+
+                        DankIcon {
+                            id: clockOrderCheck
+                            anchors.right: parent.right
+                            anchors.rightMargin: Theme.spacingS
+                            anchors.verticalCenter: parent.verticalCenter
+                            name: "check"
+                            size: 16
+                            color: Theme.primary
+                            visible: isSelected()
+                        }
+
+                        MouseArea {
+                            id: clockOrderArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                root.overflowSettingChanged(clockContextMenu.sectionId, clockContextMenu.widgetIndex, "clockDateOrder", modelData.value);
+                                clockContextMenu.close();
+                            }
+                        }
+                    }
+                }
             }
         }
     }
