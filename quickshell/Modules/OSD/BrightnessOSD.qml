@@ -109,6 +109,7 @@ DankOSD {
                 onSliderValueChanged: newValue => {
                     if (!DisplayService.brightnessAvailable)
                         return;
+                    root._displayBrightness = newValue;
                     DisplayService.setBrightness(newValue, DisplayService.lastIpcDevice, true);
                     resetHideTimer();
                 }
@@ -259,6 +260,7 @@ DankOSD {
                         const ratio = 1.0 - (mouse.y / height);
                         const newValue = Math.max(vertSlider.minimum, Math.min(vertSlider.maximum, Math.round(vertSlider.minimum + ratio * (vertSlider.maximum - vertSlider.minimum))));
                         vertSlider.value = newValue;
+                        root._displayBrightness = newValue;
                         DisplayService.setBrightness(newValue, DisplayService.lastIpcDevice, true);
                         resetHideTimer();
                     }
