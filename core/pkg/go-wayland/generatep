@@ -1,9 +1,0 @@
-#!/usr/bin/env sh
-
-# Runs go generate for each directory, but in parallel. Any arguments are appended to the
-# go generate command.
-# Usage: $ ./generatep [go generate arguments]
-# Print all generate commands: $ ./generatep -x
-
-cd ./wayland || exit 1
-find . -type f -name '*.go' -exec dirname {} \; | sort -u | parallel -j 0 go generate "$1" {}/.

@@ -21,7 +21,7 @@ PluginComponent {
         return result;
     }
     readonly property bool autoMode: SettingsData.displayProfileAutoSelect
-    readonly property string activeProfileId: SettingsData.getActiveDisplayProfile(CompositorService.compositor)
+    readonly property string activeProfileId: SessionData.getActiveDisplayProfile(CompositorService.compositor)
     readonly property var activeProfile: allProfiles[activeProfileId] || null
     readonly property string activeProfileName: activeProfile?.name ?? ""
     readonly property string displayProfileLabel: {
@@ -44,7 +44,7 @@ PluginComponent {
     function setAutoMode(enabled) {
         SettingsData.displayProfileAutoSelect = enabled;
         if (!enabled)
-            SettingsData.setActiveDisplayProfile(CompositorService.compositor, "");
+            SessionData.setActiveDisplayProfile(CompositorService.compositor, "");
         SettingsData.saveSettings();
         if (enabled)
             DisplayConfigState.applyAutoConfig();

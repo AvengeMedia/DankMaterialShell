@@ -92,7 +92,7 @@ Item {
                             width: parent.width - parent.leftPadding - parent.rightPadding
                             text: SessionData.nightModeAutoEnabled ? I18n.tr("Night Temperature") : I18n.tr("Color Temperature")
                             description: SessionData.nightModeAutoEnabled ? I18n.tr("Color temperature for night mode") : I18n.tr("Warm color temperature to apply")
-                            minimum: 2500
+                            minimum: 1000
                             maximum: 6000
                             step: 100
                             unit: "K"

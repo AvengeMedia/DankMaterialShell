@@ -10,7 +10,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wlr_screencopy"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wp_viewporter"
 	wlhelpers "github.com/AvengeMedia/DankMaterialShell/core/internal/wayland/client"
-	"github.com/AvengeMedia/DankMaterialShell/core/pkg/go-wayland/wayland/client"
+	"github.com/AvengeMedia/dankgo/wayland/client"
 )
 
 type Config struct {

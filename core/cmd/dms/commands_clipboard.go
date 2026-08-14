@@ -31,6 +31,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/clipboard"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
+	"github.com/AvengeMedia/dankgo/wlclipboard"
 	"github.com/spf13/cobra"
 )
 
@@ -283,8 +284,8 @@ func runClipCopy(cmd *cobra.Command, args []string) {
 	}
 }
 
-func parseMultiOffers(data []byte) ([]clipboard.Offer, error) {
-	var offers []clipboard.Offer
+func parseMultiOffers(data []byte) ([]wlclipboard.Offer, error) {
+	var offers []wlclipboard.Offer
 	pos := 0
 
 	for pos < len(data) {
@@ -311,14 +312,14 @@ func parseMultiOffers(data []byte) ([]clipboard.Offer, error) {
 		offerData := data[pos : pos+dataLen]
 		pos += dataLen
 
-		offers = append(offers, clipboard.Offer{MimeType: mimeType, Data: offerData})
+		offers = append(offers, wlclipboard.Offer{MimeType: mimeType, Data: offerData})
 	}
 
 	return offers, nil
 }
 
 func runClipPaste(cmd *cobra.Command, args []string) {
-	data, _, err := clipboard.Paste()
+	data, _, err := wlclipboard.Paste()
 	if err != nil {
 		log.Fatalf("paste: %v", err)
 	}
@@ -344,13 +345,13 @@ func runClipWatch(cmd *cobra.Command, args []string) {
 
 	switch {
 	case len(args) > 0:
-		if err := clipboard.Watch(ctx, func(data []byte, mimeType string) {
+		if err := wlclipboard.Watch(ctx, func(data []byte, mimeType string) {
 			runCommand(args, data)
 		}); err != nil && err != context.Canceled {
 			log.Fatalf("Watch error: %v", err)
 		}
 	case clipWatchStore:
-		if err := clipboard.Watch(ctx, func(data []byte, mimeType string) {
+		if err := wlclipboard.Watch(ctx, func(data []byte, mimeType string) {
 			if err := clipboard.Store(data, mimeType); err != nil {
 				log.Errorf("store: %v", err)
 			}
@@ -382,7 +383,7 @@ func runClipWatch(cmd *cobra.Command, args []string) {
 			log.Fatalf("Watch error: %v", err)
 		}
 	case clipJSONOutput:
-		if err := clipboard.Watch(ctx, func(data []byte, mimeType string) {
+		if err := wlclipboard.Watch(ctx, func(data []byte, mimeType string) {
 			out := map[string]any{
 				"data":      string(data),
 				"mimeType":  mimeType,
@@ -395,7 +396,7 @@ func runClipWatch(cmd *cobra.Command, args []string) {
 			log.Fatalf("Watch error: %v", err)
 		}
 	default:
-		if err := clipboard.Watch(ctx, func(data []byte, mimeType string) {
+		if err := wlclipboard.Watch(ctx, func(data []byte, mimeType string) {
 			os.Stdout.Write(data)
 			os.Stdout.WriteString("\n")
 		}); err != nil && err != context.Canceled {

@@ -73,6 +73,7 @@ DankModal {
 
     visible: false
     keepContentLoaded: true
+    useOverlayLayer: SettingsData.clipboardUseOverlayLayer
     modalWidth: ClipboardConstants.modalWidth
     modalHeight: ClipboardConstants.modalHeight
     backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)

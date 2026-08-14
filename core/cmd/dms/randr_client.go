@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wlr_output_management"
-	wlclient "github.com/AvengeMedia/DankMaterialShell/core/pkg/go-wayland/wayland/client"
+	wlclient "github.com/AvengeMedia/dankgo/wayland/client"
 )
 
 type randrOutput struct {

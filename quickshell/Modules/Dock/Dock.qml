@@ -9,7 +9,7 @@ import qs.Widgets
 Variants {
     id: dockVariants
     // Connected frame mode renders the dock inside the frame surface; skip the standalone window there.
-    model: SettingsData.showDock ? SettingsData.getFilteredScreens("dock").filter(screen => !CompositorService.frameHostsDockForScreen(screen)) : []
+    model: (SettingsData.showDock || (CompositorService.isNiri && SettingsData.dockOpenOnOverview)) ? SettingsData.getFilteredScreens("dock").filter(screen => !CompositorService.frameHostsDockForScreen(screen)) : []
 
     property var contextMenu
     property var trashContextMenu

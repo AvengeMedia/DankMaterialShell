@@ -31,7 +31,7 @@
 package virtual_keyboard
 
 import (
-	"github.com/AvengeMedia/DankMaterialShell/core/pkg/go-wayland/wayland/client"
+	"github.com/AvengeMedia/dankgo/wayland/client"
 	"golang.org/x/sys/unix"
 )
 

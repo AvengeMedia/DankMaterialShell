@@ -187,7 +187,7 @@ BasePill {
 
             const nextWindow = windows[nextIndex];
             if (nextWindow)
-                nextWindow.activate();
+                CompositorService.activateToplevel(nextWindow);
         } else {
             scrollAccumulator += deltaY;
 
@@ -209,7 +209,7 @@ BasePill {
 
                 const nextWindow = windows[nextIndex];
                 if (nextWindow)
-                    nextWindow.activate();
+                    CompositorService.activateToplevel(nextWindow);
 
                 scrollAccumulator = 0;
             }
@@ -261,6 +261,13 @@ BasePill {
                     property string windowTitle: toplevelData ? (toplevelData.title || "(Unnamed)") : "(Unnamed)"
                     property var toplevelObject: toplevelData
                     property int windowCount: isGrouped ? modelData.windows.length : 1
+                    readonly property bool isMinimized: {
+                        if (!CompositorService.supportsMinimize)
+                            return false;
+                        if (isGrouped)
+                            return groupData.windows.length > 0 && groupData.windows.every(w => w.toplevel.minimized);
+                        return toplevelObject?.minimized === true;
+                    }
                     property string tooltipText: {
                         root._desktopEntriesUpdateTrigger;
                         const desktopEntry = effectiveAppId ? DesktopEntries.heuristicLookup(effectiveAppId) : null;
@@ -309,6 +316,7 @@ BasePill {
                             mipmap: true
                             asynchronous: true
                             visible: status === Image.Ready
+                            opacity: delegateItem.isMinimized ? 0.4 : 1
                             layer.enabled: appId === "org.quickshell" || appId === "com.danklinux.dms"
                             layer.smooth: true
                             layer.mipmap: true
@@ -327,6 +335,7 @@ BasePill {
                             name: "sports_esports"
                             color: Theme.widgetTextColor
                             visible: !iconImg.visible && Paths.isSteamApp(effectiveAppId)
+                            opacity: delegateItem.isMinimized ? 0.4 : 1
                         }
 
                         StyledText {
@@ -343,6 +352,7 @@ BasePill {
                             }
                             font.pixelSize: 10
                             color: Theme.widgetTextColor
+                            opacity: delegateItem.isMinimized ? 0.4 : 1
                         }
 
                         Rectangle {
@@ -406,9 +416,9 @@ BasePill {
                                         }
                                     }
                                     const nextIndex = (currentIndex + 1) % groupData.windows.length;
-                                    groupData.windows[nextIndex].toplevel.activate();
+                                    CompositorService.activateToplevel(groupData.windows[nextIndex].toplevel);
                                 } else if (toplevelObject) {
-                                    toplevelObject.activate();
+                                    CompositorService.toggleToplevel(toplevelObject);
                                 }
                             } else if (mouse.button === Qt.RightButton) {
                                 if (tooltipLoader.item) {
@@ -433,7 +443,7 @@ BasePill {
                                         const localPos = delegateItem.mapToItem(null, delegateItem.width / 2, 0);
                                         const screenHeight = root.parentScreen ? root.parentScreen.height : Screen.height;
                                         const isBottom = root.axis?.edge === "bottom";
-                                        const yPos = isBottom ? (screenHeight - root.barThickness - root.barSpacing - 32 - Theme.spacingXS) : (root.barThickness + root.barSpacing + Theme.spacingXS);
+                                        const yPos = isBottom ? (screenHeight - root.barThickness - root.barSpacing - windowContextMenuLoader.item.menuHeight - Theme.spacingXS) : (root.barThickness + root.barSpacing + Theme.spacingXS);
                                         windowContextMenuLoader.item.showAt(localPos.x, yPos, false, root.axis?.edge);
                                     }
                                 }
@@ -506,6 +516,13 @@ BasePill {
                     property string windowTitle: toplevelData ? (toplevelData.title || "(Unnamed)") : "(Unnamed)"
                     property var toplevelObject: toplevelData
                     property int windowCount: isGrouped ? modelData.windows.length : 1
+                    readonly property bool isMinimized: {
+                        if (!CompositorService.supportsMinimize)
+                            return false;
+                        if (isGrouped)
+                            return groupData.windows.length > 0 && groupData.windows.every(w => w.toplevel.minimized);
+                        return toplevelObject?.minimized === true;
+                    }
                     property string tooltipText: {
                         root._desktopEntriesUpdateTrigger;
                         const desktopEntry = effectiveAppId ? DesktopEntries.heuristicLookup(effectiveAppId) : null;
@@ -553,6 +570,7 @@ BasePill {
                             mipmap: true
                             asynchronous: true
                             visible: status === Image.Ready
+                            opacity: delegateItem.isMinimized ? 0.4 : 1
                             layer.enabled: appId === "org.quickshell" || appId === "com.danklinux.dms"
                             layer.smooth: true
                             layer.mipmap: true
@@ -571,6 +589,7 @@ BasePill {
                             name: "sports_esports"
                             color: Theme.widgetTextColor
                             visible: !iconImg.visible && Paths.isSteamApp(effectiveAppId)
+                            opacity: delegateItem.isMinimized ? 0.4 : 1
                         }
 
                         StyledText {
@@ -587,6 +606,7 @@ BasePill {
                             }
                             font.pixelSize: 10
                             color: Theme.widgetTextColor
+                            opacity: delegateItem.isMinimized ? 0.4 : 1
                         }
 
                         Rectangle {
@@ -650,9 +670,9 @@ BasePill {
                                         }
                                     }
                                     const nextIndex = (currentIndex + 1) % groupData.windows.length;
-                                    groupData.windows[nextIndex].toplevel.activate();
+                                    CompositorService.activateToplevel(groupData.windows[nextIndex].toplevel);
                                 } else if (toplevelObject) {
-                                    toplevelObject.activate();
+                                    CompositorService.toggleToplevel(toplevelObject);
                                 }
                             } else if (mouse.button === Qt.RightButton) {
                                 if (tooltipLoader.item) {
@@ -677,7 +697,7 @@ BasePill {
                                         const localPos = delegateItem.mapToItem(null, delegateItem.width / 2, 0);
                                         const screenHeight = root.parentScreen ? root.parentScreen.height : Screen.height;
                                         const isBottom = root.axis?.edge === "bottom";
-                                        const yPos = isBottom ? (screenHeight - root.barThickness - root.barSpacing - 32 - Theme.spacingXS) : (root.barThickness + root.barSpacing + Theme.spacingXS);
+                                        const yPos = isBottom ? (screenHeight - root.barThickness - root.barSpacing - windowContextMenuLoader.item.menuHeight - Theme.spacingXS) : (root.barThickness + root.barSpacing + Theme.spacingXS);
                                         windowContextMenuLoader.item.showAt(localPos.x, yPos, false, root.axis?.edge);
                                     }
                                 }
@@ -742,6 +762,7 @@ BasePill {
             }
 
             property var currentWindow: null
+            readonly property real menuHeight: contextMenuRect.height
             property bool isVisible: false
             property point anchorPos: Qt.point(0, 0)
             property bool isVertical: false
@@ -858,36 +879,79 @@ BasePill {
                         return contextMenuWindow.anchorPos.y;
                     }
                 }
-                width: 100
-                height: 32
+                width: 120
+                height: menuColumn.height + Theme.spacingXS * 2
                 color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
                 radius: Theme.cornerRadius
                 border.width: BlurService.borderWidth
                 border.color: BlurService.borderColor
 
-                Rectangle {
-                    anchors.fill: parent
-                    radius: parent.radius
-                    color: closeMouseArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0)
-                }
+                Column {
+                    id: menuColumn
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.top: parent.top
+                    anchors.topMargin: Theme.spacingXS
+                    width: parent.width - Theme.spacingXS * 2
+                    spacing: 1
 
-                StyledText {
-                    anchors.centerIn: parent
-                    text: I18n.tr("Close")
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.widgetTextColor
-                }
+                    Rectangle {
+                        visible: CompositorService.canMinimize(contextMenuWindow.currentWindow)
+                        width: parent.width
+                        height: 28
+                        radius: Theme.cornerRadius
+                        color: minimizeMouseArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
 
-                MouseArea {
-                    id: closeMouseArea
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        if (contextMenuWindow.currentWindow) {
-                            contextMenuWindow.currentWindow.close();
+                        StyledText {
+                            anchors.centerIn: parent
+                            text: contextMenuWindow.currentWindow?.minimized ? I18n.tr("Restore") : I18n.tr("Minimize")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.widgetTextColor
                         }
-                        contextMenuWindow.close();
+
+                        MouseArea {
+                            id: minimizeMouseArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                const targetWindow = contextMenuWindow.currentWindow;
+                                if (targetWindow) {
+                                    if (targetWindow.minimized) {
+                                        CompositorService.activateToplevel(targetWindow);
+                                    } else {
+                                        targetWindow.minimized = true;
+                                    }
+                                }
+                                contextMenuWindow.close();
+                            }
+                        }
+                    }
+
+                    Rectangle {
+                        width: parent.width
+                        height: 28
+                        radius: Theme.cornerRadius
+                        color: closeMouseArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
+
+                        StyledText {
+                            anchors.centerIn: parent
+                            text: I18n.tr("Close")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.widgetTextColor
+                        }
+
+                        MouseArea {
+                            id: closeMouseArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                if (contextMenuWindow.currentWindow) {
+                                    contextMenuWindow.currentWindow.close();
+                                }
+                                contextMenuWindow.close();
+                            }
+                        }
                     }
                 }
             }

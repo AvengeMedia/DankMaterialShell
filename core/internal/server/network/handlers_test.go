@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net"
 	"testing"
+	"time"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/stretchr/testify/assert"
@@ -37,6 +38,8 @@ func (m *mockNetConn) Close() error {
 	m.closed = true
 	return nil
 }
+
+func (m *mockNetConn) SetWriteDeadline(t time.Time) error { return nil }
 
 func TestRespondError_Network(t *testing.T) {
 	mc := newMockNetConn()

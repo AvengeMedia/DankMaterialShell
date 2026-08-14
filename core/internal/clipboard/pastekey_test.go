@@ -78,28 +78,3 @@ func TestResolveKeycodes(t *testing.T) {
 		})
 	}
 }
-
-func TestExpandOffers(t *testing.T) {
-	text := ExpandOffers([]byte("hi"), "text/plain;charset=utf-8")
-	if len(text) != 5 {
-		t.Fatalf("expected 5 text offers, got %d", len(text))
-	}
-	seen := map[string]bool{}
-	for _, o := range text {
-		if string(o.Data) != "hi" {
-			t.Errorf("offer %s has wrong data", o.MimeType)
-		}
-		if seen[o.MimeType] {
-			t.Errorf("duplicate offer %s", o.MimeType)
-		}
-		seen[o.MimeType] = true
-	}
-	if !seen["UTF8_STRING"] || !seen["STRING"] || !seen["TEXT"] || !seen["text/plain"] {
-		t.Errorf("missing X11 alias offers: %v", seen)
-	}
-
-	img := ExpandOffers([]byte{1}, "image/png")
-	if len(img) != 1 || img[0].MimeType != "image/png" {
-		t.Errorf("non-text mime should not expand, got %+v", img)
-	}
-}

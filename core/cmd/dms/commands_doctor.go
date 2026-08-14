@@ -903,7 +903,6 @@ func checkOptionalDependencies() []checkResult {
 		important       bool
 	}{
 		{"matugen", "matugen", "Dynamic theming", true},
-		{"dgop", "dgop", "System monitoring", true},
 		{"cava", "cava", "Audio visualizer", true},
 		{"khal", "khal", "Calendar events", false},
 		{"danksearch", "dsearch", "File search", false},

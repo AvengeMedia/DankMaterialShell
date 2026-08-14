@@ -4,8 +4,8 @@ import (
 	"sync"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wlr_output_management"
-	wlclient "github.com/AvengeMedia/DankMaterialShell/core/pkg/go-wayland/wayland/client"
 	"github.com/AvengeMedia/dankgo/syncmap"
+	wlclient "github.com/AvengeMedia/dankgo/wayland/client"
 )
 
 type OutputMode struct {

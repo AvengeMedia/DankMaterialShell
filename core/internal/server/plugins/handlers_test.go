@@ -13,6 +13,7 @@ import (
 
 func TestHandleList(t *testing.T) {
 	mc := net.NewMockConn(t)
+	mc.EXPECT().SetWriteDeadline(mock.Anything).Return(nil).Maybe()
 	conn := models.NewConn(mc)
 	mc.EXPECT().Write(mock.Anything).Return(0, nil).Maybe()
 
@@ -27,6 +28,7 @@ func TestHandleList(t *testing.T) {
 
 func TestHandleListInstalled(t *testing.T) {
 	mc := net.NewMockConn(t)
+	mc.EXPECT().SetWriteDeadline(mock.Anything).Return(nil).Maybe()
 	conn := models.NewConn(mc)
 	mc.EXPECT().Write(mock.Anything).Return(0, nil).Maybe()
 
@@ -41,6 +43,7 @@ func TestHandleListInstalled(t *testing.T) {
 
 func TestHandleInstallMissingName(t *testing.T) {
 	mc := net.NewMockConn(t)
+	mc.EXPECT().SetWriteDeadline(mock.Anything).Return(nil).Maybe()
 	conn := models.NewConn(mc)
 	var written []byte
 	mc.EXPECT().Write(mock.Anything).RunAndReturn(func(b []byte) (int, error) {
@@ -65,6 +68,7 @@ func TestHandleInstallMissingName(t *testing.T) {
 
 func TestHandleInstallInvalidName(t *testing.T) {
 	mc := net.NewMockConn(t)
+	mc.EXPECT().SetWriteDeadline(mock.Anything).Return(nil).Maybe()
 	conn := models.NewConn(mc)
 	var written []byte
 	mc.EXPECT().Write(mock.Anything).RunAndReturn(func(b []byte) (int, error) {
@@ -90,6 +94,7 @@ func TestHandleInstallInvalidName(t *testing.T) {
 
 func TestHandleUninstallMissingName(t *testing.T) {
 	mc := net.NewMockConn(t)
+	mc.EXPECT().SetWriteDeadline(mock.Anything).Return(nil).Maybe()
 	conn := models.NewConn(mc)
 	var written []byte
 	mc.EXPECT().Write(mock.Anything).RunAndReturn(func(b []byte) (int, error) {
@@ -113,6 +118,7 @@ func TestHandleUninstallMissingName(t *testing.T) {
 
 func TestHandleUpdateMissingName(t *testing.T) {
 	mc := net.NewMockConn(t)
+	mc.EXPECT().SetWriteDeadline(mock.Anything).Return(nil).Maybe()
 	conn := models.NewConn(mc)
 	var written []byte
 	mc.EXPECT().Write(mock.Anything).RunAndReturn(func(b []byte) (int, error) {
@@ -136,6 +142,7 @@ func TestHandleUpdateMissingName(t *testing.T) {
 
 func TestHandleSearchMissingQuery(t *testing.T) {
 	mc := net.NewMockConn(t)
+	mc.EXPECT().SetWriteDeadline(mock.Anything).Return(nil).Maybe()
 	conn := models.NewConn(mc)
 	var written []byte
 	mc.EXPECT().Write(mock.Anything).RunAndReturn(func(b []byte) (int, error) {

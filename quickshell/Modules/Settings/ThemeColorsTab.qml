@@ -1542,7 +1542,6 @@ Item {
                         SettingsLocationSection {
                             width: parent.width
                             visible: SessionData.themeModeAutoMode === "location" && !SessionData.themeModeShareGammaSettings
-                            centered: true
                             description: I18n.tr("Uses sunrise/sunset times based on your location.")
                         }
 

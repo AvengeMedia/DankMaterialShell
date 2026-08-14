@@ -9,7 +9,7 @@ import (
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/errdefs"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
-	wlclient "github.com/AvengeMedia/DankMaterialShell/core/pkg/go-wayland/wayland/client"
+	wlclient "github.com/AvengeMedia/dankgo/wayland/client"
 )
 
 type WaylandContext interface {

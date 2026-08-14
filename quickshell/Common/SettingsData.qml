@@ -15,7 +15,7 @@ Singleton {
     id: root
     readonly property var log: Log.scoped("SettingsData")
 
-    readonly property int settingsConfigVersion: 13
+    readonly property int settingsConfigVersion: 15
 
     enum Position {
         Top,
@@ -102,12 +102,17 @@ Singleton {
             updated[pluginId] = {};
         updated[pluginId][key] = value;
         builtInPluginSettings = updated;
+        if (Store.SESSION_BACKED_PLUGIN_IDS.includes(pluginId)) {
+            SessionData.setBuiltInPluginState(pluginId, updated[pluginId]);
+            return;
+        }
         saveSettings();
     }
 
     property bool clipboardClickToPaste: false
     property bool clipboardEnterToPaste: false
     property bool clipboardRememberTypeFilter: false
+    property bool clipboardUseOverlayLayer: false
     property string clipboardTypeFilter: "all"
     property var clipboardVisibleEntryActions: ["pin", "edit", "delete"]
 
@@ -536,16 +541,12 @@ Singleton {
     property string greeterLockDateFormat: ""
     property string greeterFontFamily: ""
     property string greeterWallpaperFillMode: ""
-    property bool greeterSyncPending: false
-    property var greeterSyncBaseline: ({})
     property int mediaSize: 1
 
     property string appLauncherViewMode: "list"
     property string spotlightModalViewMode: "list"
     property string browserPickerViewMode: "grid"
-    property var browserUsageHistory: ({})
     property string appPickerViewMode: "grid"
-    property var filePickerUsageHistory: ({})
     property bool sortAppsAlphabetically: false
     property int appLauncherGridColumns: 4
     property bool spotlightCloseNiriOverview: true
@@ -673,7 +674,6 @@ Singleton {
     property string iconThemeDark: "System Default"
     property string iconThemeLight: "System Default"
     property bool iconThemePerMode: false
-    property string lastAppliedIconTheme: ""
     readonly property string iconTheme: resolveIconTheme()
     property var availableIconThemes: ["System Default"]
     property string systemDefaultIconTheme: ""
@@ -863,6 +863,7 @@ Singleton {
     property bool dockSmartAutoHide: false
     property bool dockUseOverlayLayer: false
     property bool dockGroupByApp: false
+    property bool dockSeparatePinnedAndRunningApps: false
     property bool dockRestoreSpecialWorkspaceOnClick: false
     property bool dockOpenOnOverview: false
     property int dockPosition: SettingsData.Position.Bottom
@@ -1006,11 +1007,7 @@ Singleton {
     property string displayNameMode: "system"
     property var screenPreferences: ({})
     property var showOnLastDisplay: ({})
-    property var niriOutputSettings: ({})
-    property var hyprlandOutputSettings: ({})
     property var displayProfiles: ({})
-    property var activeDisplayProfile: ({})
-    property var activeDisplayProfileModes: ({})
     property var displayPreviousRefreshModes: ({})
     property bool displayProfileAutoSelect: false
     property bool displayShowDisconnected: false
@@ -1117,23 +1114,8 @@ Singleton {
     property var systemMonitorDisplayPreferences: ["all"]
     property var systemMonitorVariants: []
     property var desktopWidgetPositions: ({})
-    property var desktopWidgetGridSettings: ({})
     property var desktopWidgetInstances: []
     property var desktopWidgetGroups: []
-
-    function getDesktopWidgetGridSetting(screenKey, property, defaultValue) {
-        const val = desktopWidgetGridSettings?.[screenKey]?.[property];
-        return val !== undefined ? val : defaultValue;
-    }
-
-    function setDesktopWidgetGridSetting(screenKey, property, value) {
-        const allSettings = JSON.parse(JSON.stringify(desktopWidgetGridSettings || {}));
-        if (!allSettings[screenKey])
-            allSettings[screenKey] = {};
-        allSettings[screenKey][property] = value;
-        desktopWidgetGridSettings = allSettings;
-        saveSettings();
-    }
 
     function getDesktopWidgetPosition(pluginId, screenKey, property, defaultValue) {
         const pos = desktopWidgetPositions?.[pluginId]?.[screenKey]?.[property];
@@ -1185,8 +1167,7 @@ Singleton {
             widgetType: widgetType,
             name: name || widgetType,
             enabled: true,
-            config: config || {},
-            positions: {}
+            config: config || {}
         };
         const instances = JSON.parse(JSON.stringify(desktopWidgetInstances || []));
         instances.push(instance);
@@ -1215,53 +1196,10 @@ Singleton {
         saveSettings();
     }
 
-    function updateDesktopWidgetInstancePosition(instanceId, screenKey, positionUpdates) {
-        const instances = JSON.parse(JSON.stringify(desktopWidgetInstances || []));
-        const idx = instances.findIndex(inst => inst.id === instanceId);
-        if (idx === -1)
-            return;
-        if (!instances[idx].positions)
-            instances[idx].positions = {};
-        instances[idx].positions[screenKey] = Object.assign({}, instances[idx].positions[screenKey] || {}, positionUpdates);
-        desktopWidgetInstances = instances;
-        saveSettings();
-    }
-
     function removeDesktopWidgetInstance(instanceId) {
         const instances = (desktopWidgetInstances || []).filter(inst => inst.id !== instanceId);
         desktopWidgetInstances = instances;
-        saveSettings();
-    }
-
-    function syncDesktopWidgetPositionToAllScreens(instanceId) {
-        const instances = JSON.parse(JSON.stringify(desktopWidgetInstances || []));
-        const idx = instances.findIndex(inst => inst.id === instanceId);
-        if (idx === -1)
-            return;
-        const positions = instances[idx].positions || {};
-        const screenKeys = Object.keys(positions).filter(k => k !== "_synced");
-        if (screenKeys.length === 0)
-            return;
-        const sourceKey = screenKeys[0];
-        const sourcePos = positions[sourceKey];
-        if (!sourcePos)
-            return;
-        const screen = Array.from(Quickshell.screens.values()).find(s => getScreenDisplayName(s) === sourceKey);
-        if (!screen)
-            return;
-        const screenW = screen.width;
-        const screenH = screen.height;
-        const synced = {};
-        if (sourcePos.x !== undefined)
-            synced.x = sourcePos.x / screenW;
-        if (sourcePos.y !== undefined)
-            synced.y = sourcePos.y / screenH;
-        if (sourcePos.width !== undefined)
-            synced.width = sourcePos.width;
-        if (sourcePos.height !== undefined)
-            synced.height = sourcePos.height;
-        instances[idx].positions["_synced"] = synced;
-        desktopWidgetInstances = instances;
+        SessionData.removeDesktopWidgetInstancePositions(instanceId);
         saveSettings();
     }
 
@@ -1275,8 +1213,7 @@ Singleton {
             widgetType: source.widgetType,
             name: source.name + " (Copy)",
             enabled: source.enabled,
-            config: JSON.parse(JSON.stringify(source.config || {})),
-            positions: {}
+            config: JSON.parse(JSON.stringify(source.config || {}))
         };
         const instances = JSON.parse(JSON.stringify(desktopWidgetInstances || []));
         instances.push(instance);
@@ -1424,14 +1361,15 @@ Singleton {
         iconThemePerMode = false;
         iconThemeDark = "System Default";
         iconThemeLight = "System Default";
-        lastAppliedIconTheme = "";
+        SessionData.lastAppliedIconTheme = "";
+        SessionData.saveSettings();
         saveSettings();
     }
 
     function checkIconThemeDrift() {
         if (resolveIconTheme() === "System Default")
             return;
-        if (!lastAppliedIconTheme)
+        if (!SessionData.lastAppliedIconTheme)
             return;
         const script = `if command -v gsettings >/dev/null 2>&1; then
         gsettings get org.gnome.desktop.interface icon-theme 2>/dev/null | sed "s/'//g"
@@ -1443,7 +1381,7 @@ Singleton {
             const platform = (output || "").trim();
             if (!platform)
                 return;
-            if (platform === root.lastAppliedIconTheme || platform === root.iconThemeDark || platform === root.iconThemeLight)
+            if (platform === SessionData.lastAppliedIconTheme || platform === root.iconThemeDark || platform === root.iconThemeLight)
                 return;
             root.setIconThemeUnmanaged();
             ToastService.showWarning(I18n.tr("Icon theme changed outside DMS; switched to System Default", "shown when an external tool overrides the icon theme DMS applied"));
@@ -1515,7 +1453,8 @@ Singleton {
         const gtkThemeName = (resolved === "System Default") ? systemDefaultIconTheme : resolved;
         if (gtkThemeName === "System Default" || gtkThemeName === "")
             return;
-        lastAppliedIconTheme = gtkThemeName;
+        SessionData.lastAppliedIconTheme = gtkThemeName;
+        SessionData.saveSettings();
         if (typeof DMSService !== "undefined" && DMSService.apiVersion >= 3 && typeof PortalService !== "undefined") {
             PortalService.setSystemIconTheme(gtkThemeName);
         }
@@ -1598,26 +1537,28 @@ Singleton {
     }
 
     function markGreeterSyncPending(who, key, oldValue) {
-        if (!(key in greeterSyncBaseline)) {
-            var baseline = greeterSyncBaseline;
+        if (!(key in SessionData.greeterSyncBaseline)) {
+            var baseline = Object.assign({}, SessionData.greeterSyncBaseline);
             baseline[key] = oldValue;
-            greeterSyncBaseline = baseline;
+            SessionData.greeterSyncBaseline = baseline;
         }
-        greeterSyncPending = true;
+        SessionData.greeterSyncPending = true;
+        SessionData.saveSettings();
     }
 
     function clearGreeterSyncPending() {
-        greeterSyncBaseline = {};
-        greeterSyncPending = false;
-        saveSettings();
+        SessionData.greeterSyncBaseline = {};
+        SessionData.greeterSyncPending = false;
+        SessionData.saveSettings();
     }
 
     function revertGreeterSyncPending() {
-        for (var key in greeterSyncBaseline) {
-            root[key] = greeterSyncBaseline[key];
+        for (var key in SessionData.greeterSyncBaseline) {
+            root[key] = SessionData.greeterSyncBaseline[key];
         }
-        greeterSyncBaseline = {};
-        greeterSyncPending = false;
+        SessionData.greeterSyncBaseline = {};
+        SessionData.greeterSyncPending = false;
+        SessionData.saveSettings();
         saveSettings();
     }
 
@@ -1650,6 +1591,8 @@ Singleton {
 
             const oldVersion = obj?.configVersion ?? 0;
             const legacyPins = oldVersion < 13 ? Store.extractPins(obj) : null;
+            const sessionPayload = oldVersion < 15 ? Store.extractSessionPayload(obj) : null;
+            const cachePayload = oldVersion < 15 ? Store.extractCachePayload(obj) : null;
             if (oldVersion < settingsConfigVersion) {
                 const migrated = Store.migrateToVersion(obj, settingsConfigVersion);
                 if (migrated) {
@@ -1659,6 +1602,14 @@ Singleton {
             }
             if (legacyPins)
                 Qt.callLater(() => CacheData.migratePins(legacyPins));
+            if (cachePayload)
+                Qt.callLater(() => CacheData.migrateUsageHistories(cachePayload));
+            if (sessionPayload) {
+                Qt.callLater(() => {
+                    SessionData.importFromSettings(sessionPayload);
+                    _mergeSessionState();
+                });
+            }
 
             if (obj?.lockScreenActiveMonitor !== undefined) {
                 var oldVal = obj.lockScreenActiveMonitor;
@@ -1697,6 +1648,7 @@ Singleton {
 
             _loadedSettingsSnapshot = JSON.stringify(Store.toJson(root));
             _hasLoaded = true;
+            _mergeSessionState();
             applyStoredTheme();
             updateCompositorCursor();
             Qt.callLater(checkIconThemeDrift);
@@ -1716,6 +1668,28 @@ Singleton {
     }
 
     property var _pendingMigration: null
+
+    function _mergeSessionState() {
+        if (!_hasLoaded || !SessionData._hasLoaded)
+            return;
+
+        const pluginState = SessionData.builtInPluginState || {};
+        if (Object.keys(pluginState).length > 0) {
+            const updated = JSON.parse(JSON.stringify(builtInPluginSettings));
+            for (const id in pluginState) {
+                updated[id] = pluginState[id];
+            }
+            builtInPluginSettings = updated;
+        }
+    }
+
+    Connections {
+        target: SessionData
+
+        function onLoaded() {
+            root._mergeSessionState();
+        }
+    }
 
     function _checkSettingsWritable() {
         settingsWritableCheckProcess.running = true;
@@ -3155,76 +3129,12 @@ Singleton {
         return settings ? JSON.parse(JSON.stringify(settings)) : {};
     }
 
-    function getNiriOutputSetting(outputId, key, defaultValue) {
-        if (!niriOutputSettings[outputId])
-            return defaultValue;
-        return niriOutputSettings[outputId][key] !== undefined ? niriOutputSettings[outputId][key] : defaultValue;
-    }
-
-    function setNiriOutputSetting(outputId, key, value) {
-        const updated = JSON.parse(JSON.stringify(niriOutputSettings));
-        if (!updated[outputId])
-            updated[outputId] = {};
-        updated[outputId][key] = value;
-        niriOutputSettings = updated;
-        saveSettings();
-    }
-
-    function getNiriOutputSettings(outputId) {
-        const settings = niriOutputSettings[outputId];
-        return settings ? JSON.parse(JSON.stringify(settings)) : {};
-    }
-
-    function getHyprlandOutputSetting(outputId, key, defaultValue) {
-        if (!hyprlandOutputSettings[outputId])
-            return defaultValue;
-        return hyprlandOutputSettings[outputId][key] !== undefined ? hyprlandOutputSettings[outputId][key] : defaultValue;
-    }
-
-    function setHyprlandOutputSetting(outputId, key, value) {
-        const updated = JSON.parse(JSON.stringify(hyprlandOutputSettings));
-        if (!updated[outputId])
-            updated[outputId] = {};
-        updated[outputId][key] = value;
-        hyprlandOutputSettings = updated;
-        saveSettings();
-    }
-
-    function removeHyprlandOutputSetting(outputId, key) {
-        if (!hyprlandOutputSettings[outputId] || !(key in hyprlandOutputSettings[outputId]))
-            return;
-        const updated = JSON.parse(JSON.stringify(hyprlandOutputSettings));
-        delete updated[outputId][key];
-        hyprlandOutputSettings = updated;
-        saveSettings();
-    }
-
     function removeDisplayProfile(compositor, profileId) {
         if (!displayProfiles[compositor] || !displayProfiles[compositor][profileId])
             return;
         const updated = JSON.parse(JSON.stringify(displayProfiles));
         delete updated[compositor][profileId];
         displayProfiles = updated;
-        saveSettings();
-    }
-
-    function getActiveDisplayProfile(compositor) {
-        return activeDisplayProfile[compositor] || "";
-    }
-
-    function setActiveDisplayProfile(compositor, profileId) {
-        const updated = JSON.parse(JSON.stringify(activeDisplayProfile));
-        updated[compositor] = profileId;
-        activeDisplayProfile = updated;
-        saveSettings();
-    }
-
-    function setActiveDisplayProfileModes(compositor, modes) {
-        if (JSON.stringify(activeDisplayProfileModes[compositor] || {}) === JSON.stringify(modes || {}))
-            return;
-        const updated = JSON.parse(JSON.stringify(activeDisplayProfileModes));
-        updated[compositor] = modes;
-        activeDisplayProfileModes = updated;
         saveSettings();
     }
 

@@ -91,7 +91,7 @@ DankModal {
     function updateApplicationList() {
         applicationsModel.clear();
         const apps = AppSearchService.applications;
-        const usageHistory = usageHistoryKey && SettingsData[usageHistoryKey] ? SettingsData[usageHistoryKey] : {};
+        const usageHistory = usageHistoryKey && CacheData[usageHistoryKey] ? CacheData[usageHistoryKey] : {};
         const hasCategoryFilter = categoryFilter.length > 0;
         const hasMime = mimeType.length > 0;
         const hasMimeMatches = mimeMatchedAppIds.length > 0;
@@ -557,14 +557,14 @@ DankModal {
                 root.applicationSelected(app, root.targetData);
 
                 if (usageHistoryKey && app.appId) {
-                    const usageHistory = SettingsData[usageHistoryKey] || {};
+                    const usageHistory = CacheData[usageHistoryKey] || {};
                     const currentCount = usageHistory[app.appId] ? usageHistory[app.appId].count : 0;
                     usageHistory[app.appId] = {
                         count: currentCount + 1,
                         lastUsed: Date.now(),
                         name: app.name
                     };
-                    SettingsData.set(usageHistoryKey, usageHistory);
+                    CacheData.set(usageHistoryKey, usageHistory);
                 }
 
                 root.close();

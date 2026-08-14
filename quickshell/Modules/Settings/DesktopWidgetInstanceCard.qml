@@ -362,7 +362,7 @@ SettingsCard {
                 if (!root.instanceId)
                     return;
                 if (isChecked)
-                    SettingsData.syncDesktopWidgetPositionToAllScreens(root.instanceId);
+                    SessionData.syncDesktopWidgetPositionToAllScreens(root.instanceId);
                 SettingsData.updateDesktopWidgetInstanceConfig(root.instanceId, {
                     syncPositionAcrossScreens: isChecked
                 });

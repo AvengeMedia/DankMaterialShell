@@ -10,6 +10,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/clipboard"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/cups"
 	serverDbus "github.com/AvengeMedia/DankMaterialShell/core/internal/server/dbus"
+	serverDgop "github.com/AvengeMedia/DankMaterialShell/core/internal/server/dgop"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/evdev"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/freedesktop"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/location"
@@ -109,6 +110,11 @@ func RouteRequest(conn *models.Conn, req models.Request) {
 
 	if strings.HasPrefix(req.Method, "mime.") {
 		mime.HandleRequest(conn, req)
+		return
+	}
+
+	if strings.HasPrefix(req.Method, "dgop.") {
+		serverDgop.HandleRequest(conn, req)
 		return
 	}
 

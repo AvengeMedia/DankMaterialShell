@@ -12,7 +12,7 @@ Item {
     LayoutMirroring.childrenInherit: true
 
     property string selectedProfileId: {
-        const id = SettingsData.activeDisplayProfile[CompositorService.compositor] || "";
+        const id = SessionData.activeDisplayProfile[CompositorService.compositor] || "";
         if (!SettingsData.displayProfileAutoSelect) {
             const profile = DisplayConfigState.validatedProfiles[id];
             if (profile && profile.name === "")
@@ -169,7 +169,7 @@ Item {
                                 onToggled: checked => {
                                     SettingsData.displayProfileAutoSelect = checked;
                                     if (!checked)
-                                        SettingsData.setActiveDisplayProfile(CompositorService.compositor, "");
+                                        SessionData.setActiveDisplayProfile(CompositorService.compositor, "");
                                     SettingsData.saveSettings();
                                     if (checked)
                                         DisplayConfigState.applyAutoConfig();

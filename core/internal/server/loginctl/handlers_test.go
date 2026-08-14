@@ -43,6 +43,8 @@ func (m *mockNetConn) Close() error {
 	return nil
 }
 
+func (m *mockNetConn) SetWriteDeadline(t time.Time) error { return nil }
+
 func TestRespondError_Loginctl(t *testing.T) {
 	mc := newMockNetConn()
 	conn := models.NewConn(mc)

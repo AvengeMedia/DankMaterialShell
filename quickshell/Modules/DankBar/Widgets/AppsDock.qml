@@ -569,6 +569,14 @@ BasePill {
                     return modelData.toplevel ? modelData.toplevel.activated : false;
                 }
 
+                readonly property bool isMinimized: {
+                    if (!CompositorService.supportsMinimize)
+                        return false;
+                    if (modelData.type === "grouped")
+                        return modelData.allWindows.length > 0 && modelData.allWindows.every(w => w.toplevel && w.toplevel.minimized);
+                    return modelData.toplevel?.minimized === true;
+                }
+
                 property var appId: modelData.appId
                 property int windowCount: modelData.windowCount || (modelData.isRunning ? 1 : 0)
                 property string windowTitle: {
@@ -698,6 +706,7 @@ BasePill {
                         mipmap: true
                         asynchronous: true
                         visible: status === Image.Ready && !coreIcon.visible
+                        opacity: appItem.isMinimized ? 0.4 : 1
                         layer.enabled: appItem.appId === "org.quickshell" || appItem.appId === "com.danklinux.dms"
                         layer.smooth: true
                         layer.mipmap: true
@@ -730,6 +739,7 @@ BasePill {
                         name: "sports_esports"
                         color: Theme.widgetTextColor
                         visible: !iconImg.visible && !coreIcon.visible && Paths.isSteamApp(appItem.appId)
+                        opacity: appItem.isMinimized ? 0.4 : 1
 
                         transformOrigin: Item.Center
                         scale: appItem.enlargeScale
@@ -754,6 +764,7 @@ BasePill {
                         }
                         font.pixelSize: 10
                         color: Theme.widgetTextColor
+                        opacity: appItem.isMinimized ? 0.4 : 1
 
                         transformOrigin: Item.Center
                         scale: appItem.enlargeScale
@@ -884,8 +895,7 @@ BasePill {
                                         SessionService.launchDesktopEntry(desktopEntry);
                                 }
                             } else if (modelData.windowCount === 1) {
-                                if (modelData.allWindows[0].toplevel)
-                                    modelData.allWindows[0].toplevel.activate();
+                                CompositorService.toggleToplevel(modelData.allWindows[0].toplevel);
                             } else {
                                 let currentIndex = -1;
                                 for (var i = 0; i < modelData.allWindows.length; i++) {
@@ -895,7 +905,7 @@ BasePill {
                                     }
                                 }
                                 const nextIndex = (currentIndex + 1) % modelData.allWindows.length;
-                                modelData.allWindows[nextIndex].toplevel.activate();
+                                CompositorService.activateToplevel(modelData.allWindows[nextIndex].toplevel);
                             }
                         }
                     }

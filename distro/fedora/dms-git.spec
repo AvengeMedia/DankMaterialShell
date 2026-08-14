@@ -29,7 +29,6 @@ BuildRequires:  systemd-rpm-macros
 Requires:       (quickshell-git or quickshell)
 Requires:       accountsservice
 Requires:       dms-cli = %{epoch}:%{version}-%{release}
-Requires:       dgop
 
 # Core utilities (Recommended for DMS functionality)
 Recommends:     cava

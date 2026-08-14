@@ -5,7 +5,7 @@
 package mocks_wlclient
 
 import (
-	"github.com/AvengeMedia/DankMaterialShell/core/pkg/go-wayland/wayland/client"
+	"github.com/AvengeMedia/dankgo/wayland/client"
 	mock "github.com/stretchr/testify/mock"
 )
 

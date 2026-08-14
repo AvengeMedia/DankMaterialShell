@@ -1206,9 +1206,9 @@ Item {
             if (!widget)
                 return `WIDGET_NOT_AVAILABLE: ${widgetId}`;
 
-            if (widget.popoutTarget?.shouldBeVisible)
-                return "visible";
-            return "hidden";
+            if (!widget.popoutTarget)
+                return `WIDGET_NO_POPOUT: ${widgetId}`;
+            return widget.popoutTarget.shouldBeVisible ? "visible" : "hidden";
         }
 
         function reveal(widgetId: string): string {
@@ -1897,7 +1897,7 @@ Item {
     IpcHandler {
         function listProfiles(): string {
             const profiles = DisplayConfigState.validatedProfiles;
-            const activeId = SettingsData.getActiveDisplayProfile(CompositorService.compositor);
+            const activeId = SessionData.getActiveDisplayProfile(CompositorService.compositor);
             const matchedId = DisplayConfigState.matchedProfile;
             const lines = [];
 
@@ -1952,7 +1952,7 @@ Item {
             if (ids.length === 0)
                 return "ERROR: No profiles configured";
 
-            const activeId = SettingsData.getActiveDisplayProfile(CompositorService.compositor);
+            const activeId = SessionData.getActiveDisplayProfile(CompositorService.compositor);
             const idx = ids.indexOf(activeId);
             const nextId = ids[(idx + 1) % ids.length];
             DisplayConfigState.activateProfile(nextId);
@@ -1969,7 +1969,7 @@ Item {
 
         function status(): string {
             const auto = SettingsData.displayProfileAutoSelect ? "on" : "off";
-            const activeId = SettingsData.getActiveDisplayProfile(CompositorService.compositor);
+            const activeId = SessionData.getActiveDisplayProfile(CompositorService.compositor);
             const matchedId = DisplayConfigState.matchedProfile;
             const profiles = DisplayConfigState.validatedProfiles;
             const activeName = profiles[activeId]?.name || "none";

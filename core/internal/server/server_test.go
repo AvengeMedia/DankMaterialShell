@@ -6,6 +6,7 @@ import (
 	"net"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/network"
@@ -52,6 +53,8 @@ func (m *mockConn) Write(b []byte) (n int, err error) {
 func (m *mockConn) Close() error {
 	return nil
 }
+
+func (m *mockConn) SetWriteDeadline(t time.Time) error { return nil }
 
 func TestRespondError(t *testing.T) {
 	mc := &mockConn{}

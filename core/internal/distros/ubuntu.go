@@ -79,7 +79,6 @@ func (u *UbuntuDistribution) DetectDependenciesWithTerminal(ctx context.Context,
 	}
 
 	dependencies = append(dependencies, u.detectMatugen())
-	dependencies = append(dependencies, u.detectDgop())
 	dependencies = append(dependencies, u.detectDanksearch())
 	dependencies = append(dependencies, u.detectDankCalendar())
 
@@ -124,7 +123,6 @@ func (u *UbuntuDistribution) GetPackageMappingWithVariants(wm deps.WindowManager
 		"quickshell":              u.getQuickshellMapping(variants["quickshell"]),
 		"dms-greeter":             {Name: "dms-greeter", Repository: RepoTypePPA, RepoURL: "ppa:avengemedia/danklinux"},
 		"matugen":                 {Name: "matugen", Repository: RepoTypePPA, RepoURL: "ppa:avengemedia/danklinux"},
-		"dgop":                    {Name: "dgop", Repository: RepoTypePPA, RepoURL: "ppa:avengemedia/danklinux"},
 		"ghostty":                 {Name: "ghostty", Repository: RepoTypePPA, RepoURL: "ppa:avengemedia/danklinux"},
 		"danksearch":              {Name: "danksearch", Repository: RepoTypePPA, RepoURL: "ppa:avengemedia/danklinux"},
 		"dankcalendar":            {Name: "dankcalendar-git", Repository: RepoTypePPA, RepoURL: "ppa:avengemedia/danklinux"},
@@ -577,10 +575,6 @@ func (u *UbuntuDistribution) installBuildDependencies(ctx context.Context, manua
 			if err := u.installRust(ctx, sudoPassword, progressChan); err != nil {
 				return fmt.Errorf("failed to install Rust: %w", err)
 			}
-		case "dgop":
-			if err := u.installGo(ctx, sudoPassword, progressChan); err != nil {
-				return fmt.Errorf("failed to install Go: %w", err)
-			}
 		}
 	}
 
@@ -638,53 +632,6 @@ func (u *UbuntuDistribution) installRust(ctx context.Context, sudoPassword strin
 	}
 
 	return nil
-}
-
-func (u *UbuntuDistribution) installGo(ctx context.Context, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
-	if u.commandExists("go") {
-		return nil
-	}
-
-	progressChan <- InstallProgressMsg{
-		Phase:       PhaseSystemPackages,
-		Progress:    0.87,
-		Step:        "Adding Go PPA repository...",
-		IsComplete:  false,
-		NeedsSudo:   true,
-		CommandInfo: "sudo add-apt-repository ppa:longsleep/golang-backports",
-	}
-
-	addPPACmd := privesc.ExecCommand(ctx, sudoPassword,
-		"add-apt-repository -y ppa:longsleep/golang-backports")
-	if err := u.runWithProgress(addPPACmd, progressChan, PhaseSystemPackages, 0.87, 0.88); err != nil {
-		return fmt.Errorf("failed to add Go PPA: %w", err)
-	}
-
-	progressChan <- InstallProgressMsg{
-		Phase:       PhaseSystemPackages,
-		Progress:    0.88,
-		Step:        "Updating package lists...",
-		IsComplete:  false,
-		NeedsSudo:   true,
-		CommandInfo: "sudo apt-get update",
-	}
-
-	updateCmd := privesc.ExecCommand(ctx, sudoPassword, "apt-get update")
-	if err := u.runWithProgress(updateCmd, progressChan, PhaseSystemPackages, 0.88, 0.89); err != nil {
-		return fmt.Errorf("failed to update package lists after adding Go PPA: %w", err)
-	}
-
-	progressChan <- InstallProgressMsg{
-		Phase:       PhaseSystemPackages,
-		Progress:    0.89,
-		Step:        "Installing Go...",
-		IsComplete:  false,
-		NeedsSudo:   true,
-		CommandInfo: "sudo apt-get install golang-go",
-	}
-
-	installCmd := privesc.ExecCommand(ctx, sudoPassword, "apt-get install -y golang-go")
-	return u.runWithProgress(installCmd, progressChan, PhaseSystemPackages, 0.89, 0.90)
 }
 
 func (u *UbuntuDistribution) InstallManualPackages(ctx context.Context, packages []string, variantMap map[string]deps.PackageVariant, sudoPassword string, progressChan chan<- InstallProgressMsg) error {

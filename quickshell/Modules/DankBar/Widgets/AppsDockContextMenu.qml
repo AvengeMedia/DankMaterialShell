@@ -171,7 +171,7 @@ PanelWindow {
                 }
 
                 Rectangle {
-                    implicitWidth: Theme.spacingS + windowTitle.implicitWidth + Theme.spacingXS + closeButton.width + Theme.spacingXS
+                    implicitWidth: Theme.spacingS + windowTitle.implicitWidth + Theme.spacingXS + (minimizeButton.visible ? minimizeButton.width + 2 : 0) + closeButton.width + Theme.spacingXS
                     width: parent.width
                     height: 28
                     radius: Theme.cornerRadius
@@ -181,7 +181,7 @@ PanelWindow {
                         id: windowTitle
                         anchors.left: parent.left
                         anchors.leftMargin: Theme.spacingS
-                        anchors.right: closeButton.left
+                        anchors.right: minimizeButton.visible ? minimizeButton.left : closeButton.left
                         anchors.rightMargin: Theme.spacingXS
                         anchors.verticalCenter: parent.verticalCenter
                         text: (modelData && modelData.title) ? modelData.title : I18n.tr("(Unnamed)")
@@ -190,6 +190,40 @@ PanelWindow {
                         font.weight: Font.Normal
                         elide: Text.ElideRight
                         wrapMode: Text.NoWrap
+                    }
+
+                    Rectangle {
+                        id: minimizeButton
+                        visible: CompositorService.canMinimize(modelData)
+                        anchors.right: closeButton.left
+                        anchors.rightMargin: 2
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 20
+                        height: 20
+                        radius: 10
+                        color: minimizeMouseArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
+
+                        DankIcon {
+                            anchors.centerIn: parent
+                            name: modelData.minimized ? "expand_content" : "minimize"
+                            size: 12
+                            color: Theme.surfaceText
+                        }
+
+                        MouseArea {
+                            id: minimizeMouseArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                if (modelData.minimized) {
+                                    CompositorService.activateToplevel(modelData);
+                                } else {
+                                    modelData.minimized = true;
+                                }
+                                root.close();
+                            }
+                        }
                     }
 
                     Rectangle {
@@ -232,14 +266,12 @@ PanelWindow {
                     MouseArea {
                         id: windowArea
                         anchors.fill: parent
-                        anchors.rightMargin: 24
+                        anchors.rightMargin: minimizeButton.visible ? 46 : 24
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onPressed: mouse => windowRipple.trigger(mouse.x, mouse.y)
                         onClicked: {
-                            if (modelData && modelData.activate) {
-                                modelData.activate();
-                            }
+                            CompositorService.activateToplevel(modelData);
                             root.close();
                         }
                     }

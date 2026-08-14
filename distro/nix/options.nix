@@ -39,14 +39,10 @@ in
       };
     };
 
-    dgop = {
-      package = lib.mkPackageOption pkgs "dgop" { };
-    };
-
     enableSystemMonitoring = lib.mkOption {
       type = types.bool;
       default = true;
-      description = "Add needed dependencies to use system monitoring widgets";
+      description = "Enable system monitoring widgets and keybinds";
     };
 
     enableVPN = lib.mkOption {

@@ -483,6 +483,16 @@ Item {
                     onToggled: checked => SettingsData.set("clipboardRememberTypeFilter", checked)
                 }
 
+                SettingsToggleRow {
+                    tab: "clipboard"
+                    tags: ["clipboard", "fullscreen", "overlay", "layer", "behavior"]
+                    settingKey: "clipboardUseOverlayLayer"
+                    text: I18n.tr("Use Overlay Layer", "clipboard layer toggle: use Wayland overlay layer")
+                    description: I18n.tr("Place clipboard history on the Wayland overlay layer")
+                    checked: SettingsData.clipboardUseOverlayLayer
+                    onToggled: checked => SettingsData.set("clipboardUseOverlayLayer", checked)
+                }
+
                 SettingsButtonGroupRow {
                     tab: "clipboard"
                     tags: ["clipboard", "actions", "buttons", "hide", "density", "copy", "paste", "pin", "edit", "delete"]

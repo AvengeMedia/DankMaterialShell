@@ -350,7 +350,7 @@ Item {
         }
         const nextWindow = windows[nextIndex];
         if (nextWindow) {
-            nextWindow.activate();
+            CompositorService.activateToplevel(nextWindow);
         }
     }
 

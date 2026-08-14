@@ -83,7 +83,6 @@ func (v *VoidDistribution) DetectDependenciesWithTerminal(ctx context.Context, w
 	}
 
 	dependencies = append(dependencies, v.detectMatugen())
-	dependencies = append(dependencies, v.detectDgop())
 	dependencies = append(dependencies, v.detectDanksearch())
 	dependencies = append(dependencies, v.detectDankCalendar())
 
@@ -183,7 +182,6 @@ func (v *VoidDistribution) GetPackageMappingWithVariants(wm deps.WindowManager, 
 		"matugen":                 {Name: "matugen", Repository: RepoTypeSystem},
 		"dms (DankMaterialShell)": v.getDmsMapping(variants["dms (DankMaterialShell)"]),
 		"dms-greeter":             {Name: "dms-greeter", Repository: RepoTypeXBPS, RepoURL: VoidDMSRepo},
-		"dgop":                    {Name: "dgop", Repository: RepoTypeXBPS, RepoURL: VoidDankLinuxRepo},
 		"danksearch":              {Name: "danksearch", Repository: RepoTypeXBPS, RepoURL: VoidDankLinuxRepo},
 		"dankcalendar":            {Name: "dankcalendar", Repository: RepoTypeXBPS, RepoURL: VoidDankLinuxRepo},
 	}

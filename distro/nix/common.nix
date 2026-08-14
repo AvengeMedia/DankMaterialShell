@@ -11,7 +11,6 @@ in
   packages = [
     cfg.package
   ]
-  ++ lib.optional cfg.enableSystemMonitoring cfg.dgop.package
   ++ lib.optionals cfg.enableVPN [
     pkgs.glib
     pkgs.networkmanager

@@ -59,10 +59,6 @@ func (m *ManualPackageInstaller) InstallManualPackages(ctx context.Context, pack
 			if err := m.installDankMaterialShell(ctx, variant, sudoPassword, progressChan); err != nil {
 				return fmt.Errorf("failed to install DankMaterialShell: %w", err)
 			}
-		case "dgop":
-			if err := m.installDgop(ctx, sudoPassword, progressChan); err != nil {
-				return fmt.Errorf("failed to install dgop: %w", err)
-			}
 		case "niri":
 			if err := m.installNiri(ctx, sudoPassword, progressChan); err != nil {
 				return fmt.Errorf("failed to install niri: %w", err)
@@ -92,66 +88,6 @@ func (m *ManualPackageInstaller) InstallManualPackages(ctx context.Context, pack
 		}
 	}
 
-	return nil
-}
-
-func (m *ManualPackageInstaller) installDgop(ctx context.Context, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
-	m.log("Installing dgop from source...")
-
-	homeDir := os.Getenv("HOME")
-	if homeDir == "" {
-		return fmt.Errorf("HOME environment variable not set")
-	}
-
-	cacheDir := filepath.Join(homeDir, ".cache", "dankinstall")
-	if err := os.MkdirAll(cacheDir, 0o755); err != nil {
-		return fmt.Errorf("failed to create cache directory: %w", err)
-	}
-
-	tmpDir := filepath.Join(cacheDir, "dgop-build")
-	if err := os.MkdirAll(tmpDir, 0o755); err != nil {
-		return fmt.Errorf("failed to create temp directory: %w", err)
-	}
-	defer os.RemoveAll(tmpDir)
-
-	progressChan <- InstallProgressMsg{
-		Phase:       PhaseSystemPackages,
-		Progress:    0.1,
-		Step:        "Cloning dgop repository...",
-		IsComplete:  false,
-		CommandInfo: "git clone https://github.com/AvengeMedia/dgop.git",
-	}
-
-	cloneCmd := exec.CommandContext(ctx, "git", "clone", "https://github.com/AvengeMedia/dgop.git", tmpDir)
-	if err := cloneCmd.Run(); err != nil {
-		m.logError("failed to clone dgop repository", err)
-		return fmt.Errorf("failed to clone dgop repository: %w", err)
-	}
-
-	buildCmd := exec.CommandContext(ctx, "make")
-	buildCmd.Dir = tmpDir
-	buildCmd.Env = append(os.Environ(), "TMPDIR="+cacheDir)
-	if err := m.runWithProgressStep(buildCmd, progressChan, PhaseSystemPackages, 0.4, 0.7, "Building dgop..."); err != nil {
-		return fmt.Errorf("failed to build dgop: %w", err)
-	}
-
-	progressChan <- InstallProgressMsg{
-		Phase:       PhaseSystemPackages,
-		Progress:    0.7,
-		Step:        "Installing dgop...",
-		IsComplete:  false,
-		NeedsSudo:   true,
-		CommandInfo: "sudo make install",
-	}
-
-	installCmd := privesc.ExecCommand(ctx, sudoPassword, "make install")
-	installCmd.Dir = tmpDir
-	if err := installCmd.Run(); err != nil {
-		m.logError("failed to install dgop", err)
-		return fmt.Errorf("failed to install dgop: %w", err)
-	}
-
-	m.log("dgop installed successfully from source")
 	return nil
 }
 

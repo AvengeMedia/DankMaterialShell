@@ -46,7 +46,7 @@ CompoundPill {
 
     secondaryText: {
         if (!DgopService.dgopAvailable) {
-            return I18n.tr("dgop not available");
+            return I18n.tr("DMS_SOCKET not available");
         }
         if (!selectedMount) {
             return I18n.tr("No disk data available");

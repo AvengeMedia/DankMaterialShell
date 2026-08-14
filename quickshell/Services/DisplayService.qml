@@ -377,7 +377,7 @@ Singleton {
 
     function applyWlrModeOverrides(modeOverrides, callback) {
         if (CompositorService.isHyprland) {
-            HyprlandService.generateOutputsConfig(buildWlrOutputsData(modeOverrides), SettingsData.hyprlandOutputSettings, callback);
+            HyprlandService.generateOutputsConfig(buildWlrOutputsData(modeOverrides), SessionData.hyprlandOutputSettings, callback);
             return;
         }
 
@@ -519,7 +519,7 @@ Singleton {
 
     function findActiveProfileMode(outputName, output) {
         const compositor = CompositorService.compositor;
-        const profileModes = SettingsData.activeDisplayProfileModes?.[compositor] || {};
+        const profileModes = SessionData.activeDisplayProfileModes?.[compositor] || {};
         if (Object.keys(profileModes).length === 0)
             return "";
 
@@ -1346,6 +1346,22 @@ Singleton {
         });
     }
 
+    function requestBrightnessState() {
+        if (!DMSService.isConnected) {
+            return;
+        }
+
+        DMSService.sendRequest("brightness.getState", null, response => {
+            if (response.error) {
+                log.error("Failed to request brightness state:", response.error);
+                return;
+            }
+            if (response.result) {
+                updateFromBrightnessState(response.result);
+            }
+        });
+    }
+
     function updateDeviceBrightnessDisplay(deviceName) {
         brightnessVersion++;
         brightnessChanged();
@@ -1371,6 +1387,7 @@ Singleton {
         deviceBrightnessUserSet = Object.assign({}, SessionData.brightnessUserSetValues);
         if (DMSService.isConnected) {
             checkGammaControlAvailability();
+            requestBrightnessState();
         }
     }
 
@@ -1410,6 +1427,7 @@ Singleton {
         function onConnectionStateChanged() {
             if (DMSService.isConnected) {
                 checkGammaControlAvailability();
+                requestBrightnessState();
             } else {
                 brightnessAvailable = false;
                 gammaControlAvailable = false;
@@ -1712,13 +1730,13 @@ Singleton {
 
         function setTargetTemp(value: string): string {
             if (!value)
-                return "Usage: night setTargetTemp <2500-6000>";
+                return "Usage: night setTargetTemp <1000-6000>";
 
             const temp = parseInt(value);
             if (isNaN(temp))
                 return "Invalid temperature: " + value;
-            if (temp < 2500 || temp > 6000)
-                return "Temperature must be between 2500K and 6000K";
+            if (temp < 1000 || temp > 6000)
+                return "Temperature must be between 1000K and 6000K";
 
             const rounded = Math.round(temp / 500) * 500;
             if (rounded > SessionData.nightModeHighTemperature)
@@ -1743,13 +1761,13 @@ Singleton {
 
         function setDayTemp(value: string): string {
             if (!value)
-                return "Usage: night setDayTemp <2500-6500>";
+                return "Usage: night setDayTemp <1000-6500>";
 
             const temp = parseInt(value);
             if (isNaN(temp))
                 return "Invalid temperature: " + value;
-            if (temp < 2500 || temp > 6500)
-                return "Temperature must be between 2500K and 6500K";
+            if (temp < 1000 || temp > 6500)
+                return "Temperature must be between 1000K and 6500K";
 
             const rounded = Math.round(temp / 500) * 500;
             if (rounded < SessionData.nightModeTemperature)

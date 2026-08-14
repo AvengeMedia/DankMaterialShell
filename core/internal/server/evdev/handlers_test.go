@@ -6,6 +6,7 @@ import (
 	"errors"
 	"net"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -40,6 +41,8 @@ func (m *mockNetConn) Close() error {
 	m.closed = true
 	return nil
 }
+
+func (m *mockNetConn) SetWriteDeadline(t time.Time) error { return nil }
 
 func TestHandleRequest(t *testing.T) {
 	t.Run("getState request", func(t *testing.T) {

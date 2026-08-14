@@ -32,6 +32,8 @@ func (c *clipboardTestConn) Write(b []byte) (int, error) {
 	return c.writeBuf.Write(b)
 }
 
+func (c *clipboardTestConn) SetWriteDeadline(t time.Time) error { return nil }
+
 func newTestManagerWithDB(t *testing.T) *Manager {
 	t.Helper()
 

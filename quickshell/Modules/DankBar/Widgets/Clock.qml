@@ -20,6 +20,7 @@ BasePill {
             implicitHeight: root.isVerticalOrientation ? clockColumn.implicitHeight : (root.widgetThickness - root.horizontalPadding * 2)
 
             readonly property bool compact: widgetData?.clockCompactMode !== undefined ? widgetData.clockCompactMode : SettingsData.clockCompactMode
+            readonly property bool dateFirst: widgetData?.clockDateOrder === "dateFirst"
 
             Column {
                 id: clockColumn
@@ -223,80 +224,9 @@ BasePill {
                     return hours >= 12 ? " PM" : " AM";
                 }
 
-                Row {
-                    spacing: 0
+                Loader {
                     anchors.verticalCenter: parent.verticalCenter
-
-                    StyledText {
-                        visible: clockRow.hoursStr.length > 1
-                        text: clockRow.hoursStr.charAt(0)
-                        font.pixelSize: clockRow.fontSize
-                        color: Theme.widgetTextColor
-                        width: clockRow.digitWidth
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-
-                    StyledText {
-                        text: clockRow.hoursStr.length > 1 ? clockRow.hoursStr.charAt(1) : clockRow.hoursStr.charAt(0)
-                        font.pixelSize: clockRow.fontSize
-                        color: Theme.widgetTextColor
-                        width: clockRow.digitWidth
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-
-                    StyledText {
-                        text: ":"
-                        font.pixelSize: clockRow.fontSize
-                        color: Theme.widgetTextColor
-                    }
-
-                    StyledText {
-                        text: clockRow.minutesStr.charAt(0)
-                        font.pixelSize: clockRow.fontSize
-                        color: Theme.widgetTextColor
-                        width: clockRow.digitWidth
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-
-                    StyledText {
-                        text: clockRow.minutesStr.charAt(1)
-                        font.pixelSize: clockRow.fontSize
-                        color: Theme.widgetTextColor
-                        width: clockRow.digitWidth
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-
-                    StyledText {
-                        visible: SettingsData.showSeconds
-                        text: ":"
-                        font.pixelSize: clockRow.fontSize
-                        color: Theme.widgetTextColor
-                    }
-
-                    StyledText {
-                        visible: SettingsData.showSeconds
-                        text: clockRow.secondsStr.charAt(0)
-                        font.pixelSize: clockRow.fontSize
-                        color: Theme.widgetTextColor
-                        width: clockRow.digitWidth
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-
-                    StyledText {
-                        visible: SettingsData.showSeconds
-                        text: clockRow.secondsStr.charAt(1)
-                        font.pixelSize: clockRow.fontSize
-                        color: Theme.widgetTextColor
-                        width: clockRow.digitWidth
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-
-                    StyledText {
-                        visible: !SettingsData.use24HourClock
-                        text: clockRow.ampmStr
-                        font.pixelSize: clockRow.fontSize
-                        color: Theme.widgetTextColor
-                    }
+                    sourceComponent: dateFirst && !compact ? dateComponent : timeComponent
                 }
 
                 StyledText {
@@ -308,18 +238,108 @@ BasePill {
                     visible: !compact
                 }
 
-                StyledText {
-                    id: dateText
-                    text: {
-                        if (SettingsData.clockDateFormat && SettingsData.clockDateFormat.length > 0) {
-                            return systemClock?.date?.toLocaleDateString(I18n.locale(), SettingsData.clockDateFormat);
-                        }
-                        return systemClock?.date?.toLocaleDateString(I18n.locale(), "ddd d");
-                    }
-                    font.pixelSize: clockRow.fontSize
-                    color: Theme.widgetTextColor
+                Loader {
                     anchors.verticalCenter: parent.verticalCenter
                     visible: !compact
+                    sourceComponent: dateFirst ? timeComponent : dateComponent
+                }
+
+                Component {
+                    id: timeComponent
+
+                    Row {
+                        spacing: 0
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        StyledText {
+                            visible: clockRow.hoursStr.length > 1
+                            text: clockRow.hoursStr.charAt(0)
+                            font.pixelSize: clockRow.fontSize
+                            color: Theme.widgetTextColor
+                            width: clockRow.digitWidth
+                            horizontalAlignment: Text.AlignHCenter
+                        }
+
+                        StyledText {
+                            text: clockRow.hoursStr.length > 1 ? clockRow.hoursStr.charAt(1) : clockRow.hoursStr.charAt(0)
+                            font.pixelSize: clockRow.fontSize
+                            color: Theme.widgetTextColor
+                            width: clockRow.digitWidth
+                            horizontalAlignment: Text.AlignHCenter
+                        }
+
+                        StyledText {
+                            text: ":"
+                            font.pixelSize: clockRow.fontSize
+                            color: Theme.widgetTextColor
+                        }
+
+                        StyledText {
+                            text: clockRow.minutesStr.charAt(0)
+                            font.pixelSize: clockRow.fontSize
+                            color: Theme.widgetTextColor
+                            width: clockRow.digitWidth
+                            horizontalAlignment: Text.AlignHCenter
+                        }
+
+                        StyledText {
+                            text: clockRow.minutesStr.charAt(1)
+                            font.pixelSize: clockRow.fontSize
+                            color: Theme.widgetTextColor
+                            width: clockRow.digitWidth
+                            horizontalAlignment: Text.AlignHCenter
+                        }
+
+                        StyledText {
+                            visible: SettingsData.showSeconds
+                            text: ":"
+                            font.pixelSize: clockRow.fontSize
+                            color: Theme.widgetTextColor
+                        }
+
+                        StyledText {
+                            visible: SettingsData.showSeconds
+                            text: clockRow.secondsStr.charAt(0)
+                            font.pixelSize: clockRow.fontSize
+                            color: Theme.widgetTextColor
+                            width: clockRow.digitWidth
+                            horizontalAlignment: Text.AlignHCenter
+                        }
+
+                        StyledText {
+                            visible: SettingsData.showSeconds
+                            text: clockRow.secondsStr.charAt(1)
+                            font.pixelSize: clockRow.fontSize
+                            color: Theme.widgetTextColor
+                            width: clockRow.digitWidth
+                            horizontalAlignment: Text.AlignHCenter
+                        }
+
+                        StyledText {
+                            visible: !SettingsData.use24HourClock
+                            text: clockRow.ampmStr
+                            font.pixelSize: clockRow.fontSize
+                            color: Theme.widgetTextColor
+                        }
+                    }
+                }
+
+                Component {
+                    id: dateComponent
+
+                    StyledText {
+                        id: dateText
+                        text: {
+                            if (SettingsData.clockDateFormat && SettingsData.clockDateFormat.length > 0) {
+                                return systemClock?.date?.toLocaleDateString(I18n.locale(), SettingsData.clockDateFormat);
+                            }
+                            return systemClock?.date?.toLocaleDateString(I18n.locale(), "ddd d");
+                        }
+                        font.pixelSize: clockRow.fontSize
+                        color: Theme.widgetTextColor
+                        anchors.verticalCenter: parent.verticalCenter
+                        visible: !compact
+                    }
                 }
             }
 

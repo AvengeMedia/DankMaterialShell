@@ -6,6 +6,7 @@ import (
 	"net"
 	"sync"
 	"testing"
+	"time"
 
 	mockdbus "github.com/AvengeMedia/DankMaterialShell/core/internal/mocks/github.com/godbus/dbus/v5"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
@@ -41,6 +42,8 @@ func (m *mockNetConn) Close() error {
 	m.closed = true
 	return nil
 }
+
+func (m *mockNetConn) SetWriteDeadline(t time.Time) error { return nil }
 
 func mockGetAllAccountsProperties() *dbus.Call {
 	props := map[string]dbus.Variant{

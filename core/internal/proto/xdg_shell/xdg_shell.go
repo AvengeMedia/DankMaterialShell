@@ -1,6 +1,6 @@
 package xdg_shell
 
-import "github.com/AvengeMedia/DankMaterialShell/core/pkg/go-wayland/wayland/client"
+import "github.com/AvengeMedia/dankgo/wayland/client"
 
 type Popup struct {
 	client.BaseProxy
