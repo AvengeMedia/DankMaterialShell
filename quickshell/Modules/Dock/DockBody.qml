@@ -149,6 +149,7 @@ Item {
     readonly property string _dockScreenName: dock.modelData ? dock.modelData.name : (dock.screen ? dock.screen.name : "")
     readonly property bool usesConnectedFrameChrome: CompositorService.usesConnectedFrameChromeForScreen(dock._dockScreenName)
     readonly property bool usesOverlayLayer: CompositorService.framePeerSurfacesUseOverlayForScreen(dock._dockScreenName) || SettingsData.dockUseOverlayLayer
+    readonly property bool geometryReady: dock.width > 0 && dock.height > 0 && dockBackground.width > 0 && dockBackground.height > 0
 
     function _syncDockChromeState() {
         if (!dock._dockScreenName)
@@ -158,7 +159,7 @@ Item {
             return;
         }
 
-        const presented = dock.visible && (dock.reveal || slideXAnimation.running || slideYAnimation.running) && dock.hasApps;
+        const presented = dock.geometryReady && (hostWindow?.visible ?? true) && (dock.reveal || slideXAnimation.running || slideYAnimation.running) && dock.hasApps;
         const phase = !presented ? "hidden" : ((!dock.reveal && (slideXAnimation.running || slideYAnimation.running)) ? "closing" : ((slideXAnimation.running || slideYAnimation.running) ? "opening" : "open"));
         const bodyX = dock._dockWindowOriginX() + dockBackground.x + dockContainer.x + dockMouseArea.x + dockCore.x;
         const bodyY = dock._dockWindowOriginY() + dockBackground.y + dockContainer.y + dockMouseArea.y + dockCore.y;
@@ -322,13 +323,14 @@ Item {
     }
 
     property bool reveal: {
-        if (!startupRevealDone)
+        const overviewReveal = CompositorService.isNiri && NiriService.inOverview && SettingsData.dockOpenOnOverview;
+        if ((!startupRevealDone && !overviewReveal) || !dock.geometryReady || !(hostWindow?.visible ?? true))
             return false;
 
         if (_modalRetractActive)
             return false;
 
-        if (CompositorService.isNiri && NiriService.inOverview && SettingsData.dockOpenOnOverview) {
+        if (overviewReveal) {
             return true;
         }
 
