@@ -104,7 +104,7 @@ func IsUnsupportedDistro(distroID, versionID string) bool {
 
 	if distroID == "debian" {
 		// unstable/sid support
-		if versionID == "sid" {
+		if versionID == "sid" || versionID == "testing" {
 			return false
 		}
 		if versionID == "" {
