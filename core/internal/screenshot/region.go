@@ -25,10 +25,15 @@ type SelectionState struct {
 }
 
 type RenderSlot struct {
-	shm   *ShmBuffer
-	pool  *client.ShmPool
-	wlBuf *client.Buffer
-	busy  bool
+	shm                   *ShmBuffer
+	pool                  *client.ShmPool
+	wlBuf                 *client.Buffer
+	busy                  bool
+	backgroundInitialized bool
+	backgroundSource      *ShmBuffer
+	backgroundDragging    bool
+	backgroundPhase       selectorPhase
+	renderedBounds        *selectionRenderBounds
 }
 
 type OutputSurface struct {
@@ -786,9 +791,25 @@ func (r *RegionSelector) redrawSurface(os *OutputSurface) {
 	switch r.phase {
 	case phaseScroll:
 		r.drawScrollOverlay(os, slot.shm)
+		slot.backgroundInitialized = false
+		slot.backgroundSource = nil
+		slot.renderedBounds = nil
 	default:
-		slot.shm.CopyFrom(srcBuf)
-		r.drawOverlay(os, slot.shm)
+		if !slot.backgroundInitialized ||
+			slot.backgroundSource != srcBuf ||
+			slot.backgroundDragging != r.selection.dragging ||
+			slot.backgroundPhase != r.phase {
+			slot.shm.CopyFrom(srcBuf)
+			r.dimBackground(slot.shm)
+			slot.backgroundInitialized = true
+			slot.backgroundSource = srcBuf
+			slot.backgroundDragging = r.selection.dragging
+			slot.backgroundPhase = r.phase
+			slot.renderedBounds = nil
+		} else if slot.renderedBounds != nil {
+			r.restoreSourceRect(os, slot.shm, *slot.renderedBounds)
+		}
+		slot.renderedBounds = r.drawOverlay(os, slot.shm)
 	}
 
 	if os.viewport != nil {

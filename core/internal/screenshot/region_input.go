@@ -183,48 +183,12 @@ func (r *RegionSelector) selectionDeviceRect() (*OutputSurface, int, int, int, i
 	}
 
 	os := r.selection.surface
-	srcBuf := r.getSourceBuffer(os)
-	if srcBuf == nil {
+	bounds, ok := r.selectionRenderBounds(os)
+	if !ok {
 		return nil, 0, 0, 0, 0
 	}
 
-	x1, y1 := r.selection.anchorX, r.selection.anchorY
-	x2, y2 := r.selection.currentX, r.selection.currentY
-
-	if x1 > x2 {
-		x1, x2 = x2, x1
-	}
-	if y1 > y2 {
-		y1, y2 = y2, y1
-	}
-
-	scaleX, scaleY := 1.0, 1.0
-	if os.logicalW > 0 {
-		scaleX = float64(srcBuf.Width) / float64(os.logicalW)
-		scaleY = float64(srcBuf.Height) / float64(os.logicalH)
-	}
-
-	bx1 := clamp(int(x1*scaleX), 0, srcBuf.Width)
-	by1 := clamp(int(y1*scaleY), 0, srcBuf.Height)
-	bx2 := clamp(int(x2*scaleX), 0, srcBuf.Width)
-	by2 := clamp(int(y2*scaleY), 0, srcBuf.Height)
-
-	w, h := bx2-bx1+1, by2-by1+1
-	if r.shiftHeld && w != h {
-		if w < h {
-			h = w
-		} else {
-			w = h
-		}
-	}
-	if w < 1 {
-		w = 1
-	}
-	if h < 1 {
-		h = 1
-	}
-
-	return os, bx1, by1, w, h
+	return os, bounds.x, bounds.y, bounds.w, bounds.h
 }
 
 func (r *RegionSelector) finishSelection() {
