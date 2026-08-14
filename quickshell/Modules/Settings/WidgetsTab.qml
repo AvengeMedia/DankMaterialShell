@@ -895,17 +895,6 @@ Item {
         setWidgetsForSection(sectionId, widgets);
     }
 
-    function handleClockSettingChanged(sectionId, widgetIndex, settingName, value) {
-        var widgets = getWidgetsForSection(sectionId).slice();
-        if (widgetIndex < 0 || widgetIndex >= widgets.length) {
-            return;
-        }
-        var newWidget = cloneWidgetData(widgets[widgetIndex]);
-        newWidget[settingName] = value;
-        widgets[widgetIndex] = newWidget;
-        setWidgetsForSection(sectionId, widgets);
-    }
-
     function handleDiskUsageModeChanged(sectionId, widgetIndex, mode) {
         var widgets = getWidgetsForSection(sectionId).slice();
         if (widgetIndex < 0 || widgetIndex >= widgets.length) {
@@ -1412,9 +1401,6 @@ Item {
                         onHideWhenIdleChanged: (sectionId, widgetIndex, enabled) => {
                             widgetsTab.handleHideWhenIdleChanged(sectionId, widgetIndex, enabled);
                         }
-                        onClockSettingChanged: (sectionId, widgetIndex, settingName, value) => {
-                            widgetsTab.handleClockSettingChanged(sectionId, widgetIndex, settingName, value);
-                        }
                     }
                 }
 
@@ -1502,9 +1488,6 @@ Item {
                         onHideWhenIdleChanged: (sectionId, widgetIndex, enabled) => {
                             widgetsTab.handleHideWhenIdleChanged(sectionId, widgetIndex, enabled);
                         }
-                        onClockSettingChanged: (sectionId, widgetIndex, settingName, value) => {
-                            widgetsTab.handleClockSettingChanged(sectionId, widgetIndex, settingName, value);
-                        }
                     }
                 }
 
@@ -1591,9 +1574,6 @@ Item {
                         }
                         onHideWhenIdleChanged: (sectionId, widgetIndex, enabled) => {
                             widgetsTab.handleHideWhenIdleChanged(sectionId, widgetIndex, enabled);
-                        }
-                        onClockSettingChanged: (sectionId, widgetIndex, settingName, value) => {
-                            widgetsTab.handleClockSettingChanged(sectionId, widgetIndex, settingName, value);
                         }
                     }
                 }

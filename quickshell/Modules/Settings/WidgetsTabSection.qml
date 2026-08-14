@@ -39,7 +39,6 @@ Column {
     signal diskUsageModeChanged(string sectionId, int widgetIndex, int mode)
     signal overflowSettingChanged(string sectionId, int widgetIndex, string settingName, var value)
     signal hideWhenIdleChanged(string sectionId, int widgetIndex, bool enabled)
-    signal clockSettingChanged(string sectionId, int widgetIndex, string settingName, var value)
 
     // Cross-section drag coordination with WidgetsTab (positions are section-local)
     signal dragStarted(string sectionId, string id, int index, var widgetData, var localPos)
@@ -1454,7 +1453,7 @@ Column {
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
-                                root.clockSettingChanged(clockContextMenu.sectionId, clockContextMenu.widgetIndex, "clockDateOrder", modelData.value);
+                                root.overflowSettingChanged(clockContextMenu.sectionId, clockContextMenu.widgetIndex, "clockDateOrder", modelData.value);
                                 clockContextMenu.close();
                             }
                         }
