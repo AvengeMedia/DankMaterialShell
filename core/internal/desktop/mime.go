@@ -302,6 +302,22 @@ func AppsForMime(mimeType string) []string {
 	return out
 }
 
+// HandlersForMime lists launchable handler entries for a mime type,
+// excluding Terminal=true and NoDisplay=true desktop entries so pickers
+// only offer graphical applications.
+func HandlersForMime(mimeType string) []*Entry {
+	ids := AppsForMime(mimeType)
+	out := make([]*Entry, 0, len(ids))
+	for _, id := range ids {
+		entry := EntryByID(id)
+		if entry == nil || entry.Hidden || entry.NoDisplay || entry.Terminal {
+			continue
+		}
+		out = append(out, entry)
+	}
+	return out
+}
+
 func QueryDefaults(mimeTypes []string) map[string]string {
 	out := make(map[string]string, len(mimeTypes))
 	for _, m := range mimeTypes {
