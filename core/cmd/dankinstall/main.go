@@ -18,6 +18,15 @@ var Version = "dev"
 var (
 	compositor        string
 	term              string
+	privescTool       string
+	wmGit             bool
+	quickshellGit     bool
+	dmsGit            bool
+	gitAll            bool
+	gitDeps           []string
+	allFeatures       bool
+	noFeatures        bool
+	dmsGreeter        bool
 	includeDeps       []string
 	excludeDeps       []string
 	replaceConfigs    []string
@@ -35,8 +44,7 @@ var rootCmd = &cobra.Command{
 Without flags, it launches an interactive TUI. Providing either --compositor
 or --term activates headless (unattended) mode, which requires both flags.
 
-Headless mode requires cached sudo credentials. Run 'sudo -v' beforehand, or
-configure passwordless sudo for your user.`,
+Headless mode requires cached credentials or passwordless privilege escalation.`,
 	Args:          cobra.NoArgs,
 	RunE:          runDankinstall,
 	SilenceErrors: true,
@@ -46,7 +54,19 @@ configure passwordless sudo for your user.`,
 func init() {
 	rootCmd.Flags().StringVarP(&compositor, "compositor", "c", "", "Compositor/WM to install: niri, hyprland, or mango (enables headless mode)")
 	rootCmd.Flags().StringVarP(&term, "term", "t", "", "Terminal emulator to install: ghostty, kitty, or alacritty (enables headless mode)")
-	rootCmd.Flags().StringSliceVar(&includeDeps, "include-deps", []string{}, "Optional deps to enable (e.g. dms-greeter)")
+	rootCmd.Flags().StringVarP(&privescTool, "privesc", "p", "", "Privilege escalation tool: sudo, doas, or run0")
+	rootCmd.Flags().BoolVar(&wmGit, "wm-git", false, "Use git/development version of selected window manager")
+	rootCmd.Flags().BoolVar(&quickshellGit, "quickshell-git", false, "Use git/development version of quickshell")
+	rootCmd.Flags().BoolVar(&dmsGit, "dms-git", false, "Use git/development version of DankMaterialShell")
+	rootCmd.Flags().BoolVar(&gitAll, "git-all", false, "Use git/development versions for all supported components")
+	rootCmd.Flags().BoolVar(&gitAll, "git", false, "Use git/development versions for all supported components (alias for --git-all)")
+	rootCmd.Flags().StringSliceVar(&gitDeps, "git-deps", []string{}, "Comma-separated list of dependencies to use git versions for")
+	rootCmd.Flags().BoolVarP(&allFeatures, "all-features", "a", false, "Install all optional features and dependencies")
+	rootCmd.Flags().BoolVar(&allFeatures, "all", false, "Install all optional features and dependencies (alias for --all-features)")
+	rootCmd.Flags().BoolVar(&noFeatures, "no-features", false, "Skip all optional features and dependencies")
+	rootCmd.Flags().BoolVar(&dmsGreeter, "dms-greeter", false, "Install dms-greeter optional package")
+	rootCmd.Flags().BoolVar(&dmsGreeter, "greeter", false, "Install dms-greeter optional package (alias for --dms-greeter)")
+	rootCmd.Flags().StringSliceVar(&includeDeps, "include-deps", []string{}, "Optional deps to enable (e.g. dms-greeter, danksearch)")
 	rootCmd.Flags().StringSliceVar(&excludeDeps, "exclude-deps", []string{}, "Deps to skip during installation")
 	rootCmd.Flags().StringSliceVar(&replaceConfigs, "replace-configs", []string{}, "Deploy only named configs (e.g. niri,ghostty)")
 	rootCmd.Flags().BoolVar(&replaceConfigsAll, "replace-configs-all", false, "Deploy and replace all configurations")
@@ -73,6 +93,18 @@ func runDankinstall(cmd *cobra.Command, args []string) error {
 	if !headlessMode {
 		// Reject headless-only flags when running in TUI mode.
 		headlessOnly := []string{
+			"privesc",
+			"wm-git",
+			"quickshell-git",
+			"dms-git",
+			"git-all",
+			"git",
+			"git-deps",
+			"all-features",
+			"all",
+			"no-features",
+			"dms-greeter",
+			"greeter",
 			"include-deps",
 			"exclude-deps",
 			"replace-configs",
@@ -107,9 +139,22 @@ func runHeadless() error {
 		return fmt.Errorf("--term is required for headless mode (ghostty, kitty, or alacritty)")
 	}
 
+	if allFeatures && noFeatures {
+		return fmt.Errorf("cannot specify both --all-features/--all and --no-features")
+	}
+
 	cfg := headless.Config{
 		Compositor:        compositor,
 		Terminal:          term,
+		PrivescTool:       privescTool,
+		WMGit:             wmGit,
+		QuickshellGit:     quickshellGit,
+		DMSGit:            dmsGit,
+		GitAll:            gitAll,
+		GitDeps:           gitDeps,
+		AllFeatures:       allFeatures,
+		NoFeatures:        noFeatures,
+		DmsGreeter:        dmsGreeter,
 		IncludeDeps:       includeDeps,
 		ExcludeDeps:       excludeDeps,
 		ReplaceConfigs:    replaceConfigs,

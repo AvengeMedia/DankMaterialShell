@@ -34,8 +34,17 @@ var orderedConfigNames = []string{"niri", "hyprland", "ghostty", "kitty", "alacr
 
 // Config holds all CLI parameters for unattended installation.
 type Config struct {
-	Compositor        string // "niri" or "hyprland"
-	Terminal          string // "ghostty", "kitty", or "alacritty"
+	Compositor        string   // "niri", "hyprland", or "mango"
+	Terminal          string   // "ghostty", "kitty", or "alacritty"
+	PrivescTool       string   // "sudo", "doas", or "run0"
+	WMGit             bool     // install git version of selected window manager
+	QuickshellGit     bool     // install git version of quickshell
+	DMSGit            bool     // install git version of DMS
+	GitAll            bool     // install git version of all supported components
+	GitDeps           []string // specific dependencies to force git version
+	AllFeatures       bool     // enable all optional features
+	NoFeatures        bool     // disable all optional features
+	DmsGreeter        bool     // install dms-greeter
 	IncludeDeps       []string
 	ExcludeDeps       []string
 	ReplaceConfigs    []string // specific configs to deploy (e.g. "niri", "ghostty")
@@ -67,6 +76,18 @@ func (r *Runner) GetLogChan() <-chan string {
 // Run executes the full unattended installation flow.
 func (r *Runner) Run() error {
 	r.log("Starting headless installation")
+
+	if r.cfg.PrivescTool != "" {
+		tool := privesc.Tool(strings.ToLower(r.cfg.PrivescTool))
+		switch tool {
+		case privesc.ToolSudo, privesc.ToolDoas, privesc.ToolRun0:
+			if err := privesc.SetTool(tool); err != nil {
+				return fmt.Errorf("failed to set privilege escalation tool %q: %w", r.cfg.PrivescTool, err)
+			}
+		default:
+			return fmt.Errorf("invalid --privesc value %q: must be 'sudo', 'doas', or 'run0'", r.cfg.PrivescTool)
+		}
+	}
 
 	// 1. Parse compositor and terminal selections
 	wm, err := r.parseWindowManager()
@@ -111,6 +132,8 @@ func (r *Runner) Run() error {
 	if err != nil {
 		return fmt.Errorf("dependency detection failed: %w", err)
 	}
+
+	r.applyGitVariants(dependencies)
 
 	// 5. Apply include/exclude filters and build the disabled-items map.
 	// Headless mode does not currently collect any explicit reinstall selections,
@@ -283,11 +306,69 @@ func (r *Runner) Run() error {
 	return nil
 }
 
+// applyGitVariants sets VariantGit on dependencies matching git flags or --git-deps.
+func (r *Runner) applyGitVariants(dependencies []deps.Dependency) {
+	gitDepsMap := make(map[string]bool)
+	for _, raw := range r.cfg.GitDeps {
+		for _, item := range strings.Split(raw, ",") {
+			item = strings.TrimSpace(strings.ToLower(item))
+			if item != "" {
+				gitDepsMap[item] = true
+			}
+		}
+	}
+
+	wmName := strings.ToLower(r.cfg.Compositor)
+
+	for i := range dependencies {
+		depNameLower := strings.ToLower(dependencies[i].Name)
+		isWM := depNameLower == wmName
+		isQuickshell := depNameLower == "quickshell"
+		isDMS := strings.HasPrefix(depNameLower, "dms") && strings.Contains(depNameLower, "dankmaterialshell")
+
+		shouldUseGit := r.cfg.GitAll ||
+			(isWM && (r.cfg.WMGit || gitDepsMap[depNameLower])) ||
+			(isQuickshell && (r.cfg.QuickshellGit || gitDepsMap["quickshell"])) ||
+			(isDMS && (r.cfg.DMSGit || gitDepsMap["dms"] || gitDepsMap["dms (dankmaterialshell)"])) ||
+			gitDepsMap[depNameLower]
+
+		if shouldUseGit && dependencies[i].CanToggle {
+			dependencies[i].Variant = deps.VariantGit
+		}
+	}
+}
+
 // buildDisabledItems computes the set of dependencies that should be skipped
 // during installation. Optional components are opt-in (disabled by default),
 // then re-enabled by the dedicated flags and --include-deps.
 func (r *Runner) buildDisabledItems(dependencies []deps.Dependency) (map[string]bool, error) {
 	disabledItems := make(map[string]bool)
+
+	if r.cfg.AllFeatures {
+		for _, name := range r.cfg.ExcludeDeps {
+			name = strings.TrimSpace(name)
+			if name == "" {
+				continue
+			}
+			if !r.depExists(dependencies, name) {
+				return nil, fmt.Errorf("--exclude-deps: unknown dependency %q", name)
+			}
+			if name == "dms (DankMaterialShell)" {
+				return nil, fmt.Errorf("--exclude-deps: cannot exclude required package %q", name)
+			}
+			disabledItems[name] = true
+		}
+		return disabledItems, nil
+	}
+
+	if r.cfg.NoFeatures {
+		for i := range dependencies {
+			if !dependencies[i].Required {
+				disabledItems[dependencies[i].Name] = true
+			}
+		}
+		return disabledItems, nil
+	}
 
 	for i := range dependencies {
 		if !dependencies[i].Required {
@@ -307,6 +388,12 @@ func (r *Runner) buildDisabledItems(dependencies []deps.Dependency) (map[string]
 			return nil, fmt.Errorf("--dankcalendar: not available on this distribution")
 		}
 		delete(disabledItems, "dankcalendar")
+	}
+	if r.cfg.DmsGreeter {
+		if !r.depExists(dependencies, "dms-greeter") {
+			return nil, fmt.Errorf("--dms-greeter: not available on this distribution")
+		}
+		delete(disabledItems, "dms-greeter")
 	}
 
 	// Process --include-deps (enable items that are disabled by default)

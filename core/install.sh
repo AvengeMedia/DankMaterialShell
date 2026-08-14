@@ -35,11 +35,13 @@ aarch64)
     ;;
 esac
 
+REPO_SLUG="${DMS_REPO:-JDKamalakar/DankMaterialShell}"
+
 # Get the latest release version
-LATEST_VERSION=$(curl -s https://api.github.com/repos/AvengeMedia/DankMaterialShell/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+LATEST_VERSION=$(curl -s "https://api.github.com/repos/${REPO_SLUG}/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
 
 if [ -z "$LATEST_VERSION" ]; then
-    printf "%bError: Could not fetch latest version%b\n" "$RED" "$NC"
+    printf "%bError: Could not fetch latest version from %s%b\n" "$RED" "$REPO_SLUG" "$NC"
     exit 1
 fi
 
@@ -51,8 +53,8 @@ cd "$TEMP_DIR" || exit 1
 
 # Download the gzipped binary and its checksum
 printf "%bDownloading installer...%b\n" "$GREEN" "$NC"
-curl -L "https://github.com/AvengeMedia/DankMaterialShell/releases/download/$LATEST_VERSION/dankinstall-$ARCH.gz" -o "installer.gz"
-curl -L "https://github.com/AvengeMedia/DankMaterialShell/releases/download/$LATEST_VERSION/dankinstall-$ARCH.gz.sha256" -o "expected.sha256"
+curl -L "https://github.com/${REPO_SLUG}/releases/download/$LATEST_VERSION/dankinstall-$ARCH.gz" -o "installer.gz"
+curl -L "https://github.com/${REPO_SLUG}/releases/download/$LATEST_VERSION/dankinstall-$ARCH.gz.sha256" -o "expected.sha256"
 
 # Get the expected checksum
 EXPECTED_CHECKSUM=$(awk '{print $1}' expected.sha256)
@@ -79,7 +81,7 @@ chmod +x installer
 
 # Execute the installer
 printf "%bRunning installer...%b\n" "$GREEN" "$NC"
-./installer
+./installer "$@"
 
 # Cleanup
 cd - >/dev/null
