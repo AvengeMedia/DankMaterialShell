@@ -20,6 +20,8 @@ Singleton {
     readonly property string windowrulesPath: hyprDmsDir + "/windowrules.lua"
     readonly property bool luaConfigActive: CompositorService.isHyprland && (Hyprland.usingLua === true || luaConfigDetected)
 
+    property bool inOverview: false
+
     property int _lastGapValue: -1
     property bool luaConfigDetected: false
     property bool luaConfigStatusReady: false

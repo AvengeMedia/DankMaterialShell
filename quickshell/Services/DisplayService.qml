@@ -110,8 +110,6 @@ Singleton {
     property bool nightModePaused: false
     property var nightModeExcludedAppsMatchesCache: []
 
-    property var hyprlandOverviewLoader: null
-
     property bool automationAvailable: false
     property bool gammaControlAvailable: false
     property int resumeRecoveryAttempt: 0
@@ -1114,7 +1112,7 @@ Singleton {
         }
 
         const isInOverview =
-            (CompositorService.isHyprland && root.hyprlandOverviewLoader?.item?.overviewOpen) ||
+            (CompositorService.isHyprland && HyprlandService.inOverview) ||
             (CompositorService.isNiri && NiriService.inOverview) ||
             (CompositorService.isMango && MangoService.inOverview);
 
