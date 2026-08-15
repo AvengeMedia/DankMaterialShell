@@ -1426,7 +1426,6 @@ Singleton {
 
     Component.onCompleted: {
         nightModeEnabled = SessionData.nightModeEnabled;
-        nightModePaused = SessionData.nightModePaused;
         deviceBrightnessUserSet = Object.assign({}, SessionData.brightnessUserSetValues);
         if (DMSService.isConnected) {
             checkGammaControlAvailability();
@@ -1547,9 +1546,6 @@ Singleton {
             evaluateNightMode();
         }
     }
-        function onNightModePausedChanged() {
-            nightModePaused = SessionData.nightModePaused;
-        }
         }
     }
 

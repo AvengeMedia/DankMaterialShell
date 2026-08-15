@@ -162,7 +162,6 @@ Singleton {
     property real longitude: 0.0
     property bool nightModeUseIPLocation: false
     property string nightModeLocationProvider: ""
-    property bool nightModePaused: false
 
     property bool themeModeAutoEnabled: false
     property string themeModeAutoMode: "time"
@@ -786,12 +785,6 @@ Singleton {
         newSettings[identifier] = getMonitorCyclingSettings(screenName);
         newSettings[identifier].time = time;
         monitorCyclingSettings = newSettings;
-        saveSettings();
-    }
-
-
-    function setNightModePaused(paused: bool) {
-        nightModePaused = paused;
         saveSettings();
     }
 
