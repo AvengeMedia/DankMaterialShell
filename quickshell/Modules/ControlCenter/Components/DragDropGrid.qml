@@ -191,9 +191,7 @@ Column {
             }
         case "bluetooth":
             {
-                if (BluetoothService.available && BluetoothService.adapter) {
-                    BluetoothService.adapter.enabled = !BluetoothService.adapter.enabled;
-                }
+                BluetoothService.setBluetoothEnabled(!BluetoothService.enabled);
                 break;
             }
         case "audioOutput":
