@@ -58,6 +58,7 @@ var templateRegistry = []TemplateDef{
 	{ID: "mangowc", Commands: []string{"mango"}, ConfigFile: "mangowc.toml", RequiredEnv: "MANGO_INSTANCE_SIGNATURE"},
 	{ID: "qt5ct", Commands: []string{"qt5ct"}, ConfigFile: "qt5ct.toml"},
 	{ID: "qt6ct", Commands: []string{"qt6ct"}, ConfigFile: "qt6ct.toml"},
+	{ID: "fcitx5", Commands: []string{"fcitx5"}, ConfigDirs: []string{"fcitx5"}, ConfigFile: "fcitx5.toml"},
 	{ID: "firefox", Commands: []string{"firefox"}, ConfigFile: "firefox.toml"},
 	{ID: "pywalfox", Commands: []string{"pywalfox"}, ConfigFile: "pywalfox.toml"},
 	{ID: "zenbrowser", Commands: []string{"zen", "zen-browser", "zen-beta", "zen-twilight"}, Flatpaks: []string{"app.zen_browser.zen"}, ConfigFile: "zenbrowser.toml"},

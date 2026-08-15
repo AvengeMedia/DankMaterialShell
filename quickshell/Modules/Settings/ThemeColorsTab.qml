@@ -2642,6 +2642,18 @@ Item {
 
                 SettingsToggleRow {
                     tab: "theme"
+                    tags: ["matugen", "fcitx5", "input", "template"]
+                    settingKey: "matugenTemplateFcitx5"
+                    text: "Fcitx5"
+                    description: getTemplateDescription("fcitx5", "")
+                    descriptionColor: getTemplateDescriptionColor("fcitx5")
+                    visible: SettingsData.runDmsMatugenTemplates
+                    checked: SettingsData.matugenTemplateFcitx5
+                    onToggled: checked => SettingsData.set("matugenTemplateFcitx5", checked)
+                }
+
+                SettingsToggleRow {
+                    tab: "theme"
                     tags: ["matugen", "firefox", "template"]
                     settingKey: "matugenTemplateFirefox"
                     text: "Firefox"
