@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/qsipc"
 )
 
 type ipcTargets map[string]map[string][]string
@@ -136,6 +137,18 @@ func runShellIPCCommand(args []string) {
 
 	if args[0] != "call" {
 		args = append([]string{"call"}, args...)
+	}
+	if len(args) >= 3 {
+		if pid, ok := shellApp.SessionPID(); ok {
+			result, isVoid, err := qsipc.Call(qsipc.SocketPathForPID(pid), args[1], args[2], args[3:])
+			if err != nil {
+				log.Fatalf("Error running IPC command: %v", err)
+			}
+			if !isVoid {
+				fmt.Fprintln(os.Stdout, result)
+			}
+			return
+		}
 	}
 
 	baseArgs, err := buildQsIPCBaseArgs()
