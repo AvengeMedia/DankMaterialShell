@@ -1101,12 +1101,7 @@ Singleton {
             return;
         }
 
-        const isInOverview =
-            (CompositorService.isHyprland && HyprlandService.inOverview) ||
-            (CompositorService.isNiri && NiriService.inOverview) ||
-            (CompositorService.isMango && MangoService.inOverview);
-
-        if (nightModePaused && isInOverview) {
+        if (nightModePaused && CompositorService.inOverview) {
             resumeNightMode();
             return;
         }
@@ -1549,7 +1544,6 @@ Singleton {
 
     Connections {
         target: ToplevelManager
-
         function onActiveToplevelChanged() {
             root.handleNightModeExceptions();
         }
@@ -1557,8 +1551,14 @@ Singleton {
 
     Connections {
         target: ToplevelManager.activeToplevel
-
         function onFullscreenChanged() {
+            root.handleNightModeExceptions();
+        }
+    }
+
+    Connections {
+        target: CompositorService
+        function onInOverviewChanged() {
             root.handleNightModeExceptions();
         }
     }
