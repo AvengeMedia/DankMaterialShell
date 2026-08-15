@@ -34,6 +34,10 @@ Singleton {
     property bool useNiriSorting: isNiri && NiriService
     property bool useMangoSorting: isMango && MangoService
 
+    readonly property bool inOverview: (isHyprland && HyprlandService.inOverview) ||
+                                       (isNiri && NiriService.inOverview) ||
+                                       (isMango && MangoService.inOverview)
+
     property var randrScales: ({})
     property bool randrReady: false
     signal randrDataReady
