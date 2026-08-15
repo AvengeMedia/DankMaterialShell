@@ -827,6 +827,7 @@ Singleton {
     property bool matugenTemplateMangowc: true
     property bool matugenTemplateQt5ct: true
     property bool matugenTemplateQt6ct: true
+    property bool matugenTemplateFcitx5: true
     property bool matugenTemplateFirefox: true
     property bool matugenTemplatePywalfox: true
     property bool matugenTemplateZenBrowser: true

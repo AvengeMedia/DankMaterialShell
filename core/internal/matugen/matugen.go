@@ -18,6 +18,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/dank16"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
+	"github.com/godbus/dbus/v5"
 	"github.com/lucasb-eyer/go-colorful"
 )
 
@@ -58,6 +59,7 @@ var templateRegistry = []TemplateDef{
 	{ID: "mangowc", Commands: []string{"mango"}, ConfigFile: "mangowc.toml", RequiredEnv: "MANGO_INSTANCE_SIGNATURE"},
 	{ID: "qt5ct", Commands: []string{"qt5ct"}, ConfigFile: "qt5ct.toml"},
 	{ID: "qt6ct", Commands: []string{"qt6ct"}, ConfigFile: "qt6ct.toml"},
+	{ID: "fcitx5", Commands: []string{"fcitx5"}, ConfigDirs: []string{"fcitx5"}, ConfigFile: "fcitx5.toml"},
 	{ID: "firefox", Commands: []string{"firefox"}, ConfigFile: "firefox.toml"},
 	{ID: "pywalfox", Commands: []string{"pywalfox"}, ConfigFile: "pywalfox.toml"},
 	{ID: "zenbrowser", Commands: []string{"zen", "zen-browser", "zen-beta", "zen-twilight"}, Flatpaks: []string{"app.zen_browser.zen"}, ConfigFile: "zenbrowser.toml"},
@@ -399,6 +401,9 @@ func buildOnce(opts *Options) (bool, error) {
 	}
 
 	signalTerminals(opts)
+	if !opts.ShouldSkipTemplate("fcitx5") && appExists(opts.AppChecker, []string{"fcitx5"}, nil) {
+		refreshFcitx5()
+	}
 
 	return true, nil
 }
@@ -1062,6 +1067,20 @@ func refreshQt6ct() {
 	now := time.Now()
 	if err := os.Chtimes(confPath, now, now); err != nil {
 		log.Warnf("Failed to touch qt6ct.conf: %v", err)
+	}
+}
+
+func refreshFcitx5() {
+	conn, err := dbus.ConnectSessionBus()
+	if err != nil {
+		log.Debugf("Failed to connect to session bus for Fcitx5 refresh: %v", err)
+		return
+	}
+	defer conn.Close()
+
+	obj := conn.Object("org.fcitx.Fcitx5", dbus.ObjectPath("/controller"))
+	if err := obj.Call("org.fcitx.Fcitx.Controller1.ReloadAddonConfig", 0, "classicui").Err; err != nil {
+		log.Debugf("Failed to refresh Fcitx5 theme: %v", err)
 	}
 }
 
