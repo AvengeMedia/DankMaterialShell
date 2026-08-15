@@ -393,7 +393,7 @@ FocusScope {
                 font.pixelSize: 18
                 font.weight: Font.Medium
                 color: Theme.outlineButton
-                visible: searchInput.text.length === 0
+                visible: searchInput.text.length === 0 && !searchInput.inputMethodComposing
                 clip: true
             }
 
