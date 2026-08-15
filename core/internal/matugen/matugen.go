@@ -18,6 +18,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/dank16"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
+	"github.com/godbus/dbus/v5"
 	"github.com/lucasb-eyer/go-colorful"
 )
 
@@ -400,6 +401,9 @@ func buildOnce(opts *Options) (bool, error) {
 	}
 
 	signalTerminals(opts)
+	if !opts.ShouldSkipTemplate("fcitx5") && appExists(opts.AppChecker, []string{"fcitx5"}, nil) {
+		refreshFcitx5()
+	}
 
 	return true, nil
 }
@@ -1063,6 +1067,20 @@ func refreshQt6ct() {
 	now := time.Now()
 	if err := os.Chtimes(confPath, now, now); err != nil {
 		log.Warnf("Failed to touch qt6ct.conf: %v", err)
+	}
+}
+
+func refreshFcitx5() {
+	conn, err := dbus.ConnectSessionBus()
+	if err != nil {
+		log.Debugf("Failed to connect to session bus for Fcitx5 refresh: %v", err)
+		return
+	}
+	defer conn.Close()
+
+	obj := conn.Object("org.fcitx.Fcitx5", dbus.ObjectPath("/controller"))
+	if err := obj.Call("org.fcitx.Fcitx.Controller1.ReloadAddonConfig", 0, "classicui").Err; err != nil {
+		log.Debugf("Failed to refresh Fcitx5 theme: %v", err)
 	}
 }
 
