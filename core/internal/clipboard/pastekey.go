@@ -30,7 +30,7 @@ const (
 // using the seat's own keymap, so keycodes stay valid for XWayland clients
 // (a synthetic wtype-style keymap breaks X11 apps like Steam). withShift
 // selects ctrl+shift+v for terminal targets.
-func SendPasteKeystroke(withShift bool) error {
+func SendPasteKeystroke(withShift bool) (err error) {
 	s, err := connectSession()
 	if err != nil {
 		return err
@@ -88,35 +88,42 @@ func SendPasteKeystroke(withShift bool) error {
 	}
 
 	t := uint32(0)
-	press := func(key, state uint32) error {
+	var pressed []uint32
+	press := func(key uint32) error {
 		t++
-		return vk.Key(t, key, state)
+		if err := vk.Key(t, key, keyStatePressed); err != nil {
+			return err
+		}
+		pressed = append(pressed, key)
+		return nil
 	}
 
+	// all releases happen here so error paths can't leave keys held or
+	// modifiers latched for the compositor to interpret on destroy
+	defer func() {
+		for i := len(pressed) - 1; i >= 0; i-- {
+			t++
+			if e := vk.Key(t, pressed[i], keyStateReleased); e != nil && err == nil {
+				err = fmt.Errorf("key release: %w", e)
+			}
+		}
+		if e := vk.Modifiers(0, 0, 0, 0); e != nil && err == nil {
+			err = fmt.Errorf("clear modifiers: %w", e)
+		}
+		s.display.Roundtrip()
+	}()
+
 	for _, key := range held {
-		if err := press(key, keyStatePressed); err != nil {
+		if err := press(key); err != nil {
 			return fmt.Errorf("key press: %w", err)
 		}
 	}
 	if err := vk.Modifiers(mods, 0, 0, 0); err != nil {
 		return fmt.Errorf("set modifiers: %w", err)
 	}
-	if err := press(keys.v, keyStatePressed); err != nil {
+	if err := press(keys.v); err != nil {
 		return fmt.Errorf("key press: %w", err)
 	}
-	if err := press(keys.v, keyStateReleased); err != nil {
-		return fmt.Errorf("key release: %w", err)
-	}
-	for i := len(held) - 1; i >= 0; i-- {
-		if err := press(held[i], keyStateReleased); err != nil {
-			return fmt.Errorf("key release: %w", err)
-		}
-	}
-	if err := vk.Modifiers(0, 0, 0, 0); err != nil {
-		return fmt.Errorf("clear modifiers: %w", err)
-	}
-
-	s.display.Roundtrip()
 	return nil
 }
 
