@@ -597,7 +597,7 @@ Item {
                                     Rectangle {
                                         width: nameText.contentWidth + Theme.spacingS * 2
                                         height: nameText.contentHeight + Theme.spacingXS * 2
-                                        color: Theme.surfaceContainer
+                                        color: Theme.floatingWindowSurface
                                         radius: Theme.cornerRadius
                                         anchors.bottom: parent.top
                                         anchors.bottomMargin: Theme.spacingXS
@@ -1208,7 +1208,7 @@ Item {
                                         Rectangle {
                                             width: accentNameText.contentWidth + Theme.spacingS * 2
                                             height: accentNameText.contentHeight + Theme.spacingXS * 2
-                                            color: Theme.surfaceContainer
+                                            color: Theme.floatingWindowSurface
                                             radius: Theme.cornerRadius
                                             anchors.bottom: parent.top
                                             anchors.bottomMargin: Theme.spacingXS
@@ -1525,7 +1525,9 @@ Item {
                             width: parent.width
                             height: statusRow.implicitHeight + Theme.spacingM * 2
                             radius: Theme.cornerRadius
-                            color: Theme.surfaceContainerHigh
+                            color: Theme.floatingWindowNestedSurface
+                            border.color: Theme.outlineMedium
+                            border.width: Theme.layerOutlineWidth
 
                             Row {
                                 id: statusRow

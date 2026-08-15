@@ -275,7 +275,7 @@ Item {
                                 width: parent.width
                                 height: 40
                                 radius: Theme.cornerRadius
-                                color: groupMouseArea.containsMouse ? Theme.surfaceHover : Theme.surfaceContainer
+                                color: groupMouseArea.containsMouse ? Theme.surfaceHover : Theme.floatingWindowFieldColor
 
                                 Row {
                                     anchors.fill: parent

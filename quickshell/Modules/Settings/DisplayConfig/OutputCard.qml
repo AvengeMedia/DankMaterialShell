@@ -27,9 +27,9 @@ StyledRect {
     width: parent.width
     height: settingsColumn.implicitHeight + Theme.spacingM * 2
     radius: Theme.cornerRadius
-    color: Theme.withAlpha(Theme.surfaceContainerHigh, isConnected ? 0.5 : 0.3)
-    border.color: Theme.withAlpha(Theme.outline, 0.3)
-    border.width: 1
+    color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.floatingWindowForegroundLayers ? Theme.floatingWindowForegroundTransparency * (isConnected ? 0.5 : 0.3) : 0)
+    border.color: Theme.outlineMedium
+    border.width: Theme.layerOutlineWidth
     opacity: isConnected ? (isDisabled ? 0.5 : 1.0) : 0.7
 
     Column {

@@ -29,14 +29,14 @@ Rectangle {
 
     color: {
         if (!isConnected)
-            return Theme.surfaceContainerHighest;
+            return Theme.floatingWindowFieldColor;
         if (!isValidPosition)
             return Theme.withAlpha(Theme.error, 0.3);
         if (isDragging)
             return Theme.withAlpha(Theme.primary, 0.4);
         if (dragArea.containsMouse)
             return Theme.withAlpha(Theme.primary, 0.2);
-        return Theme.surfaceContainerHigh;
+        return Theme.floatingWindowNestedSurface;
     }
 
     border.color: {

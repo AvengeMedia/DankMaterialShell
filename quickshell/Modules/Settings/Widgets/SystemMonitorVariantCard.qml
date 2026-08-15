@@ -284,7 +284,7 @@ Rectangle {
                         x: Theme.spacingM
                         height: 40
                         radius: Theme.cornerRadius
-                        color: root.cfg.gpuPciId === modelData.pciId ? Theme.primarySelected : Theme.surfaceContainer
+                        color: root.cfg.gpuPciId === modelData.pciId ? Theme.primarySelected : Theme.floatingWindowFieldColor
                         border.color: root.cfg.gpuPciId === modelData.pciId ? Theme.primary : Theme.withAlpha(Theme.primary, 0)
                         border.width: 2
 

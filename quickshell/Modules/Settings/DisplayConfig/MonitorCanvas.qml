@@ -62,9 +62,9 @@ Rectangle {
     width: parent.width
     height: 280
     radius: Theme.cornerRadius
-    color: Theme.surfaceContainerHighest
-    border.color: Theme.outline
-    border.width: 1
+    color: Theme.floatingWindowNestedSurface
+    border.color: Theme.outlineMedium
+    border.width: Theme.layerOutlineWidth
 
     Item {
         id: canvas

@@ -327,9 +327,9 @@ Item {
                                                             width: ethFieldContent.width + Theme.spacingM * 2
                                                             height: 32
                                                             radius: Theme.cornerRadius - 2
-                                                            color: Theme.surfaceContainerHigh
+                                                            color: Theme.floatingWindowFieldColor
                                                             border.width: 1
-                                                            border.color: Theme.outlineLight
+                                                            border.color: Theme.floatingWindowFieldBorderColor
 
                                                             Row {
                                                                 id: ethFieldContent

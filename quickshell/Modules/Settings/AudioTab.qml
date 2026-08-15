@@ -547,8 +547,8 @@ Item {
             width: Math.min(500, parent.width - Theme.spacingL * 4)
             height: dialogContent.implicitHeight + Theme.spacingL * 2
             radius: Theme.cornerRadius
-            color: Theme.surfaceContainerHigh
-            border.width: 1
+            color: Theme.floatingWindowNestedSurface
+            border.width: Theme.layerOutlineWidth
             border.color: Theme.outlineMedium
 
             MouseArea {

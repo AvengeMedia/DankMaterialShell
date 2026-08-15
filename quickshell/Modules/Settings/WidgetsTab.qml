@@ -1167,8 +1167,9 @@ Item {
                 width: parent.width
                 height: barSelectorContent.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
-                border.width: 0
+                color: Theme.floatingWindowNestedSurface
+                border.color: Theme.outlineMedium
+                border.width: Theme.layerOutlineWidth
                 visible: hasMultipleBars
 
                 Column {
@@ -1220,8 +1221,9 @@ Item {
                 width: parent.width
                 height: widgetManagementHeader.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
-                border.width: 0
+                color: Theme.floatingWindowNestedSurface
+                border.color: Theme.outlineMedium
+                border.width: Theme.layerOutlineWidth
 
                 Column {
                     id: widgetManagementHeader
@@ -1321,8 +1323,9 @@ Item {
                     width: parent.width
                     height: leftSection.implicitHeight + Theme.spacingL * 2
                     radius: Theme.cornerRadius
-                    color: Theme.surfaceContainerHigh
-                    border.width: 0
+                    color: Theme.floatingWindowNestedSurface
+                    border.color: Theme.outlineMedium
+                    border.width: Theme.layerOutlineWidth
 
                     WidgetsTabSection {
                         id: leftSection
@@ -1408,8 +1411,9 @@ Item {
                     width: parent.width
                     height: centerSection.implicitHeight + Theme.spacingL * 2
                     radius: Theme.cornerRadius
-                    color: Theme.surfaceContainerHigh
-                    border.width: 0
+                    color: Theme.floatingWindowNestedSurface
+                    border.color: Theme.outlineMedium
+                    border.width: Theme.layerOutlineWidth
 
                     WidgetsTabSection {
                         id: centerSection
@@ -1495,8 +1499,9 @@ Item {
                     width: parent.width
                     height: rightSection.implicitHeight + Theme.spacingL * 2
                     radius: Theme.cornerRadius
-                    color: Theme.surfaceContainerHigh
-                    border.width: 0
+                    color: Theme.floatingWindowNestedSurface
+                    border.color: Theme.outlineMedium
+                    border.width: Theme.layerOutlineWidth
 
                     WidgetsTabSection {
                         id: rightSection

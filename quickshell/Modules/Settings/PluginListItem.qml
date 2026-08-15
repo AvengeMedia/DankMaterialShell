@@ -52,8 +52,9 @@ StyledRect {
     width: parent.width
     height: pluginItemColumn.implicitHeight + Theme.spacingM * 2 + settingsContainer.height
     radius: Theme.cornerRadius
-    color: (pluginMouseArea.containsMouse || updateArea.containsMouse || uninstallArea.containsMouse || reloadArea.containsMouse) ? Theme.surfacePressed : (isExpanded ? Theme.surfaceContainerHighest : Theme.surfaceContainerHigh)
-    border.width: 0
+    color: (pluginMouseArea.containsMouse || updateArea.containsMouse || uninstallArea.containsMouse || reloadArea.containsMouse) ? Theme.surfacePressed : Theme.floatingWindowNestedSurface
+    border.color: Theme.outlineMedium
+    border.width: Theme.layerOutlineWidth
 
     MouseArea {
         id: pluginMouseArea
@@ -387,10 +388,11 @@ StyledRect {
 
         Rectangle {
             anchors.fill: parent
-            color: Theme.surfaceContainerHighest
+            color: Theme.floatingWindowFieldColor
             radius: Theme.cornerRadius
             anchors.topMargin: Theme.spacingXS
-            border.width: 0
+            border.color: Theme.outlineMedium
+            border.width: Theme.layerOutlineWidth
         }
 
         Loader {

@@ -776,9 +776,9 @@ Item {
                                                                 width: wifiFieldContent.width + Theme.spacingM * 2
                                                                 height: 32
                                                                 radius: Theme.cornerRadius - 2
-                                                                color: Theme.surfaceContainerHigh
+                                                                color: Theme.floatingWindowFieldColor
                                                                 border.width: 1
-                                                                border.color: Theme.outlineLight
+                                                                border.color: Theme.floatingWindowFieldBorderColor
 
                                                                 Row {
                                                                     id: wifiFieldContent
@@ -1137,9 +1137,9 @@ Item {
                                                         width: savedWifiFieldContent.width + Theme.spacingM * 2
                                                         height: 32
                                                         radius: Theme.cornerRadius - 2
-                                                        color: Theme.surfaceContainerHigh
+                                                        color: Theme.floatingWindowFieldColor
                                                         border.width: 1
-                                                        border.color: Theme.outlineLight
+                                                        border.color: Theme.floatingWindowFieldBorderColor
 
                                                         Row {
                                                             id: savedWifiFieldContent
@@ -1175,7 +1175,7 @@ Item {
                                 closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
 
                                 background: Rectangle {
-                                    color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+                                    color: Theme.floatingWindowSurface
                                     radius: Theme.cornerRadius
                                     border.width: 0
                                 }

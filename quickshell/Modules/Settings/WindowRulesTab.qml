@@ -374,7 +374,9 @@ Item {
                 height: headerSection.implicitHeight + Theme.spacingL * 2
                 anchors.horizontalCenter: parent.horizontalCenter
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.floatingWindowNestedSurface
+                border.color: Theme.outlineMedium
+                border.width: Theme.layerOutlineWidth
 
                 Column {
                     id: headerSection
@@ -536,7 +538,9 @@ Item {
                 height: rulesSection.implicitHeight + Theme.spacingL * 2
                 anchors.horizontalCenter: parent.horizontalCenter
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.floatingWindowNestedSurface
+                border.color: Theme.outlineMedium
+                border.width: Theme.layerOutlineWidth
 
                 Column {
                     id: rulesSection
@@ -637,7 +641,9 @@ Item {
                                     width: parent.width
                                     height: ruleContent.implicitHeight + Theme.spacingM * 2
                                     radius: Theme.cornerRadius
-                                    color: ruleDelegateItem.liveRuleData.enabled !== false ? Theme.surfaceContainer : Theme.withAlpha(Theme.surfaceContainer, 0.4)
+                                    color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.floatingWindowForegroundLayers ? Theme.floatingWindowForegroundTransparency * (ruleDelegateItem.liveRuleData.enabled !== false ? 1.0 : 0.4) : 0)
+                                    border.color: Theme.outlineMedium
+                                    border.width: Theme.layerOutlineWidth
 
                                     RowLayout {
                                         id: ruleContent
@@ -811,7 +817,9 @@ Item {
                 height: externalSection.implicitHeight + Theme.spacingL * 2
                 anchors.horizontalCenter: parent.horizontalCenter
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.floatingWindowNestedSurface
+                border.color: Theme.outlineMedium
+                border.width: Theme.layerOutlineWidth
                 visible: root.externalRules && root.externalRules.length > 0
 
                 Column {
@@ -879,7 +887,9 @@ Item {
                                 width: parent.width
                                 height: externalContent.implicitHeight + Theme.spacingM * 2
                                 radius: Theme.cornerRadius
-                                color: Theme.withAlpha(Theme.surfaceContainer, 0.4)
+                                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.floatingWindowForegroundLayers ? Theme.floatingWindowForegroundTransparency * 0.4 : 0)
+                                border.color: Theme.outlineMedium
+                                border.width: Theme.layerOutlineWidth
 
                                 MouseArea {
                                     anchors.fill: parent

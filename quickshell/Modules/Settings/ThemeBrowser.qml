@@ -673,7 +673,7 @@ DankFloatingWindow {
                                             height: 22
                                             width: variantChipText.implicitWidth + Theme.spacingS * 2
                                             radius: 11
-                                            color: isActive ? Theme.primary : Theme.surfaceContainerHigh
+                                            color: isActive ? Theme.primary : Theme.floatingWindowFieldColor
                                             border.color: isActive ? Theme.primary : Theme.outline
                                             border.width: 1
 

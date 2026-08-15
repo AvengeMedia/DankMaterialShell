@@ -202,7 +202,7 @@ DankFloatingWindow {
 
                 Rectangle {
                     anchors.fill: parent
-                    color: Theme.withAlpha(Theme.surfaceContainerHigh, root.blurActive ? 0.20 : 0.50)
+                    color: Theme.floatingWindowSurface
                 }
 
                 Row {

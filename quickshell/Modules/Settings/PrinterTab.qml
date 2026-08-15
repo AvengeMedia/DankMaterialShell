@@ -144,7 +144,9 @@ Item {
                 width: parent.width
                 height: overviewSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.floatingWindowNestedSurface
+                border.color: Theme.outlineMedium
+                border.width: Theme.layerOutlineWidth
 
                 Column {
                     id: overviewSection
@@ -247,7 +249,9 @@ Item {
                 width: parent.width
                 height: addPrinterSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.floatingWindowNestedSurface
+                border.color: Theme.outlineMedium
+                border.width: Theme.layerOutlineWidth
                 visible: CupsService.cupsAvailable
 
                 Column {
@@ -852,7 +856,9 @@ Item {
                 width: parent.width
                 height: printersSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.floatingWindowNestedSurface
+                border.color: Theme.outlineMedium
+                border.width: Theme.layerOutlineWidth
                 visible: CupsService.cupsAvailable
 
                 Column {
@@ -1192,9 +1198,9 @@ Item {
                                                             width: fieldContent.width + Theme.spacingM * 2
                                                             height: 32
                                                             radius: Theme.cornerRadius - 2
-                                                            color: Theme.surfaceContainerHigh
+                                                            color: Theme.floatingWindowFieldColor
                                                             border.width: 1
-                                                            border.color: Theme.outlineLight
+                                                            border.color: Theme.floatingWindowFieldBorderColor
 
                                                             Row {
                                                                 id: fieldContent
@@ -1415,9 +1421,9 @@ Item {
                                                             width: parent.width
                                                             height: 44
                                                             radius: Theme.cornerRadius - 2
-                                                            color: Theme.surfaceContainerHighest
+                                                            color: Theme.floatingWindowFieldColor
                                                             border.width: 1
-                                                            border.color: Theme.outlineLight
+                                                            border.color: Theme.floatingWindowFieldBorderColor
 
                                                             Row {
                                                                 anchors.left: parent.left
@@ -1553,7 +1559,9 @@ Item {
                 width: parent.width
                 height: classesSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.floatingWindowNestedSurface
+                border.color: Theme.outlineMedium
+                border.width: Theme.layerOutlineWidth
                 visible: CupsService.cupsAvailable && CupsService.printerClasses.length > 0
 
                 Column {

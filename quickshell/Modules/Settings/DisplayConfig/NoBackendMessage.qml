@@ -11,9 +11,9 @@ StyledRect {
     width: parent.width
     height: messageContent.implicitHeight + Theme.spacingL * 2
     radius: Theme.cornerRadius
-    color: Theme.surfaceContainerHigh
-    border.color: Theme.outlineHeavy
-    border.width: 0
+    color: Theme.floatingWindowNestedSurface
+    border.color: Theme.outlineMedium
+    border.width: Theme.layerOutlineWidth
 
     Column {
         id: messageContent
