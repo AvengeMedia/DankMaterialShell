@@ -32,8 +32,17 @@ type RenderSlot struct {
 	backgroundInitialized bool
 	backgroundSource      *ShmBuffer
 	backgroundDragging    bool
+	backgroundCursor      bool
 	backgroundPhase       selectorPhase
-	renderedBounds        *selectionRenderBounds
+	dirty                 *dirtyRect
+}
+
+func (s *RenderSlot) cacheValid(src *ShmBuffer, dragging, cursor bool, phase selectorPhase) bool {
+	return s.backgroundInitialized &&
+		s.backgroundSource == src &&
+		s.backgroundDragging == dragging &&
+		s.backgroundCursor == cursor &&
+		s.backgroundPhase == phase
 }
 
 type OutputSurface struct {
@@ -793,23 +802,22 @@ func (r *RegionSelector) redrawSurface(os *OutputSurface) {
 		r.drawScrollOverlay(os, slot.shm)
 		slot.backgroundInitialized = false
 		slot.backgroundSource = nil
-		slot.renderedBounds = nil
+		slot.dirty = nil
 	default:
-		if !slot.backgroundInitialized ||
-			slot.backgroundSource != srcBuf ||
-			slot.backgroundDragging != r.selection.dragging ||
-			slot.backgroundPhase != r.phase {
+		if !slot.cacheValid(srcBuf, r.selection.dragging, r.showCapturedCursor, r.phase) {
 			slot.shm.CopyFrom(srcBuf)
 			r.dimBackground(slot.shm)
+			r.drawHUD(slot.shm.Data(), slot.shm.Stride, slot.shm.Width, slot.shm.Height, os.screenFormat)
 			slot.backgroundInitialized = true
 			slot.backgroundSource = srcBuf
 			slot.backgroundDragging = r.selection.dragging
+			slot.backgroundCursor = r.showCapturedCursor
 			slot.backgroundPhase = r.phase
-			slot.renderedBounds = nil
-		} else if slot.renderedBounds != nil {
-			r.restoreSourceRect(os, slot.shm, *slot.renderedBounds)
+			slot.dirty = nil
+		} else if slot.dirty != nil {
+			r.restoreSourceRect(os, slot.shm, *slot.dirty)
 		}
-		slot.renderedBounds = r.drawOverlay(os, slot.shm)
+		slot.dirty = r.drawOverlay(os, slot.shm)
 	}
 
 	if os.viewport != nil {

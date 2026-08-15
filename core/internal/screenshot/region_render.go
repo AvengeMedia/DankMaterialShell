@@ -58,6 +58,22 @@ type selectionRenderBounds struct {
 	h int
 }
 
+type dirtyRect struct {
+	x1 int
+	y1 int
+	x2 int
+	y2 int
+}
+
+func (d dirtyRect) union(o dirtyRect) dirtyRect {
+	return dirtyRect{
+		x1: min(d.x1, o.x1),
+		y1: min(d.y1, o.y1),
+		x2: max(d.x2, o.x2),
+		y2: max(d.y2, o.y2),
+	}
+}
+
 func (r *RegionSelector) dimBackground(renderBuf *ShmBuffer) {
 	data := renderBuf.Data()
 	r.dimRegion(data, renderBuf.Stride, renderBuf.Width, renderBuf.Height, 0, 0, renderBuf.Width, renderBuf.Height)
@@ -84,7 +100,7 @@ func (r *RegionSelector) dimRegion(data []byte, stride, bufW, bufH, x1, y1, x2, 
 }
 
 func (r *RegionSelector) selectionRenderBounds(os *OutputSurface) (selectionRenderBounds, bool) {
-	if !r.selection.hasSelection || r.selection.surface != os || os.logicalW <= 0 || os.logicalH <= 0 {
+	if !r.selection.hasSelection || r.selection.surface != os {
 		return selectionRenderBounds{}, false
 	}
 
@@ -93,8 +109,11 @@ func (r *RegionSelector) selectionRenderBounds(os *OutputSurface) (selectionRend
 		return selectionRenderBounds{}, false
 	}
 
-	scaleX := float64(srcBuf.Width) / float64(os.logicalW)
-	scaleY := float64(srcBuf.Height) / float64(os.logicalH)
+	scaleX, scaleY := 1.0, 1.0
+	if os.logicalW > 0 && os.logicalH > 0 {
+		scaleX = float64(srcBuf.Width) / float64(os.logicalW)
+		scaleY = float64(srcBuf.Height) / float64(os.logicalH)
+	}
 	x1 := int(r.selection.anchorX * scaleX)
 	y1 := int(r.selection.anchorY * scaleY)
 	x2 := int(r.selection.currentX * scaleX)
@@ -121,17 +140,18 @@ func (r *RegionSelector) selectionRenderBounds(os *OutputSurface) (selectionRend
 	return selectionRenderBounds{x: x1, y: y1, w: w, h: h}, true
 }
 
-func (r *RegionSelector) restoreSourceRect(os *OutputSurface, renderBuf *ShmBuffer, bounds selectionRenderBounds) {
+func (r *RegionSelector) restoreSourceRect(os *OutputSurface, renderBuf *ShmBuffer, d dirtyRect) {
 	srcBuf := r.getSourceBuffer(os)
 	if srcBuf == nil {
 		return
 	}
 
-	const padding = 64
-	x1 := clamp(bounds.x-padding, 0, renderBuf.Width)
-	y1 := clamp(bounds.y-padding, 0, renderBuf.Height)
-	x2 := clamp(bounds.x+bounds.w+padding, 0, renderBuf.Width)
-	y2 := clamp(bounds.y+bounds.h+padding, 0, renderBuf.Height)
+	maxW := min(srcBuf.Width, renderBuf.Width)
+	maxH := min(srcBuf.Height, renderBuf.Height)
+	x1 := clamp(d.x1, 0, maxW)
+	y1 := clamp(d.y1, 0, maxH)
+	x2 := clamp(d.x2, 0, maxW)
+	y2 := clamp(d.y2, 0, maxH)
 	if x2 <= x1 || y2 <= y1 {
 		return
 	}
@@ -148,18 +168,16 @@ func (r *RegionSelector) restoreSourceRect(os *OutputSurface, renderBuf *ShmBuff
 	r.dimRegion(renderBuf.Data(), renderBuf.Stride, renderBuf.Width, renderBuf.Height, x1, y1, x2, y2)
 }
 
-func (r *RegionSelector) drawOverlay(os *OutputSurface, renderBuf *ShmBuffer) *selectionRenderBounds {
-	data := renderBuf.Data()
-	stride := renderBuf.Stride
-	w, h := renderBuf.Width, renderBuf.Height
-	format := os.screenFormat
-
-	r.drawHUD(data, stride, w, h, format)
-
+func (r *RegionSelector) drawOverlay(os *OutputSurface, renderBuf *ShmBuffer) *dirtyRect {
 	bounds, ok := r.selectionRenderBounds(os)
 	if !ok {
 		return nil
 	}
+
+	data := renderBuf.Data()
+	stride := renderBuf.Stride
+	w, h := renderBuf.Width, renderBuf.Height
+	format := os.screenFormat
 
 	srcBuf := r.getSourceBuffer(os)
 	srcData := srcBuf.Data()
@@ -179,8 +197,15 @@ func (r *RegionSelector) drawOverlay(os *OutputSurface, renderBuf *ShmBuffer) *s
 	}
 
 	r.drawBorder(data, stride, w, h, bounds.x, bounds.y, bounds.w, bounds.h, format)
-	r.drawDimensions(data, stride, w, h, bounds.x, bounds.y, bounds.w, bounds.h, format)
-	return &bounds
+	labelRect := r.drawDimensions(data, stride, w, h, bounds.x, bounds.y, bounds.w, bounds.h, format)
+
+	dirty := dirtyRect{
+		x1: bounds.x - borderThickness,
+		y1: bounds.y - borderThickness,
+		x2: bounds.x + bounds.w + borderThickness,
+		y2: bounds.y + bounds.h + borderThickness,
+	}.union(labelRect)
+	return &dirty
 }
 
 func (r *RegionSelector) drawScrollOverlay(os *OutputSurface, renderBuf *ShmBuffer) {
@@ -313,9 +338,10 @@ func (r *RegionSelector) drawHUD(data []byte, stride, bufW, bufH int, format uin
 	}
 }
 
+const borderThickness = 2
+
 func (r *RegionSelector) drawBorder(data []byte, stride, bufW, bufH, x, y, w, h int, format uint32) {
-	const thickness = 2
-	for i := 0; i < thickness; i++ {
+	for i := 0; i < borderThickness; i++ {
 		r.drawHLine(data, stride, bufW, bufH, x-i, y-i, w+2*i, format)
 		r.drawHLine(data, stride, bufW, bufH, x-i, y+h+i-1, w+2*i, format)
 		r.drawVLine(data, stride, bufW, bufH, x-i, y-i, h+2*i, format)
@@ -358,7 +384,7 @@ func (r *RegionSelector) drawVLine(data []byte, stride, bufW, bufH, x, y, length
 	}
 }
 
-func (r *RegionSelector) drawDimensions(data []byte, stride, bufW, bufH, x, y, w, h int, format uint32) {
+func (r *RegionSelector) drawDimensions(data []byte, stride, bufW, bufH, x, y, w, h int, format uint32) dirtyRect {
 	text := fmt.Sprintf("%dx%d", w, h)
 
 	const charW, charH = 8, 12
@@ -375,6 +401,7 @@ func (r *RegionSelector) drawDimensions(data []byte, stride, bufW, bufH, x, y, w
 
 	r.fillRect(data, stride, bufW, bufH, tx-4, ty-2, textW+8, textH+4, 0, 0, 0, 200, format)
 	r.drawText(data, stride, bufW, bufH, tx, ty, text, 255, 255, 255, format)
+	return dirtyRect{x1: tx - 4, y1: ty - 2, x2: tx + textW + 4, y2: ty + textH + 2}
 }
 
 func (r *RegionSelector) fillRect(data []byte, stride, bufW, bufH, x, y, w, h int, cr, cg, cb, ca uint8, format uint32) {
