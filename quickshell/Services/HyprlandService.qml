@@ -168,7 +168,7 @@ Singleton {
         return Number(value);
     }
 
-    function generateOutputsConfig(outputsData, hyprlandSettings, callback) {
+    function generateOutputsConfig(outputsData, hyprlandSettings, callback, skipReload) {
         if (!canWriteLuaConfig("outputs")) {
             if (callback)
                 callback(false);
@@ -254,7 +254,7 @@ Singleton {
                 return;
             }
             log.info("Generated outputs config at", outputsPath);
-            if (CompositorService.isHyprland)
+            if (CompositorService.isHyprland && !skipReload)
                 reloadConfig();
             if (callback)
                 callback(true);
