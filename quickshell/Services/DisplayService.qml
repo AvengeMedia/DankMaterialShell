@@ -1546,13 +1546,19 @@ Singleton {
             evaluateNightMode();
         }
     }
+
+    Connections {
+        target: ToplevelManager
+
+        function onActiveToplevelChanged() {
+            root.handleNightModeExceptions();
         }
     }
 
     Connections {
-        target: CompositorService
+        target: ToplevelManager.activeToplevel
 
-        function onToplevelsChanged() {
+        function onFullscreenChanged() {
             root.handleNightModeExceptions();
         }
     }
