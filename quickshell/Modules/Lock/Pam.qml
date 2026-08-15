@@ -70,6 +70,38 @@ Scope {
         }
     }
 
+    // The password module wants a response. The response is deliberately NOT
+    // sent automatically: with a concurrent face module (`pam_gaze_grosshack`)
+    // the prompt fires while the scan is still running, and auto-responding
+    // with an empty or partial buffer loses the race and fails the attempt.
+    // The user submits with Enter (see submitPassword), so the typed password
+    // stays intact and a successful face match can still win.
+    readonly property bool responsePending: passwd.responseRequired
+
+    function submitPassword(): void {
+        if (!passwd.responseRequired)
+            return;
+        if (root.buffer.length === 0)
+            return; // empty Enter is a no-op while an attempt is in flight
+        passwd.respond(root.buffer);
+    }
+
+    // Esc on the lock screen: abort the running attempt without burning the
+    // typed buffer. The stack is held open indefinitely while awaiting the
+    // user's Enter, so this is the only way out besides answering.
+    function cancelActiveAuth(): void {
+        if (!passwd.active)
+            return;
+        resetAuthFlows();
+        root.state = "";
+        root.lockMessage = "";
+        root.attemptInfoMessages = [];
+        root.lockoutAnnouncedThisAttempt = false;
+        flashMsg();
+        fprint.checkAvail();
+        u2f.checkAvail();
+    }
+
     function proceedAfterPrimaryAuth(): void {
         if (!root.u2fSuppressedByPrimaryPam && SettingsData.enableU2f && SettingsData.u2fMode === "and" && u2f.available) {
             u2f.startForSecondFactor();
@@ -199,7 +231,9 @@ Scope {
             }
             root.attemptInfoMessages = [];
 
-            respond(root.buffer);
+            // The response phase is untimed by design: the stack waits for the
+            // user's Enter (submitPassword). Stop the scan-phase stall guard.
+            passwdActiveTimeout.running = false;
         }
 
         onCompleted: res => {
@@ -253,6 +287,14 @@ Scope {
             } else {
                 passwdActiveTimeout.running = false;
             }
+        }
+
+        function onResponseRequiredChanged() {
+            // After the user answers, processing resumes; re-arm the guard so a
+            // hung module cannot hold the stack forever. Only the wait-for-Enter
+            // phase itself is untimed.
+            if (!passwd.responseRequired && passwd.active)
+                passwdActiveTimeout.restart();
         }
     }
 
@@ -448,7 +490,10 @@ Scope {
 
         interval: 15000
         onTriggered: {
-            if (passwd.active)
+            // Scan-phase backstop only. Once the password module asks
+            // (responseRequired), the attempt legitimately waits on the user's
+            // Enter for as long as they need; recovery is Esc.
+            if (passwd.active && !passwd.responseRequired)
                 root.recoverFromAuthStall("error");
         }
     }

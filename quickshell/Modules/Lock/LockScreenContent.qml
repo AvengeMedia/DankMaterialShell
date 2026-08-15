@@ -95,6 +95,27 @@ Item {
         return pam && (pam.u2fState === "waiting" || pam.u2fState === "insert") && !pam.u2fPending;
     }
 
+    // Lock-screen auth HUD state, derived from the PAM feedback strings Gaze
+    // emits in-process (PAM_TEXT_INFO) plus DMS's own PAM state. The strings
+    // are Gaze's own English constants (see pam-gaze-core), not PAM
+    // translations, so matching is stable across locales.
+    readonly property string authFeedbackState: {
+        if (!pam)
+            return "waiting";
+        const text = pam.lockMessage ?? "";
+        if (text.includes("Face Verified"))
+            return "matched";
+        if (text.includes("not recognized") || text.includes("timed out") || text.includes("unavailable"))
+            return "failed";
+        if (pamState === "error" || pamState === "fail" || pamState === "max")
+            return "failed";
+        if (text.includes("look at the camera") || text.includes("light") || text.includes("closer")
+                || text.includes("back up") || text.includes("center") || text.includes("Hold still")
+                || text.includes("clipped"))
+            return "waiting";
+        return "waiting";
+    }
+
     function canStartSecurityKeyUnlock() {
         return !demoMode && pam && pam.u2f && pam.u2f.available && SettingsData.enableU2f && SettingsData.u2fMode === "or" && !pam.passwd.active && !pam.u2f.active && !pam.u2fPending && !root.unlocking;
     }
@@ -941,9 +962,18 @@ Item {
                         activeFocusOnTab: !demoMode
                         onTextChanged: cursorPosition = text.length
                         onAccepted: {
-                            if (!demoMode && !root.unlocking && !pam.passwd.active && !pam.u2fPending) {
-                                pam.passwd.start();
+                            if (demoMode || root.unlocking)
+                                return;
+                            if (pam.passwd.active) {
+                                // Concurrent auth: Enter with a password answers
+                                // the pending prompt; empty Enter is a no-op that
+                                // keeps the face flow alive.
+                                pam.submitPassword();
+                                return;
                             }
+                            if (pam.u2fPending)
+                                return;
+                            pam.passwd.start();
                         }
                         Keys.onPressed: event => handleKey(event)
 
@@ -963,16 +993,23 @@ Item {
                                     event.accepted = true;
                                     return;
                                 }
+                                if (pam.passwd.active) {
+                                    // Abort the running attempt; the typed buffer
+                                    // survives for the next one.
+                                    pam.cancelActiveAuth();
+                                    event.accepted = true;
+                                    return;
+                                }
                                 clear();
                                 event.accepted = true;
                                 return;
                             }
 
-                            if (pam.passwd.active) {
-                                log.debug("PAM is active, ignoring input");
-                                event.accepted = true;
-                                return;
-                            }
+                            // Deliberately NOT swallowed while pam.passwd.active:
+                            // with a concurrent face module the password field
+                            // stays live for the whole scan, and the buffer is
+                            // submitted by Enter (submitPassword) or discarded
+                            // when the face match wins.
 
                             if ((event.modifiers & Qt.ControlModifier) && !(event.modifiers & (Qt.AltModifier | Qt.MetaModifier))) {
                                 if (securityKeyShortcutMatches(event) && canStartSecurityKeyUnlock()) {
@@ -1087,7 +1124,9 @@ Item {
                                     return;
                                 const committed = text;
                                 text = "";
-                                if (demoMode || root.unlocking || pam.passwd.active)
+                                // Input stays live while PAM is active so the
+                                // password can be typed during the face scan.
+                                if (demoMode || root.unlocking)
                                     return;
                                 passwordField.insertText(committed);
                             }
@@ -1373,9 +1412,17 @@ Item {
                         visible: (demoMode || (!pam.passwd.active && !root.unlocking && !pam.u2fPending))
                         enabled: !demoMode
                         onClicked: {
-                            if (!demoMode && !root.unlocking && !pam.u2fPending) {
-                                pam.passwd.start();
+                            if (demoMode || root.unlocking)
+                                return;
+                            if (pam.passwd.active) {
+                                // Same semantics as Enter: submit the typed
+                                // password against the pending prompt, or no-op.
+                                pam.submitPassword();
+                                return;
                             }
+                            if (pam.u2fPending)
+                                return;
+                            pam.passwd.start();
                         }
 
                         Behavior on opacity {
@@ -1401,7 +1448,18 @@ Item {
                 Layout.fillWidth: true
                 Layout.preferredHeight: text.length > 0 ? Math.min(implicitHeight, Math.ceil(Theme.fontSizeSmall * 4.5)) : 0
                 text: root.currentAuthFeedbackText()
-                color: root.authFeedbackIsHint() ? Theme.outline : Theme.error
+                color: {
+                    if (root.authFeedbackIsHint())
+                        return Theme.outline;
+                    switch (root.authFeedbackState) {
+                    case "matched":
+                        return Theme.success;
+                    case "failed":
+                        return Theme.error;
+                    default:
+                        return Theme.primary;
+                    }
+                }
                 font.pixelSize: Theme.fontSizeSmall
                 horizontalAlignment: Text.AlignHCenter
                 wrapMode: Text.WordWrap

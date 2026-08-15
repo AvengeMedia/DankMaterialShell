@@ -111,7 +111,8 @@ FocusScope {
             }
             root.awaitingFprintForPassword = false;
             root.isLoading = false;
-            root.passwordInput = "";
+            // Keep whatever the user typed while the face scan was running;
+            // it is submitted by the next Enter, never automatically.
             passwordField.forceActiveFocus();
         }
 
