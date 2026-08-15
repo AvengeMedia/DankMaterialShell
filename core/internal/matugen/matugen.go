@@ -46,6 +46,7 @@ type TemplateDef struct {
 	Flatpaks           []string
 	ConfigDirs         []string
 	ConfigFile         string
+	FlatpakConfigPath  string
 	Kind               TemplateKind
 	RunUnconditionally bool
 	RequiredEnv        string
@@ -61,7 +62,7 @@ var templateRegistry = []TemplateDef{
 	{ID: "firefox", Commands: []string{"firefox"}, ConfigFile: "firefox.toml"},
 	{ID: "pywalfox", Commands: []string{"pywalfox"}, ConfigFile: "pywalfox.toml"},
 	{ID: "zenbrowser", Commands: []string{"zen", "zen-browser", "zen-beta", "zen-twilight"}, Flatpaks: []string{"app.zen_browser.zen"}, ConfigFile: "zenbrowser.toml"},
-	{ID: "vesktop", Commands: []string{"vesktop"}, Flatpaks: []string{"dev.vencord.Vesktop"}, ConfigDirs: []string{"vesktop"}, ConfigFile: "vesktop.toml"},
+	{ID: "vesktop", Commands: []string{"vesktop"}, Flatpaks: []string{"dev.vencord.Vesktop"}, ConfigDirs: []string{"vesktop"}, ConfigFile: "vesktop.toml", FlatpakConfigPath: "dev.vencord.Vesktop/config"},
 	{ID: "vencord", Commands: []string{"discord", "Discord", "discord-canary", "DiscordCanary"}, Flatpaks: []string{"com.discordapp.Discord", "com.discordapp.DiscordCanary"}, ConfigDirs: []string{"Vencord"}, ConfigFile: "vencord.toml"},
 	{ID: "equibop", Commands: []string{"equibop"}, ConfigDirs: []string{"equibop"}, ConfigFile: "equibop.toml"},
 	{ID: "ghostty", Commands: []string{"ghostty"}, ConfigFile: "ghostty.toml", Kind: TemplateKindTerminal},
@@ -479,7 +480,14 @@ output_path = '%s'
 				appendConfig(opts, cfgFile, tmpl.Commands, tmpl.Flatpaks, tmpl.ConfigDirs, tmpl.ConfigFile)
 			}
 		default:
-			appendConfig(opts, cfgFile, tmpl.Commands, tmpl.Flatpaks, tmpl.ConfigDirs, tmpl.ConfigFile)
+			flatpaks := tmpl.Flatpaks
+			if tmpl.FlatpakConfigPath != "" {
+				flatpaks = nil
+			}
+			appendConfig(opts, cfgFile, tmpl.Commands, flatpaks, tmpl.ConfigDirs, tmpl.ConfigFile)
+			if tmpl.FlatpakConfigPath != "" {
+				appendFlatpakConfig(opts, cfgFile, tmpl.Flatpaks, tmpl.ConfigFile, tmpl.FlatpakConfigPath)
+			}
 		}
 	}
 
@@ -517,6 +525,22 @@ func appendConfig(
 	checkConfigDirs []string,
 	fileName string,
 ) {
+	appendConfigContent(opts, cfgFile, checkCmd, checkFlatpaks, checkConfigDirs, fileName, "")
+}
+
+func appendFlatpakConfig(opts *Options, cfgFile *os.File, checkFlatpaks []string, fileName, configPath string) {
+	appendConfigContent(opts, cfgFile, nil, checkFlatpaks, nil, fileName, configPath)
+}
+
+func appendConfigContent(
+	opts *Options,
+	cfgFile *os.File,
+	checkCmd []string,
+	checkFlatpaks []string,
+	checkConfigDirs []string,
+	fileName string,
+	flatpakConfigPath string,
+) {
 	configPath := filepath.Join(opts.ShellDir, "matugen", "configs", fileName)
 	if _, err := os.Stat(configPath); err != nil {
 		return
@@ -528,7 +552,18 @@ func appendConfig(
 	if err != nil {
 		return
 	}
-	cfgFile.WriteString(substituteVars(string(data), opts.ShellDir))
+	content := string(data)
+	if flatpakConfigPath != "" {
+		content = strings.ReplaceAll(content, "'CONFIG_DIR/", "'FLATPAK_CONFIG_DIR/"+flatpakConfigPath+"/")
+		lines := strings.Split(content, "\n")
+		for i, line := range lines {
+			if strings.HasPrefix(line, "[templates.") && strings.HasSuffix(line, "]") {
+				lines[i] = strings.TrimSuffix(line, "]") + "-flatpak]"
+			}
+		}
+		content = strings.Join(lines, "\n")
+	}
+	cfgFile.WriteString(substituteVars(content, opts.ShellDir))
 	cfgFile.WriteString("\n")
 }
 
@@ -679,6 +714,9 @@ func substituteVars(content, shellDir string) string {
 	result = strings.ReplaceAll(result, "'CONFIG_DIR/", "'"+utils.XDGConfigHome()+"/")
 	result = strings.ReplaceAll(result, "'DATA_DIR/", "'"+utils.XDGDataHome()+"/")
 	result = strings.ReplaceAll(result, "'CACHE_DIR/", "'"+utils.XDGCacheHome()+"/")
+	if homeDir, err := os.UserHomeDir(); err == nil {
+		result = strings.ReplaceAll(result, "'FLATPAK_CONFIG_DIR/", "'"+filepath.Join(homeDir, ".var", "app")+"/")
+	}
 	if emacsDir := utils.EmacsConfigDir(); emacsDir != "" {
 		result = strings.ReplaceAll(result, "'EMACS_DIR/", "'"+emacsDir+"/")
 	}
