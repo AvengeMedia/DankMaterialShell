@@ -333,7 +333,7 @@
     "About": "حول"
   },
   "Acceleration Profile": {
-    "Acceleration Profile": ""
+    "Acceleration Profile": "ملف تعريف التسارع"
   },
   "Accent Color": {
     "Accent Color": "لون التمييز"
@@ -411,7 +411,7 @@
     "Adapters": "المحولات"
   },
   "Adaptive": {
-    "Adaptive": ""
+    "Adaptive": "تكيفي"
   },
   "Adaptive Media Width": {
     "Adaptive Media Width": "عرض الوسائط التكيفي"
@@ -489,10 +489,10 @@
     "Add to Autostart": "إضافة إلى التشغيل التلقائي"
   },
   "Adjust pointer sensitivity speed": {
-    "Adjust pointer sensitivity speed": ""
+    "Adjust pointer sensitivity speed": "ضبط سرعة حساسية المؤشر"
   },
   "Adjust scrolling sensitivity multiplier": {
-    "Adjust scrolling sensitivity multiplier": ""
+    "Adjust scrolling sensitivity multiplier": "ضبط مضاعف حساسية التمرير"
   },
   "Adjust the bar height via inner padding": {
     "Adjust the bar height via inner padding": "ضبط ارتفاع الشريط عبر الحشوة الداخلية"
@@ -501,7 +501,7 @@
     "Adjust the number of columns in grid view mode.": "تعديل عدد الأعمدة في وضع العرض الشبكي."
   },
   "Adjust touchpad pointer speed": {
-    "Adjust touchpad pointer speed": ""
+    "Adjust touchpad pointer speed": "ضبط سرعة مؤشر لوحة اللمس"
   },
   "Adjust volume per scroll indent": {
     "Adjust volume per scroll indent": "ضبط مستوى الصوت لكل خطوة تمرير"
@@ -519,7 +519,7 @@
     "Advanced": "متقدم"
   },
   "Advanced comma-separated libxkbcommon options.": {
-    "Advanced comma-separated libxkbcommon options.": ""
+    "Advanced comma-separated libxkbcommon options.": "خيارات libxkbcommon المتقدمة مفصولة بفواصل."
   },
   "Afternoon": {
     "Afternoon": "بعد الظهر"
@@ -564,7 +564,7 @@
     "Also group repeated application icons on the active workspace": "أيضاً تجميع أيقونات التطبيقات المتكررة في سطح المكتب النشط"
   },
   "Alt + Shift": {
-    "Alt + Shift": ""
+    "Alt + Shift": "Alt + Shift"
   },
   "Alternative (OR)": {
     "Alternative (OR)": "بديل (أو)"
@@ -594,7 +594,7 @@
     "Always show when there's only one connected display": "عرض دائم عند وجود شاشة واحدة متصلة فقط"
   },
   "Always use the durations above, even if an app requests a shorter or longer one": {
-    "Always use the durations above, even if an app requests a shorter or longer one": ""
+    "Always use the durations above, even if an app requests a shorter or longer one": "استخدم دائمًا المدد المذكورة أعلاه، حتى إذا طلب التطبيق مدة أقصر أو أطول"
   },
   "Always use this app for %1": {
     "Always use this app for %1": "استخدم هذا التطبيق دائمًا لـ %1"
@@ -669,7 +669,7 @@
     "Appearance": "المظهر"
   },
   "Apple Music animated covers": {
-    "Apple Music animated covers": ""
+    "Apple Music animated covers": "أغلفة Apple Music المتحركة"
   },
   "Application": {
     "Application": "تطبيق"
@@ -954,7 +954,7 @@
     "Automatically save changes to opened files as you type": "حفظ التغييرات تلقائيًا في الملفات المفتوحة أثناء الكتابة"
   },
   "Automatically turn on Num Lock at startup": {
-    "Automatically turn on Num Lock at startup": ""
+    "Automatically turn on Num Lock at startup": "تشغيل Num Lock تلقائيًا عند بدء التشغيل"
   },
   "Automatically turn on Power Saver profile when battery is low.": {
     "Automatically turn on Power Saver profile when battery is low.": "قم بتشغيل ملف تعريف موفر الطاقة تلقائياً عند انخفاض البطارية."
@@ -1368,7 +1368,7 @@
     "Channel": "القناة"
   },
   "Characters per second while holding down key": {
-    "Characters per second while holding down key": ""
+    "Characters per second while holding down key": "عدد الأحرف في الثانية عند الاستمرار في الضغط على المفتاح"
   },
   "Charge Level": {
     "Charge Level": "مستوى الشحن"
@@ -1425,7 +1425,7 @@
     "Choose a power profile": "اختر ملف تعريف الطاقة"
   },
   "Choose a shortcut key to cycle between keyboard layouts": {
-    "Choose a shortcut key to cycle between keyboard layouts": ""
+    "Choose a shortcut key to cycle between keyboard layouts": "اختر مفتاح اختصار للتبديل بين تخطيطات لوحة المفاتيح"
   },
   "Choose colors from palette": {
     "Choose colors from palette": "اختر ألواناً من اللوحة"
@@ -1458,7 +1458,7 @@
     "Choose wallpaper folder": "اختر مجلد خلفية الشاشة"
   },
   "Choose when to generate scrolling events": {
-    "Choose when to generate scrolling events": ""
+    "Choose when to generate scrolling events": "اختر متى يتم إنشاء أحداث التمرير"
   },
   "Choose where notification popups appear on screen": {
     "Choose where notification popups appear on screen": "اختر مكان ظهور النوافذ المنبثقة للإشعارات على الشاشة"
@@ -1665,7 +1665,7 @@
     "Column Width": "عرض العمود"
   },
   "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": {
-    "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": ""
+    "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": "قائمة بأسماء التخطيطات مفصولة بفواصل. اتركها فارغة لاستخدام إعدادات لوحة مفاتيح النظام."
   },
   "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": {
     "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": "قائمة مفصولة بفواصل بأسماء الجلسات المراد إخفاؤها. ضعها بين شرطتين مائلتين للتعبير النمطي (مثال: /^_.*/)."
@@ -1698,7 +1698,7 @@
     "Compositor Settings": "إعدادات مدير النوافذ"
   },
   "Compositor actions (focus, move, etc.)": {
-    "Compositor actions (focus, move, etc.)": ""
+    "Compositor actions (focus, move, etc.)": "إجراءات الملحن (التركيز، التحريك، إلخ)"
   },
   "Config Format": {
     "Config Format": "تنسيق التكوين"
@@ -1818,7 +1818,7 @@
     "Contrast": "التباين"
   },
   "Contrast by variant": {
-    "Contrast by variant": ""
+    "Contrast by variant": "التباين حسب المتغير"
   },
   "Contributor": {
     "Contributor": "مساهم"
@@ -1977,10 +1977,10 @@
     "Critical Threshold": "عتبة المستوى الحرج"
   },
   "Ctrl + Shift": {
-    "Ctrl + Shift": ""
+    "Ctrl + Shift": "Ctrl + Shift"
   },
   "Ctrl+%1 is used for password editing": {
-    "Ctrl+%1 is used for password editing": ""
+    "Ctrl+%1 is used for password editing": "يستخدم Ctrl+%1 لتحرير كلمة المرور"
   },
   "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": {
     "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": "Ctrl+A: تحديد الكل • Ctrl+P: معاينة • Enter/Shift+Enter: البحث عن التالي/السابق • Esc: إغلاق"
@@ -2052,7 +2052,7 @@
     "Custom": "خيار مخصص"
   },
   "Custom / None": {
-    "Custom / None": ""
+    "Custom / None": "مخصص / لا شيء"
   },
   "Custom Blend": {
     "Custom Blend": "مزج مخصص"
@@ -2148,7 +2148,7 @@
     "DMS Shortcuts": "اختصارات DMS"
   },
   "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.": {
-    "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.": ""
+    "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.": "DMS هو غلاف سطح مكتب حديث قابل للتخصيص بدرجة عالية بتصميم مستوحى من %1.<br/><br/>تم بناؤه باستخدام %2، وهو إطار عمل QT6 لبناء أغلفة سطح المكتب، و%3، وهي لغة برمجة مجمعة ومكتوبة بشكل ثابت."
   },
   "DMS out of date": {
     "DMS out of date": "نسخة DMS غير محدثة"
@@ -2218,6 +2218,9 @@
   },
   "Darken Modal Background": {
     "Darken Modal Background": "عتيم خلفية النافذة المنبثقة"
+  },
+  "Date First": {
+    "Date First": ""
   },
   "Date Format": {
     "Date Format": "صيغة التاريخ"
@@ -2295,7 +2298,7 @@
     "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": "Del: مسح • Shift+Del: مسح الكل • 1-9: إجراءات • F10: مساعدة • Esc: إغلاق"
   },
   "Delay before characters start repeating": {
-    "Delay before characters start repeating": ""
+    "Delay before characters start repeating": "التأخير قبل أن تبدأ الأحرف بالتكرار"
   },
   "Delete": {
     "Delete": "حذف"
@@ -2400,7 +2403,7 @@
     "Digital": "رقمي"
   },
   "Direct path to a .xkb keymap file. Overrides layouts/variants above.": {
-    "Direct path to a .xkb keymap file. Overrides layouts/variants above.": ""
+    "Direct path to a .xkb keymap file. Overrides layouts/variants above.": "المسار المباشر لملف خريطة المفاتيح .xkb. يتجاوز التخطيطات/المتغيرات أعلاه."
   },
   "Direction Source": {
     "Direction Source": "مصدر الاتجاه"
@@ -2424,13 +2427,13 @@
     "Disable Output": "تعطيل المخرج"
   },
   "Disable While Typing": {
-    "Disable While Typing": ""
+    "Disable While Typing": "تعطيل أثناء الكتابة"
   },
   "Disable on External Mouse": {
-    "Disable on External Mouse": ""
+    "Disable on External Mouse": "تعطيل عند وجود ماوس خارجي"
   },
   "Disable touchpad when an external mouse is connected": {
-    "Disable touchpad when an external mouse is connected": ""
+    "Disable touchpad when an external mouse is connected": "تعطيل لوحة اللمس عند توصيل ماوس خارجي"
   },
   "Disabled": {
     "Disabled": "غير نشط"
@@ -2592,7 +2595,7 @@
     "Door Open": "الباب مفتوح"
   },
   "Drag Lock": {
-    "Drag Lock": ""
+    "Drag Lock": "قفل السحب"
   },
   "Drag a widget by its handle here to reorder it or drop it into another group": {
     "Drag a widget by its handle here to reorder it or drop it into another group": "اسحب أداة من مقبضها إلى هنا لإعادة ترتيبها أو إسقاطها في مجموعة أخرى"
@@ -2667,7 +2670,7 @@
     "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": "ديناميكي: منحنى زنبركي مع تجاوز - الدخول يتجاوز هدفه لفترة وجيزة ثم يستقر. معبر وحيوي."
   },
   "Edge": {
-    "Edge": ""
+    "Edge": "الحافة"
   },
   "Edge Hover Reveal": {
     "Edge Hover Reveal": "كشف حافة التمرير"
@@ -2718,7 +2721,7 @@
     "Empty Trash (%1)": "إفراغ المهملات (%1)"
   },
   "Emulate middle click by pressing left and right buttons": {
-    "Emulate middle click by pressing left and right buttons": ""
+    "Emulate middle click by pressing left and right buttons": "محاكاة النقر الأوسط بالضغط على الزرين الأيسر والأيمن"
   },
   "Enable 10-bit color depth for wider color gamut and HDR support": {
     "Enable 10-bit color depth for wider color gamut and HDR support": "تمكين عمق لون 10 بت للحصول على نطاق ألوان أوسع ودعم HDR"
@@ -2739,7 +2742,7 @@
     "Enable History": "تمكين السجل"
   },
   "Enable Num Lock": {
-    "Enable Num Lock": ""
+    "Enable Num Lock": "تمكين Num Lock"
   },
   "Enable Overview Overlay": {
     "Enable Overview Overlay": "تمكين تراكب النظرة العامة"
@@ -2850,7 +2853,7 @@
     "Enter password for ": "ادخال كلمة المرور ل "
   },
   "Enter text to encode": {
-    "Enter text to encode": ""
+    "Enter text to encode": "أدخل نصًا للترميز"
   },
   "Enter this passkey on ": {
     "Enter this passkey on ": "أدخل مفتاح المرور هذا في "
@@ -2947,6 +2950,9 @@
   },
   "Extra Light": {
     "Extra Light": "خفيف جداً"
+  },
+  "Extract theme to JSON": {
+    "Extract theme to JSON": ""
   },
   "Fade": {
     "Fade": "تلاشي"
@@ -3047,11 +3053,14 @@
   "Failed to enable night mode": {
     "Failed to enable night mode": "فشل في تمكين الوضع الليلي"
   },
+  "Failed to extract theme": {
+    "Failed to extract theme": ""
+  },
   "Failed to fetch network QR code: %1": {
     "Failed to fetch network QR code: %1": "فشل جلب رمز QR للشبكة: %1"
   },
   "Failed to generate QR code: %1": {
-    "Failed to generate QR code: %1": ""
+    "Failed to generate QR code: %1": "فشل في إنشاء رمز الاستجابة السريعة: %1"
   },
   "Failed to generate systemd override": {
     "Failed to generate systemd override": "فشل في إنشاء تجاوز systemd"
@@ -3324,10 +3333,10 @@
     "Flags": "الأعلام"
   },
   "Flat": {
-    "Flat": ""
+    "Flat": "مسطح"
   },
   "Flat uses constant speed; Adaptive scales with movement speed": {
-    "Flat uses constant speed; Adaptive scales with movement speed": ""
+    "Flat uses constant speed; Adaptive scales with movement speed": "يستخدم المسطح سرعة ثابتة؛ يتغير التكيفي مع سرعة الحركة"
   },
   "Flatpak": {
     "Flatpak": "Flatpak"
@@ -3363,10 +3372,10 @@
     "Floating Position": "الموضع العائم"
   },
   "Floating Windows": {
-    "Floating Windows": ""
+    "Floating Windows": "النوافذ العائمة"
   },
   "Floating windows follow Surface Styling settings": {
-    "Floating windows follow Surface Styling settings": ""
+    "Floating windows follow Surface Styling settings": "تتبع النوافذ العائمة إعدادات تصميم السطح"
   },
   "Fluent": {
     "Fluent": "سلس"
@@ -3498,7 +3507,7 @@
     "Foreground Layers": "طبقات المقدمة"
   },
   "Foreground Opacity": {
-    "Foreground Opacity": ""
+    "Foreground Opacity": "عتامة المقدمة"
   },
   "Forever": {
     "Forever": "إلى الأبد"
@@ -3627,7 +3636,7 @@
     "Generate Override": "إنشاء تجاوز"
   },
   "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
-    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
+    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": "إنشاء تكوينات أساسية لـ GTK3/4 أو QT5/QT6 (يتطلب qt6ct-kde) لتتبع ألوان DMS. مطلوب مرة واحدة فقط.<br /><br />يوصى بتهيئة %1 قبل تطبيق سمات GTK."
   },
   "Generic": {
     "Generic": "عام"
@@ -3645,7 +3654,7 @@
     "Global fonts can be configured in Settings → Personalization": "يمكن تكوين الخطوط العامة في الإعدادات ← إضفاء الطابع الشخصي"
   },
   "Globally": {
-    "Globally": ""
+    "Globally": "عالميًا"
   },
   "Globally scale all animation durations": {
     "Globally scale all animation durations": "تغيير حجم جميع فترات الرسوم المتحركة عالميًا"
@@ -3945,7 +3954,7 @@
     "Hover Popouts": "النوافذ المنبثقة عند التمرير"
   },
   "How layout changes are remembered across apps": {
-    "How layout changes are remembered across apps": ""
+    "How layout changes are remembered across apps": "كيف يتم تذكر تغييرات التخطيط عبر التطبيقات"
   },
   "How often the server polls for new updates.": {
     "How often the server polls for new updates.": "عدد مرات فحص الخادم للتحديثات الجديدة."
@@ -4044,7 +4053,7 @@
     "If the field is hidden, it will appear as soon as a key is pressed.": "إذا كان الحقل مخفياً، فسيظهر بمجرد الضغط على مفتاح."
   },
   "Ignore App-Requested Timeout": {
-    "Ignore App-Requested Timeout": ""
+    "Ignore App-Requested Timeout": "تجاهل المهلة المطلوبة من التطبيق"
   },
   "Ignore Completely": {
     "Ignore Completely": "تجاهل تمامًا"
@@ -4284,10 +4293,13 @@
     "Keep My Edits": "الاحتفاظ بتعديلاتي"
   },
   "Keep dragging when finger is briefly lifted": {
-    "Keep dragging when finger is briefly lifted": ""
+    "Keep dragging when finger is briefly lifted": "استمر في السحب عند رفع الإصبع لفترة وجيزة"
   },
   "Keep in Bar": {
     "Keep in Bar": "الاحتفاظ في الشريط"
+  },
+  "Keep pinned apps as launchers and show running windows separately": {
+    "Keep pinned apps as launchers and show running windows separately": ""
   },
   "Keep the clipboard type filter when reopening history": {
     "Keep the clipboard type filter when reopening history": "احتفظ بفلتر نوع الحافظة عند إعادة فتح السجل"
@@ -4305,7 +4317,7 @@
     "Key": "مفتاح"
   },
   "Key combination": {
-    "Key combination": ""
+    "Key combination": "مجموعة المفاتيح"
   },
   "Keybind Sources": {
     "Keybind Sources": "مصادر اختصارات المفاتيح"
@@ -4320,31 +4332,31 @@
     "Keybinds shown alongside regular search results": "اختصارات المفاتيح تظهر بجانب نتائج البحث العادية"
   },
   "Keyboard": {
-    "Keyboard": ""
+    "Keyboard": "لوحة المفاتيح"
   },
   "Keyboard Behavior": {
-    "Keyboard Behavior": ""
+    "Keyboard Behavior": "سلوك لوحة المفاتيح"
   },
   "Keyboard Layout Name": {
     "Keyboard Layout Name": "اسم تخطيط لوحة المفاتيح"
   },
   "Keyboard Layouts": {
-    "Keyboard Layouts": ""
+    "Keyboard Layouts": "تخطيطات لوحة المفاتيح"
   },
   "Keyboard Model": {
-    "Keyboard Model": ""
+    "Keyboard Model": "طراز لوحة المفاتيح"
   },
   "Keyboard Shortcuts": {
     "Keyboard Shortcuts": "اختصارات لوحة المفاتيح"
   },
   "Keyboard Variant": {
-    "Keyboard Variant": ""
+    "Keyboard Variant": "متغير لوحة المفاتيح"
   },
   "Keyboard shortcut to start security key unlock": {
-    "Keyboard shortcut to start security key unlock": ""
+    "Keyboard shortcut to start security key unlock": "اختصار لوحة المفاتيح لبدء إلغاء قفل مفتاح الأمان"
   },
   "Keymap File Path": {
-    "Keymap File Path": ""
+    "Keymap File Path": "مسار ملف تخطيط المفاتيح"
   },
   "Keys": {
     "Keys": "مفاتيح"
@@ -4446,7 +4458,7 @@
     "Left Section": "القسم الأيسر"
   },
   "Left-Handed Mode": {
-    "Left-Handed Mode": ""
+    "Left-Handed Mode": "وضع اليد اليسرى"
   },
   "Light": {
     "Light": "خفيف"
@@ -4590,7 +4602,7 @@
     "MAC": "MAC"
   },
   "MIT License": {
-    "MIT License": ""
+    "MIT License": "رخصة MIT"
   },
   "MTU": {
     "MTU": "MTU"
@@ -4863,7 +4875,7 @@
     "Microphone volume control": "التحكم في مستوى صوت الميكروفون"
   },
   "Middle Click Emulation": {
-    "Middle Click Emulation": ""
+    "Middle Click Emulation": "محاكاة النقر الأوسط"
   },
   "Middle Section": {
     "Middle Section": "القسم الأوسط"
@@ -4876,6 +4888,9 @@
   },
   "Minimal palette built around a single hue.": {
     "Minimal palette built around a single hue.": "لوحة ألوان مبسطة مبنية حول درجة لون واحدة."
+  },
+  "Minimize": {
+    "Minimize": ""
   },
   "Minute": {
     "Minute": "الدقيقة"
@@ -4941,10 +4956,10 @@
     "Mount Points": "نقاط التحميل"
   },
   "Mouse & Touchpad": {
-    "Mouse & Touchpad": ""
+    "Mouse & Touchpad": "الماوس ولوحة اللمس"
   },
   "Mouse Settings": {
-    "Mouse Settings": ""
+    "Mouse Settings": "إعدادات الماوس"
   },
   "Mouse clicks pass through the bar to windows behind it": {
     "Mouse clicks pass through the bar to windows behind it": "نقرات الفأرة تمر عبر الشريط إلى النوافذ خلفه"
@@ -5010,7 +5025,7 @@
     "Native: platform renderer (FreeType).": "أصلي: مصير النظام الأساسي (FreeType)."
   },
   "Natural Scrolling": {
-    "Natural Scrolling": ""
+    "Natural Scrolling": "التمرير الطبيعي"
   },
   "Natural Touchpad Scrolling": {
     "Natural Touchpad Scrolling": "تمرير لوحة اللمس الطبيعي"
@@ -5160,7 +5175,7 @@
     "No Rounding": "بدون تقريب الزوايا"
   },
   "No Scroll": {
-    "No Scroll": ""
+    "No Scroll": "بدون تمرير"
   },
   "No Shadow": {
     "No Shadow": "بدون ظل"
@@ -5559,7 +5574,7 @@
     "On": "مفعل"
   },
   "On Button Down": {
-    "On Button Down": ""
+    "On Button Down": "عند الضغط على الزر"
   },
   "On indefinitely": {
     "On indefinitely": "مفعل للأبد"
@@ -5580,7 +5595,7 @@
     "Only adjust gamma based on time or location rules.": "تعديل حرارة الألوان بناءً على قواعد الوقت أو الموقع فقط."
   },
   "Only continue if you recognize this server certificate fingerprint.": {
-    "Only continue if you recognize this server certificate fingerprint.": ""
+    "Only continue if you recognize this server certificate fingerprint.": "تابع فقط إذا كنت تتعرف على بصمة شهادة الخادم هذه."
   },
   "Only on Battery": {
     "Only on Battery": "فقط عند استخدام البطارية"
@@ -5595,13 +5610,13 @@
     "Opacity": "الشفافية"
   },
   "Opacity of cards and nested surfaces inside floating windows": {
-    "Opacity of cards and nested surfaces inside floating windows": ""
+    "Opacity of cards and nested surfaces inside floating windows": "عتامة البطاقات والأسطح المتداخلة داخل النوافذ العائمة"
   },
   "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts": {
-    "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts": ""
+    "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts": "عتامة نوافذ DMS العائمة مثل الإعدادات والمفكرة ومطالبات المصادقة"
   },
   "Opacity of foreground cards and nested surfaces on shell panels": {
-    "Opacity of foreground cards and nested surfaces on shell panels": ""
+    "Opacity of foreground cards and nested surfaces on shell panels": "عتامة بطاقات المقدمة والأسطح المتداخلة على لوحات الغلاف"
   },
   "Opaque": {
     "Opaque": "غير شفاف"
@@ -5613,7 +5628,7 @@
     "Open App": "فتح التطبيق"
   },
   "Open DMS windows floating instead of tiled": {
-    "Open DMS windows floating instead of tiled": ""
+    "Open DMS windows floating instead of tiled": "فتح نوافذ DMS عائمة بدلاً من متجانبة"
   },
   "Open Delay": {
     "Open Delay": "تأخير الفتح"
@@ -5637,7 +5652,7 @@
     "Open Trash With": "فتح المهملات باستخدام"
   },
   "Open Windows Floating": {
-    "Open Windows Floating": ""
+    "Open Windows Floating": "فتح النوافذ عائمة"
   },
   "Open a new note": {
     "Open a new note": "افتح ملاحظة جديدة"
@@ -5760,7 +5775,7 @@
     "Override Corner Radius": "تجاوز نصف قطر الزاوية"
   },
   "Override floating window transparency for Notepad": {
-    "Override floating window transparency for Notepad": ""
+    "Override floating window transparency for Notepad": "تجاوز شفافية النافذة العائمة للمفكرة"
   },
   "Override global layout settings for this output": {
     "Override global layout settings for this output": "تجاوز إعدادات التخطيط العالمية لهذا المخرج"
@@ -5838,7 +5853,7 @@
     "Pairing...": "جاري الاقتران..."
   },
   "Partial": {
-    "Partial": ""
+    "Partial": "جزئي"
   },
   "Partly Cloudy": {
     "Partly Cloudy": "غائم جزئياً"
@@ -5895,7 +5910,7 @@
     "Pending Discharge": "تفريغ معلق"
   },
   "Per Window": {
-    "Per Window": ""
+    "Per Window": "لكل نافذة"
   },
   "Per-Mode Wallpapers": {
     "Per-Mode Wallpapers": "خلفيات لكل وضع"
@@ -5959,6 +5974,9 @@
   },
   "Place a trash bin at the end of the dock": {
     "Place a trash bin at the end of the dock": "ضع سلة مهملات في نهاية شريط التطبيقات"
+  },
+  "Place clipboard history on the Wayland overlay layer": {
+    "Place clipboard history on the Wayland overlay layer": ""
   },
   "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
     "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "ضع مجلدات الملحقات هنا. يجب أن يحتوي كل ملحق على ملف بيان باسم plugin.json."
@@ -6048,7 +6066,7 @@
     "Pointer": "المؤشر"
   },
   "Pointer Speed": {
-    "Pointer Speed": ""
+    "Pointer Speed": "سرعة المؤشر"
   },
   "Polkit integration is disabled. User management requires Polkit to elevate privileges.": {
     "Polkit integration is disabled. User management requires Polkit to elevate privileges.": "تم تعطيل تكامل Polkit. تتطلب إدارة المستخدمين Polkit لرفع الامتيازات."
@@ -6159,7 +6177,7 @@
     "Press Ctrl+N or click 'New Session' to create one": "اضغط Ctrl+N أو انقر على 'جلسة جديدة' لإنشاء واحدة"
   },
   "Press Ctrl+key to set. Esc cancels.": {
-    "Press Ctrl+key to set. Esc cancels.": ""
+    "Press Ctrl+key to set. Esc cancels.": "اضغط على Ctrl+مفتاح للتعيين. Esc للإلغاء."
   },
   "Press Enter and the audio system will restart to apply the change": {
     "Press Enter and the audio system will restart to apply the change": "اضغط Enter وسيتم إعادة تشغيل نظام الصوت لتطبيق التغيير"
@@ -6174,7 +6192,7 @@
     "Pressure": "الضغط"
   },
   "Prevent accidental cursor jumps while typing": {
-    "Prevent accidental cursor jumps while typing": ""
+    "Prevent accidental cursor jumps while typing": "منع قفزات المؤشر العرضية أثناء الكتابة"
   },
   "Prevent screen timeout": {
     "Prevent screen timeout": "منع إيقاف تشغيل الشاشة"
@@ -6294,7 +6312,7 @@
     "Protocol": "البروتوكول"
   },
   "QR Generator": {
-    "QR Generator": ""
+    "QR Generator": "مولد رمز الاستجابة السريعة"
   },
   "Qt": {
     "Qt": "Qt"
@@ -6348,7 +6366,7 @@
     "Random": "عشوائي"
   },
   "Random Order": {
-    "Random Order": ""
+    "Random Order": "ترتيب عشوائي"
   },
   "Rate": {
     "Rate": "المعدل"
@@ -6402,7 +6420,7 @@
     "Regex": "تعبير نمطي (Regex)"
   },
   "Registries": {
-    "Registries": ""
+    "Registries": "السجلات"
   },
   "Regular": {
     "Regular": "عادي"
@@ -6441,7 +6459,7 @@
     "Remember Last Query": "تذكر آخر استعلام"
   },
   "Remember Layout": {
-    "Remember Layout": ""
+    "Remember Layout": "تذكر التخطيط"
   },
   "Remember Type Filter": {
     "Remember Type Filter": "تذكر فلتر النوع"
@@ -6516,10 +6534,10 @@
     "Repeat": "تكرار"
   },
   "Repeat Delay": {
-    "Repeat Delay": ""
+    "Repeat Delay": "تأخير التكرار"
   },
   "Repeat Rate": {
-    "Repeat Rate": ""
+    "Repeat Rate": "معدل التكرار"
   },
   "Replacement": {
     "Replacement": "استبدال"
@@ -6564,7 +6582,7 @@
     "Requires remembering the last user and session. Enable those options first.": "يتطلب تذكر المستخدم الأخير والجلسة. قم بتمكين تلك الخيارات أولاً."
   },
   "Requires the DMS Theme extension from the editor marketplace": {
-    "Requires the DMS Theme extension from the editor marketplace": ""
+    "Requires the DMS Theme extension from the editor marketplace": "يتطلب امتداد DMS Theme من متجر المحرر"
   },
   "Reset": {
     "Reset": "إعادة تعيين"
@@ -6603,10 +6621,13 @@
     "Restart the DankMaterialShell": "إعادة تشغيل DankMaterialShell"
   },
   "Restart userspace without rebooting the kernel, requires systemd": {
-    "Restart userspace without rebooting the kernel, requires systemd": ""
+    "Restart userspace without rebooting the kernel, requires systemd": "إعادة تشغيل مساحة المستخدم دون إعادة تشغيل النواة، يتطلب systemd"
   },
   "Restarting audio system...": {
     "Restarting audio system...": "جارٍ إعادة تشغيل نظام الصوت..."
+  },
+  "Restore": {
+    "Restore": ""
   },
   "Restore Special Workspace Windows": {
     "Restore Special Workspace Windows": "استعادة نوافذ سطح المكتب المميزة"
@@ -6624,10 +6645,10 @@
     "Reverse Scrolling Direction": "عكس اتجاه التمرير"
   },
   "Reverse mouse wheel scrolling direction": {
-    "Reverse mouse wheel scrolling direction": ""
+    "Reverse mouse wheel scrolling direction": "عكس اتجاه تمرير عجلة الماوس"
   },
   "Reverse two-finger scrolling direction": {
-    "Reverse two-finger scrolling direction": ""
+    "Reverse two-finger scrolling direction": "عكس اتجاه التمرير بإصبعين"
   },
   "Reverse workspace switch direction when scrolling over the bar": {
     "Reverse workspace switch direction when scrolling over the bar": "عكس اتجاه تبديل اسطح المكتب عند التمرير فوق الشريط"
@@ -6746,6 +6767,9 @@
   "Save & Start": {
     "Save & Start": "حفظ وابدأ"
   },
+  "Save Extracted Theme": {
+    "Save Extracted Theme": ""
+  },
   "Save Notepad File": {
     "Save Notepad File": "حفظ ملف الملاحظة"
   },
@@ -6837,7 +6861,7 @@
     "Scroll GitHub": "تمرير GitHub"
   },
   "Scroll Method": {
-    "Scroll Method": ""
+    "Scroll Method": "طريقة التمرير"
   },
   "Scroll Wheel": {
     "Scroll Wheel": "عجلة التمرير"
@@ -6855,7 +6879,7 @@
     "Scrolling": "شريطي"
   },
   "Scrolling Speed": {
-    "Scrolling Speed": ""
+    "Scrolling Speed": "سرعة التمرير"
   },
   "Search App Actions": {
     "Search App Actions": "البحث في إجراءات التطبيقات"
@@ -6921,16 +6945,16 @@
     "Security Key PAM Source": "مصدر مفتاح الأمان لـ PAM"
   },
   "Security key": {
-    "Security key": ""
+    "Security key": "مفتاح الأمان"
   },
   "Security key (%1)": {
-    "Security key (%1)": ""
+    "Security key (%1)": "مفتاح الأمان (%1)"
   },
   "Security key mode": {
     "Security key mode": "وضع مفتاح الأمان"
   },
   "Security key shortcut": {
-    "Security key shortcut": ""
+    "Security key shortcut": "اختصار مفتاح الأمان"
   },
   "Security-key availability could not be confirmed": {
     "Security-key availability could not be confirmed": "تعذّر التحقق من توفر مفتاح الأمان"
@@ -6978,7 +7002,7 @@
     "Select a desktop application": "حدد تطبيق سطح مكتب"
   },
   "Select a random wallpaper instead of cycling in alphabetical order": {
-    "Select a random wallpaper instead of cycling in alphabetical order": ""
+    "Select a random wallpaper instead of cycling in alphabetical order": "اختر خلفية عشوائية بدلاً من التدوير بالترتيب الأبجدي"
   },
   "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": {
     "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": "حدد أداة لإضافتها إلى سطح مكتبك. كل أداة هي مثيل منفصل بإعداداتها الخاصة."
@@ -7063,6 +7087,9 @@
   },
   "Separate Light & Dark Themes": {
     "Separate Light & Dark Themes": "سمات منفصلة للفاتح والمظلم"
+  },
+  "Separate Pinned and Running Apps": {
+    "Separate Pinned and Running Apps": ""
   },
   "Separate appearance for unfocused displays is not supported on this compositor.": {
     "Separate appearance for unfocused displays is not supported on this compositor.": "المظهر المنفصل للشاشات غير المركزة غير مدعوم في مدير النوافذ هذا."
@@ -7200,7 +7227,7 @@
     "Show": "إظهار"
   },
   "Show \"config reloaded\" Toast": {
-    "Show \"config reloaded\" Toast": ""
+    "Show \"config reloaded\" Toast": "إظهار رسالة 'تم إعادة تحميل التكوين'"
   },
   "Show 3rd Party": {
     "Show 3rd Party": "إظهار الطرف الثالث"
@@ -7350,7 +7377,7 @@
     "Show Seconds": "إظهار الثواني"
   },
   "Show Soft Reboot": {
-    "Show Soft Reboot": ""
+    "Show Soft Reboot": "إظهار إعادة التشغيل البرمجية"
   },
   "Show Sunrise/Sunset": {
     "Show Sunrise/Sunset": "عرض شروق/غروب الشمس"
@@ -7401,7 +7428,7 @@
     "Show a notification when battery reaches the charge limit.": "إظهار إشعار عندما تصل البطارية إلى حد الشحن."
   },
   "Show a toast when the compositor config is reloaded": {
-    "Show a toast when the compositor config is reloaded": ""
+    "Show a toast when the compositor config is reloaded": "إظهار رسالة منبثقة عند إعادة تحميل تكوين الملحن"
   },
   "Show a warning popup when battery is running low.": {
     "Show a warning popup when battery is running low.": "إظهار نافذة تحذير منبثقة عندما تكون البطارية منخفضة."
@@ -7434,7 +7461,7 @@
     "Show during Niri overview": "إظهار أثناء نظرة عامة على Niri"
   },
   "Show foreground surfaces on cards inside floating windows": {
-    "Show foreground surfaces on cards inside floating windows": ""
+    "Show foreground surfaces on cards inside floating windows": "إظهار أسطح المقدمة على البطاقات داخل النوافذ العائمة"
   },
   "Show foreground surfaces on notification cards": {
     "Show foreground surfaces on notification cards": "إظهار الأسطح الأمامية على بطاقات الإشعارات"
@@ -7449,7 +7476,7 @@
     "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": "عرض تراكب المشغل عند الكتابة في نظرة عامة على Niri. قم بتعطيله لاستخدام مشغل آخر."
   },
   "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.": {
-    "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.": ""
+    "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.": "إظهار صورة الألبوم للفيديو المتكرر من Apple Music عند توفره. يرسل اسم الفنان والألبوم قيد التشغيل إلى Apple."
   },
   "Show mode tabs and keyboard hints at the bottom.": {
     "Show mode tabs and keyboard hints at the bottom.": "إظهار علامات تبويب الوضع وتلميحات لوحة المفاتيح في الأسفل."
@@ -7563,7 +7590,7 @@
     "Snow": "ثلوج"
   },
   "Soft Reboot": {
-    "Soft Reboot": ""
+    "Soft Reboot": "إعادة تشغيل برمجية"
   },
   "Some plugins require a newer version of DMS:": {
     "Some plugins require a newer version of DMS:": "تتطلب بعض الإضافات إصدارًا أحدث من DMS:"
@@ -7587,7 +7614,7 @@
     "Source: %1": "المصدر: %1"
   },
   "Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.": {
-    "Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.": ""
+    "Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.": "مصادر الإضافات والسمات. السجلات هي مستودعات git تحتوي على دليل plugins/ أو themes/."
   },
   "Space between the bar and screen edges": {
     "Space between the bar and screen edges": "المسافة بين الشريط وحواف الشاشة"
@@ -7639,6 +7666,9 @@
   },
   "Start": {
     "Start": "ابدأ"
+  },
+  "Start DankConnect, KDE Connect, or Valent to use this plugin": {
+    "Start DankConnect, KDE Connect, or Valent to use this plugin": ""
   },
   "Start Hotspot?": {
     "Start Hotspot?": "بدء نقطة الاتصال؟"
@@ -7704,7 +7734,7 @@
     "Sunset": "غروب الشمس"
   },
   "Super + Space": {
-    "Super + Space": ""
+    "Super + Space": "Super + Space"
   },
   "Suppress Duplicate Notifications": {
     "Suppress Duplicate Notifications": "قمع الإشعارات المكررة"
@@ -7740,7 +7770,7 @@
     "Surface Opacity": "عتامة السطح"
   },
   "Surface Styling": {
-    "Surface Styling": ""
+    "Surface Styling": "نمط السطح"
   },
   "Surface Text": {
     "Surface Text": "نص السطح"
@@ -7764,13 +7794,13 @@
     "Suspend then Hibernate": "تعليق ثم إسبات"
   },
   "Swap primary and secondary mouse buttons": {
-    "Swap primary and secondary mouse buttons": ""
+    "Swap primary and secondary mouse buttons": "تبديل أزرار الماوس الأساسية والثانوية"
   },
   "Sway Website": {
     "Sway Website": "موقع Sway"
   },
   "Switch Layout Shortcut": {
-    "Switch Layout Shortcut": ""
+    "Switch Layout Shortcut": "اختصار تبديل التخطيط"
   },
   "Switch between display configurations": {
     "Switch between display configurations": "التبديل بين تكوينات العرض"
@@ -7818,7 +7848,7 @@
     "Sync to apply": "مزامنة للتطبيق"
   },
   "Sync with Global Settings": {
-    "Sync with Global Settings": ""
+    "Sync with Global Settings": "المزامنة مع الإعدادات العامة"
   },
   "Syncing...": {
     "Syncing...": "جارٍ المزامنة..."
@@ -7896,16 +7926,16 @@
     "Tailscale not available": "Tailscale غير متاح"
   },
   "Tap and Drag": {
-    "Tap and Drag": ""
+    "Tap and Drag": "النقر والسحب"
   },
   "Tap and drag on the touchpad to move items": {
-    "Tap and drag on the touchpad to move items": ""
+    "Tap and drag on the touchpad to move items": "انقر واسحب على لوحة اللمس لنقل العناصر"
   },
   "Tap the touchpad surface to trigger left click clicks": {
-    "Tap the touchpad surface to trigger left click clicks": ""
+    "Tap the touchpad surface to trigger left click clicks": "انقر على سطح لوحة اللمس لتنفيذ نقرات الزر الأيسر"
   },
   "Tap to Click": {
-    "Tap to Click": ""
+    "Tap to Click": "النقر للنقر"
   },
   "Terminal": {
     "Terminal": "محطة طرفية"
@@ -7983,7 +8013,7 @@
     "The rule applies to any window matching one of these.": "تنطبق القاعدة على أي نافذة تطابق واحدة من هذه."
   },
   "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": {
-    "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": ""
+    "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": "تغيرت شهادة الخادم منذ آخر مرة تم الوثوق بها. تابع فقط إذا كنت تتعرف على البصمة الجديدة."
   },
   "Theme & Colors": {
     "Theme & Colors": "المظهر والألوان"
@@ -7999,6 +8029,9 @@
   },
   "Theme color used for the widget outline": {
     "Theme color used for the widget outline": "لون السمة المستخدم لمخطط الأداة"
+  },
+  "Theme extracted to: %1": {
+    "Theme extracted to: %1": ""
   },
   "Theme worker failed (%1)": {
     "Theme worker failed (%1)": "فشل عامل السمة (%1)"
@@ -8086,6 +8119,9 @@
   },
   "Time & Weather": {
     "Time & Weather": "الوقت والطقس"
+  },
+  "Time First": {
+    "Time First": ""
   },
   "Time Format": {
     "Time Format": "تنسيق الوقت"
@@ -8214,10 +8250,10 @@
     "Touch your security key...": "المس مفتاح الأمان الخاص بك..."
   },
   "Touchpad Settings": {
-    "Touchpad Settings": ""
+    "Touchpad Settings": "إعدادات لوحة اللمس"
   },
   "Touchpad Speed": {
-    "Touchpad Speed": ""
+    "Touchpad Speed": "سرعة لوحة اللمس"
   },
   "Transform": {
     "Transform": "تحويل"
@@ -8280,7 +8316,7 @@
     "Turn off now": "إيقاف التشغيل الآن"
   },
   "Two Finger": {
-    "Two Finger": ""
+    "Two Finger": "إصبعان"
   },
   "Type at least 2 characters": {
     "Type at least 2 characters": "اكتب حرفين على الأقل"
@@ -8424,7 +8460,7 @@
     "Untrust": "إلغاء حفظ"
   },
   "Untrusted VPN certificate": {
-    "Untrusted VPN certificate": ""
+    "Untrusted VPN certificate": "شهادة VPN غير موثوقة"
   },
   "Up to date": {
     "Up to date": "محدث"
@@ -8928,7 +8964,7 @@
     "Window Height": "ارتفاع النافذة"
   },
   "Window Opacity": {
-    "Window Opacity": ""
+    "Window Opacity": "عتامة النافذة"
   },
   "Window Opening": {
     "Window Opening": "فتح النافذة"
@@ -8976,7 +9012,7 @@
     "X-Ray": "الأشعة السينية (X-Ray)"
   },
   "XKB Options": {
-    "XKB Options": ""
+    "XKB Options": "خيارات XKB"
   },
   "XWayland": {
     "XWayland": "XWayland"
@@ -9036,7 +9072,7 @@
     "attached": "متصل"
   },
   "below AA": {
-    "below AA": ""
+    "below AA": "أقل من AA"
   },
   "brandon": {
     "brandon": "brandon"

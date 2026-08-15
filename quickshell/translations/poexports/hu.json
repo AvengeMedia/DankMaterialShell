@@ -519,7 +519,7 @@
     "Advanced": "Speciális"
   },
   "Advanced comma-separated libxkbcommon options.": {
-    "Advanced comma-separated libxkbcommon options.": ""
+    "Advanced comma-separated libxkbcommon options.": "Haladó vesszővel elválasztott libxkbcommon opciók."
   },
   "Afternoon": {
     "Afternoon": "Délután"
@@ -564,7 +564,7 @@
     "Also group repeated application icons on the active workspace": "Az ismétlődő alkalmazásikonok csoportosítása az aktív munkaterületen is"
   },
   "Alt + Shift": {
-    "Alt + Shift": ""
+    "Alt + Shift": "Alt + Shift"
   },
   "Alternative (OR)": {
     "Alternative (OR)": "Alternatív (VAGY)"
@@ -669,7 +669,7 @@
     "Appearance": "Megjelenés"
   },
   "Apple Music animated covers": {
-    "Apple Music animated covers": ""
+    "Apple Music animated covers": "Apple Music animált borítók"
   },
   "Application": {
     "Application": "Alkalmazás"
@@ -954,7 +954,7 @@
     "Automatically save changes to opened files as you type": "A megnyitott fájlok módosításainak automatikus mentése gépelés közben"
   },
   "Automatically turn on Num Lock at startup": {
-    "Automatically turn on Num Lock at startup": ""
+    "Automatically turn on Num Lock at startup": "Num Lock automatikus bekapcsolása indításkor"
   },
   "Automatically turn on Power Saver profile when battery is low.": {
     "Automatically turn on Power Saver profile when battery is low.": "Automatikusan bekapcsolja az energiatakarékos profilt, ha az akkumulátor töltöttsége alacsony."
@@ -1011,7 +1011,7 @@
     "Background Effect": "Háttéreffektus"
   },
   "Background Opacity": {
-    "Background Opacity": "Háttér átlátszósága"
+    "Background Opacity": "Háttér átlátszatlansága"
   },
   "Background authentication sync failed. Trying terminal mode.": {
     "Background authentication sync failed. Trying terminal mode.": "A háttérbeli hitelesítési szinkronizálás sikertelen. Próbálkozás terminál módban."
@@ -1044,7 +1044,7 @@
     "Bar Inset Padding": "Sáv belső margója"
   },
   "Bar Opacity": {
-    "Bar Opacity": "Sáv átlátszósága"
+    "Bar Opacity": "Sáv átlátszatlansága"
   },
   "Bar Shadows": {
     "Bar Shadows": "Sáv árnyékai"
@@ -1059,7 +1059,7 @@
     "Bar shadow, border, and corners": "Sáv árnyék, szegély és sarkok"
   },
   "Base color for shadows (opacity is applied automatically)": {
-    "Base color for shadows (opacity is applied automatically)": "Az árnyékok alapszíne (az áttetszőség automatikusan alkalmazva)"
+    "Base color for shadows (opacity is applied automatically)": "Az árnyékok alapszíne (az átlátszatlanság automatikusan alkalmazva)"
   },
   "Base duration for animations (drag to use Custom)": {
     "Base duration for animations (drag to use Custom)": "Animációk alapértelmezett időtartama (húzd az egyéni beállításhoz)"
@@ -1149,7 +1149,7 @@
     "Blur on Overview": "Elmosás az áttekintésben"
   },
   "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support. Adjust Opacity accordingly.": {
-    "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support. Adjust Opacity accordingly.": "Háttér elmosása a sávok, felugrók, modális ablakok és értesítések mögött. Kompozitor támogatás szükséges hozzá. Állítsa be az átlátszóságot ennek megfelelően."
+    "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support. Adjust Opacity accordingly.": "Háttér elmosása a sávok, felugrók, modális ablakok és értesítések mögött. Kompozitor támogatás szükséges hozzá. Állítsd be az átlátszatlanságot ennek megfelelően."
   },
   "Blur wallpaper when niri overview is open": {
     "Blur wallpaper when niri overview is open": "Háttérkép elmosása, ha a niri-áttekintés nyitva van"
@@ -1176,7 +1176,7 @@
     "Border Off": "Keret kikapcsolva"
   },
   "Border Opacity": {
-    "Border Opacity": "Szegély átlátszósága"
+    "Border Opacity": "Szegély átlátszatlansága"
   },
   "Border Radius": {
     "Border Radius": "Szegély lekerekítése"
@@ -1368,7 +1368,7 @@
     "Channel": "Csatorna"
   },
   "Characters per second while holding down key": {
-    "Characters per second while holding down key": ""
+    "Characters per second while holding down key": "Karakterek másodpercenként billentyű nyomva tartásakor"
   },
   "Charge Level": {
     "Charge Level": "Töltési szint"
@@ -1425,7 +1425,7 @@
     "Choose a power profile": "Válassz egy energiagazdálkodási profilt"
   },
   "Choose a shortcut key to cycle between keyboard layouts": {
-    "Choose a shortcut key to cycle between keyboard layouts": ""
+    "Choose a shortcut key to cycle between keyboard layouts": "Válassz egy billentyűparancsot a billentyűzetkiosztások közötti váltáshoz"
   },
   "Choose colors from palette": {
     "Choose colors from palette": "Színek választása a palettáról"
@@ -1665,7 +1665,7 @@
     "Column Width": "Oszlopszélesség"
   },
   "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": {
-    "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": ""
+    "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": "Vesszővel elválasztott kiosztásnevek listája. Hagyd üresen a rendszer billentyűzetbeállításainak használatához."
   },
   "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": {
     "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": "Vesszővel elválasztott lista az elrejtendő munkamenet-nevekről. Reguláris kifejezésekhez (regex) tedd perjelek közé (például /^_.*/)."
@@ -1851,7 +1851,7 @@
     "Controls how strongly the selected tint color is applied": "Szabályozza, hogy a kiválasztott árnyalat mennyire erősen legyen alkalmazva"
   },
   "Controls opacity of shell surfaces, popouts, and modals": {
-    "Controls opacity of shell surfaces, popouts, and modals": "A shell felületek, felugrók és modális ablakok átlátszóságát szabályozza"
+    "Controls opacity of shell surfaces, popouts, and modals": "A shell felületek, felugrók és modális ablakok átlátszatlanságát szabályozza"
   },
   "Controls outlines around foreground cards, pills, and notification cards": {
     "Controls outlines around foreground cards, pills, and notification cards": "Az előtérben lévő kártyák, tabletták és értesítési kártyák körüli körvonalakat szabályozza"
@@ -1977,10 +1977,10 @@
     "Critical Threshold": "Kritikus küszöbérték"
   },
   "Ctrl + Shift": {
-    "Ctrl + Shift": ""
+    "Ctrl + Shift": "Ctrl + Shift"
   },
   "Ctrl+%1 is used for password editing": {
-    "Ctrl+%1 is used for password editing": ""
+    "Ctrl+%1 is used for password editing": "A Ctrl+%1 jelszószerkesztésre szolgál"
   },
   "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": {
     "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": "Ctrl+A: Összes kijelölése • Ctrl+P: Előnézet • Enter/Shift+Enter: Következő/Előző keresése • Esc: Bezárás"
@@ -2052,7 +2052,7 @@
     "Custom": "Egyéni"
   },
   "Custom / None": {
-    "Custom / None": ""
+    "Custom / None": "Egyéni / Nincs"
   },
   "Custom Blend": {
     "Custom Blend": "Egyéni keverék"
@@ -2148,7 +2148,7 @@
     "DMS Shortcuts": "DMS-gyorsbillentyűk"
   },
   "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.": {
-    "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.": ""
+    "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.": "A DMS egy nagymértékben testreszabható modern asztali héj, amelyet a %1 ihletett.<br/><br/>A %2 QT6 keretrendszerrel épült asztali héjak létrehozásához, és a %3 statikusan típusos, fordított programozási nyelvvel."
   },
   "DMS out of date": {
     "DMS out of date": "A DMS elavult"
@@ -2218,6 +2218,9 @@
   },
   "Darken Modal Background": {
     "Darken Modal Background": "Kizárólagos ablak hátterének sötétítése"
+  },
+  "Date First": {
+    "Date First": ""
   },
   "Date Format": {
     "Date Format": "Dátumformátum"
@@ -2295,7 +2298,7 @@
     "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": "Del: Törlés • Shift+Del: Összes törlése • 1-9: Műveletek • F10: Súgó • Esc: Bezárás"
   },
   "Delay before characters start repeating": {
-    "Delay before characters start repeating": ""
+    "Delay before characters start repeating": "Késleltetés a karakterek ismétlésének megkezdése előtt"
   },
   "Delete": {
     "Delete": "Törlés"
@@ -2400,7 +2403,7 @@
     "Digital": "Digitális"
   },
   "Direct path to a .xkb keymap file. Overrides layouts/variants above.": {
-    "Direct path to a .xkb keymap file. Overrides layouts/variants above.": ""
+    "Direct path to a .xkb keymap file. Overrides layouts/variants above.": "Közvetlen elérési út egy .xkb billentyűkiosztás-fájlhoz. Felülírja a fenti kiosztásokat/változatokat."
   },
   "Direction Source": {
     "Direction Source": "Irány forrása"
@@ -2568,10 +2571,10 @@
     "Dock & Launcher": "Dokk és indító"
   },
   "Dock Opacity": {
-    "Dock Opacity": "Dokk átlátszósága"
+    "Dock Opacity": "Dokk átlátszatlansága"
   },
   "Dock margin, opacity, and border": {
-    "Dock margin, opacity, and border": "Dokk margója, átlátszósága és szegélye"
+    "Dock margin, opacity, and border": "Dokk margója, átlátszatlansága és szegélye"
   },
   "Dock window": {
     "Dock window": "Dokkablak"
@@ -2739,7 +2742,7 @@
     "Enable History": "Előzmények engedélyezése"
   },
   "Enable Num Lock": {
-    "Enable Num Lock": ""
+    "Enable Num Lock": "Num Lock engedélyezése"
   },
   "Enable Overview Overlay": {
     "Enable Overview Overlay": "Áttekintő átfedés engedélyezése"
@@ -2763,7 +2766,7 @@
     "Enable WiFi before starting the hotspot.": "Engedélyezd a Wi-Fi-t a hotspot indítása előtt."
   },
   "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": {
-    "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": "Engedélyezd az egyéni felülbírálást alább a sávonkénti árnyékintenzitás, áttetszőség és szín beállításához."
+    "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": "Engedélyezd az egyéni felülbírálást alább a sávonkénti árnyékintenzitás, átlátszatlanság és szín beállításához."
   },
   "Enable compositor-targetable blur layer (namespace: dms:blurwallpaper). Requires manual niri configuration.": {
     "Enable compositor-targetable blur layer (namespace: dms:blurwallpaper). Requires manual niri configuration.": "Kompozitor által célozható elmosási réteg engedélyezése (névtér: dms:blurwallpaper). Kézi niri konfigurációt igényel."
@@ -2948,6 +2951,9 @@
   "Extra Light": {
     "Extra Light": "Extra vékony"
   },
+  "Extract theme to JSON": {
+    "Extract theme to JSON": ""
+  },
   "Fade": {
     "Fade": "Elhalványítás"
   },
@@ -3046,6 +3052,9 @@
   },
   "Failed to enable night mode": {
     "Failed to enable night mode": "Nem sikerült engedélyezni az éjszakai módot"
+  },
+  "Failed to extract theme": {
+    "Failed to extract theme": ""
   },
   "Failed to fetch network QR code: %1": {
     "Failed to fetch network QR code: %1": "Nem sikerült lekérni a hálózati QR-kódot: %1"
@@ -3363,10 +3372,10 @@
     "Floating Position": "Lebegő pozíció"
   },
   "Floating Windows": {
-    "Floating Windows": ""
+    "Floating Windows": "Lebegő ablakok"
   },
   "Floating windows follow Surface Styling settings": {
-    "Floating windows follow Surface Styling settings": ""
+    "Floating windows follow Surface Styling settings": "A lebegő ablakok követik a Felületi stílus beállításait"
   },
   "Fluent": {
     "Fluent": "Fluent"
@@ -3498,7 +3507,7 @@
     "Foreground Layers": "Előtér rétegek"
   },
   "Foreground Opacity": {
-    "Foreground Opacity": ""
+    "Foreground Opacity": "Előtér átlátszatlansága"
   },
   "Forever": {
     "Forever": "Örökké"
@@ -3627,7 +3636,7 @@
     "Generate Override": "Felülbírálás létrehozása"
   },
   "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
-    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
+    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": "Alapszintű GTK3/4 vagy QT5/QT6 (qt6ct-kde szükséges) konfigurációk generálása a DMS színeinek követéséhez. Csak egyszer szükséges.<br /><br />Javasoljuk a %1 konfigurálását a GTK témák alkalmazása előtt."
   },
   "Generic": {
     "Generic": "Általános"
@@ -3645,7 +3654,7 @@
     "Global fonts can be configured in Settings → Personalization": "A globális betűtípusok a Beállítások → Személyre szabás menüpontban beállíthatók"
   },
   "Globally": {
-    "Globally": ""
+    "Globally": "Globálisan"
   },
   "Globally scale all animation durations": {
     "Globally scale all animation durations": "Az összes animáció időtartamának globális méretezése"
@@ -3945,7 +3954,7 @@
     "Hover Popouts": "Lebegő felugró ablakok"
   },
   "How layout changes are remembered across apps": {
-    "How layout changes are remembered across apps": ""
+    "How layout changes are remembered across apps": "Hogyan jegyezze meg a kiosztásváltozásokat az alkalmazások között"
   },
   "How often the server polls for new updates.": {
     "How often the server polls for new updates.": "Milyen gyakran kérdezze le a szerver az új frissítéseket."
@@ -4289,6 +4298,9 @@
   "Keep in Bar": {
     "Keep in Bar": "Megtartás a sávban"
   },
+  "Keep pinned apps as launchers and show running windows separately": {
+    "Keep pinned apps as launchers and show running windows separately": ""
+  },
   "Keep the clipboard type filter when reopening history": {
     "Keep the clipboard type filter when reopening history": "Vágólap típusának szűrőjének megjegyzése az előzmények újbóli megnyitásakor"
   },
@@ -4305,7 +4317,7 @@
     "Key": "Billentyű"
   },
   "Key combination": {
-    "Key combination": ""
+    "Key combination": "Billentyűkombináció"
   },
   "Keybind Sources": {
     "Keybind Sources": "Gyorsbillentyű-források"
@@ -4320,31 +4332,31 @@
     "Keybinds shown alongside regular search results": "Gyorsbillentyűk megjelenítése a normál keresési eredmények mellett"
   },
   "Keyboard": {
-    "Keyboard": ""
+    "Keyboard": "Billentyűzet"
   },
   "Keyboard Behavior": {
-    "Keyboard Behavior": ""
+    "Keyboard Behavior": "Billentyűzet viselkedése"
   },
   "Keyboard Layout Name": {
     "Keyboard Layout Name": "Billentyűzetkiosztás neve"
   },
   "Keyboard Layouts": {
-    "Keyboard Layouts": ""
+    "Keyboard Layouts": "Billentyűzetkiosztások"
   },
   "Keyboard Model": {
-    "Keyboard Model": ""
+    "Keyboard Model": "Billentyűzetmodell"
   },
   "Keyboard Shortcuts": {
     "Keyboard Shortcuts": "Gyorsbillentyűk"
   },
   "Keyboard Variant": {
-    "Keyboard Variant": ""
+    "Keyboard Variant": "Billentyűzetváltozat"
   },
   "Keyboard shortcut to start security key unlock": {
-    "Keyboard shortcut to start security key unlock": ""
+    "Keyboard shortcut to start security key unlock": "Gyorsbillentyű a biztonsági kulcs feloldásának indításához"
   },
   "Keymap File Path": {
-    "Keymap File Path": ""
+    "Keymap File Path": "Billentyűkiosztás-fájl elérési útja"
   },
   "Keys": {
     "Keys": "Billentyűk"
@@ -4590,7 +4602,7 @@
     "MAC": "MAC"
   },
   "MIT License": {
-    "MIT License": ""
+    "MIT License": "MIT licenc"
   },
   "MTU": {
     "MTU": "MTU"
@@ -4876,6 +4888,9 @@
   },
   "Minimal palette built around a single hue.": {
     "Minimal palette built around a single hue.": "Minimális paletta, amely egyetlen árnyalat köré épül."
+  },
+  "Minimize": {
+    "Minimize": ""
   },
   "Minute": {
     "Minute": "Perc"
@@ -5592,16 +5607,16 @@
     "Only visible if hibernate is supported by your system": "Csak akkor látható, ha a hibernálás támogatott a rendszeren"
   },
   "Opacity": {
-    "Opacity": "Átlátszóság"
+    "Opacity": "Átlátszatlanság"
   },
   "Opacity of cards and nested surfaces inside floating windows": {
-    "Opacity of cards and nested surfaces inside floating windows": ""
+    "Opacity of cards and nested surfaces inside floating windows": "Kártyák és beágyazott felületek átlátszatlansága a lebegő ablakokon belül"
   },
   "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts": {
-    "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts": ""
+    "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts": "Lebegő DMS-ablakok (pl. Beállítások, Jegyzettömb és hitelesítési ablakok) átlátszatlansága"
   },
   "Opacity of foreground cards and nested surfaces on shell panels": {
-    "Opacity of foreground cards and nested surfaces on shell panels": ""
+    "Opacity of foreground cards and nested surfaces on shell panels": "Előtér kártyák és beágyazott felületek átlátszatlansága a héj panelein"
   },
   "Opaque": {
     "Opaque": "Átlátszatlan"
@@ -5613,7 +5628,7 @@
     "Open App": "Alkalmazás megnyitása"
   },
   "Open DMS windows floating instead of tiled": {
-    "Open DMS windows floating instead of tiled": ""
+    "Open DMS windows floating instead of tiled": "DMS-ablakok megnyitása lebegőként a csempézett helyett"
   },
   "Open Delay": {
     "Open Delay": "Megnyitási késleltetés"
@@ -5637,7 +5652,7 @@
     "Open Trash With": "Kuka megnyitása ezzel:"
   },
   "Open Windows Floating": {
-    "Open Windows Floating": ""
+    "Open Windows Floating": "Ablakok megnyitása lebegőként"
   },
   "Open a new note": {
     "Open a new note": "Új jegyzet megnyitása"
@@ -5760,7 +5775,7 @@
     "Override Corner Radius": "Sarokkerekítés felülbírálása"
   },
   "Override floating window transparency for Notepad": {
-    "Override floating window transparency for Notepad": ""
+    "Override floating window transparency for Notepad": "Lebegő ablak átlátszóságának felülírása a Jegyzettömbnél"
   },
   "Override global layout settings for this output": {
     "Override global layout settings for this output": "Globális elrendezési beállítások felülbírálása ehhez a kimenethez"
@@ -5895,7 +5910,7 @@
     "Pending Discharge": "Függőben lévő merülés"
   },
   "Per Window": {
-    "Per Window": ""
+    "Per Window": "Ablakonként"
   },
   "Per-Mode Wallpapers": {
     "Per-Mode Wallpapers": "Módonkénti háttérképek"
@@ -5959,6 +5974,9 @@
   },
   "Place a trash bin at the end of the dock": {
     "Place a trash bin at the end of the dock": "Kuka elhelyezése a dokk végén"
+  },
+  "Place clipboard history on the Wayland overlay layer": {
+    "Place clipboard history on the Wayland overlay layer": ""
   },
   "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
     "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "Helyezd ide a bővítménykönyvtárakat. Minden bővítménynek rendelkeznie kell egy plugin.json fájllal."
@@ -6159,7 +6177,7 @@
     "Press Ctrl+N or click 'New Session' to create one": "Nyomd meg a Ctrl+N billentyűkombinációt vagy kattints az „Új munkamenet” gombra a létrehozásához"
   },
   "Press Ctrl+key to set. Esc cancels.": {
-    "Press Ctrl+key to set. Esc cancels.": ""
+    "Press Ctrl+key to set. Esc cancels.": "Nyomd meg a Ctrl+billentyűt a beállításhoz. Az Esc megszakítja a kiválasztást."
   },
   "Press Enter and the audio system will restart to apply the change": {
     "Press Enter and the audio system will restart to apply the change": "Nyomd meg az Enter gombot a hangrendszer újraindulásához és a módosítások alkalmazásához"
@@ -6348,7 +6366,7 @@
     "Random": "Véletlenszerű"
   },
   "Random Order": {
-    "Random Order": ""
+    "Random Order": "Véletlenszerű sorrend"
   },
   "Rate": {
     "Rate": "Sebesség"
@@ -6402,7 +6420,7 @@
     "Regex": "Regex"
   },
   "Registries": {
-    "Registries": ""
+    "Registries": "Regiszterek"
   },
   "Regular": {
     "Regular": "Normál"
@@ -6441,7 +6459,7 @@
     "Remember Last Query": "Utolsó lekérdezés megjegyzése"
   },
   "Remember Layout": {
-    "Remember Layout": ""
+    "Remember Layout": "Kiosztás megjegyzése"
   },
   "Remember Type Filter": {
     "Remember Type Filter": "Típusszűrő megjegyzése"
@@ -6516,10 +6534,10 @@
     "Repeat": "Ismétlés"
   },
   "Repeat Delay": {
-    "Repeat Delay": ""
+    "Repeat Delay": "Ismétlési késleltetés"
   },
   "Repeat Rate": {
-    "Repeat Rate": ""
+    "Repeat Rate": "Ismétlési sebesség"
   },
   "Replacement": {
     "Replacement": "Helyettesítés"
@@ -6603,10 +6621,13 @@
     "Restart the DankMaterialShell": "A DankMaterialShell újraindítása"
   },
   "Restart userspace without rebooting the kernel, requires systemd": {
-    "Restart userspace without rebooting the kernel, requires systemd": ""
+    "Restart userspace without rebooting the kernel, requires systemd": "Felhasználói tér újraindítása a kernel újraindítása nélkül, systemd szükséges hozzá"
   },
   "Restarting audio system...": {
     "Restarting audio system...": "Hangrendszer újraindítása…"
+  },
+  "Restore": {
+    "Restore": ""
   },
   "Restore Special Workspace Windows": {
     "Restore Special Workspace Windows": "Speciális munkaterület ablakainak visszaállítása"
@@ -6745,6 +6766,9 @@
   },
   "Save & Start": {
     "Save & Start": "Mentés és indítás"
+  },
+  "Save Extracted Theme": {
+    "Save Extracted Theme": ""
   },
   "Save Notepad File": {
     "Save Notepad File": "Jegyzettömb-fájl mentése"
@@ -6921,16 +6945,16 @@
     "Security Key PAM Source": "Biztonsági kulcs PAM forrás"
   },
   "Security key": {
-    "Security key": ""
+    "Security key": "Biztonsági kulcs"
   },
   "Security key (%1)": {
-    "Security key (%1)": ""
+    "Security key (%1)": "Biztonsági kulcs (%1)"
   },
   "Security key mode": {
     "Security key mode": "Biztonsági kulcs mód"
   },
   "Security key shortcut": {
-    "Security key shortcut": ""
+    "Security key shortcut": "Biztonsági kulcs gyorsbillentyű"
   },
   "Security-key availability could not be confirmed": {
     "Security-key availability could not be confirmed": "A biztonsági kulcs elérhetősége nem ellenőrizhető"
@@ -6978,7 +7002,7 @@
     "Select a desktop application": "Válassz ki egy asztali alkalmazást"
   },
   "Select a random wallpaper instead of cycling in alphabetical order": {
-    "Select a random wallpaper instead of cycling in alphabetical order": ""
+    "Select a random wallpaper instead of cycling in alphabetical order": "Véletlenszerű háttérkép kiválasztása az ábécé sorrend helyett"
   },
   "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": {
     "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": "Válassz ki egy widgetet az asztalhoz való hozzáadáshoz. Minden widget egy külön példány, saját beállításokkal."
@@ -7063,6 +7087,9 @@
   },
   "Separate Light & Dark Themes": {
     "Separate Light & Dark Themes": "Külön világos és sötét témák"
+  },
+  "Separate Pinned and Running Apps": {
+    "Separate Pinned and Running Apps": ""
   },
   "Separate appearance for unfocused displays is not supported on this compositor.": {
     "Separate appearance for unfocused displays is not supported on this compositor.": "A nem fókuszált kijelzők különálló megjelenése nem támogatott ezen a kompozitoron."
@@ -7350,7 +7377,7 @@
     "Show Seconds": "Másodpercek megjelenítése"
   },
   "Show Soft Reboot": {
-    "Show Soft Reboot": ""
+    "Show Soft Reboot": "Szoftveres újraindítás mutatása"
   },
   "Show Sunrise/Sunset": {
     "Show Sunrise/Sunset": "Napkelte/Napnyugta megjelenítése"
@@ -7434,7 +7461,7 @@
     "Show during Niri overview": "Megjelenítés a Niri áttekintő során"
   },
   "Show foreground surfaces on cards inside floating windows": {
-    "Show foreground surfaces on cards inside floating windows": ""
+    "Show foreground surfaces on cards inside floating windows": "Előtér felületek megjelenítése a kártyákon a lebegő ablakokon belül"
   },
   "Show foreground surfaces on notification cards": {
     "Show foreground surfaces on notification cards": "Előtérben lévő felületek megjelenítése az értesítési kártyákon"
@@ -7449,7 +7476,7 @@
     "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": "Indító átfedés megjelenítése, amikor gépelsz a Niri-áttekintésben. Tiltsd le, ha másik indítót használsz."
   },
   "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.": {
-    "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.": ""
+    "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.": "Ismétlődő videós albumképek megjelenítése az Apple Musicból, ha elérhetők. Elküldi a lejátszott előadót és az album nevét az Apple-nek."
   },
   "Show mode tabs and keyboard hints at the bottom.": {
     "Show mode tabs and keyboard hints at the bottom.": "Módlapok és billentyűzettippek megjelenítése alul."
@@ -7563,7 +7590,7 @@
     "Snow": "Hó"
   },
   "Soft Reboot": {
-    "Soft Reboot": ""
+    "Soft Reboot": "Szoftveres újraindítás"
   },
   "Some plugins require a newer version of DMS:": {
     "Some plugins require a newer version of DMS:": "Néhány bővítmény a DMS újabb verzióját igényli:"
@@ -7587,7 +7614,7 @@
     "Source: %1": "Forrás: %1"
   },
   "Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.": {
-    "Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.": ""
+    "Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.": "Bővítmények és témák forrásai. A regiszterek olyan git tárolók, amelyek rendelkeznek plugins/ vagy themes/ könyvtárral."
   },
   "Space between the bar and screen edges": {
     "Space between the bar and screen edges": "A sáv és a képernyő szélei közötti távolság"
@@ -7639,6 +7666,9 @@
   },
   "Start": {
     "Start": "Indítás"
+  },
+  "Start DankConnect, KDE Connect, or Valent to use this plugin": {
+    "Start DankConnect, KDE Connect, or Valent to use this plugin": ""
   },
   "Start Hotspot?": {
     "Start Hotspot?": "Elindítod a hotspotot?"
@@ -7704,7 +7734,7 @@
     "Sunset": "Napnyugta"
   },
   "Super + Space": {
-    "Super + Space": ""
+    "Super + Space": "Super + Szóköz"
   },
   "Suppress Duplicate Notifications": {
     "Suppress Duplicate Notifications": "Duplikált értesítések elnyomása"
@@ -7740,7 +7770,7 @@
     "Surface Opacity": "Felület átlátszatlansága"
   },
   "Surface Styling": {
-    "Surface Styling": ""
+    "Surface Styling": "Felület stílusa"
   },
   "Surface Text": {
     "Surface Text": "Felszíni szöveg"
@@ -7770,7 +7800,7 @@
     "Sway Website": "Sway weboldal"
   },
   "Switch Layout Shortcut": {
-    "Switch Layout Shortcut": ""
+    "Switch Layout Shortcut": "Kiosztásváltó gyorsbillentyű"
   },
   "Switch between display configurations": {
     "Switch between display configurations": "Váltás a kijelzőkonfigurációk között"
@@ -7818,7 +7848,7 @@
     "Sync to apply": "Szinkronizálás az alkalmazáshoz"
   },
   "Sync with Global Settings": {
-    "Sync with Global Settings": ""
+    "Sync with Global Settings": "Szinkronizálás a globális beállításokkal"
   },
   "Syncing...": {
     "Syncing...": "Szinkronizálás…"
@@ -7983,7 +8013,7 @@
     "The rule applies to any window matching one of these.": "A szabály minden olyan ablakra vonatkozik, amely megegyezik ezek valamelyikével."
   },
   "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": {
-    "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": "A szerver tanúsítványa megváltozott, amióta utoljára megbízott benne. Csak akkor folytassa, ha felismeri az új ujjlenyomatot."
+    "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": "A szervertanúsítvány megváltozott a legutóbbi megbízás óta. Csak akkor folytasd, ha felismered az új ujjlenyomatot."
   },
   "Theme & Colors": {
     "Theme & Colors": "Téma és színek"
@@ -7999,6 +8029,9 @@
   },
   "Theme color used for the widget outline": {
     "Theme color used for the widget outline": "A widget körvonalához használt témaszín"
+  },
+  "Theme extracted to: %1": {
+    "Theme extracted to: %1": ""
   },
   "Theme worker failed (%1)": {
     "Theme worker failed (%1)": "A témafolyamat sikertelen (%1)"
@@ -8086,6 +8119,9 @@
   },
   "Time & Weather": {
     "Time & Weather": "Idő és időjárás"
+  },
+  "Time First": {
+    "Time First": ""
   },
   "Time Format": {
     "Time Format": "Időformátum"
@@ -8424,7 +8460,7 @@
     "Untrust": "Nem megbízható"
   },
   "Untrusted VPN certificate": {
-    "Untrusted VPN certificate": "Nem megbízható VPN tanúsítvány"
+    "Untrusted VPN certificate": "Nem megbízható VPN-tanúsítvány"
   },
   "Up to date": {
     "Up to date": "Naprakész"
@@ -8862,7 +8898,7 @@
     "Widget Management": "Widgetkezelés"
   },
   "Widget Opacity": {
-    "Widget Opacity": "Widget átlátszósága"
+    "Widget Opacity": "Widget átlátszatlansága"
   },
   "Widget Outline": {
     "Widget Outline": "Widget körvonal"
@@ -8928,7 +8964,7 @@
     "Window Height": "Ablakmagasság"
   },
   "Window Opacity": {
-    "Window Opacity": ""
+    "Window Opacity": "Ablak átlátszatlansága"
   },
   "Window Opening": {
     "Window Opening": "Ablak megnyitása"
@@ -8976,7 +9012,7 @@
     "X-Ray": "Röntgen mód"
   },
   "XKB Options": {
-    "XKB Options": ""
+    "XKB Options": "XKB-beállítások"
   },
   "XWayland": {
     "XWayland": "XWayland"

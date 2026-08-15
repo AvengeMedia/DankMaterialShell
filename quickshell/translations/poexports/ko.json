@@ -2219,6 +2219,9 @@
   "Darken Modal Background": {
     "Darken Modal Background": "모달 배경 어둡게 하기"
   },
+  "Date First": {
+    "Date First": ""
+  },
   "Date Format": {
     "Date Format": "날짜 형식"
   },
@@ -2948,6 +2951,9 @@
   "Extra Light": {
     "Extra Light": "매우 얇게"
   },
+  "Extract theme to JSON": {
+    "Extract theme to JSON": ""
+  },
   "Fade": {
     "Fade": "페이드"
   },
@@ -3046,6 +3052,9 @@
   },
   "Failed to enable night mode": {
     "Failed to enable night mode": "야간 모드 활성화 실패"
+  },
+  "Failed to extract theme": {
+    "Failed to extract theme": ""
   },
   "Failed to fetch network QR code: %1": {
     "Failed to fetch network QR code: %1": "네트워크 QR 코드 가져오기 실패: %1"
@@ -4289,6 +4298,9 @@
   "Keep in Bar": {
     "Keep in Bar": "바에 유지"
   },
+  "Keep pinned apps as launchers and show running windows separately": {
+    "Keep pinned apps as launchers and show running windows separately": ""
+  },
   "Keep the clipboard type filter when reopening history": {
     "Keep the clipboard type filter when reopening history": "기록을 다시 열 때 클립보드 유형 필터 유지"
   },
@@ -4876,6 +4888,9 @@
   },
   "Minimal palette built around a single hue.": {
     "Minimal palette built around a single hue.": "단일 색조를 중심으로 구축된 미니멀한 팔레트."
+  },
+  "Minimize": {
+    "Minimize": ""
   },
   "Minute": {
     "Minute": "분"
@@ -5960,6 +5975,9 @@
   "Place a trash bin at the end of the dock": {
     "Place a trash bin at the end of the dock": "독 끝에 휴지통 배치"
   },
+  "Place clipboard history on the Wayland overlay layer": {
+    "Place clipboard history on the Wayland overlay layer": ""
+  },
   "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
     "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "여기에 플러그인 디렉터리를 배치하세요. 각 플러그인에는 plugin.json 매니페스트 파일이 있어야 합니다."
   },
@@ -6608,6 +6626,9 @@
   "Restarting audio system...": {
     "Restarting audio system...": "오디오 시스템 다시 시작 중..."
   },
+  "Restore": {
+    "Restore": ""
+  },
   "Restore Special Workspace Windows": {
     "Restore Special Workspace Windows": "특수 작업 공간 창 복원"
   },
@@ -6745,6 +6766,9 @@
   },
   "Save & Start": {
     "Save & Start": ""
+  },
+  "Save Extracted Theme": {
+    "Save Extracted Theme": ""
   },
   "Save Notepad File": {
     "Save Notepad File": "노트패드 파일 저장"
@@ -7063,6 +7087,9 @@
   },
   "Separate Light & Dark Themes": {
     "Separate Light & Dark Themes": "별도의 라이트 및 다크 테마"
+  },
+  "Separate Pinned and Running Apps": {
+    "Separate Pinned and Running Apps": ""
   },
   "Separate appearance for unfocused displays is not supported on this compositor.": {
     "Separate appearance for unfocused displays is not supported on this compositor.": "이 컴포지터에서는 포커스되지 않은 디스플레이에 대한 별도의 모양이 지원되지 않습니다."
@@ -7640,6 +7667,9 @@
   "Start": {
     "Start": "시작"
   },
+  "Start DankConnect, KDE Connect, or Valent to use this plugin": {
+    "Start DankConnect, KDE Connect, or Valent to use this plugin": ""
+  },
   "Start Hotspot?": {
     "Start Hotspot?": ""
   },
@@ -8000,6 +8030,9 @@
   "Theme color used for the widget outline": {
     "Theme color used for the widget outline": "테마 색상이 위젯 윤곽선에 사용됨"
   },
+  "Theme extracted to: %1": {
+    "Theme extracted to: %1": ""
+  },
   "Theme worker failed (%1)": {
     "Theme worker failed (%1)": "테마 작업자 실패(%1)"
   },
@@ -8086,6 +8119,9 @@
   },
   "Time & Weather": {
     "Time & Weather": "시간 및 날짜"
+  },
+  "Time First": {
+    "Time First": ""
   },
   "Time Format": {
     "Time Format": "시간 형식"

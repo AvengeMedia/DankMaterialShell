@@ -5180,6 +5180,13 @@
     "comment": ""
   },
   {
+    "term": "Date First",
+    "translation": "",
+    "context": "Date First",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Date Format",
     "translation": "",
     "context": "Date Format",
@@ -6895,6 +6902,13 @@
     "comment": "font weight"
   },
   {
+    "term": "Extract theme to JSON",
+    "translation": "",
+    "context": "Extract theme to JSON",
+    "reference": "",
+    "comment": "extract theme tooltip"
+  },
+  {
     "term": "Fade",
     "translation": "",
     "context": "Fade",
@@ -7117,6 +7131,13 @@
     "context": "Failed to enable night mode",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Failed to extract theme",
+    "translation": "",
+    "context": "Failed to extract theme",
+    "reference": "",
+    "comment": "extract theme error"
   },
   {
     "term": "Failed to fetch network QR code: %1",
@@ -9989,6 +10010,13 @@
     "comment": ""
   },
   {
+    "term": "Keep pinned apps as launchers and show running windows separately",
+    "translation": "",
+    "context": "Keep pinned apps as launchers and show running windows separately",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Keep the clipboard type filter when reopening history",
     "translation": "",
     "context": "Keep the clipboard type filter when reopening history",
@@ -11364,6 +11392,13 @@
     "term": "Minimal palette built around a single hue.",
     "translation": "",
     "context": "Minimal palette built around a single hue.",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Minimize",
+    "translation": "",
+    "context": "Minimize",
     "reference": "",
     "comment": ""
   },
@@ -13902,6 +13937,13 @@
     "comment": ""
   },
   {
+    "term": "Place clipboard history on the Wayland overlay layer",
+    "translation": "",
+    "context": "Place clipboard history on the Wayland overlay layer",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Place plugin directories here. Each plugin should have a plugin.json manifest file.",
     "translation": "",
     "context": "Place plugin directories here. Each plugin should have a plugin.json manifest file.",
@@ -15435,6 +15477,13 @@
     "comment": "Loading overlay while WirePlumber restarts"
   },
   {
+    "term": "Restore",
+    "translation": "",
+    "context": "Restore",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Restore Special Workspace Windows",
     "translation": "",
     "context": "Restore Special Workspace Windows",
@@ -15762,6 +15811,13 @@
     "context": "Save & Start",
     "reference": "",
     "comment": "save and start hotspot action"
+  },
+  {
+    "term": "Save Extracted Theme",
+    "translation": "",
+    "context": "Save Extracted Theme",
+    "reference": "",
+    "comment": "extract theme save dialog title"
   },
   {
     "term": "Save Notepad File",
@@ -16509,6 +16565,13 @@
     "term": "Separate Light & Dark Themes",
     "translation": "",
     "context": "Separate Light & Dark Themes",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Separate Pinned and Running Apps",
+    "translation": "",
+    "context": "Separate Pinned and Running Apps",
     "reference": "",
     "comment": ""
   },
@@ -17871,18 +17934,18 @@
     "comment": "hotspot start confirmation action | start hotspot action"
   },
   {
+    "term": "Start DankConnect, KDE Connect, or Valent to use this plugin",
+    "translation": "",
+    "context": "Start DankConnect, KDE Connect, or Valent to use this plugin",
+    "reference": "",
+    "comment": "Phone Connect daemon hint"
+  },
+  {
     "term": "Start Hotspot?",
     "translation": "",
     "context": "Start Hotspot?",
     "reference": "",
     "comment": "hotspot start confirmation title"
-  },
-  {
-    "term": "Start KDE Connect or Valent to use this plugin",
-    "translation": "",
-    "context": "Start KDE Connect or Valent to use this plugin",
-    "reference": "",
-    "comment": "Phone Connect daemon hint"
   },
   {
     "term": "Start typing your notes here...",
@@ -18634,13 +18697,6 @@
     "comment": ""
   },
   {
-    "term": "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.",
-    "translation": "",
-    "context": "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.",
-    "reference": "",
-    "comment": "dgop unavailable error message"
-  },
-  {
     "term": "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.",
     "translation": "",
     "context": "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.",
@@ -18723,6 +18779,13 @@
     "context": "Theme color used for the widget outline",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Theme extracted to: %1",
+    "translation": "",
+    "context": "Theme extracted to: %1",
+    "reference": "",
+    "comment": "extract theme success"
   },
   {
     "term": "Theme worker failed (%1)",
@@ -18924,6 +18987,13 @@
     "term": "Time & Weather",
     "translation": "",
     "context": "Time & Weather",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Time First",
+    "translation": "",
+    "context": "Time First",
     "reference": "",
     "comment": ""
   },
@@ -19856,7 +19926,7 @@
     "translation": "",
     "context": "Use Overlay Layer",
     "reference": "",
-    "comment": "bar layer toggle: use Wayland overlay layer | dock layer toggle: use Wayland overlay layer | launcher layer toggle: use Wayland overlay layer"
+    "comment": "bar layer toggle: use Wayland overlay layer | clipboard layer toggle: use Wayland overlay layer | dock layer toggle: use Wayland overlay layer | launcher layer toggle: use Wayland overlay layer"
   },
   {
     "term": "Use System Theme",

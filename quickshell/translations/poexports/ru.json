@@ -2219,6 +2219,9 @@
   "Darken Modal Background": {
     "Darken Modal Background": "Затемнение фона модальных окон"
   },
+  "Date First": {
+    "Date First": ""
+  },
   "Date Format": {
     "Date Format": "Формат даты"
   },
@@ -2948,6 +2951,9 @@
   "Extra Light": {
     "Extra Light": "Сверхсветлый"
   },
+  "Extract theme to JSON": {
+    "Extract theme to JSON": ""
+  },
   "Fade": {
     "Fade": "Затухание"
   },
@@ -3046,6 +3052,9 @@
   },
   "Failed to enable night mode": {
     "Failed to enable night mode": "Не удалось включить ночной режим"
+  },
+  "Failed to extract theme": {
+    "Failed to extract theme": ""
   },
   "Failed to fetch network QR code: %1": {
     "Failed to fetch network QR code: %1": "Не удалось получить QR-код сети: %1"
@@ -4289,6 +4298,9 @@
   "Keep in Bar": {
     "Keep in Bar": "Оставить на панели"
   },
+  "Keep pinned apps as launchers and show running windows separately": {
+    "Keep pinned apps as launchers and show running windows separately": ""
+  },
   "Keep the clipboard type filter when reopening history": {
     "Keep the clipboard type filter when reopening history": "Сохранять фильтр типа буфера обмена при повторном открытии истории"
   },
@@ -4876,6 +4888,9 @@
   },
   "Minimal palette built around a single hue.": {
     "Minimal palette built around a single hue.": "Минимальная палитра, встроенная вокруг одного оттенка."
+  },
+  "Minimize": {
+    "Minimize": ""
   },
   "Minute": {
     "Minute": "Минута"
@@ -5960,6 +5975,9 @@
   "Place a trash bin at the end of the dock": {
     "Place a trash bin at the end of the dock": "Разместить корзину в конце дока"
   },
+  "Place clipboard history on the Wayland overlay layer": {
+    "Place clipboard history on the Wayland overlay layer": ""
+  },
   "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
     "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "Поместите каталоги дополнений здесь. Каждое дополнение должно иметь файл plugin.json в качестве манифеста."
   },
@@ -6608,6 +6626,9 @@
   "Restarting audio system...": {
     "Restarting audio system...": "Перезапуск аудиосистемы..."
   },
+  "Restore": {
+    "Restore": ""
+  },
   "Restore Special Workspace Windows": {
     "Restore Special Workspace Windows": "Восстановить окна специального рабочего пространства"
   },
@@ -6745,6 +6766,9 @@
   },
   "Save & Start": {
     "Save & Start": "Сохранить и запустить"
+  },
+  "Save Extracted Theme": {
+    "Save Extracted Theme": ""
   },
   "Save Notepad File": {
     "Save Notepad File": "Сохранить Файл Блокнота"
@@ -7063,6 +7087,9 @@
   },
   "Separate Light & Dark Themes": {
     "Separate Light & Dark Themes": "Раздельные светлая и тёмная темы"
+  },
+  "Separate Pinned and Running Apps": {
+    "Separate Pinned and Running Apps": ""
   },
   "Separate appearance for unfocused displays is not supported on this compositor.": {
     "Separate appearance for unfocused displays is not supported on this compositor.": "Раздельный внешний вид для неактивных мониторов не поддерживается этим композитором."
@@ -7640,6 +7667,9 @@
   "Start": {
     "Start": "Старт"
   },
+  "Start DankConnect, KDE Connect, or Valent to use this plugin": {
+    "Start DankConnect, KDE Connect, or Valent to use this plugin": ""
+  },
   "Start Hotspot?": {
     "Start Hotspot?": "Запустить точку доступа?"
   },
@@ -8000,6 +8030,9 @@
   "Theme color used for the widget outline": {
     "Theme color used for the widget outline": "Цвет темы, используемый для контура виджета"
   },
+  "Theme extracted to: %1": {
+    "Theme extracted to: %1": ""
+  },
   "Theme worker failed (%1)": {
     "Theme worker failed (%1)": "Сбой обработчика темы (%1)"
   },
@@ -8086,6 +8119,9 @@
   },
   "Time & Weather": {
     "Time & Weather": "Время & Погода"
+  },
+  "Time First": {
+    "Time First": ""
   },
   "Time Format": {
     "Time Format": "Формат времени"

@@ -333,7 +333,7 @@
     "About": "关于"
   },
   "Acceleration Profile": {
-    "Acceleration Profile": ""
+    "Acceleration Profile": "加速配置"
   },
   "Accent Color": {
     "Accent Color": "强调色"
@@ -411,7 +411,7 @@
     "Adapters": "适配器"
   },
   "Adaptive": {
-    "Adaptive": ""
+    "Adaptive": "自适应"
   },
   "Adaptive Media Width": {
     "Adaptive Media Width": "自适应媒体宽度"
@@ -489,10 +489,10 @@
     "Add to Autostart": "添加到自启动"
   },
   "Adjust pointer sensitivity speed": {
-    "Adjust pointer sensitivity speed": ""
+    "Adjust pointer sensitivity speed": "调整鼠标指针灵敏度"
   },
   "Adjust scrolling sensitivity multiplier": {
-    "Adjust scrolling sensitivity multiplier": ""
+    "Adjust scrolling sensitivity multiplier": "调整滚轮敏感度"
   },
   "Adjust the bar height via inner padding": {
     "Adjust the bar height via inner padding": "通过内边距调整状态栏高度"
@@ -501,7 +501,7 @@
     "Adjust the number of columns in grid view mode.": "调整网格视图模式中的列数"
   },
   "Adjust touchpad pointer speed": {
-    "Adjust touchpad pointer speed": ""
+    "Adjust touchpad pointer speed": "调整触摸板指针速度"
   },
   "Adjust volume per scroll indent": {
     "Adjust volume per scroll indent": "每滚动一格调节的音量"
@@ -519,7 +519,7 @@
     "Advanced": "高级"
   },
   "Advanced comma-separated libxkbcommon options.": {
-    "Advanced comma-separated libxkbcommon options.": ""
+    "Advanced comma-separated libxkbcommon options.": "高级的逗号分隔的 libxkbcommon 选项"
   },
   "Afternoon": {
     "Afternoon": "下午"
@@ -564,7 +564,7 @@
     "Also group repeated application icons on the active workspace": "在当前活动工作区对重复应用图标分组"
   },
   "Alt + Shift": {
-    "Alt + Shift": ""
+    "Alt + Shift": "Alt + Shift"
   },
   "Alternative (OR)": {
     "Alternative (OR)": "备选（或）"
@@ -669,7 +669,7 @@
     "Appearance": "外观"
   },
   "Apple Music animated covers": {
-    "Apple Music animated covers": ""
+    "Apple Music animated covers": "苹果音乐动态封面"
   },
   "Application": {
     "Application": "应用程序"
@@ -867,7 +867,7 @@
     "Auto saved": "已自动保存"
   },
   "Auto uses an installed or bundled key-only service.": {
-    "Auto uses an installed or bundled key-only service.": "自动使用已安装或随附的仅密钥服务。"
+    "Auto uses an installed or bundled key-only service.": "自动使用已安装或随附的仅密钥服务"
   },
   "Auto-Clear After": {
     "Auto-Clear After": "自动清除"
@@ -954,7 +954,7 @@
     "Automatically save changes to opened files as you type": "键入时自动保存变更"
   },
   "Automatically turn on Num Lock at startup": {
-    "Automatically turn on Num Lock at startup": ""
+    "Automatically turn on Num Lock at startup": "启动时自动开启数字锁"
   },
   "Automatically turn on Power Saver profile when battery is low.": {
     "Automatically turn on Power Saver profile when battery is low.": "低电量时自动启用省电配置"
@@ -1368,7 +1368,7 @@
     "Channel": "频道"
   },
   "Characters per second while holding down key": {
-    "Characters per second while holding down key": ""
+    "Characters per second while holding down key": "持续按下按键时每秒输入的字符数"
   },
   "Charge Level": {
     "Charge Level": "充电级别"
@@ -1425,7 +1425,7 @@
     "Choose a power profile": "选择电源配置"
   },
   "Choose a shortcut key to cycle between keyboard layouts": {
-    "Choose a shortcut key to cycle between keyboard layouts": ""
+    "Choose a shortcut key to cycle between keyboard layouts": "选择快捷键以循环写换键盘布局"
   },
   "Choose colors from palette": {
     "Choose colors from palette": "从调色板中选择颜色"
@@ -1665,7 +1665,7 @@
     "Column Width": "列宽"
   },
   "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": {
-    "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": ""
+    "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": "逗号分隔的布局名称列表。留空以使用系统键盘设置"
   },
   "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": {
     "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": "要隐藏的会话名称的逗号分隔列表。使用正则表达式时用斜杠包裹（例如：/^_.*/）。"
@@ -1740,7 +1740,7 @@
     "Configure one in Settings → Dock → Trash.": "在「设置 → Dock → 回收站」中进行设置。"
   },
   "Configure which displays show \"%1": {
-    "Configure which displays show \"%1\"": "配置要显示“%1” 的显示器"
+    "Configure which displays show \"%1\"": "配置要显示 “%1” 的显示器"
   },
   "Configure which displays show shell components": {
     "Configure which displays show shell components": "为显示器分配可显示的 shell 组件"
@@ -1977,7 +1977,7 @@
     "Critical Threshold": "警报阈值"
   },
   "Ctrl + Shift": {
-    "Ctrl + Shift": ""
+    "Ctrl + Shift": "Ctrl + Shift"
   },
   "Ctrl+%1 is used for password editing": {
     "Ctrl+%1 is used for password editing": ""
@@ -2052,7 +2052,7 @@
     "Custom": "自定义"
   },
   "Custom / None": {
-    "Custom / None": ""
+    "Custom / None": "自定义 / 无"
   },
   "Custom Blend": {
     "Custom Blend": "自定义混合"
@@ -2219,6 +2219,9 @@
   "Darken Modal Background": {
     "Darken Modal Background": "暗化模态框背景"
   },
+  "Date First": {
+    "Date First": ""
+  },
   "Date Format": {
     "Date Format": "日期格式"
   },
@@ -2295,7 +2298,7 @@
     "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": "Del：清除 • Shift+Del：清空 • 1-9：操作 • F10：帮助 • Esc：关闭"
   },
   "Delay before characters start repeating": {
-    "Delay before characters start repeating": ""
+    "Delay before characters start repeating": "开始重复键入字符前的延时"
   },
   "Delete": {
     "Delete": "删除"
@@ -2400,7 +2403,7 @@
     "Digital": "数字式"
   },
   "Direct path to a .xkb keymap file. Overrides layouts/variants above.": {
-    "Direct path to a .xkb keymap file. Overrides layouts/variants above.": ""
+    "Direct path to a .xkb keymap file. Overrides layouts/variants above.": ".xkb 键盘映射文件的目录路径。覆盖以上布局与变体"
   },
   "Direction Source": {
     "Direction Source": "方向来源"
@@ -2424,13 +2427,13 @@
     "Disable Output": "禁用输出"
   },
   "Disable While Typing": {
-    "Disable While Typing": ""
+    "Disable While Typing": "键盘输入时禁用"
   },
   "Disable on External Mouse": {
-    "Disable on External Mouse": ""
+    "Disable on External Mouse": "外接鼠标时禁用"
   },
   "Disable touchpad when an external mouse is connected": {
-    "Disable touchpad when an external mouse is connected": ""
+    "Disable touchpad when an external mouse is connected": "外接鼠标连接时禁用触摸板"
   },
   "Disabled": {
     "Disabled": "已禁用"
@@ -2592,7 +2595,7 @@
     "Door Open": "打印机维护口已打开"
   },
   "Drag Lock": {
-    "Drag Lock": ""
+    "Drag Lock": "拖拽锁定"
   },
   "Drag a widget by its handle here to reorder it or drop it into another group": {
     "Drag a widget by its handle here to reorder it or drop it into another group": "拖拽部件把手到此以重排序或放置到另一个分组"
@@ -2667,7 +2670,7 @@
     "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": "动态：带有过冲的弹簧贝塞尔——进场短暂超出目标后稳定。富有表现力，充满生命力。"
   },
   "Edge": {
-    "Edge": ""
+    "Edge": "边缘"
   },
   "Edge Hover Reveal": {
     "Edge Hover Reveal": "边缘悬停显示"
@@ -2718,7 +2721,7 @@
     "Empty Trash (%1)": "清空回收站（%1）"
   },
   "Emulate middle click by pressing left and right buttons": {
-    "Emulate middle click by pressing left and right buttons": ""
+    "Emulate middle click by pressing left and right buttons": "按下左键和右键模拟中键点击"
   },
   "Enable 10-bit color depth for wider color gamut and HDR support": {
     "Enable 10-bit color depth for wider color gamut and HDR support": "启用 10 位颜色以支持更广色域和 HDR"
@@ -2739,7 +2742,7 @@
     "Enable History": "启用历史记录"
   },
   "Enable Num Lock": {
-    "Enable Num Lock": ""
+    "Enable Num Lock": "启用数字锁"
   },
   "Enable Overview Overlay": {
     "Enable Overview Overlay": "启用概览叠加层"
@@ -2948,6 +2951,9 @@
   "Extra Light": {
     "Extra Light": "特细"
   },
+  "Extract theme to JSON": {
+    "Extract theme to JSON": ""
+  },
   "Fade": {
     "Fade": "淡入淡出"
   },
@@ -3046,6 +3052,9 @@
   },
   "Failed to enable night mode": {
     "Failed to enable night mode": "启用夜间模式失败"
+  },
+  "Failed to extract theme": {
+    "Failed to extract theme": ""
   },
   "Failed to fetch network QR code: %1": {
     "Failed to fetch network QR code: %1": "获取网络二维码失败：%1"
@@ -3324,10 +3333,10 @@
     "Flags": "标签"
   },
   "Flat": {
-    "Flat": ""
+    "Flat": "匀加速"
   },
   "Flat uses constant speed; Adaptive scales with movement speed": {
-    "Flat uses constant speed; Adaptive scales with movement speed": ""
+    "Flat uses constant speed; Adaptive scales with movement speed": "“匀加速”会均匀变速；“自适应”会与鼠标移动速度保持比例"
   },
   "Flatpak": {
     "Flatpak": "Flatpak"
@@ -3645,7 +3654,7 @@
     "Global fonts can be configured in Settings → Personalization": "可在「设置 → 个性化」中配置全局字体"
   },
   "Globally": {
-    "Globally": ""
+    "Globally": "全局"
   },
   "Globally scale all animation durations": {
     "Globally scale all animation durations": "全局缩放所有动画持续时间"
@@ -3945,7 +3954,7 @@
     "Hover Popouts": "悬停弹出"
   },
   "How layout changes are remembered across apps": {
-    "How layout changes are remembered across apps": ""
+    "How layout changes are remembered across apps": "跨应用记忆布局变更"
   },
   "How often the server polls for new updates.": {
     "How often the server polls for new updates.": "服务器多久轮询一次更新。"
@@ -4284,10 +4293,13 @@
     "Keep My Edits": "保持当前的编辑"
   },
   "Keep dragging when finger is briefly lifted": {
-    "Keep dragging when finger is briefly lifted": ""
+    "Keep dragging when finger is briefly lifted": "手指短暂抬起仍会保持拖拽状态"
   },
   "Keep in Bar": {
     "Keep in Bar": "保留在 Bar"
+  },
+  "Keep pinned apps as launchers and show running windows separately": {
+    "Keep pinned apps as launchers and show running windows separately": ""
   },
   "Keep the clipboard type filter when reopening history": {
     "Keep the clipboard type filter when reopening history": "重新打开剪贴板历史记录时保持上次的筛选类别"
@@ -4320,31 +4332,31 @@
     "Keybinds shown alongside regular search results": "快捷键绑定与常规搜索结果并列显示"
   },
   "Keyboard": {
-    "Keyboard": ""
+    "Keyboard": "键盘"
   },
   "Keyboard Behavior": {
-    "Keyboard Behavior": ""
+    "Keyboard Behavior": "键盘行为"
   },
   "Keyboard Layout Name": {
     "Keyboard Layout Name": "键盘布局名称"
   },
   "Keyboard Layouts": {
-    "Keyboard Layouts": ""
+    "Keyboard Layouts": "键盘布局"
   },
   "Keyboard Model": {
-    "Keyboard Model": ""
+    "Keyboard Model": "键盘模型"
   },
   "Keyboard Shortcuts": {
     "Keyboard Shortcuts": "键盘快捷键"
   },
   "Keyboard Variant": {
-    "Keyboard Variant": ""
+    "Keyboard Variant": "键盘变体"
   },
   "Keyboard shortcut to start security key unlock": {
     "Keyboard shortcut to start security key unlock": ""
   },
   "Keymap File Path": {
-    "Keymap File Path": ""
+    "Keymap File Path": "键盘映射文件路径"
   },
   "Keys": {
     "Keys": "键"
@@ -4446,7 +4458,7 @@
     "Left Section": "左侧区域"
   },
   "Left-Handed Mode": {
-    "Left-Handed Mode": ""
+    "Left-Handed Mode": "左手模式"
   },
   "Light": {
     "Light": "细体"
@@ -4590,7 +4602,7 @@
     "MAC": "MAC"
   },
   "MIT License": {
-    "MIT License": ""
+    "MIT License": "MIT 许可证"
   },
   "MTU": {
     "MTU": "MTU"
@@ -4863,7 +4875,7 @@
     "Microphone volume control": "麦克风音量控制"
   },
   "Middle Click Emulation": {
-    "Middle Click Emulation": ""
+    "Middle Click Emulation": "中键模拟"
   },
   "Middle Section": {
     "Middle Section": "中间区域"
@@ -4876,6 +4888,9 @@
   },
   "Minimal palette built around a single hue.": {
     "Minimal palette built around a single hue.": "简约配色，围绕单一色调构建"
+  },
+  "Minimize": {
+    "Minimize": ""
   },
   "Minute": {
     "Minute": "分钟"
@@ -4941,10 +4956,10 @@
     "Mount Points": "挂载点"
   },
   "Mouse & Touchpad": {
-    "Mouse & Touchpad": ""
+    "Mouse & Touchpad": "鼠标与触摸板"
   },
   "Mouse Settings": {
-    "Mouse Settings": ""
+    "Mouse Settings": "鼠标设置"
   },
   "Mouse clicks pass through the bar to windows behind it": {
     "Mouse clicks pass through the bar to windows behind it": "鼠标点击会穿透状态栏传递给其后的窗口"
@@ -5010,7 +5025,7 @@
     "Native: platform renderer (FreeType).": "原生：平台渲染器（FreeType）。"
   },
   "Natural Scrolling": {
-    "Natural Scrolling": ""
+    "Natural Scrolling": "自然滚动"
   },
   "Natural Touchpad Scrolling": {
     "Natural Touchpad Scrolling": "触摸板自然滚动"
@@ -5895,7 +5910,7 @@
     "Pending Discharge": "待放电"
   },
   "Per Window": {
-    "Per Window": ""
+    "Per Window": "分窗口"
   },
   "Per-Mode Wallpapers": {
     "Per-Mode Wallpapers": "按模式设置壁纸"
@@ -5960,6 +5975,9 @@
   "Place a trash bin at the end of the dock": {
     "Place a trash bin at the end of the dock": "在 Dock 末尾放置回收站图标"
   },
+  "Place clipboard history on the Wayland overlay layer": {
+    "Place clipboard history on the Wayland overlay layer": ""
+  },
   "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
     "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "此处为插件目录，每个插件应带有一个 plugin.json 描述文件。"
   },
@@ -5976,7 +5994,7 @@
     "Play": "播放"
   },
   "Play a video when the screen locks.": {
-    "Play a video when the screen locks.": "锁屏时播放视频。"
+    "Play a video when the screen locks.": "锁屏时播放视频"
   },
   "Play sound after logging in": {
     "Play sound after logging in": "登录后播放声音"
@@ -6048,7 +6066,7 @@
     "Pointer": "指针"
   },
   "Pointer Speed": {
-    "Pointer Speed": ""
+    "Pointer Speed": "指针速度"
   },
   "Polkit integration is disabled. User management requires Polkit to elevate privileges.": {
     "Polkit integration is disabled. User management requires Polkit to elevate privileges.": "Polkit 集成已禁用。用户管理需要 Polkit 提升权限。"
@@ -6174,7 +6192,7 @@
     "Pressure": "气压"
   },
   "Prevent accidental cursor jumps while typing": {
-    "Prevent accidental cursor jumps while typing": ""
+    "Prevent accidental cursor jumps while typing": "打字时放置光标意外跳动"
   },
   "Prevent screen timeout": {
     "Prevent screen timeout": "防止屏幕超时"
@@ -6402,7 +6420,7 @@
     "Regex": "正则"
   },
   "Registries": {
-    "Registries": ""
+    "Registries": "插件仓库"
   },
   "Regular": {
     "Regular": "标准"
@@ -6441,7 +6459,7 @@
     "Remember Last Query": "记住上次查询"
   },
   "Remember Layout": {
-    "Remember Layout": ""
+    "Remember Layout": "记忆布局"
   },
   "Remember Type Filter": {
     "Remember Type Filter": "记住筛选类型"
@@ -6516,10 +6534,10 @@
     "Repeat": "重复"
   },
   "Repeat Delay": {
-    "Repeat Delay": ""
+    "Repeat Delay": "重复延时"
   },
   "Repeat Rate": {
-    "Repeat Rate": ""
+    "Repeat Rate": "重复速度"
   },
   "Replacement": {
     "Replacement": "替换"
@@ -6603,10 +6621,13 @@
     "Restart the DankMaterialShell": "重启 DankMaterialShell"
   },
   "Restart userspace without rebooting the kernel, requires systemd": {
-    "Restart userspace without rebooting the kernel, requires systemd": ""
+    "Restart userspace without rebooting the kernel, requires systemd": "不重启内核的情况下重启用户空间，需要 systemd"
   },
   "Restarting audio system...": {
     "Restarting audio system...": "正在重启音频系统..."
+  },
+  "Restore": {
+    "Restore": ""
   },
   "Restore Special Workspace Windows": {
     "Restore Special Workspace Windows": "恢复特殊工作区窗口"
@@ -6624,10 +6645,10 @@
     "Reverse Scrolling Direction": "反转滚动方向"
   },
   "Reverse mouse wheel scrolling direction": {
-    "Reverse mouse wheel scrolling direction": ""
+    "Reverse mouse wheel scrolling direction": "反转鼠标滚轮滚动方向"
   },
   "Reverse two-finger scrolling direction": {
-    "Reverse two-finger scrolling direction": ""
+    "Reverse two-finger scrolling direction": "反转双指滚动方向"
   },
   "Reverse workspace switch direction when scrolling over the bar": {
     "Reverse workspace switch direction when scrolling over the bar": "当在状态栏上滚动时，反转工作区切换方向"
@@ -6746,6 +6767,9 @@
   "Save & Start": {
     "Save & Start": "保存并启动"
   },
+  "Save Extracted Theme": {
+    "Save Extracted Theme": ""
+  },
   "Save Notepad File": {
     "Save Notepad File": "保存便签"
   },
@@ -6801,10 +6825,10 @@
     "Scale": "缩放"
   },
   "Scale DankBar font sizes independently": {
-    "Scale DankBar font sizes independently": "独立调整 DankBar 字体大小"
+    "Scale DankBar font sizes independently": "独立调整 Dank 状态栏字体大小"
   },
   "Scale DankBar icon sizes independently": {
-    "Scale DankBar icon sizes independently": "独立调整 DankBar 图标大小"
+    "Scale DankBar icon sizes independently": "独立调整 Dank 状态栏图标大小"
   },
   "Scale all font sizes throughout the shell": {
     "Scale all font sizes throughout the shell": "缩放整个 shell 中的所有字体大小"
@@ -6855,7 +6879,7 @@
     "Scrolling": "滚动"
   },
   "Scrolling Speed": {
-    "Scrolling Speed": ""
+    "Scrolling Speed": "滚动速度"
   },
   "Search App Actions": {
     "Search App Actions": "搜索应用动作"
@@ -6921,7 +6945,7 @@
     "Security Key PAM Source": "安全密钥 PAM 来源"
   },
   "Security key": {
-    "Security key": ""
+    "Security key": "安全密钥"
   },
   "Security key (%1)": {
     "Security key (%1)": ""
@@ -7064,6 +7088,9 @@
   "Separate Light & Dark Themes": {
     "Separate Light & Dark Themes": "区分浅色主题与深色主题"
   },
+  "Separate Pinned and Running Apps": {
+    "Separate Pinned and Running Apps": ""
+  },
   "Separate appearance for unfocused displays is not supported on this compositor.": {
     "Separate appearance for unfocused displays is not supported on this compositor.": "此合成器不支持为非焦点显示器单独设置外观。"
   },
@@ -7188,7 +7215,7 @@
     "Shortcut (%1)": "快捷方式（%1）"
   },
   "Shortcut that opens this settings window": {
-    "Shortcut that opens this settings window": "打开此设置窗口的快捷键"
+    "Shortcut that opens this settings window": "打开此设置窗口的快捷方式"
   },
   "Shortcuts": {
     "Shortcuts": "快捷键"
@@ -7350,7 +7377,7 @@
     "Show Seconds": "显示秒数"
   },
   "Show Soft Reboot": {
-    "Show Soft Reboot": ""
+    "Show Soft Reboot": "显示软重启"
   },
   "Show Sunrise/Sunset": {
     "Show Sunrise/Sunset": "显示日出/日落"
@@ -7449,7 +7476,7 @@
     "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": "在 Niri 概览中打字时显示启动器叠加层。禁用该项以使用其他启动器。"
   },
   "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.": {
-    "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.": ""
+    "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.": "若可用，显示来自苹果音乐的循环视频专辑封面。发送播放中的艺术家及专辑名称到苹果"
   },
   "Show mode tabs and keyboard hints at the bottom.": {
     "Show mode tabs and keyboard hints at the bottom.": "在底部显示分类标签页与键盘提示。"
@@ -7563,7 +7590,7 @@
     "Snow": "下雪"
   },
   "Soft Reboot": {
-    "Soft Reboot": ""
+    "Soft Reboot": "软重启"
   },
   "Some plugins require a newer version of DMS:": {
     "Some plugins require a newer version of DMS:": "有些插件需要更新版的 DMS："
@@ -7640,6 +7667,9 @@
   "Start": {
     "Start": "开始"
   },
+  "Start DankConnect, KDE Connect, or Valent to use this plugin": {
+    "Start DankConnect, KDE Connect, or Valent to use this plugin": ""
+  },
   "Start Hotspot?": {
     "Start Hotspot?": "启动热点？"
   },
@@ -7704,7 +7734,7 @@
     "Sunset": "日落"
   },
   "Super + Space": {
-    "Super + Space": ""
+    "Super + Space": "Super + Space"
   },
   "Suppress Duplicate Notifications": {
     "Suppress Duplicate Notifications": "抑制重复通知"
@@ -7764,13 +7794,13 @@
     "Suspend then Hibernate": "挂起后休眠"
   },
   "Swap primary and secondary mouse buttons": {
-    "Swap primary and secondary mouse buttons": ""
+    "Swap primary and secondary mouse buttons": "交换鼠标主键与副键"
   },
   "Sway Website": {
     "Sway Website": "Sway 网站"
   },
   "Switch Layout Shortcut": {
-    "Switch Layout Shortcut": ""
+    "Switch Layout Shortcut": "切换布局快捷键"
   },
   "Switch between display configurations": {
     "Switch between display configurations": "在显示器配置之间切换"
@@ -7896,16 +7926,16 @@
     "Tailscale not available": "Tailscale 不可用"
   },
   "Tap and Drag": {
-    "Tap and Drag": ""
+    "Tap and Drag": "触摸拖拽"
   },
   "Tap and drag on the touchpad to move items": {
-    "Tap and drag on the touchpad to move items": ""
+    "Tap and drag on the touchpad to move items": "在触摸板点按并拖拽以移动项目"
   },
   "Tap the touchpad surface to trigger left click clicks": {
-    "Tap the touchpad surface to trigger left click clicks": ""
+    "Tap the touchpad surface to trigger left click clicks": "点按触摸板触发左键点击"
   },
   "Tap to Click": {
-    "Tap to Click": ""
+    "Tap to Click": "触摸点击"
   },
   "Terminal": {
     "Terminal": "终端"
@@ -8000,6 +8030,9 @@
   "Theme color used for the widget outline": {
     "Theme color used for the widget outline": "部件轮廓主题色"
   },
+  "Theme extracted to: %1": {
+    "Theme extracted to: %1": ""
+  },
   "Theme worker failed (%1)": {
     "Theme worker failed (%1)": "主题工作进程失败（%1）"
   },
@@ -8086,6 +8119,9 @@
   },
   "Time & Weather": {
     "Time & Weather": "时间与天气"
+  },
+  "Time First": {
+    "Time First": ""
   },
   "Time Format": {
     "Time Format": "时间格式"
@@ -8214,10 +8250,10 @@
     "Touch your security key...": "请触摸你的安全密钥..."
   },
   "Touchpad Settings": {
-    "Touchpad Settings": ""
+    "Touchpad Settings": "触摸板设置"
   },
   "Touchpad Speed": {
-    "Touchpad Speed": ""
+    "Touchpad Speed": "触摸板速度"
   },
   "Transform": {
     "Transform": "变换"
@@ -8280,7 +8316,7 @@
     "Turn off now": "立即关闭"
   },
   "Two Finger": {
-    "Two Finger": ""
+    "Two Finger": "双指"
   },
   "Type at least 2 characters": {
     "Type at least 2 characters": "至少键入两个字符"
@@ -8496,13 +8532,13 @@
     "Use System Theme": "使用系统主题"
   },
   "Use a custom image for the lock screen, or leave empty to use your desktop wallpaper.": {
-    "Use a custom image for the lock screen, or leave empty to use your desktop wallpaper.": "使用自定义锁屏图片，留空则使用桌面壁纸。"
+    "Use a custom image for the lock screen, or leave empty to use your desktop wallpaper.": "使用自定义锁屏图片，留空则使用桌面壁纸"
   },
   "Use a custom image for the login screen, or leave empty to use desktop wallpaper": {
     "Use a custom image for the login screen, or leave empty to use desktop wallpaper": "为登录屏幕使用自定义图片，留空则使用桌面壁纸"
   },
   "Use a custom radius for goth corner cutouts": {
-    "Use a custom radius for goth corner cutouts": "为Goth 圆角裁切使用自定义半径"
+    "Use a custom radius for goth corner cutouts": "为 Goth 圆角裁切使用自定义半径"
   },
   "Use a fixed shadow direction for this bar": {
     "Use a fixed shadow direction for this bar": "为此状态栏使用固定的阴影方向"
@@ -8976,7 +9012,7 @@
     "X-Ray": "X-Ray"
   },
   "XKB Options": {
-    "XKB Options": ""
+    "XKB Options": "XKB 选项"
   },
   "XWayland": {
     "XWayland": "XWayland"

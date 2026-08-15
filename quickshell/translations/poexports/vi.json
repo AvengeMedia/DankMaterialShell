@@ -2219,6 +2219,9 @@
   "Darken Modal Background": {
     "Darken Modal Background": "Làm tối nền phương thức"
   },
+  "Date First": {
+    "Date First": ""
+  },
   "Date Format": {
     "Date Format": "Định dạng ngày"
   },
@@ -2948,6 +2951,9 @@
   "Extra Light": {
     "Extra Light": "Siêu nhẹ"
   },
+  "Extract theme to JSON": {
+    "Extract theme to JSON": ""
+  },
   "Fade": {
     "Fade": "Làm mờ dần"
   },
@@ -3046,6 +3052,9 @@
   },
   "Failed to enable night mode": {
     "Failed to enable night mode": "Bật chế độ ban đêm thất bại"
+  },
+  "Failed to extract theme": {
+    "Failed to extract theme": ""
   },
   "Failed to fetch network QR code: %1": {
     "Failed to fetch network QR code: %1": "Lấy mã QR mạng thất bại: %1"
@@ -4289,6 +4298,9 @@
   "Keep in Bar": {
     "Keep in Bar": "Giữ trong thanh"
   },
+  "Keep pinned apps as launchers and show running windows separately": {
+    "Keep pinned apps as launchers and show running windows separately": ""
+  },
   "Keep the clipboard type filter when reopening history": {
     "Keep the clipboard type filter when reopening history": "Giữ bộ lọc loại clipboard khi mở lại lịch sử"
   },
@@ -4876,6 +4888,9 @@
   },
   "Minimal palette built around a single hue.": {
     "Minimal palette built around a single hue.": "Bảng màu tối thiểu được xây dựng xung quanh một màu sắc duy nhất."
+  },
+  "Minimize": {
+    "Minimize": ""
   },
   "Minute": {
     "Minute": "Phút"
@@ -5960,6 +5975,9 @@
   "Place a trash bin at the end of the dock": {
     "Place a trash bin at the end of the dock": "Đặt thùng rác ở cuối thanh dock"
   },
+  "Place clipboard history on the Wayland overlay layer": {
+    "Place clipboard history on the Wayland overlay layer": ""
+  },
   "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
     "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "Đặt thư mục plugin ở đây. Mỗi plugin cần có file plugin.json."
   },
@@ -6608,6 +6626,9 @@
   "Restarting audio system...": {
     "Restarting audio system...": "Đang khởi động lại hệ thống âm thanh..."
   },
+  "Restore": {
+    "Restore": ""
+  },
   "Restore Special Workspace Windows": {
     "Restore Special Workspace Windows": "Khôi phục các cửa sổ không gian làm việc đặc biệt"
   },
@@ -6745,6 +6766,9 @@
   },
   "Save & Start": {
     "Save & Start": "Lưu & Bắt đầu"
+  },
+  "Save Extracted Theme": {
+    "Save Extracted Theme": ""
   },
   "Save Notepad File": {
     "Save Notepad File": "Lưu tệp ghi chú"
@@ -7063,6 +7087,9 @@
   },
   "Separate Light & Dark Themes": {
     "Separate Light & Dark Themes": "Tách biệt Các chủ đề Sáng & Tối"
+  },
+  "Separate Pinned and Running Apps": {
+    "Separate Pinned and Running Apps": ""
   },
   "Separate appearance for unfocused displays is not supported on this compositor.": {
     "Separate appearance for unfocused displays is not supported on this compositor.": "Giao diện riêng biệt cho các màn hình không tập trung không được hỗ trợ trên bộ soạn thảo này."
@@ -7640,6 +7667,9 @@
   "Start": {
     "Start": "Bắt đầu"
   },
+  "Start DankConnect, KDE Connect, or Valent to use this plugin": {
+    "Start DankConnect, KDE Connect, or Valent to use this plugin": ""
+  },
   "Start Hotspot?": {
     "Start Hotspot?": "Bắt đầu Điểm nóng?"
   },
@@ -8000,6 +8030,9 @@
   "Theme color used for the widget outline": {
     "Theme color used for the widget outline": "Màu chủ đề dùng cho đường viền tiện ích"
   },
+  "Theme extracted to: %1": {
+    "Theme extracted to: %1": ""
+  },
   "Theme worker failed (%1)": {
     "Theme worker failed (%1)": "Theme worker thất bại (%1)"
   },
@@ -8086,6 +8119,9 @@
   },
   "Time & Weather": {
     "Time & Weather": "Thời gian & thời tiết"
+  },
+  "Time First": {
+    "Time First": ""
   },
   "Time Format": {
     "Time Format": "Định dạng thời gian"

@@ -198,7 +198,7 @@
     "2 seconds": "2 seconden"
   },
   "2.4 GHz": {
-    "2.4 GHz": ""
+    "2.4 GHz": "2,4 GHz"
   },
   "20 minutes": {
     "20 minutes": "20 minuten"
@@ -264,7 +264,7 @@
     "45 seconds": "45 seconden"
   },
   "5 GHz": {
-    "5 GHz": ""
+    "5 GHz": "5 GHz"
   },
   "5 min before": {
     "5 min before": "5 min. van tevoren"
@@ -333,7 +333,7 @@
     "About": "Over"
   },
   "Acceleration Profile": {
-    "Acceleration Profile": ""
+    "Acceleration Profile": "Versnellingsprofiel"
   },
   "Accent Color": {
     "Accent Color": "Accentkleur"
@@ -378,7 +378,7 @@
     "Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.": "De DMS Greeter activeren? Er wordt een terminal geopend voor sudo-authenticatie. Voer Sync uit na activering om instellingen toe te passen."
   },
   "Activates immediately": {
-    "Activates immediately": ""
+    "Activates immediately": "Wordt onmiddellijk geactiveerd"
   },
   "Activation": {
     "Activation": "Activering"
@@ -411,7 +411,7 @@
     "Adapters": "Adapters"
   },
   "Adaptive": {
-    "Adaptive": ""
+    "Adaptive": "Adaptief"
   },
   "Adaptive Media Width": {
     "Adaptive Media Width": "Adaptieve mediabreedte"
@@ -426,7 +426,7 @@
     "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": "\"%1\" toevoegen aan de groep %2? Ze moeten uitloggen en opnieuw inloggen, en vervolgens 'dms greeter sync --profile' uitvoeren om hun inlogscherm-thema te publiceren."
   },
   "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": {
-    "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": ""
+    "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": "\"%1\" toevoegen aan de %2-groep? Zij moeten uit- en weer inloggen en daarna 'dms-greeter sync --profile' uitvoeren om hun thema voor het aanmeldscherm te publiceren."
   },
   "Add Bar": {
     "Add Bar": "Balk toevoegen"
@@ -480,7 +480,7 @@
     "Add the new user to the %1 group so they can run dms greeter sync --profile.": "Voeg de nieuwe gebruiker toe aan de groep %1 zodat zij 'dms greeter sync --profile' kunnen uitvoeren."
   },
   "Add the new user to the %1 group so they can run dms-greeter sync --profile.": {
-    "Add the new user to the %1 group so they can run dms-greeter sync --profile.": ""
+    "Add the new user to the %1 group so they can run dms-greeter sync --profile.": "Voeg de nieuwe gebruiker toe aan de %1-groep zodat deze 'dms-greeter sync --profile' kan uitvoeren."
   },
   "Add the new user to the %1 group so they can use sudo.": {
     "Add the new user to the %1 group so they can use sudo.": "Voeg de nieuwe gebruiker toe aan de groep %1 zodat zij sudo kunnen gebruiken."
@@ -489,10 +489,10 @@
     "Add to Autostart": "Toevoegen aan automatisch opstarten"
   },
   "Adjust pointer sensitivity speed": {
-    "Adjust pointer sensitivity speed": ""
+    "Adjust pointer sensitivity speed": "Snelheid van de aanwijzergevoeligheid aanpassen"
   },
   "Adjust scrolling sensitivity multiplier": {
-    "Adjust scrolling sensitivity multiplier": ""
+    "Adjust scrolling sensitivity multiplier": "Vermenigvuldigingsfactor voor scrollgevoeligheid aanpassen"
   },
   "Adjust the bar height via inner padding": {
     "Adjust the bar height via inner padding": "De balkhoogte aanpassen via binnenmarge (padding)"
@@ -501,7 +501,7 @@
     "Adjust the number of columns in grid view mode.": "Pas het aantal kolommen in rasterweergave aan."
   },
   "Adjust touchpad pointer speed": {
-    "Adjust touchpad pointer speed": ""
+    "Adjust touchpad pointer speed": "Snelheid van de touchpad-aanwijzer aanpassen"
   },
   "Adjust volume per scroll indent": {
     "Adjust volume per scroll indent": "Volume per scrollstap aanpassen"
@@ -519,7 +519,7 @@
     "Advanced": "Geavanceerd"
   },
   "Advanced comma-separated libxkbcommon options.": {
-    "Advanced comma-separated libxkbcommon options.": ""
+    "Advanced comma-separated libxkbcommon options.": "Geavanceerde door komma's gescheiden libxkbcommon-opties."
   },
   "Afternoon": {
     "Afternoon": "Middag"
@@ -564,7 +564,7 @@
     "Also group repeated application icons on the active workspace": "Ook herhaalde applicatie-iconen op de actieve werkruimte groeperen"
   },
   "Alt + Shift": {
-    "Alt + Shift": ""
+    "Alt + Shift": "Alt + Shift"
   },
   "Alternative (OR)": {
     "Alternative (OR)": "Alternatief (OF)"
@@ -594,7 +594,7 @@
     "Always show when there's only one connected display": "Altijd tonen wanneer er slechts één beeldscherm is aangesloten"
   },
   "Always use the durations above, even if an app requests a shorter or longer one": {
-    "Always use the durations above, even if an app requests a shorter or longer one": ""
+    "Always use the durations above, even if an app requests a shorter or longer one": "Altijd de bovenstaande tijdsduur gebruiken, zelfs als een app om een kortere of langere vraagt"
   },
   "Always use this app for %1": {
     "Always use this app for %1": "Gebruik deze app altijd voor %1"
@@ -669,7 +669,7 @@
     "Appearance": "Uiterlijk"
   },
   "Apple Music animated covers": {
-    "Apple Music animated covers": ""
+    "Apple Music animated covers": "Geanimatede Apple Music-hoezen"
   },
   "Application": {
     "Application": "Applicatie"
@@ -684,7 +684,7 @@
     "Applications and commands to start automatically when you log in": "Applicaties en commando's die automatisch starten wanneer je inlogt"
   },
   "Applies on the next greeter sync": {
-    "Applies on the next greeter sync": ""
+    "Applies on the next greeter sync": "Wordt toegepast bij de volgende greeter-synchronisatie"
   },
   "Apply Changes": {
     "Apply Changes": "Wijzigingen toepassen"
@@ -954,7 +954,7 @@
     "Automatically save changes to opened files as you type": "Wijzigingen in geopende bestanden automatisch opslaan terwijl je typt"
   },
   "Automatically turn on Num Lock at startup": {
-    "Automatically turn on Num Lock at startup": ""
+    "Automatically turn on Num Lock at startup": "Num Lock automatisch inschakelen bij het opstarten"
   },
   "Automatically turn on Power Saver profile when battery is low.": {
     "Automatically turn on Power Saver profile when battery is low.": "Schakel het energiebesparingsprofiel automatisch in als de accu bijna leeg is."
@@ -1032,7 +1032,7 @@
     "Balanced palette with focused accents (default).": "Gebalanceerd palet met gerichte accenten (standaard)."
   },
   "Band": {
-    "Band": ""
+    "Band": "Band"
   },
   "Bar": {
     "Bar": "Balk"
@@ -1290,7 +1290,7 @@
     "Calendar Backend": "Agenda-backend"
   },
   "Calls / Headset": {
-    "Calls / Headset": ""
+    "Calls / Headset": "Oproepen / Headset"
   },
   "Camera": {
     "Camera": "Camera"
@@ -1368,7 +1368,7 @@
     "Channel": "Kanaal"
   },
   "Characters per second while holding down key": {
-    "Characters per second while holding down key": ""
+    "Characters per second while holding down key": "Tekens per seconde bij het ingedrukt houden van een toets"
   },
   "Charge Level": {
     "Charge Level": "Laadniveau"
@@ -1425,7 +1425,7 @@
     "Choose a power profile": "Kies een energieprofiel"
   },
   "Choose a shortcut key to cycle between keyboard layouts": {
-    "Choose a shortcut key to cycle between keyboard layouts": ""
+    "Choose a shortcut key to cycle between keyboard layouts": "Kies een sneltoets om tussen toetsenbordindelingen te wisselen"
   },
   "Choose colors from palette": {
     "Choose colors from palette": "Kies kleuren uit palet"
@@ -1458,7 +1458,7 @@
     "Choose wallpaper folder": "Achtergrondmap kiezen"
   },
   "Choose when to generate scrolling events": {
-    "Choose when to generate scrolling events": ""
+    "Choose when to generate scrolling events": "Kies wanneer scrollevents worden gegenereerd"
   },
   "Choose where notification popups appear on screen": {
     "Choose where notification popups appear on screen": "Kies waar meldingen op het scherm verschijnen"
@@ -1587,16 +1587,16 @@
     "Close Window": "Venster sluiten"
   },
   "Codec switched successfully": {
-    "Codec switched successfully": ""
+    "Codec switched successfully": "Codec succesvol gewijzigd"
   },
   "Codec switching is unavailable because WirePlumber was not found": {
-    "Codec switching is unavailable because WirePlumber was not found": ""
+    "Codec switching is unavailable because WirePlumber was not found": "Codec wisselen is niet beschikbaar omdat WirePlumber niet is gevonden"
   },
   "Codec switching is unavailable because pactl was not found": {
     "Codec switching is unavailable because pactl was not found": "Wisselen van codec is niet beschikbaar omdat pactl niet is gevonden"
   },
   "Codec switching is unavailable. WirePlumber wpexec was not found.": {
-    "Codec switching is unavailable. WirePlumber wpexec was not found.": ""
+    "Codec switching is unavailable. WirePlumber wpexec was not found.": "Codec wisselen is niet beschikbaar. WirePlumber wpexec is niet gevonden."
   },
   "Color": {
     "Color": "Kleur"
@@ -1665,7 +1665,7 @@
     "Column Width": "Kolombreedte"
   },
   "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": {
-    "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": ""
+    "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": "Door komma's gescheiden lijst van indelingsnamen. Laat leeg om de systeeminstellingen voor het toetsenbord te gebruiken."
   },
   "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": {
     "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": "Komma-gescheiden lijst van te verbergen sessienamen. Gebruik slashes voor regex (bijv. /^_.*/)."
@@ -1698,7 +1698,7 @@
     "Compositor Settings": "Compositor-instellingen"
   },
   "Compositor actions (focus, move, etc.)": {
-    "Compositor actions (focus, move, etc.)": ""
+    "Compositor actions (focus, move, etc.)": "Compositor-acties (focussen, verplaatsen, enz.)"
   },
   "Config Format": {
     "Config Format": "Config-formaat"
@@ -1818,7 +1818,7 @@
     "Contrast": "Contrast"
   },
   "Contrast by variant": {
-    "Contrast by variant": ""
+    "Contrast by variant": "Contrast per variant"
   },
   "Contributor": {
     "Contributor": "Bijdrager"
@@ -1920,7 +1920,7 @@
     "Corners & Background": "Hoeken & Achtergrond"
   },
   "Couldn't load hotspot password": {
-    "Couldn't load hotspot password": ""
+    "Couldn't load hotspot password": "Kon hotspot-wachtwoord niet laden"
   },
   "Count Only": {
     "Count Only": "Alleen aantal"
@@ -1977,10 +1977,10 @@
     "Critical Threshold": "Kritieke drempelwaarde"
   },
   "Ctrl + Shift": {
-    "Ctrl + Shift": ""
+    "Ctrl + Shift": "Ctrl + Shift"
   },
   "Ctrl+%1 is used for password editing": {
-    "Ctrl+%1 is used for password editing": ""
+    "Ctrl+%1 is used for password editing": "Ctrl+%1 wordt gebruikt voor het bewerken van wachtwoorden"
   },
   "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": {
     "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": "Ctrl+A: Alles selecteren • Ctrl+P: Voorbeeld • Enter/Shift+Enter: Volgende/Vorige zoeken • Esc: Sluiten"
@@ -2052,7 +2052,7 @@
     "Custom": "Aangepast"
   },
   "Custom / None": {
-    "Custom / None": ""
+    "Custom / None": "Aangepast / Geen"
   },
   "Custom Blend": {
     "Custom Blend": "Aangepaste menging"
@@ -2148,7 +2148,7 @@
     "DMS Shortcuts": "DMS-sneltoetsen"
   },
   "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.": {
-    "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.": ""
+    "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.": "DMS is een zeer aanpasbare moderne desktop-shell met een op %1 geïnspireerd ontwerp.<br/><br/>Het is gebouwd met %2, een QT6-framework voor het maken van desktop-shells, en %3, een statisch getypeerde, gecompileerde programmeertaal."
   },
   "DMS out of date": {
     "DMS out of date": "DMS verouderd"
@@ -2218,6 +2218,9 @@
   },
   "Darken Modal Background": {
     "Darken Modal Background": "Modale achtergrond verduisteren"
+  },
+  "Date First": {
+    "Date First": ""
   },
   "Date Format": {
     "Date Format": "Datumnotatie"
@@ -2295,7 +2298,7 @@
     "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": "Del: Wissen • Shift+Del: Alles wissen • 1-9: Acties • F10: Hulp • Esc: Sluiten"
   },
   "Delay before characters start repeating": {
-    "Delay before characters start repeating": ""
+    "Delay before characters start repeating": "Vertraging voordat tekens worden herhaald"
   },
   "Delete": {
     "Delete": "Verwijderen"
@@ -2400,7 +2403,7 @@
     "Digital": "Digitaal"
   },
   "Direct path to a .xkb keymap file. Overrides layouts/variants above.": {
-    "Direct path to a .xkb keymap file. Overrides layouts/variants above.": ""
+    "Direct path to a .xkb keymap file. Overrides layouts/variants above.": "Direct pad naar een .xkb-keymapbestand. Overschrijft de bovenstaande indelingen/varianten."
   },
   "Direction Source": {
     "Direction Source": "Richtingsbron"
@@ -2424,13 +2427,13 @@
     "Disable Output": "Uitvoer uitschakelen"
   },
   "Disable While Typing": {
-    "Disable While Typing": ""
+    "Disable While Typing": "Uitschakelen tijdens het typen"
   },
   "Disable on External Mouse": {
-    "Disable on External Mouse": ""
+    "Disable on External Mouse": "Uitschakelen bij externe muis"
   },
   "Disable touchpad when an external mouse is connected": {
-    "Disable touchpad when an external mouse is connected": ""
+    "Disable touchpad when an external mouse is connected": "Touchpad uitschakelen wanneer een externe muis is aangesloten"
   },
   "Disabled": {
     "Disabled": "Uitgeschakeld"
@@ -2592,7 +2595,7 @@
     "Door Open": "Deur open"
   },
   "Drag Lock": {
-    "Drag Lock": ""
+    "Drag Lock": "Sleeppuntvergrendeling"
   },
   "Drag a widget by its handle here to reorder it or drop it into another group": {
     "Drag a widget by its handle here to reorder it or drop it into another group": "Sleep een widget aan de handgreep hiernaartoe om de volgorde te wijzigen of zet hem in een andere groep"
@@ -2667,7 +2670,7 @@
     "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": "Dynamisch: Verende bézier met doorschieten — de binnenkomst gaat kort voorbij het doel en komt dan tot rust. Expressief en levendig."
   },
   "Edge": {
-    "Edge": ""
+    "Edge": "Rand"
   },
   "Edge Hover Reveal": {
     "Edge Hover Reveal": "Weergeven bij rand-hover"
@@ -2718,7 +2721,7 @@
     "Empty Trash (%1)": "Prullenbak legen (%1)"
   },
   "Emulate middle click by pressing left and right buttons": {
-    "Emulate middle click by pressing left and right buttons": ""
+    "Emulate middle click by pressing left and right buttons": "Middelklik emuleren door de linker- en rechterknop gelijktijdig in te drukken"
   },
   "Enable 10-bit color depth for wider color gamut and HDR support": {
     "Enable 10-bit color depth for wider color gamut and HDR support": "Schakel 10-bits kleurdiepte in voor een breder kleurengamma en HDR-ondersteuning"
@@ -2739,7 +2742,7 @@
     "Enable History": "Geschiedenis inschakelen"
   },
   "Enable Num Lock": {
-    "Enable Num Lock": ""
+    "Enable Num Lock": "Num Lock inschakelen"
   },
   "Enable Overview Overlay": {
     "Enable Overview Overlay": "Overzicht-overlay inschakelen"
@@ -2760,7 +2763,7 @@
     "Enable WiFi": "Wifi inschakelen"
   },
   "Enable WiFi before starting the hotspot.": {
-    "Enable WiFi before starting the hotspot.": ""
+    "Enable WiFi before starting the hotspot.": "Schakel wifi in voordat je de hotspot start."
   },
   "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": {
     "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": "Schakel hieronder een aangepaste overschrijving in om de schaduwintensiteit, dekking en kleur per balk in te stellen."
@@ -2850,7 +2853,7 @@
     "Enter password for ": "Voer wachtwoord in voor "
   },
   "Enter text to encode": {
-    "Enter text to encode": ""
+    "Enter text to encode": "Voer te coderen tekst in"
   },
   "Enter this passkey on ": {
     "Enter this passkey on ": "Voer deze toegangscode in op "
@@ -2948,6 +2951,9 @@
   "Extra Light": {
     "Extra Light": "Extra licht"
   },
+  "Extract theme to JSON": {
+    "Extract theme to JSON": ""
+  },
   "Fade": {
     "Fade": "Vervagen"
   },
@@ -2991,7 +2997,7 @@
     "Failed to check pin limit": "Controleren van vastmaaklimiet mislukt"
   },
   "Failed to configure hotspot": {
-    "Failed to configure hotspot": ""
+    "Failed to configure hotspot": "Configureren van hotspot mislukt"
   },
   "Failed to connect VPN": {
     "Failed to connect VPN": "Verbinden met VPN mislukt"
@@ -3047,11 +3053,14 @@
   "Failed to enable night mode": {
     "Failed to enable night mode": "Inschakelen van nachtmodus mislukt"
   },
+  "Failed to extract theme": {
+    "Failed to extract theme": ""
+  },
   "Failed to fetch network QR code: %1": {
     "Failed to fetch network QR code: %1": "Ophalen van netwerk-QR-code mislukt: %1"
   },
   "Failed to generate QR code: %1": {
-    "Failed to generate QR code: %1": ""
+    "Failed to generate QR code: %1": "QR-code genereren mislukt: %1"
   },
   "Failed to generate systemd override": {
     "Failed to generate systemd override": "Genereren van systemd-override mislukt"
@@ -3126,7 +3135,7 @@
     "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": "Uitvoeren van 'dms greeter status' mislukt. Zorg ervoor dat DMS is geïnstalleerd en dms in het PATH staat."
   },
   "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": {
-    "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": ""
+    "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": "Uitvoeren van 'dms-greeter status' mislukt. Zorg dat het pakket 'dms-greeter' is geïnstalleerd."
   },
   "Failed to save VPN credentials": {
     "Failed to save VPN credentials": "Opslaan van VPN-inloggegevens mislukt"
@@ -3183,13 +3192,13 @@
     "Failed to start connection to %1": "Starten van verbinding met %1 mislukt"
   },
   "Failed to start hotspot": {
-    "Failed to start hotspot": ""
+    "Failed to start hotspot": "Starten van hotspot mislukt"
   },
   "Failed to stop hotspot": {
-    "Failed to stop hotspot": ""
+    "Failed to stop hotspot": "Stoppen van hotspot mislukt"
   },
   "Failed to switch codec": {
-    "Failed to switch codec": ""
+    "Failed to switch codec": "Wisselen van codec mislukt"
   },
   "Failed to unpin entry": {
     "Failed to unpin entry": "Losmaken van item mislukt"
@@ -3324,10 +3333,10 @@
     "Flags": "Vlaggen"
   },
   "Flat": {
-    "Flat": ""
+    "Flat": "Vlak"
   },
   "Flat uses constant speed; Adaptive scales with movement speed": {
-    "Flat uses constant speed; Adaptive scales with movement speed": ""
+    "Flat uses constant speed; Adaptive scales with movement speed": "Vlak gebruikt een constante snelheid; Adaptief schaalt met de bewegingssnelheid"
   },
   "Flatpak": {
     "Flatpak": "Flatpak"
@@ -3363,10 +3372,10 @@
     "Floating Position": "Zwevende positie"
   },
   "Floating Windows": {
-    "Floating Windows": ""
+    "Floating Windows": "Zwevende vensters"
   },
   "Floating windows follow Surface Styling settings": {
-    "Floating windows follow Surface Styling settings": ""
+    "Floating windows follow Surface Styling settings": "Zwevende vensters volgen de instellingen voor oppervlaktestyling"
   },
   "Fluent": {
     "Fluent": "Fluent"
@@ -3498,7 +3507,7 @@
     "Foreground Layers": "Voorgrondlagen"
   },
   "Foreground Opacity": {
-    "Foreground Opacity": ""
+    "Foreground Opacity": "Ondoorzichtigheid voorgrond"
   },
   "Forever": {
     "Forever": "Voor altijd"
@@ -3627,7 +3636,7 @@
     "Generate Override": "Override genereren"
   },
   "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
-    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
+    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": "Genereer basisconfiguraties voor GTK3/4 of QT5/QT6 (vereist qt6ct-kde) om de DMS-kleuren te volgen. Dit is slechts eenmaal nodig.<br /><br />Het wordt aanbevolen om %1 te configureren voordat je GTK-thema's toepast."
   },
   "Generic": {
     "Generic": "Generiek"
@@ -3645,7 +3654,7 @@
     "Global fonts can be configured in Settings → Personalization": "Globale lettertypen kunnen worden geconfigureerd in Instellingen → Personalisatie"
   },
   "Globally": {
-    "Globally": ""
+    "Globally": "Globaal"
   },
   "Globally scale all animation durations": {
     "Globally scale all animation durations": "Alle animatieduren globaal schalen"
@@ -3699,7 +3708,7 @@
     "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": "Leden van de greeter-groep kunnen hun inlogscherm-thema synchroniseren met 'dms greeter sync --profile' na het uit- en inloggen."
   },
   "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": {
-    "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": ""
+    "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": "Leden van de greeter-groep kunnen hun thema voor het aanmeldscherm synchroniseren met 'dms-greeter sync --profile' na het uit- en opnieuw inloggen."
   },
   "Greeter group:": {
     "Greeter group:": "Greeter-groep:"
@@ -3915,22 +3924,22 @@
     "Hotkey overlay title (optional)": "Titel sneltoetsoverlay (optioneel)"
   },
   "Hotspot": {
-    "Hotspot": ""
+    "Hotspot": "Hotspot"
   },
   "Hotspot activation failed.": {
-    "Hotspot activation failed.": ""
+    "Hotspot activation failed.": "Hotspot-activering mislukt."
   },
   "Hotspot name": {
-    "Hotspot name": ""
+    "Hotspot name": "Hotspotnaam"
   },
   "Hotspot saved": {
-    "Hotspot saved": ""
+    "Hotspot saved": "Hotspot opgeslagen"
   },
   "Hotspot started": {
-    "Hotspot started": ""
+    "Hotspot started": "Hotspot gestart"
   },
   "Hotspot stopped": {
-    "Hotspot stopped": ""
+    "Hotspot stopped": "Hotspot gestopt"
   },
   "Hour": {
     "Hour": "Uur"
@@ -3945,7 +3954,7 @@
     "Hover Popouts": "Pop-outs bij hoveren"
   },
   "How layout changes are remembered across apps": {
-    "How layout changes are remembered across apps": ""
+    "How layout changes are remembered across apps": "Hoe wijzigingen in de indeling worden onthouden tussen apps"
   },
   "How often the server polls for new updates.": {
     "How often the server polls for new updates.": "Hoe vaak de server controleert op nieuwe updates."
@@ -3993,7 +4002,7 @@
     "IP address or hostname": "IP-adres of hostnaam"
   },
   "IP sharing setup failed. Check that dnsmasq is installed.": {
-    "IP sharing setup failed. Check that dnsmasq is installed.": ""
+    "IP sharing setup failed. Check that dnsmasq is installed.": "Instellen van IP-delen mislukt. Controleer of dnsmasq is geïnstalleerd."
   },
   "ISO Date": {
     "ISO Date": "ISO-datum"
@@ -4044,7 +4053,7 @@
     "If the field is hidden, it will appear as soon as a key is pressed.": "Als het veld verborgen is, verschijnt het zodra een toets wordt ingedrukt."
   },
   "Ignore App-Requested Timeout": {
-    "Ignore App-Requested Timeout": ""
+    "Ignore App-Requested Timeout": "Door app gevraagde time-out negeren"
   },
   "Ignore Completely": {
     "Ignore Completely": "Volledig negeren"
@@ -4284,10 +4293,13 @@
     "Keep My Edits": "Mijn bewerkingen behouden"
   },
   "Keep dragging when finger is briefly lifted": {
-    "Keep dragging when finger is briefly lifted": ""
+    "Keep dragging when finger is briefly lifted": "Doorgaan met slepen wanneer vinger kortstondig wordt opgetild"
   },
   "Keep in Bar": {
     "Keep in Bar": "In de balk houden"
+  },
+  "Keep pinned apps as launchers and show running windows separately": {
+    "Keep pinned apps as launchers and show running windows separately": ""
   },
   "Keep the clipboard type filter when reopening history": {
     "Keep the clipboard type filter when reopening history": "Behoud het klembordtypefilter bij het heropenen van de geschiedenis"
@@ -4305,7 +4317,7 @@
     "Key": "Toets"
   },
   "Key combination": {
-    "Key combination": ""
+    "Key combination": "Toetscombinatie"
   },
   "Keybind Sources": {
     "Keybind Sources": "Sneltoetsbronnen"
@@ -4320,31 +4332,31 @@
     "Keybinds shown alongside regular search results": "Sneltoetsen getoond naast gewone zoekresultaten"
   },
   "Keyboard": {
-    "Keyboard": ""
+    "Keyboard": "Toetsenbord"
   },
   "Keyboard Behavior": {
-    "Keyboard Behavior": ""
+    "Keyboard Behavior": "Toetsenbordgedrag"
   },
   "Keyboard Layout Name": {
     "Keyboard Layout Name": "Naam toetsenbordindeling"
   },
   "Keyboard Layouts": {
-    "Keyboard Layouts": ""
+    "Keyboard Layouts": "Toetsenbordindelingen"
   },
   "Keyboard Model": {
-    "Keyboard Model": ""
+    "Keyboard Model": "Toetsenbordmodel"
   },
   "Keyboard Shortcuts": {
     "Keyboard Shortcuts": "Sneltoetsen"
   },
   "Keyboard Variant": {
-    "Keyboard Variant": ""
+    "Keyboard Variant": "Toetsenbordvariant"
   },
   "Keyboard shortcut to start security key unlock": {
-    "Keyboard shortcut to start security key unlock": ""
+    "Keyboard shortcut to start security key unlock": "Sneltoets om ontgrendelen met beveiligingssleutel te starten"
   },
   "Keymap File Path": {
-    "Keymap File Path": ""
+    "Keymap File Path": "Bestandspad keymap"
   },
   "Keys": {
     "Keys": "Toetsen"
@@ -4446,7 +4458,7 @@
     "Left Section": "Linkersectie"
   },
   "Left-Handed Mode": {
-    "Left-Handed Mode": ""
+    "Left-Handed Mode": "Linkshandige modus"
   },
   "Light": {
     "Light": "Licht"
@@ -4590,7 +4602,7 @@
     "MAC": "MAC"
   },
   "MIT License": {
-    "MIT License": ""
+    "MIT License": "MIT-licentie"
   },
   "MTU": {
     "MTU": "MTU"
@@ -4863,7 +4875,7 @@
     "Microphone volume control": "Microfoonvolumeregeling"
   },
   "Middle Click Emulation": {
-    "Middle Click Emulation": ""
+    "Middle Click Emulation": "Middelklik-emulatie"
   },
   "Middle Section": {
     "Middle Section": "Middensectie"
@@ -4876,6 +4888,9 @@
   },
   "Minimal palette built around a single hue.": {
     "Minimal palette built around a single hue.": "Minimalistisch palet gebaseerd op één enkele tint."
+  },
+  "Minimize": {
+    "Minimize": ""
   },
   "Minute": {
     "Minute": "Minuut"
@@ -4941,10 +4956,10 @@
     "Mount Points": "Aankoppelpunten"
   },
   "Mouse & Touchpad": {
-    "Mouse & Touchpad": ""
+    "Mouse & Touchpad": "Muis & touchpad"
   },
   "Mouse Settings": {
-    "Mouse Settings": ""
+    "Mouse Settings": "Muisinstellingen"
   },
   "Mouse clicks pass through the bar to windows behind it": {
     "Mouse clicks pass through the bar to windows behind it": "Muisklikken gaan door de balk heen naar vensters erachter"
@@ -5010,7 +5025,7 @@
     "Native: platform renderer (FreeType).": "Native: platform-renderer (FreeType)."
   },
   "Natural Scrolling": {
-    "Natural Scrolling": ""
+    "Natural Scrolling": "Natuurlijk scrollen"
   },
   "Natural Touchpad Scrolling": {
     "Natural Touchpad Scrolling": "Natuurlijk scrollen via touchpad"
@@ -5160,7 +5175,7 @@
     "No Rounding": "Geen afronding"
   },
   "No Scroll": {
-    "No Scroll": ""
+    "No Scroll": "Niet scrollen"
   },
   "No Shadow": {
     "No Shadow": "Geen schaduw"
@@ -5559,7 +5574,7 @@
     "On": "Aan"
   },
   "On Button Down": {
-    "On Button Down": ""
+    "On Button Down": "Bij knop indrukken"
   },
   "On indefinitely": {
     "On indefinitely": "Voor onbepaalde tijd ingeschakeld"
@@ -5580,7 +5595,7 @@
     "Only adjust gamma based on time or location rules.": "Gamma alleen aanpassen op basis van tijd- of locatieregels."
   },
   "Only continue if you recognize this server certificate fingerprint.": {
-    "Only continue if you recognize this server certificate fingerprint.": ""
+    "Only continue if you recognize this server certificate fingerprint.": "Ga alleen verder als je deze vingerafdruk van het servercertificaat herkent."
   },
   "Only on Battery": {
     "Only on Battery": "Alleen op accustroom"
@@ -5595,13 +5610,13 @@
     "Opacity": "Dekking"
   },
   "Opacity of cards and nested surfaces inside floating windows": {
-    "Opacity of cards and nested surfaces inside floating windows": ""
+    "Opacity of cards and nested surfaces inside floating windows": "Ondoorzichtigheid van kaarten en geneste oppervlakken binnen zwevende vensters"
   },
   "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts": {
-    "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts": ""
+    "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts": "Ondoorzichtigheid van zwevende DMS-vensters zoals Instellingen, Kladblok en authenticatievragen"
   },
   "Opacity of foreground cards and nested surfaces on shell panels": {
-    "Opacity of foreground cards and nested surfaces on shell panels": ""
+    "Opacity of foreground cards and nested surfaces on shell panels": "Ondoorzichtigheid van voorgrondkaarten en geneste oppervlakken op shell-panelen"
   },
   "Opaque": {
     "Opaque": "Ondoorzichtig"
@@ -5613,7 +5628,7 @@
     "Open App": "App openen"
   },
   "Open DMS windows floating instead of tiled": {
-    "Open DMS windows floating instead of tiled": ""
+    "Open DMS windows floating instead of tiled": "DMS-vensters zwevend openen in plaats van getegeld"
   },
   "Open Delay": {
     "Open Delay": "Vertraging bij openen"
@@ -5637,7 +5652,7 @@
     "Open Trash With": "Prullenbak openen met"
   },
   "Open Windows Floating": {
-    "Open Windows Floating": ""
+    "Open Windows Floating": "Vensters zwevend openen"
   },
   "Open a new note": {
     "Open a new note": "Een nieuwe notitie openen"
@@ -5658,7 +5673,7 @@
     "Open in terminal": "Openen in terminal"
   },
   "Open network": {
-    "Open network": ""
+    "Open network": "Open netwerk"
   },
   "Open search bar to find text": {
     "Open search bar to find text": "Zoekbalk openen om tekst te vinden"
@@ -5688,7 +5703,7 @@
     "Opens the connected launcher in Connected Frame Mode.": "Opent de verbonden launcher in Connected Frame Mode."
   },
   "Optional": {
-    "Optional": ""
+    "Optional": "Optioneel"
   },
   "Optional description": {
     "Optional description": "Optionele beschrijving"
@@ -5700,7 +5715,7 @@
     "Optional state-based conditions applied to the first match.": "Optionele op status gebaseerde voorwaarden toegepast op de eerste match."
   },
   "Optional; leave blank for open hotspot": {
-    "Optional; leave blank for open hotspot": ""
+    "Optional; leave blank for open hotspot": "Optioneel; laat leeg voor een open hotspot"
   },
   "Options": {
     "Options": "Opties"
@@ -5760,7 +5775,7 @@
     "Override Corner Radius": "Hoekradius overschrijven"
   },
   "Override floating window transparency for Notepad": {
-    "Override floating window transparency for Notepad": ""
+    "Override floating window transparency for Notepad": "Transparantie van zwevende vensters overschrijven voor Kladblok"
   },
   "Override global layout settings for this output": {
     "Override global layout settings for this output": "Globale indelingsinstellingen overschrijven voor deze uitvoer"
@@ -5838,7 +5853,7 @@
     "Pairing...": "Koppelen..."
   },
   "Partial": {
-    "Partial": ""
+    "Partial": "Gedeeltelijk"
   },
   "Partly Cloudy": {
     "Partly Cloudy": "Half bewolkt"
@@ -5895,7 +5910,7 @@
     "Pending Discharge": "Wachten op ontladen"
   },
   "Per Window": {
-    "Per Window": ""
+    "Per Window": "Per venster"
   },
   "Per-Mode Wallpapers": {
     "Per-Mode Wallpapers": "Achtergronden per modus"
@@ -5959,6 +5974,9 @@
   },
   "Place a trash bin at the end of the dock": {
     "Place a trash bin at the end of the dock": "Plaats een prullenbak aan het einde van het dock"
+  },
+  "Place clipboard history on the Wayland overlay layer": {
+    "Place clipboard history on the Wayland overlay layer": ""
   },
   "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
     "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "Plaats plug-inmappen hier. Elke plug-in moet een plugin.json manifestbestand hebben."
@@ -6048,7 +6066,7 @@
     "Pointer": "Aanwijzer"
   },
   "Pointer Speed": {
-    "Pointer Speed": ""
+    "Pointer Speed": "Aanwijzersnelheid"
   },
   "Polkit integration is disabled. User management requires Polkit to elevate privileges.": {
     "Polkit integration is disabled. User management requires Polkit to elevate privileges.": "Polkit-integratie is uitgeschakeld. Gebruikersbeheer vereist Polkit voor het verhogen van bevoegdheden."
@@ -6159,7 +6177,7 @@
     "Press Ctrl+N or click 'New Session' to create one": "Druk op Ctrl+N of klik op 'Nieuwe sessie' om er een aan te maken"
   },
   "Press Ctrl+key to set. Esc cancels.": {
-    "Press Ctrl+key to set. Esc cancels.": ""
+    "Press Ctrl+key to set. Esc cancels.": "Druk op Ctrl+toets om in te stellen. Esc annuleert."
   },
   "Press Enter and the audio system will restart to apply the change": {
     "Press Enter and the audio system will restart to apply the change": "Druk op Enter om het audiosysteem te herstarten en de wijziging toe te passen"
@@ -6174,7 +6192,7 @@
     "Pressure": "Luchtdruk"
   },
   "Prevent accidental cursor jumps while typing": {
-    "Prevent accidental cursor jumps while typing": ""
+    "Prevent accidental cursor jumps while typing": "Voorkom onbedoelde sprongen van de cursor tijdens het typen"
   },
   "Prevent screen timeout": {
     "Prevent screen timeout": "Scherm-time-out voorkomen"
@@ -6294,7 +6312,7 @@
     "Protocol": "Protocol"
   },
   "QR Generator": {
-    "QR Generator": ""
+    "QR Generator": "QR-generator"
   },
   "Qt": {
     "Qt": "Qt"
@@ -6348,7 +6366,7 @@
     "Random": "Willekeurig"
   },
   "Random Order": {
-    "Random Order": ""
+    "Random Order": "Willekeurige volgorde"
   },
   "Rate": {
     "Rate": "Snelheid"
@@ -6357,7 +6375,7 @@
     "Re-enter password": "Wachtwoord opnieuw invoeren"
   },
   "Re-enter the password before saving.": {
-    "Re-enter the password before saving.": ""
+    "Re-enter the password before saving.": "Voer het wachtwoord opnieuw in voor het opslaan."
   },
   "Reach local network devices while using an exit node": {
     "Reach local network devices while using an exit node": "Toegang tot lokale netwerkapparaten bij gebruik van een exit-node"
@@ -6369,7 +6387,7 @@
     "Read:": "Lezen:"
   },
   "Ready": {
-    "Ready": ""
+    "Ready": "Gereed"
   },
   "Reason": {
     "Reason": "Reden"
@@ -6402,7 +6420,7 @@
     "Regex": "Regex"
   },
   "Registries": {
-    "Registries": ""
+    "Registries": "Registers"
   },
   "Regular": {
     "Regular": "Normaal"
@@ -6420,7 +6438,7 @@
     "Release": "Loslaten"
   },
   "Release to confirm": {
-    "Release to confirm": ""
+    "Release to confirm": "Loslaten om te bevestigen"
   },
   "Reload From Disk": {
     "Reload From Disk": "Herladen van schijf"
@@ -6441,7 +6459,7 @@
     "Remember Last Query": "Laatste zoekopdracht onthouden"
   },
   "Remember Layout": {
-    "Remember Layout": ""
+    "Remember Layout": "Indeling onthouden"
   },
   "Remember Type Filter": {
     "Remember Type Filter": "Typefilter onthouden"
@@ -6516,10 +6534,10 @@
     "Repeat": "Herhalen"
   },
   "Repeat Delay": {
-    "Repeat Delay": ""
+    "Repeat Delay": "Herhalingsvertraging"
   },
   "Repeat Rate": {
-    "Repeat Rate": ""
+    "Repeat Rate": "Herhalingsfrequentie"
   },
   "Replacement": {
     "Replacement": "Vervanging"
@@ -6564,7 +6582,7 @@
     "Requires remembering the last user and session. Enable those options first.": "Vereist het onthouden van de laatste gebruiker en sessie. Schakel die opties eerst in."
   },
   "Requires the DMS Theme extension from the editor marketplace": {
-    "Requires the DMS Theme extension from the editor marketplace": ""
+    "Requires the DMS Theme extension from the editor marketplace": "Vereist de extensie 'DMS Theme' uit de editor-marketplace"
   },
   "Reset": {
     "Reset": "Herstellen"
@@ -6603,10 +6621,13 @@
     "Restart the DankMaterialShell": "Herstart de DankMaterialShell"
   },
   "Restart userspace without rebooting the kernel, requires systemd": {
-    "Restart userspace without rebooting the kernel, requires systemd": ""
+    "Restart userspace without rebooting the kernel, requires systemd": "Gebruikersomgeving herstarten zonder de kernel te herstarten, vereist systemd"
   },
   "Restarting audio system...": {
     "Restarting audio system...": "Audiosysteem herstarten..."
+  },
+  "Restore": {
+    "Restore": ""
   },
   "Restore Special Workspace Windows": {
     "Restore Special Workspace Windows": "Speciale werkruimtevensters herstellen"
@@ -6624,10 +6645,10 @@
     "Reverse Scrolling Direction": "Scrollrichting omkeren"
   },
   "Reverse mouse wheel scrolling direction": {
-    "Reverse mouse wheel scrolling direction": ""
+    "Reverse mouse wheel scrolling direction": "Scrollrichting van muiswiel omkeren"
   },
   "Reverse two-finger scrolling direction": {
-    "Reverse two-finger scrolling direction": ""
+    "Reverse two-finger scrolling direction": "Scrollrichting voor twee vingers omkeren"
   },
   "Reverse workspace switch direction when scrolling over the bar": {
     "Reverse workspace switch direction when scrolling over the bar": "Werkbladwisselrichting omkeren bij scrollen over de balk"
@@ -6711,7 +6732,7 @@
     "Run paru/yay with AUR enabled when 'Update All' is clicked.": "Voer paru/yay uit met AUR ingeschakeld wanneer op 'Alles updaten' wordt geklikt."
   },
   "Running": {
-    "Running": ""
+    "Running": "Actief"
   },
   "Running Apps": {
     "Running Apps": "Actieve apps"
@@ -6738,13 +6759,16 @@
     "SMS sent successfully": "SMS succesvol verzonden"
   },
   "SSID": {
-    "SSID": ""
+    "SSID": "SSID"
   },
   "Saturation": {
     "Saturation": "Verzadiging"
   },
   "Save & Start": {
-    "Save & Start": ""
+    "Save & Start": "Opslaan & Starten"
+  },
+  "Save Extracted Theme": {
+    "Save Extracted Theme": ""
   },
   "Save Notepad File": {
     "Save Notepad File": "Kladblok-bestand opslaan"
@@ -6837,7 +6861,7 @@
     "Scroll GitHub": "Scroll GitHub"
   },
   "Scroll Method": {
-    "Scroll Method": ""
+    "Scroll Method": "Scrollmethode"
   },
   "Scroll Wheel": {
     "Scroll Wheel": "Scrollwiel"
@@ -6855,7 +6879,7 @@
     "Scrolling": "Scrollen"
   },
   "Scrolling Speed": {
-    "Scrolling Speed": ""
+    "Scrolling Speed": "Scrollsnelheid"
   },
   "Search App Actions": {
     "Search App Actions": "App-acties zoeken"
@@ -6921,16 +6945,16 @@
     "Security Key PAM Source": "PAM-bron voor beveiligingssleutel"
   },
   "Security key": {
-    "Security key": ""
+    "Security key": "Beveiligingssleutel"
   },
   "Security key (%1)": {
-    "Security key (%1)": ""
+    "Security key (%1)": "Beveiligingssleutel (%1)"
   },
   "Security key mode": {
     "Security key mode": "Beveiligingssleutel-modus"
   },
   "Security key shortcut": {
-    "Security key shortcut": ""
+    "Security key shortcut": "Sneltoets beveiligingssleutel"
   },
   "Security-key availability could not be confirmed": {
     "Security-key availability could not be confirmed": "Beschikbaarheid van beveiligingssleutel kon niet worden bevestigd"
@@ -6978,7 +7002,7 @@
     "Select a desktop application": "Selecteer een desktop-applicatie"
   },
   "Select a random wallpaper instead of cycling in alphabetical order": {
-    "Select a random wallpaper instead of cycling in alphabetical order": ""
+    "Select a random wallpaper instead of cycling in alphabetical order": "Selecteer een willekeurige achtergrond in plaats van op alfabetische volgorde"
   },
   "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": {
     "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": "Selecteer een widget om toe te voegen aan uw bureaublad. Elke widget is een apart exemplaar met eigen instellingen."
@@ -7064,6 +7088,9 @@
   "Separate Light & Dark Themes": {
     "Separate Light & Dark Themes": "Aparte lichte en donkere thema's"
   },
+  "Separate Pinned and Running Apps": {
+    "Separate Pinned and Running Apps": ""
+  },
   "Separate appearance for unfocused displays is not supported on this compositor.": {
     "Separate appearance for unfocused displays is not supported on this compositor.": "Aparte vormgeving voor schermen zonder focus wordt niet ondersteund op deze compositor."
   },
@@ -7110,13 +7137,13 @@
     "Set the percentage at which the battery is considered low.": "Stel het percentage in waarbij de accu als 'bijna leeg' wordt beschouwd."
   },
   "Set up a WiFi hotspot for sharing this connection.": {
-    "Set up a WiFi hotspot for sharing this connection.": ""
+    "Set up a WiFi hotspot for sharing this connection.": "Stel een wifi-hotspot in om deze verbinding te delen."
   },
   "Set up hotspot": {
-    "Set up hotspot": ""
+    "Set up hotspot": "Hotspot instellen"
   },
   "Set up hotspot in Settings": {
-    "Set up hotspot in Settings": ""
+    "Set up hotspot in Settings": "Hotspot instellen in Instellingen"
   },
   "Setting": {
     "Setting": "Instelling"
@@ -7200,7 +7227,7 @@
     "Show": "Tonen"
   },
   "Show \"config reloaded\" Toast": {
-    "Show \"config reloaded\" Toast": ""
+    "Show \"config reloaded\" Toast": "\"Configuratie herladen\"-melding tonen"
   },
   "Show 3rd Party": {
     "Show 3rd Party": "Derde partijen tonen"
@@ -7350,7 +7377,7 @@
     "Show Seconds": "Seconden tonen"
   },
   "Show Soft Reboot": {
-    "Show Soft Reboot": ""
+    "Show Soft Reboot": "Zachte herstart tonen"
   },
   "Show Sunrise/Sunset": {
     "Show Sunrise/Sunset": "Toon zonsopgang/zonsondergang"
@@ -7401,7 +7428,7 @@
     "Show a notification when battery reaches the charge limit.": "Toon een melding wanneer de accu de laadlimiet bereikt."
   },
   "Show a toast when the compositor config is reloaded": {
-    "Show a toast when the compositor config is reloaded": ""
+    "Show a toast when the compositor config is reloaded": "Toon een melding wanneer de compositor-configuratie is herladen"
   },
   "Show a warning popup when battery is running low.": {
     "Show a warning popup when battery is running low.": "Toon een waarschuwingspop-up als de accu bijna leeg is."
@@ -7434,7 +7461,7 @@
     "Show during Niri overview": "Weergeven tijdens Niri-overzicht"
   },
   "Show foreground surfaces on cards inside floating windows": {
-    "Show foreground surfaces on cards inside floating windows": ""
+    "Show foreground surfaces on cards inside floating windows": "Voorgrondoppervlakken tonen op kaarten binnen zwevende vensters"
   },
   "Show foreground surfaces on notification cards": {
     "Show foreground surfaces on notification cards": "Voorgrondoppervlakken weergeven op meldingkaarten"
@@ -7449,7 +7476,7 @@
     "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": "Starter-overlay tonen bij typen in Niri-overzicht. Schakel uit om een andere starter te gebruiken."
   },
   "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.": {
-    "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.": ""
+    "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.": "Toon herhalende video-albumhoezen van Apple Music indien beschikbaar. Verstuurt de artiestennaam en de albumnaam die worden afgespeeld naar Apple."
   },
   "Show mode tabs and keyboard hints at the bottom.": {
     "Show mode tabs and keyboard hints at the bottom.": "Toon modustabbladen en toetsenbordhints onderaan."
@@ -7563,7 +7590,7 @@
     "Snow": "Sneeuw"
   },
   "Soft Reboot": {
-    "Soft Reboot": ""
+    "Soft Reboot": "Zachte herstart"
   },
   "Some plugins require a newer version of DMS:": {
     "Some plugins require a newer version of DMS:": "Sommige plug-ins vereisen een nieuwere versie van DMS:"
@@ -7587,7 +7614,7 @@
     "Source: %1": "Bron: %1"
   },
   "Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.": {
-    "Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.": ""
+    "Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.": "Bronnen voor plug-ins en thema's. Registers zijn git-repositories met een plugins/- of themes/-map."
   },
   "Space between the bar and screen edges": {
     "Space between the bar and screen edges": "Ruimte tussen de balk en schermranden"
@@ -7640,8 +7667,11 @@
   "Start": {
     "Start": "Start"
   },
+  "Start DankConnect, KDE Connect, or Valent to use this plugin": {
+    "Start DankConnect, KDE Connect, or Valent to use this plugin": ""
+  },
   "Start Hotspot?": {
-    "Start Hotspot?": ""
+    "Start Hotspot?": "Hotspot starten?"
   },
   "Start KDE Connect or Valent to use this plugin": {
     "Start KDE Connect or Valent to use this plugin": "Start KDE Connect of Valent om deze plug-in te gebruiken"
@@ -7650,19 +7680,19 @@
     "Start typing your notes here...": "Begin hier met het typen van uw notities..."
   },
   "Starting hotspot...": {
-    "Starting hotspot...": ""
+    "Starting hotspot...": "Hotspot starten..."
   },
   "Starting the hotspot will disconnect WiFi from \"%1\" — the radio can't do both at once. Sharing internet then requires another connection, such as Ethernet.": {
-    "Starting the hotspot will disconnect WiFi from \"%1\" — the radio can't do both at once. Sharing internet then requires another connection, such as Ethernet.": ""
+    "Starting the hotspot will disconnect WiFi from \"%1\" — the radio can't do both at once. Sharing internet then requires another connection, such as Ethernet.": "Het starten van de hotspot zal de wifi-verbinding met \"%1\" verbreken — de hardware kan niet beide tegelijkertijd. Internet delen vereist dan een andere verbinding, zoals ethernet."
   },
   "Starting...": {
-    "Starting...": ""
+    "Starting...": "Starten..."
   },
   "State": {
     "State": "Status"
   },
   "Stop": {
-    "Stop": ""
+    "Stop": "Stoppen"
   },
   "Stop ignoring %1": {
     "Stop ignoring %1": "Stop met negeren van %1"
@@ -7704,7 +7734,7 @@
     "Sunset": "Zonsondergang"
   },
   "Super + Space": {
-    "Super + Space": ""
+    "Super + Space": "Super + Spatie"
   },
   "Suppress Duplicate Notifications": {
     "Suppress Duplicate Notifications": "Dubbele notificaties onderdrukken"
@@ -7740,7 +7770,7 @@
     "Surface Opacity": "Oppervlaktedekking"
   },
   "Surface Styling": {
-    "Surface Styling": ""
+    "Surface Styling": "Oppervlaktestyling"
   },
   "Surface Text": {
     "Surface Text": "Surface-tekst"
@@ -7764,13 +7794,13 @@
     "Suspend then Hibernate": "Onderbreken dan Sluimerstand"
   },
   "Swap primary and secondary mouse buttons": {
-    "Swap primary and secondary mouse buttons": ""
+    "Swap primary and secondary mouse buttons": "Primaire en secundaire muisknoppen omwisselen"
   },
   "Sway Website": {
     "Sway Website": "Sway-website"
   },
   "Switch Layout Shortcut": {
-    "Switch Layout Shortcut": ""
+    "Switch Layout Shortcut": "Sneltoets indeling wisselen"
   },
   "Switch between display configurations": {
     "Switch between display configurations": "Schakelen tussen schermconfiguraties"
@@ -7800,7 +7830,7 @@
     "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": "Synchronisatie past uw thema en instellingen toe op het aanmeldscherm. Gedeelde gebruikers moeten 'dms greeter sync --profile' uitvoeren in plaats van een primaire gebruikerssynchronisatie."
   },
   "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": {
-    "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": ""
+    "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": "Synchronisatie past je thema en instellingen toe op het aanmeldscherm. Andere gebruikers moeten 'dms-greeter sync --profile' uitvoeren in plaats van een synchronisatie voor de hoofdgebruiker."
   },
   "Sync completed successfully.": {
     "Sync completed successfully.": "Sync is succesvol voltooid."
@@ -7818,7 +7848,7 @@
     "Sync to apply": "Synchroniseer om toe te passen"
   },
   "Sync with Global Settings": {
-    "Sync with Global Settings": ""
+    "Sync with Global Settings": "Synchroniseren met globale instellingen"
   },
   "Syncing...": {
     "Syncing...": "Synchroniseren..."
@@ -7896,16 +7926,16 @@
     "Tailscale not available": "Tailscale niet beschikbaar"
   },
   "Tap and Drag": {
-    "Tap and Drag": ""
+    "Tap and Drag": "Tikken en slepen"
   },
   "Tap and drag on the touchpad to move items": {
-    "Tap and drag on the touchpad to move items": ""
+    "Tap and drag on the touchpad to move items": "Tik en sleep op het touchpad om items te verplaatsen"
   },
   "Tap the touchpad surface to trigger left click clicks": {
-    "Tap the touchpad surface to trigger left click clicks": ""
+    "Tap the touchpad surface to trigger left click clicks": "Tik op het touchpad-oppervlak voor een linkerklik"
   },
   "Tap to Click": {
-    "Tap to Click": ""
+    "Tap to Click": "Tikken om te klikken"
   },
   "Terminal": {
     "Terminal": "Terminal"
@@ -7920,7 +7950,7 @@
     "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": "Terminal fallback mislukt. Installeer een van de ondersteunde terminal-emulators of voer handmatig 'dms greeter sync' uit."
   },
   "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": {
-    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": ""
+    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": "Terminal-fallback mislukt. Installeer een van de ondersteunde terminal-emulators of voer 'dms-greeter sync' handmatig uit."
   },
   "Terminal fallback opened. Complete authentication there; it will close automatically when done.": {
     "Terminal fallback opened. Complete authentication there; it will close automatically when done.": "Terminal-terugval geopend. Voltooi daar de authenticatie; deze sluit automatisch zodra voltooid."
@@ -7968,7 +7998,7 @@
     "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "De DMS_SOCKET omgevingsvariabele is niet ingesteld of de socket is niet beschikbaar. Geautomatiseerd plug-inbeheer vereist de DMS_SOCKET."
   },
   "The WiFi adapter could not start access point mode.": {
-    "The WiFi adapter could not start access point mode.": ""
+    "The WiFi adapter could not start access point mode.": "De wifi-adapter kon de accesspoint-modus niet starten."
   },
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
     "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "De onderstaande instellingen wijzigen uw GTK- en Qt-instellingen. Als u uw huidige configuraties wilt behouden, maak er dan een back-up van (qt5ct.conf|qt6ct.conf en ~/.config/gtk-3.0|gtk-4.0)."
@@ -7983,7 +8013,7 @@
     "The rule applies to any window matching one of these.": "De regel is van toepassing op elk venster dat overeenkomt met een van deze."
   },
   "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": {
-    "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": ""
+    "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": "Het servercertificaat is gewijzigd sinds het voor het laatst werd vertrouwd. Ga alleen verder als je de nieuwe vingerafdruk herkent."
   },
   "Theme & Colors": {
     "Theme & Colors": "Thema & Kleuren"
@@ -7999,6 +8029,9 @@
   },
   "Theme color used for the widget outline": {
     "Theme color used for the widget outline": "Themakleur gebruikt voor de widget-omlijning"
+  },
+  "Theme extracted to: %1": {
+    "Theme extracted to: %1": ""
   },
   "Theme worker failed (%1)": {
     "Theme worker failed (%1)": "Theme worker mislukt (%1)"
@@ -8046,7 +8079,7 @@
     "This will delete all unpinned entries. %1 pinned entries will be kept.": "Dit verwijdert alle niet-vastgemaakte items. %1 vastgemaakte items blijven bewaard."
   },
   "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": {
-    "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": ""
+    "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": "Dit verbreekt de wifi-verbinding met \"%1\" — de radio kan niet tegelijkertijd een hotspot hosten en verbonden blijven. Internet delen vereist een andere verbinding, zoals ethernet."
   },
   "This will permanently delete all clipboard history.": {
     "This will permanently delete all clipboard history.": "Dit zal de volledige klembordgeschiedenis permanent verwijderen."
@@ -8086,6 +8119,9 @@
   },
   "Time & Weather": {
     "Time & Weather": "Tijd & Weer"
+  },
+  "Time First": {
+    "Time First": ""
   },
   "Time Format": {
     "Time Format": "Tijdnotatie"
@@ -8214,10 +8250,10 @@
     "Touch your security key...": "Raak uw beveiligingssleutel aan..."
   },
   "Touchpad Settings": {
-    "Touchpad Settings": ""
+    "Touchpad Settings": "Touchpad-instellingen"
   },
   "Touchpad Speed": {
-    "Touchpad Speed": ""
+    "Touchpad Speed": "Touchpadsnelheid"
   },
   "Transform": {
     "Transform": "Transformatie"
@@ -8280,7 +8316,7 @@
     "Turn off now": "Nu uitschakelen"
   },
   "Two Finger": {
-    "Two Finger": ""
+    "Two Finger": "Twee vingers"
   },
   "Type at least 2 characters": {
     "Type at least 2 characters": "Typ minstens 2 tekens"
@@ -8424,7 +8460,7 @@
     "Untrust": "Niet vertrouwen"
   },
   "Untrusted VPN certificate": {
-    "Untrusted VPN certificate": ""
+    "Untrusted VPN certificate": "Niet-vertrouwd VPN-certificaat"
   },
   "Up to date": {
     "Up to date": "Bijgewerkt"
@@ -8745,13 +8781,13 @@
     "W": "B"
   },
   "WCAG %1 body": {
-    "WCAG %1 body": ""
+    "WCAG %1 body": "WCAG %1-body"
   },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
   },
   "WPA2 password": {
-    "WPA2 password": ""
+    "WPA2 password": "WPA2-wachtwoord"
   },
   "Wallpaper": {
     "Wallpaper": "Achtergrond"
@@ -8841,10 +8877,10 @@
     "WiFi enabled": "Wifi ingeschakeld"
   },
   "WiFi is disabled": {
-    "WiFi is disabled": ""
+    "WiFi is disabled": "Wifi is uitgeschakeld"
   },
   "WiFi is disabled. You can still edit and save hotspot settings, but starting the hotspot requires WiFi to be enabled.": {
-    "WiFi is disabled. You can still edit and save hotspot settings, but starting the hotspot requires WiFi to be enabled.": ""
+    "WiFi is disabled. You can still edit and save hotspot settings, but starting the hotspot requires WiFi to be enabled.": "Wifi is uitgeschakeld. Je kunt nog steeds hotspot-instellingen bewerken en opslaan, maar voor het starten van de hotspot moet wifi zijn ingeschakeld."
   },
   "WiFi is off": {
     "WiFi is off": "Wifi is uit"
@@ -8904,7 +8940,7 @@
     "Width of window border and focus ring": "Breedte van vensterrand en focusring"
   },
   "Will disconnect \"%1": {
-    "Will disconnect \"%1\"": ""
+    "Will disconnect \"%1\"": "Zal \"%1\" verbreken"
   },
   "Wind": {
     "Wind": "Wind"
@@ -8928,7 +8964,7 @@
     "Window Height": "Vensterhoogte"
   },
   "Window Opacity": {
-    "Window Opacity": ""
+    "Window Opacity": "Vensterondoorzichtigheid"
   },
   "Window Opening": {
     "Window Opening": "Venster openen"
@@ -8976,7 +9012,7 @@
     "X-Ray": "X-Ray"
   },
   "XKB Options": {
-    "XKB Options": ""
+    "XKB Options": "XKB-opties"
   },
   "XWayland": {
     "XWayland": "XWayland"
@@ -9021,10 +9057,10 @@
     "Your compositor does not support background blur (ext-background-effect-v1)": "Je compositor ondersteunt geen achtergrondvervaging (ext-background-effect-v1)"
   },
   "Your hotspot is running.": {
-    "Your hotspot is running.": ""
+    "Your hotspot is running.": "Je hotspot is actief."
   },
   "Your hotspot profile is saved and ready to start.": {
-    "Your hotspot profile is saved and ready to start.": ""
+    "Your hotspot profile is saved and ready to start.": "Je hotspotprofiel is opgeslagen en klaar om te starten."
   },
   "Your system is up to date!": {
     "Your system is up to date!": "Uw systeem is bijgewerkt!"
@@ -9036,7 +9072,7 @@
     "attached": "gekoppeld"
   },
   "below AA": {
-    "below AA": ""
+    "below AA": "onder AA"
   },
   "brandon": {
     "brandon": "brandon"
