@@ -1169,6 +1169,12 @@ Item {
 
                     delegate: AudioOutputOSD {}
                 }
+
+                Variants {
+                    model: SettingsData.getFilteredScreens("osd")
+
+                    delegate: AuthHudPill {}
+                }
             }
         }
     }

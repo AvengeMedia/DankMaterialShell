@@ -113,7 +113,7 @@
               src = ./core;
               vendorHash = "sha256-1G56AkZmYwFWW1sBzo6Bg/qpvPlt376IQS1XHMXnzQ8=";
 
-              subPackages = [ "cmd/dms" ];
+              subPackages = [ "cmd/dms" "cmd/gaze-observe" ];
 
               ldflags = [
                 "-s"
