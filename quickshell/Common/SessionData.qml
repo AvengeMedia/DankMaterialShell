@@ -163,7 +163,6 @@ Singleton {
     property bool nightModeUseIPLocation: false
     property string nightModeLocationProvider: ""
     property bool nightModePaused: false
-    property var nightModeExcludedAppsMatchesCache: []
 
     property bool themeModeAutoEnabled: false
     property string themeModeAutoMode: "time"
@@ -790,20 +789,6 @@ Singleton {
         saveSettings();
     }
 
-    function cacheNightModeExcludedAppMatch(app: string) {
-        app = app ? String(app).toLowerCase().trim() : "";
-        var moddedList = nightModeExcludedAppsMatchesCache ? nightModeExcludedAppsMatchesCache.slice() : [];
-        if (!moddedList.includes(app)) {
-            moddedList.push(app);
-            nightModeExcludedAppsMatchesCache = moddedList;
-            saveSettings();
-        }
-    }
-
-    function resetNightModeExcludedAppsMatchesCache() {
-        nightModeExcludedAppsMatchesCache = [];
-        saveSettings();
-    }
 
     function setNightModePaused(paused: bool) {
         nightModePaused = paused;

@@ -38,7 +38,6 @@ var SPEC = {
     nightModeUseIPLocation: { def: false },
     nightModeLocationProvider: { def: "" },
     nightModePaused: { def: false },
-    nightModeExcludedAppsMatchesCache: { def: [] },
 
     themeModeAutoEnabled: { def: false },
     themeModeAutoMode: { def: "time" },

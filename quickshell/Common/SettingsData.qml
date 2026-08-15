@@ -3260,14 +3260,12 @@ Singleton {
     function addNightModeExcludedApp(identity: string) {
         var newList = addAppIdToList(identity, nightModeExcludedApps);
         nightModeExcludedApps = newList;
-        SessionData.resetNightModeExcludedAppsMatchesCache();
         saveSettings();
     }
 
     function removeNightModeExcludedApp(index: int) {
         var newList = removeAppIdFromList(index, nightModeExcludedApps);
         nightModeExcludedApps = newList;
-        SessionData.resetNightModeExcludedAppsMatchesCache();
         saveSettings();
     }
 

@@ -108,7 +108,6 @@ Singleton {
 
     property bool nightModeEnabled: false
     property bool nightModePaused: false
-    property var nightModeExcludedAppsMatchesCache: []
 
     property bool automationAvailable: false
     property bool gammaControlAvailable: false
@@ -1078,12 +1077,10 @@ Singleton {
     function pauseNightMode() {
         disableNightMode();
         nightModePaused = true;
-        SessionData.setNightModePaused(true);
     }
     function resumeNightMode() {
         enableNightMode();
         nightModePaused = false;
-        SessionData.setNightModePaused(false);
     }
 
     function isNightModeExcludedApp(appId: string): bool {
@@ -1092,17 +1089,10 @@ Singleton {
             return false;
         }
 
-        const exclusionCache = nightModeExcludedAppsMatchesCache;
-        if (exclusionCache.includes(appId)) {
-            return true;
-        }
-
         const moddedId = Paths.moddedAppId(appId);
         const desktopId = DesktopEntries.heuristicLookup(moddedId)?.id ?? "";
         const isExcludedAppException = excludedApps.some(excludedId => Paths.isAppIdMatch(appId, excludedId, desktopId));
-        if (isExcludedAppException) {
-            SessionData.cacheNightModeExcludedAppMatch(appId);
-        }
+
         return isExcludedAppException;
     }
 
@@ -1556,11 +1546,10 @@ Singleton {
         function onNightModeUseIPLocationChanged() {
             evaluateNightMode();
         }
+    }
         function onNightModePausedChanged() {
             nightModePaused = SessionData.nightModePaused;
         }
-        function onNightModeExcludedAppsMatchesCacheChanged() {
-            nightModeExcludedAppsMatchesCache = SessionData.nightModeExcludedAppsMatchesCache;
         }
     }
 
