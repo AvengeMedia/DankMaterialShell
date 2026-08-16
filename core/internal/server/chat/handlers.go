@@ -167,6 +167,9 @@ func handleChats(ctx context.Context, conn *models.Conn, req models.Request, m *
 		models.RespondError(conn, req.ID, err.Error())
 		return
 	}
+	if chats == nil {
+		chats = []chat.Chat{}
+	}
 	models.Respond(conn, req.ID, chatsResult{Chats: chats})
 }
 
@@ -201,6 +204,9 @@ func handleHistory(ctx context.Context, conn *models.Conn, req models.Request, m
 		}
 	}
 
+	if msgs == nil {
+		msgs = []chat.Message{}
+	}
 	models.Respond(conn, req.ID, historyResult{Messages: msgs, HasMore: hasMore})
 }
 
@@ -241,6 +247,15 @@ func handleSearch(ctx context.Context, conn *models.Conn, req models.Request, m 
 		if b.HasCapability(CapSearch) {
 			b.notify(MethodSearch, map[string]any{"query": query, "limit": limit})
 		}
+	}
+
+	// Empty results are sent as [] rather than null: a nil Go slice encodes as
+	// JSON null, which a caller doing `.length` on has to defend against.
+	if msgs == nil {
+		msgs = []chat.SearchHit{}
+	}
+	if chats == nil {
+		chats = []chat.Chat{}
 	}
 
 	models.Respond(conn, req.ID, searchResult{Messages: msgs, Chats: chats})
