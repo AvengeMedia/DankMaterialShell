@@ -1198,7 +1198,7 @@ Item {
                     text: I18n.tr("Corner Style")
                     description: I18n.tr("Choose how the bar meets the screen edge")
                     visible: !SettingsData.frameEnabled
-                    model: [I18n.tr("Rounded"), I18n.tr("Attached"), I18n.tr("Square")]
+                    model: [I18n.tr("Rounded"), I18n.tr("Flush"), I18n.tr("Square")]
                     currentIndex: {
                         if (selectedBarConfig?.squareCorners ?? false)
                             return 2;
