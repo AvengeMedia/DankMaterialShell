@@ -1040,7 +1040,7 @@ Item {
                     tags: ["bar", "length", "padding", "size", "shorter"]
                     unit: "px"
                     minimum: 0
-                    maximum: 128
+                    maximum: 512
                     defaultValue: 0
                     value: selectedBarConfig?.barLengthPadding ?? 0
                     onSliderDragFinished: finalValue => SettingsData.updateBarConfig(selectedBarId, {
