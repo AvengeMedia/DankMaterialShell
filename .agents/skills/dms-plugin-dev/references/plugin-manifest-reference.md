@@ -9,15 +9,17 @@
 | `description` | string | Short description (shown in UI) | Non-empty |
 | `version` | string | Semantic version | Pattern `^\d+\.\d+\.\d+(-[a-zA-Z0-9.-]+)?(\+[a-zA-Z0-9.-]+)?$` |
 | `author` | string | Creator name or email | Non-empty |
-| `type` | string | Plugin type | One of: `widget`, `daemon`, `launcher`, `desktop`, `composite` |
+| `type` | string | Plugin type | One of: `widget`, `daemon`, `launcher`, `desktop`, `composite`, `chat` |
 | `capabilities` | array | Plugin capabilities | At least 1 string item |
 
-One of `component` or `components` is required (not both):
+One of `component` or `components` is required (not both) — except for `type: "chat"`, which
+ships a `bridge` executable instead of any QML component:
 
 | Field | Type | Description | Validation |
 |-------|------|-------------|------------|
 | `component` | string | Path to main QML file (single-surface plugins) | Must start with `./`, end with `.qml` |
 | `components` | object | Map of surface name to QML path (multi-surface plugins) | At least 1 entry; keys: `widget`, `desktop`, `daemon`, `launcher` |
+| `bridge` | array | Argv for a chat provider bridge executable, relative to the plugin directory | Required for `type: "chat"`; at least 1 string item |
 
 ## Conditional Requirements
 
@@ -25,6 +27,7 @@ One of `component` or `components` is required (not both):
 |-----------|---------------|-------------|
 | `type: "launcher"` | `trigger` | Trigger string for launcher activation (e.g., `=`, `#`, `!`) |
 | `components` has `launcher` key | `trigger` | Same requirement applies to composite plugins with a launcher surface |
+| `type: "chat"` | `bridge` | Argv for the provider bridge. A chat plugin needs no `component`/`components`. See [chat-plugin-guide.md](chat-plugin-guide.md) |
 
 ## Optional Fields
 

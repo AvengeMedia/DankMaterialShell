@@ -2,9 +2,9 @@
 name: dms-plugin-dev
 description: >
   Develop plugins for DankMaterialShell (DMS), a QML-based Linux desktop shell built on
-  Quickshell. Supports five plugin types: widget (bar + Control Center), daemon (background
-  service), launcher (search + actions), desktop (draggable desktop widgets), and composite
-  (multi-surface). Covers manifest creation, QML component development, startup checks,
+  Quickshell. Supports six plugin types: widget (bar + Control Center), daemon (background
+  service), launcher (search + actions), desktop (draggable desktop widgets), composite
+  (multi-surface), and chat (a messaging provider run as an external bridge process). Covers manifest creation, QML component development, startup checks,
   settings UI, data persistence, theme integration, PopoutService usage, IPC runtime
   discovery, and external command execution. Use when the user wants to create, modify,
   or debug a DMS plugin, or asks about the DMS plugin API.
@@ -38,7 +38,7 @@ integrations, and desktop widgets. Plugins are QML components discovered from
 
 **Plugin registry:** Community plugins are available at https://plugins.danklinux.com/
 
-**Five plugin types:**
+**Six plugin types:**
 
 | Type        | Purpose                        | Base Component             | Bar pills | CC integration |
 |-------------|--------------------------------|----------------------------|-----------|----------------|
@@ -47,6 +47,7 @@ integrations, and desktop widgets. Plugins are QML components discovered from
 | `launcher`  | Searchable items in launcher   | `Item`                     | No        | No             |
 | `desktop`   | Draggable desktop widget       | `DesktopPluginComponent`   | No        | No             |
 | `composite` | Multi-surface plugin           | One component per surface  | Optional  | Optional       |
+| `chat`      | Messaging provider             | External bridge process    | No        | No             |
 
 ## Step 1: Determine Plugin Type
 
@@ -63,6 +64,10 @@ Choose the type based on what the plugin does:
 - **Needs multiple surfaces?** - Use `composite`. A single plugin that registers any combination
   of the above (e.g., a daemon + bar widget + desktop widget). Each surface gets its own
   QML component file.
+- **Connects a messaging service?** - Use `chat`. Unlike every other type, a chat plugin ships
+  no QML component: it ships an executable "bridge" that the DMS backend runs and talks to over
+  newline-delimited JSON. The backend owns the message store, unread counts, attachment cache
+  and notifications, so the bridge only translates its service's protocol into JSON lines.
 
 ## Step 2: Create the Manifest
 
@@ -279,6 +284,31 @@ PluginComponent {
 ```
 
 See [daemon-plugin-guide.md](references/daemon-plugin-guide.md) for event-driven patterns and process execution.
+
+### Chat Plugins
+
+A chat plugin has no QML component. Its manifest points at a bridge executable instead:
+
+```json
+{
+    "id": "myChat",
+    "name": "My Chat",
+    "description": "Connects DMS to My Chat",
+    "version": "1.0.0",
+    "author": "you",
+    "type": "chat",
+    "capabilities": ["chat"],
+    "icon": "chat",
+    "bridge": ["./bin/mychat"],
+    "settings": "./Settings.qml"
+}
+```
+
+The bridge can be written in any language. It prints what happened as JSON lines and reads
+commands the same way; it never opens a database, caches an image, or raises a notification.
+
+See [chat-plugin-guide.md](references/chat-plugin-guide.md) for the protocol, and
+`quickshell/PLUGINS/EchoChatExample/` for a complete working bridge.
 
 ### Composite
 
@@ -602,6 +632,7 @@ Load these on demand for detailed API documentation:
 - [launcher-plugin-guide.md](references/launcher-plugin-guide.md) - getItems/executeItem, triggers, icon types, context menus, tile view
 - [desktop-plugin-guide.md](references/desktop-plugin-guide.md) - DesktopPluginComponent, sizing, edit mode, position persistence
 - [daemon-plugin-guide.md](references/daemon-plugin-guide.md) - Event-driven background services, process execution
+- [chat-plugin-guide.md](references/chat-plugin-guide.md) - Chat provider bridges: the NDJSON protocol, capabilities, media, settings
 - [settings-components-reference.md](references/settings-components-reference.md) - All 7 setting components with complete property lists
 - [theme-reference.md](references/theme-reference.md) - Theme colors, spacing, fonts, radii, common patterns
 - [data-persistence-guide.md](references/data-persistence-guide.md) - pluginData, state API, global variables

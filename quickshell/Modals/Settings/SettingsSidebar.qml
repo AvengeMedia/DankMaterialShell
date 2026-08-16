@@ -408,6 +408,13 @@ Rectangle {
             ]
         },
         {
+            "id": "chats",
+            "text": I18n.tr("Chats"),
+            "icon": "forum",
+            "tabIndex": 46,
+            "chatCapable": true
+        },
+        {
             "id": "plugins",
             "text": I18n.tr("Plugins"),
             "icon": "extension",
@@ -449,6 +456,10 @@ Rectangle {
         if (item.greeterOnly && !GreeterService.available)
             return false;
         if (item.autostartOnly && !DesktopService.autostartAvailable)
+            return false;
+        // Hidden entirely on a backend built without chat support, rather than
+        // shown as a tab that cannot do anything.
+        if (item.chatCapable && !ChatService.available)
             return false;
         return true;
     }

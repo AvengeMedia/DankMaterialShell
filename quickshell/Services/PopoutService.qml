@@ -33,6 +33,7 @@ Singleton {
     property var settingsModal: null
     property var settingsModalLoader: null
     property var clipboardHistoryModal: null
+    property var chatsModal: null
     property var dankLauncherV2Modal: null
     property var dankLauncherV2ModalLoader: null
     property var spotlightBarModal: null
@@ -522,6 +523,24 @@ Singleton {
             }
             settingsModal?.toggle();
         }
+    }
+
+    function openChats() {
+        chatsModal?.show();
+    }
+
+    function closeChats() {
+        chatsModal?.hide();
+    }
+
+    function toggleChats() {
+        chatsModal?.toggle();
+    }
+
+    // openChat jumps straight into a conversation, for the launcher plugin and
+    // the Super+Tab rotation.
+    function openChat(provider, chatId) {
+        chatsModal?.showChat(provider, chatId);
     }
 
     function openClipboardHistory() {

@@ -131,3 +131,5 @@ distro/void/masterdir*/
 core/dms
 
 core/internal/shellembed/dist
+commit-changes.md
+readme-changes.md

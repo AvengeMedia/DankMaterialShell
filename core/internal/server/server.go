@@ -14,6 +14,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/apppicker"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/bluez"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/brightness"
+	serverChat "github.com/AvengeMedia/DankMaterialShell/core/internal/server/chat"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/clipboard"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/cups"
 	serverDbus "github.com/AvengeMedia/DankMaterialShell/core/internal/server/dbus"
@@ -36,7 +37,7 @@ import (
 	"github.com/AvengeMedia/dankgo/syncmap"
 )
 
-const APIVersion = 30
+const APIVersion = 31
 
 var CLIVersion = "dev"
 
@@ -74,6 +75,7 @@ var wallpaperManager *wallpaper.Manager
 var trayRecoveryManager *trayrecovery.Manager
 var locationManager *location.Manager
 var sysUpdateManager *sysupdate.Manager
+var chatManager *serverChat.Manager
 var geoClientInstance geolocation.Client
 
 const dbusClientID = "dms-dbus-client"
@@ -365,6 +367,22 @@ func InitializeSysUpdateManager() error {
 	return nil
 }
 
+// InitializeChatManager opens the chat store and discovers installed chat
+// plugins. Bridges stay stopped until a provider is enabled, so this costs
+// nothing for the majority of users who have no chat plugins installed.
+func InitializeChatManager() error {
+	manager, err := serverChat.NewManager()
+	if err != nil {
+		log.Warnf("Failed to initialize chat manager: %v", err)
+		return err
+	}
+
+	chatManager = manager
+
+	log.Info("Chat manager initialized")
+	return nil
+}
+
 func routeHandler(_ context.Context, conn *models.Conn, req ipc.Request, _ *ipc.Subscriber) {
 	routeRequestRecovered(conn, models.Request(req))
 }
@@ -458,6 +476,10 @@ func getCapabilities() Capabilities {
 
 	if sysUpdateManager != nil {
 		caps = append(caps, "sysupdate")
+	}
+
+	if chatManager != nil {
+		caps = append(caps, "chat")
 	}
 
 	return Capabilities{Capabilities: caps}
@@ -1181,6 +1203,38 @@ func handleSubscribe(conn *models.Conn, req models.Request) {
 		}()
 	}
 
+	if shouldSubscribe("chat") && chatManager != nil {
+		wg.Add(1)
+		chatChan := chatManager.Subscribe(clientID + "-chat")
+		go func() {
+			defer wg.Done()
+			defer chatManager.Unsubscribe(clientID + "-chat")
+
+			initialState := chatManager.GetState()
+			select {
+			case eventChan <- ServiceEvent{Service: "chat", Data: initialState}:
+			case <-stopChan:
+				return
+			}
+
+			for {
+				select {
+				case state, ok := <-chatChan:
+					if !ok {
+						return
+					}
+					select {
+					case eventChan <- ServiceEvent{Service: "chat", Data: state}:
+					case <-stopChan:
+						return
+					}
+				case <-stopChan:
+					return
+				}
+			}
+		}()
+	}
+
 	if shouldSubscribe("dbus") && dbusManager != nil {
 		wg.Add(1)
 		dbusChan := dbusManager.SubscribeSignals(dbusClient)
@@ -1288,6 +1342,9 @@ func cleanupManagers() {
 	}
 	if sysUpdateManager != nil {
 		sysUpdateManager.Close()
+	}
+	if chatManager != nil {
+		chatManager.Close()
 	}
 	if geoClientInstance != nil {
 		geoClientInstance.Close()
@@ -1710,6 +1767,10 @@ func (s *Server) Serve(printDocs bool) error {
 
 	if err := InitializeSysUpdateManager(); err != nil {
 		log.Warnf("Sysupdate manager unavailable: %v", err)
+	}
+
+	if err := InitializeChatManager(); err != nil {
+		log.Warnf("Chat manager unavailable: %v", err)
 	}
 
 	log.Info("")

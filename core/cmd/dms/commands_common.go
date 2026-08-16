@@ -785,6 +785,7 @@ func getCommonCommands() []*cobra.Command {
 		genericNotifyActionCmd,
 		matugenCmd,
 		clipboardCmd,
+		chatCmd,
 		chromaCmd,
 		doctorCmd,
 		configCmd,

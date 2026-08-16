@@ -42,7 +42,15 @@
     "type": {
       "type": "string",
       "description": "Plugin type. Use 'composite' (or any value) together with 'components' to provide multiple surfaces from one plugin.",
-      "enum": ["widget", "daemon", "launcher", "desktop", "composite"]
+      "enum": ["widget", "daemon", "launcher", "desktop", "composite", "chat"]
+    },
+    "bridge": {
+      "type": "array",
+      "description": "Argv for the chat provider bridge executable, resolved relative to the plugin directory. Required for type 'chat'. The bridge is a separate process supervised by the DMS backend, speaking newline-delimited JSON on stdin/stdout. See docs/CHAT-PLUGINS.md.",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
     },
     "capabilities": {
       "type": "array",
@@ -163,14 +171,27 @@
       }
     },
     {
-      "anyOf": [
-        {
-          "required": ["component"]
-        },
-        {
-          "required": ["components"]
+      "if": {
+        "required": ["type"],
+        "properties": {
+          "type": {
+            "const": "chat"
+          }
         }
-      ]
+      },
+      "then": {
+        "required": ["bridge"]
+      },
+      "else": {
+        "anyOf": [
+          {
+            "required": ["component"]
+          },
+          {
+            "required": ["components"]
+          }
+        ]
+      }
     }
   ],
   "additionalProperties": true

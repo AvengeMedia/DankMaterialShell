@@ -117,6 +117,17 @@ Singleton {
     property string clipboardTypeFilter: "all"
     property var clipboardVisibleEntryActions: ["pin", "edit", "delete"]
 
+    // Chat preferences. Per-provider configuration is not here -- it lives in
+    // plugin_settings.json under each chat plugin's id, since those keys are
+    // not known until a plugin is installed.
+    property bool chatNotificationsEnabled: true
+    property bool chatNotificationPreview: true
+    property bool chatNotifyGroups: true
+    property bool chatNotifyArchived: false
+    // 0 keeps everything.
+    property int chatHistoryRetentionDays: 0
+    property int chatMediaCacheMaxMB: 512
+
     property var launcherPluginVisibility: ({})
 
     function getPluginAllowWithoutTrigger(pluginId) {

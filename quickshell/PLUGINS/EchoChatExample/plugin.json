@@ -1,0 +1,16 @@
+{
+    "id": "echoChat",
+    "name": "Echo Chat",
+    "description": "A reference chat provider that echoes what you send it, for testing and for copying",
+    "version": "1.0.0",
+    "author": "DMS Team",
+    "type": "chat",
+    "capabilities": ["chat"],
+    "icon": "forum",
+    "bridge": ["./bin/echo-chat-bridge"],
+    "settings": "./Settings.qml",
+    "permissions": [
+        "settings_read",
+        "settings_write"
+    ]
+}

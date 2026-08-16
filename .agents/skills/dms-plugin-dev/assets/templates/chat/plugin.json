@@ -1,0 +1,16 @@
+{
+    "id": "myChat",
+    "name": "My Chat",
+    "description": "Connects DMS to My Chat",
+    "version": "1.0.0",
+    "author": "Your Name",
+    "type": "chat",
+    "capabilities": ["chat"],
+    "icon": "chat",
+    "bridge": ["./bin/mychat"],
+    "settings": "./Settings.qml",
+    "permissions": [
+        "settings_read",
+        "settings_write"
+    ]
+}

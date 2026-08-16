@@ -89,6 +89,7 @@ CATEGORY_KEYWORDS = {
     "Default Apps": ["browser", "terminal", "handlers", "mime"],
     "Users": ["accounts", "user", "profile"],
     "Autostart": ["startup", "launch", "boot"],
+    "Chats": ["chat", "message", "messaging", "whatsapp", "signal", "mail", "provider", "bridge"],
 }
 
 TAB_INDEX_MAP = {
@@ -137,6 +138,7 @@ TAB_INDEX_MAP = {
     "BatteryTab.qml": 42,
     "MouseTouchpadTab.qml": 44,
     "KeyboardTab.qml": 45,
+    "ChatsTab.qml": 46,
 }
 
 FILE_CONDITION_MAP = {
@@ -191,6 +193,7 @@ TAB_CATEGORY_MAP = {
     43: "Dank Dash",
     44: "System",
     45: "System",
+    46: "Chats",
 }
 
 SEARCHABLE_COMPONENTS = [

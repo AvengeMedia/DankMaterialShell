@@ -679,6 +679,16 @@ var SPEC = {
     clipboardTypeFilter: { def: "all" },
     clipboardVisibleEntryActions: { def: ["pin", "edit", "delete"] },
 
+    // No onChange hook: the backend owns the notification policy, but pushing
+    // it from here would mean qs.Common reaching into qs.Services and
+    // inverting the module layering. ChatService watches these instead.
+    chatNotificationsEnabled: { def: true },
+    chatNotificationPreview: { def: true },
+    chatNotifyGroups: { def: true },
+    chatNotifyArchived: { def: false },
+    chatHistoryRetentionDays: { def: 0 },
+    chatMediaCacheMaxMB: { def: 512 },
+
     launcherPluginVisibility: { def: {} },
     launcherPluginOrder: { def: [] },
 

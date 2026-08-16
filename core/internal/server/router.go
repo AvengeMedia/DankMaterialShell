@@ -7,6 +7,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/apppicker"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/bluez"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/brightness"
+	serverChat "github.com/AvengeMedia/DankMaterialShell/core/internal/server/chat"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/clipboard"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/cups"
 	serverDbus "github.com/AvengeMedia/DankMaterialShell/core/internal/server/dbus"
@@ -215,6 +216,15 @@ func RouteRequest(conn *models.Conn, req models.Request) {
 			return
 		}
 		sysupdate.HandleRequest(conn, req, sysUpdateManager)
+		return
+	}
+
+	if strings.HasPrefix(req.Method, "chat.") {
+		if chatManager == nil {
+			models.RespondError(conn, req.ID, "chat manager not initialized")
+			return
+		}
+		serverChat.HandleRequest(conn, req, chatManager)
 		return
 	}
 

@@ -735,6 +735,21 @@ FocusScope {
         }
 
         Loader {
+            id: chatsLoader
+            anchors.fill: parent
+            active: root.currentIndex === 46
+            visible: active
+            focus: active
+
+            sourceComponent: ChatsTab {}
+
+            onActiveChanged: {
+                if (active && item)
+                    Qt.callLater(() => item.forceActiveFocus());
+            }
+        }
+
+        Loader {
             id: keyboardLoader
             anchors.fill: parent
             active: root.currentIndex === 45

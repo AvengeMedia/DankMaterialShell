@@ -44,7 +44,16 @@ StyledRect {
         }
     }
     property bool isExpanded: expandedPluginId === pluginId
+    property bool isChatPlugin: pluginData ? (pluginData.type === "chat") : false
     property bool isLoaded: {
+        // A chat plugin is never loaded into this process -- its provider is a
+        // bridge the backend supervises -- so "loaded" means its bridge is
+        // enabled. Without this it would always read as disabled and its
+        // settings would stay behind an "enable first" message.
+        if (isChatPlugin) {
+            const provider = ChatService.providerById(pluginId);
+            return provider ? provider.enabled : false;
+        }
         PluginService.loadedPlugins;
         return PluginService.loadedPlugins[pluginId] !== undefined;
     }

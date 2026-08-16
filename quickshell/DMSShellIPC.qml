@@ -1470,6 +1470,47 @@ Item {
         target: "launcher"
     }
 
+    IpcHandler {
+        function open(): string {
+            PopoutService.openChats();
+            return "CHATS_OPEN_SUCCESS";
+        }
+
+        function close(): string {
+            PopoutService.closeChats();
+            return "CHATS_CLOSE_SUCCESS";
+        }
+
+        function toggle(): string {
+            PopoutService.toggleChats();
+            return "CHATS_TOGGLE_SUCCESS";
+        }
+
+        function openChat(provider: string, chatId: string): string {
+            if (!provider || !chatId)
+                return "CHATS_OPEN_FAILED: provider and chatId are required";
+            PopoutService.openChat(provider, chatId);
+            return `CHATS_OPEN_SUCCESS: ${provider}/${chatId}`;
+        }
+
+        // Advances the cross-provider rotation, for a Super+Tab style binding.
+        function cycle(): string {
+            const next = ChatCycleService.next();
+            if (!next)
+                return "CHATS_NO_UNREAD";
+            PopoutService.openChat(next.provider, next.chatId);
+            return `CHATS_CYCLE_SUCCESS: ${next.provider}/${next.chatId}`;
+        }
+
+        function status(): string {
+            if (!ChatService.available)
+                return "CHATS_UNAVAILABLE";
+            return `CHATS_UNREAD: ${ChatService.totalUnread}`;
+        }
+
+        target: "chats"
+    }
+
     // ! spotlight and launcher should be synonymous for backwards compat
     IpcHandler {
         function open(): string {

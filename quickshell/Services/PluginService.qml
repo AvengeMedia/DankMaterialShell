@@ -252,8 +252,20 @@ Singleton {
         return paths;
     }
 
+    // A chat plugin's provider is an external bridge process supervised by the
+    // DMS backend, not QML loaded into the shell, so it legitimately ships no
+    // component. It still appears in the plugin list and can still carry a
+    // settings component. See docs/CHAT-PLUGINS.md.
+    function _isChatManifest(manifest) {
+        return manifest && manifest.type === "chat";
+    }
+
     function _onManifestParsed(absPath, manifest, sourceTag, mtimeEpochMs) {
-        if (!manifest || !manifest.id || !manifest.name || (!manifest.component && !manifest.components)) {
+        const isChat = _isChatManifest(manifest);
+        const hasComponent = manifest && (manifest.component || manifest.components);
+        const chatIsValid = isChat && Array.isArray(manifest.bridge) && manifest.bridge.length > 0;
+
+        if (!manifest || !manifest.id || !manifest.name || (!hasComponent && !chatIsValid)) {
             log.error("invalid manifest fields:", absPath);
             knownManifests[absPath] = {
                 mtime: mtimeEpochMs,
@@ -273,7 +285,7 @@ Singleton {
 
         const componentPaths = _resolveComponentPaths(manifest, dir);
         const surfaces = Object.keys(componentPaths);
-        if (surfaces.length === 0) {
+        if (surfaces.length === 0 && !isChat) {
             log.error("no valid component surfaces in manifest:", absPath);
             knownManifests[absPath] = {
                 mtime: mtimeEpochMs,
@@ -325,6 +337,10 @@ Singleton {
             };
             _updateAvailablePluginsList();
             pluginListUpdated();
+            // A chat plugin has nothing to load in this process -- the backend
+            // owns its bridge's lifecycle, driven from Settings -> Chats.
+            if (isChat)
+                return;
             const isPureDesktop = surfaces.length === 1 && surfaces[0] === "desktop";
             const enabled = isPureDesktop || SettingsData.getPluginSetting(manifest.id, "enabled", false);
             if (enabled && !info.loaded)
@@ -695,8 +711,24 @@ Singleton {
         return loadedPlugins[pluginId] !== undefined;
     }
 
+    // isChatPlugin reports whether a plugin's provider runs as a backend bridge
+    // rather than in this process.
+    function isChatPlugin(pluginId) {
+        const plugin = availablePlugins[pluginId];
+        return !!plugin && plugin.type === "chat";
+    }
+
     function enablePlugin(pluginId, onResult) {
         SettingsData.setPluginSetting(pluginId, "enabled", true);
+        // A chat plugin has no component to load here; the backend starts its
+        // bridge process instead. Delegating keeps the Plugins tab's toggle and
+        // the one in Settings -> Chats in agreement.
+        if (isChatPlugin(pluginId)) {
+            ChatService.setProviderEnabled(pluginId, true);
+            if (onResult)
+                onResult(null);
+            return true;
+        }
         return runStartupGate(pluginId, onResult);
     }
 
@@ -800,6 +832,10 @@ Singleton {
 
     function disablePlugin(pluginId) {
         SettingsData.setPluginSetting(pluginId, "enabled", false);
+        if (isChatPlugin(pluginId)) {
+            ChatService.setProviderEnabled(pluginId, false);
+            return true;
+        }
         return unloadPlugin(pluginId);
     }
 
