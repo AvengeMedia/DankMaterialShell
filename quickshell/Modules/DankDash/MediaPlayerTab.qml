@@ -14,6 +14,7 @@ Item {
     LayoutMirroring.childrenInherit: true
 
     property MprisPlayer activePlayer: MprisController.activePlayer
+    readonly property bool windowVisible: Window.window?.visible ?? false
     readonly property real stableLength: MprisController.activePlayerStableLength
     property var allPlayers: MprisController.availablePlayers
     property var targetScreen: null
@@ -283,7 +284,7 @@ Item {
 
     Timer {
         interval: 1000
-        running: activePlayer?.playbackState === MprisPlaybackState.Playing && !isSeeking
+        running: root.windowVisible && activePlayer?.playbackState === MprisPlaybackState.Playing && !isSeeking
         repeat: true
         onTriggered: activePlayer?.positionChanged()
     }
@@ -454,6 +455,7 @@ Item {
                     artUrl: TrackArtService.resolvedArtUrl
                     accentColor: MediaAccentService.accent
                     cavaService: CavaService
+                    showAnimation: SettingsData.audioVisualizerEnabled
                 }
             }
 
