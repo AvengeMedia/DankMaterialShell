@@ -1029,6 +1029,7 @@ Singleton {
             "innerPadding": 4,
             "barInsetPadding": -1,
             "bottomGap": 0,
+            "attachToScreenEdge": false,
             "transparency": 1.0,
             "widgetTransparency": 1.0,
             "squareCorners": false,

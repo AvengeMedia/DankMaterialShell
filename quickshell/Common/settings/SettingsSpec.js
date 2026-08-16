@@ -578,6 +578,7 @@ var SPEC = {
             spacing: 4,
             innerPadding: 4,
             bottomGap: 0,
+            attachToScreenEdge: false,
             transparency: 1.0,
             widgetTransparency: 1.0,
             squareCorners: false,

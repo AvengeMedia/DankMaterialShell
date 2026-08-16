@@ -763,6 +763,31 @@
     "conditionKey": "keybindsAvailable"
   },
   {
+    "section": "barAttachToScreenEdge",
+    "label": "Attach to Screen Edge",
+    "tabIndex": 3,
+    "category": "Dank Bar",
+    "keywords": [
+      "align",
+      "attach",
+      "bar",
+      "dank",
+      "edge",
+      "flush",
+      "inner",
+      "keeping",
+      "outer",
+      "panel",
+      "rounded",
+      "screen",
+      "statusbar",
+      "taskbar",
+      "topbar",
+      "while"
+    ],
+    "description": "Align the outer bar edge with the screen while keeping the inner edge rounded"
+  },
+  {
     "section": "barAutoHide",
     "label": "Auto-hide",
     "tabIndex": 3,

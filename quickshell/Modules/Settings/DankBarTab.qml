@@ -137,6 +137,7 @@ Item {
             spacing: defaultBar.spacing ?? 4,
             innerPadding: defaultBar.innerPadding ?? 4,
             bottomGap: defaultBar.bottomGap ?? 0,
+            attachToScreenEdge: defaultBar.attachToScreenEdge ?? false,
             transparency: defaultBar.transparency ?? 1.0,
             widgetTransparency: defaultBar.widgetTransparency ?? 1.0,
             squareCorners: defaultBar.squareCorners ?? false,
@@ -1175,6 +1176,18 @@ Item {
                     checked: selectedBarConfig?.squareCorners ?? false
                     onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
                             squareCorners: checked
+                        })
+                }
+
+                SettingsToggleRow {
+                    settingKey: "barAttachToScreenEdge"
+                    tags: ["attach", "edge", "screen", "flush", "bar"]
+                    text: I18n.tr("Attach to Screen Edge")
+                    description: I18n.tr("Align the outer bar edge with the screen while keeping the inner edge rounded")
+                    visible: !SettingsData.frameEnabled
+                    checked: selectedBarConfig?.attachToScreenEdge ?? false
+                    onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
+                            attachToScreenEdge: checked
                         })
                 }
 

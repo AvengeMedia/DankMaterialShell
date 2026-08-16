@@ -29,6 +29,7 @@ Item {
     readonly property bool isBottom: barPos === SettingsData.Position.Bottom
     readonly property bool isLeft: barPos === SettingsData.Position.Left
     readonly property bool isRight: barPos === SettingsData.Position.Right
+    readonly property bool edgeAttached: (barConfig?.attachToScreenEdge ?? false) && !frameShapesBar
 
     property real wing: gothEnabled ? barWindow._wingR : 0
 
@@ -204,10 +205,10 @@ Item {
         // wing-side body corners are square where the gothic fillets attach;
         // rounding the shadow there leaves a shadow-filled notch under the
         // translucent bar fill (#2975)
-        topLeftRadius: root.gothEnabled && (root.isBottom || root.isRight) ? 0 : root.rt
-        topRightRadius: root.gothEnabled && (root.isBottom || root.isLeft) ? 0 : root.rt
-        bottomLeftRadius: root.gothEnabled && (root.isTop || root.isRight) ? 0 : root.rt
-        bottomRightRadius: root.gothEnabled && (root.isTop || root.isLeft) ? 0 : root.rt
+        topLeftRadius: root.edgeAttached && (root.isTop || root.isLeft) ? 0 : (root.gothEnabled && (root.isBottom || root.isRight) ? 0 : root.rt)
+        topRightRadius: root.edgeAttached && (root.isTop || root.isRight) ? 0 : (root.gothEnabled && (root.isBottom || root.isLeft) ? 0 : root.rt)
+        bottomLeftRadius: root.edgeAttached && (root.isBottom || root.isLeft) ? 0 : (root.gothEnabled && (root.isTop || root.isRight) ? 0 : root.rt)
+        bottomRightRadius: root.edgeAttached && (root.isBottom || root.isRight) ? 0 : (root.gothEnabled && (root.isTop || root.isLeft) ? 0 : root.rt)
         // barShape below is the sole painter of the bar; a fill here doubles
         // the alpha of translucent bars while the wings stay single-painted
         targetColor: "transparent"
@@ -298,7 +299,7 @@ Item {
         h = h - wing;
         const r = wing;
         const cr = rt;
-        const crE = frameShapesBar ? 0 : cr;
+        const crE = frameShapesBar || edgeAttached ? 0 : cr;
 
         let d = `M ${crE} 0`;
         d += ` L ${w - crE} 0`;
@@ -329,7 +330,7 @@ Item {
         h = h - wing;
         const r = wing;
         const cr = rt;
-        const crE = frameShapesBar ? 0 : cr;
+        const crE = frameShapesBar || edgeAttached ? 0 : cr;
 
         let d = `M ${crE} ${fullH}`;
         d += ` L ${w - crE} ${fullH}`;
@@ -359,7 +360,7 @@ Item {
         w = w - wing;
         const r = wing;
         const cr = rt;
-        const crE = frameShapesBar ? 0 : cr;
+        const crE = frameShapesBar || edgeAttached ? 0 : cr;
 
         let d = `M 0 ${crE}`;
         d += ` L 0 ${h - crE}`;
@@ -390,7 +391,7 @@ Item {
         w = w - wing;
         const r = wing;
         const cr = rt;
-        const crE = frameShapesBar ? 0 : cr;
+        const crE = frameShapesBar || edgeAttached ? 0 : cr;
 
         let d = `M ${fullW} ${crE}`;
         d += ` L ${fullW} ${h - crE}`;
@@ -514,11 +515,12 @@ Item {
         if (isTop) {
             const w = fullW - i * 2;
             const h = fullH - wing - i * 2;
+            const crE = edgeAttached ? 0 : cr;
 
-            let d = `M ${i + cr} ${i}`;
-            d += ` L ${i + w - cr} ${i}`;
-            if (cr > 0)
-                d += ` A ${cr} ${cr} 0 0 1 ${i + w} ${i + cr}`;
+            let d = `M ${i + crE} ${i}`;
+            d += ` L ${i + w - crE} ${i}`;
+            if (crE > 0)
+                d += ` A ${crE} ${crE} 0 0 1 ${i + w} ${i + crE}`;
             if (r > 0) {
                 d += ` L ${i + w} ${fullH - i}`;
                 d += ` A ${r} ${r} 0 0 0 ${i + w - r} ${i + h}`;
@@ -532,9 +534,9 @@ Item {
                 if (cr > 0)
                     d += ` A ${cr} ${cr} 0 0 1 ${i} ${i + h - cr}`;
             }
-            d += ` L ${i} ${i + cr}`;
-            if (cr > 0)
-                d += ` A ${cr} ${cr} 0 0 1 ${i + cr} ${i}`;
+            d += ` L ${i} ${i + crE}`;
+            if (crE > 0)
+                d += ` A ${crE} ${crE} 0 0 1 ${i + crE} ${i}`;
             d += " Z";
             return d;
         }
@@ -542,11 +544,12 @@ Item {
         if (isBottom) {
             const w = fullW - i * 2;
             const h = fullH - wing - i * 2;
+            const crE = edgeAttached ? 0 : cr;
 
-            let d = `M ${i + cr} ${fullH - i}`;
-            d += ` L ${i + w - cr} ${fullH - i}`;
-            if (cr > 0)
-                d += ` A ${cr} ${cr} 0 0 0 ${i + w} ${fullH - i - cr}`;
+            let d = `M ${i + crE} ${fullH - i}`;
+            d += ` L ${i + w - crE} ${fullH - i}`;
+            if (crE > 0)
+                d += ` A ${crE} ${crE} 0 0 0 ${i + w} ${fullH - i - crE}`;
             if (r > 0) {
                 d += ` L ${i + w} ${i}`;
                 d += ` A ${r} ${r} 0 0 1 ${i + w - r} ${i + r}`;
@@ -560,9 +563,9 @@ Item {
                 if (cr > 0)
                     d += ` A ${cr} ${cr} 0 0 0 ${i} ${i + cr}`;
             }
-            d += ` L ${i} ${fullH - i - cr}`;
-            if (cr > 0)
-                d += ` A ${cr} ${cr} 0 0 0 ${i + cr} ${fullH - i}`;
+            d += ` L ${i} ${fullH - i - crE}`;
+            if (crE > 0)
+                d += ` A ${crE} ${crE} 0 0 0 ${i + crE} ${fullH - i}`;
             d += " Z";
             return d;
         }
@@ -570,11 +573,12 @@ Item {
         if (isLeft) {
             const w = fullW - wing - i * 2;
             const h = fullH - i * 2;
+            const crE = edgeAttached ? 0 : cr;
 
-            let d = `M ${i} ${i + cr}`;
-            d += ` L ${i} ${i + h - cr}`;
-            if (cr > 0)
-                d += ` A ${cr} ${cr} 0 0 0 ${i + cr} ${i + h}`;
+            let d = `M ${i} ${i + crE}`;
+            d += ` L ${i} ${i + h - crE}`;
+            if (crE > 0)
+                d += ` A ${crE} ${crE} 0 0 0 ${i + crE} ${i + h}`;
             if (r > 0) {
                 d += ` L ${fullW - i} ${i + h}`;
                 d += ` A ${r} ${r} 0 0 1 ${i + w} ${i + h - r}`;
@@ -588,9 +592,9 @@ Item {
                 if (cr > 0)
                     d += ` A ${cr} ${cr} 0 0 0 ${i + w - cr} ${i}`;
             }
-            d += ` L ${i + cr} ${i}`;
-            if (cr > 0)
-                d += ` A ${cr} ${cr} 0 0 0 ${i} ${i + cr}`;
+            d += ` L ${i + crE} ${i}`;
+            if (crE > 0)
+                d += ` A ${crE} ${crE} 0 0 0 ${i} ${i + crE}`;
             d += " Z";
             return d;
         }
@@ -598,11 +602,12 @@ Item {
         if (isRight) {
             const w = fullW - wing - i * 2;
             const h = fullH - i * 2;
+            const crE = edgeAttached ? 0 : cr;
 
-            let d = `M ${fullW - i} ${i + cr}`;
-            d += ` L ${fullW - i} ${i + h - cr}`;
-            if (cr > 0)
-                d += ` A ${cr} ${cr} 0 0 1 ${fullW - i - cr} ${i + h}`;
+            let d = `M ${fullW - i} ${i + crE}`;
+            d += ` L ${fullW - i} ${i + h - crE}`;
+            if (crE > 0)
+                d += ` A ${crE} ${crE} 0 0 1 ${fullW - i - crE} ${i + h}`;
             if (r > 0) {
                 d += ` L ${i} ${i + h}`;
                 d += ` A ${r} ${r} 0 0 0 ${i + r} ${i + h - r}`;
@@ -616,9 +621,9 @@ Item {
                 if (cr > 0)
                     d += ` A ${cr} ${cr} 0 0 1 ${wing + i + cr} ${i}`;
             }
-            d += ` L ${fullW - i - cr} ${i}`;
-            if (cr > 0)
-                d += ` A ${cr} ${cr} 0 0 1 ${fullW - i} ${i + cr}`;
+            d += ` L ${fullW - i - crE} ${i}`;
+            if (crE > 0)
+                d += ` A ${crE} ${crE} 0 0 1 ${fullW - i} ${i + crE}`;
             d += " Z";
             return d;
         }
