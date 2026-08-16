@@ -50,7 +50,7 @@ func handleGetState(conn *models.Conn, req models.Request, manager *Manager) {
 }
 
 func handleStartDiscovery(conn *models.Conn, req models.Request, manager *Manager) {
-	if err := manager.StartDiscovery(); err != nil {
+	if err := manager.StartDiscovery(params.StringOpt(req.Params, "adapter", "")); err != nil {
 		models.RespondError(conn, req.ID, err.Error())
 		return
 	}
@@ -58,7 +58,7 @@ func handleStartDiscovery(conn *models.Conn, req models.Request, manager *Manage
 }
 
 func handleStopDiscovery(conn *models.Conn, req models.Request, manager *Manager) {
-	if err := manager.StopDiscovery(); err != nil {
+	if err := manager.StopDiscovery(params.StringOpt(req.Params, "adapter", "")); err != nil {
 		models.RespondError(conn, req.ID, err.Error())
 		return
 	}
@@ -72,7 +72,7 @@ func handleSetPowered(conn *models.Conn, req models.Request, manager *Manager) {
 		return
 	}
 
-	if err := manager.SetPowered(powered); err != nil {
+	if err := manager.SetPowered(params.StringOpt(req.Params, "adapter", ""), powered); err != nil {
 		models.RespondError(conn, req.ID, err.Error())
 		return
 	}

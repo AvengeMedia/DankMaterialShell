@@ -211,6 +211,8 @@ Singleton {
 
     property string vpnLastConnected: ""
 
+    property string bluetoothAdapterOverride: ""
+
     property string lastPlayerIdentity: ""
 
     property var deviceMaxVolumes: ({})

@@ -8,11 +8,20 @@ import (
 )
 
 type BluetoothState struct {
-	Powered          bool     `json:"powered"`
-	Discovering      bool     `json:"discovering"`
-	Devices          []Device `json:"devices"`
-	PairedDevices    []Device `json:"pairedDevices"`
-	ConnectedDevices []Device `json:"connectedDevices"`
+	Powered          bool          `json:"powered"`
+	Discovering      bool          `json:"discovering"`
+	Adapters         []AdapterInfo `json:"adapters"`
+	Devices          []Device      `json:"devices"`
+	PairedDevices    []Device      `json:"pairedDevices"`
+	ConnectedDevices []Device      `json:"connectedDevices"`
+}
+
+type AdapterInfo struct {
+	Path        string `json:"path"`
+	Name        string `json:"name"`
+	Address     string `json:"address"`
+	Powered     bool   `json:"powered"`
+	Discovering bool   `json:"discovering"`
 }
 
 type Device struct {
@@ -71,7 +80,7 @@ type Manager struct {
 	dirty              chan struct{}
 	notifierWg         sync.WaitGroup
 	lastNotifiedState  *BluetoothState
-	adapterPath        dbus.ObjectPath
+	adapterPaths       []dbus.ObjectPath
 	pendingPairings    syncmap.Map[string, bool]
 	eventQueue         chan func()
 	eventWg            sync.WaitGroup

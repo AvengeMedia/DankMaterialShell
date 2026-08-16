@@ -26,7 +26,7 @@ func WaitForAdapter() error {
 	signals := make(chan *dbus.Signal, 64)
 	conn.Signal(signals)
 
-	if _, err := findAdapter(conn); err == nil {
+	if paths, err := scanAdapters(conn); err == nil && len(paths) > 0 {
 		return nil
 	}
 
