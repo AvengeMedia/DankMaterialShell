@@ -502,7 +502,7 @@ Item {
                             width: parent.width
                             height: ruleColumn.implicitHeight + Theme.spacingM
                             radius: Theme.cornerRadius
-                            color: Theme.withAlpha(Theme.surfaceContainer, 0.5)
+                            color: Theme.floatingWindowFieldColor
 
                             Column {
                                 id: ruleColumn
@@ -704,7 +704,7 @@ Item {
                             width: parent.width
                             height: mutedRow.implicitHeight + Theme.spacingS * 2
                             radius: Theme.cornerRadius
-                            color: Theme.withAlpha(Theme.surfaceContainer, 0.5)
+                            color: Theme.floatingWindowFieldColor
 
                             Row {
                                 id: mutedRow
@@ -728,7 +728,7 @@ Item {
                                 DankButton {
                                     id: unmuteBtn
                                     text: I18n.tr("Unmute")
-                                    backgroundColor: Theme.surfaceContainer
+                                    backgroundColor: Theme.floatingWindowFieldColor
                                     textColor: Theme.primary
                                     onClicked: SettingsData.removeNotificationRule(modelData.index)
                                 }

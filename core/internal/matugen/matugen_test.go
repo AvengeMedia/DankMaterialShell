@@ -574,3 +574,41 @@ func TestAppendConfigConfigDirDoesNotExist(t *testing.T) {
 
 	assert.Empty(t, string(output))
 }
+
+func TestAppendFlatpakConfigRewritesOutputAndTemplateName(t *testing.T) {
+	tempDir := t.TempDir()
+	shellDir := filepath.Join(tempDir, "shell")
+	configDir := filepath.Join(shellDir, "matugen", "configs")
+	if err := os.MkdirAll(configDir, 0o755); err != nil {
+		t.Fatalf("failed to create config directory: %v", err)
+	}
+
+	config := "[templates.dmsvesktop]\ninput_path = 'SHELL_DIR/matugen/templates/vesktop.css'\noutput_path = 'CONFIG_DIR/vesktop/themes/dank-discord.css'\n"
+	if err := os.WriteFile(filepath.Join(configDir, "vesktop.toml"), []byte(config), 0o644); err != nil {
+		t.Fatalf("failed to write config: %v", err)
+	}
+
+	outPath := filepath.Join(tempDir, "merged.toml")
+	cfgFile, err := os.Create(outPath)
+	if err != nil {
+		t.Fatalf("failed to create output: %v", err)
+	}
+	defer cfgFile.Close()
+
+	mockChecker := mocks_utils.NewMockAppChecker(t)
+	mockChecker.EXPECT().AnyFlatpakExists("dev.vencord.Vesktop").Return(true)
+	t.Setenv("HOME", "/home/test")
+
+	appendFlatpakConfig(&Options{ShellDir: shellDir, AppChecker: mockChecker}, cfgFile, []string{"dev.vencord.Vesktop"}, "vesktop.toml", "dev.vencord.Vesktop/config")
+	if err := cfgFile.Close(); err != nil {
+		t.Fatalf("failed to close output: %v", err)
+	}
+
+	output, err := os.ReadFile(outPath)
+	if err != nil {
+		t.Fatalf("failed to read output: %v", err)
+	}
+
+	assert.Contains(t, string(output), "[templates.dmsvesktop-flatpak]")
+	assert.Contains(t, string(output), "'/home/test/.var/app/dev.vencord.Vesktop/config/vesktop/themes/dank-discord.css'")
+}

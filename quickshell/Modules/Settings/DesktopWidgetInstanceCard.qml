@@ -84,10 +84,10 @@ SettingsCard {
                 onClosed: root.confirmingDelete = false
 
                 background: Rectangle {
-                    color: Theme.surfaceContainer
+                    color: Theme.floatingWindowSurface
                     radius: Theme.cornerRadius
-                    border.color: Theme.outlineLight
-                    border.width: 1
+                    border.color: Theme.outlineMedium
+                    border.width: Theme.layerOutlineWidth
                 }
 
                 contentItem: Column {

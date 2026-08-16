@@ -608,7 +608,7 @@ Item {
                         DankTextField {
                             width: parent.width
                             placeholderText: modelData.placeholder
-                            backgroundColor: Theme.surfaceContainerHighest
+                            backgroundColor: Theme.floatingWindowFieldColor
                             normalBorderColor: Theme.outlineMedium
                             focusedBorderColor: Theme.primary
 

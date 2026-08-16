@@ -519,7 +519,7 @@
     "Advanced": "Додатково"
   },
   "Advanced comma-separated libxkbcommon options.": {
-    "Advanced comma-separated libxkbcommon options.": ""
+    "Advanced comma-separated libxkbcommon options.": "Розширені опції libxkbcommon, розділені комами"
   },
   "Afternoon": {
     "Afternoon": "День"
@@ -564,7 +564,7 @@
     "Also group repeated application icons on the active workspace": "Також групувати повторювані іконки програм на активному робочому просторі"
   },
   "Alt + Shift": {
-    "Alt + Shift": ""
+    "Alt + Shift": "Alt + Shift"
   },
   "Alternative (OR)": {
     "Alternative (OR)": "Альтернатива (АБО)"
@@ -669,7 +669,7 @@
     "Appearance": "Зовнішній вигляд"
   },
   "Apple Music animated covers": {
-    "Apple Music animated covers": ""
+    "Apple Music animated covers": "Анімовані обкладинки Apple Music"
   },
   "Application": {
     "Application": "Програма"
@@ -954,7 +954,7 @@
     "Automatically save changes to opened files as you type": "Автоматично зберігати зміни у відкритих файлах під час введення тексту"
   },
   "Automatically turn on Num Lock at startup": {
-    "Automatically turn on Num Lock at startup": ""
+    "Automatically turn on Num Lock at startup": "Автоматично вмикати Num Lock під час запуску"
   },
   "Automatically turn on Power Saver profile when battery is low.": {
     "Automatically turn on Power Saver profile when battery is low.": "Автоматично вмикати профіль економії енергії при низькому заряді батареї"
@@ -1368,7 +1368,7 @@
     "Channel": "Канал"
   },
   "Characters per second while holding down key": {
-    "Characters per second while holding down key": ""
+    "Characters per second while holding down key": "Кількість символів за секунду при утриманні клавіші"
   },
   "Charge Level": {
     "Charge Level": "Рівень заряду"
@@ -1425,7 +1425,7 @@
     "Choose a power profile": "Оберіть профіль живлення"
   },
   "Choose a shortcut key to cycle between keyboard layouts": {
-    "Choose a shortcut key to cycle between keyboard layouts": ""
+    "Choose a shortcut key to cycle between keyboard layouts": "Виберіть комбінацію клавіш для перемикання розкладок клавіатури"
   },
   "Choose colors from palette": {
     "Choose colors from palette": "Оберіть кольори з палітри"
@@ -1665,7 +1665,7 @@
     "Column Width": "Ширина колонки"
   },
   "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": {
-    "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": ""
+    "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": "Список назв розкладок, розділених комами. Залиште порожнім, щоб використовувати системні налаштування"
   },
   "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": {
     "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": "Список імен сесій через кому для приховування. Використовуйте слеші для регулярних виразів (напр., /^_.*/)"
@@ -1977,10 +1977,10 @@
     "Critical Threshold": "Критичний поріг"
   },
   "Ctrl + Shift": {
-    "Ctrl + Shift": ""
+    "Ctrl + Shift": "Ctrl + Shift"
   },
   "Ctrl+%1 is used for password editing": {
-    "Ctrl+%1 is used for password editing": ""
+    "Ctrl+%1 is used for password editing": "Ctrl+%1 використовується для редагування пароля"
   },
   "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": {
     "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": "Ctrl+A: Вибрати все • Ctrl+P: Попередній перегляд • Enter/Shift+Enter: Наступний/Попередній • Esc: Закрити"
@@ -2052,7 +2052,7 @@
     "Custom": "Власний"
   },
   "Custom / None": {
-    "Custom / None": ""
+    "Custom / None": "Спеціальна/Немає"
   },
   "Custom Blend": {
     "Custom Blend": "Власний мікс"
@@ -2148,7 +2148,7 @@
     "DMS Shortcuts": "Ярлики DMS"
   },
   "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.": {
-    "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.": ""
+    "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.": "DMS — це сучасна оболонка робочого столу з широкими можливостями налаштування та дизайном, натхненним %1<br/><br/>Вона побудована за допомогою %2 (фреймворк QT6 для створення оболонок робочого столу) та %3 (статично типізована компільована мова програмування)"
   },
   "DMS out of date": {
     "DMS out of date": "Версія DMS застаріла"
@@ -2218,6 +2218,9 @@
   },
   "Darken Modal Background": {
     "Darken Modal Background": "Затемнювати тло модальних вікон"
+  },
+  "Date First": {
+    "Date First": ""
   },
   "Date Format": {
     "Date Format": "Формат дати"
@@ -2295,7 +2298,7 @@
     "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": "Del: Очистити • Shift+Del: Очистити все • 1–9: Дії • F10: Довідка • Esc: Закрити"
   },
   "Delay before characters start repeating": {
-    "Delay before characters start repeating": ""
+    "Delay before characters start repeating": "Затримка перед початком повторення символів"
   },
   "Delete": {
     "Delete": "Видалити"
@@ -2400,7 +2403,7 @@
     "Digital": "Цифровий"
   },
   "Direct path to a .xkb keymap file. Overrides layouts/variants above.": {
-    "Direct path to a .xkb keymap file. Overrides layouts/variants above.": ""
+    "Direct path to a .xkb keymap file. Overrides layouts/variants above.": "Прямий шлях до файлу карти клавіш .xkb. Перевизначає розкладки/варіанти, вказані вище"
   },
   "Direction Source": {
     "Direction Source": "Джерело напрямку"
@@ -2739,7 +2742,7 @@
     "Enable History": "Увімкнути історію"
   },
   "Enable Num Lock": {
-    "Enable Num Lock": ""
+    "Enable Num Lock": "Увімкнути Num Lock"
   },
   "Enable Overview Overlay": {
     "Enable Overview Overlay": "Увімкнути оверлей огляду"
@@ -2948,6 +2951,9 @@
   "Extra Light": {
     "Extra Light": "Надлегкий"
   },
+  "Extract theme to JSON": {
+    "Extract theme to JSON": ""
+  },
   "Fade": {
     "Fade": "Затухання"
   },
@@ -3046,6 +3052,9 @@
   },
   "Failed to enable night mode": {
     "Failed to enable night mode": "Не вдалося увімкнути нічний режим"
+  },
+  "Failed to extract theme": {
+    "Failed to extract theme": ""
   },
   "Failed to fetch network QR code: %1": {
     "Failed to fetch network QR code: %1": "Не вдалося отримати QR-код мережі: %1"
@@ -3363,10 +3372,10 @@
     "Floating Position": "Позиція плаваючих вікон"
   },
   "Floating Windows": {
-    "Floating Windows": ""
+    "Floating Windows": "Плаваючі вікна"
   },
   "Floating windows follow Surface Styling settings": {
-    "Floating windows follow Surface Styling settings": ""
+    "Floating windows follow Surface Styling settings": "Плаваючі вікна використовують налаштування стилізації поверхонь"
   },
   "Fluent": {
     "Fluent": "Плавний"
@@ -3498,7 +3507,7 @@
     "Foreground Layers": "Передні шари"
   },
   "Foreground Opacity": {
-    "Foreground Opacity": ""
+    "Foreground Opacity": "Прозорість переднього плану"
   },
   "Forever": {
     "Forever": "Назавжди"
@@ -3627,7 +3636,7 @@
     "Generate Override": "Створити override"
   },
   "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
-    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
+    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": "Створити базові конфігурації GTK3/4 або QT5/QT6 (потрібен qt6ct-kde), щоб вони відповідали кольорам DMS. Потрібно виконати лише один раз<br/><br/>Рекомендується налаштувати %1 перед застосуванням тем GTK"
   },
   "Generic": {
     "Generic": "Загальний"
@@ -3645,7 +3654,7 @@
     "Global fonts can be configured in Settings → Personalization": "Глобальні шрифти можна налаштувати в Налаштування → Персоналізація"
   },
   "Globally": {
-    "Globally": ""
+    "Globally": "Глобально"
   },
   "Globally scale all animation durations": {
     "Globally scale all animation durations": "Глобально масштабувати тривалість усіх анімацій"
@@ -3945,7 +3954,7 @@
     "Hover Popouts": "Спливаючі вікна при наведенні"
   },
   "How layout changes are remembered across apps": {
-    "How layout changes are remembered across apps": ""
+    "How layout changes are remembered across apps": "Запам'ятовування змін розкладки між програмами"
   },
   "How often the server polls for new updates.": {
     "How often the server polls for new updates.": "Як часто сервер перевіряє наявність нових оновлень"
@@ -4289,6 +4298,9 @@
   "Keep in Bar": {
     "Keep in Bar": "Залишити в панелі"
   },
+  "Keep pinned apps as launchers and show running windows separately": {
+    "Keep pinned apps as launchers and show running windows separately": ""
+  },
   "Keep the clipboard type filter when reopening history": {
     "Keep the clipboard type filter when reopening history": "Зберігати фільтр типу буфера обміну при повторному відкритті історії"
   },
@@ -4305,7 +4317,7 @@
     "Key": "Клавіша"
   },
   "Key combination": {
-    "Key combination": ""
+    "Key combination": "Комбінація клавіш"
   },
   "Keybind Sources": {
     "Keybind Sources": "Джерела гарячих клавіш"
@@ -4320,31 +4332,31 @@
     "Keybinds shown alongside regular search results": "Гарячі клавіші відображаються разом зі звичайними результатами пошуку"
   },
   "Keyboard": {
-    "Keyboard": ""
+    "Keyboard": "Клавіатура"
   },
   "Keyboard Behavior": {
-    "Keyboard Behavior": ""
+    "Keyboard Behavior": "Поведінка клавіатури"
   },
   "Keyboard Layout Name": {
     "Keyboard Layout Name": "Назва розкладки клавіатури"
   },
   "Keyboard Layouts": {
-    "Keyboard Layouts": ""
+    "Keyboard Layouts": "Розкладки клавіатури"
   },
   "Keyboard Model": {
-    "Keyboard Model": ""
+    "Keyboard Model": "Модель клавіатури"
   },
   "Keyboard Shortcuts": {
     "Keyboard Shortcuts": "Комбінації клавіш"
   },
   "Keyboard Variant": {
-    "Keyboard Variant": ""
+    "Keyboard Variant": "Варіант клавіатури"
   },
   "Keyboard shortcut to start security key unlock": {
-    "Keyboard shortcut to start security key unlock": ""
+    "Keyboard shortcut to start security key unlock": "Гаряча клавіша для початку розблокування ключем безпеки"
   },
   "Keymap File Path": {
-    "Keymap File Path": ""
+    "Keymap File Path": "Шлях до файлу карти клавіш"
   },
   "Keys": {
     "Keys": "Клавіші"
@@ -4590,7 +4602,7 @@
     "MAC": "MAC"
   },
   "MIT License": {
-    "MIT License": ""
+    "MIT License": "Ліцензія MIT"
   },
   "MTU": {
     "MTU": "MTU"
@@ -4876,6 +4888,9 @@
   },
   "Minimal palette built around a single hue.": {
     "Minimal palette built around a single hue.": "Мінімалістична палітра на основі одного відтінку"
+  },
+  "Minimize": {
+    "Minimize": ""
   },
   "Minute": {
     "Minute": "Хвилина"
@@ -5595,13 +5610,13 @@
     "Opacity": "Непрозорість"
   },
   "Opacity of cards and nested surfaces inside floating windows": {
-    "Opacity of cards and nested surfaces inside floating windows": ""
+    "Opacity of cards and nested surfaces inside floating windows": "Прозорість карток та вкладених поверхонь всередині плаваючих вікон"
   },
   "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts": {
-    "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts": ""
+    "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts": "Прозорість плаваючих вікон DMS, таких як Налаштування, Блокнот та запити автентифікації"
   },
   "Opacity of foreground cards and nested surfaces on shell panels": {
-    "Opacity of foreground cards and nested surfaces on shell panels": ""
+    "Opacity of foreground cards and nested surfaces on shell panels": "Прозорість карток переднього плану та вкладених поверхонь на панелях оболонки"
   },
   "Opaque": {
     "Opaque": "Непрозорий"
@@ -5613,7 +5628,7 @@
     "Open App": "Відкрити програму"
   },
   "Open DMS windows floating instead of tiled": {
-    "Open DMS windows floating instead of tiled": ""
+    "Open DMS windows floating instead of tiled": "Відкривати вікна DMS як плаваючі замість плиточних"
   },
   "Open Delay": {
     "Open Delay": "Затримка відкриття"
@@ -5637,7 +5652,7 @@
     "Open Trash With": "Відкрити кошик за допомогою"
   },
   "Open Windows Floating": {
-    "Open Windows Floating": ""
+    "Open Windows Floating": "Відкривати вікна як плаваючі"
   },
   "Open a new note": {
     "Open a new note": "Створити нову нотатку"
@@ -5760,7 +5775,7 @@
     "Override Corner Radius": "Перевизначити радіус кутів"
   },
   "Override floating window transparency for Notepad": {
-    "Override floating window transparency for Notepad": ""
+    "Override floating window transparency for Notepad": "Перевизначити прозорість плаваючого вікна для Блокнота"
   },
   "Override global layout settings for this output": {
     "Override global layout settings for this output": "Перевизначити глобальні налаштування макета для цього виходу"
@@ -5895,7 +5910,7 @@
     "Pending Discharge": "Очікування розрядки"
   },
   "Per Window": {
-    "Per Window": ""
+    "Per Window": "Окремо для кожного вікна"
   },
   "Per-Mode Wallpapers": {
     "Per-Mode Wallpapers": "Шпалери для кожного режиму"
@@ -5959,6 +5974,9 @@
   },
   "Place a trash bin at the end of the dock": {
     "Place a trash bin at the end of the dock": "Розмістити кошик у кінці дока"
+  },
+  "Place clipboard history on the Wayland overlay layer": {
+    "Place clipboard history on the Wayland overlay layer": ""
   },
   "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
     "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "Розташуйте каталоги плагінів тут. Кожен плагін повинен мати файл маніфесту plugin.json"
@@ -6159,7 +6177,7 @@
     "Press Ctrl+N or click 'New Session' to create one": "Натисніть Ctrl+N або «Нова сесія», щоб створити її"
   },
   "Press Ctrl+key to set. Esc cancels.": {
-    "Press Ctrl+key to set. Esc cancels.": ""
+    "Press Ctrl+key to set. Esc cancels.": "Натисніть Ctrl + клавішу для встановлення. Esc для скасування"
   },
   "Press Enter and the audio system will restart to apply the change": {
     "Press Enter and the audio system will restart to apply the change": "Натисніть Enter, і аудіосистема перезапуститься для застосування змін"
@@ -6348,7 +6366,7 @@
     "Random": "Випадковий"
   },
   "Random Order": {
-    "Random Order": ""
+    "Random Order": "У випадковому порядку"
   },
   "Rate": {
     "Rate": "Швидкість"
@@ -6402,7 +6420,7 @@
     "Regex": "Регулярний вираз"
   },
   "Registries": {
-    "Registries": ""
+    "Registries": "Реєстри"
   },
   "Regular": {
     "Regular": "Звичайний"
@@ -6441,7 +6459,7 @@
     "Remember Last Query": "Запам'ятати останній запит"
   },
   "Remember Layout": {
-    "Remember Layout": ""
+    "Remember Layout": "Запам'ятовувати розкладку"
   },
   "Remember Type Filter": {
     "Remember Type Filter": "Запам'ятати фільтр типу"
@@ -6516,10 +6534,10 @@
     "Repeat": "Повторити"
   },
   "Repeat Delay": {
-    "Repeat Delay": ""
+    "Repeat Delay": "Затримка повтору"
   },
   "Repeat Rate": {
-    "Repeat Rate": ""
+    "Repeat Rate": "Швидкість повтору"
   },
   "Replacement": {
     "Replacement": "Заміна"
@@ -6603,10 +6621,13 @@
     "Restart the DankMaterialShell": "Перезапустити DankMaterialShell"
   },
   "Restart userspace without rebooting the kernel, requires systemd": {
-    "Restart userspace without rebooting the kernel, requires systemd": ""
+    "Restart userspace without rebooting the kernel, requires systemd": "Перезапустити користувацький простір без перезавантаження ядра (потрібен systemd)"
   },
   "Restarting audio system...": {
     "Restarting audio system...": "Перезапуск аудіосистеми..."
+  },
+  "Restore": {
+    "Restore": ""
   },
   "Restore Special Workspace Windows": {
     "Restore Special Workspace Windows": "Відновити вікна спеціального робочого простору"
@@ -6745,6 +6766,9 @@
   },
   "Save & Start": {
     "Save & Start": "Зберегти та запустити"
+  },
+  "Save Extracted Theme": {
+    "Save Extracted Theme": ""
   },
   "Save Notepad File": {
     "Save Notepad File": "Зберегти файл блокнота"
@@ -6921,16 +6945,16 @@
     "Security Key PAM Source": "Джерело PAM для ключа безпеки"
   },
   "Security key": {
-    "Security key": ""
+    "Security key": "Ключ безпеки"
   },
   "Security key (%1)": {
-    "Security key (%1)": ""
+    "Security key (%1)": "Ключ безпеки (%1)"
   },
   "Security key mode": {
     "Security key mode": "Режим ключа безпеки"
   },
   "Security key shortcut": {
-    "Security key shortcut": ""
+    "Security key shortcut": "Гаряча клавіша ключа безпеки"
   },
   "Security-key availability could not be confirmed": {
     "Security-key availability could not be confirmed": "Не вдалося підтвердити доступність ключа безпеки"
@@ -6978,7 +7002,7 @@
     "Select a desktop application": "Оберіть програму робочого столу"
   },
   "Select a random wallpaper instead of cycling in alphabetical order": {
-    "Select a random wallpaper instead of cycling in alphabetical order": ""
+    "Select a random wallpaper instead of cycling in alphabetical order": "Вибирати випадкові шпалери замість послідовного перебору за алфавітом"
   },
   "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": {
     "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": "Оберіть віджет для додавання на робочий стіл. Кожен віджет є окремим екземпляром зі своїми налаштуваннями"
@@ -7063,6 +7087,9 @@
   },
   "Separate Light & Dark Themes": {
     "Separate Light & Dark Themes": "Окремі світла та темна теми"
+  },
+  "Separate Pinned and Running Apps": {
+    "Separate Pinned and Running Apps": ""
   },
   "Separate appearance for unfocused displays is not supported on this compositor.": {
     "Separate appearance for unfocused displays is not supported on this compositor.": "Окремий вигляд для нефокусних дисплеїв не підтримується цим композитором"
@@ -7350,7 +7377,7 @@
     "Show Seconds": "Показувати секунди"
   },
   "Show Soft Reboot": {
-    "Show Soft Reboot": ""
+    "Show Soft Reboot": "Показувати «М'яке перезавантаження»"
   },
   "Show Sunrise/Sunset": {
     "Show Sunrise/Sunset": "Показати схід/захід сонця"
@@ -7434,7 +7461,7 @@
     "Show during Niri overview": "Показувати в режимі огляду Niri"
   },
   "Show foreground surfaces on cards inside floating windows": {
-    "Show foreground surfaces on cards inside floating windows": ""
+    "Show foreground surfaces on cards inside floating windows": "Показувати поверхні переднього плану на картках всередині плаваючих вікон"
   },
   "Show foreground surfaces on notification cards": {
     "Show foreground surfaces on notification cards": "Показувати передні поверхні на картках сповіщень"
@@ -7449,7 +7476,7 @@
     "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": "Показувати оверлей запуску при введенні тексту в огляді Niri. Вимкніть, щоб використовувати інший запуск"
   },
   "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.": {
-    "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.": ""
+    "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.": "Показувати зациклене відео-оформлення альбому з Apple Music, якщо воно доступне. Передає ім'я виконавця та назву альбому до компанії Apple"
   },
   "Show mode tabs and keyboard hints at the bottom.": {
     "Show mode tabs and keyboard hints at the bottom.": "Показувати вкладки режимів та підказки клавіатури внизу"
@@ -7563,7 +7590,7 @@
     "Snow": "Сніг"
   },
   "Soft Reboot": {
-    "Soft Reboot": ""
+    "Soft Reboot": "М'яке перезавантаження"
   },
   "Some plugins require a newer version of DMS:": {
     "Some plugins require a newer version of DMS:": "Деяким плагінам потрібна новіша версія DMS:"
@@ -7587,7 +7614,7 @@
     "Source: %1": "Джерело: %1"
   },
   "Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.": {
-    "Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.": ""
+    "Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.": "Джерела для плагінів та тем. Реєстри — це git-репозиторії з директоріями plugins/ або themes/"
   },
   "Space between the bar and screen edges": {
     "Space between the bar and screen edges": "Відступ між панеллю та краями екрана"
@@ -7639,6 +7666,9 @@
   },
   "Start": {
     "Start": "Запустити"
+  },
+  "Start DankConnect, KDE Connect, or Valent to use this plugin": {
+    "Start DankConnect, KDE Connect, or Valent to use this plugin": ""
   },
   "Start Hotspot?": {
     "Start Hotspot?": "Запустити точку доступу?"
@@ -7704,7 +7734,7 @@
     "Sunset": "Захід сонця"
   },
   "Super + Space": {
-    "Super + Space": ""
+    "Super + Space": "Super + Пробіл"
   },
   "Suppress Duplicate Notifications": {
     "Suppress Duplicate Notifications": "Придушувати дубльовані сповіщення"
@@ -7740,7 +7770,7 @@
     "Surface Opacity": "Прозорість поверхні"
   },
   "Surface Styling": {
-    "Surface Styling": ""
+    "Surface Styling": "Стилізація поверхонь"
   },
   "Surface Text": {
     "Surface Text": "Текст на поверхні"
@@ -7770,7 +7800,7 @@
     "Sway Website": "Сайт Sway"
   },
   "Switch Layout Shortcut": {
-    "Switch Layout Shortcut": ""
+    "Switch Layout Shortcut": "Гаряча клавіша перемикання розкладки"
   },
   "Switch between display configurations": {
     "Switch between display configurations": "Перемикатися між конфігураціями дисплеїв"
@@ -7818,7 +7848,7 @@
     "Sync to apply": "Синхронізуйте для застосування"
   },
   "Sync with Global Settings": {
-    "Sync with Global Settings": ""
+    "Sync with Global Settings": "Синхронізувати з глобальними налаштуваннями"
   },
   "Syncing...": {
     "Syncing...": "Синхронізація..."
@@ -8000,6 +8030,9 @@
   "Theme color used for the widget outline": {
     "Theme color used for the widget outline": "Колір теми для контуру віджета"
   },
+  "Theme extracted to: %1": {
+    "Theme extracted to: %1": ""
+  },
   "Theme worker failed (%1)": {
     "Theme worker failed (%1)": "Помилка робочого процесу теми (%1)"
   },
@@ -8086,6 +8119,9 @@
   },
   "Time & Weather": {
     "Time & Weather": "Час і погода"
+  },
+  "Time First": {
+    "Time First": ""
   },
   "Time Format": {
     "Time Format": "Формат часу"
@@ -8928,7 +8964,7 @@
     "Window Height": "Висота вікна"
   },
   "Window Opacity": {
-    "Window Opacity": ""
+    "Window Opacity": "Прозорість вікна"
   },
   "Window Opening": {
     "Window Opening": "Відкриття вікна"
@@ -8976,7 +9012,7 @@
     "X-Ray": "Рентген"
   },
   "XKB Options": {
-    "XKB Options": ""
+    "XKB Options": "Опції XKB"
   },
   "XWayland": {
     "XWayland": "XWayland"
@@ -9024,7 +9060,7 @@
     "Your hotspot is running.": "Ваша точка доступу працює"
   },
   "Your hotspot profile is saved and ready to start.": {
-    "Your hotspot profile is saved and ready to start.": "Профіль вашої точки доступу збережено, вона готова до запуску"
+    "Your hotspot profile is saved and ready to start.": "Профіль вашої точки доступу збережений і готовий до запуску"
   },
   "Your system is up to date!": {
     "Your system is up to date!": "Вашу систему оновлено!"

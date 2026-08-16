@@ -438,7 +438,9 @@ Item {
                     width: parent.width
                     height: Math.min(180, statusTextArea.implicitHeight + Theme.spacingM * 2)
                     radius: Theme.cornerRadius
-                    color: Theme.surfaceContainerHighest
+                    color: Theme.floatingWindowFieldColor
+                    border.color: Theme.outlineMedium
+                    border.width: Theme.layerOutlineWidth
 
                     StyledText {
                         id: statusTextArea

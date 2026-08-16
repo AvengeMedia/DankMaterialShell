@@ -42,7 +42,7 @@ Item {
     // the rest are for setting the default app.
     readonly property var mimeMapping: ({
             [root.appCategory.WebBrowser]: ["x-scheme-handler/https", "x-scheme-handler/http", "text/html", "application/xhtml+xml"],
-            [root.appCategory.FileManager]: ["inode/directory", "x-scheme-handler/file"],
+            [root.appCategory.FileManager]: ["inode/directory", "x-scheme-handler/file", "x-scheme-handler/sftp"],
             [root.appCategory.TextEditor]: ["text/plain", "text/markdown", "application/x-zerosize", "text/x-c++src", "text/x-csrc", "text/x-python", "text/x-shellscript", "application/json"],
             [root.appCategory.ImageViewer]: ["image/png", "image/jpeg", "image/gif", "image/bmp", "image/webp", "image/avif", "image/svg+xml"],
             [root.appCategory.VideoPlayer]: ["video/mp4", "video/x-matroska", "video/webm", "video/avi", "video/mpeg", "video/quicktime", "video/x-msvideo"],
@@ -131,6 +131,7 @@ Item {
                 // you don't want Kate as your file manager just because it can open folders
                 loadCategoryModel(root.appCategory.FileManager, "FileManager");
                 DesktopService.getDefaultApp(mimeMapping[category][0], category.toString());
+                DesktopService.getHandlersForMimeType(mimeMapping[category][0], category.toString());
                 break;
             default:
                 const mimeType = mimeMapping[category][0];
@@ -213,6 +214,22 @@ Item {
                     }));
 
             models[categoryIndex] = root.withDmsChooser(entries);
+            root.categoryModels = models;
+        }
+
+        function onGetHandlersForMimeResult(mimeType, apps, callbackId) {
+            const categoryIndex = parseInt(callbackId);
+            let models = Object.assign({}, root.categoryModels);
+            const existing = models[categoryIndex] || root.withDmsChooser([]);
+            const known = new Set(existing.map(opt => opt.value));
+            const extra = (apps || []).filter(app => app.id && !known.has(app.id)).map(app => ({
+                        text: app.name || root.getAppDisplayName(app.id),
+                        value: app.id
+                    }));
+            if (extra.length === 0) {
+                return;
+            }
+            models[categoryIndex] = existing.concat(extra);
             root.categoryModels = models;
         }
 
@@ -302,7 +319,7 @@ Item {
 
                 AppSelector {
                     text: I18n.tr("File Manager", "File Manager")
-                    tags: ["file", "manager"]
+                    tags: ["file", "manager", "directory", "sftp"]
                     category: root.appCategory.FileManager
                     description: I18n.tr("Manages files and directories", "Manages files and directories")
                 }

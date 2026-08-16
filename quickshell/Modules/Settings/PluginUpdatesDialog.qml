@@ -13,8 +13,9 @@ StyledRect {
     width: parent.width
     height: visible ? Math.max(200, innerColumn.implicitHeight + Theme.spacingL * 2) : 0
     radius: Theme.cornerRadius
-    color: Theme.surfaceContainerHigh
-    border.width: 0
+    color: Theme.floatingWindowNestedSurface
+    border.color: Theme.outlineMedium
+    border.width: Theme.layerOutlineWidth
     clip: true
 
     visible: false
@@ -193,8 +194,9 @@ StyledRect {
                         width: parent.width
                         height: 64
                         radius: Theme.cornerRadius
-                        color: Theme.surfaceContainerHighest
-                        border.width: 0
+                        color: Theme.floatingWindowNestedSurface
+                        border.color: Theme.outlineMedium
+                        border.width: Theme.layerOutlineWidth
 
                         Row {
                             anchors.fill: parent
@@ -242,7 +244,7 @@ StyledRect {
                                     text: I18n.tr("Diff")
                                     iconName: "open_in_new"
                                     visible: !!modelData.diffUrl || !!modelData.repo
-                                    backgroundColor: Theme.surfaceContainerHigh
+                                    backgroundColor: Theme.floatingWindowFieldColor
                                     textColor: Theme.surfaceText
                                     onClicked: {
                                         Qt.openUrlExternally(modelData.diffUrl || modelData.repo);
@@ -281,7 +283,7 @@ StyledRect {
             DankButton {
                 text: I18n.tr("Cancel")
                 iconName: "close"
-                backgroundColor: Theme.surfaceContainerHighest
+                backgroundColor: Theme.floatingWindowFieldColor
                 textColor: Theme.surfaceText
                 onClicked: root.hide()
             }

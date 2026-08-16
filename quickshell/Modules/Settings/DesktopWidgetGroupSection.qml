@@ -63,7 +63,7 @@ Column {
         height: 44
         radius: Theme.cornerRadius
         visible: section.showHeader
-        color: section.isDropTarget ? Theme.primaryContainer : Theme.surfaceContainer
+        color: section.isDropTarget ? Theme.primaryContainer : Theme.floatingWindowNestedSurface
         border.width: section.isDropTarget ? 2 : 0
         border.color: Theme.primary
 

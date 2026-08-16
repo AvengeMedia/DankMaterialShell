@@ -65,7 +65,7 @@ Item {
                             width: parent.width
                             height: subColumn.implicitHeight + Theme.spacingM
                             radius: Theme.cornerRadius
-                            color: Theme.withAlpha(Theme.surfaceContainer, 0.5)
+                            color: Theme.floatingWindowFieldColor
 
                             Column {
                                 id: subColumn

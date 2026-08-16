@@ -442,7 +442,7 @@ Item {
                         width: parent.width - validatePamButton.width - Theme.spacingS
                         placeholderText: "/etc/pam.d/my-service"
                         text: SettingsData.lockPamPath
-                        backgroundColor: Theme.surfaceContainerHighest
+                        backgroundColor: Theme.floatingWindowFieldColor
                     }
 
                     DankButton {
@@ -457,7 +457,9 @@ Item {
                     width: parent.width
                     height: Math.min(160, authStatusText.implicitHeight + Theme.spacingM * 2)
                     radius: Theme.cornerRadius
-                    color: Theme.surfaceContainerHighest
+                    color: Theme.floatingWindowFieldColor
+                    border.color: Theme.outlineMedium
+                    border.width: Theme.layerOutlineWidth
                     visible: root.authValidateMessage !== ""
 
                     StyledText {
@@ -565,7 +567,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         focus: capturing
                         text: capturing ? I18n.tr("Press key...", "lock screen security key shortcut key combination capture prompt") : SettingsData.lockScreenSecurityKeyShortcut
-                        backgroundColor: capturing ? Theme.primaryContainer : Theme.surfaceContainer
+                        backgroundColor: capturing ? Theme.primaryContainer : Theme.floatingWindowFieldColor
                         textColor: Theme.surfaceText
 
                         property bool capturing: false
@@ -658,7 +660,7 @@ Item {
                         width: parent.width - validateU2fPamButton.width - Theme.spacingS
                         placeholderText: "/etc/pam.d/dankshell-u2f"
                         text: SettingsData.lockU2fPamPath
-                        backgroundColor: Theme.surfaceContainerHighest
+                        backgroundColor: Theme.floatingWindowFieldColor
                     }
 
                     DankButton {
@@ -673,7 +675,9 @@ Item {
                     width: parent.width
                     height: Math.min(160, u2fStatusText.implicitHeight + Theme.spacingM * 2)
                     radius: Theme.cornerRadius
-                    color: Theme.surfaceContainerHighest
+                    color: Theme.floatingWindowFieldColor
+                    border.color: Theme.outlineMedium
+                    border.width: Theme.layerOutlineWidth
                     visible: !root.lockU2fControlledByPrimary && root.u2fValidateMessage !== ""
 
                     StyledText {
@@ -801,7 +805,7 @@ Item {
                             width: parent.width - browseVideoButton.width - Theme.spacingS
                             placeholderText: I18n.tr("/path/to/videos")
                             text: SettingsData.lockScreenVideoPath
-                            backgroundColor: Theme.surfaceContainerHighest
+                            backgroundColor: Theme.floatingWindowFieldColor
                             onTextChanged: {
                                 if (text !== SettingsData.lockScreenVideoPath) {
                                     SettingsData.set("lockScreenVideoPath", text);

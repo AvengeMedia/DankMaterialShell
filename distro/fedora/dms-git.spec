@@ -1,7 +1,19 @@
 # Spec for DMS - uses rpkg macros for git builds
 
 %global debug_package %{nil}
-%global version {{{ git_repo_version }}}
+%global version {{{
+set -e
+if [ "$(git rev-parse --is-shallow-repository)" = "true" ]; then
+    git fetch --unshallow --quiet
+fi
+if [ "$(git rev-parse --is-shallow-repository)" = "true" ]; then
+    echo "clone is still shallow; refusing a truncated commit count" >&2
+    exit 1
+fi
+printf '0.0.git.%s.%s\n' \
+    "$(git rev-list --count HEAD)" \
+    "$(git rev-parse --short=8 HEAD)"
+}}}
 %global pkg_summary DankMaterialShell - Material 3 inspired shell for Wayland compositors
 %global go_toolchain_version 1.26.4
 

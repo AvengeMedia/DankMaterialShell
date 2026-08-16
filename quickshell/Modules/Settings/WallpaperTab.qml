@@ -258,7 +258,7 @@ Item {
                                 iconSize: Theme.iconSizeSmall
                                 enabled: root.currentWallpaper && !root.currentWallpaper.startsWith("#") && !root.currentWallpaper.startsWith("we")
                                 opacity: enabled ? 1 : 0.5
-                                backgroundColor: Theme.surfaceContainerHigh
+                                backgroundColor: Theme.floatingWindowFieldColor
                                 iconColor: Theme.surfaceText
                                 onClicked: {
                                     if (SessionData.perMonitorWallpaper) {
@@ -275,7 +275,7 @@ Item {
                                 iconSize: Theme.iconSizeSmall
                                 enabled: root.currentWallpaper && !root.currentWallpaper.startsWith("#") && !root.currentWallpaper.startsWith("we")
                                 opacity: enabled ? 1 : 0.5
-                                backgroundColor: Theme.surfaceContainerHigh
+                                backgroundColor: Theme.floatingWindowFieldColor
                                 iconColor: Theme.surfaceText
                                 onClicked: {
                                     if (SessionData.perMonitorWallpaper) {

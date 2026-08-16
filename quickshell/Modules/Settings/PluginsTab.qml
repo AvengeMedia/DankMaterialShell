@@ -69,8 +69,9 @@ FocusScope {
                 width: parent.width
                 height: headerColumn.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
-                border.width: 0
+                color: Theme.floatingWindowNestedSurface
+                border.color: Theme.outlineMedium
+                border.width: Theme.layerOutlineWidth
 
                 Column {
                     id: headerColumn
@@ -289,8 +290,9 @@ FocusScope {
                 width: parent.width
                 height: directoryColumn.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
-                border.width: 0
+                color: Theme.floatingWindowNestedSurface
+                border.color: Theme.outlineMedium
+                border.width: Theme.layerOutlineWidth
 
                 Column {
                     id: directoryColumn
@@ -332,8 +334,9 @@ FocusScope {
                 width: parent.width
                 height: registriesColumn.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
-                border.width: 0
+                color: Theme.floatingWindowNestedSurface
+                border.color: Theme.outlineMedium
+                border.width: Theme.layerOutlineWidth
                 visible: DMSService.dmsAvailable && DMSService.apiVersion >= 29
 
                 Column {
@@ -460,8 +463,9 @@ FocusScope {
                 width: parent.width
                 height: Math.max(200, availableColumn.implicitHeight + Theme.spacingL * 2)
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
-                border.width: 0
+                color: Theme.floatingWindowNestedSurface
+                border.color: Theme.outlineMedium
+                border.width: Theme.layerOutlineWidth
 
                 Column {
                     id: availableColumn

@@ -26,9 +26,9 @@ Item {
                 width: parent.width
                 height: gammaSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
-                border.color: Theme.outlineHeavy
-                border.width: 0
+                color: Theme.floatingWindowNestedSurface
+                border.color: Theme.outlineMedium
+                border.width: Theme.layerOutlineWidth
 
                 Column {
                     id: gammaSection
@@ -368,7 +368,9 @@ Item {
                                     width: (parent.width - Theme.spacingM) / 2
                                     height: tempColumn.implicitHeight + Theme.spacingM * 2
                                     radius: Theme.cornerRadius
-                                    color: Theme.surfaceContainerHigh
+                                    color: Theme.floatingWindowNestedSurface
+                                    border.color: Theme.outlineMedium
+                                    border.width: Theme.layerOutlineWidth
 
                                     Column {
                                         id: tempColumn
@@ -403,7 +405,9 @@ Item {
                                     width: (parent.width - Theme.spacingM) / 2
                                     height: periodColumn.implicitHeight + Theme.spacingM * 2
                                     radius: Theme.cornerRadius
-                                    color: Theme.surfaceContainerHigh
+                                    color: Theme.floatingWindowNestedSurface
+                                    border.color: Theme.outlineMedium
+                                    border.width: Theme.layerOutlineWidth
 
                                     Column {
                                         id: periodColumn
@@ -444,7 +448,9 @@ Item {
                                     width: (parent.width - Theme.spacingM) / 2
                                     height: sunriseColumn.implicitHeight + Theme.spacingM * 2
                                     radius: Theme.cornerRadius
-                                    color: Theme.surfaceContainerHigh
+                                    color: Theme.floatingWindowNestedSurface
+                                    border.color: Theme.outlineMedium
+                                    border.width: Theme.layerOutlineWidth
                                     visible: DisplayService.gammaSunriseTime
 
                                     Column {
@@ -480,7 +486,9 @@ Item {
                                     width: (parent.width - Theme.spacingM) / 2
                                     height: sunsetColumn.implicitHeight + Theme.spacingM * 2
                                     radius: Theme.cornerRadius
-                                    color: Theme.surfaceContainerHigh
+                                    color: Theme.floatingWindowNestedSurface
+                                    border.color: Theme.outlineMedium
+                                    border.width: Theme.layerOutlineWidth
                                     visible: DisplayService.gammaSunsetTime
 
                                     Column {
@@ -517,7 +525,9 @@ Item {
                                 width: parent.width
                                 height: nextChangeRow.implicitHeight + Theme.spacingM * 2
                                 radius: Theme.cornerRadius
-                                color: Theme.surfaceContainerHigh
+                                color: Theme.floatingWindowNestedSurface
+                                border.color: Theme.outlineMedium
+                                border.width: Theme.layerOutlineWidth
                                 visible: DisplayService.gammaNextTransition
 
                                 Row {

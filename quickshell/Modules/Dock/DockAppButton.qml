@@ -186,28 +186,28 @@ Item {
         return true;
     }
 
+    function getActiveGroupedToplevelIndex(toplevels) {
+        for (let i = 0; i < toplevels.length; i++) {
+            if (toplevels[i].activated)
+                return i;
+        }
+
+        if (CompositorService.isNiri && NiriService.inOverview && NiriService.lastFocusedWindowId !== null) {
+            for (let i = 0; i < toplevels.length; i++) {
+                if (toplevels[i].niriWindowId === NiriService.lastFocusedWindowId)
+                    return i;
+            }
+        }
+
+        return -1;
+    }
+
     function cycleGroupedToplevels() {
         const toplevels = getGroupedToplevels();
         if (toplevels.length === 0)
             return;
 
-        let currentIndex = -1;
-        for (let i = 0; i < toplevels.length; i++) {
-            if (toplevels[i].activated) {
-                currentIndex = i;
-                break;
-            }
-        }
-
-        if (currentIndex < 0 && CompositorService.isNiri && NiriService.inOverview && NiriService.lastFocusedWindowId !== null) {
-            for (let i = 0; i < toplevels.length; i++) {
-                if (toplevels[i].niriWindowId === NiriService.lastFocusedWindowId) {
-                    currentIndex = i;
-                    break;
-                }
-            }
-        }
-
+        const currentIndex = getActiveGroupedToplevelIndex(toplevels);
         const nextToplevel = toplevels[(currentIndex + 1) % toplevels.length];
         if (restoreSpecialWorkspaceWindow(nextToplevel))
             return;
@@ -434,10 +434,12 @@ Item {
                     appData.toplevel?.close();
                     break;
                 case "grouped":
-                    if (contextMenu) {
-                        const shouldHidePin = appData.appId === "org.quickshell" || appData.appId === "com.danklinux.dms";
-                        contextMenu.showForButton(root, appData, root.height, shouldHidePin, cachedDesktopEntry, parentDockScreen, dockApps);
-                    }
+                    const groupedToplevels = getGroupedToplevels();
+                    if (groupedToplevels.length === 0)
+                        return;
+                    const activeIndex = getActiveGroupedToplevelIndex(groupedToplevels);
+                    const groupedToplevelToClose = groupedToplevels[activeIndex >= 0 ? activeIndex : 0];
+                    groupedToplevelToClose?.close();
                     break;
                 default:
                     if (!appData.appId)

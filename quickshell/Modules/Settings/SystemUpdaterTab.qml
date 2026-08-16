@@ -129,7 +129,7 @@ Item {
                             id: customIntervalField
                             width: parent.width
                             placeholderText: "30"
-                            backgroundColor: Theme.surfaceContainerHighest
+                            backgroundColor: Theme.floatingWindowFieldColor
                             normalBorderColor: Theme.outlineMedium
                             focusedBorderColor: Theme.primary
 
@@ -271,7 +271,6 @@ Item {
                         collapsible: true
                         expanded: false
                         visible: (SettingsData.updaterIgnoredPackages || []).length > 0
-                        color: Theme.withAlpha(Theme.surfaceContainer, 0.5)
 
                         Repeater {
                             model: SettingsData.updaterIgnoredPackages
@@ -283,7 +282,7 @@ Item {
                                 width: parent.width
                                 height: 40
                                 radius: Theme.cornerRadius
-                                color: Theme.withAlpha(Theme.surfaceContainer, 0.5)
+                                color: Theme.floatingWindowFieldColor
 
                                 DankIcon {
                                     id: ignoredIcon
@@ -394,7 +393,7 @@ Item {
                             id: updaterCustomCommand
                             width: parent.width
                             placeholderText: "topgrade --no-retry"
-                            backgroundColor: Theme.surfaceContainerHighest
+                            backgroundColor: Theme.floatingWindowFieldColor
                             normalBorderColor: Theme.outlineMedium
                             focusedBorderColor: Theme.primary
 
@@ -439,7 +438,7 @@ Item {
                             id: updaterTerminalCustomClass
                             width: parent.width
                             placeholderText: "-T updater"
-                            backgroundColor: Theme.surfaceContainerHighest
+                            backgroundColor: Theme.floatingWindowFieldColor
                             normalBorderColor: Theme.outlineMedium
                             focusedBorderColor: Theme.primary
 
