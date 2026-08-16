@@ -1192,28 +1192,28 @@ Item {
                     reason: I18n.tr("Managed by Frame")
                 }
 
-                SettingsToggleRow {
-                    settingKey: "barSquareCorners"
-                    tags: ["square", "corners", "rounding"]
-                    text: I18n.tr("Square Corners")
-                    description: I18n.tr("Remove corner rounding from the bar")
+                SettingsButtonGroupRow {
+                    settingKey: "barCornerStyle"
+                    tags: ["rounded", "attached", "square", "corners", "edge", "screen", "flush"]
+                    text: I18n.tr("Corner Style")
+                    description: I18n.tr("Choose how the bar meets the screen edge")
                     visible: !SettingsData.frameEnabled
-                    checked: selectedBarConfig?.squareCorners ?? false
-                    onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
-                            squareCorners: checked
-                        })
-                }
-
-                SettingsToggleRow {
-                    settingKey: "barAttachToScreenEdge"
-                    tags: ["attach", "edge", "screen", "flush", "bar"]
-                    text: I18n.tr("Attach to Screen Edge")
-                    description: I18n.tr("Align the outer bar edge with the screen while keeping the inner edge rounded")
-                    visible: !SettingsData.frameEnabled
-                    checked: selectedBarConfig?.attachToScreenEdge ?? false
-                    onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
-                            attachToScreenEdge: checked
-                        })
+                    model: [I18n.tr("Rounded"), I18n.tr("Attached"), I18n.tr("Square")]
+                    currentIndex: {
+                        if (selectedBarConfig?.squareCorners ?? false)
+                            return 2;
+                        if (selectedBarConfig?.attachToScreenEdge ?? false)
+                            return 1;
+                        return 0;
+                    }
+                    onSelectionChanged: (index, selected) => {
+                        if (!selected)
+                            return;
+                        SettingsData.updateBarConfig(selectedBarId, {
+                            squareCorners: index === 2,
+                            attachToScreenEdge: index === 1
+                        });
+                    }
                 }
 
                 SettingsToggleRow {

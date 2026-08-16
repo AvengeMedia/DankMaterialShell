@@ -763,31 +763,6 @@
     "conditionKey": "keybindsAvailable"
   },
   {
-    "section": "barAttachToScreenEdge",
-    "label": "Attach to Screen Edge",
-    "tabIndex": 3,
-    "category": "Dank Bar",
-    "keywords": [
-      "align",
-      "attach",
-      "bar",
-      "dank",
-      "edge",
-      "flush",
-      "inner",
-      "keeping",
-      "outer",
-      "panel",
-      "rounded",
-      "screen",
-      "statusbar",
-      "taskbar",
-      "topbar",
-      "while"
-    ],
-    "description": "Align the outer bar edge with the screen while keeping the inner edge rounded"
-  },
-  {
     "section": "barAutoHide",
     "label": "Auto-hide",
     "tabIndex": 3,
@@ -878,6 +853,34 @@
       "topbar"
     ],
     "icon": "dashboard"
+  },
+  {
+    "section": "barCornerStyle",
+    "label": "Corner Style",
+    "tabIndex": 3,
+    "category": "Dank Bar",
+    "keywords": [
+      "attached",
+      "bar",
+      "choose",
+      "corner",
+      "corners",
+      "dank",
+      "edge",
+      "flush",
+      "meets",
+      "panel",
+      "radius",
+      "round",
+      "rounded",
+      "screen",
+      "square",
+      "statusbar",
+      "style",
+      "taskbar",
+      "topbar"
+    ],
+    "description": "Choose how the bar meets the screen edge"
   },
   {
     "section": "barDisplay",
@@ -1246,29 +1249,6 @@
       "topbar"
     ],
     "description": "Adjust the bar height via inner padding"
-  },
-  {
-    "section": "barSquareCorners",
-    "label": "Square Corners",
-    "tabIndex": 3,
-    "category": "Dank Bar",
-    "keywords": [
-      "bar",
-      "corner",
-      "corners",
-      "dank",
-      "panel",
-      "radius",
-      "remove",
-      "round",
-      "rounded",
-      "rounding",
-      "square",
-      "statusbar",
-      "taskbar",
-      "topbar"
-    ],
-    "description": "Remove corner rounding from the bar"
   },
   {
     "section": "barAutoHideStrict",
@@ -2471,24 +2451,27 @@
     "tabIndex": 6,
     "category": "Dank Bar",
     "keywords": [
+      "attached",
       "background",
       "bar",
-      "corner",
+      "choose",
       "corners",
       "dank",
+      "edge",
+      "flush",
+      "meets",
       "panel",
       "radius",
-      "remove",
       "round",
       "rounded",
-      "rounding",
+      "screen",
       "square",
       "statusbar",
       "taskbar",
       "topbar"
     ],
     "icon": "rounded_corner",
-    "description": "Remove corner rounding from the bar"
+    "description": "Choose how the bar meets the screen edge"
   },
   {
     "section": "barAppearance",
