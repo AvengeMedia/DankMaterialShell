@@ -136,6 +136,7 @@ Item {
             rightWidgets: defaultBar.rightWidgets || [],
             spacing: defaultBar.spacing ?? 4,
             innerPadding: defaultBar.innerPadding ?? 4,
+            barLengthPadding: defaultBar.barLengthPadding ?? 0,
             bottomGap: defaultBar.bottomGap ?? 0,
             attachToScreenEdge: defaultBar.attachToScreenEdge ?? false,
             transparency: defaultBar.transparency ?? 1.0,
@@ -1026,6 +1027,30 @@ Item {
                         target: barInsetPaddingSlider
                         property: "value"
                         value: dankBarTab.insetPadDisplayValue
+                        restoreMode: Binding.RestoreBinding
+                    }
+                }
+
+                SettingsSliderRow {
+                    id: barLengthPaddingSlider
+                    settingKey: "barLengthPadding"
+                    visible: !SettingsData.frameEnabled
+                    text: I18n.tr("Bar Length Padding")
+                    description: I18n.tr("Reduce the visible bar length from both ends")
+                    tags: ["bar", "length", "padding", "size", "shorter"]
+                    unit: "px"
+                    minimum: 0
+                    maximum: 128
+                    defaultValue: 0
+                    value: selectedBarConfig?.barLengthPadding ?? 0
+                    onSliderDragFinished: finalValue => SettingsData.updateBarConfig(selectedBarId, {
+                        barLengthPadding: finalValue
+                    })
+
+                    Binding {
+                        target: barLengthPaddingSlider
+                        property: "value"
+                        value: selectedBarConfig?.barLengthPadding ?? 0
                         restoreMode: Binding.RestoreBinding
                     }
                 }

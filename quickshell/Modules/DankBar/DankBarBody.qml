@@ -571,6 +571,7 @@ Item {
 
     readonly property int notificationCount: NotificationService.notifications.length
     readonly property real effectiveBarThickness: (FrameTransitionState.effectiveFrameEnabled && usesFrameBarChrome) ? SettingsData.frameBarSize : Theme.snap(Math.max(barWindow.widgetThickness + (barConfig?.innerPadding ?? 4) + 4, Theme.barHeight - 4 - (8 - (barConfig?.innerPadding ?? 4))), _dpr)
+    readonly property real effectiveBarLengthPadding: (FrameTransitionState.effectiveFrameEnabled && usesFrameBarChrome) ? 0 : Math.max(0, barConfig?.barLengthPadding ?? 0)
     readonly property bool effectiveOpenOnOverview: FrameTransitionState.effectiveFrameEnabled ? SettingsData.frameShowOnOverview : (barConfig?.openOnOverview ?? false)
     readonly property real widgetThickness: Theme.snap(Math.max(20, 26 + (barConfig?.innerPadding ?? 4) * 0.6), _dpr)
 
@@ -1074,11 +1075,12 @@ Item {
                 Item {
                     id: barUnitInset
                     property int spacingPx: Theme.px(barWindow.effectiveSpacing, barWindow._dpr)
+                    property int lengthPaddingPx: Theme.px(barWindow.effectiveBarLengthPadding, barWindow._dpr)
                     anchors.fill: parent
-                    anchors.leftMargin: !barWindow.isVertical ? spacingPx : (axis.edge === "left" ? spacingPx : 0)
-                    anchors.rightMargin: !barWindow.isVertical ? spacingPx : (axis.edge === "right" ? spacingPx : 0)
-                    anchors.topMargin: barWindow.isVertical ? (barWindow.hasAdjacentTopBar ? 0 : spacingPx) : (axis.outerVisualEdge() === "bottom" ? 0 : spacingPx)
-                    anchors.bottomMargin: barWindow.isVertical ? (barWindow.hasAdjacentBottomBar ? 0 : spacingPx) : (axis.outerVisualEdge() === "bottom" ? spacingPx : 0)
+                    anchors.leftMargin: !barWindow.isVertical ? spacingPx + lengthPaddingPx : (axis.edge === "left" ? spacingPx : 0)
+                    anchors.rightMargin: !barWindow.isVertical ? spacingPx + lengthPaddingPx : (axis.edge === "right" ? spacingPx : 0)
+                    anchors.topMargin: barWindow.isVertical ? (barWindow.hasAdjacentTopBar ? 0 : spacingPx) + lengthPaddingPx : (axis.outerVisualEdge() === "bottom" ? 0 : spacingPx)
+                    anchors.bottomMargin: barWindow.isVertical ? (barWindow.hasAdjacentBottomBar ? 0 : spacingPx) + lengthPaddingPx : (axis.outerVisualEdge() === "bottom" ? spacingPx : 0)
 
                     BarCanvas {
                         id: barBackground

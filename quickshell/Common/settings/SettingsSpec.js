@@ -577,6 +577,7 @@ var SPEC = {
             rightWidgets: ["systemTray", "clipboard", "cpuUsage", "memUsage", "notificationButton", "battery", "controlCenterButton"],
             spacing: 4,
             innerPadding: 4,
+            barLengthPadding: 0,
             bottomGap: 0,
             attachToScreenEdge: false,
             transparency: 1.0,

@@ -813,6 +813,29 @@
     "description": "Automatically hide the bar when the pointer moves away"
   },
   {
+    "section": "barLengthPadding",
+    "label": "Bar Length Padding",
+    "tabIndex": 3,
+    "category": "Dank Bar",
+    "keywords": [
+      "bar",
+      "both",
+      "dank",
+      "ends",
+      "length",
+      "padding",
+      "panel",
+      "reduce",
+      "shorter",
+      "size",
+      "statusbar",
+      "taskbar",
+      "topbar",
+      "visible"
+    ],
+    "description": "Reduce the visible bar length from both ends"
+  },
+  {
     "section": "barClickThrough",
     "label": "Click Through",
     "tabIndex": 3,
