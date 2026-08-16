@@ -35,7 +35,7 @@ aarch64)
     ;;
 esac
 
-REPO_SLUG="${DMS_REPO:-JDKamalakar/DankMaterialShell}"
+REPO_SLUG="${DMS_REPO:-AvengeMedia/DankMaterialShell}"
 
 # Get the latest release version
 LATEST_VERSION=$(curl -s "https://api.github.com/repos/${REPO_SLUG}/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')

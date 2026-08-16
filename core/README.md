@@ -158,9 +158,9 @@ curl -fsSL https://install.danklinux.com | sh
 Headless mode requires cached credentials or passwordless privilege escalation (sudo/doas/run0):
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/JDKamalakar/DankMaterialShell/master/core/install.sh | sh -s -- -c niri -t ghostty -p sudo -y
-curl -fsSL https://raw.githubusercontent.com/JDKamalakar/DankMaterialShell/master/core/install.sh | sh -s -- -c hyprland -t kitty --wm-git --quickshell-git -a -y
-curl -fsSL https://raw.githubusercontent.com/JDKamalakar/DankMaterialShell/master/core/install.sh | sh -s -- -c mango -t alacritty --git --danksearch --dankcalendar -y
+curl -fsSL https://install.danklinux.com | sh -s -- -c niri -t ghostty -p sudo -y
+curl -fsSL https://install.danklinux.com | sh -s -- -c hyprland -t kitty --git-deps niri,quickshell -a -y
+curl -fsSL https://install.danklinux.com | sh -s -- -c mango -t alacritty --git --danksearch --dankcalendar -y
 ```
 
 | Flag | Short | Description |
@@ -168,14 +168,11 @@ curl -fsSL https://raw.githubusercontent.com/JDKamalakar/DankMaterialShell/maste
 | `--compositor <niri\|hyprland\|mango>` | `-c` | Compositor/WM to install (required for headless) |
 | `--term <ghostty\|kitty\|alacritty>` | `-t` | Terminal emulator (required for headless) |
 | `--privesc <sudo\|doas\|run0>` | `-p` | Explicit privilege escalation tool |
-| `--wm-git` | | Use git/development version of selected window manager |
-| `--quickshell-git` | | Use git/development version of quickshell |
-| `--dms-git` | | Use git/development version of DankMaterialShell |
 | `--git` / `--git-all` | | Use git/development versions for all supported components |
-| `--git-deps <name,...>` | | Specify dependencies to install git versions of |
+| `--git-deps <name,...>` | | Specify dependencies to install git versions of (e.g. `niri,quickshell`) |
 | `--all` / `--all-features` | `-a` | Install all optional features and dependencies |
 | `--no-features` | | Skip all optional features and dependencies |
-| `--dms-greeter` / `--greeter` | | Install dms-greeter optional package |
+| `--dms-greeter` | | Install dms-greeter optional package |
 | `--danksearch` | | Install danksearch and enable user indexing service |
 | `--dankcalendar` | | Install dankcalendar package |
 | `--include-deps <name,...>` | | Enable specific optional dependencies |

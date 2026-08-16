@@ -452,6 +452,13 @@ func TestBuildDisabledItems(t *testing.T) {
 			noFeatures:   true,
 			wantDisabled: []string{"dms-greeter", "danksearch", "dankcalendar"},
 		},
+		{
+			name:        "both allFeatures and noFeatures set returns error",
+			allFeatures: true,
+			noFeatures:  true,
+			wantErr:     true,
+			errContains: "cannot specify both --all-features/--all and --no-features",
+		},
 	}
 
 	for _, tt := range tests {
@@ -501,10 +508,8 @@ func TestBuildDisabledItems(t *testing.T) {
 
 func TestApplyGitVariants(t *testing.T) {
 	r := NewRunner(Config{
-		Compositor:    "niri",
-		WMGit:         true,
-		QuickshellGit: true,
-		GitDeps:       []string{"matugen"},
+		Compositor: "niri",
+		GitDeps:    []string{"niri", "quickshell", "matugen"},
 	})
 
 	dependencies := []deps.Dependency{
@@ -514,7 +519,9 @@ func TestApplyGitVariants(t *testing.T) {
 		{Name: "ghostty", Variant: deps.VariantStable, CanToggle: false},
 	}
 
-	r.applyGitVariants(dependencies)
+	if err := r.applyGitVariants(dependencies); err != nil {
+		t.Fatalf("applyGitVariants unexpected error: %v", err)
+	}
 
 	if dependencies[0].Variant != deps.VariantGit {
 		t.Errorf("expected niri variant to be VariantGit, got %v", dependencies[0].Variant)
@@ -527,5 +534,17 @@ func TestApplyGitVariants(t *testing.T) {
 	}
 	if dependencies[3].Variant != deps.VariantStable {
 		t.Errorf("expected ghostty variant to stay VariantStable (CanToggle=false), got %v", dependencies[3].Variant)
+	}
+
+	// Test unknown dependency in --git-deps returns error
+	rErr := NewRunner(Config{GitDeps: []string{"nonexistent"}})
+	if err := rErr.applyGitVariants(dependencies); err == nil {
+		t.Error("expected error for unknown git dependency, got nil")
+	}
+
+	// Test non-togglable dependency in --git-deps returns error
+	rCantToggle := NewRunner(Config{GitDeps: []string{"ghostty"}})
+	if err := rCantToggle.applyGitVariants(dependencies); err == nil {
+		t.Error("expected error for non-togglable git dependency, got nil")
 	}
 }
