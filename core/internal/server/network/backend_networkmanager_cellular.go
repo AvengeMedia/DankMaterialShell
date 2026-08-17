@@ -94,20 +94,47 @@ func (b *NetworkManagerBackend) ConnectCellular() error {
 					return fmt.Errorf("failed to activate cellular connection: %w", err)
 				}
 
-				b.updateAllCellularDevices()
-				b.updateCellularState()
-				b.listCellularConnections()
-				b.updatePrimaryConnection()
-
-				if b.onStateChange != nil {
-					b.onStateChange()
-				}
+				b.refreshCellularState()
 				return nil
 			}
 		}
 	}
 
-	return fmt.Errorf("no cellular connection profile available")
+	settings := map[string]map[string]any{
+		"connection": {
+			"id":   "Mobile broadband",
+			"type": "gsm",
+		},
+		"gsm": {
+			"auto-config": true,
+		},
+		"ipv4": {
+			"method": "auto",
+		},
+		"ipv6": {
+			"method": "auto",
+		},
+	}
+
+	if _, err := nm.AddAndActivateConnection(settings, dev); err != nil {
+		delete(settings["gsm"], "auto-config")
+		if _, retryErr := nm.AddAndActivateConnection(settings, dev); retryErr != nil {
+			return fmt.Errorf("failed to create and activate cellular connection: %w", err)
+		}
+	}
+
+	b.refreshCellularState()
+	return nil
+}
+
+func (b *NetworkManagerBackend) refreshCellularState() {
+	b.updateAllCellularDevices()
+	b.updateCellularState()
+	b.listCellularConnections()
+	b.updatePrimaryConnection()
+	if b.onStateChange != nil {
+		b.onStateChange()
+	}
 }
 
 func (b *NetworkManagerBackend) DisconnectCellular() error {
