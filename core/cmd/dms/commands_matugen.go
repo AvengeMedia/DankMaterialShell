@@ -44,11 +44,18 @@ var matugenPreviewCmd = &cobra.Command{
 	Run:   runMatugenPreview,
 }
 
+var matugenQtengineCmd = &cobra.Command{
+	Use:   "qtengine",
+	Short: "Sync qtengine's config with the current DMS theme",
+	Run:   runMatugenQtengine,
+}
+
 func init() {
 	matugenCmd.AddCommand(matugenGenerateCmd)
 	matugenCmd.AddCommand(matugenQueueCmd)
 	matugenCmd.AddCommand(matugenCheckCmd)
 	matugenCmd.AddCommand(matugenPreviewCmd)
+	matugenCmd.AddCommand(matugenQtengineCmd)
 
 	for _, cmd := range []*cobra.Command{matugenGenerateCmd, matugenQueueCmd} {
 		cmd.Flags().String("state-dir", "", "State directory for cache files")
@@ -71,6 +78,7 @@ func init() {
 	matugenQueueCmd.Flags().Duration("timeout", 90*time.Second, "Timeout for waiting")
 	matugenPreviewCmd.Flags().String("source-color", "", "Source color used to generate previews")
 	matugenPreviewCmd.Flags().Float64("contrast", 0, "Contrast value from -1 to 1 (0 = standard)")
+	matugenQtengineCmd.Flags().String("icon-theme", "", "Icon theme name")
 }
 
 func buildMatugenOptions(cmd *cobra.Command) matugen.Options {
@@ -222,4 +230,12 @@ func runMatugenPreview(cmd *cobra.Command, args []string) {
 		log.Fatalf("Failed to marshal Matugen previews: %v", err)
 	}
 	fmt.Println(string(data))
+}
+
+func runMatugenQtengine(cmd *cobra.Command, args []string) {
+	iconTheme, _ := cmd.Flags().GetString("icon-theme")
+
+	if err := matugen.SyncQtengineConfig(iconTheme); err != nil {
+		log.Fatalf("Failed to sync qtengine config: %v", err)
+	}
 }

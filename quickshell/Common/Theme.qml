@@ -1525,7 +1525,7 @@ Singleton {
         if (typeof SettingsData !== "undefined") {
             const skipTemplates = [];
             if (!SettingsData.runDmsMatugenTemplates) {
-                skipTemplates.push("gtk", "nvim", "niri", "qt5ct", "qt6ct", "fcitx5", "firefox", "pywalfox", "zenbrowser", "vesktop", "vencord", "equibop", "ghostty", "kitty", "foot", "alacritty", "wezterm", "dgop", "kcolorscheme", "vscode", "emacs", "zed");
+                skipTemplates.push("gtk", "nvim", "niri", "qt5ct", "qt6ct", "qtengine", "fcitx5", "firefox", "pywalfox", "zenbrowser", "vesktop", "vencord", "equibop", "ghostty", "kitty", "foot", "alacritty", "wezterm", "dgop", "kcolorscheme", "vscode", "emacs", "zed");
             } else {
                 if (!SettingsData.matugenTemplateGtk)
                     skipTemplates.push("gtk");
@@ -1539,6 +1539,8 @@ Singleton {
                     skipTemplates.push("qt5ct");
                 if (!SettingsData.matugenTemplateQt6ct)
                     skipTemplates.push("qt6ct");
+                if (!SettingsData.matugenTemplateQtengine)
+                    skipTemplates.push("qtengine");
                 if (!SettingsData.matugenTemplateFcitx5)
                     skipTemplates.push("fcitx5");
                 if (!SettingsData.matugenTemplateFirefox)
@@ -1823,17 +1825,35 @@ Singleton {
             return;
         }
 
-        Proc.runCommand("qtApplier", ["bash", shellDir + "/scripts/qt.sh", configDir], (output, exitCode) => {
-            if (exitCode === 0) {
-                if (typeof ToastService !== "undefined") {
-                    ToastService.showInfo(I18n.tr("Qt colors applied successfully"));
-                }
+        const isQtengineActive = SettingsData.qtengineActive;
+        let pendingAppliers = isQtengineActive ? 2 : 1;
+        let anyApplierSucceeded = false;
+        let qtengineFailed = false;
+
+        const finishApplyQtColors = succeeded => {
+            anyApplierSucceeded = anyApplierSucceeded || succeeded;
+            pendingAppliers -= 1;
+            if (pendingAppliers !== 0)
+                return;
+            if (typeof ToastService === "undefined")
+                return;
+            if (anyApplierSucceeded && !qtengineFailed) {
+                ToastService.showInfo(I18n.tr("Qt colors applied successfully"));
             } else {
-                if (typeof ToastService !== "undefined") {
-                    ToastService.showError(I18n.tr("Failed to apply %1 colors").arg("Qt"));
-                }
+                ToastService.showError(I18n.tr("Failed to apply %1 colors").arg("Qt"));
             }
+        };
+
+        Proc.runCommand("qtApplier", ["bash", shellDir + "/scripts/qt.sh", configDir], (output, exitCode) => {
+            finishApplyQtColors(exitCode === 0);
         });
+
+        if (isQtengineActive) {
+            Proc.runCommand("qtengineApplier", [Proc.dmsBin, "matugen", "qtengine", "--config-dir", configDir], (output, exitCode) => {
+                qtengineFailed = exitCode !== 0;
+                finishApplyQtColors(exitCode === 0);
+            });
+        }
     }
 
     function withAlpha(c, a) {

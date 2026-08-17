@@ -274,9 +274,9 @@ Item {
     }
 
     function warnIfMissingQtTheme() {
-        if (Quickshell.env("QT_QPA_PLATFORMTHEME") === "gtk3" || Quickshell.env("QT_QPA_PLATFORMTHEME") === "qt6ct" || Quickshell.env("QT_QPA_PLATFORMTHEME_QT6") === "qt6ct" || Quickshell.env("QT_QPA_PLATFORMTHEME") === "kde")
+        if (Quickshell.env("QT_QPA_PLATFORMTHEME") === "gtk3" || Quickshell.env("QT_QPA_PLATFORMTHEME") === "qt6ct" || Quickshell.env("QT_QPA_PLATFORMTHEME_QT6") === "qt6ct" || SettingsData.qtengineActive || Quickshell.env("QT_QPA_PLATFORMTHEME") === "kde")
             return;
-        ToastService.showError(I18n.tr("Missing Environment Variables", "qt theme env error title"), I18n.tr("You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.", "qt theme env error body"));
+        ToastService.showError(I18n.tr("Missing Environment Variables", "qt theme env error title"), I18n.tr("You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.", "qt theme env error body"));
     }
 
     function refreshMatugenSchemePreviews() {
@@ -2644,6 +2644,18 @@ Item {
 
                 SettingsToggleRow {
                     tab: "theme"
+                    tags: ["matugen", "qtengine", "template", "qt"]
+                    settingKey: "matugenTemplateQtengine"
+                    text: "qtengine"
+                    description: getTemplateDescription("qtengine", "")
+                    descriptionColor: getTemplateDescriptionColor("qtengine")
+                    visible: SettingsData.runDmsMatugenTemplates
+                    checked: SettingsData.matugenTemplateQtengine
+                    onToggled: checked => SettingsData.set("matugenTemplateQtengine", checked)
+                }
+
+                SettingsToggleRow {
+                    tab: "theme"
                     tags: ["matugen", "fcitx5", "input", "template"]
                     settingKey: "matugenTemplateFcitx5"
                     text: "Fcitx5"
@@ -2966,7 +2978,7 @@ Item {
                     StyledText {
                         id: warningText
                         font.pixelSize: Theme.fontSizeSmall
-                        text: I18n.tr("The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).")
+                        text: I18n.tr("The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).")
                         wrapMode: Text.WordWrap
                         width: parent.width - Theme.iconSizeSmall - Theme.spacingM
                         anchors.verticalCenter: parent.verticalCenter
@@ -3056,7 +3068,7 @@ Item {
                 }
 
                 StyledText {
-                    text: I18n.tr('Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.').arg(`<a href="https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming" style="text-decoration:none; color:${Theme.primary};">adw-gtk3</a>`)
+                    text: I18n.tr('Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.').arg(`<a href="https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming" style="text-decoration:none; color:${Theme.primary};">adw-gtk3</a>`)
                     textFormat: Text.RichText
                     linkColor: Theme.primary
                     onLinkActivated: url => Qt.openUrlExternally(url)

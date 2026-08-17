@@ -1,10 +1,12 @@
 package matugen
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	mocks_utils "github.com/AvengeMedia/DankMaterialShell/core/internal/mocks/utils"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
@@ -611,4 +613,320 @@ func TestAppendFlatpakConfigRewritesOutputAndTemplateName(t *testing.T) {
 
 	assert.Contains(t, string(output), "[templates.dmsvesktop-flatpak]")
 	assert.Contains(t, string(output), "'/home/test/.var/app/dev.vencord.Vesktop/config/vesktop/themes/dank-discord.css'")
+}
+
+func TestQtengineActive(t *testing.T) {
+	tests := []struct {
+		name string
+		env  map[string]string
+		want bool
+	}{
+		{name: "both unset", want: false},
+		{name: "qtengine on QT_QPA_PLATFORMTHEME", env: map[string]string{"QT_QPA_PLATFORMTHEME": "qtengine"}, want: true},
+		{name: "qtengine on QT_QPA_PLATFORMTHEME_QT6", env: map[string]string{"QT_QPA_PLATFORMTHEME_QT6": "qtengine"}, want: true},
+		{name: "gtk3", env: map[string]string{"QT_QPA_PLATFORMTHEME": "gtk3"}, want: false},
+		{name: "qt6ct on both", env: map[string]string{"QT_QPA_PLATFORMTHEME": "qt6ct", "QT_QPA_PLATFORMTHEME_QT6": "qt6ct"}, want: false},
+		{name: "both empty", env: map[string]string{"QT_QPA_PLATFORMTHEME": "", "QT_QPA_PLATFORMTHEME_QT6": ""}, want: false},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			for _, key := range []string{"QT_QPA_PLATFORMTHEME", "QT_QPA_PLATFORMTHEME_QT6"} {
+				t.Setenv(key, "")
+				os.Unsetenv(key)
+			}
+			for key, value := range tc.env {
+				t.Setenv(key, value)
+			}
+
+			assert.Equal(t, tc.want, QtengineActive())
+		})
+	}
+}
+
+func TestSyncQtengineConfig(t *testing.T) {
+	const (
+		uiFont    = "Inter,11,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
+		fixedFont = "JetBrainsMono Nerd Font,11,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
+	)
+
+	existingConfig := `{
+  "theme": {
+    "style": "Fusion",
+    "font": "` + uiFont + `",
+    "fontFixed": "` + fixedFont + `",
+    "colorScheme": "/stale/path/Old.colors",
+    "iconTheme": "breeze"
+  },
+  "misc": {
+    "wheelScrollLines": 3,
+    "dialogButtonsHaveIcons": true
+  },
+  "somethingQtengineAddsLater": ["keep", "me"]
+}
+`
+
+	tests := []struct {
+		name          string
+		existing      string
+		writeEmpty    bool
+		noColorScheme bool
+		iconTheme     string
+		wantErr       bool
+		check         func(t *testing.T, cfg, theme map[string]any)
+	}{
+		{
+			name:      "creates config when none exists",
+			iconTheme: "Papirus-Dark",
+			check: func(t *testing.T, cfg, theme map[string]any) {
+				assert.Equal(t, "Papirus-Dark", theme["iconTheme"])
+			},
+		},
+		{
+			name:      "preserves user keys at every level",
+			existing:  existingConfig,
+			iconTheme: "Papirus-Dark",
+			check: func(t *testing.T, cfg, theme map[string]any) {
+				assert.Equal(t, "Fusion", theme["style"])
+				assert.Equal(t, uiFont, theme["font"])
+				assert.Equal(t, fixedFont, theme["fontFixed"])
+				assert.Equal(t, "Papirus-Dark", theme["iconTheme"])
+				assert.Equal(t, map[string]any{"wheelScrollLines": float64(3), "dialogButtonsHaveIcons": true}, cfg["misc"])
+				assert.Equal(t, []any{"keep", "me"}, cfg["somethingQtengineAddsLater"])
+			},
+		},
+		{
+			name:      "System Default leaves the existing icon theme alone",
+			existing:  existingConfig,
+			iconTheme: "System Default",
+			check: func(t *testing.T, cfg, theme map[string]any) {
+				assert.Equal(t, "breeze", theme["iconTheme"])
+			},
+		},
+		{
+			name:      "empty icon theme writes no iconTheme key",
+			iconTheme: "",
+			check: func(t *testing.T, cfg, theme map[string]any) {
+				_, ok := theme["iconTheme"]
+				assert.False(t, ok, "iconTheme must stay absent when none was requested")
+			},
+		},
+		{
+			name:      "a top level null is a fresh start, not a panic",
+			existing:  "null",
+			iconTheme: "Papirus-Dark",
+			check: func(t *testing.T, cfg, theme map[string]any) {
+				assert.Equal(t, "Papirus-Dark", theme["iconTheme"])
+			},
+		},
+		{
+			name:      "a top level null with a trailing newline is a fresh start",
+			existing:  "null\n",
+			iconTheme: "Papirus-Dark",
+			check: func(t *testing.T, cfg, theme map[string]any) {
+				assert.Equal(t, "Papirus-Dark", theme["iconTheme"])
+			},
+		},
+		{
+			name:       "an empty file is a fresh start",
+			writeEmpty: true,
+			iconTheme:  "Papirus-Dark",
+			check: func(t *testing.T, cfg, theme map[string]any) {
+				assert.Equal(t, "Papirus-Dark", theme["iconTheme"])
+			},
+		},
+		{
+			name:      "a whitespace only file is a fresh start",
+			existing:  "\n\t \n",
+			iconTheme: "Papirus-Dark",
+			check: func(t *testing.T, cfg, theme map[string]any) {
+				assert.Equal(t, "Papirus-Dark", theme["iconTheme"])
+			},
+		},
+		{
+			name:      "a null theme is treated as absent",
+			existing:  "{\n  \"theme\": null,\n  \"misc\": {\"wheelScrollLines\": 3}\n}\n",
+			iconTheme: "Papirus-Dark",
+			check: func(t *testing.T, cfg, theme map[string]any) {
+				assert.Equal(t, "Papirus-Dark", theme["iconTheme"])
+				assert.Equal(t, map[string]any{"wheelScrollLines": float64(3)}, cfg["misc"])
+			},
+		},
+		{
+			name:          "leaves a hand set colorScheme alone when DMS generated none",
+			existing:      existingConfig,
+			noColorScheme: true,
+			iconTheme:     "Papirus-Dark",
+			check: func(t *testing.T, cfg, theme map[string]any) {
+				assert.Equal(t, "/stale/path/Old.colors", theme["colorScheme"], "pointing qtengine at a scheme that does not exist resets the user's palette")
+				assert.Equal(t, "Papirus-Dark", theme["iconTheme"])
+				assert.Equal(t, "Fusion", theme["style"])
+			},
+		},
+		{
+			name:          "writes no colorScheme at all when there is none to point at",
+			noColorScheme: true,
+			iconTheme:     "Papirus-Dark",
+			check: func(t *testing.T, cfg, theme map[string]any) {
+				_, ok := theme["colorScheme"]
+				assert.False(t, ok, "colorScheme must stay absent rather than name a missing file")
+				assert.Equal(t, "Papirus-Dark", theme["iconTheme"])
+			},
+		},
+		{
+			name:      "refuses to clobber malformed json",
+			existing:  "{ this is not json",
+			iconTheme: "Papirus-Dark",
+			wantErr:   true,
+		},
+		{
+			name:      "refuses to clobber a non-object theme",
+			existing:  "{\n  \"theme\": \"Fusion\"\n}\n",
+			iconTheme: "Papirus-Dark",
+			wantErr:   true,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			tempDir := t.TempDir()
+			configDir := filepath.Join(tempDir, "config")
+			dataHome := filepath.Join(tempDir, "data")
+			t.Setenv("XDG_CONFIG_HOME", configDir)
+			t.Setenv("XDG_DATA_HOME", dataHome)
+
+			path := QtengineConfigPath()
+			assert.Equal(t, filepath.Join(configDir, "qtengine", "config.json"), path)
+
+			scheme := filepath.Join(dataHome, "color-schemes", "DankMatugen.colors")
+			if !tc.noColorScheme {
+				if err := os.MkdirAll(filepath.Dir(scheme), 0o755); err != nil {
+					t.Fatalf("failed to create color-schemes dir: %v", err)
+				}
+				if err := os.WriteFile(scheme, []byte("[Colors:Window]\n"), 0o644); err != nil {
+					t.Fatalf("failed to write color scheme: %v", err)
+				}
+			}
+
+			if tc.existing != "" || tc.writeEmpty {
+				if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+					t.Fatalf("failed to create qtengine config dir: %v", err)
+				}
+				if err := os.WriteFile(path, []byte(tc.existing), 0o644); err != nil {
+					t.Fatalf("failed to write existing config: %v", err)
+				}
+			}
+
+			err := SyncQtengineConfig(tc.iconTheme)
+
+			if tc.wantErr {
+				assert.Error(t, err)
+				after, readErr := os.ReadFile(path)
+				assert.NoError(t, readErr)
+				assert.Equal(t, tc.existing, string(after), "a rejected merge must leave the file byte-identical")
+				return
+			}
+
+			assert.NoError(t, err)
+
+			info, err := os.Stat(path)
+			if err != nil {
+				t.Fatalf("failed to stat written config: %v", err)
+			}
+			assert.Equal(t, os.FileMode(0o644), info.Mode().Perm())
+
+			data, err := os.ReadFile(path)
+			if err != nil {
+				t.Fatalf("failed to read written config: %v", err)
+			}
+			assert.True(t, strings.HasSuffix(string(data), "}\n"), "config should be indented JSON with a trailing newline, got %q", string(data))
+
+			var cfg map[string]any
+			if err := json.Unmarshal(data, &cfg); err != nil {
+				t.Fatalf("written config is not valid JSON: %v", err)
+			}
+			theme, ok := cfg["theme"].(map[string]any)
+			if !ok {
+				t.Fatalf("written config has no theme object: %#v", cfg["theme"])
+			}
+			if !tc.noColorScheme {
+				assert.Equal(t, scheme, theme["colorScheme"])
+			}
+
+			if tc.check != nil {
+				tc.check(t, cfg, theme)
+			}
+		})
+	}
+}
+
+// The appended entry is the only thing driving the settings row's indicator.
+func TestCheckTemplatesIncludesQtengine(t *testing.T) {
+	tests := []struct {
+		name          string
+		platformTheme string
+		wantDetected  bool
+	}{
+		{name: "detected when qtengine is the platform theme", platformTheme: "qtengine", wantDetected: true},
+		{name: "not detected under another platform theme", platformTheme: "gtk3", wantDetected: false},
+		{name: "not detected when unset", platformTheme: "", wantDetected: false},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Setenv("QT_QPA_PLATFORMTHEME", tc.platformTheme)
+			t.Setenv("QT_QPA_PLATFORMTHEME_QT6", "")
+
+			// nil uses the default checker; the qtengine entry never consults it.
+			var found *TemplateCheck
+			for _, check := range CheckTemplates(nil) {
+				if check.ID == "qtengine" {
+					found = &check
+					break
+				}
+			}
+
+			if found == nil {
+				t.Fatal("CheckTemplates must report qtengine; the settings row indicator depends on it")
+			}
+			assert.Equal(t, tc.wantDetected, found.Detected)
+		})
+	}
+}
+
+func TestSyncQtengineConfigBumpsMtime(t *testing.T) {
+	tempDir := t.TempDir()
+	t.Setenv("XDG_CONFIG_HOME", filepath.Join(tempDir, "config"))
+	t.Setenv("XDG_DATA_HOME", filepath.Join(tempDir, "data"))
+
+	if err := SyncQtengineConfig("Papirus-Dark"); err != nil {
+		t.Fatalf("first sync failed: %v", err)
+	}
+
+	path := QtengineConfigPath()
+	before, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatalf("failed to read written config: %v", err)
+	}
+
+	past := time.Now().Add(-time.Hour)
+	if err := os.Chtimes(path, past, past); err != nil {
+		t.Fatalf("failed to backdate config: %v", err)
+	}
+
+	if err := SyncQtengineConfig("Papirus-Dark"); err != nil {
+		t.Fatalf("second sync failed: %v", err)
+	}
+
+	info, err := os.Stat(path)
+	if err != nil {
+		t.Fatalf("failed to stat config: %v", err)
+	}
+	assert.True(t, info.ModTime().After(past), "an unchanged write must still bump mtime; that is what repaints running apps")
+
+	after, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatalf("failed to re-read config: %v", err)
+	}
+	assert.Equal(t, string(before), string(after))
 }

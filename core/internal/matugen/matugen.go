@@ -401,6 +401,15 @@ func buildOnce(opts *Options) (bool, error) {
 		refreshQt6ct()
 	}
 
+	// kcolorscheme writes the .colors file qtengine is pointed at, so with that
+	// template off there is nothing to point to and the config would name a
+	// scheme DMS no longer generates.
+	if !opts.ShouldSkipTemplate("qtengine") && !opts.ShouldSkipTemplate("kcolorscheme") && QtengineActive() {
+		if err := SyncQtengineConfig(opts.IconTheme); err != nil {
+			log.Warnf("Failed to sync qtengine config: %v", err)
+		}
+	}
+
 	signalTerminals(opts)
 	if !opts.ShouldSkipTemplate("fcitx5") && appExists(opts.AppChecker, []string{"fcitx5"}, nil) {
 		refreshFcitx5()
@@ -1216,7 +1225,7 @@ func CheckTemplates(checker utils.AppChecker) []TemplateCheck {
 	}
 
 	homeDir, _ := os.UserHomeDir()
-	checks := make([]TemplateCheck, 0, len(templateRegistry))
+	checks := make([]TemplateCheck, 0, len(templateRegistry)+1)
 
 	for _, tmpl := range templateRegistry {
 		detected := false
@@ -1234,6 +1243,11 @@ func CheckTemplates(checker utils.AppChecker) []TemplateCheck {
 
 		checks = append(checks, TemplateCheck{ID: tmpl.ID, Detected: detected})
 	}
+
+	// qtengine is not a matugen template and ships no binary, so it has no
+	// templateRegistry entry to detect; the settings row still needs an honest
+	// indicator, which is the platform theme env var.
+	checks = append(checks, TemplateCheck{ID: "qtengine", Detected: QtengineActive()})
 
 	return checks
 }

@@ -5271,6 +5271,24 @@
     ]
   },
   {
+    "section": "matugenTemplateQtengine",
+    "label": "qtengine",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "colors",
+      "look",
+      "matugen",
+      "qt",
+      "qtengine",
+      "scheme",
+      "style",
+      "template",
+      "theme"
+    ]
+  },
+  {
     "section": "matugenTemplateVencord",
     "label": "vencord",
     "tabIndex": 10,

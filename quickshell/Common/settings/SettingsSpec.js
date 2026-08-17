@@ -401,6 +401,7 @@ var SPEC = {
     matugenTemplateQt5ct: { def: true },
     matugenTemplateQt6ct: { def: true },
     matugenTemplateFcitx5: { def: true },
+    matugenTemplateQtengine: { def: true },
     matugenTemplateFirefox: { def: true },
     matugenTemplatePywalfox: { def: true },
     matugenTemplateZenBrowser: { def: true },
