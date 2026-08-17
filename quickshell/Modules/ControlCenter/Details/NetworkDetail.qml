@@ -567,7 +567,7 @@ Rectangle {
                 anchors.horizontalCenter: parent.horizontalCenter
                 name: "network_cell"
                 size: 48
-                color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5)
+                color: Theme.surfaceTextSecondary
             }
 
             StyledText {
@@ -584,7 +584,7 @@ Rectangle {
                 width: enableCellularLabel.implicitWidth + Theme.spacingL * 2
                 height: enableCellularLabel.implicitHeight + Theme.spacingM * 2
                 radius: height / 2
-                color: enableCellularButton.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08)
+                color: enableCellularButton.containsMouse ? Theme.primaryHover : Theme.primaryHoverLight
                 border.width: 0
                 visible: NetworkService.cellularHardwareEnabled
 
@@ -625,15 +625,6 @@ Rectangle {
             id: cellularColumn
             width: parent.width
             spacing: Theme.spacingS
-
-            StyledText {
-                width: parent.width
-                visible: (NetworkService.cellularDevices?.length ?? 0) === 0
-                text: I18n.tr("No devices found")
-                font.pixelSize: Theme.fontSizeMedium
-                color: Theme.surfaceVariantText
-                horizontalAlignment: Text.AlignHCenter
-            }
 
             Repeater {
                 model: (NetworkService.cellularConnections?.length ?? 0) > 0 ? [] : (NetworkService.cellularDevices || [])

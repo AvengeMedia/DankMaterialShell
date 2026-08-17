@@ -112,7 +112,7 @@ func (b *NetworkManagerBackend) updateCellularState() error {
 	var connectedIP string
 	var anyConnected bool
 
-	for name, info := range b.cellularDevices {
+	for name, info := range b.cellularDevicesSnapshot() {
 		state, err := info.device.GetPropertyState()
 		if err != nil {
 			continue

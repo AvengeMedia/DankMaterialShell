@@ -48,14 +48,7 @@ func (b *NetworkManagerBackend) SetCellularEnabled(enabled bool) error {
 	}
 
 	b.updateCellularRadioState()
-	b.updateAllCellularDevices()
-	b.updateCellularState()
-	b.listCellularConnections()
-	b.updatePrimaryConnection()
-
-	if b.onStateChange != nil {
-		b.onStateChange()
-	}
+	b.refreshCellularState()
 
 	return nil
 }
@@ -117,9 +110,10 @@ func (b *NetworkManagerBackend) ConnectCellular() error {
 	}
 
 	if _, err := nm.AddAndActivateConnection(settings, dev); err != nil {
+		// Older NetworkManager/ModemManager stacks reject gsm.auto-config
 		delete(settings["gsm"], "auto-config")
 		if _, retryErr := nm.AddAndActivateConnection(settings, dev); retryErr != nil {
-			return fmt.Errorf("failed to create and activate cellular connection: %w", err)
+			return fmt.Errorf("failed to create and activate cellular connection: %w", retryErr)
 		}
 	}
 
@@ -147,20 +141,13 @@ func (b *NetworkManagerBackend) DisconnectCellular() error {
 		return fmt.Errorf("failed to disconnect cellular modem: %w", err)
 	}
 
-	b.updateAllCellularDevices()
-	b.updateCellularState()
-	b.listCellularConnections()
-	b.updatePrimaryConnection()
-
-	if b.onStateChange != nil {
-		b.onStateChange()
-	}
+	b.refreshCellularState()
 
 	return nil
 }
 
 func (b *NetworkManagerBackend) DisconnectCellularDevice(device string) error {
-	info, ok := b.cellularDevices[device]
+	info, ok := b.cellularDeviceByIface(device)
 	if !ok {
 		return fmt.Errorf("cellular modem %s not found", device)
 	}
@@ -169,14 +156,7 @@ func (b *NetworkManagerBackend) DisconnectCellularDevice(device string) error {
 		return fmt.Errorf("failed to disconnect %s: %w", device, err)
 	}
 
-	b.updateAllCellularDevices()
-	b.updateCellularState()
-	b.listCellularConnections()
-	b.updatePrimaryConnection()
-
-	if b.onStateChange != nil {
-		b.onStateChange()
-	}
+	b.refreshCellularState()
 
 	return nil
 }
@@ -227,13 +207,7 @@ func (b *NetworkManagerBackend) ActivateCellularConnection(uuid string) error {
 		return fmt.Errorf("failed to activate cellular connection: %w", err)
 	}
 
-	b.updateCellularState()
-	b.listCellularConnections()
-	b.updatePrimaryConnection()
-
-	if b.onStateChange != nil {
-		b.onStateChange()
-	}
+	b.refreshCellularState()
 
 	return nil
 }
@@ -306,9 +280,10 @@ func (b *NetworkManagerBackend) listCellularConnections() ([]WiredConnection, er
 }
 
 func (b *NetworkManagerBackend) updateAllCellularDevices() {
-	devices := make([]CellularDevice, 0, len(b.cellularDevices))
+	cellularDevices := b.cellularDevicesSnapshot()
+	devices := make([]CellularDevice, 0, len(cellularDevices))
 
-	for name, info := range b.cellularDevices {
+	for name, info := range cellularDevices {
 		state, _ := info.device.GetPropertyState()
 		connected := state == gonetworkmanager.NmDeviceStateActivated
 		driver, _ := info.device.GetPropertyDriver()
