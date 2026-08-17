@@ -169,6 +169,19 @@ Strings inside `quickshell/DankCommon/` are owned by the dank-qml-common repo bu
 4. Run `go mod tidy`
 5. Open pull request
 
+#### Mocks
+
+Test mocks under `core/internal/mocks/` are generated with [mockery](https://vektra.github.io/mockery/) v3. Don't edit them by hand, regenerate after changing a mocked interface:
+
+```bash
+cd core
+go run github.com/vektra/mockery/v3@latest
+# or with it installed (go install github.com/vektra/mockery/v3@latest):
+mockery
+```
+
+`core/.mockery.yml` lists every mocked interface and where its mock goes (e.g. `network.Backend` -> `internal/mocks/network/mock_Backend.go`). To mock a new interface, add it there under its package and regenerate.
+
 ## Pull request
 
 Include screenshots/video if applicable in your pull request if applicable, to visualize what your change is affecting.
