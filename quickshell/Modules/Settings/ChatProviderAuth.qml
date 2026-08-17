@@ -29,7 +29,10 @@ StyledRect {
     // a sign-in that silently will not work.
     onPayloadChanged: refreshChallenge()
     onVisibleChanged: {
-        if (visible)
+        // Only render if there is nothing to show yet: payloadChanged already
+        // covers rotation, and rendering on every visibility flip meant two
+        // concurrent requests racing over the same output file.
+        if (visible && root.qrImagePath === "")
             refreshChallenge();
     }
 
@@ -47,7 +50,7 @@ StyledRect {
                 ChatService.log.warn("could not render sign-in code:", response.error);
                 return;
             }
-            root.qrImagePath = response.result?.themed || response.result?.normal || "";
+            root.qrImagePath = response.result?.path || "";
         });
     }
 

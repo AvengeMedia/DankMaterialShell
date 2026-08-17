@@ -554,8 +554,9 @@ func handlePurge(ctx context.Context, conn *models.Conn, req models.Request, m *
 type authQRResult struct {
 	Method  string `json:"method"`
 	Payload string `json:"payload,omitempty"`
-	Themed  string `json:"themed,omitempty"`
-	Normal  string `json:"normal,omitempty"`
+	// Path is the rendered QR, black-on-white so it reads on the light plate
+	// every consumer draws behind it.
+	Path string `json:"path,omitempty"`
 }
 
 // handleAuthQRCode renders the provider's pending sign-in challenge.
@@ -588,17 +589,13 @@ func handleAuthQRCode(conn *models.Conn, req models.Request, m *Manager) {
 		return
 	}
 
-	themed, normal, err := renderAuthQRCode(m.Media().Root(), provider, payload)
+	path, err := renderAuthQRCode(m.Media().Root(), provider, payload)
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
 		return
 	}
 
-	models.Respond(conn, req.ID, authQRResult{
-		Method: method,
-		Themed: themed,
-		Normal: normal,
-	})
+	models.Respond(conn, req.ID, authQRResult{Method: method, Path: path})
 }
 
 // handleTap streams a bridge's protocol traffic to the caller until the
