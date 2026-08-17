@@ -557,11 +557,11 @@ Singleton {
                 connectionError = response.error;
                 lastConnectionError = response.error;
                 connectionStatus = "failed";
-                ToastService.showError(I18n.tr("Failed to activate cellular connection"), response.error);
+                ToastService.showError(I18n.tr("Failed to activate configuration"), response.error);
             } else {
                 connectionError = "";
                 connectionStatus = "connected";
-                ToastService.showInfo(I18n.tr("Cellular connection activated"));
+                ToastService.showInfo(I18n.tr("Configuration activated"));
             }
 
             isConnecting = false;
@@ -768,7 +768,7 @@ Singleton {
             cellularToggling = false;
 
             if (response.error) {
-                ToastService.showError(I18n.tr("Failed to toggle cellular"), response.error);
+                ToastService.showError(I18n.tr("Failed to enable cellular"), response.error);
             } else if (response.result) {
                 cellularEnabled = response.result.enabled;
                 ToastService.showInfo(cellularEnabled ? I18n.tr("Cellular enabled") : I18n.tr("Cellular disabled"));

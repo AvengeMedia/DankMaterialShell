@@ -566,7 +566,7 @@ Rectangle {
 
             StyledText {
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: NetworkService.cellularHardwareEnabled ? I18n.tr("Cellular is off") : I18n.tr("Cellular unavailable")
+                text: NetworkService.cellularHardwareEnabled ? I18n.tr("Disabled") : I18n.tr("Unavailable")
                 font.pixelSize: Theme.fontSizeLarge
                 color: Theme.surfaceText
                 font.weight: Font.Medium
@@ -622,7 +622,7 @@ Rectangle {
             StyledText {
                 width: parent.width
                 visible: (NetworkService.cellularDevices?.length ?? 0) === 0
-                text: I18n.tr("No cellular modems detected")
+                text: I18n.tr("No devices found")
                 font.pixelSize: Theme.fontSizeMedium
                 color: Theme.surfaceVariantText
                 horizontalAlignment: Text.AlignHCenter
@@ -636,7 +636,7 @@ Rectangle {
                     required property var modelData
 
                     readonly property bool isActive: modelData.isActive
-                    readonly property string configName: modelData.id || I18n.tr("Unknown Config")
+                    readonly property string configName: modelData.id || I18n.tr("Unknown")
 
                     width: parent.width
                     height: cellularContentRow.implicitHeight + Theme.spacingM * 2
@@ -726,7 +726,7 @@ Rectangle {
             StyledText {
                 width: parent.width
                 visible: (NetworkService.cellularDevices?.length ?? 0) > 0 && cellularConnectionsModel.values.length === 0
-                text: I18n.tr("No cellular profiles configured")
+                text: I18n.tr("No devices found")
                 font.pixelSize: Theme.fontSizeMedium
                 color: Theme.surfaceVariantText
                 horizontalAlignment: Text.AlignHCenter
