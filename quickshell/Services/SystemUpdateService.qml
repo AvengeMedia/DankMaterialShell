@@ -98,6 +98,10 @@ Singleton {
         if (has && !sysupdateAvailable) {
             sysupdateAvailable = true;
             requestState();
+            // The daemon always starts at defaultIntervalSeconds (30 min) and
+            // has no persistence of its own, so re-apply the saved interval
+            // on every fresh connection (daemon (re)start).
+            setInterval(SettingsData.updaterIntervalSeconds);
         } else if (!has) {
             sysupdateAvailable = false;
         }
