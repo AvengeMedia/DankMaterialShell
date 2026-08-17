@@ -149,7 +149,7 @@ func (b *NetworkManagerBackend) startSignalPump() error {
 		return err
 	}
 
-	for _, info := range b.cellularDevices {
+	for _, info := range b.cellularDevicesSnapshot() {
 		if err := conn.AddMatchSignal(
 			dbus.WithMatchObjectPath(dbus.ObjectPath(info.device.GetPath())),
 			dbus.WithMatchInterface(dbusPropsInterface),
@@ -242,7 +242,7 @@ func (b *NetworkManagerBackend) stopSignalPump() {
 		)
 	}
 
-	for _, info := range b.cellularDevices {
+	for _, info := range b.cellularDevicesSnapshot() {
 		b.dbusConn.RemoveMatchSignal(
 			dbus.WithMatchObjectPath(dbus.ObjectPath(info.device.GetPath())),
 			dbus.WithMatchInterface(dbusPropsInterface),
@@ -603,13 +603,13 @@ func (b *NetworkManagerBackend) handleDeviceAdded(devicePath dbus.ObjectPath) {
 			}
 		}
 
-		b.cellularDevices[iface] = &cellularDeviceInfo{
+		b.setCellularDeviceInfo(iface, &cellularDeviceInfo{
 			device:      dev,
 			generic:     g,
 			name:        iface,
 			hwAddress:   hwAddr,
 			description: description,
-		}
+		})
 
 		if b.cellularDevice == nil {
 			b.cellularDevice = dev
@@ -705,30 +705,19 @@ func (b *NetworkManagerBackend) handleDeviceRemoved(devicePath dbus.ObjectPath) 
 		return
 	}
 
-	for iface, info := range b.cellularDevices {
-		if info.device.GetPath() == devicePath {
-			delete(b.cellularDevices, iface)
-
-			if b.cellularDevice != nil {
-				dev := b.cellularDevice.(gonetworkmanager.Device)
-				if dev.GetPath() == devicePath {
-					b.cellularDevice = nil
-					for _, remaining := range b.cellularDevices {
-						b.cellularDevice = remaining.device
-						break
-					}
+	if _, remaining, found := b.removeCellularDeviceByPath(devicePath); found {
+		if b.cellularDevice != nil {
+			dev := b.cellularDevice.(gonetworkmanager.Device)
+			if dev.GetPath() == devicePath {
+				b.cellularDevice = nil
+				for _, r := range remaining {
+					b.cellularDevice = r.device
+					break
 				}
 			}
-
-			b.updateAllCellularDevices()
-			b.updateCellularState()
-			b.listCellularConnections()
-			b.updatePrimaryConnection()
-
-			if b.onStateChange != nil {
-				b.onStateChange()
-			}
-			return
 		}
+
+		b.refreshCellularState()
+		return
 	}
 }

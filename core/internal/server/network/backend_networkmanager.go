@@ -68,7 +68,7 @@ type NetworkManagerBackend struct {
 	wifiDev         any
 	wifiDevices     map[string]*wifiDeviceInfo
 
-	// devMutex guards ethernetDevices/wifiDevices (written by the signal pump,
+	// devMutex guards ethernetDevices/wifiDevices/cellularDevices (written by the signal pump,
 	// read by request handlers). Not reentrant — never hold it across calls
 	// into other backend methods.
 	devMutex sync.RWMutex
@@ -241,13 +241,13 @@ func (b *NetworkManagerBackend) Initialize() error {
 				}
 			}
 
-			b.cellularDevices[iface] = &cellularDeviceInfo{
+			b.setCellularDeviceInfo(iface, &cellularDeviceInfo{
 				device:      dev,
 				generic:     g,
 				name:        iface,
 				hwAddress:   hwAddr,
 				description: description,
-			}
+			})
 
 			if b.cellularDevice == nil {
 				b.cellularDevice = dev
@@ -344,6 +344,14 @@ func (b *NetworkManagerBackend) wifiDevicesSnapshot() map[string]*wifiDeviceInfo
 	return out
 }
 
+func (b *NetworkManagerBackend) cellularDevicesSnapshot() map[string]*cellularDeviceInfo {
+	b.devMutex.RLock()
+	defer b.devMutex.RUnlock()
+	out := make(map[string]*cellularDeviceInfo, len(b.cellularDevices))
+	maps.Copy(out, b.cellularDevices)
+	return out
+}
+
 func (b *NetworkManagerBackend) ethernetDeviceByIface(iface string) (*ethernetDeviceInfo, bool) {
 	b.devMutex.RLock()
 	defer b.devMutex.RUnlock()
@@ -358,6 +366,13 @@ func (b *NetworkManagerBackend) wifiDeviceByIface(iface string) (*wifiDeviceInfo
 	return info, ok
 }
 
+func (b *NetworkManagerBackend) cellularDeviceByIface(iface string) (*cellularDeviceInfo, bool) {
+	b.devMutex.RLock()
+	defer b.devMutex.RUnlock()
+	info, ok := b.cellularDevices[iface]
+	return info, ok
+}
+
 func (b *NetworkManagerBackend) setEthernetDeviceInfo(iface string, info *ethernetDeviceInfo) {
 	b.devMutex.Lock()
 	b.ethernetDevices[iface] = info
@@ -367,6 +382,12 @@ func (b *NetworkManagerBackend) setEthernetDeviceInfo(iface string, info *ethern
 func (b *NetworkManagerBackend) setWifiDeviceInfo(iface string, info *wifiDeviceInfo) {
 	b.devMutex.Lock()
 	b.wifiDevices[iface] = info
+	b.devMutex.Unlock()
+}
+
+func (b *NetworkManagerBackend) setCellularDeviceInfo(iface string, info *cellularDeviceInfo) {
+	b.devMutex.Lock()
+	b.cellularDevices[iface] = info
 	b.devMutex.Unlock()
 }
 
@@ -397,6 +418,21 @@ func (b *NetworkManagerBackend) removeWifiDeviceByPath(path dbus.ObjectPath) (re
 		delete(b.wifiDevices, iface)
 		remaining = make(map[string]*wifiDeviceInfo, len(b.wifiDevices))
 		maps.Copy(remaining, b.wifiDevices)
+		return info, remaining, true
+	}
+	return nil, nil, false
+}
+
+func (b *NetworkManagerBackend) removeCellularDeviceByPath(path dbus.ObjectPath) (removed *cellularDeviceInfo, remaining map[string]*cellularDeviceInfo, found bool) {
+	b.devMutex.Lock()
+	defer b.devMutex.Unlock()
+	for iface, info := range b.cellularDevices {
+		if info.device.GetPath() != path {
+			continue
+		}
+		delete(b.cellularDevices, iface)
+		remaining = make(map[string]*cellularDeviceInfo, len(b.cellularDevices))
+		maps.Copy(remaining, b.cellularDevices)
 		return info, remaining, true
 	}
 	return nil, nil, false
