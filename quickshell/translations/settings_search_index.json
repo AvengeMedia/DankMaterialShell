@@ -11433,17 +11433,6 @@
   },
   {
     "section": "_tab_42",
-    "label": "Cellular",
-    "tabIndex": 42,
-    "category": "Settings",
-    "keywords": [
-      "cellular",
-      "settings"
-    ],
-    "icon": "network_cell"
-  },
-  {
-    "section": "_tab_42",
     "label": "Power & Security",
     "tabIndex": 42,
     "category": "Power & Security",
@@ -12271,6 +12260,27 @@
     "description": "Click expands only on an intentional press. Hybrid peeks the current compact face on hover"
   },
   {
+    "section": "networkCellular",
+    "label": "Cellular",
+    "tabIndex": 46,
+    "category": "Dank Island",
+    "keywords": [
+      "activities",
+      "cdma",
+      "cellular",
+      "dank",
+      "dynamic island",
+      "gsm",
+      "island",
+      "lte",
+      "mobile",
+      "modem",
+      "network",
+      "wwan"
+    ],
+    "icon": "network_cell"
+  },
+  {
     "section": "dankIslandNotificationBadgeClearOnOpen",
     "label": "Clear Badge on Open",
     "tabIndex": 46,
@@ -12960,6 +12970,29 @@
     "description": "Place independent widgets to left and right of island"
   },
   {
+    "section": "networkCellularProfiles",
+    "label": "Saved Configurations",
+    "tabIndex": 46,
+    "category": "Dank Island",
+    "keywords": [
+      "activities",
+      "apn",
+      "cellular",
+      "config",
+      "configurations",
+      "configure",
+      "dank",
+      "dynamic island",
+      "island",
+      "mobile",
+      "profile",
+      "saved",
+      "setup",
+      "sim"
+    ],
+    "icon": "sim_card"
+  },
+  {
     "section": "dankIslandHomeNotificationBadge",
     "label": "Show Badge",
     "tabIndex": 46,
@@ -13121,5 +13154,18 @@
       "weather"
     ],
     "description": "Weather icon and temperature open the weather activity"
+  },
+  {
+    "section": "_tab_47",
+    "label": "Cellular",
+    "tabIndex": 47,
+    "category": "Network",
+    "keywords": [
+      "cellular",
+      "connectivity",
+      "network",
+      "online"
+    ],
+    "icon": "network_cell"
   }
 ]

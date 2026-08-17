@@ -51,15 +51,15 @@ Item {
                                 if (!NetworkService.cellularHardwareEnabled)
                                     return I18n.tr("Unavailable");
                                 if (NetworkService.cellularToggling)
-                                    return I18n.tr("Toggling...");
+                                    return I18n.tr("Connecting...");
                                 if (!NetworkService.cellularEnabled)
                                     return I18n.tr("Disabled");
                                 const devices = NetworkService.cellularDevices || [];
                                 const connected = devices.filter(d => d.connected).length;
                                 if (devices.length === 0)
-                                    return I18n.tr("No modems");
+                                    return I18n.tr("No devices found");
                                 if (connected === 0)
-                                    return devices.length === 1 ? I18n.tr("%1 modem, none connected").arg(devices.length) : I18n.tr("%1 modems, none connected").arg(devices.length);
+                                    return I18n.tr("Disconnected");
                                 return I18n.tr("%1 connected").arg(connected);
                             }
                             font.pixelSize: Theme.fontSizeSmall
@@ -94,7 +94,7 @@ Item {
                         visible: NetworkService.cellularEnabled && (NetworkService.cellularDevices?.length ?? 0) > 0
 
                         StyledText {
-                            text: I18n.tr("Modems")
+                            text: I18n.tr("Adapters")
                             font.pixelSize: Theme.fontSizeMedium
                             font.weight: Font.Medium
                             color: Theme.surfaceText
@@ -206,7 +206,7 @@ Item {
 
                     StyledText {
                         visible: NetworkService.cellularEnabled && (NetworkService.cellularDevices?.length ?? 0) === 0
-                        text: NetworkService.cellularHardwareEnabled ? I18n.tr("No cellular modems detected") : I18n.tr("Cellular hardware unavailable")
+                        text: NetworkService.cellularHardwareEnabled ? I18n.tr("No devices found") : I18n.tr("Unavailable")
                         font.pixelSize: Theme.fontSizeMedium
                         color: Theme.surfaceVariantText
                         width: parent.width
@@ -216,7 +216,7 @@ Item {
             }
 
             SettingsCard {
-                title: I18n.tr("Cellular Profiles")
+                title: I18n.tr("Saved Configurations")
                 iconName: "sim_card"
                 settingKey: "networkCellularProfiles"
                 tags: ["cellular", "mobile", "profile", "apn", "sim"]

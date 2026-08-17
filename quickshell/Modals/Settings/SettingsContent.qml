@@ -308,7 +308,7 @@ FocusScope {
         Loader {
             id: networkCellularLoader
             anchors.fill: parent
-            active: root.currentIndex === 46
+            active: root.currentIndex === 47
             visible: active
             focus: active
 
