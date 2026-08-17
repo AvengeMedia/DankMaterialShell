@@ -1044,8 +1044,8 @@ Item {
                     defaultValue: 0
                     value: selectedBarConfig?.barLengthPadding ?? 0
                     onSliderDragFinished: finalValue => SettingsData.updateBarConfig(selectedBarId, {
-                        barLengthPadding: finalValue
-                    })
+                            barLengthPadding: finalValue
+                        })
 
                     Binding {
                         target: barLengthPaddingSlider
@@ -1250,7 +1250,7 @@ Item {
                     text: I18n.tr("Corner Style")
                     description: I18n.tr("Choose how the bar meets the screen edge")
                     visible: !SettingsData.frameEnabled
-                    model: [I18n.tr("Rounded"), I18n.tr("Flush"), I18n.tr("Square")]
+                    model: [I18n.tr("Rounded", "bar corner style option"), I18n.tr("Flush", "bar corner style option"), I18n.tr("Square", "bar corner style option")]
                     currentIndex: {
                         if (selectedBarConfig?.squareCorners ?? false)
                             return 2;
