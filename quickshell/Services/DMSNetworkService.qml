@@ -813,7 +813,6 @@ Singleton {
             return;
         if (userPreference === preference && !changingPreference)
             return;
-        userPreference = preference;
         changingPreference = true;
         targetPreference = preference;
         SettingsData.set("networkPreference", preference);
