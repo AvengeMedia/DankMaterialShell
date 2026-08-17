@@ -191,7 +191,7 @@ PanelWindow {
 
     visible: !_finalized
     WlrLayershell.layer: {
-        const shouldUseOverlay = notificationData && (SettingsData.notificationOverlayEnabled || notificationData.urgency === NotificationUrgency.Critical);
+        const shouldUseOverlay = CompositorService.framePeerSurfacesUseOverlayForScreen(win.screen) || (notificationData && (SettingsData.notificationOverlayEnabled || notificationData.urgency === NotificationUrgency.Critical));
         const fallback = shouldUseOverlay ? WlrLayer.Overlay : WlrLayer.Top;
         return LayerShell.fromEnv("DMS_NOTIFICATION_LAYER", fallback);
     }
