@@ -810,18 +810,6 @@ Item {
                             }
                         }
 
-                        StyledText {
-                            text: {
-                                var mode = Theme.getSourceMode(SettingsData.matugenSourceMode);
-                                return mode.description + " (" + mode.value + ")";
-                            }
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceVariantText
-                            wrapMode: Text.WordWrap
-                            width: parent.width - Theme.spacingM * 2
-                            x: Theme.spacingM
-                        }
-
                         SettingsSliderRow {
                             tab: "theme"
                             tags: ["matugen", "contrast", "dynamic"]

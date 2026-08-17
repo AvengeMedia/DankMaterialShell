@@ -396,32 +396,25 @@ Singleton {
 
     readonly property var availableSourceModes: [({
                 "value": "dominant",
-                "label": I18n.tr("Dominant", "matugen source color option"),
-                "description": I18n.tr("Uses the wallpaper's most dominant color as the seed (default).")
+                "label": I18n.tr("Dominant", "matugen source color option")
             }), ({
                 "value": "colorful",
-                "label": I18n.tr("Colorful", "matugen source color option"),
-                "description": I18n.tr("Prefers a vivid, well-lit color over a large muted one.")
+                "label": I18n.tr("Colorful", "matugen source color option")
             }), ({
                 "value": "darkness",
-                "label": I18n.tr("Darkest", "matugen source color option"),
-                "description": I18n.tr("Seeds the palette from matugen's darkest candidate color (needs matugen 4.1).")
+                "label": I18n.tr("Darkest", "matugen source color option")
             }), ({
                 "value": "lightness",
-                "label": I18n.tr("Lightest", "matugen source color option"),
-                "description": I18n.tr("Seeds the palette from matugen's lightest candidate color (needs matugen 4.1).")
+                "label": I18n.tr("Lightest", "matugen source color option")
             }), ({
                 "value": "saturation",
-                "label": I18n.tr("Most Saturated", "matugen source color option"),
-                "description": I18n.tr("Seeds the palette from matugen's most saturated candidate color (needs matugen 4.1).")
+                "label": I18n.tr("Most Saturated", "matugen source color option")
             }), ({
                 "value": "less-saturation",
-                "label": I18n.tr("Least Saturated", "matugen source color option"),
-                "description": I18n.tr("Seeds the palette from matugen's least saturated candidate color (needs matugen 4.1).")
+                "label": I18n.tr("Least Saturated", "matugen source color option")
             }), ({
                 "value": "value",
-                "label": I18n.tr("Most Vivid", "matugen source color option"),
-                "description": I18n.tr("Seeds the palette from matugen's most vivid candidate color (needs matugen 4.1).")
+                "label": I18n.tr("Most Vivid", "matugen source color option")
             })]
 
     function getSourceMode(value) {
