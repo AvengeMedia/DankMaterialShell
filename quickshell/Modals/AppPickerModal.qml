@@ -564,8 +564,9 @@ DankModal {
 
                         Keys.onPressed: event => {
                             const hasCtrl = (event.modifiers & Qt.ControlModifier) !== 0;
+                            const hasShift = (event.modifiers & Qt.ShiftModifier) !== 0;
                             const hasOtherModifier = (event.modifiers & (Qt.AltModifier | Qt.MetaModifier)) !== 0;
-                            if (hasCtrl && !hasOtherModifier && event.key === Qt.Key_C) {
+                            if (hasCtrl && hasShift && !hasOtherModifier && event.key === Qt.Key_C) {
                                 root.copyEditableTarget();
                                 event.accepted = true;
                             }
@@ -581,7 +582,7 @@ DankModal {
                         iconName: root.targetCopied ? "check" : "content_copy"
                         iconSize: Theme.iconSize - 6
                         iconColor: root.targetCopied ? Theme.primary : Theme.surfaceText
-                        tooltipText: I18n.tr("Copy target (Ctrl+C)")
+                        tooltipText: I18n.tr("Copy target (Ctrl+Shift+C)")
                         onClicked: root.copyEditableTarget()
                     }
                 }
