@@ -40,7 +40,14 @@ func getPluginsDir() string {
 		log.Error("failed to get user config dir", "err", err)
 		return ""
 	}
-	return filepath.Join(configDir, "DankMaterialShell", "plugins")
+	path := filepath.Join(configDir, "DankMaterialShell", "plugins")
+	if resolved, err := filepath.EvalSymlinks(path); err == nil {
+		return resolved
+	}
+	if resolved, err := filepath.EvalSymlinks(filepath.Dir(path)); err == nil {
+		return filepath.Join(resolved, "plugins")
+	}
+	return path
 }
 
 func getPluginLockPath() string {
