@@ -174,22 +174,26 @@ Item {
                                         width: 28
                                         height: 28
                                         radius: 14
-                                        color: modemDisconnectBtn.containsMouse ? Theme.errorHover : "transparent"
-                                        visible: modemDelegate.isConnected
+                                        color: modemActionBtn.containsMouse ? (modemDelegate.isConnected ? Theme.errorHover : Theme.primaryHover) : "transparent"
 
                                         DankIcon {
                                             anchors.centerIn: parent
-                                            name: "link_off"
+                                            name: modemDelegate.isConnected ? "link_off" : "link"
                                             size: 18
-                                            color: modemDisconnectBtn.containsMouse ? Theme.error : Theme.surfaceVariantText
+                                            color: modemActionBtn.containsMouse ? (modemDelegate.isConnected ? Theme.error : Theme.primary) : Theme.surfaceVariantText
                                         }
 
                                         MouseArea {
-                                            id: modemDisconnectBtn
+                                            id: modemActionBtn
                                             anchors.fill: parent
                                             hoverEnabled: true
                                             cursorShape: Qt.PointingHandCursor
-                                            onClicked: NetworkService.disconnectCellularDevice(modelData.name)
+                                            onClicked: {
+                                                if (modemDelegate.isConnected)
+                                                    NetworkService.disconnectCellularDevice(modelData.name);
+                                                else
+                                                    NetworkService.connectCellular();
+                                            }
                                         }
                                     }
                                 }
@@ -199,6 +203,13 @@ Item {
                                     anchors.fill: parent
                                     anchors.rightMargin: modemActions.width + Theme.spacingM
                                     hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: {
+                                        if (modemDelegate.isConnected)
+                                            NetworkService.disconnectCellularDevice(modelData.name);
+                                        else
+                                            NetworkService.connectCellular();
+                                    }
                                 }
                             }
                         }
