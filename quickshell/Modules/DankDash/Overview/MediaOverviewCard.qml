@@ -11,29 +11,11 @@ Card {
     signal clicked
 
     property MprisPlayer activePlayer: MprisController.activePlayer
-    property real currentPosition: activePlayer?.positionSupported ? activePlayer.position : 0
-    property real displayPosition: currentPosition
-
-    readonly property real ratio: {
-        const len = MprisController.activePlayerStableLength;
-        if (!activePlayer || !activePlayer.lengthSupported || len <= 0)
-            return 0;
-        const pos = displayPosition % Math.max(1, len);
-        const calculatedRatio = pos / len;
-        return Math.max(0, Math.min(1, calculatedRatio));
-    }
-
-    onActivePlayerChanged: {
-        if (activePlayer?.positionSupported) {
-            currentPosition = Qt.binding(() => activePlayer?.position || 0);
-        } else {
-            currentPosition = 0;
-        }
-    }
+    readonly property bool windowVisible: Window.window?.visible ?? false
 
     Timer {
         interval: 300
-        running: activePlayer?.playbackState === MprisPlaybackState.Playing && !isSeeking
+        running: root.windowVisible && activePlayer?.playbackState === MprisPlaybackState.Playing && !isSeeking
         repeat: true
         onTriggered: activePlayer?.positionSupported && activePlayer.positionChanged()
     }
@@ -80,6 +62,7 @@ Card {
                 artUrl: TrackArtService.resolvedArtUrl
                 accentColor: MediaAccentService.accent
                 cavaService: CavaService
+                showAnimation: SettingsData.audioVisualizerEnabled
                 albumSize: 76
                 animationScale: 1.05
             }

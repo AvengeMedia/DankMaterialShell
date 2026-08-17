@@ -2,6 +2,7 @@ package bluez
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -27,6 +28,7 @@ func NewManager() (*Manager, error) {
 		state: &BluetoothState{
 			Powered:          false,
 			Discovering:      false,
+			Adapters:         []AdapterInfo{},
 			Devices:          []Device{},
 			PairedDevices:    []Device{},
 			ConnectedDevices: []Device{},
@@ -43,12 +45,17 @@ func NewManager() (*Manager, error) {
 	broker := NewSubscriptionBroker(m.broadcastPairingPrompt)
 	m.promptBroker = broker
 
-	adapter, err := findAdapter(conn)
+	adapters, err := scanAdapters(conn)
 	if err != nil {
 		conn.Close()
-		return nil, err
+		return nil, fmt.Errorf("%w: %v", ErrNoAdapter, err)
 	}
-	m.adapterPath = adapter
+	if len(adapters) == 0 {
+		conn.Close()
+		return nil, ErrNoAdapter
+	}
+	m.adapterPaths = adapters
+	log.Infof("[BluezManager] adapters: %v (default: %s)", adapters, adapters[0])
 
 	if err := m.initialize(); err != nil {
 		conn.Close()
@@ -74,22 +81,66 @@ func NewManager() (*Manager, error) {
 	return m, nil
 }
 
-func findAdapter(conn *dbus.Conn) (dbus.ObjectPath, error) {
+func scanAdapters(conn *dbus.Conn) ([]dbus.ObjectPath, error) {
 	obj := conn.Object(bluezService, dbus.ObjectPath("/"))
 	var objects map[dbus.ObjectPath]map[string]map[string]dbus.Variant
 
 	if err := obj.Call(objectMgrIface+".GetManagedObjects", 0).Store(&objects); err != nil {
-		return "", fmt.Errorf("%w: %v", ErrNoAdapter, err)
+		return nil, err
 	}
 
+	paths := []dbus.ObjectPath{}
 	for path, interfaces := range objects {
 		if _, ok := interfaces[adapter1Iface]; ok {
-			log.Infof("[BluezManager] found adapter: %s", path)
-			return path, nil
+			paths = append(paths, path)
 		}
 	}
+	slices.Sort(paths)
+	return paths, nil
+}
 
-	return "", ErrNoAdapter
+func (m *Manager) adapterPathsSnapshot() []dbus.ObjectPath {
+	m.stateMutex.RLock()
+	defer m.stateMutex.RUnlock()
+	return append([]dbus.ObjectPath(nil), m.adapterPaths...)
+}
+
+func (m *Manager) resolveAdapter(adapterPath string) (dbus.ObjectPath, error) {
+	m.stateMutex.RLock()
+	defer m.stateMutex.RUnlock()
+
+	if len(m.adapterPaths) == 0 {
+		return "", ErrNoAdapter
+	}
+	if adapterPath == "" {
+		return m.adapterPaths[0], nil
+	}
+	if !slices.Contains(m.adapterPaths, dbus.ObjectPath(adapterPath)) {
+		return "", fmt.Errorf("unknown adapter: %s", adapterPath)
+	}
+	return dbus.ObjectPath(adapterPath), nil
+}
+
+func (m *Manager) refreshAdapters() {
+	paths, err := scanAdapters(m.dbusConn)
+	if err != nil {
+		log.Warnf("[BluezManager] adapter scan failed: %v", err)
+		return
+	}
+
+	m.stateMutex.Lock()
+	changed := !slices.Equal(m.adapterPaths, paths)
+	m.adapterPaths = paths
+	m.stateMutex.Unlock()
+
+	if !changed {
+		return
+	}
+	log.Infof("[BluezManager] adapters changed: %v", paths)
+	if err := m.updateAdapterState(); err != nil {
+		log.Warnf("[BluezManager] adapter state refresh failed: %v", err)
+	}
+	m.notifySubscribers()
 }
 
 func (m *Manager) initialize() error {
@@ -105,21 +156,36 @@ func (m *Manager) initialize() error {
 }
 
 func (m *Manager) updateAdapterState() error {
-	obj := m.dbusConn.Object(bluezService, m.adapterPath)
+	paths := m.adapterPathsSnapshot()
+	adapters := make([]AdapterInfo, 0, len(paths))
 
-	poweredVar, err := obj.GetProperty(adapter1Iface + ".Powered")
-	if err != nil {
-		return err
-	}
+	for _, path := range paths {
+		obj := m.dbusConn.Object(bluezService, path)
 
-	discoveringVar, err := obj.GetProperty(adapter1Iface + ".Discovering")
-	if err != nil {
-		return err
+		poweredVar, err := obj.GetProperty(adapter1Iface + ".Powered")
+		if err != nil {
+			return err
+		}
+		discoveringVar, err := obj.GetProperty(adapter1Iface + ".Discovering")
+		if err != nil {
+			return err
+		}
+		aliasVar, _ := obj.GetProperty(adapter1Iface + ".Alias")
+		addressVar, _ := obj.GetProperty(adapter1Iface + ".Address")
+
+		adapters = append(adapters, AdapterInfo{
+			Path:        string(path),
+			Name:        dbusutil.AsOr(aliasVar, ""),
+			Address:     dbusutil.AsOr(addressVar, ""),
+			Powered:     dbusutil.AsOr(poweredVar, false),
+			Discovering: dbusutil.AsOr(discoveringVar, false),
+		})
 	}
 
 	m.stateMutex.Lock()
-	m.state.Powered = dbusutil.AsOr(poweredVar, false)
-	m.state.Discovering = dbusutil.AsOr(discoveringVar, false)
+	m.state.Adapters = adapters
+	m.state.Powered = len(adapters) > 0 && adapters[0].Powered
+	m.state.Discovering = len(adapters) > 0 && adapters[0].Discovering
 	m.stateMutex.Unlock()
 
 	return nil
@@ -133,6 +199,7 @@ func (m *Manager) updateDevices() error {
 		return err
 	}
 
+	adapters := m.adapterPathsSnapshot()
 	devices := []Device{}
 	paired := []Device{}
 	connected := []Device{}
@@ -143,7 +210,7 @@ func (m *Manager) updateDevices() error {
 			continue
 		}
 
-		if !strings.HasPrefix(string(path), string(m.adapterPath)+"/") {
+		if !deviceOnAnyAdapter(path, adapters) {
 			continue
 		}
 
@@ -165,6 +232,15 @@ func (m *Manager) updateDevices() error {
 	m.stateMutex.Unlock()
 
 	return nil
+}
+
+func deviceOnAnyAdapter(path dbus.ObjectPath, adapters []dbus.ObjectPath) bool {
+	for _, adapter := range adapters {
+		if strings.HasPrefix(string(path), string(adapter)+"/") {
+			return true
+		}
+	}
+	return false
 }
 
 func (m *Manager) deviceFromProps(path string, props map[string]dbus.Variant) Device {
@@ -263,39 +339,82 @@ func (m *Manager) handleSignal(sig *dbus.Signal) {
 
 		switch iface {
 		case adapter1Iface:
-			if strings.HasPrefix(string(sig.Path), string(m.adapterPath)) {
-				m.handleAdapterPropertiesChanged(changed)
-			}
+			m.handleAdapterPropertiesChanged(sig.Path, changed)
 		case device1Iface:
 			m.handleDevicePropertiesChanged(sig.Path, changed)
 		}
 
 	case objectMgrIface + ".InterfacesAdded":
+		m.maybeRefreshAdapters(sig)
 		m.notifySubscribers()
 
 	case objectMgrIface + ".InterfacesRemoved":
+		m.maybeRefreshAdapters(sig)
 		m.notifySubscribers()
 	}
 }
 
-func (m *Manager) handleAdapterPropertiesChanged(changed map[string]dbus.Variant) {
+func (m *Manager) maybeRefreshAdapters(sig *dbus.Signal) {
+	if !signalTouchesAdapter(sig) {
+		return
+	}
+	select {
+	case m.eventQueue <- m.refreshAdapters:
+	default:
+	}
+}
+
+func signalTouchesAdapter(sig *dbus.Signal) bool {
+	if len(sig.Body) < 2 {
+		return false
+	}
+	switch ifaces := sig.Body[1].(type) {
+	case map[string]map[string]dbus.Variant:
+		_, ok := ifaces[adapter1Iface]
+		return ok
+	case []string:
+		return slices.Contains(ifaces, adapter1Iface)
+	default:
+		return false
+	}
+}
+
+func (m *Manager) handleAdapterPropertiesChanged(path dbus.ObjectPath, changed map[string]dbus.Variant) {
+	powered, hasPowered := dbusutil.Get[bool](changed, "Powered")
+	discovering, hasDiscovering := dbusutil.Get[bool](changed, "Discovering")
+	if !hasPowered && !hasDiscovering {
+		return
+	}
+
 	m.stateMutex.Lock()
 	dirty := false
-
-	if powered, ok := dbusutil.Get[bool](changed, "Powered"); ok {
-		m.state.Powered = powered
+	for i := range m.state.Adapters {
+		if m.state.Adapters[i].Path != string(path) {
+			continue
+		}
+		if hasPowered {
+			m.state.Adapters[i].Powered = powered
+		}
+		if hasDiscovering {
+			m.state.Adapters[i].Discovering = discovering
+		}
 		dirty = true
 	}
-	if discovering, ok := dbusutil.Get[bool](changed, "Discovering"); ok {
-		m.state.Discovering = discovering
+	if len(m.adapterPaths) > 0 && m.adapterPaths[0] == path {
+		if hasPowered {
+			m.state.Powered = powered
+		}
+		if hasDiscovering {
+			m.state.Discovering = discovering
+		}
 		dirty = true
 	}
-
 	m.stateMutex.Unlock()
 
-	if dirty {
-		m.notifySubscribers()
+	if !dirty {
+		return
 	}
+	m.notifySubscribers()
 }
 
 func (m *Manager) handleDevicePropertiesChanged(path dbus.ObjectPath, changed map[string]dbus.Variant) {
@@ -476,23 +595,35 @@ func (m *Manager) CancelPairing(token string) error {
 	})
 }
 
-func (m *Manager) StartDiscovery() error {
-	obj := m.dbusConn.Object(bluezService, m.adapterPath)
+func (m *Manager) StartDiscovery(adapterPath string) error {
+	path, err := m.resolveAdapter(adapterPath)
+	if err != nil {
+		return err
+	}
+	obj := m.dbusConn.Object(bluezService, path)
 	return obj.Call(adapter1Iface+".StartDiscovery", 0).Err
 }
 
-func (m *Manager) StopDiscovery() error {
-	obj := m.dbusConn.Object(bluezService, m.adapterPath)
+func (m *Manager) StopDiscovery(adapterPath string) error {
+	path, err := m.resolveAdapter(adapterPath)
+	if err != nil {
+		return err
+	}
+	obj := m.dbusConn.Object(bluezService, path)
 	return obj.Call(adapter1Iface+".StopDiscovery", 0).Err
 }
 
-func (m *Manager) SetPowered(powered bool) error {
+func (m *Manager) SetPowered(adapterPath string, powered bool) error {
+	path, err := m.resolveAdapter(adapterPath)
+	if err != nil {
+		return err
+	}
 	if powered {
 		if err := rfkillUnblockBluetooth(); err != nil {
 			log.Debugf("[BluezManager] rfkill unblock failed: %v", err)
 		}
 	}
-	obj := m.dbusConn.Object(bluezService, m.adapterPath)
+	obj := m.dbusConn.Object(bluezService, path)
 	return obj.Call(propertiesIface+".Set", 0, adapter1Iface, "Powered", dbus.MakeVariant(powered)).Err
 }
 
@@ -520,7 +651,11 @@ func (m *Manager) DisconnectDevice(devicePath string) error {
 }
 
 func (m *Manager) RemoveDevice(devicePath string) error {
-	obj := m.dbusConn.Object(bluezService, m.adapterPath)
+	idx := strings.LastIndex(devicePath, "/")
+	if idx <= 0 {
+		return fmt.Errorf("invalid device path: %s", devicePath)
+	}
+	obj := m.dbusConn.Object(bluezService, dbus.ObjectPath(devicePath[:idx]))
 	return obj.Call(adapter1Iface+".RemoveDevice", 0, dbus.ObjectPath(devicePath)).Err
 }
 
@@ -567,6 +702,9 @@ func stateChanged(old, new *BluetoothState) bool {
 		return true
 	}
 	if old.Discovering != new.Discovering {
+		return true
+	}
+	if !slices.Equal(old.Adapters, new.Adapters) {
 		return true
 	}
 	if len(old.Devices) != len(new.Devices) {

@@ -136,9 +136,9 @@ Item {
                 width: parent.width
                 height: screensInfoSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
-                border.color: Theme.outlineHeavy
-                border.width: 0
+                color: Theme.floatingWindowNestedSurface
+                border.color: Theme.outlineMedium
+                border.width: Theme.layerOutlineWidth
 
                 Column {
                     id: screensInfoSection
@@ -249,9 +249,9 @@ Item {
                                 width: parent.width
                                 height: screenRow.implicitHeight + Theme.spacingS * 2
                                 radius: Theme.cornerRadius
-                                color: Theme.surfaceContainerHigh
-                                border.color: Theme.outlineHeavy
-                                border.width: 0
+                                color: Theme.floatingWindowNestedSurface
+                                border.color: Theme.outlineMedium
+                                border.width: Theme.layerOutlineWidth
 
                                 Row {
                                     id: screenRow
@@ -330,9 +330,9 @@ Item {
                         width: parent.width
                         height: componentSection.implicitHeight + Theme.spacingL * 2
                         radius: Theme.cornerRadius
-                        color: Theme.surfaceContainerHigh
-                        border.color: Theme.outlineHeavy
-                        border.width: 0
+                        color: Theme.floatingWindowNestedSurface
+                        border.color: Theme.outlineMedium
+                        border.width: Theme.layerOutlineWidth
 
                         Column {
                             id: componentSection

@@ -11,7 +11,9 @@ import qs.Services
 Singleton {
     id: root
 
-    readonly property BluetoothAdapter adapter: Bluetooth.defaultAdapter
+    readonly property var log: Log.scoped("BluetoothService")
+    readonly property var adapters: Bluetooth.adapters?.values ?? []
+    readonly property BluetoothAdapter adapter: adapters.find(a => a.dbusPath === SessionData.bluetoothAdapterOverride) ?? Bluetooth.defaultAdapter
     readonly property bool available: adapter !== null
     readonly property bool enabled: (adapter && adapter.enabled) ?? false
     readonly property bool discovering: (adapter && adapter.discovering) ?? false
@@ -77,6 +79,22 @@ Singleton {
     Component.onCompleted: {
         detectWpexecProcess.running = true;
         maybeSubscribeCodecSignals();
+    }
+
+    function setBluetoothEnabled(enabled) {
+        if (DMSService.isConnected && DMSService.capabilities.includes("bluetooth")) {
+            DMSService.sendRequest("bluetooth.setPowered", {
+                "powered": enabled,
+                "adapter": adapter?.dbusPath ?? ""
+            }, response => {
+                if (response.error)
+                    log.warn("Failed to set Bluetooth powered state:", response.error);
+            });
+            return;
+        }
+
+        if (adapter)
+            adapter.enabled = enabled;
     }
 
     Connections {

@@ -260,8 +260,9 @@ Item {
                 height: headerSection.implicitHeight + Theme.spacingL * 2
                 anchors.horizontalCenter: parent.horizontalCenter
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
-                border.width: 0
+                color: Theme.floatingWindowNestedSurface
+                border.color: Theme.outlineMedium
+                border.width: Theme.layerOutlineWidth
 
                 Column {
                     id: headerSection
@@ -433,8 +434,9 @@ Item {
                 height: categorySection.implicitHeight + Theme.spacingL * 2
                 anchors.horizontalCenter: parent.horizontalCenter
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
-                border.width: 0
+                color: Theme.floatingWindowNestedSurface
+                border.color: Theme.outlineMedium
+                border.width: Theme.layerOutlineWidth
 
                 Column {
                     id: categorySection
@@ -451,7 +453,7 @@ Item {
                             width: allChip.implicitWidth + Theme.spacingL
                             height: chipHeight
                             radius: chipHeight / 2
-                            color: !keybindsTab.selectedCategory ? Theme.primary : Theme.surfaceContainerHighest
+                            color: !keybindsTab.selectedCategory ? Theme.primary : Theme.floatingWindowFieldColor
 
                             StyledText {
                                 id: allChip
@@ -482,7 +484,7 @@ Item {
                                 width: catText.implicitWidth + Theme.spacingL
                                 height: chipHeight
                                 radius: chipHeight / 2
-                                color: keybindsTab.selectedCategory === modelData ? Theme.primary : (modelData === "__overrides__" ? Theme.withAlpha(Theme.primary, 0.15) : Theme.surfaceContainerHighest)
+                                color: keybindsTab.selectedCategory === modelData ? Theme.primary : (modelData === "__overrides__" ? Theme.withAlpha(Theme.primary, 0.15) : Theme.floatingWindowFieldColor)
 
                                 StyledText {
                                     id: catText
@@ -511,9 +513,9 @@ Item {
                 height: newBindSection.implicitHeight + Theme.spacingL * 2
                 anchors.horizontalCenter: parent.horizontalCenter
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
-                border.color: Theme.outlineVariant
-                border.width: 1
+                color: Theme.floatingWindowNestedSurface
+                border.color: Theme.outlineMedium
+                border.width: Theme.layerOutlineWidth
                 visible: keybindsTab.showingNewBind
 
                 Column {
@@ -570,8 +572,9 @@ Item {
                 height: bindsListHeader.implicitHeight + Theme.spacingL * 2
                 anchors.horizontalCenter: parent.horizontalCenter
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
-                border.width: 0
+                color: Theme.floatingWindowNestedSurface
+                border.color: Theme.outlineMedium
+                border.width: Theme.layerOutlineWidth
 
                 Column {
                     id: bindsListHeader

@@ -1,5 +1,6 @@
 import QtQuick
-import QtQuick.Controls
+import Quickshell
+import Quickshell.Wayland
 import qs.Common
 import qs.Widgets
 import qs.Services
@@ -174,6 +175,166 @@ Column {
         crossSectionActive = false;
         gapIndex = -1;
         resetWorkingOrder();
+    }
+
+    function openWidgetMenu(menu, button, modelData, index) {
+        menu.widgetData = modelData;
+        menu.sectionId = root.sectionId;
+        menu.widgetIndex = index;
+
+        const qsWin = root.QsWindow?.window;
+        const host = qsWin?.contentItem ?? root;
+        const buttonPos = button.mapToItem(host, 0, 0);
+        const popupWidth = menu.menuWidth;
+        const popupHeight = menu.menuHeight;
+        let xPos = buttonPos.x - popupWidth - Theme.spacingS;
+        if (xPos < 0)
+            xPos = buttonPos.x + button.width + Theme.spacingS;
+        let yPos = buttonPos.y - popupHeight / 2 + button.height / 2;
+        if (yPos < 0)
+            yPos = Theme.spacingS;
+        else if (yPos + popupHeight > host.height)
+            yPos = host.height - popupHeight - Theme.spacingS;
+
+        menu.menuX = xPos;
+        menu.menuY = yPos;
+        menu.open();
+    }
+
+    // Host-sized PopupWindow
+    component WidgetSettingsMenu: Item {
+        id: menuRoot
+
+        property var widgetData: null
+        property string sectionId: ""
+        property int widgetIndex: -1
+        readonly property var currentWidgetData: (widgetIndex >= 0 && widgetIndex < root.items.length) ? root.items[widgetIndex] : widgetData
+        property real menuWidth: 200
+        property real menuHeight: 80
+        property real menuX: 0
+        property real menuY: 0
+
+        default property alias content: menuContent.data
+
+        signal opened
+        signal closed
+
+        visible: false
+        width: 0
+        height: 0
+
+        function open() {
+            if (!positionInHost())
+                return;
+            popup.visible = true;
+            opened();
+        }
+
+        function close() {
+            if (popup.visible)
+                popup.visible = false;
+        }
+
+        function positionInHost() {
+            const qsWin = root.QsWindow?.window;
+            if (!qsWin)
+                return false;
+
+            popup.anchor.window = qsWin;
+            popup.anchor.rect.x = 0;
+            popup.anchor.rect.y = 0;
+            popup.anchor.edges = Edges.Top | Edges.Left;
+            popup.anchor.gravity = Edges.Bottom | Edges.Right;
+            popup.anchor.margins.top = 0;
+            popup.anchor.margins.bottom = 0;
+            popup.anchor.adjustment = PopupAdjustment.None;
+            popup.width = qsWin.width;
+            popup.height = qsWin.height;
+            popup.menuX = Math.max(0, Math.min(qsWin.width - menuRoot.menuWidth, menuRoot.menuX));
+            popup.menuY = Math.max(0, Math.min(qsWin.height - menuRoot.menuHeight, menuRoot.menuY));
+            popup.anchor.updateAnchor();
+            return true;
+        }
+
+        PopupWindow {
+            id: popup
+
+            property real menuX: 0
+            property real menuY: 0
+
+            color: "transparent"
+            visible: false
+            grabFocus: true
+
+            onVisibleChanged: {
+                if (!visible)
+                    menuRoot.closed();
+            }
+
+            BackgroundEffect.blurRegion: visible ? menuBlurRegion : null
+
+            Region {
+                id: menuBlurRegion
+                x: menuContainer.x
+                y: menuContainer.y
+                width: menuContainer.width
+                height: menuContainer.height
+                radius: Theme.cornerRadius
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                z: -1
+                enabled: popup.visible
+                acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+                onClicked: menuRoot.close()
+            }
+
+            FocusScope {
+                anchors.fill: parent
+                focus: popup.visible
+                z: 0
+
+                Keys.onEscapePressed: event => {
+                    menuRoot.close();
+                    event.accepted = true;
+                }
+            }
+
+            Item {
+                id: menuContainer
+
+                x: popup.menuX
+                y: popup.menuY
+                width: menuRoot.menuWidth
+                height: menuRoot.menuHeight
+                z: 1
+
+                Rectangle {
+                    id: contentSurface
+
+                    anchors.fill: parent
+                    color: Theme.floatingWindowNestedSurface
+                    radius: Theme.cornerRadius
+                    border.color: Theme.outlineMedium
+                    border.width: Theme.layerOutlineWidth
+                    clip: true
+
+                    MouseArea {
+                        anchors.fill: parent
+                        z: -1
+                        acceptedButtons: Qt.AllButtons
+                        onPressed: mouse => mouse.accepted = true
+                        onClicked: mouse => mouse.accepted = true
+                    }
+
+                    Item {
+                        id: menuContent
+                        anchors.fill: parent
+                    }
+                }
+            }
+        }
     }
 
     onItemsChanged: resetWorkingOrder()
@@ -351,7 +512,7 @@ Column {
                     }
                     DankColorAnimation {
                         id: itemColor
-                        to: delegateItem.dragging ? Theme.secondaryContainer : Theme.withAlpha(Theme.surfaceContainer, modelData.enabled ? 0.7 : 0.4)
+                        to: delegateItem.dragging ? Theme.secondaryContainer : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.floatingWindowForegroundLayers ? Theme.floatingWindowForegroundTransparency * (modelData.enabled ? 0.7 : 0.4) : 0)
                         duration: Theme.shortDuration
                     }
                     Behavior on border.color {
@@ -471,31 +632,7 @@ Column {
                             onExited: {
                                 sharedTooltip.hide();
                             }
-                            onClicked: {
-                                gpuContextMenu.widgetData = modelData;
-                                gpuContextMenu.sectionId = root.sectionId;
-                                gpuContextMenu.widgetIndex = index;
-
-                                var buttonPos = gpuMenuButton.mapToItem(root, 0, 0);
-                                var popupWidth = gpuContextMenu.width;
-                                var popupHeight = gpuContextMenu.height;
-
-                                var xPos = buttonPos.x - popupWidth - Theme.spacingS;
-                                if (xPos < 0) {
-                                    xPos = buttonPos.x + gpuMenuButton.width + Theme.spacingS;
-                                }
-
-                                var yPos = buttonPos.y - popupHeight / 2 + gpuMenuButton.height / 2;
-                                if (yPos < 0) {
-                                    yPos = Theme.spacingS;
-                                } else if (yPos + popupHeight > root.height) {
-                                    yPos = root.height - popupHeight - Theme.spacingS;
-                                }
-
-                                gpuContextMenu.x = xPos;
-                                gpuContextMenu.y = yPos;
-                                gpuContextMenu.open();
-                            }
+                            onClicked: root.openWidgetMenu(gpuContextMenu, gpuMenuButton, modelData, index)
                         }
 
                         Item {
@@ -543,25 +680,7 @@ Column {
                             onExited: {
                                 sharedTooltip.hide();
                             }
-                            onClicked: {
-                                diskUsageContextMenu.widgetData = modelData;
-                                diskUsageContextMenu.sectionId = root.sectionId;
-                                diskUsageContextMenu.widgetIndex = index;
-
-                                var buttonPos = diskMenuButton.mapToItem(root, 0, 0);
-                                var xPos = buttonPos.x - diskUsageContextMenu.width - Theme.spacingS;
-                                if (xPos < 0)
-                                    xPos = buttonPos.x + diskMenuButton.width + Theme.spacingS;
-                                var yPos = buttonPos.y - diskUsageContextMenu.height / 2 + diskMenuButton.height / 2;
-                                if (yPos < 0)
-                                    yPos = Theme.spacingS;
-                                else if (yPos + diskUsageContextMenu.height > root.height)
-                                    yPos = root.height - diskUsageContextMenu.height - Theme.spacingS;
-
-                                diskUsageContextMenu.x = xPos;
-                                diskUsageContextMenu.y = yPos;
-                                diskUsageContextMenu.open();
-                            }
+                            onClicked: root.openWidgetMenu(diskUsageContextMenu, diskMenuButton, modelData, index)
                         }
 
                         Item {
@@ -592,9 +711,9 @@ Column {
                                 width: Math.min(250, warningTooltipText.implicitWidth) + Theme.spacingM * 2
                                 height: warningTooltipText.implicitHeight + Theme.spacingS * 2
                                 radius: Theme.cornerRadius
-                                color: Theme.surfaceContainer
-                                border.color: Theme.outline
-                                border.width: 0
+                                color: Theme.floatingWindowNestedSurface
+                                border.color: Theme.outlineMedium
+                                border.width: Theme.layerOutlineWidth
                                 visible: warningArea.containsMouse && warningText !== ""
                                 opacity: visible ? 1 : 0
                                 x: -width - Theme.spacingS
@@ -674,31 +793,7 @@ Column {
                             onExited: {
                                 sharedTooltip.hide();
                             }
-                            onClicked: {
-                                memUsageContextMenu.widgetData = modelData;
-                                memUsageContextMenu.sectionId = root.sectionId;
-                                memUsageContextMenu.widgetIndex = index;
-
-                                var buttonPos = memMenuButton.mapToItem(root, 0, 0);
-                                var popupWidth = memUsageContextMenu.width;
-                                var popupHeight = memUsageContextMenu.height;
-
-                                var xPos = buttonPos.x - popupWidth - Theme.spacingS;
-                                if (xPos < 0) {
-                                    xPos = buttonPos.x + memMenuButton.width + Theme.spacingS;
-                                }
-
-                                var yPos = buttonPos.y - popupHeight / 2 + memMenuButton.height / 2;
-                                if (yPos < 0) {
-                                    yPos = Theme.spacingS;
-                                } else if (yPos + popupHeight > root.height) {
-                                    yPos = root.height - popupHeight - Theme.spacingS;
-                                }
-
-                                memUsageContextMenu.x = xPos;
-                                memUsageContextMenu.y = yPos;
-                                memUsageContextMenu.open();
-                            }
+                            onClicked: root.openWidgetMenu(memUsageContextMenu, memMenuButton, modelData, index)
                         }
 
                         DankActionButton {
@@ -714,30 +809,7 @@ Column {
                             onExited: {
                                 sharedTooltip.hide();
                             }
-                            onClicked: {
-                                focusedWindowContextMenu.widgetData = modelData;
-                                focusedWindowContextMenu.sectionId = root.sectionId;
-                                focusedWindowContextMenu.widgetIndex = index;
-
-                                var buttonPos = focusedWindowMenuButton.mapToItem(root, 0, 0);
-                                var popupWidth = focusedWindowContextMenu.width;
-                                var popupHeight = focusedWindowContextMenu.height;
-
-                                var xPos = buttonPos.x - popupWidth - Theme.spacingS;
-                                if (xPos < 0)
-                                    xPos = buttonPos.x + focusedWindowMenuButton.width + Theme.spacingS;
-
-                                var yPos = buttonPos.y - popupHeight / 2 + focusedWindowMenuButton.height / 2;
-                                if (yPos < 0) {
-                                    yPos = Theme.spacingS;
-                                } else if (yPos + popupHeight > root.height) {
-                                    yPos = root.height - popupHeight - Theme.spacingS;
-                                }
-
-                                focusedWindowContextMenu.x = xPos;
-                                focusedWindowContextMenu.y = yPos;
-                                focusedWindowContextMenu.open();
-                            }
+                            onClicked: root.openWidgetMenu(focusedWindowContextMenu, focusedWindowMenuButton, modelData, index)
                         }
 
                         DankActionButton {
@@ -753,30 +825,7 @@ Column {
                             onExited: {
                                 sharedTooltip.hide();
                             }
-                            onClicked: {
-                                musicContextMenu.widgetData = modelData;
-                                musicContextMenu.sectionId = root.sectionId;
-                                musicContextMenu.widgetIndex = index;
-
-                                var buttonPos = musicMenuButton.mapToItem(root, 0, 0);
-                                var popupWidth = musicContextMenu.width;
-                                var popupHeight = musicContextMenu.height;
-
-                                var xPos = buttonPos.x - popupWidth - Theme.spacingS;
-                                if (xPos < 0)
-                                    xPos = buttonPos.x + musicMenuButton.width + Theme.spacingS;
-
-                                var yPos = buttonPos.y - popupHeight / 2 + musicMenuButton.height / 2;
-                                if (yPos < 0) {
-                                    yPos = Theme.spacingS;
-                                } else if (yPos + popupHeight > root.height) {
-                                    yPos = root.height - popupHeight - Theme.spacingS;
-                                }
-
-                                musicContextMenu.x = xPos;
-                                musicContextMenu.y = yPos;
-                                musicContextMenu.open();
-                            }
+                            onClicked: root.openWidgetMenu(musicContextMenu, musicMenuButton, modelData, index)
                         }
 
                         DankActionButton {
@@ -792,30 +841,7 @@ Column {
                             onExited: {
                                 sharedTooltip.hide();
                             }
-                            onClicked: {
-                                runningAppsContextMenu.widgetData = modelData;
-                                runningAppsContextMenu.sectionId = root.sectionId;
-                                runningAppsContextMenu.widgetIndex = index;
-
-                                var buttonPos = runningAppsMenuButton.mapToItem(root, 0, 0);
-                                var popupWidth = runningAppsContextMenu.width;
-                                var popupHeight = runningAppsContextMenu.height;
-
-                                var xPos = buttonPos.x - popupWidth - Theme.spacingS;
-                                if (xPos < 0)
-                                    xPos = buttonPos.x + runningAppsMenuButton.width + Theme.spacingS;
-
-                                var yPos = buttonPos.y - popupHeight / 2 + runningAppsMenuButton.height / 2;
-                                if (yPos < 0) {
-                                    yPos = Theme.spacingS;
-                                } else if (yPos + popupHeight > root.height) {
-                                    yPos = root.height - popupHeight - Theme.spacingS;
-                                }
-
-                                runningAppsContextMenu.x = xPos;
-                                runningAppsContextMenu.y = yPos;
-                                runningAppsContextMenu.open();
-                            }
+                            onClicked: root.openWidgetMenu(runningAppsContextMenu, runningAppsMenuButton, modelData, index)
                         }
 
                         DankActionButton {
@@ -831,30 +857,7 @@ Column {
                             onExited: {
                                 sharedTooltip.hide();
                             }
-                            onClicked: {
-                                batteryContextMenu.widgetData = modelData;
-                                batteryContextMenu.sectionId = root.sectionId;
-                                batteryContextMenu.widgetIndex = index;
-
-                                var buttonPos = batteryMenuButton.mapToItem(root, 0, 0);
-                                var popupWidth = batteryContextMenu.width;
-                                var popupHeight = batteryContextMenu.height;
-
-                                var xPos = buttonPos.x - popupWidth - Theme.spacingS;
-                                if (xPos < 0)
-                                    xPos = buttonPos.x + batteryMenuButton.width + Theme.spacingS;
-
-                                var yPos = buttonPos.y - popupHeight / 2 + batteryMenuButton.height / 2;
-                                if (yPos < 0) {
-                                    yPos = Theme.spacingS;
-                                } else if (yPos + popupHeight > root.height) {
-                                    yPos = root.height - popupHeight - Theme.spacingS;
-                                }
-
-                                batteryContextMenu.x = xPos;
-                                batteryContextMenu.y = yPos;
-                                batteryContextMenu.open();
-                            }
+                            onClicked: root.openWidgetMenu(batteryContextMenu, batteryMenuButton, modelData, index)
                         }
 
                         Row {
@@ -938,30 +941,7 @@ Column {
                                 onExited: {
                                     sharedTooltip.hide();
                                 }
-                                onClicked: {
-                                    kbdLayoutCtxMenu.widgetData = modelData;
-                                    kbdLayoutCtxMenu.sectionId = root.sectionId;
-                                    kbdLayoutCtxMenu.widgetIndex = index;
-
-                                    var buttonPos = kbdLayoutCtxMenuButton.mapToItem(root, 0, 0);
-                                    var popupWidth = kbdLayoutCtxMenu.width;
-                                    var popupHeight = kbdLayoutCtxMenu.height;
-
-                                    var xPos = buttonPos.x - popupWidth - Theme.spacingS;
-                                    if (xPos < 0)
-                                        xPos = buttonPos.x + kbdLayoutCtxMenuButton.width + Theme.spacingS;
-
-                                    var yPos = buttonPos.y - popupHeight / 2 + kbdLayoutCtxMenuButton.height / 2;
-                                    if (yPos < 0) {
-                                        yPos = Theme.spacingS;
-                                    } else if (yPos + popupHeight > root.height) {
-                                        yPos = root.height - popupHeight - Theme.spacingS;
-                                    }
-
-                                    kbdLayoutCtxMenu.x = xPos;
-                                    kbdLayoutCtxMenu.y = yPos;
-                                    kbdLayoutCtxMenu.open();
-                                }
+                                onClicked: root.openWidgetMenu(kbdLayoutCtxMenu, kbdLayoutCtxMenuButton, modelData, index)
                             }
 
                             DankActionButton {
@@ -978,30 +958,7 @@ Column {
                                 onExited: {
                                     sharedTooltip.hide();
                                 }
-                                onClicked: {
-                                    clockContextMenu.widgetData = modelData;
-                                    clockContextMenu.sectionId = root.sectionId;
-                                    clockContextMenu.widgetIndex = index;
-
-                                    var buttonPos = clockCtxMenuButton.mapToItem(root, 0, 0);
-                                    var popupWidth = clockContextMenu.width;
-                                    var popupHeight = clockContextMenu.height;
-
-                                    var xPos = buttonPos.x - popupWidth - Theme.spacingS;
-                                    if (xPos < 0)
-                                        xPos = buttonPos.x + clockCtxMenuButton.width + Theme.spacingS;
-
-                                    var yPos = buttonPos.y - popupHeight / 2 + clockCtxMenuButton.height / 2;
-                                    if (yPos < 0) {
-                                        yPos = Theme.spacingS;
-                                    } else if (yPos + popupHeight > root.height) {
-                                        yPos = root.height - popupHeight - Theme.spacingS;
-                                    }
-
-                                    clockContextMenu.x = xPos;
-                                    clockContextMenu.y = yPos;
-                                    clockContextMenu.open();
-                                }
+                                onClicked: root.openWidgetMenu(clockContextMenu, clockCtxMenuButton, modelData, index)
                             }
 
                             DankActionButton {
@@ -1017,30 +974,7 @@ Column {
                                 onExited: {
                                     sharedTooltip.hide();
                                 }
-                                onClicked: {
-                                    appsDockContextMenu.widgetData = modelData;
-                                    appsDockContextMenu.sectionId = root.sectionId;
-                                    appsDockContextMenu.widgetIndex = index;
-
-                                    var buttonPos = appsDockMenuButton.mapToItem(root, 0, 0);
-                                    var popupWidth = appsDockContextMenu.width;
-                                    var popupHeight = appsDockContextMenu.height;
-
-                                    var xPos = buttonPos.x - popupWidth - Theme.spacingS;
-                                    if (xPos < 0)
-                                        xPos = buttonPos.x + appsDockMenuButton.width + Theme.spacingS;
-
-                                    var yPos = buttonPos.y - popupHeight / 2 + appsDockMenuButton.height / 2;
-                                    if (yPos < 0) {
-                                        yPos = Theme.spacingS;
-                                    } else if (yPos + popupHeight > root.height) {
-                                        yPos = root.height - popupHeight - Theme.spacingS;
-                                    }
-
-                                    appsDockContextMenu.x = xPos;
-                                    appsDockContextMenu.y = yPos;
-                                    appsDockContextMenu.open();
-                                }
+                                onClicked: root.openWidgetMenu(appsDockContextMenu, appsDockMenuButton, modelData, index)
                             }
 
                             DankActionButton {
@@ -1056,30 +990,7 @@ Column {
                                 onExited: {
                                     sharedTooltip.hide();
                                 }
-                                onClicked: {
-                                    trayContextMenu.widgetData = modelData;
-                                    trayContextMenu.sectionId = root.sectionId;
-                                    trayContextMenu.widgetIndex = index;
-
-                                    var buttonPos = trayMenuButton.mapToItem(root, 0, 0);
-                                    var popupWidth = trayContextMenu.width;
-                                    var popupHeight = trayContextMenu.height;
-
-                                    var xPos = buttonPos.x - popupWidth - Theme.spacingS;
-                                    if (xPos < 0)
-                                        xPos = buttonPos.x + trayMenuButton.width + Theme.spacingS;
-
-                                    var yPos = buttonPos.y - popupHeight / 2 + trayMenuButton.height / 2;
-                                    if (yPos < 0) {
-                                        yPos = Theme.spacingS;
-                                    } else if (yPos + popupHeight > root.height) {
-                                        yPos = root.height - popupHeight - Theme.spacingS;
-                                    }
-
-                                    trayContextMenu.x = xPos;
-                                    trayContextMenu.y = yPos;
-                                    trayContextMenu.open();
-                                }
+                                onClicked: root.openWidgetMenu(trayContextMenu, trayMenuButton, modelData, index)
                             }
 
                             Rectangle {
@@ -1087,9 +998,9 @@ Column {
                                 width: tooltipText.contentWidth + Theme.spacingM * 2
                                 height: tooltipText.contentHeight + Theme.spacingS * 2
                                 radius: Theme.cornerRadius
-                                color: Theme.surfaceContainer
-                                border.color: Theme.outline
-                                border.width: 0
+                                color: Theme.floatingWindowNestedSurface
+                                border.color: Theme.outlineMedium
+                                border.width: Theme.layerOutlineWidth
                                 visible: false
                                 opacity: visible ? 1 : 0
                                 x: -width - Theme.spacingS
@@ -1127,30 +1038,8 @@ Column {
                                 sharedTooltip.hide();
                             }
                             onClicked: {
-                                controlCenterContextMenu.widgetData = modelData;
-                                controlCenterContextMenu.sectionId = root.sectionId;
-                                controlCenterContextMenu.widgetIndex = index;
                                 controlCenterContextMenu.controlCenterGroups = controlCenterContextMenu.getOrderedControlCenterGroups();
-
-                                var buttonPos = ccMenuButton.mapToItem(root, 0, 0);
-                                var popupWidth = controlCenterContextMenu.width;
-                                var popupHeight = controlCenterContextMenu.height;
-
-                                var xPos = buttonPos.x - popupWidth - Theme.spacingS;
-                                if (xPos < 0) {
-                                    xPos = buttonPos.x + ccMenuButton.width + Theme.spacingS;
-                                }
-
-                                var yPos = buttonPos.y - popupHeight / 2 + ccMenuButton.height / 2;
-                                if (yPos < 0) {
-                                    yPos = Theme.spacingS;
-                                } else if (yPos + popupHeight > root.height) {
-                                    yPos = root.height - popupHeight - Theme.spacingS;
-                                }
-
-                                controlCenterContextMenu.x = xPos;
-                                controlCenterContextMenu.y = yPos;
-                                controlCenterContextMenu.open();
+                                root.openWidgetMenu(controlCenterContextMenu, ccMenuButton, modelData, index);
                             }
                         }
 
@@ -1167,31 +1056,7 @@ Column {
                             onExited: {
                                 sharedTooltip.hide();
                             }
-                            onClicked: {
-                                privacyContextMenu.widgetData = modelData;
-                                privacyContextMenu.sectionId = root.sectionId;
-                                privacyContextMenu.widgetIndex = index;
-
-                                var buttonPos = privacyMenuButton.mapToItem(root, 0, 0);
-                                var popupWidth = privacyContextMenu.width;
-                                var popupHeight = privacyContextMenu.height;
-
-                                var xPos = buttonPos.x - popupWidth - Theme.spacingS;
-                                if (xPos < 0) {
-                                    xPos = buttonPos.x + privacyMenuButton.width + Theme.spacingS;
-                                }
-
-                                var yPos = buttonPos.y - popupHeight / 2 + privacyMenuButton.height / 2;
-                                if (yPos < 0) {
-                                    yPos = Theme.spacingS;
-                                } else if (yPos + popupHeight > root.height) {
-                                    yPos = root.height - popupHeight - Theme.spacingS;
-                                }
-
-                                privacyContextMenu.x = xPos;
-                                privacyContextMenu.y = yPos;
-                                privacyContextMenu.open();
-                            }
+                            onClicked: root.openWidgetMenu(privacyContextMenu, privacyMenuButton, modelData, index)
                         }
 
                         DankActionButton {
@@ -1349,29 +1214,16 @@ Column {
         }
     }
 
-    Popup {
+    WidgetSettingsMenu {
         id: clockContextMenu
 
-        property var widgetData: null
-        property string sectionId: ""
-        property int widgetIndex: -1
-        readonly property var currentWidgetData: (widgetIndex >= 0 && widgetIndex < root.items.length) ? root.items[widgetIndex] : widgetData
 
-        width: 190
-        height: clockMenuColumn.implicitHeight + Theme.spacingS * 2
-        padding: 0
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        menuWidth: 190
+        menuHeight: clockMenuColumn.implicitHeight + Theme.spacingS * 2
 
-        background: Rectangle {
-            color: Theme.surfaceContainer
-            radius: Theme.cornerRadius
-            border.color: Theme.outlineMedium
-            border.width: 0
-        }
 
-        contentItem: Item {
+        Item {
+            anchors.fill: parent
             LayoutMirroring.enabled: I18n.isRtl
             LayoutMirroring.childrenInherit: true
 
@@ -1463,28 +1315,16 @@ Column {
         }
     }
 
-    Popup {
+    WidgetSettingsMenu {
         id: memUsageContextMenu
 
-        property var widgetData: null
-        property string sectionId: ""
-        property int widgetIndex: -1
 
-        width: 200
-        height: 80
-        padding: 0
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        menuWidth: 200
+        menuHeight: 80
 
-        background: Rectangle {
-            color: Theme.surfaceContainer
-            radius: Theme.cornerRadius
-            border.color: Theme.outlineMedium
-            border.width: 0
-        }
 
-        contentItem: Item {
+        Item {
+            anchors.fill: parent
             LayoutMirroring.enabled: I18n.isRtl
             LayoutMirroring.childrenInherit: true
             Column {
@@ -1613,29 +1453,16 @@ Column {
         }
     }
 
-    Popup {
+    WidgetSettingsMenu {
         id: trayContextMenu
 
-        property var widgetData: null
-        property string sectionId: ""
-        property int widgetIndex: -1
-        readonly property var currentWidgetData: (widgetIndex >= 0 && widgetIndex < root.items.length) ? root.items[widgetIndex] : widgetData
 
-        width: 280
-        height: contentColumn.implicitHeight + Theme.spacingS * 2
-        padding: 0
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        menuWidth: 280
+        menuHeight: contentColumn.implicitHeight + Theme.spacingS * 2
 
-        background: Rectangle {
-            color: Theme.surfaceContainer
-            radius: Theme.cornerRadius
-            border.color: Theme.outlineMedium
-            border.width: 0
-        }
 
-        contentItem: Item {
+        Item {
+            anchors.fill: parent
             LayoutMirroring.enabled: I18n.isRtl
             LayoutMirroring.childrenInherit: true
             Column {
@@ -1902,29 +1729,16 @@ Column {
         }
     }
 
-    Popup {
+    WidgetSettingsMenu {
         id: kbdLayoutCtxMenu
 
-        property var widgetData: null
-        property string sectionId: ""
-        property int widgetIndex: -1
-        readonly property var currentWidgetData: (widgetIndex >= 0 && widgetIndex < root.items.length) ? root.items[widgetIndex] : widgetData
 
-        width: 200
-        height: kbdLayoutCtxMenuColumn.implicitHeight + Theme.spacingS * 2
-        padding: 0
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        menuWidth: 200
+        menuHeight: kbdLayoutCtxMenuColumn.implicitHeight + Theme.spacingS * 2
 
-        background: Rectangle {
-            color: Theme.surfaceContainer
-            radius: Theme.cornerRadius
-            border.color: Theme.outlineMedium
-            border.width: 0
-        }
 
-        contentItem: Item {
+        Item {
+            anchors.fill: parent
             LayoutMirroring.enabled: I18n.isRtl
             LayoutMirroring.childrenInherit: true
             Column {
@@ -1996,28 +1810,16 @@ Column {
         }
     }
 
-    Popup {
+    WidgetSettingsMenu {
         id: focusedWindowContextMenu
 
-        property var widgetData: null
-        property string sectionId: ""
-        property int widgetIndex: -1
 
-        width: 180
-        height: focusedWindowMenuColumn.implicitHeight + Theme.spacingS * 2
-        padding: 0
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        menuWidth: 180
+        menuHeight: focusedWindowMenuColumn.implicitHeight + Theme.spacingS * 2
 
-        background: Rectangle {
-            color: Theme.surfaceContainer
-            radius: Theme.cornerRadius
-            border.color: Theme.outlineMedium
-            border.width: 0
-        }
 
-        contentItem: Item {
+        Item {
+            anchors.fill: parent
             LayoutMirroring.enabled: I18n.isRtl
             LayoutMirroring.childrenInherit: true
             Column {
@@ -2238,29 +2040,16 @@ Column {
         }
     }
 
-    Popup {
+    WidgetSettingsMenu {
         id: diskUsageContextMenu
 
-        property var widgetData: null
-        property string sectionId: ""
-        property int widgetIndex: -1
-        readonly property var currentWidgetData: (widgetIndex >= 0 && widgetIndex < root.items.length) ? root.items[widgetIndex] : widgetData
 
-        width: 240
-        height: diskMenuColumn.implicitHeight + Theme.spacingS * 2
-        padding: 0
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        menuWidth: 240
+        menuHeight: diskMenuColumn.implicitHeight + Theme.spacingS * 2
 
-        background: Rectangle {
-            color: Theme.surfaceContainer
-            radius: Theme.cornerRadius
-            border.color: Theme.outlineMedium
-            border.width: 0
-        }
 
-        contentItem: Item {
+        Item {
+            anchors.fill: parent
             LayoutMirroring.enabled: I18n.isRtl
             LayoutMirroring.childrenInherit: true
             Column {
@@ -2378,24 +2167,17 @@ Column {
         }
     }
 
-    Popup {
+    WidgetSettingsMenu {
         id: controlCenterContextMenu
 
-        property var widgetData: null
-        property string sectionId: ""
-        property int widgetIndex: -1
 
         readonly property real minimumContentWidth: controlCenterContentMetrics.implicitWidth + Theme.spacingS * 2
         readonly property real controlCenterRowHeight: 32
         readonly property real controlCenterRowSpacing: 1
         readonly property real controlCenterGroupVerticalPadding: Theme.spacingXS * 2
         readonly property real controlCenterMenuSpacing: 2
-        width: Math.max(220, minimumContentWidth)
-        height: getControlCenterPopupHeight(controlCenterGroups)
-        padding: 0
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        menuWidth: Math.max(220, minimumContentWidth)
+        menuHeight: getControlCenterPopupHeight(controlCenterGroups)
 
         onClosed: {
             cancelControlCenterDrag();
@@ -2635,14 +2417,9 @@ Column {
             return orderedGroups;
         }
 
-        background: Rectangle {
-            color: Theme.surfaceContainer
-            radius: Theme.cornerRadius
-            border.color: Theme.outlineMedium
-            border.width: 0
-        }
 
-        contentItem: Item {
+        Item {
+            anchors.fill: parent
             LayoutMirroring.enabled: I18n.isRtl
             LayoutMirroring.childrenInherit: true
             function getCurrentWidgetData() {
@@ -2922,19 +2699,12 @@ Column {
         }
     }
 
-    Popup {
+    WidgetSettingsMenu {
         id: privacyContextMenu
 
-        property var widgetData: null
-        property string sectionId: ""
-        property int widgetIndex: -1
 
-        width: 240
-        height: menuPrivacyColumn.implicitHeight + Theme.spacingS * 2
-        padding: 0
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        menuWidth: 240
+        menuHeight: menuPrivacyColumn.implicitHeight + Theme.spacingS * 2
 
         onOpened: {
             log.debug("Privacy context menu opened");
@@ -2944,14 +2714,9 @@ Column {
             log.debug("Privacy Center context menu closed");
         }
 
-        background: Rectangle {
-            color: Theme.surfaceContainer
-            radius: Theme.cornerRadius
-            border.color: Theme.outlineMedium
-            border.width: 0
-        }
 
-        contentItem: Item {
+        Item {
+            anchors.fill: parent
             LayoutMirroring.enabled: I18n.isRtl
             LayoutMirroring.childrenInherit: true
 
@@ -3161,28 +2926,16 @@ Column {
         }
     }
 
-    Popup {
+    WidgetSettingsMenu {
         id: gpuContextMenu
 
-        property var widgetData: null
-        property string sectionId: ""
-        property int widgetIndex: -1
 
-        width: 250
-        height: gpuMenuColumn.implicitHeight + Theme.spacingS * 2
-        padding: 0
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        menuWidth: 250
+        menuHeight: gpuMenuColumn.implicitHeight + Theme.spacingS * 2
 
-        background: Rectangle {
-            color: Theme.surfaceContainer
-            radius: Theme.cornerRadius
-            border.color: Theme.outlineMedium
-            border.width: 0
-        }
 
-        contentItem: Item {
+        Item {
+            anchors.fill: parent
             LayoutMirroring.enabled: I18n.isRtl
             LayoutMirroring.childrenInherit: true
             Column {
@@ -3271,29 +3024,16 @@ Column {
         }
     }
 
-    Popup {
+    WidgetSettingsMenu {
         id: batteryContextMenu
 
-        property var widgetData: null
-        property string sectionId: ""
-        property int widgetIndex: -1
-        readonly property var currentWidgetData: (widgetIndex >= 0 && widgetIndex < root.items.length) ? root.items[widgetIndex] : widgetData
 
-        width: 270
-        height: batteryMenuColumn.implicitHeight + Theme.spacingS * 2
-        padding: 0
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        menuWidth: 270
+        menuHeight: batteryMenuColumn.implicitHeight + Theme.spacingS * 2
 
-        background: Rectangle {
-            color: Theme.surfaceContainer
-            radius: Theme.cornerRadius
-            border.color: Theme.outlineMedium
-            border.width: 0
-        }
 
-        contentItem: Item {
+        Item {
+            anchors.fill: parent
             LayoutMirroring.enabled: I18n.isRtl
             LayoutMirroring.childrenInherit: true
             Column {
@@ -3668,28 +3408,16 @@ Column {
         }
     }
 
-    Popup {
+    WidgetSettingsMenu {
         id: musicContextMenu
 
-        property var widgetData: null
-        property string sectionId: ""
-        property int widgetIndex: -1
 
-        width: 180
-        height: musicMenuColumn.implicitHeight + Theme.spacingS * 2
-        padding: 0
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        menuWidth: 180
+        menuHeight: musicMenuColumn.implicitHeight + Theme.spacingS * 2
 
-        background: Rectangle {
-            color: Theme.surfaceContainer
-            radius: Theme.cornerRadius
-            border.color: Theme.outlineMedium
-            border.width: 0
-        }
 
-        contentItem: Item {
+        Item {
+            anchors.fill: parent
             LayoutMirroring.enabled: I18n.isRtl
             LayoutMirroring.childrenInherit: true
             Column {
@@ -3792,30 +3520,17 @@ Column {
         }
     }
 
-    Popup {
+    WidgetSettingsMenu {
         id: runningAppsContextMenu
 
-        property var widgetData: null
-        property string sectionId: ""
-        property int widgetIndex: -1
 
-        readonly property var currentWidgetData: (widgetIndex >= 0 && widgetIndex < root.items.length) ? root.items[widgetIndex] : widgetData
 
-        width: 240
-        height: runningAppsMenuColumn.implicitHeight + Theme.spacingS * 2
-        padding: 0
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        menuWidth: 240
+        menuHeight: runningAppsMenuColumn.implicitHeight + Theme.spacingS * 2
 
-        background: Rectangle {
-            color: Theme.surfaceContainer
-            radius: Theme.cornerRadius
-            border.color: Theme.outlineMedium
-            border.width: 0
-        }
 
-        contentItem: Item {
+        Item {
+            anchors.fill: parent
             LayoutMirroring.enabled: I18n.isRtl
             LayoutMirroring.childrenInherit: true
             Column {
@@ -4076,31 +3791,16 @@ Column {
         }
     }
 
-    Popup {
+    WidgetSettingsMenu {
         id: appsDockContextMenu
 
-        property var widgetData: null
-        property string sectionId: ""
-        property int widgetIndex: -1
 
-        // Dynamically get current widget data from the items list
-        readonly property var currentWidgetData: (widgetIndex >= 0 && widgetIndex < root.items.length) ? root.items[widgetIndex] : widgetData
+        menuWidth: 320
+        menuHeight: appsDockMenuColumn.implicitHeight + Theme.spacingS * 2
 
-        width: 320
-        height: appsDockMenuColumn.implicitHeight + Theme.spacingS * 2
-        padding: 0
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
 
-        background: Rectangle {
-            color: Theme.surfaceContainer
-            radius: Theme.cornerRadius
-            border.color: Theme.outlineMedium
-            border.width: 0
-        }
-
-        contentItem: Item {
+        Item {
+            anchors.fill: parent
             LayoutMirroring.enabled: I18n.isRtl
             LayoutMirroring.childrenInherit: true
             Column {

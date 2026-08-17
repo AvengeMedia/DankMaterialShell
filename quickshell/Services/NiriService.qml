@@ -795,6 +795,14 @@ Singleton {
         });
     }
 
+    function closeOverview() {
+        return send({
+            "Action": {
+                "CloseOverview": {}
+            }
+        });
+    }
+
     function focusMonitor(outputName) {
         return send({
             "Action": {

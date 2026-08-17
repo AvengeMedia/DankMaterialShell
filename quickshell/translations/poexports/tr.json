@@ -2219,6 +2219,9 @@
   "Darken Modal Background": {
     "Darken Modal Background": "Koyu Modal Arkaplanı"
   },
+  "Date First": {
+    "Date First": ""
+  },
   "Date Format": {
     "Date Format": "Tarih Biçimi"
   },
@@ -2948,6 +2951,9 @@
   "Extra Light": {
     "Extra Light": ""
   },
+  "Extract theme to JSON": {
+    "Extract theme to JSON": ""
+  },
   "Fade": {
     "Fade": ""
   },
@@ -3046,6 +3052,9 @@
   },
   "Failed to enable night mode": {
     "Failed to enable night mode": "Gece modu etkinleştiremedi"
+  },
+  "Failed to extract theme": {
+    "Failed to extract theme": ""
   },
   "Failed to fetch network QR code: %1": {
     "Failed to fetch network QR code: %1": ""
@@ -4289,6 +4298,9 @@
   "Keep in Bar": {
     "Keep in Bar": ""
   },
+  "Keep pinned apps as launchers and show running windows separately": {
+    "Keep pinned apps as launchers and show running windows separately": ""
+  },
   "Keep the clipboard type filter when reopening history": {
     "Keep the clipboard type filter when reopening history": ""
   },
@@ -4876,6 +4888,9 @@
   },
   "Minimal palette built around a single hue.": {
     "Minimal palette built around a single hue.": "Tek bir renk tonu etrafında oluşturulmuş minimal palet."
+  },
+  "Minimize": {
+    "Minimize": ""
   },
   "Minute": {
     "Minute": "Dakika"
@@ -5960,6 +5975,9 @@
   "Place a trash bin at the end of the dock": {
     "Place a trash bin at the end of the dock": ""
   },
+  "Place clipboard history on the Wayland overlay layer": {
+    "Place clipboard history on the Wayland overlay layer": ""
+  },
   "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
     "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "Eklenti klasörlerini buraya yerleştirin. Her eklenti plugin.json manifest dosyasına sahip olmalı."
   },
@@ -6608,6 +6626,9 @@
   "Restarting audio system...": {
     "Restarting audio system...": ""
   },
+  "Restore": {
+    "Restore": ""
+  },
   "Restore Special Workspace Windows": {
     "Restore Special Workspace Windows": ""
   },
@@ -6745,6 +6766,9 @@
   },
   "Save & Start": {
     "Save & Start": ""
+  },
+  "Save Extracted Theme": {
+    "Save Extracted Theme": ""
   },
   "Save Notepad File": {
     "Save Notepad File": "Not Defteri Dosyasını Kaydet"
@@ -7063,6 +7087,9 @@
   },
   "Separate Light & Dark Themes": {
     "Separate Light & Dark Themes": ""
+  },
+  "Separate Pinned and Running Apps": {
+    "Separate Pinned and Running Apps": ""
   },
   "Separate appearance for unfocused displays is not supported on this compositor.": {
     "Separate appearance for unfocused displays is not supported on this compositor.": ""
@@ -7640,6 +7667,9 @@
   "Start": {
     "Start": "Başlat"
   },
+  "Start DankConnect, KDE Connect, or Valent to use this plugin": {
+    "Start DankConnect, KDE Connect, or Valent to use this plugin": ""
+  },
   "Start Hotspot?": {
     "Start Hotspot?": ""
   },
@@ -8000,6 +8030,9 @@
   "Theme color used for the widget outline": {
     "Theme color used for the widget outline": ""
   },
+  "Theme extracted to: %1": {
+    "Theme extracted to: %1": ""
+  },
   "Theme worker failed (%1)": {
     "Theme worker failed (%1)": ""
   },
@@ -8086,6 +8119,9 @@
   },
   "Time & Weather": {
     "Time & Weather": "Zaman & Hava Durumu"
+  },
+  "Time First": {
+    "Time First": ""
   },
   "Time Format": {
     "Time Format": "Zaman Biçimi"

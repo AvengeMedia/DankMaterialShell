@@ -788,6 +788,29 @@
     "description": "Automatically hide the bar when the pointer moves away"
   },
   {
+    "section": "barLengthPadding",
+    "label": "Bar Length Padding",
+    "tabIndex": 3,
+    "category": "Dank Bar",
+    "keywords": [
+      "bar",
+      "both",
+      "dank",
+      "ends",
+      "length",
+      "padding",
+      "panel",
+      "reduce",
+      "shorter",
+      "size",
+      "statusbar",
+      "taskbar",
+      "topbar",
+      "visible"
+    ],
+    "description": "Reduce the visible bar length from both ends"
+  },
+  {
     "section": "barClickThrough",
     "label": "Click Through",
     "tabIndex": 3,
@@ -830,6 +853,34 @@
       "topbar"
     ],
     "icon": "dashboard"
+  },
+  {
+    "section": "barCornerStyle",
+    "label": "Corner Style",
+    "tabIndex": 3,
+    "category": "Dank Bar",
+    "keywords": [
+      "attached",
+      "bar",
+      "choose",
+      "corner",
+      "corners",
+      "dank",
+      "edge",
+      "flush",
+      "meets",
+      "panel",
+      "radius",
+      "round",
+      "rounded",
+      "screen",
+      "square",
+      "statusbar",
+      "style",
+      "taskbar",
+      "topbar"
+    ],
+    "description": "Choose how the bar meets the screen edge"
   },
   {
     "section": "barDisplay",
@@ -1198,29 +1249,6 @@
       "topbar"
     ],
     "description": "Adjust the bar height via inner padding"
-  },
-  {
-    "section": "barSquareCorners",
-    "label": "Square Corners",
-    "tabIndex": 3,
-    "category": "Dank Bar",
-    "keywords": [
-      "bar",
-      "corner",
-      "corners",
-      "dank",
-      "panel",
-      "radius",
-      "remove",
-      "round",
-      "rounded",
-      "rounding",
-      "square",
-      "statusbar",
-      "taskbar",
-      "topbar"
-    ],
-    "description": "Remove corner rounding from the bar"
   },
   {
     "section": "barAutoHideStrict",
@@ -2425,22 +2453,22 @@
     "keywords": [
       "background",
       "bar",
-      "corner",
       "corners",
       "dank",
+      "fully",
+      "invisible",
+      "make",
       "panel",
       "radius",
-      "remove",
       "round",
       "rounded",
-      "rounding",
-      "square",
       "statusbar",
       "taskbar",
-      "topbar"
+      "topbar",
+      "transparent"
     ],
     "icon": "rounded_corner",
-    "description": "Remove corner rounding from the bar"
+    "description": "Make the bar background fully transparent"
   },
   {
     "section": "barAppearance",
@@ -2890,31 +2918,6 @@
     ]
   },
   {
-    "section": "niriOverviewOverlayEnabled",
-    "label": "Enable Overview Overlay",
-    "tabIndex": 9,
-    "category": "Launcher",
-    "keywords": [
-      "another",
-      "app drawer",
-      "app menu",
-      "applications",
-      "disable",
-      "drawer",
-      "enable",
-      "launcher",
-      "menu",
-      "niri",
-      "overlay",
-      "overview",
-      "show",
-      "start",
-      "start menu",
-      "typing"
-    ],
-    "description": "Show launcher overlay when typing in Niri overview. Disable to use another launcher."
-  },
-  {
     "section": "appLauncherGridColumns",
     "label": "Grid Columns",
     "tabIndex": 9,
@@ -3090,26 +3093,31 @@
     "description": "Show darkened overlay behind modal dialogs"
   },
   {
-    "section": "spotlightCloseNiriOverview",
+    "section": "niriOverviewOverlayEnabled",
     "label": "Niri Integration",
     "tabIndex": 9,
     "category": "Launcher",
     "keywords": [
-      "apps",
-      "auto",
-      "close",
+      "another",
+      "app drawer",
+      "app menu",
+      "applications",
+      "disable",
       "drawer",
+      "enable",
       "integration",
-      "launch",
       "launcher",
-      "launching",
       "menu",
       "niri",
+      "overlay",
       "overview",
-      "start"
+      "show",
+      "start",
+      "start menu",
+      "typing"
     ],
     "icon": "open_in_new",
-    "description": "Auto-close Niri overview when launching apps.",
+    "description": "Show launcher overlay when typing in Niri overview. Disable to use another launcher.",
     "conditionKey": "isNiri"
   },
   {
@@ -3841,6 +3849,24 @@
       "appearance",
       "colors",
       "emacs",
+      "look",
+      "matugen",
+      "scheme",
+      "style",
+      "template",
+      "theme"
+    ]
+  },
+  {
+    "section": "matugenTemplateFcitx5",
+    "label": "Fcitx5",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "colors",
+      "fcitx5",
+      "input",
       "look",
       "matugen",
       "scheme",
@@ -5250,6 +5276,24 @@
       "look",
       "matugen",
       "qt6ct",
+      "scheme",
+      "style",
+      "template",
+      "theme"
+    ]
+  },
+  {
+    "section": "matugenTemplateQtengine",
+    "label": "qtengine",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "colors",
+      "look",
+      "matugen",
+      "qt",
+      "qtengine",
       "scheme",
       "style",
       "template",
@@ -10110,6 +10154,32 @@
     "description": "Width of window border and focus ring"
   },
   {
+    "section": "closeNiriOverviewOnWindowFocus",
+    "label": "Close Niri Overview on Window Focus",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "auto",
+      "close",
+      "custom",
+      "customize",
+      "dock",
+      "focus",
+      "focuses",
+      "launch",
+      "launcher",
+      "launches",
+      "niri",
+      "overview",
+      "personal",
+      "personalization",
+      "settings",
+      "window"
+    ],
+    "description": "Auto-close Niri overview when DMS launches or focuses a window."
+  },
+  {
     "section": "hyprlandLayoutBarXrayEnabled",
     "label": "Frame Xray",
     "tabIndex": 37,
@@ -10520,6 +10590,34 @@
       "window"
     ],
     "description": "Use custom window radius instead of theme radius"
+  },
+  {
+    "section": "niriOverview",
+    "label": "Overview",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "auto",
+      "close",
+      "custom",
+      "customize",
+      "dock",
+      "focus",
+      "focuses",
+      "launch",
+      "launcher",
+      "launches",
+      "niri",
+      "overview",
+      "personal",
+      "personalization",
+      "settings",
+      "window"
+    ],
+    "icon": "overview",
+    "description": "Auto-close Niri overview when DMS launches or focuses a window.",
+    "conditionKey": "isNiri"
   },
   {
     "section": "hyprlandResizeOnBorder",

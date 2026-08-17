@@ -51,9 +51,15 @@ Singleton {
         return supportsMinimize && toplevel && toplevel.minimized !== undefined;
     }
 
+    function closeNiriOverviewOnWindowFocus() {
+        if (SettingsData.closeNiriOverviewOnWindowFocus && isNiri && NiriService.inOverview)
+            NiriService.closeOverview();
+    }
+
     function activateToplevel(toplevel) {
         if (!toplevel)
             return;
+        closeNiriOverviewOnWindowFocus();
         if (canMinimize(toplevel) && toplevel.minimized)
             toplevel.minimized = false;
         toplevel.activate();
@@ -63,19 +69,18 @@ Singleton {
         if (!toplevel)
             return;
         if (!canMinimize(toplevel)) {
-            toplevel.activate();
+            activateToplevel(toplevel);
             return;
         }
         if (toplevel.minimized) {
-            toplevel.minimized = false;
-            toplevel.activate();
+            activateToplevel(toplevel);
             return;
         }
         if (toplevel.activated) {
             toplevel.minimized = true;
             return;
         }
-        toplevel.activate();
+        activateToplevel(toplevel);
     }
 
     function fetchRandrData() {

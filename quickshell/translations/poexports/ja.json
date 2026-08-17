@@ -2219,6 +2219,9 @@
   "Darken Modal Background": {
     "Darken Modal Background": "モーダル背景を暗くする"
   },
+  "Date First": {
+    "Date First": ""
+  },
   "Date Format": {
     "Date Format": "日付形式"
   },
@@ -2948,6 +2951,9 @@
   "Extra Light": {
     "Extra Light": "エクストラライト"
   },
+  "Extract theme to JSON": {
+    "Extract theme to JSON": ""
+  },
   "Fade": {
     "Fade": "フェード"
   },
@@ -3046,6 +3052,9 @@
   },
   "Failed to enable night mode": {
     "Failed to enable night mode": "ナイトモードの有効化に失敗しました"
+  },
+  "Failed to extract theme": {
+    "Failed to extract theme": ""
   },
   "Failed to fetch network QR code: %1": {
     "Failed to fetch network QR code: %1": "ネットワークQRコードの取得に失敗しました: %1"
@@ -4289,6 +4298,9 @@
   "Keep in Bar": {
     "Keep in Bar": "バーに残す"
   },
+  "Keep pinned apps as launchers and show running windows separately": {
+    "Keep pinned apps as launchers and show running windows separately": ""
+  },
   "Keep the clipboard type filter when reopening history": {
     "Keep the clipboard type filter when reopening history": "履歴を開き直したときにクリップボード種別フィルターを維持"
   },
@@ -4876,6 +4888,9 @@
   },
   "Minimal palette built around a single hue.": {
     "Minimal palette built around a single hue.": "単一の色相を中心に構築された最小限のパレット。"
+  },
+  "Minimize": {
+    "Minimize": ""
   },
   "Minute": {
     "Minute": "分"
@@ -5960,6 +5975,9 @@
   "Place a trash bin at the end of the dock": {
     "Place a trash bin at the end of the dock": "ドックの末尾にゴミ箱を配置します"
   },
+  "Place clipboard history on the Wayland overlay layer": {
+    "Place clipboard history on the Wayland overlay layer": ""
+  },
   "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
     "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "プラグインディレクトリをここに配置します。各プラグインには plugin.json マニフェストファイルが必要です。"
   },
@@ -6608,6 +6626,9 @@
   "Restarting audio system...": {
     "Restarting audio system...": "オーディオシステムを再起動しています..."
   },
+  "Restore": {
+    "Restore": ""
+  },
   "Restore Special Workspace Windows": {
     "Restore Special Workspace Windows": "特殊ワークスペースのウィンドウを復元"
   },
@@ -6745,6 +6766,9 @@
   },
   "Save & Start": {
     "Save & Start": ""
+  },
+  "Save Extracted Theme": {
+    "Save Extracted Theme": ""
   },
   "Save Notepad File": {
     "Save Notepad File": "メモ帳ファイルを保存"
@@ -7063,6 +7087,9 @@
   },
   "Separate Light & Dark Themes": {
     "Separate Light & Dark Themes": "ライト/ダークテーマを分ける"
+  },
+  "Separate Pinned and Running Apps": {
+    "Separate Pinned and Running Apps": ""
   },
   "Separate appearance for unfocused displays is not supported on this compositor.": {
     "Separate appearance for unfocused displays is not supported on this compositor.": ""
@@ -7640,6 +7667,9 @@
   "Start": {
     "Start": "始める"
   },
+  "Start DankConnect, KDE Connect, or Valent to use this plugin": {
+    "Start DankConnect, KDE Connect, or Valent to use this plugin": ""
+  },
   "Start Hotspot?": {
     "Start Hotspot?": ""
   },
@@ -8000,6 +8030,9 @@
   "Theme color used for the widget outline": {
     "Theme color used for the widget outline": "ウィジェット輪郭線に使うテーマ色"
   },
+  "Theme extracted to: %1": {
+    "Theme extracted to: %1": ""
+  },
   "Theme worker failed (%1)": {
     "Theme worker failed (%1)": "テーマワーカーが失敗しました（1%）"
   },
@@ -8086,6 +8119,9 @@
   },
   "Time & Weather": {
     "Time & Weather": "時間および天気"
+  },
+  "Time First": {
+    "Time First": ""
   },
   "Time Format": {
     "Time Format": "時刻形式"

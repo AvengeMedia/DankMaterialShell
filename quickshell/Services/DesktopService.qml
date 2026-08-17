@@ -127,6 +127,7 @@ Singleton {
 
     signal getDefaultAppResult(string mimeType, string desktopFileId, string callbackId)
     signal getAppsForMimeResult(string mimeType, var appIds, string callbackId)
+    signal getHandlersForMimeResult(string mimeType, var apps, string callbackId)
 
     function setDefaultApp(mimeType, desktopFileId, callbackId = "") {
         setDefaultAppForMimes([mimeType], desktopFileId, callbackId);
@@ -159,6 +160,19 @@ Singleton {
             }
             const result = response.result || {};
             root.getDefaultAppResult(mimeType, result.desktopId || "", callbackId);
+        });
+    }
+
+    function getHandlersForMimeType(mimeType, callbackId = "") {
+        DMSService.sendRequest("mime.handlersForMime", {
+            "mimeType": mimeType
+        }, response => {
+            if (response.error) {
+                log.warn("DesktopService.getHandlersForMimeType failed:", response.error, "mime:", mimeType);
+                return;
+            }
+            const result = response.result || {};
+            root.getHandlersForMimeResult(mimeType, result.apps || [], callbackId);
         });
     }
 

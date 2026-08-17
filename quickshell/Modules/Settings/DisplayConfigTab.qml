@@ -103,9 +103,9 @@ Item {
                 width: parent.width
                 height: profileSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
-                border.color: Theme.outlineHeavy
-                border.width: 0
+                color: Theme.floatingWindowNestedSurface
+                border.color: Theme.outlineMedium
+                border.width: Theme.layerOutlineWidth
                 visible: DisplayConfigState.hasOutputBackend
 
                 Column {
@@ -211,7 +211,7 @@ Item {
                             text: ""
                             buttonHeight: 40
                             horizontalPadding: Theme.spacingM
-                            backgroundColor: Theme.surfaceContainer
+                            backgroundColor: Theme.floatingWindowFieldColor
                             textColor: Theme.surfaceText
                             enabled: !SettingsData.displayProfileAutoSelect
                             onClicked: {
@@ -226,7 +226,7 @@ Item {
                             text: ""
                             buttonHeight: 40
                             horizontalPadding: Theme.spacingM
-                            backgroundColor: Theme.surfaceContainer
+                            backgroundColor: Theme.floatingWindowFieldColor
                             textColor: Theme.surfaceText
                             enabled: root.selectedProfileId !== "" && !SettingsData.displayProfileAutoSelect
                             onClicked: root.openEditMonitorsDialog()
@@ -238,7 +238,7 @@ Item {
                             text: ""
                             buttonHeight: 40
                             horizontalPadding: Theme.spacingM
-                            backgroundColor: Theme.surfaceContainer
+                            backgroundColor: Theme.floatingWindowFieldColor
                             textColor: Theme.error
                             enabled: root.selectedProfileId !== "" && !SettingsData.displayProfileAutoSelect
                             onClicked: root.showDeleteConfirmDialog = true
@@ -249,7 +249,7 @@ Item {
                         width: parent.width
                         height: newProfileRow.height + Theme.spacingM * 2
                         radius: Theme.cornerRadius
-                        color: Theme.surfaceContainer
+                        color: Theme.floatingWindowFieldColor
                         visible: root.showNewProfileDialog
 
                         Row {
@@ -296,7 +296,7 @@ Item {
                         width: parent.width
                         height: deleteConfirmColumn.height + Theme.spacingM * 2
                         radius: Theme.cornerRadius
-                        color: Theme.surfaceContainer
+                        color: Theme.floatingWindowFieldColor
                         visible: root.showDeleteConfirmDialog
 
                         Column {
@@ -342,7 +342,7 @@ Item {
                         width: parent.width
                         height: editMonitorsColumn.height + Theme.spacingM * 2
                         radius: Theme.cornerRadius
-                        color: Theme.surfaceContainer
+                        color: Theme.floatingWindowFieldColor
                         visible: root.showEditMonitorsDialog
 
                         Column {
@@ -428,9 +428,9 @@ Item {
                 width: parent.width
                 height: monitorConfigSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
-                border.color: Theme.outlineHeavy
-                border.width: 0
+                color: Theme.floatingWindowNestedSurface
+                border.color: Theme.outlineMedium
+                border.width: Theme.layerOutlineWidth
                 visible: DisplayConfigState.hasOutputBackend
 
                 Column {

@@ -303,9 +303,9 @@ Item {
             radius: root.isExpanded ? 0 : Theme.cornerRadius
             topLeftRadius: Theme.cornerRadius
             topRightRadius: Theme.cornerRadius
-            color: root.hasOverride ? Theme.surfaceContainer : Theme.surfaceContainerHighest
-            border.color: root.hasOverride ? Theme.outlineVariant : Theme.withAlpha(Theme.outlineVariant, 0)
-            border.width: root.hasOverride ? 1 : 0
+            color: Theme.floatingWindowNestedSurface
+            border.color: root.hasOverride ? Theme.outlineVariant : Theme.outlineMedium
+            border.width: root.hasOverride ? 1 : Theme.layerOutlineWidth
 
             RowLayout {
                 id: collapsedContent
@@ -460,9 +460,9 @@ Item {
             id: expandedRect
             width: parent ? parent.width : 0
             height: expandedContent.implicitHeight + Theme.spacingL * 2
-            color: Theme.surfaceContainerHigh
-            border.color: root.hasOverride ? Theme.outlineVariant : Theme.withAlpha(Theme.outlineVariant, 0)
-            border.width: root.hasOverride ? 1 : 0
+            color: Theme.floatingWindowNestedSurface
+            border.color: root.hasOverride ? Theme.outlineVariant : Theme.outlineMedium
+            border.width: root.hasOverride ? 1 : Theme.layerOutlineWidth
             bottomLeftRadius: Theme.cornerRadius
             bottomRightRadius: Theme.cornerRadius
 
@@ -652,7 +652,7 @@ Item {
                         Rectangle {
                             anchors.fill: parent
                             radius: Theme.cornerRadius
-                            color: root.recording ? Theme.primaryContainer : Theme.surfaceContainer
+                            color: root.recording ? Theme.primaryContainer : Theme.floatingWindowFieldColor
                             border.color: root.recording ? Theme.primary : Theme.outlineHeavy
                             border.width: root.recording ? 2 : 1
 
@@ -877,7 +877,7 @@ Item {
                                 Layout.fillWidth: true
                                 Layout.preferredHeight: root._buttonHeight
                                 radius: Theme.cornerRadius
-                                color: root._actionType === modelData.id ? Theme.surfaceContainerHighest : Theme.surfaceContainer
+                                color: root._actionType === modelData.id ? Theme.surfaceContainerHighest : Theme.floatingWindowFieldColor
                                 border.color: root._actionType === modelData.id ? Theme.outline : (typeArea.containsMouse ? Theme.outlineVariant : Theme.withAlpha(Theme.outlineVariant, 0))
                                 border.width: 1
                                 clip: true
@@ -1842,7 +1842,7 @@ Item {
                     DankButton {
                         text: I18n.tr("Reset to default")
                         buttonHeight: root._buttonHeight
-                        backgroundColor: Theme.surfaceContainer
+                        backgroundColor: Theme.floatingWindowFieldColor
                         textColor: Theme.primary
                         visible: root.editingKeyIndex >= 0 && root.editingKeyIndex < root.keys.length && root.keys[root.editingKeyIndex].isOverride === true && root.keys[root.editingKeyIndex].hasDefault === true && !root.isNew && !root.readOnly
                         onClicked: root.resetBind(root._originalKey)
@@ -1862,7 +1862,7 @@ Item {
                     DankButton {
                         text: I18n.tr("Cancel")
                         buttonHeight: root._buttonHeight
-                        backgroundColor: Theme.surfaceContainer
+                        backgroundColor: Theme.floatingWindowFieldColor
                         textColor: Theme.surfaceText
                         visible: root.hasChanges || root.isNew
                         onClicked: {

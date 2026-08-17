@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"maps"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -15,6 +16,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/clipboard"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/config"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/distros"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/matugen"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/brightness"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/network"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/tui"
@@ -321,6 +323,9 @@ func checkEnvironmentVars() []checkResult {
 	results = append(results, checkEnvVar("QT_QPA_PLATFORMTHEME")...)
 	results = append(results, checkEnvVar("QS_ICON_THEME")...)
 	results = append(results, checkXDGMenuPrefix()...)
+	if matugen.QtengineActive() {
+		results = append(results, checkQtenginePlugin()...)
+	}
 	return results
 }
 
@@ -350,6 +355,128 @@ func checkXDGMenuPrefix() []checkResult {
 		return []checkResult{{catEnvironment, "XDG_MENU_PREFIX", statusInfo, "Not set", "", doctorDocsURL + "#xdg-menu-prefix"}}
 	}
 	return nil
+}
+
+// qtQueryBinaries are the Qt build tools that can be asked where Qt looks for
+// plugins, in probe order. A binary's name does not reliably say which Qt it
+// belongs to — plain "qmake" is Qt5 on Arch and Qt6 elsewhere — so each one is
+// asked for QT_VERSION and the major is taken from the answer.
+var qtQueryBinaries = []struct{ bin, flag string }{
+	{"qmake6", "-query"},
+	{"qmake-qt6", "-query"},
+	{"qtpaths6", "--query"},
+	{"qtpaths-qt6", "--query"},
+	{"qmake-qt5", "-query"},
+	{"qtpaths-qt5", "--query"},
+	{"qmake", "-query"},
+	{"qtpaths", "--query"},
+}
+
+// checkQtenginePlugin verifies the qtengine platform theme plugin is installed
+// where Qt actually searches, for every Qt major that can be interrogated.
+//
+// Qt is asked where it looks rather than the filesystem searched, because a
+// package can install the Qt5 plugin under a prefix Qt5 does not search, after
+// which Qt5 apps silently fall back while Qt6 apps look correct. A search would
+// find the plugin and report OK on exactly that bug.
+func checkQtenginePlugin() []checkResult {
+	url := doctorDocsURL + "#environment-variables"
+
+	pluginRoots := make(map[string]string)
+	for _, q := range qtQueryBinaries {
+		if _, err := exec.LookPath(q.bin); err != nil {
+			continue
+		}
+		major, _, _ := strings.Cut(qtQuery(q.bin, q.flag, "QT_VERSION"), ".")
+		if major == "" || pluginRoots[major] != "" {
+			continue
+		}
+		if root := qtQuery(q.bin, q.flag, "QT_INSTALL_PLUGINS"); root != "" {
+			pluginRoots[major] = root
+		}
+	}
+
+	// qmake/qtpaths ship in dev packages most users lack — never warn on a Qt
+	// that could not be interrogated, and never claim it is fine either.
+	if len(pluginRoots) == 0 {
+		return []checkResult{{
+			catEnvironment, "qtengine plugin", statusInfo, "Cannot verify (no qmake/qtpaths)",
+			"Install a Qt development package to let dms doctor check the plugin against the path Qt actually searches.",
+			url,
+		}}
+	}
+
+	// Qt also searches QT_PLUGIN_PATH, so a plugin found there is loadable.
+	envRoots := filepath.SplitList(os.Getenv("QT_PLUGIN_PATH"))
+
+	var results []checkResult
+	for _, major := range slices.Sorted(maps.Keys(pluginRoots)) {
+		// qtengine only ships Qt5 and Qt6 plugins.
+		if major != "5" && major != "6" {
+			continue
+		}
+
+		root := pluginRoots[major]
+		name := fmt.Sprintf("qtengine plugin (Qt%s)", major)
+
+		plugin := qtenginePluginPath(append([]string{root}, envRoots...), major)
+		if plugin == "" {
+			expected := qtenginePluginFile(root, major)
+			results = append(results, checkResult{
+				catEnvironment, name, statusWarn, fmt.Sprintf("Not found in Qt%s plugin path", major),
+				fmt.Sprintf("Expected %s — Qt%s apps will silently fall back to an unthemed palette. The plugin is likely installed under a prefix Qt%s does not search.", expected, major, major),
+				url,
+			})
+			continue
+		}
+		results = append(results, checkResult{catEnvironment, name, statusOK, "Installed", plugin, url})
+	}
+
+	return results
+}
+
+// qtenginePluginPath returns the first of roots that holds the qtengine platform
+// theme plugin for the given Qt major, or "" if none does.
+func qtenginePluginPath(roots []string, major string) string {
+	for _, root := range roots {
+		if root == "" {
+			continue
+		}
+		path := qtenginePluginFile(root, major)
+		if _, err := os.Stat(path); err == nil {
+			return path
+		}
+	}
+	return ""
+}
+
+func qtenginePluginFile(root, major string) string {
+	return filepath.Join(root, "platformthemes", fmt.Sprintf("libqt%sengine-plugin.so", major))
+}
+
+// qtQuery asks a Qt build tool for a single QLibraryInfo property.
+func qtQuery(bin, flag, key string) string {
+	output, err := exec.Command(bin, flag, key).Output()
+	if err != nil {
+		return ""
+	}
+	return qtQueryValue(string(output), key)
+}
+
+// qtQueryValue extracts one property from a Qt query. Most tools print the bare
+// value, but some ignore the requested property and dump every one as
+// "KEY:value" lines; taking the whole output there would yield a bogus path.
+func qtQueryValue(output, key string) string {
+	lines := strings.Split(strings.TrimSpace(output), "\n")
+	for _, line := range lines {
+		if value, found := strings.CutPrefix(strings.TrimSpace(line), key+":"); found {
+			return strings.TrimSpace(value)
+		}
+	}
+	if len(lines) == 1 {
+		return strings.TrimSpace(lines[0])
+	}
+	return ""
 }
 
 func checkXDGMenuFile(prefix string) bool {
@@ -789,17 +916,15 @@ func findQtPluginDirs() []string {
 	}
 
 	// Check all paths in QT_PLUGIN_PATH env var (used by NixOS and custom setups)
-	if envPath := os.Getenv("QT_PLUGIN_PATH"); envPath != "" {
-		for dir := range strings.SplitSeq(envPath, ":") {
-			addDir(dir)
-		}
+	for _, dir := range filepath.SplitList(os.Getenv("QT_PLUGIN_PATH")) {
+		addDir(dir)
 	}
 
-	// Try qtpaths
-	for _, cmd := range []string{"qtpaths6", "qtpaths"} {
-		if output, err := exec.Command(cmd, "-query", "QT_INSTALL_PLUGINS").Output(); err == nil {
-			addDir(strings.TrimSpace(string(output)))
+	for _, q := range qtQueryBinaries {
+		if _, err := exec.LookPath(q.bin); err != nil {
+			continue
 		}
+		addDir(qtQuery(q.bin, q.flag, "QT_INSTALL_PLUGINS"))
 	}
 
 	// Fallback: common distro paths

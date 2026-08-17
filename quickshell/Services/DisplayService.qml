@@ -376,17 +376,34 @@ Singleton {
     }
 
     function applyWlrModeOverrides(modeOverrides, callback) {
-        if (CompositorService.isHyprland) {
-            HyprlandService.generateOutputsConfig(buildWlrOutputsData(modeOverrides), SessionData.hyprlandOutputSettings, callback);
-            return;
-        }
-
-        if (CompositorService.isMango) {
-            MangoService.generateOutputsConfig(buildWlrOutputsData(modeOverrides), callback);
+        if (CompositorService.isHyprland || CompositorService.isMango) {
+            applyModeOverridesWithoutReload(modeOverrides, callback);
             return;
         }
 
         WlrOutputService.applyConfiguration(buildWlrHeads(modeOverrides), callback);
+    }
+
+    // apply live and persist without a compositor config reload — full reloads
+    // are a suspected trigger for IME input lockups (#3073)
+    function applyModeOverridesWithoutReload(modeOverrides, callback) {
+        WlrOutputService.applyConfiguration(buildWlrHeads(modeOverrides), success => {
+            if (!success) {
+                persistOutputsConfig(modeOverrides, callback, false);
+                return;
+            }
+            persistOutputsConfig(modeOverrides, null, true);
+            if (callback)
+                callback(true);
+        });
+    }
+
+    function persistOutputsConfig(modeOverrides, callback, skipReload) {
+        if (CompositorService.isHyprland) {
+            HyprlandService.generateOutputsConfig(buildWlrOutputsData(modeOverrides), SessionData.hyprlandOutputSettings, callback, skipReload);
+            return;
+        }
+        MangoService.generateOutputsConfig(buildWlrOutputsData(modeOverrides), callback, skipReload);
     }
 
     function buildWlrOutputsData(modeOverrides) {

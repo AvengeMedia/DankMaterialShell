@@ -351,8 +351,8 @@ Item {
                             width: parent.width - selectButton.width - Theme.spacingM
                             height: 36
                             radius: Theme.cornerRadius
-                            color: Theme.withAlpha(Theme.surfaceContainer, 0.9)
-                            border.color: Theme.outlineStrong
+                            color: Theme.floatingWindowFieldColor
+                            border.color: Theme.floatingWindowFieldBorderColor
                             border.width: 1
 
                             StyledText {
@@ -577,7 +577,7 @@ Item {
                             id: trashCustomCommandField
                             width: parent.width
                             placeholderText: "pcmanfm trash:///"
-                            backgroundColor: Theme.surfaceContainerHighest
+                            backgroundColor: Theme.floatingWindowFieldColor
                             normalBorderColor: Theme.outlineMedium
                             focusedBorderColor: Theme.primary
                             text: SettingsData.dockTrashCustomCommand

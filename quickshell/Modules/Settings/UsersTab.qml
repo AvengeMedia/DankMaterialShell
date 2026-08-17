@@ -163,7 +163,9 @@ Item {
                         width: parent.width
                         height: Math.max(48, rowContent.implicitHeight + Theme.spacingS * 2)
                         radius: Theme.cornerRadius
-                        color: Theme.surfaceContainerHighest
+                        color: Theme.floatingWindowFieldColor
+                        border.color: Theme.outlineMedium
+                        border.width: Theme.layerOutlineWidth
 
                         readonly property bool isLastAdmin: modelData.isAdmin && UsersService.adminMembers.length <= 1
 
@@ -364,7 +366,7 @@ Item {
                         id: usernameField
                         width: parent.width
                         placeholderText: I18n.tr("e.g. alice")
-                        backgroundColor: Theme.surfaceContainerHighest
+                        backgroundColor: Theme.floatingWindowFieldColor
                         normalBorderColor: usernameInvalid ? Theme.error : Theme.outlineMedium
                         focusedBorderColor: usernameInvalid ? Theme.error : Theme.primary
 
@@ -410,7 +412,7 @@ Item {
                         placeholderText: I18n.tr("Set initial password")
                         echoMode: TextInput.Password
                         showPasswordToggle: true
-                        backgroundColor: Theme.surfaceContainerHighest
+                        backgroundColor: Theme.floatingWindowFieldColor
                         normalBorderColor: Theme.outlineMedium
                         focusedBorderColor: Theme.primary
                         onTextEdited: root.pendingPassword = text
@@ -433,7 +435,7 @@ Item {
                         placeholderText: I18n.tr("Re-enter password")
                         echoMode: TextInput.Password
                         showPasswordToggle: true
-                        backgroundColor: Theme.surfaceContainerHighest
+                        backgroundColor: Theme.floatingWindowFieldColor
                         normalBorderColor: confirmMismatch ? Theme.error : Theme.outlineMedium
                         focusedBorderColor: confirmMismatch ? Theme.error : Theme.primary
 

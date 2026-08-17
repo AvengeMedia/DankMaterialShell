@@ -563,7 +563,7 @@ Singleton {
         }
     }
 
-    function generateOutputsConfig(outputsData, callback) {
+    function generateOutputsConfig(outputsData, callback, skipReload) {
         if (!outputsData || Object.keys(outputsData).length === 0) {
             if (callback)
                 callback(false);
@@ -618,7 +618,7 @@ Singleton {
                 return;
             }
             log.info("Generated outputs config at", outputsPath);
-            if (CompositorService.isMango)
+            if (CompositorService.isMango && !skipReload)
                 reloadConfig(false);
             if (callback)
                 callback(true);

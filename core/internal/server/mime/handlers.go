@@ -18,6 +18,17 @@ type appsResult struct {
 	DesktopIDs []string `json:"desktopIds"`
 }
 
+type handlerApp struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+	Icon string `json:"icon,omitempty"`
+}
+
+type handlersResult struct {
+	MimeType string       `json:"mimeType"`
+	Apps     []handlerApp `json:"apps"`
+}
+
 type queryResult struct {
 	Defaults map[string]string `json:"defaults"`
 }
@@ -32,6 +43,8 @@ func HandleRequest(conn *models.Conn, req models.Request) {
 		handleSetDefaults(conn, req)
 	case "mime.appsForMime":
 		handleAppsForMime(conn, req)
+	case "mime.handlersForMime":
+		handleHandlersForMime(conn, req)
 	case "mime.queryDefaults":
 		handleQueryDefaults(conn, req)
 	case "mime.invalidate":
@@ -103,6 +116,27 @@ func handleAppsForMime(conn *models.Conn, req models.Request) {
 	models.Respond(conn, req.ID, appsResult{
 		MimeType:   mimeType,
 		DesktopIDs: ids,
+	})
+}
+
+func handleHandlersForMime(conn *models.Conn, req models.Request) {
+	mimeType, err := mimeParam(req.Params, "mimeType")
+	if err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+	entries := desktop.HandlersForMime(mimeType)
+	apps := make([]handlerApp, 0, len(entries))
+	for _, entry := range entries {
+		apps = append(apps, handlerApp{
+			ID:   entry.ID,
+			Name: entry.Name,
+			Icon: entry.Icon,
+		})
+	}
+	models.Respond(conn, req.ID, handlersResult{
+		MimeType: mimeType,
+		Apps:     apps,
 	})
 }
 

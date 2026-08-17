@@ -352,7 +352,9 @@ Item {
                     x: Theme.spacingM
                     height: formatHelp.implicitHeight + Theme.spacingM * 2
                     radius: Theme.cornerRadius
-                    color: Theme.surfaceContainerHigh
+                    color: Theme.floatingWindowNestedSurface
+                    border.color: Theme.outlineMedium
+                    border.width: Theme.layerOutlineWidth
 
                     Column {
                         id: formatHelp
@@ -926,7 +928,9 @@ Item {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             radius: Theme.cornerRadius
-                            color: Theme.surfaceContainerHigh
+                            color: Theme.floatingWindowNestedSurface
+                            border.color: Theme.outlineMedium
+                            border.width: Theme.layerOutlineWidth
 
                             Column {
                                 anchors.centerIn: parent
@@ -970,7 +974,9 @@ Item {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             radius: Theme.cornerRadius
-                            color: Theme.surfaceContainerHigh
+                            color: Theme.floatingWindowNestedSurface
+                            border.color: Theme.outlineMedium
+                            border.width: Theme.layerOutlineWidth
 
                             Column {
                                 anchors.centerIn: parent
@@ -1014,7 +1020,9 @@ Item {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             radius: Theme.cornerRadius
-                            color: Theme.surfaceContainerHigh
+                            color: Theme.floatingWindowNestedSurface
+                            border.color: Theme.outlineMedium
+                            border.width: Theme.layerOutlineWidth
 
                             Column {
                                 anchors.centerIn: parent
@@ -1071,7 +1079,9 @@ Item {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             radius: Theme.cornerRadius
-                            color: Theme.surfaceContainerHigh
+                            color: Theme.floatingWindowNestedSurface
+                            border.color: Theme.outlineMedium
+                            border.width: Theme.layerOutlineWidth
 
                             Column {
                                 anchors.centerIn: parent
@@ -1121,7 +1131,9 @@ Item {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             radius: Theme.cornerRadius
-                            color: Theme.surfaceContainerHigh
+                            color: Theme.floatingWindowNestedSurface
+                            border.color: Theme.outlineMedium
+                            border.width: Theme.layerOutlineWidth
 
                             Column {
                                 anchors.centerIn: parent
@@ -1165,7 +1177,9 @@ Item {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             radius: Theme.cornerRadius
-                            color: Theme.surfaceContainerHigh
+                            color: Theme.floatingWindowNestedSurface
+                            border.color: Theme.outlineMedium
+                            border.width: Theme.layerOutlineWidth
 
                             Column {
                                 anchors.centerIn: parent

@@ -224,7 +224,7 @@ Item {
                         width: parent.width
                         height: workspaceIconRow.implicitHeight + Theme.spacingM
                         radius: Theme.cornerRadius
-                        color: Theme.withAlpha(Theme.surfaceContainer, 0.5)
+                        color: Theme.floatingWindowFieldColor
                         border.width: 0
 
                         Row {
@@ -283,7 +283,7 @@ Item {
                                 width: 28
                                 height: 28
                                 radius: Theme.cornerRadius
-                                color: clearMouseArea.containsMouse ? Theme.errorHover : Theme.surfaceContainer
+                                color: clearMouseArea.containsMouse ? Theme.errorHover : Theme.floatingWindowFieldColor
                                 border.width: 0
                                 anchors.verticalCenter: parent.verticalCenter
 

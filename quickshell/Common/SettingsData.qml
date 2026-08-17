@@ -15,7 +15,7 @@ Singleton {
     id: root
     readonly property var log: Log.scoped("SettingsData")
 
-    readonly property int settingsConfigVersion: 15
+    readonly property int settingsConfigVersion: 16
 
     enum Position {
         Top,
@@ -77,6 +77,7 @@ Singleton {
     readonly property string _configUrl: StandardPaths.writableLocation(StandardPaths.ConfigLocation)
     readonly property string _configDir: Paths.strip(_configUrl)
     readonly property string pluginSettingsPath: _configDir + "/DankMaterialShell/plugin_settings.json"
+    readonly property bool qtengineActive: Quickshell.env("QT_QPA_PLATFORMTHEME") === "qtengine" || Quickshell.env("QT_QPA_PLATFORMTHEME_QT6") === "qtengine"
 
     property bool _loading: false
     property bool _pluginSettingsLoading: false
@@ -549,7 +550,7 @@ Singleton {
     property string appPickerViewMode: "grid"
     property bool sortAppsAlphabetically: false
     property int appLauncherGridColumns: 4
-    property bool spotlightCloseNiriOverview: true
+    property bool closeNiriOverviewOnWindowFocus: true
     property bool rememberLastQuery: false
     property bool rememberLastMode: true
     property var spotlightSectionViewModes: ({})
@@ -828,6 +829,8 @@ Singleton {
     property bool matugenTemplateMangowc: true
     property bool matugenTemplateQt5ct: true
     property bool matugenTemplateQt6ct: true
+    property bool matugenTemplateFcitx5: true
+    property bool matugenTemplateQtengine: true
     property bool matugenTemplateFirefox: true
     property bool matugenTemplatePywalfox: true
     property bool matugenTemplateZenBrowser: true
@@ -1028,7 +1031,9 @@ Singleton {
             "spacing": 4,
             "innerPadding": 4,
             "barInsetPadding": -1,
+            "barLengthPadding": 0,
             "bottomGap": 0,
+            "attachToScreenEdge": false,
             "transparency": 1.0,
             "widgetTransparency": 1.0,
             "squareCorners": false,
@@ -1520,6 +1525,10 @@ Singleton {
         update_qt_icon_theme ${_configDir}/qt6ct/qt6ct.conf '${qtThemeNameEscaped}'`;
 
         Quickshell.execDetached(["sh", "-lc", script]);
+
+        if (!qtengineActive || !runDmsMatugenTemplates || !matugenTemplateQtengine)
+            return;
+        Proc.runCommand("updateQtengineIconTheme", [Proc.dmsBin, "matugen", "qtengine", "--icon-theme", qtThemeName], () => {});
     }
 
     function scheduleAuthApply() {
@@ -1804,6 +1813,7 @@ Singleton {
         return {
             "shadowIntensity": config?.shadowIntensity ?? 0,
             "squareCorners": config?.squareCorners ?? false,
+            "attachToScreenEdge": config?.attachToScreenEdge ?? false,
             "gothCornersEnabled": config?.gothCornersEnabled ?? false,
             "borderEnabled": config?.borderEnabled ?? false
         };
@@ -1877,7 +1887,7 @@ Singleton {
             updateBarConfigs();
     }
 
-    // Zeroes out connected-mode-hostile fields (shadow, square/goth corners, border).
+    // Zeroes out connected-mode-hostile fields (shadow, square/goth corners, edge attach, border).
     // Returns { configs, changed } — `configs` is the same ref when no change.
     function _sanitizeBarConfigsForConnectedFrame(configs) {
         if (!connectedFrameModeActive || !Array.isArray(configs))
@@ -1898,6 +1908,10 @@ Singleton {
             }
             if (s.squareCorners ?? false) {
                 s.squareCorners = false;
+                dirty = true;
+            }
+            if (s.attachToScreenEdge ?? false) {
+                s.attachToScreenEdge = false;
                 dirty = true;
             }
             if (s.gothCornersEnabled ?? false) {

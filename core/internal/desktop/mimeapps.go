@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"maps"
 	"os"
 	"path/filepath"
 	"slices"
@@ -81,7 +82,10 @@ func readAssociations(path string) (*MimeAssociations, error) {
 	if err != nil {
 		return nil, err
 	}
+	return associationsFromData(data), nil
+}
 
+func associationsFromData(data []byte) *MimeAssociations {
 	groups := parseGroups(data)
 	assoc := newAssociations()
 
@@ -106,7 +110,7 @@ func readAssociations(path string) (*MimeAssociations, error) {
 		}
 	}
 
-	return assoc, nil
+	return assoc
 }
 
 func mergedAssociations() *MimeAssociations {
@@ -144,40 +148,22 @@ func writeUserMimeapps(update func(*MimeAssociations)) error {
 
 	path := mimeappsWritePath()
 
-	assoc, err := readAssociations(path)
-	if err != nil {
-		if !os.IsNotExist(err) {
-			return err
-		}
-		assoc = newAssociations()
+	original, err := os.ReadFile(path)
+	if err != nil && !os.IsNotExist(err) {
+		return err
 	}
 
+	assoc := associationsFromData(original)
 	update(assoc)
 
-	var buf bytes.Buffer
-	w := bufio.NewWriter(&buf)
-
-	var writeErr error
-	writeSection := func(name string, entries map[string]string) {
-		fmt.Fprintf(w, "[%s]\n", name)
-		keys := make([]string, 0, len(entries))
-		for k := range entries {
-			keys = append(keys, k)
-		}
-		sort.Strings(keys)
-		for _, k := range keys {
-			v := entries[k]
-			if !isSafeIniField(k) || !isSafeIniField(v) {
-				if writeErr == nil {
-					writeErr = fmt.Errorf("invalid mimeapps.list field %q=%q", k, v)
-				}
-				continue
-			}
-			fmt.Fprintf(w, "%s=%s\n", k, v)
-		}
-		fmt.Fprintln(w)
+	rendered, err := renderMimeapps(original, assoc)
+	if err != nil {
+		return err
 	}
+	return atomicWriteFile(path, rendered)
+}
 
+func managedGroups(assoc *MimeAssociations) (map[string]map[string]string, error) {
 	flatten := func(m map[string][]string) map[string]string {
 		out := make(map[string]string, len(m))
 		for k, list := range m {
@@ -186,22 +172,172 @@ func writeUserMimeapps(update func(*MimeAssociations)) error {
 		return out
 	}
 
-	writeSection(groupDefaults, assoc.Defaults)
-	writeSection(groupAdded, flatten(assoc.Added))
-	writeSection(groupRemoved, flatten(assoc.Removed))
+	groups := map[string]map[string]string{
+		groupDefaults: maps.Clone(assoc.Defaults),
+		groupAdded:    flatten(assoc.Added),
+		groupRemoved:  flatten(assoc.Removed),
+	}
+	for name, entries := range groups {
+		for k, v := range entries {
+			if isSafeIniField(k) && isSafeIniField(v) {
+				continue
+			}
+			return nil, fmt.Errorf("invalid mimeapps.list field in [%s]: %q=%q", name, k, v)
+		}
+	}
+	return groups, nil
+}
 
-	if writeErr != nil {
-		return writeErr
+// renderMimeapps rewrites only the three association groups defined by the
+// mime-apps spec (https://specifications.freedesktop.org/mime-apps-spec/),
+// keeping comments, blank lines, and unrelated groups verbatim.
+func renderMimeapps(original []byte, assoc *MimeAssociations) ([]byte, error) {
+	managed, err := managedGroups(assoc)
+	if err != nil {
+		return nil, err
 	}
 
-	if err := w.Flush(); err != nil {
+	written := map[string]map[string]bool{
+		groupDefaults: {},
+		groupAdded:    {},
+		groupRemoved:  {},
+	}
+
+	var out []string
+
+	flushMissing := func(group string) {
+		entries, ok := managed[group]
+		if !ok {
+			return
+		}
+		keys := make([]string, 0, len(entries))
+		for k := range entries {
+			if !written[group][k] {
+				keys = append(keys, k)
+			}
+		}
+		if len(keys) == 0 {
+			return
+		}
+		sort.Strings(keys)
+
+		insertAt := len(out)
+		for insertAt > 0 && strings.TrimSpace(out[insertAt-1]) == "" {
+			insertAt--
+		}
+		lines := make([]string, 0, len(keys))
+		for _, k := range keys {
+			written[group][k] = true
+			lines = append(lines, k+"="+entries[k])
+		}
+		tail := append([]string(nil), out[insertAt:]...)
+		out = append(out[:insertAt], append(lines, tail...)...)
+	}
+
+	current := ""
+	scanner := bufio.NewScanner(bytes.NewReader(original))
+	scanner.Buffer(make([]byte, 64*1024), 1024*1024)
+	for scanner.Scan() {
+		line := scanner.Text()
+		trimmed := strings.TrimSpace(line)
+
+		if strings.HasPrefix(trimmed, "[") && strings.HasSuffix(trimmed, "]") {
+			flushMissing(current)
+			current = trimmed[1 : len(trimmed)-1]
+			out = append(out, line)
+			continue
+		}
+
+		entries, isManaged := managed[current]
+		if !isManaged {
+			out = append(out, line)
+			continue
+		}
+
+		if trimmed == "" || strings.HasPrefix(trimmed, "#") {
+			out = append(out, line)
+			continue
+		}
+
+		eq := strings.IndexByte(trimmed, '=')
+		if eq <= 0 {
+			out = append(out, line)
+			continue
+		}
+
+		key := strings.TrimSpace(trimmed[:eq])
+		val, keep := entries[key]
+		if !keep || written[current][key] {
+			continue
+		}
+		written[current][key] = true
+		out = append(out, key+"="+val)
+	}
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+	flushMissing(current)
+
+	for _, group := range []string{groupDefaults, groupAdded, groupRemoved} {
+		entries := managed[group]
+		pending := make([]string, 0, len(entries))
+		for k := range entries {
+			if !written[group][k] {
+				pending = append(pending, k)
+			}
+		}
+		if len(pending) == 0 {
+			continue
+		}
+		sort.Strings(pending)
+
+		if len(out) > 0 && strings.TrimSpace(out[len(out)-1]) != "" {
+			out = append(out, "")
+		}
+		out = append(out, "["+group+"]")
+		for _, k := range pending {
+			written[group][k] = true
+			out = append(out, k+"="+entries[k])
+		}
+	}
+
+	if len(out) == 0 {
+		return nil, nil
+	}
+	return []byte(strings.Join(out, "\n") + "\n"), nil
+}
+
+func atomicWriteFile(path string, data []byte) error {
+	dir := filepath.Dir(path)
+	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return err
 	}
 
-	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+	tmp, err := os.CreateTemp(dir, ".mimeapps-*.tmp")
+	if err != nil {
 		return err
 	}
-	return os.WriteFile(path, buf.Bytes(), 0o644)
+	tmpPath := tmp.Name()
+
+	if _, err := tmp.Write(data); err != nil {
+		tmp.Close()
+		os.Remove(tmpPath)
+		return err
+	}
+	if err := tmp.Chmod(0o644); err != nil {
+		tmp.Close()
+		os.Remove(tmpPath)
+		return err
+	}
+	if err := tmp.Close(); err != nil {
+		os.Remove(tmpPath)
+		return err
+	}
+	if err := os.Rename(tmpPath, path); err != nil {
+		os.Remove(tmpPath)
+		return err
+	}
+	return nil
 }
 
 func setDefaultAssociation(mimeType, desktopID string) error {

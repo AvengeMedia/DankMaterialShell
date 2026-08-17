@@ -109,6 +109,7 @@ Singleton {
     }
 
     readonly property var _deferredUnloaders: ({
+            "dankDash": () => _unloadPopoutNow("dankDashPopout", "dankDashPopoutLoader"),
             "controlCenter": () => _unloadPopoutNow("controlCenterPopout", "controlCenterLoader"),
             "notificationCenter": () => _unloadPopoutNow("notificationCenterPopout", "notificationCenterLoader"),
             "appDrawer": () => _unloadPopoutNow("appDrawerPopout", "appDrawerLoader"),
@@ -263,12 +264,6 @@ Singleton {
     function closeDankDash() {
         if (dankDashPopout)
             dankDashPopout.dashVisible = false;
-    }
-
-    function unloadDankDash() {
-        // DankDash is intentionally kept alive after first use. Destroying this
-        // lazy popout during its close signal can invalidate connected overlay
-        // bindings while Qt is still unwinding the signal stack.
     }
 
     function toggleDankDash(tab, x, y, width, section, screen) {
@@ -465,7 +460,7 @@ Singleton {
                     settingsModal.hide();
                     return;
                 }
-                toplevel.activate();
+                CompositorService.activateToplevel(toplevel);
                 return;
             }
         }
@@ -484,7 +479,7 @@ Singleton {
                 }
                 var idx = settingsModal.resolveTabIndex(tabName);
                 settingsModal.setTabIndex(idx);
-                toplevel.activate();
+                CompositorService.activateToplevel(toplevel);
                 return;
             }
         }

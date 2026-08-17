@@ -51,16 +51,42 @@ var DefaultOverlayStyle = OverlayStyle{
 	AccentR: 100, AccentG: 180, AccentB: 255,
 }
 
-func (r *RegionSelector) drawOverlay(os *OutputSurface, renderBuf *ShmBuffer) {
-	data := renderBuf.Data()
-	stride := renderBuf.Stride
-	w, h := renderBuf.Width, renderBuf.Height
-	format := os.screenFormat
+type selectionRenderBounds struct {
+	x int
+	y int
+	w int
+	h int
+}
 
-	// dim, forcing alpha: the X-format source's padding byte is undefined
-	for y := 0; y < h; y++ {
+type dirtyRect struct {
+	x1 int
+	y1 int
+	x2 int
+	y2 int
+}
+
+func (d dirtyRect) union(o dirtyRect) dirtyRect {
+	return dirtyRect{
+		x1: min(d.x1, o.x1),
+		y1: min(d.y1, o.y1),
+		x2: max(d.x2, o.x2),
+		y2: max(d.y2, o.y2),
+	}
+}
+
+func (r *RegionSelector) dimBackground(renderBuf *ShmBuffer) {
+	data := renderBuf.Data()
+	r.dimRegion(data, renderBuf.Stride, renderBuf.Width, renderBuf.Height, 0, 0, renderBuf.Width, renderBuf.Height)
+}
+
+func (r *RegionSelector) dimRegion(data []byte, stride, bufW, bufH, x1, y1, x2, y2 int) {
+	x1 = clamp(x1, 0, bufW)
+	y1 = clamp(y1, 0, bufH)
+	x2 = clamp(x2, 0, bufW)
+	y2 = clamp(y2, 0, bufH)
+	for y := y1; y < y2; y++ {
 		off := y * stride
-		for x := 0; x < w; x++ {
+		for x := x1; x < x2; x++ {
 			i := off + x*4
 			if i+3 >= len(data) {
 				continue
@@ -71,38 +97,93 @@ func (r *RegionSelector) drawOverlay(os *OutputSurface, renderBuf *ShmBuffer) {
 			data[i+3] = 255
 		}
 	}
+}
 
-	r.drawHUD(data, stride, w, h, format)
-
+func (r *RegionSelector) selectionRenderBounds(os *OutputSurface) (selectionRenderBounds, bool) {
 	if !r.selection.hasSelection || r.selection.surface != os {
+		return selectionRenderBounds{}, false
+	}
+
+	srcBuf := r.getSourceBuffer(os)
+	if srcBuf == nil {
+		return selectionRenderBounds{}, false
+	}
+
+	scaleX, scaleY := 1.0, 1.0
+	if os.logicalW > 0 && os.logicalH > 0 {
+		scaleX = float64(srcBuf.Width) / float64(os.logicalW)
+		scaleY = float64(srcBuf.Height) / float64(os.logicalH)
+	}
+	x1 := int(r.selection.anchorX * scaleX)
+	y1 := int(r.selection.anchorY * scaleY)
+	x2 := int(r.selection.currentX * scaleX)
+	y2 := int(r.selection.currentY * scaleY)
+	if x1 > x2 {
+		x1, x2 = x2, x1
+	}
+	if y1 > y2 {
+		y1, y2 = y2, y1
+	}
+
+	x1 = clamp(x1, 0, srcBuf.Width-1)
+	y1 = clamp(y1, 0, srcBuf.Height-1)
+	x2 = clamp(x2, 0, srcBuf.Width-1)
+	y2 = clamp(y2, 0, srcBuf.Height-1)
+	w, h := x2-x1+1, y2-y1+1
+	if r.shiftHeld && w != h {
+		if w < h {
+			h = w
+		} else {
+			w = h
+		}
+	}
+	return selectionRenderBounds{x: x1, y: y1, w: w, h: h}, true
+}
+
+func (r *RegionSelector) restoreSourceRect(os *OutputSurface, renderBuf *ShmBuffer, d dirtyRect) {
+	srcBuf := r.getSourceBuffer(os)
+	if srcBuf == nil {
 		return
 	}
 
-	scaleX := float64(w) / float64(os.logicalW)
-	scaleY := float64(h) / float64(os.logicalH)
-
-	bx1 := int(r.selection.anchorX * scaleX)
-	by1 := int(r.selection.anchorY * scaleY)
-	bx2 := int(r.selection.currentX * scaleX)
-	by2 := int(r.selection.currentY * scaleY)
-
-	if bx1 > bx2 {
-		bx1, bx2 = bx2, bx1
-	}
-	if by1 > by2 {
-		by1, by2 = by2, by1
+	maxW := min(srcBuf.Width, renderBuf.Width)
+	maxH := min(srcBuf.Height, renderBuf.Height)
+	x1 := clamp(d.x1, 0, maxW)
+	y1 := clamp(d.y1, 0, maxH)
+	x2 := clamp(d.x2, 0, maxW)
+	y2 := clamp(d.y2, 0, maxH)
+	if x2 <= x1 || y2 <= y1 {
+		return
 	}
 
-	bx1 = clamp(bx1, 0, w-1)
-	by1 = clamp(by1, 0, h-1)
-	bx2 = clamp(bx2, 0, w-1)
-	by2 = clamp(by2, 0, h-1)
+	width := (x2 - x1) * 4
+	for y := y1; y < y2; y++ {
+		srcStart := y*srcBuf.Stride + x1*4
+		dstStart := y*renderBuf.Stride + x1*4
+		if srcStart+width > len(srcBuf.Data()) || dstStart+width > len(renderBuf.Data()) {
+			continue
+		}
+		copy(renderBuf.Data()[dstStart:dstStart+width], srcBuf.Data()[srcStart:srcStart+width])
+	}
+	r.dimRegion(renderBuf.Data(), renderBuf.Stride, renderBuf.Width, renderBuf.Height, x1, y1, x2, y2)
+}
+
+func (r *RegionSelector) drawOverlay(os *OutputSurface, renderBuf *ShmBuffer) *dirtyRect {
+	bounds, ok := r.selectionRenderBounds(os)
+	if !ok {
+		return nil
+	}
+
+	data := renderBuf.Data()
+	stride := renderBuf.Stride
+	w, h := renderBuf.Width, renderBuf.Height
+	format := os.screenFormat
 
 	srcBuf := r.getSourceBuffer(os)
 	srcData := srcBuf.Data()
-	for y := by1; y <= by2; y++ {
+	for y := bounds.y; y < bounds.y+bounds.h; y++ {
 		rowOff := y * stride
-		for x := bx1; x <= bx2; x++ {
+		for x := bounds.x; x < bounds.x+bounds.w; x++ {
 			si := y*srcBuf.Stride + x*4
 			di := rowOff + x*4
 			if si+3 >= len(srcData) || di+3 >= len(data) {
@@ -115,16 +196,16 @@ func (r *RegionSelector) drawOverlay(os *OutputSurface, renderBuf *ShmBuffer) {
 		}
 	}
 
-	selW, selH := bx2-bx1+1, by2-by1+1
-	if r.shiftHeld && selW != selH {
-		if selW < selH {
-			selH = selW
-		} else {
-			selW = selH
-		}
-	}
-	r.drawBorder(data, stride, w, h, bx1, by1, selW, selH, format)
-	r.drawDimensions(data, stride, w, h, bx1, by1, selW, selH, format)
+	r.drawBorder(data, stride, w, h, bounds.x, bounds.y, bounds.w, bounds.h, format)
+	labelRect := r.drawDimensions(data, stride, w, h, bounds.x, bounds.y, bounds.w, bounds.h, format)
+
+	dirty := dirtyRect{
+		x1: bounds.x - borderThickness,
+		y1: bounds.y - borderThickness,
+		x2: bounds.x + bounds.w + borderThickness,
+		y2: bounds.y + bounds.h + borderThickness,
+	}.union(labelRect)
+	return &dirty
 }
 
 func (r *RegionSelector) drawScrollOverlay(os *OutputSurface, renderBuf *ShmBuffer) {
@@ -257,9 +338,10 @@ func (r *RegionSelector) drawHUD(data []byte, stride, bufW, bufH int, format uin
 	}
 }
 
+const borderThickness = 2
+
 func (r *RegionSelector) drawBorder(data []byte, stride, bufW, bufH, x, y, w, h int, format uint32) {
-	const thickness = 2
-	for i := 0; i < thickness; i++ {
+	for i := 0; i < borderThickness; i++ {
 		r.drawHLine(data, stride, bufW, bufH, x-i, y-i, w+2*i, format)
 		r.drawHLine(data, stride, bufW, bufH, x-i, y+h+i-1, w+2*i, format)
 		r.drawVLine(data, stride, bufW, bufH, x-i, y-i, h+2*i, format)
@@ -302,7 +384,7 @@ func (r *RegionSelector) drawVLine(data []byte, stride, bufW, bufH, x, y, length
 	}
 }
 
-func (r *RegionSelector) drawDimensions(data []byte, stride, bufW, bufH, x, y, w, h int, format uint32) {
+func (r *RegionSelector) drawDimensions(data []byte, stride, bufW, bufH, x, y, w, h int, format uint32) dirtyRect {
 	text := fmt.Sprintf("%dx%d", w, h)
 
 	const charW, charH = 8, 12
@@ -319,6 +401,7 @@ func (r *RegionSelector) drawDimensions(data []byte, stride, bufW, bufH, x, y, w
 
 	r.fillRect(data, stride, bufW, bufH, tx-4, ty-2, textW+8, textH+4, 0, 0, 0, 200, format)
 	r.drawText(data, stride, bufW, bufH, tx, ty, text, 255, 255, 255, format)
+	return dirtyRect{x1: tx - 4, y1: ty - 2, x2: tx + textW + 4, y2: ty + textH + 2}
 }
 
 func (r *RegionSelector) fillRect(data []byte, stride, bufW, bufH, x, y, w, h int, cr, cg, cb, ca uint8, format uint32) {

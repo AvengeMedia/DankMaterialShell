@@ -189,8 +189,9 @@ Item {
                 width: parent.width
                 height: headerContent.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
-                border.width: 0
+                color: Theme.floatingWindowNestedSurface
+                border.color: Theme.outlineMedium
+                border.width: Theme.layerOutlineWidth
 
                 Column {
                     id: headerContent
@@ -290,8 +291,9 @@ Item {
                 width: parent.width
                 height: root.totalHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
-                border.width: 0
+                color: Theme.floatingWindowNestedSurface
+                border.color: Theme.outlineMedium
+                border.width: Theme.layerOutlineWidth
 
                 Item {
                     id: reorderArea
@@ -423,7 +425,7 @@ Item {
 
                                     DankColorAnimation {
                                         id: surfaceColor
-                                        to: rowItem.dragging ? Theme.secondaryContainer : Theme.withAlpha(Theme.surfaceContainer, rowItem.isEnabled ? 0.7 : 0.4)
+                                        to: rowItem.dragging ? Theme.secondaryContainer : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.floatingWindowForegroundLayers ? Theme.floatingWindowForegroundTransparency * (rowItem.isEnabled ? 0.7 : 0.4) : 0)
                                         duration: Theme.shortDuration
                                     }
 

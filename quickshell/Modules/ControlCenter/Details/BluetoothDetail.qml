@@ -121,7 +121,35 @@ Rectangle {
         }
 
         Item {
-            width: Math.max(0, parent.width - headerText.implicitWidth - scanButton.width - Theme.spacingM)
+            width: Math.max(0, parent.width - headerText.implicitWidth - scanButton.width - Theme.spacingM - (adapterDropdown.visible ? adapterDropdown.width + Theme.spacingS : 0))
+            height: parent.height
+        }
+
+        DankDropdown {
+            id: adapterDropdown
+
+            function adapterLabel(adapter) {
+                const name = adapter.name || adapter.adapterId;
+                const collides = BluetoothService.adapters.some(a => a !== adapter && (a.name || a.adapterId) === name);
+                return collides ? `${name} (${adapter.adapterId})` : name;
+            }
+
+            anchors.verticalCenter: parent.verticalCenter
+            visible: BluetoothService.adapters.length > 1
+            compactMode: true
+            dropdownWidth: 120
+            popupWidth: 200
+            alignPopupRight: true
+            options: BluetoothService.adapters.map(a => adapterLabel(a))
+            currentValue: BluetoothService.adapter ? adapterLabel(BluetoothService.adapter) : ""
+            onValueChanged: value => {
+                const selected = BluetoothService.adapters.find(a => adapterDropdown.adapterLabel(a) === value);
+                SessionData.set("bluetoothAdapterOverride", selected?.dbusPath ?? "");
+            }
+        }
+
+        Item {
+            width: adapterDropdown.visible ? Theme.spacingS : 0
             height: parent.height
         }
 

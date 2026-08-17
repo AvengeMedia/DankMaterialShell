@@ -81,6 +81,8 @@ var SPEC = {
 
     vpnLastConnected: { def: "" },
 
+    bluetoothAdapterOverride: { def: "" },
+
     lastPlayerIdentity: { def: "" },
 
     deviceMaxVolumes: { def: {} },

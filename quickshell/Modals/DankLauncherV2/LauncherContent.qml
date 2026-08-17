@@ -73,9 +73,6 @@ FocusScope {
             if (root.parentModal) {
                 root.parentModal.hide();
             }
-            if (SettingsData.spotlightCloseNiriOverview && NiriService.inOverview) {
-                NiriService.toggleOverview();
-            }
         }
     }
 

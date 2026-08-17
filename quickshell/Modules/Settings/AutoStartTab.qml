@@ -428,7 +428,7 @@ Item {
                         StyledRect {
                             height: 40
                             radius: Theme.cornerRadius
-                            color: root.newEntryDesktopId ? Theme.surfaceContainerHigh : Theme.withAlpha(Theme.surfaceContainerHigh, 0.5)
+                            color: root.newEntryDesktopId ? Theme.floatingWindowFieldColor : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.floatingWindowForegroundLayers ? Theme.floatingWindowForegroundTransparency * 0.5 : 0)
                             LayoutMirroring.enabled: I18n.isRtl
                             LayoutMirroring.childrenInherit: true
 
@@ -667,7 +667,7 @@ Item {
                             width: entriesList.width
                             height: 48
                             radius: Theme.cornerRadius
-                            color: Theme.withAlpha(Theme.surfaceContainer, 0.3)
+                            color: Theme.floatingWindowFieldColor
                             border.width: 0
 
                             Row {

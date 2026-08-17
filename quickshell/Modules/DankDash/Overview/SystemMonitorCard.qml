@@ -6,12 +6,23 @@ import qs.Widgets
 Card {
     id: root
 
-    Component.onCompleted: {
-        DgopService.addRef(["cpu", "memory", "system"]);
-    }
-    Component.onDestruction: {
+    readonly property bool windowVisible: Window.window?.visible ?? false
+    property bool dgopRefHeld: false
+
+    function syncDgopRef(wanted) {
+        if (wanted === dgopRefHeld)
+            return;
+        dgopRefHeld = wanted;
+        if (wanted) {
+            DgopService.addRef(["cpu", "memory", "system"]);
+            return;
+        }
         DgopService.removeRef(["cpu", "memory", "system"]);
     }
+
+    onWindowVisibleChanged: syncDgopRef(windowVisible)
+    Component.onCompleted: syncDgopRef(windowVisible)
+    Component.onDestruction: syncDgopRef(false)
 
     Row {
         anchors.fill: parent

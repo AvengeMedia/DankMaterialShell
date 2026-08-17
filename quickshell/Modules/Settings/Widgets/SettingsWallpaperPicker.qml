@@ -45,7 +45,7 @@ Column {
             width: parent.width - browseWallpaperButton.width - Theme.spacingS
             placeholderText: root.placeholderText
             text: root.path
-            backgroundColor: Theme.surfaceContainerHighest
+            backgroundColor: Theme.floatingWindowFieldColor
             onTextChanged: {
                 if (text !== root.path)
                     root.pathSelected(text);

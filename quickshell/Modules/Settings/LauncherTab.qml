@@ -104,7 +104,7 @@ Item {
                     width: parent.width
                     height: defaultShortcutRow.implicitHeight + Theme.spacingM * 2
                     radius: Theme.cornerRadius
-                    color: defaultShortcutMouse.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHigh, 0.48) : Theme.withAlpha(Theme.surfaceContainer, 0.35)
+                    color: defaultShortcutMouse.containsMouse ? Theme.surfaceHover : Theme.floatingWindowFieldColor
                     border.color: Theme.outlineMedium
                     border.width: 1
 
@@ -197,7 +197,7 @@ Item {
                     width: parent.width
                     height: spotlightShortcutRow.implicitHeight + Theme.spacingM * 2
                     radius: Theme.cornerRadius
-                    color: spotlightShortcutMouse.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHigh, 0.48) : Theme.withAlpha(Theme.surfaceContainer, 0.35)
+                    color: spotlightShortcutMouse.containsMouse ? Theme.surfaceHover : Theme.floatingWindowFieldColor
                     border.color: Theme.outlineMedium
                     border.width: 1
 
@@ -364,8 +364,8 @@ Item {
                         width: parent.width - selectButton.width - Theme.spacingM
                         height: 36
                         radius: Theme.cornerRadius
-                        color: Theme.withAlpha(Theme.surfaceContainer, 0.9)
-                        border.color: Theme.outlineStrong
+                        color: Theme.floatingWindowFieldColor
+                        border.color: Theme.floatingWindowFieldBorderColor
                         border.width: 1
 
                         StyledText {
@@ -778,15 +778,6 @@ Item {
                 visible: CompositorService.isNiri
 
                 SettingsToggleRow {
-                    settingKey: "spotlightCloseNiriOverview"
-                    tags: ["launcher", "niri", "overview", "close", "launch"]
-                    text: I18n.tr("Close Overview on Launch")
-                    description: I18n.tr("Auto-close Niri overview when launching apps.")
-                    checked: SettingsData.spotlightCloseNiriOverview
-                    onToggled: checked => SettingsData.set("spotlightCloseNiriOverview", checked)
-                }
-
-                SettingsToggleRow {
                     settingKey: "niriOverviewOverlayEnabled"
                     tags: ["launcher", "niri", "overview", "overlay", "enable"]
                     text: I18n.tr("Enable Overview Overlay")
@@ -833,7 +824,7 @@ Item {
                             width: parent.width
                             height: 56
                             radius: Theme.cornerRadius
-                            color: Theme.withAlpha(Theme.surfaceContainer, 0.3)
+                            color: Theme.floatingWindowFieldColor
 
                             Row {
                                 anchors.left: parent.left
@@ -1001,7 +992,7 @@ Item {
                                 width: parent.width
                                 height: 52
                                 radius: Theme.cornerRadius
-                                color: visibilityDelegateItem.held ? Theme.surfaceHover : Theme.withAlpha(Theme.surfaceContainer, 0.3)
+                                color: visibilityDelegateItem.held ? Theme.surfaceHover : Theme.floatingWindowFieldColor
 
                                 Row {
                                     anchors.left: parent.left
@@ -1263,7 +1254,7 @@ Item {
                             width: hiddenAppsList.width
                             height: 48
                             radius: Theme.cornerRadius
-                            color: Theme.withAlpha(Theme.surfaceContainer, 0.3)
+                            color: Theme.floatingWindowFieldColor
                             border.width: 0
 
                             Row {
@@ -1374,7 +1365,7 @@ Item {
                             width: overridesList.width
                             height: 48
                             radius: Theme.cornerRadius
-                            color: Theme.withAlpha(Theme.surfaceContainer, 0.3)
+                            color: Theme.floatingWindowFieldColor
                             border.width: 0
 
                             Row {
@@ -1511,7 +1502,7 @@ Item {
                             width: rankedAppsList.width
                             height: 48
                             radius: Theme.cornerRadius
-                            color: Theme.withAlpha(Theme.surfaceContainer, 0.3)
+                            color: Theme.floatingWindowFieldColor
                             border.width: 0
 
                             Row {
