@@ -396,9 +396,8 @@ func checkQtenginePlugin() []checkResult {
 		}
 	}
 
-	// Not verifiable is not broken: qmake and qtpaths ship in development
-	// packages most users do not have. Never warn on a Qt that could not be
-	// interrogated, and never claim it is fine either.
+	// qmake/qtpaths ship in dev packages most users lack — never warn on a Qt
+	// that could not be interrogated, and never claim it is fine either.
 	if len(pluginRoots) == 0 {
 		return []checkResult{{
 			catEnvironment, "qtengine plugin", statusInfo, "Cannot verify (no qmake/qtpaths)",
@@ -407,16 +406,12 @@ func checkQtenginePlugin() []checkResult {
 		}}
 	}
 
-	// Qt searches QT_PLUGIN_PATH in addition to its build-time root, and setting
-	// that override is one of the ways the misplaced-plugin bug gets worked
-	// around, so a plugin found there really is loadable.
+	// Qt also searches QT_PLUGIN_PATH, so a plugin found there is loadable.
 	envRoots := filepath.SplitList(os.Getenv("QT_PLUGIN_PATH"))
 
 	var results []checkResult
 	for _, major := range slices.Sorted(maps.Keys(pluginRoots)) {
-		// qtengine only ships Qt5 and Qt6 plugins, so warning about a Qt4
-		// qmake (still reachable through qtchooser) or a future Qt7 would
-		// report a plugin missing that was never meant to exist.
+		// qtengine only ships Qt5 and Qt6 plugins.
 		if major != "5" && major != "6" {
 			continue
 		}
@@ -921,17 +916,15 @@ func findQtPluginDirs() []string {
 	}
 
 	// Check all paths in QT_PLUGIN_PATH env var (used by NixOS and custom setups)
-	if envPath := os.Getenv("QT_PLUGIN_PATH"); envPath != "" {
-		for dir := range strings.SplitSeq(envPath, ":") {
-			addDir(dir)
-		}
+	for _, dir := range filepath.SplitList(os.Getenv("QT_PLUGIN_PATH")) {
+		addDir(dir)
 	}
 
-	// Try qtpaths
-	for _, cmd := range []string{"qtpaths6", "qtpaths"} {
-		if output, err := exec.Command(cmd, "-query", "QT_INSTALL_PLUGINS").Output(); err == nil {
-			addDir(strings.TrimSpace(string(output)))
+	for _, q := range qtQueryBinaries {
+		if _, err := exec.LookPath(q.bin); err != nil {
+			continue
 		}
+		addDir(qtQuery(q.bin, q.flag, "QT_INSTALL_PLUGINS"))
 	}
 
 	// Fallback: common distro paths

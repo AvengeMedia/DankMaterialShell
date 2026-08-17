@@ -78,7 +78,6 @@ func init() {
 	matugenQueueCmd.Flags().Duration("timeout", 90*time.Second, "Timeout for waiting")
 	matugenPreviewCmd.Flags().String("source-color", "", "Source color used to generate previews")
 	matugenPreviewCmd.Flags().Float64("contrast", 0, "Contrast value from -1 to 1 (0 = standard)")
-	matugenQtengineCmd.Flags().String("config-dir", "", "User config directory")
 	matugenQtengineCmd.Flags().String("icon-theme", "", "Icon theme name")
 }
 
@@ -234,14 +233,9 @@ func runMatugenPreview(cmd *cobra.Command, args []string) {
 }
 
 func runMatugenQtengine(cmd *cobra.Command, args []string) {
-	configDir, _ := cmd.Flags().GetString("config-dir")
 	iconTheme, _ := cmd.Flags().GetString("icon-theme")
 
-	if configDir == "" {
-		log.Fatalf("--config-dir is required")
-	}
-
-	if err := matugen.SyncQtengineConfig(configDir, iconTheme); err != nil {
+	if err := matugen.SyncQtengineConfig(iconTheme); err != nil {
 		log.Fatalf("Failed to sync qtengine config: %v", err)
 	}
 }

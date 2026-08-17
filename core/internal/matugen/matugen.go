@@ -405,7 +405,7 @@ func buildOnce(opts *Options) (bool, error) {
 	// template off there is nothing to point to and the config would name a
 	// scheme DMS no longer generates.
 	if !opts.ShouldSkipTemplate("qtengine") && !opts.ShouldSkipTemplate("kcolorscheme") && QtengineActive() {
-		if err := SyncQtengineConfig(opts.ConfigDir, opts.IconTheme); err != nil {
+		if err := SyncQtengineConfig(opts.IconTheme); err != nil {
 			log.Warnf("Failed to sync qtengine config: %v", err)
 		}
 	}

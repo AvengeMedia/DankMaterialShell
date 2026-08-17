@@ -1523,9 +1523,9 @@ Singleton {
 
         Quickshell.execDetached(["sh", "-lc", script]);
 
-        if (!qtengineActive || !matugenTemplateQtengine)
+        if (!qtengineActive || !runDmsMatugenTemplates || !matugenTemplateQtengine)
             return;
-        Proc.runCommand("updateQtengineIconTheme", [Proc.dmsBin, "matugen", "qtengine", "--config-dir", _configDir, "--icon-theme", qtThemeName], () => {});
+        Proc.runCommand("updateQtengineIconTheme", [Proc.dmsBin, "matugen", "qtengine", "--icon-theme", qtThemeName], () => {});
     }
 
     function scheduleAuthApply() {

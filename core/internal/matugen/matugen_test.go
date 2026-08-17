@@ -792,9 +792,10 @@ func TestSyncQtengineConfig(t *testing.T) {
 			tempDir := t.TempDir()
 			configDir := filepath.Join(tempDir, "config")
 			dataHome := filepath.Join(tempDir, "data")
+			t.Setenv("XDG_CONFIG_HOME", configDir)
 			t.Setenv("XDG_DATA_HOME", dataHome)
 
-			path := QtengineConfigPath(configDir)
+			path := QtengineConfigPath()
 			assert.Equal(t, filepath.Join(configDir, "qtengine", "config.json"), path)
 
 			scheme := filepath.Join(dataHome, "color-schemes", "DankMatugen.colors")
@@ -816,7 +817,7 @@ func TestSyncQtengineConfig(t *testing.T) {
 				}
 			}
 
-			err := SyncQtengineConfig(configDir, tc.iconTheme)
+			err := SyncQtengineConfig(tc.iconTheme)
 
 			if tc.wantErr {
 				assert.Error(t, err)
@@ -895,14 +896,14 @@ func TestCheckTemplatesIncludesQtengine(t *testing.T) {
 
 func TestSyncQtengineConfigBumpsMtime(t *testing.T) {
 	tempDir := t.TempDir()
-	configDir := filepath.Join(tempDir, "config")
+	t.Setenv("XDG_CONFIG_HOME", filepath.Join(tempDir, "config"))
 	t.Setenv("XDG_DATA_HOME", filepath.Join(tempDir, "data"))
 
-	if err := SyncQtengineConfig(configDir, "Papirus-Dark"); err != nil {
+	if err := SyncQtengineConfig("Papirus-Dark"); err != nil {
 		t.Fatalf("first sync failed: %v", err)
 	}
 
-	path := QtengineConfigPath(configDir)
+	path := QtengineConfigPath()
 	before, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatalf("failed to read written config: %v", err)
@@ -913,7 +914,7 @@ func TestSyncQtengineConfigBumpsMtime(t *testing.T) {
 		t.Fatalf("failed to backdate config: %v", err)
 	}
 
-	if err := SyncQtengineConfig(configDir, "Papirus-Dark"); err != nil {
+	if err := SyncQtengineConfig("Papirus-Dark"); err != nil {
 		t.Fatalf("second sync failed: %v", err)
 	}
 

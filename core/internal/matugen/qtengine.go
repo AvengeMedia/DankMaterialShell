@@ -22,24 +22,20 @@ func QtengineActive() bool {
 }
 
 // QtengineConfigPath returns the config qtengine serves both Qt5 and Qt6 from.
-func QtengineConfigPath(configDir string) string {
-	return filepath.Join(configDir, "qtengine", "config.json")
+func QtengineConfigPath() string {
+	return filepath.Join(utils.XDGConfigHome(), "qtengine", "config.json")
 }
 
 // SyncQtengineConfig merges the DMS colour scheme path and icon theme into
 // qtengine's config, preserving every other key, and writes it atomically. The
 // write's mtime bump is what trips qtengine's watcher and repaints running apps.
-//
-// theme.style, theme.font, theme.fontFixed and misc are the user's, and unknown
-// keys must survive qtengine versions we have not seen, hence the map round trip
-// rather than a typed struct.
-func SyncQtengineConfig(configDir, iconTheme string) error {
-	path := QtengineConfigPath(configDir)
+// Map round trip rather than a typed struct so keys from qtengine versions we
+// have not seen survive.
+func SyncQtengineConfig(iconTheme string) error {
+	path := QtengineConfigPath()
 
-	// qtengine treats an empty file and a JSON null as "not set" and falls back
-	// to its defaults, so both are a fresh start here too. Unmarshalling a
-	// top-level null leaves the map nil rather than erroring, which would panic
-	// on write.
+	// Empty file and JSON null are both "not set" to qtengine; a top-level null
+	// unmarshals to a nil map, which would panic on write.
 	cfg := map[string]any{}
 	data, err := os.ReadFile(path)
 	switch {
@@ -65,10 +61,8 @@ func SyncQtengineConfig(configDir, iconTheme string) error {
 		theme = obj
 	}
 
-	// Never the Dark/Light variants: all three templates render the run's active
-	// mode. Only written if the file is there, since qtengine resolves a missing
-	// path to an empty config and resets the palette to its built-in default.
-	// scripts/qt.sh makes the same check before writing this value.
+	// Only written if the file exists: qtengine resolves a missing path to an
+	// empty config and resets the palette to its built-in default.
 	scheme := filepath.Join(utils.XDGDataHome(), "color-schemes", "DankMatugen.colors")
 	if _, err := os.Stat(scheme); err == nil {
 		theme["colorScheme"] = scheme
@@ -89,9 +83,8 @@ func SyncQtengineConfig(configDir, iconTheme string) error {
 		return fmt.Errorf("failed to create %s: %w", dir, err)
 	}
 
-	// Same directory so the rename is atomic. qtengine watches the config file
-	// and its parent and re-adds the path on either signal, so the inode swap
-	// cannot drop the watch; an in-place truncate risks a torn read.
+	// Same directory so the rename is atomic; an in-place truncate risks a torn
+	// read by qtengine's watcher.
 	tmp, err := os.CreateTemp(dir, "config-*.json.tmp")
 	if err != nil {
 		return fmt.Errorf("failed to create temp config in %s: %w", dir, err)
