@@ -3,6 +3,7 @@ package qsipc
 import (
 	"bytes"
 	"encoding/hex"
+	"errors"
 	"testing"
 )
 
@@ -36,5 +37,26 @@ func TestReadResponse(t *testing.T) {
 	}
 	if isVoid || value != `{"ok": true}` {
 		t.Fatalf("unexpected response: value=%q void=%v", value, isVoid)
+	}
+}
+
+func TestReadResponseErrors(t *testing.T) {
+	tests := []struct {
+		name  string
+		index byte
+		want  error
+	}{
+		{name: "target not found", index: responseTargetNotFound, want: ErrTargetNotFound},
+		{name: "function not found", index: responseFunctionNotFound, want: ErrFunctionNotFound},
+		{name: "argument mismatch", index: responseArgumentMismatch, want: ErrArgumentMismatch},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, _, err := readResponse(bytes.NewReader([]byte{tt.index}))
+			if !errors.Is(err, tt.want) {
+				t.Fatalf("readResponse() error = %v, want %v", err, tt.want)
+			}
+		})
 	}
 }

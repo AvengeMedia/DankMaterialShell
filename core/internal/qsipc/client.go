@@ -16,11 +16,22 @@ import (
 
 const (
 	commandStringCall = 3
-	responseCompleted = 5
-	maxStringLength   = 1 << 20
+
+	// Keep these indexes in sync with quickshell-mirror/quickshell:
+	// https://github.com/quickshell-mirror/quickshell/blob/59e9c47/src/io/ipccomm.cpp#L126
+	responseTargetNotFound   = 2
+	responseFunctionNotFound = 3
+	responseArgumentMismatch = 4
+	responseCompleted        = 5
+	maxStringLength          = 1 << 20
 )
 
-var ErrUnsupportedResponse = errors.New("unsupported Quickshell IPC response")
+var (
+	ErrTargetNotFound      = errors.New("Quickshell IPC target not found")
+	ErrFunctionNotFound    = errors.New("Quickshell IPC function not found")
+	ErrArgumentMismatch    = errors.New("Quickshell IPC argument mismatch")
+	ErrUnsupportedResponse = errors.New("unsupported Quickshell IPC response")
+)
 
 // Call invokes a Quickshell IpcHandler without starting a qs child process.
 func Call(socketPath, target, function string, args []string) (string, bool, error) {
@@ -70,7 +81,16 @@ func readResponse(r io.Reader) (string, bool, error) {
 	if err := binary.Read(r, binary.BigEndian, &index); err != nil {
 		return "", false, fmt.Errorf("read Quickshell IPC response: %w", err)
 	}
-	if index != responseCompleted {
+	switch index {
+	case responseTargetNotFound:
+		return "", false, ErrTargetNotFound
+	case responseFunctionNotFound:
+		return "", false, ErrFunctionNotFound
+	case responseArgumentMismatch:
+		return "", false, ErrArgumentMismatch
+	case responseCompleted:
+		break
+	default:
 		return "", false, fmt.Errorf("%w: variant index %d", ErrUnsupportedResponse, index)
 	}
 
