@@ -180,6 +180,28 @@ Singleton {
         cycle(screenName, wallpaperPath, true);
     }
 
+    function cycleFromFolder(screenName, folderPath) {
+        if (!folderPath)
+            return;
+
+        if (screenName && monitorProcessComponent.status === Component.Ready) {
+            var process = monitorProcessFor(screenName);
+            process.command = findCommand(folderPath);
+            process.targetScreenName = screenName;
+            process.currentWallpaper = "";
+            process.goToPrevious = false;
+            process.running = true;
+            return;
+        }
+
+        var globalProcess = cyclingProcess;
+        globalProcess.command = findCommand(folderPath);
+        globalProcess.targetScreenName = screenName || "";
+        globalProcess.currentWallpaper = "";
+        globalProcess.goToPrevious = false;
+        globalProcess.running = true;
+    }
+
     function resetScheduleAfterManual() {
         if (!serverSchedulingAvailable)
             return;

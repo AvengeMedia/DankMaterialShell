@@ -1380,9 +1380,8 @@ Item {
             folderMode: true
             showHiddenFiles: true
             onFileSelected: path => {
-                var folderPath = path.startsWith("file://") ? path.substring(7) : path;
                 var targetMonitor = SessionData.perMonitorWallpaper ? selectedMonitorName : "";
-                WallpaperCyclingService.cycleToNextWallpaper(targetMonitor, folderPath + "/dummy.jpg");
+                WallpaperCyclingService.cycleFromFolder(targetMonitor, path);
                 close();
             }
         }
