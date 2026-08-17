@@ -53,7 +53,7 @@ Singleton {
 
     function closeNiriOverviewOnWindowFocus() {
         if (SettingsData.closeNiriOverviewOnWindowFocus && isNiri && NiriService.inOverview)
-            NiriService.toggleOverview();
+            NiriService.closeOverview();
     }
 
     function activateToplevel(toplevel) {

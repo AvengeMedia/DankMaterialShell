@@ -2890,31 +2890,6 @@
     ]
   },
   {
-    "section": "niriOverviewOverlayEnabled",
-    "label": "Enable Overview Overlay",
-    "tabIndex": 9,
-    "category": "Launcher",
-    "keywords": [
-      "another",
-      "app drawer",
-      "app menu",
-      "applications",
-      "disable",
-      "drawer",
-      "enable",
-      "launcher",
-      "menu",
-      "niri",
-      "overlay",
-      "overview",
-      "show",
-      "start",
-      "start menu",
-      "typing"
-    ],
-    "description": "Show launcher overlay when typing in Niri overview. Disable to use another launcher."
-  },
-  {
     "section": "appLauncherGridColumns",
     "label": "Grid Columns",
     "tabIndex": 9,
@@ -3090,29 +3065,31 @@
     "description": "Show darkened overlay behind modal dialogs"
   },
   {
-    "section": "closeNiriOverviewOnWindowFocus",
-    "label": "Overview",
-    "tabIndex": 37,
-    "category": "Personalization",
+    "section": "niriOverviewOverlayEnabled",
+    "label": "Niri Integration",
+    "tabIndex": 9,
+    "category": "Launcher",
     "keywords": [
-      "apps",
-      "auto",
-      "close",
-      "dock",
+      "another",
+      "app drawer",
+      "app menu",
+      "applications",
+      "disable",
       "drawer",
-      "focus",
+      "enable",
       "integration",
-      "launch",
       "launcher",
-      "launching",
       "menu",
       "niri",
+      "overlay",
       "overview",
-      "settings",
-      "start"
+      "show",
+      "start",
+      "start menu",
+      "typing"
     ],
-    "icon": "overview",
-    "description": "Auto-close Niri overview when DMS launches or focuses a window.",
+    "icon": "open_in_new",
+    "description": "Show launcher overlay when typing in Niri overview. Disable to use another launcher.",
     "conditionKey": "isNiri"
   },
   {
@@ -10099,6 +10076,32 @@
     "description": "Width of window border and focus ring"
   },
   {
+    "section": "closeNiriOverviewOnWindowFocus",
+    "label": "Close Niri Overview on Window Focus",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "auto",
+      "close",
+      "custom",
+      "customize",
+      "dock",
+      "focus",
+      "focuses",
+      "launch",
+      "launcher",
+      "launches",
+      "niri",
+      "overview",
+      "personal",
+      "personalization",
+      "settings",
+      "window"
+    ],
+    "description": "Auto-close Niri overview when DMS launches or focuses a window."
+  },
+  {
     "section": "hyprlandLayoutBarXrayEnabled",
     "label": "Frame Xray",
     "tabIndex": 37,
@@ -10509,6 +10512,34 @@
       "window"
     ],
     "description": "Use custom window radius instead of theme radius"
+  },
+  {
+    "section": "niriOverview",
+    "label": "Overview",
+    "tabIndex": 37,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "auto",
+      "close",
+      "custom",
+      "customize",
+      "dock",
+      "focus",
+      "focuses",
+      "launch",
+      "launcher",
+      "launches",
+      "niri",
+      "overview",
+      "personal",
+      "personalization",
+      "settings",
+      "window"
+    ],
+    "icon": "overview",
+    "description": "Auto-close Niri overview when DMS launches or focuses a window.",
+    "conditionKey": "isNiri"
   },
   {
     "section": "hyprlandResizeOnBorder",
