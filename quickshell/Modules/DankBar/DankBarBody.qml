@@ -559,7 +559,8 @@ Item {
         shouldHideForWindows = filtered.length > 0;
     }
 
-    property real effectiveSpacing: (FrameTransitionState.effectiveFrameEnabled && usesFrameBarChrome) ? 0 : ((flattenForMaximizedWindow && hasMaximizedToplevel) ? 0 : (barConfig?.spacing ?? 4))
+    readonly property bool edgeAttached: (barConfig?.attachToScreenEdge ?? false) && !(FrameTransitionState.effectiveFrameEnabled && usesFrameBarChrome)
+    property real effectiveSpacing: (FrameTransitionState.effectiveFrameEnabled && usesFrameBarChrome) ? 0 : ((edgeAttached || (flattenForMaximizedWindow && hasMaximizedToplevel)) ? 0 : (barConfig?.spacing ?? 4))
 
     Behavior on effectiveSpacing {
         enabled: barWindow.hostWindow?.visible ?? false
@@ -571,6 +572,13 @@ Item {
 
     readonly property int notificationCount: NotificationService.notifications.length
     readonly property real effectiveBarThickness: (FrameTransitionState.effectiveFrameEnabled && usesFrameBarChrome) ? SettingsData.frameBarSize : Theme.snap(Math.max(barWindow.widgetThickness + (barConfig?.innerPadding ?? 4) + 4, Theme.barHeight - 4 - (8 - (barConfig?.innerPadding ?? 4))), _dpr)
+    readonly property real effectiveBarLengthPadding: {
+        if ((FrameTransitionState.effectiveFrameEnabled && usesFrameBarChrome) || (flattenForMaximizedWindow && hasMaximizedToplevel))
+            return 0;
+        const pad = Math.max(0, barConfig?.barLengthPadding ?? 0);
+        const length = isVertical ? height : width;
+        return length > 0 ? Math.min(pad, Math.max(0, length / 2 - effectiveSpacing)) : pad;
+    }
     readonly property bool effectiveOpenOnOverview: FrameTransitionState.effectiveFrameEnabled ? SettingsData.frameShowOnOverview : (barConfig?.openOnOverview ?? false)
     readonly property real widgetThickness: Theme.snap(Math.max(20, 26 + (barConfig?.innerPadding ?? 4) * 0.6), _dpr)
 
@@ -766,6 +774,7 @@ Item {
         id: inputMask
 
         readonly property int barThickness: Theme.px(barWindow.effectiveBarThickness + barWindow.effectiveSpacing, barWindow._dpr)
+        readonly property int lengthPaddingPx: Theme.px(barWindow.effectiveBarLengthPadding, barWindow._dpr)
 
         readonly property bool inOverviewWithShow: CompositorService.isNiri && NiriService.inOverview && barWindow.effectiveOpenOnOverview
         readonly property bool effectiveVisible: (barConfig?.visible ?? true) || inOverviewWithShow
@@ -775,7 +784,7 @@ Item {
 
         x: {
             if (!axis.isVertical) {
-                return 0;
+                return lengthPaddingPx;
             } else {
                 switch (barPos) {
                 case SettingsData.Position.Left:
@@ -789,7 +798,7 @@ Item {
         }
         y: {
             if (axis.isVertical) {
-                return 0;
+                return lengthPaddingPx;
             } else {
                 switch (barPos) {
                 case SettingsData.Position.Top:
@@ -801,8 +810,8 @@ Item {
                 }
             }
         }
-        width: axis.isVertical ? maskThickness : parent.width
-        height: axis.isVertical ? parent.height : maskThickness
+        width: axis.isVertical ? maskThickness : parent.width - lengthPaddingPx * 2
+        height: axis.isVertical ? parent.height - lengthPaddingPx * 2 : maskThickness
     }
 
     readonly property bool clickThroughEnabled: barConfig?.clickThrough ?? false
@@ -1074,11 +1083,12 @@ Item {
                 Item {
                     id: barUnitInset
                     property int spacingPx: Theme.px(barWindow.effectiveSpacing, barWindow._dpr)
+                    property int lengthPaddingPx: Theme.px(barWindow.effectiveBarLengthPadding, barWindow._dpr)
                     anchors.fill: parent
-                    anchors.leftMargin: !barWindow.isVertical ? spacingPx : (axis.edge === "left" ? spacingPx : 0)
-                    anchors.rightMargin: !barWindow.isVertical ? spacingPx : (axis.edge === "right" ? spacingPx : 0)
-                    anchors.topMargin: barWindow.isVertical ? (barWindow.hasAdjacentTopBar ? 0 : spacingPx) : (axis.outerVisualEdge() === "bottom" ? 0 : spacingPx)
-                    anchors.bottomMargin: barWindow.isVertical ? (barWindow.hasAdjacentBottomBar ? 0 : spacingPx) : (axis.outerVisualEdge() === "bottom" ? spacingPx : 0)
+                    anchors.leftMargin: !barWindow.isVertical ? spacingPx + lengthPaddingPx : (axis.edge === "left" ? spacingPx : 0)
+                    anchors.rightMargin: !barWindow.isVertical ? spacingPx + lengthPaddingPx : (axis.edge === "right" ? spacingPx : 0)
+                    anchors.topMargin: barWindow.isVertical ? (barWindow.hasAdjacentTopBar ? 0 : spacingPx) + lengthPaddingPx : (axis.outerVisualEdge() === "bottom" ? 0 : spacingPx)
+                    anchors.bottomMargin: barWindow.isVertical ? (barWindow.hasAdjacentBottomBar ? 0 : spacingPx) + lengthPaddingPx : (axis.outerVisualEdge() === "bottom" ? spacingPx : 0)
 
                     BarCanvas {
                         id: barBackground

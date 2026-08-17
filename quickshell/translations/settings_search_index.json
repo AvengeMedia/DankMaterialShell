@@ -788,6 +788,29 @@
     "description": "Automatically hide the bar when the pointer moves away"
   },
   {
+    "section": "barLengthPadding",
+    "label": "Bar Length Padding",
+    "tabIndex": 3,
+    "category": "Dank Bar",
+    "keywords": [
+      "bar",
+      "both",
+      "dank",
+      "ends",
+      "length",
+      "padding",
+      "panel",
+      "reduce",
+      "shorter",
+      "size",
+      "statusbar",
+      "taskbar",
+      "topbar",
+      "visible"
+    ],
+    "description": "Reduce the visible bar length from both ends"
+  },
+  {
     "section": "barClickThrough",
     "label": "Click Through",
     "tabIndex": 3,
@@ -830,6 +853,34 @@
       "topbar"
     ],
     "icon": "dashboard"
+  },
+  {
+    "section": "barCornerStyle",
+    "label": "Corner Style",
+    "tabIndex": 3,
+    "category": "Dank Bar",
+    "keywords": [
+      "attached",
+      "bar",
+      "choose",
+      "corner",
+      "corners",
+      "dank",
+      "edge",
+      "flush",
+      "meets",
+      "panel",
+      "radius",
+      "round",
+      "rounded",
+      "screen",
+      "square",
+      "statusbar",
+      "style",
+      "taskbar",
+      "topbar"
+    ],
+    "description": "Choose how the bar meets the screen edge"
   },
   {
     "section": "barDisplay",
@@ -1198,29 +1249,6 @@
       "topbar"
     ],
     "description": "Adjust the bar height via inner padding"
-  },
-  {
-    "section": "barSquareCorners",
-    "label": "Square Corners",
-    "tabIndex": 3,
-    "category": "Dank Bar",
-    "keywords": [
-      "bar",
-      "corner",
-      "corners",
-      "dank",
-      "panel",
-      "radius",
-      "remove",
-      "round",
-      "rounded",
-      "rounding",
-      "square",
-      "statusbar",
-      "taskbar",
-      "topbar"
-    ],
-    "description": "Remove corner rounding from the bar"
   },
   {
     "section": "barAutoHideStrict",
@@ -2425,22 +2453,22 @@
     "keywords": [
       "background",
       "bar",
-      "corner",
       "corners",
       "dank",
+      "fully",
+      "invisible",
+      "make",
       "panel",
       "radius",
-      "remove",
       "round",
       "rounded",
-      "rounding",
-      "square",
       "statusbar",
       "taskbar",
-      "topbar"
+      "topbar",
+      "transparent"
     ],
     "icon": "rounded_corner",
-    "description": "Remove corner rounding from the bar"
+    "description": "Make the bar background fully transparent"
   },
   {
     "section": "barAppearance",

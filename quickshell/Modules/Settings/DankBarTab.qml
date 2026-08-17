@@ -136,7 +136,9 @@ Item {
             rightWidgets: defaultBar.rightWidgets || [],
             spacing: defaultBar.spacing ?? 4,
             innerPadding: defaultBar.innerPadding ?? 4,
+            barLengthPadding: defaultBar.barLengthPadding ?? 0,
             bottomGap: defaultBar.bottomGap ?? 0,
+            attachToScreenEdge: defaultBar.attachToScreenEdge ?? false,
             transparency: defaultBar.transparency ?? 1.0,
             widgetTransparency: defaultBar.widgetTransparency ?? 1.0,
             squareCorners: defaultBar.squareCorners ?? false,
@@ -1029,6 +1031,30 @@ Item {
                     }
                 }
 
+                SettingsSliderRow {
+                    id: barLengthPaddingSlider
+                    settingKey: "barLengthPadding"
+                    visible: !SettingsData.frameEnabled
+                    text: I18n.tr("Bar Length Padding")
+                    description: I18n.tr("Reduce the visible bar length from both ends")
+                    tags: ["bar", "length", "padding", "size", "shorter"]
+                    unit: "px"
+                    minimum: 0
+                    maximum: 512
+                    defaultValue: 0
+                    value: selectedBarConfig?.barLengthPadding ?? 0
+                    onSliderDragFinished: finalValue => SettingsData.updateBarConfig(selectedBarId, {
+                            barLengthPadding: finalValue
+                        })
+
+                    Binding {
+                        target: barLengthPaddingSlider
+                        property: "value"
+                        value: selectedBarConfig?.barLengthPadding ?? 0
+                        restoreMode: Binding.RestoreBinding
+                    }
+                }
+
                 SettingsToggleRow {
                     visible: !SettingsData.frameEnabled
                     text: I18n.tr("Sync Bar Inset Padding")
@@ -1167,18 +1193,6 @@ Item {
                 }
 
                 SettingsToggleRow {
-                    settingKey: "barSquareCorners"
-                    tags: ["square", "corners", "rounding"]
-                    text: I18n.tr("Square Corners")
-                    description: I18n.tr("Remove corner rounding from the bar")
-                    visible: !SettingsData.frameEnabled
-                    checked: selectedBarConfig?.squareCorners ?? false
-                    onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
-                            squareCorners: checked
-                        })
-                }
-
-                SettingsToggleRow {
                     settingKey: "barNoBackground"
                     tags: ["transparent", "background", "invisible"]
                     text: I18n.tr("No Background")
@@ -1228,6 +1242,30 @@ Item {
                     height: 1
                     color: Theme.outline
                     opacity: 0.15
+                }
+
+                SettingsButtonGroupRow {
+                    settingKey: "barCornerStyle"
+                    tags: ["rounded", "attached", "square", "corners", "edge", "screen", "flush"]
+                    text: I18n.tr("Corner Style")
+                    description: I18n.tr("Choose how the bar meets the screen edge")
+                    visible: !SettingsData.frameEnabled
+                    model: [I18n.tr("Rounded", "bar corner style option"), I18n.tr("Flush", "bar corner style option"), I18n.tr("Square", "bar corner style option")]
+                    currentIndex: {
+                        if (selectedBarConfig?.squareCorners ?? false)
+                            return 2;
+                        if (selectedBarConfig?.attachToScreenEdge ?? false)
+                            return 1;
+                        return 0;
+                    }
+                    onSelectionChanged: (index, selected) => {
+                        if (!selected)
+                            return;
+                        SettingsData.updateBarConfig(selectedBarId, {
+                            squareCorners: index === 2,
+                            attachToScreenEdge: index === 1
+                        });
+                    }
                 }
 
                 SettingsToggleRow {
