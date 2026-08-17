@@ -167,6 +167,25 @@ Singleton {
         markRead();
     }
 
+    // openChatAt opens a conversation positioned around a moment in time,
+    // used when jumping to a search result.
+    //
+    // Loads the page ending just after the target rather than the newest page,
+    // so the message the user picked is actually on screen.
+    function openChatAt(provider, chatId, ts) {
+        if (!provider || !chatId)
+            return;
+
+        root.activeProvider = provider;
+        root.activeChatId = chatId;
+        root.messages = [];
+        root.hasMoreHistory = false;
+
+        setFocus(provider, chatId);
+        loadHistory(ts > 0 ? ts + 1 : 0);
+        markRead();
+    }
+
     function closeChat() {
         root.activeProvider = "";
         root.activeChatId = "";
@@ -278,6 +297,44 @@ Singleton {
                 root.sendFailed(response.error);
                 ToastService.showError(I18n.tr("Attachment not sent"), response.error);
             }
+        });
+    }
+
+    // revoke deletes a message for everyone. Only offered where the provider
+    // declared it can, since most services allow it only within a time window.
+    function revoke(provider, chatId, messageId) {
+        if (!available)
+            return;
+        DMSService.sendRequest("chat.revoke", {
+            "provider": provider,
+            "chatId": chatId,
+            "messageId": messageId
+        }, response => {
+            if (response.error) {
+                root.log.warn("delete failed:", response.error);
+                ToastService.showError(I18n.tr("Message not deleted"), response.error);
+            }
+        });
+    }
+
+    // forward re-sends a message's text into another conversation.
+    //
+    // Sent as a fresh message rather than a provider-native forward: the
+    // contract has no forward verb, and every provider can send text.
+    function forward(targetProvider, targetChatId, text) {
+        if (!available || !text)
+            return;
+        DMSService.sendRequest("chat.send", {
+            "provider": targetProvider,
+            "chatId": targetChatId,
+            "text": text
+        }, response => {
+            if (response.error) {
+                root.log.warn("forward failed:", response.error);
+                ToastService.showError(I18n.tr("Message not forwarded"), response.error);
+                return;
+            }
+            ToastService.showInfo(I18n.tr("Message forwarded"));
         });
     }
 

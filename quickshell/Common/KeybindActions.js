@@ -27,6 +27,7 @@ const DMS_ACTIONS = [
     { id: "spawn dms ipc call chats open", label: "Chats: Open" },
     { id: "spawn dms ipc call chats close", label: "Chats: Close" },
     { id: "spawn dms ipc call chats cycle", label: "Chats: Cycle unread" },
+    { id: "spawn dms ipc call chats cyclePrev", label: "Chats: Cycle unread backwards" },
     { id: "spawn dms ipc call clipboard toggle", label: "Clipboard: Toggle" },
     { id: "spawn dms ipc call clipboard open", label: "Clipboard: Open" },
     { id: "spawn dms ipc call clipboard close", label: "Clipboard: Close" },

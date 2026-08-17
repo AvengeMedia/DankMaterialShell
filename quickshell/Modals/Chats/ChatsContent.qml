@@ -24,6 +24,28 @@ FocusScope {
 
     readonly property bool hasProviders: ChatService.providers.length > 0
 
+    // Message search results for the current query. The chat list filters
+    // locally as you type; searching message bodies means asking the backend,
+    // which is debounced so a query is not sent per keystroke.
+    property var messageHits: []
+    property bool searching: false
+
+    readonly property bool showingResults: searchField.text.trim().length >= 2 && messageHits.length > 0
+
+    function runSearch() {
+        const query = searchField.text.trim();
+        if (query.length < 2) {
+            root.messageHits = [];
+            return;
+        }
+
+        root.searching = true;
+        ChatService.search(query, (messages, chats) => {
+            root.searching = false;
+            root.messageHits = messages || [];
+        });
+    }
+
     // The first enabled provider waiting to be signed in, if any. Sign-in takes
     // over the conversation pane, since nothing else there is actionable until
     // it is dealt with.
@@ -55,6 +77,12 @@ FocusScope {
             out.push(chat);
         }
         return out;
+    }
+
+    Timer {
+        id: searchDebounce
+        interval: 250
+        onTriggered: root.runSearch()
     }
 
     Keys.onEscapePressed: event => {
@@ -89,10 +117,11 @@ FocusScope {
                     DankTextField {
                         id: searchField
                         width: parent.width - syncIndicator.width - Theme.spacingS
-                        placeholderText: I18n.tr("Search conversations")
+                        placeholderText: I18n.tr("Search conversations and messages")
                         leftIconName: "search"
                         showClearButton: true
 
+                        onTextChanged: searchDebounce.restart()
                         Keys.onDownPressed: chatList.forceActiveFocus()
                     }
 
@@ -168,14 +197,30 @@ FocusScope {
                 provider: root.authProvider
             }
 
+            // Message results take over the conversation pane while searching:
+            // the point of the search is to find a message, not to keep reading
+            // the one already open.
+            ChatSearchResults {
+                anchors.fill: parent
+                visible: root.authProvider === null && root.showingResults
+                hits: root.messageHits
+                query: searchField.text.trim()
+
+                onHitChosen: (provider, chatId, ts) => {
+                    searchField.text = "";
+                    root.messageHits = [];
+                    ChatService.openChatAt(provider, chatId, ts);
+                }
+            }
+
             ConversationView {
                 anchors.fill: parent
-                visible: root.authProvider === null && ChatService.hasActiveChat
+                visible: root.authProvider === null && !root.showingResults && ChatService.hasActiveChat
             }
 
             StyledText {
                 anchors.centerIn: parent
-                visible: root.authProvider === null && !ChatService.hasActiveChat
+                visible: root.authProvider === null && !root.showingResults && !ChatService.hasActiveChat
                 text: I18n.tr("Select a conversation")
                 font.pixelSize: Theme.fontSizeMedium
                 color: Theme.surfaceVariantText

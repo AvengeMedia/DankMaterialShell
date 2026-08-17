@@ -24,6 +24,7 @@ const (
 	MethodSearch     = "search"
 	MethodLogin      = "login"
 	MethodLogout     = "logout"
+	MethodRevoke     = "revoke"
 	MethodShutdown   = "shutdown"
 )
 
@@ -136,37 +137,45 @@ func (f bridgeFrame) isReply() bool { return f.Event == "" && f.ID != 0 }
 // from "the bridge says zero" -- the former must not clear a badge the host
 // derived itself.
 type wireChat struct {
-	ID           string   `json:"id"`
-	Name         string   `json:"name"`
-	IsGroup      bool     `json:"isGroup"`
-	LastTS       int64    `json:"lastTs"`
-	LastText     string   `json:"lastText"`
-	Unread       *int     `json:"unread"`
-	Archived     bool     `json:"archived"`
-	Muted        bool     `json:"muted"`
+	ID       string `json:"id"`
+	Name     string `json:"name"`
+	IsGroup  bool   `json:"isGroup"`
+	LastTS   int64  `json:"lastTs"`
+	LastText string `json:"lastText"`
+	Unread   *int   `json:"unread"`
+	// Pointers so "the bridge did not mention this" is distinguishable from
+	// "the bridge says false" -- otherwise a partial update unarchives a chat.
+	Archived     *bool    `json:"archived"`
+	Muted        *bool    `json:"muted"`
 	AvatarPath   string   `json:"avatarPath"`
 	Subject      string   `json:"subject"`
 	Participants []string `json:"participants"`
 	Folder       string   `json:"folder"`
+	// Handles are the other identifiers this conversation answers to -- a phone
+	// number, an email address, a username. Only the bridge knows them.
+	Handles []string `json:"handles"`
 }
 
 // wireMessage is a message as a bridge sends it. Media arrives as a path the
 // bridge wrote, a small base64 thumbnail, or a ref to fetch later -- never as
 // a full inline payload.
 type wireMessage struct {
-	ID         string   `json:"id"`
-	ChatID     string   `json:"chatId"`
-	TS         int64    `json:"ts"`
-	FromMe     bool     `json:"fromMe"`
-	SenderID   string   `json:"senderId"`
-	SenderName string   `json:"senderName"`
-	Kind       string   `json:"kind"`
-	Text       string   `json:"text"`
-	BodyHTML   string   `json:"bodyHtml"`
-	Status     string   `json:"status"`
-	ReplyTo    string   `json:"replyTo"`
-	CC         []string `json:"cc"`
-	BCC        []string `json:"bcc"`
+	ID         string `json:"id"`
+	ChatID     string `json:"chatId"`
+	TS         int64  `json:"ts"`
+	FromMe     bool   `json:"fromMe"`
+	SenderID   string `json:"senderId"`
+	SenderName string `json:"senderName"`
+	// SenderAvatarPath is optional; groups without per-sender pictures simply
+	// fall back to an initial.
+	SenderAvatarPath string   `json:"senderAvatarPath"`
+	Kind             string   `json:"kind"`
+	Text             string   `json:"text"`
+	BodyHTML         string   `json:"bodyHtml"`
+	Status           string   `json:"status"`
+	ReplyTo          string   `json:"replyTo"`
+	CC               []string `json:"cc"`
+	BCC              []string `json:"bcc"`
 
 	MediaPath  string `json:"mediaPath"`
 	MediaBytes string `json:"mediaBytes"`

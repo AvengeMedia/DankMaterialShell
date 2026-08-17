@@ -99,12 +99,11 @@ func (m *Manager) ingestChats(ctx context.Context, provider string, chats []wire
 			IsGroup:      wc.IsGroup,
 			LastTS:       wc.LastTS,
 			LastText:     wc.LastText,
-			Archived:     wc.Archived,
-			Muted:        wc.Muted,
 			AvatarPath:   wc.AvatarPath,
 			Subject:      wc.Subject,
 			Participants: wc.Participants,
 			Folder:       wc.Folder,
+			Handles:      wc.Handles,
 		}
 
 		// A bridge that did not mention unread must not clear a count the host
@@ -116,6 +115,20 @@ func (m *Manager) ingestChats(ctx context.Context, provider string, chats []wire
 
 		if err := m.store.UpsertChat(ctx, c); err != nil {
 			log.Warnf("chat: failed to store chat %s/%s: %v", provider, wc.ID, err)
+			continue
+		}
+
+		// Only when the bridge actually stated them, so a partial update does
+		// not quietly undo what the user chose.
+		if wc.Archived != nil {
+			if err := m.store.SetArchived(ctx, provider, wc.ID, *wc.Archived); err != nil {
+				log.Warnf("chat: failed to set archived on %s/%s: %v", provider, wc.ID, err)
+			}
+		}
+		if wc.Muted != nil {
+			if err := m.store.SetMuted(ctx, provider, wc.ID, *wc.Muted); err != nil {
+				log.Warnf("chat: failed to set muted on %s/%s: %v", provider, wc.ID, err)
+			}
 		}
 	}
 }
@@ -162,27 +175,28 @@ func (m *Manager) ingestMessages(ctx context.Context, provider string, msgs []wi
 // materialize turns a wire message into a stored one, resolving its media.
 func (m *Manager) materialize(provider string, wm wireMessage) chat.Message {
 	msg := chat.Message{
-		Provider:   provider,
-		ChatID:     wm.ChatID,
-		ID:         wm.ID,
-		TS:         wm.TS,
-		FromMe:     wm.FromMe,
-		SenderID:   wm.SenderID,
-		SenderName: wm.SenderName,
-		Kind:       wm.Kind,
-		Text:       wm.Text,
-		BodyHTML:   wm.BodyHTML,
-		Status:     wm.Status,
-		ReplyTo:    wm.ReplyTo,
-		CC:         wm.CC,
-		BCC:        wm.BCC,
-		MediaRef:   wm.MediaRef,
-		MediaMime:  wm.MediaMime,
-		MediaW:     wm.MediaW,
-		MediaH:     wm.MediaH,
-		FileName:   wm.FileName,
-		FileSize:   wm.FileSize,
-		Duration:   wm.Duration,
+		Provider:         provider,
+		ChatID:           wm.ChatID,
+		ID:               wm.ID,
+		TS:               wm.TS,
+		FromMe:           wm.FromMe,
+		SenderID:         wm.SenderID,
+		SenderName:       wm.SenderName,
+		SenderAvatarPath: wm.SenderAvatarPath,
+		Kind:             wm.Kind,
+		Text:             wm.Text,
+		BodyHTML:         wm.BodyHTML,
+		Status:           wm.Status,
+		ReplyTo:          wm.ReplyTo,
+		CC:               wm.CC,
+		BCC:              wm.BCC,
+		MediaRef:         wm.MediaRef,
+		MediaMime:        wm.MediaMime,
+		MediaW:           wm.MediaW,
+		MediaH:           wm.MediaH,
+		FileName:         wm.FileName,
+		FileSize:         wm.FileSize,
+		Duration:         wm.Duration,
 	}
 
 	if msg.TS == 0 {

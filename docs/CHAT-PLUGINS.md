@@ -194,6 +194,15 @@ everyone rather than removing the row.
 | `subject` | string | mail-shaped providers — the thread subject |
 | `participants` | string[] | mail-shaped providers — addresses on the thread |
 | `folder` | string | mail-shaped providers — `INBOX`, a label, etc. |
+| `handles` | string[] | other identifiers this conversation answers to — a phone number, an email address, a username |
+
+**Handles matter more than they look.** DMS lets a user open a conversation by
+typing a phone number, an address or a username, and it finds them by matching
+`handles` — it never parses your `id`, because an id is yours to shape. WhatsApp
+is the cautionary example: it addresses contacts by LID now, so there is no
+phone number anywhere in the id, and anything that dug through ids for one would
+silently find nothing. If your service has a reachable identifier, publish it
+here.
 
 ### Message
 

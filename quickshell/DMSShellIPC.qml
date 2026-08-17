@@ -1493,6 +1493,22 @@ Item {
             return `CHATS_OPEN_SUCCESS: ${provider}/${chatId}`;
         }
 
+        // Opens one conversation in a popout, resolved from whatever the caller
+        // has: a name, a phone number, or provider:chatId. Resolution is
+        // asynchronous, so this reports that it started rather than what it
+        // found -- an ambiguous query shows a picker.
+        function popout(query: string): string {
+            if (!query)
+                return "CHATS_POPOUT_FAILED: a name, number or provider:chatId is required";
+            PopoutService.openChatPopout(query);
+            return `CHATS_POPOUT_OPENING: ${query}`;
+        }
+
+        function closePopout(): string {
+            PopoutService.closeChatPopout();
+            return "CHATS_POPOUT_CLOSE_SUCCESS";
+        }
+
         // Advances the cross-provider rotation, for a Super+Tab style binding.
         function cycle(): string {
             const next = ChatCycleService.next();
@@ -1500,6 +1516,15 @@ Item {
                 return "CHATS_NO_UNREAD";
             PopoutService.openChat(next.provider, next.chatId);
             return `CHATS_CYCLE_SUCCESS: ${next.provider}/${next.chatId}`;
+        }
+
+        // The same rotation walked backwards, for Super+Shift+Tab.
+        function cyclePrev(): string {
+            const previous = ChatCycleService.previous();
+            if (!previous)
+                return "CHATS_NO_UNREAD";
+            PopoutService.openChat(previous.provider, previous.chatId);
+            return `CHATS_CYCLE_SUCCESS: ${previous.provider}/${previous.chatId}`;
         }
 
         function status(): string {

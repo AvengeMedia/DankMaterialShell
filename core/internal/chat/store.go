@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS chats (
   subject      TEXT NOT NULL DEFAULT '',
   participants TEXT NOT NULL DEFAULT '',
   folder       TEXT NOT NULL DEFAULT '',
+  handles      TEXT NOT NULL DEFAULT '',
   PRIMARY KEY (provider, id)
 );
 
@@ -42,6 +43,7 @@ CREATE TABLE IF NOT EXISTS messages (
   from_me     INTEGER NOT NULL DEFAULT 0,
   sender_id   TEXT NOT NULL DEFAULT '',
   sender_name TEXT NOT NULL DEFAULT '',
+  sender_avatar_path TEXT NOT NULL DEFAULT '',
   kind        TEXT NOT NULL DEFAULT 'text',
   text        TEXT NOT NULL DEFAULT '',
   body_html   TEXT NOT NULL DEFAULT '',
@@ -99,7 +101,10 @@ END;
 // migrations are applied unconditionally on open; "duplicate column" is the
 // expected outcome on an already-current database and is swallowed. Additive
 // only -- never drop or rename, since an older dms may still open this file.
-var migrations = []string{}
+var migrations = []string{
+	`ALTER TABLE messages ADD COLUMN sender_avatar_path TEXT NOT NULL DEFAULT ''`,
+	`ALTER TABLE chats ADD COLUMN handles TEXT NOT NULL DEFAULT ''`,
+}
 
 // HistoryStore is the message store. Safe for concurrent use.
 type HistoryStore struct {
@@ -154,18 +159,24 @@ func (s *HistoryStore) Close() error { return s.db.Close() }
 
 // UpsertChat merges a chat, leaving fields the caller left blank untouched.
 //
-// Bridges routinely send partial chats -- a name-only update, an archive flag
-// flip -- so a blind overwrite would erase whatever the previous event knew.
+// Bridges routinely send partial chats -- a name-only update, a handles-only
+// backfill -- so a blind overwrite would erase whatever the previous event
+// knew. Archived and muted are not settable here at all; see the note in the
+// conflict clause.
 func (s *HistoryStore) UpsertChat(ctx context.Context, c Chat) error {
 	participants, _ := json.Marshal(c.Participants)
 	if c.Participants == nil {
 		participants = []byte("")
 	}
+	handles, _ := json.Marshal(c.Handles)
+	if c.Handles == nil {
+		handles = []byte("")
+	}
 
 	_, err := s.db.ExecContext(ctx, `
 INSERT INTO chats (provider, id, name, is_group, last_ts, last_text, unread, muted, archived,
-                   read_upto, avatar_path, subject, participants, folder)
-VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                   read_upto, avatar_path, subject, participants, folder, handles)
+VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 ON CONFLICT(provider, id) DO UPDATE SET
   name         = CASE WHEN excluded.name         != '' THEN excluded.name         ELSE chats.name         END,
   is_group     = excluded.is_group OR chats.is_group,
@@ -173,16 +184,19 @@ ON CONFLICT(provider, id) DO UPDATE SET
   last_text    = CASE WHEN excluded.last_ts >= chats.last_ts AND excluded.last_text != ''
                       THEN excluded.last_text ELSE chats.last_text END,
   unread       = CASE WHEN excluded.unread >= 0 THEN excluded.unread ELSE chats.unread END,
-  muted        = excluded.muted,
-  archived     = excluded.archived,
+  -- muted and archived are deliberately absent: a Go bool cannot say "unset",
+  -- so an upsert carrying only a name would silently unarchive the chat. They
+  -- change through SetArchived and SetMuted, which are only called when a
+  -- bridge actually said so.
   read_upto    = MAX(excluded.read_upto, chats.read_upto),
   avatar_path  = CASE WHEN excluded.avatar_path  != '' THEN excluded.avatar_path  ELSE chats.avatar_path  END,
   subject      = CASE WHEN excluded.subject      != '' THEN excluded.subject      ELSE chats.subject      END,
   participants = CASE WHEN excluded.participants != '' THEN excluded.participants ELSE chats.participants END,
-  folder       = CASE WHEN excluded.folder       != '' THEN excluded.folder       ELSE chats.folder       END
+  folder       = CASE WHEN excluded.folder       != '' THEN excluded.folder       ELSE chats.folder       END,
+  handles      = CASE WHEN excluded.handles      != '' THEN excluded.handles      ELSE chats.handles      END
 `,
 		c.Provider, c.ID, c.Name, c.IsGroup, c.LastTS, c.LastText, c.Unread, c.Muted, c.Archived,
-		c.ReadUpTo, c.AvatarPath, c.Subject, string(participants), c.Folder)
+		c.ReadUpTo, c.AvatarPath, c.Subject, string(participants), c.Folder, string(handles))
 	return err
 }
 
@@ -209,7 +223,7 @@ ON CONFLICT(provider, id) DO UPDATE SET
 
 const chatSelect = `
 SELECT c.provider, c.id, c.name, c.is_group, c.last_ts, c.last_text, c.unread, c.muted,
-       c.archived, c.read_upto, c.avatar_path, c.subject, c.participants, c.folder,
+       c.archived, c.read_upto, c.avatar_path, c.subject, c.participants, c.folder, c.handles,
        COALESCE((SELECT MAX(m.ts) FROM messages m
                   WHERE m.provider = c.provider AND m.chat_id = c.id
                     AND m.from_me = 1
@@ -229,6 +243,28 @@ func (s *HistoryStore) Chats(ctx context.Context, limit int) ([]Chat, error) {
 	rows, err := s.db.QueryContext(ctx, chatSelect+`
 WHERE c.last_ts > 0
 ORDER BY c.last_ts DESC
+LIMIT ?`, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	return scanChats(rows)
+}
+
+// AllChats returns every known conversation, including ones with no messages
+// yet.
+//
+// Distinct from Chats: a provider's history sync announces conversations before
+// any message arrives, so most of what it knows has no timestamp. Those belong
+// in search and in a chat picker -- you should be able to find someone you have
+// never written to -- but not in the conversation list, which would otherwise
+// be mostly address book.
+func (s *HistoryStore) AllChats(ctx context.Context, limit int) ([]Chat, error) {
+	if limit <= 0 {
+		limit = 5000
+	}
+	rows, err := s.db.QueryContext(ctx, chatSelect+`
+ORDER BY c.last_ts DESC, c.name ASC
 LIMIT ?`, limit)
 	if err != nil {
 		return nil, err
@@ -275,14 +311,17 @@ func scanChats(rows *sql.Rows) ([]Chat, error) {
 	var out []Chat
 	for rows.Next() {
 		var c Chat
-		var participants string
+		var participants, handles string
 		if err := rows.Scan(&c.Provider, &c.ID, &c.Name, &c.IsGroup, &c.LastTS, &c.LastText,
 			&c.Unread, &c.Muted, &c.Archived, &c.ReadUpTo, &c.AvatarPath, &c.Subject,
-			&participants, &c.Folder, &c.MyLastTS); err != nil {
+			&participants, &c.Folder, &handles, &c.MyLastTS); err != nil {
 			return nil, err
 		}
 		if participants != "" {
 			_ = json.Unmarshal([]byte(participants), &c.Participants)
+		}
+		if handles != "" {
+			_ = json.Unmarshal([]byte(handles), &c.Handles)
 		}
 		out = append(out, c)
 	}
@@ -353,15 +392,16 @@ UPDATE chats SET unread = (
 // ---------------------------------------------------------------- messages
 
 const messageUpsert = `
-INSERT INTO messages (provider, chat_id, id, ts, from_me, sender_id, sender_name, kind, text,
-                      body_html, status, reply_to, cc, bcc, media_path, media_ref, media_mime,
-                      media_w, media_h, file_name, file_size, duration)
-VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+INSERT INTO messages (provider, chat_id, id, ts, from_me, sender_id, sender_name, sender_avatar_path,
+                      kind, text, body_html, status, reply_to, cc, bcc, media_path, media_ref,
+                      media_mime, media_w, media_h, file_name, file_size, duration)
+VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 ON CONFLICT(provider, chat_id, id) DO UPDATE SET
   text        = CASE WHEN excluded.text != '' THEN excluded.text ELSE messages.text END,
   body_html   = CASE WHEN excluded.body_html != '' THEN excluded.body_html ELSE messages.body_html END,
   kind        = excluded.kind,
   sender_name = CASE WHEN excluded.sender_name != '' THEN excluded.sender_name ELSE messages.sender_name END,
+  sender_avatar_path = CASE WHEN excluded.sender_avatar_path != '' THEN excluded.sender_avatar_path ELSE messages.sender_avatar_path END,
   -- Status only ratchets forward. A redelivered copy of an old message must not
   -- un-read something the user has already seen.
   status      = CASE WHEN ? > ? THEN excluded.status ELSE messages.status END,
@@ -402,7 +442,7 @@ func (s *HistoryStore) putMessage(ctx context.Context, tx *sql.Tx, m Message) er
 		m.Provider, m.ChatID, m.ID).Scan(&existing)
 
 	_, err := tx.ExecContext(ctx, messageUpsert,
-		m.Provider, m.ChatID, m.ID, m.TS, m.FromMe, m.SenderID, m.SenderName, m.Kind, m.Text,
+		m.Provider, m.ChatID, m.ID, m.TS, m.FromMe, m.SenderID, m.SenderName, m.SenderAvatarPath, m.Kind, m.Text,
 		m.BodyHTML, m.Status, m.ReplyTo, string(cc), string(bcc), m.MediaPath, m.MediaRef,
 		m.MediaMime, m.MediaW, m.MediaH, m.FileName, m.FileSize, m.Duration,
 		statusRank(m.Status), statusRank(existing))
@@ -447,8 +487,8 @@ func (s *HistoryStore) PutMessages(ctx context.Context, msgs []Message) error {
 }
 
 const messageSelect = `
-SELECT provider, chat_id, id, ts, from_me, sender_id, sender_name, kind, text, body_html,
-       status, reply_to, cc, bcc, media_path, media_ref, media_mime, media_w, media_h,
+SELECT provider, chat_id, id, ts, from_me, sender_id, sender_name, sender_avatar_path, kind, text,
+       body_html, status, reply_to, cc, bcc, media_path, media_ref, media_mime, media_w, media_h,
        file_name, file_size, duration
 FROM messages
 `
@@ -518,7 +558,7 @@ func scanMessages(rows *sql.Rows) ([]Message, error) {
 		var m Message
 		var cc, bcc string
 		if err := rows.Scan(&m.Provider, &m.ChatID, &m.ID, &m.TS, &m.FromMe, &m.SenderID,
-			&m.SenderName, &m.Kind, &m.Text, &m.BodyHTML, &m.Status, &m.ReplyTo, &cc, &bcc,
+			&m.SenderName, &m.SenderAvatarPath, &m.Kind, &m.Text, &m.BodyHTML, &m.Status, &m.ReplyTo, &cc, &bcc,
 			&m.MediaPath, &m.MediaRef, &m.MediaMime, &m.MediaW, &m.MediaH,
 			&m.FileName, &m.FileSize, &m.Duration); err != nil {
 			return nil, err
@@ -610,10 +650,10 @@ func (s *HistoryStore) SearchMessages(ctx context.Context, query string, limit i
 		// unbalanced quote or a bare NEAR would otherwise be a query error.
 		phrase := `"` + strings.ReplaceAll(query, `"`, `""`) + `"`
 		rows, err = s.db.QueryContext(ctx, `
-SELECT m.provider, m.chat_id, m.id, m.ts, m.from_me, m.sender_id, m.sender_name, m.kind, m.text,
-       m.body_html, m.status, m.reply_to, m.cc, m.bcc, m.media_path, m.media_ref, m.media_mime,
-       m.media_w, m.media_h, m.file_name, m.file_size, m.duration,
-       COALESCE(c.name, '')
+SELECT m.provider, m.chat_id, m.id, m.ts, m.from_me, m.sender_id, m.sender_name,
+       m.sender_avatar_path, m.kind, m.text, m.body_html, m.status, m.reply_to, m.cc, m.bcc,
+       m.media_path, m.media_ref, m.media_mime, m.media_w, m.media_h, m.file_name, m.file_size,
+       m.duration, COALESCE(c.name, '')
   FROM messages_fts f
   JOIN messages m ON m.rowid = f.rowid
   LEFT JOIN chats c ON c.provider = m.provider AND c.id = m.chat_id
@@ -622,10 +662,10 @@ SELECT m.provider, m.chat_id, m.id, m.ts, m.from_me, m.sender_id, m.sender_name,
  LIMIT ?`, phrase, limit)
 	} else {
 		rows, err = s.db.QueryContext(ctx, `
-SELECT m.provider, m.chat_id, m.id, m.ts, m.from_me, m.sender_id, m.sender_name, m.kind, m.text,
-       m.body_html, m.status, m.reply_to, m.cc, m.bcc, m.media_path, m.media_ref, m.media_mime,
-       m.media_w, m.media_h, m.file_name, m.file_size, m.duration,
-       COALESCE(c.name, '')
+SELECT m.provider, m.chat_id, m.id, m.ts, m.from_me, m.sender_id, m.sender_name,
+       m.sender_avatar_path, m.kind, m.text, m.body_html, m.status, m.reply_to, m.cc, m.bcc,
+       m.media_path, m.media_ref, m.media_mime, m.media_w, m.media_h, m.file_name, m.file_size,
+       m.duration, COALESCE(c.name, '')
   FROM messages m
   LEFT JOIN chats c ON c.provider = m.provider AND c.id = m.chat_id
  WHERE m.text LIKE '%' || ? || '%' ESCAPE '\'
@@ -642,7 +682,7 @@ SELECT m.provider, m.chat_id, m.id, m.ts, m.from_me, m.sender_id, m.sender_name,
 		var h SearchHit
 		var cc, bcc string
 		if err := rows.Scan(&h.Provider, &h.ChatID, &h.ID, &h.TS, &h.FromMe, &h.SenderID,
-			&h.SenderName, &h.Kind, &h.Text, &h.BodyHTML, &h.Status, &h.ReplyTo, &cc, &bcc,
+			&h.SenderName, &h.SenderAvatarPath, &h.Kind, &h.Text, &h.BodyHTML, &h.Status, &h.ReplyTo, &cc, &bcc,
 			&h.MediaPath, &h.MediaRef, &h.MediaMime, &h.MediaW, &h.MediaH,
 			&h.FileName, &h.FileSize, &h.Duration, &h.ChatName); err != nil {
 			return nil, err

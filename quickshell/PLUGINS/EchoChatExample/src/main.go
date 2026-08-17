@@ -59,9 +59,13 @@ type chatObj struct {
 	ID       string `json:"id"`
 	Name     string `json:"name"`
 	IsGroup  bool   `json:"isGroup,omitempty"`
-	LastTS   int64  `json:"lastTs"`
+	LastTS   int64  `json:"lastTs,omitempty"`
 	LastText string `json:"lastText,omitempty"`
 	Unread   *int   `json:"unread,omitempty"`
+	// Handles are the other identifiers a conversation answers to. DMS matches
+	// a typed phone number or address against these; it never picks apart an
+	// id, because an id is yours to shape.
+	Handles []string `json:"handles,omitempty"`
 }
 
 type messageObj struct {
@@ -261,8 +265,22 @@ func (b *bridge) connect() {
 	ts := now()
 
 	emitEvent("chats", map[string]any{"chats": []chatObj{
-		{ID: "echo-dm", Name: peer, LastTS: ts, LastText: "Say anything and I will echo it", Unread: &unread},
-		{ID: "echo-group", Name: "Echo Group", IsGroup: true, LastTS: ts - 60_000, LastText: "A group that echoes too"},
+		{
+			ID: "echo-dm", Name: peer, LastTS: ts, Unread: &unread,
+			LastText: "Say anything and I will echo it",
+			Handles:  []string{"+15550100"},
+		},
+		{
+			ID: "echo-group", Name: "Echo Group", IsGroup: true,
+			LastTS: ts - 60_000, LastText: "A group that echoes too",
+		},
+		// A contact with no conversation yet: findable by name or number, but
+		// deliberately absent from the conversation list until something is
+		// actually said. Most of a real address book looks like this.
+		{
+			ID: "echo-contact", Name: "Katherine Johnson",
+			Handles: []string{"+15550199", "katherine@example.com"},
+		},
 	}})
 
 	// A batch is how backfill is delivered: the host stores it in one

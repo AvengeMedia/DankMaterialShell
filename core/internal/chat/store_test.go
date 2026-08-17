@@ -210,17 +210,82 @@ func TestUpsertChatMergesPartialUpdates(t *testing.T) {
 		Provider: prov, ID: "c1", Name: "Ada", LastTS: 500, LastText: "hello",
 		AvatarPath: "/cache/ada.png", IsGroup: false,
 	}))
-	// A later event that only flips the archive flag.
+	// A later event that only carries a newer timestamp.
 	require.NoError(t, store.UpsertChat(ctx, Chat{
-		Provider: prov, ID: "c1", Archived: true,
+		Provider: prov, ID: "c1", LastTS: 900, LastText: "later",
 	}))
 
 	c, err := store.ChatByID(ctx, prov, "c1")
 	require.NoError(t, err)
 	assert.Equal(t, "Ada", c.Name)
 	assert.Equal(t, "/cache/ada.png", c.AvatarPath)
-	assert.Equal(t, int64(500), c.LastTS)
+	assert.Equal(t, int64(900), c.LastTS)
+	assert.Equal(t, "later", c.LastText)
+
+	// Archiving is not settable through an upsert; it has its own method, so a
+	// partial update can never flip it by omission.
+	require.NoError(t, store.SetArchived(ctx, prov, "c1", true))
+	c, err = store.ChatByID(ctx, prov, "c1")
+	require.NoError(t, err)
 	assert.True(t, c.Archived)
+}
+
+// A partial update must not undo the user's own choices. This is what a
+// handles-only backfill looks like, and it used to unarchive everything.
+func TestUpsertChatPreservesArchivedAndMuted(t *testing.T) {
+	store := newStore(t)
+	ctx := context.Background()
+
+	require.NoError(t, store.TouchChat(ctx, prov, "c1", "Team", "hi", 500, true, false))
+	require.NoError(t, store.SetArchived(ctx, prov, "c1", true))
+	require.NoError(t, store.SetMuted(ctx, prov, "c1", true))
+
+	// A later update that only knows a handle.
+	require.NoError(t, store.UpsertChat(ctx, Chat{
+		Provider: prov, ID: "c1", Handles: []string{"+905551234567"},
+	}))
+
+	c, err := store.ChatByID(ctx, prov, "c1")
+	require.NoError(t, err)
+	assert.True(t, c.Archived, "a partial update must not unarchive")
+	assert.True(t, c.Muted, "a partial update must not unmute")
+	assert.Equal(t, "Team", c.Name)
+	assert.Equal(t, []string{"+905551234567"}, c.Handles)
+}
+
+// Handles survive an update that does not mention them.
+func TestUpsertChatPreservesHandles(t *testing.T) {
+	store := newStore(t)
+	ctx := context.Background()
+
+	require.NoError(t, store.UpsertChat(ctx, Chat{
+		Provider: prov, ID: "c1", Name: "Ada", Handles: []string{"+905551234567"}}))
+	require.NoError(t, store.UpsertChat(ctx, Chat{
+		Provider: prov, ID: "c1", LastTS: 900, LastText: "hi"}))
+
+	c, err := store.ChatByID(ctx, prov, "c1")
+	require.NoError(t, err)
+	assert.Equal(t, []string{"+905551234567"}, c.Handles)
+	assert.Equal(t, int64(900), c.LastTS)
+}
+
+// AllChats sees conversations with no messages; Chats deliberately does not.
+func TestAllChatsIncludesInactive(t *testing.T) {
+	store := newStore(t)
+	ctx := context.Background()
+
+	require.NoError(t, store.TouchChat(ctx, prov, "active", "Active", "hi", 500, false, false))
+	require.NoError(t, store.UpsertChat(ctx, Chat{
+		Provider: prov, ID: "known", Name: "Never Messaged"}))
+
+	active, err := store.Chats(ctx, 50)
+	require.NoError(t, err)
+	require.Len(t, active, 1, "the conversation list shows only chats with activity")
+
+	all, err := store.AllChats(ctx, 50)
+	require.NoError(t, err)
+	require.Len(t, all, 2, "search and pickers see everything known")
+	assert.Equal(t, "active", all[0].ID, "active conversations come first")
 }
 
 // Chats interleave across providers by recency -- this is what lets one list

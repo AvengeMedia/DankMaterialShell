@@ -741,6 +741,14 @@ Item {
         }
     }
 
+    ChatPopout {
+        id: chatPopout
+
+        Component.onCompleted: {
+            PopoutService.chatPopout = chatPopout;
+        }
+    }
+
     NotificationModal {
         id: notificationModal
 

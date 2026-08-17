@@ -53,6 +53,8 @@ func HandleRequest(conn *models.Conn, req models.Request, manager *Manager) {
 		handleSetFocus(conn, req, manager)
 	case "chat.fetchMedia":
 		handleFetchMedia(ctx, conn, req, manager)
+	case "chat.resolve":
+		handleResolve(ctx, conn, req, manager)
 	case "chat.search":
 		handleSearch(ctx, conn, req, manager)
 	case "chat.setArchived":
@@ -63,6 +65,8 @@ func HandleRequest(conn *models.Conn, req models.Request, manager *Manager) {
 		handleAuth(ctx, conn, req, manager, MethodLogin)
 	case "chat.logout":
 		handleAuth(ctx, conn, req, manager, MethodLogout)
+	case "chat.revoke":
+		handleRevoke(ctx, conn, req, manager)
 	case "chat.purge":
 		handlePurge(ctx, conn, req, manager)
 	case "chat.authQrCode":
@@ -177,14 +181,25 @@ type chatsResult struct {
 func handleChats(ctx context.Context, conn *models.Conn, req models.Request, m *Manager) {
 	limit := models.GetOr(req, "limit", 200)
 
+	// "all" includes conversations a provider knows about but that have no
+	// messages yet -- most of an address book. Wanted by a picker or runner,
+	// not by the conversation list, which would otherwise be mostly people you
+	// have never written to.
+	all := models.GetOr(req, "all", false)
+
 	var (
 		chats []chat.Chat
 		err   error
 	)
-	if provider, ok := models.Get[string](req, "provider"); ok && provider != "" {
-		chats, err = m.Store().ChatsForProvider(ctx, provider, limit)
-	} else {
-		chats, err = m.Store().Chats(ctx, limit)
+	switch {
+	case all:
+		chats, err = m.Store().AllChats(ctx, limit)
+	default:
+		if provider, ok := models.Get[string](req, "provider"); ok && provider != "" {
+			chats, err = m.Store().ChatsForProvider(ctx, provider, limit)
+		} else {
+			chats, err = m.Store().Chats(ctx, limit)
+		}
 	}
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
@@ -282,6 +297,25 @@ func handleSearch(ctx context.Context, conn *models.Conn, req models.Request, m 
 	}
 
 	models.Respond(conn, req.ID, searchResult{Messages: msgs, Chats: chats})
+}
+
+type resolveResult struct {
+	Candidates []ResolveCandidate `json:"candidates"`
+}
+
+// handleResolve turns whatever identifier the caller has into conversations.
+func handleResolve(ctx context.Context, conn *models.Conn, req models.Request, m *Manager) {
+	query, ok := models.Get[string](req, "query")
+	if !ok || query == "" {
+		models.RespondError(conn, req.ID, "query is required")
+		return
+	}
+
+	candidates := m.Resolve(ctx, query, models.GetOr(req, "limit", 10))
+	if candidates == nil {
+		candidates = []ResolveCandidate{}
+	}
+	models.Respond(conn, req.ID, resolveResult{Candidates: candidates})
 }
 
 // ---------------------------------------------------------------- writes
@@ -528,6 +562,46 @@ func handleAuth(ctx context.Context, conn *models.Conn, req models.Request, m *M
 		models.RespondError(conn, req.ID, err.Error())
 		return
 	}
+	models.Respond(conn, req.ID, models.SuccessResult{Success: true})
+}
+
+// handleRevoke deletes a message for everyone.
+//
+// The local tombstone is written only after the provider accepts it: showing a
+// message as deleted when it is still on everyone else's screen would be a lie.
+func handleRevoke(ctx context.Context, conn *models.Conn, req models.Request, m *Manager) {
+	provider, chatID, ok := chatTarget(conn, req)
+	if !ok {
+		return
+	}
+	messageID, ok := models.Get[string](req, "messageId")
+	if !ok || messageID == "" {
+		models.RespondError(conn, req.ID, "messageId is required")
+		return
+	}
+
+	b, err := m.bridgeFor(provider)
+	if err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+	if !b.HasCapability(CapRevoke) {
+		models.RespondError(conn, req.ID, fmt.Sprintf("%s cannot delete messages", provider))
+		return
+	}
+
+	if _, err := b.call(ctx, MethodRevoke, map[string]any{
+		"chatId": chatID, "messageId": messageID,
+	}); err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+
+	if err := m.Store().MarkDeleted(ctx, provider, chatID, messageID); err != nil {
+		log.Warnf("chat: could not mark message deleted: %v", err)
+	}
+
+	m.markDirty()
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true})
 }
 

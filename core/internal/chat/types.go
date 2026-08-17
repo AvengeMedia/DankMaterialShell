@@ -96,6 +96,13 @@ type Chat struct {
 	Participants []string `json:"participants,omitempty"`
 	Folder       string   `json:"folder,omitempty"`
 
+	// Handles are the other identifiers this conversation answers to: a phone
+	// number, an email address, a username. Declared by the bridge, because
+	// only it knows what its service uses -- WhatsApp ids, for instance, are
+	// now privacy identifiers rather than phone numbers, so parsing the id
+	// would find nothing.
+	Handles []string `json:"handles,omitempty"`
+
 	// MyLastTS is when you last wrote in this chat, ignoring protocol rows.
 	// Derived on read; bridges never set it.
 	MyLastTS int64 `json:"myLastTs"`
@@ -105,20 +112,24 @@ type Chat struct {
 // MediaPath points at a file in the cache, and MediaRef is an opaque handle the
 // bridge gets back if the user asks for the full-size version later.
 type Message struct {
-	Provider   string   `json:"provider"`
-	ChatID     string   `json:"chatId"`
-	ID         string   `json:"id"`
-	TS         int64    `json:"ts"`
-	FromMe     bool     `json:"fromMe"`
-	SenderID   string   `json:"senderId,omitempty"`
-	SenderName string   `json:"senderName,omitempty"`
-	Kind       string   `json:"kind"`
-	Text       string   `json:"text"`
-	BodyHTML   string   `json:"bodyHtml,omitempty"`
-	Status     string   `json:"status"`
-	ReplyTo    string   `json:"replyTo,omitempty"`
-	CC         []string `json:"cc,omitempty"`
-	BCC        []string `json:"bcc,omitempty"`
+	Provider   string `json:"provider"`
+	ChatID     string `json:"chatId"`
+	ID         string `json:"id"`
+	TS         int64  `json:"ts"`
+	FromMe     bool   `json:"fromMe"`
+	SenderID   string `json:"senderId,omitempty"`
+	SenderName string `json:"senderName,omitempty"`
+	// SenderAvatarPath is the sender's picture, for group conversations where
+	// several people speak. Per message rather than per chat, since a group has
+	// no single face.
+	SenderAvatarPath string   `json:"senderAvatarPath,omitempty"`
+	Kind             string   `json:"kind"`
+	Text             string   `json:"text"`
+	BodyHTML         string   `json:"bodyHtml,omitempty"`
+	Status           string   `json:"status"`
+	ReplyTo          string   `json:"replyTo,omitempty"`
+	CC               []string `json:"cc,omitempty"`
+	BCC              []string `json:"bcc,omitempty"`
 
 	MediaPath string `json:"mediaPath,omitempty"`
 	MediaRef  string `json:"mediaRef,omitempty"`

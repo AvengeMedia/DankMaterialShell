@@ -18,7 +18,13 @@ Item {
     required property var message
     property var previousMessage: null
 
+    // Set when this message is under keyboard navigation.
+    property bool keyboardFocused: false
+
     signal replyRequested
+    signal forwardRequested
+    signal copyRequested
+    signal deleteRequested
 
     readonly property bool fromMe: message?.fromMe ?? false
     readonly property string kind: message?.kind ?? "text"
@@ -27,6 +33,7 @@ Item {
     readonly property string mediaPath: message?.mediaPath ?? ""
     readonly property bool hasMedia: mediaPath !== "" || (message?.mediaRef ?? "") !== ""
     readonly property bool isDeleted: kind === "deleted"
+    readonly property string senderAvatar: message?.senderAvatarPath ?? ""
 
     // System rows are the conversation talking about itself, not someone
     // speaking, so they are centred and unstyled rather than given a bubble.
@@ -86,15 +93,31 @@ Item {
 
     // ------------------------------------------------------------ message
 
-    StyledText {
+    Row {
         id: senderLabel
         visible: root.showSender
         anchors.left: parent.left
         anchors.leftMargin: Theme.spacingS
         anchors.top: parent.top
-        text: root.message?.senderName ?? ""
-        font.pixelSize: Theme.fontSizeSmall
-        color: Theme.primary
+        spacing: Theme.spacingXS
+
+        // Only on the first message of a run, so a back-and-forth does not
+        // repeat the same face on every line.
+        DankCircularImage {
+            anchors.verticalCenter: parent.verticalCenter
+            width: Theme.fontSizeMedium
+            height: Theme.fontSizeMedium
+            imageSource: root.senderAvatar !== "" ? "file://" + root.senderAvatar : ""
+            fallbackText: (root.message?.senderName ?? "?").charAt(0).toUpperCase()
+            fallbackIcon: "person"
+        }
+
+        StyledText {
+            anchors.verticalCenter: parent.verticalCenter
+            text: root.message?.senderName ?? ""
+            font.pixelSize: Theme.fontSizeSmall
+            color: Theme.primary
+        }
     }
 
     StyledRect {
@@ -117,6 +140,11 @@ Item {
                 return Theme.withAlpha(Theme.error, 0.15);
             return root.fromMe ? Theme.primarySelected : Theme.surfaceContainerHigh;
         }
+
+        // Keyboard focus needs to be visible without moving anything, so it is
+        // drawn as a border rather than a size or colour change.
+        border.color: root.keyboardFocused ? Theme.primary : "transparent"
+        border.width: root.keyboardFocused ? 2 : 0
 
         MouseArea {
             id: bubbleArea
@@ -262,17 +290,60 @@ Item {
             }
         }
 
-        // Reply is offered only where the provider supports it.
-        DankActionButton {
+        // Actions appear on hover or under keyboard focus, and each is gated on
+        // what the provider actually supports -- an action that would fail is
+        // never offered.
+        Row {
+            id: actions
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: root.fromMe ? undefined : parent.right
             anchors.right: root.fromMe ? parent.left : undefined
-            buttonSize: 26
-            iconSize: Theme.fontSizeSmall
-            iconName: "reply"
-            iconColor: Theme.surfaceVariantText
-            visible: bubbleArea.containsMouse && !root.isDeleted && ChatService.activeSupports("reply")
-            onClicked: root.replyRequested()
+            anchors.leftMargin: Theme.spacingXS
+            anchors.rightMargin: Theme.spacingXS
+            spacing: 0
+            visible: (bubbleArea.containsMouse || root.keyboardFocused) && !root.isDeleted
+
+            DankActionButton {
+                buttonSize: 26
+                iconSize: Theme.fontSizeSmall
+                iconName: "reply"
+                iconColor: Theme.surfaceVariantText
+                tooltipText: I18n.tr("Reply")
+                visible: ChatService.activeSupports("reply")
+                onClicked: root.replyRequested()
+            }
+
+            DankActionButton {
+                buttonSize: 26
+                iconSize: Theme.fontSizeSmall
+                iconName: "forward"
+                iconColor: Theme.surfaceVariantText
+                tooltipText: I18n.tr("Forward")
+                visible: root.text !== ""
+                onClicked: root.forwardRequested()
+            }
+
+            DankActionButton {
+                buttonSize: 26
+                iconSize: Theme.fontSizeSmall
+                iconName: "content_copy"
+                iconColor: Theme.surfaceVariantText
+                tooltipText: I18n.tr("Copy")
+                visible: root.text !== ""
+                onClicked: root.copyRequested()
+            }
+
+            // Deleting for everyone is usually only allowed for your own
+            // messages, and only where the provider supports it at all.
+            DankActionButton {
+                buttonSize: 26
+                iconSize: Theme.fontSizeSmall
+                iconName: "delete"
+                iconColor: Theme.error
+                tooltipText: I18n.tr("Delete for everyone")
+                visible: root.fromMe && ChatService.activeSupports("revoke")
+                onClicked: root.deleteRequested()
+            }
         }
     }
 }
