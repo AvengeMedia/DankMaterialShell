@@ -1192,30 +1192,6 @@ Item {
                     reason: I18n.tr("Managed by Frame")
                 }
 
-                SettingsButtonGroupRow {
-                    settingKey: "barCornerStyle"
-                    tags: ["rounded", "attached", "square", "corners", "edge", "screen", "flush"]
-                    text: I18n.tr("Corner Style")
-                    description: I18n.tr("Choose how the bar meets the screen edge")
-                    visible: !SettingsData.frameEnabled
-                    model: [I18n.tr("Rounded"), I18n.tr("Flush"), I18n.tr("Square")]
-                    currentIndex: {
-                        if (selectedBarConfig?.squareCorners ?? false)
-                            return 2;
-                        if (selectedBarConfig?.attachToScreenEdge ?? false)
-                            return 1;
-                        return 0;
-                    }
-                    onSelectionChanged: (index, selected) => {
-                        if (!selected)
-                            return;
-                        SettingsData.updateBarConfig(selectedBarId, {
-                            squareCorners: index === 2,
-                            attachToScreenEdge: index === 1
-                        });
-                    }
-                }
-
                 SettingsToggleRow {
                     settingKey: "barNoBackground"
                     tags: ["transparent", "background", "invisible"]
@@ -1266,6 +1242,30 @@ Item {
                     height: 1
                     color: Theme.outline
                     opacity: 0.15
+                }
+
+                SettingsButtonGroupRow {
+                    settingKey: "barCornerStyle"
+                    tags: ["rounded", "attached", "square", "corners", "edge", "screen", "flush"]
+                    text: I18n.tr("Corner Style")
+                    description: I18n.tr("Choose how the bar meets the screen edge")
+                    visible: !SettingsData.frameEnabled
+                    model: [I18n.tr("Rounded"), I18n.tr("Flush"), I18n.tr("Square")]
+                    currentIndex: {
+                        if (selectedBarConfig?.squareCorners ?? false)
+                            return 2;
+                        if (selectedBarConfig?.attachToScreenEdge ?? false)
+                            return 1;
+                        return 0;
+                    }
+                    onSelectionChanged: (index, selected) => {
+                        if (!selected)
+                            return;
+                        SettingsData.updateBarConfig(selectedBarId, {
+                            squareCorners: index === 2,
+                            attachToScreenEdge: index === 1
+                        });
+                    }
                 }
 
                 SettingsToggleRow {

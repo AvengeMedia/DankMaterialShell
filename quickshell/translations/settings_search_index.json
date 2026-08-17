@@ -2451,27 +2451,24 @@
     "tabIndex": 6,
     "category": "Dank Bar",
     "keywords": [
-      "attached",
       "background",
       "bar",
-      "choose",
       "corners",
       "dank",
-      "edge",
-      "flush",
-      "meets",
+      "fully",
+      "invisible",
+      "make",
       "panel",
       "radius",
       "round",
       "rounded",
-      "screen",
-      "square",
       "statusbar",
       "taskbar",
-      "topbar"
+      "topbar",
+      "transparent"
     ],
     "icon": "rounded_corner",
-    "description": "Choose how the bar meets the screen edge"
+    "description": "Make the bar background fully transparent"
   },
   {
     "section": "barAppearance",
