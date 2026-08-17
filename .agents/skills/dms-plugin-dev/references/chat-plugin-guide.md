@@ -28,6 +28,7 @@ This is the part worth internalising, because it is most of a chat client:
 | Concern | Who |
 |---|---|
 | Protocol session, auth, credentials | **you** |
+| Notification policy, per provider | backend |
 | Message store, pagination, dedup | backend |
 | Unread counts and read marks | backend |
 | Delivery status ratcheting | backend |
@@ -59,6 +60,7 @@ MyChatPlugin/
     "capabilities": ["chat"],
     "icon": "chat",
     "bridge": ["./bin/mychat"],
+    "warning": "Optional caveat shown prominently in settings",
     "settings": "./Settings.qml",
     "permissions": ["settings_read", "settings_write"]
 }

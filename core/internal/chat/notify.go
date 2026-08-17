@@ -13,6 +13,31 @@ import (
 // the shell says.
 const NotifyAppName = "DMS Chats"
 
+// NotifyPrefs is the effective notification policy for one provider.
+//
+// Held per provider rather than globally because the right answer differs: a
+// work account may want silence while a family one does not, and a single
+// global setting lets the noisiest provider decide for all of them.
+type NotifyPrefs struct {
+	// Enabled turns notifications off for this provider entirely.
+	Enabled bool `json:"enabled"`
+	// Preview shows the message body; off shows only that something arrived.
+	Preview bool `json:"preview"`
+	// Groups notifies for group conversations.
+	Groups bool `json:"groups"`
+	// Archived notifies for conversations the user has put away.
+	Archived bool `json:"archived"`
+	// DoNotDisturb silences the provider without discarding the settings above,
+	// so turning it back off restores what the user had chosen.
+	DoNotDisturb bool `json:"doNotDisturb"`
+}
+
+// DefaultNotifyPrefs is the conservative starting point: notify with previews
+// for direct and group messages, but stay quiet for archived conversations.
+func DefaultNotifyPrefs() NotifyPrefs {
+	return NotifyPrefs{Enabled: true, Preview: true, Groups: true, Archived: false}
+}
+
 // NotifyPolicy decides which arriving messages are worth interrupting someone
 // for. It is the whole reason a bridge never calls notify-send itself: get this
 // wrong once and a first login fires several hundred notifications at a user.
@@ -22,15 +47,6 @@ type NotifyPolicy struct {
 
 	// StartedAt is when the host came up. Anything older is backfill.
 	StartedAt time.Time
-
-	// Enabled turns chat notifications off entirely.
-	Enabled bool
-	// Preview shows the message body; off shows only that something arrived.
-	Preview bool
-	// Groups notifies for group conversations.
-	Groups bool
-	// Archived notifies for archived conversations.
-	Archived bool
 
 	// focused is the chat currently on screen, pushed down by the shell. A
 	// message you are already looking at should not also buzz.
@@ -42,17 +58,13 @@ type focusKey struct {
 	chatID   string
 }
 
-// NewNotifyPolicy returns a policy with the conservative defaults: notify, with
-// previews, for direct messages only.
+// NewNotifyPolicy returns a policy anchored at the current time, so anything
+// older than this instant counts as backfill.
 func NewNotifyPolicy(store *HistoryStore, media *Media) *NotifyPolicy {
 	return &NotifyPolicy{
 		store:     store,
 		media:     media,
 		StartedAt: time.Now(),
-		Enabled:   true,
-		Preview:   true,
-		Groups:    true,
-		Archived:  false,
 	}
 }
 
@@ -70,8 +82,11 @@ func (p *NotifyPolicy) Focused() (provider, chatID string) {
 //
 // The order matters: the cheap, certain checks come before anything that hits
 // the database.
-func (p *NotifyPolicy) suppressionReason(ctx context.Context, m Message, providerName string) string {
-	if !p.Enabled {
+func (p *NotifyPolicy) suppressionReason(ctx context.Context, m Message, prefs NotifyPrefs) string {
+	if prefs.DoNotDisturb {
+		return "do not disturb"
+	}
+	if !prefs.Enabled {
 		return "notifications disabled"
 	}
 
@@ -101,12 +116,12 @@ func (p *NotifyPolicy) suppressionReason(ctx context.Context, m Message, provide
 			return "chat muted"
 		}
 		// Archiving is how a user says "keep this out of my way".
-		if !p.Archived && p.store.IsArchived(ctx, m.Provider, m.ChatID) {
+		if !prefs.Archived && p.store.IsArchived(ctx, m.Provider, m.ChatID) {
 			return "chat archived"
 		}
 	}
 
-	if !p.Groups && p.isGroup(ctx, m) {
+	if !prefs.Groups && p.isGroup(ctx, m) {
 		return "group message"
 	}
 
@@ -123,8 +138,8 @@ func (p *NotifyPolicy) isGroup(ctx context.Context, m Message) bool {
 
 // Notify raises a desktop notification for an arriving message unless policy
 // suppresses it. Reports whether a notification was actually shown.
-func (p *NotifyPolicy) Notify(ctx context.Context, m Message, providerName string) bool {
-	if reason := p.suppressionReason(ctx, m, providerName); reason != "" {
+func (p *NotifyPolicy) Notify(ctx context.Context, m Message, providerName string, prefs NotifyPrefs) bool {
+	if reason := p.suppressionReason(ctx, m, prefs); reason != "" {
 		log.Debugf("chat: suppressed notification for %s/%s: %s", m.Provider, m.ChatID, reason)
 		return false
 	}
@@ -132,7 +147,7 @@ func (p *NotifyPolicy) Notify(ctx context.Context, m Message, providerName strin
 	title := p.titleFor(ctx, m, providerName)
 
 	body := "New message"
-	if p.Preview {
+	if prefs.Preview {
 		if preview := m.Preview(); preview != "" {
 			body = preview
 			// In a group, who spoke matters as much as what they said.
@@ -151,7 +166,7 @@ func (p *NotifyPolicy) Notify(ctx context.Context, m Message, providerName strin
 
 	// An image attachment shows as the notification's own preview. Only for
 	// already-cached files -- notifying must never trigger a download.
-	if p.Preview && m.Kind == KindImage && m.MediaPath != "" {
+	if prefs.Preview && m.Kind == KindImage && m.MediaPath != "" {
 		n.FilePath = m.MediaPath
 	}
 

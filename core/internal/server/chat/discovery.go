@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/chat"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 )
 
@@ -26,6 +27,7 @@ type pluginManifest struct {
 	Icon        string   `json:"icon"`
 	Bridge      []string `json:"bridge"`
 	Settings    string   `json:"settings"`
+	Warning     string   `json:"warning"`
 }
 
 // Provider is a discovered chat plugin.
@@ -39,17 +41,22 @@ type Provider struct {
 	Dir         string         `json:"dir"`
 	Bridge      []string       `json:"-"`
 	SettingsQML string         `json:"settingsQml,omitempty"`
+	Warning     string         `json:"warning,omitempty"`
 	MediaDir    string         `json:"-"`
 	Settings    map[string]any `json:"-"`
 }
 
 // ProviderStatus is what the settings UI and CLI show for one provider.
 type ProviderStatus struct {
-	ID           string   `json:"id"`
-	Name         string   `json:"name"`
-	Icon         string   `json:"icon"`
-	Description  string   `json:"description,omitempty"`
-	SettingsQML  string   `json:"settingsQml,omitempty"`
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	Icon        string `json:"icon"`
+	Description string `json:"description,omitempty"`
+	SettingsQML string `json:"settingsQml,omitempty"`
+	// Warning is a caveat the plugin author declared about their own provider,
+	// shown prominently in settings. Declared by the plugin rather than known
+	// to the shell, so the shell never hardcodes anything provider-specific.
+	Warning      string   `json:"warning,omitempty"`
 	Enabled      bool     `json:"enabled"`
 	Running      bool     `json:"running"`
 	State        string   `json:"state"`
@@ -59,7 +66,10 @@ type ProviderStatus struct {
 	LastError    string   `json:"lastError,omitempty"`
 	PID          int      `json:"pid,omitempty"`
 	Unread       int      `json:"unread"`
-	StderrTail   []string `json:"stderrTail,omitempty"`
+	// Notifications is the policy actually in force for this provider, so the
+	// settings UI shows what is true rather than what it last sent.
+	Notifications chat.NotifyPrefs `json:"notifications"`
+	StderrTail    []string         `json:"stderrTail,omitempty"`
 
 	// The pending sign-in challenge, if the provider is waiting for one.
 	// AuthMethod is "qr", "code" or "url"; AuthPayload is what to render.
@@ -164,6 +174,7 @@ func loadProvider(dir string) (Provider, error) {
 		Dir:         dir,
 		Bridge:      bridge,
 		SettingsQML: resolveRelative(dir, m.Settings),
+		Warning:     m.Warning,
 	}, nil
 }
 

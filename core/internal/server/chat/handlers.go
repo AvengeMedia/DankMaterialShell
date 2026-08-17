@@ -36,6 +36,8 @@ func HandleRequest(conn *models.Conn, req models.Request, manager *Manager) {
 		handleSetProviderSettings(conn, req, manager)
 	case "chat.setConfig":
 		handleSetConfig(conn, req, manager)
+	case "chat.setProviderConfig":
+		handleSetProviderConfig(conn, req, manager)
 	case "chat.getConfig":
 		models.Respond(conn, req.ID, manager.GetConfig())
 
@@ -142,6 +144,27 @@ func handleSetConfig(conn *models.Conn, req models.Request, m *Manager) {
 	}
 
 	m.SetConfig(cfg)
+	models.Respond(conn, req.ID, models.SuccessResult{Success: true})
+}
+
+// handleSetProviderConfig overrides the notification policy for one provider.
+func handleSetProviderConfig(conn *models.Conn, req models.Request, m *Manager) {
+	provider, ok := models.Get[string](req, "provider")
+	if !ok || provider == "" {
+		models.RespondError(conn, req.ID, "provider is required")
+		return
+	}
+
+	// Start from the provider's effective policy, so a partial update changes
+	// only what the caller named.
+	prefs := m.ProviderPrefs(provider)
+	prefs.Enabled = models.GetOr(req, "notificationsEnabled", prefs.Enabled)
+	prefs.Preview = models.GetOr(req, "notificationPreview", prefs.Preview)
+	prefs.Groups = models.GetOr(req, "notifyGroups", prefs.Groups)
+	prefs.Archived = models.GetOr(req, "notifyArchived", prefs.Archived)
+	prefs.DoNotDisturb = models.GetOr(req, "doNotDisturb", prefs.DoNotDisturb)
+
+	m.SetProviderPrefs(provider, prefs)
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true})
 }
 

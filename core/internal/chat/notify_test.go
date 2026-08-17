@@ -38,64 +38,74 @@ func TestSuppressionLadder(t *testing.T) {
 		return p
 	}
 
+	// Prefs travel with each call now, so every case states the policy it is
+	// exercising instead of mutating shared state.
+	defaults := DefaultNotifyPrefs()
+
 	t.Run("notifies for a normal incoming message", func(t *testing.T) {
-		assert.Empty(t, newPolicy().suppressionReason(ctx, fresh("dm"), prov))
+		assert.Empty(t, newPolicy().suppressionReason(ctx, fresh("dm"), defaults))
 	})
 
 	t.Run("disabled", func(t *testing.T) {
-		p := newPolicy()
-		p.Enabled = false
-		assert.Equal(t, "notifications disabled", p.suppressionReason(ctx, fresh("dm"), prov))
+		prefs := defaults
+		prefs.Enabled = false
+		assert.Equal(t, "notifications disabled", newPolicy().suppressionReason(ctx, fresh("dm"), prefs))
+	})
+
+	t.Run("do not disturb outranks everything else", func(t *testing.T) {
+		prefs := defaults
+		prefs.DoNotDisturb = true
+		assert.Equal(t, "do not disturb", newPolicy().suppressionReason(ctx, fresh("dm"), prefs))
 	})
 
 	t.Run("own message", func(t *testing.T) {
 		m := fresh("dm")
 		m.FromMe = true
-		assert.Equal(t, "own message", newPolicy().suppressionReason(ctx, m, prov))
+		assert.Equal(t, "own message", newPolicy().suppressionReason(ctx, m, defaults))
 	})
 
 	t.Run("protocol kinds", func(t *testing.T) {
 		for _, kind := range []string{KindSystem, KindDeleted, KindUnsupported} {
 			m := fresh("dm")
 			m.Kind = kind
-			assert.Equal(t, "protocol message", newPolicy().suppressionReason(ctx, m, prov), kind)
+			assert.Equal(t, "protocol message", newPolicy().suppressionReason(ctx, m, defaults), kind)
 		}
 	})
 
 	t.Run("backfill predating startup", func(t *testing.T) {
 		m := fresh("dm")
 		m.TS = started.Add(-time.Hour).UnixMilli()
-		assert.Equal(t, "backfill", newPolicy().suppressionReason(ctx, m, prov))
+		assert.Equal(t, "backfill", newPolicy().suppressionReason(ctx, m, defaults))
 	})
 
 	t.Run("focused chat", func(t *testing.T) {
 		p := newPolicy()
 		p.SetFocus(prov, "dm")
-		assert.Equal(t, "chat focused", p.suppressionReason(ctx, fresh("dm"), prov))
-		assert.Empty(t, p.suppressionReason(ctx, fresh("group"), prov),
+		assert.Equal(t, "chat focused", p.suppressionReason(ctx, fresh("dm"), defaults))
+		assert.Empty(t, p.suppressionReason(ctx, fresh("group"), defaults),
 			"focusing one chat does not mute the others")
 	})
 
 	t.Run("muted chat", func(t *testing.T) {
-		assert.Equal(t, "chat muted", newPolicy().suppressionReason(ctx, fresh("muted"), prov))
+		assert.Equal(t, "chat muted", newPolicy().suppressionReason(ctx, fresh("muted"), defaults))
 	})
 
 	t.Run("archived chat", func(t *testing.T) {
-		p := newPolicy()
-		assert.Equal(t, "chat archived", p.suppressionReason(ctx, fresh("filed"), prov))
+		assert.Equal(t, "chat archived", newPolicy().suppressionReason(ctx, fresh("filed"), defaults))
 
-		p.Archived = true
-		assert.Empty(t, p.suppressionReason(ctx, fresh("filed"), prov),
+		prefs := defaults
+		prefs.Archived = true
+		assert.Empty(t, newPolicy().suppressionReason(ctx, fresh("filed"), prefs),
 			"archived chats notify when the user opts in")
 	})
 
 	t.Run("group messages when groups are off", func(t *testing.T) {
-		p := newPolicy()
-		assert.Empty(t, p.suppressionReason(ctx, fresh("group"), prov))
+		assert.Empty(t, newPolicy().suppressionReason(ctx, fresh("group"), defaults))
 
-		p.Groups = false
-		assert.Equal(t, "group message", p.suppressionReason(ctx, fresh("group"), prov))
-		assert.Empty(t, p.suppressionReason(ctx, fresh("dm"), prov),
+		prefs := defaults
+		prefs.Groups = false
+		assert.Equal(t, "group message", newPolicy().suppressionReason(ctx, fresh("group"), prefs))
+		assert.Empty(t, newPolicy().suppressionReason(ctx, fresh("dm"), prefs),
 			"turning off groups leaves direct messages alone")
 	})
 }
@@ -115,7 +125,7 @@ func TestFocusIsProviderScoped(t *testing.T) {
 
 	m := Message{Provider: "beta", ChatID: "shared", ID: "m1", Kind: KindText,
 		Text: "hi", TS: time.Now().UnixMilli()}
-	assert.Empty(t, p.suppressionReason(ctx, m, "beta"))
+	assert.Empty(t, p.suppressionReason(ctx, m, DefaultNotifyPrefs()))
 }
 
 func TestMessagePreview(t *testing.T) {

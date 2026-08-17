@@ -154,7 +154,7 @@ func (m *Manager) ingestMessages(ctx context.Context, provider string, msgs []wi
 		}
 
 		if live {
-			m.notify.Notify(ctx, msg, m.providerName(provider))
+			m.notify.Notify(ctx, msg, m.providerName(provider), m.ProviderPrefs(provider))
 		}
 	}
 }

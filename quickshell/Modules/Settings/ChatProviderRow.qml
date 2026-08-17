@@ -2,13 +2,13 @@ import QtQuick
 import qs.Common
 import qs.Services
 import qs.Widgets
+import qs.Modules.Settings.Widgets
 
-// One installed chat provider in Settings -> Chats.
+// One installed chat provider, as its own container in Settings -> Chats.
 //
-// Collapsed it shows connection state and unread count; expanded it reveals the
-// provider's own settings component, which is an ordinary plugin settings file
-// written by whoever wrote the bridge. Nothing here knows what service the
-// provider talks to.
+// Everything provider-specific is declared by the plugin -- its name, icon,
+// warning and settings component -- so nothing here knows what WhatsApp or
+// Signal is. Adding a provider means installing a plugin, not editing this file.
 StyledRect {
     id: root
 
@@ -20,16 +20,18 @@ StyledRect {
     readonly property string providerId: provider?.id ?? ""
     readonly property string providerName: provider?.name || providerId
     readonly property string providerIcon: provider?.icon || "forum"
+    readonly property string description: provider?.description ?? ""
+    readonly property string warning: provider?.warning ?? ""
     readonly property bool enabled: provider?.enabled ?? false
     readonly property string state: provider?.state ?? "disconnected"
     readonly property int unread: provider?.unread ?? 0
     readonly property string lastError: provider?.lastError ?? ""
     readonly property string settingsPath: provider?.settingsQml ?? ""
     readonly property bool hasSettings: settingsPath !== ""
-
-    property bool expanded: false
+    readonly property var notifications: provider?.notifications ?? ({})
 
     readonly property bool needsLogin: state === "needsLogin"
+    readonly property bool connected: state === "connected"
 
     readonly property string stateLabel: {
         switch (root.state) {
@@ -57,45 +59,43 @@ StyledRect {
         }
     }
 
-    height: contentColumn.implicitHeight + Theme.spacingM * 2
+    function setNotification(key, value) {
+        const params = {};
+        params[key] = value;
+        ChatService.setProviderNotifications(root.providerId, params);
+    }
+
+    width: parent.width
+    height: contentColumn.implicitHeight + Theme.spacingL * 2
     radius: Theme.cornerRadius
-    color: headerArea.containsMouse ? Theme.surfacePressed : Theme.floatingWindowNestedSurface
+    color: Theme.floatingWindowNestedSurface
     border.color: Theme.outlineMedium
     border.width: Theme.layerOutlineWidth
 
-    MouseArea {
-        id: headerArea
+    Column {
+        id: contentColumn
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        height: headerRow.implicitHeight + Theme.spacingM * 2
-        hoverEnabled: true
-        cursorShape: root.hasSettings ? Qt.PointingHandCursor : Qt.ArrowCursor
-        enabled: root.hasSettings
-        onClicked: root.expanded = !root.expanded
-    }
-
-    Column {
-        id: contentColumn
-        anchors.fill: parent
-        anchors.margins: Theme.spacingM
+        anchors.margins: Theme.spacingL
         spacing: Theme.spacingM
 
+        // ------------------------------------------------------------ header
+
         Row {
-            id: headerRow
             width: parent.width
             spacing: Theme.spacingM
 
             DankIcon {
                 anchors.verticalCenter: parent.verticalCenter
                 name: root.providerIcon
-                size: Theme.iconSize
+                size: Theme.iconSizeLarge
                 color: root.enabled ? Theme.primary : Theme.surfaceVariantText
             }
 
             Column {
                 anchors.verticalCenter: parent.verticalCenter
-                width: parent.width - Theme.iconSize - toggleColumn.width - Theme.spacingM * 2
+                width: parent.width - Theme.iconSizeLarge - enableToggle.width - Theme.spacingM * 2
                 spacing: 2
 
                 Row {
@@ -104,13 +104,11 @@ StyledRect {
 
                     StyledText {
                         text: root.providerName
-                        font.pixelSize: Theme.fontSizeMedium
+                        font.pixelSize: Theme.fontSizeLarge
                         font.weight: Font.Medium
                         color: Theme.surfaceText
                     }
 
-                    // Unread is the one number worth surfacing here; the rest
-                    // of the detail lives in the chat window itself.
                     StyledRect {
                         anchors.verticalCenter: parent.verticalCenter
                         visible: root.unread > 0
@@ -151,56 +149,159 @@ StyledRect {
                 }
             }
 
-            Column {
-                id: toggleColumn
+            DankToggle {
+                id: enableToggle
                 anchors.verticalCenter: parent.verticalCenter
-                spacing: Theme.spacingXS
-
-                DankToggle {
-                    checked: root.enabled
-                    // Enabling starts a bridge process; disabling stops it.
-                    onToggled: checked => ChatService.setProviderEnabled(root.providerId, checked)
-                }
-            }
-        }
-
-        // Sign-in is only meaningful once the bridge is running, and only
-        // offered when it has actually asked for it.
-        Row {
-            width: parent.width
-            spacing: Theme.spacingS
-            visible: root.enabled && (root.needsLogin || root.state === "connected")
-
-            DankButton {
-                text: root.needsLogin ? I18n.tr("Sign in") : I18n.tr("Sign out")
-                iconName: root.needsLogin ? "login" : "logout"
-                backgroundColor: root.needsLogin ? Theme.primary : "transparent"
-                textColor: root.needsLogin ? Theme.onPrimary : Theme.surfaceText
-                onClicked: {
-                    if (root.needsLogin) {
-                        ChatService.login(root.providerId);
-                    } else {
-                        ChatService.logout(root.providerId);
-                    }
-                }
+                checked: root.enabled
+                // Enabling starts the provider's bridge process; disabling stops it.
+                onToggled: checked => ChatService.setProviderEnabled(root.providerId, checked)
             }
         }
 
         StyledText {
             width: parent.width
-            text: I18n.tr("This provider has no settings.")
+            text: root.description
+            visible: root.description !== ""
             font.pixelSize: Theme.fontSizeSmall
             color: Theme.surfaceVariantText
-            visible: root.expanded && !root.hasSettings
+            wrapMode: Text.WordWrap
         }
 
-        // The provider's own settings component, written by the bridge author.
-        // It is an ordinary PluginSettings file, so it persists into
-        // plugin_settings.json exactly like any other plugin's settings.
+        // ----------------------------------------------------------- warning
+
+        // Declared by the plugin, not the shell. A provider that carries a real
+        // caveat says so itself, and it is shown before the user turns it on.
+        StyledRect {
+            width: parent.width
+            visible: root.warning !== ""
+            height: warningRow.implicitHeight + Theme.spacingM * 2
+            radius: Theme.cornerRadius / 2
+            color: Theme.withAlpha(Theme.warning, 0.12)
+            border.color: Theme.withAlpha(Theme.warning, 0.35)
+            border.width: 1
+
+            Row {
+                id: warningRow
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.margins: Theme.spacingM
+                spacing: Theme.spacingS
+
+                DankIcon {
+                    name: "warning"
+                    size: Theme.iconSize
+                    color: Theme.warning
+                }
+
+                StyledText {
+                    width: parent.width - Theme.iconSize - Theme.spacingS
+                    text: root.warning
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceText
+                    wrapMode: Text.WordWrap
+                }
+            }
+        }
+
+        // ------------------------------------------------------------- auth
+
+        ChatProviderAuth {
+            width: parent.width
+            visible: root.enabled && root.needsLogin
+            providerId: root.providerId
+        }
+
+        // ---------------------------------------------------- notifications
+
+        SettingsDivider {
+            width: parent.width
+            visible: root.enabled
+        }
+
+        StyledText {
+            width: parent.width
+            visible: root.enabled
+            text: I18n.tr("Notifications")
+            font.pixelSize: Theme.fontSizeMedium
+            font.weight: Font.Medium
+            color: Theme.surfaceText
+        }
+
+        // Per provider rather than global: a work account and a family one
+        // rarely want the same answer, and one global setting lets the noisiest
+        // provider decide for all of them.
+        Column {
+            width: parent.width
+            visible: root.enabled
+            spacing: Theme.spacingM
+
+            SettingsToggleRow {
+                width: parent.width
+                text: I18n.tr("Do Not Disturb")
+                description: I18n.tr("Silence this provider without losing the settings below")
+                checked: root.notifications?.doNotDisturb ?? false
+                onToggled: checked => root.setNotification("doNotDisturb", checked)
+            }
+
+            SettingsToggleRow {
+                width: parent.width
+                text: I18n.tr("Notify for new messages")
+                checked: root.notifications?.enabled ?? true
+                enabled: !(root.notifications?.doNotDisturb ?? false)
+                onToggled: checked => root.setNotification("notificationsEnabled", checked)
+            }
+
+            SettingsToggleRow {
+                width: parent.width
+                text: I18n.tr("Show message preview")
+                description: I18n.tr("Include the message text rather than only that something arrived")
+                checked: root.notifications?.preview ?? true
+                enabled: (root.notifications?.enabled ?? true) && !(root.notifications?.doNotDisturb ?? false)
+                onToggled: checked => root.setNotification("notificationPreview", checked)
+            }
+
+            SettingsToggleRow {
+                width: parent.width
+                text: I18n.tr("Notify for group conversations")
+                checked: root.notifications?.groups ?? true
+                enabled: (root.notifications?.enabled ?? true) && !(root.notifications?.doNotDisturb ?? false)
+                onToggled: checked => root.setNotification("notifyGroups", checked)
+            }
+
+            SettingsToggleRow {
+                width: parent.width
+                text: I18n.tr("Notify for archived conversations")
+                description: I18n.tr("Archiving normally means keeping a conversation out of the way")
+                checked: root.notifications?.archived ?? false
+                enabled: (root.notifications?.enabled ?? true) && !(root.notifications?.doNotDisturb ?? false)
+                onToggled: checked => root.setNotification("notifyArchived", checked)
+            }
+        }
+
+        // -------------------------------------------------- plugin settings
+
+        SettingsDivider {
+            width: parent.width
+            visible: root.enabled && root.hasSettings
+        }
+
+        StyledText {
+            width: parent.width
+            visible: root.enabled && root.hasSettings
+            text: I18n.tr("%1 settings").arg(root.providerName)
+            font.pixelSize: Theme.fontSizeMedium
+            font.weight: Font.Medium
+            color: Theme.surfaceText
+        }
+
+        // The provider's own settings component, written by whoever wrote the
+        // bridge. An ordinary PluginSettings file, persisted like any other
+        // plugin's and pushed down to the running bridge on change.
         Loader {
             id: settingsLoader
             width: parent.width
-            active: root.expanded && root.hasSettings
+            active: root.enabled && root.hasSettings
             visible: active
             asynchronous: true
 
@@ -225,6 +326,35 @@ StyledRect {
             font.pixelSize: Theme.fontSizeSmall
             color: Theme.error
             visible: settingsLoader.status === Loader.Error
+        }
+
+        // ------------------------------------------------------- account
+
+        SettingsDivider {
+            width: parent.width
+            visible: root.enabled && root.connected
+        }
+
+        Row {
+            width: parent.width
+            visible: root.enabled && root.connected
+            spacing: Theme.spacingS
+
+            DankButton {
+                text: I18n.tr("Sign out")
+                iconName: "logout"
+                backgroundColor: "transparent"
+                textColor: Theme.surfaceText
+                onClicked: ChatService.logout(root.providerId)
+            }
+
+            DankButton {
+                text: I18n.tr("Delete all messages")
+                iconName: "delete_sweep"
+                backgroundColor: "transparent"
+                textColor: Theme.error
+                onClicked: ChatService.purge(root.providerId)
+            }
         }
     }
 

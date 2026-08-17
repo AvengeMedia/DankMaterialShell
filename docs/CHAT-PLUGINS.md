@@ -39,10 +39,15 @@ MyChatPlugin/
   "capabilities": ["chat"],
   "icon": "chat",
   "bridge": ["./bin/mychat"],
+  "warning": "Optional. A caveat shown prominently in settings.",
   "settings": "./Settings.qml",
   "permissions": ["settings_read", "settings_write"]
 }
 ```
+
+`warning` is optional. If your provider carries a real caveat — that the service does not sanction
+third-party clients, say — put it here and DMS shows it prominently in settings before the user
+turns the plugin on. It exists so the shell never has to hardcode anything provider-specific.
 
 `bridge` is an argv array, resolved relative to the plugin directory. It can be any executable — a
 compiled binary, or a script with a shebang. Use whatever language you like; the protocol is just JSON

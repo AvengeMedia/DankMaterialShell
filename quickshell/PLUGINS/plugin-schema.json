@@ -42,7 +42,14 @@
     "type": {
       "type": "string",
       "description": "Plugin type. Use 'composite' (or any value) together with 'components' to provide multiple surfaces from one plugin.",
-      "enum": ["widget", "daemon", "launcher", "desktop", "composite", "chat"]
+      "enum": [
+        "widget",
+        "daemon",
+        "launcher",
+        "desktop",
+        "composite",
+        "chat"
+      ]
     },
     "bridge": {
       "type": "array",
@@ -51,6 +58,10 @@
         "type": "string"
       },
       "minItems": 1
+    },
+    "warning": {
+      "type": "string",
+      "description": "A caveat about this provider shown prominently in its settings, e.g. that using it may put the account at risk. Declared by the plugin so the shell never hardcodes anything provider-specific."
     },
     "capabilities": {
       "type": "array",
@@ -154,25 +165,35 @@
         }
       },
       "then": {
-        "required": ["trigger"]
+        "required": [
+          "trigger"
+        ]
       }
     },
     {
       "if": {
-        "required": ["components"],
+        "required": [
+          "components"
+        ],
         "properties": {
           "components": {
-            "required": ["launcher"]
+            "required": [
+              "launcher"
+            ]
           }
         }
       },
       "then": {
-        "required": ["trigger"]
+        "required": [
+          "trigger"
+        ]
       }
     },
     {
       "if": {
-        "required": ["type"],
+        "required": [
+          "type"
+        ],
         "properties": {
           "type": {
             "const": "chat"
@@ -180,15 +201,21 @@
         }
       },
       "then": {
-        "required": ["bridge"]
+        "required": [
+          "bridge"
+        ]
       },
       "else": {
         "anyOf": [
           {
-            "required": ["component"]
+            "required": [
+              "component"
+            ]
           },
           {
-            "required": ["components"]
+            "required": [
+              "components"
+            ]
           }
         ]
       }

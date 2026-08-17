@@ -6,10 +6,14 @@ import qs.Modules.Settings.Widgets
 
 // Settings for the chat system.
 //
-// Two halves: global preferences that apply to every provider, and one row per
-// installed chat plugin. A chat plugin is a provider bridge supervised by the
-// backend rather than QML loaded into the shell, so enabling one here starts a
-// process -- see docs/CHAT-PLUGINS.md.
+// Shared storage preferences, then one container per installed chat plugin.
+// Notification policy is deliberately not global: it lives inside each
+// provider's container, because a work account and a family one rarely want the
+// same answer.
+//
+// A chat plugin is a bridge process supervised by the backend rather than QML
+// loaded into the shell, so enabling one here starts a process. See
+// docs/CHAT-PLUGINS.md.
 Item {
     id: root
 
@@ -69,52 +73,6 @@ Item {
 
             SettingsCard {
                 width: parent.width
-                iconName: "notifications"
-                title: I18n.tr("Notifications")
-                settingKey: "chatNotifications"
-                visible: ChatService.available
-
-                SettingsToggleRow {
-                    settingKey: "chatNotificationsEnabled"
-                    text: I18n.tr("Notify for new messages")
-                    description: I18n.tr("Messages in the conversation you are reading never notify")
-                    checked: SettingsData.chatNotificationsEnabled
-                    onToggled: checked => SettingsData.set("chatNotificationsEnabled", checked)
-                }
-
-                SettingsDivider {
-                    width: parent.width
-                }
-
-                SettingsToggleRow {
-                    settingKey: "chatNotificationPreview"
-                    text: I18n.tr("Show message preview")
-                    description: I18n.tr("Include the message text; off shows only that something arrived")
-                    checked: SettingsData.chatNotificationPreview
-                    enabled: SettingsData.chatNotificationsEnabled
-                    onToggled: checked => SettingsData.set("chatNotificationPreview", checked)
-                }
-
-                SettingsToggleRow {
-                    settingKey: "chatNotifyGroups"
-                    text: I18n.tr("Notify for group conversations")
-                    checked: SettingsData.chatNotifyGroups
-                    enabled: SettingsData.chatNotificationsEnabled
-                    onToggled: checked => SettingsData.set("chatNotifyGroups", checked)
-                }
-
-                SettingsToggleRow {
-                    settingKey: "chatNotifyArchived"
-                    text: I18n.tr("Notify for archived conversations")
-                    description: I18n.tr("Archived conversations are normally kept out of the way entirely")
-                    checked: SettingsData.chatNotifyArchived
-                    enabled: SettingsData.chatNotificationsEnabled
-                    onToggled: checked => SettingsData.set("chatNotifyArchived", checked)
-                }
-            }
-
-            SettingsCard {
-                width: parent.width
                 iconName: "database"
                 title: I18n.tr("Storage")
                 settingKey: "chatStorage"
@@ -151,31 +109,35 @@ Item {
                 }
             }
 
-            SettingsCard {
+            StyledText {
                 width: parent.width
-                iconName: "forum"
-                title: I18n.tr("Providers")
-                settingKey: "chatProviders"
                 visible: ChatService.available
+                text: I18n.tr("Providers")
+                font.pixelSize: Theme.fontSizeLarge
+                font.weight: Font.Medium
+                color: Theme.surfaceText
+            }
 
-                StyledText {
-                    width: parent.width
-                    text: I18n.tr("No chat providers installed. Install one from the plugin browser under Plugins.")
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceVariantText
-                    wrapMode: Text.WordWrap
-                    visible: ChatService.providers.length === 0
-                }
+            StyledText {
+                width: parent.width
+                text: I18n.tr("No chat providers installed. Install one from the plugin browser under Plugins.")
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.surfaceVariantText
+                wrapMode: Text.WordWrap
+                visible: ChatService.available && ChatService.providers.length === 0
+            }
 
-                Repeater {
-                    model: ChatService.providers
+            // One container per installed chat plugin. Each holds its own
+            // state, warning, sign-in, notification policy and plugin settings,
+            // so providers never share a settings surface.
+            Repeater {
+                model: ChatService.providers
 
-                    ChatProviderRow {
-                        required property var modelData
+                ChatProviderRow {
+                    required property var modelData
 
-                        width: parent.width
-                        provider: modelData
-                    }
+                    width: mainColumn.width
+                    provider: modelData
                 }
             }
         }

@@ -74,6 +74,9 @@ type Manager struct {
 	enabled   map[string]bool
 	sync      map[string]SyncProgress
 	config    Config
+	// prefs holds per-provider notification overrides. Absent means "use the
+	// global defaults in config".
+	prefs map[string]chat.NotifyPrefs
 
 	events      chan ingestEvent
 	subscribers syncmap.Map[string, chan State]
@@ -114,6 +117,7 @@ func NewManager() (*Manager, error) {
 		bridges:       map[string]*bridge{},
 		enabled:       map[string]bool{},
 		sync:          map[string]SyncProgress{},
+		prefs:         map[string]chat.NotifyPrefs{},
 		events:        make(chan ingestEvent, ingestQueueDepth),
 		dirty:         make(chan struct{}, 1),
 		stopChan:      make(chan struct{}),
@@ -178,14 +182,33 @@ func (m *Manager) SetConfig(c Config) {
 	m.config = c
 	m.mu.Unlock()
 
-	m.notify.Enabled = c.NotificationsEnabled
-	m.notify.Preview = c.NotificationPreview
-	m.notify.Groups = c.NotifyGroups
-	m.notify.Archived = c.NotifyArchived
-
 	if c.MediaCacheMaxBytes > 0 {
 		root := m.media.Root()
 		m.media = chat.NewMedia(root, c.MediaCacheMaxBytes)
+	}
+}
+
+// SetProviderPrefs overrides the notification policy for one provider.
+func (m *Manager) SetProviderPrefs(providerID string, prefs chat.NotifyPrefs) {
+	m.mu.Lock()
+	m.prefs[providerID] = prefs
+	m.mu.Unlock()
+}
+
+// ProviderPrefs is the effective policy for a provider: its own overrides if
+// the user has set any, otherwise the global defaults.
+func (m *Manager) ProviderPrefs(providerID string) chat.NotifyPrefs {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+
+	if prefs, ok := m.prefs[providerID]; ok {
+		return prefs
+	}
+	return chat.NotifyPrefs{
+		Enabled:  m.config.NotificationsEnabled,
+		Preview:  m.config.NotificationPreview,
+		Groups:   m.config.NotifyGroups,
+		Archived: m.config.NotifyArchived,
 	}
 }
 
@@ -362,7 +385,9 @@ func (m *Manager) Providers(ctx context.Context) []ProviderStatus {
 		status.Enabled = enabled[p.ID]
 		status.Description = p.Description
 		status.SettingsQML = p.SettingsQML
+		status.Warning = p.Warning
 		status.Unread = unread[p.ID]
+		status.Notifications = m.ProviderPrefs(p.ID)
 		out = append(out, status)
 	}
 	return out

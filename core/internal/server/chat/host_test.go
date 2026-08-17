@@ -104,7 +104,6 @@ func newTestManager(t *testing.T, pluginRoot string) *Manager {
 
 	media := chat.NewMedia(t.TempDir(), 0)
 	notify := chat.NewNotifyPolicy(store, media)
-	notify.Enabled = false // no session bus under test
 
 	m := &Manager{
 		store:         store,
@@ -115,10 +114,12 @@ func newTestManager(t *testing.T, pluginRoot string) *Manager {
 		bridges:       map[string]*bridge{},
 		enabled:       map[string]bool{},
 		sync:          map[string]SyncProgress{},
-		events:        make(chan ingestEvent, ingestQueueDepth),
-		dirty:         make(chan struct{}, 1),
-		stopChan:      make(chan struct{}),
-		startedAt:     time.Now(),
+		// Notifications off: there is no session bus under test.
+		prefs:     map[string]chat.NotifyPrefs{},
+		events:    make(chan ingestEvent, ingestQueueDepth),
+		dirty:     make(chan struct{}, 1),
+		stopChan:  make(chan struct{}),
+		startedAt: time.Now(),
 	}
 	m.Rescan()
 
