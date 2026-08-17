@@ -413,6 +413,17 @@ func TestBuildMatugenArgsDefaultPreservesExistingBehavior(t *testing.T) {
 	assert.Equal(t, expected, args, "empty source mode must produce byte-identical args to pre-feature behavior")
 }
 
+func TestBuildImportData(t *testing.T) {
+	const dank16 = `{"color0":"#000000"}`
+
+	assert.Equal(t, `{"dank16": {"color0":"#000000"}}`, buildImportData(dank16, ""),
+		"no image must produce byte-identical import data to pre-feature behavior")
+	assert.Equal(t, `{"dank16": {"color0":"#000000"}, "image": "/home/u/My Wallpaper.png"}`,
+		buildImportData(dank16, "/home/u/My Wallpaper.png"))
+	assert.Equal(t, `{"dank16": {"color0":"#000000"}, "image": "/home/u/a\"b\\c.png"}`,
+		buildImportData(dank16, `/home/u/a"b\c.png`), "paths must be escaped, not interpolated raw")
+}
+
 // writeTestPNG encodes img as a PNG at path, failing the test on any error.
 func writeTestPNG(t *testing.T, path string, img image.Image) {
 	t.Helper()

@@ -346,6 +346,7 @@ func buildOnce(opts *Options) (bool, error) {
 	var primaryDark, primaryLight, surface string
 	var dank16JSON string
 	var importArgs []string
+	var sourceImage string
 
 	// Colorful mode resolves the seed here, before matugen is invoked at all,
 	// by rewriting the source to the extracted hex. Both the dry-run and the
@@ -358,6 +359,11 @@ func buildOnce(opts *Options) (bool, error) {
 			log.Warnf("Colorful source extraction failed for %s, using matugen's own: %v", opts.Value, err)
 		} else {
 			log.Infof("Colorful source color: %s -> %s", opts.Value, seed)
+			// matugen resolves {{image}} to an absolute path, so match it.
+			sourceImage = opts.Value
+			if abs, err := filepath.Abs(sourceImage); err == nil {
+				sourceImage = abs
+			}
 			opts.Kind = "hex"
 			opts.Value = seed
 		}
@@ -407,8 +413,7 @@ func buildOnce(opts *Options) (bool, error) {
 		}
 
 		dank16JSON = generateDank16Variants(primaryDark, primaryLight, surface, opts.Mode)
-		importData := fmt.Sprintf(`{"dank16": %s}`, dank16JSON)
-		importArgs = []string{"--import-json-string", importData}
+		importArgs = []string{"--import-json-string", buildImportData(dank16JSON, sourceImage)}
 
 		log.Infof("Running matugen %s with dank16 injection", opts.Kind)
 		var args []string
@@ -482,6 +487,17 @@ func appendContrastArg(args []string, contrast float64) []string {
 		return args
 	}
 	return append(args, "--contrast", strconv.FormatFloat(contrast, 'f', -1, 64))
+}
+
+// buildImportData is the JSON passed to matugen's --import-json-string. image is
+// set only when the source was rewritten from a wallpaper to a hex color, where
+// matugen leaves {{image}} unset and templates using it would render "Null".
+func buildImportData(dank16JSON, image string) string {
+	if image == "" {
+		return fmt.Sprintf(`{"dank16": %s}`, dank16JSON)
+	}
+	path, _ := json.Marshal(image)
+	return fmt.Sprintf(`{"dank16": %s, "image": %s}`, dank16JSON, path)
 }
 
 func buildMergedConfig(opts *Options, cfgFile *os.File, tmpDir string) error {
