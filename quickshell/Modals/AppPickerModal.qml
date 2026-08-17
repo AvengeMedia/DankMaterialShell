@@ -229,6 +229,15 @@ DankModal {
             }
 
             Keys.onPressed: event => {
+                const hasCtrl = (event.modifiers & Qt.ControlModifier) !== 0;
+                const hasShift = (event.modifiers & Qt.ShiftModifier) !== 0;
+                const hasOtherModifier = (event.modifiers & (Qt.AltModifier | Qt.MetaModifier)) !== 0;
+                if (hasCtrl && hasShift && !hasOtherModifier && event.key === Qt.Key_C) {
+                    root.copyEditableTarget();
+                    event.accepted = true;
+                    return;
+                }
+
                 if (event.key === Qt.Key_Tab && root.mimeType.length > 0) {
                     root.rememberChoice = !root.rememberChoice;
                     event.accepted = true;
@@ -527,7 +536,7 @@ DankModal {
                     visible: root.showTargetData && root.targetData.length > 0
 
                     StyledText {
-                        id: targetDataLabel
+                        id: targetDataLabelText
                         anchors.left: parent.left
                         anchors.leftMargin: Theme.spacingS
                         anchors.verticalCenter: parent.verticalCenter
@@ -539,14 +548,14 @@ DankModal {
 
                     DankTextField {
                         id: targetDataField
-                        anchors.left: targetDataLabel.visible ? targetDataLabel.right : parent.left
+                        anchors.left: targetDataLabelText.visible ? targetDataLabelText.right : parent.left
                         anchors.leftMargin: Theme.spacingS
                         anchors.right: copyTargetButton.left
                         anchors.rightMargin: Theme.spacingXS
                         anchors.verticalCenter: parent.verticalCenter
                         height: 44
                         text: root.editableTargetData
-                        keyForwardTargets: [targetCopyShortcutHandler]
+                        keyForwardTargets: [appContent]
                         backgroundColor: Theme.withAlpha(Theme.surfaceContainerHigh, 0.5)
                         onTextEdited: root.editableTargetData = text
                         Keys.onLeftPressed: event => {
@@ -559,20 +568,6 @@ DankModal {
                         }
                     }
 
-                    Item {
-                        id: targetCopyShortcutHandler
-
-                        Keys.onPressed: event => {
-                            const hasCtrl = (event.modifiers & Qt.ControlModifier) !== 0;
-                            const hasShift = (event.modifiers & Qt.ShiftModifier) !== 0;
-                            const hasOtherModifier = (event.modifiers & (Qt.AltModifier | Qt.MetaModifier)) !== 0;
-                            if (hasCtrl && hasShift && !hasOtherModifier && event.key === Qt.Key_C) {
-                                root.copyEditableTarget();
-                                event.accepted = true;
-                            }
-                        }
-                    }
-
                     DankActionButton {
                         id: copyTargetButton
                         anchors.right: parent.right
@@ -582,7 +577,7 @@ DankModal {
                         iconName: root.targetCopied ? "check" : "content_copy"
                         iconSize: Theme.iconSize - 6
                         iconColor: root.targetCopied ? Theme.primary : Theme.surfaceText
-                        tooltipText: I18n.tr("Copy target (Ctrl+Shift+C)")
+                        tooltipText: I18n.tr("Copy target (%1)", "app picker copy target button tooltip").arg("Ctrl+Shift+C")
                         onClicked: root.copyEditableTarget()
                     }
                 }
