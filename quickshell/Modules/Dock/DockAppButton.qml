@@ -182,7 +182,7 @@ Item {
             return false;
 
         HyprlandService.toggleSpecial(specialName);
-        Qt.callLater(() => waylandToplevel.activate());
+        Qt.callLater(() => CompositorService.activateToplevel(waylandToplevel));
         return true;
     }
 

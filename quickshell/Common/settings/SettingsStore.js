@@ -389,5 +389,17 @@ function migrateToVersion(obj, targetVersion) {
         settings.configVersion = 15;
     }
 
+    if (currentVersion < 16) {
+        console.info("Migrating settings from version", currentVersion, "to version 16");
+        console.info("Moving Niri overview close behavior to the window focus setting");
+
+        if (settings.closeNiriOverviewOnWindowFocus === undefined && settings.spotlightCloseNiriOverview !== undefined) {
+            settings.closeNiriOverviewOnWindowFocus = settings.spotlightCloseNiriOverview;
+        }
+        delete settings.spotlightCloseNiriOverview;
+
+        settings.configVersion = 16;
+    }
+
     return settings;
 }

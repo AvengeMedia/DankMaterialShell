@@ -778,15 +778,6 @@ Item {
                 visible: CompositorService.isNiri
 
                 SettingsToggleRow {
-                    settingKey: "spotlightCloseNiriOverview"
-                    tags: ["launcher", "niri", "overview", "close", "launch"]
-                    text: I18n.tr("Close Overview on Launch")
-                    description: I18n.tr("Auto-close Niri overview when launching apps.")
-                    checked: SettingsData.spotlightCloseNiriOverview
-                    onToggled: checked => SettingsData.set("spotlightCloseNiriOverview", checked)
-                }
-
-                SettingsToggleRow {
                     settingKey: "niriOverviewOverlayEnabled"
                     tags: ["launcher", "niri", "overview", "overlay", "enable"]
                     text: I18n.tr("Enable Overview Overlay")

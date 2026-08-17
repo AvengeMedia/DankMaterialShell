@@ -115,7 +115,7 @@ Scope {
                             niriOverviewScope.hideSpotlight();
                             return;
                         }
-                        NiriService.toggleOverview();
+                        NiriService.closeOverview();
                     }
                 }
 
@@ -200,7 +200,7 @@ Scope {
                         if (overlayWindow.shouldShowSpotlight || niriOverviewScope.isClosing)
                             return;
                         if ([Qt.Key_Escape, Qt.Key_Return].includes(event.key)) {
-                            NiriService.toggleOverview();
+                            NiriService.closeOverview();
                             event.accepted = true;
                             return;
                         }
