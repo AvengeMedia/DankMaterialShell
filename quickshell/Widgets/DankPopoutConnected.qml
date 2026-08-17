@@ -267,7 +267,6 @@ Item {
             "phase": phase,
             "visible": visible,
             "presented": presented,
-            "layer": root.triggerUsesOverlayLayer ? "overlay" : "top",
             "barSide": contentContainer.connectedBarSide,
             "bodyRect": bodyRect,
             "animationOffset": animationOffset,
@@ -425,7 +424,7 @@ Item {
         }
     }
 
-    readonly property bool frameOwnsConnectedChrome: CompositorService.usesConnectedFrameChromeForScreen(root.screen)
+    readonly property bool frameOwnsConnectedChrome: !triggerUsesOverlayLayer && CompositorService.usesConnectedFrameChromeForScreen(root.screen)
     readonly property bool usesConnectedSurfaceChrome: Theme.isConnectedEffect && !CompositorService.connectedFrameBlockedOnScreen(root.screen)
     readonly property bool usesLocalConnectedSurfaceChrome: usesConnectedSurfaceChrome && !frameOwnsConnectedChrome
     onFrameOwnsConnectedChromeChanged: _syncPopoutChromeState()
