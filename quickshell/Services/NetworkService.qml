@@ -285,6 +285,12 @@ Singleton {
         }
     }
 
+    function connectCellular() {
+        if (activeService && activeService.connectCellular) {
+            activeService.connectCellular();
+        }
+    }
+
     function connectToSpecificCellularConfig(uuid) {
         if (activeService && activeService.connectToSpecificCellularConfig) {
             activeService.connectToSpecificCellularConfig(uuid);

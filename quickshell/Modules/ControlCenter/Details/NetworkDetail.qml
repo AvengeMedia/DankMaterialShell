@@ -56,7 +56,12 @@ Rectangle {
             types.push("cellular");
         return types.length > 0 ? types : ["wifi"];
     }
-    property string currentConnectionType: connectionTypes[Math.max(0, currentPreferenceIndex)] || "wifi"
+    property int selectedTypeIndex: -1
+    property string currentConnectionType: {
+        if (selectedTypeIndex >= 0 && selectedTypeIndex < connectionTypes.length)
+            return connectionTypes[selectedTypeIndex];
+        return connectionTypes[Math.max(0, currentPreferenceIndex)] || "wifi";
+    }
     property int maxPinnedNetworks: 3
     // Hosting on the only wifi adapter with no ethernet uplink just drops connectivity,
     // so the hotspot row only shows where sharing can actually work (or is already on).
@@ -174,11 +179,12 @@ Rectangle {
 
                 visible: connectionTypes.length > 1 && NetworkService.backend === "networkmanager" && DMSService.apiVersion > 10
                 model: connectionTypes.map(t => labelsByType[t] || t)
-                currentIndex: currentPreferenceIndex
+                currentIndex: selectedTypeIndex >= 0 ? selectedTypeIndex : currentPreferenceIndex
                 selectionMode: "single"
                 onSelectionChanged: (index, selected) => {
                     if (!selected)
                         return;
+                    selectedTypeIndex = index;
                     NetworkService.setNetworkPreference(connectionTypes[index] || "wifi");
                 }
             }
@@ -611,6 +617,7 @@ Rectangle {
         anchors.margins: Theme.spacingM
         anchors.topMargin: Theme.spacingM
         visible: currentConnectionType === "cellular" && NetworkService.backend === "networkmanager" && NetworkService.cellularEnabled && !NetworkService.cellularToggling
+        enabled: visible
         contentHeight: cellularColumn.height
         clip: true
 
@@ -626,6 +633,84 @@ Rectangle {
                 font.pixelSize: Theme.fontSizeMedium
                 color: Theme.surfaceVariantText
                 horizontalAlignment: Text.AlignHCenter
+            }
+
+            Repeater {
+                model: (NetworkService.cellularConnections?.length ?? 0) > 0 ? [] : (NetworkService.cellularDevices || [])
+
+                delegate: Rectangle {
+                    id: cellularDeviceDelegate
+                    required property var modelData
+
+                    readonly property bool isActive: modelData.connected || false
+
+                    width: parent.width
+                    height: 56
+                    radius: Theme.cornerRadius
+                    color: cellularDeviceMouse.containsMouse ? Theme.primaryHoverLight : Theme.surfaceLight
+                    border.color: isActive ? Theme.primary : Theme.outlineLight
+                    border.width: isActive ? 2 : 1
+
+                    Row {
+                        anchors.left: parent.left
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.leftMargin: Theme.spacingM
+                        anchors.right: cellularDeviceAction.left
+                        anchors.rightMargin: Theme.spacingS
+                        spacing: Theme.spacingS
+
+                        DankIcon {
+                            name: "network_cell"
+                            size: Theme.iconSize - 4
+                            color: cellularDeviceDelegate.isActive ? Theme.primary : Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Column {
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: parent.width - Theme.iconSize - Theme.spacingS
+                            spacing: 2
+
+                            StyledText {
+                                text: modelData.description || modelData.name || I18n.tr("Unknown")
+                                font.pixelSize: Theme.fontSizeMedium
+                                color: cellularDeviceDelegate.isActive ? Theme.primary : Theme.surfaceText
+                                font.weight: cellularDeviceDelegate.isActive ? Font.Medium : Font.Normal
+                                elide: Text.ElideRight
+                                width: parent.width
+                            }
+
+                            StyledText {
+                                text: cellularDeviceDelegate.isActive ? I18n.tr("Connected") : (modelData.state || I18n.tr("Available"))
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceVariantText
+                                elide: Text.ElideRight
+                                width: parent.width
+                            }
+                        }
+                    }
+
+                    DankActionButton {
+                        id: cellularDeviceAction
+                        anchors.right: parent.right
+                        anchors.rightMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        iconName: cellularDeviceDelegate.isActive ? "link_off" : "link"
+                        buttonSize: 28
+                        iconSize: 18
+                        iconColor: cellularDeviceDelegate.isActive ? Theme.error : Theme.primary
+                        onClicked: NetworkService.toggleNetworkConnection("cellular")
+                    }
+
+                    MouseArea {
+                        id: cellularDeviceMouse
+                        anchors.fill: parent
+                        anchors.rightMargin: cellularDeviceAction.width + Theme.spacingS
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: NetworkService.toggleNetworkConnection("cellular")
+                    }
+                }
             }
 
             Repeater {
@@ -725,7 +810,7 @@ Rectangle {
 
             StyledText {
                 width: parent.width
-                visible: (NetworkService.cellularDevices?.length ?? 0) > 0 && cellularConnectionsModel.values.length === 0
+                visible: (NetworkService.cellularDevices?.length ?? 0) === 0 && cellularConnectionsModel.values.length === 0
                 text: I18n.tr("No devices found")
                 font.pixelSize: Theme.fontSizeMedium
                 color: Theme.surfaceVariantText

@@ -543,6 +543,28 @@ Singleton {
         });
     }
 
+    function connectCellular() {
+        if (!networkAvailable || isConnecting)
+            return;
+        isConnecting = true;
+        connectionError = "";
+        connectionStatus = "connecting";
+
+        DMSService.sendRequest("network.cellular.connect", null, response => {
+            if (response.error) {
+                connectionError = response.error;
+                lastConnectionError = response.error;
+                connectionStatus = "failed";
+                ToastService.showError(I18n.tr("Failed to activate configuration"), response.error);
+            } else {
+                connectionError = "";
+                connectionStatus = "connected";
+                ToastService.showInfo(I18n.tr("Configuration activated"));
+            }
+            isConnecting = false;
+        });
+    }
+
     function connectToSpecificCellularConfig(uuid) {
         if (!networkAvailable || isConnecting)
             return;
@@ -857,7 +879,7 @@ Singleton {
             if (cellularConnected) {
                 DMSService.sendRequest("network.cellular.disconnect", null, null);
             } else {
-                DMSService.sendRequest("network.cellular.connect", null, null);
+                connectCellular();
             }
         }
     }
