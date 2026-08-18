@@ -78,31 +78,83 @@ Item {
         input.forceActiveFocus();
     }
 
-    // pasteAttachment writes the clipboard to a file and stages it.
+    // paste handles the clipboard itself, for both media and text.
     //
-    // Only when the clipboard actually holds something file-shaped: for plain
-    // text this does nothing and the normal text paste is left to happen.
-    function pasteAttachment() {
-        if (!root.canAttach || root.pasting)
+    // The text field's own Ctrl+V cannot be extended: the inner input consumes
+    // the key before anything wrapping it is told, so intercepting the shortcut
+    // and doing the whole job here is the only way to stage an image. Text is
+    // then inserted by hand, which is why this reads it rather than leaving it.
+    function paste() {
+        if (root.pasting)
             return;
         root.pasting = true;
 
-        // wl-paste reports the mime types on offer. Anything that is not text
-        // is written to a temp file named with a matching extension.
-        const script = "set -e\n" + "t=$(wl-paste --list-types 2>/dev/null | grep -v '^text/' | grep -v '^$' | head -1)\n" + "[ -n \"$t\" ] || exit 3\n" + "ext=${t##*/}\n" + "case \"$ext\" in jpeg) ext=jpg ;; esac\n" + "f=$(mktemp \"${XDG_RUNTIME_DIR:-/tmp}/dms-chat-paste-XXXXXX.$ext\")\n" + "wl-paste --type \"$t\" > \"$f\"\n" + "[ -s \"$f\" ] || { rm -f \"$f\"; exit 4; }\n" + "printf '%s' \"$f\"\n";
+        // One pass over the clipboard. A type that is not text wins, since a
+        // clipboard carrying an image usually offers a text fallback too.
+        const script = "types=$(wl-paste --list-types 2>/dev/null)\n" + "media=$(printf '%s\\n' \"$types\" | grep -E '^(image|video|audio|application)/' | head -1)\n" + "if [ -n \"$media\" ]; then\n" + "  ext=${media##*/}\n" + "  case \"$ext\" in jpeg) ext=jpg ;; 'vnd.oasis.opendocument.text') ext=odt ;; esac\n" + "  f=$(mktemp \"${XDG_RUNTIME_DIR:-/tmp}/dms-chat-paste-XXXXXX.$ext\")\n" + "  wl-paste --type \"$media\" > \"$f\" 2>/dev/null\n" + "  if [ -s \"$f\" ]; then printf 'FILE:%s' \"$f\"; exit 0; fi\n" + "  rm -f \"$f\"\n" + "fi\n" + "printf 'TEXT:%s' \"$(wl-paste --no-newline 2>/dev/null)\"\n";
 
-        Proc.runCommand("chat.pasteAttachment", ["sh", "-c", script], (stdout, exitCode) => {
+        Proc.runCommand("chat.paste", ["sh", "-c", script], (stdout, exitCode) => {
             root.pasting = false;
 
-            if (exitCode === 0 && (stdout || "").trim() !== "") {
-                root.stage(stdout.trim());
+            const out = stdout || "";
+            if (out.startsWith("FILE:")) {
+                if (!root.canAttach) {
+                    ToastService.showWarning(I18n.tr("Cannot attach"), I18n.tr("This provider does not accept attachments."));
+                    return;
+                }
+                root.stage(out.slice(5).trim());
                 return;
             }
 
-            // Exit 3 means the clipboard held only text, which is not an error:
-            // the text paste happens on its own.
-            if (exitCode !== 3)
-                ToastService.showWarning(I18n.tr("Nothing to attach"), I18n.tr("The clipboard holds no image or file."));
+            if (out.startsWith("TEXT:")) {
+                const pasted = out.slice(5);
+                if (pasted === "")
+                    return;
+
+                // A pasted path is almost certainly meant as an attachment, not
+                // as a line of text about a file.
+                if (root.canAttach && root.looksLikePath(pasted)) {
+                    root.stageIfFile(pasted);
+                    return;
+                }
+                root.insertText(pasted);
+            }
+        });
+    }
+
+    // insertText puts text at the cursor, since the paste is handled here
+    // rather than by the field.
+    function insertText(text) {
+        const at = input.cursorPosition;
+        const before = input.text.slice(0, at);
+        const after = input.text.slice(at);
+        input.text = before + text + after;
+        input.cursorPosition = at + text.length;
+    }
+
+    function looksLikePath(text) {
+        const trimmed = text.trim();
+        if (trimmed === "" || trimmed.indexOf("\n") !== -1)
+            return false;
+        return trimmed.startsWith("/") || trimmed.startsWith("~/") || trimmed.startsWith("file://");
+    }
+
+    // stageIfFile attaches a path only once it is confirmed to exist, so a
+    // sentence that happens to start with a slash is still just text.
+    function stageIfFile(text, onMissing) {
+        const path = text.trim().replace("file://", "");
+
+        Proc.runCommand("chat.checkPath", ["test", "-f", path], (stdout, exitCode) => {
+            if (exitCode === 0) {
+                root.stage(path);
+                if (onMissing)
+                    onMissing(true);
+                return;
+            }
+            if (onMissing)
+                onMissing(false);
+            else
+                root.insertText(text);
         });
     }
 
@@ -278,12 +330,26 @@ Item {
                     event.accepted = true;
                 }
 
-                // Ctrl+V stages an image or file. Not accepted, so a plain text
-                // paste still lands in the field when that is what the
-                // clipboard holds.
-                Keys.onPressed: event => {
-                    if ((event.modifiers & Qt.ControlModifier) && !(event.modifiers & Qt.ShiftModifier) && event.key === Qt.Key_V)
-                        root.pasteAttachment();
+                // Typing or pasting a path and pressing space attaches it,
+                // which is how a file manager's "copy path" ends up here.
+                onTextChanged: {
+                    if (!root.canAttach || root.pasting)
+                        return;
+                    if (!input.text.endsWith(" "))
+                        return;
+
+                    const candidate = input.text.trim();
+                    if (!root.looksLikePath(candidate))
+                        return;
+
+                    root.pasting = true;
+                    root.stageIfFile(candidate, found => {
+                        root.pasting = false;
+                        // Only clear the field once the file turned out to be
+                        // real; otherwise the text was just text.
+                        if (found)
+                            input.text = "";
+                    });
                 }
             }
 

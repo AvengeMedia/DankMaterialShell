@@ -200,6 +200,15 @@ FocusScope {
         onActivated: root.forwardSelected()
     }
 
+    // Paste is intercepted rather than left to the text field, which consumes
+    // Ctrl+V before anything wrapping it is told. The composer then handles
+    // both cases: an image is staged, text is inserted at the cursor.
+    Shortcut {
+        sequences: ["Ctrl+V"]
+        enabled: !root.hasOverlay
+        onActivated: composer.paste()
+    }
+
     // Ctrl+Shift+C rather than Ctrl+C: the composer always holds focus, so
     // plain Ctrl+C has to stay available for the text the user selected there.
     Shortcut {

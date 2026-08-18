@@ -59,8 +59,13 @@ StyledRect {
         }
     }
 
-    // The tags this provider's own conversations carry, so the toggles below
-    // are the ones that mean something for it.
+    // Tags the host works out for itself. Excluded from the per-tag toggles
+    // because each already has a named setting above -- listing them twice gave
+    // two controls with almost the same label doing the same thing.
+    readonly property var derivedTags: ["archived", "muted", "unread", "group", "direct"]
+
+    // The provider's own categories: WhatsApp's statuses and channels, a mail
+    // account's labels. These are the ones with no named setting of their own.
     readonly property var providerTags: {
         const seen = {};
         const out = [];
@@ -70,10 +75,11 @@ StyledRect {
                 continue;
             const tags = chat.tags || [];
             for (let t = 0; t < tags.length; t++) {
-                if (!seen[tags[t]]) {
-                    seen[tags[t]] = true;
-                    out.push(tags[t]);
-                }
+                const tag = tags[t];
+                if (seen[tag] || root.derivedTags.indexOf(tag) !== -1)
+                    continue;
+                seen[tag] = true;
+                out.push(tag);
             }
         }
         out.sort();
