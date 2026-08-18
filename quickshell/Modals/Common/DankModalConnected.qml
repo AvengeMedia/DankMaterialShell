@@ -37,7 +37,7 @@ Item {
 
     readonly property string resolvedConnectedBarSide: frameConnectedMode ? preferredConnectedBarSide : ""
 
-    readonly property bool frameOwnsConnectedChrome: frameConnectedMode && resolvedConnectedBarSide !== "" && !allowStacking && !useOverlayLayer && CompositorService.usesConnectedFrameChromeForScreen(effectiveScreen)
+    readonly property bool frameOwnsConnectedChrome: frameConnectedMode && resolvedConnectedBarSide !== "" && !allowStacking && CompositorService.usesConnectedFrameChromeForScreen(effectiveScreen)
 
     function _dockOccupiesSide(side) {
         if (!SettingsData.showDock)
@@ -140,6 +140,7 @@ Item {
             "phase": phase,
             "visible": presented,
             "presented": presented,
+            "layer": root.useOverlayLayer ? "overlay" : "top",
             "barSide": resolvedConnectedBarSide,
             "bodyRect": bodyRect,
             "animationOffset": animationOffset,

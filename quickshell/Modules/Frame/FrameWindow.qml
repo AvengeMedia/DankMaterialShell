@@ -21,7 +21,7 @@ PanelWindow {
     updatesEnabled: win._frameVisible
 
     WlrLayershell.namespace: "dms:frame"
-    WlrLayershell.layer: WlrLayer.Top
+    WlrLayershell.layer: win._usesOverlayLayer ? WlrLayer.Overlay : WlrLayer.Top
     WlrLayershell.exclusionMode: ExclusionMode.Ignore
 
     anchors {
@@ -83,6 +83,7 @@ PanelWindow {
     readonly property var _dockDescriptor: ConnectedModeState.surfaceDescriptor(win._screenName, "dock")
     readonly property var _notifDescriptor: ConnectedModeState.surfaceDescriptor(win._screenName, "notification")
     readonly property var _modalDescriptor: ConnectedModeState.surfaceDescriptor(win._screenName, "modal")
+    readonly property bool _usesOverlayLayer: (win._modalDescriptor.presented && win._modalDescriptor.layer === "overlay") || (win._popoutDescriptor.presented && win._popoutDescriptor.layer === "overlay")
 
     readonly property bool _connectedActive: CompositorService.usesConnectedFrameChromeForScreen(win.targetScreen)
     readonly property bool _dockHostedHere: {
