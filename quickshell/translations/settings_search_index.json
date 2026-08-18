@@ -11142,6 +11142,26 @@
     "description": "Show a notification when battery reaches the charge limit."
   },
   {
+    "section": "batteryStatusCard",
+    "label": "Power",
+    "tabIndex": 42,
+    "category": "Power & Security",
+    "keywords": [
+      "battery",
+      "charge",
+      "health",
+      "hibernate",
+      "power",
+      "reboot",
+      "restart",
+      "security",
+      "shutdown",
+      "sleep",
+      "status",
+      "suspend"
+    ]
+  },
+  {
     "section": "_tab_42",
     "label": "Power & Security",
     "tabIndex": 42,
@@ -11232,21 +11252,6 @@
     ],
     "icon": "tune",
     "description": "Limit the maximum battery charge level to extend lifespan."
-  },
-  {
-    "section": "batteryStatusCard",
-    "label": "Status",
-    "tabIndex": 42,
-    "category": "Power & Security",
-    "keywords": [
-      "battery",
-      "charge",
-      "health",
-      "power",
-      "security",
-      "status"
-    ],
-    "icon": "battery_charging_full"
   },
   {
     "section": "_tab_43",
