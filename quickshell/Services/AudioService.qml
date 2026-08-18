@@ -243,7 +243,7 @@ Singleton {
                     continue;
                 const meta = match[3];
                 let availability = "unknown";
-                if (meta.includes("not available")
+                if (meta.includes("not available"))
                     availability = "no";
                 else if (/\bavailable\b/.test(meta))
                     availability = "yes";

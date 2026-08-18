@@ -340,15 +340,6 @@ DankPopout {
         }
     }
 
-    Component {
-        id: audioOutputDetailComponent
-        AudioOutputDetail {
-            onShowPortSelector: node => {
-                if (contentLoader.item?.audioPortSelector)
-                    contentLoader.item.audioPortSelector.show(node);
-            }
-        }
-    }
 
     Component {
         id: audioInputDetailComponent
