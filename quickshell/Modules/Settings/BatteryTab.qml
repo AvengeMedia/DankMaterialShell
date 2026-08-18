@@ -135,33 +135,7 @@ done
                         spacing: Theme.spacingM
 
                         Item {
-                            width: (parent.width - Theme.spacingM * 2) / 3
-                            height: sourceColumn.implicitHeight
-
-                            Column {
-                                id: sourceColumn
-                                width: parent.width
-                                spacing: Theme.spacingXXS
-
-                                StyledText {
-                                    text: I18n.tr("Power source")
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: Theme.surfaceTextMedium
-                                }
-
-                                StyledText {
-                                    text: BatteryService.isPluggedIn ? I18n.tr("Plugged In (AC)") : I18n.tr("Battery Power")
-                                    font.pixelSize: Theme.fontSizeMedium
-                                    font.weight: Font.Medium
-                                    color: Theme.surfaceText
-                                    width: parent.width
-                                    elide: Text.ElideRight
-                                }
-                            }
-                        }
-
-                        Item {
-                            width: (parent.width - Theme.spacingM * 2) / 3
+                            width: (parent.width - Theme.spacingM) / 2
                             height: timeColumn.implicitHeight
 
                             Column {
@@ -202,7 +176,7 @@ done
                         }
 
                         Item {
-                            width: (parent.width - Theme.spacingM * 2) / 3
+                            width: (parent.width - Theme.spacingM) / 2
                             height: healthColumn.implicitHeight
 
                             Column {
