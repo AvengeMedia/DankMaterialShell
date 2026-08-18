@@ -27,9 +27,9 @@ const (
 )
 
 var (
-	ErrTargetNotFound      = errors.New("Quickshell IPC target not found")
-	ErrFunctionNotFound    = errors.New("Quickshell IPC function not found")
-	ErrArgumentMismatch    = errors.New("Quickshell IPC argument mismatch")
+	ErrTargetNotFound      = errors.New("quickshell IPC target not found")
+	ErrFunctionNotFound    = errors.New("quickshell IPC function not found")
+	ErrArgumentMismatch    = errors.New("quickshell IPC argument mismatch")
 	ErrUnsupportedResponse = errors.New("unsupported Quickshell IPC response")
 )
 
