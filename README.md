@@ -203,7 +203,7 @@ For documentation contributions, see [DankLinux-Docs](https://github.com/AvengeM
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=AvengeMedia/DankMaterialShell&type=date&legend=top-left)](https://www.star-history.com/#AvengeMedia/DankMaterialShell&type=date&legend=top-left)
+[![Star History Chart](https://star-history.dera.page/svg?repos=AvengeMedia/DankMaterialShell&type=date&legend=top-left)](https://star-history.dera.page/#AvengeMedia/DankMaterialShell&type=date&legend=top-left)
 
 ## License
 
