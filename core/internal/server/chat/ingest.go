@@ -104,6 +104,7 @@ func (m *Manager) ingestChats(ctx context.Context, provider string, chats []wire
 			Participants: wc.Participants,
 			Folder:       wc.Folder,
 			Handles:      wc.Handles,
+			Tags:         wc.Tags,
 		}
 
 		// A bridge that did not mention unread must not clear a count the host

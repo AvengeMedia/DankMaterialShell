@@ -317,6 +317,37 @@ Singleton {
         });
     }
 
+    // deleteLocal removes a message from this device only.
+    //
+    // Always available: it touches only our own store, so it works even where a
+    // provider has no notion of deleting for everyone.
+    function deleteLocal(provider, chatId, messageId) {
+        if (!available)
+            return;
+        DMSService.sendRequest("chat.deleteLocal", {
+            "provider": provider,
+            "chatId": chatId,
+            "messageId": messageId
+        }, response => {
+            if (response.error) {
+                root.log.warn("local delete failed:", response.error);
+                ToastService.showError(I18n.tr("Message not deleted"), response.error);
+            }
+        });
+    }
+
+    // copyFileToClipboard puts a file on the clipboard as a file, so it can be
+    // pasted into anything that accepts one rather than only as a path.
+    function copyFileToClipboard(path) {
+        if (!path)
+            return;
+
+        // wl-copy reads the bytes and takes the mime type from the file, which
+        // is what makes the paste land as an image rather than as text.
+        Quickshell.execDetached(["sh", "-c", "wl-copy --type \"$(file -b --mime-type \"$1\")\" < \"$1\"", "sh", path]);
+        ToastService.showInfo(I18n.tr("Attachment copied"));
+    }
+
     // forward re-sends a message's text into another conversation.
     //
     // Sent as a fresh message rather than a provider-native forward: the

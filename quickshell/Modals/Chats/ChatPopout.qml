@@ -21,8 +21,8 @@ DankModal {
 
     layerNamespace: "dms:chat-popout"
 
-    modalWidth: 460
-    modalHeight: 560
+    modalWidth: 920
+    modalHeight: 840
     backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
     cornerRadius: Theme.cornerRadius
     visible: false

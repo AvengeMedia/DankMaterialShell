@@ -1,22 +1,18 @@
 import QtQuick
 import Quickshell
 import qs.Common
-import qs.Modals.FileBrowser
 import qs.Services
 import qs.Widgets
 
 // The message input.
 //
-// Attachments are staged rather than sent on selection: you can add several,
-// see what you picked, remove a mistake, and write a caption before anything
-// leaves. Sending a file the instant it is chosen gives no chance to check it.
+// Attachments arrive by pasting: Ctrl+V in the text field writes whatever the
+// clipboard holds to a file and stages it with a preview. There is no file
+// browser button -- opening one from a popout put the dialog behind the window,
+// where it could not be reached without closing the chat first.
 //
-// Pasting an image from the clipboard is not wired up: attachments travel as
-// file paths, and there is no command yet that turns clipboard contents into
-// one. Staging from the file browser covers everything else.
-//
-// Every affordance is gated on what the open conversation's provider declared,
-// so a provider that cannot send attachments simply has no attach button.
+// Staged rather than sent on paste: you can add several, see what you picked,
+// remove a mistake, and write a caption before anything leaves.
 Item {
     id: root
 
@@ -30,6 +26,7 @@ Item {
 
     // Absolute paths waiting to be sent with the next message.
     property var staged: []
+    property bool pasting: false
 
     readonly property bool hasStaged: staged.length > 0
 
@@ -38,7 +35,9 @@ Item {
     function stage(path) {
         if (!path)
             return;
-        const clean = String(path).replace("file://", "");
+        const clean = String(path).replace("file://", "").trim();
+        if (clean === "")
+            return;
         // Staging the same file twice is never intended.
         if (root.staged.indexOf(clean) !== -1)
             return;
@@ -77,6 +76,34 @@ Item {
 
     function takeFocus() {
         input.forceActiveFocus();
+    }
+
+    // pasteAttachment writes the clipboard to a file and stages it.
+    //
+    // Only when the clipboard actually holds something file-shaped: for plain
+    // text this does nothing and the normal text paste is left to happen.
+    function pasteAttachment() {
+        if (!root.canAttach || root.pasting)
+            return;
+        root.pasting = true;
+
+        // wl-paste reports the mime types on offer. Anything that is not text
+        // is written to a temp file named with a matching extension.
+        const script = "set -e\n" + "t=$(wl-paste --list-types 2>/dev/null | grep -v '^text/' | grep -v '^$' | head -1)\n" + "[ -n \"$t\" ] || exit 3\n" + "ext=${t##*/}\n" + "case \"$ext\" in jpeg) ext=jpg ;; esac\n" + "f=$(mktemp \"${XDG_RUNTIME_DIR:-/tmp}/dms-chat-paste-XXXXXX.$ext\")\n" + "wl-paste --type \"$t\" > \"$f\"\n" + "[ -s \"$f\" ] || { rm -f \"$f\"; exit 4; }\n" + "printf '%s' \"$f\"\n";
+
+        Proc.runCommand("chat.pasteAttachment", ["sh", "-c", script], (stdout, exitCode) => {
+            root.pasting = false;
+
+            if (exitCode === 0 && (stdout || "").trim() !== "") {
+                root.stage(stdout.trim());
+                return;
+            }
+
+            // Exit 3 means the clipboard held only text, which is not an error:
+            // the text paste happens on its own.
+            if (exitCode !== 3)
+                ToastService.showWarning(I18n.tr("Nothing to attach"), I18n.tr("The clipboard holds no image or file."));
+        });
     }
 
     Column {
@@ -216,25 +243,17 @@ Item {
             width: parent.width
             spacing: Theme.spacingS
 
-            DankActionButton {
-                anchors.verticalCenter: parent.verticalCenter
-                visible: root.canAttach
-                buttonSize: 36
-                iconName: "attach_file"
-                iconColor: Theme.surfaceVariantText
-                tooltipText: I18n.tr("Attach a file")
-                onClicked: fileBrowser.open()
-            }
-
             DankTextField {
                 id: input
                 anchors.verticalCenter: parent.verticalCenter
-                width: parent.width - (root.canAttach ? 36 + Theme.spacingS : 0) - 36 - Theme.spacingS
+                width: parent.width - 36 - Theme.spacingS
                 enabled: root.canSend
                 placeholderText: {
                     if (!root.canSend)
                         return I18n.tr("This provider cannot send messages");
-                    return root.hasStaged ? I18n.tr("Add a caption") : I18n.tr("Message");
+                    if (root.hasStaged)
+                        return I18n.tr("Add a caption");
+                    return root.canAttach ? I18n.tr("Message, or paste an image") : I18n.tr("Message");
                 }
 
                 // Enter sends; Shift+Enter is a newline, as everywhere else.
@@ -255,28 +274,24 @@ Item {
                     root.send();
                     event.accepted = true;
                 }
+
+                // Ctrl+V stages a file or image. Not accepted, so a text paste
+                // still lands in the field when the clipboard holds only text.
+                Keys.onPressed: event => {
+                    if ((event.modifiers & Qt.ControlModifier) && event.key === Qt.Key_V)
+                        root.pasteAttachment();
+                }
             }
 
             DankActionButton {
                 anchors.verticalCenter: parent.verticalCenter
                 buttonSize: 36
-                iconName: "send"
+                iconName: root.pasting ? "hourglass_empty" : "send"
                 iconColor: (input.text.trim() !== "" || root.hasStaged) ? Theme.primary : Theme.surfaceVariantText
                 enabled: root.canSend && (input.text.trim() !== "" || root.hasStaged)
                 tooltipText: I18n.tr("Send")
                 onClicked: root.send()
             }
         }
-    }
-
-    FileBrowserModal {
-        id: fileBrowser
-        browserTitle: I18n.tr("Attach a file")
-        browserIcon: "attach_file"
-        browserType: "generic"
-
-        // Staged rather than sent, so more can be added and the selection
-        // reviewed first.
-        onFileSelected: path => root.stage(path)
     }
 }

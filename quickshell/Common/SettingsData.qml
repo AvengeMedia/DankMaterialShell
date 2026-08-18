@@ -128,6 +128,12 @@ Singleton {
     property int chatHistoryRetentionDays: 0
     property int chatMediaCacheMaxMB: 512
 
+    // Chat list filter rules. Each is
+    // { field, mode, value, action, enabled } -- see ChatFilters.js for what
+    // those mean. An array rather than named keys because the user creates
+    // however many they want.
+    property var chatFilters: []
+
     property var launcherPluginVisibility: ({})
 
     function getPluginAllowWithoutTrigger(pluginId) {

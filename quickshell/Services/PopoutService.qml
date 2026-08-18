@@ -550,6 +550,12 @@ Singleton {
         chatPopout?.openQuery(query);
     }
 
+    // openChatPopoutFor opens a conversation already identified, skipping
+    // resolution. Used by the runner, which has picked an exact row.
+    function openChatPopoutFor(provider, chatId) {
+        chatPopout?.openResolved(provider, chatId);
+    }
+
     function closeChatPopout() {
         chatPopout?.hidePopout();
     }

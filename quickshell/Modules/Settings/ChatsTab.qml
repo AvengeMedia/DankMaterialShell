@@ -109,6 +109,18 @@ Item {
                 }
             }
 
+            SettingsCard {
+                width: parent.width
+                iconName: "filter_alt"
+                title: I18n.tr("Conversation filters")
+                settingKey: "chatFilters"
+                visible: ChatService.available
+
+                ChatFilterRules {
+                    width: parent.width
+                }
+            }
+
             StyledText {
                 width: parent.width
                 visible: ChatService.available

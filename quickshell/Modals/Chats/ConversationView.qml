@@ -1,14 +1,14 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import Quickshell
 import qs.Common
 import qs.Modals.Chats
-import Quickshell
 import qs.Services
 import qs.Widgets
 
 // The open conversation: header, messages, composer.
-Item {
+FocusScope {
     id: root
 
     readonly property var chat: ChatService.activeChat
@@ -18,46 +18,56 @@ Item {
     // changes, since a reply target from another chat is meaningless.
     property var replyTarget: null
 
-    // The message under keyboard focus, as an index into ChatService.messages.
-    // -1 means none, which is the resting state: the composer has focus and
-    // typing should go there, not move a selection.
-    property int focusedIndex: -1
-
-    // The message awaiting a destination, or null. Forwarding needs a target,
-    // and picking one is a choice the user has to make.
+    // The message awaiting a destination, or null.
     property var forwardSource: null
 
     property bool showingHelp: false
 
-    readonly property var focusedMessage: focusedIndex >= 0 && focusedIndex < ChatService.messages.length ? ChatService.messages[focusedIndex] : null
+    // A pending destructive action, held until confirmed. Deleting a message is
+    // not undoable, and a mistyped key should not be enough to do it.
+    property var pendingDelete: null
+    property bool pendingDeleteForEveryone: false
 
-    // Alt+k/j walk the conversation. Alt rather than bare k/j because the
-    // composer holds focus and bare letters have to keep reaching it.
-    function focusPrevious() {
+    // The selected message, as an index into ChatService.messages.
+    //
+    // Deliberately not real focus: the composer keeps that, so typing always
+    // reaches the text field. This is a border drawn around one message and
+    // moved with Alt+K/J.
+    property int selectedIndex: -1
+
+    readonly property var selectedMessage: selectedIndex >= 0 && selectedIndex < ChatService.messages.length ? ChatService.messages[selectedIndex] : null
+
+    function takeFocus() {
+        composer.takeFocus();
+    }
+
+    // ------------------------------------------------------------- selection
+
+    function selectPrevious() {
         const count = ChatService.messages.length;
         if (count === 0)
             return;
         // From nothing, start at the newest and walk back.
-        root.focusedIndex = root.focusedIndex < 0 ? count - 1 : Math.max(0, root.focusedIndex - 1);
-        messageList.positionViewAtIndex(root.focusedIndex, ListView.Contain);
+        root.selectedIndex = root.selectedIndex < 0 ? count - 1 : Math.max(0, root.selectedIndex - 1);
+        messageList.positionViewAtIndex(root.selectedIndex, ListView.Contain);
     }
 
-    function focusNext() {
+    function selectNext() {
         const count = ChatService.messages.length;
-        if (count === 0 || root.focusedIndex < 0)
+        if (count === 0 || root.selectedIndex < 0)
             return;
-        root.focusedIndex = Math.min(count - 1, root.focusedIndex + 1);
-        messageList.positionViewAtIndex(root.focusedIndex, ListView.Contain);
+        root.selectedIndex = Math.min(count - 1, root.selectedIndex + 1);
+        messageList.positionViewAtIndex(root.selectedIndex, ListView.Contain);
     }
 
-    function clearFocus() {
-        root.focusedIndex = -1;
+    function clearSelection() {
+        root.selectedIndex = -1;
     }
 
-    // Opens whatever the focused message carries -- its attachment, or a link
-    // in its text.
-    function openFocused() {
-        const msg = root.focusedMessage;
+    // --------------------------------------------------------------- actions
+
+    function openSelected() {
+        const msg = root.selectedMessage;
         if (!msg)
             return;
 
@@ -78,61 +88,167 @@ Item {
             Quickshell.execDetached(["xdg-open", link[0]]);
     }
 
+    // copyMessage puts the message on the clipboard: an attachment goes as a
+    // file, so it can be pasted into anything that takes one, and text as text.
+    function copyMessage(msg) {
+        if (!msg)
+            return;
+
+        if (msg.mediaPath) {
+            ChatService.copyFileToClipboard(msg.mediaPath);
+            return;
+        }
+
+        if (msg.mediaRef) {
+            ChatService.fetchMedia(ChatService.activeProvider, ChatService.activeChatId, msg.id, path => {
+                if (path)
+                    ChatService.copyFileToClipboard(path);
+            });
+            return;
+        }
+
+        if ((msg.text || "") === "")
+            return;
+        Quickshell.execDetached([Proc.dmsBin, "cl", "copy", msg.text]);
+        ToastService.showInfo(I18n.tr("Copied to clipboard"));
+    }
+
+    function requestDelete(msg, forEveryone) {
+        if (!msg)
+            return;
+        if (forEveryone && !ChatService.activeSupports("revoke"))
+            return;
+        root.pendingDeleteForEveryone = forEveryone;
+        root.pendingDelete = msg;
+    }
+
+    function confirmDelete() {
+        const msg = root.pendingDelete;
+        if (!msg)
+            return;
+
+        if (root.pendingDeleteForEveryone)
+            ChatService.revoke(ChatService.activeProvider, ChatService.activeChatId, msg.id);
+        else
+            ChatService.deleteLocal(ChatService.activeProvider, ChatService.activeChatId, msg.id);
+
+        root.pendingDelete = null;
+        root.clearSelection();
+    }
+
+    function replyToSelected() {
+        if (root.selectedMessage && ChatService.activeSupports("reply"))
+            root.replyTarget = root.selectedMessage;
+    }
+
+    function forwardSelected() {
+        if (root.selectedMessage && (root.selectedMessage.text || "") !== "")
+            root.forwardSource = root.selectedMessage;
+    }
+
     Connections {
         target: ChatService
 
         function onActiveChatIdChanged() {
             root.replyTarget = null;
-            root.focusedIndex = -1;
+            root.selectedIndex = -1;
+            root.pendingDelete = null;
+            Qt.callLater(() => messageList.positionViewAtEnd());
+        }
+
+        function onMessagesChanged() {
+            // Stay pinned to the newest message unless the user has scrolled up
+            // to read something.
+            if (messageList.atYEnd || root.selectedIndex < 0)
+                Qt.callLater(() => messageList.positionViewAtEnd());
         }
     }
 
-    // Alt+k/j and Enter act on the focused message wherever focus sits inside
-    // the conversation, including while typing.
+    // Shortcuts rather than Keys handlers: the composer holds real focus and
+    // consumes most key events, so a handler on this scope would never see them.
+    Shortcut {
+        sequences: ["Alt+K"]
+        onActivated: root.selectPrevious()
+    }
+
+    Shortcut {
+        sequences: ["Alt+J"]
+        onActivated: root.selectNext()
+    }
+
+    Shortcut {
+        sequences: ["Alt+R"]
+        onActivated: root.replyToSelected()
+    }
+
+    Shortcut {
+        sequences: ["Alt+F"]
+        onActivated: root.forwardSelected()
+    }
+
+    Shortcut {
+        sequences: ["Ctrl+C"]
+        // Only while a message is selected, so Ctrl+C still copies whatever the
+        // user has highlighted in the composer.
+        enabled: root.selectedIndex >= 0
+        onActivated: root.copyMessage(root.selectedMessage)
+    }
+
+    Shortcut {
+        sequences: ["Shift+Delete"]
+        enabled: root.selectedIndex >= 0
+        onActivated: root.requestDelete(root.selectedMessage, true)
+    }
+
+    Shortcut {
+        sequences: ["Delete"]
+        enabled: root.selectedIndex >= 0
+        onActivated: root.requestDelete(root.selectedMessage, false)
+    }
+
     Keys.onPressed: event => {
-        if (event.modifiers & Qt.AltModifier) {
-            if (event.key === Qt.Key_K) {
-                root.focusPrevious();
+        if (event.key === Qt.Key_Escape) {
+            if (root.pendingDelete) {
+                root.pendingDelete = null;
                 event.accepted = true;
                 return;
             }
-            if (event.key === Qt.Key_J) {
-                root.focusNext();
+            if (root.showingHelp) {
+                root.showingHelp = false;
+                event.accepted = true;
+                return;
+            }
+            if (root.selectedIndex >= 0) {
+                root.clearSelection();
                 event.accepted = true;
                 return;
             }
         }
 
-        if (event.key === Qt.Key_Question && (event.modifiers & Qt.ShiftModifier)) {
-            root.showingHelp = !root.showingHelp;
+        if (root.selectedIndex >= 0 && (event.key === Qt.Key_Return || event.key === Qt.Key_Enter)) {
+            root.openSelected();
             event.accepted = true;
-            return;
-        }
-
-        if (root.showingHelp && event.key === Qt.Key_Escape) {
-            root.showingHelp = false;
-            event.accepted = true;
-            return;
-        }
-
-        if (root.focusedIndex >= 0) {
-            if (event.key === Qt.Key_Escape) {
-                root.clearFocus();
-                event.accepted = true;
-                return;
-            }
-            if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                root.openFocused();
-                event.accepted = true;
-            }
         }
     }
+
+    // ------------------------------------------------------------- overlays
 
     ChatKeybindHelp {
         anchors.fill: parent
         z: 20
         visible: root.showingHelp
         onDismissed: root.showingHelp = false
+    }
+
+    ChatDeleteConfirm {
+        anchors.fill: parent
+        z: 25
+        visible: root.pendingDelete !== null
+        forEveryone: root.pendingDeleteForEveryone
+        message: root.pendingDelete
+
+        onConfirmed: root.confirmDelete()
+        onCancelled: root.pendingDelete = null
     }
 
     // Destination picker for a forward. An overlay rather than a separate
@@ -158,7 +274,7 @@ Item {
 
         Item {
             width: parent.width
-            height: 48
+            height: 52
 
             Row {
                 anchors.left: parent.left
@@ -169,8 +285,8 @@ Item {
 
                 DankCircularImage {
                     anchors.verticalCenter: parent.verticalCenter
-                    width: 32
-                    height: 32
+                    width: 34
+                    height: 34
                     imageSource: root.chat?.avatarPath ? "file://" + root.chat.avatarPath : ""
                     fallbackText: root.chatName.charAt(0).toUpperCase()
                     fallbackIcon: "person"
@@ -178,7 +294,7 @@ Item {
 
                 Column {
                     anchors.verticalCenter: parent.verticalCenter
-                    width: parent.width - 32 - Theme.spacingS
+                    width: parent.width - 34 - Theme.spacingS
                     spacing: 0
 
                     StyledText {
@@ -190,14 +306,24 @@ Item {
                         elide: Text.ElideRight
                     }
 
-                    // Which service this conversation is on. Worth showing:
-                    // the list interleaves providers, so the same person may
-                    // appear more than once.
+                    // Who this is, in the service's own terms: the number or
+                    // address they are reachable at, and which service it is.
+                    // The same person can appear on more than one.
                     StyledText {
                         width: parent.width
                         text: {
+                            const parts = [];
+                            const handles = root.chat?.handles ?? [];
+                            for (let i = 0; i < handles.length; i++)
+                                parts.push(handles[i]);
+
                             const provider = ChatService.providerById(ChatService.activeProvider);
-                            return provider ? provider.name : ChatService.activeProvider;
+                            parts.push(provider ? provider.name : ChatService.activeProvider);
+
+                            if (root.chat?.isGroup)
+                                parts.push(I18n.tr("Group"));
+
+                            return parts.join("  ·  ");
                         }
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.surfaceVariantText
@@ -249,7 +375,7 @@ Item {
 
         Item {
             width: parent.width
-            height: parent.height - 48 - 1 - composer.height
+            height: parent.height - 52 - 1 - composer.height
 
             DankListView {
                 id: messageList
@@ -258,8 +384,11 @@ Item {
                 clip: true
                 model: ChatService.messages
                 spacing: Theme.spacingXS
-                // Conversations are read from the bottom.
-                verticalLayoutDirection: ListView.BottomToTop
+
+                // Chronological, top to bottom, parked at the end. An inverted
+                // list renders a chronological model newest-first and makes
+                // "scroll to the bottom" mean the wrong end of the history.
+                verticalLayoutDirection: ListView.TopToBottom
 
                 delegate: MessageBubble {
                     required property var modelData
@@ -267,24 +396,19 @@ Item {
 
                     width: messageList.width
                     message: modelData
-                    keyboardFocused: root.focusedIndex === index
-                    // The list is inverted, so the visually preceding message
-                    // is the next one in the model.
-                    previousMessage: index + 1 < ChatService.messages.length ? ChatService.messages[index + 1] : null
+                    selected: root.selectedIndex === index
+                    previousMessage: index > 0 ? ChatService.messages[index - 1] : null
 
                     onReplyRequested: root.replyTarget = modelData
-                    onDeleteRequested: ChatService.revoke(ChatService.activeProvider, ChatService.activeChatId, modelData.id)
-                    onCopyRequested: {
-                        Quickshell.execDetached([Proc.dmsBin, "cl", "copy", modelData.text || ""]);
-                        ToastService.showInfo(I18n.tr("Copied to clipboard"));
-                    }
                     onForwardRequested: root.forwardSource = modelData
+                    onCopyRequested: root.copyMessage(modelData)
+                    onDeleteRequested: root.requestDelete(modelData, ChatService.activeSupports("revoke"))
                 }
 
-                // Paging backwards happens at the visual top, which in an
-                // inverted list is the end of the model.
-                onAtYEndChanged: {
-                    if (atYEnd && ChatService.hasMoreHistory && !ChatService.loadingHistory)
+                // Older messages page in at the top, which is where the
+                // conversation continues backwards.
+                onAtYBeginningChanged: {
+                    if (atYBeginning && ChatService.hasMoreHistory && !ChatService.loadingHistory)
                         ChatService.loadOlder();
                 }
             }
@@ -317,7 +441,8 @@ Item {
             onReplyCleared: root.replyTarget = null
             onSent: {
                 root.replyTarget = null;
-                messageList.positionViewAtBeginning();
+                root.clearSelection();
+                Qt.callLater(() => messageList.positionViewAtEnd());
             }
         }
     }

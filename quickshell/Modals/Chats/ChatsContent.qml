@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell
 import qs.Common
 import qs.Modals.Chats
+import "ChatFilters.js" as ChatFilters
 import qs.Services
 import qs.Widgets
 
@@ -58,26 +59,31 @@ FocusScope {
         return null;
     }
 
-    // Chats filtered by the search box. Archived conversations are hidden
-    // unless the user is searching, since archiving means "keep this away".
+    // Conversations after the user's filter rules and the search box.
+    //
+    // Filters come first and are skipped while searching: someone who types a
+    // name is looking for that conversation, and hiding it because it happens
+    // to be archived would be obstinate.
     readonly property var visibleChats: {
         const query = searchField.text.trim().toLowerCase();
+        const source = query === "" ? ChatFilters.apply(ChatService.chats, SettingsData.chatFilters) : ChatService.chats;
+
+        if (query === "")
+            return source;
+
         const out = [];
-        for (let i = 0; i < ChatService.chats.length; i++) {
-            const chat = ChatService.chats[i];
-            if (chat.archived && query === "")
-                continue;
-            if (query !== "") {
-                const name = (chat.name || "").toLowerCase();
-                const preview = (chat.lastText || "").toLowerCase();
-                const subject = (chat.subject || "").toLowerCase();
-                if (name.indexOf(query) === -1 && preview.indexOf(query) === -1 && subject.indexOf(query) === -1)
-                    continue;
-            }
-            out.push(chat);
+        for (let i = 0; i < source.length; i++) {
+            const chat = source[i];
+            const name = (chat.name || "").toLowerCase();
+            const preview = (chat.lastText || "").toLowerCase();
+            const subject = (chat.subject || "").toLowerCase();
+            if (name.indexOf(query) !== -1 || preview.indexOf(query) !== -1 || subject.indexOf(query) !== -1)
+                out.push(chat);
         }
         return out;
     }
+
+    readonly property int hiddenCount: ChatService.chats.length - ChatFilters.apply(ChatService.chats, SettingsData.chatFilters).length
 
     Timer {
         id: searchDebounce
@@ -131,6 +137,28 @@ FocusScope {
                         width: visible ? 20 : 0
                         height: 20
                         visible: ChatService.syncing
+                    }
+                }
+
+                // Filtering is invisible otherwise, and a conversation that is
+                // simply missing looks like a bug rather than a choice.
+                Row {
+                    width: parent.width
+                    spacing: Theme.spacingXS
+                    visible: root.hiddenCount > 0 && searchField.text === ""
+
+                    DankIcon {
+                        anchors.verticalCenter: parent.verticalCenter
+                        name: "filter_alt"
+                        size: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                    }
+
+                    StyledText {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: I18n.tr("%1 hidden by filters").arg(root.hiddenCount)
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
                     }
                 }
 
@@ -207,8 +235,12 @@ FocusScope {
                 query: searchField.text.trim()
 
                 onHitChosen: (provider, chatId, ts) => {
+                    // Clear first: the results pane is bound to the query, and
+                    // leaving it set keeps the filter over the conversation the
+                    // user just asked to read.
                     searchField.text = "";
                     root.messageHits = [];
+                    searchDebounce.stop();
                     ChatService.openChatAt(provider, chatId, ts);
                 }
             }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"path/filepath"
 	"time"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/chat"
@@ -53,6 +54,8 @@ func HandleRequest(conn *models.Conn, req models.Request, manager *Manager) {
 		handleSetFocus(conn, req, manager)
 	case "chat.fetchMedia":
 		handleFetchMedia(ctx, conn, req, manager)
+	case "chat.tags":
+		handleTags(ctx, conn, req, manager)
 	case "chat.resolve":
 		handleResolve(ctx, conn, req, manager)
 	case "chat.search":
@@ -67,6 +70,8 @@ func HandleRequest(conn *models.Conn, req models.Request, manager *Manager) {
 		handleAuth(ctx, conn, req, manager, MethodLogout)
 	case "chat.revoke":
 		handleRevoke(ctx, conn, req, manager)
+	case "chat.deleteLocal":
+		handleDeleteLocal(ctx, conn, req, manager)
 	case "chat.purge":
 		handlePurge(ctx, conn, req, manager)
 	case "chat.authQrCode":
@@ -299,6 +304,24 @@ func handleSearch(ctx context.Context, conn *models.Conn, req models.Request, m 
 	models.Respond(conn, req.ID, searchResult{Messages: msgs, Chats: chats})
 }
 
+type tagsResult struct {
+	Tags []string `json:"tags"`
+}
+
+// handleTags lists every tag in use, so a filter offers what actually exists
+// rather than a set the shell guessed at.
+func handleTags(ctx context.Context, conn *models.Conn, req models.Request, m *Manager) {
+	tags, err := m.Store().KnownTags(ctx)
+	if err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+	if tags == nil {
+		tags = []string{}
+	}
+	models.Respond(conn, req.ID, tagsResult{Tags: tags})
+}
+
 type resolveResult struct {
 	Candidates []ResolveCandidate `json:"candidates"`
 }
@@ -359,6 +382,24 @@ func handleSend(ctx context.Context, conn *models.Conn, req models.Request, m *M
 		FromMe: true, Kind: chat.KindText, Text: text,
 		Status: chat.StatusPending, ReplyTo: replyTo,
 	}
+
+	// Record the attachment ourselves rather than waiting for the provider to
+	// echo it back. The user picked a local file, so there is nothing to
+	// download -- and without this, a photo you sent shows as a bare caption
+	// while the same photo received from someone else renders fine.
+	if len(attachments) > 0 {
+		if first, ok := attachments[0].(string); ok && first != "" {
+			mime := chat.MimeForPath(first)
+			if cached, err := m.Media().Adopt(provider, pendingID, mime, first); err == nil {
+				pending.MediaPath = cached
+				pending.MediaMime = mime
+				pending.Kind = chat.KindForPath(first)
+				pending.FileName = filepath.Base(first)
+			} else {
+				log.Warnf("chat: could not cache the sent attachment: %v", err)
+			}
+		}
+	}
 	if err := m.Store().PutMessage(ctx, pending); err != nil {
 		log.Warnf("chat: could not record pending message: %v", err)
 	}
@@ -403,6 +444,15 @@ func handleSend(ctx context.Context, conn *models.Conn, req models.Request, m *M
 		sent := pending
 		sent.ID = messageID
 		sent.Status = chat.StatusSent
+
+		// The cached file is named after the placeholder id, so move it to the
+		// real one; otherwise the next cache sweep sees it as unreferenced.
+		if sent.MediaPath != "" {
+			if moved, err := m.Media().Rename(provider, pendingID, messageID, sent.MediaPath); err == nil {
+				sent.MediaPath = moved
+			}
+		}
+
 		if err := m.Store().PutMessage(ctx, sent); err != nil {
 			log.Warnf("chat: could not record sent message: %v", err)
 		}
@@ -599,6 +649,30 @@ func handleRevoke(ctx context.Context, conn *models.Conn, req models.Request, m 
 
 	if err := m.Store().MarkDeleted(ctx, provider, chatID, messageID); err != nil {
 		log.Warnf("chat: could not mark message deleted: %v", err)
+	}
+
+	m.markDirty()
+	models.Respond(conn, req.ID, models.SuccessResult{Success: true})
+}
+
+// handleDeleteLocal removes a message from this device only.
+//
+// Distinct from revoke: nothing is sent anywhere, everyone else keeps their
+// copy, and it works on any provider because it touches only our own store.
+func handleDeleteLocal(ctx context.Context, conn *models.Conn, req models.Request, m *Manager) {
+	provider, chatID, ok := chatTarget(conn, req)
+	if !ok {
+		return
+	}
+	messageID, ok := models.Get[string](req, "messageId")
+	if !ok || messageID == "" {
+		models.RespondError(conn, req.ID, "messageId is required")
+		return
+	}
+
+	if err := m.Store().DeleteMessage(ctx, provider, chatID, messageID); err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
 	}
 
 	m.markDirty()

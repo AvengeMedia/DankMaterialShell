@@ -154,6 +154,9 @@ type wireChat struct {
 	// Handles are the other identifiers this conversation answers to -- a phone
 	// number, an email address, a username. Only the bridge knows them.
 	Handles []string `json:"handles"`
+	// Tags say what kind of conversation this is: archived, status, channel,
+	// broadcast, business, and whatever else the service distinguishes.
+	Tags []string `json:"tags"`
 }
 
 // wireMessage is a message as a bridge sends it. Media arrives as a path the

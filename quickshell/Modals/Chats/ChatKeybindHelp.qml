@@ -26,23 +26,48 @@ StyledRect {
 
     readonly property var groups: [
         {
-            "title": I18n.tr("Reading"),
+            "title": I18n.tr("Selecting a message"),
             "binds": [
                 {
                     "keys": "Alt + K",
-                    "text": I18n.tr("Move to the previous message")
+                    "text": I18n.tr("Select the previous message")
                 },
                 {
                     "keys": "Alt + J",
-                    "text": I18n.tr("Move to the next message")
+                    "text": I18n.tr("Select the next message")
                 },
                 {
                     "keys": "Enter",
-                    "text": I18n.tr("Open the focused message's attachment or link")
+                    "text": I18n.tr("Open the selected message's attachment or link")
                 },
                 {
                     "keys": "Esc",
-                    "text": I18n.tr("Clear the focused message, then close")
+                    "text": I18n.tr("Clear the selection, then close")
+                }
+            ]
+        },
+        {
+            "title": I18n.tr("Acting on the selected message"),
+            "binds": [
+                {
+                    "keys": "Ctrl + C",
+                    "text": I18n.tr("Copy the text, or the attachment as a file")
+                },
+                {
+                    "keys": "Alt + R",
+                    "text": I18n.tr("Reply, where the provider supports it")
+                },
+                {
+                    "keys": "Alt + F",
+                    "text": I18n.tr("Forward to another conversation")
+                },
+                {
+                    "keys": "Delete",
+                    "text": I18n.tr("Delete from this device, after confirming")
+                },
+                {
+                    "keys": "Shift + Delete",
+                    "text": I18n.tr("Delete for everyone, after confirming")
                 }
             ]
         },
@@ -56,6 +81,10 @@ StyledRect {
                 {
                     "keys": "Shift + Enter",
                     "text": I18n.tr("New line")
+                },
+                {
+                    "keys": "Ctrl + V",
+                    "text": I18n.tr("Attach an image or file from the clipboard")
                 }
             ]
         },

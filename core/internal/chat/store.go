@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	_ "modernc.org/sqlite"
@@ -32,6 +33,7 @@ CREATE TABLE IF NOT EXISTS chats (
   participants TEXT NOT NULL DEFAULT '',
   folder       TEXT NOT NULL DEFAULT '',
   handles      TEXT NOT NULL DEFAULT '',
+  tags         TEXT NOT NULL DEFAULT '',
   PRIMARY KEY (provider, id)
 );
 
@@ -104,6 +106,7 @@ END;
 var migrations = []string{
 	`ALTER TABLE messages ADD COLUMN sender_avatar_path TEXT NOT NULL DEFAULT ''`,
 	`ALTER TABLE chats ADD COLUMN handles TEXT NOT NULL DEFAULT ''`,
+	`ALTER TABLE chats ADD COLUMN tags TEXT NOT NULL DEFAULT ''`,
 }
 
 // HistoryStore is the message store. Safe for concurrent use.
@@ -172,11 +175,15 @@ func (s *HistoryStore) UpsertChat(ctx context.Context, c Chat) error {
 	if c.Handles == nil {
 		handles = []byte("")
 	}
+	tags, _ := json.Marshal(c.Tags)
+	if c.Tags == nil {
+		tags = []byte("")
+	}
 
 	_, err := s.db.ExecContext(ctx, `
 INSERT INTO chats (provider, id, name, is_group, last_ts, last_text, unread, muted, archived,
-                   read_upto, avatar_path, subject, participants, folder, handles)
-VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                   read_upto, avatar_path, subject, participants, folder, handles, tags)
+VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 ON CONFLICT(provider, id) DO UPDATE SET
   name         = CASE WHEN excluded.name         != '' THEN excluded.name         ELSE chats.name         END,
   is_group     = excluded.is_group OR chats.is_group,
@@ -193,10 +200,11 @@ ON CONFLICT(provider, id) DO UPDATE SET
   subject      = CASE WHEN excluded.subject      != '' THEN excluded.subject      ELSE chats.subject      END,
   participants = CASE WHEN excluded.participants != '' THEN excluded.participants ELSE chats.participants END,
   folder       = CASE WHEN excluded.folder       != '' THEN excluded.folder       ELSE chats.folder       END,
-  handles      = CASE WHEN excluded.handles      != '' THEN excluded.handles      ELSE chats.handles      END
+  handles      = CASE WHEN excluded.handles      != '' THEN excluded.handles      ELSE chats.handles      END,
+  tags         = CASE WHEN excluded.tags         != '' THEN excluded.tags         ELSE chats.tags         END
 `,
 		c.Provider, c.ID, c.Name, c.IsGroup, c.LastTS, c.LastText, c.Unread, c.Muted, c.Archived,
-		c.ReadUpTo, c.AvatarPath, c.Subject, string(participants), c.Folder, string(handles))
+		c.ReadUpTo, c.AvatarPath, c.Subject, string(participants), c.Folder, string(handles), string(tags))
 	return err
 }
 
@@ -223,7 +231,7 @@ ON CONFLICT(provider, id) DO UPDATE SET
 
 const chatSelect = `
 SELECT c.provider, c.id, c.name, c.is_group, c.last_ts, c.last_text, c.unread, c.muted,
-       c.archived, c.read_upto, c.avatar_path, c.subject, c.participants, c.folder, c.handles,
+       c.archived, c.read_upto, c.avatar_path, c.subject, c.participants, c.folder, c.handles, c.tags,
        COALESCE((SELECT MAX(m.ts) FROM messages m
                   WHERE m.provider = c.provider AND m.chat_id = c.id
                     AND m.from_me = 1
@@ -311,10 +319,10 @@ func scanChats(rows *sql.Rows) ([]Chat, error) {
 	var out []Chat
 	for rows.Next() {
 		var c Chat
-		var participants, handles string
+		var participants, handles, tags string
 		if err := rows.Scan(&c.Provider, &c.ID, &c.Name, &c.IsGroup, &c.LastTS, &c.LastText,
 			&c.Unread, &c.Muted, &c.Archived, &c.ReadUpTo, &c.AvatarPath, &c.Subject,
-			&participants, &c.Folder, &handles, &c.MyLastTS); err != nil {
+			&participants, &c.Folder, &handles, &tags, &c.MyLastTS); err != nil {
 			return nil, err
 		}
 		if participants != "" {
@@ -323,6 +331,10 @@ func scanChats(rows *sql.Rows) ([]Chat, error) {
 		if handles != "" {
 			_ = json.Unmarshal([]byte(handles), &c.Handles)
 		}
+		if tags != "" {
+			_ = json.Unmarshal([]byte(tags), &c.Tags)
+		}
+		c.Tags = withDerivedTags(c)
 		out = append(out, c)
 	}
 	return out, rows.Err()
@@ -725,6 +737,98 @@ LIMIT ?`, escapeLike(query), escapeLike(query), limit)
 func escapeLike(s string) string {
 	r := strings.NewReplacer(`\`, `\\`, `%`, `\%`, `_`, `\_`)
 	return r.Replace(s)
+}
+
+// Tags the host can work out for itself, so filtering on them works even for a
+// provider that declares none of its own.
+const (
+	TagArchived = "archived"
+	TagMuted    = "muted"
+	TagUnread   = "unread"
+	TagGroup    = "group"
+	TagDirect   = "direct"
+)
+
+// withDerivedTags merges what the provider declared with what the host knows.
+//
+// Archived and muted live in columns rather than in the tag list because the
+// user changes them here, so they are derived on read instead of being stored
+// twice and drifting apart.
+func withDerivedTags(c Chat) []string {
+	seen := map[string]bool{}
+	out := make([]string, 0, len(c.Tags)+3)
+
+	add := func(tag string) {
+		if tag == "" || seen[tag] {
+			return
+		}
+		seen[tag] = true
+		out = append(out, tag)
+	}
+
+	for _, tag := range c.Tags {
+		add(tag)
+	}
+
+	if c.Archived {
+		add(TagArchived)
+	}
+	if c.Muted {
+		add(TagMuted)
+	}
+	if c.Unread > 0 {
+		add(TagUnread)
+	}
+	if c.IsGroup {
+		add(TagGroup)
+	} else {
+		add(TagDirect)
+	}
+
+	return out
+}
+
+// KnownTags lists every tag any conversation carries, so a filter can offer
+// what actually exists rather than a hardcoded set.
+func (s *HistoryStore) KnownTags(ctx context.Context) ([]string, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT tags FROM chats WHERE tags != ''`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	seen := map[string]bool{}
+	for rows.Next() {
+		var raw string
+		if err := rows.Scan(&raw); err != nil {
+			return nil, err
+		}
+		var tags []string
+		if json.Unmarshal([]byte(raw), &tags) != nil {
+			continue
+		}
+		for _, tag := range tags {
+			if tag != "" {
+				seen[tag] = true
+			}
+		}
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	// The derived ones are always available, whether or not any provider
+	// happens to declare them.
+	for _, tag := range []string{TagArchived, TagMuted, TagUnread, TagGroup, TagDirect} {
+		seen[tag] = true
+	}
+
+	out := make([]string, 0, len(seen))
+	for tag := range seen {
+		out = append(out, tag)
+	}
+	sort.Strings(out)
+	return out, nil
 }
 
 // ---------------------------------------------------------------- meta

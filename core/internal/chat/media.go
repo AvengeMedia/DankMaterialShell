@@ -111,6 +111,28 @@ func (m *Media) Adopt(provider, messageID, mimeType, path string) (string, error
 	return m.Store(provider, messageID, mimeType, data)
 }
 
+// KindForPath guesses a message kind from a file's extension.
+//
+// Used when recording what the user just sent: the store has to know it is an
+// image for the bubble to render it, and the file is all there is to go on.
+func KindForPath(path string) string {
+	mime := mimeForExtension(filepath.Ext(path))
+	switch {
+	case strings.HasPrefix(mime, "image/"):
+		return KindImage
+	case strings.HasPrefix(mime, "video/"):
+		return KindVideo
+	case strings.HasPrefix(mime, "audio/"):
+		return KindAudio
+	}
+	return KindDocument
+}
+
+// MimeForPath is the mime type implied by a file's extension, or "".
+func MimeForPath(path string) string {
+	return mimeForExtension(filepath.Ext(path))
+}
+
 // Size reports the cache's total size on disk.
 func (m *Media) Size() (int64, error) {
 	var total int64
@@ -205,6 +227,28 @@ func (m *Media) GC(ctx context.Context, store *HistoryStore) (freed int64, err e
 		freed += e.size
 	}
 	return freed, nil
+}
+
+// Rename moves a cached attachment from one message id to another.
+//
+// Sending assigns a placeholder id before the provider answers with a real one;
+// without this the file keeps the placeholder's name and the next sweep treats
+// it as unreferenced.
+func (m *Media) Rename(provider, fromID, toID, path string) (string, error) {
+	if path == "" {
+		return "", fmt.Errorf("no attachment to move")
+	}
+
+	dir := m.DirFor(provider)
+	target := filepath.Join(dir, sanitizeComponent(toID)+filepath.Ext(path))
+	if target == path {
+		return path, nil
+	}
+
+	if err := os.Rename(path, target); err != nil {
+		return "", fmt.Errorf("move attachment: %w", err)
+	}
+	return target, nil
 }
 
 // PurgeProvider removes a provider's cached attachments.

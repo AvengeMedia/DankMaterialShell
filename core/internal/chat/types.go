@@ -103,6 +103,13 @@ type Chat struct {
 	// would find nothing.
 	Handles []string `json:"handles,omitempty"`
 
+	// Tags are what a provider says this conversation is: archived, muted,
+	// status, channel, broadcast, business, and whatever else a service has a
+	// notion of. Free-form on purpose -- the shell cannot know what categories
+	// a future provider will have, so it lists whatever turns up and lets the
+	// user filter on it.
+	Tags []string `json:"tags,omitempty"`
+
 	// MyLastTS is when you last wrote in this chat, ignoring protocol rows.
 	// Derived on read; bridges never set it.
 	MyLastTS int64 `json:"myLastTs"`

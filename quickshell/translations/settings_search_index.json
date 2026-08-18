@@ -11919,6 +11919,26 @@
     "icon": "forum"
   },
   {
+    "section": "chatFilters",
+    "label": "Conversation filters",
+    "tabIndex": 46,
+    "category": "Chats",
+    "keywords": [
+      "bridge",
+      "chat",
+      "chats",
+      "conversation",
+      "filters",
+      "mail",
+      "message",
+      "messaging",
+      "provider",
+      "signal",
+      "whatsapp"
+    ],
+    "icon": "filter_alt"
+  },
+  {
     "section": "chatHistoryRetentionDays",
     "label": "Keep message history for",
     "tabIndex": 46,

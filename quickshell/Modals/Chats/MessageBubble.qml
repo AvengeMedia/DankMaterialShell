@@ -18,8 +18,8 @@ Item {
     required property var message
     property var previousMessage: null
 
-    // Set when this message is under keyboard navigation.
-    property bool keyboardFocused: false
+    // Set when this message carries the Alt+K/J selection.
+    property bool selected: false
 
     signal replyRequested
     signal forwardRequested
@@ -143,8 +143,15 @@ Item {
 
         // Keyboard focus needs to be visible without moving anything, so it is
         // drawn as a border rather than a size or colour change.
-        border.color: root.keyboardFocused ? Theme.primary : "transparent"
-        border.width: root.keyboardFocused ? 2 : 0
+        border.color: root.selected ? Theme.primary : "transparent"
+        border.width: root.selected ? 2 : 0
+
+        // Hover is tracked across the bubble and its action row together:
+        // the buttons sit outside the bubble, so leaving it to reach one used
+        // to hide the very thing being reached for.
+        HoverHandler {
+            id: bubbleHover
+        }
 
         MouseArea {
             id: bubbleArea
@@ -301,7 +308,11 @@ Item {
             anchors.leftMargin: Theme.spacingXS
             anchors.rightMargin: Theme.spacingXS
             spacing: 0
-            visible: (bubbleArea.containsMouse || root.keyboardFocused) && !root.isDeleted
+            visible: (bubbleHover.hovered || actionsHover.hovered || root.selected) && !root.isDeleted
+
+            HoverHandler {
+                id: actionsHover
+            }
 
             DankActionButton {
                 buttonSize: 26
@@ -333,15 +344,14 @@ Item {
                 onClicked: root.copyRequested()
             }
 
-            // Deleting for everyone is usually only allowed for your own
-            // messages, and only where the provider supports it at all.
+            // Always offered: a message can at least be removed from this
+            // device, and the confirmation says which kind of delete it is.
             DankActionButton {
                 buttonSize: 26
                 iconSize: Theme.fontSizeSmall
                 iconName: "delete"
                 iconColor: Theme.error
-                tooltipText: I18n.tr("Delete for everyone")
-                visible: root.fromMe && ChatService.activeSupports("revoke")
+                tooltipText: root.fromMe && ChatService.activeSupports("revoke") ? I18n.tr("Delete for everyone") : I18n.tr("Delete")
                 onClicked: root.deleteRequested()
             }
         }
