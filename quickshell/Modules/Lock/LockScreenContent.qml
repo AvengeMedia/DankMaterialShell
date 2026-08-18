@@ -1009,6 +1009,7 @@ Item {
                                     event.accepted = true;
                                     return;
                                 case Qt.Key_W:
+                                case Qt.Key_Backspace:
                                     deleteWordBackward();
                                     event.accepted = true;
                                     return;
