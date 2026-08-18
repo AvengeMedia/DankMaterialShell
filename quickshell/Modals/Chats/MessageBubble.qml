@@ -35,6 +35,42 @@ Item {
     readonly property bool isDeleted: kind === "deleted"
     readonly property string senderAvatar: message?.senderAvatarPath ?? ""
 
+    readonly property string linkUrl: message?.linkUrl ?? ""
+
+    // The body with URLs turned into anchors.
+    //
+    // Escaped first: message text is other people's input, and StyledText would
+    // otherwise treat markup in it as markup.
+    readonly property string richText: {
+        const raw = root.text;
+        if (raw === "")
+            return "";
+
+        const escaped = raw.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        return escaped.replace(/(https?:\/\/[^\s<]+)/g, "<a href=\"$1\" style=\"color:" + Theme.primary + "\">$1</a>");
+    }
+    readonly property bool hasLink: linkUrl !== ""
+
+    // Hover is kept alive briefly after the pointer leaves. The action row sits
+    // beside the bubble, so reaching for a button crosses a gap that belongs to
+    // neither -- without the delay the buttons vanish on the way.
+    property bool hovering: false
+
+    Timer {
+        id: hoverGrace
+        interval: 220
+        onTriggered: root.hovering = false
+    }
+
+    function setHovered(value) {
+        if (value) {
+            hoverGrace.stop();
+            root.hovering = true;
+            return;
+        }
+        hoverGrace.restart();
+    }
+
     // System rows are the conversation talking about itself, not someone
     // speaking, so they are centred and unstyled rather than given a bubble.
     readonly property bool isSystem: kind === "system" || kind === "unsupported"
@@ -151,6 +187,7 @@ Item {
         // to hide the very thing being reached for.
         HoverHandler {
             id: bubbleHover
+            onHoveredChanged: root.setHovered(hovered)
         }
 
         MouseArea {
@@ -250,14 +287,92 @@ Item {
                 }
             }
 
+            // What the link is, when the provider resolved it. Nothing is
+            // fetched here: doing so would tell whoever hosts the page that the
+            // message had been read.
+            StyledRect {
+                visible: root.hasLink && !root.isDeleted
+                width: Math.min(280, root.width * 0.66)
+                height: linkColumn.implicitHeight + Theme.spacingS * 2
+                radius: Theme.cornerRadius / 2
+                color: Theme.withAlpha(Theme.primary, 0.10)
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: Quickshell.execDetached(["xdg-open", root.linkUrl])
+                }
+
+                Column {
+                    id: linkColumn
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.margins: Theme.spacingS
+                    spacing: 2
+
+                    StyledText {
+                        width: parent.width
+                        visible: (root.message?.linkTitle ?? "") !== ""
+                        text: root.message?.linkTitle ?? ""
+                        font.pixelSize: Theme.fontSizeSmall
+                        font.weight: Font.Medium
+                        color: Theme.surfaceText
+                        elide: Text.ElideRight
+                        maximumLineCount: 2
+                        wrapMode: Text.WordWrap
+                    }
+
+                    StyledText {
+                        width: parent.width
+                        visible: (root.message?.linkDesc ?? "") !== ""
+                        text: root.message?.linkDesc ?? ""
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                        elide: Text.ElideRight
+                        maximumLineCount: 2
+                        wrapMode: Text.WordWrap
+                    }
+
+                    Row {
+                        width: parent.width
+                        spacing: Theme.spacingXS
+
+                        DankIcon {
+                            anchors.verticalCenter: parent.verticalCenter
+                            name: "link"
+                            size: Theme.fontSizeSmall
+                            color: Theme.primary
+                        }
+
+                        StyledText {
+                            width: parent.width - Theme.fontSizeSmall - Theme.spacingXS
+                            text: root.linkUrl
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.primary
+                            elide: Text.ElideRight
+                        }
+                    }
+                }
+            }
+
             StyledText {
                 width: Math.min(implicitWidth, root.width * 0.72 - Theme.spacingM * 2)
                 visible: root.text !== "" || root.isDeleted
-                text: root.isDeleted ? I18n.tr("This message was deleted") : root.text
+                text: root.isDeleted ? I18n.tr("This message was deleted") : root.richText
                 font.pixelSize: Theme.fontSizeMedium
                 font.italic: root.isDeleted
                 color: root.isDeleted ? Theme.surfaceVariantText : Theme.surfaceText
                 wrapMode: Text.Wrap
+                // Links in the body are clickable without turning the whole
+                // message into rich text.
+                textFormat: Text.StyledText
+                onLinkActivated: url => Quickshell.execDetached(["xdg-open", url])
+
+                HoverHandler {
+                    cursorShape: Qt.PointingHandCursor
+                    enabled: parent.hoveredLink !== ""
+                }
             }
 
             // Filename for attachments that are not images.
@@ -308,10 +423,11 @@ Item {
             anchors.leftMargin: Theme.spacingXS
             anchors.rightMargin: Theme.spacingXS
             spacing: 0
-            visible: (bubbleHover.hovered || actionsHover.hovered || root.selected) && !root.isDeleted
+            visible: (root.hovering || root.selected) && !root.isDeleted
 
             HoverHandler {
                 id: actionsHover
+                onHoveredChanged: root.setHovered(hovered)
             }
 
             DankActionButton {

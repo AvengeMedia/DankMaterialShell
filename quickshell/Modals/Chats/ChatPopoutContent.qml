@@ -20,6 +20,8 @@ FocusScope {
     readonly property string resolveError: popout?.resolveError ?? ""
     readonly property bool resolving: popout?.resolving ?? false
 
+    readonly property bool hasOverlay: conversation.hasOverlay
+
     readonly property bool showingConversation: !resolving && candidates.length === 0 && resolveError === ""
 
     Ref {
@@ -27,7 +29,12 @@ FocusScope {
     }
 
     function takeFocus() {
-        root.forceActiveFocus();
+        // Straight to the composer: a chat opens ready to be written in, and
+        // every shortcut is designed around the text field holding focus.
+        if (root.showingConversation && ChatService.hasActiveChat)
+            conversation.takeFocus();
+        else
+            root.forceActiveFocus();
     }
 
     Keys.onEscapePressed: event => {
@@ -124,6 +131,7 @@ FocusScope {
     // ------------------------------------------------------- the conversation
 
     ConversationView {
+        id: conversation
         anchors.fill: parent
         anchors.margins: Theme.spacingS
         visible: root.showingConversation && ChatService.hasActiveChat

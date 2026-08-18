@@ -51,6 +51,10 @@ CREATE TABLE IF NOT EXISTS messages (
   body_html   TEXT NOT NULL DEFAULT '',
   status      TEXT NOT NULL DEFAULT 'sent',
   reply_to    TEXT NOT NULL DEFAULT '',
+  link_url    TEXT NOT NULL DEFAULT '',
+  link_title  TEXT NOT NULL DEFAULT '',
+  link_desc   TEXT NOT NULL DEFAULT '',
+  link_image  TEXT NOT NULL DEFAULT '',
   cc          TEXT NOT NULL DEFAULT '',
   bcc         TEXT NOT NULL DEFAULT '',
   media_path  TEXT NOT NULL DEFAULT '',
@@ -107,6 +111,10 @@ var migrations = []string{
 	`ALTER TABLE messages ADD COLUMN sender_avatar_path TEXT NOT NULL DEFAULT ''`,
 	`ALTER TABLE chats ADD COLUMN handles TEXT NOT NULL DEFAULT ''`,
 	`ALTER TABLE chats ADD COLUMN tags TEXT NOT NULL DEFAULT ''`,
+	`ALTER TABLE messages ADD COLUMN link_url TEXT NOT NULL DEFAULT ''`,
+	`ALTER TABLE messages ADD COLUMN link_title TEXT NOT NULL DEFAULT ''`,
+	`ALTER TABLE messages ADD COLUMN link_desc TEXT NOT NULL DEFAULT ''`,
+	`ALTER TABLE messages ADD COLUMN link_image TEXT NOT NULL DEFAULT ''`,
 }
 
 // HistoryStore is the message store. Safe for concurrent use.
@@ -406,8 +414,9 @@ UPDATE chats SET unread = (
 const messageUpsert = `
 INSERT INTO messages (provider, chat_id, id, ts, from_me, sender_id, sender_name, sender_avatar_path,
                       kind, text, body_html, status, reply_to, cc, bcc, media_path, media_ref,
-                      media_mime, media_w, media_h, file_name, file_size, duration)
-VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                      media_mime, media_w, media_h, file_name, file_size, duration,
+                      link_url, link_title, link_desc, link_image)
+VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 ON CONFLICT(provider, chat_id, id) DO UPDATE SET
   text        = CASE WHEN excluded.text != '' THEN excluded.text ELSE messages.text END,
   body_html   = CASE WHEN excluded.body_html != '' THEN excluded.body_html ELSE messages.body_html END,
@@ -426,7 +435,11 @@ ON CONFLICT(provider, chat_id, id) DO UPDATE SET
   media_h     = CASE WHEN excluded.media_h > 0 THEN excluded.media_h ELSE messages.media_h END,
   file_name   = CASE WHEN excluded.file_name != '' THEN excluded.file_name ELSE messages.file_name END,
   file_size   = CASE WHEN excluded.file_size > 0 THEN excluded.file_size ELSE messages.file_size END,
-  duration    = CASE WHEN excluded.duration  > 0 THEN excluded.duration  ELSE messages.duration  END
+  duration    = CASE WHEN excluded.duration  > 0 THEN excluded.duration  ELSE messages.duration  END,
+  link_url    = CASE WHEN excluded.link_url   != '' THEN excluded.link_url   ELSE messages.link_url   END,
+  link_title  = CASE WHEN excluded.link_title != '' THEN excluded.link_title ELSE messages.link_title END,
+  link_desc   = CASE WHEN excluded.link_desc  != '' THEN excluded.link_desc  ELSE messages.link_desc  END,
+  link_image  = CASE WHEN excluded.link_image != '' THEN excluded.link_image ELSE messages.link_image END
 `
 
 func (s *HistoryStore) putMessage(ctx context.Context, tx *sql.Tx, m Message) error {
@@ -457,6 +470,7 @@ func (s *HistoryStore) putMessage(ctx context.Context, tx *sql.Tx, m Message) er
 		m.Provider, m.ChatID, m.ID, m.TS, m.FromMe, m.SenderID, m.SenderName, m.SenderAvatarPath, m.Kind, m.Text,
 		m.BodyHTML, m.Status, m.ReplyTo, string(cc), string(bcc), m.MediaPath, m.MediaRef,
 		m.MediaMime, m.MediaW, m.MediaH, m.FileName, m.FileSize, m.Duration,
+		m.LinkURL, m.LinkTitle, m.LinkDesc, m.LinkImage,
 		statusRank(m.Status), statusRank(existing))
 	return err
 }
@@ -501,7 +515,7 @@ func (s *HistoryStore) PutMessages(ctx context.Context, msgs []Message) error {
 const messageSelect = `
 SELECT provider, chat_id, id, ts, from_me, sender_id, sender_name, sender_avatar_path, kind, text,
        body_html, status, reply_to, cc, bcc, media_path, media_ref, media_mime, media_w, media_h,
-       file_name, file_size, duration
+       file_name, file_size, duration, link_url, link_title, link_desc, link_image
 FROM messages
 `
 
@@ -572,7 +586,8 @@ func scanMessages(rows *sql.Rows) ([]Message, error) {
 		if err := rows.Scan(&m.Provider, &m.ChatID, &m.ID, &m.TS, &m.FromMe, &m.SenderID,
 			&m.SenderName, &m.SenderAvatarPath, &m.Kind, &m.Text, &m.BodyHTML, &m.Status, &m.ReplyTo, &cc, &bcc,
 			&m.MediaPath, &m.MediaRef, &m.MediaMime, &m.MediaW, &m.MediaH,
-			&m.FileName, &m.FileSize, &m.Duration); err != nil {
+			&m.FileName, &m.FileSize, &m.Duration,
+			&m.LinkURL, &m.LinkTitle, &m.LinkDesc, &m.LinkImage); err != nil {
 			return nil, err
 		}
 		if cc != "" {
@@ -665,7 +680,8 @@ func (s *HistoryStore) SearchMessages(ctx context.Context, query string, limit i
 SELECT m.provider, m.chat_id, m.id, m.ts, m.from_me, m.sender_id, m.sender_name,
        m.sender_avatar_path, m.kind, m.text, m.body_html, m.status, m.reply_to, m.cc, m.bcc,
        m.media_path, m.media_ref, m.media_mime, m.media_w, m.media_h, m.file_name, m.file_size,
-       m.duration, COALESCE(c.name, '')
+       m.duration, m.link_url, m.link_title, m.link_desc, m.link_image,
+       COALESCE(c.name, '')
   FROM messages_fts f
   JOIN messages m ON m.rowid = f.rowid
   LEFT JOIN chats c ON c.provider = m.provider AND c.id = m.chat_id
@@ -677,7 +693,8 @@ SELECT m.provider, m.chat_id, m.id, m.ts, m.from_me, m.sender_id, m.sender_name,
 SELECT m.provider, m.chat_id, m.id, m.ts, m.from_me, m.sender_id, m.sender_name,
        m.sender_avatar_path, m.kind, m.text, m.body_html, m.status, m.reply_to, m.cc, m.bcc,
        m.media_path, m.media_ref, m.media_mime, m.media_w, m.media_h, m.file_name, m.file_size,
-       m.duration, COALESCE(c.name, '')
+       m.duration, m.link_url, m.link_title, m.link_desc, m.link_image,
+       COALESCE(c.name, '')
   FROM messages m
   LEFT JOIN chats c ON c.provider = m.provider AND c.id = m.chat_id
  WHERE m.text LIKE '%' || ? || '%' ESCAPE '\'
@@ -696,7 +713,8 @@ SELECT m.provider, m.chat_id, m.id, m.ts, m.from_me, m.sender_id, m.sender_name,
 		if err := rows.Scan(&h.Provider, &h.ChatID, &h.ID, &h.TS, &h.FromMe, &h.SenderID,
 			&h.SenderName, &h.SenderAvatarPath, &h.Kind, &h.Text, &h.BodyHTML, &h.Status, &h.ReplyTo, &cc, &bcc,
 			&h.MediaPath, &h.MediaRef, &h.MediaMime, &h.MediaW, &h.MediaH,
-			&h.FileName, &h.FileSize, &h.Duration, &h.ChatName); err != nil {
+			&h.FileName, &h.FileSize, &h.Duration,
+			&h.LinkURL, &h.LinkTitle, &h.LinkDesc, &h.LinkImage, &h.ChatName); err != nil {
 			return nil, err
 		}
 		if cc != "" {

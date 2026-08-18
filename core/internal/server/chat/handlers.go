@@ -173,6 +173,18 @@ func handleSetProviderConfig(conn *models.Conn, req models.Request, m *Manager) 
 	prefs.Archived = models.GetOr(req, "notifyArchived", prefs.Archived)
 	prefs.DoNotDisturb = models.GetOr(req, "doNotDisturb", prefs.DoNotDisturb)
 
+	// Replaced wholesale rather than merged: the caller sends the complete list
+	// it wants, and a merge would make removing a tag impossible.
+	if raw, ok := models.Get[[]any](req, "mutedTags"); ok {
+		tags := make([]string, 0, len(raw))
+		for _, item := range raw {
+			if tag, ok := item.(string); ok && tag != "" {
+				tags = append(tags, tag)
+			}
+		}
+		prefs.MutedTags = tags
+	}
+
 	m.SetProviderPrefs(provider, prefs)
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true})
 }
@@ -412,6 +424,17 @@ func handleSend(ctx context.Context, conn *models.Conn, req models.Request, m *M
 	}
 	if replyTo != "" {
 		params["replyTo"] = replyTo
+
+		// A reply has to quote what it is replying to, and only the store knows
+		// that. Without it a provider builds a reply quoting an empty message,
+		// which is what the recipient then sees.
+		if quoted, err := m.Store().MessageByID(ctx, provider, chatID, replyTo); err == nil {
+			params["replyToText"] = quoted.Text
+			params["replyToSender"] = quoted.SenderID
+			params["replyToFromMe"] = quoted.FromMe
+		} else {
+			log.Warnf("chat: replying to a message that is not stored: %v", err)
+		}
 	}
 	if len(attachments) > 0 {
 		params["attachments"] = attachments

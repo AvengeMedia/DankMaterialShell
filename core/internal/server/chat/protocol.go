@@ -180,6 +180,11 @@ type wireMessage struct {
 	CC               []string `json:"cc"`
 	BCC              []string `json:"bcc"`
 
+	LinkURL   string `json:"linkUrl"`
+	LinkTitle string `json:"linkTitle"`
+	LinkDesc  string `json:"linkDesc"`
+	LinkImage string `json:"linkImage"`
+
 	MediaPath  string `json:"mediaPath"`
 	MediaBytes string `json:"mediaBytes"`
 	MediaRef   string `json:"mediaRef"`

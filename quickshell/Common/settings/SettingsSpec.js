@@ -688,7 +688,7 @@ var SPEC = {
     chatNotifyArchived: { def: false },
     chatHistoryRetentionDays: { def: 0 },
     chatMediaCacheMaxMB: { def: 512 },
-    chatFilters: { def: [] },
+    chatHiddenTags: { def: ["archived", "status", "channel", "broadcast"] },
 
     launcherPluginVisibility: { def: {} },
     launcherPluginOrder: { def: [] },

@@ -37,6 +37,20 @@ StyledRect {
         event.accepted = true;
     }
 
+    // Enter confirms, matching every other yes/no in the shell. Cancel holds
+    // focus, so a reflexive Enter on a dialog you did not expect is the safe
+    // answer only if you have not read it -- which is why the text says which
+    // kind of delete this is.
+    Keys.onReturnPressed: event => {
+        root.confirmed();
+        event.accepted = true;
+    }
+
+    Keys.onEnterPressed: event => {
+        root.confirmed();
+        event.accepted = true;
+    }
+
     Column {
         anchors.centerIn: parent
         width: Math.min(400, parent.width - Theme.spacingXL * 2)
@@ -100,8 +114,6 @@ StyledRect {
                 backgroundColor: "transparent"
                 textColor: Theme.surfaceText
                 onClicked: root.cancelled()
-
-                Keys.onReturnPressed: root.cancelled()
             }
 
             DankButton {

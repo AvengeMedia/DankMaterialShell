@@ -138,6 +138,14 @@ type Message struct {
 	CC               []string `json:"cc,omitempty"`
 	BCC              []string `json:"bcc,omitempty"`
 
+	// A link the message is about, with whatever the provider knew about it.
+	// Sent by the provider rather than fetched here: fetching would leak the
+	// fact that the message was read to whoever hosts the page.
+	LinkURL   string `json:"linkUrl,omitempty"`
+	LinkTitle string `json:"linkTitle,omitempty"`
+	LinkDesc  string `json:"linkDesc,omitempty"`
+	LinkImage string `json:"linkImage,omitempty"`
+
 	MediaPath string `json:"mediaPath,omitempty"`
 	MediaRef  string `json:"mediaRef,omitempty"`
 	MediaMime string `json:"mediaMime,omitempty"`

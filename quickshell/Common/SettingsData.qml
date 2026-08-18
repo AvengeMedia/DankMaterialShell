@@ -128,11 +128,10 @@ Singleton {
     property int chatHistoryRetentionDays: 0
     property int chatMediaCacheMaxMB: 512
 
-    // Chat list filter rules. Each is
-    // { field, mode, value, action, enabled } -- see ChatFilters.js for what
-    // those mean. An array rather than named keys because the user creates
-    // however many they want.
-    property var chatFilters: []
+    // Tags kept out of the conversation list and the runner, for example
+    // archived, status or channel. A list rather than a toggle per tag, because
+    // the tags themselves come from whichever providers are installed.
+    property var chatHiddenTags: ["archived", "status", "channel", "broadcast"]
 
     property var launcherPluginVisibility: ({})
 

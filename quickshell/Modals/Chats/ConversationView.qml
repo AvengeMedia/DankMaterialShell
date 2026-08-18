@@ -37,6 +37,17 @@ FocusScope {
 
     readonly property var selectedMessage: selectedIndex >= 0 && selectedIndex < ChatService.messages.length ? ChatService.messages[selectedIndex] : null
 
+    // True while anything is layered over the conversation. Escape belongs to
+    // the overlay then, and the modal must not act on it.
+    readonly property bool hasOverlay: showingHelp || pendingDelete !== null || forwardSource !== null
+
+    // Whatever closes an overlay puts focus back on the composer, so Escape
+    // keeps working and typing keeps landing in the text field.
+    onHasOverlayChanged: {
+        if (!hasOverlay)
+            Qt.callLater(() => composer.takeFocus());
+    }
+
     function takeFocus() {
         composer.takeFocus();
     }
@@ -109,7 +120,10 @@ FocusScope {
 
         if ((msg.text || "") === "")
             return;
-        Quickshell.execDetached([Proc.dmsBin, "cl", "copy", msg.text]);
+
+        // wl-copy rather than the clipboard manager, so text lands the same way
+        // an attachment does and is immediately readable by wl-paste.
+        Quickshell.execDetached(["sh", "-c", "printf '%s' \"$1\" | wl-copy", "sh", msg.text]);
         ToastService.showInfo(I18n.tr("Copied to clipboard"));
     }
 
@@ -186,23 +200,23 @@ FocusScope {
         onActivated: root.forwardSelected()
     }
 
+    // Ctrl+Shift+C rather than Ctrl+C: the composer always holds focus, so
+    // plain Ctrl+C has to stay available for the text the user selected there.
     Shortcut {
-        sequences: ["Ctrl+C"]
-        // Only while a message is selected, so Ctrl+C still copies whatever the
-        // user has highlighted in the composer.
+        sequences: ["Ctrl+Shift+C"]
         enabled: root.selectedIndex >= 0
         onActivated: root.copyMessage(root.selectedMessage)
     }
 
     Shortcut {
         sequences: ["Shift+Delete"]
-        enabled: root.selectedIndex >= 0
+        enabled: root.selectedIndex >= 0 && !root.hasOverlay
         onActivated: root.requestDelete(root.selectedMessage, true)
     }
 
     Shortcut {
         sequences: ["Delete"]
-        enabled: root.selectedIndex >= 0
+        enabled: root.selectedIndex >= 0 && !root.hasOverlay
         onActivated: root.requestDelete(root.selectedMessage, false)
     }
 
@@ -225,9 +239,13 @@ FocusScope {
             }
         }
 
-        if (root.selectedIndex >= 0 && (event.key === Qt.Key_Return || event.key === Qt.Key_Enter)) {
-            root.openSelected();
-            event.accepted = true;
+        // Shift+Enter opens the selected message's attachment or link. Plain
+        // Enter always sends, because the composer always holds focus.
+        if ((event.modifiers & Qt.ShiftModifier) && (event.key === Qt.Key_Return || event.key === Qt.Key_Enter)) {
+            if (root.selectedIndex >= 0) {
+                root.openSelected();
+                event.accepted = true;
+            }
         }
     }
 
@@ -237,6 +255,7 @@ FocusScope {
         anchors.fill: parent
         z: 20
         visible: root.showingHelp
+        focus: visible
         onDismissed: root.showingHelp = false
     }
 
@@ -244,6 +263,7 @@ FocusScope {
         anchors.fill: parent
         z: 25
         visible: root.pendingDelete !== null
+        focus: visible
         forEveryone: root.pendingDeleteForEveryone
         message: root.pendingDelete
 
@@ -257,6 +277,7 @@ FocusScope {
         anchors.fill: parent
         z: 10
         visible: root.forwardSource !== null
+        focus: visible
         source: root.forwardSource
 
         onCancelled: root.forwardSource = null

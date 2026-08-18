@@ -37,7 +37,7 @@ StyledRect {
                     "text": I18n.tr("Select the next message")
                 },
                 {
-                    "keys": "Enter",
+                    "keys": "Shift + Enter",
                     "text": I18n.tr("Open the selected message's attachment or link")
                 },
                 {
@@ -50,7 +50,7 @@ StyledRect {
             "title": I18n.tr("Acting on the selected message"),
             "binds": [
                 {
-                    "keys": "Ctrl + C",
+                    "keys": "Ctrl + Shift + C",
                     "text": I18n.tr("Copy the text, or the attachment as a file")
                 },
                 {
@@ -76,11 +76,7 @@ StyledRect {
             "binds": [
                 {
                     "keys": "Enter",
-                    "text": I18n.tr("Send")
-                },
-                {
-                    "keys": "Shift + Enter",
-                    "text": I18n.tr("New line")
+                    "text": I18n.tr("Send, always -- the text field keeps focus")
                 },
                 {
                     "keys": "Ctrl + V",

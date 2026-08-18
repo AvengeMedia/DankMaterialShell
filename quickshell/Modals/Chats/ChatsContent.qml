@@ -4,7 +4,6 @@ import QtQuick
 import Quickshell
 import qs.Common
 import qs.Modals.Chats
-import "ChatFilters.js" as ChatFilters
 import qs.Services
 import qs.Widgets
 
@@ -30,6 +29,10 @@ FocusScope {
     // which is debounced so a query is not sent per keystroke.
     property var messageHits: []
     property bool searching: false
+
+    // Surfaced for the modal, which must not close on Escape while the
+    // conversation has something layered over it.
+    readonly property bool hasOverlay: conversation.hasOverlay
 
     readonly property bool showingResults: searchField.text.trim().length >= 2 && messageHits.length > 0
 
@@ -59,14 +62,14 @@ FocusScope {
         return null;
     }
 
-    // Conversations after the user's filter rules and the search box.
+    // Conversations after the hidden-tag setting and the search box.
     //
-    // Filters come first and are skipped while searching: someone who types a
-    // name is looking for that conversation, and hiding it because it happens
-    // to be archived would be obstinate.
+    // Hiding is skipped while searching: someone who types a name is looking
+    // for that conversation, and refusing to show it because it happens to be
+    // archived would be obstinate.
     readonly property var visibleChats: {
         const query = searchField.text.trim().toLowerCase();
-        const source = query === "" ? ChatFilters.apply(ChatService.chats, SettingsData.chatFilters) : ChatService.chats;
+        const source = query === "" ? ChatService.visibleChats : ChatService.chats;
 
         if (query === "")
             return source;
@@ -83,7 +86,7 @@ FocusScope {
         return out;
     }
 
-    readonly property int hiddenCount: ChatService.chats.length - ChatFilters.apply(ChatService.chats, SettingsData.chatFilters).length
+    readonly property int hiddenCount: ChatService.chats.length - ChatService.visibleChats.length
 
     Timer {
         id: searchDebounce
@@ -246,6 +249,7 @@ FocusScope {
             }
 
             ConversationView {
+                id: conversation
                 anchors.fill: parent
                 visible: root.authProvider === null && !root.showingResults && ChatService.hasActiveChat
             }

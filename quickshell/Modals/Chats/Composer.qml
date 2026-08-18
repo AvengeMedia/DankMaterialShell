@@ -256,7 +256,10 @@ Item {
                     return root.canAttach ? I18n.tr("Message, or paste an image") : I18n.tr("Message");
                 }
 
-                // Enter sends; Shift+Enter is a newline, as everywhere else.
+                // Enter always sends. Shift+Enter is left unhandled here so it
+                // reaches the conversation, where it opens the selected
+                // message's attachment or link -- the text field holds focus
+                // permanently, so it is the only place those keys can arrive.
                 Keys.onReturnPressed: event => {
                     if (event.modifiers & Qt.ShiftModifier) {
                         event.accepted = false;
@@ -275,10 +278,11 @@ Item {
                     event.accepted = true;
                 }
 
-                // Ctrl+V stages a file or image. Not accepted, so a text paste
-                // still lands in the field when the clipboard holds only text.
+                // Ctrl+V stages an image or file. Not accepted, so a plain text
+                // paste still lands in the field when that is what the
+                // clipboard holds.
                 Keys.onPressed: event => {
-                    if ((event.modifiers & Qt.ControlModifier) && event.key === Qt.Key_V)
+                    if ((event.modifiers & Qt.ControlModifier) && !(event.modifiers & Qt.ShiftModifier) && event.key === Qt.Key_V)
                         root.pasteAttachment();
                 }
             }

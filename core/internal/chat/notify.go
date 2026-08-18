@@ -30,6 +30,11 @@ type NotifyPrefs struct {
 	// DoNotDisturb silences the provider without discarding the settings above,
 	// so turning it back off restores what the user had chosen.
 	DoNotDisturb bool `json:"doNotDisturb"`
+	// MutedTags silences whole categories a provider defines -- a service's
+	// statuses or channels, a mail account's labels -- without silencing the
+	// provider itself. Which tags exist is up to the provider, so this is a
+	// list rather than a fixed set of flags.
+	MutedTags []string `json:"mutedTags,omitempty"`
 }
 
 // DefaultNotifyPrefs is the conservative starting point: notify with previews
@@ -125,6 +130,31 @@ func (p *NotifyPolicy) suppressionReason(ctx context.Context, m Message, prefs N
 		return "group message"
 	}
 
+	if tag := p.mutedTag(ctx, m, prefs); tag != "" {
+		return "muted tag: " + tag
+	}
+
+	return ""
+}
+
+// mutedTag returns the tag that silences this message, or "".
+func (p *NotifyPolicy) mutedTag(ctx context.Context, m Message, prefs NotifyPrefs) string {
+	if len(prefs.MutedTags) == 0 || p.store == nil {
+		return ""
+	}
+
+	c, err := p.store.ChatByID(ctx, m.Provider, m.ChatID)
+	if err != nil {
+		return ""
+	}
+
+	for _, tag := range c.Tags {
+		for _, muted := range prefs.MutedTags {
+			if tag == muted {
+				return tag
+			}
+		}
+	}
 	return ""
 }
 

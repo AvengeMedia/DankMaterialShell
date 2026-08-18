@@ -11919,26 +11919,6 @@
     "icon": "forum"
   },
   {
-    "section": "chatFilters",
-    "label": "Conversation filters",
-    "tabIndex": 46,
-    "category": "Chats",
-    "keywords": [
-      "bridge",
-      "chat",
-      "chats",
-      "conversation",
-      "filters",
-      "mail",
-      "message",
-      "messaging",
-      "provider",
-      "signal",
-      "whatsapp"
-    ],
-    "icon": "filter_alt"
-  },
-  {
     "section": "chatHistoryRetentionDays",
     "label": "Keep message history for",
     "tabIndex": 46,
@@ -11983,5 +11963,26 @@
     ],
     "icon": "database",
     "description": "Messages are kept forever"
+  },
+  {
+    "section": "chatHiddenTags",
+    "label": "What appears in the list",
+    "tabIndex": 46,
+    "category": "Chats",
+    "keywords": [
+      "appears",
+      "bridge",
+      "chat",
+      "chats",
+      "list",
+      "mail",
+      "message",
+      "messaging",
+      "provider",
+      "signal",
+      "what",
+      "whatsapp"
+    ],
+    "icon": "filter_alt"
   }
 ]

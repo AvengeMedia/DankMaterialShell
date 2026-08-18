@@ -59,6 +59,43 @@ StyledRect {
         }
     }
 
+    // The tags this provider's own conversations carry, so the toggles below
+    // are the ones that mean something for it.
+    readonly property var providerTags: {
+        const seen = {};
+        const out = [];
+        for (let i = 0; i < ChatService.chats.length; i++) {
+            const chat = ChatService.chats[i];
+            if (chat.provider !== root.providerId)
+                continue;
+            const tags = chat.tags || [];
+            for (let t = 0; t < tags.length; t++) {
+                if (!seen[tags[t]]) {
+                    seen[tags[t]] = true;
+                    out.push(tags[t]);
+                }
+            }
+        }
+        out.sort();
+        return out;
+    }
+
+    function setTagNotify(tag, notify) {
+        const current = (root.notifications?.mutedTags ?? []).slice();
+        const at = current.indexOf(tag);
+
+        if (!notify && at === -1)
+            current.push(tag);
+        else if (notify && at !== -1)
+            current.splice(at, 1);
+        else
+            return;
+
+        ChatService.setProviderNotifications(root.providerId, {
+            "mutedTags": current
+        });
+    }
+
     function setNotification(key, value) {
         const params = {};
         params[key] = value;
@@ -267,6 +304,23 @@ StyledRect {
                 checked: root.notifications?.groups ?? true
                 enabled: (root.notifications?.enabled ?? true) && !(root.notifications?.doNotDisturb ?? false)
                 onToggled: checked => root.setNotification("notifyGroups", checked)
+            }
+
+            // Per tag, so a provider's own categories -- WhatsApp's statuses
+            // and channels, a mail account's labels -- can each be silenced
+            // without silencing the provider.
+            Repeater {
+                model: root.providerTags
+
+                SettingsToggleRow {
+                    required property var modelData
+
+                    width: parent.width
+                    text: I18n.tr("Notify for %1").arg(modelData)
+                    checked: (root.notifications?.mutedTags ?? []).indexOf(modelData) === -1
+                    enabled: (root.notifications?.enabled ?? true) && !(root.notifications?.doNotDisturb ?? false)
+                    onToggled: checked => root.setTagNotify(modelData, checked)
+                }
             }
 
             SettingsToggleRow {

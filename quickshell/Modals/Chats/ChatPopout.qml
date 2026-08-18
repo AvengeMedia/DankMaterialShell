@@ -27,6 +27,11 @@ DankModal {
     cornerRadius: Theme.cornerRadius
     visible: false
 
+    // While the conversation has an overlay up -- help, a delete confirmation,
+    // a forward picker -- Escape belongs to that overlay. Without this the
+    // whole window closes on the first press and the overlay never sees it.
+    closeOnEscapeKey: !(contentLoader.item?.hasOverlay ?? false)
+
     // Candidates when a query was ambiguous. Empty once one is chosen.
     property var candidates: []
     property string pendingQuery: ""
