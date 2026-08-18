@@ -102,7 +102,7 @@ done
                             }
 
                             StyledText {
-                                text: BatteryService.isPluggedIn ? I18n.tr("AC Adapter (Plugged In)") : I18n.tr("Battery Power")
+                                text: BatteryService.isPluggedIn ? I18n.tr("Plugged In (AC)") : I18n.tr("Battery Power")
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceTextMedium
                                 width: parent.width
@@ -150,7 +150,7 @@ done
                                 }
 
                                 StyledText {
-                                    text: BatteryService.isPluggedIn ? I18n.tr("AC Adapter (Plugged In)") : I18n.tr("Battery Power")
+                                    text: BatteryService.isPluggedIn ? I18n.tr("Plugged In (AC)") : I18n.tr("Battery Power")
                                     font.pixelSize: Theme.fontSizeMedium
                                     font.weight: Font.Medium
                                     color: Theme.surfaceText
