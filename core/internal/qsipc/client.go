@@ -19,6 +19,7 @@ const (
 
 	// Keep these indexes in sync with quickshell-mirror/quickshell:
 	// https://github.com/quickshell-mirror/quickshell/blob/59e9c47/src/io/ipccomm.cpp#L126
+	responseNotReady         = 1
 	responseTargetNotFound   = 2
 	responseFunctionNotFound = 3
 	responseArgumentMismatch = 4
@@ -27,6 +28,7 @@ const (
 )
 
 var (
+	ErrNotReady            = errors.New("quickshell IPC not ready")
 	ErrTargetNotFound      = errors.New("quickshell IPC target not found")
 	ErrFunctionNotFound    = errors.New("quickshell IPC function not found")
 	ErrArgumentMismatch    = errors.New("quickshell IPC argument mismatch")
@@ -82,6 +84,8 @@ func readResponse(r io.Reader) (string, bool, error) {
 		return "", false, fmt.Errorf("read Quickshell IPC response: %w", err)
 	}
 	switch index {
+	case responseNotReady:
+		return "", false, ErrNotReady
 	case responseTargetNotFound:
 		return "", false, ErrTargetNotFound
 	case responseFunctionNotFound:

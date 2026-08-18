@@ -17,12 +17,7 @@ func TestWriteCall(t *testing.T) {
 		t.Fatal(err)
 	}
 	if !bytes.Equal(got.Bytes(), want) {
-		for i := range got.Bytes() {
-			if got.Bytes()[i] != want[i] {
-				t.Fatalf("unexpected byte at %d: got %02x want %02x", i, got.Bytes()[i], want[i])
-			}
-		}
-		t.Fatal("unexpected wire bytes")
+		t.Fatalf("unexpected wire bytes:\ngot  %x\nwant %x", got.Bytes(), want)
 	}
 }
 
@@ -46,6 +41,7 @@ func TestReadResponseErrors(t *testing.T) {
 		index byte
 		want  error
 	}{
+		{name: "not ready", index: responseNotReady, want: ErrNotReady},
 		{name: "target not found", index: responseTargetNotFound, want: ErrTargetNotFound},
 		{name: "function not found", index: responseFunctionNotFound, want: ErrFunctionNotFound},
 		{name: "argument mismatch", index: responseArgumentMismatch, want: ErrArgumentMismatch},

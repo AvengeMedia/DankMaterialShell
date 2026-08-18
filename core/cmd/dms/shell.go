@@ -138,17 +138,8 @@ func runShellIPCCommand(args []string) {
 	if args[0] != "call" {
 		args = append([]string{"call"}, args...)
 	}
-	if len(args) >= 3 {
-		if pid, ok := shellApp.SessionPID(); ok {
-			result, isVoid, err := qsipc.Call(qsipc.SocketPathForPID(pid), args[1], args[2], args[3:])
-			if err != nil {
-				log.Fatalf("Error running IPC command: %v", err)
-			}
-			if !isVoid {
-				fmt.Fprintln(os.Stdout, result)
-			}
-			return
-		}
+	if tryDirectIPCCall(args) {
+		return
 	}
 
 	baseArgs, err := buildQsIPCBaseArgs()
@@ -164,6 +155,27 @@ func runShellIPCCommand(args []string) {
 	if err := cmd.Run(); err != nil {
 		log.Fatalf("Error running IPC command: %v", err)
 	}
+}
+
+// tryDirectIPCCall invokes the shell over its IPC socket without spawning qs.
+// Any failure falls back to the qs child process path, which owns error output.
+func tryDirectIPCCall(args []string) bool {
+	if len(args) < 3 {
+		return false
+	}
+	pid, ok := shellApp.SessionPID()
+	if !ok {
+		return false
+	}
+	result, isVoid, err := qsipc.Call(qsipc.SocketPathForPID(pid), args[1], args[2], args[3:])
+	if err != nil {
+		log.Debugf("Direct Quickshell IPC failed, falling back to qs: %v", err)
+		return false
+	}
+	if !isVoid {
+		fmt.Println(result)
+	}
+	return true
 }
 
 func printIPCHelp() {
