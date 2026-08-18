@@ -17,6 +17,13 @@ func setupHomeTrash(t *testing.T) (homeRoot string, trashDir string) {
 	}
 	t.Setenv("XDG_DATA_HOME", xdg)
 	t.Setenv("HOME", homeRoot)
+
+	// Without this, Count() and Empty() reach the machine's real per-mount
+	// trash dirs, and Empty() deletes what it finds there.
+	prev := mountPoints
+	mountPoints = func() []string { return nil }
+	t.Cleanup(func() { mountPoints = prev })
+
 	trashDir = filepath.Join(xdg, "Trash")
 	return homeRoot, trashDir
 }
