@@ -13,6 +13,7 @@ var SPEC = {
     customThemeFile: { def: "" },
     registryThemeVariants: { def: {} },
     matugenScheme: { def: "scheme-tonal-spot", onChange: "regenSystemThemes" },
+    matugenSmartMode: { def: false, onChange: "regenSystemThemes" },
     matugenContrast: { def: 0, onChange: "regenSystemThemes" },
     runUserMatugenTemplates: { def: true, onChange: "regenSystemThemes" },
     matugenTargetMonitor: { def: "", onChange: "regenSystemThemes" },

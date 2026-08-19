@@ -34,7 +34,7 @@ Item {
         const mode = SessionData.isLightMode ? "light" : "dark";
         for (var i = 0; i < Theme.availableMatugenSchemes.length; i++) {
             const option = Theme.availableMatugenSchemes[i];
-            const preview = matugenSchemePreviews[option.value];
+            const preview = matugenSchemePreviews[option.value] || matugenSchemePreviews["scheme-tonal-spot"];
             if (preview?.[mode])
                 map[option.label] = preview[mode];
         }
@@ -1313,12 +1313,30 @@ Item {
                         }
                     }
 
+                    SettingsToggleRow {
+                        tab: "theme"
+                        tags: ["matugen", "smart", "wallpaper", "auto", "mode"]
+                        settingKey: "matugenSmartMode"
+                        text: I18n.tr("Auto From Wallpaper")
+                        description: I18n.tr("Dark or light mode follows the wallpaper brightness (requires matugen 4.2+)")
+                        checked: SettingsData.matugenSmartMode
+                        enabled: Theme.matugenAvailable && Theme.currentTheme === Theme.dynamic
+                        opacity: enabled ? 1 : 0.4
+                        onToggled: checked => {
+                            if (checked && SessionData.themeModeAutoEnabled)
+                                SessionData.setThemeModeAutoEnabled(false);
+                            SettingsData.setMatugenSmartMode(checked);
+                        }
+                    }
+
                     DankToggle {
                         id: themeModeAutoToggle
                         width: parent.width
                         text: I18n.tr("Automatic Control")
                         checked: SessionData.themeModeAutoEnabled
                         onToggled: checked => {
+                            if (checked && SettingsData.matugenSmartMode)
+                                SettingsData.setMatugenSmartMode(false);
                             SessionData.setThemeModeAutoEnabled(checked);
                         }
 

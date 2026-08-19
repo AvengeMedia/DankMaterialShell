@@ -28338,5 +28338,55 @@
     "tags": [
       "shell"
     ]
+  },
+  {
+    "term": "Smart",
+    "context": "matugen color scheme option",
+    "reference": "Common/Theme.qml",
+    "comment": "",
+    "tags": []
+  },
+  {
+    "term": "Automatically picks the scheme variant based on the wallpaper. Requires matugen 4.2+.",
+    "context": "Automatically picks the scheme variant based on the wallpaper. Requires matugen 4.2+.",
+    "reference": "Common/Theme.qml",
+    "comment": "",
+    "tags": []
+  },
+  {
+    "term": "Auto From Wallpaper",
+    "context": "Auto From Wallpaper",
+    "reference": "Modules/Settings/ThemeColorsTab.qml",
+    "comment": "",
+    "tags": [
+      "settings"
+    ]
+  },
+  {
+    "term": "Dark or light mode follows the wallpaper brightness (requires matugen 4.2+)",
+    "context": "Dark or light mode follows the wallpaper brightness (requires matugen 4.2+)",
+    "reference": "Modules/Settings/ThemeColorsTab.qml",
+    "comment": "",
+    "tags": [
+      "settings"
+    ]
+  },
+  {
+    "term": "Auto (Dark Mode)",
+    "context": "Auto (Dark Mode)",
+    "reference": "Modules/ControlCenter/Components/DragDropGrid.qml",
+    "comment": "",
+    "tags": [
+      "shell"
+    ]
+  },
+  {
+    "term": "Auto (Light Mode)",
+    "context": "Auto (Light Mode)",
+    "reference": "Modules/ControlCenter/Components/DragDropGrid.qml",
+    "comment": "",
+    "tags": [
+      "shell"
+    ]
   }
 ]
