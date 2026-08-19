@@ -22,6 +22,15 @@ Singleton {
 
     property var wiredConnections: activeService?.wiredConnections ?? []
 
+    property string cellularIP: activeService?.cellularIP ?? ""
+    property string cellularInterface: activeService?.cellularInterface ?? ""
+    property bool cellularConnected: activeService?.cellularConnected ?? false
+    property bool cellularEnabled: activeService?.cellularEnabled ?? true
+    property bool cellularHardwareEnabled: activeService?.cellularHardwareEnabled ?? true
+    property string cellularConnectionUuid: activeService?.cellularConnectionUuid ?? ""
+    property var cellularDevices: activeService?.cellularDevices ?? []
+    property var cellularConnections: activeService?.cellularConnections ?? []
+
     property string wifiIP: activeService?.wifiIP ?? ""
     property string wifiInterface: activeService?.wifiInterface ?? ""
     property bool wifiConnected: activeService?.wifiConnected ?? false
@@ -51,6 +60,7 @@ Singleton {
 
     property bool wifiAvailable: activeService?.wifiAvailable ?? true
     property bool wifiToggling: activeService?.wifiToggling ?? false
+    property bool cellularToggling: activeService?.cellularToggling ?? false
     property bool changingPreference: activeService?.changingPreference ?? false
     property string targetPreference: activeService?.targetPreference ?? ""
     property var savedWifiNetworks: activeService?.savedWifiNetworks ?? []
@@ -221,6 +231,12 @@ Singleton {
         }
     }
 
+    function toggleCellularRadio() {
+        if (activeService && activeService.toggleCellularRadio) {
+            activeService.toggleCellularRadio();
+        }
+    }
+
     function enableWifiDevice() {
         if (activeService && activeService.enableWifiDevice) {
             activeService.enableWifiDevice();
@@ -254,6 +270,24 @@ Singleton {
     function disconnectEthernetDevice(deviceName) {
         if (activeService && activeService.disconnectEthernetDevice) {
             activeService.disconnectEthernetDevice(deviceName);
+        }
+    }
+
+    function disconnectCellularDevice(deviceName) {
+        if (activeService && activeService.disconnectCellularDevice) {
+            activeService.disconnectCellularDevice(deviceName);
+        }
+    }
+
+    function connectCellular() {
+        if (activeService && activeService.connectCellular) {
+            activeService.connectCellular();
+        }
+    }
+
+    function connectToSpecificCellularConfig(uuid) {
+        if (activeService && activeService.connectToSpecificCellularConfig) {
+            activeService.connectToSpecificCellularConfig(uuid);
         }
     }
 

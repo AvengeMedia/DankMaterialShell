@@ -11871,5 +11871,46 @@
     ],
     "description": "Choose a shortcut key to cycle between keyboard layouts",
     "conditionKey": "isNiri"
+  },
+  {
+    "section": "networkCellular",
+    "label": "Cellular",
+    "tabIndex": 46,
+    "category": "Network",
+    "keywords": [
+      "cdma",
+      "cellular",
+      "connectivity",
+      "gsm",
+      "lte",
+      "mobile",
+      "modem",
+      "network",
+      "online",
+      "wwan"
+    ],
+    "icon": "network_cell"
+  },
+  {
+    "section": "networkCellularProfiles",
+    "label": "Saved Configurations",
+    "tabIndex": 46,
+    "category": "Network",
+    "keywords": [
+      "apn",
+      "cellular",
+      "config",
+      "configurations",
+      "configure",
+      "connectivity",
+      "mobile",
+      "network",
+      "online",
+      "profile",
+      "saved",
+      "setup",
+      "sim"
+    ],
+    "icon": "sim_card"
   }
 ]

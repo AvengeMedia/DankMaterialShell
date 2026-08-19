@@ -99,6 +99,7 @@ Item {
                                     switch (NetworkService.networkStatus) {
                                     case "ethernet":
                                     case "wifi":
+                                    case "cellular":
                                         return Theme.success;
                                     case "disconnected":
                                         return Theme.error;
@@ -115,6 +116,8 @@ Item {
                                         return I18n.tr("Ethernet");
                                     case "wifi":
                                         return I18n.tr("WiFi");
+                                    case "cellular":
+                                        return I18n.tr("Cellular");
                                     case "disconnected":
                                         return I18n.tr("Disconnected");
                                     default:
@@ -145,7 +148,7 @@ Item {
                     Row {
                         width: parent.width
                         spacing: Theme.spacingM
-                        visible: NetworkService.backend === "networkmanager" && NetworkService.ethernetConnected && NetworkService.wifiConnected
+                        visible: NetworkService.backend === "networkmanager" && [NetworkService.ethernetConnected, NetworkService.wifiConnected, NetworkService.cellularConnected].filter(v => v).length > 1
 
                         StyledText {
                             text: I18n.tr("Preference")
@@ -161,13 +164,15 @@ Item {
 
                         DankButtonGroup {
                             id: preferenceButtons
-                            model: [I18n.tr("Auto"), I18n.tr("Ethernet"), I18n.tr("WiFi")]
+                            model: [I18n.tr("Auto"), I18n.tr("Ethernet"), I18n.tr("WiFi"), I18n.tr("Cellular")]
                             currentIndex: {
                                 switch (NetworkService.userPreference) {
                                 case "ethernet":
                                     return 1;
                                 case "wifi":
                                     return 2;
+                                case "cellular":
+                                    return 3;
                                 default:
                                     return 0;
                                 }
@@ -184,6 +189,9 @@ Item {
                                     break;
                                 case 2:
                                     NetworkService.setNetworkPreference("wifi");
+                                    break;
+                                case 3:
+                                    NetworkService.setNetworkPreference("cellular");
                                     break;
                                 }
                             }
