@@ -31,7 +31,6 @@ Singleton {
     property string cpuCursor: ""
     property string procCursor: ""
     property int cpuSampleCount: 0
-    property int processSampleCount: 0
 
     property real cpuUsage: 0
     property real cpuFrequency: 0
@@ -153,7 +152,6 @@ Singleton {
             }
             if (!enabledModules.includes("processes")) {
                 procCursor = "";
-                processSampleCount = 0;
                 allProcesses = [];
                 processes = [];
             }
@@ -399,34 +397,26 @@ Singleton {
         }
 
         if (data.processes && Array.isArray(data.processes)) {
-            processSampleCount++;
-
             if (data.cursor) {
                 procCursor = data.cursor;
             }
 
-            // First sample has no CPU deltas; use it for the cursor only and
-            // resample quickly so the visible list gets real values in one update
-            if (processSampleCount === 1) {
-                primeTimer.restart();
-            } else {
-                const newProcesses = [];
-                for (const proc of data.processes) {
-                    newProcesses.push({
-                        "pid": proc.pid || 0,
-                        "ppid": proc.ppid || 0,
-                        "cpu": proc.cpu || 0,
-                        "memoryPercent": proc.memoryPercent || proc.pssPercent || 0,
-                        "memoryKB": proc.memoryKB || proc.pssKB || 0,
-                        "command": proc.command || "",
-                        "fullCommand": proc.fullCommand || "",
-                        "username": proc.username || "",
-                        "displayName": (proc.command && proc.command.length > 15) ? proc.command.substring(0, 15) + "..." : (proc.command || "")
-                    });
-                }
-                allProcesses = newProcesses;
-                applySorting();
+            const newProcesses = [];
+            for (const proc of data.processes) {
+                newProcesses.push({
+                    "pid": proc.pid || 0,
+                    "ppid": proc.ppid || 0,
+                    "cpu": proc.cpu || 0,
+                    "memoryPercent": proc.memoryPercent || proc.pssPercent || 0,
+                    "memoryKB": proc.memoryKB || proc.pssKB || 0,
+                    "command": proc.command || "",
+                    "fullCommand": proc.fullCommand || "",
+                    "username": proc.username || "",
+                    "displayName": (proc.command && proc.command.length > 15) ? proc.command.substring(0, 15) + "..." : (proc.command || "")
+                });
             }
+            allProcesses = newProcesses;
+            applySorting();
         }
 
         const gpuData = (data.gpu && data.gpu.gpus) || data.gpus;
