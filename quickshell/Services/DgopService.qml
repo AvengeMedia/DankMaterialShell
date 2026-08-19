@@ -214,8 +214,10 @@ Singleton {
         }
 
         const params = buildMetaParams();
-        if (!params)
+        if (!params) {
+            pendingUpdate = false;
             return;
+        }
 
         isUpdating = true;
         DMSService.sendRequest("dgop.meta", params, response => {
