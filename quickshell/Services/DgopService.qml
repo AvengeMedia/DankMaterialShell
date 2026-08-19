@@ -230,7 +230,7 @@ Singleton {
 
             if (pendingUpdate) {
                 pendingUpdate = false;
-                updateAllStats();
+                primeTimer.restart();
             }
         });
     }
