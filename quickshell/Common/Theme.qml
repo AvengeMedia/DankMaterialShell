@@ -372,6 +372,38 @@ Singleton {
         return schemes[0];
     }
 
+    readonly property var availableSourceModes: [({
+                "value": "dominant",
+                "label": I18n.tr("Dominant", "matugen source color option")
+            }), ({
+                "value": "colorful",
+                "label": I18n.tr("Colorful", "matugen source color option")
+            }), ({
+                "value": "darkness",
+                "label": I18n.tr("Darkest", "matugen source color option")
+            }), ({
+                "value": "lightness",
+                "label": I18n.tr("Lightest", "matugen source color option")
+            }), ({
+                "value": "saturation",
+                "label": I18n.tr("Most Saturated", "matugen source color option")
+            }), ({
+                "value": "less-saturation",
+                "label": I18n.tr("Least Saturated", "matugen source color option")
+            }), ({
+                "value": "value",
+                "label": I18n.tr("Most Vivid", "matugen source color option")
+            })]
+
+    function getSourceMode(value) {
+        const modes = availableSourceModes;
+        for (var i = 0; i < modes.length; i++) {
+            if (modes[i].value === value)
+                return modes[i];
+        }
+        return modes[0];
+    }
+
     property color primary: currentThemeData.primary
     property color primaryText: currentThemeData.primaryText
     property color secondary: currentThemeData.secondary
@@ -1520,6 +1552,13 @@ Singleton {
         }
         if (typeof SettingsData !== "undefined" && SettingsData.matugenContrast !== 0) {
             args.push("--contrast", SettingsData.matugenContrast.toString());
+        }
+        // Only sent when it would change something. A shell newer than the dms
+        // binary is a supported setup (DMS_SHELL_DIR / -c), and an older binary
+        // exits with "unknown flag: --source-mode" rather than ignoring it, so
+        // the default must not put the flag on the command line at all.
+        if (typeof SettingsData !== "undefined" && SettingsData.matugenSourceMode && SettingsData.matugenSourceMode !== "dominant") {
+            args.push("--source-mode", SettingsData.matugenSourceMode);
         }
 
         if (typeof SettingsData !== "undefined") {

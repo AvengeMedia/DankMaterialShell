@@ -165,6 +165,7 @@ Singleton {
     property string customThemeFile: ""
     property var registryThemeVariants: ({})
     property string matugenScheme: "scheme-tonal-spot"
+    property string matugenSourceMode: "dominant"
     property real matugenContrast: 0
     property bool runUserMatugenTemplates: true
     property string matugenTargetMonitor: ""
@@ -2585,6 +2586,17 @@ Singleton {
         if (typeof Theme !== "undefined") {
             Theme.generateSystemThemesFromCurrentTheme();
         }
+    }
+
+    function setMatugenSourceMode(mode) {
+        var normalized = mode || "dominant";
+        if (matugenSourceMode === normalized)
+            return;
+        // Regeneration comes from the regenSystemThemes onChange hook in
+        // SettingsSpec.js, which set() dispatches. matugenScheme above also
+        // calls Theme.generateSystemThemesFromCurrentTheme() directly, which is
+        // redundant with its own hook.
+        set("matugenSourceMode", normalized);
     }
 
     function setMatugenContrast(value) {
