@@ -243,12 +243,6 @@ Singleton {
         }
     }
 
-    function enableCellularRadio() {
-        if (activeService && activeService.enableCellularRadio) {
-            activeService.enableCellularRadio();
-        }
-    }
-
     function setNetworkPreference(preference) {
         if (activeService && activeService.setNetworkPreference) {
             activeService.setNetworkPreference(preference);

@@ -794,7 +794,7 @@ Singleton {
             cellularToggling = false;
 
             if (response.error) {
-                ToastService.showError(I18n.tr("Failed to enable cellular"), response.error);
+                ToastService.showError(I18n.tr("Failed to toggle cellular"), response.error);
             } else if (response.result) {
                 cellularEnabled = response.result.enabled;
                 ToastService.showInfo(cellularEnabled ? I18n.tr("Cellular enabled") : I18n.tr("Cellular disabled"));
@@ -810,22 +810,6 @@ Singleton {
                 ToastService.showError(I18n.tr("Failed to enable WiFi"), response.error);
             } else {
                 ToastService.showInfo(I18n.tr("WiFi enabled"));
-            }
-        });
-    }
-
-    function enableCellularRadio() {
-        if (!networkAvailable || cellularToggling)
-            return;
-        cellularToggling = true;
-        DMSService.sendRequest("network.cellular.enable", null, response => {
-            cellularToggling = false;
-
-            if (response.error) {
-                ToastService.showError(I18n.tr("Failed to enable cellular"), response.error);
-            } else {
-                cellularEnabled = true;
-                ToastService.showInfo(I18n.tr("Cellular enabled"));
             }
         });
     }
