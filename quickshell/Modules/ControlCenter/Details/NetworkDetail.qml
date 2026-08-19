@@ -56,10 +56,10 @@ Rectangle {
             types.push("cellular");
         return types.length > 0 ? types : ["wifi"];
     }
-    property int selectedTypeIndex: -1
-    property string currentConnectionType: {
-        if (selectedTypeIndex >= 0 && selectedTypeIndex < connectionTypes.length)
-            return connectionTypes[selectedTypeIndex];
+    property string selectedType: ""
+    readonly property string currentConnectionType: {
+        if (selectedType && connectionTypes.includes(selectedType))
+            return selectedType;
         return connectionTypes[Math.max(0, currentPreferenceIndex)] || "wifi";
     }
     property int maxPinnedNetworks: 3
@@ -179,13 +179,13 @@ Rectangle {
 
                 visible: connectionTypes.length > 1 && NetworkService.backend === "networkmanager" && DMSService.apiVersion > 10
                 model: connectionTypes.map(t => labelsByType[t] || t)
-                currentIndex: selectedTypeIndex >= 0 ? selectedTypeIndex : currentPreferenceIndex
+                currentIndex: Math.max(0, connectionTypes.indexOf(currentConnectionType))
                 selectionMode: "single"
                 onSelectionChanged: (index, selected) => {
                     if (!selected)
                         return;
-                    selectedTypeIndex = index;
-                    NetworkService.setNetworkPreference(connectionTypes[index] || "wifi");
+                    selectedType = connectionTypes[index] || "wifi";
+                    NetworkService.setNetworkPreference(selectedType);
                 }
             }
 
