@@ -165,7 +165,7 @@ func TestHyprlandSetAndLoadDMSRules(t *testing.T) {
 	provider := NewHyprlandWritableProvider(tmpDir)
 
 	rule := newTestWindowRule("test_id", "Test Rule", "^(firefox)$")
-	rule.Actions.OpenFloating = boolPtr(true)
+	rule.Actions.OpenFloating = new(true)
 
 	if err := provider.SetRule(rule); err != nil {
 		t.Fatalf("SetRule failed: %v", err)
@@ -195,7 +195,7 @@ func TestHyprlandSetRuleLeavesConfOnlyInstallReadOnly(t *testing.T) {
 	}
 	provider := NewHyprlandWritableProvider(tmpDir)
 	rule := newTestWindowRule("test_id", "Test Rule", "^(firefox)$")
-	rule.Actions.OpenFloating = boolPtr(true)
+	rule.Actions.OpenFloating = new(true)
 
 	err := provider.SetRule(rule)
 	if err == nil {
@@ -214,9 +214,9 @@ func TestHyprlandRemoveRule(t *testing.T) {
 	provider := NewHyprlandWritableProvider(tmpDir)
 
 	rule1 := newTestWindowRule("rule1", "Rule 1", "^(app1)$")
-	rule1.Actions.OpenFloating = boolPtr(true)
+	rule1.Actions.OpenFloating = new(true)
 	rule2 := newTestWindowRule("rule2", "Rule 2", "^(app2)$")
-	rule2.Actions.OpenFloating = boolPtr(true)
+	rule2.Actions.OpenFloating = new(true)
 
 	_ = provider.SetRule(rule1)
 	_ = provider.SetRule(rule2)
@@ -239,11 +239,11 @@ func TestHyprlandReorderRules(t *testing.T) {
 	provider := NewHyprlandWritableProvider(tmpDir)
 
 	rule1 := newTestWindowRule("rule1", "Rule 1", "^(app1)$")
-	rule1.Actions.OpenFloating = boolPtr(true)
+	rule1.Actions.OpenFloating = new(true)
 	rule2 := newTestWindowRule("rule2", "Rule 2", "^(app2)$")
-	rule2.Actions.OpenFloating = boolPtr(true)
+	rule2.Actions.OpenFloating = new(true)
 	rule3 := newTestWindowRule("rule3", "Rule 3", "^(app3)$")
-	rule3.Actions.OpenFloating = boolPtr(true)
+	rule3.Actions.OpenFloating = new(true)
 
 	_ = provider.SetRule(rule1)
 	_ = provider.SetRule(rule2)

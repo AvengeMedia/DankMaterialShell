@@ -65,7 +65,7 @@ func (cd *ConfigDeployer) DeployConfigurationsSelectiveWithReinstallsAndSystemd(
 	return cd.deployConfigurationsInternal(ctx, wm, terminal, installedDeps, replaceConfigs, reinstallItems, useSystemd)
 }
 
-func (cd *ConfigDeployer) deployConfigurationsInternal(ctx context.Context, wm deps.WindowManager, terminal deps.Terminal, installedDeps []deps.Dependency, replaceConfigs map[string]bool, reinstallItems map[string]bool, useSystemd bool) ([]DeploymentResult, error) {
+func (cd *ConfigDeployer) deployConfigurationsInternal(_ context.Context, wm deps.WindowManager, terminal deps.Terminal, _ []deps.Dependency, replaceConfigs map[string]bool, _ map[string]bool, useSystemd bool) ([]DeploymentResult, error) {
 	var results []DeploymentResult
 
 	// Primary config file paths used to detect fresh installs.
@@ -286,7 +286,7 @@ func (cd *ConfigDeployer) deployNiriDmsConfigs(dmsDir, terminalCommand string) e
 	return nil
 }
 
-func (cd *ConfigDeployer) deployMangoConfig(terminal deps.Terminal, useSystemd bool) (DeploymentResult, error) {
+func (cd *ConfigDeployer) deployMangoConfig(terminal deps.Terminal, _ bool) (DeploymentResult, error) {
 	result := DeploymentResult{
 		ConfigType: "Mango",
 		Path:       filepath.Join(os.Getenv("HOME"), ".config", "mango", "config.conf"),

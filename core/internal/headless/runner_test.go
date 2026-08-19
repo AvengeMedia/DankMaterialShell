@@ -146,7 +146,7 @@ func TestLog(t *testing.T) {
 	r := NewRunner(Config{})
 
 	// log should not block even if channel is full
-	for i := 0; i < 1100; i++ {
+	for range 1100 {
 		r.log("message")
 	}
 	// If we reach here without hanging, the non-blocking send works

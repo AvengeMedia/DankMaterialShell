@@ -395,10 +395,7 @@ func getAllOutputInfos() map[string]*outputInfo {
 	registry.SetGlobalHandler(func(e client.RegistryGlobalEvent) {
 		if e.Interface == wlr_output_management.ZwlrOutputManagerV1InterfaceName {
 			mgr := wlr_output_management.NewZwlrOutputManagerV1(ctx)
-			version := e.Version
-			if version > 4 {
-				version = 4
-			}
+			version := min(e.Version, 4)
 			if err := registry.Bind(e.Name, e.Interface, version, mgr); err == nil {
 				outputManager = mgr
 			}

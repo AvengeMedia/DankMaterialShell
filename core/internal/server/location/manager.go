@@ -64,9 +64,7 @@ func (m *Manager) Unsubscribe(id string) {
 }
 
 func (m *Manager) startSignalPump() {
-	m.sigWG.Add(1)
-	go func() {
-		defer m.sigWG.Done()
+	m.sigWG.Go(func() {
 
 		subscription := m.client.Subscribe("locationManager")
 		defer m.client.Unsubscribe("locationManager")
@@ -83,7 +81,7 @@ func (m *Manager) startSignalPump() {
 				m.handleLocationChange(location)
 			}
 		}
-	}()
+	})
 }
 
 func (m *Manager) handleLocationChange(location geolocation.Location) {

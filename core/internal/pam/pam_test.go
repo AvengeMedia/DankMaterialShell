@@ -68,7 +68,6 @@ func TestHasManagedLockscreenPamFile(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			if got := hasManagedLockscreenPamFile(tt.content); got != tt.want {
@@ -208,7 +207,6 @@ func TestBuildManagedLockscreenPamContent(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 

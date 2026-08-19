@@ -45,14 +45,12 @@ func TestSurfaceState_ConcurrentScaleAccess(t *testing.T) {
 	}
 
 	for range goroutines / 2 {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			for range iterations {
 				scale := s.Scale()
 				assert.GreaterOrEqual(t, scale, int32(1))
 			}
-		}()
+		})
 	}
 
 	wg.Wait()
@@ -76,15 +74,13 @@ func TestSurfaceState_ConcurrentLogicalSize(t *testing.T) {
 	}
 
 	for range goroutines / 2 {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			for range iterations {
 				w, h := s.LogicalSize()
 				_ = w
 				_ = h
 			}
-		}()
+		})
 	}
 
 	wg.Wait()
@@ -98,35 +94,29 @@ func TestSurfaceState_ConcurrentIsDone(t *testing.T) {
 	const iterations = 100
 
 	for range goroutines / 3 {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			for range iterations {
 				s.OnPointerButton(0x110, 1)
 			}
-		}()
+		})
 	}
 
 	for range goroutines / 3 {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			for range iterations {
 				s.OnKey(1, 1)
 			}
-		}()
+		})
 	}
 
 	for range goroutines / 3 {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			for range iterations {
 				picked, cancelled := s.IsDone()
 				_ = picked
 				_ = cancelled
 			}
-		}()
+		})
 	}
 
 	wg.Wait()
@@ -140,13 +130,11 @@ func TestSurfaceState_ConcurrentIsReady(t *testing.T) {
 	const iterations = 100
 
 	for range goroutines {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			for range iterations {
 				_ = s.IsReady()
 			}
-		}()
+		})
 	}
 
 	wg.Wait()
@@ -160,13 +148,11 @@ func TestSurfaceState_ConcurrentSwapBuffers(t *testing.T) {
 	const iterations = 100
 
 	for range goroutines {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			for range iterations {
 				s.SwapBuffers()
 			}
-		}()
+		})
 	}
 
 	wg.Wait()

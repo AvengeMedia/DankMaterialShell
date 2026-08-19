@@ -457,7 +457,7 @@ func (f *FedoraDistribution) extractPackageNames(packages []PackageMapping) []st
 // enableTerraRepo registers the persistent Terra repo (via terra-release) so
 // `mangowm` resolves in the DNF phase. $releasever is single-quoted so dnf, not
 // the shell, expands it.
-func (f *FedoraDistribution) enableTerraRepo(ctx context.Context, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
+func (f *FedoraDistribution) enableTerraRepo(ctx context.Context, sudoPassword string, _ chan<- InstallProgressMsg) error {
 	// Skip if Terra is already configured
 	if exec.CommandContext(ctx, "sh", "-c",
 		"rpm -q terra-release >/dev/null 2>&1 || test -f /etc/yum.repos.d/terra.repo").Run() == nil {

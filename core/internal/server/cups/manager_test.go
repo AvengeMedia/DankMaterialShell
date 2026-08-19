@@ -151,17 +151,13 @@ func TestManager_Close(t *testing.T) {
 		dirty:    make(chan struct{}, 1),
 	}
 
-	m.eventWG.Add(1)
-	go func() {
-		defer m.eventWG.Done()
+	m.eventWG.Go(func() {
 		<-m.stopChan
-	}()
+	})
 
-	m.notifierWg.Add(1)
-	go func() {
-		defer m.notifierWg.Done()
+	m.notifierWg.Go(func() {
 		<-m.stopChan
-	}()
+	})
 
 	m.Close()
 	count := 0

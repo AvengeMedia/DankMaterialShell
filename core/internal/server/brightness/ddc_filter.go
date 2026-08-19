@@ -114,7 +114,7 @@ func getI2CSysfsDriver(busno int) string {
 func findI2CAdapter(devicePath string) (string, error) {
 	currentPath := devicePath
 
-	for depth := 0; depth < 10; depth++ {
+	for range 10 {
 		if _, err := os.Stat(filepath.Join(currentPath, "name")); err == nil {
 			return currentPath, nil
 		}

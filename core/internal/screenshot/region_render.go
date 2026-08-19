@@ -214,9 +214,9 @@ func (r *RegionSelector) drawScrollOverlay(os *OutputSurface, renderBuf *ShmBuff
 	w, h := renderBuf.Width, renderBuf.Height
 
 	// 40% premultiplied scrim
-	for y := 0; y < h; y++ {
+	for y := range h {
 		off := y * stride
-		for x := 0; x < w; x++ {
+		for x := range w {
 			i := off + x*4
 			if i+3 >= len(data) {
 				continue
@@ -341,7 +341,7 @@ func (r *RegionSelector) drawHUD(data []byte, stride, bufW, bufH int, format uin
 const borderThickness = 2
 
 func (r *RegionSelector) drawBorder(data []byte, stride, bufW, bufH, x, y, w, h int, format uint32) {
-	for i := 0; i < borderThickness; i++ {
+	for i := range borderThickness {
 		r.drawHLine(data, stride, bufW, bufH, x-i, y-i, w+2*i, format)
 		r.drawHLine(data, stride, bufW, bufH, x-i, y+h+i-1, w+2*i, format)
 		r.drawVLine(data, stride, bufW, bufH, x-i, y-i, h+2*i, format)
@@ -354,7 +354,7 @@ func (r *RegionSelector) drawHLine(data []byte, stride, bufW, bufH, x, y, length
 		return
 	}
 	rowOff := y * stride
-	for i := 0; i < length; i++ {
+	for i := range length {
 		px := x + i
 		if px < 0 || px >= bufW {
 			continue
@@ -371,7 +371,7 @@ func (r *RegionSelector) drawVLine(data []byte, stride, bufW, bufH, x, y, length
 	if x < 0 || x >= bufW {
 		return
 	}
-	for i := 0; i < length; i++ {
+	for i := range length {
 		py := y + i
 		if py < 0 || py >= bufH {
 			continue
@@ -450,13 +450,13 @@ func (r *RegionSelector) drawChar(data []byte, stride, bufW, bufH, x, y int, ch 
 		c0, c2 = cr, cb
 	}
 
-	for row := 0; row < 12; row++ {
+	for row := range 12 {
 		py := y + row
 		if py < 0 || py >= bufH {
 			continue
 		}
 		bits := glyph[row]
-		for col := 0; col < 8; col++ {
+		for col := range 8 {
 			if (bits & (1 << (7 - col))) == 0 {
 				continue
 			}

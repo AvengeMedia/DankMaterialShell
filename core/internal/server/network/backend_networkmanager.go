@@ -484,9 +484,7 @@ func (b *NetworkManagerBackend) cacheWiFiSecret(connUUID, ssid, settingName stri
 	}
 
 	copied := make(map[string]string, len(secrets))
-	for k, v := range secrets {
-		copied[k] = v
-	}
+	maps.Copy(copied, secrets)
 
 	b.cachedWiFiSecretMu.Lock()
 	b.cachedWiFiSecret = &cachedWiFiSecret{
@@ -512,9 +510,7 @@ func (b *NetworkManagerBackend) lookupCachedWiFiSecret(connUUID, settingName str
 	}
 
 	copied := make(map[string]string, len(cached.Secrets))
-	for k, v := range cached.Secrets {
-		copied[k] = v
-	}
+	maps.Copy(copied, cached.Secrets)
 	return copied
 }
 

@@ -33,11 +33,11 @@ func TestSharedContext_ConcurrentPostNonBlocking(t *testing.T) {
 	const goroutines = 100
 	const iterations = 50
 
-	for i := 0; i < goroutines; i++ {
+	for i := range goroutines {
 		wg.Add(1)
 		go func(id int) {
 			defer wg.Done()
-			for j := 0; j < iterations; j++ {
+			for j := range iterations {
 				sc.Post(func() {
 					_ = id + j
 				})
@@ -66,12 +66,10 @@ func TestSharedContext_StartMultipleTimes(t *testing.T) {
 	var wg sync.WaitGroup
 	const goroutines = 10
 
-	for i := 0; i < goroutines; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+	for range goroutines {
+		wg.Go(func() {
 			sc.Start()
-		}()
+		})
 	}
 
 	wg.Wait()
@@ -83,7 +81,7 @@ func TestSharedContext_DrainCmdQueue(t *testing.T) {
 	sc := newTestSharedContext(t, 256)
 
 	counter := 0
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		sc.cmdQueue <- func() {
 			counter++
 		}
@@ -108,21 +106,17 @@ func TestSharedContext_ConcurrentDrainAndPost(t *testing.T) {
 
 	var wg sync.WaitGroup
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		for i := 0; i < 100; i++ {
+	wg.Go(func() {
+		for range 100 {
 			sc.Post(func() {})
 		}
-	}()
+	})
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		for i := 0; i < 50; i++ {
+	wg.Go(func() {
+		for range 50 {
 			sc.drainCmdQueue()
 		}
-	}()
+	})
 
 	wg.Wait()
 }

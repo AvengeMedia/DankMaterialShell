@@ -1,6 +1,7 @@
 package keybinds
 
 import (
+	"slices"
 	"testing"
 )
 
@@ -169,13 +170,7 @@ func TestDefaultRegistry(t *testing.T) {
 	}
 
 	list := List()
-	found := false
-	for _, name := range list {
-		if name == "default-test" {
-			found = true
-			break
-		}
-	}
+	found := slices.Contains(list, "default-test")
 
 	if !found {
 		t.Error("provider not found in default registry list")

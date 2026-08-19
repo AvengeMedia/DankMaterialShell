@@ -120,7 +120,7 @@ func showSession(id string) (sessionInfo, error) {
 		return sessionInfo{}, err
 	}
 	fields := map[string]string{}
-	for _, line := range strings.Split(string(out), "\n") {
+	for line := range strings.SplitSeq(string(out), "\n") {
 		idx := strings.IndexByte(line, '=')
 		if idx <= 0 {
 			continue

@@ -278,10 +278,7 @@ func (r *RegionSelector) handleGlobal(e client.RegistryGlobalEvent) {
 
 	case client.OutputInterfaceName:
 		output := client.NewOutput(r.ctx)
-		version := e.Version
-		if version > 4 {
-			version = 4
-		}
+		version := min(e.Version, 4)
 		if err := r.registry.Bind(e.Name, e.Interface, version, output); err == nil {
 			r.outputsMu.Lock()
 			r.outputs[e.Name] = &WaylandOutput{
@@ -296,20 +293,14 @@ func (r *RegionSelector) handleGlobal(e client.RegistryGlobalEvent) {
 
 	case wlr_layer_shell.ZwlrLayerShellV1InterfaceName:
 		ls := wlr_layer_shell.NewZwlrLayerShellV1(r.ctx)
-		version := e.Version
-		if version > 4 {
-			version = 4
-		}
+		version := min(e.Version, 4)
 		if err := r.registry.Bind(e.Name, e.Interface, version, ls); err == nil {
 			r.layerShell = ls
 		}
 
 	case wlr_screencopy.ZwlrScreencopyManagerV1InterfaceName:
 		sc := wlr_screencopy.NewZwlrScreencopyManagerV1(r.ctx)
-		version := e.Version
-		if version > 3 {
-			version = 3
-		}
+		version := min(e.Version, 3)
 		if err := r.registry.Bind(e.Name, e.Interface, version, sc); err == nil {
 			r.screencopy = sc
 		}
@@ -477,6 +468,12 @@ func (r *RegionSelector) preCaptureOutput(output *WaylandOutput, pc *PreCapture,
 			}
 		}
 
+		// Overlay rendering and crop work on 8-bit pixels only
+		if capturedFormat.Is10Bit() {
+			capturedBuf.Convert10To8()
+			capturedFormat = capturedBuf.Format
+		}
+
 		pc.format = uint32(capturedFormat)
 
 		if pc.yInverted {
@@ -548,8 +545,8 @@ func (r *RegionSelector) createCursor() error {
 
 	// Draw crosshair
 	data := buf.Data()
-	for y := 0; y < size; y++ {
-		for x := 0; x < size; x++ {
+	for y := range size {
+		for x := range size {
 			off := (y*size + x) * 4
 			// Vertical line
 			if x >= hotspot-1 && x <= hotspot && y >= 2 && y < size-2 {
@@ -703,7 +700,7 @@ func (r *RegionSelector) initRenderBuffer(os *OutputSurface) {
 		return
 	}
 
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		slot := &RenderSlot{}
 
 		buf, err := CreateShmBuffer(os.screenBuf.Width, os.screenBuf.Height, os.screenBuf.Stride)

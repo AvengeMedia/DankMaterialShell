@@ -60,14 +60,14 @@ func parseWpaEventLine(line string) (wpaEvent, bool) {
 // wpas_auth_failed in contrib/wpa/wpa_supplicant/wpa_supplicant.c
 // (freebsd-src); the SSID is printf_encoded inside the quotes.
 func parseWpaTempDisabled(args string) (ssid string, reason string) {
-	if start := strings.Index(args, `ssid="`); start >= 0 {
-		raw := args[start+len(`ssid="`):]
+	if _, after, ok := strings.Cut(args, `ssid="`); ok {
+		raw := after
 		if end := indexUnescapedQuote(raw); end >= 0 {
 			ssid = decodeWpaSSIDText(raw[:end])
 		}
 	}
 
-	for _, field := range strings.Fields(args) {
+	for field := range strings.FieldsSeq(args) {
 		if value, ok := strings.CutPrefix(field, "reason="); ok {
 			reason = value
 			break

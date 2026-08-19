@@ -216,7 +216,7 @@ func runOpenConnectAuthenticate(ctx context.Context, args []string, secret strin
 
 func parseOpenConnectAuthenticateOutput(output string) *openConnectAuthResult {
 	result := &openConnectAuthResult{}
-	for _, line := range strings.Split(output, "\n") {
+	for line := range strings.SplitSeq(output, "\n") {
 		line = strings.TrimSpace(line)
 		switch {
 		case strings.HasPrefix(line, "COOKIE="):
@@ -250,7 +250,7 @@ func parseGPSamlFromCommandLine(line string, result *openConnectAuthResult) {
 		return
 	}
 
-	for _, part := range strings.Fields(line) {
+	for part := range strings.FieldsSeq(line) {
 		switch {
 		case strings.HasPrefix(part, "--cookie="):
 			if result.Cookie == "" {

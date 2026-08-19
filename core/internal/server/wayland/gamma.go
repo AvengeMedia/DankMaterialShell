@@ -114,10 +114,7 @@ func calcWhitepoint(temp int) rgb {
 		wp.x = x1*sineFactor + x2*(1.0-sineFactor)
 		wp.y = y1*sineFactor + y2*(1.0-sineFactor)
 	default:
-		t := temp
-		if t < 1667 {
-			t = 1667
-		}
+		t := max(temp, 1667)
 		x, y, _ := planckianLocus(t)
 		wp.x = x
 		wp.y = y
@@ -139,7 +136,7 @@ func GenerateGammaRamp(size uint32, temp int, gamma float64) GammaRamp {
 
 	wp := calcWhitepoint(temp)
 
-	for i := uint32(0); i < size; i++ {
+	for i := range size {
 		val := float64(i) / float64(size-1)
 		ramp.Red[i] = uint16(clamp01(math.Pow(val*wp.r, 1.0/gamma)) * 65535.0)
 		ramp.Green[i] = uint16(clamp01(math.Pow(val*wp.g, 1.0/gamma)) * 65535.0)
@@ -156,7 +153,7 @@ func GenerateIdentityRamp(size uint32) GammaRamp {
 		Blue:  make([]uint16, size),
 	}
 
-	for i := uint32(0); i < size; i++ {
+	for i := range size {
 		val := uint16((float64(i) / float64(size-1)) * 65535.0)
 		ramp.Red[i] = val
 		ramp.Green[i] = val
