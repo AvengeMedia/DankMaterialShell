@@ -31,18 +31,25 @@ jobs:
           submodules: recursive
 
       - name: Install flatpak
-        run: sudo apt update && sudo apt install -y flatpak
+        run: sudo apt-get update && sudo apt-get install -y flatpak
 
-      - name: Add flathub
-        run: sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+      - name: Cache flatpak runtime
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/flatpak
+          key: flatpak-org.freedesktop.Platform-24.08
 
-      - name: Add a flatpak that mutagen could support
-        run: sudo flatpak install -y org.freedesktop.Platform/x86_64/24.08 app.zen_browser.zen
+      - name: Install a flatpak for tests
+        run: |
+          flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+          flatpak info org.freedesktop.Platform//24.08 >/dev/null 2>&1 || \
+            flatpak install --user -y org.freedesktop.Platform//24.08
 
       - name: Set up Go
         uses: actions/setup-go@v6
         with:
           go-version-file: ./core/go.mod
+          cache-dependency-path: ./core/go.sum
 
       - name: Test
         run: go test -v ./...
@@ -75,6 +82,7 @@ jobs:
         uses: actions/setup-go@v6
         with:
           go-version-file: ./core/go.mod
+          cache-dependency-path: ./core/go.sum
 
       - name: Build all packages
         env:
