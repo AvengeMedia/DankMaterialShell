@@ -23,6 +23,7 @@ Item {
     property var cachedMatugenSchemes: Theme.availableMatugenSchemes.map(option => option.label)
     property var matugenSchemePreviews: ({})
     property string matugenPreviewSource: ""
+    property string matugenPreviewImage: ""
     property real matugenPreviewContrast: 0
     property string matugenPreviewRequestKey: ""
     property var installedRegistryThemes: []
@@ -284,14 +285,18 @@ Item {
             return;
         const sourceColor = Theme.getMatugenColor("source_color", Theme.primary).toString();
         const contrast = SettingsData.matugenContrast ?? 0;
-        const requestKey = sourceColor + "|" + contrast;
-        if (sourceColor === matugenPreviewSource && contrast === matugenPreviewContrast && Object.keys(matugenSchemePreviews).length > 0)
+        const imagePath = (Theme.rawWallpaperPath && !Theme.rawWallpaperPath.startsWith("#")) ? Theme.rawWallpaperPath : "";
+        const requestKey = sourceColor + "|" + contrast + "|" + imagePath;
+        if (sourceColor === matugenPreviewSource && contrast === matugenPreviewContrast && imagePath === matugenPreviewImage && Object.keys(matugenSchemePreviews).length > 0)
             return;
         if (requestKey === matugenPreviewRequestKey)
             return;
         matugenPreviewRequestKey = requestKey;
 
-        Proc.runCommand("", [Proc.dmsBin, "matugen", "preview", "--source-color", sourceColor, "--contrast", contrast.toString()], (output, exitCode) => {
+        const args = [Proc.dmsBin, "matugen", "preview", "--source-color", sourceColor, "--contrast", contrast.toString()];
+        if (imagePath)
+            args.push("--image", imagePath);
+        Proc.runCommand("", args, (output, exitCode) => {
             if (requestKey !== themeColorsTab.matugenPreviewRequestKey)
                 return;
             if (exitCode !== 0) {
@@ -301,6 +306,7 @@ Item {
             try {
                 themeColorsTab.matugenSchemePreviews = JSON.parse(output.trim());
                 themeColorsTab.matugenPreviewSource = sourceColor;
+                themeColorsTab.matugenPreviewImage = imagePath;
                 themeColorsTab.matugenPreviewContrast = contrast;
             } catch (e) {
                 themeColorsTab.matugenPreviewRequestKey = "";

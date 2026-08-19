@@ -141,12 +141,12 @@ var previewSchemeTypes = []string{
 	"scheme-rainbow",
 }
 
-func PreviewSchemes(sourceColor string, contrast float64) (map[string]SchemePreview, error) {
+func PreviewSchemes(sourceColor string, contrast float64, imagePath string) (map[string]SchemePreview, error) {
 	if sourceColor == "" {
 		return nil, fmt.Errorf("source color is required")
 	}
 
-	previews := make(map[string]SchemePreview, len(previewSchemeTypes))
+	previews := make(map[string]SchemePreview, len(previewSchemeTypes)+1)
 	for _, schemeType := range previewSchemeTypes {
 		output, err := runMatugenDryRun(&Options{
 			Kind:        "hex",
@@ -166,7 +166,37 @@ func PreviewSchemes(sourceColor string, contrast float64) (map[string]SchemePrev
 		}
 		previews[schemeType] = SchemePreview{Dark: dark, Light: light}
 	}
+
+	previews["scheme-smart"] = smartSchemePreview(previews["scheme-tonal-spot"], contrast, imagePath)
 	return previews, nil
+}
+
+func smartSchemePreview(fallback SchemePreview, contrast float64, imagePath string) SchemePreview {
+	if imagePath == "" {
+		return fallback
+	}
+	flags, err := detectMatugenVersion()
+	if err != nil || !flags.isV42 {
+		return fallback
+	}
+	output, err := runMatugenDryRun(&Options{
+		Kind:        "image",
+		Value:       imagePath,
+		Mode:        ColorModeDark,
+		MatugenType: "scheme-smart",
+		Contrast:    contrast,
+	})
+	if err != nil {
+		log.Warnf("Smart scheme preview failed falling back to tonal-spot: %v", err)
+		return fallback
+	}
+	dark := extractMatugenColor(output, "primary", "dark")
+	light := extractMatugenColor(output, "primary", "light")
+	if dark == "" || light == "" {
+		log.Warn("Smart scheme preview failed falling back to tonal-spot: primary colors missing from matugen output")
+		return fallback
+	}
+	return SchemePreview{Dark: dark, Light: light}
 }
 
 func (o *Options) ColorsOutput() string {

@@ -77,6 +77,7 @@ func init() {
 	matugenQueueCmd.Flags().Bool("wait", true, "Wait for completion")
 	matugenQueueCmd.Flags().Duration("timeout", 90*time.Second, "Timeout for waiting")
 	matugenPreviewCmd.Flags().String("source-color", "", "Source color used to generate previews")
+	matugenPreviewCmd.Flags().String("image", "", "Wallpaper image used to resolve the scheme-smart preview")
 	matugenPreviewCmd.Flags().Float64("contrast", 0, "Contrast value from -1 to 1 (0 = standard)")
 	matugenQtengineCmd.Flags().String("icon-theme", "", "Icon theme name")
 }
@@ -220,8 +221,9 @@ func runMatugenCheck(cmd *cobra.Command, args []string) {
 
 func runMatugenPreview(cmd *cobra.Command, args []string) {
 	sourceColor, _ := cmd.Flags().GetString("source-color")
+	imagePath, _ := cmd.Flags().GetString("image")
 	contrast, _ := cmd.Flags().GetFloat64("contrast")
-	previews, err := matugen.PreviewSchemes(sourceColor, contrast)
+	previews, err := matugen.PreviewSchemes(sourceColor, contrast, imagePath)
 	if err != nil {
 		log.Fatalf("Failed to generate Matugen previews: %v", err)
 	}
