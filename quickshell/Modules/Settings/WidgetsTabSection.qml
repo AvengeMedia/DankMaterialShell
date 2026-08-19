@@ -2389,8 +2389,7 @@ Column {
 
         function getOrderedControlCenterGroups() {
             const baseGroups = defaultControlCenterGroups.slice();
-            const currentWidget = contentItem.getCurrentWidgetData();
-            const savedOrder = currentWidget?.controlCenterGroupOrder;
+            const savedOrder = currentWidgetData?.controlCenterGroupOrder;
             if (!savedOrder || !savedOrder.length)
                 return baseGroups;
 
@@ -2466,7 +2465,7 @@ Column {
                         required property int index
 
                         function getCheckedState(settingName) {
-                            const wd = controlCenterContextMenu.contentItem.getCurrentWidgetData();
+                            const wd = controlCenterContextMenu.currentWidgetData;
                             switch (settingName) {
                             case "showNetworkIcon":
                                 return wd?.showNetworkIcon ?? SettingsData.controlCenterShowNetworkIcon;
