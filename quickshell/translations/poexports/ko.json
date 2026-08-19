@@ -875,6 +875,9 @@
   "Auto-Hide Timeout": {
     "Auto-Hide Timeout": "자동 숨기기 시간 제한"
   },
+  "Auto-close Niri overview when DMS launches or focuses a window.": {
+    "Auto-close Niri overview when DMS launches or focuses a window.": ""
+  },
   "Auto-close Niri overview when launching apps.": {
     "Auto-close Niri overview when launching apps.": "앱을 실행할 때 niri 오버뷰를 자동으로 닫습니다."
   },
@@ -1042,6 +1045,9 @@
   },
   "Bar Inset Padding": {
     "Bar Inset Padding": "표시줄 내부 패딩"
+  },
+  "Bar Length Padding": {
+    "Bar Length Padding": ""
   },
   "Bar Opacity": {
     "Bar Opacity": "표시줄 불투명도"
@@ -1430,6 +1436,9 @@
   "Choose colors from palette": {
     "Choose colors from palette": "팔레트에서 색상 선택"
   },
+  "Choose how the bar meets the screen edge": {
+    "Choose how the bar meets the screen edge": ""
+  },
   "Choose how the weather widget is displayed": {
     "Choose how the weather widget is displayed": "날씨 위젯이 표시되는 방식을 선택하세요"
   },
@@ -1579,6 +1588,9 @@
   },
   "Close All Windows": {
     "Close All Windows": "모든 창 닫기"
+  },
+  "Close Niri Overview on Window Focus": {
+    "Close Niri Overview on Window Focus": ""
   },
   "Close Overview on Launch": {
     "Close Overview on Launch": "실행 시 개요 닫기"
@@ -1910,11 +1922,17 @@
   "Copy Text": {
     "Copy Text": "텍스트 복사"
   },
+  "Copy target (%1)": {
+    "Copy target (%1)": ""
+  },
   "Corner Radius": {
     "Corner Radius": "모서리 둥글기"
   },
   "Corner Radius Override": {
     "Corner Radius Override": "모서리 둥글기 덮어쓰기"
+  },
+  "Corner Style": {
+    "Corner Style": ""
   },
   "Corners & Background": {
     "Corners & Background": "모서리 및 배경"
@@ -3383,6 +3401,9 @@
   "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": {
     "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": "Fluent: 부드러운 3차 감속 진입, 빠른 스냅 아웃 — 깔끔하고 우아한 곡선."
   },
+  "Flush": {
+    "Flush": ""
+  },
   "Focus": {
     "Focus": "포커스"
   },
@@ -3637,6 +3658,9 @@
   },
   "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
     "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
+  },
+  "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
+    "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
   },
   "Generic": {
     "Generic": "일반"
@@ -6407,6 +6431,9 @@
   "Recommended available": {
     "Recommended available": "권장 사용 가능"
   },
+  "Reduce the visible bar length from both ends": {
+    "Reduce the visible bar length from both ends": ""
+  },
   "Refresh": {
     "Refresh": "새로 고침"
   },
@@ -6691,6 +6718,9 @@
   },
   "Root Filesystem": {
     "Root Filesystem": "루트 파일 시스템"
+  },
+  "Rounded": {
+    "Rounded": ""
   },
   "Rounded corners for windows": {
     "Rounded corners for windows": "창 모서리 둥글게"
@@ -7652,6 +7682,9 @@
   "Spotlight Search": {
     "Spotlight Search": "스포트라이트 검색"
   },
+  "Square": {
+    "Square": ""
+  },
   "Square Corners": {
     "Square Corners": "직각 모서리"
   },
@@ -8002,6 +8035,9 @@
   },
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
     "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "아래 설정은 GTK 및 Qt 설정을 수정합니다. 현재 구성을 유지하려면 백업하세요(qt5ct.conf|qt6ct.conf 및 ~/.config/gtk-3.0|gtk-4.0)."
+  },
+  "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": {
+    "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": ""
   },
   "The custom command used when attaching to sessions (receives the session name as the first argument)": {
     "The custom command used when attaching to sessions (receives the session name as the first argument)": "세션에 연결할 때 사용되는 사용자 지정 명령어(세션 이름을 첫 번째 인수로 받음)"
@@ -9043,6 +9079,9 @@
   },
   "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": {
     "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": "환경 변수로 다음 중 하나를 설정해야 합니다:\nQT_QPA_PLATFORMTHEME=gtk3 또는\nQT_QPA_PLATFORMTHEME=qt6ct\n그런 다음 셸을 다시 시작하세요.\n\nqt6ct를 사용하려면 qt6ct-kde가 설치되어 있어야 합니다."
+  },
+  "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": {
+    "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": ""
   },
   "You'll enter your password at the greeter after the next reboot.": {
     "You'll enter your password at the greeter after the next reboot.": "다음 재부팅 후 로그인 화면에서 비밀번호를 입력하게 됩니다."

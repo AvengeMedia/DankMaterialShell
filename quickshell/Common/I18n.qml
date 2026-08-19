@@ -35,6 +35,9 @@ Singleton {
     property bool translationsLoaded: false
     property var commonTranslations: ({})
     property bool commonTranslationsLoaded: false
+    property var pluginTranslations: ({})
+
+    signal localeApplied
 
     property url _selectedPath: ""
     property url _commonSelectedPath: ""
@@ -140,6 +143,7 @@ Singleton {
         translationsLoaded = false;
         translations = ({});
         log.info(`I18n: Using locale '${localeTag}' from ${fileUrl}`);
+        localeApplied();
     }
 
     function _fallbackToEnglish() {
@@ -147,6 +151,27 @@ Singleton {
         translationsLoaded = false;
         translations = ({});
         log.warn("Falling back to built-in English strings");
+        localeApplied();
+    }
+
+    function localeCandidates() {
+        return _candidates;
+    }
+
+    function registerPluginTranslations(pluginId, table) {
+        if (!pluginId || !table)
+            return;
+        const next = Object.assign({}, pluginTranslations);
+        next[pluginId] = table;
+        pluginTranslations = next;
+    }
+
+    function unregisterPluginTranslations(pluginId) {
+        if (!(pluginId in pluginTranslations))
+            return;
+        const next = Object.assign({}, pluginTranslations);
+        delete next[pluginId];
+        pluginTranslations = next;
     }
 
     function _pickCommonTranslation() {
@@ -194,6 +219,16 @@ Singleton {
                 return hit;
         }
         return term;
+    }
+
+    function trFor(pluginId, term, context, isRealContext) {
+        const table = pluginTranslations[pluginId];
+        if (table) {
+            const hit = _lookup(table, term, context);
+            if (hit)
+                return hit;
+        }
+        return tr(term, context);
     }
 
     function trContext(context, term) {

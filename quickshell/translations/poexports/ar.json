@@ -875,6 +875,9 @@
   "Auto-Hide Timeout": {
     "Auto-Hide Timeout": "مهلة الإخفاء التلقائي"
   },
+  "Auto-close Niri overview when DMS launches or focuses a window.": {
+    "Auto-close Niri overview when DMS launches or focuses a window.": ""
+  },
   "Auto-close Niri overview when launching apps.": {
     "Auto-close Niri overview when launching apps.": "إغلاق نظرة Niri العامة تلقائياً عند تشغيل التطبيقات."
   },
@@ -1042,6 +1045,9 @@
   },
   "Bar Inset Padding": {
     "Bar Inset Padding": "حاشية الشريط"
+  },
+  "Bar Length Padding": {
+    "Bar Length Padding": ""
   },
   "Bar Opacity": {
     "Bar Opacity": "عتامة الشريط"
@@ -1430,6 +1436,9 @@
   "Choose colors from palette": {
     "Choose colors from palette": "اختر ألواناً من اللوحة"
   },
+  "Choose how the bar meets the screen edge": {
+    "Choose how the bar meets the screen edge": ""
+  },
   "Choose how the weather widget is displayed": {
     "Choose how the weather widget is displayed": "اختر كيفية عرض أداة الطقس"
   },
@@ -1579,6 +1588,9 @@
   },
   "Close All Windows": {
     "Close All Windows": "إغلاق كل النوافذ"
+  },
+  "Close Niri Overview on Window Focus": {
+    "Close Niri Overview on Window Focus": ""
   },
   "Close Overview on Launch": {
     "Close Overview on Launch": "إغلاق نظرة عامة عند التشغيل"
@@ -1910,11 +1922,17 @@
   "Copy Text": {
     "Copy Text": "نسخ النص"
   },
+  "Copy target (%1)": {
+    "Copy target (%1)": ""
+  },
   "Corner Radius": {
     "Corner Radius": "نصف قطر الزاوية"
   },
   "Corner Radius Override": {
     "Corner Radius Override": "تجاوز نصف قطر الزوايا الخارجية للشريط"
+  },
+  "Corner Style": {
+    "Corner Style": ""
   },
   "Corners & Background": {
     "Corners & Background": "الزوايا والخلفية"
@@ -2220,7 +2238,7 @@
     "Darken Modal Background": "عتيم خلفية النافذة المنبثقة"
   },
   "Date First": {
-    "Date First": ""
+    "Date First": "التاريخ أولاً"
   },
   "Date Format": {
     "Date Format": "صيغة التاريخ"
@@ -2952,7 +2970,7 @@
     "Extra Light": "خفيف جداً"
   },
   "Extract theme to JSON": {
-    "Extract theme to JSON": ""
+    "Extract theme to JSON": "استخراج السمة إلى JSON"
   },
   "Fade": {
     "Fade": "تلاشي"
@@ -3054,7 +3072,7 @@
     "Failed to enable night mode": "فشل في تمكين الوضع الليلي"
   },
   "Failed to extract theme": {
-    "Failed to extract theme": ""
+    "Failed to extract theme": "فشل استخراج السمة"
   },
   "Failed to fetch network QR code: %1": {
     "Failed to fetch network QR code: %1": "فشل جلب رمز QR للشبكة: %1"
@@ -3383,6 +3401,9 @@
   "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": {
     "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": "سلس: تباطؤ مكعب ناعم عند الدخول، وتوقف سريع عند الخروج - منحنيات نظيفة وأنيقة."
   },
+  "Flush": {
+    "Flush": ""
+  },
   "Focus": {
     "Focus": "تركيز"
   },
@@ -3637,6 +3658,9 @@
   },
   "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
     "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": "إنشاء تكوينات أساسية لـ GTK3/4 أو QT5/QT6 (يتطلب qt6ct-kde) لتتبع ألوان DMS. مطلوب مرة واحدة فقط.<br /><br />يوصى بتهيئة %1 قبل تطبيق سمات GTK."
+  },
+  "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
+    "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
   },
   "Generic": {
     "Generic": "عام"
@@ -4299,7 +4323,7 @@
     "Keep in Bar": "الاحتفاظ في الشريط"
   },
   "Keep pinned apps as launchers and show running windows separately": {
-    "Keep pinned apps as launchers and show running windows separately": ""
+    "Keep pinned apps as launchers and show running windows separately": "أبقِ التطبيقات المثبتة كـ مشغلات واعرض النوافذ قيد التشغيل بشكل منفصل"
   },
   "Keep the clipboard type filter when reopening history": {
     "Keep the clipboard type filter when reopening history": "احتفظ بفلتر نوع الحافظة عند إعادة فتح السجل"
@@ -4890,7 +4914,7 @@
     "Minimal palette built around a single hue.": "لوحة ألوان مبسطة مبنية حول درجة لون واحدة."
   },
   "Minimize": {
-    "Minimize": ""
+    "Minimize": "تصغير"
   },
   "Minute": {
     "Minute": "الدقيقة"
@@ -5976,7 +6000,7 @@
     "Place a trash bin at the end of the dock": "ضع سلة مهملات في نهاية شريط التطبيقات"
   },
   "Place clipboard history on the Wayland overlay layer": {
-    "Place clipboard history on the Wayland overlay layer": ""
+    "Place clipboard history on the Wayland overlay layer": "ضع سجل الحافظة في طبقة تراكب Wayland"
   },
   "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
     "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "ضع مجلدات الملحقات هنا. يجب أن يحتوي كل ملحق على ملف بيان باسم plugin.json."
@@ -6407,6 +6431,9 @@
   "Recommended available": {
     "Recommended available": "متوفر وموصى به"
   },
+  "Reduce the visible bar length from both ends": {
+    "Reduce the visible bar length from both ends": ""
+  },
   "Refresh": {
     "Refresh": "إعادة تحميل"
   },
@@ -6627,7 +6654,7 @@
     "Restarting audio system...": "جارٍ إعادة تشغيل نظام الصوت..."
   },
   "Restore": {
-    "Restore": ""
+    "Restore": "استعادة"
   },
   "Restore Special Workspace Windows": {
     "Restore Special Workspace Windows": "استعادة نوافذ سطح المكتب المميزة"
@@ -6691,6 +6718,9 @@
   },
   "Root Filesystem": {
     "Root Filesystem": "نظام ملفات الجذر"
+  },
+  "Rounded": {
+    "Rounded": ""
   },
   "Rounded corners for windows": {
     "Rounded corners for windows": "زوايا دائرية للنوافذ"
@@ -6768,7 +6798,7 @@
     "Save & Start": "حفظ وابدأ"
   },
   "Save Extracted Theme": {
-    "Save Extracted Theme": ""
+    "Save Extracted Theme": "حفظ السمة المستخرجة"
   },
   "Save Notepad File": {
     "Save Notepad File": "حفظ ملف الملاحظة"
@@ -7089,7 +7119,7 @@
     "Separate Light & Dark Themes": "سمات منفصلة للفاتح والمظلم"
   },
   "Separate Pinned and Running Apps": {
-    "Separate Pinned and Running Apps": ""
+    "Separate Pinned and Running Apps": "فصل التطبيقات المثبتة عن التطبيقات قيد التشغيل"
   },
   "Separate appearance for unfocused displays is not supported on this compositor.": {
     "Separate appearance for unfocused displays is not supported on this compositor.": "المظهر المنفصل للشاشات غير المركزة غير مدعوم في مدير النوافذ هذا."
@@ -7652,6 +7682,9 @@
   "Spotlight Search": {
     "Spotlight Search": "بحث Spotlight"
   },
+  "Square": {
+    "Square": ""
+  },
   "Square Corners": {
     "Square Corners": "زوايا حادة"
   },
@@ -7668,7 +7701,7 @@
     "Start": "ابدأ"
   },
   "Start DankConnect, KDE Connect, or Valent to use this plugin": {
-    "Start DankConnect, KDE Connect, or Valent to use this plugin": ""
+    "Start DankConnect, KDE Connect, or Valent to use this plugin": "ابدأ DankConnect أو KDE Connect أو Valent لاستخدام هذه الملحق"
   },
   "Start Hotspot?": {
     "Start Hotspot?": "بدء نقطة الاتصال؟"
@@ -8003,6 +8036,9 @@
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
     "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "الإعدادات أدناه ستعدل إعدادات GTK و Qt الخاصة بك. إذا كنت ترغب في الحفاظ على تكويناتك الحالية، يرجى أخذ نسخة احتياطية منها (qt5ct.conf|qt6ct.conf و ~/.config/gtk-3.0|gtk-4.0)."
   },
+  "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": {
+    "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": ""
+  },
   "The custom command used when attaching to sessions (receives the session name as the first argument)": {
     "The custom command used when attaching to sessions (receives the session name as the first argument)": "الأمر المخصص المستخدم عند الاتصال بالجلسات (يستقبل اسم الجلسة كأول وسيط)"
   },
@@ -8031,7 +8067,7 @@
     "Theme color used for the widget outline": "لون السمة المستخدم لمخطط الأداة"
   },
   "Theme extracted to: %1": {
-    "Theme extracted to: %1": ""
+    "Theme extracted to: %1": "تم استخراج السمة إلى: %1"
   },
   "Theme worker failed (%1)": {
     "Theme worker failed (%1)": "فشل عامل السمة (%1)"
@@ -8121,7 +8157,7 @@
     "Time & Weather": "الوقت والطقس"
   },
   "Time First": {
-    "Time First": ""
+    "Time First": "الوقت أولاً"
   },
   "Time Format": {
     "Time Format": "تنسيق الوقت"
@@ -9043,6 +9079,9 @@
   },
   "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": {
     "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": "تحتاج إلى ضبط اما:\nQT_QPA_PLATFORMTHEME=gtk3 او\nQT_QPA_PLATFORMTHEME=qt6ct\nكمتغيرات بيئة ثم إعادة تشغيل DMS.\n\nيتطلب qt6ct تثبيت qt6ct-kde."
+  },
+  "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": {
+    "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": ""
   },
   "You'll enter your password at the greeter after the next reboot.": {
     "You'll enter your password at the greeter after the next reboot.": "ستدخل كلمة مرورك في شاشة الترحيب بعد إعادة التشغيل التالية."

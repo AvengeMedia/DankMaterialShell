@@ -43,6 +43,7 @@ How many emojis to display at once (1-8)
 This plugin demonstrates:
 - Using `PluginComponent` for bar integration
 - `SelectionSetting`, `SliderSetting` for configuration
+- Plugin-local translations (`translations/` + `I18n.trFor`)
 - Timer-based animation
 - Popout content with grid layout
 - External command execution (`Quickshell.execDetached`)

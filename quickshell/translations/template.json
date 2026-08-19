@@ -2044,11 +2044,11 @@
     "comment": ""
   },
   {
-    "term": "Auto-close Niri overview when launching apps.",
+    "term": "Auto-close Niri overview when DMS launches or focuses a window.",
     "translation": "",
-    "context": "Auto-close Niri overview when launching apps.",
+    "context": "Auto-close Niri overview when DMS launches or focuses a window.",
     "reference": "",
-    "comment": ""
+    "comment": "Description of the close Niri overview on window focus setting"
   },
   {
     "term": "Auto-delete notifications older than this",
@@ -2425,6 +2425,13 @@
     "term": "Bar Inset Padding",
     "translation": "",
     "context": "Bar Inset Padding",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Bar Length Padding",
+    "translation": "",
+    "context": "Bar Length Padding",
     "reference": "",
     "comment": ""
   },
@@ -3339,6 +3346,13 @@
     "comment": ""
   },
   {
+    "term": "Choose how the bar meets the screen edge",
+    "translation": "",
+    "context": "Choose how the bar meets the screen edge",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Choose how the weather widget is displayed",
     "translation": "",
     "context": "Choose how the weather widget is displayed",
@@ -3689,11 +3703,11 @@
     "comment": ""
   },
   {
-    "term": "Close Overview on Launch",
+    "term": "Close Niri Overview on Window Focus",
     "translation": "",
-    "context": "Close Overview on Launch",
+    "context": "Close Niri Overview on Window Focus",
     "reference": "",
-    "comment": ""
+    "comment": "Niri setting to leave Niri overview when DMS launches or focuses a window"
   },
   {
     "term": "Close Window",
@@ -4459,6 +4473,13 @@
     "comment": ""
   },
   {
+    "term": "Copy target (%1)",
+    "translation": "",
+    "context": "Copy target (%1)",
+    "reference": "",
+    "comment": "app picker copy target button tooltip"
+  },
+  {
     "term": "Corner Radius",
     "translation": "",
     "context": "Corner Radius",
@@ -4469,6 +4490,13 @@
     "term": "Corner Radius Override",
     "translation": "",
     "context": "Corner Radius Override",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Corner Style",
+    "translation": "",
+    "context": "Corner Style",
     "reference": "",
     "comment": ""
   },
@@ -7861,6 +7889,13 @@
     "comment": ""
   },
   {
+    "term": "Flush",
+    "translation": "",
+    "context": "Flush",
+    "reference": "",
+    "comment": "bar corner style option"
+  },
+  {
     "term": "Focus",
     "translation": "",
     "context": "Focus",
@@ -8449,9 +8484,9 @@
     "comment": ""
   },
   {
-    "term": "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.",
+    "term": "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.",
     "translation": "",
-    "context": "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.",
+    "context": "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.",
     "reference": "",
     "comment": ""
   },
@@ -14966,6 +15001,13 @@
     "comment": ""
   },
   {
+    "term": "Reduce the visible bar length from both ends",
+    "translation": "",
+    "context": "Reduce the visible bar length from both ends",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Refresh",
     "translation": "",
     "context": "Refresh",
@@ -15151,13 +15193,6 @@
     "term": "Remove admin",
     "translation": "",
     "context": "Remove admin",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Remove corner rounding from the bar",
-    "translation": "",
-    "context": "Remove corner rounding from the bar",
     "reference": "",
     "comment": ""
   },
@@ -15629,6 +15664,13 @@
     "context": "Root Filesystem",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Rounded",
+    "translation": "",
+    "context": "Rounded",
+    "reference": "",
+    "comment": "bar corner style option"
   },
   {
     "term": "Rounded corners for windows",
@@ -17899,11 +17941,11 @@
     "comment": ""
   },
   {
-    "term": "Square Corners",
+    "term": "Square",
     "translation": "",
-    "context": "Square Corners",
+    "context": "Square",
     "reference": "",
-    "comment": ""
+    "comment": "bar corner style option"
   },
   {
     "term": "Stacked",
@@ -18711,9 +18753,9 @@
     "comment": "hotspot adapter failure message"
   },
   {
-    "term": "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).",
+    "term": "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).",
     "translation": "",
-    "context": "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).",
+    "context": "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).",
     "reference": "",
     "comment": ""
   },
@@ -21126,9 +21168,9 @@
     "comment": ""
   },
   {
-    "term": "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.",
+    "term": "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.",
     "translation": "",
-    "context": "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.",
+    "context": "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.",
     "reference": "",
     "comment": "qt theme env error body"
   },

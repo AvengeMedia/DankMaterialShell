@@ -875,6 +875,9 @@
   "Auto-Hide Timeout": {
     "Auto-Hide Timeout": "Tidsgräns för auto-döljande"
   },
+  "Auto-close Niri overview when DMS launches or focuses a window.": {
+    "Auto-close Niri overview when DMS launches or focuses a window.": ""
+  },
   "Auto-close Niri overview when launching apps.": {
     "Auto-close Niri overview when launching apps.": "Stäng niri-översikten automatiskt när appar startas."
   },
@@ -1042,6 +1045,9 @@
   },
   "Bar Inset Padding": {
     "Bar Inset Padding": ""
+  },
+  "Bar Length Padding": {
+    "Bar Length Padding": ""
   },
   "Bar Opacity": {
     "Bar Opacity": ""
@@ -1430,6 +1436,9 @@
   "Choose colors from palette": {
     "Choose colors from palette": "Välj färger från paletten"
   },
+  "Choose how the bar meets the screen edge": {
+    "Choose how the bar meets the screen edge": ""
+  },
   "Choose how the weather widget is displayed": {
     "Choose how the weather widget is displayed": "Välj hur väderwidgeten visas"
   },
@@ -1579,6 +1588,9 @@
   },
   "Close All Windows": {
     "Close All Windows": "Stäng alla fönster"
+  },
+  "Close Niri Overview on Window Focus": {
+    "Close Niri Overview on Window Focus": ""
   },
   "Close Overview on Launch": {
     "Close Overview on Launch": "Stäng översikt vid start"
@@ -1910,11 +1922,17 @@
   "Copy Text": {
     "Copy Text": "Kopiera text"
   },
+  "Copy target (%1)": {
+    "Copy target (%1)": ""
+  },
   "Corner Radius": {
     "Corner Radius": "Hörnradie"
   },
   "Corner Radius Override": {
     "Corner Radius Override": "Anpassad hörnradie"
+  },
+  "Corner Style": {
+    "Corner Style": ""
   },
   "Corners & Background": {
     "Corners & Background": "Hörn & bakgrund"
@@ -3383,6 +3401,9 @@
   "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": {
     "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": ""
   },
+  "Flush": {
+    "Flush": ""
+  },
   "Focus": {
     "Focus": "Fokus"
   },
@@ -3637,6 +3658,9 @@
   },
   "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
     "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
+  },
+  "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
+    "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
   },
   "Generic": {
     "Generic": "Generisk"
@@ -6407,6 +6431,9 @@
   "Recommended available": {
     "Recommended available": "Rekommenderad tillgänglig"
   },
+  "Reduce the visible bar length from both ends": {
+    "Reduce the visible bar length from both ends": ""
+  },
   "Refresh": {
     "Refresh": "Uppdatera"
   },
@@ -6691,6 +6718,9 @@
   },
   "Root Filesystem": {
     "Root Filesystem": "Rotfilsystem"
+  },
+  "Rounded": {
+    "Rounded": ""
   },
   "Rounded corners for windows": {
     "Rounded corners for windows": "Rundade hörn för fönster"
@@ -7652,6 +7682,9 @@
   "Spotlight Search": {
     "Spotlight Search": ""
   },
+  "Square": {
+    "Square": ""
+  },
   "Square Corners": {
     "Square Corners": "Fyrkantiga kanter"
   },
@@ -8002,6 +8035,9 @@
   },
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
     "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "Inställningarna nedan kommer att modifiera dina GTK- och Qt-inställningar. Om du vill behålla dina konfigurationer, vänligen säkerhetskopiera (qt5ct.conf|qt6ct.conf och ~/.config/gtk-3.0|gtk-4.0)"
+  },
+  "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": {
+    "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": ""
   },
   "The custom command used when attaching to sessions (receives the session name as the first argument)": {
     "The custom command used when attaching to sessions (receives the session name as the first argument)": "Det anpassade kommandot som används vid anslutning till sessioner (tar emot sessionsnamnet som första argument)"
@@ -9043,6 +9079,9 @@
   },
   "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": {
     "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": "Du måste ange antingen:\nQT_QPA_PLATFORMTHEME=gtk3 ELLER\nQT_QPA_PLATFORMTHEME=qt6ct\nsom miljövariabler och sedan starta om skalet.\n\nqt6ct kräver att qt6ct-kde är installerat."
+  },
+  "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": {
+    "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": ""
   },
   "You'll enter your password at the greeter after the next reboot.": {
     "You'll enter your password at the greeter after the next reboot.": ""

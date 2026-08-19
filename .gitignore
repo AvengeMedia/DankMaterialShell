@@ -117,6 +117,7 @@ core.*
 .envrc
 .direnv/
 quickshell/dms-plugins
+quickshell/dms-plugins-external
 __pycache__
 
 .vscode/

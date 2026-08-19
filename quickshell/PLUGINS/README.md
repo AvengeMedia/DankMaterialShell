@@ -46,7 +46,8 @@ $CONFIGPATH/DankMaterialShell/plugins/YourPlugin/
 ├── plugin.json          # Required: Plugin manifest
 ├── YourWidget.qml       # Required: Widget component
 ├── YourSettings.qml     # Optional: Settings UI
-└── *.js                 # Optional: JavaScript utilities
+├── *.js                 # Optional: JavaScript utilities
+└── translations/        # Optional: per-locale translation files (see Translations)
 ```
 
 ### Plugin Manifest (plugin.json)
@@ -533,6 +534,80 @@ PluginSettings {
 - Clean, consistent UI across all plugins
 - No manual `pluginService` calls needed
 - Proper layout and spacing handled automatically
+
+## Translations
+
+Plugins ship their own translations. Drop a `translations/` directory next to `plugin.json`, wrap your strings in `I18n.trFor()`, done — nothing needs to change in the DMS repo, and users get your translations just by installing the plugin.
+
+```
+YourPlugin/
+├── plugin.json
+├── YourWidget.qml
+└── translations/
+    ├── es.json
+    ├── fr.json
+    └── zh_CN.json
+```
+
+DMS loads the file matching the user's locale when it discovers the plugin, and re-reads it whenever the locale changes. No restart, no registration call.
+
+### Marking Strings
+
+Wrap every user-facing string in `I18n.trFor()`, with your plugin id as the first argument:
+
+```qml
+import qs.Common
+
+StyledText {
+    text: I18n.trFor("yourPlugin", "Cycle Speed")
+}
+```
+
+Placeholders work the same as anywhere else in DMS:
+
+```qml
+ToastService.showInfo(I18n.trFor("yourPlugin", "Copied %1 to clipboard").arg(item))
+```
+
+Lookup order is: your plugin's translation file → the global DMS catalog → the English term itself. Strings DMS already translates ("Settings", "Close", etc.) resolve from the global catalog for free, and anything untranslated renders as your English text instead of breaking.
+
+Two rules:
+
+- The plugin id must be a **literal string** that exactly matches `id` in your `plugin.json`. The string extraction tooling for central translation reads call sites — a variable there means your strings never get extracted.
+- `I18n.trFor` doesn't exist on DMS versions without plugin translation support, and calling a missing function in QML is a TypeError, not a silent no-op. Bump `requires_dms` when you adopt it.
+
+Plain `I18n.tr()` still works inside plugins, but it only checks the global catalog — it will never see your `translations/` files.
+
+### Translation Files
+
+One JSON file per locale. Top-level keys are context buckets; unless you have a reason to do otherwise, use the English term as its own bucket:
+
+```json
+{
+    "Cycle Speed": {
+        "Cycle Speed": "Velocidad de ciclo"
+    },
+    "Copied %1 to clipboard": {
+        "Copied %1 to clipboard": "%1 copiado al portapapeles"
+    }
+}
+```
+
+There is no `en.json` — the strings in your QML are the English source. Translate what you want, skip what you don't; missing terms fall through the lookup order above.
+
+File names match what DMS ships in its own catalog (`es.json`, `pt.json`, `zh_CN.json`, ...), but you're not limited to that list — resolution is driven by the user's locale. For a user on `zh_CN`, DMS tries `zh_CN.json`, then `zh-CN.json`, then `zh.json`, and uses the first one that exists.
+
+### Testing
+
+1. Reload after editing a file: `dms ipc call plugins reload yourPlugin`
+2. Switch languages in Settings → Locale — plugin strings retranslate live along with the rest of the shell
+3. Broken JSON logs a `bad plugin translations` warning in shell output and falls back to English
+
+`ExampleEmojiPlugin` is a complete working example — `trFor` calls in the widget and settings, plus `es.json` and `fr.json`.
+
+### Central Translation via POEditor
+
+Plugins in the [plugin registry](https://github.com/AvengeMedia/dms-plugin-registry) can apply to join the central DMS POEditor project — the same one community translators use for DMS itself. Approved plugins get their strings translated alongside the shell, and finished translations come back to the plugin repo as PRs. See the registry's CONTRIBUTING guide for the application process.
 
 ## PluginService API
 

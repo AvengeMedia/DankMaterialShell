@@ -31,6 +31,9 @@ def extract_qstr_strings(root_dir):
     # I18n.tr(term, context, true) -- the literal `true` flag uploads the
     # context as a real POEditor context, giving (term, context) its own
     # translation slot. Must be on one line with a literal `true`.
+    # I18n.trFor(pluginId, term[, context[, true]]) -- plugin-scoped lookup.
+    # The pluginId is matched non-capturing so trFor entries share group
+    # numbering with the I18n.tr families below.
     i18n_real_context_patterns = [
         (
             re.compile(r'I18n\.tr\(\s*"((?:\\.|[^"\\])*)"\s*,\s*"((?:\\.|[^"\\])*)"\s*,\s*true\s*\)'),
@@ -38,6 +41,14 @@ def extract_qstr_strings(root_dir):
         ),
         (
             re.compile(r"I18n\.tr\(\s*'((?:\\.|[^'\\])*)'\s*,\s*'((?:\\.|[^'\\])*)'\s*,\s*true\s*\)"),
+            "'"
+        ),
+        (
+            re.compile(r'I18n\.trFor\(\s*"(?:\\.|[^"\\])*"\s*,\s*"((?:\\.|[^"\\])*)"\s*,\s*"((?:\\.|[^"\\])*)"\s*,\s*true\s*\)'),
+            '"'
+        ),
+        (
+            re.compile(r"I18n\.trFor\(\s*'(?:\\.|[^'\\])*'\s*,\s*'((?:\\.|[^'\\])*)'\s*,\s*'((?:\\.|[^'\\])*)'\s*,\s*true\s*\)"),
             "'"
         )
     ]
@@ -49,17 +60,32 @@ def extract_qstr_strings(root_dir):
         (
             re.compile(r"I18n\.tr\(\s*'((?:\\.|[^'\\])*)'\s*,\s*'((?:\\.|[^'\\])*)'\s*\)"),
             "'"
+        ),
+        (
+            re.compile(r'I18n\.trFor\(\s*"(?:\\.|[^"\\])*"\s*,\s*"((?:\\.|[^"\\])*)"\s*,\s*"((?:\\.|[^"\\])*)"\s*\)'),
+            '"'
+        ),
+        (
+            re.compile(r"I18n\.trFor\(\s*'(?:\\.|[^'\\])*'\s*,\s*'((?:\\.|[^'\\])*)'\s*,\s*'((?:\\.|[^'\\])*)'\s*\)"),
+            "'"
         )
     ]
     i18n_simple_patterns = [
         (re.compile(r'I18n\.tr\(\s*"((?:\\.|[^"\\])*)"\s*\)'), '"'),
-        (re.compile(r"I18n\.tr\(\s*'((?:\\.|[^'\\])*)'\s*\)"), "'")
+        (re.compile(r"I18n\.tr\(\s*'((?:\\.|[^'\\])*)'\s*\)"), "'"),
+        (re.compile(r'I18n\.trFor\(\s*"(?:\\.|[^"\\])*"\s*,\s*"((?:\\.|[^"\\])*)"\s*\)'), '"'),
+        (re.compile(r"I18n\.trFor\(\s*'(?:\\.|[^'\\])*'\s*,\s*'((?:\\.|[^'\\])*)'\s*\)"), "'")
     ]
 
     # DankCommon terms are owned by the dank-qml-common repo (synced through
     # the DMS POEditor project); rglob not following the symlink is load-bearing.
     for qml_file in Path(root_dir).rglob('*.qml'):
         relative_path = qml_file.relative_to(root_dir)
+
+        # PLUGINS/ holds developer examples demonstrating plugin-local
+        # translations; their strings never enter the central catalog.
+        if relative_path.parts[0] == 'PLUGINS':
+            continue
 
         with open(qml_file, 'r', encoding='utf-8') as f:
             for line_num, line in enumerate(f, 1):
@@ -108,7 +134,7 @@ def area_tags(occurrences):
     tags = set()
     for occ in occurrences:
         path = occ['file']
-        if path.startswith('dms-plugins/'):
+        if path.startswith(('dms-plugins/', 'dms-plugins-external/')):
             tags.add('plugin-' + path.split('/')[1].lower())
         elif path.startswith(('Modules/Settings/', 'Modals/Settings/')):
             tags.add('settings')

@@ -875,6 +875,9 @@
   "Auto-Hide Timeout": {
     "Auto-Hide Timeout": "זמן קצוב להסתרה אוטומטית"
   },
+  "Auto-close Niri overview when DMS launches or focuses a window.": {
+    "Auto-close Niri overview when DMS launches or focuses a window.": ""
+  },
   "Auto-close Niri overview when launching apps.": {
     "Auto-close Niri overview when launching apps.": "סגור/י אוטומטית את הסקירה של niri כשמופעלות אפליקציות."
   },
@@ -1042,6 +1045,9 @@
   },
   "Bar Inset Padding": {
     "Bar Inset Padding": "ריווח פנימי של הסרגל"
+  },
+  "Bar Length Padding": {
+    "Bar Length Padding": ""
   },
   "Bar Opacity": {
     "Bar Opacity": "שקיפות הסרגל"
@@ -1430,6 +1436,9 @@
   "Choose colors from palette": {
     "Choose colors from palette": "בחר/י צבעים מפלטה"
   },
+  "Choose how the bar meets the screen edge": {
+    "Choose how the bar meets the screen edge": ""
+  },
   "Choose how the weather widget is displayed": {
     "Choose how the weather widget is displayed": "בחר/י כיצד ווידג׳ט מזג האוויר מוצג"
   },
@@ -1579,6 +1588,9 @@
   },
   "Close All Windows": {
     "Close All Windows": "סגור/י את כל החלונות"
+  },
+  "Close Niri Overview on Window Focus": {
+    "Close Niri Overview on Window Focus": ""
   },
   "Close Overview on Launch": {
     "Close Overview on Launch": "סגירת הסקירה בעת ההפעלה"
@@ -1910,11 +1922,17 @@
   "Copy Text": {
     "Copy Text": "העתק/י טקסט"
   },
+  "Copy target (%1)": {
+    "Copy target (%1)": ""
+  },
   "Corner Radius": {
     "Corner Radius": "רדיוס פינות"
   },
   "Corner Radius Override": {
     "Corner Radius Override": "דריסת רדיוס הפינות"
+  },
+  "Corner Style": {
+    "Corner Style": ""
   },
   "Corners & Background": {
     "Corners & Background": "פינות ורקע"
@@ -2220,7 +2238,7 @@
     "Darken Modal Background": "הכהיית הרקע של חלוניות"
   },
   "Date First": {
-    "Date First": ""
+    "Date First": "תאריך ראשון"
   },
   "Date Format": {
     "Date Format": "תבנית תאריך"
@@ -2952,7 +2970,7 @@
     "Extra Light": "דק במיוחד"
   },
   "Extract theme to JSON": {
-    "Extract theme to JSON": ""
+    "Extract theme to JSON": "חלץ/י את ערכת הנושא לקובץ JSON"
   },
   "Fade": {
     "Fade": "דהייה"
@@ -3054,7 +3072,7 @@
     "Failed to enable night mode": "הפעלת מצב לילה נכשלה"
   },
   "Failed to extract theme": {
-    "Failed to extract theme": ""
+    "Failed to extract theme": "חילוץ ערכת הנושא נכשל"
   },
   "Failed to fetch network QR code: %1": {
     "Failed to fetch network QR code: %1": "קבלת קוד QR של הרשת נכשלה: %1"
@@ -3383,6 +3401,9 @@
   "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": {
     "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": "שוטף: האטה חלקה פנימה, יציאה מהירה - עקומות נקיות ואלגנטיות."
   },
+  "Flush": {
+    "Flush": ""
+  },
   "Focus": {
     "Focus": "מיקוד"
   },
@@ -3637,6 +3658,9 @@
   },
   "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
     "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": "צור/צרי תצורות בסיס של GTK3/4 או QT5/QT6 (החבילה qt6ct-kde נדרשת) כדי לעקוב אחר הצבעים של DMS. צריך ליצור את התצורות רק פעם אחת.<br /><br />מומלץ להגדיר את %1 לפני החלת ערכות נושא של GTK."
+  },
+  "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
+    "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
   },
   "Generic": {
     "Generic": "כללי"
@@ -4299,7 +4323,7 @@
     "Keep in Bar": "השאר/י בסרגל"
   },
   "Keep pinned apps as launchers and show running windows separately": {
-    "Keep pinned apps as launchers and show running windows separately": ""
+    "Keep pinned apps as launchers and show running windows separately": "השאר/י אפליקציות מוצמדות כמשגרים והצג/י חלונות פעילים בנפרד"
   },
   "Keep the clipboard type filter when reopening history": {
     "Keep the clipboard type filter when reopening history": "שמור/שמרי את מסנן הסוגים של לוח ההעתקה בפתיחה מחדש של ההיסטוריה"
@@ -4890,7 +4914,7 @@
     "Minimal palette built around a single hue.": "פלטת צבעים מינימלית הבנויה סביב גוון יחיד."
   },
   "Minimize": {
-    "Minimize": ""
+    "Minimize": "מזעור"
   },
   "Minute": {
     "Minute": "דקה"
@@ -5976,7 +6000,7 @@
     "Place a trash bin at the end of the dock": "מקם/י פח אשפה בקצה הDock"
   },
   "Place clipboard history on the Wayland overlay layer": {
-    "Place clipboard history on the Wayland overlay layer": ""
+    "Place clipboard history on the Wayland overlay layer": "מקם/י את היסטוריית לוח ההעתקה על שכבת הכיסוי של Wayland"
   },
   "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
     "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "מקם/י כאן את תיקיות התוספים. לכל תוסף צריך להיות קובץ מניפסט בשם plugin.json."
@@ -6407,6 +6431,9 @@
   "Recommended available": {
     "Recommended available": "מומלץ זמין"
   },
+  "Reduce the visible bar length from both ends": {
+    "Reduce the visible bar length from both ends": ""
+  },
   "Refresh": {
     "Refresh": "רענון"
   },
@@ -6627,7 +6654,7 @@
     "Restarting audio system...": "מפעיל מערכת שמע מחדש..."
   },
   "Restore": {
-    "Restore": ""
+    "Restore": "שחזור"
   },
   "Restore Special Workspace Windows": {
     "Restore Special Workspace Windows": "שחזר/י חלונות מסביבת עבודה מיוחדת"
@@ -6691,6 +6718,9 @@
   },
   "Root Filesystem": {
     "Root Filesystem": "מערכת הקבצים הראשית"
+  },
+  "Rounded": {
+    "Rounded": ""
   },
   "Rounded corners for windows": {
     "Rounded corners for windows": "פינות מעוגלות לחלונות"
@@ -6768,7 +6798,7 @@
     "Save & Start": "שמור/י והפעל/י"
   },
   "Save Extracted Theme": {
-    "Save Extracted Theme": ""
+    "Save Extracted Theme": "שמירת ערכת הנושא שחולצה"
   },
   "Save Notepad File": {
     "Save Notepad File": "שמור/י פתק כקובץ"
@@ -7089,7 +7119,7 @@
     "Separate Light & Dark Themes": "ערכות נושא נפרדות למצב בהיר וכהה"
   },
   "Separate Pinned and Running Apps": {
-    "Separate Pinned and Running Apps": ""
+    "Separate Pinned and Running Apps": "הפרדת אפליקציות מוצמדות ופעילות"
   },
   "Separate appearance for unfocused displays is not supported on this compositor.": {
     "Separate appearance for unfocused displays is not supported on this compositor.": "מראה נפרד עבור מסכים לא ממוקדים אינו נתמך בקומפוזיטור זה."
@@ -7652,6 +7682,9 @@
   "Spotlight Search": {
     "Spotlight Search": "חיפוש Spotlight"
   },
+  "Square": {
+    "Square": ""
+  },
   "Square Corners": {
     "Square Corners": "פינות ישרות"
   },
@@ -7668,7 +7701,7 @@
     "Start": "התחל/י"
   },
   "Start DankConnect, KDE Connect, or Valent to use this plugin": {
-    "Start DankConnect, KDE Connect, or Valent to use this plugin": ""
+    "Start DankConnect, KDE Connect, or Valent to use this plugin": "הפעל/י את DankConnect, KDE Connect, או Valent כדי להשתמש בתוסף זה"
   },
   "Start Hotspot?": {
     "Start Hotspot?": "להפעיל את הנקודה החמה?"
@@ -8003,6 +8036,9 @@
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
     "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "ההגדרות הבאות ישנו את הגדרות ה GTK וQt שלך. אם ברצונך לשמור על התצורות הנוכחיות, אנא גבה/י אותן (הקבצים הם: qt5ct.conf|qt6ct.conf וconfig/gtk-3.0|gtk-4.0./~)."
   },
+  "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": {
+    "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": ""
+  },
   "The custom command used when attaching to sessions (receives the session name as the first argument)": {
     "The custom command used when attaching to sessions (receives the session name as the first argument)": "הפקודה המותאמת אישית שנמצאת בשימוש בעת חיבור להפעלות (מקבלת את שם ההפעלה כארגומנט הראשון)"
   },
@@ -8031,7 +8067,7 @@
     "Theme color used for the widget outline": "צבע ערכת הנושא שמשמש לקו המתאר של הווידג׳ט"
   },
   "Theme extracted to: %1": {
-    "Theme extracted to: %1": ""
+    "Theme extracted to: %1": "ערכת הנושא חולצה אל: %1"
   },
   "Theme worker failed (%1)": {
     "Theme worker failed (%1)": "עובד ערכת הנושא נכשל (%1)"
@@ -8121,7 +8157,7 @@
     "Time & Weather": "שעה ומזג אוויר"
   },
   "Time First": {
-    "Time First": ""
+    "Time First": "שעה ראשונה"
   },
   "Time Format": {
     "Time Format": "פורמט שעה"
@@ -9043,6 +9079,9 @@
   },
   "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": {
     "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": "עליך להגדיר את אחד מהמשתנים הבאים:\nQT_QPA_PLATFORMTHEME=gtk3 או\nQT_QPA_PLATFORMTHEME=qt6ct\nכמשתני סביבה ולאחר מכן להפעיל מחדש את DMS.\n\n* qt6ct דורש התקנה של qt6ct-kde."
+  },
+  "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": {
+    "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": ""
   },
   "You'll enter your password at the greeter after the next reboot.": {
     "You'll enter your password at the greeter after the next reboot.": "תצטרך/תצטרכי להזין את הסיסמה שלך במסך ההתחברות לאחר ההפעלה מחדש הבאה."

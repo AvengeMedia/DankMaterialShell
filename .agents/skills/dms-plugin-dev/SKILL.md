@@ -514,6 +514,37 @@ Quickshell.execDetached(["dms", "cl", "copy", textToCopy])
 
 **Do NOT use** `globalThis.clipboard` or browser JavaScript APIs - they don't exist in the QML runtime.
 
+## Translations (Optional)
+
+Ship per-locale files in a `translations/` directory; DMS loads the one matching the active locale and re-reads it on locale changes:
+
+```
+MyPlugin/
+└── translations/
+    ├── es.json
+    └── zh_CN.json
+```
+
+File names follow DMS locale naming (`es.json`, `pt.json`, `zh_CN.json`); resolution tries the exact tag, then the hyphenated form, then the bare language. No `en.json` - the QML terms are the English strings.
+
+Each file maps the English term to its translation, using the term as its own context bucket:
+
+```json
+{
+  "Cycle Speed": {
+    "Cycle Speed": "Velocidad de ciclo"
+  }
+}
+```
+
+In QML, call `I18n.trFor` with the plugin id as a literal string matching `plugin.json`:
+
+```qml
+text: I18n.trFor("myPlugin", "Cycle Speed")
+```
+
+Lookup order: plugin file, then the global DMS catalog, then the English term. `ExampleEmojiPlugin` in `quickshell/PLUGINS/` demonstrates the full setup. Registry plugins can apply for central POEditor translation via the registry's CONTRIBUTING guide.
+
 ## Step 11: Validate and Test
 
 1. Validate `plugin.json` against the schema at [assets/plugin-schema.json](assets/plugin-schema.json)
