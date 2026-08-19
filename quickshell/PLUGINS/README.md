@@ -1651,6 +1651,43 @@ Define these properties on your widget to customize behavior:
 - `minWidth`: Minimum allowed width (default: 100)
 - `minHeight`: Minimum allowed height (default: 100)
 
+### Runtime Resize API
+
+Desktop widgets can resize their live surface at runtime without saving the new size to disk.
+
+The wrapper exposes two functions on the widget instance:
+
+- `requestResize(width, height)`: Applies a temporary surface size override
+- `clearResize()`: Clears the temporary override and restores the normal persisted size
+
+These are available as properties on `DesktopPluginComponent` and are passed through by `DesktopPluginWrapper` automatically.
+
+```qml
+import QtQuick
+import qs.Common
+
+Item {
+    id: root
+
+    function expandPreview() {
+        if (requestResize) {
+            requestResize(420, 260)
+        }
+    }
+
+    function resetPreview() {
+        if (clearResize) {
+            clearResize()
+        }
+    }
+}
+```
+
+Notes:
+- This is a transient runtime resize only; it does not persist to `settings.json`
+- The requested size must stay within the screen bounds and above `minWidth` / `minHeight`
+- Use `clearResize()` when you want to return to the saved widget dimensions
+
 ### Loading and Saving Data
 
 Use the injected `pluginService` to persist widget-specific data:
