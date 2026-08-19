@@ -16,6 +16,7 @@ Singleton {
     readonly property bool powerSaver: PowerProfileWatcher.currentProfile === PowerProfile.PowerSaver
     property int updateInterval: refCount > 0 ? (powerSaver ? 6000 : 3000) : (powerSaver ? 60000 : 30000)
     property bool isUpdating: false
+    property bool pendingUpdate: false
     readonly property bool dgopAvailable: DMSService.isConnected && DMSService.capabilities.includes("dgop")
     property bool sessionGpuIdsSeeded: false
 
@@ -204,10 +205,13 @@ Singleton {
     function updateAllStats() {
         if (!dgopAvailable || refCount === 0 || enabledModules.length === 0) {
             isUpdating = false;
+            pendingUpdate = false;
             return;
         }
-        if (isUpdating)
+        if (isUpdating) {
+            pendingUpdate = true;
             return;
+        }
 
         const params = buildMetaParams();
         if (!params)
@@ -218,9 +222,14 @@ Singleton {
             if (!response.result) {
                 log.warn("dgop.meta failed:", response.error || "empty result");
                 isUpdating = false;
-                return;
+            } else {
+                parseData(response.result);
             }
-            parseData(response.result);
+
+            if (pendingUpdate) {
+                pendingUpdate = false;
+                updateAllStats();
+            }
         });
     }
 
