@@ -152,6 +152,7 @@ Singleton {
     property string wallpaperCyclingMode: "interval"
     property int wallpaperCyclingInterval: 300
     property string wallpaperCyclingTime: "06:00"
+    property string wallpaperCyclingFolderPath: ""
     property var monitorCyclingSettings: ({})
 
     property bool nightModeEnabled: false

@@ -23,6 +23,7 @@ var SPEC = {
     wallpaperCyclingMode: { def: "interval" },
     wallpaperCyclingInterval: { def: 300 },
     wallpaperCyclingTime: { def: "06:00" },
+    wallpaperCyclingFolderPath: { def: "" },
     monitorCyclingSettings: { def: {} },
 
     nightModeEnabled: { def: false },

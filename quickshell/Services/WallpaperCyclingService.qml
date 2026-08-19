@@ -184,6 +184,9 @@ Singleton {
         if (!folderPath)
             return;
 
+        SessionData.wallpaperCyclingFolderPath = folderPath;
+        SessionData.saveSettings();
+
         if (screenName && monitorProcessComponent.status === Component.Ready) {
             var process = monitorProcessFor(screenName);
             process.command = findCommand(folderPath);
