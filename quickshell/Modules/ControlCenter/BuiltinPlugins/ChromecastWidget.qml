@@ -30,7 +30,7 @@ PluginComponent {
             return name;
         }
         if (ChromecastService.discovering)
-            return I18n.tr("Searching…", "Chromecast searching for devices");
+            return I18n.tr("Searching...", "Chromecast searching for devices");
         const count = ChromecastService.deviceCount;
         if (count > 0)
             return I18n.tr("%1 devices", "Number of Chromecast devices found").arg(count);

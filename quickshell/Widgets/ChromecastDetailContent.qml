@@ -261,7 +261,7 @@ Rectangle {
                         }
 
                         StyledText {
-                            text: ChromecastService.discovering ? I18n.tr("Searching for devices…", "Chromecast discovery in progress") : I18n.tr("No devices found", "No Chromecast devices on the network")
+                            text: ChromecastService.discovering ? I18n.tr("Searching for devices...", "Chromecast discovery in progress") : I18n.tr("No devices found", "No Chromecast devices on the network")
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceVariantText
                             anchors.horizontalCenter: parent.horizontalCenter
