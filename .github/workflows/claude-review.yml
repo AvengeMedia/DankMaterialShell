@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       issues: write
+      pull-requests: write
     outputs:
       allowed: ${{ steps.team.outputs.allowed }}
     steps:
@@ -34,6 +35,7 @@ jobs:
           echo "allowed=$allowed" >> "$GITHUB_OUTPUT"
 
       - name: React
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ALLOWED: ${{ steps.team.outputs.allowed }}
