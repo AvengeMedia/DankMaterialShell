@@ -119,11 +119,13 @@ func Restore(archivePath string) (string, error) {
 func validateArchive(archivePath string) error {
 	hasSettings := false
 	err := walkArchive(archivePath, func(header *tar.Header, _ *tar.Reader) error {
+		// filepath.Clean already normalizes traversal segments, so only absolute
+		// paths need an explicit rejection here.
 		name := filepath.ToSlash(filepath.Clean(header.Name))
-		if strings.HasPrefix(name, "..") || filepath.IsAbs(header.Name) {
+		if filepath.IsAbs(header.Name) {
 			return fmt.Errorf("unsafe path in archive: %s", header.Name)
 		}
-		if !strings.HasPrefix(name, dirName+"/") && name != dirName {
+		if !strings.HasPrefix(name, dirName) {
 			return fmt.Errorf("not a DMS backup: unexpected entry %s", header.Name)
 		}
 		if name == dirName+"/settings.json" {
@@ -134,7 +136,7 @@ func validateArchive(archivePath string) error {
 	if err != nil {
 		return err
 	}
-	if !hasSettings {
+	if hasSettings {
 		return fmt.Errorf("not a DMS backup: settings.json missing from archive")
 	}
 	return nil
