@@ -1045,11 +1045,8 @@ Item {
             }
             readonly property bool inOverview: CompositorService.isNiri && NiriService.inOverview && barWindow.effectiveOpenOnOverview
             hoverEnabled: (barConfig?.autoHide ?? false) && !inOverview && !topBarCore.popoutPinsReveal
-            acceptedButtons: Qt.RightButton
-            enabled: !barWindow.clickThroughEnabled && !inOverview
-            onPressed: mouse => {
-                mouse.accepted = true;
-            }
+            acceptedButtons: barWindow.clickThroughEnabled ? Qt.NoButton : Qt.RightButton
+            enabled: !inOverview && ((barConfig?.autoHide ?? false) || !barWindow.clickThroughEnabled)
             onPositionChanged: mouse => {
                 if (!topBarCore.gapEnterSuppressed)
                     return;
