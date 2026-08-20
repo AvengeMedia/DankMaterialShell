@@ -12,6 +12,7 @@ require (
 	github.com/fsnotify/fsnotify v1.10.1
 	github.com/godbus/dbus/v5 v5.2.2
 	github.com/holoplot/go-evdev v0.0.0-20260504100651-66d1748fe847
+	github.com/klauspost/compress v1.19.2
 	github.com/pilebones/go-udev v0.9.1
 	github.com/sblinch/kdl-go v0.0.0-20260121213736-8b7053306ca6
 	github.com/spf13/cobra v1.10.2

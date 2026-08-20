@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"image"
 	"image/jpeg"
-	"image/png"
 	"io"
 	"os"
 	"path/filepath"
@@ -174,8 +173,7 @@ func ImageToBuffer(img image.Image) (*ShmBuffer, error) {
 }
 
 func EncodePNG(w io.Writer, img image.Image) error {
-	enc := png.Encoder{CompressionLevel: png.BestSpeed}
-	return enc.Encode(w, img)
+	return encodePNG(w, img)
 }
 
 func EncodeJPEG(w io.Writer, img image.Image, quality int) error {

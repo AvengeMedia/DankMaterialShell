@@ -84,42 +84,11 @@ func (c *CICP) chunk() []byte {
 	return binary.BigEndian.AppendUint32(chunk, crc32.ChecksumIEEE(payload))
 }
 
-// cicpInjector inserts a cICP chunk after IHDR (PNG signature + IHDR = 33 bytes).
-type cicpInjector struct {
-	w       io.Writer
-	chunk   []byte
-	written int
-}
-
-func (ci *cicpInjector) Write(p []byte) (int, error) {
-	const ihdrEnd = 33
-	if ci.written >= ihdrEnd {
-		return ci.w.Write(p)
-	}
-
-	n := min(ihdrEnd-ci.written, len(p))
-	if _, err := ci.w.Write(p[:n]); err != nil {
-		return 0, err
-	}
-	ci.written += n
-	if ci.written == ihdrEnd {
-		if _, err := ci.w.Write(ci.chunk); err != nil {
-			return n, err
-		}
-	}
-	if n < len(p) {
-		if _, err := ci.w.Write(p[n:]); err != nil {
-			return n, err
-		}
-	}
-	return len(p), nil
-}
-
 func EncodePNGTagged(w io.Writer, img image.Image, cicp *CICP) error {
-	if cicp != nil {
-		w = &cicpInjector{w: w, chunk: cicp.chunk()}
+	if cicp == nil {
+		return encodePNG(w, img)
 	}
-	return EncodePNG(w, img)
+	return encodePNG(w, img, cicp.chunk())
 }
 
 // outputCICP queries the output's image description via wp_color_management_v1.
