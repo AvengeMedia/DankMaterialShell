@@ -729,7 +729,7 @@ Item {
                             if (KeybindsService.currentProvider === "niri")
                                 mods = KeyUtils.withSymbolicMod(mods, KeybindsService.modKey);
 
-                            const key = KeyUtils.xkbKeyFromQtKey(qtKey, !!(event.modifiers & Qt.KeypadModifier), hasShift);
+                            const key = KeyUtils.xkbKeyFromQtKey(qtKey, !!(event.modifiers & Qt.KeypadModifier), hasShift, event.nativeScanCode);
                             if (!key) {
                                 log.warn("Unknown key:", event.key, "mods:", event.modifiers);
                                 return;
@@ -1306,11 +1306,7 @@ Item {
                         args[argDef.name] = textValue;
 
                         root.updateEdit({
-                            "action": Actions.buildCompositorAction(
-                                KeybindsService.currentProvider,
-                                parsed?.base || argConfig.base,
-                                args
-                            )
+                            "action": Actions.buildCompositorAction(KeybindsService.currentProvider, parsed?.base || argConfig.base, args)
                         });
                     }
 
