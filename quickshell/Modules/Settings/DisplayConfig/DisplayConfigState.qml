@@ -2391,8 +2391,8 @@ Singleton {
         }
         backendWriteOutputsConfig(original);
         clearPendingChanges();
-        if (originalOutputs)
-            outputs = original;
+        // clearPendingChanges() resets originalOutputs, so restore the model from the snapshot.
+        outputs = original;
         changesReverted();
     }
 
