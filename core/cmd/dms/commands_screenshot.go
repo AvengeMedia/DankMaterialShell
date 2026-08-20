@@ -381,7 +381,7 @@ func copyImageToClipboard(buf *screenshot.ShmBuffer, format screenshot.Format, q
 		}
 	default:
 		mimeType = "image/png"
-		if err := screenshot.EncodePNGTagged(&data, screenshot.BufferToImageDeep(buf, pixelFormat), cicp); err != nil {
+		if err := screenshot.EncodeBufferPNG(&data, buf, pixelFormat, cicp); err != nil {
 			return err
 		}
 	}
@@ -394,7 +394,7 @@ func writeImageToStdout(buf *screenshot.ShmBuffer, format screenshot.Format, qua
 	case screenshot.FormatJPEG:
 		return screenshot.EncodeJPEG(os.Stdout, screenshot.BufferToImageWithFormat(buf, pixelFormat), quality)
 	default:
-		return screenshot.EncodePNGTagged(os.Stdout, screenshot.BufferToImageDeep(buf, pixelFormat), cicp)
+		return screenshot.EncodeBufferPNG(os.Stdout, buf, pixelFormat, cicp)
 	}
 }
 

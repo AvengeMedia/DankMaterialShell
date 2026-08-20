@@ -25,6 +25,7 @@ const (
 	adlerBase      = 65521
 )
 
+// pngSource reads rows in place from pix; pack converts a row to PNG channel order, nil when it already is.
 type pngSource struct {
 	pix           []byte
 	stride        int
@@ -32,71 +33,107 @@ type pngSource struct {
 	depth         byte
 	colorType     byte
 	srcBpp        int
-	dstBpp        int
+	pack          func(dst, src []byte)
 }
 
-func pngSourceOf(pix []byte, stride, width, height int, depth byte, opaque bool) pngSource {
-	s := pngSource{pix: pix, stride: stride, width: width, height: height, depth: depth}
-	s.srcBpp = 4 * int(depth) / 8
-	s.dstBpp, s.colorType = s.srcBpp, pngColorRGBA
-	if opaque {
-		s.dstBpp, s.colorType = 3*int(depth)/8, pngColorRGB
+func (s pngSource) dstBpp() int {
+	channels := 4
+	if s.colorType == pngColorRGB {
+		channels = 3
 	}
-	return s
+	return channels * int(s.depth) / 8
+}
+
+func packRGBX(dst, src []byte) {
+	for x := range len(dst) / 3 {
+		d, p := dst[x*3:x*3+3], src[x*4:x*4+4]
+		d[0], d[1], d[2] = p[0], p[1], p[2]
+	}
+}
+
+func packBGRX(dst, src []byte) {
+	for x := range len(dst) / 3 {
+		d, p := dst[x*3:x*3+3], src[x*4:x*4+4]
+		d[0], d[1], d[2] = p[2], p[1], p[0]
+	}
+}
+
+func packRGBX16(dst, src []byte) {
+	for x := range len(dst) / 6 {
+		copy(dst[x*6:x*6+6], src[x*8:x*8+6])
+	}
+}
+
+func pack2101010(swapRB bool) func(dst, src []byte) {
+	return func(dst, src []byte) {
+		for x := range len(dst) / 6 {
+			v := binary.LittleEndian.Uint32(src[x*4:])
+			c0, c1, c2 := v&0x3FF, v>>10&0x3FF, v>>20&0x3FF
+			if swapRB {
+				c0, c2 = c2, c0
+			}
+			d := dst[x*6 : x*6+6]
+			binary.BigEndian.PutUint16(d[0:], uint16(c0<<6|c0>>4))
+			binary.BigEndian.PutUint16(d[2:], uint16(c1<<6|c1>>4))
+			binary.BigEndian.PutUint16(d[4:], uint16(c2<<6|c2>>4))
+		}
+	}
 }
 
 func newPNGSource(img image.Image) pngSource {
 	b := img.Bounds()
+	s := pngSource{width: b.Dx(), height: b.Dy(), colorType: pngColorRGBA}
 	switch src := img.(type) {
 	case *image.RGBA:
-		if src.Opaque() {
-			return pngSourceOf(src.Pix, src.Stride, b.Dx(), b.Dy(), 8, true)
+		if !src.Opaque() {
+			break
 		}
+		s.pix, s.stride, s.depth, s.srcBpp = src.Pix, src.Stride, 8, 4
+		s.colorType, s.pack = pngColorRGB, packRGBX
+		return s
 	case *image.NRGBA:
-		return pngSourceOf(src.Pix, src.Stride, b.Dx(), b.Dy(), 8, src.Opaque())
+		s.pix, s.stride, s.depth, s.srcBpp = src.Pix, src.Stride, 8, 4
+		if src.Opaque() {
+			s.colorType, s.pack = pngColorRGB, packRGBX
+		}
+		return s
 	case *image.NRGBA64:
-		return pngSourceOf(src.Pix, src.Stride, b.Dx(), b.Dy(), 16, src.Opaque())
+		s.pix, s.stride, s.depth, s.srcBpp = src.Pix, src.Stride, 16, 8
+		if src.Opaque() {
+			s.colorType, s.pack = pngColorRGB, packRGBX16
+		}
+		return s
 	}
-	nrgba := image.NewNRGBA(image.Rect(0, 0, b.Dx(), b.Dy()))
+	nrgba := image.NewNRGBA(image.Rect(0, 0, s.width, s.height))
 	draw.Draw(nrgba, nrgba.Rect, img, b.Min, draw.Src)
 	return newPNGSource(nrgba)
 }
 
-func (s pngSource) row(y int, scratch []byte) []byte {
-	src := s.pix[y*s.stride : y*s.stride+s.width*s.srcBpp]
-	switch s.dstBpp {
-	case s.srcBpp:
-		return src
-	case 3:
-		for x := 0; x < s.width; x++ {
-			d, p := scratch[x*3:x*3+3], src[x*4:x*4+4]
-			d[0], d[1], d[2] = p[0], p[1], p[2]
-		}
+func newShmPNGSource(buf *ShmBuffer, format uint32) pngSource {
+	s := pngSource{pix: buf.Data(), stride: buf.Stride, width: buf.Width, height: buf.Height, depth: 8, colorType: pngColorRGB, srcBpp: 4}
+	switch f := PixelFormat(format); {
+	case f.Is10Bit():
+		s.depth, s.pack = 16, pack2101010(tenBitSwapRB(format))
+	case f == FormatABGR8888, f == FormatXBGR8888:
+		s.pack = packRGBX
 	default:
-		for x := 0; x < s.width; x++ {
-			copy(scratch[x*s.dstBpp:(x+1)*s.dstBpp], src[x*s.srcBpp:])
-		}
+		s.pack = packBGRX
 	}
-	return scratch
+	return s
 }
 
-func (s pngSource) filterBand(y0, y1 int) []byte {
-	rowLen := s.width * s.dstBpp
-	out := make([]byte, (rowLen+1)*(y1-y0))
-	scratch := make([]byte, rowLen)
-	bpp := s.dstBpp
-	for y := y0; y < y1; y++ {
-		line := out[(y-y0)*(rowLen+1):][:rowLen+1]
-		line[0] = pngFilterSub
-		row := s.row(y, scratch)
-		copy(line[1:1+bpp], row[:bpp])
-		cur, prev, dst := row[bpp:], row[:rowLen-bpp], line[1+bpp:]
-		prev, dst = prev[:len(cur)], dst[:len(cur)]
-		for i := range cur {
-			dst[i] = cur[i] - prev[i]
-		}
+func (s pngSource) filterRow(y, bpp int, packed, dst []byte) {
+	row := s.pix[y*s.stride:][:s.width*s.srcBpp]
+	if s.pack != nil {
+		s.pack(packed, row)
+		row = packed
 	}
-	return out
+	copy(dst[:bpp], row[:bpp])
+	cur, prev, out := row[bpp:], row[:len(row)-bpp], dst[bpp:]
+	prev, out = prev[:len(cur)], out[:len(cur)]
+	for i := range cur {
+		out[i] = cur[i] - prev[i]
+	}
 }
 
 type pngBand struct {
@@ -106,21 +143,30 @@ type pngBand struct {
 }
 
 func (s pngSource) compressBand(y0, y1 int, final bool) (pngBand, error) {
-	raw := s.filterBand(y0, y1)
+	bpp := s.dstBpp()
+	rowLen := s.width * bpp
+	line := make([]byte, rowLen+1)
+	line[0] = pngFilterSub
+	packed := make([]byte, rowLen)
 	var buf bytes.Buffer
 	fw, err := flate.NewWriter(&buf, flate.BestSpeed)
 	if err != nil {
 		return pngBand{}, err
 	}
-	if _, err := fw.Write(raw); err != nil {
-		return pngBand{}, err
+	sum := adler32.New()
+	for y := y0; y < y1; y++ {
+		s.filterRow(y, bpp, packed, line[1:])
+		sum.Write(line)
+		if _, err := fw.Write(line); err != nil {
+			return pngBand{}, err
+		}
 	}
 	if final {
 		err = fw.Close()
 	} else {
 		err = fw.Flush()
 	}
-	return pngBand{data: buf.Bytes(), adler: adler32.Checksum(raw), size: len(raw)}, err
+	return pngBand{data: buf.Bytes(), adler: sum.Sum32(), size: len(line) * (y1 - y0)}, err
 }
 
 func adlerCombine(a, b uint32, lenB int) uint32 {
@@ -175,21 +221,20 @@ func (s pngSource) ihdr() []byte {
 	return b
 }
 
-// encodePNG deflates row bands in parallel into a single zlib stream; extraChunks go right after IHDR.
-func encodePNG(w io.Writer, img image.Image, extraChunks ...[]byte) error {
-	src := newPNGSource(img)
-	if src.width <= 0 || src.height <= 0 {
+// encode deflates row bands in parallel into a single zlib stream; extraChunks go right after IHDR.
+func (s pngSource) encode(w io.Writer, extraChunks ...[]byte) error {
+	if s.width <= 0 || s.height <= 0 {
 		return errors.New("png: empty image")
 	}
 
-	bands := min(runtime.GOMAXPROCS(0), max(1, src.height/pngMinBandRows))
+	bands := min(runtime.GOMAXPROCS(0), max(1, s.height/pngMinBandRows))
 	results := make([]pngBand, bands)
 	errs := make([]error, bands)
 	var wg sync.WaitGroup
 	for b := range bands {
 		wg.Go(func() {
-			y0, y1 := src.height*b/bands, src.height*(b+1)/bands
-			results[b], errs[b] = src.compressBand(y0, y1, b == bands-1)
+			y0, y1 := s.height*b/bands, s.height*(b+1)/bands
+			results[b], errs[b] = s.compressBand(y0, y1, b == bands-1)
 		})
 	}
 	wg.Wait()
@@ -209,7 +254,7 @@ func encodePNG(w io.Writer, img image.Image, extraChunks ...[]byte) error {
 	if _, err := w.Write(pngSignature); err != nil {
 		return err
 	}
-	if err := writeChunk(w, "IHDR", src.ihdr()); err != nil {
+	if err := writeChunk(w, "IHDR", s.ihdr()); err != nil {
 		return err
 	}
 	for _, c := range extraChunks {
@@ -221,4 +266,17 @@ func encodePNG(w io.Writer, img image.Image, extraChunks ...[]byte) error {
 		return err
 	}
 	return writeChunk(w, "IEND")
+}
+
+func EncodePNG(w io.Writer, img image.Image) error {
+	return newPNGSource(img).encode(w)
+}
+
+func EncodePNGTagged(w io.Writer, img image.Image, cicp *CICP) error {
+	return newPNGSource(img).encode(w, cicp.chunks()...)
+}
+
+// EncodeBufferPNG reads the capture mapping directly; 10-bit formats are kept as 16-bit channels.
+func EncodeBufferPNG(w io.Writer, buf *ShmBuffer, format uint32, cicp *CICP) error {
+	return newShmPNGSource(buf, format).encode(w, cicp.chunks()...)
 }

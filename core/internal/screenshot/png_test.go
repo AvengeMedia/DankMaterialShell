@@ -2,6 +2,7 @@ package screenshot
 
 import (
 	"bytes"
+	"encoding/binary"
 	"hash/adler32"
 	"image"
 	"image/color"
@@ -134,5 +135,60 @@ func TestAdlerCombine(t *testing.T) {
 	}
 	if got := adlerCombine(1, adler32.Checksum(data), len(data)); got != adler32.Checksum(data) {
 		t.Error("combine with empty prefix must be identity")
+	}
+}
+
+func TestEncodeBufferPNG(t *testing.T) {
+	const w, h = 5, 3
+	const r10, g10, b10 = uint32(1023), uint32(512), uint32(0)
+	cases := []struct {
+		name   string
+		format PixelFormat
+		pixel  uint32
+		want   color.RGBA64
+	}{
+		{"xrgb8888", FormatXRGB8888, 0x00FF8000, color.RGBA64{0xFFFF, 0x8080, 0, 0xFFFF}},
+		{"argb8888-alpha-ignored", FormatARGB8888, 0x10FF8000, color.RGBA64{0xFFFF, 0x8080, 0, 0xFFFF}},
+		{"xbgr8888", FormatXBGR8888, 0x000080FF, color.RGBA64{0xFFFF, 0x8080, 0, 0xFFFF}},
+		{"xrgb2101010", FormatXRGB2101010, r10<<20 | g10<<10 | b10, color.RGBA64{0xFFFF, 512<<6 | 512>>4, 0, 0xFFFF}},
+		{"xbgr2101010", FormatXBGR2101010, b10<<20 | g10<<10 | r10, color.RGBA64{0xFFFF, 512<<6 | 512>>4, 0, 0xFFFF}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			buf, err := CreateShmBuffer(w, h, w*4+8)
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer buf.Close()
+			for y := range h {
+				for x := range w {
+					binary.LittleEndian.PutUint32(buf.Data()[y*buf.Stride+x*4:], tc.pixel)
+				}
+			}
+
+			var out bytes.Buffer
+			if err := EncodeBufferPNG(&out, buf, uint32(tc.format), nil); err != nil {
+				t.Fatal(err)
+			}
+			data := out.Bytes()
+			img, err := png.Decode(bytes.NewReader(data))
+			if err != nil {
+				t.Fatal(err)
+			}
+			if img.Bounds().Dx() != w || img.Bounds().Dy() != h {
+				t.Fatalf("bounds = %v", img.Bounds())
+			}
+			got := color.RGBA64Model.Convert(img.At(w-1, h-1)).(color.RGBA64)
+			if got != tc.want {
+				t.Errorf("pixel = %v, want %v", got, tc.want)
+			}
+			wantDepth := byte(8)
+			if tc.format.Is10Bit() {
+				wantDepth = 16
+			}
+			if depth := data[24]; depth != wantDepth {
+				t.Errorf("bit depth = %d, want %d", depth, wantDepth)
+			}
+		})
 	}
 }

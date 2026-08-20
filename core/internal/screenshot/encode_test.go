@@ -2,7 +2,6 @@ package screenshot
 
 import (
 	"encoding/binary"
-	"image"
 	"testing"
 )
 
@@ -42,29 +41,5 @@ func TestBufferToImageWithFormat10Bit(t *testing.T) {
 				t.Errorf("pixel = %v, want %v", got, want)
 			}
 		})
-	}
-}
-
-func TestBufferToImageDeep10Bit(t *testing.T) {
-	const r10, g10, b10 = uint32(1023), uint32(512), uint32(0)
-	buf := newTenBitBuffer(t, FormatXRGB2101010, r10<<20|g10<<10|b10)
-
-	img, ok := BufferToImageDeep(buf, uint32(FormatXRGB2101010)).(*image.NRGBA64)
-	if !ok {
-		t.Fatal("expected *image.NRGBA64 for 10-bit source")
-	}
-
-	want := [4]uint16{0xFFFF, 512<<6 | 512>>4, 0, 0xFFFF}
-	for i, w := range want {
-		if got := binary.BigEndian.Uint16(img.Pix[i*2:]); got != w {
-			t.Errorf("channel %d = %d, want %d", i, got, w)
-		}
-	}
-}
-
-func TestBufferToImageDeep8BitFallback(t *testing.T) {
-	buf := newTenBitBuffer(t, FormatXRGB8888, 0)
-	if _, ok := BufferToImageDeep(buf, uint32(FormatXRGB8888)).(*image.RGBA); !ok {
-		t.Error("expected *image.RGBA for 8-bit source")
 	}
 }

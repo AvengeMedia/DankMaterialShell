@@ -47,39 +47,6 @@ func tenBitToRGBA(buf *ShmBuffer, format uint32) *image.RGBA {
 	return img
 }
 
-// BufferToImageDeep preserves 10-bit sources as 16-bit-per-channel; others decode to 8-bit RGBA.
-func BufferToImageDeep(buf *ShmBuffer, format uint32) image.Image {
-	if !PixelFormat(format).Is10Bit() {
-		return BufferToImageWithFormat(buf, format)
-	}
-
-	img := image.NewNRGBA64(image.Rect(0, 0, buf.Width, buf.Height))
-	data := buf.Data()
-	swapRB := tenBitSwapRB(format)
-
-	for y := 0; y < buf.Height; y++ {
-		srcOff := y * buf.Stride
-		dstOff := y * img.Stride
-		for x := 0; x < buf.Width; x++ {
-			si := srcOff + x*4
-			di := dstOff + x*8
-			if si+4 > len(data) || di+8 > len(img.Pix) {
-				continue
-			}
-			v := binary.LittleEndian.Uint32(data[si:])
-			c0, c1, c2 := v&0x3FF, (v>>10)&0x3FF, (v>>20)&0x3FF
-			if swapRB {
-				c0, c2 = c2, c0
-			}
-			binary.BigEndian.PutUint16(img.Pix[di+0:], uint16(c0<<6|c0>>4))
-			binary.BigEndian.PutUint16(img.Pix[di+2:], uint16(c1<<6|c1>>4))
-			binary.BigEndian.PutUint16(img.Pix[di+4:], uint16(c2<<6|c2>>4))
-			binary.BigEndian.PutUint16(img.Pix[di+6:], 0xFFFF)
-		}
-	}
-	return img
-}
-
 func BufferToImageWithFormat(buf *ShmBuffer, format uint32) *image.RGBA {
 	if PixelFormat(format).Is10Bit() {
 		return tenBitToRGBA(buf, format)
@@ -172,10 +139,6 @@ func ImageToBuffer(img image.Image) (*ShmBuffer, error) {
 	return buf, nil
 }
 
-func EncodePNG(w io.Writer, img image.Image) error {
-	return encodePNG(w, img)
-}
-
 func EncodeJPEG(w io.Writer, img image.Image, quality int) error {
 	return jpeg.Encode(w, img, &jpeg.Options{Quality: quality})
 }
@@ -251,6 +214,6 @@ func WriteToFileWithFormat(buf *ShmBuffer, path string, format Format, quality i
 	case FormatPPM:
 		return EncodePPM(f, BufferToImageWithFormat(buf, pixelFormat))
 	default:
-		return EncodePNGTagged(f, BufferToImageDeep(buf, pixelFormat), cicp)
+		return EncodeBufferPNG(f, buf, pixelFormat, cicp)
 	}
 }
