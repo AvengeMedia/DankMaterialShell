@@ -1,0 +1,113 @@
+name: Claude Review
+
+# `/claude review` on a PR by a member of an allowed team. Review only, no edits or pushes.
+# Secrets: CLAUDE_CODE_OAUTH_TOKEN (claude setup-token), CLAUDE_REVIEW_ORG_READ_TOKEN (PAT, org Members: read)
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions: {}
+
+jobs:
+  gate:
+    if: github.event.issue.pull_request && startsWith(github.event.comment.body, '/claude review')
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    outputs:
+      allowed: ${{ steps.team.outputs.allowed }}
+    steps:
+      - name: Check team membership
+        id: team
+        env:
+          GH_TOKEN: ${{ secrets.CLAUDE_REVIEW_ORG_READ_TOKEN }}
+          ORG: ${{ github.repository_owner }}
+          USER: ${{ github.event.comment.user.login }}
+          TEAMS: dms-collaborators owners
+        run: |
+          allowed=false
+          for team in $TEAMS; do
+            state=$(gh api "orgs/$ORG/teams/$team/memberships/$USER" --jq .state 2>/dev/null || true)
+            [ "$state" = active ] && allowed=true && break
+          done
+          echo "allowed=$allowed" >> "$GITHUB_OUTPUT"
+
+      - name: React
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ALLOWED: ${{ steps.team.outputs.allowed }}
+          COMMENT_ID: ${{ github.event.comment.id }}
+        run: |
+          [ "$ALLOWED" = true ] && content=eyes || content=-1
+          gh api -X POST "repos/${{ github.repository }}/issues/comments/$COMMENT_ID/reactions" -f "content=$content"
+
+  review:
+    needs: gate
+    if: needs.gate.outputs.allowed == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    concurrency:
+      group: claude-review-${{ github.event.issue.number }}
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: refs/pull/${{ github.event.issue.number }}/head
+          fetch-depth: 0
+          submodules: recursive
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Review pull request #${{ github.event.issue.number }} in ${{ github.repository }}, requested by @${{ github.event.comment.user.login }}:
+
+            ---
+            ${{ github.event.comment.body }}
+            ---
+
+            Text after `/claude review` is an optional focus. Honor it but still report anything serious outside it.
+            The PR head is checked out. Use `gh pr view ${{ github.event.issue.number }}` and `gh pr diff ${{ github.event.issue.number }}`, read surrounding code as needed.
+
+            Steps:
+            1. Read CONTRIBUTING.md.
+            2. Read the PR title, description and diff.
+            3. Check existing comments so you don't repeat them: `gh api repos/${{ github.repository }}/pulls/${{ github.event.issue.number }}/comments` and `gh pr view ${{ github.event.issue.number }} --comments`. Skip findings already covered by a comment that still applies.
+            4. Verify each candidate finding against the code. Drop anything you can't confirm.
+            5. Post one inline comment per confirmed finding with `mcp__github_inline_comment__create_inline_comment` (`confirmed: true`). Say what's wrong, why, and the fix. Add a committable suggestion only if it alone fully fixes the issue.
+            6. Post one summary comment. If a comment starting with `## Claude review` already exists, `gh pr comment ${{ github.event.issue.number }} --edit-last --body ...`, else `gh pr comment ${{ github.event.issue.number }} --body ...`. Format:
+
+               ## Claude review
+               <one line verdict>
+               - <finding, file:line> per inline comment posted this run
+               Checked: <one line>. Model: claude-opus-5.
+
+               No findings: "No issues found." plus what was checked.
+
+            Flag only issues introduced by this PR:
+            - Bugs: wrong logic, crashes, nil/undefined access, races, leaks (timers, connections, processes, handles), bad Go error handling, edge cases that will clearly be hit.
+            - QML: undefined refs, missing imports, binding loops, bindings that never update, handlers on the wrong object, raw Flickable/ListView/ScrollView instead of the Dank* wrappers.
+            - Security: command injection, path traversal, unsafe file permissions, secrets in code.
+            - CONTRIBUTING.md rules: user-facing strings in `I18n.tr()` with translator context, reuse existing terms from quickshell/translations/en.json; en.json and template.json must not be touched in a PR; mocks under core/internal/mocks/ are regenerated not hand-edited; new dank-qml-common contract properties need the matching library change.
+            - Go: unformatted code, go.mod/go.sum out of sync with imports, tests that no longer compile.
+
+            Don't flag style or naming, pre-existing issues, anything a linter or compiler catches, speculative input-dependent problems, missing tests or docs, or refactor ideas. Not sure it's real: don't post it.
+
+            Review only. Never edit files, commit, push, approve or request changes. Post each finding once. Keep comments short.
+          claude_args: |
+            --model claude-opus-5
+            --max-turns 80
+            --allowedTools "Read,Grep,Glob,LS,Task,mcp__github_inline_comment__create_inline_comment,Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr comment:*),Bash(gh api repos/${{ github.repository }}/pulls/${{ github.event.issue.number }}/comments:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git blame:*)"
+            --disallowedTools "Edit,Write,MultiEdit,NotebookEdit,WebFetch,WebSearch"
+
+      - if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr comment ${{ github.event.issue.number }} --body "Claude review failed: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
