@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"runtime/debug"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/clipboard"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/colorpicker"
@@ -95,6 +96,10 @@ func runColorPick(cmd *cobra.Command, args []string) {
 		Autocopy:     colorAutocopy,
 		Notify:       colorNotify,
 	}
+
+	// One-shot process holding a few screen-sized buffers: skip GC cycles while it runs.
+	debug.SetGCPercent(-1)
+	debug.SetMemoryLimit(1 << 30)
 
 	picker := colorpicker.New(config)
 	color, err := picker.Run()

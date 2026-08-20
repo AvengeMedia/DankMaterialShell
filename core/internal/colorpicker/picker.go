@@ -35,18 +35,19 @@ type Output struct {
 }
 
 type LayerSurface struct {
-	output      *Output
-	state       *SurfaceState
-	wlSurface   *client.Surface
-	layerSurf   *wlr_layer_shell.ZwlrLayerSurfaceV1
-	viewport    *wp_viewporter.WpViewport
-	wlPools     [2]*client.ShmPool
-	wlBuffers   [2]*client.Buffer
-	slotBusy    [2]bool
-	needsRedraw bool
-	scopyBuffer *client.Buffer
-	configured  bool
-	hidden      bool
+	output       *Output
+	state        *SurfaceState
+	wlSurface    *client.Surface
+	layerSurf    *wlr_layer_shell.ZwlrLayerSurfaceV1
+	viewport     *wp_viewporter.WpViewport
+	wlPools      [2]*client.ShmPool
+	wlBuffers    [2]*client.Buffer
+	slotBusy     [2]bool
+	needsRedraw  bool
+	framePending bool
+	scopyBuffer  *client.Buffer
+	configured   bool
+	hidden       bool
 }
 
 type Picker struct {
@@ -65,6 +66,8 @@ type Picker struct {
 	screencopy *wlr_screencopy.ZwlrScreencopyManagerV1
 	viewporter *wp_viewporter.WpViewporter
 	colorMgr   *wp_color_management.WpColorManagerV1
+
+	compositorVersion uint32
 
 	shortcutsInhibitMgr *keyboard_shortcuts_inhibit.ZwpKeyboardShortcutsInhibitManagerV1
 	shortcutsInhibitor  *keyboard_shortcuts_inhibit.ZwpKeyboardShortcutsInhibitorV1
@@ -166,9 +169,10 @@ func (p *Picker) checkDone() {
 	}
 }
 
+// flushRedraws paints queued surfaces, at most once per compositor frame each.
 func (p *Picker) flushRedraws() {
 	for _, ls := range p.surfaces {
-		if !ls.needsRedraw {
+		if !ls.needsRedraw || ls.framePending {
 			continue
 		}
 		p.redrawSurface(ls)
@@ -215,6 +219,7 @@ func (p *Picker) handleGlobal(e client.RegistryGlobalEvent) {
 		compositor := client.NewCompositor(p.ctx)
 		if err := p.registry.Bind(e.Name, e.Interface, e.Version, compositor); err == nil {
 			p.compositor = compositor
+			p.compositorVersion = e.Version
 		}
 
 	case client.ShmInterfaceName:
@@ -547,17 +552,18 @@ func (p *Picker) captureForSurface(ls *LayerSurface) {
 
 func (p *Picker) redrawSurface(ls *LayerSurface) {
 	slot := ls.state.FrontIndex()
-	if ls.slotBusy[slot] {
+	if ls.slotBusy[slot] || ls.framePending {
 		ls.needsRedraw = true
 		return
 	}
 
 	var renderBuf *ShmBuffer
+	var damage []rect
 	switch {
 	case ls.hidden:
-		renderBuf = ls.state.RedrawScreenOnly()
+		renderBuf, damage = ls.state.RedrawScreenOnly()
 	default:
-		renderBuf = ls.state.Redraw()
+		renderBuf, damage = ls.state.Redraw()
 	}
 	if renderBuf == nil {
 		return
@@ -604,7 +610,25 @@ func (p *Picker) redrawSurface(ls *LayerSurface) {
 		_ = ls.wlSurface.SetBufferScale(bufferScale)
 	}
 	_ = ls.wlSurface.Attach(ls.wlBuffers[slot], 0, 0)
-	_ = ls.wlSurface.Damage(0, 0, int32(logicalW), int32(logicalH))
+	switch {
+	case p.compositorVersion < 4:
+		_ = ls.wlSurface.Damage(0, 0, int32(logicalW), int32(logicalH))
+	default:
+		for _, r := range damage {
+			r = r.clip(renderBuf.Width, renderBuf.Height)
+			if r.w <= 0 || r.h <= 0 {
+				continue
+			}
+			_ = ls.wlSurface.DamageBuffer(int32(r.x), int32(r.y), int32(r.w), int32(r.h))
+		}
+	}
+	if cb, err := ls.wlSurface.Frame(); err == nil {
+		ls.framePending = true
+		cb.SetDoneHandler(func(client.CallbackDoneEvent) {
+			_ = cb.Destroy()
+			ls.framePending = false
+		})
+	}
 	_ = ls.wlSurface.Commit()
 
 	ls.state.SwapBuffers()
