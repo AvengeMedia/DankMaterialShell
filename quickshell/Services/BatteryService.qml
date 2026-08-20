@@ -405,21 +405,37 @@ Singleton {
         return btDevices;
     }
 
-    // Format time remaining for charge/discharge
-    function formatTimeRemaining() {
-        if (!batteryAvailable) {
-            return "Unknown";
-        }
+    function estimatedSeconds() {
+        if (!batteryAvailable)
+            return 0;
 
         const rate = _smoothedChangeRate > 0 ? _smoothedChangeRate : changeRate;
         const totalTime = (isCharging) ? ((batteryCapacity - batteryEnergy) / rate) : (batteryEnergy / rate);
-        const avgTime = Math.abs(totalTime * 3600);
-        if (!avgTime || avgTime <= 0 || avgTime > 86400)
+        const seconds = Math.abs(totalTime * 3600);
+        if (!seconds || seconds <= 0 || seconds > 86400)
+            return 0;
+        return seconds;
+    }
+
+    // Format time remaining for charge/discharge
+    function formatTimeRemaining() {
+        const seconds = estimatedSeconds();
+        if (!seconds)
             return "Unknown";
 
-        const hours = Math.floor(avgTime / 3600);
-        const minutes = Math.floor((avgTime % 3600) / 60);
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
         return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+    }
+
+    function formatEstimatedTime() {
+        const seconds = estimatedSeconds();
+        if (!seconds)
+            return "";
+
+        const target = new Date(Date.now() + seconds * 1000);
+        const use24Hour = SettingsData.use24HourClock !== false;
+        return target.toLocaleTimeString(Qt.locale(), use24Hour ? "HH:mm" : "h:mm AP");
     }
 
     function getBatteryIcon() {
