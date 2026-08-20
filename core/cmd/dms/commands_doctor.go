@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"maps"
 	"os"
@@ -510,9 +511,8 @@ func checkVersions(qsMissingFeatures bool) []checkResult {
 		{catVersions, "DMS CLI", statusOK, formatVersion(Version), dmsCliDetails, doctorDocsURL + "#dms-cli"},
 	}
 
-	qsVersion, qsStatus, qsPath := getQuickshellVersionInfo(qsMissingFeatures)
-	qsDetails := ""
-	if doctorVerbose && qsPath != "" {
+	qsVersion, qsStatus, qsPath, qsDetails := getQuickshellVersionInfo(qsMissingFeatures)
+	if doctorVerbose && qsPath != "" && qsDetails == "" {
 		qsDetails = qsPath
 	}
 	results = append(results, checkResult{catVersions, "Quickshell", qsStatus, qsVersion, qsDetails, doctorDocsURL + "#quickshell"})
@@ -547,30 +547,43 @@ func getDMSShellVersion() (version, path string) {
 	return "", ""
 }
 
-func getQuickshellVersionInfo(missingFeatures bool) (string, status, string) {
+func getQuickshellVersionInfo(missingFeatures bool) (string, status, string, string) {
 	if !utils.CommandExists("qs") {
-		return "Not installed", statusError, ""
+		return "Not installed", statusError, "", ""
 	}
 
 	qsPath, _ := exec.LookPath("qs")
 
 	output, err := exec.Command("qs", "--version").Output()
 	if err != nil {
-		return "Installed (version check failed)", statusWarn, qsPath
+		details := "Run 'qs --version' to inspect the failure."
+		var exitErr *exec.ExitError
+		if errors.As(err, &exitErr) {
+			details = quickshellVersionFailureDetails(string(exitErr.Stderr))
+		}
+		return "Installed (version check failed)", statusWarn, qsPath, details
 	}
 
 	fullVersion := strings.TrimSpace(string(output))
 	if matches := quickshellVersionRegex.FindStringSubmatch(fullVersion); len(matches) >= 2 {
 		if version.CompareVersions(matches[1], "0.2.0") < 0 {
-			return fmt.Sprintf("%s (needs >= 0.2.0)", fullVersion), statusError, qsPath
+			return fmt.Sprintf("%s (needs >= 0.2.0)", fullVersion), statusError, qsPath, ""
 		}
 		if missingFeatures {
-			return fullVersion, statusWarn, qsPath
+			return fullVersion, statusWarn, qsPath, ""
 		}
-		return fullVersion, statusOK, qsPath
+		return fullVersion, statusOK, qsPath, ""
 	}
 
-	return fullVersion, statusWarn, qsPath
+	return fullVersion, statusWarn, qsPath, ""
+}
+
+func quickshellVersionFailureDetails(stderr string) string {
+	if strings.Contains(stderr, "undefined symbol:") && strings.Contains(stderr, "Qt_6_PRIVATE_API") {
+		return "Quickshell is incompatible with the installed Qt libraries. Rebuild or reinstall Quickshell against the current Qt version."
+	}
+
+	return "Run 'qs --version' to inspect the failure."
 }
 
 func checkDMSInstallation() []checkResult {
