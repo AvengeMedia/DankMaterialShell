@@ -89,20 +89,33 @@ Item {
             return;
         root.pasting = true;
 
-        // One pass over the clipboard. A type that is not text wins, since a
-        // clipboard carrying an image usually offers a text fallback too.
-        const script = "types=$(wl-paste --list-types 2>/dev/null)\n" + "media=$(printf '%s\\n' \"$types\" | grep -E '^(image|video|audio|application)/' | head -1)\n" + "if [ -n \"$media\" ]; then\n" + "  ext=${media##*/}\n" + "  case \"$ext\" in jpeg) ext=jpg ;; 'vnd.oasis.opendocument.text') ext=odt ;; esac\n" + "  f=$(mktemp \"${XDG_RUNTIME_DIR:-/tmp}/dms-chat-paste-XXXXXX.$ext\")\n" + "  wl-paste --type \"$media\" > \"$f\" 2>/dev/null\n" + "  if [ -s \"$f\" ]; then printf 'FILE:%s' \"$f\"; exit 0; fi\n" + "  rm -f \"$f\"\n" + "fi\n" + "printf 'TEXT:%s' \"$(wl-paste --no-newline 2>/dev/null)\"\n";
+        // One pass over the clipboard, in the order that matters:
+        //
+        //   1. a copied file, which a file manager offers as text/uri-list
+        //   2. raw media bytes, as a screenshot tool offers
+        //   3. text
+        //
+        // uri-list comes first because copying a file in a file manager also
+        // offers its name as text, and attaching the file is what was meant.
+        const script = "types=$(wl-paste --list-types 2>/dev/null)\n" + "if printf '%s\\n' \"$types\" | grep -qx 'text/uri-list'; then\n" + "  wl-paste --type text/uri-list 2>/dev/null | tr -d '\\r' | grep -v '^$' | while IFS= read -r u; do\n" + "    printf 'FILE:%s\\n' \"${u#file://}\"\n" + "  done\n" + "  exit 0\n" + "fi\n" + "media=$(printf '%s\\n' \"$types\" | grep -E '^(image|video|audio|application)/' | head -1)\n" + "if [ -n \"$media\" ]; then\n" + "  ext=${media##*/}\n" + "  case \"$ext\" in jpeg) ext=jpg ;; esac\n" + "  f=$(mktemp \"${XDG_RUNTIME_DIR:-/tmp}/dms-chat-paste-XXXXXX.$ext\")\n" + "  wl-paste --type \"$media\" > \"$f\" 2>/dev/null\n" + "  if [ -s \"$f\" ]; then printf 'FILE:%s\\n' \"$f\"; exit 0; fi\n" + "  rm -f \"$f\"\n" + "fi\n" + "printf 'TEXT:%s' \"$(wl-paste --no-newline 2>/dev/null)\"\n";
 
         Proc.runCommand("chat.paste", ["sh", "-c", script], (stdout, exitCode) => {
             root.pasting = false;
 
             const out = stdout || "";
+
+            // Several files can be copied at once, so every FILE line counts.
             if (out.startsWith("FILE:")) {
                 if (!root.canAttach) {
                     ToastService.showWarning(I18n.tr("Cannot attach"), I18n.tr("This provider does not accept attachments."));
                     return;
                 }
-                root.stage(out.slice(5).trim());
+
+                const lines = out.split("\n");
+                for (let i = 0; i < lines.length; i++) {
+                    if (lines[i].startsWith("FILE:"))
+                        root.stage(decodeURIComponent(lines[i].slice(5).trim()));
+                }
                 return;
             }
 

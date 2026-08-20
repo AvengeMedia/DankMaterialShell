@@ -11963,26 +11963,5 @@
     ],
     "icon": "database",
     "description": "Messages are kept forever"
-  },
-  {
-    "section": "chatHiddenTags",
-    "label": "What appears in the list",
-    "tabIndex": 46,
-    "category": "Chats",
-    "keywords": [
-      "appears",
-      "bridge",
-      "chat",
-      "chats",
-      "list",
-      "mail",
-      "message",
-      "messaging",
-      "provider",
-      "signal",
-      "what",
-      "whatsapp"
-    ],
-    "icon": "filter_alt"
   }
 ]

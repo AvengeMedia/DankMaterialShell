@@ -73,29 +73,36 @@ Singleton {
     // Every tag any conversation carries, for the settings toggles.
     property var knownTags: []
 
-    // Conversations after the user's hidden-tag setting.
+    // Conversations after each provider's own hidden-tag setting.
     //
-    // Applied here rather than in each view so the chat list, the runner and
-    // anything else agree on what is visible.
+    // Per provider rather than global: which categories exist is a property of
+    // the service, so WhatsApp decides about its statuses and channels and a
+    // mail plugin decides about its labels. Applied here rather than in each
+    // view so the chat list and the runner agree on what is visible.
     readonly property var visibleChats: {
-        const hidden = SettingsData.chatHiddenTags || [];
-        if (hidden.length === 0)
-            return chats;
-
         const out = [];
         for (let i = 0; i < chats.length; i++) {
-            const tags = chats[i].tags || [];
-            let drop = false;
-            for (let t = 0; t < tags.length; t++) {
-                if (hidden.indexOf(tags[t]) !== -1) {
-                    drop = true;
-                    break;
-                }
-            }
-            if (!drop)
+            if (!isChatHidden(chats[i]))
                 out.push(chats[i]);
         }
         return out;
+    }
+
+    // isChatHidden reads the hiddenTags list a provider's own settings maintain.
+    function isChatHidden(chat) {
+        if (!chat)
+            return false;
+
+        const hidden = SettingsData.getPluginSetting(chat.provider, "hiddenTags", []);
+        if (!hidden || hidden.length === 0)
+            return false;
+
+        const tags = chat.tags || [];
+        for (let t = 0; t < tags.length; t++) {
+            if (hidden.indexOf(tags[t]) !== -1)
+                return true;
+        }
+        return false;
     }
 
     function refreshTags() {
@@ -105,26 +112,6 @@ Singleton {
             if (!response.error)
                 root.knownTags = response.result?.tags || [];
         });
-    }
-
-    // isTagHidden reports whether conversations with a tag are kept out of the
-    // list and the runner.
-    function isTagHidden(tag) {
-        return (SettingsData.chatHiddenTags || []).indexOf(tag) !== -1;
-    }
-
-    function setTagHidden(tag, hidden) {
-        const current = (SettingsData.chatHiddenTags || []).slice();
-        const at = current.indexOf(tag);
-
-        if (hidden && at === -1)
-            current.push(tag);
-        else if (!hidden && at !== -1)
-            current.splice(at, 1);
-        else
-            return;
-
-        SettingsData.set("chatHiddenTags", current);
     }
 
     readonly property int totalUnread: {

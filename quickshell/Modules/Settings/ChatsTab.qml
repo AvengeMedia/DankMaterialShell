@@ -109,45 +109,6 @@ Item {
                 }
             }
 
-            SettingsCard {
-                width: parent.width
-                iconName: "filter_alt"
-                title: I18n.tr("What appears in the list")
-                settingKey: "chatHiddenTags"
-                visible: ChatService.available
-
-                StyledText {
-                    width: parent.width
-                    text: I18n.tr("Conversations are tagged by whichever provider they came from. Turn one off to keep it out of the conversation list and the runner. Searching still finds it.")
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceVariantText
-                    wrapMode: Text.WordWrap
-                }
-
-                // One toggle per tag actually in use, so a provider installed
-                // later brings its own categories without a change here.
-                Repeater {
-                    model: ChatService.knownTags
-
-                    SettingsToggleRow {
-                        required property var modelData
-
-                        width: parent.width
-                        text: I18n.tr("Show %1").arg(modelData)
-                        checked: !ChatService.isTagHidden(modelData)
-                        onToggled: checked => ChatService.setTagHidden(modelData, !checked)
-                    }
-                }
-
-                StyledText {
-                    width: parent.width
-                    visible: ChatService.knownTags.length === 0
-                    text: I18n.tr("No tags yet. They appear once a provider is connected.")
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceVariantText
-                }
-            }
-
             StyledText {
                 width: parent.width
                 visible: ChatService.available

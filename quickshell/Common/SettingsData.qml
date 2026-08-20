@@ -128,11 +128,6 @@ Singleton {
     property int chatHistoryRetentionDays: 0
     property int chatMediaCacheMaxMB: 512
 
-    // Tags kept out of the conversation list and the runner, for example
-    // archived, status or channel. A list rather than a toggle per tag, because
-    // the tags themselves come from whichever providers are installed.
-    property var chatHiddenTags: ["archived", "status", "channel", "broadcast"]
-
     property var launcherPluginVisibility: ({})
 
     function getPluginAllowWithoutTrigger(pluginId) {

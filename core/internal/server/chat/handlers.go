@@ -368,7 +368,14 @@ func handleSend(ctx context.Context, conn *models.Conn, req models.Request, m *M
 
 	text := models.GetOr(req, "text", "")
 	replyTo := models.GetOr(req, "replyTo", "")
-	attachments, _ := models.Get[[]any](req, "attachments")
+	rawAttachments, _ := models.Get[[]any](req, "attachments")
+
+	attachments := make([]string, 0, len(rawAttachments))
+	for _, item := range rawAttachments {
+		if path, ok := item.(string); ok && path != "" {
+			attachments = append(attachments, path)
+		}
+	}
 
 	if text == "" && len(attachments) == 0 {
 		models.RespondError(conn, req.ID, "nothing to send")
@@ -385,10 +392,56 @@ func handleSend(ctx context.Context, conn *models.Conn, req models.Request, m *M
 		return
 	}
 
-	// A pending row goes in first so the message appears in the conversation
-	// immediately rather than after the network round trip.
+	// No attachments: one message, the simple case.
+	if len(attachments) == 0 {
+		id, err := m.sendOne(ctx, b, provider, chatID, text, replyTo, "")
+		if err != nil {
+			models.RespondError(conn, req.ID, err.Error())
+			return
+		}
+		models.Respond(conn, req.ID, sendResponse{Success: true, MessageID: id})
+		return
+	}
+
+	// One message per attachment, each with its own row.
+	//
+	// The provider sends them separately, so recording a single row would show
+	// one message in the conversation while several actually went out. The
+	// caption rides on the first, as it does in other clients.
+	var lastID string
+	for i, path := range attachments {
+		caption := ""
+		if i == 0 {
+			caption = text
+		}
+
+		// Only the first carries the reply, so a batch does not quote the same
+		// message several times over.
+		reply := ""
+		if i == 0 {
+			reply = replyTo
+		}
+
+		id, err := m.sendOne(ctx, b, provider, chatID, caption, reply, path)
+		if err != nil {
+			models.RespondError(conn, req.ID, err.Error())
+			return
+		}
+		lastID = id
+	}
+
+	models.Respond(conn, req.ID, sendResponse{Success: true, MessageID: lastID})
+}
+
+// sendOne records a message, hands it to the bridge, and reconciles the row
+// with whatever id the provider assigned.
+//
+// A pending row goes in first so the message appears in the conversation
+// immediately rather than after the network round trip.
+func (m *Manager) sendOne(ctx context.Context, b *bridge, provider, chatID, text, replyTo, attachment string) (string, error) {
 	pendingID := fmt.Sprintf("pending-%d", time.Now().UnixNano())
 	now := time.Now().UnixMilli()
+
 	pending := chat.Message{
 		Provider: provider, ChatID: chatID, ID: pendingID, TS: now,
 		FromMe: true, Kind: chat.KindText, Text: text,
@@ -399,19 +452,18 @@ func handleSend(ctx context.Context, conn *models.Conn, req models.Request, m *M
 	// echo it back. The user picked a local file, so there is nothing to
 	// download -- and without this, a photo you sent shows as a bare caption
 	// while the same photo received from someone else renders fine.
-	if len(attachments) > 0 {
-		if first, ok := attachments[0].(string); ok && first != "" {
-			mime := chat.MimeForPath(first)
-			if cached, err := m.Media().Adopt(provider, pendingID, mime, first); err == nil {
-				pending.MediaPath = cached
-				pending.MediaMime = mime
-				pending.Kind = chat.KindForPath(first)
-				pending.FileName = filepath.Base(first)
-			} else {
-				log.Warnf("chat: could not cache the sent attachment: %v", err)
-			}
+	if attachment != "" {
+		mime := chat.MimeForPath(attachment)
+		if cached, err := m.Media().Adopt(provider, pendingID, mime, attachment); err == nil {
+			pending.MediaPath = cached
+			pending.MediaMime = mime
+			pending.Kind = chat.KindForPath(attachment)
+			pending.FileName = filepath.Base(attachment)
+		} else {
+			log.Warnf("chat: could not cache the sent attachment: %v", err)
 		}
 	}
+
 	if err := m.Store().PutMessage(ctx, pending); err != nil {
 		log.Warnf("chat: could not record pending message: %v", err)
 	}
@@ -421,6 +473,9 @@ func handleSend(ctx context.Context, conn *models.Conn, req models.Request, m *M
 	params := map[string]any{"chatId": chatID}
 	if text != "" {
 		params["text"] = text
+	}
+	if attachment != "" {
+		params["attachments"] = []string{attachment}
 	}
 	if replyTo != "" {
 		params["replyTo"] = replyTo
@@ -432,12 +487,10 @@ func handleSend(ctx context.Context, conn *models.Conn, req models.Request, m *M
 			params["replyToText"] = quoted.Text
 			params["replyToSender"] = quoted.SenderID
 			params["replyToFromMe"] = quoted.FromMe
+			params["replyToKind"] = quoted.Kind
 		} else {
 			log.Warnf("chat: replying to a message that is not stored: %v", err)
 		}
-	}
-	if len(attachments) > 0 {
-		params["attachments"] = attachments
 	}
 
 	frame, err := b.call(ctx, MethodSend, params)
@@ -446,8 +499,7 @@ func handleSend(ctx context.Context, conn *models.Conn, req models.Request, m *M
 		// not go out rather than having it silently vanish.
 		_ = m.Store().SetMessageStatus(ctx, provider, pendingID, chat.StatusFailed)
 		m.markDirty()
-		models.RespondError(conn, req.ID, err.Error())
-		return
+		return "", err
 	}
 
 	messageID := pendingID
@@ -464,6 +516,7 @@ func handleSend(ctx context.Context, conn *models.Conn, req models.Request, m *M
 		if err := m.Store().DeleteMessage(ctx, provider, chatID, pendingID); err != nil {
 			log.Warnf("chat: could not clear pending message: %v", err)
 		}
+
 		sent := pending
 		sent.ID = messageID
 		sent.Status = chat.StatusSent
@@ -484,7 +537,7 @@ func handleSend(ctx context.Context, conn *models.Conn, req models.Request, m *M
 	}
 
 	m.markDirty()
-	models.Respond(conn, req.ID, sendResponse{Success: true, MessageID: messageID})
+	return messageID, nil
 }
 
 func handleMarkRead(ctx context.Context, conn *models.Conn, req models.Request, m *Manager) {
