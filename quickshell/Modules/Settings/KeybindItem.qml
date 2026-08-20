@@ -1254,6 +1254,66 @@ Item {
                     readonly property var argConfig: Actions.getActionArgConfig(KeybindsService.currentProvider, root.editAction)
                     readonly property var parsedArgs: Actions.parseCompositorActionArgs(KeybindsService.currentProvider, root.editAction)
 
+                    readonly property int argCount: argConfig?.config?.args?.length || 0
+
+                    readonly property int argEditorCount: {
+                        const defs = argConfig?.config?.args || [];
+                        let count = 0;
+
+                        for (let i = 0; i < defs.length; i++) {
+                            if (shouldShowArgEditor(i, defs[i]))
+                                count++;
+                        }
+
+                        return count;
+                    }
+
+                    function shouldShowArgEditor(index, argDef) {
+                        if (!argDef)
+                            return false;
+
+                        if (argDef.type !== "text" && argDef.type !== "number")
+                            return false;
+
+                        if (KeybindsService.currentProvider === "mangowc")
+                            return true;
+
+                        return index === 0;
+                    }
+
+                    function displayArgValue(argDef) {
+                        if (!argDef || !parsedArgs?.args)
+                            return "";
+
+                        const value = parsedArgs.args[argDef.name];
+
+                        if (value === undefined || value === null)
+                            return "";
+
+                        if (argDef.emptyValue !== undefined && value === argDef.emptyValue)
+                            return "";
+
+                        return String(value);
+                    }
+
+                    function commitArgValue(argDef, textValue) {
+                        if (!argDef || !argConfig)
+                            return;
+
+                        const parsed = parsedArgs;
+                        const args = Object.assign({}, parsed?.args || {});
+
+                        args[argDef.name] = textValue;
+
+                        root.updateEdit({
+                            "action": Actions.buildCompositorAction(
+                                KeybindsService.currentProvider,
+                                parsed?.base || argConfig.base,
+                                args
+                            )
+                        });
+                    }
+
                     StyledText {
                         text: I18n.tr("Options")
                         font.pixelSize: Theme.fontSizeSmall
@@ -1266,51 +1326,78 @@ Item {
                         Layout.fillWidth: true
                         spacing: Theme.spacingS
 
-                        DankTextField {
-                            id: argValueField
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: root._inputHeight
+                        Repeater {
+                            model: optionsRow.argCount
 
-                            readonly property string _argName: optionsRow.argConfig?.config?.args[0]?.name || "value"
+                            delegate: ColumnLayout {
+                                id: argEditor
 
-                            visible: {
-                                const cfg = optionsRow.argConfig;
-                                if (!cfg?.config?.args)
-                                    return false;
-                                const firstArg = cfg.config.args[0];
-                                return firstArg && (firstArg.type === "text" || firstArg.type === "number");
-                            }
-                            placeholderText: optionsRow.argConfig?.config?.args[0]?.placeholder || ""
+                                required property int index
 
-                            function commitValue(textValue) {
-                                const cfg = optionsRow.argConfig;
-                                if (!cfg)
-                                    return;
-                                const parsed = optionsRow.parsedArgs;
-                                const args = Object.assign({}, parsed?.args || {});
-                                args[_argName] = textValue;
-                                root.updateEdit({
-                                    "action": Actions.buildCompositorAction(KeybindsService.currentProvider, parsed?.base || cfg.base, args)
-                                });
-                            }
+                                readonly property var argDef: optionsRow.argConfig?.config?.args[index] || null
+                                readonly property bool editorVisible: optionsRow.shouldShowArgEditor(index, argDef)
 
-                            Connections {
-                                target: optionsRow
-                                function onParsedArgsChanged() {
-                                    const argName = argValueField._argName;
-                                    const newText = optionsRow.parsedArgs?.args[argName] || "";
-                                    if (argValueField.text !== newText)
-                                        argValueField.text = newText;
+                                Layout.fillWidth: editorVisible
+                                spacing: Theme.spacingXS
+                                visible: editorVisible
+
+                                StyledText {
+                                    text: I18n.tr(argEditor.argDef?.label || "", "keybind option label")
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: Theme.surfaceVariantText
+                                    Layout.fillWidth: true
+                                    Layout.leftMargin: 6
+                                    horizontalAlignment: Text.AlignLeft
+                                    visible: optionsRow.argEditorCount > 1
+                                }
+
+                                DankTextField {
+                                    id: argField
+
+                                    Layout.fillWidth: true
+                                    Layout.preferredHeight: root._inputHeight
+                                    placeholderText: I18n.tr(argEditor.argDef?.placeholder || "", "keybind option placeholder")
+
+                                    property bool _syncing: false
+
+                                    function syncFromAction() {
+                                        const newText = optionsRow.displayArgValue(argEditor.argDef);
+
+                                        if (text === newText)
+                                            return;
+
+                                        _syncing = true;
+                                        text = newText;
+                                        _syncing = false;
+                                    }
+
+                                    Connections {
+                                        target: optionsRow
+
+                                        function onParsedArgsChanged() {
+                                            argField.syncFromAction();
+                                        }
+                                    }
+
+                                    Connections {
+                                        target: argEditor
+
+                                        function onArgDefChanged() {
+                                            argField.syncFromAction();
+                                        }
+                                    }
+
+                                    Component.onCompleted: {
+                                        syncFromAction();
+                                    }
+
+                                    onTextChanged: {
+                                        if (!_syncing)
+                                            optionsRow.commitArgValue(argEditor.argDef, text);
+                                    }
                                 }
                             }
-
-                            Component.onCompleted: {
-                                text = optionsRow.parsedArgs?.args[_argName] || "";
-                            }
-
-                            onTextChanged: commitValue(text)
                         }
-
                         RowLayout {
                             visible: {
                                 const cfg = optionsRow.argConfig;
