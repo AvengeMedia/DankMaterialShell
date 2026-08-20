@@ -9,6 +9,7 @@ require (
 	github.com/charmbracelet/bubbles v1.0.0
 	github.com/charmbracelet/bubbletea v1.3.10
 	github.com/charmbracelet/lipgloss v1.1.0
+	github.com/dlclark/regexp2/v2 v2.5.1
 	github.com/fsnotify/fsnotify v1.10.1
 	github.com/godbus/dbus/v5 v5.2.2
 	github.com/holoplot/go-evdev v0.0.0-20260504100651-66d1748fe847
@@ -20,7 +21,6 @@ require (
 	github.com/yeqown/go-qrcode/v2 v2.2.5
 	github.com/yeqown/go-qrcode/writer/standard v1.3.0
 	github.com/yuin/goldmark v1.8.4
-	github.com/yuin/goldmark-highlighting/v2 v2.0.0-20230729083705-37449abec8cc
 	go.etcd.io/bbolt v1.5.0
 	go4.org/mem v0.0.0-20240501181205-ae6ca9944745
 	golang.org/x/image v0.44.0
@@ -39,7 +39,6 @@ require (
 	github.com/coder/websocket v1.8.15 // indirect
 	github.com/danielgtaylor/huma/v2 v2.39.1 // indirect
 	github.com/dblohm7/wingoes v0.0.0-20260526185140-fb298caac7ca // indirect
-	github.com/dlclark/regexp2/v2 v2.5.1 // indirect
 	github.com/ebitengine/purego v0.10.2 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/fogleman/gg v1.3.0 // indirect
@@ -113,4 +112,5 @@ require (
 // See: https://github.com/mattn/go-localereader/issues/2
 replace github.com/mattn/go-localereader v0.0.1 => github.com/mattn/go-localereader v0.0.2-0.20220822084749-2491eb6c1c75
 
+// This is because go-runewidth > 0.0.25 builds LUTs at startup
 replace github.com/mattn/go-runewidth => github.com/mattn/go-runewidth v0.0.25

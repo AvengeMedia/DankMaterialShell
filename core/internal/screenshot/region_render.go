@@ -70,15 +70,6 @@ func (d dirtyRect) empty() bool {
 	return d.x2 <= d.x1 || d.y2 <= d.y1
 }
 
-func (d dirtyRect) union(o dirtyRect) dirtyRect {
-	return dirtyRect{
-		x1: min(d.x1, o.x1),
-		y1: min(d.y1, o.y1),
-		x2: max(d.x2, o.x2),
-		y2: max(d.y2, o.y2),
-	}
-}
-
 func (d dirtyRect) intersect(o dirtyRect) dirtyRect {
 	return dirtyRect{
 		x1: max(d.x1, o.x1),
