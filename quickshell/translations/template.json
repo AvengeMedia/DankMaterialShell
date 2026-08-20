@@ -21810,47 +21810,5 @@
     "context": "↑/↓: Navigate • Enter: Paste • Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help",
     "reference": "",
     "comment": "Keyboard hints when enter-to-paste is enabled"
-  },
-  {
-    "term": "Smart",
-    "translation": "",
-    "context": "matugen color scheme option",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Automatically picks the scheme variant based on the wallpaper. Requires matugen 4.2+.",
-    "translation": "",
-    "context": "Automatically picks the scheme variant based on the wallpaper. Requires matugen 4.2+.",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Auto From Wallpaper",
-    "translation": "",
-    "context": "Auto From Wallpaper",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Dark or light mode follows the wallpaper brightness (requires matugen 4.2+)",
-    "translation": "",
-    "context": "Dark or light mode follows the wallpaper brightness (requires matugen 4.2+)",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Auto (Dark Mode)",
-    "translation": "",
-    "context": "Auto (Dark Mode)",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Auto (Light Mode)",
-    "translation": "",
-    "context": "Auto (Light Mode)",
-    "reference": "",
-    "comment": ""
   }
 ]
