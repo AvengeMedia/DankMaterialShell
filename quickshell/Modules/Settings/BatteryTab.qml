@@ -150,26 +150,15 @@ done
                                 }
 
                                 StyledText {
-                                    text: BatteryService.formatTimeRemaining()
+                                    text: {
+                                        const remaining = BatteryService.formatTimeRemaining();
+                                        const estimated = BatteryService.formatEstimatedTime();
+                                        return estimated ? `${remaining} (${estimated})` : remaining;
+                                    }
                                     font.pixelSize: Theme.fontSizeMedium
                                     font.weight: Font.Medium
                                     color: Theme.surfaceText
                                     width: parent.width
-                                    elide: Text.ElideRight
-                                }
-
-                                StyledText {
-                                    text: {
-                                        const time = BatteryService.formatEstimatedTime();
-                                        if (!time)
-                                            return "";
-                                        const label = BatteryService.isCharging ? I18n.tr("Full around %1") : I18n.tr("Empty around %1");
-                                        return label.arg(time);
-                                    }
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: Theme.surfaceTextMedium
-                                    width: parent.width
-                                    visible: text.length > 0
                                     elide: Text.ElideRight
                                 }
                             }
