@@ -382,9 +382,9 @@ func (p *NiriParser) processNodes(nodes []*document.Node, section *NiriSection, 
 		case "input":
 			p.handleInput(node)
 		case "binds":
-			p.extractBinds(node, section, "")
+			p.extractBinds(node, "")
 		case "recent-windows":
-			p.handleRecentWindows(node, section)
+			p.handleRecentWindows(node)
 		}
 	}
 }
@@ -438,7 +438,7 @@ func (p *NiriParser) HasDMSBindsIncluded() bool {
 	return p.dmsBindsIncluded
 }
 
-func (p *NiriParser) handleRecentWindows(node *document.Node, section *NiriSection) {
+func (p *NiriParser) handleRecentWindows(node *document.Node) {
 	if node.Children == nil {
 		return
 	}
@@ -447,11 +447,11 @@ func (p *NiriParser) handleRecentWindows(node *document.Node, section *NiriSecti
 		if child.Name.String() != "binds" {
 			continue
 		}
-		p.extractBinds(child, section, "Alt-Tab")
+		p.extractBinds(child, "Alt-Tab")
 	}
 }
 
-func (p *NiriParser) extractBinds(node *document.Node, section *NiriSection, subcategory string) {
+func (p *NiriParser) extractBinds(node *document.Node, subcategory string) {
 	if node.Children == nil {
 		return
 	}

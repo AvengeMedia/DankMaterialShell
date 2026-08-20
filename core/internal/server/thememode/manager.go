@@ -193,9 +193,7 @@ func (m *Manager) Close() {
 
 func (m *Manager) WatchLoginctl(lm *loginctl.Manager) {
 	ch := lm.Subscribe("thememode")
-	m.wg.Add(1)
-	go func() {
-		defer m.wg.Done()
+	m.wg.Go(func() {
 		defer lm.Unsubscribe("thememode")
 		for {
 			select {
@@ -211,7 +209,7 @@ func (m *Manager) WatchLoginctl(lm *loginctl.Manager) {
 				m.TriggerUpdate()
 			}
 		}
-	}()
+	})
 }
 
 func (m *Manager) schedulerLoop() {

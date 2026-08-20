@@ -16,6 +16,7 @@ Column {
     property var model: null
     property var expandedWidgetData: null
     property var bluetoothCodecSelector: null
+    property var audioPortSelector: null
     property bool darkModeTransitionPending: false
     property string screenName: ""
     property string screenModel: ""
@@ -379,6 +380,7 @@ Column {
                 expandedSection: active ? root.expandedSection : retainedSection
                 expandedWidgetData: active ? root.expandedWidgetData : retainedWidgetData
                 bluetoothCodecSelector: root.bluetoothCodecSelector
+                audioPortSelector: root.audioPortSelector
                 widgetModel: root.model
                 collapseCallback: root.collapseRequested
                 screenName: root.screenName

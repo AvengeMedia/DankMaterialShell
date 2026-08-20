@@ -3,6 +3,7 @@ package plugins
 import (
 	"encoding/json"
 	"fmt"
+	"maps"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -190,8 +191,6 @@ func (lock *PluginLockfile) SetRepositoryCommit(repo, commit string) {
 
 func (lock PluginLockfile) Clone() PluginLockfile {
 	cloned := NewPluginLockfile()
-	for id, plugin := range lock.Plugins {
-		cloned.Plugins[id] = plugin
-	}
+	maps.Copy(cloned.Plugins, lock.Plugins)
 	return cloned
 }

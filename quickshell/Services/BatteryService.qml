@@ -406,9 +406,8 @@ Singleton {
     }
 
     function estimatedSeconds() {
-        if (!batteryAvailable) {
+        if (!batteryAvailable)
             return 0;
-        }
 
         const rate = _smoothedChangeRate > 0 ? _smoothedChangeRate : changeRate;
         const totalTime = (isCharging) ? ((batteryCapacity - batteryEnergy) / rate) : (batteryEnergy / rate);

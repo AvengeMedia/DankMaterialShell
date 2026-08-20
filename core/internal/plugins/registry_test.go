@@ -119,6 +119,7 @@ func TestRealGitClientRevisionCheckout(t *testing.T) {
 }
 
 func setupTestRegistry(t *testing.T) (*Registry, afero.Fs, string) {
+	t.Helper()
 	fs := afero.NewMemMapFs()
 	tmpDir := "/test-cache"
 	registry := &Registry{

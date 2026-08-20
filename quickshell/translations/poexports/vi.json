@@ -875,6 +875,9 @@
   "Auto-Hide Timeout": {
     "Auto-Hide Timeout": "Thời gian chờ tự động ẩn"
   },
+  "Auto-close Niri overview when DMS launches or focuses a window.": {
+    "Auto-close Niri overview when DMS launches or focuses a window.": ""
+  },
   "Auto-close Niri overview when launching apps.": {
     "Auto-close Niri overview when launching apps.": "Tự động đóng phần tổng quan Niri khi khởi chạy ứng dụng."
   },
@@ -1042,6 +1045,9 @@
   },
   "Bar Inset Padding": {
     "Bar Inset Padding": "Khoảng Cách Lề Thanh"
+  },
+  "Bar Length Padding": {
+    "Bar Length Padding": ""
   },
   "Bar Opacity": {
     "Bar Opacity": "Độ mờ thanh"
@@ -1430,6 +1436,9 @@
   "Choose colors from palette": {
     "Choose colors from palette": "Chọn màu từ bảng màu"
   },
+  "Choose how the bar meets the screen edge": {
+    "Choose how the bar meets the screen edge": ""
+  },
   "Choose how the weather widget is displayed": {
     "Choose how the weather widget is displayed": "Chọn cách hiển thị tiện ích thời tiết"
   },
@@ -1579,6 +1588,9 @@
   },
   "Close All Windows": {
     "Close All Windows": "Đóng tất cả cửa sổ"
+  },
+  "Close Niri Overview on Window Focus": {
+    "Close Niri Overview on Window Focus": ""
   },
   "Close Overview on Launch": {
     "Close Overview on Launch": "Đóng phần tổng quan khi khởi chạy"
@@ -1910,11 +1922,17 @@
   "Copy Text": {
     "Copy Text": "Sao chép văn bản"
   },
+  "Copy target (%1)": {
+    "Copy target (%1)": ""
+  },
   "Corner Radius": {
     "Corner Radius": "Bán kính góc"
   },
   "Corner Radius Override": {
     "Corner Radius Override": "Ghi đè bán kính góc"
+  },
+  "Corner Style": {
+    "Corner Style": ""
   },
   "Corners & Background": {
     "Corners & Background": "Góc & Nền"
@@ -3383,6 +3401,9 @@
   "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": {
     "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": "Trôi chảy: Giảm tốc khối mượt mà khi vào, bật ra nhanh chóng — những đường cong sạch sẽ, thanh lịch."
   },
+  "Flush": {
+    "Flush": ""
+  },
   "Focus": {
     "Focus": "Tiêu điểm"
   },
@@ -3637,6 +3658,9 @@
   },
   "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
     "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
+  },
+  "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
+    "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
   },
   "Generic": {
     "Generic": "Chung"
@@ -6407,6 +6431,9 @@
   "Recommended available": {
     "Recommended available": "Đề xuất có sẵn"
   },
+  "Reduce the visible bar length from both ends": {
+    "Reduce the visible bar length from both ends": ""
+  },
   "Refresh": {
     "Refresh": "Làm mới"
   },
@@ -6691,6 +6718,9 @@
   },
   "Root Filesystem": {
     "Root Filesystem": "Hệ thống tệp gốc"
+  },
+  "Rounded": {
+    "Rounded": ""
   },
   "Rounded corners for windows": {
     "Rounded corners for windows": "Bo góc cho cửa sổ"
@@ -7652,6 +7682,9 @@
   "Spotlight Search": {
     "Spotlight Search": "Tìm kiếm nhanh"
   },
+  "Square": {
+    "Square": ""
+  },
   "Square Corners": {
     "Square Corners": "Bo góc vuông"
   },
@@ -8002,6 +8035,9 @@
   },
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
     "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "Các thiết lập dưới đây sẽ thay đổi GTK và Qt. Hãy sao lưu cấu hình hiện tại nếu cần (qt5ct.conf|qt6ct.conf và ~/.config/gtk-3.0|gtk-4.0)."
+  },
+  "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": {
+    "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": ""
   },
   "The custom command used when attaching to sessions (receives the session name as the first argument)": {
     "The custom command used when attaching to sessions (receives the session name as the first argument)": "Lệnh tùy chỉnh được sử dụng khi đính kèm vào các phiên (nhận tên phiên làm đối số đầu tiên)"
@@ -9043,6 +9079,9 @@
   },
   "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": {
     "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": "Bạn cần đặt một trong hai:\nQT_QPA_PLATFORMTHEME=gtk3 HOẶC\nQT_QPA_PLATFORMTHEME=qt6ct\nlàm biến môi trường, sau đó khởi động lại shell.\n\nqt6ct yêu cầu cài đặt qt6ct-kde."
+  },
+  "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": {
+    "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": ""
   },
   "You'll enter your password at the greeter after the next reboot.": {
     "You'll enter your password at the greeter after the next reboot.": "Bạn sẽ nhập mật khẩu tại greeter sau lần khởi động lại tiếp theo."

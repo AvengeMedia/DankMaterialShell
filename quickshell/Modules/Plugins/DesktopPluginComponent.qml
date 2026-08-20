@@ -14,6 +14,9 @@ Item {
     property real minWidth: 100
     property real minHeight: 100
 
+    property var requestResize: null
+    property var clearResize: null
+
     readonly property bool isInstance: instanceId !== "" && instanceData !== null
     readonly property var instanceConfig: instanceData?.config ?? {}
 

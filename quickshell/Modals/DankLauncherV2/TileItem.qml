@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import Quickshell.Widgets
 import Quickshell.Wayland
 import qs.Common
 import qs.Services
@@ -77,12 +78,11 @@ Rectangle {
         anchors.fill: parent
         anchors.margins: 4
 
-        Rectangle {
+        ClippingRectangle {
             id: imageContainer
             anchors.fill: parent
             radius: Theme.cornerRadius - 2
             color: Theme.surfaceContainerHigh
-            clip: true
 
             ScreencopyView {
                 id: screencopyView

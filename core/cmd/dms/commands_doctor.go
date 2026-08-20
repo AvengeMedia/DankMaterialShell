@@ -1347,8 +1347,8 @@ func fontInFcList(name, cacheLower string) bool {
 	if target == "" {
 		return false
 	}
-	for _, line := range strings.Split(cacheLower, "\n") {
-		for _, fam := range strings.Split(strings.TrimSpace(line), ",") {
+	for line := range strings.SplitSeq(cacheLower, "\n") {
+		for fam := range strings.SplitSeq(strings.TrimSpace(line), ",") {
 			if strings.TrimSpace(fam) == target {
 				return true
 			}

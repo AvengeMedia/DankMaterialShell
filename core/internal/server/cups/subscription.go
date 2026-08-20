@@ -117,10 +117,7 @@ func (sm *SubscriptionManager) notificationLoop() {
 		if err != nil {
 			log.Warnf("[CUPS] Error fetching notifications: %v", err)
 			jitter := time.Duration(50+(time.Now().UnixNano()%200)) * time.Millisecond
-			sleepTime := backoff + jitter
-			if sleepTime > 30*time.Second {
-				sleepTime = 30 * time.Second
-			}
+			sleepTime := min(backoff+jitter, 30*time.Second)
 			select {
 			case <-sm.stopChan:
 				return

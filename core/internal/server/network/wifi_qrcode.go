@@ -46,7 +46,7 @@ func iwdConfigPath(ssid string) string {
 
 func parseIWDPassphrase(data string) (string, error) {
 	inSecurity := false
-	for _, line := range strings.Split(data, "\n") {
+	for line := range strings.SplitSeq(data, "\n") {
 		line = strings.TrimSpace(line)
 		switch {
 		case line == "[Security]":

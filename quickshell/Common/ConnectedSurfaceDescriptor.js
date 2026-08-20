@@ -41,6 +41,12 @@ function _barSide(value, fallback) {
     return fallback;
 }
 
+function _layer(value, fallback) {
+    if (value === "overlay" || value === "top")
+        return value;
+    return fallback === "overlay" ? "overlay" : "top";
+}
+
 function slotForKind(kind) {
     return kind === "launcher" ? "modal" : _kind(kind, "modal");
 }
@@ -86,6 +92,7 @@ function normalize(input, defaults) {
         "phase": inferPhase(visible, presented, source.phase !== undefined ? source.phase : base.phase),
         "visible": visible,
         "presented": presented,
+        "layer": _layer(source.layer, _layer(base.layer, "top")),
         "barSide": _barSide(source.barSide, _barSide(base.barSide, defaultSide)),
         "bodyRect": bodyRect,
         "animationOffset": animationOffset,
@@ -124,6 +131,7 @@ function same(a, b, threshold) {
         && a.phase === b.phase
         && a.visible === b.visible
         && a.presented === b.presented
+        && a.layer === b.layer
         && a.barSide === b.barSide
         && Math.abs(a.bodyRect.x - b.bodyRect.x) < epsilon
         && Math.abs(a.bodyRect.y - b.bodyRect.y) < epsilon

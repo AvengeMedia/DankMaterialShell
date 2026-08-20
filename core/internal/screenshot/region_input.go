@@ -213,7 +213,7 @@ func (r *RegionSelector) finishSelection() {
 
 	srcData := srcBuf.Data()
 	dstData := cropped.Data()
-	for y := 0; y < h; y++ {
+	for y := range h {
 		srcY := by1 + y
 		if os.yInverted {
 			srcY = srcBuf.Height - 1 - (by1 + y)
@@ -225,7 +225,7 @@ func (r *RegionSelector) finishSelection() {
 		if os.yInverted {
 			dstY = h - 1 - y
 		}
-		for x := 0; x < w; x++ {
+		for x := range w {
 			srcX := bx1 + x
 			if srcX < 0 || srcX >= srcBuf.Width {
 				continue

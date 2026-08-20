@@ -17,6 +17,10 @@ Rectangle {
         return widgets.some(widget => widget.id === "volumeSlider");
     }
 
+    signal showPortSelector(var node)
+
+    Component.onCompleted: AudioService.refreshSinkPorts()
+
     implicitHeight: headerRow.height + (!hasVolumeSliderInCC ? volumeSlider.height : 0) + audioContent.height + Theme.spacingM
     radius: Theme.cornerRadius
     color: Theme.nestedSurface
@@ -210,6 +214,9 @@ Rectangle {
                     required property var modelData
                     required property int index
 
+                    readonly property bool hasMultiplePorts: AudioService.sinkHasMultiplePorts(modelData)
+                    readonly property real portButtonReserve: hasMultiplePorts ? portButton.width + Theme.spacingXS : 0
+
                     width: parent.width
                     height: 50
                     radius: Theme.cornerRadius
@@ -239,7 +246,7 @@ Rectangle {
                             anchors.verticalCenter: parent.verticalCenter
                             width: {
                                 const iconWidth = Theme.iconSize;
-                                const pinButtonWidth = pinOutputRow.width + Theme.spacingS * 4 + Theme.spacingM;
+                                const pinButtonWidth = pinOutputRow.width + Theme.spacingS * 4 + Theme.spacingM + outputDelegate.portButtonReserve;
                                 return parent.parent.width - iconWidth - parent.spacing - pinButtonWidth - Theme.spacingM * 2;
                             }
 
@@ -266,7 +273,22 @@ Rectangle {
                         }
                     }
 
+                    DankActionButton {
+                        id: portButton
+                        anchors.right: pinPill.left
+                        anchors.rightMargin: Theme.spacingXS
+                        anchors.verticalCenter: parent.verticalCenter
+                        visible: outputDelegate.hasMultiplePorts
+                        buttonSize: 28
+                        iconName: "tune"
+                        iconSize: 16
+                        iconColor: Theme.surfaceText
+                        tooltipText: I18n.tr("Port Selection", "audio output port selector button tooltip")
+                        onClicked: root.showPortSelector(modelData)
+                    }
+
                     Rectangle {
+                        id: pinPill
                         anchors.right: parent.right
                         anchors.rightMargin: Theme.spacingM
                         anchors.verticalCenter: parent.verticalCenter
@@ -342,7 +364,7 @@ Rectangle {
                     MouseArea {
                         id: deviceMouseArea
                         anchors.fill: parent
-                        anchors.rightMargin: pinOutputRow.width + Theme.spacingS * 4
+                        anchors.rightMargin: pinOutputRow.width + Theme.spacingS * 4 + outputDelegate.portButtonReserve
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onPressed: mouse => {

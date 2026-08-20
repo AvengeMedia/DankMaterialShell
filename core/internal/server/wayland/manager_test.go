@@ -32,11 +32,11 @@ func TestManager_ActorSerializesOutputStateAccess(t *testing.T) {
 	const goroutines = 50
 	const iterations = 100
 
-	for i := 0; i < goroutines; i++ {
+	for i := range goroutines {
 		wg.Add(1)
 		go func(id int) {
 			defer wg.Done()
-			for j := 0; j < iterations; j++ {
+			for j := range iterations {
 				m.post(func() {
 					if out, ok := m.outputs.Load(state.id); ok {
 						out.rampSize = uint32(j)
@@ -69,7 +69,7 @@ func TestManager_ConcurrentSubscriberAccess(t *testing.T) {
 	var wg sync.WaitGroup
 	const goroutines = 20
 
-	for i := 0; i < goroutines; i++ {
+	for i := range goroutines {
 		wg.Add(1)
 		go func(id int) {
 			defer wg.Done()
@@ -96,22 +96,20 @@ func TestManager_ConcurrentGetState(t *testing.T) {
 	const goroutines = 50
 	const iterations = 100
 
-	for i := 0; i < goroutines/2; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			for j := 0; j < iterations; j++ {
+	for range goroutines / 2 {
+		wg.Go(func() {
+			for range iterations {
 				s := m.GetState()
 				assert.GreaterOrEqual(t, s.CurrentTemp, 0)
 			}
-		}()
+		})
 	}
 
-	for i := 0; i < goroutines/2; i++ {
+	for i := range goroutines / 2 {
 		wg.Add(1)
 		go func(i int) {
 			defer wg.Done()
-			for j := 0; j < iterations; j++ {
+			for j := range iterations {
 				m.stateMutex.Lock()
 				m.state = &State{
 					CurrentTemp: 4000 + i*100,
@@ -134,25 +132,23 @@ func TestManager_ConcurrentConfigAccess(t *testing.T) {
 	const goroutines = 30
 	const iterations = 100
 
-	for i := 0; i < goroutines/2; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			for j := 0; j < iterations; j++ {
+	for range goroutines / 2 {
+		wg.Go(func() {
+			for range iterations {
 				m.configMutex.RLock()
 				_ = m.config.LowTemp
 				_ = m.config.HighTemp
 				_ = m.config.Enabled
 				m.configMutex.RUnlock()
 			}
-		}()
+		})
 	}
 
-	for i := 0; i < goroutines/2; i++ {
+	for i := range goroutines / 2 {
 		wg.Add(1)
 		go func(i int) {
 			defer wg.Done()
-			for j := 0; j < iterations; j++ {
+			for j := range iterations {
 				m.configMutex.Lock()
 				m.config.LowTemp = 3000 + j
 				m.config.HighTemp = 7000 - j
@@ -172,13 +168,13 @@ func TestManager_SyncmapOutputsConcurrentAccess(t *testing.T) {
 	const goroutines = 30
 	const iterations = 50
 
-	for i := 0; i < goroutines; i++ {
+	for i := range goroutines {
 		wg.Add(1)
 		go func(id int) {
 			defer wg.Done()
 			key := uint32(id)
 
-			for j := 0; j < iterations; j++ {
+			for j := range iterations {
 				state := &outputState{
 					id:       key,
 					rampSize: uint32(j),
@@ -211,24 +207,22 @@ func TestManager_LocationCacheConcurrentAccess(t *testing.T) {
 	const goroutines = 20
 	const iterations = 100
 
-	for i := 0; i < goroutines/2; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			for j := 0; j < iterations; j++ {
+	for range goroutines / 2 {
+		wg.Go(func() {
+			for range iterations {
 				m.locationMutex.RLock()
 				_ = m.cachedIPLat
 				_ = m.cachedIPLon
 				m.locationMutex.RUnlock()
 			}
-		}()
+		})
 	}
 
-	for i := 0; i < goroutines/2; i++ {
+	for i := range goroutines / 2 {
 		wg.Add(1)
 		go func(i int) {
 			defer wg.Done()
-			for j := 0; j < iterations; j++ {
+			for j := range iterations {
 				lat := float64(40 + i)
 				lon := float64(-74 + j)
 				m.locationMutex.Lock()
@@ -259,11 +253,9 @@ func TestManager_ScheduleConcurrentAccess(t *testing.T) {
 	const goroutines = 20
 	const iterations = 100
 
-	for i := 0; i < goroutines/2; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			for j := 0; j < iterations; j++ {
+	for range goroutines / 2 {
+		wg.Go(func() {
+			for range iterations {
 				m.scheduleMutex.RLock()
 				_ = m.schedule.times.Dawn
 				_ = m.schedule.times.Sunrise
@@ -271,21 +263,19 @@ func TestManager_ScheduleConcurrentAccess(t *testing.T) {
 				_ = m.schedule.condition
 				m.scheduleMutex.RUnlock()
 			}
-		}()
+		})
 	}
 
-	for i := 0; i < goroutines/2; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			for j := 0; j < iterations; j++ {
+	for range goroutines / 2 {
+		wg.Go(func() {
+			for range iterations {
 				m.scheduleMutex.Lock()
 				m.schedule.times.Dawn = time.Now()
 				m.schedule.times.Sunrise = time.Now().Add(time.Hour)
 				m.schedule.condition = SunNormal
 				m.scheduleMutex.Unlock()
 			}
-		}()
+		})
 	}
 
 	wg.Wait()
@@ -382,7 +372,7 @@ func TestNotifySubscribers_NonBlocking(t *testing.T) {
 		dirty: make(chan struct{}, 1),
 	}
 
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		m.notifySubscribers()
 	}
 

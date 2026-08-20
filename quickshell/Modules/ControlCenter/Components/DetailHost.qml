@@ -9,6 +9,7 @@ Item {
     property string expandedSection: ""
     property var expandedWidgetData: null
     property var bluetoothCodecSelector: null
+    property var audioPortSelector: null
     property string screenName: ""
     property string screenModel: ""
 
@@ -212,7 +213,12 @@ Item {
 
     Component {
         id: audioOutputDetailComponent
-        AudioOutputDetail {}
+        AudioOutputDetail {
+            onShowPortSelector: node => {
+                if (root.audioPortSelector)
+                    root.audioPortSelector.show(node);
+            }
+        }
     }
 
     Component {

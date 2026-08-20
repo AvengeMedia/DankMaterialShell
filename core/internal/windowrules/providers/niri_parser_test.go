@@ -80,8 +80,8 @@ window-rule {
 
 func TestConvertNiriRulesToWindowRules(t *testing.T) {
 	niriRules := []NiriWindowRule{
-		{MatchAppID: "^firefox$", Opacity: floatPtr(0.8)},
-		{MatchAppID: "^code$", OpenFloating: boolPtr(true)},
+		{MatchAppID: "^firefox$", Opacity: new(0.8)},
+		{MatchAppID: "^code$", OpenFloating: new(true)},
 	}
 
 	result := ConvertNiriRulesToWindowRules(niriRules)
@@ -121,8 +121,8 @@ func TestNiriSetAndLoadDMSRules(t *testing.T) {
 	provider := NewNiriWritableProvider(tmpDir)
 
 	rule := newTestWindowRule("test_id", "Test Rule", "^firefox$")
-	rule.Actions.OpenFloating = boolPtr(true)
-	rule.Actions.Opacity = floatPtr(0.85)
+	rule.Actions.OpenFloating = new(true)
+	rule.Actions.Opacity = new(0.85)
 
 	if err := provider.SetRule(rule); err != nil {
 		t.Fatalf("SetRule failed: %v", err)
@@ -150,9 +150,9 @@ func TestNiriRemoveRule(t *testing.T) {
 	provider := NewNiriWritableProvider(tmpDir)
 
 	rule1 := newTestWindowRule("rule1", "Rule 1", "app1")
-	rule1.Actions.OpenFloating = boolPtr(true)
+	rule1.Actions.OpenFloating = new(true)
 	rule2 := newTestWindowRule("rule2", "Rule 2", "app2")
-	rule2.Actions.OpenFloating = boolPtr(true)
+	rule2.Actions.OpenFloating = new(true)
 
 	_ = provider.SetRule(rule1)
 	_ = provider.SetRule(rule2)
@@ -175,11 +175,11 @@ func TestNiriReorderRules(t *testing.T) {
 	provider := NewNiriWritableProvider(tmpDir)
 
 	rule1 := newTestWindowRule("rule1", "Rule 1", "app1")
-	rule1.Actions.OpenFloating = boolPtr(true)
+	rule1.Actions.OpenFloating = new(true)
 	rule2 := newTestWindowRule("rule2", "Rule 2", "app2")
-	rule2.Actions.OpenFloating = boolPtr(true)
+	rule2.Actions.OpenFloating = new(true)
 	rule3 := newTestWindowRule("rule3", "Rule 3", "app3")
-	rule3.Actions.OpenFloating = boolPtr(true)
+	rule3.Actions.OpenFloating = new(true)
 
 	_ = provider.SetRule(rule1)
 	_ = provider.SetRule(rule2)
@@ -361,7 +361,7 @@ window-rule {
 	}
 
 	edited := newTestWindowRule("firefox", "Firefox", "^firefox$")
-	edited.Actions.OpenFloating = boolPtr(false)
+	edited.Actions.OpenFloating = new(false)
 	if err := provider.SetRule(edited); err != nil {
 		t.Fatalf("SetRule failed: %v", err)
 	}

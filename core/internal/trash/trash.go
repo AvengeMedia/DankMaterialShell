@@ -250,6 +250,10 @@ func Put(path string) (Entry, error) {
 	}, nil
 }
 
+// mountPoints is a variable so tests can keep the mount walk off the real
+// filesystem; HOME and XDG_DATA_HOME alone do not redirect it.
+var mountPoints = readMountPoints
+
 // allTrashDirs returns the home trash plus every per-mountpoint trash dir
 // that exists (and passes the spec's safety checks for $topdir/.Trash).
 func allTrashDirs() []string {
@@ -259,7 +263,7 @@ func allTrashDirs() []string {
 	}
 
 	uid := strconv.Itoa(os.Getuid())
-	for _, mount := range readMountPoints() {
+	for _, mount := range mountPoints() {
 		shared := filepath.Join(mount, ".Trash")
 		if isValidSharedTrash(shared) {
 			candidate := filepath.Join(shared, uid)

@@ -1,0 +1,50 @@
+{
+  "All Mixed": {
+    "All Mixed": "Tout mélangé"
+  },
+  "Choose which collection of emojis to cycle through": {
+    "Choose which collection of emojis to cycle through": "Choisissez la collection d'émojis à faire défiler"
+  },
+  "Click an emoji to copy it to clipboard": {
+    "Click an emoji to copy it to clipboard": "Cliquez sur un émoji pour le copier dans le presse-papiers"
+  },
+  "Copied %1 to clipboard": {
+    "Copied %1 to clipboard": "%1 copié dans le presse-papiers"
+  },
+  "Configure which emojis appear in your bar, how quickly they cycle, and how many show at once.": {
+    "Configure which emojis appear in your bar, how quickly they cycle, and how many show at once.": "Configurez quels émojis apparaissent dans votre barre, la vitesse du cycle et combien s'affichent à la fois."
+  },
+  "Cycle Speed": {
+    "Cycle Speed": "Vitesse de défilement"
+  },
+  "Emoji Cycler Settings": {
+    "Emoji Cycler Settings": "Réglages du cycleur d'émojis"
+  },
+  "Emoji Picker": {
+    "Emoji Picker": "Sélecteur d'émojis"
+  },
+  "Emoji Set": {
+    "Emoji Set": "Jeu d'émojis"
+  },
+  "Hand Gestures": {
+    "Hand Gestures": "Gestes de la main"
+  },
+  "Happy & Sad": {
+    "Happy & Sad": "Joyeux et tristes"
+  },
+  "Hearts": {
+    "Hearts": "Cœurs"
+  },
+  "How quickly emojis rotate (in seconds)": {
+    "How quickly emojis rotate (in seconds)": "La vitesse de rotation des émojis (en secondes)"
+  },
+  "Max Bar Emojis": {
+    "Max Bar Emojis": "Émojis max dans la barre"
+  },
+  "Maximum number of emojis to display in the bar at once": {
+    "Maximum number of emojis to display in the bar at once": "Nombre maximum d'émojis affichés simultanément dans la barre"
+  },
+  "💡 Tip: Click the emoji widget in your bar to open the emoji picker and copy any emoji to your clipboard!": {
+    "💡 Tip: Click the emoji widget in your bar to open the emoji picker and copy any emoji to your clipboard!": "💡 Astuce : cliquez sur le widget émoji de votre barre pour ouvrir le sélecteur et copier n'importe quel émoji dans le presse-papiers !"
+  }
+}

@@ -226,7 +226,9 @@ Item {
     }
 
     function _triggerBarUsesOverlayLayer(targetScreen, barConfig) {
-        return LayerShell.envUsesOverlay("DMS_DANKBAR_LAYER", (barConfig?.useOverlayLayer ?? false) || CompositorService.framePeerSurfacesUseOverlayForScreen(targetScreen));
+        const frameHostsBar = CompositorService.frameHostsBarForConfig(targetScreen, barConfig);
+        const frameRequiresOverlay = CompositorService.framePeerSurfacesUseOverlayForScreen(targetScreen) && !frameHostsBar;
+        return LayerShell.envUsesOverlay("DMS_DANKBAR_LAYER", (barConfig?.useOverlayLayer ?? false) || frameRequiresOverlay);
     }
 
     function setTriggerPosition(x, y, width, section, targetScreen, barPosition, barThickness, barSpacing, barConfig) {

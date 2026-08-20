@@ -8,6 +8,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/keyboard_shortcuts_inhibit"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wlr_layer_shell"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wlr_screencopy"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wp_color_management"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wp_viewporter"
 	wlhelpers "github.com/AvengeMedia/DankMaterialShell/core/internal/wayland/client"
 	"github.com/AvengeMedia/dankgo/wayland/client"
@@ -63,6 +64,7 @@ type Picker struct {
 	layerShell *wlr_layer_shell.ZwlrLayerShellV1
 	screencopy *wlr_screencopy.ZwlrScreencopyManagerV1
 	viewporter *wp_viewporter.WpViewporter
+	colorMgr   *wp_color_management.WpColorManagerV1
 
 	shortcutsInhibitMgr *keyboard_shortcuts_inhibit.ZwpKeyboardShortcutsInhibitManagerV1
 	shortcutsInhibitor  *keyboard_shortcuts_inhibit.ZwpKeyboardShortcutsInhibitorV1
@@ -263,6 +265,12 @@ func (p *Picker) handleGlobal(e client.RegistryGlobalEvent) {
 			p.viewporter = viewporter
 		}
 
+	case wp_color_management.WpColorManagerV1InterfaceName:
+		mgr := wp_color_management.NewWpColorManagerV1(p.ctx)
+		if err := p.registry.Bind(e.Name, e.Interface, 1, mgr); err == nil {
+			p.colorMgr = mgr
+		}
+
 	case keyboard_shortcuts_inhibit.ZwpKeyboardShortcutsInhibitManagerV1InterfaceName:
 		mgr := keyboard_shortcuts_inhibit.NewZwpKeyboardShortcutsInhibitManagerV1(p.ctx)
 		if err := p.registry.Bind(e.Name, e.Interface, e.Version, mgr); err == nil {
@@ -321,14 +329,36 @@ func (p *Picker) createSurfaces() error {
 	p.outputsMu.Unlock()
 
 	for _, output := range outputs {
+		refLum, pq := p.outputPQEncoding(output)
 		ls, err := p.createLayerSurface(output)
 		if err != nil {
 			return fmt.Errorf("output %s: %w", output.name, err)
+		}
+		if pq {
+			ls.state.SetPQEncoding(refLum)
 		}
 		p.surfaces = append(p.surfaces, ls)
 	}
 
 	return nil
+}
+
+func (p *Picker) outputPQEncoding(output *Output) (float64, bool) {
+	if p.colorMgr == nil {
+		return 0, false
+	}
+
+	desc, ok := wp_color_management.QueryOutputDescription(p.colorMgr, output.wlOutput, p.roundtrip)
+	if !ok {
+		return 0, false
+	}
+
+	pq := desc.TF == uint32(wp_color_management.WpColorManagerV1TransferFunctionSt2084Pq) &&
+		desc.Primaries == uint32(wp_color_management.WpColorManagerV1PrimariesBt2020)
+	if !pq {
+		return 0, false
+	}
+	return float64(desc.ReferenceLum), true
 }
 
 func (p *Picker) createLayerSurface(output *Output) (*LayerSurface, error) {
@@ -724,6 +754,10 @@ func (p *Picker) cleanup() {
 
 	if p.viewporter != nil {
 		p.viewporter.Destroy()
+	}
+
+	if p.colorMgr != nil {
+		p.colorMgr.Destroy()
 	}
 
 	if p.screencopy != nil {

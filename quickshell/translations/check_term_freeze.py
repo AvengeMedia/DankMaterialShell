@@ -22,12 +22,13 @@ FREEZE_FILE = SCRIPT_DIR / 'term_freeze.json'
 
 
 
-# dms-plugins is a separate checkout with its own release cadence; the freeze
-# only guards this repo's terms. Catalog extraction still includes plugins.
+# dms-plugins and dms-plugins-external are separate checkouts with their own
+# release cadence; the freeze only guards this repo's terms. Catalog
+# extraction still includes plugins.
 def shell_terms(translations):
     return {
         term: info for term, info in translations.items()
-        if any(not occ['file'].startswith('dms-plugins/') for occ in info['occurrences'])
+        if any(not occ['file'].startswith(('dms-plugins/', 'dms-plugins-external/')) for occ in info['occurrences'])
     }
 
 def main():

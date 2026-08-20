@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"maps"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -647,7 +648,7 @@ func (b *NetworkManagerBackend) handleOpenConnectPasswordAuth(
 }
 
 func suggestedOpenConnectServerCert(output string) string {
-	for _, field := range strings.Fields(output) {
+	for field := range strings.FieldsSeq(output) {
 		field = strings.Trim(field, "'\".,")
 		if strings.HasPrefix(field, "pin-sha256:") {
 			return field
@@ -708,9 +709,7 @@ func (b *NetworkManagerBackend) handleOpenVPNUsernameAuth(targetConn gonetworkma
 	if dataVariant, ok := vpn["data"]; ok {
 		if dm, ok := dataVariant.Value().(map[string]string); ok {
 			data = make(map[string]string)
-			for k, v := range dm {
-				data[k] = v
-			}
+			maps.Copy(data, dm)
 		} else {
 			data = make(map[string]string)
 		}
@@ -1074,9 +1073,7 @@ func (b *NetworkManagerBackend) saveVPNCredentials(creds *pendingVPNCredentials)
 	if dataVariant, ok := vpn["data"]; ok {
 		if dm, ok := dataVariant.Value().(map[string]string); ok {
 			data = make(map[string]string)
-			for k, v := range dm {
-				data[k] = v
-			}
+			maps.Copy(data, dm)
 		} else {
 			data = make(map[string]string)
 		}
@@ -1100,9 +1097,7 @@ func (b *NetworkManagerBackend) saveVPNCredentials(creds *pendingVPNCredentials)
 		if storedVPN, ok := stored["vpn"]; ok {
 			if storedSecrets, ok := storedVPN["secrets"]; ok {
 				saved, _ := storedSecrets.Value().(map[string]string)
-				for field, value := range saved {
-					secs[field] = value
-				}
+				maps.Copy(secs, saved)
 			}
 		}
 		for field, value := range creds.PersistentSecrets {
@@ -1291,8 +1286,8 @@ func (b *NetworkManagerBackend) importVPNWithNmcli(filePath string, name string)
 	}
 	var connUUID, connName string
 
-	lines := strings.Split(outputStr, "\n")
-	for _, line := range lines {
+	lines := strings.SplitSeq(outputStr, "\n")
+	for line := range lines {
 		if strings.Contains(line, "successfully added") {
 			parts := strings.Fields(line)
 			for i, part := range parts {

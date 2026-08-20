@@ -1,0 +1,50 @@
+{
+  "All Mixed": {
+    "All Mixed": "Todo mezclado"
+  },
+  "Choose which collection of emojis to cycle through": {
+    "Choose which collection of emojis to cycle through": "Elige qué colección de emojis se cicla"
+  },
+  "Click an emoji to copy it to clipboard": {
+    "Click an emoji to copy it to clipboard": "Haz clic en un emoji para copiarlo al portapapeles"
+  },
+  "Copied %1 to clipboard": {
+    "Copied %1 to clipboard": "%1 copiado al portapapeles"
+  },
+  "Configure which emojis appear in your bar, how quickly they cycle, and how many show at once.": {
+    "Configure which emojis appear in your bar, how quickly they cycle, and how many show at once.": "Configura qué emojis aparecen en tu barra, la velocidad del ciclo y cuántos se muestran a la vez."
+  },
+  "Cycle Speed": {
+    "Cycle Speed": "Velocidad de ciclo"
+  },
+  "Emoji Cycler Settings": {
+    "Emoji Cycler Settings": "Ajustes del ciclador de emojis"
+  },
+  "Emoji Picker": {
+    "Emoji Picker": "Selector de emojis"
+  },
+  "Emoji Set": {
+    "Emoji Set": "Conjunto de emojis"
+  },
+  "Hand Gestures": {
+    "Hand Gestures": "Gestos de mano"
+  },
+  "Happy & Sad": {
+    "Happy & Sad": "Felices y tristes"
+  },
+  "Hearts": {
+    "Hearts": "Corazones"
+  },
+  "How quickly emojis rotate (in seconds)": {
+    "How quickly emojis rotate (in seconds)": "La rapidez con la que rotan los emojis (en segundos)"
+  },
+  "Max Bar Emojis": {
+    "Max Bar Emojis": "Máximo de emojis en la barra"
+  },
+  "Maximum number of emojis to display in the bar at once": {
+    "Maximum number of emojis to display in the bar at once": "Número máximo de emojis mostrados en la barra a la vez"
+  },
+  "💡 Tip: Click the emoji widget in your bar to open the emoji picker and copy any emoji to your clipboard!": {
+    "💡 Tip: Click the emoji widget in your bar to open the emoji picker and copy any emoji to your clipboard!": "💡 Consejo: ¡Haz clic en el widget de emojis de tu barra para abrir el selector y copiar cualquier emoji al portapapeles!"
+  }
+}

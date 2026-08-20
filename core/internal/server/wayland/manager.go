@@ -158,19 +158,13 @@ func (m *Manager) setupRegistry() error {
 		switch e.Interface {
 		case wlr_gamma_control.ZwlrGammaControlManagerV1InterfaceName:
 			manager := wlr_gamma_control.NewZwlrGammaControlManagerV1(m.ctx)
-			version := e.Version
-			if version > 1 {
-				version = 1
-			}
+			version := min(e.Version, 1)
 			if err := registry.Bind(e.Name, e.Interface, version, manager); err == nil {
 				gammaMgr = manager
 			}
 		case "wl_output":
 			output := wlclient.NewOutput(m.ctx)
-			version := e.Version
-			if version > 4 {
-				version = 4
-			}
+			version := min(e.Version, 4)
 			if err := registry.Bind(e.Name, e.Interface, version, output); err != nil {
 				return
 			}

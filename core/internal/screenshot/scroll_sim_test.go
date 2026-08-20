@@ -48,7 +48,7 @@ func fractionalFrame(page []byte, stride, frameH int, offset float64) []byte {
 	top := int(offset)
 	frac := offset - float64(top)
 	out := make([]byte, frameH*stride)
-	for y := 0; y < frameH; y++ {
+	for y := range frameH {
 		a := page[(top+y)*stride : (top+y+1)*stride]
 		b := page[(top+y+1)*stride : (top+y+2)*stride]
 		row := out[y*stride : (y+1)*stride]
@@ -88,13 +88,13 @@ func webbyPage(rng *rand.Rand, stride, rows int) []byte {
 // screen-fixed sidebar in the unsampled outer 8% plus per-frame hover noise
 func addFixedChrome(rng *rand.Rand, frame []byte, stride, frameH int, sidebar []byte) {
 	sbw := len(sidebar) / frameH
-	for y := 0; y < frameH; y++ {
+	for y := range frameH {
 		copy(frame[y*stride:y*stride+sbw], sidebar[y*sbw:(y+1)*sbw])
 	}
 	hoverTop := 40 + rng.Intn(frameH-80)
 	for y := hoverTop; y < hoverTop+24; y++ {
 		off := y*stride + stride/3
-		for x := 0; x < 60; x++ {
+		for x := range 60 {
 			frame[off+x] ^= 0x08
 		}
 	}

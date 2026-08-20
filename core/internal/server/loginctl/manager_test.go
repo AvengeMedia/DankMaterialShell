@@ -181,7 +181,7 @@ func TestManager_GetState_ThreadSafe(t *testing.T) {
 	}
 
 	done := make(chan bool)
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		go func() {
 			state := manager.GetState()
 			assert.Equal(t, "1", state.SessionID)
@@ -190,7 +190,7 @@ func TestManager_GetState_ThreadSafe(t *testing.T) {
 		}()
 	}
 
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		select {
 		case <-done:
 		case <-time.After(1 * time.Second):

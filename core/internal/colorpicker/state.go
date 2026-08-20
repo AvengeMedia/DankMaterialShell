@@ -25,6 +25,8 @@ type SurfaceState struct {
 
 	screenBuf    *ShmBuffer
 	screenFormat PixelFormat
+	pqEncoded    bool
+	refLum       float64
 	yInverted    bool
 
 	logicalW int
@@ -54,6 +56,13 @@ func NewSurfaceState(format OutputFormat, lowercase bool) *SurfaceState {
 		displayFormat: format,
 		lowercase:     lowercase,
 	}
+}
+
+func (s *SurfaceState) SetPQEncoding(refLum float64) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.pqEncoded = true
+	s.refLum = refLum
 }
 
 func (s *SurfaceState) SetScale(scale int32) {
@@ -150,6 +159,17 @@ func (s *SurfaceState) OnScreencopyReady() {
 			s.screenBuf = converted
 			s.screenFormat = newFormat
 		}
+	}
+
+	// Magnifier rendering and pixel picking work on 8-bit pixels only
+	if s.screenFormat.Is10Bit() {
+		switch {
+		case s.pqEncoded:
+			s.screenBuf.ConvertPQ2020ToSRGB(s.refLum)
+		default:
+			s.screenBuf.Convert10To8()
+		}
+		s.screenFormat = s.screenBuf.Format
 	}
 
 	s.recomputeScale()
@@ -530,7 +550,7 @@ func drawMagnifierWithInversion(
 				}
 				srcOff := sy*srcStride + sx*4
 				if srcOff+4 <= len(src) {
-					finalColor = Color{R: src[srcOff+rOff], G: src[srcOff+1], B: src[srcOff+bOff], A: 255}
+					finalColor = Color{R: src[srcOff+rOff], G: src[srcOff+1], B: src[srcOff+bOff]}
 				} else {
 					continue
 				}
@@ -543,12 +563,11 @@ func drawMagnifierWithInversion(
 		}
 	}
 
-	drawMagnifierCrosshair(dst, dstStride, dstW, dstH, cx, cy, int(innerRadius), crossThickness, crossInnerRadius, format)
+	drawMagnifierCrosshair(dst, dstStride, dstW, dstH, cx, cy, int(innerRadius), crossThickness, crossInnerRadius)
 }
 
 func drawMagnifierCrosshair(
 	data []byte, stride, width, height, cx, cy, radius, thickness, innerRadius int,
-	format PixelFormat,
 ) {
 	if width <= 0 || height <= 0 {
 		return

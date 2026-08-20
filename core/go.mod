@@ -3,7 +3,7 @@ module github.com/AvengeMedia/DankMaterialShell/core
 go 1.26.4
 
 require (
-	github.com/AvengeMedia/dgop v0.2.4-0.20260808141551-f559f2f31d2a
+	github.com/AvengeMedia/dgop v0.2.4-0.20260819141338-085d828cf577
 	github.com/Wifx/gonetworkmanager/v2 v2.2.0
 	github.com/alecthomas/chroma/v2 v2.27.0
 	github.com/charmbracelet/bubbles v1.0.0
@@ -12,6 +12,7 @@ require (
 	github.com/fsnotify/fsnotify v1.10.1
 	github.com/godbus/dbus/v5 v5.2.2
 	github.com/holoplot/go-evdev v0.0.0-20260504100651-66d1748fe847
+	github.com/klauspost/compress v1.19.2
 	github.com/pilebones/go-udev v0.9.1
 	github.com/sblinch/kdl-go v0.0.0-20260121213736-8b7053306ca6
 	github.com/spf13/cobra v1.10.2
@@ -111,3 +112,5 @@ require (
 // v0.0.1 tag is missing a LICENSE file; master has it.
 // See: https://github.com/mattn/go-localereader/issues/2
 replace github.com/mattn/go-localereader v0.0.1 => github.com/mattn/go-localereader v0.0.2-0.20220822084749-2491eb6c1c75
+
+replace github.com/mattn/go-runewidth => github.com/mattn/go-runewidth v0.0.25

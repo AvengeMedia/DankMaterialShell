@@ -11,6 +11,7 @@ DankModal {
 
     property string title: I18n.tr("Select Application")
     property string targetData: ""
+    property string editableTargetData: ""
     property string targetDataLabel: ""
     property string searchQuery: ""
     property int selectedIndex: 0
@@ -23,6 +24,7 @@ DankModal {
     property string mimeType: ""
     property var rememberMimeTypes: []
     property bool rememberChoice: false
+    property bool targetCopied: false
     property var mimeMatchedAppIds: []
     property var mimeMatchedRawIds: []
 
@@ -49,6 +51,8 @@ DankModal {
 
     onOpened: {
         searchQuery = "";
+        editableTargetData = targetData;
+        targetCopied = false;
         rememberChoice = false;
         fetchMimeMatches();
         updateApplicationList();
@@ -192,6 +196,20 @@ DankModal {
 
     onSearchQueryChanged: updateApplicationList()
 
+    function copyEditableTarget() {
+        Quickshell.execDetached(["dms", "cl", "copy", editableTargetData]);
+        ToastService.showInfo(I18n.tr("Copied to clipboard"));
+        targetCopied = true;
+        targetCopyConfirmationTimer.restart();
+    }
+
+    Timer {
+        id: targetCopyConfirmationTimer
+        interval: 1200
+        repeat: false
+        onTriggered: root.targetCopied = false
+    }
+
     ListModel {
         id: applicationsModel
     }
@@ -211,6 +229,15 @@ DankModal {
             }
 
             Keys.onPressed: event => {
+                const hasCtrl = (event.modifiers & Qt.ControlModifier) !== 0;
+                const hasShift = (event.modifiers & Qt.ShiftModifier) !== 0;
+                const hasOtherModifier = (event.modifiers & (Qt.AltModifier | Qt.MetaModifier)) !== 0;
+                if (hasCtrl && hasShift && !hasOtherModifier && event.key === Qt.Key_C) {
+                    root.copyEditableTarget();
+                    event.accepted = true;
+                    return;
+                }
+
                 if (event.key === Qt.Key_Tab && root.mimeType.length > 0) {
                     root.rememberChoice = !root.rememberChoice;
                     event.accepted = true;
@@ -379,7 +406,7 @@ DankModal {
                         let usedHeight = 40 + Theme.spacingS;
                         usedHeight += 52 + Theme.spacingS;
                         if (root.showTargetData) {
-                            usedHeight += 36 + Theme.spacingS;
+                            usedHeight += 52 + Theme.spacingS;
                         }
                         if (root.mimeType && root.mimeType.length > 0) {
                             usedHeight += 36 + Theme.spacingS;
@@ -501,7 +528,7 @@ DankModal {
 
                 Rectangle {
                     width: parent.width
-                    height: 36
+                    height: 52
                     radius: Theme.cornerRadius
                     color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.5)
                     border.color: Theme.outlineMedium
@@ -509,17 +536,49 @@ DankModal {
                     visible: root.showTargetData && root.targetData.length > 0
 
                     StyledText {
+                        id: targetDataLabelText
                         anchors.left: parent.left
-                        anchors.leftMargin: Theme.spacingM
-                        anchors.right: parent.right
-                        anchors.rightMargin: Theme.spacingM
+                        anchors.leftMargin: Theme.spacingS
                         anchors.verticalCenter: parent.verticalCenter
-                        text: root.targetDataLabel.length > 0 ? root.targetDataLabel + ": " + root.targetData : root.targetData
+                        text: root.targetDataLabel.length > 0 ? root.targetDataLabel + ":" : ""
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.surfaceTextMedium
-                        elide: Text.ElideMiddle
-                        wrapMode: Text.NoWrap
-                        maximumLineCount: 1
+                        visible: text.length > 0
+                    }
+
+                    DankTextField {
+                        id: targetDataField
+                        anchors.left: targetDataLabelText.visible ? targetDataLabelText.right : parent.left
+                        anchors.leftMargin: Theme.spacingS
+                        anchors.right: copyTargetButton.left
+                        anchors.rightMargin: Theme.spacingXS
+                        anchors.verticalCenter: parent.verticalCenter
+                        height: 44
+                        text: root.editableTargetData
+                        keyForwardTargets: [appContent]
+                        backgroundColor: Theme.withAlpha(Theme.surfaceContainerHigh, 0.5)
+                        onTextEdited: root.editableTargetData = text
+                        Keys.onLeftPressed: event => {
+                            if (cursorPosition === 0)
+                                event.accepted = true;
+                        }
+                        Keys.onRightPressed: event => {
+                            if (cursorPosition === text.length)
+                                event.accepted = true;
+                        }
+                    }
+
+                    DankActionButton {
+                        id: copyTargetButton
+                        anchors.right: parent.right
+                        anchors.rightMargin: Theme.spacingXS
+                        anchors.verticalCenter: parent.verticalCenter
+                        buttonSize: 36
+                        iconName: root.targetCopied ? "check" : "content_copy"
+                        iconSize: Theme.iconSize - 6
+                        iconColor: root.targetCopied ? Theme.primary : Theme.surfaceText
+                        tooltipText: I18n.tr("Copy target (%1)", "app picker copy target button tooltip").arg("Ctrl+Shift+C")
+                        onClicked: root.copyEditableTarget()
                     }
                 }
 
@@ -554,7 +613,7 @@ DankModal {
                     }
                 }
 
-                root.applicationSelected(app, root.targetData);
+                root.applicationSelected(app, root.editableTargetData);
 
                 if (usageHistoryKey && app.appId) {
                     const usageHistory = CacheData[usageHistoryKey] || {};

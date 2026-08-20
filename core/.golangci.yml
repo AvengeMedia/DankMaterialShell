@@ -72,7 +72,6 @@ linters:
       - path: _test\.go
         linters:
           - errcheck
-          - govet
           - unused
           - ineffassign
           - staticcheck
