@@ -72,7 +72,8 @@ func handleMatugenQueue(conn *models.Conn, req models.Request) {
 func handleMatugenStatus(conn *models.Conn, req models.Request) {
 	queue := matugen.GetQueue()
 	models.Respond(conn, req.ID, map[string]bool{
-		"running": queue.IsRunning(),
-		"pending": queue.HasPending(),
+		"running":        queue.IsRunning(),
+		"pending":        queue.HasPending(),
+		"smartSupported": matugen.SupportsSmart(),
 	})
 }

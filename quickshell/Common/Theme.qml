@@ -364,7 +364,7 @@ Singleton {
             }), ({
                 "value": "scheme-smart",
                 "label": I18n.tr("Smart", "matugen color scheme option"),
-                "description": I18n.tr("Automatically picks the scheme variant based on the wallpaper. Requires matugen 4.2+.")
+                "description": I18n.tr("Automatically picks the scheme variant based on the wallpaper.")
             })]
 
     function getMatugenScheme(value) {

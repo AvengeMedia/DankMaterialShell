@@ -812,6 +812,11 @@ func detectMatugenVersion() (matugenFlags, error) {
 	return detectMatugenVersionLocked()
 }
 
+func SupportsSmart() bool {
+	flags, err := detectMatugenVersion()
+	return err == nil && flags.isV42
+}
+
 func redetectMatugenVersion(old matugenFlags) (matugenFlags, bool) {
 	matugenVersionMu.Lock()
 	defer matugenVersionMu.Unlock()

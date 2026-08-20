@@ -24,6 +24,7 @@ Singleton {
     property bool isConnected: false
     readonly property bool isConnecting: requestSocket.connected && !requestSocket.linkUp
     property bool subscribeConnected: false
+    property bool matugenSmartSupported: false
 
     readonly property string socketPath: Quickshell.env("DMS_SOCKET")
 
@@ -150,6 +151,7 @@ Singleton {
                 root.isConnected = true;
                 root.connectionStateChanged();
                 subscribeSocket.connected = true;
+                root.refreshMatugenStatus();
                 return;
             }
             root.isConnected = false;
@@ -210,6 +212,13 @@ Singleton {
                 handleSubscriptionEvent(response);
             }
         }
+    }
+
+    function refreshMatugenStatus() {
+        sendRequest("matugen.status", null, response => {
+            if (!response.error && response.result)
+                matugenSmartSupported = response.result.smartSupported === true;
+        });
     }
 
     function sendSubscribeRequest() {

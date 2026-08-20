@@ -20,7 +20,8 @@ Item {
     readonly property bool frameModeActive: SettingsData.frameEnabled
     property var cachedIconThemes: SettingsData.availableIconThemes
     property var cachedCursorThemes: SettingsData.availableCursorThemes
-    property var cachedMatugenSchemes: Theme.availableMatugenSchemes.map(option => option.label)
+    readonly property bool matugenSmartCapable: Theme.matugenAvailable && DMSService.matugenSmartSupported
+    property var cachedMatugenSchemes: Theme.availableMatugenSchemes.filter(option => DMSService.matugenSmartSupported || option.value !== "scheme-smart").map(option => option.label)
     property var matugenSchemePreviews: ({})
     property string matugenPreviewSource: ""
     property string matugenPreviewImage: ""
@@ -1324,9 +1325,10 @@ Item {
                         tags: ["matugen", "smart", "wallpaper", "auto", "mode"]
                         settingKey: "matugenSmartMode"
                         text: I18n.tr("Auto From Wallpaper")
-                        description: I18n.tr("Dark or light mode follows the wallpaper brightness (requires matugen 4.2+)")
+                        description: I18n.tr("Dark or light mode follows the wallpaper brightness")
                         checked: SettingsData.matugenSmartMode
-                        enabled: Theme.matugenAvailable && Theme.currentTheme === Theme.dynamic
+                        visible: matugenSmartCapable
+                        enabled: Theme.currentTheme === Theme.dynamic
                         opacity: enabled ? 1 : 0.4
                         onToggled: checked => {
                             if (checked && SessionData.themeModeAutoEnabled)
