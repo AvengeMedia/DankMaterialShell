@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"net"
+	"os"
+	"path/filepath"
 	"sync"
 	"testing"
 	"time"
@@ -155,9 +157,19 @@ func TestHandleSetIconFile(t *testing.T) {
 	})
 
 	t.Run("successful set icon file", func(t *testing.T) {
+		iconPath := filepath.Join(t.TempDir(), "icon.png")
+		require.NoError(t, os.WriteFile(iconPath, []byte("image-bytes"), 0o600))
+
 		mockAccountsObj := mockdbus.NewMockBusObject(t)
 		mockCall := &dbus.Call{Err: nil}
-		mockAccountsObj.EXPECT().Call("org.freedesktop.Accounts.User.SetIconFile", dbus.Flags(0), "/path/to/icon.png").Return(mockCall)
+		stagedCopy := mock.MatchedBy(func(path string) bool {
+			if path == iconPath {
+				return false
+			}
+			data, err := os.ReadFile(path)
+			return err == nil && string(data) == "image-bytes"
+		})
+		mockAccountsObj.EXPECT().Call("org.freedesktop.Accounts.User.SetIconFile", dbus.Flags(0), stagedCopy).Return(mockCall)
 		mockAccountsObj.EXPECT().CallWithContext(mock.Anything, "org.freedesktop.DBus.Properties.GetAll", dbus.Flags(0), "org.freedesktop.Accounts.User").Return(mockGetAllAccountsProperties())
 
 		manager := &Manager{
@@ -176,7 +188,7 @@ func TestHandleSetIconFile(t *testing.T) {
 			ID:     123,
 			Method: "freedesktop.accounts.setIconFile",
 			Params: map[string]any{
-				"path": "/path/to/icon.png",
+				"path": iconPath,
 			},
 		}
 
