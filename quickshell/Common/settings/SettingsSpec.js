@@ -518,6 +518,7 @@ var SPEC = {
     notificationHistorySaveNormal: { def: true },
     notificationHistorySaveCritical: { def: true },
     notificationRules: { def: [] },
+    notificationDndAllowCritical: { def: true },
     notificationFocusedMonitor: { def: false },
 
     osdAlwaysShowValue: { def: false },

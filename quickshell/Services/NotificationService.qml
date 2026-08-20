@@ -458,6 +458,10 @@ Singleton {
         return value.toLowerCase().includes(pattern.toLowerCase());
     }
 
+    function _allowedInDnd(urgency, bypassDnd) {
+        return bypassDnd || (SettingsData.notificationDndAllowCritical && urgency === NotificationUrgency.Critical);
+    }
+
     function _evaluateNotificationPolicy(notif) {
         const baseUrgency = typeof notif.urgency === "number" ? notif.urgency : NotificationUrgency.Normal;
         const policy = {
@@ -465,6 +469,7 @@ Singleton {
             "disablePopup": false,
             "hideFromCenter": false,
             "disableHistory": false,
+            "bypassDnd": false,
             "urgency": baseUrgency
         };
 
@@ -478,6 +483,8 @@ Singleton {
             "summary": notif.summary || "",
             "body": notif.body || ""
         };
+
+        policy.bypassDnd = rules.some(rule => rule.bypassDnd === true && _matchesNotificationRule(rule, info));
 
         for (const rule of rules) {
             if (!_matchesNotificationRule(rule, info))
@@ -676,7 +683,8 @@ Singleton {
             const soundHints = notif.hints || {};
             const suppressSound = !!soundHints["suppress-sound"];
             const requestsSound = !!soundHints["sound-name"];
-            if (SettingsData.soundsEnabled && (SettingsData.soundNewNotification || requestsSound) && !suppressSound) {
+            const dndBlocked = SessionData.doNotDisturb && !_allowedInDnd(policy.urgency, policy.bypassDnd);
+            if (!dndBlocked && SettingsData.soundsEnabled && (SettingsData.soundNewNotification || requestsSound) && !suppressSound) {
                 if (policy.urgency === NotificationUrgency.Critical) {
                     AudioService.playCriticalNotificationSound();
                 } else {
@@ -684,7 +692,7 @@ Singleton {
                 }
             }
 
-            const shouldShowPopup = !root.popupsDisabled && !SessionData.doNotDisturb && !policy.disablePopup;
+            const shouldShowPopup = !root.popupsDisabled && !dndBlocked && !policy.disablePopup;
             const isTransient = notif.transient;
             const shouldKeepInCenter = !isTransient && !policy.hideFromCenter;
 
@@ -698,7 +706,8 @@ Singleton {
             const wrapper = notifComponent.createObject(root, {
                 "popup": shouldShowPopup,
                 "notification": notif,
-                "urgencyOverride": policy.urgency
+                "urgencyOverride": policy.urgency,
+                "bypassDnd": policy.bypassDnd
             });
 
             if (wrapper) {
@@ -732,6 +741,7 @@ Singleton {
         property bool popup: false
         property bool removedByLimit: false
         property bool isPersistent: true
+        property bool bypassDnd: false
         property int seq: 0
         property string persistedImagePath: ""
 
@@ -1012,19 +1022,13 @@ Singleton {
             return;
         if (popupsDisabled)
             return;
-        if (SessionData.doNotDisturb)
-            return;
-        if (notificationQueue.length === 0)
+        const nextIndex = notificationQueue.findIndex(w => w && (!SessionData.doNotDisturb || _allowedInDnd(w.urgency, w.bypassDnd)));
+        if (nextIndex === -1)
             return;
 
         _processingQueue = true;
 
-        const next = notificationQueue.shift();
-        if (!next) {
-            _processingQueue = false;
-            return;
-        }
-
+        const next = notificationQueue.splice(nextIndex, 1)[0];
         next.seq = ++seqCounter;
 
         const activePopups = visibleNotifications.filter(n => n && n.popup);
@@ -1348,16 +1352,13 @@ Singleton {
         target: SessionData
         function onDoNotDisturbChanged() {
             if (SessionData.doNotDisturb) {
-                // Hide all current popups when DND is enabled
+                notificationQueue = notificationQueue.filter(w => w && _allowedInDnd(w.urgency, w.bypassDnd));
                 for (const notif of visibleNotifications) {
-                    notif.popup = false;
+                    if (!_allowedInDnd(notif.urgency, notif.bypassDnd))
+                        notif.popup = false;
                 }
-                visibleNotifications = [];
-                notificationQueue = [];
-            } else {
-                // Re-enable popup processing when DND is disabled
-                processQueue();
             }
+            processQueue();
         }
     }
 

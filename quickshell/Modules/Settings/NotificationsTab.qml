@@ -16,18 +16,15 @@ Item {
         }
     }
 
-    readonly property var mutedRules: {
-        var rules = SettingsData.notificationRules || [];
-        var out = [];
-        for (var i = 0; i < rules.length; i++) {
-            if ((rules[i].action || "").toString().toLowerCase() === "mute")
-                out.push({
-                    rule: rules[i],
-                    index: i
-                });
-        }
-        return out;
+    function indexedRules(predicate) {
+        return (SettingsData.notificationRules || []).map((rule, index) => ({
+                    rule: rule,
+                    index: index
+                })).filter(entry => predicate(entry.rule));
     }
+
+    readonly property var mutedRules: indexedRules(rule => (rule.action || "").toString().toLowerCase() === "mute")
+    readonly property var dndBypassRules: indexedRules(rule => rule.bypassDnd === true)
 
     readonly property var timeoutOptions: [
         {
@@ -447,6 +444,70 @@ Item {
                     checked: SessionData.doNotDisturb
                     onToggled: checked => SessionData.setDoNotDisturb(checked)
                 }
+
+                SettingsToggleRow {
+                    settingKey: "notificationDndAllowCritical"
+                    tags: ["notification", "dnd", "critical", "priority", "urgent", "bypass"]
+                    text: I18n.tr("Critical Priority")
+                    description: I18n.tr("Show critical priority popups while Do Not Disturb is on")
+                    checked: SettingsData.notificationDndAllowCritical
+                    onToggled: checked => SettingsData.set("notificationDndAllowCritical", checked)
+                }
+
+                Column {
+                    width: parent.width
+                    spacing: Theme.spacingS
+
+                    StyledText {
+                        text: I18n.tr("Apps allowed to show popups while Do Not Disturb is on. Right-click a notification and choose \"Allow in Do Not Disturb\" to add one here.")
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                        wrapMode: Text.WordWrap
+                        width: parent.width
+                        bottomPadding: Theme.spacingS
+                    }
+
+                    Repeater {
+                        model: root.dndBypassRules
+
+                        delegate: Rectangle {
+                            width: parent.width
+                            height: dndBypassRow.implicitHeight + Theme.spacingS * 2
+                            radius: Theme.cornerRadius
+                            color: Theme.floatingWindowFieldColor
+
+                            Row {
+                                id: dndBypassRow
+                                anchors.fill: parent
+                                anchors.margins: Theme.spacingS
+                                spacing: Theme.spacingM
+
+                                StyledText {
+                                    id: dndBypassLabel
+                                    text: modelData.rule.pattern || I18n.tr("Unknown")
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: Theme.surfaceText
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+
+                                Item {
+                                    width: Math.max(0, parent.width - parent.spacing * 2 - dndBypassLabel.width - dndBypassRemoveBtn.width)
+                                    height: 1
+                                }
+
+                                DankActionButton {
+                                    id: dndBypassRemoveBtn
+                                    buttonSize: 28
+                                    iconName: "delete"
+                                    iconSize: 18
+                                    iconColor: Theme.surfaceVariantText
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    onClicked: SettingsData.removeNotificationRule(modelData.index)
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             SettingsCard {
@@ -669,6 +730,33 @@ Item {
                                             options: root.notificationRuleUrgencyOptions.map(o => o.label)
                                             onValueChanged: value => SettingsData.updateNotificationRuleField(index, "urgency", root.getRuleOptionValue(root.notificationRuleUrgencyOptions, value, "default"))
                                         }
+                                    }
+                                }
+
+                                Row {
+                                    width: parent.width
+                                    spacing: Theme.spacingS
+
+                                    StyledText {
+                                        id: bypassDndLabel
+                                        text: I18n.tr("Allow in Do Not Disturb")
+                                        font.pixelSize: Theme.fontSizeSmall - 1
+                                        color: Theme.surfaceVariantText
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+
+                                    Item {
+                                        width: Math.max(0, parent.width - bypassDndLabel.implicitWidth - bypassDndToggle.width - Theme.spacingS * 2)
+                                        height: 1
+                                    }
+
+                                    DankToggle {
+                                        id: bypassDndToggle
+                                        width: 40
+                                        height: 24
+                                        hideText: true
+                                        checked: modelData.bypassDnd === true
+                                        onToggled: checked => SettingsData.updateNotificationRuleField(index, "bypassDnd", checked)
                                     }
                                 }
                             }

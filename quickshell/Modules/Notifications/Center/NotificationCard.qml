@@ -1141,6 +1141,27 @@ Rectangle {
         }
 
         MenuItem {
+            id: dndBypassItem
+            readonly property bool isDndBypassed: SettingsData.isAppDndBypassed(notificationGroup?.appName || "", notificationGroup?.latestNotification?.desktopEntry || "")
+            text: isDndBypassed ? I18n.tr("Block %1 in Do Not Disturb").arg(notificationGroup?.appName || I18n.tr("this app")) : I18n.tr("Allow %1 in Do Not Disturb").arg(notificationGroup?.appName || I18n.tr("this app"))
+
+            contentItem: StyledText {
+                text: parent.text
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.surfaceText
+                leftPadding: Theme.spacingS
+                verticalAlignment: Text.AlignVCenter
+            }
+
+            background: Rectangle {
+                color: parent.hovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
+                radius: Theme.cornerRadius / 2
+            }
+
+            onTriggered: SettingsData.setAppDndBypass(notificationGroup?.appName || "", notificationGroup?.latestNotification?.desktopEntry || "", !isDndBypassed)
+        }
+
+        MenuItem {
             text: I18n.tr("Dismiss")
 
             contentItem: StyledText {

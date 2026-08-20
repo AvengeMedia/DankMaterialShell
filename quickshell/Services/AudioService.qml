@@ -733,13 +733,13 @@ EOFCONFIG
     }
 
     function playNormalNotificationSound() {
-        if (!soundsAvailable || !normalNotificationSound || SessionData.doNotDisturb || notificationsAudioMuted || shouldMuteForMedia())
+        if (!soundsAvailable || !normalNotificationSound || notificationsAudioMuted || shouldMuteForMedia())
             return;
         normalNotificationSound.play();
     }
 
     function playCriticalNotificationSound() {
-        if (!soundsAvailable || !criticalNotificationSound || SessionData.doNotDisturb || notificationsAudioMuted || shouldMuteForMedia())
+        if (!soundsAvailable || !criticalNotificationSound || notificationsAudioMuted || shouldMuteForMedia())
             return;
         criticalNotificationSound.play();
     }

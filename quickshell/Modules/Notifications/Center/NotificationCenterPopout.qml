@@ -189,18 +189,11 @@ DankPopout {
 
             property var externalKeyboardController: null
             property real cachedHeaderHeight: 32
-            readonly property real settingsMaxHeight: {
-                const screenH = root.screen ? root.screen.height : 1080;
-                const maxPopupH = screenH * 0.8;
-                const overhead = cachedHeaderHeight + Theme.spacingL * 2 + Theme.spacingM * 2;
-                return Math.max(200, maxPopupH - overhead - 150);
-            }
             implicitHeight: {
                 let baseHeight = Theme.spacingL * 2;
                 baseHeight += cachedHeaderHeight;
                 baseHeight += Theme.spacingM * 2;
 
-                const settingsHeight = notificationSettings.expanded ? Math.min(notificationSettings.naturalContentHeight, settingsMaxHeight) : 0;
                 const currentListHeight = root.shouldBeVisible ? notificationList.stableContentHeight : notificationList.listContentHeight;
                 let listHeight = notificationHeader.currentTab === 0 ? currentListHeight : Math.max(200, NotificationService.historyList.length * 80);
                 if (notificationHeader.currentTab === 0 && NotificationService.groupedNotifications.length === 0) {
@@ -211,10 +204,7 @@ DankPopout {
                 }
 
                 const maxContentArea = 600;
-                const availableListSpace = Math.max(200, maxContentArea - settingsHeight);
-
-                baseHeight += settingsHeight;
-                baseHeight += Math.min(listHeight, availableListSpace);
+                baseHeight += Math.min(listHeight, maxContentArea);
 
                 const maxHeight = root.screen ? root.screen.height * 0.8 : Screen.height * 0.8;
                 return Math.max(300, Math.min(baseHeight, maxHeight));
@@ -290,19 +280,16 @@ DankPopout {
                         objectName: "notificationHeader"
                         transientSurfaceTracker: root.transientSurfaceTracker
                         onHeightChanged: notificationContent.cachedHeaderHeight = height
-                    }
-
-                    NotificationSettings {
-                        id: notificationSettings
-                        transientSurfaceTracker: root.transientSurfaceTracker
-                        expanded: notificationHeader.showSettings
-                        maxAllowedHeight: notificationContent.settingsMaxHeight
+                        onSettingsRequested: {
+                            root.notificationHistoryVisible = false;
+                            PopoutService.openSettingsWithTab("notifications", root, () => root.open());
+                        }
                     }
 
                     Item {
                         visible: notificationHeader.currentTab === 0
                         width: parent.width
-                        height: parent.height - notificationContent.cachedHeaderHeight - notificationSettings.height - contentColumnInner.spacing * 2
+                        height: parent.height - notificationContent.cachedHeaderHeight - contentColumnInner.spacing
 
                         KeyboardNavigatedNotificationList {
                             id: notificationList
@@ -321,7 +308,7 @@ DankPopout {
                         id: historyList
                         visible: notificationHeader.currentTab === 1
                         width: parent.width
-                        height: parent.height - notificationContent.cachedHeaderHeight - notificationSettings.height - contentColumnInner.spacing * 2
+                        height: parent.height - notificationContent.cachedHeaderHeight - contentColumnInner.spacing
                     }
                 }
             }
