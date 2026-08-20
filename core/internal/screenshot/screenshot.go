@@ -131,6 +131,11 @@ func (s *Screenshoter) captureRegion() (*CaptureResult, error) {
 		}
 	}
 
+	if s.config.SelectorHook != nil {
+		s.config.SelectorHook(true)
+		defer s.config.SelectorHook(false)
+	}
+
 	selector := NewRegionSelector(s)
 	result, cancelled, err := selector.Run()
 	if err != nil {
@@ -579,11 +584,13 @@ func (s *Screenshoter) captureAndCrop(output *WaylandOutput, region Region) (*Ca
 
 	outX, outY := output.x, output.y
 	scale := float64(output.scale)
-	if hx, hy, _, _, ok := GetHyprlandMonitorGeometry(output.name); ok {
-		outX, outY = hx, hy
-	}
-	if s := GetHyprlandMonitorScale(output.name); s > 0 {
-		scale = s
+	if DetectCompositor() == CompositorHyprland {
+		if hx, hy, _, _, ok := GetHyprlandMonitorGeometry(output.name); ok {
+			outX, outY = hx, hy
+		}
+		if s := GetHyprlandMonitorScale(output.name); s > 0 {
+			scale = s
+		}
 	}
 	if scale <= 0 {
 		scale = 1.0

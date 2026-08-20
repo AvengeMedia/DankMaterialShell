@@ -84,8 +84,8 @@ func (r *RegionSelector) setupPointerHandlers() {
 
 		r.selection.currentX = curX
 		r.selection.currentY = curY
-		for _, os := range r.surfaces {
-			r.redrawSurface(os)
+		if r.selection.surface != nil {
+			r.redrawSurface(r.selection.surface)
 		}
 	})
 

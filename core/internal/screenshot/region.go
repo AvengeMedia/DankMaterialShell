@@ -34,7 +34,7 @@ type RenderSlot struct {
 	backgroundDragging    bool
 	backgroundCursor      bool
 	backgroundPhase       selectorPhase
-	dirty                 *dirtyRect
+	overlay               *overlay
 }
 
 func (s *RenderSlot) cacheValid(src *ShmBuffer, dragging, cursor bool, phase selectorPhase) bool {
@@ -61,6 +61,10 @@ type OutputSurface struct {
 	// Triple-buffered render slots
 	slots      [3]*RenderSlot
 	slotsReady bool
+
+	shown        *overlay
+	framePending bool
+	redrawQueued bool
 }
 
 type PreCapture struct {
@@ -85,6 +89,8 @@ type RegionSelector struct {
 	layerShell *wlr_layer_shell.ZwlrLayerShellV1
 	screencopy *wlr_screencopy.ZwlrScreencopyManagerV1
 	viewporter *wp_viewporter.WpViewporter
+
+	compositorVersion uint32
 
 	shortcutsInhibitMgr *keyboard_shortcuts_inhibit.ZwpKeyboardShortcutsInhibitManagerV1
 	shortcutsInhibitor  *keyboard_shortcuts_inhibit.ZwpKeyboardShortcutsInhibitorV1
@@ -261,6 +267,7 @@ func (r *RegionSelector) handleGlobal(e client.RegistryGlobalEvent) {
 		comp := client.NewCompositor(r.ctx)
 		if err := r.registry.Bind(e.Name, e.Interface, e.Version, comp); err == nil {
 			r.compositor = comp
+			r.compositorVersion = e.Version
 		}
 
 	case client.ShmInterfaceName:
@@ -732,6 +739,9 @@ func (r *RegionSelector) initRenderBuffer(os *OutputSurface) {
 		slotRef := slot
 		wlBuf.SetReleaseHandler(func(e client.BufferReleaseEvent) {
 			slotRef.busy = false
+			if os.redrawQueued && !os.framePending {
+				r.renderSurface(os)
+			}
 		})
 
 		os.slots[i] = slot
@@ -783,7 +793,16 @@ func (r *RegionSelector) getSourceBuffer(os *OutputSurface) *ShmBuffer {
 	return os.screenBuf
 }
 
+// redrawSurface coalesces redraws to one per compositor frame.
 func (r *RegionSelector) redrawSurface(os *OutputSurface) {
+	os.redrawQueued = true
+	if os.framePending {
+		return
+	}
+	r.renderSurface(os)
+}
+
+func (r *RegionSelector) renderSurface(os *OutputSurface) {
 	srcBuf := r.getSourceBuffer(os)
 	if srcBuf == nil || !os.slotsReady {
 		return
@@ -793,15 +812,20 @@ func (r *RegionSelector) redrawSurface(os *OutputSurface) {
 	if slot == nil {
 		return
 	}
+	os.redrawQueued = false
 
+	fullDamage := true
+	var damage []dirtyRect
 	switch r.phase {
 	case phaseScroll:
 		r.drawScrollOverlay(os, slot.shm)
 		slot.backgroundInitialized = false
 		slot.backgroundSource = nil
-		slot.dirty = nil
+		slot.overlay, os.shown = nil, nil
 	default:
-		if !slot.cacheValid(srcBuf, r.selection.dragging, r.showCapturedCursor, r.phase) {
+		cur := r.overlayFor(os, slot.shm)
+		switch {
+		case !slot.cacheValid(srcBuf, r.selection.dragging, r.showCapturedCursor, r.phase):
 			slot.shm.CopyFrom(srcBuf)
 			r.dimBackground(slot.shm)
 			r.drawHUD(slot.shm.Data(), slot.shm.Stride, slot.shm.Width, slot.shm.Height, os.screenFormat)
@@ -810,11 +834,16 @@ func (r *RegionSelector) redrawSurface(os *OutputSurface) {
 			slot.backgroundDragging = r.selection.dragging
 			slot.backgroundCursor = r.showCapturedCursor
 			slot.backgroundPhase = r.phase
-			slot.dirty = nil
-		} else if slot.dirty != nil {
-			r.restoreSourceRect(os, slot.shm, *slot.dirty)
+			slot.overlay = nil
+		case r.compositorVersion >= 4:
+			fullDamage = false
+			damage = overlayDamage(os.shown, cur)
+			if len(damage) == 0 {
+				return
+			}
 		}
-		slot.dirty = r.drawOverlay(os, slot.shm)
+		r.drawOverlay(os, slot.shm, slot.overlay, cur)
+		slot.overlay, os.shown = cur, cur
 	}
 
 	if os.viewport != nil {
@@ -830,7 +859,28 @@ func (r *RegionSelector) redrawSurface(os *OutputSurface) {
 	}
 
 	_ = os.wlSurface.Attach(slot.wlBuf, 0, 0)
-	_ = os.wlSurface.Damage(0, 0, int32(os.logicalW), int32(os.logicalH))
+	switch {
+	case fullDamage:
+		_ = os.wlSurface.Damage(0, 0, int32(os.logicalW), int32(os.logicalH))
+	default:
+		for _, d := range damage {
+			d = d.clampTo(slot.shm.Width, slot.shm.Height)
+			if d.empty() {
+				continue
+			}
+			_ = os.wlSurface.DamageBuffer(int32(d.x1), int32(d.y1), int32(d.x2-d.x1), int32(d.y2-d.y1))
+		}
+	}
+	if cb, err := os.wlSurface.Frame(); err == nil {
+		os.framePending = true
+		cb.SetDoneHandler(func(client.CallbackDoneEvent) {
+			_ = cb.Destroy()
+			os.framePending = false
+			if os.redrawQueued {
+				r.renderSurface(os)
+			}
+		})
+	}
 	_ = os.wlSurface.Commit()
 
 	// Mark this slot as busy until compositor releases it

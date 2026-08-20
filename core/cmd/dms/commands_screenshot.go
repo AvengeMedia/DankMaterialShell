@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime/debug"
 	"strconv"
 	"strings"
 
@@ -225,7 +226,8 @@ func getScreenshotConfig(mode screenshot.Mode) screenshot.Config {
 	return config
 }
 
-// setPopoutScreenshotMode toggles the shell handshake so popouts drop their keyboard grab during region select. Best-effort.
+// setPopoutScreenshotMode toggles the shell handshake so popouts drop their keyboard grab during region select.
+// Best-effort and not awaited: qs takes ~20ms to come up, longer than the selector needs to show.
 func setPopoutScreenshotMode(begin bool) {
 	fn := "end"
 	if begin {
@@ -244,7 +246,7 @@ func setPopoutScreenshotMode(begin bool) {
 		cmdArgs = append(cmdArgs, "-p", shellApp.ConfigPath())
 	}
 	cmdArgs = append(cmdArgs, "call", "screenshot", fn)
-	_ = exec.Command("qs", cmdArgs...).Run()
+	_ = exec.Command("qs", cmdArgs...).Start()
 }
 
 func writeScreenshotJSON(meta screenshotMetadata) {
@@ -277,16 +279,13 @@ func runScreenshot(config screenshot.Config) {
 		os.Exit(1)
 	}
 
-	// Region select needs the keyboard; drop popout grabs for its duration.
-	result, err := func() (*screenshot.CaptureResult, error) {
-		interactive := config.Mode == screenshot.ModeRegion || config.Mode == screenshot.ModeLastRegion || config.Mode == screenshot.ModeScroll
-		if interactive {
-			setPopoutScreenshotMode(true)
-			defer setPopoutScreenshotMode(false)
-		}
-		return screenshot.New(config).Run()
-	}()
+	// Short-lived process over a few tens of MB: let the heap grow instead of paying GC cycles mid-capture.
+	debug.SetGCPercent(-1)
+	debug.SetMemoryLimit(1 << 30)
 
+	// Region select needs the keyboard; drop popout grabs for its duration.
+	config.SelectorHook = setPopoutScreenshotMode
+	result, err := screenshot.New(config).Run()
 	if err != nil {
 		exitScreenshotError("", err)
 	}
