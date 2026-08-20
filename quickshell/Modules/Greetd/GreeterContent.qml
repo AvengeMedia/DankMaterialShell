@@ -72,8 +72,9 @@ Item {
     // Falls back to PAM-only detection until the fprintd D-Bus probe completes.
     readonly property bool greeterPamHasFprint: greeterPamStackHasFprint && (!fprintdProbeComplete || fprintdHasDevice)
     readonly property bool greeterPamHasU2f: greeterPamStackHasModule("pam_u2f")
-    readonly property bool greeterExternalAuthAvailable: (greeterPamHasFprint && GreetdSettings.greeterEnableFprint) || (greeterPamHasU2f && GreetdSettings.greeterEnableU2f)
-    readonly property bool greeterPamHasExternalAuth: greeterPamHasFprint || greeterPamHasU2f
+    readonly property bool greeterPamHasHowdy: greeterPamStackHasModule("pam_howdy")
+    readonly property bool greeterExternalAuthAvailable: (greeterPamHasFprint && GreetdSettings.greeterEnableFprint) || (greeterPamHasU2f && GreetdSettings.greeterEnableU2f) || greeterPamHasHowdy
+    readonly property bool greeterPamHasExternalAuth: greeterPamHasFprint || greeterPamHasU2f || greeterPamHasHowdy
     readonly property bool externalAuthInProgress: awaitingExternalAuth || (Greetd.state !== GreetdState.Inactive && passwordSubmitRequested && greeterPamHasExternalAuth && !pendingPasswordResponse)
     readonly property string externalAuthStatusMessage: {
         if (!externalAuthInProgress)
@@ -82,6 +83,8 @@ Item {
             return I18n.tr("Awaiting fingerprint or security key authentication");
         if (greeterPamHasFprint)
             return I18n.tr("Awaiting fingerprint authentication");
+        if (greeterPamHasHowdy)
+            return I18n.tr("Awaiting face authentication");
         return I18n.tr("Awaiting security key authentication");
     }
     readonly property string authDisplayMessage: authFeedbackMessage || authSuccessMessage || externalAuthStatusMessage
