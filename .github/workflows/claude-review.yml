@@ -83,7 +83,7 @@ jobs:
             3. Check existing comments so you don't repeat them: `gh api repos/${{ github.repository }}/pulls/${{ github.event.issue.number }}/comments` and `gh pr view ${{ github.event.issue.number }} --comments`. Skip findings already covered by a comment that still applies.
             4. Verify each candidate finding against the code. Drop anything you can't confirm.
             5. Post one inline comment per confirmed finding with `mcp__github_inline_comment__create_inline_comment` (`confirmed: true`). Say what's wrong, why, and the fix. Add a committable suggestion only if it alone fully fixes the issue.
-            6. Post one summary comment. If a comment starting with `## Claude review` already exists, `gh pr comment ${{ github.event.issue.number }} --edit-last --body ...`, else `gh pr comment ${{ github.event.issue.number }} --body ...`. Format:
+            6. Post one new summary comment with `gh pr comment ${{ github.event.issue.number }} --body ...`. Never edit earlier comments. Format:
 
                ## Claude review
                <one line verdict>
