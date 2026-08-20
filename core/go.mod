@@ -94,7 +94,7 @@ require (
 	github.com/lucasb-eyer/go-colorful v1.4.1
 	github.com/mattn/go-isatty v0.0.24
 	github.com/mattn/go-localereader v0.0.2-0.20220822084749-2491eb6c1c75 // indirect
-	github.com/mattn/go-runewidth v0.0.27 // indirect
+	github.com/mattn/go-runewidth v0.0.28 // indirect
 	github.com/muesli/ansi v0.0.0-20230316100256-276c6243b2f6 // indirect
 	github.com/muesli/cancelreader v0.2.2 // indirect
 	github.com/muesli/termenv v0.16.0 // indirect
@@ -111,6 +111,3 @@ require (
 // v0.0.1 tag is missing a LICENSE file; master has it.
 // See: https://github.com/mattn/go-localereader/issues/2
 replace github.com/mattn/go-localereader v0.0.1 => github.com/mattn/go-localereader v0.0.2-0.20220822084749-2491eb6c1c75
-
-// This is because go-runewidth > 0.0.25 builds LUTs at startup
-replace github.com/mattn/go-runewidth => github.com/mattn/go-runewidth v0.0.25
