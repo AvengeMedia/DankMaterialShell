@@ -369,6 +369,7 @@ Singleton {
             const enriched = {
                 "appId": bestMatch.appId,
                 "title": bestMatch.title,
+                "sourceToplevel": bestMatch,
                 "activated": !!client.is_focused,
                 "mangoWindowId": client.id,
                 "mangoTags": client.tags || [],

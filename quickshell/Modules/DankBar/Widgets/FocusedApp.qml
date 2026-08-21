@@ -34,6 +34,34 @@ BasePill {
     property bool isHovered: mouseArea.containsMouse
     property bool isAutoHideBar: false
 
+    function resolveSortedWindow() {
+        const sortedWindows = CompositorService.sortedToplevels || [];
+        const exactMatch = sortedWindows.find(window => window === activeWindow || window.wayland === activeWindow || window.sourceToplevel === activeWindow);
+        if (exactMatch)
+            return exactMatch;
+
+        const titleMatches = sortedWindows.filter(window => window.appId === activeWindow.appId && window.title === activeWindow.title);
+        return titleMatches.length === 1 ? titleMatches[0] : null;
+    }
+
+    function resolveActiveWindowPid() {
+        if (!activeWindow)
+            return 0;
+        if (CompositorService.isNiri) {
+            const sortedWindow = resolveSortedWindow();
+            return sortedWindow?.niriWindowId !== undefined ? NiriService.windows.find(w => w.id === sortedWindow.niriWindowId)?.pid || 0 : 0;
+        }
+        if (CompositorService.isHyprland) {
+            const hyprWindow = Array.from(Hyprland.toplevels?.values || []).find(t => t.wayland === activeWindow);
+            return hyprWindow?.lastIpcObject?.pid || 0;
+        }
+        if (CompositorService.isMango) {
+            const sortedWindow = resolveSortedWindow();
+            return sortedWindow?.mangoWindowId !== undefined ? MangoService.windows.find(w => w.id === sortedWindow.mangoWindowId)?.pid || 0 : 0;
+        }
+        return activeWindow.pid || 0;
+    }
+
     readonly property real minTooltipY: {
         if (!parentScreen || !isVerticalOrientation) {
             return 0;
@@ -353,7 +381,7 @@ BasePill {
         id: mouseArea
         anchors.fill: parent
         hoverEnabled: root.isVerticalOrientation
-        acceptedButtons: Qt.NoButton
+        cursorShape: Qt.PointingHandCursor
         onEntered: {
             if (root.isVerticalOrientation && activeWindow && activeWindow.appId && root.parentScreen) {
                 tooltipLoader.active = true;
@@ -378,11 +406,39 @@ BasePill {
             }
             tooltipLoader.active = false;
         }
+
+        acceptedButtons: Qt.LeftButton
+        onClicked: {
+            if (!activeWindow || !root.parentScreen)
+                return;
+            if (tooltipLoader.item)
+                tooltipLoader.item.hide();
+            tooltipLoader.active = false;
+
+            focusedWindowPopoutLoader.active = true;
+            if (!focusedWindowPopoutLoader.item)
+                return;
+
+            const globalPos = root.visualContent.mapToItem(null, 0, 0);
+            const barPosition = root.axis?.edge === "left" ? 2 : (root.axis?.edge === "right" ? 3 : (root.axis?.edge === "top" ? 0 : 1));
+            const position = SettingsData.getPopupTriggerPosition(globalPos, root.parentScreen, root.barThickness, root.visualWidth, root.barSpacing, barPosition, root.barConfig);
+            const popout = focusedWindowPopoutLoader.item;
+            popout.currentWindow = activeWindow;
+            popout.processId = root.resolveActiveWindowPid();
+            popout.setTriggerPosition(position.x, position.y, position.width, root.section, root.parentScreen, barPosition, root.barThickness, root.barSpacing, root.barConfig);
+            popout.toggle();
+        }
     }
 
     Loader {
         id: tooltipLoader
         active: false
         sourceComponent: DankTooltip {}
+    }
+
+    Loader {
+        id: focusedWindowPopoutLoader
+        active: false
+        sourceComponent: FocusedWindowContextMenu {}
     }
 }
