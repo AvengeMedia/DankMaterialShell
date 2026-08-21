@@ -1,7 +1,9 @@
 BINARY_NAME=dms
 BINARY_NAME_INSTALL=dankinstall
+CAST_HELPER=dms-cast-helper
 SOURCE_DIR=cmd/dms
 SOURCE_DIR_INSTALL=cmd/dankinstall
+SOURCE_DIR_CAST=cmd/dms-cast-helper
 BUILD_DIR=bin
 SHELL_SRC=../quickshell
 EMBED_DIR=internal/shellembed/dist
@@ -32,7 +34,7 @@ else
 DIST_ARCHS = $(ARCH)
 endif
 
-.PHONY: all build sync-shell dankinstall dist clean install install-all install-dankinstall uninstall uninstall-all uninstall-dankinstall install-config uninstall-config test fmt vet deps print-version help
+.PHONY: all build sync-shell dankinstall cast-helper dist clean install install-all install-dankinstall install-cast-helper uninstall uninstall-all uninstall-dankinstall install-config uninstall-config test fmt vet deps print-version help
 
 # Default target
 all: build
@@ -71,6 +73,16 @@ dankinstall:
 	CGO_ENABLED=0 $(GO) build $(BUILD_LDFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME_INSTALL) ./$(SOURCE_DIR_INSTALL)
 	@echo "Build complete: $(BUILD_DIR)/$(BINARY_NAME_INSTALL)"
 
+# Build the go-gst screen-capture helper used by the cast screen-mirror feature.
+# Opt-in (not part of `make build`) because it needs CGO + GStreamer dev packages
+# (gstreamer-1.0, gst-plugins-base, plus plugins-good/bad/ugly + pipewire at
+# runtime). The main dms binary stays CGO-free and spawns this when present.
+cast-helper:
+	@echo "Building $(CAST_HELPER) (requires CGO + GStreamer dev)..."
+	@mkdir -p $(BUILD_DIR)
+	CGO_ENABLED=1 $(GO) build -tags casthelper -ldflags='-s -w' -o $(BUILD_DIR)/$(CAST_HELPER) ./$(SOURCE_DIR_CAST)
+	@echo "Build complete: $(BUILD_DIR)/$(CAST_HELPER)"
+
 # Build distro binaries (no update/greeter support) for each DIST_OSES/DIST_ARCHS pair
 dist: sync-shell
 	@echo "Building $(BINARY_NAME) for distribution ($(DIST_OSES) x $(DIST_ARCHS))..."
@@ -89,6 +101,12 @@ build-all: build dankinstall
 install:
 	@echo "Installing $(BINARY_NAME) to $(INSTALL_DIR)..."
 	@install -D -m 755 $(BUILD_DIR)/$(BINARY_NAME) $(INSTALL_DIR)/$(BINARY_NAME)
+	@echo "Installation complete"
+
+# Install the cast helper next to dms (dms finds it via the same directory).
+install-cast-helper:
+	@echo "Installing $(CAST_HELPER) to $(INSTALL_DIR)..."
+	@install -D -m 755 $(BUILD_DIR)/$(CAST_HELPER) $(INSTALL_DIR)/$(CAST_HELPER)
 	@echo "Installation complete"
 
 install-all:
