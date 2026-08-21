@@ -415,10 +415,7 @@ func (m Model) viewDebugLogs() string {
 		b.WriteString("No logs available\n")
 	} else {
 		// Calculate available height (reserve space for header and footer)
-		maxHeight := m.height - 6
-		if maxHeight < 10 {
-			maxHeight = 10
-		}
+		maxHeight := max(m.height-6, 10)
 
 		// Show the most recent logs
 		startIdx := 0

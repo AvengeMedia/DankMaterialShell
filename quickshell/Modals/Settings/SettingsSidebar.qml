@@ -704,6 +704,8 @@ Rectangle {
         tabChangeRequested(result.tabIndex);
         autoCollapseIfNeeded(oldIndex, result.tabIndex);
         autoExpandForTab(result.tabIndex);
+        if (result.runtimeType === "plugin" && result.runtimeId && root.parentModal?.openPluginSettings)
+            root.parentModal.openPluginSettings(result.runtimeId);
         keyboardHighlightIndex = -1;
         Qt.callLater(searchField.forceActiveFocus);
     }

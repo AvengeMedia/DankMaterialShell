@@ -8,13 +8,13 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/highlight"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/highlight/lexers"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/highlight/styles"
 	"github.com/alecthomas/chroma/v2"
 	"github.com/alecthomas/chroma/v2/formatters/html"
-	"github.com/alecthomas/chroma/v2/lexers"
-	"github.com/alecthomas/chroma/v2/styles"
 	"github.com/spf13/cobra"
 	"github.com/yuin/goldmark"
-	highlighting "github.com/yuin/goldmark-highlighting/v2"
 	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/parser"
 	ghtml "github.com/yuin/goldmark/renderer/html"
@@ -116,7 +116,7 @@ func getCachedStyle(name string) *chroma.Style {
 	style := styles.Get(name)
 	if style == nil {
 		fmt.Fprintf(os.Stderr, "Warning: Style '%s' not found, using fallback\n", name)
-		style = styles.Fallback
+		style = styles.Fallback()
 	}
 
 	cacheMutex.Lock()
@@ -209,12 +209,10 @@ func runChroma(cmd *cobra.Command, args []string) {
 		md := goldmark.New(
 			goldmark.WithExtensions(
 				extension.GFM,
-				highlighting.NewHighlighting(
-					highlighting.WithStyle(chromaStyle),
-					highlighting.WithFormatOptions(
-						html.WithClasses(!chromaInline),
-					),
-				),
+				highlight.Markdown{
+					Style:     styles.Get(chromaStyle),
+					Formatter: html.New(html.WithClasses(!chromaInline)),
+				},
 			),
 			goldmark.WithParserOptions(
 				parser.WithAutoHeadingID(),

@@ -159,6 +159,8 @@ Text {
 
 Preferably, try to keep new terms to a minimum and re-use existing terms where possible. See `quickshell/translations/en.json` for the list of existing terms. (This isn't always possible obviously, but instead of using `Auto-connect` you would use `Autoconnect` since it's already translated)
 
+Don't re-extract the translations. `en.json` and `template.json` are synced with POEditor by a maintainer script, so running `extract_translations.py` in your PR just makes a diff that fights the next sync. Add your `I18n.tr()` calls and leave the catalogs alone. (`settings_search_index.json` is the exception, the pre-commit hook regenerates that one when you touch settings QML.)
+
 Strings inside `quickshell/DankCommon/` are owned by the dank-qml-common repo but stay in the DMS POEditor project — extraction here deliberately skips them, and `scripts/i18nsync.py sync` uploads the union of app terms and the submodule's terms instead (common terms carry the `dank-qml-common` tag). On download the sync splits the exports: app translations go to `quickshell/translations/poexports/`, common translations go to `dank-qml-common/DankCommon/translations/poexports/` for you to commit in that repo and bump. At runtime `I18n` merges both catalogs (app terms win). Other apps (dankcalendar) keep their own POEditor projects and merge the `dank-qml-common`-tagged terms from the DMS project.
 
 ### GO (`core` directory)
@@ -168,6 +170,8 @@ Strings inside `quickshell/DankCommon/` are owned by the dank-qml-common repo bu
 3. Add appropriate test coverage and ensure tests pass with `make test`
 4. Run `go mod tidy`
 5. Open pull request
+
+golangci-lint runs as a pre-commit hook and covers `go vet`, so there's nothing separate to run. If you run `go vet ./...` yourself you'll see complaints about the generated mocks, ignore them, `core/.golangci.yml` excludes that directory.
 
 #### Mocks
 

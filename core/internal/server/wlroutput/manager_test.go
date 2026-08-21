@@ -155,23 +155,21 @@ func TestManager_ConcurrentGetState(t *testing.T) {
 	const goroutines = 50
 	const iterations = 100
 
-	for i := 0; i < goroutines/2; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			for j := 0; j < iterations; j++ {
+	for range goroutines / 2 {
+		wg.Go(func() {
+			for range iterations {
 				s := m.GetState()
 				_ = s.Serial
 				_ = s.Outputs
 			}
-		}()
+		})
 	}
 
-	for i := 0; i < goroutines/2; i++ {
+	for i := range goroutines / 2 {
 		wg.Add(1)
 		go func(i int) {
 			defer wg.Done()
-			for j := 0; j < iterations; j++ {
+			for j := range iterations {
 				m.stateMutex.Lock()
 				m.state = &State{
 					Serial:  uint32(j),
@@ -194,7 +192,7 @@ func TestManager_ConcurrentSubscriberAccess(t *testing.T) {
 	var wg sync.WaitGroup
 	const goroutines = 20
 
-	for i := 0; i < goroutines; i++ {
+	for i := range goroutines {
 		wg.Add(1)
 		go func(id int) {
 			defer wg.Done()
@@ -216,13 +214,13 @@ func TestManager_SyncmapHeadsConcurrentAccess(t *testing.T) {
 	const goroutines = 30
 	const iterations = 50
 
-	for i := 0; i < goroutines; i++ {
+	for i := range goroutines {
 		wg.Add(1)
 		go func(id int) {
 			defer wg.Done()
 			key := uint32(id)
 
-			for j := 0; j < iterations; j++ {
+			for j := range iterations {
 				state := &headState{
 					id:      key,
 					name:    "test-head",
@@ -257,13 +255,13 @@ func TestManager_SyncmapModesConcurrentAccess(t *testing.T) {
 	const goroutines = 30
 	const iterations = 50
 
-	for i := 0; i < goroutines; i++ {
+	for i := range goroutines {
 		wg.Add(1)
 		go func(id int) {
 			defer wg.Done()
 			key := uint32(id)
 
-			for j := 0; j < iterations; j++ {
+			for j := range iterations {
 				state := &modeState{
 					id:        key,
 					width:     int32(1920 + j),
@@ -296,7 +294,7 @@ func TestManager_NotifySubscribersNonBlocking(t *testing.T) {
 		dirty: make(chan struct{}, 1),
 	}
 
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		m.notifySubscribers()
 	}
 
@@ -374,9 +372,18 @@ func TestOutput_Fields(t *testing.T) {
 
 	assert.Equal(t, "eDP-1", out.Name)
 	assert.Equal(t, "Built-in display", out.Description)
+	assert.Equal(t, "BOE", out.Make)
+	assert.Equal(t, "0x0ABC", out.Model)
+	assert.Equal(t, "12345", out.SerialNumber)
+	assert.Equal(t, int32(309), out.PhysicalWidth)
+	assert.Equal(t, int32(174), out.PhysicalHeight)
 	assert.True(t, out.Enabled)
+	assert.Equal(t, int32(0), out.X)
+	assert.Equal(t, int32(0), out.Y)
+	assert.Equal(t, int32(0), out.Transform)
 	assert.Equal(t, float64(1.5), out.Scale)
 	assert.Equal(t, uint32(1), out.AdaptiveSync)
+	assert.Equal(t, uint32(1), out.ID)
 }
 
 func TestHeadState_ModeIDsSlice(t *testing.T) {
@@ -386,6 +393,7 @@ func TestHeadState_ModeIDsSlice(t *testing.T) {
 	}
 
 	head.modeIDs = append(head.modeIDs, 1, 2, 3)
+	assert.Equal(t, uint32(1), head.id)
 	assert.Len(t, head.modeIDs, 3)
 	assert.Equal(t, uint32(1), head.modeIDs[0])
 }

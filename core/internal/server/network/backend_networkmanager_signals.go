@@ -159,9 +159,7 @@ func (b *NetworkManagerBackend) startSignalPump() error {
 		return err
 	}
 
-	b.sigWG.Add(1)
-	go func() {
-		defer b.sigWG.Done()
+	b.sigWG.Go(func() {
 		for {
 			select {
 			case <-b.stopChan:
@@ -176,7 +174,7 @@ func (b *NetworkManagerBackend) startSignalPump() error {
 				b.handleDBusSignal(sig)
 			}
 		}
-	}()
+	})
 	return nil
 }
 

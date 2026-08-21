@@ -77,7 +77,7 @@ func requiresTarget(filePath, rootDir, targetAbs string, processed map[string]bo
 		return false
 	}
 
-	for _, raw := range strings.Split(string(data), "\n") {
+	for raw := range strings.SplitSeq(string(data), "\n") {
 		for _, module := range Requires(raw) {
 			candidate := ModuleToPath(rootDir, module)
 			if candidate == "" {

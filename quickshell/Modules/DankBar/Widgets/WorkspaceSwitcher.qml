@@ -253,6 +253,16 @@ Item {
         return ws.id > 0 ? ws.id : "name:" + (ws.name ?? "");
     }
 
+    // A hotplug can leave the workspace→monitor mapping stale so nothing matches this screen;
+    // show what the monitor itself reports rather than a fabricated workspace "1" (#3133)
+    function hyprlandMonitorWorkspaces(workspaces) {
+        const monitorWorkspaces = workspaces.filter(ws => ws.monitor?.name === root.screenName);
+        if (monitorWorkspaces.length > 0)
+            return monitorWorkspaces.sort(hyprlandWorkspaceOrder);
+        const active = Hyprland.monitors?.values?.find(m => m.name === root.screenName)?.activeWorkspace;
+        return active ? [active] : [];
+    }
+
     function getHyprlandWorkspaces() {
         const workspaces = Hyprland.workspaces?.values || [];
         if (workspaces.length === 0) {
@@ -284,13 +294,7 @@ Item {
         if (!root.screenName || SettingsData.workspaceFollowFocus) {
             filtered = filtered.slice().sort(hyprlandWorkspaceOrder);
         } else {
-            const monitorWorkspaces = filtered.filter(ws => ws.monitor?.name === root.screenName);
-            filtered = monitorWorkspaces.length > 0 ? monitorWorkspaces.sort(hyprlandWorkspaceOrder) : [
-                {
-                    id: 1,
-                    name: "1"
-                }
-            ];
+            filtered = hyprlandMonitorWorkspaces(filtered);
         }
 
         if (!SettingsData.showOccupiedWorkspacesOnly) {

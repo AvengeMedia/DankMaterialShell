@@ -680,7 +680,7 @@ func dispatcherCycleNext(params string) string {
 		return `hl.dsp.window.cycle_next()`
 	}
 	fields := []luaField{}
-	for _, field := range strings.Fields(params) {
+	for field := range strings.FieldsSeq(params) {
 		switch field {
 		case "prev", "previous", "b":
 			fields = append(fields, luaBoolField("next", false))

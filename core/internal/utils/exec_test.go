@@ -41,8 +41,8 @@ func TestEnvWithUserBinPathPrependsLocalBin(t *testing.T) {
 	env := EnvWithUserBinPath([]string{"PATH=/usr/bin", "OTHER=value"})
 	var pathValue string
 	for _, entry := range env {
-		if strings.HasPrefix(entry, "PATH=") {
-			pathValue = strings.TrimPrefix(entry, "PATH=")
+		if after, ok := strings.CutPrefix(entry, "PATH="); ok {
+			pathValue = after
 			break
 		}
 	}

@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
@@ -108,8 +109,8 @@ func (p *SwayParser) expandVariables(text string) string {
 func swayAutogenerateComment(command string) string {
 	command = strings.TrimSpace(command)
 
-	if strings.HasPrefix(command, "exec ") {
-		cmdPart := strings.TrimPrefix(command, "exec ")
+	if after, ok := strings.CutPrefix(command, "exec "); ok {
+		cmdPart := after
 		cmdPart = strings.TrimPrefix(cmdPart, "--no-startup-id ")
 		return cmdPart
 	}
@@ -249,13 +250,7 @@ func (p *SwayParser) getKeybindAtLine(lineNumber int) *SwayKeyBinding {
 	modstring := keyCombo + string(SwayModSeparators[0])
 	pos := 0
 	for index, char := range modstring {
-		isModSep := false
-		for _, sep := range SwayModSeparators {
-			if char == sep {
-				isModSep = true
-				break
-			}
-		}
+		isModSep := slices.Contains(SwayModSeparators, char)
 		if isModSep {
 			if index-pos > 0 {
 				part := modstring[pos:index]

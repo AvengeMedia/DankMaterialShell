@@ -11,6 +11,11 @@ const (
 	FormatXBGR8888 = shm.FormatXBGR8888
 	FormatRGB888   = shm.FormatRGB888
 	FormatBGR888   = shm.FormatBGR888
+
+	FormatARGB2101010 = shm.FormatARGB2101010
+	FormatXRGB2101010 = shm.FormatXRGB2101010
+	FormatABGR2101010 = shm.FormatABGR2101010
+	FormatXBGR2101010 = shm.FormatXBGR2101010
 )
 
 const (

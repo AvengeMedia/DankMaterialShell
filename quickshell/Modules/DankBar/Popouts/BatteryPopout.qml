@@ -175,7 +175,9 @@ DankPopout {
                                 return I18n.tr("Power profile management available");
                             const time = BatteryService.formatTimeRemaining();
                             if (time !== "Unknown") {
-                                return BatteryService.isCharging ? I18n.tr("Time until full: %1").arg(time) : I18n.tr("Time remaining: %1").arg(time);
+                                const estimated = BatteryService.formatEstimatedTime();
+                                const timeText = estimated ? `${time} (${estimated})` : time;
+                                return BatteryService.isCharging ? I18n.tr("Time until full: %1").arg(timeText) : I18n.tr("Time remaining: %1").arg(timeText);
                             }
                             return "";
                         }

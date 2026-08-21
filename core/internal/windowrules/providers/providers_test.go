@@ -12,11 +12,3 @@ func newTestWindowRule(id, name, appID string) windowrules.WindowRule {
 		},
 	}
 }
-
-func boolPtr(b bool) *bool {
-	return &b
-}
-
-func floatPtr(f float64) *float64 {
-	return &f
-}

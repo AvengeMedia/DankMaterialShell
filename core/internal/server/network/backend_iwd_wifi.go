@@ -496,11 +496,9 @@ func (b *IWDBackend) maybeReplaceSavedPSK(att *connectAttempt) {
 		return
 	}
 
-	b.sigWG.Add(1)
-	go func() {
-		defer b.sigWG.Done()
+	b.sigWG.Go(func() {
 		b.requestReplacementPSK(att.ssid)
-	}()
+	})
 }
 
 func (b *IWDBackend) requestReplacementPSK(ssid string) {
@@ -548,9 +546,7 @@ func (b *IWDBackend) requestReplacementPSK(ssid string) {
 }
 
 func (b *IWDBackend) startAttemptWatchdog(att *connectAttempt) {
-	b.sigWG.Add(1)
-	go func() {
-		defer b.sigWG.Done()
+	b.sigWG.Go(func() {
 
 		ticker := time.NewTicker(250 * time.Millisecond)
 		defer ticker.Stop()
@@ -598,7 +594,7 @@ func (b *IWDBackend) startAttemptWatchdog(att *connectAttempt) {
 				return
 			}
 		}
-	}()
+	})
 }
 
 func (b *IWDBackend) mapIwdDBusError(name string) string {

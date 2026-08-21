@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -506,9 +507,9 @@ func (p *HyprlandParser) parseFileWithSource(filePath, sectionName string) (*Hyp
 	p.currentSource = absPath
 
 	section := &HyprlandSection{Name: sectionName}
-	lines := strings.Split(string(data), "\n")
+	lines := strings.SplitSeq(string(data), "\n")
 
-	for _, line := range lines {
+	for line := range lines {
 		trimmed := strings.TrimSpace(line)
 
 		if strings.HasPrefix(trimmed, "source") {
@@ -588,8 +589,8 @@ func (p *HyprlandParser) parseDMSBindsDirectly(dmsBindsPath string, section *Hyp
 	prevSource := p.currentSource
 	p.currentSource = dmsBindsPath
 
-	lines := strings.Split(string(data), "\n")
-	for _, line := range lines {
+	lines := strings.SplitSeq(string(data), "\n")
+	for line := range lines {
 		trimmed := strings.TrimSpace(line)
 		if !strings.HasPrefix(trimmed, "bind") {
 			continue
@@ -799,13 +800,7 @@ func (p *HyprlandParser) parseBindLine(line string) *HyprlandKeyBinding {
 		modstring := mods + string(ModSeparators[0])
 		idx := 0
 		for index, char := range modstring {
-			isModSep := false
-			for _, sep := range ModSeparators {
-				if char == sep {
-					isModSep = true
-					break
-				}
-			}
+			isModSep := slices.Contains(ModSeparators, char)
 			if isModSep {
 				if index-idx > 1 {
 					modList = append(modList, modstring[idx:index])
@@ -1053,8 +1048,8 @@ func luaExprToDispatcherParams(expr string) (dispatcher, params string) {
 		arg := extractLuaCallStringArg(expr, "hl.dsp.exec_cmd")
 		if arg != "" {
 			if u, err := strconv.Unquote(arg); err == nil {
-				if strings.HasPrefix(u, "hyprctl dispatch ") {
-					return splitDispatchCommand(strings.TrimSpace(strings.TrimPrefix(u, "hyprctl dispatch ")))
+				if after, ok := strings.CutPrefix(u, "hyprctl dispatch "); ok {
+					return splitDispatchCommand(strings.TrimSpace(after))
 				}
 				return "exec", u
 			}

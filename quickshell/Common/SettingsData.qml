@@ -968,6 +968,7 @@ Singleton {
     property bool notificationHistorySaveNormal: true
     property bool notificationHistorySaveCritical: true
     property var notificationRules: []
+    property bool notificationDndAllowCritical: true
     property bool notificationFocusedMonitor: false
 
     property bool osdAlwaysShowValue: false
@@ -2906,33 +2907,33 @@ Singleton {
     property bool _pendingExpandNotificationRules: false
     property int _pendingNotificationRuleIndex: -1
 
-    function addNotificationRule() {
-        var rules = JSON.parse(JSON.stringify(notificationRules || []));
-        rules.push({
+    function _newNotificationRule(overrides) {
+        return Object.assign({
             enabled: true,
             field: "appName",
             pattern: "",
             matchType: "contains",
             action: "default",
-            urgency: "default"
-        });
+            urgency: "default",
+            bypassDnd: false
+        }, overrides || {});
+    }
+
+    function addNotificationRule() {
+        var rules = JSON.parse(JSON.stringify(notificationRules || []));
+        rules.push(_newNotificationRule());
         notificationRules = rules;
         saveSettings();
     }
 
     function addNotificationRuleForNotification(appName, desktopEntry) {
         var rules = JSON.parse(JSON.stringify(notificationRules || []));
-        var pattern = (desktopEntry && desktopEntry !== "") ? desktopEntry : (appName || "");
-        var field = (desktopEntry && desktopEntry !== "") ? "desktopEntry" : "appName";
-        var rule = {
-            enabled: true,
-            field: pattern ? field : "appName",
-            pattern: pattern || "",
-            matchType: pattern ? "exact" : "contains",
-            action: "default",
-            urgency: "default"
-        };
-        rules.push(rule);
+        var pattern = desktopEntry || appName || "";
+        rules.push(_newNotificationRule(pattern ? {
+            field: desktopEntry ? "desktopEntry" : "appName",
+            pattern: pattern,
+            matchType: "exact"
+        } : {}));
         notificationRules = rules;
         saveSettings();
         var index = rules.length - 1;
@@ -2941,67 +2942,79 @@ Singleton {
         return index;
     }
 
-    function addMuteRuleForApp(appName, desktopEntry) {
-        var rules = JSON.parse(JSON.stringify(notificationRules || []));
-        var pattern = (desktopEntry && desktopEntry !== "") ? desktopEntry : (appName || "");
-        var field = (desktopEntry && desktopEntry !== "") ? "desktopEntry" : "appName";
-        if (pattern === "")
-            return;
-        rules.push({
-            enabled: true,
-            field: field,
-            pattern: pattern,
-            matchType: "exact",
-            action: "mute",
-            urgency: "default"
+    function _isMuteRule(rule) {
+        return (rule.action || "").toString().toLowerCase() === "mute";
+    }
+
+    function _isDndBypassRule(rule) {
+        return rule.bypassDnd === true;
+    }
+
+    function _appRuleIndex(rules, appName, desktopEntry, predicate) {
+        const app = (appName || "").toString().toLowerCase();
+        const desktop = (desktopEntry || "").toString().toLowerCase();
+        if (!app && !desktop)
+            return -1;
+        return rules.findIndex(rule => {
+            if (!predicate(rule))
+                return false;
+            const pattern = (rule.pattern || "").toString().toLowerCase();
+            return pattern !== "" && (pattern === app || pattern === desktop);
         });
+    }
+
+    function _addAppRule(appName, desktopEntry, overrides) {
+        const pattern = desktopEntry || appName || "";
+        if (!pattern)
+            return;
+        var rules = JSON.parse(JSON.stringify(notificationRules || []));
+        rules.push(_newNotificationRule(Object.assign({
+            field: desktopEntry ? "desktopEntry" : "appName",
+            pattern: pattern,
+            matchType: "exact"
+        }, overrides)));
         notificationRules = rules;
         saveSettings();
     }
 
+    function _removeAppRule(appName, desktopEntry, predicate) {
+        var rules = JSON.parse(JSON.stringify(notificationRules || []));
+        const index = _appRuleIndex(rules, appName, desktopEntry, predicate);
+        if (index === -1)
+            return;
+        rules.splice(index, 1);
+        notificationRules = rules;
+        saveSettings();
+    }
+
+    function addMuteRuleForApp(appName, desktopEntry) {
+        _addAppRule(appName, desktopEntry, {
+            action: "mute"
+        });
+    }
+
     function isAppMuted(appName, desktopEntry) {
-        const rules = notificationRules || [];
-        const pat = (desktopEntry && desktopEntry !== "" ? desktopEntry : appName || "").toString().toLowerCase();
-        if (!pat)
-            return false;
-        for (let i = 0; i < rules.length; i++) {
-            const r = rules[i];
-            if ((r.action || "").toString().toLowerCase() !== "mute" || r.enabled === false)
-                continue;
-            const field = (r.field || "appName").toString().toLowerCase();
-            const rulePat = (r.pattern || "").toString().toLowerCase();
-            if (!rulePat)
-                continue;
-            const useDesktop = field === "desktopentry";
-            const matches = (useDesktop && desktopEntry) ? (desktopEntry.toString().toLowerCase() === rulePat) : (appName && appName.toString().toLowerCase() === rulePat);
-            if (matches)
-                return true;
-            if (rulePat === pat)
-                return true;
-        }
-        return false;
+        return _appRuleIndex(notificationRules || [], appName, desktopEntry, rule => rule.enabled !== false && _isMuteRule(rule)) !== -1;
     }
 
     function removeMuteRuleForApp(appName, desktopEntry) {
-        var rules = JSON.parse(JSON.stringify(notificationRules || []));
-        const app = (appName || "").toString().toLowerCase();
-        const desktop = (desktopEntry || "").toString().toLowerCase();
-        if (!app && !desktop)
+        _removeAppRule(appName, desktopEntry, _isMuteRule);
+    }
+
+    function isAppDndBypassed(appName, desktopEntry) {
+        return _appRuleIndex(notificationRules || [], appName, desktopEntry, rule => rule.enabled !== false && _isDndBypassRule(rule)) !== -1;
+    }
+
+    function setAppDndBypass(appName, desktopEntry, enabled) {
+        if (!enabled) {
+            _removeAppRule(appName, desktopEntry, _isDndBypassRule);
             return;
-        for (let i = rules.length - 1; i >= 0; i--) {
-            const r = rules[i];
-            if ((r.action || "").toString().toLowerCase() !== "mute")
-                continue;
-            const rulePat = (r.pattern || "").toString().toLowerCase();
-            if (!rulePat)
-                continue;
-            if (rulePat === app || rulePat === desktop) {
-                rules.splice(i, 1);
-                notificationRules = rules;
-                saveSettings();
-                return;
-            }
         }
+        if (isAppDndBypassed(appName, desktopEntry))
+            return;
+        _addAppRule(appName, desktopEntry, {
+            bypassDnd: true
+        });
     }
 
     function updateNotificationRule(index, ruleData) {

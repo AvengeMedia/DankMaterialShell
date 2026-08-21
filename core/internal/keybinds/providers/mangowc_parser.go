@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
@@ -237,8 +238,8 @@ func (p *MangoWCParser) ParseKeys() []MangoWCKeyBinding {
 			pendingComment = ""
 			continue
 		}
-		if strings.HasPrefix(trimmed, "#") {
-			pendingComment = strings.TrimSpace(strings.TrimPrefix(trimmed, "#"))
+		if after, ok := strings.CutPrefix(trimmed, "#"); ok {
+			pendingComment = strings.TrimSpace(after)
 			if isMangoWCSectionComment(pendingComment) {
 				pendingComment = ""
 			}
@@ -403,9 +404,9 @@ func (p *MangoWCParser) parseFileWithSource(filePath string) ([]MangoWCKeyBindin
 
 	var keybinds []MangoWCKeyBinding
 	var pendingComment string
-	lines := strings.Split(string(data), "\n")
+	lines := strings.SplitSeq(string(data), "\n")
 
-	for _, line := range lines {
+	for line := range lines {
 		trimmed := strings.TrimSpace(line)
 
 		if trimmed == "" {
@@ -419,8 +420,8 @@ func (p *MangoWCParser) parseFileWithSource(filePath string) ([]MangoWCKeyBindin
 			continue
 		}
 
-		if strings.HasPrefix(trimmed, "#") {
-			pendingComment = strings.TrimSpace(strings.TrimPrefix(trimmed, "#"))
+		if after, ok := strings.CutPrefix(trimmed, "#"); ok {
+			pendingComment = strings.TrimSpace(after)
 			if isMangoWCSectionComment(pendingComment) {
 				pendingComment = ""
 			}
@@ -547,13 +548,7 @@ func (p *MangoWCParser) getKeybindAtLineContent(line string, precedingComment st
 		modstring := mods + string(MangoWCModSeparators[0])
 		idx := 0
 		for index, char := range modstring {
-			isModSep := false
-			for _, sep := range MangoWCModSeparators {
-				if char == sep {
-					isModSep = true
-					break
-				}
-			}
+			isModSep := slices.Contains(MangoWCModSeparators, char)
 			if isModSep {
 				if index-idx > 1 {
 					modList = append(modList, modstring[idx:index])

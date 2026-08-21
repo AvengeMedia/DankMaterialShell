@@ -17,6 +17,7 @@ PanelWindow {
     signal dismissRequested
 
     readonly property bool isMuted: SettingsData.isAppMuted(appName, desktopEntry)
+    readonly property bool isDndBypassed: SettingsData.isAppDndBypassed(appName, desktopEntry)
 
     onVisibleChanged: transientSurfaceTracker?.setActive(root, visible, root)
     Component.onDestruction: transientSurfaceTracker?.unregister(root)
@@ -54,6 +55,9 @@ PanelWindow {
                 SettingsData.addMuteRuleForApp(appName, desktopEntry);
                 muted();
             }
+            break;
+        case "dnd":
+            SettingsData.setAppDndBypass(appName, desktopEntry, !isDndBypassed);
             break;
         case "dismiss":
             dismissRequested();
@@ -129,6 +133,10 @@ PanelWindow {
                     {
                         "label": root.isMuted ? I18n.tr("Unmute popups for %1").arg(root.appName || I18n.tr("this app")) : I18n.tr("Mute popups for %1").arg(root.appName || I18n.tr("this app")),
                         "action": "mute"
+                    },
+                    {
+                        "label": root.isDndBypassed ? I18n.tr("Block %1 in Do Not Disturb").arg(root.appName || I18n.tr("this app")) : I18n.tr("Allow %1 in Do Not Disturb").arg(root.appName || I18n.tr("this app")),
+                        "action": "dnd"
                     },
                     {
                         "label": I18n.tr("Dismiss"),

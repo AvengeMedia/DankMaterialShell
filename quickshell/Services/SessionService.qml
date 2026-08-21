@@ -488,10 +488,34 @@ Singleton {
     // * Idle Inhibitor
     signal inhibitorChanged
 
+    // The inhibitor is a state the user turns on explicitly, so it is persisted in the session
+    // like the other Control Center toggles (doNotDisturb, nightModeEnabled, ...). Without this
+    // it lived only in memory and every shell restart silently cleared it.
+    //
+    // Both entry points are needed because the two singletons are lazily created and the order is
+    // not fixed: onLoaded covers "service first, session file read later", the restore below
+    // covers "session already loaded by the time the service is instantiated". enableIdleInhibit
+    // is idempotent, so whichever runs second does nothing.
+    function _restoreIdleInhibit() {
+        if (SessionData.idleInhibited && !idleInhibited)
+            enableIdleInhibit();
+    }
+
+    Connections {
+        target: SessionData
+
+        function onLoaded() {
+            root._restoreIdleInhibit();
+        }
+    }
+
+    Component.onCompleted: _restoreIdleInhibit()
+
     function enableIdleInhibit() {
         if (idleInhibited)
             return;
         idleInhibited = true;
+        SessionData.setIdleInhibited(true);
         inhibitorChanged();
     }
 
@@ -499,6 +523,7 @@ Singleton {
         if (!idleInhibited)
             return;
         idleInhibited = false;
+        SessionData.setIdleInhibited(false);
         inhibitorChanged();
     }
 

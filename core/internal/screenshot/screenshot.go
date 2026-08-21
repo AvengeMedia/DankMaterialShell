@@ -7,6 +7,7 @@ import (
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wlr_screencopy"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wp_color_management"
 	wlhelpers "github.com/AvengeMedia/DankMaterialShell/core/internal/wayland/client"
 	"github.com/AvengeMedia/dankgo/wayland/client"
 )
@@ -29,6 +30,7 @@ type CaptureResult struct {
 	YInverted bool
 	Format    uint32
 	Scale     float64
+	CICP      *CICP
 }
 
 func (o *WaylandOutput) effectiveScale() float64 {
@@ -55,6 +57,7 @@ type Screenshoter struct {
 	compositor *client.Compositor
 	shm        *client.Shm
 	screencopy *wlr_screencopy.ZwlrScreencopyManagerV1
+	colorMgr   *wp_color_management.WpColorManagerV1
 
 	outputs   map[uint32]*WaylandOutput
 	outputsMu sync.Mutex
@@ -128,6 +131,11 @@ func (s *Screenshoter) captureRegion() (*CaptureResult, error) {
 		}
 	}
 
+	if s.config.SelectorHook != nil {
+		s.config.SelectorHook(true)
+		defer s.config.SelectorHook(false)
+	}
+
 	selector := NewRegionSelector(s)
 	result, cancelled, err := selector.Run()
 	if err != nil {
@@ -139,6 +147,10 @@ func (s *Screenshoter) captureRegion() (*CaptureResult, error) {
 
 	if err := SaveLastRegion(result.Region); err != nil {
 		log.Debug("failed to save last region", "err", err)
+	}
+
+	if out := s.findOutputByName(result.Region.Output); out != nil {
+		result.CICP = s.outputCICP(out)
 	}
 
 	return result, nil
@@ -275,6 +287,7 @@ func (s *Screenshoter) captureMangoWindow(output *WaylandOutput, region Region, 
 		YInverted: false,
 		Format:    result.Format,
 		Scale:     scale,
+		CICP:      result.CICP,
 	}, nil
 }
 
@@ -436,9 +449,18 @@ func (s *Screenshoter) captureAllScreens() (*CaptureResult, error) {
 	composite.Clear()
 
 	var format uint32
+	cicp := entries[0].result.CICP
 	for _, e := range entries {
+		// Outputs may mix 8-bit and 10-bit; composite in 8-bit
+		if PixelFormat(e.result.Format).Is10Bit() {
+			e.result.Buffer.Convert10To8()
+			e.result.Format = uint32(e.result.Buffer.Format)
+		}
 		if format == 0 {
 			format = e.result.Format
+		}
+		if cicp != nil && (e.result.CICP == nil || *e.result.CICP != *cicp) {
+			cicp = nil
 		}
 		s.blitBufferScaled(composite, e.result.Buffer,
 			e.canvasX-minX, e.canvasY-minY, e.canvasW, e.canvasH,
@@ -451,6 +473,7 @@ func (s *Screenshoter) captureAllScreens() (*CaptureResult, error) {
 		Region: Region{X: int32(minX), Y: int32(minY), Width: int32(totalW), Height: int32(totalH)},
 		Format: format,
 		Scale:  maxScale,
+		CICP:   cicp,
 	}, nil
 }
 
@@ -462,7 +485,7 @@ func (s *Screenshoter) blitBufferScaled(dst, src *ShmBuffer, dstX, dstY, dstW, d
 	srcData := src.Data()
 	dstData := dst.Data()
 
-	for dy := 0; dy < dstH; dy++ {
+	for dy := range dstH {
 		canvasY := dstY + dy
 		if canvasY < 0 || canvasY >= dst.Height {
 			continue
@@ -479,7 +502,7 @@ func (s *Screenshoter) blitBufferScaled(dst, src *ShmBuffer, dstX, dstY, dstW, d
 		srcRowOff := srcY * src.Stride
 		dstRowOff := canvasY * dst.Stride
 
-		for dx := 0; dx < dstW; dx++ {
+		for dx := range dstW {
 			canvasX := dstX + dx
 			if canvasX < 0 || canvasX >= dst.Width {
 				continue
@@ -524,6 +547,7 @@ func (s *Screenshoter) captureWholeOutput(output *WaylandOutput) (*CaptureResult
 		return nil, err
 	}
 	result.Scale = output.effectiveScale()
+	result.CICP = s.outputCICP(output)
 
 	if result.YInverted {
 		result.Buffer.FlipVertical()
@@ -560,11 +584,13 @@ func (s *Screenshoter) captureAndCrop(output *WaylandOutput, region Region) (*Ca
 
 	outX, outY := output.x, output.y
 	scale := float64(output.scale)
-	if hx, hy, _, _, ok := GetHyprlandMonitorGeometry(output.name); ok {
-		outX, outY = hx, hy
-	}
-	if s := GetHyprlandMonitorScale(output.name); s > 0 {
-		scale = s
+	if DetectCompositor() == CompositorHyprland {
+		if hx, hy, _, _, ok := GetHyprlandMonitorGeometry(output.name); ok {
+			outX, outY = hx, hy
+		}
+		if s := GetHyprlandMonitorScale(output.name); s > 0 {
+			scale = s
+		}
 	}
 	if scale <= 0 {
 		scale = 1.0
@@ -584,7 +610,7 @@ func (s *Screenshoter) captureAndCrop(output *WaylandOutput, region Region) (*Ca
 	srcData := result.Buffer.Data()
 	dstData := cropped.Data()
 
-	for y := 0; y < h; y++ {
+	for y := range h {
 		srcY := localY + y
 		if result.YInverted {
 			srcY = result.Buffer.Height - 1 - (localY + y)
@@ -598,7 +624,7 @@ func (s *Screenshoter) captureAndCrop(output *WaylandOutput, region Region) (*Ca
 			dstY = h - 1 - y
 		}
 
-		for x := 0; x < w; x++ {
+		for x := range w {
 			srcX := localX + x
 			if srcX < 0 || srcX >= result.Buffer.Width {
 				continue
@@ -627,6 +653,7 @@ func (s *Screenshoter) captureAndCrop(output *WaylandOutput, region Region) (*Ca
 		YInverted: false,
 		Format:    result.Format,
 		Scale:     scale,
+		CICP:      result.CICP,
 	}, nil
 }
 
@@ -679,6 +706,7 @@ func (s *Screenshoter) captureRegionOnOutput(output *WaylandOutput, region Regio
 		return nil, err
 	}
 	result.Scale = scale
+	result.CICP = s.outputCICP(output)
 	return result, nil
 }
 
@@ -741,6 +769,7 @@ func (s *Screenshoter) captureRegionOnTransformedOutput(output *WaylandOutput, r
 		YInverted: false,
 		Format:    result.Format,
 		Scale:     scale,
+		CICP:      result.CICP,
 	}, nil
 }
 
@@ -969,10 +998,7 @@ func (s *Screenshoter) handleGlobal(e client.RegistryGlobalEvent) {
 
 	case client.OutputInterfaceName:
 		output := client.NewOutput(s.ctx)
-		version := e.Version
-		if version > 4 {
-			version = 4
-		}
+		version := min(e.Version, 4)
 		if err := s.registry.Bind(e.Name, e.Interface, version, output); err == nil {
 			s.outputsMu.Lock()
 			s.outputs[e.Name] = &WaylandOutput{
@@ -987,12 +1013,15 @@ func (s *Screenshoter) handleGlobal(e client.RegistryGlobalEvent) {
 
 	case wlr_screencopy.ZwlrScreencopyManagerV1InterfaceName:
 		sc := wlr_screencopy.NewZwlrScreencopyManagerV1(s.ctx)
-		version := e.Version
-		if version > 3 {
-			version = 3
-		}
+		version := min(e.Version, 3)
 		if err := s.registry.Bind(e.Name, e.Interface, version, sc); err == nil {
 			s.screencopy = sc
+		}
+
+	case wp_color_management.WpColorManagerV1InterfaceName:
+		mgr := wp_color_management.NewWpColorManagerV1(s.ctx)
+		if err := s.registry.Bind(e.Name, e.Interface, 1, mgr); err == nil {
+			s.colorMgr = mgr
 		}
 	}
 }
@@ -1037,6 +1066,9 @@ func (s *Screenshoter) setupOutputHandlers(name uint32, output *client.Output) {
 }
 
 func (s *Screenshoter) cleanup() {
+	if s.colorMgr != nil {
+		s.colorMgr.Destroy()
+	}
 	if s.screencopy != nil {
 		s.screencopy.Destroy()
 	}

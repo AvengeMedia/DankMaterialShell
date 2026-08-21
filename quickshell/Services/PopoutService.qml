@@ -395,7 +395,29 @@ Singleton {
         }
     }
 
-    function openSettingsWithTab(tabName: string) {
+    property var _settingsReturnOrigin: null
+    property var _settingsReturnReopen: null
+
+    Connections {
+        target: root.settingsModal
+        function onClosingModal() {
+            root._restoreSettingsOrigin();
+        }
+    }
+
+    function _restoreSettingsOrigin() {
+        const origin = _settingsReturnOrigin;
+        const reopen = _settingsReturnReopen;
+        _settingsReturnOrigin = null;
+        _settingsReturnReopen = null;
+        if (!origin || !reopen)
+            return;
+        reopen();
+    }
+
+    function openSettingsWithTab(tabName: string, returnOrigin, reopen) {
+        _settingsReturnOrigin = returnOrigin ?? null;
+        _settingsReturnReopen = reopen ?? null;
         if (settingsModal) {
             settingsModal.showWithTabName(tabName);
             return;

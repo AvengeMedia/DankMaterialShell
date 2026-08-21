@@ -4,6 +4,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"slices"
 	"strings"
 )
 
@@ -51,12 +52,7 @@ func CommandExists(cmd string) bool {
 }
 
 func AnyCommandExists(cmds ...string) bool {
-	for _, cmd := range cmds {
-		if CommandExists(cmd) {
-			return true
-		}
-	}
-	return false
+	return slices.ContainsFunc(cmds, CommandExists)
 }
 
 func EnvWithUserBinPath(env []string) []string {

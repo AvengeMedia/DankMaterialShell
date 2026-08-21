@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/privesc"
@@ -205,8 +206,8 @@ func syncAuthConfigWithDeps(logFunc func(string), sudoPassword string, options S
 }
 
 func PamTextIncludesFile(pamText, filename string) bool {
-	lines := strings.Split(pamText, "\n")
-	for _, line := range lines {
+	lines := strings.SplitSeq(pamText, "\n")
+	for line := range lines {
 		trimmed := strings.TrimSpace(line)
 		if trimmed == "" || strings.HasPrefix(trimmed, "#") {
 			continue
@@ -249,8 +250,8 @@ func detectIncludedPamModule(pamText, module string, deps syncDeps) string {
 }
 
 func pamContentHasModule(content, module string) bool {
-	lines := strings.Split(content, "\n")
-	for _, line := range lines {
+	lines := strings.SplitSeq(content, "\n")
+	for line := range lines {
 		trimmed := strings.TrimSpace(line)
 		if trimmed == "" || strings.HasPrefix(trimmed, "#") {
 			continue
@@ -288,7 +289,7 @@ func pamDirectiveType(line string) string {
 }
 
 func isExcludedLockscreenPamLine(line string) bool {
-	for _, field := range strings.Fields(line) {
+	for field := range strings.FieldsSeq(line) {
 		if strings.HasPrefix(field, "#") {
 			break
 		}
@@ -339,15 +340,13 @@ func (r lockscreenPamResolver) resolveService(serviceName string, filterType str
 		return nil, fmt.Errorf("failed to read PAM file %s: %w", serviceName, err)
 	}
 
-	for _, seen := range stack {
-		if seen == path {
-			chain := append(append([]string{}, stack...), path)
-			display := make([]string, 0, len(chain))
-			for _, item := range chain {
-				display = append(display, filepath.Base(item))
-			}
-			return nil, fmt.Errorf("cyclic PAM include detected: %s", strings.Join(display, " -> "))
+	if slices.Contains(stack, path) {
+		chain := append(append([]string{}, stack...), path)
+		display := make([]string, 0, len(chain))
+		for _, item := range chain {
+			display = append(display, filepath.Base(item))
 		}
+		return nil, fmt.Errorf("cyclic PAM include detected: %s", strings.Join(display, " -> "))
 	}
 
 	data, err := r.readFile(path)
@@ -356,7 +355,7 @@ func (r lockscreenPamResolver) resolveService(serviceName string, filterType str
 	}
 
 	var resolved []string
-	for _, rawLine := range strings.Split(strings.ReplaceAll(string(data), "\r\n", "\n"), "\n") {
+	for rawLine := range strings.SplitSeq(strings.ReplaceAll(string(data), "\r\n", "\n"), "\n") {
 		rawLine = strings.TrimRight(rawLine, "\r")
 		trimmed := strings.TrimSpace(rawLine)
 		if trimmed == "" || strings.HasPrefix(trimmed, "#") || trimmed == "#%PAM-1.0" {
@@ -542,15 +541,13 @@ func (r lockscreenPamResolver) analyzePath(path string) lockscreenPamAnalysis {
 }
 
 func (r lockscreenPamResolver) analyzeInto(path string, filterType string, stack []string, acc *lockscreenPamAnalysis) error {
-	for _, seen := range stack {
-		if seen == path {
-			chain := append(append([]string{}, stack...), path)
-			display := make([]string, 0, len(chain))
-			for _, item := range chain {
-				display = append(display, filepath.Base(item))
-			}
-			return fmt.Errorf("cyclic PAM include detected: %s", strings.Join(display, " -> "))
+	if slices.Contains(stack, path) {
+		chain := append(append([]string{}, stack...), path)
+		display := make([]string, 0, len(chain))
+		for _, item := range chain {
+			display = append(display, filepath.Base(item))
 		}
+		return fmt.Errorf("cyclic PAM include detected: %s", strings.Join(display, " -> "))
 	}
 
 	data, err := r.readFile(path)
@@ -558,7 +555,7 @@ func (r lockscreenPamResolver) analyzeInto(path string, filterType string, stack
 		return fmt.Errorf("failed to read PAM file %s: %w", path, err)
 	}
 
-	for _, rawLine := range strings.Split(strings.ReplaceAll(string(data), "\r\n", "\n"), "\n") {
+	for rawLine := range strings.SplitSeq(strings.ReplaceAll(string(data), "\r\n", "\n"), "\n") {
 		rawLine = strings.TrimRight(rawLine, "\r")
 		trimmed := strings.TrimSpace(rawLine)
 		if trimmed == "" || strings.HasPrefix(trimmed, "#") {
@@ -601,7 +598,7 @@ func (r lockscreenPamResolver) analyzeInto(path string, filterType string, stack
 		}
 
 		foundModule := false
-		for _, field := range strings.Fields(trimmed) {
+		for field := range strings.FieldsSeq(trimmed) {
 			if strings.HasPrefix(field, "#") {
 				break
 			}

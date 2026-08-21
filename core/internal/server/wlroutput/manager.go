@@ -94,10 +94,7 @@ func (m *Manager) setupRegistry() error {
 		if e.Interface == wlr_output_management.ZwlrOutputManagerV1InterfaceName {
 			log.Infof("WlrOutput: found %s", wlr_output_management.ZwlrOutputManagerV1InterfaceName)
 			manager := wlr_output_management.NewZwlrOutputManagerV1(m.ctx)
-			version := e.Version
-			if version > 4 {
-				version = 4
-			}
+			version := min(e.Version, 4)
 
 			manager.SetHeadHandler(func(e wlr_output_management.ZwlrOutputManagerV1HeadEvent) {
 				m.handleHead(e)

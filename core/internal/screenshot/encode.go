@@ -2,10 +2,10 @@ package screenshot
 
 import (
 	"bufio"
+	"encoding/binary"
 	"fmt"
 	"image"
 	"image/jpeg"
-	"image/png"
 	"io"
 	"os"
 	"path/filepath"
@@ -18,7 +18,40 @@ func BufferToImage(buf *ShmBuffer) *image.RGBA {
 	return BufferToImageWithFormat(buf, uint32(FormatARGB8888))
 }
 
+func tenBitSwapRB(format uint32) bool {
+	return format == uint32(FormatARGB2101010) || format == uint32(FormatXRGB2101010)
+}
+
+func tenBitToRGBA(buf *ShmBuffer, format uint32) *image.RGBA {
+	img := image.NewRGBA(image.Rect(0, 0, buf.Width, buf.Height))
+	data := buf.Data()
+	swapRB := tenBitSwapRB(format)
+
+	for y := 0; y < buf.Height; y++ {
+		srcOff := y * buf.Stride
+		dstOff := y * img.Stride
+		for x := 0; x < buf.Width; x++ {
+			si := srcOff + x*4
+			di := dstOff + x*4
+			if si+4 > len(data) || di+4 > len(img.Pix) {
+				continue
+			}
+			v := binary.LittleEndian.Uint32(data[si:])
+			c0, c1, c2 := uint8(v>>2), uint8(v>>12), uint8(v>>22)
+			if swapRB {
+				c0, c2 = c2, c0
+			}
+			img.Pix[di+0], img.Pix[di+1], img.Pix[di+2], img.Pix[di+3] = c0, c1, c2, 255
+		}
+	}
+	return img
+}
+
 func BufferToImageWithFormat(buf *ShmBuffer, format uint32) *image.RGBA {
+	if PixelFormat(format).Is10Bit() {
+		return tenBitToRGBA(buf, format)
+	}
+
 	img := image.NewRGBA(image.Rect(0, 0, buf.Width, buf.Height))
 	data := buf.Data()
 
@@ -106,11 +139,6 @@ func ImageToBuffer(img image.Image) (*ShmBuffer, error) {
 	return buf, nil
 }
 
-func EncodePNG(w io.Writer, img image.Image) error {
-	enc := png.Encoder{CompressionLevel: png.BestSpeed}
-	return enc.Encode(w, img)
-}
-
 func EncodeJPEG(w io.Writer, img image.Image, quality int) error {
 	return jpeg.Encode(w, img, &jpeg.Options{Quality: quality})
 }
@@ -170,23 +198,22 @@ func GetOutputDir() string {
 }
 
 func WriteToFile(buf *ShmBuffer, path string, format Format, quality int) error {
-	return WriteToFileWithFormat(buf, path, format, quality, uint32(FormatARGB8888))
+	return WriteToFileWithFormat(buf, path, format, quality, uint32(FormatARGB8888), nil)
 }
 
-func WriteToFileWithFormat(buf *ShmBuffer, path string, format Format, quality int, pixelFormat uint32) error {
+func WriteToFileWithFormat(buf *ShmBuffer, path string, format Format, quality int, pixelFormat uint32, cicp *CICP) error {
 	f, err := os.Create(path)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
 
-	img := BufferToImageWithFormat(buf, pixelFormat)
 	switch format {
 	case FormatJPEG:
-		return EncodeJPEG(f, img, quality)
+		return EncodeJPEG(f, BufferToImageWithFormat(buf, pixelFormat), quality)
 	case FormatPPM:
-		return EncodePPM(f, img)
+		return EncodePPM(f, BufferToImageWithFormat(buf, pixelFormat))
 	default:
-		return EncodePNG(f, img)
+		return EncodeBufferPNG(f, buf, pixelFormat, cicp)
 	}
 }

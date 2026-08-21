@@ -36,15 +36,15 @@ type ColorScheme struct {
 type ThemeVariant struct {
 	ID    string      `json:"id"`
 	Name  string      `json:"name"`
-	Dark  ColorScheme `json:"dark,omitempty"`
-	Light ColorScheme `json:"light,omitempty"`
+	Dark  ColorScheme `json:"dark"`
+	Light ColorScheme `json:"light"`
 }
 
 type ThemeFlavor struct {
 	ID    string      `json:"id"`
 	Name  string      `json:"name"`
-	Dark  ColorScheme `json:"dark,omitempty"`
-	Light ColorScheme `json:"light,omitempty"`
+	Dark  ColorScheme `json:"dark"`
+	Light ColorScheme `json:"light"`
 }
 
 type ThemeAccent struct {

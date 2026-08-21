@@ -128,7 +128,7 @@ func (m *Manager) lockedPluginFromInstall(pluginPath string) (LockedPlugin, stri
 
 func parseLegacyPluginMetadata(data string) map[string]string {
 	metadata := make(map[string]string)
-	for _, line := range strings.Split(data, "\n") {
+	for line := range strings.SplitSeq(data, "\n") {
 		key, value, ok := strings.Cut(line, "=")
 		if ok {
 			metadata[strings.TrimSpace(key)] = strings.TrimSpace(value)

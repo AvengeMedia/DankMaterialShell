@@ -123,8 +123,8 @@ func (p *HyprlandRulesParser) parseDMSRulesDirectly(dmsRulesPath string) {
 	if strings.EqualFold(filepath.Ext(abs), ".lua") {
 		p.parseLuaWindowRules(string(data), filepath.Dir(abs), abs, false)
 	} else {
-		lines := strings.Split(string(data), "\n")
-		for _, line := range lines {
+		lines := strings.SplitSeq(string(data), "\n")
+		for line := range lines {
 			p.parseLine(line)
 		}
 	}
@@ -157,8 +157,8 @@ func (p *HyprlandRulesParser) parseFile(filePath string) error {
 	prevSource := p.currentSource
 	p.currentSource = absPath
 
-	lines := strings.Split(string(data), "\n")
-	for _, line := range lines {
+	lines := strings.SplitSeq(string(data), "\n")
+	for line := range lines {
 		trimmed := strings.TrimSpace(line)
 
 		if strings.HasPrefix(trimmed, "source") {
@@ -264,8 +264,8 @@ func (p *HyprlandRulesParser) parseWindowRuleV2(content string, rule *HyprlandWi
 		rule.Rule = ruleAndValue
 	}
 
-	matchPairs := strings.Split(matchPart, ",")
-	for _, pair := range matchPairs {
+	matchPairs := strings.SplitSeq(matchPart, ",")
+	for pair := range matchPairs {
 		pair = strings.TrimSpace(pair)
 		if colonIdx := strings.Index(pair, ":"); colonIdx > 0 {
 			key := strings.TrimSpace(pair[:colonIdx])
@@ -708,9 +708,9 @@ func (p *HyprlandWritableProvider) LoadDMSRules() ([]windowrules.WindowRule, err
 func (p *HyprlandWritableProvider) loadDMSRulesFromConf(data []byte, rulesPath string) ([]windowrules.WindowRule, error) {
 	var rules []windowrules.WindowRule
 	var currentID, currentName string
-	lines := strings.Split(string(data), "\n")
+	lines := strings.SplitSeq(string(data), "\n")
 
-	for _, line := range lines {
+	for line := range lines {
 		trimmed := strings.TrimSpace(line)
 
 		if matches := dmsRuleCommentRegex.FindStringSubmatch(trimmed); matches != nil {
@@ -1231,29 +1231,27 @@ func parseMatchLua(val string, m *luaMatchFields) {
 			m.title = luaStringValue(v)
 		case "xwayland":
 			if b, okb := luaBoolLike(v); okb {
-				m.xwayland = boolRef(b)
+				m.xwayland = new(b)
 			}
 		case "floating":
 			if b, okb := luaBoolLike(v); okb {
-				m.floating = boolRef(b)
+				m.floating = new(b)
 			}
 		case "fullscreen":
 			if b, okb := luaBoolLike(v); okb {
-				m.fullscreen = boolRef(b)
+				m.fullscreen = new(b)
 			}
 		case "pinned":
 			if b, okb := luaBoolLike(v); okb {
-				m.pinned = boolRef(b)
+				m.pinned = new(b)
 			}
 		case "initialised", "initialized":
 			if b, okb := luaBoolLike(v); okb {
-				m.initialised = boolRef(b)
+				m.initialised = new(b)
 			}
 		}
 	}
 }
-
-func boolRef(b bool) *bool { return &b }
 
 func applyLuaActionKey(a *windowrules.Actions, key, raw string) bool {
 	k := strings.TrimSpace(strings.ToLower(key))

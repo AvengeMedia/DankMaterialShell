@@ -82,46 +82,12 @@ Item {
     property bool greeterBinaryExists: false
     property bool greeterEnabled: false
     readonly property bool greeterInstalled: greeterBinaryExists || greeterEnabled
-    readonly property string greeterAction: {
-        if (!greeterInstalled)
-            return "install";
-        if (!greeterEnabled)
-            return "activate";
-        return "";
-    }
+    readonly property string greeterAction: greeterBinaryExists && !greeterEnabled ? "activate" : ""
     readonly property bool greeterActionAvailable: greeterAction !== ""
 
-    readonly property string greeterActionLabel: {
-        switch (greeterAction) {
-        case "install":
-            return I18n.tr("Install");
-        case "activate":
-            return I18n.tr("Activate");
-        default:
-            return "";
-        }
-    }
-    readonly property string greeterActionIcon: {
-        switch (greeterAction) {
-        case "install":
-            return "download";
-        case "activate":
-            return "login";
-        default:
-            return "";
-        }
-    }
-    readonly property var greeterActionCommand: {
-        switch (greeterAction) {
-        case "install":
-            return ["dms", "greeter", "install", "--terminal"];
-        case "activate":
-            return ["dms-greeter", "enable", "--terminal"];
-        default:
-            return [];
-        }
-    }
-    property string greeterPendingAction: ""
+    readonly property string greeterActionLabel: greeterAction === "activate" ? I18n.tr("Activate") : ""
+    readonly property string greeterActionIcon: greeterAction === "activate" ? "login" : ""
+    readonly property var greeterActionCommand: greeterAction === "activate" ? ["dms-greeter", "enable", "--terminal"] : []
 
     function checkGreeterInstallState() {
         greetdEnabledCheckProcess.running = true;
@@ -137,7 +103,6 @@ Item {
     }
 
     function runGreeterInstallAction() {
-        root.greeterPendingAction = root.greeterAction;
         greeterStatusText = I18n.tr("Opening terminal: ") + root.greeterActionLabel + "...";
         greeterInstallActionRunning = true;
         greeterInstallActionProcess.running = true;
@@ -147,23 +112,10 @@ Item {
         if (!root.greeterActionAvailable)
             return;
 
-        var title, message, confirmText;
-        switch (root.greeterAction) {
-        case "install":
-            title = I18n.tr("Install Greeter", "greeter action confirmation");
-            message = I18n.tr("Install the DMS greeter? A terminal will open for sudo authentication.");
-            confirmText = I18n.tr("Install");
-            break;
-        case "activate":
-            title = I18n.tr("Activate Greeter", "greeter action confirmation");
-            message = I18n.tr("Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings.");
-            confirmText = I18n.tr("Activate");
-            break;
-        }
         greeterActionConfirm.showWithOptions({
-            "title": title,
-            "message": message,
-            "confirmText": confirmText,
+            "title": I18n.tr("Activate Greeter", "greeter action confirmation"),
+            "message": I18n.tr("Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings."),
+            "confirmText": I18n.tr("Activate"),
             "cancelText": I18n.tr("Cancel"),
             "confirmColor": Theme.primary,
             "onConfirm": () => root.runGreeterInstallAction(),
@@ -212,6 +164,8 @@ Item {
 
         onExited: exitCode => {
             root.greeterBinaryExists = (exitCode === 0);
+            if (exitCode !== 0 && root.greeterStatusText === "")
+                root.greeterStatusText = I18n.tr("Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.", "greeter status error");
         }
     }
 
@@ -344,21 +298,12 @@ Item {
 
         onExited: exitCode => {
             root.greeterInstallActionRunning = false;
-            const pending = root.greeterPendingAction;
-            root.greeterPendingAction = "";
             root.checkGreeterInstallState();
             if (exitCode !== 0) {
                 root.greeterStatusText = I18n.tr("Action failed or terminal was closed.") + " (exit " + exitCode + ")";
                 return;
             }
-            switch (pending) {
-            case "install":
-                root.greeterStatusText = I18n.tr("Install complete. Greeter has been installed.");
-                return;
-            default:
-                root.greeterStatusText = I18n.tr("Greeter activated. greetd is now enabled.");
-                return;
-            }
+            root.greeterStatusText = I18n.tr("Greeter activated. greetd is now enabled.");
         }
     }
 

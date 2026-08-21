@@ -34,6 +34,7 @@ Singleton {
     property bool isLightMode: false
     property bool doNotDisturb: false
     property real doNotDisturbUntil: 0
+    property bool idleInhibited: false
     property string terminalOverride: ""
     property bool isSwitchingMode: false
     property bool suppressOSD: true
@@ -624,6 +625,14 @@ Singleton {
         const minutes = Number(durationMinutes) || 0;
         doNotDisturb = enabled;
         doNotDisturbUntil = (enabled && minutes > 0) ? Date.now() + minutes * 60 * 1000 : 0;
+        saveSettings();
+    }
+
+    function setIdleInhibited(enabled) {
+        const next = !!enabled;
+        if (idleInhibited === next)
+            return;
+        idleInhibited = next;
         saveSettings();
     }
 

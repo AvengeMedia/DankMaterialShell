@@ -2,11 +2,13 @@ package main
 
 import (
 	"bytes"
+	"encoding/binary"
 	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime/debug"
 	"strconv"
 	"strings"
 
@@ -224,7 +226,8 @@ func getScreenshotConfig(mode screenshot.Mode) screenshot.Config {
 	return config
 }
 
-// setPopoutScreenshotMode toggles the shell handshake so popouts drop their keyboard grab during region select. Best-effort.
+// setPopoutScreenshotMode toggles the shell handshake so popouts drop their keyboard grab during region select.
+// Best-effort and not awaited: qs takes ~20ms to come up, longer than the selector needs to show.
 func setPopoutScreenshotMode(begin bool) {
 	fn := "end"
 	if begin {
@@ -243,7 +246,7 @@ func setPopoutScreenshotMode(begin bool) {
 		cmdArgs = append(cmdArgs, "-p", shellApp.ConfigPath())
 	}
 	cmdArgs = append(cmdArgs, "call", "screenshot", fn)
-	_ = exec.Command("qs", cmdArgs...).Run()
+	_ = exec.Command("qs", cmdArgs...).Start()
 }
 
 func writeScreenshotJSON(meta screenshotMetadata) {
@@ -276,16 +279,13 @@ func runScreenshot(config screenshot.Config) {
 		os.Exit(1)
 	}
 
-	// Region select needs the keyboard; drop popout grabs for its duration.
-	result, err := func() (*screenshot.CaptureResult, error) {
-		interactive := config.Mode == screenshot.ModeRegion || config.Mode == screenshot.ModeLastRegion || config.Mode == screenshot.ModeScroll
-		if interactive {
-			setPopoutScreenshotMode(true)
-			defer setPopoutScreenshotMode(false)
-		}
-		return screenshot.New(config).Run()
-	}()
+	// Short-lived process over a few tens of MB: let the heap grow instead of paying GC cycles mid-capture.
+	debug.SetGCPercent(-1)
+	debug.SetMemoryLimit(1 << 30)
 
+	// Region select needs the keyboard; drop popout grabs for its duration.
+	config.SelectorHook = setPopoutScreenshotMode
+	result, err := screenshot.New(config).Run()
 	if err != nil {
 		exitScreenshotError("", err)
 	}
@@ -304,7 +304,7 @@ func runScreenshot(config screenshot.Config) {
 	}
 
 	if config.Stdout {
-		if err := writeImageToStdout(result.Buffer, config.Format, config.Quality, result.Format); err != nil {
+		if err := writeImageToStdout(result.Buffer, config.Format, config.Quality, result.Format, result.CICP); err != nil {
 			exitScreenshotError(" writing to stdout", err)
 		}
 		return
@@ -324,7 +324,7 @@ func runScreenshot(config screenshot.Config) {
 		}
 
 		filePath = filepath.Join(outputDir, filename)
-		if err := screenshot.WriteToFileWithFormat(result.Buffer, filePath, config.Format, config.Quality, result.Format); err != nil {
+		if err := screenshot.WriteToFileWithFormat(result.Buffer, filePath, config.Format, config.Quality, result.Format, result.CICP); err != nil {
 			exitScreenshotError(" writing file", err)
 		}
 		if !ssJSON {
@@ -333,7 +333,7 @@ func runScreenshot(config screenshot.Config) {
 	}
 
 	if config.Clipboard {
-		if err := copyImageToClipboard(result.Buffer, config.Format, config.Quality, result.Format); err != nil {
+		if err := copyImageToClipboard(result.Buffer, config.Format, config.Quality, result.Format, result.CICP); err != nil {
 			exitScreenshotError(" copying to clipboard", err)
 		}
 		if !ssJSON && !config.SaveFile {
@@ -368,21 +368,19 @@ func runScreenshot(config screenshot.Config) {
 	}
 }
 
-func copyImageToClipboard(buf *screenshot.ShmBuffer, format screenshot.Format, quality int, pixelFormat uint32) error {
+func copyImageToClipboard(buf *screenshot.ShmBuffer, format screenshot.Format, quality int, pixelFormat uint32, cicp *screenshot.CICP) error {
 	var mimeType string
 	var data bytes.Buffer
-
-	img := screenshot.BufferToImageWithFormat(buf, pixelFormat)
 
 	switch format {
 	case screenshot.FormatJPEG:
 		mimeType = "image/jpeg"
-		if err := screenshot.EncodeJPEG(&data, img, quality); err != nil {
+		if err := screenshot.EncodeJPEG(&data, screenshot.BufferToImageWithFormat(buf, pixelFormat), quality); err != nil {
 			return err
 		}
 	default:
 		mimeType = "image/png"
-		if err := screenshot.EncodePNG(&data, img); err != nil {
+		if err := screenshot.EncodeBufferPNG(&data, buf, pixelFormat, cicp); err != nil {
 			return err
 		}
 	}
@@ -390,14 +388,12 @@ func copyImageToClipboard(buf *screenshot.ShmBuffer, format screenshot.Format, q
 	return clipboard.Copy(data.Bytes(), mimeType)
 }
 
-func writeImageToStdout(buf *screenshot.ShmBuffer, format screenshot.Format, quality int, pixelFormat uint32) error {
-	img := screenshot.BufferToImageWithFormat(buf, pixelFormat)
-
+func writeImageToStdout(buf *screenshot.ShmBuffer, format screenshot.Format, quality int, pixelFormat uint32, cicp *screenshot.CICP) error {
 	switch format {
 	case screenshot.FormatJPEG:
-		return screenshot.EncodeJPEG(os.Stdout, img, quality)
+		return screenshot.EncodeJPEG(os.Stdout, screenshot.BufferToImageWithFormat(buf, pixelFormat), quality)
 	default:
-		return screenshot.EncodePNG(os.Stdout, img)
+		return screenshot.EncodeBufferPNG(os.Stdout, buf, pixelFormat, cicp)
 	}
 }
 
@@ -424,9 +420,12 @@ func bufferToRGBThumbnail(buf *screenshot.ShmBuffer, maxSize int, pixelFormat ui
 	data := buf.Data()
 	rgb := make([]byte, dstW*dstH*3)
 
+	is10Bit := screenshot.PixelFormat(pixelFormat).Is10Bit()
+
 	var swapRB bool
 	switch pixelFormat {
-	case uint32(screenshot.FormatABGR8888), uint32(screenshot.FormatXBGR8888):
+	case uint32(screenshot.FormatABGR8888), uint32(screenshot.FormatXBGR8888),
+		uint32(screenshot.FormatABGR2101010), uint32(screenshot.FormatXBGR2101010):
 		swapRB = false
 	default:
 		swapRB = true
@@ -447,11 +446,19 @@ func bufferToRGBThumbnail(buf *screenshot.ShmBuffer, maxSize int, pixelFormat ui
 			if si+3 >= len(data) {
 				continue
 			}
-			if swapRB {
+			switch {
+			case is10Bit:
+				v := binary.LittleEndian.Uint32(data[si:])
+				c0, c1, c2 := uint8(v>>2), uint8(v>>12), uint8(v>>22)
+				if swapRB {
+					c0, c2 = c2, c0
+				}
+				rgb[di+0], rgb[di+1], rgb[di+2] = c0, c1, c2
+			case swapRB:
 				rgb[di+0] = data[si+2]
 				rgb[di+1] = data[si+1]
 				rgb[di+2] = data[si+0]
-			} else {
+			default:
 				rgb[di+0] = data[si+0]
 				rgb[di+1] = data[si+1]
 				rgb[di+2] = data[si+2]

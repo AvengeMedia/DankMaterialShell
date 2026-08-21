@@ -12,6 +12,7 @@ import (
 )
 
 func setupTestManager(t *testing.T) (*Manager, afero.Fs, string) {
+	t.Helper()
 	fs := afero.NewMemMapFs()
 	pluginsDir := "/test-plugins"
 	manager := &Manager{

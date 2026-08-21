@@ -932,7 +932,7 @@ func downloadToTempFile(rawURL string) (string, error) {
 	var contentType string
 	var lastErr error
 
-	for attempt := 0; attempt < 3; attempt++ {
+	for attempt := range 3 {
 		if attempt > 0 {
 			time.Sleep(time.Duration(attempt) * 500 * time.Millisecond)
 		}

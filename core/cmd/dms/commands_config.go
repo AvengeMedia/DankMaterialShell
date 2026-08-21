@@ -150,9 +150,9 @@ func hyprlandFindIncludeHyprlang(filePath, target string, processed map[string]b
 	}
 
 	baseDir := filepath.Dir(absPath)
-	lines := strings.Split(string(data), "\n")
+	lines := strings.SplitSeq(string(data), "\n")
 
-	for _, line := range lines {
+	for line := range lines {
 		trimmed := strings.TrimSpace(line)
 		if strings.HasPrefix(trimmed, "#") || trimmed == "" {
 			continue
@@ -229,7 +229,7 @@ func niriFindInclude(filePath, target string, processed map[string]bool) bool {
 	baseDir := filepath.Dir(absPath)
 	content := string(data)
 
-	for _, line := range strings.Split(content, "\n") {
+	for line := range strings.SplitSeq(content, "\n") {
 		trimmed := strings.TrimSpace(line)
 		if strings.HasPrefix(trimmed, "//") || trimmed == "" {
 			continue
@@ -306,9 +306,9 @@ func mangowcFindInclude(filePath, target string, processed map[string]bool) bool
 	}
 
 	baseDir := filepath.Dir(absPath)
-	lines := strings.Split(string(data), "\n")
+	lines := strings.SplitSeq(string(data), "\n")
 
-	for _, line := range lines {
+	for line := range lines {
 		trimmed := strings.TrimSpace(line)
 		if strings.HasPrefix(trimmed, "#") || trimmed == "" {
 			continue

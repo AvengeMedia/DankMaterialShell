@@ -138,9 +138,7 @@ func (c *GeoClueClient) startSignalPump() error {
 		return err
 	}
 
-	c.sigWG.Add(1)
-	go func() {
-		defer c.sigWG.Done()
+	c.sigWG.Go(func() {
 
 		clientObj := c.dbusConn.Object(dbusGeoClueService, c.clientPath)
 		clientObj.Call(dbusGeoClueClientTimeStart, 0)
@@ -161,7 +159,7 @@ func (c *GeoClueClient) startSignalPump() error {
 				c.handleSignal(sig)
 			}
 		}
-	}()
+	})
 
 	return nil
 }

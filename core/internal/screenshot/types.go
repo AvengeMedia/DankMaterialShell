@@ -64,6 +64,8 @@ type Config struct {
 	Notify     bool
 	Stdout     bool
 	IntervalMs int
+	// SelectorHook runs as the interactive selector starts (true) and ends (false).
+	SelectorHook func(begin bool)
 }
 
 func DefaultConfig() Config {

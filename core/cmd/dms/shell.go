@@ -286,8 +286,8 @@ func ensureFontCache() {
 }
 
 func fontInCache(target, cache string) bool {
-	for _, line := range strings.Split(cache, "\n") {
-		for _, fam := range strings.Split(strings.TrimSpace(line), ",") {
+	for line := range strings.SplitSeq(cache, "\n") {
+		for fam := range strings.SplitSeq(strings.TrimSpace(line), ",") {
 			if strings.TrimSpace(fam) == target {
 				return true
 			}

@@ -2,6 +2,8 @@ package freedesktop
 
 import (
 	"fmt"
+	"io"
+	"os"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 	"github.com/godbus/dbus/v5"
@@ -12,13 +14,54 @@ func (m *Manager) SetIconFile(iconPath string) error {
 		return fmt.Errorf("accounts service not available")
 	}
 
-	err := m.accountsObj.Call(dbusAccountsUserInterface+".SetIconFile", 0, iconPath).Err
+	stagedPath, cleanup, err := stageIconFile(iconPath)
+	if err != nil {
+		return err
+	}
+	defer cleanup()
+
+	err = m.accountsObj.Call(dbusAccountsUserInterface+".SetIconFile", 0, stagedPath).Err
 	if err != nil {
 		return fmt.Errorf("failed to set icon file: %w", err)
 	}
 
 	m.updateAccountsState()
 	return nil
+}
+
+// accounts-daemon stats the icon as root before copying it into its own
+// store, which fails on FUSE mounts (no allow_other) and root_squash NFS.
+// Hand it a copy on a path root can read; the daemon keeps its own copy, so
+// the staged file is removed once the call returns.
+func stageIconFile(iconPath string) (string, func(), error) {
+	noop := func() {}
+	if iconPath == "" {
+		return "", noop, nil
+	}
+
+	src, err := os.Open(iconPath)
+	if err != nil {
+		return "", noop, fmt.Errorf("failed to open icon file: %w", err)
+	}
+	defer src.Close()
+
+	tmp, err := os.CreateTemp("", "dms-profile-icon-*")
+	if err != nil {
+		return "", noop, fmt.Errorf("failed to stage icon file: %w", err)
+	}
+	cleanup := func() { os.Remove(tmp.Name()) }
+
+	if _, err := io.Copy(tmp, src); err != nil {
+		tmp.Close()
+		cleanup()
+		return "", noop, fmt.Errorf("failed to stage icon file: %w", err)
+	}
+	if err := tmp.Close(); err != nil {
+		cleanup()
+		return "", noop, fmt.Errorf("failed to stage icon file: %w", err)
+	}
+
+	return tmp.Name(), cleanup, nil
 }
 
 func (m *Manager) SetRealName(name string) error {

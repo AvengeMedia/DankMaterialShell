@@ -530,11 +530,20 @@ Singleton {
         const outputKeys = Object.keys(configEntry.outputs || {});
         if (outputKeys.length === 0)
             return false;
-        const hasEnabled = outputKeys.some(k => !configEntry.outputs[k].disabled);
-        if (hasEnabled)
+        const hasEnabledReal = outputKeys.some(k => {
+            const o = configEntry.outputs[k];
+            return !o.disabled && o.make && o.model;
+        });
+        if (hasEnabledReal)
             return false;
-        delete configEntry.outputs[outputKeys[0]].disabled;
-        return true;
+        for (const k of outputKeys) {
+            const o = configEntry.outputs[k];
+            if (o.make && o.model) {
+                delete o.disabled;
+                return true;
+            }
+        }
+        return false;
     }
 
     function applyConfigEntry(configEntry, configId, profileName, isManual) {
@@ -548,6 +557,20 @@ Singleton {
             return;
         }
         ensureEnabledOutput(configEntry);
+        const outputKeys = Object.keys(configEntry.outputs || {});
+        const hasRealOutput = outputKeys.some(k => {
+            const o = configEntry.outputs[k];
+            return o.make && o.model;
+        });
+        if (!hasRealOutput) {
+            backendWriteOutputsConfig({}, null, success => {
+                if (success) {
+                    SettingsData.setActiveDisplayProfile(CompositorService.compositor, configId);
+                    WlrOutputService.requestState();
+                }
+            });
+            return;
+        }
         // Capture the entry being applied so disabled-output settings fields can read
         // scale/position/transform back even when wlr reports no logical viewport.
         root.lastAppliedEntry = JSON.parse(JSON.stringify(configEntry));
@@ -2391,8 +2414,8 @@ Singleton {
         }
         backendWriteOutputsConfig(original);
         clearPendingChanges();
-        if (originalOutputs)
-            outputs = original;
+        // clearPendingChanges() resets originalOutputs, so restore the model from the snapshot.
+        outputs = original;
         changesReverted();
     }
 

@@ -4,6 +4,7 @@ var SPEC = {
     isLightMode: { def: false },
     doNotDisturb: { def: false },
     doNotDisturbUntil: { def: 0 },
+    idleInhibited: { def: false },
     terminalOverride: { def: "" },
 
     wallpaperPath: { def: "" },

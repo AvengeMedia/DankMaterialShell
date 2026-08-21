@@ -2,6 +2,7 @@ package providers
 
 import (
 	"fmt"
+	"maps"
 	"os"
 	"path/filepath"
 	"sort"
@@ -287,14 +288,14 @@ func (m *MangoWCProvider) loadOverrideBinds() (map[string]*mangowcOverrideBind, 
 	}
 
 	var pendingComment string
-	for _, line := range strings.Split(string(data), "\n") {
+	for line := range strings.SplitSeq(string(data), "\n") {
 		trimmed := strings.TrimSpace(line)
 		if trimmed == "" {
 			pendingComment = ""
 			continue
 		}
-		if strings.HasPrefix(trimmed, "#") {
-			pendingComment = strings.TrimSpace(strings.TrimPrefix(trimmed, "#"))
+		if after, ok := strings.CutPrefix(trimmed, "#"); ok {
+			pendingComment = strings.TrimSpace(after)
 			if isMangoWCSectionComment(pendingComment) {
 				pendingComment = ""
 			}
@@ -444,15 +445,13 @@ func (m *MangoWCProvider) generatePreservedBindsContent(existingContent string, 
 	}
 
 	remaining := make(map[string]*mangowcOverrideBind, len(binds))
-	for key, bind := range binds {
-		remaining[key] = bind
-	}
+	maps.Copy(remaining, binds)
 	if useStockScaffold {
 		m.dropReplacedStockBinds(remaining)
 	}
 
 	var lines []string
-	for _, line := range strings.Split(source, "\n") {
+	for line := range strings.SplitSeq(source, "\n") {
 		templateBind, ok := m.parseOverrideBindLine(line, m.previousComment(lines))
 		if !ok || templateBind == nil {
 			lines = append(lines, line)

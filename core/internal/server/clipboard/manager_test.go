@@ -457,7 +457,7 @@ func TestManager_ConcurrentSubscriberAccess(t *testing.T) {
 	var wg sync.WaitGroup
 	const goroutines = 20
 
-	for i := 0; i < goroutines; i++ {
+	for i := range goroutines {
 		wg.Add(1)
 		go func(id int) {
 			defer wg.Done()
@@ -484,23 +484,21 @@ func TestManager_ConcurrentGetState(t *testing.T) {
 	const goroutines = 50
 	const iterations = 100
 
-	for i := 0; i < goroutines/2; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			for j := 0; j < iterations; j++ {
+	for range goroutines / 2 {
+		wg.Go(func() {
+			for range iterations {
 				s := m.GetState()
 				_ = s.Enabled
 				_ = len(s.History)
 			}
-		}()
+		})
 	}
 
-	for i := 0; i < goroutines/2; i++ {
+	for i := range goroutines / 2 {
 		wg.Add(1)
 		go func(i int) {
 			defer wg.Done()
-			for j := 0; j < iterations; j++ {
+			for j := range iterations {
 				m.stateMutex.Lock()
 				m.state = &State{
 					Enabled: j%2 == 0,
@@ -523,23 +521,21 @@ func TestManager_ConcurrentConfigAccess(t *testing.T) {
 	const goroutines = 30
 	const iterations = 100
 
-	for i := 0; i < goroutines/2; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			for j := 0; j < iterations; j++ {
+	for range goroutines / 2 {
+		wg.Go(func() {
+			for range iterations {
 				cfg := m.getConfig()
 				_ = cfg.MaxHistory
 				_ = cfg.MaxEntrySize
 			}
-		}()
+		})
 	}
 
-	for i := 0; i < goroutines/2; i++ {
+	for i := range goroutines / 2 {
 		wg.Add(1)
 		go func(i int) {
 			defer wg.Done()
-			for j := 0; j < iterations; j++ {
+			for j := range iterations {
 				m.configMutex.Lock()
 				m.config.MaxHistory = 50 + j
 				m.config.MaxEntrySize = int64(1024 * j)
@@ -556,7 +552,7 @@ func TestManager_NotifySubscribersNonBlocking(t *testing.T) {
 		dirty: make(chan struct{}, 1),
 	}
 
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		m.notifySubscribers()
 	}
 
@@ -573,13 +569,13 @@ func TestManager_ConcurrentOfferAccess(t *testing.T) {
 	const goroutines = 20
 	const iterations = 50
 
-	for i := 0; i < goroutines; i++ {
+	for i := range goroutines {
 		wg.Add(1)
 		go func(id int) {
 			defer wg.Done()
 			key := uint32(id)
 
-			for j := 0; j < iterations; j++ {
+			for range iterations {
 				m.offerMutex.Lock()
 				m.offerRegistry[key] = struct{}{}
 				m.offerMimeTypes[key] = []string{"text/plain"}
@@ -608,28 +604,24 @@ func TestManager_ConcurrentOwnerAccess(t *testing.T) {
 	const goroutines = 30
 	const iterations = 100
 
-	for i := 0; i < goroutines/2; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			for j := 0; j < iterations; j++ {
+	for range goroutines / 2 {
+		wg.Go(func() {
+			for range iterations {
 				m.ownerLock.Lock()
 				_ = m.isOwner
 				m.ownerLock.Unlock()
 			}
-		}()
+		})
 	}
 
-	for i := 0; i < goroutines/2; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			for j := 0; j < iterations; j++ {
+	for range goroutines / 2 {
+		wg.Go(func() {
+			for j := range iterations {
 				m.ownerLock.Lock()
 				m.isOwner = j%2 == 0
 				m.ownerLock.Unlock()
 			}
-		}()
+		})
 	}
 
 	wg.Wait()
@@ -789,14 +781,12 @@ func TestManager_ConcurrentPostWithMock(t *testing.T) {
 	}
 
 	var wg sync.WaitGroup
-	for i := 0; i < 10; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			for j := 0; j < 10; j++ {
+	for range 10 {
+		wg.Go(func() {
+			for range 10 {
 				m.post(func() {})
 			}
-		}()
+		})
 	}
 
 	wg.Wait()

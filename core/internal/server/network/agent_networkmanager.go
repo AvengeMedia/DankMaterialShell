@@ -26,7 +26,6 @@ const (
 const (
 	nmSecretAgentFlagAllowInteraction = 0x1
 	nmSecretAgentFlagRequestNew       = 0x2
-	nmSecretAgentFlagUserRequested    = 0x4
 	nmSecretAgentFlagOnlySystem       = 0x80000000
 )
 
@@ -861,7 +860,7 @@ func needsExternalBrowserAuth(protocol, authType, username string, data map[stri
 	return false
 }
 
-func vpnFieldMeta(field, vpnService string) (label string, isSecret bool) {
+func vpnFieldMeta(field, _ string) (label string, isSecret bool) {
 	switch field {
 	case "gp-saml":
 		return "GlobalProtect SAML/SSO", false
