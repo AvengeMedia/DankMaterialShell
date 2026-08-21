@@ -206,6 +206,10 @@ func (r *RegionSelector) selectionDeviceRect() (*OutputSurface, int, int, int, i
 }
 
 func (r *RegionSelector) finishSelection() {
+	if r.screenshoter != nil && r.screenshoter.config.Mode == ModeScroll && r.selectionSpansOutputs() {
+		r.clampSelectionToSurface()
+	}
+
 	if r.selectionSpansOutputs() {
 		r.finishSelectionAcrossOutputs()
 		return
@@ -279,6 +283,20 @@ func (r *RegionSelector) finishSelection() {
 	}
 
 	r.running = false
+}
+
+func (r *RegionSelector) clampSelectionToSurface() {
+	os := r.selection.surface
+	if os == nil || os.output == nil {
+		return
+	}
+
+	minX := float64(os.output.x)
+	minY := float64(os.output.y)
+	maxX := minX + float64(os.logicalW)
+	maxY := minY + float64(os.logicalH)
+	r.selection.currentX = math.Max(minX, math.Min(maxX, r.selection.currentX))
+	r.selection.currentY = math.Max(minY, math.Min(maxY, r.selection.currentY))
 }
 
 func (r *RegionSelector) selectionSpansOutputs() bool {

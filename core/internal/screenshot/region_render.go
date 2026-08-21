@@ -216,8 +216,8 @@ func (r *RegionSelector) selectionRenderBounds(os *OutputSurface) (selectionRend
 	outputMinY := float64(os.output.y)
 	outputMaxX := outputMinX + float64(os.logicalW)
 	outputMaxY := outputMinY + float64(os.logicalH)
-	if selectionMaxX < outputMinX || selectionMinX > outputMaxX ||
-		selectionMaxY < outputMinY || selectionMinY > outputMaxY {
+	if selectionMaxX < outputMinX || selectionMinX >= outputMaxX ||
+		selectionMaxY < outputMinY || selectionMinY >= outputMaxY {
 		return selectionRenderBounds{}, false
 	}
 
