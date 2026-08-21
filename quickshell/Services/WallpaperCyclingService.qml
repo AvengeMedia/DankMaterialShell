@@ -110,7 +110,8 @@ Singleton {
                     "enabled": !!(s.enabled && wp && !wp.startsWith("#")),
                     "mode": s.mode || "interval",
                     "intervalSec": s.interval || 300,
-                    "time": s.time || "06:00"
+                    "time": s.time || "06:00",
+                    "folderPath": SessionData.wallpaperCyclingFolderPath || ""
                 };
             }
         }
@@ -153,8 +154,12 @@ Singleton {
         const currentWallpaper = wallpaperPath || SessionData.wallpaperPath;
         if (!currentWallpaper)
             return;
-        const wallpaperDir = currentWallpaper.substring(0, currentWallpaper.lastIndexOf('/'));
-
+        let wallpaperDir;
+        if (SessionData.wallpaperCyclingFolderPath) {
+            wallpaperDir = SessionData.wallpaperCyclingFolderPath;
+        } else {
+            wallpaperDir = currentWallpaper.substring(0, currentWallpaper.lastIndexOf('/'));
+        }
         if (screenName && monitorProcessComponent.status === Component.Ready) {
             var process = monitorProcessFor(screenName);
             process.command = findCommand(wallpaperDir);
@@ -252,7 +257,11 @@ Singleton {
         if (files.length < 1)
             return;
         const wallpaperList = files.sort();
-        let currentIndex = wallpaperList.findIndex(path => path === currentPath);
+        const isInitialFolderSelect = currentPath === "";
+        let currentIndex = -1;
+        if (!isInitialFolderSelect) {
+            currentIndex = wallpaperList.findIndex(path => path === currentPath);
+        }
         if (currentIndex === -1)
             currentIndex = 0;
 
@@ -264,7 +273,9 @@ Singleton {
         }
 
         let targetIndex;
-        if (isRandom) {
+        if (isInitialFolderSelect) {
+            targetIndex = 0;
+        } else if (isRandom) {
             if (wallpaperList.length > 1) {
                 do {
                     targetIndex = Math.floor(Math.random() * wallpaperList.length);

@@ -1374,7 +1374,7 @@ Item {
 
         FileBrowserModal {
             parentModal: root.parentModal
-            browserTitle: I18n.tr("Select Wallpaper Folder", "wallpaper folder file browser title")
+            browserTitle: I18n.tr("Choose wallpaper folder", "wallpaper folder file browser title")
             browserIcon: "folder"
             browserType: "wallpaper"
             folderMode: true
