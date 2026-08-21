@@ -38,6 +38,21 @@ FocusScope {
         });
     }
 
+    function openPluginSettings(pluginId) {
+        if (!pluginId)
+            return;
+        expandedPluginId = pluginId;
+        Qt.callLater(() => {
+            const index = filteredPlugins.findIndex(plugin => plugin.id === pluginId);
+            const item = index >= 0 ? pluginRepeater.itemAt(index) : null;
+            if (!item)
+                return;
+            const mapped = item.mapToItem(pluginFlickable.contentItem, 0, 0);
+            const maxY = Math.max(0, pluginFlickable.contentHeight - pluginFlickable.height);
+            pluginFlickable.contentY = Math.min(maxY, Math.max(0, mapped.y - Theme.spacingM));
+        });
+    }
+
     Connections {
         target: PluginService
         function onAvailablePluginsListChanged() {
@@ -52,6 +67,7 @@ FocusScope {
     }
 
     DankFlickable {
+        id: pluginFlickable
         anchors.fill: parent
         clip: true
         contentHeight: mainColumn.height + Theme.spacingXL
