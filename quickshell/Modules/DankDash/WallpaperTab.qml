@@ -159,8 +159,11 @@ Item {
     function setCurrentWallpaper(path) {
         if (SessionData.perMonitorWallpaper && targetScreenName) {
             SessionData.setMonitorWallpaper(targetScreenName, path);
+            SessionData.setMonitorCyclingFolderPath(targetScreenName, "");
         } else {
             SessionData.setWallpaper(path);
+            SessionData.wallpaperCyclingFolderPath = "";
+            SessionData.saveSettings();
         }
     }
 

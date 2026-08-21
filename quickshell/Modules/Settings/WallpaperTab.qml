@@ -219,10 +219,13 @@ Item {
                                         onClicked: {
                                             if (SessionData.perMonitorWallpaper) {
                                                 SessionData.setMonitorWallpaper(selectedMonitorName, "");
+                                                SessionData.setMonitorCyclingFolderPath(selectedMonitorName, "");
                                             } else {
                                                 if (Theme.currentTheme === Theme.dynamic)
                                                     Theme.switchTheme("blue");
                                                 SessionData.clearWallpaper();
+                                                SessionData.wallpaperCyclingFolderPath = "";
+                                                SessionData.saveSettings();
                                             }
                                         }
                                     }
@@ -1360,8 +1363,11 @@ Item {
             onFileSelected: path => {
                 if (SessionData.perMonitorWallpaper) {
                     SessionData.setMonitorWallpaper(selectedMonitorName, path);
+                    SessionData.setMonitorCyclingFolderPath(selectedMonitorName, "");
                 } else {
                     SessionData.setWallpaper(path);
+                    SessionData.wallpaperCyclingFolderPath = "";
+                    SessionData.saveSettings();
                 }
                 close();
             }

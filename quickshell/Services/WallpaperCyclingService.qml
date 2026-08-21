@@ -110,8 +110,7 @@ Singleton {
                     "enabled": !!(s.enabled && wp && !wp.startsWith("#")),
                     "mode": s.mode || "interval",
                     "intervalSec": s.interval || 300,
-                    "time": s.time || "06:00",
-                    "folderPath": SessionData.wallpaperCyclingFolderPath || ""
+                    "time": s.time || "06:00"
                 };
             }
         }
@@ -149,17 +148,27 @@ Singleton {
         monitorProcesses = newProcesses;
         return process;
     }
-
     function cycle(screenName, wallpaperPath, goToPrevious) {
-        const currentWallpaper = wallpaperPath || SessionData.wallpaperPath;
+        const currentWallpaper = wallpaperPath || (screenName ? SessionData.getMonitorWallpaper(screenName) : SessionData.wallpaperPath);
         if (!currentWallpaper)
             return;
         let wallpaperDir;
-        if (SessionData.wallpaperCyclingFolderPath) {
-            wallpaperDir = SessionData.wallpaperCyclingFolderPath;
+
+        if (screenName) {
+            const monitorSettings = SessionData.getMonitorCyclingSettings(screenName);
+            if (monitorSettings.folderPath && currentWallpaper.startsWith(monitorSettings.folderPath + "/")) {
+                wallpaperDir = monitorSettings.folderPath;
+            } else {
+                wallpaperDir = currentWallpaper.substring(0, currentWallpaper.lastIndexOf('/'));
+            }
         } else {
-            wallpaperDir = currentWallpaper.substring(0, currentWallpaper.lastIndexOf('/'));
+            if (SessionData.wallpaperCyclingFolderPath && currentWallpaper.startsWith(SessionData.wallpaperCyclingFolderPath + "/")) {
+                wallpaperDir = SessionData.wallpaperCyclingFolderPath;
+            } else {
+                wallpaperDir = currentWallpaper.substring(0, currentWallpaper.lastIndexOf('/'));
+            }
         }
+
         if (screenName && monitorProcessComponent.status === Component.Ready) {
             var process = monitorProcessFor(screenName);
             process.command = findCommand(wallpaperDir);
@@ -189,8 +198,12 @@ Singleton {
         if (!folderPath)
             return;
 
-        SessionData.wallpaperCyclingFolderPath = folderPath;
-        SessionData.saveSettings();
+        if (screenName) {
+            SessionData.setMonitorCyclingFolderPath(screenName, folderPath);
+        } else {
+            SessionData.wallpaperCyclingFolderPath = folderPath;
+            SessionData.saveSettings();
+        }
 
         if (screenName && monitorProcessComponent.status === Component.Ready) {
             var process = monitorProcessFor(screenName);
@@ -367,6 +380,8 @@ Singleton {
 
             try {
                 SessionData.setWallpaper(absolutePath);
+                SessionData.wallpaperCyclingFolderPath = "";
+                SessionData.saveSettings();
                 return "SUCCESS: Wallpaper set to " + absolutePath;
             } catch (e) {
                 return "ERROR: Failed to set wallpaper: " + e.toString();
@@ -377,6 +392,7 @@ Singleton {
             SessionData.setWallpaper("");
             SessionData.setPerMonitorWallpaper(false);
             SessionData.monitorWallpapers = {};
+            SessionData.wallpaperCyclingFolderPath = "";
             SessionData.saveSettings();
             return "SUCCESS: All wallpapers cleared";
         }
@@ -438,6 +454,7 @@ Singleton {
                     SessionData.setPerMonitorWallpaper(true);
                 }
                 SessionData.setMonitorWallpaper(screenName, absolutePath);
+                SessionData.setMonitorCyclingFolderPath(screenName, "");
                 return "SUCCESS: Wallpaper set for " + screenName + " to " + absolutePath;
             } catch (e) {
                 return "ERROR: Failed to set wallpaper for " + screenName + ": " + e.toString();
