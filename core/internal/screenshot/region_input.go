@@ -327,8 +327,8 @@ func (r *RegionSelector) finishSelectionAcrossOutputs() {
 	maxX := math.Max(r.selection.anchorX, r.selection.currentX)
 	maxY := math.Max(r.selection.anchorY, r.selection.currentY)
 	primaryScale := float64(primary.screenBuf.Width) / float64(primary.logicalW)
-	targetW := int(math.Round((maxX - minX) * primaryScale))
-	targetH := int(math.Round((maxY - minY) * primaryScale))
+	targetW := int(math.Round((maxX-minX)*primaryScale)) + 1
+	targetH := int(math.Round((maxY-minY)*primaryScale)) + 1
 	if targetW <= 0 || targetH <= 0 {
 		r.running = false
 		return
@@ -383,7 +383,8 @@ func (r *RegionSelector) finishSelectionAcrossOutputs() {
 		Y:      int32(math.Round((minY-float64(primary.output.y))*primaryScale)) + primary.output.y,
 		Width:  int32(targetW),
 		Height: int32(targetH),
-		Output: primary.output.name,
+		// Cross-output regions cannot be replayed by the single-output last mode.
+		Output: "",
 	}
 	r.running = false
 }

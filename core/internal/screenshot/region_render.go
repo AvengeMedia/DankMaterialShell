@@ -55,10 +55,10 @@ var DefaultOverlayStyle = OverlayStyle{
 }
 
 type selectionRenderBounds struct {
-	x int
-	y int
-	w int
-	h int
+	x, y, w, h  int
+	labelText   string
+	top, bottom bool
+	left, right bool
 }
 
 // dirtyRect is half-open in buffer pixels.
@@ -119,6 +119,10 @@ type overlay struct {
 	interior dirtyRect
 	label    dirtyRect
 	text     string
+	top      bool
+	bottom   bool
+	left     bool
+	right    bool
 }
 
 func (o *overlay) full() dirtyRect {
@@ -249,7 +253,19 @@ func (r *RegionSelector) selectionRenderBounds(os *OutputSurface) (selectionRend
 			w = h
 		}
 	}
-	return selectionRenderBounds{x: x1, y: y1, w: w, h: h}, true
+	labelText := ""
+	if os == r.selection.surface {
+		labelW := int(math.Round((selectionMaxX-selectionMinX)*scaleX)) + 1
+		labelH := int(math.Round((selectionMaxY-selectionMinY)*scaleY)) + 1
+		labelText = fmt.Sprintf("%dx%d", labelW, labelH)
+	}
+	return selectionRenderBounds{
+		x: x1, y: y1, w: w, h: h, labelText: labelText,
+		top:    selectionMinY >= outputMinY && selectionMinY < outputMaxY,
+		bottom: selectionMaxY > outputMinY && selectionMaxY <= outputMaxY,
+		left:   selectionMinX >= outputMinX && selectionMinX < outputMaxX,
+		right:  selectionMaxX > outputMinX && selectionMaxX <= outputMaxX,
+	}, true
 }
 
 func (r *RegionSelector) overlayFor(os *OutputSurface, buf *ShmBuffer) *overlay {
@@ -257,11 +273,18 @@ func (r *RegionSelector) overlayFor(os *OutputSurface, buf *ShmBuffer) *overlay 
 	if !ok {
 		return nil
 	}
-	label, text := labelRect(bounds, buf.Width, buf.Height)
+	var label dirtyRect
+	if bounds.labelText != "" {
+		label, _ = labelRect(bounds, buf.Width, buf.Height)
+	}
 	return &overlay{
 		interior: dirtyRect{bounds.x, bounds.y, bounds.x + bounds.w, bounds.y + bounds.h},
 		label:    label,
-		text:     text,
+		text:     bounds.labelText,
+		top:      bounds.top,
+		bottom:   bounds.bottom,
+		left:     bounds.left,
+		right:    bounds.right,
 	}
 }
 
@@ -280,8 +303,27 @@ func (r *RegionSelector) drawOverlay(os *OutputSurface, renderBuf *ShmBuffer, pr
 
 	data, stride, w, h := renderBuf.Data(), renderBuf.Stride, renderBuf.Width, renderBuf.Height
 	in := cur.interior
-	r.drawBorder(data, stride, w, h, in.x1, in.y1, in.x2-in.x1, in.y2-in.y1, os.screenFormat)
-	r.drawLabel(data, stride, w, h, cur, os.screenFormat)
+	r.drawSelectionBorder(data, stride, w, h, in, cur, os.screenFormat)
+	if cur.text != "" {
+		r.drawLabel(data, stride, w, h, cur, os.screenFormat)
+	}
+}
+
+func (r *RegionSelector) drawSelectionBorder(data []byte, stride, bufW, bufH int, in dirtyRect, o *overlay, format uint32) {
+	for i := range borderThickness {
+		if o.top {
+			r.drawHLine(data, stride, bufW, bufH, in.x1, in.y1-i, in.x2-in.x1, format)
+		}
+		if o.bottom {
+			r.drawHLine(data, stride, bufW, bufH, in.x1, in.y2+i-1, in.x2-in.x1, format)
+		}
+		if o.left {
+			r.drawVLine(data, stride, bufW, bufH, in.x1-i, in.y1, in.y2-in.y1, format)
+		}
+		if o.right {
+			r.drawVLine(data, stride, bufW, bufH, in.x2+i-1, in.y1, in.y2-in.y1, format)
+		}
+	}
 }
 
 // overlayDamage lists the buffer areas that differ between a frame showing prev and one showing cur.
@@ -471,7 +513,7 @@ func (r *RegionSelector) drawVLine(data []byte, stride, bufW, bufH, x, y, length
 }
 
 func labelRect(b selectionRenderBounds, bufW, bufH int) (dirtyRect, string) {
-	text := fmt.Sprintf("%dx%d", b.w, b.h)
+	text := b.labelText
 
 	const charW, charH = 8, 12
 	textW := len(text) * (charW + 1)
