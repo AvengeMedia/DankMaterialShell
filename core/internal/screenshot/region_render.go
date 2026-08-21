@@ -196,7 +196,7 @@ func (r *RegionSelector) paintRect(os *OutputSurface, dst *ShmBuffer, area dirty
 }
 
 func (r *RegionSelector) selectionRenderBounds(os *OutputSurface) (selectionRenderBounds, bool) {
-	if !r.selection.hasSelection || r.selection.surface != os {
+	if !r.selection.hasSelection || os == nil || os.output == nil {
 		return selectionRenderBounds{}, false
 	}
 
@@ -210,10 +210,10 @@ func (r *RegionSelector) selectionRenderBounds(os *OutputSurface) (selectionRend
 		scaleX = float64(srcBuf.Width) / float64(os.logicalW)
 		scaleY = float64(srcBuf.Height) / float64(os.logicalH)
 	}
-	x1 := int(r.selection.anchorX * scaleX)
-	y1 := int(r.selection.anchorY * scaleY)
-	x2 := int(r.selection.currentX * scaleX)
-	y2 := int(r.selection.currentY * scaleY)
+	x1 := int((r.selection.anchorX - float64(os.output.x)) * scaleX)
+	y1 := int((r.selection.anchorY - float64(os.output.y)) * scaleY)
+	x2 := int((r.selection.currentX - float64(os.output.x)) * scaleX)
+	y2 := int((r.selection.currentY - float64(os.output.y)) * scaleY)
 	if x1 > x2 {
 		x1, x2 = x2, x1
 	}
