@@ -203,7 +203,12 @@ func (r *RegionSelector) paintRect(os *OutputSurface, dst *ShmBuffer, area dirty
 }
 
 func (r *RegionSelector) selectionRenderBounds(os *OutputSurface) (selectionRenderBounds, bool) {
-	if !r.selection.hasSelection || os == nil || os.output == nil {
+	if os == nil || os.output == nil {
+		return selectionRenderBounds{}, false
+	}
+
+	ext, ok := r.selectionExtent()
+	if !ok || !ext.intersects(os) {
 		return selectionRenderBounds{}, false
 	}
 
@@ -220,43 +225,25 @@ func (r *RegionSelector) selectionRenderBounds(os *OutputSurface) (selectionRend
 	outputMinY := float64(os.output.y)
 	outputMaxX := outputMinX + float64(os.logicalW)
 	outputMaxY := outputMinY + float64(os.logicalH)
-	if selectionMaxX < outputMinX || selectionMinX >= outputMaxX ||
-		selectionMaxY < outputMinY || selectionMinY >= outputMaxY {
-		return selectionRenderBounds{}, false
-	}
 
 	scaleX, scaleY := 1.0, 1.0
 	if os.logicalW > 0 && os.logicalH > 0 {
 		scaleX = float64(srcBuf.Width) / float64(os.logicalW)
 		scaleY = float64(srcBuf.Height) / float64(os.logicalH)
 	}
-	x1 := int((r.selection.anchorX - outputMinX) * scaleX)
-	y1 := int((r.selection.anchorY - outputMinY) * scaleY)
-	x2 := int((r.selection.currentX - outputMinX) * scaleX)
-	y2 := int((r.selection.currentY - outputMinY) * scaleY)
-	if x1 > x2 {
-		x1, x2 = x2, x1
-	}
-	if y1 > y2 {
-		y1, y2 = y2, y1
-	}
-
-	x1 = clamp(x1, 0, srcBuf.Width-1)
-	y1 = clamp(y1, 0, srcBuf.Height-1)
-	x2 = clamp(x2, 0, srcBuf.Width-1)
-	y2 = clamp(y2, 0, srcBuf.Height-1)
+	x1 := clamp(int(math.Floor((selectionMinX-outputMinX)*scaleX)), 0, srcBuf.Width-1)
+	y1 := clamp(int(math.Floor((selectionMinY-outputMinY)*scaleY)), 0, srcBuf.Height-1)
+	x2 := clamp(int(math.Floor((selectionMaxX-outputMinX)*scaleX)), 0, srcBuf.Width-1)
+	y2 := clamp(int(math.Floor((selectionMaxY-outputMinY)*scaleY)), 0, srcBuf.Height-1)
 	w, h := x2-x1+1, y2-y1+1
-	if r.shiftHeld && w != h {
-		if w < h {
-			h = w
-		} else {
-			w = h
-		}
+	labelW, labelH := ext.width(), ext.height()
+	if r.shiftHeld && ext.within(os) {
+		w = min(w, h)
+		h = w
+		labelW, labelH = w, h
 	}
 	labelText := ""
-	if os == r.selection.surface {
-		labelW := int(math.Round((selectionMaxX-selectionMinX)*scaleX)) + 1
-		labelH := int(math.Round((selectionMaxY-selectionMinY)*scaleY)) + 1
+	if os == ext.surface {
 		labelText = fmt.Sprintf("%dx%d", labelW, labelH)
 	}
 	return selectionRenderBounds{
@@ -533,12 +520,16 @@ func (r *RegionSelector) drawLabel(data []byte, stride, bufW, bufH int, o *overl
 	r.drawText(data, stride, bufW, bufH, l.x1+4, l.y1+2, o.text, 255, 255, 255, format)
 }
 
+func formatIsBGR(format uint32) bool {
+	return format == uint32(FormatABGR8888) || format == uint32(FormatXBGR8888)
+}
+
 func (r *RegionSelector) fillRect(data []byte, stride, bufW, bufH, x, y, w, h int, cr, cg, cb, ca uint8, format uint32) {
 	alpha := float64(ca) / 255.0
 	invAlpha := 1.0 - alpha
 
 	c0, c2 := cb, cr
-	if format == uint32(FormatABGR8888) || format == uint32(FormatXBGR8888) {
+	if formatIsBGR(format) {
 		c0, c2 = cr, cb
 	}
 
@@ -575,7 +566,7 @@ func (r *RegionSelector) drawChar(data []byte, stride, bufW, bufH, x, y int, ch 
 	}
 
 	c0, c2 := cb, cr
-	if format == uint32(FormatABGR8888) || format == uint32(FormatXBGR8888) {
+	if formatIsBGR(format) {
 		c0, c2 = cr, cb
 	}
 
