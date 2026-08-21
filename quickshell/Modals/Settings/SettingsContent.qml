@@ -12,8 +12,27 @@ FocusScope {
 
     property int currentIndex: 0
     property var parentModal: null
+    property string pendingPluginId: ""
 
     focus: true
+
+    function openPluginSettings(pluginId) {
+        pendingPluginId = pluginId || "";
+        if (currentIndex === 12)
+            Qt.callLater(applyPendingPluginSettings);
+    }
+
+    function applyPendingPluginSettings() {
+        if (!pendingPluginId || !pluginsLoader.item)
+            return;
+        pluginsLoader.item.openPluginSettings(pendingPluginId);
+        pendingPluginId = "";
+    }
+
+    onCurrentIndexChanged: {
+        if (currentIndex === 12 && pendingPluginId)
+            Qt.callLater(applyPendingPluginSettings);
+    }
 
     Rectangle {
         anchors.fill: parent
@@ -379,6 +398,13 @@ FocusScope {
             onActiveChanged: {
                 if (active && item)
                     Qt.callLater(() => item.forceActiveFocus());
+                if (active)
+                    Qt.callLater(root.applyPendingPluginSettings);
+            }
+
+            onLoaded: {
+                if (visible)
+                    Qt.callLater(root.applyPendingPluginSettings);
             }
         }
 

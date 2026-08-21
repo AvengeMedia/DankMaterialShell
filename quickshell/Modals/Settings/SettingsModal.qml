@@ -86,6 +86,11 @@ DankFloatingWindow {
         showWithTabName("keybinds");
     }
 
+    function openPluginSettings(pluginId: string) {
+        setTabIndex(12);
+        content.openPluginSettings(pluginId);
+    }
+
     function toggleMenu() {
         enableAnimations = true;
         menuVisible = !menuVisible;
