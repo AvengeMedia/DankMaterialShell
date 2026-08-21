@@ -55,6 +55,7 @@ done
             // 1. Information Card
             SettingsCard {
                 width: parent.width
+                title: I18n.tr("Status")
                 settingKey: "batteryStatusCard"
                 tags: ["battery", "status", "charge", "health"]
 
@@ -102,7 +103,7 @@ done
                             }
 
                             StyledText {
-                                text: BatteryService.isPluggedIn ? I18n.tr("Plugged In (AC)") : I18n.tr("Battery Power")
+                                text: BatteryService.isPluggedIn ? I18n.tr("AC Adapter (Plugged In)") : I18n.tr("Battery Power")
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceTextMedium
                                 width: parent.width
@@ -144,7 +145,7 @@ done
                                 spacing: Theme.spacingXXS
 
                                 StyledText {
-                                    text: I18n.tr("Estimated time")
+                                    text: I18n.tr("Estimated Time")
                                     font.pixelSize: Theme.fontSizeSmall
                                     color: Theme.surfaceTextMedium
                                 }
@@ -174,7 +175,7 @@ done
                                 spacing: Theme.spacingXXS
 
                                 StyledText {
-                                    text: I18n.tr("Battery health")
+                                    text: I18n.tr("Battery Health")
                                     font.pixelSize: Theme.fontSizeSmall
                                     color: Theme.surfaceTextMedium
                                 }
