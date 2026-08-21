@@ -115,9 +115,10 @@ const DMS_ACTIONS = [
     { id: "spawn dms ipc call mpris previous", label: "Media: Previous Track" },
     { id: "spawn dms ipc call mpris next", label: "Media: Next Track" },
     { id: "spawn dms ipc call mpris stop", label: "Media: Stop" },
-    { id: "spawn dms ipc call niri screenshot", label: "Screenshot: Interactive", compositor: "niri" },
-    { id: "spawn dms ipc call niri screenshotScreen", label: "Screenshot: Full Screen", compositor: "niri" },
-    { id: "spawn dms ipc call niri screenshotWindow", label: "Screenshot: Window", compositor: "niri" },
+    { id: "spawn dms screenshot", label: "Screenshot: Region" },
+    { id: "spawn dms screenshot full", label: "Screenshot: Full Screen" },
+    { id: "spawn dms screenshot all", label: "Screenshot: All Screens" },
+    { id: "spawn dms screenshot window", label: "Screenshot: Window" },
     { id: "spawn dms ipc call hypr toggleOverview", label: "Hyprland: Toggle Overview", compositor: "hyprland" },
     { id: "spawn dms ipc call hypr openOverview", label: "Hyprland: Open Overview", compositor: "hyprland" },
     { id: "spawn dms ipc call hypr closeOverview", label: "Hyprland: Close Overview", compositor: "hyprland" },
@@ -742,6 +743,12 @@ const ACTION_ARGS = {
     hyprland: HYPRLAND_ACTION_ARGS
 };
 
+const SCREENSHOT_FLAGS = [
+    { name: "no-file", type: "flag", flag: "--no-file", label: "Save", inverted: true },
+    { name: "no-clipboard", type: "flag", flag: "--no-clipboard", label: "Clipboard", inverted: true },
+    { name: "cursor", type: "flag", flag: "--cursor=on", label: "Pointer" }
+];
+
 const DMS_ACTION_ARGS = {
     "audio increment": {
         base: "spawn dms ipc call audio increment",
@@ -784,7 +791,11 @@ const DMS_ACTION_ARGS = {
         args: [
             { name: "tab", type: "text", label: "Tab", placeholder: "overview, media, wallpaper, weather", default: "" }
         ]
-    }
+    },
+    "screenshot": { base: "spawn dms screenshot", args: SCREENSHOT_FLAGS },
+    "screenshot full": { base: "spawn dms screenshot full", args: SCREENSHOT_FLAGS },
+    "screenshot all": { base: "spawn dms screenshot all", args: SCREENSHOT_FLAGS },
+    "screenshot window": { base: "spawn dms screenshot window", args: SCREENSHOT_FLAGS }
 };
 
 const DMS_AMOUNT_LABELS = {
@@ -889,6 +900,11 @@ function getActionLabel(action, compositor) {
     if (dmsAct)
         return dmsAct.label;
 
+    var dmsKey = findDmsArgKey(action);
+    var baseAct = dmsKey ? findDmsAction(DMS_ACTION_ARGS[dmsKey].base) : null;
+    if (baseAct)
+        return baseAct.label;
+
     if (compositor) {
         var compAct = findCompositorAction(compositor, action);
         if (compAct)
@@ -909,7 +925,7 @@ function getActionLabel(action, compositor) {
 function getActionType(action) {
     if (!action)
         return "compositor";
-    if (action.startsWith("spawn dms ipc call "))
+    if (isDmsAction(action))
         return "dms";
     if (/^spawn \w+ -c /.test(action) || action.startsWith("spawn_shell "))
         return "shell";
@@ -921,7 +937,7 @@ function getActionType(action) {
 function isDmsAction(action) {
     if (!action)
         return false;
-    return action.startsWith("spawn dms ipc call ");
+    return action.startsWith("spawn dms ipc call ") || /^spawn dms screenshot( |$)/.test(action);
 }
 
 function isValidAction(action) {
@@ -1009,12 +1025,23 @@ function getActionArgConfig(compositor, action) {
     if (compositorArgs && compositorArgs[baseAction])
         return { type: "compositor", base: baseAction, config: compositorArgs[baseAction] };
 
-    for (var key in DMS_ACTION_ARGS) {
-        if (action.startsWith(DMS_ACTION_ARGS[key].base))
-            return { type: "dms", base: key, config: DMS_ACTION_ARGS[key] };
-    }
+    var dmsKey = findDmsArgKey(action);
+    if (dmsKey)
+        return { type: "dms", base: dmsKey, config: DMS_ACTION_ARGS[dmsKey] };
 
     return null;
+}
+
+function findDmsArgKey(action) {
+    var best = null;
+    for (var key in DMS_ACTION_ARGS) {
+        var base = DMS_ACTION_ARGS[key].base;
+        if (action !== base && !action.startsWith(base + " "))
+            continue;
+        if (!best || base.length > DMS_ACTION_ARGS[best].base.length)
+            best = key;
+    }
+    return best;
 }
 
 function parseCompositorActionArgs(compositor, action) {
@@ -1327,53 +1354,59 @@ function parseDmsActionArgs(action) {
     if (!action)
         return { base: "", args: {} };
 
-    for (var key in DMS_ACTION_ARGS) {
-        var config = DMS_ACTION_ARGS[key];
-        if (!action.startsWith(config.base))
-            continue;
+    var key = findDmsArgKey(action);
+    if (!key)
+        return { base: action, args: {} };
 
-        var rest = action.slice(config.base.length).trim();
-        var result = { base: key, args: {} };
+    var config = DMS_ACTION_ARGS[key];
+    var rest = action.slice(config.base.length).trim();
+    var result = { base: key, args: {} };
 
-        if (!rest)
-            return result;
-
-        var tokens = [];
-        var current = "";
-        var inQuotes = false;
-        var hadQuotes = false;
-        for (var i = 0; i < rest.length; i++) {
-            var c = rest[i];
-            switch (c) {
-                case '"':
-                    inQuotes = !inQuotes;
-                    hadQuotes = true;
-                    break;
-                case ' ':
-                    if (inQuotes) {
-                        current += c;
-                    } else if (current || hadQuotes) {
-                        tokens.push(current);
-                        current = "";
-                        hadQuotes = false;
-                    }
-                    break;
-                default:
-                    current += c;
-                    break;
-            }
-        }
-        if (current || hadQuotes)
-            tokens.push(current);
-
-        for (var j = 0; j < config.args.length && j < tokens.length; j++) {
-            result.args[config.args[j].name] = tokens[j];
-        }
-
+    if (!rest)
         return result;
+
+    var tokens = [];
+    var current = "";
+    var inQuotes = false;
+    var hadQuotes = false;
+    for (var i = 0; i < rest.length; i++) {
+        var c = rest[i];
+        switch (c) {
+            case '"':
+                inQuotes = !inQuotes;
+                hadQuotes = true;
+                break;
+            case ' ':
+                if (inQuotes) {
+                    current += c;
+                } else if (current || hadQuotes) {
+                    tokens.push(current);
+                    current = "";
+                    hadQuotes = false;
+                }
+                break;
+            default:
+                current += c;
+                break;
+        }
+    }
+    if (current || hadQuotes)
+        tokens.push(current);
+
+    var positional = tokens.filter(t => !t.startsWith("--"));
+    var p = 0;
+    for (var j = 0; j < config.args.length; j++) {
+        var argDef = config.args[j];
+        if (argDef.type === "flag") {
+            result.args[argDef.name] = tokens.indexOf(argDef.flag) !== -1;
+            continue;
+        }
+        if (p >= positional.length)
+            break;
+        result.args[argDef.name] = positional[p++];
     }
 
-    return { base: action, args: {} };
+    return result;
 }
 
 function buildDmsAction(baseKey, args) {
@@ -1382,9 +1415,11 @@ function buildDmsAction(baseKey, args) {
         return "";
 
     var parts = [config.base];
+    var positional = config.args.filter(a => a.type !== "flag");
+    var flags = config.args.filter(a => a.type === "flag");
 
-    for (var i = 0; i < config.args.length; i++) {
-        var argDef = config.args[i];
+    for (var i = 0; i < positional.length; i++) {
+        var argDef = positional[i];
         var value = args?.[argDef.name];
         if (value === undefined || value === null)
             value = argDef.default ?? "";
@@ -1396,6 +1431,11 @@ function buildDmsAction(baseKey, args) {
         } else {
             break;
         }
+    }
+
+    for (var f = 0; f < flags.length; f++) {
+        if (args?.[flags[f].name] === true)
+            parts.push(flags[f].flag);
     }
 
     return parts.join(" ");

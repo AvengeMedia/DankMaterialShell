@@ -212,12 +212,12 @@ binds {
     Mod+Shift+Equal { set-window-height "+10%"; }
 
     // === Screenshots ===
-    XF86Launch1 { screenshot; }
-    Ctrl+XF86Launch1 { screenshot-screen; }
-    Alt+XF86Launch1 { screenshot-window; }
-    Print { screenshot; }
-    Ctrl+Print { screenshot-screen; }
-    Alt+Print { screenshot-window; }
+    XF86Launch1 hotkey-overlay-title="Screenshot: Region" { spawn "dms" "screenshot"; }
+    Ctrl+XF86Launch1 hotkey-overlay-title="Screenshot: Full Screen" { spawn "dms" "screenshot" "full"; }
+    Alt+XF86Launch1 hotkey-overlay-title="Screenshot: Window" { spawn "dms" "screenshot" "window"; }
+    Print hotkey-overlay-title="Screenshot: Region" { spawn "dms" "screenshot"; }
+    Ctrl+Print hotkey-overlay-title="Screenshot: Full Screen" { spawn "dms" "screenshot" "full"; }
+    Alt+Print hotkey-overlay-title="Screenshot: Window" { spawn "dms" "screenshot" "window"; }
     // === Display Profiles ===
     Mod+P hotkey-overlay-title="Cycle Display Profile" {
         spawn "dms" "ipc" "outputs" "cycleProfile";
