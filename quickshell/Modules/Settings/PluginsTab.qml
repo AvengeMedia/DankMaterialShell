@@ -41,6 +41,10 @@ FocusScope {
     function openPluginSettings(pluginId) {
         if (!pluginId)
             return;
+        searchQuery = "";
+        isSearchExpanded = false;
+        pluginSearchField.text = "";
+        updateFilteredPlugins();
         expandedPluginId = pluginId;
         Qt.callLater(() => {
             const index = filteredPlugins.findIndex(plugin => plugin.id === pluginId);

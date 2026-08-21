@@ -150,14 +150,17 @@ Singleton {
     }
 
     function translateItem(item) {
+        const isRuntimePlugin = item.runtimeType === "plugin";
+        const label = isRuntimePlugin ? item.label : I18n.tr(item.label);
+        const description = isRuntimePlugin ? (item.description || "") : I18n.tr(item.description || "");
         return {
             section: item.section,
-            label: I18n.tr(item.label),
+            label: label,
             tabIndex: item.tabIndex,
             category: I18n.tr(item.category),
             keywords: item.keywords || [],
             icon: item.icon || "settings",
-            description: item.description ? I18n.tr(item.description) : "",
+            description: description,
             conditionKey: item.conditionKey,
             runtimeType: item.runtimeType || "",
             runtimeId: item.runtimeId || ""
