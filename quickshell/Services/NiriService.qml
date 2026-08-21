@@ -1012,6 +1012,7 @@ Singleton {
             const enrichedToplevel = {
                 "appId": bestMatch.appId,
                 "title": bestMatch.title,
+                "sourceToplevel": bestMatch,
                 "activated": isFocused,
                 "niriWindowId": niriWindow.id,
                 "niriWorkspaceId": niriWindow.workspace_id,
@@ -1085,6 +1086,7 @@ Singleton {
             const enrichedToplevel = {
                 "appId": bestMatch.appId,
                 "title": bestMatch.title,
+                "sourceToplevel": bestMatch,
                 "activated": isFocused,
                 "niriWindowId": niriWindow.id,
                 "niriWorkspaceId": niriWindow.workspace_id,

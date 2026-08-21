@@ -36,7 +36,7 @@ BasePill {
 
     function resolveSortedWindow() {
         const sortedWindows = CompositorService.sortedToplevels || [];
-        const exactMatch = sortedWindows.find(window => window === activeWindow || window.wayland === activeWindow);
+        const exactMatch = sortedWindows.find(window => window === activeWindow || window.wayland === activeWindow || window.sourceToplevel === activeWindow);
         if (exactMatch)
             return exactMatch;
 
