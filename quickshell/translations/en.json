@@ -4243,6 +4243,34 @@
     ]
   },
   {
+    "term": "Cellular",
+    "context": "Cellular",
+    "reference": "Modules/Settings/NetworkStatusTab.qml:120, Modules/Settings/NetworkStatusTab.qml:167, Modules/Settings/NetworkCellularTab.qml:35, Modules/ControlCenter/Components/DragDropGrid.qml:493, Modules/ControlCenter/Components/DragDropGrid.qml:498, Modules/ControlCenter/Details/NetworkDetail.qml:177, Modals/Settings/SettingsSidebar.qml:269",
+    "comment": "network status",
+    "tags": [
+      "settings",
+      "shell"
+    ]
+  },
+  {
+    "term": "Cellular disabled",
+    "context": "Cellular disabled",
+    "reference": "Services/DMSNetworkService.qml:796",
+    "comment": "",
+    "tags": [
+      "shell"
+    ]
+  },
+  {
+    "term": "Cellular enabled",
+    "context": "Cellular enabled",
+    "reference": "Services/DMSNetworkService.qml:796",
+    "comment": "",
+    "tags": [
+      "shell"
+    ]
+  },
+  {
     "term": "Center Section",
     "context": "Center Section",
     "reference": "Modules/Settings/WidgetSelectionPopup.qml:29, Modules/Settings/WidgetsTab.qml:1422",
@@ -7801,6 +7829,16 @@
     ]
   },
   {
+    "term": "Disabling cellular...",
+    "context": "Disabling cellular...",
+    "reference": "Modules/Settings/NetworkCellularTab.qml:54, Modules/ControlCenter/Details/NetworkDetail.qml:542",
+    "comment": "",
+    "tags": [
+      "settings",
+      "shell"
+    ]
+  },
+  {
     "term": "Disc",
     "context": "Disc",
     "reference": "Modules/Settings/WallpaperTab.qml:1203",
@@ -8704,6 +8742,15 @@
     ]
   },
   {
+    "term": "Enable Cellular",
+    "context": "Enable Cellular",
+    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:594",
+    "comment": "",
+    "tags": [
+      "shell"
+    ]
+  },
+  {
     "term": "Enable Do Not Disturb",
     "context": "Enable Do Not Disturb",
     "reference": "Modules/Settings/NotificationsTab.qml:426",
@@ -8909,6 +8956,16 @@
     "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:388, Modules/ControlCenter/Components/DragDropGrid.qml:469",
     "comment": "network status",
     "tags": [
+      "shell"
+    ]
+  },
+  {
+    "term": "Enabling cellular...",
+    "context": "Enabling cellular...",
+    "reference": "Modules/Settings/NetworkCellularTab.qml:54, Modules/ControlCenter/Details/NetworkDetail.qml:542",
+    "comment": "",
+    "tags": [
+      "settings",
       "shell"
     ]
   },
@@ -10126,6 +10183,15 @@
     "context": "Failed to switch port",
     "reference": "Services/AudioService.qml:186",
     "comment": "audio sink port switch failure message",
+    "tags": [
+      "shell"
+    ]
+  },
+  {
+    "term": "Failed to toggle cellular",
+    "context": "Failed to toggle cellular",
+    "reference": "Services/DMSNetworkService.qml:793",
+    "comment": "",
     "tags": [
       "shell"
     ]

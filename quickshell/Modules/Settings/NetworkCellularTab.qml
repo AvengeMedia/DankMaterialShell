@@ -51,7 +51,7 @@ Item {
                                 if (!NetworkService.cellularHardwareEnabled)
                                     return I18n.tr("Unavailable");
                                 if (NetworkService.cellularToggling)
-                                    return I18n.tr("Connecting...");
+                                    return NetworkService.cellularEnabled ? I18n.tr("Disabling cellular...") : I18n.tr("Enabling cellular...");
                                 if (!NetworkService.cellularEnabled)
                                     return I18n.tr("Disabled");
                                 const devices = NetworkService.cellularDevices || [];
