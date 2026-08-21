@@ -1,6 +1,8 @@
 package screenshot
 
 import (
+	"math"
+
 	"github.com/AvengeMedia/dankgo/wayland/client"
 )
 
@@ -41,6 +43,9 @@ func (r *RegionSelector) setupPointerHandlers() {
 
 		r.pointerX = e.SurfaceX
 		r.pointerY = e.SurfaceY
+		if r.selection.dragging {
+			r.updateSelectionCurrent(r.activeSurface, r.pointerX, r.pointerY)
+		}
 	})
 
 	r.pointer.SetMotionHandler(func(e client.PointerMotionEvent) {
@@ -55,38 +60,7 @@ func (r *RegionSelector) setupPointerHandlers() {
 			return
 		}
 
-		curX, curY := e.SurfaceX, e.SurfaceY
-		if r.shiftHeld {
-			dx := curX - r.selection.anchorX
-			dy := curY - r.selection.anchorY
-			adx, ady := dx, dy
-			if adx < 0 {
-				adx = -adx
-			}
-			if ady < 0 {
-				ady = -ady
-			}
-			size := adx
-			if ady > adx {
-				size = ady
-			}
-			if dx < 0 {
-				curX = r.selection.anchorX - size
-			} else {
-				curX = r.selection.anchorX + size
-			}
-			if dy < 0 {
-				curY = r.selection.anchorY - size
-			} else {
-				curY = r.selection.anchorY + size
-			}
-		}
-
-		r.selection.currentX = curX
-		r.selection.currentY = curY
-		if r.selection.surface != nil {
-			r.redrawSurface(r.selection.surface)
-		}
+		r.updateSelectionCurrent(r.activeSurface, e.SurfaceX, e.SurfaceY)
 	})
 
 	r.pointer.SetButtonHandler(func(e client.PointerButtonEvent) {
@@ -116,10 +90,10 @@ func (r *RegionSelector) setupPointerHandlers() {
 				r.selection.hasSelection = true
 				r.selection.dragging = true
 				r.selection.surface = r.activeSurface
-				r.selection.anchorX = r.pointerX
-				r.selection.anchorY = r.pointerY
-				r.selection.currentX = r.pointerX
-				r.selection.currentY = r.pointerY
+				r.selection.anchorX = r.pointerX + float64(r.activeSurface.output.x)
+				r.selection.anchorY = r.pointerY + float64(r.activeSurface.output.y)
+				r.selection.currentX = r.selection.anchorX
+				r.selection.currentY = r.selection.anchorY
 				for _, os := range r.surfaces {
 					r.redrawSurface(os)
 				}
@@ -137,6 +111,46 @@ func (r *RegionSelector) setupPointerHandlers() {
 			r.running = false
 		}
 	})
+}
+
+func (r *RegionSelector) updateSelectionCurrent(os *OutputSurface, surfaceX, surfaceY float64) {
+	if os == nil || os.output == nil || !r.selection.dragging {
+		return
+	}
+
+	curX := surfaceX + float64(os.output.x)
+	curY := surfaceY + float64(os.output.y)
+	if r.shiftHeld {
+		dx := curX - r.selection.anchorX
+		dy := curY - r.selection.anchorY
+		adx, ady := dx, dy
+		if adx < 0 {
+			adx = -adx
+		}
+		if ady < 0 {
+			ady = -ady
+		}
+		size := adx
+		if ady > adx {
+			size = ady
+		}
+		if dx < 0 {
+			curX = r.selection.anchorX - size
+		} else {
+			curX = r.selection.anchorX + size
+		}
+		if dy < 0 {
+			curY = r.selection.anchorY - size
+		} else {
+			curY = r.selection.anchorY + size
+		}
+	}
+
+	r.selection.currentX = curX
+	r.selection.currentY = curY
+	for _, surface := range r.surfaces {
+		r.redrawSurface(surface)
+	}
 }
 
 func (r *RegionSelector) setupKeyboardHandlers() {
@@ -192,13 +206,22 @@ func (r *RegionSelector) selectionDeviceRect() (*OutputSurface, int, int, int, i
 }
 
 func (r *RegionSelector) finishSelection() {
+	scrollMode := r.screenshoter != nil && r.screenshoter.config.Mode == ModeScroll
+	switch {
+	case scrollMode:
+		r.clampSelectionToSurface()
+	case r.selectionSpansOutputs():
+		r.finishSelectionAcrossOutputs()
+		return
+	}
+
 	os, bx1, by1, w, h := r.selectionDeviceRect()
 	if os == nil {
 		r.running = false
 		return
 	}
 
-	if r.screenshoter != nil && r.screenshoter.config.Mode == ModeScroll {
+	if scrollMode {
 		r.enterScrollPhase(os, bx1, by1, w, h)
 		return
 	}
@@ -260,4 +283,172 @@ func (r *RegionSelector) finishSelection() {
 	}
 
 	r.running = false
+}
+
+func (r *RegionSelector) clampSelectionToSurface() {
+	os := r.selection.surface
+	if os == nil || os.output == nil {
+		return
+	}
+
+	minX := float64(os.output.x)
+	minY := float64(os.output.y)
+	maxX := minX + float64(os.logicalW)
+	maxY := minY + float64(os.logicalH)
+	r.selection.currentX = math.Max(minX, math.Min(maxX, r.selection.currentX))
+	r.selection.currentY = math.Max(minY, math.Min(maxY, r.selection.currentY))
+}
+
+// selectionExtent is the selection as half-open device pixels on its surface's buffer grid.
+type selectionExtent struct {
+	surface        *OutputSurface
+	x1, y1, x2, y2 int
+	scaleX, scaleY float64
+}
+
+func (r *RegionSelector) selectionExtent() (selectionExtent, bool) {
+	os := r.selection.surface
+	if !r.selection.hasSelection || os == nil || os.output == nil || os.screenBuf == nil || os.logicalW <= 0 || os.logicalH <= 0 {
+		return selectionExtent{}, false
+	}
+
+	scaleX := float64(os.screenBuf.Width) / float64(os.logicalW)
+	scaleY := float64(os.screenBuf.Height) / float64(os.logicalH)
+	minX := math.Min(r.selection.anchorX, r.selection.currentX) - float64(os.output.x)
+	minY := math.Min(r.selection.anchorY, r.selection.currentY) - float64(os.output.y)
+	maxX := math.Max(r.selection.anchorX, r.selection.currentX) - float64(os.output.x)
+	maxY := math.Max(r.selection.anchorY, r.selection.currentY) - float64(os.output.y)
+	return selectionExtent{
+		surface: os,
+		x1:      int(math.Floor(minX * scaleX)),
+		y1:      int(math.Floor(minY * scaleY)),
+		x2:      int(math.Floor(maxX*scaleX)) + 1,
+		y2:      int(math.Floor(maxY*scaleY)) + 1,
+		scaleX:  scaleX,
+		scaleY:  scaleY,
+	}, true
+}
+
+func (e selectionExtent) width() int  { return e.x2 - e.x1 }
+func (e selectionExtent) height() int { return e.y2 - e.y1 }
+
+func (e selectionExtent) logical() (x1, y1, x2, y2 float64) {
+	ox, oy := float64(e.surface.output.x), float64(e.surface.output.y)
+	return ox + float64(e.x1)/e.scaleX, oy + float64(e.y1)/e.scaleY,
+		ox + float64(e.x2)/e.scaleX, oy + float64(e.y2)/e.scaleY
+}
+
+// outputRect maps os onto the extent's grid; integer math first keeps shared output edges exact.
+func (e selectionExtent) outputRect(os *OutputSurface) (x1, y1, x2, y2 float64) {
+	dx := int(os.output.x - e.surface.output.x)
+	dy := int(os.output.y - e.surface.output.y)
+	bw, bh := e.surface.screenBuf.Width, e.surface.screenBuf.Height
+	lw, lh := e.surface.logicalW, e.surface.logicalH
+	return float64(dx*bw) / float64(lw), float64(dy*bh) / float64(lh),
+		float64((dx+os.logicalW)*bw) / float64(lw), float64((dy+os.logicalH)*bh) / float64(lh)
+}
+
+func (e selectionExtent) within(os *OutputSurface) bool {
+	x1, y1, x2, y2 := e.outputRect(os)
+	return float64(e.x1) >= x1 && float64(e.y1) >= y1 && float64(e.x2) <= x2 && float64(e.y2) <= y2
+}
+
+func (e selectionExtent) intersects(os *OutputSurface) bool {
+	x1, y1, x2, y2 := e.outputRect(os)
+	return float64(e.x1) < x2 && float64(e.x2) > x1 && float64(e.y1) < y2 && float64(e.y2) > y1
+}
+
+func (r *RegionSelector) selectionSpansOutputs() bool {
+	ext, ok := r.selectionExtent()
+	return ok && !ext.within(ext.surface)
+}
+
+func (r *RegionSelector) finishSelectionAcrossOutputs() {
+	ext, ok := r.selectionExtent()
+	if !ok || ext.width() <= 0 || ext.height() <= 0 {
+		r.running = false
+		return
+	}
+
+	composite, err := CreateShmBuffer(ext.width(), ext.height(), ext.width()*4)
+	if err != nil {
+		r.running = false
+		return
+	}
+	composite.Clear()
+
+	primary := ext.surface
+	minX, minY, maxX, maxY := ext.logical()
+	for _, os := range r.surfaces {
+		src := r.getSourceBuffer(os)
+		if src == nil || os.output == nil || os.logicalW <= 0 || os.logicalH <= 0 || !ext.intersects(os) {
+			continue
+		}
+
+		ox, oy := float64(os.output.x), float64(os.output.y)
+		ix1 := math.Max(minX, ox)
+		iy1 := math.Max(minY, oy)
+		ix2 := math.Min(maxX, ox+float64(os.logicalW))
+		iy2 := math.Min(maxY, oy+float64(os.logicalH))
+
+		scaleX := float64(src.Width) / float64(os.logicalW)
+		scaleY := float64(src.Height) / float64(os.logicalH)
+		srcX := clamp(int(math.Floor((ix1-ox)*scaleX)), 0, src.Width)
+		srcY := clamp(int(math.Floor((iy1-oy)*scaleY)), 0, src.Height)
+		srcRight := clamp(int(math.Ceil((ix2-ox)*scaleX)), 0, src.Width)
+		srcBottom := clamp(int(math.Ceil((iy2-oy)*scaleY)), 0, src.Height)
+
+		dstX := int(math.Round((ix1 - minX) * ext.scaleX))
+		dstY := int(math.Round((iy1 - minY) * ext.scaleY))
+		dstRight := int(math.Round((ix2 - minX) * ext.scaleX))
+		dstBottom := int(math.Round((iy2 - minY) * ext.scaleY))
+		swapRB := formatIsBGR(os.screenFormat) != formatIsBGR(primary.screenFormat)
+		blitSelectionPiece(composite, src, srcX, srcY, srcRight-srcX, srcBottom-srcY, dstX, dstY, dstRight-dstX, dstBottom-dstY, swapRB)
+	}
+
+	r.capturedBuffer = composite
+	r.capturedRegion = Region{Width: int32(ext.width()), Height: int32(ext.height()), Output: primary.output.name}
+	r.result = Region{
+		X:      int32(ext.x1) + primary.output.x,
+		Y:      int32(ext.y1) + primary.output.y,
+		Width:  int32(ext.width()),
+		Height: int32(ext.height()),
+		// Cross-output regions cannot be replayed by the single-output last mode.
+		Output: "",
+	}
+	r.running = false
+}
+
+func blitSelectionPiece(dst, src *ShmBuffer, srcX, srcY, srcW, srcH, dstX, dstY, dstW, dstH int, swapRB bool) {
+	if srcW <= 0 || srcH <= 0 || dstW <= 0 || dstH <= 0 {
+		return
+	}
+	c0, c2 := 0, 2
+	if swapRB {
+		c0, c2 = 2, 0
+	}
+	srcData, dstData := src.Data(), dst.Data()
+	for y := 0; y < dstH; y++ {
+		canvasY := dstY + y
+		if canvasY < 0 || canvasY >= dst.Height {
+			continue
+		}
+		sourceY := srcY + y*srcH/dstH
+		for x := 0; x < dstW; x++ {
+			canvasX := dstX + x
+			if canvasX < 0 || canvasX >= dst.Width {
+				continue
+			}
+			sourceX := srcX + x*srcW/dstW
+			si := sourceY*src.Stride + sourceX*4
+			di := canvasY*dst.Stride + canvasX*4
+			if si+3 >= len(srcData) || di+3 >= len(dstData) {
+				continue
+			}
+			dstData[di+0] = srcData[si+c0]
+			dstData[di+1] = srcData[si+1]
+			dstData[di+2] = srcData[si+c2]
+			dstData[di+3] = srcData[si+3]
+		}
+	}
 }

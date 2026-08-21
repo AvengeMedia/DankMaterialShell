@@ -17,7 +17,8 @@ type SelectionState struct {
 	hasSelection bool           // There's a selection to display (pre-loaded or user-drawn)
 	dragging     bool           // User is actively drawing a new selection
 	surface      *OutputSurface // Surface where selection was made
-	// Surface-local logical coordinates (from pointer events)
+	// Global logical coordinates. Keeping these independent of the active
+	// surface lets a drag continue across output boundaries.
 	anchorX  float64
 	anchorY  float64
 	currentX float64
@@ -779,10 +780,10 @@ func (r *RegionSelector) applyPreSelection(os *OutputSurface) {
 	r.selection.hasSelection = true
 	r.selection.dragging = false
 	r.selection.surface = os
-	r.selection.anchorX = x1
-	r.selection.anchorY = y1
-	r.selection.currentX = x2
-	r.selection.currentY = y2
+	r.selection.anchorX = float64(os.output.x) + x1
+	r.selection.anchorY = float64(os.output.y) + y1
+	r.selection.currentX = float64(os.output.x) + x2
+	r.selection.currentY = float64(os.output.y) + y2
 	r.activeSurface = os
 }
 
