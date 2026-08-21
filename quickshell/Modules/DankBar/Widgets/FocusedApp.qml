@@ -34,17 +34,31 @@ BasePill {
     property bool isHovered: mouseArea.containsMouse
     property bool isAutoHideBar: false
 
+    function resolveSortedWindow() {
+        const sortedWindows = CompositorService.sortedToplevels || [];
+        const exactMatch = sortedWindows.find(window => window === activeWindow || window.wayland === activeWindow);
+        if (exactMatch)
+            return exactMatch;
+
+        const titleMatches = sortedWindows.filter(window => window.appId === activeWindow.appId && window.title === activeWindow.title);
+        return titleMatches.length === 1 ? titleMatches[0] : null;
+    }
+
     function resolveActiveWindowPid() {
         if (!activeWindow)
             return 0;
-        if (CompositorService.isNiri)
-            return NiriService.windows.find(w => w.is_focused)?.pid || 0;
+        if (CompositorService.isNiri) {
+            const sortedWindow = resolveSortedWindow();
+            return sortedWindow?.niriWindowId !== undefined ? NiriService.windows.find(w => w.id === sortedWindow.niriWindowId)?.pid || 0 : 0;
+        }
         if (CompositorService.isHyprland) {
-            const hyprWindow = Array.from(Hyprland.toplevels?.values || []).find(t => t.wayland === activeWindow || t.activated);
+            const hyprWindow = Array.from(Hyprland.toplevels?.values || []).find(t => t.wayland === activeWindow);
             return hyprWindow?.lastIpcObject?.pid || 0;
         }
-        if (CompositorService.isMango)
-            return MangoService.windows.find(w => w.is_focused)?.pid || 0;
+        if (CompositorService.isMango) {
+            const sortedWindow = resolveSortedWindow();
+            return sortedWindow?.mangoWindowId !== undefined ? MangoService.windows.find(w => w.id === sortedWindow.mangoWindowId)?.pid || 0 : 0;
+        }
         return activeWindow.pid || 0;
     }
 
