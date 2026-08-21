@@ -13,7 +13,7 @@ DankPopout {
 
     readonly property string appId: currentWindow?.appId || ""
     readonly property string windowTitle: currentWindow?.title || ""
-    readonly property string appName: appId ? Paths.getAppName(appId, DesktopEntries.heuristicLookup(appId)) : I18n.tr("Unknown")
+    readonly property string appName: appId ? Paths.getAppName(appId, DesktopEntries.heuristicLookup(Paths.moddedAppId(appId))) : I18n.tr("Unknown")
     readonly property int pid: processId
 
     layerNamespace: "dms:focused-window-popout"
@@ -104,7 +104,7 @@ DankPopout {
                     model: [
                         { label: I18n.tr("App ID"), value: root.appId, copyable: !!root.appId },
                         { label: I18n.tr("Title"), value: root.windowTitle || I18n.tr("Untitled"), copyable: !!root.windowTitle },
-                        { label: I18n.tr("PID"), value: root.pid > 0 ? root.pid.toString() : I18n.tr("Unavailable"), copyable: root.pid > 0 }
+                        { label: I18n.tr("PID", "Label for the process ID row in the focused window popout"), value: root.pid > 0 ? root.pid.toString() : I18n.tr("Unavailable"), copyable: root.pid > 0 }
                     ]
 
                     delegate: Rectangle {
