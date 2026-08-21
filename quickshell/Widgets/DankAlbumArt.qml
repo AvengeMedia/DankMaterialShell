@@ -245,12 +245,20 @@ Item {
 
     // Apple Music animated cover, layered over the static art which stays as fallback.
     Loader {
+        readonly property bool wantsAnimatedArt: root.onScreen && activePlayer?.playbackState === MprisPlaybackState.Playing && AppleMusicArtService.animatedArtUrl !== ""
+
         width: albumSize
         height: albumSize
         anchors.centerIn: parent
         z: 1
-        active: MultimediaService.available && root.onScreen && activePlayer?.playbackState === MprisPlaybackState.Playing && AppleMusicArtService.animatedArtUrl !== ""
+        active: wantsAnimatedArt && MultimediaService.available
         source: "DankAnimatedAlbumArt.qml"
+
+        onWantsAnimatedArtChanged: {
+            if (!wantsAnimatedArt)
+                return;
+            MultimediaService.ensureProbed();
+        }
     }
 
     // Outgoing art, shown on top only while fading out over the new mainArt.

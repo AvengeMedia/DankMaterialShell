@@ -17,6 +17,7 @@ Singleton {
     readonly property PwNode source: Pipewire.defaultAudioSource
 
     readonly property bool soundsAvailable: MultimediaService.available
+    property bool playersRequested: false
     property bool gsettingsAvailable: false
     property var availableSoundThemes: []
     property string currentSoundTheme: ""
@@ -34,7 +35,7 @@ Singleton {
 
     Loader {
         id: soundsLoader
-        active: root.soundsAvailable
+        active: root.playersRequested && root.soundsAvailable
         source: "AudioSoundPlayers.qml"
         onLoaded: {
             item.volume = Qt.binding(() => root.notificationsVolume);
@@ -714,37 +715,50 @@ EOFCONFIG
         return SettingsData.muteSoundsWhenMediaPlaying && isMediaPlaying();
     }
 
+    function ensurePlayers() {
+        if (!SettingsData.soundsEnabled)
+            return;
+        MultimediaService.ensureProbed();
+        playersRequested = true;
+    }
+
     function playVolumeChangeSound() {
+        ensurePlayers();
         if (!soundsAvailable || !volumeChangeSound || notificationsAudioMuted || shouldMuteForMedia())
             return;
         volumeChangeSound.play();
     }
 
     function playPowerPlugSound() {
+        ensurePlayers();
         if (!soundsAvailable || !powerPlugSound || notificationsAudioMuted || shouldMuteForMedia())
             return;
         powerPlugSound.play();
     }
 
     function playPowerUnplugSound() {
+        ensurePlayers();
         if (!soundsAvailable || !powerUnplugSound || notificationsAudioMuted || shouldMuteForMedia())
             return;
         powerUnplugSound.play();
     }
 
     function playNormalNotificationSound() {
+        ensurePlayers();
         if (!soundsAvailable || !normalNotificationSound || notificationsAudioMuted || shouldMuteForMedia())
             return;
         normalNotificationSound.play();
     }
 
     function playCriticalNotificationSound() {
+        ensurePlayers();
         if (!soundsAvailable || !criticalNotificationSound || notificationsAudioMuted || shouldMuteForMedia())
             return;
         criticalNotificationSound.play();
     }
 
     function playLoginSound() {
+        ensurePlayers();
         if (!soundsAvailable || !loginSound || notificationsAudioMuted || shouldMuteForMedia()) {
             return;
         }
@@ -1128,12 +1142,14 @@ EOFCONFIG
         }
     }
 
+    onSoundsAvailableChanged: {
+        if (!soundsAvailable)
+            return;
+        checkGsettings();
+    }
+
     Component.onCompleted: {
         rebuildTypedNodeLists();
-
-        if (soundsAvailable)
-            checkGsettings();
-
         loadDeviceAliases();
     }
 }

@@ -65,6 +65,7 @@ Rectangle {
             anchors.horizontalCenter: parent.horizontalCenter
             iconValue: root.iconValue
             iconSize: root.computedIconSize
+            animate: root.item?.data?.animated === true
             fallbackText: (root.item?.name?.length > 0) ? root.item.name.charAt(0).toUpperCase() : "?"
             iconColor: root.isSelected ? Theme.primary : Theme.surfaceText
             materialIconSizeAdjustment: root.computedIconSize * 0.3

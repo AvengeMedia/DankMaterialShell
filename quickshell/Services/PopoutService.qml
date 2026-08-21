@@ -52,6 +52,7 @@ Singleton {
     property var polkitAuthModal: null
     property var polkitAuthModalLoader: null
     property var bluetoothPairingModal: null
+    property var bluetoothPairingModalLoader: null
     property var networkInfoModal: null
     property var windowRuleModalLoader: null
     property var powerProfileModal: null
@@ -880,6 +881,15 @@ Singleton {
 
     function hideColorPicker() {
         colorPickerModal?.close();
+    }
+
+    function ensureBluetoothPairingModal() {
+        if (bluetoothPairingModal)
+            return bluetoothPairingModal;
+        if (!bluetoothPairingModalLoader)
+            return null;
+        bluetoothPairingModalLoader.active = true;
+        return bluetoothPairingModalLoader.item;
     }
 
     function showNotificationModal() {

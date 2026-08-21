@@ -104,6 +104,7 @@ Item {
         if (!SettingsData.lockScreenVideoEnabled || !SettingsData.lockScreenVideoPath)
             return;
 
+        MultimediaService.ensureProbed();
         if (!MultimediaService.available) {
             ToastService.showError(I18n.tr("Video Screensaver"), I18n.tr("QtMultimedia is not available"));
             return;

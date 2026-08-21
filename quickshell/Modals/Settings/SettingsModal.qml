@@ -11,6 +11,8 @@ DankFloatingWindow {
     property var profileBrowser: profileBrowserLoader.item
     property var wallpaperBrowser: wallpaperBrowserLoader.item
 
+    Component.onCompleted: MultimediaService.ensureProbed()
+
     function openProfileBrowser(allowStacking) {
         profileBrowserLoader.active = true;
         if (!profileBrowserLoader.item)
@@ -154,6 +156,7 @@ DankFloatingWindow {
             }
             onDialogClosed: () => {
                 allowStacking = true;
+                Qt.callLater(() => profileBrowserLoader.active = false);
             }
         }
     }
@@ -178,6 +181,7 @@ DankFloatingWindow {
             }
             onDialogClosed: () => {
                 allowStacking = true;
+                Qt.callLater(() => wallpaperBrowserLoader.active = false);
             }
         }
     }

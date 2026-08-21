@@ -481,18 +481,8 @@ Singleton {
                 comps[surface] = comp;
             }
 
-            if (comps.launcher) {
-                const instance = comps.launcher.createObject(root, {
-                    "pluginService": root
-                });
-                if (!instance) {
-                    log.error("failed to instantiate launcher surface:", pluginId, comps.launcher.errorString());
-                    pluginLoadFailed(pluginId, comps.launcher.errorString());
-                    return false;
-                }
-                newInstances[pluginId] = instance;
+            if (comps.launcher)
                 newLaunchers[pluginId] = comps.launcher;
-            }
 
             if (comps.daemon) {
                 newDaemons[pluginId] = comps.daemon;
@@ -890,8 +880,35 @@ Singleton {
         return loadPlugin(pluginId, true);
     }
 
+    function ensureLauncherInstance(pluginId) {
+        const existing = pluginInstances[pluginId];
+        if (existing)
+            return existing;
+        const comp = pluginLauncherComponents[pluginId];
+        if (!comp)
+            return null;
+        const instance = comp.createObject(root, {
+            "pluginService": root
+        });
+        if (!instance) {
+            log.error("failed to instantiate launcher surface:", pluginId, comp.errorString());
+            pluginLoadFailed(pluginId, comp.errorString());
+            return null;
+        }
+        const newInstances = Object.assign({}, pluginInstances);
+        newInstances[pluginId] = instance;
+        pluginInstances = newInstances;
+        return instance;
+    }
+
+    function ensureLauncherInstances() {
+        for (const pluginId in pluginLauncherComponents)
+            ensureLauncherInstance(pluginId);
+    }
+
     function togglePlugin(pluginId) {
-        const instance = pluginInstances[pluginId] || pluginDaemonInstances[pluginId];
+        const launcherInstance = pluginLauncherComponents[pluginId] ? ensureLauncherInstance(pluginId) : null;
+        const instance = launcherInstance || pluginDaemonInstances[pluginId];
         if (!instance || typeof instance.toggle !== "function")
             return false;
         instance.toggle();

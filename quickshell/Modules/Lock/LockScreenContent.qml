@@ -107,8 +107,7 @@ Item {
     }
 
     function securityKeyShortcutMatches(event) {
-        return SettingsData.lockScreenSecurityKeyShortcutEnabled
-            && KeyUtils.eventMatchesCombo(event, SettingsData.lockScreenSecurityKeyShortcut);
+        return SettingsData.lockScreenSecurityKeyShortcutEnabled && KeyUtils.eventMatchesCombo(event, SettingsData.lockScreenSecurityKeyShortcut);
     }
 
     Component.onCompleted: {
@@ -267,7 +266,10 @@ Item {
             return root.hasCustomWallpaper ? "Fill" : SessionData.getMonitorWallpaperFillMode(root.screenName);
         }
 
-        active: wallpaperSource !== ""
+        readonly property real screenScale: CompositorService.getScreenScale(Quickshell.screens.find(s => s.name === root.screenName) ?? null)
+        readonly property size decodeSize: Qt.size(Math.round(width * screenScale), Math.round(height * screenScale))
+
+        active: wallpaperSource !== "" && width > 0 && height > 0
         asynchronous: false
 
         sourceComponent: fillModeName === "Scrolling" ? scrollWallpaperComp : plainWallpaperComp
@@ -293,6 +295,7 @@ Item {
         id: plainWallpaperComp
         Image {
             source: wallpaperBackground.wallpaperSource
+            sourceSize: wallpaperBackground.decodeSize
             fillMode: Theme.getFillMode(wallpaperBackground.fillModeName)
             smooth: true
             cache: true
@@ -308,6 +311,7 @@ Item {
                 anchors.fill: parent
                 visible: false
                 source: wallpaperBackground.wallpaperSource
+                sourceSize: wallpaperBackground.decodeSize
                 asynchronous: false
                 cache: true
             }

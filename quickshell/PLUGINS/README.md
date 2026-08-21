@@ -1290,6 +1290,8 @@ To create a launcher plugin, set the plugin type in `plugin.json`:
 }
 ```
 
+Launcher components are instantiated on first launcher open, not at shell startup. Put background work (timers, processes, IPC handlers) in a daemon surface.
+
 ### Launcher Component Contract
 
 Create `MyLauncher.qml` with the following interface:

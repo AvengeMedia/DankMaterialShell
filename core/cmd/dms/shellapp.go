@@ -78,5 +78,8 @@ func dmsExtraEnv(string) []string {
 	if os.Getenv("QSG_USE_SIMPLE_ANIMATION_DRIVER") == "" {
 		env = append(env, "QSG_USE_SIMPLE_ANIMATION_DRIVER=1")
 	}
+	if _, set := os.LookupEnv("MALLOC_CONF"); !set {
+		env = append(env, "MALLOC_CONF=thp:never,narenas:4,dirty_decay_ms:3000")
+	}
 	return env
 }
