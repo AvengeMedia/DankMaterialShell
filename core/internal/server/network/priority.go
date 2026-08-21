@@ -219,15 +219,18 @@ func (m *Manager) setConnectionPriority(connType string, autoconnectPriority int
 			continue
 		}
 
-		connRef := connName
+		args := []string{"con", "mod"}
 		if connUUID != "" {
-			connRef = "uuid:" + connUUID
+			args = append(args, "uuid", connUUID)
+		} else {
+			args = append(args, connName)
 		}
-
-		if err := exec.Command("nmcli", "con", "mod", connRef,
+		args = append(args,
 			"connection.autoconnect-priority", fmt.Sprintf("%d", autoconnectPriority),
 			"ipv4.route-metric", fmt.Sprintf("%d", routeMetric),
-			"ipv6.route-metric", fmt.Sprintf("%d", routeMetric)).Run(); err != nil {
+			"ipv6.route-metric", fmt.Sprintf("%d", routeMetric))
+
+		if err := exec.Command("nmcli", args...).Run(); err != nil {
 			log.Warnf("Failed to set priority for %s: %v", connName, err)
 			continue
 		}
