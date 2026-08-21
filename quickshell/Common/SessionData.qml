@@ -153,6 +153,7 @@ Singleton {
     property string wallpaperCyclingMode: "interval"
     property int wallpaperCyclingInterval: 300
     property string wallpaperCyclingTime: "06:00"
+    property string wallpaperCyclingFolderPath: ""
     property var monitorCyclingSettings: ({})
 
     property bool nightModeEnabled: false
@@ -1000,6 +1001,37 @@ Singleton {
         saveSettings();
     }
 
+    function setMonitorCyclingFolderPath(screenName, folderPath) {
+        var screen = null;
+        var screens = Quickshell.screens;
+        for (var i = 0; i < screens.length; i++) {
+            if (screens[i].name === screenName) {
+                screen = screens[i];
+                break;
+            }
+        }
+
+        if (!screen) {
+            log.warn("Screen not found");
+            return;
+        }
+
+        var identifier = typeof SettingsData !== "undefined" ? SettingsData.getScreenDisplayName(screen) : screen.name;
+
+        var newSettings = {};
+        for (var key in monitorCyclingSettings) {
+            var isThisScreen = key === screen.name || (screen.model && key === screen.model);
+            if (!isThisScreen) {
+                newSettings[key] = monitorCyclingSettings[key];
+            }
+        }
+
+        newSettings[identifier] = getMonitorCyclingSettings(screenName);
+        newSettings[identifier].folderPath = folderPath;
+        monitorCyclingSettings = newSettings;
+        saveSettings();
+    }
+
     function setNightModeEnabled(enabled) {
         nightModeEnabled = enabled;
         saveSettings();
@@ -1545,7 +1577,8 @@ Singleton {
             "random": false,
             "mode": "interval",
             "interval": 300,
-            "time": "06:00"
+            "time": "06:00",
+            "folderPath": ""
         };
         var value = _findMonitorValue(monitorCyclingSettings, screenName);
         return Object.assign({}, defaults, value !== undefined ? value : {});

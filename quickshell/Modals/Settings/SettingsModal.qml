@@ -177,6 +177,8 @@ DankFloatingWindow {
             fileExtensions: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp", "*.jxl", "*.avif", "*.heif", "*.exr"]
             onFileSelected: path => {
                 SessionData.setWallpaper(path);
+                SessionData.wallpaperCyclingFolderPath = "";
+                SessionData.saveSettings();
                 close();
             }
             onDialogClosed: () => {

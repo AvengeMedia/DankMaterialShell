@@ -148,12 +148,26 @@ Singleton {
         monitorProcesses = newProcesses;
         return process;
     }
-
     function cycle(screenName, wallpaperPath, goToPrevious) {
-        const currentWallpaper = wallpaperPath || SessionData.wallpaperPath;
+        const currentWallpaper = wallpaperPath || (screenName ? SessionData.getMonitorWallpaper(screenName) : SessionData.wallpaperPath);
         if (!currentWallpaper)
             return;
-        const wallpaperDir = currentWallpaper.substring(0, currentWallpaper.lastIndexOf('/'));
+        let wallpaperDir;
+
+        if (screenName) {
+            const monitorSettings = SessionData.getMonitorCyclingSettings(screenName);
+            if (monitorSettings.folderPath && currentWallpaper.startsWith(monitorSettings.folderPath + "/")) {
+                wallpaperDir = monitorSettings.folderPath;
+            } else {
+                wallpaperDir = currentWallpaper.substring(0, currentWallpaper.lastIndexOf('/'));
+            }
+        } else {
+            if (SessionData.wallpaperCyclingFolderPath && currentWallpaper.startsWith(SessionData.wallpaperCyclingFolderPath + "/")) {
+                wallpaperDir = SessionData.wallpaperCyclingFolderPath;
+            } else {
+                wallpaperDir = currentWallpaper.substring(0, currentWallpaper.lastIndexOf('/'));
+            }
+        }
 
         if (screenName && monitorProcessComponent.status === Component.Ready) {
             var process = monitorProcessFor(screenName);
@@ -178,6 +192,35 @@ Singleton {
 
     function cycleToPrevWallpaper(screenName, wallpaperPath) {
         cycle(screenName, wallpaperPath, true);
+    }
+
+    function cycleFromFolder(screenName, folderPath) {
+        if (!folderPath)
+            return;
+
+        if (screenName) {
+            SessionData.setMonitorCyclingFolderPath(screenName, folderPath);
+        } else {
+            SessionData.wallpaperCyclingFolderPath = folderPath;
+            SessionData.saveSettings();
+        }
+
+        if (screenName && monitorProcessComponent.status === Component.Ready) {
+            var process = monitorProcessFor(screenName);
+            process.command = findCommand(folderPath);
+            process.targetScreenName = screenName;
+            process.currentWallpaper = "";
+            process.goToPrevious = false;
+            process.running = true;
+            return;
+        }
+
+        var globalProcess = cyclingProcess;
+        globalProcess.command = findCommand(folderPath);
+        globalProcess.targetScreenName = screenName || "";
+        globalProcess.currentWallpaper = "";
+        globalProcess.goToPrevious = false;
+        globalProcess.running = true;
     }
 
     function resetScheduleAfterManual() {
@@ -224,10 +267,14 @@ Singleton {
         if (!text || !text.trim())
             return;
         const files = text.trim().split('\n').filter(file => file.length > 0);
-        if (files.length <= 1)
+        if (files.length < 1)
             return;
         const wallpaperList = files.sort();
-        let currentIndex = wallpaperList.findIndex(path => path === currentPath);
+        const isInitialFolderSelect = currentPath === "";
+        let currentIndex = -1;
+        if (!isInitialFolderSelect) {
+            currentIndex = wallpaperList.findIndex(path => path === currentPath);
+        }
         if (currentIndex === -1)
             currentIndex = 0;
 
@@ -239,7 +286,9 @@ Singleton {
         }
 
         let targetIndex;
-        if (isRandom) {
+        if (isInitialFolderSelect) {
+            targetIndex = 0;
+        } else if (isRandom) {
             if (wallpaperList.length > 1) {
                 do {
                     targetIndex = Math.floor(Math.random() * wallpaperList.length);
@@ -331,6 +380,8 @@ Singleton {
 
             try {
                 SessionData.setWallpaper(absolutePath);
+                SessionData.wallpaperCyclingFolderPath = "";
+                SessionData.saveSettings();
                 return "SUCCESS: Wallpaper set to " + absolutePath;
             } catch (e) {
                 return "ERROR: Failed to set wallpaper: " + e.toString();
@@ -341,6 +392,7 @@ Singleton {
             SessionData.setWallpaper("");
             SessionData.setPerMonitorWallpaper(false);
             SessionData.monitorWallpapers = {};
+            SessionData.wallpaperCyclingFolderPath = "";
             SessionData.saveSettings();
             return "SUCCESS: All wallpapers cleared";
         }
@@ -402,6 +454,7 @@ Singleton {
                     SessionData.setPerMonitorWallpaper(true);
                 }
                 SessionData.setMonitorWallpaper(screenName, absolutePath);
+                SessionData.setMonitorCyclingFolderPath(screenName, "");
                 return "SUCCESS: Wallpaper set for " + screenName + " to " + absolutePath;
             } catch (e) {
                 return "ERROR: Failed to set wallpaper for " + screenName + ": " + e.toString();
