@@ -195,12 +195,30 @@ Item {
             log.info("Screens changed:", Quickshell.screens.length, Quickshell.screens.map(s => "'" + s.name + "'").join(","), "hasReal:", hasReal, "hadReal:", root.hadRealScreen);
             const fullReconnect = !root.hadRealScreen && hasReal;
             const partialReconnect = root.previousRealScreenNames.length > 0 && currentNames.some(name => !root.previousRealScreenNames.includes(name));
-            if (fullReconnect || partialReconnect) {
-                log.info("Screen reconnect detected, scheduling surface recovery", "full:", fullReconnect, "partial:", partialReconnect);
+            const removed = hasReal && root.previousRealScreenNames.some(name => !currentNames.includes(name));
+            if (fullReconnect || partialReconnect || removed) {
+                log.info("Screen change detected, scheduling surface recovery", "full:", fullReconnect, "partial:", partialReconnect, "removed:", removed);
                 root.scheduleScreenReconnectRecovery();
             }
             root.hadRealScreen = hasReal;
             root.previousRealScreenNames = currentNames;
+        }
+    }
+
+    // Quickshell.screensChanged only fires on add/remove. Removing or reconfiguring one output
+    // reflows the survivors, and the compositor may leave their layer surfaces stale at the
+    // old placement until something forces a repaint (#3135), so watch geometry per screen.
+    Instantiator {
+        model: Quickshell.screens
+        delegate: Connections {
+            required property ShellScreen modelData
+            target: modelData
+            function onGeometryChanged() {
+                if (modelData.name.length === 0)
+                    return;
+                root.log.info("Screen geometry changed:", modelData.name, modelData.x, modelData.y, modelData.width, modelData.height);
+                root.scheduleScreenReconnectRecovery();
+            }
         }
     }
 
