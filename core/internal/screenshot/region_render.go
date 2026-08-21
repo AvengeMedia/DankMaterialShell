@@ -1,6 +1,9 @@
 package screenshot
 
-import "fmt"
+import (
+	"fmt"
+	"math"
+)
 
 var fontGlyphs = map[rune][12]uint8{
 	'0': {0x3C, 0x66, 0x66, 0x6E, 0x76, 0x66, 0x66, 0x66, 0x66, 0x3C, 0x00, 0x00},
@@ -205,15 +208,28 @@ func (r *RegionSelector) selectionRenderBounds(os *OutputSurface) (selectionRend
 		return selectionRenderBounds{}, false
 	}
 
+	selectionMinX := math.Min(r.selection.anchorX, r.selection.currentX)
+	selectionMinY := math.Min(r.selection.anchorY, r.selection.currentY)
+	selectionMaxX := math.Max(r.selection.anchorX, r.selection.currentX)
+	selectionMaxY := math.Max(r.selection.anchorY, r.selection.currentY)
+	outputMinX := float64(os.output.x)
+	outputMinY := float64(os.output.y)
+	outputMaxX := outputMinX + float64(os.logicalW)
+	outputMaxY := outputMinY + float64(os.logicalH)
+	if selectionMaxX < outputMinX || selectionMinX > outputMaxX ||
+		selectionMaxY < outputMinY || selectionMinY > outputMaxY {
+		return selectionRenderBounds{}, false
+	}
+
 	scaleX, scaleY := 1.0, 1.0
 	if os.logicalW > 0 && os.logicalH > 0 {
 		scaleX = float64(srcBuf.Width) / float64(os.logicalW)
 		scaleY = float64(srcBuf.Height) / float64(os.logicalH)
 	}
-	x1 := int((r.selection.anchorX - float64(os.output.x)) * scaleX)
-	y1 := int((r.selection.anchorY - float64(os.output.y)) * scaleY)
-	x2 := int((r.selection.currentX - float64(os.output.x)) * scaleX)
-	y2 := int((r.selection.currentY - float64(os.output.y)) * scaleY)
+	x1 := int((r.selection.anchorX - outputMinX) * scaleX)
+	y1 := int((r.selection.anchorY - outputMinY) * scaleY)
+	x2 := int((r.selection.currentX - outputMinX) * scaleX)
+	y2 := int((r.selection.currentY - outputMinY) * scaleY)
 	if x1 > x2 {
 		x1, x2 = x2, x1
 	}
