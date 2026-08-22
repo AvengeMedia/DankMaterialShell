@@ -747,7 +747,7 @@ Column {
                     return I18n.tr("Night Mode");
                 case "darkMode": {
                     if (SettingsData.matugenSmartMode)
-                        return SessionData.isLightMode ? I18n.tr("Auto (Light Mode)") : I18n.tr("Auto (Dark Mode)");
+                        return SessionData.isLightMode ? I18n.tr("Auto (Light Mode)", "dark mode toggle label when matugen smart mode resolved light") : I18n.tr("Auto (Dark Mode)", "dark mode toggle label when matugen smart mode resolved dark");
                     return I18n.tr("Dark Mode");
                 }
                 case "idleInhibitor":

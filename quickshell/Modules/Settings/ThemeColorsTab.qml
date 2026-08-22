@@ -1324,7 +1324,7 @@ Item {
                         tab: "theme"
                         tags: ["matugen", "smart", "wallpaper", "auto", "mode"]
                         settingKey: "matugenSmartMode"
-                        text: I18n.tr("Auto From Wallpaper")
+                        text: I18n.tr("Auto From Wallpaper", "toggle that lets wallpaper brightness decide light/dark mode")
                         description: I18n.tr("Dark or light mode follows the wallpaper brightness")
                         checked: SettingsData.matugenSmartMode
                         visible: matugenSmartCapable
