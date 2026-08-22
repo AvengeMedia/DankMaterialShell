@@ -34,8 +34,14 @@ var orderedConfigNames = []string{"niri", "hyprland", "ghostty", "kitty", "alacr
 
 // Config holds all CLI parameters for unattended installation.
 type Config struct {
-	Compositor        string // "niri" or "hyprland"
-	Terminal          string // "ghostty", "kitty", or "alacritty"
+	Compositor        string   // "niri", "hyprland", or "mango"
+	Terminal          string   // "ghostty", "kitty", or "alacritty"
+	PrivescTool       string   // "sudo", "doas", or "run0"
+	GitAll            bool     // install git version of all supported components
+	GitDeps           []string // specific dependencies to force git version
+	AllFeatures       bool     // enable all optional features
+	NoFeatures        bool     // disable all optional features
+	DmsGreeter        bool     // install dms-greeter
 	IncludeDeps       []string
 	ExcludeDeps       []string
 	ReplaceConfigs    []string // specific configs to deploy (e.g. "niri", "ghostty")
@@ -67,6 +73,12 @@ func (r *Runner) GetLogChan() <-chan string {
 // Run executes the full unattended installation flow.
 func (r *Runner) Run() error {
 	r.log("Starting headless installation")
+
+	if r.cfg.PrivescTool != "" {
+		if err := privesc.SetTool(privesc.Tool(strings.ToLower(r.cfg.PrivescTool))); err != nil {
+			return fmt.Errorf("failed to set privilege escalation tool %q: %w", r.cfg.PrivescTool, err)
+		}
+	}
 
 	// 1. Parse compositor and terminal selections
 	wm, err := r.parseWindowManager()
@@ -110,6 +122,10 @@ func (r *Runner) Run() error {
 	dependencies, err := distro.DetectDependenciesWithTerminal(context.Background(), wm, terminal)
 	if err != nil {
 		return fmt.Errorf("dependency detection failed: %w", err)
+	}
+
+	if err := r.applyGitVariants(dependencies); err != nil {
+		return err
 	}
 
 	// 5. Apply include/exclude filters and build the disabled-items map.
@@ -283,16 +299,66 @@ func (r *Runner) Run() error {
 	return nil
 }
 
+// applyGitVariants sets VariantGit on dependencies matching git flags or --git-deps.
+func (r *Runner) applyGitVariants(dependencies []deps.Dependency) error {
+	gitDepsMap := make(map[string]bool)
+	for _, raw := range r.cfg.GitDeps {
+		for _, item := range strings.Split(raw, ",") {
+			item = strings.TrimSpace(strings.ToLower(item))
+			if item != "" {
+				gitDepsMap[item] = true
+			}
+		}
+	}
+
+	for target := range gitDepsMap {
+		found := false
+		for i := range dependencies {
+			depNameLower := strings.ToLower(dependencies[i].Name)
+			if depNameLower == target || (target == "dms" && depNameLower == "dms (dankmaterialshell)") {
+				found = true
+				if !dependencies[i].CanToggle {
+					return fmt.Errorf("--git-deps: dependency %q does not support git variant", dependencies[i].Name)
+				}
+				dependencies[i].Variant = deps.VariantGit
+			}
+		}
+		if !found {
+			return fmt.Errorf("--git-deps: unknown dependency %q", target)
+		}
+	}
+
+	if r.cfg.GitAll {
+		for i := range dependencies {
+			if dependencies[i].CanToggle {
+				dependencies[i].Variant = deps.VariantGit
+			}
+		}
+	}
+
+	return nil
+}
+
 // buildDisabledItems computes the set of dependencies that should be skipped
 // during installation. Optional components are opt-in (disabled by default),
 // then re-enabled by the dedicated flags and --include-deps.
 func (r *Runner) buildDisabledItems(dependencies []deps.Dependency) (map[string]bool, error) {
+	if r.cfg.AllFeatures && r.cfg.NoFeatures {
+		return nil, fmt.Errorf("cannot specify both --all-features/--all and --no-features")
+	}
+
 	disabledItems := make(map[string]bool)
 
-	for i := range dependencies {
-		if !dependencies[i].Required {
-			disabledItems[dependencies[i].Name] = true
+	if !r.cfg.AllFeatures {
+		for i := range dependencies {
+			if !dependencies[i].Required {
+				disabledItems[dependencies[i].Name] = true
+			}
 		}
+	}
+
+	if r.cfg.NoFeatures {
+		return disabledItems, nil
 	}
 
 	// Dedicated flags resolve before include/exclude
@@ -307,6 +373,12 @@ func (r *Runner) buildDisabledItems(dependencies []deps.Dependency) (map[string]
 			return nil, fmt.Errorf("--dankcalendar: not available on this distribution")
 		}
 		delete(disabledItems, "dankcalendar")
+	}
+	if r.cfg.DmsGreeter {
+		if !r.depExists(dependencies, "dms-greeter") {
+			return nil, fmt.Errorf("--dms-greeter: not available on this distribution")
+		}
+		delete(disabledItems, "dms-greeter")
 	}
 
 	// Process --include-deps (enable items that are disabled by default)
