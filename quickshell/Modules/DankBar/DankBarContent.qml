@@ -1283,6 +1283,7 @@ Item {
                     widgetItem: cpuTempWidget,
                     section: topBarContent.getWidgetSection(parent) || "right",
                     triggerSource: "cpu_temp",
+                    tabIndex: 1,
                     mode: "click"
                 });
             }
@@ -1307,6 +1308,7 @@ Item {
                     widgetItem: gpuTempWidget,
                     section: topBarContent.getWidgetSection(parent) || "right",
                     triggerSource: "gpu_temp",
+                    tabIndex: 3,
                     mode: "click"
                 });
             }
