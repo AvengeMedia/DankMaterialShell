@@ -609,6 +609,25 @@ Item {
     }
 
     LazyLoader {
+        id: colorPickerPopoutLoader
+
+        active: false
+
+        Component.onCompleted: {
+            PopoutService.colorPickerPopoutLoader = colorPickerPopoutLoader;
+        }
+
+        ColorPickerPopout {
+            id: colorPickerPopout
+            onPopoutClosed: PopoutService.unloadColorPicker()
+
+            Component.onCompleted: {
+                PopoutService.colorPickerPopout = colorPickerPopout;
+            }
+        }
+    }
+
+    LazyLoader {
         id: processListPopoutLoader
 
         active: false

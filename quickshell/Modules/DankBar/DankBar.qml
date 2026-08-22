@@ -10,7 +10,6 @@ Item {
 
     required property var barConfig
 
-    signal colorPickerRequested
     signal barReady(var barConfig)
 
     Component.onCompleted: BarWidgetService.registerDankBarItem(root.barConfig?.id, root)

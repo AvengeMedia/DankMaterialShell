@@ -375,10 +375,6 @@ Item {
         Component.onDestruction: teardown()
     }
 
-    signal colorPickerRequested
-
-    onColorPickerRequested: rootWindow.colorPickerRequested()
-
     property alias axis: axis
 
     AxisContext {

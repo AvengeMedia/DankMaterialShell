@@ -102,9 +102,21 @@ DankPopout {
 
                 Repeater {
                     model: [
-                        { label: I18n.tr("App ID"), value: root.appId, copyable: !!root.appId },
-                        { label: I18n.tr("Title"), value: root.windowTitle || I18n.tr("Untitled"), copyable: !!root.windowTitle },
-                        { label: I18n.tr("PID", "Label for the process ID row in the focused window popout"), value: root.pid > 0 ? root.pid.toString() : I18n.tr("Unavailable"), copyable: root.pid > 0 }
+                        {
+                            label: I18n.tr("App ID"),
+                            value: root.appId,
+                            copyable: !!root.appId
+                        },
+                        {
+                            label: I18n.tr("Title"),
+                            value: root.windowTitle || I18n.tr("Untitled"),
+                            copyable: !!root.windowTitle
+                        },
+                        {
+                            label: I18n.tr("PID", "Label for the process ID row in the focused window popout"),
+                            value: root.pid > 0 ? root.pid.toString() : I18n.tr("Unavailable"),
+                            copyable: root.pid > 0
+                        }
                     ]
 
                     delegate: Rectangle {
@@ -170,7 +182,7 @@ DankPopout {
                 Item {
                     visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango
                     width: parent.width
-                    height: visible ? 32 : 0
+                    height: 32
 
                     Rectangle {
                         anchors.fill: parent

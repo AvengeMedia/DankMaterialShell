@@ -23,6 +23,8 @@ Singleton {
     property var batteryPopoutLoader: null
     property var vpnPopout: null
     property var vpnPopoutLoader: null
+    property var colorPickerPopout: null
+    property var colorPickerPopoutLoader: null
     property var systemUpdatePopout: null
     property var systemUpdateLoader: null
     property var layoutPopout: null
@@ -117,6 +119,7 @@ Singleton {
             "processList": () => _unloadPopoutNow("processListPopout", "processListPopoutLoader"),
             "battery": () => _unloadPopoutNow("batteryPopout", "batteryPopoutLoader"),
             "vpn": () => _unloadPopoutNow("vpnPopout", "vpnPopoutLoader"),
+            "colorPicker": () => _unloadPopoutNow("colorPickerPopout", "colorPickerPopoutLoader"),
             "systemUpdate": () => _unloadPopoutNow("systemUpdatePopout", "systemUpdateLoader"),
             "layout": () => _unloadPopoutNow("layoutPopout", "layoutPopoutLoader"),
             "clipboardHistory": () => _unloadPopoutNow("clipboardHistoryPopout", "clipboardHistoryPopoutLoader"),
@@ -881,6 +884,10 @@ Singleton {
 
     function hideColorPicker() {
         colorPickerModal?.close();
+    }
+
+    function unloadColorPicker() {
+        _scheduleUnload("colorPicker");
     }
 
     function ensureBluetoothPairingModal() {

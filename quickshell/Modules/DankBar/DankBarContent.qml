@@ -493,7 +493,7 @@ Item {
         if (loader.item)
             return loader.item;
 
-        const pairs = [[PopoutService.appDrawerLoader, PopoutService.appDrawerPopout], [PopoutService.batteryPopoutLoader, PopoutService.batteryPopout], [PopoutService.clipboardHistoryPopoutLoader, PopoutService.clipboardHistoryPopout], [PopoutService.controlCenterLoader, PopoutService.controlCenterPopout], [PopoutService.dankDashPopoutLoader, PopoutService.dankDashPopout], [PopoutService.layoutPopoutLoader, PopoutService.layoutPopout], [PopoutService.notificationCenterLoader, PopoutService.notificationCenterPopout], [PopoutService.processListPopoutLoader, PopoutService.processListPopout], [PopoutService.systemUpdateLoader, PopoutService.systemUpdatePopout], [PopoutService.vpnPopoutLoader, PopoutService.vpnPopout]];
+        const pairs = [[PopoutService.appDrawerLoader, PopoutService.appDrawerPopout], [PopoutService.batteryPopoutLoader, PopoutService.batteryPopout], [PopoutService.clipboardHistoryPopoutLoader, PopoutService.clipboardHistoryPopout], [PopoutService.controlCenterLoader, PopoutService.controlCenterPopout], [PopoutService.dankDashPopoutLoader, PopoutService.dankDashPopout], [PopoutService.layoutPopoutLoader, PopoutService.layoutPopout], [PopoutService.notificationCenterLoader, PopoutService.notificationCenterPopout], [PopoutService.processListPopoutLoader, PopoutService.processListPopout], [PopoutService.systemUpdateLoader, PopoutService.systemUpdatePopout], [PopoutService.vpnPopoutLoader, PopoutService.vpnPopout], [PopoutService.colorPickerPopoutLoader, PopoutService.colorPickerPopout]];
         for (let i = 0; i < pairs.length; i++) {
             if (loader === pairs[i][0] && pairs[i][1])
                 return pairs[i][1];
@@ -1553,12 +1553,20 @@ Item {
         id: colorPickerComponent
 
         ColorPicker {
+            id: colorPickerWidget
+            isActive: PopoutService.colorPickerPopoutLoader?.item ? PopoutService.colorPickerPopoutLoader?.item.shouldBeVisible : false
             widgetThickness: barWindow.widgetThickness
             barThickness: barWindow.effectiveBarThickness
             section: topBarContent.getWidgetSection(parent) || "right"
             parentScreen: barWindow.screen
             onColorPickerRequested: {
-                barWindow.colorPickerRequested();
+                topBarContent.openWidgetPopout({
+                    loader: PopoutService.colorPickerPopoutLoader,
+                    widgetItem: colorPickerWidget,
+                    section: topBarContent.getWidgetSection(parent) || "right",
+                    triggerSource: "colorPicker",
+                    mode: "click"
+                });
             }
         }
     }

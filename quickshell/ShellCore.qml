@@ -142,17 +142,6 @@ Item {
             sourceComponent: DankBar {
                 barConfig: barLoader.barConfig
                 hyprlandOverviewLoader: dankBarRepeater.hyprlandOverviewLoaderRef
-
-                onColorPickerRequested: {
-                    const modal = PopoutService.colorPickerModal;
-                    if (!modal)
-                        return;
-                    if (modal.shouldBeVisible) {
-                        modal.close();
-                    } else {
-                        modal.show();
-                    }
-                }
             }
         }
     }
