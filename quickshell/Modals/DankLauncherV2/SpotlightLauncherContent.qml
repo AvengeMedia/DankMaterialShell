@@ -35,7 +35,7 @@ FocusScope {
     }
     readonly property color _searchSurfaceColor: Theme.withAlpha(_hasQuery ? Theme.surfaceContainerHigh : Theme.surfaceContainer, _searchSurfaceAlpha)
     readonly property color _searchWellColor: {
-        if (searchInput.activeFocus)
+        if (searchInput.getActiveFocus())
             return Theme.withAlpha(Theme.primaryContainer, Theme.transparentBlurLayers ? 0.42 : 1.0);
         if (Theme.transparentBlurLayers)
             return Theme.ccPillInactiveBg;
@@ -303,7 +303,7 @@ FocusScope {
                     anchors.centerIn: parent
                     name: searchController.activePluginId ? "extension" : searchController.searchMode === "files" ? "folder" : "search"
                     size: 20
-                    color: searchInput.activeFocus ? Theme.primary : Theme.surfaceVariantText
+                    color: searchInput.getActiveFocus() ? Theme.primary : Theme.surfaceVariantText
                 }
             }
 
@@ -381,34 +381,20 @@ FocusScope {
                 }
             }
 
-            Text {
-                anchors.left: leadingWell.right
-                anchors.leftMargin: Theme.spacingM
-                anchors.right: rightControls.left
-                anchors.rightMargin: Theme.spacingS
-                anchors.verticalCenter: parent.verticalCenter
-                text: I18n.tr("Spotlight Search")
-                font.pixelSize: 18
-                font.weight: Font.Medium
-                color: Theme.outlineButton
-                visible: searchInput.text.length === 0 && !searchInput.inputMethodComposing
-                clip: true
-            }
-
-            TextInput {
+            DankTextField {
                 id: searchInput
                 anchors.left: leadingWell.right
-                anchors.leftMargin: Theme.spacingM
                 anchors.right: rightControls.left
-                anchors.rightMargin: Theme.spacingS
-                anchors.verticalCenter: parent.verticalCenter
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
                 font.pixelSize: 18
                 font.weight: Font.Medium
-                color: Theme.surfaceText
-                selectionColor: Theme.primary
-                selectedTextColor: Theme.primaryText
-                clip: true
-                focus: true
+                placeholderText: I18n.tr("Spotlight Search")
+                hidePlaceholderOnFocus: false
+                backgroundColor: "transparent"
+                borderWidth: 0
+                focusedBorderWidth: 0
+                keyForwardTargets: [searchKeyHandler]
 
                 onTextChanged: {
                     if (text.length > 0) {
@@ -418,7 +404,11 @@ FocusScope {
                     }
                 }
 
-                Keys.onPressed: event => root._handleKey(event)
+                Item {
+                    id: searchKeyHandler
+
+                    Keys.onPressed: event => root._handleKey(event)
+                }
             }
         }
     }

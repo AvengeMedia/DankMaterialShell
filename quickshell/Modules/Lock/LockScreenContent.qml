@@ -1072,7 +1072,8 @@ Item {
                         // (ibus ibuswaylandim.c) instead of forwarding raw keys, so an active
                         // text input must exist to receive them; the hidden-text hints put
                         // fcitx5 into plain keyboard passthrough (CapabilityFlag::Password).
-                        // Raw keys stay in handleKey (#2950).
+                        // Raw keys stay in handleKey (#2950). The cursor delegate disables
+                        // Qt's blink repaint timer; passwordCursor draws the visible one.
                         TextInput {
                             id: imeCommitSink
 
@@ -1080,6 +1081,7 @@ Item {
                             width: 1
                             height: 1
                             opacity: 0
+                            cursorDelegate: Item {}
                             echoMode: TextInput.Password
                             inputMethodHints: Qt.ImhHiddenText | Qt.ImhSensitiveData | Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
                             Keys.onPressed: event => {

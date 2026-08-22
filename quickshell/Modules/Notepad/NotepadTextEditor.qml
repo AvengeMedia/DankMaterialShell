@@ -365,8 +365,8 @@ Column {
         visible: searchVisible
         opacity: searchVisible ? 1 : 0
         color: Theme.floatingWindowNestedSurface
-        border.color: searchField.activeFocus ? Theme.primary : Theme.outlineMedium
-        border.width: searchField.activeFocus ? 2 : 1
+        border.color: searchField.getActiveFocus() ? Theme.primary : Theme.outlineMedium
+        border.width: searchField.getActiveFocus() ? 2 : 1
         radius: Theme.cornerRadius
 
         Behavior on opacity {
@@ -378,32 +378,35 @@ Column {
 
         RowLayout {
             anchors.fill: parent
-            anchors.leftMargin: Theme.spacingM
             anchors.rightMargin: Theme.spacingM
             spacing: Theme.spacingS
 
-            // Search icon
-            DankIcon {
-                Layout.alignment: Qt.AlignVCenter
-                name: "search"
-                size: Theme.iconSize - 2
-                color: searchField.activeFocus ? Theme.primary : Theme.surfaceVariantText
-            }
-
-            // Search input field
-            TextInput {
+            DankTextField {
                 id: searchField
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignVCenter
-                height: 32
+                Layout.preferredHeight: 32
+                leftIconName: "search"
+                leftIconSize: Theme.iconSize - 2
                 font.pixelSize: Theme.fontSizeMedium
-                color: Theme.surfaceText
-                verticalAlignment: TextInput.AlignVCenter
-                selectByMouse: true
-                clip: true
+                placeholderText: I18n.tr("Find in note...")
+                placeholderColor: Theme.surfaceTextSecondary
+                backgroundColor: "transparent"
+                borderWidth: 0
+                focusedBorderWidth: 0
+                topPadding: 0
+                bottomPadding: 0
+                keyForwardTargets: [searchKeyHandler]
 
                 Component.onCompleted: {
                     text = root.searchQuery;
+                }
+
+                onTextChanged: {
+                    if (root.searchQuery !== text) {
+                        root.searchQuery = text;
+                        root.performSearch();
+                    }
                 }
 
                 Connections {
@@ -415,43 +418,30 @@ Column {
                     }
                 }
 
-                onTextChanged: {
-                    if (root.searchQuery !== text) {
-                        root.searchQuery = text;
-                        root.performSearch();
-                    }
-                }
-                Keys.onEscapePressed: event => {
-                    root.hideSearch();
-                    event.accepted = true;
-                }
-                Keys.onReturnPressed: event => {
-                    if (event.modifiers & Qt.ShiftModifier) {
-                        root.findPrevious();
-                    } else {
-                        root.findNext();
-                    }
-                    event.accepted = true;
-                }
-                Keys.onEnterPressed: event => {
-                    if (event.modifiers & Qt.ShiftModifier) {
-                        root.findPrevious();
-                    } else {
-                        root.findNext();
-                    }
-                    event.accepted = true;
-                }
-            }
+                Item {
+                    id: searchKeyHandler
 
-            // Placeholder text
-            StyledText {
-                Layout.fillWidth: true
-                Layout.alignment: Qt.AlignVCenter
-                text: I18n.tr("Find in note...")
-                font: searchField.font
-                color: Theme.surfaceTextSecondary
-                visible: searchField.text.length === 0 && !searchField.activeFocus
-                Layout.leftMargin: -(searchField.width - 20) // Position over the input field
+                    Keys.onEscapePressed: event => {
+                        root.hideSearch();
+                        event.accepted = true;
+                    }
+                    Keys.onReturnPressed: event => {
+                        if (event.modifiers & Qt.ShiftModifier) {
+                            root.findPrevious();
+                        } else {
+                            root.findNext();
+                        }
+                        event.accepted = true;
+                    }
+                    Keys.onEnterPressed: event => {
+                        if (event.modifiers & Qt.ShiftModifier) {
+                            root.findPrevious();
+                        } else {
+                            root.findNext();
+                        }
+                        event.accepted = true;
+                    }
+                }
             }
 
             // Match count display
