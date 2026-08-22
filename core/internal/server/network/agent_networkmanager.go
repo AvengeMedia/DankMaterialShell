@@ -75,7 +75,7 @@ const introspectXML = `
 </node>`
 
 func NewSecretAgent(prompts PromptBroker, manager *Manager, backend *NetworkManagerBackend) (*SecretAgent, error) {
-	c, err := dbus.ConnectSystemBus()
+	c, err := dbus.SystemBus()
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to system bus: %w", err)
 	}
@@ -90,19 +90,18 @@ func NewSecretAgent(prompts PromptBroker, manager *Manager, backend *NetworkMana
 	}
 
 	if err := c.Export(sa, sa.objPath, nmSecretAgentIface); err != nil {
-		c.Close()
 		return nil, fmt.Errorf("failed to export secret agent: %w", err)
 	}
 
 	if err := c.Export(sa, sa.objPath, "org.freedesktop.DBus.Introspectable"); err != nil {
-		c.Close()
+		sa.unexport()
 		return nil, fmt.Errorf("failed to export introspection: %w", err)
 	}
 
 	mgr := c.Object("org.freedesktop.NetworkManager", dbus.ObjectPath(nmAgentManagerPath))
 	call := mgr.Call(nmAgentManagerIface+".Register", 0, sa.id)
 	if call.Err != nil {
-		c.Close()
+		sa.unexport()
 		return nil, fmt.Errorf("failed to register agent with NetworkManager: %w", call.Err)
 	}
 
@@ -111,11 +110,17 @@ func NewSecretAgent(prompts PromptBroker, manager *Manager, backend *NetworkMana
 }
 
 func (a *SecretAgent) Close() {
-	if a.conn != nil {
-		mgr := a.conn.Object("org.freedesktop.NetworkManager", dbus.ObjectPath(nmAgentManagerPath))
-		mgr.Call(nmAgentManagerIface+".Unregister", 0, a.id)
-		a.conn.Close()
+	if a.conn == nil {
+		return
 	}
+	mgr := a.conn.Object("org.freedesktop.NetworkManager", dbus.ObjectPath(nmAgentManagerPath))
+	mgr.Call(nmAgentManagerIface+".Unregister", 0, a.id)
+	a.unexport()
+}
+
+func (a *SecretAgent) unexport() {
+	_ = a.conn.Export(nil, a.objPath, nmSecretAgentIface)
+	_ = a.conn.Export(nil, a.objPath, "org.freedesktop.DBus.Introspectable")
 }
 
 func (a *SecretAgent) GetSecrets(

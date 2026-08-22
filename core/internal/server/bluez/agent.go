@@ -69,7 +69,7 @@ type BluezAgent struct {
 }
 
 func NewBluezAgent(broker PromptBroker) (*BluezAgent, error) {
-	conn, err := dbus.ConnectSystemBus()
+	conn, err := dbus.SystemBus()
 	if err != nil {
 		return nil, fmt.Errorf("system bus connection failed: %w", err)
 	}
@@ -80,18 +80,17 @@ func NewBluezAgent(broker PromptBroker) (*BluezAgent, error) {
 	}
 
 	if err := conn.Export(agent, dbus.ObjectPath(agentPath), agent1Iface); err != nil {
-		conn.Close()
 		return nil, fmt.Errorf("agent export failed: %w", err)
 	}
 
 	if err := conn.Export(agent, dbus.ObjectPath(agentPath), "org.freedesktop.DBus.Introspectable"); err != nil {
-		conn.Close()
+		agent.unexport()
 		return nil, fmt.Errorf("introspection export failed: %w", err)
 	}
 
 	mgr := conn.Object(bluezService, dbus.ObjectPath(agentManagerPath))
 	if err := mgr.Call(agentManagerIface+".RegisterAgent", 0, dbus.ObjectPath(agentPath), agentCapability).Err; err != nil {
-		conn.Close()
+		agent.unexport()
 		return nil, fmt.Errorf("agent registration failed: %w", err)
 	}
 
@@ -109,7 +108,12 @@ func (a *BluezAgent) Close() {
 	}
 	mgr := a.conn.Object(bluezService, dbus.ObjectPath(agentManagerPath))
 	mgr.Call(agentManagerIface+".UnregisterAgent", 0, dbus.ObjectPath(agentPath))
-	a.conn.Close()
+	a.unexport()
+}
+
+func (a *BluezAgent) unexport() {
+	_ = a.conn.Export(nil, dbus.ObjectPath(agentPath), agent1Iface)
+	_ = a.conn.Export(nil, dbus.ObjectPath(agentPath), "org.freedesktop.DBus.Introspectable")
 }
 
 func (a *BluezAgent) Release() *dbus.Error {

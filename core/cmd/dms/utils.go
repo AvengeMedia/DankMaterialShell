@@ -1,9 +1,18 @@
 package main
 
 import (
+	"os"
 	"os/exec"
+	"runtime"
 	"strings"
 )
+
+func disableMemProfilingUnlessRequested() {
+	if os.Getenv("DMS_PPROF") != "" {
+		return
+	}
+	runtime.MemProfileRate = 0
+}
 
 // isReadOnlyCommand returns true if the CLI args indicate a command that is
 // safe to run as root (e.g. shell completion, help).

@@ -2,11 +2,7 @@ package screenshot
 
 import (
 	"fmt"
-	"os"
-	"os/exec"
 	"path/filepath"
-	"strconv"
-	"syscall"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/godbus/dbus/v5"
@@ -26,11 +22,11 @@ type NotifyResult struct {
 	Height    int
 }
 
-func SendNotification(result NotifyResult) {
+func SendNotification(result NotifyResult) uint32 {
 	conn, err := dbus.SessionBus()
 	if err != nil {
 		log.Debug("dbus session failed", "err", err)
-		return
+		return 0
 	}
 
 	var actions []string
@@ -89,93 +85,17 @@ func SendNotification(result NotifyResult) {
 
 	if call.Err != nil {
 		log.Debug("notify call failed", "err", call.Err)
-		return
+		return 0
 	}
 
 	var notificationID uint32
 	if err := call.Store(&notificationID); err != nil {
 		log.Debug("failed to get notification id", "err", err)
-		return
+		return 0
 	}
 
-	if len(actions) == 0 || result.FilePath == "" {
-		return
+	if len(actions) == 0 {
+		return 0
 	}
-
-	spawnActionListener(notificationID, result.FilePath)
-}
-
-func spawnActionListener(notificationID uint32, filePath string) {
-	exe, err := os.Executable()
-	if err != nil {
-		log.Debug("failed to get executable", "err", err)
-		return
-	}
-
-	cmd := exec.Command(exe, "notify-action", fmt.Sprintf("%d", notificationID), filePath)
-	cmd.SysProcAttr = &syscall.SysProcAttr{
-		Setsid: true,
-	}
-	cmd.Start()
-}
-
-func RunNotifyActionListener(args []string) {
-	if len(args) < 2 {
-		return
-	}
-
-	notificationID, err := strconv.ParseUint(args[0], 10, 32)
-	if err != nil {
-		return
-	}
-
-	filePath := args[1]
-
-	conn, err := dbus.SessionBus()
-	if err != nil {
-		return
-	}
-
-	if err := conn.AddMatchSignal(
-		dbus.WithMatchObjectPath(notifyPath),
-		dbus.WithMatchInterface(notifyInterface),
-	); err != nil {
-		return
-	}
-
-	signals := make(chan *dbus.Signal, 10)
-	conn.Signal(signals)
-
-	for sig := range signals {
-		switch sig.Name {
-		case notifyInterface + ".ActionInvoked":
-			if len(sig.Body) < 2 {
-				continue
-			}
-			id, ok := sig.Body[0].(uint32)
-			if !ok || id != uint32(notificationID) {
-				continue
-			}
-			openFile(filePath)
-			return
-
-		case notifyInterface + ".NotificationClosed":
-			if len(sig.Body) < 1 {
-				continue
-			}
-			id, ok := sig.Body[0].(uint32)
-			if !ok || id != uint32(notificationID) {
-				continue
-			}
-			return
-		}
-	}
-}
-
-func openFile(filePath string) {
-	cmd := exec.Command("xdg-open", filePath)
-	cmd.SysProcAttr = &syscall.SysProcAttr{
-		Setsid: true,
-	}
-	cmd.Start()
+	return notificationID
 }

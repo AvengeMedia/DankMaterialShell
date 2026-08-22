@@ -13,6 +13,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime/debug"
 	"slices"
 	"strings"
 	"syscall"
@@ -347,10 +348,10 @@ func (m *Manager) releaseCurrentSource() {
 	source.Destroy()
 }
 
-func readPipeTimeout(r *os.File) []byte {
+func readPipeTimeout(r *os.File, maxSize int64) []byte {
 	done := make(chan []byte, 1)
 	go func() {
-		data, _ := io.ReadAll(r)
+		data, _ := io.ReadAll(io.LimitReader(r, maxSize+1))
 		done <- data
 	}()
 
@@ -374,11 +375,11 @@ func (m *Manager) readAndStore(r *os.File, mimeType string, altR *os.File, altMi
 	default:
 		go func() {
 			defer altR.Close()
-			altCh <- readPipeTimeout(altR)
+			altCh <- readPipeTimeout(altR, cfg.MaxEntrySize)
 		}()
 	}
 
-	data := readPipeTimeout(r)
+	data := readPipeTimeout(r, cfg.MaxEntrySize)
 	altData := <-altCh
 
 	if len(bytes.TrimSpace(altData)) == 0 || int64(len(altData)) > cfg.MaxEntrySize {
@@ -398,6 +399,10 @@ func (m *Manager) readAndStore(r *os.File, mimeType string, altR *os.File, altMi
 
 	m.updateState()
 	m.notifySubscribers()
+
+	if len(data)+len(altData) >= largeEntryBytes {
+		debug.FreeOSMemory()
+	}
 }
 
 func (m *Manager) storeClipboardEntry(data []byte, mimeType string, altData []byte, altMime string) {
@@ -1964,12 +1969,11 @@ func (m *Manager) dbusConnForFlatpak() (*dbus.Conn, error) {
 		return m.dbusConn, nil
 	}
 
-	conn, err := dbus.ConnectSessionBus()
+	conn, err := dbus.SessionBus()
 	if err != nil {
 		return nil, fmt.Errorf("connect session bus: %w", err)
 	}
 	if !conn.SupportsUnixFDs() {
-		conn.Close()
 		return nil, fmt.Errorf("D-Bus connection does not support Unix FD passing")
 	}
 	m.dbusConn = conn

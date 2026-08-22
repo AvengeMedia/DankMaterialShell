@@ -19,7 +19,7 @@ type Manager struct {
 }
 
 func NewManager() (*Manager, error) {
-	conn, err := dbus.ConnectSessionBus()
+	conn, err := dbus.SessionBus()
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to session bus: %w", err)
 	}
@@ -87,8 +87,5 @@ func (m *Manager) Close() {
 		close(m.stopChan)
 	}
 	m.wg.Wait()
-	if m.conn != nil {
-		m.conn.Close()
-	}
 	log.Info("TrayRecovery manager closed")
 }

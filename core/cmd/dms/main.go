@@ -26,6 +26,7 @@ func init() {
 }
 
 func main() {
+	disableMemProfilingUnlessRequested()
 	clipboard.MaybeServeAndExit()
 
 	if os.Geteuid() == 0 && !isReadOnlyCommand(os.Args) {

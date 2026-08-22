@@ -12,7 +12,7 @@ import (
 )
 
 func NewManager() (*Manager, error) {
-	conn, err := dbus.ConnectSystemBus()
+	conn, err := dbus.SystemBus()
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to system bus: %w", err)
 	}
@@ -29,7 +29,6 @@ func NewManager() (*Manager, error) {
 	m.sleepInhibitorEnabled.Store(true)
 
 	if err := m.initialize(); err != nil {
-		conn.Close()
 		return nil, err
 	}
 
@@ -714,8 +713,4 @@ func (m *Manager) Close() {
 		m.subscribers.Delete(key)
 		return true
 	})
-
-	if m.conn != nil {
-		m.conn.Close()
-	}
 }

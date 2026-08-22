@@ -13,12 +13,12 @@ import (
 )
 
 func NewManager() (*Manager, error) {
-	systemConn, err := dbus.ConnectSystemBus()
+	systemConn, err := dbus.SystemBus()
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to system bus: %w", err)
 	}
 
-	sessionConn, err := dbus.ConnectSessionBus()
+	sessionConn, err := dbus.SessionBus()
 	if err != nil {
 		sessionConn = nil
 	}
@@ -308,9 +308,6 @@ func (m *Manager) Close() {
 		return true
 	})
 
-	if m.systemConn != nil {
-		m.systemConn.Close()
-	}
 	if m.sessionConn != nil {
 		m.sessionConn.RemoveMatchSignal(
 			dbus.WithMatchInterface(dbusPortalSettingsInterface),
@@ -324,6 +321,5 @@ func (m *Manager) Close() {
 			m.sessionConn.RemoveSignal(signals)
 			close(signals)
 		}
-		m.sessionConn.Close()
 	}
 }

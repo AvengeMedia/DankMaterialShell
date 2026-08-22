@@ -10,6 +10,8 @@ import (
 	"github.com/godbus/dbus/v5"
 )
 
+var cupsNotifierMatch = dbus.WithMatchInterface("org.cups.cupsd.Notifier")
+
 type DBusSubscriptionManager struct {
 	client         CUPSClientInterface
 	subscriptionID int
@@ -42,7 +44,7 @@ func (sm *DBusSubscriptionManager) Start() error {
 	sm.eventChan = make(chan SubscriptionEvent, 100)
 	sm.mu.Unlock()
 
-	conn, err := dbus.ConnectSystemBus()
+	conn, err := dbus.SystemBus()
 	if err != nil {
 		sm.mu.Lock()
 		sm.running = false
@@ -53,7 +55,6 @@ func (sm *DBusSubscriptionManager) Start() error {
 
 	subID, err := sm.createDBusSubscription()
 	if err != nil {
-		sm.conn.Close()
 		sm.mu.Lock()
 		sm.running = false
 		sm.mu.Unlock()
@@ -63,11 +64,8 @@ func (sm *DBusSubscriptionManager) Start() error {
 	sm.subscriptionID = subID
 	log.Infof("[CUPS] Created D-Bus subscription with ID %d", subID)
 
-	if err := sm.conn.AddMatchSignal(
-		dbus.WithMatchInterface("org.cups.cupsd.Notifier"),
-	); err != nil {
+	if err := sm.conn.AddMatchSignal(cupsNotifierMatch); err != nil {
 		sm.cancelSubscription()
-		sm.conn.Close()
 		sm.mu.Lock()
 		sm.running = false
 		sm.mu.Unlock()
@@ -277,7 +275,7 @@ func (sm *DBusSubscriptionManager) Stop() {
 	}
 
 	if sm.conn != nil {
-		sm.conn.Close()
+		_ = sm.conn.RemoveMatchSignal(cupsNotifierMatch)
 		sm.conn = nil
 	}
 

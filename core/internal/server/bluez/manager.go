@@ -18,8 +18,14 @@ const (
 	propertiesIface = "org.freedesktop.DBus.Properties"
 )
 
+var bluezMatchRules = [][]dbus.MatchOption{
+	{dbus.WithMatchInterface(propertiesIface), dbus.WithMatchMember("PropertiesChanged")},
+	{dbus.WithMatchInterface(objectMgrIface), dbus.WithMatchMember("InterfacesAdded")},
+	{dbus.WithMatchInterface(objectMgrIface), dbus.WithMatchMember("InterfacesRemoved")},
+}
+
 func NewManager() (*Manager, error) {
-	conn, err := dbus.ConnectSystemBus()
+	conn, err := dbus.SystemBus()
 	if err != nil {
 		return nil, fmt.Errorf("system bus connection failed: %w", err)
 	}
@@ -47,23 +53,19 @@ func NewManager() (*Manager, error) {
 
 	adapters, err := scanAdapters(conn)
 	if err != nil {
-		conn.Close()
 		return nil, fmt.Errorf("%w: %v", ErrNoAdapter, err)
 	}
 	if len(adapters) == 0 {
-		conn.Close()
 		return nil, ErrNoAdapter
 	}
 	m.adapterPaths = adapters
 	log.Infof("[BluezManager] adapters: %v (default: %s)", adapters, adapters[0])
 
 	if err := m.initialize(); err != nil {
-		conn.Close()
 		return nil, err
 	}
 
 	if err := m.startAgent(); err != nil {
-		conn.Close()
 		return nil, fmt.Errorf("agent start failed: %w", err)
 	}
 
@@ -277,25 +279,10 @@ func (m *Manager) startAgent() error {
 func (m *Manager) startSignalPump() error {
 	m.dbusConn.Signal(m.signals)
 
-	if err := m.dbusConn.AddMatchSignal(
-		dbus.WithMatchInterface(propertiesIface),
-		dbus.WithMatchMember("PropertiesChanged"),
-	); err != nil {
-		return err
-	}
-
-	if err := m.dbusConn.AddMatchSignal(
-		dbus.WithMatchInterface(objectMgrIface),
-		dbus.WithMatchMember("InterfacesAdded"),
-	); err != nil {
-		return err
-	}
-
-	if err := m.dbusConn.AddMatchSignal(
-		dbus.WithMatchInterface(objectMgrIface),
-		dbus.WithMatchMember("InterfacesRemoved"),
-	); err != nil {
-		return err
+	for _, rule := range bluezMatchRules {
+		if err := m.dbusConn.AddMatchSignal(rule...); err != nil {
+			return err
+		}
 	}
 
 	m.sigWG.Go(func() {
@@ -673,6 +660,9 @@ func (m *Manager) Close() {
 		m.dbusConn.RemoveSignal(m.signals)
 		close(m.signals)
 	}
+	for _, rule := range bluezMatchRules {
+		_ = m.dbusConn.RemoveMatchSignal(rule...)
+	}
 
 	if m.agent != nil {
 		m.agent.Close()
@@ -689,10 +679,6 @@ func (m *Manager) Close() {
 		m.pairingSubscribers.Delete(key)
 		return true
 	})
-
-	if m.dbusConn != nil {
-		m.dbusConn.Close()
-	}
 }
 
 func stateChanged(old, new *BluetoothState) bool {

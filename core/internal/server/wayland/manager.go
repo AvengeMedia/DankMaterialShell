@@ -126,15 +126,15 @@ func (m *Manager) anyOutputReady() bool {
 	return anyReady
 }
 
+const prepareForSleepMatchRule = "type='signal',interface='org.freedesktop.login1.Manager',member='PrepareForSleep',path='/org/freedesktop/login1'"
+
 func (m *Manager) setupDBusMonitor() error {
-	conn, err := dbus.ConnectSystemBus()
+	conn, err := dbus.SystemBus()
 	if err != nil {
 		return fmt.Errorf("system bus: %w", err)
 	}
 
-	matchRule := "type='signal',interface='org.freedesktop.login1.Manager',member='PrepareForSleep',path='/org/freedesktop/login1'"
-	if err := conn.BusObject().Call("org.freedesktop.DBus.AddMatch", 0, matchRule).Err; err != nil {
-		conn.Close()
+	if err := conn.BusObject().Call("org.freedesktop.DBus.AddMatch", 0, prepareForSleepMatchRule).Err; err != nil {
 		return fmt.Errorf("add match: %w", err)
 	}
 
@@ -1281,6 +1281,6 @@ func (m *Manager) Close() {
 
 	if m.dbusConn != nil {
 		m.dbusConn.RemoveSignal(m.dbusSignal)
-		m.dbusConn.Close()
+		m.dbusConn.BusObject().Call("org.freedesktop.DBus.RemoveMatch", 0, prepareForSleepMatchRule)
 	}
 }

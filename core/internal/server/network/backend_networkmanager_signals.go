@@ -12,7 +12,7 @@ const (
 )
 
 func (b *NetworkManagerBackend) startSignalPump() error {
-	conn, err := dbus.ConnectSystemBus()
+	conn, err := dbus.SystemBus()
 	if err != nil {
 		return err
 	}
@@ -28,7 +28,6 @@ func (b *NetworkManagerBackend) startSignalPump() error {
 		dbus.WithMatchMember("PropertiesChanged"),
 	); err != nil {
 		conn.RemoveSignal(signals)
-		conn.Close()
 		return err
 	}
 
@@ -43,7 +42,6 @@ func (b *NetworkManagerBackend) startSignalPump() error {
 			dbus.WithMatchMember("PropertiesChanged"),
 		)
 		conn.RemoveSignal(signals)
-		conn.Close()
 		return err
 	}
 
@@ -63,7 +61,6 @@ func (b *NetworkManagerBackend) startSignalPump() error {
 			dbus.WithMatchMember("NewConnection"),
 		)
 		conn.RemoveSignal(signals)
-		conn.Close()
 		return err
 	}
 
@@ -88,7 +85,6 @@ func (b *NetworkManagerBackend) startSignalPump() error {
 			dbus.WithMatchMember("ConnectionRemoved"),
 		)
 		conn.RemoveSignal(signals)
-		conn.Close()
 		return err
 	}
 
@@ -98,7 +94,6 @@ func (b *NetworkManagerBackend) startSignalPump() error {
 		dbus.WithMatchMember("DeviceAdded"),
 	); err != nil {
 		conn.RemoveSignal(signals)
-		conn.Close()
 		return err
 	}
 
@@ -108,7 +103,6 @@ func (b *NetworkManagerBackend) startSignalPump() error {
 		dbus.WithMatchMember("DeviceRemoved"),
 	); err != nil {
 		conn.RemoveSignal(signals)
-		conn.Close()
 		return err
 	}
 
@@ -119,7 +113,6 @@ func (b *NetworkManagerBackend) startSignalPump() error {
 			dbus.WithMatchMember("PropertiesChanged"),
 		); err != nil {
 			conn.RemoveSignal(signals)
-			conn.Close()
 			return err
 		}
 	}
@@ -131,7 +124,6 @@ func (b *NetworkManagerBackend) startSignalPump() error {
 			dbus.WithMatchMember("PropertiesChanged"),
 		); err != nil {
 			conn.RemoveSignal(signals)
-			conn.Close()
 			return err
 		}
 	}
@@ -145,7 +137,6 @@ func (b *NetworkManagerBackend) startSignalPump() error {
 		dbus.WithMatchMember("VpnStateChanged"),
 	); err != nil {
 		conn.RemoveSignal(signals)
-		conn.Close()
 		return err
 	}
 
@@ -155,7 +146,6 @@ func (b *NetworkManagerBackend) startSignalPump() error {
 		dbus.WithMatchMember("StateChanged"),
 	); err != nil {
 		conn.RemoveSignal(signals)
-		conn.Close()
 		return err
 	}
 
@@ -248,7 +238,6 @@ func (b *NetworkManagerBackend) stopSignalPump() {
 
 	b.sigWG.Wait()
 
-	b.dbusConn.Close()
 }
 
 func (b *NetworkManagerBackend) handleDBusSignal(sig *dbus.Signal) {

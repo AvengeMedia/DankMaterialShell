@@ -6,8 +6,10 @@ import (
 )
 
 type Manager struct {
-	systemConn  *dbus.Conn
-	sessionConn *dbus.Conn
+	systemConn     *dbus.Conn
+	sessionConn    *dbus.Conn
+	systemSignals  chan *dbus.Signal
+	sessionSignals chan *dbus.Signal
 
 	subscriptions     syncmap.Map[string, *signalSubscription]
 	signalSubscribers syncmap.Map[string, chan SignalEvent]

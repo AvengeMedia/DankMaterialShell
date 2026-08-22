@@ -77,18 +77,6 @@ func TestLogindBackend_SetBrightness_LEDDevice(t *testing.T) {
 	}
 }
 
-func TestLogindBackend_Close(t *testing.T) {
-	mockConn := mocks_brightness.NewMockDBusConn(t)
-	backend := NewLogindBackendWithConn(mockConn)
-
-	mockConn.EXPECT().
-		Close().
-		Return(nil).
-		Once()
-
-	backend.Close()
-}
-
 func TestLogindBackend_Close_NilConn(t *testing.T) {
 	backend := &LogindBackend{conn: nil}
 	backend.Close()
