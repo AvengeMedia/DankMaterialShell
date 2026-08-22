@@ -1,6 +1,6 @@
 module github.com/AvengeMedia/DankMaterialShell/core
 
-go 1.26.4
+go 1.26.5
 
 require (
 	github.com/AvengeMedia/dgop v0.2.4-0.20260819141338-085d828cf577
@@ -24,7 +24,7 @@ require (
 	go.etcd.io/bbolt v1.5.0
 	go4.org/mem v0.0.0-20240501181205-ae6ca9944745
 	golang.org/x/image v0.44.0
-	tailscale.com v1.100.0
+	tailscale.com v1.102.0
 )
 
 require (
