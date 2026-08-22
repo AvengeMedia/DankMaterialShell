@@ -20,9 +20,11 @@ Item {
     readonly property bool frameModeActive: SettingsData.frameEnabled
     property var cachedIconThemes: SettingsData.availableIconThemes
     property var cachedCursorThemes: SettingsData.availableCursorThemes
-    property var cachedMatugenSchemes: Theme.availableMatugenSchemes.map(option => option.label)
+    readonly property bool matugenSmartCapable: Theme.matugenAvailable && DMSService.matugenSmartSupported
+    property var cachedMatugenSchemes: Theme.availableMatugenSchemes.filter(option => DMSService.matugenSmartSupported || option.value !== "scheme-smart").map(option => option.label)
     property var matugenSchemePreviews: ({})
     property string matugenPreviewSource: ""
+    property string matugenPreviewImage: ""
     property real matugenPreviewContrast: 0
     property string matugenPreviewRequestKey: ""
     property var installedRegistryThemes: []
@@ -34,7 +36,7 @@ Item {
         const mode = SessionData.isLightMode ? "light" : "dark";
         for (var i = 0; i < Theme.availableMatugenSchemes.length; i++) {
             const option = Theme.availableMatugenSchemes[i];
-            const preview = matugenSchemePreviews[option.value];
+            const preview = matugenSchemePreviews[option.value] || matugenSchemePreviews["scheme-tonal-spot"];
             if (preview?.[mode])
                 map[option.label] = preview[mode];
         }
@@ -284,14 +286,18 @@ Item {
             return;
         const sourceColor = Theme.getMatugenColor("source_color", Theme.primary).toString();
         const contrast = SettingsData.matugenContrast ?? 0;
-        const requestKey = sourceColor + "|" + contrast;
-        if (sourceColor === matugenPreviewSource && contrast === matugenPreviewContrast && Object.keys(matugenSchemePreviews).length > 0)
+        const imagePath = (Theme.rawWallpaperPath && !Theme.rawWallpaperPath.startsWith("#")) ? Theme.rawWallpaperPath : "";
+        const requestKey = sourceColor + "|" + contrast + "|" + imagePath;
+        if (sourceColor === matugenPreviewSource && contrast === matugenPreviewContrast && imagePath === matugenPreviewImage && Object.keys(matugenSchemePreviews).length > 0)
             return;
         if (requestKey === matugenPreviewRequestKey)
             return;
         matugenPreviewRequestKey = requestKey;
 
-        Proc.runCommand("", [Proc.dmsBin, "matugen", "preview", "--source-color", sourceColor, "--contrast", contrast.toString()], (output, exitCode) => {
+        const args = [Proc.dmsBin, "matugen", "preview", "--source-color", sourceColor, "--contrast", contrast.toString()];
+        if (imagePath)
+            args.push("--image", imagePath);
+        Proc.runCommand("", args, (output, exitCode) => {
             if (requestKey !== themeColorsTab.matugenPreviewRequestKey)
                 return;
             if (exitCode !== 0) {
@@ -301,6 +307,7 @@ Item {
             try {
                 themeColorsTab.matugenSchemePreviews = JSON.parse(output.trim());
                 themeColorsTab.matugenPreviewSource = sourceColor;
+                themeColorsTab.matugenPreviewImage = imagePath;
                 themeColorsTab.matugenPreviewContrast = contrast;
             } catch (e) {
                 themeColorsTab.matugenPreviewRequestKey = "";
@@ -1313,12 +1320,31 @@ Item {
                         }
                     }
 
+                    SettingsToggleRow {
+                        tab: "theme"
+                        tags: ["matugen", "smart", "wallpaper", "auto", "mode"]
+                        settingKey: "matugenSmartMode"
+                        text: I18n.tr("Auto From Wallpaper", "toggle that lets wallpaper brightness decide light/dark mode")
+                        description: I18n.tr("Dark or light mode follows the wallpaper brightness")
+                        checked: SettingsData.matugenSmartMode
+                        visible: matugenSmartCapable
+                        enabled: Theme.currentTheme === Theme.dynamic
+                        opacity: enabled ? 1 : 0.4
+                        onToggled: checked => {
+                            if (checked && SessionData.themeModeAutoEnabled)
+                                SessionData.setThemeModeAutoEnabled(false);
+                            SettingsData.setMatugenSmartMode(checked);
+                        }
+                    }
+
                     DankToggle {
                         id: themeModeAutoToggle
                         width: parent.width
                         text: I18n.tr("Automatic Control")
                         checked: SessionData.themeModeAutoEnabled
                         onToggled: checked => {
+                            if (checked && SettingsData.matugenSmartMode)
+                                SettingsData.setMatugenSmartMode(false);
                             SessionData.setThemeModeAutoEnabled(checked);
                         }
 

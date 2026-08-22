@@ -29,6 +29,7 @@ type ColorMode string
 const (
 	ColorModeDark  ColorMode = "dark"
 	ColorModeLight ColorMode = "light"
+	ColorModeSmart ColorMode = "smart"
 )
 
 type TemplateKind int
@@ -94,6 +95,7 @@ var (
 	matugenVersionOK   bool
 	matugenSupportsCOE bool
 	matugenIsV4        bool
+	matugenIsV42       bool
 )
 
 type Options struct {
@@ -139,16 +141,17 @@ var previewSchemeTypes = []string{
 	"scheme-rainbow",
 }
 
-func PreviewSchemes(sourceColor string, contrast float64) (map[string]SchemePreview, error) {
+func PreviewSchemes(sourceColor string, contrast float64, imagePath string) (map[string]SchemePreview, error) {
 	if sourceColor == "" {
 		return nil, fmt.Errorf("source color is required")
 	}
 
-	previews := make(map[string]SchemePreview, len(previewSchemeTypes))
+	previews := make(map[string]SchemePreview, len(previewSchemeTypes)+1)
 	for _, schemeType := range previewSchemeTypes {
 		output, err := runMatugenDryRun(&Options{
 			Kind:        "hex",
 			Value:       sourceColor,
+			Mode:        ColorModeDark,
 			MatugenType: schemeType,
 			Contrast:    contrast,
 		})
@@ -163,7 +166,37 @@ func PreviewSchemes(sourceColor string, contrast float64) (map[string]SchemePrev
 		}
 		previews[schemeType] = SchemePreview{Dark: dark, Light: light}
 	}
+
+	previews["scheme-smart"] = smartSchemePreview(previews["scheme-tonal-spot"], contrast, imagePath)
 	return previews, nil
+}
+
+func smartSchemePreview(fallback SchemePreview, contrast float64, imagePath string) SchemePreview {
+	if imagePath == "" {
+		return fallback
+	}
+	flags, err := detectMatugenVersion()
+	if err != nil || !flags.isV42 {
+		return fallback
+	}
+	output, err := runMatugenDryRun(&Options{
+		Kind:        "image",
+		Value:       imagePath,
+		Mode:        ColorModeDark,
+		MatugenType: "scheme-smart",
+		Contrast:    contrast,
+	})
+	if err != nil {
+		log.Warnf("Smart scheme preview failed falling back to tonal-spot: %v", err)
+		return fallback
+	}
+	dark := extractMatugenColor(output, "primary", "dark")
+	light := extractMatugenColor(output, "primary", "light")
+	if dark == "" || light == "" {
+		log.Warn("Smart scheme preview failed falling back to tonal-spot: primary colors missing from matugen output")
+		return fallback
+	}
+	return SchemePreview{Dark: dark, Light: light}
 }
 
 func (o *Options) ColorsOutput() string {
@@ -279,6 +312,14 @@ func Run(opts Options) error {
 
 func buildOnce(opts *Options) (bool, error) {
 	defer os.Remove(opts.colorsStaging())
+
+	flags, err := detectMatugenVersion()
+	if err != nil {
+		return false, err
+	}
+	if err := resolveSmartMode(opts, flags); err != nil {
+		return false, err
+	}
 
 	cfgFile, err := os.CreateTemp("", "matugen-config-*.toml")
 	if err != nil {
@@ -757,6 +798,7 @@ func extractTOMLSection(content, startMarker, endMarker string) string {
 type matugenFlags struct {
 	supportsCOE bool
 	isV4        bool
+	isV42       bool
 }
 
 func detectMatugenVersion() (matugenFlags, error) {
@@ -764,10 +806,15 @@ func detectMatugenVersion() (matugenFlags, error) {
 	defer matugenVersionMu.Unlock()
 
 	if matugenVersionOK {
-		return matugenFlags{matugenSupportsCOE, matugenIsV4}, nil
+		return matugenFlags{matugenSupportsCOE, matugenIsV4, matugenIsV42}, nil
 	}
 
 	return detectMatugenVersionLocked()
+}
+
+func SupportsSmart() bool {
+	flags, err := detectMatugenVersion()
+	return err == nil && flags.isV42
 }
 
 func redetectMatugenVersion(old matugenFlags) (matugenFlags, bool) {
@@ -779,7 +826,7 @@ func redetectMatugenVersion(old matugenFlags) (matugenFlags, bool) {
 	if err != nil {
 		return old, false
 	}
-	changed := flags.supportsCOE != old.supportsCOE || flags.isV4 != old.isV4
+	changed := flags.supportsCOE != old.supportsCOE || flags.isV4 != old.isV4 || flags.isV42 != old.isV42
 	return flags, changed
 }
 
@@ -811,6 +858,7 @@ func detectMatugenVersionLocked() (matugenFlags, error) {
 
 	matugenSupportsCOE = major > 3 || (major == 3 && minor >= 1)
 	matugenIsV4 = major >= 4
+	matugenIsV42 = major > 4 || (major == 4 && minor >= 2)
 	matugenVersionOK = true
 
 	if matugenSupportsCOE {
@@ -819,7 +867,7 @@ func detectMatugenVersionLocked() (matugenFlags, error) {
 	if matugenIsV4 {
 		log.Debugf("Matugen %s detected: using v4 compatibility flags", versionStr)
 	}
-	return matugenFlags{matugenSupportsCOE, matugenIsV4}, nil
+	return matugenFlags{matugenSupportsCOE, matugenIsV4, matugenIsV42}, nil
 }
 
 func buildMatugenArgs(baseArgs []string, flags matugenFlags) []string {
@@ -896,7 +944,7 @@ func execDryRun(opts *Options, flags matugenFlags) (string, error) {
 	default:
 		baseArgs = []string{opts.Kind, opts.Value}
 	}
-	baseArgs = append(baseArgs, "-m", "dark", "-t", opts.MatugenType, "--json", "hex", "--dry-run")
+	baseArgs = append(baseArgs, "-m", string(opts.Mode), "-t", opts.MatugenType, "--json", "hex", "--dry-run")
 	baseArgs = appendContrastArg(baseArgs, opts.Contrast)
 	if flags.isV4 {
 		baseArgs = append(baseArgs, "--source-color-index", "0", "--old-json-output")
@@ -938,6 +986,44 @@ func extractMatugenColor(jsonStr, colorName, variant string) string {
 	}
 
 	return variantData
+}
+
+func extractTopLevelString(jsonStr, key string) string {
+	var data map[string]any
+	if err := json.Unmarshal([]byte(jsonStr), &data); err != nil {
+		return ""
+	}
+	if val, ok := data[key].(string); ok {
+		return val
+	}
+	return ""
+}
+
+func resolveSmartMode(opts *Options, flags matugenFlags) error {
+	if opts.MatugenType == "scheme-smart" && !flags.isV42 {
+		return fmt.Errorf("scheme-smart requires matugen 4.2+")
+	}
+	if opts.Mode != ColorModeSmart {
+		return nil
+	}
+	if !flags.isV42 {
+		return fmt.Errorf("smart mode requires matugen 4.2+")
+	}
+	if opts.Kind != "image" || opts.StockColors != "" {
+		opts.Mode = ColorModeDark
+		return nil
+	}
+	output, err := runMatugenDryRun(opts)
+	if err != nil {
+		return fmt.Errorf("smart mode resolution failed: %w", err)
+	}
+	resolved := extractTopLevelString(output, "mode")
+	if resolved != string(ColorModeLight) && resolved != string(ColorModeDark) {
+		return fmt.Errorf("smart mode resolution returned unexpected mode %q", resolved)
+	}
+	log.Infof("Smart mode resolved to %s", resolved)
+	opts.Mode = ColorMode(resolved)
+	return nil
 }
 
 func extractNestedColor(jsonStr, colorName, variant string) string {

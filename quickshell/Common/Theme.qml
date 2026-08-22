@@ -361,6 +361,10 @@ Singleton {
                 "value": "scheme-rainbow",
                 "label": I18n.tr("Rainbow", "matugen color scheme option"),
                 "description": I18n.tr("Diverse palette spanning the full spectrum.")
+            }), ({
+                "value": "scheme-smart",
+                "label": I18n.tr("Smart", "matugen color scheme option"),
+                "description": I18n.tr("Automatically picks the scheme variant based on the wallpaper.")
             })]
 
     function getMatugenScheme(value) {
@@ -1168,6 +1172,11 @@ Singleton {
     }
 
     function setLightMode(light, savePrefs = true, enableTransition = false) {
+        if (typeof SettingsData !== "undefined" && SettingsData.matugenSmartMode) {
+            SettingsData.matugenSmartMode = false;
+            SettingsData.saveSettings();
+        }
+
         if (enableTransition) {
             screenTransition();
             lightModeTransitionTimer.lightMode = light;
@@ -1495,7 +1504,7 @@ Singleton {
         const desired = {
             "kind": kind,
             "value": value,
-            "mode": isLight ? "light" : "dark",
+            "mode": (typeof SettingsData !== "undefined" && SettingsData.matugenSmartMode && kind === "image" && !stockColors) ? "smart" : (isLight ? "light" : "dark"),
             "iconTheme": iconTheme || "System Default",
             "matugenType": matugenType || "scheme-tonal-spot",
             "runUserTemplates": (typeof SettingsData !== "undefined") ? SettingsData.runUserMatugenTemplates : true
@@ -2070,6 +2079,13 @@ Singleton {
                 const colorsText = dynamicColorsFileView.text();
                 if (colorsText) {
                     root.matugenColors = JSON.parse(colorsText);
+                    if (typeof SettingsData !== "undefined" && SettingsData.matugenSmartMode && root.matugenColors && root.matugenColors.mode && typeof SessionData !== "undefined" && !SessionData.isSwitchingMode) {
+                        const resolvedLight = root.matugenColors.mode === "light";
+                        if (SessionData.isLightMode !== resolvedLight) {
+                            SessionData.setLightMode(resolvedLight, true);
+                            SettingsData.updateCosmicThemeMode(resolvedLight);
+                        }
+                    }
                     if (typeof ToastService !== "undefined") {
                         ToastService.clearWallpaperError();
                     }
