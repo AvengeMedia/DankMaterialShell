@@ -214,6 +214,29 @@ func TestWatchLoop_Reconnect(t *testing.T) {
 	}, 3*time.Second, 50*time.Millisecond)
 }
 
+func TestWatchLoop_BacksOffOnPersistentBusError(t *testing.T) {
+	var watchCalls atomic.Int32
+
+	client := &mockClient{
+		watchFn: func(ctx context.Context, mask ipn.NotifyWatchOpt) (ipnBusWatcher, error) {
+			watchCalls.Add(1)
+			return newMockWatcher(ctx, nil, fmt.Errorf("json: cannot unmarshal object")), nil
+		},
+		statusFn: func(ctx context.Context) (*ipnstate.Status, error) {
+			return runningStatus(), nil
+		},
+	}
+
+	m := newManager(client)
+	defer m.Close()
+
+	time.Sleep(300 * time.Millisecond)
+
+	calls := watchCalls.Load()
+	assert.LessOrEqual(t, int(calls), 3,
+		"a persistent bus read error should back off, not reconnect in a hot loop; got %d attempts in 300ms", calls)
+}
+
 func TestManager_Subscribe(t *testing.T) {
 	client := &mockClient{
 		watchFn: func(ctx context.Context, mask ipn.NotifyWatchOpt) (ipnBusWatcher, error) {

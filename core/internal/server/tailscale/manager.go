@@ -112,17 +112,13 @@ func (m *Manager) watchLoop(ctx context.Context) {
 				m.updateState(&TailscaleState{Connected: false, BackendState: "Unreachable"})
 				unreachableSent = true
 			}
-			select {
-			case <-ctx.Done():
+			if !sleepBackoff(ctx, &backoff) {
 				return
-			case <-time.After(backoff):
 			}
-			backoff = min(backoff*2, 30*time.Second)
 			continue
 		}
 
 		unreachableSent = false
-		backoff = time.Second
 		log.Info("[Tailscale] Connected to IPN bus")
 		m.markAvailable()
 
@@ -132,6 +128,8 @@ func (m *Manager) watchLoop(ctx context.Context) {
 				log.Warnf("[Tailscale] IPN bus error: %v", err)
 				break
 			}
+
+			backoff = time.Second
 
 			if notify.State == nil && notify.NetMap == nil { //nolint:staticcheck // NetMap is deprecated upstream but still the only activity signal on some platforms
 				continue
@@ -143,7 +141,21 @@ func (m *Manager) watchLoop(ctx context.Context) {
 		}
 
 		watcher.Close()
+
+		if !sleepBackoff(ctx, &backoff) {
+			return
+		}
 	}
+}
+
+func sleepBackoff(ctx context.Context, backoff *time.Duration) bool {
+	select {
+	case <-ctx.Done():
+		return false
+	case <-time.After(*backoff):
+	}
+	*backoff = min(*backoff*2, 30*time.Second)
+	return true
 }
 
 // debounceLoop coalesces rapid bus notifications into a single Status RPC
