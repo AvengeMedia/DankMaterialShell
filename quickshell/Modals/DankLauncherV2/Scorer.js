@@ -5,6 +5,9 @@ const Weights = {
     prefixMatch: 5000,
     wordBoundary: 3000,
     substring: 500,
+    genericPrefix: 800,
+    generic: 400,
+    id: 350,
     fuzzy: 100,
     frecency: 2000,
     typeBonus: {
@@ -116,9 +119,24 @@ function score(item, query, frecencyData) {
 
     var textScore = calculateTextScore(name, q)
 
+    if (textScore === 0 && item.data && item.data.genericName) {
+        var genericLower = item.data.genericName.toLowerCase()
+        if (genericLower.startsWith(q))
+            textScore = Weights.genericPrefix
+        else if (genericLower.includes(q))
+            textScore = Weights.generic
+    }
+
     if (textScore === 0 && item.subtitle) {
         var subtitleScore = calculateTextScore(item.subtitle.toLowerCase(), q)
         textScore = subtitleScore * 0.5
+    }
+
+    if (textScore === 0 && item.id && item.type === "app") {
+        var id = item.id.toLowerCase().replace(/\.desktop$/, "")
+        if (id.includes(q)) {
+            textScore = Weights.id
+        }
     }
 
     if (textScore === 0 && item.keywords) {
