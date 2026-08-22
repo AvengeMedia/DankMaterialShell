@@ -2081,8 +2081,10 @@ Singleton {
                     root.matugenColors = JSON.parse(colorsText);
                     if (typeof SettingsData !== "undefined" && SettingsData.matugenSmartMode && root.matugenColors && root.matugenColors.mode && typeof SessionData !== "undefined" && !SessionData.isSwitchingMode) {
                         const resolvedLight = root.matugenColors.mode === "light";
-                        if (SessionData.isLightMode !== resolvedLight)
+                        if (SessionData.isLightMode !== resolvedLight) {
                             SessionData.setLightMode(resolvedLight, true);
+                            SettingsData.updateCosmicThemeMode(resolvedLight);
+                        }
                     }
                     if (typeof ToastService !== "undefined") {
                         ToastService.clearWallpaperError();
