@@ -84,6 +84,9 @@ func TestGetCacheDir(t *testing.T) {
 }
 
 func TestRealGitClientRevisionCheckout(t *testing.T) {
+	t.Setenv("GIT_CONFIG_GLOBAL", "")
+	t.Setenv("GIT_CONFIG_SYSTEM", "")
+
 	repoPath := t.TempDir()
 	repo, err := git.PlainInit(repoPath, false)
 	require.NoError(t, err)
