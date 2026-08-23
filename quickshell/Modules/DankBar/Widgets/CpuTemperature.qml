@@ -59,6 +59,7 @@ BasePill {
 
                         return Math.round(DgopService.cpuTemperature).toString();
                     }
+                    isMonospace: true
                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                     color: Theme.widgetTextColor
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -101,6 +102,7 @@ BasePill {
 
                     StyledTextMetrics {
                         id: tempBaseline
+                        isMonospace: true
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         text: "88°"
                     }
@@ -114,6 +116,7 @@ BasePill {
 
                             return Math.round(DgopService.cpuTemperature) + "°";
                         }
+                        isMonospace: true
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         color: Theme.widgetTextColor
 

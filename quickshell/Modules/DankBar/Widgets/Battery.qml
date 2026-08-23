@@ -151,6 +151,7 @@ BasePill {
 
                 StyledText {
                     text: battery.verticalDisplayText
+                    isMonospace: true
                     font.pixelSize: Theme.barTextSize(battery.barThickness, battery.barConfig?.fontScale, battery.barConfig?.maximizeWidgetText)
                     color: Theme.widgetTextColor
                     horizontalAlignment: Text.AlignHCenter
@@ -197,6 +198,7 @@ BasePill {
 
                 StyledText {
                     text: battery.horizontalSideText
+                    isMonospace: true
                     font.pixelSize: Theme.barTextSize(battery.barThickness, battery.barConfig?.fontScale, battery.barConfig?.maximizeWidgetText)
                     color: Theme.widgetTextColor
                     anchors.verticalCenter: parent.verticalCenter

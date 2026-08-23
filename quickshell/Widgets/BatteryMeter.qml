@@ -67,6 +67,7 @@ Item {
 
         font.pixelSize: Math.max(1, root.baseTextSize)
         font.weight: Font.Bold
+        isMonospace: true
         text: root.numberText
     }
 
@@ -127,6 +128,7 @@ Item {
             y: root.textBaseline - baselineOffset
             text: root.numberText
             color: glyphs.glyphColor
+            isMonospace: true
             font.pixelSize: Math.max(1, root.textSize)
             font.weight: Font.Bold
         }

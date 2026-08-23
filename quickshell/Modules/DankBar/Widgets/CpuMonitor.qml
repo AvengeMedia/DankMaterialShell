@@ -59,6 +59,7 @@ BasePill {
 
                         return DgopService.cpuUsage.toFixed(0);
                     }
+                    isMonospace: true
                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                     color: Theme.widgetTextColor
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -101,12 +102,14 @@ BasePill {
 
                     StyledTextMetrics {
                         id: cpuBaseline
+                        isMonospace: true
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         text: "100%"
                     }
 
                     StyledTextMetrics {
                         id: cpuCurrent
+                        isMonospace: true
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         text: cpuText.text
                     }
@@ -120,6 +123,7 @@ BasePill {
                             }
                             return v.toFixed(0) + "%";
                         }
+                        isMonospace: true
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         color: Theme.widgetTextColor
 

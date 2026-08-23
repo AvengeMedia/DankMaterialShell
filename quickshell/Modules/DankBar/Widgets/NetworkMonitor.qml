@@ -42,6 +42,7 @@ BasePill {
                             return (rate / 1024).toFixed(0) + "K";
                         return (rate / (1024 * 1024)).toFixed(0) + "M";
                     }
+                    isMonospace: true
                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                     color: Theme.info
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -56,6 +57,7 @@ BasePill {
                             return (rate / 1024).toFixed(0) + "K";
                         return (rate / (1024 * 1024)).toFixed(0) + "M";
                     }
+                    isMonospace: true
                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                     color: Theme.error
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -87,6 +89,7 @@ BasePill {
 
                     StyledText {
                         text: DgopService.networkRxRate > 0 ? Format.formatRate(DgopService.networkRxRate, 1) : "0 B/s"
+                        isMonospace: true
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         color: Theme.widgetTextColor
                         anchors.verticalCenter: parent.verticalCenter
@@ -96,6 +99,7 @@ BasePill {
 
                         StyledTextMetrics {
                             id: rxBaseline
+                            isMonospace: true
                             font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                             text: "88.8 MB/s"
                         }
@@ -116,6 +120,7 @@ BasePill {
 
                     StyledText {
                         text: DgopService.networkTxRate > 0 ? Format.formatRate(DgopService.networkTxRate, 1) : "0 B/s"
+                        isMonospace: true
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         color: Theme.widgetTextColor
                         anchors.verticalCenter: parent.verticalCenter
@@ -125,6 +130,7 @@ BasePill {
 
                         StyledTextMetrics {
                             id: txBaseline
+                            isMonospace: true
                             font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                             text: "88.8 MB/s"
                         }

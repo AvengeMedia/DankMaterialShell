@@ -44,6 +44,7 @@ BasePill {
                         const temp = SettingsData.useFahrenheit ? WeatherService.weather.tempF : WeatherService.weather.temp;
                         return temp;
                     }
+                    isMonospace: true
                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                     color: Theme.widgetTextColor
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -65,6 +66,7 @@ BasePill {
 
                 StyledText {
                     text: WeatherService.currentTempText(false)
+                    isMonospace: true
                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                     color: Theme.widgetTextColor
                     anchors.verticalCenter: parent.verticalCenter

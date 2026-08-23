@@ -66,6 +66,7 @@ BasePill {
 
                         return DgopService.memoryUsage.toFixed(0);
                     }
+                    isMonospace: true
                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                     color: Theme.widgetTextColor
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -74,6 +75,7 @@ BasePill {
                 StyledText {
                     visible: root.showSwap && DgopService.totalSwapKB > 0
                     text: root.swapUsage.toFixed(0)
+                    isMonospace: true
                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                     color: Theme.surfaceVariantText
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -116,6 +118,7 @@ BasePill {
 
                     StyledTextMetrics {
                         id: ramBaseline
+                        isMonospace: true
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         text: {
                             let baseText = root.showInGb ? "88.8 GB" : "88%";
@@ -148,6 +151,7 @@ BasePill {
                             }
                             return ramText;
                         }
+                        isMonospace: true
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         color: Theme.widgetTextColor
 

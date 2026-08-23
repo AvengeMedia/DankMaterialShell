@@ -148,6 +148,7 @@ BasePill {
                             return root.diskUsagePercent.toFixed(0);
                         }
                     }
+                    isMonospace: true
                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                     color: Theme.widgetTextColor
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -208,6 +209,7 @@ BasePill {
 
                     StyledTextMetrics {
                         id: diskBaseline
+                        isMonospace: true
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         text: {
                             switch (root.diskUsageMode) {
@@ -224,6 +226,7 @@ BasePill {
 
                     StyledTextMetrics {
                         id: diskCurrent
+                        isMonospace: true
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         text: diskText.text
                     }
@@ -247,6 +250,7 @@ BasePill {
                                 return root.diskUsagePercent.toFixed(0) + "%";
                             }
                         }
+                        isMonospace: true
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         color: Theme.widgetTextColor
 

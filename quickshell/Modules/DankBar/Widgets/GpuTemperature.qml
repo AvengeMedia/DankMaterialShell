@@ -127,6 +127,7 @@ BasePill {
 
                         return Math.round(root.displayTemp).toString();
                     }
+                    isMonospace: true
                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                     color: Theme.widgetTextColor
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -169,6 +170,7 @@ BasePill {
 
                     StyledTextMetrics {
                         id: gpuTempBaseline
+                        isMonospace: true
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         text: "88°"
                     }
@@ -182,6 +184,7 @@ BasePill {
 
                             return Math.round(root.displayTemp) + "°";
                         }
+                        isMonospace: true
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         color: Theme.widgetTextColor
 
