@@ -109,6 +109,7 @@ type RegionSelector struct {
 	cursorBuffer  *ShmBuffer
 	cursorSerial  uint32
 	cursorShape   *wp_cursor_shape.WpCursorShapeManagerV1
+	cursorDevice  *wp_cursor_shape.WpCursorShapeDeviceV1
 	cursorWlBuf   *client.Buffer
 	cursorPool    *client.ShmPool
 
@@ -630,12 +631,14 @@ func (r *RegionSelector) setNativeCursor(serial uint32) {
 	} else if r.ctrlHeld {
 		shape = wp_cursor_shape.ShapeGrab
 	}
-	device, err := r.cursorShape.GetPointer(r.pointer)
-	if err != nil {
-		return
+	if r.cursorDevice == nil {
+		device, err := r.cursorShape.GetPointer(r.pointer)
+		if err != nil {
+			return
+		}
+		r.cursorDevice = device
 	}
-	_ = device.SetShape(serial, shape)
-	_ = device.Destroy()
+	_ = r.cursorDevice.SetShape(serial, shape)
 }
 
 func (r *RegionSelector) createOutputSurface(output *WaylandOutput) (*OutputSurface, error) {
@@ -933,6 +936,12 @@ func (r *RegionSelector) cleanup() {
 	}
 	if r.cursorBuffer != nil {
 		r.cursorBuffer.Close()
+	}
+	if r.cursorDevice != nil {
+		_ = r.cursorDevice.Destroy()
+	}
+	if r.cursorShape != nil {
+		_ = r.cursorShape.Destroy()
 	}
 
 	r.cleanupScroll()

@@ -30,9 +30,7 @@ func (r *RegionSelector) setupInput() {
 func (r *RegionSelector) setupPointerHandlers() {
 	r.pointer.SetEnterHandler(func(e client.PointerEnterEvent) {
 		r.cursorSerial = e.Serial
-		if r.cursorShape != nil {
-			r.setNativeCursor(e.Serial)
-		} else if r.cursorSurface != nil {
+		if r.cursorShape == nil && r.cursorSurface != nil {
 			_ = r.pointer.SetCursor(e.Serial, r.cursorSurface, 12, 12)
 		}
 
