@@ -559,8 +559,18 @@ Column {
                                 }
                                 return null;
                             })();
-                        if (primaryDevice)
-                            return primaryDevice.name || primaryDevice.alias || primaryDevice.deviceName || I18n.tr("Connected Device", "bluetooth status");
+                        if (primaryDevice) {
+                            const name = primaryDevice.name || primaryDevice.alias || primaryDevice.deviceName || I18n.tr("Connected Device", "bluetooth status");
+                            // A reported 0% is valid; batteryAvailable distinguishes missing data.
+                            // https://quickshell.org/docs/v0.3.1/types/Quickshell.Bluetooth/BluetoothDevice/
+                            // https://bluez.readthedocs.io/en/latest/battery-api/
+                            if (primaryDevice.batteryAvailable)
+                                return `${name} • ${Math.round(primaryDevice.battery * 100)}%`;
+                            const btBattery = BatteryService.bluetoothDevices.find(dev => dev.name === name || dev.name.toLowerCase().includes(name.toLowerCase()) || name.toLowerCase().includes(dev.name.toLowerCase()));
+                            if (btBattery)
+                                return `${name} • ${btBattery.percentage}%`;
+                            return name;
+                        }
                         return I18n.tr("No devices", "bluetooth status");
                     }
                 case "audioOutput":
