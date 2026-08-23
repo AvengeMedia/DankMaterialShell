@@ -358,6 +358,7 @@ Item {
     LazyLoader {
         id: emptyTrashConfirmLoader
         active: false
+        readonly property ConfirmModal loadedModal: item as ConfirmModal
 
         ConfirmModal {
             id: emptyTrashConfirm
@@ -368,7 +369,9 @@ Item {
         target: TrashService
         function onEmptyTrashConfirmRequested(itemCount) {
             emptyTrashConfirmLoader.active = true;
-            emptyTrashConfirmLoader.item.showWithOptions({
+            if (!emptyTrashConfirmLoader.loadedModal)
+                return;
+            emptyTrashConfirmLoader.loadedModal.showWithOptions({
                 title: I18n.tr("Empty Trash"),
                 message: I18n.tr("Permanently delete %1 item(s)? This cannot be undone.").arg(itemCount),
                 confirmText: I18n.tr("Empty"),
@@ -804,6 +807,7 @@ Item {
     LazyLoader {
         id: browserPickerModalLoader
         active: false
+        readonly property BrowserPickerModal loadedModal: item as BrowserPickerModal
 
         BrowserPickerModal {
             id: browserPickerModal
@@ -813,6 +817,7 @@ Item {
     LazyLoader {
         id: filePickerModalLoader
         active: false
+        readonly property AppPickerModal loadedModal: item as AppPickerModal
 
         AppPickerModal {
             id: filePickerModal
@@ -884,7 +889,9 @@ Item {
                 return;
             }
             browserPickerModalLoader.active = true;
-            const picker = browserPickerModalLoader.item;
+            const picker = browserPickerModalLoader.loadedModal;
+            if (!picker)
+                return;
             picker.url = url;
             picker.open();
         }
@@ -898,7 +905,9 @@ Item {
             }
 
             filePickerModalLoader.active = true;
-            const picker = filePickerModalLoader.item;
+            const picker = filePickerModalLoader.loadedModal;
+            if (!picker)
+                return;
             picker.targetData = data.target;
             picker.targetDataLabel = data.requestType || "file";
             picker.mimeType = data.mimeType || "";
