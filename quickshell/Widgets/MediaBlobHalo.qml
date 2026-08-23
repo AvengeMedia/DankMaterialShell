@@ -147,7 +147,7 @@ Item {
 
         Behavior on activation {
             NumberAnimation {
-                duration: Theme.extraLongDuration
+                duration: 550
                 easing.type: Easing.InOutQuad
             }
         }

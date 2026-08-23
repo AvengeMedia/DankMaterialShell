@@ -164,5 +164,5 @@ FocusScope {
         }
     }
 
-    Component.onCompleted: Qt.callLater(() => root.controller.markVisualsReady("controlcenter"))
+    Component.onCompleted: root.controller.markVisualsReady("controlcenter")
 }

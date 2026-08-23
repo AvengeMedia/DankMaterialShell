@@ -165,7 +165,7 @@ Item {
     Item {
         id: leftInput
 
-        x: root.edgeAligned ? root.edgeInset : root.islandSurface.currentVisualX - SettingsData.dankIslandSatelliteGap - width
+        x: root.edgeAligned ? root.edgeInset : Math.round(root.islandSurface.currentVisualX - SettingsData.dankIslandSatelliteGap - width)
         y: root.rowY
         width: root.visible ? leftWidgetSection.implicitWidth : 0
         height: root.visible ? root.barThickness : 0
@@ -191,7 +191,7 @@ Item {
     Item {
         id: rightInput
 
-        x: root.edgeAligned ? root.width - root.edgeInset - width : root.islandSurface.currentVisualX + root.islandSurface.currentVisualWidth + SettingsData.dankIslandSatelliteGap
+        x: root.edgeAligned ? root.width - root.edgeInset - width : Math.round(root.islandSurface.currentVisualX + root.islandSurface.currentVisualWidth + SettingsData.dankIslandSatelliteGap)
         y: root.rowY
         width: root.visible ? rightWidgetSection.implicitWidth : 0
         height: root.visible ? root.barThickness : 0

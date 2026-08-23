@@ -192,6 +192,7 @@ BasePill {
                     showNumber: battery.showPercent
                     showPercentSign: battery.pillPercentSign
                     thickness: Theme.barIconSize(battery.barThickness, -4, battery.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                    fontSize: Theme.barTextSize(battery.barThickness, battery.barConfig?.fontScale, battery.barConfig?.maximizeWidgetText)
                     anchors.verticalCenter: parent.verticalCenter
                 }
 

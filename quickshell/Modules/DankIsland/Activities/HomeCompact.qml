@@ -245,6 +245,7 @@ Item {
                 anchors.centerIn: parent
                 visible: item.usesBattery
                 thickness: root.tight ? 12 : 14
+                fontSize: Theme.fontSizeSmall
                 hovered: statusArea.containsMouse
                 outlined: SettingsData.dankIslandBatteryStyle === "outline"
             }

@@ -42,6 +42,7 @@ Item {
 
     readonly property alias inputMaskItem: inputEnvelope
     readonly property bool motionRunning: motion.running
+    readonly property real springTimeConstantMs: motion.timeConstantMs
     property real trackedHeight: 0
     readonly property Item mediaDropdownMaskItem: mediaDropdowns.activePanel
     property real fadeCompactHeight: 48
@@ -50,10 +51,10 @@ Item {
     property int mediaDropdownType: 0
     property point mediaDropdownAnchor: Qt.point(0, 0)
     readonly property bool bottomEdge: SettingsData.dankIslandEdge === "bottom"
-    readonly property real currentVisualWidth: Math.round(motion.currentWidth)
-    readonly property real currentVisualHeight: Math.round(motion.currentHeight)
-    readonly property real currentVisualX: Math.round((width - currentVisualWidth) / 2 + motion.currentOffsetX)
-    readonly property real currentVisualY: bottomEdge ? height - Math.round(motion.currentOffsetY) - currentVisualHeight : Math.round(motion.currentOffsetY)
+    readonly property real currentVisualWidth: motion.currentWidth
+    readonly property real currentVisualHeight: motion.currentHeight
+    readonly property real currentVisualX: (width - currentVisualWidth) / 2 + motion.currentOffsetX
+    readonly property real currentVisualY: bottomEdge ? height - motion.currentOffsetY - currentVisualHeight : motion.currentOffsetY
     readonly property real targetVisualX: Math.round((width - motion.targetWidth) / 2 + motion.targetOffsetX)
     readonly property real targetVisualY: bottomEdge ? height - Math.round(motion.targetOffsetY) - motion.targetHeight : Math.round(motion.targetOffsetY)
     readonly property real targetScreenY: targetVisualY + root.hostOriginY
@@ -233,8 +234,8 @@ Item {
         IslandContentHost {
             id: contentHost
 
-            anchors.fill: parent
             controller: root.controller
+            springTimeConstantMs: root.springTimeConstantMs
             morphProgress: root.morphProgress
             expanded: root.controller.expanded
             pointerInside: root.controller.pointerInside

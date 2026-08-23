@@ -27,16 +27,19 @@ Item {
             return Theme.surfaceVariant;
         return root.lowState ? Theme.error : Theme.primary;
     }
+    readonly property color dimColor: Theme.withAlpha(root.fillColor, root.hovered ? 0.6 : 0.48)
     readonly property color trackColor: {
         if (root.outlined)
             return root.hovered ? Theme.withAlpha(Theme.surfaceVariant, 0.45) : "transparent";
-        return Theme.withAlpha(Theme.surfaceText, root.hovered ? 0.25 : 0.14);
+        return root.dimColor;
     }
     readonly property color onFillColor: {
         if (root.lowState)
             return Theme.isLightColor(Theme.error) ? Qt.rgba(0, 0, 0, 0.9) : Qt.rgba(1, 1, 1, 0.95);
         return Theme.primaryText;
     }
+    readonly property color glyphColor: root.outlined ? Theme.surfaceText : root.onFillColor
+    readonly property int glyphWeight: Theme.fontWeight
     readonly property string numberText: Math.round(root.level).toString()
     readonly property string signText: root.showPercentSign ? "%" : ""
     readonly property bool boltInside: root.charging && root.showBolt
@@ -46,10 +49,11 @@ Item {
     readonly property real textCanvasLeft: (root.boltInside ? 8 : 1.5) * root.unit
     readonly property real textCanvasWidth: root.bodyLength - root.textCanvasLeft - 1.5 * root.unit
     readonly property real textNeed: fitMetrics.advanceWidth + signMetrics.advanceWidth
+    property real fontSize: Theme.fontSizeSmall
     readonly property real baseTextSize: {
         if (!root.boltInside)
-            return 10 * root.unit;
-        return root.numberText.length >= 3 ? 6 * root.unit : 9 * root.unit;
+            return root.fontSize;
+        return root.numberText.length >= 3 ? root.fontSize * 0.55 : root.fontSize * 0.82;
     }
     readonly property real signRatio: 0.72
     readonly property real textSize: root.baseTextSize
@@ -57,10 +61,11 @@ Item {
     readonly property real textBaseline: root.height / 2 - digitInk.tightBoundingRect.y - digitInk.tightBoundingRect.height / 2
     readonly property real boltHeight: root.vertical ? 8 * root.unit : 6 * root.unit
     readonly property real boltWidth: root.boltHeight * (6 / 13)
-    readonly property real bodyLength: Math.max(Math.round(22 * root.unit), Math.ceil(root.numberInside ? root.textNeed + root.textCanvasLeft + 1.5 * root.unit : 0))
-    readonly property real capOffset: root.bodyLength
-    readonly property real capBreadth: Math.max(1, Math.round(1.5 * root.unit))
-    readonly property real capSpan: Math.round(8 * root.unit)
+    readonly property real bodyLength: Math.max(Math.round(25 * root.unit), Math.ceil(root.numberInside ? root.textNeed + root.textCanvasLeft + 1.5 * root.unit : 0))
+    readonly property real capGap: Math.max(1, Math.round(root.unit))
+    readonly property real capOffset: root.bodyLength + root.capGap
+    readonly property real capBreadth: Math.max(1, Math.round(1.25 * root.unit))
+    readonly property real capSpan: Math.round(6 * root.unit)
 
     implicitWidth: root.vertical ? Math.round(14 * root.unit) : root.capOffset + root.capBreadth
     implicitHeight: root.vertical ? root.capOffset + root.capBreadth : Math.round(14 * root.unit)
@@ -68,6 +73,7 @@ Item {
     StyledTextMetrics {
         id: fitMetrics
 
+        font.weight: root.glyphWeight
         font.pixelSize: Math.max(1, root.baseTextSize)
         text: root.numberText
     }
@@ -75,6 +81,7 @@ Item {
     StyledTextMetrics {
         id: digitInk
 
+        font.weight: root.glyphWeight
         font.pixelSize: Math.max(1, root.textSize)
         text: "0"
     }
@@ -82,6 +89,7 @@ Item {
     StyledTextMetrics {
         id: signMetrics
 
+        font.weight: root.glyphWeight
         font.pixelSize: Math.max(1, root.baseTextSize * root.signRatio)
         text: root.signText
     }
@@ -127,44 +135,6 @@ Item {
         }
     }
 
-    component Glyphs: Item {
-        id: glyphs
-
-        property color glyphColor
-
-        width: root.width
-        height: root.height
-
-        StyledText {
-            id: numberGlyph
-
-            visible: root.numberInside
-            x: root.textCanvasLeft + (root.textCanvasWidth - implicitWidth - signGlyph.implicitWidth) / 2
-            y: root.textBaseline - baselineOffset
-            text: root.numberText
-            color: glyphs.glyphColor
-            font.pixelSize: Math.max(1, root.textSize)
-        }
-
-        StyledText {
-            id: signGlyph
-
-            visible: root.numberInside && root.signText !== ""
-            x: numberGlyph.x + numberGlyph.implicitWidth
-            anchors.verticalCenter: numberGlyph.verticalCenter
-            text: root.signText
-            color: glyphs.glyphColor
-            font.pixelSize: root.signSize
-        }
-
-        Bolt {
-            visible: root.boltInside
-            x: root.vertical ? (root.width - width) / 2 : 2 * root.unit + (6 * root.unit - width) / 2
-            y: root.vertical ? (root.height - height) / 2 : 4 * root.unit
-            fillColor: glyphs.glyphColor
-        }
-    }
-
     Rectangle {
         id: cap
 
@@ -172,10 +142,8 @@ Item {
         y: root.vertical ? 0 : (root.height - root.capSpan) / 2
         width: root.vertical ? root.capSpan : root.capBreadth
         height: root.vertical ? root.capBreadth : root.capSpan
-        topLeftRadius: root.vertical ? root.unit : 0
-        topRightRadius: root.unit
-        bottomRightRadius: root.vertical ? 0 : root.unit
-        color: root.fillColor
+        radius: root.capBreadth / 2
+        color: root.outlined ? root.fillColor : root.dimColor
     }
 
     Rectangle {
@@ -234,23 +202,40 @@ Item {
         }
     }
 
-    Glyphs {
-        visible: root.glyphsVisible
-        glyphColor: Theme.surfaceText
-    }
-
     Item {
-        x: interior.x + fill.x
-        y: interior.y + fill.y
-        width: fill.width
-        height: fill.height
-        clip: true
-        visible: root.glyphsVisible && !root.outlined
+        visible: root.glyphsVisible
+        width: root.width
+        height: root.height
 
-        Glyphs {
-            x: -parent.x
-            y: -parent.y
-            glyphColor: root.onFillColor
+        StyledText {
+            id: numberGlyph
+
+            visible: root.numberInside
+            x: root.textCanvasLeft + (root.textCanvasWidth - implicitWidth - signGlyph.implicitWidth) / 2
+            y: root.textBaseline - baselineOffset
+            text: root.numberText
+            color: root.glyphColor
+            font.weight: root.glyphWeight
+            font.pixelSize: Math.max(1, root.textSize)
+        }
+
+        StyledText {
+            id: signGlyph
+
+            visible: root.numberInside && root.signText !== ""
+            x: numberGlyph.x + numberGlyph.implicitWidth
+            anchors.verticalCenter: numberGlyph.verticalCenter
+            text: root.signText
+            color: root.glyphColor
+            font.weight: root.glyphWeight
+            font.pixelSize: root.signSize
+        }
+
+        Bolt {
+            visible: root.boltInside
+            x: root.vertical ? (root.width - width) / 2 : 2 * root.unit + (6 * root.unit - width) / 2
+            y: root.vertical ? (root.height - height) / 2 : 4 * root.unit
+            fillColor: root.glyphColor
         }
     }
 }

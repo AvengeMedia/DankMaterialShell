@@ -6,9 +6,14 @@ import qs.Common
 Item {
     id: root
 
+    x: Math.round(parent.x) - parent.x
+    y: Math.round(parent.y) - parent.y
+    width: Math.round(parent.x + parent.width) - Math.round(parent.x)
+    height: Math.round(parent.y + parent.height) - Math.round(parent.y)
     clip: true
 
     required property var controller
+    required property real springTimeConstantMs
     required property real morphProgress
     required property bool expanded
     required property bool pointerInside
@@ -126,15 +131,15 @@ Item {
         id: activityTransition
 
         PauseAnimation {
-            duration: Theme.shorterDuration
+            duration: Math.round(root.springTimeConstantMs)
         }
 
         NumberAnimation {
             target: root
             property: "activityFade"
             to: 1
-            duration: Theme.mediumDuration
-            easing.type: Theme.standardEasing
+            duration: Math.round(root.springTimeConstantMs * 3)
+            easing.type: Easing.OutCubic
         }
 
         ScriptAction {

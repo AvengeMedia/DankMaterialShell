@@ -16,6 +16,7 @@ QtObject {
     property real velocityEpsilon: 0.035
     property real maximumFrameTime: 1 / 30
     property real integrationStep: 1 / 240
+    readonly property real timeConstantMs: reducedMotion ? 0 : 2000 * mass / Math.max(1, damping)
 
     property real currentWidth: 176
     property real currentHeight: 42
