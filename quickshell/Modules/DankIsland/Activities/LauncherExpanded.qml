@@ -86,11 +86,12 @@ FocusScope {
     Connections {
         target: root.islandController
 
-        function onLauncherSessionSerialChanged() {
-            Qt.callLater(root.initializeSession);
+        function onSessionStarted(activityId) {
+            if (activityId === "launcher")
+                Qt.callLater(root.initializeSession);
         }
     }
 
-    Component.onCompleted: root.islandController.markLauncherVisualsReady()
+    Component.onCompleted: root.islandController.markVisualsReady("launcher")
     Component.onDestruction: root.islandController.launcherInputFocused = false
 }

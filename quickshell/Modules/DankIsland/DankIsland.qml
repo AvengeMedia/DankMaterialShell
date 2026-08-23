@@ -16,79 +16,95 @@ Item {
 
     readonly property bool launcherOpen: root.activityOpen("launcher")
     readonly property bool controlCenterOpen: root.activityOpen("controlcenter")
-    readonly property bool wallpaperOpen: root.activityOpen("wallpaper")
-    readonly property bool weatherOpen: root.activityOpen("weather")
-    readonly property bool mediaOpen: root.activityOpen("media")
-    readonly property bool homeOpen: root.activityOpen("home")
-    readonly property bool notificationCenterOpen: root.activityOpen("notificationcenter")
 
-    function activityOpen(activityId) {
-        const hosts = islandVariants.instances || [];
-        for (let i = 0; i < hosts.length; i++) {
-            if (hosts[i]?.islandController?.activeActivity === activityId && hosts[i].islandController.expanded)
-                return true;
-        }
-        return false;
+    function hosts() {
+        return islandVariants.instances || [];
     }
 
     function hostWithActivity(activityId) {
-        const hosts = islandVariants.instances || [];
-        for (let i = 0; i < hosts.length; i++) {
-            if (hosts[i]?.islandController?.activeActivity === activityId && hosts[i].islandController.expanded)
-                return hosts[i];
+        for (const host of hosts()) {
+            if (host?.islandController?.activeActivity === activityId && host.islandController.expanded)
+                return host;
         }
         return null;
     }
 
+    function activityOpen(activityId) {
+        return root.hostWithActivity(activityId) !== null;
+    }
+
+    function hostForExactScreen(screen) {
+        if (!screen)
+            return null;
+        for (const host of hosts()) {
+            if (host?.screen === screen || host?.screen?.name === screen.name)
+                return host;
+        }
+        return null;
+    }
+
+    function hostForScreenName(screenName) {
+        for (const host of hosts()) {
+            if (host?.screen?.name === screenName)
+                return host;
+        }
+        return null;
+    }
+
+    function focusedHost() {
+        const focusedName = CompositorService.getFocusedScreen()?.name ?? "";
+        return focusedName ? root.hostForScreenName(focusedName) : null;
+    }
+
+    function focusedIslandScreen() {
+        return root.focusedHost()?.screen ?? null;
+    }
+
     function hasHostForScreen(screen) {
         if (!screen)
-            return (islandVariants.instances || []).length > 0;
-        const hosts = islandVariants.instances || [];
-        for (let i = 0; i < hosts.length; i++) {
-            if (hosts[i]?.screen === screen || hosts[i]?.screen?.name === screen.name)
-                return true;
-        }
-        return false;
+            return hosts().length > 0;
+        return root.hostForExactScreen(screen) !== null;
+    }
+
+    function hostForScreenOrFocused(screen) {
+        return root.hostForExactScreen(screen) ?? root.focusedHost();
     }
 
     function hostForScreen(screenName) {
         const requestedName = (screenName || "").trim();
-        const hosts = islandVariants.instances || [];
-        // An explicitly named screen with no island is an error, not a redirect to another display.
-        if (requestedName) {
-            for (let i = 0; i < hosts.length; i++) {
-                if (hosts[i]?.screen?.name === requestedName)
-                    return hosts[i];
-            }
-            return null;
-        }
-        const focusedName = CompositorService.getFocusedScreen()?.name ?? "";
-        if (focusedName) {
-            for (let i = 0; i < hosts.length; i++) {
-                if (hosts[i]?.screen?.name === focusedName)
-                    return hosts[i];
-            }
-        }
-        return hosts.length > 0 ? hosts[0] : null;
+        if (requestedName)
+            return root.hostForScreenName(requestedName);
+        return root.focusedHost() ?? (hosts()[0] ?? null);
     }
 
     function activityName(activity) {
         const requested = (activity || "home").trim().toLowerCase();
-        if (requested === "media" || requested === "launcher" || requested === "controlcenter" || requested === "wallpaper" || requested === "weather" || requested === "notificationcenter")
+        switch (requested) {
+        case "media":
+        case "launcher":
+        case "controlcenter":
+        case "wallpaper":
+        case "weather":
+        case "notificationcenter":
             return requested;
-        if (requested === "control-center" || requested === "cc")
+        case "control-center":
+        case "cc":
             return "controlcenter";
-        if (requested === "notifications" || requested === "notification-center" || requested === "notification" || requested === "nc")
+        case "notifications":
+        case "notification-center":
+        case "notification":
+        case "nc":
             return "notificationcenter";
+        }
         return "home";
     }
 
-    function openActivityOn(host, activityId) {
+    function openActivityOn(host, activityId, section) {
         switch (activityId) {
         case "launcher":
             return host.islandController.requestLauncher("", "", false);
         case "controlcenter":
-            return host.islandController.requestControlCenter("", false);
+            return host.islandController.requestControlCenter(section || "", false);
         case "wallpaper":
             return host.islandController.requestWallpaper(false);
         case "weather":
@@ -99,24 +115,26 @@ Item {
         return host.islandController.requestActivity(activityId, true, true);
     }
 
-    function focusedHost() {
-        const focusedName = CompositorService.getFocusedScreen()?.name ?? "";
-        if (!focusedName)
-            return null;
-        const hosts = islandVariants.instances || [];
-        for (let i = 0; i < hosts.length; i++) {
-            if (hosts[i]?.screen?.name === focusedName)
-                return hosts[i];
+    function openActivity(activityId, screen, section): bool {
+        const host = root.hostForScreenOrFocused(screen);
+        return host ? root.openActivityOn(host, activityId, section) === true : false;
+    }
+
+    function toggleActivity(activityId, screen, section): bool {
+        const openHost = root.hostWithActivity(activityId);
+        if (openHost) {
+            openHost.islandController.requestCollapse();
+            return true;
         }
-        return null;
+        return root.openActivity(activityId, screen, section);
     }
 
-    function focusedIslandScreen() {
-        return root.focusedHost()?.screen ?? null;
-    }
-
-    function activeLauncherHost() {
-        return root.hostWithActivity("launcher");
+    function closeActivity(activityId): bool {
+        const host = root.hostWithActivity(activityId);
+        if (!host)
+            return false;
+        host.islandController.requestCollapse();
+        return true;
     }
 
     function openLauncher(query, mode): bool {
@@ -125,219 +143,86 @@ Item {
     }
 
     function toggleLauncher(query, mode): bool {
-        const openHost = root.activeLauncherHost();
-        if (openHost) {
-            openHost.islandController.requestCollapse();
+        if (root.closeActivity("launcher"))
             return true;
-        }
-        const host = root.focusedHost();
-        return host ? host.islandController.requestLauncher(query || "", mode || "", false) : false;
+        return root.openLauncher(query, mode);
     }
 
     function closeLauncher(): bool {
-        const host = root.activeLauncherHost();
+        return root.closeActivity("launcher");
+    }
+
+    function ipcOpen(activity, screen) {
+        const host = root.hostForScreen(screen);
         if (!host)
-            return false;
-        host.islandController.requestCollapse();
-        return true;
+            return "DANK_ISLAND_UNAVAILABLE";
+        const requested = root.activityName(activity);
+        if (!root.openActivityOn(host, requested, ""))
+            return `DANK_ISLAND_ACTIVITY_UNAVAILABLE: ${requested}`;
+        return `DANK_ISLAND_OPEN: ${requested}\t${host.screen?.name ?? ""}`;
     }
 
-    function controlCenterHostForScreen(screen) {
-        if (screen) {
-            const hosts = islandVariants.instances || [];
-            for (let i = 0; i < hosts.length; i++) {
-                if (hosts[i]?.screen === screen || hosts[i]?.screen?.name === screen.name)
-                    return hosts[i];
-            }
-        }
-        return root.focusedHost();
-    }
-
-    function openControlCenter(section, screen): bool {
-        const host = root.controlCenterHostForScreen(screen);
-        return host ? host.islandController.requestControlCenter(section || "", false) : false;
-    }
-
-    function toggleControlCenter(section, screen): bool {
-        const openHost = root.hostWithActivity("controlcenter");
-        if (openHost) {
-            openHost.islandController.requestCollapse();
-            return true;
-        }
-        return root.openControlCenter(section, screen);
-    }
-
-    function closeControlCenter(): bool {
-        const host = root.hostWithActivity("controlcenter");
+    function ipcToggle(activity, screen) {
+        const host = root.hostForScreen(screen);
         if (!host)
-            return false;
-        host.islandController.requestCollapse();
-        return true;
-    }
-
-    function wallpaperHostForScreen(screen) {
-        if (screen) {
-            const hosts = islandVariants.instances || [];
-            for (let i = 0; i < hosts.length; i++) {
-                if (hosts[i]?.screen === screen || hosts[i]?.screen?.name === screen.name)
-                    return hosts[i];
-            }
+            return "DANK_ISLAND_UNAVAILABLE";
+        if (host.islandController.expanded && !host.islandController.notificationActive) {
+            host.islandController.requestCollapse();
+            return `DANK_ISLAND_CLOSED: ${host.screen?.name ?? ""}`;
         }
-        return root.focusedHost();
+        return ipcOpen(activity, screen);
     }
 
-    function openWallpaper(screen): bool {
-        const host = root.wallpaperHostForScreen(screen);
-        return host ? host.islandController.requestWallpaper(false) : false;
-    }
-
-    function toggleWallpaper(screen): bool {
-        const openHost = root.hostWithActivity("wallpaper");
-        if (openHost) {
-            openHost.islandController.requestCollapse();
-            return true;
-        }
-        return root.openWallpaper(screen);
-    }
-
-    function closeWallpaper(): bool {
-        const host = root.hostWithActivity("wallpaper");
+    function ipcShow(activity, screen) {
+        const host = root.hostForScreen(screen);
         if (!host)
-            return false;
-        host.islandController.requestCollapse();
-        return true;
+            return "DANK_ISLAND_UNAVAILABLE";
+        const requested = root.activityName(activity);
+        if (!host.islandController.requestActivity(requested, false, false))
+            return `DANK_ISLAND_ACTIVITY_UNAVAILABLE: ${requested}`;
+        return `DANK_ISLAND_SHOW: ${requested}\t${host.screen?.name ?? ""}`;
     }
 
-    function weatherHostForScreen(screen) {
-        if (screen) {
-            const hosts = islandVariants.instances || [];
-            for (let i = 0; i < hosts.length; i++) {
-                if (hosts[i]?.screen === screen || hosts[i]?.screen?.name === screen.name)
-                    return hosts[i];
-            }
-        }
-        return root.focusedHost();
-    }
-
-    function openWeather(screen): bool {
-        const host = root.weatherHostForScreen(screen);
-        return host ? host.islandController.requestWeather(false) : false;
-    }
-
-    function toggleWeather(screen): bool {
-        const openHost = root.hostWithActivity("weather");
-        if (openHost) {
-            openHost.islandController.requestCollapse();
-            return true;
-        }
-        return root.openWeather(screen);
-    }
-
-    function closeWeather(): bool {
-        const host = root.hostWithActivity("weather");
+    function ipcClose(screen) {
+        const host = root.hostForScreen(screen);
         if (!host)
-            return false;
+            return "DANK_ISLAND_UNAVAILABLE";
         host.islandController.requestCollapse();
-        return true;
+        return `DANK_ISLAND_CLOSED: ${host.screen?.name ?? ""}`;
     }
 
-    function notificationHostForScreen(screen) {
-        if (screen) {
-            const hosts = islandVariants.instances || [];
-            for (let i = 0; i < hosts.length; i++) {
-                if (hosts[i]?.screen === screen || hosts[i]?.screen?.name === screen.name)
-                    return hosts[i];
-            }
-        }
-        return root.focusedHost();
-    }
-
-    function openNotifications(screen): bool {
-        const host = root.notificationHostForScreen(screen);
-        return host ? host.islandController.requestNotificationCenter(false) : false;
-    }
-
-    function toggleNotifications(screen): bool {
-        const openHost = root.hostWithActivity("notificationcenter");
-        if (openHost) {
-            openHost.islandController.requestCollapse();
-            return true;
-        }
-        return root.openNotifications(screen);
-    }
-
-    function closeNotifications(): bool {
-        const host = root.hostWithActivity("notificationcenter");
+    function ipcCycle(screen) {
+        const host = root.hostForScreen(screen);
         if (!host)
-            return false;
-        host.islandController.requestCollapse();
-        return true;
+            return "DANK_ISLAND_UNAVAILABLE";
+        host.islandController.cycleActivity(1, host.islandController.expanded);
+        return `DANK_ISLAND_ACTIVITY: ${host.islandController.activeActivity}\t${host.screen?.name ?? ""}`;
     }
 
-    function mediaHostForScreen(screen) {
-        if (screen) {
-            const hosts = islandVariants.instances || [];
-            for (let i = 0; i < hosts.length; i++) {
-                if (hosts[i]?.screen === screen || hosts[i]?.screen?.name === screen.name)
-                    return hosts[i];
-            }
-        }
-        return root.focusedHost();
-    }
-
-    function openMedia(screen): bool {
-        const host = root.mediaHostForScreen(screen);
-        return host ? host.islandController.requestActivity("media", true, true) : false;
-    }
-
-    function toggleMedia(screen): bool {
-        const openHost = root.hostWithActivity("media");
-        if (openHost) {
-            openHost.islandController.requestCollapse();
-            return true;
-        }
-        return root.openMedia(screen);
-    }
-
-    function closeMedia(): bool {
-        const host = root.hostWithActivity("media");
+    function ipcStatus(screen) {
+        const host = root.hostForScreen(screen);
         if (!host)
-            return false;
-        host.islandController.requestCollapse();
-        return true;
-    }
-
-    function homeHostForScreen(screen) {
-        if (screen) {
-            const hosts = islandVariants.instances || [];
-            for (let i = 0; i < hosts.length; i++) {
-                if (hosts[i]?.screen === screen || hosts[i]?.screen?.name === screen.name)
-                    return hosts[i];
-            }
-        }
-        return root.focusedHost();
-    }
-
-    function openHome(screen): bool {
-        const host = root.homeHostForScreen(screen);
-        return host ? host.islandController.requestActivity("home", true, true) : false;
-    }
-
-    function toggleHome(screen): bool {
-        const openHost = root.hostWithActivity("home");
-        if (openHost) {
-            openHost.islandController.requestCollapse();
-            return true;
-        }
-        return root.openHome(screen);
-    }
-
-    function closeHome(): bool {
-        const host = root.hostWithActivity("home");
-        if (!host)
-            return false;
-        host.islandController.requestCollapse();
-        return true;
+            return JSON.stringify({
+                "available": false,
+                "enabled": true,
+                "launcherAvailable": false
+            });
+        return JSON.stringify({
+            "available": true,
+            "enabled": true,
+            "screen": host.screen?.name ?? "",
+            "activity": host.islandController.activeActivity,
+            "expanded": host.islandController.expanded,
+            "mediaAvailable": host.islandController.mediaAvailable,
+            "launcherAvailable": true,
+            "controlCenterAvailable": true,
+            "wallpaperAvailable": true,
+            "weatherAvailable": true,
+            "notificationCenterAvailable": true,
+            "launcherInputFocused": host.islandController.launcherInputFocused,
+            "launcherResultCount": host.launcherResultCount,
+            "compactHeight": host.islandController.compactHeight
+        });
     }
 
     Component.onCompleted: PopoutService.dankIslandRouter = root
@@ -364,134 +249,60 @@ Item {
     IpcHandler {
         target: "island"
 
-        function _runOpen(activity, screen) {
-            const host = root.hostForScreen(screen);
-            if (!host)
-                return "DANK_ISLAND_UNAVAILABLE";
-            const requested = root.activityName(activity);
-            const accepted = root.openActivityOn(host, requested);
-            if (!accepted)
-                return `DANK_ISLAND_ACTIVITY_UNAVAILABLE: ${requested}`;
-            return `DANK_ISLAND_OPEN: ${requested}\t${host.screen?.name ?? ""}`;
-        }
-
-        function _runToggle(activity, screen) {
-            const host = root.hostForScreen(screen);
-            if (!host)
-                return "DANK_ISLAND_UNAVAILABLE";
-            if (host.islandController.expanded && !host.islandController.notificationActive) {
-                host.islandController.requestCollapse();
-                return `DANK_ISLAND_CLOSED: ${host.screen?.name ?? ""}`;
-            }
-            return _runOpen(activity, screen);
-        }
-
-        function _runShow(activity, screen) {
-            const host = root.hostForScreen(screen);
-            if (!host)
-                return "DANK_ISLAND_UNAVAILABLE";
-            const requested = root.activityName(activity);
-            if (!host.islandController.requestActivity(requested, false, false))
-                return `DANK_ISLAND_ACTIVITY_UNAVAILABLE: ${requested}`;
-            return `DANK_ISLAND_SHOW: ${requested}\t${host.screen?.name ?? ""}`;
-        }
-
-        function _runClose(screen) {
-            const host = root.hostForScreen(screen);
-            if (!host)
-                return "DANK_ISLAND_UNAVAILABLE";
-            host.islandController.requestCollapse();
-            return `DANK_ISLAND_CLOSED: ${host.screen?.name ?? ""}`;
-        }
-
-        function _runCycle(screen) {
-            const host = root.hostForScreen(screen);
-            if (!host)
-                return "DANK_ISLAND_UNAVAILABLE";
-            host.islandController.cycleActivity(1, host.islandController.expanded);
-            return `DANK_ISLAND_ACTIVITY: ${host.islandController.activeActivity}\t${host.screen?.name ?? ""}`;
-        }
-
-        function _runStatus(screen) {
-            const host = root.hostForScreen(screen);
-            if (!host)
-                return JSON.stringify({
-                    "available": false,
-                    "enabled": true,
-                    "launcherAvailable": false
-                });
-            return JSON.stringify({
-                "available": true,
-                "enabled": true,
-                "screen": host.screen?.name ?? "",
-                "activity": host.islandController.activeActivity,
-                "expanded": host.islandController.expanded,
-                "mediaAvailable": host.islandController.mediaAvailable,
-                "launcherAvailable": true,
-                "controlCenterAvailable": true,
-                "wallpaperAvailable": true,
-                "weatherAvailable": true,
-                "notificationCenterAvailable": true,
-                "launcherInputFocused": host.islandController.launcherInputFocused,
-                "launcherResultCount": host.launcherResultCount,
-                "compactHeight": host.islandController.compactHeight
-            });
-        }
-
         function open(activity: string): string {
-            return _runOpen(activity, "");
+            return root.ipcOpen(activity, "");
         }
 
         function toggle(activity: string): string {
-            return _runToggle(activity, "");
+            return root.ipcToggle(activity, "");
         }
 
         function show(activity: string): string {
-            return _runShow(activity, "");
+            return root.ipcShow(activity, "");
         }
 
         function close(): string {
-            return _runClose("");
+            return root.ipcClose("");
         }
 
         function cycle(): string {
-            return _runCycle("");
+            return root.ipcCycle("");
         }
 
         function status(): string {
-            return _runStatus("");
+            return root.ipcStatus("");
         }
 
         function openOn(activity: string, screen: string): string {
-            return _runOpen(activity, screen);
+            return root.ipcOpen(activity, screen);
         }
 
         function toggleOn(activity: string, screen: string): string {
-            return _runToggle(activity, screen);
+            return root.ipcToggle(activity, screen);
         }
 
         function showOn(activity: string, screen: string): string {
-            return _runShow(activity, screen);
+            return root.ipcShow(activity, screen);
         }
 
         function closeOn(screen: string): string {
-            return _runClose(screen);
+            return root.ipcClose(screen);
         }
 
         function cycleOn(screen: string): string {
-            return _runCycle(screen);
+            return root.ipcCycle(screen);
         }
 
         function statusOn(screen: string): string {
-            return _runStatus(screen);
+            return root.ipcStatus(screen);
         }
 
         function notifications(): string {
-            return _runToggle("notificationcenter", "");
+            return root.ipcToggle("notificationcenter", "");
         }
 
         function notificationsOn(screen: string): string {
-            return _runToggle("notificationcenter", screen);
+            return root.ipcToggle("notificationcenter", screen);
         }
     }
 }

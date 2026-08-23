@@ -6,25 +6,19 @@ import qs.Common
 QtObject {
     id: root
 
-    // Hybrid peeks the current compact face on hover. Click pins destinations.
     property string interactionMode: "click"
     property bool hoverExpanded: false
     property bool inputSuspended: false
     property bool expanded: false
     property bool pointerInside: false
-    // Slots with their own click target suppress hover expansion so the click wins.
     property int slotHoverCount: 0
     readonly property bool slotHovered: slotHoverCount > 0
     property bool mediaDropdownOpen: false
-    property bool autoDemo: false
     property bool keyboardDismissRequested: false
     property string activeActivity: "home"
     property bool mediaAvailable: false
     property bool mediaPreferred: false
     property bool launcherCycleEnabled: false
-    property bool launcherVisualsRequested: false
-    property bool launcherVisualsReady: false
-    property bool launcherRequestPending: false
     property bool launcherSessionActive: false
     property bool launcherInputFocused: false
     onLauncherInputFocusedChanged: {
@@ -33,37 +27,18 @@ QtObject {
     }
     property string launcherPendingQuery: ""
     property string launcherPendingMode: ""
-    property int launcherSessionSerial: 0
     property bool _launcherPendingExpand: true
     property bool _launcherPendingKeyboardFocus: true
-    property bool controlCenterVisualsRequested: false
-    property bool controlCenterVisualsReady: false
-    property bool controlCenterRequestPending: false
     property string controlCenterPendingSection: ""
-    property int controlCenterSessionSerial: 0
-    property bool wallpaperVisualsRequested: false
-    property bool wallpaperVisualsReady: false
-    property bool wallpaperRequestPending: false
-    property int wallpaperSessionSerial: 0
-    property bool weatherVisualsRequested: false
-    property bool weatherVisualsReady: false
-    property bool weatherRequestPending: false
-    property bool notificationCenterVisualsRequested: false
-    property bool notificationCenterVisualsReady: false
-    property bool notificationCenterRequestPending: false
-    property int notificationCenterSessionSerial: 0
-    // Arriving notifications stay pill-sized unless the user opts into full expansion.
     property bool notificationExpandAllowed: false
     property bool keyboardYielded: false
     property real horizontalOffset: 0
     property real outerGap: 8
-    // Expanded silhouette signature: tight corners on the screen edge, open corners facing the desktop.
     readonly property bool bottomEdge: SettingsData.dankIslandEdge === "bottom"
     readonly property real anchoredRadius: bottomEdge ? 34 : 26
     readonly property real freeRadius: bottomEdge ? 26 : 34
     property real compactHeight: 38
     property int transientTimeout: 2200
-    // Adopted popup timeout; 0 is sticky until dismiss.
     property int notificationTimeout: 5000
     property string transientReturnActivity: ""
     property string suspendedActivity: ""
@@ -72,14 +47,11 @@ QtObject {
     property int hoverOpenDelay: 150
     property int hoverCloseDelay: 150
     property int mediaReturnDelay: 1800
-    property real controlCenterContentHeight: 420
     property real controlCenterMaxHeight: 640
-    readonly property real controlCenterHeight: Math.max(320, Math.min(controlCenterMaxHeight, controlCenterContentHeight))
-    property real notificationCenterContentHeight: 320
     property real notificationCenterMaxHeight: 640
-    readonly property real notificationCenterHeight: Math.max(320, Math.min(notificationCenterMaxHeight, notificationCenterContentHeight))
+    readonly property real controlCenterHeight: Math.max(320, Math.min(controlCenterMaxHeight, destinationContentHeight("controlcenter")))
+    readonly property real notificationCenterHeight: Math.max(320, Math.min(notificationCenterMaxHeight, destinationContentHeight("notificationcenter")))
 
-    // Below the pill threshold every compact face drops to a single text line.
     readonly property bool compactDense: compactHeight < 40
     readonly property real compactFaceHeight: compactHeight + (compactDense ? 2 : 4)
     readonly property real compactIconSize: Math.max(14, Math.min(32, compactHeight - 8))
@@ -88,21 +60,21 @@ QtObject {
 
     property int unreadNotificationCount: 0
     readonly property bool homeNotificationBadge: unreadNotificationCount > 0
-    readonly property real homeSlotMargin: homeCompactTight ? 4 : 8
-    readonly property real homeSlotSpacing: homeCompactTight ? 2 : 4
+    readonly property real homeSlotMargin: homeCompactTight ? Theme.spacingXS : Theme.spacingS
+    readonly property real homeSlotSpacing: homeCompactTight ? Theme.spacingXXS : Theme.spacingXS
     readonly property real homeClusterGap: homeCompactTight ? 6 : 10
     property real homeContentWidth: 200
+    property real mediaContentWidth: 360
+    readonly property real mediaCompactMaxWidth: 360
 
-    // Ignore sub-2px clock jitter so the spring does not restart every tick.
+    signal sessionStarted(string activityId)
+
     function setHomeContentWidth(width) {
         const next = Math.ceil(width);
         if (!isFinite(next) || next <= 0 || Math.abs(next - homeContentWidth) < 2)
             return;
         homeContentWidth = next;
     }
-
-    property real mediaContentWidth: 360
-    readonly property real mediaCompactMaxWidth: 360
 
     function setMediaContentWidth(width) {
         const next = Math.ceil(Math.min(root.mediaCompactMaxWidth, width));
@@ -111,52 +83,177 @@ QtObject {
         mediaContentWidth = next;
     }
 
-    property real launcherContentWidth: 160
-    property real controlCenterContentWidth: 180
-    property real wallpaperContentWidth: 150
-    property real weatherContentWidth: 130
-    property real notificationCenterContentWidth: 170
-    readonly property real destinationCompactEndPad: Math.max(root.compactFaceHeight / 2, Theme.spacingM) + Theme.spacingS
+    readonly property var destinations: ["launcher", "controlcenter", "wallpaper", "weather", "notificationcenter"]
+    readonly property var destinationDefaults: ({
+            "launcher": {
+                "contentWidth": 160,
+                "contentHeight": 0
+            },
+            "controlcenter": {
+                "contentWidth": 180,
+                "contentHeight": 420
+            },
+            "wallpaper": {
+                "contentWidth": 150,
+                "contentHeight": 0
+            },
+            "weather": {
+                "contentWidth": 130,
+                "contentHeight": 0
+            },
+            "notificationcenter": {
+                "contentWidth": 170,
+                "contentHeight": 320
+            }
+        })
+    property var destinationState: root.freshDestinationState()
+    property int destinationRevision: 0
 
-    function destinationCompactWidthFromContent(contentWidth) {
-        return Math.ceil(Math.max(root.compactFaceHeight, contentWidth + root.destinationCompactEndPad * 2));
+    function freshDestinationState() {
+        const state = {};
+        for (const id of destinations) {
+            state[id] = {
+                "requested": false,
+                "ready": false,
+                "pending": false,
+                "contentWidth": destinationDefaults[id].contentWidth,
+                "contentHeight": destinationDefaults[id].contentHeight
+            };
+        }
+        return state;
+    }
+
+    function destinationEntry(activityId) {
+        destinationRevision;
+        return destinationState[activityId] ?? null;
+    }
+
+    function isDestination(activityId) {
+        return destinations.indexOf(activityId) !== -1;
+    }
+
+    function visualsRequested(activityId) {
+        return destinationEntry(activityId)?.requested ?? false;
+    }
+
+    function visualsReady(activityId) {
+        return destinationEntry(activityId)?.ready ?? false;
+    }
+
+    function destinationContentWidth(activityId) {
+        return destinationEntry(activityId)?.contentWidth ?? 0;
+    }
+
+    function destinationContentHeight(activityId) {
+        return destinationEntry(activityId)?.contentHeight ?? 0;
     }
 
     function setDestinationContentWidth(activityId, width) {
+        const entry = destinationState[activityId];
         const next = Math.ceil(width);
-        if (!isFinite(next) || next <= 0)
+        if (!entry || !isFinite(next) || next <= 0 || Math.abs(next - entry.contentWidth) < 2)
             return;
+        entry.contentWidth = next;
+        destinationRevision++;
+    }
+
+    function setDestinationContentHeight(activityId, height) {
+        const entry = destinationState[activityId];
+        const next = Math.round(height);
+        if (!entry || !isFinite(next) || Math.abs(next - entry.contentHeight) < 1)
+            return;
+        entry.contentHeight = next;
+        destinationRevision++;
+    }
+
+    function setVisualsReady(activityId, ready) {
+        const entry = destinationState[activityId];
+        if (!entry || entry.ready === ready)
+            return;
+        entry.ready = ready;
+        destinationRevision++;
+    }
+
+    function markVisualsReady(activityId) {
+        const entry = destinationState[activityId];
+        if (!entry)
+            return;
+        const pending = entry.pending;
+        entry.ready = true;
+        entry.pending = false;
+        destinationRevision++;
+        if (!pending)
+            return;
+        if (activityId === "launcher") {
+            requestActivity("launcher", _launcherPendingExpand, _launcherPendingKeyboardFocus);
+            return;
+        }
+        requestActivity(activityId, true, true);
+    }
+
+    function clearPendingRequests(exceptId) {
+        let changed = false;
+        for (const id of destinations) {
+            const entry = destinationState[id];
+            if (id === exceptId || !entry.pending)
+                continue;
+            entry.pending = false;
+            changed = true;
+        }
+        if (changed)
+            destinationRevision++;
+    }
+
+    function releaseIdleVisuals() {
+        for (const id of destinations) {
+            if (expanded && activeActivity === id)
+                continue;
+            const entry = destinationState[id];
+            if (!entry.requested && !entry.ready)
+                continue;
+            visualsReleaseTimer.restart();
+            return;
+        }
+        visualsReleaseTimer.stop();
+    }
+
+    function dropIdleVisuals() {
+        for (const id of destinations) {
+            if (expanded && activeActivity === id)
+                continue;
+            if (destinationState[id].pending)
+                continue;
+            dropVisuals(id);
+        }
+    }
+
+    function dropVisuals(activityId) {
+        const entry = destinationState[activityId];
+        entry.requested = false;
+        entry.ready = false;
+        entry.pending = false;
+        entry.contentHeight = destinationDefaults[activityId].contentHeight;
+        destinationRevision++;
         switch (activityId) {
         case "launcher":
-            if (Math.abs(next - launcherContentWidth) < 2)
-                return;
-            launcherContentWidth = next;
+            launcherSessionActive = false;
+            launcherInputFocused = false;
+            launcherPendingQuery = "";
+            launcherPendingMode = "";
             return;
         case "controlcenter":
-            if (Math.abs(next - controlCenterContentWidth) < 2)
-                return;
-            controlCenterContentWidth = next;
+            controlCenterPendingSection = "";
             return;
         case "wallpaper":
-            if (Math.abs(next - wallpaperContentWidth) < 2)
-                return;
-            wallpaperContentWidth = next;
-            return;
-        case "weather":
-            if (Math.abs(next - weatherContentWidth) < 2)
-                return;
-            weatherContentWidth = next;
-            return;
-        case "notificationcenter":
-            if (Math.abs(next - notificationCenterContentWidth) < 2)
-                return;
-            notificationCenterContentWidth = next;
+            keyboardYielded = false;
             return;
         }
     }
 
-    function setLauncherContentWidth(width) {
-        root.setDestinationContentWidth("launcher", width);
+    readonly property real destinationCompactEndPad: Math.max(root.compactFaceHeight / 2, Theme.spacingM) + Theme.spacingS
+
+    function destinationCompactWidth(activityId) {
+        return Math.ceil(Math.max(root.compactFaceHeight, destinationContentWidth(activityId) + root.destinationCompactEndPad * 2));
     }
 
     function resolvedHomeSlot(value, fallback) {
@@ -170,245 +267,89 @@ QtObject {
     readonly property string homeWeatherSlot: SettingsData.weatherEnabled ? resolvedHomeSlot(SettingsData.dankIslandHomeWeatherSlot, "hidden") : "hidden"
 
     readonly property real homeCompactWidth: Math.ceil(homeSlotMargin * 2 + Math.max(homeContentWidth, 1))
-
-    readonly property var homeCompactTarget: ({
-            "width": root.homeCompactWidth,
-            "height": root.homeCompactFaceHeight,
-            "offsetX": root.horizontalOffset,
-            "offsetY": root.outerGap,
-            "topLeftRadius": root.homeCompactFaceHeight / 2,
-            "topRightRadius": root.homeCompactFaceHeight / 2,
-            "bottomLeftRadius": root.homeCompactFaceHeight / 2,
-            "bottomRightRadius": root.homeCompactFaceHeight / 2
-        })
-    readonly property var homeExpandedTarget: ({
-            "width": SettingsData.showWeekNumber ? 736 : 700,
-            "height": 452,
-            "offsetX": root.horizontalOffset,
-            "offsetY": root.outerGap,
-            "topLeftRadius": root.anchoredRadius,
-            "topRightRadius": root.anchoredRadius,
-            "bottomLeftRadius": root.freeRadius,
-            "bottomRightRadius": root.freeRadius
-        })
     readonly property real mediaCompactWidth: Math.ceil(Math.max(1, mediaContentWidth))
 
-    readonly property var mediaCompactTarget: ({
-            "width": root.mediaCompactWidth,
-            "height": root.compactFaceHeight,
+    function pillTarget(width, height) {
+        const radius = height / 2;
+        return {
+            "width": width,
+            "height": height,
             "offsetX": root.horizontalOffset,
             "offsetY": root.outerGap,
-            "topLeftRadius": root.compactFaceHeight / 2,
-            "topRightRadius": root.compactFaceHeight / 2,
-            "bottomLeftRadius": root.compactFaceHeight / 2,
-            "bottomRightRadius": root.compactFaceHeight / 2
-        })
-    readonly property var mediaExpandedTarget: ({
-            "width": 600,
-            "height": 352,
-            "offsetX": root.horizontalOffset,
-            "offsetY": root.outerGap,
-            "topLeftRadius": root.anchoredRadius,
-            "topRightRadius": root.anchoredRadius,
-            "bottomLeftRadius": root.freeRadius,
-            "bottomRightRadius": root.freeRadius
-        })
-    readonly property real launcherCompactWidth: root.destinationCompactWidthFromContent(launcherContentWidth)
-    readonly property real controlCenterCompactWidth: root.destinationCompactWidthFromContent(controlCenterContentWidth)
-    readonly property real wallpaperCompactWidth: root.destinationCompactWidthFromContent(wallpaperContentWidth)
-    readonly property real weatherCompactWidth: root.destinationCompactWidthFromContent(weatherContentWidth)
-    readonly property real notificationCenterCompactWidth: root.destinationCompactWidthFromContent(notificationCenterContentWidth)
+            "topLeftRadius": radius,
+            "topRightRadius": radius,
+            "bottomLeftRadius": radius,
+            "bottomRightRadius": radius
+        };
+    }
 
-    readonly property var launcherCompactTarget: ({
-            "width": root.launcherCompactWidth,
-            "height": root.compactFaceHeight,
-            "offsetX": root.horizontalOffset,
-            "offsetY": root.outerGap,
-            "topLeftRadius": root.compactFaceHeight / 2,
-            "topRightRadius": root.compactFaceHeight / 2,
-            "bottomLeftRadius": root.compactFaceHeight / 2,
-            "bottomRightRadius": root.compactFaceHeight / 2
-        })
-    readonly property var launcherExpandedTarget: ({
-            "width": 680,
-            "height": 560,
+    function sheetTarget(width, height) {
+        return {
+            "width": width,
+            "height": height,
             "offsetX": root.horizontalOffset,
             "offsetY": root.outerGap,
             "topLeftRadius": root.anchoredRadius,
             "topRightRadius": root.anchoredRadius,
             "bottomLeftRadius": root.freeRadius,
             "bottomRightRadius": root.freeRadius
-        })
-    readonly property var controlCenterCompactTarget: ({
-            "width": root.controlCenterCompactWidth,
-            "height": root.compactFaceHeight,
-            "offsetX": root.horizontalOffset,
-            "offsetY": root.outerGap,
-            "topLeftRadius": root.compactFaceHeight / 2,
-            "topRightRadius": root.compactFaceHeight / 2,
-            "bottomLeftRadius": root.compactFaceHeight / 2,
-            "bottomRightRadius": root.compactFaceHeight / 2
-        })
-    readonly property var controlCenterExpandedTarget: ({
-            "width": 580,
-            "height": root.controlCenterHeight,
-            "offsetX": root.horizontalOffset,
-            "offsetY": root.outerGap,
-            "topLeftRadius": root.anchoredRadius,
-            "topRightRadius": root.anchoredRadius,
-            "bottomLeftRadius": root.freeRadius,
-            "bottomRightRadius": root.freeRadius
-        })
-    readonly property var wallpaperCompactTarget: ({
-            "width": root.wallpaperCompactWidth,
-            "height": root.compactFaceHeight,
-            "offsetX": root.horizontalOffset,
-            "offsetY": root.outerGap,
-            "topLeftRadius": root.compactFaceHeight / 2,
-            "topRightRadius": root.compactFaceHeight / 2,
-            "bottomLeftRadius": root.compactFaceHeight / 2,
-            "bottomRightRadius": root.compactFaceHeight / 2
-        })
-    readonly property var wallpaperExpandedTarget: ({
-            "width": 700,
-            "height": 452,
-            "offsetX": root.horizontalOffset,
-            "offsetY": root.outerGap,
-            "topLeftRadius": root.anchoredRadius,
-            "topRightRadius": root.anchoredRadius,
-            "bottomLeftRadius": root.freeRadius,
-            "bottomRightRadius": root.freeRadius
-        })
-    readonly property var weatherCompactTarget: ({
-            "width": root.weatherCompactWidth,
-            "height": root.compactFaceHeight,
-            "offsetX": root.horizontalOffset,
-            "offsetY": root.outerGap,
-            "topLeftRadius": root.compactFaceHeight / 2,
-            "topRightRadius": root.compactFaceHeight / 2,
-            "bottomLeftRadius": root.compactFaceHeight / 2,
-            "bottomRightRadius": root.compactFaceHeight / 2
-        })
-    readonly property var weatherExpandedTarget: ({
-            "width": SettingsData.showWeekNumber ? 736 : 700,
-            "height": 452,
-            "offsetX": root.horizontalOffset,
-            "offsetY": root.outerGap,
-            "topLeftRadius": root.anchoredRadius,
-            "topRightRadius": root.anchoredRadius,
-            "bottomLeftRadius": root.freeRadius,
-            "bottomRightRadius": root.freeRadius
-        })
-    readonly property var systemCompactTarget: ({
-            "width": SettingsData.osdAlwaysShowValue ? 330 : 282,
-            "height": root.compactFaceHeight,
-            "offsetX": root.horizontalOffset,
-            "offsetY": root.outerGap,
-            "topLeftRadius": root.compactFaceHeight / 2,
-            "topRightRadius": root.compactFaceHeight / 2,
-            "bottomLeftRadius": root.compactFaceHeight / 2,
-            "bottomRightRadius": root.compactFaceHeight / 2
-        })
-    readonly property var systemExpandedTarget: ({
-            "width": 460,
-            "height": 176,
-            "offsetX": root.horizontalOffset,
-            "offsetY": root.outerGap,
-            "topLeftRadius": root.anchoredRadius,
-            "topRightRadius": root.anchoredRadius,
-            "bottomLeftRadius": root.freeRadius,
-            "bottomRightRadius": root.freeRadius
-        })
-    readonly property var notificationCompactTarget: ({
-            "width": root.compactDense ? 320 : 360,
-            "height": root.compactFaceHeight,
-            "offsetX": root.horizontalOffset,
-            "offsetY": root.outerGap,
-            "topLeftRadius": root.compactFaceHeight / 2,
-            "topRightRadius": root.compactFaceHeight / 2,
-            "bottomLeftRadius": root.compactFaceHeight / 2,
-            "bottomRightRadius": root.compactFaceHeight / 2
-        })
-    readonly property var notificationExpandedTarget: ({
-            "width": 520,
-            "height": 220,
-            "offsetX": root.horizontalOffset,
-            "offsetY": root.outerGap,
-            "topLeftRadius": root.anchoredRadius,
-            "topRightRadius": root.anchoredRadius,
-            "bottomLeftRadius": root.freeRadius,
-            "bottomRightRadius": root.freeRadius
-        })
-    readonly property var notificationCenterCompactTarget: ({
-            "width": root.notificationCenterCompactWidth,
-            "height": root.compactFaceHeight,
-            "offsetX": root.horizontalOffset,
-            "offsetY": root.outerGap,
-            "topLeftRadius": root.compactFaceHeight / 2,
-            "topRightRadius": root.compactFaceHeight / 2,
-            "bottomLeftRadius": root.compactFaceHeight / 2,
-            "bottomRightRadius": root.compactFaceHeight / 2
-        })
-    readonly property var notificationCenterExpandedTarget: ({
-            "width": 480,
-            "height": root.notificationCenterHeight,
-            "offsetX": root.horizontalOffset,
-            "offsetY": root.outerGap,
-            "topLeftRadius": root.anchoredRadius,
-            "topRightRadius": root.anchoredRadius,
-            "bottomLeftRadius": root.freeRadius,
-            "bottomRightRadius": root.freeRadius
-        })
+        };
+    }
+
+    readonly property var homeCompactTarget: pillTarget(homeCompactWidth, homeCompactFaceHeight)
+    readonly property var homeExpandedTarget: sheetTarget(SettingsData.showWeekNumber ? 736 : 700, 452)
+    readonly property var mediaCompactTarget: pillTarget(mediaCompactWidth, compactFaceHeight)
+    readonly property var mediaExpandedTarget: sheetTarget(600, 352)
+    readonly property var launcherExpandedTarget: sheetTarget(680, 560)
+    readonly property var controlCenterExpandedTarget: sheetTarget(580, controlCenterHeight)
+    readonly property var wallpaperExpandedTarget: sheetTarget(700, 452)
+    readonly property var weatherExpandedTarget: sheetTarget(SettingsData.showWeekNumber ? 736 : 700, 452)
+    readonly property var systemCompactTarget: pillTarget(SettingsData.osdAlwaysShowValue ? 330 : 282, compactFaceHeight)
+    readonly property var systemExpandedTarget: sheetTarget(460, 176)
+    readonly property var notificationCompactTarget: pillTarget(compactDense ? 320 : 360, compactFaceHeight)
+    readonly property var notificationExpandedTarget: sheetTarget(520, 220)
+    readonly property var notificationCenterExpandedTarget: sheetTarget(480, notificationCenterHeight)
+
     readonly property bool systemActivityActive: activeActivity === "volume" || activeActivity === "brightness"
     readonly property bool notificationActive: activeActivity === "notification"
     readonly property bool notificationHeldForSystem: root.systemActivityActive && root.transientReturnActivity === "notification"
     readonly property bool transientActive: systemActivityActive || notificationActive
     readonly property bool timeoutSuspended: pointerInside || (expanded && !notificationActive)
-    readonly property var fullDestinations: ["launcher", "controlcenter", "wallpaper", "weather", "notificationcenter"]
-    readonly property bool activityOwnsBlankClicks: root.fullDestinations.indexOf(root.activeActivity) !== -1
+    readonly property bool activityOwnsBlankClicks: isDestination(activeActivity)
     readonly property bool hoverExpandEnabled: root.interactionMode === "hybrid" && !root.systemActivityActive
     readonly property var compactTarget: {
-        if (root.notificationActive)
-            return root.notificationCompactTarget;
-        switch (root.activeActivity) {
-        case "launcher":
-            return root.launcherCompactTarget;
-        case "controlcenter":
-            return root.controlCenterCompactTarget;
-        case "wallpaper":
-            return root.wallpaperCompactTarget;
-        case "weather":
-            return root.weatherCompactTarget;
-        case "notificationcenter":
-            return root.notificationCenterCompactTarget;
-        case "media":
-            return root.mediaCompactTarget;
-        }
-        return root.systemActivityActive ? root.systemCompactTarget : root.homeCompactTarget;
+        if (notificationActive)
+            return notificationCompactTarget;
+        if (systemActivityActive)
+            return systemCompactTarget;
+        if (isDestination(activeActivity))
+            return pillTarget(destinationCompactWidth(activeActivity), compactFaceHeight);
+        return activeActivity === "media" ? mediaCompactTarget : homeCompactTarget;
     }
     readonly property var expandedTarget: {
-        if (root.notificationActive)
-            return root.notificationExpandedTarget;
-        switch (root.activeActivity) {
+        if (notificationActive)
+            return notificationExpandedTarget;
+        if (systemActivityActive)
+            return systemExpandedTarget;
+        switch (activeActivity) {
         case "launcher":
-            return root.launcherExpandedTarget;
+            return launcherExpandedTarget;
         case "controlcenter":
-            return root.controlCenterExpandedTarget;
+            return controlCenterExpandedTarget;
         case "wallpaper":
-            return root.wallpaperExpandedTarget;
+            return wallpaperExpandedTarget;
         case "weather":
-            return root.weatherExpandedTarget;
+            return weatherExpandedTarget;
         case "notificationcenter":
-            return root.notificationCenterExpandedTarget;
+            return notificationCenterExpandedTarget;
         case "media":
-            return root.mediaExpandedTarget;
+            return mediaExpandedTarget;
         }
-        return root.systemActivityActive ? root.systemExpandedTarget : root.homeExpandedTarget;
+        return homeExpandedTarget;
     }
     readonly property var targetDescriptor: expanded ? expandedTarget : compactTarget
 
     function syncNotificationTimeout(restart) {
-        // Hover pauses arrival expiry; opt-in expansion remains a timed glance.
         if (!notificationActive || timeoutSuspended || notificationTimeout <= 0) {
             notificationTimer.stop();
             return;
@@ -443,7 +384,6 @@ QtObject {
     }
 
     onInputSuspendedChanged: {
-        // Screenshot selection owns input while the island remains mapped for the session.
         if (!inputSuspended)
             return;
         hoverExpanded = false;
@@ -452,13 +392,9 @@ QtObject {
         keyboardDismissRequested = false;
         expanded = false;
         keyboardYielded = false;
-        launcherRequestPending = false;
         launcherSessionActive = false;
-        controlCenterRequestPending = false;
-        wallpaperRequestPending = false;
-        weatherRequestPending = false;
-        notificationCenterRequestPending = false;
-        if (fullDestinations.indexOf(activeActivity) !== -1)
+        clearPendingRequests("");
+        if (activityOwnsBlankClicks)
             activeActivity = mediaAvailable && mediaPreferred ? "media" : "home";
     }
 
@@ -504,11 +440,7 @@ QtObject {
         if (notificationActive && !notificationExpandAllowed)
             return requestNotificationCenter(false);
         hoverExpanded = false;
-        launcherRequestPending = false;
-        controlCenterRequestPending = false;
-        wallpaperRequestPending = false;
-        weatherRequestPending = false;
-        notificationCenterRequestPending = false;
+        clearPendingRequests("");
         hoverCloseTimer.stop();
         transientTimer.stop();
         notificationTimer.stop();
@@ -525,12 +457,8 @@ QtObject {
         keyboardDismissRequested = false;
         keyboardYielded = false;
         expanded = false;
-        launcherRequestPending = false;
         launcherSessionActive = false;
-        controlCenterRequestPending = false;
-        wallpaperRequestPending = false;
-        weatherRequestPending = false;
-        notificationCenterRequestPending = false;
+        clearPendingRequests("");
         if (notificationActive) {
             resumeAfterNotification(false);
             return true;
@@ -539,12 +467,8 @@ QtObject {
             finishTransient();
             return true;
         }
-
-        if (activityOwnsBlankClicks) {
+        if (activityOwnsBlankClicks)
             activeActivity = mediaAvailable && mediaPreferred ? "media" : "home";
-            return true;
-        }
-
         return true;
     }
 
@@ -553,13 +477,14 @@ QtObject {
             return "notification";
         if (activityId === "media" && !mediaAvailable)
             return "home";
-        if (activityId === "home" || activityId === "media" || fullDestinations.indexOf(activityId) !== -1)
+        if (activityId === "home" || activityId === "media" || isDestination(activityId))
             return activityId;
         return mediaAvailable && mediaPreferred ? "media" : "home";
     }
 
     function requestActivity(activityId, shouldExpand, requestKeyboardFocus) {
-        if (activityId !== "home" && activityId !== "media" && fullDestinations.indexOf(activityId) === -1)
+        const destination = isDestination(activityId);
+        if (activityId !== "home" && activityId !== "media" && !destination)
             return false;
         if (inputSuspended && shouldExpand === true)
             return false;
@@ -568,24 +493,9 @@ QtObject {
         if (activityId === "weather" && !SettingsData.weatherEnabled)
             return false;
 
-        if (activityId !== "launcher") {
-            launcherRequestPending = false;
+        if (activityId !== "launcher")
             launcherSessionActive = false;
-        }
-        if (activityId !== "controlcenter")
-            controlCenterRequestPending = false;
-        if (activityId === "wallpaper")
-            wallpaperReleaseTimer.stop();
-        else
-            wallpaperRequestPending = false;
-        if (activityId === "weather")
-            weatherReleaseTimer.stop();
-        else
-            weatherRequestPending = false;
-        if (activityId === "notificationcenter")
-            notificationCenterReleaseTimer.stop();
-        else
-            notificationCenterRequestPending = false;
+        clearPendingRequests(activityId);
 
         if (activeActivity === activityId && expanded && shouldExpand === true) {
             if (requestKeyboardFocus === true) {
@@ -595,35 +505,15 @@ QtObject {
             return true;
         }
 
-        if (activityId === "launcher" && shouldExpand === true && !launcherVisualsReady) {
-            launcherRequestPending = true;
-            _launcherPendingExpand = true;
-            _launcherPendingKeyboardFocus = requestKeyboardFocus === true;
-            launcherVisualsRequested = true;
-            return true;
-        }
-
-        if (activityId === "controlcenter" && shouldExpand === true && !controlCenterVisualsReady) {
-            controlCenterRequestPending = true;
-            controlCenterVisualsRequested = true;
-            return true;
-        }
-
-        if (activityId === "wallpaper" && shouldExpand === true && !wallpaperVisualsReady) {
-            wallpaperRequestPending = true;
-            wallpaperVisualsRequested = true;
-            return true;
-        }
-
-        if (activityId === "weather" && shouldExpand === true && !weatherVisualsReady) {
-            weatherRequestPending = true;
-            weatherVisualsRequested = true;
-            return true;
-        }
-
-        if (activityId === "notificationcenter" && shouldExpand === true && !notificationCenterVisualsReady) {
-            notificationCenterRequestPending = true;
-            notificationCenterVisualsRequested = true;
+        if (destination && shouldExpand === true && !visualsReady(activityId)) {
+            const entry = destinationState[activityId];
+            entry.pending = true;
+            entry.requested = true;
+            destinationRevision++;
+            if (activityId === "launcher") {
+                _launcherPendingExpand = true;
+                _launcherPendingKeyboardFocus = requestKeyboardFocus === true;
+            }
             return true;
         }
 
@@ -632,24 +522,15 @@ QtObject {
         hoverOpenTimer.stop();
         hoverCloseTimer.stop();
         transientTimer.stop();
-        // IPC and other destinations consume the card so its timeout cannot snap back.
-        root.consumeTransientNotification();
+        consumeTransientNotification();
         keyboardDismissRequested = shouldExpand === true && requestKeyboardFocus === true;
         expanded = shouldExpand === true;
         activeActivity = activityId;
-        if (activityId === "media")
-            mediaPreferred = true;
-        else if (activityId === "home")
-            mediaPreferred = false;
+        if (activityId === "media" || activityId === "home")
+            mediaPreferred = activityId === "media";
         launcherSessionActive = activityId === "launcher" && expanded;
-        if (launcherSessionActive)
-            launcherSessionSerial++;
-        if (activityId === "controlcenter" && expanded)
-            controlCenterSessionSerial++;
-        if (activityId === "wallpaper" && expanded)
-            wallpaperSessionSerial++;
-        if (activityId === "notificationcenter" && expanded)
-            notificationCenterSessionSerial++;
+        if (destination && expanded)
+            sessionStarted(activityId);
         return true;
     }
 
@@ -680,162 +561,11 @@ QtObject {
         return requestActivity("weather", true, true);
     }
 
-    function markLauncherVisualsReady() {
-        launcherVisualsReady = true;
-        if (!launcherRequestPending)
-            return;
-        launcherRequestPending = false;
-        requestActivity("launcher", _launcherPendingExpand, _launcherPendingKeyboardFocus);
-    }
-
-    function releaseLauncherVisuals() {
-        if (expanded && activeActivity === "launcher") {
-            launcherReleaseTimer.stop();
-            return;
-        }
-        if (!launcherVisualsRequested && !launcherVisualsReady)
-            return;
-        launcherReleaseTimer.restart();
-    }
-
-    function _dropLauncherVisuals() {
-        launcherReleaseTimer.stop();
-        if (expanded && activeActivity === "launcher")
-            return;
-        launcherRequestPending = false;
-        launcherVisualsRequested = false;
-        launcherVisualsReady = false;
-        launcherSessionActive = false;
-        launcherInputFocused = false;
-        launcherPendingQuery = "";
-        launcherPendingMode = "";
-    }
-
-    function markControlCenterVisualsReady() {
-        controlCenterVisualsReady = true;
-        if (!controlCenterRequestPending)
-            return;
-        controlCenterRequestPending = false;
-        requestActivity("controlcenter", true, true);
-    }
-
-    function releaseControlCenterVisuals() {
-        if (expanded && activeActivity === "controlcenter") {
-            controlCenterReleaseTimer.stop();
-            return;
-        }
-        if (!controlCenterVisualsRequested && !controlCenterVisualsReady)
-            return;
-        controlCenterReleaseTimer.restart();
-    }
-
-    function _dropControlCenterVisuals() {
-        controlCenterReleaseTimer.stop();
-        if (expanded && activeActivity === "controlcenter")
-            return;
-        controlCenterRequestPending = false;
-        controlCenterVisualsRequested = false;
-        controlCenterVisualsReady = false;
-        controlCenterPendingSection = "";
-        controlCenterContentHeight = 420;
-    }
-
     function requestNotificationCenter(shouldToggle) {
         if (shouldToggle === true && activeActivity === "notificationcenter" && expanded)
             return requestCollapse();
         root.consumeTransientNotification();
         return requestActivity("notificationcenter", true, true);
-    }
-
-    function markNotificationCenterVisualsReady() {
-        notificationCenterVisualsReady = true;
-        if (!notificationCenterRequestPending)
-            return;
-        notificationCenterRequestPending = false;
-        requestActivity("notificationcenter", true, true);
-    }
-
-    function setNotificationCenterContentHeight(height) {
-        const next = Math.round(height);
-        if (!isFinite(next) || Math.abs(next - notificationCenterContentHeight) < 1)
-            return;
-        notificationCenterContentHeight = next;
-    }
-
-    function releaseNotificationCenterVisuals() {
-        if (expanded && activeActivity === "notificationcenter") {
-            notificationCenterReleaseTimer.stop();
-            return;
-        }
-        if (!notificationCenterVisualsRequested && !notificationCenterVisualsReady)
-            return;
-        notificationCenterReleaseTimer.restart();
-    }
-
-    function _dropNotificationCenterVisuals() {
-        notificationCenterReleaseTimer.stop();
-        notificationCenterRequestPending = false;
-        notificationCenterVisualsRequested = false;
-        notificationCenterVisualsReady = false;
-        notificationCenterContentHeight = 320;
-    }
-
-    function markWallpaperVisualsReady() {
-        wallpaperVisualsReady = true;
-        if (!wallpaperRequestPending)
-            return;
-        wallpaperRequestPending = false;
-        requestActivity("wallpaper", true, true);
-    }
-
-    function releaseWallpaperVisuals() {
-        if (expanded && activeActivity === "wallpaper") {
-            wallpaperReleaseTimer.stop();
-            return;
-        }
-        if (!wallpaperVisualsRequested && !wallpaperVisualsReady)
-            return;
-        wallpaperReleaseTimer.restart();
-    }
-
-    function _dropWallpaperVisuals() {
-        wallpaperReleaseTimer.stop();
-        wallpaperRequestPending = false;
-        wallpaperVisualsRequested = false;
-        wallpaperVisualsReady = false;
-        keyboardYielded = false;
-    }
-
-    function markWeatherVisualsReady() {
-        weatherVisualsReady = true;
-        if (!weatherRequestPending)
-            return;
-        weatherRequestPending = false;
-        requestActivity("weather", true, true);
-    }
-
-    function releaseWeatherVisuals() {
-        if (expanded && activeActivity === "weather") {
-            weatherReleaseTimer.stop();
-            return;
-        }
-        if (!weatherVisualsRequested && !weatherVisualsReady)
-            return;
-        weatherReleaseTimer.restart();
-    }
-
-    function _dropWeatherVisuals() {
-        weatherReleaseTimer.stop();
-        weatherRequestPending = false;
-        weatherVisualsRequested = false;
-        weatherVisualsReady = false;
-    }
-
-    function setControlCenterContentHeight(height) {
-        const next = Math.round(height);
-        if (!isFinite(next) || Math.abs(next - controlCenterContentHeight) < 1)
-            return;
-        controlCenterContentHeight = next;
     }
 
     function cycleActivity(direction, shouldExpand) {
@@ -874,12 +604,8 @@ QtObject {
         if (activityId !== "volume" && activityId !== "brightness")
             return false;
 
-        launcherRequestPending = false;
         launcherSessionActive = false;
-        controlCenterRequestPending = false;
-        wallpaperRequestPending = false;
-        weatherRequestPending = false;
-        notificationCenterRequestPending = false;
+        clearPendingRequests("");
 
         if (notificationActive) {
             notificationTimer.stop();
@@ -927,16 +653,10 @@ QtObject {
         if (!canRequestNotification(critical))
             return false;
 
-        if (notificationActive) {
+        if (notificationActive)
             return refreshNotification();
-        }
 
-        launcherRequestPending = false;
-        controlCenterRequestPending = false;
-        wallpaperRequestPending = false;
-        weatherRequestPending = false;
-        notificationCenterRequestPending = false;
-
+        clearPendingRequests("");
         transientTimer.stop();
         suspendedActivity = activeActivity;
         suspendedExpanded = expanded;
@@ -971,14 +691,8 @@ QtObject {
         keyboardDismissRequested = nextKeyboardDismissRequested;
         activeActivity = nextActivity;
         launcherSessionActive = nextActivity === "launcher" && nextExpanded;
-        if (launcherSessionActive)
-            launcherSessionSerial++;
-        if (nextActivity === "controlcenter" && nextExpanded)
-            controlCenterSessionSerial++;
-        if (nextActivity === "wallpaper" && nextExpanded)
-            wallpaperSessionSerial++;
-        if (nextActivity === "notificationcenter" && nextExpanded)
-            notificationCenterSessionSerial++;
+        if (nextExpanded && isDestination(nextActivity))
+            sessionStarted(nextActivity);
         if (systemActivityActive && !expanded)
             transientTimer.restart();
     }
@@ -1029,17 +743,17 @@ QtObject {
 
     function updatePointerInside(inside) {
         pointerInside = inside === true;
-        if (pointerInside) {
-            hoverCloseTimer.stop();
-            if (hoverExpandEnabled && !expanded && !slotHovered)
-                hoverOpenTimer.restart();
-        } else {
+        syncNotificationTimeout(!pointerInside);
+        syncTransientTimeout(!pointerInside);
+        if (!pointerInside) {
             hoverOpenTimer.stop();
             if (hoverExpanded && expanded && !mediaDropdownOpen)
                 hoverCloseTimer.restart();
+            return true;
         }
-        syncNotificationTimeout(!pointerInside);
-        syncTransientTimeout(!pointerInside);
+        hoverCloseTimer.stop();
+        if (hoverExpandEnabled && !expanded && !slotHovered)
+            hoverOpenTimer.restart();
         return true;
     }
 
@@ -1058,13 +772,6 @@ QtObject {
             if (!root.pointerInside && !root.mediaDropdownOpen && root.hoverExpanded)
                 root.requestHoverCollapse();
         }
-    }
-
-    property Timer autoDemoTimer: Timer {
-        interval: 1600
-        repeat: true
-        running: root.autoDemo
-        onTriggered: root.requestToggle(false)
     }
 
     property Timer mediaReturnTimer: Timer {
@@ -1092,28 +799,8 @@ QtObject {
         onTriggered: root.completeNotification()
     }
 
-    property Timer launcherReleaseTimer: Timer {
+    property Timer visualsReleaseTimer: Timer {
         interval: 260
-        onTriggered: root._dropLauncherVisuals()
-    }
-
-    property Timer controlCenterReleaseTimer: Timer {
-        interval: 260
-        onTriggered: root._dropControlCenterVisuals()
-    }
-
-    property Timer wallpaperReleaseTimer: Timer {
-        interval: 260
-        onTriggered: root._dropWallpaperVisuals()
-    }
-
-    property Timer weatherReleaseTimer: Timer {
-        interval: 260
-        onTriggered: root._dropWeatherVisuals()
-    }
-
-    property Timer notificationCenterReleaseTimer: Timer {
-        interval: 260
-        onTriggered: root._dropNotificationCenterVisuals()
+        onTriggered: root.dropIdleVisuals()
     }
 }

@@ -48,7 +48,7 @@ Item {
                 width: parent.width
                 iconName: "view_in_ar"
                 title: I18n.tr("Dank Island - Beta")
-                settingKey: "dankIslandBarId"
+                settingKey: "dankIslandInstance"
 
                 SettingsButtonGroupRow {
                     settingKey: "dankIslandBarId"
@@ -260,11 +260,13 @@ Item {
                     tags: ["island", "appearance", "palette", "surface", "bright", "dim"]
                     text: I18n.tr("Palette")
                     model: [I18n.tr("Default"), I18n.tr("Bright"), I18n.tr("Dim")]
-                    currentIndex: SettingsData.dankIslandPalette === "bright" ? 1 : SettingsData.dankIslandPalette === "dim" ? 2 : 0
+                    readonly property var _paletteValues: ["default", "bright", "dim"]
+
+                    currentIndex: Math.max(0, _paletteValues.indexOf(SettingsData.dankIslandPalette))
                     onSelectionChanged: (index, selected) => {
                         if (!selected)
                             return;
-                        SettingsData.set("dankIslandPalette", index === 1 ? "bright" : index === 2 ? "dim" : "default");
+                        SettingsData.set("dankIslandPalette", _paletteValues[index] ?? "default");
                     }
                 }
 
@@ -369,7 +371,7 @@ Item {
             SettingsCard {
                 width: parent.width
                 iconName: "touch_app"
-                title: I18n.tr("Interaction")
+                title: I18n.tr("Behavior")
                 settingKey: "dankIslandInteraction"
                 enabled: SettingsData.dankIslandEnabled
 
@@ -399,7 +401,7 @@ Item {
                 SettingsSliderRow {
                     settingKey: "dankIslandHoverOpenDelay"
                     tags: ["island", "interaction", "hover", "open", "delay"]
-                    text: I18n.tr("Hover Open Delay")
+                    text: I18n.tr("Open Delay")
                     unit: "ms"
                     minimum: 0
                     maximum: 1000
@@ -413,7 +415,7 @@ Item {
                 SettingsSliderRow {
                     settingKey: "dankIslandHoverCloseDelay"
                     tags: ["island", "interaction", "hover", "close", "delay"]
-                    text: I18n.tr("Hover Close Delay")
+                    text: I18n.tr("Hide Delay")
                     unit: "ms"
                     minimum: 0
                     maximum: 1000
@@ -435,6 +437,7 @@ Item {
 
                 SettingsToggleRow {
                     settingKey: "dankIslandReducedMotion"
+                    tags: ["island", "motion", "animation", "reduce", "accessibility", "spring"]
                     text: I18n.tr("Reduce Motion")
                     description: I18n.tr("Apply island geometry changes immediately without spring overshoot")
                     checked: SettingsData.dankIslandReducedMotion
@@ -443,6 +446,7 @@ Item {
 
                 SettingsSliderRow {
                     settingKey: "dankIslandSpringStiffness"
+                    tags: ["island", "motion", "spring", "stiffness", "animation"]
                     text: I18n.tr("Spring Stiffness")
                     description: I18n.tr("Higher values pull island toward its target more strongly")
                     minimum: 100
@@ -456,6 +460,7 @@ Item {
 
                 SettingsSliderRow {
                     settingKey: "dankIslandSpringDamping"
+                    tags: ["island", "motion", "spring", "damping", "bounce", "animation"]
                     text: I18n.tr("Spring Damping")
                     description: I18n.tr("Higher values settle island with less bounce")
                     minimum: 10
@@ -469,6 +474,7 @@ Item {
 
                 SettingsSliderRow {
                     settingKey: "dankIslandSpringMass"
+                    tags: ["island", "motion", "spring", "mass", "inertia", "animation"]
                     text: I18n.tr("Spring Mass")
                     description: I18n.tr("Higher percentages give island more inertia")
                     minimum: 25

@@ -23,7 +23,6 @@ Item {
     property real springStiffness: 560
     property real springDamping: 37
     property real springMass: 1
-    // Screen-space Y of the host strip's local origin; non-zero only on the bottom edge.
     property real hostOriginY: 0
     property string palette: "default"
     property bool highContrast: false
@@ -43,6 +42,10 @@ Item {
 
     readonly property alias inputMaskItem: inputEnvelope
     readonly property bool motionRunning: motion.running
+    readonly property real targetEdgeExtent: motion.targetOffsetY + motion.targetHeight
+    readonly property real currentEdgeExtent: motion.currentOffsetY + motion.currentHeight
+    property real motionStartEdgeExtent: 0
+    property real trackedHeight: 0
     readonly property Item mediaDropdownMaskItem: mediaDropdowns.__activePanel
     property real fadeCompactHeight: 48
     property real fadeExpandedHeight: 352
@@ -56,7 +59,6 @@ Item {
     readonly property real currentVisualHeight: motion.currentHeight
     readonly property real targetVisualX: (width - motion.targetWidth) / 2 + motion.targetOffsetX
     readonly property real targetVisualY: bottomEdge ? height - motion.targetOffsetY - motion.targetHeight : motion.targetOffsetY
-    // Activity hosts hand alignedY to full-screen windows, which need screen space, not surface space.
     readonly property real targetScreenY: targetVisualY + root.hostOriginY
     readonly property real targetVisualWidth: motion.targetWidth
     readonly property real targetVisualHeight: motion.targetHeight
@@ -72,29 +74,21 @@ Item {
             fadeExpandedHeight = controller.expandedTarget.height;
         else
             fadeCompactHeight = controller.compactTarget.height;
-        // A retarget leaves the frozen start stale, so widen it to cover where the island is now.
         if (motion.running)
             root.unionMotionStartBounds();
         motion.setTarget(controller.targetDescriptor);
         if (!motion.running)
-            root.releaseIdleVisuals();
+            root.controller.releaseIdleVisuals();
     }
 
     function unionMotionStartBounds() {
+        root.motionStartEdgeExtent = Math.max(root.motionStartEdgeExtent, root.currentEdgeExtent);
         const b = root.motionStartBounds;
         const left = Math.min(b.x, root.currentVisualX);
         const top = Math.min(b.y, root.currentVisualY);
         const right = Math.max(b.x + b.width, root.currentVisualX + motion.currentWidth);
         const bottom = Math.max(b.y + b.height, root.currentVisualY + motion.currentHeight);
         root.motionStartBounds = Qt.rect(left, top, right - left, bottom - top);
-    }
-
-    function releaseIdleVisuals() {
-        root.controller.releaseWallpaperVisuals();
-        root.controller.releaseWeatherVisuals();
-        root.controller.releaseNotificationCenterVisuals();
-        root.controller.releaseLauncherVisuals();
-        root.controller.releaseControlCenterVisuals();
     }
 
     function openMediaDropdown(type, pos) {
@@ -123,9 +117,19 @@ Item {
     }
 
     Component.onCompleted: {
+        trackedHeight = height;
         fadeCompactHeight = controller.compactTarget.height;
         fadeExpandedHeight = controller.expandedTarget.height;
         motion.snapTo(controller.targetDescriptor);
+    }
+
+    onHeightChanged: {
+        const delta = height - trackedHeight;
+        trackedHeight = height;
+        if (!bottomEdge || !motion.running || delta === 0)
+            return;
+        const b = motionStartBounds;
+        motionStartBounds = Qt.rect(b.x, b.y + delta, b.width, b.height);
     }
 
     Connections {
@@ -152,11 +156,12 @@ Item {
         function onRunningChanged() {
             if (motion.running) {
                 root.motionStartBounds = Qt.rect(root.currentVisualX, root.currentVisualY, motion.currentWidth, motion.currentHeight);
+                root.motionStartEdgeExtent = root.currentEdgeExtent;
                 if (root.controller.activeActivity === "media")
                     root.hideMediaDropdowns();
                 return;
             }
-            root.releaseIdleVisuals();
+            root.controller.releaseIdleVisuals();
         }
     }
 
@@ -180,7 +185,6 @@ Item {
     Item {
         id: inputEnvelope
 
-        // Cover underdamped overshoot for the frozen flight, scaled to travel.
         readonly property real overshootBudget: {
             if (!motion.running)
                 return 0;
@@ -216,7 +220,6 @@ Item {
         border.width: root.highContrast ? 2 : 0
         border.color: root.highContrast ? Theme.outlineStrong : "transparent"
 
-        // Full destinations keep blank clicks for their own content instead of collapsing.
         MouseArea {
             anchors.fill: parent
             acceptedButtons: Qt.LeftButton
@@ -236,6 +239,7 @@ Item {
             id: contentHost
 
             anchors.fill: parent
+            controller: root.controller
             morphProgress: root.morphProgress
             expanded: root.controller.expanded
             pointerInside: root.controller.pointerInside
@@ -246,32 +250,22 @@ Item {
             mediaExpandedComponent: expandedMediaComponent
             launcherCompactComponent: compactLauncherComponent
             launcherExpandedComponent: expandedLauncherComponent
-            launcherVisualsRequested: root.controller.launcherVisualsRequested
             controlCenterCompactComponent: compactControlCenterComponent
             controlCenterExpandedComponent: expandedControlCenterComponent
-            controlCenterVisualsRequested: root.controller.controlCenterVisualsRequested
             wallpaperCompactComponent: compactWallpaperComponent
             wallpaperExpandedComponent: expandedWallpaperComponent
-            wallpaperVisualsRequested: root.controller.wallpaperVisualsRequested
             weatherCompactComponent: compactWeatherComponent
             weatherExpandedComponent: expandedWeatherComponent
-            weatherVisualsRequested: root.controller.weatherVisualsRequested
             systemCompactComponent: compactSystemComponent
             systemExpandedComponent: expandedSystemComponent
             notificationCompactComponent: compactNotificationComponent
             notificationExpandedComponent: expandedNotificationComponent
             notificationCenterCompactComponent: compactNotificationCenterComponent
             notificationCenterExpandedComponent: expandedNotificationCenterComponent
-            notificationCenterVisualsRequested: root.controller.notificationCenterVisualsRequested
         }
 
         HoverHandler {
-            onHoveredChanged: {
-                if (hovered)
-                    root.controller.updatePointerInside(true);
-                else
-                    root.controller.updatePointerInside(false);
-            }
+            onHoveredChanged: root.controller.updatePointerInside(hovered)
         }
     }
 
@@ -335,7 +329,6 @@ Item {
             geometrySettled: !motion.running
             effectiveScreen: root.effectiveScreen
             alignedX: root.targetVisualX
-            // Surface-local on purpose: the media dropdowns it anchors live inside this surface.
             alignedY: root.targetVisualY
             alignedWidth: root.targetVisualWidth
             alignedHeight: root.targetVisualHeight
@@ -363,7 +356,6 @@ Item {
             launcherController: root.launcherController
             transientSurfaceTracker: root.launcherTransientSurfaceTracker
             effectiveScreen: root.effectiveScreen
-            // Settled bounds; animated values rebind the tree every frame.
             alignedX: root.targetVisualX
             alignedY: root.targetScreenY
         }
@@ -385,7 +377,6 @@ Item {
             effectiveScreen: root.effectiveScreen
             colorPickerModal: root.colorPickerModal
             powerMenuModalLoader: root.powerMenuModalLoader
-            // Settled bounds; animated values rebind the tree every frame.
             alignedX: root.targetVisualX
             alignedY: root.targetScreenY
             alignedWidth: root.targetVisualWidth

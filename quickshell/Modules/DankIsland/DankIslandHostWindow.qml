@@ -48,14 +48,13 @@ PanelWindow {
     readonly property var islandLayer: LayerShell.fromEnv("DMS_DANKISLAND_LAYER", usesOverlayLayer ? WlrLayer.Overlay : WlrLayer.Top)
     readonly property bool bottomEdge: SettingsData.dankIslandEdge === "bottom"
     readonly property int reservedStripHeight: Math.max(reserveHeight, outerGap + compactHeight)
-    // Input bands hug the anchored edge, which is the far side of the host when anchored bottom.
     readonly property int stripY: root.bottomEdge ? root.height - root.reservedStripHeight : 0
-    // Screen-space Y of this strip's local origin. Zero on top, where the two spaces coincide.
     readonly property int hostOriginY: root.bottomEdge ? Math.max(0, (root.screen?.height ?? 0) - root.height) : 0
     readonly property int outerGap: Math.max(0, Math.min(48, SettingsData.dankIslandOuterGap))
-    // The host is larger than the visible island to cover every clamped activity target.
     readonly property int maxActivityHeight: Math.max(560, Math.min(680, (screen?.height ?? 1080) - 200))
     readonly property int hostHeight: outerGap + maxActivityHeight + 8
+    readonly property int collapsedHostHeight: Math.max(reservedStripHeight, outerGap + Math.ceil(Math.max(controller.compactFaceHeight, satelliteHost.barThickness)) + 4)
+    readonly property bool hostTall: controller.expanded || surface.targetEdgeExtent > collapsedHostHeight || (surface.motionRunning && surface.motionStartEdgeExtent > collapsedHostHeight)
     readonly property int maxActivityWidth: 736
     readonly property real maximumHorizontalOffset: Math.max(0, (width - maxActivityWidth) / 2 - 8)
     property var colorPickerModal: null
@@ -65,7 +64,7 @@ PanelWindow {
     signal lockRequested
 
     color: "transparent"
-    implicitHeight: hostHeight
+    implicitHeight: hostTall ? hostHeight : collapsedHostHeight
     exclusiveZone: floating ? 0 : reservedStripHeight
     readonly property alias islandController: controller
     readonly property int launcherResultCount: launcherController.flatModel?.length ?? 0
@@ -156,14 +155,8 @@ PanelWindow {
     IslandController {
         id: controller
 
-        readonly property string interactionOverride: Quickshell.env("DMS_DANKISLAND_INTERACTION") ?? ""
-
-        interactionMode: {
-            const raw = interactionOverride || SettingsData.dankIslandInteractionMode;
-            return raw === "click" ? "click" : "hybrid";
-        }
+        interactionMode: SettingsData.dankIslandInteractionMode === "click" ? "click" : "hybrid"
         inputSuspended: PopoutManager.screenshotActive
-        autoDemo: Quickshell.env("DMS_DANKISLAND_DEMO") === "1"
         horizontalOffset: Math.max(-root.maximumHorizontalOffset, Math.min(root.maximumHorizontalOffset, SettingsData.dankIslandHorizontalOffset))
         outerGap: root.outerGap
         compactHeight: root.compactHeight
@@ -201,26 +194,25 @@ PanelWindow {
         }
     }
 
-    DmsMediaActivitySource {
+    IslandMediaSource {
         id: mediaSource
 
         controller: controller
     }
 
-    DmsSystemActivitySource {
+    IslandSystemSource {
         id: systemSource
 
         controller: controller
     }
 
-    DmsNotificationActivitySource {
+    IslandNotificationSource {
         id: notificationSource
 
         controller: controller
         targetScreen: root.screen
     }
 
-    // Empty strip dismisses satellite popouts while something is open; click-through otherwise.
     // PopoutManager mutates the map in place, so this tracks popoutChanged instead.
     property int popoutRevision: 0
     readonly property bool satelliteSurfacesOpen: {

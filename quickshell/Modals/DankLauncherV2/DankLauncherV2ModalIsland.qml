@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import qs.Services
 
@@ -98,10 +100,12 @@ Item {
             return;
         if (spotlightOpen) {
             _islandWasOpen = true;
-        } else if (_islandWasOpen) {
-            _islandWasOpen = false;
-            dialogClosed();
+            return;
         }
+        if (!_islandWasOpen)
+            return;
+        _islandWasOpen = false;
+        dialogClosed();
     }
 
     DankLauncherV2ModalSpotlight {

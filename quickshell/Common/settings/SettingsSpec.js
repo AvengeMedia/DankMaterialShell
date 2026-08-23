@@ -520,6 +520,7 @@ var SPEC = {
     notificationRules: { def: [] },
     notificationDndAllowCritical: { def: true },
     notificationFocusedMonitor: { def: false },
+
     dankIslandBarId: { def: "", onChange: "updateBarConfigs" },
     dankIslandFloating: { def: false },
     dankIslandUseOverlayLayer: { def: false },

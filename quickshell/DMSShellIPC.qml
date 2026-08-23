@@ -217,7 +217,7 @@ Item {
 
     IpcHandler {
         function open(): string {
-            if (PopoutService.routeControlCenterToIsland(null, "", false))
+            if (PopoutService.routeToIsland("controlcenter", null, false, ""))
                 return "CONTROL_CENTER_OPEN_SUCCESS";
             const bar = root.getPreferredBar("controlCenterButtonRef");
             if (bar) {
@@ -228,7 +228,7 @@ Item {
         }
 
         function hide(): string {
-            if (PopoutService.dankIslandRouter?.closeControlCenter?.() === true)
+            if (PopoutService.closeIslandActivity("controlcenter"))
                 return "CONTROL_CENTER_HIDE_SUCCESS";
             if (root.controlCenterLoader.item && root.controlCenterLoader.item.shouldBeVisible) {
                 root.controlCenterLoader.item.close();
@@ -242,7 +242,7 @@ Item {
                 root.controlCenterLoader.item.close();
                 return "CONTROL_CENTER_TOGGLE_SUCCESS";
             }
-            if (PopoutService.routeControlCenterToIsland(null, "", true))
+            if (PopoutService.routeToIsland("controlcenter", null, true, ""))
                 return "CONTROL_CENTER_TOGGLE_SUCCESS";
 
             const bar = root.getPreferredBar("controlCenterButtonRef");
@@ -313,13 +313,13 @@ Item {
         function _openDash(tab, position) {
             const tabId = _resolveTabId(tab);
             if (!position) {
-                if (tabId === "overview" && PopoutService.routeOverviewToIsland(null, false))
+                if (tabId === "overview" && PopoutService.routeToIsland("home", null, false))
                     return true;
-                if (tabId === "media" && PopoutService.routeMediaToIsland(null, false))
+                if (tabId === "media" && PopoutService.routeToIsland("media", null, false))
                     return true;
-                if (tabId === "wallpaper" && PopoutService.routeWallpaperToIsland(null, false))
+                if (tabId === "wallpaper" && PopoutService.routeToIsland("wallpaper", null, false))
                     return true;
-                if (tabId === "weather" && PopoutService.routeWeatherToIsland(null, false))
+                if (tabId === "weather" && PopoutService.routeToIsland("weather", null, false))
                     return true;
             }
 
@@ -348,13 +348,13 @@ Item {
 
             const tabId = _resolveTabId(tab);
             if (!position) {
-                if (tabId === "overview" && PopoutService.routeOverviewToIsland(null, true))
+                if (tabId === "overview" && PopoutService.routeToIsland("home", null, true))
                     return true;
-                if (tabId === "media" && PopoutService.routeMediaToIsland(null, true))
+                if (tabId === "media" && PopoutService.routeToIsland("media", null, true))
                     return true;
-                if (tabId === "wallpaper" && PopoutService.routeWallpaperToIsland(null, true))
+                if (tabId === "wallpaper" && PopoutService.routeToIsland("wallpaper", null, true))
                     return true;
-                if (tabId === "weather" && PopoutService.routeWeatherToIsland(null, true))
+                if (tabId === "weather" && PopoutService.routeToIsland("weather", null, true))
                     return true;
             }
 
@@ -377,7 +377,7 @@ Item {
         }
 
         function close(): string {
-            if (PopoutService.closeIslandHome() || PopoutService.closeIslandMedia() || PopoutService.closeIslandWallpaper() || PopoutService.closeIslandWeather())
+            if (PopoutService.closeIslandActivity("home") || PopoutService.closeIslandActivity("media") || PopoutService.closeIslandActivity("wallpaper") || PopoutService.closeIslandActivity("weather"))
                 return "DASH_CLOSE_SUCCESS";
             if (root.dankDashPopoutLoader.item) {
                 root.dankDashPopoutLoader.item.dashVisible = false;
@@ -785,7 +785,7 @@ Item {
     // ! TODO - remove for v1.6
     IpcHandler {
         function wallpaper(): string {
-            if (PopoutService.routeWallpaperToIsland(null, true))
+            if (PopoutService.routeToIsland("wallpaper", null, true))
                 return "WARN; deprecated, use dms ipc call dash toggle wallpaper instead";
             const bar = root.getPreferredBar("clockButtonRef") || root.getPreferredBar();
             if (bar) {

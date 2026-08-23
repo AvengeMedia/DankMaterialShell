@@ -11988,6 +11988,33 @@
     "description": "Solid material type or Outline"
   },
   {
+    "section": "dankIslandInteraction",
+    "label": "Behavior",
+    "tabIndex": 46,
+    "category": "Dank Island",
+    "keywords": [
+      "activities",
+      "behavior",
+      "click",
+      "compact",
+      "current",
+      "dank",
+      "dynamic island",
+      "expand",
+      "expands",
+      "face",
+      "hover",
+      "hybrid",
+      "intentional",
+      "interaction",
+      "island",
+      "peeks",
+      "press"
+    ],
+    "icon": "touch_app",
+    "description": "Click expands only on an intentional press. Hybrid peeks the current compact face on hover"
+  },
+  {
     "section": "dankIslandHomeCompactTight",
     "label": "Compact Clock Pill",
     "tabIndex": 46,
@@ -12036,7 +12063,7 @@
     "description": "Resize the resting island to align with nearby widgets"
   },
   {
-    "section": "dankIslandBarId",
+    "section": "dankIslandInstance",
     "label": "Dank Island - Beta",
     "tabIndex": 46,
     "category": "Dank Island",
@@ -12127,6 +12154,23 @@
     "description": "Floats above windows and other content"
   },
   {
+    "section": "dankIslandHoverCloseDelay",
+    "label": "Hide Delay",
+    "tabIndex": 46,
+    "category": "Dank Island",
+    "keywords": [
+      "activities",
+      "close",
+      "dank",
+      "delay",
+      "dynamic island",
+      "hide",
+      "hover",
+      "interaction",
+      "island"
+    ]
+  },
+  {
     "section": "dankIslandHighContrast",
     "label": "High Contrast",
     "tabIndex": 46,
@@ -12201,64 +12245,6 @@
     "description": "Move island and satellites left or right from display center"
   },
   {
-    "section": "dankIslandHoverCloseDelay",
-    "label": "Hover Close Delay",
-    "tabIndex": 46,
-    "category": "Dank Island",
-    "keywords": [
-      "activities",
-      "close",
-      "dank",
-      "delay",
-      "dynamic island",
-      "hover",
-      "interaction",
-      "island"
-    ]
-  },
-  {
-    "section": "dankIslandHoverOpenDelay",
-    "label": "Hover Open Delay",
-    "tabIndex": 46,
-    "category": "Dank Island",
-    "keywords": [
-      "activities",
-      "dank",
-      "delay",
-      "dynamic island",
-      "hover",
-      "interaction",
-      "island",
-      "open"
-    ]
-  },
-  {
-    "section": "dankIslandInteraction",
-    "label": "Interaction",
-    "tabIndex": 46,
-    "category": "Dank Island",
-    "keywords": [
-      "activities",
-      "click",
-      "compact",
-      "current",
-      "dank",
-      "dynamic island",
-      "expand",
-      "expands",
-      "face",
-      "hover",
-      "hybrid",
-      "intentional",
-      "interaction",
-      "island",
-      "peeks",
-      "press"
-    ],
-    "icon": "touch_app",
-    "description": "Click expands only on an intentional press. Hybrid peeks the current compact face on hover"
-  },
-  {
     "section": "_tab_46",
     "label": "Island",
     "tabIndex": 46,
@@ -12285,6 +12271,23 @@
       "satellite",
       "spacing",
       "widgets"
+    ]
+  },
+  {
+    "section": "dankIslandBarId",
+    "label": "Island Instance",
+    "tabIndex": 46,
+    "category": "Dank Island",
+    "keywords": [
+      "activities",
+      "bar",
+      "dank",
+      "dynamic island",
+      "instance",
+      "island",
+      "media",
+      "notifications",
+      "osd"
     ]
   },
   {
@@ -12348,6 +12351,7 @@
     "keywords": [
       "accessibility",
       "activities",
+      "animation",
       "apply",
       "changes",
       "dank",
@@ -12357,11 +12361,28 @@
       "island",
       "motion",
       "overshoot",
+      "reduce",
       "spring",
       "without"
     ],
     "icon": "animation",
     "description": "Apply island geometry changes immediately without spring overshoot"
+  },
+  {
+    "section": "dankIslandHoverOpenDelay",
+    "label": "Open Delay",
+    "tabIndex": 46,
+    "category": "Dank Island",
+    "keywords": [
+      "activities",
+      "dank",
+      "delay",
+      "dynamic island",
+      "hover",
+      "interaction",
+      "island",
+      "open"
+    ]
   },
   {
     "section": "dankIslandOuterGap",
@@ -12463,7 +12484,9 @@
     "tabIndex": 46,
     "category": "Dank Island",
     "keywords": [
+      "accessibility",
       "activities",
+      "animation",
       "apply",
       "changes",
       "dank",
@@ -12553,6 +12576,7 @@
     "category": "Dank Island",
     "keywords": [
       "activities",
+      "animation",
       "bounce",
       "damping",
       "dank",
@@ -12560,6 +12584,7 @@
       "higher",
       "island",
       "less",
+      "motion",
       "settle",
       "spring",
       "values"
@@ -12573,6 +12598,7 @@
     "category": "Dank Island",
     "keywords": [
       "activities",
+      "animation",
       "dank",
       "dynamic island",
       "give",
@@ -12581,6 +12607,7 @@
       "island",
       "mass",
       "more",
+      "motion",
       "percentages",
       "spring"
     ],
@@ -12593,11 +12620,13 @@
     "category": "Dank Island",
     "keywords": [
       "activities",
+      "animation",
       "dank",
       "dynamic island",
       "higher",
       "island",
       "more",
+      "motion",
       "pull",
       "spring",
       "stiffness",

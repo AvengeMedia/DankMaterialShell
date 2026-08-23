@@ -5,7 +5,6 @@ import qs.Common
 import qs.Modules.Notifications.Center
 import qs.Services
 
-// Shared notification center body hosted in the island silhouette.
 FocusScope {
     id: root
 
@@ -28,7 +27,6 @@ FocusScope {
         if (!hostContract.shouldBeVisible)
             return;
         root._sessionOpen = true;
-        // Suppresses transient island cards for as long as the list owns them.
         NotificationService.onOverlayOpen();
         keyboardController.reset();
         keyboardController.listView = content.notificationList;
@@ -56,14 +54,14 @@ FocusScope {
         Qt.callLater(() => {
             root._heightReportPending = false;
             content.notificationList.syncSessionContentHeight();
-            root.islandController.setNotificationCenterContentHeight(content.targetImplicitHeight + root.bottomInset);
+            root.islandController.setDestinationContentHeight("notificationcenter", content.targetImplicitHeight + root.bottomInset);
         });
     }
 
     function prepareVisuals() {
         content.notificationList.syncSessionContentHeight();
-        root.islandController.setNotificationCenterContentHeight(content.targetImplicitHeight + root.bottomInset);
-        root.islandController.markNotificationCenterVisualsReady();
+        root.islandController.setDestinationContentHeight("notificationcenter", content.targetImplicitHeight + root.bottomInset);
+        root.islandController.markVisualsReady("notificationcenter");
     }
 
     QtObject {
@@ -116,8 +114,9 @@ FocusScope {
     Connections {
         target: root.islandController
 
-        function onNotificationCenterSessionSerialChanged() {
-            Qt.callLater(root.beginSession);
+        function onSessionStarted(activityId) {
+            if (activityId === "notificationcenter")
+                Qt.callLater(root.beginSession);
         }
 
         function onExpandedChanged() {

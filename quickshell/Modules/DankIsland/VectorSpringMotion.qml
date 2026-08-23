@@ -44,7 +44,13 @@ QtObject {
     property real velocityBottomLeftRadius: 0
     property real velocityBottomRightRadius: 0
 
+    function matchesTarget(target) {
+        return targetWidth === target.width && targetHeight === target.height && targetOffsetX === target.offsetX && targetOffsetY === target.offsetY && targetTopLeftRadius === target.topLeftRadius && targetTopRightRadius === target.topRightRadius && targetBottomLeftRadius === target.bottomLeftRadius && targetBottomRightRadius === target.bottomRightRadius;
+    }
+
     function setTarget(target) {
+        if (matchesTarget(target))
+            return;
         targetWidth = target.width;
         targetHeight = target.height;
         targetOffsetX = target.offsetX;
@@ -94,13 +100,8 @@ QtObject {
     }
 
     function isSettled() {
-        const positionSettled = Math.abs(targetWidth - currentWidth) <= positionEpsilon && Math.abs(targetHeight - currentHeight) <= positionEpsilon
-            && Math.abs(targetOffsetX - currentOffsetX) <= positionEpsilon && Math.abs(targetOffsetY - currentOffsetY) <= positionEpsilon
-            && Math.abs(targetTopLeftRadius - currentTopLeftRadius) <= positionEpsilon && Math.abs(targetTopRightRadius - currentTopRightRadius) <= positionEpsilon
-            && Math.abs(targetBottomLeftRadius - currentBottomLeftRadius) <= positionEpsilon && Math.abs(targetBottomRightRadius - currentBottomRightRadius) <= positionEpsilon;
-        const velocitySettled = Math.abs(velocityWidth) <= velocityEpsilon && Math.abs(velocityHeight) <= velocityEpsilon && Math.abs(velocityOffsetX) <= velocityEpsilon
-            && Math.abs(velocityOffsetY) <= velocityEpsilon && Math.abs(velocityTopLeftRadius) <= velocityEpsilon && Math.abs(velocityTopRightRadius) <= velocityEpsilon
-            && Math.abs(velocityBottomLeftRadius) <= velocityEpsilon && Math.abs(velocityBottomRightRadius) <= velocityEpsilon;
+        const positionSettled = Math.abs(targetWidth - currentWidth) <= positionEpsilon && Math.abs(targetHeight - currentHeight) <= positionEpsilon && Math.abs(targetOffsetX - currentOffsetX) <= positionEpsilon && Math.abs(targetOffsetY - currentOffsetY) <= positionEpsilon && Math.abs(targetTopLeftRadius - currentTopLeftRadius) <= positionEpsilon && Math.abs(targetTopRightRadius - currentTopRightRadius) <= positionEpsilon && Math.abs(targetBottomLeftRadius - currentBottomLeftRadius) <= positionEpsilon && Math.abs(targetBottomRightRadius - currentBottomRightRadius) <= positionEpsilon;
+        const velocitySettled = Math.abs(velocityWidth) <= velocityEpsilon && Math.abs(velocityHeight) <= velocityEpsilon && Math.abs(velocityOffsetX) <= velocityEpsilon && Math.abs(velocityOffsetY) <= velocityEpsilon && Math.abs(velocityTopLeftRadius) <= velocityEpsilon && Math.abs(velocityTopRightRadius) <= velocityEpsilon && Math.abs(velocityBottomLeftRadius) <= velocityEpsilon && Math.abs(velocityBottomRightRadius) <= velocityEpsilon;
         return positionSettled && velocitySettled;
     }
 

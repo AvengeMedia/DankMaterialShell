@@ -39,52 +39,34 @@ Item {
             Column {
                 anchors.verticalCenter: parent.verticalCenter
                 width: parent.width - 46 - closeButton.width - parent.spacing * 2
-                spacing: 2
+                spacing: Theme.spacingXXS
 
-                Text {
+                StyledText {
                     width: parent.width
                     text: root.notificationModel.appName
                     color: Theme.surfaceText
-                    font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeMedium
                     font.weight: Font.DemiBold
                     elide: Text.ElideRight
                 }
 
-                Text {
+                StyledText {
                     width: parent.width
                     text: root.notificationModel.timeText
                     color: Theme.surfaceTextSecondary
-                    font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeSmall
                     elide: Text.ElideRight
                 }
             }
 
-            Rectangle {
+            DankActionButton {
                 id: closeButton
 
                 anchors.verticalCenter: parent.verticalCenter
-                width: 38
-                height: 38
-                radius: 19
-                color: closeArea.containsMouse ? Theme.surfaceTextHover : "transparent"
-
-                DankIcon {
-                    anchors.centerIn: parent
-                    name: "close"
-                    size: 21
-                    color: Theme.surfaceText
-                }
-
-                MouseArea {
-                    id: closeArea
-
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: root.notificationModel.dismiss()
-                }
+                iconName: "close"
+                iconSize: 21
+                buttonSize: 38
+                onClicked: root.notificationModel.dismiss()
             }
         }
 
@@ -99,11 +81,10 @@ Item {
             }
             spacing: Theme.spacingS
 
-            Text {
+            StyledText {
                 width: parent.width
                 text: root.notificationModel.summary
                 color: Theme.surfaceText
-                font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeLarge
                 font.weight: Font.DemiBold
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
@@ -111,11 +92,10 @@ Item {
                 elide: Text.ElideRight
             }
 
-            Text {
+            StyledText {
                 width: parent.width
                 text: root.notificationModel.body
                 color: Theme.surfaceTextMedium
-                font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeSmall
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 maximumLineCount: 3
@@ -134,61 +114,29 @@ Item {
             height: 34
             spacing: Theme.spacingS
 
-            Rectangle {
-                width: dismissLabel.implicitWidth + Theme.spacingL * 2
+            DankButton {
                 height: parent.height
                 radius: height / 2
-                color: dismissArea.containsMouse ? Theme.surfaceTextHover : "transparent"
+                text: I18n.tr("Dismiss")
+                backgroundColor: "transparent"
+                textColor: Theme.surfaceText
+                buttonHeight: parent.height
+                horizontalPadding: Theme.spacingL
                 border.width: 1
                 border.color: Theme.withAlpha(Theme.outline, 0.5)
-
-                Text {
-                    id: dismissLabel
-
-                    anchors.centerIn: parent
-                    text: "Dismiss"
-                    color: Theme.surfaceText
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontSizeSmall
-                    font.weight: Font.Medium
-                }
-
-                MouseArea {
-                    id: dismissArea
-
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: root.notificationModel.dismiss()
-                }
+                onClicked: root.notificationModel.dismiss()
             }
 
-            Rectangle {
+            DankButton {
                 visible: root.notificationModel.hasAction
-                width: actionLabel.implicitWidth + Theme.spacingL * 2
                 height: parent.height
                 radius: height / 2
-                color: actionArea.containsMouse ? Theme.primaryContainer : Theme.primary
-
-                Text {
-                    id: actionLabel
-
-                    anchors.centerIn: parent
-                    text: root.notificationModel.actionLabel
-                    color: actionArea.containsMouse ? Theme.primary : Theme.onPrimary
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontSizeSmall
-                    font.weight: Font.DemiBold
-                }
-
-                MouseArea {
-                    id: actionArea
-
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: root.notificationModel.activate()
-                }
+                text: root.notificationModel.actionLabel
+                backgroundColor: Theme.primary
+                textColor: Theme.onPrimary
+                buttonHeight: parent.height
+                horizontalPadding: Theme.spacingL
+                onClicked: root.notificationModel.activate()
             }
         }
     }

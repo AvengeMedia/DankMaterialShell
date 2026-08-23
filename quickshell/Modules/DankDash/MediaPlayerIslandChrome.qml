@@ -4,7 +4,6 @@ import QtQuick
 import Quickshell.Services.Mpris
 import Quickshell.Widgets
 import qs.Common
-import qs.Modules.DankIsland.Activities
 import qs.Services
 import qs.Widgets
 

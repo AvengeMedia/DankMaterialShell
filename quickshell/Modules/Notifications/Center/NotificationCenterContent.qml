@@ -4,7 +4,6 @@ import QtQuick
 import qs.Common
 import qs.Services
 
-// Host-agnostic notification center body; popout and island both host this.
 Item {
     id: root
 

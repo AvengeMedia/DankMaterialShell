@@ -5,7 +5,6 @@ import qs.Common
 import qs.Modules.ControlCenter
 import qs.Services
 
-// Shared Control Center body hosted in the island silhouette.
 FocusScope {
     id: root
 
@@ -17,7 +16,6 @@ FocusScope {
     property real alignedY: 0
     property real alignedWidth: 0
     property real alignedHeight: 0
-    // Report content height once per turn; the controller clamps it before retargeting the spring.
     property real bottomInset: Theme.spacingM
     property bool _heightReportPending: false
 
@@ -46,7 +44,7 @@ FocusScope {
         root._heightReportPending = true;
         Qt.callLater(() => {
             root._heightReportPending = false;
-            root.islandController.setControlCenterContentHeight(content.targetImplicitHeight + Theme.spacingXS + root.bottomInset);
+            root.islandController.setDestinationContentHeight("controlcenter", content.targetImplicitHeight + Theme.spacingXS + root.bottomInset);
         });
     }
 
@@ -59,7 +57,6 @@ FocusScope {
         property var expandedWidgetData: null
 
         readonly property bool shouldBeVisible: root.islandController.activeActivity === "controlcenter" && root.islandController.expanded
-        // The island has no outside chrome to click, so the header row closes it.
         readonly property bool headerTogglesClose: true
         readonly property bool powerMenuOpen: root.powerMenuModalLoader?.item?.shouldBeVisible ?? false
         readonly property var screen: root.effectiveScreen
@@ -111,7 +108,6 @@ FocusScope {
         root.releaseScanState();
     }
 
-    // Hot-unplug skips the visibility path; release scans here too.
     Component.onDestruction: {
         if (hostContract.shouldBeVisible)
             root.releaseScanState();
@@ -156,8 +152,9 @@ FocusScope {
     Connections {
         target: root.islandController
 
-        function onControlCenterSessionSerialChanged() {
-            Qt.callLater(root.beginSession);
+        function onSessionStarted(activityId) {
+            if (activityId === "controlcenter")
+                Qt.callLater(root.beginSession);
         }
 
         function onExpandedChanged() {
@@ -171,5 +168,5 @@ FocusScope {
         }
     }
 
-    Component.onCompleted: root.islandController.markControlCenterVisualsReady()
+    Component.onCompleted: root.islandController.markVisualsReady("controlcenter")
 }

@@ -43,23 +43,20 @@ Item {
             width: parent.width - root.iconSize - parent.spacing - (root.notificationModel.critical ? 3 + parent.spacing : 0)
             spacing: 1
 
-            // A dense pill keeps one line, so the app name folds into the summary.
-            Text {
+            StyledText {
                 width: parent.width
                 visible: !root.dense
                 text: root.notificationModel.appName + (root.notificationModel.timeText ? " · " + root.notificationModel.timeText : "")
                 color: Theme.surfaceTextSecondary
-                font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeSmall
                 font.weight: Font.Medium
                 elide: Text.ElideRight
             }
 
-            Text {
+            StyledText {
                 width: parent.width
                 text: root.dense && root.notificationModel.appName ? root.notificationModel.appName + " · " + root.notificationModel.summary : root.notificationModel.summary
                 color: Theme.surfaceText
-                font.family: Theme.fontFamily
                 font.pixelSize: root.dense ? Theme.fontSizeSmall : Theme.fontSizeMedium
                 font.weight: Font.DemiBold
                 elide: Text.ElideRight

@@ -1,10 +1,12 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import qs.Common
 
 Item {
     id: root
 
+    required property var controller
     required property real morphProgress
     required property bool expanded
     required property bool pointerInside
@@ -15,27 +17,21 @@ Item {
     required property Component mediaExpandedComponent
     required property Component launcherCompactComponent
     required property Component launcherExpandedComponent
-    required property bool launcherVisualsRequested
     required property Component controlCenterCompactComponent
     required property Component controlCenterExpandedComponent
-    required property bool controlCenterVisualsRequested
     required property Component wallpaperCompactComponent
     required property Component wallpaperExpandedComponent
-    required property bool wallpaperVisualsRequested
     required property Component weatherCompactComponent
     required property Component weatherExpandedComponent
-    required property bool weatherVisualsRequested
     required property Component systemCompactComponent
     required property Component systemExpandedComponent
     required property Component notificationCompactComponent
     required property Component notificationExpandedComponent
     required property Component notificationCenterCompactComponent
     required property Component notificationCenterExpandedComponent
-    required property bool notificationCenterVisualsRequested
 
     readonly property real compactFade: root.fadeCompact(root.morphProgress)
     readonly property real expandedFade: root.fadeExpanded(root.morphProgress)
-    // Outgoing faces freeze at the morph they were drawn at so they do not flash expanded.
     readonly property real outgoingCompactFade: root.fadeCompact(root.outgoingMorph)
     readonly property real outgoingExpandedFade: root.fadeExpanded(root.outgoingMorph)
     readonly property bool mediaSurfaceActive: root.activityId === "media" || root.outgoingActivity === "media"
@@ -103,7 +99,6 @@ Item {
             homeExpandedTouched = true;
     }
 
-    // Overview is latched on first pointer intent, not at startup.
     onPointerInsideChanged: {
         if (root.pointerInside)
             root.homeExpandedTouched = true;
@@ -126,14 +121,14 @@ Item {
         id: activityTransition
 
         PauseAnimation {
-            duration: 45
+            duration: Theme.shorterDuration
         }
 
         NumberAnimation {
             target: root
             property: "activityFade"
             to: 1
-            duration: 180
+            duration: Theme.mediumDuration
             easing.type: Easing.OutCubic
         }
 
@@ -156,12 +151,11 @@ Item {
         id: homeExpandedLoader
 
         anchors.fill: parent
-        // Latched: built on first expansion, then kept so later morphs never hitch.
         active: root.homeExpandedTouched
         asynchronous: true
         sourceComponent: root.homeExpandedComponent
         opacity: root.expandedOpacity("home")
-        visible: active || opacity > 0.001
+        visible: opacity > 0.001
         enabled: opacity >= 0.5
     }
 
@@ -201,7 +195,7 @@ Item {
         id: launcherExpandedLoader
 
         anchors.fill: parent
-        active: root.launcherVisualsRequested
+        active: root.controller.visualsRequested("launcher")
         asynchronous: true
         sourceComponent: root.launcherExpandedComponent
         opacity: root.expandedOpacity("launcher")
@@ -223,7 +217,7 @@ Item {
         id: controlCenterExpandedLoader
 
         anchors.fill: parent
-        active: root.controlCenterVisualsRequested
+        active: root.controller.visualsRequested("controlcenter")
         asynchronous: false
         sourceComponent: root.controlCenterExpandedComponent
         opacity: root.expandedOpacity("controlcenter")
@@ -245,11 +239,11 @@ Item {
         id: wallpaperExpandedLoader
 
         anchors.fill: parent
-        active: root.wallpaperVisualsRequested
+        active: root.controller.visualsRequested("wallpaper")
         asynchronous: true
         sourceComponent: root.wallpaperExpandedComponent
         opacity: root.expandedOpacity("wallpaper")
-        visible: active || opacity > 0.001
+        visible: opacity > 0.001
         enabled: opacity >= 0.5
     }
 
@@ -267,11 +261,11 @@ Item {
         id: weatherExpandedLoader
 
         anchors.fill: parent
-        active: root.weatherVisualsRequested
+        active: root.controller.visualsRequested("weather")
         asynchronous: true
         sourceComponent: root.weatherExpandedComponent
         opacity: root.expandedOpacity("weather")
-        visible: active || opacity > 0.001
+        visible: opacity > 0.001
         enabled: opacity >= 0.5
     }
 
@@ -289,7 +283,7 @@ Item {
         id: notificationCenterExpandedLoader
 
         anchors.fill: parent
-        active: root.notificationCenterVisualsRequested
+        active: root.controller.visualsRequested("notificationcenter")
         asynchronous: true
         sourceComponent: root.notificationCenterExpandedComponent
         opacity: root.expandedOpacity("notificationcenter")

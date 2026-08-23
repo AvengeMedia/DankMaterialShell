@@ -7,7 +7,6 @@ import qs.Modules.ControlCenter.Models
 import qs.Modules.ControlCenter.Details
 import qs.Widgets
 
-// Host-agnostic Control Center body; popout and island both host this.
 Rectangle {
     id: root
 

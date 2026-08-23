@@ -2,7 +2,6 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 
-// Compact-face slot click target; hover here suppresses island hover-expand.
 MouseArea {
     id: root
 

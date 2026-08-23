@@ -123,21 +123,21 @@ DankModal {
     IpcHandler {
         // DankIsland owns this trigger whenever it is the sole bar for the screen.
         function open(): string {
-            if (PopoutService.routeNotificationCenterToIsland(null, false))
+            if (PopoutService.routeToIsland("notificationcenter", null, false))
                 return "NOTIFICATION_ISLAND_OPEN_SUCCESS";
             notificationModal.show();
             return "NOTIFICATION_MODAL_OPEN_SUCCESS";
         }
 
         function close(): string {
-            if (PopoutService.closeIslandNotificationCenter())
+            if (PopoutService.closeIslandActivity("notificationcenter"))
                 return "NOTIFICATION_ISLAND_CLOSE_SUCCESS";
             notificationModal.hide();
             return "NOTIFICATION_MODAL_CLOSE_SUCCESS";
         }
 
         function toggle(): string {
-            if (PopoutService.routeNotificationCenterToIsland(null, true))
+            if (PopoutService.routeToIsland("notificationcenter", null, true))
                 return "NOTIFICATION_ISLAND_TOGGLE_SUCCESS";
             notificationModal.toggle();
             return "NOTIFICATION_MODAL_TOGGLE_SUCCESS";

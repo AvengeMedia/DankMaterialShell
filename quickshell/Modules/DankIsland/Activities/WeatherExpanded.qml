@@ -60,10 +60,10 @@ FocusScope {
 
     Component.onCompleted: {
         root.contentStaged = true;
-        root.islandController.markWeatherVisualsReady();
+        root.islandController.markVisualsReady("weather");
     }
 
     Component.onDestruction: {
-        root.islandController.weatherVisualsReady = false;
+        root.islandController.setVisualsReady("weather", false);
     }
 }

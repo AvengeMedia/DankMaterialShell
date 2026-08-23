@@ -141,84 +141,21 @@ Singleton {
     }
 
     readonly property bool islandControlCenterOpen: dankIslandRouter?.controlCenterOpen ?? false
-    readonly property bool islandMediaOpen: dankIslandRouter?.mediaOpen ?? false
-    readonly property bool islandWallpaperOpen: dankIslandRouter?.wallpaperOpen ?? false
-    readonly property bool islandWeatherOpen: dankIslandRouter?.weatherOpen ?? false
-    readonly property bool islandHomeOpen: dankIslandRouter?.homeOpen ?? false
-    readonly property bool islandNotificationCenterOpen: dankIslandRouter?.notificationCenterOpen ?? false
 
-    // Shared triggers use the island only when it owns that screen; false lets callers keep the popout path.
-    function routeControlCenterToIsland(screen, section, shouldToggle) {
+    function routeToIsland(activityId, screen, shouldToggle, section) {
         if (!_islandOwnsSharedTrigger(screen))
             return false;
         if (shouldToggle === true)
-            return dankIslandRouter.toggleControlCenter(section || "", screen ?? null);
-        return dankIslandRouter.openControlCenter(section || "", screen ?? null);
+            return dankIslandRouter.toggleActivity(activityId, screen ?? null, section || "") === true;
+        return dankIslandRouter.openActivity(activityId, screen ?? null, section || "") === true;
     }
 
-    // A missing media session is a deliberate fallback signal, not a handled request.
-    function routeMediaToIsland(screen, shouldToggle) {
-        if (!_islandOwnsSharedTrigger(screen))
-            return false;
-        if (shouldToggle === true)
-            return dankIslandRouter.toggleMedia(screen ?? null) === true;
-        return dankIslandRouter.openMedia(screen ?? null) === true;
-    }
-
-    function routeWallpaperToIsland(screen, shouldToggle) {
-        if (!_islandOwnsSharedTrigger(screen))
-            return false;
-        if (shouldToggle === true)
-            return dankIslandRouter.toggleWallpaper(screen ?? null) === true;
-        return dankIslandRouter.openWallpaper(screen ?? null) === true;
-    }
-
-    function routeWeatherToIsland(screen, shouldToggle) {
-        if (!_islandOwnsSharedTrigger(screen))
-            return false;
-        if (shouldToggle === true)
-            return dankIslandRouter.toggleWeather(screen ?? null) === true;
-        return dankIslandRouter.openWeather(screen ?? null) === true;
-    }
-
-    function routeOverviewToIsland(screen, shouldToggle) {
-        if (!_islandOwnsSharedTrigger(screen))
-            return false;
-        if (shouldToggle === true)
-            return dankIslandRouter.toggleHome(screen ?? null) === true;
-        return dankIslandRouter.openHome(screen ?? null) === true;
-    }
-
-    function routeNotificationCenterToIsland(screen, shouldToggle) {
-        if (!_islandOwnsSharedTrigger(screen))
-            return false;
-        if (shouldToggle === true)
-            return dankIslandRouter.toggleNotifications(screen ?? null) === true;
-        return dankIslandRouter.openNotifications(screen ?? null) === true;
-    }
-
-    function closeIslandNotificationCenter() {
-        return dankIslandRouter?.closeNotifications?.() === true;
-    }
-
-    function closeIslandMedia() {
-        return dankIslandRouter?.closeMedia?.() === true;
-    }
-
-    function closeIslandWallpaper() {
-        return dankIslandRouter?.closeWallpaper?.() === true;
-    }
-
-    function closeIslandWeather() {
-        return dankIslandRouter?.closeWeather?.() === true;
-    }
-
-    function closeIslandHome() {
-        return dankIslandRouter?.closeHome?.() === true;
+    function closeIslandActivity(activityId) {
+        return dankIslandRouter?.closeActivity?.(activityId) === true;
     }
 
     function openControlCenter(x, y, width, section, screen) {
-        if (_islandOwnsSharedTrigger(screen) && dankIslandRouter.openControlCenter(section || "", screen ?? null))
+        if (routeToIsland("controlcenter", screen, false, section))
             return;
         if (controlCenterPopout) {
             setPosition(controlCenterPopout, x, y, width, section, screen);
@@ -227,7 +164,7 @@ Singleton {
     }
 
     function closeControlCenter() {
-        if (dankIslandRouter?.closeControlCenter?.() === true)
+        if (closeIslandActivity("controlcenter"))
             return;
         controlCenterPopout?.close();
     }
@@ -237,7 +174,7 @@ Singleton {
     }
 
     function toggleControlCenter(x, y, width, section, screen) {
-        if (_islandOwnsSharedTrigger(screen) && dankIslandRouter.toggleControlCenter(section || "", screen ?? null))
+        if (routeToIsland("controlcenter", screen, true, section))
             return;
         if (controlCenterPopout) {
             setPosition(controlCenterPopout, x, y, width, section, screen);
@@ -246,7 +183,7 @@ Singleton {
     }
 
     function openNotificationCenter(x, y, width, section, screen) {
-        if (routeNotificationCenterToIsland(screen, false))
+        if (routeToIsland("notificationcenter", screen, false))
             return;
         if (notificationCenterPopout) {
             setPosition(notificationCenterPopout, x, y, width, section, screen);
@@ -255,7 +192,7 @@ Singleton {
     }
 
     function closeNotificationCenter() {
-        if (closeIslandNotificationCenter())
+        if (closeIslandActivity("notificationcenter"))
             return;
         notificationCenterPopout?.close();
     }
@@ -265,7 +202,7 @@ Singleton {
     }
 
     function toggleNotificationCenter(x, y, width, section, screen) {
-        if (routeNotificationCenterToIsland(screen, true))
+        if (routeToIsland("notificationcenter", screen, true))
             return;
         if (notificationCenterPopout) {
             setPosition(notificationCenterPopout, x, y, width, section, screen);

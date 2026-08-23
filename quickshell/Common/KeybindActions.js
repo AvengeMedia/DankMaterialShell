@@ -18,6 +18,7 @@ const DMS_ACTIONS = [
     { id: "spawn dms ipc call island open controlcenter", label: "DankIsland: Open Control Center" },
     { id: "spawn dms ipc call island open wallpaper", label: "DankIsland: Open Wallpapers" },
     { id: "spawn dms ipc call island open weather", label: "DankIsland: Open Weather" },
+    { id: "spawn dms ipc call island open notificationcenter", label: "DankIsland: Open Notification Center" },
     { id: "spawn dms ipc call island cycle", label: "DankIsland: Cycle Activity" },
     { id: "spawn dms ipc call island close", label: "DankIsland: Close" },
     { id: "spawn dms ipc call defaultApp browser", label: "Default Web Browser: Open" },

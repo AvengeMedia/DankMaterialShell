@@ -110,7 +110,7 @@ Item {
 
     Connections {
         target: CavaService
-        enabled: blobEffect.visible && root.available
+        enabled: root.blobActive
 
         function onValuesChanged() {
             root.updateBands();
@@ -147,7 +147,7 @@ Item {
 
         Behavior on activation {
             NumberAnimation {
-                duration: 550
+                duration: Theme.extraLongDuration
                 easing.type: Easing.InOutQuad
             }
         }

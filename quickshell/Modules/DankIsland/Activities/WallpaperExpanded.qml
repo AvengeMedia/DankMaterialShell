@@ -81,18 +81,19 @@ FocusScope {
     Connections {
         target: root.islandController
 
-        function onWallpaperSessionSerialChanged() {
-            Qt.callLater(root.beginSession);
+        function onSessionStarted(activityId) {
+            if (activityId === "wallpaper")
+                Qt.callLater(root.beginSession);
         }
     }
 
     Component.onCompleted: {
         root.contentStaged = true;
-        root.islandController.markWallpaperVisualsReady();
+        root.islandController.markVisualsReady("wallpaper");
     }
 
     Component.onDestruction: {
         root.islandController.keyboardYielded = false;
-        root.islandController.wallpaperVisualsReady = false;
+        root.islandController.setVisualsReady("wallpaper", false);
     }
 }

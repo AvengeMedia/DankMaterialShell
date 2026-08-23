@@ -43,28 +43,20 @@ Item {
         bandsB = nextB;
     }
 
-    onLiveChanged: {
-        if (live)
-            updateBands();
-        else
+    function syncBands() {
+        if (!live) {
             applyIdleBands();
-    }
-
-    onAvailableChanged: {
-        if (!available)
             return;
-        if (live)
-            updateBands();
-        else
-            applyIdleBands();
+        }
+        updateBands();
     }
 
-    Component.onCompleted: {
-        if (root.live)
-            updateBands();
-        else
-            applyIdleBands();
+    onLiveChanged: syncBands()
+    onAvailableChanged: {
+        if (available)
+            syncBands();
     }
+    Component.onCompleted: syncBands()
 
     Loader {
         active: root.live && root.available

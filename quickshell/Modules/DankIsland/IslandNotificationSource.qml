@@ -1,7 +1,6 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import Quickshell
 import Quickshell.Services.Notifications
 import qs.Common
 import qs.Services
@@ -22,11 +21,8 @@ QtObject {
     property string fallbackText: ""
     property string actionLabel: ""
     property bool critical: false
-    property int demoIndex: 0
 
-    readonly property bool demoEnabled: Quickshell.env("DMS_DANKISLAND_NOTIFICATION_DEMO") === "1"
     readonly property bool hasAction: actionLabel.length > 0
-    // Keep the wrapper alive while the island is hovered or expanded, matching NotificationPopup.
     readonly property bool wrapperTimeoutHeld: (controller.notificationActive && controller.timeoutSuspended) || controller.notificationHeldForSystem
 
     function isFocusedScreen() {
@@ -36,7 +32,6 @@ QtObject {
         return !!focused && !!root.targetScreen && focused.name === root.targetScreen.name;
     }
 
-    // Hold display fields through the outgoing crossfade.
     function scheduleDisplayFieldClear() {
         displayFieldClearTimer.restart();
     }
@@ -111,16 +106,16 @@ QtObject {
         releaseWrapperTimeoutHold();
         displayFieldClearTimer.stop();
         currentWrapper = wrapper;
-        appName = wrapper.appName || "Notification";
+        appName = wrapper.appName || I18n.tr("Notification");
         summary = plainText(wrapper.summary) || appName;
         body = plainText(wrapper.body);
-        timeText = wrapper.timeStr || "Now";
+        timeText = wrapper.timeStr || "";
         imageSource = resolveImage(wrapper);
         fallbackIcon = resolveFallbackIcon(wrapper);
         fallbackText = appName.charAt(0).toUpperCase();
         critical = isCritical;
         const actions = wrapper.actions || [];
-        actionLabel = actions.length > 0 ? (actions[0].text || "Open") : "";
+        actionLabel = actions.length > 0 ? (actions[0].text || I18n.tr("Open")) : "";
         controller.notificationTimeout = wrapperTimeout(wrapper);
         const accepted = controller.requestNotification(isCritical);
         applyWrapperTimeoutHold();
@@ -137,9 +132,6 @@ QtObject {
     onWrapperTimeoutHeldChanged: applyWrapperTimeoutHold()
 
     function syncVisibleNotifications() {
-        if (demoEnabled)
-            return;
-
         const visible = NotificationService.visibleNotifications || [];
         if (visible.length > 0) {
             const latest = visible[visible.length - 1];
@@ -147,18 +139,14 @@ QtObject {
                 return;
         }
 
-        if (currentWrapper && visible.indexOf(currentWrapper) === -1) {
-            currentWrapper = null;
-            controller.completeNotification();
-            scheduleDisplayFieldClear();
-        }
+        if (!currentWrapper || visible.indexOf(currentWrapper) !== -1)
+            return;
+        currentWrapper = null;
+        controller.completeNotification();
+        scheduleDisplayFieldClear();
     }
 
     function activate() {
-        if (demoEnabled) {
-            controller.completeNotification();
-            return;
-        }
         const actions = currentWrapper?.actions || [];
         if (actions.length > 0)
             actions[0].invoke();
@@ -170,45 +158,8 @@ QtObject {
         currentWrapper = null;
         controller.completeNotification();
         scheduleDisplayFieldClear();
-        if (!demoEnabled && wrapper)
+        if (wrapper)
             NotificationService.dismissNotification(wrapper);
-    }
-
-    function showDemo() {
-        const variants = [
-            {
-                "appName": "Messages",
-                "summary": "New message from Alex",
-                "body": "The new activity transition looks great. Are we still on for tomorrow?",
-                "icon": "material:mark_chat_unread",
-                "action": "Reply"
-            },
-            {
-                "appName": "Calendar",
-                "summary": "Design review in 10 minutes",
-                "body": "DankIsland activity protocol · Studio call",
-                "icon": "material:event_upcoming",
-                "action": "Open"
-            }
-        ];
-        const demo = variants[demoIndex % variants.length];
-        demoIndex += 1;
-        if (!controller.canRequestNotification(false))
-            return;
-        releaseWrapperTimeoutHold();
-        displayFieldClearTimer.stop();
-        currentWrapper = null;
-        appName = demo.appName;
-        summary = demo.summary;
-        body = demo.body;
-        timeText = "Now";
-        imageSource = "";
-        fallbackIcon = demo.icon;
-        fallbackText = demo.appName.charAt(0);
-        actionLabel = demo.action;
-        critical = false;
-        controller.notificationTimeout = 5000;
-        controller.requestNotification(false);
     }
 
     property Connections notificationConnections: Connections {
@@ -228,17 +179,5 @@ QtObject {
         onTriggered: root.clearDisplayFields()
     }
 
-    property Timer demoTimer: Timer {
-        interval: 7000
-        repeat: true
-        running: root.demoEnabled
-        onTriggered: root.showDemo()
-    }
-
-    Component.onCompleted: {
-        if (demoEnabled)
-            Qt.callLater(showDemo);
-        else
-            syncVisibleNotifications();
-    }
+    Component.onCompleted: syncVisibleNotifications()
 }

@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell
 import qs.Common
 import qs.Services
+import qs.Widgets
 
 Item {
     id: root
@@ -35,8 +36,6 @@ Item {
 
     TextMetrics {
         id: titleMetrics
-
-        font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeSmall
         font.weight: Font.DemiBold
         text: root.mediaModel.title
@@ -44,8 +43,6 @@ Item {
 
     TextMetrics {
         id: artistMetrics
-
-        font.family: Theme.fontFamily
         font.pixelSize: Math.max(9, Theme.fontSizeSmall - 2)
         text: root.dense ? "" : root.mediaModel.artist
     }
@@ -104,7 +101,7 @@ Item {
                 height: titleText.implicitHeight
                 clip: true
 
-                Text {
+                StyledText {
                     id: titleText
 
                     readonly property bool onScreen: Window.window?.visible ?? false
@@ -153,7 +150,6 @@ Item {
                     x: needsScrolling ? -scrollOffset : 0
                     text: root.mediaModel.title
                     color: Theme.surfaceText
-                    font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeSmall
                     font.weight: Font.DemiBold
                     wrapMode: Text.NoWrap
@@ -186,13 +182,12 @@ Item {
                 }
             }
 
-            Text {
+            StyledText {
                 x: root.textGutter
                 width: parent.width - root.textGutter * 2
                 visible: !root.dense
                 text: root.mediaModel.artist
                 color: Theme.surfaceTextSecondary
-                font.family: Theme.fontFamily
                 font.pixelSize: Math.max(9, Theme.fontSizeSmall - 2)
                 elide: Text.ElideRight
             }
@@ -218,13 +213,12 @@ Item {
             radius: height / 2
             color: clockArea.containsMouse ? Theme.surfaceTextHover : "transparent"
 
-            Text {
+            StyledText {
                 id: clockText
 
                 anchors.centerIn: parent
                 text: root.timeText
                 color: Theme.surfaceText
-                font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeSmall
                 font.weight: Font.DemiBold
             }

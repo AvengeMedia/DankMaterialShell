@@ -50,7 +50,6 @@ Item {
             id: numberGlyph
 
             anchors.verticalCenter: parent.verticalCenter
-            // Digits have no descenders; sink by half the descent to optically center.
             anchors.verticalCenterOffset: Math.round(digitMetrics.descent / 2)
             text: root.numberText
             color: glyphs.glyphColor
@@ -72,7 +71,11 @@ Item {
         width: root.bodyWidth
         height: root.thickness
         radius: Math.round(Math.min(width, height) * 0.34)
-        color: root.outlined ? (root.hovered ? Theme.withAlpha(Theme.surfaceVariant, 0.45) : "transparent") : (root.hovered ? Theme.surfaceVariant : Theme.withAlpha(Theme.surfaceVariant, 0.9))
+        color: {
+            if (root.outlined)
+                return root.hovered ? Theme.withAlpha(Theme.surfaceVariant, 0.45) : "transparent";
+            return root.hovered ? Theme.surfaceVariant : Theme.withAlpha(Theme.surfaceVariant, 0.9);
+        }
         border.width: root.outlined ? 1.2 : 0
         border.color: root.fillColor
 

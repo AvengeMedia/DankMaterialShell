@@ -139,7 +139,7 @@ Item {
             id: weatherRow
 
             anchors.centerIn: parent
-            spacing: 2
+            spacing: Theme.spacingXXS
             visible: slot.isWeather
 
             DankIcon {
@@ -213,11 +213,10 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             spacing: root.tight ? Theme.spacingXS : Theme.spacingS
 
-            Text {
+            StyledText {
                 anchors.verticalCenter: parent.verticalCenter
                 text: root.timeText
                 color: Theme.surfaceText
-                font.family: Theme.fontFamily
                 font.pixelSize: root.tight ? Theme.fontSizeSmall : Theme.fontSizeMedium
                 font.weight: Font.DemiBold
             }
@@ -230,13 +229,12 @@ Item {
                 color: Theme.primary
             }
 
-            Text {
+            StyledText {
                 id: dateLabel
 
                 anchors.verticalCenter: parent.verticalCenter
                 text: root.dateText
                 color: Theme.surfaceTextMedium
-                font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeSmall
                 font.weight: Font.Medium
             }
