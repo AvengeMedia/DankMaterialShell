@@ -67,7 +67,7 @@ BasePill {
                     isMonospace: false
                     text: WeatherService.currentTempText(false)
                     reserveText: text.replace(/\d/g, "0")
-                    width: reservedWidth
+                    width: Math.ceil(Math.max(implicitWidth, reservedWidth))
                     horizontalAlignment: Text.AlignHCenter
                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                     color: Theme.widgetTextColor

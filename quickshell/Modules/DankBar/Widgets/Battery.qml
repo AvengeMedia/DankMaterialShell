@@ -199,7 +199,7 @@ BasePill {
                     isMonospace: false
                     text: battery.horizontalSideText
                     reserveText: battery.horizontalSideText.replace(/\d/g, "0")
-                    width: reservedWidth
+                    width: Math.ceil(Math.max(implicitWidth, reservedWidth))
                     horizontalAlignment: Text.AlignHCenter
                     font.pixelSize: Theme.barTextSize(battery.barThickness, battery.barConfig?.fontScale, battery.barConfig?.maximizeWidgetText)
                     color: Theme.widgetTextColor

@@ -69,7 +69,6 @@ Item {
         id: fitMetrics
 
         font.pixelSize: Math.max(1, root.baseTextSize)
-        font.weight: Font.Bold
         text: root.numberText
     }
 
@@ -77,7 +76,6 @@ Item {
         id: digitInk
 
         font.pixelSize: Math.max(1, root.textSize)
-        font.weight: Font.Bold
         text: "0"
     }
 
@@ -85,7 +83,6 @@ Item {
         id: signMetrics
 
         font.pixelSize: Math.max(1, root.baseTextSize * root.signRatio)
-        font.weight: Font.Bold
         text: root.signText
     }
 
@@ -147,7 +144,6 @@ Item {
             text: root.numberText
             color: glyphs.glyphColor
             font.pixelSize: Math.max(1, root.textSize)
-            font.weight: Font.Bold
         }
 
         StyledText {
@@ -159,7 +155,6 @@ Item {
             text: root.signText
             color: glyphs.glyphColor
             font.pixelSize: root.signSize
-            font.weight: Font.Bold
         }
 
         Bolt {

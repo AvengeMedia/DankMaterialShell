@@ -120,11 +120,10 @@ Item {
                     isMonospace: false
                     text: root.timeText
                     reserveText: root.timeText.replace(/\d/g, "0")
-                    width: reservedWidth
+                    width: Math.ceil(Math.max(implicitWidth, reservedWidth))
                     horizontalAlignment: Text.AlignHCenter
                     color: Theme.surfaceText
                     font.pixelSize: Theme.fontSizeSmall
-                    font.weight: Font.DemiBold
                 }
 
                 ClusterDot {
@@ -147,7 +146,6 @@ Item {
                     text: root.dateText
                     color: Theme.surfaceTextMedium
                     font.pixelSize: Theme.fontSizeSmall
-                    font.weight: Font.Medium
                 }
             }
         }
@@ -220,7 +218,6 @@ Item {
                     text: WeatherService.currentTempText()
                     color: Theme.surfaceTextSecondary
                     font.pixelSize: Theme.fontSizeSmall
-                    font.weight: Font.Medium
                 }
             }
 
