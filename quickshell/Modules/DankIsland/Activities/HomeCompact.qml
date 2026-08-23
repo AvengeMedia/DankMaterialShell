@@ -20,27 +20,17 @@ Item {
     readonly property real itemSpacing: root.tight ? Theme.spacingXS : Theme.spacingS
     readonly property real dotSize: root.tight ? 3 : 4
     readonly property bool weatherSlotEnabled: root.controller.homeWeatherSlot !== "hidden"
-    readonly property bool batteryStatus: BatteryService.batteryAvailable
-    readonly property var leftSlotIds: root.slotsForSide("left")
-    readonly property var rightSlotIds: root.slotsForSide("right")
-    readonly property var clusterIds: root.clusterItemsForSide("left").concat(["clock"]).concat(root.clusterItemsForSide("right"))
+    readonly property var clusterIds: root.itemsForSide("left").concat(["clock"]).concat(root.itemsForSide("right"))
     property bool weatherRefHeld: false
 
-    function slotsForSide(side) {
+    function itemsForSide(side) {
         const ids = [];
         if (root.controller.homeMediaSlot === side)
             ids.push("media");
-        if (root.controller.homeStatusSlot === side && !root.batteryStatus)
-            ids.push("status");
-        return ids;
-    }
-
-    function clusterItemsForSide(side) {
-        const ids = [];
         if (root.controller.homeWeatherSlot === side)
             ids.push("weather");
-        if (root.controller.homeStatusSlot === side && root.batteryStatus)
-            ids.push("battery");
+        if (root.controller.homeStatusSlot === side)
+            ids.push("status");
         return ids;
     }
 
@@ -76,66 +66,6 @@ Item {
         precision: SettingsData.showSeconds ? SystemClock.Seconds : SystemClock.Minutes
     }
 
-    component HomeActionSlot: Item {
-        id: slot
-
-        required property string actionId
-
-        readonly property bool isMedia: slot.actionId === "media"
-
-        width: root.slotSize
-        height: root.slotSize
-
-        Rectangle {
-            anchors.fill: parent
-            radius: height / 2
-            color: slotArea.containsMouse ? Theme.surfaceTextHover : "transparent"
-        }
-
-        AudioVisualization {
-            anchors.centerIn: parent
-            width: root.tight ? 16 : 20
-            height: width
-            maxBarHeight: Math.max(3, height - 2)
-            idleIconName: "graphic_eq"
-            visible: slot.isMedia && root.controller.mediaAvailable
-        }
-
-        DankIcon {
-            anchors.centerIn: parent
-            visible: slot.isMedia && !root.controller.mediaAvailable
-            name: "search"
-            size: root.iconSize
-            color: Theme.surfaceTextMedium
-        }
-
-        DankIcon {
-            anchors.centerIn: parent
-            visible: !slot.isMedia
-            name: "tune"
-            size: root.iconSize
-            color: Theme.surfaceText
-        }
-
-        IslandSlotHoverArea {
-            id: slotArea
-
-            anchors.fill: parent
-            controller: root.controller
-            onClicked: {
-                if (!slot.isMedia) {
-                    root.controller.requestControlCenter("", false);
-                    return;
-                }
-                if (root.controller.mediaAvailable) {
-                    root.controller.requestActivity("media", false, false);
-                    return;
-                }
-                root.controller.requestLauncher("", "", false);
-            }
-        }
-    }
-
     component ClusterDot: Rectangle {
         property bool unread: false
 
@@ -146,6 +76,16 @@ Item {
         color: unread ? Theme.secondary : Theme.primary
     }
 
+    component HoverBackdrop: Rectangle {
+        property bool hovered: false
+
+        anchors.centerIn: parent
+        width: parent.width + Theme.spacingS
+        height: root.slotSize
+        radius: height / 2
+        color: hovered ? Theme.surfaceTextHover : "transparent"
+    }
+
     component ClusterItem: Row {
         id: item
 
@@ -153,8 +93,10 @@ Item {
         property int itemIndex: 0
 
         readonly property bool isClock: item.itemId === "clock"
+        readonly property bool isMedia: item.itemId === "media"
         readonly property bool isWeather: item.itemId === "weather"
-        readonly property bool isBattery: item.itemId === "battery"
+        readonly property bool isStatus: item.itemId === "status"
+        readonly property bool usesBattery: item.isStatus && BatteryService.batteryAvailable
 
         spacing: root.itemSpacing
 
@@ -177,7 +119,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     text: root.timeText
                     color: Theme.surfaceText
-                    font.pixelSize: root.tight ? Theme.fontSizeSmall : Theme.fontSizeMedium
+                    font.pixelSize: Theme.fontSizeSmall
                     font.weight: Font.DemiBold
                 }
 
@@ -189,7 +131,7 @@ Item {
                     IslandSlotHoverArea {
                         anchors.centerIn: parent
                         width: parent.width + Theme.spacingS
-                        height: parent.height + Theme.spacingS
+                        height: root.slotSize
                         enabled: unreadDot.unread
                         controller: root.controller
                         onClicked: root.controller.requestNotificationCenter(false)
@@ -207,16 +149,55 @@ Item {
         }
 
         Item {
+            width: root.iconSize + Theme.spacingXS
+            height: root.slotSize
+            visible: item.isMedia
+
+            HoverBackdrop {
+                hovered: mediaArea.containsMouse
+            }
+
+            AudioVisualization {
+                anchors.centerIn: parent
+                width: root.iconSize + Theme.spacingXS
+                height: width
+                maxBarHeight: Math.max(3, height - 2)
+                idleIconName: "graphic_eq"
+                visible: root.controller.mediaAvailable
+            }
+
+            DankIcon {
+                anchors.centerIn: parent
+                visible: !root.controller.mediaAvailable
+                name: "search"
+                size: root.iconSize
+                color: Theme.surfaceTextMedium
+            }
+
+            IslandSlotHoverArea {
+                id: mediaArea
+
+                anchors.centerIn: parent
+                width: parent.width + Theme.spacingS
+                height: root.slotSize
+                controller: root.controller
+                onClicked: {
+                    if (root.controller.mediaAvailable) {
+                        root.controller.requestActivity("media", false, false);
+                        return;
+                    }
+                    root.controller.requestLauncher("", "", false);
+                }
+            }
+        }
+
+        Item {
             width: weatherRow.implicitWidth
             height: root.slotSize
             visible: item.isWeather
 
-            Rectangle {
-                anchors.centerIn: parent
-                width: parent.width + Theme.spacingS
-                height: parent.height
-                radius: height / 2
-                color: weatherArea.containsMouse ? Theme.surfaceTextHover : "transparent"
+            HoverBackdrop {
+                hovered: weatherArea.containsMouse
             }
 
             Row {
@@ -246,32 +227,45 @@ Item {
 
                 anchors.centerIn: parent
                 width: parent.width + Theme.spacingS
-                height: parent.height
+                height: root.slotSize
                 controller: root.controller
                 onClicked: root.controller.requestWeather(false)
             }
         }
 
         Item {
-            width: batteryMeter.width
+            width: item.usesBattery ? batteryMeter.width : root.iconSize
             height: root.slotSize
-            visible: item.isBattery
+            visible: item.isStatus
+
+            HoverBackdrop {
+                hovered: statusArea.containsMouse && !item.usesBattery
+            }
 
             BatteryMeter {
                 id: batteryMeter
 
                 anchors.centerIn: parent
+                visible: item.usesBattery
                 thickness: root.tight ? 12 : 14
-                hovered: batteryArea.containsMouse
+                hovered: statusArea.containsMouse
                 outlined: SettingsData.dankIslandBatteryStyle === "outline"
             }
 
+            DankIcon {
+                anchors.centerIn: parent
+                visible: !item.usesBattery
+                name: "tune"
+                size: root.iconSize
+                color: Theme.surfaceText
+            }
+
             IslandSlotHoverArea {
-                id: batteryArea
+                id: statusArea
 
                 anchors.centerIn: parent
                 width: parent.width + Theme.spacingS
-                height: parent.height
+                height: root.slotSize
                 controller: root.controller
                 onClicked: root.controller.requestControlCenter("", false)
             }
@@ -282,39 +276,17 @@ Item {
         id: compactRow
 
         anchors.centerIn: parent
-        spacing: root.controller.homeClusterGap
+        height: root.slotSize
+        spacing: root.itemSpacing
 
         Repeater {
-            model: root.leftSlotIds
+            model: root.clusterIds
 
-            HomeActionSlot {
+            ClusterItem {
                 required property var modelData
-                actionId: String(modelData)
-            }
-        }
-
-        Row {
-            height: root.slotSize
-            spacing: root.itemSpacing
-
-            Repeater {
-                model: root.clusterIds
-
-                ClusterItem {
-                    required property var modelData
-                    required property int index
-                    itemId: String(modelData)
-                    itemIndex: index
-                }
-            }
-        }
-
-        Repeater {
-            model: root.rightSlotIds
-
-            HomeActionSlot {
-                required property var modelData
-                actionId: String(modelData)
+                required property int index
+                itemId: String(modelData)
+                itemIndex: index
             }
         }
     }

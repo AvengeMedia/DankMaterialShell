@@ -464,6 +464,7 @@ Item {
 
         NotificationCompact {
             notificationModel: root.notificationModel
+            controller: root.controller
             dense: root.controller.compactDense
             iconSize: root.controller.compactIconSize
         }

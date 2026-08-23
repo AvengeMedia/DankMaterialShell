@@ -66,6 +66,9 @@ QtObject {
     property real homeContentWidth: 200
     property real mediaContentWidth: 360
     readonly property real mediaCompactMaxWidth: 360
+    property real notificationContentWidth: 0
+    readonly property real notificationCompactMinWidth: compactDense ? 200 : 240
+    readonly property real notificationCompactMaxWidth: compactDense ? 320 : 360
 
     signal sessionStarted(string activityId)
 
@@ -74,6 +77,13 @@ QtObject {
         if (!isFinite(next) || next <= 0 || Math.abs(next - homeContentWidth) < 2)
             return;
         homeContentWidth = next;
+    }
+
+    function setNotificationContentWidth(width) {
+        const next = Math.ceil(width);
+        if (!isFinite(next) || next <= 0 || Math.abs(next - notificationContentWidth) < 2)
+            return;
+        notificationContentWidth = next;
     }
 
     function setMediaContentWidth(width) {
@@ -306,7 +316,7 @@ QtObject {
     readonly property var weatherExpandedTarget: sheetTarget(SettingsData.showWeekNumber ? 736 : 700, 452)
     readonly property var systemCompactTarget: pillTarget(SettingsData.osdAlwaysShowValue ? 330 : 282, compactFaceHeight)
     readonly property var systemExpandedTarget: sheetTarget(460, 176)
-    readonly property var notificationCompactTarget: pillTarget(compactDense ? 320 : 360, compactFaceHeight)
+    readonly property var notificationCompactTarget: pillTarget(Math.ceil(Math.max(notificationCompactMinWidth, Math.min(notificationCompactMaxWidth, notificationContentWidth))), compactFaceHeight)
     readonly property var notificationExpandedTarget: sheetTarget(520, 220)
     readonly property var notificationCenterExpandedTarget: sheetTarget(480, notificationCenterHeight)
 
