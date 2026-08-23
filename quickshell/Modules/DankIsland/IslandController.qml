@@ -761,6 +761,7 @@ QtObject {
         syncNotificationTimeout(!pointerInside);
         syncTransientTimeout(!pointerInside);
         if (!pointerInside) {
+            slotHoverCount = 0;
             hoverOpenTimer.stop();
             if (hoverExpanded && expanded && !mediaDropdownOpen)
                 hoverCloseTimer.restart();

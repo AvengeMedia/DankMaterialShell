@@ -130,8 +130,8 @@ Item {
 
                     IslandSlotHoverArea {
                         anchors.centerIn: parent
-                        width: parent.width + Theme.spacingS
-                        height: root.slotSize
+                        width: parent.width + Theme.spacingXS
+                        height: parent.height + Theme.spacingXS
                         enabled: unreadDot.unread
                         controller: root.controller
                         onClicked: root.controller.requestNotificationCenter(false)
@@ -177,9 +177,7 @@ Item {
             IslandSlotHoverArea {
                 id: mediaArea
 
-                anchors.centerIn: parent
-                width: parent.width + Theme.spacingS
-                height: root.slotSize
+                anchors.fill: parent
                 controller: root.controller
                 onClicked: {
                     if (root.controller.mediaAvailable) {
@@ -225,9 +223,7 @@ Item {
             IslandSlotHoverArea {
                 id: weatherArea
 
-                anchors.centerIn: parent
-                width: parent.width + Theme.spacingS
-                height: root.slotSize
+                anchors.fill: parent
                 controller: root.controller
                 onClicked: root.controller.requestWeather(false)
             }
@@ -263,9 +259,7 @@ Item {
             IslandSlotHoverArea {
                 id: statusArea
 
-                anchors.centerIn: parent
-                width: parent.width + Theme.spacingS
-                height: root.slotSize
+                anchors.fill: parent
                 controller: root.controller
                 onClicked: root.controller.requestControlCenter("", false)
             }
