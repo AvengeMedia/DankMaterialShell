@@ -29,7 +29,10 @@ func (r *RegionSelector) setupInput() {
 
 func (r *RegionSelector) setupPointerHandlers() {
 	r.pointer.SetEnterHandler(func(e client.PointerEnterEvent) {
-		if r.cursorSurface != nil {
+		r.cursorSerial = e.Serial
+		if r.cursorShape != nil {
+			r.setNativeCursor(e.Serial)
+		} else if r.cursorSurface != nil {
 			_ = r.pointer.SetCursor(e.Serial, r.cursorSurface, 12, 12)
 		}
 
@@ -46,6 +49,7 @@ func (r *RegionSelector) setupPointerHandlers() {
 		if r.selection.dragging {
 			r.updateSelectionCurrent(r.activeSurface, r.pointerX, r.pointerY)
 		}
+		r.refreshCursor()
 	})
 
 	r.pointer.SetMotionHandler(func(e client.PointerMotionEvent) {
@@ -94,11 +98,13 @@ func (r *RegionSelector) setupPointerHandlers() {
 				r.selection.anchorY = r.pointerY + float64(r.activeSurface.output.y)
 				r.selection.currentX = r.selection.anchorX
 				r.selection.currentY = r.selection.anchorY
+				r.refreshCursor()
 				for _, os := range r.surfaces {
 					r.redrawSurface(os)
 				}
 			case 0: // released
 				r.selection.dragging = false
+				r.refreshCursor()
 				for _, os := range r.surfaces {
 					r.redrawSurface(os)
 				}
@@ -156,9 +162,15 @@ func (r *RegionSelector) updateSelectionCurrent(os *OutputSurface, surfaceX, sur
 func (r *RegionSelector) setupKeyboardHandlers() {
 	r.keyboard.SetModifiersHandler(func(e client.KeyboardModifiersEvent) {
 		r.shiftHeld = e.ModsDepressed&1 != 0
+		r.ctrlHeld = e.ModsDepressed&4 != 0
+		r.refreshCursor()
 	})
 
 	r.keyboard.SetKeyHandler(func(e client.KeyboardKeyEvent) {
+		if e.Key == 29 || e.Key == 97 { // Ctrl left/right
+			r.ctrlHeld = e.State != 0
+			r.refreshCursor()
+		}
 		if e.State != 1 {
 			return
 		}

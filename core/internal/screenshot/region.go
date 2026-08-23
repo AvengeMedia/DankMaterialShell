@@ -8,6 +8,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/keyboard_shortcuts_inhibit"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wlr_layer_shell"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wlr_screencopy"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wp_cursor_shape"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wp_viewporter"
 	wlhelpers "github.com/AvengeMedia/DankMaterialShell/core/internal/wayland/client"
 	"github.com/AvengeMedia/dankgo/wayland/client"
@@ -103,9 +104,11 @@ type RegionSelector struct {
 	surfaces      []*OutputSurface
 	activeSurface *OutputSurface
 
-	// Cursor surface for crosshair
+	// Cursor surface fallback when the compositor lacks cursor shapes.
 	cursorSurface *client.Surface
 	cursorBuffer  *ShmBuffer
+	cursorSerial  uint32
+	cursorShape   *wp_cursor_shape.WpCursorShapeManagerV1
 	cursorWlBuf   *client.Buffer
 	cursorPool    *client.ShmPool
 
@@ -115,6 +118,8 @@ type RegionSelector struct {
 	preSelect          Region
 	showCapturedCursor bool
 	shiftHeld          bool
+	ctrlHeld           bool
+	movingSelection    bool
 
 	phase  selectorPhase
 	scroll *scrollSession
@@ -323,6 +328,12 @@ func (r *RegionSelector) handleGlobal(e client.RegistryGlobalEvent) {
 		mgr := keyboard_shortcuts_inhibit.NewZwpKeyboardShortcutsInhibitManagerV1(r.ctx)
 		if err := r.registry.Bind(e.Name, e.Interface, e.Version, mgr); err == nil {
 			r.shortcutsInhibitMgr = mgr
+		}
+
+	case wp_cursor_shape.WpCursorShapeManagerV1InterfaceName:
+		mgr := wp_cursor_shape.NewWpCursorShapeManagerV1(r.ctx)
+		if err := r.registry.Bind(e.Name, e.Interface, 1, mgr); err == nil {
+			r.cursorShape = mgr
 		}
 	}
 }
@@ -603,6 +614,28 @@ func (r *RegionSelector) createCursor() error {
 	}
 
 	return nil
+}
+
+func (r *RegionSelector) refreshCursor() {
+	r.setNativeCursor(r.cursorSerial)
+}
+
+func (r *RegionSelector) setNativeCursor(serial uint32) {
+	if r.cursorShape == nil || r.pointer == nil || serial == 0 {
+		return
+	}
+	shape := wp_cursor_shape.ShapeCrosshair
+	if r.movingSelection && r.selection.dragging {
+		shape = wp_cursor_shape.ShapeGrabbing
+	} else if r.ctrlHeld {
+		shape = wp_cursor_shape.ShapeGrab
+	}
+	device, err := r.cursorShape.GetPointer(r.pointer)
+	if err != nil {
+		return
+	}
+	_ = device.SetShape(serial, shape)
+	_ = device.Destroy()
 }
 
 func (r *RegionSelector) createOutputSurface(output *WaylandOutput) (*OutputSurface, error) {
