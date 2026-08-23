@@ -7,8 +7,6 @@ Item {
     id: root
 
     required property var controller
-    required property real islandX
-    required property real hostWidth
     required property real morphProgress
     required property bool expanded
     required property bool pointerInside
@@ -32,7 +30,6 @@ Item {
     required property Component notificationCenterCompactComponent
     required property Component notificationCenterExpandedComponent
 
-    readonly property real fitInset: Theme.spacingS
     readonly property real compactFade: root.fadeCompact(root.morphProgress)
     readonly property real expandedFade: root.fadeExpanded(root.morphProgress)
     readonly property real outgoingCompactFade: root.fadeCompact(root.outgoingMorph)
@@ -58,23 +55,10 @@ Item {
         return root.renderedActivity === activity || root.outgoingActivity === activity;
     }
 
-    function compactFrame(activity) {
-        const target = root.controller.compactTargetFor(activity);
-        const left = Math.round((root.hostWidth - target.width) / 2 + target.offsetX);
-        const top = Math.round((root.height - target.height) / 2);
-        return Qt.rect(left - root.islandX, top, target.width, target.height);
-    }
-
-    function fitFade(activity) {
-        const target = root.controller.compactTargetFor(activity);
-        const slack = Math.min(root.width - target.width, root.height - target.height) + root.fitInset * 4;
-        return Math.max(0, Math.min(1, slack / (root.fitInset * 2)));
-    }
-
     function compactOpacity(activity) {
         const incoming = root.renderedActivity === activity ? root.activityFade * root.compactFade : 0;
         const outgoing = root.outgoingActivity === activity ? (1 - root.activityFade) * root.outgoingCompactFade : 0;
-        return Math.max(incoming, outgoing) * root.fitFade(activity);
+        return Math.max(incoming, outgoing);
     }
 
     function expandedOpacity(activity) {
@@ -157,15 +141,7 @@ Item {
     }
 
     component CompactFace: Loader {
-        id: face
-
-        required property string activity
-        readonly property rect frame: root.compactFrame(face.activity)
-
-        x: frame.x
-        y: frame.y
-        width: frame.width
-        height: frame.height
+        anchors.fill: parent
         asynchronous: false
         visible: opacity > 0.001
         enabled: opacity >= 0.5
@@ -178,7 +154,6 @@ Item {
     }
 
     CompactFace {
-        activity: "home"
         active: true
         sourceComponent: root.homeCompactComponent
         opacity: root.compactOpacity("home")
@@ -194,7 +169,6 @@ Item {
     }
 
     CompactFace {
-        activity: "media"
         active: root.mediaSurfaceActive
         sourceComponent: root.mediaCompactComponent
         opacity: root.compactOpacity("media")
@@ -210,7 +184,6 @@ Item {
     }
 
     CompactFace {
-        activity: "launcher"
         active: root.surfaceActive("launcher")
         sourceComponent: root.launcherCompactComponent
         opacity: root.compactOpacity("launcher")
@@ -226,7 +199,6 @@ Item {
     }
 
     CompactFace {
-        activity: "controlcenter"
         active: root.surfaceActive("controlcenter")
         sourceComponent: root.controlCenterCompactComponent
         opacity: root.compactOpacity("controlcenter")
@@ -240,7 +212,6 @@ Item {
     }
 
     CompactFace {
-        activity: "wallpaper"
         active: root.surfaceActive("wallpaper")
         sourceComponent: root.wallpaperCompactComponent
         opacity: root.compactOpacity("wallpaper")
@@ -256,7 +227,6 @@ Item {
     }
 
     CompactFace {
-        activity: "weather"
         active: root.surfaceActive("weather")
         sourceComponent: root.weatherCompactComponent
         opacity: root.compactOpacity("weather")
@@ -272,7 +242,6 @@ Item {
     }
 
     CompactFace {
-        activity: "notificationcenter"
         active: root.surfaceActive("notificationcenter")
         sourceComponent: root.notificationCenterCompactComponent
         opacity: root.compactOpacity("notificationcenter")
@@ -288,7 +257,6 @@ Item {
     }
 
     CompactFace {
-        activity: "volume"
         active: root.systemSurfaceActive
         sourceComponent: root.systemCompactComponent
         opacity: Math.max(root.compactOpacity("volume"), root.compactOpacity("brightness"))
@@ -302,7 +270,6 @@ Item {
     }
 
     CompactFace {
-        activity: "notification"
         active: root.surfaceActive("notification")
         sourceComponent: root.notificationCompactComponent
         opacity: root.compactOpacity("notification")

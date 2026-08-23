@@ -54,14 +54,12 @@ PanelWindow {
     readonly property int outerGap: Math.max(0, Math.min(48, SettingsData.dankIslandOuterGap))
     readonly property int maxActivityHeight: Math.max(560, Math.min(680, (screen?.height ?? 1080) - 200))
     readonly property int hostHeight: outerGap + maxActivityHeight + 8
-    readonly property int collapsedHostHeight: Math.max(reservedStripHeight, outerGap + Math.ceil(Math.max(controller.compactFaceHeight, satelliteHost.barThickness)) + 4)
-    readonly property bool hostTall: controller.expanded || surface.targetEdgeExtent > collapsedHostHeight || (surface.motionRunning && surface.motionStartEdgeExtent > collapsedHostHeight)
     readonly property int maxActivityWidth: 736
     readonly property real maximumHorizontalOffset: Math.max(0, (width - maxActivityWidth) / 2 - 8)
     property bool keyboardFocusArmed: true
 
     color: "transparent"
-    implicitHeight: hostTall ? hostHeight : collapsedHostHeight
+    implicitHeight: hostHeight
     exclusiveZone: floating ? 0 : reservedStripHeight
     readonly property alias islandController: controller
     readonly property int launcherResultCount: launcherController.flatModel?.length ?? 0

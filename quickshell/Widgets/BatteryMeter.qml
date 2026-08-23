@@ -30,9 +30,13 @@ Item {
     readonly property color trackColor: {
         if (root.outlined)
             return root.hovered ? Theme.withAlpha(Theme.surfaceVariant, 0.45) : "transparent";
-        return Theme.withAlpha(Theme.surfaceText, root.hovered ? 0.42 : 0.28);
+        return Theme.withAlpha(Theme.surfaceText, root.hovered ? 0.25 : 0.14);
     }
-    readonly property color onFillColor: Theme.isLightColor(root.fillColor) ? Qt.rgba(0, 0, 0, 0.9) : Qt.rgba(1, 1, 1, 0.95)
+    readonly property color onFillColor: {
+        if (root.lowState)
+            return Theme.isLightColor(Theme.error) ? Qt.rgba(0, 0, 0, 0.9) : Qt.rgba(1, 1, 1, 0.95);
+        return Theme.primaryText;
+    }
     readonly property string numberText: Math.round(root.level) + (root.showPercentSign ? "%" : "")
     readonly property bool boltInside: root.charging && root.showBolt
     readonly property bool numberInside: !root.vertical && root.showNumber && BatteryService.batteryAvailable

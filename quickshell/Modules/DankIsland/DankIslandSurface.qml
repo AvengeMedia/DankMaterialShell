@@ -42,9 +42,6 @@ Item {
 
     readonly property alias inputMaskItem: inputEnvelope
     readonly property bool motionRunning: motion.running
-    readonly property real targetEdgeExtent: motion.targetOffsetY + motion.targetHeight
-    readonly property real currentEdgeExtent: motion.currentOffsetY + motion.currentHeight
-    property real motionStartEdgeExtent: 0
     property real trackedHeight: 0
     readonly property Item mediaDropdownMaskItem: mediaDropdowns.activePanel
     property real fadeCompactHeight: 48
@@ -82,7 +79,6 @@ Item {
     }
 
     function unionMotionStartBounds() {
-        root.motionStartEdgeExtent = Math.max(root.motionStartEdgeExtent, root.currentEdgeExtent);
         const b = root.motionStartBounds;
         const left = Math.min(b.x, root.currentVisualX);
         const top = Math.min(b.y, root.currentVisualY);
@@ -156,7 +152,6 @@ Item {
         function onRunningChanged() {
             if (motion.running) {
                 root.motionStartBounds = Qt.rect(root.currentVisualX, root.currentVisualY, root.currentVisualWidth, root.currentVisualHeight);
-                root.motionStartEdgeExtent = root.currentEdgeExtent;
                 if (root.controller.activeActivity === "media")
                     root.hideMediaDropdowns();
                 return;
@@ -240,8 +235,6 @@ Item {
 
             anchors.fill: parent
             controller: root.controller
-            islandX: root.currentVisualX
-            hostWidth: root.width
             morphProgress: root.morphProgress
             expanded: root.controller.expanded
             pointerInside: root.controller.pointerInside
