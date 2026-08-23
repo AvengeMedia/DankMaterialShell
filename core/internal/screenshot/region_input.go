@@ -88,12 +88,21 @@ func (r *RegionSelector) setupPointerHandlers() {
 		case 0x110: // BTN_LEFT
 			switch e.State {
 			case 1: // pressed
+				pointerX := r.pointerX + float64(r.activeSurface.output.x)
+				pointerY := r.pointerY + float64(r.activeSurface.output.y)
+				if r.ctrlHeld && r.beginSelectionMove(pointerX, pointerY) {
+					r.selection.dragging = true
+					r.refreshCursor()
+					break
+				}
+
 				r.preSelect = Region{}
+				r.movingSelection = false
 				r.selection.hasSelection = true
 				r.selection.dragging = true
 				r.selection.surface = r.activeSurface
-				r.selection.anchorX = r.pointerX + float64(r.activeSurface.output.x)
-				r.selection.anchorY = r.pointerY + float64(r.activeSurface.output.y)
+				r.selection.anchorX = pointerX
+				r.selection.anchorY = pointerY
 				r.selection.currentX = r.selection.anchorX
 				r.selection.currentY = r.selection.anchorY
 				r.refreshCursor()
@@ -102,6 +111,7 @@ func (r *RegionSelector) setupPointerHandlers() {
 				}
 			case 0: // released
 				r.selection.dragging = false
+				r.movingSelection = false
 				r.refreshCursor()
 				for _, os := range r.surfaces {
 					r.redrawSurface(os)
@@ -124,6 +134,11 @@ func (r *RegionSelector) updateSelectionCurrent(os *OutputSurface, surfaceX, sur
 
 	curX := surfaceX + float64(os.output.x)
 	curY := surfaceY + float64(os.output.y)
+	if r.movingSelection {
+		r.updateMovedSelection(curX, curY)
+		return
+	}
+
 	if r.shiftHeld {
 		dx := curX - r.selection.anchorX
 		dy := curY - r.selection.anchorY
@@ -155,6 +170,79 @@ func (r *RegionSelector) updateSelectionCurrent(os *OutputSurface, surfaceX, sur
 	for _, surface := range r.surfaces {
 		r.redrawSurface(surface)
 	}
+}
+
+func (r *RegionSelector) beginSelectionMove(pointerX, pointerY float64) bool {
+	if !r.selection.hasSelection {
+		return false
+	}
+
+	minX := math.Min(r.selection.anchorX, r.selection.currentX)
+	minY := math.Min(r.selection.anchorY, r.selection.currentY)
+	r.moveOffsetX = pointerX - minX
+	r.moveOffsetY = pointerY - minY
+	r.movingSelection = true
+	return true
+}
+
+func (r *RegionSelector) updateMovedSelection(pointerX, pointerY float64) {
+	minX := math.Min(r.selection.anchorX, r.selection.currentX)
+	minY := math.Min(r.selection.anchorY, r.selection.currentY)
+	maxX := math.Max(r.selection.anchorX, r.selection.currentX)
+	maxY := math.Max(r.selection.anchorY, r.selection.currentY)
+	width := maxX - minX
+	height := maxY - minY
+
+	newMinX := pointerX - r.moveOffsetX
+	newMinY := pointerY - r.moveOffsetY
+	newMinX, newMinY = r.clampMovedSelection(newMinX, newMinY, width, height)
+	deltaX := newMinX - minX
+	deltaY := newMinY - minY
+	r.selection.anchorX += deltaX
+	r.selection.currentX += deltaX
+	r.selection.anchorY += deltaY
+	r.selection.currentY += deltaY
+
+	for _, surface := range r.surfaces {
+		r.redrawSurface(surface)
+	}
+}
+
+func (r *RegionSelector) clampMovedSelection(x, y, width, height float64) (float64, float64) {
+	var minX, minY, maxX, maxY float64
+	initialized := false
+	for _, surface := range r.surfaces {
+		if surface == nil || surface.output == nil || surface.logicalW <= 0 || surface.logicalH <= 0 {
+			continue
+		}
+		outputMinX := float64(surface.output.x)
+		outputMinY := float64(surface.output.y)
+		outputMaxX := outputMinX + float64(surface.logicalW)
+		outputMaxY := outputMinY + float64(surface.logicalH)
+		if !initialized {
+			minX, minY, maxX, maxY = outputMinX, outputMinY, outputMaxX, outputMaxY
+			initialized = true
+			continue
+		}
+		minX = math.Min(minX, outputMinX)
+		minY = math.Min(minY, outputMinY)
+		maxX = math.Max(maxX, outputMaxX)
+		maxY = math.Max(maxY, outputMaxY)
+	}
+	if !initialized {
+		return x, y
+	}
+	epsilonX, epsilonY := 1.0, 1.0
+	if surface := r.selection.surface; surface != nil && surface.screenBuf != nil {
+		if surface.logicalW > 0 && surface.screenBuf.Width > 0 {
+			epsilonX = float64(surface.logicalW) / float64(surface.screenBuf.Width)
+		}
+		if surface.logicalH > 0 && surface.screenBuf.Height > 0 {
+			epsilonY = float64(surface.logicalH) / float64(surface.screenBuf.Height)
+		}
+	}
+	return math.Max(minX, math.Min(maxX-width-epsilonX, x)),
+		math.Max(minY, math.Min(maxY-height-epsilonY, y))
 }
 
 func (r *RegionSelector) setupKeyboardHandlers() {

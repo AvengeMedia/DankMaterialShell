@@ -121,6 +121,8 @@ type RegionSelector struct {
 	shiftHeld          bool
 	ctrlHeld           bool
 	movingSelection    bool
+	moveOffsetX        float64
+	moveOffsetY        float64
 
 	phase  selectorPhase
 	scroll *scrollSession
