@@ -25,7 +25,7 @@ Item {
     readonly property real measuredWidth: {
         let width = Theme.spacingS + root.artworkSize + Theme.spacingXS + root.cavaWidth + Theme.spacingXS + root.naturalTextWidth + Theme.spacingXS;
         if (root.clockVisible)
-            width += clockText.implicitWidth + Theme.spacingXS * 2 + Theme.spacingS;
+            width += clockText.reservedWidth + Theme.spacingXS * 2 + Theme.spacingS;
         return width;
     }
 
@@ -128,7 +128,7 @@ Item {
             rightMargin: Theme.spacingS
             verticalCenter: parent.verticalCenter
         }
-        width: root.clockVisible ? (clockText.implicitWidth + Theme.spacingXS * 2) : 0
+        width: root.clockVisible ? (clockText.reservedWidth + Theme.spacingXS * 2) : 0
         height: root.clockPillHeight
         visible: root.clockVisible
 
@@ -137,11 +137,15 @@ Item {
             radius: height / 2
             color: clockArea.containsMouse ? Theme.surfaceTextHover : "transparent"
 
-            StyledText {
+            NumericText {
                 id: clockText
 
                 anchors.centerIn: parent
+                isMonospace: false
                 text: root.timeText
+                reserveText: root.timeText.replace(/\d/g, "0")
+                width: reservedWidth
+                horizontalAlignment: Text.AlignHCenter
                 color: Theme.surfaceText
                 font.pixelSize: Theme.fontSizeSmall
                 font.weight: Font.DemiBold

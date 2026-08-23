@@ -115,9 +115,13 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: root.itemSpacing
 
-                StyledText {
+                NumericText {
                     anchors.verticalCenter: parent.verticalCenter
+                    isMonospace: false
                     text: root.timeText
+                    reserveText: root.timeText.replace(/\d/g, "0")
+                    width: reservedWidth
+                    horizontalAlignment: Text.AlignHCenter
                     color: Theme.surfaceText
                     font.pixelSize: Theme.fontSizeSmall
                     font.weight: Font.DemiBold

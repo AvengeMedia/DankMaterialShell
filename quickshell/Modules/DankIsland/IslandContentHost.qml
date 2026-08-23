@@ -6,6 +6,8 @@ import qs.Common
 Item {
     id: root
 
+    clip: true
+
     required property var controller
     required property real morphProgress
     required property bool expanded
@@ -148,7 +150,11 @@ Item {
     }
 
     component ExpandedFace: Loader {
-        anchors.fill: parent
+        required property string activity
+        readonly property var target: root.controller.expandedTargetFor(activity)
+
+        width: target.width
+        height: target.height
         visible: opacity > 0.001
         enabled: opacity >= 0.5
     }
@@ -162,6 +168,7 @@ Item {
     ExpandedFace {
         id: homeExpandedLoader
 
+        activity: "home"
         active: root.homeExpandedTouched
         asynchronous: true
         sourceComponent: root.homeExpandedComponent
@@ -177,6 +184,7 @@ Item {
     ExpandedFace {
         id: mediaExpandedLoader
 
+        activity: "media"
         active: root.mediaSurfaceActive && (root.expanded || root.expandedFade > 0)
         asynchronous: false
         sourceComponent: root.mediaExpandedComponent
@@ -192,6 +200,7 @@ Item {
     ExpandedFace {
         id: launcherExpandedLoader
 
+        activity: "launcher"
         active: root.controller.visualsRequested("launcher")
         asynchronous: true
         sourceComponent: root.launcherExpandedComponent
@@ -205,6 +214,7 @@ Item {
     }
 
     ExpandedFace {
+        activity: "controlcenter"
         active: root.controller.visualsRequested("controlcenter")
         asynchronous: false
         sourceComponent: root.controlCenterExpandedComponent
@@ -220,6 +230,7 @@ Item {
     ExpandedFace {
         id: wallpaperExpandedLoader
 
+        activity: "wallpaper"
         active: root.controller.visualsRequested("wallpaper")
         asynchronous: true
         sourceComponent: root.wallpaperExpandedComponent
@@ -235,6 +246,7 @@ Item {
     ExpandedFace {
         id: weatherExpandedLoader
 
+        activity: "weather"
         active: root.controller.visualsRequested("weather")
         asynchronous: true
         sourceComponent: root.weatherExpandedComponent
@@ -250,6 +262,7 @@ Item {
     ExpandedFace {
         id: notificationCenterExpandedLoader
 
+        activity: "notificationcenter"
         active: root.controller.visualsRequested("notificationcenter")
         asynchronous: true
         sourceComponent: root.notificationCenterExpandedComponent
@@ -263,6 +276,7 @@ Item {
     }
 
     ExpandedFace {
+        activity: "volume"
         active: root.systemSurfaceActive && (root.expanded || root.expandedFade > 0)
         asynchronous: false
         sourceComponent: root.systemExpandedComponent
@@ -276,6 +290,7 @@ Item {
     }
 
     ExpandedFace {
+        activity: "notification"
         active: root.surfaceActive("notification") && (root.expanded || root.expandedFade > 0)
         asynchronous: false
         sourceComponent: root.notificationExpandedComponent

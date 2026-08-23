@@ -343,12 +343,13 @@ QtObject {
     }
 
     readonly property var compactTarget: compactTargetFor(activeActivity)
-    readonly property var expandedTarget: {
-        if (notificationActive)
+    function expandedTargetFor(activityId) {
+        switch (activityId) {
+        case "notification":
             return notificationExpandedTarget;
-        if (systemActivityActive)
+        case "volume":
+        case "brightness":
             return systemExpandedTarget;
-        switch (activeActivity) {
         case "launcher":
             return launcherExpandedTarget;
         case "controlcenter":
@@ -364,6 +365,8 @@ QtObject {
         }
         return homeExpandedTarget;
     }
+
+    readonly property var expandedTarget: expandedTargetFor(activeActivity)
     readonly property var targetDescriptor: expanded ? expandedTarget : compactTarget
 
     function syncNotificationTimeout(restart) {

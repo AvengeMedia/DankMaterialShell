@@ -63,8 +63,12 @@ BasePill {
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
-                StyledText {
+                NumericText {
+                    isMonospace: false
                     text: WeatherService.currentTempText(false)
+                    reserveText: text.replace(/\d/g, "0")
+                    width: reservedWidth
+                    horizontalAlignment: Text.AlignHCenter
                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                     color: Theme.widgetTextColor
                     anchors.verticalCenter: parent.verticalCenter

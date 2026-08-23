@@ -195,8 +195,12 @@ BasePill {
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
-                StyledText {
+                NumericText {
+                    isMonospace: false
                     text: battery.horizontalSideText
+                    reserveText: battery.horizontalSideText.replace(/\d/g, "0")
+                    width: reservedWidth
+                    horizontalAlignment: Text.AlignHCenter
                     font.pixelSize: Theme.barTextSize(battery.barThickness, battery.barConfig?.fontScale, battery.barConfig?.maximizeWidgetText)
                     color: Theme.widgetTextColor
                     anchors.verticalCenter: parent.verticalCenter
