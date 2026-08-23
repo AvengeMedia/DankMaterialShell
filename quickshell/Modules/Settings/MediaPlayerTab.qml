@@ -35,7 +35,6 @@ Item {
         }
 
         function recreatePopup() {
-            log.debug("Recreating popup");
             popupLoader.active = false;
             popupLoader.active = true;
         }

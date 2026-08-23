@@ -7,7 +7,6 @@ import Quickshell.Wayland
 import Quickshell.Io
 import qs.Common
 import qs.Services
-import qs.Modules.WorkspaceOverlays
 
 Singleton {
     id: root

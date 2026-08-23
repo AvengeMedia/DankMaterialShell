@@ -48,7 +48,6 @@ Item {
         }
 
         function recreatePopup() {
-            log.debug("Recreating popup");
             popupLoader.active = false;
             popupLoader.active = true;
         }
@@ -685,7 +684,6 @@ Item {
                 iconName: "settings_night_sight"
                 title: I18n.tr("Night Mode Exceptions")
                 settingKey: "nightModeExceptions"
-                readonly property var log: Log.scoped("NightModeExceptions")
 
                 SettingsToggleRow {
                     settingKey: "nightModeExcludeFullscreen"
