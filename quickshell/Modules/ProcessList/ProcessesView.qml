@@ -12,6 +12,7 @@ Item {
     property string expandedPid: ""
     property var contextMenu: null
     property string processFilter: "all" // "all", "user", "system"
+    property bool active: true
 
     property int selectedIndex: -1
     property bool keyboardNavigationActive: false
@@ -250,14 +251,27 @@ Item {
         }
     }
 
+    readonly property var dgopModules: ["processes", "cpu", "memory", "system"]
+    property bool _dgopHeld: false
+
+    function syncDgopRef(wanted) {
+        if (wanted === _dgopHeld)
+            return;
+        _dgopHeld = wanted;
+        if (wanted)
+            DgopService.addRef(dgopModules);
+        else
+            DgopService.removeRef(dgopModules);
+    }
+
+    onActiveChanged: syncDgopRef(active)
+
     Component.onCompleted: {
-        DgopService.addRef(["processes", "cpu", "memory", "system"]);
+        syncDgopRef(active);
         cachedProcesses = filteredProcesses;
     }
 
-    Component.onDestruction: {
-        DgopService.removeRef(["processes", "cpu", "memory", "system"]);
-    }
+    Component.onDestruction: syncDgopRef(false)
 
     ColumnLayout {
         anchors.fill: parent
