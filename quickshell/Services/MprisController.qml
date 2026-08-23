@@ -310,7 +310,6 @@ Singleton {
     }
 
     function setPinned(identity: string): void {
-        pinnedIdentity = identity;
         if (SessionData.pinnedPlayerIdentity !== identity)
             SessionData.set("pinnedPlayerIdentity", identity);
         _resolveActivePlayer();
