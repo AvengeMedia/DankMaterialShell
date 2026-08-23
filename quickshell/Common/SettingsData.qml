@@ -970,6 +970,43 @@ Singleton {
     property var notificationRules: []
     property bool notificationDndAllowCritical: true
     property bool notificationFocusedMonitor: false
+    // Names the bar config rendered as Dank Island instead of a DankBar. Empty = no island.
+    property string dankIslandBarId: ""
+    readonly property var islandBarConfig: dankIslandBarId ? (barConfigs.find(cfg => cfg.id === dankIslandBarId) || null) : null
+    readonly property bool dankIslandEnabled: !!islandBarConfig && (islandBarConfig.enabled ?? false)
+    readonly property int dankIslandPosition: islandBarConfig?.position ?? SettingsData.Position.Top
+    readonly property string dankIslandEdge: dankIslandPosition === SettingsData.Position.Bottom ? "bottom" : "top"
+    readonly property int dankIslandReservedStripHeight: {
+        const reserve = Math.max(36, Math.min(128, dankIslandReserveHeight));
+        const compact = Math.max(36, Math.min(72, dankIslandCompactHeight));
+        const gap = Math.max(0, Math.min(48, dankIslandOuterGap));
+        return Math.max(reserve, gap + compact);
+    }
+    property bool dankIslandFloating: false
+    property bool dankIslandUseOverlayLayer: false
+    property int dankIslandReserveHeight: 40
+    property int dankIslandCompactHeight: 38
+    property int dankIslandOuterGap: 4
+    property int dankIslandHorizontalOffset: 0
+    property string dankIslandInteractionMode: "hybrid"
+    property int dankIslandHoverOpenDelay: 220
+    property int dankIslandHoverCloseDelay: 400
+    property string dankIslandPalette: "default"
+    property bool dankIslandHighContrast: false
+    property bool dankIslandMediaClockVisible: true
+    property bool dankIslandNotificationExpand: false
+    property string dankIslandHomeMediaSlot: "left"
+    property string dankIslandHomeStatusSlot: "right"
+    property string dankIslandHomeWeatherSlot: "hidden"
+    property bool dankIslandHomeCompactTight: false
+    property string dankIslandBatteryStyle: "solid"
+    property bool dankIslandSatellitesEnabled: true
+    property string dankIslandSatellitePosition: "edges"
+    property int dankIslandSatelliteGap: 12
+    property bool dankIslandReducedMotion: false
+    property real dankIslandSpringStiffness: 560
+    property real dankIslandSpringDamping: 37
+    property real dankIslandSpringMass: 1
 
     property bool osdAlwaysShowValue: false
     property int osdPosition: SettingsData.Position.BottomCenter
@@ -1585,7 +1622,13 @@ Singleton {
         })
 
     function set(key, value) {
+        if (key === "dankIslandInteractionMode" && value !== "click" && value !== "hybrid")
+            value = "hybrid";
         Spec.set(root, key, value, saveSettings, _hooks);
+        if (key === "dankIslandBarId" && value && frameEnabled)
+            set("frameEnabled", false);
+        if (key === "frameEnabled" && value && dankIslandBarId)
+            set("dankIslandBarId", "");
     }
 
     function loadSettings() {
@@ -1638,6 +1681,10 @@ Singleton {
             }
 
             Store.parse(root, obj);
+
+            // set() enforces this pair, but a hand-edited settings.json bypasses set() entirely.
+            if (frameEnabled && dankIslandBarId)
+                dankIslandBarId = "";
 
             if (obj?.directionalAnimationMode === 3 && frameMode !== "connected")
                 frameMode = "connected";
@@ -2044,8 +2091,14 @@ Singleton {
         return showSeconds ? "h:mm:ss AP" : "h:mm AP";
     }
 
+    function getEffectiveDateFormat(fallback) {
+        if (clockDateFormat && clockDateFormat.length > 0)
+            return clockDateFormat;
+        return fallback || "ddd d";
+    }
+
     function initializeListModels() {
-        const defaultBar = barConfigs[0] || getBarConfig("default");
+        const defaultBar = getPrimaryBarConfig();
         if (defaultBar) {
             Lists.init(leftWidgetsModel, centerWidgetsModel, rightWidgetsModel, defaultBar.leftWidgets, defaultBar.centerWidgets, defaultBar.rightWidgets);
         }
@@ -2059,7 +2112,7 @@ Singleton {
     function getPopupTriggerPosition(pos, screen, barThickness, widgetWidth, barSpacing, barPosition, barConfig) {
         const relativeX = pos.x;
         const relativeY = pos.y;
-        const defaultBar = barConfigs[0] || getBarConfig("default");
+        const defaultBar = getPrimaryBarConfig();
         const spacing = barSpacing !== undefined ? barSpacing : (defaultBar?.spacing ?? 4);
         const position = barPosition !== undefined ? barPosition : (defaultBar?.position ?? SettingsData.Position.Top);
         const rawBottomGap = barConfig ? (barConfig.bottomGap !== undefined ? barConfig.bottomGap : (defaultBar?.bottomGap ?? 0)) : (defaultBar?.bottomGap ?? 0);
@@ -2119,7 +2172,7 @@ Singleton {
         }
 
         const enabledBars = getEnabledBarConfigs();
-        const defaultBar = barConfigs[0] || getBarConfig("default");
+        const defaultBar = getPrimaryBarConfig();
         const position = barPosition !== undefined ? barPosition : (defaultBar?.position ?? SettingsData.Position.Top);
         let topBar = 0;
         let bottomBar = 0;
@@ -2162,6 +2215,16 @@ Singleton {
             }
         }
 
+        // The island is not a bar, but it is chrome: popouts still have to clear its strip.
+        if (!isIslandBarConfig(barConfig)) {
+            const islandTop = dankIslandEdgeOffset(screen, "top");
+            const islandBottom = dankIslandEdgeOffset(screen, "bottom");
+            if (islandTop > 0)
+                topBar = Math.max(topBar, islandTop);
+            if (islandBottom > 0)
+                bottomBar = Math.max(bottomBar, islandBottom);
+        }
+
         return {
             "topBar": topBar,
             "bottomBar": bottomBar,
@@ -2181,7 +2244,7 @@ Singleton {
             };
         }
 
-        const defaultBar = barConfigs[0] || getBarConfig("default");
+        const defaultBar = getPrimaryBarConfig();
         const wingRadius = (defaultBar?.gothCornerRadiusOverride ?? false) ? (defaultBar?.gothCornerRadiusValue ?? 12) : Theme.cornerRadius;
         const wingSize = (defaultBar?.gothCornersEnabled ?? false) ? Math.max(0, wingRadius) : 0;
         const screenWidth = screen.width;
@@ -2306,7 +2369,7 @@ Singleton {
     }
 
     function setBarIpcReveal(barId, revealed) {
-        if (!barId)
+        if (!barId || barId === dankIslandBarId)
             return;
         const nextRevealed = !!revealed;
         if (!!barIpcRevealStates[barId] === nextRevealed)
@@ -2340,6 +2403,8 @@ Singleton {
         const index = configs.findIndex(cfg => cfg.id === barId);
         if (index === -1)
             return;
+        if (isIslandBarConfig(configs[index]) && updates.position !== undefined && updates.position !== SettingsData.Position.Top && updates.position !== SettingsData.Position.Bottom)
+            delete updates.position;
         const positionChanged = updates.position !== undefined && configs[index].position !== updates.position;
         if (updates.autoHide === false || updates.visible === false)
             setBarIpcReveal(barId, false);
@@ -2358,6 +2423,8 @@ Singleton {
             return;
         const configs = barConfigs.filter(cfg => cfg.id !== barId);
         barConfigs = configs;
+        if (dankIslandBarId === barId)
+            dankIslandBarId = "";
         if (connectedFrameBarStyleBackups?.[barId] !== undefined) {
             const nextBackups = JSON.parse(JSON.stringify(connectedFrameBarStyleBackups || {}));
             delete nextBackups[barId];
@@ -2367,8 +2434,22 @@ Singleton {
         updateBarConfigs();
     }
 
+    // Bar-kind instances only. The island reserves its own edge via dankIslandOwnsEdge.
     function getEnabledBarConfigs() {
-        return barConfigs.filter(cfg => cfg.enabled);
+        return barConfigs.filter(cfg => cfg.enabled && !isIslandBarConfig(cfg));
+    }
+
+    function getBarKindConfigs() {
+        return barConfigs.filter(cfg => !isIslandBarConfig(cfg));
+    }
+
+    // Style and popup fallbacks never treat the island as "the bar".
+    function getPrimaryBarConfig() {
+        const bars = getBarKindConfigs();
+        if (bars.length > 0)
+            return bars[0];
+        const fallback = getBarConfig("default");
+        return isIslandBarConfig(fallback) ? null : fallback;
     }
 
     function _sideToPosition(side) {
@@ -2383,6 +2464,20 @@ Singleton {
             return SettingsData.Position.Right;
         }
         return -1;
+    }
+
+    function positionToSide(pos) {
+        switch (pos) {
+        case SettingsData.Position.Top:
+            return "top";
+        case SettingsData.Position.Bottom:
+            return "bottom";
+        case SettingsData.Position.Left:
+            return "left";
+        case SettingsData.Position.Right:
+            return "right";
+        }
+        return "";
     }
 
     // Check if a bar occupies the specified screen edge
@@ -2507,6 +2602,35 @@ Singleton {
         return (bc?.showOnLastDisplay ?? false) && Quickshell.screens.length === 1;
     }
 
+    function isIslandBarConfig(bc) {
+        return !!bc && !!dankIslandBarId && bc.id === dankIslandBarId;
+    }
+
+    function getIslandScreens() {
+        const cfg = islandBarConfig;
+        if (!cfg || !(cfg.enabled ?? false))
+            return [];
+        return Quickshell.screens.filter(screen => barConfigCoversScreen(cfg, screen));
+    }
+
+    function dankIslandCoversScreen(screen) {
+        const cfg = islandBarConfig;
+        return !!screen && !!cfg && (cfg.enabled ?? false) && barConfigCoversScreen(cfg, screen);
+    }
+
+    function dankIslandOwnsEdge(screen, edge) {
+        return dankIslandCoversScreen(screen) && dankIslandEdge === edge;
+    }
+
+    // Painted strip thickness on `edge`, including when floating drops the exclusive zone.
+    function dankIslandEdgeOffset(screen, edge) {
+        return dankIslandOwnsEdge(screen, edge) ? dankIslandReservedStripHeight : 0;
+    }
+
+    function dankIslandIsSoleBarForScreen(screen) {
+        return dankIslandCoversScreen(screen) && getActiveBarEdgesForScreen(screen).length === 0;
+    }
+
     function getActiveBarEdgesForScreen(screen) {
         if (!screen)
             return [];
@@ -2516,6 +2640,10 @@ Singleton {
             if (!bc.enabled)
                 continue;
             if (!barConfigCoversScreen(bc, screen))
+                continue;
+            if (isIslandBarConfig(bc))
+                continue;
+            if (dankIslandOwnsEdge(screen, positionToSide(bc.position ?? SettingsData.Position.Top)))
                 continue;
             switch (bc.position ?? 0) {
             case SettingsData.Position.Top:
@@ -2544,6 +2672,10 @@ Singleton {
             if (!bc.enabled || !(bc.useOverlayLayer ?? false))
                 continue;
             if (!barConfigCoversScreen(bc, screen))
+                continue;
+            if (isIslandBarConfig(bc))
+                continue;
+            if (dankIslandOwnsEdge(screen, positionToSide(bc.position ?? SettingsData.Position.Top)))
                 continue;
             switch (bc.position ?? 0) {
             case SettingsData.Position.Top:
@@ -2727,8 +2859,9 @@ Singleton {
 
     function setShowDock(enabled) {
         showDock = enabled;
-        const defaultBar = barConfigs[0] || getBarConfig("default");
-        const barPos = defaultBar?.position ?? SettingsData.Position.Top;
+        const defaultBar = getPrimaryBarConfig();
+        // -1 matches no Position, so island-only setups have no dock conflict.
+        const barPos = defaultBar ? (defaultBar.position ?? SettingsData.Position.Top) : -1;
         if (enabled && dockPosition === barPos) {
             if (barPos === SettingsData.Position.Top) {
                 setDockPosition(SettingsData.Position.Bottom);
@@ -2752,8 +2885,9 @@ Singleton {
 
     function setDockPosition(position) {
         dockPosition = position;
-        const defaultBar = barConfigs[0] || getBarConfig("default");
-        const barPos = defaultBar?.position ?? SettingsData.Position.Top;
+        const defaultBar = getPrimaryBarConfig();
+        // -1 matches no Position, so island-only setups have no dock conflict.
+        const barPos = defaultBar ? (defaultBar.position ?? SettingsData.Position.Top) : -1;
         if (position === SettingsData.Position.Bottom && barPos === SettingsData.Position.Bottom && showDock) {
             setDankBarPosition(SettingsData.Position.Top);
         }
@@ -2771,7 +2905,7 @@ Singleton {
     }
 
     function setDankBarPosition(position) {
-        const defaultBar = barConfigs[0] || getBarConfig("default");
+        const defaultBar = getPrimaryBarConfig();
         if (!defaultBar)
             return;
         if (position === SettingsData.Position.Bottom && dockPosition === SettingsData.Position.Bottom && showDock) {
@@ -2796,7 +2930,7 @@ Singleton {
     }
 
     function setDankBarLeftWidgets(order) {
-        const defaultBar = barConfigs[0] || getBarConfig("default");
+        const defaultBar = getPrimaryBarConfig();
         if (defaultBar) {
             updateBarConfig(defaultBar.id, {
                 "leftWidgets": order
@@ -2806,7 +2940,7 @@ Singleton {
     }
 
     function setDankBarCenterWidgets(order) {
-        const defaultBar = barConfigs[0] || getBarConfig("default");
+        const defaultBar = getPrimaryBarConfig();
         if (defaultBar) {
             updateBarConfig(defaultBar.id, {
                 "centerWidgets": order
@@ -2816,7 +2950,7 @@ Singleton {
     }
 
     function setDankBarRightWidgets(order) {
-        const defaultBar = barConfigs[0] || getBarConfig("default");
+        const defaultBar = getPrimaryBarConfig();
         if (defaultBar) {
             updateBarConfig(defaultBar.id, {
                 "rightWidgets": order

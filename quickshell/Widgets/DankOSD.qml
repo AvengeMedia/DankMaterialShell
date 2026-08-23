@@ -130,10 +130,12 @@ PanelWindow {
         const configs = SettingsData.barConfigs;
         if (!screen || !configs)
             return offsets;
-        const defaultBar = configs[0] || SettingsData.getBarConfig("default");
+        const defaultBar = SettingsData.getPrimaryBarConfig();
         for (var i = 0; i < configs.length; i++) {
             const bc = configs[i];
             if (!bc || !(bc.enabled ?? true) || !(bc.visible ?? true))
+                continue;
+            if (SettingsData.isIslandBarConfig(bc))
                 continue;
             if (!SettingsData.barConfigCoversScreen(bc, screen))
                 continue;
@@ -158,6 +160,9 @@ PanelWindow {
                 break;
             }
         }
+        // Legacy OSDs still instantiate on island screens, so the strip has to be reserved for them.
+        offsets.top = Math.max(offsets.top, SettingsData.dankIslandEdgeOffset(screen, "top"));
+        offsets.bottom = Math.max(offsets.bottom, SettingsData.dankIslandEdgeOffset(screen, "bottom"));
         return offsets;
     }
 

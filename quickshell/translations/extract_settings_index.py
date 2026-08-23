@@ -86,6 +86,7 @@ CATEGORY_KEYWORDS = {
     "Greeter": ["login", "greetd", "display manager"],
     "Multiplexers": ["tmux", "zellij", "terminal"],
     "Frame": ["window", "border", "decoration"],
+    "Dank Island": ["island", "activities", "dynamic island"],
     "Default Apps": ["browser", "terminal", "handlers", "mime"],
     "Users": ["accounts", "user", "profile"],
     "Autostart": ["startup", "launch", "boot"],
@@ -96,6 +97,7 @@ TAB_INDEX_MAP = {
     "TimeWeatherTab.qml": 1,
     "KeybindsTab.qml": 2,
     "DankBarTab.qml": 3,
+    "DankIslandTab.qml": 46,
     "WorkspacesTab.qml": 4,
     "CompositorLayoutTab.qml": 37,
     "WindowRulesTab.qml": 38,
@@ -191,6 +193,7 @@ TAB_CATEGORY_MAP = {
     43: "Dank Dash",
     44: "System",
     45: "System",
+    46: "Dank Island",
 }
 
 SEARCHABLE_COMPONENTS = [

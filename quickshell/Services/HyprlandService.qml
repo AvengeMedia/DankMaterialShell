@@ -80,7 +80,7 @@ Singleton {
         function onBarConfigsChanged() {
             if (!CompositorService.isHyprland)
                 return;
-            const newGaps = Math.max(4, (SettingsData.barConfigs[0]?.spacing ?? 4));
+            const newGaps = Math.max(4, (SettingsData.getPrimaryBarConfig()?.spacing ?? 4));
             if (newGaps === root._lastGapValue)
                 return;
             root._lastGapValue = newGaps;
@@ -330,7 +330,7 @@ Singleton {
         layoutGenerationRunning = true;
 
         const defaultRadius = typeof SettingsData !== "undefined" ? SettingsData.cornerRadius : 12;
-        const defaultGaps = typeof SettingsData !== "undefined" ? Math.max(4, (SettingsData.barConfigs[0]?.spacing ?? 4)) : 4;
+        const defaultGaps = typeof SettingsData !== "undefined" ? Math.max(4, (SettingsData.getPrimaryBarConfig()?.spacing ?? 4)) : 4;
         const defaultBorderSize = 2;
 
         const cornerRadius = (typeof SettingsData !== "undefined" && SettingsData.hyprlandLayoutRadiusOverride >= 0) ? SettingsData.hyprlandLayoutRadiusOverride : defaultRadius;
@@ -344,6 +344,8 @@ Singleton {
         // Hyprland `xray = false` is still early-development; unset already samples real content, so only force xray=true
         // dms:frame only in separate mode — connected-mode frame blur overlaps windows via popouts/arcs
         const xrayNamespaces = ["dms:bar"];
+        if (typeof SettingsData !== "undefined" && SettingsData.dankIslandEnabled)
+            xrayNamespaces.push("dms:dankisland");
         if (frameEnabled && SettingsData.frameMode !== "connected")
             xrayNamespaces.push("dms:frame");
 

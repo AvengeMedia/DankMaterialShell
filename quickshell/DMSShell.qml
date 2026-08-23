@@ -13,6 +13,7 @@ import qs.Modals.DankLauncherV2
 import qs.Modules
 import qs.Modules.AppDrawer
 import qs.Modules.DankDash
+import qs.Modules.DankIsland
 import qs.Modules.ControlCenter
 import qs.Modules.Dock
 import qs.Modules.Lock
@@ -37,6 +38,18 @@ Item {
 
     property bool osdSurfacesLoaded: false
     property int pendingOsdResumeReloads: 0
+    readonly property var dankIslandScreens: SettingsData.getIslandScreens()
+    readonly property var notificationPopupScreens: {
+        const screens = SettingsData.notificationFocusedMonitor ? Quickshell.screens : SettingsData.getFilteredScreens("notifications");
+        return root.withoutDankIslandScreens(screens);
+    }
+    readonly property var legacySystemLevelOsdScreens: root.withoutDankIslandScreens(SettingsData.getFilteredScreens("osd"))
+
+    function withoutDankIslandScreens(screens) {
+        if (!SettingsData.dankIslandEnabled)
+            return screens;
+        return screens.filter(screen => root.dankIslandScreens.indexOf(screen) === -1);
+    }
 
     function recreateOsdSurfaces() {
         OSDManager.currentOSDsByScreen = ({});
@@ -386,9 +399,25 @@ Item {
     }
 
     Variants {
-        model: SettingsData.notificationFocusedMonitor ? Quickshell.screens : SettingsData.getFilteredScreens("notifications")
+        model: root.notificationPopupScreens
 
         delegate: NotificationPopupManager {}
+    }
+
+    Loader {
+        id: dankIslandLoader
+
+        property var modalRef: colorPickerModal
+        property LazyLoader powerModalLoaderRef: powerMenuModalLoader
+
+        active: SettingsData.dankIslandEnabled
+        asynchronous: false
+        sourceComponent: DankIsland {
+            screenModel: root.dankIslandScreens
+            colorPickerModal: dankIslandLoader.modalRef
+            powerMenuModalLoader: dankIslandLoader.powerModalLoaderRef
+            onLockRequested: lock.activate()
+        }
     }
 
     LazyLoader {
@@ -1159,7 +1188,7 @@ Item {
         sourceComponent: Component {
             Item {
                 Variants {
-                    model: SettingsData.getFilteredScreens("osd")
+                    model: root.legacySystemLevelOsdScreens
 
                     delegate: VolumeOSD {}
                 }
@@ -1183,7 +1212,7 @@ Item {
                 }
 
                 Variants {
-                    model: SettingsData.getFilteredScreens("osd")
+                    model: root.legacySystemLevelOsdScreens
 
                     delegate: BrightnessOSD {}
                 }

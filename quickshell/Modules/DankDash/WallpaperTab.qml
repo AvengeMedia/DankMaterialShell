@@ -40,6 +40,7 @@ Item {
     property bool sortAscending: true
     // Forces the page grid to rebuild when the folder model reorders in place.
     property int gridRevision: 0
+    property int pagerCachePages: 1
 
     signal requestTabChange(int newIndex)
 
@@ -64,15 +65,18 @@ Item {
         return Math.max(0, Math.min(itemsPerPage, wallpaperCount - page * itemsPerPage));
     }
 
-    function matchesSearch(fileName, filePath) {
+    function searchTerms() {
         const query = searchQuery.trim().toLowerCase();
-        if (!query)
+        return query ? query.split(/\s+/).filter(t => t.length > 0) : [];
+    }
+
+    function matchesTerms(terms, fileName, filePath) {
+        if (terms.length === 0)
             return true;
 
         const haystack = (fileName + " " + filePath).toLowerCase();
-        const terms = query.split(/\s+/);
         for (let i = 0; i < terms.length; i++) {
-            if (terms[i] && haystack.indexOf(terms[i]) === -1)
+            if (haystack.indexOf(terms[i]) === -1)
                 return false;
         }
         return true;
@@ -81,27 +85,56 @@ Item {
     function rebuildWallpaperList(preferCurrentWallpaper) {
         const paths = [];
         if (wallpaperFolderModel.status === FolderListModel.Ready) {
-            for (let i = 0; i < wallpaperFolderModel.count; i++) {
+            const terms = searchTerms();
+            const rowCount = wallpaperFolderModel.count;
+            for (let i = 0; i < rowCount; i++) {
                 const filePath = cleanFilePath(wallpaperFolderModel.get(i, "filePath"));
-                const fileName = wallpaperFolderModel.get(i, "fileName") || filePath.substring(filePath.lastIndexOf('/') + 1);
-                if (filePath && matchesSearch(fileName, filePath))
-                    paths.push(filePath);
+                if (!filePath)
+                    continue;
+                if (terms.length > 0) {
+                    const fileName = wallpaperFolderModel.get(i, "fileName") || filePath.substring(filePath.lastIndexOf('/') + 1);
+                    if (!matchesTerms(terms, fileName, filePath))
+                        continue;
+                }
+                paths.push(filePath);
             }
+        }
+
+        const selectCurrent = preferCurrentWallpaper && visible && active;
+        if (selectCurrent) {
+            enableAnimation = false;
+            const currentWallpaper = getCurrentWallpaper();
+            let matched = false;
+            if (currentWallpaper) {
+                for (let i = 0; i < paths.length; i++) {
+                    if (paths[i] === currentWallpaper) {
+                        currentPage = Math.floor(i / itemsPerPage);
+                        gridIndex = i % itemsPerPage;
+                        matched = true;
+                        break;
+                    }
+                }
+            }
+            if (!matched) {
+                currentPage = 0;
+                gridIndex = 0;
+            }
+        } else {
+            const nextTotal = Math.max(1, Math.ceil(paths.length / itemsPerPage));
+            if (currentPage >= nextTotal)
+                currentPage = Math.max(0, nextTotal - 1);
+            const visibleCount = Math.max(0, Math.min(itemsPerPage, paths.length - currentPage * itemsPerPage));
+            gridIndex = visibleCount > 0 ? Math.min(gridIndex, visibleCount - 1) : 0;
         }
 
         filteredWallpaperPaths = paths;
         gridRevision++;
-
-        if (currentPage >= totalPages)
-            currentPage = Math.max(0, totalPages - 1);
-
-        const visibleCount = pageItemCount(currentPage);
-        gridIndex = visibleCount > 0 ? Math.min(gridIndex, visibleCount - 1) : 0;
-
-        if (preferCurrentWallpaper && visible && active)
-            setInitialSelection();
-        else
-            updateSelectedFileName();
+        updateSelectedFileName();
+        if (selectCurrent) {
+            Qt.callLater(() => {
+                enableAnimation = true;
+            });
+        }
     }
 
     function focusSearch() {
@@ -514,27 +547,31 @@ Item {
         }
     }
 
-    FileBrowserSurfaceModal {
-        id: wallpaperBrowser
+    Loader {
+        id: wallpaperBrowserLoader
 
-        browserTitle: I18n.tr("Select Wallpaper Directory", "wallpaper directory file browser title")
-        browserIcon: "folder_open"
-        browserType: "wallpaper"
-        showHiddenFiles: false
-        fileExtensions: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp", "*.jxl", "*.avif", "*.heif", "*.exr"]
-        parentPopout: root.parentPopout
+        active: false
 
-        onFileSelected: path => {
-            const cleanPath = path.replace(/^file:\/\//, '');
-            setCurrentWallpaper(cleanPath);
+        sourceComponent: FileBrowserSurfaceModal {
+            browserTitle: I18n.tr("Select Wallpaper Directory", "wallpaper directory file browser title")
+            browserIcon: "folder_open"
+            browserType: "wallpaper"
+            showHiddenFiles: false
+            fileExtensions: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp", "*.jxl", "*.avif", "*.heif", "*.exr"]
+            parentPopout: root.parentPopout
 
-            const dirPath = cleanPath.substring(0, cleanPath.lastIndexOf('/'));
-            if (dirPath) {
-                wallpaperDir = dirPath;
-                CacheData.wallpaperLastPath = dirPath;
-                CacheData.saveCache();
+            onFileSelected: path => {
+                const cleanPath = path.replace(/^file:\/\//, '');
+                root.setCurrentWallpaper(cleanPath);
+
+                const dirPath = cleanPath.substring(0, cleanPath.lastIndexOf('/'));
+                if (dirPath) {
+                    root.wallpaperDir = dirPath;
+                    CacheData.wallpaperLastPath = dirPath;
+                    CacheData.saveCache();
+                }
+                close();
             }
-            close();
         }
     }
 
@@ -565,9 +602,14 @@ Item {
                 keyNavigationEnabled: false
                 activeFocusOnTab: false
                 focus: false
-                cacheBuffer: Math.max(0, height * 2)
-                reuseItems: true
-                model: root.totalPages
+                cacheBuffer: Math.max(0, height * root.pagerCachePages)
+                reuseItems: false
+                model: height > 1 ? root.totalPages : 0
+
+                onCountChanged: {
+                    if (count > 0 && currentIndex !== root.currentPage)
+                        currentIndex = root.currentPage;
+                }
 
                 onCurrentIndexChanged: {
                     if (!moving) {
@@ -595,7 +637,7 @@ Item {
                     property int pageIndex: index
 
                     width: pager.width
-                    height: pager.height
+                    height: Math.max(1, pager.height)
                     cellWidth: width / 4
                     cellHeight: height / 4
                     interactive: false
@@ -811,7 +853,7 @@ Item {
                     DankActionButton {
                         id: sortButton
                         anchors.verticalCenter: parent.verticalCenter
-                        iconName: "sort"
+                        iconName: "filter_list"
                         iconSize: 20
                         buttonSize: 32
                         opacity: 0.7
@@ -833,7 +875,10 @@ Item {
                         opacity: 0.7
                         tooltipText: I18n.tr("Choose wallpaper folder")
                         tooltipSide: "top"
-                        onClicked: wallpaperBrowser.open()
+                        onClicked: {
+                            wallpaperBrowserLoader.active = true;
+                            wallpaperBrowserLoader.item.open();
+                        }
                     }
 
                     Item {

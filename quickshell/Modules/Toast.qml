@@ -17,7 +17,9 @@ PanelWindow {
 
     readonly property real dpr: modelData ? CompositorService.getScreenScale(modelData) : 1
     readonly property real shadowBuffer: 5
-    readonly property real toastY: Theme.barHeight - 4 + (SettingsData.barConfigs[0]?.spacing ?? 4) + 2
+    // Toasts always drop from the top edge, so they clear whichever chrome owns it.
+    readonly property real islandTopOffset: SettingsData.dankIslandEdgeOffset(modelData, "top")
+    readonly property real toastY: islandTopOffset > 0 ? islandTopOffset + Theme.spacingS : Theme.barHeight - 4 + (SettingsData.getPrimaryBarConfig()?.spacing ?? 4) + 2
 
     Connections {
         target: ToastService

@@ -310,8 +310,11 @@ DankModal {
     positioning: parentBounds.width > 0 ? "custom" : "center"
     customPosition: {
         if (parentBounds.width > 0) {
-            const effectiveBarThickness = Math.max(26 + (SettingsData.barConfigs[0]?.innerPadding ?? 4) * 0.6 + (SettingsData.barConfigs[0]?.innerPadding ?? 4) + 4, Theme.barHeight - 4 - (8 - (SettingsData.barConfigs[0]?.innerPadding ?? 4)));
-            const barExclusionZone = effectiveBarThickness + (SettingsData.barConfigs[0]?.spacing ?? 4) + (SettingsData.barConfigs[0]?.bottomGap ?? 0);
+            const bar = SettingsData.getPrimaryBarConfig();
+            const barPadding = bar?.innerPadding ?? 4;
+            const effectiveBarThickness = Math.max(26 + barPadding * 0.6 + barPadding + 4, Theme.barHeight - 4 - (8 - barPadding));
+            const barExclusionZone = effectiveBarThickness + (bar?.spacing ?? 4) + (bar?.bottomGap ?? 0);
+            const barPosition = bar?.position ?? SettingsData.Position.Top;
             const screenW = parentScreen?.width ?? 1920;
             const screenH = parentScreen?.height ?? 1080;
             const margin = Theme.spacingL;
@@ -319,8 +322,10 @@ DankModal {
             let targetX = parentBounds.x + (parentBounds.width - modalWidth) / 2;
             let targetY = parentBounds.y + (parentBounds.height - modalHeight) / 2;
 
-            const minY = (SettingsData.barConfigs[0]?.position ?? SettingsData.Position.Top) === SettingsData.Position.Top ? barExclusionZone + margin : margin;
-            const maxY = (SettingsData.barConfigs[0]?.position ?? SettingsData.Position.Top) === SettingsData.Position.Bottom ? screenH - modalHeight - barExclusionZone - margin : screenH - modalHeight - margin;
+            const topChrome = Math.max(bar && barPosition === SettingsData.Position.Top ? barExclusionZone : 0, SettingsData.dankIslandEdgeOffset(parentScreen, "top"));
+            const bottomChrome = Math.max(bar && barPosition === SettingsData.Position.Bottom ? barExclusionZone : 0, SettingsData.dankIslandEdgeOffset(parentScreen, "bottom"));
+            const minY = topChrome + margin;
+            const maxY = screenH - modalHeight - bottomChrome - margin;
 
             targetY = Math.max(minY, Math.min(maxY, targetY));
 

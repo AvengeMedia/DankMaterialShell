@@ -525,7 +525,7 @@ Singleton {
         function onBarConfigsChanged() {
             if (!CompositorService.isMango)
                 return;
-            const newGaps = Math.max(4, (SettingsData.barConfigs[0]?.spacing ?? 4));
+            const newGaps = Math.max(4, (SettingsData.getPrimaryBarConfig()?.spacing ?? 4));
             if (newGaps === root._lastGapValue)
                 return;
             root._lastGapValue = newGaps;
@@ -631,7 +631,7 @@ Singleton {
             return;
 
         const defaultRadius = typeof SettingsData !== "undefined" ? SettingsData.cornerRadius : 12;
-        const defaultGaps = typeof SettingsData !== "undefined" ? Math.max(4, (SettingsData.barConfigs[0]?.spacing ?? 4)) : 4;
+        const defaultGaps = typeof SettingsData !== "undefined" ? Math.max(4, (SettingsData.getPrimaryBarConfig()?.spacing ?? 4)) : 4;
         const defaultBorderSize = 2;
 
         const cornerRadius = (typeof SettingsData !== "undefined" && SettingsData.mangoLayoutRadiusOverride >= 0) ? SettingsData.mangoLayoutRadiusOverride : defaultRadius;

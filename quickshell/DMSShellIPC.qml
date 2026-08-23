@@ -217,6 +217,8 @@ Item {
 
     IpcHandler {
         function open(): string {
+            if (PopoutService.routeControlCenterToIsland(null, "", false))
+                return "CONTROL_CENTER_OPEN_SUCCESS";
             const bar = root.getPreferredBar("controlCenterButtonRef");
             if (bar) {
                 bar.triggerControlCenter();
@@ -226,6 +228,8 @@ Item {
         }
 
         function hide(): string {
+            if (PopoutService.dankIslandRouter?.closeControlCenter?.() === true)
+                return "CONTROL_CENTER_HIDE_SUCCESS";
             if (root.controlCenterLoader.item && root.controlCenterLoader.item.shouldBeVisible) {
                 root.controlCenterLoader.item.close();
                 return "CONTROL_CENTER_HIDE_SUCCESS";
@@ -238,6 +242,8 @@ Item {
                 root.controlCenterLoader.item.close();
                 return "CONTROL_CENTER_TOGGLE_SUCCESS";
             }
+            if (PopoutService.routeControlCenterToIsland(null, "", true))
+                return "CONTROL_CENTER_TOGGLE_SUCCESS";
 
             const bar = root.getPreferredBar("controlCenterButtonRef");
             if (bar) {
@@ -248,6 +254,8 @@ Item {
         }
 
         function status(): string {
+            if (PopoutService.islandControlCenterOpen)
+                return "visible";
             return (root.controlCenterLoader.item && root.controlCenterLoader.item.shouldBeVisible) ? "visible" : "hidden";
         }
 
@@ -303,11 +311,22 @@ Item {
         }
 
         function _openDash(tab, position) {
+            const tabId = _resolveTabId(tab);
+            if (!position) {
+                if (tabId === "overview" && PopoutService.routeOverviewToIsland(null, false))
+                    return true;
+                if (tabId === "media" && PopoutService.routeMediaToIsland(null, false))
+                    return true;
+                if (tabId === "wallpaper" && PopoutService.routeWallpaperToIsland(null, false))
+                    return true;
+                if (tabId === "weather" && PopoutService.routeWeatherToIsland(null, false))
+                    return true;
+            }
+
             const bar = _dashBar(position);
             if (!bar)
                 return false;
 
-            const tabId = _resolveTabId(tab);
             const dash = root.dankDashPopoutLoader.item;
             if (dash && dash.shouldBeVisible && dash.triggerScreen?.name === bar.screen?.name) {
                 if (position && bar.positionDash)
@@ -327,10 +346,22 @@ Item {
                 return true;
             }
 
+            const tabId = _resolveTabId(tab);
+            if (!position) {
+                if (tabId === "overview" && PopoutService.routeOverviewToIsland(null, true))
+                    return true;
+                if (tabId === "media" && PopoutService.routeMediaToIsland(null, true))
+                    return true;
+                if (tabId === "wallpaper" && PopoutService.routeWallpaperToIsland(null, true))
+                    return true;
+                if (tabId === "weather" && PopoutService.routeWeatherToIsland(null, true))
+                    return true;
+            }
+
             const bar = _dashBar(position);
             if (!bar)
                 return false;
-            return bar.triggerDashTab(_resolveTabId(tab), position);
+            return bar.triggerDashTab(tabId, position);
         }
 
         function resolveTabIndex(tab: string): int {
@@ -346,6 +377,8 @@ Item {
         }
 
         function close(): string {
+            if (PopoutService.closeIslandHome() || PopoutService.closeIslandMedia() || PopoutService.closeIslandWallpaper() || PopoutService.closeIslandWeather())
+                return "DASH_CLOSE_SUCCESS";
             if (root.dankDashPopoutLoader.item) {
                 root.dankDashPopoutLoader.item.dashVisible = false;
                 return "DASH_CLOSE_SUCCESS";
@@ -752,6 +785,8 @@ Item {
     // ! TODO - remove for v1.6
     IpcHandler {
         function wallpaper(): string {
+            if (PopoutService.routeWallpaperToIsland(null, true))
+                return "WARN; deprecated, use dms ipc call dash toggle wallpaper instead";
             const bar = root.getPreferredBar("clockButtonRef") || root.getPreferredBar();
             if (bar) {
                 bar.triggerWallpaperBrowser();
@@ -788,6 +823,8 @@ Item {
             } = getBarConfig(selector, value);
             if (error)
                 return error;
+            if (SettingsData.isIslandBarConfig(barConfig))
+                return "BAR_IS_ISLAND";
             SettingsData.updateBarConfig(barConfig.id, {
                 visible: true
             });
@@ -801,6 +838,8 @@ Item {
             } = getBarConfig(selector, value);
             if (error)
                 return error;
+            if (SettingsData.isIslandBarConfig(barConfig))
+                return "BAR_IS_ISLAND";
             SettingsData.updateBarConfig(barConfig.id, {
                 visible: false
             });
@@ -814,6 +853,8 @@ Item {
             } = getBarConfig(selector, value);
             if (error)
                 return error;
+            if (SettingsData.isIslandBarConfig(barConfig))
+                return "BAR_IS_ISLAND";
             SettingsData.updateBarConfig(barConfig.id, {
                 visible: !barConfig.visible
             });
@@ -837,6 +878,8 @@ Item {
             } = getBarConfig(selector, value);
             if (error)
                 return error;
+            if (SettingsData.isIslandBarConfig(barConfig))
+                return "BAR_IS_ISLAND";
             SettingsData.updateBarConfig(barConfig.id, {
                 autoHide: true
             });
@@ -850,6 +893,8 @@ Item {
             } = getBarConfig(selector, value);
             if (error)
                 return error;
+            if (SettingsData.isIslandBarConfig(barConfig))
+                return "BAR_IS_ISLAND";
             SettingsData.updateBarConfig(barConfig.id, {
                 autoHide: false
             });
@@ -863,6 +908,8 @@ Item {
             } = getBarConfig(selector, value);
             if (error)
                 return error;
+            if (SettingsData.isIslandBarConfig(barConfig))
+                return "BAR_IS_ISLAND";
             SettingsData.updateBarConfig(barConfig.id, {
                 autoHide: !barConfig.autoHide
             });
@@ -876,6 +923,8 @@ Item {
             } = getBarConfig(selector, value);
             if (error)
                 return error;
+            if (SettingsData.isIslandBarConfig(barConfig))
+                return "BAR_IS_ISLAND";
             if (!barConfig.autoHide)
                 return "BAR_AUTO_HIDE_DISABLED";
             if (!(barConfig.visible ?? true)) {
@@ -916,6 +965,9 @@ Item {
             const posValue = positionMap[position.toLowerCase()];
             if (posValue === undefined)
                 return "BAR_INVALID_POSITION";
+            // The island silhouette only anchors top or bottom.
+            if (SettingsData.isIslandBarConfig(barConfig) && posValue !== SettingsData.Position.Top && posValue !== SettingsData.Position.Bottom)
+                return "BAR_IS_ISLAND";
             SettingsData.updateBarConfig(barConfig.id, {
                 position: posValue
             });

@@ -13,22 +13,104 @@ DankListView {
     property alias listContentHeight: listView.contentHeight
     property real stableContentHeight: 0
     property bool cardAnimateExpansion: true
+    property bool trackStableContentHeight: true
+    property bool trackSessionContentHeight: false
+    property bool lightweightCards: false
     property bool listInitialized: false
     property int swipingCardIndex: -1
     property real swipingCardOffset: 0
     property bool _stableHeightUpdatePending: false
+    property bool _sessionHeightUpdatePending: false
+    property real sessionContentHeight: 0
     property var transientSurfaceTracker: null
     readonly property real shadowBlurPx: Theme.elevationEnabled ? ((Theme.elevationLevel1 && Theme.elevationLevel1.blurPx !== undefined) ? Theme.elevationLevel1.blurPx : 4) : 0
     readonly property real shadowHorizontalGutter: Theme.snap(Math.max(Theme.spacingS, Math.min(32, shadowBlurPx * 1.5 + 6)), 1)
     readonly property real shadowVerticalGutter: Theme.snap(Math.max(Theme.spacingXS, 6), 1)
     readonly property real delegateShadowGutter: Theme.snap(Math.max(Theme.spacingXS, 4), 1)
+    readonly property real estimatedCollapsedCardHeight: {
+        const compact = SettingsData.notificationCompactMode;
+        const padding = compact ? Theme.notificationCardPaddingCompact : Theme.notificationCardPadding;
+        const icon = compact ? Theme.notificationIconSizeCompact : Theme.notificationIconSizeNormal;
+        const body = Theme.fontSizeSmall * 1.2 + Theme.fontSizeMedium * 1.2 + Theme.fontSizeSmall * 1.2 * (compact ? 1 : 2);
+        const actionHeight = compact ? 20 : 24;
+        const contentSpacing = compact ? Theme.spacingXS : Theme.spacingS;
+        return padding * 2 + Math.max(icon, body) + actionHeight + contentSpacing + delegateShadowGutter;
+    }
 
     Component.onCompleted: {
         Qt.callLater(() => {
             if (listView) {
                 listView.listInitialized = true;
-                listView.syncStableContentHeight(false);
+                if (listView.trackStableContentHeight)
+                    listView.syncStableContentHeight(false);
+                listView.syncSessionContentHeight();
             }
+        });
+    }
+
+    function estimateContentHeight(groupCount) {
+        if (groupCount <= 0)
+            return 0;
+        return topMargin + bottomMargin + groupCount * estimatedCollapsedCardHeight + Math.max(0, groupCount - 1) * spacing;
+    }
+
+    function estimateExpandedCardHeight(group) {
+        const compact = SettingsData.notificationCompactMode;
+        const padding = compact ? Theme.notificationCardPaddingCompact : Theme.notificationCardPadding;
+        const header = compact ? 32 : 40;
+        const count = Math.min(10, Math.max(1, group?.count || group?.notifications?.length || 1));
+        const icon = compact ? Theme.notificationExpandedIconSizeCompact : Theme.notificationExpandedIconSizeNormal;
+        const itemPadding = compact ? Theme.spacingS : Theme.spacingM;
+        const contentSpacing = compact ? Theme.spacingXS : Theme.spacingS;
+        const actionHeight = compact ? 20 : 24;
+        const textBlock = Theme.fontSizeSmall * 1.2 + Theme.fontSizeMedium * 1.2 + Theme.fontSizeSmall * 1.2 * 2;
+        const row = itemPadding * 2 + Math.max(icon, textBlock) + actionHeight + contentSpacing * 2;
+        const innerSpacing = compact ? Theme.spacingS : Theme.spacingL;
+        const headerSpacing = compact ? Theme.spacingXS : Theme.spacingS;
+        return padding * 2 + header + headerSpacing + count * row + Math.max(0, count - 1) * innerSpacing + delegateShadowGutter;
+    }
+
+    function estimatedHeightForGroup(group) {
+        if (!group)
+            return estimatedCollapsedCardHeight;
+        if (NotificationService.expandedGroups[group.key])
+            return estimateExpandedCardHeight(group);
+        return estimatedCollapsedCardHeight;
+    }
+
+    function computeSessionContentHeight() {
+        const groups = NotificationService.groupedNotifications;
+        const count = groups ? groups.length : 0;
+        if (count <= 0)
+            return 0;
+
+        let total = topMargin + bottomMargin + Math.max(0, count - 1) * spacing;
+        for (let i = 0; i < count; i++) {
+            const item = itemAtIndex(i);
+            if (item && item.nonAnimHeight !== undefined && item.nonAnimHeight > 0)
+                total += item.nonAnimHeight;
+            else
+                total += estimatedHeightForGroup(groups[i]);
+        }
+        return Math.max(0, total);
+    }
+
+    function syncSessionContentHeight() {
+        if (!trackSessionContentHeight)
+            return;
+        const next = computeSessionContentHeight();
+        if (Math.abs(next - sessionContentHeight) <= 0.5)
+            return;
+        sessionContentHeight = next;
+    }
+
+    function queueSessionContentHeightUpdate() {
+        if (!trackSessionContentHeight || _sessionHeightUpdatePending)
+            return;
+        _sessionHeightUpdatePending = true;
+        Qt.callLater(() => {
+            _sessionHeightUpdatePending = false;
+            syncSessionContentHeight();
         });
     }
 
@@ -47,6 +129,8 @@ DankListView {
     }
 
     function syncStableContentHeight(useTarget) {
+        if (!trackStableContentHeight)
+            return;
         const nextHeight = useTarget ? targetContentHeight() : contentHeight;
         if (Math.abs(nextHeight - stableContentHeight) <= 0.5)
             return;
@@ -54,7 +138,7 @@ DankListView {
     }
 
     function queueStableContentHeightUpdate(useTarget) {
-        if (_stableHeightUpdatePending)
+        if (!trackStableContentHeight || _stableHeightUpdatePending)
             return;
         _stableHeightUpdatePending = true;
         Qt.callLater(() => {
@@ -64,11 +148,13 @@ DankListView {
     }
 
     onContentHeightChanged: {
-        if (!isAnimatingExpansion)
+        if (trackStableContentHeight && !isAnimatingExpansion)
             queueStableContentHeightUpdate(false);
     }
 
     onIsAnimatingExpansionChanged: {
+        if (!trackStableContentHeight)
+            return;
         if (isAnimatingExpansion) {
             syncStableContentHeight(true);
         } else {
@@ -121,10 +207,12 @@ DankListView {
         anchors.horizontalCenter: parent.horizontalCenter
     }
 
+    onCountChanged: listView.queueSessionContentHeightUpdate()
+
     onModelChanged: {
-        if (!keyboardController || !keyboardController.keyboardNavigationActive) {
+        listView.queueSessionContentHeightUpdate();
+        if (!keyboardController || !keyboardController.keyboardNavigationActive)
             return;
-        }
         keyboardController.rebuildFlatNavigation();
         Qt.callLater(() => {
             if (keyboardController && keyboardController.keyboardNavigationActive && !autoScrollDisabled) {
@@ -155,7 +243,9 @@ DankListView {
             Qt.callLater(() => {
                 if (delegateRoot) {
                     delegateRoot.__delegateInitialized = true;
-                    listView.queueStableContentHeightUpdate(listView.isAnimatingExpansion);
+                    if (listView.trackStableContentHeight)
+                        listView.queueStableContentHeightUpdate(listView.isAnimatingExpansion);
+                    listView.queueSessionContentHeightUpdate();
                 }
             });
         }
@@ -174,6 +264,7 @@ DankListView {
             notificationGroup: modelData
             keyboardNavigationActive: listView.keyboardActive
             animateExpansion: listView.cardAnimateExpansion && listView.listInitialized
+            lightweight: listView.lightweightCards
             transientSurfaceTracker: listView.transientSurfaceTracker
             opacity: {
                 const swipeAmount = Math.abs(delegateRoot.swipeOffset);
@@ -183,6 +274,8 @@ DankListView {
                 return Math.max(0, 1 - fadeProgress);
             }
             onIsAnimatingChanged: {
+                if (!listView.trackStableContentHeight)
+                    return;
                 if (isAnimating) {
                     listView.isAnimatingExpansion = true;
                     listView.syncStableContentHeight(true);
@@ -204,6 +297,9 @@ DankListView {
             }
 
             onTargetHeightChanged: {
+                listView.queueSessionContentHeightUpdate();
+                if (!listView.trackStableContentHeight)
+                    return;
                 if (isAnimating || listView.isAnimatingExpansion)
                     listView.syncStableContentHeight(true);
                 else
@@ -289,6 +385,7 @@ DankListView {
         target: NotificationService
 
         function onGroupedNotificationsChanged() {
+            listView.queueSessionContentHeightUpdate();
             if (!keyboardController) {
                 return;
             }
@@ -310,12 +407,14 @@ DankListView {
         }
 
         function onExpandedGroupsChanged() {
+            listView.queueSessionContentHeightUpdate();
             if (!keyboardController || !keyboardController.keyboardNavigationActive)
                 return;
             expansionEnsureVisibleTimer.restart();
         }
 
         function onExpandedMessagesChanged() {
+            listView.queueSessionContentHeightUpdate();
             if (!keyboardController || !keyboardController.keyboardNavigationActive)
                 return;
             expansionEnsureVisibleTimer.restart();

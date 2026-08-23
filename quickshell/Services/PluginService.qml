@@ -707,7 +707,7 @@ Singleton {
             return id !== widgetId;
         }
 
-        const defaultBar = SettingsData.barConfigs[0] || SettingsData.getBarConfig("default");
+        const defaultBar = SettingsData.getPrimaryBarConfig();
         if (!defaultBar)
             return;
         const leftWidgets = defaultBar.leftWidgets || [];

@@ -45,6 +45,6 @@ Item {
         anchors.fill: parent
         radius: root.radius
         visible: false
-        layer.enabled: true
+        layer.enabled: root.blurActive
     }
 }

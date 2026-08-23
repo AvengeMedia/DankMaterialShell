@@ -10,6 +10,9 @@ Item {
     property int currentTab: 0
     property bool showDndMenu: false
     property var transientSurfaceTracker: null
+    property bool tapToClose: false
+
+    signal headerTapped
 
     signal settingsRequested
 
@@ -53,6 +56,13 @@ Item {
         Item {
             width: parent.width
             height: Math.max(titleRow.implicitHeight, actionsRow.implicitHeight)
+
+            MouseArea {
+                anchors.fill: parent
+                enabled: root.tapToClose
+                acceptedButtons: Qt.LeftButton
+                onClicked: root.headerTapped()
+            }
 
             Row {
                 id: titleRow

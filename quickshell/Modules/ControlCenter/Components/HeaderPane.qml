@@ -10,11 +10,14 @@ Rectangle {
     LayoutMirroring.childrenInherit: true
 
     property bool editMode: false
+    // Hosts that morph in place reuse the header's dead space as their close target.
+    property bool tapToClose: false
 
     signal powerButtonClicked
     signal lockRequested
     signal editModeToggled
     signal settingsButtonClicked
+    signal headerTapped
 
     Component.onCompleted: DgopService.addRef("system")
     Component.onDestruction: DgopService.removeRef("system")
@@ -24,6 +27,13 @@ Rectangle {
     color: Theme.nestedSurface
     border.color: Theme.outlineMedium
     border.width: Theme.layerOutlineWidth
+
+    MouseArea {
+        anchors.fill: parent
+        enabled: root.tapToClose
+        acceptedButtons: Qt.LeftButton
+        onClicked: root.headerTapped()
+    }
 
     Row {
         anchors.left: parent.left

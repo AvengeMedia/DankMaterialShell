@@ -4,8 +4,6 @@ import qs.Common
 import qs.Modules.ControlCenter.Details
 import qs.Services
 import qs.Widgets
-import qs.Modules.ControlCenter.Components
-import qs.Modules.ControlCenter.Models
 import "./utils/state.js" as StateUtils
 
 DankPopout {
@@ -34,8 +32,9 @@ DankPopout {
         const item = contentLoader.item;
         if (!item)
             return 400;
+        // The content now reports its own insets, so no popout-side padding.
         const naturalHeight = item.targetImplicitHeight !== undefined ? item.targetImplicitHeight : item.implicitHeight;
-        return Math.max(300, naturalHeight + 20);
+        return Math.max(300, naturalHeight);
     }
 
     function updateTargetPopupHeight() {
@@ -162,160 +161,9 @@ DankPopout {
         }
     }
 
-    WidgetModel {
-        id: widgetModel
-    }
-
     content: Component {
-        Rectangle {
-            id: controlContent
-
-            LayoutMirroring.enabled: I18n.isRtl
-            LayoutMirroring.childrenInherit: true
-
-            readonly property real targetImplicitHeight: {
-                let total = headerPane.implicitHeight + Theme.spacingS + widgetGrid.targetImplicitHeight;
-                if (editControls.visible)
-                    total += Theme.spacingS + editControls.height;
-                return total + Theme.spacingM;
-            }
-            implicitHeight: targetImplicitHeight
-            property alias bluetoothCodecSelector: bluetoothCodecSelector
-            property alias audioPortSelector: audioPortSelector
-
-            color: "transparent"
-            clip: true
-
-            Rectangle {
-                anchors.fill: parent
-                color: Qt.rgba(0, 0, 0, 0.6)
-                radius: parent.radius
-                visible: root.powerMenuOpen
-                z: 5000
-
-                Behavior on opacity {
-                    enabled: !Theme.isDirectionalEffect
-                    NumberAnimation {
-                        duration: Theme.shortDuration
-                        easing.type: Easing.BezierSpline
-                        easing.bezierCurve: root.shouldBeVisible ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
-                    }
-                }
-            }
-
-            DankFlickable {
-                id: contentFlickable
-                anchors.fill: parent
-                clip: true
-                contentWidth: width
-                contentHeight: Math.max(height, mainColumn.implicitHeight + Theme.spacingM)
-                interactive: contentHeight > height
-
-                Column {
-                    id: mainColumn
-                    width: contentFlickable.width - Theme.spacingL * 2
-                    x: Theme.spacingL
-                    y: Theme.spacingL
-                    spacing: Theme.spacingS
-
-                    HeaderPane {
-                        id: headerPane
-                        width: parent.width
-                        editMode: root.editMode
-                        onEditModeToggled: root.editMode = !root.editMode
-                        onPowerButtonClicked: {
-                            if (powerMenuModalLoader) {
-                                powerMenuModalLoader.active = true;
-                                if (powerMenuModalLoader.item) {
-                                    const bounds = Qt.rect(root.alignedX, root.alignedY, root.popupWidth, root.popupHeight);
-                                    powerMenuModalLoader.item.openFromControlCenter(bounds, root.screen);
-                                }
-                            }
-                        }
-                        onLockRequested: {
-                            root.close();
-                            root.lockRequested();
-                        }
-                        onSettingsButtonClicked: {
-                            root.close();
-                        }
-                    }
-
-                    DragDropGrid {
-                        id: widgetGrid
-                        width: parent.width
-                        editMode: root.editMode
-                        maxPopoutHeight: {
-                            const screenHeight = (root.triggerScreen?.height ?? 1080);
-                            return screenHeight - 100 - Theme.spacingL - headerPane.implicitHeight - Theme.spacingS;
-                        }
-                        expandedSection: root.expandedSection
-                        expandedWidgetIndex: root.expandedWidgetIndex
-                        expandedWidgetData: root.expandedWidgetData
-                        model: widgetModel
-                        bluetoothCodecSelector: bluetoothCodecSelector
-                        audioPortSelector: audioPortSelector
-                        colorPickerModal: root.colorPickerModal
-                        screenName: root.triggerScreen?.name || ""
-                        screenModel: root.triggerScreen?.model || ""
-                        parentScreen: root.triggerScreen
-                        onExpandClicked: (widgetData, globalIndex) => {
-                            root.expandedWidgetIndex = globalIndex;
-                            root.expandedWidgetData = widgetData;
-                            if (widgetData.id === "diskUsage") {
-                                root.toggleSection("diskUsage_" + (widgetData.instanceId || "default"));
-                            } else if (widgetData.id === "brightnessSlider") {
-                                root.toggleSection("brightnessSlider_" + (widgetData.instanceId || "default"));
-                            } else {
-                                root.toggleSection(widgetData.id);
-                            }
-                        }
-                        onRemoveWidget: index => widgetModel.removeWidget(index)
-                        onMoveWidget: (fromIndex, toIndex) => widgetModel.moveWidget(fromIndex, toIndex)
-                        onToggleWidgetSize: index => widgetModel.toggleWidgetSize(index)
-                        onCollapseRequested: root.collapseAll()
-                        onConfigRequested: (idx, data, anchor) => widgetConfigOverlay.open(idx, data, anchor)
-                    }
-
-                    EditControls {
-                        id: editControls
-                        width: parent.width
-                        visible: editMode
-                        popupScreen: root.screen
-                        popoutX: root.alignedX
-                        popoutY: root.alignedY
-                        popoutWidth: root.alignedWidth
-                        popoutHeight: root.alignedHeight
-                        availableWidgets: {
-                            if (!editMode)
-                                return [];
-                            const existingIds = (SettingsData.controlCenterWidgets || []).map(w => w.id);
-                            const allWidgets = widgetModel.baseWidgetDefinitions.concat(widgetModel.getPluginWidgets());
-                            return allWidgets.filter(w => w.allowMultiple || !existingIds.includes(w.id));
-                        }
-                        onAddWidget: widgetId => widgetModel.addWidget(widgetId)
-                        onResetToDefault: () => widgetModel.resetToDefault()
-                        onClearAll: () => widgetModel.clearAll()
-                    }
-                }
-            }
-
-            BluetoothCodecSelector {
-                id: bluetoothCodecSelector
-                anchors.fill: parent
-                z: 10000
-            }
-
-            AudioPortSelector {
-                id: audioPortSelector
-                anchors.fill: parent
-                z: 10000
-            }
-
-            WidgetConfigOverlay {
-                id: widgetConfigOverlay
-                anchors.fill: parent
-            }
+        ControlCenterContent {
+            host: root
         }
     }
 

@@ -38,6 +38,8 @@ Singleton {
     readonly property int notificationDedupBurstMs: 5000
     property var _recentDedupKeys: []
 
+    signal notificationDeduplicated(var wrapper)
+
     property var _dismissQueue: []
     property int _dismissBatchSize: 8
     property int _dismissTickMs: 8
@@ -657,8 +659,11 @@ Singleton {
                 const dedupKey = _notificationDedupKey(notif);
                 const duplicate = _findActiveDuplicate(notif);
                 if (duplicate || _hasRecentDuplicate(dedupKey)) {
-                    if (duplicate && duplicate.timer && duplicate.timer.running)
-                        duplicate.timer.restart();
+                    if (duplicate) {
+                        if (duplicate.timer && duplicate.timer.running)
+                            duplicate.timer.restart();
+                        root.notificationDeduplicated(duplicate);
+                    }
                     try {
                         notif.dismiss();
                     } catch (e) {}

@@ -14,11 +14,30 @@ Item {
     property int dropdownType: 0
     property var activePlayer: null
     property var allPlayers: []
-    // Chromium keeps dead MPRIS services registered w/empty metadata; avoid listing them
-    readonly property var selectablePlayers: (allPlayers || []).filter(p => p && !MprisController.isIdle(p))
+    // Drop idle Chromium MPRIS stubs, and only while the players panel is open.
+    readonly property var selectablePlayers: root.dropdownType !== 3 ? [] : (allPlayers || []).filter(p => p && !MprisController.isIdle(p))
     property point anchorPos: Qt.point(0, 0)
     property bool isRightEdge: false
     property var targetWindow: null
+    property rect availableBounds: Qt.rect(0, 0, 0, 0)
+
+    function clampY(rawY, panelHeight) {
+        if (availableBounds.height <= 0)
+            return rawY;
+        const margin = Theme.spacingS;
+        const minY = availableBounds.y + margin;
+        const maxY = availableBounds.y + availableBounds.height - panelHeight - margin;
+        return Math.max(minY, Math.min(maxY, rawY));
+    }
+
+    function clampX(rawX, panelWidth) {
+        if (availableBounds.width <= 0)
+            return rawX;
+        const margin = Theme.spacingS;
+        const minX = availableBounds.x + margin;
+        const maxX = availableBounds.x + availableBounds.width - panelWidth - margin;
+        return Math.max(minX, Math.min(maxX, rawX));
+    }
 
     property bool __isChromeBrowser: {
         if (!activePlayer?.identity)
@@ -30,6 +49,8 @@ Item {
     property real currentVolume: usePlayerVolume ? activePlayer.volume : (AudioService.sink?.audio?.volume ?? 0)
     property bool volumeAvailable: !!((activePlayer && activePlayer.volumeSupported && !__isChromeBrowser) || (AudioService.sink && AudioService.sink.audio))
     property var availableDevices: {
+        if (root.dropdownType !== 2)
+            return [];
         const hidden = SessionData.hiddenOutputDeviceNames ?? [];
         return Pipewire.nodes.values.filter(node => {
             if (!node.audio || !node.isSink || node.isStream)
@@ -113,8 +134,8 @@ Item {
         visible: dropdownType === 1 && volumeAvailable
         width: 60
         height: 180
-        x: isRightEdge ? anchorPos.x : anchorPos.x - width
-        y: anchorPos.y - height / 2
+        x: clampX(isRightEdge ? anchorPos.x : anchorPos.x - width, width)
+        y: clampY(anchorPos.y - height / 2, height)
         radius: Theme.cornerRadius * 2
         color: Theme.floatingSurface
         border.color: Theme.outlineStrong
@@ -257,8 +278,8 @@ Item {
         visible: dropdownType === 2
         width: 280
         height: Math.max(200, Math.min(280, availableDevices.length * 50 + 100))
-        x: isRightEdge ? anchorPos.x : anchorPos.x - width
-        y: anchorPos.y - height / 2
+        x: clampX(isRightEdge ? anchorPos.x : anchorPos.x - width, width)
+        y: clampY(anchorPos.y - height / 2, height)
         radius: Theme.cornerRadius * 2
         color: Theme.floatingSurface
         border.color: Theme.outlineStrong
@@ -462,8 +483,8 @@ Item {
         visible: dropdownType === 3
         width: 240
         height: Math.max(180, Math.min(240, (root.selectablePlayers?.length || 0) * 50 + 80))
-        x: isRightEdge ? anchorPos.x : anchorPos.x - width
-        y: anchorPos.y - height / 2
+        x: clampX(isRightEdge ? anchorPos.x : anchorPos.x - width, width)
+        y: clampY(anchorPos.y - height / 2, height)
         radius: Theme.cornerRadius * 2
         color: Theme.floatingSurface
         border.color: Theme.outlineStrong

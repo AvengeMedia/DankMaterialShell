@@ -684,6 +684,22 @@ FocusScope {
         }
 
         Loader {
+            id: dankIslandLoader
+            anchors.fill: parent
+            active: root.currentIndex === 46
+            visible: active
+            focus: active
+            sourceComponent: DankIslandTab {
+                parentModal: root.parentModal
+            }
+
+            onActiveChanged: {
+                if (active && item)
+                    Qt.callLater(() => item.forceActiveFocus());
+            }
+        }
+
+        Loader {
             id: usersLoader
             anchors.fill: parent
             active: root.currentIndex === 35

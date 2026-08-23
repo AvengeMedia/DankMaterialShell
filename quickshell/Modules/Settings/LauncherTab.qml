@@ -79,7 +79,7 @@ Item {
                 StyledText {
                     width: parent.width
                     visible: !SettingsData.connectedFrameModeActive
-                    text: SettingsData.launcherStyle === "spotlight" ? I18n.tr("Default launcher shortcuts open the minimal Spotlight Bar. The dedicated Spotlight Bar shortcut below stays independent.") : I18n.tr("Default launcher shortcuts open the full launcher with mode tabs, grid view, and action panel.")
+                    text: SettingsData.launcherStyle === "island" ? I18n.tr("Default launcher shortcuts open a native launcher activity inside Dank Island. Spotlight is used when the focused screen has no DankIsland.") : SettingsData.launcherStyle === "spotlight" ? I18n.tr("Default launcher shortcuts open the minimal Spotlight Bar. The dedicated Spotlight Bar shortcut below stays independent.") : I18n.tr("Default launcher shortcuts open the full launcher with mode tabs, grid view, and action panel.")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceVariantText
                     wrapMode: Text.WordWrap
@@ -88,14 +88,14 @@ Item {
                 SettingsButtonGroupRow {
                     visible: !SettingsData.connectedFrameModeActive
                     settingKey: "launcherStyleSelector"
-                    tags: ["launcher", "style", "default", "spotlight", "full", "minimal"]
+                    tags: ["launcher", "style", "default", "spotlight", "full", "minimal", "island", "dankisland"]
                     text: I18n.tr("Default Opens")
-                    model: [I18n.tr("Full"), I18n.tr("Spotlight")]
-                    currentIndex: SettingsData.launcherStyle === "spotlight" ? 1 : 0
+                    model: [I18n.tr("Full"), I18n.tr("Spotlight"), I18n.tr("Island")]
+                    currentIndex: SettingsData.launcherStyle === "island" ? 2 : SettingsData.launcherStyle === "spotlight" ? 1 : 0
                     onSelectionChanged: (index, selected) => {
                         if (!selected)
                             return;
-                        SettingsData.set("launcherStyle", index === 1 ? "spotlight" : "full");
+                        SettingsData.set("launcherStyle", index === 2 ? "island" : index === 1 ? "spotlight" : "full");
                     }
                 }
 

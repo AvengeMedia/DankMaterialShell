@@ -11,8 +11,23 @@ Card {
 
     signal clicked
 
-    Component.onCompleted: WeatherService.addRef()
-    Component.onDestruction: WeatherService.removeRef()
+    property bool live: Window.window?.visible ?? false
+    property bool weatherRefHeld: false
+
+    function syncWeatherRef(wanted) {
+        if (wanted === weatherRefHeld)
+            return;
+        weatherRefHeld = wanted;
+        if (wanted) {
+            WeatherService.addRef();
+            return;
+        }
+        WeatherService.removeRef();
+    }
+
+    onLiveChanged: syncWeatherRef(live)
+    Component.onCompleted: syncWeatherRef(live)
+    Component.onDestruction: syncWeatherRef(false)
 
     Column {
         anchors.centerIn: parent

@@ -13,12 +13,26 @@ Item {
 
     implicitWidth: SettingsData.showWeekNumber ? 736 : 700
     implicitHeight: 410
+    property bool live: Window.window?.visible ?? false
+    property bool weatherRefHeld: false
     property bool syncing: false
     property bool showHourly: false
     property bool available: WeatherService.weather.available
 
-    Component.onCompleted: WeatherService.addRef()
-    Component.onDestruction: WeatherService.removeRef()
+    function syncWeatherRef(wanted) {
+        if (wanted === weatherRefHeld)
+            return;
+        weatherRefHeld = wanted;
+        if (wanted) {
+            WeatherService.addRef();
+            return;
+        }
+        WeatherService.removeRef();
+    }
+
+    onLiveChanged: syncWeatherRef(live)
+    Component.onCompleted: syncWeatherRef(live)
+    Component.onDestruction: syncWeatherRef(false)
 
     function syncFrom(type) {
         if (!dailyLoader.item || !hourlyLoader.item)
@@ -530,6 +544,7 @@ Item {
 
                 Loader {
                     anchors.fill: parent
+                    active: root.live
                     asynchronous: true
                     sourceComponent: skyContentComponent
                     opacity: status === Loader.Ready ? 1 : 0
@@ -871,7 +886,7 @@ Item {
                 id: dailyLoader
                 anchors.fill: parent
                 sourceComponent: dailyComponent
-                active: root.visible && root.available && width > 0 && height > 0
+                active: root.live && root.available && width > 0 && height > 0
                 visible: !root.showHourly
                 asynchronous: true
                 opacity: 0
@@ -888,7 +903,7 @@ Item {
                 id: hourlyLoader
                 anchors.fill: parent
                 sourceComponent: hourlyComponent
-                active: root.visible && root.available && width > 0 && height > 0
+                active: root.live && root.available && width > 0 && height > 0
                 visible: root.showHourly
                 asynchronous: true
                 opacity: 0

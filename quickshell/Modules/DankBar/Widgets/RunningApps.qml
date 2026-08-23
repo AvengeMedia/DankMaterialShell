@@ -769,7 +769,7 @@ BasePill {
             property string edge: "top"
 
             // New properties for bar context
-            property int triggerBarPosition: (SettingsData.barConfigs[0]?.position ?? SettingsData.Position.Top)
+            property int triggerBarPosition: (SettingsData.getPrimaryBarConfig()?.position ?? SettingsData.Position.Top)
             property real triggerBarThickness: 0
             property real triggerBarSpacing: 0
             property var triggerBarConfig: null

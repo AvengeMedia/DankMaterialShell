@@ -37,6 +37,7 @@ Singleton {
     property var clipboardHistoryModal: null
     property var dankLauncherV2Modal: null
     property var dankLauncherV2ModalLoader: null
+    property var dankIslandRouter: null
     property var spotlightBarModal: null
     property var spotlightBarModalLoader: null
     property var powerMenuModal: null
@@ -132,7 +133,93 @@ Singleton {
         }
     }
 
+    function _islandOwnsSharedTrigger(screen) {
+        const target = screen ?? dankIslandRouter?.focusedIslandScreen?.() ?? null;
+        if (dankIslandRouter?.hasHostForScreen?.(target) !== true)
+            return false;
+        return SettingsData.dankIslandIsSoleBarForScreen(target);
+    }
+
+    readonly property bool islandControlCenterOpen: dankIslandRouter?.controlCenterOpen ?? false
+    readonly property bool islandMediaOpen: dankIslandRouter?.mediaOpen ?? false
+    readonly property bool islandWallpaperOpen: dankIslandRouter?.wallpaperOpen ?? false
+    readonly property bool islandWeatherOpen: dankIslandRouter?.weatherOpen ?? false
+    readonly property bool islandHomeOpen: dankIslandRouter?.homeOpen ?? false
+    readonly property bool islandNotificationCenterOpen: dankIslandRouter?.notificationCenterOpen ?? false
+
+    // Shared triggers use the island only when it owns that screen; false lets callers keep the popout path.
+    function routeControlCenterToIsland(screen, section, shouldToggle) {
+        if (!_islandOwnsSharedTrigger(screen))
+            return false;
+        if (shouldToggle === true)
+            return dankIslandRouter.toggleControlCenter(section || "", screen ?? null);
+        return dankIslandRouter.openControlCenter(section || "", screen ?? null);
+    }
+
+    // A missing media session is a deliberate fallback signal, not a handled request.
+    function routeMediaToIsland(screen, shouldToggle) {
+        if (!_islandOwnsSharedTrigger(screen))
+            return false;
+        if (shouldToggle === true)
+            return dankIslandRouter.toggleMedia(screen ?? null) === true;
+        return dankIslandRouter.openMedia(screen ?? null) === true;
+    }
+
+    function routeWallpaperToIsland(screen, shouldToggle) {
+        if (!_islandOwnsSharedTrigger(screen))
+            return false;
+        if (shouldToggle === true)
+            return dankIslandRouter.toggleWallpaper(screen ?? null) === true;
+        return dankIslandRouter.openWallpaper(screen ?? null) === true;
+    }
+
+    function routeWeatherToIsland(screen, shouldToggle) {
+        if (!_islandOwnsSharedTrigger(screen))
+            return false;
+        if (shouldToggle === true)
+            return dankIslandRouter.toggleWeather(screen ?? null) === true;
+        return dankIslandRouter.openWeather(screen ?? null) === true;
+    }
+
+    function routeOverviewToIsland(screen, shouldToggle) {
+        if (!_islandOwnsSharedTrigger(screen))
+            return false;
+        if (shouldToggle === true)
+            return dankIslandRouter.toggleHome(screen ?? null) === true;
+        return dankIslandRouter.openHome(screen ?? null) === true;
+    }
+
+    function routeNotificationCenterToIsland(screen, shouldToggle) {
+        if (!_islandOwnsSharedTrigger(screen))
+            return false;
+        if (shouldToggle === true)
+            return dankIslandRouter.toggleNotifications(screen ?? null) === true;
+        return dankIslandRouter.openNotifications(screen ?? null) === true;
+    }
+
+    function closeIslandNotificationCenter() {
+        return dankIslandRouter?.closeNotifications?.() === true;
+    }
+
+    function closeIslandMedia() {
+        return dankIslandRouter?.closeMedia?.() === true;
+    }
+
+    function closeIslandWallpaper() {
+        return dankIslandRouter?.closeWallpaper?.() === true;
+    }
+
+    function closeIslandWeather() {
+        return dankIslandRouter?.closeWeather?.() === true;
+    }
+
+    function closeIslandHome() {
+        return dankIslandRouter?.closeHome?.() === true;
+    }
+
     function openControlCenter(x, y, width, section, screen) {
+        if (_islandOwnsSharedTrigger(screen) && dankIslandRouter.openControlCenter(section || "", screen ?? null))
+            return;
         if (controlCenterPopout) {
             setPosition(controlCenterPopout, x, y, width, section, screen);
             controlCenterPopout.open();
@@ -140,6 +227,8 @@ Singleton {
     }
 
     function closeControlCenter() {
+        if (dankIslandRouter?.closeControlCenter?.() === true)
+            return;
         controlCenterPopout?.close();
     }
 
@@ -148,6 +237,8 @@ Singleton {
     }
 
     function toggleControlCenter(x, y, width, section, screen) {
+        if (_islandOwnsSharedTrigger(screen) && dankIslandRouter.toggleControlCenter(section || "", screen ?? null))
+            return;
         if (controlCenterPopout) {
             setPosition(controlCenterPopout, x, y, width, section, screen);
             controlCenterPopout.toggle();
@@ -155,6 +246,8 @@ Singleton {
     }
 
     function openNotificationCenter(x, y, width, section, screen) {
+        if (routeNotificationCenterToIsland(screen, false))
+            return;
         if (notificationCenterPopout) {
             setPosition(notificationCenterPopout, x, y, width, section, screen);
             notificationCenterPopout.open();
@@ -162,6 +255,8 @@ Singleton {
     }
 
     function closeNotificationCenter() {
+        if (closeIslandNotificationCenter())
+            return;
         notificationCenterPopout?.close();
     }
 
@@ -170,6 +265,8 @@ Singleton {
     }
 
     function toggleNotificationCenter(x, y, width, section, screen) {
+        if (routeNotificationCenterToIsland(screen, true))
+            return;
         if (notificationCenterPopout) {
             setPosition(notificationCenterPopout, x, y, width, section, screen);
             notificationCenterPopout.toggle();

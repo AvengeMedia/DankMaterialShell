@@ -1,0 +1,175 @@
+pragma ComponentBehavior: Bound
+
+import QtQuick
+import qs.Common
+import qs.Modules.ControlCenter
+import qs.Services
+
+// Shared Control Center body hosted in the island silhouette.
+FocusScope {
+    id: root
+
+    required property var islandController
+    property var effectiveScreen: null
+    property var colorPickerModal: null
+    property var powerMenuModalLoader: null
+    property real alignedX: 0
+    property real alignedY: 0
+    property real alignedWidth: 0
+    property real alignedHeight: 0
+    // Report content height once per turn; the controller clamps it before retargeting the spring.
+    property real bottomInset: Theme.spacingM
+    property bool _heightReportPending: false
+
+    signal lockRequested
+
+    clip: true
+
+    function resetState() {
+        hostContract.editMode = false;
+        hostContract.expandedSection = "";
+        hostContract.expandedWidgetIndex = -1;
+        hostContract.expandedWidgetData = null;
+    }
+
+    function beginSession() {
+        hostContract.editMode = false;
+        hostContract.expandedSection = root.islandController.controlCenterPendingSection || "";
+        hostContract.expandedWidgetIndex = -1;
+        hostContract.expandedWidgetData = null;
+        root.queueHeightReport();
+    }
+
+    function queueHeightReport() {
+        if (root._heightReportPending)
+            return;
+        root._heightReportPending = true;
+        Qt.callLater(() => {
+            root._heightReportPending = false;
+            root.islandController.setControlCenterContentHeight(content.targetImplicitHeight + Theme.spacingXS + root.bottomInset);
+        });
+    }
+
+    QtObject {
+        id: hostContract
+
+        property bool editMode: false
+        property string expandedSection: ""
+        property int expandedWidgetIndex: -1
+        property var expandedWidgetData: null
+
+        readonly property bool shouldBeVisible: root.islandController.activeActivity === "controlcenter" && root.islandController.expanded
+        // The island has no outside chrome to click, so the header row closes it.
+        readonly property bool headerTogglesClose: true
+        readonly property bool powerMenuOpen: root.powerMenuModalLoader?.item?.shouldBeVisible ?? false
+        readonly property var screen: root.effectiveScreen
+        readonly property var triggerScreen: root.effectiveScreen
+        readonly property var colorPickerModal: root.colorPickerModal
+        readonly property var powerMenuModalLoader: root.powerMenuModalLoader
+        readonly property real alignedX: root.alignedX
+        readonly property real alignedY: root.alignedY
+        readonly property real alignedWidth: root.alignedWidth
+        readonly property real alignedHeight: root.alignedHeight
+        readonly property real popupWidth: root.alignedWidth
+        readonly property real popupHeight: root.alignedHeight
+
+        signal lockRequested
+
+        function close() {
+            root.islandController.requestCollapse();
+        }
+
+        function collapseAll() {
+            hostContract.expandedSection = "";
+            hostContract.expandedWidgetIndex = -1;
+            hostContract.expandedWidgetData = null;
+        }
+
+        function toggleSection(section) {
+            if (hostContract.expandedSection === section) {
+                hostContract.expandedSection = "";
+                hostContract.expandedWidgetIndex = -1;
+                return;
+            }
+            hostContract.expandedSection = section;
+        }
+    }
+
+    function releaseScanState() {
+        if (NetworkService.activeService)
+            NetworkService.activeService.autoRefreshEnabled = false;
+        if (BluetoothService.adapter && BluetoothService.adapter.discovering)
+            BluetoothService.adapter.discovering = false;
+    }
+
+    function applyPresentationLifecycle() {
+        if (hostContract.shouldBeVisible) {
+            if (NetworkService.activeService)
+                NetworkService.activeService.autoRefreshEnabled = NetworkService.wifiEnabled;
+            return;
+        }
+        root.releaseScanState();
+    }
+
+    // Hot-unplug skips the visibility path; release scans here too.
+    Component.onDestruction: {
+        if (hostContract.shouldBeVisible)
+            root.releaseScanState();
+    }
+
+    Connections {
+        target: hostContract
+
+        function onLockRequested() {
+            root.lockRequested();
+        }
+
+        function onShouldBeVisibleChanged() {
+            Qt.callLater(root.applyPresentationLifecycle);
+        }
+    }
+
+    Connections {
+        target: NetworkService
+
+        function onCredentialsRequestedChanged() {
+            if (NetworkService.credentialsRequested && hostContract.shouldBeVisible)
+                root.islandController.requestCollapse();
+        }
+    }
+
+    ControlCenterContent {
+        id: content
+
+        anchors {
+            fill: parent
+            leftMargin: Theme.spacingXS
+            rightMargin: Theme.spacingXS
+            topMargin: Theme.spacingXS
+            bottomMargin: root.bottomInset
+        }
+        host: hostContract
+
+        onTargetImplicitHeightChanged: root.queueHeightReport()
+    }
+
+    Connections {
+        target: root.islandController
+
+        function onControlCenterSessionSerialChanged() {
+            Qt.callLater(root.beginSession);
+        }
+
+        function onExpandedChanged() {
+            if (!root.islandController.expanded)
+                root.resetState();
+        }
+
+        function onActiveActivityChanged() {
+            if (root.islandController.activeActivity !== "controlcenter")
+                root.resetState();
+        }
+    }
+
+    Component.onCompleted: root.islandController.markControlCenterVisualsReady()
+}

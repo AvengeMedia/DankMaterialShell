@@ -121,7 +121,7 @@ Singleton {
     Connections {
         target: SettingsData
         function onBarConfigsChanged() {
-            const newGaps = Math.max(4, (SettingsData.barConfigs[0]?.spacing ?? 4));
+            const newGaps = Math.max(4, (SettingsData.getPrimaryBarConfig()?.spacing ?? 4));
             if (newGaps === root._lastGapValue)
                 return;
             root._lastGapValue = newGaps;
@@ -1203,7 +1203,7 @@ Singleton {
         log.debug("Generating layout config...");
 
         const defaultRadius = typeof SettingsData !== "undefined" ? SettingsData.cornerRadius : 12;
-        const defaultGaps = typeof SettingsData !== "undefined" ? Math.max(4, (SettingsData.barConfigs[0]?.spacing ?? 4)) : 4;
+        const defaultGaps = typeof SettingsData !== "undefined" ? Math.max(4, (SettingsData.getPrimaryBarConfig()?.spacing ?? 4)) : 4;
         const defaultBorderSize = 2;
 
         const cornerRadius = (typeof SettingsData !== "undefined" && SettingsData.niriLayoutRadiusOverride >= 0) ? SettingsData.niriLayoutRadiusOverride : defaultRadius;
@@ -1214,6 +1214,8 @@ Singleton {
         const frameEnabled = typeof SettingsData !== "undefined" && SettingsData.frameEnabled;
         // dms:frame only in separate mode — connected-mode frame blur overlaps windows via popouts/arcs
         const excludeNamespaces = ["dms:bar"];
+        if (typeof SettingsData !== "undefined" && SettingsData.dankIslandEnabled)
+            excludeNamespaces.push("dms:dankisland");
         if (frameEnabled && SettingsData.frameMode !== "connected")
             excludeNamespaces.push("dms:frame");
 

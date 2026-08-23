@@ -11,6 +11,7 @@ Item {
 
     implicitWidth: SettingsData.showWeekNumber ? 736 : 700
     implicitHeight: 410
+    property bool live: Window.window?.visible ?? false
 
     signal switchToWeatherTab
     signal switchToMediaTab
@@ -29,6 +30,7 @@ Item {
             y: 0
             width: parent.width * 0.2 - Theme.spacingM * 2
             height: 180
+            live: root.live
         }
 
         // Weather - top middle-left (narrower)
@@ -38,6 +40,7 @@ Item {
             width: SettingsData.weatherEnabled ? parent.width * 0.3 : 0
             height: 100
             visible: SettingsData.weatherEnabled
+            live: root.live
 
             onClicked: root.switchToWeatherTab()
         }
@@ -48,6 +51,7 @@ Item {
             y: 0
             width: SettingsData.weatherEnabled ? parent.width * 0.5 : parent.width * 0.8
             height: 100
+            live: root.live
         }
 
         // SystemMonitor - middle left (narrow and shorter)
@@ -56,6 +60,7 @@ Item {
             y: 180 + Theme.spacingM
             width: parent.width * 0.2 - Theme.spacingM * 2
             height: 220
+            live: root.live
         }
 
         // Calendar - bottom middle; deferred so the grid stays off the emerge frame.
@@ -86,6 +91,7 @@ Item {
             y: 100 + Theme.spacingM
             width: parent.width * 0.2
             height: 300
+            live: root.live
 
             onClicked: root.switchToMediaTab()
         }

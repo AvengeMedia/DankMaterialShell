@@ -114,7 +114,7 @@ Rectangle {
         },
         {
             "id": "dankbar",
-            "text": I18n.tr("Dank Bar"),
+            "text": I18n.tr("Primary Bar"),
             "icon": "toolbar",
             "children": [
                 {
@@ -146,6 +146,12 @@ Rectangle {
                     "text": I18n.tr("Frame"),
                     "icon": "frame_source",
                     "tabIndex": 33
+                },
+                {
+                    "id": "dank_island",
+                    "text": I18n.tr("Island"),
+                    "icon": "view_in_ar",
+                    "tabIndex": 46
                 }
             ]
         },
@@ -157,7 +163,7 @@ Rectangle {
             "children": [
                 {
                     "id": "dank_dash",
-                    "text": I18n.tr("Dank Dash"),
+                    "text": I18n.tr("Dashboard"),
                     "icon": "space_dashboard",
                     "tabIndex": 43
                 },

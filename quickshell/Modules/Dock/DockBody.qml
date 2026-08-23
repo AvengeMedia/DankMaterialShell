@@ -53,7 +53,7 @@ Item {
     }
 
     readonly property real barSpacing: {
-        const defaultBar = SettingsData.barConfigs[0] || SettingsData.getBarConfig("default");
+        const defaultBar = SettingsData.getPrimaryBarConfig();
         if (!defaultBar)
             return 0;
 
@@ -84,6 +84,8 @@ Item {
         const topBar = SettingsData.barConfigs.find(bc => {
             if (!bc.enabled || bc.autoHide || !(bc.visible ?? true))
                 return false;
+            if (SettingsData.isIslandBarConfig(bc))
+                return false;
             if (bc.position !== SettingsData.Position.Top && bc.position !== 0)
                 return false;
             const onThisScreen = bc.screenPreferences.length === 0 || bc.screenPreferences.includes("all") || bc.screenPreferences.includes(screenName);
@@ -98,6 +100,8 @@ Item {
         const screenName = dock.modelData?.name ?? "";
         const leftBar = SettingsData.barConfigs.find(bc => {
             if (!bc.enabled || bc.autoHide || !(bc.visible ?? true))
+                return false;
+            if (SettingsData.isIslandBarConfig(bc))
                 return false;
             if (bc.position !== SettingsData.Position.Left && bc.position !== 2)
                 return false;

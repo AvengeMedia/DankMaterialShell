@@ -586,6 +586,8 @@ Item {
         return SettingsData.barConfigs.some(bc => {
             if (!bc.enabled || bc.id === barConfig?.id)
                 return false;
+            if (SettingsData.isIslandBarConfig(bc))
+                return false;
             if (bc.autoHide)
                 return false;
             if (!(bc.visible ?? true))
@@ -608,6 +610,8 @@ Item {
             return false;
         const result = SettingsData.barConfigs.some(bc => {
             if (!bc.enabled || bc.id === barConfig?.id)
+                return false;
+            if (SettingsData.isIslandBarConfig(bc))
                 return false;
             if (bc.autoHide)
                 return false;
@@ -633,6 +637,8 @@ Item {
         const result = SettingsData.barConfigs.some(bc => {
             if (!bc.enabled || bc.id === barConfig?.id)
                 return false;
+            if (SettingsData.isIslandBarConfig(bc))
+                return false;
             if (bc.autoHide)
                 return false;
             if (!(bc.visible ?? true))
@@ -656,6 +662,8 @@ Item {
             return false;
         const result = SettingsData.barConfigs.some(bc => {
             if (!bc.enabled || bc.id === barConfig?.id)
+                return false;
+            if (SettingsData.isIslandBarConfig(bc))
                 return false;
             if (bc.autoHide)
                 return false;
