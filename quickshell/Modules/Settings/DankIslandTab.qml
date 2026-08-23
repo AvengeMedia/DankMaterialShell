@@ -377,7 +377,7 @@ Item {
                     settingKey: "dankIslandInteractionMode"
                     tags: ["island", "interaction", "click", "hybrid", "expand"]
                     text: I18n.tr("Expansion Mode")
-                    description: I18n.tr("Click expands only on an intentional press. Hybrid peeks glance faces on hover")
+                    description: I18n.tr("Click expands only on an intentional press. Hybrid peeks the current compact face on hover")
                     readonly property var _modeValues: ["click", "hybrid"]
                     model: [I18n.tr("Click"), I18n.tr("Hybrid")]
                     currentIndex: SettingsData.dankIslandInteractionMode === "click" ? 0 : 1
@@ -389,7 +389,7 @@ Item {
 
                 StyledText {
                     width: parent.width
-                    text: I18n.tr("Hybrid peeks at the clock, media, system faces, and notifications on hover. Control Center, the launcher, wallpapers, and weather are click actions")
+                    text: I18n.tr("Hybrid peeks the current compact face on hover. Click pins a destination so it stays open")
                     color: Theme.surfaceVariantText
                     font.pixelSize: Theme.fontSizeSmall
                     wrapMode: Text.WordWrap
@@ -404,7 +404,7 @@ Item {
                     minimum: 0
                     maximum: 1000
                     step: 10
-                    defaultValue: 220
+                    defaultValue: 150
                     value: SettingsData.dankIslandHoverOpenDelay
                     enabled: SettingsData.dankIslandInteractionMode !== "click"
                     onSliderValueChanged: value => SettingsData.set("dankIslandHoverOpenDelay", value)
@@ -418,7 +418,7 @@ Item {
                     minimum: 0
                     maximum: 1000
                     step: 10
-                    defaultValue: 400
+                    defaultValue: 150
                     value: SettingsData.dankIslandHoverCloseDelay
                     enabled: SettingsData.dankIslandInteractionMode !== "click"
                     onSliderValueChanged: value => SettingsData.set("dankIslandHoverCloseDelay", value)

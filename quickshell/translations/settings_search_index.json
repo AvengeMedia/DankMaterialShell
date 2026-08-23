@@ -12085,13 +12085,14 @@
     "keywords": [
       "activities",
       "click",
+      "compact",
+      "current",
       "dank",
       "dynamic island",
       "expand",
       "expands",
       "expansion",
-      "faces",
-      "glance",
+      "face",
       "hover",
       "hybrid",
       "intentional",
@@ -12101,7 +12102,7 @@
       "peeks",
       "press"
     ],
-    "description": "Click expands only on an intentional press. Hybrid peeks glance faces on hover"
+    "description": "Click expands only on an intentional press. Hybrid peeks the current compact face on hover"
   },
   {
     "section": "dankIslandFloating",
@@ -12239,12 +12240,13 @@
     "keywords": [
       "activities",
       "click",
+      "compact",
+      "current",
       "dank",
       "dynamic island",
       "expand",
       "expands",
-      "faces",
-      "glance",
+      "face",
       "hover",
       "hybrid",
       "intentional",
@@ -12254,7 +12256,7 @@
       "press"
     ],
     "icon": "touch_app",
-    "description": "Click expands only on an intentional press. Hybrid peeks glance faces on hover"
+    "description": "Click expands only on an intentional press. Hybrid peeks the current compact face on hover"
   },
   {
     "section": "_tab_46",

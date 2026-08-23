@@ -27,7 +27,7 @@ QtObject {
     readonly property bool demoEnabled: Quickshell.env("DMS_DANKISLAND_NOTIFICATION_DEMO") === "1"
     readonly property bool hasAction: actionLabel.length > 0
     // Keep the wrapper alive while the island is hovered or expanded, matching NotificationPopup.
-    readonly property bool wrapperTimeoutHeld: controller.notificationActive && controller.timeoutSuspended
+    readonly property bool wrapperTimeoutHeld: (controller.notificationActive && controller.timeoutSuspended) || controller.notificationHeldForSystem
 
     function isFocusedScreen() {
         if (!SettingsData.notificationFocusedMonitor)

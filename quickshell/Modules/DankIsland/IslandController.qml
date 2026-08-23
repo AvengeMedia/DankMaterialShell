@@ -6,7 +6,7 @@ import qs.Common
 QtObject {
     id: root
 
-    // Hybrid expands glance faces on hover but keeps full destinations click-driven.
+    // Hybrid peeks the current compact face on hover. Click pins destinations.
     property string interactionMode: "click"
     property bool hoverExpanded: false
     property bool inputSuspended: false
@@ -27,6 +27,10 @@ QtObject {
     property bool launcherRequestPending: false
     property bool launcherSessionActive: false
     property bool launcherInputFocused: false
+    onLauncherInputFocusedChanged: {
+        if (launcherInputFocused)
+            hoverExpanded = false;
+    }
     property string launcherPendingQuery: ""
     property string launcherPendingMode: ""
     property int launcherSessionSerial: 0
@@ -65,8 +69,8 @@ QtObject {
     property string suspendedActivity: ""
     property bool suspendedExpanded: false
     property bool suspendedKeyboardDismissRequested: false
-    property int hoverOpenDelay: 220
-    property int hoverCloseDelay: 400
+    property int hoverOpenDelay: 150
+    property int hoverCloseDelay: 150
     property int mediaReturnDelay: 1800
     property real controlCenterContentHeight: 420
     property real controlCenterMaxHeight: 640
@@ -357,11 +361,12 @@ QtObject {
         })
     readonly property bool systemActivityActive: activeActivity === "volume" || activeActivity === "brightness"
     readonly property bool notificationActive: activeActivity === "notification"
+    readonly property bool notificationHeldForSystem: root.systemActivityActive && root.transientReturnActivity === "notification"
     readonly property bool transientActive: systemActivityActive || notificationActive
     readonly property bool timeoutSuspended: pointerInside || (expanded && !notificationActive)
     readonly property var fullDestinations: ["launcher", "controlcenter", "wallpaper", "weather", "notificationcenter"]
     readonly property bool activityOwnsBlankClicks: root.fullDestinations.indexOf(root.activeActivity) !== -1
-    readonly property bool hoverExpandEnabled: root.interactionMode === "hybrid" && !root.activityOwnsBlankClicks && !root.systemActivityActive
+    readonly property bool hoverExpandEnabled: root.interactionMode === "hybrid" && !root.systemActivityActive
     readonly property var compactTarget: {
         if (root.notificationActive)
             return root.notificationCompactTarget;
@@ -544,6 +549,8 @@ QtObject {
     }
 
     function resolvedReturnActivity(activityId) {
+        if (activityId === "notification")
+            return "notification";
         if (activityId === "media" && !mediaAvailable)
             return "home";
         if (activityId === "home" || activityId === "media" || fullDestinations.indexOf(activityId) !== -1)
@@ -581,8 +588,10 @@ QtObject {
             notificationCenterRequestPending = false;
 
         if (activeActivity === activityId && expanded && shouldExpand === true) {
-            if (requestKeyboardFocus === true)
+            if (requestKeyboardFocus === true) {
                 keyboardDismissRequested = true;
+                hoverExpanded = false;
+            }
             return true;
         }
 
@@ -618,7 +627,8 @@ QtObject {
             return true;
         }
 
-        hoverExpanded = false;
+        if (requestKeyboardFocus === true)
+            hoverExpanded = false;
         hoverOpenTimer.stop();
         hoverCloseTimer.stop();
         transientTimer.stop();
@@ -849,14 +859,19 @@ QtObject {
         transientTimer.stop();
         const returnActivity = resolvedReturnActivity(transientReturnActivity);
         transientReturnActivity = "";
+        if (returnActivity === "notification") {
+            hoverExpanded = false;
+            keyboardDismissRequested = false;
+            expanded = notificationExpandAllowed;
+            activeActivity = "notification";
+            syncNotificationTimeout(true);
+            return;
+        }
         activeActivity = returnActivity;
     }
 
     function requestSystemActivity(activityId) {
         if (activityId !== "volume" && activityId !== "brightness")
-            return false;
-
-        if (notificationActive)
             return false;
 
         launcherRequestPending = false;
@@ -865,6 +880,20 @@ QtObject {
         wallpaperRequestPending = false;
         weatherRequestPending = false;
         notificationCenterRequestPending = false;
+
+        if (notificationActive) {
+            notificationTimer.stop();
+            hoverExpanded = false;
+            hoverOpenTimer.stop();
+            hoverCloseTimer.stop();
+            keyboardDismissRequested = false;
+            expanded = false;
+            if (!systemActivityActive)
+                transientReturnActivity = "notification";
+            activeActivity = activityId;
+            syncTransientTimeout(true);
+            return true;
+        }
 
         if (expanded) {
             if (activeActivity === activityId)
@@ -884,6 +913,8 @@ QtObject {
     }
 
     function consumeTransientNotification() {
+        if (transientReturnActivity === "notification")
+            transientReturnActivity = "";
         if (!notificationActive)
             return;
         notificationTimer.stop();
@@ -953,6 +984,8 @@ QtObject {
     }
 
     function completeNotification() {
+        if (transientReturnActivity === "notification")
+            transientReturnActivity = "";
         if (!notificationActive)
             return false;
         resumeAfterNotification(true);
@@ -990,7 +1023,7 @@ QtObject {
             hoverCloseTimer.stop();
             return;
         }
-        if (!pointerInside && hoverExpanded && expanded && !activityOwnsBlankClicks)
+        if (!pointerInside && hoverExpanded && expanded)
             hoverCloseTimer.restart();
     }
 
@@ -1002,7 +1035,7 @@ QtObject {
                 hoverOpenTimer.restart();
         } else {
             hoverOpenTimer.stop();
-            if (hoverExpanded && expanded && !activityOwnsBlankClicks && !mediaDropdownOpen)
+            if (hoverExpanded && expanded && !mediaDropdownOpen)
                 hoverCloseTimer.restart();
         }
         syncNotificationTimeout(!pointerInside);

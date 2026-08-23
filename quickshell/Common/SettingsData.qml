@@ -989,8 +989,8 @@ Singleton {
     property int dankIslandOuterGap: 4
     property int dankIslandHorizontalOffset: 0
     property string dankIslandInteractionMode: "hybrid"
-    property int dankIslandHoverOpenDelay: 220
-    property int dankIslandHoverCloseDelay: 400
+    property int dankIslandHoverOpenDelay: 150
+    property int dankIslandHoverCloseDelay: 150
     property string dankIslandPalette: "default"
     property bool dankIslandHighContrast: false
     property bool dankIslandMediaClockVisible: true
