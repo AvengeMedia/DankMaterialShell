@@ -37,29 +37,28 @@ Item {
             return Theme.isLightColor(Theme.error) ? Qt.rgba(0, 0, 0, 0.9) : Qt.rgba(1, 1, 1, 0.95);
         return Theme.primaryText;
     }
-    readonly property string numberText: Math.round(root.level) + (root.showPercentSign ? "%" : "")
+    readonly property string numberText: Math.round(root.level).toString()
+    readonly property string signText: root.showPercentSign ? "%" : ""
     readonly property bool boltInside: root.charging && root.showBolt
     readonly property bool numberInside: !root.vertical && root.showNumber && BatteryService.batteryAvailable
     readonly property bool glyphsVisible: root.numberInside || root.boltInside
     readonly property real strokeWidth: root.outlined ? 1.5 * root.unit : 0
-    readonly property real textCanvasLeft: (root.boltInside ? 8 : 2) * root.unit
-    readonly property real textCanvasWidth: (root.boltInside ? 12 : 18) * root.unit
+    readonly property real textCanvasLeft: (root.boltInside ? 8 : 1.5) * root.unit
+    readonly property real textCanvasWidth: root.bodyLength - root.textCanvasLeft - 1.5 * root.unit
+    readonly property real textNeed: fitMetrics.advanceWidth + signMetrics.advanceWidth
     readonly property real baseTextSize: {
         if (!root.boltInside)
             return 10 * root.unit;
         return root.numberText.length >= 3 ? 6 * root.unit : 9 * root.unit;
     }
-    readonly property real textNudge: {
-        if (!root.boltInside)
-            return 1.5 * root.unit;
-        return root.numberText.length >= 3 ? 1 * root.unit : 1.25 * root.unit;
-    }
-    readonly property real textSize: Math.min(root.baseTextSize, root.baseTextSize * root.textCanvasWidth / Math.max(1, fitMetrics.advanceWidth))
-    readonly property real textBaseline: 2 * root.unit + (10 * root.unit + root.textSize) / 2 - root.textNudge
+    readonly property real signRatio: 0.72
+    readonly property real textSize: root.baseTextSize
+    readonly property real signSize: Math.max(1, root.textSize * root.signRatio)
+    readonly property real textBaseline: root.height / 2 - digitInk.tightBoundingRect.y - digitInk.tightBoundingRect.height / 2
     readonly property real boltHeight: root.vertical ? 8 * root.unit : 6 * root.unit
     readonly property real boltWidth: root.boltHeight * (6 / 13)
-    readonly property real bodyLength: Math.round(22 * root.unit)
-    readonly property real capOffset: Math.round(22.5 * root.unit)
+    readonly property real bodyLength: Math.max(Math.round(22 * root.unit), Math.ceil(root.numberInside ? root.textNeed + root.textCanvasLeft + 1.5 * root.unit : 0))
+    readonly property real capOffset: root.bodyLength
     readonly property real capBreadth: Math.max(1, Math.round(1.5 * root.unit))
     readonly property real capSpan: Math.round(8 * root.unit)
 
@@ -72,6 +71,22 @@ Item {
         font.pixelSize: Math.max(1, root.baseTextSize)
         font.weight: Font.Bold
         text: root.numberText
+    }
+
+    StyledTextMetrics {
+        id: digitInk
+
+        font.pixelSize: Math.max(1, root.textSize)
+        font.weight: Font.Bold
+        text: "0"
+    }
+
+    StyledTextMetrics {
+        id: signMetrics
+
+        font.pixelSize: Math.max(1, root.baseTextSize * root.signRatio)
+        font.weight: Font.Bold
+        text: root.signText
     }
 
     component Bolt: Shape {
@@ -127,11 +142,23 @@ Item {
             id: numberGlyph
 
             visible: root.numberInside
-            x: root.textCanvasLeft + (root.textCanvasWidth - implicitWidth) / 2
+            x: root.textCanvasLeft + (root.textCanvasWidth - implicitWidth - signGlyph.implicitWidth) / 2
             y: root.textBaseline - baselineOffset
             text: root.numberText
             color: glyphs.glyphColor
             font.pixelSize: Math.max(1, root.textSize)
+            font.weight: Font.Bold
+        }
+
+        StyledText {
+            id: signGlyph
+
+            visible: root.numberInside && root.signText !== ""
+            x: numberGlyph.x + numberGlyph.implicitWidth
+            anchors.verticalCenter: numberGlyph.verticalCenter
+            text: root.signText
+            color: glyphs.glyphColor
+            font.pixelSize: root.signSize
             font.weight: Font.Bold
         }
 
