@@ -404,6 +404,7 @@ var SPEC = {
     matugenTemplateQtengine: { def: true },
     matugenTemplateFirefox: { def: true },
     matugenTemplatePywalfox: { def: true },
+    matugenTemplateSpicetify: { def: true },
     matugenTemplateZenBrowser: { def: true },
     matugenTemplateVesktop: { def: true },
     matugenTemplateVencord: { def: true },

@@ -832,6 +832,7 @@ Singleton {
     property bool matugenTemplateQtengine: true
     property bool matugenTemplateFirefox: true
     property bool matugenTemplatePywalfox: true
+    property bool matugenTemplateSpicetify: true
     property bool matugenTemplateZenBrowser: true
     property bool matugenTemplateVesktop: true
     property bool matugenTemplateVencord: true

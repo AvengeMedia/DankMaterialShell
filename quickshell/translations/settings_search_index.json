@@ -4646,6 +4646,24 @@
     "description": "Material inspired shadows and elevation on modals, popouts, and dialogs"
   },
   {
+    "section": "matugenTemplateSpicetify",
+    "label": "Spicetify",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "colors",
+      "look",
+      "matugen",
+      "scheme",
+      "spicetify",
+      "spotify",
+      "style",
+      "template",
+      "theme"
+    ]
+  },
+  {
     "section": "blurBorderColor",
     "label": "Surface Border Color",
     "tabIndex": 10,

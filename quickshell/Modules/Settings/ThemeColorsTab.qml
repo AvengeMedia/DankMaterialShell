@@ -255,6 +255,10 @@ Item {
         return Theme.warning;
     }
 
+    function disableSpicetify() {
+        Proc.runCommand("disable-spicetify", ["sh", "-c", "command -v spicetify >/dev/null 2>&1 && spicetify config current_theme marketplace >/dev/null && spicetify apply"], () => {});
+    }
+
     function openSurfaceBorderColorPicker() {
         PopoutService.colorPickerModal.selectedColor = SettingsData.blurBorderCustomColor ?? "#ffffff";
         PopoutService.colorPickerModal.pickerTitle = I18n.tr("Surface Border Color");
@@ -2688,6 +2692,22 @@ Item {
                     visible: SettingsData.runDmsMatugenTemplates
                     checked: SettingsData.matugenTemplatePywalfox
                     onToggled: checked => SettingsData.set("matugenTemplatePywalfox", checked)
+                }
+
+                SettingsToggleRow {
+                    tab: "theme"
+                    tags: ["matugen", "spicetify", "spotify", "template"]
+                    settingKey: "matugenTemplateSpicetify"
+                    text: "Spicetify"
+                    description: getTemplateDescription("spicetify", "Requires Spicetify Marketplace and reloading Spotify after theme changes")
+                    descriptionColor: getTemplateDescriptionColor("spicetify")
+                    visible: SettingsData.runDmsMatugenTemplates
+                    checked: SettingsData.matugenTemplateSpicetify
+                    onToggled: checked => {
+                        if (!checked)
+                            disableSpicetify();
+                        SettingsData.set("matugenTemplateSpicetify", checked);
+                    }
                 }
 
                 SettingsToggleRow {

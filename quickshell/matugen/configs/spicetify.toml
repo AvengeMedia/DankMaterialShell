@@ -1,0 +1,4 @@
+[templates.dmspicetify]
+input_path = 'SHELL_DIR/matugen/templates/spicetify.ini'
+output_path = 'CONFIG_DIR/spicetify/Themes/DMS/color.ini'
+post_hook = 'sh -c "command -v spicetify >/dev/null 2>&1 && spicetify config current_theme DMS color_scheme dms >/dev/null && spicetify -q apply --no-restart || true"'
