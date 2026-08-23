@@ -556,7 +556,7 @@ Item {
                                 anchors.leftMargin: Theme.spacingM
                                 anchors.verticalCenter: parent.verticalCenter
                                 spacing: Theme.spacingM
-                                width: parent.width - Theme.spacingM * 2
+                                width: parent.width - Theme.spacingM * 2 - pinIndicator.width - Theme.spacingS
 
                                 DankIcon {
                                     name: "music_note"
@@ -596,12 +596,36 @@ Item {
                                 }
                             }
 
+                            Rectangle {
+                                id: pinIndicator
+                                readonly property bool pinned: !!modelData?.identity && MprisController.pinnedIdentity === modelData.identity
+                                anchors.right: parent.right
+                                anchors.rightMargin: Theme.spacingM
+                                anchors.verticalCenter: parent.verticalCenter
+                                width: 12
+                                height: 12
+                                radius: 6
+                                color: pinned ? Theme.primary : "transparent"
+                                border.color: pinned ? Theme.primary : Theme.outlineHeavy
+                                border.width: 2
+                            }
+
                             MouseArea {
                                 id: playerMouseArea
                                 anchors.fill: parent
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
-                                onClicked: {
+                                acceptedButtons: Qt.LeftButton | Qt.RightButton
+                                onClicked: mouse => {
+                                    if (mouse.button === Qt.RightButton) {
+                                        if (modelData?.identity) {
+                                            if (MprisController.pinnedIdentity === modelData.identity)
+                                                MprisController.setPinned("");
+                                            else
+                                                MprisController.setPinned(modelData.identity);
+                                        }
+                                        return;
+                                    }
                                     if (modelData?.identity) {
                                         root.playerSelected(modelData);
                                     }

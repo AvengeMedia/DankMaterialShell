@@ -43,6 +43,7 @@ Singleton {
         });
     }
     property MprisPlayer activePlayer: null
+    property string pinnedIdentity: SessionData.pinnedPlayerIdentity || ""
     property real activePlayerStableLength: 0
     // Chromium can report blank metadata between tracks
     property string stableTitle: ""
@@ -247,6 +248,13 @@ Singleton {
         if (playing.length === 0)
             return null;
 
+        if (pinnedIdentity !== "") {
+            const pinLower = pinnedIdentity.toLowerCase();
+            const pinned = playing.find(player => player.identity === pinnedIdentity) ?? playing.find(player => (player.identity || "").toLowerCase().includes(pinLower));
+            if (pinned)
+                return pinned;
+        }
+
         const controllable = playing.filter(player => player.canControl);
         if (activePlayer?.isPlaying) {
             if (activePlayer.canControl || controllable.length === 0)
@@ -299,6 +307,13 @@ Singleton {
         activePlayer = player;
         if (player)
             _persistIdentity(player.identity);
+    }
+
+    function setPinned(identity: string): void {
+        pinnedIdentity = identity;
+        if (SessionData.pinnedPlayerIdentity !== identity)
+            SessionData.set("pinnedPlayerIdentity", identity);
+        _resolveActivePlayer();
     }
 
     function _persistIdentity(identity: string): void {
