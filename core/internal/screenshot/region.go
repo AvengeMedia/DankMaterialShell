@@ -625,11 +625,11 @@ func (r *RegionSelector) setNativeCursor(serial uint32) {
 	if r.cursorShape == nil || r.pointer == nil || serial == 0 {
 		return
 	}
-	shape := wp_cursor_shape.ShapeCrosshair
+	shape := uint32(wp_cursor_shape.WpCursorShapeDeviceV1ShapeCrosshair)
 	if r.movingSelection && r.selection.dragging {
-		shape = wp_cursor_shape.ShapeGrabbing
+		shape = uint32(wp_cursor_shape.WpCursorShapeDeviceV1ShapeGrabbing)
 	} else if r.ctrlHeld {
-		shape = wp_cursor_shape.ShapeGrab
+		shape = uint32(wp_cursor_shape.WpCursorShapeDeviceV1ShapeGrab)
 	}
 	if r.cursorDevice == nil {
 		device, err := r.cursorShape.GetPointer(r.pointer)
