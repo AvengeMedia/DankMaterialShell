@@ -255,8 +255,21 @@ Item {
         return Theme.warning;
     }
 
-    function disableSpicetify() {
-        Proc.runCommand("disable-spicetify", ["sh", "-c", "command -v spicetify >/dev/null 2>&1 && spicetify config current_theme marketplace >/dev/null && spicetify apply"], () => {});
+    function restoreSpicetifyTheme() {
+        const statePath = SettingsData._configDir + "/DankMaterialShell/spicetify-theme";
+        const script = `if command -v spicetify >/dev/null 2>&1 && [ -e "${statePath}" ]; then
+        currentTheme=$(spicetify config current_theme)
+        if [ "$currentTheme" = DMS ]; then
+            theme=$(sed -n '1p' "${statePath}")
+            scheme=$(sed -n '2p' "${statePath}")
+            if spicetify config current_theme "$theme" color_scheme "$scheme" >/dev/null && spicetify -q apply --no-restart; then
+                rm -f "${statePath}"
+            fi
+        else
+            rm -f "${statePath}"
+        fi
+        fi`;
+        Proc.runCommand("restore-spicetify-theme", ["sh", "-c", script], () => {});
     }
 
     function openSurfaceBorderColorPicker() {
@@ -2699,13 +2712,13 @@ Item {
                     tags: ["matugen", "spicetify", "spotify", "template"]
                     settingKey: "matugenTemplateSpicetify"
                     text: "Spicetify"
-                    description: getTemplateDescription("spicetify", "Requires Spicetify Marketplace and reloading Spotify after theme changes")
+                    description: getTemplateDescription("spicetify", I18n.tr("Restores the previous Spotify theme when disabled; reload Spotify after theme changes", "spicetify matugen template description"))
                     descriptionColor: getTemplateDescriptionColor("spicetify")
                     visible: SettingsData.runDmsMatugenTemplates
                     checked: SettingsData.matugenTemplateSpicetify
                     onToggled: checked => {
                         if (!checked)
-                            disableSpicetify();
+                            restoreSpicetifyTheme();
                         SettingsData.set("matugenTemplateSpicetify", checked);
                     }
                 }

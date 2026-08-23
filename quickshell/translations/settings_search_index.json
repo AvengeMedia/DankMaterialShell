@@ -4651,17 +4651,24 @@
     "tabIndex": 10,
     "category": "Theme & Colors",
     "keywords": [
+      "after",
       "appearance",
+      "changes",
       "colors",
+      "colour",
       "look",
       "matugen",
+      "previous",
+      "reload",
+      "restores",
       "scheme",
       "spicetify",
       "spotify",
       "style",
       "template",
       "theme"
-    ]
+    ],
+    "description": "Restores the previous Spotify theme when disabled; reload Spotify after theme changes"
   },
   {
     "section": "blurBorderColor",
