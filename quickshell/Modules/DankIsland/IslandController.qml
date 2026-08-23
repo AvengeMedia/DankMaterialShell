@@ -82,9 +82,9 @@ QtObject {
     // Below the pill threshold every compact face drops to a single text line.
     readonly property bool compactDense: compactHeight < 40
     readonly property real compactFaceHeight: compactHeight + (compactDense ? 2 : 4)
-    readonly property real compactIconSize: Math.max(22, Math.min(32, compactHeight - 8))
+    readonly property real compactIconSize: Math.max(14, Math.min(32, compactHeight - 8))
     readonly property bool homeCompactTight: SettingsData.dankIslandHomeCompactTight
-    readonly property real homeCompactFaceHeight: homeCompactTight ? Math.max(28, Math.min(32, compactHeight - 8)) : compactFaceHeight
+    readonly property real homeCompactFaceHeight: homeCompactTight ? Math.max(16, Math.min(32, compactHeight - 8)) : compactFaceHeight
 
     property int unreadNotificationCount: 0
     readonly property bool homeNotificationBadge: unreadNotificationCount > 0

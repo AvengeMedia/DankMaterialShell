@@ -94,7 +94,7 @@ Item {
                     text: I18n.tr("Reserved Height")
                     description: I18n.tr("Space kept clear for compact island and satellites")
                     unit: "px"
-                    minimum: 36
+                    minimum: 24
                     maximum: 128
                     step: 1
                     defaultValue: 40
@@ -109,7 +109,7 @@ Item {
                     text: I18n.tr("Compact Island Height")
                     description: I18n.tr("Resize the resting island to align with nearby widgets")
                     unit: "px"
-                    minimum: 36
+                    minimum: 24
                     maximum: 72
                     step: 1
                     defaultValue: 38

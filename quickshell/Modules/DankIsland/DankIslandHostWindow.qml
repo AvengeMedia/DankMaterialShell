@@ -41,8 +41,8 @@ PanelWindow {
         return false;
     }
 
-    readonly property int reserveHeight: Math.max(36, Math.min(128, SettingsData.dankIslandReserveHeight))
-    readonly property int compactHeight: Math.max(36, Math.min(72, SettingsData.dankIslandCompactHeight))
+    readonly property int reserveHeight: Math.max(24, Math.min(128, SettingsData.dankIslandReserveHeight))
+    readonly property int compactHeight: Math.max(24, Math.min(72, SettingsData.dankIslandCompactHeight))
     readonly property bool floating: SettingsData.dankIslandFloating
     readonly property bool usesOverlayLayer: LayerShell.envUsesOverlay("DMS_DANKISLAND_LAYER", SettingsData.dankIslandUseOverlayLayer)
     readonly property var islandLayer: LayerShell.fromEnv("DMS_DANKISLAND_LAYER", usesOverlayLayer ? WlrLayer.Overlay : WlrLayer.Top)

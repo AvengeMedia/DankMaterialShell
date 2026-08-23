@@ -977,8 +977,8 @@ Singleton {
     readonly property int dankIslandPosition: islandBarConfig?.position ?? SettingsData.Position.Top
     readonly property string dankIslandEdge: dankIslandPosition === SettingsData.Position.Bottom ? "bottom" : "top"
     readonly property int dankIslandReservedStripHeight: {
-        const reserve = Math.max(36, Math.min(128, dankIslandReserveHeight));
-        const compact = Math.max(36, Math.min(72, dankIslandCompactHeight));
+        const reserve = Math.max(24, Math.min(128, dankIslandReserveHeight));
+        const compact = Math.max(24, Math.min(72, dankIslandCompactHeight));
         const gap = Math.max(0, Math.min(48, dankIslandOuterGap));
         return Math.max(reserve, gap + compact);
     }
