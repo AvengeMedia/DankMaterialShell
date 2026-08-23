@@ -11965,29 +11965,6 @@
     "description": "Battery gauge opens Control Center"
   },
   {
-    "section": "dankIslandBatteryStyle",
-    "label": "Battery Gauge",
-    "tabIndex": 46,
-    "category": "Dank Island",
-    "keywords": [
-      "activities",
-      "appearance",
-      "battery",
-      "charge",
-      "charging",
-      "dank",
-      "dynamic island",
-      "gauge",
-      "island",
-      "material",
-      "outline",
-      "power",
-      "solid",
-      "type"
-    ],
-    "description": "Solid material type or Outline"
-  },
-  {
     "section": "dankIslandInteraction",
     "label": "Behavior",
     "tabIndex": 46,
@@ -12314,6 +12291,30 @@
     "description": "Show a clickable clock beside compact media details"
   },
   {
+    "section": "dankIslandBatteryStyle",
+    "label": "Material Battery Style",
+    "tabIndex": 46,
+    "category": "Dank Island",
+    "keywords": [
+      "activities",
+      "appearance",
+      "battery",
+      "charge",
+      "charging",
+      "dank",
+      "dynamic island",
+      "gauge",
+      "island",
+      "material",
+      "outline",
+      "power",
+      "solid",
+      "style",
+      "type"
+    ],
+    "description": "Solid material type or Outline"
+  },
+  {
     "section": "dankIslandHomeMediaSlot",
     "label": "Media / Launcher",
     "tabIndex": 46,
@@ -12386,7 +12387,7 @@
   },
   {
     "section": "dankIslandOuterGap",
-    "label": "Outer Gap",
+    "label": "Outer Gaps",
     "tabIndex": 46,
     "category": "Dank Island",
     "keywords": [
@@ -12398,6 +12399,7 @@
       "dynamic island",
       "edge",
       "gap",
+      "gaps",
       "island",
       "margin",
       "monitor",
@@ -12428,7 +12430,7 @@
   },
   {
     "section": "dankIslandPlacement",
-    "label": "Placement",
+    "label": "Position",
     "tabIndex": 46,
     "category": "Dank Island",
     "keywords": [
@@ -12443,6 +12445,7 @@
       "island",
       "overlay",
       "placement",
+      "position",
       "reserve",
       "windows"
     ],
@@ -12451,7 +12454,7 @@
   },
   {
     "section": "dankIslandSatellitePosition",
-    "label": "Placement",
+    "label": "Position",
     "tabIndex": 46,
     "category": "Dank Island",
     "keywords": [
@@ -12467,7 +12470,6 @@
       "keep",
       "modules",
       "panel",
-      "placement",
       "position",
       "satellite",
       "standalone",

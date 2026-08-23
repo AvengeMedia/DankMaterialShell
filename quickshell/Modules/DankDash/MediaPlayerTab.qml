@@ -6,6 +6,7 @@ import Quickshell.Widgets
 import qs.Common
 import qs.Services
 import qs.Widgets
+import "../../Common/Format.js" as Format
 
 Item {
     id: root
@@ -73,8 +74,8 @@ Item {
 
     // Derived "no players" state: always correct, no timers.
     readonly property int _playerCount: allPlayers ? allPlayers.length : 0
-    readonly property bool _noneAvailable: _playerCount === 0
-    readonly property bool showNoPlayerNow: (!_switchHold) && (_noneAvailable || !activePlayer)
+    readonly property bool noneAvailable: _playerCount === 0
+    readonly property bool showNoPlayerNow: (!_switchHold) && (noneAvailable || !activePlayer)
 
     property bool _switchHold: false
     Timer {
@@ -559,7 +560,7 @@ Item {
     Item {
         anchors.fill: parent
         clip: false
-        visible: !_noneAvailable && (!showNoPlayerNow)
+        visible: !noneAvailable && (!showNoPlayerNow)
         ColumnLayout {
             id: playerContent
             width: 484
@@ -674,11 +675,7 @@ Item {
                                     if (!activePlayer)
                                         return "0:00";
                                     const rawPos = Math.max(0, activePlayer.position || 0);
-                                    const pos = stableLength ? rawPos % Math.max(1, stableLength) : rawPos;
-                                    const minutes = Math.floor(pos / 60);
-                                    const seconds = Math.floor(pos % 60);
-                                    const timeStr = minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
-                                    return timeStr;
+                                    return Format.formatDuration(stableLength ? rawPos % Math.max(1, stableLength) : rawPos);
                                 }
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText
@@ -690,10 +687,7 @@ Item {
                                 text: {
                                     if (!activePlayer || stableLength <= 0)
                                         return "--:--";
-                                    const dur = stableLength;
-                                    const minutes = Math.floor(dur / 60);
-                                    const seconds = Math.floor(dur % 60);
-                                    return minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+                                    return Format.formatDuration(stableLength);
                                 }
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText

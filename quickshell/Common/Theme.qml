@@ -1879,6 +1879,16 @@ Singleton {
         return Qt.rgba(c1.r * (1 - r) + c2.r * r, c1.g * (1 - r) + c2.g * r, c1.b * (1 - r) + c2.b * r, c1.a * (1 - r) + c2.a * r);
     }
 
+    function luminance(c) {
+        if (!c || c.r === undefined)
+            return 0;
+        return 0.299 * c.r + 0.587 * c.g + 0.114 * c.b;
+    }
+
+    function isLightColor(c, threshold = 0.5) {
+        return luminance(c) > threshold;
+    }
+
     function getFillMode(modeName) {
         switch (modeName) {
         case "Stretch":

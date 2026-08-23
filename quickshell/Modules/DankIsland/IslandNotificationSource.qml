@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell.Services.Notifications
 import qs.Common
 import qs.Services
+import "../../Common/htmlElide.js" as HtmlElide
 
 QtObject {
     id: root
@@ -24,13 +25,6 @@ QtObject {
 
     readonly property bool hasAction: actionLabel.length > 0
     readonly property bool wrapperTimeoutHeld: (controller.notificationActive && controller.timeoutSuspended) || controller.notificationHeldForSystem
-
-    function isFocusedScreen() {
-        if (!SettingsData.notificationFocusedMonitor)
-            return true;
-        const focused = CompositorService.getFocusedScreen();
-        return !!focused && !!root.targetScreen && focused.name === root.targetScreen.name;
-    }
 
     function scheduleDisplayFieldClear() {
         displayFieldClearTimer.restart();
@@ -55,27 +49,6 @@ QtObject {
         return interval >= 0 ? interval : 5000;
     }
 
-    function plainText(value) {
-        return String(value || "").replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
-    }
-
-    function resolveImage(wrapper) {
-        const image = wrapper?.cleanImage || "";
-        if (image)
-            return image;
-        const icon = wrapper?.appIcon || "";
-        if (icon.startsWith("file://") || icon.startsWith("http://") || icon.startsWith("https://") || icon.includes("/"))
-            return icon;
-        return "";
-    }
-
-    function resolveFallbackIcon(wrapper) {
-        const rawImage = wrapper?.image || "";
-        if (rawImage.startsWith("image://icon/"))
-            return rawImage.substring(13);
-        return wrapper?.appIcon || "material:notifications";
-    }
-
     function applyWrapperTimeoutHold() {
         const timer = currentWrapper?.timer;
         if (!timer)
@@ -96,7 +69,7 @@ QtObject {
     }
 
     function adopt(wrapper) {
-        if (!wrapper || !isFocusedScreen())
+        if (!wrapper || !NotificationService.isFocusedScreen(root.targetScreen))
             return false;
 
         const isCritical = wrapper.urgency === NotificationUrgency.Critical;
@@ -106,16 +79,16 @@ QtObject {
         releaseWrapperTimeoutHold();
         displayFieldClearTimer.stop();
         currentWrapper = wrapper;
-        appName = wrapper.appName || I18n.tr("Notification");
-        summary = plainText(wrapper.summary) || appName;
-        body = plainText(wrapper.body);
+        appName = wrapper.appName || I18n.tr("Notification", "island notification face: fallback app name");
+        summary = HtmlElide.plainText(wrapper.summary) || appName;
+        body = HtmlElide.plainText(wrapper.body);
         timeText = wrapper.timeStr || "";
-        imageSource = resolveImage(wrapper);
-        fallbackIcon = resolveFallbackIcon(wrapper);
+        imageSource = wrapper.displayImage;
+        fallbackIcon = wrapper.fallbackIconName || "material:notifications";
         fallbackText = appName.charAt(0).toUpperCase();
         critical = isCritical;
         const actions = wrapper.actions || [];
-        actionLabel = actions.length > 0 ? (actions[0].text || I18n.tr("Open")) : "";
+        actionLabel = actions.length > 0 ? (actions[0].text || I18n.tr("Open", "island notification face: default action button")) : "";
         controller.notificationTimeout = wrapperTimeout(wrapper);
         const accepted = controller.requestNotification(isCritical);
         applyWrapperTimeoutHold();
@@ -133,12 +106,9 @@ QtObject {
 
     function syncVisibleNotifications() {
         const visible = NotificationService.visibleNotifications || [];
-        if (visible.length > 0) {
-            const latest = visible[visible.length - 1];
-            if (latest === currentWrapper || adopt(latest))
-                return;
-        }
-
+        const latest = visible.length > 0 ? visible[visible.length - 1] : null;
+        if (latest && (latest === currentWrapper || adopt(latest)))
+            return;
         if (!currentWrapper || visible.indexOf(currentWrapper) !== -1)
             return;
         currentWrapper = null;

@@ -43,7 +43,8 @@ Item {
     readonly property real edgeInset: Theme.snap(Math.max(0, root.edgeInsetRaw < 0 ? root.edgeBaseMargin : root.edgeInsetRaw), root.screenScale)
 
     readonly property bool bottomEdge: SettingsData.dankIslandEdge === "bottom"
-    readonly property real rowY: root.bottomEdge ? root.height - root.outerGap - root.barThickness : root.outerGap
+    readonly property real rowInset: Theme.snap(Math.max(0, (root.controller.compactFaceHeight - root.barThickness) / 2), root.screenScale)
+    readonly property real rowY: root.bottomEdge ? root.height - root.outerGap - root.rowInset - root.barThickness : root.outerGap + root.rowInset
     readonly property bool tracksIsland: !root.edgeAligned && root.visible
     readonly property bool motionRunning: root.tracksIsland && (root.islandSurface?.motionRunning ?? false)
     readonly property real islandStartX: root.islandSurface?.motionStartBounds.x ?? 0

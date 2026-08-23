@@ -838,20 +838,8 @@ Singleton {
 
         const deviceInfo = getCurrentDeviceInfoByName(actualDevice);
         const isExponential = SessionData.getBrightnessExponential(actualDevice);
-
-        let minValue = 0;
-        let maxValue = 100;
-
-        switch (true) {
-        case isExponential:
-            minValue = 1;
-            maxValue = 100;
-            break;
-        default:
-            minValue = (deviceInfo && (deviceInfo.class === "backlight" || deviceInfo.class === "ddc")) ? 1 : 0;
-            maxValue = deviceInfo?.displayMax || 100;
-            break;
-        }
+        const minValue = brightnessMinimum(deviceInfo);
+        const maxValue = brightnessMaximum(deviceInfo);
 
         if (maxValue <= 0) {
             log.warn("Invalid max value for device", actualDevice, "- skipping brightness change");
@@ -1022,11 +1010,49 @@ Singleton {
     }
 
     function getDeviceMax(deviceName) {
-        const deviceInfo = getCurrentDeviceInfoByName(deviceName);
-        if (!deviceInfo) {
-            return 100;
+        return brightnessMaximum(getCurrentDeviceInfoByName(deviceName));
+    }
+
+    function brightnessMinimum(deviceInfo) {
+        if (!deviceInfo || SessionData.getBrightnessExponential(deviceInfo.id))
+            return 1;
+        switch (deviceInfo.class) {
+        case "backlight":
+        case "ddc":
+            return 1;
+        default:
+            return 0;
         }
+    }
+
+    function brightnessMaximum(deviceInfo) {
+        if (!deviceInfo || SessionData.getBrightnessExponential(deviceInfo.id))
+            return 100;
         return deviceInfo.displayMax || 100;
+    }
+
+    function brightnessUnit(deviceInfo) {
+        if (!deviceInfo || SessionData.getBrightnessExponential(deviceInfo.id))
+            return "%";
+        return deviceInfo.class === "ddc" ? "" : "%";
+    }
+
+    function brightnessIconName(deviceInfo, level) {
+        if (!deviceInfo)
+            return "brightness_medium";
+        switch (deviceInfo.class) {
+        case "backlight":
+        case "ddc":
+            break;
+        default:
+            return String(deviceInfo.name ?? "").includes("kbd") ? "keyboard" : "lightbulb";
+        }
+        if (level === undefined)
+            return "brightness_medium";
+        const ratio = level / brightnessMaximum(deviceInfo);
+        if (ratio <= 0.33)
+            return "brightness_low";
+        return ratio <= 0.66 ? "brightness_medium" : "brightness_high";
     }
 
     // Night Mode Functions - Simplified
@@ -1568,11 +1594,9 @@ Singleton {
             if (actualDevice && actualDevice !== root.currentDevice)
                 root.setCurrentDevice(actualDevice, false);
 
-            const isExponential = SessionData.getBrightnessExponential(actualDevice);
             const currentBrightness = root.getDeviceBrightness(actualDevice);
             const deviceInfo = root.getCurrentDeviceInfoByName(actualDevice);
-
-            const maxValue = isExponential ? 100 : (deviceInfo?.displayMax || 100);
+            const maxValue = root.brightnessMaximum(deviceInfo);
             const newBrightness = Math.min(maxValue, currentBrightness + stepValue);
 
             root.setBrightness(newBrightness, actualDevice);
@@ -1595,22 +1619,9 @@ Singleton {
             if (actualDevice && actualDevice !== root.currentDevice)
                 root.setCurrentDevice(actualDevice, false);
 
-            const isExponential = SessionData.getBrightnessExponential(actualDevice);
             const currentBrightness = root.getDeviceBrightness(actualDevice);
             const deviceInfo = root.getCurrentDeviceInfoByName(actualDevice);
-
-            let minValue = 0;
-            switch (true) {
-            case isExponential:
-                minValue = 1;
-                break;
-            case deviceInfo && (deviceInfo.class === "backlight" || deviceInfo.class === "ddc"):
-                minValue = 1;
-                break;
-            default:
-                minValue = 0;
-                break;
-            }
+            const minValue = root.brightnessMinimum(deviceInfo);
 
             const newBrightness = Math.max(minValue, currentBrightness - stepValue);
 

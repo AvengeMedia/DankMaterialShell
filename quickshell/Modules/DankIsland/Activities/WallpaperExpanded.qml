@@ -8,13 +8,13 @@ import qs.Widgets
 FocusScope {
     id: root
 
-    required property var islandController
+    required property var controller
     property var effectiveScreen: null
 
     property bool contentStaged: false
 
-    readonly property real stageWidth: root.islandController.wallpaperExpandedTarget.width - 2
-    readonly property real stageHeight: root.islandController.wallpaperExpandedTarget.height - 2
+    readonly property real stageWidth: root.controller.wallpaperExpandedTarget.width - 2
+    readonly property real stageHeight: root.controller.wallpaperExpandedTarget.height - 2
     readonly property var wallpaperTab: tabLoader.item
 
     clip: true
@@ -33,7 +33,7 @@ FocusScope {
 
         property var customKeyboardFocus: null
 
-        onCustomKeyboardFocusChanged: root.islandController.keyboardYielded = hostContract.customKeyboardFocus !== null
+        onCustomKeyboardFocusChanged: root.controller.keyboardYielded = hostContract.customKeyboardFocus !== null
     }
 
     Loader {
@@ -73,13 +73,13 @@ FocusScope {
             return;
         }
         if (event.key === Qt.Key_Escape) {
-            root.islandController.requestCollapse();
+            root.controller.requestCollapse();
             event.accepted = true;
         }
     }
 
     Connections {
-        target: root.islandController
+        target: root.controller
 
         function onSessionStarted(activityId) {
             if (activityId === "wallpaper")
@@ -89,11 +89,11 @@ FocusScope {
 
     Component.onCompleted: {
         root.contentStaged = true;
-        root.islandController.markVisualsReady("wallpaper");
+        root.controller.markVisualsReady("wallpaper");
     }
 
     Component.onDestruction: {
-        root.islandController.keyboardYielded = false;
-        root.islandController.setVisualsReady("wallpaper", false);
+        root.controller.keyboardYielded = false;
+        root.controller.setVisualsReady("wallpaper", false);
     }
 }

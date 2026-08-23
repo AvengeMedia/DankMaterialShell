@@ -271,17 +271,6 @@ Rectangle {
         DankCircularImage {
             id: iconContainer
             cacheImages: root.lightweight
-            readonly property string rawImage: notificationGroup?.latestNotification?.image || ""
-            readonly property string iconFromImage: {
-                if (rawImage.startsWith("image://icon/"))
-                    return rawImage.substring(13);
-                return "";
-            }
-            readonly property bool imageHasSpecialPrefix: {
-                const icon = iconFromImage;
-                return icon.startsWith("material:") || icon.startsWith("svg:") || icon.startsWith("unicode:") || icon.startsWith("image:");
-            }
-            readonly property bool hasNotificationImage: rawImage !== "" && (!rawImage.startsWith("image://icon/") || iconFromImage.startsWith("/"))
 
             width: iconSize
             height: iconSize
@@ -289,25 +278,9 @@ Rectangle {
             anchors.top: parent.top
             anchors.topMargin: descriptionExpanded ? Math.max(0, Theme.fontSizeSmall * 1.2 + (Theme.fontSizeMedium * 1.2 + Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 2)) / 2 - iconSize / 2) : Math.max(0, Theme.fontSizeSmall * 1.2 + (textContainer.height - Theme.fontSizeSmall * 1.2) / 2 - iconSize / 2)
 
-            imageSource: {
-                if (hasNotificationImage)
-                    return notificationGroup.latestNotification.cleanImage;
-                if (imageHasSpecialPrefix)
-                    return "";
-                const appIcon = notificationGroup?.latestNotification?.appIcon;
-                if (!appIcon)
-                    return "";
-                if (appIcon.startsWith("file://") || appIcon.startsWith("http://") || appIcon.startsWith("https://") || appIcon.includes("/"))
-                    return appIcon;
-                return "";
-            }
-
-            hasImage: hasNotificationImage
-            fallbackIcon: {
-                if (imageHasSpecialPrefix)
-                    return iconFromImage;
-                return notificationGroup?.latestNotification?.appIcon || iconFromImage || "";
-            }
+            imageSource: notificationGroup?.latestNotification?.displayImage ?? ""
+            hasImage: notificationGroup?.latestNotification?.hasDisplayImage ?? false
+            fallbackIcon: notificationGroup?.latestNotification?.fallbackIconName ?? ""
             fallbackText: {
                 const appName = notificationGroup?.appName || "?";
                 return appName.charAt(0).toUpperCase();
@@ -615,42 +588,14 @@ Rectangle {
                                 id: messageIcon
                                 cacheImages: root.lightweight
 
-                                readonly property string rawImage: modelData?.image || ""
-                                readonly property string iconFromImage: {
-                                    if (rawImage.startsWith("image://icon/"))
-                                        return rawImage.substring(13);
-                                    return "";
-                                }
-                                readonly property bool imageHasSpecialPrefix: {
-                                    const icon = iconFromImage;
-                                    return icon.startsWith("material:") || icon.startsWith("svg:") || icon.startsWith("unicode:") || icon.startsWith("image:");
-                                }
-                                readonly property bool hasNotificationImage: rawImage !== "" && (!rawImage.startsWith("image://icon/") || iconFromImage.startsWith("/"))
-
                                 width: expandedIconSize
                                 height: expandedIconSize
                                 anchors.left: parent.left
                                 anchors.top: parent.top
                                 anchors.topMargin: Theme.fontSizeSmall * 1.2 + (compactMode ? Theme.spacingXS : Theme.spacingS)
 
-                                imageSource: {
-                                    if (hasNotificationImage)
-                                        return modelData.cleanImage;
-                                    if (imageHasSpecialPrefix)
-                                        return "";
-                                    const appIcon = modelData?.appIcon;
-                                    if (!appIcon)
-                                        return "";
-                                    if (appIcon.startsWith("file://") || appIcon.startsWith("http://") || appIcon.startsWith("https://") || appIcon.includes("/"))
-                                        return appIcon;
-                                    return "";
-                                }
-
-                                fallbackIcon: {
-                                    if (imageHasSpecialPrefix)
-                                        return iconFromImage;
-                                    return modelData?.appIcon || iconFromImage || "";
-                                }
+                                imageSource: modelData?.displayImage ?? ""
+                                fallbackIcon: modelData?.fallbackIconName ?? ""
 
                                 fallbackText: {
                                     const appName = modelData?.appName || "?";

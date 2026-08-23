@@ -15,65 +15,18 @@ QtObject {
     readonly property bool available: volumeActivity ? !!AudioService.sink?.audio : DisplayService.brightnessAvailable
     readonly property bool muted: volumeActivity && (AudioService.sink?.audio?.muted ?? false)
     readonly property real value: volumeActivity ? Math.min(AudioService.sinkMaxVolume, Math.round((AudioService.sink?.audio?.volume ?? 0) * 100)) : DisplayService.brightnessLevel
-    readonly property real maximum: {
-        if (volumeActivity)
-            return AudioService.sinkMaxVolume;
-        const deviceInfo = DisplayService.getCurrentDeviceInfo();
-        if (!deviceInfo)
-            return 100;
-        if (SessionData.getBrightnessExponential(deviceInfo.id))
-            return 100;
-        return deviceInfo.displayMax || 100;
-    }
-    readonly property int minimum: {
-        if (volumeActivity)
-            return 0;
-        const deviceInfo = DisplayService.getCurrentDeviceInfo();
-        if (!deviceInfo)
-            return 1;
-        if (SessionData.getBrightnessExponential(deviceInfo.id))
-            return 1;
-        return (deviceInfo.class === "backlight" || deviceInfo.class === "ddc") ? 1 : 0;
-    }
+    readonly property var brightnessDevice: DisplayService.getCurrentDeviceInfo()
+    readonly property real maximum: volumeActivity ? AudioService.sinkMaxVolume : DisplayService.brightnessMaximum(brightnessDevice)
+    readonly property int minimum: volumeActivity ? 0 : DisplayService.brightnessMinimum(brightnessDevice)
     readonly property real ratio: maximum > 0 ? Math.max(0, Math.min(1, value / maximum)) : 0
-    readonly property string title: volumeActivity ? I18n.tr("Volume") : I18n.tr("Brightness")
-    readonly property string unit: {
-        if (volumeActivity)
-            return "%";
-        const deviceInfo = DisplayService.getCurrentDeviceInfo();
-        if (!deviceInfo)
-            return "%";
-        if (SessionData.getBrightnessExponential(deviceInfo.id))
-            return "%";
-        return deviceInfo.class === "ddc" ? "" : "%";
-    }
-    readonly property string displayValue: muted ? I18n.tr("Muted") : Math.round(value) + unit
-    readonly property string iconName: volumeActivity ? volumeIconName() : brightnessIconName()
-
-    function volumeIconName() {
-        if (!available || muted)
-            return "volume_off";
-        const volume = AudioService.sink?.audio?.volume ?? 0;
-        if (volume === 0)
-            return "volume_mute";
-        return volume <= 0.33 ? "volume_down" : "volume_up";
-    }
-
-    function brightnessIconName() {
-        const deviceInfo = DisplayService.getCurrentDeviceInfo();
-        if (!available || !deviceInfo)
-            return "brightness_low";
-        if (deviceInfo.class === "backlight" || deviceInfo.class === "ddc") {
-            if (ratio <= 0.33)
-                return "brightness_low";
-            return ratio <= 0.66 ? "brightness_medium" : "brightness_high";
-        }
-        if (String(deviceInfo.name ?? "").includes("kbd"))
-            return "keyboard";
-        return "lightbulb";
-    }
+    readonly property string title: volumeActivity ? I18n.tr("Volume", "island system face: volume title") : I18n.tr("Brightness", "island system face: brightness title")
+    readonly property string unit: volumeActivity ? "%" : DisplayService.brightnessUnit(brightnessDevice)
+    readonly property string displayValue: muted ? I18n.tr("Muted", "island system face: muted value label") : Math.round(value) + unit
+    readonly property string iconName: volumeActivity ? AudioService.sinkVolumeIconName : DisplayService.brightnessIconName(brightnessDevice, value)
 
     function show(activityKind) {
+        if (SessionData.suppressOSD)
+            return;
         if (controller.requestSystemActivity(activityKind))
             kind = activityKind;
     }

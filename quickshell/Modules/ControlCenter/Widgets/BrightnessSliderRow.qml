@@ -125,24 +125,7 @@ Row {
 
             DankIcon {
                 anchors.centerIn: parent
-                name: {
-                    if (!DisplayService.brightnessAvailable || !targetDevice) {
-                        return "brightness_low";
-                    }
-
-                    if (targetDevice.class === "backlight" || targetDevice.class === "ddc") {
-                        const brightness = targetBrightness;
-                        if (brightness <= 33)
-                            return "brightness_low";
-                        if (brightness <= 66)
-                            return "brightness_medium";
-                        return "brightness_high";
-                    } else if (targetDevice.name.includes("kbd")) {
-                        return "keyboard";
-                    } else {
-                        return "lightbulb";
-                    }
-                }
+                name: DisplayService.brightnessAvailable && targetDevice ? DisplayService.brightnessIconName(targetDevice, targetBrightness) : "brightness_low"
                 size: Theme.iconSize
                 color: DisplayService.brightnessAvailable && targetDevice && targetBrightness > 0 ? Theme.primary : Theme.surfaceText
             }
@@ -155,34 +138,10 @@ Row {
         anchors.verticalCenter: parent.verticalCenter
         width: parent.width - (Theme.iconSize + Theme.spacingS * 2)
         enabled: DisplayService.brightnessAvailable && targetDeviceName.length > 0
-        minimum: {
-            if (!targetDevice)
-                return 1;
-            const isExponential = SessionData.getBrightnessExponential(targetDevice.id);
-            if (isExponential) {
-                return 1;
-            }
-            return (targetDevice.class === "backlight" || targetDevice.class === "ddc") ? 1 : 0;
-        }
-        maximum: {
-            if (!targetDevice)
-                return 100;
-            const isExponential = SessionData.getBrightnessExponential(targetDevice.id);
-            if (isExponential) {
-                return 100;
-            }
-            return targetDevice.displayMax || 100;
-        }
+        minimum: DisplayService.brightnessMinimum(targetDevice)
+        maximum: DisplayService.brightnessMaximum(targetDevice)
         showValue: true
-        unit: {
-            if (!targetDevice)
-                return "%";
-            const isExponential = SessionData.getBrightnessExponential(targetDevice.id);
-            if (isExponential) {
-                return "%";
-            }
-            return targetDevice.class === "ddc" ? "" : "%";
-        }
+        unit: DisplayService.brightnessUnit(targetDevice)
         onSliderValueChanged: function (newValue) {
             if (DisplayService.brightnessAvailable && targetDeviceName) {
                 DisplayService.setBrightness(newValue, targetDeviceName, true);

@@ -8,7 +8,7 @@ import qs.Services
 FocusScope {
     id: root
 
-    required property var islandController
+    required property var controller
     property var effectiveScreen: null
     property var transientSurfaceTracker: null
     property real bottomInset: Theme.spacingM
@@ -54,35 +54,35 @@ FocusScope {
         Qt.callLater(() => {
             root._heightReportPending = false;
             content.notificationList.syncSessionContentHeight();
-            root.islandController.setDestinationContentHeight("notificationcenter", content.targetImplicitHeight + root.bottomInset);
+            root.controller.setDestinationContentHeight("notificationcenter", content.targetImplicitHeight + root.bottomInset);
         });
     }
 
     function prepareVisuals() {
         content.notificationList.syncSessionContentHeight();
-        root.islandController.setDestinationContentHeight("notificationcenter", content.targetImplicitHeight + root.bottomInset);
-        root.islandController.markVisualsReady("notificationcenter");
+        root.controller.setDestinationContentHeight("notificationcenter", content.targetImplicitHeight + root.bottomInset);
+        root.controller.markVisualsReady("notificationcenter");
     }
 
     QtObject {
         id: hostContract
 
-        readonly property bool shouldBeVisible: root.islandController.activeActivity === "notificationcenter" && root.islandController.expanded
+        readonly property bool shouldBeVisible: root.controller.activeActivity === "notificationcenter" && root.controller.expanded
         readonly property var screen: root.effectiveScreen
         readonly property var transientSurfaceTracker: root.transientSurfaceTracker
-        readonly property real maxContentHeight: root.islandController.notificationCenterMaxHeight - root.bottomInset
+        readonly property real maxContentHeight: root.controller.notificationCenterMaxHeight - root.bottomInset
         readonly property bool hostOwnsHeight: true
         readonly property bool headerTogglesClose: true
         readonly property bool animateCardExpansion: false
         readonly property bool lightweightNotifications: true
 
         function close() {
-            root.islandController.requestCollapse();
+            root.controller.requestCollapse();
         }
 
         function requestSettings() {
-            root.islandController.requestCollapse();
-            PopoutService.openSettingsWithTab("notifications", root, () => root.islandController.requestNotificationCenter(false));
+            root.controller.requestCollapse();
+            PopoutService.openSettingsWithTab("notifications", root, () => root.controller.requestNotificationCenter(false));
         }
     }
 
@@ -91,7 +91,7 @@ FocusScope {
 
         listView: null
         isOpen: hostContract.shouldBeVisible
-        onClose: () => root.islandController.requestCollapse()
+        onClose: () => root.controller.requestCollapse()
     }
 
     Keys.onPressed: event => content.handleKey(event)
@@ -105,14 +105,14 @@ FocusScope {
             horizontalCenter: parent.horizontalCenter
             bottomMargin: root.bottomInset
         }
-        width: root.islandController.notificationCenterExpandedTarget.width
+        width: root.controller.notificationCenterExpandedTarget.width
         host: hostContract
         externalKeyboardController: keyboardController
         onTargetImplicitHeightChanged: root.queueHeightReport()
     }
 
     Connections {
-        target: root.islandController
+        target: root.controller
 
         function onSessionStarted(activityId) {
             if (activityId === "notificationcenter")
@@ -120,12 +120,12 @@ FocusScope {
         }
 
         function onExpandedChanged() {
-            if (!root.islandController.expanded)
+            if (!root.controller.expanded)
                 root.endSession();
         }
 
         function onActiveActivityChanged() {
-            if (root.islandController.activeActivity !== "notificationcenter")
+            if (root.controller.activeActivity !== "notificationcenter")
                 root.endSession();
         }
     }

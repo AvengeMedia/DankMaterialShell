@@ -1105,126 +1105,19 @@ Item {
                         anchors.fill: parent
                         z: -2
                         acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
-                        onClicked: {
-                            const screenName = barWindow.screen?.name;
-                            if (!screenName)
-                                return;
-                            if (PopoutManager.currentPopoutsByScreen[screenName])
-                                PopoutManager.closeAllPopouts();
-                            if (ModalManager.currentModalsByScreen[screenName])
-                                ModalManager.closeAllModalsExcept(null);
-                            TrayMenuManager.closeAllMenus();
-                        }
+                        onClicked: PopoutManager.dismissAllForScreen(barWindow.screen?.name)
                     }
 
-                    MouseArea {
+                    BarScrollArea {
                         id: scrollArea
                         anchors.fill: parent
-                        acceptedButtons: Qt.NoButton
                         propagateComposedEvents: true
                         z: -1
-
-                        property real touchpadAccumulatorY: 0
-                        property real touchpadAccumulatorX: 0
-                        property real mouseAccumulatorY: 0
-                        property real mouseAccumulatorX: 0
-                        property bool actionInProgress: false
-
-                        Timer {
-                            id: cooldownTimer
-                            interval: 100
-                            onTriggered: parent.actionInProgress = false
-                        }
-
-                        function handleScrollAction(behavior, direction) {
-                            switch (behavior) {
-                            case "workspace":
-                                topBarContent.switchWorkspace(direction);
-                                return true;
-                            case "column":
-                                if (!CompositorService.isNiri)
-                                    return false;
-                                if (direction > 0)
-                                    NiriService.moveColumnRight(barWindow.screenName);
-                                else
-                                    NiriService.moveColumnLeft(barWindow.screenName);
-                                return true;
-                            default:
-                                return false;
-                            }
-                        }
-
-                        function processWheel(wheel) {
-                            if (!(barConfig?.scrollEnabled ?? true) || actionInProgress) {
-                                wheel.accepted = false;
-                                return;
-                            }
-
-                            const deltaY = wheel.angleDelta.y;
-                            const deltaX = wheel.angleDelta.x;
-                            const isTouchpadY = wheel.pixelDelta && wheel.pixelDelta.y !== 0;
-                            const isTouchpadX = wheel.pixelDelta && wheel.pixelDelta.x !== 0;
-                            const xBehavior = barConfig?.scrollXBehavior ?? "column";
-                            const yBehavior = barConfig?.scrollYBehavior ?? "workspace";
-                            const reverse = SettingsData.reverseScrolling ? -1 : 1;
-
-                            if (CompositorService.isNiri && xBehavior !== "none" && Math.abs(deltaX) > Math.abs(deltaY)) {
-                                if (isTouchpadX) {
-                                    touchpadAccumulatorX += deltaX;
-                                    if (Math.abs(touchpadAccumulatorX) >= 500) {
-                                        const direction = touchpadAccumulatorX * reverse < 0 ? 1 : -1;
-                                        if (handleScrollAction(xBehavior, direction)) {
-                                            actionInProgress = true;
-                                            cooldownTimer.restart();
-                                        }
-                                        touchpadAccumulatorX = 0;
-                                    }
-                                } else {
-                                    mouseAccumulatorX += deltaX;
-                                    if (Math.abs(mouseAccumulatorX) >= 120) {
-                                        const direction = mouseAccumulatorX * reverse < 0 ? 1 : -1;
-                                        if (handleScrollAction(xBehavior, direction)) {
-                                            actionInProgress = true;
-                                            cooldownTimer.restart();
-                                        }
-                                        mouseAccumulatorX = 0;
-                                    }
-                                }
-                                wheel.accepted = false;
-                                return;
-                            }
-
-                            if (yBehavior === "none") {
-                                wheel.accepted = false;
-                                return;
-                            }
-
-                            if (isTouchpadY) {
-                                touchpadAccumulatorY += deltaY;
-                                if (Math.abs(touchpadAccumulatorY) >= 500) {
-                                    const direction = touchpadAccumulatorY * reverse < 0 ? 1 : -1;
-                                    if (handleScrollAction(yBehavior, direction)) {
-                                        actionInProgress = true;
-                                        cooldownTimer.restart();
-                                    }
-                                    touchpadAccumulatorY = 0;
-                                }
-                            } else {
-                                mouseAccumulatorY += deltaY;
-                                if (Math.abs(mouseAccumulatorY) >= 120) {
-                                    const direction = mouseAccumulatorY * reverse < 0 ? 1 : -1;
-                                    if (handleScrollAction(yBehavior, direction)) {
-                                        actionInProgress = true;
-                                        cooldownTimer.restart();
-                                    }
-                                    mouseAccumulatorY = 0;
-                                }
-                            }
-
-                            wheel.accepted = false;
-                        }
-
-                        onWheel: wheel => processWheel(wheel)
+                        scrollEnabled: barConfig?.scrollEnabled ?? true
+                        xBehavior: barConfig?.scrollXBehavior ?? "column"
+                        yBehavior: barConfig?.scrollYBehavior ?? "workspace"
+                        screenName: barWindow.screenName
+                        onWorkspaceSwitchRequested: direction => topBarContent.switchWorkspace(direction)
                     }
 
                     DankBarContent {

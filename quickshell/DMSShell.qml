@@ -13,7 +13,6 @@ import qs.Modals.DankLauncherV2
 import qs.Modules
 import qs.Modules.AppDrawer
 import qs.Modules.DankDash
-import qs.Modules.DankIsland
 import qs.Modules.ControlCenter
 import qs.Modules.Dock
 import qs.Modules.Lock
@@ -405,22 +404,6 @@ Item {
         model: root.notificationPopupScreens
 
         delegate: NotificationPopupManager {}
-    }
-
-    Loader {
-        id: dankIslandLoader
-
-        property var modalRef: colorPickerModal
-        property LazyLoader powerModalLoaderRef: powerMenuModalLoader
-
-        active: SettingsData.dankIslandEnabled
-        asynchronous: false
-        sourceComponent: DankIsland {
-            screenModel: root.dankIslandScreens
-            colorPickerModal: dankIslandLoader.modalRef
-            powerMenuModalLoader: dankIslandLoader.powerModalLoaderRef
-            onLockRequested: lock.activate()
-        }
     }
 
     LazyLoader {

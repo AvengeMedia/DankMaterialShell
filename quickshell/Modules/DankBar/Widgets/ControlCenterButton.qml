@@ -146,18 +146,6 @@ BasePill {
         return false;
     }
 
-    function getVolumeIconName() {
-        if (!AudioService.sink?.audio)
-            return "volume_up";
-        if (AudioService.sink.audio.muted)
-            return "volume_off";
-        if (AudioService.sink.audio.volume === 0)
-            return "volume_mute";
-        if (AudioService.sink.audio.volume * 100 < 33)
-            return "volume_down";
-        return "volume_up";
-    }
-
     function getMicIconName() {
         if (!AudioService.source?.audio)
             return "mic";
@@ -176,14 +164,7 @@ BasePill {
 
     function getBrightnessIconName() {
         const deviceName = getEffectiveBrightnessDevice();
-        if (!deviceName)
-            return "brightness_medium";
-        const level = DisplayService.getDeviceBrightness(deviceName);
-        if (level <= 33)
-            return "brightness_low";
-        if (level <= 66)
-            return "brightness_medium";
-        return "brightness_high";
+        return DisplayService.brightnessIconName(DisplayService.getCurrentDeviceInfoByName(deviceName), DisplayService.getDeviceBrightness(deviceName));
     }
 
     function getScreenPinKey() {
@@ -560,7 +541,7 @@ BasePill {
                         DankIcon {
                             id: audioIconV
                             visible: verticalGroupItem.modelData.id === "audio"
-                            name: root.getVolumeIconName()
+                            name: AudioService.sinkVolumeIconName
                             size: root.vIconSize
                             color: Theme.widgetIconColor
                             anchors.horizontalCenter: parent.horizontalCenter
@@ -760,7 +741,7 @@ BasePill {
 
                                 DankIcon {
                                     id: audioIcon
-                                    name: root.getVolumeIconName()
+                                    name: AudioService.sinkVolumeIconName
                                     size: root.getControlCenterIconSize()
                                     color: Theme.widgetIconColor
                                     anchors.verticalCenter: parent.verticalCenter

@@ -17,14 +17,12 @@ Item {
     property int maximum: 100
     property string unit: "%"
     property string displayText: ""
-    property string reserveText: ""
     property bool sliderEnabled: true
-    property bool alwaysShowValue: SettingsData.osdAlwaysShowValue
     property color thumbOutlineColor: Theme.surfaceContainer
     property real horizontalPadding: -1
 
     readonly property bool containsMouse: iconArea.containsMouse || levelSlider.containsMouse
-    readonly property bool showValueColumn: root.alwaysShowValue
+    readonly property bool showValueColumn: SettingsData.osdAlwaysShowValue
     readonly property alias isDragging: levelSlider.isDragging
     readonly property real effectiveHorizontalPadding: root.horizontalPadding >= 0 ? root.horizontalPadding : Math.max(Theme.spacingS, Math.round((height - root.iconSize) / 2))
 
@@ -123,8 +121,6 @@ Item {
                     if (candidate.length > widest.length)
                         widest = candidate;
                 }
-                if (root.reserveText.length > widest.length)
-                    return root.reserveText;
                 return widest;
             }
             color: Theme.surfaceText

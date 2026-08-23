@@ -5,6 +5,7 @@ import qs.Common
 import qs.Modules.DankDash
 import qs.Modules.DankIsland.Activities
 import qs.Services
+import qs.Widgets
 
 Item {
     id: root
@@ -16,8 +17,6 @@ Item {
     required property var launcherController
     property var launcherTransientSurfaceTracker: null
     property var notificationTransientSurfaceTracker: null
-    property var colorPickerModal: null
-    property var powerMenuModalLoader: null
     property var effectiveScreen: null
     property bool reducedMotion: false
     property real springStiffness: 560
@@ -30,14 +29,15 @@ Item {
     readonly property color surfaceColor: {
         if (root.highContrast)
             return Theme.surfaceContainerHighest;
-        if (root.palette === "bright")
+        switch (root.palette) {
+        case "bright":
             return Theme.surfaceBright;
-        if (root.palette === "dim")
+        case "dim":
             return Theme.surfaceDim;
+        }
         return Theme.surfaceContainerHigh;
     }
 
-    signal lockRequested
     signal scrollWheel(var wheel)
 
     readonly property alias inputMaskItem: inputEnvelope
@@ -46,19 +46,19 @@ Item {
     readonly property real currentEdgeExtent: motion.currentOffsetY + motion.currentHeight
     property real motionStartEdgeExtent: 0
     property real trackedHeight: 0
-    readonly property Item mediaDropdownMaskItem: mediaDropdowns.__activePanel
+    readonly property Item mediaDropdownMaskItem: mediaDropdowns.activePanel
     property real fadeCompactHeight: 48
     property real fadeExpandedHeight: 352
     property rect motionStartBounds: Qt.rect(0, 0, 0, 0)
     property int mediaDropdownType: 0
     property point mediaDropdownAnchor: Qt.point(0, 0)
-    readonly property real currentVisualX: (width - motion.currentWidth) / 2 + motion.currentOffsetX
     readonly property bool bottomEdge: SettingsData.dankIslandEdge === "bottom"
-    readonly property real currentVisualY: bottomEdge ? height - motion.currentOffsetY - motion.currentHeight : motion.currentOffsetY
-    readonly property real currentVisualWidth: motion.currentWidth
-    readonly property real currentVisualHeight: motion.currentHeight
-    readonly property real targetVisualX: (width - motion.targetWidth) / 2 + motion.targetOffsetX
-    readonly property real targetVisualY: bottomEdge ? height - motion.targetOffsetY - motion.targetHeight : motion.targetOffsetY
+    readonly property real currentVisualWidth: Math.round(motion.currentWidth)
+    readonly property real currentVisualHeight: Math.round(motion.currentHeight)
+    readonly property real currentVisualX: Math.round((width - currentVisualWidth) / 2 + motion.currentOffsetX)
+    readonly property real currentVisualY: bottomEdge ? height - Math.round(motion.currentOffsetY) - currentVisualHeight : Math.round(motion.currentOffsetY)
+    readonly property real targetVisualX: Math.round((width - motion.targetWidth) / 2 + motion.targetOffsetX)
+    readonly property real targetVisualY: bottomEdge ? height - Math.round(motion.targetOffsetY) - motion.targetHeight : Math.round(motion.targetOffsetY)
     readonly property real targetScreenY: targetVisualY + root.hostOriginY
     readonly property real targetVisualWidth: motion.targetWidth
     readonly property real targetVisualHeight: motion.targetHeight
@@ -86,8 +86,8 @@ Item {
         const b = root.motionStartBounds;
         const left = Math.min(b.x, root.currentVisualX);
         const top = Math.min(b.y, root.currentVisualY);
-        const right = Math.max(b.x + b.width, root.currentVisualX + motion.currentWidth);
-        const bottom = Math.max(b.y + b.height, root.currentVisualY + motion.currentHeight);
+        const right = Math.max(b.x + b.width, root.currentVisualX + root.currentVisualWidth);
+        const bottom = Math.max(b.y + b.height, root.currentVisualY + root.currentVisualHeight);
         root.motionStartBounds = Qt.rect(left, top, right - left, bottom - top);
     }
 
@@ -155,7 +155,7 @@ Item {
 
         function onRunningChanged() {
             if (motion.running) {
-                root.motionStartBounds = Qt.rect(root.currentVisualX, root.currentVisualY, motion.currentWidth, motion.currentHeight);
+                root.motionStartBounds = Qt.rect(root.currentVisualX, root.currentVisualY, root.currentVisualWidth, root.currentVisualHeight);
                 root.motionStartEdgeExtent = root.currentEdgeExtent;
                 if (root.controller.activeActivity === "media")
                     root.hideMediaDropdowns();
@@ -210,8 +210,8 @@ Item {
 
         x: root.currentVisualX
         y: root.currentVisualY
-        width: motion.currentWidth
-        height: motion.currentHeight
+        width: root.currentVisualWidth
+        height: root.currentVisualHeight
         topLeftRadius: Math.max(0, motion.currentTopLeftRadius)
         topRightRadius: Math.max(0, motion.currentTopRightRadius)
         bottomLeftRadius: Math.max(0, motion.currentBottomLeftRadius)
@@ -240,6 +240,8 @@ Item {
 
             anchors.fill: parent
             controller: root.controller
+            islandX: root.currentVisualX
+            hostWidth: root.width
             morphProgress: root.morphProgress
             expanded: root.controller.expanded
             pointerInside: root.controller.pointerInside
@@ -300,7 +302,6 @@ Item {
 
         HomeCompact {
             controller: root.controller
-            mediaModel: root.mediaModel
         }
     }
 
@@ -308,7 +309,7 @@ Item {
         id: expandedHomeComponent
 
         HomeExpanded {
-            islandController: root.controller
+            controller: root.controller
         }
     }
 
@@ -325,7 +326,7 @@ Item {
         id: expandedMediaComponent
 
         MediaExpanded {
-            islandController: root.controller
+            controller: root.controller
             geometrySettled: !motion.running
             effectiveScreen: root.effectiveScreen
             alignedX: root.targetVisualX
@@ -343,8 +344,25 @@ Item {
     Component {
         id: compactLauncherComponent
 
-        LauncherCompact {
+        DestinationCompact {
+            id: launcherFace
+
+            readonly property real logoSize: Math.max(12, Theme.iconSizeSmall + SettingsData.launcherLogoSizeOffset)
+            readonly property color logoColor: Theme.effectiveLogoColor !== "" ? Theme.effectiveLogoColor : Theme.surfaceText
+
             controller: root.controller
+            activityId: "launcher"
+            label: I18n.tr("Launcher", "island compact face: launcher label")
+            leading: LauncherLogo {
+                mode: SettingsData.launcherLogoMode
+                size: launcherFace.logoSize
+                appsIconColor: launcherFace.logoColor
+                colorOverride: String(launcherFace.logoColor)
+                brightness: SettingsData.launcherLogoBrightness
+                contrast: SettingsData.launcherLogoContrast
+                customPath: SettingsData.launcherLogoCustomPath
+                fallbackToApps: true
+            }
         }
     }
 
@@ -352,7 +370,7 @@ Item {
         id: expandedLauncherComponent
 
         LauncherExpanded {
-            islandController: root.controller
+            controller: root.controller
             launcherController: root.launcherController
             transientSurfaceTracker: root.launcherTransientSurfaceTracker
             effectiveScreen: root.effectiveScreen
@@ -364,8 +382,11 @@ Item {
     Component {
         id: compactControlCenterComponent
 
-        ControlCenterCompact {
+        DestinationCompact {
             controller: root.controller
+            activityId: "controlcenter"
+            iconName: "tune"
+            label: I18n.tr("Control Center", "island compact face: control center label")
         }
     }
 
@@ -373,23 +394,23 @@ Item {
         id: expandedControlCenterComponent
 
         ControlCenterExpanded {
-            islandController: root.controller
+            controller: root.controller
             effectiveScreen: root.effectiveScreen
-            colorPickerModal: root.colorPickerModal
-            powerMenuModalLoader: root.powerMenuModalLoader
             alignedX: root.targetVisualX
             alignedY: root.targetScreenY
             alignedWidth: root.targetVisualWidth
             alignedHeight: root.targetVisualHeight
-            onLockRequested: root.lockRequested()
         }
     }
 
     Component {
         id: compactWallpaperComponent
 
-        WallpaperCompact {
+        DestinationCompact {
             controller: root.controller
+            activityId: "wallpaper"
+            iconName: "wallpaper"
+            label: I18n.tr("Wallpaper", "island compact face: wallpaper picker label")
         }
     }
 
@@ -397,7 +418,7 @@ Item {
         id: expandedWallpaperComponent
 
         WallpaperExpanded {
-            islandController: root.controller
+            controller: root.controller
             effectiveScreen: root.effectiveScreen
         }
     }
@@ -405,8 +426,11 @@ Item {
     Component {
         id: compactWeatherComponent
 
-        WeatherCompact {
+        DestinationCompact {
             controller: root.controller
+            activityId: "weather"
+            iconName: "partly_cloudy_day"
+            label: I18n.tr("Weather", "island compact face: weather label")
         }
     }
 
@@ -414,7 +438,7 @@ Item {
         id: expandedWeatherComponent
 
         WeatherExpanded {
-            islandController: root.controller
+            controller: root.controller
         }
     }
 
@@ -423,7 +447,6 @@ Item {
 
         SystemLevelCompact {
             systemModel: root.systemModel
-            dense: root.controller.compactDense
             iconSize: root.controller.compactIconSize
         }
     }
@@ -449,8 +472,15 @@ Item {
     Component {
         id: compactNotificationCenterComponent
 
-        NotificationCenterCompact {
+        DestinationCompact {
+            id: notificationCenterFace
+
+            readonly property int unreadCount: NotificationService.notifications.length
+
             controller: root.controller
+            activityId: "notificationcenter"
+            iconName: notificationCenterFace.unreadCount > 0 ? "notifications_active" : "notifications"
+            label: notificationCenterFace.unreadCount > 0 ? I18n.tr("%1 notifications", "island compact face: unread notification count").arg(notificationCenterFace.unreadCount) : I18n.tr("Notifications", "island compact face: notification center label")
         }
     }
 
@@ -458,7 +488,7 @@ Item {
         id: expandedNotificationCenterComponent
 
         NotificationCenterExpanded {
-            islandController: root.controller
+            controller: root.controller
             effectiveScreen: root.effectiveScreen
             transientSurfaceTracker: root.notificationTransientSurfaceTracker
         }

@@ -129,21 +129,7 @@ Column {
                 return "bluetooth";
             }
         case "audioOutput":
-            {
-                if (!AudioService.sink?.audio)
-                    return "volume_off";
-                let volume = AudioService.sink.audio.volume;
-                let muted = AudioService.sink.audio.muted;
-                if (muted)
-                    return "volume_off";
-                if (volume === 0.0)
-                    return "volume_mute";
-                if (volume <= 0.33)
-                    return "volume_down";
-                if (volume <= 0.66)
-                    return "volume_up";
-                return "volume_up";
-            }
+            return AudioService.sinkVolumeIconName;
         case "audioInput":
             {
                 if (!AudioService.source?.audio)

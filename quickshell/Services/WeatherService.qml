@@ -352,6 +352,13 @@ Singleton {
         return includeUnits ? value + unit : value;
     }
 
+    function currentTempText(unitsShort = true) {
+        const unit = unitsShort ? "°" : (SettingsData.useFahrenheit ? "°F" : "°C");
+        if (!weather.available)
+            return "--" + unit;
+        return (SettingsData.useFahrenheit ? weather.tempF : weather.temp) + unit;
+    }
+
     function formatSpeed(kmh, includeUnits = true) {
         if (kmh == null) {
             return null;

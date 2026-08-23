@@ -7,6 +7,8 @@ Item {
     id: root
 
     required property var controller
+    required property real islandX
+    required property real hostWidth
     required property real morphProgress
     required property bool expanded
     required property bool pointerInside
@@ -30,11 +32,13 @@ Item {
     required property Component notificationCenterCompactComponent
     required property Component notificationCenterExpandedComponent
 
+    readonly property real fitInset: Theme.spacingS
     readonly property real compactFade: root.fadeCompact(root.morphProgress)
     readonly property real expandedFade: root.fadeExpanded(root.morphProgress)
     readonly property real outgoingCompactFade: root.fadeCompact(root.outgoingMorph)
     readonly property real outgoingExpandedFade: root.fadeExpanded(root.outgoingMorph)
-    readonly property bool mediaSurfaceActive: root.activityId === "media" || root.outgoingActivity === "media"
+    readonly property bool mediaSurfaceActive: root.surfaceActive("media")
+    readonly property bool systemSurfaceActive: root.surfaceActive("volume") || root.surfaceActive("brightness")
 
     property string renderedActivity: "home"
     property string outgoingActivity: ""
@@ -54,10 +58,23 @@ Item {
         return root.renderedActivity === activity || root.outgoingActivity === activity;
     }
 
+    function compactFrame(activity) {
+        const target = root.controller.compactTargetFor(activity);
+        const left = Math.round((root.hostWidth - target.width) / 2 + target.offsetX);
+        const top = Math.round((root.height - target.height) / 2);
+        return Qt.rect(left - root.islandX, top, target.width, target.height);
+    }
+
+    function fitFade(activity) {
+        const target = root.controller.compactTargetFor(activity);
+        const slack = Math.min(root.width - target.width, root.height - target.height) + root.fitInset * 4;
+        return Math.max(0, Math.min(1, slack / (root.fitInset * 2)));
+    }
+
     function compactOpacity(activity) {
         const incoming = root.renderedActivity === activity ? root.activityFade * root.compactFade : 0;
         const outgoing = root.outgoingActivity === activity ? (1 - root.activityFade) * root.outgoingCompactFade : 0;
-        return Math.max(incoming, outgoing);
+        return Math.max(incoming, outgoing) * root.fitFade(activity);
     }
 
     function expandedOpacity(activity) {
@@ -67,29 +84,31 @@ Item {
     }
 
     function requestActivityFocus() {
-        if (root.activityId === "launcher" && launcherExpandedLoader.item) {
+        switch (root.activityId) {
+        case "launcher":
+            if (!launcherExpandedLoader.item)
+                return false;
             launcherExpandedLoader.item.focusSearch();
             return true;
-        }
-        if (root.activityId === "home" && homeExpandedLoader.item) {
+        case "home":
+            if (!homeExpandedLoader.item)
+                return false;
             homeExpandedLoader.item.focusOverview();
             return true;
-        }
-        if (root.activityId === "media" && mediaExpandedLoader.item) {
-            mediaExpandedLoader.item.focusPlayer();
-            return true;
-        }
-        if (root.activityId === "wallpaper" && wallpaperExpandedLoader.item) {
+        case "media":
+            return mediaExpandedLoader.item?.focusPlayer() === true;
+        case "wallpaper":
+            if (!wallpaperExpandedLoader.item)
+                return false;
             wallpaperExpandedLoader.item.focusGrid();
             return true;
-        }
-        if (root.activityId === "weather" && weatherExpandedLoader.item) {
+        case "weather":
+            if (!weatherExpandedLoader.item)
+                return false;
             weatherExpandedLoader.item.focusWeather();
             return true;
-        }
-        if (root.activityId === "notificationcenter" && notificationCenterExpandedLoader.item) {
-            notificationCenterExpandedLoader.item.focusList();
-            return true;
+        case "notificationcenter":
+            return notificationCenterExpandedLoader.item?.focusList() === true;
         }
         return false;
     }
@@ -129,7 +148,7 @@ Item {
             property: "activityFade"
             to: 1
             duration: Theme.mediumDuration
-            easing.type: Easing.OutCubic
+            easing.type: Theme.standardEasing
         }
 
         ScriptAction {
@@ -137,197 +156,162 @@ Item {
         }
     }
 
-    Loader {
-        anchors.fill: parent
-        active: true
+    component CompactFace: Loader {
+        id: face
+
+        required property string activity
+        readonly property rect frame: root.compactFrame(face.activity)
+
+        x: frame.x
+        y: frame.y
+        width: frame.width
+        height: frame.height
         asynchronous: false
-        sourceComponent: root.homeCompactComponent
-        opacity: root.compactOpacity("home")
         visible: opacity > 0.001
         enabled: opacity >= 0.5
     }
 
-    Loader {
+    component ExpandedFace: Loader {
+        anchors.fill: parent
+        visible: opacity > 0.001
+        enabled: opacity >= 0.5
+    }
+
+    CompactFace {
+        activity: "home"
+        active: true
+        sourceComponent: root.homeCompactComponent
+        opacity: root.compactOpacity("home")
+    }
+
+    ExpandedFace {
         id: homeExpandedLoader
 
-        anchors.fill: parent
         active: root.homeExpandedTouched
         asynchronous: true
         sourceComponent: root.homeExpandedComponent
         opacity: root.expandedOpacity("home")
-        visible: opacity > 0.001
-        enabled: opacity >= 0.5
     }
 
-    Loader {
-        anchors.fill: parent
+    CompactFace {
+        activity: "media"
         active: root.mediaSurfaceActive
-        asynchronous: false
         sourceComponent: root.mediaCompactComponent
         opacity: root.compactOpacity("media")
-        visible: opacity > 0.001
-        enabled: opacity >= 0.5
     }
 
-    Loader {
+    ExpandedFace {
         id: mediaExpandedLoader
 
-        anchors.fill: parent
         active: root.mediaSurfaceActive && (root.expanded || root.expandedFade > 0)
         asynchronous: false
         sourceComponent: root.mediaExpandedComponent
         opacity: root.expandedOpacity("media")
-        visible: opacity > 0.001
-        enabled: opacity >= 0.5
     }
 
-    Loader {
-        anchors.fill: parent
+    CompactFace {
+        activity: "launcher"
         active: root.surfaceActive("launcher")
-        asynchronous: false
         sourceComponent: root.launcherCompactComponent
         opacity: root.compactOpacity("launcher")
-        visible: opacity > 0.001
-        enabled: opacity >= 0.5
     }
 
-    Loader {
+    ExpandedFace {
         id: launcherExpandedLoader
 
-        anchors.fill: parent
         active: root.controller.visualsRequested("launcher")
         asynchronous: true
         sourceComponent: root.launcherExpandedComponent
         opacity: root.expandedOpacity("launcher")
-        visible: opacity > 0.001
-        enabled: opacity >= 0.5
     }
 
-    Loader {
-        anchors.fill: parent
+    CompactFace {
+        activity: "controlcenter"
         active: root.surfaceActive("controlcenter")
-        asynchronous: false
         sourceComponent: root.controlCenterCompactComponent
         opacity: root.compactOpacity("controlcenter")
-        visible: opacity > 0.001
-        enabled: opacity >= 0.5
     }
 
-    Loader {
-        id: controlCenterExpandedLoader
-
-        anchors.fill: parent
+    ExpandedFace {
         active: root.controller.visualsRequested("controlcenter")
         asynchronous: false
         sourceComponent: root.controlCenterExpandedComponent
         opacity: root.expandedOpacity("controlcenter")
-        visible: opacity > 0.001
-        enabled: opacity >= 0.5
     }
 
-    Loader {
-        anchors.fill: parent
+    CompactFace {
+        activity: "wallpaper"
         active: root.surfaceActive("wallpaper")
-        asynchronous: false
         sourceComponent: root.wallpaperCompactComponent
         opacity: root.compactOpacity("wallpaper")
-        visible: opacity > 0.001
-        enabled: opacity >= 0.5
     }
 
-    Loader {
+    ExpandedFace {
         id: wallpaperExpandedLoader
 
-        anchors.fill: parent
         active: root.controller.visualsRequested("wallpaper")
         asynchronous: true
         sourceComponent: root.wallpaperExpandedComponent
         opacity: root.expandedOpacity("wallpaper")
-        visible: opacity > 0.001
-        enabled: opacity >= 0.5
     }
 
-    Loader {
-        anchors.fill: parent
+    CompactFace {
+        activity: "weather"
         active: root.surfaceActive("weather")
-        asynchronous: false
         sourceComponent: root.weatherCompactComponent
         opacity: root.compactOpacity("weather")
-        visible: opacity > 0.001
-        enabled: opacity >= 0.5
     }
 
-    Loader {
+    ExpandedFace {
         id: weatherExpandedLoader
 
-        anchors.fill: parent
         active: root.controller.visualsRequested("weather")
         asynchronous: true
         sourceComponent: root.weatherExpandedComponent
         opacity: root.expandedOpacity("weather")
-        visible: opacity > 0.001
-        enabled: opacity >= 0.5
     }
 
-    Loader {
-        anchors.fill: parent
+    CompactFace {
+        activity: "notificationcenter"
         active: root.surfaceActive("notificationcenter")
-        asynchronous: false
         sourceComponent: root.notificationCenterCompactComponent
         opacity: root.compactOpacity("notificationcenter")
-        visible: opacity > 0.001
-        enabled: opacity >= 0.5
     }
 
-    Loader {
+    ExpandedFace {
         id: notificationCenterExpandedLoader
 
-        anchors.fill: parent
         active: root.controller.visualsRequested("notificationcenter")
         asynchronous: true
         sourceComponent: root.notificationCenterExpandedComponent
         opacity: root.expandedOpacity("notificationcenter")
-        visible: opacity > 0.001
-        enabled: opacity >= 0.5
     }
 
-    Loader {
-        anchors.fill: parent
-        active: root.surfaceActive("volume") || root.surfaceActive("brightness")
-        asynchronous: false
+    CompactFace {
+        activity: "volume"
+        active: root.systemSurfaceActive
         sourceComponent: root.systemCompactComponent
         opacity: Math.max(root.compactOpacity("volume"), root.compactOpacity("brightness"))
-        visible: opacity > 0.001
-        enabled: opacity >= 0.5
     }
 
-    Loader {
-        anchors.fill: parent
-        active: (root.surfaceActive("volume") || root.surfaceActive("brightness")) && (root.expanded || root.expandedFade > 0)
+    ExpandedFace {
+        active: root.systemSurfaceActive && (root.expanded || root.expandedFade > 0)
         asynchronous: false
         sourceComponent: root.systemExpandedComponent
         opacity: Math.max(root.expandedOpacity("volume"), root.expandedOpacity("brightness"))
-        visible: opacity > 0.001
-        enabled: opacity >= 0.5
     }
 
-    Loader {
-        anchors.fill: parent
+    CompactFace {
+        activity: "notification"
         active: root.surfaceActive("notification")
-        asynchronous: false
         sourceComponent: root.notificationCompactComponent
         opacity: root.compactOpacity("notification")
-        visible: opacity > 0.001
-        enabled: opacity >= 0.5
     }
 
-    Loader {
-        anchors.fill: parent
+    ExpandedFace {
         active: root.surfaceActive("notification") && (root.expanded || root.expandedFade > 0)
         asynchronous: false
         sourceComponent: root.notificationExpandedComponent
         opacity: root.expandedOpacity("notification")
-        visible: opacity > 0.001
-        enabled: opacity >= 0.5
     }
 }

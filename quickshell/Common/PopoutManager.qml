@@ -188,6 +188,16 @@ Singleton {
         // Keep map entries until each popout's close animation finishes (hidePopout).
     }
 
+    function dismissAllForScreen(screenName) {
+        if (!screenName)
+            return;
+        if (currentPopoutsByScreen[screenName])
+            closeAllPopouts();
+        if (ModalManager.currentModalsByScreen[screenName])
+            ModalManager.closeAllModalsExcept(null);
+        TrayMenuManager.closeAllMenus();
+    }
+
     function closePopoutForScreen(screen) {
         if (!screen)
             return;

@@ -9,10 +9,6 @@ Item {
     id: root
 
     property var screenModel: Quickshell.screens
-    property var colorPickerModal: null
-    property var powerMenuModalLoader: null
-
-    signal lockRequested
 
     readonly property bool launcherOpen: root.activityOpen("launcher")
     readonly property bool controlCenterOpen: root.activityOpen("controlcenter")
@@ -240,9 +236,6 @@ Item {
             required property var modelData
 
             screen: modelData
-            colorPickerModal: root.colorPickerModal
-            powerMenuModalLoader: root.powerMenuModalLoader
-            onLockRequested: root.lockRequested()
         }
     }
 

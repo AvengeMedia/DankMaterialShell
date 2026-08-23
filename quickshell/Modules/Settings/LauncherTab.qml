@@ -69,7 +69,7 @@ Item {
                 title: I18n.tr("Default Launcher")
                 settingKey: "launcherStyle"
 
-                SettingsControlledByFrame {
+                SettingsControlledBy {
                     visible: SettingsData.connectedFrameModeActive
                     parentModal: root.parentModal
                     settingLabel: I18n.tr("Default Launcher")
@@ -753,7 +753,7 @@ Item {
                 settingKey: "modalBackground"
                 tags: ["modal", "darken", "background", "overlay", "launcher"]
 
-                SettingsControlledByFrame {
+                SettingsControlledBy {
                     visible: SettingsData.frameEnabled
                     parentModal: root.parentModal
                     settingLabel: I18n.tr("Darken Modal Background")

@@ -841,18 +841,13 @@ PanelWindow {
                     id: iconContainer
                     cacheImages: false
 
-                    readonly property string rawImage: notificationData?.image || ""
-                    readonly property string iconFromImage: {
-                        if (rawImage.startsWith("image://icon/"))
-                            return rawImage.substring(13);
-                        return "";
+                    readonly property bool hasDisplayImage: notificationData?.hasDisplayImage ?? false
+                    readonly property bool needsImagePersist: {
+                        if (!hasDisplayImage || notificationData.persistedImagePath)
+                            return false;
+                        const image = notificationData.image || "";
+                        return image.startsWith("image://qsimage/") || NotificationService.notificationIconFromImage(image).startsWith("/");
                     }
-                    readonly property bool imageHasSpecialPrefix: {
-                        const icon = iconFromImage;
-                        return icon.startsWith("material:") || icon.startsWith("svg:") || icon.startsWith("unicode:") || icon.startsWith("image:");
-                    }
-                    readonly property bool hasNotificationImage: rawImage !== "" && (!rawImage.startsWith("image://icon/") || iconFromImage.startsWith("/"))
-                    readonly property bool needsImagePersist: hasNotificationImage && (rawImage.startsWith("image://qsimage/") || iconFromImage.startsWith("/")) && !notificationData.persistedImagePath
 
                     width: popupIconSize
                     height: popupIconSize
@@ -868,27 +863,9 @@ PanelWindow {
                         return Math.max(0, Theme.fontSizeSmall * 1.2 + (textContainer.height - Theme.fontSizeSmall * 1.2) / 2 - popupIconSize / 2);
                     }
 
-                    imageSource: {
-                        if (!notificationData)
-                            return "";
-                        if (hasNotificationImage)
-                            return notificationData.cleanImage || "";
-                        if (imageHasSpecialPrefix)
-                            return "";
-                        const appIcon = notificationData.appIcon;
-                        if (!appIcon)
-                            return "";
-                        if (appIcon.startsWith("file://") || appIcon.startsWith("http://") || appIcon.startsWith("https://") || appIcon.includes("/"))
-                            return appIcon;
-                        return "";
-                    }
-
-                    hasImage: hasNotificationImage
-                    fallbackIcon: {
-                        if (imageHasSpecialPrefix)
-                            return iconFromImage;
-                        return notificationData?.appIcon || iconFromImage || "";
-                    }
+                    imageSource: notificationData?.displayImage ?? ""
+                    hasImage: hasDisplayImage
+                    fallbackIcon: notificationData?.fallbackIconName ?? ""
                     fallbackText: {
                         const appName = notificationData?.appName || "?";
                         return appName.charAt(0).toUpperCase();

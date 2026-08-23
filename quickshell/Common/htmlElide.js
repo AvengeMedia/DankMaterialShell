@@ -13,6 +13,12 @@ function stripHtmlTags(html) {
         .replace(/&#039;/g, "'");
 }
 
+function plainText(html) {
+    if (!html)
+        return "";
+    return stripHtmlTags(html).replace(/\s+/g, " ").trim();
+}
+
 function elideRichText(html, visibleBudget) {
     if (!html)
         return "";

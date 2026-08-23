@@ -7,7 +7,7 @@ import qs.Modals.DankLauncherV2
 FocusScope {
     id: root
 
-    required property var islandController
+    required property var controller
     required property var launcherController
     property var transientSurfaceTracker: null
     property var effectiveScreen: null
@@ -24,12 +24,12 @@ FocusScope {
     }
 
     function initializeSession() {
-        const targetQuery = islandController.launcherPendingQuery || (SettingsData.rememberLastQuery ? (SessionData.launcherLastQuery || "") : "");
-        const targetMode = islandController.launcherPendingMode || SessionData.getLauncherRestoreMode();
+        const targetQuery = root.controller.launcherPendingQuery || (SettingsData.rememberLastQuery ? (SessionData.launcherLastQuery || "") : "");
+        const targetMode = root.controller.launcherPendingMode || SessionData.getLauncherRestoreMode();
 
         launcherContent.closeTransientUi?.();
         launcherController.reset();
-        launcherController.explicitQuerySession = !!islandController.launcherPendingQuery;
+        launcherController.explicitQuerySession = !!root.controller.launcherPendingQuery;
         launcherController.searchMode = targetMode;
         launcherController.historyIndex = -1;
 
@@ -43,16 +43,17 @@ FocusScope {
 
         launcherContent.resetScroll();
         root.focusSearch();
-        if (islandController.launcherPendingQuery)
-            launcherContent.searchField.cursorPosition = targetQuery.length;
-        else
+        if (!root.controller.launcherPendingQuery) {
             launcherContent.searchField.selectAll();
+            return;
+        }
+        launcherContent.searchField.cursorPosition = targetQuery.length;
     }
 
     QtObject {
         id: hostContract
 
-        readonly property bool spotlightOpen: root.islandController.launcherSessionActive
+        readonly property bool spotlightOpen: root.controller.launcherSessionActive
         readonly property bool isClosing: false
         readonly property bool contentVisible: true
         readonly property var effectiveScreen: root.effectiveScreen
@@ -62,7 +63,7 @@ FocusScope {
         readonly property real alignedY: root.alignedY
 
         function hide() {
-            root.islandController.requestCollapse();
+            root.controller.requestCollapse();
         }
     }
 
@@ -78,13 +79,13 @@ FocusScope {
         controllerOverride: root.launcherController
         transientSurfaceTracker: root.transientSurfaceTracker
         showResultsWithoutQuery: true
-        maxResultsHeight: Math.max(120, islandController.launcherExpandedTarget.height - Theme.spacingM - root.bottomInset - launcherContent.searchAreaHeight)
+        maxResultsHeight: Math.max(120, root.controller.launcherExpandedTarget.height - Theme.spacingM - root.bottomInset - launcherContent.searchAreaHeight)
     }
 
-    onActiveFocusChanged: root.islandController.launcherInputFocused = activeFocus
+    onActiveFocusChanged: root.controller.launcherInputFocused = activeFocus
 
     Connections {
-        target: root.islandController
+        target: root.controller
 
         function onSessionStarted(activityId) {
             if (activityId === "launcher")
@@ -92,6 +93,6 @@ FocusScope {
         }
     }
 
-    Component.onCompleted: root.islandController.markVisualsReady("launcher")
-    Component.onDestruction: root.islandController.launcherInputFocused = false
+    Component.onCompleted: root.controller.markVisualsReady("launcher")
+    Component.onDestruction: root.controller.launcherInputFocused = false
 }

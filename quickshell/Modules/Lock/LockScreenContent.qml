@@ -1815,19 +1815,7 @@ Item {
                 }
 
                 DankIcon {
-                    name: {
-                        if (!AudioService.sink?.audio) {
-                            return "volume_up";
-                        }
-                        if (AudioService.sink.audio.muted)
-                            return "volume_off";
-                        if (AudioService.sink.audio.volume === 0)
-                            return "volume_mute";
-                        if (AudioService.sink.audio.volume * 100 < 33) {
-                            return "volume_down";
-                        }
-                        return "volume_up";
-                    }
+                    name: AudioService.sinkVolumeIconName
                     size: Theme.iconSize - 2
                     color: (AudioService.sink && AudioService.sink.audio && (AudioService.sink.audio.muted || AudioService.sink.audio.volume === 0)) ? Qt.rgba(255, 255, 255, 0.5) : "white"
                     anchors.verticalCenter: parent.verticalCenter

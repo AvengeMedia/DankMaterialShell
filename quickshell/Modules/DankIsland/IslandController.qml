@@ -317,15 +317,22 @@ QtObject {
     readonly property bool timeoutSuspended: pointerInside || (expanded && !notificationActive)
     readonly property bool activityOwnsBlankClicks: isDestination(activeActivity)
     readonly property bool hoverExpandEnabled: root.interactionMode === "hybrid" && !root.systemActivityActive
-    readonly property var compactTarget: {
-        if (notificationActive)
+    function compactTargetFor(activityId) {
+        switch (activityId) {
+        case "notification":
             return notificationCompactTarget;
-        if (systemActivityActive)
+        case "volume":
+        case "brightness":
             return systemCompactTarget;
-        if (isDestination(activeActivity))
-            return pillTarget(destinationCompactWidth(activeActivity), compactFaceHeight);
-        return activeActivity === "media" ? mediaCompactTarget : homeCompactTarget;
+        case "media":
+            return mediaCompactTarget;
+        case "home":
+            return homeCompactTarget;
+        }
+        return isDestination(activityId) ? pillTarget(destinationCompactWidth(activityId), compactFaceHeight) : homeCompactTarget;
     }
+
+    readonly property var compactTarget: compactTargetFor(activeActivity)
     readonly property var expandedTarget: {
         if (notificationActive)
             return notificationExpandedTarget;
@@ -373,14 +380,13 @@ QtObject {
         if (available) {
             mediaReturnTimer.stop();
             mediaAvailable = true;
-            return true;
+            return;
         }
 
         mediaAvailable = false;
         mediaPreferred = false;
         if (activeActivity === "media")
             mediaReturnTimer.restart();
-        return true;
     }
 
     onInputSuspendedChanged: {
@@ -473,11 +479,14 @@ QtObject {
     }
 
     function resolvedReturnActivity(activityId) {
-        if (activityId === "notification")
-            return "notification";
-        if (activityId === "media" && !mediaAvailable)
-            return "home";
-        if (activityId === "home" || activityId === "media" || isDestination(activityId))
+        switch (activityId) {
+        case "notification":
+        case "home":
+            return activityId;
+        case "media":
+            return mediaAvailable ? "media" : "home";
+        }
+        if (isDestination(activityId))
             return activityId;
         return mediaAvailable && mediaPreferred ? "media" : "home";
     }
@@ -607,6 +616,13 @@ QtObject {
         launcherSessionActive = false;
         clearPendingRequests("");
 
+        if (expanded && !notificationActive) {
+            if (activeActivity !== activityId)
+                return false;
+            transientTimer.stop();
+            return true;
+        }
+
         if (notificationActive) {
             notificationTimer.stop();
             hoverExpanded = false;
@@ -614,17 +630,6 @@ QtObject {
             hoverCloseTimer.stop();
             keyboardDismissRequested = false;
             expanded = false;
-            if (!systemActivityActive)
-                transientReturnActivity = "notification";
-            activeActivity = activityId;
-            syncTransientTimeout(true);
-            return true;
-        }
-
-        if (expanded) {
-            if (activeActivity === activityId)
-                transientTimer.stop();
-            return activeActivity === activityId;
         }
 
         if (!systemActivityActive)
@@ -749,12 +754,11 @@ QtObject {
             hoverOpenTimer.stop();
             if (hoverExpanded && expanded && !mediaDropdownOpen)
                 hoverCloseTimer.restart();
-            return true;
+            return;
         }
         hoverCloseTimer.stop();
         if (hoverExpandEnabled && !expanded && !slotHovered)
             hoverOpenTimer.restart();
-        return true;
     }
 
     property Timer hoverOpenTimer: Timer {

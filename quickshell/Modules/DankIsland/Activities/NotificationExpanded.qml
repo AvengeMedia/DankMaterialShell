@@ -117,7 +117,7 @@ Item {
             DankButton {
                 height: parent.height
                 radius: height / 2
-                text: I18n.tr("Dismiss")
+                text: I18n.tr("Dismiss", "island notification face: dismiss button")
                 backgroundColor: "transparent"
                 textColor: Theme.surfaceText
                 buttonHeight: parent.height

@@ -8,9 +8,14 @@ Item {
     id: root
 
     required property var controller
+    required property string activityId
+    required property string label
+    property string iconName: ""
+    property color iconColor: Theme.primary
+    property Component leading: null
 
     function pushMeasuredWidth() {
-        root.controller.setDestinationContentWidth("controlcenter", compactRow.implicitWidth);
+        root.controller.setDestinationContentWidth(root.activityId, compactRow.implicitWidth);
     }
 
     Component.onCompleted: root.pushMeasuredWidth()
@@ -23,16 +28,24 @@ Item {
 
         onImplicitWidthChanged: root.pushMeasuredWidth()
 
+        Loader {
+            anchors.verticalCenter: parent.verticalCenter
+            active: root.leading !== null
+            visible: active
+            sourceComponent: root.leading
+        }
+
         DankIcon {
             anchors.verticalCenter: parent.verticalCenter
-            name: "tune"
+            visible: root.iconName !== ""
+            name: root.iconName
             size: Theme.iconSizeSmall
-            color: Theme.primary
+            color: root.iconColor
         }
 
         StyledText {
             anchors.verticalCenter: parent.verticalCenter
-            text: I18n.tr("Control Center")
+            text: root.label
             color: Theme.surfaceText
             font.pixelSize: Theme.fontSizeMedium
             font.weight: Font.DemiBold

@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import qs.Common
 import qs.Modules.DankBar
+import qs.Modules.DankIsland
 import qs.Modules.Frame
 import qs.Modules.WorkspaceOverlays
 import qs.Services
@@ -143,6 +144,14 @@ Item {
                 barConfig: barLoader.barConfig
                 hyprlandOverviewLoader: dankBarRepeater.hyprlandOverviewLoaderRef
             }
+        }
+    }
+
+    Loader {
+        active: SettingsData.dankIslandEnabled
+        asynchronous: false
+        sourceComponent: DankIsland {
+            screenModel: SettingsData.getIslandScreens()
         }
     }
 

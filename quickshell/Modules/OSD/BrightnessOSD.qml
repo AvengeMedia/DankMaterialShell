@@ -47,40 +47,12 @@ DankOSD {
 
             OsdLevelRow {
                 anchors.fill: parent
-                iconName: {
-                    const deviceInfo = DisplayService.getCurrentDeviceInfo();
-                    if (!deviceInfo || deviceInfo.class === "backlight" || deviceInfo.class === "ddc")
-                        return "brightness_medium";
-                    if (deviceInfo.name.includes("kbd"))
-                        return "keyboard";
-                    return "lightbulb";
-                }
+                iconName: DisplayService.brightnessIconName(DisplayService.getCurrentDeviceInfo())
                 iconColor: Theme.primary
                 value: root._displayBrightness
-                minimum: {
-                    const deviceInfo = DisplayService.getCurrentDeviceInfo();
-                    if (!deviceInfo)
-                        return 1;
-                    if (SessionData.getBrightnessExponential(deviceInfo.id))
-                        return 1;
-                    return (deviceInfo.class === "backlight" || deviceInfo.class === "ddc") ? 1 : 0;
-                }
-                maximum: {
-                    const deviceInfo = DisplayService.getCurrentDeviceInfo();
-                    if (!deviceInfo)
-                        return 100;
-                    if (SessionData.getBrightnessExponential(deviceInfo.id))
-                        return 100;
-                    return deviceInfo.displayMax || 100;
-                }
-                unit: {
-                    const deviceInfo = DisplayService.getCurrentDeviceInfo();
-                    if (!deviceInfo)
-                        return "%";
-                    if (SessionData.getBrightnessExponential(deviceInfo.id))
-                        return "%";
-                    return deviceInfo.class === "ddc" ? "" : "%";
-                }
+                minimum: DisplayService.brightnessMinimum(DisplayService.getCurrentDeviceInfo())
+                maximum: DisplayService.brightnessMaximum(DisplayService.getCurrentDeviceInfo())
+                unit: DisplayService.brightnessUnit(DisplayService.getCurrentDeviceInfo())
                 sliderEnabled: DisplayService.brightnessAvailable
                 onHoverChanged: hovered => setChildHovered(hovered)
                 onSliderValueChanged: newValue => {
@@ -116,14 +88,7 @@ DankOSD {
 
                 DankIcon {
                     anchors.centerIn: parent
-                    name: {
-                        const deviceInfo = DisplayService.getCurrentDeviceInfo();
-                        if (!deviceInfo || deviceInfo.class === "backlight" || deviceInfo.class === "ddc")
-                            return "brightness_medium";
-                        if (deviceInfo.name.includes("kbd"))
-                            return "keyboard";
-                        return "lightbulb";
-                    }
+                    name: DisplayService.brightnessIconName(DisplayService.getCurrentDeviceInfo())
                     size: Theme.iconSize
                     color: Theme.primary
                 }
@@ -144,23 +109,8 @@ DankOSD {
                     when: !vertSlider.dragging
                 }
 
-                readonly property int minimum: {
-                    const deviceInfo = DisplayService.getCurrentDeviceInfo();
-                    if (!deviceInfo)
-                        return 1;
-                    if (SessionData.getBrightnessExponential(deviceInfo.id))
-                        return 1;
-                    return (deviceInfo.class === "backlight" || deviceInfo.class === "ddc") ? 1 : 0;
-                }
-
-                readonly property int maximum: {
-                    const deviceInfo = DisplayService.getCurrentDeviceInfo();
-                    if (!deviceInfo)
-                        return 100;
-                    if (SessionData.getBrightnessExponential(deviceInfo.id))
-                        return 100;
-                    return deviceInfo.displayMax || 100;
-                }
+                readonly property int minimum: DisplayService.brightnessMinimum(DisplayService.getCurrentDeviceInfo())
+                readonly property int maximum: DisplayService.brightnessMaximum(DisplayService.getCurrentDeviceInfo())
 
                 Rectangle {
                     id: vertTrack

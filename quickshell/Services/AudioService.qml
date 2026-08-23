@@ -790,6 +790,19 @@ EOFCONFIG
         }
     }
 
+    readonly property string sinkVolumeIconName: volumeIconName(sink)
+
+    function volumeIconName(node, noDeviceIcon = "volume_off") {
+        const audio = node?.audio;
+        if (!audio)
+            return noDeviceIcon;
+        if (audio.muted)
+            return "volume_off";
+        if (audio.volume === 0)
+            return "volume_mute";
+        return audio.volume <= 0.33 ? "volume_down" : "volume_up";
+    }
+
     function sinkIcon(node) {
         if (!node)
             return "speaker";

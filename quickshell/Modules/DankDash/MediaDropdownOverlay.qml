@@ -103,6 +103,7 @@ Item {
         root.volumeChanged(Math.max(0, Math.min(1, next)));
     }
 
+    readonly property Item activePanel: __activePanel
     readonly property Item __activePanel: {
         switch (dropdownType) {
         case 1:

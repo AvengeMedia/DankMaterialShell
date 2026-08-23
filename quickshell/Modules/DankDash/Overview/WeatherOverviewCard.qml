@@ -86,12 +86,7 @@ Card {
 
             StyledText {
                 anchors.left: parent.left
-                text: {
-                    const temp = SettingsData.useFahrenheit ? WeatherService.weather.tempF : WeatherService.weather.temp;
-                    if (temp === undefined || temp === null)
-                        return "--°" + (SettingsData.useFahrenheit ? "F" : "C");
-                    return temp + "°" + (SettingsData.useFahrenheit ? "F" : "C");
-                }
+                text: WeatherService.currentTempText(false)
                 font.pixelSize: Theme.fontSizeXLarge + 4
                 color: Theme.surfaceText
                 font.weight: Font.Light

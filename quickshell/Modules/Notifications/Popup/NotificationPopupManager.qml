@@ -161,13 +161,6 @@ QtObject {
         });
     }
 
-    function _isFocusedScreen() {
-        if (!SettingsData.notificationFocusedMonitor)
-            return true;
-        const focused = CompositorService.getFocusedScreen();
-        return focused && manager.modelData && focused.name === manager.modelData.name;
-    }
-
     function _sync(newWrappers) {
         let needsReposition = false;
         _syncingVisibleNotifications = true;
@@ -181,7 +174,7 @@ QtObject {
             }
         }
         for (const w of newWrappers) {
-            if (w && !_hasWindowFor(w) && _isFocusedScreen()) {
+            if (w && !_hasWindowFor(w) && NotificationService.isFocusedScreen(manager.modelData)) {
                 needsReposition = _insertAtTop(w, true) || needsReposition;
             }
         }

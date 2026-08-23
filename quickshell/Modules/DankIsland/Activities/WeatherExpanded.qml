@@ -8,14 +8,13 @@ import qs.Widgets
 FocusScope {
     id: root
 
-    required property var islandController
+    required property var controller
 
     property bool contentStaged: false
 
-    readonly property real stageWidth: root.islandController.weatherExpandedTarget.width - 2
-    readonly property real stageHeight: root.islandController.weatherExpandedTarget.height - 2
+    readonly property real stageWidth: root.controller.weatherExpandedTarget.width - 2
+    readonly property real stageHeight: root.controller.weatherExpandedTarget.height - 2
     readonly property real faceInset: Theme.spacingM
-    readonly property var weatherTab: tabLoader.item
 
     clip: true
 
@@ -40,7 +39,7 @@ FocusScope {
         id: weatherTabComponent
 
         WeatherTab {
-            live: root.islandController.expanded && root.islandController.activeActivity === "weather"
+            live: root.controller.expanded && root.controller.activeActivity === "weather"
             Component.onCompleted: root.focusWeather()
         }
     }
@@ -53,17 +52,17 @@ FocusScope {
 
     Keys.onPressed: event => {
         if (event.key === Qt.Key_Escape) {
-            root.islandController.requestCollapse();
+            root.controller.requestCollapse();
             event.accepted = true;
         }
     }
 
     Component.onCompleted: {
         root.contentStaged = true;
-        root.islandController.markVisualsReady("weather");
+        root.controller.markVisualsReady("weather");
     }
 
     Component.onDestruction: {
-        root.islandController.setVisualsReady("weather", false);
+        root.controller.setVisualsReady("weather", false);
     }
 }

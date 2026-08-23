@@ -8,18 +8,14 @@ import qs.Services
 FocusScope {
     id: root
 
-    required property var islandController
+    required property var controller
     property var effectiveScreen: null
-    property var colorPickerModal: null
-    property var powerMenuModalLoader: null
     property real alignedX: 0
     property real alignedY: 0
     property real alignedWidth: 0
     property real alignedHeight: 0
     property real bottomInset: Theme.spacingM
     property bool _heightReportPending: false
-
-    signal lockRequested
 
     clip: true
 
@@ -32,7 +28,7 @@ FocusScope {
 
     function beginSession() {
         hostContract.editMode = false;
-        hostContract.expandedSection = root.islandController.controlCenterPendingSection || "";
+        hostContract.expandedSection = root.controller.controlCenterPendingSection || "";
         hostContract.expandedWidgetIndex = -1;
         hostContract.expandedWidgetData = null;
         root.queueHeightReport();
@@ -44,7 +40,7 @@ FocusScope {
         root._heightReportPending = true;
         Qt.callLater(() => {
             root._heightReportPending = false;
-            root.islandController.setDestinationContentHeight("controlcenter", content.targetImplicitHeight + Theme.spacingXS + root.bottomInset);
+            root.controller.setDestinationContentHeight("controlcenter", content.targetImplicitHeight + Theme.spacingXS + root.bottomInset);
         });
     }
 
@@ -56,13 +52,13 @@ FocusScope {
         property int expandedWidgetIndex: -1
         property var expandedWidgetData: null
 
-        readonly property bool shouldBeVisible: root.islandController.activeActivity === "controlcenter" && root.islandController.expanded
+        readonly property bool shouldBeVisible: root.controller.activeActivity === "controlcenter" && root.controller.expanded
         readonly property bool headerTogglesClose: true
-        readonly property bool powerMenuOpen: root.powerMenuModalLoader?.item?.shouldBeVisible ?? false
+        readonly property bool powerMenuOpen: PopoutService.powerMenuModalLoader?.item?.shouldBeVisible ?? false
         readonly property var screen: root.effectiveScreen
         readonly property var triggerScreen: root.effectiveScreen
-        readonly property var colorPickerModal: root.colorPickerModal
-        readonly property var powerMenuModalLoader: root.powerMenuModalLoader
+        readonly property var colorPickerModal: PopoutService.colorPickerModal
+        readonly property var powerMenuModalLoader: PopoutService.powerMenuModalLoader
         readonly property real alignedX: root.alignedX
         readonly property real alignedY: root.alignedY
         readonly property real alignedWidth: root.alignedWidth
@@ -73,7 +69,7 @@ FocusScope {
         signal lockRequested
 
         function close() {
-            root.islandController.requestCollapse();
+            root.controller.requestCollapse();
         }
 
         function collapseAll() {
@@ -100,12 +96,12 @@ FocusScope {
     }
 
     function applyPresentationLifecycle() {
-        if (hostContract.shouldBeVisible) {
-            if (NetworkService.activeService)
-                NetworkService.activeService.autoRefreshEnabled = NetworkService.wifiEnabled;
+        if (!hostContract.shouldBeVisible) {
+            root.releaseScanState();
             return;
         }
-        root.releaseScanState();
+        if (NetworkService.activeService)
+            NetworkService.activeService.autoRefreshEnabled = NetworkService.wifiEnabled;
     }
 
     Component.onDestruction: {
@@ -117,7 +113,7 @@ FocusScope {
         target: hostContract
 
         function onLockRequested() {
-            root.lockRequested();
+            IdleService.lockRequested();
         }
 
         function onShouldBeVisibleChanged() {
@@ -130,7 +126,7 @@ FocusScope {
 
         function onCredentialsRequestedChanged() {
             if (NetworkService.credentialsRequested && hostContract.shouldBeVisible)
-                root.islandController.requestCollapse();
+                root.controller.requestCollapse();
         }
     }
 
@@ -150,7 +146,7 @@ FocusScope {
     }
 
     Connections {
-        target: root.islandController
+        target: root.controller
 
         function onSessionStarted(activityId) {
             if (activityId === "controlcenter")
@@ -158,15 +154,15 @@ FocusScope {
         }
 
         function onExpandedChanged() {
-            if (!root.islandController.expanded)
+            if (!root.controller.expanded)
                 root.resetState();
         }
 
         function onActiveActivityChanged() {
-            if (root.islandController.activeActivity !== "controlcenter")
+            if (root.controller.activeActivity !== "controlcenter")
                 root.resetState();
         }
     }
 
-    Component.onCompleted: root.islandController.markVisualsReady("controlcenter")
+    Component.onCompleted: Qt.callLater(() => root.controller.markVisualsReady("controlcenter"))
 }

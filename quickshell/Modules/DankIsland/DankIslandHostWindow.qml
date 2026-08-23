@@ -5,6 +5,7 @@ import Quickshell
 import Quickshell.Wayland
 import qs.Common
 import qs.Modals.DankLauncherV2 as DankLauncher
+import qs.Modules.DankBar
 import qs.Services
 import qs.Widgets
 
@@ -57,11 +58,7 @@ PanelWindow {
     readonly property bool hostTall: controller.expanded || surface.targetEdgeExtent > collapsedHostHeight || (surface.motionRunning && surface.motionStartEdgeExtent > collapsedHostHeight)
     readonly property int maxActivityWidth: 736
     readonly property real maximumHorizontalOffset: Math.max(0, (width - maxActivityWidth) / 2 - 8)
-    property var colorPickerModal: null
-    property var powerMenuModalLoader: null
     property bool keyboardFocusArmed: true
-
-    signal lockRequested
 
     color: "transparent"
     implicitHeight: hostTall ? hostHeight : collapsedHostHeight
@@ -223,17 +220,6 @@ PanelWindow {
         return !!PopoutManager.currentPopoutsByScreen[screenName] || !!ModalManager.currentModalsByScreen[screenName];
     }
 
-    function dismissSatelliteSurfaces() {
-        const screenName = root.screen?.name;
-        if (!screenName)
-            return;
-        if (PopoutManager.currentPopoutsByScreen[screenName])
-            PopoutManager.closeAllPopouts();
-        if (ModalManager.currentModalsByScreen[screenName])
-            ModalManager.closeAllModalsExcept(null);
-        TrayMenuManager.closeAllMenus();
-    }
-
     MouseArea {
         id: satelliteDismissStrip
 
@@ -245,10 +231,10 @@ PanelWindow {
         acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
         hoverEnabled: false
         enabled: root.satelliteSurfacesOpen && !controller.inputSuspended
-        onClicked: root.dismissSatelliteSurfaces()
+        onClicked: PopoutManager.dismissAllForScreen(root.screen?.name)
     }
 
-    MouseArea {
+    BarScrollArea {
         id: scrollStrip
 
         x: 0
@@ -256,111 +242,13 @@ PanelWindow {
         z: -1
         width: parent.width
         height: root.reservedStripHeight
-        acceptedButtons: Qt.NoButton
         hoverEnabled: false
         enabled: satelliteHost.scrollEnabled && !controller.inputSuspended
-
-        property real touchpadAccumulatorY: 0
-        property real touchpadAccumulatorX: 0
-        property real mouseAccumulatorY: 0
-        property real mouseAccumulatorX: 0
-        property bool actionInProgress: false
-
-        Timer {
-            id: cooldownTimer
-            interval: 100
-            onTriggered: scrollStrip.actionInProgress = false
-        }
-
-        function handleScrollAction(behavior, direction) {
-            switch (behavior) {
-            case "workspace":
-                satelliteHost.switchWorkspace(direction);
-                return true;
-            case "column":
-                if (!CompositorService.isNiri)
-                    return false;
-                if (direction > 0)
-                    NiriService.moveColumnRight(root.screen?.name);
-                else
-                    NiriService.moveColumnLeft(root.screen?.name);
-                return true;
-            default:
-                return false;
-            }
-        }
-
-        function processWheel(wheel) {
-            if (!satelliteHost.scrollEnabled || actionInProgress) {
-                wheel.accepted = false;
-                return;
-            }
-
-            const deltaY = wheel.angleDelta.y;
-            const deltaX = wheel.angleDelta.x;
-            const isTouchpadY = wheel.pixelDelta && wheel.pixelDelta.y !== 0;
-            const isTouchpadX = wheel.pixelDelta && wheel.pixelDelta.x !== 0;
-            const xBehavior = satelliteHost.scrollXBehavior || "column";
-            const yBehavior = satelliteHost.scrollYBehavior || "workspace";
-            const reverse = SettingsData.reverseScrolling ? -1 : 1;
-
-            if (CompositorService.isNiri && xBehavior !== "none" && Math.abs(deltaX) > Math.abs(deltaY)) {
-                if (isTouchpadX) {
-                    touchpadAccumulatorX += deltaX;
-                    if (Math.abs(touchpadAccumulatorX) >= 500) {
-                        const direction = touchpadAccumulatorX * reverse < 0 ? 1 : -1;
-                        if (handleScrollAction(xBehavior, direction)) {
-                            actionInProgress = true;
-                            cooldownTimer.restart();
-                        }
-                        touchpadAccumulatorX = 0;
-                    }
-                } else {
-                    mouseAccumulatorX += deltaX;
-                    if (Math.abs(mouseAccumulatorX) >= 120) {
-                        const direction = mouseAccumulatorX * reverse < 0 ? 1 : -1;
-                        if (handleScrollAction(xBehavior, direction)) {
-                            actionInProgress = true;
-                            cooldownTimer.restart();
-                        }
-                        mouseAccumulatorX = 0;
-                    }
-                }
-                wheel.accepted = false;
-                return;
-            }
-
-            if (yBehavior === "none") {
-                wheel.accepted = false;
-                return;
-            }
-
-            if (isTouchpadY) {
-                touchpadAccumulatorY += deltaY;
-                if (Math.abs(touchpadAccumulatorY) >= 500) {
-                    const direction = touchpadAccumulatorY * reverse < 0 ? 1 : -1;
-                    if (handleScrollAction(yBehavior, direction)) {
-                        actionInProgress = true;
-                        cooldownTimer.restart();
-                    }
-                    touchpadAccumulatorY = 0;
-                }
-            } else {
-                mouseAccumulatorY += deltaY;
-                if (Math.abs(mouseAccumulatorY) >= 120) {
-                    const direction = mouseAccumulatorY * reverse < 0 ? 1 : -1;
-                    if (handleScrollAction(yBehavior, direction)) {
-                        actionInProgress = true;
-                        cooldownTimer.restart();
-                    }
-                    mouseAccumulatorY = 0;
-                }
-            }
-
-            wheel.accepted = false;
-        }
-
-        onWheel: wheel => processWheel(wheel)
+        scrollEnabled: satelliteHost.scrollEnabled
+        xBehavior: satelliteHost.scrollXBehavior
+        yBehavior: satelliteHost.scrollYBehavior
+        screenName: root.screen?.name ?? ""
+        onWorkspaceSwitchRequested: direction => satelliteHost.switchWorkspace(direction)
     }
 
     DankIslandSurface {
@@ -374,8 +262,6 @@ PanelWindow {
         launcherController: launcherController
         launcherTransientSurfaceTracker: launcherTransientSurfaces
         notificationTransientSurfaceTracker: notificationTransientSurfaces
-        colorPickerModal: root.colorPickerModal
-        powerMenuModalLoader: root.powerMenuModalLoader
         effectiveScreen: root.screen
         hostOriginY: root.hostOriginY
         reducedMotion: SettingsData.dankIslandReducedMotion || SettingsData.animationSpeed === SettingsData.AnimationSpeed.None
@@ -384,7 +270,6 @@ PanelWindow {
         springMass: Math.max(0.25, Math.min(3, SettingsData.dankIslandSpringMass))
         palette: SettingsData.dankIslandPalette
         highContrast: SettingsData.dankIslandHighContrast
-        onLockRequested: root.lockRequested()
         onScrollWheel: wheel => scrollStrip.processWheel(wheel)
     }
 

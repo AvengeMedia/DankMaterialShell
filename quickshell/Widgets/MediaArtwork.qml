@@ -3,12 +3,13 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell.Widgets
 import qs.Common
-import qs.Widgets
 
 Item {
     id: root
 
-    required property var mediaModel
+    property var mediaModel: null
+    property string artUrl: mediaModel?.artUrl ?? ""
+    property real placeholderIconSize: Math.min(width, height) * 0.46
     property real cornerRadius: Math.min(width, height) * 0.22
     readonly property int artPixelSize: Math.max(1, Math.round(Math.max(width, height) * 2))
 
@@ -21,7 +22,7 @@ Item {
         DankIcon {
             anchors.centerIn: parent
             name: "music_note"
-            size: Math.min(parent.width, parent.height) * 0.46
+            size: root.placeholderIconSize
             color: Theme.primary
             visible: artwork.status !== Image.Ready
         }
@@ -30,7 +31,7 @@ Item {
             id: artwork
 
             anchors.fill: parent
-            source: root.visible && root.width > 0 ? root.mediaModel.artUrl : ""
+            source: root.visible && root.width > 0 ? root.artUrl : ""
             asynchronous: true
             cache: true
             fillMode: Image.PreserveAspectCrop

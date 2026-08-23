@@ -8,12 +8,12 @@ import qs.Widgets
 FocusScope {
     id: root
 
-    required property var islandController
+    required property var controller
 
     property bool contentStaged: false
 
-    readonly property real stageWidth: root.islandController.homeExpandedTarget.width - 2
-    readonly property real stageHeight: root.islandController.homeExpandedTarget.height - 2
+    readonly property real stageWidth: root.controller.homeExpandedTarget.width - 2
+    readonly property real stageHeight: root.controller.homeExpandedTarget.height - 2
     readonly property real faceInset: Theme.spacingM
     readonly property var overviewTab: tabLoader.item
 
@@ -40,13 +40,13 @@ FocusScope {
         id: overviewTabComponent
 
         OverviewTab {
-            live: root.islandController.expanded && root.islandController.activeActivity === "home"
-            onCloseDash: root.islandController.requestCollapse()
+            live: root.controller.expanded && root.controller.activeActivity === "home"
+            onCloseDash: root.controller.requestCollapse()
             onNavFocusRequested: root.focusOverview()
-            onSwitchToMediaTab: root.islandController.requestActivity("media", true, true)
+            onSwitchToMediaTab: root.controller.requestActivity("media", true, true)
             onSwitchToWeatherTab: {
                 if (SettingsData.weatherEnabled)
-                    root.islandController.requestWeather(false);
+                    root.controller.requestWeather(false);
             }
             Component.onCompleted: root.focusOverview()
         }
@@ -64,7 +64,7 @@ FocusScope {
             return;
         }
         if (event.key === Qt.Key_Escape) {
-            root.islandController.requestCollapse();
+            root.controller.requestCollapse();
             event.accepted = true;
         }
     }

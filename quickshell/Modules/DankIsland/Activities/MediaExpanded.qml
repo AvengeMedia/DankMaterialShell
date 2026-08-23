@@ -7,7 +7,7 @@ import qs.Widgets
 FocusScope {
     id: root
 
-    required property var islandController
+    required property var controller
     property var effectiveScreen: null
     property real alignedX: 0
     property real alignedY: 0
@@ -16,7 +16,7 @@ FocusScope {
 
     property bool contentStaged: false
     property bool geometrySettled: false
-    readonly property bool menusEnabled: islandController.expanded && geometrySettled
+    readonly property bool menusEnabled: root.controller.expanded && geometrySettled
     readonly property var playerTab: tabLoader.item
 
     signal showVolumeDropdown(point pos)
@@ -51,7 +51,7 @@ FocusScope {
 
         MediaPlayerTab {
             chrome: "island"
-            live: root.islandController.expanded && root.islandController.activeActivity === "media"
+            live: root.controller.expanded && root.controller.activeActivity === "media"
             targetScreen: root.effectiveScreen
             popoutX: root.alignedX
             popoutY: root.alignedY
@@ -81,16 +81,16 @@ FocusScope {
             return;
         }
         if (event.key === Qt.Key_Escape) {
-            root.islandController.requestCollapse();
+            root.controller.requestCollapse();
             event.accepted = true;
         }
     }
 
     Connections {
-        target: root.islandController
+        target: root.controller
 
         function onMediaDropdownOpenChanged() {
-            if (!root.islandController.mediaDropdownOpen)
+            if (!root.controller.mediaDropdownOpen)
                 root.resetDropdownStates();
         }
     }

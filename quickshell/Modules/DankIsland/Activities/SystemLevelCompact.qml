@@ -8,7 +8,6 @@ Item {
     id: root
 
     required property var systemModel
-    property bool dense: false
     property real iconSize: 36
 
     OsdLevelRow {

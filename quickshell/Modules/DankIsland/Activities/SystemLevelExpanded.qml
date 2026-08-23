@@ -54,7 +54,7 @@ Item {
                 }
 
                 StyledText {
-                    text: root.systemModel.volumeActivity ? I18n.tr("Click the icon to mute") : I18n.tr("Display level")
+                    text: root.systemModel.volumeActivity ? I18n.tr("Click the icon to mute", "island volume face: hint under the title") : I18n.tr("Display brightness control", "island brightness face: hint under the title")
                     color: Theme.surfaceTextSecondary
                     font.pixelSize: Theme.fontSizeSmall
                 }

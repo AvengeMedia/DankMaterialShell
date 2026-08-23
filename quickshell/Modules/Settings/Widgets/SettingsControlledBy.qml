@@ -10,9 +10,35 @@ StyledRect {
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
+    property string target: "frame"
     property string settingLabel: ""
     property string reason: ""
     property var parentModal: null
+
+    readonly property string iconName: {
+        switch (target) {
+        case "island":
+            return "view_in_ar";
+        default:
+            return "frame_source";
+        }
+    }
+    readonly property string buttonText: {
+        switch (target) {
+        case "island":
+            return I18n.tr("Open Island", "settings: button that opens the Dank Island tab");
+        default:
+            return I18n.tr("Open Frame", "settings: button that opens the Frame tab");
+        }
+    }
+    readonly property string tabName: {
+        switch (target) {
+        case "island":
+            return "dank_island";
+        default:
+            return "frame";
+        }
+    }
 
     width: parent?.width ?? 0
     height: contentRow.implicitHeight + Theme.spacingM * 2
@@ -31,7 +57,7 @@ StyledRect {
         spacing: Theme.spacingM
 
         DankIcon {
-            name: "view_in_ar"
+            name: root.iconName
             size: Theme.iconSize
             color: Theme.primary
             anchors.verticalCenter: parent.verticalCenter
@@ -64,7 +90,7 @@ StyledRect {
         DankButton {
             id: openButton
             anchors.verticalCenter: parent.verticalCenter
-            text: I18n.tr("Open Island")
+            text: root.buttonText
             backgroundColor: Theme.primary
             textColor: Theme.primaryText
             buttonHeight: 32
@@ -72,7 +98,7 @@ StyledRect {
             onClicked: {
                 if (!root.parentModal)
                     return;
-                root.parentModal.showWithTabName("dank_island");
+                root.parentModal.showWithTabName(root.tabName);
             }
         }
     }

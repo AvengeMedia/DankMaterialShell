@@ -6,6 +6,7 @@ import Quickshell.Widgets
 import qs.Common
 import qs.Services
 import qs.Widgets
+import "../../Common/Format.js" as Format
 
 Item {
     id: root
@@ -22,8 +23,8 @@ Item {
     readonly property color accent: root.player.accent
     readonly property color onAccent: root.player.onAccent
     readonly property string artUrl: TrackArtService.resolvedArtUrl
-    readonly property string title: MprisController.stableTitle || I18n.tr("Unknown Track")
-    readonly property string artist: MprisController.stableArtist || I18n.tr("Unknown Artist")
+    readonly property string title: MprisController.stableTitle || I18n.tr("Unknown Track", "island media player: fallback title")
+    readonly property string artist: MprisController.stableArtist || I18n.tr("Unknown Artist", "island media player: fallback artist")
     readonly property string album: MprisController.stableAlbum || ""
 
     Component {
@@ -33,14 +34,6 @@ Item {
             accentColor: root.accent
             playing: root.activePlayer?.playbackState === MprisPlaybackState.Playing
         }
-    }
-
-    function formatTime(seconds) {
-        if (!isFinite(seconds) || seconds < 0)
-            return "0:00";
-        const minutes = Math.floor(seconds / 60);
-        const remainder = Math.floor(seconds % 60);
-        return minutes + ":" + String(remainder).padStart(2, "0");
     }
 
     function volumeIcon() {
@@ -146,7 +139,7 @@ Item {
         }
 
         StyledText {
-            text: I18n.tr("No Active Players")
+            text: I18n.tr("No Active Players", "island media player: empty state")
             font.pixelSize: Theme.fontSizeLarge
             color: Theme.surfaceTextMedium
             anchors.horizontalCenter: parent.horizontalCenter
@@ -160,7 +153,7 @@ Item {
             fill: parent
             margins: 18
         }
-        visible: !root.player._noneAvailable && !root.player.showNoPlayerNow
+        visible: !root.player.noneAvailable && !root.player.showNoPlayerNow
 
         Item {
             id: headerRow
@@ -204,34 +197,14 @@ Item {
                     border.width: 1
                     border.color: Theme.withAlpha(root.accent, 0.3)
 
-                    ClippingRectangle {
+                    MediaArtwork {
                         anchors {
                             fill: parent
                             margins: 2
                         }
-                        radius: 28
-                        color: Theme.primaryContainer
-                        antialiasing: true
-
-                        DankIcon {
-                            anchors.centerIn: parent
-                            name: "music_note"
-                            size: 46
-                            color: Theme.primary
-                            visible: artwork.status !== Image.Ready
-                        }
-
-                        Image {
-                            id: artwork
-
-                            anchors.fill: parent
-                            source: root.visible ? root.artUrl : ""
-                            asynchronous: true
-                            cache: true
-                            fillMode: Image.PreserveAspectCrop
-                            sourceSize: Qt.size(240, 240)
-                            visible: status === Image.Ready
-                        }
+                        cornerRadius: 28
+                        placeholderIconSize: 46
+                        artUrl: root.artUrl
                     }
                 }
             }
@@ -419,7 +392,7 @@ Item {
                         left: parent.left
                         bottom: parent.bottom
                     }
-                    text: root.formatTime(root.activePlayer?.position || 0)
+                    text: Format.formatDuration(root.activePlayer?.position || 0)
                     color: root.accent
                     font.pixelSize: Theme.fontSizeSmall
                     font.weight: Font.DemiBold
@@ -430,7 +403,7 @@ Item {
                         right: parent.right
                         bottom: parent.bottom
                     }
-                    text: root.player.stableLength > 0 ? root.formatTime(root.player.stableLength) : "--:--"
+                    text: root.player.stableLength > 0 ? Format.formatDuration(root.player.stableLength) : "--:--"
                     color: Theme.surfaceTextSecondary
                     font.pixelSize: Theme.fontSizeSmall
                     font.weight: Font.Medium

@@ -740,6 +740,60 @@ Singleton {
         }
     }
 
+    function isFocusedScreen(screen) {
+        if (!SettingsData.notificationFocusedMonitor)
+            return true;
+        const focused = CompositorService.getFocusedScreen();
+        return !!focused && !!screen && focused.name === screen.name;
+    }
+
+    function notificationIconFromImage(image) {
+        image = image || "";
+        return image.startsWith("image://icon/") ? image.substring(13) : "";
+    }
+
+    function notificationImageHasSpecialPrefix(image) {
+        return /^(material|svg|unicode|image):/.test(notificationIconFromImage(image));
+    }
+
+    function notificationHasImage(image) {
+        image = image || "";
+        return image !== "" && (!image.startsWith("image://icon/") || notificationIconFromImage(image).startsWith("/"));
+    }
+
+    function notificationCleanImage(image) {
+        image = image || "";
+        if (!image)
+            return "";
+        if (image.startsWith("image://icon/")) {
+            const payload = image.substring(13);
+            if (payload.startsWith("/"))
+                return "file://" + payload;
+        }
+        return Paths.strip(image);
+    }
+
+    function notificationImageSource(image, appIcon) {
+        image = image || "";
+        appIcon = appIcon || "";
+        if (notificationHasImage(image))
+            return notificationCleanImage(image);
+        if (notificationImageHasSpecialPrefix(image))
+            return "";
+        if (!appIcon)
+            return "";
+        return /^(file|https?):\/\//.test(appIcon) || appIcon.includes("/") ? appIcon : "";
+    }
+
+    function notificationFallbackIcon(image, appIcon) {
+        image = image || "";
+        appIcon = appIcon || "";
+        const fromImage = notificationIconFromImage(image);
+        if (notificationImageHasSpecialPrefix(image))
+            return fromImage;
+        return appIcon || fromImage || "";
+    }
+
     component NotifWrapper: QtObject {
         id: wrapper
 
@@ -852,16 +906,10 @@ Singleton {
         }
         readonly property string desktopEntry: notification?.desktopEntry ?? ""
         readonly property string image: notification?.image ?? ""
-        readonly property string cleanImage: {
-            if (!image)
-                return "";
-            if (image.startsWith("image://icon/")) {
-                const payload = image.substring(13);
-                if (payload.startsWith("/"))
-                    return "file://" + payload;
-            }
-            return Paths.strip(image);
-        }
+        readonly property string cleanImage: root.notificationCleanImage(image)
+        readonly property bool hasDisplayImage: root.notificationHasImage(image)
+        readonly property string displayImage: root.notificationImageSource(image, appIcon)
+        readonly property string fallbackIconName: root.notificationFallbackIcon(image, appIcon)
         property int urgencyOverride: notification?.urgency ?? NotificationUrgency.Normal
         readonly property int urgency: urgencyOverride
         readonly property list<NotificationAction> actions: notification?.actions ?? []
