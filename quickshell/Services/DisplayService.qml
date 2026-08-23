@@ -1016,26 +1016,40 @@ Singleton {
     }
 
     // Night Mode Functions - Simplified
-    function enableNightMode() {
+    function _setGammaEnabled(enabled, quiet) {
         if (!gammaControlAvailable) {
-            ToastService.showWarning(I18n.tr("Night mode failed: DMS gamma control not available"));
-            return;
+            if (!quiet) {
+                ToastService.showWarning(I18n.tr("Night mode action failed: DMS gamma control not available"));
+            }
+            return Promise.resolve(false);
         }
 
+        return new Promise(resolve => {
+            DMSService.sendRequest("wayland.gamma.setEnabled", {
+                "enabled": enabled
+            }, response => {
+                if (response.error) {
+                    log.error(`Failed to ${enabled ? "enable" : "disable"} gamma control:`, response.error);
+                    ToastService.showError(I18n.tr("Night mode error"), response.error, "", "night-mode");
+                    resolve(false);
+                } else {
+                    ToastService.dismissCategory("night-mode");
+                    resolve(true);
+                }
+            });
+        });
+    }
+
+    function enableNightMode() {
         nightModeEnabled = true;
         SessionData.setNightModeEnabled(true);
 
-        DMSService.sendRequest("wayland.gamma.setEnabled", {
-            "enabled": true
-        }, response => {
-            if (response.error) {
-                log.error("Failed to enable gamma control:", response.error);
-                ToastService.showError(I18n.tr("Failed to enable night mode"), response.error, "", "night-mode");
+        _setGammaEnabled(true, false).then(success => {
+            if (!success) {
                 nightModeEnabled = false;
                 SessionData.setNightModeEnabled(false);
                 return;
             }
-            ToastService.dismissCategory("night-mode");
 
             if (SessionData.nightModeAutoEnabled) {
                 startAutomation();
@@ -1049,18 +1063,10 @@ Singleton {
         nightModeEnabled = false;
         SessionData.setNightModeEnabled(false);
 
-        if (!gammaControlAvailable) {
-            return;
-        }
-
-        DMSService.sendRequest("wayland.gamma.setEnabled", {
-            "enabled": false
-        }, response => {
-            if (response.error) {
-                log.error("Failed to disable gamma control:", response.error);
-                ToastService.showError(I18n.tr("Failed to disable night mode"), response.error, "", "night-mode");
-            } else {
-                ToastService.dismissCategory("night-mode");
+        _setGammaEnabled(false, false).then(success => {
+            if (!success) {
+                nightModeEnabled = true;
+                SessionData.setNightModeEnabled(true);
             }
         });
     }
@@ -1074,12 +1080,21 @@ Singleton {
     }
 
     function pauseNightMode() {
-        disableNightMode();
         nightModePaused = true;
+        _setGammaEnabled(false, true).then(success => {
+            if (!success) {
+                nightModePaused = false;
+            }
+        });
     }
+
     function resumeNightMode() {
-        enableNightMode();
         nightModePaused = false;
+        _setGammaEnabled(true, true).then(success => {
+            if (!success) {
+                nightModePaused = true;
+            }
+        });
     }
 
     function isNightModeExcludedApp(appId: string): bool {
@@ -1110,9 +1125,7 @@ Singleton {
             return;
         }
 
-        const shouldPause =
-            (SettingsData.nightModeExcludeFullscreen && activeApp.fullscreen) ||
-            isNightModeExcludedApp(activeApp.appId);
+        const shouldPause = (SettingsData.nightModeExcludeFullscreen && activeApp.fullscreen) || isNightModeExcludedApp(activeApp.appId);
 
         if (shouldPause) {
             if (!nightModePaused && nightModeEnabled) {
