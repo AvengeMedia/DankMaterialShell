@@ -1,6 +1,8 @@
 package dank16
 
 import (
+	"bytes"
+	"encoding/json"
 	"math"
 	"testing"
 )
@@ -86,6 +88,54 @@ func TestRGBToHex(t *testing.T) {
 			result := RGBToHex(tt.input)
 			if result != tt.expected {
 				t.Errorf("RGBToHex(%v) = %s, expected %s", tt.input, result, tt.expected)
+			}
+		})
+	}
+}
+
+func TestRGBToHSL(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    RGB
+		expected HSL
+	}{
+		{
+			name:     "black",
+			input:    RGB{R: 0.0, G: 0.0, B: 0.0},
+			expected: HSL{H: 0.0, S: 0.0, L: 0.0},
+		},
+		{
+			name:     "white",
+			input:    RGB{R: 1.0, G: 1.0, B: 1.0},
+			expected: HSL{H: 0.0, S: 0.0, L: 1.0},
+		},
+		{
+			name:     "red",
+			input:    RGB{R: 1.0, G: 0.0, B: 0.0},
+			expected: HSL{H: 0.0, S: 1.0, L: 0.5},
+		},
+		{
+			name:     "green",
+			input:    RGB{R: 0.0, G: 1.0, B: 0.0},
+			expected: HSL{H: 120.0 / 360.0, S: 1.0, L: 0.5},
+		},
+		{
+			name:     "blue",
+			input:    RGB{R: 0.0, G: 0.0, B: 1.0},
+			expected: HSL{H: 240.0 / 360.0, S: 1.0, L: 0.5},
+		},
+		{
+			name:     "magenta",
+			input:    RGB{R: 1.0, G: 0.0, B: 1.0},
+			expected: HSL{H: 300 / 360.0, S: 1.0, L: 0.5},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := RGBToHSL(tt.input)
+			if !floatEqual(result.H, tt.expected.H) || !floatEqual(result.S, tt.expected.S) || !floatEqual(result.L, tt.expected.L) {
+				t.Errorf("RGBToHSL(%v) = %v, expected %v", tt.input, result, tt.expected)
 			}
 		})
 	}
@@ -309,31 +359,41 @@ func TestEnsureContrast(t *testing.T) {
 
 func TestGeneratePalette(t *testing.T) {
 	tests := []struct {
-		name string
-		base string
-		opts PaletteOptions
+		name          string
+		base          string
+		backgroundHex string
+		backgroundHSL string
+		opts          PaletteOptions
 	}{
 		{
-			name: "dark theme default",
-			base: "#625690",
-			opts: PaletteOptions{IsLight: false},
+			name:          "dark theme default",
+			base:          "#625690",
+			backgroundHex: "#1a1a1a",
+			backgroundHSL: "hsl(0.0, 0.0%, 10.2%)",
+			opts:          PaletteOptions{IsLight: false},
 		},
 		{
-			name: "light theme default",
-			base: "#625690",
-			opts: PaletteOptions{IsLight: true},
+			name:          "light theme default",
+			base:          "#625690",
+			backgroundHex: "#f8f8f8",
+			backgroundHSL: "hsl(0.0, 0.0%, 97.3%)",
+			opts:          PaletteOptions{IsLight: true},
 		},
 		{
-			name: "light theme with custom background",
-			base: "#625690",
+			name:          "light theme with custom background",
+			base:          "#625690",
+			backgroundHex: "#fafafa",
+			backgroundHSL: "hsl(0.0, 0.0%, 98.0%)",
 			opts: PaletteOptions{
 				IsLight:    true,
 				Background: "#fafafa",
 			},
 		},
 		{
-			name: "dark theme with custom background",
-			base: "#625690",
+			name:          "dark theme with custom background",
+			base:          "#625690",
+			backgroundHex: "#0a0a0a",
+			backgroundHSL: "hsl(0.0, 0.0%, 3.9%)",
 			opts: PaletteOptions{
 				IsLight:    false,
 				Background: "#0a0a0a",
@@ -358,12 +418,12 @@ func TestGeneratePalette(t *testing.T) {
 				}
 			}
 
-			if tt.opts.Background != "" && result.Color0.Hex != tt.opts.Background {
-				t.Errorf("Background color = %s, expected %s", result.Color0.Hex, tt.opts.Background)
-			} else if !tt.opts.IsLight && tt.opts.Background == "" && result.Color0.Hex != "#1a1a1a" {
-				t.Errorf("Dark mode background = %s, expected #1a1a1a", result.Color0.Hex)
-			} else if tt.opts.IsLight && tt.opts.Background == "" && result.Color0.Hex != "#f8f8f8" {
-				t.Errorf("Light mode background = %s, expected #f8f8f8", result.Color0.Hex)
+			if result.Color0.Hex != tt.backgroundHex {
+				t.Errorf("Background color hex = %s, expected %s", result.Color0.Hex, tt.backgroundHex)
+			}
+
+			if result.Color0.HSL != tt.backgroundHSL {
+				t.Errorf("Background color hsl = %s, expected %s", result.Color0.HSL, tt.backgroundHSL)
 			}
 
 			// Color15 is now derived from primary, so just verify it's a valid color
@@ -379,6 +439,59 @@ func TestGeneratePalette(t *testing.T) {
 				if color15Lum < 0.5 {
 					t.Errorf("Dark mode Color15 = %s (lum %.2f) is too dark", result.Color15.Hex, color15Lum)
 				}
+			}
+		})
+	}
+}
+
+func TestFormatOutput(t *testing.T) {
+	tests := []struct {
+		in  string
+		out []byte
+	}{
+		{
+			in:  "#000000",
+			out: []byte(`{"hex":"#000000","hex_stripped":"000000","hex_alpha":"#000000ff","hex_alpha_stripped":"000000ff","alpha_hex":"#ff000000","alpha_hex_stripped":"ff000000","rgb":"rgb(0, 0, 0)","rgba":"rgba(0, 0, 0, 1.0)","hsl":"hsl(0.0, 0.0%, 0.0%)","hsla":"hsla(0.0, 0.0%, 0.0%, 1.0)","red":"0","green":"0","blue":"0","alpha":"1.0","hue":"0.0","saturation":"0.0%","lightness":"0.0%"}`),
+		},
+		{
+			in:  "#ffffff",
+			out: []byte(`{"hex":"#ffffff","hex_stripped":"ffffff","hex_alpha":"#ffffffff","hex_alpha_stripped":"ffffffff","alpha_hex":"#ffffffff","alpha_hex_stripped":"ffffffff","rgb":"rgb(255, 255, 255)","rgba":"rgba(255, 255, 255, 1.0)","hsl":"hsl(0.0, 0.0%, 100.0%)","hsla":"hsla(0.0, 0.0%, 100.0%, 1.0)","red":"255","green":"255","blue":"255","alpha":"1.0","hue":"0.0","saturation":"0.0%","lightness":"100.0%"}`),
+		},
+		{
+			in:  "#ff0000",
+			out: []byte(`{"hex":"#ff0000","hex_stripped":"ff0000","hex_alpha":"#ff0000ff","hex_alpha_stripped":"ff0000ff","alpha_hex":"#ffff0000","alpha_hex_stripped":"ffff0000","rgb":"rgb(255, 0, 0)","rgba":"rgba(255, 0, 0, 1.0)","hsl":"hsl(0.0, 100.0%, 50.0%)","hsla":"hsla(0.0, 100.0%, 50.0%, 1.0)","red":"255","green":"0","blue":"0","alpha":"1.0","hue":"0.0","saturation":"100.0%","lightness":"50.0%"}`),
+		},
+		{
+			in:  "#00ff00",
+			out: []byte(`{"hex":"#00ff00","hex_stripped":"00ff00","hex_alpha":"#00ff00ff","hex_alpha_stripped":"00ff00ff","alpha_hex":"#ff00ff00","alpha_hex_stripped":"ff00ff00","rgb":"rgb(0, 255, 0)","rgba":"rgba(0, 255, 0, 1.0)","hsl":"hsl(120.0, 100.0%, 50.0%)","hsla":"hsla(120.0, 100.0%, 50.0%, 1.0)","red":"0","green":"255","blue":"0","alpha":"1.0","hue":"120.0","saturation":"100.0%","lightness":"50.0%"}`),
+		},
+		{
+			in:  "#0000ff",
+			out: []byte(`{"hex":"#0000ff","hex_stripped":"0000ff","hex_alpha":"#0000ffff","hex_alpha_stripped":"0000ffff","alpha_hex":"#ff0000ff","alpha_hex_stripped":"ff0000ff","rgb":"rgb(0, 0, 255)","rgba":"rgba(0, 0, 255, 1.0)","hsl":"hsl(240.0, 100.0%, 50.0%)","hsla":"hsla(240.0, 100.0%, 50.0%, 1.0)","red":"0","green":"0","blue":"255","alpha":"1.0","hue":"240.0","saturation":"100.0%","lightness":"50.0%"}`),
+		},
+		{
+			in:  "#625690",
+			out: []byte(`{"hex":"#625690","hex_stripped":"625690","hex_alpha":"#625690ff","hex_alpha_stripped":"625690ff","alpha_hex":"#ff625690","alpha_hex_stripped":"ff625690","rgb":"rgb(98, 86, 144)","rgba":"rgba(98, 86, 144, 1.0)","hsl":"hsl(252.4, 25.2%, 45.1%)","hsla":"hsla(252.4, 25.2%, 45.1%, 1.0)","red":"98","green":"86","blue":"144","alpha":"1.0","hue":"252.4","saturation":"25.2%","lightness":"45.1%"}`),
+		},
+		{
+			in:  "#ff00ff",
+			out: []byte(`{"hex":"#ff00ff","hex_stripped":"ff00ff","hex_alpha":"#ff00ffff","hex_alpha_stripped":"ff00ffff","alpha_hex":"#ffff00ff","alpha_hex_stripped":"ffff00ff","rgb":"rgb(255, 0, 255)","rgba":"rgba(255, 0, 255, 1.0)","hsl":"hsl(300.0, 100.0%, 50.0%)","hsla":"hsla(300.0, 100.0%, 50.0%, 1.0)","red":"255","green":"0","blue":"255","alpha":"1.0","hue":"300.0","saturation":"100.0%","lightness":"50.0%"}`),
+		},
+		{
+			in:  "#888888",
+			out: []byte(`{"hex":"#888888","hex_stripped":"888888","hex_alpha":"#888888ff","hex_alpha_stripped":"888888ff","alpha_hex":"#ff888888","alpha_hex_stripped":"ff888888","rgb":"rgb(136, 136, 136)","rgba":"rgba(136, 136, 136, 1.0)","hsl":"hsl(0.0, 0.0%, 53.3%)","hsla":"hsla(0.0, 0.0%, 53.3%, 1.0)","red":"136","green":"136","blue":"136","alpha":"1.0","hue":"0.0","saturation":"0.0%","lightness":"53.3%"}`),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.in, func(t *testing.T) {
+			ci := NewColorInfo(tt.in)
+			out, err := json.Marshal(ci)
+			if err != nil {
+				t.Error("Failed encoding", err)
+			}
+			if !bytes.Equal(out, tt.out) {
+				t.Errorf("Color output mismatch, got = %s, expected %s", out, tt.out)
 			}
 		})
 	}
