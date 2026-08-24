@@ -786,7 +786,7 @@ Rectangle {
         target: DMSService
 
         function onBluetoothPairingRequest(data) {
-            const modal = PopoutService.bluetoothPairingModal;
+            const modal = PopoutService.ensureBluetoothPairingModal();
             if (!modal)
                 return;
             if (modal.token === data.token)

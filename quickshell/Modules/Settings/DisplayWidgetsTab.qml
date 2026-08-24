@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import qs.Common
+import qs.Modules.Settings.Widgets
 import qs.Services
 import qs.Widgets
 
@@ -13,13 +14,16 @@ Item {
 
     function getBarComponentsFromSettings() {
         const bars = SettingsData.barConfigs || [];
-        return bars.map(bar => ({
-                    "id": "bar:" + bar.id,
-                    "name": bar.name || "Bar",
-                    "description": I18n.tr("Individual bar configuration"),
-                    "icon": "toolbar",
-                    "barId": bar.id
-                }));
+        return bars.map(bar => {
+            const isIsland = SettingsData.isIslandBarConfig(bar);
+            return {
+                "id": "bar:" + bar.id,
+                "name": bar.name || "Bar",
+                "description": isIsland ? I18n.tr("Dank Island instance") : I18n.tr("Individual bar configuration"),
+                "icon": isIsland ? "view_in_ar" : "toolbar",
+                "barId": bar.id
+            };
+        });
     }
 
     property var variantComponents: getVariantComponentsList()

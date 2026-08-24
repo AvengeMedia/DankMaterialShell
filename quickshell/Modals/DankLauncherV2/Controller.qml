@@ -52,8 +52,10 @@ Item {
 
     onActiveChanged: {
         ClipboardService.invalidateLauncherSearchCache();
-        if (active)
+        if (active) {
+            Qt.callLater(PluginService.ensureLauncherInstances);
             return;
+        }
 
         SessionData.addLauncherHistory(searchQuery, explicitQuerySession);
         sections = [];

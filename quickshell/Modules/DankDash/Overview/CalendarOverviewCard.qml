@@ -925,9 +925,8 @@ Rectangle {
                             }
                         }
 
-                        // Inline Edit Input Box
-                        Rectangle {
-                            id: editInputContainer
+                        DankTextField {
+                            id: editInput
                             anchors.left: parent.left
                             anchors.right: parent.right
                             anchors.leftMargin: 36
@@ -935,26 +934,25 @@ Rectangle {
                             anchors.verticalCenter: parent.verticalCenter
                             height: 28
                             visible: taskItem.isEditing
-                            color: "transparent"
+                            font.pixelSize: Theme.fontSizeSmall
+                            backgroundColor: "transparent"
+                            borderWidth: 0
+                            focusedBorderWidth: 0
+                            topPadding: 0
+                            bottomPadding: 0
+                            text: modelData ? modelData.title : ""
+                            keyForwardTargets: [editKeyHandler]
 
-                            TextInput {
-                                id: editInput
-                                anchors.fill: parent
-                                verticalAlignment: TextInput.AlignVCenter
-                                color: Theme.surfaceText
-                                font.pixelSize: Theme.fontSizeSmall
-                                selectByMouse: true
-                                clip: true
-
-                                text: modelData ? modelData.title : ""
-
-                                onAccepted: {
-                                    let txt = text.trim();
-                                    if (txt !== "" && modelData && modelData.id) {
-                                        CalendarService.editTask(modelData.id, txt);
-                                    }
-                                    taskItem.isEditing = false;
+                            onAccepted: {
+                                let txt = text.trim();
+                                if (txt !== "" && modelData && modelData.id) {
+                                    CalendarService.editTask(modelData.id, txt);
                                 }
+                                taskItem.isEditing = false;
+                            }
+
+                            Item {
+                                id: editKeyHandler
 
                                 Keys.onEscapePressed: event => {
                                     taskItem.isEditing = false;
@@ -1056,42 +1054,29 @@ Rectangle {
             }
         }
 
-        Rectangle {
+        DankTextField {
+            id: taskInput
             width: parent.width - Theme.spacingS * 2
             height: 34
             anchors.horizontalCenter: parent.horizontalCenter
-            radius: Theme.cornerRadius
-            color: Theme.nestedSurface
-            border.color: Theme.outlineMedium
-            border.width: 1
             visible: showEventDetails
+            font.pixelSize: Theme.fontSizeSmall
+            backgroundColor: Theme.nestedSurface
+            normalBorderColor: Theme.outlineMedium
+            placeholderText: I18n.tr("Add a task...", "placeholder in the new-task input field")
+            hidePlaceholderOnFocus: false
+            keyForwardTargets: [taskKeyHandler]
 
-            TextInput {
-                id: taskInput
-                anchors.fill: parent
-                anchors.leftMargin: Theme.spacingS
-                anchors.rightMargin: Theme.spacingS
-                verticalAlignment: TextInput.AlignVCenter
-                color: Theme.surfaceText
-                font.pixelSize: Theme.fontSizeSmall
-                selectByMouse: true
-                clip: true
-
-                Text {
-                    text: I18n.tr("Add a task...", "placeholder in the new-task input field")
-                    color: Theme.outlineButton
-                    visible: taskInput.text.length === 0
-                    font.pixelSize: Theme.fontSizeSmall
-                    anchors.verticalCenter: parent.verticalCenter
+            onAccepted: {
+                let txt = text.trim();
+                if (txt !== "") {
+                    CalendarService.addTaskForDate(root.selectedDate, txt);
+                    text = "";
                 }
+            }
 
-                onAccepted: {
-                    let txt = text.trim();
-                    if (txt !== "") {
-                        CalendarService.addTaskForDate(root.selectedDate, txt);
-                        text = "";
-                    }
-                }
+            Item {
+                id: taskKeyHandler
 
                 Keys.onEscapePressed: event => {
                     root.showEventDetails = false;

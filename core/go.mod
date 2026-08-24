@@ -1,6 +1,6 @@
 module github.com/AvengeMedia/DankMaterialShell/core
 
-go 1.26.4
+go 1.26.5
 
 require (
 	github.com/AvengeMedia/dgop v0.2.4-0.20260819141338-085d828cf577
@@ -25,7 +25,7 @@ require (
 	go4.org/mem v0.0.0-20240501181205-ae6ca9944745
 	golang.org/x/image v0.44.0
 	modernc.org/sqlite v1.56.0
-	tailscale.com v1.100.0
+	tailscale.com v1.102.0
 )
 
 require (
@@ -87,7 +87,7 @@ require (
 )
 
 require (
-	github.com/AvengeMedia/dankgo v0.0.0-20260812195758-5935f34d40ce
+	github.com/AvengeMedia/dankgo v0.0.0-20260823164143-10434658325c
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/charmbracelet/colorprofile v0.4.3 // indirect

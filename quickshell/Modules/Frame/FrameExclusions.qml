@@ -86,6 +86,7 @@ Scope {
     }
 
     component EdgeExclusion: PanelWindow {
+        id: edgeExclusion
         required property var targetScreen
         property real exclusionSize: SettingsData.frameThickness
 
@@ -102,6 +103,9 @@ Scope {
         mask: Region {}
         implicitWidth: 1
         implicitHeight: 1
+
+        Component.onCompleted: SurfaceRecovery.track(edgeExclusion)
+        Component.onDestruction: SurfaceRecovery.untrack(edgeExclusion)
 
         anchors {
             top: anchorTop

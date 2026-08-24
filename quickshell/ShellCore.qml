@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import qs.Common
 import qs.Modules.DankBar
+import qs.Modules.DankIsland
 import qs.Modules.Frame
 import qs.Modules.WorkspaceOverlays
 import qs.Services
@@ -23,7 +24,7 @@ Item {
     property string _barLayoutStateJson: {
         if (!barSurfacesLoaded)
             return "[]";
-        const configs = SettingsData.barConfigs;
+        const configs = SettingsData.getBarKindConfigs();
         const mapped = configs.map(c => ({
                     id: c.id,
                     position: c.position,
@@ -117,7 +118,7 @@ Item {
         property var hyprlandOverviewLoaderRef: hyprlandOverviewLoader
 
         // Horizontal bars must claim their exclusive zones first, so vertical bars wait for every enabled horizontal bar to load
-        readonly property int horizontalWanted: SettingsData.barConfigs.filter(c => (c.enabled ?? false) && c.position !== SettingsData.Position.Left && c.position !== SettingsData.Position.Right).length
+        readonly property int horizontalWanted: SettingsData.getBarKindConfigs().filter(c => (c.enabled ?? false) && c.position !== SettingsData.Position.Left && c.position !== SettingsData.Position.Right).length
         property int horizontalReady: 0
 
         function recountHorizontalReady() {
@@ -142,18 +143,15 @@ Item {
             sourceComponent: DankBar {
                 barConfig: barLoader.barConfig
                 hyprlandOverviewLoader: dankBarRepeater.hyprlandOverviewLoaderRef
-
-                onColorPickerRequested: {
-                    const modal = PopoutService.colorPickerModal;
-                    if (!modal)
-                        return;
-                    if (modal.shouldBeVisible) {
-                        modal.close();
-                    } else {
-                        modal.show();
-                    }
-                }
             }
+        }
+    }
+
+    Loader {
+        active: SettingsData.dankIslandEnabled
+        asynchronous: false
+        sourceComponent: DankIsland {
+            screenModel: SettingsData.getIslandScreens()
         }
     }
 
@@ -195,12 +193,30 @@ Item {
             log.info("Screens changed:", Quickshell.screens.length, Quickshell.screens.map(s => "'" + s.name + "'").join(","), "hasReal:", hasReal, "hadReal:", root.hadRealScreen);
             const fullReconnect = !root.hadRealScreen && hasReal;
             const partialReconnect = root.previousRealScreenNames.length > 0 && currentNames.some(name => !root.previousRealScreenNames.includes(name));
-            if (fullReconnect || partialReconnect) {
-                log.info("Screen reconnect detected, scheduling surface recovery", "full:", fullReconnect, "partial:", partialReconnect);
+            const removed = hasReal && root.previousRealScreenNames.some(name => !currentNames.includes(name));
+            if (fullReconnect || partialReconnect || removed) {
+                log.info("Screen change detected, scheduling surface recovery", "full:", fullReconnect, "partial:", partialReconnect, "removed:", removed);
                 root.scheduleScreenReconnectRecovery();
             }
             root.hadRealScreen = hasReal;
             root.previousRealScreenNames = currentNames;
+        }
+    }
+
+    // Quickshell.screensChanged only fires on add/remove. Removing or reconfiguring one output
+    // reflows the survivors, and the compositor may leave their layer surfaces stale at the
+    // old placement until something forces a repaint (#3135), so watch geometry per screen.
+    Instantiator {
+        model: Quickshell.screens
+        delegate: Connections {
+            required property ShellScreen modelData
+            target: modelData
+            function onGeometryChanged() {
+                if (modelData.name.length === 0)
+                    return;
+                root.log.info("Screen geometry changed:", modelData.name, modelData.x, modelData.y, modelData.width, modelData.height);
+                root.scheduleScreenReconnectRecovery();
+            }
         }
     }
 
@@ -219,6 +235,12 @@ Item {
         screenReconnectDebounce.restart();
     }
 
+    function refreshScreenSurfaces() {
+        log.info("Refreshing layer surfaces, screens:", Quickshell.screens.length, Quickshell.screens.map(s => s.name).join(","));
+        SurfaceRecovery.refreshAll();
+        surfaceRefreshVerifyTimer.restart();
+    }
+
     Timer {
         id: screenReconnectDebounce
         // Wide enough to collapse the output-remove + output-re-add pair that one
@@ -229,15 +251,27 @@ Item {
             root._screenRecoveryCooldown = true;
             root._screenRecoveryPending = false;
             screenReconnectCooldown.restart();
-            root.triggerSurfaceRecovery("screen-reconnect");
+            root.refreshScreenSurfaces();
+        }
+    }
+
+    Timer {
+        id: surfaceRefreshVerifyTimer
+        interval: 800
+        repeat: false
+        onTriggered: {
+            const stale = SurfaceRecovery.staleWindows();
+            if (stale.length === 0)
+                return;
+            log.warn("Layer surfaces still stale after refresh:", stale.map(w => (w.screen?.name ?? "?") + ":" + w.width + "x" + w.height).join(","));
+            root.triggerSurfaceRecovery("stale-surfaces");
         }
     }
 
     Timer {
         id: screenReconnectCooldown
-        // Must exceed the full two-pass surfaceResumeRecoveryTimer sequence
-        // (800 + 2000 ms) so the cooldown still covers an in-flight recovery;
-        // raise this if those passes are lengthened.
+        // Must exceed surfaceRefreshVerifyTimer plus the two-pass
+        // surfaceResumeRecoveryTimer sequence (800 + 800 + 2000 ms).
         interval: 4000
         repeat: false
         onTriggered: {
@@ -288,6 +322,7 @@ Item {
             // its cooldown expires.
             screenReconnectDebounce.stop();
             screenReconnectCooldown.stop();
+            surfaceRefreshVerifyTimer.stop();
             root._screenRecoveryCooldown = false;
             root._screenRecoveryPending = false;
 

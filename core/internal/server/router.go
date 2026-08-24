@@ -19,6 +19,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/mime"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/network"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/notifyactions"
 	serverPlugins "github.com/AvengeMedia/DankMaterialShell/core/internal/server/plugins"
 	serverRegistries "github.com/AvengeMedia/DankMaterialShell/core/internal/server/registries"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/sysupdate"
@@ -207,6 +208,15 @@ func RouteRequest(conn *models.Conn, req models.Request) {
 			return
 		}
 		location.HandleRequest(conn, req, locationManager)
+		return
+	}
+
+	if strings.HasPrefix(req.Method, "notify.") {
+		if notifyActionsManager == nil {
+			models.RespondError(conn, req.ID, "notification action manager not initialized")
+			return
+		}
+		notifyactions.HandleRequest(conn, req, notifyActionsManager)
 		return
 	}
 

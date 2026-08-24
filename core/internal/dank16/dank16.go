@@ -3,6 +3,7 @@ package dank16
 import (
 	"fmt"
 	"math"
+	"strconv"
 
 	"github.com/lucasb-eyer/go-colorful"
 )
@@ -11,27 +12,38 @@ type RGB struct {
 	R, G, B float64
 }
 
+type HSL struct {
+	H, S, L float64
+}
+
 type HSV struct {
 	H, S, V float64
 }
 
 type ColorInfo struct {
-	Hex         string `json:"hex"`
-	HexStripped string `json:"hex_stripped"`
-	R           int    `json:"r"`
-	G           int    `json:"g"`
-	B           int    `json:"b"`
-}
-
-type VariantColorValue struct {
-	Hex         string `json:"hex"`
-	HexStripped string `json:"hex_stripped"`
+	Hex              string `json:"hex"`
+	HexStripped      string `json:"hex_stripped"`
+	HexAlpha         string `json:"hex_alpha"`
+	HexAlphaStripped string `json:"hex_alpha_stripped"`
+	AlphaHex         string `json:"alpha_hex"`
+	AlphaHexStripped string `json:"alpha_hex_stripped"`
+	RGB              string `json:"rgb"`
+	RGBA             string `json:"rgba"`
+	HSL              string `json:"hsl"`
+	HSLA             string `json:"hsla"`
+	R                string `json:"red"`
+	G                string `json:"green"`
+	B                string `json:"blue"`
+	A                string `json:"alpha"`
+	H                string `json:"hue"`
+	S                string `json:"saturation"`
+	L                string `json:"lightness"`
 }
 
 type VariantColorInfo struct {
-	Dark    VariantColorValue `json:"dark"`
-	Light   VariantColorValue `json:"light"`
-	Default VariantColorValue `json:"default"`
+	Dark    ColorInfo `json:"dark"`
+	Light   ColorInfo `json:"light"`
+	Default ColorInfo `json:"default"`
 }
 
 type Palette struct {
@@ -74,16 +86,41 @@ type VariantPalette struct {
 
 func NewColorInfo(hex string) ColorInfo {
 	rgb := HexToRGB(hex)
+	hsl := RGBToHSL(rgb)
+
+	var r, g, b, a, h, s, l string
+
+	r = strconv.FormatInt(int64(math.Round(rgb.R*255)), 10)
+	g = strconv.FormatInt(int64(math.Round(rgb.G*255)), 10)
+	b = strconv.FormatInt(int64(math.Round(rgb.B*255)), 10)
+	a = "1.0"
+
+	h = strconv.FormatFloat(math.Round(hsl.H*3600)/10, 'f', 1, 64)
+	s = fmt.Sprintf("%.1f%%", math.Round(hsl.S*1000.0)/10.0)
+	l = fmt.Sprintf("%.1f%%", math.Round(hsl.L*1000.0)/10.0)
+
 	stripped := hex
 	if len(hex) > 0 && hex[0] == '#' {
 		stripped = hex[1:]
 	}
 	return ColorInfo{
-		Hex:         hex,
-		HexStripped: stripped,
-		R:           int(math.Round(rgb.R * 255)),
-		G:           int(math.Round(rgb.G * 255)),
-		B:           int(math.Round(rgb.B * 255)),
+		Hex:              hex,
+		HexStripped:      stripped,
+		HexAlpha:         hex + "ff",
+		HexAlphaStripped: stripped + "ff",
+		AlphaHex:         "#ff" + stripped,
+		AlphaHexStripped: "ff" + stripped,
+		RGB:              fmt.Sprintf("rgb(%s, %s, %s)", r, g, b),
+		RGBA:             fmt.Sprintf("rgba(%s, %s, %s, %s)", r, g, b, a),
+		HSL:              fmt.Sprintf("hsl(%s, %s, %s)", h, s, l),
+		HSLA:             fmt.Sprintf("hsla(%s, %s, %s, %s)", h, s, l, a),
+		R:                r,
+		G:                g,
+		B:                b,
+		A:                a,
+		H:                h,
+		S:                s,
+		L:                l,
 	}
 }
 
@@ -136,6 +173,35 @@ func RGBToHSV(rgb RGB) HSV {
 	}
 
 	return HSV{H: h, S: s, V: max}
+}
+
+func RGBToHSL(rgb RGB) HSL {
+	max := math.Max(math.Max(rgb.R, rgb.G), rgb.B)
+	min := math.Min(math.Min(rgb.R, rgb.G), rgb.B)
+	delta := max - min
+	var h, s, l float64
+
+	l = (max + min) / 2
+	if delta == 0 {
+		return HSL{H: 0, S: 0, L: l}
+	}
+
+	switch max {
+	case rgb.R:
+		h = math.Mod((rgb.G-rgb.B)/delta, 6.0) / 6.0
+	case rgb.G:
+		h = ((rgb.B-rgb.R)/delta + 2.0) / 6.0
+	default:
+		h = ((rgb.R-rgb.G)/delta + 4.0) / 6.0
+	}
+
+	if h < 0 {
+		h += 1.0
+	}
+
+	s = delta / (1 - math.Abs((2*l)-1))
+
+	return HSL{H: h, S: s, L: l}
 }
 
 func HSVToRGB(hsv HSV) RGB {
@@ -623,17 +689,14 @@ type VariantOptions struct {
 }
 
 func mergeColorInfo(dark, light ColorInfo, isLightMode bool) VariantColorInfo {
-	darkVal := VariantColorValue{Hex: dark.Hex, HexStripped: dark.HexStripped}
-	lightVal := VariantColorValue{Hex: light.Hex, HexStripped: light.HexStripped}
-
-	defaultVal := darkVal
+	defaultVal := dark
 	if isLightMode {
-		defaultVal = lightVal
+		defaultVal = light
 	}
 
 	return VariantColorInfo{
-		Dark:    darkVal,
-		Light:   lightVal,
+		Dark:    dark,
+		Light:   light,
 		Default: defaultVal,
 	}
 }

@@ -85,6 +85,16 @@ func NewManager() (*Manager, error) {
 	return m, nil
 }
 
+func armNonBlocking(device EvdevDevice) {
+	nb, ok := device.(interface{ NonBlock() error })
+	if !ok {
+		return
+	}
+	if err := nb.NonBlock(); err != nil {
+		log.Debugf("evdev: non-blocking mode for %s: %v", device.Path(), err)
+	}
+}
+
 func capsLockFromDevices(devices []EvdevDevice) (bool, bool) {
 	for _, device := range devices {
 		if device == nil {
@@ -92,6 +102,7 @@ func capsLockFromDevices(devices []EvdevDevice) (bool, bool) {
 		}
 
 		ledStates, err := device.State(evLedType)
+		armNonBlocking(device)
 		if err != nil || len(ledStates) == 0 {
 			continue
 		}
@@ -126,6 +137,7 @@ func findKeyboards() ([]EvdevDevice, error) {
 		}
 
 		deviceName, _ := device.Name()
+		armNonBlocking(device)
 		log.Debugf("Found keyboard: %s at %s", deviceName, path)
 		keyboards = append(keyboards, device)
 	}
@@ -208,6 +220,7 @@ func (m *Manager) watchForNewKeyboards() {
 				}
 
 				deviceName, _ := device.Name()
+				armNonBlocking(device)
 				log.Debugf("Hotplugged keyboard: %s at %s", deviceName, event.Name)
 
 				m.devices = append(m.devices, device)

@@ -10,21 +10,20 @@ import (
 var ErrNoAdapter = errors.New("no bluetooth adapter found")
 
 func WaitForAdapter() error {
-	conn, err := dbus.ConnectSystemBus()
+	conn, err := dbus.SystemBus()
 	if err != nil {
-		return err
-	}
-	defer conn.Close()
-
-	if err := conn.AddMatchSignal(
-		dbus.WithMatchInterface(objectMgrIface),
-		dbus.WithMatchMember("InterfacesAdded"),
-	); err != nil {
 		return err
 	}
 
 	signals := make(chan *dbus.Signal, 64)
 	conn.Signal(signals)
+	defer conn.RemoveSignal(signals)
+
+	adapterAdded := []dbus.MatchOption{dbus.WithMatchInterface(objectMgrIface), dbus.WithMatchMember("InterfacesAdded")}
+	if err := conn.AddMatchSignal(adapterAdded...); err != nil {
+		return err
+	}
+	defer conn.RemoveMatchSignal(adapterAdded...)
 
 	if paths, err := scanAdapters(conn); err == nil && len(paths) > 0 {
 		return nil

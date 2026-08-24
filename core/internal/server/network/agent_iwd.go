@@ -92,10 +92,13 @@ func NewIWDAgent(conn *dbus.Conn, prompts PromptBroker) (*IWDAgent, error) {
 }
 
 func (a *IWDAgent) Close() {
-	if a.conn != nil {
-		mgr := a.conn.Object("net.connman.iwd", dbus.ObjectPath(iwdAgentManagerPath))
-		mgr.Call(iwdAgentManagerIface+".UnregisterAgent", 0, a.objPath)
+	if a.conn == nil {
+		return
 	}
+	mgr := a.conn.Object("net.connman.iwd", dbus.ObjectPath(iwdAgentManagerPath))
+	mgr.Call(iwdAgentManagerIface+".UnregisterAgent", 0, a.objPath)
+	_ = a.conn.Export(nil, a.objPath, iwdAgentInterface)
+	_ = a.conn.Export(nil, a.objPath, "org.freedesktop.DBus.Introspectable")
 }
 
 func (a *IWDAgent) SetStateChecker(checker ConnectionStateChecker) {

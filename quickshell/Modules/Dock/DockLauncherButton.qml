@@ -1,6 +1,4 @@
 import QtQuick
-import QtQuick.Effects
-import Quickshell.Widgets
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -196,98 +194,16 @@ Item {
             width: actualIconSize
             height: actualIconSize
 
-            DankIcon {
-                visible: SettingsData.dockLauncherLogoMode === "apps"
+            LauncherLogo {
                 anchors.centerIn: parent
-                name: "apps"
-                size: actualIconSize - 4
-                color: Theme.widgetIconColor
-            }
-
-            SystemLogo {
-                visible: SettingsData.dockLauncherLogoMode === "os"
-                anchors.centerIn: parent
-                width: actualIconSize + SettingsData.dockLauncherLogoSizeOffset
-                height: actualIconSize + SettingsData.dockLauncherLogoSizeOffset
+                mode: SettingsData.dockLauncherLogoMode
+                size: actualIconSize + SettingsData.dockLauncherLogoSizeOffset
+                appsIconSize: actualIconSize - 4
+                appsIconColor: Theme.widgetIconColor
                 colorOverride: effectiveLogoColor
-                brightnessOverride: SettingsData.dockLauncherLogoBrightness
-                contrastOverride: SettingsData.dockLauncherLogoContrast
-            }
-
-            IconImage {
-                visible: SettingsData.dockLauncherLogoMode === "dank"
-                anchors.centerIn: parent
-                width: actualIconSize + SettingsData.dockLauncherLogoSizeOffset
-                height: actualIconSize + SettingsData.dockLauncherLogoSizeOffset
-                smooth: true
-                mipmap: true
-                asynchronous: true
-                source: "file://" + Theme.shellDir + "/assets/danklogo.svg"
-                layer.enabled: effectiveLogoColor !== ""
-                layer.smooth: true
-                layer.mipmap: true
-                layer.effect: MultiEffect {
-                    saturation: 0
-                    colorization: 1
-                    colorizationColor: effectiveLogoColor
-                }
-            }
-
-            IconImage {
-                visible: SettingsData.dockLauncherLogoMode === "compositor" && (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle || CompositorService.isLabwc)
-                anchors.centerIn: parent
-                width: actualIconSize + SettingsData.dockLauncherLogoSizeOffset
-                height: actualIconSize + SettingsData.dockLauncherLogoSizeOffset
-                smooth: true
-                asynchronous: true
-                source: {
-                    if (CompositorService.isNiri) {
-                        return "file://" + Theme.shellDir + "/assets/niri.svg";
-                    } else if (CompositorService.isHyprland) {
-                        return "file://" + Theme.shellDir + "/assets/hyprland.svg";
-                    } else if (CompositorService.isMango) {
-                        return "file://" + Theme.shellDir + "/assets/mango.png";
-                    } else if (CompositorService.isSway) {
-                        return "file://" + Theme.shellDir + "/assets/sway.svg";
-                    } else if (CompositorService.isScroll) {
-                        return "file://" + Theme.shellDir + "/assets/sway.svg";
-                    } else if (CompositorService.isMiracle) {
-                        return "file://" + Theme.shellDir + "/assets/miraclewm.svg";
-                    } else if (CompositorService.isLabwc) {
-                        return "file://" + Theme.shellDir + "/assets/labwc.png";
-                    }
-                    return "";
-                }
-                layer.enabled: effectiveLogoColor !== ""
-                layer.effect: MultiEffect {
-                    saturation: 0
-                    colorization: 1
-                    colorizationColor: effectiveLogoColor
-                    brightness: {
-                        SettingsData.dockLauncherLogoBrightness;
-                    }
-                    contrast: {
-                        SettingsData.dockLauncherLogoContrast;
-                    }
-                }
-            }
-
-            IconImage {
-                visible: SettingsData.dockLauncherLogoMode === "custom" && SettingsData.dockLauncherLogoCustomPath !== ""
-                anchors.centerIn: parent
-                width: actualIconSize + SettingsData.dockLauncherLogoSizeOffset
-                height: actualIconSize + SettingsData.dockLauncherLogoSizeOffset
-                smooth: true
-                asynchronous: true
-                source: SettingsData.dockLauncherLogoCustomPath ? "file://" + SettingsData.dockLauncherLogoCustomPath.replace("file://", "") : ""
-                layer.enabled: effectiveLogoColor !== ""
-                layer.effect: MultiEffect {
-                    saturation: 0
-                    colorization: 1
-                    colorizationColor: effectiveLogoColor
-                    brightness: SettingsData.dockLauncherLogoBrightness
-                    contrast: SettingsData.dockLauncherLogoContrast
-                }
+                brightness: SettingsData.dockLauncherLogoBrightness
+                contrast: SettingsData.dockLauncherLogoContrast
+                customPath: SettingsData.dockLauncherLogoCustomPath
             }
         }
     }

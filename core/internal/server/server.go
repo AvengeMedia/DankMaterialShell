@@ -25,6 +25,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/loginctl"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/network"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/notifyactions"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/sysupdate"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/tailscale"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/thememode"
@@ -77,6 +78,7 @@ var trayRecoveryManager *trayrecovery.Manager
 var locationManager *location.Manager
 var sysUpdateManager *sysupdate.Manager
 var chatManager *serverChat.Manager
+var notifyActionsManager *notifyactions.Manager
 var geoClientInstance geolocation.Client
 
 const dbusClientID = "dms-dbus-client"
@@ -352,6 +354,16 @@ func InitializeLocationManager(geoClient geolocation.Client) error {
 	locationManager = manager
 
 	log.Info("Location manager initialized")
+	return nil
+}
+
+func InitializeNotifyActionsManager() error {
+	manager, err := notifyactions.NewManager()
+	if err != nil {
+		return err
+	}
+	notifyActionsManager = manager
+	log.Info("Notification action manager initialized")
 	return nil
 }
 
@@ -1313,6 +1325,9 @@ func cleanupManagers() {
 	if dbusManager != nil {
 		dbusManager.Close()
 	}
+	if notifyActionsManager != nil {
+		notifyActionsManager.Close()
+	}
 	if themeModeManager != nil {
 		themeModeManager.Close()
 	}
@@ -1375,6 +1390,9 @@ func Start(printDocs bool) error {
 func (s *Server) Serve(printDocs bool) error {
 	defer s.ipc.Close()
 	defer cleanupManagers()
+
+	tuneRuntime()
+	startPprof()
 
 	// Tailscale manager always starts — reconnects internally via WatchIPNBus.
 	// The capability is only advertised once tailscaled is reachable; the
@@ -1530,6 +1548,8 @@ func (s *Server) Serve(printDocs bool) error {
 		log.Info(" clipboard.getConfig                   - Get clipboard configuration")
 		log.Info(" clipboard.setConfig                   - Set configuration (params: maxHistory?, maxEntrySize?, autoClearDays?, clearAtStartup?)")
 		log.Info(" clipboard.subscribe                   - Subscribe to clipboard state changes (streaming)")
+		log.Info("Notify:")
+		log.Info(" notify.watchAction                    - Open a file when a notification action fires (params: id, path)")
 		log.Info("Location:")
 		log.Info(" location.getState                      - Get current location state")
 		log.Info(" location.subscribe                     - Subscribe to location changes (streaming)")
@@ -1750,6 +1770,12 @@ func (s *Server) Serve(printDocs bool) error {
 			log.Warnf("DBus manager unavailable: %v", err)
 		} else {
 			notifyCapabilityChange()
+		}
+	}()
+
+	go func() {
+		if err := InitializeNotifyActionsManager(); err != nil {
+			log.Warnf("Notification action manager unavailable: %v", err)
 		}
 	}()
 

@@ -7,18 +7,18 @@ import (
 	"github.com/godbus/dbus/v5"
 )
 
+var networkdMatchRules = []string{
+	"type='signal',interface='org.freedesktop.DBus.Properties',member='PropertiesChanged',path_namespace='/org/freedesktop/network1'",
+	"type='signal',interface='org.freedesktop.network1.Manager'",
+}
+
 func (b *SystemdNetworkdBackend) StartMonitoring(onStateChange func()) error {
 	b.onStateChange = onStateChange
 
 	b.signals = make(chan *dbus.Signal, 64)
 	b.conn.Signal(b.signals)
 
-	matchRules := []string{
-		"type='signal',interface='org.freedesktop.DBus.Properties',member='PropertiesChanged',path_namespace='/org/freedesktop/network1'",
-		"type='signal',interface='org.freedesktop.network1.Manager'",
-	}
-
-	for _, rule := range matchRules {
+	for _, rule := range networkdMatchRules {
 		if err := b.conn.BusObject().Call("org.freedesktop.DBus.AddMatch", 0, rule).Err; err != nil {
 			return fmt.Errorf("add match %q: %w", rule, err)
 		}

@@ -1927,7 +1927,7 @@ Item {
                     onSliderValueChanged: newValue => SettingsData.setCornerRadius(newValue)
                 }
 
-                SettingsControlledByFrame {
+                SettingsControlledBy {
                     visible: themeColorsTab.connectedFrameModeActive
                     parentModal: themeColorsTab.parentModal
                     settingLabel: I18n.tr("Surface Opacity")

@@ -221,6 +221,10 @@ Singleton {
         enabled: isHyprland
 
         function onRawEvent(event) {
+            if (event.name === "monitoraddedv2" || event.name === "monitorremoved") {
+                root.refreshHyprlandMonitorLayout();
+                return;
+            }
             if (event.name === "openwindow" || event.name === "closewindow" || event.name === "movewindow" || event.name === "movewindowv2" || event.name === "workspace" || event.name === "workspacev2" || event.name === "focusedmon" || event.name === "focusedmonv2" || event.name === "activewindow" || event.name === "activewindowv2" || event.name === "changefloatingmode" || event.name === "fullscreen" || event.name === "moveintogroup" || event.name === "moveoutofgroup" || event.name === "activespecial") {
                 try {
                     Hyprland.refreshToplevels();
@@ -690,7 +694,17 @@ Singleton {
         target: Quickshell
         function onScreensChanged() {
             root._recomputeFrameBlocked();
+            root.refreshHyprlandMonitorLayout();
         }
+    }
+
+    // Workspace moves can land before Hyprland announces the monitor and before the Wayland
+    // output reaches us, so re-read both models once the screen set settles (#3133)
+    function refreshHyprlandMonitorLayout() {
+        if (!isHyprland)
+            return;
+        Hyprland.refreshMonitors();
+        Hyprland.refreshWorkspaces();
     }
 
     function _screenForName(screenOrName) {

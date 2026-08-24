@@ -14,6 +14,8 @@ import (
 	wlclient "github.com/AvengeMedia/dankgo/wayland/client"
 )
 
+const largeEntryBytes = 1 << 20
+
 type Config struct {
 	MaxHistory     int   `json:"maxHistory"`
 	MaxEntrySize   int64 `json:"maxEntrySize"`

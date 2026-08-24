@@ -15,6 +15,7 @@ Rectangle {
     property bool userInitiatedExpansion: false
     property bool isAnimating: false
     property bool animateExpansion: true
+    property bool lightweight: false
     property bool isDescriptionToggleAnimation: false
     property bool _retainedExpandedContent: false
     property bool _clipAnimatedContent: false
@@ -47,8 +48,8 @@ Rectangle {
     height: expanded ? (expandedContent.height + cardPadding * 2) : (baseCardHeight + collapsedContent.extraHeight)
     readonly property real targetHeight: expanded ? (expandedContent.height + cardPadding * 2) : (baseCardHeight + collapsedContent.extraHeight)
     radius: connectedFrameMode ? Theme.connectedSurfaceRadius : Theme.cornerRadius
-    scale: (cardHoverHandler.hovered ? 1.004 : 1.0) * listLevelAdjacentScaleInfluence
-    readonly property bool shadowsAllowed: Theme.elevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
+    scale: lightweight ? 1 : (cardHoverHandler.hovered ? 1.004 : 1.0) * listLevelAdjacentScaleInfluence
+    readonly property bool shadowsAllowed: !lightweight && Theme.elevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
     readonly property var shadowElevation: Theme.elevationLevel1
     readonly property real baseShadowBlurPx: (shadowElevation && shadowElevation.blurPx !== undefined) ? shadowElevation.blurPx : 4
     readonly property real hoverShadowBlurBoost: cardHoverHandler.hovered ? Math.min(2, baseShadowBlurPx * 0.25) : 0
@@ -89,7 +90,7 @@ Rectangle {
     }
 
     Behavior on scale {
-        enabled: listLevelScaleAnimationsEnabled
+        enabled: !root.lightweight && listLevelScaleAnimationsEnabled
         NumberAnimation {
             duration: Theme.shortDuration
             easing.type: Theme.standardEasing
@@ -97,7 +98,7 @@ Rectangle {
     }
 
     Behavior on shadowBlurPx {
-        enabled: !root.connectedFrameMode
+        enabled: !root.lightweight && !root.connectedFrameMode
         NumberAnimation {
             duration: Theme.shortDuration
             easing.type: Theme.standardEasing
@@ -105,7 +106,7 @@ Rectangle {
     }
 
     Behavior on shadowOffsetXPx {
-        enabled: !root.connectedFrameMode
+        enabled: !root.lightweight && !root.connectedFrameMode
         NumberAnimation {
             duration: Theme.shortDuration
             easing.type: Theme.standardEasing
@@ -113,7 +114,7 @@ Rectangle {
     }
 
     Behavior on shadowOffsetYPx {
-        enabled: !root.connectedFrameMode
+        enabled: !root.lightweight && !root.connectedFrameMode
         NumberAnimation {
             duration: Theme.shortDuration
             easing.type: Theme.standardEasing
@@ -224,6 +225,7 @@ Rectangle {
         shadowOffsetY: root.shadowOffsetYPx
         shadowColor: root.shadowElevation ? Theme.elevationShadowColor(root.shadowElevation) : Theme.withAlpha(Theme.elevationShadowColor(root.shadowElevation), 0)
         shadowEnabled: root.shadowsAllowed && !root.connectedFrameMode
+        visible: !root.lightweight
     }
 
     Rectangle {
@@ -268,18 +270,7 @@ Rectangle {
 
         DankCircularImage {
             id: iconContainer
-            cacheImages: false
-            readonly property string rawImage: notificationGroup?.latestNotification?.image || ""
-            readonly property string iconFromImage: {
-                if (rawImage.startsWith("image://icon/"))
-                    return rawImage.substring(13);
-                return "";
-            }
-            readonly property bool imageHasSpecialPrefix: {
-                const icon = iconFromImage;
-                return icon.startsWith("material:") || icon.startsWith("svg:") || icon.startsWith("unicode:") || icon.startsWith("image:");
-            }
-            readonly property bool hasNotificationImage: rawImage !== "" && (!rawImage.startsWith("image://icon/") || iconFromImage.startsWith("/"))
+            cacheImages: root.lightweight
 
             width: iconSize
             height: iconSize
@@ -287,25 +278,9 @@ Rectangle {
             anchors.top: parent.top
             anchors.topMargin: descriptionExpanded ? Math.max(0, Theme.fontSizeSmall * 1.2 + (Theme.fontSizeMedium * 1.2 + Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 2)) / 2 - iconSize / 2) : Math.max(0, Theme.fontSizeSmall * 1.2 + (textContainer.height - Theme.fontSizeSmall * 1.2) / 2 - iconSize / 2)
 
-            imageSource: {
-                if (hasNotificationImage)
-                    return notificationGroup.latestNotification.cleanImage;
-                if (imageHasSpecialPrefix)
-                    return "";
-                const appIcon = notificationGroup?.latestNotification?.appIcon;
-                if (!appIcon)
-                    return "";
-                if (appIcon.startsWith("file://") || appIcon.startsWith("http://") || appIcon.startsWith("https://") || appIcon.includes("/"))
-                    return appIcon;
-                return "";
-            }
-
-            hasImage: hasNotificationImage
-            fallbackIcon: {
-                if (imageHasSpecialPrefix)
-                    return iconFromImage;
-                return notificationGroup?.latestNotification?.appIcon || iconFromImage || "";
-            }
+            imageSource: notificationGroup?.latestNotification?.displayImage ?? ""
+            hasImage: notificationGroup?.latestNotification?.hasDisplayImage ?? false
+            fallbackIcon: notificationGroup?.latestNotification?.fallbackIconName ?? ""
             fallbackText: {
                 const appName = notificationGroup?.appName || "?";
                 return appName.charAt(0).toUpperCase();
@@ -611,19 +586,7 @@ Rectangle {
 
                             DankCircularImage {
                                 id: messageIcon
-                                cacheImages: false
-
-                                readonly property string rawImage: modelData?.image || ""
-                                readonly property string iconFromImage: {
-                                    if (rawImage.startsWith("image://icon/"))
-                                        return rawImage.substring(13);
-                                    return "";
-                                }
-                                readonly property bool imageHasSpecialPrefix: {
-                                    const icon = iconFromImage;
-                                    return icon.startsWith("material:") || icon.startsWith("svg:") || icon.startsWith("unicode:") || icon.startsWith("image:");
-                                }
-                                readonly property bool hasNotificationImage: rawImage !== "" && (!rawImage.startsWith("image://icon/") || iconFromImage.startsWith("/"))
+                                cacheImages: root.lightweight
 
                                 width: expandedIconSize
                                 height: expandedIconSize
@@ -631,24 +594,8 @@ Rectangle {
                                 anchors.top: parent.top
                                 anchors.topMargin: Theme.fontSizeSmall * 1.2 + (compactMode ? Theme.spacingXS : Theme.spacingS)
 
-                                imageSource: {
-                                    if (hasNotificationImage)
-                                        return modelData.cleanImage;
-                                    if (imageHasSpecialPrefix)
-                                        return "";
-                                    const appIcon = modelData?.appIcon;
-                                    if (!appIcon)
-                                        return "";
-                                    if (appIcon.startsWith("file://") || appIcon.startsWith("http://") || appIcon.startsWith("https://") || appIcon.includes("/"))
-                                        return appIcon;
-                                    return "";
-                                }
-
-                                fallbackIcon: {
-                                    if (imageHasSpecialPrefix)
-                                        return iconFromImage;
-                                    return modelData?.appIcon || iconFromImage || "";
-                                }
+                                imageSource: modelData?.displayImage ?? ""
+                                fallbackIcon: modelData?.fallbackIconName ?? ""
 
                                 fallbackText: {
                                     const appName = modelData?.appName || "?";

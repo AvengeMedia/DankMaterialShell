@@ -104,21 +104,7 @@ Rectangle {
 
             DankIcon {
                 anchors.centerIn: parent
-                name: {
-                    if (!AudioService.sink || !AudioService.sink.audio)
-                        return "volume_off";
-                    let muted = AudioService.sink.audio.muted;
-                    let volume = AudioService.sink.audio.volume;
-                    if (muted)
-                        return "volume_off";
-                    if (volume === 0.0)
-                        return "volume_mute";
-                    if (volume <= 0.33)
-                        return "volume_down";
-                    if (volume <= 0.66)
-                        return "volume_up";
-                    return "volume_up";
-                }
+                name: AudioService.sinkVolumeIconName
                 size: Theme.iconSize
                 color: AudioService.sink && AudioService.sink.audio && !AudioService.sink.audio.muted && AudioService.sink.audio.volume > 0 ? Theme.primary : Theme.surfaceText
             }
@@ -502,23 +488,7 @@ Rectangle {
 
                                 DankIcon {
                                     anchors.centerIn: parent
-                                    name: {
-                                        if (!modelData)
-                                            return "volume_off";
-
-                                        let volume = modelData.audio.volume;
-                                        let muted = modelData.audio.muted;
-
-                                        if (muted)
-                                            return "volume_off";
-                                        if (volume === 0.0)
-                                            return "volume_mute";
-                                        if (volume <= 0.33)
-                                            return "volume_down";
-                                        if (volume <= 0.66)
-                                            return "volume_up";
-                                        return "volume_up";
-                                    }
+                                    name: AudioService.volumeIconName(modelData)
                                     size: Theme.iconSize
                                     color: modelData && !modelData.audio.muted && modelData.audio.volume > 0 ? Theme.primary : Theme.surfaceText
                                 }

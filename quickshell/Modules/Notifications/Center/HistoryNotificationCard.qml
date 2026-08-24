@@ -144,43 +144,15 @@ Rectangle {
         DankCircularImage {
             id: iconContainer
             cacheImages: false
-            readonly property string rawImage: historyItem.image || ""
-            readonly property string iconFromImage: {
-                if (rawImage.startsWith("image://icon/"))
-                    return rawImage.substring(13);
-                return "";
-            }
-            readonly property bool imageHasSpecialPrefix: {
-                const icon = iconFromImage;
-                return icon.startsWith("material:") || icon.startsWith("svg:") || icon.startsWith("unicode:") || icon.startsWith("image:");
-            }
-            readonly property bool hasNotificationImage: rawImage !== "" && (!rawImage.startsWith("image://icon/") || iconFromImage.startsWith("/"))
-            readonly property string resolvedImage: iconFromImage.startsWith("/") ? ("file://" + iconFromImage) : rawImage
 
             width: iconSize
             height: iconSize
             anchors.left: parent.left
             anchors.top: parent.top
 
-            imageSource: {
-                if (hasNotificationImage)
-                    return resolvedImage;
-                if (imageHasSpecialPrefix)
-                    return "";
-                const appIcon = historyItem.appIcon;
-                if (!appIcon)
-                    return "";
-                if (appIcon.startsWith("file://") || appIcon.startsWith("http://") || appIcon.startsWith("https://") || appIcon.includes("/"))
-                    return appIcon;
-                return "";
-            }
-
-            hasImage: hasNotificationImage
-            fallbackIcon: {
-                if (imageHasSpecialPrefix)
-                    return iconFromImage;
-                return historyItem.appIcon || iconFromImage || "";
-            }
+            imageSource: NotificationService.notificationImageSource(historyItem.image || "", historyItem.appIcon || "")
+            hasImage: NotificationService.notificationHasImage(historyItem.image || "")
+            fallbackIcon: NotificationService.notificationFallbackIcon(historyItem.image || "", historyItem.appIcon || "")
             fallbackText: {
                 const appName = historyItem.appName || "?";
                 return appName.charAt(0).toUpperCase();

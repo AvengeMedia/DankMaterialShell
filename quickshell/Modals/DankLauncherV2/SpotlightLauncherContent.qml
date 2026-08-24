@@ -10,16 +10,21 @@ FocusScope {
 
     property var parentModal: null
     property alias searchField: searchInput
-    property alias controller: searchController
+    property var controllerOverride: null
+    readonly property var controller: controllerOverride ?? searchController
     readonly property alias activeContextMenu: contextMenu
     property var transientSurfaceTracker: null
+    property bool showResultsWithoutQuery: false
+    property bool suspendSearchUpdates: false
+    property real maxResultsHeight: 0
 
-    readonly property bool _hasQuery: searchInput.text.length > 0
+    readonly property bool _hasQuery: root.showResultsWithoutQuery || searchInput.text.length > 0
     readonly property real _searchBarH: 56
     readonly property real _searchAreaH: _searchBarH
+    readonly property alias searchAreaHeight: root._searchAreaH
     readonly property real _statusH: 92
     readonly property real _rowH: 64
-    readonly property real _maxResultsH: Math.min(430, (parentModal?.screenHeight ?? 900) * 0.55)
+    readonly property real _maxResultsH: root.maxResultsHeight > 0 ? root.maxResultsHeight : Math.min(430, (parentModal?.screenHeight ?? 900) * 0.55)
     readonly property var _resultRows: _buildRows()
     readonly property real _resultsContentH: _resultRows.length > 0 ? _resultRows.length * _rowH + resultsList.bottomInset : _statusH
     readonly property real _resultsH: _hasQuery ? Math.min(_resultsContentH, _maxResultsH) : 0
@@ -35,7 +40,7 @@ FocusScope {
     }
     readonly property color _searchSurfaceColor: Theme.withAlpha(_hasQuery ? Theme.surfaceContainerHigh : Theme.surfaceContainer, _searchSurfaceAlpha)
     readonly property color _searchWellColor: {
-        if (searchInput.activeFocus)
+        if (searchInput.getActiveFocus())
             return Theme.withAlpha(Theme.primaryContainer, Theme.transparentBlurLayers ? 0.42 : 1.0);
         if (Theme.transparentBlurLayers)
             return Theme.ccPillInactiveBg;
@@ -58,14 +63,20 @@ FocusScope {
         resultsList.resetScroll();
     }
 
+    function resetSearch() {
+        root.controller.reset();
+        if (root.showResultsWithoutQuery)
+            root.controller.performSearch();
+    }
+
     function closeTransientUi() {
         transientSurfaceTracker?.closeAll?.();
         root.enabled = true;
     }
 
     function _buildRows() {
-        const flat = searchController.flatModel || [];
-        const sections = searchController.sections || [];
+        const flat = root.controller.flatModel || [];
+        const sections = root.controller.sections || [];
         const rows = [];
         const seen = {};
         for (let i = 0; i < flat.length; i++) {
@@ -106,7 +117,7 @@ FocusScope {
 
         switch (event.key) {
         case Qt.Key_Escape:
-            if (searchController.clearPluginFilter()) {
+            if (root.controller.clearPluginFilter()) {
                 event.accepted = true;
                 return;
             }
@@ -115,12 +126,12 @@ FocusScope {
             return;
         case Qt.Key_Backspace:
             if (searchInput.text.length === 0) {
-                if (searchController.clearPluginFilter()) {
+                if (root.controller.clearPluginFilter()) {
                     event.accepted = true;
                     return;
                 }
-                if (searchController.autoSwitchedToFiles) {
-                    searchController.restorePreviousMode();
+                if (root.controller.autoSwitchedToFiles) {
+                    root.controller.restorePreviousMode();
                     event.accepted = true;
                     return;
                 }
@@ -128,31 +139,31 @@ FocusScope {
             event.accepted = false;
             return;
         case Qt.Key_Down:
-            searchController.selectNext();
+            root.controller.selectNext();
             event.accepted = true;
             return;
         case Qt.Key_Up:
-            searchController.selectPrevious();
+            root.controller.selectPrevious();
             event.accepted = true;
             return;
         case Qt.Key_PageDown:
-            searchController.selectPageDown(7);
+            root.controller.selectPageDown(7);
             event.accepted = true;
             return;
         case Qt.Key_PageUp:
-            searchController.selectPageUp(7);
+            root.controller.selectPageUp(7);
             event.accepted = true;
             return;
         case Qt.Key_J:
             if (hasCtrl) {
-                searchController.selectNext();
+                root.controller.selectNext();
                 event.accepted = true;
                 return;
             }
             break;
         case Qt.Key_K:
             if (hasCtrl) {
-                searchController.selectPrevious();
+                root.controller.selectPrevious();
                 event.accepted = true;
                 return;
             }
@@ -168,45 +179,45 @@ FocusScope {
         case Qt.Key_Return:
         case Qt.Key_Enter:
             if (event.modifiers & Qt.ShiftModifier) {
-                searchController.pasteSelected();
+                root.controller.pasteSelected();
             } else {
-                searchController.executeSelected();
+                root.controller.executeSelected();
             }
             event.accepted = true;
             return;
         case Qt.Key_Menu:
         case Qt.Key_F10:
-            if (contextMenu.hasContextMenuActions(searchController.selectedItem)) {
+            if (contextMenu.hasContextMenuActions(root.controller.selectedItem)) {
                 const scenePos = resultsList.getSelectedItemPosition();
-                _showContextMenu(searchController.selectedItem, scenePos.x, scenePos.y, true);
+                _showContextMenu(root.controller.selectedItem, scenePos.x, scenePos.y, true);
                 event.accepted = true;
                 return;
             }
             break;
         case Qt.Key_1:
             if (hasCtrl || hasAlt) {
-                searchController.setMode("all");
+                root.controller.setMode("all");
                 event.accepted = true;
                 return;
             }
             break;
         case Qt.Key_2:
             if (hasCtrl || hasAlt) {
-                searchController.setMode("apps");
+                root.controller.setMode("apps");
                 event.accepted = true;
                 return;
             }
             break;
         case Qt.Key_3:
             if (hasCtrl || hasAlt) {
-                searchController.setMode("files");
+                root.controller.setMode("files");
                 event.accepted = true;
                 return;
             }
             break;
         case Qt.Key_4:
             if (hasCtrl || hasAlt) {
-                searchController.setMode("plugins");
+                root.controller.setMode("plugins");
                 event.accepted = true;
                 return;
             }
@@ -218,19 +229,15 @@ FocusScope {
 
     Controller {
         id: searchController
-        active: root.parentModal ? (root.parentModal.spotlightOpen || root.parentModal.isClosing) : true
+        active: !root.controllerOverride && (root.parentModal ? (root.parentModal.spotlightOpen || root.parentModal.isClosing) : true)
         viewModeContext: "spotlight"
         forceLinearNavigation: true
-
-        onItemExecuted: {
-            root.parentModal?.hide();
-        }
     }
 
     LauncherContextMenu {
         id: contextMenu
         parent: root
-        controller: searchController
+        controller: root.controller
         searchField: searchInput
         parentHandler: root
         allowEditActions: false
@@ -257,7 +264,13 @@ FocusScope {
     }
 
     Connections {
-        target: searchController
+        target: root.controller
+
+        function onItemExecuted() {
+            root.parentModal?.hide();
+            if (SettingsData.spotlightCloseNiriOverview && NiriService.inOverview)
+                NiriService.toggleOverview();
+        }
         function onModeChanged(mode, userInitiated) {
             if (!userInitiated || !SettingsData.rememberLastMode)
                 return;
@@ -301,9 +314,9 @@ FocusScope {
 
                 DankIcon {
                     anchors.centerIn: parent
-                    name: searchController.activePluginId ? "extension" : searchController.searchMode === "files" ? "folder" : "search"
+                    name: root.controller.activePluginId ? "extension" : root.controller.searchMode === "files" ? "folder" : "search"
                     size: 20
-                    color: searchInput.activeFocus ? Theme.primary : Theme.surfaceVariantText
+                    color: searchInput.getActiveFocus() ? Theme.primary : Theme.surfaceVariantText
                 }
             }
 
@@ -375,50 +388,41 @@ FocusScope {
                     visible: searchInput.text.length > 0
                     onClicked: {
                         searchInput.text = "";
-                        searchController.reset();
                         root._focusSearch();
                     }
                 }
             }
 
-            Text {
-                anchors.left: leadingWell.right
-                anchors.leftMargin: Theme.spacingM
-                anchors.right: rightControls.left
-                anchors.rightMargin: Theme.spacingS
-                anchors.verticalCenter: parent.verticalCenter
-                text: I18n.tr("Spotlight Search")
-                font.pixelSize: 18
-                font.weight: Font.Medium
-                color: Theme.outlineButton
-                visible: searchInput.text.length === 0 && !searchInput.inputMethodComposing
-                clip: true
-            }
-
-            TextInput {
+            DankTextField {
                 id: searchInput
                 anchors.left: leadingWell.right
-                anchors.leftMargin: Theme.spacingM
                 anchors.right: rightControls.left
-                anchors.rightMargin: Theme.spacingS
-                anchors.verticalCenter: parent.verticalCenter
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
                 font.pixelSize: 18
                 font.weight: Font.Medium
-                color: Theme.surfaceText
-                selectionColor: Theme.primary
-                selectedTextColor: Theme.primaryText
-                clip: true
-                focus: true
+                placeholderText: I18n.tr("Spotlight Search")
+                hidePlaceholderOnFocus: false
+                backgroundColor: "transparent"
+                borderWidth: 0
+                focusedBorderWidth: 0
+                keyForwardTargets: [searchKeyHandler]
 
                 onTextChanged: {
+                    if (root.suspendSearchUpdates)
+                        return;
                     if (text.length > 0) {
-                        searchController.setSearchQuery(text);
+                        root.controller.setSearchQuery(text);
                     } else {
-                        searchController.reset();
+                        root.resetSearch();
                     }
                 }
 
-                Keys.onPressed: event => root._handleKey(event)
+                Item {
+                    id: searchKeyHandler
+
+                    Keys.onPressed: event => root._handleKey(event)
+                }
             }
         }
     }
@@ -443,7 +447,7 @@ FocusScope {
         SpotlightResultsList {
             id: resultsList
             anchors.fill: parent
-            controller: searchController
+            controller: root.controller
             hasQuery: root._hasQuery
             rows: root._resultRows
 
@@ -473,7 +477,7 @@ FocusScope {
     ]
 
     function _isCategorySelected(cat) {
-        return searchController.searchMode === cat.mode;
+        return root.controller.searchMode === cat.mode;
     }
 
     function _cycleCategory(reverse) {
@@ -492,9 +496,9 @@ FocusScope {
         const cat = _categoryModel[index];
         if (!cat)
             return;
-        searchController.setMode(cat.mode, false);
+        root.controller.setMode(cat.mode, false);
         if (root._hasQuery)
-            searchController.setSearchQuery(searchInput.text);
+            root.controller.setSearchQuery(searchInput.text);
         root._focusSearch();
     }
 }

@@ -132,9 +132,11 @@ This runs gofmt, golangci-lint, tests, and builds before each commit when `core/
 
 **Regenerating Wayland Protocol Bindings:**
 
+Protocol XML files live in `internal/proto/xml/`. Bindings are generated with the [dankgo](https://github.com/AvengeMedia/dankgo) `go-wayland-scanner`:
+
 ```bash
-go install github.com/rajveermalviya/go-wayland/cmd/go-wayland-scanner@latest
-go-wayland-scanner -i internal/proto/xml/wlr-gamma-control-unstable-v1.xml \
+go run github.com/AvengeMedia/dankgo/cmd/go-wayland-scanner@latest \
+  -i internal/proto/xml/wlr-gamma-control-unstable-v1.xml \
   -pkg wlr_gamma_control -o internal/proto/wlr_gamma_control/gamma_control.go
 ```
 

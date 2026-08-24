@@ -64,7 +64,8 @@ Item {
     }
 
     readonly property bool useSpotlightBackend: !FrameTransitionState.effectiveConnectedFrameModeActive && SettingsData.launcherStyle === "spotlight"
-    readonly property var _desiredBackend: useSpotlightBackend ? spotlightComp : (FrameTransitionState.effectiveConnectedFrameModeActive ? connectedComp : standaloneComp)
+    readonly property bool useIslandBackend: !FrameTransitionState.effectiveConnectedFrameModeActive && SettingsData.launcherStyle === "island"
+    readonly property var _desiredBackend: FrameTransitionState.effectiveConnectedFrameModeActive ? connectedComp : useIslandBackend ? islandComp : useSpotlightBackend ? spotlightComp : standaloneComp
     property var _resolvedBackend: null
 
     Component.onCompleted: _resolvedBackend = _desiredBackend
@@ -109,6 +110,11 @@ Item {
     Component {
         id: spotlightComp
         DankLauncherV2ModalSpotlight {}
+    }
+
+    Component {
+        id: islandComp
+        DankLauncherV2ModalIsland {}
     }
 
     function _wireBackend(it) {

@@ -11,8 +11,23 @@ Card {
 
     signal clicked
 
-    Component.onCompleted: WeatherService.addRef()
-    Component.onDestruction: WeatherService.removeRef()
+    property bool live: Window.window?.visible ?? false
+    property bool weatherRefHeld: false
+
+    function syncWeatherRef(wanted) {
+        if (wanted === weatherRefHeld)
+            return;
+        weatherRefHeld = wanted;
+        if (wanted) {
+            WeatherService.addRef();
+            return;
+        }
+        WeatherService.removeRef();
+    }
+
+    onLiveChanged: syncWeatherRef(live)
+    Component.onCompleted: syncWeatherRef(live)
+    Component.onDestruction: syncWeatherRef(false)
 
     Column {
         anchors.centerIn: parent
@@ -71,12 +86,7 @@ Card {
 
             StyledText {
                 anchors.left: parent.left
-                text: {
-                    const temp = SettingsData.useFahrenheit ? WeatherService.weather.tempF : WeatherService.weather.temp;
-                    if (temp === undefined || temp === null)
-                        return "--°" + (SettingsData.useFahrenheit ? "F" : "C");
-                    return temp + "°" + (SettingsData.useFahrenheit ? "F" : "C");
-                }
+                text: WeatherService.currentTempText(false)
                 font.pixelSize: Theme.fontSizeXLarge + 4
                 color: Theme.surfaceText
                 font.weight: Font.Light

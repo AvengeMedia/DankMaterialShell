@@ -7,6 +7,8 @@ import qs.Widgets
 Card {
     id: root
 
+    property bool live: Window.window?.visible ?? false
+
     Column {
         anchors.centerIn: parent
         spacing: 0
@@ -110,13 +112,16 @@ Card {
 
     SystemClock {
         id: systemClock
-        precision: SettingsData.showSeconds ? SystemClock.Seconds : SystemClock.Minutes
+        enabled: root.live
+        precision: root.live && SettingsData.showSeconds ? SystemClock.Seconds : SystemClock.Minutes
     }
 
     Connections {
         target: SessionService
 
         function onSessionResumed() {
+            if (!root.live)
+                return;
             systemClock.enabled = false;
             systemClock.enabled = true;
         }

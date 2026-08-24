@@ -145,8 +145,10 @@ func (s *Screenshoter) captureRegion() (*CaptureResult, error) {
 		return nil, nil
 	}
 
-	if err := SaveLastRegion(result.Region); err != nil {
-		log.Debug("failed to save last region", "err", err)
+	if result.Region.Output != "" {
+		if err := SaveLastRegion(result.Region); err != nil {
+			log.Debug("failed to save last region", "err", err)
+		}
 	}
 
 	if out := s.findOutputByName(result.Region.Output); out != nil {

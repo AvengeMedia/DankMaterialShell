@@ -19,7 +19,8 @@ if [[ -n "${QS_ARGS:-}" ]]; then
     # shellcheck disable=SC2206
     qs_args=($QS_ARGS)
 else
-    config_path="$("$QS_BIN" list --all 2>/dev/null | awk -F': ' '/Config path:/ { print $2; exit }')"
+    repo_shell="$(cd "$(dirname "$0")/.." && pwd)/quickshell/shell.qml"
+    config_path="$("$QS_BIN" list --all 2>/dev/null | awk -F': ' -v want="$repo_shell" '/Config path:/ { if ($2 == want) { print $2; found = 1; exit } if (!first) first = $2 } END { if (!found) print first }')"
     if [[ -n "$config_path" ]]; then
         qs_args=(-p "$config_path")
     else

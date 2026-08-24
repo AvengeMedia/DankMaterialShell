@@ -11,11 +11,11 @@ Card {
     signal clicked
 
     property MprisPlayer activePlayer: MprisController.activePlayer
-    readonly property bool windowVisible: Window.window?.visible ?? false
+    property bool live: Window.window?.visible ?? false
 
     Timer {
         interval: 300
-        running: root.windowVisible && activePlayer?.playbackState === MprisPlaybackState.Playing && !isSeeking
+        running: root.live && activePlayer?.playbackState === MprisPlaybackState.Playing && !isSeeking
         repeat: true
         onTriggered: activePlayer?.positionSupported && activePlayer.positionChanged()
     }
@@ -62,7 +62,7 @@ Card {
                 artUrl: TrackArtService.resolvedArtUrl
                 accentColor: MediaAccentService.accent
                 cavaService: CavaService
-                showAnimation: SettingsData.audioVisualizerEnabled
+                showAnimation: root.live && SettingsData.audioVisualizerEnabled
                 albumSize: 76
                 animationScale: 1.05
             }

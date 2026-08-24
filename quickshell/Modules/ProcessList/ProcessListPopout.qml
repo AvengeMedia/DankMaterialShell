@@ -62,6 +62,7 @@ DankPopout {
 
     Ref {
         service: DgopService
+        active: processListPopout.shouldBeVisible
     }
 
     ProcessContextMenu {
@@ -378,6 +379,7 @@ DankPopout {
                         id: processesView
                         anchors.fill: parent
                         anchors.margins: Theme.spacingS
+                        active: processListPopout.shouldBeVisible || processListPopout.isClosing
                         searchText: processListPopout.searchText
                         expandedPid: processListPopout.expandedPid
                         processFilter: processListPopout.processFilter

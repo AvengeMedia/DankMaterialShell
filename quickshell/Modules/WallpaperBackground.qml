@@ -572,8 +572,6 @@ Variants {
             }
 
             function startTransition() {
-                currentWallpaper.layer.enabled = true;
-                nextWallpaper.layer.enabled = true;
                 root.useNextForEffect = true;
                 root.effectActive = true;
                 if (srcCurrent.scheduleUpdate)
@@ -708,7 +706,6 @@ Variants {
                 anchors.fill: parent
                 visible: !root.effectiveScrolling
                 opacity: 1
-                layer.enabled: false
                 asynchronous: true
                 retainWhileLoading: true
                 smooth: true
@@ -740,7 +737,6 @@ Variants {
                 anchors.fill: parent
                 visible: source !== ""
                 opacity: 0
-                layer.enabled: false
                 asynchronous: true
                 retainWhileLoading: true
                 smooth: true
@@ -1087,8 +1083,6 @@ Variants {
                     root.useNextForEffect = false;
                     nextWallpaper.source = "";
                     root.transitionProgress = 0.0;
-                    currentWallpaper.layer.enabled = false;
-                    nextWallpaper.layer.enabled = false;
                     root.effectActive = false;
                     root.changePending = false;
 

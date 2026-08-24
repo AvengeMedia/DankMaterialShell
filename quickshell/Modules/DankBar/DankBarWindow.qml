@@ -69,8 +69,14 @@ PanelWindow {
 
     BackgroundEffect.blurRegion: body.blurRegion
 
-    Component.onCompleted: KeyboardFocus.registerBarWindow(barWindow)
-    Component.onDestruction: KeyboardFocus.unregisterBarWindow(barWindow)
+    Component.onCompleted: {
+        KeyboardFocus.registerBarWindow(barWindow);
+        SurfaceRecovery.track(barWindow);
+    }
+    Component.onDestruction: {
+        KeyboardFocus.unregisterBarWindow(barWindow);
+        SurfaceRecovery.untrack(barWindow);
+    }
 
     IdleInhibitor {
         window: barWindow

@@ -13,6 +13,7 @@ import (
 	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/clipboard"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/notify"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/screenshot"
 	"github.com/spf13/cobra"
 )
@@ -152,7 +153,7 @@ var notifyActionCmd = &cobra.Command{
 	Use:    "notify-action",
 	Hidden: true,
 	Run: func(cmd *cobra.Command, args []string) {
-		screenshot.RunNotifyActionListener(args)
+		notify.RunActionListener(args)
 	},
 }
 
@@ -358,13 +359,14 @@ func runScreenshot(config screenshot.Config) {
 
 	if config.Notify {
 		thumbData, thumbW, thumbH := bufferToRGBThumbnail(result.Buffer, 256, result.Format)
-		screenshot.SendNotification(screenshot.NotifyResult{
+		id := screenshot.SendNotification(screenshot.NotifyResult{
 			FilePath:  filePath,
 			Clipboard: config.Clipboard,
 			ImageData: thumbData,
 			Width:     thumbW,
 			Height:    thumbH,
 		})
+		watchNotificationAction(id, filePath)
 	}
 }
 

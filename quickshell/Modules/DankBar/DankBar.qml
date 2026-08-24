@@ -10,7 +10,6 @@ Item {
 
     required property var barConfig
 
-    signal colorPickerRequested
     signal barReady(var barConfig)
 
     Component.onCompleted: BarWidgetService.registerDankBarItem(root.barConfig?.id, root)
@@ -166,7 +165,14 @@ Item {
             const base = Quickshell.screens.filter(screen => SettingsData.barConfigCoversScreen(root.barConfig, screen));
             // Connected frame mode renders the bar inside the frame surface; skip the standalone window there
             // unless this bar wants the overlay layer, which the frame surface cannot provide.
-            return base.filter(screen => !CompositorService.frameHostsBarForConfig(screen, root.barConfig));
+            return base.filter(screen => {
+                if (CompositorService.frameHostsBarForConfig(screen, root.barConfig))
+                    return false;
+                if (SettingsData.isIslandBarConfig(root.barConfig))
+                    return false;
+                const edge = SettingsData.positionToSide(root.barConfig?.position ?? SettingsData.Position.Top);
+                return !SettingsData.dankIslandOwnsEdge(screen, edge);
+            });
         }
 
         delegate: DankBarWindow {

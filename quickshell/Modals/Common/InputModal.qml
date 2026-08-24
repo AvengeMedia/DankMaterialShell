@@ -91,6 +91,8 @@ DankModal {
 
     content: Component {
         FocusScope {
+            id: inputContent
+
             anchors.fill: parent
             implicitHeight: mainColumn.implicitHeight
             focus: true
@@ -98,7 +100,7 @@ DankModal {
             property alias textInputRef: textInput
 
             Keys.onPressed: function (event) {
-                const textFieldFocused = textInput.activeFocus;
+                const textFieldFocused = textInput.getActiveFocus();
 
                 switch (event.key) {
                 case Qt.Key_Escape:
@@ -109,7 +111,7 @@ DankModal {
                     if (textFieldFocused) {
                         root.keyboardNavigation = true;
                         root.selectedButton = 0;
-                        textInput.focus = false;
+                        textInput.setFocus(false);
                     } else {
                         root.keyboardNavigation = true;
                         if (root.selectedButton === -1) {
@@ -189,38 +191,22 @@ DankModal {
                     visible: root.inputMessage !== ""
                 }
 
-                Rectangle {
+                DankTextField {
+                    id: textInput
+
                     width: parent.width
                     height: 40
-                    radius: Theme.cornerRadius
-                    color: Theme.surfaceVariantAlpha
-                    border.color: textInput.activeFocus ? Theme.primary : Theme.withAlpha(Theme.primary, 0)
-                    border.width: textInput.activeFocus ? 1 : 0
-
-                    TextInput {
-                        id: textInput
-
-                        anchors.fill: parent
-                        anchors.leftMargin: Theme.spacingM
-                        anchors.rightMargin: Theme.spacingM
-                        verticalAlignment: TextInput.AlignVCenter
-                        font.pixelSize: Theme.fontSizeMedium
-                        color: Theme.surfaceText
-                        selectionColor: Theme.primary
-                        selectedTextColor: Theme.primaryText
-                        clip: true
-                        text: root.inputText
-                        onTextChanged: root.inputText = text
-
-                        StyledText {
-                            anchors.fill: parent
-                            verticalAlignment: Text.AlignVCenter
-                            font.pixelSize: Theme.fontSizeMedium
-                            color: Theme.onSurface_38
-                            text: root.inputPlaceholder
-                            visible: textInput.text === "" && !textInput.activeFocus
-                        }
-                    }
+                    font.pixelSize: Theme.fontSizeMedium
+                    placeholderText: root.inputPlaceholder
+                    placeholderColor: Theme.onSurface_38
+                    backgroundColor: Theme.surfaceVariantAlpha
+                    normalBorderColor: Theme.withAlpha(Theme.primary, 0)
+                    focusedBorderColor: Theme.primary
+                    borderWidth: 0
+                    focusedBorderWidth: 1
+                    text: root.inputText
+                    keyForwardTargets: [inputContent]
+                    onTextChanged: root.inputText = text
                 }
 
                 Item {

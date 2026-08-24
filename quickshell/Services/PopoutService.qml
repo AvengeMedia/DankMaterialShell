@@ -23,6 +23,8 @@ Singleton {
     property var batteryPopoutLoader: null
     property var vpnPopout: null
     property var vpnPopoutLoader: null
+    property var colorPickerPopout: null
+    property var colorPickerPopoutLoader: null
     property var systemUpdatePopout: null
     property var systemUpdateLoader: null
     property var layoutPopout: null
@@ -37,6 +39,7 @@ Singleton {
     property var chatPopout: null
     property var dankLauncherV2Modal: null
     property var dankLauncherV2ModalLoader: null
+    property var dankIslandRouter: null
     property var spotlightBarModal: null
     property var spotlightBarModalLoader: null
     property var powerMenuModal: null
@@ -54,6 +57,7 @@ Singleton {
     property var polkitAuthModal: null
     property var polkitAuthModalLoader: null
     property var bluetoothPairingModal: null
+    property var bluetoothPairingModalLoader: null
     property var networkInfoModal: null
     property var windowRuleModalLoader: null
     property var powerProfileModal: null
@@ -118,6 +122,7 @@ Singleton {
             "processList": () => _unloadPopoutNow("processListPopout", "processListPopoutLoader"),
             "battery": () => _unloadPopoutNow("batteryPopout", "batteryPopoutLoader"),
             "vpn": () => _unloadPopoutNow("vpnPopout", "vpnPopoutLoader"),
+            "colorPicker": () => _unloadPopoutNow("colorPickerPopout", "colorPickerPopoutLoader"),
             "systemUpdate": () => _unloadPopoutNow("systemUpdatePopout", "systemUpdateLoader"),
             "layout": () => _unloadPopoutNow("layoutPopout", "layoutPopoutLoader"),
             "clipboardHistory": () => _unloadPopoutNow("clipboardHistoryPopout", "clipboardHistoryPopoutLoader"),
@@ -130,7 +135,30 @@ Singleton {
         }
     }
 
+    function _islandOwnsSharedTrigger(screen) {
+        const target = screen ?? dankIslandRouter?.focusedIslandScreen?.() ?? null;
+        if (dankIslandRouter?.hasHostForScreen?.(target) !== true)
+            return false;
+        return SettingsData.dankIslandIsSoleBarForScreen(target);
+    }
+
+    readonly property bool islandControlCenterOpen: dankIslandRouter?.controlCenterOpen ?? false
+
+    function routeToIsland(activityId, screen, shouldToggle, section) {
+        if (!_islandOwnsSharedTrigger(screen))
+            return false;
+        if (shouldToggle === true)
+            return dankIslandRouter.toggleActivity(activityId, screen ?? null, section || "") === true;
+        return dankIslandRouter.openActivity(activityId, screen ?? null, section || "") === true;
+    }
+
+    function closeIslandActivity(activityId) {
+        return dankIslandRouter?.closeActivity?.(activityId) === true;
+    }
+
     function openControlCenter(x, y, width, section, screen) {
+        if (routeToIsland("controlcenter", screen, false, section))
+            return;
         if (controlCenterPopout) {
             setPosition(controlCenterPopout, x, y, width, section, screen);
             controlCenterPopout.open();
@@ -138,6 +166,8 @@ Singleton {
     }
 
     function closeControlCenter() {
+        if (closeIslandActivity("controlcenter"))
+            return;
         controlCenterPopout?.close();
     }
 
@@ -146,6 +176,8 @@ Singleton {
     }
 
     function toggleControlCenter(x, y, width, section, screen) {
+        if (routeToIsland("controlcenter", screen, true, section))
+            return;
         if (controlCenterPopout) {
             setPosition(controlCenterPopout, x, y, width, section, screen);
             controlCenterPopout.toggle();
@@ -153,6 +185,8 @@ Singleton {
     }
 
     function openNotificationCenter(x, y, width, section, screen) {
+        if (routeToIsland("notificationcenter", screen, false))
+            return;
         if (notificationCenterPopout) {
             setPosition(notificationCenterPopout, x, y, width, section, screen);
             notificationCenterPopout.open();
@@ -160,6 +194,8 @@ Singleton {
     }
 
     function closeNotificationCenter() {
+        if (closeIslandActivity("notificationcenter"))
+            return;
         notificationCenterPopout?.close();
     }
 
@@ -168,6 +204,8 @@ Singleton {
     }
 
     function toggleNotificationCenter(x, y, width, section, screen) {
+        if (routeToIsland("notificationcenter", screen, true))
+            return;
         if (notificationCenterPopout) {
             setPosition(notificationCenterPopout, x, y, width, section, screen);
             notificationCenterPopout.toggle();
@@ -916,6 +954,19 @@ Singleton {
 
     function hideColorPicker() {
         colorPickerModal?.close();
+    }
+
+    function unloadColorPicker() {
+        _scheduleUnload("colorPicker");
+    }
+
+    function ensureBluetoothPairingModal() {
+        if (bluetoothPairingModal)
+            return bluetoothPairingModal;
+        if (!bluetoothPairingModalLoader)
+            return null;
+        bluetoothPairingModalLoader.active = true;
+        return bluetoothPairingModalLoader.item;
     }
 
     function showNotificationModal() {

@@ -200,7 +200,9 @@ func (p *NotifyPolicy) Notify(ctx context.Context, m Message, providerName strin
 		n.FilePath = m.MediaPath
 	}
 
-	if err := notify.Send(n); err != nil {
+	// Send returns the notification id, which chat has no use for: these are
+	// fire-and-forget and never replaced or recalled.
+	if _, err := notify.Send(n); err != nil {
 		log.Warnf("chat: notification failed: %v", err)
 		return false
 	}

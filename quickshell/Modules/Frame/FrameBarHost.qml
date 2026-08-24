@@ -27,6 +27,10 @@ Item {
                 continue;
             if (!SettingsData.barConfigCoversScreen(bc, host.targetScreen))
                 continue;
+            if (SettingsData.isIslandBarConfig(bc))
+                continue;
+            if (SettingsData.dankIslandOwnsEdge(host.targetScreen, SettingsData.positionToSide(bc.position ?? SettingsData.Position.Top)))
+                continue;
             let edge = "top";
             switch (bc.position ?? 0) {
             case SettingsData.Position.Bottom:

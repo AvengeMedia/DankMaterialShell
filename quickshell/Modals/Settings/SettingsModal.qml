@@ -11,6 +11,8 @@ DankFloatingWindow {
     property var profileBrowser: profileBrowserLoader.item
     property var wallpaperBrowser: wallpaperBrowserLoader.item
 
+    Component.onCompleted: MultimediaService.ensureProbed()
+
     function openProfileBrowser(allowStacking) {
         profileBrowserLoader.active = true;
         if (!profileBrowserLoader.item)
@@ -86,6 +88,11 @@ DankFloatingWindow {
         showWithTabName("keybinds");
     }
 
+    function openPluginSettings(pluginId: string) {
+        setTabIndex(12);
+        content.openPluginSettings(pluginId);
+    }
+
     function toggleMenu() {
         enableAnimations = true;
         menuVisible = !menuVisible;
@@ -149,6 +156,7 @@ DankFloatingWindow {
             }
             onDialogClosed: () => {
                 allowStacking = true;
+                Qt.callLater(() => profileBrowserLoader.active = false);
             }
         }
     }
@@ -169,10 +177,13 @@ DankFloatingWindow {
             fileExtensions: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp", "*.jxl", "*.avif", "*.heif", "*.exr"]
             onFileSelected: path => {
                 SessionData.setWallpaper(path);
+                SessionData.wallpaperCyclingFolderPath = "";
+                SessionData.saveSettings();
                 close();
             }
             onDialogClosed: () => {
                 allowStacking = true;
+                Qt.callLater(() => wallpaperBrowserLoader.active = false);
             }
         }
     }

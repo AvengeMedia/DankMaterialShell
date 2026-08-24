@@ -1,6 +1,4 @@
 import QtQuick
-import QtQuick.Shapes
-import Quickshell.Services.UPower
 import qs.Common
 import qs.Modules.Plugins
 import qs.Services
@@ -110,234 +108,6 @@ BasePill {
 
     visible: true
 
-    // AOSP's battery bolt glyph (config_batterymeterBoltPath), solid-filled and
-    // cropped tight to its own ink so it reads bold at normal icon size instead
-    // of needing to be inflated past the bar's calibrated icon height.
-    component OfficialBolt: Shape {
-        id: officialBolt
-        property color fillColor: Theme.surfaceText
-        property real size: 16
-        implicitWidth: Math.round(officialBolt.size * (6 / 13))
-        implicitHeight: Math.round(officialBolt.size)
-        preferredRendererType: Shape.CurveRenderer
-
-        ShapePath {
-            fillColor: officialBolt.fillColor
-            strokeColor: "transparent"
-
-            startX: officialBolt.width * (1 / 3)
-            startY: officialBolt.height
-            PathLine {
-                x: officialBolt.width * (1 / 3)
-                y: officialBolt.height * (7.5 / 13)
-            }
-            PathLine {
-                x: 0
-                y: officialBolt.height * (7.5 / 13)
-            }
-            PathLine {
-                x: officialBolt.width * (2 / 3)
-                y: 0
-            }
-            PathLine {
-                x: officialBolt.width * (2 / 3)
-                y: officialBolt.height * (5.5 / 13)
-            }
-            PathLine {
-                x: officialBolt.width
-                y: officialBolt.height * (5.5 / 13)
-            }
-            PathLine {
-                x: officialBolt.width * (1 / 3)
-                y: officialBolt.height
-            }
-        }
-    }
-
-    // Material 3 style horizontal/vertical battery pill with the level inside
-    component BatteryPill: Item {
-        id: pill
-
-        property real thickness: 18
-        property bool vertical: false
-        property bool showNumber: true
-        property bool showPercentSign: false
-
-        readonly property int signSize: Math.max(1, Math.round(pill.glyphSize * 0.72))
-        readonly property real bodyLength: Math.round(pill.thickness * 1.95)
-        readonly property real level: Math.max(0, Math.min(100, BatteryService.batteryLevel))
-        readonly property bool charging: BatteryService.isCharging
-        readonly property bool lowState: BatteryService.isLowBattery && !BatteryService.isCharging
-        readonly property color fillColor: {
-            if (!BatteryService.batteryAvailable)
-                return Theme.surfaceVariant;
-            if (pill.lowState)
-                return Theme.error;
-            return Theme.primary;
-        }
-        readonly property color onFillColor: {
-            const c = pill.fillColor;
-            const lum = 0.299 * c.r + 0.587 * c.g + 0.114 * c.b;
-            return lum > 0.5 ? Qt.rgba(0, 0, 0, 0.9) : Qt.rgba(1, 1, 1, 0.95);
-        }
-        readonly property string numberText: Math.round(pill.level).toString()
-        readonly property int glyphSize: Math.round(pill.thickness * 0.58)
-        readonly property int boltSize: Math.round(pill.thickness * 0.72)
-        readonly property real nubBreadth: Math.round(pill.thickness * 0.16)
-        readonly property real nubSpan: Math.round(pill.thickness * 0.46)
-
-        implicitWidth: pill.vertical ? pill.thickness : Math.max(pill.bodyLength, (!pill.vertical && pill.showNumber) ? numRowTrack.width + pill.thickness * 0.7 : 0) + pill.nubBreadth
-        implicitHeight: pill.vertical ? pill.bodyLength + pill.nubBreadth : pill.thickness
-
-        Rectangle {
-            id: body
-            x: 0
-            y: pill.vertical ? pill.nubBreadth : 0
-            width: pill.vertical ? parent.width : parent.width - pill.nubBreadth
-            height: pill.vertical ? parent.height - pill.nubBreadth : parent.height
-            radius: Math.round(Math.min(width, height) * 0.34)
-            color: Theme.withAlpha(Theme.surfaceVariant, 0.9)
-
-            Rectangle {
-                id: fill
-                radius: body.radius
-                color: pill.fillColor
-                anchors.left: parent.left
-                anchors.bottom: parent.bottom
-                width: pill.vertical ? parent.width : Math.round(parent.width * pill.level / 100)
-                height: pill.vertical ? Math.round(parent.height * pill.level / 100) : parent.height
-
-                Behavior on width {
-                    enabled: !pill.vertical
-                    NumberAnimation {
-                        duration: Theme.mediumDuration
-                        easing.type: Theme.standardEasing
-                    }
-                }
-
-                Behavior on height {
-                    enabled: pill.vertical
-                    NumberAnimation {
-                        duration: Theme.mediumDuration
-                        easing.type: Theme.standardEasing
-                    }
-                }
-            }
-
-            // Tinted for the empty track. Horizontal always shows the number;
-            // vertical swaps in a centered bolt while charging.
-            Item {
-                id: glyphTrack
-                anchors.fill: parent
-                visible: BatteryService.batteryAvailable && ((pill.charging && pill.vertical) || (!pill.vertical && pill.showNumber))
-
-                Row {
-                    id: numRowTrack
-                    visible: !pill.vertical && pill.showNumber
-                    anchors.centerIn: parent
-                    spacing: 1
-
-                    StyledText {
-                        id: numTrack
-                        text: pill.numberText
-                        color: Theme.surfaceText
-                        font.pixelSize: pill.glyphSize
-                        font.weight: Font.Bold
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-
-                    StyledText {
-                        text: "%"
-                        visible: pill.showPercentSign
-                        color: Theme.surfaceText
-                        font.pixelSize: pill.signSize
-                        font.weight: Font.Bold
-                        anchors.baseline: numTrack.baseline
-                    }
-                }
-
-                DankIcon {
-                    name: "bolt"
-                    size: pill.boltSize
-                    color: Theme.surfaceText
-                    visible: pill.charging && pill.vertical
-                    anchors.centerIn: parent
-                }
-            }
-
-            // Same glyphs tinted for the fill, clipped so they stay legible over it.
-            Item {
-                visible: glyphTrack.visible
-                x: fill.x
-                y: fill.y
-                width: fill.width
-                height: fill.height
-                clip: true
-
-                Item {
-                    x: -fill.x
-                    y: -fill.y
-                    width: body.width
-                    height: body.height
-
-                    Row {
-                        visible: !pill.vertical && pill.showNumber
-                        anchors.centerIn: parent
-                        spacing: 1
-
-                        StyledText {
-                            id: numFill
-                            text: pill.numberText
-                            color: pill.onFillColor
-                            font.pixelSize: pill.glyphSize
-                            font.weight: Font.Bold
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        StyledText {
-                            text: "%"
-                            visible: pill.showPercentSign
-                            color: pill.onFillColor
-                            font.pixelSize: pill.signSize
-                            font.weight: Font.Bold
-                            anchors.baseline: numFill.baseline
-                        }
-                    }
-
-                    DankIcon {
-                        name: "bolt"
-                        size: pill.boltSize
-                        color: pill.onFillColor
-                        visible: pill.charging && pill.vertical
-                        anchors.centerIn: parent
-                    }
-                }
-            }
-        }
-
-        // Battery terminal nub, colored to match the outline/track so it
-        // reads as part of the same frame rather than a fill segment.
-        Rectangle {
-            visible: !pill.vertical
-            anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
-            width: pill.nubBreadth
-            height: pill.nubSpan
-            radius: Math.round(pill.nubBreadth * 0.35)
-            color: Theme.withAlpha(Theme.surfaceVariant, 0.9)
-        }
-
-        Rectangle {
-            visible: pill.vertical
-            anchors.top: parent.top
-            anchors.horizontalCenter: parent.horizontalCenter
-            width: pill.nubSpan
-            height: pill.nubBreadth
-            radius: Math.round(pill.nubBreadth * 0.35)
-            color: Theme.withAlpha(Theme.surfaceVariant, 0.9)
-        }
-    }
-
     content: Component {
         Item {
             implicitWidth: battery.isVerticalOrientation ? (battery.widgetThickness - battery.horizontalPadding * 2) : batteryContent.implicitWidth
@@ -371,7 +141,7 @@ BasePill {
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
 
-                BatteryPill {
+                BatteryMeter {
                     visible: battery.pillStyle
                     vertical: true
                     showNumber: false
@@ -417,24 +187,21 @@ BasePill {
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
-                BatteryPill {
+                BatteryMeter {
                     visible: battery.pillStyle
-                    vertical: false
                     showNumber: battery.showPercent
                     showPercentSign: battery.pillPercentSign
                     thickness: Theme.barIconSize(battery.barThickness, -4, battery.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                    fontSize: Theme.barTextSize(battery.barThickness, battery.barConfig?.fontScale, battery.barConfig?.maximizeWidgetText)
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
-                OfficialBolt {
-                    visible: battery.pillStyle && BatteryService.batteryAvailable && BatteryService.isCharging
-                    fillColor: Theme.primary
-                    size: Math.round(Theme.barIconSize(battery.barThickness, -4, battery.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale) * 0.85)
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                StyledText {
+                NumericText {
+                    isMonospace: false
                     text: battery.horizontalSideText
+                    reserveText: battery.horizontalSideText.replace(/\d/g, "0")
+                    width: Math.ceil(Math.max(implicitWidth, reservedWidth))
+                    horizontalAlignment: Text.AlignHCenter
                     font.pixelSize: Theme.barTextSize(battery.barThickness, battery.barConfig?.fontScale, battery.barConfig?.maximizeWidgetText)
                     color: Theme.widgetTextColor
                     anchors.verticalCenter: parent.verticalCenter

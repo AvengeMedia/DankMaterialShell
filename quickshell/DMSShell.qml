@@ -38,6 +38,18 @@ Item {
 
     property bool osdSurfacesLoaded: false
     property int pendingOsdResumeReloads: 0
+    readonly property var dankIslandScreens: SettingsData.getIslandScreens()
+    readonly property var notificationPopupScreens: {
+        const screens = SettingsData.notificationFocusedMonitor ? Quickshell.screens : SettingsData.getFilteredScreens("notifications");
+        return root.withoutDankIslandScreens(screens);
+    }
+    readonly property var legacySystemLevelOsdScreens: root.withoutDankIslandScreens(SettingsData.getFilteredScreens("osd"))
+
+    function withoutDankIslandScreens(screens) {
+        if (!SettingsData.dankIslandEnabled)
+            return screens;
+        return screens.filter(screen => root.dankIslandScreens.indexOf(screen) === -1);
+    }
 
     function recreateOsdSurfaces() {
         OSDManager.currentOSDsByScreen = ({});
@@ -343,14 +355,23 @@ Item {
         }
     }
 
-    ConfirmModal {
-        id: emptyTrashConfirm
+    LazyLoader {
+        id: emptyTrashConfirmLoader
+        active: false
+        readonly property ConfirmModal loadedModal: item as ConfirmModal
+
+        ConfirmModal {
+            id: emptyTrashConfirm
+        }
     }
 
     Connections {
         target: TrashService
         function onEmptyTrashConfirmRequested(itemCount) {
-            emptyTrashConfirm.showWithOptions({
+            emptyTrashConfirmLoader.active = true;
+            if (!emptyTrashConfirmLoader.loadedModal)
+                return;
+            emptyTrashConfirmLoader.loadedModal.showWithOptions({
                 title: I18n.tr("Empty Trash"),
                 message: I18n.tr("Permanently delete %1 item(s)? This cannot be undone.").arg(itemCount),
                 confirmText: I18n.tr("Empty"),
@@ -381,7 +402,7 @@ Item {
     }
 
     Variants {
-        model: SettingsData.notificationFocusedMonitor ? Quickshell.screens : SettingsData.getFilteredScreens("notifications")
+        model: root.notificationPopupScreens
 
         delegate: NotificationPopupManager {}
     }
@@ -493,11 +514,18 @@ Item {
         }
     }
 
-    BluetoothPairingModal {
-        id: bluetoothPairingModal
+    LazyLoader {
+        id: bluetoothPairingModalLoader
+        active: false
 
-        Component.onCompleted: {
-            PopoutService.bluetoothPairingModal = bluetoothPairingModal;
+        Component.onCompleted: PopoutService.bluetoothPairingModalLoader = bluetoothPairingModalLoader
+
+        BluetoothPairingModal {
+            id: bluetoothPairingModal
+
+            Component.onCompleted: {
+                PopoutService.bluetoothPairingModal = bluetoothPairingModal;
+            }
         }
     }
 
@@ -592,6 +620,25 @@ Item {
 
             Component.onCompleted: {
                 PopoutService.vpnPopout = vpnPopout;
+            }
+        }
+    }
+
+    LazyLoader {
+        id: colorPickerPopoutLoader
+
+        active: false
+
+        Component.onCompleted: {
+            PopoutService.colorPickerPopoutLoader = colorPickerPopoutLoader;
+        }
+
+        ColorPickerPopout {
+            id: colorPickerPopout
+            onPopoutClosed: PopoutService.unloadColorPicker()
+
+            Component.onCompleted: {
+                PopoutService.colorPickerPopout = colorPickerPopout;
             }
         }
     }
@@ -757,56 +804,68 @@ Item {
         }
     }
 
-    BrowserPickerModal {
-        id: browserPickerModal
+    LazyLoader {
+        id: browserPickerModalLoader
+        active: false
+        readonly property BrowserPickerModal loadedModal: item as BrowserPickerModal
+
+        BrowserPickerModal {
+            id: browserPickerModal
+        }
     }
 
-    AppPickerModal {
-        id: filePickerModal
-        title: I18n.tr("Open with...")
-        viewMode: SettingsData.appPickerViewMode || "grid"
+    LazyLoader {
+        id: filePickerModalLoader
+        active: false
+        readonly property AppPickerModal loadedModal: item as AppPickerModal
 
-        onViewModeChanged: {
-            SettingsData.set("appPickerViewMode", viewMode);
-        }
+        AppPickerModal {
+            id: filePickerModal
+            title: I18n.tr("Open with...")
+            viewMode: SettingsData.appPickerViewMode || "grid"
 
-        function shellEscape(str) {
-            return "'" + str.replace(/'/g, "'\\''") + "'";
-        }
-
-        onApplicationSelected: (app, filePath) => {
-            if (!app)
-                return;
-            let cmd = app.exec || "";
-            const escapedPath = shellEscape(filePath);
-            const escapedUri = shellEscape("file://" + filePath);
-
-            let hasField = false;
-            if (cmd.includes("%f")) {
-                cmd = cmd.replace("%f", escapedPath);
-                hasField = true;
-            } else if (cmd.includes("%F")) {
-                cmd = cmd.replace("%F", escapedPath);
-                hasField = true;
-            } else if (cmd.includes("%u")) {
-                cmd = cmd.replace("%u", escapedUri);
-                hasField = true;
-            } else if (cmd.includes("%U")) {
-                cmd = cmd.replace("%U", escapedUri);
-                hasField = true;
+            onViewModeChanged: {
+                SettingsData.set("appPickerViewMode", viewMode);
             }
 
-            cmd = cmd.replace(/%[ikc]/g, "");
-
-            if (!hasField) {
-                cmd += " " + escapedPath;
+            function shellEscape(str) {
+                return "'" + str.replace(/'/g, "'\\''") + "'";
             }
 
-            log.debug("FilePicker: Launching", cmd);
+            onApplicationSelected: (app, filePath) => {
+                if (!app)
+                    return;
+                let cmd = app.exec || "";
+                const escapedPath = shellEscape(filePath);
+                const escapedUri = shellEscape("file://" + filePath);
 
-            Quickshell.execDetached({
-                command: ["sh", "-c", cmd]
-            });
+                let hasField = false;
+                if (cmd.includes("%f")) {
+                    cmd = cmd.replace("%f", escapedPath);
+                    hasField = true;
+                } else if (cmd.includes("%F")) {
+                    cmd = cmd.replace("%F", escapedPath);
+                    hasField = true;
+                } else if (cmd.includes("%u")) {
+                    cmd = cmd.replace("%u", escapedUri);
+                    hasField = true;
+                } else if (cmd.includes("%U")) {
+                    cmd = cmd.replace("%U", escapedUri);
+                    hasField = true;
+                }
+
+                cmd = cmd.replace(/%[ikc]/g, "");
+
+                if (!hasField) {
+                    cmd += " " + escapedPath;
+                }
+
+                log.debug("FilePicker: Launching", cmd);
+
+                Quickshell.execDetached({
+                    command: ["sh", "-c", cmd]
+                });
+            }
         }
     }
 
@@ -829,8 +888,12 @@ Item {
                 }
                 return;
             }
-            browserPickerModal.url = url;
-            browserPickerModal.open();
+            browserPickerModalLoader.active = true;
+            const picker = browserPickerModalLoader.loadedModal;
+            if (!picker)
+                return;
+            picker.url = url;
+            picker.open();
         }
 
         function onAppPickerRequested(data) {
@@ -841,19 +904,17 @@ Item {
                 return;
             }
 
-            filePickerModal.targetData = data.target;
-            filePickerModal.targetDataLabel = data.requestType || "file";
-            filePickerModal.mimeType = data.mimeType || "";
-            filePickerModal.rememberMimeTypes = [];
-
-            if (data.categories && data.categories.length > 0) {
-                filePickerModal.categoryFilter = data.categories;
-            } else {
-                filePickerModal.categoryFilter = [];
-            }
-
-            filePickerModal.usageHistoryKey = "filePickerUsageHistory";
-            filePickerModal.open();
+            filePickerModalLoader.active = true;
+            const picker = filePickerModalLoader.loadedModal;
+            if (!picker)
+                return;
+            picker.targetData = data.target;
+            picker.targetDataLabel = data.requestType || "file";
+            picker.mimeType = data.mimeType || "";
+            picker.rememberMimeTypes = [];
+            picker.categoryFilter = data.categories?.length > 0 ? data.categories : [];
+            picker.usageHistoryKey = "filePickerUsageHistory";
+            picker.open();
         }
     }
 
@@ -1136,7 +1197,7 @@ Item {
         sourceComponent: Component {
             Item {
                 Variants {
-                    model: SettingsData.getFilteredScreens("osd")
+                    model: root.legacySystemLevelOsdScreens
 
                     delegate: VolumeOSD {}
                 }
@@ -1160,7 +1221,7 @@ Item {
                 }
 
                 Variants {
-                    model: SettingsData.getFilteredScreens("osd")
+                    model: root.legacySystemLevelOsdScreens
 
                     delegate: BrightnessOSD {}
                 }

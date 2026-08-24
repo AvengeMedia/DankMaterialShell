@@ -15,7 +15,9 @@ DankOSD {
         _displayVolume = Math.round(AudioService.source.audio.volume * 100);
     }
 
-    osdWidth: useVertical ? (40 + Theme.spacingS * 2) : Math.min(260, screenWidth - Theme.spacingM * 2)
+    readonly property real osdValueReserve: SettingsData.osdAlwaysShowValue ? 48 : 0
+
+    osdWidth: useVertical ? (40 + Theme.spacingS * 2) : Math.min(216 + osdValueReserve, screenWidth - Theme.spacingM * 2)
     osdHeight: useVertical ? Math.min(260, screenHeight - Theme.spacingM * 2) : (40 + Theme.spacingS * 2)
     autoHideInterval: 3000
     enableMouseInteraction: true
@@ -59,64 +61,25 @@ DankOSD {
         id: horizontalContent
 
         Item {
-            property int gap: Theme.spacingS
-
-            anchors.centerIn: parent
-            width: parent.width - Theme.spacingS * 2
-            height: 40
+            anchors.fill: parent
 
             MouseArea {
                 anchors.fill: parent
                 onClicked: root.hide()
             }
 
-            Rectangle {
-                width: Theme.iconSize
-                height: Theme.iconSize
-                radius: Theme.iconSize / 2
-                color: "transparent"
-                x: parent.gap
-                anchors.verticalCenter: parent.verticalCenter
-
-                DankIcon {
-                    anchors.centerIn: parent
-                    name: AudioService.source?.audio?.muted ? "mic_off" : "mic"
-                    size: Theme.iconSize
-                    color: muteButton.containsMouse ? Theme.primary : (AudioService.source?.audio?.muted ? Theme.error : Theme.surfaceText)
-                }
-
-                MouseArea {
-                    id: muteButton
-
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: AudioService.toggleMicMute()
-                    onContainsMouseChanged: setChildHovered(containsMouse || volumeSlider.containsMouse)
-                }
-            }
-
-            DankSlider {
-                id: volumeSlider
-
-                width: parent.width - Theme.iconSize - parent.gap * 3
-                height: 40
-                x: parent.gap * 2 + Theme.iconSize
-                anchors.verticalCenter: parent.verticalCenter
+            OsdLevelRow {
+                anchors.fill: parent
+                iconName: AudioService.source?.audio?.muted ? "mic_off" : "mic"
+                iconColor: AudioService.source?.audio?.muted ? Theme.error : Theme.surfaceText
+                iconInteractive: true
+                value: root._displayVolume
                 minimum: 0
                 maximum: 100
-                enabled: AudioService.source?.audio ?? false
-                showValue: true
-                unit: "%"
-                thumbOutlineColor: Theme.surfaceContainer
-                valueOverride: root._displayVolume
-                alwaysShowValue: SettingsData.osdAlwaysShowValue
-
-                Component.onCompleted: {
-                    root._syncVolume();
-                    value = root._displayVolume;
-                }
-
+                sliderEnabled: !!AudioService.source?.audio
+                displayText: AudioService.source?.audio?.muted ? I18n.tr("Muted") : ""
+                onIconClicked: AudioService.toggleMicMute()
+                onHoverChanged: hovered => setChildHovered(hovered)
                 onSliderValueChanged: newValue => {
                     if (!AudioService.source?.audio)
                         return;
@@ -124,13 +87,7 @@ DankOSD {
                     AudioService.source.audio.volume = newValue / 100;
                     resetHideTimer();
                 }
-
-                onContainsMouseChanged: setChildHovered(containsMouse || muteButton.containsMouse)
-
-                Binding on value {
-                    value: root._displayVolume
-                    when: !volumeSlider.pressed
-                }
+                Component.onCompleted: root._syncVolume()
             }
         }
     }
@@ -176,7 +133,7 @@ DankOSD {
             Item {
                 id: vertSlider
                 width: 12
-                height: parent.height - Theme.iconSize - gap * 3 - 24
+                height: parent.height - Theme.iconSize - gap * 3 - (SettingsData.osdAlwaysShowValue ? 24 : 0)
                 anchors.horizontalCenter: parent.horizontalCenter
                 y: gap * 2 + Theme.iconSize
 

@@ -17,7 +17,7 @@ Item {
 
     function releaseTextInputFocus() {
         if (editField) {
-            editField.focus = false;
+            editField.setFocus(false);
         }
     }
 
@@ -231,78 +231,37 @@ Item {
             }
         }
 
-        StyledRect {
-            id: editFieldContainer
+        DankTextEdit {
+            id: editField
             width: parent.width
             height: Math.max(Theme.fontSizeMedium * 8, parent.height - editorHeader.height - editorActions.height - Theme.spacingM * 2)
-            radius: Theme.cornerRadius
-            color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-            border.color: editField.activeFocus ? Theme.primary : Theme.outlineMedium
-            border.width: editField.activeFocus ? 2 : 1
-            clip: true
+            leftIconName: "edit"
+            placeholderText: I18n.tr("Edit clipboard text")
+            backgroundColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+            normalBorderColor: Theme.outlineMedium
+            focusedBorderColor: Theme.primary
+            keyForwardTargets: [editorKeyHandler]
 
-            DankIcon {
-                id: editIcon
-                name: "edit"
-                size: Theme.iconSize
-                color: editField.activeFocus ? Theme.primary : Theme.surfaceVariantText
-                anchors.left: parent.left
-                anchors.leftMargin: Theme.spacingM
-                anchors.top: parent.top
-                anchors.topMargin: Theme.spacingM
-            }
+            onTextEdited: root.editorText = text
 
-            DankFlickable {
-                id: editScroll
-                anchors.left: editIcon.right
-                anchors.leftMargin: Theme.spacingS
-                anchors.right: parent.right
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                anchors.rightMargin: Theme.spacingM
-                anchors.topMargin: Theme.spacingS
-                anchors.bottomMargin: Theme.spacingS
-                clip: true
-                contentWidth: width
-                contentHeight: editField.height
+            Item {
+                id: editorKeyHandler
 
-                TextEdit {
-                    id: editField
-                    width: editScroll.width
-                    height: Math.max(editScroll.height, contentHeight)
-                    font.pixelSize: Theme.fontSizeMedium
-                    color: Theme.surfaceText
-                    wrapMode: TextEdit.Wrap
-                    selectByMouse: true
-                    onTextChanged: root.editorText = text
-                    Keys.onPressed: function (event) {
-                        const hasCtrl = (event.modifiers & Qt.ControlModifier) !== 0;
-                        const hasShift = (event.modifiers & Qt.ShiftModifier) !== 0;
+                Keys.onPressed: function (event) {
+                    const hasCtrl = (event.modifiers & Qt.ControlModifier) !== 0;
+                    const hasShift = (event.modifiers & Qt.ShiftModifier) !== 0;
 
-                        if (hasCtrl && event.key === Qt.Key_S) {
-                            root.saveEntry(hasShift ? "close" : "history");
-                            event.accepted = true;
-                            return;
-                        }
-                        if (hasCtrl && hasShift && event.key === Qt.Key_V) {
-                            root.saveEntry("paste");
-                            event.accepted = true;
-                            return;
-                        }
+                    if (hasCtrl && event.key === Qt.Key_S) {
+                        root.saveEntry(hasShift ? "close" : "history");
+                        event.accepted = true;
+                        return;
+                    }
+                    if (hasCtrl && hasShift && event.key === Qt.Key_V) {
+                        root.saveEntry("paste");
+                        event.accepted = true;
+                        return;
                     }
                 }
-            }
-
-            StyledText {
-                text: I18n.tr("Edit clipboard text")
-                font.pixelSize: Theme.fontSizeMedium
-                color: Theme.outlineButton
-                anchors.left: editScroll.left
-                anchors.right: editScroll.right
-                anchors.top: editScroll.top
-                anchors.bottom: editScroll.bottom
-                visible: editField.text.length === 0 && !editField.activeFocus
-                wrapMode: Text.WordWrap
             }
         }
 

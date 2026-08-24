@@ -1005,6 +1005,20 @@ Item {
                     readonly property bool hasAmountArg: parsedArgs?.base ? (dmsActionArgs[parsedArgs.base]?.args?.some(a => a.name === "amount") ?? false) : false
                     readonly property bool hasDeviceArg: parsedArgs?.base ? (dmsActionArgs[parsedArgs.base]?.args?.some(a => a.name === "device") ?? false) : false
                     readonly property bool hasTabArg: parsedArgs?.base ? (dmsActionArgs[parsedArgs.base]?.args?.some(a => a.name === "tab") ?? false) : false
+                    readonly property var flagArgs: parsedArgs?.base ? (dmsActionArgs[parsedArgs.base]?.args?.filter(a => a.type === "flag") ?? []) : []
+
+                    function flagLabel(name) {
+                        switch (name) {
+                        case "no-file":
+                            return I18n.tr("Save");
+                        case "no-clipboard":
+                            return I18n.tr("Clipboard");
+                        case "cursor":
+                            return I18n.tr("Pointer");
+                        default:
+                            return name;
+                        }
+                    }
 
                     visible: root._actionType === "dms" && argConfig?.type === "dms"
 
@@ -1156,6 +1170,52 @@ Item {
                                 "action": Actions.buildDmsAction(dmsArgsRow.parsedArgs.base, newArgs)
                             });
                         }
+                    }
+
+                    StyledText {
+                        text: I18n.tr("Options")
+                        font.pixelSize: Theme.fontSizeSmall
+                        font.weight: Font.Medium
+                        color: Theme.surfaceVariantText
+                        Layout.preferredWidth: root._labelWidth
+                        visible: dmsArgsRow.flagArgs.length > 0
+                    }
+
+                    Repeater {
+                        model: dmsArgsRow.flagArgs
+
+                        delegate: RowLayout {
+                            id: flagToggle
+                            required property var modelData
+                            spacing: Theme.spacingXS
+
+                            DankToggle {
+                                checked: {
+                                    const set = dmsArgsRow.parsedArgs?.args[flagToggle.modelData.name] === true;
+                                    return flagToggle.modelData.inverted ? !set : set;
+                                }
+                                onToggled: newChecked => {
+                                    if (root.readOnly || !dmsArgsRow.parsedArgs)
+                                        return;
+                                    const newArgs = Object.assign({}, dmsArgsRow.parsedArgs.args);
+                                    newArgs[flagToggle.modelData.name] = flagToggle.modelData.inverted ? !newChecked : newChecked;
+                                    root.updateEdit({
+                                        "action": Actions.buildDmsAction(dmsArgsRow.parsedArgs.base, newArgs)
+                                    });
+                                }
+                            }
+
+                            StyledText {
+                                text: dmsArgsRow.flagLabel(flagToggle.modelData.name)
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceVariantText
+                            }
+                        }
+                    }
+
+                    Item {
+                        Layout.fillWidth: true
+                        visible: dmsArgsRow.flagArgs.length > 0
                     }
                 }
 

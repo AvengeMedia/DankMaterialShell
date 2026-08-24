@@ -50,6 +50,14 @@ function pad2(n) {
     return n < 10 ? "0" + n : "" + n;
 }
 
+function formatDuration(seconds) {
+    if (!isFinite(seconds) || seconds < 0)
+        return "0:00";
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return m + ":" + pad2(s);
+}
+
 function formatUntil(ts, use24h) {
     if (!ts)
         return "";

@@ -32,6 +32,14 @@ Singleton {
         }
     }
 
+    Connections {
+        target: PluginService
+
+        function onPluginListUpdated() {
+            root._refreshTranslatedCache();
+        }
+    }
+
     readonly property var conditionMap: ({
             "isNiri": () => CompositorService.isNiri,
             "isHyprland": () => CompositorService.isHyprland,
@@ -142,27 +150,33 @@ Singleton {
     }
 
     function translateItem(item) {
+        const isRuntimePlugin = item.runtimeType === "plugin";
+        const label = isRuntimePlugin ? item.label : I18n.tr(item.label);
+        const description = isRuntimePlugin ? (item.description || "") : I18n.tr(item.description || "");
         return {
             section: item.section,
-            label: I18n.tr(item.label),
+            label: label,
             tabIndex: item.tabIndex,
             category: I18n.tr(item.category),
             keywords: item.keywords || [],
             icon: item.icon || "settings",
-            description: item.description ? I18n.tr(item.description) : "",
-            conditionKey: item.conditionKey
+            description: description,
+            conditionKey: item.conditionKey,
+            runtimeType: item.runtimeType || "",
+            runtimeId: item.runtimeId || ""
         };
     }
 
     function _rebuildTranslationCache() {
         var cache = [];
-        for (var i = 0; i < settingsIndex.length; i++) {
-            var item = settingsIndex[i];
+        var items = settingsIndex.concat(_runtimeSearchEntries());
+        for (var i = 0; i < items.length; i++) {
+            var item = items[i];
             var t = translateItem(item);
             var sourceDescription = item.description || "";
             var labelLower = _lowerVariants([item.label, t.label]);
             var categoryLower = _lowerVariants([item.category, t.category]);
-            var descriptionLower = _lowerVariants([sourceDescription, t.description]);
+            var descriptionLower = item.runtimeType === "plugin" ? [] : _lowerVariants([sourceDescription, t.description]);
             cache.push({
                 section: t.section,
                 label: t.label,
@@ -172,6 +186,8 @@ Singleton {
                 icon: t.icon,
                 description: t.description,
                 conditionKey: t.conditionKey,
+                runtimeType: t.runtimeType,
+                runtimeId: t.runtimeId,
                 isTab: String(t.section).startsWith("_tab_"),
                 labelSearch: labelLower,
                 categorySearch: categoryLower,
@@ -183,6 +199,27 @@ Singleton {
             });
         }
         _translatedCache = cache;
+    }
+
+    function _runtimeSearchEntries() {
+        var entries = [];
+        var plugins = PluginService.availablePluginsList || [];
+        for (var i = 0; i < plugins.length; i++) {
+            var plugin = plugins[i];
+            entries.push({
+                section: "",
+                label: plugin.name || plugin.id,
+                tabIndex: 12,
+                category: "Plugins",
+                keywords: [plugin.id || ""],
+                icon: plugin.icon || "extension",
+                description: plugin.description || "",
+                conditionKey: "",
+                runtimeType: "plugin",
+                runtimeId: plugin.id || ""
+            });
+        }
+        return entries;
     }
 
     function _lowerVariants(values) {
@@ -338,6 +375,10 @@ Singleton {
         }
 
         scored.sort((a, b) => {
+            const aRuntime = !!a.item.runtimeType;
+            const bRuntime = !!b.item.runtimeType;
+            if (aRuntime !== bRuntime)
+                return aRuntime ? 1 : -1;
             if (b.score !== a.score)
                 return b.score - a.score;
             if (b.labelScore !== a.labelScore)

@@ -85,19 +85,17 @@ func NewSystemdNetworkdBackend() (*SystemdNetworkdBackend, error) {
 }
 
 func (b *SystemdNetworkdBackend) Initialize() error {
-	c, err := dbus.ConnectSystemBus()
+	c, err := dbus.SystemBus()
 	if err != nil {
 		return fmt.Errorf("connect bus: %w", err)
 	}
 	b.conn = c
 
 	if err := b.enumerateLinks(); err != nil {
-		c.Close()
 		return fmt.Errorf("enumerate links: %w", err)
 	}
 
 	if err := b.updateState(); err != nil {
-		c.Close()
 		return fmt.Errorf("update initial state: %w", err)
 	}
 
@@ -108,8 +106,13 @@ func (b *SystemdNetworkdBackend) Close() {
 	close(b.stopChan)
 	b.StopMonitoring()
 
-	if b.conn != nil {
-		b.conn.Close()
+	if b.conn == nil || b.signals == nil {
+		return
+	}
+	b.conn.RemoveSignal(b.signals)
+	close(b.signals)
+	for _, rule := range networkdMatchRules {
+		b.conn.BusObject().Call("org.freedesktop.DBus.RemoveMatch", 0, rule)
 	}
 }
 

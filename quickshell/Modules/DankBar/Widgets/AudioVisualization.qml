@@ -2,19 +2,24 @@ import QtQuick
 import Quickshell.Services.Mpris
 import qs.Common
 import qs.Services
+import qs.Widgets
 
 Item {
     id: root
 
     readonly property MprisPlayer activePlayer: MprisController.activePlayer
     readonly property bool isPlaying: activePlayer !== null && activePlayer.playbackState === MprisPlaybackState.Playing
-    readonly property bool live: visible && (Window.window?.visible ?? false) && isPlaying
+    readonly property bool live: visible && enabled && (Window.window?.visible ?? false) && isPlaying
+    readonly property bool available: CavaService.cavaAvailable && SettingsData.audioVisualizerEnabled
+    readonly property bool showBars: idleIconName === "" || (available && live)
+
+    property real maxBarHeight: Theme.iconSize - 2
+    readonly property real minBarHeight: 3
+    property color barColor: Theme.primary
+    property string idleIconName: ""
 
     width: 20
     height: Theme.iconSize
-
-    readonly property real maxBarHeight: Theme.iconSize - 2
-    readonly property real minBarHeight: 3
 
     onLiveChanged: {
         if (!live) {
@@ -29,15 +34,6 @@ Item {
             Ref {
                 service: CavaService
             }
-        }
-    }
-
-    Timer {
-        running: !CavaService.cavaAvailable && root.live
-        interval: 500
-        repeat: true
-        onTriggered: {
-            CavaService.values = [Math.random() * 20 + 5, Math.random() * 25 + 8, Math.random() * 22 + 6, Math.random() * 20 + 5, Math.random() * 22 + 6, Math.random() * 25 + 8];
         }
     }
 
@@ -65,6 +61,7 @@ Item {
     ShaderEffect {
         id: bars
         anchors.fill: parent
+        visible: root.showBars
 
         property real widthPx: width
         property real heightPx: height
@@ -72,8 +69,16 @@ Item {
         property real maxH: root.maxBarHeight
         property vector4d bandsA: Qt.vector4d(0, 0, 0, 0)
         property vector2d bandsB: Qt.vector2d(0, 0)
-        property vector4d fillColor: Qt.vector4d(Theme.primary.r, Theme.primary.g, Theme.primary.b, Theme.primary.a)
+        property vector4d fillColor: Qt.vector4d(root.barColor.r, root.barColor.g, root.barColor.b, root.barColor.a)
 
         fragmentShader: Qt.resolvedUrl("../../../Shaders/qsb/viz_bars.frag.qsb")
+    }
+
+    DankIcon {
+        anchors.centerIn: parent
+        visible: !root.showBars
+        name: root.idleIconName
+        size: Math.min(parent.width, parent.height)
+        color: root.barColor
     }
 }

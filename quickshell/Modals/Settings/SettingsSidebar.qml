@@ -114,7 +114,7 @@ Rectangle {
         },
         {
             "id": "dankbar",
-            "text": I18n.tr("Dank Bar"),
+            "text": I18n.tr("Primary Bar"),
             "icon": "toolbar",
             "children": [
                 {
@@ -146,6 +146,12 @@ Rectangle {
                     "text": I18n.tr("Frame"),
                     "icon": "frame_source",
                     "tabIndex": 33
+                },
+                {
+                    "id": "dank_island",
+                    "text": I18n.tr("Island"),
+                    "icon": "view_in_ar",
+                    "tabIndex": 46
                 }
             ]
         },
@@ -157,7 +163,7 @@ Rectangle {
             "children": [
                 {
                     "id": "dank_dash",
-                    "text": I18n.tr("Dank Dash"),
+                    "text": I18n.tr("Dashboard"),
                     "icon": "space_dashboard",
                     "tabIndex": 43
                 },
@@ -411,7 +417,7 @@ Rectangle {
             "id": "chats",
             "text": I18n.tr("Chats"),
             "icon": "forum",
-            "tabIndex": 46,
+            "tabIndex": 47,
             "chatCapable": true
         },
         {
@@ -715,6 +721,8 @@ Rectangle {
         tabChangeRequested(result.tabIndex);
         autoCollapseIfNeeded(oldIndex, result.tabIndex);
         autoExpandForTab(result.tabIndex);
+        if (result.runtimeType === "plugin" && result.runtimeId && root.parentModal?.openPluginSettings)
+            root.parentModal.openPluginSettings(result.runtimeId);
         keyboardHighlightIndex = -1;
         Qt.callLater(searchField.forceActiveFocus);
     }

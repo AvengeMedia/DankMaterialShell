@@ -31,7 +31,7 @@ BasePill {
 
     function updateWidgetPciId(pciId) {
         const sections = ["left", "center", "right"];
-        const defaultBar = SettingsData.barConfigs[0] || SettingsData.getBarConfig("default");
+        const defaultBar = SettingsData.getPrimaryBarConfig();
         if (!defaultBar)
             return;
         for (let s = 0; s < sections.length; s++) {

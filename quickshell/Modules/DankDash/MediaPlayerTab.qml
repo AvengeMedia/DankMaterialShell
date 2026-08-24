@@ -6,6 +6,7 @@ import Quickshell.Widgets
 import qs.Common
 import qs.Services
 import qs.Widgets
+import "../../Common/Format.js" as Format
 
 Item {
     id: root
@@ -14,7 +15,6 @@ Item {
     LayoutMirroring.childrenInherit: true
 
     property MprisPlayer activePlayer: MprisController.activePlayer
-    readonly property bool windowVisible: Window.window?.visible ?? false
     readonly property real stableLength: MprisController.activePlayerStableLength
     property var allPlayers: MprisController.availablePlayers
     property var targetScreen: null
@@ -25,6 +25,10 @@ Item {
     property real contentOffsetY: 0
     property string section: ""
     property int barPosition: SettingsData.Position.Top
+    property string chrome: "dash"
+    property bool live: Window.window?.visible ?? false
+    property bool menusEnabled: true
+    readonly property bool islandChrome: chrome === "island"
 
     readonly property color accent: MediaAccentService.accent
     readonly property color onAccent: MediaAccentService.onAccent
@@ -41,6 +45,7 @@ Item {
     property bool volumeExpanded: false
     property bool devicesExpanded: false
     property bool playersExpanded: false
+    property real previousVolume: 0.0
 
     function resetDropdownStates() {
         volumeExpanded = false;
@@ -69,8 +74,8 @@ Item {
 
     // Derived "no players" state: always correct, no timers.
     readonly property int _playerCount: allPlayers ? allPlayers.length : 0
-    readonly property bool _noneAvailable: _playerCount === 0
-    readonly property bool showNoPlayerNow: (!_switchHold) && (_noneAvailable || !activePlayer)
+    readonly property bool noneAvailable: _playerCount === 0
+    readonly property bool showNoPlayerNow: (!_switchHold) && (noneAvailable || !activePlayer)
 
     property bool _switchHold: false
     Timer {
@@ -78,6 +83,13 @@ Item {
         interval: 1500
         repeat: false
         onTriggered: _switchHold = false
+    }
+
+    onMenusEnabledChanged: {
+        if (!root.menusEnabled) {
+            resetDropdownStates();
+            hideDropdowns();
+        }
     }
 
     onActivePlayerChanged: {
@@ -109,7 +121,7 @@ Item {
     }
 
     implicitWidth: SettingsData.showWeekNumber ? 736 : 700
-    implicitHeight: playerContent.height + playerContent.anchors.topMargin * 2
+    implicitHeight: chromeLoader.item ? chromeLoader.item.implicitHeight : 410
 
     Connections {
         target: activePlayer
@@ -184,18 +196,109 @@ Item {
         }
     }
 
+    function dropdownAnchor(button) {
+        if (!button)
+            return null;
+        if (root.islandChrome) {
+            const rightEdge = root.mapToItem(null, root.width, 0).x;
+            const point = button.mapToItem(null, 0, button.height / 2);
+            return {
+                "pos": Qt.point(rightEdge + Theme.spacingS, point.y),
+                "rightEdge": true
+            };
+        }
+        const buttonsOnRight = !root.isRightEdge;
+        const btnY = button.mapToItem(root, 0, button.height / 2).y;
+        return {
+            "pos": Qt.point(buttonsOnRight ? (root.popoutX + root.popoutWidth) : root.popoutX, root.popoutY + root.contentOffsetY + btnY),
+            "rightEdge": buttonsOnRight
+        };
+    }
+
     function triggerVolumeDropdown() {
-        if (!volumeAvailable)
+        if (!root.menusEnabled || !volumeAvailable)
             return;
         if (volumeExpanded)
             return;
+        const button = chromeLoader.item?.volumeButton;
+        const anchor = dropdownAnchor(button);
+        if (!anchor)
+            return;
         hideDropdowns();
         volumeExpanded = true;
-        const buttonsOnRight = !isRightEdge;
-        const btnY = volumeButton.y + volumeButton.height / 2;
-        const screenX = buttonsOnRight ? (popoutX + popoutWidth) : popoutX;
-        const screenY = popoutY + contentOffsetY + btnY;
-        showVolumeDropdown(Qt.point(screenX, screenY), targetScreen, buttonsOnRight, activePlayer, allPlayers);
+        showVolumeDropdown(anchor.pos, targetScreen, anchor.rightEdge, activePlayer, allPlayers);
+    }
+
+    function triggerPlayersDropdown() {
+        if (!root.menusEnabled)
+            return;
+        const button = chromeLoader.item?.playerSelectorButton;
+        const anchor = dropdownAnchor(button);
+        if (!anchor)
+            return;
+        if (playersExpanded)
+            return;
+        hideDropdowns();
+        playersExpanded = true;
+        showPlayersDropdown(anchor.pos, targetScreen, anchor.rightEdge, activePlayer, allPlayers);
+    }
+
+    function triggerDevicesDropdown() {
+        if (!root.menusEnabled)
+            return;
+        const button = chromeLoader.item?.audioDevicesButton;
+        const anchor = dropdownAnchor(button);
+        if (!anchor)
+            return;
+        if (devicesExpanded)
+            return;
+        hideDropdowns();
+        devicesExpanded = true;
+        showAudioDevicesDropdown(anchor.pos, targetScreen, anchor.rightEdge);
+    }
+
+    function cycleNextPlayer() {
+        const players = (root.allPlayers || []).filter(p => p && !MprisController.isIdle(p));
+        if (players.length < 2)
+            return;
+        let currentIndex = -1;
+        for (let i = 0; i < players.length; i++) {
+            if (players[i] === root.activePlayer) {
+                currentIndex = i;
+                break;
+            }
+        }
+        MprisController.setActivePlayer(players[(currentIndex + 1) % players.length]);
+    }
+
+    function cycleNextSink() {
+        const sinks = AudioService.getAvailableSinks();
+        if (!sinks || sinks.length < 2)
+            return;
+        let currentIndex = -1;
+        for (let i = 0; i < sinks.length; i++) {
+            if (sinks[i]?.name === AudioService.sink?.name) {
+                currentIndex = i;
+                break;
+            }
+        }
+        AudioService.setSink(sinks[(currentIndex + 1) % sinks.length]);
+    }
+
+    function cycleLoopState() {
+        if (!activePlayer?.canControl || !activePlayer.loopSupported)
+            return;
+        switch (activePlayer.loopState) {
+        case MprisLoopState.None:
+            activePlayer.loopState = MprisLoopState.Playlist;
+            break;
+        case MprisLoopState.Playlist:
+            activePlayer.loopState = MprisLoopState.Track;
+            break;
+        case MprisLoopState.Track:
+            activePlayer.loopState = MprisLoopState.None;
+            break;
+        }
     }
 
     function toggleMute() {
@@ -203,14 +306,14 @@ Item {
             return;
         SessionData.suppressOSDTemporarily();
         if (currentVolume > 0) {
-            volumeButton.previousVolume = currentVolume;
+            root.previousVolume = currentVolume;
             if (usePlayerVolume) {
                 activePlayer.volume = 0;
             } else if (AudioService.sink?.audio) {
                 AudioService.sink.audio.volume = 0;
             }
         } else {
-            const restoreVolume = volumeButton.previousVolume > 0 ? volumeButton.previousVolume : 0.5;
+            const restoreVolume = root.previousVolume > 0 ? root.previousVolume : 0.5;
             if (usePlayerVolume) {
                 activePlayer.volume = restoreVolume;
             } else if (AudioService.sink?.audio) {
@@ -284,13 +387,38 @@ Item {
 
     Timer {
         interval: 1000
-        running: root.windowVisible && activePlayer?.playbackState === MprisPlaybackState.Playing && !isSeeking
+        running: root.live && activePlayer?.playbackState === MprisPlaybackState.Playing && !isSeeking
         repeat: true
         onTriggered: activePlayer?.positionChanged()
     }
 
-    Item {
-        id: bgContainer
+    Loader {
+        id: chromeLoader
+
+        anchors.fill: parent
+        sourceComponent: root.islandChrome ? islandChromeComponent : dashChromeComponent
+    }
+
+    Component {
+        id: islandChromeComponent
+
+        MediaPlayerIslandChrome {
+            player: root
+        }
+    }
+
+    Component {
+        id: dashChromeComponent
+
+        Item {
+            anchors.fill: parent
+            implicitHeight: playerContent.height + playerContent.anchors.topMargin * 2
+            property alias volumeButton: volumeButton
+            property alias playerSelectorButton: playerSelectorButton
+            property alias audioDevicesButton: audioDevicesButton
+
+            Item {
+                id: bgContainer
         anchors.fill: parent
 
         // Fall back to the live mpris url so the background is never blank.
@@ -432,7 +560,7 @@ Item {
     Item {
         anchors.fill: parent
         clip: false
-        visible: !_noneAvailable && (!showNoPlayerNow)
+        visible: !noneAvailable && (!showNoPlayerNow)
         ColumnLayout {
             id: playerContent
             width: 484
@@ -547,11 +675,7 @@ Item {
                                     if (!activePlayer)
                                         return "0:00";
                                     const rawPos = Math.max(0, activePlayer.position || 0);
-                                    const pos = stableLength ? rawPos % Math.max(1, stableLength) : rawPos;
-                                    const minutes = Math.floor(pos / 60);
-                                    const seconds = Math.floor(pos % 60);
-                                    const timeStr = minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
-                                    return timeStr;
+                                    return Format.formatDuration(stableLength ? rawPos % Math.max(1, stableLength) : rawPos);
                                 }
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText
@@ -563,10 +687,7 @@ Item {
                                 text: {
                                     if (!activePlayer || stableLength <= 0)
                                         return "--:--";
-                                    const dur = stableLength;
-                                    const minutes = Math.floor(dur / 60);
-                                    const seconds = Math.floor(dur % 60);
-                                    return minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+                                    return Format.formatDuration(stableLength);
                                 }
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText
@@ -860,8 +981,6 @@ Item {
         z: 101
         enabled: volumeAvailable
 
-        property real previousVolume: 0.0
-
         DankIcon {
             anchors.centerIn: parent
             name: getVolumeIcon()
@@ -989,6 +1108,8 @@ Item {
             onExited: {
                 if (devicesExpanded)
                     dropdownButtonExited();
+            }
+        }
             }
         }
     }

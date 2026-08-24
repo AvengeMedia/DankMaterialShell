@@ -43,6 +43,9 @@ Variants {
         implicitHeight: body.surfaceImplicitHeight
         exclusiveZone: body.surfaceExclusiveZone
 
+        Component.onCompleted: SurfaceRecovery.track(dock)
+        Component.onDestruction: SurfaceRecovery.untrack(dock)
+
         WindowBlur {
             targetWindow: dock
             blurEnabled: body.effectiveBlurEnabled && !body.usesConnectedFrameChrome
@@ -79,6 +82,9 @@ Variants {
 
             WlrLayershell.namespace: "dms:dock-exclusion"
             WlrLayershell.layer: WlrLayer.Top
+
+            Component.onCompleted: SurfaceRecovery.track(dockExclusion)
+            Component.onDestruction: SurfaceRecovery.untrack(dockExclusion)
 
             anchors {
                 top: !body.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Top) : true

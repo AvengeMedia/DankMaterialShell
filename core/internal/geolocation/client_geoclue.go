@@ -47,7 +47,7 @@ type GeoClueClient struct {
 }
 
 func newGeoClueClient() (*GeoClueClient, error) {
-	dbusConn, err := dbus.ConnectSystemBus()
+	dbusConn, err := dbus.SystemBus()
 	if err != nil {
 		return nil, fmt.Errorf("system bus connection failed: %w", err)
 	}
@@ -64,7 +64,6 @@ func newGeoClueClient() (*GeoClueClient, error) {
 	}
 
 	if err := c.setupClient(); err != nil {
-		dbusConn.Close()
 		return nil, err
 	}
 
@@ -90,10 +89,6 @@ func (c *GeoClueClient) Close() {
 		c.subscribers.Delete(key)
 		return true
 	})
-
-	if c.dbusConn != nil {
-		c.dbusConn.Close()
-	}
 }
 
 func (c *GeoClueClient) Subscribe(id string) chan Location {

@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 	"syscall"
+	"time"
 
 	"github.com/godbus/dbus/v5"
 )
@@ -19,6 +20,8 @@ const (
 
 	maxSummaryLen = 29
 	maxBodyLen    = 80
+
+	listenerMaxLifetime = time.Hour
 )
 
 type Notification struct {
@@ -30,10 +33,10 @@ type Notification struct {
 	Timeout  int32
 }
 
-func Send(n Notification) error {
+func Send(n Notification) (uint32, error) {
 	conn, err := dbus.SessionBus()
 	if err != nil {
-		return fmt.Errorf("dbus session failed: %w", err)
+		return 0, fmt.Errorf("dbus session failed: %w", err)
 	}
 
 	if n.AppName == "" {
@@ -82,22 +85,18 @@ func Send(n Notification) error {
 	)
 
 	if call.Err != nil {
-		return fmt.Errorf("notify call failed: %w", call.Err)
+		return 0, fmt.Errorf("notify call failed: %w", call.Err)
 	}
 
 	var notificationID uint32
 	if err := call.Store(&notificationID); err != nil {
-		return fmt.Errorf("failed to get notification id: %w", err)
+		return 0, fmt.Errorf("failed to get notification id: %w", err)
 	}
 
-	if len(actions) > 0 && n.FilePath != "" {
-		spawnActionListener(notificationID, n.FilePath)
-	}
-
-	return nil
+	return notificationID, nil
 }
 
-func spawnActionListener(notificationID uint32, filePath string) {
+func SpawnActionListener(notificationID uint32, filePath string) {
 	exe, err := os.Executable()
 	if err != nil {
 		return
@@ -136,35 +135,43 @@ func RunActionListener(args []string) {
 
 	signals := make(chan *dbus.Signal, 10)
 	conn.Signal(signals)
+	deadline := time.After(listenerMaxLifetime)
 
-	for sig := range signals {
-		switch sig.Name {
-		case notifyInterface + ".ActionInvoked":
-			if len(sig.Body) < 2 {
-				continue
-			}
-			id, ok := sig.Body[0].(uint32)
-			if !ok || id != uint32(notificationID) {
-				continue
-			}
-			action, ok := sig.Body[1].(string)
-			if !ok {
-				continue
-			}
-			handleAction(action, filePath)
+	for {
+		select {
+		case <-deadline:
 			return
-
-		case notifyInterface + ".NotificationClosed":
-			if len(sig.Body) < 1 {
-				continue
+		case sig := <-signals:
+			if sig == nil || handleSignal(sig, uint32(notificationID), filePath) {
+				return
 			}
-			id, ok := sig.Body[0].(uint32)
-			if !ok || id != uint32(notificationID) {
-				continue
-			}
-			return
 		}
 	}
+}
+
+func handleSignal(sig *dbus.Signal, notificationID uint32, filePath string) bool {
+	if len(sig.Body) < 1 {
+		return false
+	}
+	id, ok := sig.Body[0].(uint32)
+	if !ok || id != notificationID {
+		return false
+	}
+	switch sig.Name {
+	case notifyInterface + ".NotificationClosed":
+		return true
+	case notifyInterface + ".ActionInvoked":
+		if len(sig.Body) < 2 {
+			return false
+		}
+		action, ok := sig.Body[1].(string)
+		if !ok {
+			return false
+		}
+		handleAction(action, filePath)
+		return true
+	}
+	return false
 }
 
 func handleAction(action, filePath string) {

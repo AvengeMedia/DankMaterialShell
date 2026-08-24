@@ -101,6 +101,7 @@ Rectangle {
                 anchors.fill: parent
                 iconValue: root.iconValue
                 iconSize: Math.min(parent.width, parent.height)
+                animate: root.item?.data?.animated === true
                 fallbackText: (root.item?.name?.length > 0) ? root.item.name.charAt(0).toUpperCase() : "?"
                 materialIconSizeAdjustment: iconSize * 0.3
                 visible: !root.hasScreencopy

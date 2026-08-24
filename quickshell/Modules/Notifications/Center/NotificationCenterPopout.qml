@@ -181,146 +181,56 @@ DankPopout {
     }
 
     content: Component {
-        Rectangle {
+        Item {
             id: notificationContent
 
-            LayoutMirroring.enabled: I18n.isRtl
-            LayoutMirroring.childrenInherit: true
+            property alias externalKeyboardController: body.externalKeyboardController
 
-            property var externalKeyboardController: null
-            property real cachedHeaderHeight: 32
-            implicitHeight: {
-                let baseHeight = Theme.spacingL * 2;
-                baseHeight += cachedHeaderHeight;
-                baseHeight += Theme.spacingM * 2;
-
-                const currentListHeight = root.shouldBeVisible ? notificationList.stableContentHeight : notificationList.listContentHeight;
-                let listHeight = notificationHeader.currentTab === 0 ? currentListHeight : Math.max(200, NotificationService.historyList.length * 80);
-                if (notificationHeader.currentTab === 0 && NotificationService.groupedNotifications.length === 0) {
-                    listHeight = 200;
-                }
-                if (notificationHeader.currentTab === 1 && NotificationService.historyList.length === 0) {
-                    listHeight = 200;
-                }
-
-                const maxContentArea = 600;
-                baseHeight += Math.min(listHeight, maxContentArea);
-
-                const maxHeight = root.screen ? root.screen.height * 0.8 : Screen.height * 0.8;
-                return Math.max(300, Math.min(baseHeight, maxHeight));
-            }
-
-            color: "transparent"
+            implicitHeight: body.implicitHeight
             focus: true
 
             Component.onCompleted: {
-                if (root.shouldBeVisible) {
+                if (root.shouldBeVisible)
                     forceActiveFocus();
-                }
             }
 
-            Keys.onPressed: event => {
-                if (event.key === Qt.Key_Escape) {
-                    notificationHistoryVisible = false;
-                    event.accepted = true;
-                    return;
-                }
-
-                if (event.key === Qt.Key_Left) {
-                    if (notificationHeader.currentTab > 0) {
-                        notificationHeader.currentTab = 0;
-                        event.accepted = true;
-                    }
-                    return;
-                }
-
-                if (event.key === Qt.Key_Right) {
-                    if (notificationHeader.currentTab === 0 && SettingsData.notificationHistoryEnabled) {
-                        notificationHeader.currentTab = 1;
-                        event.accepted = true;
-                    }
-                    return;
-                }
-                if (notificationHeader.currentTab === 1) {
-                    historyList.handleKey(event);
-                    return;
-                }
-                if (externalKeyboardController) {
-                    externalKeyboardController.handleKey(event);
-                }
-            }
+            Keys.onPressed: event => body.handleKey(event)
 
             Connections {
+                target: root
+
                 function onShouldBeVisibleChanged() {
                     if (root.shouldBeVisible) {
-                        Qt.callLater(() => {
-                            notificationContent.forceActiveFocus();
-                        });
-                    } else {
-                        notificationContent.focus = false;
+                        Qt.callLater(() => notificationContent.forceActiveFocus());
+                        return;
                     }
+                    notificationContent.focus = false;
                 }
-                target: root
             }
 
-            FocusScope {
-                id: contentColumn
+            QtObject {
+                id: popoutHost
+
+                readonly property bool shouldBeVisible: root.shouldBeVisible
+                readonly property var screen: root.screen
+                readonly property var transientSurfaceTracker: root.transientSurfaceTracker
+                readonly property real maxContentHeight: (root.screen?.height ?? 1080) * 0.8
+
+                function close() {
+                    root.notificationHistoryVisible = false;
+                }
+
+                function requestSettings() {
+                    root.notificationHistoryVisible = false;
+                    PopoutService.openSettingsWithTab("notifications", root, () => root.open());
+                }
+            }
+
+            NotificationCenterContent {
+                id: body
 
                 anchors.fill: parent
-                anchors.margins: Theme.spacingL
-                focus: true
-
-                Column {
-                    id: contentColumnInner
-                    anchors.fill: parent
-                    spacing: Theme.spacingM
-
-                    NotificationHeader {
-                        id: notificationHeader
-                        objectName: "notificationHeader"
-                        transientSurfaceTracker: root.transientSurfaceTracker
-                        onHeightChanged: notificationContent.cachedHeaderHeight = height
-                        onSettingsRequested: {
-                            root.notificationHistoryVisible = false;
-                            PopoutService.openSettingsWithTab("notifications", root, () => root.open());
-                        }
-                    }
-
-                    Item {
-                        visible: notificationHeader.currentTab === 0
-                        width: parent.width
-                        height: parent.height - notificationContent.cachedHeaderHeight - contentColumnInner.spacing
-
-                        KeyboardNavigatedNotificationList {
-                            id: notificationList
-                            objectName: "notificationList"
-                            anchors.fill: parent
-                            anchors.leftMargin: -shadowHorizontalGutter
-                            anchors.rightMargin: -shadowHorizontalGutter
-                            anchors.topMargin: -(shadowVerticalGutter + delegateShadowGutter / 2)
-                            anchors.bottomMargin: -(shadowVerticalGutter + delegateShadowGutter / 2)
-                            cardAnimateExpansion: true
-                            transientSurfaceTracker: root.transientSurfaceTracker
-                        }
-                    }
-
-                    HistoryNotificationList {
-                        id: historyList
-                        visible: notificationHeader.currentTab === 1
-                        width: parent.width
-                        height: parent.height - notificationContent.cachedHeaderHeight - contentColumnInner.spacing
-                    }
-                }
-            }
-
-            NotificationKeyboardHints {
-                id: keyboardHints
-                anchors.bottom: parent.bottom
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.margins: Theme.spacingL
-                showHints: notificationHeader.currentTab === 0 ? (externalKeyboardController && externalKeyboardController.showKeyboardHints) || false : historyList.showKeyboardHints
-                z: 200
+                host: popoutHost
             }
         }
     }

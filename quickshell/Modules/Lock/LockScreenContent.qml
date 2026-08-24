@@ -107,8 +107,7 @@ Item {
     }
 
     function securityKeyShortcutMatches(event) {
-        return SettingsData.lockScreenSecurityKeyShortcutEnabled
-            && KeyUtils.eventMatchesCombo(event, SettingsData.lockScreenSecurityKeyShortcut);
+        return SettingsData.lockScreenSecurityKeyShortcutEnabled && KeyUtils.eventMatchesCombo(event, SettingsData.lockScreenSecurityKeyShortcut);
     }
 
     Component.onCompleted: {
@@ -267,7 +266,10 @@ Item {
             return root.hasCustomWallpaper ? "Fill" : SessionData.getMonitorWallpaperFillMode(root.screenName);
         }
 
-        active: wallpaperSource !== ""
+        readonly property real screenScale: CompositorService.getScreenScale(Quickshell.screens.find(s => s.name === root.screenName) ?? null)
+        readonly property size decodeSize: Qt.size(Math.round(width * screenScale), Math.round(height * screenScale))
+
+        active: wallpaperSource !== "" && width > 0 && height > 0
         asynchronous: false
 
         sourceComponent: fillModeName === "Scrolling" ? scrollWallpaperComp : plainWallpaperComp
@@ -293,6 +295,7 @@ Item {
         id: plainWallpaperComp
         Image {
             source: wallpaperBackground.wallpaperSource
+            sourceSize: wallpaperBackground.decodeSize
             fillMode: Theme.getFillMode(wallpaperBackground.fillModeName)
             smooth: true
             cache: true
@@ -308,6 +311,7 @@ Item {
                 anchors.fill: parent
                 visible: false
                 source: wallpaperBackground.wallpaperSource
+                sourceSize: wallpaperBackground.decodeSize
                 asynchronous: false
                 cache: true
             }
@@ -1068,7 +1072,8 @@ Item {
                         // (ibus ibuswaylandim.c) instead of forwarding raw keys, so an active
                         // text input must exist to receive them; the hidden-text hints put
                         // fcitx5 into plain keyboard passthrough (CapabilityFlag::Password).
-                        // Raw keys stay in handleKey (#2950).
+                        // Raw keys stay in handleKey (#2950). The cursor delegate disables
+                        // Qt's blink repaint timer; passwordCursor draws the visible one.
                         TextInput {
                             id: imeCommitSink
 
@@ -1076,6 +1081,7 @@ Item {
                             width: 1
                             height: 1
                             opacity: 0
+                            cursorDelegate: Item {}
                             echoMode: TextInput.Password
                             inputMethodHints: Qt.ImhHiddenText | Qt.ImhSensitiveData | Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
                             Keys.onPressed: event => {
@@ -1809,19 +1815,7 @@ Item {
                 }
 
                 DankIcon {
-                    name: {
-                        if (!AudioService.sink?.audio) {
-                            return "volume_up";
-                        }
-                        if (AudioService.sink.audio.muted)
-                            return "volume_off";
-                        if (AudioService.sink.audio.volume === 0)
-                            return "volume_mute";
-                        if (AudioService.sink.audio.volume * 100 < 33) {
-                            return "volume_down";
-                        }
-                        return "volume_up";
-                    }
+                    name: AudioService.sinkVolumeIconName
                     size: Theme.iconSize - 2
                     color: (AudioService.sink && AudioService.sink.audio && (AudioService.sink.audio.muted || AudioService.sink.audio.volume === 0)) ? Qt.rgba(255, 255, 255, 0.5) : "white"
                     anchors.verticalCenter: parent.verticalCenter

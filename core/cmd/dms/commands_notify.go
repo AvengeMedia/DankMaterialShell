@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/notify"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/spf13/cobra"
 )
 
@@ -61,8 +62,27 @@ func runNotify(cmd *cobra.Command, args []string) {
 		Timeout:  int32(notifyTimeout),
 	}
 
-	if err := notify.Send(n); err != nil {
+	id, err := notify.Send(n)
+	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
 	}
+	if n.FilePath == "" {
+		return
+	}
+	watchNotificationAction(id, n.FilePath)
+}
+
+func watchNotificationAction(id uint32, path string) {
+	if id == 0 {
+		return
+	}
+	resp, ok := tryServerRequest(models.Request{
+		Method: "notify.watchAction",
+		Params: map[string]any{"id": id, "path": path},
+	})
+	if ok && resp.Error == "" {
+		return
+	}
+	notify.SpawnActionListener(id, path)
 }

@@ -17,6 +17,23 @@ Singleton {
     readonly property list<NotifWrapper> allWrappers: []
     readonly property list<NotifWrapper> popups: allWrappers.filter(n => n && n.popup)
 
+    property var seenNotifications: []
+    readonly property int unreadCount: {
+        const seen = root.seenNotifications;
+        if (seen.length === 0)
+            return root.notifications.length;
+        let count = 0;
+        for (const wrapper of root.notifications) {
+            if (seen.indexOf(wrapper) === -1)
+                count++;
+        }
+        return count;
+    }
+
+    function markNotificationsSeen() {
+        root.seenNotifications = root.notifications.slice();
+    }
+
     property var historyList: []
     readonly property string historyFile: Paths.strip(Paths.cache) + "/notification_history.json"
     readonly property string imageCacheDir: Paths.strip(Paths.cache) + "/notification_images"
@@ -37,6 +54,8 @@ Singleton {
     property int _ingressCountThisSec: 0
     readonly property int notificationDedupBurstMs: 5000
     property var _recentDedupKeys: []
+
+    signal notificationDeduplicated(var wrapper)
 
     property var _dismissQueue: []
     property int _dismissBatchSize: 8
@@ -546,6 +565,7 @@ Singleton {
 
     function onOverlayOpen() {
         popupsDisabled = true;
+        markNotificationsSeen();
         addGate.stop();
         addGateBusy = false;
 
@@ -562,6 +582,7 @@ Singleton {
 
     function onOverlayClose() {
         popupsDisabled = false;
+        markNotificationsSeen();
         processQueue();
     }
 
@@ -657,8 +678,11 @@ Singleton {
                 const dedupKey = _notificationDedupKey(notif);
                 const duplicate = _findActiveDuplicate(notif);
                 if (duplicate || _hasRecentDuplicate(dedupKey)) {
-                    if (duplicate && duplicate.timer && duplicate.timer.running)
-                        duplicate.timer.restart();
+                    if (duplicate) {
+                        if (duplicate.timer && duplicate.timer.running)
+                            duplicate.timer.restart();
+                        root.notificationDeduplicated(duplicate);
+                    }
                     try {
                         notif.dismiss();
                     } catch (e) {}
@@ -733,6 +757,60 @@ Singleton {
 
             _recomputeGroupsLater();
         }
+    }
+
+    function isFocusedScreen(screen) {
+        if (!SettingsData.notificationFocusedMonitor)
+            return true;
+        const focused = CompositorService.getFocusedScreen();
+        return !!focused && !!screen && focused.name === screen.name;
+    }
+
+    function notificationIconFromImage(image) {
+        image = image || "";
+        return image.startsWith("image://icon/") ? image.substring(13) : "";
+    }
+
+    function notificationImageHasSpecialPrefix(image) {
+        return /^(material|svg|unicode|image):/.test(notificationIconFromImage(image));
+    }
+
+    function notificationHasImage(image) {
+        image = image || "";
+        return image !== "" && (!image.startsWith("image://icon/") || notificationIconFromImage(image).startsWith("/"));
+    }
+
+    function notificationCleanImage(image) {
+        image = image || "";
+        if (!image)
+            return "";
+        if (image.startsWith("image://icon/")) {
+            const payload = image.substring(13);
+            if (payload.startsWith("/"))
+                return "file://" + payload;
+        }
+        return Paths.strip(image);
+    }
+
+    function notificationImageSource(image, appIcon) {
+        image = image || "";
+        appIcon = appIcon || "";
+        if (notificationHasImage(image))
+            return notificationCleanImage(image);
+        if (notificationImageHasSpecialPrefix(image))
+            return "";
+        if (!appIcon)
+            return "";
+        return /^(file|https?):\/\//.test(appIcon) || appIcon.includes("/") ? appIcon : "";
+    }
+
+    function notificationFallbackIcon(image, appIcon) {
+        image = image || "";
+        appIcon = appIcon || "";
+        const fromImage = notificationIconFromImage(image);
+        if (notificationImageHasSpecialPrefix(image))
+            return fromImage;
+        return appIcon || fromImage || "";
     }
 
     component NotifWrapper: QtObject {
@@ -847,16 +925,10 @@ Singleton {
         }
         readonly property string desktopEntry: notification?.desktopEntry ?? ""
         readonly property string image: notification?.image ?? ""
-        readonly property string cleanImage: {
-            if (!image)
-                return "";
-            if (image.startsWith("image://icon/")) {
-                const payload = image.substring(13);
-                if (payload.startsWith("/"))
-                    return "file://" + payload;
-            }
-            return Paths.strip(image);
-        }
+        readonly property string cleanImage: root.notificationCleanImage(image)
+        readonly property bool hasDisplayImage: root.notificationHasImage(image)
+        readonly property string displayImage: root.notificationImageSource(image, appIcon)
+        readonly property string fallbackIconName: root.notificationFallbackIcon(image, appIcon)
         property int urgencyOverride: notification?.urgency ?? NotificationUrgency.Normal
         readonly property int urgency: urgencyOverride
         readonly property list<NotificationAction> actions: notification?.actions ?? []

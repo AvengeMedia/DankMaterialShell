@@ -64,7 +64,13 @@ func newOverlayFixture(t testing.TB, w, h int) (*RegionSelector, *OutputSurface)
 	rng := rand.New(rand.NewSource(7))
 	rng.Read(src.Data())
 
-	os := &OutputSurface{screenBuf: src, screenFormat: uint32(FormatXRGB8888), logicalW: w, logicalH: h}
+	os := &OutputSurface{
+		output:       &WaylandOutput{},
+		screenBuf:    src,
+		screenFormat: uint32(FormatXRGB8888),
+		logicalW:     w,
+		logicalH:     h,
+	}
 	r := &RegionSelector{showCapturedCursor: true}
 	r.selection.surface = os
 	return r, os

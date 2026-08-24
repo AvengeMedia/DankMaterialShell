@@ -45,23 +45,7 @@ Row {
 
         DankIcon {
             anchors.centerIn: parent
-            name: {
-                if (!defaultSink?.audio)
-                    return "volume_off";
-
-                let volume = defaultSink.audio.volume;
-                let muted = defaultSink.audio.muted;
-
-                if (muted)
-                    return "volume_off";
-                if (volume === 0.0)
-                    return "volume_mute";
-                if (volume <= 0.33)
-                    return "volume_down";
-                if (volume <= 0.66)
-                    return "volume_up";
-                return "volume_up";
-            }
+            name: AudioService.volumeIconName(defaultSink)
             size: Theme.iconSize
             color: defaultSink?.audio && !defaultSink.audio.muted && defaultSink.audio.volume > 0 ? Theme.primary : Theme.surfaceText
         }

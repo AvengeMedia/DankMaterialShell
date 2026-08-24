@@ -8,6 +8,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/keyboard_shortcuts_inhibit"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wlr_layer_shell"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wlr_screencopy"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wp_cursor_shape"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wp_viewporter"
 	wlhelpers "github.com/AvengeMedia/DankMaterialShell/core/internal/wayland/client"
 	"github.com/AvengeMedia/dankgo/wayland/client"
@@ -17,7 +18,8 @@ type SelectionState struct {
 	hasSelection bool           // There's a selection to display (pre-loaded or user-drawn)
 	dragging     bool           // User is actively drawing a new selection
 	surface      *OutputSurface // Surface where selection was made
-	// Surface-local logical coordinates (from pointer events)
+	// Global logical coordinates. Keeping these independent of the active
+	// surface lets a drag continue across output boundaries.
 	anchorX  float64
 	anchorY  float64
 	currentX float64
@@ -102,9 +104,12 @@ type RegionSelector struct {
 	surfaces      []*OutputSurface
 	activeSurface *OutputSurface
 
-	// Cursor surface for crosshair
+	// Cursor surface fallback when the compositor lacks cursor shapes.
 	cursorSurface *client.Surface
 	cursorBuffer  *ShmBuffer
+	cursorSerial  uint32
+	cursorShape   *wp_cursor_shape.WpCursorShapeManagerV1
+	cursorDevice  *wp_cursor_shape.WpCursorShapeDeviceV1
 	cursorWlBuf   *client.Buffer
 	cursorPool    *client.ShmPool
 
@@ -114,6 +119,8 @@ type RegionSelector struct {
 	preSelect          Region
 	showCapturedCursor bool
 	shiftHeld          bool
+	ctrlHeld           bool
+	movingSelection    bool
 
 	phase  selectorPhase
 	scroll *scrollSession
@@ -322,6 +329,12 @@ func (r *RegionSelector) handleGlobal(e client.RegistryGlobalEvent) {
 		mgr := keyboard_shortcuts_inhibit.NewZwpKeyboardShortcutsInhibitManagerV1(r.ctx)
 		if err := r.registry.Bind(e.Name, e.Interface, e.Version, mgr); err == nil {
 			r.shortcutsInhibitMgr = mgr
+		}
+
+	case wp_cursor_shape.WpCursorShapeManagerV1InterfaceName:
+		mgr := wp_cursor_shape.NewWpCursorShapeManagerV1(r.ctx)
+		if err := r.registry.Bind(e.Name, e.Interface, 1, mgr); err == nil {
+			r.cursorShape = mgr
 		}
 	}
 }
@@ -604,6 +617,30 @@ func (r *RegionSelector) createCursor() error {
 	return nil
 }
 
+func (r *RegionSelector) refreshCursor() {
+	r.setNativeCursor(r.cursorSerial)
+}
+
+func (r *RegionSelector) setNativeCursor(serial uint32) {
+	if r.cursorShape == nil || r.pointer == nil || serial == 0 {
+		return
+	}
+	shape := uint32(wp_cursor_shape.WpCursorShapeDeviceV1ShapeCrosshair)
+	if r.movingSelection && r.selection.dragging {
+		shape = uint32(wp_cursor_shape.WpCursorShapeDeviceV1ShapeGrabbing)
+	} else if r.ctrlHeld {
+		shape = uint32(wp_cursor_shape.WpCursorShapeDeviceV1ShapeGrab)
+	}
+	if r.cursorDevice == nil {
+		device, err := r.cursorShape.GetPointer(r.pointer)
+		if err != nil {
+			return
+		}
+		r.cursorDevice = device
+	}
+	_ = r.cursorDevice.SetShape(serial, shape)
+}
+
 func (r *RegionSelector) createOutputSurface(output *WaylandOutput) (*OutputSurface, error) {
 	surface, err := r.compositor.CreateSurface()
 	if err != nil {
@@ -779,10 +816,10 @@ func (r *RegionSelector) applyPreSelection(os *OutputSurface) {
 	r.selection.hasSelection = true
 	r.selection.dragging = false
 	r.selection.surface = os
-	r.selection.anchorX = x1
-	r.selection.anchorY = y1
-	r.selection.currentX = x2
-	r.selection.currentY = y2
+	r.selection.anchorX = float64(os.output.x) + x1
+	r.selection.anchorY = float64(os.output.y) + y1
+	r.selection.currentX = float64(os.output.x) + x2
+	r.selection.currentY = float64(os.output.y) + y2
 	r.activeSurface = os
 }
 
@@ -899,6 +936,12 @@ func (r *RegionSelector) cleanup() {
 	}
 	if r.cursorBuffer != nil {
 		r.cursorBuffer.Close()
+	}
+	if r.cursorDevice != nil {
+		_ = r.cursorDevice.Destroy()
+	}
+	if r.cursorShape != nil {
+		_ = r.cursorShape.Destroy()
 	}
 
 	r.cleanupScroll()

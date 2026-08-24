@@ -9,8 +9,23 @@ Card {
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
-    Component.onCompleted: DgopService.addRef("system")
-    Component.onDestruction: DgopService.removeRef("system")
+    property bool live: Window.window?.visible ?? false
+    property bool dgopRefHeld: false
+
+    function syncDgopRef(wanted) {
+        if (wanted === dgopRefHeld)
+            return;
+        dgopRefHeld = wanted;
+        if (wanted) {
+            DgopService.addRef("system");
+            return;
+        }
+        DgopService.removeRef("system");
+    }
+
+    onLiveChanged: syncDgopRef(live)
+    Component.onCompleted: syncDgopRef(live)
+    Component.onDestruction: syncDgopRef(false)
 
     Row {
         anchors.left: parent.left

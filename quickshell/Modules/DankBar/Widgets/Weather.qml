@@ -63,14 +63,12 @@ BasePill {
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
-                StyledText {
-                    text: {
-                        if (!WeatherService.weather.available) {
-                            return "--°" + (SettingsData.useFahrenheit ? "F" : "C");
-                        }
-                        const temp = SettingsData.useFahrenheit ? WeatherService.weather.tempF : WeatherService.weather.temp;
-                        return temp + "°" + (SettingsData.useFahrenheit ? "F" : "C");
-                    }
+                NumericText {
+                    isMonospace: false
+                    text: WeatherService.currentTempText(false)
+                    reserveText: text.replace(/\d/g, "0")
+                    width: Math.ceil(Math.max(implicitWidth, reservedWidth))
+                    horizontalAlignment: Text.AlignHCenter
                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                     color: Theme.widgetTextColor
                     anchors.verticalCenter: parent.verticalCenter

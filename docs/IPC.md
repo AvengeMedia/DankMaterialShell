@@ -517,6 +517,90 @@ dms ipc call bar hide
 dms ipc call bar status
 ```
 
+### Dank Island instances
+
+One bar instance may be designated as Dank Island (Settings → Island → Island instance)
+
+## Target: `island`
+
+Dank Island activity surface. Requires a bar instance designated as the island in Settings (Island → Island instance) and enabled. Commands target the focused screen.
+
+### Activities
+
+- `home` — compact clock (default when the activity argument is unrecognized)
+- `media` — now-playing (unavailable when no media session is active)
+- `launcher` — native island launcher
+- `controlcenter` — Control Center (`control-center` and `cc` are aliases)
+- `wallpaper` — wallpaper browser
+- `weather` — weather (unavailable when weather is disabled)
+- `notificationcenter` — notification center (`notifications`, `notification-center`, and `nc` are aliases)
+
+### Functions
+
+**`open <activity>`**
+- Expand the island into the requested activity
+- Parameters: `activity` - Activity id (see above)
+- Returns: `DANK_ISLAND_OPEN: <activity>\t<screen>`, `DANK_ISLAND_ACTIVITY_UNAVAILABLE: <activity>`, or `DANK_ISLAND_UNAVAILABLE`
+
+**`toggle <activity>`**
+- Collapse if the island is expanded; otherwise expand into the requested activity
+- Parameters: `activity` - Activity id to open when collapsed
+- Returns: `DANK_ISLAND_OPEN: <activity>\t<screen>`, `DANK_ISLAND_CLOSED: <screen>`, `DANK_ISLAND_ACTIVITY_UNAVAILABLE: <activity>`, or `DANK_ISLAND_UNAVAILABLE`
+
+**`show <activity>`**
+- Switch the compact island face without expanding
+- Parameters: `activity` - Activity id
+- Returns: `DANK_ISLAND_SHOW: <activity>\t<screen>`, `DANK_ISLAND_ACTIVITY_UNAVAILABLE: <activity>`, or `DANK_ISLAND_UNAVAILABLE`
+
+**`close`**
+- Collapse the island back to its compact face
+- Returns: `DANK_ISLAND_CLOSED: <screen>` or `DANK_ISLAND_UNAVAILABLE`
+
+**`cycle`**
+- Cycle island activities (`home` → `media` when available → `launcher` when Launcher → Default Opens is Island → `controlcenter` → `notificationcenter`)
+- Returns: `DANK_ISLAND_ACTIVITY: <activity>\t<screen>` or `DANK_ISLAND_UNAVAILABLE`
+
+**`status`**
+- JSON snapshot of the island on the focused screen
+- Returns: Object with `available`, `enabled`, `screen`, `activity`, `expanded`, `mediaAvailable`, `launcherAvailable`, `controlCenterAvailable`, `wallpaperAvailable`, `weatherAvailable`, `notificationCenterAvailable`, `launcherInputFocused`, `launcherResultCount`, and `compactHeight`. When no host exists: `{"available":false,"enabled":true,"launcherAvailable":false}`
+
+**`notifications`**
+- Toggle the notification center as an island activity
+- Returns: `DANK_ISLAND_OPEN: notificationcenter\t<screen>`, `DANK_ISLAND_CLOSED: <screen>`, or `DANK_ISLAND_UNAVAILABLE`
+
+**`openOn <activity> <screen>` / `toggleOn <activity> <screen>` / `showOn <activity> <screen>` / `closeOn <screen>` / `cycleOn <screen>` / `statusOn <screen>` / `notificationsOn <screen>`**
+- Same actions on a specific monitor (e.g. `DP-1`)
+- A screen name with no island on it returns `DANK_ISLAND_UNAVAILABLE` rather than falling back to another display
+
+### Shared IPC routing
+
+When Dank Island is the sole top chrome on the focused display, these existing targets open island activities instead of their popouts:
+
+- `control-center` `open` / `toggle` / `hide` / `status`
+- `notifications` `open` / `toggle` / `close` (the notification modal falls back when the island does not own the screen)
+- `dash` `open` / `toggle` `overview` (or no tab), `media`, `wallpaper`, or `weather`, and `dash close` while those activities are open
+- `dankdash wallpaper` (deprecated; same wallpaper path)
+
+`spotlight` and `launcher` open the island launcher when **Launcher → Default Opens** is set to Island, and fall back to Spotlight if the focused screen has no island.
+
+### Examples
+```bash
+dms ipc call island toggle home
+dms ipc call island open home
+dms ipc call island open media
+dms ipc call island open launcher
+dms ipc call island open controlcenter
+dms ipc call island open wallpaper
+dms ipc call island open weather
+dms ipc call island open notifications
+dms ipc call island notifications
+dms ipc call island show home
+dms ipc call island toggleOn media DP-1
+dms ipc call island cycle
+dms ipc call island close
+dms ipc call island status
+```
+
 ## Target: `systemupdater`
 
 System updater widget control and background update checks.
@@ -610,6 +694,8 @@ Application launcher modal control.
   - Parameters: `query` - Search text to pre-fill in the search box (only used when opening)
   - Returns: Success confirmation
 
+When **Launcher → Default Opens** is set to Island, `spotlight` and `launcher` open the island launcher on the focused screen (Spotlight is used if that screen has no Dank Island). Direct island control is `island open launcher`.
+
 ### Target: `clipboard`
 Clipboard history modal control.
 
@@ -670,6 +756,8 @@ Control Center popout containing network, bluetooth, audio, power, and other qui
 - `close` - Hide the control center
 - `toggle` - Toggle control center visibility
 
+When Dank Island is enabled and is the sole top chrome on the focused display, these calls open the native Control Center island activity instead of the popout. Use `island` to target a specific screen or activity.
+
 **Examples**
 ```bash
 dms ipc call control-center toggle
@@ -704,6 +792,8 @@ Dashboard popup control with tab selection for overview, media, and weather info
 - `toggle [tab]` - Toggle dashboard popup visibility with optional tab selection
   - Parameters: `tab` - Tab to open when showing: "", "overview", "media", or "weather"
   - Returns: Success/failure message
+
+On displays where Dank Island is the sole top chrome, `open`/`toggle` with `overview` (or no tab), `media`, `wallpaper`, or `weather` route to the matching island activity. `close` collapses those island activities when they are open.
 
 ### Target: `dankdash`
 DankDash wallpaper browser control.
@@ -785,6 +875,12 @@ Displays a live overview of all workspaces across all monitors with window previ
 # Open application launcher
 dms ipc call spotlight toggle
 
+# Toggle Dank Island on the focused screen
+dms ipc call island toggle home
+dms ipc call island open media
+dms ipc call island open controlcenter
+dms ipc call island cycle
+
 # Open spotlight with pre-filled search
 dms ipc call spotlight openQuery browser
 dms ipc call spotlight toggleQuery "!"
@@ -855,6 +951,8 @@ These IPC commands are designed to be used with window manager keybindings.
 ```kdl
 binds {
     Mod+Space { spawn "qs" "-c" "dms" "ipc" "call" "spotlight" "toggle"; }
+    Mod+I { spawn "qs" "-c" "dms" "ipc" "call" "island" "toggle" "home"; }
+    Mod+Shift+I { spawn "qs" "-c" "dms" "ipc" "call" "island" "open" "controlcenter"; }
     Mod+V { spawn "qs" "-c" "dms" "ipc" "call" "clipboard" "toggle"; }
     Mod+P { spawn "qs" "-c" "dms" "ipc" "call" "notepad" "toggle"; }
     Mod+Shift+P { spawn "qs" "-c" "dms" "ipc" "call" "notepad" "expand"; }
@@ -868,6 +966,8 @@ binds {
 **Example Hyprland configuration:**
 ```conf
 bind = SUPER, Space, exec, qs -c dms ipc call spotlight toggle
+bind = SUPER, I, exec, qs -c dms ipc call island toggle home
+bind = SUPER SHIFT, I, exec, qs -c dms ipc call island open controlcenter
 bind = SUPER, V, exec, qs -c dms ipc call clipboard toggle
 bind = SUPER, P, exec, qs -c dms ipc call notepad toggle
 bind = SUPER SHIFT, P, exec, qs -c dms ipc call notepad expand

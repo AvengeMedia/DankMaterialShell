@@ -172,25 +172,32 @@ Column {
                                         anchors.verticalCenter: parent.verticalCenter
                                     }
 
-                                    TextInput {
+                                    DankTextField {
                                         id: renameField
                                         visible: delegateItem.editing
                                         enabled: delegateItem.editing
                                         width: parent.width
-                                        anchors.verticalCenter: parent.verticalCenter
+                                        height: parent.height
                                         font.pixelSize: Theme.fontSizeSmall
                                         font.weight: Font.Medium
-                                        color: Theme.primary
-                                        selectionColor: Theme.primary
-                                        selectedTextColor: Theme.background
-                                        selectByMouse: true
-                                        clip: true
+                                        textColor: Theme.primary
+                                        backgroundColor: "transparent"
+                                        borderWidth: 0
+                                        focusedBorderWidth: 0
+                                        topPadding: 0
+                                        bottomPadding: 0
+                                        keyForwardTargets: [renameKeyHandler]
 
                                         onEditingFinished: root.commitRename(index, text)
-                                        Keys.onEscapePressed: event => {
-                                            text = modelData.title || "Untitled";
-                                            root.editingIndex = -1;
-                                            event.accepted = true;
+
+                                        Item {
+                                            id: renameKeyHandler
+
+                                            Keys.onEscapePressed: event => {
+                                                renameField.text = modelData.title || "Untitled";
+                                                root.editingIndex = -1;
+                                                event.accepted = true;
+                                            }
                                         }
 
                                         // A tab switch re-focuses the editor via Qt.callLater; the

@@ -10,11 +10,12 @@ import (
 )
 
 const (
-	secretServiceBusName = "org.freedesktop.secrets"
-	secretServicePath    = "/org/freedesktop/secrets"
-	secretServiceIface   = "org.freedesktop.Secret.Service"
-	secretItemIface      = "org.freedesktop.Secret.Item"
-	secretPromptIface    = "org.freedesktop.Secret.Prompt"
+	secretServiceBusName      = "org.freedesktop.secrets"
+	secretServicePath         = "/org/freedesktop/secrets"
+	secretServiceIface        = "org.freedesktop.Secret.Service"
+	secretServiceSessionIface = "org.freedesktop.Secret.Session"
+	secretItemIface           = "org.freedesktop.Secret.Item"
+	secretPromptIface         = "org.freedesktop.Secret.Prompt"
 )
 
 type secretServiceSession struct {
@@ -24,7 +25,7 @@ type secretServiceSession struct {
 }
 
 func openSecretService() (*secretServiceSession, error) {
-	c, err := dbus.ConnectSessionBus()
+	c, err := dbus.SessionBus()
 	if err != nil {
 		return nil, err
 	}
@@ -34,11 +35,9 @@ func openSecretService() (*secretServiceSession, error) {
 	var sessionPath dbus.ObjectPath
 	call := svc.Call(secretServiceIface+".OpenSession", 0, "plain", dbus.MakeVariant(""))
 	if call.Err != nil {
-		c.Close()
 		return nil, call.Err
 	}
 	if err := call.Store(new(dbus.Variant), &sessionPath); err != nil {
-		c.Close()
 		return nil, err
 	}
 
@@ -177,7 +176,7 @@ func (s *secretServiceSession) lookup(connUuid, settingName, settingKey string) 
 }
 
 func (s *secretServiceSession) close() {
-	s.conn.Close()
+	s.conn.Object(secretServiceBusName, s.sessionPath).Call(secretServiceSessionIface+".Close", 0)
 }
 
 func (a *SecretAgent) trySecretService(

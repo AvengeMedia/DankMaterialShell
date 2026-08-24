@@ -12,8 +12,27 @@ FocusScope {
 
     property int currentIndex: 0
     property var parentModal: null
+    property string pendingPluginId: ""
 
     focus: true
+
+    function openPluginSettings(pluginId) {
+        pendingPluginId = pluginId || "";
+        if (currentIndex === 12)
+            Qt.callLater(applyPendingPluginSettings);
+    }
+
+    function applyPendingPluginSettings() {
+        if (!pendingPluginId || !pluginsLoader.item)
+            return;
+        pluginsLoader.item.openPluginSettings(pendingPluginId);
+        pendingPluginId = "";
+    }
+
+    onCurrentIndexChanged: {
+        if (currentIndex === 12 && pendingPluginId)
+            Qt.callLater(applyPendingPluginSettings);
+    }
 
     Rectangle {
         anchors.fill: parent
@@ -379,6 +398,13 @@ FocusScope {
             onActiveChanged: {
                 if (active && item)
                     Qt.callLater(() => item.forceActiveFocus());
+                if (active)
+                    Qt.callLater(root.applyPendingPluginSettings);
+            }
+
+            onLoaded: {
+                if (visible)
+                    Qt.callLater(root.applyPendingPluginSettings);
             }
         }
 
@@ -658,6 +684,22 @@ FocusScope {
         }
 
         Loader {
+            id: dankIslandLoader
+            anchors.fill: parent
+            active: root.currentIndex === 46
+            visible: active
+            focus: active
+            sourceComponent: DankIslandTab {
+                parentModal: root.parentModal
+            }
+
+            onActiveChanged: {
+                if (active && item)
+                    Qt.callLater(() => item.forceActiveFocus());
+            }
+        }
+
+        Loader {
             id: usersLoader
             anchors.fill: parent
             active: root.currentIndex === 35
@@ -737,7 +779,7 @@ FocusScope {
         Loader {
             id: chatsLoader
             anchors.fill: parent
-            active: root.currentIndex === 46
+            active: root.currentIndex === 47
             visible: active
             focus: active
 

@@ -842,43 +842,15 @@ Singleton {
             return [];
         }
 
-        let instance = PluginService.pluginInstances[pluginId];
-        let isPersistent = true;
-
-        if (!instance) {
-            const component = PluginService.pluginLauncherComponents[pluginId];
-            if (!component)
-                return [];
-
-            try {
-                instance = component.createObject(root, {
-                    "pluginService": PluginService
-                });
-                isPersistent = false;
-            } catch (e) {
-                log.warn("Error creating temporary plugin instance", pluginId, ":", e);
-                return [];
-            }
-        }
-
+        const instance = PluginService.ensureLauncherInstance(pluginId);
         if (!instance)
             return [];
 
         try {
-            if (typeof instance.getItems === "function") {
-                const items = instance.getItems(query || "");
-                if (!isPersistent)
-                    instance.destroy();
-                return items || [];
-            }
-
-            if (!isPersistent) {
-                instance.destroy();
-            }
+            if (typeof instance.getItems === "function")
+                return instance.getItems(query || "") || [];
         } catch (e) {
             log.warn("Error getting items from plugin", pluginId, ":", e);
-            if (!isPersistent)
-                instance.destroy();
         }
 
         return [];
@@ -888,43 +860,17 @@ Singleton {
         if (typeof PluginService === "undefined")
             return false;
 
-        let instance = PluginService.pluginInstances[pluginId];
-        let isPersistent = true;
-
-        if (!instance) {
-            const component = PluginService.pluginLauncherComponents[pluginId];
-            if (!component)
-                return false;
-
-            try {
-                instance = component.createObject(root, {
-                    "pluginService": PluginService
-                });
-                isPersistent = false;
-            } catch (e) {
-                log.warn("Error creating temporary plugin instance for execution", pluginId, ":", e);
-                return false;
-            }
-        }
-
+        const instance = PluginService.ensureLauncherInstance(pluginId);
         if (!instance)
             return false;
 
         try {
             if (typeof instance.executeItem === "function") {
                 instance.executeItem(item);
-                if (!isPersistent)
-                    instance.destroy();
                 return true;
-            }
-
-            if (!isPersistent) {
-                instance.destroy();
             }
         } catch (e) {
             log.warn("Error executing item from plugin", pluginId, ":", e);
-            if (!isPersistent)
-                instance.destroy();
         }
 
         return false;
@@ -934,7 +880,7 @@ Singleton {
         if (typeof PluginService === "undefined")
             return null;
 
-        const instance = PluginService.pluginInstances[pluginId];
+        const instance = PluginService.ensureLauncherInstance(pluginId);
         if (!instance)
             return null;
 
@@ -954,7 +900,7 @@ Singleton {
         if (typeof PluginService === "undefined")
             return [];
 
-        const instance = PluginService.pluginInstances[pluginId];
+        const instance = PluginService.ensureLauncherInstance(pluginId);
         if (!instance)
             return [];
 
@@ -973,7 +919,7 @@ Singleton {
         if (typeof PluginService === "undefined")
             return;
 
-        const instance = PluginService.pluginInstances[pluginId];
+        const instance = PluginService.ensureLauncherInstance(pluginId);
         if (!instance)
             return;
 

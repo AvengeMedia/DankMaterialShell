@@ -32,31 +32,31 @@ PanelWindow {
     }
 
     color: "transparent"
-    // Click-through everywhere except the bar strips it hosts in connected mode.
+    // Click-through everywhere except the frame gutters and hosted bar strips.
     mask: Region {
         Region {
-            readonly property bool present: win._connectedActive && win.barEdges.includes("top")
+            readonly property bool present: win._frameActive && win.cutoutTopInset > 0
             x: 0
             y: 0
             width: present ? win._windowRegionWidth : 0
             height: present ? win.cutoutTopInset : 0
         }
         Region {
-            readonly property bool present: win._connectedActive && win.barEdges.includes("bottom")
+            readonly property bool present: win._frameActive && win.cutoutBottomInset > 0
             x: 0
             y: present ? win._windowRegionHeight - win.cutoutBottomInset : 0
             width: present ? win._windowRegionWidth : 0
             height: present ? win.cutoutBottomInset : 0
         }
         Region {
-            readonly property bool present: win._connectedActive && win.barEdges.includes("left")
+            readonly property bool present: win._frameActive && win.cutoutLeftInset > 0
             x: 0
             y: 0
             width: present ? win.cutoutLeftInset : 0
             height: present ? win._windowRegionHeight : 0
         }
         Region {
-            readonly property bool present: win._connectedActive && win.barEdges.includes("right")
+            readonly property bool present: win._frameActive && win.cutoutRightInset > 0
             x: present ? win._windowRegionWidth - win.cutoutRightInset : 0
             y: 0
             width: present ? win.cutoutRightInset : 0

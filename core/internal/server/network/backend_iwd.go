@@ -101,14 +101,13 @@ func NewIWDBackend() (*IWDBackend, error) {
 }
 
 func (b *IWDBackend) Initialize() error {
-	conn, err := dbus.ConnectSystemBus()
+	conn, err := dbus.SystemBus()
 	if err != nil {
 		return fmt.Errorf("failed to connect to system bus: %w", err)
 	}
 	b.conn = conn
 
 	if err := b.discoverDevices(); err != nil {
-		conn.Close()
 		return fmt.Errorf("failed to discover iwd devices: %w", err)
 	}
 
@@ -117,7 +116,6 @@ func (b *IWDBackend) Initialize() error {
 	}
 
 	if err := b.updateState(); err != nil {
-		conn.Close()
 		return fmt.Errorf("failed to get initial state: %w", err)
 	}
 
@@ -130,10 +128,6 @@ func (b *IWDBackend) Close() {
 
 	if b.iwdAgent != nil {
 		b.iwdAgent.Close()
-	}
-
-	if b.conn != nil {
-		b.conn.Close()
 	}
 }
 

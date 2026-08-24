@@ -12,20 +12,21 @@ import (
 )
 
 func NewManager() (*Manager, error) {
-	systemConn, err := dbus.ConnectSystemBus()
+	systemConn, err := dbus.SystemBus()
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to system bus: %w", err)
 	}
 
-	sessionConn, err := dbus.ConnectSessionBus()
+	sessionConn, err := dbus.SessionBus()
 	if err != nil {
-		systemConn.Close()
 		return nil, fmt.Errorf("failed to connect to session bus: %w", err)
 	}
 
 	m := &Manager{
-		systemConn:  systemConn,
-		sessionConn: sessionConn,
+		systemConn:     systemConn,
+		sessionConn:    sessionConn,
+		systemSignals:  make(chan *dbus.Signal, 256),
+		sessionSignals: make(chan *dbus.Signal, 256),
 	}
 
 	go m.processSystemSignals()
@@ -300,10 +301,9 @@ func (m *Manager) processSystemSignals() {
 	if m.systemConn == nil {
 		return
 	}
-	ch := make(chan *dbus.Signal, 256)
-	m.systemConn.Signal(ch)
+	m.systemConn.Signal(m.systemSignals)
 
-	for sig := range ch {
+	for sig := range m.systemSignals {
 		m.dispatchSignal("system", sig)
 	}
 }
@@ -312,10 +312,9 @@ func (m *Manager) processSessionSignals() {
 	if m.sessionConn == nil {
 		return
 	}
-	ch := make(chan *dbus.Signal, 256)
-	m.sessionConn.Signal(ch)
+	m.sessionConn.Signal(m.sessionSignals)
 
-	for sig := range ch {
+	for sig := range m.sessionSignals {
 		m.dispatchSignal("session", sig)
 	}
 }
@@ -376,10 +375,12 @@ func (m *Manager) Close() {
 	})
 
 	if m.systemConn != nil {
-		m.systemConn.Close()
+		m.systemConn.RemoveSignal(m.systemSignals)
+		close(m.systemSignals)
 	}
 	if m.sessionConn != nil {
-		m.sessionConn.Close()
+		m.sessionConn.RemoveSignal(m.sessionSignals)
+		close(m.sessionSignals)
 	}
 }
 

@@ -650,7 +650,7 @@ Item {
                 }
             }
 
-            SettingsControlledByFrame {
+            SettingsControlledBy {
                 visible: root.connectedFrameModeActive
                 parentModal: root.parentModal
                 settingLabel: I18n.tr("Dock margin, opacity, and border")

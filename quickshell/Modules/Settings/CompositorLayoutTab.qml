@@ -269,42 +269,6 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
 
             SettingsCard {
                 width: parent.width
-                tags: ["compositor", "toast"]
-                title: I18n.tr("Notifications")
-                settingKey: "compositorNotifications"
-                iconName: "notifications"
-                visible: CompositorService.isNiri || CompositorService.isMango
-
-                SettingsToggleRow {
-                    tags: ["compositor", "toast", "reload"]
-                    settingKey: "showConfigReloadToast"
-                    text: I18n.tr("Show \"config reloaded\" Toast")
-                    description: I18n.tr("Show a toast when the compositor config is reloaded")
-                    checked: SessionData.showConfigReloadToast
-                    onToggled: checked => SessionData.showConfigReloadToast = checked
-                }
-            }
-
-            SettingsCard {
-                width: parent.width
-                tags: ["niri", "overview", "window", "focus", "launch", "launcher", "dock", "settings"]
-                title: I18n.tr("Overview")
-                settingKey: "niriOverview"
-                iconName: "overview"
-                visible: CompositorService.isNiri
-
-                SettingsToggleRow {
-                    tags: ["niri", "overview", "window", "focus", "launch", "launcher", "dock", "settings"]
-                    settingKey: "closeNiriOverviewOnWindowFocus"
-                    text: I18n.tr("Close Niri Overview on Window Focus", "Niri setting to leave Niri overview when DMS launches or focuses a window")
-                    description: I18n.tr("Auto-close Niri overview when DMS launches or focuses a window.", "Description of the close Niri overview on window focus setting")
-                    checked: SettingsData.closeNiriOverviewOnWindowFocus
-                    onToggled: checked => SettingsData.set("closeNiriOverviewOnWindowFocus", checked)
-                }
-            }
-
-            SettingsCard {
-                width: parent.width
                 tags: ["niri", "layout", "gaps", "radius", "window", "border"]
                 title: I18n.tr("%1 Layout Overrides").arg("niri")
                 settingKey: "niriLayout"
@@ -327,7 +291,7 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
                             return;
                         switch (index) {
                         case 1:
-                            SettingsData.set("niriLayoutGapsOverride", Math.max(4, (SettingsData.barConfigs[0]?.spacing ?? 4)));
+                            SettingsData.set("niriLayoutGapsOverride", Math.max(4, (SettingsData.getPrimaryBarConfig()?.spacing ?? 4)));
                             return;
                         case 2:
                             SettingsData.set("niriLayoutGapsOverride", -2);
@@ -348,7 +312,7 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
                     minimum: 0
                     maximum: 50
                     unit: "px"
-                    defaultValue: Math.max(4, (SettingsData.barConfigs[0]?.spacing ?? 4))
+                    defaultValue: Math.max(4, (SettingsData.getPrimaryBarConfig()?.spacing ?? 4))
                     onSliderValueChanged: newValue => SettingsData.set("niriLayoutGapsOverride", newValue)
                 }
 
@@ -434,6 +398,42 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
 
             SettingsCard {
                 width: parent.width
+                tags: ["compositor", "toast"]
+                title: I18n.tr("Notifications")
+                settingKey: "compositorNotifications"
+                iconName: "notifications"
+                visible: CompositorService.isNiri || CompositorService.isMango
+
+                SettingsToggleRow {
+                    tags: ["compositor", "toast", "reload"]
+                    settingKey: "showConfigReloadToast"
+                    text: I18n.tr("Show \"config reloaded\" Toast")
+                    description: I18n.tr("Show a toast when the compositor config is reloaded")
+                    checked: SessionData.showConfigReloadToast
+                    onToggled: checked => SessionData.showConfigReloadToast = checked
+                }
+            }
+
+            SettingsCard {
+                width: parent.width
+                tags: ["niri", "overview", "window", "focus", "launch", "launcher", "dock", "settings"]
+                title: I18n.tr("Overview")
+                settingKey: "niriOverview"
+                iconName: "overview"
+                visible: CompositorService.isNiri
+
+                SettingsToggleRow {
+                    tags: ["niri", "overview", "window", "focus", "launch", "launcher", "dock", "settings"]
+                    settingKey: "closeNiriOverviewOnWindowFocus"
+                    text: I18n.tr("Close Niri Overview on Window Focus", "Niri setting to leave Niri overview when DMS launches or focuses a window")
+                    description: I18n.tr("Auto-close Niri overview when DMS launches or focuses a window.", "Description of the close Niri overview on window focus setting")
+                    checked: SettingsData.closeNiriOverviewOnWindowFocus
+                    onToggled: checked => SettingsData.set("closeNiriOverviewOnWindowFocus", checked)
+                }
+            }
+
+            SettingsCard {
+                width: parent.width
                 tags: ["hyprland", "layout", "gaps", "radius", "window", "border", "rounding"]
                 title: I18n.tr("%1 Layout Overrides").arg("Hyprland")
                 settingKey: "hyprlandLayout"
@@ -456,7 +456,7 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
                             return;
                         switch (index) {
                         case 1:
-                            SettingsData.set("hyprlandLayoutGapsOverride", Math.max(4, (SettingsData.barConfigs[0]?.spacing ?? 4)));
+                            SettingsData.set("hyprlandLayoutGapsOverride", Math.max(4, (SettingsData.getPrimaryBarConfig()?.spacing ?? 4)));
                             return;
                         case 2:
                             SettingsData.set("hyprlandLayoutGapsOverride", -2);
@@ -477,7 +477,7 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
                     minimum: 0
                     maximum: 50
                     unit: "px"
-                    defaultValue: Math.max(4, (SettingsData.barConfigs[0]?.spacing ?? 4))
+                    defaultValue: Math.max(4, (SettingsData.getPrimaryBarConfig()?.spacing ?? 4))
                     onSliderValueChanged: newValue => SettingsData.set("hyprlandLayoutGapsOverride", newValue)
                 }
 
@@ -607,7 +607,7 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
                             return;
                         switch (index) {
                         case 1:
-                            SettingsData.set("mangoLayoutGapsOverride", Math.max(4, (SettingsData.barConfigs[0]?.spacing ?? 4)));
+                            SettingsData.set("mangoLayoutGapsOverride", Math.max(4, (SettingsData.getPrimaryBarConfig()?.spacing ?? 4)));
                             return;
                         case 2:
                             SettingsData.set("mangoLayoutGapsOverride", -2);
@@ -628,7 +628,7 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
                     minimum: 0
                     maximum: 50
                     unit: "px"
-                    defaultValue: Math.max(4, (SettingsData.barConfigs[0]?.spacing ?? 4))
+                    defaultValue: Math.max(4, (SettingsData.getPrimaryBarConfig()?.spacing ?? 4))
                     onSliderValueChanged: newValue => SettingsData.set("mangoLayoutGapsOverride", newValue)
                 }
 

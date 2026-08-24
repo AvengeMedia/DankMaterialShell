@@ -141,7 +141,7 @@ Column {
                         anchors.centerIn: parent
                         name: "colorize"
                         size: 16
-                        color: (root.customColor.r * 0.299 + root.customColor.g * 0.587 + root.customColor.b * 0.114) > 0.5 ? "#000000" : "#ffffff"
+                        color: Theme.isLightColor(root.customColor) ? "#000000" : "#ffffff"
                     }
                 }
 

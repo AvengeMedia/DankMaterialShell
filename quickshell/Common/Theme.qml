@@ -22,7 +22,7 @@ Singleton {
     readonly property real popupDistance: {
         if (typeof SettingsData === "undefined")
             return 4;
-        const defaultBar = SettingsData.barConfigs[0] || SettingsData.getBarConfig("default");
+        const defaultBar = SettingsData.getPrimaryBarConfig();
         if (!defaultBar)
             return 4;
         const useAuto = defaultBar.popupGapsAuto ?? true;
@@ -390,6 +390,8 @@ Singleton {
     property color surfaceContainer: currentThemeData.surfaceContainer
     property color surfaceContainerHigh: currentThemeData.surfaceContainerHigh
     property color surfaceContainerHighest: currentThemeData.surfaceContainerHighest || surfaceContainerHigh
+    property color surfaceBright: currentThemeData.surfaceBright || (isLightMode ? surface : surfaceContainerHighest)
+    property color surfaceDim: currentThemeData.surfaceDim || (isLightMode ? surfaceContainer : background)
     property color primaryContainer: currentThemeData.primaryContainer || blend(surfaceContainerHigh, primary, 0.45)
     property color secondaryContainer: currentThemeData.secondaryContainer || blend(surfaceContainerHigh, secondary, 0.35)
     property color tertiaryContainer: currentThemeData.tertiaryContainer || blend(surfaceContainerHigh, tertiary, 0.35)
@@ -1875,6 +1877,16 @@ Singleton {
 
     function blend(c1, c2, r) {
         return Qt.rgba(c1.r * (1 - r) + c2.r * r, c1.g * (1 - r) + c2.g * r, c1.b * (1 - r) + c2.b * r, c1.a * (1 - r) + c2.a * r);
+    }
+
+    function luminance(c) {
+        if (!c || c.r === undefined)
+            return 0;
+        return 0.299 * c.r + 0.587 * c.g + 0.114 * c.b;
+    }
+
+    function isLightColor(c, threshold = 0.5) {
+        return luminance(c) > threshold;
     }
 
     function getFillMode(modeName) {

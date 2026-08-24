@@ -24,6 +24,12 @@ Item {
         return pos === SettingsData.Position.Left || pos === SettingsData.Position.Right;
     }
 
+    readonly property bool dankIslandOwnsSelectedBarCenter: {
+        SettingsData.dankIslandBarId;
+        selectedBarId;
+        return !!selectedBarId && selectedBarId === SettingsData.dankIslandBarId;
+    }
+
     property bool hasMultipleBars: SettingsData.barConfigs.length > 1
     property int pluginCatalogRevision: 0
 
@@ -423,6 +429,8 @@ Item {
     }
 
     function setWidgetsForSection(sectionId, widgets) {
+        if (sectionId === "center" && dankIslandOwnsSelectedBarCenter)
+            return;
         switch (sectionId) {
         case "left":
             SettingsData.updateBarConfig(selectedBarId, {
@@ -522,16 +530,7 @@ Item {
                 "id": widget,
                 "enabled": true
             };
-        var result = {
-            "id": widget.id,
-            "enabled": widget.enabled
-        };
-        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "diskUsageMode", "minimumWidth", "showSwap", "showInGb", "mediaSize", "clockCompactMode", "clockDateOrder", "focusedWindowSize", "focusedWindowCompactMode", "focusedWindowShowIcon", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "keyboardLayoutNameShowIcon", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showBatteryPercent", "showBatteryPercentOnlyOnBattery", "showBatteryTime", "showBatteryTimeOnlyOnBattery", "batteryPillStyle", "batteryPillPercentSign", "showPrinterIcon", "showScreenSharingIcon", "showIdleInhibitorIcon", "showDoNotDisturbIcon", "controlCenterGroupOrder", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge", "trayUseInlineExpansion", "trayPopupSingleLine", "trayAutoOverflow", "trayMaxVisibleItems", "hideWhenIdle"];
-        for (var i = 0; i < keys.length; i++) {
-            if (widget[keys[i]] !== undefined)
-                result[keys[i]] = widget[keys[i]];
-        }
-        return result;
+        return Object.assign({}, widget);
     }
 
     function handleItemEnabledChanged(sectionId, itemId, enabled) {
@@ -574,6 +573,8 @@ Item {
 
     // Move a widget across sections (or within); committed as one atomic bar-config save
     function moveWidget(fromSection, toSection, movedId, toIndex) {
+        if (dankIslandOwnsSelectedBarCenter && (fromSection === "center" || toSection === "center"))
+            return;
         if (fromSection === toSection) {
             var arr = getWidgetsForSection(fromSection).slice();
             var fi = arr.findIndex(w => (typeof w === "string" ? w : w.id) === movedId);
@@ -598,7 +599,7 @@ Item {
     }
 
     function sectionAtY(gy) {
-        var sections = ["left", "center", "right"];
+        var sections = dankIslandOwnsSelectedBarCenter ? ["left", "right"] : ["left", "center", "right"];
         var nearest = "";
         var nearestDist = Infinity;
         for (var i = 0; i < sections.length; i++) {
@@ -724,7 +725,7 @@ Item {
     }
 
     function moveAcrossSections(sectionId, id, delta) {
-        var order = ["left", "center", "right"];
+        var order = dankIslandOwnsSelectedBarCenter ? ["left", "right"] : ["left", "center", "right"];
         var si = order.indexOf(sectionId);
         var ti = si + delta;
         if (si < 0 || ti < 0 || ti >= order.length)
@@ -1419,9 +1420,10 @@ Item {
                         id: centerSection
                         anchors.fill: parent
                         anchors.margins: Theme.spacingL
-                        title: selectedBarIsVertical ? I18n.tr("Middle Section") : I18n.tr("Center Section")
-                        titleIcon: "format_align_center"
+                        title: widgetsTab.dankIslandOwnsSelectedBarCenter ? I18n.tr("Center Section - Reserved by Dank Island") : (selectedBarIsVertical ? I18n.tr("Middle Section") : I18n.tr("Center Section"))
+                        titleIcon: widgetsTab.dankIslandOwnsSelectedBarCenter ? "lock" : "format_align_center"
                         sectionId: "center"
+                        readOnly: widgetsTab.dankIslandOwnsSelectedBarCenter
                         allWidgets: widgetsTab.baseWidgetDefinitions
                         items: widgetsTab.getItemsForSection("center")
                         onItemEnabledChanged: (sectionId, itemId, enabled) => {
