@@ -117,8 +117,16 @@ Initiate a WiFi connection.
 
 **Parameters:**
 - `ssid` (string, required): Network SSID
-- `password` (string, optional): Pre-shared key for WPA/WPA2/WPA3 networks
+- `password` (string, optional): Pre-shared key for WPA/WPA2/WPA3 networks, or the 802.1X password when `username` is set
 - `interactive` (boolean, optional): Enable credential prompting if authentication fails or password is missing. Automatically set to `true` when connecting to secured networks without providing a password.
+- `username` (string, optional): 802.1X identity; marks the connection as enterprise
+- `eapMethod` (string, optional): 802.1X EAP method (`peap`, `ttls`, `pwd`, `tls`); defaults to `peap`
+- `phase2Auth` (string, optional): Inner authentication for `peap`/`ttls` (`mschapv2`, `pap`, `mschap`, `chap`, `gtc`, `md5`); defaults to `mschapv2`
+- `anonymousIdentity` (string, optional): 802.1X anonymous outer identity
+- `domainSuffixMatch` (string, optional): Required suffix of the RADIUS server certificate domain
+- `caCertPath` (string, optional): CA certificate file for server validation
+- `useSystemCACerts` (boolean, optional): Validate the server against the system CA store; defaults to `false`
+- `clientCertPath`, `privateKeyPath` (string, optional): Client certificate and key for `tls`
 
 **Response:**
 ```json

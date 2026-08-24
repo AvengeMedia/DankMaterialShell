@@ -54,6 +54,10 @@ const introspectXML = `
 			<arg type="u" name="flags" direction="in"/>
 			<arg type="a{sa{sv}}" name="secrets" direction="out"/>
 		</method>
+		<method name="SaveSecrets">
+			<arg type="a{sa{sv}}" name="connection" direction="in"/>
+			<arg type="o" name="connection_path" direction="in"/>
+		</method>
 		<method name="DeleteSecrets">
 			<arg type="a{sa{sv}}" name="connection" direction="in"/>
 			<arg type="o" name="connection_path" direction="in"/>
@@ -145,14 +149,7 @@ func (a *SecretAgent) GetSecrets(
 		return nil, dbus.NewError("org.freedesktop.NetworkManager.SecretAgent.Error.NoSecrets", nil)
 	}
 
-	var connUuid string
-	if c, ok := conn["connection"]; ok {
-		if v, ok := c["uuid"]; ok {
-			if s, ok2 := v.Value().(string); ok2 {
-				connUuid = s
-			}
-		}
-	}
+	connUuid := readConnUUID(conn)
 
 	// Phase 1: Determine if this connection is ours and what fields we need.
 	if a.backend != nil {
@@ -577,9 +574,61 @@ func (a *SecretAgent) GetSecrets(
 	return out, nil
 }
 
+// SaveSecrets persists agent-owned secrets to the Secret Service keyring using
+// the attribute schema trySecretService reads back. NM calls this after
+// activation for secrets with NM_SETTING_SECRET_FLAG_AGENT_OWNED; without it
+// those secrets are lost and every reconnect re-prompts.
+func (a *SecretAgent) SaveSecrets(conn map[string]nmVariantMap, path dbus.ObjectPath) *dbus.Error {
+	_, displayName, _ := readConnTypeAndName(conn)
+	connUuid := readConnUUID(conn)
+	log.Infof("[SecretAgent] SaveSecrets called: path=%s, name=%s", path, displayName)
+
+	if connUuid == "" {
+		return nil
+	}
+
+	owned := agentOwnedSecrets(conn)
+	if len(owned) == 0 {
+		return nil
+	}
+
+	sess, err := openSecretService()
+	if err != nil {
+		log.Warnf("[SecretAgent] SaveSecrets: failed to open secret service: %v", err)
+		return nil
+	}
+	defer sess.close()
+
+	for setting, secrets := range owned {
+		for key, value := range secrets {
+			label := fmt.Sprintf("Network secret for %s/%s/%s", displayName, setting, key)
+			if err := sess.store(connUuid, setting, key, label, value); err != nil {
+				log.Warnf("[SecretAgent] SaveSecrets: failed to store %s/%s: %v", setting, key, err)
+				continue
+			}
+			log.Infof("[SecretAgent] SaveSecrets: stored %s/%s for %s", setting, key, connUuid)
+		}
+	}
+
+	return nil
+}
+
 func (a *SecretAgent) DeleteSecrets(conn map[string]nmVariantMap, path dbus.ObjectPath) *dbus.Error {
-	ssid := readSSID(conn)
-	log.Infof("[SecretAgent] DeleteSecrets called: path=%s, SSID=%s", path, ssid)
+	connUuid := readConnUUID(conn)
+	log.Infof("[SecretAgent] DeleteSecrets called: path=%s, uuid=%s", path, connUuid)
+
+	if connUuid == "" {
+		return nil
+	}
+
+	sess, err := openSecretService()
+	if err != nil {
+		log.Debugf("[SecretAgent] DeleteSecrets: failed to open secret service: %v", err)
+		return nil
+	}
+	defer sess.close()
+
+	sess.deleteAll(connUuid)
 	return nil
 }
 
@@ -604,25 +653,25 @@ func (a *SecretAgent) Introspect() (string, *dbus.Error) {
 	return introspectXML, nil
 }
 
+// save8021xIdentity persists a prompted identity into the profile. Update2
+// replaces the whole connection, so the full settings must round-trip with
+// stored secrets merged back, or system-owned passwords would be wiped.
 func (a *SecretAgent) save8021xIdentity(path dbus.ObjectPath, identity string) {
 	connObj := a.conn.Object("org.freedesktop.NetworkManager", path)
-	var existing map[string]map[string]dbus.Variant
-	if err := connObj.Call("org.freedesktop.NetworkManager.Settings.Connection.GetSettings", 0).Store(&existing); err != nil {
+	var settings map[string]map[string]dbus.Variant
+	if err := connObj.Call("org.freedesktop.NetworkManager.Settings.Connection.GetSettings", 0).Store(&settings); err != nil {
 		log.Warnf("[SecretAgent] Failed to get settings for identity save: %v", err)
 		return
 	}
 
-	settings := make(map[string]map[string]dbus.Variant)
-	if connSection, ok := existing["connection"]; ok {
-		settings["connection"] = connSection
-	}
-
-	dot1x, ok := existing["802-1x"]
+	dot1x, ok := settings["802-1x"]
 	if !ok {
 		dot1x = make(map[string]dbus.Variant)
+		settings["802-1x"] = dot1x
 	}
 	dot1x["identity"] = dbus.MakeVariant(identity)
-	settings["802-1x"] = dot1x
+
+	mergeStoredSecretsRaw(connObj, settings)
 
 	var result map[string]dbus.Variant
 	if err := connObj.Call("org.freedesktop.NetworkManager.Settings.Connection.Update2", 0,
@@ -631,6 +680,77 @@ func (a *SecretAgent) save8021xIdentity(path dbus.ObjectPath, identity string) {
 		return
 	}
 	log.Infof("[SecretAgent] Saved 802.1x identity to connection profile")
+}
+
+func mergeStoredSecretsRaw(connObj dbus.BusObject, settings map[string]map[string]dbus.Variant) {
+	for _, setting := range []string{"802-11-wireless-security", "802-1x", "vpn"} {
+		section, ok := settings[setting]
+		if !ok {
+			continue
+		}
+
+		var secrets map[string]map[string]dbus.Variant
+		if err := connObj.Call("org.freedesktop.NetworkManager.Settings.Connection.GetSecrets", 0, setting).Store(&secrets); err != nil {
+			continue
+		}
+
+		for k, v := range secrets[setting] {
+			if _, exists := section[k]; exists {
+				continue
+			}
+			section[k] = v
+		}
+	}
+}
+
+func readConnUUID(conn map[string]nmVariantMap) string {
+	c, ok := conn["connection"]
+	if !ok {
+		return ""
+	}
+	v, ok := c["uuid"]
+	if !ok {
+		return ""
+	}
+	s, _ := v.Value().(string)
+	return s
+}
+
+// agentOwnedSecrets extracts secrets flagged NM_SETTING_SECRET_FLAG_AGENT_OWNED.
+// Secret properties are identified by their "<name>-flags" sibling key.
+func agentOwnedSecrets(conn map[string]nmVariantMap) map[string]map[string]string {
+	const nmSecretFlagAgentOwned = 0x1
+
+	out := make(map[string]map[string]string)
+	for _, setting := range []string{"802-11-wireless-security", "802-1x"} {
+		section, ok := conn[setting]
+		if !ok {
+			continue
+		}
+
+		for key, v := range section {
+			if strings.HasSuffix(key, "-flags") {
+				continue
+			}
+			value, ok := v.Value().(string)
+			if !ok || value == "" {
+				continue
+			}
+			flagsVariant, ok := section[key+"-flags"]
+			if !ok {
+				continue
+			}
+			flags, ok := flagsVariant.Value().(uint32)
+			if !ok || flags&nmSecretFlagAgentOwned == 0 {
+				continue
+			}
+			if out[setting] == nil {
+				out[setting] = make(map[string]string)
+			}
+			out[setting][key] = value
+		}
+	}
+	return out
 }
 
 func readSSID(conn map[string]nmVariantMap) string {

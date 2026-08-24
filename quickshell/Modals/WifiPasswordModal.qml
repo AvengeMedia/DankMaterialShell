@@ -26,6 +26,8 @@ DankModal {
 
     property string wifiAnonymousIdentityInput: ""
     property string wifiDomainInput: ""
+    property string eapMethodValue: "peap"
+    property string phase2AuthValue: "mschapv2"
 
     property bool isPromptMode: false
     property string promptToken: ""
@@ -46,8 +48,10 @@ DankModal {
     readonly property string serverCertificateFingerprint: promptHints.length > 0 ? promptHints[0] : ""
     readonly property bool showUsernameField: requiresEnterprise && !isVpnPrompt && fieldsInfo.length === 0
     readonly property bool showPasswordField: fieldsInfo.length === 0 && !isCertificatePrompt
-    readonly property bool showAnonField: requiresEnterprise && !isVpnPrompt
-    readonly property bool showDomainField: requiresEnterprise && !isVpnPrompt
+    readonly property bool showEapFields: requiresEnterprise && !isVpnPrompt && !isPromptMode
+    readonly property bool showPhase2Dropdown: eapMethodValue === "peap" || eapMethodValue === "ttls"
+    readonly property bool showAnonField: requiresEnterprise && !isVpnPrompt && !isPromptMode && eapMethodValue !== "pwd"
+    readonly property bool showDomainField: showAnonField
     readonly property bool showSavePasswordCheckbox: (isVpnPrompt || fieldsInfo.length > 0) && promptReason !== "pkcs11" && !isCertificatePrompt
 
     readonly property int inputFieldHeight: Theme.fontSizeMedium + Theme.spacingL * 2
@@ -62,6 +66,8 @@ DankModal {
         h += fieldsInfo.length * inputFieldWithSpacing;
         if (isHiddenNetwork)
             h += inputFieldWithSpacing;
+        if (showEapFields)
+            h += eapSelectorRow.implicitHeight + Theme.spacingM;
         if (showUsernameField)
             h += inputFieldWithSpacing;
         if (showPasswordField)
@@ -107,6 +113,8 @@ DankModal {
         wifiUsernameInput = "";
         wifiAnonymousIdentityInput = "";
         wifiDomainInput = "";
+        eapMethodValue = "peap";
+        phase2AuthValue = "mschapv2";
         isPromptMode = false;
         isHiddenNetwork = false;
         promptToken = "";
@@ -134,6 +142,8 @@ DankModal {
         wifiUsernameInput = "";
         wifiAnonymousIdentityInput = "";
         wifiDomainInput = "";
+        eapMethodValue = "peap";
+        phase2AuthValue = "mschapv2";
         isPromptMode = false;
         isHiddenNetwork = true;
         promptToken = "";
@@ -176,6 +186,8 @@ DankModal {
         wifiUsernameInput = "";
         wifiAnonymousIdentityInput = "";
         wifiDomainInput = "";
+        eapMethodValue = "peap";
+        phase2AuthValue = "mschapv2";
 
         open();
         Qt.callLater(() => {
@@ -241,7 +253,11 @@ DankModal {
         } else {
             const ssid = isHiddenNetwork ? ssidInput.text : wifiPasswordSSID;
             const username = requiresEnterprise ? usernameInput.text : "";
-            NetworkService.connectToWifi(ssid, passwordInput.text, username, wifiAnonymousIdentityInput, wifiDomainInput, isHiddenNetwork);
+            const anonIdentity = showAnonField ? wifiAnonymousIdentityInput : "";
+            const domainMatch = showDomainField ? wifiDomainInput : "";
+            const eap = requiresEnterprise ? eapMethodValue : "";
+            const phase2 = requiresEnterprise && showPhase2Dropdown ? phase2AuthValue : "";
+            NetworkService.connectToWifi(ssid, passwordInput.text, username, anonIdentity, domainMatch, isHiddenNetwork, eap, phase2);
         }
 
         hide();
@@ -539,6 +555,58 @@ DankModal {
                 }
             }
 
+            Row {
+                id: eapSelectorRow
+
+                visible: showEapFields
+                width: parent.width
+                spacing: Theme.spacingM
+
+                Column {
+                    width: showPhase2Dropdown ? (parent.width - Theme.spacingM) / 2 : parent.width
+                    spacing: Theme.spacingXS
+
+                    StyledText {
+                        text: I18n.tr("Authentication")
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                    }
+
+                    DankDropdown {
+                        width: parent.width
+                        dropdownWidth: parent.width
+                        compactMode: true
+                        options: ["PEAP", "TTLS", "PWD"]
+                        currentValue: eapMethodValue.toUpperCase()
+                        onValueChanged: value => {
+                            eapMethodValue = value.toLowerCase();
+                            phase2AuthValue = eapMethodValue === "ttls" ? "pap" : "mschapv2";
+                        }
+                    }
+                }
+
+                Column {
+                    visible: showPhase2Dropdown
+                    width: (parent.width - Theme.spacingM) / 2
+                    spacing: Theme.spacingXS
+
+                    StyledText {
+                        text: I18n.tr("Inner authentication", "802.1X phase 2 authentication method")
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                    }
+
+                    DankDropdown {
+                        width: parent.width
+                        dropdownWidth: parent.width
+                        compactMode: true
+                        options: eapMethodValue === "ttls" ? ["PAP", "MSCHAPv2", "MSCHAP", "CHAP", "GTC", "MD5"] : ["MSCHAPv2", "GTC", "MD5"]
+                        currentValue: phase2AuthValue === "mschapv2" ? "MSCHAPv2" : phase2AuthValue.toUpperCase()
+                        onValueChanged: value => phase2AuthValue = value.toLowerCase()
+                    }
+                }
+            }
+
             Rectangle {
                 width: parent.width
                 height: inputFieldHeight
@@ -564,7 +632,7 @@ DankModal {
                     backgroundColor: "transparent"
                     enabled: root.shouldBeVisible
                     keyNavigationTab: passwordInput
-                    keyNavigationBacktab: domainMatchInput
+                    keyNavigationBacktab: showDomainField ? domainMatchInput : passwordInput
                     onTextEdited: wifiUsernameInput = text
                     onAccepted: passwordInput.forceActiveFocus()
                 }
@@ -596,11 +664,11 @@ DankModal {
                     placeholderText: (requiresEnterprise && !isVpnPrompt) ? I18n.tr("Password") : ""
                     backgroundColor: "transparent"
                     enabled: root.shouldBeVisible
-                    keyNavigationTab: (requiresEnterprise && !isVpnPrompt) ? anonInput : null
-                    keyNavigationBacktab: (requiresEnterprise && !isVpnPrompt) ? usernameInput : null
+                    keyNavigationTab: showAnonField ? anonInput : (showUsernameField ? usernameInput : null)
+                    keyNavigationBacktab: showUsernameField ? usernameInput : null
                     onTextEdited: wifiPasswordInput = text
                     onAccepted: {
-                        if (requiresEnterprise && !isVpnPrompt) {
+                        if (showAnonField) {
                             anonInput.forceActiveFocus();
                             return;
                         }

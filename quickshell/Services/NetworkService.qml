@@ -197,9 +197,9 @@ Singleton {
         }
     }
 
-    function connectToWifi(ssid, password = "", username = "", anonymousIdentity = "", domainSuffixMatch = "") {
+    function connectToWifi(ssid, password = "", username = "", anonymousIdentity = "", domainSuffixMatch = "", hidden = false, eapMethod = "", phase2Auth = "") {
         if (activeService && activeService.connectToWifi) {
-            activeService.connectToWifi(ssid, password, username, anonymousIdentity, domainSuffixMatch);
+            activeService.connectToWifi(ssid, password, username, anonymousIdentity, domainSuffixMatch, hidden, eapMethod, phase2Auth);
         }
     }
 
@@ -239,9 +239,9 @@ Singleton {
         }
     }
 
-    function connectToWifiAndSetPreference(ssid, password, username = "", anonymousIdentity = "", domainSuffixMatch = "") {
+    function connectToWifiAndSetPreference(ssid, password, username = "", anonymousIdentity = "", domainSuffixMatch = "", hidden = false, eapMethod = "", phase2Auth = "") {
         if (activeService && activeService.connectToWifiAndSetPreference) {
-            activeService.connectToWifiAndSetPreference(ssid, password, username, anonymousIdentity, domainSuffixMatch);
+            activeService.connectToWifiAndSetPreference(ssid, password, username, anonymousIdentity, domainSuffixMatch, hidden, eapMethod, phase2Auth);
         }
     }
 

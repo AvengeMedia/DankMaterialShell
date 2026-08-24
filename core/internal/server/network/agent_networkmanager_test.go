@@ -434,6 +434,69 @@ func TestBuildWiFiSecretsResponse(t *testing.T) {
 	})
 }
 
+func TestAgentOwnedSecrets(t *testing.T) {
+	t.Run("agent-owned password extracted", func(t *testing.T) {
+		conn := map[string]nmVariantMap{
+			"802-1x": {
+				"identity":       dbus.MakeVariant("john"),
+				"password":       dbus.MakeVariant("hunter2"),
+				"password-flags": dbus.MakeVariant(uint32(1)),
+			},
+		}
+
+		owned := agentOwnedSecrets(conn)
+		assert.Equal(t, map[string]map[string]string{
+			"802-1x": {"password": "hunter2"},
+		}, owned)
+	})
+
+	t.Run("system-owned and flagless secrets skipped", func(t *testing.T) {
+		conn := map[string]nmVariantMap{
+			"802-11-wireless-security": {
+				"key-mgmt":  dbus.MakeVariant("wpa-psk"),
+				"psk":       dbus.MakeVariant("hunter2"),
+				"psk-flags": dbus.MakeVariant(uint32(0)),
+			},
+			"802-1x": {
+				"password": dbus.MakeVariant("hunter2"),
+			},
+		}
+
+		assert.Empty(t, agentOwnedSecrets(conn))
+	})
+
+	t.Run("agent-owned psk extracted", func(t *testing.T) {
+		conn := map[string]nmVariantMap{
+			"802-11-wireless-security": {
+				"psk":       dbus.MakeVariant("hunter2"),
+				"psk-flags": dbus.MakeVariant(uint32(1)),
+			},
+		}
+
+		owned := agentOwnedSecrets(conn)
+		assert.Equal(t, "hunter2", owned["802-11-wireless-security"]["psk"])
+	})
+
+	t.Run("not-saved flag skipped", func(t *testing.T) {
+		conn := map[string]nmVariantMap{
+			"802-1x": {
+				"password":       dbus.MakeVariant("hunter2"),
+				"password-flags": dbus.MakeVariant(uint32(2)),
+			},
+		}
+
+		assert.Empty(t, agentOwnedSecrets(conn))
+	})
+}
+
+func TestReadConnUUID(t *testing.T) {
+	assert.Equal(t, "abc-123", readConnUUID(map[string]nmVariantMap{
+		"connection": {"uuid": dbus.MakeVariant("abc-123")},
+	}))
+	assert.Equal(t, "", readConnUUID(map[string]nmVariantMap{}))
+	assert.Equal(t, "", readConnUUID(map[string]nmVariantMap{"connection": {}}))
+}
+
 func TestWiFiSecretCache(t *testing.T) {
 	b := &NetworkManagerBackend{}
 

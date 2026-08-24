@@ -301,6 +301,11 @@ func (b *NetworkManagerBackend) ConnectWiFi(req ConnectionRequest) error {
 
 	existingConn, err := b.findConnection(req.SSID)
 	if err == nil && existingConn != nil {
+		if req.Password != "" || req.Username != "" {
+			if err := updateConnectionCredentials(existingConn, req); err != nil {
+				log.Warnf("[ConnectWiFi] Failed to update credentials on existing profile: %v", err)
+			}
+		}
 		b.stateMutex.Lock()
 		b.state.ConnectingPreExisting = true
 		b.stateMutex.Unlock()
@@ -930,6 +935,60 @@ func (b *NetworkManagerBackend) createAndConnectWiFiOnDevice(req ConnectionReque
 	}
 
 	return nil
+}
+
+// updateConnectionCredentials applies user-supplied credentials to a saved
+// profile before activation; without this a retype after a password change is
+// silently ignored in favor of the stored (stale) secret.
+func updateConnectionCredentials(conn gonetworkmanager.Connection, req ConnectionRequest) error {
+	settings, err := conn.GetSettings()
+	if err != nil {
+		return fmt.Errorf("failed to get connection settings: %w", err)
+	}
+
+	for _, section := range []string{"ipv4", "ipv6"} {
+		ipCfg, ok := settings[section]
+		if !ok {
+			continue
+		}
+		delete(ipCfg, "addresses")
+		delete(ipCfg, "routes")
+		delete(ipCfg, "dns")
+	}
+
+	mergeStoredSecrets(conn, settings)
+
+	if dot1x, ok := settings["802-1x"]; ok {
+		if req.Username != "" {
+			dot1x["identity"] = req.Username
+		}
+		if req.Password != "" {
+			dot1x["password"] = req.Password
+			dot1x["password-flags"] = uint32(0)
+		}
+		if req.AnonymousIdentity != "" {
+			dot1x["anonymous-identity"] = req.AnonymousIdentity
+		}
+		if req.DomainSuffixMatch != "" {
+			dot1x["domain-suffix-match"] = req.DomainSuffixMatch
+		}
+		return conn.Update(settings)
+	}
+
+	sec, ok := settings["802-11-wireless-security"]
+	if !ok || req.Password == "" {
+		return nil
+	}
+
+	keyMgmt, _ := sec["key-mgmt"].(string)
+	switch keyMgmt {
+	case "wpa-psk", "sae", "wpa-psk-sae":
+		sec["psk"] = req.Password
+		sec["psk-flags"] = uint32(0)
+	default:
+		return nil
+	}
+	return conn.Update(settings)
 }
 
 func (b *NetworkManagerBackend) SetWiFiAutoconnect(ssid string, autoconnect bool) error {

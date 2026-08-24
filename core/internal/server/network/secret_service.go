@@ -10,12 +10,15 @@ import (
 )
 
 const (
-	secretServiceBusName      = "org.freedesktop.secrets"
-	secretServicePath         = "/org/freedesktop/secrets"
-	secretServiceIface        = "org.freedesktop.Secret.Service"
-	secretServiceSessionIface = "org.freedesktop.Secret.Session"
-	secretItemIface           = "org.freedesktop.Secret.Item"
-	secretPromptIface         = "org.freedesktop.Secret.Prompt"
+	secretServiceBusName        = "org.freedesktop.secrets"
+	secretServicePath           = "/org/freedesktop/secrets"
+	secretServiceIface          = "org.freedesktop.Secret.Service"
+	secretServiceSessionIface   = "org.freedesktop.Secret.Session"
+	secretCollectionIface       = "org.freedesktop.Secret.Collection"
+	secretItemIface             = "org.freedesktop.Secret.Item"
+	secretPromptIface           = "org.freedesktop.Secret.Prompt"
+	secretDefaultCollectionPath = "/org/freedesktop/secrets/aliases/default"
+	nmSecretXdgSchema           = "org.freedesktop.NetworkManager.Connection"
 )
 
 type secretServiceSession struct {
@@ -173,6 +176,65 @@ func (s *secretServiceSession) lookup(connUuid, settingName, settingKey string) 
 
 	log.Infof("[SecretAgent] Retrieved secret from secret service for %s/%s", connUuid, settingKey)
 	return secretValue
+}
+
+func (s *secretServiceSession) store(connUuid, settingName, settingKey, label, value string) error {
+	coll := s.conn.Object(secretServiceBusName, dbus.ObjectPath(secretDefaultCollectionPath))
+
+	if err := s.unlock([]dbus.ObjectPath{dbus.ObjectPath(secretDefaultCollectionPath)}); err != nil {
+		return fmt.Errorf("failed to unlock default collection: %w", err)
+	}
+
+	props := map[string]dbus.Variant{
+		"org.freedesktop.Secret.Item.Label": dbus.MakeVariant(label),
+		"org.freedesktop.Secret.Item.Attributes": dbus.MakeVariant(map[string]string{
+			"xdg:schema":      nmSecretXdgSchema,
+			"connection-uuid": connUuid,
+			"setting-name":    settingName,
+			"setting-key":     settingKey,
+		}),
+	}
+	secret := struct {
+		Session     dbus.ObjectPath
+		Parameters  []byte
+		Value       []byte
+		ContentType string
+	}{s.sessionPath, []byte{}, []byte(value), "text/plain"}
+
+	var itemPath, promptPath dbus.ObjectPath
+	call := coll.Call(secretCollectionIface+".CreateItem", 0, props, secret, true)
+	if call.Err != nil {
+		return call.Err
+	}
+	if err := call.Store(&itemPath, &promptPath); err != nil {
+		return err
+	}
+	if itemPath == "/" {
+		return fmt.Errorf("collection requires a prompt to create item")
+	}
+	return nil
+}
+
+func (s *secretServiceSession) deleteAll(connUuid string) {
+	attrs := map[string]string{"connection-uuid": connUuid}
+
+	var unlocked, locked []dbus.ObjectPath
+	call := s.svc.Call(secretServiceIface+".SearchItems", 0, attrs)
+	if call.Err != nil {
+		log.Debugf("[SecretAgent] deleteAll SearchItems failed: %v", call.Err)
+		return
+	}
+	if err := call.Store(&unlocked, &locked); err != nil {
+		log.Debugf("[SecretAgent] deleteAll failed to store SearchItems result: %v", err)
+		return
+	}
+
+	for _, path := range append(unlocked, locked...) {
+		item := s.conn.Object(secretServiceBusName, path)
+		if call := item.Call(secretItemIface+".Delete", 0); call.Err != nil {
+			log.Debugf("[SecretAgent] deleteAll failed to delete %s: %v", path, call.Err)
+		}
+	}
 }
 
 func (s *secretServiceSession) close() {
