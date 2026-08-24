@@ -2079,7 +2079,7 @@ Singleton {
                 const colorsText = dynamicColorsFileView.text();
                 if (colorsText) {
                     root.matugenColors = JSON.parse(colorsText);
-                    if (typeof SettingsData !== "undefined" && SettingsData.matugenSmartMode && root.matugenColors && root.matugenColors.mode && typeof SessionData !== "undefined" && !SessionData.isSwitchingMode) {
+                    if (typeof SettingsData !== "undefined" && SettingsData.matugenSmartMode && currentTheme === dynamic && root.matugenColors && root.matugenColors.mode && typeof SessionData !== "undefined" && !SessionData.isSwitchingMode) {
                         const resolvedLight = root.matugenColors.mode === "light";
                         if (SessionData.isLightMode !== resolvedLight) {
                             SessionData.setLightMode(resolvedLight, true);

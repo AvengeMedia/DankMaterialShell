@@ -746,7 +746,7 @@ Column {
                 case "nightMode":
                     return I18n.tr("Night Mode");
                 case "darkMode": {
-                    if (SettingsData.matugenSmartMode)
+                    if (SettingsData.matugenSmartMode && Theme.currentTheme === Theme.dynamic)
                         return SessionData.isLightMode ? I18n.tr("Auto (Light Mode)", "dark mode toggle label when matugen smart mode resolved light") : I18n.tr("Auto (Dark Mode)", "dark mode toggle label when matugen smart mode resolved dark");
                     return I18n.tr("Dark Mode");
                 }
