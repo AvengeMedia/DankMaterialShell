@@ -202,9 +202,41 @@ func (r *RegionSelector) updateMovedSelection(pointerX, pointerY float64) {
 	r.selection.currentX += deltaX
 	r.selection.anchorY += deltaY
 	r.selection.currentY += deltaY
+	r.rehomeSelectionSurface()
 
 	for _, surface := range r.surfaces {
 		r.redrawSurface(surface)
+	}
+}
+
+func (r *RegionSelector) rehomeSelectionSurface() {
+	minX := math.Min(r.selection.anchorX, r.selection.currentX)
+	minY := math.Min(r.selection.anchorY, r.selection.currentY)
+	maxX := math.Max(r.selection.anchorX, r.selection.currentX)
+	maxY := math.Max(r.selection.anchorY, r.selection.currentY)
+
+	for _, surface := range r.surfaces {
+		if surface == nil || surface.output == nil || surface.logicalW <= 0 || surface.logicalH <= 0 {
+			continue
+		}
+		outputMinX := float64(surface.output.x)
+		outputMinY := float64(surface.output.y)
+		outputMaxX := outputMinX + float64(surface.logicalW)
+		outputMaxY := outputMinY + float64(surface.logicalH)
+		epsilonX, epsilonY := 1.0, 1.0
+		if surface.screenBuf != nil {
+			if surface.screenBuf.Width > 0 {
+				epsilonX = float64(surface.logicalW) / float64(surface.screenBuf.Width)
+			}
+			if surface.screenBuf.Height > 0 {
+				epsilonY = float64(surface.logicalH) / float64(surface.screenBuf.Height)
+			}
+		}
+		if minX >= outputMinX && minY >= outputMinY &&
+			maxX <= outputMaxX-epsilonX && maxY <= outputMaxY-epsilonY {
+			r.selection.surface = surface
+			return
+		}
 	}
 }
 
