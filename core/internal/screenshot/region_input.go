@@ -135,7 +135,7 @@ func (r *RegionSelector) updateSelectionCurrent(os *OutputSurface, surfaceX, sur
 	curX := surfaceX + float64(os.output.x)
 	curY := surfaceY + float64(os.output.y)
 	if r.movingSelection {
-		r.updateMovedSelection(curX, curY)
+		r.updateMovedSelection(os, curX, curY)
 		return
 	}
 
@@ -185,7 +185,7 @@ func (r *RegionSelector) beginSelectionMove(pointerX, pointerY float64) bool {
 	return true
 }
 
-func (r *RegionSelector) updateMovedSelection(pointerX, pointerY float64) {
+func (r *RegionSelector) updateMovedSelection(activeSurface *OutputSurface, pointerX, pointerY float64) {
 	minX := math.Min(r.selection.anchorX, r.selection.currentX)
 	minY := math.Min(r.selection.anchorY, r.selection.currentY)
 	maxX := math.Max(r.selection.anchorX, r.selection.currentX)
@@ -195,7 +195,7 @@ func (r *RegionSelector) updateMovedSelection(pointerX, pointerY float64) {
 
 	newMinX := pointerX - r.moveOffsetX
 	newMinY := pointerY - r.moveOffsetY
-	newMinX, newMinY = r.clampMovedSelection(newMinX, newMinY, width, height)
+	newMinX, newMinY = r.clampMovedSelection(activeSurface, newMinX, newMinY, width, height)
 	deltaX := newMinX - minX
 	deltaY := newMinY - minY
 	r.selection.anchorX += deltaX
@@ -240,37 +240,48 @@ func (r *RegionSelector) rehomeSelectionSurface() {
 	}
 }
 
-func (r *RegionSelector) clampMovedSelection(x, y, width, height float64) (float64, float64) {
+func (r *RegionSelector) clampMovedSelection(activeSurface *OutputSurface, x, y, width, height float64) (float64, float64) {
 	var minX, minY, maxX, maxY float64
 	initialized := false
-	for _, surface := range r.surfaces {
-		if surface == nil || surface.output == nil || surface.logicalW <= 0 || surface.logicalH <= 0 {
-			continue
+	boundsSurface := r.selection.surface
+	if activeSurface != nil && activeSurface.output != nil && activeSurface.logicalW > 0 && activeSurface.logicalH > 0 {
+		minX = float64(activeSurface.output.x)
+		minY = float64(activeSurface.output.y)
+		maxX = minX + float64(activeSurface.logicalW)
+		maxY = minY + float64(activeSurface.logicalH)
+		initialized = true
+		boundsSurface = activeSurface
+	} else {
+		for _, surface := range r.surfaces {
+			if surface == nil || surface.output == nil || surface.logicalW <= 0 || surface.logicalH <= 0 {
+				continue
+			}
+			outputMinX := float64(surface.output.x)
+			outputMinY := float64(surface.output.y)
+			outputMaxX := outputMinX + float64(surface.logicalW)
+			outputMaxY := outputMinY + float64(surface.logicalH)
+			if !initialized {
+				minX, minY, maxX, maxY = outputMinX, outputMinY, outputMaxX, outputMaxY
+				initialized = true
+				continue
+			}
+			minX = math.Min(minX, outputMinX)
+			minY = math.Min(minY, outputMinY)
+			maxX = math.Max(maxX, outputMaxX)
+			maxY = math.Max(maxY, outputMaxY)
 		}
-		outputMinX := float64(surface.output.x)
-		outputMinY := float64(surface.output.y)
-		outputMaxX := outputMinX + float64(surface.logicalW)
-		outputMaxY := outputMinY + float64(surface.logicalH)
-		if !initialized {
-			minX, minY, maxX, maxY = outputMinX, outputMinY, outputMaxX, outputMaxY
-			initialized = true
-			continue
-		}
-		minX = math.Min(minX, outputMinX)
-		minY = math.Min(minY, outputMinY)
-		maxX = math.Max(maxX, outputMaxX)
-		maxY = math.Max(maxY, outputMaxY)
 	}
 	if !initialized {
 		return x, y
 	}
+
 	epsilonX, epsilonY := 1.0, 1.0
-	if surface := r.selection.surface; surface != nil && surface.screenBuf != nil {
-		if surface.logicalW > 0 && surface.screenBuf.Width > 0 {
-			epsilonX = float64(surface.logicalW) / float64(surface.screenBuf.Width)
+	if boundsSurface != nil && boundsSurface.screenBuf != nil {
+		if boundsSurface.logicalW > 0 && boundsSurface.screenBuf.Width > 0 {
+			epsilonX = float64(boundsSurface.logicalW) / float64(boundsSurface.screenBuf.Width)
 		}
-		if surface.logicalH > 0 && surface.screenBuf.Height > 0 {
-			epsilonY = float64(surface.logicalH) / float64(surface.screenBuf.Height)
+		if boundsSurface.logicalH > 0 && boundsSurface.screenBuf.Height > 0 {
+			epsilonY = float64(boundsSurface.logicalH) / float64(boundsSurface.screenBuf.Height)
 		}
 	}
 	return math.Max(minX, math.Min(maxX-width-epsilonX, x)),
