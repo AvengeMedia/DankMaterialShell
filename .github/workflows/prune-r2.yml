@@ -1,0 +1,66 @@
+name: Prune Void R2 archive
+
+# Keeps the danklinux-void bucket inside the Cloudflare R2 free tier by
+# deleting the oldest archive/<repo>/<timestamp>/ snapshots written by
+# publish-void-r2.sh. Live repositories (<repo>/current/) are never touched.
+
+on:
+  schedule:
+    - cron: "30 6 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Report what would be deleted without deleting'
+        type: boolean
+        required: false
+        default: false
+      max_bucket_gb:
+        description: 'Total bucket size to prune down to (GB)'
+        type: string
+        required: false
+        default: '8'
+      keep_days:
+        description: 'Delete archive snapshots older than this many days'
+        type: string
+        required: false
+        default: '30'
+      keep_min_snapshots:
+        description: 'Always keep at least this many snapshots per repo (age rule only)'
+        type: string
+        required: false
+        default: '2'
+
+permissions:
+  contents: read
+
+# Serialize with the XBPS publisher so a snapshot is never pruned mid-publish.
+concurrency:
+  group: void-xbps-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  prune:
+    name: Prune archive snapshots
+    runs-on: ubuntu-latest
+    if: github.repository == 'AvengeMedia/DankMaterialShell'
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: auto
+      AWS_EC2_METADATA_DISABLED: true
+      R2_BUCKET: danklinux-void
+      R2_ENDPOINT: https://${{ secrets.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com
+      ARCHIVE_PREFIX: archive/
+      MAX_BUCKET_GB: ${{ github.event.inputs.max_bucket_gb || '8' }}
+      KEEP_DAYS: ${{ github.event.inputs.keep_days || '30' }}
+      KEEP_MIN_SNAPSHOTS: ${{ github.event.inputs.keep_min_snapshots || '2' }}
+      DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          sparse-checkout: .github/scripts
+          sparse-checkout-cone-mode: false
+
+      - name: Prune archive
+        run: bash .github/scripts/prune-void-r2.sh

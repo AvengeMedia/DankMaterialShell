@@ -423,7 +423,7 @@
     "Add \"%1\" to the %2 group?": "Adicionar \"%1\" ao grupo %2?"
   },
   "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": {
-    "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": ""
+    "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": "Adicionar \"%1\" ao grupo %2? O usuário precisará encerrar a sessão e entrar novamente, depois executar \"dms greeter sync --profile\" para aplicar o tema da tela de login."
   },
   "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": {
     "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": "Adicionar \"%1\" ao grupo %2? Eles devem sair e entrar novamente e então executar dms-greeter sync --profile para publicar o tema da tela de login."
@@ -477,7 +477,7 @@
     "Add notes": "Adicionar notas"
   },
   "Add the new user to the %1 group so they can run dms greeter sync --profile.": {
-    "Add the new user to the %1 group so they can run dms greeter sync --profile.": ""
+    "Add the new user to the %1 group so they can run dms greeter sync --profile.": "Adicione o novo usuário ao grupo %1 para permitir a execução de \"dms greeter sync --profile\""
   },
   "Add the new user to the %1 group so they can run dms-greeter sync --profile.": {
     "Add the new user to the %1 group so they can run dms-greeter sync --profile.": "Adicione o novo usuário ao grupo %1 para que possa executar dms-greeter sync --profile."
@@ -804,7 +804,7 @@
     "Authenticate": "Autenticar"
   },
   "Authenticated!": {
-    "Authenticated!": ""
+    "Authenticated!": "Autenticado!"
   },
   "Authentication": {
     "Authentication": "Autenticação"
@@ -874,6 +874,9 @@
   },
   "Auto-Hide Timeout": {
     "Auto-Hide Timeout": "Tempo Limite de Ocultação Automática"
+  },
+  "Auto-close Niri overview when DMS launches or focuses a window.": {
+    "Auto-close Niri overview when DMS launches or focuses a window.": ""
   },
   "Auto-close Niri overview when launching apps.": {
     "Auto-close Niri overview when launching apps.": "Fechar automaticamente overview do niri ao lançar aplicativos."
@@ -1042,6 +1045,9 @@
   },
   "Bar Inset Padding": {
     "Bar Inset Padding": "Preenchimento Interno da Barra"
+  },
+  "Bar Length Padding": {
+    "Bar Length Padding": ""
   },
   "Bar Opacity": {
     "Bar Opacity": "Opacidade da Barra"
@@ -1430,6 +1436,9 @@
   "Choose colors from palette": {
     "Choose colors from palette": "Escolha cores da paleta"
   },
+  "Choose how the bar meets the screen edge": {
+    "Choose how the bar meets the screen edge": ""
+  },
   "Choose how the weather widget is displayed": {
     "Choose how the weather widget is displayed": "Escolha como o widget de clima é exibido"
   },
@@ -1580,6 +1589,9 @@
   "Close All Windows": {
     "Close All Windows": "Fechar Todas as Janelas"
   },
+  "Close Niri Overview on Window Focus": {
+    "Close Niri Overview on Window Focus": ""
+  },
   "Close Overview on Launch": {
     "Close Overview on Launch": "Fechar Overview ao Lançar Aplicativos"
   },
@@ -1593,7 +1605,7 @@
     "Codec switching is unavailable because WirePlumber was not found": "A alternância de codec não está disponível porque o WirePlumber não foi encontrado"
   },
   "Codec switching is unavailable because pactl was not found": {
-    "Codec switching is unavailable because pactl was not found": ""
+    "Codec switching is unavailable because pactl was not found": "A troca de codecs está indisponível porque o \"pactl\" não foi encontrado."
   },
   "Codec switching is unavailable. WirePlumber wpexec was not found.": {
     "Codec switching is unavailable. WirePlumber wpexec was not found.": "A alternância de codec não está disponível. O wpexec do WirePlumber não foi encontrado."
@@ -1910,11 +1922,17 @@
   "Copy Text": {
     "Copy Text": "Copiar Texto"
   },
+  "Copy target (%1)": {
+    "Copy target (%1)": ""
+  },
   "Corner Radius": {
     "Corner Radius": "Arredondamento"
   },
   "Corner Radius Override": {
     "Corner Radius Override": "Sobrescrever Arredondamento"
+  },
+  "Corner Style": {
+    "Corner Style": ""
   },
   "Corners & Background": {
     "Corners & Background": "Cantos e Fundo"
@@ -2220,7 +2238,7 @@
     "Darken Modal Background": "Escurecer Fundo de Modais"
   },
   "Date First": {
-    "Date First": ""
+    "Date First": "Data primeiro"
   },
   "Date Format": {
     "Date Format": "Formatação de Data"
@@ -2952,7 +2970,7 @@
     "Extra Light": "Extra Light"
   },
   "Extract theme to JSON": {
-    "Extract theme to JSON": ""
+    "Extract theme to JSON": "Exportar tema para JSON"
   },
   "Fade": {
     "Fade": "Esmaecimento"
@@ -3054,7 +3072,7 @@
     "Failed to enable night mode": "Falha ao ativar o modo noturno"
   },
   "Failed to extract theme": {
-    "Failed to extract theme": ""
+    "Failed to extract theme": "Falha na extração do tema"
   },
   "Failed to fetch network QR code: %1": {
     "Failed to fetch network QR code: %1": "Falha ao buscar o código QR da rede: %1"
@@ -3132,7 +3150,7 @@
     "Failed to ring device": "Falha ao tocar dispositivo"
   },
   "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": {
-    "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": ""
+    "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": "Falha ao executar \"dms greeter status\". Verifique se o DMS está instalado e se o comando dms está no PATH."
   },
   "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": {
     "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": "Falha ao executar 'dms-greeter status'. Certifique-se de que o pacote dms-greeter está instalado."
@@ -3382,6 +3400,9 @@
   },
   "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": {
     "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": "Fluent: desaceleração cúbica suave ao entrar, ajuste rápido ao sair — curvas limpas e elegantes."
+  },
+  "Flush": {
+    "Flush": ""
   },
   "Focus": {
     "Focus": "Foco"
@@ -3638,6 +3659,9 @@
   "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
     "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": "Gerar configurações base de GTK3/4 ou QT5/QT6 (requer qt6ct-kde) para seguir as cores do DMS. Necessário apenas uma vez.<br /><br />É recomendado configurar %1 antes de aplicar temas GTK."
   },
+  "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
+    "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
+  },
   "Generic": {
     "Generic": "Genérico"
   },
@@ -3705,7 +3729,7 @@
     "Greeter font": "Fonte do greeter"
   },
   "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": {
-    "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": ""
+    "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": "Membros do grupo greeter podem sincronizar o tema da tela de login com \"dms greeter sync --profile\" após encerrar a sessão e entrar novamente."
   },
   "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": {
     "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": "Os membros do grupo do greeter podem sincronizar o tema da tela de login com dms-greeter sync --profile após sair e entrar novamente."
@@ -4254,7 +4278,7 @@
     "Invalid package name — letters, digits and @._+:- only.": "Nome de pacote inválido — apenas letras, dígitos e @._+:-."
   },
   "Invalid password for %1": {
-    "Invalid password for %1": ""
+    "Invalid password for %1": "Senha inválida para %1"
   },
   "Invalid username": {
     "Invalid username": "Nome de usuário inválido"
@@ -4299,7 +4323,7 @@
     "Keep in Bar": "Manter na Barra"
   },
   "Keep pinned apps as launchers and show running windows separately": {
-    "Keep pinned apps as launchers and show running windows separately": ""
+    "Keep pinned apps as launchers and show running windows separately": "Manter aplicativos fixados como inicializadores e exibir janelas em execução separadamente"
   },
   "Keep the clipboard type filter when reopening history": {
     "Keep the clipboard type filter when reopening history": "Manter o filtro de tipo da área de transferência ao reabrir o histórico"
@@ -4635,7 +4659,7 @@
     "Managed by the primary PAM source": "Gerenciado pela fonte PAM principal"
   },
   "Managed by the primary PAM source.": {
-    "Managed by the primary PAM source.": ""
+    "Managed by the primary PAM source.": "Gerenciado pelo provedor principal do PAM."
   },
   "Management": {
     "Management": "Gerenciamento"
@@ -4890,7 +4914,7 @@
     "Minimal palette built around a single hue.": "Paleta mínima construída ao redor de um único tom."
   },
   "Minimize": {
-    "Minimize": ""
+    "Minimize": "Minimizar"
   },
   "Minute": {
     "Minute": "Minuto"
@@ -5058,7 +5082,7 @@
     "Network download and upload speed display": "Monitor de velocidades de download e upload da rede"
   },
   "Network not found": {
-    "Network not found": ""
+    "Network not found": "Rede não encontrada"
   },
   "Neutral": {
     "Neutral": "Neutro"
@@ -5781,7 +5805,7 @@
     "Override global layout settings for this output": "Substituir configurações de layout global para esta saída"
   },
   "Override global transparency for Notepad": {
-    "Override global transparency for Notepad": ""
+    "Override global transparency for Notepad": "Sobrescrever transparência global para o Notepad"
   },
   "Override terminal with a custom command or script": {
     "Override terminal with a custom command or script": "Substituir o terminal por um comando ou script personalizado"
@@ -5976,7 +6000,7 @@
     "Place a trash bin at the end of the dock": "Colocar uma lixeira no final do dock"
   },
   "Place clipboard history on the Wayland overlay layer": {
-    "Place clipboard history on the Wayland overlay layer": ""
+    "Place clipboard history on the Wayland overlay layer": "Posicionar histórico da área de transferência na camada de sobreposição do Wayland"
   },
   "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
     "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "Use este local para os diretórios de plugin. Cada plugin deve ter um arquivo de manifesto plugin.json."
@@ -6407,6 +6431,9 @@
   "Recommended available": {
     "Recommended available": "Recomendado disponível"
   },
+  "Reduce the visible bar length from both ends": {
+    "Reduce the visible bar length from both ends": ""
+  },
   "Refresh": {
     "Refresh": "Recarregar"
   },
@@ -6627,7 +6654,7 @@
     "Restarting audio system...": "Reiniciando sistema de áudio..."
   },
   "Restore": {
-    "Restore": ""
+    "Restore": "Restaurar"
   },
   "Restore Special Workspace Windows": {
     "Restore Special Workspace Windows": "Restaurar Janelas de Espaço de Trabalho Especial"
@@ -6691,6 +6718,9 @@
   },
   "Root Filesystem": {
     "Root Filesystem": "Sistema de Arquivos Raiz"
+  },
+  "Rounded": {
+    "Rounded": ""
   },
   "Rounded corners for windows": {
     "Rounded corners for windows": "Cantos arredondados para janelas"
@@ -6768,7 +6798,7 @@
     "Save & Start": "Salvar e Iniciar"
   },
   "Save Extracted Theme": {
-    "Save Extracted Theme": ""
+    "Save Extracted Theme": "Salvar Tema Exportado"
   },
   "Save Notepad File": {
     "Save Notepad File": "Salvar Arquivo do Bloco de Notas"
@@ -7089,7 +7119,7 @@
     "Separate Light & Dark Themes": "Temas Claro e Escuro Separados"
   },
   "Separate Pinned and Running Apps": {
-    "Separate Pinned and Running Apps": ""
+    "Separate Pinned and Running Apps": "Separar Aplicativos Fixados e Rodando"
   },
   "Separate appearance for unfocused displays is not supported on this compositor.": {
     "Separate appearance for unfocused displays is not supported on this compositor.": "Aparência separada para monitores não focados não é compatível neste compositor."
@@ -7652,6 +7682,9 @@
   "Spotlight Search": {
     "Spotlight Search": "Pesquisa Spotlight"
   },
+  "Square": {
+    "Square": ""
+  },
   "Square Corners": {
     "Square Corners": "Cantos Retos"
   },
@@ -7668,7 +7701,7 @@
     "Start": "Iniciar"
   },
   "Start DankConnect, KDE Connect, or Valent to use this plugin": {
-    "Start DankConnect, KDE Connect, or Valent to use this plugin": ""
+    "Start DankConnect, KDE Connect, or Valent to use this plugin": "Inicie o DankConnect, o KDE Connect ou o Valent para usar este plugin"
   },
   "Start Hotspot?": {
     "Start Hotspot?": "Iniciar Hotspot?"
@@ -7827,7 +7860,7 @@
     "Sync Position Across Screens": "Sincronizar Posição entre Telas"
   },
   "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": {
-    "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": ""
+    "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": "A sincronização aplica seu tema e configurações à tela de login. Usuários compartilhados devem executar \"dms greeter sync --profile\" em vez da sincronização do usuário principal."
   },
   "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": {
     "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": "A sincronização aplica seu tema e configurações à tela de login. Usuários compartilhados devem executar dms-greeter sync --profile em vez de uma sincronização de usuário primário."
@@ -7947,7 +7980,7 @@
     "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": "Falha no fallback do terminal. Instale um emulador de terminal compatível ou execute 'dms auth sync' manualmente."
   },
   "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": {
-    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": ""
+    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": "A tentativa de fallback para o terminal falhou. Instale um dos emuladores de terminal compatíveis ou execute manualmente \"dms greeter sync\"."
   },
   "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": {
     "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": "Falha no fallback do terminal. Instale um dos emuladores de terminal compatíveis ou execute 'dms-greeter sync' manualmente."
@@ -8003,6 +8036,9 @@
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
     "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "As configurações abaixo vão modificar suas configurações GTK e Qt. Se você deseja preservá-las, por favor faça um back up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0)."
   },
+  "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": {
+    "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": ""
+  },
   "The custom command used when attaching to sessions (receives the session name as the first argument)": {
     "The custom command used when attaching to sessions (receives the session name as the first argument)": "O comando personalizado usado ao anexar a sessões (recebe o nome da sessão como primeiro argumento)"
   },
@@ -8031,7 +8067,7 @@
     "Theme color used for the widget outline": "Cor do tema usada para o contorno do widget"
   },
   "Theme extracted to: %1": {
-    "Theme extracted to: %1": ""
+    "Theme extracted to: %1": "Tema exportado para: %1"
   },
   "Theme worker failed (%1)": {
     "Theme worker failed (%1)": "Falha no worker de tema (%1)"
@@ -8121,7 +8157,7 @@
     "Time & Weather": "Hora & Clima"
   },
   "Time First": {
-    "Time First": ""
+    "Time First": "Hora primeiro"
   },
   "Time Format": {
     "Time Format": "Formato de Tempo"
@@ -8370,7 +8406,7 @@
     "Uninstall failed: %1": "Desinstalação falhou: %1"
   },
   "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.": {
-    "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.": ""
+    "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.": "Desinstalar o DMS greeter? Isso removerá a configuração e restaurará o gerenciador de exibição anterior. Um terminal será aberto para autenticação via sudo."
   },
   "Uninstalled: %1": {
     "Uninstalled: %1": "Desinstalado: %1"
@@ -8781,7 +8817,7 @@
     "W": "W"
   },
   "WCAG %1 body": {
-    "WCAG %1 body": ""
+    "WCAG %1 body": "WCAG %1 corpo"
   },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
@@ -9044,6 +9080,9 @@
   "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": {
     "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": "Você precisa definir um dos seguintes:\nQT_QPA_PLATFORMTHEME=gtk3 OU\nQT_QPA_PLATFORMTHEME=qt6ct\ncomo variáveis de ambiente, e então reiniciar o shell.\n\nqt6ct requer qt6ct-kde para ser instalado."
   },
+  "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": {
+    "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": ""
+  },
   "You'll enter your password at the greeter after the next reboot.": {
     "You'll enter your password at the greeter after the next reboot.": "Você inserirá sua senha no greeter após o próximo reinício."
   },
@@ -9117,7 +9156,7 @@
     "discuss": "discutir"
   },
   "display rotation option": {
-    "Normal": ""
+    "Normal": "Normal"
   },
   "e.g. /usr/bin/my-script --flag": {
     "e.g. /usr/bin/my-script --flag": "ex.: /usr/bin/my-script --flag"
@@ -9192,7 +9231,7 @@
     "nav": "nav"
   },
   "network security type": {
-    "Open": ""
+    "Open": "Aberta"
   },
   "niri GitHub": {
     "niri GitHub": "GitHub do niri"
@@ -9240,7 +9279,7 @@
     "power-profiles-daemon not available": "power-profiles-daemon indisponível"
   },
   "primary network connection label": {
-    "Primary": ""
+    "Primary": "Primária"
   },
   "procs": {
     "procs": "processos"

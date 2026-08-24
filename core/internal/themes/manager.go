@@ -228,12 +228,9 @@ func compareVersions(installed, registry string) int {
 	installedParts := strings.Split(installed, ".")
 	registryParts := strings.Split(registry, ".")
 
-	maxLen := len(installedParts)
-	if len(registryParts) > maxLen {
-		maxLen = len(registryParts)
-	}
+	maxLen := max(len(registryParts), len(installedParts))
 
-	for i := 0; i < maxLen; i++ {
+	for i := range maxLen {
 		var installedNum, registryNum int
 		if i < len(installedParts) {
 			fmt.Sscanf(installedParts[i], "%d", &installedNum)

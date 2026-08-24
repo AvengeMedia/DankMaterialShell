@@ -21,8 +21,8 @@ func TestConfigValidate(t *testing.T) {
 			config: Config{
 				LowTemp:   4000,
 				HighTemp:  6500,
-				Latitude:  floatPtr(40.7128),
-				Longitude: floatPtr(-74.0060),
+				Latitude:  new(40.7128),
+				Longitude: new(-74.0060),
 				Gamma:     1.0,
 				Enabled:   true,
 			},
@@ -33,8 +33,8 @@ func TestConfigValidate(t *testing.T) {
 			config: Config{
 				LowTemp:       4000,
 				HighTemp:      6500,
-				ManualSunrise: timePtr(time.Date(0, 1, 1, 6, 30, 0, 0, time.Local)),
-				ManualSunset:  timePtr(time.Date(0, 1, 1, 18, 30, 0, 0, time.Local)),
+				ManualSunrise: new(time.Date(0, 1, 1, 6, 30, 0, 0, time.Local)),
+				ManualSunset:  new(time.Date(0, 1, 1, 18, 30, 0, 0, time.Local)),
 				Gamma:         1.0,
 				Enabled:       true,
 			},
@@ -117,8 +117,8 @@ func TestConfigValidate(t *testing.T) {
 			config: Config{
 				LowTemp:   4000,
 				HighTemp:  6500,
-				Latitude:  floatPtr(100),
-				Longitude: floatPtr(0),
+				Latitude:  new(100.0),
+				Longitude: new(0.0),
 				Gamma:     1.0,
 			},
 			wantErr: true,
@@ -128,8 +128,8 @@ func TestConfigValidate(t *testing.T) {
 			config: Config{
 				LowTemp:   4000,
 				HighTemp:  6500,
-				Latitude:  floatPtr(-100),
-				Longitude: floatPtr(0),
+				Latitude:  new(-100.0),
+				Longitude: new(0.0),
 				Gamma:     1.0,
 			},
 			wantErr: true,
@@ -139,8 +139,8 @@ func TestConfigValidate(t *testing.T) {
 			config: Config{
 				LowTemp:   4000,
 				HighTemp:  6500,
-				Latitude:  floatPtr(40),
-				Longitude: floatPtr(200),
+				Latitude:  new(40.0),
+				Longitude: new(200.0),
 				Gamma:     1.0,
 			},
 			wantErr: true,
@@ -150,8 +150,8 @@ func TestConfigValidate(t *testing.T) {
 			config: Config{
 				LowTemp:   4000,
 				HighTemp:  6500,
-				Latitude:  floatPtr(40),
-				Longitude: floatPtr(-200),
+				Latitude:  new(40.0),
+				Longitude: new(-200.0),
 				Gamma:     1.0,
 			},
 			wantErr: true,
@@ -161,7 +161,7 @@ func TestConfigValidate(t *testing.T) {
 			config: Config{
 				LowTemp:  4000,
 				HighTemp: 6500,
-				Latitude: floatPtr(40),
+				Latitude: new(40.0),
 				Gamma:    1.0,
 			},
 			wantErr: true,
@@ -171,7 +171,7 @@ func TestConfigValidate(t *testing.T) {
 			config: Config{
 				LowTemp:   4000,
 				HighTemp:  6500,
-				Longitude: floatPtr(-74),
+				Longitude: new(-74.0),
 				Gamma:     1.0,
 			},
 			wantErr: true,
@@ -181,7 +181,7 @@ func TestConfigValidate(t *testing.T) {
 			config: Config{
 				LowTemp:       4000,
 				HighTemp:      6500,
-				ManualSunrise: timePtr(time.Date(0, 1, 1, 6, 30, 0, 0, time.Local)),
+				ManualSunrise: new(time.Date(0, 1, 1, 6, 30, 0, 0, time.Local)),
 				Gamma:         1.0,
 			},
 			wantErr: true,
@@ -191,7 +191,7 @@ func TestConfigValidate(t *testing.T) {
 			config: Config{
 				LowTemp:      4000,
 				HighTemp:     6500,
-				ManualSunset: timePtr(time.Date(0, 1, 1, 18, 30, 0, 0, time.Local)),
+				ManualSunset: new(time.Date(0, 1, 1, 18, 30, 0, 0, time.Local)),
 				Gamma:        1.0,
 			},
 			wantErr: true,
@@ -319,12 +319,4 @@ func TestStateChanged(t *testing.T) {
 			}
 		})
 	}
-}
-
-func floatPtr(f float64) *float64 {
-	return &f
-}
-
-func timePtr(t time.Time) *time.Time {
-	return &t
 }

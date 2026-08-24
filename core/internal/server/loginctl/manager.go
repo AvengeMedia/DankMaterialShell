@@ -646,9 +646,7 @@ func (m *Manager) startSignalPump() error {
 		return err
 	}
 
-	m.sigWG.Add(1)
-	go func() {
-		defer m.sigWG.Done()
+	m.sigWG.Go(func() {
 		for {
 			select {
 			case <-m.stopChan:
@@ -663,7 +661,7 @@ func (m *Manager) startSignalPump() error {
 				m.handleDBusSignal(sig)
 			}
 		}
-	}()
+	})
 	return nil
 }
 

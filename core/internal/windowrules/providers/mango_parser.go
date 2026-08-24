@@ -24,17 +24,17 @@ var mangoMetaCommentRegex = regexp.MustCompile(`^#\s*@id=(\S*)\s*@name=(.*)$`)
 
 func parseMangoWindowRuleLine(value string) map[string]string {
 	fields := map[string]string{}
-	for _, pair := range strings.Split(value, ",") {
+	for pair := range strings.SplitSeq(value, ",") {
 		pair = strings.TrimSpace(pair)
 		if pair == "" {
 			continue
 		}
-		colon := strings.Index(pair, ":")
-		if colon < 0 {
+		before, after, ok := strings.Cut(pair, ":")
+		if !ok {
 			continue
 		}
-		key := strings.TrimSpace(pair[:colon])
-		val := strings.TrimSpace(pair[colon+1:])
+		key := strings.TrimSpace(before)
+		val := strings.TrimSpace(after)
 		if key != "" {
 			fields[key] = val
 		}
@@ -67,7 +67,7 @@ func parseMangoRulesFile(path, source string) []MangoWindowRule {
 		return nil
 	}
 	var rules []MangoWindowRule
-	for _, line := range strings.Split(string(data), "\n") {
+	for line := range strings.SplitSeq(string(data), "\n") {
 		trimmed := strings.TrimSpace(line)
 		if m := mangoWindowRuleRegex.FindStringSubmatch(trimmed); m != nil {
 			rules = append(rules, MangoWindowRule{Source: source, Fields: parseMangoWindowRuleLine(m[1])})
@@ -114,7 +114,7 @@ func mangoDMSRulesIncluded(mainPath string) bool {
 	if err != nil {
 		return false
 	}
-	for _, line := range strings.Split(string(data), "\n") {
+	for line := range strings.SplitSeq(string(data), "\n") {
 		trimmed := strings.TrimSpace(line)
 		if strings.HasPrefix(trimmed, "source") && strings.Contains(trimmed, "dms/windowrules.conf") {
 			return true
@@ -317,7 +317,7 @@ func (p *MangoWritableProvider) LoadDMSRules() ([]windowrules.WindowRule, error)
 	var rules []windowrules.WindowRule
 	var curID, curName string
 	idx := 0
-	for _, line := range strings.Split(string(data), "\n") {
+	for line := range strings.SplitSeq(string(data), "\n") {
 		trimmed := strings.TrimSpace(line)
 		if m := mangoMetaCommentRegex.FindStringSubmatch(trimmed); m != nil {
 			curID = m[1]

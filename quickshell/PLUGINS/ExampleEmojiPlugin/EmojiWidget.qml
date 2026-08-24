@@ -23,24 +23,24 @@ PluginComponent {
         repeat: true
         onTriggered: {
             if (root.enabledEmojis.length > 0) {
-                root.currentIndex = (root.currentIndex + 1) % root.enabledEmojis.length
-                root.updateDisplayedEmojis()
+                root.currentIndex = (root.currentIndex + 1) % root.enabledEmojis.length;
+                root.updateDisplayedEmojis();
             }
         }
     }
 
     function updateDisplayedEmojis() {
-        const maxToShow = Math.min(root.maxBarEmojis, root.enabledEmojis.length)
-        let emojis = []
+        const maxToShow = Math.min(root.maxBarEmojis, root.enabledEmojis.length);
+        let emojis = [];
         for (let i = 0; i < maxToShow; i++) {
-            const idx = (root.currentIndex + i) % root.enabledEmojis.length
-            emojis.push(root.enabledEmojis[idx])
+            const idx = (root.currentIndex + i) % root.enabledEmojis.length;
+            emojis.push(root.enabledEmojis[idx]);
         }
-        root.displayedEmojis = emojis
+        root.displayedEmojis = emojis;
     }
 
     Component.onCompleted: {
-        updateDisplayedEmojis()
+        updateDisplayedEmojis();
     }
 
     onEnabledEmojisChanged: updateDisplayedEmojis()
@@ -81,25 +81,11 @@ PluginComponent {
         PopoutComponent {
             id: popoutColumn
 
-            headerText: "Emoji Picker"
-            detailsText: "Click an emoji to copy it to clipboard"
+            headerText: I18n.trFor("exampleEmojiPlugin", "Emoji Picker")
+            detailsText: I18n.trFor("exampleEmojiPlugin", "Click an emoji to copy it to clipboard")
             showCloseButton: true
 
-            property var allEmojis: [
-                "😀", "😃", "😄", "😁", "😆", "😅", "🤣", "😂", "🙂", "🙃",
-                "😉", "😊", "😇", "🥰", "😍", "🤩", "😘", "😗", "😚", "😙",
-                "😋", "😛", "😜", "🤪", "😝", "🤑", "🤗", "🤭", "🤫", "🤔",
-                "🤐", "🤨", "😐", "😑", "😶", "😏", "😒", "🙄", "😬", "🤥",
-                "😌", "😔", "😪", "🤤", "😴", "😷", "🤒", "🤕", "🤢", "🤮",
-                "🤧", "🥵", "🥶", "😶‍🌫️", "😵", "😵‍💫", "🤯", "🤠", "🥳", "😎",
-                "🤓", "🧐", "😕", "😟", "🙁", "☹️", "😮", "😯", "😲", "😳",
-                "🥺", "😦", "😧", "😨", "😰", "😥", "😢", "😭", "😱", "😖",
-                "😣", "😞", "😓", "😩", "😫", "🥱", "😤", "😡", "😠", "🤬",
-                "❤️", "🧡", "💛", "💚", "💙", "💜", "🖤", "🤍", "🤎", "💔",
-                "❤️‍🔥", "❤️‍🩹", "💕", "💞", "💓", "💗", "💖", "💘", "💝", "💟",
-                "👍", "👎", "👊", "✊", "🤛", "🤜", "🤞", "✌️", "🤟", "🤘",
-                "👌", "🤌", "🤏", "👈", "👉", "👆", "👇", "☝️", "✋", "🤚"
-            ]
+            property var allEmojis: ["😀", "😃", "😄", "😁", "😆", "😅", "🤣", "😂", "🙂", "🙃", "😉", "😊", "😇", "🥰", "😍", "🤩", "😘", "😗", "😚", "😙", "😋", "😛", "😜", "🤪", "😝", "🤑", "🤗", "🤭", "🤫", "🤔", "🤐", "🤨", "😐", "😑", "😶", "😏", "😒", "🙄", "😬", "🤥", "😌", "😔", "😪", "🤤", "😴", "😷", "🤒", "🤕", "🤢", "🤮", "🤧", "🥵", "🥶", "😶‍🌫️", "😵", "😵‍💫", "🤯", "🤠", "🥳", "😎", "🤓", "🧐", "😕", "😟", "🙁", "☹️", "😮", "😯", "😲", "😳", "🥺", "😦", "😧", "😨", "😰", "😥", "😢", "😭", "😱", "😖", "😣", "😞", "😓", "😩", "😫", "🥱", "😤", "😡", "😠", "🤬", "❤️", "🧡", "💛", "💚", "💙", "💜", "🖤", "🤍", "🤎", "💔", "❤️‍🔥", "❤️‍🩹", "💕", "💞", "💓", "💗", "💖", "💘", "💝", "💟", "👍", "👎", "👊", "✊", "🤛", "🤜", "🤞", "✌️", "🤟", "🤘", "👌", "🤌", "🤏", "👈", "👉", "👆", "👇", "☝️", "✋", "🤚"]
 
             Item {
                 width: parent.width
@@ -135,9 +121,9 @@ PluginComponent {
                             cursorShape: Qt.PointingHandCursor
 
                             onClicked: {
-                                Quickshell.execDetached(["dms", "cl", "copy", modelData])
-                                ToastService.showInfo("Copied " + modelData + " to clipboard")
-                                popoutColumn.closePopout()
+                                Quickshell.execDetached(["dms", "cl", "copy", modelData]);
+                                ToastService.showInfo(I18n.trFor("exampleEmojiPlugin", "Copied %1 to clipboard").arg(modelData));
+                                popoutColumn.closePopout();
                             }
                         }
                     }

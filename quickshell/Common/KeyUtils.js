@@ -182,12 +182,26 @@ const KP_MAP = {
     46: "KP_Decimal"
 };
 
-function xkbKeyFromQtKey(qk, isKeypad, hasShift) {
+// Shift+digit arrives as the layout's shifted symbol (latam Shift+0 is "="),
+// but compositors match binds on the unshifted keysym, so resolve the digit
+// row from the physical key instead. xkb keycodes 10..19 are evdev KEY_1..KEY_0.
+function digitFromScanCode(scanCode) {
+    if (!(scanCode >= 10 && scanCode <= 19))
+        return "";
+    return String((scanCode - 9) % 10);
+}
+
+function xkbKeyFromQtKey(qk, isKeypad, hasShift, scanCode) {
     if (isKeypad) {
         if (qk >= 48 && qk <= 57)
             return "KP_" + (qk - 48);
         if (KP_MAP[qk])
             return KP_MAP[qk];
+    }
+    if (hasShift) {
+        const digit = digitFromScanCode(scanCode);
+        if (digit)
+            return digit;
     }
     if (!hasShift && SYMBOL_KEYSYM[qk])
         return SYMBOL_KEYSYM[qk];

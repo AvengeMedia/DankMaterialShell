@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"runtime/debug"
+	"slices"
 	"sync"
 	"time"
 
@@ -525,13 +526,7 @@ func handleSubscribe(conn *models.Conn, req models.Request) {
 		services = []string{"all"}
 	}
 
-	subscribeAll := false
-	for _, s := range services {
-		if s == "all" {
-			subscribeAll = true
-			break
-		}
-	}
+	subscribeAll := slices.Contains(services, "all")
 
 	var wg sync.WaitGroup
 	eventChan := make(chan ServiceEvent, 256)
@@ -540,9 +535,7 @@ func handleSubscribe(conn *models.Conn, req models.Request) {
 	capChan := make(chan ServerInfo, 64)
 	capabilitySubscribers.Store(clientID+"-capabilities", capChan)
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		defer capabilitySubscribers.Delete(clientID + "-capabilities")
 
 		for {
@@ -560,18 +553,13 @@ func handleSubscribe(conn *models.Conn, req models.Request) {
 				return
 			}
 		}
-	}()
+	})
 
 	shouldSubscribe := func(service string) bool {
 		if subscribeAll {
 			return true
 		}
-		for _, s := range services {
-			if s == service {
-				return true
-			}
-		}
-		return false
+		return slices.Contains(services, service)
 	}
 
 	if shouldSubscribe("network") && networkManager != nil {

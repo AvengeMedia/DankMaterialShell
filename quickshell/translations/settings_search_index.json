@@ -6836,6 +6836,29 @@
     "description": "Use smaller notification cards"
   },
   {
+    "section": "notificationDndAllowCritical",
+    "label": "Critical Priority",
+    "tabIndex": 17,
+    "category": "Notifications",
+    "keywords": [
+      "alerts",
+      "bypass",
+      "critical",
+      "disturb",
+      "dnd",
+      "messages",
+      "notification",
+      "notifications",
+      "popups",
+      "priority",
+      "show",
+      "toast",
+      "urgent",
+      "while"
+    ],
+    "description": "Show critical priority popups while Do Not Disturb is on"
+  },
+  {
     "section": "notificationHistorySaveCritical",
     "label": "Critical Priority",
     "tabIndex": 17,

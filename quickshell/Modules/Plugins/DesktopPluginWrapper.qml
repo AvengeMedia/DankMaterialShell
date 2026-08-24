@@ -231,6 +231,20 @@ Item {
         dragOverrideH = -1;
     }
 
+    function requestResize(width, height) {
+        if (width < minWidth || height < minHeight)
+            return;
+        if (width > screenWidth || height > screenHeight)
+            return;
+        dragOverrideW = width;
+        dragOverrideH = height;
+    }
+
+    function clearResize() {
+        dragOverrideW = -1;
+        dragOverrideH = -1;
+    }
+
     property real minWidth: contentLoader.item?.minWidth ?? 100
     property real minHeight: contentLoader.item?.minHeight ?? 100
     property bool forceSquare: contentLoader.item?.forceSquare ?? false
@@ -442,6 +456,10 @@ Item {
                     item.widgetHeight = Qt.binding(() => contentLoader.height);
                 if (item.screen !== undefined)
                     item.screen = Qt.binding(() => root.screen);
+                if (item.requestResize !== undefined)
+                    item.requestResize = root.requestResize;
+                if (item.clearResize !== undefined)
+                    item.clearResize = root.clearResize;
             }
         }
 

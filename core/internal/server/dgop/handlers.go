@@ -40,7 +40,7 @@ func handleMeta(conn *models.Conn, req models.Request) {
 		SortBy:         gops.ProcSortBy(params.StringOpt(req.Params, "sort", string(gops.SortByCPU))),
 		ProcLimit:      params.IntOpt(req.Params, "limit", 20),
 		EnableCPU:      !params.BoolLoose(req.Params, "noCpu"),
-		MergeChildren:  params.BoolLoose(req.Params, "mergeChildren"),
+		MergeChildren:  params.BoolOpt(req.Params, "mergeChildren", true),
 		GPUPciIds:      params.StringSlice(req.Params, "gpuPciIds"),
 		CPUCursor:      params.StringOpt(req.Params, "cpuCursor", ""),
 		ProcCursor:     params.StringOpt(req.Params, "procCursor", ""),

@@ -51,7 +51,7 @@ func TestManager_GetState_ThreadSafe(t *testing.T) {
 	}
 
 	done := make(chan bool)
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		go func() {
 			state := manager.GetState()
 			assert.True(t, state.Accounts.Available)
@@ -60,7 +60,7 @@ func TestManager_GetState_ThreadSafe(t *testing.T) {
 		}()
 	}
 
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		<-done
 	}
 }

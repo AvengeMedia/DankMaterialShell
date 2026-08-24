@@ -7,10 +7,11 @@ Item {
     id: root
 
     property var keyboardController: null
-    property bool showSettings: false
     property int currentTab: 0
     property bool showDndMenu: false
     property var transientSurfaceTracker: null
+
+    signal settingsRequested
 
     onShowDndMenuChanged: transientSurfaceTracker?.setActive(root, showDndMenu, null)
     Component.onDestruction: transientSurfaceTracker?.unregister(root)
@@ -27,11 +28,6 @@ Item {
     onCurrentTabChanged: {
         if (currentTab === 1 && !SettingsData.notificationHistoryEnabled)
             currentTab = 0;
-    }
-
-    onShowSettingsChanged: {
-        if (showSettings)
-            showDndMenu = false;
     }
 
     Connections {
@@ -84,8 +80,6 @@ Item {
                             return;
                         }
                         root.showDndMenu = !root.showDndMenu;
-                        if (root.showDndMenu)
-                            root.showSettings = false;
                     }
                     onEntered: sharedTooltip.show(SessionData.doNotDisturb ? I18n.tr("Turn off Do Not Disturb") : I18n.tr("Do Not Disturb"), doNotDisturbButton, 0, 0, "bottom")
                     onExited: sharedTooltip.hide()
@@ -97,11 +91,7 @@ Item {
                     iconColor: root.showDndMenu ? Theme.primary : Theme.surfaceText
                     buttonSize: Theme.iconSize + Theme.spacingS
                     anchors.verticalCenter: parent.verticalCenter
-                    onClicked: {
-                        root.showDndMenu = !root.showDndMenu;
-                        if (root.showDndMenu)
-                            root.showSettings = false;
-                    }
+                    onClicked: root.showDndMenu = !root.showDndMenu
                     onEntered: sharedTooltip.show(I18n.tr("Silence for a while"), dndScheduleButton, 0, 0, "bottom")
                     onExited: sharedTooltip.hide()
                 }
@@ -129,10 +119,9 @@ Item {
                 DankActionButton {
                     id: settingsButton
                     iconName: "settings"
-                    iconColor: root.showSettings ? Theme.primary : Theme.surfaceText
                     buttonSize: Theme.iconSize + Theme.spacingS
                     anchors.verticalCenter: parent.verticalCenter
-                    onClicked: root.showSettings = !root.showSettings
+                    onClicked: root.settingsRequested()
                 }
 
                 Rectangle {

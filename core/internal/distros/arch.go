@@ -172,7 +172,7 @@ func parseSRCINFODeps(srcinfoPath string) (deps []string, makedeps []string, err
 	if err != nil {
 		return nil, nil, err
 	}
-	for _, line := range strings.Split(string(data), "\n") {
+	for line := range strings.SplitSeq(string(data), "\n") {
 		line = strings.TrimSpace(line)
 		var pkg string
 		var target *[]string

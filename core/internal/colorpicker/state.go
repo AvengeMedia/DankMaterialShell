@@ -25,6 +25,8 @@ type SurfaceState struct {
 
 	screenBuf    *ShmBuffer
 	screenFormat PixelFormat
+	pqEncoded    bool
+	refLum       float64
 	yInverted    bool
 
 	logicalW int
@@ -32,6 +34,10 @@ type SurfaceState struct {
 
 	renderBufs [2]*ShmBuffer
 	front      int
+	primed     [2]bool
+	drawn      [2][]rect
+	shown      []rect
+	fullDamage bool
 
 	scale  int32
 	scaleX float64
@@ -54,6 +60,13 @@ func NewSurfaceState(format OutputFormat, lowercase bool) *SurfaceState {
 		displayFormat: format,
 		lowercase:     lowercase,
 	}
+}
+
+func (s *SurfaceState) SetPQEncoding(refLum float64) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.pqEncoded = true
+	s.refLum = refLum
 }
 
 func (s *SurfaceState) SetScale(scale int32) {
@@ -152,6 +165,17 @@ func (s *SurfaceState) OnScreencopyReady() {
 		}
 	}
 
+	// Magnifier rendering and pixel picking work on 8-bit pixels only
+	if s.screenFormat.Is10Bit() {
+		switch {
+		case s.pqEncoded:
+			s.screenBuf.ConvertPQ2020ToSRGB(s.refLum)
+		default:
+			s.screenBuf.Convert10To8()
+		}
+		s.screenFormat = s.screenBuf.Format
+	}
+
 	s.recomputeScale()
 	s.ensureRenderBuffers()
 	s.readyForDisplay = true
@@ -192,6 +216,10 @@ func (s *SurfaceState) ensureRenderBuffers() {
 	if s.screenBuf == nil {
 		return
 	}
+	s.primed = [2]bool{}
+	s.drawn = [2][]rect{}
+	s.shown = nil
+	s.fullDamage = true
 
 	width := s.screenBuf.Width
 	height := s.screenBuf.Height
@@ -286,20 +314,69 @@ func (s *SurfaceState) SwapBuffers() {
 	s.mu.Unlock()
 }
 
-func (s *SurfaceState) Redraw() *ShmBuffer {
+// rect is a buffer-pixel area, clipped on use.
+type rect struct{ x, y, w, h int }
+
+func (r rect) clip(w, h int) rect {
+	x1, y1 := max(r.x, 0), max(r.y, 0)
+	x2, y2 := min(r.x+r.w, w), min(r.y+r.h, h)
+	return rect{x1, y1, max(x2-x1, 0), max(y2-y1, 0)}
+}
+
+func magnifierRect(cx, cy int) rect {
+	const reach = magnifierRadius + 2
+	return rect{cx - reach, cy - reach, 2*reach + 1, 2*reach + 1}
+}
+
+// restore puts screen pixels back under the front buffer's previous overlay and
+// records cur as its new footprint. It returns what differs from the frame on screen.
+func (s *SurfaceState) restore(dst *ShmBuffer, cur []rect) []rect {
+	i := s.front
+	switch {
+	case !s.primed[i]:
+		dst.CopyFrom(s.screenBuf)
+		s.primed[i] = true
+	default:
+		for _, r := range s.drawn[i] {
+			s.copyRect(dst, r)
+		}
+	}
+	s.drawn[i] = cur
+
+	damage := append(append([]rect(nil), s.shown...), cur...)
+	if s.fullDamage {
+		s.fullDamage = false
+		damage = []rect{{0, 0, dst.Width, dst.Height}}
+	}
+	s.shown = cur
+	return damage
+}
+
+func (s *SurfaceState) copyRect(dst *ShmBuffer, r rect) {
+	r = r.clip(min(dst.Width, s.screenBuf.Width), min(dst.Height, s.screenBuf.Height))
+	if r.w <= 0 || r.h <= 0 {
+		return
+	}
+	src := s.screenBuf
+	for y := r.y; y < r.y+r.h; y++ {
+		copy(dst.Data()[y*dst.Stride+r.x*4:][:r.w*4], src.Data()[y*src.Stride+r.x*4:][:r.w*4])
+	}
+}
+
+// Redraw draws the magnifier and preview at the pointer into the front buffer,
+// touching only the previous and new overlay areas; the rects are the damage.
+func (s *SurfaceState) Redraw() (*ShmBuffer, []rect) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	if !s.readyForDisplay || s.screenBuf == nil {
-		return nil
+		return nil, nil
 	}
 
 	dst := s.renderBufs[s.front]
 	if dst == nil {
-		return nil
+		return nil, nil
 	}
-
-	dst.CopyFrom(s.screenBuf)
 
 	px := int(math.Round(float64(s.pointerX) * s.scaleX))
 	py := int(math.Round(float64(s.pointerY) * s.scaleY))
@@ -313,6 +390,8 @@ func (s *SurfaceState) Redraw() *ShmBuffer {
 	}
 
 	picked := GetPixelColorWithFormat(s.screenBuf, px, sampleY, s.screenFormat)
+	text := formatColorForPreview(picked, s.displayFormat, s.lowercase)
+	damage := s.restore(dst, []rect{magnifierRect(px, py), previewRect(dst.Width, dst.Height, px, py, text)})
 
 	drawMagnifierWithInversion(
 		dst.Data(), dst.Stride, dst.Width, dst.Height,
@@ -322,26 +401,25 @@ func (s *SurfaceState) Redraw() *ShmBuffer {
 
 	drawColorPreview(dst.Data(), dst.Stride, dst.Width, dst.Height, px, py, picked, s.displayFormat, s.lowercase, s.screenFormat)
 
-	return dst
+	return dst, damage
 }
 
 // RedrawScreenOnly renders just the screenshot without any overlay (magnifier, preview).
 // Used for when pointer leaves the surface.
-func (s *SurfaceState) RedrawScreenOnly() *ShmBuffer {
+func (s *SurfaceState) RedrawScreenOnly() (*ShmBuffer, []rect) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	if !s.readyForDisplay || s.screenBuf == nil {
-		return nil
+		return nil, nil
 	}
 
 	dst := s.renderBufs[s.front]
 	if dst == nil {
-		return nil
+		return nil, nil
 	}
 
-	dst.CopyFrom(s.screenBuf)
-	return dst
+	return dst, s.restore(dst, nil)
 }
 
 func (s *SurfaceState) PickColor() (Color, bool) {
@@ -422,6 +500,8 @@ func blendColors(bg, fg Color, alpha float64) Color {
 	}
 }
 
+const magnifierRadius = 80
+
 func drawMagnifierWithInversion(
 	dst []byte, dstStride, dstW, dstH int,
 	src []byte, srcStride, srcW, srcH int,
@@ -435,7 +515,7 @@ func drawMagnifierWithInversion(
 	}
 
 	const (
-		outerRadius      = 80
+		outerRadius      = magnifierRadius
 		borderThickness  = 4
 		aaWidth          = 1.5
 		zoom             = 8.0
@@ -530,7 +610,7 @@ func drawMagnifierWithInversion(
 				}
 				srcOff := sy*srcStride + sx*4
 				if srcOff+4 <= len(src) {
-					finalColor = Color{R: src[srcOff+rOff], G: src[srcOff+1], B: src[srcOff+bOff], A: 255}
+					finalColor = Color{R: src[srcOff+rOff], G: src[srcOff+1], B: src[srcOff+bOff]}
 				} else {
 					continue
 				}
@@ -543,12 +623,11 @@ func drawMagnifierWithInversion(
 		}
 	}
 
-	drawMagnifierCrosshair(dst, dstStride, dstW, dstH, cx, cy, int(innerRadius), crossThickness, crossInnerRadius, format)
+	drawMagnifierCrosshair(dst, dstStride, dstW, dstH, cx, cy, int(innerRadius), crossThickness, crossInnerRadius)
 }
 
 func drawMagnifierCrosshair(
 	data []byte, stride, width, height, cx, cy, radius, thickness, innerRadius int,
-	format PixelFormat,
 ) {
 	if width <= 0 || height <= 0 {
 		return
@@ -1046,30 +1125,28 @@ var fontGlyphs = map[rune][fontH]uint8{
 	},
 }
 
-func drawColorPreview(data []byte, stride, width, height int, cx, cy int, c Color, format OutputFormat, lowercase bool, pixelFormat PixelFormat) {
-	text := formatColorForPreview(c, format, lowercase)
+const (
+	previewPaddingX = 8
+	previewPaddingY = 4
+	previewSpace    = 2
+	previewOffset   = 88
+)
+
+// previewRect places the color label beside the magnifier, flipping to the left
+// and clamping so it stays on the buffer.
+func previewRect(width, height, cx, cy int, text string) rect {
 	if len(text) == 0 {
-		return
+		return rect{}
 	}
+	textW := len(text)*(fontW+previewSpace) - previewSpace
+	boxW := textW + previewPaddingX*2
+	boxH := fontH + previewPaddingY*2
 
-	const (
-		paddingX = 8
-		paddingY = 4
-		space    = 2
-		offset   = 88
-	)
-
-	textW := len(text)*(fontW+space) - space
-	textH := fontH
-
-	boxW := textW + paddingX*2
-	boxH := textH + paddingY*2
-
-	x := cx + offset
+	x := cx + previewOffset
 	y := cy - boxH/2
 
 	if x+boxW >= width {
-		x = cx - boxW - offset
+		x = cx - boxW - previewOffset
 	}
 	if x < 0 {
 		x = 0
@@ -1080,8 +1157,18 @@ func drawColorPreview(data []byte, stride, width, height int, cx, cy int, c Colo
 	if y+boxH >= height {
 		y = height - boxH
 	}
+	return rect{x, y, boxW, boxH}
+}
 
-	drawFilledRect(data, stride, width, height, x, y, boxW, boxH, c, pixelFormat)
+func drawColorPreview(data []byte, stride, width, height int, cx, cy int, c Color, format OutputFormat, lowercase bool, pixelFormat PixelFormat) {
+	text := formatColorForPreview(c, format, lowercase)
+	if len(text) == 0 {
+		return
+	}
+
+	box := previewRect(width, height, cx, cy, text)
+	x, y := box.x, box.y
+	drawFilledRect(data, stride, width, height, x, y, box.w, box.h, c, pixelFormat)
 
 	lum := 0.299*float64(c.R) + 0.587*float64(c.G) + 0.114*float64(c.B)
 	var fg Color
@@ -1090,7 +1177,7 @@ func drawColorPreview(data []byte, stride, width, height int, cx, cy int, c Colo
 	} else {
 		fg = Color{R: 255, G: 255, B: 255, A: 255}
 	}
-	drawText(data, stride, width, height, x+paddingX, y+paddingY, text, fg, pixelFormat)
+	drawText(data, stride, width, height, x+previewPaddingX, y+previewPaddingY, text, fg, pixelFormat)
 }
 
 func formatColorForPreview(c Color, format OutputFormat, lowercase bool) string {

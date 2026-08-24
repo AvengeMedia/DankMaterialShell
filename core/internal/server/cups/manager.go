@@ -141,8 +141,7 @@ func isNoPrintersError(err error) bool {
 		return false
 	}
 
-	var ippErr ipp.IPPError
-	if errors.As(err, &ippErr) {
+	if ippErr, ok := errors.AsType[ipp.IPPError](err); ok {
 		return ippErr.Status == 1030
 	}
 

@@ -124,7 +124,7 @@ func debianAPTSuites(sources string) []string {
 		stanza = nil
 	}
 
-	for _, raw := range strings.Split(sources, "\n") {
+	for raw := range strings.SplitSeq(sources, "\n") {
 		line := strings.TrimSpace(raw)
 		if line == "" {
 			flushStanza()
@@ -164,8 +164,8 @@ func normalizeDebianSuite(suite string) string {
 	suite = strings.ToLower(strings.TrimSpace(suite))
 	suite = strings.Trim(suite, "/")
 	for _, suffix := range []string{"-security", "-updates", "-backports", "-proposed-updates"} {
-		if strings.HasSuffix(suite, suffix) {
-			return strings.TrimSuffix(suite, suffix)
+		if before, ok := strings.CutSuffix(suite, suffix); ok {
+			return before
 		}
 	}
 	return suite

@@ -299,7 +299,7 @@ const MANGOWC_ACTIONS = {
     ],
     "Scratchpad": [
         { id: "toggle_scratchpad", label: "Toggle Scratchpad" },
-        { id: "toggle_name_scratchpad", label: "Toggle Named Scratchpad" }
+        { id: "toggle_named_scratchpad", label: "Toggle Named Scratchpad" }
     ],
     "Overview": [
         { id: "toggleoverview", label: "Toggle Overview" }
@@ -554,8 +554,12 @@ const MANGOWC_ACTION_ARGS = {
     "setoption": {
         args: [{ name: "option", type: "text", label: "Option", placeholder: "option_name value" }]
     },
-    "toggle_name_scratchpad": {
-        args: [{ name: "name", type: "text", label: "Name", placeholder: "scratchpad name" }]
+    "toggle_named_scratchpad": {
+        args: [
+            { name: "appid", type: "text", label: "App ID", placeholder: "Optional", emptyValue: "none" },
+            { name: "title", type: "text", label: "Title", placeholder: "Optional", emptyValue: "none" },
+            { name: "command", type: "text", label: "Command", placeholder: "Command" }
+        ]
     },
     "incnmaster": {
         args: [{ name: "value", type: "number", label: "Amount", placeholder: "+1, -1" }]
@@ -1075,9 +1079,24 @@ function parseCompositorActionArgs(compositor, action) {
         case "mangowc":
             if (argConfig.args && argConfig.args.length > 0 && argParts.length > 0) {
                 var paramStr = argParts.join(" ");
-                var paramValues = paramStr.split(",");
-                for (var m = 0; m < argConfig.args.length && m < paramValues.length; m++) {
-                    args[argConfig.args[m].name] = paramValues[m];
+                var remaining = paramStr;
+
+                for (var m = 0; m < argConfig.args.length; m++) {
+                    var argDef = argConfig.args[m];
+
+                    if (m === argConfig.args.length - 1) {
+                        args[argDef.name] = remaining;
+                        break;
+                    }
+
+                    var commaIdx = remaining.indexOf(",");
+                    if (commaIdx === -1) {
+                        args[argDef.name] = remaining;
+                        break;
+                    }
+
+                    args[argDef.name] = remaining.substring(0, commaIdx);
+                    remaining = remaining.substring(commaIdx + 1);
                 }
             }
             break;
@@ -1220,15 +1239,26 @@ function buildCompositorAction(compositor, base, args) {
             if (compositorArgs && compositorArgs[base] && compositorArgs[base].args) {
                 var argConfig = compositorArgs[base].args;
                 var argValues = [];
+
                 for (var i = 0; i < argConfig.length; i++) {
                     var argDef = argConfig[i];
                     var val = args[argDef.name];
-                    if (val === undefined || val === "")
-                        val = argDef.default || "";
-                    if (val === "" && argValues.length === 0)
-                        continue;
+
+                    if (val === undefined || val === "") {
+                        if (argDef.emptyValue !== undefined)
+                            val = argDef.emptyValue;
+                        else if (argDef.default !== undefined)
+                            val = argDef.default;
+                        else
+                            val = "";
+                    }
+
                     argValues.push(val);
                 }
+
+                while (argValues.length > 0 && argValues[argValues.length - 1] === "")
+                    argValues.pop();
+
                 if (argValues.length > 0)
                     parts.push(argValues.join(","));
             } else if (args.value) {

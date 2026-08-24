@@ -531,7 +531,7 @@ func isOpenSUSEInstallMediaURI(uri string) bool {
 func parseZypperInstallMediaAliases(output string) []string {
 	var aliases []string
 
-	for _, line := range strings.Split(output, "\n") {
+	for line := range strings.SplitSeq(output, "\n") {
 		line = strings.TrimSpace(line)
 		if line == "" || !strings.Contains(line, "|") {
 			continue

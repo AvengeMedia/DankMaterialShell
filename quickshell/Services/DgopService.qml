@@ -16,6 +16,7 @@ Singleton {
     readonly property bool powerSaver: PowerProfileWatcher.currentProfile === PowerProfile.PowerSaver
     property int updateInterval: refCount > 0 ? (powerSaver ? 6000 : 3000) : (powerSaver ? 60000 : 30000)
     property bool isUpdating: false
+    property bool pendingUpdate: false
     readonly property bool dgopAvailable: DMSService.isConnected && DMSService.capabilities.includes("dgop")
     property bool sessionGpuIdsSeeded: false
 
@@ -31,7 +32,6 @@ Singleton {
     property string cpuCursor: ""
     property string procCursor: ""
     property int cpuSampleCount: 0
-    property int processSampleCount: 0
 
     property real cpuUsage: 0
     property real cpuFrequency: 0
@@ -153,7 +153,6 @@ Singleton {
             }
             if (!enabledModules.includes("processes")) {
                 procCursor = "";
-                processSampleCount = 0;
                 allProcesses = [];
                 processes = [];
             }
@@ -206,23 +205,33 @@ Singleton {
     function updateAllStats() {
         if (!dgopAvailable || refCount === 0 || enabledModules.length === 0) {
             isUpdating = false;
+            pendingUpdate = false;
             return;
         }
-        if (isUpdating)
+        if (isUpdating) {
+            pendingUpdate = true;
             return;
+        }
 
         const params = buildMetaParams();
-        if (!params)
+        if (!params) {
+            pendingUpdate = false;
             return;
+        }
 
         isUpdating = true;
         DMSService.sendRequest("dgop.meta", params, response => {
             if (!response.result) {
                 log.warn("dgop.meta failed:", response.error || "empty result");
                 isUpdating = false;
-                return;
+            } else {
+                parseData(response.result);
             }
-            parseData(response.result);
+
+            if (pendingUpdate) {
+                pendingUpdate = false;
+                primeTimer.restart();
+            }
         });
     }
 
@@ -399,34 +408,26 @@ Singleton {
         }
 
         if (data.processes && Array.isArray(data.processes)) {
-            processSampleCount++;
-
             if (data.cursor) {
                 procCursor = data.cursor;
             }
 
-            // First sample has no CPU deltas; use it for the cursor only and
-            // resample quickly so the visible list gets real values in one update
-            if (processSampleCount === 1) {
-                primeTimer.restart();
-            } else {
-                const newProcesses = [];
-                for (const proc of data.processes) {
-                    newProcesses.push({
-                        "pid": proc.pid || 0,
-                        "ppid": proc.ppid || 0,
-                        "cpu": proc.cpu || 0,
-                        "memoryPercent": proc.memoryPercent || proc.pssPercent || 0,
-                        "memoryKB": proc.memoryKB || proc.pssKB || 0,
-                        "command": proc.command || "",
-                        "fullCommand": proc.fullCommand || "",
-                        "username": proc.username || "",
-                        "displayName": (proc.command && proc.command.length > 15) ? proc.command.substring(0, 15) + "..." : (proc.command || "")
-                    });
-                }
-                allProcesses = newProcesses;
-                applySorting();
+            const newProcesses = [];
+            for (const proc of data.processes) {
+                newProcesses.push({
+                    "pid": proc.pid || 0,
+                    "ppid": proc.ppid || 0,
+                    "cpu": proc.cpu || 0,
+                    "memoryPercent": proc.memoryPercent || proc.pssPercent || 0,
+                    "memoryKB": proc.memoryKB || proc.pssKB || 0,
+                    "command": proc.command || "",
+                    "fullCommand": proc.fullCommand || "",
+                    "username": proc.username || "",
+                    "displayName": (proc.command && proc.command.length > 15) ? proc.command.substring(0, 15) + "..." : (proc.command || "")
+                });
             }
+            allProcesses = newProcesses;
+            applySorting();
         }
 
         const gpuData = (data.gpu && data.gpu.gpus) || data.gpus;

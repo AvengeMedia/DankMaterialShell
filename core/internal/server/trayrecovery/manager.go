@@ -46,9 +46,7 @@ func NewManager() (*Manager, error) {
 // This handles the case where the process survives suspend.
 func (m *Manager) WatchLoginctl(lm *loginctl.Manager) {
 	ch := lm.Subscribe("tray-recovery")
-	m.wg.Add(1)
-	go func() {
-		defer m.wg.Done()
+	m.wg.Go(func() {
 		defer lm.Unsubscribe("tray-recovery")
 
 		wasSleeping := false
@@ -70,7 +68,7 @@ func (m *Manager) WatchLoginctl(lm *loginctl.Manager) {
 				}
 			}
 		}
-	}()
+	})
 }
 
 func (m *Manager) scheduleRecovery() {

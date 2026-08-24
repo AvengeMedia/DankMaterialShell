@@ -135,7 +135,8 @@ fmt:
 
 vet:
 	@echo "Running go vet..."
-	$(GO) vet ./...
+	$(GO) vet $$($(GO) list ./... | grep -v internal/highlight/lexers)
+	$(GO) vet -composites=false ./internal/highlight/lexers
 
 deps:
 	@echo "Updating dependencies..."

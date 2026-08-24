@@ -221,13 +221,11 @@ DankModal {
                     keyboardController: modalKeyboardController
                     transientSurfaceTracker: notificationModal.transientSurfaceTracker
                     onCurrentTabChanged: notificationModal.currentTab = currentTab
+                    onSettingsRequested: {
+                        notificationModal.hide();
+                        PopoutService.openSettingsWithTab("notifications", notificationModal, () => notificationModal.show());
+                    }
                     Component.onCompleted: notificationModal.notificationHeaderRef = notificationHeader
-                }
-
-                NotificationSettings {
-                    id: notificationSettings
-                    transientSurfaceTracker: notificationModal.transientSurfaceTracker
-                    expanded: notificationHeader.showSettings
                 }
 
                 KeyboardNavigatedNotificationList {

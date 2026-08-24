@@ -111,7 +111,7 @@ func wpaHexString(s string) string {
 
 func parseWpaScanResults(text string) []wpaScanResult {
 	var results []wpaScanResult
-	for _, line := range strings.Split(text, "\n") {
+	for line := range strings.SplitSeq(text, "\n") {
 		if line == "" || strings.HasPrefix(line, "bssid /") {
 			continue
 		}
@@ -192,7 +192,7 @@ func wpaWiFiNetworksFromScanResults(results []wpaScanResult) []WiFiNetwork {
 
 func parseWpaStatus(text string) wpaStatus {
 	st := wpaStatus{networkID: -1}
-	for _, line := range strings.Split(text, "\n") {
+	for line := range strings.SplitSeq(text, "\n") {
 		key, value, ok := strings.Cut(line, "=")
 		if !ok {
 			continue
@@ -219,7 +219,7 @@ func parseWpaStatus(text string) wpaStatus {
 }
 
 func parseWpaSignalPollRSSI(text string) (int, bool) {
-	for _, line := range strings.Split(text, "\n") {
+	for line := range strings.SplitSeq(text, "\n") {
 		value, ok := strings.CutPrefix(line, "RSSI=")
 		if !ok {
 			continue
@@ -235,7 +235,7 @@ func parseWpaSignalPollRSSI(text string) (int, bool) {
 
 func parseWpaListNetworks(text string) []wpaSavedNetwork {
 	var networks []wpaSavedNetwork
-	for _, line := range strings.Split(text, "\n") {
+	for line := range strings.SplitSeq(text, "\n") {
 		if line == "" || strings.HasPrefix(line, "network id /") {
 			continue
 		}
@@ -649,9 +649,7 @@ func (b *WpaSupplicantBackend) maybeReplacePSK(att *wpaConnectAttempt) {
 		return
 	}
 
-	b.sigWG.Add(1)
-	go func() {
-		defer b.sigWG.Done()
+	b.sigWG.Go(func() {
 
 		psk, ok := b.promptForPSK(ssid, "wrong-password")
 		if !ok {
@@ -661,13 +659,11 @@ func (b *WpaSupplicantBackend) maybeReplacePSK(att *wpaConnectAttempt) {
 		if err := b.ConnectWiFi(ConnectionRequest{SSID: ssid, Password: psk}); err != nil {
 			log.Warnf("failed to reconnect %s with replacement credentials: %v", ssid, err)
 		}
-	}()
+	})
 }
 
 func (b *WpaSupplicantBackend) startAttemptWatchdog(att *wpaConnectAttempt) {
-	b.sigWG.Add(1)
-	go func() {
-		defer b.sigWG.Done()
+	b.sigWG.Go(func() {
 
 		timer := time.NewTimer(time.Until(att.deadline))
 		defer timer.Stop()
@@ -683,7 +679,7 @@ func (b *WpaSupplicantBackend) startAttemptWatchdog(att *wpaConnectAttempt) {
 			b.finalizeAttempt(att, b.classifyAttempt(att))
 		case <-b.stopChan:
 		}
-	}()
+	})
 }
 
 func (b *WpaSupplicantBackend) ConnectWiFi(req ConnectionRequest) error {
@@ -728,11 +724,9 @@ func (b *WpaSupplicantBackend) ConnectWiFi(req ConnectionRequest) error {
 
 	secured := visible.Secured || (req.Hidden && req.Password != "")
 
-	b.sigWG.Add(1)
-	go func() {
-		defer b.sigWG.Done()
+	b.sigWG.Go(func() {
 		b.runConnectAttempt(att, req, secured)
-	}()
+	})
 
 	return nil
 }
@@ -953,7 +947,7 @@ func parseWpaConfigPassphrase(data, ssid string) (string, error) {
 	inBlock := false
 	var blockSSID, blockPSK string
 
-	for _, line := range strings.Split(data, "\n") {
+	for line := range strings.SplitSeq(data, "\n") {
 		line = strings.TrimSpace(line)
 		if strings.HasPrefix(line, "#") {
 			continue

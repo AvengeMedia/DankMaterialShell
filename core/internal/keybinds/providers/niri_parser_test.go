@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
+	"strings"
 	"testing"
 )
 
@@ -610,12 +611,12 @@ binds {
 	bindMap := make(map[string]*NiriKeyBinding)
 	for i := range result.Section.Keybinds {
 		kb := &result.Section.Keybinds[i]
-		key := ""
+		var key strings.Builder
 		for _, m := range kb.Mods {
-			key += m + "+"
+			key.WriteString(m + "+")
 		}
-		key += kb.Key
-		bindMap[key] = kb
+		key.WriteString(kb.Key)
+		bindMap[key.String()] = kb
 	}
 
 	if kb, ok := bindMap["Mod+T"]; ok {

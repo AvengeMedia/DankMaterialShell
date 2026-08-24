@@ -32,6 +32,8 @@ Singleton {
     property var globalVars: ({})
     property var pluginLoadErrors: ({})
 
+    property var _translationLoaders: ({})
+
     property var _stateCache: ({})
     property var _stateLoaded: ({})
     property var _stateWriters: ({})
@@ -216,6 +218,80 @@ Singleton {
 
     readonly property var pluginSurfaceKeys: ["widget", "desktop", "daemon", "launcher"]
 
+    Connections {
+        target: I18n
+        function onLocaleApplied() {
+            for (const pluginId in root.availablePlugins)
+                root._loadPluginTranslations(pluginId, root.availablePlugins[pluginId].pluginDirectory);
+        }
+    }
+
+    function _dropPluginTranslations(pluginId) {
+        const loader = _translationLoaders[pluginId];
+        if (loader) {
+            loader.destroy();
+            delete _translationLoaders[pluginId];
+        }
+        I18n.unregisterPluginTranslations(pluginId);
+    }
+
+    function _loadPluginTranslations(pluginId, dir) {
+        if (!dir)
+            return;
+        const loader = _translationLoaders[pluginId];
+        if (loader) {
+            loader.destroy();
+            delete _translationLoaders[pluginId];
+        }
+        const candidates = I18n.localeCandidates();
+        if (!candidates.length) {
+            I18n.unregisterPluginTranslations(pluginId);
+            return;
+        }
+        _tryTranslationCandidate(pluginId, dir, candidates, 0);
+    }
+
+    function _tryTranslationCandidate(pluginId, dir, candidates, index) {
+        if (index >= candidates.length) {
+            delete _translationLoaders[pluginId];
+            I18n.unregisterPluginTranslations(pluginId);
+            return;
+        }
+        _translationLoaders[pluginId] = translationFvComp.createObject(root, {
+            pluginId: pluginId,
+            dir: dir,
+            candidates: candidates,
+            index: index,
+            path: dir + "/translations/" + candidates[index] + ".json"
+        });
+    }
+
+    Component {
+        id: translationFvComp
+        FileView {
+            id: tfv
+            property string pluginId: ""
+            property string dir: ""
+            property var candidates: []
+            property int index: 0
+            printErrors: false
+            onLoaded: {
+                try {
+                    I18n.registerPluginTranslations(pluginId, JSON.parse(text()));
+                } catch (e) {
+                    root.log.warn("bad plugin translations", path, e.message);
+                    I18n.unregisterPluginTranslations(pluginId);
+                }
+                delete root._translationLoaders[pluginId];
+                tfv.destroy();
+            }
+            onLoadFailed: err => {
+                tfv.destroy();
+                root._tryTranslationCandidate(pluginId, dir, candidates, index + 1);
+            }
+        }
+    }
+
     function _stripDotSlash(p) {
         return p.startsWith("./") ? p.slice(2) : p;
     }
@@ -337,8 +413,10 @@ Singleton {
             };
             _updateAvailablePluginsList();
             pluginListUpdated();
+            _loadPluginTranslations(manifest.id, dir);
             // A chat plugin has nothing to load in this process -- the backend
-            // owns its bridge's lifecycle, driven from Settings -> Chats.
+            // owns its bridge's lifecycle, driven from Settings -> Chats. Its
+            // translations are still registered above, for its settings page.
             if (isChat)
                 return;
             const isPureDesktop = surfaces.length === 1 && surfaces[0] === "desktop";
@@ -360,6 +438,7 @@ Singleton {
         if (current && current.manifestPath === absPath) {
             if (current.loaded)
                 unloadPlugin(pluginId);
+            _dropPluginTranslations(pluginId);
             const newMap = Object.assign({}, availablePlugins);
             delete newMap[pluginId];
             availablePlugins = newMap;
@@ -842,6 +921,9 @@ Singleton {
     function reloadPlugin(pluginId) {
         if (isPluginLoaded(pluginId))
             unloadPlugin(pluginId);
+        const plugin = availablePlugins[pluginId];
+        if (plugin)
+            _loadPluginTranslations(pluginId, plugin.pluginDirectory);
         return loadPlugin(pluginId, true);
     }
 

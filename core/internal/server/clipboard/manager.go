@@ -1507,14 +1507,8 @@ func (m *Manager) Search(params SearchParams) SearchResult {
 
 	total := len(all)
 
-	start := params.Offset
-	if start > total {
-		start = total
-	}
-	end := start + params.Limit
-	if end > total {
-		end = total
-	}
+	start := min(params.Offset, total)
+	end := min(start+params.Limit, total)
 
 	return SearchResult{
 		Entries: all[start:end],
@@ -2049,7 +2043,7 @@ func getInstalledFlatpaks() []string {
 	}
 
 	var apps []string
-	for _, line := range strings.Split(strings.TrimSpace(string(out)), "\n") {
+	for line := range strings.SplitSeq(strings.TrimSpace(string(out)), "\n") {
 		if app := strings.TrimSpace(line); app != "" {
 			apps = append(apps, app)
 		}

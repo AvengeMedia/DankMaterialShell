@@ -104,7 +104,7 @@ func parseHexColor(hex string) ([3]uint8, bool) {
 	var r, g, b uint8
 	for i, ptr := range []*uint8{&r, &g, &b} {
 		val := 0
-		for j := 0; j < 2; j++ {
+		for j := range 2 {
 			c := hex[i*2+j]
 			val *= 16
 			switch {

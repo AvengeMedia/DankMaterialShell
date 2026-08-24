@@ -875,6 +875,9 @@
   "Auto-Hide Timeout": {
     "Auto-Hide Timeout": "وقفه پنهان خودکار"
   },
+  "Auto-close Niri overview when DMS launches or focuses a window.": {
+    "Auto-close Niri overview when DMS launches or focuses a window.": ""
+  },
   "Auto-close Niri overview when launching apps.": {
     "Auto-close Niri overview when launching apps.": "هنگام اجرای برنامه‌ها نمای کلی نیری را خودکار ببند."
   },
@@ -1008,7 +1011,7 @@
     "Background Color": ""
   },
   "Background Effect": {
-    "Background Effect": ""
+    "Background Effect": "افکت پس‌زمینه"
   },
   "Background Opacity": {
     "Background Opacity": "شفافیت پس‌زمینه"
@@ -1043,8 +1046,11 @@
   "Bar Inset Padding": {
     "Bar Inset Padding": ""
   },
+  "Bar Length Padding": {
+    "Bar Length Padding": ""
+  },
   "Bar Opacity": {
-    "Bar Opacity": ""
+    "Bar Opacity": "شفافیت نوار"
   },
   "Bar Shadows": {
     "Bar Shadows": "سایه نوارها"
@@ -1140,7 +1146,7 @@
     "Bluetooth not available": "بلوتوث در دسترس نیست"
   },
   "Blur": {
-    "Blur": ""
+    "Blur": "تاری"
   },
   "Blur Wallpaper Layer": {
     "Blur Wallpaper Layer": "لایه تصویر پس‌زمینه تار"
@@ -1422,13 +1428,16 @@
     "Choose a color": "یک رنگ انتخاب کنید"
   },
   "Choose a power profile": {
-    "Choose a power profile": ""
+    "Choose a power profile": "یک پروفایل پاور انتخاب کنید"
   },
   "Choose a shortcut key to cycle between keyboard layouts": {
     "Choose a shortcut key to cycle between keyboard layouts": ""
   },
   "Choose colors from palette": {
     "Choose colors from palette": "انتخاب رنگ‌ها از پالت رنگی"
+  },
+  "Choose how the bar meets the screen edge": {
+    "Choose how the bar meets the screen edge": ""
   },
   "Choose how the weather widget is displayed": {
     "Choose how the weather widget is displayed": "انتخاب کنید که ابزارک آب و هوا چگونه نمایش داده شود"
@@ -1557,7 +1566,7 @@
     "Clipboard Manager": "مدیریت کلیپ‌بورد"
   },
   "Clipboard Saved": {
-    "Clipboard Saved": ""
+    "Clipboard Saved": "کلیپ‌بورد ذخیره شد"
   },
   "Clipboard sent": {
     "Clipboard sent": "کلیپ‌بورد ارسال شد"
@@ -1579,6 +1588,9 @@
   },
   "Close All Windows": {
     "Close All Windows": "بستن همه پنجره‌ها"
+  },
+  "Close Niri Overview on Window Focus": {
+    "Close Niri Overview on Window Focus": ""
   },
   "Close Overview on Launch": {
     "Close Overview on Launch": "بستن نمای کلی هنگام اجرا"
@@ -1910,11 +1922,17 @@
   "Copy Text": {
     "Copy Text": "کپی متن"
   },
+  "Copy target (%1)": {
+    "Copy target (%1)": ""
+  },
   "Corner Radius": {
     "Corner Radius": "شعاع گوشه"
   },
   "Corner Radius Override": {
     "Corner Radius Override": "جایگزینی شعاع گوشه‌ها"
+  },
+  "Corner Style": {
+    "Corner Style": ""
   },
   "Corners & Background": {
     "Corners & Background": "گوشه‌ها و پس‌زمینه"
@@ -2571,10 +2589,10 @@
     "Dock & Launcher": "داک و لانچر"
   },
   "Dock Opacity": {
-    "Dock Opacity": ""
+    "Dock Opacity": "شفافیت داک"
   },
   "Dock margin, opacity, and border": {
-    "Dock margin, opacity, and border": ""
+    "Dock margin, opacity, and border": "فاصله بیرونی، شفافیت و حاشیه داک"
   },
   "Dock window": {
     "Dock window": ""
@@ -3383,6 +3401,9 @@
   "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": {
     "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": "فلوئنت: شتاب مکعبی نرم آهسته در ورود، خروج سریع و ناگهانی — منحنی‌های تمیز و زیبا"
   },
+  "Flush": {
+    "Flush": ""
+  },
   "Focus": {
     "Focus": "فوکوس"
   },
@@ -3507,7 +3528,7 @@
     "Foreground Layers": "لایه‌های پیش‌زمینه"
   },
   "Foreground Opacity": {
-    "Foreground Opacity": ""
+    "Foreground Opacity": "شفافیت پیش‌زمینه"
   },
   "Forever": {
     "Forever": "برای همیشه"
@@ -3637,6 +3658,9 @@
   },
   "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
     "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
+  },
+  "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
+    "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
   },
   "Generic": {
     "Generic": "عمومی"
@@ -5616,7 +5640,7 @@
     "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts": ""
   },
   "Opacity of foreground cards and nested surfaces on shell panels": {
-    "Opacity of foreground cards and nested surfaces on shell panels": ""
+    "Opacity of foreground cards and nested surfaces on shell panels": "شفافیت کارت‌های پیش‌زمینه و سطوح تو در تو روی پنل‌های شِل"
   },
   "Opaque": {
     "Opaque": "کدر"
@@ -6407,6 +6431,9 @@
   "Recommended available": {
     "Recommended available": "پیشنهادی موجود است"
   },
+  "Reduce the visible bar length from both ends": {
+    "Reduce the visible bar length from both ends": ""
+  },
   "Refresh": {
     "Refresh": "تازه‌سازی"
   },
@@ -6691,6 +6718,9 @@
   },
   "Root Filesystem": {
     "Root Filesystem": "سیستم فایل ریشه"
+  },
+  "Rounded": {
+    "Rounded": ""
   },
   "Rounded corners for windows": {
     "Rounded corners for windows": "گوشه‌های گرد برای پنجره‌ها"
@@ -7652,6 +7682,9 @@
   "Spotlight Search": {
     "Spotlight Search": "جستجوی اسپات‌لایت"
   },
+  "Square": {
+    "Square": ""
+  },
   "Square Corners": {
     "Square Corners": "گوشه‌های مربعی"
   },
@@ -8002,6 +8035,9 @@
   },
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
     "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "تنظیمات پایین، تنظیمات Qt و GTK شما را تغییر می‌دهند. اگر می‌خواهید تنظیمات کنونی خود را نگه دارید، لطفا از آنها نسخه پشتیبان تهیه کنید (qt5ctl.conf |qt6ctl.conf و ~/.config/gtk-3.0|gtk-4.0)"
+  },
+  "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": {
+    "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": ""
   },
   "The custom command used when attaching to sessions (receives the session name as the first argument)": {
     "The custom command used when attaching to sessions (receives the session name as the first argument)": "دستور سفارشی که هنگام اتصال به نشست‌ها استفاده می‌شود (نام نشست را به عنوان اولین آرگومان دریافت می‌کند)"
@@ -8898,7 +8934,7 @@
     "Widget Management": "مدیریت ابزارک‌ها"
   },
   "Widget Opacity": {
-    "Widget Opacity": ""
+    "Widget Opacity": "شفافیت ابزارک"
   },
   "Widget Outline": {
     "Widget Outline": "خط بیرونی ابزارک"
@@ -8964,7 +9000,7 @@
     "Window Height": "ارتفاع پنجره"
   },
   "Window Opacity": {
-    "Window Opacity": ""
+    "Window Opacity": "شفافیت پنجره"
   },
   "Window Opening": {
     "Window Opening": "باز کردن پنجره"
@@ -9042,7 +9078,10 @@
     "You have unsaved changes. Save before continuing?": "شما تغییرات ذخیره نشده‌ دارید. پیش از ادامه ذخیره شوند؟"
   },
   "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": {
-    "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": "لازم است یکی از مقادیر زیر را به عنوان متغیر محیطی تنظیم نمایید:\nQT_QPA_PLATFORMTHEME=gtk3 یا\nQT_QPA_PLATFORMTHEME=qt6ct\nو پس از آن، شل را مجدداً راه‌اندازی کنید.\n\nبسته qt6ct نیازمند نصب qt6ct-kde است."
+    "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": "لازم است یکی از مقادیر زیر را به عنوان متغیر محیطی تنظیم نمایید:\nQT_QPA_PLATFORMTHEME=gtk3 یا\nQT_QPA_PLATFORMTHEME=qt6ct\nو پس از آن، شل را مجدداً راه‌اندازی کنید.\n\nبسته qt6ct نیازمند نصب qt6ct-kde می‌باشد."
+  },
+  "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": {
+    "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": ""
   },
   "You'll enter your password at the greeter after the next reboot.": {
     "You'll enter your password at the greeter after the next reboot.": ""

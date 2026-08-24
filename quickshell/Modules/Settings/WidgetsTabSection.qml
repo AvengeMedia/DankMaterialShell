@@ -1217,10 +1217,8 @@ Column {
     WidgetSettingsMenu {
         id: clockContextMenu
 
-
         menuWidth: 190
         menuHeight: clockMenuColumn.implicitHeight + Theme.spacingS * 2
-
 
         Item {
             anchors.fill: parent
@@ -1318,10 +1316,8 @@ Column {
     WidgetSettingsMenu {
         id: memUsageContextMenu
 
-
         menuWidth: 200
         menuHeight: 80
-
 
         Item {
             anchors.fill: parent
@@ -1456,10 +1452,8 @@ Column {
     WidgetSettingsMenu {
         id: trayContextMenu
 
-
         menuWidth: 280
         menuHeight: contentColumn.implicitHeight + Theme.spacingS * 2
-
 
         Item {
             anchors.fill: parent
@@ -1732,10 +1726,8 @@ Column {
     WidgetSettingsMenu {
         id: kbdLayoutCtxMenu
 
-
         menuWidth: 200
         menuHeight: kbdLayoutCtxMenuColumn.implicitHeight + Theme.spacingS * 2
-
 
         Item {
             anchors.fill: parent
@@ -1813,10 +1805,8 @@ Column {
     WidgetSettingsMenu {
         id: focusedWindowContextMenu
 
-
         menuWidth: 180
         menuHeight: focusedWindowMenuColumn.implicitHeight + Theme.spacingS * 2
-
 
         Item {
             anchors.fill: parent
@@ -2043,10 +2033,8 @@ Column {
     WidgetSettingsMenu {
         id: diskUsageContextMenu
 
-
         menuWidth: 240
         menuHeight: diskMenuColumn.implicitHeight + Theme.spacingS * 2
-
 
         Item {
             anchors.fill: parent
@@ -2169,7 +2157,6 @@ Column {
 
     WidgetSettingsMenu {
         id: controlCenterContextMenu
-
 
         readonly property real minimumContentWidth: controlCenterContentMetrics.implicitWidth + Theme.spacingS * 2
         readonly property real controlCenterRowHeight: 32
@@ -2389,8 +2376,7 @@ Column {
 
         function getOrderedControlCenterGroups() {
             const baseGroups = defaultControlCenterGroups.slice();
-            const currentWidget = contentItem.getCurrentWidgetData();
-            const savedOrder = currentWidget?.controlCenterGroupOrder;
+            const savedOrder = currentWidgetData?.controlCenterGroupOrder;
             if (!savedOrder || !savedOrder.length)
                 return baseGroups;
 
@@ -2417,17 +2403,10 @@ Column {
             return orderedGroups;
         }
 
-
         Item {
             anchors.fill: parent
             LayoutMirroring.enabled: I18n.isRtl
             LayoutMirroring.childrenInherit: true
-            function getCurrentWidgetData() {
-                const widgets = root.items || [];
-                if (controlCenterContextMenu.widgetIndex >= 0 && controlCenterContextMenu.widgetIndex < widgets.length)
-                    return widgets[controlCenterContextMenu.widgetIndex];
-                return controlCenterContextMenu.widgetData;
-            }
 
             Column {
                 id: menuColumn
@@ -2466,7 +2445,7 @@ Column {
                         required property int index
 
                         function getCheckedState(settingName) {
-                            const wd = controlCenterContextMenu.contentItem.getCurrentWidgetData();
+                            const wd = controlCenterContextMenu.currentWidgetData;
                             switch (settingName) {
                             case "showNetworkIcon":
                                 return wd?.showNetworkIcon ?? SettingsData.controlCenterShowNetworkIcon;
@@ -2702,7 +2681,6 @@ Column {
     WidgetSettingsMenu {
         id: privacyContextMenu
 
-
         menuWidth: 240
         menuHeight: menuPrivacyColumn.implicitHeight + Theme.spacingS * 2
 
@@ -2713,7 +2691,6 @@ Column {
         onClosed: {
             log.debug("Privacy Center context menu closed");
         }
-
 
         Item {
             anchors.fill: parent
@@ -2929,10 +2906,8 @@ Column {
     WidgetSettingsMenu {
         id: gpuContextMenu
 
-
         menuWidth: 250
         menuHeight: gpuMenuColumn.implicitHeight + Theme.spacingS * 2
-
 
         Item {
             anchors.fill: parent
@@ -3027,10 +3002,8 @@ Column {
     WidgetSettingsMenu {
         id: batteryContextMenu
 
-
         menuWidth: 270
         menuHeight: batteryMenuColumn.implicitHeight + Theme.spacingS * 2
-
 
         Item {
             anchors.fill: parent
@@ -3411,10 +3384,8 @@ Column {
     WidgetSettingsMenu {
         id: musicContextMenu
 
-
         menuWidth: 180
         menuHeight: musicMenuColumn.implicitHeight + Theme.spacingS * 2
-
 
         Item {
             anchors.fill: parent
@@ -3523,11 +3494,8 @@ Column {
     WidgetSettingsMenu {
         id: runningAppsContextMenu
 
-
-
         menuWidth: 240
         menuHeight: runningAppsMenuColumn.implicitHeight + Theme.spacingS * 2
-
 
         Item {
             anchors.fill: parent
@@ -3794,10 +3762,8 @@ Column {
     WidgetSettingsMenu {
         id: appsDockContextMenu
 
-
         menuWidth: 320
         menuHeight: appsDockMenuColumn.implicitHeight + Theme.spacingS * 2
-
 
         Item {
             anchors.fill: parent

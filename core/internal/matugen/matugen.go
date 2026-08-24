@@ -178,7 +178,7 @@ func (o *Options) ShouldSkipTemplate(name string) bool {
 	if o.SkipTemplates == "" {
 		return false
 	}
-	for _, skip := range strings.Split(o.SkipTemplates, ",") {
+	for skip := range strings.SplitSeq(o.SkipTemplates, ",") {
 		if strings.TrimSpace(skip) == name {
 			return true
 		}
@@ -446,8 +446,8 @@ func buildMergedConfig(opts *Options, cfgFile *os.File, tmpDir string) error {
 	baseConfigPath := filepath.Join(opts.ShellDir, "matugen", "configs", "base.toml")
 	if data, err := os.ReadFile(baseConfigPath); err == nil {
 		content := string(data)
-		lines := strings.Split(content, "\n")
-		for _, line := range lines {
+		lines := strings.SplitSeq(content, "\n")
+		for line := range lines {
 			if strings.TrimSpace(line) == "[config]" {
 				continue
 			}
@@ -602,8 +602,8 @@ func appendTerminalConfig(opts *Options, cfgFile *os.File, tmpDir string, checkC
 		return
 	}
 
-	lines := strings.Split(content, "\n")
-	for _, line := range lines {
+	lines := strings.SplitSeq(content, "\n")
+	for line := range lines {
 		if !strings.Contains(line, "input_path") || !strings.Contains(line, "SHELL_DIR/matugen/templates/") {
 			continue
 		}
@@ -1002,7 +1002,7 @@ func isDMSKDEColorSchemeActive(configDir string) bool {
 	}
 
 	inGeneral := false
-	for _, line := range strings.Split(string(data), "\n") {
+	for line := range strings.SplitSeq(string(data), "\n") {
 		line = strings.TrimSpace(line)
 		if strings.HasPrefix(line, "[") {
 			inGeneral = line == "[General]"

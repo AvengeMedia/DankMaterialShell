@@ -875,6 +875,9 @@
   "Auto-Hide Timeout": {
     "Auto-Hide Timeout": "Zeitüberschreitung für automatisches Ausblenden"
   },
+  "Auto-close Niri overview when DMS launches or focuses a window.": {
+    "Auto-close Niri overview when DMS launches or focuses a window.": ""
+  },
   "Auto-close Niri overview when launching apps.": {
     "Auto-close Niri overview when launching apps.": "Niri Übersicht schliessen beim öffnen von Anwendungs."
   },
@@ -1042,6 +1045,9 @@
   },
   "Bar Inset Padding": {
     "Bar Inset Padding": "Leisten-Innenabstand"
+  },
+  "Bar Length Padding": {
+    "Bar Length Padding": ""
   },
   "Bar Opacity": {
     "Bar Opacity": "Leistendeckkraft"
@@ -1430,6 +1436,9 @@
   "Choose colors from palette": {
     "Choose colors from palette": "Farbe von Palette"
   },
+  "Choose how the bar meets the screen edge": {
+    "Choose how the bar meets the screen edge": ""
+  },
   "Choose how the weather widget is displayed": {
     "Choose how the weather widget is displayed": "Wählen Sie aus, wie das Wetter-Widget angezeigt werden soll"
   },
@@ -1579,6 +1588,9 @@
   },
   "Close All Windows": {
     "Close All Windows": "Alle Fenster schließen"
+  },
+  "Close Niri Overview on Window Focus": {
+    "Close Niri Overview on Window Focus": ""
   },
   "Close Overview on Launch": {
     "Close Overview on Launch": "Übersicht bei start des Launchers schließen"
@@ -1910,11 +1922,17 @@
   "Copy Text": {
     "Copy Text": "Text kopieren"
   },
+  "Copy target (%1)": {
+    "Copy target (%1)": ""
+  },
   "Corner Radius": {
     "Corner Radius": "Abrundungsradius"
   },
   "Corner Radius Override": {
     "Corner Radius Override": "Abrundung überschreiben"
+  },
+  "Corner Style": {
+    "Corner Style": ""
   },
   "Corners & Background": {
     "Corners & Background": "Ecken & Hintergrund"
@@ -2220,7 +2238,7 @@
     "Darken Modal Background": "Modalen Hintergrund abdunkeln"
   },
   "Date First": {
-    "Date First": ""
+    "Date First": "Datum zuerst"
   },
   "Date Format": {
     "Date Format": "Datumsformat"
@@ -2952,7 +2970,7 @@
     "Extra Light": "Extradünn"
   },
   "Extract theme to JSON": {
-    "Extract theme to JSON": ""
+    "Extract theme to JSON": "Thema nach JSON extrahieren"
   },
   "Fade": {
     "Fade": "Überblenden"
@@ -3054,7 +3072,7 @@
     "Failed to enable night mode": "Nachtmodus konnte nicht aktiviert werden"
   },
   "Failed to extract theme": {
-    "Failed to extract theme": ""
+    "Failed to extract theme": "Extraktion des Themas fehlgeschlagen"
   },
   "Failed to fetch network QR code: %1": {
     "Failed to fetch network QR code: %1": "Netzwerk-QR-Code konnte nicht abgerufen werden: %1"
@@ -3383,6 +3401,9 @@
   "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": {
     "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": "Fließend: Sanfte kubische Verzögerung beim Hineinkommen, schnelles Einrasten beim Herausgehen – saubere, elegante Kurven."
   },
+  "Flush": {
+    "Flush": ""
+  },
   "Focus": {
     "Focus": "Fokus"
   },
@@ -3637,6 +3658,9 @@
   },
   "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
     "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": "Erzeugen Sie Basis-GTK3/4- oder QT5/QT6-Konfigurationen (erfordert qt6ct-kde), um den DMS-Farben zu folgen. Nur einmalig erforderlich.<br /><br />Es wird empfohlen, %1 zu konfigurieren, bevor GTK-Themes angewendet werden."
+  },
+  "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
+    "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
   },
   "Generic": {
     "Generic": "Generisch"
@@ -4299,7 +4323,7 @@
     "Keep in Bar": "In der Leiste behalten"
   },
   "Keep pinned apps as launchers and show running windows separately": {
-    "Keep pinned apps as launchers and show running windows separately": ""
+    "Keep pinned apps as launchers and show running windows separately": "Angepinnte Apps als Starter beibehalten und laufende Fenster separat anzeigen"
   },
   "Keep the clipboard type filter when reopening history": {
     "Keep the clipboard type filter when reopening history": "Zwischenablage-Typfilter beim erneuten Öffnen des Verlaufs beibehalten"
@@ -4890,7 +4914,7 @@
     "Minimal palette built around a single hue.": "Minimale Palette mit einem Farbton."
   },
   "Minimize": {
-    "Minimize": ""
+    "Minimize": "Minimieren"
   },
   "Minute": {
     "Minute": "Minute"
@@ -5976,7 +6000,7 @@
     "Place a trash bin at the end of the dock": "Einen Papierkorb am Ende des Docks platzieren"
   },
   "Place clipboard history on the Wayland overlay layer": {
-    "Place clipboard history on the Wayland overlay layer": ""
+    "Place clipboard history on the Wayland overlay layer": "Zwischenablage-Verlauf auf der Wayland-Overlay-Ebene platzieren"
   },
   "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
     "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "Legen Sie hier die Plugin-Verzeichnisse ab. Jedes Plugin sollte eine Manifestdatei namens plugin.json enthalten."
@@ -6407,6 +6431,9 @@
   "Recommended available": {
     "Recommended available": "Empfohlen verfügbar"
   },
+  "Reduce the visible bar length from both ends": {
+    "Reduce the visible bar length from both ends": ""
+  },
   "Refresh": {
     "Refresh": "Aktualisieren"
   },
@@ -6627,7 +6654,7 @@
     "Restarting audio system...": "Audiosystem wird neu gestartet..."
   },
   "Restore": {
-    "Restore": ""
+    "Restore": "Wiederherstellen"
   },
   "Restore Special Workspace Windows": {
     "Restore Special Workspace Windows": "Fenster in speziellen Arbeitsbereichen wiederherstellen"
@@ -6691,6 +6718,9 @@
   },
   "Root Filesystem": {
     "Root Filesystem": "Root-Dateisystem"
+  },
+  "Rounded": {
+    "Rounded": ""
   },
   "Rounded corners for windows": {
     "Rounded corners for windows": "Abgerundete Ecken für Fenster"
@@ -6768,7 +6798,7 @@
     "Save & Start": "Speichern & Starten"
   },
   "Save Extracted Theme": {
-    "Save Extracted Theme": ""
+    "Save Extracted Theme": "Extrahiertes Thema speichern"
   },
   "Save Notepad File": {
     "Save Notepad File": "Speicher Notepad Datei"
@@ -7089,7 +7119,7 @@
     "Separate Light & Dark Themes": "Getrennte helle & dunkle Themes"
   },
   "Separate Pinned and Running Apps": {
-    "Separate Pinned and Running Apps": ""
+    "Separate Pinned and Running Apps": "Angepinnte und laufende Apps trennen"
   },
   "Separate appearance for unfocused displays is not supported on this compositor.": {
     "Separate appearance for unfocused displays is not supported on this compositor.": "Separates Erscheinungsbild für nicht fokussierte Bildschirme wird von diesem Compositor nicht unterstützt."
@@ -7652,6 +7682,9 @@
   "Spotlight Search": {
     "Spotlight Search": "Spotlight-Suche"
   },
+  "Square": {
+    "Square": ""
+  },
   "Square Corners": {
     "Square Corners": "keine Abrundung"
   },
@@ -7668,7 +7701,7 @@
     "Start": "Start"
   },
   "Start DankConnect, KDE Connect, or Valent to use this plugin": {
-    "Start DankConnect, KDE Connect, or Valent to use this plugin": ""
+    "Start DankConnect, KDE Connect, or Valent to use this plugin": "Starten Sie DankConnect, KDE Connect oder Valent, um dieses Plugin zu verwenden"
   },
   "Start Hotspot?": {
     "Start Hotspot?": "Hotspot starten?"
@@ -8003,6 +8036,9 @@
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
     "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "Die folgenden Einstellungen werden Ihre GTK- und Qt-Einstellungen ändern. Wenn Sie Ihre aktuellen Konfigurationen beibehalten möchten, sichern Sie diese bitte (qt5ct.conf|qt6ct.conf und ~/.config/gtk-3.0|gtk-4.0)."
   },
+  "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": {
+    "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": ""
+  },
   "The custom command used when attaching to sessions (receives the session name as the first argument)": {
     "The custom command used when attaching to sessions (receives the session name as the first argument)": "Der benutzerdefinierte Befehl beim Verbinden mit Sitzungen (erhält den Sitzungsnamen als erstes Argument)"
   },
@@ -8031,7 +8067,7 @@
     "Theme color used for the widget outline": "Themenfarbe für den Widget-Umriss"
   },
   "Theme extracted to: %1": {
-    "Theme extracted to: %1": ""
+    "Theme extracted to: %1": "Thema extrahiert nach: %1"
   },
   "Theme worker failed (%1)": {
     "Theme worker failed (%1)": "Theme-Worker fehlgeschlagen (%1)"
@@ -8121,7 +8157,7 @@
     "Time & Weather": "Zeit & Wetter"
   },
   "Time First": {
-    "Time First": ""
+    "Time First": "Zeit zuerst"
   },
   "Time Format": {
     "Time Format": "Zeitformat"
@@ -9043,6 +9079,9 @@
   },
   "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": {
     "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": "Sie müssen entweder:\nQT_QPA_PLATFORMTHEME=gtk3 ODER\nQT_QPA_PLATFORMTHEME=qt6ct\nals Umgebungsvariablen setzen und dann die Shell neu starten.\n\nqt6ct erfordert die Installation von qt6ct-kde."
+  },
+  "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": {
+    "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": ""
   },
   "You'll enter your password at the greeter after the next reboot.": {
     "You'll enter your password at the greeter after the next reboot.": "Nach dem nächsten Neustart geben Sie Ihr Passwort beim Greeter ein."

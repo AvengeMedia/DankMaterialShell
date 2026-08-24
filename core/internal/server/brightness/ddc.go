@@ -54,7 +54,7 @@ func (b *DDCBackend) scanI2CDevicesInternal(force bool) error {
 
 	activeBuses := make(map[int]bool)
 
-	for i := 0; i < 32; i++ {
+	for i := range 32 {
 		busPath := fmt.Sprintf("/dev/i2c-%d", i)
 		if _, err := os.Stat(busPath); os.IsNotExist(err) {
 			continue
@@ -314,7 +314,7 @@ func (b *DDCBackend) setBrightnessImmediateWithExponent(id string, value int) er
 }
 
 func (b *DDCBackend) getVCPFeature(fd int, vcp byte) (*ddcCapability, error) {
-	for flushTry := 0; flushTry < 3; flushTry++ {
+	for range 3 {
 		dummy := make([]byte, 32)
 		n, _ := syscall.Read(fd, dummy)
 		if n == 0 {

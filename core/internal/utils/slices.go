@@ -1,5 +1,7 @@
 package utils
 
+import "slices"
+
 func Filter[T any](items []T, predicate func(T) bool) []T {
 	var result []T
 	for _, item := range items {
@@ -29,21 +31,11 @@ func Map[T, U any](items []T, transform func(T) U) []U {
 }
 
 func Contains[T comparable](items []T, target T) bool {
-	for _, item := range items {
-		if item == target {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(items, target)
 }
 
 func Any[T any](items []T, predicate func(T) bool) bool {
-	for _, item := range items {
-		if predicate(item) {
-			return true
-		}
-	}
-	return false
+	return slices.ContainsFunc(items, predicate)
 }
 
 func All[T any](items []T, predicate func(T) bool) bool {

@@ -256,13 +256,7 @@ func (m *Manager) IncrementBrightnessWithExponent(deviceID string, step int, exp
 		return fmt.Errorf("device not found: %s", deviceID)
 	}
 
-	newPercent := currentPercent + step
-	if newPercent > 100 {
-		newPercent = 100
-	}
-	if newPercent < 0 {
-		newPercent = 0
-	}
+	newPercent := max(min(currentPercent+step, 100), 0)
 
 	return m.SetBrightnessWithExponent(deviceID, newPercent, exponential, exponent)
 }
