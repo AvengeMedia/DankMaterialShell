@@ -119,7 +119,8 @@ BasePill {
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
 
-                StyledText {
+                NumericText {
+                    isMonospace: false
                     text: {
                         if (root.displayTemp === undefined || root.displayTemp === null || root.displayTemp === 0) {
                             return "--";
@@ -157,39 +158,21 @@ BasePill {
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
-                Item {
-                    id: textBox
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    implicitWidth: root.minimumWidth ? Math.max(gpuTempBaseline.width, gpuTempText.paintedWidth) : gpuTempText.paintedWidth
-                    implicitHeight: gpuTempText.implicitHeight
-
-                    width: implicitWidth
-                    height: implicitHeight
-
-                    StyledTextMetrics {
-                        id: gpuTempBaseline
-                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
-                        text: "88°"
-                    }
-
-                    StyledText {
-                        id: gpuTempText
-                        text: {
-                            if (root.displayTemp === undefined || root.displayTemp === null || root.displayTemp === 0) {
-                                return "--°";
-                            }
-
-                            return Math.round(root.displayTemp) + "°";
+                NumericText {
+                    isMonospace: false
+                    text: {
+                        if (root.displayTemp === undefined || root.displayTemp === null || root.displayTemp === 0) {
+                            return "--°";
                         }
-                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
-                        color: Theme.widgetTextColor
 
-                        anchors.fill: parent
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                        elide: Text.ElideNone
+                        return Math.round(root.displayTemp) + "°";
                     }
+                    reserveText: root.minimumWidth ? "88°" : ""
+                    width: Math.ceil(Math.max(implicitWidth, reservedWidth))
+                    horizontalAlignment: Text.AlignHCenter
+                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
+                    color: Theme.widgetTextColor
+                    anchors.verticalCenter: parent.verticalCenter
                 }
             }
         }

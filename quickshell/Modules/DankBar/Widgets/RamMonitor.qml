@@ -54,7 +54,8 @@ BasePill {
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
 
-                StyledText {
+                NumericText {
+                    isMonospace: false
                     text: {
                         if (DgopService.memoryUsage === undefined || DgopService.memoryUsage === null || DgopService.memoryUsage === 0) {
                             return "--";
@@ -71,7 +72,8 @@ BasePill {
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
 
-                StyledText {
+                NumericText {
+                    isMonospace: false
                     visible: root.showSwap && DgopService.totalSwapKB > 0
                     text: root.swapUsage.toFixed(0)
                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
@@ -104,59 +106,40 @@ BasePill {
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
-                Item {
-                    id: textBox
+                NumericText {
+                    isMonospace: false
+                    text: {
+                        if (DgopService.memoryUsage === undefined || DgopService.memoryUsage === null || DgopService.memoryUsage === 0) {
+                            return root.showInGb ? "-- GB" : "--%";
+                        }
+
+                        let ramText = "";
+                        if (root.showInGb) {
+                            ramText = (DgopService.usedMemoryMB / 1024).toFixed(1) + " GB";
+                        } else {
+                            ramText = DgopService.memoryUsage.toFixed(0) + "%";
+                        }
+
+                        if (root.showSwap && DgopService.totalSwapKB > 0) {
+                            return ramText + " · " + root.swapUsage.toFixed(0) + "%";
+                        }
+                        return ramText;
+                    }
+                    reserveText: {
+                        if (!root.minimumWidth) {
+                            return "";
+                        }
+                        const baseText = root.showInGb ? "88.8 GB" : "88%";
+                        if (!root.showSwap) {
+                            return baseText;
+                        }
+                        return root.swapUsage < 10 ? baseText + " · 0%" : baseText + " · 88%";
+                    }
+                    width: Math.ceil(Math.max(implicitWidth, reservedWidth))
+                    horizontalAlignment: Text.AlignHCenter
+                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
+                    color: Theme.widgetTextColor
                     anchors.verticalCenter: parent.verticalCenter
-
-                    implicitWidth: root.minimumWidth ? Math.max(ramBaseline.width, ramText.paintedWidth) : ramText.paintedWidth
-                    implicitHeight: ramText.implicitHeight
-
-                    width: implicitWidth
-                    height: implicitHeight
-
-                    StyledTextMetrics {
-                        id: ramBaseline
-                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
-                        text: {
-                            let baseText = root.showInGb ? "88.8 GB" : "88%";
-                            if (!root.showSwap) {
-                                return baseText;
-                            }
-                            if (root.swapUsage < 10) {
-                                return baseText + " · 0%";
-                            }
-                            return baseText + " · 88%";
-                        }
-                    }
-
-                    StyledText {
-                        id: ramText
-                        text: {
-                            if (DgopService.memoryUsage === undefined || DgopService.memoryUsage === null || DgopService.memoryUsage === 0) {
-                                return root.showInGb ? "-- GB" : "--%";
-                            }
-
-                            let ramText = "";
-                            if (root.showInGb) {
-                                ramText = (DgopService.usedMemoryMB / 1024).toFixed(1) + " GB";
-                            } else {
-                                ramText = DgopService.memoryUsage.toFixed(0) + "%";
-                            }
-
-                            if (root.showSwap && DgopService.totalSwapKB > 0) {
-                                return ramText + " · " + root.swapUsage.toFixed(0) + "%";
-                            }
-                            return ramText;
-                        }
-                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
-                        color: Theme.widgetTextColor
-
-                        anchors.fill: parent
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                        elide: Text.ElideNone
-                        wrapMode: Text.NoWrap
-                    }
                 }
             }
         }

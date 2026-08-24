@@ -75,6 +75,9 @@ Item {
 
         font.weight: root.glyphWeight
         font.pixelSize: Math.max(1, root.baseTextSize)
+        font.features: {
+            "tnum": 1
+        }
         text: root.numberText
     }
 
@@ -207,9 +210,10 @@ Item {
         width: root.width
         height: root.height
 
-        StyledText {
+        NumericText {
             id: numberGlyph
 
+            isMonospace: false
             visible: root.numberInside
             x: root.textCanvasLeft + (root.textCanvasWidth - implicitWidth - signGlyph.implicitWidth) / 2
             y: root.textBaseline - baselineOffset

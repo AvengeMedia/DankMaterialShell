@@ -51,7 +51,8 @@ BasePill {
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
 
-                StyledText {
+                NumericText {
+                    isMonospace: false
                     text: {
                         if (DgopService.cpuUsage === undefined || DgopService.cpuUsage === null || DgopService.cpuUsage === 0) {
                             return "--";
@@ -89,45 +90,21 @@ BasePill {
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
-                Item {
-                    id: textBox
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    implicitWidth: root.minimumWidth ? Math.max(cpuBaseline.width, cpuCurrent.width) : cpuCurrent.width
-                    implicitHeight: cpuText.implicitHeight
-
-                    width: implicitWidth
-                    height: implicitHeight
-
-                    StyledTextMetrics {
-                        id: cpuBaseline
-                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
-                        text: "100%"
-                    }
-
-                    StyledTextMetrics {
-                        id: cpuCurrent
-                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
-                        text: cpuText.text
-                    }
-
-                    StyledText {
-                        id: cpuText
-                        text: {
-                            const v = DgopService.cpuUsage;
-                            if (v === undefined || v === null || v === 0) {
-                                return "--%";
-                            }
-                            return v.toFixed(0) + "%";
+                NumericText {
+                    isMonospace: false
+                    text: {
+                        const v = DgopService.cpuUsage;
+                        if (v === undefined || v === null || v === 0) {
+                            return "--%";
                         }
-                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
-                        color: Theme.widgetTextColor
-
-                        anchors.fill: parent
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                        elide: Text.ElideNone
+                        return v.toFixed(0) + "%";
                     }
+                    reserveText: root.minimumWidth ? "100%" : ""
+                    width: Math.ceil(Math.max(implicitWidth, reservedWidth))
+                    horizontalAlignment: Text.AlignHCenter
+                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
+                    color: Theme.widgetTextColor
+                    anchors.verticalCenter: parent.verticalCenter
                 }
             }
         }

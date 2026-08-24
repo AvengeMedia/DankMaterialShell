@@ -51,7 +51,8 @@ BasePill {
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
 
-                StyledText {
+                NumericText {
+                    isMonospace: false
                     text: {
                         if (DgopService.cpuTemperature === undefined || DgopService.cpuTemperature === null || DgopService.cpuTemperature < 0) {
                             return "--";
@@ -89,39 +90,21 @@ BasePill {
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
-                Item {
-                    id: textBox
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    implicitWidth: root.minimumWidth ? Math.max(tempBaseline.width, cpuTempText.paintedWidth) : cpuTempText.paintedWidth
-                    implicitHeight: cpuTempText.implicitHeight
-
-                    width: implicitWidth
-                    height: implicitHeight
-
-                    StyledTextMetrics {
-                        id: tempBaseline
-                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
-                        text: "88°"
-                    }
-
-                    StyledText {
-                        id: cpuTempText
-                        text: {
-                            if (DgopService.cpuTemperature === undefined || DgopService.cpuTemperature === null || DgopService.cpuTemperature < 0) {
-                                return "--°";
-                            }
-
-                            return Math.round(DgopService.cpuTemperature) + "°";
+                NumericText {
+                    isMonospace: false
+                    text: {
+                        if (DgopService.cpuTemperature === undefined || DgopService.cpuTemperature === null || DgopService.cpuTemperature < 0) {
+                            return "--°";
                         }
-                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
-                        color: Theme.widgetTextColor
 
-                        anchors.fill: parent
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                        elide: Text.ElideNone
+                        return Math.round(DgopService.cpuTemperature) + "°";
                     }
+                    reserveText: root.minimumWidth ? "88°" : ""
+                    width: Math.ceil(Math.max(implicitWidth, reservedWidth))
+                    horizontalAlignment: Text.AlignHCenter
+                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
+                    color: Theme.widgetTextColor
+                    anchors.verticalCenter: parent.verticalCenter
                 }
             }
         }
