@@ -190,10 +190,10 @@ Item {
                     text: I18n.tr("Battery / Control Center", "island settings: battery or control center slot row")
                     description: BatteryService.batteryAvailable ? I18n.tr("Battery gauge opens Control Center", "island settings: status slot description with battery") : I18n.tr("Tools icon opens Control Center", "island settings: status slot description without battery")
                     model: [I18n.tr("Left", "island settings: battery or control center slot left of the clock"), I18n.tr("Right", "island settings: battery or control center slot right of the clock"), I18n.tr("Hidden", "island settings: battery or control center slot hidden")]
-                    currentIndex: root.valueIndex(root.homeSlotValues, SettingsData.dankIslandHomeStatusSlot, "right")
+                    currentIndex: root.valueIndex(root.homeSlotValues, SettingsData.dankIslandHomeStatusSlot, "hidden")
                     onSelectionChanged: (index, selected) => {
                         if (selected)
-                            SettingsData.set("dankIslandHomeStatusSlot", root.homeSlotValues[index] ?? "right");
+                            SettingsData.set("dankIslandHomeStatusSlot", root.homeSlotValues[index] ?? "hidden");
                     }
                 }
 
@@ -291,6 +291,15 @@ Item {
                     description: I18n.tr("Show a clickable clock beside compact media details", "island settings: media clock description")
                     checked: SettingsData.dankIslandMediaClockVisible
                     onToggled: checked => SettingsData.set("dankIslandMediaClockVisible", checked)
+                }
+
+                SettingsToggleRow {
+                    settingKey: "dankIslandHomeNotificationBadge"
+                    tags: ["island", "home", "notifications", "badge", "unread", "count"]
+                    text: I18n.tr("Show Badge", "island settings: unread notification count on the home face")
+                    description: I18n.tr("Unread notification count beside the clock", "island settings: notification badge description")
+                    checked: SettingsData.dankIslandHomeNotificationBadge
+                    onToggled: checked => SettingsData.set("dankIslandHomeNotificationBadge", checked)
                 }
 
                 SettingsButtonGroupRow {

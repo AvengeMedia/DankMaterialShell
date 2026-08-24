@@ -235,6 +235,8 @@ Item {
             id: contentHost
 
             controller: root.controller
+            islandX: root.currentVisualX
+            hostWidth: root.width
             springTimeConstantMs: root.springTimeConstantMs
             morphProgress: root.morphProgress
             expanded: root.controller.expanded

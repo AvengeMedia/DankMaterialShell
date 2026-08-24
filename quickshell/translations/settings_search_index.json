@@ -12550,6 +12550,32 @@
     "description": "Place independent widgets to left and right of island"
   },
   {
+    "section": "dankIslandHomeNotificationBadge",
+    "label": "Show Badge",
+    "tabIndex": 46,
+    "category": "Dank Island",
+    "keywords": [
+      "activities",
+      "alert",
+      "badge",
+      "beside",
+      "clock",
+      "count",
+      "dank",
+      "dynamic island",
+      "home",
+      "island",
+      "notif",
+      "notification",
+      "notifications",
+      "show",
+      "time",
+      "unread",
+      "watch"
+    ],
+    "description": "Unread notification count beside the clock"
+  },
+  {
     "section": "dankIslandSatellitesEnabled",
     "label": "Show Satellite Widgets",
     "tabIndex": 46,

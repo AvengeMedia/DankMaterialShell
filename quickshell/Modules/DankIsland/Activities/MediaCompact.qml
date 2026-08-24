@@ -115,6 +115,7 @@ Item {
                 text: root.mediaModel.artist
                 color: Theme.surfaceTextSecondary
                 font.pixelSize: Math.max(9, Theme.fontSizeSmall - 2)
+                wrapMode: Text.NoWrap
                 elide: Text.ElideRight
             }
         }

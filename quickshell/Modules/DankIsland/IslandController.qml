@@ -59,10 +59,8 @@ QtObject {
     readonly property real homeCompactFaceHeight: homeCompactTight ? Math.max(16, Math.min(32, compactHeight - 8)) : compactFaceHeight
 
     property int unreadNotificationCount: 0
-    readonly property bool homeNotificationBadge: unreadNotificationCount > 0
-    readonly property real homeSlotMargin: homeCompactTight ? Theme.spacingXS : Theme.spacingS
-    readonly property real homeSlotSpacing: homeCompactTight ? Theme.spacingXXS : Theme.spacingXS
-    readonly property real homeClusterGap: homeCompactTight ? 6 : 10
+    readonly property bool homeNotificationBadge: SettingsData.dankIslandHomeNotificationBadge && unreadNotificationCount > 0
+    readonly property real homeSlotMargin: homeCompactTight ? Theme.spacingS : Theme.spacingM
     property real homeContentWidth: 200
     property real mediaContentWidth: 360
     readonly property real mediaCompactMaxWidth: 360
@@ -273,7 +271,7 @@ QtObject {
     }
 
     readonly property string homeMediaSlot: resolvedHomeSlot(SettingsData.dankIslandHomeMediaSlot, "left")
-    readonly property string homeStatusSlot: resolvedHomeSlot(SettingsData.dankIslandHomeStatusSlot, "right")
+    readonly property string homeStatusSlot: resolvedHomeSlot(SettingsData.dankIslandHomeStatusSlot, "hidden")
     readonly property string homeWeatherSlot: SettingsData.weatherEnabled ? resolvedHomeSlot(SettingsData.dankIslandHomeWeatherSlot, "hidden") : "hidden"
 
     readonly property real homeCompactWidth: Math.ceil(homeSlotMargin * 2 + Math.max(homeContentWidth, 1))

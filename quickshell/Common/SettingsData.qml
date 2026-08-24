@@ -994,9 +994,10 @@ Singleton {
     property string dankIslandPalette: "default"
     property bool dankIslandHighContrast: false
     property bool dankIslandMediaClockVisible: true
+    property bool dankIslandHomeNotificationBadge: true
     property bool dankIslandNotificationExpand: false
     property string dankIslandHomeMediaSlot: "left"
-    property string dankIslandHomeStatusSlot: "right"
+    property string dankIslandHomeStatusSlot: "hidden"
     property string dankIslandHomeWeatherSlot: "hidden"
     property bool dankIslandHomeCompactTight: false
     property string dankIslandBatteryStyle: "solid"

@@ -79,6 +79,7 @@ Item {
                 color: Theme.surfaceTextSecondary
                 font.pixelSize: Theme.fontSizeSmall
                 font.weight: Font.Medium
+                wrapMode: Text.NoWrap
                 elide: Text.ElideRight
             }
 
@@ -88,6 +89,7 @@ Item {
                 color: Theme.surfaceText
                 font.pixelSize: root.dense ? Theme.fontSizeSmall : Theme.fontSizeMedium
                 font.weight: Font.DemiBold
+                wrapMode: Text.NoWrap
                 elide: Text.ElideRight
             }
         }
