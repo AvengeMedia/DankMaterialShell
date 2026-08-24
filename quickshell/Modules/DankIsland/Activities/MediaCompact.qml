@@ -18,6 +18,8 @@ Item {
     readonly property real textGutter: Theme.spacingXS
     readonly property real cavaWidth: 20
     readonly property real minTextWidth: 48
+    readonly property real clockLeadPad: Theme.spacingXS / 2
+    readonly property real clockTrailPad: Theme.spacingS
     readonly property real clockPillHeight: root.dense ? Math.max(22, root.artworkSize - Theme.spacingXS) : 32
     readonly property string timeText: systemClock.date.toLocaleTimeString(I18n.locale(), SettingsData.getEffectiveTimeFormat())
     readonly property bool clockVisible: SettingsData.dankIslandMediaClockVisible
@@ -155,7 +157,10 @@ Item {
             IslandSlotHoverArea {
                 id: clockArea
 
-                anchors.fill: parent
+                anchors.verticalCenter: parent.verticalCenter
+                x: -root.clockLeadPad
+                width: parent.width + root.clockLeadPad + root.clockTrailPad
+                height: root.height
                 controller: root.controller
                 onClicked: root.controller.requestActivity("home", false, false)
             }

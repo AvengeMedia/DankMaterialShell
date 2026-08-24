@@ -17,6 +17,23 @@ Singleton {
     readonly property list<NotifWrapper> allWrappers: []
     readonly property list<NotifWrapper> popups: allWrappers.filter(n => n && n.popup)
 
+    property var seenNotifications: []
+    readonly property int unreadCount: {
+        const seen = root.seenNotifications;
+        if (seen.length === 0)
+            return root.notifications.length;
+        let count = 0;
+        for (const wrapper of root.notifications) {
+            if (seen.indexOf(wrapper) === -1)
+                count++;
+        }
+        return count;
+    }
+
+    function markNotificationsSeen() {
+        root.seenNotifications = root.notifications.slice();
+    }
+
     property var historyList: []
     readonly property string historyFile: Paths.strip(Paths.cache) + "/notification_history.json"
     readonly property string imageCacheDir: Paths.strip(Paths.cache) + "/notification_images"
@@ -548,6 +565,7 @@ Singleton {
 
     function onOverlayOpen() {
         popupsDisabled = true;
+        markNotificationsSeen();
         addGate.stop();
         addGateBusy = false;
 
@@ -564,6 +582,7 @@ Singleton {
 
     function onOverlayClose() {
         popupsDisabled = false;
+        markNotificationsSeen();
         processQueue();
     }
 

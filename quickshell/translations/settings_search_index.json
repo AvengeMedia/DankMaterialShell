@@ -11992,6 +11992,33 @@
     "description": "Click expands only on an intentional press. Hybrid peeks the current compact face on hover"
   },
   {
+    "section": "dankIslandNotificationBadgeClearOnOpen",
+    "label": "Clear Badge on Open",
+    "tabIndex": 46,
+    "category": "Dank Island",
+    "keywords": [
+      "active",
+      "activities",
+      "alert",
+      "alerts",
+      "badge",
+      "clear",
+      "clears",
+      "dank",
+      "dismiss",
+      "dynamic island",
+      "home",
+      "island",
+      "keeps",
+      "notif",
+      "notifications",
+      "notifs",
+      "open",
+      "unread"
+    ],
+    "description": "Clears the badge on open but keeps notifications active"
+  },
+  {
     "section": "dankIslandHomeCompactTight",
     "label": "Compact Clock Pill",
     "tabIndex": 46,
@@ -12368,6 +12395,31 @@
     ],
     "icon": "animation",
     "description": "Apply island geometry changes immediately without spring overshoot"
+  },
+  {
+    "section": "dankIslandNotifications",
+    "label": "Notifications",
+    "tabIndex": 46,
+    "category": "Dank Island",
+    "keywords": [
+      "activities",
+      "alert",
+      "alerts",
+      "arrival",
+      "click",
+      "dank",
+      "default",
+      "dynamic island",
+      "expand",
+      "hover",
+      "island",
+      "notif",
+      "notifications",
+      "notifs",
+      "size"
+    ],
+    "icon": "notifications",
+    "description": "Expand notifications by default instead of click or hover"
   },
   {
     "section": "dankIslandHoverOpenDelay",

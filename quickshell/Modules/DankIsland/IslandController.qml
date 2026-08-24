@@ -66,7 +66,7 @@ QtObject {
     readonly property real mediaCompactMaxWidth: 360
     property real notificationContentWidth: 0
     readonly property real notificationCompactMinWidth: compactDense ? 200 : 240
-    readonly property real notificationCompactMaxWidth: compactDense ? 320 : 360
+    readonly property real notificationCompactMaxWidth: mediaCompactMaxWidth
 
     signal sessionStarted(string activityId)
 

@@ -995,6 +995,7 @@ Singleton {
     property bool dankIslandHighContrast: false
     property bool dankIslandMediaClockVisible: true
     property bool dankIslandHomeNotificationBadge: true
+    property bool dankIslandNotificationBadgeClearOnOpen: false
     property bool dankIslandNotificationExpand: false
     property string dankIslandHomeMediaSlot: "left"
     property string dankIslandHomeStatusSlot: "hidden"

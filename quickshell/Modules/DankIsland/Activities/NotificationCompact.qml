@@ -15,7 +15,7 @@ Item {
     readonly property string headerText: root.notificationModel.appName + (root.notificationModel.timeText ? " · " + root.notificationModel.timeText : "")
     readonly property string summaryText: root.dense && root.notificationModel.appName ? root.notificationModel.appName + " · " + root.notificationModel.summary : root.notificationModel.summary
     readonly property real criticalWidth: root.notificationModel.critical ? 3 + Theme.spacingS : 0
-    readonly property real measuredWidth: Theme.spacingS * 3 + root.criticalWidth + root.iconSize + Math.max(root.dense ? 0 : headerMetrics.width, summaryMetrics.width)
+    readonly property real measuredWidth: Theme.spacingS * 3 + root.criticalWidth + root.iconSize + Theme.spacingXS + Math.max(root.dense ? 0 : headerLabel.implicitWidth, summaryLabel.implicitWidth)
 
     function pushMeasuredWidth() {
         root.controller.setNotificationContentWidth(root.measuredWidth);
@@ -23,22 +23,6 @@ Item {
 
     onMeasuredWidthChanged: root.pushMeasuredWidth()
     Component.onCompleted: root.pushMeasuredWidth()
-
-    StyledTextMetrics {
-        id: headerMetrics
-
-        font.pixelSize: Theme.fontSizeSmall
-        font.weight: Font.Medium
-        text: root.headerText
-    }
-
-    StyledTextMetrics {
-        id: summaryMetrics
-
-        font.pixelSize: root.dense ? Theme.fontSizeSmall : Theme.fontSizeMedium
-        font.weight: Font.DemiBold
-        text: root.summaryText
-    }
 
     Row {
         anchors {
@@ -73,6 +57,8 @@ Item {
             spacing: 1
 
             StyledText {
+                id: headerLabel
+
                 width: parent.width
                 visible: !root.dense
                 text: root.headerText
@@ -84,6 +70,8 @@ Item {
             }
 
             StyledText {
+                id: summaryLabel
+
                 width: parent.width
                 text: root.summaryText
                 color: Theme.surfaceText

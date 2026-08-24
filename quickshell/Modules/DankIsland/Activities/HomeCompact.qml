@@ -20,6 +20,7 @@ Item {
     readonly property real iconSize: root.textSize + Theme.spacingXS
     readonly property real statusIconSize: root.textSize + Theme.spacingXXS
     readonly property real groupSpacing: root.controller.homeSlotMargin
+    readonly property real edgePad: Math.max(root.groupSpacing, (root.width - compactRow.width) / 2)
     readonly property bool weatherSlotEnabled: root.controller.homeWeatherSlot !== "hidden"
     readonly property var groupIds: root.groupsForSide("left").concat(["clock"]).concat(root.groupsForSide("right"))
     property bool weatherRefHeld: false
@@ -86,7 +87,10 @@ Item {
         id: item
 
         required property string groupId
+        required property int slotIndex
 
+        readonly property real leadPad: item.slotIndex === 0 ? root.edgePad : root.groupSpacing / 2
+        readonly property real trailPad: item.slotIndex === root.groupIds.length - 1 ? root.edgePad : root.groupSpacing / 2
         readonly property bool isClock: item.groupId === "clock"
         readonly property bool isMedia: item.groupId === "media"
         readonly property bool isWeather: item.groupId === "weather"
@@ -228,7 +232,10 @@ Item {
         IslandSlotHoverArea {
             id: groupArea
 
-            anchors.fill: parent
+            anchors.verticalCenter: parent.verticalCenter
+            x: -item.leadPad
+            width: parent.width + item.leadPad + item.trailPad
+            height: root.height
             enabled: !item.isClock
             controller: root.controller
             onClicked: {
@@ -265,7 +272,9 @@ Item {
 
             GroupItem {
                 required property var modelData
+                required property int index
                 groupId: String(modelData)
+                slotIndex: index
             }
         }
     }

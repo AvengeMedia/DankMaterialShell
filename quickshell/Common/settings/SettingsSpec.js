@@ -535,6 +535,7 @@ var SPEC = {
     dankIslandHighContrast: { def: false },
     dankIslandMediaClockVisible: { def: true },
     dankIslandHomeNotificationBadge: { def: true },
+    dankIslandNotificationBadgeClearOnOpen: { def: false },
     dankIslandNotificationExpand: { def: false },
     dankIslandHomeMediaSlot: { def: "left" },
     dankIslandHomeStatusSlot: { def: "hidden" },

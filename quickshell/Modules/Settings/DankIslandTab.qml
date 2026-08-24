@@ -276,30 +276,12 @@ Item {
                 }
 
                 SettingsToggleRow {
-                    settingKey: "dankIslandNotificationExpand"
-                    tags: ["island", "notifications", "expand", "arrival", "size"]
-                    text: I18n.tr("Expand Notifications", "island settings: expanded notification toggle")
-                    description: I18n.tr("Expand notifications by default instead of click or hover", "island settings: expanded notification description")
-                    checked: SettingsData.dankIslandNotificationExpand
-                    onToggled: checked => SettingsData.set("dankIslandNotificationExpand", checked)
-                }
-
-                SettingsToggleRow {
                     settingKey: "dankIslandMediaClockVisible"
                     tags: ["island", "media", "clock", "compact", "time"]
                     text: I18n.tr("Keep Clock with Media", "island settings: clock in media face toggle")
                     description: I18n.tr("Show a clickable clock beside compact media details", "island settings: media clock description")
                     checked: SettingsData.dankIslandMediaClockVisible
                     onToggled: checked => SettingsData.set("dankIslandMediaClockVisible", checked)
-                }
-
-                SettingsToggleRow {
-                    settingKey: "dankIslandHomeNotificationBadge"
-                    tags: ["island", "home", "notifications", "badge", "unread", "count"]
-                    text: I18n.tr("Show Badge", "island settings: unread notification count on the home face")
-                    description: I18n.tr("Unread notification count beside the clock", "island settings: notification badge description")
-                    checked: SettingsData.dankIslandHomeNotificationBadge
-                    onToggled: checked => SettingsData.set("dankIslandHomeNotificationBadge", checked)
                 }
 
                 SettingsButtonGroupRow {
@@ -314,6 +296,42 @@ Item {
                         if (selected)
                             SettingsData.set("dankIslandBatteryStyle", root.batteryStyleValues[index] ?? "solid");
                     }
+                }
+            }
+
+            SettingsCard {
+                width: parent.width
+                iconName: "notifications"
+                title: I18n.tr("Notifications", "island settings: notifications card title")
+                settingKey: "dankIslandNotifications"
+                enabled: SettingsData.dankIslandEnabled
+
+                SettingsToggleRow {
+                    settingKey: "dankIslandNotificationExpand"
+                    tags: ["island", "notifications", "expand", "arrival", "size"]
+                    text: I18n.tr("Expand Notifications", "island settings: expanded notification toggle")
+                    description: I18n.tr("Expand notifications by default instead of click or hover", "island settings: expanded notification description")
+                    checked: SettingsData.dankIslandNotificationExpand
+                    onToggled: checked => SettingsData.set("dankIslandNotificationExpand", checked)
+                }
+
+                SettingsToggleRow {
+                    settingKey: "dankIslandHomeNotificationBadge"
+                    tags: ["island", "home", "notifications", "badge", "unread", "count"]
+                    text: I18n.tr("Show Badge", "island settings: unread notification count on the home face")
+                    description: I18n.tr("Unread notification count beside the clock", "island settings: notification badge description")
+                    checked: SettingsData.dankIslandHomeNotificationBadge
+                    onToggled: checked => SettingsData.set("dankIslandHomeNotificationBadge", checked)
+                }
+
+                SettingsToggleRow {
+                    settingKey: "dankIslandNotificationBadgeClearOnOpen"
+                    tags: ["island", "home", "notifications", "badge", "unread", "clear", "dismiss", "open"]
+                    text: I18n.tr("Clear Badge on Open", "island settings: clear the notification badge when the center opens")
+                    description: I18n.tr("Clears the badge on open but keeps notifications active", "island settings: clear badge on open description")
+                    checked: SettingsData.dankIslandNotificationBadgeClearOnOpen
+                    enabled: SettingsData.dankIslandHomeNotificationBadge
+                    onToggled: checked => SettingsData.set("dankIslandNotificationBadgeClearOnOpen", checked)
                 }
             }
 

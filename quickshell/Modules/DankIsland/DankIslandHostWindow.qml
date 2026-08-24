@@ -159,7 +159,7 @@ PanelWindow {
         controlCenterMaxHeight: root.maxActivityHeight
         notificationCenterMaxHeight: root.maxActivityHeight
         notificationExpandAllowed: SettingsData.dankIslandNotificationExpand
-        unreadNotificationCount: NotificationService.notifications.length
+        unreadNotificationCount: SettingsData.dankIslandNotificationBadgeClearOnOpen ? NotificationService.unreadCount : NotificationService.notifications.length
         hoverOpenDelay: Math.max(0, Math.min(1000, SettingsData.dankIslandHoverOpenDelay))
         hoverCloseDelay: Math.max(0, Math.min(1000, SettingsData.dankIslandHoverCloseDelay))
     }
