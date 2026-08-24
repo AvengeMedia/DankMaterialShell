@@ -16,6 +16,9 @@ opens the database, never writes to the media cache, and never decides what to n
    (protocol)          (yours)                                 (ours)
 ```
 
+For using chats rather than writing a provider — commands, keybinds, filters, where data
+lives — see [CHATS.md](CHATS.md).
+
 ---
 
 ## What a plugin looks like
