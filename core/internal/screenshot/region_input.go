@@ -223,15 +223,7 @@ func (r *RegionSelector) rehomeSelectionSurface() {
 		outputMinY := float64(surface.output.y)
 		outputMaxX := outputMinX + float64(surface.logicalW)
 		outputMaxY := outputMinY + float64(surface.logicalH)
-		epsilonX, epsilonY := 1.0, 1.0
-		if surface.screenBuf != nil {
-			if surface.screenBuf.Width > 0 {
-				epsilonX = float64(surface.logicalW) / float64(surface.screenBuf.Width)
-			}
-			if surface.screenBuf.Height > 0 {
-				epsilonY = float64(surface.logicalH) / float64(surface.screenBuf.Height)
-			}
-		}
+		epsilonX, epsilonY := surfaceEpsilon(surface)
 		if minX >= outputMinX && minY >= outputMinY &&
 			maxX <= outputMaxX-epsilonX && maxY <= outputMaxY-epsilonY {
 			r.selection.surface = surface
@@ -241,51 +233,72 @@ func (r *RegionSelector) rehomeSelectionSurface() {
 }
 
 func (r *RegionSelector) clampMovedSelection(activeSurface *OutputSurface, x, y, width, height float64) (float64, float64) {
-	var minX, minY, maxX, maxY float64
+	var unionMinX, unionMinY, unionMaxX, unionMaxY, unionEpsX, unionEpsY float64
 	initialized := false
-	boundsSurface := r.selection.surface
-	if activeSurface != nil && activeSurface.output != nil && activeSurface.logicalW > 0 && activeSurface.logicalH > 0 {
-		minX = float64(activeSurface.output.x)
-		minY = float64(activeSurface.output.y)
-		maxX = minX + float64(activeSurface.logicalW)
-		maxY = minY + float64(activeSurface.logicalH)
-		initialized = true
-		boundsSurface = activeSurface
-	} else {
-		for _, surface := range r.surfaces {
-			if surface == nil || surface.output == nil || surface.logicalW <= 0 || surface.logicalH <= 0 {
-				continue
-			}
-			outputMinX := float64(surface.output.x)
-			outputMinY := float64(surface.output.y)
-			outputMaxX := outputMinX + float64(surface.logicalW)
-			outputMaxY := outputMinY + float64(surface.logicalH)
-			if !initialized {
-				minX, minY, maxX, maxY = outputMinX, outputMinY, outputMaxX, outputMaxY
-				initialized = true
-				continue
-			}
-			minX = math.Min(minX, outputMinX)
-			minY = math.Min(minY, outputMinY)
-			maxX = math.Max(maxX, outputMaxX)
-			maxY = math.Max(maxY, outputMaxY)
+	for _, surface := range r.surfaces {
+		if surface == nil || surface.output == nil || surface.logicalW <= 0 || surface.logicalH <= 0 {
+			continue
 		}
+		outputMinX := float64(surface.output.x)
+		outputMinY := float64(surface.output.y)
+		outputMaxX := outputMinX + float64(surface.logicalW)
+		outputMaxY := outputMinY + float64(surface.logicalH)
+		epsilonX, epsilonY := surfaceEpsilon(surface)
+		if !initialized {
+			unionMinX, unionMinY, unionMaxX, unionMaxY = outputMinX, outputMinY, outputMaxX, outputMaxY
+			unionEpsX, unionEpsY = epsilonX, epsilonY
+			initialized = true
+			continue
+		}
+		unionMinX = math.Min(unionMinX, outputMinX)
+		unionMinY = math.Min(unionMinY, outputMinY)
+		unionMaxX = math.Max(unionMaxX, outputMaxX)
+		unionMaxY = math.Max(unionMaxY, outputMaxY)
+		unionEpsX = math.Max(unionEpsX, epsilonX)
+		unionEpsY = math.Max(unionEpsY, epsilonY)
 	}
 	if !initialized {
 		return x, y
 	}
 
-	epsilonX, epsilonY := 1.0, 1.0
-	if boundsSurface != nil && boundsSurface.screenBuf != nil {
-		if boundsSurface.logicalW > 0 && boundsSurface.screenBuf.Width > 0 {
-			epsilonX = float64(boundsSurface.logicalW) / float64(boundsSurface.screenBuf.Width)
-		}
-		if boundsSurface.logicalH > 0 && boundsSurface.screenBuf.Height > 0 {
-			epsilonY = float64(boundsSurface.logicalH) / float64(boundsSurface.screenBuf.Height)
-		}
+	minX, minY, maxX, maxY := unionMinX, unionMinY, unionMaxX, unionMaxY
+	epsilonX, epsilonY := unionEpsX, unionEpsY
+	if activeSurface != nil && activeSurface.output != nil && activeSurface.logicalW > 0 && activeSurface.logicalH > 0 {
+		minX = float64(activeSurface.output.x)
+		minY = float64(activeSurface.output.y)
+		maxX = minX + float64(activeSurface.logicalW)
+		maxY = minY + float64(activeSurface.logicalH)
+		epsilonX, epsilonY = surfaceEpsilon(activeSurface)
 	}
-	return math.Max(minX, math.Min(maxX-width-epsilonX, x)),
-		math.Max(minY, math.Min(maxY-height-epsilonY, y))
+
+	return clampMoveAxis(x, width, minX, maxX-epsilonX, unionMinX, unionMaxX-unionEpsX),
+		clampMoveAxis(y, height, minY, maxY-epsilonY, unionMinY, unionMaxY-unionEpsY)
+}
+
+// a region larger than the active output falls back to the output union so the clamp range cannot invert and freeze the drag
+func clampMoveAxis(pos, size, lo, hi, unionLo, unionHi float64) float64 {
+	if hi-size < lo {
+		lo, hi = unionLo, unionHi
+	}
+	upper := hi - size
+	if upper < lo {
+		lo, upper = upper, lo
+	}
+	return math.Max(lo, math.Min(upper, pos))
+}
+
+func surfaceEpsilon(surface *OutputSurface) (float64, float64) {
+	epsilonX, epsilonY := 1.0, 1.0
+	if surface.screenBuf == nil {
+		return epsilonX, epsilonY
+	}
+	if surface.logicalW > 0 && surface.screenBuf.Width > 0 {
+		epsilonX = float64(surface.logicalW) / float64(surface.screenBuf.Width)
+	}
+	if surface.logicalH > 0 && surface.screenBuf.Height > 0 {
+		epsilonY = float64(surface.logicalH) / float64(surface.screenBuf.Height)
+	}
+	return epsilonX, epsilonY
 }
 
 func (r *RegionSelector) setupKeyboardHandlers() {
