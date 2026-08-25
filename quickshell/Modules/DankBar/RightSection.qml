@@ -20,6 +20,7 @@ Item {
     // False when a perpendicular bar occupies this edge, so the last widget's click area
     // doesn't extend past the bar into the neighbour (matters most in the frame surface).
     property bool edgeIsScreenEdge: true
+    property real crossEdgeExtension: 0
 
     readonly property bool isVertical: overrideAxisLayout ? forceVerticalLayout : (axis?.isVertical ?? false)
     property alias widgetLayoutLoader: layoutLoader
@@ -75,6 +76,7 @@ Item {
                         sectionSpacing: parent.rowSpacing
                         isLeftBarEdge: false
                         isRightBarEdge: root.edgeIsScreenEdge
+                        crossEdgeExtension: root.crossEdgeExtension
                     }
                 }
             }

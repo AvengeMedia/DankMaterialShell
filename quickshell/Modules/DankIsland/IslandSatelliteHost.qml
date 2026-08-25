@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
+import Quickshell.Wayland
 import qs.Common
 import qs.Modules.DankBar
 import qs.Services
@@ -45,6 +46,31 @@ Item {
     readonly property bool bottomEdge: SettingsData.dankIslandEdge === "bottom"
     readonly property real rowInset: Theme.snap(Math.max(0, (root.controller.compactFaceHeight - root.barThickness) / 2), root.screenScale)
     readonly property real rowY: root.bottomEdge ? root.height - root.outerGap - root.rowInset - root.barThickness : root.outerGap + root.rowInset
+    readonly property bool backgroundEnabled: SettingsData.dankIslandSatelliteBackground
+    readonly property bool spanEdges: root.edgeAligned || root.backgroundEnabled
+    readonly property real chromePad: Theme.snap(root.innerPadding + Theme.spacingXS, root.screenScale)
+    readonly property real chromeInset: root.backgroundEnabled ? root.chromePad : 0
+    readonly property real chromeY: root.bottomEdge ? root.rowY : 0
+    readonly property real chromeHeight: root.bottomEdge ? root.height - root.rowY : root.rowY + root.barThickness
+    readonly property real crossEdgeExtension: root.spanEdges ? (root.bottomEdge ? root.height - root.rowY - root.barThickness : root.rowY) : 0
+    readonly property bool gothCorners: SettingsData.dankIslandSatelliteGothCorners
+    readonly property real chromeOpacity: Math.max(0, Math.min(1, SettingsData.dankIslandSatelliteTransparency))
+    readonly property real sweepRadius: Math.max(4, Math.min(64, SettingsData.dankIslandSatelliteSwoopRadius))
+    readonly property color chromeBase: {
+        if (SettingsData.dankIslandHighContrast)
+            return Theme.surfaceContainerHighest;
+        switch (SettingsData.dankIslandPalette) {
+        case "bright":
+            return Theme.surfaceBright;
+        case "dim":
+            return Theme.surfaceDim;
+        }
+        return Theme.surfaceContainerHigh;
+    }
+    readonly property color chromeColor: Theme.withAlpha(root.chromeBase, root.chromeOpacity)
+    readonly property bool chromeTranslucent: root.backgroundEnabled && root.chromeOpacity > 0 && root.chromeOpacity < 1
+    readonly property real islandOpacity: root.islandSurface?.surfaceOpacity ?? 1
+    readonly property bool islandTranslucent: root.islandOpacity > 0 && root.islandOpacity < 1
     readonly property bool tracksIsland: !root.edgeAligned && root.visible
     readonly property bool motionRunning: root.tracksIsland && (root.islandSurface?.motionRunning ?? false)
     readonly property real islandStartX: root.islandSurface?.motionStartBounds.x ?? 0
@@ -125,8 +151,190 @@ Item {
         signal colorPickerRequested
 
         function registerBlurWidget(item) {
+            root.registerBlurWidget(item);
         }
         function unregisterBlurWidget(item) {
+            root.unregisterBlurWidget(item);
+        }
+    }
+
+    property var _blurWidgetItems: []
+    property var _blurRegion: null
+
+    function registerBlurWidget(item) {
+        if (root._blurWidgetItems.indexOf(item) >= 0)
+            return;
+        root._blurWidgetItems = root._blurWidgetItems.concat([item]);
+        blurRebuildTimer.restart();
+    }
+
+    function unregisterBlurWidget(item) {
+        const idx = root._blurWidgetItems.indexOf(item);
+        if (idx < 0)
+            return;
+        const arr = root._blurWidgetItems.slice();
+        arr.splice(idx, 1);
+        root._blurWidgetItems = arr;
+        blurRebuildTimer.restart();
+    }
+
+    function rebuildBlur() {
+        const old = root._blurRegion;
+        if (old) {
+            root.hostWindow.BackgroundEffect.blurRegion = null;
+            root._blurRegion = null;
+            old.destroy();
+        }
+        if (!BlurService.enabled)
+            return;
+        const widgets = root._blurWidgetItems.filter(w => w && w.visible && w.width > 0 && w.height > 0);
+        const chromes = [leftChrome, rightChrome].filter(c => root.chromeTranslucent && c.visible);
+        if (chromes.length === 0 && widgets.length === 0 && !root.islandTranslucent)
+            return;
+        const region = blurRegionComp.createObject(root.hostWindow);
+        if (!region)
+            return;
+        const subRegions = [];
+        if (root.islandTranslucent) {
+            const islandSub = blurIslandRegionComp.createObject(region);
+            if (islandSub)
+                subRegions.push(islandSub);
+        }
+        for (const chrome of chromes) {
+            const body = blurItemRegionComp.createObject(region, {
+                w: chrome
+            });
+            if (body)
+                subRegions.push(body);
+            if (!root.gothCorners)
+                continue;
+            for (const isWing of [true, false]) {
+                const piece = blurSweepRegionComp.createObject(region, {
+                    chrome: chrome,
+                    isWing: isWing
+                });
+                if (piece)
+                    subRegions.push(piece);
+            }
+        }
+        for (const w of widgets) {
+            const sub = blurItemRegionComp.createObject(region, {
+                w: w
+            });
+            if (sub)
+                subRegions.push(sub);
+        }
+        region.regions = subRegions;
+        root._blurRegion = region;
+        root.hostWindow.BackgroundEffect.blurRegion = region;
+    }
+
+    onChromeTranslucentChanged: blurRebuildTimer.restart()
+    onGothCornersChanged: blurRebuildTimer.restart()
+    onIslandTranslucentChanged: blurRebuildTimer.restart()
+    Component.onCompleted: blurRebuildTimer.restart()
+
+    Connections {
+        target: BlurService
+
+        function onEnabledChanged() {
+            blurRebuildTimer.restart();
+        }
+    }
+
+    // Blur regions need republishing after geometry settles, same as WindowBlur's settle kicks
+    Connections {
+        target: root.islandSurface ?? null
+
+        function onMotionRunningChanged() {
+            if (root.islandSurface.motionRunning)
+                return;
+            blurRebuildTimer.restart();
+            blurTrailTimer.restart();
+        }
+    }
+
+    Timer {
+        id: blurTrailTimer
+
+        interval: 96
+        onTriggered: root.rebuildBlur()
+    }
+
+    Component.onDestruction: {
+        if (root._blurRegion && root.hostWindow)
+            root.hostWindow.BackgroundEffect.blurRegion = null;
+    }
+
+    Timer {
+        id: blurRebuildTimer
+
+        interval: 1
+        onTriggered: root.rebuildBlur()
+    }
+
+    Component {
+        id: blurRegionComp
+
+        Region {}
+    }
+
+    Component {
+        id: blurItemRegionComp
+
+        Region {
+            property Item w
+
+            item: w
+            radius: Theme.cornerRadius
+        }
+    }
+
+    Component {
+        id: blurIslandRegionComp
+
+        Region {
+            x: root.islandSurface?.currentVisualX ?? 0
+            y: root.islandSurface?.currentVisualY ?? 0
+            width: root.islandSurface?.currentVisualWidth ?? 0
+            height: root.islandSurface?.currentVisualHeight ?? 0
+            radius: root.islandSurface?.currentSurfaceRadius ?? 0
+        }
+    }
+
+    Component {
+        id: blurSweepRegionComp
+
+        // s×s square at a chrome corner minus a quarter-disc — the fillet the chrome paints
+        Region {
+            id: piece
+
+            property Item chrome
+            property bool isWing
+
+            readonly property real s: piece.chrome.sweepR
+
+            x: {
+                if (piece.isWing)
+                    return piece.chrome.rightSide ? piece.chrome.x + piece.chrome.width - piece.s : piece.chrome.x;
+                return piece.chrome.rightSide ? piece.chrome.x - piece.s : piece.chrome.x + piece.chrome.width;
+            }
+            y: {
+                if (piece.isWing)
+                    return piece.chrome.bottomEdge ? piece.chrome.y - piece.s : piece.chrome.y + piece.chrome.height;
+                return piece.chrome.bottomEdge ? piece.chrome.y + piece.chrome.height - piece.s : piece.chrome.y;
+            }
+            width: piece.s
+            height: piece.s
+
+            Region {
+                intersection: Intersection.Subtract
+                radius: piece.s
+                width: piece.s * 2
+                height: piece.s * 2
+                x: piece.x - (piece.chrome.rightSide ? piece.s : 0)
+                y: piece.y - (piece.chrome.bottomEdge ? piece.s : 0)
+            }
         }
     }
 
@@ -147,19 +355,54 @@ Item {
     Item {
         id: leftInputEnvelope
 
-        x: root.motionRunning ? Math.min(root.islandStartX, root.islandTargetX) - SettingsData.dankIslandSatelliteGap - leftInput.width : leftInput.x
-        y: leftInput.y
-        width: leftInput.width + root.leftEdgeSpread
-        height: leftInput.height
+        x: root.spanEdges ? 0 : (root.motionRunning ? Math.min(root.islandStartX, root.islandTargetX) - SettingsData.dankIslandSatelliteGap - leftInput.width : leftInput.x)
+        y: root.spanEdges ? root.chromeY : leftInput.y
+        width: root.spanEdges ? (leftInput.width > 0 ? Math.max(0, leftInput.x + leftInput.width + root.chromeInset) : 0) : leftInput.width + root.leftEdgeSpread
+        height: root.spanEdges ? (leftInput.width > 0 ? root.chromeHeight : 0) : leftInput.height
     }
 
     Item {
         id: rightInputEnvelope
 
-        x: root.motionRunning ? Math.min(root.islandStartRight, root.islandTargetRight) + SettingsData.dankIslandSatelliteGap : rightInput.x
-        y: rightInput.y
-        width: rightInput.width + root.rightEdgeSpread
-        height: rightInput.height
+        readonly property real edgeX: rightInput.width > 0 ? rightInput.x - root.chromeInset : root.width
+
+        x: root.spanEdges ? edgeX : (root.motionRunning ? Math.min(root.islandStartRight, root.islandTargetRight) + SettingsData.dankIslandSatelliteGap : rightInput.x)
+        y: root.spanEdges ? root.chromeY : rightInput.y
+        width: root.spanEdges ? Math.max(0, root.width - edgeX) : rightInput.width + root.rightEdgeSpread
+        height: root.spanEdges ? (rightInput.width > 0 ? root.chromeHeight : 0) : rightInput.height
+    }
+
+    IslandSatelliteChrome {
+        id: leftChrome
+
+        x: 0
+        y: root.chromeY
+        width: Math.max(0, leftInput.x + leftInput.width + root.chromePad)
+        height: root.chromeHeight
+        visible: root.backgroundEnabled && leftInput.width > 0
+        fillColor: root.chromeColor
+        gothEnabled: root.gothCorners
+        sweep: root.sweepRadius
+        bottomEdge: root.bottomEdge
+        parentScreen: root.targetScreen
+        onVisibleChanged: blurRebuildTimer.restart()
+    }
+
+    IslandSatelliteChrome {
+        id: rightChrome
+
+        rightSide: true
+        x: rightInput.x - root.chromePad
+        y: root.chromeY
+        width: Math.max(0, root.width - x)
+        height: root.chromeHeight
+        visible: root.backgroundEnabled && rightInput.width > 0
+        fillColor: root.chromeColor
+        gothEnabled: root.gothCorners
+        sweep: root.sweepRadius
+        bottomEdge: root.bottomEdge
+        parentScreen: root.targetScreen
+        onVisibleChanged: blurRebuildTimer.restart()
     }
 
     Item {
@@ -185,6 +428,7 @@ Item {
             barSpacing: root.satelliteSpacing
             barConfig: root.satelliteConfig
             blurBarWindow: satelliteBarWindow
+            crossEdgeExtension: root.crossEdgeExtension
         }
     }
 
@@ -211,6 +455,7 @@ Item {
             barSpacing: root.satelliteSpacing
             barConfig: root.satelliteConfig
             blurBarWindow: satelliteBarWindow
+            crossEdgeExtension: root.crossEdgeExtension
         }
     }
 }

@@ -25,6 +25,7 @@ Loader {
     property bool isRightBarEdge: false
     property bool isTopBarEdge: false
     property bool isBottomBarEdge: false
+    property real crossEdgeExtension: 0
     property string _registeredScreenName: ""
     property var _registeredItem: null
 
@@ -180,6 +181,14 @@ Loader {
         when: root.item && "isBottomBarEdge" in root.item
         property: "isBottomBarEdge"
         value: root.isBottomBarEdge
+        restoreMode: Binding.RestoreNone
+    }
+
+    Binding {
+        target: root.item
+        when: root.item && "crossEdgeExtension" in root.item
+        property: "crossEdgeExtension"
+        value: root.crossEdgeExtension
         restoreMode: Binding.RestoreNone
     }
 

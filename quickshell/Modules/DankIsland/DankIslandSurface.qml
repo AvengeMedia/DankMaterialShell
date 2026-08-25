@@ -37,6 +37,17 @@ Item {
         }
         return Theme.surfaceContainerHigh;
     }
+    readonly property bool popupStyled: root.controller.expanded
+    readonly property real compactOpacity: Math.max(0, Math.min(1, SettingsData.dankIslandTransparency))
+    readonly property color effectiveSurfaceColor: {
+        if (root.highContrast)
+            return Theme.surfaceContainerHighest;
+        if (root.popupStyled)
+            return Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency);
+        return Theme.withAlpha(root.surfaceColor, root.compactOpacity);
+    }
+    readonly property real surfaceOpacity: root.effectiveSurfaceColor.a
+    readonly property real currentSurfaceRadius: Math.max(0, motion.currentTopLeftRadius, motion.currentBottomLeftRadius)
 
     signal scrollWheel(var wheel)
 
@@ -212,9 +223,16 @@ Item {
         topRightRadius: Math.max(0, motion.currentTopRightRadius)
         bottomLeftRadius: Math.max(0, motion.currentBottomLeftRadius)
         bottomRightRadius: Math.max(0, motion.currentBottomRightRadius)
-        color: root.surfaceColor
-        border.width: root.highContrast ? 2 : 0
-        border.color: root.highContrast ? Theme.outlineStrong : "transparent"
+        color: root.effectiveSurfaceColor
+        border.width: root.highContrast ? 2 : (root.popupStyled ? BlurService.borderWidth : 0)
+        border.color: root.highContrast ? Theme.outlineStrong : (root.popupStyled ? BlurService.borderColor : "transparent")
+
+        Behavior on color {
+            ColorAnimation {
+                duration: root.reducedMotion ? 0 : Theme.shortDuration
+                easing.type: Easing.OutCubic
+            }
+        }
 
         MouseArea {
             anchors.fill: parent

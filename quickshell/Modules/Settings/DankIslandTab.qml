@@ -266,6 +266,19 @@ Item {
                     }
                 }
 
+                SettingsSliderRow {
+                    settingKey: "dankIslandTransparency"
+                    tags: ["island", "appearance", "surface", "opacity", "transparency", "blur"]
+                    text: I18n.tr("Opacity", "island settings: island surface opacity slider")
+                    unit: "%"
+                    minimum: 0
+                    maximum: 100
+                    step: 1
+                    defaultValue: 100
+                    value: Math.round(SettingsData.dankIslandTransparency * 100)
+                    onSliderValueChanged: value => SettingsData.set("dankIslandTransparency", value / 100)
+                }
+
                 SettingsToggleRow {
                     settingKey: "dankIslandHighContrast"
                     tags: ["island", "appearance", "contrast", "accessibility", "outline"]
@@ -351,6 +364,54 @@ Item {
                     description: I18n.tr("Place independent widgets to left and right of island", "island settings: satellite widgets description")
                     checked: SettingsData.dankIslandSatellitesEnabled
                     onToggled: checked => SettingsData.set("dankIslandSatellitesEnabled", checked)
+                }
+
+                SettingsToggleRow {
+                    settingKey: "dankIslandSatelliteBackground"
+                    tags: ["island", "satellite", "widgets", "background", "chrome"]
+                    text: I18n.tr("Background", "island settings: satellite background toggle")
+                    description: I18n.tr("Draw an island-styled background behind satellite widgets", "island settings: satellite background description")
+                    checked: SettingsData.dankIslandSatelliteBackground
+                    enabled: SettingsData.dankIslandSatellitesEnabled
+                    onToggled: checked => SettingsData.set("dankIslandSatelliteBackground", checked)
+                }
+
+                SettingsToggleRow {
+                    settingKey: "dankIslandSatelliteGothCorners"
+                    tags: ["island", "satellite", "goth", "corners", "wing", "sweep"]
+                    text: I18n.tr("Goth Corners", "island settings: satellite goth corners toggle")
+                    description: I18n.tr("Sweep the background into the screen edges", "island settings: satellite goth corners description")
+                    checked: SettingsData.dankIslandSatelliteGothCorners
+                    enabled: SettingsData.dankIslandSatellitesEnabled && SettingsData.dankIslandSatelliteBackground
+                    onToggled: checked => SettingsData.set("dankIslandSatelliteGothCorners", checked)
+                }
+
+                SettingsSliderRow {
+                    settingKey: "dankIslandSatelliteSwoopRadius"
+                    tags: ["island", "satellite", "goth", "corners", "radius", "sweep", "size"]
+                    text: I18n.tr("Corner Radius", "island settings: satellite goth corner radius slider")
+                    unit: "px"
+                    minimum: 4
+                    maximum: 64
+                    step: 1
+                    defaultValue: 24
+                    value: SettingsData.dankIslandSatelliteSwoopRadius
+                    enabled: SettingsData.dankIslandSatellitesEnabled && SettingsData.dankIslandSatelliteBackground && SettingsData.dankIslandSatelliteGothCorners
+                    onSliderValueChanged: value => SettingsData.set("dankIslandSatelliteSwoopRadius", value)
+                }
+
+                SettingsSliderRow {
+                    settingKey: "dankIslandSatelliteTransparency"
+                    tags: ["island", "satellite", "background", "opacity", "transparency", "blur"]
+                    text: I18n.tr("Opacity", "island settings: satellite background opacity slider")
+                    unit: "%"
+                    minimum: 0
+                    maximum: 100
+                    step: 1
+                    defaultValue: 100
+                    value: Math.round(SettingsData.dankIslandSatelliteTransparency * 100)
+                    enabled: SettingsData.dankIslandSatellitesEnabled && SettingsData.dankIslandSatelliteBackground
+                    onSliderValueChanged: value => SettingsData.set("dankIslandSatelliteTransparency", value / 100)
                 }
 
                 SettingsButtonGroupRow {

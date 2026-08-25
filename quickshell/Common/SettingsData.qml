@@ -995,6 +995,7 @@ Singleton {
     property int dankIslandHoverOpenDelay: 150
     property int dankIslandHoverCloseDelay: 150
     property string dankIslandPalette: "default"
+    property real dankIslandTransparency: 1
     property bool dankIslandHighContrast: false
     property bool dankIslandMediaClockVisible: true
     property bool dankIslandHomeNotificationBadge: true
@@ -1008,6 +1009,10 @@ Singleton {
     property bool dankIslandSatellitesEnabled: true
     property string dankIslandSatellitePosition: "edges"
     property int dankIslandSatelliteGap: 12
+    property bool dankIslandSatelliteBackground: false
+    property bool dankIslandSatelliteGothCorners: true
+    property real dankIslandSatelliteTransparency: 1
+    property int dankIslandSatelliteSwoopRadius: 24
     property bool dankIslandReducedMotion: false
     property real dankIslandSpringStiffness: 560
     property real dankIslandSpringDamping: 37

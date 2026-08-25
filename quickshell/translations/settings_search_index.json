@@ -12042,6 +12042,28 @@
     "description": "Draw an outline and use the highest-contrast surface tone"
   },
   {
+    "section": "dankIslandSatelliteBackground",
+    "label": "Background",
+    "tabIndex": 46,
+    "category": "Dank Island",
+    "keywords": [
+      "activities",
+      "background",
+      "behind",
+      "chrome",
+      "components",
+      "dank",
+      "draw",
+      "dynamic island",
+      "island",
+      "modules",
+      "satellite",
+      "styled",
+      "widgets"
+    ],
+    "description": "Draw an island-styled background behind satellite widgets"
+  },
+  {
     "section": "dankIslandHomeStatusSlot",
     "label": "Battery / Control Center",
     "tabIndex": 46,
@@ -12169,6 +12191,27 @@
     "description": "Resize the resting island to align with nearby widgets"
   },
   {
+    "section": "dankIslandSatelliteSwoopRadius",
+    "label": "Corner Radius",
+    "tabIndex": 46,
+    "category": "Dank Island",
+    "keywords": [
+      "activities",
+      "corner",
+      "corners",
+      "dank",
+      "dynamic island",
+      "goth",
+      "island",
+      "radius",
+      "round",
+      "rounded",
+      "satellite",
+      "size",
+      "sweep"
+    ]
+  },
+  {
     "section": "dankIslandInstance",
     "label": "Dank Island - Beta",
     "tabIndex": 46,
@@ -12258,6 +12301,30 @@
       "windows"
     ],
     "description": "Floats above windows and other content"
+  },
+  {
+    "section": "dankIslandSatelliteGothCorners",
+    "label": "Goth Corners",
+    "tabIndex": 46,
+    "category": "Dank Island",
+    "keywords": [
+      "activities",
+      "background",
+      "corners",
+      "dank",
+      "dynamic island",
+      "edges",
+      "goth",
+      "island",
+      "radius",
+      "round",
+      "rounded",
+      "satellite",
+      "screen",
+      "sweep",
+      "wing"
+    ],
+    "description": "Sweep the background into the screen edges"
   },
   {
     "section": "dankIslandHoverCloseDelay",
@@ -12522,6 +12589,40 @@
     ],
     "icon": "notifications",
     "description": "Expand notifications by default instead of click or hover"
+  },
+  {
+    "section": "dankIslandSatelliteTransparency",
+    "label": "Opacity",
+    "tabIndex": 46,
+    "category": "Dank Island",
+    "keywords": [
+      "activities",
+      "background",
+      "blur",
+      "dank",
+      "dynamic island",
+      "island",
+      "opacity",
+      "satellite",
+      "transparency"
+    ]
+  },
+  {
+    "section": "dankIslandTransparency",
+    "label": "Opacity",
+    "tabIndex": 46,
+    "category": "Dank Island",
+    "keywords": [
+      "activities",
+      "appearance",
+      "blur",
+      "dank",
+      "dynamic island",
+      "island",
+      "opacity",
+      "surface",
+      "transparency"
+    ]
   },
   {
     "section": "dankIslandHoverOpenDelay",
