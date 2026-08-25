@@ -19,7 +19,6 @@ BasePill {
     readonly property bool showTime: widgetData?.showBatteryTime !== undefined ? widgetData.showBatteryTime : SettingsData.showBatteryTime
     readonly property bool showTimeOnlyOnBattery: widgetData?.showBatteryTimeOnlyOnBattery !== undefined ? widgetData.showBatteryTimeOnlyOnBattery : SettingsData.showBatteryTimeOnlyOnBattery
     readonly property bool pillStyle: widgetData?.batteryPillStyle !== undefined ? widgetData.batteryPillStyle : SettingsData.batteryPillStyle
-    readonly property bool pillPercentSign: widgetData?.batteryPillPercentSign !== undefined ? widgetData.batteryPillPercentSign : SettingsData.batteryPillPercentSign
 
     readonly property string batteryTimeText: {
         if (showTimeOnlyOnBattery && BatteryService.isPluggedIn) {
@@ -190,7 +189,6 @@ BasePill {
                 BatteryMeter {
                     visible: battery.pillStyle
                     showNumber: battery.showPercent
-                    showPercentSign: battery.pillPercentSign
                     thickness: Theme.barIconSize(battery.barThickness, -4, battery.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                     fontSize: Theme.barTextSize(battery.barThickness, battery.barConfig?.fontScale, battery.barConfig?.maximizeWidgetText)
                     anchors.verticalCenter: parent.verticalCenter

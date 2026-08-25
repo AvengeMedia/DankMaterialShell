@@ -142,7 +142,6 @@ var SPEC = {
     showBatteryTime: { def: false },
     showBatteryTimeOnlyOnBattery: { def: false },
     batteryPillStyle: { def: false },
-    batteryPillPercentSign: { def: false },
     showControlCenterButton: { def: true },
     showCapsLockIndicator: { def: true },
 

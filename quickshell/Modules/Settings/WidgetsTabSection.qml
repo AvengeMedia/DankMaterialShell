@@ -3319,68 +3319,6 @@ Column {
                         }
                     }
                 }
-
-                Rectangle {
-                    width: parent.width
-                    height: Math.max(18, Theme.fontSizeSmall) + Theme.spacingM * 2
-                    radius: Theme.cornerRadius
-                    color: batteryPillPercentArea.containsMouse && batteryPillToggle.checked ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
-                    opacity: batteryPillToggle.checked ? 1.0 : 0.5
-
-                    Row {
-                        anchors.left: parent.left
-                        anchors.leftMargin: Theme.spacingS + 18
-                        anchors.right: batteryPillPercentToggle.left
-                        anchors.rightMargin: Theme.spacingS
-                        anchors.verticalCenter: parent.verticalCenter
-                        spacing: Theme.spacingS
-                        clip: true
-
-                        DankIcon {
-                            name: "percent"
-                            size: 18
-                            color: Theme.outline
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        StyledText {
-                            text: I18n.tr("Show Percentage")
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceText
-                            font.weight: Font.Normal
-                            anchors.verticalCenter: parent.verticalCenter
-                            elide: Text.ElideRight
-                            maximumLineCount: 1
-                            width: parent.width - 18 - Theme.spacingS
-                        }
-                    }
-
-                    DankToggle {
-                        id: batteryPillPercentToggle
-                        anchors.right: parent.right
-                        anchors.rightMargin: Theme.spacingS
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: 40
-                        height: 20
-                        enabled: batteryPillToggle.checked
-                        checked: batteryContextMenu.currentWidgetData?.batteryPillPercentSign ?? SettingsData.batteryPillPercentSign
-                        onToggled: {
-                            root.overflowSettingChanged(batteryContextMenu.sectionId, batteryContextMenu.widgetIndex, "batteryPillPercentSign", toggled);
-                        }
-                    }
-
-                    MouseArea {
-                        id: batteryPillPercentArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        enabled: batteryPillToggle.checked
-                        cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-                        onPressed: {
-                            batteryPillPercentToggle.checked = !batteryPillPercentToggle.checked;
-                            root.overflowSettingChanged(batteryContextMenu.sectionId, batteryContextMenu.widgetIndex, "batteryPillPercentSign", batteryPillPercentToggle.checked);
-                        }
-                    }
-                }
             }
         }
     }
