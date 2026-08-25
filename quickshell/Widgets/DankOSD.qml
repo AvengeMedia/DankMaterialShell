@@ -235,6 +235,22 @@ PanelWindow {
     implicitWidth: alignedWidth + (shadowBuffer * 2)
     implicitHeight: alignedHeight + (shadowBuffer * 2)
 
+    readonly property var scaleSpringParams: Theme.springPreset("default", animationDuration)
+
+    SpringMotion {
+        id: osdScaleSpring
+        reducedMotion: root.animationDuration <= 0
+        positionEpsilon: 0.001
+        velocityEpsilon: 0.001
+        stiffness: root.scaleSpringParams.stiffness
+        damping: root.scaleSpringParams.damping
+        value: root.shouldBeVisible ? 1 : 0.9
+
+        Component.onCompleted: snapTo(root.shouldBeVisible ? 1 : 0.9)
+    }
+
+    onShouldBeVisibleChanged: osdScaleSpring.retarget(root.shouldBeVisible ? 1 : 0.9)
+
     Timer {
         id: hideTimer
 
@@ -251,7 +267,7 @@ PanelWindow {
 
     Timer {
         id: closeTimer
-        interval: animationDuration + 50
+        interval: Math.max(animationDuration + 50, Math.round(osdScaleSpring.settleDurationMs) + 50)
         onTriggered: {
             if (!shouldBeVisible) {
                 visible = false;
@@ -267,7 +283,7 @@ PanelWindow {
         width: alignedWidth
         height: alignedHeight
         opacity: shouldBeVisible ? 1 : 0
-        scale: shouldBeVisible ? 1 : 0.9
+        scale: osdScaleSpring.value
 
         property bool childHovered: false
         readonly property real popupSurfaceAlpha: Theme.popupTransparency
@@ -315,13 +331,6 @@ PanelWindow {
         }
 
         Behavior on opacity {
-            NumberAnimation {
-                duration: animationDuration
-                easing.type: animationEasing
-            }
-        }
-
-        Behavior on scale {
             NumberAnimation {
                 duration: animationDuration
                 easing.type: animationEasing

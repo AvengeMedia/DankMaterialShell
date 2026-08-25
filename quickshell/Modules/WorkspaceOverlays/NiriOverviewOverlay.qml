@@ -275,7 +275,9 @@ Scope {
                     y: {
                         if (!Theme.isConnectedEffect)
                             return Theme.snap(_centerY, overlayWindow.dpr);
-                        return Theme.snap(overlayWindow.shouldShowSpotlight ? _connectedRestY : _connectedCollapsedY, overlayWindow.dpr);
+                        const rest = _connectedRestY;
+                        const collapsed = _connectedCollapsedY;
+                        return Theme.snap(collapsed + (rest - collapsed) * slideMorph.value, overlayWindow.dpr);
                     }
 
                     readonly property int baseWidth: {
@@ -307,7 +309,55 @@ Scope {
 
                     readonly property bool animatingOut: niriOverviewScope.isClosing && overlayWindow.isSpotlightScreen
 
-                    scale: Theme.isConnectedEffect ? 1.0 : (overlayWindow.shouldShowSpotlight ? 1.0 : 0.96)
+                    readonly property var scaleSpringParams: Theme.springPreset("fast", Theme.expressiveDurations.fast)
+                    readonly property var slideSpringParams: Theme.springPreset("default", Theme.popoutAnimationDuration)
+
+                    function checkExitSettled() {
+                        if (!spotlightContainer.animatingOut)
+                            return;
+                        const spring = Theme.isConnectedEffect ? slideMorph : scaleMorph;
+                        if (!spring.running)
+                            niriOverviewScope.resetState();
+                    }
+
+                    SpringMotion {
+                        id: scaleMorph
+                        enabled: !Theme.isConnectedEffect
+                        reducedMotion: Theme.expressiveDurations.fast <= 0
+                        positionEpsilon: 0.001
+                        velocityEpsilon: 0.001
+                        stiffness: spotlightContainer.scaleSpringParams.stiffness
+                        damping: spotlightContainer.scaleSpringParams.damping
+                        value: overlayWindow.shouldShowSpotlight ? 1 : 0
+
+                        Component.onCompleted: snapTo(overlayWindow.shouldShowSpotlight ? 1 : 0)
+                        onRunningChanged: spotlightContainer.checkExitSettled()
+                    }
+
+                    SpringMotion {
+                        id: slideMorph
+                        enabled: Theme.isConnectedEffect
+                        reducedMotion: Theme.popoutAnimationDuration <= 0
+                        positionEpsilon: 0.05
+                        velocityEpsilon: 0.05
+                        stiffness: spotlightContainer.slideSpringParams.stiffness
+                        damping: spotlightContainer.slideSpringParams.damping
+                        value: overlayWindow.shouldShowSpotlight ? 1 : 0
+
+                        Component.onCompleted: snapTo(overlayWindow.shouldShowSpotlight ? 1 : 0)
+                        onRunningChanged: spotlightContainer.checkExitSettled()
+                    }
+
+                    Connections {
+                        target: overlayWindow
+                        function onShouldShowSpotlightChanged() {
+                            scaleMorph.retarget(overlayWindow.shouldShowSpotlight ? 1 : 0);
+                            slideMorph.retarget(overlayWindow.shouldShowSpotlight ? 1 : 0);
+                            spotlightContainer.checkExitSettled();
+                        }
+                    }
+
+                    scale: Theme.isConnectedEffect ? 1.0 : (0.96 + 0.04 * scaleMorph.value)
                     opacity: Theme.isConnectedEffect ? 1 : (overlayWindow.shouldShowSpotlight ? 1 : 0)
                     visible: overlayWindow.shouldShowSpotlight || animatingOut
                     enabled: overlayWindow.shouldShowSpotlight
@@ -316,44 +366,12 @@ Scope {
                     layer.smooth: false
                     layer.textureSize: layer.enabled ? Qt.size(Math.round(width * overlayWindow.dpr), Math.round(height * overlayWindow.dpr)) : Qt.size(0, 0)
 
-                    Behavior on scale {
-                        id: scaleAnimation
-                        enabled: !Theme.isConnectedEffect
-                        NumberAnimation {
-                            duration: Theme.expressiveDurations.fast
-                            easing.type: Easing.BezierSpline
-                            easing.bezierCurve: spotlightContainer.visible ? Theme.expressiveCurves.expressiveFastSpatial : Theme.expressiveCurves.standardAccel
-                            onRunningChanged: {
-                                if (running || !spotlightContainer.animatingOut)
-                                    return;
-                                niriOverviewScope.resetState();
-                            }
-                        }
-                    }
-
                     Behavior on opacity {
                         enabled: !Theme.isConnectedEffect
                         NumberAnimation {
                             duration: Theme.expressiveDurations.fast
                             easing.type: Easing.BezierSpline
                             easing.bezierCurve: spotlightContainer.visible ? Theme.expressiveCurves.expressiveFastSpatial : Theme.expressiveCurves.standardAccel
-                        }
-                    }
-
-                    // Connected-mode slide — only animates in full connected-frame mode.
-                    // Drives resetState when the slide-out finishes (scale/opacity are
-                    // static in connected mode so their onRunningChanged never fires).
-                    Behavior on y {
-                        enabled: Theme.isConnectedEffect
-                        NumberAnimation {
-                            duration: Theme.variantDuration(Theme.popoutAnimationDuration, overlayWindow.shouldShowSpotlight)
-                            easing.type: Easing.BezierSpline
-                            easing.bezierCurve: overlayWindow.shouldShowSpotlight ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
-                            onRunningChanged: {
-                                if (running || !spotlightContainer.animatingOut)
-                                    return;
-                                niriOverviewScope.resetState();
-                            }
                         }
                     }
 

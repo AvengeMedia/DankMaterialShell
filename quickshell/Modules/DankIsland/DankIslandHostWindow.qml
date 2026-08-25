@@ -262,7 +262,7 @@ PanelWindow {
         notificationTransientSurfaceTracker: notificationTransientSurfaces
         effectiveScreen: root.screen
         hostOriginY: root.hostOriginY
-        reducedMotion: SettingsData.dankIslandReducedMotion || SettingsData.animationSpeed === SettingsData.AnimationSpeed.None
+        reducedMotion: SettingsData.dankIslandReducedMotion || SettingsData.reduceMotion || SettingsData.animationSpeed === SettingsData.AnimationSpeed.None
         springStiffness: Math.max(100, Math.min(1200, SettingsData.dankIslandSpringStiffness))
         springDamping: Math.max(10, Math.min(100, SettingsData.dankIslandSpringDamping))
         springMass: Math.max(0.25, Math.min(3, SettingsData.dankIslandSpringMass))

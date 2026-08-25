@@ -57,144 +57,6 @@ Item {
 
             SettingsCard {
                 tab: "typography"
-                tags: ["animation", "variant", "style", "slide", "fluent", "dynamic", "motion"]
-                title: I18n.tr("Animation Style")
-                settingKey: "animationVariant"
-                iconName: "auto_awesome_motion"
-
-                Item {
-                    width: parent.width
-                    height: animVariantGroup.implicitHeight
-                    clip: true
-
-                    DankButtonGroup {
-                        id: animVariantGroup
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        buttonPadding: parent.width < 480 ? Theme.spacingS : Theme.spacingL
-                        minButtonWidth: parent.width < 480 ? 64 : 96
-                        textSize: parent.width < 480 ? Theme.fontSizeSmall : Theme.fontSizeMedium
-                        model: [I18n.tr("Material"), I18n.tr("Fluent"), I18n.tr("Dynamic")]
-                        selectionMode: "single"
-                        currentIndex: SettingsData.animationVariant
-                        onSelectionChanged: (index, selected) => {
-                            if (!selected)
-                                return;
-                            SettingsData.set("animationVariant", index);
-                        }
-
-                        Connections {
-                            target: SettingsData
-                            function onAnimationVariantChanged() {
-                                animVariantGroup.currentIndex = SettingsData.animationVariant;
-                            }
-                        }
-                    }
-                }
-
-                Rectangle {
-                    width: parent.width
-                    height: 1
-                    color: Theme.outline
-                    opacity: 0.15
-                }
-
-                Item {
-                    width: parent.width
-                    height: variantDescription.implicitHeight + Theme.spacingS * 2
-
-                    StyledText {
-                        id: variantDescription
-                        x: Theme.spacingM
-                        y: Theme.spacingS
-                        width: parent.width - Theme.spacingM * 2
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceVariantText
-                        wrapMode: Text.WordWrap
-                        text: {
-                            switch (SettingsData.animationVariant) {
-                            case 1:
-                                return I18n.tr("Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.");
-                            case 2:
-                                return I18n.tr("Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.");
-                            default:
-                                return I18n.tr("Material: Material Design 3 Expressive bezier curves. The DMS default feel.");
-                            }
-                        }
-                    }
-                }
-            }
-
-            SettingsCard {
-                tab: "typography"
-                tags: ["animation", "motion", "effect", "slide", "directional", "depth", "spring", "physics"]
-                title: I18n.tr("Motion Effects")
-                settingKey: "motionEffect"
-                iconName: "motion_photos_on"
-
-                Item {
-                    width: parent.width
-                    height: motionEffectGroup.implicitHeight
-                    clip: true
-
-                    DankButtonGroup {
-                        id: motionEffectGroup
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        buttonPadding: parent.width < 480 ? Theme.spacingS : Theme.spacingL
-                        minButtonWidth: parent.width < 480 ? 64 : 96
-                        textSize: parent.width < 480 ? Theme.fontSizeSmall : Theme.fontSizeMedium
-                        model: [I18n.tr("Standard"), I18n.tr("Directional"), I18n.tr("Depth")]
-                        selectionMode: "single"
-                        currentIndex: SettingsData.motionEffect
-                        onSelectionChanged: (index, selected) => {
-                            if (!selected)
-                                return;
-                            SettingsData.set("motionEffect", index);
-                        }
-
-                        Connections {
-                            target: SettingsData
-                            function onMotionEffectChanged() {
-                                motionEffectGroup.currentIndex = SettingsData.motionEffect;
-                            }
-                        }
-                    }
-                }
-
-                Rectangle {
-                    width: parent.width
-                    height: 1
-                    color: Theme.outline
-                    opacity: 0.15
-                }
-
-                Item {
-                    width: parent.width
-                    height: motionEffectDescription.implicitHeight + Theme.spacingS * 2
-
-                    StyledText {
-                        id: motionEffectDescription
-                        x: Theme.spacingM
-                        y: Theme.spacingS
-                        width: parent.width - Theme.spacingM * 2
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceVariantText
-                        wrapMode: Text.WordWrap
-                        text: {
-                            switch (SettingsData.motionEffect) {
-                            case 1:
-                                return I18n.tr("Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.");
-                            case 2:
-                                return I18n.tr("Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.");
-                            default:
-                                return I18n.tr("Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.");
-                            }
-                        }
-                    }
-                }
-            }
-
-            SettingsCard {
-                tab: "typography"
                 tags: ["font", "family", "text", "typography"]
                 title: I18n.tr("Typography")
                 settingKey: "typography"
@@ -336,141 +198,151 @@ Item {
                 settingKey: "textRenderType"
                 iconName: "text_format"
 
-                Item {
-                    width: parent.width
-                    height: renderTypeGroup.implicitHeight
-                    clip: true
-
-                    DankButtonGroup {
-                        id: renderTypeGroup
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        buttonPadding: parent.width < 480 ? Theme.spacingS : Theme.spacingL
-                        minButtonWidth: parent.width < 480 ? 64 : 96
-                        textSize: parent.width < 480 ? Theme.fontSizeSmall : Theme.fontSizeMedium
-                        model: [I18n.tr("Native"), I18n.tr("Qt"), I18n.tr("Curve")]
-                        selectionMode: "single"
-                        currentIndex: {
-                            switch (SettingsData.textRenderType) {
-                            case SettingsData.TextRenderType.Qt:
-                                return 1;
-                            case SettingsData.TextRenderType.Curve:
-                                return 2;
-                            default:
-                                return 0;
-                            }
+                SettingsButtonGroupRow {
+                    tab: "typography"
+                    tags: ["text", "render", "rendering", "type", "native", "qt", "curve", "freetype"]
+                    settingKey: "textRenderType"
+                    text: I18n.tr("Render Type")
+                    description: {
+                        switch (SettingsData.textRenderType) {
+                        case SettingsData.TextRenderType.Qt:
+                            return I18n.tr("Distance-field renderer.");
+                        case SettingsData.TextRenderType.Curve:
+                            return I18n.tr("Curve rasterizer.");
+                        default:
+                            return I18n.tr("Platform renderer (FreeType).");
                         }
-                        onSelectionChanged: (index, selected) => {
-                            if (!selected)
-                                return;
-                            switch (index) {
-                            case 1:
-                                SettingsData.set("textRenderType", SettingsData.TextRenderType.Qt);
-                                break;
-                            case 2:
-                                SettingsData.set("textRenderType", SettingsData.TextRenderType.Curve);
-                                break;
-                            default:
-                                SettingsData.set("textRenderType", SettingsData.TextRenderType.Native);
-                                break;
-                            }
+                    }
+                    model: [I18n.tr("Native"), I18n.tr("Qt"), I18n.tr("Curve")]
+                    currentIndex: {
+                        switch (SettingsData.textRenderType) {
+                        case SettingsData.TextRenderType.Qt:
+                            return 1;
+                        case SettingsData.TextRenderType.Curve:
+                            return 2;
+                        default:
+                            return 0;
                         }
-
-                        Connections {
-                            target: SettingsData
-                            function onTextRenderTypeChanged() {
-                                switch (SettingsData.textRenderType) {
-                                case SettingsData.TextRenderType.Qt:
-                                    renderTypeGroup.currentIndex = 1;
-                                    break;
-                                case SettingsData.TextRenderType.Curve:
-                                    renderTypeGroup.currentIndex = 2;
-                                    break;
-                                default:
-                                    renderTypeGroup.currentIndex = 0;
-                                    break;
-                                }
-                            }
+                    }
+                    onSelectionChanged: (index, selected) => {
+                        if (!selected)
+                            return;
+                        switch (index) {
+                        case 1:
+                            SettingsData.set("textRenderType", SettingsData.TextRenderType.Qt);
+                            break;
+                        case 2:
+                            SettingsData.set("textRenderType", SettingsData.TextRenderType.Curve);
+                            break;
+                        default:
+                            SettingsData.set("textRenderType", SettingsData.TextRenderType.Native);
+                            break;
                         }
                     }
                 }
 
-                Rectangle {
-                    width: parent.width
-                    height: 1
-                    color: Theme.outline
-                    opacity: 0.15
+                SettingsButtonGroupRow {
+                    tab: "typography"
+                    tags: ["text", "render", "quality", "level"]
+                    settingKey: "textRenderQuality"
+                    text: I18n.tr("Quality")
+                    model: [I18n.tr("Default"), I18n.tr("Low", "quality level option"), I18n.tr("Normal", "quality level option"), I18n.tr("High", "quality level option"), I18n.tr("Very High", "quality level option")]
+                    currentIndex: SettingsData.textRenderQuality
+                    onSelectionChanged: (index, selected) => {
+                        if (!selected)
+                            return;
+                        SettingsData.set("textRenderQuality", index);
+                    }
                 }
+            }
 
-                Item {
-                    width: parent.width
-                    height: renderTypeDescription.implicitHeight + Theme.spacingS * 2
+            SettingsCard {
+                tab: "typography"
+                tags: ["animation", "variant", "style", "slide", "fluent", "dynamic", "motion", "effect", "directional", "depth", "spring", "physics", "bounce", "accessibility", "reduce"]
+                title: I18n.tr("Motion")
+                settingKey: "animationVariant"
+                iconName: "auto_awesome_motion"
 
-                    StyledText {
-                        id: renderTypeDescription
-                        x: Theme.spacingM
-                        y: Theme.spacingS
-                        width: parent.width - Theme.spacingM * 2
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceVariantText
-                        wrapMode: Text.WordWrap
-                        text: {
-                            switch (SettingsData.textRenderType) {
-                            case SettingsData.TextRenderType.Qt:
-                                return I18n.tr("Qt: distance-field renderer.");
-                            case SettingsData.TextRenderType.Curve:
-                                return I18n.tr("Curve: curve rasterizer.");
-                            default:
-                                return I18n.tr("Native: platform renderer (FreeType).");
-                            }
+                SettingsButtonGroupRow {
+                    tab: "typography"
+                    tags: ["animation", "variant", "style", "slide", "fluent", "dynamic", "motion"]
+                    settingKey: "animationVariant"
+                    text: I18n.tr("Animation Style")
+                    description: {
+                        switch (SettingsData.animationVariant) {
+                        case 1:
+                            return I18n.tr("Smooth cubic deceleration in, quick snap out, clean, elegant curves.");
+                        case 2:
+                            return I18n.tr("Spring bezier with overshoot, entry briefly exceeds its target then settles.");
+                        default:
+                            return I18n.tr("Material 3 Expressive bezier curves, default.");
                         }
+                    }
+                    model: [I18n.tr("Material"), I18n.tr("Fluent"), I18n.tr("Dynamic")]
+                    currentIndex: SettingsData.animationVariant
+                    onSelectionChanged: (index, selected) => {
+                        if (!selected)
+                            return;
+                        SettingsData.set("animationVariant", index);
                     }
                 }
 
-                Rectangle {
-                    width: parent.width
-                    height: 1
-                    color: Theme.outline
-                    opacity: 0.15
+                SettingsButtonGroupRow {
+                    tab: "typography"
+                    tags: ["animation", "motion", "effect", "slide", "directional", "depth", "spring", "physics"]
+                    settingKey: "motionEffect"
+                    text: I18n.tr("Motion Effects")
+                    description: {
+                        switch (SettingsData.motionEffect) {
+                        case 1:
+                            return I18n.tr("Panels glide in from a larger distance at full size, no scale change, pure clean motion.");
+                        case 2:
+                            return I18n.tr("Panels scale up from small as they slide in, a dramatic pop-forward depth effect.");
+                        default:
+                            return I18n.tr("Material 3 Expressive panels rise from below with a subtle scale, default.");
+                        }
+                    }
+                    model: [I18n.tr("Standard"), I18n.tr("Directional"), I18n.tr("Depth")]
+                    currentIndex: SettingsData.motionEffect
+                    onSelectionChanged: (index, selected) => {
+                        if (!selected)
+                            return;
+                        SettingsData.set("motionEffect", index);
+                    }
                 }
 
-                Item {
-                    width: parent.width
-                    height: qualityGroup.implicitHeight + qualityLabel.implicitHeight + Theme.spacingS
-                    clip: true
-
-                    StyledText {
-                        id: qualityLabel
-                        x: Theme.spacingM
-                        text: I18n.tr("Quality")
-                        font.pixelSize: Theme.fontSizeSmall
-                        font.weight: Font.Medium
-                        color: Theme.surfaceText
-                    }
-
-                    DankButtonGroup {
-                        id: qualityGroup
-                        anchors.top: qualityLabel.bottom
-                        anchors.topMargin: Theme.spacingS
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        buttonPadding: parent.width < 480 ? Theme.spacingXS : Theme.spacingS
-                        minButtonWidth: parent.width < 480 ? 40 : 56
-                        textSize: parent.width < 480 ? Theme.fontSizeSmall : Theme.fontSizeMedium
-                        model: [I18n.tr("Default"), I18n.tr("Low", "quality level option"), I18n.tr("Normal", "quality level option"), I18n.tr("High", "quality level option"), I18n.tr("Very High", "quality level option")]
-                        selectionMode: "single"
-                        currentIndex: SettingsData.textRenderQuality
-                        onSelectionChanged: (index, selected) => {
-                            if (!selected)
-                                return;
-                            SettingsData.set("textRenderQuality", index);
-                        }
-
-                        Connections {
-                            target: SettingsData
-                            function onTextRenderQualityChanged() {
-                                qualityGroup.currentIndex = SettingsData.textRenderQuality;
-                            }
+                SettingsButtonGroupRow {
+                    tab: "typography"
+                    tags: ["animation", "spring", "physics", "bounce", "motion"]
+                    settingKey: "springBounce"
+                    text: I18n.tr("Spring Motion")
+                    description: {
+                        switch (SettingsData.springBounce) {
+                        case 0:
+                            return I18n.tr("Damped springs settle straight to their target with no overshoot");
+                        case 2:
+                            return I18n.tr("Springs carry extra energy and visibly bounce before settling");
+                        default:
+                            return I18n.tr("A slight natural settle, DMS default");
                         }
                     }
+                    model: [I18n.tr("Smooth"), I18n.tr("Balanced"), I18n.tr("Playful")]
+                    currentIndex: SettingsData.springBounce
+                    onSelectionChanged: (index, selected) => {
+                        if (!selected)
+                            return;
+                        SettingsData.set("springBounce", index);
+                    }
+                }
+
+                SettingsToggleRow {
+                    tab: "typography"
+                    tags: ["animation", "spring", "physics", "accessibility", "reduce", "motion"]
+                    settingKey: "reduceMotion"
+                    text: I18n.tr("Reduce Motion")
+                    description: I18n.tr("Snap spring-driven motion straight to its target without physics travel")
+                    checked: SettingsData.reduceMotion
+                    onToggled: checked => SettingsData.set("reduceMotion", checked)
                 }
             }
 
@@ -481,32 +353,17 @@ Item {
                 settingKey: "animationSpeed"
                 iconName: "animation"
 
-                Item {
-                    width: parent.width
-                    height: animationSpeedGroup.implicitHeight
-                    clip: true
-
-                    DankButtonGroup {
-                        id: animationSpeedGroup
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        buttonPadding: parent.width < 480 ? Theme.spacingS : Theme.spacingL
-                        minButtonWidth: parent.width < 480 ? 44 : 64
-                        textSize: parent.width < 480 ? Theme.fontSizeSmall : Theme.fontSizeMedium
-                        model: [I18n.tr("None"), I18n.tr("Short"), I18n.tr("Medium"), I18n.tr("Long"), I18n.tr("Custom")]
-                        selectionMode: "single"
-                        currentIndex: SettingsData.animationSpeed
-                        onSelectionChanged: (index, selected) => {
-                            if (!selected)
-                                return;
-                            SettingsData.set("animationSpeed", index);
-                        }
-
-                        Connections {
-                            target: SettingsData
-                            function onAnimationSpeedChanged() {
-                                animationSpeedGroup.currentIndex = SettingsData.animationSpeed;
-                            }
-                        }
+                SettingsButtonGroupRow {
+                    tab: "typography"
+                    tags: ["animation", "speed", "motion", "duration"]
+                    settingKey: "animationSpeed"
+                    text: I18n.tr("Speed")
+                    model: [I18n.tr("None"), I18n.tr("Short"), I18n.tr("Medium"), I18n.tr("Long"), I18n.tr("Custom")]
+                    currentIndex: SettingsData.animationSpeed
+                    onSelectionChanged: (index, selected) => {
+                        if (!selected)
+                            return;
+                        SettingsData.set("animationSpeed", index);
                     }
                 }
 
@@ -523,7 +380,7 @@ Item {
                     tags: ["animation", "duration", "custom", "speed"]
                     settingKey: "customAnimationDuration"
                     text: I18n.tr("Animation Duration")
-                    description: I18n.tr("Globally scale all animation durations")
+                    description: I18n.tr("Globally scale animation durations with geometric motion & spring based physics with bezier curves")
                     minimum: 0
                     maximum: 1000
                     value: Theme.currentAnimationBaseDuration
@@ -573,39 +430,25 @@ Item {
 
             SettingsCard {
                 tab: "typography"
-                tags: ["animation", "speed", "motion", "duration", "popout", "sync"]
+                tags: ["animation", "speed", "motion", "duration", "popout", "sync", "spring", "physics"]
                 title: I18n.tr("%1 Animation Speed").arg(I18n.tr("Popouts"))
                 settingKey: "popoutAnimationSpeed"
                 iconName: "open_in_new"
+                visible: !SettingsData.syncComponentAnimationSpeeds
 
-                Item {
-                    width: parent.width
-                    height: popoutSpeedGroup.implicitHeight
-                    clip: true
-
-                    DankButtonGroup {
-                        id: popoutSpeedGroup
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        buttonPadding: parent.width < 480 ? Theme.spacingS : Theme.spacingL
-                        minButtonWidth: parent.width < 480 ? 44 : 64
-                        textSize: parent.width < 480 ? Theme.fontSizeSmall : Theme.fontSizeMedium
-                        model: [I18n.tr("None"), I18n.tr("Short"), I18n.tr("Medium"), I18n.tr("Long"), I18n.tr("Custom")]
-                        selectionMode: "single"
-                        currentIndex: SettingsData.popoutAnimationSpeed
-                        onSelectionChanged: (index, selected) => {
-                            if (!selected)
-                                return;
-                            if (SettingsData.syncComponentAnimationSpeeds)
-                                SettingsData.set("syncComponentAnimationSpeeds", false);
-                            SettingsData.set("popoutAnimationSpeed", index);
-                        }
-
-                        Connections {
-                            target: SettingsData
-                            function onPopoutAnimationSpeedChanged() {
-                                popoutSpeedGroup.currentIndex = SettingsData.popoutAnimationSpeed;
-                            }
-                        }
+                SettingsButtonGroupRow {
+                    tab: "typography"
+                    tags: ["animation", "speed", "motion", "duration", "popout"]
+                    settingKey: "popoutAnimationSpeed"
+                    text: I18n.tr("Speed")
+                    model: [I18n.tr("None"), I18n.tr("Short"), I18n.tr("Medium"), I18n.tr("Long"), I18n.tr("Custom")]
+                    currentIndex: SettingsData.popoutAnimationSpeed
+                    onSelectionChanged: (index, selected) => {
+                        if (!selected)
+                            return;
+                        if (SettingsData.syncComponentAnimationSpeeds)
+                            SettingsData.set("syncComponentAnimationSpeeds", false);
+                        SettingsData.set("popoutAnimationSpeed", index);
                     }
                 }
 
@@ -656,39 +499,25 @@ Item {
 
             SettingsCard {
                 tab: "typography"
-                tags: ["animation", "speed", "motion", "duration", "modal", "sync"]
+                tags: ["animation", "speed", "motion", "duration", "modal", "sync", "spring", "physics"]
                 title: I18n.tr("%1 Animation Speed").arg(I18n.tr("Modals"))
                 settingKey: "modalAnimationSpeed"
                 iconName: "web_asset"
+                visible: !SettingsData.syncComponentAnimationSpeeds
 
-                Item {
-                    width: parent.width
-                    height: modalSpeedGroup.implicitHeight
-                    clip: true
-
-                    DankButtonGroup {
-                        id: modalSpeedGroup
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        buttonPadding: parent.width < 480 ? Theme.spacingS : Theme.spacingL
-                        minButtonWidth: parent.width < 480 ? 44 : 64
-                        textSize: parent.width < 480 ? Theme.fontSizeSmall : Theme.fontSizeMedium
-                        model: [I18n.tr("None"), I18n.tr("Short"), I18n.tr("Medium"), I18n.tr("Long"), I18n.tr("Custom")]
-                        selectionMode: "single"
-                        currentIndex: SettingsData.modalAnimationSpeed
-                        onSelectionChanged: (index, selected) => {
-                            if (!selected)
-                                return;
-                            if (SettingsData.syncComponentAnimationSpeeds)
-                                SettingsData.set("syncComponentAnimationSpeeds", false);
-                            SettingsData.set("modalAnimationSpeed", index);
-                        }
-
-                        Connections {
-                            target: SettingsData
-                            function onModalAnimationSpeedChanged() {
-                                modalSpeedGroup.currentIndex = SettingsData.modalAnimationSpeed;
-                            }
-                        }
+                SettingsButtonGroupRow {
+                    tab: "typography"
+                    tags: ["animation", "speed", "motion", "duration", "modal"]
+                    settingKey: "modalAnimationSpeed"
+                    text: I18n.tr("Speed")
+                    model: [I18n.tr("None"), I18n.tr("Short"), I18n.tr("Medium"), I18n.tr("Long"), I18n.tr("Custom")]
+                    currentIndex: SettingsData.modalAnimationSpeed
+                    onSelectionChanged: (index, selected) => {
+                        if (!selected)
+                            return;
+                        if (SettingsData.syncComponentAnimationSpeeds)
+                            SettingsData.set("syncComponentAnimationSpeeds", false);
+                        SettingsData.set("modalAnimationSpeed", index);
                     }
                 }
 

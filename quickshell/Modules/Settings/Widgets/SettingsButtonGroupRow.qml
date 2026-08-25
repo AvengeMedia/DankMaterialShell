@@ -68,49 +68,51 @@ Item {
 
     signal selectionChanged(int index, bool selected)
 
+    // Stack label/description above a centered button group when the text
+    // column would be crushed by the buttons; sit side-by-side otherwise.
+    readonly property bool compact: width - buttonGroup.width - Theme.spacingM * 3 < 200
+
     width: parent?.width ?? 0
-    height: Math.max(60, textColumn.implicitHeight + Theme.spacingM * 2)
+    height: {
+        if (compact)
+            return textColumn.implicitHeight + Theme.spacingS + buttonGroup.height + Theme.spacingM * 2;
+        return Math.max(60, Math.max(textColumn.implicitHeight, buttonGroup.height) + Theme.spacingM * 2);
+    }
 
-    Row {
-        id: contentRow
-        width: parent.width - Theme.spacingM * 2
+    Column {
+        id: textColumn
         x: Theme.spacingM
-        anchors.verticalCenter: parent.verticalCenter
-        spacing: Theme.spacingM
+        y: root.compact ? Theme.spacingM : (root.height - height) / 2
+        width: root.compact ? root.width - Theme.spacingM * 2 : root.width - buttonGroup.width - Theme.spacingM * 3
+        spacing: Theme.spacingXS
 
-        Column {
-            id: textColumn
-            width: parent.width - buttonGroup.width - Theme.spacingM
-            anchors.verticalCenter: parent.verticalCenter
-            spacing: Theme.spacingXS
-
-            StyledText {
-                text: root.text
-                font.pixelSize: Theme.fontSizeMedium
-                font.weight: Font.Medium
-                color: Theme.surfaceText
-                elide: Text.ElideRight
-                width: parent.width
-                visible: root.text !== ""
-                horizontalAlignment: Text.AlignLeft
-            }
-
-            StyledText {
-                text: root.description
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.surfaceVariantText
-                wrapMode: Text.WordWrap
-                width: parent.width
-                visible: root.description !== ""
-                horizontalAlignment: Text.AlignLeft
-            }
+        StyledText {
+            text: root.text
+            font.pixelSize: Theme.fontSizeMedium
+            font.weight: Font.Medium
+            color: Theme.surfaceText
+            elide: Text.ElideRight
+            width: parent.width
+            visible: root.text !== ""
+            horizontalAlignment: Text.AlignLeft
         }
 
-        DankButtonGroup {
-            id: buttonGroup
-            anchors.verticalCenter: parent.verticalCenter
-            selectionMode: "single"
-            onSelectionChanged: (index, selected) => root.selectionChanged(index, selected)
+        StyledText {
+            text: root.description
+            font.pixelSize: Theme.fontSizeSmall
+            color: Theme.surfaceVariantText
+            wrapMode: Text.WordWrap
+            width: parent.width
+            visible: root.description !== ""
+            horizontalAlignment: Text.AlignLeft
         }
+    }
+
+    DankButtonGroup {
+        id: buttonGroup
+        x: root.compact ? (root.width - width) / 2 : root.width - width - Theme.spacingM
+        y: root.compact ? textColumn.y + textColumn.implicitHeight + Theme.spacingS : (root.height - height) / 2
+        selectionMode: "single"
+        onSelectionChanged: (index, selected) => root.selectionChanged(index, selected)
     }
 }

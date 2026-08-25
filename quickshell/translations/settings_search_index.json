@@ -6009,7 +6009,9 @@
       "fonts",
       "modal",
       "motion",
+      "physics",
       "speed",
+      "spring",
       "sync",
       "text",
       "transition",
@@ -6029,8 +6031,10 @@
       "duration",
       "fonts",
       "motion",
+      "physics",
       "popout",
       "speed",
+      "spring",
       "sync",
       "text",
       "transition",
@@ -6047,19 +6051,25 @@
       "animate",
       "animation",
       "animations",
+      "based",
+      "bezier",
+      "curves",
       "custom",
       "duration",
       "durations",
       "fonts",
+      "geometric",
       "globally",
       "motion",
+      "physics",
       "scale",
       "speed",
+      "spring",
       "text",
       "transition",
       "typography"
     ],
-    "description": "Globally scale all animation durations"
+    "description": "Globally scale animation durations with geometric motion & spring based physics with bezier curves"
   },
   {
     "section": "animationSpeed",
@@ -6070,41 +6080,25 @@
       "animate",
       "animation",
       "animations",
+      "based",
+      "bezier",
+      "curves",
       "duration",
       "durations",
       "fonts",
+      "geometric",
       "globally",
       "motion",
+      "physics",
       "scale",
       "speed",
+      "spring",
       "text",
       "transition",
       "typography"
     ],
     "icon": "animation",
-    "description": "Globally scale all animation durations"
-  },
-  {
-    "section": "animationVariant",
-    "label": "Animation Style",
-    "tabIndex": 14,
-    "category": "Typography & Motion",
-    "keywords": [
-      "animate",
-      "animation",
-      "animations",
-      "dynamic",
-      "fluent",
-      "fonts",
-      "motion",
-      "slide",
-      "style",
-      "text",
-      "transition",
-      "typography",
-      "variant"
-    ],
-    "icon": "auto_awesome_motion"
+    "description": "Globally scale animation durations with geometric motion & spring based physics with bezier curves"
   },
   {
     "section": "modalCustomAnimationDuration",
@@ -6210,6 +6204,33 @@
     "description": "Select monospace font for process list and technical displays"
   },
   {
+    "section": "animationVariant",
+    "label": "Motion",
+    "tabIndex": 14,
+    "category": "Typography & Motion",
+    "keywords": [
+      "accessibility",
+      "animation",
+      "bounce",
+      "depth",
+      "directional",
+      "dynamic",
+      "effect",
+      "fluent",
+      "fonts",
+      "motion",
+      "physics",
+      "reduce",
+      "slide",
+      "spring",
+      "style",
+      "text",
+      "typography",
+      "variant"
+    ],
+    "icon": "auto_awesome_motion"
+  },
+  {
     "section": "motionEffect",
     "label": "Motion Effects",
     "tabIndex": 14,
@@ -6227,8 +6248,7 @@
       "spring",
       "text",
       "typography"
-    ],
-    "icon": "motion_photos_on"
+    ]
   },
   {
     "section": "fontFamily",
@@ -6247,6 +6267,46 @@
       "typography"
     ],
     "description": "Select the font family for UI text"
+  },
+  {
+    "section": "textRenderQuality",
+    "label": "Quality",
+    "tabIndex": 14,
+    "category": "Typography & Motion",
+    "keywords": [
+      "animation",
+      "fonts",
+      "level",
+      "motion",
+      "quality",
+      "render",
+      "text",
+      "typography"
+    ]
+  },
+  {
+    "section": "reduceMotion",
+    "label": "Reduce Motion",
+    "tabIndex": 14,
+    "category": "Typography & Motion",
+    "keywords": [
+      "accessibility",
+      "animation",
+      "driven",
+      "fonts",
+      "motion",
+      "physics",
+      "reduce",
+      "snap",
+      "spring",
+      "straight",
+      "target",
+      "text",
+      "travel",
+      "typography",
+      "without"
+    ],
+    "description": "Snap spring-driven motion straight to its target without physics travel"
   },
   {
     "section": "enableRippleEffects",
@@ -6274,6 +6334,22 @@
     ],
     "icon": "radio_button_unchecked",
     "description": "Show Material Design ripple animations on interactive elements"
+  },
+  {
+    "section": "springBounce",
+    "label": "Spring Motion",
+    "tabIndex": 14,
+    "category": "Typography & Motion",
+    "keywords": [
+      "animation",
+      "bounce",
+      "fonts",
+      "motion",
+      "physics",
+      "spring",
+      "text",
+      "typography"
+    ]
   },
   {
     "section": "syncComponentAnimationSpeeds",
@@ -6812,6 +6888,32 @@
       "wave"
     ],
     "description": "Use animated wave progress bars for media playback"
+  },
+  {
+    "section": "notificationAnimationSpeed",
+    "label": "Animation Speed",
+    "tabIndex": 17,
+    "category": "Notifications",
+    "keywords": [
+      "alert",
+      "alerts",
+      "animate",
+      "animation",
+      "animations",
+      "control",
+      "duration",
+      "history",
+      "messages",
+      "motion",
+      "notif",
+      "notification",
+      "notifications",
+      "popups",
+      "speed",
+      "toast",
+      "transition"
+    ],
+    "description": "Control animation duration for notification popups and history"
   },
   {
     "section": "notificationBodyFontSize",

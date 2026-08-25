@@ -33,7 +33,7 @@ PanelWindow {
     }
     readonly property int inlineExpandDuration: Theme.notificationInlineExpandDuration
     readonly property int inlineCollapseDuration: Theme.notificationInlineCollapseDuration
-    property bool inlineHeightAnimating: false
+    readonly property bool inlineHeightAnimating: heightSpring.running
 
     WindowBlur {
         targetWindow: win
@@ -211,7 +211,7 @@ PanelWindow {
         return basePopupHeight;
     }
     readonly property real targetAlignedHeight: Theme.px(Math.max(0, contentImplicitHeight), dpr)
-    property real renderedAlignedHeight: targetAlignedHeight
+    property real renderedAlignedHeight: heightSpring.value
     property real allocatedAlignedHeight: targetAlignedHeight
     readonly property bool inlineGeometryGrowing: targetAlignedHeight >= renderedAlignedHeight
     readonly property bool contentAnchorsTop: isTopCenter || SettingsData.notificationPopupPosition === SettingsData.Position.Top || SettingsData.notificationPopupPosition === SettingsData.Position.Left
@@ -229,8 +229,7 @@ PanelWindow {
             return;
 
         if (!_inlineGeometryReady) {
-            renderedHeightAnim.stop();
-            renderedAlignedHeight = target;
+            heightSpring.snapTo(target);
             allocatedAlignedHeight = target;
             _lastReportedAlignedHeight = target;
             return;
@@ -246,7 +245,7 @@ PanelWindow {
             return;
         }
 
-        renderedAlignedHeight = target;
+        heightSpring.retarget(target);
         if (connectedFrameMode)
             popupChromeGeometryChanged();
         if (inlineMotionDuration(target >= currentRendered) <= 0)
@@ -257,8 +256,7 @@ PanelWindow {
         const target = Math.max(0, Number(targetAlignedHeight));
         if (isNaN(target))
             return;
-        if (Math.abs(renderedAlignedHeight - target) >= 0.5)
-            renderedAlignedHeight = target;
+        heightSpring.snapTo(target);
         if (Math.abs(allocatedAlignedHeight - target) >= 0.5)
             allocatedAlignedHeight = target;
         _lastReportedAlignedHeight = renderedAlignedHeight;
@@ -273,15 +271,21 @@ PanelWindow {
             popupChromeGeometryChanged();
     }
 
-    Behavior on renderedAlignedHeight {
+    SpringMotion {
+        id: heightSpring
         enabled: !win.exiting && !win._isDestroying
-        NumberAnimation {
-            id: renderedHeightAnim
-            duration: win.inlineMotionDuration(win.inlineGeometryGrowing)
-            easing.type: Easing.BezierSpline
-            easing.bezierCurve: win.inlineGeometryGrowing ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
-            onRunningChanged: win.inlineHeightAnimating = running
-            onFinished: win.finishInlineHeightAnimation()
+        reducedMotion: win.inlineExpandDuration <= 0 && win.inlineCollapseDuration <= 0
+        positionEpsilon: 0.05
+        velocityEpsilon: 0.05
+        stiffness: Theme.springPreset("default", Math.max(win.inlineExpandDuration, win.inlineCollapseDuration)).stiffness
+        damping: Theme.springPreset("default", Math.max(win.inlineExpandDuration, win.inlineCollapseDuration)).damping
+        value: win.targetAlignedHeight
+
+        Component.onCompleted: snapTo(win.targetAlignedHeight)
+
+        onRunningChanged: {
+            if (!running)
+                Qt.callLater(() => win.finishInlineHeightAnimation());
         }
     }
 
@@ -291,8 +295,7 @@ PanelWindow {
         }
     }
     Component.onCompleted: {
-        renderedHeightAnim.stop();
-        renderedAlignedHeight = targetAlignedHeight;
+        heightSpring.snapTo(targetAlignedHeight);
         allocatedAlignedHeight = targetAlignedHeight;
         _inlineGeometryReady = true;
         _lastReportedAlignedHeight = renderedAlignedHeight;

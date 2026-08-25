@@ -195,7 +195,10 @@ Item {
 
     onFrameOwnsConnectedChromeChanged: _syncModalChromeState()
     onResolvedConnectedBarSideChanged: _queueFullSync()
-    onShouldBeVisibleChanged: _queueFullSync()
+    onShouldBeVisibleChanged: {
+        morph.retarget(shouldBeVisible ? 1 : 0);
+        _queueFullSync();
+    }
     // Low resource scalar writes: publish synchronously to stay in the same frame
     onAlignedXChanged: _syncModalBody()
     onAlignedYChanged: _syncModalBody()
@@ -301,7 +304,7 @@ Item {
 
     Timer {
         id: closeTimer
-        interval: Theme.variantCloseInterval(animationDuration)
+        interval: Math.max(Theme.variantCloseInterval(animationDuration), morph.settleDurationMs + 32)
         onTriggered: {
             if (shouldBeVisible)
                 return;
@@ -570,22 +573,22 @@ Item {
 
                 readonly property real computedScaleCollapsed: root.animationScaleCollapsed
 
-                QtObject {
+                // openProgress spring: 0 = collapsed, 1 = open.
+                SpringMotion {
                     id: morph
-                    property real openProgress: root.shouldBeVisible ? 1 : 0
-                    Behavior on openProgress {
-                        enabled: root.animationsEnabled
-                        NumberAnimation {
-                            duration: Theme.variantDuration(root.animationDuration, root.shouldBeVisible)
-                            easing.type: Easing.BezierSpline
-                            easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
-                        }
-                    }
+                    enabled: root.animationsEnabled
+                    reducedMotion: root.animationDuration <= 0
+                    positionEpsilon: 0.001
+                    velocityEpsilon: 0.001
+                    stiffness: Theme.springPreset("default", root.animationDuration).stiffness
+                    damping: Theme.springPreset("default", root.animationDuration).damping
+
+                    Component.onCompleted: snapTo(root.shouldBeVisible ? 1 : 0)
                 }
 
-                readonly property real animX: root.frozenMotionOffsetX * (1 - morph.openProgress)
-                readonly property real animY: root.frozenMotionOffsetY * (1 - morph.openProgress)
-                readonly property real scaleValue: computedScaleCollapsed + (1.0 - computedScaleCollapsed) * morph.openProgress
+                readonly property real animX: root.frozenMotionOffsetX * (1 - morph.value)
+                readonly property real animY: root.frozenMotionOffsetY * (1 - morph.value)
+                readonly property real scaleValue: computedScaleCollapsed + (1.0 - computedScaleCollapsed) * morph.value
 
                 onAnimXChanged: if (root.frameOwnsConnectedChrome)
                     root._syncModalAnim()

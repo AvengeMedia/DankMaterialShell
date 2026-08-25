@@ -109,7 +109,7 @@ Scope {
 
                 Timer {
                     id: closeTimer
-                    interval: Theme.expressiveDurations.expressiveDefaultSpatial + 120
+                    interval: Math.max(Theme.expressiveDurations.expressiveDefaultSpatial + 120, Math.round(morph.settleDurationMs) + 120)
                     onTriggered: {
                         root.visible = false;
                     }
@@ -149,64 +149,59 @@ Scope {
                     width: contentContainer.width
                     height: contentContainer.height
 
-                    Item {
-                        id: contentContainer
-                        width: childrenRect.width
-                        height: childrenRect.height
-                        transformOrigin: Item.Center
+                Item {
+                    id: contentContainer
+                    width: childrenRect.width
+                    height: childrenRect.height
+                    transformOrigin: Item.Center
 
-                        opacity: overviewScope.overviewOpen ? 1 : 0
-                        scale: overviewScope.overviewOpen ? 1 : Theme.effectScaleCollapsed
-                        x: {
-                            if (overviewScope.overviewOpen)
-                                return 0;
-                            if (Theme.isDepthEffect)
-                                return Theme.effectAnimOffset * 0.25;
-                            return 0;
-                        }
-                        y: {
-                            if (overviewScope.overviewOpen)
-                                return 0;
-                            if (Theme.isDirectionalEffect)
-                                return -Math.max(contentContainer.height * 0.8, Theme.effectAnimOffset * 1.1);
-                            if (Theme.isDepthEffect)
-                                return Math.max(Theme.effectAnimOffset * 0.85, 28);
-                            return Theme.effectAnimOffset;
-                        }
+                    readonly property var morphSpringParams: Theme.springPreset("expressive", Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, overviewScope.overviewOpen))
+                    readonly property real collapsedX: {
+                        if (Theme.isDepthEffect)
+                            return Theme.effectAnimOffset * 0.25;
+                        return 0;
+                    }
+                    readonly property real collapsedY: {
+                        if (Theme.isDirectionalEffect)
+                            return -Math.max(contentContainer.height * 0.8, Theme.effectAnimOffset * 1.1);
+                        if (Theme.isDepthEffect)
+                            return Math.max(Theme.effectAnimOffset * 0.85, 28);
+                        return Theme.effectAnimOffset;
+                    }
 
-                        Behavior on opacity {
-                            NumberAnimation {
-                                duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, overviewScope.overviewOpen)
-                                easing.type: Easing.BezierSpline
-                                easing.bezierCurve: overviewScope.overviewOpen ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
-                            }
-                        }
+                    SpringMotion {
+                        id: morph
+                        reducedMotion: Theme.springMotionDisabled
+                        positionEpsilon: 0.001
+                        velocityEpsilon: 0.001
+                        stiffness: contentContainer.morphSpringParams.stiffness
+                        damping: contentContainer.morphSpringParams.damping
+                        value: overviewScope.overviewOpen ? 1 : 0
 
-                        Behavior on scale {
-                            NumberAnimation {
-                                duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, overviewScope.overviewOpen)
-                                easing.type: Easing.BezierSpline
-                                easing.bezierCurve: overviewScope.overviewOpen ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
-                            }
-                        }
+                        Component.onCompleted: snapTo(overviewScope.overviewOpen ? 1 : 0)
+                    }
 
-                        Behavior on x {
-                            NumberAnimation {
-                                duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, overviewScope.overviewOpen)
-                                easing.type: Easing.BezierSpline
-                                easing.bezierCurve: overviewScope.overviewOpen ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
-                            }
+                    Connections {
+                        target: overviewScope
+                        function onOverviewOpenChanged() {
+                            morph.retarget(overviewScope.overviewOpen ? 1 : 0);
                         }
+                    }
 
-                        Behavior on y {
-                            NumberAnimation {
-                                duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, overviewScope.overviewOpen)
-                                easing.type: Easing.BezierSpline
-                                easing.bezierCurve: overviewScope.overviewOpen ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
-                            }
+                    opacity: overviewScope.overviewOpen ? 1 : 0
+                    scale: Theme.effectScaleCollapsed + (1.0 - Theme.effectScaleCollapsed) * morph.value
+                    x: collapsedX * (1 - morph.value)
+                    y: collapsedY * (1 - morph.value)
+
+                    Behavior on opacity {
+                        NumberAnimation {
+                            duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, overviewScope.overviewOpen)
+                            easing.type: Easing.BezierSpline
+                            easing.bezierCurve: overviewScope.overviewOpen ? Theme.variantModalEnterCurve : Theme.variantModalExitCurve
                         }
+                    }
 
-                        Loader {
+                    Loader {
                             id: overviewLoader
                             active: overviewScope.overviewOpen
                             asynchronous: false

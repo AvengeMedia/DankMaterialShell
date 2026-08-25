@@ -314,6 +314,7 @@ Item {
     }
 
     onAlignedYChanged: {
+        geometryYSpring.retarget(root.alignedY)
         if (shouldBeVisible)
             _setAnimatedSurfaceEnvelope();
         _kickBlurCommit();
@@ -351,7 +352,7 @@ Item {
         if (contentContainer && !shouldBeVisible) {
             // Snap morph closed only on a fresh open; on screen-change re-open we stay at 1
             // because shouldBeVisible doesn't change and won't drive morph back to 1.
-            morph.openProgress = 0;
+            morph.retarget(0);
         }
 
         _setSurfaceGeometry(alignedX, alignedY, alignedWidth, alignedHeight);
@@ -421,7 +422,7 @@ Item {
 
     Timer {
         id: closeTimer
-        interval: Theme.variantCloseInterval(animationDuration)
+        interval: Math.max(Theme.variantCloseInterval(animationDuration), morph.settleDurationMs + 32)
         onTriggered: {
             if (!shouldBeVisible) {
                 contentWindow.visible = false;
@@ -445,31 +446,38 @@ Item {
     readonly property real shadowBuffer: Theme.snap(shadowRenderPadding + shadowMotionPadding, dpr)
     readonly property real alignedWidth: Theme.px(popupWidth, dpr)
     readonly property real alignedHeight: Theme.px(popupHeight, dpr)
-    property real renderedAlignedY: alignedY
-    property real renderedAlignedHeight: alignedHeight
+    readonly property var _geometrySpringParams: Theme.springPreset("default", root.animationDuration)
+
+    SpringMotion {
+        id: geometryYSpring
+        enabled: root.animationsEnabled && contentWindow.visible && root.shouldBeVisible && !root._settlingToOpen
+        reducedMotion: root.animationDuration <= 0
+        positionEpsilon: 0.05
+        velocityEpsilon: 0.05
+        stiffness: root._geometrySpringParams.stiffness
+        damping: root._geometrySpringParams.damping
+        value: root.alignedY
+    }
+
+    SpringMotion {
+        id: geometryHSpring
+        enabled: root.animationsEnabled && contentWindow.visible && root.shouldBeVisible && !root._settlingToOpen
+        reducedMotion: root.animationDuration <= 0
+        positionEpsilon: 0.05
+        velocityEpsilon: 0.05
+        stiffness: root._geometrySpringParams.stiffness
+        damping: root._geometrySpringParams.damping
+        value: root.alignedHeight
+    }
+
+    property real renderedAlignedY: geometryYSpring.value
+    property real renderedAlignedHeight: geometryHSpring.value
     readonly property bool renderedGeometryGrowing: alignedHeight >= renderedAlignedHeight
     // Snap rendered geometry while the entrance morph runs so it doesn't ride a second animation.
-    readonly property bool _settlingToOpen: _fullHeight && shouldBeVisible && morphAnim.running
-
-    Behavior on renderedAlignedY {
-        enabled: root.animationsEnabled && contentWindow.visible && root.shouldBeVisible && !root._settlingToOpen
-        NumberAnimation {
-            duration: Theme.variantDuration(root.animationDuration, root.renderedGeometryGrowing)
-            easing.type: Easing.BezierSpline
-            easing.bezierCurve: root.renderedGeometryGrowing ? root.animationEnterCurve : root.animationExitCurve
-        }
-    }
-
-    Behavior on renderedAlignedHeight {
-        enabled: root.animationsEnabled && contentWindow.visible && root.shouldBeVisible && !root._settlingToOpen
-        NumberAnimation {
-            duration: Theme.variantDuration(root.animationDuration, root.renderedGeometryGrowing)
-            easing.type: Easing.BezierSpline
-            easing.bezierCurve: root.renderedGeometryGrowing ? root.animationEnterCurve : root.animationExitCurve
-        }
-    }
+    readonly property bool _settlingToOpen: _fullHeight && shouldBeVisible && morph.running
 
     onAlignedHeightChanged: {
+        geometryHSpring.retarget(root.alignedHeight)
         if (shouldBeVisible)
             _setAnimatedSurfaceEnvelope();
         _kickBlurCommit();
@@ -499,7 +507,7 @@ Item {
 
     Timer {
         id: surfaceSettleTimer
-        interval: Math.max(0, Theme.variantDuration(root.animationDuration, root.renderedGeometryGrowing) + 32)
+        interval: Math.max(Theme.variantDuration(root.animationDuration, root.renderedGeometryGrowing) + 32, geometryHSpring.settleDurationMs + 32)
         repeat: false
         onTriggered: root._setSettledSurfaceGeometry()
     }
@@ -655,7 +663,7 @@ Item {
             id: popoutBlur
             targetWindow: contentWindow
             readonly property real s: Math.min(1, contentContainer.scaleValue)
-            readonly property real op: Math.max(0, Math.min(1, (morph.openProgress - 0.08) * 1.6))
+            readonly property real op: Math.max(0, Math.min(1, (morph.value - 0.08) * 1.6))
             readonly property real visibleScale: s * op
             readonly property bool revealClipActive: root.fluidStandaloneActive
 
@@ -775,25 +783,23 @@ Item {
                 trackingEnabled: root.hoverDismissEnabled && root.shouldBeVisible
             }
 
-            // openProgress: 0 = closed (at offset, scaleCollapsed), 1 = open (at 0, scale 1).
-            QtObject {
+            // openProgress spring: 0 = collapsed, 1 = open.
+            SpringMotion {
                 id: morph
-                property real openProgress: 0
-                onOpenProgressChanged: root._kickBlurCommit()
-                Behavior on openProgress {
-                    enabled: root.animationsEnabled
-                    NumberAnimation {
-                        id: morphAnim
-                        duration: Theme.variantDuration(root.animationDuration, root.shouldBeVisible)
-                        easing.type: Easing.BezierSpline
-                        easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
-                    }
-                }
+                enabled: root.animationsEnabled
+                reducedMotion: root.animationDuration <= 0
+                positionEpsilon: 0.001
+                velocityEpsilon: 0.001
+                stiffness: root._geometrySpringParams.stiffness
+                damping: root._geometrySpringParams.damping
+                onValueChanged: root._kickBlurCommit()
+
+                Component.onCompleted: snapTo(root.shouldBeVisible ? 1 : 0)
             }
 
-            readonly property real animX: contentContainer.offsetX * (1 - morph.openProgress)
-            readonly property real animY: contentContainer.offsetY * (1 - morph.openProgress)
-            readonly property real scaleValue: contentContainer.computedScaleCollapsed + (1.0 - contentContainer.computedScaleCollapsed) * morph.openProgress
+            readonly property real animX: contentContainer.offsetX * (1 - morph.value)
+            readonly property real animY: contentContainer.offsetY * (1 - morph.value)
+            readonly property real scaleValue: contentContainer.computedScaleCollapsed + (1.0 - contentContainer.computedScaleCollapsed) * morph.value
             readonly property real clampedAnimX: Math.max(-width, Math.min(animX, width))
             readonly property real clampedAnimY: Math.max(-height, Math.min(animY, height))
             readonly property real revealWidth: {
@@ -817,12 +823,10 @@ Item {
             readonly property real revealX: root.fluidStandaloneActive && barRight ? Theme.snap(width - revealWidth, root.dpr) : 0
             readonly property real revealY: root.fluidStandaloneActive && barBottom ? Theme.snap(height - revealHeight, root.dpr) : 0
 
-            Component.onCompleted: morph.openProgress = root.shouldBeVisible ? 1 : 0
-
             Connections {
                 target: root
                 function onShouldBeVisibleChanged() {
-                    morph.openProgress = root.shouldBeVisible ? 1 : 0;
+                    morph.retarget(root.shouldBeVisible ? 1 : 0);
                 }
             }
 

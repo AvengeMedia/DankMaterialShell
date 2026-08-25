@@ -587,25 +587,40 @@ Item {
                         return 0;
                     }
 
+                    readonly property var shiftSpringParams: Theme.springPreset("fast", 150)
+
+                    SpringMotion {
+                        id: shiftXSpring
+                        enabled: !root.suppressShiftAnimation
+                        positionEpsilon: 0.05
+                        velocityEpsilon: 0.05
+                        stiffness: delegateItem.shiftSpringParams.stiffness
+                        damping: delegateItem.shiftSpringParams.damping
+                        value: delegateItem.shiftOffset
+
+                        Component.onCompleted: snapTo(delegateItem.shiftOffset)
+                    }
+
+                    SpringMotion {
+                        id: shiftYSpring
+                        enabled: !root.suppressShiftAnimation
+                        positionEpsilon: 0.05
+                        velocityEpsilon: 0.05
+                        stiffness: delegateItem.shiftSpringParams.stiffness
+                        damping: delegateItem.shiftSpringParams.damping
+                        value: delegateItem.shiftOffset
+
+                        Component.onCompleted: snapTo(delegateItem.shiftOffset)
+                    }
+
+                    onShiftOffsetChanged: {
+                        shiftXSpring.retarget(shiftOffset);
+                        shiftYSpring.retarget(shiftOffset);
+                    }
+
                     transform: Translate {
-                        x: root.isVertical ? 0 : delegateItem.shiftOffset
-                        y: root.isVertical ? delegateItem.shiftOffset : 0
-
-                        Behavior on x {
-                            enabled: !root.suppressShiftAnimation
-                            NumberAnimation {
-                                duration: 150
-                                easing.type: Easing.OutCubic
-                            }
-                        }
-
-                        Behavior on y {
-                            enabled: !root.suppressShiftAnimation
-                            NumberAnimation {
-                                duration: 150
-                                easing.type: Easing.OutCubic
-                            }
-                        }
+                        x: root.isVertical ? 0 : shiftXSpring.value
+                        y: root.isVertical ? shiftYSpring.value : 0
                     }
 
                     Rectangle {

@@ -54,7 +54,7 @@ PanelWindow {
         if (hoverDismissSuspended)
             return;
         hoverDismissEnabled = false;
-        slideAnimation.duration = Math.round(Theme.expressiveDurations.expressiveDefaultSpatial);
+        slideContainer.slideSlowExit = true;
         hide();
     }
 
@@ -113,6 +113,7 @@ PanelWindow {
 
     readonly property real dpr: CompositorService.getScreenScale(root.screen)
     readonly property real alignedWidth: Theme.px(expandable && expandedWidth ? expandedWidthValue : slideoutWidth, dpr)
+    onAlignedWidthChanged: widthSpring.retarget(alignedWidth)
     readonly property real alignedHeight: Theme.px(modelData ? modelData.height : 800, dpr)
     readonly property real alignedEdgeGap: Theme.px(edgeGap, dpr)
     readonly property real slideoutSlideSnapX: Theme.snap(slideContainer.slideOffset, dpr)
@@ -136,39 +137,54 @@ PanelWindow {
         anchors.bottomMargin: root.alignedEdgeGap
         anchors.rightMargin: root.alignedEdgeGap
         anchors.leftMargin: root.alignedEdgeGap
-        width: root.alignedWidth
-        height: root.alignedHeight - root.alignedEdgeGap * 2
 
-        property real slideOffset: root.slideFromLeft ? -root.alignedWidth : root.alignedWidth
+        property bool slideSlowExit: false
+        readonly property var slideSpringParams: Theme.springPreset("default", slideSlowExit ? Math.round(Theme.expressiveDurations.expressiveDefaultSpatial) : 450)
+        readonly property var widthSpringParams: Theme.springPreset("default", Theme.popoutAnimationDuration)
+
+        SpringMotion {
+            id: slideSpring
+            reducedMotion: false
+            positionEpsilon: 0.05
+            velocityEpsilon: 0.05
+            stiffness: slideContainer.slideSpringParams.stiffness
+            damping: slideContainer.slideSpringParams.damping
+            value: root.slideFromLeft ? -root.alignedWidth : root.alignedWidth
+
+            Component.onCompleted: snapTo(root.slideFromLeft ? -root.alignedWidth : root.alignedWidth)
+
+            onRunningChanged: {
+                if (running)
+                    return;
+                if (!root.isVisible)
+                    root.mappedVisible = false;
+                slideContainer.slideSlowExit = false;
+            }
+        }
+
+        SpringMotion {
+            id: widthSpring
+            enabled: root.expandable
+            reducedMotion: Theme.popoutAnimationDuration <= 0
+            positionEpsilon: 0.05
+            velocityEpsilon: 0.05
+            stiffness: slideContainer.widthSpringParams.stiffness
+            damping: slideContainer.widthSpringParams.damping
+            value: root.alignedWidth
+
+            Component.onCompleted: snapTo(root.alignedWidth)
+        }
+
+        property real slideOffset: slideSpring.value
+
+        width: widthSpring.value
+        height: root.alignedHeight - root.alignedEdgeGap * 2
 
         Connections {
             target: root
             function onIsVisibleChanged() {
-                slideContainer.slideOffset = root.isVisible ? 0 : (root.slideFromLeft ? -slideContainer.width : slideContainer.width);
-            }
-        }
-
-        Behavior on slideOffset {
-            NumberAnimation {
-                id: slideAnimation
-                duration: 450
-                easing.type: Easing.OutCubic
-
-                onRunningChanged: {
-                    if (!running) {
-                        if (!root.isVisible)
-                            root.mappedVisible = false;
-                        slideAnimation.duration = 450;
-                    }
-                }
-            }
-        }
-
-        Behavior on width {
-            enabled: root.expandable
-            NumberAnimation {
-                duration: Theme.popoutAnimationDuration
-                easing.type: Easing.OutCubic
+                const target = root.isVisible ? 0 : (root.slideFromLeft ? -slideContainer.width : slideContainer.width);
+                slideSpring.retarget(target);
             }
         }
 

@@ -18,6 +18,48 @@ Item {
     property real contentOriginY: 0
     property real contentScale: 0
 
+    readonly property var geometrySpringParams: Theme.springPreset("expressive", Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, overviewOpen))
+
+    SpringMotion {
+        id: xSpring
+        reducedMotion: Theme.springMotionDisabled
+        positionEpsilon: 0.05
+        velocityEpsilon: 0.05
+        stiffness: root.geometrySpringParams.stiffness
+        damping: root.geometrySpringParams.damping
+        value: root.initX
+    }
+
+    SpringMotion {
+        id: ySpring
+        reducedMotion: Theme.springMotionDisabled
+        positionEpsilon: 0.05
+        velocityEpsilon: 0.05
+        stiffness: root.geometrySpringParams.stiffness
+        damping: root.geometrySpringParams.damping
+        value: root.initY
+    }
+
+    SpringMotion {
+        id: widthSpring
+        reducedMotion: Theme.springMotionDisabled
+        positionEpsilon: 0.05
+        velocityEpsilon: 0.05
+        stiffness: root.geometrySpringParams.stiffness
+        damping: root.geometrySpringParams.damping
+        value: root.targetWindowWidth
+    }
+
+    SpringMotion {
+        id: heightSpring
+        reducedMotion: Theme.springMotionDisabled
+        positionEpsilon: 0.05
+        velocityEpsilon: 0.05
+        stiffness: root.geometrySpringParams.stiffness
+        damping: root.geometrySpringParams.damping
+        value: root.targetWindowHeight
+    }
+
     readonly property var windowData: toplevel?.lastIpcObject || null
     readonly property var monitorObj: toplevel?.monitor
     readonly property var monitorData: monitorObj?.lastIpcObject || null
@@ -51,41 +93,17 @@ Item {
     property var iconPath: Paths.getAppIcon(windowData?.class ?? "", entry) || Quickshell.iconPath("application-x-executable", "image-missing")
     property bool compactMode: Theme.fontSizeSmall * 4 > targetWindowHeight || Theme.fontSizeSmall * 4 > targetWindowWidth
 
-    x: initX
-    y: initY
-    width: targetWindowWidth
-    height: targetWindowHeight
+    x: xSpring.value
+    y: ySpring.value
+    width: widthSpring.value
+    height: heightSpring.value
     visible: intersectsViewport
     opacity: (monitorObj?.id ?? -1) == widgetMonitorId ? 1 : 0.4
 
-    Behavior on x {
-        NumberAnimation {
-            duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, overviewOpen)
-            easing.type: Easing.BezierSpline
-            easing.bezierCurve: Theme.variantModalEnterCurve
-        }
-    }
-    Behavior on y {
-        NumberAnimation {
-            duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, overviewOpen)
-            easing.type: Easing.BezierSpline
-            easing.bezierCurve: Theme.variantModalEnterCurve
-        }
-    }
-    Behavior on width {
-        NumberAnimation {
-            duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, overviewOpen)
-            easing.type: Easing.BezierSpline
-            easing.bezierCurve: Theme.variantModalEnterCurve
-        }
-    }
-    Behavior on height {
-        NumberAnimation {
-            duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, overviewOpen)
-            easing.type: Easing.BezierSpline
-            easing.bezierCurve: Theme.variantModalEnterCurve
-        }
-    }
+    onInitXChanged: xSpring.retarget(initX)
+    onInitYChanged: ySpring.retarget(initY)
+    onTargetWindowWidthChanged: widthSpring.retarget(targetWindowWidth)
+    onTargetWindowHeightChanged: heightSpring.retarget(targetWindowHeight)
 
     ClippingRectangle {
         anchors.fill: parent
@@ -117,26 +135,37 @@ Item {
                     property var iconSize: {
                         return Math.min(targetWindowWidth, targetWindowHeight) * (root.compactMode ? root.iconToWindowRatioCompact : root.iconToWindowRatio) / (root.monitorData?.scale ?? 1);
                     }
+
+                    SpringMotion {
+                        id: iconWidthSpring
+                        reducedMotion: Theme.springMotionDisabled
+                        positionEpsilon: 0.05
+                        velocityEpsilon: 0.05
+                        stiffness: root.geometrySpringParams.stiffness
+                        damping: root.geometrySpringParams.damping
+                        value: windowIcon.iconSize
+                    }
+
+                    SpringMotion {
+                        id: iconHeightSpring
+                        reducedMotion: Theme.springMotionDisabled
+                        positionEpsilon: 0.05
+                        velocityEpsilon: 0.05
+                        stiffness: root.geometrySpringParams.stiffness
+                        damping: root.geometrySpringParams.damping
+                        value: windowIcon.iconSize
+                    }
+
+                    onIconSizeChanged: {
+                        iconWidthSpring.retarget(iconSize);
+                        iconHeightSpring.retarget(iconSize);
+                    }
+
                     Layout.alignment: Qt.AlignHCenter
                     source: root.iconPath
-                    width: iconSize
-                    height: iconSize
+                    width: iconWidthSpring.value
+                    height: iconHeightSpring.value
                     sourceSize: Qt.size(iconSize, iconSize)
-
-                    Behavior on width {
-                        NumberAnimation {
-                            duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, overviewOpen)
-                            easing.type: Easing.BezierSpline
-                            easing.bezierCurve: Theme.variantModalEnterCurve
-                        }
-                    }
-                    Behavior on height {
-                        NumberAnimation {
-                            duration: Theme.variantDuration(Theme.expressiveDurations.expressiveDefaultSpatial, overviewOpen)
-                            easing.type: Easing.BezierSpline
-                            easing.bezierCurve: Theme.variantModalEnterCurve
-                        }
-                    }
                 }
             }
         }

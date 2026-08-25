@@ -163,8 +163,8 @@ Item {
             return;
         }
 
-        const presented = dock.geometryReady && (hostWindow?.visible ?? true) && (dock.reveal || slideXAnimation.running || slideYAnimation.running) && dock.hasApps;
-        const phase = !presented ? "hidden" : ((!dock.reveal && (slideXAnimation.running || slideYAnimation.running)) ? "closing" : ((slideXAnimation.running || slideYAnimation.running) ? "opening" : "open"));
+        const presented = dock.geometryReady && (hostWindow?.visible ?? true) && (dock.reveal || slideXSpring.running || slideYSpring.running) && dock.hasApps;
+        const phase = !presented ? "hidden" : ((!dock.reveal && (slideXSpring.running || slideYSpring.running)) ? "closing" : ((slideXSpring.running || slideYSpring.running) ? "opening" : "open"));
         const bodyX = dock._dockWindowOriginX() + dockBackground.x + dockContainer.x + dockMouseArea.x + dockCore.x;
         const bodyY = dock._dockWindowOriginY() + dockBackground.y + dockContainer.y + dockMouseArea.y + dockCore.y;
         const bodyW = dock.hasApps ? dockBackground.width : 0;
@@ -219,6 +219,32 @@ Item {
     DeferredAction {
         id: dockChromeSync
         onTriggered: dock._syncDockChromeState()
+    }
+
+    readonly property var slideSpringParams: dock.usesConnectedFrameChrome ? Theme.springPreset("default", Theme.variantDuration(Theme.popoutAnimationDuration, dock.reveal)) : Theme.springPreset("fast", Theme.shortDuration)
+
+    SpringMotion {
+        id: slideXSpring
+        positionEpsilon: 0.05
+        velocityEpsilon: 0.05
+        stiffness: dock.slideSpringParams.stiffness
+        damping: dock.slideSpringParams.damping
+        value: dockSlide.targetX
+
+        onRunningChanged: if (!running)
+            dock._syncDockChromeState()
+    }
+
+    SpringMotion {
+        id: slideYSpring
+        positionEpsilon: 0.05
+        velocityEpsilon: 0.05
+        stiffness: dock.slideSpringParams.stiffness
+        damping: dock.slideSpringParams.damping
+        value: dockSlide.targetY
+
+        onRunningChanged: if (!running)
+            dock._syncDockChromeState()
     }
 
     property bool contextMenuOpen: (dock.contextMenu && dock.contextMenu.visible && dock.contextMenu.screen === modelData)
@@ -629,7 +655,8 @@ Item {
 
                 transform: Translate {
                     id: dockSlide
-                    x: {
+
+                    readonly property real targetX: {
                         if (!dock.isVertical)
                             return 0;
                         if (dock.reveal)
@@ -645,7 +672,7 @@ Item {
                             return -hideDistance;
                         }
                     }
-                    y: {
+                    readonly property real targetY: {
                         if (dock.isVertical)
                             return 0;
                         if (dock.reveal)
@@ -662,27 +689,11 @@ Item {
                         }
                     }
 
-                    Behavior on x {
-                        NumberAnimation {
-                            id: slideXAnimation
-                            duration: dock.usesConnectedFrameChrome ? Theme.variantDuration(Theme.popoutAnimationDuration, dock.reveal) : Theme.shortDuration
-                            easing.type: dock.usesConnectedFrameChrome ? Easing.BezierSpline : Easing.OutCubic
-                            easing.bezierCurve: dock.usesConnectedFrameChrome ? (dock.reveal ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve) : []
-                            onRunningChanged: if (!running)
-                                dock._syncDockChromeState()
-                        }
-                    }
+                    x: slideXSpring.value
+                    y: slideYSpring.value
 
-                    Behavior on y {
-                        NumberAnimation {
-                            id: slideYAnimation
-                            duration: dock.usesConnectedFrameChrome ? Theme.variantDuration(Theme.popoutAnimationDuration, dock.reveal) : Theme.shortDuration
-                            easing.type: dock.usesConnectedFrameChrome ? Easing.BezierSpline : Easing.OutCubic
-                            easing.bezierCurve: dock.usesConnectedFrameChrome ? (dock.reveal ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve) : []
-                            onRunningChanged: if (!running)
-                                dock._syncDockChromeState()
-                        }
-                    }
+                    onTargetXChanged: slideXSpring.retarget(targetX)
+                    onTargetYChanged: slideYSpring.retarget(targetY)
 
                     onXChanged: dock._queueSlideSync()
                     onYChanged: dock._queueSlideSync()

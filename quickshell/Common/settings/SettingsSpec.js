@@ -90,6 +90,8 @@ var SPEC = {
     popoutCustomAnimationDuration: { def: 150 },
     modalAnimationSpeed: { def: 1 },
     modalCustomAnimationDuration: { def: 150 },
+    reduceMotion: { def: false },
+    springBounce: { def: 1 },
     enableRippleEffects: { def: true },
     animationVariant: { def: 0 },
     motionEffect: { def: 0 },

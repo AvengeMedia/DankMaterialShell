@@ -160,7 +160,7 @@ Item {
 
     Timer {
         id: closeTimer
-        interval: animationDuration + 50
+        interval: Math.max(animationDuration + 50, morph.settleDurationMs + 50)
         onTriggered: {
             if (shouldBeVisible)
                 return;
@@ -210,7 +210,10 @@ Item {
     onAlignedYChanged: _kickBlurCommit()
     onAlignedWidthChanged: _kickBlurCommit()
     onAlignedHeightChanged: _kickBlurCommit()
-    onShouldBeVisibleChanged: _kickBlurCommit()
+    onShouldBeVisibleChanged: {
+        morph.retarget(shouldBeVisible ? 1 : 0);
+        _kickBlurCommit();
+    }
 
     PanelWindow {
         id: clickCatcher
@@ -255,7 +258,7 @@ Item {
         WindowBlur {
             targetWindow: contentWindow
             readonly property real s: Math.min(1, modalContainer.scaleValue)
-            readonly property real op: Math.max(0, Math.min(1, (morph.openProgress - 0.06) * 2))
+            readonly property real op: Math.max(0, Math.min(1, (morph.value - 0.06) * 2))
             readonly property real visibleScale: s * op
             // Blur tracks the surface's scaled rect, matching the connected backend.
             blurX: modalContainer.x + modalContainer.width * (1 - visibleScale) * 0.5 + Theme.snap(modalContainer.animX, root.dpr)
@@ -347,23 +350,23 @@ Item {
             readonly property real offsetX: slide ? 15 : 0
             readonly property real offsetY: slide ? -30 : root.animationOffset
 
-            // openProgress: 0 = closed (at offset, scaleCollapsed), 1 = open (at 0, scale 1).
-            QtObject {
+            // openProgress spring: 0 = collapsed, 1 = open.
+            SpringMotion {
                 id: morph
-                property real openProgress: root.shouldBeVisible ? 1 : 0
-                onOpenProgressChanged: root._kickBlurCommit()
-                Behavior on openProgress {
-                    enabled: root.animationsEnabled
-                    DankAnim {
-                        duration: root.animationDuration
-                        easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
-                    }
-                }
+                enabled: root.animationsEnabled
+                reducedMotion: root.animationDuration <= 0
+                positionEpsilon: 0.001
+                velocityEpsilon: 0.001
+                stiffness: Theme.springPreset("default", root.animationDuration).stiffness
+                damping: Theme.springPreset("default", root.animationDuration).damping
+                onValueChanged: root._kickBlurCommit()
+
+                Component.onCompleted: snapTo(root.shouldBeVisible ? 1 : 0)
             }
 
-            readonly property real animX: modalContainer.offsetX * (1 - morph.openProgress)
-            readonly property real animY: modalContainer.offsetY * (1 - morph.openProgress)
-            readonly property real scaleValue: root.animationScaleCollapsed + (1.0 - root.animationScaleCollapsed) * morph.openProgress
+            readonly property real animX: modalContainer.offsetX * (1 - morph.value)
+            readonly property real animY: modalContainer.offsetY * (1 - morph.value)
+            readonly property real scaleValue: root.animationScaleCollapsed + (1.0 - root.animationScaleCollapsed) * morph.value
 
             Item {
                 id: contentContainer

@@ -489,7 +489,7 @@ Item {
 
     Timer {
         id: closeCleanupTimer
-        interval: Theme.variantCloseInterval(root.launcherAnimationDuration)
+        interval: Math.max(Theme.variantCloseInterval(root.launcherAnimationDuration), morph.settleDurationMs + 32)
         repeat: false
         onTriggered: {
             isClosing = false;
@@ -744,21 +744,29 @@ Item {
                 return -Math.max((root.shadowPad || 0) + Theme.effectAnimOffset, 40);
             }
 
-            QtObject {
+            // openProgress spring: 0 = collapsed, 1 = emerged.
+            SpringMotion {
                 id: morph
-                property real openProgress: root._motionActive ? 1 : 0
-                Behavior on openProgress {
-                    enabled: root.animationsEnabled
-                    DankAnim {
-                        duration: Theme.variantDuration(root.launcherAnimationDuration, root._motionActive)
-                        easing.bezierCurve: root._motionActive ? root.launcherEnterCurve : root.launcherExitCurve
-                    }
+                enabled: root.animationsEnabled
+                reducedMotion: root.launcherAnimationDuration <= 0
+                positionEpsilon: 0.001
+                velocityEpsilon: 0.001
+                stiffness: Theme.springPreset("default", root.launcherAnimationDuration).stiffness
+                damping: Theme.springPreset("default", root.launcherAnimationDuration).damping
+
+                Component.onCompleted: snapTo(root._motionActive ? 1 : 0)
+            }
+
+            Connections {
+                target: root
+                function on_motionActiveChanged() {
+                    morph.retarget(root._motionActive ? 1 : 0);
                 }
             }
 
-            readonly property real animX: root._frozenMotionX * (1 - morph.openProgress)
-            readonly property real animY: root._frozenMotionY * (1 - morph.openProgress)
-            readonly property real scaleValue: Theme.effectScaleCollapsed + (1.0 - Theme.effectScaleCollapsed) * morph.openProgress
+            readonly property real animX: root._frozenMotionX * (1 - morph.value)
+            readonly property real animY: root._frozenMotionY * (1 - morph.value)
+            readonly property real scaleValue: Theme.effectScaleCollapsed + (1.0 - Theme.effectScaleCollapsed) * morph.value
 
             onAnimXChanged: if (root.frameOwnsConnectedChrome)
                 root._queueAnimSync()

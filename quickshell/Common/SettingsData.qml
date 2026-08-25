@@ -246,6 +246,10 @@ Singleton {
     property int popoutCustomAnimationDuration: 150
     property int modalAnimationSpeed: SettingsData.AnimationSpeed.Short
     property int modalCustomAnimationDuration: 150
+    property bool reduceMotion: false
+    onReduceMotionChanged: saveSettings()
+    property int springBounce: 1
+    onSpringBounceChanged: saveSettings()
     property bool enableRippleEffects: true
     onEnableRippleEffectsChanged: saveSettings()
     property int animationVariant: SettingsData.AnimationVariant.Material

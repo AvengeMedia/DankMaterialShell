@@ -341,16 +341,9 @@ Item {
                     spacing: Theme.spacingS
                     visible: SessionService.hibernateSupported
 
-                    StyledText {
-                        text: I18n.tr("Suspend behavior")
-                        font.pixelSize: Theme.fontSizeMedium
-                        color: Theme.surfaceText
-                        leftPadding: Theme.spacingM
-                    }
-
-                    DankButtonGroup {
+                    SettingsButtonGroupRow {
                         id: suspendBehaviorSelector
-                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: I18n.tr("Suspend behavior")
                         model: [I18n.tr("Suspend"), I18n.tr("Hibernate"), I18n.tr("Suspend then Hibernate")]
                         selectionMode: "single"
                         checkEnabled: false

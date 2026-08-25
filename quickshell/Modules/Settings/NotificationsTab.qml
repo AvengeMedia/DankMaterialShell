@@ -362,42 +362,17 @@ Item {
                         anchors.topMargin: Theme.spacingM
                         spacing: Theme.spacingS
 
-                        StyledText {
+                        SettingsButtonGroupRow {
+                            settingKey: "notificationAnimationSpeed"
+                            tags: ["notification", "animation", "speed", "duration"]
                             text: I18n.tr("Animation Speed")
-                            font.pixelSize: Theme.fontSizeMedium
-                            font.weight: Font.Medium
-                            color: Theme.surfaceText
-                            width: parent.width
-                        }
-
-                        StyledText {
-                            text: I18n.tr("Control animation duration for notification popups and history")
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceVariantText
-                            wrapMode: Text.WordWrap
-                            width: parent.width
-                        }
-
-                        DankButtonGroup {
-                            id: notificationSpeedGroup
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            buttonPadding: parent.width < 480 ? Theme.spacingS : Theme.spacingM
-                            minButtonWidth: parent.width < 480 ? 44 : 56
-                            textSize: parent.width < 480 ? Theme.fontSizeSmall : Theme.fontSizeMedium
+                            description: I18n.tr("Control animation duration for notification popups and history")
                             model: [I18n.tr("None"), I18n.tr("Short"), I18n.tr("Medium"), I18n.tr("Long"), I18n.tr("Custom")]
-                            selectionMode: "single"
                             currentIndex: SettingsData.notificationAnimationSpeed
                             onSelectionChanged: (index, selected) => {
                                 if (!selected)
                                     return;
                                 SettingsData.set("notificationAnimationSpeed", index);
-                            }
-
-                            Connections {
-                                target: SettingsData
-                                function onNotificationAnimationSpeedChanged() {
-                                    notificationSpeedGroup.currentIndex = SettingsData.notificationAnimationSpeed;
-                                }
                             }
                         }
 

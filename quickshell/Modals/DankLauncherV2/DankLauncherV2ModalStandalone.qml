@@ -260,7 +260,7 @@ Item {
 
     Timer {
         id: closeCleanupTimer
-        interval: Theme.modalAnimationDuration + 50
+        interval: Math.max(Theme.modalAnimationDuration + 50, Math.round(morph.settleDurationMs) + 32)
         repeat: false
         onTriggered: {
             isClosing = false;
@@ -474,11 +474,27 @@ Item {
             }
 
             property bool _renderActive: contentVisible
-            property real publishedScale: contentVisible ? 1 : 0.96
             property real publishedOpacity: contentVisible ? 1 : 0
+            readonly property var emergeSpringParams: Theme.springPreset("default", Theme.modalAnimationDuration)
 
+            // emerge morph spring: 0 = collapsed, 1 = emerged. Drives scale only;
+            // opacity and publishedOpacity stay on eased curves.
+            SpringMotion {
+                id: morph
+                reducedMotion: Theme.modalAnimationDuration <= 0
+                positionEpsilon: 0.001
+                velocityEpsilon: 0.001
+                stiffness: modalContainer.emergeSpringParams.stiffness
+                damping: modalContainer.emergeSpringParams.damping
+                value: root.contentVisible ? 1 : 0
+
+                Component.onCompleted: snapTo(root.contentVisible ? 1 : 0)
+            }
+
+            property real publishedScale: 0.96 + 0.04 * morph.value
+            scale: publishedScale
             opacity: contentVisible ? 1 : 0
-            scale: contentVisible ? 1 : 0.96
+
             transformOrigin: Item.Center
             onOpacityChanged: root._kickBlurCommit()
             onPublishedScaleChanged: root._kickBlurCommit()
@@ -490,22 +506,6 @@ Item {
                     easing.bezierCurve: contentVisible ? Theme.expressiveCurves.expressiveDefaultSpatial : Theme.expressiveCurves.emphasized
                     onRunningChanged: if (!running && !root.contentVisible)
                         modalContainer._renderActive = false
-                }
-            }
-
-            Behavior on scale {
-                NumberAnimation {
-                    easing.type: Easing.BezierSpline
-                    duration: Theme.modalAnimationDuration
-                    easing.bezierCurve: contentVisible ? Theme.expressiveCurves.expressiveDefaultSpatial : Theme.expressiveCurves.emphasized
-                }
-            }
-
-            Behavior on publishedScale {
-                NumberAnimation {
-                    easing.type: Easing.BezierSpline
-                    duration: Theme.modalAnimationDuration
-                    easing.bezierCurve: contentVisible ? Theme.expressiveCurves.expressiveDefaultSpatial : Theme.expressiveCurves.emphasized
                 }
             }
 
@@ -522,6 +522,7 @@ Item {
                 function onContentVisibleChanged() {
                     if (root.contentVisible)
                         modalContainer._renderActive = true;
+                    morph.retarget(root.contentVisible ? 1 : 0);
                 }
             }
 

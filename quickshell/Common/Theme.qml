@@ -1009,6 +1009,34 @@ Singleton {
         };
     }
 
+    // Expressive spatial spring presets ([stiffness, damping], unit mass) tuned to a
+    // 500ms reference transition; runtime values scale via springPreset().
+    readonly property var springSpecs: {
+        "expressive": [560, 37],
+        "fast": [220, 23],
+        "default": [100, 16]
+    }
+
+    // Damping multipliers for the user-facing spring bounce setting:
+    // crisp settles without overshoot, playful adds visible bounce.
+    readonly property var springDampingScales: [1.22, 1.0, 0.82]
+
+    function tunedSpring(spec, baseDuration) {
+        const f = Math.max(0.05, baseDuration / 500);
+        const bounce = typeof SettingsData !== "undefined" && SettingsData.springBounce >= 0 && SettingsData.springBounce < springDampingScales.length ? springDampingScales[Math.round(SettingsData.springBounce)] : 1;
+        return {
+            "stiffness": spec[0] / (f * f),
+            "damping": spec[1] / f * bounce,
+            "mass": 1
+        };
+    }
+
+    function springPreset(name, baseDuration) {
+        return tunedSpring(springSpecs[name] ?? springSpecs["default"], baseDuration);
+    }
+
+    readonly property bool springMotionDisabled: currentAnimationBaseDuration <= 0
+
     readonly property int notificationAnimationBaseDuration: {
         if (typeof SettingsData === "undefined")
             return 200;
