@@ -362,7 +362,10 @@ Rectangle {
                                         return BatteryService.bluetoothDevices.find(dev => dev.name === name || dev.name.toLowerCase().includes(name.toLowerCase()) || name.toLowerCase().includes(dev.name.toLowerCase()));
                                     }
                                     text: {
-                                        if (pairedDelegate.modelData.batteryAvailable && pairedDelegate.modelData.battery > 0)
+                                        // A reported 0% is valid; batteryAvailable distinguishes missing data.
+                                        // https://quickshell.org/docs/v0.3.1/types/Quickshell.Bluetooth/BluetoothDevice/
+                                        // https://bluez.readthedocs.io/en/latest/battery-api/
+                                        if (pairedDelegate.modelData.batteryAvailable)
                                             return "• " + Math.round(pairedDelegate.modelData.battery * 100) + "%";
                                         if (btBattery)
                                             return "• " + btBattery.percentage + "%";
