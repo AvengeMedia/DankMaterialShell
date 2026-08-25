@@ -44,14 +44,17 @@ Item {
     readonly property real edgeInset: Theme.snap(Math.max(0, root.edgeInsetRaw < 0 ? root.edgeBaseMargin : root.edgeInsetRaw), root.screenScale)
 
     readonly property bool bottomEdge: SettingsData.dankIslandEdge === "bottom"
-    readonly property real rowInset: Theme.snap(Math.max(0, (root.controller.compactFaceHeight - root.barThickness) / 2), root.screenScale)
-    readonly property real rowY: root.bottomEdge ? root.height - root.outerGap - root.rowInset - root.barThickness : root.outerGap + root.rowInset
+    readonly property real stripHeight: root.hostWindow?.reservedStripHeight ?? (root.outerGap + root.barThickness)
+    readonly property real rowY: {
+        const centered = Theme.snap((root.stripHeight - root.barThickness) / 2, root.screenScale);
+        return root.bottomEdge ? root.height - root.stripHeight + centered : centered;
+    }
     readonly property bool backgroundEnabled: SettingsData.dankIslandSatelliteBackground
     readonly property bool spanEdges: root.edgeAligned || root.backgroundEnabled
     readonly property real chromePad: Theme.snap(root.innerPadding + Theme.spacingXS, root.screenScale)
     readonly property real chromeInset: root.backgroundEnabled ? root.chromePad : 0
-    readonly property real chromeY: root.bottomEdge ? root.rowY : 0
-    readonly property real chromeHeight: root.bottomEdge ? root.height - root.rowY : root.rowY + root.barThickness
+    readonly property real chromeY: root.bottomEdge ? root.height - root.stripHeight : 0
+    readonly property real chromeHeight: root.stripHeight
     readonly property real crossEdgeExtension: root.spanEdges ? (root.bottomEdge ? root.height - root.rowY - root.barThickness : root.rowY) : 0
     readonly property bool gothCorners: SettingsData.dankIslandSatelliteGothCorners
     readonly property real chromeOpacity: Math.max(0, Math.min(1, SettingsData.dankIslandSatelliteTransparency))
