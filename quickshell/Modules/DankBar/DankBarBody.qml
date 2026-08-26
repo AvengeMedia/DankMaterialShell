@@ -782,7 +782,7 @@ Item {
 
         readonly property bool inOverviewWithShow: CompositorService.isNiri && NiriService.inOverview && barWindow.effectiveOpenOnOverview
         readonly property bool effectiveVisible: (barConfig?.visible ?? true) || inOverviewWithShow
-        readonly property bool showing: effectiveVisible && (topBarCore.reveal || inOverviewWithShow || !topBarCore.autoHide)
+        readonly property bool showing: effectiveVisible && (topBarCore.reveal || inOverviewWithShow)
 
         readonly property int maskThickness: showing ? barThickness : 1
 
