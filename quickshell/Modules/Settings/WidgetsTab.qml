@@ -1088,6 +1088,8 @@ Item {
                     item.trayAutoOverflow = widget.trayAutoOverflow;
                 if (widget.trayMaxVisibleItems !== undefined)
                     item.trayMaxVisibleItems = widget.trayMaxVisibleItems;
+                if (widget.trayIconSpacing !== undefined)
+                    item.trayIconSpacing = widget.trayIconSpacing;
                 if (widget.hideWhenIdle !== undefined)
                     item.hideWhenIdle = widget.hideWhenIdle;
             }
