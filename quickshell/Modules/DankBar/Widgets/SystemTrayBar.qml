@@ -1890,10 +1890,10 @@ BasePill {
                                     anchors.leftMargin: Theme.spacingS
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: {
-                                        const itemId = menuRoot.trayItem?.id || "Unknown";
+                                        const itemTitle = menuRoot.trayItem?.tooltipTitle || menuRoot.trayItem?.id || I18n.tr("Unknown");
                                         if (root.isAutoOverflowTrayItem(menuRoot.trayItem))
-                                            return itemId + " · " + I18n.tr("Keep in Bar");
-                                        return itemId;
+                                            return itemTitle + " · " + I18n.tr("Keep in Bar");
+                                        return itemTitle;
                                     }
                                     font.pixelSize: Theme.fontSizeSmall
                                     color: Theme.surfaceTextMedium
