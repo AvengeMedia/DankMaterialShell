@@ -55,8 +55,7 @@ func (o Options) request(ctx context.Context, url string) (*http.Request, error)
 	return req, nil
 }
 
-// Open issues the GET and hands back the body on a 2xx. The caller closes it,
-// which is also what releases the timeout.
+// Closing the body is what cancels the timeout context.
 func Open(ctx context.Context, url string, opts Options) (io.ReadCloser, error) {
 	if opts.Timeout <= 0 {
 		return open(ctx, url, opts)
@@ -100,7 +99,6 @@ func open(ctx context.Context, url string, opts Options) (io.ReadCloser, error) 
 	return resp.Body, nil
 }
 
-// Bytes reads the whole response into memory.
 func Bytes(ctx context.Context, url string, opts Options) ([]byte, error) {
 	body, err := Open(ctx, url, opts)
 	if err != nil {
@@ -110,7 +108,6 @@ func Bytes(ctx context.Context, url string, opts Options) ([]byte, error) {
 	return io.ReadAll(body)
 }
 
-// ToWriter streams the response into w.
 func ToWriter(ctx context.Context, url string, opts Options, w io.Writer) error {
 	body, err := Open(ctx, url, opts)
 	if err != nil {
@@ -122,8 +119,6 @@ func ToWriter(ctx context.Context, url string, opts Options, w io.Writer) error 
 	return err
 }
 
-// ToFile streams the response to path, creating parent directories and leaving
-// nothing behind on failure.
 func ToFile(ctx context.Context, url string, opts Options, path string) error {
 	if dir := filepath.Dir(path); dir != "." {
 		if err := os.MkdirAll(dir, 0o755); err != nil {

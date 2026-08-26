@@ -9,7 +9,6 @@ import (
 
 const latestReleaseURL = "https://api.github.com/repos/AvengeMedia/DankMaterialShell/releases/latest"
 
-// LatestReleaseTag returns the tag of the newest DankMaterialShell release.
 func LatestReleaseTag(ctx context.Context) (string, error) {
 	body, err := Bytes(ctx, latestReleaseURL, Options{Timeout: 10 * time.Second})
 	if err != nil {

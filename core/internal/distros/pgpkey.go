@@ -30,8 +30,6 @@ func crc24(data []byte) uint32 {
 	return crc & 0xFFFFFF
 }
 
-// dearmorPGP converts an ASCII-armored key (RFC 4880 section 6.2) into the
-// binary form apt wants behind signed-by, matching `gpg --batch --dearmor`.
 func dearmorPGP(armored []byte) ([]byte, error) {
 	lines := strings.Split(strings.ReplaceAll(string(armored), "\r\n", "\n"), "\n")
 
@@ -46,8 +44,7 @@ func dearmorPGP(armored []byte) ([]byte, error) {
 		return nil, fmt.Errorf("no PGP armor header found")
 	}
 
-	// Armor headers ("Version: ...") run until the first blank line; a block
-	// with no headers starts its payload immediately.
+	// Armor headers run until the first blank line; a headerless block has none.
 	for start < len(lines) && strings.Contains(lines[start], ": ") {
 		start++
 	}
@@ -114,8 +111,7 @@ func fetchDearmoredKey(ctx context.Context, url string) ([]byte, error) {
 	return keyring, nil
 }
 
-// writeTempKeyring stages the keyring somewhere the unprivileged process can
-// write, for a privileged install into /etc/apt/keyrings.
+// privesc.ExecCommand owns stdin for the sudo password, so the key cannot be piped in.
 func writeTempKeyring(keyring []byte) (string, error) {
 	f, err := os.CreateTemp("", "dms-repo-key-*.gpg")
 	if err != nil {

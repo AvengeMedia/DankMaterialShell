@@ -7,8 +7,7 @@ import (
 	"testing"
 )
 
-// The golden file was produced by `gpg --batch --dearmor` against the armored
-// fixture, so this pins dearmorPGP to gpg's output byte for byte.
+// Golden is `gpg --batch --dearmor` output for the fixture.
 func TestDearmorPGPMatchesGPGGolden(t *testing.T) {
 	armored, err := os.ReadFile("testdata/obs-release.asc")
 	if err != nil {

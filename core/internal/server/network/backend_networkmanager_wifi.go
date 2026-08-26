@@ -748,11 +748,15 @@ func (b *NetworkManagerBackend) createAndConnectWiFiOnDevice(req ConnectionReque
 		rsnFlags, _ = targetAP.GetPropertyRSNFlags()
 	}
 
-	const KeyMgmt8021x = uint32(512)
-	const KeyMgmtPsk = uint32(256)
-	const KeyMgmtSae = uint32(1024)
+	const (
+		keyMgmt8021x = uint32(gonetworkmanager.Nm80211APSecKeyMgmt8021X)
+		keyMgmtPsk   = uint32(gonetworkmanager.Nm80211APSecKeyMgmtPSK)
+		keyMgmtSae   = uint32(gonetworkmanager.Nm80211APSecKeyMgmtSAE)
+		// OWE_TM sits on the open BSS of a mixed network, which still wants key-mgmt=owe.
+		keyMgmtOwe = uint32(gonetworkmanager.Nm80211APSecKeyMgmtOWE) | uint32(gonetworkmanager.Nm80211APSecKeyMgmtOWETM)
+	)
 
-	var isEnterprise, isPsk, isSae, secured bool
+	var isEnterprise, isPsk, isSae, isOwe, secured bool
 
 	switch {
 	case req.Hidden:
@@ -760,9 +764,10 @@ func (b *NetworkManagerBackend) createAndConnectWiFiOnDevice(req ConnectionReque
 		isEnterprise = req.Username != ""
 		isPsk = req.Password != "" && !isEnterprise
 	default:
-		isEnterprise = (wpaFlags&KeyMgmt8021x) != 0 || (rsnFlags&KeyMgmt8021x) != 0
-		isPsk = (wpaFlags&KeyMgmtPsk) != 0 || (rsnFlags&KeyMgmtPsk) != 0
-		isSae = (wpaFlags&KeyMgmtSae) != 0 || (rsnFlags&KeyMgmtSae) != 0
+		isEnterprise = (wpaFlags&keyMgmt8021x) != 0 || (rsnFlags&keyMgmt8021x) != 0
+		isPsk = (wpaFlags&keyMgmtPsk) != 0 || (rsnFlags&keyMgmtPsk) != 0
+		isSae = (wpaFlags&keyMgmtSae) != 0 || (rsnFlags&keyMgmtSae) != 0
+		isOwe = (wpaFlags&keyMgmtOwe) != 0 || (rsnFlags&keyMgmtOwe) != 0
 		secured = flags != uint32(gonetworkmanager.Nm80211APFlagsNone) ||
 			wpaFlags != uint32(gonetworkmanager.Nm80211APSecNone) ||
 			rsnFlags != uint32(gonetworkmanager.Nm80211APSecNone)
@@ -876,8 +881,14 @@ func (b *NetworkManagerBackend) createAndConnectWiFiOnDevice(req ConnectionReque
 			}
 			settings["802-11-wireless-security"] = sec
 
+		case isOwe:
+			// No pmf unlike the sae case: OWE mandates PMF and NM applies it itself.
+			settings["802-11-wireless-security"] = map[string]any{
+				"key-mgmt": "owe",
+			}
+
 		default:
-			return fmt.Errorf("secured network but not SAE/PSK/802.1X (rsn=0x%x wpa=0x%x)", rsnFlags, wpaFlags)
+			return fmt.Errorf("secured network but not OWE/SAE/PSK/802.1X (rsn=0x%x wpa=0x%x)", rsnFlags, wpaFlags)
 		}
 	} else {
 		wifiSettings := map[string]any{
