@@ -240,6 +240,7 @@ var SPEC = {
     trayAutoOverflow: { def: true },
     trayPopupSingleLine: { def: true },
     trayMaxVisibleItems: { def: 0 },
+    trayIconSpacing: { def: 0 },
     appsDockHideIndicators: { def: false },
     appsDockColorizeActive: { def: false },
     appsDockActiveColorMode: { def: "primary" },

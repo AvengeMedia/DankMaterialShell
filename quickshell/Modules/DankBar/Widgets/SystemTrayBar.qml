@@ -24,6 +24,7 @@ BasePill {
     property bool useSingleLineOverflowPopup: widgetData?.trayPopupSingleLine ?? SettingsData.trayPopupSingleLine
     property bool useAutomaticOverflow: widgetData?.trayAutoOverflow ?? SettingsData.trayAutoOverflow
     property int configuredMaxVisibleItems: widgetData?.trayMaxVisibleItems ?? SettingsData.trayMaxVisibleItems
+    property real configuredIconSpacing: Math.max(0, widgetData?.trayIconSpacing ?? SettingsData.trayIconSpacing)
     property real sectionAvailablePrimarySize: 0
     readonly property var hiddenTrayIds: {
         const envValue = Quickshell.env("DMS_HIDE_TRAYIDS") || "";
@@ -178,7 +179,7 @@ BasePill {
         const sectionPrimary = root.sectionAvailablePrimarySize > 0 ? root.sectionAvailablePrimarySize : (root.isVerticalOrientation ? (root.parentScreen?.height || 0) : (root.parentScreen?.width || 0));
         const logicalPrimary = sectionPrimary > 0 ? (sectionPrimary / scale) : 640;
         const maxTrayShare = root.isVerticalOrientation ? 0.55 : 0.50;
-        const itemSize = Math.max(1, root.trayItemSize);
+        const itemSize = Math.max(1, root.trayItemSize + root.configuredIconSpacing);
         const slots = Math.floor((logicalPrimary * maxTrayShare) / itemSize);
         return Math.max(2, Math.min(10, Math.min(root.visibleSortedTrayItems.length, slots)));
     }
@@ -320,7 +321,7 @@ BasePill {
     }
 
     function updateMainDrag(axisOffset, visualIndex, reversed) {
-        const itemSize = root.trayItemSize;
+        const itemSize = root.trayItemSize + root.configuredIconSpacing;
         const slotOffset = Math.round(axisOffset / itemSize);
         const visualTargetIndex = Math.max(0, Math.min(root.mainBarItems.length - 1, visualIndex + slotOffset));
         const newTargetIndex = reversed ? (root.mainBarItems.length - 1 - visualTargetIndex) : visualTargetIndex;
@@ -468,7 +469,7 @@ BasePill {
     Component {
         id: rowComp
         Row {
-            spacing: 0
+            spacing: root.configuredIconSpacing
             layoutDirection: root.reverseInlineHorizontal ? Qt.RightToLeft : Qt.LeftToRight
 
             Repeater {
@@ -487,7 +488,7 @@ BasePill {
                     height: root.barThickness
                     z: dragHandler.dragging ? 100 : 0
 
-                    property real shiftOffset: root.dragShiftOffset(index, root.draggedIndex, root.dropTargetIndex, root.trayItemSize)
+                    property real shiftOffset: root.dragShiftOffset(index, root.draggedIndex, root.dropTargetIndex, root.trayItemSize + root.configuredIconSpacing)
 
                     transform: Translate {
                         x: delegateRoot.shiftOffset
@@ -706,7 +707,7 @@ BasePill {
 
             width: root.isVerticalOrientation ? root.barThickness : (root.inlineExpanded ? root.trayItemSize : 0)
             height: root.isVerticalOrientation ? (root.inlineExpanded ? root.trayItemSize : 0) : root.barThickness
-            visible: width > 0 || height > 0
+            visible: width > 0 && height > 0
 
             Behavior on width {
                 enabled: !root.isVerticalOrientation
@@ -819,7 +820,7 @@ BasePill {
             height: root.trayItemSize
             z: dragHandler.dragging ? 100 : 0
 
-            property real shiftOffset: root.dragShiftOffset(index, root.draggedIndex, root.dropTargetIndex, root.trayItemSize)
+            property real shiftOffset: root.dragShiftOffset(index, root.draggedIndex, root.dropTargetIndex, root.trayItemSize + root.configuredIconSpacing)
 
             transform: Translate {
                 y: shiftOffset
@@ -975,7 +976,7 @@ BasePill {
     Component {
         id: columnComp
         Column {
-            spacing: 0
+            spacing: root.configuredIconSpacing
 
             // Column lacks layoutDirection, so we use four repeaters with mutually exclusive models to control whether main items or expanded items appear above/ below the toggle button.
             // When reverseInlineVertical is true the first and third repeaters are empty and the second and fourth are active, and vice-versa.
