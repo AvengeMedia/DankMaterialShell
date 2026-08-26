@@ -551,7 +551,16 @@ Item {
             const tooltipX = buttonLocalPos.x + btnW / 2 + adjacentLeftBarWidth;
             const tooltipHeight = 32;
             const totalFromEdge = bgMargin + dockBackground.height + dock.borderThickness + gap;
-            const screenRelativeY = isBottom ? (screenHeight - totalFromEdge - tooltipHeight) : totalFromEdge;
+            const magTargetScale = SettingsData.dockMagnificationEnabled ? SettingsData.dockMagnificationAmount : 1.0;
+            const magExtra = btnH * (magTargetScale - 1);
+            let screenRelativeY;
+            if (isBottom) {
+                screenRelativeY = screenHeight - totalFromEdge - tooltipHeight - magExtra;
+                if (screenRelativeY < gap)
+                    screenRelativeY = gap;
+            } else {
+                screenRelativeY = totalFromEdge;
+            }
             dockTooltip.show(tooltipText, tooltipX, screenRelativeY, dock.screen, false, false);
             return;
         }
