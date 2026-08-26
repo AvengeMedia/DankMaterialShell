@@ -3,6 +3,7 @@ package distros
 import (
 	"context"
 	"fmt"
+	"os"
 	"os/exec"
 	"strings"
 
@@ -267,12 +268,12 @@ func (d *DebianDistribution) InstallPrerequisites(ctx context.Context, sudoPassw
 		Step:        "Installing development dependencies...",
 		IsComplete:  false,
 		NeedsSudo:   true,
-		CommandInfo: "sudo apt-get install -y curl wget git cmake ninja-build pkg-config gnupg libxcb-cursor-dev libglib2.0-dev libpolkit-agent-1-dev",
+		CommandInfo: "sudo apt-get install -y curl wget git cmake ninja-build pkg-config libxcb-cursor-dev libglib2.0-dev libpolkit-agent-1-dev",
 		LogOutput:   "Installing additional development tools",
 	}
 
 	devToolsCmd := privesc.ExecCommand(ctx, sudoPassword,
-		"DEBIAN_FRONTEND=noninteractive apt-get install -y curl wget git cmake ninja-build pkg-config gnupg libxcb-cursor-dev libglib2.0-dev libpolkit-agent-1-dev libjpeg-dev libpugixml-dev")
+		"DEBIAN_FRONTEND=noninteractive apt-get install -y curl wget git cmake ninja-build pkg-config libxcb-cursor-dev libglib2.0-dev libpolkit-agent-1-dev libjpeg-dev libpugixml-dev")
 	if err := d.runWithProgress(devToolsCmd, progressChan, PhasePrerequisites, 0.10, 0.12); err != nil {
 		return fmt.Errorf("failed to install development tools: %w", err)
 	}
@@ -505,12 +506,22 @@ func (d *DebianDistribution) enableOBSRepos(ctx context.Context, obsPkgs []Packa
 				Progress:    0.18,
 				Step:        fmt.Sprintf("Adding OBS GPG key for %s...", pkg.RepoURL),
 				NeedsSudo:   true,
-				CommandInfo: fmt.Sprintf("curl & gpg to add key for %s", pkg.RepoURL),
+				CommandInfo: fmt.Sprintf("install keyring for %s", pkg.RepoURL),
 			}
 
-			keyCmd := fmt.Sprintf("bash -c 'rm -f %s && curl -fsSL %s/Release.key | gpg --batch --dearmor -o %s'", keyringPath, baseURL, keyringPath)
-			cmd := privesc.ExecCommand(ctx, sudoPassword, keyCmd)
-			if err := d.runWithProgress(cmd, progressChan, PhaseSystemPackages, 0.18, 0.20); err != nil {
+			keyring, err := fetchDearmoredKey(ctx, baseURL+"/Release.key")
+			if err != nil {
+				return fmt.Errorf("failed to add OBS GPG key for %s: %w", pkg.RepoURL, err)
+			}
+			tmpKeyring, err := writeTempKeyring(keyring)
+			if err != nil {
+				return fmt.Errorf("failed to add OBS GPG key for %s: %w", pkg.RepoURL, err)
+			}
+
+			cmd := privesc.ExecCommand(ctx, sudoPassword, fmt.Sprintf("install -m 0644 %s %s", tmpKeyring, keyringPath))
+			err = d.runWithProgress(cmd, progressChan, PhaseSystemPackages, 0.18, 0.20)
+			os.Remove(tmpKeyring)
+			if err != nil {
 				return fmt.Errorf("failed to add OBS GPG key for %s: %w", pkg.RepoURL, err)
 			}
 

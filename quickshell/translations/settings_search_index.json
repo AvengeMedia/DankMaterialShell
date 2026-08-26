@@ -6916,6 +6916,32 @@
     "description": "Control animation duration for notification popups and history"
   },
   {
+    "section": "notificationPopupBodyInvokesAction",
+    "label": "Body Click Runs Default Action",
+    "tabIndex": 17,
+    "category": "Notifications",
+    "keywords": [
+      "action",
+      "alerts",
+      "body",
+      "click",
+      "clicking",
+      "default",
+      "expand",
+      "expanding",
+      "first",
+      "invoke",
+      "messages",
+      "notification",
+      "notifications",
+      "open",
+      "popup",
+      "runs",
+      "toast"
+    ],
+    "description": "Clicking a popup runs its first action instead of expanding the body"
+  },
+  {
     "section": "notificationBodyFontSize",
     "label": "Body Font Size",
     "tabIndex": 17,

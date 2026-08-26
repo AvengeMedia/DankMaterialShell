@@ -521,6 +521,7 @@ Singleton {
     property bool trayAutoOverflow: true
     property bool trayPopupSingleLine: true
     property int trayMaxVisibleItems: 0
+    property real trayIconSpacing: 0
     property bool appsDockHideIndicators: false
     property bool appsDockColorizeActive: false
     property string appsDockActiveColorMode: "primary"
@@ -903,6 +904,7 @@ Singleton {
     property bool notificationOverlayEnabled: false
     property bool notificationPopupShadowEnabled: true
     property bool notificationPopupPrivacyMode: false
+    property bool notificationPopupBodyInvokesAction: false
     property bool notificationForegroundLayers: true
     property int overviewRows: 2
     property int overviewColumns: 5

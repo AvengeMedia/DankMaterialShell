@@ -343,6 +343,15 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    settingKey: "notificationPopupBodyInvokesAction"
+                    tags: ["notification", "popup", "click", "body", "action", "invoke", "expand", "open"]
+                    text: I18n.tr("Body Click Runs Default Action")
+                    description: I18n.tr("Clicking a popup runs its first action instead of expanding the body")
+                    checked: SettingsData.notificationPopupBodyInvokesAction
+                    onToggled: checked => SettingsData.set("notificationPopupBodyInvokesAction", checked)
+                }
+
+                SettingsToggleRow {
                     settingKey: "notificationFocusedMonitor"
                     tags: ["notification", "popup", "focused", "monitor", "display", "screen", "active"]
                     text: I18n.tr("Focused Monitor Only")
