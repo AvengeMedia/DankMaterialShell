@@ -21,6 +21,7 @@ Item {
     property var blurBarWindow: null
     property var hyprlandOverviewLoader: null
     property var parentScreen: null
+    property real crossEdgeExtension: 0
 
     readonly property bool isMango: CompositorService.isMango
 
@@ -45,7 +46,7 @@ Item {
     }
     readonly property real _topMargin: {
         if (!isVertical)
-            return 0;
+            return axis?.edge === "top" ? crossEdgeExtension : 0;
         root.y;
         if (!root.parent)
             return 0;
@@ -54,7 +55,7 @@ Item {
     }
     readonly property real _bottomMargin: {
         if (!isVertical)
-            return 0;
+            return axis?.edge === "bottom" ? crossEdgeExtension : 0;
         root.y;
         root.height;
         if (!root.parent || !blurBarWindow)

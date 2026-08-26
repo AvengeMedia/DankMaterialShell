@@ -26,7 +26,7 @@ PanelWindow {
 
     function containsGlobalPoint(gx, gy, padding) {
         const pad = padding !== undefined ? padding : 16;
-        const items = [surface.inputMaskItem, surface.mediaDropdownMaskItem, satelliteHost.leftInputItem, satelliteHost.rightInputItem];
+        const items = [surface.inputMaskItem, surface.fittsStripItem, surface.mediaDropdownMaskItem, satelliteHost.leftInputItem, satelliteHost.rightInputItem];
         for (let i = 0; i < items.length; i++) {
             const item = items[i];
             if (!item || item.width <= 0 || item.height <= 0)
@@ -124,6 +124,10 @@ PanelWindow {
     mask: Region {
         Region {
             item: controller.inputSuspended ? null : surface.inputMaskItem
+        }
+
+        Region {
+            item: controller.inputSuspended ? null : surface.fittsStripItem
         }
 
         Region {
@@ -320,6 +324,11 @@ PanelWindow {
             }
 
             Region {
+                item: fittsStripHole
+                intersection: Intersection.Subtract
+            }
+
+            Region {
                 item: leftSatelliteHole
                 intersection: Intersection.Subtract
             }
@@ -350,6 +359,15 @@ PanelWindow {
             y: surface.inputMaskItem.y + root.hostOriginY
             width: surface.inputMaskItem.width
             height: surface.inputMaskItem.height
+        }
+
+        Item {
+            id: fittsStripHole
+
+            x: surface.fittsStripItem.x
+            y: surface.fittsStripItem.y + root.hostOriginY
+            width: surface.fittsStripItem.visible ? surface.fittsStripItem.width : 0
+            height: surface.fittsStripItem.visible ? surface.fittsStripItem.height : 0
         }
 
         Item {

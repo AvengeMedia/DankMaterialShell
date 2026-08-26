@@ -17,6 +17,14 @@ Item {
     property var blurBarWindow: null
     property string pluginId: ""
     property var pluginService: null
+    property bool isFirst: false
+    property bool isLast: false
+    property bool isLeftBarEdge: false
+    property bool isRightBarEdge: false
+    property bool isTopBarEdge: false
+    property bool isBottomBarEdge: false
+    property real sectionSpacing: 0
+    property real crossEdgeExtension: 0
 
     property string visibilityCommand: ""
     property int visibilityInterval: 0
@@ -191,6 +199,14 @@ Item {
         barConfig: root.barConfig
         blurBarWindow: root.blurBarWindow
         content: root.horizontalBarPill
+        isFirst: root.isFirst
+        isLast: root.isLast
+        isLeftBarEdge: root.isLeftBarEdge
+        isRightBarEdge: root.isRightBarEdge
+        isTopBarEdge: root.isTopBarEdge
+        isBottomBarEdge: root.isBottomBarEdge
+        sectionSpacing: root.sectionSpacing
+        crossEdgeExtension: root.crossEdgeExtension
 
         states: State {
             name: "hidden"
@@ -252,6 +268,14 @@ Item {
         blurBarWindow: root.blurBarWindow
         content: root.verticalBarPill
         isVerticalOrientation: true
+        isFirst: root.isFirst
+        isLast: root.isLast
+        isLeftBarEdge: root.isLeftBarEdge
+        isRightBarEdge: root.isRightBarEdge
+        isTopBarEdge: root.isTopBarEdge
+        isBottomBarEdge: root.isBottomBarEdge
+        sectionSpacing: root.sectionSpacing
+        crossEdgeExtension: root.crossEdgeExtension
 
         states: State {
             name: "hidden"

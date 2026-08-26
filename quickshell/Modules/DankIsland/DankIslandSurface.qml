@@ -52,6 +52,7 @@ Item {
     signal scrollWheel(var wheel)
 
     readonly property alias inputMaskItem: inputEnvelope
+    readonly property alias fittsStripItem: fittsStrip
     readonly property bool motionRunning: motion.running
     readonly property real springTimeConstantMs: motion.timeConstantMs
     property real trackedHeight: 0
@@ -281,7 +282,45 @@ Item {
         }
 
         HoverHandler {
-            onHoveredChanged: root.controller.updatePointerInside(hovered)
+            id: islandHover
+
+            onHoveredChanged: root.updateFittsPointerInside()
+        }
+    }
+
+    function updateFittsPointerInside() {
+        root.controller.updatePointerInside(islandHover.hovered || stripHover.hovered);
+    }
+
+    // Fitts zone from the island edge to the screen edge — hover/click count as island.
+    // Bounds follow the spring target, never the per-frame value, so the Wayland mask is not
+    // rewritten every frame and the strip never shrinks out from under the cursor mid-open.
+    Item {
+        id: fittsStrip
+
+        readonly property real spanWidth: Math.max(root.controller.compactTarget.width, motion.targetWidth)
+        readonly property real edgeGap: root.bottomEdge ? Math.max(0, root.height - (root.targetVisualY + motion.targetHeight)) : Math.max(0, root.targetVisualY)
+
+        x: Math.round((root.width - spanWidth) / 2 + motion.targetOffsetX)
+        y: root.bottomEdge ? root.targetVisualY + motion.targetHeight : 0
+        width: spanWidth
+        height: edgeGap
+        visible: edgeGap > 0 && spanWidth > 0
+
+        HoverHandler {
+            id: stripHover
+
+            onHoveredChanged: root.updateFittsPointerInside()
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            acceptedButtons: Qt.LeftButton
+            onClicked: root.controller.requestToggle(true)
+            onWheel: wheel => {
+                root.scrollWheel(wheel);
+                wheel.accepted = true;
+            }
         }
     }
 

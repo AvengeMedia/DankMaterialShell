@@ -570,7 +570,10 @@ BasePill {
 
                     MouseArea {
                         id: trayItemArea
-                        anchors.fill: parent
+                        y: root.isVerticalOrientation ? 0 : -root.topMargin
+                        x: root.isVerticalOrientation ? -root.leftMargin : 0
+                        width: parent.width + (root.isVerticalOrientation ? root.leftMargin + root.rightMargin : 0)
+                        height: parent.height + (root.isVerticalOrientation ? 0 : root.topMargin + root.bottomMargin)
                         hoverEnabled: true
                         acceptedButtons: Qt.LeftButton | Qt.RightButton
                         cursorShape: dragHandler.longPressing ? Qt.DragMoveCursor : Qt.PointingHandCursor
@@ -777,7 +780,10 @@ BasePill {
 
             MouseArea {
                 id: inlineTrayItemArea
-                anchors.fill: parent
+                y: root.isVerticalOrientation ? 0 : -root.topMargin
+                x: root.isVerticalOrientation ? -root.leftMargin : 0
+                width: parent.width + (root.isVerticalOrientation ? root.leftMargin + root.rightMargin : 0)
+                height: parent.height + (root.isVerticalOrientation ? 0 : root.topMargin + root.bottomMargin)
                 hoverEnabled: true
                 acceptedButtons: Qt.LeftButton | Qt.RightButton
                 cursorShape: Qt.PointingHandCursor
@@ -896,7 +902,10 @@ BasePill {
 
             MouseArea {
                 id: trayItemArea
-                anchors.fill: parent
+                y: root.isVerticalOrientation ? 0 : -root.topMargin
+                x: root.isVerticalOrientation ? -root.leftMargin : 0
+                width: parent.width + (root.isVerticalOrientation ? root.leftMargin + root.rightMargin : 0)
+                height: parent.height + (root.isVerticalOrientation ? 0 : root.topMargin + root.bottomMargin)
                 hoverEnabled: true
                 acceptedButtons: Qt.LeftButton | Qt.RightButton
                 cursorShape: dragHandler.longPressing ? Qt.DragMoveCursor : Qt.PointingHandCursor

@@ -397,7 +397,10 @@ BasePill {
 
                     MouseArea {
                         id: mouseArea
-                        anchors.fill: parent
+                        y: root.isVerticalOrientation ? 0 : -root.topMargin
+                        x: root.isVerticalOrientation ? -root.leftMargin : 0
+                        width: parent.width + (root.isVerticalOrientation ? root.leftMargin + root.rightMargin : 0)
+                        height: parent.height + (root.isVerticalOrientation ? 0 : root.topMargin + root.bottomMargin)
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
@@ -651,7 +654,10 @@ BasePill {
 
                     MouseArea {
                         id: mouseArea
-                        anchors.fill: parent
+                        y: root.isVerticalOrientation ? 0 : -root.topMargin
+                        x: root.isVerticalOrientation ? -root.leftMargin : 0
+                        width: parent.width + (root.isVerticalOrientation ? root.leftMargin + root.rightMargin : 0)
+                        height: parent.height + (root.isVerticalOrientation ? 0 : root.topMargin + root.bottomMargin)
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton

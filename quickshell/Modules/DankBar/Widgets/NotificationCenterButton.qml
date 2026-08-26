@@ -65,7 +65,10 @@ BasePill {
     }
 
     MouseArea {
-        anchors.fill: parent
+        x: -root.leftMargin
+        y: -root.topMargin
+        width: root.width + root.leftMargin + root.rightMargin
+        height: root.height + root.topMargin + root.bottomMargin
         acceptedButtons: Qt.MiddleButton
         cursorShape: Qt.PointingHandCursor
         onPressed: mouse => {

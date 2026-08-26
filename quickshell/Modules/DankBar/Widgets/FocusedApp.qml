@@ -379,7 +379,10 @@ BasePill {
 
     MouseArea {
         id: mouseArea
-        anchors.fill: parent
+        x: -root.leftMargin
+        y: -root.topMargin
+        width: root.width + root.leftMargin + root.rightMargin
+        height: root.height + root.topMargin + root.bottomMargin
         hoverEnabled: root.isVerticalOrientation
         cursorShape: Qt.PointingHandCursor
         onEntered: {
