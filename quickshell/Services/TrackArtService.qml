@@ -17,7 +17,8 @@ Singleton {
     readonly property var _artHashDenylist: ["764a730860c5b8a7bbee690ee5a443672ae37dc8"]
 
     function djb2Hash(str) {
-        if (!str) return "";
+        if (!str)
+            return "";
         let hash = 5381;
         for (let i = 0; i < str.length; i++) {
             hash = ((hash << 5) + hash) + str.charCodeAt(i);
@@ -27,7 +28,8 @@ Singleton {
     }
 
     function _directArtworkUrl(player) {
-        if (!player) return "";
+        if (!player)
+            return "";
 
         let artUrl = player.trackArtUrl || "";
         if (artUrl !== "") {
@@ -36,7 +38,8 @@ Singleton {
 
         if (player.metadata && player.metadata["mpris:artUrl"]) {
             artUrl = player.metadata["mpris:artUrl"].toString();
-            if (artUrl !== "") return artUrl;
+            if (artUrl !== "")
+                return artUrl;
         }
 
         // YouTube publishes no artUrl; derive the thumbnail from the video id.
@@ -102,7 +105,7 @@ Singleton {
                     _commit(localFileUrl, artKey, targetUrl);
                     loading = false;
                 } else {
-                    const dlCmd = "mkdir -p \"$(dirname \"$1\")\" && curl -f -s -L -o \"$1\" \"$2\" && mv \"$1\" \"$3\" || { rm -f \"$1\"; exit 1; }";
+                    const dlCmd = "\"$0\" dl -o \"$1\" \"$2\" >/dev/null && mv \"$1\" \"$3\" || { rm -f \"$1\"; exit 1; }";
 
                     // YouTube: try the 16:9 maxres thumbnail before falling back.
                     if (targetUrl.includes("img.youtube.com/vi/")) {
@@ -111,7 +114,7 @@ Singleton {
                         const mqUrl = "https://img.youtube.com/vi/" + videoId + "/mqdefault.jpg";
                         const tmpPath = filePath + ".tmp";
 
-                        Proc.runCommand(null, ["sh", "-c", dlCmd, "sh", tmpPath, maxresUrl, filePath], (maxOutput, maxExitCode) => {
+                        Proc.runCommand(null, ["sh", "-c", dlCmd, Proc.dmsBin, tmpPath, maxresUrl, filePath], (maxOutput, maxExitCode) => {
                             if (_lastArtUrl !== targetUrl || _requestSerial !== requestSerial)
                                 return;
 
@@ -119,7 +122,7 @@ Singleton {
                                 _commit(localFileUrl, artKey, targetUrl);
                                 loading = false;
                             } else {
-                                Proc.runCommand(null, ["sh", "-c", dlCmd, "sh", tmpPath, mqUrl, filePath], (mqOutput, mqExitCode) => {
+                                Proc.runCommand(null, ["sh", "-c", dlCmd, Proc.dmsBin, tmpPath, mqUrl, filePath], (mqOutput, mqExitCode) => {
                                     if (_lastArtUrl !== targetUrl || _requestSerial !== requestSerial)
                                         return;
 
@@ -130,7 +133,7 @@ Singleton {
                         }, 50, 15000);
                     } else {
                         const tmpPath = filePath + ".tmp";
-                        Proc.runCommand(null, ["sh", "-c", dlCmd, "sh", tmpPath, targetUrl, filePath], (dlOutput, dlExitCode) => {
+                        Proc.runCommand(null, ["sh", "-c", dlCmd, Proc.dmsBin, tmpPath, targetUrl, filePath], (dlOutput, dlExitCode) => {
                             if (_lastArtUrl !== targetUrl || _requestSerial !== requestSerial)
                                 return;
 
@@ -194,12 +197,24 @@ Singleton {
             required property MprisPlayer modelData
             target: modelData
             ignoreUnknownSignals: true
-            function onIsPlayingChanged() { root._updateArtUrl(); }
-            function onTrackTitleChanged() { root._updateArtUrl(); }
-            function onTrackArtistChanged() { root._updateArtUrl(); }
-            function onTrackAlbumChanged() { root._updateArtUrl(); }
-            function onTrackArtUrlChanged() { root._updateArtUrl(); }
-            function onMetadataChanged() { root._updateArtUrl(); }
+            function onIsPlayingChanged() {
+                root._updateArtUrl();
+            }
+            function onTrackTitleChanged() {
+                root._updateArtUrl();
+            }
+            function onTrackArtistChanged() {
+                root._updateArtUrl();
+            }
+            function onTrackAlbumChanged() {
+                root._updateArtUrl();
+            }
+            function onTrackArtUrlChanged() {
+                root._updateArtUrl();
+            }
+            function onMetadataChanged() {
+                root._updateArtUrl();
+            }
         }
     }
 

@@ -16,6 +16,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/distros"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/errdefs"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/netfetch"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/privesc"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/version"
@@ -412,25 +413,9 @@ func updateDMSBinary() error {
 	}
 
 	fmt.Println("Fetching latest release version...")
-	cmd := exec.Command("curl", "-s", "https://api.github.com/repos/AvengeMedia/DankMaterialShell/releases/latest")
-	output, err := cmd.Output()
+	version, err := netfetch.LatestReleaseTag(context.Background())
 	if err != nil {
 		return fmt.Errorf("failed to fetch latest release: %w", err)
-	}
-
-	version := ""
-	for line := range strings.SplitSeq(string(output), "\n") {
-		if strings.Contains(line, "\"tag_name\"") {
-			parts := strings.Split(line, "\"")
-			if len(parts) >= 4 {
-				version = parts[3]
-				break
-			}
-		}
-	}
-
-	if version == "" {
-		return fmt.Errorf("could not determine latest version")
 	}
 
 	fmt.Printf("Latest version: %s\n", version)
@@ -448,14 +433,12 @@ func updateDMSBinary() error {
 	checksumPath := filepath.Join(tempDir, "dms.gz.sha256")
 
 	fmt.Println("Downloading dms binary...")
-	downloadCmd := exec.Command("curl", "-L", binaryURL, "-o", binaryPath)
-	if err := downloadCmd.Run(); err != nil {
+	if err := netfetch.ToFile(context.Background(), binaryURL, netfetch.Options{Timeout: 5 * time.Minute}, binaryPath); err != nil {
 		return fmt.Errorf("failed to download binary: %w", err)
 	}
 
 	fmt.Println("Downloading checksum...")
-	downloadCmd = exec.Command("curl", "-L", checksumURL, "-o", checksumPath)
-	if err := downloadCmd.Run(); err != nil {
+	if err := netfetch.ToFile(context.Background(), checksumURL, netfetch.Options{Timeout: 30 * time.Second}, checksumPath); err != nil {
 		return fmt.Errorf("failed to download checksum: %w", err)
 	}
 

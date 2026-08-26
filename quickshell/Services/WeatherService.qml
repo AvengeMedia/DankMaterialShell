@@ -47,7 +47,7 @@ Singleton {
 
     // ionice is util-linux only; the BSDs get plain nice
     readonly property var lowPriorityCmd: Qt.platform.os === "linux" ? ["nice", "-n", "19", "ionice", "-c3"] : ["nice", "-n", "19"]
-    readonly property var curlBaseCmd: ["curl", "-sS", "--fail", "--connect-timeout", "3", "--max-time", "6", "--limit-rate", "100k", "--compressed"]
+    readonly property var fetchCmd: [Proc.dmsBin, "dl", "--connect-timeout", "8", "--timeout", "20"]
 
     property var weatherIcons: ({
             "0": "clear_day",
@@ -564,7 +564,7 @@ Singleton {
     }
 
     function getLocationFromCity(city) {
-        cityGeocodeFetcher.command = lowPriorityCmd.concat(curlBaseCmd).concat([getGeocodingUrl(city)]);
+        cityGeocodeFetcher.command = lowPriorityCmd.concat(fetchCmd, [getGeocodingUrl(city)]);
         cityGeocodeFetcher.running = true;
     }
 
@@ -610,21 +610,21 @@ Singleton {
 
     function tryNominatim(lat, lon, reqId) {
         const url = "https://nominatim.openstreetmap.org/reverse?lat=" + lat + "&lon=" + lon + "&format=json&addressdetails=1&accept-language=en";
-        nominatimFetcher.command = lowPriorityCmd.concat(curlBaseCmd).concat(["-H", "User-Agent: DankMaterialShell Weather Widget", url]);
+        nominatimFetcher.command = lowPriorityCmd.concat(fetchCmd, ["--user-agent", "DankMaterialShell Weather Widget", url]);
         nominatimFetcher.reqId = reqId;
         nominatimFetcher.running = true;
     }
 
     function tryPhoton(lat, lon, reqId) {
         const url = "https://photon.komoot.io/reverse?lat=" + lat + "&lon=" + lon + "&lang=en";
-        photonFetcher.command = lowPriorityCmd.concat(curlBaseCmd).concat([url]);
+        photonFetcher.command = lowPriorityCmd.concat(fetchCmd, [url]);
         photonFetcher.reqId = reqId;
         photonFetcher.running = true;
     }
 
     function tryBigDataCloud(lat, lon, reqId) {
         const url = "https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=" + lat + "&longitude=" + lon + "&localityLanguage=zh";
-        bigDataCloudFetcher.command = lowPriorityCmd.concat(curlBaseCmd).concat([url]);
+        bigDataCloudFetcher.command = lowPriorityCmd.concat(fetchCmd, [url]);
         bigDataCloudFetcher.reqId = reqId;
         bigDataCloudFetcher.running = true;
     }
@@ -659,8 +659,7 @@ Singleton {
 
         root.lastFetchTime = now;
         root.weather.loading = true;
-        const weatherCmd = lowPriorityCmd.concat(["curl", "-sS", "--fail", "--connect-timeout", "3", "--max-time", "6", "--limit-rate", "150k", "--compressed"]);
-        weatherFetcher.command = weatherCmd.concat([apiUrl]);
+        weatherFetcher.command = lowPriorityCmd.concat(root.fetchCmd, [apiUrl]);
         weatherFetcher.running = true;
     }
 
@@ -817,7 +816,7 @@ Singleton {
     Process {
         id: ipLocationFetcher
         running: false
-        command: lowPriorityCmd.concat(curlBaseCmd).concat(["http://ip-api.com/json/"])
+        command: lowPriorityCmd.concat(fetchCmd, ["http://ip-api.com/json/"])
 
         stdout: StdioCollector {
             onStreamFinished: {

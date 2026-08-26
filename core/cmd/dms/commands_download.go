@@ -3,19 +3,19 @@ package main
 import (
 	"context"
 	"fmt"
-	"io"
-	"net"
-	"net/http"
 	"os"
-	"path/filepath"
+	"strings"
 	"time"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/netfetch"
 	"github.com/spf13/cobra"
 )
 
 var dlOutput string
 var dlUserAgent string
+var dlHeaders []string
 var dlTimeout int
+var dlConnectTimeout int
 var dlIPv4Only bool
 
 var dlCmd = &cobra.Command{
@@ -33,65 +33,52 @@ var dlCmd = &cobra.Command{
 func init() {
 	dlCmd.Flags().StringVarP(&dlOutput, "output", "o", "", "Output file path (default: stdout)")
 	dlCmd.Flags().StringVar(&dlUserAgent, "user-agent", "", "Custom User-Agent header")
-	dlCmd.Flags().IntVar(&dlTimeout, "timeout", 10, "Request timeout in seconds")
+	dlCmd.Flags().StringArrayVarP(&dlHeaders, "header", "H", nil, "Extra request header as 'Name: value' (repeatable)")
+	dlCmd.Flags().IntVar(&dlTimeout, "timeout", 10, "Total request timeout in seconds")
+	dlCmd.Flags().IntVar(&dlConnectTimeout, "connect-timeout", 5, "Connection timeout in seconds")
 	dlCmd.Flags().BoolVarP(&dlIPv4Only, "ipv4", "4", false, "Force IPv4 only")
 }
 
-func runDownload(url string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(dlTimeout)*time.Second)
-	defer cancel()
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return fmt.Errorf("invalid request: %w", err)
+func parseHeaders(raw []string) (map[string]string, error) {
+	if len(raw) == 0 {
+		return nil, nil
 	}
 
-	switch {
-	case dlUserAgent != "":
-		req.Header.Set("User-Agent", dlUserAgent)
-	default:
-		req.Header.Set("User-Agent", "DankMaterialShell/1.0 (Linux)")
-	}
-
-	dialer := &net.Dialer{Timeout: 5 * time.Second}
-	transport := &http.Transport{DialContext: dialer.DialContext}
-	if dlIPv4Only {
-		transport.DialContext = func(ctx context.Context, network, addr string) (net.Conn, error) {
-			return dialer.DialContext(ctx, "tcp4", addr)
+	headers := make(map[string]string, len(raw))
+	for _, entry := range raw {
+		name, value, found := strings.Cut(entry, ":")
+		if !found {
+			return nil, fmt.Errorf("invalid header %q: expected 'Name: value'", entry)
 		}
+		name = strings.TrimSpace(name)
+		if name == "" {
+			return nil, fmt.Errorf("invalid header %q: empty name", entry)
+		}
+		headers[name] = strings.TrimSpace(value)
 	}
-	client := &http.Client{Transport: transport}
+	return headers, nil
+}
 
-	resp, err := client.Do(req)
+func runDownload(url string) error {
+	headers, err := parseHeaders(dlHeaders)
 	if err != nil {
-		return fmt.Errorf("download failed: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return fmt.Errorf("HTTP %d", resp.StatusCode)
-	}
-
-	if dlOutput == "" {
-		_, err = io.Copy(os.Stdout, resp.Body)
 		return err
 	}
 
-	if dir := filepath.Dir(dlOutput); dir != "." {
-		if err := os.MkdirAll(dir, 0755); err != nil {
-			return fmt.Errorf("mkdir failed: %w", err)
-		}
+	opts := netfetch.Options{
+		Headers:        headers,
+		UserAgent:      dlUserAgent,
+		Timeout:        time.Duration(dlTimeout) * time.Second,
+		ConnectTimeout: time.Duration(dlConnectTimeout) * time.Second,
+		IPv4Only:       dlIPv4Only,
 	}
 
-	f, err := os.Create(dlOutput)
-	if err != nil {
-		return fmt.Errorf("create failed: %w", err)
+	if dlOutput == "" {
+		return netfetch.ToWriter(context.Background(), url, opts, os.Stdout)
 	}
-	defer f.Close()
 
-	if _, err := io.Copy(f, resp.Body); err != nil {
-		os.Remove(dlOutput)
-		return fmt.Errorf("write failed: %w", err)
+	if err := netfetch.ToFile(context.Background(), url, opts, dlOutput); err != nil {
+		return err
 	}
 
 	fmt.Println(dlOutput)

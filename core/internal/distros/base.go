@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/netfetch"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/privesc"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/version"
 )
@@ -661,16 +662,9 @@ func (b *BaseDistribution) installDMSBinary(ctx context.Context, sudoPassword st
 		CommandInfo: fmt.Sprintf("Downloading dms-%s.gz", arch),
 	}
 
-	// Get latest release version
-	latestVersionCmd := exec.CommandContext(ctx, "bash", "-c",
-		`curl -s https://api.github.com/repos/AvengeMedia/DankMaterialShell/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'`)
-	versionOutput, err := latestVersionCmd.Output()
+	version, err := netfetch.LatestReleaseTag(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to get latest DMS version: %w", err)
-	}
-	version := strings.TrimSpace(string(versionOutput))
-	if version == "" {
-		return fmt.Errorf("could not determine latest DMS version")
 	}
 
 	homeDir, err := os.UserHomeDir()
@@ -687,8 +681,7 @@ func (b *BaseDistribution) installDMSBinary(ctx context.Context, sudoPassword st
 	downloadURL := fmt.Sprintf("https://github.com/AvengeMedia/DankMaterialShell/releases/download/%s/dms-cli-%s.gz", version, arch)
 	gzPath := filepath.Join(tmpDir, "dms.gz")
 
-	downloadCmd := exec.CommandContext(ctx, "curl", "-L", downloadURL, "-o", gzPath)
-	if err := downloadCmd.Run(); err != nil {
+	if err := netfetch.ToFile(ctx, downloadURL, netfetch.Options{Timeout: 5 * time.Minute}, gzPath); err != nil {
 		return fmt.Errorf("failed to download DMS binary: %w", err)
 	}
 

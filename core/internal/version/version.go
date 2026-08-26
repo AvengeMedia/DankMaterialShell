@@ -1,7 +1,7 @@
 package version
 
 import (
-	"encoding/json"
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/netfetch"
 )
 
 type VersionInfo struct {
@@ -26,7 +27,7 @@ type VersionFetcher interface {
 	GetLatestVersion(dmsPath string) (string, error)
 }
 
-// DefaultVersionFetcher is the default implementation that uses git/curl
+// DefaultVersionFetcher is the default implementation that uses git and the GitHub API
 type DefaultVersionFetcher struct{}
 
 func (d *DefaultVersionFetcher) GetCurrentVersion(dmsPath string) (string, error) {
@@ -135,29 +136,7 @@ func (d *DefaultVersionFetcher) GetLatestVersion(dmsPath string) (string, error)
 		}
 	}
 
-	// Add timeout to prevent hanging when GitHub is down
-	cmd := exec.Command("curl", "-s", "--max-time", "5", "https://api.github.com/repos/AvengeMedia/DankMaterialShell/releases/latest")
-	output, err := cmd.Output()
-	if err != nil {
-		return "", fmt.Errorf("failed to fetch latest release: %w", err)
-	}
-
-	var result struct {
-		TagName string `json:"tag_name"`
-	}
-	if err := json.Unmarshal(output, &result); err != nil {
-		for line := range strings.SplitSeq(string(output), "\n") {
-			if strings.Contains(line, "\"tag_name\"") {
-				parts := strings.Split(line, "\"")
-				if len(parts) >= 4 {
-					return parts[3], nil
-				}
-			}
-		}
-		return "", fmt.Errorf("failed to parse latest version: %w", err)
-	}
-
-	return result.TagName, nil
+	return netfetch.LatestReleaseTag(context.Background())
 }
 
 // defaultFetcher is used by the public functions
