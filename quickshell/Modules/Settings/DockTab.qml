@@ -244,6 +244,48 @@ Item {
 
             SettingsCard {
                 width: parent.width
+                iconName: "zoom_in"
+                title: I18n.tr("Magnification")
+                settingKey: "dockMagnification"
+
+                SettingsToggleRow {
+                    settingKey: "dockMagnificationEnabled"
+                    tags: ["dock", "magnification", "zoom", "macos", "hover", "effect"]
+                    text: I18n.tr("Enable Magnification")
+                    description: I18n.tr("Magnify dock icons under the cursor, similar to macOS")
+                    checked: SettingsData.dockMagnificationEnabled
+                    onToggled: checked => SettingsData.set("dockMagnificationEnabled", checked)
+                }
+
+                SettingsSliderRow {
+                    settingKey: "dockMagnificationAmount"
+                    tags: ["dock", "magnification", "zoom", "scale", "amount"]
+                    text: I18n.tr("Magnification Amount")
+                    minimum: 110
+                    maximum: 170
+                    step: 10
+                    value: Math.round(SettingsData.dockMagnificationAmount * 100)
+                    defaultValue: 160
+                    visible: SettingsData.dockMagnificationEnabled
+                    onSliderValueChanged: newValue => SettingsData.set("dockMagnificationAmount", newValue / 100)
+                }
+
+                SettingsSliderRow {
+                    settingKey: "dockMagnificationSpread"
+                    tags: ["dock", "magnification", "spread", "reach", "range"]
+                    text: I18n.tr("Effect Spread")
+                    minimum: 100
+                    maximum: 800
+                    step: 10
+                    value: Math.round(SettingsData.dockMagnificationSpread * 100)
+                    defaultValue: 380
+                    visible: SettingsData.dockMagnificationEnabled
+                    onSliderValueChanged: newValue => SettingsData.set("dockMagnificationSpread", newValue / 100)
+                }
+            }
+
+            SettingsCard {
+                width: parent.width
                 iconName: "apps"
                 title: I18n.tr("Launcher Button")
                 settingKey: "dockLauncher"
@@ -623,6 +665,19 @@ Item {
                     unit: "px"
                     defaultValue: 8
                     onSliderValueChanged: newValue => SettingsData.set("dockSpacing", newValue)
+                }
+
+                SettingsSliderRow {
+                    settingKey: "dockAppSpacing"
+                    tags: ["dock", "spacing", "gap", "app", "icon", "buttons"]
+                    text: I18n.tr("App Spacing")
+                    description: I18n.tr("Gap between app icons in the dock")
+                    value: SettingsData.dockAppSpacing
+                    minimum: 0
+                    maximum: 10
+                    unit: "px"
+                    defaultValue: 4
+                    onSliderValueChanged: newValue => SettingsData.set("dockAppSpacing", newValue)
                 }
 
                 SettingsSliderRow {

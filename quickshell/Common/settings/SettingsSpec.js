@@ -461,6 +461,10 @@ var SPEC = {
     dockShowTrash: { def: false },
     dockTrashFileManager: { def: "default" },
     dockTrashCustomCommand: { def: "" },
+    dockMagnificationEnabled: { def: false },
+    dockMagnificationAmount:  { def: 1.6 },
+    dockMagnificationSpread:  { def: 3.8 },
+    dockAppSpacing:           { def: 4 },
 
     notificationOverlayEnabled: { def: false },
     notificationPopupShadowEnabled: { def: true },

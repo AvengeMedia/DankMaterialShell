@@ -26,8 +26,8 @@ Item {
 
     property real stableMouseDelta: -9999
     property real globalMagFactor: 0
-    readonly property real maxMagnification: SettingsData.dockMagnificationEnabled ? SettingsData.dockMagnificationAmount : 1.0
-    readonly property real magSpread: SettingsData.dockMagnificationEnabled ? root.iconSize * SettingsData.dockMagnificationSpread : 1
+    readonly property real maxMagnification: 1.6
+    readonly property real magSpread: root.iconSize * 3.8
 
     readonly property real baseImplicitWidth: isVertical ? baseAppHeight : baseAppWidth
     readonly property real baseImplicitHeight: isVertical ? baseAppWidth : baseAppHeight
@@ -39,56 +39,32 @@ Item {
             if (item.isInOverflow)
                 continue;
             if (item.type === "separator") {
-                count += 8 / (iconSize * 1.2);
+                count += 8 / root.iconSize;
             } else {
                 count += 1;
             }
         }
-        return count * (iconSize * 1.2) + Math.max(0, count - 1) * layoutFlow.spacing;
+        return count * root.iconSize + Math.max(0, count - 1) * layoutFlow.spacing;
     }
+    
     readonly property real baseAppHeight: iconSize
 
     clip: false
-    implicitWidth: isVertical ? appLayout.height : appLayout.width
-    implicitHeight: isVertical ? appLayout.width : appLayout.height
+    implicitWidth: isVertical ? appLayout.width : appLayout.width
+    implicitHeight: isVertical ? appLayout.height : appLayout.height
 
-    function dockIndexToPinnedIndex(dockIndex) {
-        if (!SettingsData.dockLauncherEnabled)
-            return dockIndex;
-
-        const launcherPos = SessionData.dockLauncherPosition;
-        return dockIndex < launcherPos ? dockIndex : dockIndex - 1;
-    }
-
-    function movePinnedApp(fromDockIndex, toDockIndex) {
-        const fromPinnedIndex = dockIndexToPinnedIndex(fromDockIndex);
-        const toPinnedIndex = dockIndexToPinnedIndex(toDockIndex);
-
-        if (fromPinnedIndex === toPinnedIndex)
-            return;
-
-        const currentPinned = [...(SessionData.pinnedApps || [])];
-        if (fromPinnedIndex < 0 || fromPinnedIndex >= currentPinned.length || toPinnedIndex < 0 || toPinnedIndex >= currentPinned.length)
-            return;
-
-        const movedApp = currentPinned.splice(fromPinnedIndex, 1)[0];
-        currentPinned.splice(toPinnedIndex, 0, movedApp);
-        SessionData.setPinnedApps(currentPinned);
-    }
-
+    // Точный перевод координат мыши из динамического размера дока в базовая нерасширенную систему
     function updateMouseDelta(pos) {
-        if (baseAppWidth <= 0)
-            return;
+        if (baseAppWidth <= 0) return;
         let accumCurrent = 0;
         let accumBase = 0;
 
         for (let i = 0; i < repeater.count; i++) {
             let item = repeater.itemAt(i);
-            if (!item || item.isInOverflow)
-                continue;
+            if (!item || item.isInOverflow) continue;
 
             let curSize = isVertical ? item.height : item.width;
-            let baseSize = (repeater.dockItems[i]?.type === "separator") ? 8 : iconSize * 1.2;
+            let baseSize = (repeater.dockItems[i]?.type === "separator") ? (isVertical ? iconSize : 8) : iconSize;
             let spacing = layoutFlow.spacing;
 
             if (pos <= accumCurrent + curSize + spacing / 2) {
@@ -115,6 +91,30 @@ Item {
         }
     }
 
+    function dockIndexToPinnedIndex(dockIndex) {
+        if (!SettingsData.dockLauncherEnabled)
+            return dockIndex;
+
+        const launcherPos = SessionData.dockLauncherPosition;
+        return dockIndex < launcherPos ? dockIndex : dockIndex - 1;
+    }
+
+    function movePinnedApp(fromDockIndex, toDockIndex) {
+        const fromPinnedIndex = dockIndexToPinnedIndex(fromDockIndex);
+        const toPinnedIndex = dockIndexToPinnedIndex(toDockIndex);
+
+        if (fromPinnedIndex === toPinnedIndex)
+            return;
+
+        const currentPinned = [...(SessionData.pinnedApps || [])];
+        if (fromPinnedIndex < 0 || fromPinnedIndex >= currentPinned.length || toPinnedIndex < 0 || toPinnedIndex >= currentPinned.length)
+            return;
+
+        const movedApp = currentPinned.splice(fromPinnedIndex, 1)[0];
+        currentPinned.splice(toPinnedIndex, 0, movedApp);
+        SessionData.setPinnedApps(currentPinned);
+    }
+
     Item {
         id: appLayout
         width: layoutFlow.width
@@ -127,25 +127,20 @@ Item {
                 root.updateMouseDelta(pos);
             }
             onHoveredChanged: {
-                root.globalMagFactor = SettingsData.dockMagnificationEnabled && hovered ? 1.0 : 0.0;
+                root.globalMagFactor = hovered ? 1.0 : 0.0;
             }
         }
 
         Behavior on width {
             enabled: root.globalMagFactor === 0
-            NumberAnimation {
-                duration: Theme.shortDuration
-                easing.type: Easing.OutCubic
-            }
+            NumberAnimation { duration: Theme.shortDuration; easing.type: Easing.OutCubic }
         }
 
         Behavior on height {
             enabled: root.globalMagFactor === 0
-            NumberAnimation {
-                duration: Theme.shortDuration
-                easing.type: Easing.OutCubic
-            }
+            NumberAnimation { duration: Theme.shortDuration; easing.type: Easing.OutCubic }
         }
+        
         anchors.horizontalCenter: root.isVertical ? undefined : parent.horizontalCenter
         anchors.verticalCenter: root.isVertical ? parent.verticalCenter : undefined
         anchors.left: root.isVertical && SettingsData.dockPosition === SettingsData.Position.Left ? parent.left : undefined
@@ -155,7 +150,7 @@ Item {
         Flow {
             id: layoutFlow
             flow: root.isVertical ? Flow.TopToBottom : Flow.LeftToRight
-            spacing: SettingsData.dockAppSpacing
+            spacing: Math.min(8, Math.max(4, root.iconSize * 0.08))
 
             Repeater {
                 id: repeater
@@ -202,7 +197,6 @@ Item {
                 }
 
                 function buildBaseItems() {
-                    const items = [];
                     const pinnedApps = [...(SessionData.pinnedApps || [])];
                     const allToplevels = CompositorService.sortedToplevels;
                     const sortedToplevels = (SettingsData.dockIsolateDisplays && root.dockScreen) ? allToplevels.filter(t => isOnScreen(t, root.dockScreen.name)) : allToplevels;
@@ -216,21 +210,18 @@ Item {
                 function buildGroupedItems(pinnedApps, sortedToplevels) {
                     const items = [];
                     const appGroups = new Map();
-                    const separatePinnedAndRunning = SettingsData.dockSeparatePinnedAndRunningApps;
 
-                    if (!separatePinnedAndRunning) {
-                        pinnedApps.forEach(rawAppId => {
-                            const appId = Paths.moddedAppId(rawAppId);
-                            const coreAppData = getCoreAppData(appId);
-                            appGroups.set(appId, {
-                                appId: appId,
-                                isPinned: true,
-                                windows: [],
-                                isCoreApp: coreAppData !== null,
-                                coreAppData: coreAppData
-                            });
+                    pinnedApps.forEach(rawAppId => {
+                        const appId = Paths.moddedAppId(rawAppId);
+                        const coreAppData = getCoreAppData(appId);
+                        appGroups.set(appId, {
+                            appId: appId,
+                            isPinned: true,
+                            windows: [],
+                            isCoreApp: coreAppData !== null,
+                            coreAppData: coreAppData
                         });
-                    }
+                    });
 
                     sortedToplevels.forEach((toplevel, index) => {
                         const rawAppId = toplevel.appId || "unknown";
@@ -279,24 +270,6 @@ Item {
                         (group.isPinned ? pinnedGroups : unpinnedGroups).push(item);
                     });
 
-                    if (separatePinnedAndRunning) {
-                        pinnedApps.forEach(rawAppId => {
-                            const appId = Paths.moddedAppId(rawAppId);
-                            const coreAppData = getCoreAppData(appId);
-                            pinnedGroups.push({
-                                uniqueKey: "pinned_" + appId,
-                                type: "pinned",
-                                appId: appId,
-                                toplevel: null,
-                                isPinned: true,
-                                isRunning: false,
-                                isCoreApp: coreAppData !== null,
-                                coreAppData: coreAppData,
-                                isInOverflow: false
-                            });
-                        });
-                    }
-
                     pinnedGroups.forEach(item => items.push(item));
                     insertLauncher(items);
 
@@ -317,7 +290,6 @@ Item {
                     const items = [];
                     const runningAppIds = new Set();
                     const windowItems = [];
-                    const separatePinnedAndRunning = SettingsData.dockSeparatePinnedAndRunningApps;
 
                     sortedToplevels.forEach((toplevel, index) => {
                         let uniqueKey = "window_" + index;
@@ -362,21 +334,6 @@ Item {
                     pinnedApps.forEach(rawAppId => {
                         const appId = Paths.moddedAppId(rawAppId);
                         const coreAppData = getCoreAppData(appId);
-                        if (separatePinnedAndRunning) {
-                            items.push({
-                                uniqueKey: "pinned_" + appId,
-                                type: "pinned",
-                                appId: appId,
-                                toplevel: null,
-                                isPinned: true,
-                                isRunning: false,
-                                isCoreApp: coreAppData !== null,
-                                coreAppData: coreAppData,
-                                isInOverflow: false
-                            });
-                            return;
-                        }
-
                         const matchIndex = remainingWindowItems.findIndex(item => item.appId === appId);
 
                         if (matchIndex !== -1) {
@@ -477,9 +434,7 @@ Item {
                 }
 
                 function applyOverflow(baseResult) {
-                    const {
-                        items
-                    } = baseResult;
+                    const { items } = baseResult;
                     const maxPinned = root.maxVisibleApps;
                     const maxRunning = root.maxVisibleRunningApps;
 
@@ -590,6 +545,7 @@ Item {
                     readonly property bool isOverflowToggle: itemData.type === "overflow-toggle"
                     readonly property bool isTrash: itemData.type === "trash"
                     readonly property bool isInOverflow: itemData.isInOverflow === true
+                    readonly property bool isSeparator: itemData.type === "separator"
                     readonly property bool isDragging: {
                         switch (itemData.type) {
                         case "launcher":
@@ -601,45 +557,40 @@ Item {
                         }
                     }
 
-                    clip: false
-                    z: isDragging ? 100 : Math.round(magFactor * 50)
-                    visible: !isInOverflow || root.overflowExpanded
-                    opacity: (isInOverflow && !root.overflowExpanded) ? 0 : 1
-
-                    readonly property bool isSeparator: itemData.type === "separator"
-
-                    readonly property real baseCenterPos: {
+                    property real baseCenterPos: {
                         let pos = 0;
                         const items = repeater.dockItems;
                         for (let i = 0; i < delegateItem.index; i++) {
                             const item = items[i];
-                            if (item.isInOverflow && !root.overflowExpanded)
-                                continue;
-                            let w = (item.type === "separator") ? 8 : root.iconSize * 1.2;
+                            if (item.isInOverflow && !root.overflowExpanded) continue;
+                            let w = (item.type === "separator") ? (root.isVertical ? root.iconSize : 8) : root.iconSize;
                             pos += w + layoutFlow.spacing;
                         }
-                        let myW = (itemData.type === "separator") ? 8 : root.iconSize * 1.2;
+                        let myW = (itemData.type === "separator") ? (root.isVertical ? root.iconSize : 8) : root.iconSize;
                         return pos + myW / 2;
                     }
 
                     readonly property real stableItemDelta: baseCenterPos - (root.baseAppWidth / 2)
                     readonly property real distToMouse: root.globalMagFactor === 0 ? 9999 : Math.abs(stableItemDelta - root.stableMouseDelta)
-
+                    
                     readonly property real magFactor: {
-                        if (!SettingsData.dockMagnificationEnabled || isSeparator || root.globalMagFactor === 0)
-                            return 0;
-                        if (distToMouse >= root.magSpread)
-                            return 0;
+                        if (isSeparator || root.globalMagFactor === 0) return 0;
+                        if (distToMouse >= root.magSpread) return 0;
                         return Math.pow(Math.cos((distToMouse / root.magSpread) * (Math.PI / 2)), 2);
                     }
-
-                    readonly property real targetScale: (isInOverflow && !root.overflowExpanded)
-                        ? 0.8
+                    
+                    readonly property real targetScale: (isInOverflow && !root.overflowExpanded) 
+                        ? 0.8 
                         : (1.0 + (root.maxMagnification - 1.0) * magFactor * root.globalMagFactor)
 
-                    readonly property real baseW: (isInOverflow && !root.overflowExpanded) ? 0 : (isSeparator ? (root.isVertical ? root.iconSize : 8) : (root.isVertical ? root.iconSize : root.iconSize * 1.2))
-                    readonly property real baseH: (isInOverflow && !root.overflowExpanded) ? 0 : (isSeparator ? (root.isVertical ? 8 : root.iconSize) : (root.isVertical ? root.iconSize * 1.2 : root.iconSize))
+                    readonly property real baseW: (isInOverflow && !root.overflowExpanded) ? 0 : (isSeparator ? (root.isVertical ? root.iconSize : 8) : root.iconSize)
+                    readonly property real baseH: (isInOverflow && !root.overflowExpanded) ? 0 : (isSeparator ? (root.isVertical ? 8 : root.iconSize) : root.iconSize)
 
+                    clip: false
+                    z: isDragging ? 100 : Math.round(magFactor * 50)
+                    visible: !isInOverflow || root.overflowExpanded
+                    opacity: (isInOverflow && !root.overflowExpanded) ? 0 : 1
+                    
                     width: root.isVertical ? baseW : (baseW * targetScale)
                     height: root.isVertical ? (baseH * targetScale) : baseH
 
@@ -659,7 +610,7 @@ Item {
                         const dragIdx = root.draggedIndex;
                         const dropIdx = root.dropTargetIndex;
                         const myIdx = model.index;
-                        const shiftAmount = root.iconSize * 1.2 + layoutFlow.spacing;
+                        const shiftAmount = root.iconSize + layoutFlow.spacing;
 
                         if (dropIdx < 0)
                             return 0;
@@ -670,58 +621,42 @@ Item {
                         return 0;
                     }
 
-                    readonly property var shiftSpringParams: Theme.springPreset("fast", 150)
-
-                    SpringMotion {
-                        id: shiftXSpring
-                        enabled: !root.suppressShiftAnimation
-                        positionEpsilon: 0.05
-                        velocityEpsilon: 0.05
-                        stiffness: delegateItem.shiftSpringParams.stiffness
-                        damping: delegateItem.shiftSpringParams.damping
-                        value: delegateItem.shiftOffset
-
-                        Component.onCompleted: snapTo(delegateItem.shiftOffset)
-                    }
-
-                    SpringMotion {
-                        id: shiftYSpring
-                        enabled: !root.suppressShiftAnimation
-                        positionEpsilon: 0.05
-                        velocityEpsilon: 0.05
-                        stiffness: delegateItem.shiftSpringParams.stiffness
-                        damping: delegateItem.shiftSpringParams.damping
-                        value: delegateItem.shiftOffset
-
-                        Component.onCompleted: snapTo(delegateItem.shiftOffset)
-                    }
-
-                    onShiftOffsetChanged: {
-                        shiftXSpring.retarget(shiftOffset);
-                        shiftYSpring.retarget(shiftOffset);
-                    }
-
                     transform: Translate {
-                        x: root.isVertical ? 0 : shiftXSpring.value
-                        y: root.isVertical ? shiftYSpring.value : 0
+                        x: root.isVertical ? 0 : delegateItem.shiftOffset
+                        y: root.isVertical ? delegateItem.shiftOffset : 0
+
+                        Behavior on x {
+                            enabled: !root.suppressShiftAnimation
+                            NumberAnimation {
+                                duration: 150
+                                easing.type: Easing.OutCubic
+                            }
+                        }
+
+                        Behavior on y {
+                            enabled: !root.suppressShiftAnimation
+                            NumberAnimation {
+                                duration: 150
+                                easing.type: Easing.OutCubic
+                            }
+                        }
                     }
 
                     Item {
                         id: visualWrapper
                         width: delegateItem.baseW
                         height: delegateItem.baseH
-
+                        
                         anchors.bottom: root.isVertical ? undefined : parent.bottom
                         anchors.horizontalCenter: root.isVertical ? undefined : parent.horizontalCenter
-
+                        
                         anchors.verticalCenter: root.isVertical ? parent.verticalCenter : undefined
                         anchors.left: (root.isVertical && SettingsData.dockPosition === SettingsData.Position.Left) ? parent.left : undefined
                         anchors.right: (root.isVertical && SettingsData.dockPosition === SettingsData.Position.Right) ? parent.right : undefined
 
                         scale: delegateItem.targetScale
                         transformOrigin: {
-                            if (!root.isVertical)
-                                return Item.Bottom;
+                            if (!root.isVertical) return Item.Bottom;
                             return SettingsData.dockPosition === SettingsData.Position.Left ? Item.Left : Item.Right;
                         }
 
@@ -740,7 +675,7 @@ Item {
                             anchors.centerIn: parent
                             width: parent.width
                             height: parent.height
-                            actualIconSize: root.iconSize
+                            actualIconSize: root.iconSize 
                             overflowCount: itemData.overflowCount || 0
                             overflowExpanded: root.overflowExpanded
                             isVertical: root.isVertical
@@ -842,15 +777,6 @@ Item {
         }
         function onDockMaxVisibleRunningAppsChanged() {
             repeater.updateModel();
-        }
-        function onDockSeparatePinnedAndRunningAppsChanged() {
-            root.suppressShiftAnimation = true;
-            root.draggedIndex = -1;
-            root.dropTargetIndex = -1;
-            repeater.updateModel();
-            Qt.callLater(() => {
-                root.suppressShiftAnimation = false;
-            });
         }
         function onDockShowTrashChanged() {
             repeater.updateModel();
