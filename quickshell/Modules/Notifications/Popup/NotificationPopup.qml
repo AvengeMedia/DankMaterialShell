@@ -109,6 +109,7 @@ PanelWindow {
     readonly property string clearText: I18n.tr("Dismiss")
     property bool descriptionExpanded: false
     readonly property bool hasExpandableBody: (notificationData?.htmlBody || "").replace(/<[^>]*>/g, "").trim().length > 0
+    readonly property bool bodyClickInvokesAction: SettingsData.notificationPopupBodyInvokesAction && (notificationData?.actions?.length ?? 0) > 0
     onDescriptionExpandedChanged: {
         if (connectedFrameMode)
             popupChromeGeometryChanged();
@@ -174,6 +175,11 @@ PanelWindow {
     function closeTransientUi() {
         transientSurfaces.closeAll();
         popupContextMenuLoader.active = false;
+    }
+
+    function invokeDefaultAction() {
+        notificationData.actions[0].invoke();
+        NotificationService.dismissNotification(notificationData);
     }
 
     function dismissPopupReliably() {
@@ -966,10 +972,16 @@ PanelWindow {
 
                         MouseArea {
                             anchors.fill: parent
-                            cursorShape: parent.hoveredLink ? Qt.PointingHandCursor : (bodyText.hasMoreText || descriptionExpanded) ? Qt.PointingHandCursor : Qt.ArrowCursor
+                            cursorShape: (parent.hoveredLink || win.bodyClickInvokesAction || bodyText.hasMoreText || descriptionExpanded) ? Qt.PointingHandCursor : Qt.ArrowCursor
 
                             onClicked: mouse => {
-                                if (!parent.hoveredLink && (bodyText.hasMoreText || descriptionExpanded))
+                                if (parent.hoveredLink || win.exiting)
+                                    return;
+                                if (win.bodyClickInvokesAction) {
+                                    win.invokeDefaultAction();
+                                    return;
+                                }
+                                if (bodyText.hasMoreText || descriptionExpanded)
                                     win.descriptionExpanded = !win.descriptionExpanded;
                             }
 
@@ -1023,7 +1035,7 @@ PanelWindow {
                 iconSize: compactMode ? 14 : 16
                 buttonSize: compactMode ? 20 : 24
                 z: 15
-                visible: SettingsData.notificationPopupPrivacyMode && win.hasExpandableBody
+                visible: (SettingsData.notificationPopupPrivacyMode || win.bodyClickInvokesAction) && win.hasExpandableBody
 
                 onClicked: {
                     if (win.hasExpandableBody)
@@ -1155,6 +1167,10 @@ PanelWindow {
                             menu.showAt(win.margins.left + p.x, win.margins.top + p.y, win.screen);
                         }
                     } else if (mouse.button === Qt.LeftButton) {
+                        if (win.bodyClickInvokesAction) {
+                            win.invokeDefaultAction();
+                            return;
+                        }
                         const canExpand = bodyText.hasMoreText || win.descriptionExpanded || (SettingsData.notificationPopupPrivacyMode && win.hasExpandableBody);
                         if (canExpand) {
                             win.descriptionExpanded = !win.descriptionExpanded;
