@@ -56,7 +56,7 @@ func sunDeclination(orbitAngle float64) float64 {
 
 func sunHourAngle(latRad, declination, targetSunRad float64) float64 {
 	return math.Acos(math.Cos(targetSunRad)/
-		math.Cos(latRad)*math.Cos(declination) -
+		(math.Cos(latRad)*math.Cos(declination)) -
 		math.Tan(latRad)*math.Tan(declination))
 }
 
