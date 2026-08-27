@@ -165,6 +165,7 @@ Singleton {
     property string customThemeFile: ""
     property var registryThemeVariants: ({})
     property string matugenScheme: "scheme-tonal-spot"
+    property bool matugenSmartMode: false
     property real matugenContrast: 0
     property bool runUserMatugenTemplates: true
     property string matugenTargetMonitor: ""
@@ -2730,6 +2731,12 @@ Singleton {
         if (typeof Theme !== "undefined") {
             Theme.generateSystemThemesFromCurrentTheme();
         }
+    }
+
+    function setMatugenSmartMode(enabled) {
+        if (matugenSmartMode === enabled)
+            return;
+        set("matugenSmartMode", enabled);
     }
 
     function setMatugenContrast(value) {

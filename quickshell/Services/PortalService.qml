@@ -91,6 +91,8 @@ Singleton {
             return false;
         if (typeof SessionData !== "undefined" && SessionData.themeModeAutoEnabled)
             return false;
+        if (SettingsData.matugenSmartMode && typeof Theme !== "undefined" && Theme.currentTheme === Theme.dynamic)
+            return false;
         return typeof Theme !== "undefined";
     }
 

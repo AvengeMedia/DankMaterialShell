@@ -970,3 +970,96 @@ func TestSyncQtengineConfigBumpsMtime(t *testing.T) {
 	}
 	assert.Equal(t, string(before), string(after))
 }
+
+func TestExtractTopLevelString(t *testing.T) {
+	tests := []struct {
+		name    string
+		jsonStr string
+		key     string
+		want    string
+	}{
+		{name: "returns top-level string key", jsonStr: `{"mode":"light","colors":{}}`, key: "mode", want: "light"},
+		{name: "empty for missing key", jsonStr: `{"mode":"dark"}`, key: "is_dark_mode", want: ""},
+		{name: "empty for non-string value", jsonStr: `{"mode":42}`, key: "mode", want: ""},
+		{name: "empty for invalid json", jsonStr: `{mode`, key: "mode", want: ""},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.want, extractTopLevelString(tc.jsonStr, tc.key))
+		})
+	}
+}
+
+func TestResolveSmartMode(t *testing.T) {
+	tests := []struct {
+		name        string
+		mode        ColorMode
+		matugenType string
+		kind        string
+		stockColors string
+		isV42       bool
+		wantErr     string
+		wantMode    ColorMode
+	}{
+		{
+			name:     "concrete mode passes through untouched",
+			mode:     ColorModeLight,
+			kind:     "image",
+			isV42:    true,
+			wantMode: ColorModeLight,
+		},
+		{
+			name:    "smart mode errors on old matugen",
+			mode:    ColorModeSmart,
+			kind:    "image",
+			isV42:   false,
+			wantErr: "smart mode requires matugen 4.2+",
+		},
+		{
+			name:        "scheme-smart errors on old matugen",
+			mode:        ColorModeDark,
+			matugenType: "scheme-smart",
+			kind:        "image",
+			isV42:       false,
+			wantErr:     "scheme-smart requires matugen 4.2+",
+		},
+		{
+			name:     "smart falls back to dark for non-image kind",
+			mode:     ColorModeSmart,
+			kind:     "hex",
+			isV42:    true,
+			wantMode: ColorModeDark,
+		},
+		{
+			name:        "smart falls back to dark for stock colors",
+			mode:        ColorModeSmart,
+			kind:        "image",
+			stockColors: `{"primary":{}}`,
+			isV42:       true,
+			wantMode:    ColorModeDark,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			opts := &Options{
+				Mode:        tc.mode,
+				MatugenType: tc.matugenType,
+				Kind:        tc.kind,
+				StockColors: tc.stockColors,
+			}
+			if opts.MatugenType == "" {
+				opts.MatugenType = "scheme-tonal-spot"
+			}
+
+			err := resolveSmartMode(opts, matugenFlags{isV42: tc.isV42})
+			if tc.wantErr != "" {
+				assert.ErrorContains(t, err, tc.wantErr)
+				return
+			}
+			assert.NoError(t, err)
+			assert.Equal(t, tc.wantMode, opts.Mode)
+		})
+	}
+}

@@ -611,9 +611,10 @@ Singleton {
         }
     }
 
-    function setLightMode(lightMode) {
+    function setLightMode(lightMode, skipWallpaperSync) {
         isSwitchingMode = true;
-        syncWallpaperForCurrentMode(lightMode);
+        if (!skipWallpaperSync)
+            syncWallpaperForCurrentMode(lightMode);
         isLightMode = lightMode;
         saveSettings();
         Qt.callLater(() => {
