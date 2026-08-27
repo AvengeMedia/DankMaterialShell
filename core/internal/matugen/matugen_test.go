@@ -860,6 +860,46 @@ func TestSyncQtengineConfig(t *testing.T) {
 	}
 }
 
+func TestSyncQtengineConfigAtUsesExplicitConfigDir(t *testing.T) {
+	tempDir := t.TempDir()
+	xdgConfigDir := filepath.Join(tempDir, "xdg-config")
+	explicitConfigDir := filepath.Join(tempDir, "explicit-config")
+	dataHome := filepath.Join(tempDir, "data")
+	t.Setenv("XDG_CONFIG_HOME", xdgConfigDir)
+	t.Setenv("XDG_DATA_HOME", dataHome)
+
+	scheme := filepath.Join(dataHome, "color-schemes", "DankMatugen.colors")
+	if err := os.MkdirAll(filepath.Dir(scheme), 0o755); err != nil {
+		t.Fatalf("failed to create color-schemes dir: %v", err)
+	}
+	if err := os.WriteFile(scheme, []byte("[Colors:Window]\n"), 0o644); err != nil {
+		t.Fatalf("failed to write color scheme: %v", err)
+	}
+
+	if err := SyncQtengineConfigAt(explicitConfigDir, "Papirus-Dark"); err != nil {
+		t.Fatalf("sync with explicit config dir failed: %v", err)
+	}
+
+	explicitPath := filepath.Join(explicitConfigDir, "qtengine", "config.json")
+	data, err := os.ReadFile(explicitPath)
+	if err != nil {
+		t.Fatalf("failed to read config from explicit directory: %v", err)
+	}
+	var cfg map[string]any
+	if err := json.Unmarshal(data, &cfg); err != nil {
+		t.Fatalf("written config is not valid JSON: %v", err)
+	}
+	theme, ok := cfg["theme"].(map[string]any)
+	if !ok {
+		t.Fatalf("written config has no theme object: %#v", cfg["theme"])
+	}
+	assert.Equal(t, scheme, theme["colorScheme"])
+	assert.Equal(t, "Papirus-Dark", theme["iconTheme"])
+
+	_, err = os.Stat(filepath.Join(xdgConfigDir, "qtengine", "config.json"))
+	assert.ErrorIs(t, err, os.ErrNotExist, "explicit config dir must take precedence over XDG_CONFIG_HOME")
+}
+
 // The appended entry is the only thing driving the settings row's indicator.
 func TestCheckTemplatesIncludesQtengine(t *testing.T) {
 	tests := []struct {
