@@ -166,6 +166,26 @@ Item {
                     }
                 }
 
+                SettingsDropdownRow {
+                    tab: "time"
+                    tags: ["calendar", "tasks", "list", "default", "caldav", "todo"]
+                    settingKey: "defaultTaskCalendarId"
+                    visible: CalendarService.isDankActive && _taskLists.length > 0
+                    text: I18n.tr("Default Task List")
+                    description: I18n.tr("Task list used when adding tasks from the dash calendar")
+                    readonly property var _taskLists: (CalendarService.calendars || []).filter(c => c.holdsTasks && !c.readOnly && !c.hidden)
+                    readonly property var _labels: [I18n.tr("Auto")].concat(_taskLists.map(c => c.name))
+                    options: _labels
+                    currentValue: {
+                        const idx = _taskLists.findIndex(c => c.id === SettingsData.defaultTaskCalendarId);
+                        return idx >= 0 ? _labels[idx + 1] : I18n.tr("Auto");
+                    }
+                    onValueChanged: value => {
+                        const idx = _labels.indexOf(value);
+                        SettingsData.set("defaultTaskCalendarId", idx > 0 ? _taskLists[idx - 1].id : "");
+                    }
+                }
+
                 Rectangle {
                     width: parent.width
                     height: 1

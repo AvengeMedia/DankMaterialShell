@@ -228,6 +228,7 @@ Singleton {
     property int firstDayOfWeek: -1
     property bool showWeekNumber: false
     property string calendarBackend: "auto"
+    property string defaultTaskCalendarId: ""
     property string clockFormat: "auto"
     readonly property bool localeUses24Hour: {
         const fmt = Qt.locale().timeFormat(Locale.ShortFormat).replace(/'[^']*'/g, "");

@@ -78,6 +78,7 @@ var SPEC = {
     firstDayOfWeek: { def: -1 },
     showWeekNumber: { def: false },
     calendarBackend: { def: "auto" },
+    defaultTaskCalendarId: { def: "" },
     clockFormat: { def: "auto", onChange: "markGreeterSyncPending" },
     showSeconds: { def: false, onChange: "markGreeterSyncPending" },
     padHours12Hour: { def: false, onChange: "markGreeterSyncPending" },

@@ -573,7 +573,16 @@ Item {
 
     function defaultTaskCalendar() {
         const writable = taskCalendars().filter(c => !c.hidden);
-        return writable.length > 0 ? writable[0] : null;
+        if (writable.length === 0)
+            return null;
+        const preferred = SettingsData.defaultTaskCalendarId;
+        if (preferred) {
+            for (let i = 0; i < writable.length; i++) {
+                if (writable[i].id === preferred)
+                    return writable[i];
+            }
+        }
+        return writable[0];
     }
 
     function _taskAsEvent(t) {
