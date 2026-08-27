@@ -337,6 +337,7 @@ func InitializeTrayRecoveryManager() error {
 	}
 
 	trayRecoveryManager = manager
+	manager.WatchWatcherOwner()
 
 	log.Info("TrayRecovery manager initialized")
 	return nil
