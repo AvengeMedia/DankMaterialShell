@@ -135,7 +135,7 @@ func (r *RegionSelector) updateSelectionCurrent(os *OutputSurface, surfaceX, sur
 	curX := surfaceX + float64(os.output.x)
 	curY := surfaceY + float64(os.output.y)
 	if r.movingSelection {
-		r.updateMovedSelection(os, curX, curY)
+		r.updateMovedSelection(curX, curY)
 		return
 	}
 
@@ -165,11 +165,30 @@ func (r *RegionSelector) updateSelectionCurrent(os *OutputSurface, surfaceX, sur
 		}
 	}
 
+	if r.altHeld {
+		if minX, minY, maxX, maxY, ok := surfaceClampBounds(r.selection.surface); ok {
+			curX = math.Max(minX, math.Min(maxX, curX))
+			curY = math.Max(minY, math.Min(maxY, curY))
+		}
+	}
+
 	r.selection.currentX = curX
 	r.selection.currentY = curY
 	for _, surface := range r.surfaces {
 		r.redrawSurface(surface)
 	}
+}
+
+func surfaceClampBounds(os *OutputSurface) (minX, minY, maxX, maxY float64, ok bool) {
+	if os == nil || os.output == nil || os.logicalW <= 0 || os.logicalH <= 0 {
+		return 0, 0, 0, 0, false
+	}
+	epsilonX, epsilonY := surfaceEpsilon(os)
+	minX = float64(os.output.x)
+	minY = float64(os.output.y)
+	maxX = minX + float64(os.logicalW) - epsilonX
+	maxY = minY + float64(os.logicalH) - epsilonY
+	return minX, minY, maxX, maxY, true
 }
 
 func (r *RegionSelector) beginSelectionMove(pointerX, pointerY float64) bool {
@@ -185,7 +204,7 @@ func (r *RegionSelector) beginSelectionMove(pointerX, pointerY float64) bool {
 	return true
 }
 
-func (r *RegionSelector) updateMovedSelection(activeSurface *OutputSurface, pointerX, pointerY float64) {
+func (r *RegionSelector) updateMovedSelection(pointerX, pointerY float64) {
 	minX := math.Min(r.selection.anchorX, r.selection.currentX)
 	minY := math.Min(r.selection.anchorY, r.selection.currentY)
 	maxX := math.Max(r.selection.anchorX, r.selection.currentX)
@@ -195,7 +214,7 @@ func (r *RegionSelector) updateMovedSelection(activeSurface *OutputSurface, poin
 
 	newMinX := pointerX - r.moveOffsetX
 	newMinY := pointerY - r.moveOffsetY
-	newMinX, newMinY = r.clampMovedSelection(activeSurface, newMinX, newMinY, width, height)
+	newMinX, newMinY = r.clampMovedSelection(newMinX, newMinY, width, height)
 	deltaX := newMinX - minX
 	deltaY := newMinY - minY
 	r.selection.anchorX += deltaX
@@ -232,7 +251,7 @@ func (r *RegionSelector) rehomeSelectionSurface() {
 	}
 }
 
-func (r *RegionSelector) clampMovedSelection(activeSurface *OutputSurface, x, y, width, height float64) (float64, float64) {
+func (r *RegionSelector) clampMovedSelection(x, y, width, height float64) (float64, float64) {
 	var unionMinX, unionMinY, unionMaxX, unionMaxY, unionEpsX, unionEpsY float64
 	initialized := false
 	for _, surface := range r.surfaces {
@@ -261,29 +280,25 @@ func (r *RegionSelector) clampMovedSelection(activeSurface *OutputSurface, x, y,
 		return x, y
 	}
 
-	minX, minY, maxX, maxY := unionMinX, unionMinY, unionMaxX, unionMaxY
-	epsilonX, epsilonY := unionEpsX, unionEpsY
-	if activeSurface != nil && activeSurface.output != nil && activeSurface.logicalW > 0 && activeSurface.logicalH > 0 {
-		minX = float64(activeSurface.output.x)
-		minY = float64(activeSurface.output.y)
-		maxX = minX + float64(activeSurface.logicalW)
-		maxY = minY + float64(activeSurface.logicalH)
-		epsilonX, epsilonY = surfaceEpsilon(activeSurface)
+	minX, minY := unionMinX, unionMinY
+	maxX, maxY := unionMaxX-unionEpsX, unionMaxY-unionEpsY
+	if r.altHeld {
+		if surfMinX, surfMinY, surfMaxX, surfMaxY, ok := surfaceClampBounds(r.selection.surface); ok {
+			if surfMaxX-surfMinX >= width {
+				minX, maxX = surfMinX, surfMaxX
+			}
+			if surfMaxY-surfMinY >= height {
+				minY, maxY = surfMinY, surfMaxY
+			}
+		}
 	}
 
-	return clampMoveAxis(x, width, minX, maxX-epsilonX, unionMinX, unionMaxX-unionEpsX),
-		clampMoveAxis(y, height, minY, maxY-epsilonY, unionMinY, unionMaxY-unionEpsY)
+	return clampMoveAxis(x, width, minX, maxX),
+		clampMoveAxis(y, height, minY, maxY)
 }
 
-// a region larger than the active output falls back to the output union so the clamp range cannot invert and freeze the drag
-func clampMoveAxis(pos, size, lo, hi, unionLo, unionHi float64) float64 {
-	if hi-size < lo {
-		lo, hi = unionLo, unionHi
-	}
-	upper := hi - size
-	if upper < lo {
-		lo, upper = upper, lo
-	}
+func clampMoveAxis(pos, size, lo, hi float64) float64 {
+	upper := math.Max(lo, hi-size)
 	return math.Max(lo, math.Min(upper, pos))
 }
 
@@ -305,13 +320,17 @@ func (r *RegionSelector) setupKeyboardHandlers() {
 	r.keyboard.SetModifiersHandler(func(e client.KeyboardModifiersEvent) {
 		r.shiftHeld = e.ModsDepressed&1 != 0
 		r.ctrlHeld = e.ModsDepressed&4 != 0
+		r.altHeld = e.ModsDepressed&8 != 0
 		r.refreshCursor()
 	})
 
 	r.keyboard.SetKeyHandler(func(e client.KeyboardKeyEvent) {
-		if e.Key == 29 || e.Key == 97 { // Ctrl left/right
+		switch e.Key {
+		case 29, 97: // Ctrl left/right
 			r.ctrlHeld = e.State != 0
 			r.refreshCursor()
+		case 56, 100: // Alt left/right
+			r.altHeld = e.State != 0
 		}
 		if e.State != 1 {
 			return
@@ -449,6 +468,8 @@ func (r *RegionSelector) clampSelectionToSurface() {
 	minY := float64(os.output.y)
 	maxX := minX + float64(os.logicalW)
 	maxY := minY + float64(os.logicalH)
+	r.selection.anchorX = math.Max(minX, math.Min(maxX, r.selection.anchorX))
+	r.selection.anchorY = math.Max(minY, math.Min(maxY, r.selection.anchorY))
 	r.selection.currentX = math.Max(minX, math.Min(maxX, r.selection.currentX))
 	r.selection.currentY = math.Max(minY, math.Min(maxY, r.selection.currentY))
 }

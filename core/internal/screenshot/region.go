@@ -120,6 +120,7 @@ type RegionSelector struct {
 	showCapturedCursor bool
 	shiftHeld          bool
 	ctrlHeld           bool
+	altHeld            bool
 	movingSelection    bool
 	moveOffsetX        float64
 	moveOffsetY        float64
