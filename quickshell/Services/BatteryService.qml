@@ -141,15 +141,17 @@ Singleton {
 
     Component.onCompleted: _syncLastIsCharging()
 
-    function sendAlert(title, message, isWarning, category, notificationType) {
+    // urgency: "critical" (red), "warning" (orange/important), or "info"
+    function sendAlert(title, message, urgency, icon, notificationType) {
         if (notificationType === 1) {
-            Quickshell.execDetached(["notify-send", "-u", isWarning ? "critical" : "normal", "-a", "DMS", "-i", isWarning ? "material:battery_alert" : "material:battery_charging_full", title, message]);
+            const dbusUrgency = urgency === "critical" ? "critical" : (urgency === "warning" ? "normal" : "low");
+            Quickshell.execDetached(["notify-send", "-u", dbusUrgency, "-a", "DMS", "-i", icon, title, message]);
+        } else if (urgency === "critical") {
+            ToastService.showError(title, message, "", icon);
+        } else if (urgency === "warning") {
+            ToastService.showWarning(title, message, "", icon);
         } else {
-            if (isWarning) {
-                ToastService.showWarning(title, message, "", category);
-            } else {
-                ToastService.showInfo(title, message, "", category);
-            }
+            ToastService.showInfo(title, message, "", icon);
         }
     }
 
@@ -157,7 +159,7 @@ Singleton {
         if (isCharging && batteryLevel >= SettingsData.batteryChargeLimit) {
             if (!_hasNotifiedChargeLimit && SettingsData.batteryNotifyChargeLimit) {
                 _hasNotifiedChargeLimit = true;
-                sendAlert(I18n.tr("Charge Limit Reached"), I18n.tr("Battery has charged to your set limit of %1%").arg(SettingsData.batteryChargeLimit), false, "material:battery_profile", SettingsData.batteryChargeLimitNotificationType);
+                sendAlert(I18n.tr("Charge Limit Reached"), I18n.tr("Battery has charged to your set limit of %1%").arg(SettingsData.batteryChargeLimit), "info", "material:battery_profile", SettingsData.batteryChargeLimitNotificationType);
             }
         } else if (!isCharging || batteryLevel < SettingsData.batteryChargeLimit - 2) {
             _hasNotifiedChargeLimit = false;
@@ -173,7 +175,7 @@ Singleton {
         if (isCriticalBattery) {
             if (!_hasNotifiedCriticalBattery && SettingsData.batteryNotifyCritical) {
                 _hasNotifiedCriticalBattery = true;
-                sendAlert(I18n.tr("Critical Battery"), I18n.tr("Battery is at %1% - Connect charger immediately!").arg(batteryLevel), true, "material:battery_alert", SettingsData.batteryCriticalNotificationType);
+                sendAlert(I18n.tr("Critical Battery"), I18n.tr("Battery is at %1% - Connect charger immediately!").arg(batteryLevel), "critical", "material:battery_alert", SettingsData.batteryCriticalNotificationType);
             }
             return;
         }
@@ -186,7 +188,7 @@ Singleton {
         if (isLowBattery) {
             if (!_hasNotifiedLowBattery && SettingsData.batteryNotifyLow) {
                 _hasNotifiedLowBattery = true;
-                sendAlert(I18n.tr("Low Battery"), I18n.tr("Battery is at %1% - Consider charging soon").arg(batteryLevel), true, "material:battery_0_bar", SettingsData.batteryLowNotificationType);
+                sendAlert(I18n.tr("Low Battery"), I18n.tr("Battery is at %1% - Consider charging soon").arg(batteryLevel), "warning", "material:battery_0_bar", SettingsData.batteryLowNotificationType);
             }
 
             if (SettingsData.batteryAutoPowerSaver && PowerProfileWatcher.available) {
