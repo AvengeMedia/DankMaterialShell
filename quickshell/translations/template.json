@@ -172,7 +172,7 @@
     "translation": "",
     "context": "%1 notifications",
     "reference": "",
-    "comment": ""
+    "comment": "island compact face: unread notification count"
   },
   {
     "term": "%1 online",
@@ -180,6 +180,13 @@
     "context": "%1 online",
     "reference": "",
     "comment": "Number of online Tailscale peers"
+  },
+  {
+    "term": "%1 position",
+    "translation": "",
+    "context": "%1 position",
+    "reference": "",
+    "comment": ""
   },
   {
     "term": "%1 tasks",
@@ -728,6 +735,13 @@
     "comment": ""
   },
   {
+    "term": "A slight natural settle, DMS default",
+    "translation": "",
+    "context": "A slight natural settle, DMS default",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "A user with that name already exists.",
     "translation": "",
     "context": "A user with that name already exists.",
@@ -1134,6 +1148,13 @@
     "comment": ""
   },
   {
+    "term": "Additional settings are managed by the Island",
+    "translation": "",
+    "context": "Additional settings are managed by the Island",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Adjust pointer sensitivity speed",
     "translation": "",
     "context": "Adjust pointer sensitivity speed",
@@ -1260,6 +1281,13 @@
     "comment": ""
   },
   {
+    "term": "Allow %1 in Do Not Disturb",
+    "translation": "",
+    "context": "Allow %1 in Do Not Disturb",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Allow LAN access",
     "translation": "",
     "context": "Allow LAN access",
@@ -1291,6 +1319,13 @@
     "term": "Allow greeter login access",
     "translation": "",
     "context": "Allow greeter login access",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Allow in Do Not Disturb",
+    "translation": "",
+    "context": "Allow in Do Not Disturb",
     "reference": "",
     "comment": ""
   },
@@ -1551,7 +1586,7 @@
     "translation": "",
     "context": "Appearance",
     "reference": "",
-    "comment": "launcher appearance settings"
+    "comment": "island settings: appearance card title | launcher appearance settings"
   },
   {
     "term": "Apple Music animated covers",
@@ -1638,6 +1673,13 @@
     "comment": ""
   },
   {
+    "term": "Apply island geometry changes immediately without spring overshoot",
+    "translation": "",
+    "context": "Apply island geometry changes immediately without spring overshoot",
+    "reference": "",
+    "comment": "island settings: reduce motion description"
+  },
+  {
     "term": "Apply to Hardware",
     "translation": "",
     "context": "Apply to Hardware",
@@ -1690,6 +1732,13 @@
     "term": "Apps Icon",
     "translation": "",
     "context": "Apps Icon",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Apps allowed to show popups while Do Not Disturb is on. Right-click a notification and choose \"Allow in Do Not Disturb\" to add one here.",
+    "translation": "",
+    "context": "Apps allowed to show popups while Do Not Disturb is on. Right-click a notification and choose \"Allow in Do Not Disturb\" to add one here.",
     "reference": "",
     "comment": ""
   },
@@ -1960,6 +2009,20 @@
     "comment": "bar shadow direction source option | shadow direction option"
   },
   {
+    "term": "Auto (Dark Mode)",
+    "translation": "",
+    "context": "Auto (Dark Mode)",
+    "reference": "",
+    "comment": "dark mode toggle label when matugen smart mode resolved dark"
+  },
+  {
+    "term": "Auto (Light Mode)",
+    "translation": "",
+    "context": "Auto (Light Mode)",
+    "reference": "",
+    "comment": "dark mode toggle label when matugen smart mode resolved light"
+  },
+  {
     "term": "Auto (Wide)",
     "translation": "",
     "context": "Auto (Wide)",
@@ -1972,6 +2035,13 @@
     "context": "Auto Compositor Gaps",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Auto From Wallpaper",
+    "translation": "",
+    "context": "Auto From Wallpaper",
+    "reference": "",
+    "comment": "toggle that lets wallpaper brightness decide light/dark mode"
   },
   {
     "term": "Auto Location",
@@ -2212,6 +2282,13 @@
     "comment": ""
   },
   {
+    "term": "Automatically picks the scheme variant based on the wallpaper.",
+    "translation": "",
+    "context": "Automatically picks the scheme variant based on the wallpaper.",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Automatically save changes to opened files as you type",
     "translation": "",
     "context": "Automatically save changes to opened files as you type",
@@ -2258,7 +2335,7 @@
     "translation": "",
     "context": "Available",
     "reference": "",
-    "comment": ""
+    "comment": "audio port availability status"
   },
   {
     "term": "Available Layouts",
@@ -2328,7 +2405,7 @@
     "translation": "",
     "context": "Background",
     "reference": "",
-    "comment": ""
+    "comment": "island settings: satellite background toggle"
   },
   {
     "term": "Background Blur",
@@ -2419,7 +2496,7 @@
     "translation": "",
     "context": "Bar %1",
     "reference": "",
-    "comment": "numbered name for an unnamed bar, %1 is its position"
+    "comment": "island instance choice: unnamed bar, %1 is its number | numbered name for an unnamed bar, %1 is its position"
   },
   {
     "term": "Bar Inset Padding",
@@ -2457,6 +2534,20 @@
     "comment": ""
   },
   {
+    "term": "Bar border and shadow",
+    "translation": "",
+    "context": "Bar border and shadow",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Bar corners",
+    "translation": "",
+    "context": "Bar corners",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Bar corners and background",
     "translation": "",
     "context": "Bar corners and background",
@@ -2467,6 +2558,13 @@
     "term": "Bar shadow, border, and corners",
     "translation": "",
     "context": "Bar shadow, border, and corners",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Bar visibility",
+    "translation": "",
+    "context": "Bar visibility",
     "reference": "",
     "comment": ""
   },
@@ -2499,6 +2597,13 @@
     "comment": ""
   },
   {
+    "term": "Battery / Control Center",
+    "translation": "",
+    "context": "Battery / Control Center",
+    "reference": "",
+    "comment": "island settings: battery or control center slot row"
+  },
+  {
     "term": "Battery Charge Limit",
     "translation": "",
     "context": "Battery Charge Limit",
@@ -2525,6 +2630,13 @@
     "context": "Battery and power management",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Battery gauge opens Control Center",
+    "translation": "",
+    "context": "Battery gauge opens Control Center",
+    "reference": "",
+    "comment": "island settings: status slot description with battery"
   },
   {
     "term": "Battery has charged to your set limit of %1%",
@@ -2559,7 +2671,7 @@
     "translation": "",
     "context": "Behavior",
     "reference": "",
-    "comment": ""
+    "comment": "island settings: behavior card title"
   },
   {
     "term": "Bind lock screen to dbus signals from loginctl. Disable if using an external lock screen",
@@ -2600,6 +2712,13 @@
     "term": "Blend between Surface High and the selected custom color",
     "translation": "",
     "context": "Blend between Surface High and the selected custom color",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Block %1 in Do Not Disturb",
+    "translation": "",
+    "context": "Block %1 in Do Not Disturb",
     "reference": "",
     "comment": ""
   },
@@ -2707,6 +2826,13 @@
     "context": "Body",
     "reference": "",
     "comment": "notification rule match field option"
+  },
+  {
+    "term": "Body Click Runs Default Action",
+    "translation": "",
+    "context": "Body Click Runs Default Action",
+    "reference": "",
+    "comment": ""
   },
   {
     "term": "Body Font Size",
@@ -2842,11 +2968,18 @@
     "comment": ""
   },
   {
+    "term": "Bright",
+    "translation": "",
+    "context": "Bright",
+    "reference": "",
+    "comment": "island settings: bright surface tone"
+  },
+  {
     "term": "Brightness",
     "translation": "",
     "context": "Brightness",
     "reference": "",
-    "comment": ""
+    "comment": "island system face: brightness title"
   },
   {
     "term": "Brightness Slider",
@@ -3143,6 +3276,13 @@
     "comment": ""
   },
   {
+    "term": "Center Section - Reserved by Dank Island",
+    "translation": "",
+    "context": "Center Section - Reserved by Dank Island",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Center Single Column",
     "translation": "",
     "context": "Center Single Column",
@@ -3413,7 +3553,7 @@
     "translation": "",
     "context": "Choose wallpaper folder",
     "reference": "",
-    "comment": ""
+    "comment": "wallpaper folder file browser title"
   },
   {
     "term": "Choose when to generate scrolling events",
@@ -3463,6 +3603,13 @@
     "context": "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Choose which shortcuts sit left or right of the clock",
+    "translation": "",
+    "context": "Choose which shortcuts sit left or right of the clock",
+    "reference": "",
+    "comment": "island settings: home face slot hint"
   },
   {
     "term": "Chroma Style",
@@ -3521,6 +3668,13 @@
     "comment": ""
   },
   {
+    "term": "Clear Badge on Open",
+    "translation": "",
+    "context": "Clear Badge on Open",
+    "reference": "",
+    "comment": "island settings: clear the notification badge when the center opens"
+  },
+  {
     "term": "Clear History?",
     "translation": "",
     "context": "Clear History?",
@@ -3547,6 +3701,20 @@
     "context": "Clear at Startup",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Clears the badge on open but keeps notifications active",
+    "translation": "",
+    "context": "Clears the badge on open but keeps notifications active",
+    "reference": "",
+    "comment": "island settings: clear badge on open description"
+  },
+  {
+    "term": "Click",
+    "translation": "",
+    "context": "Click",
+    "reference": "",
+    "comment": "island settings: click expansion mode"
   },
   {
     "term": "Click 'Setup' to create %1 and add include to your compositor config.",
@@ -3591,6 +3759,20 @@
     "comment": ""
   },
   {
+    "term": "Click expands only on an intentional press. Hybrid peeks the current compact face on hover",
+    "translation": "",
+    "context": "Click expands only on an intentional press. Hybrid peeks the current compact face on hover",
+    "reference": "",
+    "comment": "island settings: expansion mode description"
+  },
+  {
+    "term": "Click the icon to mute",
+    "translation": "",
+    "context": "Click the icon to mute",
+    "reference": "",
+    "comment": "island volume face: hint under the title"
+  },
+  {
     "term": "Click to Paste",
     "translation": "",
     "context": "Click to Paste",
@@ -3610,6 +3792,13 @@
     "context": "Click to select a custom theme JSON file",
     "reference": "",
     "comment": "custom theme file hint"
+  },
+  {
+    "term": "Clicking a popup runs its first action instead of expanding the body",
+    "translation": "",
+    "context": "Clicking a popup runs its first action instead of expanding the body",
+    "reference": "",
+    "comment": ""
   },
   {
     "term": "Clip",
@@ -3941,11 +4130,32 @@
     "comment": ""
   },
   {
+    "term": "Compact Clock Pill",
+    "translation": "",
+    "context": "Compact Clock Pill",
+    "reference": "",
+    "comment": "island settings: tighter home pill toggle"
+  },
+  {
+    "term": "Compact Island Height",
+    "translation": "",
+    "context": "Compact Island Height",
+    "reference": "",
+    "comment": "island settings: compact pill height slider"
+  },
+  {
     "term": "Compact Mode",
     "translation": "",
     "context": "Compact Mode",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Compact home clock pill in both width and height",
+    "translation": "",
+    "context": "Compact home clock pill in both width and height",
+    "reference": "",
+    "comment": "island settings: tight pill description"
   },
   {
     "term": "Completed",
@@ -4070,6 +4280,13 @@
     "term": "Configure which displays show \"%1\"",
     "translation": "",
     "context": "Configure which displays show \"%1\"",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Configure which displays show Dank Island as \"%1\"",
+    "translation": "",
+    "context": "Configure which displays show Dank Island as \"%1\"",
     "reference": "",
     "comment": ""
   },
@@ -4267,7 +4484,7 @@
     "translation": "",
     "context": "Control Center",
     "reference": "",
-    "comment": "greeter feature card title"
+    "comment": "greeter feature card title | island compact face: control center label"
   },
   {
     "term": "Control Center Tile Color",
@@ -4484,7 +4701,7 @@
     "translation": "",
     "context": "Corner Radius",
     "reference": "",
-    "comment": ""
+    "comment": "island settings: satellite goth corner radius slider"
   },
   {
     "term": "Corner Radius Override",
@@ -4497,6 +4714,13 @@
     "term": "Corner Style",
     "translation": "",
     "context": "Corner Style",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Corner style applies to the bar surface",
+    "translation": "",
+    "context": "Corner style applies to the bar surface",
     "reference": "",
     "comment": ""
   },
@@ -4778,7 +5002,7 @@
     "translation": "",
     "context": "Current: %1",
     "reference": "",
-    "comment": ""
+    "comment": "audio port selector active port label, %1 is the port name"
   },
   {
     "term": "Cursor Size",
@@ -4802,9 +5026,9 @@
     "comment": ""
   },
   {
-    "term": "Curve: curve rasterizer.",
+    "term": "Curve rasterizer.",
     "translation": "",
-    "context": "Curve: curve rasterizer.",
+    "context": "Curve rasterizer.",
     "reference": "",
     "comment": ""
   },
@@ -5103,6 +5327,13 @@
     "comment": ""
   },
   {
+    "term": "Damped springs settle straight to their target with no overshoot",
+    "translation": "",
+    "context": "Damped springs settle straight to their target with no overshoot",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Dank",
     "translation": "",
     "context": "Dank",
@@ -5127,6 +5358,20 @@
     "term": "Dank Dash",
     "translation": "",
     "context": "Dank Dash",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Dank Island - Beta",
+    "translation": "",
+    "context": "Dank Island - Beta",
+    "reference": "",
+    "comment": "island settings: page title"
+  },
+  {
+    "term": "Dank Island instance",
+    "translation": "",
+    "context": "Dank Island instance",
     "reference": "",
     "comment": ""
   },
@@ -5201,9 +5446,23 @@
     "comment": ""
   },
   {
+    "term": "Dark or light mode follows the wallpaper brightness",
+    "translation": "",
+    "context": "Dark or light mode follows the wallpaper brightness",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Darken Modal Background",
     "translation": "",
     "context": "Darken Modal Background",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Dashboard",
+    "translation": "",
+    "context": "Dashboard",
     "reference": "",
     "comment": ""
   },
@@ -5289,7 +5548,7 @@
     "translation": "",
     "context": "Default",
     "reference": "",
-    "comment": "notification rule action option | notification rule urgency option | widget style option | workspace color option"
+    "comment": "island settings: default surface tone | notification rule action option | notification rule urgency option | widget style option | workspace color option"
   },
   {
     "term": "Default (Black)",
@@ -5344,6 +5603,13 @@
     "term": "Default Width (%)",
     "translation": "",
     "context": "Default Width (%)",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Default launcher shortcuts open a native launcher activity inside Dank Island. Spotlight is used when the focused screen has no DankIsland.",
+    "translation": "",
+    "context": "Default launcher shortcuts open a native launcher activity inside Dank Island. Spotlight is used when the focused screen has no DankIsland.",
     "reference": "",
     "comment": ""
   },
@@ -5495,13 +5761,6 @@
     "comment": ""
   },
   {
-    "term": "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.",
-    "translation": "",
-    "context": "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Derives colors that closely match the underlying image.",
     "translation": "",
     "context": "Derives colors that closely match the underlying image.",
@@ -5642,6 +5901,13 @@
     "comment": ""
   },
   {
+    "term": "Dim",
+    "translation": "",
+    "context": "Dim",
+    "reference": "",
+    "comment": "island settings: dim surface tone"
+  },
+  {
     "term": "Direct path to a .xkb keymap file. Overrides layouts/variants above.",
     "translation": "",
     "context": "Direct path to a .xkb keymap file. Overrides layouts/variants above.",
@@ -5659,13 +5925,6 @@
     "term": "Directional",
     "translation": "",
     "context": "Directional",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.",
-    "translation": "",
-    "context": "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.",
     "reference": "",
     "comment": ""
   },
@@ -5835,7 +6094,7 @@
     "translation": "",
     "context": "Dismiss",
     "reference": "",
-    "comment": ""
+    "comment": "island notification face: dismiss button"
   },
   {
     "term": "Display",
@@ -5912,7 +6171,7 @@
     "translation": "",
     "context": "Display brightness control",
     "reference": "",
-    "comment": ""
+    "comment": "island brightness face: hint under the title"
   },
   {
     "term": "Display configuration is not available. WLR output management protocol not supported.",
@@ -5995,6 +6254,20 @@
     "term": "Displays the active keyboard layout and allows switching",
     "translation": "",
     "context": "Displays the active keyboard layout and allows switching",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Distance between display edge and island",
+    "translation": "",
+    "context": "Distance between display edge and island",
+    "reference": "",
+    "comment": "island settings: outer gap description"
+  },
+  {
+    "term": "Distance-field renderer.",
+    "translation": "",
+    "context": "Distance-field renderer.",
     "reference": "",
     "comment": ""
   },
@@ -6146,6 +6419,20 @@
     "comment": ""
   },
   {
+    "term": "Draw an island-styled background behind satellite widgets",
+    "translation": "",
+    "context": "Draw an island-styled background behind satellite widgets",
+    "reference": "",
+    "comment": "island settings: satellite background description"
+  },
+  {
+    "term": "Draw an outline and use the highest-contrast surface tone",
+    "translation": "",
+    "context": "Draw an outline and use the highest-contrast surface tone",
+    "reference": "",
+    "comment": "island settings: high contrast description"
+  },
+  {
     "term": "Driver",
     "translation": "",
     "context": "Driver",
@@ -6263,13 +6550,6 @@
     "context": "Dynamic colors, presets",
     "reference": "",
     "comment": "greeter theme description"
-  },
-  {
-    "term": "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.",
-    "translation": "",
-    "context": "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.",
-    "reference": "",
-    "comment": ""
   },
   {
     "term": "Edge",
@@ -6440,6 +6720,13 @@
     "comment": "notification history toggle label"
   },
   {
+    "term": "Enable Island",
+    "translation": "",
+    "context": "Enable Island",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Enable Num Lock",
     "translation": "",
     "context": "Enable Num Lock",
@@ -6550,6 +6837,13 @@
     "context": "Enable security key authentication",
     "reference": "",
     "comment": "Enable FIDO2/U2F hardware security key for lock screen"
+  },
+  {
+    "term": "Enable weather in Time & Weather to show this shortcut",
+    "translation": "",
+    "context": "Enable weather in Time & Weather to show this shortcut",
+    "reference": "",
+    "comment": "island settings: weather slot disabled hint"
   },
   {
     "term": "Enabled",
@@ -6851,6 +7145,27 @@
     "context": "Exit node",
     "reference": "",
     "comment": "Tailscale exit node selector label"
+  },
+  {
+    "term": "Expand Notifications",
+    "translation": "",
+    "context": "Expand Notifications",
+    "reference": "",
+    "comment": "island settings: expanded notification toggle"
+  },
+  {
+    "term": "Expand notifications by default instead of click or hover",
+    "translation": "",
+    "context": "Expand notifications by default instead of click or hover",
+    "reference": "",
+    "comment": "island settings: expanded notification description"
+  },
+  {
+    "term": "Expansion Mode",
+    "translation": "",
+    "context": "Expansion Mode",
+    "reference": "",
+    "comment": "island settings: click or hover expansion row"
   },
   {
     "term": "Experimental Feature",
@@ -7483,6 +7798,13 @@
     "comment": ""
   },
   {
+    "term": "Failed to switch port",
+    "translation": "",
+    "context": "Failed to switch port",
+    "reference": "",
+    "comment": "audio sink port switch failure message"
+  },
+  {
     "term": "Failed to unpin entry",
     "translation": "",
     "context": "Failed to unpin entry",
@@ -7823,7 +8145,7 @@
     "translation": "",
     "context": "Float",
     "reference": "",
-    "comment": ""
+    "comment": "island settings: float toggle"
   },
   {
     "term": "Float Anchor",
@@ -7875,16 +8197,16 @@
     "comment": ""
   },
   {
+    "term": "Floats above windows and other content",
+    "translation": "",
+    "context": "Floats above windows and other content",
+    "reference": "",
+    "comment": "island settings: float toggle description"
+  },
+  {
     "term": "Fluent",
     "translation": "",
     "context": "Fluent",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.",
-    "translation": "",
-    "context": "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.",
     "reference": "",
     "comment": ""
   },
@@ -8533,9 +8855,9 @@
     "comment": ""
   },
   {
-    "term": "Globally scale all animation durations",
+    "term": "Globally scale animation durations with geometric motion & spring based physics with bezier curves",
     "translation": "",
-    "context": "Globally scale all animation durations",
+    "context": "Globally scale animation durations with geometric motion & spring based physics with bezier curves",
     "reference": "",
     "comment": ""
   },
@@ -8565,7 +8887,7 @@
     "translation": "",
     "context": "Goth Corners",
     "reference": "",
-    "comment": ""
+    "comment": "island settings: satellite goth corners toggle"
   },
   {
     "term": "Gradually fade the screen before locking with a configurable grace period",
@@ -8894,7 +9216,7 @@
     "translation": "",
     "context": "Hidden",
     "reference": "",
-    "comment": ""
+    "comment": "island settings: battery or control center slot hidden | island settings: media or launcher slot hidden | island settings: weather slot hidden"
   },
   {
     "term": "Hidden (%1)",
@@ -8950,7 +9272,7 @@
     "translation": "",
     "context": "Hide Delay",
     "reference": "",
-    "comment": ""
+    "comment": "island settings: hover hide delay slider"
   },
   {
     "term": "Hide Indicators",
@@ -9009,13 +9331,6 @@
     "comment": "plugin browser filter chip"
   },
   {
-    "term": "Hide notification content until expanded",
-    "translation": "",
-    "context": "Hide notification content until expanded",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Hide notification content until expanded; popups show collapsed by default",
     "translation": "",
     "context": "Hide notification content until expanded; popups show collapsed by default",
@@ -9058,11 +9373,39 @@
     "comment": "quality level option"
   },
   {
+    "term": "High Contrast",
+    "translation": "",
+    "context": "High Contrast",
+    "reference": "",
+    "comment": "island settings: high contrast toggle"
+  },
+  {
     "term": "High-fidelity palette that preserves source hues.",
     "translation": "",
     "context": "High-fidelity palette that preserves source hues.",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Higher percentages give island more inertia",
+    "translation": "",
+    "context": "Higher percentages give island more inertia",
+    "reference": "",
+    "comment": "island settings: mass description"
+  },
+  {
+    "term": "Higher values pull island toward its target more strongly",
+    "translation": "",
+    "context": "Higher values pull island toward its target more strongly",
+    "reference": "",
+    "comment": "island settings: stiffness description"
+  },
+  {
+    "term": "Higher values settle island with less bounce",
+    "translation": "",
+    "context": "Higher values settle island with less bounce",
+    "reference": "",
+    "comment": "island settings: damping description"
   },
   {
     "term": "Highlight Active Workspace App",
@@ -9140,6 +9483,20 @@
     "context": "Hold to confirm (%1s)",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Home Compact",
+    "translation": "",
+    "context": "Home Compact",
+    "reference": "",
+    "comment": "island settings: home face card title"
+  },
+  {
+    "term": "Horizontal Offset",
+    "translation": "",
+    "context": "Horizontal Offset",
+    "reference": "",
+    "comment": "island settings: horizontal offset slider"
   },
   {
     "term": "Horizontal and vertical bar thickness",
@@ -9289,6 +9646,20 @@
     "comment": ""
   },
   {
+    "term": "Hybrid",
+    "translation": "",
+    "context": "Hybrid",
+    "reference": "",
+    "comment": "island settings: hover plus click expansion mode"
+  },
+  {
+    "term": "Hybrid peeks the current compact face on hover. Click pins a destination so it stays open",
+    "translation": "",
+    "context": "Hybrid peeks the current compact face on hover. Click pins a destination so it stays open",
+    "reference": "",
+    "comment": "island settings: hybrid mode hint"
+  },
+  {
     "term": "Hyprland Discord Server",
     "translation": "",
     "context": "Hyprland Discord Server",
@@ -9397,6 +9768,13 @@
     "term": "Icon Size %",
     "translation": "",
     "context": "Icon Size %",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Icon Spacing",
+    "translation": "",
+    "context": "Icon Spacing",
     "reference": "",
     "comment": ""
   },
@@ -9716,6 +10094,13 @@
     "comment": ""
   },
   {
+    "term": "Inner authentication",
+    "translation": "",
+    "context": "Inner authentication",
+    "reference": "",
+    "comment": "802.1X phase 2 authentication method"
+  },
+  {
     "term": "Inner padding applied to each widget",
     "translation": "",
     "context": "Inner padding applied to each widget",
@@ -9758,13 +10143,6 @@
     "comment": "install action button"
   },
   {
-    "term": "Install Greeter",
-    "translation": "",
-    "context": "Install Greeter",
-    "reference": "",
-    "comment": "greeter action confirmation"
-  },
-  {
     "term": "Install Plugin",
     "translation": "",
     "context": "Install Plugin",
@@ -9784,13 +10162,6 @@
     "context": "Install color themes from the DMS theme registry",
     "reference": "",
     "comment": "theme browser description"
-  },
-  {
-    "term": "Install complete. Greeter has been installed.",
-    "translation": "",
-    "context": "Install complete. Greeter has been installed.",
-    "reference": "",
-    "comment": ""
   },
   {
     "term": "Install dsearch to search files.",
@@ -9826,13 +10197,6 @@
     "context": "Install plugins from the DMS plugin registry",
     "reference": "",
     "comment": "plugin browser description"
-  },
-  {
-    "term": "Install the DMS greeter? A terminal will open for sudo authentication.",
-    "translation": "",
-    "context": "Install the DMS greeter? A terminal will open for sudo authentication.",
-    "reference": "",
-    "comment": ""
   },
   {
     "term": "Install theme '%1' from the DMS registry?",
@@ -9975,6 +10339,34 @@
     "comment": "wallpaper transition option"
   },
   {
+    "term": "Island",
+    "translation": "",
+    "context": "Island",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Island Gap",
+    "translation": "",
+    "context": "Island Gap",
+    "reference": "",
+    "comment": "island settings: satellite to island gap slider"
+  },
+  {
+    "term": "Island Instance",
+    "translation": "",
+    "context": "Island Instance",
+    "reference": "",
+    "comment": "island settings: which bar config the island replaces"
+  },
+  {
+    "term": "Island placement",
+    "translation": "",
+    "context": "Island placement",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Isolate Displays",
     "translation": "",
     "context": "Isolate Displays",
@@ -10024,6 +10416,13 @@
     "comment": ""
   },
   {
+    "term": "Keep Clock with Media",
+    "translation": "",
+    "context": "Keep Clock with Media",
+    "reference": "",
+    "comment": "island settings: clock in media face toggle"
+  },
+  {
     "term": "Keep My Edits",
     "translation": "",
     "context": "Keep My Edits",
@@ -10064,6 +10463,13 @@
     "context": "Keep typing",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Keep widgets beside the island or align them like a standalone bar",
+    "translation": "",
+    "context": "Keep widgets beside the island or align them like a standalone bar",
+    "reference": "",
+    "comment": "island settings: satellite position description"
   },
   {
     "term": "Keeping Awake",
@@ -10350,7 +10756,7 @@
     "translation": "",
     "context": "Launcher",
     "reference": "",
-    "comment": ""
+    "comment": "island compact face: launcher label | island settings: button to launcher tab"
   },
   {
     "term": "Launcher Button",
@@ -10399,7 +10805,7 @@
     "translation": "",
     "context": "Left",
     "reference": "",
-    "comment": "screen edge position"
+    "comment": "island settings: battery or control center slot left of the clock | island settings: media or launcher slot left of the clock | island settings: weather slot left of the clock | screen edge position"
   },
   {
     "term": "Left Center",
@@ -10561,6 +10967,13 @@
     "context": "Loading keybinds...",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Loading ports...",
+    "translation": "",
+    "context": "Loading ports...",
+    "reference": "",
+    "comment": "audio port selector loading state"
   },
   {
     "term": "Loading trending...",
@@ -10990,11 +11403,25 @@
     "comment": ""
   },
   {
+    "term": "Material 3 Expressive bezier curves, default.",
+    "translation": "",
+    "context": "Material 3 Expressive bezier curves, default.",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Material 3 Expressive panels rise from below with a subtle scale, default.",
+    "translation": "",
+    "context": "Material 3 Expressive panels rise from below with a subtle scale, default.",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Material Battery Style",
     "translation": "",
     "context": "Material Battery Style",
     "reference": "",
-    "comment": ""
+    "comment": "island settings: battery meter style row"
   },
   {
     "term": "Material Colors",
@@ -11021,13 +11448,6 @@
     "term": "Material inspired shadows and elevation on modals, popouts, and dialogs",
     "translation": "",
     "context": "Material inspired shadows and elevation on modals, popouts, and dialogs",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Material: Material Design 3 Expressive bezier curves. The DMS default feel.",
-    "translation": "",
-    "context": "Material: Material Design 3 Expressive bezier curves. The DMS default feel.",
     "reference": "",
     "comment": ""
   },
@@ -11233,6 +11653,13 @@
     "context": "Media",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Media / Launcher",
+    "translation": "",
+    "context": "Media / Launcher",
+    "reference": "",
+    "comment": "island settings: media or launcher slot row"
   },
   {
     "term": "Media Controls",
@@ -11578,6 +12005,20 @@
     "comment": ""
   },
   {
+    "term": "Motion",
+    "translation": "",
+    "context": "Motion",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Motion & Accessibility",
+    "translation": "",
+    "context": "Motion & Accessibility",
+    "reference": "",
+    "comment": "island settings: motion card title"
+  },
+  {
     "term": "Motion Effects",
     "translation": "",
     "context": "Motion Effects",
@@ -11632,6 +12073,13 @@
     "context": "Move Widget",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Move island and satellites left or right from display center",
+    "translation": "",
+    "context": "Move island and satellites left or right from display center",
+    "reference": "",
+    "comment": "island settings: horizontal offset description"
   },
   {
     "term": "Moving to Paused",
@@ -11701,7 +12149,7 @@
     "translation": "",
     "context": "Muted",
     "reference": "",
-    "comment": "audio status"
+    "comment": "audio status | island system face: muted value label"
   },
   {
     "term": "Muted Apps",
@@ -11753,13 +12201,6 @@
     "comment": ""
   },
   {
-    "term": "Native: platform renderer (FreeType).",
-    "translation": "",
-    "context": "Native: platform renderer (FreeType).",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Natural Scrolling",
     "translation": "",
     "context": "Natural Scrolling",
@@ -11779,6 +12220,13 @@
     "context": "Navigate",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Near Island",
+    "translation": "",
+    "context": "Near Island",
+    "reference": "",
+    "comment": "island settings: satellites hug the island"
   },
   {
     "term": "Network",
@@ -11995,7 +12443,7 @@
     "translation": "",
     "context": "No Active Players",
     "reference": "",
-    "comment": ""
+    "comment": "island media player: empty state"
   },
   {
     "term": "No Anim",
@@ -12509,6 +12957,13 @@
     "comment": "empty plugin list"
   },
   {
+    "term": "No ports found",
+    "translation": "",
+    "context": "No ports found",
+    "reference": "",
+    "comment": "audio port selector empty state"
+  },
+  {
     "term": "No printer found",
     "translation": "",
     "context": "No printer found",
@@ -12877,7 +13332,7 @@
     "translation": "",
     "context": "Notification",
     "reference": "",
-    "comment": ""
+    "comment": "island notification face: fallback app name"
   },
   {
     "term": "Notification Center",
@@ -12908,13 +13363,6 @@
     "comment": ""
   },
   {
-    "term": "Notification Settings",
-    "translation": "",
-    "context": "Notification Settings",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Notification Type",
     "translation": "",
     "context": "Notification Type",
@@ -12933,7 +13381,7 @@
     "translation": "",
     "context": "Notifications",
     "reference": "",
-    "comment": "KDE Connect notifications label | greeter settings link"
+    "comment": "KDE Connect notifications label | greeter settings link | island compact face: notification center label | island settings: notifications card title"
   },
   {
     "term": "Notify when limit is reached",
@@ -12996,7 +13444,7 @@
     "translation": "",
     "context": "Off",
     "reference": "",
-    "comment": "bluetooth status"
+    "comment": "bluetooth status | island instance choice: island disabled"
   },
   {
     "term": "Office",
@@ -13115,7 +13563,7 @@
     "translation": "",
     "context": "Opacity",
     "reference": "",
-    "comment": ""
+    "comment": "island settings: island surface opacity slider | island settings: satellite background opacity slider"
   },
   {
     "term": "Opacity of cards and nested surfaces inside floating windows",
@@ -13150,7 +13598,7 @@
     "translation": "",
     "context": "Open",
     "reference": "",
-    "comment": ""
+    "comment": "island notification face: default action button"
   },
   {
     "term": "Open",
@@ -13178,7 +13626,7 @@
     "translation": "",
     "context": "Open Delay",
     "reference": "",
-    "comment": ""
+    "comment": "island settings: hover open delay slider"
   },
   {
     "term": "Open Dir",
@@ -13192,7 +13640,7 @@
     "translation": "",
     "context": "Open Frame",
     "reference": "",
-    "comment": ""
+    "comment": "settings: button that opens the Frame tab"
   },
   {
     "term": "Open From",
@@ -13200,6 +13648,13 @@
     "context": "Open From",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Open Island",
+    "translation": "",
+    "context": "Open Island",
+    "reference": "",
+    "comment": "settings: button that opens the Dank Island tab"
   },
   {
     "term": "Open Notepad File",
@@ -13409,14 +13864,14 @@
     "translation": "",
     "context": "Outer Gaps",
     "reference": "",
-    "comment": ""
+    "comment": "island settings: gap between screen edge and island"
   },
   {
     "term": "Outline",
     "translation": "",
     "context": "Outline",
     "reference": "",
-    "comment": "outline color | surface border color"
+    "comment": "island settings: outlined battery meter style | outline color | surface border color"
   },
   {
     "term": "Outline around shell surfaces",
@@ -13594,6 +14049,13 @@
     "comment": "PDF Reader"
   },
   {
+    "term": "PID",
+    "translation": "",
+    "context": "PID",
+    "reference": "",
+    "comment": "Label for the process ID row in the focused window popout"
+  },
+  {
     "term": "PIN",
     "translation": "",
     "context": "PIN",
@@ -13683,6 +14145,27 @@
     "context": "Pairing...",
     "reference": "",
     "comment": "KDE Connect pairing in progress status"
+  },
+  {
+    "term": "Palette",
+    "translation": "",
+    "context": "Palette",
+    "reference": "",
+    "comment": "island settings: surface tone choice"
+  },
+  {
+    "term": "Panels glide in from a larger distance at full size, no scale change, pure clean motion.",
+    "translation": "",
+    "context": "Panels glide in from a larger distance at full size, no scale change, pure clean motion.",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.",
+    "translation": "",
+    "context": "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.",
+    "reference": "",
+    "comment": ""
   },
   {
     "term": "Partial",
@@ -13979,6 +14462,13 @@
     "comment": ""
   },
   {
+    "term": "Place independent widgets to left and right of island",
+    "translation": "",
+    "context": "Place independent widgets to left and right of island",
+    "reference": "",
+    "comment": "island settings: satellite widgets description"
+  },
+  {
     "term": "Place plugin directories here. Each plugin should have a plugin.json manifest file.",
     "translation": "",
     "context": "Place plugin directories here. Each plugin should have a plugin.json manifest file.",
@@ -14003,6 +14493,13 @@
     "term": "Place the dock on the Wayland overlay layer",
     "translation": "",
     "context": "Place the dock on the Wayland overlay layer",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Platform renderer (FreeType).",
+    "translation": "",
+    "context": "Platform renderer (FreeType).",
     "reference": "",
     "comment": ""
   },
@@ -14059,6 +14556,13 @@
     "term": "Playback error: ",
     "translation": "",
     "context": "Playback error: ",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Playful",
+    "translation": "",
+    "context": "Playful",
     "reference": "",
     "comment": ""
   },
@@ -14266,6 +14770,20 @@
     "comment": "Label for printer port number input field"
   },
   {
+    "term": "Port Selection",
+    "translation": "",
+    "context": "Port Selection",
+    "reference": "",
+    "comment": "audio output port selector button tooltip | audio port selector modal subtitle"
+  },
+  {
+    "term": "Port switched",
+    "translation": "",
+    "context": "Port switched",
+    "reference": "",
+    "comment": "audio sink port switched successful message"
+  },
+  {
     "term": "Portal",
     "translation": "",
     "context": "Portal",
@@ -14277,7 +14795,7 @@
     "translation": "",
     "context": "Position",
     "reference": "",
-    "comment": ""
+    "comment": "island settings: position card title"
   },
   {
     "term": "Position, pinned apps",
@@ -14546,6 +15064,13 @@
     "comment": ""
   },
   {
+    "term": "Primary Bar",
+    "translation": "",
+    "context": "Primary Bar",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Primary Container",
     "translation": "",
     "context": "Primary Container",
@@ -14791,13 +15316,6 @@
     "comment": ""
   },
   {
-    "term": "Qt: distance-field renderer.",
-    "translation": "",
-    "context": "Qt: distance-field renderer.",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "QtMultimedia is not available",
     "translation": "",
     "context": "QtMultimedia is not available",
@@ -14999,6 +15517,13 @@
     "context": "Recommended available",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Reduce Motion",
+    "translation": "",
+    "context": "Reduce Motion",
+    "reference": "",
+    "comment": "island settings: reduce motion toggle"
   },
   {
     "term": "Reduce the visible bar length from both ends",
@@ -15281,6 +15806,13 @@
     "comment": ""
   },
   {
+    "term": "Render Type",
+    "translation": "",
+    "context": "Render Type",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Reorder & Group",
     "translation": "",
     "context": "Reorder & Group",
@@ -15414,6 +15946,13 @@
     "comment": "vscode matugen template description"
   },
   {
+    "term": "Reserved Height",
+    "translation": "",
+    "context": "Reserved Height",
+    "reference": "",
+    "comment": "island settings: reserved strip height slider"
+  },
+  {
     "term": "Reset",
     "translation": "",
     "context": "Reset",
@@ -15461,6 +16000,13 @@
     "context": "Resize on Border",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Resize the resting island to align with nearby widgets",
+    "translation": "",
+    "context": "Resize the resting island to align with nearby widgets",
+    "reference": "",
+    "comment": "island settings: compact height description"
   },
   {
     "term": "Resize windows by dragging their edges with the mouse",
@@ -15593,7 +16139,7 @@
     "translation": "",
     "context": "Right",
     "reference": "",
-    "comment": "screen edge position"
+    "comment": "island settings: battery or control center slot right of the clock | island settings: media or launcher slot right of the clock | island settings: weather slot right of the clock | screen edge position"
   },
   {
     "term": "Right Center",
@@ -15834,6 +16380,20 @@
     "comment": "hotspot network name placeholder"
   },
   {
+    "term": "Satellite Widgets",
+    "translation": "",
+    "context": "Satellite Widgets",
+    "reference": "",
+    "comment": "island settings: satellite widgets card title"
+  },
+  {
+    "term": "Satellites widget to place left or right of the island",
+    "translation": "",
+    "context": "Satellites widget to place left or right of the island",
+    "reference": "",
+    "comment": "island settings: satellite widgets hint"
+  },
+  {
     "term": "Saturation",
     "translation": "",
     "context": "Saturation",
@@ -16037,6 +16597,13 @@
     "comment": ""
   },
   {
+    "term": "Screen Edges",
+    "translation": "",
+    "context": "Screen Edges",
+    "reference": "",
+    "comment": "island settings: satellites sit at screen edges"
+  },
+  {
     "term": "Screen sharing",
     "translation": "",
     "context": "Screen sharing",
@@ -16203,6 +16770,13 @@
     "context": "Search themes...",
     "reference": "",
     "comment": "theme search placeholder"
+  },
+  {
+    "term": "Search when idle, visualizer when media is playing",
+    "translation": "",
+    "context": "Search when idle, visualizer when media is playing",
+    "reference": "",
+    "comment": "island settings: media slot description"
   },
   {
     "term": "Search widgets...",
@@ -16965,7 +17539,7 @@
     "translation": "",
     "context": "Show Badge",
     "reference": "",
-    "comment": ""
+    "comment": "island settings: unread notification count on the home face"
   },
   {
     "term": "Show CPU",
@@ -17269,6 +17843,13 @@
     "comment": ""
   },
   {
+    "term": "Show Satellite Widgets",
+    "translation": "",
+    "context": "Show Satellite Widgets",
+    "reference": "",
+    "comment": "island settings: satellite widgets toggle"
+  },
+  {
     "term": "Show Saved Items",
     "translation": "",
     "context": "Show Saved Items",
@@ -17395,6 +17976,13 @@
     "comment": ""
   },
   {
+    "term": "Show a clickable clock beside compact media details",
+    "translation": "",
+    "context": "Show a clickable clock beside compact media details",
+    "reference": "",
+    "comment": "island settings: media clock description"
+  },
+  {
     "term": "Show a notification when battery reaches the charge limit.",
     "translation": "",
     "context": "Show a notification when battery reaches the charge limit.",
@@ -17440,6 +18028,13 @@
     "term": "Show cava audio visualizer in media widget",
     "translation": "",
     "context": "Show cava audio visualizer in media widget",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Show critical priority popups while Do Not Disturb is on",
+    "translation": "",
+    "context": "Show critical priority popups while Do Not Disturb is on",
     "reference": "",
     "comment": ""
   },
@@ -17766,6 +18361,13 @@
     "comment": ""
   },
   {
+    "term": "Smart",
+    "translation": "",
+    "context": "Smart",
+    "reference": "",
+    "comment": "matugen color scheme option"
+  },
+  {
     "term": "Smartcard Authentication",
     "translation": "",
     "context": "Smartcard Authentication",
@@ -17773,9 +18375,30 @@
     "comment": ""
   },
   {
+    "term": "Smooth",
+    "translation": "",
+    "context": "Smooth",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Smooth cubic deceleration in, quick snap out, clean, elegant curves.",
+    "translation": "",
+    "context": "Smooth cubic deceleration in, quick snap out, clean, elegant curves.",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Snap",
     "translation": "",
     "context": "Snap",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Snap spring-driven motion straight to its target without physics travel",
+    "translation": "",
+    "context": "Snap spring-driven motion straight to its target without physics travel",
     "reference": "",
     "comment": ""
   },
@@ -17794,9 +18417,30 @@
     "comment": ""
   },
   {
+    "term": "Solid",
+    "translation": "",
+    "context": "Solid",
+    "reference": "",
+    "comment": "island settings: filled battery meter style"
+  },
+  {
+    "term": "Solid material type or Outline",
+    "translation": "",
+    "context": "Solid material type or Outline",
+    "reference": "",
+    "comment": "island settings: battery style description"
+  },
+  {
     "term": "Some plugins require a newer version of DMS:",
     "translation": "",
     "context": "Some plugins require a newer version of DMS:",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Some settings are managed by the island",
+    "translation": "",
+    "context": "Some settings are managed by the island",
     "reference": "",
     "comment": ""
   },
@@ -17878,6 +18522,13 @@
     "comment": ""
   },
   {
+    "term": "Space kept clear for compact island and satellites",
+    "translation": "",
+    "context": "Space kept clear for compact island and satellites",
+    "reference": "",
+    "comment": "island settings: reserved height description"
+  },
+  {
     "term": "Spacer",
     "translation": "",
     "context": "Spacer",
@@ -17941,6 +18592,48 @@
     "comment": ""
   },
   {
+    "term": "Spring Damping",
+    "translation": "",
+    "context": "Spring Damping",
+    "reference": "",
+    "comment": "island settings: spring damping slider"
+  },
+  {
+    "term": "Spring Mass",
+    "translation": "",
+    "context": "Spring Mass",
+    "reference": "",
+    "comment": "island settings: spring mass slider"
+  },
+  {
+    "term": "Spring Motion",
+    "translation": "",
+    "context": "Spring Motion",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Spring Stiffness",
+    "translation": "",
+    "context": "Spring Stiffness",
+    "reference": "",
+    "comment": "island settings: spring stiffness slider"
+  },
+  {
+    "term": "Spring bezier with overshoot, entry briefly exceeds its target then settles.",
+    "translation": "",
+    "context": "Spring bezier with overshoot, entry briefly exceeds its target then settles.",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Springs carry extra energy and visibly bounce before settling",
+    "translation": "",
+    "context": "Springs carry extra energy and visibly bounce before settling",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Square",
     "translation": "",
     "context": "Square",
@@ -17955,16 +18648,16 @@
     "comment": ""
   },
   {
+    "term": "Stage the Wayland overlay layer to remain visible over fullscreen apps",
+    "translation": "",
+    "context": "Stage the Wayland overlay layer to remain visible over fullscreen apps",
+    "reference": "",
+    "comment": "island settings: overlay layer description"
+  },
+  {
     "term": "Standard",
     "translation": "",
     "context": "Standard",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.",
-    "translation": "",
-    "context": "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.",
     "reference": "",
     "comment": ""
   },
@@ -18289,6 +18982,13 @@
     "context": "Sway Website",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Sweep the background into the screen edges",
+    "translation": "",
+    "context": "Sweep the background into the screen edges",
+    "reference": "",
+    "comment": "island settings: satellite goth corners description"
   },
   {
     "term": "Switch Layout Shortcut",
@@ -18746,6 +19446,20 @@
     "comment": ""
   },
   {
+    "term": "The Island anchors to the top or bottom edge",
+    "translation": "",
+    "context": "The Island anchors to the top or bottom edge",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "The Island holds this edge on a display this bar covers, so the bar stays hidden there",
+    "translation": "",
+    "context": "The Island holds this edge on a display this bar covers, so the bar stays hidden there",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "The WiFi adapter could not start access point mode.",
     "translation": "",
     "context": "The WiFi adapter could not start access point mode.",
@@ -18763,6 +19477,13 @@
     "term": "The custom command used when attaching to sessions (receives the session name as the first argument)",
     "translation": "",
     "context": "The custom command used when attaching to sessions (receives the session name as the first argument)",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "The island draws its own surface",
+    "translation": "",
+    "context": "The island draws its own surface",
     "reference": "",
     "comment": ""
   },
@@ -18847,6 +19568,13 @@
     "term": "These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)",
     "translation": "",
     "context": "These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "These style the bar surface, which the Island replaces",
+    "translation": "",
+    "context": "These style the bar surface, which the Island replaces",
     "reference": "",
     "comment": ""
   },
@@ -19030,7 +19758,7 @@
     "translation": "",
     "context": "Time & Weather",
     "reference": "",
-    "comment": ""
+    "comment": "island settings: button to weather tab"
   },
   {
     "term": "Time First",
@@ -19201,6 +19929,13 @@
     "comment": ""
   },
   {
+    "term": "Toggle the Island on this instance's displays",
+    "translation": "",
+    "context": "Toggle the Island on this instance's displays",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Toggle visibility of this bar configuration",
     "translation": "",
     "context": "Toggle visibility of this bar configuration",
@@ -19255,6 +19990,13 @@
     "context": "Tools",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Tools icon opens Control Center",
+    "translation": "",
+    "context": "Tools icon opens Control Center",
+    "reference": "",
+    "comment": "island settings: status slot description without battery"
   },
   {
     "term": "Top",
@@ -19555,7 +20297,7 @@
     "translation": "",
     "context": "Unavailable",
     "reference": "",
-    "comment": "Phone Connect unavailable status"
+    "comment": "Phone Connect unavailable status | audio port availability status"
   },
   {
     "term": "Uncategorized",
@@ -19639,7 +20381,7 @@
     "translation": "",
     "context": "Unknown Artist",
     "reference": "",
-    "comment": ""
+    "comment": "island media face: fallback artist | island media player: fallback artist"
   },
   {
     "term": "Unknown Config",
@@ -19695,7 +20437,7 @@
     "translation": "",
     "context": "Unknown Track",
     "reference": "",
-    "comment": ""
+    "comment": "island media face: fallback title | island media player: fallback title"
   },
   {
     "term": "Unload on Close",
@@ -19752,6 +20494,13 @@
     "context": "Unpin from Dock",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Unread notification count beside the clock",
+    "translation": "",
+    "context": "Unread notification count beside the clock",
+    "reference": "",
+    "comment": "island settings: notification badge description"
   },
   {
     "term": "Unsaved changes",
@@ -19968,7 +20717,7 @@
     "translation": "",
     "context": "Use Overlay Layer",
     "reference": "",
-    "comment": "bar layer toggle: use Wayland overlay layer | clipboard layer toggle: use Wayland overlay layer | dock layer toggle: use Wayland overlay layer | launcher layer toggle: use Wayland overlay layer"
+    "comment": "bar layer toggle: use Wayland overlay layer | clipboard layer toggle: use Wayland overlay layer | dock layer toggle: use Wayland overlay layer | island layer toggle: use Wayland overlay layer | launcher layer toggle: use Wayland overlay layer"
   },
   {
     "term": "Use System Theme",
@@ -20521,7 +21270,7 @@
     "translation": "",
     "context": "Volume",
     "reference": "",
-    "comment": ""
+    "comment": "island system face: volume title"
   },
   {
     "term": "Volume Changed",
@@ -20577,7 +21326,7 @@
     "translation": "",
     "context": "Wallpaper",
     "reference": "",
-    "comment": "greeter settings link"
+    "comment": "greeter settings link | island compact face: wallpaper picker label"
   },
   {
     "term": "Wallpaper Error",
@@ -20654,7 +21403,7 @@
     "translation": "",
     "context": "Weather",
     "reference": "",
-    "comment": ""
+    "comment": "island compact face: weather label | island settings: weather slot row"
   },
   {
     "term": "Weather Widget",
@@ -20662,6 +21411,13 @@
     "context": "Weather Widget",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Weather icon and temperature open the weather activity",
+    "translation": "",
+    "context": "Weather icon and temperature open the weather activity",
+    "reference": "",
+    "comment": "island settings: weather slot description"
   },
   {
     "term": "Web Browser",

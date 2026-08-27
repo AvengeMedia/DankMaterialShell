@@ -77,6 +77,9 @@
   "%1 online": {
     "%1 online": ""
   },
+  "%1 position": {
+    "%1 position": ""
+  },
   "%1 tasks": {
     "%1 tasks": ""
   },
@@ -311,6 +314,9 @@
   "A separate minimal launcher action that works in Standalone, Separate Frame Mode, and Connected Frame Mode.": {
     "A separate minimal launcher action that works in Standalone, Separate Frame Mode, and Connected Frame Mode.": ""
   },
+  "A slight natural settle, DMS default": {
+    "A slight natural settle, DMS default": ""
+  },
   "A user with that name already exists.": {
     "A user with that name already exists.": ""
   },
@@ -488,6 +494,9 @@
   "Add to Autostart": {
     "Add to Autostart": ""
   },
+  "Additional settings are managed by the Island": {
+    "Additional settings are managed by the Island": ""
+  },
   "Adjust pointer sensitivity speed": {
     "Adjust pointer sensitivity speed": ""
   },
@@ -542,6 +551,9 @@
   "Allow": {
     "Allow": ""
   },
+  "Allow %1 in Do Not Disturb": {
+    "Allow %1 in Do Not Disturb": ""
+  },
   "Allow LAN access": {
     "Allow LAN access": ""
   },
@@ -556,6 +568,9 @@
   },
   "Allow greeter login access": {
     "Allow greeter login access": ""
+  },
+  "Allow in Do Not Disturb": {
+    "Allow in Do Not Disturb": ""
   },
   "Already on that session": {
     "Already on that session": ""
@@ -704,6 +719,9 @@
   "Apply inverse concave corner cutouts to the bar": {
     "Apply inverse concave corner cutouts to the bar": ""
   },
+  "Apply island geometry changes immediately without spring overshoot": {
+    "Apply island geometry changes immediately without spring overshoot": ""
+  },
   "Apply to Hardware": {
     "Apply to Hardware": ""
   },
@@ -727,6 +745,9 @@
   },
   "Apps Icon": {
     "Apps Icon": "Appar-ikon"
+  },
+  "Apps allowed to show popups while Do Not Disturb is on. Right-click a notification and choose \"Allow in Do Not Disturb\" to add one here.": {
+    "Apps allowed to show popups while Do Not Disturb is on. Right-click a notification and choose \"Allow in Do Not Disturb\" to add one here.": ""
   },
   "Apps are ordered by usage frequency, then last used, then alphabetically.": {
     "Apps are ordered by usage frequency, then last used, then alphabetically.": "Appar ordnas först efter användningsfrekvens, sedan senast användning, sist alfabetiskt."
@@ -839,11 +860,20 @@
   "Auto (Bar-aware)": {
     "Auto (Bar-aware)": "Automatisk (menyradsmedveten)"
   },
+  "Auto (Dark Mode)": {
+    "Auto (Dark Mode)": ""
+  },
+  "Auto (Light Mode)": {
+    "Auto (Light Mode)": ""
+  },
   "Auto (Wide)": {
     "Auto (Wide)": "Automatisk (bred)"
   },
   "Auto Compositor Gaps": {
     "Auto Compositor Gaps": ""
+  },
+  "Auto From Wallpaper": {
+    "Auto From Wallpaper": ""
   },
   "Auto Location": {
     "Auto Location": "Automatisk plats"
@@ -953,6 +983,9 @@
   "Automatically lock the screen when the system prepares to suspend": {
     "Automatically lock the screen when the system prepares to suspend": "Lås skärmen automatiskt när systemet förbereder sig för strömsparläge"
   },
+  "Automatically picks the scheme variant based on the wallpaper.": {
+    "Automatically picks the scheme variant based on the wallpaper.": ""
+  },
   "Automatically save changes to opened files as you type": {
     "Automatically save changes to opened files as you type": ""
   },
@@ -1058,11 +1091,20 @@
   "Bar Spacing": {
     "Bar Spacing": ""
   },
+  "Bar border and shadow": {
+    "Bar border and shadow": ""
+  },
+  "Bar corners": {
+    "Bar corners": ""
+  },
   "Bar corners and background": {
     "Bar corners and background": ""
   },
   "Bar shadow, border, and corners": {
     "Bar shadow, border, and corners": ""
+  },
+  "Bar visibility": {
+    "Bar visibility": ""
   },
   "Base color for shadows (opacity is applied automatically)": {
     "Base color for shadows (opacity is applied automatically)": "Basfärg för skuggor (opacitet tillämpas automatiskt)"
@@ -1076,6 +1118,9 @@
   "Battery %1": {
     "Battery %1": "Batteri %1"
   },
+  "Battery / Control Center": {
+    "Battery / Control Center": ""
+  },
   "Battery Charge Limit": {
     "Battery Charge Limit": "Laddningsgräns"
   },
@@ -1087,6 +1132,9 @@
   },
   "Battery and power management": {
     "Battery and power management": "Batteri och energihantering"
+  },
+  "Battery gauge opens Control Center": {
+    "Battery gauge opens Control Center": ""
   },
   "Battery has charged to your set limit of %1%": {
     "Battery has charged to your set limit of %1%": ""
@@ -1120,6 +1168,9 @@
   },
   "Blend between Surface High and the selected custom color": {
     "Blend between Surface High and the selected custom color": ""
+  },
+  "Block %1 in Do Not Disturb": {
+    "Block %1 in Do Not Disturb": ""
   },
   "Block Out": {
     "Block Out": "Blockera"
@@ -1165,6 +1216,9 @@
   },
   "Body": {
     "Body": "Brödtext"
+  },
+  "Body Click Runs Default Action": {
+    "Body Click Runs Default Action": ""
   },
   "Body Font Size": {
     "Body Font Size": ""
@@ -1222,6 +1276,9 @@
   },
   "Bottom dock for pinned and running applications": {
     "Bottom dock for pinned and running applications": "Nedre dock för fästa och aktiva appar"
+  },
+  "Bright": {
+    "Bright": ""
   },
   "Brightness": {
     "Brightness": "Ljusstyrka"
@@ -1348,6 +1405,9 @@
   },
   "Center Section": {
     "Center Section": "Mittavdelning"
+  },
+  "Center Section - Reserved by Dank Island": {
+    "Center Section - Reserved by Dank Island": ""
   },
   "Center Single Column": {
     "Center Single Column": "Centrera enstaka kolumn"
@@ -1487,6 +1547,9 @@
   "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": {
     "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": ""
   },
+  "Choose which shortcuts sit left or right of the clock": {
+    "Choose which shortcuts sit left or right of the clock": ""
+  },
   "Chroma Style": {
     "Chroma Style": "Chroma-stil"
   },
@@ -1511,6 +1574,9 @@
   "Clear All Jobs": {
     "Clear All Jobs": "Rensa alla jobb"
   },
+  "Clear Badge on Open": {
+    "Clear Badge on Open": ""
+  },
   "Clear History?": {
     "Clear History?": "Rensa historik?"
   },
@@ -1522,6 +1588,12 @@
   },
   "Clear at Startup": {
     "Clear at Startup": "Rensa vid start"
+  },
+  "Clears the badge on open but keeps notifications active": {
+    "Clears the badge on open but keeps notifications active": ""
+  },
+  "Click": {
+    "Click": ""
   },
   "Click 'Setup' to create %1 and add include to your compositor config.": {
     "Click 'Setup' to create %1 and add include to your compositor config.": "Klicka på 'Konfiguration' för att skapa %1 och lägga till inkludering i din kompositorkonfiguration."
@@ -1541,6 +1613,12 @@
   "Click any shortcut to edit. Changes save to %1": {
     "Click any shortcut to edit. Changes save to %1": "Klicka på ett kortkommando för att redigera. Ändringar sparas i %1"
   },
+  "Click expands only on an intentional press. Hybrid peeks the current compact face on hover": {
+    "Click expands only on an intentional press. Hybrid peeks the current compact face on hover": ""
+  },
+  "Click the icon to mute": {
+    "Click the icon to mute": ""
+  },
   "Click to Paste": {
     "Click to Paste": ""
   },
@@ -1549,6 +1627,9 @@
   },
   "Click to select a custom theme JSON file": {
     "Click to select a custom theme JSON file": "Klicka för att välja en anpassad JSON-temafil"
+  },
+  "Clicking a popup runs its first action instead of expanding the body": {
+    "Clicking a popup runs its first action instead of expanding the body": ""
   },
   "Clip": {
     "Clip": "Klipp"
@@ -1697,8 +1778,17 @@
   "Compact": {
     "Compact": "Kompakt"
   },
+  "Compact Clock Pill": {
+    "Compact Clock Pill": ""
+  },
+  "Compact Island Height": {
+    "Compact Island Height": ""
+  },
   "Compact Mode": {
     "Compact Mode": "Kompakt läge"
+  },
+  "Compact home clock pill in both width and height": {
+    "Compact home clock pill in both width and height": ""
   },
   "Completed": {
     "Completed": "Klar"
@@ -1753,6 +1843,9 @@
   },
   "Configure which displays show \"%1": {
     "Configure which displays show \"%1\"": "Konfigurera vilka bildskärmar som visar \"%1\""
+  },
+  "Configure which displays show Dank Island as \"%1": {
+    "Configure which displays show Dank Island as \"%1\"": ""
   },
   "Configure which displays show shell components": {
     "Configure which displays show shell components": "Konfigurera vilka bildskärmar visar shellkomponenter"
@@ -1934,6 +2027,9 @@
   "Corner Style": {
     "Corner Style": ""
   },
+  "Corner style applies to the bar surface": {
+    "Corner style applies to the bar surface": ""
+  },
   "Corners & Background": {
     "Corners & Background": "Hörn & bakgrund"
   },
@@ -2062,6 +2158,9 @@
   },
   "Curve": {
     "Curve": ""
+  },
+  "Curve rasterizer.": {
+    "Curve rasterizer.": ""
   },
   "Curve: curve rasterizer.": {
     "Curve: curve rasterizer.": ""
@@ -2192,6 +2291,9 @@
   "Daily at:": {
     "Daily at:": "Dagligen vid:"
   },
+  "Damped springs settle straight to their target with no overshoot": {
+    "Damped springs settle straight to their target with no overshoot": ""
+  },
   "Dank": {
     "Dank": "Dank"
   },
@@ -2203,6 +2305,12 @@
   },
   "Dank Dash": {
     "Dank Dash": ""
+  },
+  "Dank Island - Beta": {
+    "Dank Island - Beta": ""
+  },
+  "Dank Island instance": {
+    "Dank Island instance": ""
   },
   "DankBar": {
     "DankBar": "DankBar"
@@ -2234,8 +2342,14 @@
   "Dark mode harmony": {
     "Dark mode harmony": "Mörkt läge-harmoni"
   },
+  "Dark or light mode follows the wallpaper brightness": {
+    "Dark or light mode follows the wallpaper brightness": ""
+  },
   "Darken Modal Background": {
     "Darken Modal Background": "Mörklägg bakgrund bakom dialogrutor"
+  },
+  "Dashboard": {
+    "Dashboard": ""
   },
   "Date First": {
     "Date First": ""
@@ -2296,6 +2410,9 @@
   },
   "Default Width (%)": {
     "Default Width (%)": "Standardbredd (%)"
+  },
+  "Default launcher shortcuts open a native launcher activity inside Dank Island. Spotlight is used when the focused screen has no DankIsland.": {
+    "Default launcher shortcuts open a native launcher activity inside Dank Island. Spotlight is used when the focused screen has no DankIsland.": ""
   },
   "Default launcher shortcuts open the full launcher with mode tabs, grid view, and action panel.": {
     "Default launcher shortcuts open the full launcher with mode tabs, grid view, and action panel.": ""
@@ -2419,6 +2536,9 @@
   },
   "Digital": {
     "Digital": "Digital"
+  },
+  "Dim": {
+    "Dim": ""
   },
   "Direct path to a .xkb keymap file. Overrides layouts/variants above.": {
     "Direct path to a .xkb keymap file. Overrides layouts/variants above.": ""
@@ -2573,6 +2693,12 @@
   "Displays the active keyboard layout and allows switching": {
     "Displays the active keyboard layout and allows switching": "Visa aktiv tangentbordslayout och växla tangentbordslayouter"
   },
+  "Distance between display edge and island": {
+    "Distance between display edge and island": ""
+  },
+  "Distance-field renderer.": {
+    "Distance-field renderer.": ""
+  },
   "Distribution": {
     "Distribution": "Distribution"
   },
@@ -2632,6 +2758,12 @@
   },
   "Draw a connected picture-frame border around the entire display": {
     "Draw a connected picture-frame border around the entire display": ""
+  },
+  "Draw an island-styled background behind satellite widgets": {
+    "Draw an island-styled background behind satellite widgets": ""
+  },
+  "Draw an outline and use the highest-contrast surface tone": {
+    "Draw an outline and use the highest-contrast surface tone": ""
   },
   "Driver": {
     "Driver": "Drivrutin"
@@ -2759,6 +2891,9 @@
   "Enable History": {
     "Enable History": "Aktivera historik"
   },
+  "Enable Island": {
+    "Enable Island": ""
+  },
   "Enable Num Lock": {
     "Enable Num Lock": ""
   },
@@ -2806,6 +2941,9 @@
   },
   "Enable security key authentication": {
     "Enable security key authentication": "Aktivera säkerhetsnyckelautentisering"
+  },
+  "Enable weather in Time & Weather to show this shortcut": {
+    "Enable weather in Time & Weather to show this shortcut": ""
   },
   "Enabled": {
     "Enabled": "Aktiverat"
@@ -2935,6 +3073,15 @@
   },
   "Exit node": {
     "Exit node": ""
+  },
+  "Expand Notifications": {
+    "Expand Notifications": ""
+  },
+  "Expand notifications by default instead of click or hover": {
+    "Expand notifications by default instead of click or hover": ""
+  },
+  "Expansion Mode": {
+    "Expansion Mode": ""
   },
   "Experimental Feature": {
     "Experimental Feature": "Experimentell funktion"
@@ -3218,6 +3365,9 @@
   "Failed to switch codec": {
     "Failed to switch codec": ""
   },
+  "Failed to switch port": {
+    "Failed to switch port": ""
+  },
   "Failed to unpin entry": {
     "Failed to unpin entry": "Misslyckades med att ta bort fästning av post"
   },
@@ -3394,6 +3544,9 @@
   },
   "Floating windows follow Surface Styling settings": {
     "Floating windows follow Surface Styling settings": ""
+  },
+  "Floats above windows and other content": {
+    "Floats above windows and other content": ""
   },
   "Fluent": {
     "Fluent": ""
@@ -3683,6 +3836,9 @@
   "Globally scale all animation durations": {
     "Globally scale all animation durations": "Skala alla animeringstider globalt"
   },
+  "Globally scale animation durations with geometric motion & spring based physics with bezier curves": {
+    "Globally scale animation durations with geometric motion & spring based physics with bezier curves": ""
+  },
   "Golden Hour": {
     "Golden Hour": "Gyllene timmen"
   },
@@ -3905,8 +4061,20 @@
   "High": {
     "High": ""
   },
+  "High Contrast": {
+    "High Contrast": ""
+  },
   "High-fidelity palette that preserves source hues.": {
     "High-fidelity palette that preserves source hues.": "Högtrogen palett som bevarar källfärgerna."
+  },
+  "Higher percentages give island more inertia": {
+    "Higher percentages give island more inertia": ""
+  },
+  "Higher values pull island toward its target more strongly": {
+    "Higher values pull island toward its target more strongly": ""
+  },
+  "Higher values settle island with less bounce": {
+    "Higher values settle island with less bounce": ""
   },
   "Highlight Active Workspace App": {
     "Highlight Active Workspace App": "Markera aktiv app i arbetsytan"
@@ -3931,6 +4099,12 @@
   },
   "Hold to Confirm Power Actions": {
     "Hold to Confirm Power Actions": "Håll för att bekräfta strömåtgärder"
+  },
+  "Home Compact": {
+    "Home Compact": ""
+  },
+  "Horizontal Offset": {
+    "Horizontal Offset": ""
   },
   "Horizontal and vertical bar thickness": {
     "Horizontal and vertical bar thickness": ""
@@ -3995,6 +4169,12 @@
   "Humidity": {
     "Humidity": "Luftfuktighet"
   },
+  "Hybrid": {
+    "Hybrid": ""
+  },
+  "Hybrid peeks the current compact face on hover. Click pins a destination so it stays open": {
+    "Hybrid peeks the current compact face on hover. Click pins a destination so it stays open": ""
+  },
   "Hyprland Discord Server": {
     "Hyprland Discord Server": "Hyprland Discord-server"
   },
@@ -4042,6 +4222,9 @@
   },
   "Icon Size %": {
     "Icon Size %": "Ikonstorlek %"
+  },
+  "Icon Spacing": {
+    "Icon Spacing": ""
   },
   "Icon Theme": {
     "Icon Theme": "Ikontema"
@@ -4178,6 +4361,9 @@
   "Inner Gaps": {
     "Inner Gaps": ""
   },
+  "Inner authentication": {
+    "Inner authentication": ""
+  },
   "Inner padding applied to each widget": {
     "Inner padding applied to each widget": ""
   },
@@ -4292,6 +4478,18 @@
   "Iris Bloom": {
     "Iris Bloom": "Iris Bloom"
   },
+  "Island": {
+    "Island": ""
+  },
+  "Island Gap": {
+    "Island Gap": ""
+  },
+  "Island Instance": {
+    "Island Instance": ""
+  },
+  "Island placement": {
+    "Island placement": ""
+  },
   "Isolate Displays": {
     "Isolate Displays": "Isolera bildskärmar"
   },
@@ -4313,6 +4511,9 @@
   "Keep Changes": {
     "Keep Changes": "Behåll ändringar"
   },
+  "Keep Clock with Media": {
+    "Keep Clock with Media": ""
+  },
   "Keep My Edits": {
     "Keep My Edits": ""
   },
@@ -4330,6 +4531,9 @@
   },
   "Keep typing": {
     "Keep typing": ""
+  },
+  "Keep widgets beside the island or align them like a standalone bar": {
+    "Keep widgets beside the island or align them like a standalone bar": ""
   },
   "Keeping Awake": {
     "Keeping Awake": "Håller vaken"
@@ -4544,6 +4748,9 @@
   "Loading keybinds...": {
     "Loading keybinds...": "Läser in kortkommandon..."
   },
+  "Loading ports...": {
+    "Loading ports...": ""
+  },
   "Loading trending...": {
     "Loading trending...": "Läser in trendande..."
   },
@@ -4727,6 +4934,12 @@
   "Material": {
     "Material": ""
   },
+  "Material 3 Expressive bezier curves, default.": {
+    "Material 3 Expressive bezier curves, default.": ""
+  },
+  "Material 3 Expressive panels rise from below with a subtle scale, default.": {
+    "Material 3 Expressive panels rise from below with a subtle scale, default.": ""
+  },
   "Material Battery Style": {
     "Material Battery Style": ""
   },
@@ -4828,6 +5041,9 @@
   },
   "Maximum pinned entries reached": {
     "Maximum pinned entries reached": "Maximalt antal fästa poster uppnått"
+  },
+  "Media / Launcher": {
+    "Media / Launcher": ""
   },
   "Media Controls": {
     "Media Controls": "Mediereglage"
@@ -4973,6 +5189,12 @@
   "Morning": {
     "Morning": "Förmiddag"
   },
+  "Motion": {
+    "Motion": ""
+  },
+  "Motion & Accessibility": {
+    "Motion & Accessibility": ""
+  },
   "Motion Effects": {
     "Motion Effects": ""
   },
@@ -4996,6 +5218,9 @@
   },
   "Move Widget": {
     "Move Widget": "Flytta widget"
+  },
+  "Move island and satellites left or right from display center": {
+    "Move island and satellites left or right from display center": ""
   },
   "Moving to Paused": {
     "Moving to Paused": "Pausar"
@@ -5056,6 +5281,9 @@
   },
   "Navigate": {
     "Navigate": "Navigera"
+  },
+  "Near Island": {
+    "Near Island": ""
   },
   "Network": {
     "Network": "Nätverk"
@@ -5375,6 +5603,9 @@
   "No plugins found": {
     "No plugins found": "Inga tillägg hittades"
   },
+  "No ports found": {
+    "No ports found": ""
+  },
   "No printer found": {
     "No printer found": "Ingen skrivare hittades"
   },
@@ -5666,6 +5897,9 @@
   "Open From": {
     "Open From": ""
   },
+  "Open Island": {
+    "Open Island": ""
+  },
   "Open Notepad File": {
     "Open Notepad File": "Öppna anteckning"
   },
@@ -5837,6 +6071,9 @@
   "PDF Reader": {
     "PDF Reader": ""
   },
+  "PID": {
+    "PID": ""
+  },
   "PIN": {
     "PIN": "PIN"
   },
@@ -5875,6 +6112,15 @@
   },
   "Pairing...": {
     "Pairing...": "Parkopplar..."
+  },
+  "Palette": {
+    "Palette": ""
+  },
+  "Panels glide in from a larger distance at full size, no scale change, pure clean motion.": {
+    "Panels glide in from a larger distance at full size, no scale change, pure clean motion.": ""
+  },
+  "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": {
+    "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": ""
   },
   "Partial": {
     "Partial": ""
@@ -6002,6 +6248,9 @@
   "Place clipboard history on the Wayland overlay layer": {
     "Place clipboard history on the Wayland overlay layer": ""
   },
+  "Place independent widgets to left and right of island": {
+    "Place independent widgets to left and right of island": ""
+  },
   "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
     "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "Lägg till tilläggsmappar här. Varje tillägg ska ha en plugin.json manifestfil."
   },
@@ -6013,6 +6262,9 @@
   },
   "Place the dock on the Wayland overlay layer": {
     "Place the dock on the Wayland overlay layer": ""
+  },
+  "Platform renderer (FreeType).": {
+    "Platform renderer (FreeType).": ""
   },
   "Play": {
     "Play": ""
@@ -6037,6 +6289,9 @@
   },
   "Playback error: ": {
     "Playback error: ": "Uppspelningsfel: "
+  },
+  "Playful": {
+    "Playful": ""
   },
   "Plays audio files": {
     "Plays audio files": ""
@@ -6124,6 +6379,12 @@
   },
   "Port": {
     "Port": "Port"
+  },
+  "Port Selection": {
+    "Port Selection": ""
+  },
+  "Port switched": {
+    "Port switched": ""
   },
   "Portal": {
     "Portal": "Portal"
@@ -6238,6 +6499,9 @@
   },
   "Primary": {
     "Primary": "Primär"
+  },
+  "Primary Bar": {
+    "Primary Bar": ""
   },
   "Primary Container": {
     "Primary Container": "Primär behållare"
@@ -6431,6 +6695,9 @@
   "Recommended available": {
     "Recommended available": "Rekommenderad tillgänglig"
   },
+  "Reduce Motion": {
+    "Reduce Motion": ""
+  },
   "Reduce the visible bar length from both ends": {
     "Reduce the visible bar length from both ends": ""
   },
@@ -6554,6 +6821,9 @@
   "Rename Workspace": {
     "Rename Workspace": "Byt namn på arbetsyta"
   },
+  "Render Type": {
+    "Render Type": ""
+  },
   "Reorder & Group": {
     "Reorder & Group": ""
   },
@@ -6611,6 +6881,9 @@
   "Requires the DMS Theme extension from the editor marketplace": {
     "Requires the DMS Theme extension from the editor marketplace": ""
   },
+  "Reserved Height": {
+    "Reserved Height": ""
+  },
   "Reset": {
     "Reset": "Återställ"
   },
@@ -6631,6 +6904,9 @@
   },
   "Resize on Border": {
     "Resize on Border": ""
+  },
+  "Resize the resting island to align with nearby widgets": {
+    "Resize the resting island to align with nearby widgets": ""
   },
   "Resize windows by dragging their edges with the mouse": {
     "Resize windows by dragging their edges with the mouse": ""
@@ -6791,6 +7067,12 @@
   "SSID": {
     "SSID": ""
   },
+  "Satellite Widgets": {
+    "Satellite Widgets": ""
+  },
+  "Satellites widget to place left or right of the island": {
+    "Satellites widget to place left or right of the island": ""
+  },
   "Saturation": {
     "Saturation": ""
   },
@@ -6875,6 +7157,9 @@
   "Score": {
     "Score": "Poäng"
   },
+  "Screen Edges": {
+    "Screen Edges": ""
+  },
   "Screen sharing": {
     "Screen sharing": "Skärmdelning"
   },
@@ -6946,6 +7231,9 @@
   },
   "Search themes...": {
     "Search themes...": "Sök teman..."
+  },
+  "Search when idle, visualizer when media is playing": {
+    "Search when idle, visualizer when media is playing": ""
   },
   "Search widgets...": {
     "Search widgets...": "Sök widgetar..."
@@ -7400,6 +7688,9 @@
   "Show Restart DMS": {
     "Show Restart DMS": "Visa DMS-omstart"
   },
+  "Show Satellite Widgets": {
+    "Show Satellite Widgets": ""
+  },
   "Show Saved Items": {
     "Show Saved Items": "Visa sparade objekt"
   },
@@ -7454,6 +7745,9 @@
   "Show a bar that drains as the popup's auto-dismiss timer runs": {
     "Show a bar that drains as the popup's auto-dismiss timer runs": ""
   },
+  "Show a clickable clock beside compact media details": {
+    "Show a clickable clock beside compact media details": ""
+  },
   "Show a notification when battery reaches the charge limit.": {
     "Show a notification when battery reaches the charge limit.": ""
   },
@@ -7474,6 +7768,9 @@
   },
   "Show cava audio visualizer in media widget": {
     "Show cava audio visualizer in media widget": "Visa cava-ljudvisualiserare i mediawidget"
+  },
+  "Show critical priority popups while Do Not Disturb is on": {
+    "Show critical priority popups while Do Not Disturb is on": ""
   },
   "Show darkened overlay behind modal dialogs": {
     "Show darkened overlay behind modal dialogs": "Visa mörklagt överlägg bakom modala dialogrutor"
@@ -7610,11 +7907,23 @@
   "Small": {
     "Small": "Liten"
   },
+  "Smart": {
+    "Smart": ""
+  },
   "Smartcard Authentication": {
     "Smartcard Authentication": "Smartkortsautentisering"
   },
+  "Smooth": {
+    "Smooth": ""
+  },
+  "Smooth cubic deceleration in, quick snap out, clean, elegant curves.": {
+    "Smooth cubic deceleration in, quick snap out, clean, elegant curves.": ""
+  },
   "Snap": {
     "Snap": "Knäppa"
+  },
+  "Snap spring-driven motion straight to its target without physics travel": {
+    "Snap spring-driven motion straight to its target without physics travel": ""
   },
   "Snow": {
     "Snow": "Snö"
@@ -7622,8 +7931,17 @@
   "Soft Reboot": {
     "Soft Reboot": ""
   },
+  "Solid": {
+    "Solid": ""
+  },
+  "Solid material type or Outline": {
+    "Solid material type or Outline": ""
+  },
   "Some plugins require a newer version of DMS:": {
     "Some plugins require a newer version of DMS:": "Några tillägg kräver en nyare version av DMS:"
+  },
+  "Some settings are managed by the island": {
+    "Some settings are managed by the island": ""
   },
   "Sort Alphabetically": {
     "Sort Alphabetically": "Sortera alfabetiskt"
@@ -7655,6 +7973,9 @@
   "Space between windows and screen edges": {
     "Space between windows and screen edges": ""
   },
+  "Space kept clear for compact island and satellites": {
+    "Space kept clear for compact island and satellites": ""
+  },
   "Spacer": {
     "Spacer": "Mellanrum"
   },
@@ -7682,6 +8003,24 @@
   "Spotlight Search": {
     "Spotlight Search": ""
   },
+  "Spring Damping": {
+    "Spring Damping": ""
+  },
+  "Spring Mass": {
+    "Spring Mass": ""
+  },
+  "Spring Motion": {
+    "Spring Motion": ""
+  },
+  "Spring Stiffness": {
+    "Spring Stiffness": ""
+  },
+  "Spring bezier with overshoot, entry briefly exceeds its target then settles.": {
+    "Spring bezier with overshoot, entry briefly exceeds its target then settles.": ""
+  },
+  "Springs carry extra energy and visibly bounce before settling": {
+    "Springs carry extra energy and visibly bounce before settling": ""
+  },
   "Square": {
     "Square": ""
   },
@@ -7690,6 +8029,9 @@
   },
   "Stacked": {
     "Stacked": "Staplade"
+  },
+  "Stage the Wayland overlay layer to remain visible over fullscreen apps": {
+    "Stage the Wayland overlay layer to remain visible over fullscreen apps": ""
   },
   "Standard": {
     "Standard": "Standard"
@@ -7831,6 +8173,9 @@
   },
   "Sway Website": {
     "Sway Website": "Sways webbplats"
+  },
+  "Sweep the background into the screen edges": {
+    "Sweep the background into the screen edges": ""
   },
   "Switch Layout Shortcut": {
     "Switch Layout Shortcut": ""
@@ -8030,6 +8375,12 @@
   "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": {
     "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "Miljövariabeln DMS_SOCKET har antingen inte ställts in eller socketen är otillgänglig. DMS_SOCKET krävs för att hantera tillägg automatiskt."
   },
+  "The Island anchors to the top or bottom edge": {
+    "The Island anchors to the top or bottom edge": ""
+  },
+  "The Island holds this edge on a display this bar covers, so the bar stays hidden there": {
+    "The Island holds this edge on a display this bar covers, so the bar stays hidden there": ""
+  },
   "The WiFi adapter could not start access point mode.": {
     "The WiFi adapter could not start access point mode.": ""
   },
@@ -8041,6 +8392,9 @@
   },
   "The custom command used when attaching to sessions (receives the session name as the first argument)": {
     "The custom command used when attaching to sessions (receives the session name as the first argument)": "Det anpassade kommandot som används vid anslutning till sessioner (tar emot sessionsnamnet som första argument)"
+  },
+  "The island draws its own surface": {
+    "The island draws its own surface": ""
   },
   "The job queue of this printer is empty": {
     "The job queue of this printer is empty": "Skrivarens jobbkö är tom"
@@ -8077,6 +8431,9 @@
   },
   "These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)": {
     "These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)": ""
+  },
+  "These style the bar surface, which the Island replaces": {
+    "These style the bar surface, which the Island replaces": ""
   },
   "Thickness": {
     "Thickness": "Tjocklek"
@@ -8228,6 +8585,9 @@
   "Toggle fonts": {
     "Toggle fonts": ""
   },
+  "Toggle the Island on this instance's displays": {
+    "Toggle the Island on this instance's displays": ""
+  },
   "Toggle visibility of this bar configuration": {
     "Toggle visibility of this bar configuration": "Växla synlighet för denna menyradskonfiguration"
   },
@@ -8251,6 +8611,9 @@
   },
   "Tools": {
     "Tools": "Verktyg"
+  },
+  "Tools icon opens Control Center": {
+    "Tools icon opens Control Center": ""
   },
   "Top": {
     "Top": "Topp"
@@ -8470,6 +8833,9 @@
   },
   "Unpin from Dock": {
     "Unpin from Dock": "Ta bort från Dock"
+  },
+  "Unread notification count beside the clock": {
+    "Unread notification count beside the clock": ""
   },
   "Unsaved changes": {
     "Unsaved changes": "Osparade ändringar"
@@ -8863,6 +9229,9 @@
   },
   "Weather Widget": {
     "Weather Widget": "Väderwidget"
+  },
+  "Weather icon and temperature open the weather activity": {
+    "Weather icon and temperature open the weather activity": ""
   },
   "Web Browser": {
     "Web Browser": ""

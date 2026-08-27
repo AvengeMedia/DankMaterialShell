@@ -77,6 +77,9 @@
   "%1 online": {
     "%1 online": "%1 在线"
   },
+  "%1 position": {
+    "%1 position": ""
+  },
   "%1 tasks": {
     "%1 tasks": "%1 项任务"
   },
@@ -311,6 +314,9 @@
   "A separate minimal launcher action that works in Standalone, Separate Frame Mode, and Connected Frame Mode.": {
     "A separate minimal launcher action that works in Standalone, Separate Frame Mode, and Connected Frame Mode.": "一个独立的极简启动器动作，适用于独立模式、分离框架模式和连接框架模式。"
   },
+  "A slight natural settle, DMS default": {
+    "A slight natural settle, DMS default": ""
+  },
   "A user with that name already exists.": {
     "A user with that name already exists.": "已存在同名用户。"
   },
@@ -488,6 +494,9 @@
   "Add to Autostart": {
     "Add to Autostart": "添加到自启动"
   },
+  "Additional settings are managed by the Island": {
+    "Additional settings are managed by the Island": ""
+  },
   "Adjust pointer sensitivity speed": {
     "Adjust pointer sensitivity speed": "调整鼠标指针灵敏度"
   },
@@ -542,6 +551,9 @@
   "Allow": {
     "Allow": "允许"
   },
+  "Allow %1 in Do Not Disturb": {
+    "Allow %1 in Do Not Disturb": ""
+  },
   "Allow LAN access": {
     "Allow LAN access": "允许局域网访问"
   },
@@ -556,6 +568,9 @@
   },
   "Allow greeter login access": {
     "Allow greeter login access": "允许登录界面访问"
+  },
+  "Allow in Do Not Disturb": {
+    "Allow in Do Not Disturb": ""
   },
   "Already on that session": {
     "Already on that session": "已在该会话中"
@@ -704,6 +719,9 @@
   "Apply inverse concave corner cutouts to the bar": {
     "Apply inverse concave corner cutouts to the bar": "为状态栏应用反向凹角裁切"
   },
+  "Apply island geometry changes immediately without spring overshoot": {
+    "Apply island geometry changes immediately without spring overshoot": ""
+  },
   "Apply to Hardware": {
     "Apply to Hardware": "应用到硬件"
   },
@@ -727,6 +745,9 @@
   },
   "Apps Icon": {
     "Apps Icon": "应用图标"
+  },
+  "Apps allowed to show popups while Do Not Disturb is on. Right-click a notification and choose \"Allow in Do Not Disturb\" to add one here.": {
+    "Apps allowed to show popups while Do Not Disturb is on. Right-click a notification and choose \"Allow in Do Not Disturb\" to add one here.": ""
   },
   "Apps are ordered by usage frequency, then last used, then alphabetically.": {
     "Apps are ordered by usage frequency, then last used, then alphabetically.": "应用依次按使用频率、最近使用时间和字母顺序排序。"
@@ -839,11 +860,20 @@
   "Auto (Bar-aware)": {
     "Auto (Bar-aware)": "自动（感知状态栏）"
   },
+  "Auto (Dark Mode)": {
+    "Auto (Dark Mode)": ""
+  },
+  "Auto (Light Mode)": {
+    "Auto (Light Mode)": ""
+  },
   "Auto (Wide)": {
     "Auto (Wide)": "自动（宽色域）"
   },
   "Auto Compositor Gaps": {
     "Auto Compositor Gaps": "自动合成器间隙"
+  },
+  "Auto From Wallpaper": {
+    "Auto From Wallpaper": ""
   },
   "Auto Location": {
     "Auto Location": "自动定位"
@@ -953,6 +983,9 @@
   "Automatically lock the screen when the system prepares to suspend": {
     "Automatically lock the screen when the system prepares to suspend": "当系统准备挂起时自动锁定屏幕"
   },
+  "Automatically picks the scheme variant based on the wallpaper.": {
+    "Automatically picks the scheme variant based on the wallpaper.": ""
+  },
   "Automatically save changes to opened files as you type": {
     "Automatically save changes to opened files as you type": "键入时自动保存变更"
   },
@@ -1058,11 +1091,20 @@
   "Bar Spacing": {
     "Bar Spacing": "状态栏间距"
   },
+  "Bar border and shadow": {
+    "Bar border and shadow": ""
+  },
+  "Bar corners": {
+    "Bar corners": ""
+  },
   "Bar corners and background": {
     "Bar corners and background": "状态栏圆角与背景"
   },
   "Bar shadow, border, and corners": {
     "Bar shadow, border, and corners": "状态栏阴影、边框与圆角"
+  },
+  "Bar visibility": {
+    "Bar visibility": ""
   },
   "Base color for shadows (opacity is applied automatically)": {
     "Base color for shadows (opacity is applied automatically)": "阴影基础颜色（不透明度会自动应用）"
@@ -1076,6 +1118,9 @@
   "Battery %1": {
     "Battery %1": "剩余电量 %1"
   },
+  "Battery / Control Center": {
+    "Battery / Control Center": ""
+  },
   "Battery Charge Limit": {
     "Battery Charge Limit": "电池充电限制"
   },
@@ -1087,6 +1132,9 @@
   },
   "Battery and power management": {
     "Battery and power management": "电池与电源管理"
+  },
+  "Battery gauge opens Control Center": {
+    "Battery gauge opens Control Center": ""
   },
   "Battery has charged to your set limit of %1%": {
     "Battery has charged to your set limit of %1%": "电池已充电至设置的上限 %1%"
@@ -1120,6 +1168,9 @@
   },
   "Blend between Surface High and the selected custom color": {
     "Blend between Surface High and the selected custom color": "在 Surface High 与所选自定义颜色之间混合"
+  },
+  "Block %1 in Do Not Disturb": {
+    "Block %1 in Do Not Disturb": ""
   },
   "Block Out": {
     "Block Out": "阻止捕获"
@@ -1165,6 +1216,9 @@
   },
   "Body": {
     "Body": "主体"
+  },
+  "Body Click Runs Default Action": {
+    "Body Click Runs Default Action": ""
   },
   "Body Font Size": {
     "Body Font Size": "内容字号"
@@ -1222,6 +1276,9 @@
   },
   "Bottom dock for pinned and running applications": {
     "Bottom dock for pinned and running applications": "显示已固定和运行中应用的 Dock"
+  },
+  "Bright": {
+    "Bright": ""
   },
   "Brightness": {
     "Brightness": "亮度"
@@ -1348,6 +1405,9 @@
   },
   "Center Section": {
     "Center Section": "中间区域"
+  },
+  "Center Section - Reserved by Dank Island": {
+    "Center Section - Reserved by Dank Island": ""
   },
   "Center Single Column": {
     "Center Single Column": "居中单列"
@@ -1487,6 +1547,9 @@
   "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": {
     "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": "选择哪些显示器显示锁屏界面。其他显示器将显示纯色以防止 OLED 烧屏。"
   },
+  "Choose which shortcuts sit left or right of the clock": {
+    "Choose which shortcuts sit left or right of the clock": ""
+  },
   "Chroma Style": {
     "Chroma Style": "色度风格"
   },
@@ -1511,6 +1574,9 @@
   "Clear All Jobs": {
     "Clear All Jobs": "清除所有任务"
   },
+  "Clear Badge on Open": {
+    "Clear Badge on Open": ""
+  },
   "Clear History?": {
     "Clear History?": "是否清除历史？"
   },
@@ -1522,6 +1588,12 @@
   },
   "Clear at Startup": {
     "Clear at Startup": "启动时清除"
+  },
+  "Clears the badge on open but keeps notifications active": {
+    "Clears the badge on open but keeps notifications active": ""
+  },
+  "Click": {
+    "Click": ""
   },
   "Click 'Setup' to create %1 and add include to your compositor config.": {
     "Click 'Setup' to create %1 and add include to your compositor config.": "点击“设置”以创建 %1 配置，并添加引用至合成器配置文件。"
@@ -1541,6 +1613,12 @@
   "Click any shortcut to edit. Changes save to %1": {
     "Click any shortcut to edit. Changes save to %1": "点击任意快捷方式以编辑。更改将保存至 %1。"
   },
+  "Click expands only on an intentional press. Hybrid peeks the current compact face on hover": {
+    "Click expands only on an intentional press. Hybrid peeks the current compact face on hover": ""
+  },
+  "Click the icon to mute": {
+    "Click the icon to mute": ""
+  },
   "Click to Paste": {
     "Click to Paste": "点击粘贴"
   },
@@ -1549,6 +1627,9 @@
   },
   "Click to select a custom theme JSON file": {
     "Click to select a custom theme JSON file": "点击以选择自定义主题的 JSON 文件"
+  },
+  "Clicking a popup runs its first action instead of expanding the body": {
+    "Clicking a popup runs its first action instead of expanding the body": ""
   },
   "Clip": {
     "Clip": "裁剪"
@@ -1697,8 +1778,17 @@
   "Compact": {
     "Compact": "紧凑"
   },
+  "Compact Clock Pill": {
+    "Compact Clock Pill": ""
+  },
+  "Compact Island Height": {
+    "Compact Island Height": ""
+  },
   "Compact Mode": {
     "Compact Mode": "紧凑模式"
+  },
+  "Compact home clock pill in both width and height": {
+    "Compact home clock pill in both width and height": ""
   },
   "Completed": {
     "Completed": "已完成"
@@ -1753,6 +1843,9 @@
   },
   "Configure which displays show \"%1": {
     "Configure which displays show \"%1\"": "配置要显示 “%1” 的显示器"
+  },
+  "Configure which displays show Dank Island as \"%1": {
+    "Configure which displays show Dank Island as \"%1\"": ""
   },
   "Configure which displays show shell components": {
     "Configure which displays show shell components": "为显示器分配可显示的 shell 组件"
@@ -1934,6 +2027,9 @@
   "Corner Style": {
     "Corner Style": ""
   },
+  "Corner style applies to the bar surface": {
+    "Corner style applies to the bar surface": ""
+  },
   "Corners & Background": {
     "Corners & Background": "圆角与背景"
   },
@@ -2062,6 +2158,9 @@
   },
   "Curve": {
     "Curve": "Curve"
+  },
+  "Curve rasterizer.": {
+    "Curve rasterizer.": ""
   },
   "Curve: curve rasterizer.": {
     "Curve: curve rasterizer.": "曲线：曲线光栅器。"
@@ -2192,6 +2291,9 @@
   "Daily at:": {
     "Daily at:": "在每日："
   },
+  "Damped springs settle straight to their target with no overshoot": {
+    "Damped springs settle straight to their target with no overshoot": ""
+  },
   "Dank": {
     "Dank": "Dank"
   },
@@ -2203,6 +2305,12 @@
   },
   "Dank Dash": {
     "Dank Dash": "Dank 面板"
+  },
+  "Dank Island - Beta": {
+    "Dank Island - Beta": ""
+  },
+  "Dank Island instance": {
+    "Dank Island instance": ""
   },
   "DankBar": {
     "DankBar": "Dank 状态栏"
@@ -2234,8 +2342,14 @@
   "Dark mode harmony": {
     "Dark mode harmony": "深色模式调和"
   },
+  "Dark or light mode follows the wallpaper brightness": {
+    "Dark or light mode follows the wallpaper brightness": ""
+  },
   "Darken Modal Background": {
     "Darken Modal Background": "暗化模态框背景"
+  },
+  "Dashboard": {
+    "Dashboard": ""
   },
   "Date First": {
     "Date First": ""
@@ -2296,6 +2410,9 @@
   },
   "Default Width (%)": {
     "Default Width (%)": "默认宽度（%）"
+  },
+  "Default launcher shortcuts open a native launcher activity inside Dank Island. Spotlight is used when the focused screen has no DankIsland.": {
+    "Default launcher shortcuts open a native launcher activity inside Dank Island. Spotlight is used when the focused screen has no DankIsland.": ""
   },
   "Default launcher shortcuts open the full launcher with mode tabs, grid view, and action panel.": {
     "Default launcher shortcuts open the full launcher with mode tabs, grid view, and action panel.": "默认启动器快捷键会打开完整启动器，带有模式标签页、网格视图和操作面板。"
@@ -2419,6 +2536,9 @@
   },
   "Digital": {
     "Digital": "数字式"
+  },
+  "Dim": {
+    "Dim": ""
   },
   "Direct path to a .xkb keymap file. Overrides layouts/variants above.": {
     "Direct path to a .xkb keymap file. Overrides layouts/variants above.": ".xkb 键盘映射文件的目录路径。覆盖以上布局与变体"
@@ -2573,6 +2693,12 @@
   "Displays the active keyboard layout and allows switching": {
     "Displays the active keyboard layout and allows switching": "显示当前键盘布局并支持切换"
   },
+  "Distance between display edge and island": {
+    "Distance between display edge and island": ""
+  },
+  "Distance-field renderer.": {
+    "Distance-field renderer.": ""
+  },
   "Distribution": {
     "Distribution": "发行版"
   },
@@ -2632,6 +2758,12 @@
   },
   "Draw a connected picture-frame border around the entire display": {
     "Draw a connected picture-frame border around the entire display": "在整个显示器周围画出连接状态栏的画框边框"
+  },
+  "Draw an island-styled background behind satellite widgets": {
+    "Draw an island-styled background behind satellite widgets": ""
+  },
+  "Draw an outline and use the highest-contrast surface tone": {
+    "Draw an outline and use the highest-contrast surface tone": ""
   },
   "Driver": {
     "Driver": "驱动程序"
@@ -2759,6 +2891,9 @@
   "Enable History": {
     "Enable History": "启用历史记录"
   },
+  "Enable Island": {
+    "Enable Island": ""
+  },
   "Enable Num Lock": {
     "Enable Num Lock": "启用数字锁"
   },
@@ -2806,6 +2941,9 @@
   },
   "Enable security key authentication": {
     "Enable security key authentication": "启用安全密钥认证"
+  },
+  "Enable weather in Time & Weather to show this shortcut": {
+    "Enable weather in Time & Weather to show this shortcut": ""
   },
   "Enabled": {
     "Enabled": "已启用"
@@ -2935,6 +3073,15 @@
   },
   "Exit node": {
     "Exit node": "出口节点"
+  },
+  "Expand Notifications": {
+    "Expand Notifications": ""
+  },
+  "Expand notifications by default instead of click or hover": {
+    "Expand notifications by default instead of click or hover": ""
+  },
+  "Expansion Mode": {
+    "Expansion Mode": ""
   },
   "Experimental Feature": {
     "Experimental Feature": "实验性功能"
@@ -3218,6 +3365,9 @@
   "Failed to switch codec": {
     "Failed to switch codec": "切换编解码器失败"
   },
+  "Failed to switch port": {
+    "Failed to switch port": ""
+  },
   "Failed to unpin entry": {
     "Failed to unpin entry": "取消固定项目失败"
   },
@@ -3394,6 +3544,9 @@
   },
   "Floating windows follow Surface Styling settings": {
     "Floating windows follow Surface Styling settings": ""
+  },
+  "Floats above windows and other content": {
+    "Floats above windows and other content": ""
   },
   "Fluent": {
     "Fluent": "流畅"
@@ -3683,6 +3836,9 @@
   "Globally scale all animation durations": {
     "Globally scale all animation durations": "全局缩放所有动画持续时间"
   },
+  "Globally scale animation durations with geometric motion & spring based physics with bezier curves": {
+    "Globally scale animation durations with geometric motion & spring based physics with bezier curves": ""
+  },
   "Golden Hour": {
     "Golden Hour": "黄金时段"
   },
@@ -3905,8 +4061,20 @@
   "High": {
     "High": "高"
   },
+  "High Contrast": {
+    "High Contrast": ""
+  },
   "High-fidelity palette that preserves source hues.": {
     "High-fidelity palette that preserves source hues.": "高保真配色，保留原始色调"
+  },
+  "Higher percentages give island more inertia": {
+    "Higher percentages give island more inertia": ""
+  },
+  "Higher values pull island toward its target more strongly": {
+    "Higher values pull island toward its target more strongly": ""
+  },
+  "Higher values settle island with less bounce": {
+    "Higher values settle island with less bounce": ""
   },
   "Highlight Active Workspace App": {
     "Highlight Active Workspace App": "高亮活动工作区应用"
@@ -3931,6 +4099,12 @@
   },
   "Hold to Confirm Power Actions": {
     "Hold to Confirm Power Actions": "按住以确认电源操作"
+  },
+  "Home Compact": {
+    "Home Compact": ""
+  },
+  "Horizontal Offset": {
+    "Horizontal Offset": ""
   },
   "Horizontal and vertical bar thickness": {
     "Horizontal and vertical bar thickness": "水平与垂直状态栏厚度"
@@ -3995,6 +4169,12 @@
   "Humidity": {
     "Humidity": "湿度"
   },
+  "Hybrid": {
+    "Hybrid": ""
+  },
+  "Hybrid peeks the current compact face on hover. Click pins a destination so it stays open": {
+    "Hybrid peeks the current compact face on hover. Click pins a destination so it stays open": ""
+  },
   "Hyprland Discord Server": {
     "Hyprland Discord Server": "Hyprland Discord 服务器"
   },
@@ -4042,6 +4222,9 @@
   },
   "Icon Size %": {
     "Icon Size %": "图标大小 %"
+  },
+  "Icon Spacing": {
+    "Icon Spacing": ""
   },
   "Icon Theme": {
     "Icon Theme": "图标主题"
@@ -4178,6 +4361,9 @@
   "Inner Gaps": {
     "Inner Gaps": "内间距"
   },
+  "Inner authentication": {
+    "Inner authentication": ""
+  },
   "Inner padding applied to each widget": {
     "Inner padding applied to each widget": "应用到每个部件的内边距"
   },
@@ -4292,6 +4478,18 @@
   "Iris Bloom": {
     "Iris Bloom": "鸢尾花开"
   },
+  "Island": {
+    "Island": ""
+  },
+  "Island Gap": {
+    "Island Gap": ""
+  },
+  "Island Instance": {
+    "Island Instance": ""
+  },
+  "Island placement": {
+    "Island placement": ""
+  },
   "Isolate Displays": {
     "Isolate Displays": "隔离显示"
   },
@@ -4313,6 +4511,9 @@
   "Keep Changes": {
     "Keep Changes": "保持更改"
   },
+  "Keep Clock with Media": {
+    "Keep Clock with Media": ""
+  },
   "Keep My Edits": {
     "Keep My Edits": "保持当前的编辑"
   },
@@ -4330,6 +4531,9 @@
   },
   "Keep typing": {
     "Keep typing": "继续输入"
+  },
+  "Keep widgets beside the island or align them like a standalone bar": {
+    "Keep widgets beside the island or align them like a standalone bar": ""
   },
   "Keeping Awake": {
     "Keeping Awake": "保持活动"
@@ -4544,6 +4748,9 @@
   "Loading keybinds...": {
     "Loading keybinds...": "正在加载按键绑定..."
   },
+  "Loading ports...": {
+    "Loading ports...": ""
+  },
   "Loading trending...": {
     "Loading trending...": "正在加载热门内容..."
   },
@@ -4727,6 +4934,12 @@
   "Material": {
     "Material": "Material"
   },
+  "Material 3 Expressive bezier curves, default.": {
+    "Material 3 Expressive bezier curves, default.": ""
+  },
+  "Material 3 Expressive panels rise from below with a subtle scale, default.": {
+    "Material 3 Expressive panels rise from below with a subtle scale, default.": ""
+  },
   "Material Battery Style": {
     "Material Battery Style": "Material 电池样式"
   },
@@ -4828,6 +5041,9 @@
   },
   "Maximum pinned entries reached": {
     "Maximum pinned entries reached": "已达固定项目最多数量"
+  },
+  "Media / Launcher": {
+    "Media / Launcher": ""
   },
   "Media Controls": {
     "Media Controls": "媒体控制"
@@ -4973,6 +5189,12 @@
   "Morning": {
     "Morning": "上午"
   },
+  "Motion": {
+    "Motion": ""
+  },
+  "Motion & Accessibility": {
+    "Motion & Accessibility": ""
+  },
   "Motion Effects": {
     "Motion Effects": "动画效果"
   },
@@ -4996,6 +5218,9 @@
   },
   "Move Widget": {
     "Move Widget": "移动部件"
+  },
+  "Move island and satellites left or right from display center": {
+    "Move island and satellites left or right from display center": ""
   },
   "Moving to Paused": {
     "Moving to Paused": "正在暂停打印机"
@@ -5056,6 +5281,9 @@
   },
   "Navigate": {
     "Navigate": "导航"
+  },
+  "Near Island": {
+    "Near Island": ""
   },
   "Network": {
     "Network": "网络"
@@ -5375,6 +5603,9 @@
   "No plugins found": {
     "No plugins found": "未找到插件"
   },
+  "No ports found": {
+    "No ports found": ""
+  },
   "No printer found": {
     "No printer found": "未找到打印机"
   },
@@ -5619,7 +5850,7 @@
     "Only adjust gamma based on time or location rules.": "根据时间或位置调节伽马值。"
   },
   "Only continue if you recognize this server certificate fingerprint.": {
-    "Only continue if you recognize this server certificate fingerprint.": ""
+    "Only continue if you recognize this server certificate fingerprint.": "仅当您能识别服务器证书指纹时才继续。"
   },
   "Only on Battery": {
     "Only on Battery": "仅使用电池时"
@@ -5665,6 +5896,9 @@
   },
   "Open From": {
     "Open From": "打开位置"
+  },
+  "Open Island": {
+    "Open Island": ""
   },
   "Open Notepad File": {
     "Open Notepad File": "打开便签"
@@ -5837,6 +6071,9 @@
   "PDF Reader": {
     "PDF Reader": "PDF 阅读器"
   },
+  "PID": {
+    "PID": ""
+  },
   "PIN": {
     "PIN": "PIN 码"
   },
@@ -5876,8 +6113,17 @@
   "Pairing...": {
     "Pairing...": "配对中..."
   },
+  "Palette": {
+    "Palette": ""
+  },
+  "Panels glide in from a larger distance at full size, no scale change, pure clean motion.": {
+    "Panels glide in from a larger distance at full size, no scale change, pure clean motion.": ""
+  },
+  "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": {
+    "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": ""
+  },
   "Partial": {
-    "Partial": ""
+    "Partial": "部分"
   },
   "Partly Cloudy": {
     "Partly Cloudy": "部分多云"
@@ -6002,6 +6248,9 @@
   "Place clipboard history on the Wayland overlay layer": {
     "Place clipboard history on the Wayland overlay layer": ""
   },
+  "Place independent widgets to left and right of island": {
+    "Place independent widgets to left and right of island": ""
+  },
   "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
     "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "此处为插件目录，每个插件应带有一个 plugin.json 描述文件。"
   },
@@ -6013,6 +6262,9 @@
   },
   "Place the dock on the Wayland overlay layer": {
     "Place the dock on the Wayland overlay layer": "将 Dock 置于 Wayland 叠加层"
+  },
+  "Platform renderer (FreeType).": {
+    "Platform renderer (FreeType).": ""
   },
   "Play": {
     "Play": "播放"
@@ -6037,6 +6289,9 @@
   },
   "Playback error: ": {
     "Playback error: ": "播放错误： "
+  },
+  "Playful": {
+    "Playful": ""
   },
   "Plays audio files": {
     "Plays audio files": "播放音频文件"
@@ -6124,6 +6379,12 @@
   },
   "Port": {
     "Port": "端口"
+  },
+  "Port Selection": {
+    "Port Selection": ""
+  },
+  "Port switched": {
+    "Port switched": ""
   },
   "Portal": {
     "Portal": "门户"
@@ -6239,6 +6500,9 @@
   "Primary": {
     "Primary": "主色"
   },
+  "Primary Bar": {
+    "Primary Bar": ""
+  },
   "Primary Container": {
     "Primary Container": "主色容器"
   },
@@ -6336,7 +6600,7 @@
     "Protocol": "协议"
   },
   "QR Generator": {
-    "QR Generator": ""
+    "QR Generator": "二维码生成器"
   },
   "Qt": {
     "Qt": "Qt"
@@ -6430,6 +6694,9 @@
   },
   "Recommended available": {
     "Recommended available": "推荐可用"
+  },
+  "Reduce Motion": {
+    "Reduce Motion": ""
   },
   "Reduce the visible bar length from both ends": {
     "Reduce the visible bar length from both ends": ""
@@ -6554,6 +6821,9 @@
   "Rename Workspace": {
     "Rename Workspace": "重命名工作区"
   },
+  "Render Type": {
+    "Render Type": ""
+  },
   "Reorder & Group": {
     "Reorder & Group": "重新排序与分组"
   },
@@ -6611,6 +6881,9 @@
   "Requires the DMS Theme extension from the editor marketplace": {
     "Requires the DMS Theme extension from the editor marketplace": ""
   },
+  "Reserved Height": {
+    "Reserved Height": ""
+  },
   "Reset": {
     "Reset": "重置"
   },
@@ -6631,6 +6904,9 @@
   },
   "Resize on Border": {
     "Resize on Border": "边框处调整尺寸"
+  },
+  "Resize the resting island to align with nearby widgets": {
+    "Resize the resting island to align with nearby widgets": ""
   },
   "Resize windows by dragging their edges with the mouse": {
     "Resize windows by dragging their edges with the mouse": "使用鼠标拖拽窗口边缘调整窗口尺寸"
@@ -6791,6 +7067,12 @@
   "SSID": {
     "SSID": "SSID"
   },
+  "Satellite Widgets": {
+    "Satellite Widgets": ""
+  },
+  "Satellites widget to place left or right of the island": {
+    "Satellites widget to place left or right of the island": ""
+  },
   "Saturation": {
     "Saturation": "饱和度"
   },
@@ -6875,6 +7157,9 @@
   "Score": {
     "Score": "分数"
   },
+  "Screen Edges": {
+    "Screen Edges": ""
+  },
   "Screen sharing": {
     "Screen sharing": "屏幕共享"
   },
@@ -6891,7 +7176,7 @@
     "Scroll GitHub": "Scroll GitHub"
   },
   "Scroll Method": {
-    "Scroll Method": ""
+    "Scroll Method": "滚动方式"
   },
   "Scroll Wheel": {
     "Scroll Wheel": "滚动滚轮"
@@ -6946,6 +7231,9 @@
   },
   "Search themes...": {
     "Search themes...": "搜索主题..."
+  },
+  "Search when idle, visualizer when media is playing": {
+    "Search when idle, visualizer when media is playing": ""
   },
   "Search widgets...": {
     "Search widgets...": "搜索部件..."
@@ -7257,7 +7545,7 @@
     "Show": "显示"
   },
   "Show \"config reloaded\" Toast": {
-    "Show \"config reloaded\" Toast": ""
+    "Show \"config reloaded\" Toast": "显示“配置已重载”浮动通知"
   },
   "Show 3rd Party": {
     "Show 3rd Party": "显示第三方"
@@ -7400,6 +7688,9 @@
   "Show Restart DMS": {
     "Show Restart DMS": "显示重启 DMS"
   },
+  "Show Satellite Widgets": {
+    "Show Satellite Widgets": ""
+  },
   "Show Saved Items": {
     "Show Saved Items": "显示已保存的项目"
   },
@@ -7454,11 +7745,14 @@
   "Show a bar that drains as the popup's auto-dismiss timer runs": {
     "Show a bar that drains as the popup's auto-dismiss timer runs": "显示随通知弹窗超时倒计时而缩短的进度条"
   },
+  "Show a clickable clock beside compact media details": {
+    "Show a clickable clock beside compact media details": ""
+  },
   "Show a notification when battery reaches the charge limit.": {
     "Show a notification when battery reaches the charge limit.": "电池达到充电限制时显示通知"
   },
   "Show a toast when the compositor config is reloaded": {
-    "Show a toast when the compositor config is reloaded": ""
+    "Show a toast when the compositor config is reloaded": "合成器配置重载时显示浮动通知"
   },
   "Show a warning popup when battery is running low.": {
     "Show a warning popup when battery is running low.": "低电量使用时显示警示弹窗"
@@ -7474,6 +7768,9 @@
   },
   "Show cava audio visualizer in media widget": {
     "Show cava audio visualizer in media widget": "在多媒体部件中显示 cava 音频可视化"
+  },
+  "Show critical priority popups while Do Not Disturb is on": {
+    "Show critical priority popups while Do Not Disturb is on": ""
   },
   "Show darkened overlay behind modal dialogs": {
     "Show darkened overlay behind modal dialogs": "在模态框后显示暗化遮罩"
@@ -7610,11 +7907,23 @@
   "Small": {
     "Small": "较小"
   },
+  "Smart": {
+    "Smart": ""
+  },
   "Smartcard Authentication": {
     "Smartcard Authentication": "智能卡认证"
   },
+  "Smooth": {
+    "Smooth": ""
+  },
+  "Smooth cubic deceleration in, quick snap out, clean, elegant curves.": {
+    "Smooth cubic deceleration in, quick snap out, clean, elegant curves.": ""
+  },
   "Snap": {
     "Snap": "快照"
+  },
+  "Snap spring-driven motion straight to its target without physics travel": {
+    "Snap spring-driven motion straight to its target without physics travel": ""
   },
   "Snow": {
     "Snow": "下雪"
@@ -7622,8 +7931,17 @@
   "Soft Reboot": {
     "Soft Reboot": "软重启"
   },
+  "Solid": {
+    "Solid": ""
+  },
+  "Solid material type or Outline": {
+    "Solid material type or Outline": ""
+  },
   "Some plugins require a newer version of DMS:": {
     "Some plugins require a newer version of DMS:": "有些插件需要更新版的 DMS："
+  },
+  "Some settings are managed by the island": {
+    "Some settings are managed by the island": ""
   },
   "Sort Alphabetically": {
     "Sort Alphabetically": "按字母顺序排序"
@@ -7655,6 +7973,9 @@
   "Space between windows and screen edges": {
     "Space between windows and screen edges": "窗口与屏幕边缘之间的间距"
   },
+  "Space kept clear for compact island and satellites": {
+    "Space kept clear for compact island and satellites": ""
+  },
   "Spacer": {
     "Spacer": "空白占位"
   },
@@ -7682,6 +8003,24 @@
   "Spotlight Search": {
     "Spotlight Search": "聚焦搜索"
   },
+  "Spring Damping": {
+    "Spring Damping": ""
+  },
+  "Spring Mass": {
+    "Spring Mass": ""
+  },
+  "Spring Motion": {
+    "Spring Motion": ""
+  },
+  "Spring Stiffness": {
+    "Spring Stiffness": ""
+  },
+  "Spring bezier with overshoot, entry briefly exceeds its target then settles.": {
+    "Spring bezier with overshoot, entry briefly exceeds its target then settles.": ""
+  },
+  "Springs carry extra energy and visibly bounce before settling": {
+    "Springs carry extra energy and visibly bounce before settling": ""
+  },
   "Square": {
     "Square": ""
   },
@@ -7690,6 +8029,9 @@
   },
   "Stacked": {
     "Stacked": "堆叠"
+  },
+  "Stage the Wayland overlay layer to remain visible over fullscreen apps": {
+    "Stage the Wayland overlay layer to remain visible over fullscreen apps": ""
   },
   "Standard": {
     "Standard": "标准"
@@ -7831,6 +8173,9 @@
   },
   "Sway Website": {
     "Sway Website": "Sway 网站"
+  },
+  "Sweep the background into the screen edges": {
+    "Sweep the background into the screen edges": ""
   },
   "Switch Layout Shortcut": {
     "Switch Layout Shortcut": "切换布局快捷键"
@@ -8030,6 +8375,12 @@
   "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": {
     "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "未设置 DMS_SOCKET 环境变量或套接字不可用，无法使用自动插件管理。"
   },
+  "The Island anchors to the top or bottom edge": {
+    "The Island anchors to the top or bottom edge": ""
+  },
+  "The Island holds this edge on a display this bar covers, so the bar stays hidden there": {
+    "The Island holds this edge on a display this bar covers, so the bar stays hidden there": ""
+  },
   "The WiFi adapter could not start access point mode.": {
     "The WiFi adapter could not start access point mode.": "WiFi 适配器无法启动接入点模式。"
   },
@@ -8042,6 +8393,9 @@
   "The custom command used when attaching to sessions (receives the session name as the first argument)": {
     "The custom command used when attaching to sessions (receives the session name as the first argument)": "连接会话时使用的自定义命令（将接收会话名称作为首个参数）"
   },
+  "The island draws its own surface": {
+    "The island draws its own surface": ""
+  },
   "The job queue of this printer is empty": {
     "The job queue of this printer is empty": "打印任务队列为空"
   },
@@ -8049,7 +8403,7 @@
     "The rule applies to any window matching one of these.": "规则会应用到匹配以上任一条件的窗口。"
   },
   "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": {
-    "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": ""
+    "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": "服务器证书自上次受信任以来已变更。仅当您能识别新的指纹时才继续。"
   },
   "Theme & Colors": {
     "Theme & Colors": "主题与配色"
@@ -8077,6 +8431,9 @@
   },
   "These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)": {
     "These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)": "创建的自启动项会写入到 XDG 自启动目录（~/.config/autostart/*.desktop）"
+  },
+  "These style the bar surface, which the Island replaces": {
+    "These style the bar surface, which the Island replaces": ""
   },
   "Thickness": {
     "Thickness": "厚度"
@@ -8228,6 +8585,9 @@
   "Toggle fonts": {
     "Toggle fonts": "切换字体"
   },
+  "Toggle the Island on this instance's displays": {
+    "Toggle the Island on this instance's displays": ""
+  },
   "Toggle visibility of this bar configuration": {
     "Toggle visibility of this bar configuration": "切换此状态栏可见性"
   },
@@ -8251,6 +8611,9 @@
   },
   "Tools": {
     "Tools": "工具"
+  },
+  "Tools icon opens Control Center": {
+    "Tools icon opens Control Center": ""
   },
   "Top": {
     "Top": "顶部"
@@ -8471,6 +8834,9 @@
   "Unpin from Dock": {
     "Unpin from Dock": "从 Dock 取消固定"
   },
+  "Unread notification count beside the clock": {
+    "Unread notification count beside the clock": ""
+  },
   "Unsaved changes": {
     "Unsaved changes": "未保存更改"
   },
@@ -8496,7 +8862,7 @@
     "Untrust": "取消信任"
   },
   "Untrusted VPN certificate": {
-    "Untrusted VPN certificate": ""
+    "Untrusted VPN certificate": "不受信任的 VPN 证书"
   },
   "Up to date": {
     "Up to date": "已是最新"
@@ -8863,6 +9229,9 @@
   },
   "Weather Widget": {
     "Weather Widget": "天气部件"
+  },
+  "Weather icon and temperature open the weather activity": {
+    "Weather icon and temperature open the weather activity": ""
   },
   "Web Browser": {
     "Web Browser": "网络浏览器"

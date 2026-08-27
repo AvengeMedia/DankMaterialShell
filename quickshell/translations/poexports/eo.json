@@ -77,6 +77,9 @@
   "%1 online": {
     "%1 online": "%1 interrete"
   },
+  "%1 position": {
+    "%1 position": ""
+  },
   "%1 tasks": {
     "%1 tasks": "%1 taskoj"
   },
@@ -311,6 +314,9 @@
   "A separate minimal launcher action that works in Standalone, Separate Frame Mode, and Connected Frame Mode.": {
     "A separate minimal launcher action that works in Standalone, Separate Frame Mode, and Connected Frame Mode.": "Aparta minimuma lanĉila ago, kiu funkcias en Memstara, Aparta Kadra Reĝimo kaj Konektita Kadra Reĝimo."
   },
+  "A slight natural settle, DMS default": {
+    "A slight natural settle, DMS default": ""
+  },
   "A user with that name already exists.": {
     "A user with that name already exists.": "Uzanto kun tiu nomo jam ekzistas."
   },
@@ -488,6 +494,9 @@
   "Add to Autostart": {
     "Add to Autostart": "Aldoni al memlanĉo"
   },
+  "Additional settings are managed by the Island": {
+    "Additional settings are managed by the Island": ""
+  },
   "Adjust pointer sensitivity speed": {
     "Adjust pointer sensitivity speed": ""
   },
@@ -542,6 +551,9 @@
   "Allow": {
     "Allow": "Permesi"
   },
+  "Allow %1 in Do Not Disturb": {
+    "Allow %1 in Do Not Disturb": ""
+  },
   "Allow LAN access": {
     "Allow LAN access": ""
   },
@@ -556,6 +568,9 @@
   },
   "Allow greeter login access": {
     "Allow greeter login access": "Permesu salutan aliron"
+  },
+  "Allow in Do Not Disturb": {
+    "Allow in Do Not Disturb": ""
   },
   "Already on that session": {
     "Already on that session": "Jam en tiu sesio"
@@ -704,6 +719,9 @@
   "Apply inverse concave corner cutouts to the bar": {
     "Apply inverse concave corner cutouts to the bar": "Apliki inversajn konkavajn angulojn eltranĉaĵojn al la stango"
   },
+  "Apply island geometry changes immediately without spring overshoot": {
+    "Apply island geometry changes immediately without spring overshoot": ""
+  },
   "Apply to Hardware": {
     "Apply to Hardware": ""
   },
@@ -727,6 +745,9 @@
   },
   "Apps Icon": {
     "Apps Icon": "Piktogramo de aplikaĵoj"
+  },
+  "Apps allowed to show popups while Do Not Disturb is on. Right-click a notification and choose \"Allow in Do Not Disturb\" to add one here.": {
+    "Apps allowed to show popups while Do Not Disturb is on. Right-click a notification and choose \"Allow in Do Not Disturb\" to add one here.": ""
   },
   "Apps are ordered by usage frequency, then last used, then alphabetically.": {
     "Apps are ordered by usage frequency, then last used, then alphabetically.": "Aplikaĵoj estas ordigitaj laŭ uz-ofteco, poste laŭ lasta uzo, poste alfabete."
@@ -839,11 +860,20 @@
   "Auto (Bar-aware)": {
     "Auto (Bar-aware)": "Aŭtomata (sciante pri bretoj)"
   },
+  "Auto (Dark Mode)": {
+    "Auto (Dark Mode)": ""
+  },
+  "Auto (Light Mode)": {
+    "Auto (Light Mode)": ""
+  },
   "Auto (Wide)": {
     "Auto (Wide)": "Aŭtomata (larĝa)"
   },
   "Auto Compositor Gaps": {
     "Auto Compositor Gaps": "Aŭtomata Komponisto Interspacoj"
+  },
+  "Auto From Wallpaper": {
+    "Auto From Wallpaper": ""
   },
   "Auto Location": {
     "Auto Location": "Aŭtomata loko"
@@ -953,6 +983,9 @@
   "Automatically lock the screen when the system prepares to suspend": {
     "Automatically lock the screen when the system prepares to suspend": "Aŭtomate ŝlosi la ekranon kiam la sistemo prepariĝas por dormeti"
   },
+  "Automatically picks the scheme variant based on the wallpaper.": {
+    "Automatically picks the scheme variant based on the wallpaper.": ""
+  },
   "Automatically save changes to opened files as you type": {
     "Automatically save changes to opened files as you type": "Aŭtomate konservu ŝanĝojn al malfermitaj dosieroj dum vi tajpas"
   },
@@ -1058,11 +1091,20 @@
   "Bar Spacing": {
     "Bar Spacing": ""
   },
+  "Bar border and shadow": {
+    "Bar border and shadow": ""
+  },
+  "Bar corners": {
+    "Bar corners": ""
+  },
   "Bar corners and background": {
     "Bar corners and background": "Trinkejo anguloj kaj fono"
   },
   "Bar shadow, border, and corners": {
     "Bar shadow, border, and corners": "Barombro, limo kaj anguloj"
+  },
+  "Bar visibility": {
+    "Bar visibility": ""
   },
   "Base color for shadows (opacity is applied automatically)": {
     "Base color for shadows (opacity is applied automatically)": "Baza koloro por ombroj (opakeco aplikiĝas aŭtomate)"
@@ -1076,6 +1118,9 @@
   "Battery %1": {
     "Battery %1": "Baterio %1"
   },
+  "Battery / Control Center": {
+    "Battery / Control Center": ""
+  },
   "Battery Charge Limit": {
     "Battery Charge Limit": "Baterioŝarga limigo"
   },
@@ -1087,6 +1132,9 @@
   },
   "Battery and power management": {
     "Battery and power management": "Mastrumado de baterio kaj potenco"
+  },
+  "Battery gauge opens Control Center": {
+    "Battery gauge opens Control Center": ""
   },
   "Battery has charged to your set limit of %1%": {
     "Battery has charged to your set limit of %1%": ""
@@ -1120,6 +1168,9 @@
   },
   "Blend between Surface High and the selected custom color": {
     "Blend between Surface High and the selected custom color": ""
+  },
+  "Block %1 in Do Not Disturb": {
+    "Block %1 in Do Not Disturb": ""
   },
   "Block Out": {
     "Block Out": "Bloki"
@@ -1165,6 +1216,9 @@
   },
   "Body": {
     "Body": "Korpo"
+  },
+  "Body Click Runs Default Action": {
+    "Body Click Runs Default Action": ""
   },
   "Body Font Size": {
     "Body Font Size": "Teksta tipara grando"
@@ -1222,6 +1276,9 @@
   },
   "Bottom dock for pinned and running applications": {
     "Bottom dock for pinned and running applications": "Malsupra doko por fiksitaj kaj lanĉitaj aplikaĵoj"
+  },
+  "Bright": {
+    "Bright": ""
   },
   "Brightness": {
     "Brightness": "Brileco"
@@ -1348,6 +1405,9 @@
   },
   "Center Section": {
     "Center Section": "Centra sekcio"
+  },
+  "Center Section - Reserved by Dank Island": {
+    "Center Section - Reserved by Dank Island": ""
   },
   "Center Single Column": {
     "Center Single Column": "Centrigi unuopan kolumnon"
@@ -1487,6 +1547,9 @@
   "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": {
     "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": ""
   },
+  "Choose which shortcuts sit left or right of the clock": {
+    "Choose which shortcuts sit left or right of the clock": ""
+  },
   "Chroma Style": {
     "Chroma Style": "Kroma Stilo"
   },
@@ -1511,6 +1574,9 @@
   "Clear All Jobs": {
     "Clear All Jobs": "Viŝi ĉiujn taskojn"
   },
+  "Clear Badge on Open": {
+    "Clear Badge on Open": ""
+  },
   "Clear History?": {
     "Clear History?": "Ĉu viŝi la historion?"
   },
@@ -1522,6 +1588,12 @@
   },
   "Clear at Startup": {
     "Clear at Startup": "Viŝi dum lanĉo"
+  },
+  "Clears the badge on open but keeps notifications active": {
+    "Clears the badge on open but keeps notifications active": ""
+  },
+  "Click": {
+    "Click": ""
   },
   "Click 'Setup' to create %1 and add include to your compositor config.": {
     "Click 'Setup' to create %1 and add include to your compositor config.": "Klaku «Agordi» por krei %1 kaj aldoni inkluzivon al via komponila agordo."
@@ -1541,6 +1613,12 @@
   "Click any shortcut to edit. Changes save to %1": {
     "Click any shortcut to edit. Changes save to %1": "Klaku iun ajn mallongigon por redakti. Ŝanĝoj konserviĝas al %1"
   },
+  "Click expands only on an intentional press. Hybrid peeks the current compact face on hover": {
+    "Click expands only on an intentional press. Hybrid peeks the current compact face on hover": ""
+  },
+  "Click the icon to mute": {
+    "Click the icon to mute": ""
+  },
   "Click to Paste": {
     "Click to Paste": ""
   },
@@ -1549,6 +1627,9 @@
   },
   "Click to select a custom theme JSON file": {
     "Click to select a custom theme JSON file": "Klaku por elekti propran etosan JSON-dosieron"
+  },
+  "Clicking a popup runs its first action instead of expanding the body": {
+    "Clicking a popup runs its first action instead of expanding the body": ""
   },
   "Clip": {
     "Clip": "Tondi"
@@ -1697,8 +1778,17 @@
   "Compact": {
     "Compact": "Kompakta"
   },
+  "Compact Clock Pill": {
+    "Compact Clock Pill": ""
+  },
+  "Compact Island Height": {
+    "Compact Island Height": ""
+  },
   "Compact Mode": {
     "Compact Mode": "Kompakta reĝimo"
+  },
+  "Compact home clock pill in both width and height": {
+    "Compact home clock pill in both width and height": ""
   },
   "Completed": {
     "Completed": "Plenumita"
@@ -1753,6 +1843,9 @@
   },
   "Configure which displays show \"%1": {
     "Configure which displays show \"%1\"": "Agordi kiuj ekranoj montras \"%1\""
+  },
+  "Configure which displays show Dank Island as \"%1": {
+    "Configure which displays show Dank Island as \"%1\"": ""
   },
   "Configure which displays show shell components": {
     "Configure which displays show shell components": "Agordi kiuj ekranoj montras ŝel-erojn"
@@ -1934,6 +2027,9 @@
   "Corner Style": {
     "Corner Style": ""
   },
+  "Corner style applies to the bar surface": {
+    "Corner style applies to the bar surface": ""
+  },
   "Corners & Background": {
     "Corners & Background": "Anguloj kaj fono"
   },
@@ -2062,6 +2158,9 @@
   },
   "Curve": {
     "Curve": "kurbo"
+  },
+  "Curve rasterizer.": {
+    "Curve rasterizer.": ""
   },
   "Curve: curve rasterizer.": {
     "Curve: curve rasterizer.": "Kurbo: kurba rasterigilo."
@@ -2192,6 +2291,9 @@
   "Daily at:": {
     "Daily at:": "Ĉiutage je:"
   },
+  "Damped springs settle straight to their target with no overshoot": {
+    "Damped springs settle straight to their target with no overshoot": ""
+  },
   "Dank": {
     "Dank": "Dank"
   },
@@ -2203,6 +2305,12 @@
   },
   "Dank Dash": {
     "Dank Dash": ""
+  },
+  "Dank Island - Beta": {
+    "Dank Island - Beta": ""
+  },
+  "Dank Island instance": {
+    "Dank Island instance": ""
   },
   "DankBar": {
     "DankBar": "DankBar"
@@ -2234,8 +2342,14 @@
   "Dark mode harmony": {
     "Dark mode harmony": "Harmonio de nokta reĝimo"
   },
+  "Dark or light mode follows the wallpaper brightness": {
+    "Dark or light mode follows the wallpaper brightness": ""
+  },
   "Darken Modal Background": {
     "Darken Modal Background": "Malheligi fonon de modaloj"
+  },
+  "Dashboard": {
+    "Dashboard": ""
   },
   "Date First": {
     "Date First": ""
@@ -2296,6 +2410,9 @@
   },
   "Default Width (%)": {
     "Default Width (%)": "Defaŭlta larĝo (%)"
+  },
+  "Default launcher shortcuts open a native launcher activity inside Dank Island. Spotlight is used when the focused screen has no DankIsland.": {
+    "Default launcher shortcuts open a native launcher activity inside Dank Island. Spotlight is used when the focused screen has no DankIsland.": ""
   },
   "Default launcher shortcuts open the full launcher with mode tabs, grid view, and action panel.": {
     "Default launcher shortcuts open the full launcher with mode tabs, grid view, and action panel.": "Defaŭltaj lanĉilaj ŝparvojoj malfermas la plenan lanĉilon kun reĝimlangetoj, kradvido kaj agadpanelo."
@@ -2419,6 +2536,9 @@
   },
   "Digital": {
     "Digital": "Cifereca"
+  },
+  "Dim": {
+    "Dim": ""
   },
   "Direct path to a .xkb keymap file. Overrides layouts/variants above.": {
     "Direct path to a .xkb keymap file. Overrides layouts/variants above.": ""
@@ -2573,6 +2693,12 @@
   "Displays the active keyboard layout and allows switching": {
     "Displays the active keyboard layout and allows switching": "Montras la aktivan klavararanĝon kaj permesas ŝanĝadon"
   },
+  "Distance between display edge and island": {
+    "Distance between display edge and island": ""
+  },
+  "Distance-field renderer.": {
+    "Distance-field renderer.": ""
+  },
   "Distribution": {
     "Distribution": "Distribuaĵo"
   },
@@ -2632,6 +2758,12 @@
   },
   "Draw a connected picture-frame border around the entire display": {
     "Draw a connected picture-frame border around the entire display": "Desegnu ligitan bild-kadran randon ĉirkaŭ la tuta ekrano"
+  },
+  "Draw an island-styled background behind satellite widgets": {
+    "Draw an island-styled background behind satellite widgets": ""
+  },
+  "Draw an outline and use the highest-contrast surface tone": {
+    "Draw an outline and use the highest-contrast surface tone": ""
   },
   "Driver": {
     "Driver": "Pelilo"
@@ -2759,6 +2891,9 @@
   "Enable History": {
     "Enable History": "Ŝalti historion"
   },
+  "Enable Island": {
+    "Enable Island": ""
+  },
   "Enable Num Lock": {
     "Enable Num Lock": ""
   },
@@ -2806,6 +2941,9 @@
   },
   "Enable security key authentication": {
     "Enable security key authentication": "Ŝalti sekurŝlosilan aŭtentigon"
+  },
+  "Enable weather in Time & Weather to show this shortcut": {
+    "Enable weather in Time & Weather to show this shortcut": ""
   },
   "Enabled": {
     "Enabled": "Ŝaltita"
@@ -2935,6 +3073,15 @@
   },
   "Exit node": {
     "Exit node": ""
+  },
+  "Expand Notifications": {
+    "Expand Notifications": ""
+  },
+  "Expand notifications by default instead of click or hover": {
+    "Expand notifications by default instead of click or hover": ""
+  },
+  "Expansion Mode": {
+    "Expansion Mode": ""
   },
   "Experimental Feature": {
     "Experimental Feature": "Eksperimenta trajto"
@@ -3218,6 +3365,9 @@
   "Failed to switch codec": {
     "Failed to switch codec": ""
   },
+  "Failed to switch port": {
+    "Failed to switch port": ""
+  },
   "Failed to unpin entry": {
     "Failed to unpin entry": "Malsukcesis malkonekti eron"
   },
@@ -3394,6 +3544,9 @@
   },
   "Floating windows follow Surface Styling settings": {
     "Floating windows follow Surface Styling settings": ""
+  },
+  "Floats above windows and other content": {
+    "Floats above windows and other content": ""
   },
   "Fluent": {
     "Fluent": "rutinhava"
@@ -3683,6 +3836,9 @@
   "Globally scale all animation durations": {
     "Globally scale all animation durations": "Globale skali ĉiujn animaciajn daŭrojn"
   },
+  "Globally scale animation durations with geometric motion & spring based physics with bezier curves": {
+    "Globally scale animation durations with geometric motion & spring based physics with bezier curves": ""
+  },
   "Golden Hour": {
     "Golden Hour": "Ora horo"
   },
@@ -3905,8 +4061,20 @@
   "High": {
     "High": "Alte"
   },
+  "High Contrast": {
+    "High Contrast": ""
+  },
   "High-fidelity palette that preserves source hues.": {
     "High-fidelity palette that preserves source hues.": "Fidela paletro kiu konservas fontajn nuancojn."
+  },
+  "Higher percentages give island more inertia": {
+    "Higher percentages give island more inertia": ""
+  },
+  "Higher values pull island toward its target more strongly": {
+    "Higher values pull island toward its target more strongly": ""
+  },
+  "Higher values settle island with less bounce": {
+    "Higher values settle island with less bounce": ""
   },
   "Highlight Active Workspace App": {
     "Highlight Active Workspace App": "Emfazi aplikaĵon de aktiva laborspaco"
@@ -3931,6 +4099,12 @@
   },
   "Hold to Confirm Power Actions": {
     "Hold to Confirm Power Actions": "Teni por konfirmi elektrajn agojn"
+  },
+  "Home Compact": {
+    "Home Compact": ""
+  },
+  "Horizontal Offset": {
+    "Horizontal Offset": ""
   },
   "Horizontal and vertical bar thickness": {
     "Horizontal and vertical bar thickness": "Horizontala kaj vertikala stanga dikeco"
@@ -3995,6 +4169,12 @@
   "Humidity": {
     "Humidity": "Humideco"
   },
+  "Hybrid": {
+    "Hybrid": ""
+  },
+  "Hybrid peeks the current compact face on hover. Click pins a destination so it stays open": {
+    "Hybrid peeks the current compact face on hover. Click pins a destination so it stays open": ""
+  },
   "Hyprland Discord Server": {
     "Hyprland Discord Server": "Discord-servilo de Hyprland"
   },
@@ -4042,6 +4222,9 @@
   },
   "Icon Size %": {
     "Icon Size %": "Grando de piktogramoj %"
+  },
+  "Icon Spacing": {
+    "Icon Spacing": ""
   },
   "Icon Theme": {
     "Icon Theme": "Piktograma etoso"
@@ -4178,6 +4361,9 @@
   "Inner Gaps": {
     "Inner Gaps": ""
   },
+  "Inner authentication": {
+    "Inner authentication": ""
+  },
   "Inner padding applied to each widget": {
     "Inner padding applied to each widget": "Interna remburaĵo aplikita al ĉiu fenestraĵo"
   },
@@ -4292,6 +4478,18 @@
   "Iris Bloom": {
     "Iris Bloom": "Iris-floraĵo"
   },
+  "Island": {
+    "Island": ""
+  },
+  "Island Gap": {
+    "Island Gap": ""
+  },
+  "Island Instance": {
+    "Island Instance": ""
+  },
+  "Island placement": {
+    "Island placement": ""
+  },
   "Isolate Displays": {
     "Isolate Displays": "Izoli ekranojn"
   },
@@ -4313,6 +4511,9 @@
   "Keep Changes": {
     "Keep Changes": "Konservi ŝanĝojn"
   },
+  "Keep Clock with Media": {
+    "Keep Clock with Media": ""
+  },
   "Keep My Edits": {
     "Keep My Edits": "Konservu Miajn Redaktojn"
   },
@@ -4330,6 +4531,9 @@
   },
   "Keep typing": {
     "Keep typing": "Daŭre tajpu"
+  },
+  "Keep widgets beside the island or align them like a standalone bar": {
+    "Keep widgets beside the island or align them like a standalone bar": ""
   },
   "Keeping Awake": {
     "Keeping Awake": "Tenante nedormema"
@@ -4544,6 +4748,9 @@
   "Loading keybinds...": {
     "Loading keybinds...": "Ŝargante klavkombinojn..."
   },
+  "Loading ports...": {
+    "Loading ports...": ""
+  },
   "Loading trending...": {
     "Loading trending...": "Ŝarĝante tendencojn..."
   },
@@ -4727,6 +4934,12 @@
   "Material": {
     "Material": "ŝtofo"
   },
+  "Material 3 Expressive bezier curves, default.": {
+    "Material 3 Expressive bezier curves, default.": ""
+  },
+  "Material 3 Expressive panels rise from below with a subtle scale, default.": {
+    "Material 3 Expressive panels rise from below with a subtle scale, default.": ""
+  },
   "Material Battery Style": {
     "Material Battery Style": ""
   },
@@ -4828,6 +5041,9 @@
   },
   "Maximum pinned entries reached": {
     "Maximum pinned entries reached": "Maksimumaj fiksitaj eroj atingitaj"
+  },
+  "Media / Launcher": {
+    "Media / Launcher": ""
   },
   "Media Controls": {
     "Media Controls": "Aŭdvidaĵaj regiloj"
@@ -4973,6 +5189,12 @@
   "Morning": {
     "Morning": "Mateno"
   },
+  "Motion": {
+    "Motion": ""
+  },
+  "Motion & Accessibility": {
+    "Motion & Accessibility": ""
+  },
   "Motion Effects": {
     "Motion Effects": "Moviĝaj Efikoj"
   },
@@ -4996,6 +5218,9 @@
   },
   "Move Widget": {
     "Move Widget": "Movi fenestraĵon"
+  },
+  "Move island and satellites left or right from display center": {
+    "Move island and satellites left or right from display center": ""
   },
   "Moving to Paused": {
     "Moving to Paused": "Movante al paŭzita stato"
@@ -5056,6 +5281,9 @@
   },
   "Navigate": {
     "Navigate": "Navigi"
+  },
+  "Near Island": {
+    "Near Island": ""
   },
   "Network": {
     "Network": "Reto"
@@ -5375,6 +5603,9 @@
   "No plugins found": {
     "No plugins found": "Neniuj kromprogramoj estis trovitaj"
   },
+  "No ports found": {
+    "No ports found": ""
+  },
   "No printer found": {
     "No printer found": "Neniu presilo estis trovita"
   },
@@ -5666,6 +5897,9 @@
   "Open From": {
     "Open From": "Malfermu De"
   },
+  "Open Island": {
+    "Open Island": ""
+  },
   "Open Notepad File": {
     "Open Notepad File": "Malfermi notlibran dosieron"
   },
@@ -5837,6 +6071,9 @@
   "PDF Reader": {
     "PDF Reader": "PDF-Leganto"
   },
+  "PID": {
+    "PID": ""
+  },
   "PIN": {
     "PIN": "PIN"
   },
@@ -5875,6 +6112,15 @@
   },
   "Pairing...": {
     "Pairing...": "Parigante..."
+  },
+  "Palette": {
+    "Palette": ""
+  },
+  "Panels glide in from a larger distance at full size, no scale change, pure clean motion.": {
+    "Panels glide in from a larger distance at full size, no scale change, pure clean motion.": ""
+  },
+  "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": {
+    "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": ""
   },
   "Partial": {
     "Partial": ""
@@ -6002,6 +6248,9 @@
   "Place clipboard history on the Wayland overlay layer": {
     "Place clipboard history on the Wayland overlay layer": ""
   },
+  "Place independent widgets to left and right of island": {
+    "Place independent widgets to left and right of island": ""
+  },
   "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
     "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "Metu kromprogramajn dosierujojn ĉi tien. Ĉiu kromprogramo devus havi dosieron plugin.json."
   },
@@ -6013,6 +6262,9 @@
   },
   "Place the dock on the Wayland overlay layer": {
     "Place the dock on the Wayland overlay layer": "Metu la dokon sur la Wayland-kovrotavolo"
+  },
+  "Platform renderer (FreeType).": {
+    "Platform renderer (FreeType).": ""
   },
   "Play": {
     "Play": ""
@@ -6037,6 +6289,9 @@
   },
   "Playback error: ": {
     "Playback error: ": "Eraro dum ludado: "
+  },
+  "Playful": {
+    "Playful": ""
   },
   "Plays audio files": {
     "Plays audio files": "Ludas sondosierojn"
@@ -6124,6 +6379,12 @@
   },
   "Port": {
     "Port": "Pordo"
+  },
+  "Port Selection": {
+    "Port Selection": ""
+  },
+  "Port switched": {
+    "Port switched": ""
   },
   "Portal": {
     "Portal": "Portalo"
@@ -6238,6 +6499,9 @@
   },
   "Primary": {
     "Primary": "Ĉefa"
+  },
+  "Primary Bar": {
+    "Primary Bar": ""
   },
   "Primary Container": {
     "Primary Container": "Ĉefa ujo"
@@ -6431,6 +6695,9 @@
   "Recommended available": {
     "Recommended available": "Rekomendita disponeblo"
   },
+  "Reduce Motion": {
+    "Reduce Motion": ""
+  },
   "Reduce the visible bar length from both ends": {
     "Reduce the visible bar length from both ends": ""
   },
@@ -6554,6 +6821,9 @@
   "Rename Workspace": {
     "Rename Workspace": "Renomi laborspacon"
   },
+  "Render Type": {
+    "Render Type": ""
+  },
   "Reorder & Group": {
     "Reorder & Group": ""
   },
@@ -6611,6 +6881,9 @@
   "Requires the DMS Theme extension from the editor marketplace": {
     "Requires the DMS Theme extension from the editor marketplace": ""
   },
+  "Reserved Height": {
+    "Reserved Height": ""
+  },
   "Reset": {
     "Reset": "Rekomencigi"
   },
@@ -6631,6 +6904,9 @@
   },
   "Resize on Border": {
     "Resize on Border": "Regrandigi sur Limo"
+  },
+  "Resize the resting island to align with nearby widgets": {
+    "Resize the resting island to align with nearby widgets": ""
   },
   "Resize windows by dragging their edges with the mouse": {
     "Resize windows by dragging their edges with the mouse": "Regrandigi fenestrojn trenante iliajn randojn per la muso"
@@ -6791,6 +7067,12 @@
   "SSID": {
     "SSID": ""
   },
+  "Satellite Widgets": {
+    "Satellite Widgets": ""
+  },
+  "Satellites widget to place left or right of the island": {
+    "Satellites widget to place left or right of the island": ""
+  },
   "Saturation": {
     "Saturation": "satureco"
   },
@@ -6875,6 +7157,9 @@
   "Score": {
     "Score": "Poentaro"
   },
+  "Screen Edges": {
+    "Screen Edges": ""
+  },
   "Screen sharing": {
     "Screen sharing": "Divido de ekrano"
   },
@@ -6946,6 +7231,9 @@
   },
   "Search themes...": {
     "Search themes...": "Serĉi etosojn..."
+  },
+  "Search when idle, visualizer when media is playing": {
+    "Search when idle, visualizer when media is playing": ""
   },
   "Search widgets...": {
     "Search widgets...": "Serĉi fenestraĵojn..."
@@ -7400,6 +7688,9 @@
   "Show Restart DMS": {
     "Show Restart DMS": "Montri restartigon de DMS"
   },
+  "Show Satellite Widgets": {
+    "Show Satellite Widgets": ""
+  },
   "Show Saved Items": {
     "Show Saved Items": "Montri konservitajn erojn"
   },
@@ -7454,6 +7745,9 @@
   "Show a bar that drains as the popup's auto-dismiss timer runs": {
     "Show a bar that drains as the popup's auto-dismiss timer runs": "Montru trinkejon, kiu dreniĝas dum la aŭtomata forĵeta tempigilo de la ŝprucfenestro funkcias"
   },
+  "Show a clickable clock beside compact media details": {
+    "Show a clickable clock beside compact media details": ""
+  },
   "Show a notification when battery reaches the charge limit.": {
     "Show a notification when battery reaches the charge limit.": ""
   },
@@ -7474,6 +7768,9 @@
   },
   "Show cava audio visualizer in media widget": {
     "Show cava audio visualizer in media widget": "Montri sonvidigilon cava en aŭdvidaĵa fenestraĵo"
+  },
+  "Show critical priority popups while Do Not Disturb is on": {
+    "Show critical priority popups while Do Not Disturb is on": ""
   },
   "Show darkened overlay behind modal dialogs": {
     "Show darkened overlay behind modal dialogs": "Montri malheligitan tavolon malantaŭ modalaj dialogoj"
@@ -7610,11 +7907,23 @@
   "Small": {
     "Small": "Malgranda"
   },
+  "Smart": {
+    "Smart": ""
+  },
   "Smartcard Authentication": {
     "Smartcard Authentication": "Blat-karta aŭtentigo"
   },
+  "Smooth": {
+    "Smooth": ""
+  },
+  "Smooth cubic deceleration in, quick snap out, clean, elegant curves.": {
+    "Smooth cubic deceleration in, quick snap out, clean, elegant curves.": ""
+  },
   "Snap": {
     "Snap": "Alglui"
+  },
+  "Snap spring-driven motion straight to its target without physics travel": {
+    "Snap spring-driven motion straight to its target without physics travel": ""
   },
   "Snow": {
     "Snow": "Neĝo"
@@ -7622,8 +7931,17 @@
   "Soft Reboot": {
     "Soft Reboot": ""
   },
+  "Solid": {
+    "Solid": ""
+  },
+  "Solid material type or Outline": {
+    "Solid material type or Outline": ""
+  },
   "Some plugins require a newer version of DMS:": {
     "Some plugins require a newer version of DMS:": "Iuj kromprogramoj postulas pli novan version de DMS:"
+  },
+  "Some settings are managed by the island": {
+    "Some settings are managed by the island": ""
   },
   "Sort Alphabetically": {
     "Sort Alphabetically": "Ordigi alfabete"
@@ -7655,6 +7973,9 @@
   "Space between windows and screen edges": {
     "Space between windows and screen edges": ""
   },
+  "Space kept clear for compact island and satellites": {
+    "Space kept clear for compact island and satellites": ""
+  },
   "Spacer": {
     "Spacer": "Interspacigilo"
   },
@@ -7682,6 +8003,24 @@
   "Spotlight Search": {
     "Spotlight Search": "Spotlight Serĉo"
   },
+  "Spring Damping": {
+    "Spring Damping": ""
+  },
+  "Spring Mass": {
+    "Spring Mass": ""
+  },
+  "Spring Motion": {
+    "Spring Motion": ""
+  },
+  "Spring Stiffness": {
+    "Spring Stiffness": ""
+  },
+  "Spring bezier with overshoot, entry briefly exceeds its target then settles.": {
+    "Spring bezier with overshoot, entry briefly exceeds its target then settles.": ""
+  },
+  "Springs carry extra energy and visibly bounce before settling": {
+    "Springs carry extra energy and visibly bounce before settling": ""
+  },
   "Square": {
     "Square": ""
   },
@@ -7690,6 +8029,9 @@
   },
   "Stacked": {
     "Stacked": "Stakita"
+  },
+  "Stage the Wayland overlay layer to remain visible over fullscreen apps": {
+    "Stage the Wayland overlay layer to remain visible over fullscreen apps": ""
   },
   "Standard": {
     "Standard": "Norma"
@@ -7831,6 +8173,9 @@
   },
   "Sway Website": {
     "Sway Website": "Retejo de Sway"
+  },
+  "Sweep the background into the screen edges": {
+    "Sweep the background into the screen edges": ""
   },
   "Switch Layout Shortcut": {
     "Switch Layout Shortcut": ""
@@ -8030,6 +8375,12 @@
   "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": {
     "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "La media variablo DMS_SOCKET ne estas agordita aŭ la kontaktskatolo ne estas disponebla. Aŭtomata mastrumado de kromprogramoj postulas la DMS_SOCKET."
   },
+  "The Island anchors to the top or bottom edge": {
+    "The Island anchors to the top or bottom edge": ""
+  },
+  "The Island holds this edge on a display this bar covers, so the bar stays hidden there": {
+    "The Island holds this edge on a display this bar covers, so the bar stays hidden there": ""
+  },
   "The WiFi adapter could not start access point mode.": {
     "The WiFi adapter could not start access point mode.": ""
   },
@@ -8041,6 +8392,9 @@
   },
   "The custom command used when attaching to sessions (receives the session name as the first argument)": {
     "The custom command used when attaching to sessions (receives the session name as the first argument)": "La propra komando uzata kiam oni aligas al seancoj (ricevas la seanc-nomon kiel la unuan argumenton)"
+  },
+  "The island draws its own surface": {
+    "The island draws its own surface": ""
   },
   "The job queue of this printer is empty": {
     "The job queue of this printer is empty": "La task-atendovico de ĉi tiu presilo estas malplena"
@@ -8077,6 +8431,9 @@
   },
   "These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)": {
     "These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)": "Ĉi tiuj aldonas enskribojn al la XDG-aŭtomata dosierujo (~/.config/autostart/*.desktop)"
+  },
+  "These style the bar surface, which the Island replaces": {
+    "These style the bar surface, which the Island replaces": ""
   },
   "Thickness": {
     "Thickness": "Dikeco"
@@ -8228,6 +8585,9 @@
   "Toggle fonts": {
     "Toggle fonts": "Ŝaltu tiparojn"
   },
+  "Toggle the Island on this instance's displays": {
+    "Toggle the Island on this instance's displays": ""
+  },
   "Toggle visibility of this bar configuration": {
     "Toggle visibility of this bar configuration": "Baskuligi videblecon de ĉi tiu breta agordo"
   },
@@ -8251,6 +8611,9 @@
   },
   "Tools": {
     "Tools": "Iloj"
+  },
+  "Tools icon opens Control Center": {
+    "Tools icon opens Control Center": ""
   },
   "Top": {
     "Top": "Supre"
@@ -8470,6 +8833,9 @@
   },
   "Unpin from Dock": {
     "Unpin from Dock": "Malfiksi de la doko"
+  },
+  "Unread notification count beside the clock": {
+    "Unread notification count beside the clock": ""
   },
   "Unsaved changes": {
     "Unsaved changes": "Nekonservitaj ŝanĝoj"
@@ -8863,6 +9229,9 @@
   },
   "Weather Widget": {
     "Weather Widget": "Veter-fenestraĵo"
+  },
+  "Weather icon and temperature open the weather activity": {
+    "Weather icon and temperature open the weather activity": ""
   },
   "Web Browser": {
     "Web Browser": "retumilo"
