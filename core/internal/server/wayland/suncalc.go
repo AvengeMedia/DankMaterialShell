@@ -54,23 +54,30 @@ func sunDeclination(orbitAngle float64) float64 {
 		0.00148*math.Sin(3*orbitAngle)
 }
 
-func sunHourAngle(latRad, declination, targetSunRad float64) float64 {
-	return math.Acos(math.Cos(targetSunRad)/
+type thresholdState int
+
+const (
+	thresholdCrosses thresholdState = iota
+	thresholdAlwaysAbove
+	thresholdAlwaysBelow
+)
+
+func sunHourAngle(latRad, declination, targetSunRad float64) (float64, thresholdState) {
+	cosH := math.Cos(targetSunRad)/
 		(math.Cos(latRad)*math.Cos(declination)) -
-		math.Tan(latRad)*math.Tan(declination))
+		math.Tan(latRad)*math.Tan(declination)
+	switch {
+	case cosH < -1:
+		return math.Pi, thresholdAlwaysAbove
+	case cosH > 1:
+		return 0, thresholdAlwaysBelow
+	default:
+		return math.Acos(cosH), thresholdCrosses
+	}
 }
 
 func hourAngleToSeconds(hourAngle, eqtime float64) float64 {
 	return radToDeg * (4.0*math.Pi - 4*hourAngle - eqtime) * 60
-}
-
-func sunCondition(latRad, declination float64) SunCondition {
-	signLat := latRad >= 0
-	signDecl := declination >= 0
-	if signLat == signDecl {
-		return SunMidnightSun
-	}
-	return SunPolarNight
 }
 
 func CalculateSunTimesWithTwilight(lat, lon float64, date time.Time, elevTwilight, elevDaylight float64) (SunTimes, SunCondition) {
@@ -83,12 +90,14 @@ func CalculateSunTimesWithTwilight(lat, lon float64, date time.Time, elevTwiligh
 	decl := sunDeclination(orbitAngle)
 	eqtime := equationOfTime(orbitAngle)
 
-	haTwilight := sunHourAngle(latRad, decl, elevTwilightRad)
-	haDaylight := sunHourAngle(latRad, decl, elevDaylightRad)
+	haTwilight, twilightState := sunHourAngle(latRad, decl, elevTwilightRad)
+	haDaylight, daylightState := sunHourAngle(latRad, decl, elevDaylightRad)
 
-	if math.IsNaN(haTwilight) || math.IsNaN(haDaylight) {
-		cond := sunCondition(latRad, decl)
-		return SunTimes{}, cond
+	if daylightState == thresholdAlwaysAbove {
+		return SunTimes{}, SunMidnightSun
+	}
+	if twilightState == thresholdAlwaysBelow {
+		return SunTimes{}, SunPolarNight
 	}
 
 	dayStart := time.Date(utc.Year(), utc.Month(), utc.Day(), 0, 0, 0, 0, time.UTC)
