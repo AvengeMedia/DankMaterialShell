@@ -113,30 +113,30 @@ Item {
         active: contentWindow.visible || root.shouldBeVisible
         presented: contentWindow.visible || root.shouldBeVisible
         renewTokenOnRecovery: false
-        isCurrentOwner: function(name) {
+        isCurrentOwner: function (name) {
             return PopoutManager.isCurrentPopout(root.popoutHandle, name);
         }
-        hasOwner: function(_name, ownerId) {
+        hasOwner: function (_name, ownerId) {
             return ConnectedModeState.hasPopoutOwner(ownerId);
         }
-        statePresent: function(name, ownerId) {
+        statePresent: function (name, ownerId) {
             return ConnectedModeState.hasPopoutOwner(ownerId) && ConnectedModeState.hasSurfaceDescriptor(name, "popout", ownerId);
         }
-        claimState: function(_name, state, ownerId) {
+        claimState: function (_name, state, ownerId) {
             return ConnectedModeState.claimPopout(ownerId, state);
         }
-        ensureState: function(_name, state, ownerId) {
+        ensureState: function (_name, state, ownerId) {
             if (!ConnectedModeState.hasPopoutOwner(ownerId))
                 return false;
             return ConnectedModeState.updatePopout(ownerId, state);
         }
-        releaseState: function(_name, ownerId) {
+        releaseState: function (_name, ownerId) {
             return ConnectedModeState.releasePopout(ownerId);
         }
-        updateAnimationState: function(_name, ownerId, animX, animY) {
+        updateAnimationState: function (_name, ownerId, animX, animY) {
             return ConnectedModeState.setPopoutAnim(ownerId, animX, animY);
         }
-        updateBodyState: function(_name, ownerId, bodyX, bodyY, bodyW, bodyH) {
+        updateBodyState: function (_name, ownerId, bodyX, bodyY, bodyW, bodyH) {
             return ConnectedModeState.setPopoutBody(ownerId, bodyX, bodyY, bodyW, bodyH);
         }
         onClaimIdChanged: root._resetPublishedBody()
@@ -425,7 +425,7 @@ Item {
     }
 
     readonly property bool frameOwnsConnectedChrome: CompositorService.usesConnectedFrameChromeForScreen(root.screen)
-    readonly property bool usesConnectedSurfaceChrome: Theme.isConnectedEffect && !CompositorService.connectedFrameBlockedOnScreen(root.screen)
+    readonly property bool usesConnectedSurfaceChrome: Theme.isConnectedEffect
     readonly property bool usesLocalConnectedSurfaceChrome: usesConnectedSurfaceChrome && !frameOwnsConnectedChrome
     onFrameOwnsConnectedChromeChanged: _syncPopoutChromeState()
 
@@ -708,8 +708,8 @@ Item {
     readonly property bool _settlingToOpen: fullHeightSurface && shouldBeVisible && morph.running
 
     onAlignedYChanged: {
-        geometryYSpring.retarget(root.alignedY)
-        _queueFullSync()
+        geometryYSpring.retarget(root.alignedY);
+        _queueFullSync();
     }
 
     // Morph transition coordinates to animate travel between popouts during switch.
@@ -836,7 +836,7 @@ Item {
     }
 
     onAlignedHeightChanged: {
-        geometryHSpring.retarget(root.alignedHeight)
+        geometryHSpring.retarget(root.alignedHeight);
         _queueFullSync();
         if (!suspendShadowWhileResizing || !shouldBeVisible)
             return;

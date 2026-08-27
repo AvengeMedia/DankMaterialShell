@@ -177,7 +177,6 @@ Singleton {
             // Avoid reassigning (and invalidating bindings) when contents are equivalent.
             if (!_toplevelListEquivalent(next, sortedToplevels))
                 sortedToplevels = next;
-            _recomputeFrameBlocked();
             toplevelsChanged();
         }
     }
@@ -231,10 +230,8 @@ Singleton {
                     if (event.name === "workspace" || event.name === "workspacev2" || event.name === "focusedmon" || event.name === "focusedmonv2" || event.name === "activespecial")
                         Hyprland.refreshMonitors();
                 } catch (e) {}
-                if (event.name === "activespecial") {
+                if (event.name === "activespecial")
                     root.updateHyprlandVisibleSpecialWorkspaces(event);
-                    root._recomputeFrameBlocked();
-                }
                 root.scheduleSort();
             }
         }
@@ -244,10 +241,6 @@ Singleton {
         function onWindowsChanged() {
             root.scheduleSort();
         }
-        // Workspace switches affect the fullscreen check's active workspace.
-        function onAllWorkspacesChanged() {
-            root._recomputeFrameBlocked();
-        }
     }
 
     Component.onCompleted: {
@@ -255,7 +248,6 @@ Singleton {
         detectCompositor();
         updateHyprlandVisibleSpecialWorkspaces(null);
         scheduleSort();
-        _recomputeFrameBlocked();
         Qt.callLater(() => {
             NiriService.generateNiriLayoutConfig();
             HyprlandService.generateLayoutConfig();
@@ -608,92 +600,9 @@ Singleton {
         }
     }
 
-    function hyprlandSpecialWorkspaceBlocksConnectedFrame(screenOrName) {
-        const screenName = _screenName(screenOrName);
-        if (!isHyprland || !screenName || !Hyprland.toplevels?.values)
-            return false;
-        const visibleSpecialWorkspace = hyprlandVisibleSpecialWorkspaceOnScreen(screenName);
-        if (!visibleSpecialWorkspace)
-            return false;
-
-        try {
-            for (const t of Hyprland.toplevels.values) {
-                const monName = t.monitor?.name ?? t.lastIpcObject?.monitor ?? "";
-                if (monName !== screenName)
-                    continue;
-                const wsName = _normalizeSpecialWorkspaceName(t.workspace?.name ?? t.lastIpcObject?.workspace?.name ?? "");
-                if (!wsName || wsName !== visibleSpecialWorkspace)
-                    continue;
-                if (_hyprlandToplevelMapped(t))
-                    return true;
-            }
-        } catch (e) {
-            log.warn("hyprlandSpecialWorkspaceBlocksConnectedFrame failed:", e);
-        }
-        return false;
-    }
-
-    // Per-screen cache for connectedFrameBlockedOnScreen to avoid recomputing on every consumer binding.
-    property var frameBlockedByScreen: ({})
-
-    function _recomputeFrameBlocked() {
-        const screens = Quickshell.screens || [];
-        const next = {};
-        let changed = false;
-        for (let i = 0; i < screens.length; i++) {
-            const name = screens[i]?.name;
-            if (!name)
-                continue;
-            const blocked = hyprlandSpecialWorkspaceBlocksConnectedFrame(name);
-            next[name] = blocked;
-            if (frameBlockedByScreen[name] !== blocked)
-                changed = true;
-        }
-        if (!changed) {
-            for (const name in frameBlockedByScreen) {
-                if (!(name in next)) {
-                    changed = true;
-                    break;
-                }
-            }
-        }
-        if (changed)
-            frameBlockedByScreen = next;
-    }
-
-    function connectedFrameBlockedOnScreen(screenOrName) {
-        const screenName = _screenName(screenOrName);
-        if (!screenName)
-            return false;
-        const cached = frameBlockedByScreen[screenName];
-        if (cached !== undefined)
-            return cached;
-        return hyprlandSpecialWorkspaceBlocksConnectedFrame(screenName);
-    }
-
-    Connections {
-        target: ToplevelManager
-        function onActiveToplevelChanged() {
-            root._recomputeFrameBlocked();
-        }
-    }
-
-    // Track active toplevel's fullscreen/activated state directly (no per-property signals from ToplevelManager).
-    Connections {
-        target: ToplevelManager.activeToplevel
-        ignoreUnknownSignals: true
-        function onFullscreenChanged() {
-            root._recomputeFrameBlocked();
-        }
-        function onActivatedChanged() {
-            root._recomputeFrameBlocked();
-        }
-    }
-
     Connections {
         target: Quickshell
         function onScreensChanged() {
-            root._recomputeFrameBlocked();
             root.refreshHyprlandMonitorLayout();
         }
     }
@@ -731,18 +640,14 @@ Singleton {
     }
 
     function frameWindowVisibleForScreen(screenOrName) {
-        if (!frameConfiguredForScreen(screenOrName))
-            return false;
-        return !connectedFrameBlockedOnScreen(screenOrName);
+        return frameConfiguredForScreen(screenOrName);
     }
 
     function usesConnectedFrameChromeForScreen(screenOrName) {
         return FrameTransitionState.effectiveConnectedFrameModeActive && frameWindowVisibleForScreen(screenOrName);
     }
 
-    // Connected mode renders the bar inside the frame surface. True whenever connected
-    // chrome is configured for the screen, independent of the fullscreen block, so the
-    // standalone bar surface stays suppressed while the frame-hosted bar hides with the frame.
+    // Connected mode renders the bar inside the frame surface.
     function frameHostsSurfacesForScreen(screenOrName) {
         return FrameTransitionState.effectiveConnectedFrameModeActive && frameConfiguredForScreen(screenOrName);
     }
