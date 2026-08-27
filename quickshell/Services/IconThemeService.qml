@@ -11,12 +11,14 @@ Singleton {
     id: root
     readonly property var log: Log.scoped("IconThemeService")
 
-    readonly property string managedTheme: {
+    readonly property string settingsTheme: {
         if (typeof SettingsData === "undefined")
             return "";
         const t = SettingsData.resolveIconTheme();
         return (!t || t === "System Default") ? "" : t;
     }
+    property string systemProbedTheme: ""
+    readonly property string managedTheme: settingsTheme || systemProbedTheme
 
     property var _searchDirs: []
     property string _dirsForTheme: ""
@@ -39,7 +41,24 @@ Singleton {
     onManagedThemeChanged: _rebuild()
     Component.onCompleted: {
         Paths.iconResolver = name => resolve(name);
+        _probeSystemTheme();
         _rebuild();
+    }
+
+    // "System Default" leaves Qt's lookup, which sees only hicolor unless a Qt platform theme or QS_ICON_THEME is configured.
+    function _probeSystemTheme() {
+        if (Quickshell.env("QS_ICON_THEME"))
+            return;
+        const script = `v=$(sed -n 's/^gtk-icon-theme-name *= *//p' "\${XDG_CONFIG_HOME:-$HOME/.config}/gtk-3.0/settings.ini" 2>/dev/null | head -1)
+[ -z "$v" ] && command -v gsettings >/dev/null 2>&1 && v=$(gsettings get org.gnome.desktop.interface icon-theme 2>/dev/null)
+printf '%s' "$v" | tr -d "'\\""`;
+
+        Proc.runCommand("iconThemeProbe", ["sh", "-c", script], (out, code) => {
+            const theme = (out || "").trim();
+            if (!theme)
+                return;
+            root.systemProbedTheme = theme;
+        });
     }
 
     function _bumpRevision() {
