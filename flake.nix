@@ -157,7 +157,7 @@
 
                 substituteInPlace $out/lib/systemd/user/dms.service \
                   --replace-fail /usr/bin/dms $out/bin/dms \
-                  --replace-fail /usr/bin/pkill ${pkgs.procps}/bin/pkill
+                  --replace-fail /bin/kill ${pkgs.coreutils}/bin/kill
 
                 substituteInPlace $out/share/quickshell/dms/assets/pam/fprint \
                   --replace-fail pam_fprintd.so ${pkgs.fprintd}/lib/security/pam_fprintd.so \

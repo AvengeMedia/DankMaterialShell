@@ -13,15 +13,17 @@ import (
 )
 
 var shellApp = shellapp.New(shellapp.Config{
-	ID:        "danklinux",
-	EnvPrefix: "DMS",
-	QSAppID:   "com.danklinux.dms",
-	Version:   Version,
-	Embedded:  embeddedShell{},
-	Boot:      bootBackend,
-	PreLaunch: preLaunch,
-	ExtraEnv:  dmsExtraEnv,
-	OnUIExit:  logStartupFailure,
+	ID:                     "danklinux",
+	EnvPrefix:              "DMS",
+	QSAppID:                "com.danklinux.dms",
+	Version:                Version,
+	Embedded:               embeddedShell{},
+	Boot:                   bootBackend,
+	PreLaunch:              preLaunch,
+	ExtraEnv:               dmsExtraEnv,
+	OnUIExit:               logStartupFailure,
+	SessionRestartExitCode: dmsSessionRestartExitCode,
+	TryManagedRestart:      trySystemdRestart,
 })
 
 type embeddedShell struct{}

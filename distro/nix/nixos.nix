@@ -45,6 +45,8 @@ in
       serviceConfig = {
         ExecStart = lib.getExe cfg.package + " run --session";
         Restart = "on-failure";
+        RestartForceExitStatus = "TEMPFAIL";
+        SuccessExitStatus = "TEMPFAIL";
       };
     };
 
