@@ -24,6 +24,40 @@ BasePill {
         return "";
     }
     property string hyprlandKeyboard: ""
+    property var hyprlandLayoutLabels: []
+    readonly property var _allLayoutLabels: CompositorService.isNiri ? (NiriService.keyboardLayoutNames || []).map(n => displayLabel(n)) : hyprlandLayoutLabels
+    readonly property string reserveLabel: widestLabel(_allLayoutLabels)
+    readonly property string verticalReserveLabel: widestLabel(_allLayoutLabels.map(n => LayoutCodes.layoutCode(n)))
+
+    function widestLabel(labels) {
+        let widest = "";
+        for (let i = 0; i < labels.length; i++) {
+            if (labels[i].length > widest.length)
+                widest = labels[i];
+        }
+        return widest;
+    }
+
+    function displayLabel(layoutName) {
+        if (!layoutName)
+            return "";
+        if (compactMode && !CompositorService.isHyprland) {
+            const match = layoutName.match(/^(\S+)(?:.*\(([^)]+)\))?/);
+            if (match) {
+                const lang = match[1].toLowerCase();
+                const code = LayoutCodes.LANG_CODES[lang] || lang.substring(0, 2);
+                if (match[2]) {
+                    const variant = match[2].trim();
+                    const isValid = validVariants.some(v => variant.toUpperCase().includes(v.toUpperCase())) || variant.length <= 3;
+                    if (isValid)
+                        return code + "-" + variant;
+                }
+                return code.toUpperCase();
+            }
+            return LayoutCodes.layoutCode(layoutName);
+        }
+        return layoutName;
+    }
 
     content: Component {
         Item {
@@ -44,10 +78,12 @@ BasePill {
                     visible: root.showIcon
                 }
 
-                StyledText {
-                    text: {
-                        return LayoutCodes.layoutCode(root.currentLayout);
-                    }
+                NumericText {
+                    isMonospace: false
+                    text: LayoutCodes.layoutCode(root.currentLayout)
+                    reserveText: root.verticalReserveLabel
+                    width: Math.ceil(Math.max(implicitWidth, reservedWidth))
+                    horizontalAlignment: Text.AlignHCenter
                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                     color: Theme.widgetTextColor
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -68,27 +104,12 @@ BasePill {
                     visible: root.showIcon
                 }
 
-                StyledText {
-                    text: {
-                        if (!root.currentLayout)
-                            return "";
-                        if (root.compactMode && !CompositorService.isHyprland) {
-                            const match = root.currentLayout.match(/^(\S+)(?:.*\(([^)]+)\))?/);
-                            if (match) {
-                                const lang = match[1].toLowerCase();
-                                const code = LayoutCodes.LANG_CODES[lang] || lang.substring(0, 2);
-                                if (match[2]) {
-                                    const variant = match[2].trim();
-                                    const isValid = root.validVariants.some(v => variant.toUpperCase().includes(v.toUpperCase())) || variant.length <= 3;
-                                    if (isValid)
-                                        return code + "-" + variant;
-                                }
-                                return code.toUpperCase();
-                            }
-                            return LayoutCodes.layoutCode(root.currentLayout);
-                        }
-                        return root.currentLayout;
-                    }
+                NumericText {
+                    isMonospace: false
+                    text: root.displayLabel(root.currentLayout)
+                    reserveText: root.reserveLabel
+                    width: Math.ceil(Math.max(implicitWidth, reservedWidth))
+                    horizontalAlignment: Text.AlignHCenter
                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                     color: Theme.widgetTextColor
                     anchors.verticalCenter: parent.verticalCenter
@@ -191,15 +212,13 @@ BasePill {
                             const variants = mainKeyboard.variant.split(",");
                             const index = mainKeyboard.active_layout_index;
 
-                            if (layouts[index] && variants[index] !== undefined) {
-                                if (variants[index] === "") {
-                                    root.currentLayout = layouts[index];
-                                } else {
-                                    root.currentLayout = layouts[index] + "-" + variants[index];
-                                }
-                            } else {
-                                root.currentLayout = layouts[index];
+                            const labels = [];
+                            for (let i = 0; i < layouts.length; i++) {
+                                const v = variants[i] !== undefined ? variants[i] : "";
+                                labels.push(v === "" ? layouts[i] : layouts[i] + "-" + v);
                             }
+                            root.hyprlandLayoutLabels = labels;
+                            root.currentLayout = labels[index] ?? layouts[index];
                         } else if (mainKeyboard && mainKeyboard.active_keymap) {
                             root.currentLayout = mainKeyboard.active_keymap;
                         } else {
