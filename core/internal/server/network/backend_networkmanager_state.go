@@ -1,6 +1,7 @@
 package network
 
 import (
+	"sort"
 	"time"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/errdefs"
@@ -146,12 +147,51 @@ func (b *NetworkManagerBackend) classifyNMStateReason(reason uint32) string {
 	}
 }
 
-func (b *NetworkManagerBackend) updateWiFiState() error {
-	if b.wifiDevice == nil {
-		return nil
+// With several adapters, state must follow the associated device, not whichever
+// enumerated first (#2460).
+func (b *NetworkManagerBackend) wifiDeviceForState() (gonetworkmanager.Device, gonetworkmanager.DeviceWireless) {
+	var fallbackDev gonetworkmanager.Device
+	if b.wifiDevice != nil {
+		fallbackDev = b.wifiDevice.(gonetworkmanager.Device)
+	}
+	var fallbackWireless gonetworkmanager.DeviceWireless
+	if b.wifiDev != nil {
+		fallbackWireless = b.wifiDev.(gonetworkmanager.DeviceWireless)
 	}
 
-	dev := b.wifiDevice.(gonetworkmanager.Device)
+	snapshot := b.wifiDevicesSnapshot()
+	if len(snapshot) < 2 {
+		return fallbackDev, fallbackWireless
+	}
+
+	apMode := b.activeAPModeWiFiDevicePaths()
+	names := make([]string, 0, len(snapshot))
+	for name := range snapshot {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	for _, name := range names {
+		info := snapshot[name]
+		if info.device == nil {
+			continue
+		}
+		state, err := info.device.GetPropertyState()
+		if err != nil || state != gonetworkmanager.NmDeviceStateActivated {
+			continue
+		}
+		if apMode[string(info.device.GetPath())] {
+			continue
+		}
+		return info.device, info.wireless
+	}
+	return fallbackDev, fallbackWireless
+}
+
+func (b *NetworkManagerBackend) updateWiFiState() error {
+	dev, wireless := b.wifiDeviceForState()
+	if dev == nil {
+		return nil
+	}
 
 	iface, err := dev.GetPropertyInterface()
 	if err != nil {
@@ -177,9 +217,13 @@ func (b *NetworkManagerBackend) updateWiFiState() error {
 	var signal uint8
 
 	if connected {
-		if err := b.ensureWiFiDevice(); err == nil && b.wifiDev != nil {
-			w := b.wifiDev.(gonetworkmanager.DeviceWireless)
-			activeAP, err := w.GetPropertyActiveAccessPoint()
+		if wireless == nil {
+			if err := b.ensureWiFiDevice(); err == nil && b.wifiDev != nil {
+				wireless = b.wifiDev.(gonetworkmanager.DeviceWireless)
+			}
+		}
+		if wireless != nil {
+			activeAP, err := wireless.GetPropertyActiveAccessPoint()
 			if err == nil && activeAP != nil && activeAP.GetPath() != "/" {
 				ssid, _ = activeAP.GetPropertySSID()
 				signal, _ = activeAP.GetPropertyStrength()

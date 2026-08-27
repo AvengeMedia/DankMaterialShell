@@ -115,3 +115,34 @@ func TestNetworkManagerBackend_UpdatePrimaryConnection_TypeMapping(t *testing.T)
 		})
 	}
 }
+
+func TestNetworkManagerBackend_UpdateWiFiState_PicksConnectedDevice(t *testing.T) {
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+	backend, err := NewNetworkManagerBackend(mockNM)
+	assert.NoError(t, err)
+
+	first := mock_gonetworkmanager.NewMockDevice(t)
+	first.EXPECT().GetPropertyState().Return(gonetworkmanager.NmDeviceStateDisconnected, nil)
+
+	second := mock_gonetworkmanager.NewMockDevice(t)
+	second.EXPECT().GetPropertyState().Return(gonetworkmanager.NmDeviceStateActivated, nil)
+	second.EXPECT().GetPath().Return("/org/freedesktop/NetworkManager/Devices/2")
+	second.EXPECT().GetPropertyInterface().Return("wlan1", nil)
+	second.EXPECT().GetPropertyIP4Config().Return(nil, nil)
+
+	secondWireless := mock_gonetworkmanager.NewMockDeviceWireless(t)
+	secondWireless.EXPECT().GetPropertyActiveAccessPoint().Return(nil, nil)
+
+	mockNM.EXPECT().GetPropertyActiveConnections().Return([]gonetworkmanager.ActiveConnection{}, nil)
+
+	backend.setWifiDeviceInfo("wlan0", &wifiDeviceInfo{device: first, name: "wlan0"})
+	backend.setWifiDeviceInfo("wlan1", &wifiDeviceInfo{device: second, wireless: secondWireless, name: "wlan1"})
+	backend.wifiDevice = first
+
+	assert.NoError(t, backend.updateWiFiState())
+
+	backend.stateMutex.RLock()
+	defer backend.stateMutex.RUnlock()
+	assert.True(t, backend.state.WiFiConnected)
+	assert.Equal(t, "wlan1", backend.state.WiFiDevice)
+}
