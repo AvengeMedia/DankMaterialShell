@@ -57,7 +57,8 @@ func (b *NetworkManagerBackend) updatePrimaryConnection() error {
 
 	b.stateMutex.Lock()
 	switch connType {
-	case "802-3-ethernet":
+	// Link aggregates carry the default route while the member NIC has no IP (#1581).
+	case "802-3-ethernet", "bridge", "bond", "team", "vlan":
 		b.state.NetworkStatus = StatusEthernet
 	case "802-11-wireless":
 		b.state.NetworkStatus = StatusWiFi

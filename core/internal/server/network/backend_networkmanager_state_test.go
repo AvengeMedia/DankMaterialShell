@@ -80,3 +80,38 @@ func TestNetworkManagerBackend_GetDeviceIP_NoConfig(t *testing.T) {
 	ip := backend.getDeviceIP(mockDevice)
 	assert.Empty(t, ip)
 }
+
+func TestNetworkManagerBackend_UpdatePrimaryConnection_TypeMapping(t *testing.T) {
+	testCases := []struct {
+		connType string
+		expected NetworkStatus
+	}{
+		{"802-3-ethernet", StatusEthernet},
+		{"bridge", StatusEthernet},
+		{"bond", StatusEthernet},
+		{"team", StatusEthernet},
+		{"vlan", StatusEthernet},
+		{"802-11-wireless", StatusWiFi},
+		{"tun", StatusDisconnected},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.connType, func(t *testing.T) {
+			mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+			mockConn := mock_gonetworkmanager.NewMockActiveConnection(t)
+
+			backend, err := NewNetworkManagerBackend(mockNM)
+			assert.NoError(t, err)
+
+			mockNM.EXPECT().GetPropertyActiveConnections().Return([]gonetworkmanager.ActiveConnection{}, nil)
+			mockNM.EXPECT().GetPropertyPrimaryConnection().Return(mockConn, nil)
+			mockConn.EXPECT().GetPath().Return("/org/freedesktop/NetworkManager/ActiveConnection/1")
+			mockConn.EXPECT().GetPropertyType().Return(tc.connType, nil)
+
+			assert.NoError(t, backend.updatePrimaryConnection())
+			backend.stateMutex.RLock()
+			defer backend.stateMutex.RUnlock()
+			assert.Equal(t, tc.expected, backend.state.NetworkStatus)
+		})
+	}
+}
