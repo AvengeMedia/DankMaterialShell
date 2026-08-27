@@ -14,8 +14,7 @@ Item {
 
     readonly property string headerText: root.notificationModel.appName + (root.notificationModel.timeText ? " · " + root.notificationModel.timeText : "")
     readonly property string summaryText: root.dense && root.notificationModel.appName ? root.notificationModel.appName + " · " + root.notificationModel.summary : root.notificationModel.summary
-    readonly property real criticalWidth: root.notificationModel.critical ? 3 + Theme.spacingS : 0
-    readonly property real measuredWidth: Theme.spacingS * 3 + root.criticalWidth + root.iconSize + Theme.spacingXS + Math.max(root.dense ? 0 : headerLabel.implicitWidth, summaryLabel.implicitWidth)
+    readonly property real measuredWidth: Theme.spacingS * 3 + root.iconSize + Theme.spacingXS + Math.max(root.dense ? 0 : headerLabel.implicitWidth, summaryLabel.implicitWidth)
 
     function pushMeasuredWidth() {
         root.controller.setNotificationContentWidth(root.measuredWidth);
@@ -32,15 +31,6 @@ Item {
         }
         spacing: Theme.spacingS
 
-        Rectangle {
-            anchors.verticalCenter: parent.verticalCenter
-            width: root.notificationModel.critical ? 3 : 0
-            height: Math.max(12, parent.height - Theme.spacingS)
-            radius: 1.5
-            color: Theme.error
-            visible: root.notificationModel.critical
-        }
-
         DankCircularImage {
             anchors.verticalCenter: parent.verticalCenter
             width: root.iconSize
@@ -53,7 +43,7 @@ Item {
 
         Column {
             anchors.verticalCenter: parent.verticalCenter
-            width: parent.width - root.iconSize - parent.spacing - root.criticalWidth
+            width: parent.width - root.iconSize - parent.spacing
             spacing: 1
 
             StyledText {

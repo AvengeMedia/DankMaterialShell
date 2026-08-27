@@ -48,6 +48,15 @@ Item {
     }
     readonly property real surfaceOpacity: root.effectiveSurfaceColor.a
     readonly property real currentSurfaceRadius: Math.max(0, motion.currentTopLeftRadius, motion.currentBottomLeftRadius)
+    readonly property color notificationAccentColor: {
+        if (!root.controller.notificationActive)
+            return "transparent";
+        if (root.notificationModel.critical)
+            return Theme.error;
+        if (root.notificationModel.important)
+            return Theme.warning;
+        return "transparent";
+    }
 
     signal scrollWheel(var wheel)
 
@@ -225,10 +234,17 @@ Item {
         bottomLeftRadius: Math.max(0, motion.currentBottomLeftRadius)
         bottomRightRadius: Math.max(0, motion.currentBottomRightRadius)
         color: root.effectiveSurfaceColor
-        border.width: root.highContrast ? 2 : (root.popupStyled ? BlurService.borderWidth : 0)
-        border.color: root.highContrast ? Theme.outlineStrong : (root.popupStyled ? BlurService.borderColor : "transparent")
+        border.width: root.notificationAccentColor !== "transparent" ? 1.5 : (root.highContrast ? 2 : (root.popupStyled ? BlurService.borderWidth : 0))
+        border.color: root.notificationAccentColor !== "transparent" ? root.notificationAccentColor : (root.highContrast ? Theme.outlineStrong : (root.popupStyled ? BlurService.borderColor : "transparent"))
 
         Behavior on color {
+            ColorAnimation {
+                duration: root.reducedMotion ? 0 : Theme.shortDuration
+                easing.type: Easing.OutCubic
+            }
+        }
+
+        Behavior on border.color {
             ColorAnimation {
                 duration: root.reducedMotion ? 0 : Theme.shortDuration
                 easing.type: Easing.OutCubic
