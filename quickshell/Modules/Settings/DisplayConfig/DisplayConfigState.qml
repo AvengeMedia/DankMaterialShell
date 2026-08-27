@@ -2517,6 +2517,14 @@ Singleton {
         const phys = getPhysicalSize(output);
         const scale = output.logical?.scale || 1.0;
 
+        // niri floors logical sizes (2560/1.1 -> 2327, 1600/1.3 -> 1230); rounding up by
+        // one leaves a dead seam at snapped edges (#2526).
+        if (CompositorService.isNiri) {
+            return {
+                "w": Math.floor(phys.w / scale),
+                "h": Math.floor(phys.h / scale)
+            };
+        }
         return {
             "w": Math.round(phys.w / scale),
             "h": Math.round(phys.h / scale)
