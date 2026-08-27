@@ -792,6 +792,21 @@ Singleton {
         return Paths.strip(image);
     }
 
+    // Apps like kitty send app_icon as their bundled logo path; the themed icon wins when the basename resolves (#2746).
+    function notificationThemedAppIcon(appIcon) {
+        if (/^https?:\/\//.test(appIcon))
+            return "";
+        const path = appIcon.startsWith("file://") ? appIcon.substring(7) : appIcon;
+        if (!path.startsWith("/"))
+            return "";
+        const file = path.substring(path.lastIndexOf("/") + 1);
+        const dot = file.lastIndexOf(".");
+        const base = dot > 0 ? file.substring(0, dot) : file;
+        if (!base)
+            return "";
+        return Paths.themedIconPath(base) ? base : "";
+    }
+
     function notificationImageSource(image, appIcon) {
         image = image || "";
         appIcon = appIcon || "";
@@ -800,6 +815,8 @@ Singleton {
         if (notificationImageHasSpecialPrefix(image))
             return "";
         if (!appIcon)
+            return "";
+        if (notificationThemedAppIcon(appIcon))
             return "";
         return /^(file|https?):\/\//.test(appIcon) || appIcon.includes("/") ? appIcon : "";
     }
@@ -810,6 +827,9 @@ Singleton {
         const fromImage = notificationIconFromImage(image);
         if (notificationImageHasSpecialPrefix(image))
             return fromImage;
+        const themed = notificationThemedAppIcon(appIcon);
+        if (themed)
+            return themed;
         return appIcon || fromImage || "";
     }
 
