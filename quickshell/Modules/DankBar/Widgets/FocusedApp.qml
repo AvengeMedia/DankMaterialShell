@@ -29,6 +29,8 @@ BasePill {
         }
     }
     property int availableWidth: maxWidth
+    readonly property real effectiveHorizontalWidth: Math.max(0, Math.min(maxWidth, availableWidth))
+    readonly property real effectiveHorizontalInnerWidth: Math.max(0, effectiveHorizontalWidth - horizontalPadding * 2)
     property Toplevel activeWindow: null
     property var activeDesktopEntry: null
     property bool isHovered: mouseArea.containsMouse
@@ -200,9 +202,9 @@ BasePill {
         return activeWindow && (activeWindow.title || activeWindow.appId);
     }
 
-    width: hasWindowsOnCurrentWorkspace ? (isVerticalOrientation ? barThickness : visualWidth) : 0
+    width: hasWindowsOnCurrentWorkspace ? (isVerticalOrientation ? barThickness : (effectiveHorizontalInnerWidth > 0 ? visualWidth : 0)) : 0
     height: hasWindowsOnCurrentWorkspace ? (isVerticalOrientation ? visualHeight : barThickness) : 0
-    visible: hasWindowsOnCurrentWorkspace
+    visible: hasWindowsOnCurrentWorkspace && (isVerticalOrientation || effectiveHorizontalInnerWidth > 0)
 
     content: Component {
         Item {
@@ -211,10 +213,11 @@ BasePill {
                     return 0;
                 if (root.isVerticalOrientation)
                     return root.widgetThickness - root.horizontalPadding * 2;
-                return contentRow.implicitWidth;
+                return Math.min(contentRow.implicitWidth, root.effectiveHorizontalInnerWidth);
             }
+            width: root.isVerticalOrientation ? root.widgetThickness - root.horizontalPadding * 2 : Math.min(implicitWidth, root.effectiveHorizontalInnerWidth)
             implicitHeight: root.widgetThickness - root.horizontalPadding * 2
-            clip: false
+            clip: !root.isVerticalOrientation
 
             IconImage {
                 id: appIcon
@@ -263,7 +266,8 @@ BasePill {
 
             Row {
                 id: contentRow
-                anchors.centerIn: parent
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: parent.left
                 spacing: Theme.spacingS
                 visible: !root.isVerticalOrientation
 
@@ -316,7 +320,16 @@ BasePill {
                     wrapMode: Text.NoWrap
                     elide: Text.ElideRight
                     maximumLineCount: 1
-                    width: Math.min(implicitWidth, compactMode ? 80 : 180)
+                    width: {
+                        const sp = contentRow.spacing;
+                        let used = 0;
+                        if (horizontalAppIcon.visible)
+                            used += horizontalAppIcon.width + sp;
+                        else if (horizontalSteamIcon.visible)
+                            used += horizontalSteamIcon.width + sp;
+                        const budget = Math.max(0, root.effectiveHorizontalInnerWidth - used);
+                        return Math.min(implicitWidth, compactMode ? 80 : 180, budget);
+                    }
                     visible: text.length > 0
                 }
 
@@ -368,7 +381,7 @@ BasePill {
                             used += appText.width + sp;
                         if (appSeparator.visible)
                             used += appSeparator.width + sp;
-                        const budget = root.maxWidth - root.horizontalPadding * 2 - used;
+                        const budget = root.effectiveHorizontalInnerWidth - used;
                         return Math.min(implicitWidth, Math.max(0, budget));
                     }
                     visible: text.length > 0

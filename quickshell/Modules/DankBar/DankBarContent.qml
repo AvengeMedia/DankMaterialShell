@@ -1040,8 +1040,19 @@ Item {
         id: focusedWindowComponent
 
         FocusedApp {
+            id: focusedWindowWidget
             axis: barWindow.axis
-            availableWidth: topBarContent.leftToMediaGap
+            availableWidth: {
+                const configuredWidth = focusedWindowWidget.maxWidth;
+                const focusedWidgetContainer = focusedWindowWidget.parent?.parent;
+                if (barWindow.axis?.isVertical || topBarContent.getWidgetSection(focusedWindowWidget) !== "left" || hCenterSection.contentSize <= 0 || !focusedWidgetContainer)
+                    return configuredWidth;
+
+                // Read Row coordinates directly so this binding tracks reflow.
+                const focusedWidgetLeft = hLeftSection.x + focusedWidgetContainer.x;
+                const centerContentLeft = hCenterSection.x + hCenterSection.contentStart;
+                return Math.max(0, centerContentLeft - focusedWidgetLeft);
+            }
             widgetThickness: barWindow.widgetThickness
             barThickness: barWindow.effectiveBarThickness
             barSpacing: barConfig?.spacing ?? 4
