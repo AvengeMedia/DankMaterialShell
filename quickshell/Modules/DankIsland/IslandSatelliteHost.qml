@@ -50,7 +50,7 @@ Item {
         return root.bottomEdge ? root.height - root.stripHeight + centered : centered;
     }
     readonly property bool backgroundEnabled: SettingsData.dankIslandSatelliteBackground
-    readonly property bool spanEdges: root.edgeAligned || root.backgroundEnabled
+    readonly property bool spanEdges: root.edgeAligned
     readonly property real chromePad: Theme.snap(root.innerPadding + Theme.spacingXS, root.screenScale)
     readonly property real chromeInset: root.backgroundEnabled ? root.chromePad : 0
     readonly property real chromeY: root.bottomEdge ? root.height - root.stripHeight : 0
@@ -317,13 +317,17 @@ Item {
 
             readonly property real s: piece.chrome.sweepR
 
+            readonly property bool leadsIn: piece.chrome.floating ? piece.isWing : piece.chrome.rightSide
+
             x: {
+                if (piece.chrome.floating)
+                    return piece.isWing ? piece.chrome.x - piece.s : piece.chrome.x + piece.chrome.width;
                 if (piece.isWing)
                     return piece.chrome.rightSide ? piece.chrome.x + piece.chrome.width - piece.s : piece.chrome.x;
                 return piece.chrome.rightSide ? piece.chrome.x - piece.s : piece.chrome.x + piece.chrome.width;
             }
             y: {
-                if (piece.isWing)
+                if (piece.isWing && !piece.chrome.floating)
                     return piece.chrome.bottomEdge ? piece.chrome.y - piece.s : piece.chrome.y + piece.chrome.height;
                 return piece.chrome.bottomEdge ? piece.chrome.y + piece.chrome.height - piece.s : piece.chrome.y;
             }
@@ -335,7 +339,7 @@ Item {
                 radius: piece.s
                 width: piece.s * 2
                 height: piece.s * 2
-                x: piece.x - (piece.chrome.rightSide ? piece.s : 0)
+                x: piece.x - (piece.leadsIn ? piece.s : 0)
                 y: piece.y - (piece.chrome.bottomEdge ? piece.s : 0)
             }
         }
@@ -358,9 +362,9 @@ Item {
     Item {
         id: leftInputEnvelope
 
-        x: root.spanEdges ? 0 : (root.motionRunning ? Math.min(root.islandStartX, root.islandTargetX) - SettingsData.dankIslandSatelliteGap - leftInput.width : leftInput.x)
+        x: (root.spanEdges ? 0 : (root.motionRunning ? Math.min(root.islandStartX, root.islandTargetX) - SettingsData.dankIslandSatelliteGap - leftInput.width : leftInput.x)) - (root.spanEdges ? 0 : root.chromeInset)
         y: root.spanEdges ? root.chromeY : leftInput.y
-        width: root.spanEdges ? (leftInput.width > 0 ? Math.max(0, leftInput.x + leftInput.width + root.chromeInset) : 0) : leftInput.width + root.leftEdgeSpread
+        width: root.spanEdges ? (leftInput.width > 0 ? Math.max(0, leftInput.x + leftInput.width + root.chromeInset) : 0) : leftInput.width + root.leftEdgeSpread + root.chromeInset * 2
         height: root.spanEdges ? (leftInput.width > 0 ? root.chromeHeight : 0) : leftInput.height
     }
 
@@ -369,18 +373,19 @@ Item {
 
         readonly property real edgeX: rightInput.width > 0 ? rightInput.x - root.chromeInset : root.width
 
-        x: root.spanEdges ? edgeX : (root.motionRunning ? Math.min(root.islandStartRight, root.islandTargetRight) + SettingsData.dankIslandSatelliteGap : rightInput.x)
+        x: (root.spanEdges ? edgeX : (root.motionRunning ? Math.min(root.islandStartRight, root.islandTargetRight) + SettingsData.dankIslandSatelliteGap : rightInput.x)) - (root.spanEdges ? 0 : root.chromeInset)
         y: root.spanEdges ? root.chromeY : rightInput.y
-        width: root.spanEdges ? Math.max(0, root.width - edgeX) : rightInput.width + root.rightEdgeSpread
+        width: root.spanEdges ? Math.max(0, root.width - edgeX) : rightInput.width + root.rightEdgeSpread + root.chromeInset * 2
         height: root.spanEdges ? (rightInput.width > 0 ? root.chromeHeight : 0) : rightInput.height
     }
 
     IslandSatelliteChrome {
         id: leftChrome
 
-        x: 0
+        floating: !root.edgeAligned
+        x: root.edgeAligned ? 0 : leftInput.x - root.chromePad
         y: root.chromeY
-        width: Math.max(0, leftInput.x + leftInput.width + root.chromePad)
+        width: leftInput.width > 0 ? (root.edgeAligned ? leftInput.x + leftInput.width + root.chromePad : leftInput.width + root.chromePad * 2) : 0
         height: root.chromeHeight
         visible: root.backgroundEnabled && leftInput.width > 0
         fillColor: root.chromeColor
@@ -395,9 +400,10 @@ Item {
         id: rightChrome
 
         rightSide: true
+        floating: !root.edgeAligned
         x: rightInput.x - root.chromePad
         y: root.chromeY
-        width: Math.max(0, root.width - x)
+        width: rightInput.width > 0 ? (root.edgeAligned ? Math.max(0, root.width - x) : rightInput.width + root.chromePad * 2) : 0
         height: root.chromeHeight
         visible: root.backgroundEnabled && rightInput.width > 0
         fillColor: root.chromeColor
