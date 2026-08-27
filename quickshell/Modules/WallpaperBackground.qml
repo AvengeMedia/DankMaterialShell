@@ -318,7 +318,7 @@ Variants {
                     return;
                 const pending = root.pendingWallpaper;
                 root.pendingWallpaper = "";
-                Qt.callLater(() => root.changeWallpaper(pending, true));
+                Qt.callLater(() => root.changeWallpaper(pending));
             }
 
             function updateWorkspaceData() {
@@ -588,11 +588,7 @@ Variants {
                 onTriggered: transitionAnimation.start()
             }
 
-            function changeWallpaper(newPath, force) {
-                if (!force && newPath === currentWallpaper.source.toString()) {
-                    root.changePending = false;
-                    return;
-                }
+            function changeWallpaper(newPath) {
                 if (!newPath || newPath.startsWith("#")) {
                     root.changePending = false;
                     return;
@@ -600,6 +596,14 @@ Variants {
                 root.screenScale = CompositorService.getScreenScale(modelData);
                 if (root.transitioning || root.effectActive) {
                     root.pendingWallpaper = newPath;
+                    return;
+                }
+                if (newPath === currentWallpaper.source.toString()) {
+                    if (nextWallpaper.source.toString()) {
+                        setWallpaperImmediate(newPath);
+                        return;
+                    }
+                    root.changePending = false;
                     return;
                 }
                 if (!currentWallpaper.source) {
@@ -1090,7 +1094,7 @@ Variants {
                         return;
                     var pending = root.pendingWallpaper;
                     root.pendingWallpaper = "";
-                    Qt.callLater(() => root.changeWallpaper(pending, true));
+                    Qt.callLater(() => root.changeWallpaper(pending));
                 }
             }
 
