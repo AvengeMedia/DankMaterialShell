@@ -1819,6 +1819,30 @@
     "icon": "view_module"
   },
   {
+    "section": "dockAppSpacing",
+    "label": "App Spacing",
+    "tabIndex": 5,
+    "category": "Dock",
+    "keywords": [
+      "app",
+      "between",
+      "buttons",
+      "dock",
+      "gap",
+      "gaps",
+      "icon",
+      "icons",
+      "launcher bar",
+      "margin",
+      "margins",
+      "padding",
+      "panel",
+      "spacing",
+      "taskbar"
+    ],
+    "description": "Gap between app icons in the dock"
+  },
+  {
     "section": "dockAutoHide",
     "label": "Auto-hide Dock",
     "tabIndex": 5,
@@ -1928,6 +1952,46 @@
       "taskbar"
     ],
     "icon": "shelf_auto_hide"
+  },
+  {
+    "section": "dockMagnificationSpread",
+    "label": "Effect Spread",
+    "tabIndex": 5,
+    "category": "Dock",
+    "keywords": [
+      "dock",
+      "effect",
+      "launcher bar",
+      "magnification",
+      "range",
+      "reach",
+      "spread",
+      "taskbar"
+    ]
+  },
+  {
+    "section": "dockMagnificationEnabled",
+    "label": "Enable Magnification",
+    "tabIndex": 5,
+    "category": "Dock",
+    "keywords": [
+      "cursor",
+      "dock",
+      "effect",
+      "enable",
+      "hover",
+      "icons",
+      "launcher bar",
+      "macos",
+      "magnification",
+      "magnify",
+      "panel",
+      "similar",
+      "taskbar",
+      "under",
+      "zoom"
+    ],
+    "description": "Magnify dock icons under the cursor, similar to macOS"
   },
   {
     "section": "dockExclusiveZone",
@@ -2060,6 +2124,45 @@
       "taskbar"
     ],
     "icon": "apps"
+  },
+  {
+    "section": "dockMagnification",
+    "label": "Magnification",
+    "tabIndex": 5,
+    "category": "Dock",
+    "keywords": [
+      "cursor",
+      "dock",
+      "effect",
+      "hover",
+      "icons",
+      "launcher bar",
+      "macos",
+      "magnification",
+      "magnify",
+      "panel",
+      "similar",
+      "taskbar",
+      "under",
+      "zoom"
+    ],
+    "icon": "zoom_in",
+    "description": "Magnify dock icons under the cursor, similar to macOS"
+  },
+  {
+    "section": "dockMagnificationAmount",
+    "label": "Magnification Amount",
+    "tabIndex": 5,
+    "category": "Dock",
+    "keywords": [
+      "amount",
+      "dock",
+      "launcher bar",
+      "magnification",
+      "scale",
+      "taskbar",
+      "zoom"
+    ]
   },
   {
     "section": "dockMaxVisibleApps",
@@ -2335,21 +2438,24 @@
     "tabIndex": 5,
     "category": "Dock",
     "keywords": [
+      "app",
+      "between",
+      "buttons",
       "dock",
-      "exclusive",
       "gap",
       "gaps",
+      "icon",
+      "icons",
       "launcher bar",
       "margin",
       "margins",
-      "offset",
       "padding",
-      "reserved",
+      "panel",
       "spacing",
-      "taskbar",
-      "zone"
+      "taskbar"
     ],
-    "icon": "space_bar"
+    "icon": "space_bar",
+    "description": "Gap between app icons in the dock"
   },
   {
     "section": "dockTrash",
