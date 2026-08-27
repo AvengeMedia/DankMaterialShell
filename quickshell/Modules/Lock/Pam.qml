@@ -5,6 +5,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Pam
 import qs.Common
+import qs.Services
 
 Scope {
     id: root
@@ -427,6 +428,19 @@ Scope {
 
         interval: Math.min(1500 * Math.pow(2, Math.max(0, fprint.errorTries - 1)), 30000)
         onTriggered: fprint.start()
+    }
+
+    Connections {
+        target: SessionService
+
+        // timers run on monotonic time, so suspend leaves the backoff remainder to burn after wake (#3171)
+        function onSessionResumed() {
+            if (!fprint.available || !SettingsData.enableFprint || !root.lockSecured || root.fprintSuppressedByPrimaryPam)
+                return;
+            fprint.errorTries = 0;
+            if (errorRetry.running)
+                errorRetry.restart();
+        }
     }
 
     Timer {
