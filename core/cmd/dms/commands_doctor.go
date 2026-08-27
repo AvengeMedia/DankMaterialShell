@@ -1091,6 +1091,11 @@ func checkConfigurationFiles() []checkResult {
 			status = statusWarn
 			message += " (read-only)"
 		}
+		// The shell falls back to defaults on a parse failure, so a broken file must not report ok.
+		if data, readErr := os.ReadFile(cf.path); readErr == nil && len(data) > 0 && !json.Valid(data) {
+			status = statusError
+			message = "Invalid JSON - the shell ignores this file and runs on defaults"
+		}
 		results = append(results, checkResult{catConfigFiles, cf.name, status, message, cf.path, doctorDocsURL + "#config-files"})
 	}
 	return results
