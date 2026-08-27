@@ -1061,7 +1061,60 @@ func checkOptionalDependencies() []checkResult {
 		}
 	}
 
+	results = append(results, checkAdwGtk3())
+
 	return results
+}
+
+// Mirrors the search in quickshell/scripts/gtk.sh: user theme dirs, then XDG_DATA_DIRS.
+func checkAdwGtk3() checkResult {
+	optionalFeaturesURL := doctorDocsURL + "#optional-features"
+	home, _ := os.UserHomeDir()
+	dataHome := os.Getenv("XDG_DATA_HOME")
+	if dataHome == "" {
+		dataHome = filepath.Join(home, ".local", "share")
+	}
+	userRoots := []string{filepath.Join(dataHome, "themes"), filepath.Join(home, ".themes")}
+
+	dataDirs := os.Getenv("XDG_DATA_DIRS")
+	if dataDirs == "" {
+		dataDirs = "/usr/local/share:/usr/share"
+	}
+	var systemRoots []string
+	for _, d := range strings.Split(dataDirs, ":") {
+		if d != "" {
+			systemRoots = append(systemRoots, filepath.Join(d, "themes"))
+		}
+	}
+
+	locate := func(roots []string, variant string) bool {
+		for _, root := range roots {
+			if info, err := os.Stat(filepath.Join(root, "adw-gtk3"+variant, "gtk-3.0")); err == nil && info.IsDir() {
+				return true
+			}
+		}
+		return false
+	}
+
+	userLight := locate(userRoots, "")
+	userDark := locate(userRoots, "-dark")
+	sysLight := locate(systemRoots, "")
+	sysDark := locate(systemRoots, "-dark")
+
+	switch {
+	case userLight && userDark:
+		return checkResult{catOptionalFeatures, "adw-gtk3", statusOK, "Installed", "GTK3 dynamic theming (user copy)", optionalFeaturesURL}
+	case sysLight && sysDark:
+		return checkResult{catOptionalFeatures, "adw-gtk3", statusOK, "Installed", "GTK3 dynamic theming (system copy, applied on next theme apply)", optionalFeaturesURL}
+	case userLight || userDark || sysLight || sysDark:
+		missing := "adw-gtk3-dark"
+		if userDark || sysDark {
+			missing = "adw-gtk3"
+		}
+		return checkResult{catOptionalFeatures, "adw-gtk3", statusWarn, "Missing " + missing, "GTK3 dynamic theming needs both variants", optionalFeaturesURL}
+	default:
+		return checkResult{catOptionalFeatures, "adw-gtk3", statusInfo, "Not installed", "GTK3 dynamic theming; without it the global CSS override applies", optionalFeaturesURL}
+	}
 }
 
 func checkConfigurationFiles() []checkResult {
