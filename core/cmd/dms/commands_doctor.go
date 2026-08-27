@@ -1181,6 +1181,13 @@ func checkSystemdServices() []checkResult {
 		results = append(results, checkResult{catServices, "dms.service", status, message, "", doctorDocsURL + "#services"})
 	}
 
+	if dmsState.exists && dmsState.enabled == "enabled" {
+		gsState := getServiceState("graphical-session.target", true)
+		if gsState.exists && gsState.active != "active" {
+			results = append(results, checkResult{catServices, "graphical-session.target", statusWarn, "Inactive", "Compositor session never activated it, so dms.service cannot autostart. On Hyprland, hyprland-session.target must exist and be started by the compositor.", doctorDocsURL + "#services"})
+		}
+	}
+
 	greetdState := getServiceState("greetd", false)
 	switch {
 	case greetdState.exists:

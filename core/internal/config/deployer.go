@@ -690,6 +690,14 @@ func (cd *ConfigDeployer) deployHyprlandConfig(terminal deps.Terminal, useSystem
 		return result, result.Error
 	}
 
+	if useSystemd {
+		if targetPath, err := EnsureHyprlandSessionTarget(); err != nil {
+			cd.log(fmt.Sprintf("Warning: failed to write hyprland-session.target: %v", err))
+		} else {
+			cd.log(fmt.Sprintf("Ensured hyprland session target at %s", targetPath))
+		}
+	}
+
 	movedLegacy, err := backupLegacyHyprlandConfFiles(configDir, dmsDir, backupDir)
 	if err != nil {
 		result.Error = fmt.Errorf("failed to back up legacy hyprlang configs: %w", err)
