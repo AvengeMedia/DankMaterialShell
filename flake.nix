@@ -129,6 +129,7 @@
               postInstall = ''
                 mkdir -p $out/share/quickshell/dms
                 cp -r ${rootSrc}/quickshell/. $out/share/quickshell/dms/
+                rm -f $out/share/quickshell/dms/AGENTS.md $out/share/quickshell/dms/CLAUDE.md
 
                 rm -f $out/share/quickshell/dms/DankCommon
                 cp -r ${dank-qml-common}/DankCommon $out/share/quickshell/dms/DankCommon
