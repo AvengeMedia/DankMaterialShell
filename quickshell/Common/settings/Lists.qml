@@ -32,6 +32,8 @@ Singleton {
             showBatteryPercentOnlyOnBattery: false,
             showBatteryTime: false,
             showBatteryTimeOnlyOnBattery: false,
+            showBatteryPowerCharging: false,
+            showBatteryPowerDischarging: false,
             batteryPillStyle: false,
             showPrinterIcon: false,
             showScreenSharingIcon: true
@@ -96,6 +98,10 @@ Singleton {
                 item.showBatteryTime = order[i].showBatteryTime;
             if (isObj && order[i].showBatteryTimeOnlyOnBattery !== undefined)
                 item.showBatteryTimeOnlyOnBattery = order[i].showBatteryTimeOnlyOnBattery;
+            if (isObj && order[i].showBatteryPowerCharging !== undefined)
+                item.showBatteryPowerCharging = order[i].showBatteryPowerCharging;
+            if (isObj && order[i].showBatteryPowerDischarging !== undefined)
+                item.showBatteryPowerDischarging = order[i].showBatteryPowerDischarging;
             if (isObj && order[i].batteryPillStyle !== undefined)
                 item.batteryPillStyle = order[i].batteryPillStyle;
             if (isObj && order[i].showPrinterIcon !== undefined)

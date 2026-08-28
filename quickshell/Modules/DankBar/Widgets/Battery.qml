@@ -19,6 +19,14 @@ BasePill {
     readonly property bool showTime: widgetData?.showBatteryTime !== undefined ? widgetData.showBatteryTime : SettingsData.showBatteryTime
     readonly property bool showTimeOnlyOnBattery: widgetData?.showBatteryTimeOnlyOnBattery !== undefined ? widgetData.showBatteryTimeOnlyOnBattery : SettingsData.showBatteryTimeOnlyOnBattery
     readonly property bool pillStyle: widgetData?.batteryPillStyle !== undefined ? widgetData.batteryPillStyle : SettingsData.batteryPillStyle
+    readonly property bool showPowerCharging: widgetData?.showBatteryPowerCharging !== undefined ? widgetData.showBatteryPowerCharging : SettingsData.showBatteryPowerCharging
+    readonly property bool showPowerDischarging: widgetData?.showBatteryPowerDischarging !== undefined ? widgetData.showBatteryPowerDischarging : SettingsData.showBatteryPowerDischarging
+    readonly property bool showPower: BatteryService.isCharging ? showPowerCharging : showPowerDischarging
+
+    // Signed charge/discharge rate, e.g. "+45W" while charging, "-8.4W" while
+    // draining. Empty (and therefore hidden) whenever the battery is idle.
+    readonly property string batteryPowerText: showPower ? BatteryService.formatPowerRate(false) : ""
+    readonly property string verticalBatteryPowerText: showPower ? BatteryService.formatPowerRate(true) : ""
 
     readonly property string batteryTimeText: {
         if (showTimeOnlyOnBattery && BatteryService.isPluggedIn) {
@@ -53,37 +61,46 @@ BasePill {
     }
 
     readonly property string horizontalDisplayText: {
-        if (showPercent && showTime && batteryTimeText) {
-            return `${BatteryService.batteryLevel}% (${batteryTimeText})`;
-        }
+        const parts = [];
         if (showPercent) {
-            return `${BatteryService.batteryLevel}%`;
+            parts.push(`${BatteryService.batteryLevel}%`);
         }
         if (showTime && batteryTimeText) {
-            return batteryTimeText;
+            parts.push(showPercent ? `(${batteryTimeText})` : batteryTimeText);
         }
-        return "";
+        if (batteryPowerText) {
+            parts.push(batteryPowerText);
+        }
+        return parts.join(" ");
     }
 
-    // Percent always stays inside the pill; only the time shows beside it.
+    // Percent always stays inside the pill; time and wattage show beside it.
     readonly property string horizontalSideText: {
         if (!pillStyle) {
             return horizontalDisplayText;
         }
-        return (showTime && batteryTimeText) ? batteryTimeText : "";
+        const parts = [];
+        if (showTime && batteryTimeText) {
+            parts.push(batteryTimeText);
+        }
+        if (batteryPowerText) {
+            parts.push(batteryPowerText);
+        }
+        return parts.join(" ");
     }
 
     readonly property string verticalDisplayText: {
-        if (showPercent && showTime && batteryTimeText) {
-            return `${BatteryService.batteryLevel}\n${verticalBatteryTimeText}`;
-        }
+        const lines = [];
         if (showPercent) {
-            return BatteryService.batteryLevel.toString();
+            lines.push(BatteryService.batteryLevel.toString());
         }
         if (showTime && batteryTimeText) {
-            return verticalBatteryTimeText;
+            lines.push(verticalBatteryTimeText);
         }
-        return "";
+        if (verticalBatteryPowerText) {
+            lines.push(verticalBatteryPowerText);
+        }
+        return lines.join("\n");
     }
 
     property real touchpadAccumulator: 0
