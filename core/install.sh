@@ -79,7 +79,7 @@ chmod +x installer
 
 # Execute the installer
 printf "%bRunning installer...%b\n" "$GREEN" "$NC"
-./installer
+./installer "$@"
 
 # Cleanup
 cd - >/dev/null

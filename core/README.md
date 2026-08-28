@@ -157,17 +157,25 @@ curl -fsSL https://install.danklinux.com | sh
 
 **Headless (unattended):**
 
-Headless mode requires cached sudo credentials. Run `sudo -v` first:
+Headless mode requires cached credentials or a passwordless rule for your privilege escalation tool (sudo, doas, or run0). With sudo, run `sudo -v` first:
 
 ```bash
 sudo -v && curl -fsSL https://install.danklinux.com | sh -s -- -c niri -t ghostty -y
-sudo -v && curl -fsSL https://install.danklinux.com | sh -s -- -c hyprland -t kitty --include-deps dms-greeter -y
+sudo -v && curl -fsSL https://install.danklinux.com | sh -s -- -c hyprland -t kitty --dms-greeter -y
+sudo -v && curl -fsSL https://install.danklinux.com | sh -s -- -c niri -t ghostty --git-deps niri,quickshell --all-features -y
 ```
 
 | Flag | Short | Description |
 |------|-------|-------------|
-| `--compositor <niri|hyprland>` | `-c` | Compositor/WM to install (required for headless) |
-| `--term <ghostty|kitty|alacritty>` | `-t` | Terminal emulator (required for headless) |
+| `--compositor <niri\|hyprland\|mango>` | `-c` | Compositor/WM to install (required for headless) |
+| `--term <ghostty\|kitty\|alacritty>` | `-t` | Terminal emulator (required for headless) |
+| `--privesc <sudo\|doas\|run0>` | | Privilege escalation tool (default: autodetect) |
+| `--git` | | Install the git version of every dependency that has one |
+| `--git-deps <name,...>` | | Install the git version of specific dependencies (e.g. `niri,quickshell`) |
+| `--all-features` | | Enable all optional dependencies (`dms-greeter`, `danksearch`, `dankcalendar`) |
+| `--dms-greeter` | | Install dms-greeter |
+| `--danksearch` | | Install danksearch and enable its user indexing service |
+| `--dankcalendar` | | Install dankcalendar |
 | `--include-deps <name,...>` | | Enable optional dependencies (e.g. `dms-greeter`) |
 | `--exclude-deps <name,...>` | | Skip specific dependencies |
 | `--replace-configs <name,...>` | | Replace specific configuration files (mutually exclusive with `--replace-configs-all`) |
@@ -176,7 +184,7 @@ sudo -v && curl -fsSL https://install.danklinux.com | sh -s -- -c hyprland -t ki
 
 Headless mode requires `--yes` to proceed; without it, the installer exits with an error.
 Configuration files are not replaced by default unless `--replace-configs` or `--replace-configs-all` is specified.
-`dms-greeter` is disabled by default; use `--include-deps dms-greeter` to enable it.
+Optional packages (`dms-greeter`, `danksearch`, `dankcalendar`) are disabled by default; enable them with their dedicated flags, `--include-deps`, or `--all-features`.
 
 When no flags are provided, `dankinstall` launches the interactive TUI.
 
@@ -185,7 +193,7 @@ When no flags are provided, `dankinstall` launches the interactive TUI.
 Headless mode activates when `--compositor` or `--term` is provided.
 
 - Both `--compositor` and `--term` are required; providing only one results in an error.
-- Headless-only flags (`--include-deps`, `--exclude-deps`, `--replace-configs`, `--replace-configs-all`, `--yes`) are rejected in TUI mode.
+- Headless-only flags (`--privesc`, `--git`, `--git-deps`, `--all-features`, `--include-deps`, `--exclude-deps`, `--replace-configs`, `--replace-configs-all`, `--yes`, `--danksearch`, `--dankcalendar`, `--dms-greeter`) are rejected in TUI mode.
 - Positional arguments are not accepted.
 
 ### Log file location
