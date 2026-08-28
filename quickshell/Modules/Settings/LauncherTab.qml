@@ -813,7 +813,7 @@ Item {
                     spacing: Theme.spacingS
 
                     Repeater {
-                        model: ["dms_settings", "dms_notepad", "dms_sysmon", "dms_settings_search", "dms_clipboard_search", "dms_colorpicker", "dms_qr_generator"]
+                        model: ["dms_settings", "dms_notepad", "dms_sysmon", "dms_settings_search", "dms_clipboard_search", "dms_power", "dms_colorpicker", "dms_qr_generator"]
 
                         delegate: Rectangle {
                             id: pluginDelegate

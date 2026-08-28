@@ -1077,26 +1077,7 @@ Item {
 
     function _executePowerAction(action) {
         PopoutService.closeControlCenter();
-        switch (action) {
-        case "logout":
-            SessionService.logout();
-            break;
-        case "suspend":
-            SessionService.suspend();
-            break;
-        case "hibernate":
-            SessionService.hibernate();
-            break;
-        case "reboot":
-            SessionService.reboot();
-            break;
-        case "softreboot":
-            SessionService.softReboot();
-            break;
-        case "poweroff":
-            SessionService.poweroff();
-            break;
-        }
+        SessionService.executePowerAction(action);
     }
 
     function _lockFromPowerMenu() {

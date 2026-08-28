@@ -210,6 +210,17 @@ Singleton {
                 defaultTrigger: "",
                 isLauncher: false
             },
+            "dms_power": {
+                id: "dms_power",
+                name: I18n.tr("Power"),
+                cornerIcon: "power_settings_new",
+                comment: "DMS",
+                defaultTrigger: "pw",
+                isLauncher: true,
+                viewMode: "list",
+                viewModeEnforced: true,
+                defaultSectionPriority: 2.3
+            },
             "dms_qr_generator": {
                 id: "dms_qr_generator",
                 name: I18n.tr("QR Generator"),
@@ -308,7 +319,51 @@ Singleton {
         return result;
     }
 
+    readonly property var powerLauncherKeywords: ({
+            lock: ["lock"],
+            logout: ["logout", "exit", "sign out"],
+            suspend: ["suspend", "sleep"],
+            hibernate: ["hibernate"],
+            reboot: ["reboot", "restart"],
+            softreboot: ["soft reboot"],
+            poweroff: ["poweroff", "shutdown", "halt"],
+            restart: ["restart", "shell", "reload"]
+        })
+
+    function getPowerLauncherActions() {
+        const ids = ["lock", "logout", "suspend", "hibernate", "reboot", "softreboot", "poweroff", "restart"];
+        const customIds = (SettingsData.customPowerButtons || []).map((button, i) => "custom:" + i);
+        return ids.filter(a => SessionService.isPowerActionSupported(a)).concat(customIds).map(a => {
+            const data = SessionService.getPowerActionData(a);
+            return {
+                action: a,
+                name: data.label,
+                icon: data.icon,
+                keywords: powerLauncherKeywords[a] || []
+            };
+        }).filter(a => a.name);
+    }
+
     function getBuiltInLauncherItems(pluginId, query) {
+        if (pluginId === "dms_power") {
+            const q = (query || "").toString().trim().toLowerCase();
+            return getPowerLauncherActions().filter(a => {
+                if (!q)
+                    return true;
+                if (a.name.toLowerCase().includes(q))
+                    return true;
+                return a.keywords.some(k => k.includes(q));
+            }).map(a => ({
+                        name: a.name,
+                        icon: "material:" + a.icon,
+                        comment: I18n.tr("Power"),
+                        action: "power:" + a.action,
+                        keywords: a.keywords,
+                        isBuiltInLauncher: true,
+                        builtInPluginId: pluginId
+                    }));
+        }
+
         if (pluginId === "dms_clipboard_search") {
             const trimmed = (query || "").toString().trim();
             const entries = ClipboardService.getCachedLauncherSearchEntries(trimmed, 20).slice().sort((a, b) => {
@@ -379,8 +434,18 @@ Singleton {
         case "qr_generate":
             PopoutService.showQRGeneratorModal(parts.slice(1).join(":"));
             return true;
+        case "power":
+            return executePowerLauncherAction(parts.slice(1).join(":"));
         }
         return false;
+    }
+
+    function executePowerLauncherAction(action) {
+        if (action === "lock") {
+            IdleService.lockRequested();
+            return true;
+        }
+        return SessionService.executePowerAction(action);
     }
 
     function getCoreApps(query) {

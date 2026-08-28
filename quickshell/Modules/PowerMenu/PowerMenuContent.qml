@@ -1,5 +1,4 @@
 import QtQuick
-import Quickshell
 import Quickshell.Widgets
 import qs.Common
 import qs.Services
@@ -127,29 +126,15 @@ FocusScope {
     }
 
     function executeAction(action) {
+        closeRequested();
         if (action === "lock") {
-            closeRequested();
             lockRequested();
             return;
         }
-        if (action === "restart") {
-            closeRequested();
-            Quickshell.execDetached(["dms", "restart"]);
-            return;
-        }
         if (action === "switchuser") {
-            closeRequested();
             switchUserRequested();
             return;
         }
-        if (action.startsWith("custom:")) {
-            const button = (SettingsData.customPowerButtons || [])[parseInt(action.slice(7), 10)];
-            closeRequested();
-            if (button?.command)
-                Quickshell.execDetached(["sh", "-c", button.command]);
-            return;
-        }
-        closeRequested();
         root.powerActionRequested(action);
     }
 
@@ -181,13 +166,7 @@ FocusScope {
     function updateVisibleActions() {
         const allActions = SettingsData.powerMenuActions || ["reboot", "logout", "poweroff", "lock", "suspend", "restart"];
         const customButtons = SettingsData.customPowerButtons || [];
-        visibleActions = allActions.filter(action => {
-            if (action === "hibernate" && !SessionService.hibernateSupported)
-                return false;
-            if (action === "softreboot" && !SessionService.softRebootSupported)
-                return false;
-            return true;
-        }).concat(customButtons.map((button, i) => "custom:" + i));
+        visibleActions = allActions.filter(action => SessionService.isPowerActionSupported(action)).concat(customButtons.map((button, i) => "custom:" + i));
 
         if (!SettingsData.powerMenuGridLayout)
             return;
@@ -227,76 +206,7 @@ FocusScope {
     }
 
     function getActionData(action) {
-        if (action.startsWith("custom:")) {
-            const button = (SettingsData.customPowerButtons || [])[parseInt(action.slice(7), 10)];
-            return {
-                "icon": button?.icon || "terminal",
-                "label": button?.label || button?.command || "",
-                "key": ""
-            };
-        }
-        switch (action) {
-        case "reboot":
-            return {
-                "icon": "restart_alt",
-                "label": I18n.tr("Reboot"),
-                "key": "R"
-            };
-        case "softreboot":
-            return {
-                "icon": "autorenew",
-                "label": I18n.tr("Soft Reboot"),
-                "key": "B"
-            };
-        case "logout":
-            return {
-                "icon": "logout",
-                "label": I18n.tr("Log Out"),
-                "key": "X"
-            };
-        case "poweroff":
-            return {
-                "icon": "power_settings_new",
-                "label": I18n.tr("Power Off"),
-                "key": "P"
-            };
-        case "lock":
-            return {
-                "icon": "lock",
-                "label": I18n.tr("Lock"),
-                "key": "L"
-            };
-        case "suspend":
-            return {
-                "icon": "bedtime",
-                "label": I18n.tr("Suspend"),
-                "key": "S"
-            };
-        case "hibernate":
-            return {
-                "icon": "ac_unit",
-                "label": I18n.tr("Hibernate"),
-                "key": "H"
-            };
-        case "restart":
-            return {
-                "icon": "refresh",
-                "label": I18n.tr("Restart DMS"),
-                "key": "D"
-            };
-        case "switchuser":
-            return {
-                "icon": "switch_account",
-                "label": I18n.tr("Switch User"),
-                "key": "U"
-            };
-        default:
-            return {
-                "icon": "help",
-                "label": action,
-                "key": "?"
-            };
-        }
+        return SessionService.getPowerActionData(action);
     }
 
     function selectOption(action, actionIndex) {

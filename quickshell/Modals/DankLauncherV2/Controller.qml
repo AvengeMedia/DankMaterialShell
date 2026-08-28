@@ -1537,9 +1537,12 @@ Item {
             var meta = getPluginMetadata(pluginId);
             var viewPref = getPluginViewPref(pluginId);
             var orderIdx = orderMap[pluginId];
+            var defaultPriority = AppSearchService.builtInPlugins[pluginId]?.defaultSectionPriority;
             var priority;
             if (orderIdx !== undefined) {
                 priority = 2.6 + orderIdx * 0.01;
+            } else if (defaultPriority !== undefined) {
+                priority = defaultPriority;
             } else {
                 priority = unorderedPriority;
                 unorderedPriority += 0.01;
