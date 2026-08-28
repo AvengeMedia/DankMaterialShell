@@ -225,10 +225,9 @@ Rectangle {
 
     function cycleAction(reverse = false) {
         if (actions.length > 0) {
-            if (!reverse)
-                selectedActionIndex = (selectedActionIndex + 1) % actions.length;
-            else
-                selectedActionIndex = (selectedActionIndex - 1) % actions.length;
+            selectedActionIndex = reverse
+                ? (selectedActionIndex - 1 + actions.length) % actions.length
+                : (selectedActionIndex + 1) % actions.length;
             ensureSelectedVisible();
         }
     }
