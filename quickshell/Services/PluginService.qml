@@ -76,7 +76,7 @@ Singleton {
     Process {
         id: directoryCheckProcess
         command: ["test", "-d", root.pluginDirectory]
-        onExited: (exitCode) => {
+        onExited: exitCode => {
             root.pluginDirectoryExists = (exitCode === 0);
         }
     }
@@ -210,7 +210,9 @@ Singleton {
                 fv.destroy();
             }
             onLoadFailed: err => {
-                root.log.warn("manifest load failed", absPath, err);
+                // a directory without plugin.json is not a plugin, not a failed one (#3112)
+                if (err !== FileViewError.FileNotFound)
+                    root.log.warn("manifest load failed", absPath, err);
                 fv.destroy();
             }
         }
@@ -1198,7 +1200,7 @@ Singleton {
         return result;
     }
 
-    readonly property string _ipcIdPattern: "^[a-zA-Z0-9_\\-:]{1,64}$";
+    readonly property string _ipcIdPattern: "^[a-zA-Z0-9_\\-:]{1,64}$"
 
     IpcHandler {
         target: "plugin-scan"
