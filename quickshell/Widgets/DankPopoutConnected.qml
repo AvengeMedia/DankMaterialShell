@@ -680,37 +680,31 @@ Item {
     readonly property real alignedHeight: Theme.px(popupHeight, dpr)
     readonly property var _geometrySpringParams: Theme.springPreset("default", root.animationDuration)
 
-    SpringMotion {
-        id: geometryYSpring
-        enabled: root.animationsEnabled && contentWindow.visible && root.shouldBeVisible && !root._settlingToOpen
-        reducedMotion: root.animationDuration <= 0
-        positionEpsilon: 0.05
-        velocityEpsilon: 0.05
-        stiffness: root._geometrySpringParams.stiffness
-        damping: root._geometrySpringParams.damping
-        value: root.alignedY
-    }
-
-    SpringMotion {
-        id: geometryHSpring
-        enabled: root.animationsEnabled && contentWindow.visible && root.shouldBeVisible && !root._settlingToOpen
-        reducedMotion: root.animationDuration <= 0
-        positionEpsilon: 0.05
-        velocityEpsilon: 0.05
-        stiffness: root._geometrySpringParams.stiffness
-        damping: root._geometrySpringParams.damping
-        value: root.alignedHeight
-    }
-
-    property real renderedAlignedY: geometryYSpring.value
-    property real renderedAlignedHeight: geometryHSpring.value
+    property real renderedAlignedY: alignedY
+    property real renderedAlignedHeight: alignedHeight
     readonly property bool renderedGeometryGrowing: alignedHeight >= renderedAlignedHeight
     readonly property bool _settlingToOpen: fullHeightSurface && shouldBeVisible && morph.running
 
-    onAlignedYChanged: {
-        geometryYSpring.retarget(root.alignedY);
-        _queueFullSync();
+    // content animates on these curves; springs here drift and overshoot it
+    Behavior on renderedAlignedY {
+        enabled: root.animationsEnabled && contentWindow.visible && root.shouldBeVisible && !root._settlingToOpen
+        NumberAnimation {
+            duration: Theme.variantDuration(root.animationDuration, root.renderedGeometryGrowing)
+            easing.type: Easing.BezierSpline
+            easing.bezierCurve: root.renderedGeometryGrowing ? root.animationEnterCurve : root.animationExitCurve
+        }
     }
+
+    Behavior on renderedAlignedHeight {
+        enabled: root.animationsEnabled && contentWindow.visible && root.shouldBeVisible && !root._settlingToOpen
+        NumberAnimation {
+            duration: Theme.variantDuration(root.animationDuration, root.renderedGeometryGrowing)
+            easing.type: Easing.BezierSpline
+            easing.bezierCurve: root.renderedGeometryGrowing ? root.animationEnterCurve : root.animationExitCurve
+        }
+    }
+
+    onAlignedYChanged: _queueFullSync()
 
     // Morph transition coordinates to animate travel between popouts during switch.
     property bool morphTravelEnabled: false
@@ -836,7 +830,6 @@ Item {
     }
 
     onAlignedHeightChanged: {
-        geometryHSpring.retarget(root.alignedHeight);
         _queueFullSync();
         if (!suspendShadowWhileResizing || !shouldBeVisible)
             return;
