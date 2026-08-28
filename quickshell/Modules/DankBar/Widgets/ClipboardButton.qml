@@ -11,6 +11,7 @@ BasePill {
 
     property bool isActive: false
     property bool isAutoHideBar: false
+    property bool dropConfirmed: false
 
     signal clipboardClicked
     signal showSavedItemsRequested
@@ -31,6 +32,50 @@ BasePill {
 
     function clamp(value, minValue, maxValue) {
         return Math.max(minValue, Math.min(maxValue, value));
+    }
+
+    function handleDrop(drop) {
+        if (!ClipboardService.clipboardAvailable)
+            return;
+
+        if (drop.hasUrls && drop.urls.length > 0) {
+            const url = drop.urls[0].toString();
+            if (url.startsWith("file://")) {
+                const filePath = decodeURIComponent(url.substring(7));
+                DMSService.sendRequest("clipboard.copyFile", { "filePath": filePath }, response => {
+                    if (response.error) {
+                        ToastService.showError(I18n.tr("Failed to save dropped file"));
+                        return;
+                    }
+                    root.showDropConfirmation();
+                });
+                return;
+            }
+        }
+
+        if (drop.hasText && drop.text.length > 0) {
+            DMSService.sendRequest("clipboard.store", {
+                "data": drop.text,
+                "mimeType": "text/plain;charset=utf-8"
+            }, response => {
+                if (response.error) {
+                    ToastService.showError(I18n.tr("Failed to save dropped text"));
+                    return;
+                }
+                root.showDropConfirmation();
+            });
+        }
+    }
+
+    function showDropConfirmation() {
+        dropConfirmed = true;
+        dropConfirmationTimer.restart();
+    }
+
+    Timer {
+        id: dropConfirmationTimer
+        interval: 1200
+        onTriggered: root.dropConfirmed = false
     }
 
     function openContextMenu() {
@@ -84,12 +129,32 @@ BasePill {
             implicitWidth: icon.width
             implicitHeight: root.widgetThickness - root.horizontalPadding * 2
 
+            property bool draggingOver: false
+
+            DropArea {
+                anchors.fill: parent
+                onEntered: draggingOver = true
+                onExited: draggingOver = false
+                onDropped: drop => {
+                    draggingOver = false;
+                    root.handleDrop(drop);
+                }
+            }
+
             DankIcon {
                 id: icon
                 anchors.centerIn: parent
-                name: "content_paste"
+                name: root.dropConfirmed ? "check" : "content_paste"
                 size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
-                color: Theme.widgetIconColor
+                color: root.dropConfirmed || draggingOver ? Theme.primary : Theme.widgetIconColor
+                scale: draggingOver ? 1.2 : 1.0
+
+                Behavior on color {
+                    ColorAnimation { duration: 150 }
+                }
+                Behavior on scale {
+                    NumberAnimation { duration: 200; easing.type: Easing.OutBack }
+                }
             }
         }
     }
