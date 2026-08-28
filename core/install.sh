@@ -47,6 +47,7 @@ printf "%bInstalling Dankinstall %s for %s...%b\n" "$GREEN" "$LATEST_VERSION" "$
 
 # Download and install
 TEMP_DIR=$(mktemp -d)
+trap 'cd / && rm -rf "$TEMP_DIR"' EXIT
 cd "$TEMP_DIR" || exit 1
 
 # Download the gzipped binary and its checksum
@@ -67,8 +68,6 @@ if [ "$EXPECTED_CHECKSUM" != "$ACTUAL_CHECKSUM" ]; then
     printf "Expected: %s\n" "$EXPECTED_CHECKSUM"
     printf "Got:      %s\n" "$ACTUAL_CHECKSUM"
     printf "The downloaded file may be corrupted or tampered with\n"
-    cd - >/dev/null
-    rm -rf "$TEMP_DIR"
     exit 1
 fi
 
@@ -79,8 +78,4 @@ chmod +x installer
 
 # Execute the installer
 printf "%bRunning installer...%b\n" "$GREEN" "$NC"
-./installer
-
-# Cleanup
-cd - >/dev/null
-rm -rf "$TEMP_DIR"
+./installer "$@"
