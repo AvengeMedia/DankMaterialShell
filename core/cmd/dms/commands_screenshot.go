@@ -377,7 +377,7 @@ func copyImageToClipboard(buf *screenshot.ShmBuffer, format screenshot.Format, q
 	switch format {
 	case screenshot.FormatJPEG:
 		mimeType = "image/jpeg"
-		if err := screenshot.EncodeJPEG(&data, screenshot.BufferToImageWithFormat(buf, pixelFormat), quality); err != nil {
+		if err := screenshot.EncodeBufferJPEG(&data, buf, pixelFormat, quality); err != nil {
 			return err
 		}
 	default:
@@ -393,7 +393,7 @@ func copyImageToClipboard(buf *screenshot.ShmBuffer, format screenshot.Format, q
 func writeImageToStdout(buf *screenshot.ShmBuffer, format screenshot.Format, quality int, pixelFormat uint32, cicp *screenshot.CICP) error {
 	switch format {
 	case screenshot.FormatJPEG:
-		return screenshot.EncodeJPEG(os.Stdout, screenshot.BufferToImageWithFormat(buf, pixelFormat), quality)
+		return screenshot.EncodeBufferJPEG(os.Stdout, buf, pixelFormat, quality)
 	default:
 		return screenshot.EncodeBufferPNG(os.Stdout, buf, pixelFormat, cicp)
 	}
