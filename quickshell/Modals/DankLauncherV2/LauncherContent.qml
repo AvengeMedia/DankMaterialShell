@@ -212,13 +212,20 @@ FocusScope {
             event.accepted = false;
             return;
         case Qt.Key_Tab:
-            if (actionPanel.hasActions) {
+            if (hasCtrl) {
+                actionPanel.hide();
+                controller.cycleMode();
+            } else if (actionPanel.hasActions) {
                 actionPanel.expanded ? actionPanel.cycleAction() : actionPanel.show();
             }
             return;
         case Qt.Key_Backtab:
-            if (actionPanel.expanded)
+            if (hasCtrl) {
                 actionPanel.hide();
+                controller.cycleMode(true);
+            } else if (actionPanel.hasActions) {
+                actionPanel.expanded ? actionPanel.cycleAction(true) : actionPanel.show();
+            }
             return;
         case Qt.Key_Return:
         case Qt.Key_Enter:
