@@ -240,7 +240,6 @@ Singleton {
     property bool padHours12Hour: false
     property bool useFahrenheit: false
     property string windSpeedUnit: "kmh"
-    property bool nightModeEnabled: false
     property int animationSpeed: SettingsData.AnimationSpeed.Short
     property int customAnimationDuration: 500
     property bool syncComponentAnimationSpeeds: true

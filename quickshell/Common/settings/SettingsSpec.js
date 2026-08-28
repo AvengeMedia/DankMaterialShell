@@ -85,7 +85,6 @@ var SPEC = {
     padHours12Hour: { def: false, onChange: "markGreeterSyncPending" },
     useFahrenheit: { def: false },
     windSpeedUnit: { def: "kmh" },
-    nightModeEnabled: { def: false },
     animationSpeed: { def: 1 },
     customAnimationDuration: { def: 500 },
     syncComponentAnimationSpeeds: { def: true },
