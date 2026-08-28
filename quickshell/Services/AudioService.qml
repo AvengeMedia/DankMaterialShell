@@ -641,16 +641,14 @@ EOFCONFIG
                 for theme in ${themesToSearch}; do
                     for event_name in $names; do
                         for base_path in ${searchPaths.join(" ")}; do
-                            sounds_path="$base_path/sounds"
-                            for ext in ${extensions.join(" ")}; do
-                                file_path="$sounds_path/$theme/stereo/$event_name.$ext"
-                                if [ -f "$file_path" ]; then
-                                    echo "$event_key=$file_path"
-                                    found=1
-                                    break
-                                fi
-                            done
-                            [ $found -eq 1 ] && break
+                            theme_dir="$base_path/sounds/$theme"
+                            [ -d "$theme_dir" ] || continue
+                            file_path=$(find -L "$theme_dir" \\( ${extensions.map(e => `-name "$event_name.${e}"`).join(" -o ")} \\) -print 2>/dev/null | sort | head -1)
+                            if [ -n "$file_path" ]; then
+                                echo "$event_key=$file_path"
+                                found=1
+                                break
+                            fi
                         done
                         [ $found -eq 1 ] && break
                     done
