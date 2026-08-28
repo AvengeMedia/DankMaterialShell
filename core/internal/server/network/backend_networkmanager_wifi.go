@@ -345,11 +345,10 @@ func (b *NetworkManagerBackend) ConnectWiFi(req ConnectionRequest) error {
 }
 
 func (b *NetworkManagerBackend) DisconnectWiFi() error {
-	if b.wifiDevice == nil {
+	dev, _ := b.wifiDeviceForState()
+	if dev == nil {
 		return fmt.Errorf("no WiFi device available")
 	}
-
-	dev := b.wifiDevice.(gonetworkmanager.Device)
 
 	err := dev.Disconnect()
 	if err != nil {
