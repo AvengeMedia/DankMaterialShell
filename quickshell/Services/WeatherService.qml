@@ -9,6 +9,7 @@ import "../Common/suncalc.js" as SunCalc
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("WeatherService")
 
     property int refCount: 0
 
@@ -691,12 +692,17 @@ Singleton {
         }
     }
 
-    function handleWeatherFailure() {
+    property string lastFetchError: ""
+
+    function handleWeatherFailure(reason) {
+        if (reason)
+            root.lastFetchError = reason;
         root.retryAttempts++;
         if (root.retryAttempts < root.maxRetryAttempts) {
             retryTimer.start();
         } else {
             root.retryAttempts = 0;
+            log.warn("Weather fetch failed:", root.lastFetchError || "no output from fetcher");
             if (!root.weather.available) {
                 root.weather.loading = false;
             }
@@ -911,11 +917,15 @@ Singleton {
         id: weatherFetcher
         running: false
 
+        stderr: StdioCollector {
+            id: weatherFetchErr
+        }
+
         stdout: StdioCollector {
             onStreamFinished: {
                 const raw = text.trim();
                 if (!raw || raw[0] !== "{") {
-                    root.handleWeatherFailure();
+                    root.handleWeatherFailure(weatherFetchErr.text.trim());
                     return;
                 }
 
@@ -996,6 +1006,7 @@ Singleton {
                     const feelsLikeC = current.apparent_temperature || tempC;
                     const feelsLikeF = feelsLikeC * 9 / 5 + 32;
 
+                    root.lastFetchError = "";
                     root.weather = {
                         "available": true,
                         "loading": false,

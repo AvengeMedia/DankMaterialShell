@@ -185,6 +185,16 @@ Item {
                 }
             }
         }
+
+        StyledText {
+            text: WeatherService.lastFetchError
+            visible: text.length > 0
+            font.pixelSize: Theme.fontSizeSmall
+            color: Theme.withAlpha(Theme.surfaceText, 0.5)
+            width: Math.min(implicitWidth, 420)
+            elide: Text.ElideRight
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
     }
 
     Column {
