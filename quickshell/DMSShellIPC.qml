@@ -1090,6 +1090,10 @@ Item {
             return SettingsData.getCurrentSettingsJson();
         }
 
+        function dumpSession(): string {
+            return SessionData.getCurrentSessionJson();
+        }
+
         function set(key: string, value: string): string {
             if (!(key in SettingsData)) {
                 log.warn("Cannot set property, not found:", key);
