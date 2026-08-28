@@ -2,6 +2,7 @@ package brightness
 
 import (
 	"fmt"
+	"os"
 	"sort"
 	"strings"
 	"time"
@@ -41,6 +42,10 @@ func (m *Manager) initLogind() {
 }
 
 func (m *Manager) initDDC() {
+	if os.Getenv("DMS_NO_DDC") != "" {
+		log.Info("DDC backend disabled via DMS_NO_DDC")
+		return
+	}
 	ddc, err := NewDDCBackend()
 	if err != nil {
 		log.Debugf("Failed to initialize DDC backend: %v", err)
