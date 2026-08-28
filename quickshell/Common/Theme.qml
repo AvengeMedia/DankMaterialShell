@@ -325,7 +325,22 @@ Singleton {
         }
     }
 
-    readonly property var availableMatugenSchemes: [({
+    readonly property var availableMatugenSchemes: {
+        const schemes = _matugenSchemeDefs;
+        const seen = {};
+        for (let i = 0; i < schemes.length; i++) {
+            const label = schemes[i].label;
+            if (seen[label] === undefined) {
+                seen[label] = true;
+                continue;
+            }
+            // duplicate translations otherwise collapse the label-keyed dropdown onto one scheme (#3154)
+            schemes[i].label = label + " (" + schemes[i].value.replace("scheme-", "") + ")";
+        }
+        return schemes;
+    }
+
+    readonly property var _matugenSchemeDefs: [({
                 "value": "scheme-tonal-spot",
                 "label": I18n.tr("Tonal Spot", "matugen color scheme option"),
                 "description": I18n.tr("Balanced palette with focused accents (default).")
@@ -1952,17 +1967,26 @@ Singleton {
     // Returns numeric fillMode value for shader use (matches shader calculateUV logic)
     function getShaderFillMode(modeName) {
         switch (modeName) {
-        case "Stretch": return 0;
+        case "Stretch":
+            return 0;
         case "Fit":
-        case "PreserveAspectFit": return 1;
+        case "PreserveAspectFit":
+            return 1;
         case "Fill":
-        case "PreserveAspectCrop": return 2;
-        case "Tile": return 3;
-        case "TileVertically": return 4;
-        case "TileHorizontally": return 5;
-        case "Pad": return 6;
-        case "Scrolling": return 7;
-        default: return 2;
+        case "PreserveAspectCrop":
+            return 2;
+        case "Tile":
+            return 3;
+        case "TileVertically":
+            return 4;
+        case "TileHorizontally":
+            return 5;
+        case "Pad":
+            return 6;
+        case "Scrolling":
+            return 7;
+        default:
+            return 2;
         }
     }
 
