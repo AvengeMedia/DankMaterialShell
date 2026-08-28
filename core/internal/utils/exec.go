@@ -79,7 +79,7 @@ func EnvWithUserBinPath(env []string) []string {
 		}
 	}
 
-	prepend := make([]string, 0, 2)
+	prepend := make([]string, 0, len(userBinDirs()))
 	for _, dir := range userBinDirs() {
 		if dir == "" {
 			continue
@@ -104,7 +104,13 @@ func EnvWithUserBinPath(env []string) []string {
 func userBinDirs() []string {
 	dirs := []string{}
 	if home, err := os.UserHomeDir(); err == nil && home != "" {
-		dirs = append(dirs, filepath.Join(home, ".local", "bin"))
+		dirs = append(dirs,
+			filepath.Join(home, ".local", "bin"),
+			filepath.Join(home, ".nix-profile", "bin"),
+		)
+		if user := filepath.Base(home); user != "" && user != string(filepath.Separator) {
+			dirs = append(dirs, filepath.Join("/etc/profiles/per-user", user, "bin"))
+		}
 	}
 	dirs = append(dirs, "/usr/local/bin")
 	return dirs

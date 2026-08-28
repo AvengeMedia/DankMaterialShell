@@ -601,6 +601,7 @@ func appendConfigContent(
 		return
 	}
 	if !appExists(opts.AppChecker, checkCmd, checkFlatpaks) && !configDirExists(checkConfigDirs) {
+		log.Debugf("Skipping template %s: app not detected", strings.TrimSuffix(fileName, ".toml"))
 		return
 	}
 	data, err := os.ReadFile(configPath)
@@ -628,6 +629,7 @@ func appendTerminalConfig(opts *Options, cfgFile *os.File, tmpDir string, checkC
 		return
 	}
 	if !appExists(opts.AppChecker, checkCmd, checkFlatpaks) {
+		log.Debugf("Skipping template %s: app not detected", strings.TrimSuffix(fileName, ".toml"))
 		return
 	}
 	data, err := os.ReadFile(configPath)
