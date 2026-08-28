@@ -793,6 +793,7 @@ Rectangle {
                 onTextChanged: {
                     SettingsSearchService.search(text);
                     root.searchSelectedIndex = 0;
+                    sidebarFlickable.contentY = 0;
                     Qt.callLater(root.ensureSearchResultVisible);
                 }
                 keyForwardTargets: [keyHandler]
