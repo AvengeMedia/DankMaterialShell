@@ -1065,45 +1065,72 @@ Item {
         PowerMenuModal {
             id: powerMenuModal
 
-            onPowerActionRequested: (action, title, message) => {
-                PopoutService.closeControlCenter();
-                switch (action) {
-                case "logout":
-                    SessionService.logout();
-                    break;
-                case "suspend":
-                    SessionService.suspend();
-                    break;
-                case "hibernate":
-                    SessionService.hibernate();
-                    break;
-                case "reboot":
-                    SessionService.reboot();
-                    break;
-                case "softreboot":
-                    SessionService.softReboot();
-                    break;
-                case "poweroff":
-                    SessionService.poweroff();
-                    break;
-                }
-            }
-
-            onLockRequested: {
-                PopoutService.closeControlCenter();
-                lock.activate();
-            }
-
-            onSwitchUserRequested: {
-                switchUserModalLoader.active = true;
-                Qt.callLater(() => {
-                    if (switchUserModalLoader.loadedModal)
-                        switchUserModalLoader.loadedModal.showFromPowerMenu();
-                });
-            }
+            onPowerActionRequested: (action, title, message) => root._executePowerAction(action)
+            onLockRequested: root._lockFromPowerMenu()
+            onSwitchUserRequested: root._switchUserFromPowerMenu()
 
             Component.onCompleted: {
                 PopoutService.powerMenuModal = powerMenuModal;
+            }
+        }
+    }
+
+    function _executePowerAction(action) {
+        PopoutService.closeControlCenter();
+        switch (action) {
+        case "logout":
+            SessionService.logout();
+            break;
+        case "suspend":
+            SessionService.suspend();
+            break;
+        case "hibernate":
+            SessionService.hibernate();
+            break;
+        case "reboot":
+            SessionService.reboot();
+            break;
+        case "softreboot":
+            SessionService.softReboot();
+            break;
+        case "poweroff":
+            SessionService.poweroff();
+            break;
+        }
+    }
+
+    function _lockFromPowerMenu() {
+        PopoutService.closeControlCenter();
+        lock.activate();
+    }
+
+    function _switchUserFromPowerMenu() {
+        switchUserModalLoader.active = true;
+        Qt.callLater(() => {
+            if (switchUserModalLoader.loadedModal)
+                switchUserModalLoader.loadedModal.showFromPowerMenu();
+        });
+    }
+
+    LazyLoader {
+        id: powerMenuPopoutLoader
+
+        active: false
+
+        Component.onCompleted: {
+            PopoutService.powerMenuPopoutLoader = powerMenuPopoutLoader;
+        }
+
+        PowerMenuPopout {
+            id: powerMenuPopout
+
+            onPowerActionRequested: action => root._executePowerAction(action)
+            onLockRequested: root._lockFromPowerMenu()
+            onSwitchUserRequested: root._switchUserFromPowerMenu()
+            onPopoutClosed: PopoutService.unloadPowerMenuPopout()
+
+            Component.onCompleted: {
+                PopoutService.powerMenuPopout = powerMenuPopout;
             }
         }
     }

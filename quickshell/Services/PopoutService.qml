@@ -42,6 +42,8 @@ Singleton {
     property var spotlightBarModalLoader: null
     property var powerMenuModal: null
     property var powerMenuModalLoader: null
+    property var powerMenuPopout: null
+    property var powerMenuPopoutLoader: null
     property var processListModal: null
     property var processListModalLoader: null
     property var colorPickerModal: null
@@ -121,6 +123,7 @@ Singleton {
             "battery": () => _unloadPopoutNow("batteryPopout", "batteryPopoutLoader"),
             "vpn": () => _unloadPopoutNow("vpnPopout", "vpnPopoutLoader"),
             "colorPicker": () => _unloadPopoutNow("colorPickerPopout", "colorPickerPopoutLoader"),
+            "powerMenuPopout": () => _unloadPopoutNow("powerMenuPopout", "powerMenuPopoutLoader"),
             "systemUpdate": () => _unloadPopoutNow("systemUpdatePopout", "systemUpdateLoader"),
             "layout": () => _unloadPopoutNow("layoutPopout", "layoutPopoutLoader"),
             "clipboardHistory": () => _unloadPopoutNow("clipboardHistoryPopout", "clipboardHistoryPopoutLoader"),
@@ -968,6 +971,10 @@ Singleton {
 
     function unloadColorPicker() {
         _scheduleUnload("colorPicker");
+    }
+
+    function unloadPowerMenuPopout() {
+        _scheduleUnload("powerMenuPopout");
     }
 
     function ensureBluetoothPairingModal() {
