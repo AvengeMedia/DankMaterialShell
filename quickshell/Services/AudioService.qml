@@ -99,7 +99,7 @@ Singleton {
 
     function getAvailableSinks() {
         const hidden = SessionData.hiddenOutputDeviceNames ?? [];
-        return Pipewire.nodes.values.filter(node => node.audio && node.isSink && !node.isStream && !hidden.includes(node.name));
+        return Pipewire.nodes.values.filter(node => node.audio && node.isSink && (SettingsData.audioShowStreamDevices || !node.isStream) && !hidden.includes(node.name));
     }
 
     property list<PwNode> typedSinks: []
@@ -109,7 +109,7 @@ Singleton {
         const newSinks = [];
         const newSources = [];
         for (const node of Pipewire.nodes.values) {
-            if (!node?.audio || node.isStream)
+            if (!node?.audio || (node.isStream && !SettingsData.audioShowStreamDevices))
                 continue;
             if (node.isSink)
                 newSinks.push(node);
@@ -123,6 +123,13 @@ Singleton {
     Connections {
         target: Pipewire.nodes
         function onValuesChanged() {
+            root.rebuildTypedNodeLists();
+        }
+    }
+
+    Connections {
+        target: SettingsData
+        function onAudioShowStreamDevicesChanged() {
             root.rebuildTypedNodeLists();
         }
     }
@@ -958,7 +965,7 @@ EOFCONFIG
     }
 
     PwObjectTracker {
-        objects: Pipewire.nodes.values.filter(node => node.audio && !node.isStream)
+        objects: Pipewire.nodes.values.filter(node => node.audio && (SettingsData.audioShowStreamDevices || !node.isStream))
     }
 
     function setVolume(percentage) {

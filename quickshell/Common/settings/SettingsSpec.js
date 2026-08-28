@@ -79,6 +79,7 @@ var SPEC = {
     showWeekNumber: { def: false },
     calendarBackend: { def: "auto" },
     defaultTaskCalendarId: { def: "" },
+    audioShowStreamDevices: { def: false },
     clockFormat: { def: "auto", onChange: "markGreeterSyncPending" },
     showSeconds: { def: false, onChange: "markGreeterSyncPending" },
     padHours12Hour: { def: false, onChange: "markGreeterSyncPending" },
