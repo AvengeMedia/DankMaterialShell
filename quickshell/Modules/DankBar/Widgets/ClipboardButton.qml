@@ -39,10 +39,10 @@ BasePill {
             return;
 
         if (drop.hasUrls && drop.urls.length > 0) {
-            const url = drop.urls[0].toString();
-            if (url.startsWith("file://")) {
+            const fileUrls = drop.urls.map(url => url.toString()).filter(url => url.startsWith("file://"));
+            if (fileUrls.length > 0) {
                 DMSService.sendRequest("clipboard.store", {
-                    "data": url,
+                    "data": fileUrls.join("\r\n"),
                     "mimeType": "text/uri-list"
                 }, response => {
                     if (response.error) {
