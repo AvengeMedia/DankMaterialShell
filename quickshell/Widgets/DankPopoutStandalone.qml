@@ -314,7 +314,7 @@ Item {
     }
 
     onAlignedYChanged: {
-        geometryYSpring.retarget(root.alignedY)
+        geometryYSpring.retarget(root.alignedY);
         if (shouldBeVisible)
             _setAnimatedSurfaceEnvelope();
         _kickBlurCommit();
@@ -474,10 +474,11 @@ Item {
     property real renderedAlignedHeight: geometryHSpring.value
     readonly property bool renderedGeometryGrowing: alignedHeight >= renderedAlignedHeight
     // Snap rendered geometry while the entrance morph runs so it doesn't ride a second animation.
-    readonly property bool _settlingToOpen: _fullHeight && shouldBeVisible && morph.running
+    // Positioner-based content lays out in the polish pass after open(), so first-open height lands late for every popout, not just full-height ones.
+    readonly property bool _settlingToOpen: shouldBeVisible && morph.running
 
     onAlignedHeightChanged: {
-        geometryHSpring.retarget(root.alignedHeight)
+        geometryHSpring.retarget(root.alignedHeight);
         if (shouldBeVisible)
             _setAnimatedSurfaceEnvelope();
         _kickBlurCommit();
