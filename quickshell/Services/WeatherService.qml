@@ -557,6 +557,13 @@ Singleton {
     }
 
     function getLocationFromCoords(lat, lon) {
+        const configuredName = SettingsData.weatherLocation;
+        if (configuredName) {
+            setLocation(lat, lon, configuredName, "");
+            fetchWeather(lat, lon);
+            return;
+        }
+
         // Use coordinates immediately for weather; resolve city name in parallel with fallbacks
         setLocation(lat, lon, I18n.tr("Local Weather"), "");
         fetchWeather(lat, lon);
