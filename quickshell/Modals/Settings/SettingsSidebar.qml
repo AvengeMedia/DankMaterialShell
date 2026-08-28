@@ -730,6 +730,25 @@ Rectangle {
         if (SettingsSearchService.results.length === 0)
             return;
         searchSelectedIndex = Math.max(0, Math.min(searchSelectedIndex + delta, SettingsSearchService.results.length - 1));
+        Qt.callLater(ensureSearchResultVisible);
+    }
+
+    function ensureSearchResultVisible() {
+        const result = searchResultsRepeater.itemAt(searchSelectedIndex);
+        const contentItem = sidebarFlickable.contentItem;
+        if (!result || !contentItem)
+            return;
+
+        const mapped = result.mapToItem(contentItem, 0, 0);
+        const margin = Theme.spacingS;
+        const top = mapped.y;
+        const bottom = top + result.height;
+        const maxContentY = Math.max(0, sidebarFlickable.contentHeight - sidebarFlickable.height);
+        if (top < sidebarFlickable.contentY + margin) {
+            sidebarFlickable.contentY = Math.max(0, top - margin);
+        } else if (bottom > sidebarFlickable.contentY + sidebarFlickable.height - margin) {
+            sidebarFlickable.contentY = Math.min(maxContentY, bottom - sidebarFlickable.height + margin);
+        }
     }
 
     DankFlickable {
@@ -774,6 +793,8 @@ Rectangle {
                 onTextChanged: {
                     SettingsSearchService.search(text);
                     root.searchSelectedIndex = 0;
+                    sidebarFlickable.contentY = 0;
+                    Qt.callLater(root.ensureSearchResultVisible);
                 }
                 keyForwardTargets: [keyHandler]
 
@@ -844,6 +865,7 @@ Rectangle {
                 }
 
                 Repeater {
+                    id: searchResultsRepeater
                     model: ScriptModel {
                         values: SettingsSearchService.results
                     }
