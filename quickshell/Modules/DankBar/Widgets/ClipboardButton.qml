@@ -41,8 +41,10 @@ BasePill {
         if (drop.hasUrls && drop.urls.length > 0) {
             const url = drop.urls[0].toString();
             if (url.startsWith("file://")) {
-                const filePath = decodeURIComponent(url.substring(7));
-                DMSService.sendRequest("clipboard.copyFile", { "filePath": filePath }, response => {
+                DMSService.sendRequest("clipboard.store", {
+                    "data": url,
+                    "mimeType": "text/uri-list"
+                }, response => {
                     if (response.error) {
                         ToastService.showError(I18n.tr("Failed to save dropped file"));
                         return;
@@ -133,10 +135,12 @@ BasePill {
 
             DropArea {
                 anchors.fill: parent
+                anchors.margins: -root.horizontalPadding
                 onEntered: draggingOver = true
                 onExited: draggingOver = false
                 onDropped: drop => {
                     draggingOver = false;
+                    drop.accept(Qt.CopyAction);
                     root.handleDrop(drop);
                 }
             }
