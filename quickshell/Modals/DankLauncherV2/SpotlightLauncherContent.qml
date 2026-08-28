@@ -22,6 +22,7 @@ FocusScope {
     readonly property real _searchBarH: 56
     readonly property real _searchAreaH: _searchBarH
     readonly property alias searchAreaHeight: root._searchAreaH
+    readonly property real actionPanelHeight: actionPanel.height
     readonly property real _statusH: 92
     readonly property real _rowH: 64
     readonly property real _maxResultsH: root.maxResultsHeight > 0 ? root.maxResultsHeight : Math.min(430, (parentModal?.screenHeight ?? 900) * 0.55)
@@ -283,6 +284,11 @@ FocusScope {
 
     Connections {
         target: root.controller
+
+        function onSelectedItemChanged() {
+            if (actionPanel.expanded)
+                actionPanel.hide();
+        }
 
         function onItemExecuted() {
             root.parentModal?.hide();
