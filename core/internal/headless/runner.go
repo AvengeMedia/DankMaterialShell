@@ -121,7 +121,7 @@ func (r *Runner) Run() error {
 		return fmt.Errorf("dependency detection failed: %w", err)
 	}
 
-	reinstallItems, err := r.applyGitVariants(dependencies)
+	reinstallItems, err := r.applyGitVariants(dependencies, gitVariantChecker(distro, wm, dependencies))
 	if err != nil {
 		return err
 	}
@@ -312,12 +312,24 @@ func (r *Runner) applyPrivescTool() error {
 	}
 }
 
-// applyGitVariants switches deps named by --git-deps (or all toggleable deps
-// with --git) to their git variant. Deps already installed as stable are
-// marked for reinstall, otherwise InstallPackages skips them.
-func (r *Runner) applyGitVariants(dependencies []deps.Dependency) (map[string]bool, error) {
+// CanToggle is not enough: some distros discard the variant (hyprland on Arch maps to stable either way)
+func gitVariantChecker(distro distros.Distribution, wm deps.WindowManager, dependencies []deps.Dependency) func(name string) bool {
+	stable := distro.GetPackageMappingWithVariants(wm, map[string]deps.PackageVariant{})
+	allGit := make(map[string]deps.PackageVariant, len(dependencies))
+	for _, dep := range dependencies {
+		allGit[dep.Name] = deps.VariantGit
+	}
+	git := distro.GetPackageMappingWithVariants(wm, allGit)
+	return func(name string) bool {
+		mapping, ok := git[name]
+		return ok && mapping != stable[name]
+	}
+}
+
+func (r *Runner) applyGitVariants(dependencies []deps.Dependency, hasGitVariant func(name string) bool) (map[string]bool, error) {
 	reinstallItems := make(map[string]bool)
 
+	// InstallPackages skips StatusInstalled deps unless marked for reinstall
 	markGit := func(dep *deps.Dependency) {
 		if dep.Variant == deps.VariantStable && dep.Status == deps.StatusInstalled {
 			reinstallItems[dep.Name] = true
@@ -334,8 +346,8 @@ func (r *Runner) applyGitVariants(dependencies []deps.Dependency) (map[string]bo
 		if dep == nil {
 			return nil, fmt.Errorf("--git-deps: unknown dependency %q", name)
 		}
-		if !dep.CanToggle {
-			return nil, fmt.Errorf("--git-deps: %q does not have a git variant", dep.Name)
+		if !dep.CanToggle || !hasGitVariant(dep.Name) {
+			return nil, fmt.Errorf("--git-deps: %q does not have a git variant on this distribution", dep.Name)
 		}
 		markGit(dep)
 	}
@@ -345,7 +357,7 @@ func (r *Runner) applyGitVariants(dependencies []deps.Dependency) (map[string]bo
 	}
 
 	for i := range dependencies {
-		if dependencies[i].CanToggle {
+		if dependencies[i].CanToggle && hasGitVariant(dependencies[i].Name) {
 			markGit(&dependencies[i])
 		}
 	}

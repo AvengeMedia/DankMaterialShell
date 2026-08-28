@@ -536,6 +536,7 @@ func TestApplyGitVariants(t *testing.T) {
 		name          string
 		gitAll        bool
 		gitDeps       []string
+		noGitVariant  []string // deps whose git and stable packages resolve identically
 		wantErr       bool
 		errContains   string
 		wantGit       []string
@@ -586,6 +587,21 @@ func TestApplyGitVariants(t *testing.T) {
 			wantStable:    []string{"ghostty"},
 			wantReinstall: []string{"niri"},
 		},
+		{
+			name:         "git-deps errors when the distro has no distinct git package",
+			gitDeps:      []string{"niri"},
+			noGitVariant: []string{"niri"},
+			wantErr:      true,
+			errContains:  "does not have a git variant",
+		},
+		{
+			name:          "git skips deps without a distinct git package",
+			gitAll:        true,
+			noGitVariant:  []string{"niri"},
+			wantGit:       []string{"quickshell", "hyprland", "dms (DankMaterialShell)"},
+			wantStable:    []string{"niri", "ghostty"},
+			wantReinstall: nil,
+		},
 	}
 
 	for _, tt := range tests {
@@ -593,7 +609,16 @@ func TestApplyGitVariants(t *testing.T) {
 			r := NewRunner(Config{GitAll: tt.gitAll, GitDeps: tt.gitDeps})
 			d := freshDeps()
 
-			reinstall, err := r.applyGitVariants(d)
+			hasGitVariant := func(name string) bool {
+				for _, n := range tt.noGitVariant {
+					if n == name {
+						return false
+					}
+				}
+				return true
+			}
+
+			reinstall, err := r.applyGitVariants(d, hasGitVariant)
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("applyGitVariants() error = %v, wantErr %v", err, tt.wantErr)
 			}

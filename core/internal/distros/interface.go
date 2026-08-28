@@ -101,6 +101,7 @@ type Distribution interface {
 
 	// Package Mapping
 	GetPackageMapping(wm deps.WindowManager) map[string]PackageMapping
+	GetPackageMappingWithVariants(wm deps.WindowManager, variants map[string]deps.PackageVariant) map[string]PackageMapping
 
 	// Prerequisites
 	InstallPrerequisites(ctx context.Context, sudoPassword string, progressChan chan<- InstallProgressMsg) error
