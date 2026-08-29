@@ -3269,6 +3269,27 @@
     "comment": "plugin browser sort option"
   },
   {
+    "term": "Cellular",
+    "translation": "",
+    "context": "Cellular",
+    "reference": "",
+    "comment": "network status"
+  },
+  {
+    "term": "Cellular disabled",
+    "translation": "",
+    "context": "Cellular disabled",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Cellular enabled",
+    "translation": "",
+    "context": "Cellular enabled",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Center Section",
     "translation": "",
     "context": "Center Section",
@@ -3342,13 +3363,6 @@
     "term": "Characters per second while holding down key",
     "translation": "",
     "context": "Characters per second while holding down key",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Charge Level",
-    "translation": "",
-    "context": "Charge Level",
     "reference": "",
     "comment": ""
   },
@@ -3868,7 +3882,7 @@
     "translation": "",
     "context": "Clock Style",
     "reference": "",
-    "comment": ""
+    "comment": "lock screen clock layout setting"
   },
   {
     "term": "Clock, calendar, system info and profile",
@@ -5600,6 +5614,13 @@
     "comment": ""
   },
   {
+    "term": "Default Task List",
+    "translation": "",
+    "context": "Default Task List",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Default Width (%)",
     "translation": "",
     "context": "Default Width (%)",
@@ -6002,6 +6023,13 @@
     "term": "Disabling auto-login on startup...",
     "translation": "",
     "context": "Disabling auto-login on startup...",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Disabling cellular...",
+    "translation": "",
+    "context": "Disabling cellular...",
     "reference": "",
     "comment": ""
   },
@@ -6699,6 +6727,13 @@
     "comment": ""
   },
   {
+    "term": "Enable Cellular",
+    "translation": "",
+    "context": "Enable Cellular",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Enable Do Not Disturb",
     "translation": "",
     "context": "Enable Do Not Disturb",
@@ -6858,6 +6893,13 @@
     "context": "Enabling WiFi...",
     "reference": "",
     "comment": "network status"
+  },
+  {
+    "term": "Enabling cellular...",
+    "translation": "",
+    "context": "Enabling cellular...",
+    "reference": "",
+    "comment": ""
   },
   {
     "term": "End",
@@ -7672,6 +7714,20 @@
     "comment": ""
   },
   {
+    "term": "Failed to save dropped file",
+    "translation": "",
+    "context": "Failed to save dropped file",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Failed to save dropped text",
+    "translation": "",
+    "context": "Failed to save dropped text",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Failed to save keybind",
     "translation": "",
     "context": "Failed to save keybind",
@@ -7803,6 +7859,13 @@
     "context": "Failed to switch port",
     "reference": "",
     "comment": "audio sink port switch failure message"
+  },
+  {
+    "term": "Failed to toggle cellular",
+    "translation": "",
+    "context": "Failed to toggle cellular",
+    "reference": "",
+    "comment": ""
   },
   {
     "term": "Failed to unpin entry",
@@ -9492,6 +9555,13 @@
     "comment": "island settings: home face card title"
   },
   {
+    "term": "Horizontal",
+    "translation": "",
+    "context": "Horizontal",
+    "reference": "",
+    "comment": "lock screen clock style option"
+  },
+  {
     "term": "Horizontal Offset",
     "translation": "",
     "context": "Horizontal Offset",
@@ -9985,6 +10055,13 @@
     "term": "Include Transitions",
     "translation": "",
     "context": "Include Transitions",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Include application streams and virtual sinks in the device lists",
+    "translation": "",
+    "context": "Include application streams and virtual sinks in the device lists",
     "reference": "",
     "comment": ""
   },
@@ -17934,6 +18011,13 @@
     "comment": ""
   },
   {
+    "term": "Show Virtual Devices",
+    "translation": "",
+    "context": "Show Virtual Devices",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Show Weather Condition",
     "translation": "",
     "context": "Show Weather Condition",
@@ -18669,18 +18753,18 @@
     "comment": "hotspot start confirmation action | start hotspot action"
   },
   {
-    "term": "Start DankConnect, KDE Connect, or Valent to use this plugin",
-    "translation": "",
-    "context": "Start DankConnect, KDE Connect, or Valent to use this plugin",
-    "reference": "",
-    "comment": "Phone Connect daemon hint"
-  },
-  {
     "term": "Start Hotspot?",
     "translation": "",
     "context": "Start Hotspot?",
     "reference": "",
     "comment": "hotspot start confirmation title"
+  },
+  {
+    "term": "Start KDE Connect or Valent to use this plugin",
+    "translation": "",
+    "context": "Start KDE Connect or Valent to use this plugin",
+    "reference": "",
+    "comment": "Phone Connect daemon hint"
   },
   {
     "term": "Start typing your notes here...",
@@ -19320,6 +19404,13 @@
     "comment": ""
   },
   {
+    "term": "Task list used when adding tasks from the dash calendar",
+    "translation": "",
+    "context": "Task list used when adding tasks from the dash calendar",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Terminal",
     "translation": "",
     "context": "Terminal",
@@ -19479,6 +19570,13 @@
     "context": "The custom command used when attaching to sessions (receives the session name as the first argument)",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.",
+    "translation": "",
+    "context": "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.",
+    "reference": "",
+    "comment": "embedded greeter status"
   },
   {
     "term": "The island draws its own surface",
@@ -21154,6 +21252,13 @@
     "comment": ""
   },
   {
+    "term": "Vertical",
+    "translation": "",
+    "context": "Vertical",
+    "reference": "",
+    "comment": "lock screen clock style option"
+  },
+  {
     "term": "Vertical Deck",
     "translation": "",
     "context": "Vertical Deck",
@@ -22097,6 +22202,13 @@
     "context": "discuss",
     "reference": "",
     "comment": "plugin discussion link"
+  },
+  {
+    "term": "dms-greeter is not installed. Install the dms-greeter package to manage the greeter.",
+    "translation": "",
+    "context": "dms-greeter is not installed. Install the dms-greeter package to manage the greeter.",
+    "reference": "",
+    "comment": "greeter status placeholder"
   },
   {
     "term": "e.g. /usr/bin/my-script --flag",

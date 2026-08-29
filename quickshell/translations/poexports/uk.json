@@ -1403,6 +1403,15 @@
   "Category": {
     "Category": "Категорія"
   },
+  "Cellular": {
+    "Cellular": ""
+  },
+  "Cellular disabled": {
+    "Cellular disabled": ""
+  },
+  "Cellular enabled": {
+    "Cellular enabled": ""
+  },
   "Center Section": {
     "Center Section": "Центральна секція"
   },
@@ -2408,6 +2417,9 @@
   "Default Opens": {
     "Default Opens": "Відкривається за замовчуванням"
   },
+  "Default Task List": {
+    "Default Task List": ""
+  },
   "Default Width (%)": {
     "Default Width (%)": "Типова ширина (%)"
   },
@@ -2584,6 +2596,9 @@
   },
   "Disabling auto-login on startup...": {
     "Disabling auto-login on startup...": "Вимкнення автологіну при запуску..."
+  },
+  "Disabling cellular...": {
+    "Disabling cellular...": ""
   },
   "Disc": {
     "Disc": "Диск"
@@ -2882,6 +2897,9 @@
   "Enable Bar": {
     "Enable Bar": "Увімкнути панель"
   },
+  "Enable Cellular": {
+    "Enable Cellular": ""
+  },
   "Enable Do Not Disturb": {
     "Enable Do Not Disturb": "Увімкнути режим «Не турбувати»"
   },
@@ -2950,6 +2968,9 @@
   },
   "Enabling WiFi...": {
     "Enabling WiFi...": "Увімкнення WiFi..."
+  },
+  "Enabling cellular...": {
+    "Enabling cellular...": ""
   },
   "End": {
     "End": "Кінець"
@@ -3311,6 +3332,12 @@
   "Failed to save clipboard setting": {
     "Failed to save clipboard setting": "Не вдалося зберегти налаштування буфера обміну"
   },
+  "Failed to save dropped file": {
+    "Failed to save dropped file": ""
+  },
+  "Failed to save dropped text": {
+    "Failed to save dropped text": ""
+  },
   "Failed to save keybind": {
     "Failed to save keybind": "Не вдалося зберегти комбінацію клавіш"
   },
@@ -3367,6 +3394,9 @@
   },
   "Failed to switch port": {
     "Failed to switch port": ""
+  },
+  "Failed to toggle cellular": {
+    "Failed to toggle cellular": ""
   },
   "Failed to unpin entry": {
     "Failed to unpin entry": "Не вдалося відкріпити запис"
@@ -4103,6 +4133,9 @@
   "Home Compact": {
     "Home Compact": ""
   },
+  "Horizontal": {
+    "Horizontal": ""
+  },
   "Horizontal Offset": {
     "Horizontal Offset": ""
   },
@@ -4315,6 +4348,9 @@
   },
   "Include Transitions": {
     "Include Transitions": "Включити переходи"
+  },
+  "Include application streams and virtual sinks in the device lists": {
+    "Include application streams and virtual sinks in the device lists": ""
   },
   "Include desktop actions (shortcuts) in search results.": {
     "Include desktop actions (shortcuts) in search results.": "Включати дії робочого столу (ярлики) в результатах пошуку"
@@ -7727,6 +7763,9 @@
   "Show Trash in Dock": {
     "Show Trash in Dock": "Показувати кошик у док-панелі"
   },
+  "Show Virtual Devices": {
+    "Show Virtual Devices": ""
+  },
   "Show Weather Condition": {
     "Show Weather Condition": "Показувати стан погоди"
   },
@@ -8315,6 +8354,9 @@
   "Tap to Click": {
     "Tap to Click": "Натискання для кліку"
   },
+  "Task list used when adding tasks from the dash calendar": {
+    "Task list used when adding tasks from the dash calendar": ""
+  },
   "Terminal": {
     "Terminal": "Термінал"
   },
@@ -8392,6 +8434,9 @@
   },
   "The custom command used when attaching to sessions (receives the session name as the first argument)": {
     "The custom command used when attaching to sessions (receives the session name as the first argument)": "Спеціальна команда, що використовується при підключенні до сесій (отримує назву сесії як перший аргумент)"
+  },
+  "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": {
+    "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": ""
   },
   "The island draws its own surface": {
     "The island draws its own surface": ""
@@ -9116,6 +9161,9 @@
   "Version": {
     "Version": "Версія"
   },
+  "Vertical": {
+    "Vertical": ""
+  },
   "Vertical Deck": {
     "Vertical Deck": "Вертикальна колода"
   },
@@ -9526,6 +9574,9 @@
   },
   "display rotation option": {
     "Normal": "Нормальний"
+  },
+  "dms-greeter is not installed. Install the dms-greeter package to manage the greeter.": {
+    "dms-greeter is not installed. Install the dms-greeter package to manage the greeter.": ""
   },
   "e.g. /usr/bin/my-script --flag": {
     "e.g. /usr/bin/my-script --flag": "напр. /usr/bin/my-script --flag"

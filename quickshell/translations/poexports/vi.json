@@ -1403,6 +1403,15 @@
   "Category": {
     "Category": "Loại"
   },
+  "Cellular": {
+    "Cellular": ""
+  },
+  "Cellular disabled": {
+    "Cellular disabled": ""
+  },
+  "Cellular enabled": {
+    "Cellular enabled": ""
+  },
   "Center Section": {
     "Center Section": "Phần trung tâm"
   },
@@ -2408,6 +2417,9 @@
   "Default Opens": {
     "Default Opens": "Mở mặc định"
   },
+  "Default Task List": {
+    "Default Task List": ""
+  },
   "Default Width (%)": {
     "Default Width (%)": "Chiều rộng mặc định (%)"
   },
@@ -2584,6 +2596,9 @@
   },
   "Disabling auto-login on startup...": {
     "Disabling auto-login on startup...": "Đang tắt đăng nhập tự động khi khởi động..."
+  },
+  "Disabling cellular...": {
+    "Disabling cellular...": ""
   },
   "Disc": {
     "Disc": "Đĩa"
@@ -2882,6 +2897,9 @@
   "Enable Bar": {
     "Enable Bar": "Bật thanh"
   },
+  "Enable Cellular": {
+    "Enable Cellular": ""
+  },
   "Enable Do Not Disturb": {
     "Enable Do Not Disturb": "Bật Chế độ không làm phiền"
   },
@@ -2950,6 +2968,9 @@
   },
   "Enabling WiFi...": {
     "Enabling WiFi...": "Đang bật WiFi..."
+  },
+  "Enabling cellular...": {
+    "Enabling cellular...": ""
   },
   "End": {
     "End": "Hết"
@@ -3311,6 +3332,12 @@
   "Failed to save clipboard setting": {
     "Failed to save clipboard setting": "Lưu cài đặt bảng nhớ tạm thất bại"
   },
+  "Failed to save dropped file": {
+    "Failed to save dropped file": ""
+  },
+  "Failed to save dropped text": {
+    "Failed to save dropped text": ""
+  },
   "Failed to save keybind": {
     "Failed to save keybind": "Lưu phím tắt thất bại"
   },
@@ -3367,6 +3394,9 @@
   },
   "Failed to switch port": {
     "Failed to switch port": ""
+  },
+  "Failed to toggle cellular": {
+    "Failed to toggle cellular": ""
   },
   "Failed to unpin entry": {
     "Failed to unpin entry": "Bỏ ghim mục thất bại"
@@ -4103,6 +4133,9 @@
   "Home Compact": {
     "Home Compact": ""
   },
+  "Horizontal": {
+    "Horizontal": ""
+  },
   "Horizontal Offset": {
     "Horizontal Offset": ""
   },
@@ -4315,6 +4348,9 @@
   },
   "Include Transitions": {
     "Include Transitions": "Hiệu ứng chuyển cảnh"
+  },
+  "Include application streams and virtual sinks in the device lists": {
+    "Include application streams and virtual sinks in the device lists": ""
   },
   "Include desktop actions (shortcuts) in search results.": {
     "Include desktop actions (shortcuts) in search results.": "Bao gồm các hành động máy tính (phím tắt) trong kết quả tìm kiếm."
@@ -7727,6 +7763,9 @@
   "Show Trash in Dock": {
     "Show Trash in Dock": "Hiển thị thùng rác trong thanh dock"
   },
+  "Show Virtual Devices": {
+    "Show Virtual Devices": ""
+  },
   "Show Weather Condition": {
     "Show Weather Condition": "Hiển thị điều kiện thời tiết"
   },
@@ -8315,6 +8354,9 @@
   "Tap to Click": {
     "Tap to Click": "Nhấp để Nhấp"
   },
+  "Task list used when adding tasks from the dash calendar": {
+    "Task list used when adding tasks from the dash calendar": ""
+  },
   "Terminal": {
     "Terminal": "Cửa sổ dòng lệnh"
   },
@@ -8392,6 +8434,9 @@
   },
   "The custom command used when attaching to sessions (receives the session name as the first argument)": {
     "The custom command used when attaching to sessions (receives the session name as the first argument)": "Lệnh tùy chỉnh được sử dụng khi đính kèm vào các phiên (nhận tên phiên làm đối số đầu tiên)"
+  },
+  "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": {
+    "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": ""
   },
   "The island draws its own surface": {
     "The island draws its own surface": ""
@@ -9116,6 +9161,9 @@
   "Version": {
     "Version": "Phiên bản"
   },
+  "Vertical": {
+    "Vertical": ""
+  },
   "Vertical Deck": {
     "Vertical Deck": "Xếp chồng dọc"
   },
@@ -9526,6 +9574,9 @@
   },
   "display rotation option": {
     "Normal": "Bình thường"
+  },
+  "dms-greeter is not installed. Install the dms-greeter package to manage the greeter.": {
+    "dms-greeter is not installed. Install the dms-greeter package to manage the greeter.": ""
   },
   "e.g. /usr/bin/my-script --flag": {
     "e.g. /usr/bin/my-script --flag": "vd. /usr/bin/my-script --flag"

@@ -78,7 +78,7 @@
     "%1 online": "%1 מקוונים"
   },
   "%1 position": {
-    "%1 position": ""
+    "%1 position": "מיקום %1"
   },
   "%1 tasks": {
     "%1 tasks": "%1 משימות"
@@ -315,7 +315,7 @@
     "A separate minimal launcher action that works in Standalone, Separate Frame Mode, and Connected Frame Mode.": "פעולת משגר מינימלית ונפרדת שעובדת במצב עצמאי, במצב מסגרת נפרדת ובמצב מסגרת מחוברת."
   },
   "A slight natural settle, DMS default": {
-    "A slight natural settle, DMS default": ""
+    "A slight natural settle, DMS default": "התייצבות טבעית קלה, ברירת המחדל של DMS"
   },
   "A user with that name already exists.": {
     "A user with that name already exists.": "כבר קיים משתמש/ת עם השם זה."
@@ -495,7 +495,7 @@
     "Add to Autostart": "הוספה להפעלה אוטומטית"
   },
   "Additional settings are managed by the Island": {
-    "Additional settings are managed by the Island": ""
+    "Additional settings are managed by the Island": "הגדרות נוספות מנוהלות על ידי האי"
   },
   "Adjust pointer sensitivity speed": {
     "Adjust pointer sensitivity speed": "כוונן/י את מהירות רגישות המצביע"
@@ -552,7 +552,7 @@
     "Allow": "אפשר/י"
   },
   "Allow %1 in Do Not Disturb": {
-    "Allow %1 in Do Not Disturb": ""
+    "Allow %1 in Do Not Disturb": "אפשר/י %1 במצב ״נא לא להפריע״"
   },
   "Allow LAN access": {
     "Allow LAN access": "אפשר/י גישה לLAN"
@@ -570,7 +570,7 @@
     "Allow greeter login access": "אפשר/י גישת התחברות לgreeter"
   },
   "Allow in Do Not Disturb": {
-    "Allow in Do Not Disturb": ""
+    "Allow in Do Not Disturb": "אפשר/י במצב ״נא לא להפריע״"
   },
   "Already on that session": {
     "Already on that session": "כבר בהפעלה זו"
@@ -720,7 +720,7 @@
     "Apply inverse concave corner cutouts to the bar": "החל/י חיתוכי פינות קעורים הפוכים על הסרגל"
   },
   "Apply island geometry changes immediately without spring overshoot": {
-    "Apply island geometry changes immediately without spring overshoot": ""
+    "Apply island geometry changes immediately without spring overshoot": "החל/י שינויי גיאומטריה של האי באופן מיידי ללא חריגת קפיץ"
   },
   "Apply to Hardware": {
     "Apply to Hardware": "החלה על החומרה"
@@ -747,7 +747,7 @@
     "Apps Icon": "סמל האפליקציות"
   },
   "Apps allowed to show popups while Do Not Disturb is on. Right-click a notification and choose \"Allow in Do Not Disturb\" to add one here.": {
-    "Apps allowed to show popups while Do Not Disturb is on. Right-click a notification and choose \"Allow in Do Not Disturb\" to add one here.": ""
+    "Apps allowed to show popups while Do Not Disturb is on. Right-click a notification and choose \"Allow in Do Not Disturb\" to add one here.": "אפליקציות המורשות להציג חלונות קופצים בזמן שמצב ״נא לא להפריע״ מופעל. לחץ/י לחיצה ימנית על התראה ובחר/י ב\"אפשר/י במצב ״נא לא להפריע״\" להוספה לכאן."
   },
   "Apps are ordered by usage frequency, then last used, then alphabetically.": {
     "Apps are ordered by usage frequency, then last used, then alphabetically.": "האפליקציות ממוינות לפי תדירות השימוש, אחר כך לפי שימוש אחרון ולבסוף לפי סדר אלפביתי."
@@ -861,10 +861,10 @@
     "Auto (Bar-aware)": "אוטומטי (מודע לסרגל)"
   },
   "Auto (Dark Mode)": {
-    "Auto (Dark Mode)": ""
+    "Auto (Dark Mode)": "אוטומטי (מצב כהה)"
   },
   "Auto (Light Mode)": {
-    "Auto (Light Mode)": ""
+    "Auto (Light Mode)": "אוטומטי (מצב בהיר)"
   },
   "Auto (Wide)": {
     "Auto (Wide)": "אוטומטי (רחב)"
@@ -873,7 +873,7 @@
     "Auto Compositor Gaps": "מרווחי קומפוזיטור אוטומטיים"
   },
   "Auto From Wallpaper": {
-    "Auto From Wallpaper": ""
+    "Auto From Wallpaper": "אוטומטי מתמונת הרקע"
   },
   "Auto Location": {
     "Auto Location": "מיקום אוטומטי"
@@ -984,7 +984,7 @@
     "Automatically lock the screen when the system prepares to suspend": "נעילה אוטומטית של המסך כשהמערכת מתכוננת למצב השהיה"
   },
   "Automatically picks the scheme variant based on the wallpaper.": {
-    "Automatically picks the scheme variant based on the wallpaper.": ""
+    "Automatically picks the scheme variant based on the wallpaper.": "בוחר אוטומטית את גרסת ערכת הנושא בהתבסס על תמונת הרקע."
   },
   "Automatically save changes to opened files as you type": {
     "Automatically save changes to opened files as you type": "שמור/שמרי שינויים בקבצים פתוחים אוטומטית בעת ההקלדה"
@@ -1092,10 +1092,10 @@
     "Bar Spacing": "ריווח הסרגל"
   },
   "Bar border and shadow": {
-    "Bar border and shadow": ""
+    "Bar border and shadow": "מסגרת וצל של הסרגל"
   },
   "Bar corners": {
-    "Bar corners": ""
+    "Bar corners": "פינות הסרגל"
   },
   "Bar corners and background": {
     "Bar corners and background": "פינות ורקע הסרגל"
@@ -1104,7 +1104,7 @@
     "Bar shadow, border, and corners": "צל, מסגרת ופינות של הסרגל"
   },
   "Bar visibility": {
-    "Bar visibility": ""
+    "Bar visibility": "נראות הסרגל"
   },
   "Base color for shadows (opacity is applied automatically)": {
     "Base color for shadows (opacity is applied automatically)": "צבע בסיס לצללים (שקיפות מוחלת אוטומטית)"
@@ -1119,7 +1119,7 @@
     "Battery %1": "סוללה %1"
   },
   "Battery / Control Center": {
-    "Battery / Control Center": ""
+    "Battery / Control Center": "סוללה / מרכז הבקרה"
   },
   "Battery Charge Limit": {
     "Battery Charge Limit": "מגבלה טעינה לסוללה"
@@ -1134,7 +1134,7 @@
     "Battery and power management": "ניהול סוללה וחשמל"
   },
   "Battery gauge opens Control Center": {
-    "Battery gauge opens Control Center": ""
+    "Battery gauge opens Control Center": "מד הסוללה פותח את מרכז הבקרה"
   },
   "Battery has charged to your set limit of %1%": {
     "Battery has charged to your set limit of %1%": "הסוללה נטענה למגבלה שהוגדרה (%1%)"
@@ -1170,7 +1170,7 @@
     "Blend between Surface High and the selected custom color": "מיזוג בין צבע המשטח הגבוה (Surface High) לצבע המותאם אישית שנבחר"
   },
   "Block %1 in Do Not Disturb": {
-    "Block %1 in Do Not Disturb": ""
+    "Block %1 in Do Not Disturb": "חסום/חסמי את %1 במצב ״נא לא להפריע״"
   },
   "Block Out": {
     "Block Out": "חסימה החוצה"
@@ -1218,7 +1218,7 @@
     "Body": "גוף"
   },
   "Body Click Runs Default Action": {
-    "Body Click Runs Default Action": ""
+    "Body Click Runs Default Action": "לחיצה על גוף ההודעה מפעילה את פעולת ברירת המחדל"
   },
   "Body Font Size": {
     "Body Font Size": "גודל גופן של גוף ההודעה"
@@ -1278,7 +1278,7 @@
     "Bottom dock for pinned and running applications": "הצגת Dock תחתון לאפליקציות נעוצות ופעילות"
   },
   "Bright": {
-    "Bright": ""
+    "Bright": "בהיר"
   },
   "Brightness": {
     "Brightness": "בהירות"
@@ -1403,11 +1403,20 @@
   "Category": {
     "Category": "קטגוריה"
   },
+  "Cellular": {
+    "Cellular": ""
+  },
+  "Cellular disabled": {
+    "Cellular disabled": ""
+  },
+  "Cellular enabled": {
+    "Cellular enabled": ""
+  },
   "Center Section": {
     "Center Section": "קטע אמצעי"
   },
   "Center Section - Reserved by Dank Island": {
-    "Center Section - Reserved by Dank Island": ""
+    "Center Section - Reserved by Dank Island": "קטע אמצעי - שמור על ידי Dank Island"
   },
   "Center Single Column": {
     "Center Single Column": "מרכוז של עמודה בודדת"
@@ -1548,7 +1557,7 @@
     "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": "בחר/י אילו מסכים יציגו את ממשק מסך הנעילה. מסכים אחרים יציגו צבע אחיד כהגנה מפני צריבת מסכי OLED."
   },
   "Choose which shortcuts sit left or right of the clock": {
-    "Choose which shortcuts sit left or right of the clock": ""
+    "Choose which shortcuts sit left or right of the clock": "בחר/י אילו קיצורי דרך ישבו משמאל או מימין לשעון"
   },
   "Chroma Style": {
     "Chroma Style": "סגנון Chroma"
@@ -1575,7 +1584,7 @@
     "Clear All Jobs": "נקה/י את כל העבודות"
   },
   "Clear Badge on Open": {
-    "Clear Badge on Open": ""
+    "Clear Badge on Open": "ניקוי התג בעת פתיחה"
   },
   "Clear History?": {
     "Clear History?": "לנקות את ההיסטוריה?"
@@ -1590,10 +1599,10 @@
     "Clear at Startup": "ניקוי בהפעלה"
   },
   "Clears the badge on open but keeps notifications active": {
-    "Clears the badge on open but keeps notifications active": ""
+    "Clears the badge on open but keeps notifications active": "מנקה את התג בעת הפתיחה אך שומר על ההתראות פעילות"
   },
   "Click": {
-    "Click": ""
+    "Click": "לחיצה"
   },
   "Click 'Setup' to create %1 and add include to your compositor config.": {
     "Click 'Setup' to create %1 and add include to your compositor config.": "לחץ/י על 'התקנה' כדי ליצור את %1 ולכלול אותו בהגדרות הקומפוזיטור שלך."
@@ -1614,10 +1623,10 @@
     "Click any shortcut to edit. Changes save to %1": "לחץ/י על כל קיצור דרך כדי לערוך. השינויים נשמרים ב%1"
   },
   "Click expands only on an intentional press. Hybrid peeks the current compact face on hover": {
-    "Click expands only on an intentional press. Hybrid peeks the current compact face on hover": ""
+    "Click expands only on an intentional press. Hybrid peeks the current compact face on hover": "לחיצה מרחיבה את האי רק בלחיצה מכוונת. מצב היברידי מציץ אל התצוגה הקומפקטית הנוכחית בעת ריחוף"
   },
   "Click the icon to mute": {
-    "Click the icon to mute": ""
+    "Click the icon to mute": "לחץ/י על הסמל כדי להשתיק"
   },
   "Click to Paste": {
     "Click to Paste": "לחיצה להדבקה"
@@ -1629,7 +1638,7 @@
     "Click to select a custom theme JSON file": "לחץ/י כדי לבחור קובץ JSON של ערכת נושא מותאמת אישית"
   },
   "Clicking a popup runs its first action instead of expanding the body": {
-    "Clicking a popup runs its first action instead of expanding the body": ""
+    "Clicking a popup runs its first action instead of expanding the body": "לחיצה על חלון קופץ מפעילה את הפעולה הראשונה שלו במקום להרחיב את גוף ההודעה"
   },
   "Clip": {
     "Clip": "חיתוך"
@@ -1779,16 +1788,16 @@
     "Compact": "קומפקטי"
   },
   "Compact Clock Pill": {
-    "Compact Clock Pill": ""
+    "Compact Clock Pill": "כפתור שעון קומפקטי"
   },
   "Compact Island Height": {
-    "Compact Island Height": ""
+    "Compact Island Height": "גובה קומפקטי לאי"
   },
   "Compact Mode": {
     "Compact Mode": "מצב קומפקטי"
   },
   "Compact home clock pill in both width and height": {
-    "Compact home clock pill in both width and height": ""
+    "Compact home clock pill in both width and height": "כפתור שעון בית קומפקטי גם ברוחב וגם בגובה"
   },
   "Completed": {
     "Completed": "הושלם"
@@ -1845,7 +1854,7 @@
     "Configure which displays show \"%1\"": "הגדר/י אילו מסכים מציגים את \"%1\""
   },
   "Configure which displays show Dank Island as \"%1": {
-    "Configure which displays show Dank Island as \"%1\"": ""
+    "Configure which displays show Dank Island as \"%1\"": "הגדר/י אילו מסכים מציגים את Dank Island בתור \"%1\""
   },
   "Configure which displays show shell components": {
     "Configure which displays show shell components": "הגדר/י אילו מסכים יציגו רכיבי מעטפת"
@@ -2028,7 +2037,7 @@
     "Corner Style": "סגנון הפינות"
   },
   "Corner style applies to the bar surface": {
-    "Corner style applies to the bar surface": ""
+    "Corner style applies to the bar surface": "סגנון הפינות חל על משטח הסרגל"
   },
   "Corners & Background": {
     "Corners & Background": "פינות ורקע"
@@ -2160,7 +2169,7 @@
     "Curve": "עקומה"
   },
   "Curve rasterizer.": {
-    "Curve rasterizer.": ""
+    "Curve rasterizer.": "המרה לפי עקומות."
   },
   "Curve: curve rasterizer.": {
     "Curve: curve rasterizer.": "מעוקם: המרה לפי עקומות."
@@ -2292,7 +2301,7 @@
     "Daily at:": "יומי בשעה:"
   },
   "Damped springs settle straight to their target with no overshoot": {
-    "Damped springs settle straight to their target with no overshoot": ""
+    "Damped springs settle straight to their target with no overshoot": "קפיצים מרוסנים מתייצבים ישר ליעדם ללא חריגה"
   },
   "Dank": {
     "Dank": "Dank"
@@ -2307,10 +2316,10 @@
     "Dank Dash": "Dank Dash"
   },
   "Dank Island - Beta": {
-    "Dank Island - Beta": ""
+    "Dank Island - Beta": "Dank Island - בטא"
   },
   "Dank Island instance": {
-    "Dank Island instance": ""
+    "Dank Island instance": "מופע של Dank Island"
   },
   "DankBar": {
     "DankBar": "Dank Bar"
@@ -2343,13 +2352,13 @@
     "Dark mode harmony": "הרמוניה במצב כהה"
   },
   "Dark or light mode follows the wallpaper brightness": {
-    "Dark or light mode follows the wallpaper brightness": ""
+    "Dark or light mode follows the wallpaper brightness": "מצב כהה או בהיר עוקב אחר בהירות תמונת הרקע"
   },
   "Darken Modal Background": {
     "Darken Modal Background": "הכהיית הרקע של חלוניות"
   },
   "Dashboard": {
-    "Dashboard": ""
+    "Dashboard": "לוח בקרה"
   },
   "Date First": {
     "Date First": "תאריך ראשון"
@@ -2408,11 +2417,14 @@
   "Default Opens": {
     "Default Opens": "פתיחה כברירת מחדל"
   },
+  "Default Task List": {
+    "Default Task List": ""
+  },
   "Default Width (%)": {
     "Default Width (%)": "רוחב ברירת מחדל (%)"
   },
   "Default launcher shortcuts open a native launcher activity inside Dank Island. Spotlight is used when the focused screen has no DankIsland.": {
-    "Default launcher shortcuts open a native launcher activity inside Dank Island. Spotlight is used when the focused screen has no DankIsland.": ""
+    "Default launcher shortcuts open a native launcher activity inside Dank Island. Spotlight is used when the focused screen has no DankIsland.": "קיצורי משגר ברירת המחדל פותחים פעילות משגר מובנית בתוך Dank Island. נעשה שימוש בSpotlight כאשר למסך הממוקד אין Dank Island."
   },
   "Default launcher shortcuts open the full launcher with mode tabs, grid view, and action panel.": {
     "Default launcher shortcuts open the full launcher with mode tabs, grid view, and action panel.": "קיצורי משגר ברירת המחדל פותחים את המשגר המלא עם כרטיסיות מצבים, תצוגת רשת ופאנל פעולות."
@@ -2538,7 +2550,7 @@
     "Digital": "דיגיטלי"
   },
   "Dim": {
-    "Dim": ""
+    "Dim": "עמום"
   },
   "Direct path to a .xkb keymap file. Overrides layouts/variants above.": {
     "Direct path to a .xkb keymap file. Overrides layouts/variants above.": "נתיב ישיר לקובץ מיפוי קיצורים מסוג xkb. דורס פריסות/גרסאות שמופיעות למעלה."
@@ -2584,6 +2596,9 @@
   },
   "Disabling auto-login on startup...": {
     "Disabling auto-login on startup...": "משבית התחברות אוטומטית בהפעלה..."
+  },
+  "Disabling cellular...": {
+    "Disabling cellular...": ""
   },
   "Disc": {
     "Disc": "דיסק"
@@ -2694,10 +2709,10 @@
     "Displays the active keyboard layout and allows switching": "מציג את פריסת המקלדת הפעילה ומאפשר להחליף בין פריסות"
   },
   "Distance between display edge and island": {
-    "Distance between display edge and island": ""
+    "Distance between display edge and island": "המרחק בין קצה המסך לאי"
   },
   "Distance-field renderer.": {
-    "Distance-field renderer.": ""
+    "Distance-field renderer.": "מעבד שדה-מרחק."
   },
   "Distribution": {
     "Distribution": "הפצה"
@@ -2760,10 +2775,10 @@
     "Draw a connected picture-frame border around the entire display": "צייר/י מסגרת תמונה מחוברת סביב כל התצוגה"
   },
   "Draw an island-styled background behind satellite widgets": {
-    "Draw an island-styled background behind satellite widgets": ""
+    "Draw an island-styled background behind satellite widgets": "צייר/י רקע בסגנון Island מאחורי ווידג׳טי הלוויין"
   },
   "Draw an outline and use the highest-contrast surface tone": {
-    "Draw an outline and use the highest-contrast surface tone": ""
+    "Draw an outline and use the highest-contrast surface tone": "צייר/י קו מתאר והשתמש/י בגוון המשטח בעל הניגודיות הגבוהה ביותר"
   },
   "Driver": {
     "Driver": "מנהל התקן"
@@ -2882,6 +2897,9 @@
   "Enable Bar": {
     "Enable Bar": "הפעל/י סרגל"
   },
+  "Enable Cellular": {
+    "Enable Cellular": ""
+  },
   "Enable Do Not Disturb": {
     "Enable Do Not Disturb": "הפעלה של מצב ״נא לא להפריע״"
   },
@@ -2892,7 +2910,7 @@
     "Enable History": "הפעלת ההיסטוריה"
   },
   "Enable Island": {
-    "Enable Island": ""
+    "Enable Island": "הפעל/י את האי"
   },
   "Enable Num Lock": {
     "Enable Num Lock": "הפעלה של Num Lock"
@@ -2943,13 +2961,16 @@
     "Enable security key authentication": "הפעלת אימות באמצעות מפתח אבטחה"
   },
   "Enable weather in Time & Weather to show this shortcut": {
-    "Enable weather in Time & Weather to show this shortcut": ""
+    "Enable weather in Time & Weather to show this shortcut": "הפעל/י מזג אוויר ב\"שעה ומזג אוויר\" כדי להציג קיצור דרך זה"
   },
   "Enabled": {
     "Enabled": "מופעל"
   },
   "Enabling WiFi...": {
     "Enabling WiFi...": "מפעיל WiFi..."
+  },
+  "Enabling cellular...": {
+    "Enabling cellular...": ""
   },
   "End": {
     "End": "סוף"
@@ -3075,13 +3096,13 @@
     "Exit node": "נקודת יציאה"
   },
   "Expand Notifications": {
-    "Expand Notifications": ""
+    "Expand Notifications": "הרחבת התראות"
   },
   "Expand notifications by default instead of click or hover": {
-    "Expand notifications by default instead of click or hover": ""
+    "Expand notifications by default instead of click or hover": "הרחב/י התראות כברירת מחדל במקום בלחיצה או בריחוף"
   },
   "Expansion Mode": {
-    "Expansion Mode": ""
+    "Expansion Mode": "מצב הרחבה"
   },
   "Experimental Feature": {
     "Experimental Feature": "תכונה ניסיונית"
@@ -3311,6 +3332,12 @@
   "Failed to save clipboard setting": {
     "Failed to save clipboard setting": "שמירת ההגדרה של לוח ההעתקה נכשלה"
   },
+  "Failed to save dropped file": {
+    "Failed to save dropped file": ""
+  },
+  "Failed to save dropped text": {
+    "Failed to save dropped text": ""
+  },
   "Failed to save keybind": {
     "Failed to save keybind": "שמירת קיצור המקלדת נכשלה"
   },
@@ -3366,7 +3393,10 @@
     "Failed to switch codec": "החלפת הקודק נכשלה"
   },
   "Failed to switch port": {
-    "Failed to switch port": ""
+    "Failed to switch port": "החלפת הפורט נכשלה"
+  },
+  "Failed to toggle cellular": {
+    "Failed to toggle cellular": ""
   },
   "Failed to unpin entry": {
     "Failed to unpin entry": "ביטול הצמדת הרשומה נכשל"
@@ -3546,7 +3576,7 @@
     "Floating windows follow Surface Styling settings": "חלונות צפים עוקבים אחר הגדרות סגנון משטח"
   },
   "Floats above windows and other content": {
-    "Floats above windows and other content": ""
+    "Floats above windows and other content": "צף מעל חלונות ותוכן אחר"
   },
   "Fluent": {
     "Fluent": "שוטף"
@@ -3837,7 +3867,7 @@
     "Globally scale all animation durations": "התאם/י גלובלית את כל משכי הזמן לאנימציה"
   },
   "Globally scale animation durations with geometric motion & spring based physics with bezier curves": {
-    "Globally scale animation durations with geometric motion & spring based physics with bezier curves": ""
+    "Globally scale animation durations with geometric motion & spring based physics with bezier curves": "התאם/י גלובלית את משכי הזמן לאנימציה עם תנועה גיאומטרית ופיזיקה מבוססת קפיץ עם עקומות Bezier"
   },
   "Golden Hour": {
     "Golden Hour": "שעת הזהב"
@@ -4062,19 +4092,19 @@
     "High": "גבוה"
   },
   "High Contrast": {
-    "High Contrast": ""
+    "High Contrast": "ניגודיות גבוהה"
   },
   "High-fidelity palette that preserves source hues.": {
     "High-fidelity palette that preserves source hues.": "פלטת צבעים בנאמנות גבוהה המשמרת את גווני המקור."
   },
   "Higher percentages give island more inertia": {
-    "Higher percentages give island more inertia": ""
+    "Higher percentages give island more inertia": "אחוזים גבוהים יותר מעניקים לאי יותר אינרציה"
   },
   "Higher values pull island toward its target more strongly": {
-    "Higher values pull island toward its target more strongly": ""
+    "Higher values pull island toward its target more strongly": "ערכים גבוהים יותר מושכים את האי לעבר יעדו בחוזקה רבה יותר"
   },
   "Higher values settle island with less bounce": {
-    "Higher values settle island with less bounce": ""
+    "Higher values settle island with less bounce": "ערכים גבוהים יותר מייצבים את האי עם פחות קפיציות"
   },
   "Highlight Active Workspace App": {
     "Highlight Active Workspace App": "הדגש/י את האפליקציה הפעילה בסביבת העבודה"
@@ -4101,10 +4131,13 @@
     "Hold to Confirm Power Actions": "החזקה לאישור פעולות חשמל"
   },
   "Home Compact": {
-    "Home Compact": ""
+    "Home Compact": "בית קומפקטי"
+  },
+  "Horizontal": {
+    "Horizontal": ""
   },
   "Horizontal Offset": {
-    "Horizontal Offset": ""
+    "Horizontal Offset": "היסט אופקי"
   },
   "Horizontal and vertical bar thickness": {
     "Horizontal and vertical bar thickness": "עובי סרגל אופקי ואנכי"
@@ -4170,10 +4203,10 @@
     "Humidity": "לחות"
   },
   "Hybrid": {
-    "Hybrid": ""
+    "Hybrid": "היברידי"
   },
   "Hybrid peeks the current compact face on hover. Click pins a destination so it stays open": {
-    "Hybrid peeks the current compact face on hover. Click pins a destination so it stays open": ""
+    "Hybrid peeks the current compact face on hover. Click pins a destination so it stays open": "מצב היברידי מציץ אל התצוגה הקומפקטית הנוכחית בעת ריחוף. לחיצה מצמידה יעד כך שיישאר פתוח"
   },
   "Hyprland Discord Server": {
     "Hyprland Discord Server": "שרת הDiscord של Hyprland"
@@ -4224,7 +4257,7 @@
     "Icon Size %": "גודל הסמל ב%"
   },
   "Icon Spacing": {
-    "Icon Spacing": ""
+    "Icon Spacing": "ריווח סמלים"
   },
   "Icon Theme": {
     "Icon Theme": "ערכת נושא של סמלים"
@@ -4316,6 +4349,9 @@
   "Include Transitions": {
     "Include Transitions": "כלול/כללי מעברים"
   },
+  "Include application streams and virtual sinks in the device lists": {
+    "Include application streams and virtual sinks in the device lists": ""
+  },
   "Include desktop actions (shortcuts) in search results.": {
     "Include desktop actions (shortcuts) in search results.": "כלול/כללי פעולות לשולחן העבודה (קיצורי דרך) בתוצאות החיפוש."
   },
@@ -4362,7 +4398,7 @@
     "Inner Gaps": "מרווחים פנימיים"
   },
   "Inner authentication": {
-    "Inner authentication": ""
+    "Inner authentication": "אימות פנימי"
   },
   "Inner padding applied to each widget": {
     "Inner padding applied to each widget": "ריווח פנימי שמוחל על כל ווידג׳ט"
@@ -4479,16 +4515,16 @@
     "Iris Bloom": "פריחת האיריס"
   },
   "Island": {
-    "Island": ""
+    "Island": "Island"
   },
   "Island Gap": {
-    "Island Gap": ""
+    "Island Gap": "מרווח האי"
   },
   "Island Instance": {
-    "Island Instance": ""
+    "Island Instance": "מופע של האי"
   },
   "Island placement": {
-    "Island placement": ""
+    "Island placement": "מיקום האי"
   },
   "Isolate Displays": {
     "Isolate Displays": "בידוד מסכים"
@@ -4512,7 +4548,7 @@
     "Keep Changes": "שמור/י שינויים"
   },
   "Keep Clock with Media": {
-    "Keep Clock with Media": ""
+    "Keep Clock with Media": "שמור/י את השעון עם המדיה"
   },
   "Keep My Edits": {
     "Keep My Edits": "שמור/שמרי את העריכות שלי"
@@ -4533,7 +4569,7 @@
     "Keep typing": "המשך/המשיכי להקליד"
   },
   "Keep widgets beside the island or align them like a standalone bar": {
-    "Keep widgets beside the island or align them like a standalone bar": ""
+    "Keep widgets beside the island or align them like a standalone bar": "השאר/י ווידג׳טים לצד האי או ישר/י אותם כמו סרגל עצמאי"
   },
   "Keeping Awake": {
     "Keeping Awake": "שינה נמנעת"
@@ -4749,7 +4785,7 @@
     "Loading keybinds...": "טוען קיצורי מקלדת..."
   },
   "Loading ports...": {
-    "Loading ports...": ""
+    "Loading ports...": "טוען פורטים..."
   },
   "Loading trending...": {
     "Loading trending...": "טוען טרנדים..."
@@ -4935,10 +4971,10 @@
     "Material": "חומרי"
   },
   "Material 3 Expressive bezier curves, default.": {
-    "Material 3 Expressive bezier curves, default.": ""
+    "Material 3 Expressive bezier curves, default.": "עקומות Bezier אקספרסיביות של Material Design 3, ברירת מחדל."
   },
   "Material 3 Expressive panels rise from below with a subtle scale, default.": {
-    "Material 3 Expressive panels rise from below with a subtle scale, default.": ""
+    "Material 3 Expressive panels rise from below with a subtle scale, default.": "פאנלים אקספרסיביים של Material 3 עולים מלמטה עם שינוי קנה מידה עדין, ברירת מחדל."
   },
   "Material Battery Style": {
     "Material Battery Style": "סגנון סוללה חומרי (Material)"
@@ -5043,7 +5079,7 @@
     "Maximum pinned entries reached": "הושג מקסימום רשומות מוצמדות"
   },
   "Media / Launcher": {
-    "Media / Launcher": ""
+    "Media / Launcher": "מדיה / משגר"
   },
   "Media Controls": {
     "Media Controls": "פקדי מדיה"
@@ -5190,10 +5226,10 @@
     "Morning": "בוקר"
   },
   "Motion": {
-    "Motion": ""
+    "Motion": "תנועה"
   },
   "Motion & Accessibility": {
-    "Motion & Accessibility": ""
+    "Motion & Accessibility": "תנועה ונגישות"
   },
   "Motion Effects": {
     "Motion Effects": "אפקטי תנועה"
@@ -5220,7 +5256,7 @@
     "Move Widget": "הזזת הווידג׳ט"
   },
   "Move island and satellites left or right from display center": {
-    "Move island and satellites left or right from display center": ""
+    "Move island and satellites left or right from display center": "הזז/י את האי והלוויינים שמאלה או ימינה ממרכז המסך"
   },
   "Moving to Paused": {
     "Moving to Paused": "עובר להשהיה"
@@ -5283,7 +5319,7 @@
     "Navigate": "ניווט"
   },
   "Near Island": {
-    "Near Island": ""
+    "Near Island": "קרוב לאי"
   },
   "Network": {
     "Network": "רשת"
@@ -5604,7 +5640,7 @@
     "No plugins found": "לא נמצאו תוספים"
   },
   "No ports found": {
-    "No ports found": ""
+    "No ports found": "לא נמצאו פורטים"
   },
   "No printer found": {
     "No printer found": "לא נמצאה מדפסת"
@@ -5898,7 +5934,7 @@
     "Open From": "פתח/י מתוך"
   },
   "Open Island": {
-    "Open Island": ""
+    "Open Island": "פתח/י את האי"
   },
   "Open Notepad File": {
     "Open Notepad File": "פתח/י קובץ בפנקס"
@@ -6072,7 +6108,7 @@
     "PDF Reader": "קורא PDF"
   },
   "PID": {
-    "PID": ""
+    "PID": "PID"
   },
   "PIN": {
     "PIN": "קוד PIN"
@@ -6114,13 +6150,13 @@
     "Pairing...": "מתאים..."
   },
   "Palette": {
-    "Palette": ""
+    "Palette": "פלטה"
   },
   "Panels glide in from a larger distance at full size, no scale change, pure clean motion.": {
-    "Panels glide in from a larger distance at full size, no scale change, pure clean motion.": ""
+    "Panels glide in from a larger distance at full size, no scale change, pure clean motion.": "הפאנלים מחליקים פנימה ממרחק גדול יותר בגודל מלא, ללא שינוי קנה מידה, תנועה חלקה ונקייה."
   },
   "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": {
-    "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": ""
+    "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": "הפאנלים גדלים תוך כדי החלקה פנימה, אפקט עומק דרמטי שבולט קדימה."
   },
   "Partial": {
     "Partial": "חלקי"
@@ -6249,7 +6285,7 @@
     "Place clipboard history on the Wayland overlay layer": "מקם/י את היסטוריית לוח ההעתקה על שכבת הכיסוי של Wayland"
   },
   "Place independent widgets to left and right of island": {
-    "Place independent widgets to left and right of island": ""
+    "Place independent widgets to left and right of island": "מקם/י ווידג׳טים עצמאיים משמאל ומימין לאי"
   },
   "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
     "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "מקם/י כאן את תיקיות התוספים. לכל תוסף צריך להיות קובץ מניפסט בשם plugin.json."
@@ -6264,7 +6300,7 @@
     "Place the dock on the Wayland overlay layer": "הצב/י את הDock בשכבת הכיסוי של Wayland"
   },
   "Platform renderer (FreeType).": {
-    "Platform renderer (FreeType).": ""
+    "Platform renderer (FreeType).": "מעבד הפלטפורמה המובנה (FreeType)."
   },
   "Play": {
     "Play": "נגן"
@@ -6291,7 +6327,7 @@
     "Playback error: ": "שגיאת השמעה: "
   },
   "Playful": {
-    "Playful": ""
+    "Playful": "משחקי"
   },
   "Plays audio files": {
     "Plays audio files": "לניגון קבצי שמע"
@@ -6381,10 +6417,10 @@
     "Port": "פורט"
   },
   "Port Selection": {
-    "Port Selection": ""
+    "Port Selection": "בחירת פורט"
   },
   "Port switched": {
-    "Port switched": ""
+    "Port switched": "הפורט הוחלף"
   },
   "Portal": {
     "Portal": "פורטל"
@@ -6501,7 +6537,7 @@
     "Primary": "ראשי"
   },
   "Primary Bar": {
-    "Primary Bar": ""
+    "Primary Bar": "סרגל ראשי"
   },
   "Primary Container": {
     "Primary Container": "מיכל ראשי"
@@ -6696,7 +6732,7 @@
     "Recommended available": "מומלץ זמין"
   },
   "Reduce Motion": {
-    "Reduce Motion": ""
+    "Reduce Motion": "הפחתת תנועה"
   },
   "Reduce the visible bar length from both ends": {
     "Reduce the visible bar length from both ends": "הפחת/י את האורך הגלוי של הסרגל משני הקצוות"
@@ -6822,7 +6858,7 @@
     "Rename Workspace": "שנה/י את השם של סביבת העבודה"
   },
   "Render Type": {
-    "Render Type": ""
+    "Render Type": "סוג עיבוד"
   },
   "Reorder & Group": {
     "Reorder & Group": "סידור מחדש וקיבוץ"
@@ -6882,7 +6918,7 @@
     "Requires the DMS Theme extension from the editor marketplace": "דורש את התוסף DMS Theme מחנות התוספים של העורך"
   },
   "Reserved Height": {
-    "Reserved Height": ""
+    "Reserved Height": "גובה שמור"
   },
   "Reset": {
     "Reset": "איפוס"
@@ -6906,7 +6942,7 @@
     "Resize on Border": "שינוי גודל במסגרת"
   },
   "Resize the resting island to align with nearby widgets": {
-    "Resize the resting island to align with nearby widgets": ""
+    "Resize the resting island to align with nearby widgets": "שנה/י את גודל האי במצב מנוחה כדי להתיישר עם ווידג׳טים סמוכים"
   },
   "Resize windows by dragging their edges with the mouse": {
     "Resize windows by dragging their edges with the mouse": "שנה/י גודל חלונות על ידי גרירת הקצוות שלהם עם העכבר"
@@ -7068,10 +7104,10 @@
     "SSID": "SSID"
   },
   "Satellite Widgets": {
-    "Satellite Widgets": ""
+    "Satellite Widgets": "ווידג׳טי לוויין"
   },
   "Satellites widget to place left or right of the island": {
-    "Satellites widget to place left or right of the island": ""
+    "Satellites widget to place left or right of the island": "ווידג׳טי לוויין למקם משמאל או מימין לאי"
   },
   "Saturation": {
     "Saturation": "רוויה"
@@ -7158,7 +7194,7 @@
     "Score": "Score"
   },
   "Screen Edges": {
-    "Screen Edges": ""
+    "Screen Edges": "קצוות המסך"
   },
   "Screen sharing": {
     "Screen sharing": "שיתוף מסך"
@@ -7233,7 +7269,7 @@
     "Search themes...": "חפש/י ערכות נושא..."
   },
   "Search when idle, visualizer when media is playing": {
-    "Search when idle, visualizer when media is playing": ""
+    "Search when idle, visualizer when media is playing": "חיפוש בהמתנה, מחולל חזותי כאשר מדיה מתנגנת"
   },
   "Search widgets...": {
     "Search widgets...": "חפש/י ווידג׳טים..."
@@ -7689,7 +7725,7 @@
     "Show Restart DMS": "הצגה של \"הפעלה מחדש של DMS\""
   },
   "Show Satellite Widgets": {
-    "Show Satellite Widgets": ""
+    "Show Satellite Widgets": "הצג/י ווידג׳טי לוויין"
   },
   "Show Saved Items": {
     "Show Saved Items": "הצג/י פריטים שמורים"
@@ -7727,6 +7763,9 @@
   "Show Trash in Dock": {
     "Show Trash in Dock": "הצג/י אשפה בDock"
   },
+  "Show Virtual Devices": {
+    "Show Virtual Devices": ""
+  },
   "Show Weather Condition": {
     "Show Weather Condition": "הצגת תנאי מזג האוויר"
   },
@@ -7746,7 +7785,7 @@
     "Show a bar that drains as the popup's auto-dismiss timer runs": "הצג/י פס שמתרוקן ככל שהזמן לסגירה האוטומטית של החלון הקופץ עובר"
   },
   "Show a clickable clock beside compact media details": {
-    "Show a clickable clock beside compact media details": ""
+    "Show a clickable clock beside compact media details": "הצג/י שעון שניתן ללחוץ עליו לצד פרטי מדיה קומפקטיים"
   },
   "Show a notification when battery reaches the charge limit.": {
     "Show a notification when battery reaches the charge limit.": "הצג/י התראה כאשר הסוללה מגיעה למגבלת הטעינה."
@@ -7770,7 +7809,7 @@
     "Show cava audio visualizer in media widget": "הצג/י את המחולל החזותי לשמע (cava) בווידג׳ט המדיה"
   },
   "Show critical priority popups while Do Not Disturb is on": {
-    "Show critical priority popups while Do Not Disturb is on": ""
+    "Show critical priority popups while Do Not Disturb is on": "הצג/י חלונות קופצים בעדיפות קריטית בזמן שמצב ״נא לא להפריע״ מופעל"
   },
   "Show darkened overlay behind modal dialogs": {
     "Show darkened overlay behind modal dialogs": "הצג/י שכבה כהה מאחורי חלוניות דו-שיח"
@@ -7908,22 +7947,22 @@
     "Small": "קטן"
   },
   "Smart": {
-    "Smart": ""
+    "Smart": "חכם"
   },
   "Smartcard Authentication": {
     "Smartcard Authentication": "אימות עם כרטיס חכם"
   },
   "Smooth": {
-    "Smooth": ""
+    "Smooth": "חלק"
   },
   "Smooth cubic deceleration in, quick snap out, clean, elegant curves.": {
-    "Smooth cubic deceleration in, quick snap out, clean, elegant curves.": ""
+    "Smooth cubic deceleration in, quick snap out, clean, elegant curves.": "האטה חלקה פנימה, יציאה מהירה, עקומות נקיות ואלגנטיות."
   },
   "Snap": {
     "Snap": "הצמד/י"
   },
   "Snap spring-driven motion straight to its target without physics travel": {
-    "Snap spring-driven motion straight to its target without physics travel": ""
+    "Snap spring-driven motion straight to its target without physics travel": "הצמד/י תנועה מבוססת קפיץ ישר ליעדה ללא מהלך פיזיקלי"
   },
   "Snow": {
     "Snow": "שלג"
@@ -7932,16 +7971,16 @@
     "Soft Reboot": "הפעלה מחדש רכה"
   },
   "Solid": {
-    "Solid": ""
+    "Solid": "מלא"
   },
   "Solid material type or Outline": {
-    "Solid material type or Outline": ""
+    "Solid material type or Outline": "סוג חומר מלא או קו מתאר"
   },
   "Some plugins require a newer version of DMS:": {
     "Some plugins require a newer version of DMS:": "תוספים מסוימים דורשים גרסה חדשה יותר של DMS:"
   },
   "Some settings are managed by the island": {
-    "Some settings are managed by the island": ""
+    "Some settings are managed by the island": "חלק מההגדרות מנוהלות על ידי האי"
   },
   "Sort Alphabetically": {
     "Sort Alphabetically": "מיון לפי סדר אלפביתי"
@@ -7974,7 +8013,7 @@
     "Space between windows and screen edges": "מרווח בין חלונות וקצוות המסך"
   },
   "Space kept clear for compact island and satellites": {
-    "Space kept clear for compact island and satellites": ""
+    "Space kept clear for compact island and satellites": "שטח שנשאר פנוי עבור האי הקומפקטי והלוויינים"
   },
   "Spacer": {
     "Spacer": "מרווח"
@@ -8004,22 +8043,22 @@
     "Spotlight Search": "חיפוש Spotlight"
   },
   "Spring Damping": {
-    "Spring Damping": ""
+    "Spring Damping": "ריסון קפיץ"
   },
   "Spring Mass": {
-    "Spring Mass": ""
+    "Spring Mass": "מסת קפיץ"
   },
   "Spring Motion": {
-    "Spring Motion": ""
+    "Spring Motion": "תנועת קפיץ"
   },
   "Spring Stiffness": {
-    "Spring Stiffness": ""
+    "Spring Stiffness": "קשיחות קפיץ"
   },
   "Spring bezier with overshoot, entry briefly exceeds its target then settles.": {
-    "Spring bezier with overshoot, entry briefly exceeds its target then settles.": ""
+    "Spring bezier with overshoot, entry briefly exceeds its target then settles.": "עקומת Bezier של קפיץ עם חריגה, הכניסה חורגת לרגע מהיעד ואז מתייצבת."
   },
   "Springs carry extra energy and visibly bounce before settling": {
-    "Springs carry extra energy and visibly bounce before settling": ""
+    "Springs carry extra energy and visibly bounce before settling": "קפיצים נושאים אנרגיה נוספת וקופצים באופן גלוי לפני התייצבות"
   },
   "Square": {
     "Square": "מרובע"
@@ -8031,7 +8070,7 @@
     "Stacked": "בערימה"
   },
   "Stage the Wayland overlay layer to remain visible over fullscreen apps": {
-    "Stage the Wayland overlay layer to remain visible over fullscreen apps": ""
+    "Stage the Wayland overlay layer to remain visible over fullscreen apps": "הגדר/י את שכבת הכיסוי של Wayland כדי שתישאר גלויה מעל אפליקציות במסך מלא"
   },
   "Standard": {
     "Standard": "רגיל"
@@ -8175,7 +8214,7 @@
     "Sway Website": "האתר של Sway"
   },
   "Sweep the background into the screen edges": {
-    "Sweep the background into the screen edges": ""
+    "Sweep the background into the screen edges": "פרוס/פרסי את הרקע לתוך קצוות המסך"
   },
   "Switch Layout Shortcut": {
     "Switch Layout Shortcut": "קיצור מקלדת להחלפת פריסה"
@@ -8315,6 +8354,9 @@
   "Tap to Click": {
     "Tap to Click": "הקשה ללחיצה"
   },
+  "Task list used when adding tasks from the dash calendar": {
+    "Task list used when adding tasks from the dash calendar": ""
+  },
   "Terminal": {
     "Terminal": "מסוף"
   },
@@ -8376,10 +8418,10 @@
     "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "משתנה הסביבה DMS_SOCKET אינו מוגדר או שהsocket אינו זמין. ניהול תוספים אוטומטי דורש את DMS_SOCKET."
   },
   "The Island anchors to the top or bottom edge": {
-    "The Island anchors to the top or bottom edge": ""
+    "The Island anchors to the top or bottom edge": "האי מעוגן לקצה העליון או התחתון"
   },
   "The Island holds this edge on a display this bar covers, so the bar stays hidden there": {
-    "The Island holds this edge on a display this bar covers, so the bar stays hidden there": ""
+    "The Island holds this edge on a display this bar covers, so the bar stays hidden there": "האי תופס את הקצה הזה במסך שהסרגל הזה מכסה, ולכן הסרגל נשאר מוסתר שם"
   },
   "The WiFi adapter could not start access point mode.": {
     "The WiFi adapter could not start access point mode.": "מתאם הWiFi לא הצליח להפעיל מצב נקודת גישה."
@@ -8393,8 +8435,11 @@
   "The custom command used when attaching to sessions (receives the session name as the first argument)": {
     "The custom command used when attaching to sessions (receives the session name as the first argument)": "הפקודה המותאמת אישית שנמצאת בשימוש בעת חיבור להפעלות (מקבלת את שם ההפעלה כארגומנט הראשון)"
   },
+  "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": {
+    "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": ""
+  },
   "The island draws its own surface": {
-    "The island draws its own surface": ""
+    "The island draws its own surface": "האי מצייר את המשטח של עצמו"
   },
   "The job queue of this printer is empty": {
     "The job queue of this printer is empty": "תור ההדפסה של מדפסת זו ריק"
@@ -8433,7 +8478,7 @@
     "These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)": "אלה מוסיפים רשומות לתיקיית ההפעלה האוטומטית של XDG (~/.config/autostart/*.desktop)"
   },
   "These style the bar surface, which the Island replaces": {
-    "These style the bar surface, which the Island replaces": ""
+    "These style the bar surface, which the Island replaces": "אלה מעצבים את משטח הסרגל, שאותו האי מחליף"
   },
   "Thickness": {
     "Thickness": "עובי"
@@ -8586,7 +8631,7 @@
     "Toggle fonts": "החלף/י גופנים"
   },
   "Toggle the Island on this instance's displays": {
-    "Toggle the Island on this instance's displays": ""
+    "Toggle the Island on this instance's displays": "הפעל/השבת את האי במסכים של מופע זה"
   },
   "Toggle visibility of this bar configuration": {
     "Toggle visibility of this bar configuration": "שנה/י את ההצגה/הסתרה של תצורת סרגל זו"
@@ -8613,7 +8658,7 @@
     "Tools": "כלים"
   },
   "Tools icon opens Control Center": {
-    "Tools icon opens Control Center": ""
+    "Tools icon opens Control Center": "סמל הכלים פותח את מרכז הבקרה"
   },
   "Top": {
     "Top": "למעלה"
@@ -8835,7 +8880,7 @@
     "Unpin from Dock": "בטל/י נעיצה על הDock"
   },
   "Unread notification count beside the clock": {
-    "Unread notification count beside the clock": ""
+    "Unread notification count beside the clock": "מספר ההתראות שלא נקראו לצד השעון"
   },
   "Unsaved changes": {
     "Unsaved changes": "שינויים שלא נשמרו"
@@ -9116,6 +9161,9 @@
   "Version": {
     "Version": "גרסה"
   },
+  "Vertical": {
+    "Vertical": ""
+  },
   "Vertical Deck": {
     "Vertical Deck": "חפיסה אנכית"
   },
@@ -9231,7 +9279,7 @@
     "Weather Widget": "ווידג׳ט מזג האוויר"
   },
   "Weather icon and temperature open the weather activity": {
-    "Weather icon and temperature open the weather activity": ""
+    "Weather icon and temperature open the weather activity": "סמל מזג האוויר והטמפרטורה פותחים את פעילות מזג האוויר"
   },
   "Web Browser": {
     "Web Browser": "דפדפן לגלישה באינטרנט"
@@ -9526,6 +9574,9 @@
   },
   "display rotation option": {
     "Normal": "רגיל"
+  },
+  "dms-greeter is not installed. Install the dms-greeter package to manage the greeter.": {
+    "dms-greeter is not installed. Install the dms-greeter package to manage the greeter.": ""
   },
   "e.g. /usr/bin/my-script --flag": {
     "e.g. /usr/bin/my-script --flag": "לדוגמה /usr/bin/my-script --flag"

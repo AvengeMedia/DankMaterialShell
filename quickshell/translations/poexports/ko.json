@@ -1403,6 +1403,15 @@
   "Category": {
     "Category": "카테고리"
   },
+  "Cellular": {
+    "Cellular": ""
+  },
+  "Cellular disabled": {
+    "Cellular disabled": ""
+  },
+  "Cellular enabled": {
+    "Cellular enabled": ""
+  },
   "Center Section": {
     "Center Section": "중앙 구역"
   },
@@ -2408,6 +2417,9 @@
   "Default Opens": {
     "Default Opens": "기본 열기"
   },
+  "Default Task List": {
+    "Default Task List": ""
+  },
   "Default Width (%)": {
     "Default Width (%)": "기본 너비(%)"
   },
@@ -2584,6 +2596,9 @@
   },
   "Disabling auto-login on startup...": {
     "Disabling auto-login on startup...": "시작 시 자동 로그인 비활성화 중..."
+  },
+  "Disabling cellular...": {
+    "Disabling cellular...": ""
   },
   "Disc": {
     "Disc": "디스크"
@@ -2882,6 +2897,9 @@
   "Enable Bar": {
     "Enable Bar": "표시줄 활성화"
   },
+  "Enable Cellular": {
+    "Enable Cellular": ""
+  },
   "Enable Do Not Disturb": {
     "Enable Do Not Disturb": "방해 금지 모드 켜기"
   },
@@ -2950,6 +2968,9 @@
   },
   "Enabling WiFi...": {
     "Enabling WiFi...": "Wi-Fi 켜는 중..."
+  },
+  "Enabling cellular...": {
+    "Enabling cellular...": ""
   },
   "End": {
     "End": "끝"
@@ -3311,6 +3332,12 @@
   "Failed to save clipboard setting": {
     "Failed to save clipboard setting": "클립보드 설정 저장 실패"
   },
+  "Failed to save dropped file": {
+    "Failed to save dropped file": ""
+  },
+  "Failed to save dropped text": {
+    "Failed to save dropped text": ""
+  },
   "Failed to save keybind": {
     "Failed to save keybind": "키 바인딩 저장 실패"
   },
@@ -3367,6 +3394,9 @@
   },
   "Failed to switch port": {
     "Failed to switch port": ""
+  },
+  "Failed to toggle cellular": {
+    "Failed to toggle cellular": ""
   },
   "Failed to unpin entry": {
     "Failed to unpin entry": "항목 고정 해제 실패"
@@ -4103,6 +4133,9 @@
   "Home Compact": {
     "Home Compact": ""
   },
+  "Horizontal": {
+    "Horizontal": ""
+  },
   "Horizontal Offset": {
     "Horizontal Offset": ""
   },
@@ -4315,6 +4348,9 @@
   },
   "Include Transitions": {
     "Include Transitions": "전환 포함"
+  },
+  "Include application streams and virtual sinks in the device lists": {
+    "Include application streams and virtual sinks in the device lists": ""
   },
   "Include desktop actions (shortcuts) in search results.": {
     "Include desktop actions (shortcuts) in search results.": "검색 결과에 데스크톱 작업(바로 가기)을 포함합니다."
@@ -7727,6 +7763,9 @@
   "Show Trash in Dock": {
     "Show Trash in Dock": "독에 휴지통 표시"
   },
+  "Show Virtual Devices": {
+    "Show Virtual Devices": ""
+  },
   "Show Weather Condition": {
     "Show Weather Condition": "날씨 상태 표시"
   },
@@ -8315,6 +8354,9 @@
   "Tap to Click": {
     "Tap to Click": ""
   },
+  "Task list used when adding tasks from the dash calendar": {
+    "Task list used when adding tasks from the dash calendar": ""
+  },
   "Terminal": {
     "Terminal": "터미널"
   },
@@ -8392,6 +8434,9 @@
   },
   "The custom command used when attaching to sessions (receives the session name as the first argument)": {
     "The custom command used when attaching to sessions (receives the session name as the first argument)": "세션에 연결할 때 사용되는 사용자 지정 명령어(세션 이름을 첫 번째 인수로 받음)"
+  },
+  "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": {
+    "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": ""
   },
   "The island draws its own surface": {
     "The island draws its own surface": ""
@@ -9116,6 +9161,9 @@
   "Version": {
     "Version": "버전"
   },
+  "Vertical": {
+    "Vertical": ""
+  },
   "Vertical Deck": {
     "Vertical Deck": "세로 데크"
   },
@@ -9526,6 +9574,9 @@
   },
   "display rotation option": {
     "Normal": ""
+  },
+  "dms-greeter is not installed. Install the dms-greeter package to manage the greeter.": {
+    "dms-greeter is not installed. Install the dms-greeter package to manage the greeter.": ""
   },
   "e.g. /usr/bin/my-script --flag": {
     "e.g. /usr/bin/my-script --flag": "예: /usr/bin/my-script --flag"

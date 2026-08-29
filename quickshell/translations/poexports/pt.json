@@ -1403,6 +1403,15 @@
   "Category": {
     "Category": "Categoria"
   },
+  "Cellular": {
+    "Cellular": ""
+  },
+  "Cellular disabled": {
+    "Cellular disabled": ""
+  },
+  "Cellular enabled": {
+    "Cellular enabled": ""
+  },
   "Center Section": {
     "Center Section": "Seção Central"
   },
@@ -2408,6 +2417,9 @@
   "Default Opens": {
     "Default Opens": "Abertura Padrão"
   },
+  "Default Task List": {
+    "Default Task List": ""
+  },
   "Default Width (%)": {
     "Default Width (%)": "Largura Padrão (%)"
   },
@@ -2584,6 +2596,9 @@
   },
   "Disabling auto-login on startup...": {
     "Disabling auto-login on startup...": "Desativando o login automático na inicialização..."
+  },
+  "Disabling cellular...": {
+    "Disabling cellular...": ""
   },
   "Disc": {
     "Disc": "Disco"
@@ -2882,6 +2897,9 @@
   "Enable Bar": {
     "Enable Bar": "Habilitar Barra"
   },
+  "Enable Cellular": {
+    "Enable Cellular": ""
+  },
   "Enable Do Not Disturb": {
     "Enable Do Not Disturb": "Habilitar Não Perturbe"
   },
@@ -2950,6 +2968,9 @@
   },
   "Enabling WiFi...": {
     "Enabling WiFi...": "Ativando WiFi..."
+  },
+  "Enabling cellular...": {
+    "Enabling cellular...": ""
   },
   "End": {
     "End": "Fim"
@@ -3311,6 +3332,12 @@
   "Failed to save clipboard setting": {
     "Failed to save clipboard setting": "Falha ao salvar configuração de área de transferência"
   },
+  "Failed to save dropped file": {
+    "Failed to save dropped file": ""
+  },
+  "Failed to save dropped text": {
+    "Failed to save dropped text": ""
+  },
   "Failed to save keybind": {
     "Failed to save keybind": "Falha ao salvar atalho"
   },
@@ -3367,6 +3394,9 @@
   },
   "Failed to switch port": {
     "Failed to switch port": ""
+  },
+  "Failed to toggle cellular": {
+    "Failed to toggle cellular": ""
   },
   "Failed to unpin entry": {
     "Failed to unpin entry": "Falha ao remover entrada"
@@ -4103,6 +4133,9 @@
   "Home Compact": {
     "Home Compact": ""
   },
+  "Horizontal": {
+    "Horizontal": ""
+  },
   "Horizontal Offset": {
     "Horizontal Offset": ""
   },
@@ -4315,6 +4348,9 @@
   },
   "Include Transitions": {
     "Include Transitions": "Incluir Transições"
+  },
+  "Include application streams and virtual sinks in the device lists": {
+    "Include application streams and virtual sinks in the device lists": ""
   },
   "Include desktop actions (shortcuts) in search results.": {
     "Include desktop actions (shortcuts) in search results.": "Incluir ações de desktop (atalhos) nos resultados da pesquisa."
@@ -7727,6 +7763,9 @@
   "Show Trash in Dock": {
     "Show Trash in Dock": "Mostrar a Lixeira no Dock"
   },
+  "Show Virtual Devices": {
+    "Show Virtual Devices": ""
+  },
   "Show Weather Condition": {
     "Show Weather Condition": "Mostrar Condição do Tempo"
   },
@@ -8315,6 +8354,9 @@
   "Tap to Click": {
     "Tap to Click": "Tocar para Clicar"
   },
+  "Task list used when adding tasks from the dash calendar": {
+    "Task list used when adding tasks from the dash calendar": ""
+  },
   "Terminal": {
     "Terminal": "Terminal"
   },
@@ -8392,6 +8434,9 @@
   },
   "The custom command used when attaching to sessions (receives the session name as the first argument)": {
     "The custom command used when attaching to sessions (receives the session name as the first argument)": "O comando personalizado usado ao anexar a sessões (recebe o nome da sessão como primeiro argumento)"
+  },
+  "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": {
+    "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": ""
   },
   "The island draws its own surface": {
     "The island draws its own surface": ""
@@ -9116,6 +9161,9 @@
   "Version": {
     "Version": "Versão"
   },
+  "Vertical": {
+    "Vertical": ""
+  },
   "Vertical Deck": {
     "Vertical Deck": "Deck Vertical"
   },
@@ -9526,6 +9574,9 @@
   },
   "display rotation option": {
     "Normal": "Normal"
+  },
+  "dms-greeter is not installed. Install the dms-greeter package to manage the greeter.": {
+    "dms-greeter is not installed. Install the dms-greeter package to manage the greeter.": ""
   },
   "e.g. /usr/bin/my-script --flag": {
     "e.g. /usr/bin/my-script --flag": "ex.: /usr/bin/my-script --flag"

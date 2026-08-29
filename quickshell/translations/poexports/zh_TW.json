@@ -1403,6 +1403,15 @@
   "Category": {
     "Category": "類別"
   },
+  "Cellular": {
+    "Cellular": ""
+  },
+  "Cellular disabled": {
+    "Cellular disabled": ""
+  },
+  "Cellular enabled": {
+    "Cellular enabled": ""
+  },
   "Center Section": {
     "Center Section": "中間區塊"
   },
@@ -2408,6 +2417,9 @@
   "Default Opens": {
     "Default Opens": "預設開啟方式"
   },
+  "Default Task List": {
+    "Default Task List": ""
+  },
   "Default Width (%)": {
     "Default Width (%)": "預設寬度 (%)"
   },
@@ -2584,6 +2596,9 @@
   },
   "Disabling auto-login on startup...": {
     "Disabling auto-login on startup...": ""
+  },
+  "Disabling cellular...": {
+    "Disabling cellular...": ""
   },
   "Disc": {
     "Disc": "光碟"
@@ -2882,6 +2897,9 @@
   "Enable Bar": {
     "Enable Bar": "啟用欄"
   },
+  "Enable Cellular": {
+    "Enable Cellular": ""
+  },
   "Enable Do Not Disturb": {
     "Enable Do Not Disturb": "啟用勿擾模式"
   },
@@ -2950,6 +2968,9 @@
   },
   "Enabling WiFi...": {
     "Enabling WiFi...": "正在啟用 Wi-Fi..."
+  },
+  "Enabling cellular...": {
+    "Enabling cellular...": ""
   },
   "End": {
     "End": "結束"
@@ -3311,6 +3332,12 @@
   "Failed to save clipboard setting": {
     "Failed to save clipboard setting": "儲存剪貼簿設定失敗"
   },
+  "Failed to save dropped file": {
+    "Failed to save dropped file": ""
+  },
+  "Failed to save dropped text": {
+    "Failed to save dropped text": ""
+  },
   "Failed to save keybind": {
     "Failed to save keybind": "保存按鍵綁定失敗"
   },
@@ -3367,6 +3394,9 @@
   },
   "Failed to switch port": {
     "Failed to switch port": ""
+  },
+  "Failed to toggle cellular": {
+    "Failed to toggle cellular": ""
   },
   "Failed to unpin entry": {
     "Failed to unpin entry": "無法解除釘選項目"
@@ -4103,6 +4133,9 @@
   "Home Compact": {
     "Home Compact": ""
   },
+  "Horizontal": {
+    "Horizontal": ""
+  },
   "Horizontal Offset": {
     "Horizontal Offset": ""
   },
@@ -4315,6 +4348,9 @@
   },
   "Include Transitions": {
     "Include Transitions": "包括過渡"
+  },
+  "Include application streams and virtual sinks in the device lists": {
+    "Include application streams and virtual sinks in the device lists": ""
   },
   "Include desktop actions (shortcuts) in search results.": {
     "Include desktop actions (shortcuts) in search results.": "在搜尋結果中包含桌面動作（捷徑）。"
@@ -7727,6 +7763,9 @@
   "Show Trash in Dock": {
     "Show Trash in Dock": "在 Dock 中顯示垃圾桶"
   },
+  "Show Virtual Devices": {
+    "Show Virtual Devices": ""
+  },
   "Show Weather Condition": {
     "Show Weather Condition": "顯示天氣狀況"
   },
@@ -8315,6 +8354,9 @@
   "Tap to Click": {
     "Tap to Click": ""
   },
+  "Task list used when adding tasks from the dash calendar": {
+    "Task list used when adding tasks from the dash calendar": ""
+  },
   "Terminal": {
     "Terminal": "終端機"
   },
@@ -8392,6 +8434,9 @@
   },
   "The custom command used when attaching to sessions (receives the session name as the first argument)": {
     "The custom command used when attaching to sessions (receives the session name as the first argument)": "附加到會話時使用的自訂命令（將會話名稱作為第一個參數接收）"
+  },
+  "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": {
+    "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": ""
   },
   "The island draws its own surface": {
     "The island draws its own surface": ""
@@ -9116,6 +9161,9 @@
   "Version": {
     "Version": "版本"
   },
+  "Vertical": {
+    "Vertical": ""
+  },
   "Vertical Deck": {
     "Vertical Deck": "垂直 Deck"
   },
@@ -9526,6 +9574,9 @@
   },
   "display rotation option": {
     "Normal": ""
+  },
+  "dms-greeter is not installed. Install the dms-greeter package to manage the greeter.": {
+    "dms-greeter is not installed. Install the dms-greeter package to manage the greeter.": ""
   },
   "e.g. /usr/bin/my-script --flag": {
     "e.g. /usr/bin/my-script --flag": "例如：/usr/bin/my-script --flag"

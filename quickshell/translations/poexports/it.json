@@ -78,7 +78,7 @@
     "%1 online": "%1 online"
   },
   "%1 position": {
-    "%1 position": ""
+    "%1 position": "Posizione %1"
   },
   "%1 tasks": {
     "%1 tasks": "%1 attività"
@@ -315,7 +315,7 @@
     "A separate minimal launcher action that works in Standalone, Separate Frame Mode, and Connected Frame Mode.": "Un'azione di avvio minimale separata che funziona in modalità Standalone, in modalità Separate Frame e in modalità Connected Frame."
   },
   "A slight natural settle, DMS default": {
-    "A slight natural settle, DMS default": ""
+    "A slight natural settle, DMS default": "Leggero assestamento naturale, impostazione predefinita di DMS"
   },
   "A user with that name already exists.": {
     "A user with that name already exists.": "Esiste già un utente con quel nome."
@@ -495,7 +495,7 @@
     "Add to Autostart": "Aggiungi all'Avvio Automatico"
   },
   "Additional settings are managed by the Island": {
-    "Additional settings are managed by the Island": ""
+    "Additional settings are managed by the Island": "Le impostazioni aggiuntive sono gestite dall'Island"
   },
   "Adjust pointer sensitivity speed": {
     "Adjust pointer sensitivity speed": "Regola la velocità di sensibilità del puntatore"
@@ -552,7 +552,7 @@
     "Allow": "Consenti"
   },
   "Allow %1 in Do Not Disturb": {
-    "Allow %1 in Do Not Disturb": ""
+    "Allow %1 in Do Not Disturb": "Consenti %1 in Non Disturbare"
   },
   "Allow LAN access": {
     "Allow LAN access": "Consenti accesso LAN"
@@ -570,7 +570,7 @@
     "Allow greeter login access": "Consenti l'accesso al login del greeter"
   },
   "Allow in Do Not Disturb": {
-    "Allow in Do Not Disturb": ""
+    "Allow in Do Not Disturb": "Consenti in Non Disturbare"
   },
   "Already on that session": {
     "Already on that session": "Già in quella sessione"
@@ -720,7 +720,7 @@
     "Apply inverse concave corner cutouts to the bar": "Applica intagli angolari concavi alla barra"
   },
   "Apply island geometry changes immediately without spring overshoot": {
-    "Apply island geometry changes immediately without spring overshoot": ""
+    "Apply island geometry changes immediately without spring overshoot": "Applica immediatamente le modifiche geometriche all'isola senza oscillazione elastica"
   },
   "Apply to Hardware": {
     "Apply to Hardware": "Applica all'Hardware"
@@ -747,7 +747,7 @@
     "Apps Icon": "Icona App"
   },
   "Apps allowed to show popups while Do Not Disturb is on. Right-click a notification and choose \"Allow in Do Not Disturb\" to add one here.": {
-    "Apps allowed to show popups while Do Not Disturb is on. Right-click a notification and choose \"Allow in Do Not Disturb\" to add one here.": ""
+    "Apps allowed to show popups while Do Not Disturb is on. Right-click a notification and choose \"Allow in Do Not Disturb\" to add one here.": "App autorizzate a mostrare popup durante la modalità Non Disturbare. Fai clic destro su una notifica e scegli \"Consenti in Non Disturbare\" per aggiungerne una qui."
   },
   "Apps are ordered by usage frequency, then last used, then alphabetically.": {
     "Apps are ordered by usage frequency, then last used, then alphabetically.": "Le applicazioni sono ordinate per frequenza di utilizzo, poi per ultimo utilizzo, infine in ordine alfabetico."
@@ -861,10 +861,10 @@
     "Auto (Bar-aware)": "Auto (In base alla barra)"
   },
   "Auto (Dark Mode)": {
-    "Auto (Dark Mode)": ""
+    "Auto (Dark Mode)": "Automatico (Modalità Scura)"
   },
   "Auto (Light Mode)": {
-    "Auto (Light Mode)": ""
+    "Auto (Light Mode)": "Automatico (Modalità Chiara)"
   },
   "Auto (Wide)": {
     "Auto (Wide)": "Automatico (Ampio)"
@@ -873,7 +873,7 @@
     "Auto Compositor Gaps": "Spaziature Automatiche del Compositor"
   },
   "Auto From Wallpaper": {
-    "Auto From Wallpaper": ""
+    "Auto From Wallpaper": "Automatico dallo Sfondo"
   },
   "Auto Location": {
     "Auto Location": "Posizione Automatica"
@@ -984,7 +984,7 @@
     "Automatically lock the screen when the system prepares to suspend": "Blocca automaticamente lo schermo quando il sistema si prepara alla sospensione"
   },
   "Automatically picks the scheme variant based on the wallpaper.": {
-    "Automatically picks the scheme variant based on the wallpaper.": ""
+    "Automatically picks the scheme variant based on the wallpaper.": "Seleziona automaticamente la variante dello schema in base allo sfondo."
   },
   "Automatically save changes to opened files as you type": {
     "Automatically save changes to opened files as you type": "Salva automaticamente le modifiche ai file aperti durante la digitazione"
@@ -1092,10 +1092,10 @@
     "Bar Spacing": "Spaziatura della Barra"
   },
   "Bar border and shadow": {
-    "Bar border and shadow": ""
+    "Bar border and shadow": "Bordo e ombra della barra"
   },
   "Bar corners": {
-    "Bar corners": ""
+    "Bar corners": "Angoli della barra"
   },
   "Bar corners and background": {
     "Bar corners and background": "Angoli e sfondo della barra"
@@ -1104,7 +1104,7 @@
     "Bar shadow, border, and corners": "Ombra, bordo e angoli della barra"
   },
   "Bar visibility": {
-    "Bar visibility": ""
+    "Bar visibility": "Visibilità della barra"
   },
   "Base color for shadows (opacity is applied automatically)": {
     "Base color for shadows (opacity is applied automatically)": "Colore base per le ombre (l'opacità è applicata automaticamente)"
@@ -1119,7 +1119,7 @@
     "Battery %1": "Batteria %1"
   },
   "Battery / Control Center": {
-    "Battery / Control Center": ""
+    "Battery / Control Center": "Batteria / Centro di Controllo"
   },
   "Battery Charge Limit": {
     "Battery Charge Limit": "Limite Carica Batteria"
@@ -1134,7 +1134,7 @@
     "Battery and power management": "Gestione batteria e alimentazione"
   },
   "Battery gauge opens Control Center": {
-    "Battery gauge opens Control Center": ""
+    "Battery gauge opens Control Center": "L'indicatore della batteria apre il Centro di Controllo"
   },
   "Battery has charged to your set limit of %1%": {
     "Battery has charged to your set limit of %1%": "La batteria ha raggiunto il limite impostato al %1%"
@@ -1170,7 +1170,7 @@
     "Blend between Surface High and the selected custom color": "Mixa tra Superficie Elevata e il colore personalizzato selezionato"
   },
   "Block %1 in Do Not Disturb": {
-    "Block %1 in Do Not Disturb": ""
+    "Block %1 in Do Not Disturb": "Blocca %1 in Non Disturbare"
   },
   "Block Out": {
     "Block Out": "Escludi"
@@ -1218,7 +1218,7 @@
     "Body": "Corpo"
   },
   "Body Click Runs Default Action": {
-    "Body Click Runs Default Action": ""
+    "Body Click Runs Default Action": "Il Clic sul Corpo Esegue l'Azione Predefinita"
   },
   "Body Font Size": {
     "Body Font Size": "Dimensione Font Corpo"
@@ -1278,7 +1278,7 @@
     "Bottom dock for pinned and running applications": "Dock inferiore per applicazioni fissate e in esecuzione"
   },
   "Bright": {
-    "Bright": ""
+    "Bright": "Luminoso"
   },
   "Brightness": {
     "Brightness": "Luminosità"
@@ -1403,11 +1403,20 @@
   "Category": {
     "Category": "Categoria"
   },
+  "Cellular": {
+    "Cellular": ""
+  },
+  "Cellular disabled": {
+    "Cellular disabled": ""
+  },
+  "Cellular enabled": {
+    "Cellular enabled": ""
+  },
   "Center Section": {
     "Center Section": "Sezione Centrale"
   },
   "Center Section - Reserved by Dank Island": {
-    "Center Section - Reserved by Dank Island": ""
+    "Center Section - Reserved by Dank Island": "Sezione Centrale - Riservata alla Dank Island"
   },
   "Center Single Column": {
     "Center Single Column": "Colonna Singola Centrale"
@@ -1548,7 +1557,7 @@
     "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": "Scegli quali monitor mostrano l'interfaccia della schermata di blocco. Gli altri monitor mostreranno un colore solido per la protezione dal burn-in degli OLED."
   },
   "Choose which shortcuts sit left or right of the clock": {
-    "Choose which shortcuts sit left or right of the clock": ""
+    "Choose which shortcuts sit left or right of the clock": "Scegli quali scorciatoie posizionare a sinistra o a destra dell'orologio"
   },
   "Chroma Style": {
     "Chroma Style": "Stile Chroma"
@@ -1575,7 +1584,7 @@
     "Clear All Jobs": "Elimina Tutte le Stampe"
   },
   "Clear Badge on Open": {
-    "Clear Badge on Open": ""
+    "Clear Badge on Open": "Azzera Badge all'Apertura"
   },
   "Clear History?": {
     "Clear History?": "Cancellare la Cronologia?"
@@ -1590,10 +1599,10 @@
     "Clear at Startup": "Cancella all'Avvio"
   },
   "Clears the badge on open but keeps notifications active": {
-    "Clears the badge on open but keeps notifications active": ""
+    "Clears the badge on open but keeps notifications active": "Azzera il badge all'apertura mantenendo attive le notifiche"
   },
   "Click": {
-    "Click": ""
+    "Click": "Clic"
   },
   "Click 'Setup' to create %1 and add include to your compositor config.": {
     "Click 'Setup' to create %1 and add include to your compositor config.": "Fai clic su \"Configura\" per creare %1 e aggiungere l'inclusione al file di configurazione del compositor."
@@ -1614,10 +1623,10 @@
     "Click any shortcut to edit. Changes save to %1": "Fai clic su qualsiasi scorciatoia per modificare. Le modifiche vengono salvate in %1"
   },
   "Click expands only on an intentional press. Hybrid peeks the current compact face on hover": {
-    "Click expands only on an intentional press. Hybrid peeks the current compact face on hover": ""
+    "Click expands only on an intentional press. Hybrid peeks the current compact face on hover": "Il clic espande solo su pressione intenzionale. Ibrido mostra un'anteprima compatta al passaggio del mouse"
   },
   "Click the icon to mute": {
-    "Click the icon to mute": ""
+    "Click the icon to mute": "Fai clic sull'icona per silenziare"
   },
   "Click to Paste": {
     "Click to Paste": "Fai clic per Incollare"
@@ -1629,7 +1638,7 @@
     "Click to select a custom theme JSON file": "Fai clic per selezionare un file tema JSON personalizzato"
   },
   "Clicking a popup runs its first action instead of expanding the body": {
-    "Clicking a popup runs its first action instead of expanding the body": ""
+    "Clicking a popup runs its first action instead of expanding the body": "Facendo clic su un popup viene eseguita la prima azione anziché espandere il corpo"
   },
   "Clip": {
     "Clip": "Ritaglia"
@@ -1779,16 +1788,16 @@
     "Compact": "Compatto"
   },
   "Compact Clock Pill": {
-    "Compact Clock Pill": ""
+    "Compact Clock Pill": "Pillola Orologio Compatta"
   },
   "Compact Island Height": {
-    "Compact Island Height": ""
+    "Compact Island Height": "Altezza Isola Compatta"
   },
   "Compact Mode": {
     "Compact Mode": "Modalità Compatta"
   },
   "Compact home clock pill in both width and height": {
-    "Compact home clock pill in both width and height": ""
+    "Compact home clock pill in both width and height": "Riduci la pillola dell'orologio principale sia in larghezza che in altezza"
   },
   "Completed": {
     "Completed": "Completato"
@@ -1845,7 +1854,7 @@
     "Configure which displays show \"%1\"": "Configura quali schermi mostrano \"%1\""
   },
   "Configure which displays show Dank Island as \"%1": {
-    "Configure which displays show Dank Island as \"%1\"": ""
+    "Configure which displays show Dank Island as \"%1\"": "Configura quali schermi mostrano Dank Island come \"%1\""
   },
   "Configure which displays show shell components": {
     "Configure which displays show shell components": "Configura quali schermi mostrano i componenti della shell"
@@ -2028,7 +2037,7 @@
     "Corner Style": "Stile degli Angoli"
   },
   "Corner style applies to the bar surface": {
-    "Corner style applies to the bar surface": ""
+    "Corner style applies to the bar surface": "Lo stile degli angoli si applica alla superficie della barra"
   },
   "Corners & Background": {
     "Corners & Background": "Angoli e Sfondo"
@@ -2103,13 +2112,13 @@
     "Ctrl+S: Save • Ctrl+O: Open • Ctrl+N: New • Ctrl+F: Find": "Ctrl+S: Salva • Ctrl+O: Apri • Ctrl+N: Nuovo • Ctrl+F: Trova"
   },
   "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close": {
-    "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close": "Ctrl+Tab: Cambia Tab • Ctrl+S: Aggiungi/Rimuovi • Shift+Del: Cancella Tutto • Esc: Chiudi"
+    "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close": "Ctrl+Tab: Cambia Tab • Ctrl+S: Fissa/Rimuovi • Shift+Del: Cancella Tutto • Esc: Chiudi"
   },
   "Ctrl+Tab: Switch Tabs • Ctrl+S: Pin/Unpin • Shift+Enter: Copy • Shift+Del: Clear All • F10: Help • Esc: Close": {
-    "Ctrl+Tab: Switch Tabs • Ctrl+S: Pin/Unpin • Shift+Enter: Copy • Shift+Del: Clear All • F10: Help • Esc: Close": "Ctrl+Tab: Cambia scheda • Ctrl+S: Blocca/Sblocca • Shift+Invio: Copia • Shift+Canc: Cancella tutto • F10: Aiuto • Esc: Chiudi"
+    "Ctrl+Tab: Switch Tabs • Ctrl+S: Pin/Unpin • Shift+Enter: Copy • Shift+Del: Clear All • F10: Help • Esc: Close": "Ctrl+Tab: Cambia scheda • Ctrl+S: Fissa/Rimuovi • Shift+Invio: Copia • Shift+Canc: Cancella tutto • F10: Aiuto • Esc: Chiudi"
   },
   "Ctrl+Tab: Switch Tabs • Ctrl+S: Pin/Unpin • Shift+Enter: Paste • Shift+Del: Clear All • F10: Help • Esc: Close": {
-    "Ctrl+Tab: Switch Tabs • Ctrl+S: Pin/Unpin • Shift+Enter: Paste • Shift+Del: Clear All • F10: Help • Esc: Close": "Ctrl+Tab: Cambia scheda • Ctrl+S: Blocca/Sblocca • Shift+Invio: Incolla • Shift+Canc: Cancella tutto • F10: Aiuto • Esc: Chiudi"
+    "Ctrl+Tab: Switch Tabs • Ctrl+S: Pin/Unpin • Shift+Enter: Paste • Shift+Del: Clear All • F10: Help • Esc: Close": "Ctrl+Tab: Cambia scheda • Ctrl+S: Fissa/Rimuovi • Shift+Invio: Incolla • Shift+Canc: Cancella tutto • F10: Aiuto • Esc: Chiudi"
   },
   "Current": {
     "Current": "Attuali"
@@ -2160,7 +2169,7 @@
     "Curve": "Curva"
   },
   "Curve rasterizer.": {
-    "Curve rasterizer.": ""
+    "Curve rasterizer.": "Rasterizzatore di curve."
   },
   "Curve: curve rasterizer.": {
     "Curve: curve rasterizer.": "Curve: rasterizzatore a curve."
@@ -2292,7 +2301,7 @@
     "Daily at:": "Ogni giorno alle:"
   },
   "Damped springs settle straight to their target with no overshoot": {
-    "Damped springs settle straight to their target with no overshoot": ""
+    "Damped springs settle straight to their target with no overshoot": "Le molle smorzate si stabilizzano direttamente sul bersaglio senza oscillazioni"
   },
   "Dank": {
     "Dank": "Dank"
@@ -2307,10 +2316,10 @@
     "Dank Dash": "Dank Dash"
   },
   "Dank Island - Beta": {
-    "Dank Island - Beta": ""
+    "Dank Island - Beta": "Dank Island - Beta"
   },
   "Dank Island instance": {
-    "Dank Island instance": ""
+    "Dank Island instance": "Istanza di Dank Island"
   },
   "DankBar": {
     "DankBar": "DankBar"
@@ -2343,13 +2352,13 @@
     "Dark mode harmony": "Armonia modalità scura"
   },
   "Dark or light mode follows the wallpaper brightness": {
-    "Dark or light mode follows the wallpaper brightness": ""
+    "Dark or light mode follows the wallpaper brightness": "La modalità chiara o scura seguono la luminosità dello sfondo"
   },
   "Darken Modal Background": {
     "Darken Modal Background": "Scurisci Sfondo Modale"
   },
   "Dashboard": {
-    "Dashboard": ""
+    "Dashboard": "Dashboard"
   },
   "Date First": {
     "Date First": "Prima la Data"
@@ -2408,11 +2417,14 @@
   "Default Opens": {
     "Default Opens": "Aperture Predefinite"
   },
+  "Default Task List": {
+    "Default Task List": ""
+  },
   "Default Width (%)": {
     "Default Width (%)": "Larghezza Predefinita (%)"
   },
   "Default launcher shortcuts open a native launcher activity inside Dank Island. Spotlight is used when the focused screen has no DankIsland.": {
-    "Default launcher shortcuts open a native launcher activity inside Dank Island. Spotlight is used when the focused screen has no DankIsland.": ""
+    "Default launcher shortcuts open a native launcher activity inside Dank Island. Spotlight is used when the focused screen has no DankIsland.": "Le scorciatoie predefinite del launcher aprono un'attività nativa all'interno della Dank Island. Spotlight viene usato se lo schermo attivo non ha una Dank Island."
   },
   "Default launcher shortcuts open the full launcher with mode tabs, grid view, and action panel.": {
     "Default launcher shortcuts open the full launcher with mode tabs, grid view, and action panel.": "Le scorciatoie predefinite del launcher aprono il launcher completo con schede delle modalità, visualizzazione a griglia e pannello delle azioni."
@@ -2538,7 +2550,7 @@
     "Digital": "Digitale"
   },
   "Dim": {
-    "Dim": ""
+    "Dim": "Attenuato"
   },
   "Direct path to a .xkb keymap file. Overrides layouts/variants above.": {
     "Direct path to a .xkb keymap file. Overrides layouts/variants above.": "Percorso diretto a un file keymap .xkb. Sovrascrive i layout/varianti sopra."
@@ -2584,6 +2596,9 @@
   },
   "Disabling auto-login on startup...": {
     "Disabling auto-login on startup...": "Disabilitazione accesso automatico all'avvio..."
+  },
+  "Disabling cellular...": {
+    "Disabling cellular...": ""
   },
   "Disc": {
     "Disc": "Disco"
@@ -2694,10 +2709,10 @@
     "Displays the active keyboard layout and allows switching": "Mostra il layout tastiera attivo e ne permette il cambio"
   },
   "Distance between display edge and island": {
-    "Distance between display edge and island": ""
+    "Distance between display edge and island": "Distanza tra il bordo dello schermo e l'isola"
   },
   "Distance-field renderer.": {
-    "Distance-field renderer.": ""
+    "Distance-field renderer.": "Renderer a campo di distanza."
   },
   "Distribution": {
     "Distribution": "Distribuzione"
@@ -2760,10 +2775,10 @@
     "Draw a connected picture-frame border around the entire display": "Disegna un bordo a cornice continuo attorno all'intero display"
   },
   "Draw an island-styled background behind satellite widgets": {
-    "Draw an island-styled background behind satellite widgets": ""
+    "Draw an island-styled background behind satellite widgets": "Disegna uno sfondo in stile isola dietro i widget satellite"
   },
   "Draw an outline and use the highest-contrast surface tone": {
-    "Draw an outline and use the highest-contrast surface tone": ""
+    "Draw an outline and use the highest-contrast surface tone": "Disegna un contorno e usa la tonalità di superficie a contrasto più elevato"
   },
   "Driver": {
     "Driver": "Driver"
@@ -2882,6 +2897,9 @@
   "Enable Bar": {
     "Enable Bar": "Abilita Barra"
   },
+  "Enable Cellular": {
+    "Enable Cellular": ""
+  },
   "Enable Do Not Disturb": {
     "Enable Do Not Disturb": "Abilita Non Disturbare"
   },
@@ -2892,7 +2910,7 @@
     "Enable History": "Abilita Cronologia"
   },
   "Enable Island": {
-    "Enable Island": ""
+    "Enable Island": "Abilita Isola"
   },
   "Enable Num Lock": {
     "Enable Num Lock": "Abilita Bloc Num"
@@ -2943,13 +2961,16 @@
     "Enable security key authentication": "Abilita l'autenticazione con chiave di sicurezza"
   },
   "Enable weather in Time & Weather to show this shortcut": {
-    "Enable weather in Time & Weather to show this shortcut": ""
+    "Enable weather in Time & Weather to show this shortcut": "Abilita il meteo in Orario e Meteo per mostrare questa scorciatoia"
   },
   "Enabled": {
     "Enabled": "Attivato"
   },
   "Enabling WiFi...": {
     "Enabling WiFi...": "Attivazione Wi-Fi..."
+  },
+  "Enabling cellular...": {
+    "Enabling cellular...": ""
   },
   "End": {
     "End": "Fine"
@@ -3075,13 +3096,13 @@
     "Exit node": "Nodo di uscita"
   },
   "Expand Notifications": {
-    "Expand Notifications": ""
+    "Expand Notifications": "Espandi Notifiche"
   },
   "Expand notifications by default instead of click or hover": {
-    "Expand notifications by default instead of click or hover": ""
+    "Expand notifications by default instead of click or hover": "Espandi le notifiche per impostazione predefinita anziché al clic o al passaggio del mouse"
   },
   "Expansion Mode": {
-    "Expansion Mode": ""
+    "Expansion Mode": "Modalità di Espansione"
   },
   "Experimental Feature": {
     "Experimental Feature": "Funzionalità Sperimentale"
@@ -3311,6 +3332,12 @@
   "Failed to save clipboard setting": {
     "Failed to save clipboard setting": "Impossibile salvare l'impostazione degli appunti"
   },
+  "Failed to save dropped file": {
+    "Failed to save dropped file": ""
+  },
+  "Failed to save dropped text": {
+    "Failed to save dropped text": ""
+  },
   "Failed to save keybind": {
     "Failed to save keybind": "Impossibile salvare la scorciatoia"
   },
@@ -3366,7 +3393,10 @@
     "Failed to switch codec": "Impossibile cambiare codec"
   },
   "Failed to switch port": {
-    "Failed to switch port": ""
+    "Failed to switch port": "Impossibile cambiare porta"
+  },
+  "Failed to toggle cellular": {
+    "Failed to toggle cellular": ""
   },
   "Failed to unpin entry": {
     "Failed to unpin entry": "Impossibile rimuovere la voce"
@@ -3546,7 +3576,7 @@
     "Floating windows follow Surface Styling settings": "Le finestre fluttuanti seguono le impostazioni di Stile Superficie"
   },
   "Floats above windows and other content": {
-    "Floats above windows and other content": ""
+    "Floats above windows and other content": "Fluttua sopra le finestre e gli altri contenuti"
   },
   "Fluent": {
     "Fluent": "Fluente"
@@ -3837,7 +3867,7 @@
     "Globally scale all animation durations": "Scala globalmente tutte le durate delle animazioni"
   },
   "Globally scale animation durations with geometric motion & spring based physics with bezier curves": {
-    "Globally scale animation durations with geometric motion & spring based physics with bezier curves": ""
+    "Globally scale animation durations with geometric motion & spring based physics with bezier curves": "Scala globalmente la durata delle animazioni con moto geometrico, fisica a molla e curve di Bézier"
   },
   "Golden Hour": {
     "Golden Hour": "Ora Dorata"
@@ -4062,19 +4092,19 @@
     "High": "Alta"
   },
   "High Contrast": {
-    "High Contrast": ""
+    "High Contrast": "Contrasto Elevato"
   },
   "High-fidelity palette that preserves source hues.": {
     "High-fidelity palette that preserves source hues.": "Tavolozza ad alta fedeltà che preserva le tonalità della sorgente."
   },
   "Higher percentages give island more inertia": {
-    "Higher percentages give island more inertia": ""
+    "Higher percentages give island more inertia": "Percentuali più elevate conferiscono maggiore inerzia all'isola"
   },
   "Higher values pull island toward its target more strongly": {
-    "Higher values pull island toward its target more strongly": ""
+    "Higher values pull island toward its target more strongly": "Valori più alti attirano l'isola verso il bersaglio con maggiore forza"
   },
   "Higher values settle island with less bounce": {
-    "Higher values settle island with less bounce": ""
+    "Higher values settle island with less bounce": "Valori più alti stabilizzano l'isola con minori rimbalzi"
   },
   "Highlight Active Workspace App": {
     "Highlight Active Workspace App": "Evidenzia App Spazio di Lavoro Attivo"
@@ -4101,10 +4131,13 @@
     "Hold to Confirm Power Actions": "Tieni Premuto per Confermare le Azioni di Alimentazione"
   },
   "Home Compact": {
-    "Home Compact": ""
+    "Home Compact": "Home Compatta"
+  },
+  "Horizontal": {
+    "Horizontal": ""
   },
   "Horizontal Offset": {
-    "Horizontal Offset": ""
+    "Horizontal Offset": "Offset Orizzontale"
   },
   "Horizontal and vertical bar thickness": {
     "Horizontal and vertical bar thickness": "Spessore orizzontale e verticale della barra"
@@ -4170,10 +4203,10 @@
     "Humidity": "Umidità"
   },
   "Hybrid": {
-    "Hybrid": ""
+    "Hybrid": "Ibrido"
   },
   "Hybrid peeks the current compact face on hover. Click pins a destination so it stays open": {
-    "Hybrid peeks the current compact face on hover. Click pins a destination so it stays open": ""
+    "Hybrid peeks the current compact face on hover. Click pins a destination so it stays open": "Ibrido mostra l'interfaccia compatta al passaggio del mouse. Il clic fissa la destinazione mantenendola aperta"
   },
   "Hyprland Discord Server": {
     "Hyprland Discord Server": "Server Discord di Hyprland"
@@ -4224,7 +4257,7 @@
     "Icon Size %": "% Dimensione Icona"
   },
   "Icon Spacing": {
-    "Icon Spacing": ""
+    "Icon Spacing": "Spaziatura Icone"
   },
   "Icon Theme": {
     "Icon Theme": "Tema Icone"
@@ -4316,6 +4349,9 @@
   "Include Transitions": {
     "Include Transitions": "Includi Transizioni"
   },
+  "Include application streams and virtual sinks in the device lists": {
+    "Include application streams and virtual sinks in the device lists": ""
+  },
   "Include desktop actions (shortcuts) in search results.": {
     "Include desktop actions (shortcuts) in search results.": "Includi azioni desktop (scorciatoie) nei risultati di ricerca."
   },
@@ -4362,7 +4398,7 @@
     "Inner Gaps": "Spaziature Interne"
   },
   "Inner authentication": {
-    "Inner authentication": ""
+    "Inner authentication": "Autenticazione interna"
   },
   "Inner padding applied to each widget": {
     "Inner padding applied to each widget": "Spaziatura interna applicata a ciascun widget"
@@ -4479,16 +4515,16 @@
     "Iris Bloom": "Effetto Iride"
   },
   "Island": {
-    "Island": ""
+    "Island": "Isola"
   },
   "Island Gap": {
-    "Island Gap": ""
+    "Island Gap": "Spaziatura Isola"
   },
   "Island Instance": {
-    "Island Instance": ""
+    "Island Instance": "Istanza Isola"
   },
   "Island placement": {
-    "Island placement": ""
+    "Island placement": "Posizionamento dell'isola"
   },
   "Isolate Displays": {
     "Isolate Displays": "Isola Schermi"
@@ -4512,7 +4548,7 @@
     "Keep Changes": "Conserva Modifiche"
   },
   "Keep Clock with Media": {
-    "Keep Clock with Media": ""
+    "Keep Clock with Media": "Mantieni Orologio con i Media"
   },
   "Keep My Edits": {
     "Keep My Edits": "Mantieni le Mie Modifiche"
@@ -4533,7 +4569,7 @@
     "Keep typing": "Continua a digitare"
   },
   "Keep widgets beside the island or align them like a standalone bar": {
-    "Keep widgets beside the island or align them like a standalone bar": ""
+    "Keep widgets beside the island or align them like a standalone bar": "Mantieni i widget accanto all'isola o allineali come in una barra indipendente"
   },
   "Keeping Awake": {
     "Keeping Awake": "Mantieni Attivo"
@@ -4749,7 +4785,7 @@
     "Loading keybinds...": "Caricamento scorciatoie..."
   },
   "Loading ports...": {
-    "Loading ports...": ""
+    "Loading ports...": "Caricamento porte in corso..."
   },
   "Loading trending...": {
     "Loading trending...": "Caricamento tendenze..."
@@ -4935,10 +4971,10 @@
     "Material": "Material"
   },
   "Material 3 Expressive bezier curves, default.": {
-    "Material 3 Expressive bezier curves, default.": ""
+    "Material 3 Expressive bezier curves, default.": "Curve di Bézier espressive di Material 3, predefinito."
   },
   "Material 3 Expressive panels rise from below with a subtle scale, default.": {
-    "Material 3 Expressive panels rise from below with a subtle scale, default.": ""
+    "Material 3 Expressive panels rise from below with a subtle scale, default.": "I pannelli espressivi di Material 3 emergono dal basso con una scala sottile, predefinito."
   },
   "Material Battery Style": {
     "Material Battery Style": "Stile Batteria Material"
@@ -5043,7 +5079,7 @@
     "Maximum pinned entries reached": "Raggiunto il numero massimo di voci fissate"
   },
   "Media / Launcher": {
-    "Media / Launcher": ""
+    "Media / Launcher": "Media / Launcher"
   },
   "Media Controls": {
     "Media Controls": "Controlli Media"
@@ -5190,10 +5226,10 @@
     "Morning": "Mattina"
   },
   "Motion": {
-    "Motion": ""
+    "Motion": "Movimento"
   },
   "Motion & Accessibility": {
-    "Motion & Accessibility": ""
+    "Motion & Accessibility": "Movimento e Accessibilità"
   },
   "Motion Effects": {
     "Motion Effects": "Effetti di Movimento"
@@ -5220,7 +5256,7 @@
     "Move Widget": "Sposta Widget"
   },
   "Move island and satellites left or right from display center": {
-    "Move island and satellites left or right from display center": ""
+    "Move island and satellites left or right from display center": "Sposta l'isola e i satelliti a sinistra o a destra rispetto al centro dello schermo"
   },
   "Moving to Paused": {
     "Moving to Paused": "Messa in Pausa"
@@ -5283,7 +5319,7 @@
     "Navigate": "Naviga"
   },
   "Near Island": {
-    "Near Island": ""
+    "Near Island": "Vicino all'Isola"
   },
   "Network": {
     "Network": "Rete"
@@ -5604,7 +5640,7 @@
     "No plugins found": "Nessun plugin trovato"
   },
   "No ports found": {
-    "No ports found": ""
+    "No ports found": "Nessuna porta trovata"
   },
   "No printer found": {
     "No printer found": "Nessuna stampante trovata"
@@ -5898,7 +5934,7 @@
     "Open From": "Apri Da"
   },
   "Open Island": {
-    "Open Island": ""
+    "Open Island": "Apri Isola"
   },
   "Open Notepad File": {
     "Open Notepad File": "Apri File Blocco Note"
@@ -6072,7 +6108,7 @@
     "PDF Reader": "Lettore PDF"
   },
   "PID": {
-    "PID": ""
+    "PID": "PID"
   },
   "PIN": {
     "PIN": "PIN"
@@ -6114,13 +6150,13 @@
     "Pairing...": "Associazione in corso..."
   },
   "Palette": {
-    "Palette": ""
+    "Palette": "Tavolozza"
   },
   "Panels glide in from a larger distance at full size, no scale change, pure clean motion.": {
-    "Panels glide in from a larger distance at full size, no scale change, pure clean motion.": ""
+    "Panels glide in from a larger distance at full size, no scale change, pure clean motion.": "I pannelli scivolano da maggiore distanza a dimensione reale, senza cambio di scala, movimento pulito."
   },
   "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": {
-    "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": ""
+    "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": "I pannelli si ingrandiscono mentre scorrono in entrata, per un marcato effetto di profondità in primo piano."
   },
   "Partial": {
     "Partial": "Parziale"
@@ -6249,7 +6285,7 @@
     "Place clipboard history on the Wayland overlay layer": "Posiziona la cronologia degli appunti sul livello overlay di Wayland"
   },
   "Place independent widgets to left and right of island": {
-    "Place independent widgets to left and right of island": ""
+    "Place independent widgets to left and right of island": "Posiziona widget indipendenti a sinistra e a destra dell'isola"
   },
   "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
     "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "Posiziona qui le cartelle dei plugin. Ogni plugin dovrebbe contenere un file manifesto plugin.json."
@@ -6264,7 +6300,7 @@
     "Place the dock on the Wayland overlay layer": "Posiziona il dock sul livello di sovrapposizione di Wayland"
   },
   "Platform renderer (FreeType).": {
-    "Platform renderer (FreeType).": ""
+    "Platform renderer (FreeType).": "Renderer di piattaforma (FreeType)"
   },
   "Play": {
     "Play": "Riproduci"
@@ -6291,7 +6327,7 @@
     "Playback error: ": "Errore di riproduzione: "
   },
   "Playful": {
-    "Playful": ""
+    "Playful": "Giocoso"
   },
   "Plays audio files": {
     "Plays audio files": "Riproduzione di file audio"
@@ -6381,10 +6417,10 @@
     "Port": "Porta"
   },
   "Port Selection": {
-    "Port Selection": ""
+    "Port Selection": "Selezione Porta"
   },
   "Port switched": {
-    "Port switched": ""
+    "Port switched": "Porta cambiata"
   },
   "Portal": {
     "Portal": "Vortice"
@@ -6501,7 +6537,7 @@
     "Primary": "Primario"
   },
   "Primary Bar": {
-    "Primary Bar": ""
+    "Primary Bar": "Barra Principale"
   },
   "Primary Container": {
     "Primary Container": "Contenitore Primario"
@@ -6696,7 +6732,7 @@
     "Recommended available": "Opzione consigliata disponibile"
   },
   "Reduce Motion": {
-    "Reduce Motion": ""
+    "Reduce Motion": "Riduci Movimento"
   },
   "Reduce the visible bar length from both ends": {
     "Reduce the visible bar length from both ends": "Riduci la lunghezza visibile della barra da entrambe le estremità"
@@ -6822,7 +6858,7 @@
     "Rename Workspace": "Rinomina Spazio di Lavoro"
   },
   "Render Type": {
-    "Render Type": ""
+    "Render Type": "Tipo di Rendering"
   },
   "Reorder & Group": {
     "Reorder & Group": "Riordina e Raggruppa"
@@ -6882,7 +6918,7 @@
     "Requires the DMS Theme extension from the editor marketplace": "Richiede l'estensione DMS Theme dal marketplace dell'editor"
   },
   "Reserved Height": {
-    "Reserved Height": ""
+    "Reserved Height": "Altezza Riservata"
   },
   "Reset": {
     "Reset": "Reimposta"
@@ -6906,7 +6942,7 @@
     "Resize on Border": "Ridimensiona dal Bordo"
   },
   "Resize the resting island to align with nearby widgets": {
-    "Resize the resting island to align with nearby widgets": ""
+    "Resize the resting island to align with nearby widgets": "Ridimensiona l'isola a riposo per allinearla ai widget adiacenti"
   },
   "Resize windows by dragging their edges with the mouse": {
     "Resize windows by dragging their edges with the mouse": "Ridimensiona le finestre trascinando i bordi con il mouse"
@@ -7068,10 +7104,10 @@
     "SSID": "SSID"
   },
   "Satellite Widgets": {
-    "Satellite Widgets": ""
+    "Satellite Widgets": "Widget Satellite"
   },
   "Satellites widget to place left or right of the island": {
-    "Satellites widget to place left or right of the island": ""
+    "Satellites widget to place left or right of the island": "Widget satellite da posizionare a sinistra o a destra dell'isola"
   },
   "Saturation": {
     "Saturation": "Saturazione"
@@ -7158,7 +7194,7 @@
     "Score": "Punteggio"
   },
   "Screen Edges": {
-    "Screen Edges": ""
+    "Screen Edges": "Bordi dello Schermo"
   },
   "Screen sharing": {
     "Screen sharing": "Condivisione schermo"
@@ -7233,7 +7269,7 @@
     "Search themes...": "Cerca temi..."
   },
   "Search when idle, visualizer when media is playing": {
-    "Search when idle, visualizer when media is playing": ""
+    "Search when idle, visualizer when media is playing": "Cerca quando inattivo, visualizzatore durante la riproduzione multimediale"
   },
   "Search widgets...": {
     "Search widgets...": "Cerca widget..."
@@ -7689,7 +7725,7 @@
     "Show Restart DMS": "Mostra Riavvia DMS"
   },
   "Show Satellite Widgets": {
-    "Show Satellite Widgets": ""
+    "Show Satellite Widgets": "Mostra Widget Satellite"
   },
   "Show Saved Items": {
     "Show Saved Items": "Mostra Elementi Salvati"
@@ -7727,6 +7763,9 @@
   "Show Trash in Dock": {
     "Show Trash in Dock": "Mostra il Cestino nel Dock"
   },
+  "Show Virtual Devices": {
+    "Show Virtual Devices": ""
+  },
   "Show Weather Condition": {
     "Show Weather Condition": "Mostra Condizioni Meteo"
   },
@@ -7746,7 +7785,7 @@
     "Show a bar that drains as the popup's auto-dismiss timer runs": "Mostra una barra che si svuota mentre scorre il timer di chiusura automatica del popup"
   },
   "Show a clickable clock beside compact media details": {
-    "Show a clickable clock beside compact media details": ""
+    "Show a clickable clock beside compact media details": "Mostra un orologio cliccabile accanto ai dettagli compatti dei media"
   },
   "Show a notification when battery reaches the charge limit.": {
     "Show a notification when battery reaches the charge limit.": "Mostra una notifica quando la batteria raggiunge il limite di carica."
@@ -7770,7 +7809,7 @@
     "Show cava audio visualizer in media widget": "Mostra il visualizzatore audio cava nel widget multimediale"
   },
   "Show critical priority popups while Do Not Disturb is on": {
-    "Show critical priority popups while Do Not Disturb is on": ""
+    "Show critical priority popups while Do Not Disturb is on": "Mostra i popup a priorità critica quando la modalità Non Disturbare è attiva"
   },
   "Show darkened overlay behind modal dialogs": {
     "Show darkened overlay behind modal dialogs": "Mostra la sovrapposizione oscurata dietro le finestre di dialogo modali"
@@ -7908,22 +7947,22 @@
     "Small": "Piccolo"
   },
   "Smart": {
-    "Smart": ""
+    "Smart": "Intelligente"
   },
   "Smartcard Authentication": {
     "Smartcard Authentication": "Autenticazione Tramite Smart Card"
   },
   "Smooth": {
-    "Smooth": ""
+    "Smooth": "Fluido"
   },
   "Smooth cubic deceleration in, quick snap out, clean, elegant curves.": {
-    "Smooth cubic deceleration in, quick snap out, clean, elegant curves.": ""
+    "Smooth cubic deceleration in, quick snap out, clean, elegant curves.": "Decelerazione cubica fluida in entrata, rilascio rapido in uscita, curve pulite ed eleganti."
   },
   "Snap": {
     "Snap": "Aggancia"
   },
   "Snap spring-driven motion straight to its target without physics travel": {
-    "Snap spring-driven motion straight to its target without physics travel": ""
+    "Snap spring-driven motion straight to its target without physics travel": "Aggancia il movimento a molla direttamente al bersaglio senza transizione fisica"
   },
   "Snow": {
     "Snow": "Neve"
@@ -7932,16 +7971,16 @@
     "Soft Reboot": "Riavvio Soft"
   },
   "Solid": {
-    "Solid": ""
+    "Solid": "Pieno"
   },
   "Solid material type or Outline": {
-    "Solid material type or Outline": ""
+    "Solid material type or Outline": "Tipo di materiale pieno o Contorno"
   },
   "Some plugins require a newer version of DMS:": {
     "Some plugins require a newer version of DMS:": "Alcuni plugin richiedono una versione più recente di DMS:"
   },
   "Some settings are managed by the island": {
-    "Some settings are managed by the island": ""
+    "Some settings are managed by the island": "Alcune impostazioni sono gestite dall'isola"
   },
   "Sort Alphabetically": {
     "Sort Alphabetically": "Ordina Alfabeticamente"
@@ -7974,7 +8013,7 @@
     "Space between windows and screen edges": "Spazio tra le finestre e i bordi dello schermo"
   },
   "Space kept clear for compact island and satellites": {
-    "Space kept clear for compact island and satellites": ""
+    "Space kept clear for compact island and satellites": "Spazio mantenuto libero per l'isola compatta e i satelliti"
   },
   "Spacer": {
     "Spacer": "Distanziatore"
@@ -8004,22 +8043,22 @@
     "Spotlight Search": "Ricerca Spotlight"
   },
   "Spring Damping": {
-    "Spring Damping": ""
+    "Spring Damping": "Smorzamento della Molla"
   },
   "Spring Mass": {
-    "Spring Mass": ""
+    "Spring Mass": "Massa della Molla"
   },
   "Spring Motion": {
-    "Spring Motion": ""
+    "Spring Motion": "Movimento Elastico"
   },
   "Spring Stiffness": {
-    "Spring Stiffness": ""
+    "Spring Stiffness": "Rigidità della Molla"
   },
   "Spring bezier with overshoot, entry briefly exceeds its target then settles.": {
-    "Spring bezier with overshoot, entry briefly exceeds its target then settles.": ""
+    "Spring bezier with overshoot, entry briefly exceeds its target then settles.": "Curva di Bézier a molla con rimbalzo: l'entrata supera brevemente il punto finale per poi assestarsi."
   },
   "Springs carry extra energy and visibly bounce before settling": {
-    "Springs carry extra energy and visibly bounce before settling": ""
+    "Springs carry extra energy and visibly bounce before settling": "Le molle accumulano energia extra e rimbalzano visibilmente prima di stabilizzarsi"
   },
   "Square": {
     "Square": "Squadrato"
@@ -8031,7 +8070,7 @@
     "Stacked": "Impilato"
   },
   "Stage the Wayland overlay layer to remain visible over fullscreen apps": {
-    "Stage the Wayland overlay layer to remain visible over fullscreen apps": ""
+    "Stage the Wayland overlay layer to remain visible over fullscreen apps": "Predisponi il livello overlay di Wayland per rimanere visibile sopra le app a schermo intero"
   },
   "Standard": {
     "Standard": "Standard"
@@ -8112,7 +8151,7 @@
     "Super + Space": "Super + Spazio"
   },
   "Suppress Duplicate Notifications": {
-    "Suppress Duplicate Notifications": "Disabilita le notifiche duplicate"
+    "Suppress Duplicate Notifications": "Sopprimi le Notifiche Duplicate"
   },
   "Suppress notification popups while enabled": {
     "Suppress notification popups while enabled": "Sopprimi i popup di notifica quando attivato"
@@ -8175,7 +8214,7 @@
     "Sway Website": "Sito Web di Sway"
   },
   "Sweep the background into the screen edges": {
-    "Sweep the background into the screen edges": ""
+    "Sweep the background into the screen edges": "Estendi lo sfondo fino ai bordi dello schermo"
   },
   "Switch Layout Shortcut": {
     "Switch Layout Shortcut": "Scorciatoia Cambio Layout"
@@ -8315,6 +8354,9 @@
   "Tap to Click": {
     "Tap to Click": "Tocca per Fare Clic"
   },
+  "Task list used when adding tasks from the dash calendar": {
+    "Task list used when adding tasks from the dash calendar": ""
+  },
   "Terminal": {
     "Terminal": "Terminale"
   },
@@ -8376,10 +8418,10 @@
     "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "La variabile d'ambiente DMS_SOCKET non è impostata o il socket non è disponibile. La gestione automatica dei plugin richiede il DMS_SOCKET."
   },
   "The Island anchors to the top or bottom edge": {
-    "The Island anchors to the top or bottom edge": ""
+    "The Island anchors to the top or bottom edge": "L'isola si ancora al bordo superiore o inferiore"
   },
   "The Island holds this edge on a display this bar covers, so the bar stays hidden there": {
-    "The Island holds this edge on a display this bar covers, so the bar stays hidden there": ""
+    "The Island holds this edge on a display this bar covers, so the bar stays hidden there": "L'isola occupa questo bordo su uno schermo coperto da questa barra, quindi la barra rimane nascosta"
   },
   "The WiFi adapter could not start access point mode.": {
     "The WiFi adapter could not start access point mode.": "L'adattatore Wi-Fi non è riuscito ad avviare la modalità access point."
@@ -8393,8 +8435,11 @@
   "The custom command used when attaching to sessions (receives the session name as the first argument)": {
     "The custom command used when attaching to sessions (receives the session name as the first argument)": "Il comando personalizzato usato per agganciarsi alle sessioni (riceve il nome della sessione come primo argomento)"
   },
+  "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": {
+    "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": ""
+  },
   "The island draws its own surface": {
-    "The island draws its own surface": ""
+    "The island draws its own surface": "L'isola disegna la propria superficie"
   },
   "The job queue of this printer is empty": {
     "The job queue of this printer is empty": "La coda delle stampe della stampante è vuota"
@@ -8433,7 +8478,7 @@
     "These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)": "Queste aggiungono voci alla directory di avvio automatico XDG (~/.config/autostart/*.desktop)"
   },
   "These style the bar surface, which the Island replaces": {
-    "These style the bar surface, which the Island replaces": ""
+    "These style the bar surface, which the Island replaces": "Queste opzioni definiscono lo stile della superficie della barra, sostituita dall'Isola"
   },
   "Thickness": {
     "Thickness": "Spessore"
@@ -8586,7 +8631,7 @@
     "Toggle fonts": "Alterna i font"
   },
   "Toggle the Island on this instance's displays": {
-    "Toggle the Island on this instance's displays": ""
+    "Toggle the Island on this instance's displays": "Attiva/disattiva l'Isola sugli schermi di questa istanza"
   },
   "Toggle visibility of this bar configuration": {
     "Toggle visibility of this bar configuration": "Mostra/Nascondi questa configurazione della barra"
@@ -8613,7 +8658,7 @@
     "Tools": "Strumenti"
   },
   "Tools icon opens Control Center": {
-    "Tools icon opens Control Center": ""
+    "Tools icon opens Control Center": "L'icona degli strumenti apre il Centro di Controllo"
   },
   "Top": {
     "Top": "In Alto"
@@ -8835,7 +8880,7 @@
     "Unpin from Dock": "Rimuovi dal Dock"
   },
   "Unread notification count beside the clock": {
-    "Unread notification count beside the clock": ""
+    "Unread notification count beside the clock": "Conteggio delle notifiche non lette accanto all'orologio"
   },
   "Unsaved changes": {
     "Unsaved changes": "Modifiche non salvate"
@@ -9116,6 +9161,9 @@
   "Version": {
     "Version": "Versione"
   },
+  "Vertical": {
+    "Vertical": ""
+  },
   "Vertical Deck": {
     "Vertical Deck": "Pila Verticale"
   },
@@ -9231,7 +9279,7 @@
     "Weather Widget": "Widget Meteo"
   },
   "Weather icon and temperature open the weather activity": {
-    "Weather icon and temperature open the weather activity": ""
+    "Weather icon and temperature open the weather activity": "L'icona del meteo e la temperatura aprono l'attività meteo"
   },
   "Web Browser": {
     "Web Browser": "Browser Web"
@@ -9527,6 +9575,9 @@
   "display rotation option": {
     "Normal": "Normale"
   },
+  "dms-greeter is not installed. Install the dms-greeter package to manage the greeter.": {
+    "dms-greeter is not installed. Install the dms-greeter package to manage the greeter.": ""
+  },
   "e.g. /usr/bin/my-script --flag": {
     "e.g. /usr/bin/my-script --flag": "es. /usr/bin/my-script --flag"
   },
@@ -9747,9 +9798,9 @@
     "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": "↑/↓: Nav • Spazio: Espandi • Invio: Azione/Espandi • E: Testo"
   },
   "↑/↓: Navigate • Enter/Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help": {
-    "↑/↓: Navigate • Enter/Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help": "↑/↓: Naviga • Invio/Ctrl+C: Copia • Canc: Elimina • Ctrl+E: Modifica • Ctrl+S: Aggiungi/Rimuovi • F10: Aiuto"
+    "↑/↓: Navigate • Enter/Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help": "↑/↓: Naviga • Invio/Ctrl+C: Copia • Canc: Elimina • Ctrl+E: Modifica • Ctrl+S: Fissa/Rimuovi • F10: Aiuto"
   },
   "↑/↓: Navigate • Enter: Paste • Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help": {
-    "↑/↓: Navigate • Enter: Paste • Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help": "↑/↓: Naviga • Invio: Incolla • Ctrl+C: Copia • Canc: Elimina • Ctrl+E: Modifica • Ctrl+S: Aggiungi/Rimuovi • F10: Aiuto"
+    "↑/↓: Navigate • Enter: Paste • Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help": "↑/↓: Naviga • Invio: Incolla • Ctrl+C: Copia • Canc: Elimina • Ctrl+E: Modifica • Ctrl+S: Fissa/Rimuovi • F10: Aiuto"
   }
 }
