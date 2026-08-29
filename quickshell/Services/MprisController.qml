@@ -250,7 +250,9 @@ Singleton {
 
         if (pinnedIdentity !== "") {
             const pinLower = pinnedIdentity.toLowerCase();
-            const pinned = playing.find(player => player.identity === pinnedIdentity) ?? playing.find(player => (player.identity || "").toLowerCase().includes(pinLower));
+            const exact = playing.filter(player => player.identity === pinnedIdentity);
+            const matches = exact.length > 0 ? exact : playing.filter(player => (player.identity || "").toLowerCase().includes(pinLower));
+            const pinned = matches.find(player => player.canControl) ?? matches[0];
             if (pinned)
                 return pinned;
         }
