@@ -306,6 +306,9 @@ func (b *NetworkManagerBackend) Initialize() error {
 
 	b.updateAllEthernetDevices()
 	b.updateAllCellularDevices()
+	if err := b.updateCellularState(); err != nil {
+		log.Warnf("Failed to update cellular state: %v", err)
+	}
 	if _, err := b.listCellularConnections(); err != nil {
 		log.Warnf("Failed to get initial cellular configurations: %v", err)
 	}
