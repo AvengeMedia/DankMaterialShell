@@ -85,14 +85,14 @@ done
                                 width: parent.width
 
                                 StyledText {
-                                    text: BatteryService.batteryAvailable ? `${BatteryService.batteryLevel}%` : I18n.tr("Power")
+                                    text: BatteryService.batteryAvailable ? `${BatteryService.batteryLevel}%` : ""
                                     font.pixelSize: Theme.fontSizeXLarge
                                     font.weight: Font.Bold
                                     color: root.batteryStatusColor
                                 }
 
                                 StyledText {
-                                    text: BatteryService.batteryAvailable ? BatteryService.batteryStatus : I18n.tr("Management")
+                                    text: BatteryService.batteryStatus
                                     font.pixelSize: Theme.fontSizeLarge
                                     font.weight: Font.Medium
                                     color: Theme.surfaceText
