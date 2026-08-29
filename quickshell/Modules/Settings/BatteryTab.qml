@@ -123,6 +123,7 @@ done
                         }
 
                         Rectangle {
+                            anchors.left: parent.left
                             width: parent.width * Math.max(0, Math.min(1, BatteryService.batteryLevel / 100))
                             height: parent.height
                             radius: height / 2
