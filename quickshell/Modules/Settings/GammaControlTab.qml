@@ -318,6 +318,20 @@ Item {
                                     }
                                 }
                             }
+
+                            SettingsSliderRow {
+                                settingKey: "nightModeTransitionMinutes"
+                                tags: ["gamma", "night", "transition", "duration", "fade"]
+                                width: parent.width
+                                text: I18n.tr("Transition Duration")
+                                minimum: 0
+                                maximum: 180
+                                step: 5
+                                unit: "min"
+                                value: SessionData.nightModeTransitionMinutes
+                                visible: DMSService.apiVersion >= 32
+                                onSliderValueChanged: newValue => SessionData.setNightModeTransitionMinutes(newValue)
+                            }
                         }
 
                         SettingsLocationSection {

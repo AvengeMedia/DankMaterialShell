@@ -26,6 +26,7 @@ const (
 	ErrTypeSecretPromptTimeout
 	ErrTypeSecretAgentFailed
 	ErrTypeGeneric
+	ErrTypeInvalidDuration
 )
 
 func NewCustomError(errType ErrorType, message string) error {
@@ -54,6 +55,7 @@ var (
 	ErrInvalidGamma          = NewCustomError(ErrTypeInvalidGamma, "gamma must be between 0 and 10")
 	ErrInvalidLocation       = NewCustomError(ErrTypeInvalidLocation, "invalid latitude/longitude")
 	ErrInvalidManualTimes    = NewCustomError(ErrTypeInvalidManualTimes, "both sunrise and sunset must be set or neither")
+	ErrInvalidDuration       = NewCustomError(ErrTypeInvalidDuration, "duration must be between 0 and 6 hours")
 	ErrNoWaylandDisplay      = NewCustomError(ErrTypeNoWaylandDisplay, "no wayland display available")
 	ErrNoGammaControl        = NewCustomError(ErrTypeNoGammaControl, "compositor does not support gamma control")
 	ErrNotInitialized        = NewCustomError(ErrTypeNotInitialized, "manager not initialized")

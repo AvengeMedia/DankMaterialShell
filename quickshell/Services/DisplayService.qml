@@ -1196,7 +1196,8 @@ Singleton {
 
                 DMSService.sendRequest("wayland.gamma.setManualTimes", {
                     "sunrise": sunrise,
-                    "sunset": sunset
+                    "sunset": sunset,
+                    "durationMinutes": SessionData.nightModeTransitionMinutes
                 }, response => {
                     if (response.error) {
                         log.error("Failed to set manual times:", response.error);
@@ -1532,6 +1533,9 @@ Singleton {
             evaluateNightMode();
         }
         function onNightModeEndMinuteChanged() {
+            evaluateNightMode();
+        }
+        function onNightModeTransitionMinutesChanged() {
             evaluateNightMode();
         }
         function onNightModeTemperatureChanged() {

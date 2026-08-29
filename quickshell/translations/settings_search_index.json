@@ -8970,6 +8970,23 @@
     "description": "Color temperature for night mode"
   },
   {
+    "section": "nightModeTransitionMinutes",
+    "label": "Transition Duration",
+    "tabIndex": 25,
+    "category": "Displays",
+    "keywords": [
+      "displays",
+      "duration",
+      "fade",
+      "gamma",
+      "monitor",
+      "night",
+      "resolution",
+      "screen",
+      "transition"
+    ]
+  },
+  {
     "section": "_tab_26",
     "label": "Widgets",
     "tabIndex": 26,

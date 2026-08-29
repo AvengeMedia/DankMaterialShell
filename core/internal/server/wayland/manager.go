@@ -1157,17 +1157,19 @@ func (m *Manager) SetUseIPLocation(use bool) {
 	m.triggerUpdate()
 }
 
-func (m *Manager) SetManualTimes(sunrise, sunset time.Time) error {
+func (m *Manager) SetManualTimes(sunrise, sunset time.Time, duration *time.Duration) error {
 	m.configMutex.Lock()
 	if m.config.ManualSunrise != nil && m.config.ManualSunset != nil &&
 		m.config.ManualSunrise.Hour() == sunrise.Hour() && m.config.ManualSunrise.Minute() == sunrise.Minute() &&
-		m.config.ManualSunset.Hour() == sunset.Hour() && m.config.ManualSunset.Minute() == sunset.Minute() {
+		m.config.ManualSunset.Hour() == sunset.Hour() && m.config.ManualSunset.Minute() == sunset.Minute() &&
+		durationEqual(m.config.ManualDuration, duration) {
 		m.configMutex.Unlock()
 		return nil
 	}
 	updated := m.config
 	updated.ManualSunrise = &sunrise
 	updated.ManualSunset = &sunset
+	updated.ManualDuration = duration
 	if err := updated.Validate(); err != nil {
 		m.configMutex.Unlock()
 		return err
@@ -1180,14 +1182,22 @@ func (m *Manager) SetManualTimes(sunrise, sunset time.Time) error {
 
 func (m *Manager) ClearManualTimes() {
 	m.configMutex.Lock()
-	if m.config.ManualSunrise == nil && m.config.ManualSunset == nil {
+	if m.config.ManualSunrise == nil && m.config.ManualSunset == nil && m.config.ManualDuration == nil {
 		m.configMutex.Unlock()
 		return
 	}
 	m.config.ManualSunrise = nil
 	m.config.ManualSunset = nil
+	m.config.ManualDuration = nil
 	m.configMutex.Unlock()
 	m.triggerUpdate()
+}
+
+func durationEqual(a, b *time.Duration) bool {
+	if a == nil || b == nil {
+		return a == b
+	}
+	return *a == *b
 }
 
 func (m *Manager) SetGamma(gamma float64) error {

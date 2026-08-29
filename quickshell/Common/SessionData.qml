@@ -167,6 +167,7 @@ Singleton {
     property int nightModeStartMinute: 0
     property int nightModeEndHour: 6
     property int nightModeEndMinute: 0
+    property int nightModeTransitionMinutes: 60
     property real latitude: 0.0
     property real longitude: 0.0
     property bool nightModeUseIPLocation: false
@@ -1082,6 +1083,11 @@ Singleton {
 
     function setNightModeEndMinute(minute) {
         nightModeEndMinute = minute;
+        saveSettings();
+    }
+
+    function setNightModeTransitionMinutes(minutes) {
+        nightModeTransitionMinutes = minutes;
         saveSettings();
     }
 

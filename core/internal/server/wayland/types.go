@@ -155,6 +155,9 @@ func (c *Config) Validate() error {
 	if (c.ManualSunrise != nil) != (c.ManualSunset != nil) {
 		return errdefs.ErrInvalidManualTimes
 	}
+	if c.ManualDuration != nil && (*c.ManualDuration < 0 || *c.ManualDuration > 6*time.Hour) {
+		return errdefs.ErrInvalidDuration
+	}
 	return nil
 }
 
