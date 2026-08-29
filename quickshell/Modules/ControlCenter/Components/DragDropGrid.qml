@@ -175,7 +175,7 @@ Column {
         switch (id) {
         case "wifi":
             {
-                if (NetworkService.networkStatus !== "ethernet" && !NetworkService.wifiToggling) {
+                if (NetworkService.networkStatus !== "ethernet" && NetworkService.networkStatus !== "cellular" && !NetworkService.wifiToggling) {
                     NetworkService.toggleWifiRadio();
                 }
                 break;
@@ -755,11 +755,12 @@ Column {
                 switch (widgetData.id || "") {
                 case "nightMode":
                     return I18n.tr("Night Mode");
-                case "darkMode": {
-                    if (SettingsData.matugenSmartMode && Theme.currentTheme === Theme.dynamic)
-                        return SessionData.isLightMode ? I18n.tr("Auto (Light Mode)", "dark mode toggle label when matugen smart mode resolved light") : I18n.tr("Auto (Dark Mode)", "dark mode toggle label when matugen smart mode resolved dark");
-                    return I18n.tr("Dark Mode");
-                }
+                case "darkMode":
+                    {
+                        if (SettingsData.matugenSmartMode && Theme.currentTheme === Theme.dynamic)
+                            return SessionData.isLightMode ? I18n.tr("Auto (Light Mode)", "dark mode toggle label when matugen smart mode resolved light") : I18n.tr("Auto (Dark Mode)", "dark mode toggle label when matugen smart mode resolved dark");
+                        return I18n.tr("Dark Mode");
+                    }
                 case "idleInhibitor":
                     return SessionService.idleInhibited ? I18n.tr("Keeping Awake") : I18n.tr("Keep Awake");
                 default:

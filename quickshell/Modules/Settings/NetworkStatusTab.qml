@@ -164,36 +164,26 @@ Item {
 
                         DankButtonGroup {
                             id: preferenceButtons
-                            model: [I18n.tr("Auto"), I18n.tr("Ethernet"), I18n.tr("WiFi"), I18n.tr("Cellular")]
-                            currentIndex: {
-                                switch (NetworkService.userPreference) {
-                                case "ethernet":
-                                    return 1;
-                                case "wifi":
-                                    return 2;
-                                case "cellular":
-                                    return 3;
-                                default:
-                                    return 0;
-                                }
+
+                            readonly property var preferenceValues: {
+                                const values = ["auto", "ethernet", "wifi"];
+                                if ((NetworkService.cellularDevices?.length ?? 0) > 0)
+                                    values.push("cellular");
+                                return values;
                             }
+                            readonly property var labelsByValue: ({
+                                    "auto": I18n.tr("Auto"),
+                                    "ethernet": I18n.tr("Ethernet"),
+                                    "wifi": I18n.tr("WiFi"),
+                                    "cellular": I18n.tr("Cellular")
+                                })
+
+                            model: preferenceValues.map(v => labelsByValue[v] || v)
+                            currentIndex: Math.max(0, preferenceValues.indexOf(NetworkService.userPreference))
                             onSelectionChanged: (index, selected) => {
                                 if (!selected)
                                     return;
-                                switch (index) {
-                                case 0:
-                                    NetworkService.setNetworkPreference("auto");
-                                    break;
-                                case 1:
-                                    NetworkService.setNetworkPreference("ethernet");
-                                    break;
-                                case 2:
-                                    NetworkService.setNetworkPreference("wifi");
-                                    break;
-                                case 3:
-                                    NetworkService.setNetworkPreference("cellular");
-                                    break;
-                                }
+                                NetworkService.setNetworkPreference(preferenceValues[index] || "auto");
                             }
                         }
                     }

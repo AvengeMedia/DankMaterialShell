@@ -3269,27 +3269,6 @@
     "comment": "plugin browser sort option"
   },
   {
-    "term": "Cellular",
-    "translation": "",
-    "context": "Cellular",
-    "reference": "",
-    "comment": "network status"
-  },
-  {
-    "term": "Cellular disabled",
-    "translation": "",
-    "context": "Cellular disabled",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Cellular enabled",
-    "translation": "",
-    "context": "Cellular enabled",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Center Section",
     "translation": "",
     "context": "Center Section",
@@ -6027,13 +6006,6 @@
     "comment": ""
   },
   {
-    "term": "Disabling cellular...",
-    "translation": "",
-    "context": "Disabling cellular...",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Disc",
     "translation": "",
     "context": "Disc",
@@ -6727,13 +6699,6 @@
     "comment": ""
   },
   {
-    "term": "Enable Cellular",
-    "translation": "",
-    "context": "Enable Cellular",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Enable Do Not Disturb",
     "translation": "",
     "context": "Enable Do Not Disturb",
@@ -6893,13 +6858,6 @@
     "context": "Enabling WiFi...",
     "reference": "",
     "comment": "network status"
-  },
-  {
-    "term": "Enabling cellular...",
-    "translation": "",
-    "context": "Enabling cellular...",
-    "reference": "",
-    "comment": ""
   },
   {
     "term": "End",
@@ -7845,13 +7803,6 @@
     "context": "Failed to switch port",
     "reference": "",
     "comment": "audio sink port switch failure message"
-  },
-  {
-    "term": "Failed to toggle cellular",
-    "translation": "",
-    "context": "Failed to toggle cellular",
-    "reference": "",
-    "comment": ""
   },
   {
     "term": "Failed to unpin entry",
