@@ -8,6 +8,14 @@ import qs.Modules.Settings.Widgets
 Item {
     id: root
 
+    readonly property color batteryStatusColor: {
+        if (BatteryService.isLowBattery && !BatteryService.isCharging)
+            return Theme.error;
+        if (BatteryService.isCharging || BatteryService.isPluggedIn)
+            return Theme.primary;
+        return Theme.surfaceText;
+    }
+
     Process {
         id: applyLimitProcess
         command: ["pkexec", "sh", "-c", "
@@ -47,7 +55,6 @@ done
             // 1. Information Card
             SettingsCard {
                 width: parent.width
-                iconName: "battery_charging_full"
                 title: I18n.tr("Status")
                 settingKey: "batteryStatusCard"
                 tags: ["battery", "status", "charge", "health"]
@@ -57,108 +64,132 @@ done
                     x: Theme.spacingM
                     spacing: Theme.spacingM
 
-                    SettingsDivider {}
-
                     Row {
                         width: parent.width
-                        StyledText {
-                            text: I18n.tr("Power source")
-                            font.pixelSize: Theme.fontSizeMedium
-                            color: Theme.surfaceVariantText
-                            width: parent.width / 2
-                            horizontalAlignment: Text.AlignLeft
+                        spacing: Theme.spacingM
+
+                        DankIcon {
+                            name: BatteryService.getBatteryIcon()
+                            size: Theme.iconSizeLarge
+                            color: root.batteryStatusColor
+                            anchors.verticalCenter: parent.verticalCenter
                         }
-                        StyledText {
-                            text: BatteryService.isPluggedIn ? I18n.tr("AC Adapter (Plugged In)") : I18n.tr("Battery Power")
-                            font.pixelSize: Theme.fontSizeMedium
-                            font.weight: Font.Medium
-                            color: Theme.surfaceText
-                            width: parent.width / 2
-                            horizontalAlignment: Text.AlignLeft
+
+                        Column {
+                            spacing: Theme.spacingXS
+                            width: parent.width - Theme.iconSizeLarge - Theme.spacingM
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            Row {
+                                spacing: Theme.spacingS
+                                width: parent.width
+
+                                StyledText {
+                                    text: BatteryService.batteryAvailable ? `${BatteryService.batteryLevel}%` : ""
+                                    font.pixelSize: Theme.fontSizeXLarge
+                                    font.weight: Font.Bold
+                                    color: root.batteryStatusColor
+                                }
+
+                                StyledText {
+                                    text: BatteryService.batteryStatus
+                                    font.pixelSize: Theme.fontSizeLarge
+                                    font.weight: Font.Medium
+                                    color: Theme.surfaceText
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    elide: Text.ElideRight
+                                    width: Math.max(0, parent.width - 100)
+                                }
+                            }
+
+                            StyledText {
+                                text: BatteryService.isPluggedIn ? I18n.tr("AC Adapter (Plugged In)") : I18n.tr("Battery Power")
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceTextMedium
+                                width: parent.width
+                                elide: Text.ElideRight
+                            }
                         }
                     }
 
-                    SettingsDivider {}
-
-                    Row {
+                    Item {
                         width: parent.width
-                        StyledText {
-                            text: I18n.tr("Charge Level")
-                            font.pixelSize: Theme.fontSizeMedium
-                            color: Theme.surfaceVariantText
-                            width: parent.width / 2
-                            horizontalAlignment: Text.AlignLeft
+                        height: 4
+
+                        Rectangle {
+                            anchors.fill: parent
+                            radius: height / 2
+                            color: Theme.withAlpha(Theme.primary, 0.16)
                         }
-                        StyledText {
-                            text: `${BatteryService.batteryLevel}%`
-                            font.pixelSize: Theme.fontSizeMedium
-                            font.weight: Font.Medium
-                            color: Theme.surfaceText
-                            width: parent.width / 2
-                            horizontalAlignment: Text.AlignLeft
+
+                        Rectangle {
+                            anchors.left: parent.left
+                            width: parent.width * Math.max(0, Math.min(1, BatteryService.batteryLevel / 100))
+                            height: parent.height
+                            radius: height / 2
+                            color: root.batteryStatusColor
+                            visible: BatteryService.batteryAvailable
                         }
                     }
 
-                    SettingsDivider {}
-
                     Row {
                         width: parent.width
-                        StyledText {
-                            text: I18n.tr("Status")
-                            font.pixelSize: Theme.fontSizeMedium
-                            color: Theme.surfaceVariantText
-                            width: parent.width / 2
-                            horizontalAlignment: Text.AlignLeft
-                        }
-                        StyledText {
-                            text: BatteryService.batteryStatus
-                            font.pixelSize: Theme.fontSizeMedium
-                            font.weight: Font.Medium
-                            color: Theme.surfaceText
-                            width: parent.width / 2
-                            horizontalAlignment: Text.AlignLeft
-                        }
-                    }
+                        spacing: Theme.spacingM
 
-                    SettingsDivider {}
+                        Item {
+                            width: (parent.width - Theme.spacingM) / 2
+                            height: timeColumn.implicitHeight
 
-                    Row {
-                        width: parent.width
-                        StyledText {
-                            text: I18n.tr("Estimated Time")
-                            font.pixelSize: Theme.fontSizeMedium
-                            color: Theme.surfaceVariantText
-                            width: parent.width / 2
-                            horizontalAlignment: Text.AlignLeft
-                        }
-                        StyledText {
-                            text: BatteryService.formatTimeRemaining()
-                            font.pixelSize: Theme.fontSizeMedium
-                            font.weight: Font.Medium
-                            color: Theme.surfaceText
-                            width: parent.width / 2
-                            horizontalAlignment: Text.AlignLeft
-                        }
-                    }
+                            Column {
+                                id: timeColumn
+                                width: parent.width
+                                spacing: Theme.spacingXXS
 
-                    SettingsDivider {}
+                                StyledText {
+                                    text: I18n.tr("Estimated Time")
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: Theme.surfaceTextMedium
+                                }
 
-                    Row {
-                        width: parent.width
-                        StyledText {
-                            text: I18n.tr("Battery Health")
-                            font.pixelSize: Theme.fontSizeMedium
-                            color: Theme.surfaceVariantText
-                            width: parent.width / 2
-                            horizontalAlignment: Text.AlignLeft
+                                StyledText {
+                                    text: {
+                                        const remaining = BatteryService.formatTimeRemaining();
+                                        const estimated = BatteryService.formatEstimatedTime();
+                                        return estimated ? `${remaining} (${estimated})` : remaining;
+                                    }
+                                    font.pixelSize: Theme.fontSizeMedium
+                                    font.weight: Font.Medium
+                                    color: Theme.surfaceText
+                                    width: parent.width
+                                    elide: Text.ElideRight
+                                }
+                            }
                         }
-                        StyledText {
-                            text: BatteryService.batteryHealth
-                            font.pixelSize: Theme.fontSizeMedium
-                            font.weight: Font.Medium
-                            color: Theme.surfaceText
-                            width: parent.width / 2
-                            horizontalAlignment: Text.AlignLeft
+
+                        Item {
+                            width: (parent.width - Theme.spacingM) / 2
+                            height: healthColumn.implicitHeight
+
+                            Column {
+                                id: healthColumn
+                                width: parent.width
+                                spacing: Theme.spacingXXS
+
+                                StyledText {
+                                    text: I18n.tr("Battery Health")
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: Theme.surfaceTextMedium
+                                }
+
+                                StyledText {
+                                    text: BatteryService.batteryHealth
+                                    font.pixelSize: Theme.fontSizeMedium
+                                    font.weight: Font.Medium
+                                    color: Theme.surfaceText
+                                    width: parent.width
+                                    elide: Text.ElideRight
+                                }
+                            }
                         }
                     }
                 }
