@@ -153,12 +153,8 @@ Item {
     readonly property string _dockScreenName: dock.modelData ? dock.modelData.name : (dock.screen ? dock.screen.name : "")
     readonly property bool usesConnectedFrameChrome: CompositorService.usesConnectedFrameChromeForScreen(dock._dockScreenName)
     readonly property bool usesOverlayLayer: CompositorService.framePeerSurfacesUseOverlayForScreen(dock._dockScreenName) || SettingsData.dockUseOverlayLayer
-    property bool fullscreenOnScreen: false
+    readonly property bool fullscreenOnScreen: CompositorService.fullscreenToplevelOnScreen(dock._dockScreenName)
     readonly property bool geometryReady: dock.width > 0 && dock.height > 0 && dockBackground.width > 0 && dockBackground.height > 0
-
-    function _updateFullscreenOnScreen() {
-        fullscreenOnScreen = CompositorService.fullscreenToplevelOnScreen(dock._dockScreenName);
-    }
 
     function _syncDockChromeState() {
         if (!dock._dockScreenName)
@@ -390,10 +386,7 @@ Item {
         }
     }
 
-    Component.onCompleted: {
-        _updateFullscreenOnScreen();
-        dockChromeSync.schedule();
-    }
+    Component.onCompleted: dockChromeSync.schedule()
     Component.onDestruction: {
         dockChromeSync.cancel();
         dockSlideSync.cancel();
@@ -407,13 +400,6 @@ Item {
     onHasAppsChanged: dock._syncDockChromeState()
     onConnectedBarSideChanged: dock._syncDockChromeState()
     onUsesConnectedFrameChromeChanged: dock._syncDockChromeState()
-
-    Connections {
-        target: CompositorService
-        function onToplevelsChanged() {
-            dock._updateFullscreenOnScreen();
-        }
-    }
 
     Connections {
         target: SettingsData
