@@ -233,6 +233,10 @@ Item {
     }
 
     onChromeTranslucentChanged: blurRebuildTimer.restart()
+    onEdgeAlignedChanged: {
+        blurRebuildTimer.restart();
+        blurTrailTimer.restart();
+    }
     onGothCornersChanged: blurRebuildTimer.restart()
     onIslandTranslucentChanged: blurRebuildTimer.restart()
     Component.onCompleted: blurRebuildTimer.restart()
@@ -254,6 +258,22 @@ Item {
                 return;
             blurRebuildTimer.restart();
             blurTrailTimer.restart();
+        }
+    }
+
+    function kickBlur() {
+        if (root.motionRunning)
+            return;
+        blurKickTimer.restart();
+    }
+
+    Timer {
+        id: blurKickTimer
+
+        interval: 1
+        onTriggered: {
+            if (root._blurRegion)
+                root._blurRegion.changed();
         }
     }
 
@@ -421,6 +441,8 @@ Item {
         y: root.rowY
         width: root.visible ? leftWidgetSection.implicitWidth : 0
         height: root.visible ? root.barThickness : 0
+        onXChanged: root.kickBlur()
+        onWidthChanged: root.kickBlur()
 
         LeftSection {
             id: leftWidgetSection
@@ -438,6 +460,7 @@ Item {
             barConfig: root.satelliteConfig
             blurBarWindow: satelliteBarWindow
             crossEdgeExtension: root.crossEdgeExtension
+            edgeIsScreenEdge: root.edgeAligned
         }
     }
 
@@ -448,6 +471,8 @@ Item {
         y: root.rowY
         width: root.visible ? rightWidgetSection.implicitWidth : 0
         height: root.visible ? root.barThickness : 0
+        onXChanged: root.kickBlur()
+        onWidthChanged: root.kickBlur()
 
         RightSection {
             id: rightWidgetSection
@@ -465,6 +490,7 @@ Item {
             barConfig: root.satelliteConfig
             blurBarWindow: satelliteBarWindow
             crossEdgeExtension: root.crossEdgeExtension
+            edgeIsScreenEdge: root.edgeAligned
         }
     }
 }
