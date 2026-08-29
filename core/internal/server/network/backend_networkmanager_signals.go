@@ -593,10 +593,9 @@ func (b *NetworkManagerBackend) handleDeviceAdded(devicePath dbus.ObjectPath) {
 		b.updatePrimaryConnection()
 
 	case gonetworkmanager.NmDeviceTypeModem:
-		g, _ := gonetworkmanager.NewDeviceGeneric(devicePath)
 		hwAddr := ""
 		description := "Mobile broadband"
-		if g != nil {
+		if g, err := gonetworkmanager.NewDeviceGeneric(devicePath); err == nil {
 			hwAddr, _ = g.GetPropertyHwAddress()
 			if desc, err := g.GetPropertyTypeDescription(); err == nil && desc != "" {
 				description = desc
@@ -605,7 +604,6 @@ func (b *NetworkManagerBackend) handleDeviceAdded(devicePath dbus.ObjectPath) {
 
 		b.setCellularDeviceInfo(iface, &cellularDeviceInfo{
 			device:      dev,
-			generic:     g,
 			name:        iface,
 			hwAddress:   hwAddr,
 			description: description,

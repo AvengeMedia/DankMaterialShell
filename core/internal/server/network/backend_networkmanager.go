@@ -51,7 +51,6 @@ type ethernetDeviceInfo struct {
 
 type cellularDeviceInfo struct {
 	device      gonetworkmanager.Device
-	generic     gonetworkmanager.DeviceGeneric
 	name        string
 	hwAddress   string
 	description string
@@ -231,10 +230,9 @@ func (b *NetworkManagerBackend) Initialize() error {
 			if err != nil {
 				continue
 			}
-			g, _ := gonetworkmanager.NewDeviceGeneric(dev.GetPath())
 			hwAddr := ""
 			description := "Mobile broadband"
-			if g != nil {
+			if g, err := gonetworkmanager.NewDeviceGeneric(dev.GetPath()); err == nil {
 				hwAddr, _ = g.GetPropertyHwAddress()
 				if desc, err := g.GetPropertyTypeDescription(); err == nil && desc != "" {
 					description = desc
@@ -243,7 +241,6 @@ func (b *NetworkManagerBackend) Initialize() error {
 
 			b.setCellularDeviceInfo(iface, &cellularDeviceInfo{
 				device:      dev,
-				generic:     g,
 				name:        iface,
 				hwAddress:   hwAddr,
 				description: description,

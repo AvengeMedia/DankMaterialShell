@@ -817,8 +817,6 @@ Singleton {
     function setNetworkPreference(preference) {
         if (!networkAvailable)
             return;
-        if (userPreference === preference && !changingPreference)
-            return;
         changingPreference = true;
         targetPreference = preference;
         SettingsData.set("networkPreference", preference);
