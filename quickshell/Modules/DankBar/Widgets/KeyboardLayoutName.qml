@@ -171,6 +171,14 @@ BasePill {
         }
     }
 
+    Connections {
+        target: CompositorService
+
+        function onCompositorChanged() {
+            root.updateLayout();
+        }
+    }
+
     Component.onCompleted: {
         if (CompositorService.isHyprland || CompositorService.isSway) {
             updateLayout();
