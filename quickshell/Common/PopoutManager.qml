@@ -254,8 +254,7 @@ Singleton {
         if (!popout || !popout.screen)
             return;
 
-        // Clicking a transient popout closes it instead of leaving it hover-owned.
-        const wasTransient = popout.hoverDismissEnabled === true;
+        // Clicks pin a popout, while clicking its active trigger toggles it closed below.
         if (!hoverRequest && popout.hoverDismissEnabled !== undefined)
             popout.hoverDismissEnabled = false;
 
@@ -309,7 +308,7 @@ Singleton {
             if (hoverRequest && sameDefinedTrigger)
                 return;
 
-            if (!hoverRequest && (wasTransient || triggerId === undefined || sameDefinedTrigger)) {
+            if (!hoverRequest && (triggerId === undefined || sameDefinedTrigger)) {
                 _closePopout(popout);
                 return;
             }

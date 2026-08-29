@@ -137,6 +137,7 @@ Item {
 
         cancelQueuedHitTest();
         _cancelPendingHover();
+        _hoverReopenSuppressedTrigger = "";
         if (!hoverPopoutsEnabled || isActiveHoverSurfacePinned())
             return;
         _barExitPending = true;
