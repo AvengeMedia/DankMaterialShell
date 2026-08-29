@@ -36,6 +36,57 @@ func (_m *MockBackend) EXPECT() *MockBackend_Expecter {
 	return &MockBackend_Expecter{mock: &_m.Mock}
 }
 
+// ActivateCellularConnection provides a mock function for the type MockBackend
+func (_mock *MockBackend) ActivateCellularConnection(uuid string) error {
+	ret := _mock.Called(uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ActivateCellularConnection")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(string) error); ok {
+		r0 = returnFunc(uuid)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// MockBackend_ActivateCellularConnection_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ActivateCellularConnection'
+type MockBackend_ActivateCellularConnection_Call struct {
+	*mock.Call
+}
+
+// ActivateCellularConnection is a helper method to define mock.On call
+//   - uuid string
+func (_e *MockBackend_Expecter) ActivateCellularConnection(uuid any) *MockBackend_ActivateCellularConnection_Call {
+	return &MockBackend_ActivateCellularConnection_Call{Call: _e.mock.On("ActivateCellularConnection", uuid)}
+}
+
+func (_c *MockBackend_ActivateCellularConnection_Call) Run(run func(uuid string)) *MockBackend_ActivateCellularConnection_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 string
+		if args[0] != nil {
+			arg0 = args[0].(string)
+		}
+		run(
+			arg0,
+		)
+	})
+	return _c
+}
+
+func (_c *MockBackend_ActivateCellularConnection_Call) Return(err error) *MockBackend_ActivateCellularConnection_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *MockBackend_ActivateCellularConnection_Call) RunAndReturn(run func(uuid string) error) *MockBackend_ActivateCellularConnection_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // ActivateWiredConnection provides a mock function for the type MockBackend
 func (_mock *MockBackend) ActivateWiredConnection(uuid string) error {
 	ret := _mock.Called(uuid)
@@ -219,6 +270,50 @@ func (_c *MockBackend_Close_Call) Return() *MockBackend_Close_Call {
 
 func (_c *MockBackend_Close_Call) RunAndReturn(run func()) *MockBackend_Close_Call {
 	_c.Run(run)
+	return _c
+}
+
+// ConnectCellular provides a mock function for the type MockBackend
+func (_mock *MockBackend) ConnectCellular() error {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for ConnectCellular")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func() error); ok {
+		r0 = returnFunc()
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// MockBackend_ConnectCellular_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ConnectCellular'
+type MockBackend_ConnectCellular_Call struct {
+	*mock.Call
+}
+
+// ConnectCellular is a helper method to define mock.On call
+func (_e *MockBackend_Expecter) ConnectCellular() *MockBackend_ConnectCellular_Call {
+	return &MockBackend_ConnectCellular_Call{Call: _e.mock.On("ConnectCellular")}
+}
+
+func (_c *MockBackend_ConnectCellular_Call) Run(run func()) *MockBackend_ConnectCellular_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *MockBackend_ConnectCellular_Call) Return(err error) *MockBackend_ConnectCellular_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *MockBackend_ConnectCellular_Call) RunAndReturn(run func() error) *MockBackend_ConnectCellular_Call {
+	_c.Call.Return(run)
 	return _c
 }
 
@@ -465,6 +560,101 @@ func (_c *MockBackend_DisconnectAllVPN_Call) Return(err error) *MockBackend_Disc
 }
 
 func (_c *MockBackend_DisconnectAllVPN_Call) RunAndReturn(run func() error) *MockBackend_DisconnectAllVPN_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// DisconnectCellular provides a mock function for the type MockBackend
+func (_mock *MockBackend) DisconnectCellular() error {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for DisconnectCellular")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func() error); ok {
+		r0 = returnFunc()
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// MockBackend_DisconnectCellular_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DisconnectCellular'
+type MockBackend_DisconnectCellular_Call struct {
+	*mock.Call
+}
+
+// DisconnectCellular is a helper method to define mock.On call
+func (_e *MockBackend_Expecter) DisconnectCellular() *MockBackend_DisconnectCellular_Call {
+	return &MockBackend_DisconnectCellular_Call{Call: _e.mock.On("DisconnectCellular")}
+}
+
+func (_c *MockBackend_DisconnectCellular_Call) Run(run func()) *MockBackend_DisconnectCellular_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *MockBackend_DisconnectCellular_Call) Return(err error) *MockBackend_DisconnectCellular_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *MockBackend_DisconnectCellular_Call) RunAndReturn(run func() error) *MockBackend_DisconnectCellular_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// DisconnectCellularDevice provides a mock function for the type MockBackend
+func (_mock *MockBackend) DisconnectCellularDevice(device string) error {
+	ret := _mock.Called(device)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DisconnectCellularDevice")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(string) error); ok {
+		r0 = returnFunc(device)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// MockBackend_DisconnectCellularDevice_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DisconnectCellularDevice'
+type MockBackend_DisconnectCellularDevice_Call struct {
+	*mock.Call
+}
+
+// DisconnectCellularDevice is a helper method to define mock.On call
+//   - device string
+func (_e *MockBackend_Expecter) DisconnectCellularDevice(device any) *MockBackend_DisconnectCellularDevice_Call {
+	return &MockBackend_DisconnectCellularDevice_Call{Call: _e.mock.On("DisconnectCellularDevice", device)}
+}
+
+func (_c *MockBackend_DisconnectCellularDevice_Call) Run(run func(device string)) *MockBackend_DisconnectCellularDevice_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 string
+		if args[0] != nil {
+			arg0 = args[0].(string)
+		}
+		run(
+			arg0,
+		)
+	})
+	return _c
+}
+
+func (_c *MockBackend_DisconnectCellularDevice_Call) Return(err error) *MockBackend_DisconnectCellularDevice_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *MockBackend_DisconnectCellularDevice_Call) RunAndReturn(run func(device string) error) *MockBackend_DisconnectCellularDevice_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -757,6 +947,160 @@ func (_c *MockBackend_ForgetWiFiNetwork_Call) Return(err error) *MockBackend_For
 }
 
 func (_c *MockBackend_ForgetWiFiNetwork_Call) RunAndReturn(run func(ssid string) error) *MockBackend_ForgetWiFiNetwork_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetCellularConnections provides a mock function for the type MockBackend
+func (_mock *MockBackend) GetCellularConnections() ([]network.WiredConnection, error) {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetCellularConnections")
+	}
+
+	var r0 []network.WiredConnection
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func() ([]network.WiredConnection, error)); ok {
+		return returnFunc()
+	}
+	if returnFunc, ok := ret.Get(0).(func() []network.WiredConnection); ok {
+		r0 = returnFunc()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]network.WiredConnection)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func() error); ok {
+		r1 = returnFunc()
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// MockBackend_GetCellularConnections_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetCellularConnections'
+type MockBackend_GetCellularConnections_Call struct {
+	*mock.Call
+}
+
+// GetCellularConnections is a helper method to define mock.On call
+func (_e *MockBackend_Expecter) GetCellularConnections() *MockBackend_GetCellularConnections_Call {
+	return &MockBackend_GetCellularConnections_Call{Call: _e.mock.On("GetCellularConnections")}
+}
+
+func (_c *MockBackend_GetCellularConnections_Call) Run(run func()) *MockBackend_GetCellularConnections_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *MockBackend_GetCellularConnections_Call) Return(wiredConnections []network.WiredConnection, err error) *MockBackend_GetCellularConnections_Call {
+	_c.Call.Return(wiredConnections, err)
+	return _c
+}
+
+func (_c *MockBackend_GetCellularConnections_Call) RunAndReturn(run func() ([]network.WiredConnection, error)) *MockBackend_GetCellularConnections_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetCellularDevices provides a mock function for the type MockBackend
+func (_mock *MockBackend) GetCellularDevices() []network.CellularDevice {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetCellularDevices")
+	}
+
+	var r0 []network.CellularDevice
+	if returnFunc, ok := ret.Get(0).(func() []network.CellularDevice); ok {
+		r0 = returnFunc()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]network.CellularDevice)
+		}
+	}
+	return r0
+}
+
+// MockBackend_GetCellularDevices_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetCellularDevices'
+type MockBackend_GetCellularDevices_Call struct {
+	*mock.Call
+}
+
+// GetCellularDevices is a helper method to define mock.On call
+func (_e *MockBackend_Expecter) GetCellularDevices() *MockBackend_GetCellularDevices_Call {
+	return &MockBackend_GetCellularDevices_Call{Call: _e.mock.On("GetCellularDevices")}
+}
+
+func (_c *MockBackend_GetCellularDevices_Call) Run(run func()) *MockBackend_GetCellularDevices_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *MockBackend_GetCellularDevices_Call) Return(cellularDevices []network.CellularDevice) *MockBackend_GetCellularDevices_Call {
+	_c.Call.Return(cellularDevices)
+	return _c
+}
+
+func (_c *MockBackend_GetCellularDevices_Call) RunAndReturn(run func() []network.CellularDevice) *MockBackend_GetCellularDevices_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetCellularEnabled provides a mock function for the type MockBackend
+func (_mock *MockBackend) GetCellularEnabled() (bool, error) {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetCellularEnabled")
+	}
+
+	var r0 bool
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func() (bool, error)); ok {
+		return returnFunc()
+	}
+	if returnFunc, ok := ret.Get(0).(func() bool); ok {
+		r0 = returnFunc()
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+	if returnFunc, ok := ret.Get(1).(func() error); ok {
+		r1 = returnFunc()
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// MockBackend_GetCellularEnabled_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetCellularEnabled'
+type MockBackend_GetCellularEnabled_Call struct {
+	*mock.Call
+}
+
+// GetCellularEnabled is a helper method to define mock.On call
+func (_e *MockBackend_Expecter) GetCellularEnabled() *MockBackend_GetCellularEnabled_Call {
+	return &MockBackend_GetCellularEnabled_Call{Call: _e.mock.On("GetCellularEnabled")}
+}
+
+func (_c *MockBackend_GetCellularEnabled_Call) Run(run func()) *MockBackend_GetCellularEnabled_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *MockBackend_GetCellularEnabled_Call) Return(b bool, err error) *MockBackend_GetCellularEnabled_Call {
+	_c.Call.Return(b, err)
+	return _c
+}
+
+func (_c *MockBackend_GetCellularEnabled_Call) RunAndReturn(run func() (bool, error)) *MockBackend_GetCellularEnabled_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -1676,6 +2020,57 @@ func (_c *MockBackend_ScanWiFiDevice_Call) Return(err error) *MockBackend_ScanWi
 }
 
 func (_c *MockBackend_ScanWiFiDevice_Call) RunAndReturn(run func(device string) error) *MockBackend_ScanWiFiDevice_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// SetCellularEnabled provides a mock function for the type MockBackend
+func (_mock *MockBackend) SetCellularEnabled(enabled bool) error {
+	ret := _mock.Called(enabled)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SetCellularEnabled")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(bool) error); ok {
+		r0 = returnFunc(enabled)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// MockBackend_SetCellularEnabled_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SetCellularEnabled'
+type MockBackend_SetCellularEnabled_Call struct {
+	*mock.Call
+}
+
+// SetCellularEnabled is a helper method to define mock.On call
+//   - enabled bool
+func (_e *MockBackend_Expecter) SetCellularEnabled(enabled any) *MockBackend_SetCellularEnabled_Call {
+	return &MockBackend_SetCellularEnabled_Call{Call: _e.mock.On("SetCellularEnabled", enabled)}
+}
+
+func (_c *MockBackend_SetCellularEnabled_Call) Run(run func(enabled bool)) *MockBackend_SetCellularEnabled_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 bool
+		if args[0] != nil {
+			arg0 = args[0].(bool)
+		}
+		run(
+			arg0,
+		)
+	})
+	return _c
+}
+
+func (_c *MockBackend_SetCellularEnabled_Call) Return(err error) *MockBackend_SetCellularEnabled_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *MockBackend_SetCellularEnabled_Call) RunAndReturn(run func(enabled bool) error) *MockBackend_SetCellularEnabled_Call {
 	_c.Call.Return(run)
 	return _c
 }

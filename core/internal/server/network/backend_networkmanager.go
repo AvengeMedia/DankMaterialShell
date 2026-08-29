@@ -49,16 +49,25 @@ type ethernetDeviceInfo struct {
 	hwAddress string
 }
 
+type cellularDeviceInfo struct {
+	device      gonetworkmanager.Device
+	name        string
+	hwAddress   string
+	description string
+}
+
 type NetworkManagerBackend struct {
 	nmConn          any
 	ethernetDevice  any
 	ethernetDevices map[string]*ethernetDeviceInfo
+	cellularDevice  any
+	cellularDevices map[string]*cellularDeviceInfo
 	wifiDevice      any
 	settings        any
 	wifiDev         any
 	wifiDevices     map[string]*wifiDeviceInfo
 
-	// devMutex guards ethernetDevices/wifiDevices (written by the signal pump,
+	// devMutex guards ethernetDevices/wifiDevices/cellularDevices (written by the signal pump,
 	// read by request handlers). Not reentrant — never hold it across calls
 	// into other backend methods.
 	devMutex sync.RWMutex
@@ -152,6 +161,7 @@ func NewNetworkManagerBackend(nmConn ...gonetworkmanager.NetworkManager) (*Netwo
 		nmConn:          nm,
 		stopChan:        make(chan struct{}),
 		ethernetDevices: make(map[string]*ethernetDeviceInfo),
+		cellularDevices: make(map[string]*cellularDeviceInfo),
 		wifiDevices:     make(map[string]*wifiDeviceInfo),
 		state: &BackendState{
 			Backend: "networkmanager",
@@ -212,6 +222,34 @@ func (b *NetworkManagerBackend) Initialize() error {
 				return fmt.Errorf("failed to get wired configurations: %w", err)
 			}
 
+		case gonetworkmanager.NmDeviceTypeModem:
+			if managed, _ := dev.GetPropertyManaged(); !managed {
+				continue
+			}
+			iface, err := dev.GetPropertyInterface()
+			if err != nil {
+				continue
+			}
+			hwAddr := ""
+			description := "Mobile broadband"
+			if g, err := gonetworkmanager.NewDeviceGeneric(dev.GetPath()); err == nil {
+				hwAddr, _ = g.GetPropertyHwAddress()
+				if desc, err := g.GetPropertyTypeDescription(); err == nil && desc != "" {
+					description = desc
+				}
+			}
+
+			b.setCellularDeviceInfo(iface, &cellularDeviceInfo{
+				device:      dev,
+				name:        iface,
+				hwAddress:   hwAddr,
+				description: description,
+			})
+
+			if b.cellularDevice == nil {
+				b.cellularDevice = dev
+			}
+
 		case gonetworkmanager.NmDeviceTypeWifi:
 			iface, err := dev.GetPropertyInterface()
 			if err != nil {
@@ -243,6 +281,7 @@ func (b *NetworkManagerBackend) Initialize() error {
 		b.state.WiFiEnabled = wifiEnabled
 		b.stateMutex.Unlock()
 	}
+	b.updateCellularRadioState()
 
 	if err := b.updateWiFiState(); err != nil {
 		log.Warnf("Failed to update WiFi state: %v", err)
@@ -266,6 +305,13 @@ func (b *NetworkManagerBackend) Initialize() error {
 	b.updateAllWiFiDevices()
 
 	b.updateAllEthernetDevices()
+	b.updateAllCellularDevices()
+	if err := b.updateCellularState(); err != nil {
+		log.Warnf("Failed to update cellular state: %v", err)
+	}
+	if _, err := b.listCellularConnections(); err != nil {
+		log.Warnf("Failed to get initial cellular configurations: %v", err)
+	}
 
 	if err := b.updatePrimaryConnection(); err != nil {
 		return err
@@ -298,6 +344,14 @@ func (b *NetworkManagerBackend) wifiDevicesSnapshot() map[string]*wifiDeviceInfo
 	return out
 }
 
+func (b *NetworkManagerBackend) cellularDevicesSnapshot() map[string]*cellularDeviceInfo {
+	b.devMutex.RLock()
+	defer b.devMutex.RUnlock()
+	out := make(map[string]*cellularDeviceInfo, len(b.cellularDevices))
+	maps.Copy(out, b.cellularDevices)
+	return out
+}
+
 func (b *NetworkManagerBackend) ethernetDeviceByIface(iface string) (*ethernetDeviceInfo, bool) {
 	b.devMutex.RLock()
 	defer b.devMutex.RUnlock()
@@ -312,6 +366,13 @@ func (b *NetworkManagerBackend) wifiDeviceByIface(iface string) (*wifiDeviceInfo
 	return info, ok
 }
 
+func (b *NetworkManagerBackend) cellularDeviceByIface(iface string) (*cellularDeviceInfo, bool) {
+	b.devMutex.RLock()
+	defer b.devMutex.RUnlock()
+	info, ok := b.cellularDevices[iface]
+	return info, ok
+}
+
 func (b *NetworkManagerBackend) setEthernetDeviceInfo(iface string, info *ethernetDeviceInfo) {
 	b.devMutex.Lock()
 	b.ethernetDevices[iface] = info
@@ -321,6 +382,12 @@ func (b *NetworkManagerBackend) setEthernetDeviceInfo(iface string, info *ethern
 func (b *NetworkManagerBackend) setWifiDeviceInfo(iface string, info *wifiDeviceInfo) {
 	b.devMutex.Lock()
 	b.wifiDevices[iface] = info
+	b.devMutex.Unlock()
+}
+
+func (b *NetworkManagerBackend) setCellularDeviceInfo(iface string, info *cellularDeviceInfo) {
+	b.devMutex.Lock()
+	b.cellularDevices[iface] = info
 	b.devMutex.Unlock()
 }
 
@@ -356,6 +423,21 @@ func (b *NetworkManagerBackend) removeWifiDeviceByPath(path dbus.ObjectPath) (re
 	return nil, nil, false
 }
 
+func (b *NetworkManagerBackend) removeCellularDeviceByPath(path dbus.ObjectPath) (removed *cellularDeviceInfo, remaining map[string]*cellularDeviceInfo, found bool) {
+	b.devMutex.Lock()
+	defer b.devMutex.Unlock()
+	for iface, info := range b.cellularDevices {
+		if info.device.GetPath() != path {
+			continue
+		}
+		delete(b.cellularDevices, iface)
+		remaining = make(map[string]*cellularDeviceInfo, len(b.cellularDevices))
+		maps.Copy(remaining, b.cellularDevices)
+		return info, remaining, true
+	}
+	return nil, nil, false
+}
+
 func (b *NetworkManagerBackend) Close() {
 	close(b.stopChan)
 	b.StopMonitoring()
@@ -375,6 +457,8 @@ func (b *NetworkManagerBackend) GetCurrentState() (*BackendState, error) {
 	state.WiFiDevices = append([]WiFiDevice(nil), b.state.WiFiDevices...)
 	state.WiredConnections = append([]WiredConnection(nil), b.state.WiredConnections...)
 	state.EthernetDevices = append([]EthernetDevice(nil), b.state.EthernetDevices...)
+	state.CellularConnections = append([]WiredConnection(nil), b.state.CellularConnections...)
+	state.CellularDevices = append([]CellularDevice(nil), b.state.CellularDevices...)
 	state.VPNProfiles = append([]VPNProfile(nil), b.state.VPNProfiles...)
 	state.VPNActive = append([]VPNActive(nil), b.state.VPNActive...)
 
@@ -588,7 +672,7 @@ func (b *NetworkManagerBackend) getActiveConnections() (map[string]bool, error) 
 			continue
 		}
 
-		if connType != "802-3-ethernet" {
+		if connType != "802-3-ethernet" && !isCellularConnectionType(connType) {
 			continue
 		}
 

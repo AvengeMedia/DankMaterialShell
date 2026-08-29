@@ -24,6 +24,15 @@ Singleton {
 
     property var wiredConnections: []
 
+    property string cellularIP: ""
+    property string cellularInterface: ""
+    property bool cellularConnected: false
+    property bool cellularEnabled: true
+    property bool cellularHardwareEnabled: true
+    property string cellularConnectionUuid: ""
+    property var cellularDevices: []
+    property var cellularConnections: []
+
     property string wifiIP: ""
     property string wifiInterface: ""
     property bool wifiConnected: false
@@ -66,6 +75,7 @@ Singleton {
 
     property bool wifiAvailable: true
     property bool wifiToggling: false
+    property bool cellularToggling: false
     property bool changingPreference: false
     property string targetPreference: ""
     property var savedWifiNetworks: []
@@ -330,6 +340,15 @@ Singleton {
 
         wiredConnections = state.wiredConnections || [];
 
+        cellularIP = state.cellularIP || "";
+        cellularInterface = state.cellularDevice || "";
+        cellularConnected = state.cellularConnected || false;
+        cellularEnabled = state.cellularEnabled !== undefined ? state.cellularEnabled : true;
+        cellularHardwareEnabled = state.cellularHardwareEnabled !== undefined ? state.cellularHardwareEnabled : true;
+        cellularConnectionUuid = state.cellularConnectionUuid || "";
+        cellularDevices = state.cellularDevices || [];
+        cellularConnections = state.cellularConnections || [];
+
         wifiIP = state.wifiIP || "";
         wifiInterface = state.wifiDevice || "";
         wifiConnected = state.wifiConnected || false;
@@ -509,6 +528,53 @@ Singleton {
         };
 
         DMSService.sendRequest("network.ethernet.connect.config", params, response => {
+            if (response.error) {
+                connectionError = response.error;
+                lastConnectionError = response.error;
+                connectionStatus = "failed";
+                ToastService.showError(I18n.tr("Failed to activate configuration"), response.error);
+            } else {
+                connectionError = "";
+                connectionStatus = "connected";
+                ToastService.showInfo(I18n.tr("Configuration activated"));
+            }
+
+            isConnecting = false;
+        });
+    }
+
+    function connectCellular() {
+        if (!networkAvailable || isConnecting)
+            return;
+        isConnecting = true;
+        connectionError = "";
+        connectionStatus = "connecting";
+
+        DMSService.sendRequest("network.cellular.connect", null, response => {
+            if (response.error) {
+                connectionError = response.error;
+                lastConnectionError = response.error;
+                connectionStatus = "failed";
+                ToastService.showError(I18n.tr("Failed to activate configuration"), response.error);
+            } else {
+                connectionError = "";
+                connectionStatus = "connected";
+                ToastService.showInfo(I18n.tr("Configuration activated"));
+            }
+            isConnecting = false;
+        });
+    }
+
+    function connectToSpecificCellularConfig(uuid) {
+        if (!networkAvailable || isConnecting)
+            return;
+        isConnecting = true;
+        connectionError = "";
+        connectionStatus = "connecting";
+
+        DMSService.sendRequest("network.cellular.connect.config", {
+            uuid: uuid
+        }, response => {
             if (response.error) {
                 connectionError = response.error;
                 lastConnectionError = response.error;
@@ -720,6 +786,22 @@ Singleton {
         });
     }
 
+    function toggleCellularRadio() {
+        if (!networkAvailable || cellularToggling)
+            return;
+        cellularToggling = true;
+        DMSService.sendRequest("network.cellular.toggle", null, response => {
+            cellularToggling = false;
+
+            if (response.error) {
+                ToastService.showError(I18n.tr("Failed to toggle cellular"), response.error);
+            } else if (response.result) {
+                cellularEnabled = response.result.enabled;
+                ToastService.showInfo(cellularEnabled ? I18n.tr("Cellular enabled") : I18n.tr("Cellular disabled"));
+            }
+        });
+    }
+
     function enableWifiDevice() {
         if (!networkAvailable)
             return;
@@ -756,6 +838,8 @@ Singleton {
             setNetworkPreference("wifi");
         } else if (type === "ethernet") {
             setNetworkPreference("ethernet");
+        } else if (type === "cellular") {
+            setNetworkPreference("cellular");
         }
     }
 
@@ -773,6 +857,12 @@ Singleton {
             } else {
                 DMSService.sendRequest("network.ethernet.connect", null, null);
             }
+        } else if (type === "cellular") {
+            if (cellularConnected) {
+                DMSService.sendRequest("network.cellular.disconnect", null, null);
+            } else {
+                connectCellular();
+            }
         }
     }
 
@@ -780,6 +870,14 @@ Singleton {
         if (!networkAvailable)
             return;
         DMSService.sendRequest("network.ethernet.disconnect", {
+            device: deviceName
+        }, null);
+    }
+
+    function disconnectCellularDevice(deviceName) {
+        if (!networkAvailable)
+            return;
+        DMSService.sendRequest("network.cellular.disconnect", {
             device: deviceName
         }, null);
     }

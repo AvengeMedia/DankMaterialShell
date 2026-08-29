@@ -97,3 +97,35 @@ func (b *SystemdNetworkdBackend) DisconnectWiFiDevice(device string) error {
 func (b *SystemdNetworkdBackend) GetWiFiDevices() []WiFiDevice {
 	return nil
 }
+
+func (b *SystemdNetworkdBackend) GetCellularDevices() []CellularDevice {
+	return []CellularDevice{}
+}
+
+func (b *SystemdNetworkdBackend) GetCellularEnabled() (bool, error) {
+	return false, fmt.Errorf("cellular radio control not supported by networkd backend")
+}
+
+func (b *SystemdNetworkdBackend) SetCellularEnabled(enabled bool) error {
+	return fmt.Errorf("cellular radio control not supported by networkd backend")
+}
+
+func (b *SystemdNetworkdBackend) GetCellularConnections() ([]WiredConnection, error) {
+	return nil, fmt.Errorf("cellular connections not supported by networkd backend")
+}
+
+func (b *SystemdNetworkdBackend) ConnectCellular() error {
+	return fmt.Errorf("cellular connections not supported by networkd backend")
+}
+
+func (b *SystemdNetworkdBackend) DisconnectCellular() error {
+	return fmt.Errorf("cellular connections not supported by networkd backend")
+}
+
+func (b *SystemdNetworkdBackend) DisconnectCellularDevice(device string) error {
+	return fmt.Errorf("cellular connections not supported by networkd backend")
+}
+
+func (b *SystemdNetworkdBackend) ActivateCellularConnection(uuid string) error {
+	return fmt.Errorf("cellular connections not supported by networkd backend")
+}

@@ -306,6 +306,21 @@ FocusScope {
         }
 
         Loader {
+            id: networkCellularLoader
+            anchors.fill: parent
+            active: root.currentIndex === 47
+            visible: active
+            focus: active
+
+            sourceComponent: NetworkCellularTab {}
+
+            onActiveChanged: {
+                if (active && item)
+                    Qt.callLater(() => item.forceActiveFocus());
+            }
+        }
+
+        Loader {
             id: printerLoader
             anchors.fill: parent
             active: root.currentIndex === 8

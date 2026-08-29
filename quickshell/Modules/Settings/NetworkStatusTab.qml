@@ -99,6 +99,7 @@ Item {
                                     switch (NetworkService.networkStatus) {
                                     case "ethernet":
                                     case "wifi":
+                                    case "cellular":
                                         return Theme.success;
                                     case "disconnected":
                                         return Theme.error;
@@ -115,6 +116,8 @@ Item {
                                         return I18n.tr("Ethernet");
                                     case "wifi":
                                         return I18n.tr("WiFi");
+                                    case "cellular":
+                                        return I18n.tr("Cellular");
                                     case "disconnected":
                                         return I18n.tr("Disconnected");
                                     default:
@@ -145,7 +148,7 @@ Item {
                     Row {
                         width: parent.width
                         spacing: Theme.spacingM
-                        visible: NetworkService.backend === "networkmanager" && NetworkService.ethernetConnected && NetworkService.wifiConnected
+                        visible: NetworkService.backend === "networkmanager" && [NetworkService.ethernetConnected, NetworkService.wifiConnected, NetworkService.cellularConnected].filter(v => v).length > 1
 
                         StyledText {
                             text: I18n.tr("Preference")
@@ -161,31 +164,26 @@ Item {
 
                         DankButtonGroup {
                             id: preferenceButtons
-                            model: [I18n.tr("Auto"), I18n.tr("Ethernet"), I18n.tr("WiFi")]
-                            currentIndex: {
-                                switch (NetworkService.userPreference) {
-                                case "ethernet":
-                                    return 1;
-                                case "wifi":
-                                    return 2;
-                                default:
-                                    return 0;
-                                }
+
+                            readonly property var preferenceValues: {
+                                const values = ["auto", "ethernet", "wifi"];
+                                if ((NetworkService.cellularDevices?.length ?? 0) > 0)
+                                    values.push("cellular");
+                                return values;
                             }
+                            readonly property var labelsByValue: ({
+                                    "auto": I18n.tr("Auto"),
+                                    "ethernet": I18n.tr("Ethernet"),
+                                    "wifi": I18n.tr("WiFi"),
+                                    "cellular": I18n.tr("Cellular")
+                                })
+
+                            model: preferenceValues.map(v => labelsByValue[v] || v)
+                            currentIndex: Math.max(0, preferenceValues.indexOf(NetworkService.userPreference))
                             onSelectionChanged: (index, selected) => {
                                 if (!selected)
                                     return;
-                                switch (index) {
-                                case 0:
-                                    NetworkService.setNetworkPreference("auto");
-                                    break;
-                                case 1:
-                                    NetworkService.setNetworkPreference("ethernet");
-                                    break;
-                                case 2:
-                                    NetworkService.setNetworkPreference("wifi");
-                                    break;
-                                }
+                                NetworkService.setNetworkPreference(preferenceValues[index] || "auto");
                             }
                         }
                     }

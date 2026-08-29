@@ -63,6 +63,8 @@ func (b *NetworkManagerBackend) updatePrimaryConnection() error {
 		b.state.NetworkStatus = StatusEthernet
 	case "802-11-wireless":
 		b.state.NetworkStatus = StatusWiFi
+	case "gsm", "cdma":
+		b.state.NetworkStatus = StatusCellular
 	case "vpn", "wireguard":
 		b.state.NetworkStatus = StatusVPN
 	default:
@@ -102,6 +104,40 @@ func (b *NetworkManagerBackend) updateEthernetState() error {
 	b.state.EthernetDevice = connectedDevice
 	b.state.EthernetConnected = anyConnected
 	b.state.EthernetIP = connectedIP
+	b.stateMutex.Unlock()
+
+	return nil
+}
+
+func (b *NetworkManagerBackend) updateCellularState() error {
+	var connectedDevice string
+	var connectedIP string
+	var anyConnected bool
+
+	for name, info := range b.cellularDevicesSnapshot() {
+		state, err := info.device.GetPropertyState()
+		if err != nil {
+			continue
+		}
+
+		if state == gonetworkmanager.NmDeviceStateActivated {
+			anyConnected = true
+			connectedDevice = name
+			connectedIP = b.getDeviceIP(info.device)
+			break
+		}
+	}
+
+	if !anyConnected && b.cellularDevice != nil {
+		dev := b.cellularDevice.(gonetworkmanager.Device)
+		iface, _ := dev.GetPropertyInterface()
+		connectedDevice = iface
+	}
+
+	b.stateMutex.Lock()
+	b.state.CellularDevice = connectedDevice
+	b.state.CellularConnected = anyConnected
+	b.state.CellularIP = connectedIP
 	b.stateMutex.Unlock()
 
 	return nil

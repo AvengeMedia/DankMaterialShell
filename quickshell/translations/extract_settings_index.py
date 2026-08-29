@@ -108,6 +108,7 @@ TAB_INDEX_MAP = {
     "NetworkEthernetTab.qml": 39,
     "NetworkWifiTab.qml": 40,
     "NetworkVpnTab.qml": 41,
+    "NetworkCellularTab.qml": 47,
     "PrinterTab.qml": 8,
     "LauncherTab.qml": 9,
     "ThemeColorsTab.qml": 10,
@@ -194,6 +195,7 @@ TAB_CATEGORY_MAP = {
     44: "System",
     45: "System",
     46: "Dank Island",
+    47: "Network",
 }
 
 SEARCHABLE_COMPONENTS = [

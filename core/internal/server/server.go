@@ -38,7 +38,7 @@ import (
 	"github.com/AvengeMedia/dankgo/syncmap"
 )
 
-const APIVersion = 30
+const APIVersion = 31
 
 var CLIVersion = "dev"
 
@@ -1384,6 +1384,12 @@ func (s *Server) Serve(printDocs bool) error {
 		log.Info(" network.ethernet.connect    - Connect Ethernet")
 		log.Info(" network.ethernet.connect.config - Connect Ethernet to a specific configuration")
 		log.Info(" network.ethernet.disconnect - Disconnect Ethernet")
+		log.Info(" network.cellular.connect    - Connect Cellular")
+		log.Info(" network.cellular.connect.config - Connect Cellular to a specific configuration (params: uuid)")
+		log.Info(" network.cellular.disconnect - Disconnect Cellular (params: device?)")
+		log.Info(" network.cellular.toggle     - Toggle Cellular radio")
+		log.Info(" network.cellular.enable     - Enable Cellular")
+		log.Info(" network.cellular.disable    - Disable Cellular")
 		log.Info(" network.vpn.profiles        - List VPN profiles")
 		log.Info(" network.vpn.active          - List active VPN connections")
 		log.Info(" network.vpn.connect         - Connect VPN (params: uuidOrName|name|uuid, singleActive?)")
@@ -1395,7 +1401,7 @@ func (s *Server) Serve(printDocs bool) error {
 		log.Info(" network.vpn.getConfig       - Get VPN configuration (params: uuid|name|uuidOrName)")
 		log.Info(" network.vpn.updateConfig    - Update VPN configuration (params: uuid, name?, autoconnect?, data?)")
 		log.Info(" network.vpn.delete          - Delete VPN connection (params: uuid|name|uuidOrName)")
-		log.Info(" network.preference.set      - Set preference (params: preference [auto|wifi|ethernet])")
+		log.Info(" network.preference.set      - Set preference (params: preference [auto|wifi|ethernet|cellular])")
 		log.Info(" network.info                - Get network info (params: ssid)")
 		log.Info(" network.credentials.submit  - Submit credentials for prompt (params: token, secrets, save?)")
 		log.Info(" network.credentials.cancel  - Cancel credential prompt (params: token)")

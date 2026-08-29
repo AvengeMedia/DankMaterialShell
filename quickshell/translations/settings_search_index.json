@@ -13110,5 +13110,46 @@
       "weather"
     ],
     "description": "Weather icon and temperature open the weather activity"
+  },
+  {
+    "section": "networkCellular",
+    "label": "Cellular",
+    "tabIndex": 47,
+    "category": "Network",
+    "keywords": [
+      "cdma",
+      "cellular",
+      "connectivity",
+      "gsm",
+      "lte",
+      "mobile",
+      "modem",
+      "network",
+      "online",
+      "wwan"
+    ],
+    "icon": "network_cell"
+  },
+  {
+    "section": "networkCellularProfiles",
+    "label": "Saved Configurations",
+    "tabIndex": 47,
+    "category": "Network",
+    "keywords": [
+      "apn",
+      "cellular",
+      "config",
+      "configurations",
+      "configure",
+      "connectivity",
+      "mobile",
+      "network",
+      "online",
+      "profile",
+      "saved",
+      "setup",
+      "sim"
+    ],
+    "icon": "sim_card"
   }
 ]

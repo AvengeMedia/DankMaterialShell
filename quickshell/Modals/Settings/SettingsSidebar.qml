@@ -281,6 +281,12 @@ Rectangle {
                     "tabIndex": 40
                 },
                 {
+                    "id": "network_cellular",
+                    "text": I18n.tr("Cellular"),
+                    "icon": "network_cell",
+                    "tabIndex": 47
+                },
+                {
                     "id": "network_vpn",
                     "text": I18n.tr("VPN"),
                     "icon": "vpn_key",
