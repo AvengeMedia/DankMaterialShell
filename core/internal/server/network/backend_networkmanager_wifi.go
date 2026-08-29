@@ -139,7 +139,7 @@ func (b *NetworkManagerBackend) GetWiFiNetworkDetails(ssid string) (*NetworkInfo
 		maxBitrate, _ := ap.GetPropertyMaxBitrate()
 		bssid, _ := ap.GetPropertyHWAddress()
 
-		secured := flags != uint32(gonetworkmanager.Nm80211APFlagsNone) ||
+		secured := flags&uint32(gonetworkmanager.Nm80211APFlagsPrivacy) != 0 ||
 			wpaFlags != uint32(gonetworkmanager.Nm80211APSecNone) ||
 			rsnFlags != uint32(gonetworkmanager.Nm80211APSecNone)
 
@@ -554,7 +554,7 @@ func (b *NetworkManagerBackend) updateWiFiNetworks() ([]WiFiNetwork, error) {
 		maxBitrate, _ := ap.GetPropertyMaxBitrate()
 		bssid, _ := ap.GetPropertyHWAddress()
 
-		secured := flags != uint32(gonetworkmanager.Nm80211APFlagsNone) ||
+		secured := flags&uint32(gonetworkmanager.Nm80211APFlagsPrivacy) != 0 ||
 			wpaFlags != uint32(gonetworkmanager.Nm80211APSecNone) ||
 			rsnFlags != uint32(gonetworkmanager.Nm80211APSecNone)
 
@@ -767,7 +767,7 @@ func (b *NetworkManagerBackend) createAndConnectWiFiOnDevice(req ConnectionReque
 		isPsk = (wpaFlags&keyMgmtPsk) != 0 || (rsnFlags&keyMgmtPsk) != 0
 		isSae = (wpaFlags&keyMgmtSae) != 0 || (rsnFlags&keyMgmtSae) != 0
 		isOwe = (wpaFlags&keyMgmtOwe) != 0 || (rsnFlags&keyMgmtOwe) != 0
-		secured = flags != uint32(gonetworkmanager.Nm80211APFlagsNone) ||
+		secured = flags&uint32(gonetworkmanager.Nm80211APFlagsPrivacy) != 0 ||
 			wpaFlags != uint32(gonetworkmanager.Nm80211APSecNone) ||
 			rsnFlags != uint32(gonetworkmanager.Nm80211APSecNone)
 	}
@@ -1200,7 +1200,7 @@ func (b *NetworkManagerBackend) updateAllWiFiDevices() {
 				maxBitrate, _ := ap.GetPropertyMaxBitrate()
 				apBSSID, _ := ap.GetPropertyHWAddress()
 
-				secured := flags != uint32(gonetworkmanager.Nm80211APFlagsNone) ||
+				secured := flags&uint32(gonetworkmanager.Nm80211APFlagsPrivacy) != 0 ||
 					wpaFlags != uint32(gonetworkmanager.Nm80211APSecNone) ||
 					rsnFlags != uint32(gonetworkmanager.Nm80211APSecNone)
 
