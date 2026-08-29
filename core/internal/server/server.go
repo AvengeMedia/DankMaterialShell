@@ -84,6 +84,7 @@ const dbusClientID = "dms-dbus-client"
 var capabilitySubscribers syncmap.Map[string, chan ServerInfo]
 var cupsMu sync.Mutex
 var cupsSubscriberCount int
+var cupsEverAvailable bool
 
 var appPaths = paths.New("danklinux")
 
@@ -176,6 +177,7 @@ func InitializeAppPickerManager() error {
 	return nil
 }
 
+// Reports whether the cups capability was newly gained, not whether a manager was created.
 func initializeCupsManagerLocked() (bool, error) {
 	if cupsManager != nil {
 		return false, nil
@@ -187,32 +189,37 @@ func initializeCupsManagerLocked() (bool, error) {
 	}
 	cupsManager = manager
 	log.Info("CUPS manager initialized")
-	return true, nil
+	gained := !cupsEverAvailable
+	cupsEverAvailable = true
+	return gained, nil
 }
 
 func ensureCupsManager() (*cups.Manager, error) {
 	cupsMu.Lock()
-	created, err := initializeCupsManagerLocked()
+	gained, err := initializeCupsManagerLocked()
 	mgr := cupsManager
 	cupsMu.Unlock()
 	if err != nil {
 		return nil, err
 	}
-	if created {
+	if gained {
 		notifyCapabilityChange()
 	}
 	return mgr, nil
 }
 
+// Sticky: the manager is torn down when nobody is subscribed, but CUPS itself stays available.
 func cupsAvailable() bool {
 	cupsMu.Lock()
 	defer cupsMu.Unlock()
-	return cupsManager != nil
+	return cupsEverAvailable
 }
 
 func releaseCupsSubscriber() {
 	cupsMu.Lock()
-	cupsSubscriberCount--
+	if cupsSubscriberCount > 0 {
+		cupsSubscriberCount--
+	}
 	var mgr *cups.Manager
 	if cupsSubscriberCount == 0 && cupsManager != nil {
 		mgr = cupsManager
@@ -224,7 +231,6 @@ func releaseCupsSubscriber() {
 	}
 	log.Info("Last CUPS subscriber disconnected, shutting down CUPS manager")
 	mgr.Close()
-	notifyCapabilityChange()
 }
 
 func InitializeBrightnessManager() error {
@@ -887,13 +893,13 @@ func handleSubscribe(conn *models.Conn, req models.Request) {
 	if shouldSubscribe("cups") {
 		cupsMu.Lock()
 		cupsSubscriberCount++
-		created, err := initializeCupsManagerLocked()
+		gained, err := initializeCupsManagerLocked()
 		mgr := cupsManager
 		cupsMu.Unlock()
 
 		if err != nil {
 			log.Warnf("Failed to initialize CUPS manager for subscription: %v", err)
-		} else if created {
+		} else if gained {
 			notifyCapabilityChange()
 		}
 
