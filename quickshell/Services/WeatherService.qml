@@ -5,6 +5,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.Common
+import qs.Modules.Greetd
 import "../Common/suncalc.js" as SunCalc
 
 Singleton {
@@ -470,7 +471,7 @@ Singleton {
     }
 
     function getConfiguredLocationName() {
-        return SettingsData.weatherLocation;
+        return SessionData.isGreeterMode ? SessionData.weatherLocation : SettingsData.weatherLocation;
     }
 
     function setLocation(lat, lon, city, country) {
@@ -523,9 +524,9 @@ Singleton {
     }
 
     function updateLocation() {
-        const useAuto = SettingsData.useAutoLocation;
-        const coords = SettingsData.weatherCoordinates;
-        const cityName = SettingsData.weatherLocation;
+        const useAuto = SessionData.isGreeterMode ? GreetdSettings.useAutoLocation : SettingsData.useAutoLocation;
+        const coords = SessionData.isGreeterMode ? SessionData.weatherCoordinates : SettingsData.weatherCoordinates;
+        const cityName = SessionData.isGreeterMode ? SessionData.weatherLocation : SettingsData.weatherLocation;
 
         if (useAuto) {
             getLocationFromService();
@@ -1047,7 +1048,7 @@ Singleton {
     Timer {
         id: updateTimer
         interval: nextInterval()
-        running: root.refCount > 0 && SettingsData.weatherEnabled
+        running: root.refCount > 0 && SettingsData.weatherEnabled && !SessionData.isGreeterMode
         repeat: true
         triggeredOnStart: true
         onTriggered: {

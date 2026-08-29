@@ -497,3 +497,41 @@ jobs:
             exit 0
           fi
           bash scripts/notify-issues.sh "$PREVIOUS_TAG" "$TAG"
+
+  # Pin the satellite repos to this release's version. Each dispatch target
+  # decides for itself whether to tag: X.Y.0 always tags, X.Y.Z skips when the
+  # repo has no commits of its own since its last tag.
+  fanout:
+    name: Pin ${{ matrix.repo }}
+    runs-on: ubuntu-latest
+    needs: [release]
+    if: ${{ !contains(inputs.tag, '-') }}
+    strategy:
+      fail-fast: false
+      matrix:
+        repo:
+          - dgop
+          - dankgo
+          - dank-qml-common
+          - dankcalendar
+          - danksearch
+          - dank-greeter
+    steps:
+      - name: Create GitHub App token
+        id: app_token
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ matrix.repo }}
+
+      - name: Dispatch pin-release
+        env:
+          GH_TOKEN: ${{ steps.app_token.outputs.token }}
+          REPO: ${{ github.repository_owner }}/${{ matrix.repo }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          gh workflow run pin-release.yml --repo "$REPO" -f version="$TAG"
+          echo "dispatched pin-release ${TAG} to ${REPO}" >> "$GITHUB_STEP_SUMMARY"

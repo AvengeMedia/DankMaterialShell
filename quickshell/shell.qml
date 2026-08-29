@@ -17,6 +17,7 @@ import qs.Services
 ShellRoot {
     id: entrypoint
 
+    readonly property bool runGreeter: Quickshell.env("DMS_RUN_GREETER") === "1" || Quickshell.env("DMS_RUN_GREETER") === "true"
     readonly property bool disableHotReload: Quickshell.env("DMS_DISABLE_HOT_RELOAD") === "1" || Quickshell.env("DMS_DISABLE_HOT_RELOAD") === "true"
 
     Component.onCompleted: {
@@ -28,12 +29,15 @@ ShellRoot {
         DC.Log.backend = Log;
         DC.Host.session = SessionService;
         DC.Host.cache = CacheData;
+        if (entrypoint.runGreeter)
+            return;
         // Build the polkit agent here, outside incubation: first-touching it from a Connections target during DMSShell's async load crashed QQmlConnections::connectSignalsToMethods.
         void PolkitService.agent;
     }
 
     Loader {
         id: wallpaperLoader
+        active: !entrypoint.runGreeter
         asynchronous: false
 
         sourceComponent: Scope {
@@ -49,6 +53,7 @@ ShellRoot {
 
     Loader {
         id: shellCoreLoader
+        active: !entrypoint.runGreeter
         asynchronous: true
         source: "ShellCore.qml"
         onLoaded: dmsShellLoader.setSource("DMSShell.qml", {
@@ -59,5 +64,12 @@ ShellRoot {
     Loader {
         id: dmsShellLoader
         asynchronous: true
+    }
+
+    Loader {
+        id: dmsGreeterLoader
+        active: entrypoint.runGreeter
+        asynchronous: false
+        source: "DMSGreeter.qml"
     }
 }
