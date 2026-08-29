@@ -980,6 +980,7 @@ Item {
                     value: selectedBarConfig?.spacing ?? 4
                     minimum: 0
                     maximum: 32
+                    unit: "px"
                     defaultValue: 4
                     onSliderDragFinished: finalValue => {
                         SettingsData.updateBarConfig(selectedBarId, {
@@ -1005,6 +1006,7 @@ Item {
                     value: selectedBarConfig?.bottomGap ?? 0
                     minimum: -50
                     maximum: 50
+                    unit: "px"
                     defaultValue: 0
                     onSliderDragFinished: finalValue => {
                         SettingsData.updateBarConfig(selectedBarId, {
@@ -1030,6 +1032,7 @@ Item {
                     value: selectedBarConfig?.innerPadding ?? 4
                     minimum: -8
                     maximum: 24
+                    unit: "px"
                     defaultValue: 4
                     onSliderDragFinished: finalValue => {
                         SettingsData.updateBarConfig(selectedBarId, {
