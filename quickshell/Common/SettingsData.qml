@@ -914,6 +914,7 @@ Singleton {
     property bool lockScreenShowPowerActions: true
     property bool lockScreenShowSystemIcons: true
     property bool lockScreenShowTime: true
+    property string lockScreenClockStyle: "horizontal"
     property bool lockScreenShowDate: true
     property bool lockScreenShowProfileImage: true
     property bool lockScreenShowPasswordField: true

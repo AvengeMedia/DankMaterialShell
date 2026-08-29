@@ -5519,6 +5519,24 @@
     "description": "Bind lock screen to dbus signals from loginctl. Disable if using an external lock screen"
   },
   {
+    "section": "lockScreenClockStyle",
+    "label": "Clock Style",
+    "tabIndex": 11,
+    "category": "Lock Screen",
+    "keywords": [
+      "clock",
+      "lock",
+      "login",
+      "password",
+      "screen",
+      "security",
+      "style",
+      "time",
+      "vertical",
+      "watch"
+    ]
+  },
+  {
     "section": "lockDisplay",
     "label": "Display Assignment",
     "tabIndex": 11,

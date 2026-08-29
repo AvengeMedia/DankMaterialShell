@@ -369,7 +369,7 @@ Item {
             anchors.bottom: parent.verticalCenter
             anchors.bottomMargin: 60
             width: parent.width
-            height: clockText.implicitHeight
+            height: verticalClock.visible ? verticalClock.implicitHeight : clockText.implicitHeight
             visible: SettingsData.lockScreenShowTime
 
             Row {
@@ -377,6 +377,7 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: parent.top
                 spacing: 0
+                visible: SettingsData.lockScreenClockStyle !== "vertical"
 
                 property string fullTimeStr: {
                     const format = SettingsData.getEffectiveTimeFormat();
@@ -443,6 +444,52 @@ Item {
                 ClockDigitText {
                     text: clockText.ampm
                     visible: clockText.ampm !== ""
+                }
+            }
+
+            Column {
+                id: verticalClock
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: parent.top
+                spacing: -8
+                visible: SettingsData.lockScreenClockStyle === "vertical"
+
+                Row {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 0
+
+                    ClockDigitText {
+                        width: 75
+                        text: clockText.hours.length > 1 ? clockText.hours[0] : ""
+                    }
+                    ClockDigitText {
+                        width: 75
+                        text: clockText.hours.length > 1 ? clockText.hours[1] : clockText.hours.length > 0 ? clockText.hours[0] : ""
+                    }
+                }
+
+                Row {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 0
+
+                    ClockDigitText {
+                        width: 75
+                        text: clockText.minutes.length > 0 ? clockText.minutes[0] : ""
+                    }
+                    ClockDigitText {
+                        width: 75
+                        text: clockText.minutes.length > 1 ? clockText.minutes[1] : ""
+                    }
+                }
+
+                StyledText {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: clockText.hasSeconds ? clockText.seconds + (clockText.ampm !== "" ? " " + clockText.ampm : "") : clockText.ampm
+                    font.pixelSize: 42
+                    font.weight: Font.Light
+                    font.family: root.lockFontFamily !== "" ? root.lockFontFamily : resolvedFontFamily
+                    color: "white"
+                    visible: clockText.hasSeconds || clockText.ampm !== ""
                 }
             }
         }

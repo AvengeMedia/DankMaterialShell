@@ -480,6 +480,7 @@ var SPEC = {
     lockScreenShowPowerActions: { def: true },
     lockScreenShowSystemIcons: { def: true },
     lockScreenShowTime: { def: true },
+    lockScreenClockStyle: { def: "horizontal" },
     lockScreenShowDate: { def: true },
     lockScreenShowProfileImage: { def: true },
     lockScreenShowPasswordField: { def: true },
