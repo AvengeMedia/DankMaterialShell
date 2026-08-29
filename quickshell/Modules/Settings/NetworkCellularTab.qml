@@ -85,7 +85,7 @@ Item {
                     Rectangle {
                         width: parent.width
                         height: 1
-                        color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+                        color: Theme.outlineStrong
                     }
 
                     Column {
@@ -213,15 +213,6 @@ Item {
                                 }
                             }
                         }
-                    }
-
-                    StyledText {
-                        visible: NetworkService.cellularEnabled && (NetworkService.cellularDevices?.length ?? 0) === 0
-                        text: NetworkService.cellularHardwareEnabled ? I18n.tr("No devices found") : I18n.tr("Unavailable")
-                        font.pixelSize: Theme.fontSizeMedium
-                        color: Theme.surfaceVariantText
-                        width: parent.width
-                        horizontalAlignment: Text.AlignHCenter
                     }
                 }
             }
