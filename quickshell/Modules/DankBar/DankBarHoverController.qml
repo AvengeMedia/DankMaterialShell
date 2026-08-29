@@ -32,6 +32,7 @@ Item {
     property bool _barExitPending: false
     property var _pendingHoverHit: null
     property string _pendingHoverTrigger: ""
+    property string _hoverReopenSuppressedTrigger: ""
 
     property bool _candidateCacheValid: false
     property var _candidateCache: []
@@ -54,6 +55,7 @@ Item {
         if (hasOpenHoverSurface() && !isActiveHoverSurfacePinned())
             closeHoverSurfaces();
         activeHoverTrigger = "";
+        _hoverReopenSuppressedTrigger = "";
     }
 
     Component.onDestruction: _disconnectCandidateWatchers()
@@ -154,6 +156,7 @@ Item {
         cancelQueuedHitTest();
         _cancelPendingHover();
         _hoverCloseTimer.stop();
+        _hoverReopenSuppressedTrigger = "";
         barContent._pendingPopoutOpenSpec = null;
 
         const activePopout = PopoutManager.getActivePopout(barWindow?.screen);
@@ -631,12 +634,16 @@ Item {
     function _syncHoverTriggerState() {
         if (activeHoverTrigger === "notepadButton") {
             const instance = _notepadWidgetForScreen()?.notepadInstance;
-            if (!instance?.isVisible)
+            if (!instance?.isVisible) {
+                _hoverReopenSuppressedTrigger = activeHoverTrigger;
                 activeHoverTrigger = "";
+            }
             return;
         }
-        if (activeHoverTrigger !== "" && !hasOpenHoverSurface())
+        if (activeHoverTrigger !== "" && !hasOpenHoverSurface()) {
+            _hoverReopenSuppressedTrigger = activeHoverTrigger;
             activeHoverTrigger = "";
+        }
     }
 
     function hasOpenHoverSurface() {
@@ -819,6 +826,7 @@ Item {
 
         const hit = findWidgetAtGlobalPoint(gx, gy);
         if (!hit) {
+            _hoverReopenSuppressedTrigger = "";
             _cancelPendingHover();
             scheduleHoverClose(gx, gy);
             return;
@@ -842,6 +850,14 @@ Item {
             scheduleHoverClose(gx, gy);
             return;
         }
+
+        if (_hoverReopenSuppressedTrigger === triggerKey) {
+            _cancelPendingHover();
+            _hoverCloseTimer.stop();
+            return;
+        }
+        if (_hoverReopenSuppressedTrigger !== "")
+            _hoverReopenSuppressedTrigger = "";
 
         _hoverCloseTimer.stop();
 

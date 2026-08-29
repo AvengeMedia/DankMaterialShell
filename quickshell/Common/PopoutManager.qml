@@ -254,7 +254,7 @@ Singleton {
         if (!popout || !popout.screen)
             return;
 
-        // Clicking a transient popout pins it instead of toggling it closed.
+        // Clicking a transient popout closes it instead of leaving it hover-owned.
         const wasTransient = popout.hoverDismissEnabled === true;
         if (!hoverRequest && popout.hoverDismissEnabled !== undefined)
             popout.hoverDismissEnabled = false;
@@ -309,15 +309,8 @@ Singleton {
             if (hoverRequest && sameDefinedTrigger)
                 return;
 
-            if (!hoverRequest && (triggerId === undefined || sameDefinedTrigger)) {
-                if (!wasTransient) {
-                    _closePopout(popout);
-                    return;
-                }
-                if (popout.updateSurfacePosition)
-                    popout.updateSurfacePosition();
-                if (triggerId !== undefined)
-                    currentPopoutTriggers[screenName] = triggerId;
+            if (!hoverRequest && (wasTransient || triggerId === undefined || sameDefinedTrigger)) {
+                _closePopout(popout);
                 return;
             }
 
