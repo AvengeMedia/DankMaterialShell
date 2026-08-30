@@ -388,8 +388,48 @@ Singleton {
     property string _settingsPendingTab: ""
     property int _settingsPendingTabIndex: -1
 
+    property double _settingsShownAt: 0
+
+    Connections {
+        target: root.settingsModal
+        function onVisibleChanged() {
+            if (root.settingsModal?.visible)
+                root._settingsShownAt = Date.now();
+        }
+    }
+
+    function _settingsWindowDead() {
+        if (!settingsModal?.visible)
+            return false;
+        // toplevel registration is async; a freshly shown window looks dead.
+        if (Date.now() - _settingsShownAt < 2000)
+            return false;
+        const settingsTitle = I18n.tr("Settings", "settings window title");
+        for (const toplevel of ToplevelManager.toplevels.values) {
+            if (toplevel.title === "Settings" || toplevel.title === settingsTitle)
+                return false;
+        }
+        return true;
+    }
+
+    function _rebuildDeadSettings() {
+        settingsModal.visible = false;
+        settingsModal = null;
+        settingsModalLoader.active = false;
+        _settingsWantsOpen = true;
+        _settingsWantsToggle = false;
+        Qt.callLater(() => {
+            if (settingsModalLoader)
+                settingsModalLoader.activeAsync = true;
+        });
+    }
+
     function openSettings() {
         if (settingsModal) {
+            if (_settingsWindowDead()) {
+                _rebuildDeadSettings();
+                return;
+            }
             settingsModal.show();
         } else if (settingsModalLoader) {
             _settingsWantsOpen = true;
@@ -400,6 +440,11 @@ Singleton {
 
     function openSettingsWithTab(tabName: string) {
         if (settingsModal) {
+            if (_settingsWindowDead()) {
+                _settingsPendingTab = tabName;
+                _rebuildDeadSettings();
+                return;
+            }
             settingsModal.showWithTabName(tabName);
             return;
         }
@@ -413,6 +458,11 @@ Singleton {
 
     function openSettingsWithTabIndex(tabIndex: int) {
         if (settingsModal) {
+            if (_settingsWindowDead()) {
+                _settingsPendingTabIndex = tabIndex;
+                _rebuildDeadSettings();
+                return;
+            }
             settingsModal.showWithTab(tabIndex);
             return;
         }
