@@ -143,7 +143,7 @@ PanelWindow {
         }
 
         Region {
-            item: controller.inputSuspended || !satelliteHost.scrollEnabled ? null : scrollStrip
+            item: controller.inputSuspended || !satelliteHost.scrollEnabled || root.floating ? null : scrollStrip
         }
 
         Region {
