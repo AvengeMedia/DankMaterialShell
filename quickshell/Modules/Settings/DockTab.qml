@@ -98,6 +98,16 @@ Item {
                     visible: SettingsData.showDock
                     onToggled: checked => SettingsData.set("dockUseOverlayLayer", checked)
                 }
+
+                SettingsToggleRow {
+                    settingKey: "dockShowOnFullscreen"
+                    tags: ["dock", "fullscreen", "overlay", "show", "visibility"]
+                    text: I18n.tr("Show Dock Over Fullscreen")
+                    description: I18n.tr("Keep the dock visible above fullscreen applications")
+                    checked: SettingsData.dockShowOnFullscreen
+                    visible: SettingsData.showDock && SettingsData.dockUseOverlayLayer
+                    onToggled: checked => SettingsData.set("dockShowOnFullscreen", checked)
+                }
             }
 
             SettingsCard {

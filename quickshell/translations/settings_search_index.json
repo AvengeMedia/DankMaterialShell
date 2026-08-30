@@ -2253,6 +2253,32 @@
     "description": "Display a dock with pinned and running applications"
   },
   {
+    "section": "dockShowOnFullscreen",
+    "label": "Show Dock Over Fullscreen",
+    "tabIndex": 5,
+    "category": "Dock",
+    "keywords": [
+      "above",
+      "app",
+      "applications",
+      "apps",
+      "dock",
+      "fullscreen",
+      "keep",
+      "launcher bar",
+      "over",
+      "overlay",
+      "panel",
+      "program",
+      "programs",
+      "show",
+      "taskbar",
+      "visibility",
+      "visible"
+    ],
+    "description": "Keep the dock visible above fullscreen applications"
+  },
+  {
     "section": "dockLauncherEnabled",
     "label": "Show Launcher Button",
     "tabIndex": 5,

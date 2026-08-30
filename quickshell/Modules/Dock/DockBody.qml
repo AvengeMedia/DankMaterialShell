@@ -154,7 +154,7 @@ Item {
     readonly property bool usesConnectedFrameChrome: CompositorService.usesConnectedFrameChromeForScreen(dock._dockScreenName)
     readonly property bool usesOverlayLayer: CompositorService.framePeerSurfacesUseOverlayForScreen(dock._dockScreenName) || SettingsData.dockUseOverlayLayer
     readonly property bool fullscreenOnScreen: CompositorService.fullscreenToplevelOnScreen(dock._dockScreenName)
-    readonly property bool hiddenForFullscreen: usesOverlayLayer && fullscreenOnScreen
+    readonly property bool hiddenForFullscreen: usesOverlayLayer && fullscreenOnScreen && !SettingsData.dockShowOnFullscreen
     readonly property bool geometryReady: dock.width > 0 && dock.height > 0 && dockBackground.width > 0 && dockBackground.height > 0
 
     function _syncDockChromeState() {
@@ -366,8 +366,11 @@ Item {
             return true;
         }
 
-        if (usesOverlayLayer && fullscreenOnScreen)
+        if (hiddenForFullscreen)
             return false;
+
+        if (usesOverlayLayer && fullscreenOnScreen && SettingsData.dockShowOnFullscreen)
+            return true;
 
         // Smart auto-hide: show dock when no windows overlap, hide when they do
         if (SettingsData.dockSmartAutoHide) {
