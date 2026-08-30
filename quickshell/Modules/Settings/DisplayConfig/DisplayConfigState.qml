@@ -1000,15 +1000,15 @@ Singleton {
             if (!settings)
                 continue;
 
-            if (current[outputName])
-                continue;
-
-            const entry = {};
+            const entry = current[outputName] ?? {};
+            let imported = false;
             for (const field of importedFields) {
-                if (settings[field] !== undefined)
-                    entry[field] = settings[field];
+                if (settings[field] === undefined || entry[field] !== undefined)
+                    continue;
+                entry[field] = settings[field];
+                imported = true;
             }
-            if (Object.keys(entry).length === 0)
+            if (!imported)
                 continue;
 
             current[outputName] = entry;
