@@ -369,9 +369,6 @@ Item {
         if (hiddenForFullscreen)
             return false;
 
-        if (usesOverlayLayer && fullscreenOnScreen && SettingsData.dockShowOnFullscreen)
-            return true;
-
         // Smart auto-hide: show dock when no windows overlap, hide when they do
         if (SettingsData.dockSmartAutoHide) {
             if (shouldHideForWindows)
