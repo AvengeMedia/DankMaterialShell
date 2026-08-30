@@ -345,6 +345,135 @@ func TestHandleGetEntry_MissingIDReturnsNullResult(t *testing.T) {
 	assert.Nil(t, resp.Result)
 }
 
+func storeTestEntry(t *testing.T, m *Manager, text string) uint64 {
+	t.Helper()
+
+	require.NoError(t, m.storeEntry(Entry{
+		Data:      []byte(text),
+		MimeType:  "text/plain;charset=utf-8",
+		Preview:   text,
+		Size:      len(text),
+		Timestamp: time.Now().Truncate(time.Second),
+		IsImage:   false,
+	}))
+
+	for _, entry := range m.GetHistory() {
+		if entry.Preview == text {
+			return entry.ID
+		}
+	}
+
+	t.Fatalf("stored entry %q not found in history", text)
+	return 0
+}
+
+func TestDeleteEntries_DeletesRequestedKeepsRest(t *testing.T) {
+	m := newTestManagerWithDB(t)
+
+	first := storeTestEntry(t, m, "first")
+	second := storeTestEntry(t, m, "second")
+	third := storeTestEntry(t, m, "third")
+
+	deleted, err := m.DeleteEntries([]uint64{first, third})
+	require.NoError(t, err)
+	assert.Equal(t, 2, deleted)
+
+	history := m.GetHistory()
+	require.Len(t, history, 1)
+	assert.Equal(t, second, history[0].ID)
+}
+
+func TestDeleteEntries_SkipsPinnedEntries(t *testing.T) {
+	m := newTestManagerWithDB(t)
+
+	unpinned := storeTestEntry(t, m, "unpinned")
+	pinned := storeTestEntry(t, m, "pinned")
+	require.NoError(t, m.PinEntry(pinned))
+
+	deleted, err := m.DeleteEntries([]uint64{unpinned, pinned})
+	require.NoError(t, err)
+	assert.Equal(t, 1, deleted)
+
+	history := m.GetHistory()
+	require.Len(t, history, 1)
+	assert.True(t, history[0].Pinned)
+}
+
+func TestDeleteEntries_IgnoresUnknownIDs(t *testing.T) {
+	m := newTestManagerWithDB(t)
+
+	only := storeTestEntry(t, m, "only")
+
+	deleted, err := m.DeleteEntries([]uint64{only, only + 1000})
+	require.NoError(t, err)
+	assert.Equal(t, 1, deleted)
+	assert.Empty(t, m.GetHistory())
+}
+
+func TestDeleteEntries_EmptyListIsNoOp(t *testing.T) {
+	m := newTestManagerWithDB(t)
+
+	storeTestEntry(t, m, "keep me")
+
+	deleted, err := m.DeleteEntries(nil)
+	require.NoError(t, err)
+	assert.Equal(t, 0, deleted)
+	assert.Len(t, m.GetHistory(), 1)
+}
+
+func TestHandleDeleteEntries_ReportsDeletedCount(t *testing.T) {
+	m := newTestManagerWithDB(t)
+
+	first := storeTestEntry(t, m, "first")
+	second := storeTestEntry(t, m, "second")
+
+	mc := newClipboardTestConn()
+	conn := models.NewConn(mc)
+	handleDeleteEntries(conn, models.Request{
+		ID:     1,
+		Params: map[string]any{"ids": []any{float64(first), float64(second)}},
+	}, m)
+
+	var resp models.Response[map[string]int]
+	require.NoError(t, json.NewDecoder(mc.writeBuf).Decode(&resp))
+	assert.Empty(t, resp.Error)
+	require.NotNil(t, resp.Result)
+	assert.Equal(t, 2, (*resp.Result)["deleted"])
+	assert.Empty(t, m.GetHistory())
+}
+
+func TestHandleDeleteEntries_RejectsBadParams(t *testing.T) {
+	tests := []struct {
+		name   string
+		params map[string]any
+	}{
+		{"missing ids", map[string]any{}},
+		{"ids not an array", map[string]any{"ids": float64(1)}},
+		{"negative id", map[string]any{"ids": []any{float64(-1)}}},
+		{"fractional id", map[string]any{"ids": []any{float64(1.5)}}},
+		{"id of the wrong type", map[string]any{"ids": []any{"1"}}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			m := newTestManagerWithDB(t)
+			kept := storeTestEntry(t, m, "kept")
+
+			mc := newClipboardTestConn()
+			conn := models.NewConn(mc)
+			handleDeleteEntries(conn, models.Request{ID: 1, Params: tt.params}, m)
+
+			var resp models.Response[any]
+			require.NoError(t, json.NewDecoder(mc.writeBuf).Decode(&resp))
+			assert.NotEmpty(t, resp.Error)
+
+			history := m.GetHistory()
+			require.Len(t, history, 1)
+			assert.Equal(t, kept, history[0].ID)
+		})
+	}
+}
+
 func TestUnpinEntry_KeepsTopUnpinnedDuplicate(t *testing.T) {
 	m := newTestManagerWithDB(t)
 
