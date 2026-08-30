@@ -872,6 +872,7 @@ Singleton {
     property bool dockAutoHide: false
     property bool dockSmartAutoHide: false
     property bool dockUseOverlayLayer: false
+    property bool dockShowOnFullscreen: false
     property bool dockGroupByApp: false
     property bool dockSeparatePinnedAndRunningApps: false
     property bool dockRestoreSpecialWorkspaceOnClick: false

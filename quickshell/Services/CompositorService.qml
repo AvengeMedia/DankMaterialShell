@@ -526,6 +526,20 @@ Singleton {
         return toplevels;
     }
 
+    function fullscreenToplevelOnScreen(screenOrName) {
+        const screenName = _screenName(screenOrName);
+        if (!screenName || !ToplevelManager.toplevels?.values)
+            return false;
+
+        const toplevels = ToplevelManager.toplevels.values;
+        for (let i = 0; i < toplevels.length; i++) {
+            const toplevel = toplevels[i];
+            if (toplevel?.fullscreen && toplevel.activated && _toplevelOnScreen(toplevel, screenName))
+                return true;
+        }
+        return false;
+    }
+
     function filterCurrentDisplay(toplevels, screenName) {
         if (!toplevels || toplevels.length === 0 || !screenName)
             return toplevels;

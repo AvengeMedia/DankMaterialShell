@@ -153,6 +153,8 @@ Item {
     readonly property string _dockScreenName: dock.modelData ? dock.modelData.name : (dock.screen ? dock.screen.name : "")
     readonly property bool usesConnectedFrameChrome: CompositorService.usesConnectedFrameChromeForScreen(dock._dockScreenName)
     readonly property bool usesOverlayLayer: CompositorService.framePeerSurfacesUseOverlayForScreen(dock._dockScreenName) || SettingsData.dockUseOverlayLayer
+    readonly property bool fullscreenOnScreen: CompositorService.fullscreenToplevelOnScreen(dock._dockScreenName)
+    readonly property bool hiddenForFullscreen: usesOverlayLayer && fullscreenOnScreen && !SettingsData.dockShowOnFullscreen
     readonly property bool geometryReady: dock.width > 0 && dock.height > 0 && dockBackground.width > 0 && dockBackground.height > 0
 
     function _syncDockChromeState() {
@@ -364,6 +366,9 @@ Item {
             return true;
         }
 
+        if (hiddenForFullscreen)
+            return false;
+
         // Smart auto-hide: show dock when no windows overlap, hide when they do
         if (SettingsData.dockSmartAutoHide) {
             if (shouldHideForWindows)
@@ -470,6 +475,8 @@ Item {
             return expanded ? Math.min(bodyY - innerReach, dock.height - 1) : dock.height - 1;
         }
         width: {
+            if (dock.hiddenForFullscreen && !expanded)
+                return 0;
             if (chrome)
                 return dockMouseArea.width + (isVertical && expanded ? animationHeadroom : 0) + (expanded ? borderThickness * 2 + dock.horizontalConnectorExtent * 2 : 0);
             if (!isVertical)
@@ -479,6 +486,8 @@ Item {
             return atEndEdge ? dock.width - x : Math.max(bodyX + dockBackground.width + innerReach, 1);
         }
         height: {
+            if (dock.hiddenForFullscreen && !expanded)
+                return 0;
             if (chrome)
                 return dockMouseArea.height + (!isVertical && expanded ? animationHeadroom : 0) + (expanded ? borderThickness * 2 + dock.verticalConnectorExtent * 2 : 0);
             if (isVertical)
