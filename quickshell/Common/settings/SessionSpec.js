@@ -87,6 +87,7 @@ var SPEC = {
     bluetoothAdapterOverride: { def: "" },
 
     lastPlayerIdentity: { def: "" },
+    pinnedPlayerIdentity: { def: "" },
 
     deviceMaxVolumes: { def: {} },
     hiddenOutputDeviceNames: { def: [] },

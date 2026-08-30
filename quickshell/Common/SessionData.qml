@@ -219,6 +219,7 @@ Singleton {
     property string bluetoothAdapterOverride: ""
 
     property string lastPlayerIdentity: ""
+    property string pinnedPlayerIdentity: ""
 
     property var deviceMaxVolumes: ({})
     property var hiddenOutputDeviceNames: []
