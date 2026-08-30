@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"net"
+	"os"
 	"path/filepath"
 	"sync"
 	"sync/atomic"
@@ -791,4 +792,64 @@ func TestManager_ConcurrentPostWithMock(t *testing.T) {
 
 	wg.Wait()
 	assert.Equal(t, int32(100), postCount.Load())
+}
+
+func corruptInlineBucketRoot(t *testing.T, path string) {
+	t.Helper()
+
+	f, err := os.OpenFile(path, os.O_RDWR, 0o644)
+	require.NoError(t, err)
+	defer f.Close()
+
+	// flips the inline bucket root pgid to an out-of-range page, per issue #3232
+	_, err = f.WriteAt([]byte{16}, int64(4*os.Getpagesize()+32+9))
+	require.NoError(t, err)
+}
+
+func TestOpenDB_HealsCorruptedBucketPage(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "db")
+
+	db, err := openDB(path)
+	require.NoError(t, err)
+	require.NoError(t, db.Close())
+
+	corruptInlineBucketRoot(t, path)
+
+	db, err = openDB(path)
+	require.NoError(t, err)
+	defer db.Close()
+
+	m := &Manager{config: DefaultConfig(), db: db, dbPath: path}
+	require.NoError(t, m.storeEntry(Entry{Data: []byte("x"), MimeType: "text/plain"}))
+	assert.Len(t, m.GetHistory(), 1)
+}
+
+func TestOpenDB_HealsGarbageFile(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "db")
+	require.NoError(t, os.WriteFile(path, bytes.Repeat([]byte{0xAB}, 64<<10), 0o644))
+
+	db, err := openDB(path)
+	require.NoError(t, err)
+	defer db.Close()
+
+	_, err = os.Stat(path + ".corrupt")
+	require.NoError(t, err)
+}
+
+func TestStoreEntry_CorruptDBReturnsErrorNotPanic(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "db")
+
+	db, err := openDB(path)
+	require.NoError(t, err)
+	require.NoError(t, db.Close())
+
+	corruptInlineBucketRoot(t, path)
+
+	db, err = bolt.Open(path, 0o644, &bolt.Options{Timeout: time.Second})
+	require.NoError(t, err)
+	defer db.Close()
+
+	m := &Manager{config: DefaultConfig(), db: db, dbPath: path}
+	_ = m.storeEntry(Entry{Data: []byte("x"), MimeType: "text/plain"})
+	_ = m.GetHistory()
 }
