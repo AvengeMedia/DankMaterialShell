@@ -105,7 +105,7 @@ Item {
                     text: I18n.tr("Show Dock Over Fullscreen", "dock visibility toggle")
                     description: I18n.tr("Keep the dock visible above fullscreen applications", "dock visibility toggle description")
                     checked: SettingsData.dockShowOnFullscreen
-                    visible: SettingsData.showDock && SettingsData.dockUseOverlayLayer
+                    visible: SettingsData.showDock
                     onToggled: checked => SettingsData.set("dockShowOnFullscreen", checked)
                 }
             }

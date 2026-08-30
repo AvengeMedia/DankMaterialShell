@@ -475,7 +475,7 @@ Item {
             return expanded ? Math.min(bodyY - innerReach, dock.height - 1) : dock.height - 1;
         }
         width: {
-            if (dock.hiddenForFullscreen)
+            if (dock.hiddenForFullscreen && !expanded)
                 return 0;
             if (chrome)
                 return dockMouseArea.width + (isVertical && expanded ? animationHeadroom : 0) + (expanded ? borderThickness * 2 + dock.horizontalConnectorExtent * 2 : 0);
@@ -486,7 +486,7 @@ Item {
             return atEndEdge ? dock.width - x : Math.max(bodyX + dockBackground.width + innerReach, 1);
         }
         height: {
-            if (dock.hiddenForFullscreen)
+            if (dock.hiddenForFullscreen && !expanded)
                 return 0;
             if (chrome)
                 return dockMouseArea.height + (!isVertical && expanded ? animationHeadroom : 0) + (expanded ? borderThickness * 2 + dock.verticalConnectorExtent * 2 : 0);
