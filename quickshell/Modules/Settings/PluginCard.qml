@@ -10,12 +10,17 @@ Rectangle {
     property var plugin: ({})
     property bool installed: false
     property bool selected: false
+    property string fallbackIcon: "extension"
+    property string previewSource: PluginService.previewUrl(plugin)
+    property var badges: PluginService.badgeModel(plugin)
+    property bool allowUninstall: false
     property real previewHeight: Math.round((width - Theme.spacingS * 2) * 0.52)
     readonly property int infoHeight: 100
     readonly property bool compatible: PluginService.checkPluginCompatibility(plugin.requires_dms)
 
     signal clicked
     signal installRequested
+    signal uninstallRequested
 
     implicitHeight: previewHeight + infoHeight + Theme.spacingS * 2 + Theme.spacingM
     radius: Theme.cornerRadius
@@ -71,7 +76,7 @@ Rectangle {
             CachingImage {
                 id: cardPreview
                 anchors.fill: parent
-                imagePath: PluginService.previewUrl(root.plugin)
+                imagePath: root.previewSource
                 maxCacheSize: 640
                 fillMode: Image.PreserveAspectCrop
                 animate: false
@@ -80,7 +85,7 @@ Rectangle {
 
             DankIcon {
                 anchors.centerIn: parent
-                name: root.plugin.icon || "extension"
+                name: root.plugin.icon || root.fallbackIcon
                 size: Theme.iconSize + 12
                 color: Theme.withAlpha(Theme.outline, 0.6)
                 visible: cardPreview.status !== Image.Ready
@@ -100,7 +105,7 @@ Rectangle {
             spacing: Theme.spacingXXS
 
             Repeater {
-                model: PluginService.badgeModel(root.plugin)
+                model: root.badges
 
                 PluginBadge {
                     required property var modelData
@@ -140,7 +145,7 @@ Rectangle {
 
             DankIcon {
                 id: cardIcon
-                name: root.plugin.icon || "extension"
+                name: root.plugin.icon || root.fallbackIcon
                 size: Theme.iconSize - 4
                 color: Theme.primary
                 anchors.verticalCenter: parent.verticalCenter
@@ -175,7 +180,7 @@ Rectangle {
                 color: {
                     switch (buttonState) {
                     case "installed":
-                        return Theme.surfaceVariant;
+                        return root.allowUninstall && installMouseArea.containsMouse ? Theme.withAlpha(Theme.error, 0.15) : Theme.surfaceVariant;
                     case "incompatible":
                         return Theme.withAlpha(Theme.warning, 0.15);
                     default:
@@ -197,7 +202,7 @@ Rectangle {
                     name: {
                         switch (installAction.buttonState) {
                         case "installed":
-                            return "check";
+                            return root.allowUninstall && installMouseArea.containsMouse ? "delete" : "check";
                         case "incompatible":
                             return "warning";
                         default:
@@ -207,7 +212,7 @@ Rectangle {
                     color: {
                         switch (installAction.buttonState) {
                         case "installed":
-                            return Theme.surfaceText;
+                            return root.allowUninstall && installMouseArea.containsMouse ? Theme.error : Theme.surfaceText;
                         case "incompatible":
                             return Theme.warning;
                         default:
@@ -218,11 +223,14 @@ Rectangle {
 
                 MouseArea {
                     id: installMouseArea
+
+                    readonly property bool canUninstall: installAction.buttonState === "installed" && root.allowUninstall
+
                     anchors.fill: parent
                     hoverEnabled: true
-                    cursorShape: installAction.buttonState === "available" ? Qt.PointingHandCursor : Qt.ArrowCursor
-                    enabled: installAction.buttonState === "available"
-                    onClicked: root.installRequested()
+                    cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+                    enabled: installAction.buttonState === "available" || canUninstall
+                    onClicked: canUninstall ? root.uninstallRequested() : root.installRequested()
                 }
             }
         }

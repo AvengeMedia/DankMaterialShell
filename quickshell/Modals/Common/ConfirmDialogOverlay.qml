@@ -1,13 +1,8 @@
 import QtQuick
 import qs.Common
-import qs.Modals.Common
-import qs.Widgets
 
-DankModal {
+Item {
     id: root
-
-    layerNamespace: "dms:confirm-modal"
-    keepPopoutsOpen: true
 
     property string confirmTitle: ""
     property string confirmMessage: ""
@@ -16,6 +11,9 @@ DankModal {
     property color confirmButtonColor: Theme.primary
     property var onConfirm: function () {}
     property var onCancel: function () {}
+    property real backgroundOpacity: 0.5
+
+    signal dialogClosed
 
     function show(title, message, onConfirmCallback, onCancelCallback) {
         showWithOptions({
@@ -34,43 +32,65 @@ DankModal {
         confirmButtonColor = options.confirmColor || Theme.primary;
         onConfirm = options.onConfirm || (() => {});
         onCancel = options.onCancel || (() => {});
-        open();
+        dialogContent.reset();
+        visible = true;
+        overlayFocusScope.forceActiveFocus();
+    }
+
+    function close() {
+        visible = false;
+        dialogClosed();
     }
 
     function _activate(button) {
+        const cancelCallback = onCancel;
+        const confirmCallback = onConfirm;
         close();
         if (button === 0) {
-            onCancel && onCancel();
+            cancelCallback && cancelCallback();
             return;
         }
-        onConfirm && onConfirm();
+        confirmCallback && confirmCallback();
     }
 
-    shouldBeVisible: false
-    allowStacking: true
-    modalWidth: 350
-    modalHeight: contentLoader.item ? contentLoader.item.implicitHeight + Theme.spacingM * 2 : 160
-    enableShadow: true
-    shouldHaveFocus: true
-    onBackgroundClicked: _activate(0)
-    onOpened: {
-        contentLoader?.item?.dialog?.reset();
-        Qt.callLater(function () {
-            modalFocusScope.forceActiveFocus();
-            modalFocusScope.focus = true;
-            shouldHaveFocus = true;
-        });
-    }
-    modalFocusScope.Keys.onPressed: function (event) {
-        contentLoader?.item?.dialog?.handleKey(event);
-    }
+    anchors.fill: parent
+    visible: false
+    z: 100
 
-    content: Component {
-        Item {
+    FocusScope {
+        id: overlayFocusScope
+
+        anchors.fill: parent
+        focus: root.visible
+
+        Keys.onPressed: event => dialogContent.handleKey(event)
+
+        Rectangle {
             anchors.fill: parent
-            implicitHeight: dialogContent.implicitHeight
+            color: "black"
+            opacity: root.backgroundOpacity
+        }
 
-            property alias dialog: dialogContent
+        MouseArea {
+            anchors.fill: parent
+            hoverEnabled: true
+            onClicked: root._activate(0)
+        }
+
+        Rectangle {
+            width: 350
+            height: dialogContent.implicitHeight + Theme.spacingL
+            anchors.centerIn: parent
+            radius: Theme.cornerRadius
+            // No compositor blur behind an in-window card; popupTransparency would show raw content through
+            color: Theme.surfaceContainer
+            border.color: Theme.outlineMedium
+            border.width: 1
+
+            MouseArea {
+                anchors.fill: parent
+                hoverEnabled: true
+            }
 
             ConfirmDialogContent {
                 id: dialogContent

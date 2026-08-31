@@ -479,7 +479,12 @@ DankFloatingWindow {
     function show() {
         if (parentModal)
             parentModal.shouldHaveFocus = false;
+        const wasVisible = visible;
         visible = true;
+        if (wasVisible && PopoutService.pendingPluginInstall) {
+            pendingInstallHandled = false;
+            checkPendingInstall();
+        }
         Qt.callLater(() => browserSearchField.forceActiveFocus());
     }
 
@@ -556,8 +561,10 @@ DankFloatingWindow {
         }
     }
 
-    ConfirmModal {
+    ConfirmDialogOverlay {
         id: urlInstallConfirm
+
+        onDialogClosed: Qt.callLater(() => browserSearchField.forceActiveFocus())
     }
 
     FocusScope {

@@ -706,10 +706,27 @@ FocusScope {
         }
     }
 
+    property bool _pluginBrowserShowQueued: false
+
+    Connections {
+        target: pluginBrowserLoader
+
+        function onItemChanged() {
+            if (!pluginsTab._pluginBrowserShowQueued || !pluginBrowserLoader.item)
+                return;
+            pluginsTab._pluginBrowserShowQueued = false;
+            pluginBrowserLoader.item.show();
+        }
+    }
+
     function showPluginBrowser() {
         pluginBrowserLoader.active = true;
-        if (pluginBrowserLoader.item)
+        if (pluginBrowserLoader.item) {
             pluginBrowserLoader.item.show();
+            return;
+        }
+        // LazyLoader can't incubate on its first event-loop tick; show once item lands
+        _pluginBrowserShowQueued = true;
     }
 
     function showPluginUpdatesDialog() {

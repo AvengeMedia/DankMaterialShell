@@ -3166,10 +3166,27 @@ Item {
         }
     }
 
+    property bool _themeBrowserShowQueued: false
+
+    Connections {
+        target: themeBrowserLoader
+
+        function onItemChanged() {
+            if (!themeColorsTab._themeBrowserShowQueued || !themeBrowserLoader.item)
+                return;
+            themeColorsTab._themeBrowserShowQueued = false;
+            themeBrowserLoader.item.show();
+        }
+    }
+
     function showThemeBrowser() {
         themeBrowserLoader.active = true;
-        if (themeBrowserLoader.item)
+        if (themeBrowserLoader.item) {
             themeBrowserLoader.item.show();
+            return;
+        }
+        // LazyLoader can't incubate on its first event-loop tick; show once item lands
+        _themeBrowserShowQueued = true;
     }
 
     FileView {

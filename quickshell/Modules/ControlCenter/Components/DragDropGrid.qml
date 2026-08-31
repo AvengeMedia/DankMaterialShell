@@ -1144,9 +1144,15 @@ Column {
                     }
                 }
                 function onPluginLoaded(loadedPluginId) {
-                    if (loadedPluginId !== pluginId || pluginInstance)
+                    if (loadedPluginId !== pluginId)
                         return;
-                    Qt.callLater(() => tryCreatePluginInstance());
+                    Qt.callLater(() => {
+                        if (pluginInstance) {
+                            pluginInstance.destroy();
+                            pluginInstance = null;
+                        }
+                        tryCreatePluginInstance();
+                    });
                 }
             }
 

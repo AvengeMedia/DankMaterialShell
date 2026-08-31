@@ -6,6 +6,8 @@ import qs.Modules.ControlCenter.Details
 Item {
     id: root
 
+    readonly property var log: Log.scoped("DetailHost")
+
     property string expandedSection: ""
     property var expandedWidgetData: null
     property var bluetoothCodecSelector: null
@@ -81,6 +83,46 @@ Item {
         }
     }
 
+    function _createPluginDetail(pluginId) {
+        const pluginComponent = PluginService.pluginWidgetComponents[pluginId];
+        if (!pluginComponent) {
+            return;
+        }
+
+        try {
+            pluginDetailInstance = pluginComponent.createObject(null, {
+                "pluginId": pluginId,
+                "pluginService": PluginService
+            });
+        } catch (e) {
+            log.warn("stale plugin component for", pluginId, "- reloading");
+            PluginService.reloadPlugin(pluginId);
+            return;
+        }
+
+        if (!pluginDetailInstance || !pluginDetailInstance.ccDetailContent) {
+            if (pluginDetailInstance) {
+                pluginDetailInstance.destroy();
+                pluginDetailInstance = null;
+            }
+            return;
+        }
+
+        pluginDetailLoader.sourceComponent = pluginDetailInstance.ccDetailContent;
+        pluginDetailLoader.active = true;
+    }
+
+    Connections {
+        target: PluginService
+
+        function onPluginLoaded(pluginId) {
+            if (root.pluginDetailInstance || root.expandedSection !== "plugin_" + pluginId) {
+                return;
+            }
+            root._createPluginDetail(pluginId);
+        }
+    }
+
     onExpandedSectionChanged: {
         if (pluginDetailInstance) {
             pluginDetailInstance.destroy();
@@ -132,23 +174,7 @@ Item {
         }
 
         if (root.expandedSection.startsWith("plugin_")) {
-            const pluginId = root.expandedSection.replace("plugin_", "");
-            const pluginComponent = PluginService.pluginWidgetComponents[pluginId];
-            if (!pluginComponent) {
-                return;
-            }
-
-            pluginDetailInstance = pluginComponent.createObject(null);
-            if (!pluginDetailInstance || !pluginDetailInstance.ccDetailContent) {
-                if (pluginDetailInstance) {
-                    pluginDetailInstance.destroy();
-                    pluginDetailInstance = null;
-                }
-                return;
-            }
-
-            pluginDetailLoader.sourceComponent = pluginDetailInstance.ccDetailContent;
-            pluginDetailLoader.active = true;
+            _createPluginDetail(root.expandedSection.replace("plugin_", ""));
             return;
         }
 
