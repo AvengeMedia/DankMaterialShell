@@ -385,28 +385,28 @@ func InitializeSysUpdateManager() error {
 	return nil
 }
 
-func routeHandler(_ context.Context, conn *models.Conn, req ipc.Request, _ *ipc.Subscriber) {
-	routeRequestRecovered(conn, models.Request(req))
+func routeHandler(ctx context.Context, conn *models.Conn, req ipc.Request, _ *ipc.Subscriber) {
+	routeRequestRecovered(ctx, conn, models.Request(req))
 }
 
-func subscribeHandler(_ context.Context, conn *models.Conn, req ipc.Request, _ *ipc.Subscriber) {
+func subscribeHandler(ctx context.Context, conn *models.Conn, req ipc.Request, _ *ipc.Subscriber) {
 	switch req.Method {
 	case "subscribe":
-		routeRequestRecovered(conn, models.Request(req))
+		routeRequestRecovered(ctx, conn, models.Request(req))
 	default:
 		models.RespondError(conn, req.ID, fmt.Sprintf("unknown method: %s", req.Method))
 	}
 }
 
 // routeRequestRecovered keeps a panicking handler from taking down the whole daemon
-func routeRequestRecovered(conn *models.Conn, req models.Request) {
+func routeRequestRecovered(ctx context.Context, conn *models.Conn, req models.Request) {
 	defer func() {
 		if r := recover(); r != nil {
 			log.Errorf("RouteRequest panic recovered: method=%s panic=%v\n%s", req.Method, r, debug.Stack())
 			models.RespondError(conn, req.ID, "internal server error")
 		}
 	}()
-	RouteRequest(conn, req)
+	RouteRequest(ctx, conn, req)
 }
 
 func getCapabilities() Capabilities {
@@ -502,7 +502,11 @@ func notifyCapabilityChange() {
 	})
 }
 
-func handleSubscribe(conn *models.Conn, req models.Request) {
+func serviceSubscribed(services []string, service string, includeAll bool) bool {
+	return slices.Contains(services, service) || includeAll && slices.Contains(services, "all")
+}
+
+func handleSubscribe(ctx context.Context, conn *models.Conn, req models.Request) {
 	clientID := fmt.Sprintf("meta-client-%p", conn)
 
 	dbusClient := dbusClientID
@@ -528,6 +532,13 @@ func handleSubscribe(conn *models.Conn, req models.Request) {
 	var wg sync.WaitGroup
 	eventChan := make(chan ServiceEvent, 256)
 	stopChan := make(chan struct{})
+	stop := sync.OnceFunc(func() { close(stopChan) })
+	stopContext := context.AfterFunc(ctx, stop)
+	defer func() {
+		stopContext()
+		stop()
+		wg.Wait()
+	}()
 
 	capChan := make(chan ServerInfo, 64)
 	capabilitySubscribers.Store(clientID+"-capabilities", capChan)
@@ -553,10 +564,7 @@ func handleSubscribe(conn *models.Conn, req models.Request) {
 	})
 
 	shouldSubscribe := func(service string) bool {
-		if subscribeAll {
-			return true
-		}
-		return slices.Contains(services, service)
+		return serviceSubscribed(services, service, subscribeAll)
 	}
 
 	if shouldSubscribe("network") && networkManager != nil {
@@ -838,6 +846,36 @@ func handleSubscribe(conn *models.Conn, req models.Request) {
 				}
 			}
 		}()
+	}
+
+	if serviceSubscribed(services, "mpris.command", false) && bluezManager != nil {
+		commandID := clientID + "-mpris-command"
+		commandChan, err := bluezManager.SubscribePlayerCommands(commandID)
+		if err != nil {
+			log.Warnf("MPRIS command subscription rejected: %v", err)
+		} else {
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				defer bluezManager.UnsubscribePlayerCommands(commandID)
+
+				for {
+					select {
+					case command, ok := <-commandChan:
+						if !ok {
+							return
+						}
+						select {
+						case eventChan <- ServiceEvent{Service: "mpris.command", Data: command}:
+						case <-stopChan:
+							return
+						}
+					case <-stopChan:
+						return
+					}
+				}
+			}()
+		}
 	}
 
 	if shouldSubscribe("bluetooth.pairing") && bluezManager != nil {
@@ -1223,17 +1261,23 @@ func handleSubscribe(conn *models.Conn, req models.Request) {
 		ID:     req.ID,
 		Result: &ServiceEvent{Service: "server", Data: info},
 	}); err != nil {
-		close(stopChan)
 		return
 	}
 
-	for event := range eventChan {
-		if err := conn.WriteResponse(models.Response[ServiceEvent]{
-			ID:     req.ID,
-			Result: &event,
-		}); err != nil {
-			close(stopChan)
+	for {
+		select {
+		case <-ctx.Done():
 			return
+		case event, ok := <-eventChan:
+			if !ok {
+				return
+			}
+			if err := conn.WriteResponse(models.Response[ServiceEvent]{
+				ID:     req.ID,
+				Result: &event,
+			}); err != nil {
+				return
+			}
 		}
 	}
 }

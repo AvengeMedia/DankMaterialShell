@@ -514,6 +514,7 @@ Singleton {
     property string audioScrollMode: "volume"
     property int audioWheelScrollAmount: 5
     property bool audioDeviceScrollVolumeEnabled: false
+    property bool bluetoothMprisEnabled: false
     property var mediaExcludePlayers: []
     property bool clockCompactMode: false
     property int focusedWindowSize: 1
