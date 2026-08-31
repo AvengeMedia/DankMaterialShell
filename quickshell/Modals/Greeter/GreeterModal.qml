@@ -1,5 +1,4 @@
 import QtQuick
-import Quickshell
 import Quickshell.Io
 import qs.Common
 import qs.Services
@@ -10,8 +9,8 @@ DankFloatingWindow {
     readonly property var log: Log.scoped("GreeterModal")
 
     property int currentPage: 0
-    readonly property int totalPages: 3
-    readonly property var pageComponents: [welcomePage, doctorPage, completePage]
+    readonly property int totalPages: 4
+    readonly property var pageComponents: [welcomePage, doctorPage, pluginsPage, completePage]
 
     property var cheatsheetData: ({})
     property bool cheatsheetLoaded: false
@@ -278,7 +277,7 @@ DankFloatingWindow {
                     text: I18n.tr("Skip", "greeter skip button")
                     backgroundColor: "transparent"
                     textColor: Theme.surfaceVariantText
-                    onClicked: root.skip()
+                    onClicked: root.currentPage === 1 ? root.nextPage() : root.skip()
                 }
 
                 DankButton {
@@ -325,6 +324,11 @@ DankFloatingWindow {
     Component {
         id: doctorPage
         GreeterDoctorPage {}
+    }
+
+    Component {
+        id: pluginsPage
+        GreeterPluginsPage {}
     }
 
     Component {

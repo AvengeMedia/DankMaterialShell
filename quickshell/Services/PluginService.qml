@@ -23,6 +23,7 @@ Singleton {
 
     property bool pluginDirectoryExists: false
     property string systemPluginDirectory: "/etc/xdg/quickshell/dms-plugins"
+    readonly property string previewApiBase: "https://api.danklinux.com/previews/"
 
     property var knownManifests: ({})
     property var pathToPluginId: ({})
@@ -1181,6 +1182,128 @@ Singleton {
         newGlobals[pluginId][varName] = value;
         globalVars = newGlobals;
         globalVarChanged(pluginId, varName);
+    }
+
+    function previewUrl(plugin) {
+        if (!plugin)
+            return "";
+        if (plugin.previewUrl)
+            return plugin.previewUrl;
+        if (plugin.id)
+            return previewApiBase + plugin.id;
+        return plugin.screenshot || "";
+    }
+
+    function heroUrl(plugin) {
+        if (!plugin)
+            return "";
+        return plugin.screenshot || previewUrl(plugin);
+    }
+
+    function statusTone(status) {
+        switch (status) {
+        case "broken":
+            return "error";
+        case "unmaintained":
+            return "warning";
+        case "reviewed":
+            return "info";
+        default:
+            return "outline";
+        }
+    }
+
+    function statusLabel(status) {
+        switch (status) {
+        case "broken":
+            return I18n.tr("broken", "plugin status");
+        case "unmaintained":
+            return I18n.tr("unmaintained", "plugin status");
+        case "deprecated":
+            return I18n.tr("deprecated", "plugin status");
+        case "reviewed":
+            return I18n.tr("reviewed", "plugin status");
+        default:
+            return status;
+        }
+    }
+
+    function badgeTone(tone) {
+        switch (tone) {
+        case "secondary":
+            return Theme.secondary;
+        case "warning":
+            return Theme.warning;
+        case "error":
+            return Theme.error;
+        case "info":
+            return Theme.info;
+        case "outline":
+            return Theme.outline;
+        default:
+            return Theme.primary;
+        }
+    }
+
+    function badgeModel(plugin) {
+        if (!plugin || (!plugin.id && !plugin.name))
+            return [];
+        var badges = [];
+        if (plugin.featured)
+            badges.push({
+                label: I18n.tr("featured"),
+                icon: "star",
+                tone: "secondary"
+            });
+        if (plugin.firstParty)
+            badges.push({
+                label: I18n.tr("official"),
+                icon: "verified",
+                tone: "primary"
+            });
+        else
+            badges.push({
+                label: I18n.tr("3rd party"),
+                icon: "",
+                tone: "warning"
+            });
+        var status = plugin.status || [];
+        for (var i = 0; i < status.length; i++)
+            badges.push({
+                label: statusLabel(status[i]),
+                icon: "",
+                tone: statusTone(status[i])
+            });
+        return badges;
+    }
+
+    function installFromRegistry(pluginName, enableAfterInstall, onDone) {
+        ToastService.showInfo(I18n.tr("Installing: %1", "installation progress").arg(pluginName));
+        DMSService.install(pluginName, response => {
+            if (response.error) {
+                ToastService.showError(I18n.tr("Install failed: %1", "installation error").arg(response.error));
+                if (onDone)
+                    onDone(false);
+                return;
+            }
+            ToastService.showInfo(I18n.tr("Installed: %1", "installation success").arg(pluginName));
+            scanPlugins();
+            if (!enableAfterInstall) {
+                if (onDone)
+                    onDone(true);
+                return;
+            }
+            Qt.callLater(() => {
+                enablePlugin(pluginName);
+                const plugin = availablePlugins[pluginName];
+                if (plugin?.type === "desktop") {
+                    const defaultConfig = DesktopWidgetRegistry.getDefaultConfig(pluginName);
+                    SettingsData.createDesktopWidgetInstance(pluginName, plugin.name || pluginName, defaultConfig);
+                }
+                if (onDone)
+                    onDone(true);
+            });
+        });
     }
 
     function checkPluginCompatibility(requiresDms) {
