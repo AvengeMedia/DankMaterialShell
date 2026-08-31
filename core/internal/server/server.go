@@ -1497,6 +1497,7 @@ func (s *Server) Serve(printDocs bool) error {
 		log.Info(" clipboard.getHistory                  - Get clipboard history with previews")
 		log.Info(" clipboard.getEntry                    - Get full entry by ID (params: id)")
 		log.Info(" clipboard.deleteEntry                 - Delete entry by ID (params: id)")
+		log.Info(" clipboard.deleteEntries               - Delete entries by ID, skipping pinned ones (params: ids)")
 		log.Info(" clipboard.clearHistory                - Clear all clipboard history")
 		log.Info(" clipboard.copy                        - Copy text to clipboard (params: text)")
 		log.Info(" clipboard.paste                       - Get current clipboard text")

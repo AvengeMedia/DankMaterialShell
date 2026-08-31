@@ -147,7 +147,7 @@ FocusScope {
             if (unpinnedEntries.length === 0) {
                 return;
             }
-            clearConfirmDialog.show(I18n.tr("Clear History?"), I18n.tr("This will delete the %1 entries matching the current filter. Pinned entries are kept.").arg(unpinnedEntries.length), function () {
+            clearConfirmDialog.show(I18n.tr("Clear History?"), I18n.tr("This will delete the %1 entries matching the current filter. Pinned entries are kept.", "clipboard modal: clear confirmation while a search filter is active, %1 is the number of matching entries").arg(unpinnedEntries.length), function () {
                 clearFiltered();
             }, function () {});
             return;
