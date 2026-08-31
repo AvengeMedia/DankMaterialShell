@@ -182,7 +182,7 @@ Column {
             }
         case "bluetooth":
             {
-                BluetoothService.setBluetoothEnabled(!BluetoothService.enabled);
+                BluetoothService.toggleBluetooth();
                 break;
             }
         case "audioOutput":

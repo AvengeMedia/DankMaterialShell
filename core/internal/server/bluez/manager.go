@@ -603,6 +603,28 @@ func (m *Manager) SetPowered(adapterPath string, powered bool) error {
 	if err != nil {
 		return err
 	}
+	return m.setPoweredAt(path, powered)
+}
+
+func (m *Manager) TogglePowered(adapterPath string) (bool, error) {
+	path, err := m.resolveAdapter(adapterPath)
+	if err != nil {
+		return false, err
+	}
+
+	poweredVar, err := m.dbusConn.Object(bluezService, path).GetProperty(adapter1Iface + ".Powered")
+	if err != nil {
+		return false, err
+	}
+
+	target := !dbusutil.AsOr(poweredVar, false)
+	if err := m.setPoweredAt(path, target); err != nil {
+		return false, err
+	}
+	return target, nil
+}
+
+func (m *Manager) setPoweredAt(path dbus.ObjectPath, powered bool) error {
 	if powered {
 		if err := rfkillUnblockBluetooth(); err != nil {
 			log.Debugf("[BluezManager] rfkill unblock failed: %v", err)

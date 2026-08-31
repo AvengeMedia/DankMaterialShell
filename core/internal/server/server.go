@@ -38,7 +38,7 @@ import (
 	"github.com/AvengeMedia/dankgo/syncmap"
 )
 
-const APIVersion = 32
+const APIVersion = 33
 
 var CLIVersion = "dev"
 
@@ -1449,6 +1449,7 @@ func (s *Server) Serve(printDocs bool) error {
 		log.Info(" bluetooth.startDiscovery              - Start device discovery (params: adapter?)")
 		log.Info(" bluetooth.stopDiscovery               - Stop device discovery (params: adapter?)")
 		log.Info(" bluetooth.setPowered                  - Set adapter power state (params: powered, adapter?)")
+		log.Info(" bluetooth.togglePowered               - Toggle adapter power state from its live value (params: adapter?)")
 		log.Info(" bluetooth.pair                        - Pair with device (params: device)")
 		log.Info(" bluetooth.connect                     - Connect to device (params: device)")
 		log.Info(" bluetooth.disconnect                  - Disconnect from device (params: device)")

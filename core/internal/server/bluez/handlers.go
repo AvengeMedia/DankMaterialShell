@@ -7,6 +7,11 @@ import (
 	"github.com/AvengeMedia/dankgo/ipc/params"
 )
 
+type PoweredResult struct {
+	Success bool `json:"success"`
+	Powered bool `json:"powered"`
+}
+
 type BluetoothEvent struct {
 	Type string         `json:"type"`
 	Data BluetoothState `json:"data"`
@@ -22,6 +27,8 @@ func HandleRequest(conn *models.Conn, req models.Request, manager *Manager) {
 		handleStopDiscovery(conn, req, manager)
 	case "bluetooth.setPowered":
 		handleSetPowered(conn, req, manager)
+	case "bluetooth.togglePowered":
+		handleTogglePowered(conn, req, manager)
 	case "bluetooth.pair":
 		handlePairDevice(conn, req, manager)
 	case "bluetooth.connect":
@@ -78,6 +85,16 @@ func handleSetPowered(conn *models.Conn, req models.Request, manager *Manager) {
 	}
 
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "powered state updated"})
+}
+
+func handleTogglePowered(conn *models.Conn, req models.Request, manager *Manager) {
+	powered, err := manager.TogglePowered(params.StringOpt(req.Params, "adapter", ""))
+	if err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+
+	models.Respond(conn, req.ID, PoweredResult{Success: true, Powered: powered})
 }
 
 func handlePairDevice(conn *models.Conn, req models.Request, manager *Manager) {

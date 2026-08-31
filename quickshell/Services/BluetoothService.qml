@@ -18,6 +18,7 @@ Singleton {
     readonly property bool enabled: (adapter && adapter.enabled) ?? false
     readonly property bool discovering: (adapter && adapter.discovering) ?? false
     readonly property bool dbusBridgeAvailable: DMSService.isConnected && DMSService.capabilities.includes("dbus")
+    readonly property bool bluetoothBridgeAvailable: DMSService.isConnected && DMSService.capabilities.includes("bluetooth")
     property bool wpexecAvailable: false
     property bool wpexecChecked: false
     property var pendingCodecActions: []
@@ -82,7 +83,7 @@ Singleton {
     }
 
     function setBluetoothEnabled(enabled) {
-        if (DMSService.isConnected && DMSService.capabilities.includes("bluetooth")) {
+        if (bluetoothBridgeAvailable) {
             DMSService.sendRequest("bluetooth.setPowered", {
                 "powered": enabled,
                 "adapter": adapter?.dbusPath ?? ""
@@ -95,6 +96,20 @@ Singleton {
 
         if (adapter)
             adapter.enabled = enabled;
+    }
+
+    function toggleBluetooth() {
+        if (bluetoothBridgeAvailable && DMSService.apiVersion >= 33) {
+            DMSService.sendRequest("bluetooth.togglePowered", {
+                "adapter": adapter?.dbusPath ?? ""
+            }, response => {
+                if (response.error)
+                    log.warn("Failed to toggle Bluetooth powered state:", response.error);
+            });
+            return;
+        }
+
+        setBluetoothEnabled(!enabled);
     }
 
     Connections {
