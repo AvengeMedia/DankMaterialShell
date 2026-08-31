@@ -78,7 +78,7 @@
     "%1 online": "%1 online"
   },
   "%1 position": {
-    "%1 position": ""
+    "%1 position": "%1 pozíció"
   },
   "%1 tasks": {
     "%1 tasks": "%1 feladat"
@@ -315,7 +315,7 @@
     "A separate minimal launcher action that works in Standalone, Separate Frame Mode, and Connected Frame Mode.": "Egy különálló minimális indítási művelet, amely Önálló, Különálló keret és Csatlakoztatott keret módban is működik."
   },
   "A slight natural settle, DMS default": {
-    "A slight natural settle, DMS default": ""
+    "A slight natural settle, DMS default": "Enyhe természetes beállás, DMS alapértelmezett"
   },
   "A user with that name already exists.": {
     "A user with that name already exists.": "Már létezik ilyen nevű felhasználó."
@@ -495,7 +495,7 @@
     "Add to Autostart": "Hozzáadás az automatikus indításhoz"
   },
   "Additional settings are managed by the Island": {
-    "Additional settings are managed by the Island": ""
+    "Additional settings are managed by the Island": "A további beállításokat az Island kezeli"
   },
   "Adjust pointer sensitivity speed": {
     "Adjust pointer sensitivity speed": "Mutató érzékenységének sebességének beállítása"
@@ -552,7 +552,7 @@
     "Allow": "Engedélyezés"
   },
   "Allow %1 in Do Not Disturb": {
-    "Allow %1 in Do Not Disturb": ""
+    "Allow %1 in Do Not Disturb": "%1 engedélyezése Ne zavarjanak módban"
   },
   "Allow LAN access": {
     "Allow LAN access": "LAN-hozzáférés engedélyezése"
@@ -570,7 +570,7 @@
     "Allow greeter login access": "Bejelentkezés engedélyezése az üdvözlőképernyőn"
   },
   "Allow in Do Not Disturb": {
-    "Allow in Do Not Disturb": ""
+    "Allow in Do Not Disturb": "Engedélyezés Ne zavarjanak módban"
   },
   "Already on that session": {
     "Already on that session": "Már ebben a munkamenetben vagy"
@@ -720,7 +720,7 @@
     "Apply inverse concave corner cutouts to the bar": "Inverz konkáv sarokkivágások alkalmazása a sávra"
   },
   "Apply island geometry changes immediately without spring overshoot": {
-    "Apply island geometry changes immediately without spring overshoot": ""
+    "Apply island geometry changes immediately without spring overshoot": "Sziget-geometria módosítások azonnali alkalmazása rugós túlnyúlás nélkül"
   },
   "Apply to Hardware": {
     "Apply to Hardware": "Alkalmazás a hardverre"
@@ -729,10 +729,10 @@
     "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": "Meleg színhőmérséklet alkalmazása a szem megerőltetésének csökkentése érdekében. Az alábbi automatizálási beállítások segítségével szabályozhatod, hogy mikor aktiválódjon."
   },
   "Applying authentication changes...": {
-    "Applying authentication changes...": "Hitelesítési módosítások alkalmazása..."
+    "Applying authentication changes...": "Hitelesítési módosítások alkalmazása…"
   },
   "Applying auto-login on startup...": {
-    "Applying auto-login on startup...": "Automatikus bejelentkezés alkalmazása indításkor..."
+    "Applying auto-login on startup...": "Automatikus bejelentkezés alkalmazása indításkor…"
   },
   "Apps": {
     "Apps": "Alkalmazások"
@@ -747,7 +747,7 @@
     "Apps Icon": "Alkalmazásikon"
   },
   "Apps allowed to show popups while Do Not Disturb is on. Right-click a notification and choose \"Allow in Do Not Disturb\" to add one here.": {
-    "Apps allowed to show popups while Do Not Disturb is on. Right-click a notification and choose \"Allow in Do Not Disturb\" to add one here.": ""
+    "Apps allowed to show popups while Do Not Disturb is on. Right-click a notification and choose \"Allow in Do Not Disturb\" to add one here.": "Alkalmazások, amelyek megjeleníthetnek felugró ablakokat a Ne zavarjanak mód bekapcsolásakor. Kattints jobb gombbal egy értesítésre, és válaszd az „Engedélyezés Ne zavarjanak módban” lehetőséget a hozzáadáshoz."
   },
   "Apps are ordered by usage frequency, then last used, then alphabetically.": {
     "Apps are ordered by usage frequency, then last used, then alphabetically.": "Az alkalmazások használati gyakoriság, majd az utolsó használat ideje, végül betűrend szerint vannak rendezve."
@@ -861,10 +861,10 @@
     "Auto (Bar-aware)": "Automatikus (sávérzékeny)"
   },
   "Auto (Dark Mode)": {
-    "Auto (Dark Mode)": ""
+    "Auto (Dark Mode)": "Automatikus (Sötét mód)"
   },
   "Auto (Light Mode)": {
-    "Auto (Light Mode)": ""
+    "Auto (Light Mode)": "Automatikus (Világos mód)"
   },
   "Auto (Wide)": {
     "Auto (Wide)": "Automatikus (széles)"
@@ -873,7 +873,7 @@
     "Auto Compositor Gaps": "Automatikus kompozitor rések"
   },
   "Auto From Wallpaper": {
-    "Auto From Wallpaper": ""
+    "Auto From Wallpaper": "Automatikus háttérkép alapján"
   },
   "Auto Location": {
     "Auto Location": "Automatikus helymeghatározás"
@@ -984,7 +984,7 @@
     "Automatically lock the screen when the system prepares to suspend": "A képernyő automatikus zárolása, amikor a rendszer felfüggesztésre készül"
   },
   "Automatically picks the scheme variant based on the wallpaper.": {
-    "Automatically picks the scheme variant based on the wallpaper.": ""
+    "Automatically picks the scheme variant based on the wallpaper.": "Automatikusan kiválasztja a sémát a háttérkép alapján."
   },
   "Automatically save changes to opened files as you type": {
     "Automatically save changes to opened files as you type": "A megnyitott fájlok módosításainak automatikus mentése gépelés közben"
@@ -1092,10 +1092,10 @@
     "Bar Spacing": "Sávok közötti térköz"
   },
   "Bar border and shadow": {
-    "Bar border and shadow": ""
+    "Bar border and shadow": "Sáv kerete és árnyéka"
   },
   "Bar corners": {
-    "Bar corners": ""
+    "Bar corners": "Sáv sarkai"
   },
   "Bar corners and background": {
     "Bar corners and background": "Sáv sarkok és háttér"
@@ -1104,7 +1104,7 @@
     "Bar shadow, border, and corners": "Sáv árnyék, szegély és sarkok"
   },
   "Bar visibility": {
-    "Bar visibility": ""
+    "Bar visibility": "Sáv láthatósága"
   },
   "Base color for shadows (opacity is applied automatically)": {
     "Base color for shadows (opacity is applied automatically)": "Az árnyékok alapszíne (az átlátszatlanság automatikusan alkalmazva)"
@@ -1119,7 +1119,7 @@
     "Battery %1": "Akkumulátor: %1"
   },
   "Battery / Control Center": {
-    "Battery / Control Center": ""
+    "Battery / Control Center": "Akkumulátor / Vezérlőközpont"
   },
   "Battery Charge Limit": {
     "Battery Charge Limit": "Akkumulátor töltési korlát"
@@ -1134,7 +1134,7 @@
     "Battery and power management": "Akkumulátor- és energiakezelés"
   },
   "Battery gauge opens Control Center": {
-    "Battery gauge opens Control Center": ""
+    "Battery gauge opens Control Center": "Az akkumulátorjelző megnyitja a Vezérlőközpontot"
   },
   "Battery has charged to your set limit of %1%": {
     "Battery has charged to your set limit of %1%": "Az akkumulátor feltöltődött a beállított %1% határértékre"
@@ -1170,7 +1170,7 @@
     "Blend between Surface High and the selected custom color": "Átmenet a Surface High és a kiválasztott egyéni szín között"
   },
   "Block %1 in Do Not Disturb": {
-    "Block %1 in Do Not Disturb": ""
+    "Block %1 in Do Not Disturb": "%1 tiltása Ne zavarjanak módban"
   },
   "Block Out": {
     "Block Out": "Kizárás"
@@ -1218,7 +1218,7 @@
     "Body": "Szövegtörzs"
   },
   "Body Click Runs Default Action": {
-    "Body Click Runs Default Action": ""
+    "Body Click Runs Default Action": "A törzsre kattintás futtatja az alapértelmezett műveletet"
   },
   "Body Font Size": {
     "Body Font Size": "Törzsszöveg betűmérete"
@@ -1278,7 +1278,7 @@
     "Bottom dock for pinned and running applications": "Alsó dokk a rögzített és a futó alkalmazásoknak"
   },
   "Bright": {
-    "Bright": ""
+    "Bright": "Fényes"
   },
   "Brightness": {
     "Brightness": "Fényerő"
@@ -1404,19 +1404,19 @@
     "Category": "Kategória"
   },
   "Cellular": {
-    "Cellular": ""
+    "Cellular": "Mobilhálózat"
   },
   "Cellular disabled": {
-    "Cellular disabled": ""
+    "Cellular disabled": "Mobilhálózat letiltva"
   },
   "Cellular enabled": {
-    "Cellular enabled": ""
+    "Cellular enabled": "Mobilhálózat engedélyezve"
   },
   "Center Section": {
     "Center Section": "Középső rész"
   },
   "Center Section - Reserved by Dank Island": {
-    "Center Section - Reserved by Dank Island": ""
+    "Center Section - Reserved by Dank Island": "Középső szakasz - Dank Island által fenntartva"
   },
   "Center Single Column": {
     "Center Single Column": "Középső egyoszlopos"
@@ -1473,7 +1473,7 @@
     "Checking for updates...": "Frissítések keresése…"
   },
   "Checking whether sudo authentication is needed...": {
-    "Checking whether sudo authentication is needed...": "Sudo-hitelesítés szükségességének ellenőrzése..."
+    "Checking whether sudo authentication is needed...": "Sudo-hitelesítés szükségességének ellenőrzése…"
   },
   "Checking...": {
     "Checking...": "Ellenőrzés…"
@@ -1548,7 +1548,7 @@
     "Choose whether to launch a desktop app or a command": "Válaszd ki, hogy asztali alkalmazást vagy parancsot indítasz"
   },
   "Choose which action buttons appear on clipboard entries": {
-    "Choose which action buttons appear on clipboard entries": "Válassza ki, mely műveletgombok jelenjenek meg a vágólap bejegyzésein"
+    "Choose which action buttons appear on clipboard entries": "Mely műveletgombok jelenjenek meg a vágólap bejegyzésein"
   },
   "Choose which displays show this widget": {
     "Choose which displays show this widget": "Mely kijelzők mutassák ezt a widgetet"
@@ -1557,7 +1557,7 @@
     "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": "Mely monitorok jelenítsék meg a lezárási képernyő felületét. A többi monitor egyszínű képet jelenít meg az OLED beégés elleni védelem érdekében."
   },
   "Choose which shortcuts sit left or right of the clock": {
-    "Choose which shortcuts sit left or right of the clock": ""
+    "Choose which shortcuts sit left or right of the clock": "Mely parancsikonok legyenek az órától balra vagy jobbra"
   },
   "Chroma Style": {
     "Chroma Style": "Chroma stílus"
@@ -1584,7 +1584,10 @@
     "Clear All Jobs": "Összes feladat törlése"
   },
   "Clear Badge on Open": {
-    "Clear Badge on Open": ""
+    "Clear Badge on Open": "Jelvény törlése megnyitáskor"
+  },
+  "Clear Filtered": {
+    "Clear Filtered": ""
   },
   "Clear History?": {
     "Clear History?": "Törlöd az előzményeket?"
@@ -1599,10 +1602,10 @@
     "Clear at Startup": "Törlés indításkor"
   },
   "Clears the badge on open but keeps notifications active": {
-    "Clears the badge on open but keeps notifications active": ""
+    "Clears the badge on open but keeps notifications active": "Törli a jelvényt a megnyitáskor, de aktívan tartja az értesítéseket"
   },
   "Click": {
-    "Click": ""
+    "Click": "Kattintás"
   },
   "Click 'Setup' to create %1 and add include to your compositor config.": {
     "Click 'Setup' to create %1 and add include to your compositor config.": "Kattints a „Beállítás” gombra a %1 létrehozásához és az include bejegyzés hozzáadásához a kompozitor konfigurációhoz."
@@ -1623,10 +1626,10 @@
     "Click any shortcut to edit. Changes save to %1": "Kattints bármelyik gyorsbillentyűre a szerkesztéshez. A módosítások a(z) %1 fájlba lesznek mentve."
   },
   "Click expands only on an intentional press. Hybrid peeks the current compact face on hover": {
-    "Click expands only on an intentional press. Hybrid peeks the current compact face on hover": ""
+    "Click expands only on an intentional press. Hybrid peeks the current compact face on hover": "A kattintás csak szándékos megnyomásra bontja ki. A hibrid rámutatáskor bepillantást enged az aktuális kompakt felületre"
   },
   "Click the icon to mute": {
-    "Click the icon to mute": ""
+    "Click the icon to mute": "Kattints az ikonra a némításhoz"
   },
   "Click to Paste": {
     "Click to Paste": "Kattints a beillesztéshez"
@@ -1638,7 +1641,7 @@
     "Click to select a custom theme JSON file": "Kattints egy egyéni téma JSON fájl kiválasztásához"
   },
   "Clicking a popup runs its first action instead of expanding the body": {
-    "Clicking a popup runs its first action instead of expanding the body": ""
+    "Clicking a popup runs its first action instead of expanding the body": "A felugró ablakra való kattintás az első műveletét futtatja a törzs kibontása helyett"
   },
   "Clip": {
     "Clip": "Vágás"
@@ -1782,7 +1785,7 @@
     "Commands": "Parancsok"
   },
   "Community favorites to get you started": {
-    "Community favorites to get you started": ""
+    "Community favorites to get you started": "Közösségi kedvencek a kezdéshez"
   },
   "Community themes": {
     "Community themes": "Közösségi témák"
@@ -1791,16 +1794,16 @@
     "Compact": "Kompakt"
   },
   "Compact Clock Pill": {
-    "Compact Clock Pill": ""
+    "Compact Clock Pill": "Kompakt óra kapszula"
   },
   "Compact Island Height": {
-    "Compact Island Height": ""
+    "Compact Island Height": "Kompakt szigetmagasság"
   },
   "Compact Mode": {
     "Compact Mode": "Kompakt mód"
   },
   "Compact home clock pill in both width and height": {
-    "Compact home clock pill in both width and height": ""
+    "Compact home clock pill in both width and height": "Kompakt otthoni óra kapszula szélességben és magasságban is"
   },
   "Completed": {
     "Completed": "Befejezve"
@@ -1857,7 +1860,7 @@
     "Configure which displays show \"%1\"": "Mely kijelzők mutassák ezt: „%1”"
   },
   "Configure which displays show Dank Island as \"%1": {
-    "Configure which displays show Dank Island as \"%1\"": ""
+    "Configure which displays show Dank Island as \"%1\"": "Mely kijelzők jelenítsék meg a Dank Islandet mint „%1”"
   },
   "Configure which displays show shell components": {
     "Configure which displays show shell components": "Mely kijelzőkön jelenjenek meg a héj összetevői"
@@ -1914,7 +1917,7 @@
     "Connecting to Device": "Csatlakozás az eszközhöz"
   },
   "Connecting to clipboard service...": {
-    "Connecting to clipboard service...": "Kapcsolódás a vágólap-szolgáltatáshoz..."
+    "Connecting to clipboard service...": "Kapcsolódás a vágólap-szolgáltatáshoz…"
   },
   "Connecting...": {
     "Connecting...": "Csatlakozás…"
@@ -2040,7 +2043,7 @@
     "Corner Style": "Sarokstílus"
   },
   "Corner style applies to the bar surface": {
-    "Corner style applies to the bar surface": ""
+    "Corner style applies to the bar surface": "A sarokstílus a sáv felületére vonatkozik"
   },
   "Corners & Background": {
     "Corners & Background": "Sarkok és háttér"
@@ -2049,7 +2052,7 @@
     "Couldn't load hotspot password": "Nem sikerült betölteni a hotspot jelszavát"
   },
   "Couldn't load plugins": {
-    "Couldn't load plugins": ""
+    "Couldn't load plugins": "Nem sikerült betölteni a bővítményeket"
   },
   "Count Only": {
     "Count Only": "Csak darabszám"
@@ -2175,7 +2178,7 @@
     "Curve": "Görbe"
   },
   "Curve rasterizer.": {
-    "Curve rasterizer.": ""
+    "Curve rasterizer.": "Görbe raszterizáló."
   },
   "Curve: curve rasterizer.": {
     "Curve: curve rasterizer.": "Görbe: görberaszterező."
@@ -2307,7 +2310,7 @@
     "Daily at:": "Naponta ekkor:"
   },
   "Damped springs settle straight to their target with no overshoot": {
-    "Damped springs settle straight to their target with no overshoot": ""
+    "Damped springs settle straight to their target with no overshoot": "A csillapított rugók közvetlenül a célhoz igazodnak, túlnyúlás nélkül"
   },
   "Dank": {
     "Dank": "Dank"
@@ -2322,10 +2325,10 @@
     "Dank Dash": "Dank Dash"
   },
   "Dank Island - Beta": {
-    "Dank Island - Beta": ""
+    "Dank Island - Beta": "Dank Island - Béta"
   },
   "Dank Island instance": {
-    "Dank Island instance": ""
+    "Dank Island instance": "Dank Island példány"
   },
   "DankBar": {
     "DankBar": "DankBar"
@@ -2358,13 +2361,13 @@
     "Dark mode harmony": "Sötét mód (harmónia)"
   },
   "Dark or light mode follows the wallpaper brightness": {
-    "Dark or light mode follows the wallpaper brightness": ""
+    "Dark or light mode follows the wallpaper brightness": "A sötét vagy világos mód követi a háttérkép fényerejét"
   },
   "Darken Modal Background": {
     "Darken Modal Background": "Kizárólagos ablak hátterének sötétítése"
   },
   "Dashboard": {
-    "Dashboard": ""
+    "Dashboard": "Irányítópult"
   },
   "Date First": {
     "Date First": "Dátum előre"
@@ -2424,13 +2427,13 @@
     "Default Opens": "Alapértelmezetten megnyitja"
   },
   "Default Task List": {
-    "Default Task List": ""
+    "Default Task List": "Alapértelmezett feladatlista"
   },
   "Default Width (%)": {
     "Default Width (%)": "Alapértelmezett szélesség (%)"
   },
   "Default launcher shortcuts open a native launcher activity inside Dank Island. Spotlight is used when the focused screen has no DankIsland.": {
-    "Default launcher shortcuts open a native launcher activity inside Dank Island. Spotlight is used when the focused screen has no DankIsland.": ""
+    "Default launcher shortcuts open a native launcher activity inside Dank Island. Spotlight is used when the focused screen has no DankIsland.": "Az alapértelmezett indító parancsikonok megnyitnak egy natív indító tevékenységet a Dank Islanden belül. A Spotlight használatos, ha a fókuszált képernyőn nincs DankIsland."
   },
   "Default launcher shortcuts open the full launcher with mode tabs, grid view, and action panel.": {
     "Default launcher shortcuts open the full launcher with mode tabs, grid view, and action panel.": "Az alapértelmezett indító gyorsbillentyűk megnyitják a teljes indítót módfülekkel, rácsnézettel és műveleti panellel."
@@ -2556,7 +2559,7 @@
     "Digital": "Digitális"
   },
   "Dim": {
-    "Dim": ""
+    "Dim": "Halvány"
   },
   "Direct path to a .xkb keymap file. Overrides layouts/variants above.": {
     "Direct path to a .xkb keymap file. Overrides layouts/variants above.": "Közvetlen elérési út egy .xkb billentyűkiosztás-fájlhoz. Felülírja a fenti kiosztásokat/változatokat."
@@ -2601,10 +2604,10 @@
     "Disabling WiFi...": "Wi-Fi kikapcsolása…"
   },
   "Disabling auto-login on startup...": {
-    "Disabling auto-login on startup...": "Automatikus bejelentkezés letiltása indításkor..."
+    "Disabling auto-login on startup...": "Automatikus bejelentkezés letiltása indításkor…"
   },
   "Disabling cellular...": {
-    "Disabling cellular...": ""
+    "Disabling cellular...": "Mobilhálózat letiltása…"
   },
   "Disc": {
     "Disc": "Lemez"
@@ -2673,7 +2676,7 @@
     "Display and switch MangoWC layouts": "MangoWC elrendezések megjelenítése és váltása"
   },
   "Display application icons in workspace indicators": {
-    "Display application icons in workspace indicators": "Alkalmazás ikonok megjelenítése a munkaterület-jelzőkben"
+    "Display application icons in workspace indicators": "Alkalmazásikonok megjelenítése a munkaterület-jelzőkben"
   },
   "Display brightness control": {
     "Display brightness control": "A kijelző fényerejének szabályozásása"
@@ -2715,10 +2718,10 @@
     "Displays the active keyboard layout and allows switching": "Megjeleníti az aktív billentyűzetkiosztást és lehetővé teszi a váltást"
   },
   "Distance between display edge and island": {
-    "Distance between display edge and island": ""
+    "Distance between display edge and island": "Távolság a kijelző széle és a sziget között"
   },
   "Distance-field renderer.": {
-    "Distance-field renderer.": ""
+    "Distance-field renderer.": "Távolságmező-alapú renderelő."
   },
   "Distribution": {
     "Distribution": "Disztribúció"
@@ -2781,10 +2784,10 @@
     "Draw a connected picture-frame border around the entire display": "Összefüggő képkeret-szegély rajzolása a teljes kijelző köré"
   },
   "Draw an island-styled background behind satellite widgets": {
-    "Draw an island-styled background behind satellite widgets": ""
+    "Draw an island-styled background behind satellite widgets": "Sziget-stílusú háttér rajzolása a műholdas widgetek mögé"
   },
   "Draw an outline and use the highest-contrast surface tone": {
-    "Draw an outline and use the highest-contrast surface tone": ""
+    "Draw an outline and use the highest-contrast surface tone": "Körvonal rajzolása és a legmagasabb kontrasztú felületi tónus használata"
   },
   "Driver": {
     "Driver": "Illesztőprogram"
@@ -2904,7 +2907,7 @@
     "Enable Bar": "Sáv engedélyezése"
   },
   "Enable Cellular": {
-    "Enable Cellular": ""
+    "Enable Cellular": "Mobilhálózat engedélyezése"
   },
   "Enable Do Not Disturb": {
     "Enable Do Not Disturb": "Ne zavarjanak engedélyezése"
@@ -2916,7 +2919,7 @@
     "Enable History": "Előzmények engedélyezése"
   },
   "Enable Island": {
-    "Enable Island": ""
+    "Enable Island": "Sziget engedélyezése"
   },
   "Enable Num Lock": {
     "Enable Num Lock": "Num Lock engedélyezése"
@@ -2967,7 +2970,7 @@
     "Enable security key authentication": "Biztonsági kulcsos hitelesítés engedélyezése"
   },
   "Enable weather in Time & Weather to show this shortcut": {
-    "Enable weather in Time & Weather to show this shortcut": ""
+    "Enable weather in Time & Weather to show this shortcut": "Engedélyezd az időjárást az Idő és időjárás menüpontban a parancsikon megjelenítéséhez"
   },
   "Enabled": {
     "Enabled": "Engedélyezve"
@@ -2976,7 +2979,7 @@
     "Enabling WiFi...": "Wi-Fi bekapcsolása…"
   },
   "Enabling cellular...": {
-    "Enabling cellular...": ""
+    "Enabling cellular...": "Mobilhálózat engedélyezése…"
   },
   "End": {
     "End": "Vége"
@@ -3018,7 +3021,7 @@
     "Enter custom lock screen format (e.g., dddd, MMMM d)": "Zárolási képernyő egyéni formátumának megadása (például dddd, MMMM d)"
   },
   "Enter custom top bar format (e.g., ddd MMM d)": {
-    "Enter custom top bar format (e.g., ddd MMM d)": "Egyéni felső sáv formátum megadása (például ddd MMM d)"
+    "Enter custom top bar format (e.g., ddd MMM d)": "Egyéni felsősáv-formátum megadása (például ddd MMM d)"
   },
   "Enter device name...": {
     "Enter device name...": "Add meg az eszköz nevét…"
@@ -3102,13 +3105,13 @@
     "Exit node": "Kilépési csomópont"
   },
   "Expand Notifications": {
-    "Expand Notifications": ""
+    "Expand Notifications": "Értesítések kibontása"
   },
   "Expand notifications by default instead of click or hover": {
-    "Expand notifications by default instead of click or hover": ""
+    "Expand notifications by default instead of click or hover": "Értesítések kibontása alapértelmezés szerint kattintás vagy rámutatás helyett"
   },
   "Expansion Mode": {
-    "Expansion Mode": ""
+    "Expansion Mode": "Kibontási mód"
   },
   "Experimental Feature": {
     "Experimental Feature": "Kísérleti funkció"
@@ -3270,7 +3273,7 @@
     "Failed to load VPN config": "Nem sikerült betölteni a VPN-konfigurációt"
   },
   "Failed to load clipboard configuration.": {
-    "Failed to load clipboard configuration.": "Nem sikerült betölteni a vágólap-konfigurációt."
+    "Failed to load clipboard configuration.": "Nem sikerült betölteni a vágólap-beállításokat."
   },
   "Failed to move job": {
     "Failed to move job": "Nem sikerült a feladat áthelyezése"
@@ -3339,10 +3342,10 @@
     "Failed to save clipboard setting": "Nem sikerült menteni a vágólap beállítást"
   },
   "Failed to save dropped file": {
-    "Failed to save dropped file": ""
+    "Failed to save dropped file": "Nem sikerült menteni a bedobott fájlt"
   },
   "Failed to save dropped text": {
-    "Failed to save dropped text": ""
+    "Failed to save dropped text": "Nem sikerült menteni a bedobott szöveget"
   },
   "Failed to save keybind": {
     "Failed to save keybind": "Nem sikerült menteni a gyorsbillentyűt"
@@ -3399,10 +3402,10 @@
     "Failed to switch codec": "Nem sikerült a kodekváltás"
   },
   "Failed to switch port": {
-    "Failed to switch port": ""
+    "Failed to switch port": "Nem sikerült portot váltani"
   },
   "Failed to toggle cellular": {
-    "Failed to toggle cellular": ""
+    "Failed to toggle cellular": "Nem sikerült átváltani a mobilhálózatot"
   },
   "Failed to unpin entry": {
     "Failed to unpin entry": "Nem sikerült a bejegyzés rögzítésének feloldása"
@@ -3582,7 +3585,7 @@
     "Floating windows follow Surface Styling settings": "A lebegő ablakok követik a Felületi stílus beállításait"
   },
   "Floats above windows and other content": {
-    "Floats above windows and other content": ""
+    "Floats above windows and other content": "Az ablakok és egyéb tartalmak felett lebeg"
   },
   "Fluent": {
     "Fluent": "Fluent"
@@ -3873,7 +3876,7 @@
     "Globally scale all animation durations": "Az összes animáció időtartamának globális méretezése"
   },
   "Globally scale animation durations with geometric motion & spring based physics with bezier curves": {
-    "Globally scale animation durations with geometric motion & spring based physics with bezier curves": ""
+    "Globally scale animation durations with geometric motion & spring based physics with bezier curves": "Animáció időtartamának globális skálázása geometriai mozgással és rugó-alapú fizikával, Bézier-görbékkel"
   },
   "Golden Hour": {
     "Golden Hour": "Aranyóra"
@@ -4098,19 +4101,19 @@
     "High": "Magas"
   },
   "High Contrast": {
-    "High Contrast": ""
+    "High Contrast": "Magas kontraszt"
   },
   "High-fidelity palette that preserves source hues.": {
     "High-fidelity palette that preserves source hues.": "Nagy hűségű paletta, amely megőrzi a forrás árnyalatait."
   },
   "Higher percentages give island more inertia": {
-    "Higher percentages give island more inertia": ""
+    "Higher percentages give island more inertia": "A magasabb százalékok nagyobb tehetetlenséget adnak a szigetnek"
   },
   "Higher values pull island toward its target more strongly": {
-    "Higher values pull island toward its target more strongly": ""
+    "Higher values pull island toward its target more strongly": "A magasabb értékek erősebben vonzzák a szigetet a célja felé"
   },
   "Higher values settle island with less bounce": {
-    "Higher values settle island with less bounce": ""
+    "Higher values settle island with less bounce": "A magasabb értékek kevesebb pattogással állítják be a szigetet"
   },
   "Highlight Active Workspace App": {
     "Highlight Active Workspace App": "Aktív munkaterület-alkalmazás kiemelése"
@@ -4137,13 +4140,13 @@
     "Hold to Confirm Power Actions": "Lenyomva tartás a főkapcsoló-műveletek megerősítéséhez"
   },
   "Home Compact": {
-    "Home Compact": ""
+    "Home Compact": "Kompakt Kezdőlap"
   },
   "Horizontal": {
-    "Horizontal": ""
+    "Horizontal": "Vízszintes"
   },
   "Horizontal Offset": {
-    "Horizontal Offset": ""
+    "Horizontal Offset": "Vízszintes eltolás"
   },
   "Horizontal and vertical bar thickness": {
     "Horizontal and vertical bar thickness": "Vízszintes és függőleges sávvastagság"
@@ -4209,10 +4212,10 @@
     "Humidity": "Páratartalom"
   },
   "Hybrid": {
-    "Hybrid": ""
+    "Hybrid": "Hibrid"
   },
   "Hybrid peeks the current compact face on hover. Click pins a destination so it stays open": {
-    "Hybrid peeks the current compact face on hover. Click pins a destination so it stays open": ""
+    "Hybrid peeks the current compact face on hover. Click pins a destination so it stays open": "A hibrid rámutatáskor bepillantást enged az aktuális kompakt felületre. A kattintás rögzíti a célt, így az nyitva marad"
   },
   "Hyprland Discord Server": {
     "Hyprland Discord Server": "Hyprland Discord szervere"
@@ -4263,7 +4266,7 @@
     "Icon Size %": "Ikonméret %"
   },
   "Icon Spacing": {
-    "Icon Spacing": ""
+    "Icon Spacing": "Ikonok távolsága"
   },
   "Icon Theme": {
     "Icon Theme": "Ikontéma"
@@ -4356,7 +4359,7 @@
     "Include Transitions": "Átmenetekkel együtt"
   },
   "Include application streams and virtual sinks in the device lists": {
-    "Include application streams and virtual sinks in the device lists": ""
+    "Include application streams and virtual sinks in the device lists": "Alkalmazásfolyamok és virtuális nyelők belefoglalása az eszközlistákba"
   },
   "Include desktop actions (shortcuts) in search results.": {
     "Include desktop actions (shortcuts) in search results.": "Asztali műveletek (parancsikonok) belefoglalása a keresési eredményekbe."
@@ -4377,7 +4380,7 @@
     "Indicator Style": "Jelzőstílus"
   },
   "Individual Batteries": {
-    "Individual Batteries": "Egyéni akkumulátorok"
+    "Individual Batteries": "Egyedi akkumulátorok"
   },
   "Individual bar configuration": {
     "Individual bar configuration": "Egyéni sáv konfiguráció"
@@ -4404,7 +4407,7 @@
     "Inner Gaps": "Belső hézagok"
   },
   "Inner authentication": {
-    "Inner authentication": ""
+    "Inner authentication": "Belső hitelesítés"
   },
   "Inner padding applied to each widget": {
     "Inner padding applied to each widget": "Az egyes widgetekre alkalmazott belső térköz"
@@ -4521,16 +4524,16 @@
     "Iris Bloom": "Íriszvirágzás"
   },
   "Island": {
-    "Island": ""
+    "Island": "Sziget"
   },
   "Island Gap": {
-    "Island Gap": ""
+    "Island Gap": "Sziget rés"
   },
   "Island Instance": {
-    "Island Instance": ""
+    "Island Instance": "Sziget példány"
   },
   "Island placement": {
-    "Island placement": ""
+    "Island placement": "Sziget elhelyezése"
   },
   "Isolate Displays": {
     "Isolate Displays": "Kijelzők elszigetelése"
@@ -4554,7 +4557,7 @@
     "Keep Changes": "Változtatások megtartása"
   },
   "Keep Clock with Media": {
-    "Keep Clock with Media": ""
+    "Keep Clock with Media": "Óra megtartása a médiával"
   },
   "Keep My Edits": {
     "Keep My Edits": "Saját szerkesztések megtartása"
@@ -4572,13 +4575,13 @@
     "Keep the clipboard type filter when reopening history": "Vágólap típusának szűrőjének megjegyzése az előzmények újbóli megnyitásakor"
   },
   "Keep the dock visible above fullscreen applications": {
-    "Keep the dock visible above fullscreen applications": ""
+    "Keep the dock visible above fullscreen applications": "A dokk láthatóan tartása a teljes képernyős alkalmazások felett"
   },
   "Keep typing": {
     "Keep typing": "Gépelj tovább"
   },
   "Keep widgets beside the island or align them like a standalone bar": {
-    "Keep widgets beside the island or align them like a standalone bar": ""
+    "Keep widgets beside the island or align them like a standalone bar": "Widgetek megtartása a sziget mellett, vagy igazításuk önálló sávként"
   },
   "Keeping Awake": {
     "Keeping Awake": "Ébren tartva"
@@ -4794,7 +4797,7 @@
     "Loading keybinds...": "Gyorsbillentyűk betöltése…"
   },
   "Loading ports...": {
-    "Loading ports...": ""
+    "Loading ports...": "Portok betöltése…"
   },
   "Loading trending...": {
     "Loading trending...": "Trendek betöltése…"
@@ -4980,13 +4983,13 @@
     "Material": "Material"
   },
   "Material 3 Expressive bezier curves, default.": {
-    "Material 3 Expressive bezier curves, default.": ""
+    "Material 3 Expressive bezier curves, default.": "Material 3 Expressive Bézier-görbék, alapértelmezett."
   },
   "Material 3 Expressive panels rise from below with a subtle scale, default.": {
-    "Material 3 Expressive panels rise from below with a subtle scale, default.": ""
+    "Material 3 Expressive panels rise from below with a subtle scale, default.": "A Material 3 Expressive panelek alulról emelkednek fel finom skálázással, alapértelmezett."
   },
   "Material Battery Style": {
-    "Material Battery Style": "Anyagszerű akkumulátor stílus"
+    "Material Battery Style": "Material akkumulátorstílus"
   },
   "Material Colors": {
     "Material Colors": "Material színek"
@@ -5088,7 +5091,7 @@
     "Maximum pinned entries reached": "Elérted a rögzített bejegyzések maximális számát"
   },
   "Media / Launcher": {
-    "Media / Launcher": ""
+    "Media / Launcher": "Média / Indító"
   },
   "Media Controls": {
     "Media Controls": "Médiavezérlők"
@@ -5235,10 +5238,10 @@
     "Morning": "Reggel"
   },
   "Motion": {
-    "Motion": ""
+    "Motion": "Mozgás"
   },
   "Motion & Accessibility": {
-    "Motion & Accessibility": ""
+    "Motion & Accessibility": "Mozgás és akadálymentesítés"
   },
   "Motion Effects": {
     "Motion Effects": "Mozgáseffektusok"
@@ -5265,7 +5268,7 @@
     "Move Widget": "Widget áthelyezése"
   },
   "Move island and satellites left or right from display center": {
-    "Move island and satellites left or right from display center": ""
+    "Move island and satellites left or right from display center": "Sziget és műholdak mozgatása balra vagy jobbra a kijelző közepétől"
   },
   "Moving to Paused": {
     "Moving to Paused": "Szüneteltetésre váltás"
@@ -5310,7 +5313,7 @@
     "NM not supported": "Az NM nem támogatott"
   },
   "Named Workspace Icons": {
-    "Named Workspace Icons": "Nevesített munkaterület ikonok"
+    "Named Workspace Icons": "Nevesített munkaterület-ikonok"
   },
   "Native": {
     "Native": "Natív"
@@ -5328,7 +5331,7 @@
     "Navigate": "Navigáció"
   },
   "Near Island": {
-    "Near Island": ""
+    "Near Island": "Sziget mellett"
   },
   "Network": {
     "Network": "Hálózat"
@@ -5649,7 +5652,7 @@
     "No plugins found": "Nem található bővítmény"
   },
   "No ports found": {
-    "No ports found": ""
+    "No ports found": "Nem található port"
   },
   "No printer found": {
     "No printer found": "Nem található nyomtató"
@@ -5664,7 +5667,7 @@
     "No profiles": "Nincsenek profilok"
   },
   "No recent clipboard entries found": {
-    "No recent clipboard entries found": "Nem találhatók legutóbbi vágólapbejegyzések"
+    "No recent clipboard entries found": "Nem találhatók legutóbbi vágólap-bejegyzések"
   },
   "No reminder": {
     "No reminder": "Nincs emlékeztető"
@@ -5892,7 +5895,7 @@
     "Online": "Online"
   },
   "Only adjust gamma based on time or location rules.": {
-    "Only adjust gamma based on time or location rules.": "Csak az idő- vagy helyalapú szabályok szerint állítsa a gammát."
+    "Only adjust gamma based on time or location rules.": "A gamma csak idő- vagy helyalapú szabályok szerint módosuljon."
   },
   "Only continue if you recognize this server certificate fingerprint.": {
     "Only continue if you recognize this server certificate fingerprint.": "Csak akkor folytasd, ha felismered ezt a kiszolgálói tanúsítvány-ujjlenyomatot."
@@ -5943,7 +5946,7 @@
     "Open From": "Megnyitás innen"
   },
   "Open Island": {
-    "Open Island": ""
+    "Open Island": "Nyitott sziget"
   },
   "Open Notepad File": {
     "Open Notepad File": "Jegyzettömb-fájl megnyitása"
@@ -6117,7 +6120,7 @@
     "PDF Reader": "PDF-olvasó"
   },
   "PID": {
-    "PID": ""
+    "PID": "PID"
   },
   "PIN": {
     "PIN": "PIN"
@@ -6159,13 +6162,13 @@
     "Pairing...": "Párosítás…"
   },
   "Palette": {
-    "Palette": ""
+    "Palette": "Paletta"
   },
   "Panels glide in from a larger distance at full size, no scale change, pure clean motion.": {
-    "Panels glide in from a larger distance at full size, no scale change, pure clean motion.": ""
+    "Panels glide in from a larger distance at full size, no scale change, pure clean motion.": "A panelek nagyobb távolságból csúsznak be teljes méretben, méretváltozás nélkül, tiszta mozgással."
   },
   "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": {
-    "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": ""
+    "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": "A panelek kicsiből felskálázódnak beúszás közben, drámai, előreugró mélységhatást keltve."
   },
   "Partial": {
     "Partial": "Részleges"
@@ -6294,7 +6297,7 @@
     "Place clipboard history on the Wayland overlay layer": "Vágólap előzményeinek elhelyezése a Wayland átfedő rétegen"
   },
   "Place independent widgets to left and right of island": {
-    "Place independent widgets to left and right of island": ""
+    "Place independent widgets to left and right of island": "Helyezz el független widgeteket a szigettől balra és jobbra"
   },
   "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
     "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "Helyezd ide a bővítménykönyvtárakat. Minden bővítménynek rendelkeznie kell egy plugin.json fájllal."
@@ -6309,7 +6312,7 @@
     "Place the dock on the Wayland overlay layer": "A dokk elhelyezése a Wayland-átfedési rétegen"
   },
   "Platform renderer (FreeType).": {
-    "Platform renderer (FreeType).": ""
+    "Platform renderer (FreeType).": "Platform renderelő (FreeType)."
   },
   "Play": {
     "Play": "Lejátszás"
@@ -6336,7 +6339,7 @@
     "Playback error: ": "Lejátszási hiba: "
   },
   "Playful": {
-    "Playful": ""
+    "Playful": "Játékos"
   },
   "Plays audio files": {
     "Plays audio files": "Hangfájlok lejátszása"
@@ -6408,7 +6411,7 @@
     "Popouts and Modals follow global Animation Speed (disable to customize independently)": "A felugró ablakok és kizárólagos párbeszédablakok a globális animációs sebességet követik (letiltás az egyéni testreszabáshoz)"
   },
   "Popular Plugins": {
-    "Popular Plugins": ""
+    "Popular Plugins": "Népszerű bővítmények"
   },
   "Popup Only": {
     "Popup Only": "Csak felugró"
@@ -6429,10 +6432,10 @@
     "Port": "Port"
   },
   "Port Selection": {
-    "Port Selection": ""
+    "Port Selection": "Portválasztás"
   },
   "Port switched": {
-    "Port switched": ""
+    "Port switched": "Port átváltva"
   },
   "Portal": {
     "Portal": "Portál"
@@ -6549,7 +6552,7 @@
     "Primary": "Elsődleges"
   },
   "Primary Bar": {
-    "Primary Bar": ""
+    "Primary Bar": "Elsődleges sáv"
   },
   "Primary Container": {
     "Primary Container": "Elsődleges tároló"
@@ -6744,7 +6747,7 @@
     "Recommended available": "Ajánlott, elérhető"
   },
   "Reduce Motion": {
-    "Reduce Motion": ""
+    "Reduce Motion": "Mozgás csökkentése"
   },
   "Reduce the visible bar length from both ends": {
     "Reduce the visible bar length from both ends": "A látható sáv hosszának csökkentése mindkét végéről"
@@ -6870,7 +6873,7 @@
     "Rename Workspace": "Munkaterület átnevezése"
   },
   "Render Type": {
-    "Render Type": ""
+    "Render Type": "Renderelési típus"
   },
   "Reorder & Group": {
     "Reorder & Group": "Újrarendezés és csoportosítás"
@@ -6930,7 +6933,7 @@
     "Requires the DMS Theme extension from the editor marketplace": "Megköveteli a DMS Theme bővítményt a szerkesztő piacteréről"
   },
   "Reserved Height": {
-    "Reserved Height": ""
+    "Reserved Height": "Fenntartott magasság"
   },
   "Reset": {
     "Reset": "Visszaállítás"
@@ -6954,7 +6957,7 @@
     "Resize on Border": "Átméretezés a szegélynél"
   },
   "Resize the resting island to align with nearby widgets": {
-    "Resize the resting island to align with nearby widgets": ""
+    "Resize the resting island to align with nearby widgets": "A pihenő sziget átméretezése a közeli widgetekhez való igazodáshoz"
   },
   "Resize windows by dragging their edges with the mouse": {
     "Resize windows by dragging their edges with the mouse": "Ablakok átméretezése a szegélyük egérrel történő húzásával"
@@ -6990,7 +6993,7 @@
     "Resume": "Folytatás"
   },
   "Retry": {
-    "Retry": ""
+    "Retry": "Újra"
   },
   "Reveal the arcs where surfaces meet the frame": {
     "Reveal the arcs where surfaces meet the frame": "Az ívek felfedése ott, ahol a felületek találkoznak a kerettel"
@@ -7119,10 +7122,10 @@
     "SSID": "SSID"
   },
   "Satellite Widgets": {
-    "Satellite Widgets": ""
+    "Satellite Widgets": "Műholdas widgetek"
   },
   "Satellites widget to place left or right of the island": {
-    "Satellites widget to place left or right of the island": ""
+    "Satellites widget to place left or right of the island": "Műholdas widget a szigettől balra vagy jobbra való elhelyezéshez"
   },
   "Saturation": {
     "Saturation": "Telítettség"
@@ -7209,7 +7212,7 @@
     "Score": "Pontszám"
   },
   "Screen Edges": {
-    "Screen Edges": ""
+    "Screen Edges": "Képernyőszélek"
   },
   "Screen sharing": {
     "Screen sharing": "Képernyőmegosztás"
@@ -7284,7 +7287,7 @@
     "Search themes...": "Témák keresése…"
   },
   "Search when idle, visualizer when media is playing": {
-    "Search when idle, visualizer when media is playing": ""
+    "Search when idle, visualizer when media is playing": "Keresés üresjáratban, vizualizáció média lejátszása közben"
   },
   "Search widgets...": {
     "Search widgets...": "Widgetek keresése…"
@@ -7413,7 +7416,7 @@
     "Select lock screen background image": "Lezárási képernyő háttérképének kiválasztása"
   },
   "Select monospace font for process list and technical displays": {
-    "Select monospace font for process list and technical displays": "Rögzített szélességű betűtípus (folyamatlistához és technikai kijelzőkhöz)"
+    "Select monospace font for process list and technical displays": "Betűtípus a folyamatlistához és technikai kijelzőkhöz"
   },
   "Select network": {
     "Select network": "Hálózat kiválasztása"
@@ -7428,7 +7431,7 @@
     "Select which keybind providers to include": "Válaszd ki a befoglalni kívánt gyorsbillentyű-szolgáltatókat"
   },
   "Select which transitions to include in randomization": {
-    "Select which transitions to include in randomization": "Válaszd ki, mely átmenetek legyenek a véletlenszerűsítésben"
+    "Select which transitions to include in randomization": "Mely átmenetek legyenek a véletlenszerűsítésben"
   },
   "Select...": {
     "Select...": "Kiválasztás…"
@@ -7619,8 +7622,14 @@
   "Show CPU Temp": {
     "Show CPU Temp": "CPU-hőmérséklet megjelenítése"
   },
+  "Show Charge Rate": {
+    "Show Charge Rate": ""
+  },
   "Show Date": {
     "Show Date": "Dátum megjelenítése"
+  },
+  "Show Discharge Rate": {
+    "Show Discharge Rate": ""
   },
   "Show Disk": {
     "Show Disk": "Lemez megjelenítése"
@@ -7629,7 +7638,7 @@
     "Show Dock": "Dokk megjelenítése"
   },
   "Show Dock Over Fullscreen": {
-    "Show Dock Over Fullscreen": ""
+    "Show Dock Over Fullscreen": "Dokk megjelenítése teljes képernyő felett"
   },
   "Show Feels Like Temperature": {
     "Show Feels Like Temperature": "Hőérzet megjelenítése"
@@ -7680,7 +7689,7 @@
     "Show Log Out": "Kijelentkezés megjelenítése"
   },
   "Show Material Design ripple animations on interactive elements": {
-    "Show Material Design ripple animations on interactive elements": "Material Design hullám animációk megjelenítése az interaktív elemeken"
+    "Show Material Design ripple animations on interactive elements": "Material Design hullámanimációk megjelenítése az interaktív elemeken"
   },
   "Show Media Player": {
     "Show Media Player": "Médialejátszó megjelenítése"
@@ -7743,7 +7752,7 @@
     "Show Restart DMS": "„DMS újraindítása” megjelenítése"
   },
   "Show Satellite Widgets": {
-    "Show Satellite Widgets": ""
+    "Show Satellite Widgets": "Műholdas widgetek megjelenítése"
   },
   "Show Saved Items": {
     "Show Saved Items": "Mentett elemek megjelenítése"
@@ -7782,7 +7791,7 @@
     "Show Trash in Dock": "Kuka megjelenítése a dokkban"
   },
   "Show Virtual Devices": {
-    "Show Virtual Devices": ""
+    "Show Virtual Devices": "Virtuális eszközök megjelenítése"
   },
   "Show Weather Condition": {
     "Show Weather Condition": "Időjárási körülmények megjelenítése"
@@ -7803,7 +7812,7 @@
     "Show a bar that drains as the popup's auto-dismiss timer runs": "Egy fogyó sáv megjelenítése, ahogy a felugró ablak automatikus bezárási időzítője lejár"
   },
   "Show a clickable clock beside compact media details": {
-    "Show a clickable clock beside compact media details": ""
+    "Show a clickable clock beside compact media details": "Kattintható óra megjelenítése a kompakt médiarészletek mellett"
   },
   "Show a notification when battery reaches the charge limit.": {
     "Show a notification when battery reaches the charge limit.": "Értesítés megjelenítése, ha az akkumulátor eléri a töltési korlátot."
@@ -7827,7 +7836,7 @@
     "Show cava audio visualizer in media widget": "Cava hangvizualizáló megjelenítése a média widgeten"
   },
   "Show critical priority popups while Do Not Disturb is on": {
-    "Show critical priority popups while Do Not Disturb is on": ""
+    "Show critical priority popups while Do Not Disturb is on": "Kritikus prioritású felugró ablakok megjelenítése Ne zavarjanak módban"
   },
   "Show darkened overlay behind modal dialogs": {
     "Show darkened overlay behind modal dialogs": "Sötétített átfedés megjelenítése a kizárólagos párbeszédablakok mögött"
@@ -7891,6 +7900,9 @@
   },
   "Show weather information in top bar and control center": {
     "Show weather information in top bar and control center": "Időjárási információk megjelenítése a felső sávon és a vezérlőközponton"
+  },
+  "Show weather on the login screen": {
+    "Show weather on the login screen": ""
   },
   "Show workspace index numbers in the top bar workspace switcher": {
     "Show workspace index numbers in the top bar workspace switcher": "Munkaterület-indexszámok megjelenítése a felső sáv munkaterület-váltójában"
@@ -7965,22 +7977,22 @@
     "Small": "Kicsi"
   },
   "Smart": {
-    "Smart": ""
+    "Smart": "Intelligens"
   },
   "Smartcard Authentication": {
     "Smartcard Authentication": "Intelligens kártyás hitelesítés"
   },
   "Smooth": {
-    "Smooth": ""
+    "Smooth": "Sima"
   },
   "Smooth cubic deceleration in, quick snap out, clean, elegant curves.": {
-    "Smooth cubic deceleration in, quick snap out, clean, elegant curves.": ""
+    "Smooth cubic deceleration in, quick snap out, clean, elegant curves.": "Sima köbös lassulás befelé, gyors bepattanás kifelé, tiszta, elegáns görbék."
   },
   "Snap": {
     "Snap": "Illesztés"
   },
   "Snap spring-driven motion straight to its target without physics travel": {
-    "Snap spring-driven motion straight to its target without physics travel": ""
+    "Snap spring-driven motion straight to its target without physics travel": "Rugó által vezérelt mozgás közvetlenül a célra, fizikai mozgás nélkül"
   },
   "Snow": {
     "Snow": "Hó"
@@ -7989,16 +8001,16 @@
     "Soft Reboot": "Szoftveres újraindítás"
   },
   "Solid": {
-    "Solid": ""
+    "Solid": "Szilárd"
   },
   "Solid material type or Outline": {
-    "Solid material type or Outline": ""
+    "Solid material type or Outline": "Szilárd anyagtípus vagy Körvonal"
   },
   "Some plugins require a newer version of DMS:": {
     "Some plugins require a newer version of DMS:": "Néhány bővítmény a DMS újabb verzióját igényli:"
   },
   "Some settings are managed by the island": {
-    "Some settings are managed by the island": ""
+    "Some settings are managed by the island": "Néhány beállítást a sziget kezel"
   },
   "Sort Alphabetically": {
     "Sort Alphabetically": "Rendezés betűrend szerint"
@@ -8031,7 +8043,7 @@
     "Space between windows and screen edges": "Távolság az ablakok és a képernyő szélei között"
   },
   "Space kept clear for compact island and satellites": {
-    "Space kept clear for compact island and satellites": ""
+    "Space kept clear for compact island and satellites": "Szabadon tartott hely a kompakt sziget és a műholdak számára"
   },
   "Spacer": {
     "Spacer": "Térköz"
@@ -8061,22 +8073,22 @@
     "Spotlight Search": "Spotlight-keresés"
   },
   "Spring Damping": {
-    "Spring Damping": ""
+    "Spring Damping": "Rugócsillapítás"
   },
   "Spring Mass": {
-    "Spring Mass": ""
+    "Spring Mass": "Rugótömeg"
   },
   "Spring Motion": {
-    "Spring Motion": ""
+    "Spring Motion": "Rugómozgás"
   },
   "Spring Stiffness": {
-    "Spring Stiffness": ""
+    "Spring Stiffness": "Rugómerevség"
   },
   "Spring bezier with overshoot, entry briefly exceeds its target then settles.": {
-    "Spring bezier with overshoot, entry briefly exceeds its target then settles.": ""
+    "Spring bezier with overshoot, entry briefly exceeds its target then settles.": "Rugós Bezier túllövéssel, a belépés rövid időre meghaladja a célt, majd beáll."
   },
   "Springs carry extra energy and visibly bounce before settling": {
-    "Springs carry extra energy and visibly bounce before settling": ""
+    "Springs carry extra energy and visibly bounce before settling": "A rugók extra energiát hordoznak, és láthatóan pattognak a leülepedés előtt"
   },
   "Square": {
     "Square": "Szögletes"
@@ -8088,10 +8100,10 @@
     "Stacked": "Halmozott"
   },
   "Stage the Wayland overlay layer to remain visible over fullscreen apps": {
-    "Stage the Wayland overlay layer to remain visible over fullscreen apps": ""
+    "Stage the Wayland overlay layer to remain visible over fullscreen apps": "A Wayland átfedő réteg előkészítése, hogy látható maradjon a teljes képernyős alkalmazások felett"
   },
   "Standard": {
-    "Standard": "Szabványos"
+    "Standard": "Standard"
   },
   "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": {
     "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": "Standard: Klasszikus Material Design 3 — a panelek alulról emelkednek fel finom skálázással. A DMS alapértelmezett beállítása."
@@ -8232,7 +8244,7 @@
     "Sway Website": "Sway weboldal"
   },
   "Sweep the background into the screen edges": {
-    "Sweep the background into the screen edges": ""
+    "Sweep the background into the screen edges": "A háttér besöprése a képernyő széleibe"
   },
   "Switch Layout Shortcut": {
     "Switch Layout Shortcut": "Kiosztásváltó gyorsbillentyű"
@@ -8373,7 +8385,7 @@
     "Tap to Click": "Koppintás a kattintáshoz"
   },
   "Task list used when adding tasks from the dash calendar": {
-    "Task list used when adding tasks from the dash calendar": ""
+    "Task list used when adding tasks from the dash calendar": "A feladatlista, amelyet a dash naptárból történő feladatok hozzáadásakor használnak"
   },
   "Terminal": {
     "Terminal": "Terminál"
@@ -8436,10 +8448,10 @@
     "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "A DMS_SOCKET környezeti változó nincs beállítva, vagy a socket nem érhető el. Az automatizált bővítménykezeléshez DMS_SOCKET szükséges."
   },
   "The Island anchors to the top or bottom edge": {
-    "The Island anchors to the top or bottom edge": ""
+    "The Island anchors to the top or bottom edge": "A sziget a felső vagy alsó szélhez rögzül"
   },
   "The Island holds this edge on a display this bar covers, so the bar stays hidden there": {
-    "The Island holds this edge on a display this bar covers, so the bar stays hidden there": ""
+    "The Island holds this edge on a display this bar covers, so the bar stays hidden there": "A sziget megtartja ezt a szélt a sáv által lefedett kijelzőn, így a sáv ott rejtve marad"
   },
   "The WiFi adapter could not start access point mode.": {
     "The WiFi adapter could not start access point mode.": "A Wi-Fi kártya nem tudott hozzáférési pont módba lépni."
@@ -8454,10 +8466,10 @@
     "The custom command used when attaching to sessions (receives the session name as the first argument)": "A munkamenetekhez való csatlakozáskor használt egyéni parancs (első argumentumként a munkamenet nevét kapja)"
   },
   "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": {
-    "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": ""
+    "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": "A DMS-hez mellékelt bejelentkező felület aktív (archinstall beállítás). Továbbra is működik így, de a téma és a beállítások szinkronizálásához az önálló bejelentkező felület szükséges. Telepítsd a greetd-dms-greeter-bin csomagot az AUR-ból, majd futtasd a Szinkronizálást az üdvözlőképernyő migrálásához."
   },
   "The island draws its own surface": {
-    "The island draws its own surface": ""
+    "The island draws its own surface": "A sziget saját felületet rajzol"
   },
   "The job queue of this printer is empty": {
     "The job queue of this printer is empty": "A nyomtató feladatlistája üres"
@@ -8496,7 +8508,7 @@
     "These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)": "Ezek bejegyzéseket adnak hozzá az XDG automatikus indítási könyvtárhoz (~/.config/autostart/*.desktop)"
   },
   "These style the bar surface, which the Island replaces": {
-    "These style the bar surface, which the Island replaces": ""
+    "These style the bar surface, which the Island replaces": "Ezek stílusozzák a sáv felületét, amelyet a sziget helyettesít"
   },
   "Thickness": {
     "Thickness": "Vastagság"
@@ -8529,10 +8541,13 @@
     "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": "Ez a bővítmény nem rendelkezik „settings_write” engedéllyel.\n\nAdd hozzá a \"permissions\": [\"settings_read\", \"settings_write\"] sort a plugin.json fájlhoz"
   },
   "This widget prevents GPU power off states, which can significantly impact battery life on laptops. It is not recommended to use this on laptops with hybrid graphics.": {
-    "This widget prevents GPU power off states, which can significantly impact battery life on laptops. It is not recommended to use this on laptops with hybrid graphics.": "Ez a widget megakadályozza a GPU kikapcsolt állapotát, ami jelentősen befolyásolhatja a laptopok akkumulátor élettartamát. Nem ajánlott hibrid grafikus kártyával rendelkező laptopokon használni."
+    "This widget prevents GPU power off states, which can significantly impact battery life on laptops. It is not recommended to use this on laptops with hybrid graphics.": "Ez a widget megakadályozza a GPU kikapcsolt állapotát, ami jelentősen befolyásolhatja a laptopok akkumulátor-élettartamát. Nem ajánlott hibrid grafikus kártyával rendelkező laptopokon használni."
   },
   "This will delete all unpinned entries. %1 pinned entries will be kept.": {
     "This will delete all unpinned entries. %1 pinned entries will be kept.": "Ez törli az összes nem rögzített bejegyzést. %1 rögzített bejegyzés marad meg."
+  },
+  "This will delete the %1 entries matching the current filter. Pinned entries are kept.": {
+    "This will delete the %1 entries matching the current filter. Pinned entries are kept.": ""
   },
   "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": {
     "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": "Ez le fogja választani a Wi-Fi-t a(z) „%1” hálózatról – az interfész nem tud egyszerre hotspotot biztosítani és kapcsolódva is maradni. Az internetmegosztáshoz egy másik kapcsolatra, például Ethernetre lesz szükség."
@@ -8649,7 +8664,7 @@
     "Toggle fonts": "Betűtípusok átváltása"
   },
   "Toggle the Island on this instance's displays": {
-    "Toggle the Island on this instance's displays": ""
+    "Toggle the Island on this instance's displays": "A sziget ki-be kapcsolása a példány kijelzőin"
   },
   "Toggle visibility of this bar configuration": {
     "Toggle visibility of this bar configuration": "A sávkonfiguráció láthatóságának váltása"
@@ -8676,7 +8691,7 @@
     "Tools": "Eszközök"
   },
   "Tools icon opens Control Center": {
-    "Tools icon opens Control Center": ""
+    "Tools icon opens Control Center": "Az Eszközök ikon megnyitja a Vezérlőközpontot"
   },
   "Top": {
     "Top": "Felső"
@@ -8721,7 +8736,7 @@
     "Transform": "Átalakítás"
   },
   "Transition Duration": {
-    "Transition Duration": ""
+    "Transition Duration": "Átmenet időtartama"
   },
   "Transition Effect": {
     "Transition Effect": "Átmeneti hatás"
@@ -8901,7 +8916,7 @@
     "Unpin from Dock": "Rögzítés feloldása a Dokkról"
   },
   "Unread notification count beside the clock": {
-    "Unread notification count beside the clock": ""
+    "Unread notification count beside the clock": "Olvasatlan értesítések száma az óra mellett"
   },
   "Unsaved changes": {
     "Unsaved changes": "Nem mentett változtatások"
@@ -9183,7 +9198,7 @@
     "Version": "Verzió"
   },
   "Vertical": {
-    "Vertical": ""
+    "Vertical": "Függőleges"
   },
   "Vertical Deck": {
     "Vertical Deck": "Függőleges köteg"
@@ -9300,7 +9315,7 @@
     "Weather Widget": "Időjárás widget"
   },
   "Weather icon and temperature open the weather activity": {
-    "Weather icon and temperature open the weather activity": ""
+    "Weather icon and temperature open the weather activity": "Az időjárás ikon és a hőmérséklet megnyitja az időjárás aktivitást"
   },
   "Web Browser": {
     "Web Browser": "Böngésző"
@@ -9513,7 +9528,7 @@
     "Yesterday": "Tegnap"
   },
   "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.": {
-    "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.": ""
+    "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.": "A DMS-t további appletekkel, indító funkciókkal és widgetekkel bővítheted a bővítményrendszeren keresztül. Több száz érhető el a hivatalos DMS-regiszterben, amelyeket a közösség és a DMS csapata készített. Telepíts néhányat most, vagy később a DMS CLI-n vagy a Beállítások ablakon keresztül."
   },
   "You have unsaved changes. Save before continuing?": {
     "You have unsaved changes. Save before continuing?": "Nem mentett változtatásaid vannak. Szeretnél menteni a folytatás előtt?"
@@ -9600,7 +9615,7 @@
     "Normal": "Normál"
   },
   "dms-greeter is not installed. Install the dms-greeter package to manage the greeter.": {
-    "dms-greeter is not installed. Install the dms-greeter package to manage the greeter.": ""
+    "dms-greeter is not installed. Install the dms-greeter package to manage the greeter.": "A dms-greeter nincs telepítve. Telepítsd a dms-greeter csomagot az üdvözlőképernyő kezeléséhez."
   },
   "e.g. /usr/bin/my-script --flag": {
     "e.g. /usr/bin/my-script --flag": "Például /usr/bin/my-script --flag"

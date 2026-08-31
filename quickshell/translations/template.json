@@ -3689,6 +3689,13 @@
     "comment": "island settings: clear the notification badge when the center opens"
   },
   {
+    "term": "Clear Filtered",
+    "translation": "",
+    "context": "Clear Filtered",
+    "reference": "",
+    "comment": "clipboard modal: clear button tooltip while a search filter is active"
+  },
+  {
     "term": "Clear History?",
     "translation": "",
     "context": "Clear History?",
@@ -4485,13 +4492,6 @@
     "context": "Contrast",
     "reference": "",
     "comment": ""
-  },
-  {
-    "term": "Contrast by variant",
-    "translation": "",
-    "context": "Contrast by variant",
-    "reference": "",
-    "comment": "WCAG breakdown popup heading"
   },
   {
     "term": "Contributor",
@@ -14266,13 +14266,6 @@
     "comment": ""
   },
   {
-    "term": "Partial",
-    "translation": "",
-    "context": "Partial",
-    "reference": "",
-    "comment": "contrast badge suffix: only some variants pass"
-  },
-  {
     "term": "Partly Cloudy",
     "translation": "",
     "context": "Partly Cloudy",
@@ -17675,11 +17668,25 @@
     "comment": ""
   },
   {
+    "term": "Show Charge Rate",
+    "translation": "",
+    "context": "Show Charge Rate",
+    "reference": "",
+    "comment": "Battery bar widget setting: show how many watts are going into the battery while charging"
+  },
+  {
     "term": "Show Date",
     "translation": "",
     "context": "Show Date",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Show Discharge Rate",
+    "translation": "",
+    "context": "Show Discharge Rate",
+    "reference": "",
+    "comment": "Battery bar widget setting: show how many watts the system is drawing from the battery"
   },
   {
     "term": "Show Disk",
@@ -18308,6 +18315,13 @@
     "term": "Show weather information in top bar and control center",
     "translation": "",
     "context": "Show weather information in top bar and control center",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Show weather on the login screen",
+    "translation": "",
+    "context": "Show weather on the login screen",
     "reference": "",
     "comment": ""
   },
@@ -19803,6 +19817,13 @@
     "comment": ""
   },
   {
+    "term": "This will delete the %1 entries matching the current filter. Pinned entries are kept.",
+    "translation": "",
+    "context": "This will delete the %1 entries matching the current filter. Pinned entries are kept.",
+    "reference": "",
+    "comment": "clipboard modal: clear confirmation while a search filter is active, %1 is the number of matching entries"
+  },
+  {
     "term": "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.",
     "translation": "",
     "context": "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.",
@@ -20473,13 +20494,6 @@
     "context": "Ungrouped",
     "reference": "",
     "comment": ""
-  },
-  {
-    "term": "Uninstall",
-    "translation": "",
-    "context": "Uninstall",
-    "reference": "",
-    "comment": "uninstall action button"
   },
   {
     "term": "Uninstall Plugin",
@@ -21557,7 +21571,7 @@
     "translation": "",
     "context": "Weather",
     "reference": "",
-    "comment": "island compact face: weather label | island settings: weather slot row"
+    "comment": "Enable weather display on the lock screen window | Enable weather display on the login screen | island compact face: weather label | island settings: weather slot row"
   },
   {
     "term": "Weather Widget",
@@ -22153,13 +22167,6 @@
     "context": "attached",
     "reference": "",
     "comment": ""
-  },
-  {
-    "term": "below AA",
-    "translation": "",
-    "context": "below AA",
-    "reference": "",
-    "comment": "contrast level below the AA threshold"
   },
   {
     "term": "brandon",

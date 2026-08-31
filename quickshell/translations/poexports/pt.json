@@ -78,7 +78,7 @@
     "%1 online": "%1 online"
   },
   "%1 position": {
-    "%1 position": ""
+    "%1 position": "%1 posição"
   },
   "%1 tasks": {
     "%1 tasks": "%1 tarefas"
@@ -315,7 +315,7 @@
     "A separate minimal launcher action that works in Standalone, Separate Frame Mode, and Connected Frame Mode.": "Uma ação de inicializador mínima separada que funciona nos modos Standalone, Frame Separado e Frame Conectado."
   },
   "A slight natural settle, DMS default": {
-    "A slight natural settle, DMS default": ""
+    "A slight natural settle, DMS default": "Uma leve acomodação natural, padrão do DMS"
   },
   "A user with that name already exists.": {
     "A user with that name already exists.": "Já existe um usuário com esse nome."
@@ -495,7 +495,7 @@
     "Add to Autostart": "Adicionar à Inicialização Automática"
   },
   "Additional settings are managed by the Island": {
-    "Additional settings are managed by the Island": ""
+    "Additional settings are managed by the Island": "Configurações adicionais "
   },
   "Adjust pointer sensitivity speed": {
     "Adjust pointer sensitivity speed": "Ajustar a velocidade de sensibilidade do ponteiro"
@@ -552,7 +552,7 @@
     "Allow": "Permitir"
   },
   "Allow %1 in Do Not Disturb": {
-    "Allow %1 in Do Not Disturb": ""
+    "Allow %1 in Do Not Disturb": "Permitir %1 em Não Perturbe"
   },
   "Allow LAN access": {
     "Allow LAN access": "Permitir acesso à LAN"
@@ -570,7 +570,7 @@
     "Allow greeter login access": "Permitir acesso de login ao greeter"
   },
   "Allow in Do Not Disturb": {
-    "Allow in Do Not Disturb": ""
+    "Allow in Do Not Disturb": "Permitir no Não perturbe"
   },
   "Already on that session": {
     "Already on that session": "Já está nessa sessão"
@@ -720,7 +720,7 @@
     "Apply inverse concave corner cutouts to the bar": "Aplicar recortes de canto côncavos inversos à barra"
   },
   "Apply island geometry changes immediately without spring overshoot": {
-    "Apply island geometry changes immediately without spring overshoot": ""
+    "Apply island geometry changes immediately without spring overshoot": "Aplique imediatamente as alterações na geometria da ilha sem ultrapassar o ponto ideal da mola"
   },
   "Apply to Hardware": {
     "Apply to Hardware": "Aplicar ao Hardware"
@@ -747,7 +747,7 @@
     "Apps Icon": "Ícones de Apps"
   },
   "Apps allowed to show popups while Do Not Disturb is on. Right-click a notification and choose \"Allow in Do Not Disturb\" to add one here.": {
-    "Apps allowed to show popups while Do Not Disturb is on. Right-click a notification and choose \"Allow in Do Not Disturb\" to add one here.": ""
+    "Apps allowed to show popups while Do Not Disturb is on. Right-click a notification and choose \"Allow in Do Not Disturb\" to add one here.": "Aplicativos autorizados a exibir pop-ups enquanto o modo Não perturbe estiver ativado. Clique com o botão direito do mouse em uma notificação e escolha \"Permitir no modo Não perturbe\" para adicionar uma aqui."
   },
   "Apps are ordered by usage frequency, then last used, then alphabetically.": {
     "Apps are ordered by usage frequency, then last used, then alphabetically.": "Os aplicativos são ordenados por frequência de uso, mais recentes, e por último, alfabéticamente."
@@ -861,10 +861,10 @@
     "Auto (Bar-aware)": "Auto (ciente da barra)"
   },
   "Auto (Dark Mode)": {
-    "Auto (Dark Mode)": ""
+    "Auto (Dark Mode)": "Automático (Modo Escuro)"
   },
   "Auto (Light Mode)": {
-    "Auto (Light Mode)": ""
+    "Auto (Light Mode)": "Automático (Modo Claro)"
   },
   "Auto (Wide)": {
     "Auto (Wide)": "Automático (Largo)"
@@ -873,7 +873,7 @@
     "Auto Compositor Gaps": "Lacunas Automáticas do Compositor"
   },
   "Auto From Wallpaper": {
-    "Auto From Wallpaper": ""
+    "Auto From Wallpaper": "Automático a partir do papel de parede"
   },
   "Auto Location": {
     "Auto Location": "Localização Automática"
@@ -1585,6 +1585,9 @@
   },
   "Clear Badge on Open": {
     "Clear Badge on Open": ""
+  },
+  "Clear Filtered": {
+    "Clear Filtered": ""
   },
   "Clear History?": {
     "Clear History?": "Limpar Histórico?"
@@ -7619,8 +7622,14 @@
   "Show CPU Temp": {
     "Show CPU Temp": "Mostrar Temperatura da CPU"
   },
+  "Show Charge Rate": {
+    "Show Charge Rate": ""
+  },
   "Show Date": {
     "Show Date": "Mostrar Data"
+  },
+  "Show Discharge Rate": {
+    "Show Discharge Rate": ""
   },
   "Show Disk": {
     "Show Disk": "Mostrar Disco"
@@ -7891,6 +7900,9 @@
   },
   "Show weather information in top bar and control center": {
     "Show weather information in top bar and control center": "Mostrar informação de clima na barra superior e na central de controle"
+  },
+  "Show weather on the login screen": {
+    "Show weather on the login screen": ""
   },
   "Show workspace index numbers in the top bar workspace switcher": {
     "Show workspace index numbers in the top bar workspace switcher": "Mostrar números de índice das áreas de trabalho no seletor de áreas de trabalho"
@@ -8533,6 +8545,9 @@
   },
   "This will delete all unpinned entries. %1 pinned entries will be kept.": {
     "This will delete all unpinned entries. %1 pinned entries will be kept.": "Isso excluirá todas as entradas não fixadas. %1 entradas fixadas serão mantidas."
+  },
+  "This will delete the %1 entries matching the current filter. Pinned entries are kept.": {
+    "This will delete the %1 entries matching the current filter. Pinned entries are kept.": ""
   },
   "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": {
     "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": "Isso desconectará o WiFi de \"%1\" — o rádio não pode hospedar um hotspot e permanecer conectado ao mesmo tempo. O compartilhamento de internet precisará de outra conexão, como Ethernet."

@@ -272,7 +272,7 @@
   {
     "term": "%1 variants",
     "context": "%1 variants",
-    "reference": "Modules/Settings/ThemeBrowser.qml:489, Modules/Settings/ThemeBrowser.qml:490",
+    "reference": "Modules/Settings/ThemeBrowser.qml:91",
     "comment": "",
     "tags": [
       "settings"
@@ -353,7 +353,7 @@
   {
     "term": "'Alternative' lets the key unlock on its own. 'Second factor' requires password or fingerprint first, then the key.",
     "context": "'Alternative' lets the key unlock on its own. 'Second factor' requires password or fingerprint first, then the key.",
-    "reference": "Modules/Settings/LockScreenTab.qml:526",
+    "reference": "Modules/Settings/LockScreenTab.qml:534",
     "comment": "lock screen U2F security key mode setting",
     "tags": [
       "settings"
@@ -380,7 +380,7 @@
   {
     "term": "/path/to/videos",
     "context": "/path/to/videos",
-    "reference": "Modules/Settings/LockScreenTab.qml:820",
+    "reference": "Modules/Settings/LockScreenTab.qml:828",
     "comment": "",
     "tags": [
       "settings"
@@ -761,7 +761,7 @@
   {
     "term": "3rd party",
     "context": "3rd party",
-    "reference": "Services/PluginService.qml:1266",
+    "reference": "Services/PluginService.qml:1270",
     "comment": "",
     "tags": [
       "shell"
@@ -1198,7 +1198,7 @@
   {
     "term": "Active Color",
     "context": "Active Color",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:4148",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:4266",
     "comment": "",
     "tags": [
       "settings"
@@ -1616,7 +1616,7 @@
   {
     "term": "All",
     "context": "All",
-    "reference": "Modals/ProcessListModal.qml:371, Services/AppSearchService.qml:829, Services/AppSearchService.qml:850, dms-plugins/DankStickerSearch/DankStickerSearch.qml:101, Modals/DankLauncherV2/Controller.qml:791, Modals/DankLauncherV2/SpotlightLauncherContent.qml:496, Modals/DankLauncherV2/LauncherContent.qml:327, Modals/DankLauncherV2/LauncherContent.qml:610, Modals/Clipboard/ClipboardContent.qml:16, Modules/ProcessList/ProcessListPopout.qml:170, Modules/Settings/WidgetsTabSection.qml:3859, Modules/Settings/WidgetsTabSection.qml:3915, Modules/Settings/PluginBrowser.qml:171, Modules/Settings/KeybindsTab.qml:460, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:103, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:106, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:118, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:260, Modules/Notifications/Center/HistoryNotificationList.qml:87",
+    "reference": "Modals/ProcessListModal.qml:371, Services/AppSearchService.qml:829, Services/AppSearchService.qml:850, dms-plugins/DankStickerSearch/DankStickerSearch.qml:101, Modals/DankLauncherV2/Controller.qml:791, Modals/DankLauncherV2/SpotlightLauncherContent.qml:496, Modals/DankLauncherV2/LauncherContent.qml:327, Modals/DankLauncherV2/LauncherContent.qml:610, Modals/Clipboard/ClipboardContent.qml:16, Modules/ProcessList/ProcessListPopout.qml:170, Modules/Settings/WidgetsTabSection.qml:3977, Modules/Settings/WidgetsTabSection.qml:4033, Modules/Settings/PluginBrowser.qml:171, Modules/Settings/KeybindsTab.qml:460, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:103, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:106, Modules/Settings/DisplayConfig/NiriOutputSettings.qml:118, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:260, Modules/Notifications/Center/HistoryNotificationList.qml:87",
     "comment": "Tailscale filter: all devices | notification history filter | plugin browser category filter",
     "tags": [
       "plugin-dankstickersearch",
@@ -1754,7 +1754,7 @@
   {
     "term": "Alternative (OR)",
     "context": "Alternative (OR)",
-    "reference": "Modules/Settings/LockScreenTab.qml:528, Modules/Settings/LockScreenTab.qml:529",
+    "reference": "Modules/Settings/LockScreenTab.qml:536, Modules/Settings/LockScreenTab.qml:537",
     "comment": "U2F mode option: key works as standalone unlock method",
     "tags": [
       "settings"
@@ -2025,7 +2025,7 @@
   {
     "term": "App Names",
     "context": "App Names",
-    "reference": "Modules/Settings/LockScreenTab.qml:349, Modules/Settings/NotificationsTab.qml:83, Modules/Settings/NotificationsTab.qml:852",
+    "reference": "Modules/Settings/LockScreenTab.qml:357, Modules/Settings/NotificationsTab.qml:83, Modules/Settings/NotificationsTab.qml:852",
     "comment": "lock screen notification mode option | notification rule match field option",
     "tags": [
       "settings"
@@ -2052,7 +2052,7 @@
   {
     "term": "Appearance",
     "context": "Appearance",
-    "reference": "Modals/Settings/SettingsSidebar.qml:132, Modules/Settings/GreeterTab.qml:512, Modules/Settings/LauncherTab.qml:609, Modules/Settings/LockScreenTab.qml:363, Modules/Settings/DankIslandTab.qml:253, Modules/Settings/WorkspaceAppearanceCard.qml:11",
+    "reference": "Modals/Settings/SettingsSidebar.qml:132, Modules/Settings/GreeterTab.qml:512, Modules/Settings/LauncherTab.qml:609, Modules/Settings/LockScreenTab.qml:371, Modules/Settings/DankIslandTab.qml:253, Modules/Settings/WorkspaceAppearanceCard.qml:11",
     "comment": "island settings: appearance card title | launcher appearance settings",
     "tags": [
       "settings"
@@ -2116,7 +2116,7 @@
   {
     "term": "Apply Changes",
     "context": "Apply Changes",
-    "reference": "Modules/Settings/LockScreenTab.qml:464, Modules/Settings/LockScreenTab.qml:682, Modules/Settings/DisplayConfigTab.qml:609",
+    "reference": "Modules/Settings/LockScreenTab.qml:472, Modules/Settings/LockScreenTab.qml:690, Modules/Settings/DisplayConfigTab.qml:609",
     "comment": "validate and apply custom PAM authentication source | validate and apply custom U2F PAM authentication source",
     "tags": [
       "settings"
@@ -2233,7 +2233,7 @@
   {
     "term": "Apps Dock Settings",
     "context": "Apps Dock Settings",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:3801",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:3919",
     "comment": "",
     "tags": [
       "settings"
@@ -2489,7 +2489,7 @@
   {
     "term": "Authentication",
     "context": "Authentication",
-    "reference": "Modals/PolkitAuthModal.qml:27, Modals/WifiPasswordModal.qml:570, Modules/Settings/GreeterTab.qml:465, Modules/Settings/LockScreenTab.qml:414",
+    "reference": "Modals/PolkitAuthModal.qml:27, Modals/WifiPasswordModal.qml:570, Modules/Settings/GreeterTab.qml:465, Modules/Settings/LockScreenTab.qml:422",
     "comment": "",
     "tags": [
       "settings",
@@ -2508,7 +2508,7 @@
   {
     "term": "Authentication Source",
     "context": "Authentication Source",
-    "reference": "Modules/Settings/LockScreenTab.qml:428",
+    "reference": "Modules/Settings/LockScreenTab.qml:436",
     "comment": "lock screen PAM source setting",
     "tags": [
       "settings"
@@ -2527,7 +2527,7 @@
   {
     "term": "Authentication changes apply automatically",
     "context": "Authentication changes apply automatically",
-    "reference": "Modules/Settings/LockScreenTab.qml:418",
+    "reference": "Modules/Settings/LockScreenTab.qml:426",
     "comment": "",
     "tags": [
       "settings"
@@ -2717,7 +2717,7 @@
   {
     "term": "Auto uses an installed or bundled key-only service.",
     "context": "Auto uses an installed or bundled key-only service.",
-    "reference": "Modules/Settings/LockScreenTab.qml:653",
+    "reference": "Modules/Settings/LockScreenTab.qml:661",
     "comment": "lock screen dedicated U2F PAM source setting",
     "tags": [
       "settings"
@@ -2807,7 +2807,7 @@
   {
     "term": "Auto-login on startup",
     "context": "Auto-login on startup",
-    "reference": "Modules/Settings/GreeterTab.qml:633",
+    "reference": "Modules/Settings/GreeterTab.qml:642",
     "comment": "",
     "tags": [
       "settings"
@@ -2871,7 +2871,7 @@
   {
     "term": "Automatic Cycling",
     "context": "Automatic Cycling",
-    "reference": "Modules/Settings/WallpaperTab.qml:916, Modules/Settings/LockScreenTab.qml:841",
+    "reference": "Modules/Settings/WallpaperTab.qml:916, Modules/Settings/LockScreenTab.qml:849",
     "comment": "",
     "tags": [
       "settings"
@@ -2943,7 +2943,7 @@
   {
     "term": "Automatically lock the screen when DMS starts",
     "context": "Automatically lock the screen when DMS starts",
-    "reference": "Modules/Settings/LockScreenTab.qml:763",
+    "reference": "Modules/Settings/LockScreenTab.qml:771",
     "comment": "",
     "tags": [
       "settings"
@@ -2952,7 +2952,7 @@
   {
     "term": "Automatically lock the screen when the system prepares to suspend",
     "context": "Automatically lock the screen when the system prepares to suspend",
-    "reference": "Modules/Settings/PowerSleepTab.qml:93, Modules/Settings/LockScreenTab.qml:744",
+    "reference": "Modules/Settings/PowerSleepTab.qml:93, Modules/Settings/LockScreenTab.qml:752",
     "comment": "",
     "tags": [
       "settings"
@@ -3115,7 +3115,7 @@
   {
     "term": "Background",
     "context": "Background",
-    "reference": "Modules/Settings/GreeterTab.qml:566, Modules/Settings/LockScreenTab.qml:384, Modules/Settings/DankIslandTab.qml:372",
+    "reference": "Modules/Settings/GreeterTab.qml:575, Modules/Settings/LockScreenTab.qml:392, Modules/Settings/DankIslandTab.qml:372",
     "comment": "island settings: satellite background toggle",
     "tags": [
       "settings"
@@ -3196,7 +3196,7 @@
   {
     "term": "Balanced",
     "context": "Balanced",
-    "reference": "Common/Theme.qml:1555, Modules/Settings/TypographyMotionTab.qml:329",
+    "reference": "Common/Theme.qml:1557, Modules/Settings/TypographyMotionTab.qml:329",
     "comment": "power profile option",
     "tags": [
       "settings",
@@ -3461,7 +3461,7 @@
   {
     "term": "Behavior",
     "context": "Behavior",
-    "reference": "Modules/Settings/DockTab.qml:166, Modules/Settings/GreeterTab.qml:600, Modules/Settings/LockScreenTab.qml:714, Modules/Settings/DankIslandTab.qml:458, Modules/Settings/ClipboardTab.qml:442",
+    "reference": "Modules/Settings/DockTab.qml:166, Modules/Settings/GreeterTab.qml:609, Modules/Settings/LockScreenTab.qml:722, Modules/Settings/DankIslandTab.qml:458, Modules/Settings/ClipboardTab.qml:442",
     "comment": "island settings: behavior card title",
     "tags": [
       "settings"
@@ -3470,7 +3470,7 @@
   {
     "term": "Bind lock screen to dbus signals from loginctl. Disable if using an external lock screen",
     "context": "Bind lock screen to dbus signals from loginctl. Disable if using an external lock screen",
-    "reference": "Modules/Settings/LockScreenTab.qml:730",
+    "reference": "Modules/Settings/LockScreenTab.qml:738",
     "comment": "",
     "tags": [
       "settings"
@@ -3661,7 +3661,7 @@
   {
     "term": "Body",
     "context": "Body",
-    "reference": "Modules/Settings/ThemeBrowser.qml:555, Modules/Settings/NotificationsTab.qml:95",
+    "reference": "Modules/Settings/NotificationsTab.qml:95",
     "comment": "notification rule match field option",
     "tags": [
       "settings"
@@ -3832,7 +3832,7 @@
   {
     "term": "Bottom Section",
     "context": "Bottom Section",
-    "reference": "Modules/Settings/WidgetsTab.qml:1511",
+    "reference": "Modules/Settings/WidgetsTab.qml:1517",
     "comment": "",
     "tags": [
       "settings"
@@ -3896,7 +3896,7 @@
   {
     "term": "Browse",
     "context": "Browse",
-    "reference": "Modals/DankLauncherV2/SpotlightResultRow.qml:61, Modals/DankLauncherV2/Controller.qml:222, Modals/DankLauncherV2/Controller.qml:1438, Modules/Settings/ThemeColorsTab.qml:540, Modules/Settings/AutoStartTab.qml:489, Modules/Settings/PluginsTab.qml:258, Modules/Settings/LockScreenTab.qml:832, Modules/Settings/Widgets/SettingsWallpaperPicker.qml:57",
+    "reference": "Modals/DankLauncherV2/SpotlightResultRow.qml:61, Modals/DankLauncherV2/Controller.qml:222, Modals/DankLauncherV2/Controller.qml:1438, Modules/Settings/ThemeColorsTab.qml:540, Modules/Settings/AutoStartTab.qml:489, Modules/Settings/PluginsTab.qml:258, Modules/Settings/LockScreenTab.qml:840, Modules/Settings/Widgets/SettingsWallpaperPicker.qml:57",
     "comment": "theme category option",
     "tags": [
       "settings",
@@ -3915,7 +3915,7 @@
   {
     "term": "Browse Plugins",
     "context": "Browse Plugins",
-    "reference": "Modals/Greeter/GreeterPluginsPage.qml:213, Modules/Settings/PluginBrowser.qml:498, Modules/Settings/PluginBrowser.qml:654, Modules/Settings/DesktopWidgetsTab.qml:199",
+    "reference": "Modals/Greeter/GreeterPluginsPage.qml:213, Modules/Settings/PluginBrowser.qml:503, Modules/Settings/PluginBrowser.qml:661, Modules/Settings/DesktopWidgetsTab.qml:199",
     "comment": "plugin browser header | plugin browser window title",
     "tags": [
       "settings",
@@ -3925,7 +3925,7 @@
   {
     "term": "Browse Themes",
     "context": "Browse Themes",
-    "reference": "Modules/Settings/ThemeColorsTab.qml:1048, Modules/Settings/ThemeBrowser.qml:146, Modules/Settings/ThemeBrowser.qml:242",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:1048, Modules/Settings/ThemeBrowser.qml:220, Modules/Settings/ThemeBrowser.qml:341",
     "comment": "browse themes button | theme browser header | theme browser window title",
     "tags": [
       "settings"
@@ -4098,7 +4098,7 @@
   {
     "term": "Cancel",
     "context": "Cancel",
-    "reference": "DMSShell.qml:377, Modals/WindowRuleModal.qml:1937, Modals/PolkitAuthContent.qml:321, Modals/WorkspaceRenameModal.qml:161, Modals/BluetoothPairingModal.qml:267, Modals/WifiPasswordModal.qml:802, Modals/DankLauncherV2/AppEditView.qml:283, Modals/Common/ConfirmModal.qml:15, Modals/Common/ConfirmModal.qml:26, Modals/Common/ConfirmModal.qml:39, Modals/Clipboard/ClipboardEditor.qml:281, Modules/Settings/PluginBrowser.qml:473, Modules/Settings/PluginBrowser.qml:1642, Modules/Settings/GreeterTab.qml:121, Modules/Settings/PluginUpdatesDialog.qml:284, Modules/Settings/ThemeBrowser.qml:121, Modules/Settings/DisplayConfigTab.qml:287, Modules/Settings/DisplayConfigTab.qml:332, Modules/Settings/DisplayConfigTab.qml:416, Modules/Settings/AudioTab.qml:744, Modules/Settings/KeybindItem.qml:2006, Modules/Settings/NetworkWifiTab.qml:1562, Modules/DankDash/Overview/CalendarEventEditor.qml:342, Modules/DankBar/Popouts/SystemUpdatePopout.qml:253",
+    "reference": "DMSShell.qml:377, Modals/WindowRuleModal.qml:1937, Modals/PolkitAuthContent.qml:321, Modals/WorkspaceRenameModal.qml:161, Modals/BluetoothPairingModal.qml:267, Modals/WifiPasswordModal.qml:802, Modals/DankLauncherV2/AppEditView.qml:283, Modals/Common/ConfirmModal.qml:15, Modals/Common/ConfirmModal.qml:33, Modals/Common/ConfirmDialogOverlay.qml:10, Modals/Common/ConfirmDialogOverlay.qml:31, Modals/Common/ConfirmDialogContent.qml:11, Modals/Clipboard/ClipboardEditor.qml:281, Modules/Settings/PluginBrowser.qml:473, Modules/Settings/PluginBrowser.qml:1649, Modules/Settings/GreeterTab.qml:121, Modules/Settings/PluginUpdatesDialog.qml:284, Modules/Settings/ThemeBrowser.qml:190, Modules/Settings/DisplayConfigTab.qml:287, Modules/Settings/DisplayConfigTab.qml:332, Modules/Settings/DisplayConfigTab.qml:416, Modules/Settings/AudioTab.qml:744, Modules/Settings/KeybindItem.qml:2006, Modules/Settings/NetworkWifiTab.qml:1562, Modules/DankDash/Overview/CalendarEventEditor.qml:342, Modules/DankBar/Popouts/SystemUpdatePopout.qml:253",
     "comment": "cancel hotspot editing action",
     "tags": [
       "settings",
@@ -4182,7 +4182,7 @@
   {
     "term": "Capabilities",
     "context": "Capabilities",
-    "reference": "Modules/Settings/AboutTab.qml:728, Modules/Settings/PluginBrowser.qml:1382",
+    "reference": "Modules/Settings/AboutTab.qml:728, Modules/Settings/PluginBrowser.qml:1389",
     "comment": "plugin detail section",
     "tags": [
       "settings"
@@ -4274,7 +4274,7 @@
   {
     "term": "Center Section",
     "context": "Center Section",
-    "reference": "Modules/Settings/WidgetSelectionPopup.qml:29, Modules/Settings/WidgetsTab.qml:1422",
+    "reference": "Modules/Settings/WidgetSelectionPopup.qml:29, Modules/Settings/WidgetsTab.qml:1428",
     "comment": "",
     "tags": [
       "settings"
@@ -4283,7 +4283,7 @@
   {
     "term": "Center Section - Reserved by Dank Island",
     "context": "Center Section - Reserved by Dank Island",
-    "reference": "Modules/Settings/WidgetsTab.qml:1422",
+    "reference": "Modules/Settings/WidgetsTab.qml:1428",
     "comment": "",
     "tags": [
       "settings"
@@ -4391,7 +4391,7 @@
   {
     "term": "Charging",
     "context": "Charging",
-    "reference": "Services/BatteryService.qml:417, Services/BatteryService.qml:439, Services/BatteryService.qml:450, Modules/ControlCenter/Widgets/BatteryPill.qml:25",
+    "reference": "Services/BatteryService.qml:440, Services/BatteryService.qml:462, Services/BatteryService.qml:473, Modules/ControlCenter/Widgets/BatteryPill.qml:25",
     "comment": "battery status",
     "tags": [
       "shell"
@@ -4691,7 +4691,7 @@
   {
     "term": "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.",
     "context": "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.",
-    "reference": "Modules/Settings/LockScreenTab.qml:857",
+    "reference": "Modules/Settings/LockScreenTab.qml:865",
     "comment": "",
     "tags": [
       "settings"
@@ -4765,7 +4765,7 @@
   {
     "term": "Clear All",
     "context": "Clear All",
-    "reference": "Modals/Clipboard/ClipboardHeader.qml:70, Modals/Clipboard/ClipboardHistoryPopout.qml:105, Modals/Clipboard/ClipboardHistoryModal.qml:98, Modules/Settings/PrinterTab.qml:1389, Modules/DankBar/Widgets/ClipboardButton.qml:326",
+    "reference": "Modals/Clipboard/ClipboardHeader.qml:71, Modals/Clipboard/ClipboardHistoryPopout.qml:105, Modals/Clipboard/ClipboardHistoryModal.qml:98, Modules/Settings/PrinterTab.qml:1389, Modules/DankBar/Widgets/ClipboardButton.qml:326",
     "comment": "",
     "tags": [
       "settings",
@@ -4791,9 +4791,18 @@
     ]
   },
   {
+    "term": "Clear Filtered",
+    "context": "Clear Filtered",
+    "reference": "Modals/Clipboard/ClipboardHeader.qml:71",
+    "comment": "clipboard modal: clear button tooltip while a search filter is active",
+    "tags": [
+      "shell"
+    ]
+  },
+  {
     "term": "Clear History?",
     "context": "Clear History?",
-    "reference": "Modals/Clipboard/ClipboardHistoryContent.qml:140, Modules/DankBar/DankBarContent.qml:922",
+    "reference": "Modals/Clipboard/ClipboardHistoryContent.qml:150, Modals/Clipboard/ClipboardHistoryContent.qml:157, Modules/DankBar/DankBarContent.qml:922",
     "comment": "",
     "tags": [
       "shell"
@@ -4984,7 +4993,7 @@
   {
     "term": "Clipboard History",
     "context": "Clipboard History",
-    "reference": "Modals/Clipboard/ClipboardHeader.qml:35",
+    "reference": "Modals/Clipboard/ClipboardHeader.qml:36",
     "comment": "",
     "tags": [
       "shell"
@@ -5002,7 +5011,7 @@
   {
     "term": "Clipboard Saved",
     "context": "Clipboard Saved",
-    "reference": "Modals/Clipboard/ClipboardHeader.qml:35",
+    "reference": "Modals/Clipboard/ClipboardHeader.qml:36",
     "comment": "",
     "tags": [
       "shell"
@@ -5193,7 +5202,7 @@
   {
     "term": "Color displayed on monitors without the lock screen",
     "context": "Color displayed on monitors without the lock screen",
-    "reference": "Modules/Settings/LockScreenTab.qml:895",
+    "reference": "Modules/Settings/LockScreenTab.qml:903",
     "comment": "",
     "tags": [
       "settings"
@@ -5274,7 +5283,7 @@
   {
     "term": "Colorize Active",
     "context": "Colorize Active",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:4105",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:4223",
     "comment": "",
     "tags": [
       "settings"
@@ -5410,7 +5419,7 @@
   {
     "term": "Compact Mode",
     "context": "Compact Mode",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:1017, Modules/Settings/WidgetsTabSection.qml:3572",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:1017, Modules/Settings/WidgetsTabSection.qml:3690",
     "comment": "",
     "tags": [
       "settings"
@@ -5608,7 +5617,7 @@
   {
     "term": "Confirm",
     "context": "Confirm",
-    "reference": "Modals/BluetoothPairingModal.qml:313, Modals/Common/ConfirmModal.qml:14, Modals/Common/ConfirmModal.qml:25, Modals/Common/ConfirmModal.qml:38",
+    "reference": "Modals/BluetoothPairingModal.qml:313, Modals/Common/ConfirmModal.qml:14, Modals/Common/ConfirmModal.qml:32, Modals/Common/ConfirmDialogOverlay.qml:9, Modals/Common/ConfirmDialogOverlay.qml:30, Modals/Common/ConfirmDialogContent.qml:10",
     "comment": "",
     "tags": [
       "shell"
@@ -5763,7 +5772,7 @@
   {
     "term": "Connecting to clipboard service...",
     "context": "Connecting to clipboard service...",
-    "reference": "Modals/Clipboard/ClipboardContent.qml:234, Modals/Clipboard/ClipboardContent.qml:296",
+    "reference": "Modals/Clipboard/ClipboardContent.qml:235, Modals/Clipboard/ClipboardContent.qml:297",
     "comment": "",
     "tags": [
       "shell"
@@ -5826,15 +5835,6 @@
     ]
   },
   {
-    "term": "Contrast by variant",
-    "context": "Contrast by variant",
-    "reference": "Modules/Settings/ThemeBrowser.qml:603",
-    "comment": "WCAG breakdown popup heading",
-    "tags": [
-      "settings"
-    ]
-  },
-  {
     "term": "Contributor",
     "context": "Contributor",
     "reference": "Modules/Settings/PluginBrowser.qml:60",
@@ -5883,7 +5883,7 @@
   {
     "term": "Control what notification information is shown on the lock screen",
     "context": "Control what notification information is shown on the lock screen",
-    "reference": "Modules/Settings/LockScreenTab.qml:348, Modules/Settings/NotificationsTab.qml:851",
+    "reference": "Modules/Settings/LockScreenTab.qml:356, Modules/Settings/NotificationsTab.qml:851",
     "comment": "lock screen notification privacy setting",
     "tags": [
       "settings"
@@ -5973,7 +5973,7 @@
   {
     "term": "Convenience options for the login screen",
     "context": "Convenience options for the login screen",
-    "reference": "Modules/Settings/GreeterTab.qml:604",
+    "reference": "Modules/Settings/GreeterTab.qml:613",
     "comment": "",
     "tags": [
       "settings"
@@ -6030,7 +6030,7 @@
   {
     "term": "Copied to clipboard",
     "context": "Copied to clipboard",
-    "reference": "Modals/AppPickerModal.qml:201, Services/ClipboardService.qml:212, dms-plugins/DankStickerSearch/DankStickerSearch.qml:230, dms-plugins/DankLauncherKeys/DankLauncherKeys.qml:154, dms-plugins/DankGifSearch/DankGifSearch.qml:175, Modals/Settings/SettingsModal.qml:334, Modals/Settings/SettingsModal.qml:351, Modules/Notepad/NotepadTextEditor.qml:328, Modules/Settings/DesktopWidgetInstanceCard.qml:426, Modules/DankBar/Widgets/FocusedWindowContextMenu.qml:30",
+    "reference": "Modals/AppPickerModal.qml:201, Services/ClipboardService.qml:213, dms-plugins/DankStickerSearch/DankStickerSearch.qml:230, dms-plugins/DankLauncherKeys/DankLauncherKeys.qml:154, dms-plugins/DankGifSearch/DankGifSearch.qml:175, Modals/Settings/SettingsModal.qml:334, Modals/Settings/SettingsModal.qml:351, Modules/Notepad/NotepadTextEditor.qml:328, Modules/Settings/DesktopWidgetInstanceCard.qml:426, Modules/DankBar/Widgets/FocusedWindowContextMenu.qml:30",
     "comment": "",
     "tags": [
       "plugin-dankgifsearch",
@@ -6191,7 +6191,7 @@
   {
     "term": "Couldn't load plugins",
     "context": "Couldn't load plugins",
-    "reference": "Modals/Greeter/GreeterPluginsPage.qml:162, Modules/Settings/PluginBrowser.qml:1023",
+    "reference": "Modals/Greeter/GreeterPluginsPage.qml:162, Modules/Settings/PluginBrowser.qml:1030",
     "comment": "plugin registry fetch error",
     "tags": [
       "settings",
@@ -6201,7 +6201,7 @@
   {
     "term": "Count Only",
     "context": "Count Only",
-    "reference": "Modules/Settings/LockScreenTab.qml:349, Modules/Settings/NotificationsTab.qml:852",
+    "reference": "Modules/Settings/LockScreenTab.qml:357, Modules/Settings/NotificationsTab.qml:852",
     "comment": "lock screen notification mode option",
     "tags": [
       "settings"
@@ -6373,7 +6373,7 @@
   {
     "term": "Ctrl+%1 is used for password editing",
     "context": "Ctrl+%1 is used for password editing",
-    "reference": "Modules/Settings/LockScreenTab.qml:636",
+    "reference": "Modules/Settings/LockScreenTab.qml:644",
     "comment": "lock screen security key shortcut reserved key warning",
     "tags": [
       "settings"
@@ -6454,7 +6454,7 @@
   {
     "term": "Current Monitor",
     "context": "Current Monitor",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:3746",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:3864",
     "comment": "Running apps filter: only show apps from the same monitor",
     "tags": [
       "settings"
@@ -6508,7 +6508,7 @@
   {
     "term": "Current Workspace",
     "context": "Current Workspace",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:3688",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:3806",
     "comment": "Running apps filter: only show apps from the active workspace",
     "tags": [
       "settings"
@@ -6580,7 +6580,7 @@
   {
     "term": "Custom",
     "context": "Custom",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:47, Modules/Settings/ThemeColorsTab.qml:69, Modules/Settings/ThemeColorsTab.qml:540, Modules/Settings/ThemeColorsTab.qml:540, Modules/Settings/ThemeColorsTab.qml:1889, Modules/Settings/ThemeColorsTab.qml:1895, Modules/Settings/ThemeColorsTab.qml:1906, Modules/Settings/ThemeColorsTab.qml:1918, Modules/Settings/ThemeColorsTab.qml:2176, Modules/Settings/ThemeColorsTab.qml:2182, Modules/Settings/ThemeColorsTab.qml:2193, Modules/Settings/ThemeColorsTab.qml:2204, Modules/Settings/TypographyMotionTab.qml:361, Modules/Settings/TypographyMotionTab.qml:444, Modules/Settings/TypographyMotionTab.qml:513, Modules/Settings/DockTab.qml:314, Modules/Settings/DockTab.qml:421, Modules/Settings/GreeterTab.qml:556, Modules/Settings/WallpaperTab.qml:379, Modules/Settings/LauncherTab.qml:318, Modules/Settings/LauncherTab.qml:427, Modules/Settings/TimeWeatherTab.qml:241, Modules/Settings/TimeWeatherTab.qml:328, Modules/Settings/DankBarTab.qml:1946, Modules/Settings/WorkspaceAppearanceCard.qml:52, Modules/Settings/WorkspaceAppearanceCard.qml:90, Modules/Settings/WorkspaceAppearanceCard.qml:122, Modules/Settings/WorkspaceAppearanceCard.qml:157, Modules/Settings/WorkspaceAppearanceCard.qml:183, Modules/Settings/FrameTab.qml:231, Modules/Settings/NotificationsTab.qml:379, Modules/Settings/KeybindItem.qml:1584, Modules/Settings/CompositorLayoutTab.qml:283, Modules/Settings/CompositorLayoutTab.qml:448, Modules/Settings/CompositorLayoutTab.qml:599, Modules/Settings/SystemUpdaterTab.qml:33, Modules/Settings/Widgets/SettingsColorPicker.qml:52, Modules/Settings/Widgets/DeviceAliasRow.qml:92",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:47, Modules/Settings/ThemeColorsTab.qml:69, Modules/Settings/ThemeColorsTab.qml:540, Modules/Settings/ThemeColorsTab.qml:540, Modules/Settings/ThemeColorsTab.qml:1889, Modules/Settings/ThemeColorsTab.qml:1895, Modules/Settings/ThemeColorsTab.qml:1906, Modules/Settings/ThemeColorsTab.qml:1918, Modules/Settings/ThemeColorsTab.qml:2176, Modules/Settings/ThemeColorsTab.qml:2182, Modules/Settings/ThemeColorsTab.qml:2193, Modules/Settings/ThemeColorsTab.qml:2204, Modules/Settings/TypographyMotionTab.qml:361, Modules/Settings/TypographyMotionTab.qml:444, Modules/Settings/TypographyMotionTab.qml:513, Modules/Settings/DockTab.qml:314, Modules/Settings/DockTab.qml:421, Modules/Settings/GreeterTab.qml:565, Modules/Settings/WallpaperTab.qml:379, Modules/Settings/LauncherTab.qml:318, Modules/Settings/LauncherTab.qml:427, Modules/Settings/TimeWeatherTab.qml:241, Modules/Settings/TimeWeatherTab.qml:328, Modules/Settings/DankBarTab.qml:1946, Modules/Settings/WorkspaceAppearanceCard.qml:52, Modules/Settings/WorkspaceAppearanceCard.qml:90, Modules/Settings/WorkspaceAppearanceCard.qml:122, Modules/Settings/WorkspaceAppearanceCard.qml:157, Modules/Settings/WorkspaceAppearanceCard.qml:183, Modules/Settings/FrameTab.qml:231, Modules/Settings/NotificationsTab.qml:379, Modules/Settings/KeybindItem.qml:1584, Modules/Settings/CompositorLayoutTab.qml:283, Modules/Settings/CompositorLayoutTab.qml:448, Modules/Settings/CompositorLayoutTab.qml:599, Modules/Settings/SystemUpdaterTab.qml:33, Modules/Settings/Widgets/SettingsColorPicker.qml:52, Modules/Settings/Widgets/DeviceAliasRow.qml:92",
     "comment": "shadow color option | surface border color | theme category option | widget background color option | workspace color option",
     "tags": [
       "plugin-dankdesktopweather",
@@ -6798,7 +6798,7 @@
   {
     "term": "Customize the font and background of the lock screen, or leave empty to use your theme font and desktop wallpaper. Changes apply instantly.",
     "context": "Customize the font and background of the lock screen, or leave empty to use your theme font and desktop wallpaper. Changes apply instantly.",
-    "reference": "Modules/Settings/LockScreenTab.qml:367",
+    "reference": "Modules/Settings/LockScreenTab.qml:375",
     "comment": "",
     "tags": [
       "settings"
@@ -7150,7 +7150,7 @@
   {
     "term": "Date Format",
     "context": "Date Format",
-    "reference": "Modules/Settings/GreeterTab.qml:547, Modules/Settings/TimeWeatherTab.qml:108",
+    "reference": "Modules/Settings/GreeterTab.qml:556, Modules/Settings/TimeWeatherTab.qml:108",
     "comment": "",
     "tags": [
       "settings"
@@ -7159,7 +7159,7 @@
   {
     "term": "Date format on greeter",
     "context": "Date format on greeter",
-    "reference": "Modules/Settings/GreeterTab.qml:535",
+    "reference": "Modules/Settings/GreeterTab.qml:544",
     "comment": "",
     "tags": [
       "settings"
@@ -7459,7 +7459,7 @@
   {
     "term": "Delete Saved Item?",
     "context": "Delete Saved Item?",
-    "reference": "Services/ClipboardService.qml:280",
+    "reference": "Services/ClipboardService.qml:281",
     "comment": "",
     "tags": [
       "shell"
@@ -7514,7 +7514,7 @@
   {
     "term": "Dependencies & documentation",
     "context": "Dependencies & documentation",
-    "reference": "Modules/Settings/GreeterTab.qml:644",
+    "reference": "Modules/Settings/GreeterTab.qml:653",
     "comment": "",
     "tags": [
       "settings"
@@ -7814,7 +7814,7 @@
   {
     "term": "Disabled",
     "context": "Disabled",
-    "reference": "Modules/Settings/ThemeColorsTab.qml:1590, Modules/Settings/AutoStartTab.qml:723, Modules/Settings/LockScreenTab.qml:349, Modules/Settings/NetworkCellularTab.qml:56, Modules/Settings/DankBarTab.qml:462, Modules/Settings/NotificationsTab.qml:852, Modules/Settings/NetworkWifiTab.qml:172, Modules/Settings/DisplayConfig/OutputCard.qml:128, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2190, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2196, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2198, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2210, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2224, Modules/ControlCenter/Details/NetworkDetail.qml:575, Modules/ControlCenter/Components/DragDropGrid.qml:503",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:1590, Modules/Settings/AutoStartTab.qml:723, Modules/Settings/LockScreenTab.qml:357, Modules/Settings/NetworkCellularTab.qml:56, Modules/Settings/DankBarTab.qml:462, Modules/Settings/NotificationsTab.qml:852, Modules/Settings/NetworkWifiTab.qml:172, Modules/Settings/DisplayConfig/OutputCard.qml:128, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2190, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2196, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2198, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2210, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2224, Modules/ControlCenter/Details/NetworkDetail.qml:575, Modules/ControlCenter/Components/DragDropGrid.qml:503",
     "comment": "bluetooth status | lock screen notification mode option",
     "tags": [
       "settings",
@@ -7879,7 +7879,7 @@
   {
     "term": "Discharging",
     "context": "Discharging",
-    "reference": "Services/BatteryService.qml:419, Services/BatteryService.qml:440, Services/BatteryService.qml:450",
+    "reference": "Services/BatteryService.qml:442, Services/BatteryService.qml:463, Services/BatteryService.qml:473",
     "comment": "battery status",
     "tags": [
       "shell"
@@ -7992,7 +7992,7 @@
   {
     "term": "Display Assignment",
     "context": "Display Assignment",
-    "reference": "Modules/Settings/LockScreenTab.qml:853, Modules/Settings/DankBarTab.qml:596, Modules/Settings/FrameTab.qml:393",
+    "reference": "Modules/Settings/LockScreenTab.qml:861, Modules/Settings/DankBarTab.qml:596, Modules/Settings/FrameTab.qml:393",
     "comment": "",
     "tags": [
       "settings"
@@ -8375,7 +8375,7 @@
   {
     "term": "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.",
     "context": "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.",
-    "reference": "Modules/Settings/WidgetsTab.qml:1310",
+    "reference": "Modules/Settings/WidgetsTab.qml:1316",
     "comment": "",
     "tags": [
       "settings"
@@ -8555,7 +8555,7 @@
   {
     "term": "Dynamic colors parse error: %1",
     "context": "Dynamic colors parse error: %1",
-    "reference": "Common/Theme.qml:2226",
+    "reference": "Common/Theme.qml:2228",
     "comment": "",
     "tags": [
       "shell"
@@ -8700,7 +8700,7 @@
   {
     "term": "Empty",
     "context": "Empty",
-    "reference": "DMSShell.qml:376, Services/BatteryService.qml:421, Modules/Notepad/NotepadTextEditor.qml:994",
+    "reference": "DMSShell.qml:376, Services/BatteryService.qml:444, Modules/Notepad/NotepadTextEditor.qml:994",
     "comment": "battery status",
     "tags": [
       "shell"
@@ -8845,7 +8845,7 @@
   {
     "term": "Enable Video Screensaver",
     "context": "Enable Video Screensaver",
-    "reference": "Modules/Settings/LockScreenTab.qml:787",
+    "reference": "Modules/Settings/LockScreenTab.qml:795",
     "comment": "",
     "tags": [
       "settings"
@@ -8909,7 +8909,7 @@
   {
     "term": "Enable fingerprint authentication",
     "context": "Enable fingerprint authentication",
-    "reference": "Modules/Settings/LockScreenTab.qml:503",
+    "reference": "Modules/Settings/LockScreenTab.qml:511",
     "comment": "",
     "tags": [
       "settings"
@@ -8927,7 +8927,7 @@
   {
     "term": "Enable loginctl lock integration",
     "context": "Enable loginctl lock integration",
-    "reference": "Modules/Settings/LockScreenTab.qml:729",
+    "reference": "Modules/Settings/LockScreenTab.qml:737",
     "comment": "",
     "tags": [
       "settings"
@@ -8945,7 +8945,7 @@
   {
     "term": "Enable security key authentication",
     "context": "Enable security key authentication",
-    "reference": "Modules/Settings/LockScreenTab.qml:514",
+    "reference": "Modules/Settings/LockScreenTab.qml:522",
     "comment": "Enable FIDO2/U2F hardware security key for lock screen",
     "tags": [
       "settings"
@@ -9011,7 +9011,7 @@
   {
     "term": "Enlarge on Hover",
     "context": "Enlarge on Hover",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:4212",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:4330",
     "comment": "",
     "tags": [
       "settings"
@@ -9020,7 +9020,7 @@
   {
     "term": "Enlargement %",
     "context": "Enlargement %",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:4254",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:4372",
     "comment": "",
     "tags": [
       "settings"
@@ -9209,7 +9209,7 @@
   {
     "term": "Entry pinned",
     "context": "Entry pinned",
-    "reference": "Services/ClipboardService.qml:315",
+    "reference": "Services/ClipboardService.qml:316",
     "comment": "",
     "tags": [
       "shell"
@@ -9218,7 +9218,7 @@
   {
     "term": "Entry unpinned",
     "context": "Entry unpinned",
-    "reference": "Services/ClipboardService.qml:329",
+    "reference": "Services/ClipboardService.qml:330",
     "comment": "",
     "tags": [
       "shell"
@@ -9553,7 +9553,7 @@
   {
     "term": "Failed to apply %1 colors",
     "context": "Failed to apply %1 colors",
-    "reference": "Common/Theme.qml:1912, Common/Theme.qml:1941",
+    "reference": "Common/Theme.qml:1914, Common/Theme.qml:1943",
     "comment": "",
     "tags": [
       "shell"
@@ -9607,7 +9607,7 @@
   {
     "term": "Failed to check pin limit",
     "context": "Failed to check pin limit",
-    "reference": "Services/ClipboardService.qml:298",
+    "reference": "Services/ClipboardService.qml:299",
     "comment": "",
     "tags": [
       "shell"
@@ -9643,7 +9643,7 @@
   {
     "term": "Failed to copy entry",
     "context": "Failed to copy entry",
-    "reference": "Services/ClipboardService.qml:209, Services/ClipboardService.qml:238",
+    "reference": "Services/ClipboardService.qml:210, Services/ClipboardService.qml:239",
     "comment": "",
     "tags": [
       "shell"
@@ -9787,7 +9787,7 @@
   {
     "term": "Failed to extract theme",
     "context": "Failed to extract theme",
-    "reference": "Modules/Settings/ThemeColorsTab.qml:3187",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:3204",
     "comment": "extract theme error",
     "tags": [
       "settings"
@@ -9877,7 +9877,7 @@
   {
     "term": "Failed to parse %1",
     "context": "Failed to parse %1",
-    "reference": "Common/SettingsData.qml:1747, Common/SettingsData.qml:1867, Common/SettingsData.qml:3410, Services/ToastService.qml:188",
+    "reference": "Common/SettingsData.qml:1751, Common/SettingsData.qml:1871, Common/SettingsData.qml:3414, Services/ToastService.qml:188",
     "comment": "",
     "tags": [
       "shell"
@@ -9895,7 +9895,7 @@
   {
     "term": "Failed to pin entry",
     "context": "Failed to pin entry",
-    "reference": "Services/ClipboardService.qml:312",
+    "reference": "Services/ClipboardService.qml:313",
     "comment": "",
     "tags": [
       "shell"
@@ -9913,7 +9913,7 @@
   {
     "term": "Failed to read theme file: %1",
     "context": "Failed to read theme file: %1",
-    "reference": "Common/Theme.qml:2174",
+    "reference": "Common/Theme.qml:2176",
     "comment": "",
     "tags": [
       "shell"
@@ -10237,7 +10237,7 @@
   {
     "term": "Failed to unpin entry",
     "context": "Failed to unpin entry",
-    "reference": "Services/ClipboardService.qml:326",
+    "reference": "Services/ClipboardService.qml:327",
     "comment": "",
     "tags": [
       "shell"
@@ -10474,7 +10474,7 @@
   {
     "term": "Filter",
     "context": "Filter",
-    "reference": "Modules/Settings/PluginBrowser.qml:872",
+    "reference": "Modules/Settings/PluginBrowser.qml:879",
     "comment": "plugin browser category filter label",
     "tags": [
       "settings"
@@ -10483,7 +10483,7 @@
   {
     "term": "Filter by type",
     "context": "Filter by type",
-    "reference": "Modals/Clipboard/ClipboardContent.qml:153",
+    "reference": "Modals/Clipboard/ClipboardContent.qml:154",
     "comment": "Clipboard history type filter button tooltip",
     "tags": [
       "shell"
@@ -10974,7 +10974,7 @@
   {
     "term": "Font used for the clock and date on the lock screen",
     "context": "Font used for the clock and date on the lock screen",
-    "reference": "Modules/Settings/LockScreenTab.qml:378",
+    "reference": "Modules/Settings/LockScreenTab.qml:386",
     "comment": "",
     "tags": [
       "settings"
@@ -11218,7 +11218,7 @@
   {
     "term": "Format the date on the login screen",
     "context": "Format the date on the login screen",
-    "reference": "Modules/Settings/GreeterTab.qml:548",
+    "reference": "Modules/Settings/GreeterTab.qml:557",
     "comment": "",
     "tags": [
       "settings"
@@ -11335,7 +11335,7 @@
   {
     "term": "Full Content",
     "context": "Full Content",
-    "reference": "Modules/Settings/LockScreenTab.qml:349, Modules/Settings/NotificationsTab.qml:852",
+    "reference": "Modules/Settings/LockScreenTab.qml:357, Modules/Settings/NotificationsTab.qml:852",
     "comment": "lock screen notification mode option",
     "tags": [
       "settings"
@@ -11399,7 +11399,7 @@
   {
     "term": "Fully Charged",
     "context": "Fully Charged",
-    "reference": "Services/BatteryService.qml:423",
+    "reference": "Services/BatteryService.qml:446",
     "comment": "battery status",
     "tags": [
       "shell"
@@ -11453,7 +11453,7 @@
   {
     "term": "GTK colors applied successfully",
     "context": "GTK colors applied successfully",
-    "reference": "Common/Theme.qml:1908",
+    "reference": "Common/Theme.qml:1910",
     "comment": "",
     "tags": [
       "shell"
@@ -11832,7 +11832,7 @@
   {
     "term": "Group by App",
     "context": "Group by App",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:3630, Modules/Settings/DockTab.qml:181",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:3748, Modules/Settings/DockTab.qml:181",
     "comment": "",
     "tags": [
       "settings"
@@ -12113,7 +12113,7 @@
   {
     "term": "Hide 3rd Party",
     "context": "Hide 3rd Party",
-    "reference": "Modules/Settings/PluginBrowser.qml:685",
+    "reference": "Modules/Settings/PluginBrowser.qml:692",
     "comment": "",
     "tags": [
       "settings"
@@ -12140,7 +12140,7 @@
   {
     "term": "Hide Indicators",
     "context": "Hide Indicators",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:4046",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:4164",
     "comment": "",
     "tags": [
       "settings"
@@ -12356,7 +12356,7 @@
   {
     "term": "History cleared. %1 pinned entries kept.",
     "context": "History cleared. %1 pinned entries kept.",
-    "reference": "Services/ClipboardService.qml:345",
+    "reference": "Services/ClipboardService.qml:346",
     "comment": "",
     "tags": [
       "shell"
@@ -12702,7 +12702,7 @@
   {
     "term": "I Understand",
     "context": "I Understand",
-    "reference": "Modules/Settings/PluginBrowser.qml:1648",
+    "reference": "Modules/Settings/PluginBrowser.qml:1655",
     "comment": "",
     "tags": [
       "settings"
@@ -12784,7 +12784,7 @@
   {
     "term": "Icon Size %",
     "context": "Icon Size %",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:4307",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:4425",
     "comment": "",
     "tags": [
       "settings"
@@ -12811,7 +12811,7 @@
   {
     "term": "Icon theme changed outside DMS; switched to System Default",
     "context": "Icon theme changed outside DMS; switched to System Default",
-    "reference": "Common/SettingsData.qml:1453",
+    "reference": "Common/SettingsData.qml:1457",
     "comment": "shown when an external tool overrides the icon theme DMS applied",
     "tags": [
       "shell"
@@ -12992,7 +12992,7 @@
   {
     "term": "Image copied to clipboard",
     "context": "Image copied to clipboard",
-    "reference": "Services/ClipboardService.qml:212",
+    "reference": "Services/ClipboardService.qml:213",
     "comment": "",
     "tags": [
       "shell"
@@ -13021,7 +13021,7 @@
   {
     "term": "Inactive Monitor Color",
     "context": "Inactive Monitor Color",
-    "reference": "Modules/Settings/LockScreenTab.qml:889, Modules/Settings/LockScreenTab.qml:920",
+    "reference": "Modules/Settings/LockScreenTab.qml:897, Modules/Settings/LockScreenTab.qml:928",
     "comment": "",
     "tags": [
       "settings"
@@ -13276,7 +13276,7 @@
   {
     "term": "Install",
     "context": "Install",
-    "reference": "Modules/Settings/PluginBrowser.qml:472, Modules/Settings/PluginBrowser.qml:1206, Modules/Settings/ThemeBrowser.qml:120, Modules/Settings/ThemeBrowser.qml:766",
+    "reference": "Modules/Settings/PluginBrowser.qml:472, Modules/Settings/PluginBrowser.qml:1213, Modules/Settings/ThemeBrowser.qml:189",
     "comment": "install action button",
     "tags": [
       "settings"
@@ -13294,7 +13294,7 @@
   {
     "term": "Install Theme",
     "context": "Install Theme",
-    "reference": "Modules/Settings/ThemeBrowser.qml:118",
+    "reference": "Modules/Settings/ThemeBrowser.qml:187",
     "comment": "theme installation dialog title",
     "tags": [
       "settings"
@@ -13303,7 +13303,7 @@
   {
     "term": "Install color themes from the DMS theme registry",
     "context": "Install color themes from the DMS theme registry",
-    "reference": "Modules/Settings/ThemeBrowser.qml:289",
+    "reference": "Modules/Settings/ThemeBrowser.qml:388",
     "comment": "theme browser description",
     "tags": [
       "settings"
@@ -13321,7 +13321,7 @@
   {
     "term": "Install failed: %1",
     "context": "Install failed: %1",
-    "reference": "Services/PluginService.qml:1284, Modules/Settings/ThemeBrowser.qml:68",
+    "reference": "Services/PluginService.qml:1288, Modules/Settings/ThemeBrowser.qml:137",
     "comment": "installation error",
     "tags": [
       "settings",
@@ -13349,7 +13349,7 @@
   {
     "term": "Install plugins from the DMS plugin registry",
     "context": "Install plugins from the DMS plugin registry",
-    "reference": "Modules/Settings/PluginBrowser.qml:665",
+    "reference": "Modules/Settings/PluginBrowser.qml:672",
     "comment": "plugin browser description",
     "tags": [
       "settings"
@@ -13358,7 +13358,7 @@
   {
     "term": "Install theme '%1' from the DMS registry?",
     "context": "Install theme '%1' from the DMS registry?",
-    "reference": "Modules/Settings/ThemeBrowser.qml:119",
+    "reference": "Modules/Settings/ThemeBrowser.qml:188",
     "comment": "theme installation confirmation",
     "tags": [
       "settings"
@@ -13367,7 +13367,7 @@
   {
     "term": "Installation and PAM setup are documented in the ",
     "context": "Installation and PAM setup are documented in the ",
-    "reference": "Modules/Settings/GreeterTab.qml:657",
+    "reference": "Modules/Settings/GreeterTab.qml:666",
     "comment": "",
     "tags": [
       "settings"
@@ -13376,7 +13376,7 @@
   {
     "term": "Installed",
     "context": "Installed",
-    "reference": "Modules/Settings/PluginBrowser.qml:1202, Modules/Settings/ThemeBrowser.qml:769",
+    "reference": "Modules/Settings/PluginBrowser.qml:1209",
     "comment": "installed status",
     "tags": [
       "settings"
@@ -13394,7 +13394,7 @@
   {
     "term": "Installed: %1",
     "context": "Installed: %1",
-    "reference": "Services/PluginService.qml:1289, Modules/Settings/ThemeBrowser.qml:71",
+    "reference": "Services/PluginService.qml:1293, Modules/Settings/ThemeBrowser.qml:140",
     "comment": "installation success",
     "tags": [
       "settings",
@@ -13404,7 +13404,7 @@
   {
     "term": "Installing: %1",
     "context": "Installing: %1",
-    "reference": "Services/PluginService.qml:1281, Modules/Settings/ThemeBrowser.qml:65",
+    "reference": "Services/PluginService.qml:1285, Modules/Settings/ThemeBrowser.qml:134",
     "comment": "installation progress",
     "tags": [
       "settings",
@@ -13478,7 +13478,7 @@
   {
     "term": "Invalid JSON format: %1",
     "context": "Invalid JSON format: %1",
-    "reference": "Common/Theme.qml:2160",
+    "reference": "Common/Theme.qml:2162",
     "comment": "",
     "tags": [
       "shell"
@@ -13749,7 +13749,7 @@
   {
     "term": "Key combination",
     "context": "Key combination",
-    "reference": "Modules/Settings/LockScreenTab.qml:560",
+    "reference": "Modules/Settings/LockScreenTab.qml:568",
     "comment": "lock screen security key shortcut key combination setting",
     "tags": [
       "settings"
@@ -13839,7 +13839,7 @@
   {
     "term": "Keyboard Shortcuts",
     "context": "Keyboard Shortcuts",
-    "reference": "Modals/Settings/SettingsSidebar.qml:228, Modals/Settings/SettingsSidebar.qml:698, Modals/Clipboard/ClipboardHeader.qml:62, Modules/Notepad/NotepadSettings.qml:526, Modules/Settings/KeybindsTab.qml:290",
+    "reference": "Modals/Settings/SettingsSidebar.qml:228, Modals/Settings/SettingsSidebar.qml:698, Modals/Clipboard/ClipboardHeader.qml:63, Modules/Notepad/NotepadSettings.qml:526, Modules/Settings/KeybindsTab.qml:290",
     "comment": "",
     "tags": [
       "settings",
@@ -13858,7 +13858,7 @@
   {
     "term": "Keyboard shortcut to start security key unlock",
     "context": "Keyboard shortcut to start security key unlock",
-    "reference": "Modules/Settings/LockScreenTab.qml:542",
+    "reference": "Modules/Settings/LockScreenTab.qml:550",
     "comment": "lock screen security key shortcut setting",
     "tags": [
       "settings"
@@ -13948,7 +13948,7 @@
   {
     "term": "Large",
     "context": "Large",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:2037, Modules/Settings/WidgetsTabSection.qml:3436",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2037, Modules/Settings/WidgetsTabSection.qml:3554",
     "comment": "",
     "tags": [
       "settings"
@@ -13957,7 +13957,7 @@
   {
     "term": "Largest",
     "context": "Largest",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:2042, Modules/Settings/WidgetsTabSection.qml:3441",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2042, Modules/Settings/WidgetsTabSection.qml:3559",
     "comment": "",
     "tags": [
       "settings"
@@ -14167,7 +14167,7 @@
   {
     "term": "Left Section",
     "context": "Left Section",
-    "reference": "Modules/Settings/WidgetSelectionPopup.qml:27, Modules/Settings/WidgetsTab.qml:1334",
+    "reference": "Modules/Settings/WidgetSelectionPopup.qml:27, Modules/Settings/WidgetsTab.qml:1340",
     "comment": "",
     "tags": [
       "settings"
@@ -14468,7 +14468,7 @@
   {
     "term": "Lock at startup",
     "context": "Lock at startup",
-    "reference": "Modules/Settings/LockScreenTab.qml:762",
+    "reference": "Modules/Settings/LockScreenTab.qml:770",
     "comment": "",
     "tags": [
       "settings"
@@ -14477,7 +14477,7 @@
   {
     "term": "Lock before suspend",
     "context": "Lock before suspend",
-    "reference": "Modules/Settings/PowerSleepTab.qml:92, Modules/Settings/LockScreenTab.qml:743",
+    "reference": "Modules/Settings/PowerSleepTab.qml:92, Modules/Settings/LockScreenTab.qml:751",
     "comment": "",
     "tags": [
       "settings"
@@ -14495,7 +14495,7 @@
   {
     "term": "Lock screen font",
     "context": "Lock screen font",
-    "reference": "Modules/Settings/LockScreenTab.qml:377",
+    "reference": "Modules/Settings/LockScreenTab.qml:385",
     "comment": "",
     "tags": [
       "settings"
@@ -14722,7 +14722,7 @@
   {
     "term": "Managed by the primary PAM source",
     "context": "Managed by the primary PAM source",
-    "reference": "Modules/Settings/GreeterTab.qml:22, Modules/Settings/GreeterTab.qml:42, Modules/Settings/LockScreenTab.qml:504, Modules/Settings/LockScreenTab.qml:515",
+    "reference": "Modules/Settings/GreeterTab.qml:22, Modules/Settings/GreeterTab.qml:42, Modules/Settings/LockScreenTab.qml:512, Modules/Settings/LockScreenTab.qml:523",
     "comment": "factor managed by PAM source status",
     "tags": [
       "settings"
@@ -14947,7 +14947,7 @@
   {
     "term": "Material Battery Style",
     "context": "Material Battery Style",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:3367, Modules/Settings/DankIslandTab.qml:303",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:3485, Modules/Settings/DankIslandTab.qml:303",
     "comment": "island settings: battery meter style row",
     "tags": [
       "settings"
@@ -15056,7 +15056,7 @@
   {
     "term": "Max Pinned Apps",
     "context": "Max Pinned Apps",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:3831",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:3949",
     "comment": "",
     "tags": [
       "settings"
@@ -15074,7 +15074,7 @@
   {
     "term": "Max Running Apps",
     "context": "Max Running Apps",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:3887",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:4005",
     "comment": "",
     "tags": [
       "settings"
@@ -15238,7 +15238,7 @@
   {
     "term": "Maximum pinned entries reached",
     "context": "Maximum pinned entries reached",
-    "reference": "Services/ClipboardService.qml:304",
+    "reference": "Services/ClipboardService.qml:305",
     "comment": "",
     "tags": [
       "shell"
@@ -15348,7 +15348,7 @@
   {
     "term": "Medium",
     "context": "Medium",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:116, Modules/Settings/TypographyMotionTab.qml:128, Modules/Settings/TypographyMotionTab.qml:156, Modules/Settings/TypographyMotionTab.qml:361, Modules/Settings/TypographyMotionTab.qml:444, Modules/Settings/TypographyMotionTab.qml:513, Modules/Settings/WidgetsTabSection.qml:2032, Modules/Settings/WidgetsTabSection.qml:3431, Modules/Settings/NotificationsTab.qml:379",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:116, Modules/Settings/TypographyMotionTab.qml:128, Modules/Settings/TypographyMotionTab.qml:156, Modules/Settings/TypographyMotionTab.qml:361, Modules/Settings/TypographyMotionTab.qml:444, Modules/Settings/TypographyMotionTab.qml:513, Modules/Settings/WidgetsTabSection.qml:2032, Modules/Settings/WidgetsTabSection.qml:3549, Modules/Settings/NotificationsTab.qml:379",
     "comment": "font weight",
     "tags": [
       "settings"
@@ -15484,7 +15484,7 @@
   {
     "term": "Middle Section",
     "context": "Middle Section",
-    "reference": "Modules/Settings/WidgetsTab.qml:1422",
+    "reference": "Modules/Settings/WidgetsTab.qml:1428",
     "comment": "",
     "tags": [
       "settings"
@@ -16574,7 +16574,7 @@
   {
     "term": "No battery",
     "context": "No battery",
-    "reference": "Services/BatteryService.qml:435, Modules/ControlCenter/Widgets/BatteryPill.qml:15",
+    "reference": "Services/BatteryService.qml:458, Modules/ControlCenter/Widgets/BatteryPill.qml:15",
     "comment": "battery status",
     "tags": [
       "shell"
@@ -16947,7 +16947,7 @@
   {
     "term": "No plugins found",
     "context": "No plugins found",
-    "reference": "Modules/Settings/PluginBrowser.qml:1003, Modules/Settings/PluginsTab.qml:594",
+    "reference": "Modules/Settings/PluginBrowser.qml:1010, Modules/Settings/PluginsTab.qml:594",
     "comment": "empty plugin list",
     "tags": [
       "settings"
@@ -17002,7 +17002,7 @@
   {
     "term": "No recent clipboard entries found",
     "context": "No recent clipboard entries found",
-    "reference": "Modals/Clipboard/ClipboardContent.qml:234",
+    "reference": "Modals/Clipboard/ClipboardContent.qml:235",
     "comment": "",
     "tags": [
       "shell"
@@ -17040,7 +17040,7 @@
   {
     "term": "No saved clipboard entries",
     "context": "No saved clipboard entries",
-    "reference": "Modals/Clipboard/ClipboardContent.qml:296",
+    "reference": "Modals/Clipboard/ClipboardContent.qml:297",
     "comment": "",
     "tags": [
       "shell"
@@ -17049,7 +17049,7 @@
   {
     "term": "No screenshot provided",
     "context": "No screenshot provided",
-    "reference": "Modules/Settings/PluginBrowser.qml:1303",
+    "reference": "Modules/Settings/PluginBrowser.qml:1310",
     "comment": "plugin browser no screenshot",
     "tags": [
       "settings"
@@ -17094,7 +17094,7 @@
   {
     "term": "No themes found",
     "context": "No themes found",
-    "reference": "Modules/Settings/ThemeBrowser.qml:802",
+    "reference": "Modules/Settings/ThemeBrowser.qml:485",
     "comment": "empty theme list",
     "tags": [
       "settings"
@@ -17461,7 +17461,7 @@
   {
     "term": "Notification Display",
     "context": "Notification Display",
-    "reference": "Modules/Settings/LockScreenTab.qml:347, Modules/Settings/NotificationsTab.qml:850",
+    "reference": "Modules/Settings/LockScreenTab.qml:355, Modules/Settings/NotificationsTab.qml:850",
     "comment": "lock screen notification privacy setting",
     "tags": [
       "settings"
@@ -18217,7 +18217,7 @@
   {
     "term": "Overflow",
     "context": "Overflow",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:3812",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:3930",
     "comment": "",
     "tags": [
       "settings"
@@ -18533,15 +18533,6 @@
     ]
   },
   {
-    "term": "Partial",
-    "context": "Partial",
-    "reference": "Modules/Settings/ThemeBrowser.qml:557",
-    "comment": "contrast badge suffix: only some variants pass",
-    "tags": [
-      "settings"
-    ]
-  },
-  {
     "term": "Partly Cloudy",
     "context": "Partly Cloudy",
     "reference": "Services/WeatherService.qml:128",
@@ -18629,7 +18620,7 @@
   {
     "term": "Paste failed: %1",
     "context": "Paste failed: %1",
-    "reference": "Services/ClipboardService.qml:81",
+    "reference": "Services/ClipboardService.qml:82",
     "comment": "",
     "tags": [
       "shell"
@@ -18647,7 +18638,7 @@
   {
     "term": "Path to a video file or folder containing videos",
     "context": "Path to a video file or folder containing videos",
-    "reference": "Modules/Settings/LockScreenTab.qml:806",
+    "reference": "Modules/Settings/LockScreenTab.qml:814",
     "comment": "",
     "tags": [
       "settings"
@@ -18694,7 +18685,7 @@
   {
     "term": "Pending Charge",
     "context": "Pending Charge",
-    "reference": "Services/BatteryService.qml:425",
+    "reference": "Services/BatteryService.qml:448",
     "comment": "battery status",
     "tags": [
       "shell"
@@ -18703,7 +18694,7 @@
   {
     "term": "Pending Discharge",
     "context": "Pending Discharge",
-    "reference": "Services/BatteryService.qml:427",
+    "reference": "Services/BatteryService.qml:450",
     "comment": "battery status",
     "tags": [
       "shell"
@@ -18757,7 +18748,7 @@
   {
     "term": "Performance",
     "context": "Performance",
-    "reference": "Modals/ProcessListModal.qml:305, Common/Theme.qml:1557",
+    "reference": "Modals/ProcessListModal.qml:305, Common/Theme.qml:1559",
     "comment": "power profile option",
     "tags": [
       "shell"
@@ -18820,7 +18811,7 @@
   {
     "term": "Pick a different random video each time from the same folder",
     "context": "Pick a different random video each time from the same folder",
-    "reference": "Modules/Settings/LockScreenTab.qml:842",
+    "reference": "Modules/Settings/LockScreenTab.qml:850",
     "comment": "",
     "tags": [
       "settings"
@@ -18985,7 +18976,7 @@
   {
     "term": "Play a video when the screen locks.",
     "context": "Play a video when the screen locks.",
-    "reference": "Modules/Settings/LockScreenTab.qml:788",
+    "reference": "Modules/Settings/LockScreenTab.qml:796",
     "comment": "",
     "tags": [
       "settings"
@@ -19084,7 +19075,7 @@
   {
     "term": "Plugged In",
     "context": "Plugged In",
-    "reference": "Services/BatteryService.qml:440, Services/BatteryService.qml:444, Services/BatteryService.qml:450, Modules/Settings/SoundsTab.qml:164, Modules/ControlCenter/Widgets/BatteryPill.qml:28",
+    "reference": "Services/BatteryService.qml:463, Services/BatteryService.qml:467, Services/BatteryService.qml:473, Modules/Settings/SoundsTab.qml:164, Modules/ControlCenter/Widgets/BatteryPill.qml:28",
     "comment": "battery status",
     "tags": [
       "settings",
@@ -19476,7 +19467,7 @@
   {
     "term": "Power Saver",
     "context": "Power Saver",
-    "reference": "Common/Theme.qml:1553",
+    "reference": "Common/Theme.qml:1555",
     "comment": "power profile option",
     "tags": [
       "shell"
@@ -19485,7 +19476,7 @@
   {
     "term": "Power off monitors on lock",
     "context": "Power off monitors on lock",
-    "reference": "Modules/Settings/LockScreenTab.qml:753",
+    "reference": "Modules/Settings/LockScreenTab.qml:761",
     "comment": "",
     "tags": [
       "settings"
@@ -19512,7 +19503,7 @@
   {
     "term": "Pre-fill the last successful username on the greeter",
     "context": "Pre-fill the last successful username on the greeter",
-    "reference": "Modules/Settings/GreeterTab.qml:625",
+    "reference": "Modules/Settings/GreeterTab.qml:634",
     "comment": "",
     "tags": [
       "settings"
@@ -19521,7 +19512,7 @@
   {
     "term": "Pre-select the last used session on the greeter",
     "context": "Pre-select the last used session on the greeter",
-    "reference": "Modules/Settings/GreeterTab.qml:616",
+    "reference": "Modules/Settings/GreeterTab.qml:625",
     "comment": "",
     "tags": [
       "settings"
@@ -19584,7 +19575,7 @@
   {
     "term": "Press Ctrl+key to set. Esc cancels.",
     "context": "Press Ctrl+key to set. Esc cancels.",
-    "reference": "Modules/Settings/LockScreenTab.qml:569",
+    "reference": "Modules/Settings/LockScreenTab.qml:577",
     "comment": "lock screen security key shortcut key combination capture hint",
     "tags": [
       "settings"
@@ -19611,7 +19602,7 @@
   {
     "term": "Press key...",
     "context": "Press key...",
-    "reference": "Modules/Settings/LockScreenTab.qml:583, Modules/Settings/KeybindItem.qml:667",
+    "reference": "Modules/Settings/LockScreenTab.qml:591, Modules/Settings/KeybindItem.qml:667",
     "comment": "lock screen security key shortcut key combination capture prompt",
     "tags": [
       "settings"
@@ -20031,7 +20022,7 @@
   {
     "term": "Qt colors applied successfully",
     "context": "Qt colors applied successfully",
-    "reference": "Common/Theme.qml:1939",
+    "reference": "Common/Theme.qml:1941",
     "comment": "",
     "tags": [
       "shell"
@@ -20049,7 +20040,7 @@
   {
     "term": "QtMultimedia is not available - video screensaver requires qt multimedia services",
     "context": "QtMultimedia is not available - video screensaver requires qt multimedia services",
-    "reference": "Modules/Settings/LockScreenTab.qml:777",
+    "reference": "Modules/Settings/LockScreenTab.qml:785",
     "comment": "",
     "tags": [
       "settings"
@@ -20257,7 +20248,7 @@
   {
     "term": "Recent",
     "context": "Recent",
-    "reference": "Modals/Clipboard/ClipboardHeader.qml:54",
+    "reference": "Modals/Clipboard/ClipboardHeader.qml:55",
     "comment": "",
     "tags": [
       "shell"
@@ -20393,7 +20384,7 @@
   {
     "term": "Related: %1",
     "context": "Related: %1",
-    "reference": "Modules/Settings/PluginBrowser.qml:1464",
+    "reference": "Modules/Settings/PluginBrowser.qml:1471",
     "comment": "related plugins",
     "tags": [
       "settings"
@@ -20492,7 +20483,7 @@
   {
     "term": "Remember last session",
     "context": "Remember last session",
-    "reference": "Modules/Settings/GreeterTab.qml:615",
+    "reference": "Modules/Settings/GreeterTab.qml:624",
     "comment": "",
     "tags": [
       "settings"
@@ -20501,7 +20492,7 @@
   {
     "term": "Remember last user",
     "context": "Remember last user",
-    "reference": "Modules/Settings/GreeterTab.qml:624",
+    "reference": "Modules/Settings/GreeterTab.qml:633",
     "comment": "",
     "tags": [
       "settings"
@@ -20763,7 +20754,7 @@
   {
     "term": "Requires %1",
     "context": "Requires %1",
-    "reference": "Modules/Settings/PluginBrowser.qml:1204",
+    "reference": "Modules/Settings/PluginBrowser.qml:1211",
     "comment": "version requirement",
     "tags": [
       "settings"
@@ -20818,7 +20809,7 @@
   {
     "term": "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys).",
     "context": "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys).",
-    "reference": "Modules/Settings/GreeterTab.qml:648",
+    "reference": "Modules/Settings/GreeterTab.qml:657",
     "comment": "",
     "tags": [
       "settings"
@@ -20836,7 +20827,7 @@
   {
     "term": "Requires remembering the last user and session. Enable those options first.",
     "context": "Requires remembering the last user and session. Enable those options first.",
-    "reference": "Modules/Settings/GreeterTab.qml:634",
+    "reference": "Modules/Settings/GreeterTab.qml:643",
     "comment": "",
     "tags": [
       "settings"
@@ -20863,7 +20854,7 @@
   {
     "term": "Reset",
     "context": "Reset",
-    "reference": "Modals/DankLauncherV2/AppEditView.qml:259, Modules/Settings/WidgetsTab.qml:1279, Modules/Settings/KeybindsTab.qml:122, Modules/Settings/DankDashTab.qml:249, Modules/Settings/DankDashTab.qml:264, Modules/Settings/Widgets/SettingsSliderRow.qml:134, Modules/Settings/Widgets/SettingsSliderCard.qml:122, Modules/ControlCenter/Components/EditControls.qml:306",
+    "reference": "Modals/DankLauncherV2/AppEditView.qml:259, Modules/Settings/WidgetsTab.qml:1285, Modules/Settings/KeybindsTab.qml:122, Modules/Settings/DankDashTab.qml:249, Modules/Settings/DankDashTab.qml:264, Modules/Settings/Widgets/SettingsSliderRow.qml:134, Modules/Settings/Widgets/SettingsSliderCard.qml:122, Modules/ControlCenter/Components/EditControls.qml:306",
     "comment": "",
     "tags": [
       "settings",
@@ -21037,7 +21028,7 @@
   {
     "term": "Retry",
     "context": "Retry",
-    "reference": "Modals/Greeter/GreeterPluginsPage.qml:176, Modules/Settings/PluginBrowser.qml:1037",
+    "reference": "Modals/Greeter/GreeterPluginsPage.qml:176, Modules/Settings/PluginBrowser.qml:1044",
     "comment": "retry failed action button",
     "tags": [
       "settings",
@@ -21129,7 +21120,7 @@
   {
     "term": "Right Section",
     "context": "Right Section",
-    "reference": "Modules/Settings/WidgetSelectionPopup.qml:31, Modules/Settings/WidgetsTab.qml:1511",
+    "reference": "Modules/Settings/WidgetSelectionPopup.qml:31, Modules/Settings/WidgetsTab.qml:1517",
     "comment": "",
     "tags": [
       "settings"
@@ -21354,7 +21345,7 @@
   {
     "term": "Running Apps Settings",
     "context": "Running Apps Settings",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:3542",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:3660",
     "comment": "",
     "tags": [
       "settings"
@@ -21581,7 +21572,7 @@
   {
     "term": "Saved",
     "context": "Saved",
-    "reference": "Modals/Clipboard/ClipboardHeader.qml:54, Modules/Notepad/NotepadTextEditor.qml:1025, Modules/Settings/NetworkWifiTab.qml:572, Modules/ControlCenter/Details/NetworkDetail.qml:1183",
+    "reference": "Modals/Clipboard/ClipboardHeader.qml:55, Modules/Notepad/NotepadTextEditor.qml:1025, Modules/Settings/NetworkWifiTab.qml:572, Modules/ControlCenter/Details/NetworkDetail.qml:1183",
     "comment": "",
     "tags": [
       "settings",
@@ -21618,7 +21609,7 @@
   {
     "term": "Saved item deleted",
     "context": "Saved item deleted",
-    "reference": "Services/ClipboardService.qml:290",
+    "reference": "Services/ClipboardService.qml:291",
     "comment": "",
     "tags": [
       "shell"
@@ -21729,7 +21720,7 @@
   {
     "term": "Screenshot unavailable",
     "context": "Screenshot unavailable",
-    "reference": "Modules/Settings/PluginBrowser.qml:1303",
+    "reference": "Modules/Settings/PluginBrowser.qml:1310",
     "comment": "plugin browser screenshot error",
     "tags": [
       "settings"
@@ -21900,7 +21891,7 @@
   {
     "term": "Search plugins...",
     "context": "Search plugins...",
-    "reference": "Modules/Settings/PluginBrowser.qml:743",
+    "reference": "Modules/Settings/PluginBrowser.qml:750",
     "comment": "plugin search placeholder",
     "tags": [
       "settings"
@@ -21927,7 +21918,7 @@
   {
     "term": "Search themes...",
     "context": "Search themes...",
-    "reference": "Modules/Settings/ThemeBrowser.qml:309",
+    "reference": "Modules/Settings/ThemeBrowser.qml:408",
     "comment": "theme search placeholder",
     "tags": [
       "settings"
@@ -21975,7 +21966,7 @@
   {
     "term": "Second Factor (AND)",
     "context": "Second Factor (AND)",
-    "reference": "Modules/Settings/LockScreenTab.qml:528, Modules/Settings/LockScreenTab.qml:529, Modules/Settings/LockScreenTab.qml:531",
+    "reference": "Modules/Settings/LockScreenTab.qml:536, Modules/Settings/LockScreenTab.qml:537, Modules/Settings/LockScreenTab.qml:539",
     "comment": "U2F mode option: key required after password or fingerprint",
     "tags": [
       "settings"
@@ -22031,7 +22022,7 @@
   {
     "term": "Security Key PAM Source",
     "context": "Security Key PAM Source",
-    "reference": "Modules/Settings/LockScreenTab.qml:652",
+    "reference": "Modules/Settings/LockScreenTab.qml:660",
     "comment": "lock screen dedicated U2F PAM source setting",
     "tags": [
       "settings"
@@ -22058,7 +22049,7 @@
   {
     "term": "Security key mode",
     "context": "Security key mode",
-    "reference": "Modules/Settings/LockScreenTab.qml:525",
+    "reference": "Modules/Settings/LockScreenTab.qml:533",
     "comment": "lock screen U2F security key mode setting",
     "tags": [
       "settings"
@@ -22067,7 +22058,7 @@
   {
     "term": "Security key shortcut",
     "context": "Security key shortcut",
-    "reference": "Modules/Settings/LockScreenTab.qml:541",
+    "reference": "Modules/Settings/LockScreenTab.qml:549",
     "comment": "lock screen security key shortcut toggle",
     "tags": [
       "settings"
@@ -22113,7 +22104,7 @@
   {
     "term": "Select Bar",
     "context": "Select Bar",
-    "reference": "Modules/Settings/WidgetsTab.qml:1193",
+    "reference": "Modules/Settings/WidgetsTab.qml:1199",
     "comment": "",
     "tags": [
       "settings"
@@ -22320,7 +22311,7 @@
   {
     "term": "Select greeter background image",
     "context": "Select greeter background image",
-    "reference": "Modules/Settings/GreeterTab.qml:589",
+    "reference": "Modules/Settings/GreeterTab.qml:598",
     "comment": "",
     "tags": [
       "settings"
@@ -22329,7 +22320,7 @@
   {
     "term": "Select lock screen background image",
     "context": "Select lock screen background image",
-    "reference": "Modules/Settings/LockScreenTab.qml:403",
+    "reference": "Modules/Settings/LockScreenTab.qml:411",
     "comment": "",
     "tags": [
       "settings"
@@ -22901,7 +22892,7 @@
   {
     "term": "Show 3rd Party",
     "context": "Show 3rd Party",
-    "reference": "Modules/Settings/PluginBrowser.qml:685",
+    "reference": "Modules/Settings/PluginBrowser.qml:692",
     "comment": "",
     "tags": [
       "settings"
@@ -22928,7 +22919,7 @@
   {
     "term": "Show Badge",
     "context": "Show Badge",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:3968, Modules/Settings/DankIslandTab.qml:334",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:4086, Modules/Settings/DankIslandTab.qml:334",
     "comment": "island settings: unread notification count on the home face",
     "tags": [
       "settings"
@@ -22962,10 +22953,28 @@
     ]
   },
   {
+    "term": "Show Charge Rate",
+    "context": "Show Charge Rate",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:3367",
+    "comment": "Battery bar widget setting: show how many watts are going into the battery while charging",
+    "tags": [
+      "settings"
+    ]
+  },
+  {
     "term": "Show Date",
     "context": "Show Date",
     "reference": "Modules/Settings/DesktopWidgetSettings/ClockSettings.qml:90",
     "comment": "",
+    "tags": [
+      "settings"
+    ]
+  },
+  {
+    "term": "Show Discharge Rate",
+    "context": "Show Discharge Rate",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:3426",
+    "comment": "Battery bar widget setting: show how many watts the system is drawing from the battery",
     "tags": [
       "settings"
     ]
@@ -23781,6 +23790,15 @@
     ]
   },
   {
+    "term": "Show weather on the login screen",
+    "context": "Show weather on the login screen",
+    "reference": "Modules/Settings/GreeterTab.qml:538",
+    "comment": "",
+    "tags": [
+      "settings"
+    ]
+  },
+  {
     "term": "Show workspace index numbers in the top bar workspace switcher",
     "context": "Show workspace index numbers in the top bar workspace switcher",
     "reference": "Modules/Settings/WorkspacesTab.qml:35",
@@ -23982,7 +24000,7 @@
   {
     "term": "Skip the greeter password after boot until you sign out. Lock screen unlock is unchanged. Takes effect on the next reboot after sync.",
     "context": "Skip the greeter password after boot until you sign out. Lock screen unlock is unchanged. Takes effect on the next reboot after sync.",
-    "reference": "Modules/Settings/GreeterTab.qml:634",
+    "reference": "Modules/Settings/GreeterTab.qml:643",
     "comment": "",
     "tags": [
       "settings"
@@ -24000,7 +24018,7 @@
   {
     "term": "Small",
     "context": "Small",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:2027, Modules/Settings/WidgetsTabSection.qml:3426",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2027, Modules/Settings/WidgetsTabSection.qml:3544",
     "comment": "",
     "tags": [
       "settings"
@@ -24964,7 +24982,7 @@
   {
     "term": "Sync to apply",
     "context": "Sync to apply",
-    "reference": "Modules/Settings/GreeterTab.qml:744",
+    "reference": "Modules/Settings/GreeterTab.qml:753",
     "comment": "",
     "tags": [
       "settings"
@@ -24982,7 +25000,7 @@
   {
     "term": "Syncing...",
     "context": "Syncing...",
-    "reference": "Modules/Settings/GreeterTab.qml:744",
+    "reference": "Modules/Settings/GreeterTab.qml:753",
     "comment": "",
     "tags": [
       "settings"
@@ -25565,7 +25583,7 @@
   {
     "term": "Theme extracted to: %1",
     "context": "Theme extracted to: %1",
-    "reference": "Modules/Settings/ThemeColorsTab.qml:3183",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:3200",
     "comment": "extract theme success",
     "tags": [
       "settings"
@@ -25574,7 +25592,7 @@
   {
     "term": "Theme worker failed (%1)",
     "context": "Theme worker failed (%1)",
-    "reference": "Common/Theme.qml:2131",
+    "reference": "Common/Theme.qml:2133",
     "comment": "",
     "tags": [
       "shell"
@@ -25628,7 +25646,7 @@
   {
     "term": "Third-Party Plugin Warning",
     "context": "Third-Party Plugin Warning",
-    "reference": "Modules/Settings/PluginBrowser.qml:1546, Modules/Settings/PluginBrowser.qml:1579",
+    "reference": "Modules/Settings/PluginBrowser.qml:1553, Modules/Settings/PluginBrowser.qml:1586",
     "comment": "",
     "tags": [
       "settings"
@@ -25637,7 +25655,7 @@
   {
     "term": "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\n\nThese plugins may pose security and privacy risks - install at your own risk.",
     "context": "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\n\nThese plugins may pose security and privacy risks - install at your own risk.",
-    "reference": "Modules/Settings/PluginBrowser.qml:1603",
+    "reference": "Modules/Settings/PluginBrowser.qml:1610",
     "comment": "",
     "tags": [
       "settings"
@@ -25710,8 +25728,17 @@
   {
     "term": "This will delete all unpinned entries. %1 pinned entries will be kept.",
     "context": "This will delete all unpinned entries. %1 pinned entries will be kept.",
-    "reference": "Modals/Clipboard/ClipboardHistoryContent.qml:139, Modules/DankBar/DankBarContent.qml:921",
+    "reference": "Modals/Clipboard/ClipboardHistoryContent.qml:156, Modules/DankBar/DankBarContent.qml:921",
     "comment": "",
+    "tags": [
+      "shell"
+    ]
+  },
+  {
+    "term": "This will delete the %1 entries matching the current filter. Pinned entries are kept.",
+    "context": "This will delete the %1 entries matching the current filter. Pinned entries are kept.",
+    "reference": "Modals/Clipboard/ClipboardHistoryContent.qml:150",
+    "comment": "clipboard modal: clear confirmation while a search filter is active, %1 is the number of matching entries",
     "tags": [
       "shell"
     ]
@@ -25729,7 +25756,7 @@
   {
     "term": "This will permanently delete all clipboard history.",
     "context": "This will permanently delete all clipboard history.",
-    "reference": "Modals/Clipboard/ClipboardHistoryContent.qml:139, Modules/DankBar/DankBarContent.qml:921",
+    "reference": "Modals/Clipboard/ClipboardHistoryContent.qml:156, Modules/DankBar/DankBarContent.qml:921",
     "comment": "",
     "tags": [
       "shell"
@@ -25738,7 +25765,7 @@
   {
     "term": "This will permanently remove this saved clipboard item. This action cannot be undone.",
     "context": "This will permanently remove this saved clipboard item. This action cannot be undone.",
-    "reference": "Services/ClipboardService.qml:280",
+    "reference": "Services/ClipboardService.qml:281",
     "comment": "",
     "tags": [
       "shell"
@@ -26217,7 +26244,7 @@
   {
     "term": "Top Section",
     "context": "Top Section",
-    "reference": "Modules/Settings/WidgetsTab.qml:1334",
+    "reference": "Modules/Settings/WidgetsTab.qml:1340",
     "comment": "",
     "tags": [
       "settings"
@@ -26428,7 +26455,7 @@
   {
     "term": "Turn off all displays immediately when the lock screen activates",
     "context": "Turn off all displays immediately when the lock screen activates",
-    "reference": "Modules/Settings/LockScreenTab.qml:754",
+    "reference": "Modules/Settings/LockScreenTab.qml:762",
     "comment": "",
     "tags": [
       "settings"
@@ -26545,7 +26572,7 @@
   {
     "term": "Unavailable",
     "context": "Unavailable",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:459, Modules/Settings/NetworkVpnTab.qml:82, Modules/Settings/PrinterTab.qml:214, Modules/Settings/WidgetsTab.qml:988, Modules/Settings/NetworkCellularTab.qml:52, Modules/Settings/NetworkEthernetTab.qml:167, Modules/Settings/NetworkWifiTab.qml:963, Modules/ControlCenter/Details/AudioPortSelector.qml:292, Modules/ControlCenter/Details/NetworkDetail.qml:575, Modules/DankBar/Widgets/FocusedWindowContextMenu.qml:117",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:459, Modules/Settings/NetworkVpnTab.qml:82, Modules/Settings/PrinterTab.qml:214, Modules/Settings/WidgetsTab.qml:990, Modules/Settings/NetworkCellularTab.qml:52, Modules/Settings/NetworkEthernetTab.qml:167, Modules/Settings/NetworkWifiTab.qml:963, Modules/ControlCenter/Details/AudioPortSelector.qml:292, Modules/ControlCenter/Details/NetworkDetail.qml:575, Modules/DankBar/Widgets/FocusedWindowContextMenu.qml:117",
     "comment": "Phone Connect unavailable status | audio port availability status",
     "tags": [
       "plugin-dankkdeconnect",
@@ -26590,15 +26617,6 @@
     ]
   },
   {
-    "term": "Uninstall",
-    "context": "Uninstall",
-    "reference": "Modules/Settings/ThemeBrowser.qml:768",
-    "comment": "uninstall action button",
-    "tags": [
-      "settings"
-    ]
-  },
-  {
     "term": "Uninstall Plugin",
     "context": "Uninstall Plugin",
     "reference": "Modules/Settings/PluginListItem.qml:261",
@@ -26610,7 +26628,7 @@
   {
     "term": "Uninstall failed: %1",
     "context": "Uninstall failed: %1",
-    "reference": "Modules/Settings/ThemeColorsTab.qml:1024, Modules/Settings/ThemeBrowser.qml:97, Modules/Settings/PluginListItem.qml:250",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:1024, Modules/Settings/ThemeBrowser.qml:166, Modules/Settings/PluginListItem.qml:250",
     "comment": "uninstallation error",
     "tags": [
       "settings"
@@ -26619,7 +26637,7 @@
   {
     "term": "Uninstalled: %1",
     "context": "Uninstalled: %1",
-    "reference": "Modules/Settings/ThemeColorsTab.qml:1027, Modules/Settings/ThemeBrowser.qml:100",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:1027, Modules/Settings/ThemeBrowser.qml:169",
     "comment": "uninstallation success",
     "tags": [
       "settings"
@@ -26628,7 +26646,7 @@
   {
     "term": "Uninstalling: %1",
     "context": "Uninstalling: %1",
-    "reference": "Modules/Settings/ThemeColorsTab.qml:1021, Modules/Settings/ThemeBrowser.qml:94",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:1021, Modules/Settings/ThemeBrowser.qml:163",
     "comment": "uninstallation progress",
     "tags": [
       "settings"
@@ -26637,7 +26655,7 @@
   {
     "term": "Unknown",
     "context": "Unknown",
-    "reference": "Common/Theme.qml:1559, Services/WeatherService.qml:155, Services/WeatherService.qml:736, Services/WeatherService.qml:737, Services/WeatherService.qml:778, Services/WeatherService.qml:779, Services/WeatherService.qml:814, Services/WeatherService.qml:815, Services/WeatherService.qml:1018, Services/WeatherService.qml:1019, Services/BatteryService.qml:429, dms-plugins/DankKDEConnect/DankKDEConnect.qml:1582, dms-plugins/DankKDEConnect/components/DeviceCard.qml:298, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:741, Modules/Lock/LockScreenContent.qml:534, Modules/Lock/LockScreenContent.qml:654, Modules/Lock/LockScreenContent.qml:750, Modules/Settings/PluginBrowser.qml:1348, Modules/Settings/NetworkStatusTab.qml:79, Modules/Settings/NetworkStatusTab.qml:124, Modules/Settings/PrinterTab.qml:1659, Modules/Settings/ThemeBrowser.qml:645, Modules/Settings/PluginCard.qml:232, Modules/Settings/WidgetsTab.qml:985, Modules/Settings/NetworkCellularTab.qml:142, Modules/Settings/NetworkCellularTab.qml:153, Modules/Settings/NetworkCellularTab.qml:269, Modules/Settings/NetworkEthernetTab.qml:146, Modules/Settings/NetworkEthernetTab.qml:169, Modules/Settings/NetworkEthernetTab.qml:317, Modules/Settings/NetworkEthernetTab.qml:428, Modules/Settings/NotificationsTab.qml:471, Modules/Settings/NotificationsTab.qml:789, Modules/Settings/NetworkWifiTab.qml:530, Modules/Settings/NetworkWifiTab.qml:940, Modules/ControlCenter/Details/BatteryDetail.qml:184, Modules/ControlCenter/Details/NetworkDetail.qml:666, Modules/ControlCenter/Details/NetworkDetail.qml:715, Modules/ControlCenter/Components/HeaderPane.qml:73, Modules/ControlCenter/Components/DragDropGrid.qml:511, Modules/ControlCenter/Components/DragDropGrid.qml:767, Modules/DankDash/Overview/MediaOverviewCard.qml:77, Modules/DankBar/Popouts/BatteryPopout.qml:342, Modules/DankBar/Widgets/FocusedWindowContextMenu.qml:16, Modules/DankBar/Widgets/SystemTrayBar.qml:1894",
+    "reference": "Common/Theme.qml:1561, Services/WeatherService.qml:155, Services/WeatherService.qml:736, Services/WeatherService.qml:737, Services/WeatherService.qml:778, Services/WeatherService.qml:779, Services/WeatherService.qml:814, Services/WeatherService.qml:815, Services/WeatherService.qml:1018, Services/WeatherService.qml:1019, Services/BatteryService.qml:452, dms-plugins/DankKDEConnect/DankKDEConnect.qml:1582, dms-plugins/DankKDEConnect/components/DeviceCard.qml:298, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:741, Modules/Lock/LockScreenContent.qml:534, Modules/Lock/LockScreenContent.qml:654, Modules/Lock/LockScreenContent.qml:750, Modules/Settings/PluginBrowser.qml:1355, Modules/Settings/NetworkStatusTab.qml:79, Modules/Settings/NetworkStatusTab.qml:124, Modules/Settings/PrinterTab.qml:1659, Modules/Settings/PluginCard.qml:240, Modules/Settings/WidgetsTab.qml:987, Modules/Settings/NetworkCellularTab.qml:142, Modules/Settings/NetworkCellularTab.qml:153, Modules/Settings/NetworkCellularTab.qml:269, Modules/Settings/NetworkEthernetTab.qml:146, Modules/Settings/NetworkEthernetTab.qml:169, Modules/Settings/NetworkEthernetTab.qml:317, Modules/Settings/NetworkEthernetTab.qml:428, Modules/Settings/NotificationsTab.qml:471, Modules/Settings/NotificationsTab.qml:789, Modules/Settings/NetworkWifiTab.qml:530, Modules/Settings/NetworkWifiTab.qml:940, Modules/ControlCenter/Details/BatteryDetail.qml:184, Modules/ControlCenter/Details/NetworkDetail.qml:666, Modules/ControlCenter/Details/NetworkDetail.qml:715, Modules/ControlCenter/Components/HeaderPane.qml:73, Modules/ControlCenter/Components/DragDropGrid.qml:511, Modules/ControlCenter/Components/DragDropGrid.qml:767, Modules/DankDash/Overview/MediaOverviewCard.qml:77, Modules/DankBar/Popouts/BatteryPopout.qml:342, Modules/DankBar/Widgets/FocusedWindowContextMenu.qml:16, Modules/DankBar/Widgets/SystemTrayBar.qml:1894",
     "comment": "KDE Connect unknown device status | Status | battery status | power profile option | unknown author | widget status",
     "tags": [
       "plugin-dankkdeconnect",
@@ -27113,7 +27131,7 @@
   {
     "term": "Use a custom image for the lock screen, or leave empty to use your desktop wallpaper.",
     "context": "Use a custom image for the lock screen, or leave empty to use your desktop wallpaper.",
-    "reference": "Modules/Settings/LockScreenTab.qml:392",
+    "reference": "Modules/Settings/LockScreenTab.qml:400",
     "comment": "",
     "tags": [
       "settings"
@@ -27122,7 +27140,7 @@
   {
     "term": "Use a custom image for the login screen, or leave empty to use desktop wallpaper",
     "context": "Use a custom image for the login screen, or leave empty to use desktop wallpaper",
-    "reference": "Modules/Settings/GreeterTab.qml:576",
+    "reference": "Modules/Settings/GreeterTab.qml:585",
     "comment": "",
     "tags": [
       "settings"
@@ -27302,7 +27320,7 @@
   {
     "term": "Use system PAM authentication",
     "context": "Use system PAM authentication",
-    "reference": "Modules/Settings/GreeterTab.qml:480, Modules/Settings/LockScreenTab.qml:495",
+    "reference": "Modules/Settings/GreeterTab.qml:480, Modules/Settings/LockScreenTab.qml:503",
     "comment": "system PAM policy toggle",
     "tags": [
       "settings"
@@ -27738,7 +27756,7 @@
   {
     "term": "Video Path",
     "context": "Video Path",
-    "reference": "Modules/Settings/LockScreenTab.qml:800",
+    "reference": "Modules/Settings/LockScreenTab.qml:808",
     "comment": "",
     "tags": [
       "settings"
@@ -27756,7 +27774,7 @@
   {
     "term": "Video Screensaver",
     "context": "Video Screensaver",
-    "reference": "Modules/Lock/VideoScreensaver.qml:39, Modules/Lock/VideoScreensaver.qml:76, Modules/Lock/VideoScreensaver.qml:109, Modules/Settings/LockScreenTab.qml:772",
+    "reference": "Modules/Lock/VideoScreensaver.qml:39, Modules/Lock/VideoScreensaver.qml:76, Modules/Lock/VideoScreensaver.qml:109, Modules/Settings/LockScreenTab.qml:780",
     "comment": "",
     "tags": [
       "settings",
@@ -27794,7 +27812,7 @@
   {
     "term": "Visual Effects",
     "context": "Visual Effects",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:4012",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:4130",
     "comment": "",
     "tags": [
       "settings"
@@ -27996,8 +28014,8 @@
   {
     "term": "Weather",
     "context": "Weather",
-    "reference": "Modules/DankDash/DankDashPopout.qml:30, Modules/DankIsland/DankIslandSurface.qml:502, Modules/Settings/TimeWeatherTab.qml:465, Modules/Settings/DankIslandTab.qml:203, Modules/Settings/KeybindItem.qml:1145, Modules/Settings/KeybindItem.qml:1150, Modules/Settings/KeybindItem.qml:1162, Modules/Settings/DankDashTab.qml:37",
-    "comment": "island compact face: weather label | island settings: weather slot row",
+    "reference": "Modules/DankDash/DankDashPopout.qml:30, Modules/DankIsland/DankIslandSurface.qml:502, Modules/Settings/GreeterTab.qml:537, Modules/Settings/TimeWeatherTab.qml:465, Modules/Settings/LockScreenTab.qml:347, Modules/Settings/DankIslandTab.qml:203, Modules/Settings/KeybindItem.qml:1145, Modules/Settings/KeybindItem.qml:1150, Modules/Settings/KeybindItem.qml:1162, Modules/Settings/DankDashTab.qml:37",
+    "comment": "Enable weather display on the lock screen window | Enable weather display on the login screen | island compact face: weather label | island settings: weather slot row",
     "tags": [
       "settings",
       "shell"
@@ -28087,7 +28105,7 @@
   {
     "term": "Which PAM service the lock screen uses to authenticate",
     "context": "Which PAM service the lock screen uses to authenticate",
-    "reference": "Modules/Settings/LockScreenTab.qml:429",
+    "reference": "Modules/Settings/LockScreenTab.qml:437",
     "comment": "lock screen PAM source setting",
     "tags": [
       "settings"
@@ -28224,7 +28242,7 @@
   {
     "term": "Widget Management",
     "context": "Widget Management",
-    "reference": "Modules/Settings/WidgetsTab.qml:1246",
+    "reference": "Modules/Settings/WidgetsTab.qml:1252",
     "comment": "",
     "tags": [
       "settings"
@@ -28778,15 +28796,6 @@
     ]
   },
   {
-    "term": "below AA",
-    "context": "below AA",
-    "reference": "Modules/Settings/ThemeBrowser.qml:632",
-    "comment": "contrast level below the AA threshold",
-    "tags": [
-      "settings"
-    ]
-  },
-  {
     "term": "brandon",
     "context": "brandon",
     "reference": "Modules/DankDash/Overview/UserInfoCard.qml:59",
@@ -28798,7 +28807,7 @@
   {
     "term": "broken",
     "context": "broken",
-    "reference": "Services/PluginService.qml:1219",
+    "reference": "Services/PluginService.qml:1223",
     "comment": "plugin status",
     "tags": [
       "shell"
@@ -28807,7 +28816,7 @@
   {
     "term": "by %1",
     "context": "by %1",
-    "reference": "Modules/Settings/PluginBrowser.qml:1348, Modules/Settings/PluginUpdatesDialog.qml:229, Modules/Settings/ThemeBrowser.qml:645, Modules/Settings/PluginCard.qml:232",
+    "reference": "Modules/Settings/PluginBrowser.qml:1355, Modules/Settings/PluginUpdatesDialog.qml:229, Modules/Settings/PluginCard.qml:240",
     "comment": "author attribution",
     "tags": [
       "settings"
@@ -28861,7 +28870,7 @@
   {
     "term": "deprecated",
     "context": "deprecated",
-    "reference": "Services/PluginService.qml:1223",
+    "reference": "Services/PluginService.qml:1227",
     "comment": "plugin status",
     "tags": [
       "shell"
@@ -28906,7 +28915,7 @@
   {
     "term": "discuss",
     "context": "discuss",
-    "reference": "Modules/Settings/PluginBrowser.qml:1350",
+    "reference": "Modules/Settings/PluginBrowser.qml:1357",
     "comment": "plugin discussion link",
     "tags": [
       "settings"
@@ -29005,7 +29014,7 @@
   {
     "term": "featured",
     "context": "featured",
-    "reference": "Services/PluginService.qml:1254, Modules/Settings/DesktopWidgetBrowser.qml:386",
+    "reference": "Services/PluginService.qml:1258, Modules/Settings/DesktopWidgetBrowser.qml:386",
     "comment": "",
     "tags": [
       "settings",
@@ -29051,7 +29060,7 @@
   {
     "term": "loginctl not available - lock integration requires DMS socket connection",
     "context": "loginctl not available - lock integration requires DMS socket connection",
-    "reference": "Modules/Settings/LockScreenTab.qml:718",
+    "reference": "Modules/Settings/LockScreenTab.qml:726",
     "comment": "",
     "tags": [
       "settings"
@@ -29096,7 +29105,7 @@
   {
     "term": "matugen not available or disabled - cannot apply %1 colors",
     "context": "matugen not available or disabled - cannot apply %1 colors",
-    "reference": "Common/Theme.qml:1899, Common/Theme.qml:1921",
+    "reference": "Common/Theme.qml:1901, Common/Theme.qml:1923",
     "comment": "",
     "tags": [
       "shell"
@@ -29204,7 +29213,7 @@
   {
     "term": "official",
     "context": "official",
-    "reference": "Services/PluginService.qml:1260, Modules/Settings/PluginsTab.qml:415, Modules/Settings/ThemeBrowser.qml:467",
+    "reference": "Services/PluginService.qml:1264, Modules/Settings/PluginsTab.qml:415",
     "comment": "",
     "tags": [
       "settings",
@@ -29268,7 +29277,7 @@
   {
     "term": "power-profiles-daemon not available",
     "context": "power-profiles-daemon not available",
-    "reference": "Modals/PowerProfileModal.qml:122, Modules/ControlCenter/Details/BatteryDetail.qml:31, Modules/DankBar/Popouts/BatteryPopout.qml:28, Modules/DankBar/Widgets/Battery.qml:227",
+    "reference": "Modals/PowerProfileModal.qml:122, Modules/ControlCenter/Details/BatteryDetail.qml:31, Modules/DankBar/Popouts/BatteryPopout.qml:28, Modules/DankBar/Widgets/Battery.qml:244",
     "comment": "",
     "tags": [
       "shell"
@@ -29313,7 +29322,7 @@
   {
     "term": "reviewed",
     "context": "reviewed",
-    "reference": "Services/PluginService.qml:1225",
+    "reference": "Services/PluginService.qml:1229",
     "comment": "plugin status",
     "tags": [
       "shell"
@@ -29340,7 +29349,7 @@
   {
     "term": "source",
     "context": "source",
-    "reference": "Modules/Settings/PluginBrowser.qml:1349",
+    "reference": "Modules/Settings/PluginBrowser.qml:1356",
     "comment": "source code link",
     "tags": [
       "settings"
@@ -29367,7 +29376,7 @@
   {
     "term": "unmaintained",
     "context": "unmaintained",
-    "reference": "Services/PluginService.qml:1221",
+    "reference": "Services/PluginService.qml:1225",
     "comment": "plugin status",
     "tags": [
       "shell"
@@ -29439,7 +29448,7 @@
   {
     "term": "• Install only from trusted sources",
     "context": "• Install only from trusted sources",
-    "reference": "Modules/Settings/PluginBrowser.qml:1626",
+    "reference": "Modules/Settings/PluginBrowser.qml:1633",
     "comment": "",
     "tags": [
       "settings"
@@ -29484,7 +29493,7 @@
   {
     "term": "• Plugins may contain bugs or security issues",
     "context": "• Plugins may contain bugs or security issues",
-    "reference": "Modules/Settings/PluginBrowser.qml:1614",
+    "reference": "Modules/Settings/PluginBrowser.qml:1621",
     "comment": "",
     "tags": [
       "settings"
@@ -29493,7 +29502,7 @@
   {
     "term": "• Review code before installation when possible",
     "context": "• Review code before installation when possible",
-    "reference": "Modules/Settings/PluginBrowser.qml:1620",
+    "reference": "Modules/Settings/PluginBrowser.qml:1627",
     "comment": "",
     "tags": [
       "settings"

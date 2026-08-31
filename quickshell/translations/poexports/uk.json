@@ -1586,6 +1586,9 @@
   "Clear Badge on Open": {
     "Clear Badge on Open": "Очищати індикатор під час відкриття"
   },
+  "Clear Filtered": {
+    "Clear Filtered": ""
+  },
   "Clear History?": {
     "Clear History?": "Очистити історію?"
   },
@@ -7619,8 +7622,14 @@
   "Show CPU Temp": {
     "Show CPU Temp": "Показувати температуру ЦП"
   },
+  "Show Charge Rate": {
+    "Show Charge Rate": ""
+  },
   "Show Date": {
     "Show Date": "Показувати дату"
+  },
+  "Show Discharge Rate": {
+    "Show Discharge Rate": ""
   },
   "Show Disk": {
     "Show Disk": "Показувати диск"
@@ -7891,6 +7900,9 @@
   },
   "Show weather information in top bar and control center": {
     "Show weather information in top bar and control center": "Показувати інформацію про погоду у верхній панелі та центрі керування"
+  },
+  "Show weather on the login screen": {
+    "Show weather on the login screen": ""
   },
   "Show workspace index numbers in the top bar workspace switcher": {
     "Show workspace index numbers in the top bar workspace switcher": "Показувати номери робочих областей у перемикачі на верхній панелі"
@@ -8533,6 +8545,9 @@
   },
   "This will delete all unpinned entries. %1 pinned entries will be kept.": {
     "This will delete all unpinned entries. %1 pinned entries will be kept.": "Це видалить усі незакріплені записи. Буде збережено %1 закріплених записів"
+  },
+  "This will delete the %1 entries matching the current filter. Pinned entries are kept.": {
+    "This will delete the %1 entries matching the current filter. Pinned entries are kept.": ""
   },
   "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": {
     "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": "Це розірве з'єднання WiFi з «%1» — радіомодуль не може одночасно працювати як точка доступу та бути підключеним до мережі. Для спільного використання інтернету знадобиться інше підключення, наприклад Ethernet"

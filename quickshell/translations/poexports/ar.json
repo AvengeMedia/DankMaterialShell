@@ -1308,7 +1308,7 @@
     "Browse and set wallpapers": "تصفح وتعيين خلفيات الشاشة"
   },
   "Browse or search plugins": {
-    "Browse or search plugins": "تصفح أو ابحث عن الإضافات"
+    "Browse or search plugins": "تصفح أو ابحث عن الملحقات"
   },
   "Button Color": {
     "Button Color": "لون الزر"
@@ -1586,6 +1586,9 @@
   "Clear Badge on Open": {
     "Clear Badge on Open": "مسح الشارة عند الفتح"
   },
+  "Clear Filtered": {
+    "Clear Filtered": ""
+  },
   "Clear History?": {
     "Clear History?": "مسح السجل؟"
   },
@@ -1782,7 +1785,7 @@
     "Commands": "الأوامر"
   },
   "Community favorites to get you started": {
-    "Community favorites to get you started": ""
+    "Community favorites to get you started": "مفضلات المجتمع لتبدأ بها"
   },
   "Community themes": {
     "Community themes": "سمات المجتمع"
@@ -2049,7 +2052,7 @@
     "Couldn't load hotspot password": "تعذر تحميل كلمة مرور نقطة الاتصال"
   },
   "Couldn't load plugins": {
-    "Couldn't load plugins": ""
+    "Couldn't load plugins": "تعذر تحميل الملحقات"
   },
   "Count Only": {
     "Count Only": "العد فقط"
@@ -4362,7 +4365,7 @@
     "Include desktop actions (shortcuts) in search results.": "تضمين إجراءات سطح المكتب (الاختصارات) في نتائج البحث."
   },
   "Incompatible Plugins Loaded": {
-    "Incompatible Plugins Loaded": "تم تحميل إضافات غير متوافقة"
+    "Incompatible Plugins Loaded": "تم تحميل ملحقات غير متوافقة"
   },
   "Incorrect password": {
     "Incorrect password": "كلمة المرور غير صحيحة"
@@ -4428,7 +4431,7 @@
     "Install Greeter": "تثبيت شاشة الترحيب"
   },
   "Install Plugin": {
-    "Install Plugin": "تثبيت إضافة"
+    "Install Plugin": "تثبيت ملحق"
   },
   "Install Theme": {
     "Install Theme": "تثبيت سمة"
@@ -4449,7 +4452,7 @@
     "Install matugen package for dynamic theming": "تثبيت حزمة matugen للسمات الديناميكية"
   },
   "Install plugin '%1' from the DMS registry?": {
-    "Install plugin '%1' from the DMS registry?": "هل تريد تثبيت الإضافة '%1' من سجل DMS؟"
+    "Install plugin '%1' from the DMS registry?": "هل تريد تثبيت الملحق '%1' من سجل DMS؟"
   },
   "Install plugins from the DMS plugin registry": {
     "Install plugins from the DMS plugin registry": "تثبيت الملحقات من سجل ملحقات DMS"
@@ -4572,7 +4575,7 @@
     "Keep the clipboard type filter when reopening history": "احتفظ بفلتر نوع الحافظة عند إعادة فتح السجل"
   },
   "Keep the dock visible above fullscreen applications": {
-    "Keep the dock visible above fullscreen applications": ""
+    "Keep the dock visible above fullscreen applications": "اجعل الشريط مرئيًا فوق تطبيقات ملء الشاشة"
   },
   "Keep typing": {
     "Keep typing": "استمر في الكتابة"
@@ -6300,7 +6303,7 @@
     "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "ضع مجلدات الملحقات هنا. يجب أن يحتوي كل ملحق على ملف بيان باسم plugin.json."
   },
   "Place plugins in %1": {
-    "Place plugins in %1": "ضع الإضافات في %1"
+    "Place plugins in %1": "ضع الملحقات في %1"
   },
   "Place the bar on the Wayland overlay layer": {
     "Place the bar on the Wayland overlay layer": "ضع الشريط على طبقة تراكب Wayland"
@@ -6351,7 +6354,7 @@
     "Plugged In": "متصل بالشاحن"
   },
   "Plugin": {
-    "Plugin": "إضافة"
+    "Plugin": "ملحق"
   },
   "Plugin Directory": {
     "Plugin Directory": "مجلد الملحقات"
@@ -6408,7 +6411,7 @@
     "Popouts and Modals follow global Animation Speed (disable to customize independently)": "تتبع النوافذ المنبثقة والنوافذ المشروطة سرعة الرسوم المتحركة العالمية (عطل الخيار للتخصيص بشكل مستقل)"
   },
   "Popular Plugins": {
-    "Popular Plugins": ""
+    "Popular Plugins": "الملحقات الشائعة"
   },
   "Popup Only": {
     "Popup Only": "نافذة منبثقة فقط"
@@ -6990,7 +6993,7 @@
     "Resume": "استئناف"
   },
   "Retry": {
-    "Retry": ""
+    "Retry": "إعادة المحاولة"
   },
   "Reveal the arcs where surfaces meet the frame": {
     "Reveal the arcs where surfaces meet the frame": "كشف الأقواس حيث تلتقي الأسطح بالإطار"
@@ -7263,7 +7266,7 @@
     "Search devices...": "البحث عن الأجهزة..."
   },
   "Search installed plugins...": {
-    "Search installed plugins...": "البحث عن الإضافات المثبتة..."
+    "Search installed plugins...": "البحث عن الملحقات المثبتة..."
   },
   "Search keybinds...": {
     "Search keybinds...": "البحث في اختصارات لوحة المفاتيح..."
@@ -7619,8 +7622,14 @@
   "Show CPU Temp": {
     "Show CPU Temp": "إظهار درجة حرارة المعالج"
   },
+  "Show Charge Rate": {
+    "Show Charge Rate": ""
+  },
   "Show Date": {
     "Show Date": "إظهار التاريخ"
+  },
+  "Show Discharge Rate": {
+    "Show Discharge Rate": ""
   },
   "Show Disk": {
     "Show Disk": "إظهار القرص"
@@ -7629,7 +7638,7 @@
     "Show Dock": "إظهار شريط التطبيقات"
   },
   "Show Dock Over Fullscreen": {
-    "Show Dock Over Fullscreen": ""
+    "Show Dock Over Fullscreen": "إظهار الشريط فوق ملء الشاشة"
   },
   "Show Feels Like Temperature": {
     "Show Feels Like Temperature": "عرض درجة الحرارة المحسوسة"
@@ -7892,6 +7901,9 @@
   "Show weather information in top bar and control center": {
     "Show weather information in top bar and control center": "إظهار معلومات الطقس في الشريط العلوي ومركز التحكم"
   },
+  "Show weather on the login screen": {
+    "Show weather on the login screen": ""
+  },
   "Show workspace index numbers in the top bar workspace switcher": {
     "Show workspace index numbers in the top bar workspace switcher": "إظهار أرقام أسطح المكتب في مبدل أسطح المكتب بالشريط العلوي"
   },
@@ -7995,7 +8007,7 @@
     "Solid material type or Outline": "نوع المادة الصلبة أو المخططة"
   },
   "Some plugins require a newer version of DMS:": {
-    "Some plugins require a newer version of DMS:": "تتطلب بعض الإضافات إصدارًا أحدث من DMS:"
+    "Some plugins require a newer version of DMS:": "تتطلب بعض الملحقات إصدارًا أحدث من DMS:"
   },
   "Some settings are managed by the island": {
     "Some settings are managed by the island": "تتم إدارة بعض الإعدادات بواسطة الجزيرة"
@@ -8019,7 +8031,7 @@
     "Source: %1": "المصدر: %1"
   },
   "Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.": {
-    "Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.": "مصادر الإضافات والسمات. السجلات هي مستودعات git تحتوي على دليل plugins/ أو themes/."
+    "Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.": "مصادر الملحقات والسمات. السجلات هي مستودعات git تحتوي على دليل plugins/ أو themes/."
   },
   "Space between the bar and screen edges": {
     "Space between the bar and screen edges": "المسافة بين الشريط وحواف الشاشة"
@@ -8508,7 +8520,7 @@
     "Third-Party Plugin Warning": "تحذير بشأن ملحقات الطرف الثالث"
   },
   "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\n\nThese plugins may pose security and privacy risks - install at your own risk.": {
-    "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\n\nThese plugins may pose security and privacy risks - install at your own risk.": "الإضافات الخارجية تم إنشاؤها بواسطة المجتمع ولا يتم دعمها رسميًا بواسطة DankMaterialShell. قد تشكل هذه الإضافات مخاطر أمنية وخصوصية - التثبيت على مسؤوليتك الخاصة."
+    "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\n\nThese plugins may pose security and privacy risks - install at your own risk.": "الملحقات الخارجية تم إنشاؤها بواسطة المجتمع ولا يتم دعمها رسميًا بواسطة DankMaterialShell. قد تشكل هذه الملحقات مخاطر أمنية وخصوصية - التثبيت على مسؤوليتك الخاصة."
   },
   "This bind is overridden by config.kdl": {
     "This bind is overridden by config.kdl": "هذا الربط تم تجاوزه بواسطة config.kdl"
@@ -8533,6 +8545,9 @@
   },
   "This will delete all unpinned entries. %1 pinned entries will be kept.": {
     "This will delete all unpinned entries. %1 pinned entries will be kept.": "سيؤدي هذا إلى حذف جميع الإدخالات غير المثبتة. سيتم الاحتفاظ بـ %1 من الإدخالات المثبتة."
+  },
+  "This will delete the %1 entries matching the current filter. Pinned entries are kept.": {
+    "This will delete the %1 entries matching the current filter. Pinned entries are kept.": ""
   },
   "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": {
     "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": "سيؤدي هذا إلى قطع اتصال WiFi من \"%1\" — لا يمكن للراديو استضافة نقطة اتصال والبقاء متصلاً في الوقت نفسه. ستحتاج مشاركة الإنترنت إلى اتصال آخر، مثل إيثرنت."
@@ -8721,7 +8736,7 @@
     "Transform": "تحويل"
   },
   "Transition Duration": {
-    "Transition Duration": ""
+    "Transition Duration": "مدة الانتقال"
   },
   "Transition Effect": {
     "Transition Effect": "تأثير الانتقال"
@@ -9513,7 +9528,7 @@
     "Yesterday": "أمس"
   },
   "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.": {
-    "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.": ""
+    "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.": "يمكنك توسيع DMS بمزيد من التطبيقات الصغيرة وميزات المشغل والأدوات عبر نظام الملحقات. تتوفر المئات منها في سجل DMS الرسمي، وهي من بناء المجتمع وفريق DMS. قم بتثبيت بعضها الآن، أو لاحقًا عبر واجهة سطر أوامر DMS أو نافذة الإعدادات."
   },
   "You have unsaved changes. Save before continuing?": {
     "You have unsaved changes. Save before continuing?": "لديك تغييرات غير محفوظة. هل تريد الحفظ قبل المتابعة؟"

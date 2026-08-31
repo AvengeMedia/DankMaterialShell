@@ -1586,6 +1586,9 @@
   "Clear Badge on Open": {
     "Clear Badge on Open": ""
   },
+  "Clear Filtered": {
+    "Clear Filtered": ""
+  },
   "Clear History?": {
     "Clear History?": "Ĉu viŝi la historion?"
   },
@@ -7619,8 +7622,14 @@
   "Show CPU Temp": {
     "Show CPU Temp": "Montri ĉefprocesoro-temperaturon"
   },
+  "Show Charge Rate": {
+    "Show Charge Rate": ""
+  },
   "Show Date": {
     "Show Date": "Montri daton"
+  },
+  "Show Discharge Rate": {
+    "Show Discharge Rate": ""
   },
   "Show Disk": {
     "Show Disk": "Montri diskon"
@@ -7891,6 +7900,9 @@
   },
   "Show weather information in top bar and control center": {
     "Show weather information in top bar and control center": "Montri veterajn informojn en supra breto kaj regcentro"
+  },
+  "Show weather on the login screen": {
+    "Show weather on the login screen": ""
   },
   "Show workspace index numbers in the top bar workspace switcher": {
     "Show workspace index numbers in the top bar workspace switcher": "Montri indeksajn numerojn de laborspacoj en la supra laborspaca ŝaltilo"
@@ -8533,6 +8545,9 @@
   },
   "This will delete all unpinned entries. %1 pinned entries will be kept.": {
     "This will delete all unpinned entries. %1 pinned entries will be kept.": "Ĉi tio forigos ĉiujn nefiksitajn erojn. %1 fiksitaj eroj estos konservitaj."
+  },
+  "This will delete the %1 entries matching the current filter. Pinned entries are kept.": {
+    "This will delete the %1 entries matching the current filter. Pinned entries are kept.": ""
   },
   "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": {
     "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": ""
