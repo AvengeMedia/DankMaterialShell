@@ -53,10 +53,14 @@ type HyprlandParser struct {
 	bindOrder          []string
 	processedFiles     map[string]bool
 	dmsProcessed       bool
-	removedKeys        map[string]bool // bare hl.unbind targets (negative overrides)
-	defaultDMSKeys     map[string]bool // keys present in dms/binds.{lua,conf}
-	configFormat       string
-	readOnly           bool
+	removedKeys        map[string]bool // hl.unbind targets
+	// rebindSources maps a removed key to the files that unbind and then rebind
+	// it. Their own bind survives the removal; binds from anywhere else do not.
+	rebindSources  map[string]map[string]bool
+	fileUnbinds    map[string]bool // hl.unbind targets seen so far in the file being parsed
+	defaultDMSKeys map[string]bool // keys present in dms/binds.{lua,conf}
+	configFormat   string
+	readOnly       bool
 }
 
 func NewHyprlandParser(configDir string) *HyprlandParser {
@@ -72,6 +76,7 @@ func NewHyprlandParser(configDir string) *HyprlandParser {
 		bindOrder:          []string{},
 		processedFiles:     make(map[string]bool),
 		removedKeys:        make(map[string]bool),
+		rebindSources:      make(map[string]map[string]bool),
 		defaultDMSKeys:     make(map[string]bool),
 	}
 }
@@ -372,7 +377,10 @@ func (p *HyprlandParser) addBind(kb *HyprlandKeyBinding) bool {
 	}
 	if isDMSBind {
 		p.dmsBindKeys[normalizedKey] = true
-	} else if p.dmsBindKeys[normalizedKey] {
+	} else if p.dmsBindKeys[normalizedKey] && !p.fileUnbinds[normalizedKey] {
+		// Without a preceding hl.unbind both binds stay live in Hyprland, which
+		// is the conflict this counts. With one, the DMS bind is gone and this
+		// is the effective bind, so it belongs in the list (#3145).
 		p.bindsAfterDMS++
 		p.conflictingConfigs[normalizedKey] = kb
 		p.configBindKeys[normalizedKey] = true
@@ -437,7 +445,8 @@ func (p *HyprlandParser) removeUnboundDMSBinds(section *HyprlandSection) {
 	filtered := section.Keybinds[:0]
 	for i := range section.Keybinds {
 		kb := section.Keybinds[i]
-		if isDMSBindsSourcePath(kb.Source) && p.removedKeys[p.normalizeKey(p.formatBindKey(&kb))] {
+		key := p.normalizeKey(p.formatBindKey(&kb))
+		if isDMSBindsSourcePath(kb.Source) && p.removedKeys[key] && !p.rebindSources[key][kb.Source] {
 			continue
 		}
 		filtered = append(filtered, kb)
@@ -622,7 +631,9 @@ func (p *HyprlandParser) parseLuaLinesFromPath(absPath string) (*HyprlandSection
 func (p *HyprlandParser) parseLuaLines(content string, baseDir, absPath, sectionName string) (*HyprlandSection, error) {
 	section := &HyprlandSection{Name: sectionName}
 	prevSource := p.currentSource
+	prevUnbinds := p.fileUnbinds
 	p.currentSource = absPath
+	p.fileUnbinds = make(map[string]bool)
 
 	lines := expandLuaConfigLines(strings.Split(content, "\n"))
 	boundInFile := make(map[string]bool)
@@ -675,8 +686,12 @@ func (p *HyprlandParser) parseLuaLines(content string, baseDir, absPath, section
 		if strings.HasPrefix(trimmed, "hl.unbind") {
 			if key, ok := parseLuaUnbindLine(trimmed); ok {
 				normalized := strings.ToLower(key)
-				if !boundInFile[normalized] {
-					p.removedKeys[normalized] = true
+				p.removedKeys[normalized] = true
+				p.fileUnbinds[normalized] = true
+				if boundInFile[normalized] {
+					// unbind plus rebind in one file is an override, not a
+					// removal: this file's own bind has to survive
+					p.noteRebindSource(normalized, absPath)
 				}
 			}
 			continue
@@ -703,7 +718,15 @@ func (p *HyprlandParser) parseLuaLines(content string, baseDir, absPath, section
 	}
 
 	p.currentSource = prevSource
+	p.fileUnbinds = prevUnbinds
 	return section, nil
+}
+
+func (p *HyprlandParser) noteRebindSource(key, source string) {
+	if p.rebindSources[key] == nil {
+		p.rebindSources[key] = make(map[string]bool)
+	}
+	p.rebindSources[key][source] = true
 }
 
 func luaBindOptFlags(optSuffix string) string {
