@@ -85,8 +85,7 @@ func CalculateSunTimesWithTwilight(lat, lon float64, date time.Time, elevTwiligh
 	elevTwilightRad := (90.833 - elevTwilight) * degToRad
 	elevDaylightRad := (90.833 - elevDaylight) * degToRad
 
-	utc := date.UTC()
-	orbitAngle := dateOrbitAngle(utc)
+	orbitAngle := dateOrbitAngle(date)
 	decl := sunDeclination(orbitAngle)
 	eqtime := equationOfTime(orbitAngle)
 
@@ -100,7 +99,16 @@ func CalculateSunTimesWithTwilight(lat, lon float64, date time.Time, elevTwiligh
 		return SunTimes{}, SunPolarNight
 	}
 
-	dayStart := time.Date(utc.Year(), utc.Month(), utc.Day(), 0, 0, 0, 0, time.UTC)
+	// The reference day is the caller's calendar day, not date.UTC()'s. The
+	// event seconds below are local mean solar time and lonOffset converts them
+	// to UTC, so a local morning east of Greenwich lands on the previous UTC day
+	// and a local evening west of it on the next one. Reading the day off
+	// date.UTC() therefore returns the neighbouring day's times whenever the two
+	// calendars disagree, which is most of the day for large offsets (#3179).
+	// dayStart stays anchored at UTC midnight so the lonOffset arithmetic is
+	// unchanged.
+	year, month, day := date.Date()
+	dayStart := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
 	lonOffset := time.Duration(-lon*4) * time.Minute
 
 	dawnSecs := hourAngleToSeconds(math.Abs(haTwilight), eqtime)
