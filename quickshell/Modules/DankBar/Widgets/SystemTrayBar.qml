@@ -1375,6 +1375,9 @@ BasePill {
         id: trayMenuContentComponent
 
         Item {
+            id: trayMenuContentRoot
+            focus: true
+
             readonly property real _rawW: Math.min(500, Math.max(250, menuColumn.implicitWidth + Theme.spacingS * 2))
             readonly property real _rawH: Math.min(
                 Math.max(40, menuColumn.implicitHeight + Theme.spacingS * 2),
@@ -1389,6 +1392,7 @@ BasePill {
             Component.onCompleted: {
                 trayMenuState.computedWidth  = implicitWidth;
                 trayMenuState.computedHeight = implicitHeight;
+                forceActiveFocus();
             }
 
             ListModel { id: entryStack }
