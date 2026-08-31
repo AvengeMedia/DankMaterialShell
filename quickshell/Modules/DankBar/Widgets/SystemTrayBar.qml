@@ -517,6 +517,7 @@ BasePill {
         content: trayMenuContentComponent
         contentHandlesKeys: true
         property alias openedByHover: trayMenuState.openedByHover
+        onOpened: contentLoader.item?.forceActiveFocus()
     }
 
     Connections {
@@ -525,12 +526,21 @@ BasePill {
         function onPopoutClosed() { root.menuOpen = false; }
     }
 
+    function _unregisterMenuIfMatches(targetMenu) {
+        if (!root.parentScreen || !targetMenu)
+            return;
+        const currentRegistered = TrayMenuManager.activeTrayMenus[root.parentScreen.name];
+        if (currentRegistered === targetMenu) {
+            TrayMenuManager.unregisterMenu(root.parentScreen.name);
+        }
+    }
+
     onMenuOpenChanged: {
         if (root.menuOpen && root.parentScreen) {
             trayMenuState.close();
             TrayMenuManager.registerMenu(root.parentScreen.name, overflowPopout);
         } else if (!root.menuOpen && root.parentScreen) {
-            TrayMenuManager.unregisterMenu(root.parentScreen.name);
+            root._unregisterMenuIfMatches(overflowPopout);
             overflowPopout.close();
         }
     }
@@ -1343,9 +1353,7 @@ BasePill {
 
         function close() {
             showMenu = false;
-            if (root.parentScreen) {
-                TrayMenuManager.unregisterMenu(root.parentScreen.name);
-            }
+            root._unregisterMenuIfMatches(trayMenuPopout);
             trayMenuPopout.close();
         }
     }
@@ -1358,9 +1366,7 @@ BasePill {
         function onBackgroundClicked() { trayMenuState.close(); }
         function onPopoutClosed() {
             trayMenuState.showMenu = false;
-            if (root.parentScreen) {
-                TrayMenuManager.unregisterMenu(root.parentScreen.name);
-            }
+            root._unregisterMenuIfMatches(trayMenuPopout);
         }
     }
 
@@ -1685,10 +1691,10 @@ BasePill {
 
         const barPosition = (axisObj?.edge === "left") ? 2 : ((axisObj?.edge === "right") ? 3 : ((axisObj?.edge === "top") ? 0 : 1));
 
-        let localPos = anchor ? anchor.mapToItem(null, 0, 0) : Qt.point(0, 0);
-        if (anchor && anchor.window && root.window && anchor.window !== root.window) {
+        let localPos = Qt.point(0, 0);
+        if (anchor) {
             const globalPos = anchor.mapToGlobal(0, 0);
-            localPos = root.window.mapFromGlobal(globalPos.x, globalPos.y);
+            localPos = Qt.point(globalPos.x - (screen.x || 0), globalPos.y - (screen.y || 0));
         }
         const triggerWidth = anchor ? anchor.width : root.width;
         const pos = SettingsData.getPopupTriggerPosition(localPos, screen, root.barThickness, triggerWidth, root.barSpacing, barPosition, root.barConfig);
