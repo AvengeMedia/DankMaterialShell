@@ -6074,6 +6074,23 @@
     "description": "Play a video when the screen locks."
   },
   {
+    "section": "lockScreenShowWeather",
+    "label": "Weather",
+    "tabIndex": 11,
+    "category": "Lock Screen",
+    "keywords": [
+      "climate",
+      "forecast",
+      "lock",
+      "login",
+      "password",
+      "screen",
+      "security",
+      "temperature",
+      "weather"
+    ]
+  },
+  {
     "section": "_tab_12",
     "label": "Plugins",
     "tabIndex": 12,
@@ -9476,6 +9493,26 @@
       "write"
     ],
     "description": "DMS removes its managed block from /etc/pam.d/greetd and stops write services",
+    "conditionKey": "greeterAvailable"
+  },
+  {
+    "section": "greeterShowWeather",
+    "label": "Weather",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "climate",
+      "display manager",
+      "forecast",
+      "greetd",
+      "greeter",
+      "login",
+      "screen",
+      "show",
+      "temperature",
+      "weather"
+    ],
+    "description": "Show weather on the login screen",
     "conditionKey": "greeterAvailable"
   },
   {

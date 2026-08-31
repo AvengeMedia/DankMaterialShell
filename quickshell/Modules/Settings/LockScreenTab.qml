@@ -341,6 +341,14 @@ Item {
                     onToggled: checked => SettingsData.set("lockScreenShowMediaPlayer", checked)
                 }
 
+                SettingsToggleRow {
+                    settingKey: "lockScreenShowWeather"
+                    tags: ["lock", "screen", "weather", "temperature", "forecast"]
+                    text: I18n.tr("Weather", "Enable weather display on the lock screen window")
+                    checked: SettingsData.lockScreenShowWeather
+                    onToggled: checked => SettingsData.set("lockScreenShowWeather", checked)
+                }
+
                 SettingsDropdownRow {
                     settingKey: "lockScreenNotificationMode"
                     tags: ["lock", "screen", "notification", "notifications", "privacy"]

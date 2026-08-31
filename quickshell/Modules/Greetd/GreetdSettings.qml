@@ -53,6 +53,7 @@ Singleton {
     property string weatherCoordinates: "40.7128,-74.0060"
     property bool useAutoLocation: false
     property bool weatherEnabled: true
+    property bool greeterShowWeather: true
     property string iconTheme: "System Default"
     property bool useOSLogo: false
     property string osLogoColorOverride: ""
@@ -126,6 +127,7 @@ Singleton {
             weatherCoordinates = settings.weatherCoordinates !== undefined ? settings.weatherCoordinates : "40.7128,-74.0060";
             useAutoLocation = settings.useAutoLocation !== undefined ? settings.useAutoLocation : false;
             weatherEnabled = settings.weatherEnabled !== undefined ? settings.weatherEnabled : true;
+            greeterShowWeather = settings.greeterShowWeather !== undefined ? settings.greeterShowWeather : true;
             iconTheme = settings.iconTheme !== undefined ? settings.iconTheme : "System Default";
             useOSLogo = settings.useOSLogo !== undefined ? settings.useOSLogo : false;
             osLogoColorOverride = settings.osLogoColorOverride !== undefined ? settings.osLogoColorOverride : "";

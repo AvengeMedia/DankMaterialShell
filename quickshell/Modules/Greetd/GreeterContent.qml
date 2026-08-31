@@ -103,7 +103,7 @@ Item {
             return;
         if (!GreetdSettings.settingsLoaded)
             return;
-        if (!GreetdSettings.weatherEnabled)
+        if (!GreetdSettings.greeterShowWeather)
             return;
         weatherInitialized = true;
         WeatherService.addRef();
@@ -1520,13 +1520,13 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 visible: {
                     const keyboardVisible = (CompositorService.isNiri && NiriService.keyboardLayoutNames.length > 1) || (CompositorService.isHyprland && hyprlandLayoutCount > 1);
-                    return keyboardVisible && GreetdSettings.weatherEnabled && WeatherService.weather.available;
+                    return keyboardVisible && GreetdSettings.greeterShowWeather && WeatherService.weather.available;
                 }
             }
 
             Row {
                 spacing: Theme.spacingXS
-                visible: GreetdSettings.weatherEnabled && WeatherService.weather.available
+                visible: GreetdSettings.greeterShowWeather && WeatherService.weather.available
                 anchors.verticalCenter: parent.verticalCenter
 
                 DankIcon {
@@ -1550,7 +1550,7 @@ Item {
                 height: 24
                 color: Qt.rgba(255, 255, 255, 0.2)
                 anchors.verticalCenter: parent.verticalCenter
-                visible: GreetdSettings.weatherEnabled && WeatherService.weather.available && (NetworkService.networkStatus !== "disconnected" || BluetoothService.enabled || (AudioService.sink && AudioService.sink.audio) || BatteryService.batteryAvailable)
+                visible: GreetdSettings.greeterShowWeather && WeatherService.weather.available && (NetworkService.networkStatus !== "disconnected" || BluetoothService.enabled || (AudioService.sink && AudioService.sink.audio) || BatteryService.batteryAvailable)
             }
 
             Row {

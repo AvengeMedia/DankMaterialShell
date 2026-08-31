@@ -546,6 +546,7 @@ Singleton {
     property bool greeterAutoLogin: false
     property bool greeterEnableFprint: false
     property bool greeterEnableU2f: false
+    property bool greeterShowWeather: true
     property string greeterWallpaperPath: ""
     property string greeterLockDateFormat: ""
     property string greeterFontFamily: ""
@@ -921,6 +922,7 @@ Singleton {
     property bool lockScreenShowProfileImage: true
     property bool lockScreenShowPasswordField: true
     property bool lockScreenShowMediaPlayer: true
+    property bool lockScreenShowWeather: true
     property bool lockScreenPowerOffMonitorsOnLock: false
     property bool lockAtStartup: false
 

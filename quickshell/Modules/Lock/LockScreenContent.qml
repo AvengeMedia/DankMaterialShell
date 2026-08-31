@@ -1769,12 +1769,12 @@ Item {
                 height: 24
                 color: Qt.rgba(255, 255, 255, 0.2)
                 anchors.verticalCenter: parent.verticalCenter
-                visible: MprisController.activePlayer && SettingsData.lockScreenShowMediaPlayer && WeatherService.weather.available
+                visible: MprisController.activePlayer && SettingsData.lockScreenShowMediaPlayer && SettingsData.lockScreenShowWeather && WeatherService.weather.available
             }
 
             Row {
                 spacing: Theme.spacingXS
-                visible: WeatherService.weather.available
+                visible: SettingsData.lockScreenShowWeather && WeatherService.weather.available
                 anchors.verticalCenter: parent.verticalCenter
 
                 DankIcon {
@@ -1798,7 +1798,7 @@ Item {
                 height: 24
                 color: Qt.rgba(255, 255, 255, 0.2)
                 anchors.verticalCenter: parent.verticalCenter
-                visible: WeatherService.weather.available && (NetworkService.networkStatus !== "disconnected" || BluetoothService.enabled || (AudioService.sink && AudioService.sink.audio) || BatteryService.batteryAvailable)
+                visible: SettingsData.lockScreenShowWeather && WeatherService.weather.available && (NetworkService.networkStatus !== "disconnected" || BluetoothService.enabled || (AudioService.sink && AudioService.sink.audio) || BatteryService.batteryAvailable)
             }
 
             Row {

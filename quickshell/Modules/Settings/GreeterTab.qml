@@ -531,6 +531,15 @@ Item {
                     onFontSelected: family => SettingsData.set("greeterFontFamily", family)
                 }
 
+                SettingsToggleRow {
+                    settingKey: "greeterShowWeather"
+                    tags: ["greeter", "weather", "temperature", "login"]
+                    text: I18n.tr("Weather", "Enable weather display on the login screen")
+                    description: I18n.tr("Show weather on the login screen")
+                    checked: SettingsData.greeterShowWeather
+                    onToggled: checked => SettingsData.set("greeterShowWeather", checked)
+                }
+
                 StyledText {
                     text: I18n.tr("Date format on greeter")
                     font.pixelSize: Theme.fontSizeMedium
