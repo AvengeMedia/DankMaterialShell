@@ -796,6 +796,14 @@ EOFCONFIG
     }
 
     readonly property string sinkVolumeIconName: volumeIconName(sink)
+    readonly property bool sinkSilent: isSilent(sink)
+
+    function isSilent(node) {
+        const audio = node?.audio;
+        if (!audio)
+            return false;
+        return audio.muted || audio.volume === 0;
+    }
 
     function volumeIconName(node, noDeviceIcon = "volume_off") {
         const audio = node?.audio;

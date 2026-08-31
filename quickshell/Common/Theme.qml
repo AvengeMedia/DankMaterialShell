@@ -1464,6 +1464,8 @@ Singleton {
         }
     }
 
+    property color widgetInactiveIconColor: withAlpha(widgetIconColor, 0.6)
+
     property color widgetTextColor: {
         if (typeof SettingsData === "undefined") {
             return surfaceText;

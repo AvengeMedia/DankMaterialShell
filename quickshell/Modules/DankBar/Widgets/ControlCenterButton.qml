@@ -164,6 +164,12 @@ BasePill {
         return Theme.widgetIconColor;
     }
 
+    function getAudioIconColor() {
+        if (AudioService.sinkSilent)
+            return Theme.widgetInactiveIconColor;
+        return Theme.widgetIconColor;
+    }
+
     function getBrightnessIconName() {
         const deviceName = getEffectiveBrightnessDevice();
         return DisplayService.brightnessIconName(DisplayService.getCurrentDeviceInfoByName(deviceName), DisplayService.getDeviceBrightness(deviceName));
@@ -545,7 +551,7 @@ BasePill {
                             visible: verticalGroupItem.modelData.id === "audio"
                             name: AudioService.sinkVolumeIconName
                             size: root.vIconSize
-                            color: Theme.widgetIconColor
+                            color: root.getAudioIconColor()
                             anchors.horizontalCenter: parent.horizontalCenter
                             anchors.top: parent.top
                         }
@@ -745,7 +751,7 @@ BasePill {
                                     id: audioIcon
                                     name: AudioService.sinkVolumeIconName
                                     size: root.getControlCenterIconSize()
-                                    color: Theme.widgetIconColor
+                                    color: root.getAudioIconColor()
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
 
