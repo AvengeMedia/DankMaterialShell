@@ -536,10 +536,12 @@ BasePill {
     }
 
     onMenuOpenChanged: {
-        if (root.menuOpen && root.parentScreen) {
+        if (!root.useOverflowPopup || !root.parentScreen)
+            return;
+        if (root.menuOpen) {
             trayMenuState.close();
             TrayMenuManager.registerMenu(root.parentScreen.name, overflowPopout);
-        } else if (!root.menuOpen && root.parentScreen) {
+        } else {
             root._unregisterMenuIfMatches(overflowPopout);
             overflowPopout.close();
         }
