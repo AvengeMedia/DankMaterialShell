@@ -11,6 +11,7 @@ Item {
     property bool showKeyboardHints: false
     property string activeTab: "recents"
     property int pinnedCount: 0
+    property bool clearsFilteredOnly: false
 
     signal keyboardHintsToggled
     signal clearAllClicked
@@ -67,7 +68,7 @@ Item {
             iconName: "delete_sweep"
             iconSize: Theme.iconSize
             iconColor: Theme.surfaceText
-            tooltipText: I18n.tr("Clear All")
+            tooltipText: header.clearsFilteredOnly ? I18n.tr("Clear Filtered", "clipboard modal: clear button tooltip while a search filter is active") : I18n.tr("Clear All")
             onClicked: clearAllClicked()
         }
 

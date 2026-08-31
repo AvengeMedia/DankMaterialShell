@@ -95,6 +95,7 @@ Item {
             showKeyboardHints: modal.showKeyboardHints
             activeTab: modal.activeTab
             pinnedCount: modal.pinnedCount
+            clearsFilteredOnly: modal.clearsFilteredOnly
             onKeyboardHintsToggled: modal.showKeyboardHints = !modal.showKeyboardHints
             onTabChanged: tabName => modal.activeTab = tabName
             onClearAllClicked: modal.confirmClearAll()

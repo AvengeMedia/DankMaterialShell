@@ -27,6 +27,7 @@ Singleton {
     property int totalCount: 0
     property string searchText: ""
     property string activeFilter: "all"
+    readonly property bool filterActive: searchText.trim().length > 0 || activeFilter !== "all"
     property int selectedIndex: 0
     property bool keyboardNavigationActive: false
     property int refCount: 0
@@ -344,6 +345,23 @@ Singleton {
             if (hasPinned) {
                 ToastService.showInfo(I18n.tr("History cleared. %1 pinned entries kept.").arg(savedCount));
             }
+        });
+    }
+
+    function clearFiltered() {
+        const ids = unpinnedEntries.map(entry => entry.id);
+        if (ids.length === 0) {
+            return;
+        }
+        DMSService.sendRequest("clipboard.deleteEntries", {
+            "ids": ids
+        }, function (response) {
+            if (response.error) {
+                log.warn("Failed to clear filtered entries:", response.error);
+                return;
+            }
+            refresh();
+            historyCleared();
         });
     }
 
